@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils";
-import { convertirGenero } from "../../utils/helpers";
+import { convertirGenero, getSign } from "../../utils/helpers";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
@@ -38,7 +38,8 @@ export default function Hoja_Consulta_Externa(data = {}) {
     numeroFicha: String(data.norden),
     sede: data.sede || data.nombreSede,
     horaSalida: String(data.horaSalida),
-    direccionPaciente: String(data.direccionPaciente)
+    direccionPaciente: String(data.direccionPaciente),
+    digitalizacion: data.digitalizacion || [],
   };
 
   // Usar solo datos reales
@@ -374,7 +375,7 @@ export default function Hoja_Consulta_Externa(data = {}) {
   
   // DIBUJAR EL TEXTO DE OBSERVACIONES INMEDIATAMENTE DESPUÉS DE DIBUJAR LA FILA
   const yObservaciones = yPos + 2.5; // Después del header de observaciones + margen
-  doc.setFont("helvetica", "normal").setFontSize(7.5);
+  doc.setFont("helvetica", "normal").setFontSize(6.5);
   dibujarTextoConSaltosLinea(datosFinales.observaciones, tablaInicioX + 2, yObservaciones + 1, 160);
   
   yPos += alturaFilaFinal;
@@ -502,6 +503,44 @@ export default function Hoja_Consulta_Externa(data = {}) {
     yTexto += filaAltura; // Incrementar para mantener consistencia
   }
 
+  let firmaTrabajadorUrl = getSign(datosFinales, "FIRMAP");
+  if (firmaTrabajadorUrl) {
+    try {
+      const imgWidth = 30;
+      const imgHeight = 20;
+      const x = 140;
+      const y = 220;
+      doc.addImage(firmaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando firma del trabajador:", error);
+    }
+  }
+
+  let huellaTrabajadorUrl = getSign(datosFinales, "HUELLA");
+  if (huellaTrabajadorUrl) {
+    try {
+      const imgWidth = 12;
+      const imgHeight = 20;
+      const x = 180;
+      const y = 220;
+      doc.addImage(huellaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando huella del trabajador:", error);
+    }
+  }
+
+  let firmaMedicoUrl = getSign(datosFinales, "SELLOFIRMA");
+  if (firmaMedicoUrl) {
+    try {
+      const imgWidth = 45;
+      const imgHeight = 20;
+      const x = 135;
+      const y = 246;
+      doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando firma del médico:", error);
+    }
+  }
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8});
 

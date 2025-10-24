@@ -1,390 +1,31 @@
 import jsPDF from "jspdf";
-import headerAnexo16Boroo from "./Headers/Header_Anexo16_Boroo.jsx";
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
+import { getSign } from "../../utils/helpers.js";
+import drawColorBox from '../components/ColorBox.jsx';
+import CabeceraLogo from '../components/CabeceraLogo.jsx';
+import footerTR from '../components/footerTR.jsx';
 
-export default function Anexo16Boroo(data = {}) {
+export default function Anexo7C_Boro(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-  const margin = 0; // Sin márgenes
   const pageW = doc.internal.pageSize.getWidth();
-  const pageH = doc.internal.pageSize.getHeight();
 
-  // === PÁGINA 1 ===
-  // === 0) HEADER ===
-  headerAnexo16Boroo(doc, data, 1);
+  // Contador de páginas dinámico
+  let numeroPagina = 1;
 
-  // === 1) Imagen de fondo para Anexo16 Boroo - Página 1 ===
-  const fondoImg = "/img/Anexo16/Anexo16_Boroo_Pag1.png";
-
-  // Márgenes de 6mm a cada lado (consistente con Anexo16 normal)
-  const margenLateral = 6; // 6mm
-
-  // Usar el ancho del documento menos los márgenes laterales
-  const imgWidth = pageW - (margenLateral * 2); // Ancho menos márgenes
-  const imgHeight = pageH * 0.85; // 85% de la altura para dejar espacio para ajustar
-
-  // Posicionar desde abajo hacia arriba con márgenes laterales
-  const xOffset = margenLateral; // Margen izquierdo
-  const yOffset = pageH - imgHeight - 8; // Subido 8 puntos hacia arriba
-
-  try {
-    doc.addImage(fondoImg, "PNG", xOffset, yOffset, imgWidth, imgHeight);
-  } catch (e) {
-    doc.text("Imagen de Anexo16 Boroo Página 1 no disponible", margin, yOffset + 10);
-  }
-
-  // === 2) CAMPOS DE DATOS PERSONALIZABLES PARA PÁGINA 1 ===
-
-  // Datos de prueba para Anexo16 Boroo
-  const datosPrueba = {
-    fechaExamen: "15/08/2025",
-    mineralesExplotados: "Oro, Plata, Cobre",
-    lugarFechaNacimiento: "Trujillo, 15/03/1985",
-    domicilioHabitual: "Av. Principal 123, Urbanización Los Olivos, Trujillo",
-    tipoTrabajo: {
-      superficie: true,    // No marcado
-      concentrador: true,   // Marcado (como en la imagen)
-      subsuelo: true      // No marcado
-    },
-    alturaLabor: {
-      debajo2500: true,
-      rango2501_4000: true,
-      rango2501_3000: true,
-      rango4001_4500: true,
-      rango2001_3500: true,
-      mas4501: true  // Solo marcar uno según la respuesta
-    },
-    // Datos personales
-    datosPersonales: {
-      edad: "38",
-      sexo: {
-        masculino: true,   // M marcado
-        femenino: true    // F no marcado
-      },
-      dni: "12345678",
-      telefono: "987654321",
-      estadoCivil: {
-        soltero: true,
-        casado: true,      // Casado marcado
-        conviviente: true,
-        viudo: true,
-        divorciado: true
-      },
-      gradoInstruccion: {
-        analfabeto: true,
-        primariaCompleta: true,
-        primariaIncompleta: true,
-        secundariaCompleta: true,  // Sec.Com marcado
-        secundariaIncompleta: true,
-        universidad: true,
-        tecnico: true
-      }
-    },
-    // Factores de riesgo ocupacional
-    factoresRiesgo: {
-      // Primera columna
-      ruido: true,
-      polvo: true,
-      vibSegmentario: true,
-      vibTotal: true,
-      // Segunda columna
-      cancerigenos: true,
-      mutagenicos: true,
-      solventes: true,
-      metales: true,
-      // Tercera columna
-      temperatura: true,
-      biologicos: true,
-      posturas: true,
-      turnos: true,
-      // Cuarta columna
-      carga: true,
-      movRepet: true,
-      pvd: true,
-      otros: true
-    },
-    // Información del puesto
-    informacionPuesto: {
-      puestoPostula: "Operador de Maquinaria Pesada",
-      puestoActual: "Asistente de Operaciones",
-      tiempo: "2 años",
-      reubicacion: {
-        si: true,
-        no: true  // NO marcado
-      }
-    },
-    // Antecedentes médicos
-    antecedentesMedicos: {
-      personales: "Hipertensión arterial desde 2020. Accidente laboral en 2019 con fractura de brazo derecho.",
-      familiares: "Padre con diabetes tipo 2. Madre con hipertensión arterial."
-    },
-    // Inmunizaciones
-    inmunizaciones: {
-      tetano: true,
-      hepatitisB: true,
-      fiebreAmarilla: true
-    },
-    // Número de hijos
-    numeroHijos: {
-      vivos: "2",
-      muertos: "0"
-    },
-    // Hábitos
-    habitos: {
-      tabaco: {
-        nada: true,
-        poco: true,
-        habitual: true,
-        excesivo: true
-      },
-      alcohol: {
-        nada: true,
-        poco: true,
-        habitual: true,
-        excesivo: true
-      },
-      drogas: {
-        nada: true,
-        poco: true,
-        habitual: true,
-        excesivo: true
-      }
-    },
-    // Medidas corporales
-    medidasCorporales: {
-      talla: "175",
-      peso: "78",
-      imc: "25.4",
-      cintura: "85",
-      cadera: "95",
-      icc: "0.89"
-    },
-    // Función respiratoria
-    funcionRespiratoria: {
-      fvc: "4.2",
-      fev1: "3.5",
-      fev1Fvc: "83.3",
-      fef2575: "3.1",
-      conclusion: "Función pulmonar normal"
-    },
-    // Temperatura
-    temperatura: "36.5",
-    // Evaluación física
-    evaluacionFisica: {
-      cabeza: "NORMAL, SIN ALTERACIONES VISIBLES",
-      perimetroCuello: "38.5",
-      bocaAmigdalas: "MUCOSA ORAL NORMAL, AMÍGDALAS SIN ALTERACIONES",
-      cuello: "NORMAL, SIN ADENOPATÍAS",
-      nariz: "NORMAL, SIN OBSTRUCCIONES",
-      dentadura: {
-        piezasMalEstado: "1",
-        piezasFaltantes: "2"
-      }
-    },
-    // Evaluación oftalmológica
-    evaluacionOftalmologica: {
-      vision: {
-        cerca: {
-          sinCorregir: {
-            od: "20/20",  // Ojo derecho
-            oi: "20/25"   // Ojo izquierdo
-          },
-          corregida: {
-            od: "20/20",
-            oi: "20/20"
-          }
-        },
-        lejos: {
-          sinCorregir: {
-            od: "20/30",
-            oi: "20/40"
-          },
-          corregida: {
-            od: "20/20",
-            oi: "20/20"
-          }
-        }
-      },
-      enfermedadesOculares: "NINGUNA",
-      reflejosPupilares: "NORMALES, ISOCÓRICAS, FOTORREACTIVAS",
-      testIshihara: "NORMAL",
-      testColoresPuros: "NORMAL",
-      testProfundidad: "NORMAL"
-    },
-    // Evaluación de oídos
-    evaluacionOidos: {
-      audiometria: {
-        oidoDerecho: {
-          frecuencia500: "20",
-          frecuencia1000: "15",
-          frecuencia2000: "20",
-          frecuencia3000: "25",
-          frecuencia4000: "10",
-          frecuencia5000: "5",
-          frecuencia8000: "10"
-        },
-        oidoIzquierdo: {
-          frecuencia500: "10",
-          frecuencia1000: "5",
-          frecuencia2000: "10",
-          frecuencia3000: "15",
-          frecuencia4000: "10",
-          frecuencia5000: "10",
-          frecuencia8000: "5"
-        }
-      },
-      otoscopia: {
-        oidoDerecho: "NORMAL",
-        oidoIzquierdo: "NORMAL"
-      }
-    },
-    // Cardiovascular
-    cardiovascular: "CONSERVADO",
-    // Signos vitales
-    signosVitales: {
-      frecuenciaRespiratoria: "18",
-      frecuenciaCardiaca: "72",
-      saturacionOxigeno: "98",
-      presionArterial: {
-        sistolica: "120",
-        diastolica: "80"
-      }
-    },
-    // Evaluación física adicional
-    evaluacionFisicaAdicional: {
-      pulmones: {
-        normal: true,
-        anormal: true,
-        descripcion: "AUSCULTACIÓN PULMONAR NORMAL, SIN SIBILANCIAS NI RONCUS"
-      },
-      piel: {
-        normal: true,
-        anormal: true,
-        descripcion: "PIEL NORMAL, SIN ALTERACIONES"
-      },
-      miembrosSuperiores: "MOVILIDAD COMPLETA, FUERZA MUSCULAR NORMAL, SIN DEFORMIDADES",
-      miembrosInferiores: "MARCHA NORMAL, FUERZA MUSCULAR ADECUADA, SIN EDEMAS"
-    },
-    // Página 2 - Evaluación neurológica y física
-    evaluacionNeurologica: {
-      reflejosOsteotendinosos: "CONSERVADOS",
-      marcha: "NORMAL"
-    },
-    // Evaluación de columna y abdomen
-    evaluacionColumnaAbdomen: {
-      columnaVertebral: "CENTRAL, MÓVIL, CURVATURAS CONSERVADAS",
-      abdomen: "RHA(+), B/D, NO DOLOROSO A LA PALPACIÓN",
-      anillosInguinales: "CONSERVADOS",
-      organosGenitales: "DE CARÁCTER NORMAL"
-    },
-    // Evaluación rectal y hernias
-    evaluacionRectalHernias: {
-      tactoRectal: {
-        noSeHizo: true,
-        anormal: true,
-        normal: true
-      },
-      hernias: "NO",
-      varices: "NO",
-      gangliosLinfaticos: "NO LINFADENOPATÍAS"
-    },
-    // Evaluación mental
-    evaluacionMental: {
-      lenguajeAtencionMemoria: "NORMAL",
-      anamnesis: "COLABORADOR REFIERE SENTIRSE BIEN, SIN PROBLEMAS DE SALUD",
-      estadoMental: "DESPIERTO, OTEP, COMUNICATIVO"
-    },
-    // Radiografía de tórax
-    radiografiaTorax: {
-      numeroRx: "96639",
-      fecha: "28/05/2025",
-      calidad: "2",
-      simbolos: "N/A",
-      vertices: "TEXTO MAS LARGO PRUEBA",
-      hilios: "TEXTO MAS LARGO PRUEBA",
-      senos: "TEXTO MAS LARGO PRUEBA",
-      mediastinos: "NORMALES",
-      conclusionesRadiograficas: "TRAMA BRONCOVASCULAR",
-      siluetaCardiovascular: "NORMAL"
-    },
-    // Textos de Neumoconiosis
-    textoNeumoconiosis1: "Texto de prueba 1 largo para ver como se ve",
-    textoNeumoconiosis2: "Texto de prueba 2 largo para ver como se ve",
-    textoNeumoconiosis3: "Texto de prueba 3 largo para ver como se ve",
-    // Reacciones serológicas
-    reaccionesSerologicas: {
-      titulacion: "0/0" // Primera opción marcada
-    },
-    // Reacciones serológicas LUES
-    reaccionesSerologicasLues: {
-      positivo: true,
-      negativo: true
-    },
-    // Grupo sanguíneo
-    grupoSanguineo: {
-      grupo: {
-        o: true,
-        a: true,
-        b: true,
-        ab: true
-      },
-      factorRh: {
-        positivo: true,
-        negativo: true
-      }
-    },
-    // Hemoglobina/Hematocrito
-    hemoglobinaHematocrito: "13 gr. %",
-    // Otros exámenes
-    otrosExamenes: "Examen de orina: NORMAL. Hemograma: NORMAL. Glicemia: 85 mg/dl.",
-    // Apto para trabajar
-    aptoParaTrabajar: {
-      si: true,
-      no: true,
-    },
-    // Revaluación de empresa
-    revaluacionEmpresa: true,
-    // Documento de identidad
-    docIdentidad: "76543210",
-    // Exámenes de laboratorio
-    examenesLaboratorio: {
-      // Hemograma Completo
-      vsg: "15",
-      glucosa: "85",
-      urea: "25",
-      creatinina: "0.9",
-      // Perfil Lipídico Completo
-      ldl: "110",
-      hdl: "45",
-      vldl: "25",
-      trigliceridos: "150",
-      colesterolTotal: "180",
-      // Examen Completo de Orina
-      cocainaOrina: "NEGATIVO",
-      marihuanaOrina: "NEGATIVO",
-      mercurioOrina: "NORMAL",
-      plomoOrina: "NORMAL"
-    },
-    // Conclusiones y Recomendaciones/Restricciones (Página 2)
-    conclusiones: "EVALUACIÓN CLÍNICA DENTRO DE PARÁMETROS NORMALES.",
-    recomendacionesRestricciones: "MANTENER HÁBITOS SALUDABLES. CONTROL MÉDICO ANUAL.",
-    // Observaciones
-    observaciones: [
-      "1-ELECTROCARDIOGRAMA: BRADICARDIA SINUSAL ASINTOMATICA. DESVIACION IZQUIERDA DEL EJE CARDIACO. DESVIACION DERECHA DEL EJE CARDIACO. DESVIACION IZQUIERDA DEL EJE CARDIACO. .- EVALUACION ANUAL.",
-      "2-ELECTROCARDIOGRAMA PODEROSA: .- EVALUACION ANUAL. - EVALUACION EN 6 MESES.",
-      "3-TRAMA BRONCOVASCULAR ACENTUADA EN ACP.",
-      "4-TRAMA BRONCOVASCULAR ACENTUADA EN ACP.",
-      "5- EVALUACION POR NEUMOLOGIA",
-      "6-7-- USO DE LENTES CORRECTORES.",
-      "8-AMETROPIA LEVE BILATERAL- DISCROMATOPSIA. - PTERIGIÓN BILATERAL.",
-      "9-- DISCROMATOPSIA. - PTERIGIÓN BILATERAL.:EVALUACION POR OFTALMOLOGIA.",
-      "10-ODONTOGRAMA : NO PASO EXAMEN ODONTOLOGICO",
-      "AUDIOMETRIA - NORMAL - NORMAL .EVALUACION ANUAL",
-      "11-ELECTROCARDIOGRAMA: BRADICARDIA SINUSAL ASINTOMATICA. DESVIACION IZQUIERDA DEL EJE CARDIACO. DESVIACION DERECHA DEL EJE CARDIACO. DESVIACION IZQUIERDA DEL EJE CARDIACO. - EVALUACION ANUAL.",
-      "12-ELECTROCARDIOGRAMA PODEROSA: .- EVALUACION ANUAL. - EVALUACION EN 6 MESES.",
-      "1-ELECTROCARDIOGRAMA: - EVALUACION ANUAL."
-    ]
-  };
   const datosReales = {
+    // Datos básicos para header
+    apellidosNombres: String(data.nombres_nombres ?? "").trim(),
+    numeroFicha: String(data.norden_n_orden ?? ""),
+    sede: data.sede || data.nombreSede || "",
+    direccionPaciente: String(data.direccionPaciente_direccion ?? ""),
+    departamento: data.departamentoPaciente || "",
+    provincia: data.provinciaPaciente || "",
+    distrito: data.distritoPaciente || "",
+    color: data.color,
+    codigoColor: data.codigoColor,
+    textoColor: data.textoColor,
+    
+    // Mapeo completo desde Anexo7C_Boro.jsx
     fechaExamen: formatearFechaCorta(data.fechaAnexo7c_fecha ?? ""),
     mineralesExplotados: data.mineral_mineral_po ?? "",
     lugarFechaNacimiento: `${data.lugarNacimientoPaciente_lugar_nac_pa ?? ""}\n${formatearFechaCorta(data.fechaNacimientoPaciente_fecha_nacimiento_pa ?? "")}`,
@@ -411,22 +52,8 @@ export default function Anexo16Boroo(data = {}) {
       },
       dni: String(data.dni_cod_pa ?? ""),
       telefono: data.celularPaciente_cel_pa ?? "",
-      estadoCivil: {
-        soltero: data.estadoCivilPaciente_estado_civil_pa === "SOLTERO" ?? false,
-        casado: data.estadoCivilPaciente_estado_civil_pa === "CASADO" ?? false,
-        conviviente: data.estadoCivilPaciente_estado_civil_pa === "CONVIVIENTE" ?? false,
-        viudo: data.estadoCivilPaciente_estado_civil_pa === "VIUDO" ?? false,
-        divorciado: data.estadoCivilPaciente_estado_civil_pa === "DIVORCIADO" ?? false
-      },
-      gradoInstruccion: {
-        analfabeto: data.nivelEstudioPaciente_nivel_est_pa === "ANALFABETO" ?? false,
-        primariaCompleta: data.nivelEstudioPaciente_nivel_est_pa === "PRIMARIA COMPLETA" ?? false,
-        primariaIncompleta: data.nivelEstudioPaciente_nivel_est_pa === "PRIMARIA INCOMPLETA" ?? false,
-        secundariaCompleta: data.nivelEstudioPaciente_nivel_est_pa === "SECUNDARIA COMPLETA" ?? false,
-        secundariaIncompleta: data.nivelEstudioPaciente_nivel_est_pa === "SECUNDARIA INCOMPLETA" ?? false,
-        universidad: data.nivelEstudioPaciente_nivel_est_pa === "UNIVERSITARIO" ?? false,
-        tecnico: data.nivelEstudioPaciente_nivel_est_pa === "TECNICO" ?? false,
-      }
+      estadoCivil: data.estadoCivilPaciente_estado_civil_pa ?? "",
+      gradoInstruccion: data.nivelEstudioPaciente_nivel_est_pa ?? ""
     },
     // Factores de riesgo ocupacional
     factoresRiesgo: {
@@ -655,10 +282,26 @@ export default function Anexo16Boroo(data = {}) {
       conclusionesRadiograficas: data.conclusionesRadiograficas_txtconclusionesradiograficas ?? "",
       siluetaCardiovascular: data.siluetaCardioVascular_txtsiluetacardiovascular ?? ""
     },
+    // Campos adicionales para las secciones de radiografía
+    nroRx: String(data.nrx_n_rx ?? ""),
+    fechaRx: formatearFechaCorta(data.fechaExamenRadiografico_fecha_exra ?? ""),
+    calidadRx: data.calidadExamenRadiografico_txtcalidad ?? "",
+    simbolosRx: data.simbolosExamenRadiografico_txtsimbolos ?? "",
+    vertices: data.verticesRadiografiaTorax_txtvertices ?? "",
+    mediastinos: data.meadiastinos_txtmediastinos ?? "",
+    helios: data.hilosRadiografiaTorax_txthilios ?? "",
+    senos: data.senosCostoFrenicos_txtsenoscostofrenicos ?? "",
+    siluetaCardiovascular: data.siluetaCardioVascular_txtsiluetacardiovascular ?? "",
+    conclusionesRadiograficas: data.conclusionesRadiograficas_txtconclusionesradiograficas ?? "",
     // Textos de Neumoconiosis
     textoNeumoconiosis1: data.examenRadiograficoSinNeumoconiosis_txtsinneumoconiosis ?? "",
     textoNeumoconiosis2: data.examenRadiograficoIrep_txtirep ?? "",
     textoNeumoconiosis3: data.examenRadiograficoConNeumoconiosis_txtconneumoconiosis ?? "",
+    // Otros hallazgos radiográficos
+    sinNeumoconiosis: data.examenRadiograficoSinNeumoconiosis_txtsinneumoconiosis ?? "",
+    imagenRadiograficaExposicionPolvo: data.examenRadiograficoIrep_txtirep ?? "",
+    conNeumoconiosis: data.examenRadiograficoConNeumoconiosis_txtconneumoconiosis ?? "",
+    reaccionesSerologicasLues: data.negativoLaboratorioClinico_chknegativo ? "NEGATIVO" : "",
     // Reacciones serológicas
     reaccionesSerologicas: {
       titulacion: "",
@@ -676,10 +319,7 @@ export default function Anexo16Boroo(data = {}) {
       titulacion_st: data.examenRadiograficoSt_ex_st ?? false,
     },
     // Reacciones serológicas LUES
-    reaccionesSerologicasLues: {
-      positivo: data.positivoLaboratorioClinico_chkpositivo ?? false,
-      negativo: data.negativoLaboratorioClinico_chknegativo ?? false
-    },
+    // reaccionesSerologicasLues ya definido arriba
     // Grupo sanguíneo
     grupoSanguineo: {
       grupo: {
@@ -731,1487 +371,2685 @@ export default function Anexo16Boroo(data = {}) {
     // Observaciones
     observaciones: data.observacionesFichaMedicaAnexo7c_txtobservacionesfm
       ? data.observacionesFichaMedicaAnexo7c_txtobservacionesfm.split('\n').filter(obs => obs.trim() !== '')
-      : []
+      : [],
+    
+    // Campos adicionales para compatibilidad con el nuevo formato
+    // Signos vitales (formato simple para compatibilidad)
+    fRespiratoria: data.frecuenciaRespiratoriaTriaje_f_respiratoria ?? "",
+    fCardiaca: data.frecuenciaCardiacaTriaje_f_cardiaca ?? "",
+    satO2: data.saturacionOxigenoTriaje_sat_02 ?? "",
+    presionSistolica: data.sistolicaTriaje_sistolica ?? "",
+    presionDiastolica: data.diastolicaTriaje_diastolica ?? "",
+    
+    // Neumoconiosis (formato simple para compatibilidad)
+    neumoconiosisCategoria: data.examenRadiografico0_ex_0 ? "0/0" :
+                            data.examenRadiografico10_ex_10 ? "1/0" :
+                            data.examenRadiografico11_ex_11 ? "1/1" :
+                            data.examenRadiografico12_ex_12 ? "1/2" :
+                            data.examenRadiografico21_ex_21 ? "2/1" :
+                            data.examenRadiografico22_ex_22 ? "2/2" :
+                            data.examenRadiografico23_ex_23 ? "2/3" :
+                            data.examenRadiografico32_ex_32 ? "3/2" :
+                            data.examenRadiografico33_ex_33 ? "3/3" :
+                            data.examenRadiografico3mas_ex_3mas ? "3/+" :
+                            data.examenRadiograficoAbc_ex_abc ? "A" :
+                            data.examenRadiograficoSt_ex_st ? "ST" : "",
+    
+    // Textos de Neumoconiosis (formato simple para compatibilidad)
+    // sinNeumoconiosis, imagenRadiograficaExposicionPolvo, conNeumoconiosis ya definidos arriba
+    
+    // Campos adicionales para compatibilidad con el nuevo formato (formato simple)
+    vsgSimple: data.vsgLaboratorioClinico_txtvsg ?? "",
+    glucosaSimple: data.glucosaLaboratorioClinico_txtglucosabio ?? "",
+    ureaSimple: "N/A", //revisar - no hay campo específico en JSON
+    creatininaSimple: data.creatininaLaboratorioClinico_txtcreatininabio ?? "",
+    ldlSimple: data.ldlcolesterolAnalisisBioquimico_txtldlcolesterol ?? "",
+    hdlSimple: data.hdlcolesterolAnalisisBioquimico_txthdlcolesterol ?? "",
+    vldlSimple: data.vldlcolesterolAnalisisBioquimico_txtvldlcolesterol ?? "",
+    trigliceridosSimple: data.trigliceridosAnalisisBioquimico_txttrigliceridos ?? "",
+    colesterolTotalSimple: data.colesterolAnalisisBioquimico_txtcolesterol ?? "",
+    cocainaSimple: data.cocainaLaboratorioClinico_txtcocaina ?? "",
+    marihuanaSimple: data.marihuanaLaboratorioClinico_txtmarihuana ?? "",
+    mercurioSimple: "N/A", //revisar - no hay campo específico en JSON
+    plomoSimple: "N/A", //revisar - no hay campo específico en JSON
+    grupoSanguineoSimple: data.grupoSanguineoO_chko ? "O" :
+                    data.grupoSanguineoA_chka ? "A" :
+                    data.grupoSanguineoB_chkb ? "B" :
+                    data.grupoSanguineoAB_chkab ? "AB" : "",
+    factorRhSimple: data.grupoSanguineoRhPositivo_rbrhpositivo ? "POSITIVO" :
+              data.grupoSanguineoRhNegativo_rbrhnegativo ? "NEGATIVO" : "",
+    hemoglobinaHematocritoSimple: data.hemoglobina_txthemoglobina ?? "",
+    aptoParaTrabajarSimple: data.examenRadiograficoAptoSi_apto_si ? "SI" :
+                      data.examenRadiograficoAptoNo_apto_no ? "NO" : "",
+    otrosExamenesSimple: data.examenRadiograficoOtros_txtotrosex ?? "",
+    conclusionesSimple: data.observacionesFichaMedicaAnexo7c_txtobservacionesfm ?? "",
+    recomendacionesRestriccionesSimple: data.conclusionMedicoAnexo7c_txtconclusionmed ?? "",
+    
+    // Campos adicionales para compatibilidad con el PDF
+    tipoExamen: String(data.nombreExamen_nom_examen ?? ""),
+    documentoIdentidad: String(data.dni_cod_pa ?? ""),
+    edad: String(data.edad_edad ?? ""),
+    fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente_fecha_nacimiento_pa ?? ""),
+    areaTrabajo: data.areaPaciente || "",
+    puestoTrabajo: data.cargo_cargo_de || "",
+    empresa: data.empresa_razon_empresa || "",
+    contrata: data.contrata_razon_contrata || "",
+    estadoCivil: data.estadoCivilPaciente_estado_civil_pa || "",
+    gradoEstudios: data.nivelEstudioPaciente_nivel_est_pa || "",
+    sexo: data.sexo_sexo_pa === "M" ? "MASCULINO" : data.sexo_sexo_pa === "F" ? "FEMENINO" : "",
+    antecedentesPersonales: data.antecedentesPersonalesAnexo7c_txtantecedentespersonales || "",
+    antecedentesFamiliares: data.antecedentesFamiliaresAnexo7c_txtantecedentesfamiliares || "",
+    numeroHijosVivos: data.hijosVivosAnexo7c_txthijosvivos || "",
+    numeroHijosMuertos: data.hijosMuertosAnexo7c || "",
+    fvc: data.fvcFuncionRespiratoria_fvc || "",
+    fev1fvc: data.fev1FvcFuncionRespiratoria_fev1fvc || "",
+    fev1: data.fev1FuncionRespiratoria_fev1 || "",
+    fef: data.fef2575FuncionRespiratoria_fef25_75 || "",
+    conclusionEspirometria: data.conclusionAnexo7c_txtconclusion || "",
+    temp: data.temperaturaTriaje_temperatura || "",
+    talla: data.tallaTriaje_talla || "",
+    peso: data.pesoTriaje_peso || "",
+    cintura: data.cinturaTriaje_cintura || "",
+    cadera: data.caderaTriaje_cadera || "",
+    icc: data.iccTriaje_icc || "",
+    imc: data.imcTriaje_imc || "",
+    cabeza: data.cabezaAnexo7c_txtcabeza || "",
+    perimetroCuello: data.perimetroCuelloTriaje_perimetro_cuello || "",
+    cuello: data.cuelloAnexo7c_txtcuello || "",
+    nariz: data.narizAnexo7c_txtnariz || "",
+    boca: data.baflAnexo7c_txtb_a_f_l || "",
+    amigdalas: data.baflAnexo7c_txtb_a_f_l || "",
+    faringe: data.baflAnexo7c_txtb_a_f_l || "",
+    laringe: data.baflAnexo7c_txtb_a_f_l || "",
+    dentadura: "Evaluación dental",
+    piezasMalEstado: String(data.piezasMalEstadoOdontograma_txtpiezasmalestado ?? ""),
+    piezasFaltantes: String(data.ausentesOdontograma_txtausentes ?? ""),
   };
 
-  // Usar datos de prueba por ahora
-  const datosFinales = data && data.norden_n_orden ? datosReales : datosPrueba;
+  // Usar solo datos reales
+  const datosFinales = datosReales;
 
+  // Header reutilizable
+  const drawHeader = (pageNumber) => {
+    // Logo y membrete
+    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
-  // === SECCIÓN: FECHA DEL EXAMEN Y MINERALES ===
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.setTextColor(0, 0, 0);
-
-  // Fecha del Examen (izquierda)
-  const xFechaExamen = 40;
-  const yFechaExamen = 40.2;
-  if (datosFinales.fechaExamen) {
-    doc.text(datosFinales.fechaExamen.toUpperCase(), xFechaExamen, yFechaExamen);
-  }
-
-  // Minerales Explotados (derecha)
-  const xMinerales = 140;
-  const yMinerales = 40.2;
-  if (datosFinales.mineralesExplotados) {
-    doc.text(datosFinales.mineralesExplotados.toUpperCase(), xMinerales, yMinerales);
-  }
-
-  // === SECCIÓN: COLUMNAS PRINCIPALES ===
-
-  // Columna 1: LUGAR Y FECHA DE NACIMIENTO
-  const xLugarNacimiento = 15;
-  const yLugarNacimiento = 50;
-  if (datosFinales.lugarFechaNacimiento) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(datosFinales.lugarFechaNacimiento.toUpperCase(), xLugarNacimiento, yLugarNacimiento, { maxWidth: 40 });
-  }
-
-  // Columna 2: DOMICILIO HABITUAL
-  const xDomicilio = 57;
-  const yDomicilio = 50;
-  if (datosFinales.domicilioHabitual) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(datosFinales.domicilioHabitual.toUpperCase(), xDomicilio, yDomicilio, { maxWidth: 35 });
-  }
-
-  // Columna 3: TIPO DE TRABAJO - Checkboxes (SUPERFICIE, CONCENTRADOR, SUBSUELO)
-  const tipoTrabajoPosiciones = [
-    { tipo: "superficie", x: 128, y: 47, texto: "SUPERFICIE" },
-    { tipo: "concentrador", x: 128, y: 54, texto: "CONCENTRADOR" },
-    { tipo: "subsuelo", x: 128, y: 61, texto: "SUBSUELO" }
-  ];
-
-  if (datosFinales.tipoTrabajo) {
-    doc.setTextColor(0, 0, 255); // Color azul para las X
-    doc.setFont("helvetica", "bold").setFontSize(12);
-
-    tipoTrabajoPosiciones.forEach(pos => {
-      if (datosFinales.tipoTrabajo[pos.tipo]) {
-        doc.text("X", pos.x, pos.y);
-      }
-    });
-
-    doc.setTextColor(0, 0, 0); // Resetear a negro
-  }
-
-  // Columna 4: ALTURA DE LA LABOR (MSNM) - Checkboxes
-  const alturaPosiciones = [
-    { rango: "debajo2500", x: 162, y: 50.2, texto: "Debajo 2500" },
-    { rango: "rango2501_4000", x: 192, y: 50.2, texto: "2501 a 4000" },
-    { rango: "rango2501_3000", x: 162, y: 55.7, texto: "2501 a 3000" },
-    { rango: "rango4001_4500", x: 192, y: 55.7, texto: "4001 a 4500" },
-    { rango: "rango2001_3500", x: 162, y: 61.2, texto: "2001 a 3500" },
-    { rango: "mas4501", x: 192, y: 61.2, texto: "Más de 4501" }
-  ];
-
-  if (datosFinales.alturaLabor) {
-    doc.setTextColor(0, 0, 255); // Color azul para las X
-    doc.setFont("helvetica", "bold").setFontSize(12);
-
-    alturaPosiciones.forEach(pos => {
-      if (datosFinales.alturaLabor[pos.rango]) {
-        doc.text("X", pos.x, pos.y);
-      }
-    });
-
-    doc.setTextColor(0, 0, 0); // Resetear a negro
-  }
-
-  // === SECCIÓN: DATOS PERSONALES ===
-  // EDAD
-  const xEdad = 11;
-  const yEdad = 74;
-  if (datosFinales.datosPersonales && datosFinales.datosPersonales.edad) {
-    doc.setFont("helvetica", "normal").setFontSize(10);
+    // Título principal (solo en página 1)
+    // Título en todas las páginas
+    doc.setFont("helvetica", "bold").setFontSize(13);
     doc.setTextColor(0, 0, 0);
-    // Número de edad centrado
-    doc.text(datosFinales.datosPersonales.edad, xEdad, yEdad, { align: 'center' });
+    doc.text("ANEXO 16", pageW / 2, 28, { align: "center" });
+    doc.text("FICHA MEDICA Ocupacional", pageW / 2, 32, { align: "center" });
 
-    // "Años" centrado abajo
+    // Número de Ficha y Página (alineación automática mejorada)
     doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text("Años", xEdad, yEdad + 3, { align: 'center' });
-  }
+    doc.text("Nro de ficha: ", pageW - 80, 15);
 
-  // SEXO - Checkboxes
-  const sexoPosiciones = [
-    { tipo: "masculino", x: 28.3, y: 74, texto: "M" },
-    { tipo: "femenino", x: 28.3, y: 79.8, texto: "F" }
-  ];
+    doc.setFont("helvetica", "normal").setFontSize(18);
+    doc.text(datosFinales.numeroFicha, pageW - 60, 16);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Sede: " + datosFinales.sede, pageW - 80, 20);
+    doc.text("Fecha de examen: " + datosFinales.fechaExamen, pageW - 80, 25);
 
+    doc.text("Pag. " + pageNumber.toString().padStart(2, '0'), pageW - 30, 10);
+
+    drawColorBox(doc, {
+      color: datosFinales.codigoColor,
+      text: datosFinales.textoColor,
+      x: pageW - 30,
+      y: 10,
+      size: 22,
+      showLine: true,
+      fontSize: 30,
+      textPosition: 0.9
+    });
+  };
+
+  // === DIBUJAR HEADER ===
+  drawHeader(numeroPagina);
+
+  // === FUNCIONES AUXILIARES ===
+  // Función para texto con salto de línea
+  const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
+    // Validar que el texto no sea undefined, null o vacío
+    if (!texto || texto === null || texto === undefined) {
+      return y;
+    }
+    
+    const fontSize = doc.internal.getFontSize();
+    const palabras = String(texto).split(' ');
+    let lineaActual = '';
+    let yPos = y;
+    
+    palabras.forEach(palabra => {
+      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+      const anchoTexto = doc.getTextWidth(textoPrueba);
+      
+      if (anchoTexto <= anchoMaximo) {
+        lineaActual = textoPrueba;
+      } else {
+        if (lineaActual) {
+          doc.text(lineaActual, x, yPos);
+          yPos += fontSize * 0.35; // salto real entre líneas
+          lineaActual = palabra;
+        } else {
+          doc.text(palabra, x, yPos);
+          yPos += fontSize * 0.35;
+        }
+      }
+    });
+    
+    if (lineaActual) {
+      doc.text(lineaActual, x, yPos);
+      yPos += fontSize * 0.35;
+    }
+    
+    return yPos; // Devuelve la nueva posición final
+  };
+
+  // Función general para dibujar header de sección con fondo gris
+  const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
+    const tablaInicioX = 5;
+    const tablaAncho = 200;
+    
+    // Configurar líneas con grosor consistente
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
+    
+    // Dibujar fondo gris más oscuro
+    doc.setFillColor(160, 160, 160);
+    doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
+    
+    // Dibujar líneas del header
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
+    
+    // Dibujar texto del título
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
+    
+    return yPos + alturaHeader;
+  };
+
+  // Función para dibujar header de sección con fondo celeste (azul claro)
+  const dibujarHeaderSeccionCeleste = (titulo, yPos, alturaHeader = 4) => {
+    const tablaInicioX = 5;
+    const tablaAncho = 200;
+    
+    // Configurar líneas con grosor consistente
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
+    
+    // Dibujar fondo celeste
+    doc.setFillColor(173, 216, 230);
+    doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
+    
+    // Dibujar líneas del header
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
+    
+    // Dibujar texto del título
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
+    
+    return yPos + alturaHeader;
+  };
+
+  // Función para dibujar fila con división de dos columnas y títulos
+  const dibujarFilaConDosColumnas = (tituloCol1, tituloCol2, yPos, alturaFila = 5) => {
+    const tablaInicioX = 5;
+    const tablaAncho = 200;
+    
+    // Configurar líneas con grosor consistente
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
+    
+    // Dibujar líneas de la fila
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila); // Línea izquierda
+    doc.line(tablaInicioX + tablaAncho / 2, yPos, tablaInicioX + tablaAncho / 2, yPos + alturaFila); // División central
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
+    doc.line(tablaInicioX, yPos + alturaFila, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
+
+    // Dibujar títulos de las columnas
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text(tituloCol1, tablaInicioX + 2, yPos + 3.5);
+    doc.text(tituloCol2, tablaInicioX + tablaAncho / 2 + 2, yPos + 3.5);
+
+    return yPos + alturaFila; // Retorna la nueva posición Y
+  };
+
+  // === SECCIÓN 1: DATOS PERSONALES ===
+  const tablaInicioX = 5;
+  const tablaAncho = 200;
+  let yPos = 35.5;
+  const filaAltura = 5;
+
+  // Header de datos personales
+  yPos = dibujarHeaderSeccion("1. DATOS PERSONALES", yPos, filaAltura);
+
+  // Fila: Apellidos y Nombres con división para Tipo de examen
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + filaAltura); // División para Tipo de examen
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 45, yPos, tablaInicioX + 45, yPos + filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Fila: Domicilio (completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Fila: Puesto de Trabajo, Área de Trabajo (2 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 115, yPos, tablaInicioX + 115, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Fila: Empresa (completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Fila: Contrata (completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Fila: Estado Civil, Grado de Estudios (2 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Fila: Minerales explotados o procesados, Reubicación (2 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Fila: Explotación, Altura de la labor (MSNM) (2 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // === CONTENIDO DE LA TABLA ===
+  let yTexto = 35.5 + filaAltura + 2.5; // Ajustar para el header
+
+  // Apellidos y Nombres
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  // Ajustar ancho para la nueva división (hasta x = tablaInicioX + 140)
+  doc.text(datosFinales.apellidosNombres || "", tablaInicioX + 35, yTexto + 1);
+
+  // Columna derecha: Tipo de examen
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("T. Examen:", tablaInicioX + 137, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.tipoExamen || "", tablaInicioX + 155, yTexto + 1);
+  yTexto += filaAltura;
+
+  // DNI, Edad, Sexo, Fecha Nac.
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("DNI:", tablaInicioX + 2, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.documentoIdentidad || "", tablaInicioX + 12, yTexto + 1);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Edad:", tablaInicioX + 47, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.edad ? (datosFinales.edad + " Años") : ""), tablaInicioX + 58, yTexto + 1);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Sexo:", tablaInicioX + 92, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  
+  // Convertir objeto sexo a string
+  let sexoTexto = "";
   if (datosFinales.datosPersonales && datosFinales.datosPersonales.sexo) {
-    doc.setTextColor(0, 0, 255); // Color azul para las X
-    doc.setFont("helvetica", "bold").setFontSize(12);
-
-    sexoPosiciones.forEach(pos => {
-      if (datosFinales.datosPersonales.sexo[pos.tipo]) {
-        doc.text("X", pos.x, pos.y);
-      }
-    });
-
-    doc.setTextColor(0, 0, 0); // Resetear a negro
+    if (datosFinales.datosPersonales.sexo.masculino) sexoTexto = "MASCULINO";
+    else if (datosFinales.datosPersonales.sexo.femenino) sexoTexto = "FEMENINO";
   }
+  
+  doc.text(sexoTexto, tablaInicioX + 105, yTexto + 1);
 
-  // DNI / CE / NIE
-  const xDni = 48.5;
-  const yDni = 71;
-  if (datosFinales.datosPersonales && datosFinales.datosPersonales.dni) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.datosPersonales.dni, xDni, yDni);
-  }
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Fecha Nac.:", tablaInicioX + 137, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.fechaNacimiento || "", tablaInicioX + 155, yTexto + 1);
+  yTexto += filaAltura;
 
-  // TELÉFONO
-  const xTelefono = 49;
-  const yTelefono = 81;
-  if (datosFinales.datosPersonales && datosFinales.datosPersonales.telefono) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.datosPersonales.telefono, xTelefono, yTelefono);
-  }
+  // Domicilio
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Domicilio:", tablaInicioX + 2, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.direccionPaciente || "", tablaInicioX + 25, yTexto + 1);
+  yTexto += filaAltura;
 
-  // ESTADO CIVIL - Checkboxes
-  const estadoCivilPosiciones = [
-    { tipo: "soltero", x: 90.5, y: 72.5, texto: "Soltero" },
-    { tipo: "casado", x: 90.5, y: 78, texto: "Casado" },
-    { tipo: "conviviente", x: 119.7, y: 71.1, texto: "Conviviente" },
-    { tipo: "viudo", x: 119.7, y: 76.7, texto: "Viudo" },
-    { tipo: "divorciado", x: 119.7, y: 82.3, texto: "Divorciado" }
-  ];
+  // Puesto de Trabajo, Área de Trabajo
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.puestoTrabajo || "", tablaInicioX + 30, yTexto + 1);
 
-  if (datosFinales.datosPersonales && datosFinales.datosPersonales.estadoCivil) {
-    doc.setTextColor(0, 0, 255); // Color azul para las X
-    doc.setFont("helvetica", "bold").setFontSize(12);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Área de Trabajo:", tablaInicioX + 117, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.areaTrabajo || "", tablaInicioX + 135, yTexto + 1);
+  yTexto += filaAltura;
 
-    estadoCivilPosiciones.forEach(pos => {
-      if (datosFinales.datosPersonales.estadoCivil[pos.tipo]) {
-        doc.text("X", pos.x, pos.y);
-      }
-    });
+  // Empresa
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Empresa:", tablaInicioX + 2, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.empresa || "", tablaInicioX + 24, yTexto + 1);
+  yTexto += filaAltura;
 
-    doc.setTextColor(0, 0, 0); // Resetear a negro
-  }
+  // Contratista
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Contratista:", tablaInicioX + 2, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.contrata || "", tablaInicioX + 24, yTexto + 1);
+  yTexto += filaAltura;
 
-  // GRADO DE INSTRUCCIÓN - Checkboxes (en dos columnas)
-  const gradoInstruccionPosiciones = [
-    // Columna izquierda
-    { tipo: "analfabeto", x: 153.2, y: 70.7, texto: "Analfabeto" },
-    { tipo: "primariaCompleta", x: 153.2, y: 76.1, texto: "Primaria.Com." },
-    { tipo: "primariaIncompleta", x: 153.2, y: 81.5, texto: "Primaria.Inc." },
-    // Columna derecha
-    { tipo: "secundariaCompleta", x: 172.3, y: 76.1, texto: "Sec.Com" },
-    { tipo: "secundariaIncompleta", x: 172.3, y: 81.5, texto: "Sec.Inc" },
-    { tipo: "universidad", x: 192, y: 76.1, texto: "Univers" },
-    { tipo: "tecnico", x: 192, y: 81.5, texto: "Técnico" }
-  ];
+  // Estado Civil, Grado de Estudios
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Estado Civil:", tablaInicioX + 2, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(data.estadoCivilPaciente_estado_civil_pa || "", tablaInicioX + 25, yTexto + 1);
 
-  if (datosFinales.datosPersonales && datosFinales.datosPersonales.gradoInstruccion) {
-    doc.setTextColor(0, 0, 255); // Color azul para las X
-    doc.setFont("helvetica", "bold").setFontSize(12);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Grado de Estudios:", tablaInicioX + 92, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(data.nivelEstudioPaciente_nivel_est_pa || "", tablaInicioX +  121, yTexto + 1);
+  yTexto += filaAltura;
 
-    gradoInstruccionPosiciones.forEach(pos => {
-      if (datosFinales.datosPersonales.gradoInstruccion[pos.tipo]) {
-        doc.text("X", pos.x, pos.y);
-      }
-    });
+  // Minerales explotados o procesados, Reubicación
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Minerales explotados o procesados:", tablaInicioX + 2, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.mineralesExplotados || "").toLowerCase(), tablaInicioX + 55, yTexto + 1);
 
-    doc.setTextColor(0, 0, 0); // Resetear a negro
-  }
-
-  // === SECCIÓN: FACTORES DE RIESGO OCUPACIONAL ===
-  const factoresRiesgoPosiciones = [
-    // Primera columna
-    { factor: "ruido", x: 34, y: 88.7, texto: "Ruido" },
-    { factor: "polvo", x: 34, y: 94, texto: "Polvo" },
-    { factor: "vibSegmentario", x: 34, y: 99, texto: "Vib Segmentario" },
-    { factor: "vibTotal", x: 34, y: 104, texto: "Vib Total" },
-    // Segunda columna
-    { factor: "cancerigenos", x: 63, y: 88.7, texto: "Cancerígenos" },
-    { factor: "mutagenicos", x: 63, y: 94, texto: "Mutágenicos" },
-    { factor: "solventes", x: 63, y: 99, texto: "Solventes" },
-    { factor: "metales", x: 63, y: 104, texto: "Metales" },
-    // Tercera columna
-    { factor: "temperatura", x: 88.5, y: 88.7, texto: "Temperatura" },
-    { factor: "biologicos", x: 88.5, y: 94, texto: "Biológicos" },
-    { factor: "posturas", x: 88.5, y: 99, texto: "Posturas" },
-    { factor: "turnos", x: 88.5, y: 104, texto: "Turnos" },
-    // Cuarta columna
-    { factor: "carga", x: 115.5, y: 88.7, texto: "Carga" },
-    { factor: "movRepet", x: 115.5, y: 94, texto: "Mov. Repet." },
-    { factor: "pvd", x: 115.5, y: 99, texto: "PVD" },
-    { factor: "otros", x: 115.5, y: 104, texto: "Otros" }
-  ];
-
-  if (datosFinales.factoresRiesgo) {
-    doc.setTextColor(0, 0, 255); // Color azul para las X
-    doc.setFont("helvetica", "bold").setFontSize(12);
-
-    factoresRiesgoPosiciones.forEach(pos => {
-      if (datosFinales.factoresRiesgo[pos.factor]) {
-        doc.text("X", pos.x, pos.y);
-      }
-    });
-
-    doc.setTextColor(0, 0, 0); // Resetear a negro
-  }
-
-  // === SECCIÓN: INFORMACIÓN DEL PUESTO ===
-  // Puesto al que Postula
-  const xPuestoPostula = 155;
-  const yPuestoPostula = 88;
-  if (datosFinales.informacionPuesto && datosFinales.informacionPuesto.puestoPostula) {
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.informacionPuesto.puestoPostula.toUpperCase(), xPuestoPostula, yPuestoPostula);
-  }
-
-  // Puesto Actual
-  const xPuestoActual = 155;
-  const yPuestoActual = 93;
-  if (datosFinales.informacionPuesto && datosFinales.informacionPuesto.puestoActual) {
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.informacionPuesto.puestoActual.toUpperCase(), xPuestoActual, yPuestoActual);
-  }
-
-  // Tiempo
-  const xTiempo = 155;
-  const yTiempo = 98.5;
-  if (datosFinales.informacionPuesto && datosFinales.informacionPuesto.tiempo) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.informacionPuesto.tiempo.toUpperCase(), xTiempo, yTiempo);
-  }
-
-  // Reubicación - Checkboxes
-  const reubicacionPosiciones = [
-    { tipo: "si", x: 173, y: 104, texto: "SI" },
-    { tipo: "no", x: 190, y: 104, texto: "NO" }
-  ];
-
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Reubicación:", tablaInicioX + 92, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  
+  // Convertir objeto reubicacion a string
+  let reubicacionTexto = "";
   if (datosFinales.informacionPuesto && datosFinales.informacionPuesto.reubicacion) {
-    doc.setTextColor(0, 0, 255); // Color azul para las X
-    doc.setFont("helvetica", "bold").setFontSize(12);
+    if (datosFinales.informacionPuesto.reubicacion.si) reubicacionTexto = "SI";
+    else if (datosFinales.informacionPuesto.reubicacion.no) reubicacionTexto = "NO";
+  }
+  
+  doc.text(reubicacionTexto, tablaInicioX + 115, yTexto + 1);
+  yTexto += filaAltura;
 
-    reubicacionPosiciones.forEach(pos => {
-      if (datosFinales.informacionPuesto.reubicacion[pos.tipo]) {
-        doc.text("X", pos.x, pos.y);
-      }
-    });
+  // Explotación, Altura de la labor (MSNM)
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Explotación:", tablaInicioX + 2, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  
+  // Convertir objeto tipoTrabajo a string
+  let explotacionTexto = "";
+  if (datosFinales.tipoTrabajo) {
+    const tipos = [];
+    if (datosFinales.tipoTrabajo.superficie) tipos.push("SUPERFICIE");
+    if (datosFinales.tipoTrabajo.concentrador) tipos.push("CONCENTRADOR");
+    if (datosFinales.tipoTrabajo.subsuelo) tipos.push("SUBSUELO");
+    explotacionTexto = tipos.join(", ");
+  }
+  
+  doc.text(explotacionTexto, tablaInicioX + 25, yTexto + 1);
 
-    doc.setTextColor(0, 0, 0); // Resetear a negro
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Altura de la labor (MSNM):", tablaInicioX + 92, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  
+  // Convertir objeto alturaLabor a string
+  let alturaLaborTexto = "";
+  if (datosFinales.alturaLabor) {
+    const alturas = [];
+    if (datosFinales.alturaLabor.debajo2500) alturas.push("DEBAJO 2500");
+    if (datosFinales.alturaLabor.rango2501_3000) alturas.push("2501 A 3000");
+    if (datosFinales.alturaLabor.rango2001_3500) alturas.push("3001 A 3500");
+    if (datosFinales.alturaLabor.rango2501_4000) alturas.push("3501 A 4000");
+    if (datosFinales.alturaLabor.rango4001_4500) alturas.push("4001 A 4500");
+    if (datosFinales.alturaLabor.mas4501) alturas.push("MAS DE 4501");
+    alturaLaborTexto = alturas.join(", ");
+  }
+  
+  doc.text(alturaLaborTexto, tablaInicioX + 132, yTexto + 1);
+  yTexto += filaAltura;
+
+  // === SECCIÓN DE FACTORES DE RIESGO OCUPACIONALES ===
+  yPos = dibujarHeaderSeccion("FACTORES DE RIESGO OCUPACIONALES", yPos, filaAltura);
+
+  // Calcular divisiones para 8 columnas (4 factores + 4 espacios para X)
+  const colWidth = tablaAncho / 8; // Ancho de cada columna
+  const colPositions = [];
+  const colWidths = [];
+  for (let i = 0; i <= 8; i++) {
+    colPositions.push(tablaInicioX + (i * colWidth));
+    colWidths.push(colWidth);
   }
 
-  // === SECCIÓN: ANTECEDENTES MÉDICOS ===
-  // Antecedentes Personales
-  const xAntecedentesPersonales = 70;
-  const yAntecedentesPersonales = 115;
-  if (datosFinales.antecedentesMedicos && datosFinales.antecedentesMedicos.personales) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.antecedentesMedicos.personales.toUpperCase(), xAntecedentesPersonales, yAntecedentesPersonales, { maxWidth: 130 });
+  // Fila 1: Ruido | | Cancerigenos | | temperatura | | carga | |
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  for (let i = 1; i < 8; i++) {
+    doc.line(colPositions[i], yPos, colPositions[i], yPos + filaAltura);
+  }
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Fila 2: polvo | | mutagenos | | biologicos | | mov. repet. | |
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  for (let i = 1; i < 8; i++) {
+    doc.line(colPositions[i], yPos, colPositions[i], yPos + filaAltura);
+  }
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Fila 3: vib segmentario | | solventes | | posturas | | PVD | |
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  for (let i = 1; i < 8; i++) {
+    doc.line(colPositions[i], yPos, colPositions[i], yPos + filaAltura);
+  }
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Fila 4: vib total | | metales | | turno | | otros | |
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  for (let i = 1; i < 8; i++) {
+    doc.line(colPositions[i], yPos, colPositions[i], yPos + filaAltura);
+  }
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // === CONTENIDO DE FACTORES DE RIESGO ===
+  let yTextoFactores = yPos - (4 * filaAltura) + 2.5;
+
+  // Fila 1: Ruido, Cancerigenos, temperatura, carga
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Ruido", colPositions[0] + 2, yTextoFactores + 1);
+  doc.text("Cancerigenos", colPositions[2] + 2, yTextoFactores + 1);
+  doc.text("temperatura", colPositions[4] + 2, yTextoFactores + 1);
+  doc.text("carga", colPositions[6] + 2, yTextoFactores + 1);
+  
+  // Marcar X si está presente (centradas)
+  if (datosFinales.factoresRiesgo.ruido) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", colPositions[1] + colWidths[1]/2 - 1, yTextoFactores + 1);
+  }
+  if (datosFinales.factoresRiesgo.cancerigenos) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", colPositions[3] + colWidths[3]/2 - 1, yTextoFactores + 1);
+  }
+  if (datosFinales.factoresRiesgo.temperatura) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", colPositions[5] + colWidths[5]/2 - 1, yTextoFactores + 1);
+  }
+  if (datosFinales.factoresRiesgo.carga) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", colPositions[7] + colWidths[7]/2 - 1, yTextoFactores + 1);
+  }
+  yTextoFactores += filaAltura;
+
+  // Fila 2: polvo, mutagenos, biologicos, mov. repet.
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("polvo", colPositions[0] + 2, yTextoFactores + 1);
+  doc.text("mutagenos", colPositions[2] + 2, yTextoFactores + 1);
+  doc.text("biologicos", colPositions[4] + 2, yTextoFactores + 1);
+  doc.text("mov. repet.", colPositions[6] + 2, yTextoFactores + 1);
+  
+  // Marcar X si está presente (centradas)
+  if (datosFinales.factoresRiesgo.polvo) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", colPositions[1] + colWidths[1]/2 - 1, yTextoFactores + 1);
+  }
+  if (datosFinales.factoresRiesgo.mutagenicos) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", colPositions[3] + colWidths[3]/2 - 1, yTextoFactores + 1);
+  }
+  if (datosFinales.factoresRiesgo.biologicos) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", colPositions[5] + colWidths[5]/2 - 1, yTextoFactores + 1);
+  }
+  if (datosFinales.factoresRiesgo.movRepet) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", colPositions[7] + colWidths[7]/2 - 1, yTextoFactores + 1);
+  }
+  yTextoFactores += filaAltura;
+
+  // Fila 3: vib segmentario, solventes, posturas, PVD
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("vib segmentario", colPositions[0] + 2, yTextoFactores + 1);
+  doc.text("solventes", colPositions[2] + 2, yTextoFactores + 1);
+  doc.text("posturas", colPositions[4] + 2, yTextoFactores + 1);
+  doc.text("PVD", colPositions[6] + 2, yTextoFactores + 1);
+  
+  // Marcar X si está presente (centradas)
+  if (datosFinales.factoresRiesgo.vibSegmentario) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", colPositions[1] + colWidths[1]/2 - 1, yTextoFactores + 1);
+  }
+  if (datosFinales.factoresRiesgo.solventes) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", colPositions[3] + colWidths[3]/2 - 1, yTextoFactores + 1);
+  }
+  if (datosFinales.factoresRiesgo.posturas) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", colPositions[5] + colWidths[5]/2 - 1, yTextoFactores + 1);
+  }
+  if (datosFinales.factoresRiesgo.pvd) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", colPositions[7] + colWidths[7]/2 - 1, yTextoFactores + 1);
+  }
+  yTextoFactores += filaAltura;
+
+  // Fila 4: vib total, metales, turno, otros
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("vib total", colPositions[0] + 2, yTextoFactores + 1);
+  doc.text("metales", colPositions[2] + 2, yTextoFactores + 1);
+  doc.text("turno", colPositions[4] + 2, yTextoFactores + 1);
+  doc.text("otros", colPositions[6] + 2, yTextoFactores + 1);
+  
+  // Marcar X si está presente (centradas)
+  if (datosFinales.factoresRiesgo.vibTotal) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", colPositions[1] + colWidths[1]/2 - 1, yTextoFactores + 1);
+  }
+  if (datosFinales.factoresRiesgo.metales) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", colPositions[3] + colWidths[3]/2 - 1, yTextoFactores + 1);
+  }
+  if (datosFinales.factoresRiesgo.turnos) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", colPositions[5] + colWidths[5]/2 - 1, yTextoFactores + 1);
+  }
+  if (datosFinales.factoresRiesgo.otros) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", colPositions[7] + colWidths[7]/2 - 1, yTextoFactores + 1);
+  }
+  yTextoFactores += filaAltura;
+
+  // === SECCIÓN 2: ANTECEDENTES OCUPACIONALES ===
+  yPos = dibujarHeaderSeccion("2. ANTECEDENTES OCUPACIONALES", yPos, filaAltura);
+
+  // Fila: Antecedentes personales (completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Fila: Antecedentes familiares (completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Fila: Inmunizaciones | Tetano | X | Hepatitis-B | X | Fiebre amarilla | X |
+  const colInmunizacionWidth = 40;
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 50, yPos, tablaInicioX + 50, yPos + filaAltura); // División después de "Inmunizaciones"
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura); // División después de Tetano
+  doc.line(tablaInicioX + 130, yPos, tablaInicioX + 130, yPos + filaAltura); // División después de Hepatitis-B
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Fila: Número de hijos | Vivos: {data} | Muertos: {data} |
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 50, yPos, tablaInicioX + 50, yPos + filaAltura); // División después de "Número de hijos"
+  doc.line(tablaInicioX + 120, yPos, tablaInicioX + 120, yPos + filaAltura); // División después de "Vivos"
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // === CONTENIDO DE LA SECCIÓN ANTECEDENTES OCUPACIONALES ===
+  let yTextoAntecedentes = yPos - (4 * filaAltura) + 2.5; // Ajustar para el header
+
+  // Antecedentes personales
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Antecedentes personales:", tablaInicioX + 2, yTextoAntecedentes + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Niega db, tbc, hta, convulsiones, asma, alergias, accidentes", tablaInicioX + 40, yTextoAntecedentes + 1);
+  yTextoAntecedentes += filaAltura;
+
+  // Antecedentes familiares
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Antecedentes familiares:", tablaInicioX + 2, yTextoAntecedentes + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("No contributivos", tablaInicioX + 40, yTextoAntecedentes + 1);
+  yTextoAntecedentes += filaAltura;
+
+  // Inmunizaciones
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Inmunizaciones:", tablaInicioX + 2, yTextoAntecedentes + 1);
+
+  // Tetano
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Tetano:", tablaInicioX + 52, yTextoAntecedentes + 1);
+  if (datosFinales.inmunizaciones?.tetano) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", tablaInicioX + 78, yTextoAntecedentes + 1);
   }
 
-  // Antecedentes Familiares
-  const xAntecedentesFamiliares = 8;
-  const yAntecedentesFamiliares = 133;
-  if (datosFinales.antecedentesMedicos && datosFinales.antecedentesMedicos.familiares) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.antecedentesMedicos.familiares.toUpperCase(), xAntecedentesFamiliares, yAntecedentesFamiliares, { maxWidth: 70 });
+  // Hepatitis-B
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Hepatitis-B:", tablaInicioX + 92, yTextoAntecedentes + 1);
+  if (datosFinales.inmunizaciones?.hepatitisB) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", tablaInicioX + 118, yTextoAntecedentes + 1);
   }
 
-  // === SECCIÓN: INMUNIZACIONES ===
-  const inmunizacionesPosiciones = [
-    { tipo: "tetano", x: 93, y: 135, texto: "TETANO" },
-    { tipo: "hepatitisB", x: 122, y: 135, texto: "HEPATITIS - B" },
-    { tipo: "fiebreAmarilla", x: 157, y: 135, texto: "FIEBRE AMARILLA" }
-  ];
-
-  if (datosFinales.inmunizaciones) {
-    doc.setTextColor(0, 0, 255); // Color azul para las X
-    doc.setFont("helvetica", "bold").setFontSize(12);
-
-    inmunizacionesPosiciones.forEach(pos => {
-      if (datosFinales.inmunizaciones[pos.tipo]) {
-        doc.text("X", pos.x, pos.y);
-      }
-    });
-
-    doc.setTextColor(0, 0, 0); // Resetear a negro
+  // Fiebre amarilla
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Fiebre amarilla:", tablaInicioX + 132, yTextoAntecedentes + 1);
+  if (datosFinales.inmunizaciones?.fiebreAmarilla) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", tablaInicioX + 158, yTextoAntecedentes + 1);
   }
+  yTextoAntecedentes += filaAltura;
 
-  // === SECCIÓN: NÚMERO DE HIJOS ===
-  const xHijosVivos = 177;
-  const yHijosVivos = 137;
-  if (datosFinales.numeroHijos && datosFinales.numeroHijos.vivos) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.numeroHijos.vivos, xHijosVivos, yHijosVivos);
+  // Número de hijos
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Número de hijos:", tablaInicioX + 2, yTextoAntecedentes + 1);
+
+  // Vivos
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Vivos:", tablaInicioX + 52, yTextoAntecedentes + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.numeroHijos?.vivos || "", tablaInicioX + 70, yTextoAntecedentes + 1);
+
+  // Muertos
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Muertos:", tablaInicioX + 122, yTextoAntecedentes + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.numeroHijos?.muertos || "", tablaInicioX + 145, yTextoAntecedentes + 1);
+  yTextoAntecedentes += filaAltura;
+
+  // === SECCIÓN 3: HÁBITOS NOCIVOS ===
+  yPos = dibujarHeaderSeccion("3. HÁBITOS NOCIVOS", yPos, filaAltura);
+
+  // Fila: Tabaco: {data} | alcohol: {data} | Drogas: {data}
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho / 3, yPos, tablaInicioX + tablaAncho / 3, yPos + filaAltura); // División 1/3
+  doc.line(tablaInicioX + (2 * tablaAncho / 3), yPos, tablaInicioX + (2 * tablaAncho / 3), yPos + filaAltura); // División 2/3
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // === CONTENIDO DE HÁBITOS NOCIVOS ===
+  let yTextoHabitos = yPos - filaAltura + 2.5;
+
+  // Función para determinar frecuencia de hábitos
+  const obtenerFrecuencia = (habito) => {
+    if (!habito) return "";
+    if (habito.nada) return "Nada";
+    if (habito.poco) return "Poco";
+    if (habito.habitual) return "Habitual";
+    if (habito.excesivo) return "Excesivo";
+    return "";
+  };
+
+  // Tabaco
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Tabaco:", tablaInicioX + 2, yTextoHabitos + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(obtenerFrecuencia(datosFinales.habitos?.tabaco), tablaInicioX + 20, yTextoHabitos + 1);
+
+  // Alcohol
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Alcohol:", tablaInicioX + tablaAncho / 3 + 2, yTextoHabitos + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(obtenerFrecuencia(datosFinales.habitos?.alcohol), tablaInicioX + tablaAncho / 3 + 20, yTextoHabitos + 1);
+
+  // Drogas
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Drogas:", tablaInicioX + (2 * tablaAncho / 3) + 2, yTextoHabitos + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(obtenerFrecuencia(datosFinales.habitos?.drogas), tablaInicioX + (2 * tablaAncho / 3) + 20, yTextoHabitos + 1);
+  yTextoHabitos += filaAltura;
+
+  // === SECCIÓN 4: ESPIROMETRÍA ===
+  yPos = dibujarHeaderSeccion("4. ESPIROMETRÍA", yPos, filaAltura);
+
+  // Fila para datos de espirometría (8 columnas: label | data | label | data | etc.)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  for (let i = 1; i < 8; i++) {
+    doc.line(colPositions[i], yPos, colPositions[i], yPos + filaAltura);
   }
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
 
-  const xHijosMuertos = 195;
-  const yHijosMuertos = 137;
-  if (datosFinales.numeroHijos && datosFinales.numeroHijos.muertos) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.numeroHijos.muertos, xHijosMuertos, yHijosMuertos);
-  }
+  // Fila para conclusión (completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
 
-  // === SECCIÓN: HÁBITOS ===
-  const habitosPosiciones = [
-    // Tabaco
-    { habito: "tabaco", nivel: "nada", x: 26, y: 149, texto: "Nada" },
-    { habito: "tabaco", nivel: "poco", x: 26, y: 154.3, texto: "Poco" },
-    { habito: "tabaco", nivel: "habitual", x: 26, y: 159.2, texto: "Habitual" },
-    { habito: "tabaco", nivel: "excesivo", x: 26, y: 164.8, texto: "Excesivo" },
-    // Alcohol
-    { habito: "alcohol", nivel: "nada", x: 42, y: 149, texto: "Nada" },
-    { habito: "alcohol", nivel: "poco", x: 42, y: 154.3, texto: "Poco" },
-    { habito: "alcohol", nivel: "habitual", x: 42, y: 159.2, texto: "Habitual" },
-    { habito: "alcohol", nivel: "excesivo", x: 42, y: 164.8, texto: "Excesivo" },
-    // Drogas
-    { habito: "drogas", nivel: "nada", x: 58.7, y: 149, texto: "Nada" },
-    { habito: "drogas", nivel: "poco", x: 58.7, y: 154.3, texto: "Poco" },
-    { habito: "drogas", nivel: "habitual", x: 58.7, y: 159.2, texto: "Habitual" },
-    { habito: "drogas", nivel: "excesivo", x: 58.7, y: 164.8, texto: "Excesivo" }
-  ];
+  // === CONTENIDO DE ESPIROMETRÍA ===
+  let yTextoEspirometria = yPos - (2 * filaAltura) + 2.5;
 
-  if (datosFinales.habitos) {
-    doc.setTextColor(0, 0, 255); // Color azul para las X
-    doc.setFont("helvetica", "bold").setFontSize(12);
-
-    habitosPosiciones.forEach(pos => {
-      if (datosFinales.habitos[pos.habito] && datosFinales.habitos[pos.habito][pos.nivel]) {
-        doc.text("X", pos.x, pos.y);
-      }
-    });
-
-    doc.setTextColor(0, 0, 0); // Resetear a negro
-  }
-
-  // === SECCIÓN: MEDIDAS CORPORALES ===
-  // Talla
-  const xTalla = 75;
-  const yTalla = 149;
-  if (datosFinales.medidasCorporales && datosFinales.medidasCorporales.talla) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.medidasCorporales.talla + " m", xTalla, yTalla);
-  }
-
-  // Peso
-  const xPeso = 95;
-  const yPeso = 149;
-  if (datosFinales.medidasCorporales && datosFinales.medidasCorporales.peso) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.medidasCorporales.peso + " kg", xPeso, yPeso);
-  }
-
-  // IMC
-  const xImc = 84;
-  const yImc = 164;
-  if (datosFinales.medidasCorporales && datosFinales.medidasCorporales.imc) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.medidasCorporales.imc, xImc, yImc);
-  }
-
-  // === SECCIÓN: FUNCIÓN RESPIRATORIA ===
-  // FVC
-  const xFvc = 118;
-  const yFvc = 148;
-  if (datosFinales.funcionRespiratoria && datosFinales.funcionRespiratoria.fvc) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.funcionRespiratoria.fvc + " L", xFvc, yFvc);
-  }
-
-  // FEV1
-  const xFev1 = 118;
-  const yFev1 = 154;
-  if (datosFinales.funcionRespiratoria && datosFinales.funcionRespiratoria.fev1) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.funcionRespiratoria.fev1 + " L", xFev1, yFev1);
-  }
-
-  // FEV1/FVC
-  const xFev1Fvc = 151;
-  const yFev1Fvc = 148;
-  if (datosFinales.funcionRespiratoria && datosFinales.funcionRespiratoria.fev1Fvc) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.funcionRespiratoria.fev1Fvc + " %", xFev1Fvc, yFev1Fvc);
-  }
-
-  // FEF 25-75%
-  const xFef2575 = 151;
-  const yFef2575 = 154;
-  if (datosFinales.funcionRespiratoria && datosFinales.funcionRespiratoria.fef2575) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.funcionRespiratoria.fef2575 + " l/s", xFef2575, yFef2575);
-  }
+  // Fila de datos: FVC | {data} | FVE1/FVC | {data} | FVE1 | {data} | FEF | {data}
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("FVC", colPositions[0] + 2, yTextoEspirometria + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.funcionRespiratoria?.fvc || "") + " L", colPositions[1] + 2, yTextoEspirometria + 1);
+  
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("FVE1/FVC", colPositions[2] + 2, yTextoEspirometria + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.funcionRespiratoria?.fev1Fvc || "") + " %", colPositions[3] + 2, yTextoEspirometria + 1);
+  
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("FVE1", colPositions[4] + 2, yTextoEspirometria + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.funcionRespiratoria?.fev1 || "") + " L", colPositions[5] + 2, yTextoEspirometria + 1);
+  
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("FEF", colPositions[6] + 2, yTextoEspirometria + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.funcionRespiratoria?.fef2575 || "") + " L/s", colPositions[7] + 2, yTextoEspirometria + 1);
+  yTextoEspirometria += filaAltura;
 
   // Conclusión
-  const xConclusion = 109;
-  const yConclusion = 162;
-  if (datosFinales.funcionRespiratoria && datosFinales.funcionRespiratoria.conclusion) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.funcionRespiratoria.conclusion.toUpperCase(), xConclusion, yConclusion, { maxWidth: 70 });
-  }
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Conclusión:", tablaInicioX + 2, yTextoEspirometria + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Espirometría normal.", tablaInicioX + 25, yTextoEspirometria + 1);
+  yTextoEspirometria += filaAltura;
 
-  // === SECCIÓN: TEMPERATURA ===
-  const xTemperatura = 185;
-  const yTemperatura = 148;
-  if (datosFinales.temperatura) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.temperatura + " °C", xTemperatura, yTemperatura);
-  }
 
-  // === SECCIÓN: CINTURA / CADERA / ICC ===
-  // Cintura
-  const xCintura = 185;
-  const yCintura = 154;
-  if (datosFinales.medidasCorporales && datosFinales.medidasCorporales.cintura) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.medidasCorporales.cintura + " cm", xCintura, yCintura);
-  }
+  // === SECCIÓN 5: SIGNOS VITALES Y MEDICIONES CORPORALES ===
+  yPos = dibujarHeaderSeccion("5. SIGNOS VITALES Y MEDICIONES CORPORALES", yPos, filaAltura);
 
-  // Cadera
-  const xCadera = 185;
-  const yCadera = 158;
-  if (datosFinales.medidasCorporales && datosFinales.medidasCorporales.cadera) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.medidasCorporales.cadera + " cm", xCadera, yCadera);
-  }
+  // Fila 1: Temperatura | Talla | Peso (3 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho / 3, yPos, tablaInicioX + tablaAncho / 3, yPos + filaAltura); // División 1/3
+  doc.line(tablaInicioX + (2 * tablaAncho / 3), yPos, tablaInicioX + (2 * tablaAncho / 3), yPos + filaAltura); // División 2/3
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
 
-  // ICC
-  const xIcc = 185;
-  const yIcc = 163;
-  if (datosFinales.medidasCorporales && datosFinales.medidasCorporales.icc) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.medidasCorporales.icc, xIcc, yIcc);
-  }
+  // Fila 2: Cintura | Cadera (2 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho / 2, yPos, tablaInicioX + tablaAncho / 2, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
 
-  // === SECCIÓN: EVALUACIÓN FÍSICA ===
-  // CABEZA
-  const xCabeza = 25;
-  const yCabeza = 170;
-  if (datosFinales.evaluacionFisica && datosFinales.evaluacionFisica.cabeza) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisica.cabeza.toUpperCase(), xCabeza, yCabeza, { maxWidth: 60 });
-  }
+  // Fila 3: ICC | IMC (2 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho / 2, yPos, tablaInicioX + tablaAncho / 2, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
 
-  // PERÍMETRO CUELLO
-  const xPerimetroCuello = 40;
-  const yPerimetroCuello = 175;
-  if (datosFinales.evaluacionFisica && datosFinales.evaluacionFisica.perimetroCuello) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisica.perimetroCuello + " cm", xPerimetroCuello, yPerimetroCuello);
-  }
+  // === CONTENIDO DE SIGNOS VITALES Y MEDICIONES ===
+  let yTextoMediciones = yPos - (3 * filaAltura) + 2.5;
 
-  // BOCA, AMÍGDALAS, FARINGE, LARINGE
-  const xBocaAmigdalas = 11;
-  const yBocaAmigdalas = 183;
-  if (datosFinales.evaluacionFisica && datosFinales.evaluacionFisica.bocaAmigdalas) {
-    doc.setFont("helvetica", "normal").setFontSize(7.5);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisica.bocaAmigdalas.toUpperCase(), xBocaAmigdalas, yBocaAmigdalas, { maxWidth: 80 });
-  }
+  // Fila 1: Temperatura | Talla | Peso
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Temperatura:", tablaInicioX + 2, yTextoMediciones + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.temperatura || "") + "°C", tablaInicioX + 30, yTextoMediciones + 1);
 
-  // CUELLO
-  const xCuello = 123;
-  const yCuello = 170;
-  if (datosFinales.evaluacionFisica && datosFinales.evaluacionFisica.cuello) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisica.cuello.toUpperCase(), xCuello, yCuello, { maxWidth: 80 });
-  }
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Talla:", tablaInicioX + tablaAncho / 3 + 2, yTextoMediciones + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.medidasCorporales?.talla || "") + " m", tablaInicioX + tablaAncho / 3 + 20, yTextoMediciones + 1);
 
-  // NARÍZ
-  const xNariz = 123;
-  const yNariz = 175;
-  if (datosFinales.evaluacionFisica && datosFinales.evaluacionFisica.nariz) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisica.nariz.toUpperCase(), xNariz, yNariz, { maxWidth: 80 });
-  }
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Peso:", tablaInicioX + (2 * tablaAncho / 3) + 2, yTextoMediciones + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.medidasCorporales?.peso || "") + " kg", tablaInicioX + (2 * tablaAncho / 3) + 20, yTextoMediciones + 1);
+  yTextoMediciones += filaAltura;
 
-  // DENTADURA - Piezas en mal estado
-  const xPiezasMalEstado = 170;
-  const yPiezasMalEstado = 181;
-  if (datosFinales.evaluacionFisica && datosFinales.evaluacionFisica.dentadura && datosFinales.evaluacionFisica.dentadura.piezasMalEstado) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisica.dentadura.piezasMalEstado.toUpperCase(), xPiezasMalEstado, yPiezasMalEstado, { maxWidth: 60 });
-  }
+  // Fila 2: Cintura | Cadera
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Cintura:", tablaInicioX + 2, yTextoMediciones + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.medidasCorporales?.cintura || "") + " cm", tablaInicioX + 25, yTextoMediciones + 1);
 
-  // DENTADURA - Piezas que faltan
-  const xPiezasFaltantes = 170;
-  const yPiezasFaltantes = 186;
-  if (datosFinales.evaluacionFisica && datosFinales.evaluacionFisica.dentadura && datosFinales.evaluacionFisica.dentadura.piezasFaltantes) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisica.dentadura.piezasFaltantes.toUpperCase(), xPiezasFaltantes, yPiezasFaltantes, { maxWidth: 60 });
-  }
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Cadera:", tablaInicioX + tablaAncho / 2 + 2, yTextoMediciones + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.medidasCorporales?.cadera || "") + " cm", tablaInicioX + tablaAncho / 2 + 25, yTextoMediciones + 1);
+  yTextoMediciones += filaAltura;
 
-  // === SECCIÓN: EVALUACIÓN OFTALMOLÓGICA (OJOS) ===
-  // VISIÓN DE CERCA - SIN CORREGIR
-  const xVisionCercaSinCorregirOD = 40;
-  const yVisionCercaSinCorregirOD = 203;
-  if (datosFinales.evaluacionOftalmologica && datosFinales.evaluacionOftalmologica.vision && datosFinales.evaluacionOftalmologica.vision.cerca && datosFinales.evaluacionOftalmologica.vision.cerca.sinCorregir) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionOftalmologica.vision.cerca.sinCorregir.od.toUpperCase(), xVisionCercaSinCorregirOD, yVisionCercaSinCorregirOD);
-  }
+  // Fila 3: ICC | IMC
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Índice Cintura-Cadera (ICC):", tablaInicioX + 2, yTextoMediciones + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.medidasCorporales?.icc || "", tablaInicioX + 60, yTextoMediciones + 1);
 
-  const xVisionCercaSinCorregirOI = 57;
-  const yVisionCercaSinCorregirOI = 203;
-  if (datosFinales.evaluacionOftalmologica && datosFinales.evaluacionOftalmologica.vision && datosFinales.evaluacionOftalmologica.vision.cerca && datosFinales.evaluacionOftalmologica.vision.cerca.sinCorregir) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionOftalmologica.vision.cerca.sinCorregir.oi.toUpperCase(), xVisionCercaSinCorregirOI, yVisionCercaSinCorregirOI);
-  }
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Índice de Masa Corporal (IMC):", tablaInicioX + tablaAncho / 2 + 2, yTextoMediciones + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.medidasCorporales?.imc || "") + " kg/m²", tablaInicioX + tablaAncho / 2 + 60, yTextoMediciones + 1);
+  yTextoMediciones += filaAltura;
 
-  // VISIÓN DE CERCA - CORREGIDA
-  const xVisionCercaCorregidaOD = 75;
-  const yVisionCercaCorregidaOD = 203;
-  if (datosFinales.evaluacionOftalmologica && datosFinales.evaluacionOftalmologica.vision && datosFinales.evaluacionOftalmologica.vision.cerca && datosFinales.evaluacionOftalmologica.vision.cerca.corregida) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionOftalmologica.vision.cerca.corregida.od.toUpperCase(), xVisionCercaCorregidaOD, yVisionCercaCorregidaOD);
-  }
+  // === SECCIÓN 6: EXAMEN FÍSICO DETALLADO ===
+  yPos = dibujarHeaderSeccion("6. EXAMEN FÍSICO DETALLADO", yPos, filaAltura);
 
-  const xVisionCercaCorregidaOI = 94;
-  const yVisionCercaCorregidaOI = 203;
-  if (datosFinales.evaluacionOftalmologica && datosFinales.evaluacionOftalmologica.vision && datosFinales.evaluacionOftalmologica.vision.cerca && datosFinales.evaluacionOftalmologica.vision.cerca.corregida) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionOftalmologica.vision.cerca.corregida.oi.toUpperCase(), xVisionCercaCorregidaOI, yVisionCercaCorregidaOI);
-  }
+  // Fila 1: Cabeza | Perímetro Cuello | Cuello | Nariz (4 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho / 4, yPos, tablaInicioX + tablaAncho / 4, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho / 2, yPos, tablaInicioX + tablaAncho / 2, yPos + filaAltura);
+  doc.line(tablaInicioX + (3 * tablaAncho / 4), yPos, tablaInicioX + (3 * tablaAncho / 4), yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
 
-  // VISIÓN DE LEJOS - SIN CORREGIR
-  const xVisionLejosSinCorregirOD = 40;
-  const yVisionLejosSinCorregirOD = 210;
-  if (datosFinales.evaluacionOftalmologica && datosFinales.evaluacionOftalmologica.vision && datosFinales.evaluacionOftalmologica.vision.lejos && datosFinales.evaluacionOftalmologica.vision.lejos.sinCorregir) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionOftalmologica.vision.lejos.sinCorregir.od.toUpperCase(), xVisionLejosSinCorregirOD, yVisionLejosSinCorregirOD);
-  }
+  // Fila 2: Boca, Amígdalas, Faringe, Laringe (un solo campo)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
 
-  const xVisionLejosSinCorregirOI = 57;
-  const yVisionLejosSinCorregirOI = 210;
-  if (datosFinales.evaluacionOftalmologica && datosFinales.evaluacionOftalmologica.vision && datosFinales.evaluacionOftalmologica.vision.lejos && datosFinales.evaluacionOftalmologica.vision.lejos.sinCorregir) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionOftalmologica.vision.lejos.sinCorregir.oi.toUpperCase(), xVisionLejosSinCorregirOI, yVisionLejosSinCorregirOI);
-  }
+  // Fila 3: Dentadura | Piezas en mal estado | Piezas faltantes (3 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho / 3, yPos, tablaInicioX + tablaAncho / 3, yPos + filaAltura);
+  doc.line(tablaInicioX + (2 * tablaAncho / 3), yPos, tablaInicioX + (2 * tablaAncho / 3), yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-  // VISIÓN DE LEJOS - CORREGIDA
-  const xVisionLejosCorregidaOD = 75;
-  const yVisionLejosCorregidaOD = 210;
-  if (datosFinales.evaluacionOftalmologica && datosFinales.evaluacionOftalmologica.vision && datosFinales.evaluacionOftalmologica.vision.lejos && datosFinales.evaluacionOftalmologica.vision.lejos.corregida) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionOftalmologica.vision.lejos.corregida.od.toUpperCase(), xVisionLejosCorregidaOD, yVisionLejosCorregidaOD);
-  }
+  // === CONTENIDO DE EXAMEN FÍSICO DETALLADO ===
+  let yTextoExamenDetallado = yPos - (2 * filaAltura) + 2.5;
 
-  const xVisionLejosCorregidaOI = 94;
-  const yVisionLejosCorregidaOI = 210;
-  if (datosFinales.evaluacionOftalmologica && datosFinales.evaluacionOftalmologica.vision && datosFinales.evaluacionOftalmologica.vision.lejos && datosFinales.evaluacionOftalmologica.vision.lejos.corregida) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionOftalmologica.vision.lejos.corregida.oi.toUpperCase(), xVisionLejosCorregidaOI, yVisionLejosCorregidaOI);
-  }
+  // Función para formatear texto: primera letra mayúscula, resto minúscula, excepto N/A
+  const formatearTexto = (texto) => {
+    if (!texto) return "";
+    const textoStr = texto.toString().trim();
+    if (textoStr === "N/A" || textoStr === "N/A.") return textoStr;
+    return textoStr.charAt(0).toUpperCase() + textoStr.slice(1).toLowerCase();
+  };
 
-  // ENFERMEDADES OCULARES
-  const xEnfermedadesOculares = 110;
-  const yEnfermedadesOculares = 195;
-  if (datosFinales.evaluacionOftalmologica && datosFinales.evaluacionOftalmologica.enfermedadesOculares) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionOftalmologica.enfermedadesOculares.toUpperCase(), xEnfermedadesOculares, yEnfermedadesOculares, { maxWidth: 100 });
-  }
+  // Fila 1: Cabeza | Perímetro Cuello | Cuello | Nariz
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Cabeza:", tablaInicioX + 2, yTextoExamenDetallado + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto(datosFinales.evaluacionFisica?.cabeza || ""), tablaInicioX + 20, yTextoExamenDetallado + 1);
 
-  // REFLEJOS PUPILARES
-  const xReflejosPupilares = 135;
-  const yReflejosPupilares = 210;
-  if (datosFinales.evaluacionOftalmologica.reflejosPupilares) {
-    doc.setFont("helvetica", "normal").setFontSize(7.5);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionOftalmologica.reflejosPupilares.toUpperCase(), xReflejosPupilares, yReflejosPupilares, { maxWidth: 100 });
-  }
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Perímetro Cuello:", tablaInicioX + tablaAncho / 4 + 2, yTextoExamenDetallado + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.evaluacionFisica?.perimetroCuello || "") + " cm", tablaInicioX + tablaAncho / 4 + 30, yTextoExamenDetallado + 1);
 
-  // === SECCIÓN: TESTS DE VISIÓN ===
-  // TEST DE ISHIHARA
-  const xTestIshihara = 64;
-  const yTestIshihara = 216.5;
-  if (datosFinales.evaluacionOftalmologica && datosFinales.evaluacionOftalmologica.testIshihara) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionOftalmologica.testIshihara.toUpperCase(), xTestIshihara, yTestIshihara);
-  }
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Cuello:", tablaInicioX + tablaAncho / 2 + 2, yTextoExamenDetallado + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto(datosFinales.evaluacionFisica?.cuello || ""), tablaInicioX + tablaAncho / 2 + 15, yTextoExamenDetallado + 1);
 
-  // TEST DE COLORES PUROS
-  const xTestColoresPuros = 120;
-  const yTestColoresPuros = 216.5;
-  if (datosFinales.evaluacionOftalmologica && datosFinales.evaluacionOftalmologica.testColoresPuros) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionOftalmologica.testColoresPuros.toUpperCase(), xTestColoresPuros, yTestColoresPuros);
-  }
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Nariz:", tablaInicioX + (3 * tablaAncho / 4) + 2, yTextoExamenDetallado + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto(datosFinales.evaluacionFisica?.nariz || ""), tablaInicioX + (3 * tablaAncho / 4) + 15, yTextoExamenDetallado + 1);
+  yTextoExamenDetallado += filaAltura;
 
-  // TEST DE PROFUNDIDAD
-  const xTestProfundidad = 178;
-  const yTestProfundidad = 216.5;
-  if (datosFinales.evaluacionOftalmologica && datosFinales.evaluacionOftalmologica.testProfundidad) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionOftalmologica.testProfundidad.toUpperCase(), xTestProfundidad, yTestProfundidad);
-  }
+  // Fila 2: Boca, Amígdalas, Faringe, Laringe (un solo campo)
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
 
-  // === SECCIÓN: EVALUACIÓN DE OÍDOS ===
-  // AUDIOMETRÍA - OÍDO DERECHO
-  const audiometriaOidoDerecho = [
-    { frecuencia: "frecuencia500", x: 28.5, y: 233, valor: "20" },
-    { frecuencia: "frecuencia1000", x: 40, y: 233, valor: "15" },
-    { frecuencia: "frecuencia2000", x: 52, y: 233, valor: "20" },
-    { frecuencia: "frecuencia3000", x: 63, y: 233, valor: "25" },
-    { frecuencia: "frecuencia4000", x: 74, y: 233, valor: "10" },
-    { frecuencia: "frecuencia5000", x: 85, y: 233, valor: "5" },
-    { frecuencia: "frecuencia8000", x: 97, y: 233, valor: "10" }
-  ];
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Boca, Amígdalas, Faringe, Laringe:", tablaInicioX + 2, yTextoExamenDetallado + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto(datosFinales.evaluacionFisica?.bocaAmigdalas || ""), tablaInicioX + 60, yTextoExamenDetallado + 1);
+  yTextoExamenDetallado += filaAltura;
 
-  if (datosFinales.evaluacionOidos && datosFinales.evaluacionOidos.audiometria && datosFinales.evaluacionOidos.audiometria.oidoDerecho) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
+  // Fila 3: Dentadura | Piezas en mal estado | Piezas faltantes
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Dentadura:", tablaInicioX + 2, yTextoExamenDetallado + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Evaluación dental", tablaInicioX + 25, yTextoExamenDetallado + 1);
 
-    audiometriaOidoDerecho.forEach(pos => {
-      if (datosFinales.evaluacionOidos.audiometria.oidoDerecho[pos.frecuencia]) {
-        doc.text(datosFinales.evaluacionOidos.audiometria.oidoDerecho[pos.frecuencia], pos.x, pos.y, { align: 'center' });
-      }
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Piezas en mal estado:", tablaInicioX + tablaAncho / 3 + 2, yTextoExamenDetallado + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.evaluacionFisica?.dentadura?.piezasMalEstado || "", tablaInicioX + tablaAncho / 3 + 40, yTextoExamenDetallado + 1);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Piezas faltantes:", tablaInicioX + (2 * tablaAncho / 3) + 2, yTextoExamenDetallado + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.evaluacionFisica?.dentadura?.piezasFaltantes || "", tablaInicioX + (2 * tablaAncho / 3) + 35, yTextoExamenDetallado + 1);
+
+  // === SECCIÓN OJOS ===
+  // Fila gris: OJOS
+  doc.setFillColor(160, 160, 160); // Color gris
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("7. OJOS", tablaInicioX + 2, yPos + 3.5);
+  yPos += filaAltura;
+
+  // === TABLA DE AGUDEZA VISUAL ===
+  const filaAlturaAgudeza = 4.5;
+  const colAgudezaAncho = 30; // AGUDEZA VISUAL
+  const colSinCorregirAncho = 30; // SIN CORREGIR
+  const colCorregidaAncho = 30; // CORREGIDA
+  const colObservacionesAncho = 95; // OBSERVACIONES
+  
+  // Posiciones de columnas
+  let xAgudeza = tablaInicioX;
+  let xSinCorregir = xAgudeza + colAgudezaAncho;
+  let xCorregida = xSinCorregir + colSinCorregirAncho;
+  let xObservaciones = xCorregida + colCorregidaAncho;
+  
+  // Dibujar header de la tabla de agudeza visual
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaAgudeza);
+  doc.line(xSinCorregir, yPos, xSinCorregir, yPos + filaAlturaAgudeza);
+  doc.line(xCorregida, yPos, xCorregida, yPos + filaAlturaAgudeza);
+  doc.line(xObservaciones, yPos, xObservaciones, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAlturaAgudeza, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  
+  // Contenido del header
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("AGUDEZA VISUAL", xAgudeza + 2, yPos + 3.5);
+  
+  // Centrar "SIN CORREGIR"
+  const textoSinCorregir = "SIN CORREGIR";
+  const anchoSinCorregir = doc.getTextWidth(textoSinCorregir);
+  doc.text(textoSinCorregir, xSinCorregir + (colSinCorregirAncho - anchoSinCorregir) / 2, yPos + 3.5);
+  
+  // Centrar "CORREGIDA"
+  const textoCorregida = "CORREGIDA";
+  const anchoCorregida = doc.getTextWidth(textoCorregida);
+  doc.text(textoCorregida, xCorregida + (colCorregidaAncho - anchoCorregida) / 2, yPos + 3.5);
+  
+  // Centrar "ENFERMEDADES OCULARES"
+  const textoObservaciones = "ENFERMEDADES OCULARES";
+  const anchoObservaciones = doc.getTextWidth(textoObservaciones);
+  doc.text(textoObservaciones, xObservaciones + (colObservacionesAncho - anchoObservaciones) / 2, yPos + 3.5);
+  yPos += filaAlturaAgudeza;
+  
+  // Calcular posiciones de las mitades de las columnas antes de usarlas
+  const mitadSinCorregir = xSinCorregir + (colSinCorregirAncho / 2);
+  const mitadCorregida = xCorregida + (colCorregidaAncho / 2);
+  
+  // Preparar texto de enfermedades oculares con wrap
+  const textoEnfermedades = formatearTexto(data.enfermedadesOcularesAnexo7c_txtenfermedadesoculares || "");
+  const maxWidth = colObservacionesAncho - 8; // Ancho disponible menos margen
+  const lineHeight = 3.5;
+  const lines = doc.splitTextToSize(textoEnfermedades, maxWidth);
+  
+  // Dibujar subheader con O.D y O.I
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaAgudeza);
+  doc.line(xSinCorregir, yPos, xSinCorregir, yPos + filaAlturaAgudeza);
+  doc.line(xCorregida, yPos, xCorregida, yPos + filaAlturaAgudeza);
+  doc.line(xObservaciones, yPos, xObservaciones, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  // Línea horizontal superior solo hasta el final de CORREGIDA
+  doc.line(tablaInicioX, yPos, xObservaciones, yPos);
+  // Línea horizontal inferior solo hasta el final de CORREGIDA
+  doc.line(tablaInicioX, yPos + filaAlturaAgudeza, xObservaciones, yPos + filaAlturaAgudeza);
+  
+  // Dibujar líneas verticales para dividir O.D y O.I
+  doc.line(mitadSinCorregir, yPos, mitadSinCorregir, yPos + filaAlturaAgudeza);
+  doc.line(mitadCorregida, yPos, mitadCorregida, yPos + filaAlturaAgudeza);
+  
+  // Contenido del subheader
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  
+  // Centrar "O.D" en la primera celda de SIN CORREGIR
+  const textoOD1 = "O.D";
+  const anchoOD1 = doc.getTextWidth(textoOD1);
+  doc.text(textoOD1, xSinCorregir + (colSinCorregirAncho / 2 - anchoOD1) / 2, yPos + 3.5);
+  
+  // Centrar "O.I" en la segunda celda de SIN CORREGIR
+  const textoOI1 = "O.I";
+  const anchoOI1 = doc.getTextWidth(textoOI1);
+  doc.text(textoOI1, mitadSinCorregir + (colSinCorregirAncho / 2 - anchoOI1) / 2, yPos + 3.5);
+  
+  // Centrar "O.D" en la primera celda de CORREGIDA
+  const textoOD2 = "O.D";
+  const anchoOD2 = doc.getTextWidth(textoOD2);
+  doc.text(textoOD2, xCorregida + (colCorregidaAncho / 2 - anchoOD2) / 2, yPos + 3.5);
+  
+  // Centrar "O.I" en la segunda celda de CORREGIDA
+  const textoOI2 = "O.I";
+  const anchoOI2 = doc.getTextWidth(textoOI2);
+  doc.text(textoOI2, mitadCorregida + (colCorregidaAncho / 2 - anchoOI2) / 2, yPos + 3.5);
+  yPos += filaAlturaAgudeza;
+  
+  // Dibujar fila de datos para Visión de Cerca
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaAgudeza);
+  doc.line(xSinCorregir, yPos, xSinCorregir, yPos + filaAlturaAgudeza);
+  doc.line(xCorregida, yPos, xCorregida, yPos + filaAlturaAgudeza);
+  doc.line(xObservaciones, yPos, xObservaciones, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  // Línea horizontal superior solo hasta el final de CORREGIDA
+  doc.line(tablaInicioX, yPos, xObservaciones, yPos);
+  // Línea horizontal inferior solo hasta el final de CORREGIDA
+  doc.line(tablaInicioX, yPos + filaAlturaAgudeza, xObservaciones, yPos + filaAlturaAgudeza);
+  
+  // Dibujar líneas verticales para dividir O.D y O.I en la fila de datos
+  doc.line(mitadSinCorregir, yPos, mitadSinCorregir, yPos + filaAlturaAgudeza);
+  doc.line(mitadCorregida, yPos, mitadCorregida, yPos + filaAlturaAgudeza);
+  
+  // Contenido de la fila Visión de Cerca
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Visión de Cerca:", xAgudeza + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  // Centrar datos O.D y O.I en SIN CORREGIR
+  const odSinCorregir = datosFinales.evaluacionOftalmologica?.vision?.cerca?.sinCorregir?.od || "";
+  const oiSinCorregir = datosFinales.evaluacionOftalmologica?.vision?.cerca?.sinCorregir?.oi || "";
+  const anchoOdSinCorregir = doc.getTextWidth(odSinCorregir);
+  const anchoOiSinCorregir = doc.getTextWidth(oiSinCorregir);
+  doc.text(odSinCorregir, xSinCorregir + (colSinCorregirAncho / 2 - anchoOdSinCorregir) / 2, yPos + 3.5);
+  doc.text(oiSinCorregir, mitadSinCorregir + (colSinCorregirAncho / 2 - anchoOiSinCorregir) / 2, yPos + 3.5);
+  
+  // Centrar datos O.D y O.I en CORREGIDA
+  const odCorregida = datosFinales.evaluacionOftalmologica?.vision?.cerca?.corregida?.od || "";
+  const oiCorregida = datosFinales.evaluacionOftalmologica?.vision?.cerca?.corregida?.oi || "";
+  const anchoOdCorregida = doc.getTextWidth(odCorregida);
+  const anchoOiCorregida = doc.getTextWidth(oiCorregida);
+  doc.text(odCorregida, xCorregida + (colCorregidaAncho / 2 - anchoOdCorregida) / 2, yPos + 3.5);
+  doc.text(oiCorregida, mitadCorregida + (colCorregidaAncho / 2 - anchoOiCorregida) / 2, yPos + 3.5);
+  
+  // Mostrar las primeras líneas del texto de enfermedades oculares en esta fila
+  lines.slice(0, 2).forEach((line, index) => {
+    doc.text(line, xObservaciones + 4, yPos + 3.5 + (index * lineHeight));
+  });
+  
+  yPos += filaAlturaAgudeza;
+
+  // Línea horizontal separadora entre filas de datos (solo hasta el final de CORREGIDA)
+  doc.line(tablaInicioX, yPos, xObservaciones, yPos);
+
+  // Dibujar fila de datos para Visión de Lejos
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaAgudeza);
+  doc.line(xSinCorregir, yPos, xSinCorregir, yPos + filaAlturaAgudeza);
+  doc.line(xCorregida, yPos, xCorregida, yPos + filaAlturaAgudeza);
+  doc.line(xObservaciones, yPos, xObservaciones, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  // Línea horizontal superior solo hasta el final de CORREGIDA
+  doc.line(tablaInicioX, yPos, xObservaciones, yPos);
+  // Línea horizontal inferior solo hasta el final de CORREGIDA
+  doc.line(tablaInicioX, yPos + filaAlturaAgudeza, xObservaciones, yPos + filaAlturaAgudeza);
+  
+  // Dibujar líneas verticales para dividir O.D y O.I en la fila de datos
+  doc.line(mitadSinCorregir, yPos, mitadSinCorregir, yPos + filaAlturaAgudeza);
+  doc.line(mitadCorregida, yPos, mitadCorregida, yPos + filaAlturaAgudeza);
+  
+  // Contenido de la fila Visión de Lejos
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Visión de Lejos:", xAgudeza + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  // Centrar datos O.D y O.I en SIN CORREGIR
+  const odLejosSinCorregir = datosFinales.evaluacionOftalmologica?.vision?.lejos?.sinCorregir?.od || "";
+  const oiLejosSinCorregir = datosFinales.evaluacionOftalmologica?.vision?.lejos?.sinCorregir?.oi || "";
+  const anchoOdLejosSinCorregir = doc.getTextWidth(odLejosSinCorregir);
+  const anchoOiLejosSinCorregir = doc.getTextWidth(oiLejosSinCorregir);
+  doc.text(odLejosSinCorregir, xSinCorregir + (colSinCorregirAncho / 2 - anchoOdLejosSinCorregir) / 2, yPos + 3.5);
+  doc.text(oiLejosSinCorregir, mitadSinCorregir + (colSinCorregirAncho / 2 - anchoOiLejosSinCorregir) / 2, yPos + 3.5);
+  
+  // Centrar datos O.D y O.I en CORREGIDA
+  const odLejosCorregida = datosFinales.evaluacionOftalmologica?.vision?.lejos?.corregida?.od || "";
+  const oiLejosCorregida = datosFinales.evaluacionOftalmologica?.vision?.lejos?.corregida?.oi || "";
+  const anchoOdLejosCorregida = doc.getTextWidth(odLejosCorregida);
+  const anchoOiLejosCorregida = doc.getTextWidth(oiLejosCorregida);
+  doc.text(odLejosCorregida, xCorregida + (colCorregidaAncho / 2 - anchoOdLejosCorregida) / 2, yPos + 3.5);
+  doc.text(oiLejosCorregida, mitadCorregida + (colCorregidaAncho / 2 - anchoOiLejosCorregida) / 2, yPos + 3.5);
+  
+  // Continuar con las líneas restantes del texto de enfermedades oculares
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  
+  // Mostrar las líneas restantes (a partir de la línea 2) en esta fila
+  if (lines && lines.length > 2) {
+    lines.slice(2).forEach((line, index) => {
+      doc.text(line, xObservaciones + 4, yPos + 3.5 + (index * lineHeight));
     });
   }
+  
+  yPos += filaAlturaAgudeza;
 
-  // AUDIOMETRÍA - OÍDO IZQUIERDO
-  const audiometriaOidoIzquierdo = [
-    { frecuencia: "frecuencia500", x: 129, y: 233, valor: "10" },
-    { frecuencia: "frecuencia1000", x: 140, y: 233, valor: "5" },
-    { frecuencia: "frecuencia2000", x: 151, y: 233, valor: "10" },
-    { frecuencia: "frecuencia3000", x: 163, y: 233, valor: "15" },
-    { frecuencia: "frecuencia4000", x: 173, y: 233, valor: "10" },
-    { frecuencia: "frecuencia5000", x: 185, y: 233, valor: "10" },
-    { frecuencia: "frecuencia8000", x: 197, y: 233, valor: "5" }
-  ];
+  // Dibujar fila adicional para REFLEJOS PUPILARES (sin líneas divisoras)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAlturaAgudeza, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  
+  // Contenido de la fila REFLEJOS PUPILARES
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Reflejos Pupilares:", xAgudeza + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto(datosFinales.evaluacionOftalmologica?.reflejosPupilares || ""), xObservaciones - 45, yPos + 3.5);
+  
+  yPos += filaAlturaAgudeza;
 
-  if (datosFinales.evaluacionOidos && datosFinales.evaluacionOidos.audiometria && datosFinales.evaluacionOidos.audiometria.oidoIzquierdo) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
+  // === FILA: VISIÓN DE COLORES ===
+  // Definir anchos de columna personalizados
+  const colVisionWidth = 30; // Visión de colores
+  const colIshiharaWidth = 55; // Test de Ishihara
+  const colColoresWidth = 55; // Test de colores puros
+  const colProfundidadWidth = 55; // Test de profundidad
+  
+  const xVision = tablaInicioX;
+  const xIshihara = xVision + colVisionWidth;
+  const xColores = xIshihara + colIshiharaWidth;
+  const xProfundidad = xColores + colColoresWidth;
+  
+  // Dibujar líneas verticales
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(xIshihara, yPos, xIshihara, yPos + filaAltura);
+  doc.line(xColores, yPos, xColores, yPos + filaAltura);
+  doc.line(xProfundidad, yPos, xProfundidad, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  
+  // Contenido de la fila Visión de Colores
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Visión de colores", xVision + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.visionColoresAnexo7c_txtvisioncolores || "", xVision + 35, yPos + 3.5);
+  
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Test de Ishihara:", xIshihara + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.tecishiharaNormal_rbtecishihara_normal ? "Normal" : "Anormal", xIshihara + 35, yPos + 3.5);
+  
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Test de colores puros:", xColores + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.teccoleresNormal_rbteccoleres_normal ? "Normal" : "Anormal", xColores + 40, yPos + 3.5);
+  
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Test de profundidad:", xProfundidad + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.tecestereopsiaNormal_rbtecestereopsia_normal ? "Normal" : "Anormal", xProfundidad + 40, yPos + 3.5);
+  
+  yPos += filaAltura;
 
-    audiometriaOidoIzquierdo.forEach(pos => {
-      if (datosFinales.evaluacionOidos.audiometria.oidoIzquierdo[pos.frecuencia]) {
-        doc.text(datosFinales.evaluacionOidos.audiometria.oidoIzquierdo[pos.frecuencia], pos.x, pos.y, { align: 'center' });
-      }
-    });
+  // === SECCIÓN 8: OÍDOS ===
+  // Fila gris: 8. OÍDOS
+  doc.setFillColor(160, 160, 160); // Color gris
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("8. OÍDOS", tablaInicioX + 2, yPos + 3.5);
+  yPos += filaAltura;
+
+  // Fila títulos: Oído derecho | Oído izquierdo
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho / 2, yPos, tablaInicioX + tablaAncho / 2, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+
+  const textoOidoDerecho = "OÍDO DERECHO";
+  const anchoOidoDerecho = doc.getTextWidth(textoOidoDerecho);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(textoOidoDerecho, tablaInicioX + (tablaAncho / 2 - anchoOidoDerecho) / 2, yPos + 3.5);
+
+  const textoOidoIzquierdo = "OÍDO IZQUIERDO";
+  const anchoOidoIzquierdo = doc.getTextWidth(textoOidoIzquierdo);
+  doc.text(textoOidoIzquierdo, tablaInicioX + tablaAncho / 2 + (tablaAncho / 2 - anchoOidoIzquierdo) / 2, yPos + 3.5);
+  yPos += filaAltura;
+
+  // Fila frecuencias
+  const numColsPerEarOidos = 8;
+  const colWidthOidos = (tablaAncho / 2) / numColsPerEarOidos;
+  const frequencies = [500, 1000, 2000, 3000, 4000, 5000, 8000];
+
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+
+  // Líneas verticales para ambos lados
+  for (let side = 0; side < 2; side++) {
+    const startX = side * (tablaAncho / 2) + tablaInicioX;
+    for (let j = 0; j <= numColsPerEarOidos; j++) {
+      const x = startX + j * colWidthOidos;
+      doc.line(x, yPos, x, yPos + filaAltura);
+    }
   }
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-  // OTOSCOPÍA - OÍDO DERECHO
-  const xOtoscopiaOidoDerecho = 42;
-  const yOtoscopiaOidoDerecho = 240.5;
-  if (datosFinales.evaluacionOidos && datosFinales.evaluacionOidos.otoscopia && datosFinales.evaluacionOidos.otoscopia.oidoDerecho) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionOidos.otoscopia.oidoDerecho.toUpperCase(), xOtoscopiaOidoDerecho, yOtoscopiaOidoDerecho);
+  // Etiqueta Hz en columna 0 y frecuencias en columnas 1-7
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  for (let side = 0; side < 2; side++) {
+    const startX = side * (tablaAncho / 2) + tablaInicioX;
+    // Hz en col 0
+    const textoHz = "Hz";
+    const anchoHz = doc.getTextWidth(textoHz);
+    doc.text(textoHz, startX + (colWidthOidos - anchoHz) / 2, yPos + 3.5);
+    // Frecuencias
+    for (let k = 0; k < frequencies.length; k++) {
+      const colIndex = k + 1;
+      const x = startX + colIndex * colWidthOidos;
+      const textoFreq = frequencies[k].toString();
+      const anchoFreq = doc.getTextWidth(textoFreq);
+      doc.text(textoFreq, x + (colWidthOidos - anchoFreq) / 2, yPos + 3.5);
+    }
   }
+  yPos += filaAltura;
 
-  // OTOSCOPÍA - OÍDO IZQUIERDO
-  const xOtoscopiaOidoIzquierdo = 42;
-  const yOtoscopiaOidoIzquierdo = 245.1;
-  if (datosFinales.evaluacionOidos && datosFinales.evaluacionOidos.otoscopia && datosFinales.evaluacionOidos.otoscopia.oidoIzquierdo) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionOidos.otoscopia.oidoIzquierdo.toUpperCase(), xOtoscopiaOidoIzquierdo, yOtoscopiaOidoIzquierdo);
+  // Fila de datos
+  // Líneas verticales para ambos lados
+  for (let side = 0; side < 2; side++) {
+    const startX = side * (tablaAncho / 2) + tablaInicioX;
+    for (let j = 0; j <= numColsPerEarOidos; j++) {
+      const x = startX + j * colWidthOidos;
+      doc.line(x, yPos, x, yPos + filaAltura);
+    }
   }
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-  // === SECCIÓN: CARDIOVASCULAR ===
-  const xCardiovascular = 40;
-  const yCardiovascular = 251;
-  if (datosFinales.cardiovascular) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.cardiovascular.toUpperCase(), xCardiovascular, yCardiovascular, { maxWidth: 100 });
+  // Etiquetas dB(A) en columna 0 y datos en 1-7
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  for (let side = 0; side < 2; side++) {
+    const startX = side * (tablaAncho / 2) + tablaInicioX;
+    const textoDb = "dB(A)";
+    const anchoDb = doc.getTextWidth(textoDb);
+    doc.text(textoDb, startX + (colWidthOidos - anchoDb) / 2, yPos + 3.5);
   }
+  doc.setFont("helvetica", "normal").setFontSize(8);
 
-  // === SECCIÓN: PULMONES ===
-  // PULMONES - Checkboxes
-  const pulmonesPosiciones = [
-    { tipo: "normal", x: 43.7, y: 259.5, texto: "Normal" },
-    { tipo: "anormal", x: 74.2, y: 259.5, texto: "Anormal" }
-  ];
+  // Datos para oídos
+  const rightFreqData = {
+    500: datosFinales.evaluacionOidos?.audiometria?.oidoDerecho?.frecuencia500 || "",
+    1000: datosFinales.evaluacionOidos?.audiometria?.oidoDerecho?.frecuencia1000 || "",
+    2000: datosFinales.evaluacionOidos?.audiometria?.oidoDerecho?.frecuencia2000 || "",
+    3000: datosFinales.evaluacionOidos?.audiometria?.oidoDerecho?.frecuencia3000 || "",
+    4000: datosFinales.evaluacionOidos?.audiometria?.oidoDerecho?.frecuencia4000 || "",
+    5000: datosFinales.evaluacionOidos?.audiometria?.oidoDerecho?.frecuencia5000 || "",
+    8000: datosFinales.evaluacionOidos?.audiometria?.oidoDerecho?.frecuencia8000 || ""
+  };
+  const leftFreqData = {
+    500: datosFinales.evaluacionOidos?.audiometria?.oidoIzquierdo?.frecuencia500 || "",
+    1000: datosFinales.evaluacionOidos?.audiometria?.oidoIzquierdo?.frecuencia1000 || "",
+    2000: datosFinales.evaluacionOidos?.audiometria?.oidoIzquierdo?.frecuencia2000 || "",
+    3000: datosFinales.evaluacionOidos?.audiometria?.oidoIzquierdo?.frecuencia3000 || "",
+    4000: datosFinales.evaluacionOidos?.audiometria?.oidoIzquierdo?.frecuencia4000 || "",
+    5000: datosFinales.evaluacionOidos?.audiometria?.oidoIzquierdo?.frecuencia5000 || "",
+    8000: datosFinales.evaluacionOidos?.audiometria?.oidoIzquierdo?.frecuencia8000 || ""
+  };
+  const allData = [rightFreqData, leftFreqData];
 
-  if (datosFinales.evaluacionFisicaAdicional && datosFinales.evaluacionFisicaAdicional.pulmones) {
-    doc.setTextColor(0, 0, 255); // Color azul para las X
-    doc.setFont("helvetica", "bold").setFontSize(12);
-
-    pulmonesPosiciones.forEach(pos => {
-      if (datosFinales.evaluacionFisicaAdicional.pulmones[pos.tipo]) {
-        doc.text("X", pos.x, pos.y);
-      }
-    });
-
-    doc.setTextColor(0, 0, 0); // Resetear a negro
+  for (let side = 0; side < 2; side++) {
+    const startX = side * (tablaAncho / 2) + tablaInicioX;
+    const freqData = allData[side];
+    for (let k = 0; k < frequencies.length; k++) {
+      const freq = frequencies[k];
+      const dataVal = freqData[freq] || "";
+      const colIndex = k + 1;
+      const x = startX + colIndex * colWidthOidos;
+      const anchoData = doc.getTextWidth(dataVal);
+      doc.text(dataVal, x + (colWidthOidos - anchoData) / 2, yPos + 3.5);
+    }
   }
+  yPos += filaAltura;
 
-  // PIEL - Checkboxes
-  const pielPosiciones = [
-    { tipo: "normal", x: 144.5, y: 259.5, texto: "Normal" },
-    { tipo: "anormal", x: 175.4, y: 259.5, texto: "Anormal" }
-  ];
+  // === FILA: OTOSCOPIA Y CARDIOVASCULAR ===
+  const col1Width = 25; // OTOSCOPIA
+  const col2Width = 30; // O.D
+  const col3Width = 30; // O.I
+  const col4Width = 35; // CARDIOVASCULAR
+  const col5Width = 40; // data
 
-  if (datosFinales.evaluacionFisicaAdicional && datosFinales.evaluacionFisicaAdicional.piel) {
-    doc.setTextColor(0, 0, 255); // Color azul para las X
-    doc.setFont("helvetica", "bold").setFontSize(12);
+  let x1 = tablaInicioX + col1Width;
+  let x2 = x1 + col2Width;
+  let x3 = x2 + col3Width;
+  let x4 = x3 + col4Width;
 
-    pielPosiciones.forEach(pos => {
-      if (datosFinales.evaluacionFisicaAdicional.piel[pos.tipo]) {
-        doc.text("X", pos.x, pos.y);
-      }
-    });
+  // Dibujar líneas de la fila
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(x1, yPos, x1, yPos + filaAltura);
+  doc.line(x2, yPos, x2, yPos + filaAltura);
+  doc.line(x3, yPos, x3, yPos + filaAltura);
+  doc.line(x4, yPos, x4, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-    doc.setTextColor(0, 0, 0); // Resetear a negro
-  }
+  // Contenido
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("OTOSCOPIA", tablaInicioX + 2, yPos + 3.5);
+  doc.text("O.D:", x1 + 2, yPos + 3.5);
+  doc.text("O.I:", x2 + 2, yPos + 3.5);
+  doc.text("CARDIOVASCULAR", x3 + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto(datosFinales.evaluacionOidos?.otoscopia?.oidoDerecho || ""), x1 + 10, yPos + 3.5);
+  doc.text(formatearTexto(datosFinales.evaluacionOidos?.otoscopia?.oidoIzquierdo || ""), x2 + 10, yPos + 3.5);
+  doc.text(formatearTexto(datosFinales.cardiovascular || ""), x4 + 2, yPos + 3.5);
+  yPos += filaAltura;
 
-  // PULMONES - Descripción
-  const xPulmonesDescripcion = 30;
-  const yPulmonesDescripcion = 264;
-  if (datosFinales.evaluacionFisicaAdicional && datosFinales.evaluacionFisicaAdicional.pulmones && datosFinales.evaluacionFisicaAdicional.pulmones.descripcion) {
-    doc.setFont("helvetica", "normal").setFontSize(6);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisicaAdicional.pulmones.descripcion.toUpperCase(), xPulmonesDescripcion, yPulmonesDescripcion, { maxWidth: 80 });
-  }
 
-  // PIEL - Descripción
-  const xPielDescripcion = 132;
-  const yPielDescripcion = 264;
-  if (datosFinales.evaluacionFisicaAdicional && datosFinales.evaluacionFisicaAdicional.piel && datosFinales.evaluacionFisicaAdicional.piel.descripcion) {
-    doc.setFont("helvetica", "normal").setFontSize(6);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisicaAdicional.piel.descripcion.toUpperCase(), xPielDescripcion, yPielDescripcion, { maxWidth: 80 });
-  }
+  // === FOOTER PÁGINA 1 ===
+  footerTR(doc, { footerOffsetY: 8 });
 
-  // === SECCIÓN: MIEMBROS SUPERIORES ===
-  const xMiembrosSuperiores = 40;
-  const yMiembrosSuperiores = 271;
-  if (datosFinales.evaluacionFisicaAdicional && datosFinales.evaluacionFisicaAdicional.miembrosSuperiores) {
-    doc.setFont("helvetica", "normal").setFontSize(7.5);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisicaAdicional.miembrosSuperiores.toUpperCase(), xMiembrosSuperiores, yMiembrosSuperiores, { maxWidth: 160 });
-  }
+  // === CREAR PÁGINA 2 ===
+  // Forzar creación de segunda página para PULMONES y PIEL
+  doc.addPage();
+  numeroPagina = 2;
+  yPos = 35.5; // Posición inicial de la nueva página
 
-  // === SECCIÓN: MIEMBROS INFERIORES ===
-  const xMiembrosInferiores = 40;
-  const yMiembrosInferiores = 281;
-  if (datosFinales.evaluacionFisicaAdicional && datosFinales.evaluacionFisicaAdicional.miembrosInferiores) {
-    doc.setFont("helvetica", "normal").setFontSize(7.5);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisicaAdicional.miembrosInferiores.toUpperCase(), xMiembrosInferiores, yMiembrosInferiores, { maxWidth: 160 });
-  }
+  // Dibujar header en la nueva página
+  drawHeader(numeroPagina);
 
   // === SECCIÓN: SIGNOS VITALES ===
-  // F.Respiratoria
-  const xFrecuenciaRespiratoria = 133;
-  const yFrecuenciaRespiratoria = 240.5;
-  if (datosFinales.signosVitales && datosFinales.signosVitales.frecuenciaRespiratoria) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.signosVitales.frecuenciaRespiratoria + " x min", xFrecuenciaRespiratoria, yFrecuenciaRespiratoria);
-  }
+  yPos = dibujarHeaderSeccion("9. SIGNOS VITALES", yPos, filaAltura);
 
-  // F.Cardíaca
-  const xFrecuenciaCardiaca = 133;
-  const yFrecuenciaCardiaca = 244.3;
-  if (datosFinales.signosVitales && datosFinales.signosVitales.frecuenciaCardiaca) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.signosVitales.frecuenciaCardiaca + " x min", xFrecuenciaCardiaca, yFrecuenciaCardiaca);
-  }
+  // Fila: F. Respiratoria | F. Cardiaca | SatO2 (3 columnas)
+  const colVitalWidth = tablaAncho / 3;
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + colVitalWidth, yPos, tablaInicioX + colVitalWidth, yPos + filaAltura);
+  doc.line(tablaInicioX + (2 * colVitalWidth), yPos, tablaInicioX + (2 * colVitalWidth), yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-  // Sat.02
-  const xSaturacionOxigeno = 133;
-  const ySaturacionOxigeno = 248;
-  if (datosFinales.signosVitales && datosFinales.signosVitales.saturacionOxigeno) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.signosVitales.saturacionOxigeno + " %", xSaturacionOxigeno, ySaturacionOxigeno);
-  }
+  // Contenido
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("F. Respiratoria:", tablaInicioX + 2, yPos + 3.5);
+  doc.text("F. Cardiaca:", tablaInicioX + colVitalWidth + 2, yPos + 3.5);
+  doc.text("SatO2:", tablaInicioX + (2 * colVitalWidth) + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.fRespiratoria || "") + " x/min", tablaInicioX + 35, yPos + 3.5);
+  doc.text((datosFinales.fCardiaca || "") + " x/min", tablaInicioX + colVitalWidth + 35, yPos + 3.5);
+  doc.text((datosFinales.satO2 || "") + "%", tablaInicioX + (2 * colVitalWidth) + 20, yPos + 3.5);
+  yPos += filaAltura;
 
-  // PRESIÓN ARTERIAL SISTÉMICA - Sistólica
-  const xPresionSistolica = 185;
-  const yPresionSistolica = 244.4;
-  if (datosFinales.signosVitales && datosFinales.signosVitales.presionArterial && datosFinales.signosVitales.presionArterial.sistolica) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.signosVitales.presionArterial.sistolica + " mmHg", xPresionSistolica, yPresionSistolica, { align: 'center' });
-  }
+  // Fila: PRESION ARTERIAL | Sistólica | Diastólica (3 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + colVitalWidth, yPos, tablaInicioX + colVitalWidth, yPos + filaAltura);
+  doc.line(tablaInicioX + (2 * colVitalWidth), yPos, tablaInicioX + (2 * colVitalWidth), yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-  // PRESIÓN ARTERIAL SISTÉMICA - Diastólica
-  const xPresionDiastolica = 185;
-  const yPresionDiastolica = 250.3;
-  if (datosFinales.signosVitales && datosFinales.signosVitales.presionArterial && datosFinales.signosVitales.presionArterial.diastolica) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.signosVitales.presionArterial.diastolica + " mmHg", xPresionDiastolica, yPresionDiastolica, { align: 'center' });
-  }
+  // Contenido
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("PRESIÓN ARTERIAL SISTEMÁTICA", tablaInicioX + 2, yPos + 3.5);
+  doc.text("Sistólica:", tablaInicioX + colVitalWidth + 2, yPos + 3.5);
+  doc.text("Diastólica:", tablaInicioX + (2 * colVitalWidth) + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.presionSistolica || "") + " mmHg", tablaInicioX + colVitalWidth + 35, yPos + 3.5);
+  doc.text((datosFinales.presionDiastolica || "") + " mmHg", tablaInicioX + (2 * colVitalWidth) + 35, yPos + 3.5);
+  yPos += filaAltura;
 
-  // === PÁGINA 2 ===
-  doc.addPage();
+  // === PÁGINA 2: PULMONES Y PIEL ===
+  // === SECCIÓN PULMONES ===
+  yPos = dibujarHeaderSeccion("10. PULMONES", yPos, filaAltura);
 
-  // === 0) HEADER para Página 2 ===
-  headerAnexo16Boroo(doc, data, 2);
+    // Fila: PULMONES | Normal | | Anormal | X | PIEL | Normal | X | Anormal | |
+    const colPulmonesWidth = 30; // PULMONES
+    const colNormalWidth = 20;   // Normal
+    const colCheckWidth = 10;    // Checkbox
+    const colAnormalWidth = 20;  // Anormal
+    const colCheck2Width = 10;   // Checkbox
+    const colPielWidth = 30;     // PIEL
+    const colNormal2Width = 20;  // Normal
+    const colCheck3Width = 10;   // Checkbox
+    const colAnormal2Width = 20; // Anormal
+    let xPulmones = tablaInicioX;
+    let xNormal = xPulmones + colPulmonesWidth;
+    let xCheck1 = xNormal + colNormalWidth;
+    let xAnormal = xCheck1 + colCheckWidth;
+    let xCheck2 = xAnormal + colAnormalWidth;
+    let xPiel = xCheck2 + colCheck2Width;
+    let xNormal2 = xPiel + colPielWidth;
+    let xCheck3 = xNormal2 + colNormal2Width;
+    let xAnormal2 = xCheck3 + colCheck3Width;
+    let xCheck4 = xAnormal2 + colAnormal2Width;
 
-  // === 1) Imagen de fondo para Anexo16 Boroo - Página 2 ===
-  const fondoImg2 = "/img/Anexo16/Anexo16_Boroo_Pag2.png";
+    // Dibujar líneas de la fila
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(xNormal, yPos, xNormal, yPos + filaAltura);
+    doc.line(xCheck1, yPos, xCheck1, yPos + filaAltura);
+    doc.line(xAnormal, yPos, xAnormal, yPos + filaAltura);
+    doc.line(xCheck2, yPos, xCheck2, yPos + filaAltura);
+    doc.line(xPiel, yPos, xPiel, yPos + filaAltura);
+    doc.line(xNormal2, yPos, xNormal2, yPos + filaAltura);
+    doc.line(xCheck3, yPos, xCheck3, yPos + filaAltura);
+    doc.line(xAnormal2, yPos, xAnormal2, yPos + filaAltura);
+    doc.line(xCheck4, yPos, xCheck4, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-  // Márgenes de 6mm a cada lado (usar la misma variable de la página 1)
-  const margenLateral2 = 6; // 6mm
+    // Contenido de la fila
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("PULMONES", xPulmones + 2, yPos + 3.5);
+    doc.text("Normal", xNormal + 2, yPos + 3.5);
+    doc.text("Anormal", xAnormal + 2, yPos + 3.5);
+    doc.text("PIEL", xPiel + 2, yPos + 3.5);
+    doc.text("Normal", xNormal2 + 2, yPos + 3.5);
+    doc.text("Anormal", xAnormal2 + 2, yPos + 3.5);
 
-  // Usar el ancho del documento menos los márgenes laterales
-  const imgWidth2 = pageW - (margenLateral2 * 2); // Ancho menos márgenes
-  const imgHeight2 = pageH * 0.85; // 85% de la altura para dejar espacio para ajustar
+    // Marcar checkboxes según los datos
+    if (datosFinales.evaluacionFisicaAdicional?.pulmones?.normal) {
+      doc.setFont("helvetica", "bold").setFontSize(10);
+      doc.text("X", xCheck1 + 3, yPos + 3.5);
+    }
+    if (datosFinales.evaluacionFisicaAdicional?.pulmones?.anormal) {
+      doc.setFont("helvetica", "bold").setFontSize(10);
+      doc.text("X", xCheck2 + 3, yPos + 3.5);
+    }
+    if (datosFinales.evaluacionFisicaAdicional?.piel?.normal) {
+      doc.setFont("helvetica", "bold").setFontSize(10);
+      doc.text("X", xCheck3 + 3, yPos + 3.5);
+    }
+    if (datosFinales.evaluacionFisicaAdicional?.piel?.anormal) {
+      doc.setFont("helvetica", "bold").setFontSize(10);
+      doc.text("X", xCheck4 + 3, yPos + 3.5);
+    }
+    yPos += filaAltura;
 
-  // Posicionar desde abajo hacia arriba con márgenes laterales
-  const xOffset2 = margenLateral2; // Margen izquierdo
-  const yOffset2 = pageH - imgHeight2 - 8; // Subido 8 puntos hacia arriba
+    // Fila de descripciones con altura dinámica
+    const textoPulmones = "Descripción: " + formatearTexto(datosFinales.evaluacionFisicaAdicional?.pulmones?.descripcion || "");
+    const textoPiel = "Descripción: " + formatearTexto(datosFinales.evaluacionFisicaAdicional?.piel?.descripcion || "");
+    
+    // Calcular altura dinámica para cada columna
+    const anchoDisponiblePulmones = xPiel - xPulmones - 4; // Ancho disponible para pulmones
+    const anchoDisponiblePiel = tablaAncho - xPiel - 4; // Ancho disponible para piel
+    
+    const lineasPulmones = doc.splitTextToSize(textoPulmones, anchoDisponiblePulmones);
+    const lineasPiel = doc.splitTextToSize(textoPiel, anchoDisponiblePiel);
+    
+    // Usar la altura de la columna con más líneas
+    const maxLineas = Math.max(lineasPulmones.length, lineasPiel.length);
+    const alturaDinamicaDescripcion = Math.max(filaAltura, maxLineas * 2.5 + 2 + 3); // +3 para margen inferior
 
-  try {
-    doc.addImage(fondoImg2, "PNG", xOffset2, yOffset2, imgWidth2, imgHeight2);
-  } catch (e) {
-    doc.text("Imagen de Anexo16 Boroo Página 2 no disponible", margin, yOffset2 + 10);
-  }
+    // Dibujar líneas de la fila dinámica
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaDescripcion);
+    doc.line(xPiel, yPos, xPiel, yPos + alturaDinamicaDescripcion);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaDescripcion);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + alturaDinamicaDescripcion, tablaInicioX + tablaAncho, yPos + alturaDinamicaDescripcion);
 
-  // === 2) CAMPOS DE DATOS PERSONALIZABLES PARA PÁGINA 2 ===
-
-  // === SECCIÓN: EVALUACIÓN NEUROLÓGICA ===
-  // REFLEJOS OSTEOTENDINOSOS
-  const xReflejosOsteotendinosos = 55;
-  const yReflejosOsteotendinosos = 42;
-  if (datosFinales.evaluacionNeurologica && datosFinales.evaluacionNeurologica.reflejosOsteotendinosos) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionNeurologica.reflejosOsteotendinosos.toUpperCase(), xReflejosOsteotendinosos, yReflejosOsteotendinosos);
-  }
-
-  // MARCHA
-  const xMarcha = 140;
-  const yMarcha = 42;
-  if (datosFinales.evaluacionNeurologica && datosFinales.evaluacionNeurologica.marcha) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionNeurologica.marcha.toUpperCase(), xMarcha, yMarcha);
-  }
-
-  // === SECCIÓN: EVALUACIÓN DE COLUMNA Y ABDOMEN ===
-  // COLUMNA VERTEBRAL
-  const xColumnaVertebral = 45;
-  const yColumnaVertebral = 48.5;
-  if (datosFinales.evaluacionColumnaAbdomen && datosFinales.evaluacionColumnaAbdomen.columnaVertebral) {
+    // Contenido de descripciones con salto de línea
     doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionColumnaAbdomen.columnaVertebral.toUpperCase(), xColumnaVertebral, yColumnaVertebral, { maxWidth: 80 });
+    doc.text(lineasPulmones, xPulmones + 2, yPos + 3.5);
+    doc.text(lineasPiel, xPiel + 2, yPos + 3.5);
+    
+    yPos += alturaDinamicaDescripcion;
+
+  // === SECCIÓN MIEMBROS SUPERIORES ===
+  yPos = dibujarHeaderSeccion("11. MIEMBROS SUPERIORES", yPos, filaAltura);
+
+  // Fila de Miembros Superiores con altura dinámica
+  const tituloMiembrosSuperiores = "Miembros Superiores: ";
+  const datoMiembrosSuperiores = formatearTexto(datosFinales.evaluacionFisicaAdicional?.miembrosSuperiores || "");
+  const textoMiembrosSuperiores = tituloMiembrosSuperiores + datoMiembrosSuperiores;
+  const anchoDisponibleMiembrosSuperiores = tablaAncho - 4;
+  const lineasMiembrosSuperiores = doc.splitTextToSize(textoMiembrosSuperiores, anchoDisponibleMiembrosSuperiores);
+  const alturaDinamicaMiembrosSuperiores = Math.max(filaAltura, lineasMiembrosSuperiores.length * 2.5 + 2);
+
+  // Dibujar líneas de la fila dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaMiembrosSuperiores);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaMiembrosSuperiores);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaDinamicaMiembrosSuperiores, tablaInicioX + tablaAncho, yPos + alturaDinamicaMiembrosSuperiores);
+
+  // Contenido con formato mixto
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloMiembrosSuperiores, tablaInicioX + 2, yPos + 3.5);
+  const anchoTitulo = doc.getTextWidth(tituloMiembrosSuperiores);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoMiembrosSuperiores, tablaInicioX + 2 + anchoTitulo + 5, yPos + 3.5);
+  yPos += alturaDinamicaMiembrosSuperiores;
+
+  // === SECCIÓN MIEMBROS INFERIORES ===
+  yPos = dibujarHeaderSeccion("12. MIEMBROS INFERIORES", yPos, filaAltura);
+
+  // Fila de Miembros Inferiores con altura dinámica
+  const tituloMiembrosInferiores = "Miembros Inferiores: ";
+  const datoMiembrosInferiores = formatearTexto(datosFinales.evaluacionFisicaAdicional?.miembrosInferiores || "");
+  const textoMiembrosInferiores = tituloMiembrosInferiores + datoMiembrosInferiores;
+  const anchoDisponibleMiembrosInferiores = tablaAncho - 4;
+  const lineasMiembrosInferiores = doc.splitTextToSize(textoMiembrosInferiores, anchoDisponibleMiembrosInferiores);
+  const alturaDinamicaMiembrosInferiores = Math.max(filaAltura, lineasMiembrosInferiores.length * 2.5 + 2);
+
+  // Dibujar líneas de la fila dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaMiembrosInferiores);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaMiembrosInferiores);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaDinamicaMiembrosInferiores, tablaInicioX + tablaAncho, yPos + alturaDinamicaMiembrosInferiores);
+
+  // Contenido con formato mixto
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloMiembrosInferiores, tablaInicioX + 2, yPos + 3.5);
+  const anchoTituloInferiores = doc.getTextWidth(tituloMiembrosInferiores);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoMiembrosInferiores, tablaInicioX + 2 + anchoTituloInferiores + 5, yPos + 3.5);
+  yPos += alturaDinamicaMiembrosInferiores;
+
+  // === FILA: REFLEJOS OSTEO-TENDINOSOS Y MARCHA ===
+  const tituloReflejos = "Reflejos Osteotendinosos: ";
+  const datoReflejos = formatearTexto(datosFinales.evaluacionNeurologica?.reflejosOsteotendinosos || "");
+  const textoReflejos = tituloReflejos + datoReflejos;
+  
+  const tituloMarcha = "Marcha: ";
+  const datoMarcha = formatearTexto(datosFinales.evaluacionNeurologica?.marcha || "");
+  const textoMarcha = tituloMarcha + datoMarcha;
+  
+  // Calcular altura dinámica para cada columna
+  const anchoDisponibleReflejos = tablaAncho / 2 - 4;
+  const anchoDisponibleMarcha = tablaAncho / 2 - 4;
+  
+  const lineasReflejos = doc.splitTextToSize(textoReflejos, anchoDisponibleReflejos);
+  const lineasMarcha = doc.splitTextToSize(textoMarcha, anchoDisponibleMarcha);
+  
+  // Usar la altura de la columna con más líneas
+  const maxLineasReflejosMarcha = Math.max(lineasReflejos.length, lineasMarcha.length);
+  const alturaDinamicaReflejosMarcha = Math.max(filaAltura, maxLineasReflejosMarcha * 2.5 + 2);
+
+  // Dibujar líneas de la fila dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaReflejosMarcha);
+  doc.line(tablaInicioX + tablaAncho / 2, yPos, tablaInicioX + tablaAncho / 2, yPos + alturaDinamicaReflejosMarcha);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaReflejosMarcha);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaDinamicaReflejosMarcha, tablaInicioX + tablaAncho, yPos + alturaDinamicaReflejosMarcha);
+
+  // Contenido con formato mixto
+  // Reflejos Osteotendinosos
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloReflejos, tablaInicioX + 2, yPos + 3.5);
+  const anchoTituloReflejos = doc.getTextWidth(tituloReflejos);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoReflejos, tablaInicioX + 2 + anchoTituloReflejos + 5  , yPos + 3.5);
+  
+  // Marcha
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloMarcha, tablaInicioX + tablaAncho / 2 + 2, yPos + 3.5);
+  const anchoTituloMarcha = doc.getTextWidth(tituloMarcha);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoMarcha, tablaInicioX + tablaAncho / 2 + 2 + anchoTituloMarcha + 5, yPos + 3.5);
+  yPos += alturaDinamicaReflejosMarcha;
+
+  // === FILA: COLUMNA VERTEBRAL ===
+  const tituloColumna = "Columna Vertebral: ";
+  const datoColumna = formatearTexto(datosFinales.evaluacionColumnaAbdomen?.columnaVertebral || "");
+  const textoColumna = tituloColumna + datoColumna;
+  const anchoDisponibleColumna = tablaAncho - 4;
+  const lineasColumna = doc.splitTextToSize(textoColumna, anchoDisponibleColumna);
+  const alturaDinamicaColumna = Math.max(filaAltura, lineasColumna.length * 2.5 + 2);
+
+  // Dibujar líneas de la fila dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaColumna);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaColumna);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaDinamicaColumna, tablaInicioX + tablaAncho, yPos + alturaDinamicaColumna);
+
+  // Contenido con formato mixto
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloColumna, tablaInicioX + 2, yPos + 3.5);
+  const anchoTituloColumna = doc.getTextWidth(tituloColumna);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoColumna, tablaInicioX + 2 + anchoTituloColumna + 5, yPos + 3.5);
+  yPos += alturaDinamicaColumna;
+
+  // === FILA: ABDOMEN Y TACTO RECTAL ===
+  const tituloAbdomen = "Abdomen: ";
+  const datoAbdomen = formatearTexto(datosFinales.evaluacionColumnaAbdomen?.abdomen || "");
+  const textoAbdomen = tituloAbdomen + datoAbdomen;
+  // Función para determinar el estado del tacto rectal
+  const obtenerEstadoTactoRectal = () => {
+    if (datosFinales.evaluacionRectalHernias?.tactoRectal?.normal) return "Normal";
+    if (datosFinales.evaluacionRectalHernias?.tactoRectal?.anormal) return "Anormal";
+    if (datosFinales.evaluacionRectalHernias?.tactoRectal?.noSeHizo) return "No hizo";
+    return "";
+  };
+  
+  const tituloTactoRectal = "Tacto Rectal: ";
+  const datoTactoRectal = obtenerEstadoTactoRectal();
+  const textoTactoRectal = tituloTactoRectal + "  " + datoTactoRectal; // Adding 10mm spacing
+  
+  // Calcular altura dinámica para cada columna
+  const anchoDisponibleAbdomen = tablaAncho / 2 - 4;
+  const anchoDisponibleTactoRectal = tablaAncho / 2 - 4;
+  
+  const lineasAbdomen = doc.splitTextToSize(textoAbdomen, anchoDisponibleAbdomen);
+  const lineasTactoRectal = doc.splitTextToSize(textoTactoRectal, anchoDisponibleTactoRectal);
+  
+  // Usar la altura de la columna con más líneas
+  const maxLineasAbdomenTacto = Math.max(lineasAbdomen.length, lineasTactoRectal.length);
+  const alturaDinamicaAbdomenTacto = Math.max(filaAltura, maxLineasAbdomenTacto * 2.5 + 2);
+
+  // Dibujar líneas de la fila dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaAbdomenTacto);
+  doc.line(tablaInicioX + tablaAncho / 2, yPos, tablaInicioX + tablaAncho / 2, yPos + alturaDinamicaAbdomenTacto);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaAbdomenTacto);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaDinamicaAbdomenTacto, tablaInicioX + tablaAncho, yPos + alturaDinamicaAbdomenTacto);
+
+  // Contenido con formato mixto
+  // Abdomen
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloAbdomen, tablaInicioX + 2, yPos + 3.5);
+  const anchoTituloAbdomen = doc.getTextWidth(tituloAbdomen);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoAbdomen, tablaInicioX + 2 + anchoTituloAbdomen + 5, yPos + 3.5);
+  
+  // Tacto Rectal
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloTactoRectal, tablaInicioX + tablaAncho / 2 + 2, yPos + 3.5);
+  const anchoTituloTactoRectal = doc.getTextWidth(tituloTactoRectal);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoTactoRectal, tablaInicioX + tablaAncho / 2 + 2 + anchoTituloTactoRectal + 5, yPos + 3.5);
+  yPos += alturaDinamicaAbdomenTacto;
+
+  // === FILA: ANILLOS INGUINALES, HERNIAS Y VARICES ===
+  const tituloAnillos = "Anillos Inguinales: ";
+  const datoAnillos = formatearTexto(datosFinales.evaluacionColumnaAbdomen?.anillosInguinales || "");
+  const textoAnillos = tituloAnillos + datoAnillos;
+  
+  const tituloHernias = "Hernias: ";
+  const datoHernias = formatearTexto(datosFinales.evaluacionRectalHernias?.hernias || "");
+  const textoHernias = tituloHernias + datoHernias;
+  
+  const tituloVarices = "Varices: ";
+  const datoVarices = formatearTexto(datosFinales.evaluacionRectalHernias?.varices || "");
+  const textoVarices = tituloVarices + datoVarices;
+  
+  // Calcular altura dinámica para cada columna (3 columnas)
+  const anchoDisponibleAnillos = tablaAncho / 3 - 4;
+  const anchoDisponibleHernias = tablaAncho / 3 - 4;
+  const anchoDisponibleVarices = tablaAncho / 3 - 4;
+  
+  const lineasAnillos = doc.splitTextToSize(textoAnillos, anchoDisponibleAnillos);
+  const lineasHernias = doc.splitTextToSize(textoHernias, anchoDisponibleHernias);
+  const lineasVarices = doc.splitTextToSize(textoVarices, anchoDisponibleVarices);
+  
+  // Usar la altura de la columna con más líneas
+  const maxLineasAnillosHerniasVarices = Math.max(lineasAnillos.length, lineasHernias.length, lineasVarices.length);
+  const alturaDinamicaAnillosHerniasVarices = Math.max(filaAltura, maxLineasAnillosHerniasVarices * 2.5 + 2);
+
+  // Dibujar líneas de la fila dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaAnillosHerniasVarices);
+  doc.line(tablaInicioX + tablaAncho / 3, yPos, tablaInicioX + tablaAncho / 3, yPos + alturaDinamicaAnillosHerniasVarices);
+  doc.line(tablaInicioX + (2 * tablaAncho / 3), yPos, tablaInicioX + (2 * tablaAncho / 3), yPos + alturaDinamicaAnillosHerniasVarices);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaAnillosHerniasVarices);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaDinamicaAnillosHerniasVarices, tablaInicioX + tablaAncho, yPos + alturaDinamicaAnillosHerniasVarices);
+
+  // Contenido con formato mixto
+  // Anillos Inguinales
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloAnillos, tablaInicioX + 2, yPos + 3.5);
+  const anchoTituloAnillos = doc.getTextWidth(tituloAnillos);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoAnillos, tablaInicioX + 2 + anchoTituloAnillos + 5, yPos + 3.5);
+  
+  // Hernias
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloHernias, tablaInicioX + tablaAncho / 3 + 2, yPos + 3.5);
+  const anchoTituloHernias = doc.getTextWidth(tituloHernias);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoHernias, tablaInicioX + tablaAncho / 3 + 2 + anchoTituloHernias + 5, yPos + 3.5);
+  
+  // Varices
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloVarices, tablaInicioX + (2 * tablaAncho / 3) + 2, yPos + 3.5);
+  const anchoTituloVarices = doc.getTextWidth(tituloVarices);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoVarices, tablaInicioX + (2 * tablaAncho / 3) + 2 + anchoTituloVarices + 5, yPos + 3.5);
+  yPos += alturaDinamicaAnillosHerniasVarices;
+
+  // === FILA: ÓRGANOS GENITALES Y GANGLIOS LINFÁTICOS ===
+  const tituloOrganos = "Órganos Genitales: ";
+  const datoOrganos = formatearTexto(datosFinales.evaluacionColumnaAbdomen?.organosGenitales || "");
+  const textoOrganos = tituloOrganos + datoOrganos;
+  
+  const tituloGanglios = "Ganglios Linfáticos: ";
+  const datoGanglios = formatearTexto(datosFinales.evaluacionRectalHernias?.gangliosLinfaticos || "");
+  const textoGanglios = tituloGanglios + datoGanglios;
+  
+  // Calcular altura dinámica para cada columna
+  const anchoDisponibleOrganos = tablaAncho / 2 - 4;
+  const anchoDisponibleGanglios = tablaAncho / 2 - 4;
+  
+  const lineasOrganos = doc.splitTextToSize(textoOrganos, anchoDisponibleOrganos);
+  const lineasGanglios = doc.splitTextToSize(textoGanglios, anchoDisponibleGanglios);
+  
+  // Usar la altura de la columna con más líneas
+  const maxLineasOrganosGanglios = Math.max(lineasOrganos.length, lineasGanglios.length);
+  const alturaDinamicaOrganosGanglios = Math.max(filaAltura, maxLineasOrganosGanglios * 2.5 + 2);
+
+  // Dibujar líneas de la fila dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaOrganosGanglios);
+  doc.line(tablaInicioX + tablaAncho / 2, yPos, tablaInicioX + tablaAncho / 2, yPos + alturaDinamicaOrganosGanglios);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaOrganosGanglios);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaDinamicaOrganosGanglios, tablaInicioX + tablaAncho, yPos + alturaDinamicaOrganosGanglios);
+
+  // Contenido con formato mixto
+  // Órganos Genitales
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloOrganos, tablaInicioX + 2, yPos + 3.5);
+  const anchoTituloOrganos = doc.getTextWidth(tituloOrganos);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoOrganos, tablaInicioX + 2 + anchoTituloOrganos + 5, yPos + 3.5);
+  
+  // Ganglios Linfáticos
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloGanglios, tablaInicioX + tablaAncho / 2 + 2, yPos + 3.5);
+  const anchoTituloGanglios = doc.getTextWidth(tituloGanglios);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoGanglios, tablaInicioX + tablaAncho / 2 + 2 + anchoTituloGanglios + 5, yPos + 3.5);
+  yPos += alturaDinamicaOrganosGanglios;
+
+  // === FILA: LENGUAJE, ATENCIÓN, MEMORIA, INTELIGENCIA, ORIENTACIÓN, AFECTIVIDAD ===
+  const tituloLenguaje = "Lenguaje, Atención, Memoria, Inteligencia, Orientación, Afectividad: ";
+  const datoLenguaje = formatearTexto(datosFinales.evaluacionMental?.lenguajeAtencionMemoria || "");
+  const textoLenguaje = tituloLenguaje + datoLenguaje;
+  const anchoDisponibleLenguaje = tablaAncho - 4;
+  const lineasLenguaje = doc.splitTextToSize(textoLenguaje, anchoDisponibleLenguaje);
+  const alturaDinamicaLenguaje = Math.max(filaAltura, lineasLenguaje.length * 2.5 + 2);
+
+  // Dibujar líneas de la fila dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaLenguaje);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaLenguaje);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaDinamicaLenguaje, tablaInicioX + tablaAncho, yPos + alturaDinamicaLenguaje);
+
+  // Contenido con formato mixto
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloLenguaje, tablaInicioX + 2, yPos + 3.5);
+  const anchoTituloLenguaje = doc.getTextWidth(tituloLenguaje);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoLenguaje, tablaInicioX + 2 + anchoTituloLenguaje + 5, yPos + 3.5);
+  yPos += alturaDinamicaLenguaje;
+
+  // === FILA: ANAMNESIS ===
+  const tituloAnamnesis = "Anamnesis: ";
+  const datoAnamnesis = formatearTexto(datosFinales.evaluacionMental?.anamnesis || "");
+  const textoAnamnesis = tituloAnamnesis + datoAnamnesis;
+  const anchoDisponibleAnamnesis = tablaAncho - 4;
+  const lineasAnamnesis = doc.splitTextToSize(textoAnamnesis, anchoDisponibleAnamnesis);
+  const alturaDinamicaAnamnesis = Math.max(filaAltura, lineasAnamnesis.length * 2.5 + 2);
+
+  // Dibujar líneas de la fila dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaAnamnesis);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaAnamnesis);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaDinamicaAnamnesis, tablaInicioX + tablaAncho, yPos + alturaDinamicaAnamnesis);
+
+  // Contenido con formato mixto
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloAnamnesis, tablaInicioX + 2, yPos + 3.5);
+  const anchoTituloAnamnesis = doc.getTextWidth(tituloAnamnesis);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoAnamnesis, tablaInicioX + 2 + anchoTituloAnamnesis, yPos + 3.5);
+  yPos += alturaDinamicaAnamnesis;
+
+  // === FILA: ESTADO MENTAL ===
+  const tituloEstadoMental = "Estado Mental: ";
+  const datoEstadoMental = formatearTexto(datosFinales.evaluacionMental?.estadoMental || "");
+  const textoEstadoMental = tituloEstadoMental + datoEstadoMental;
+  const anchoDisponibleEstadoMental = tablaAncho - 4;
+  const lineasEstadoMental = doc.splitTextToSize(textoEstadoMental, anchoDisponibleEstadoMental);
+  const alturaDinamicaEstadoMental = Math.max(filaAltura, lineasEstadoMental.length * 2.5 + 2);
+
+  // Dibujar líneas de la fila dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaEstadoMental);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaEstadoMental);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaDinamicaEstadoMental, tablaInicioX + tablaAncho, yPos + alturaDinamicaEstadoMental);
+
+  // Contenido con formato mixto
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloEstadoMental, tablaInicioX + 2, yPos + 3.5);
+  const anchoTituloEstadoMental = doc.getTextWidth(tituloEstadoMental);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoEstadoMental, tablaInicioX + 2 + anchoTituloEstadoMental, yPos + 3.5);
+  yPos += alturaDinamicaEstadoMental;
+
+  // === FILA: NRO RX, FECHA, CALIDAD, SÍMBOLOS ===
+  const tituloNroRx = "Nro Rx: ";
+  const datoNroRx = formatearTexto(datosFinales.nroRx || "");
+  const textoNroRx = tituloNroRx + datoNroRx;
+  
+  const tituloFechaRx = "Fecha: ";
+  const datoFechaRx = formatearTexto(datosFinales.fechaRx || "");
+  const textoFechaRx = tituloFechaRx + datoFechaRx;
+  
+  const tituloCalidadRx = "Calidad: ";
+  const datoCalidadRx = formatearTexto(datosFinales.calidadRx || "");
+  const textoCalidadRx = tituloCalidadRx + datoCalidadRx;
+  
+  const tituloSimbolosRx = "Símbolos: ";
+  const datoSimbolosRx = formatearTexto(datosFinales.simbolosRx || "");
+  const textoSimbolosRx = tituloSimbolosRx + datoSimbolosRx;
+  
+  // Calcular altura dinámica para cada columna (4 columnas)
+  const anchoDisponibleNroRx = tablaAncho / 4 - 4;
+  const anchoDisponibleFechaRx = tablaAncho / 4 - 4;
+  const anchoDisponibleCalidadRx = tablaAncho / 4 - 4;
+  const anchoDisponibleSimbolosRx = tablaAncho / 4 - 4;
+  
+  const lineasNroRx = doc.splitTextToSize(textoNroRx, anchoDisponibleNroRx);
+  const lineasFechaRx = doc.splitTextToSize(textoFechaRx, anchoDisponibleFechaRx);
+  const lineasCalidadRx = doc.splitTextToSize(textoCalidadRx, anchoDisponibleCalidadRx);
+  const lineasSimbolosRx = doc.splitTextToSize(textoSimbolosRx, anchoDisponibleSimbolosRx);
+  
+  // Usar la altura de la columna con más líneas
+  const maxLineasRx = Math.max(lineasNroRx.length, lineasFechaRx.length, lineasCalidadRx.length, lineasSimbolosRx.length);
+  const alturaDinamicaRx = Math.max(filaAltura, maxLineasRx * 2.5 + 2);
+
+  // Dibujar líneas de la fila dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaRx);
+  doc.line(tablaInicioX + tablaAncho / 4, yPos, tablaInicioX + tablaAncho / 4, yPos + alturaDinamicaRx);
+  doc.line(tablaInicioX + tablaAncho / 2, yPos, tablaInicioX + tablaAncho / 2, yPos + alturaDinamicaRx);
+  doc.line(tablaInicioX + (3 * tablaAncho / 4), yPos, tablaInicioX + (3 * tablaAncho / 4), yPos + alturaDinamicaRx);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaRx);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaDinamicaRx, tablaInicioX + tablaAncho, yPos + alturaDinamicaRx);
+
+  // Contenido con formato mixto
+  // Nro Rx
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloNroRx, tablaInicioX + 2, yPos + 3.5);
+  const anchoTituloNroRx = doc.getTextWidth(tituloNroRx);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoNroRx, tablaInicioX + 2 + anchoTituloNroRx + 5, yPos + 3.5);
+  
+  // Fecha Rx
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloFechaRx, tablaInicioX + tablaAncho / 4 + 2, yPos + 3.5);
+  const anchoTituloFechaRx = doc.getTextWidth(tituloFechaRx);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoFechaRx, tablaInicioX + tablaAncho / 4 + 2 + anchoTituloFechaRx + 5, yPos + 3.5);
+  
+  // Calidad Rx
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloCalidadRx, tablaInicioX + tablaAncho / 2 + 2, yPos + 3.5);
+  const anchoTituloCalidadRx = doc.getTextWidth(tituloCalidadRx);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoCalidadRx, tablaInicioX + tablaAncho / 2 + 2 + anchoTituloCalidadRx + 5, yPos + 3.5);
+  
+  // Símbolos Rx
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloSimbolosRx, tablaInicioX + (3 * tablaAncho / 4) + 2, yPos + 3.5);
+  const anchoTituloSimbolosRx = doc.getTextWidth(tituloSimbolosRx);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoSimbolosRx, tablaInicioX + (3 * tablaAncho / 4) + 2 + anchoTituloSimbolosRx + 5 , yPos + 3.5);
+  yPos += alturaDinamicaRx;
+
+  // === FILA: VÉRTICES ===
+  const tituloVertices = "Vértices: ";
+  const datoVertices = formatearTexto(datosFinales.vertices || "");
+  const textoVertices = tituloVertices + datoVertices;
+  const anchoDisponibleVertices = tablaAncho - 4;
+  const lineasVertices = doc.splitTextToSize(textoVertices, anchoDisponibleVertices);
+  const alturaDinamicaVertices = Math.max(filaAltura, lineasVertices.length * 2.5 + 2);
+
+  // Dibujar líneas de la fila dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaVertices);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaVertices);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaDinamicaVertices, tablaInicioX + tablaAncho, yPos + alturaDinamicaVertices);
+
+  // Contenido con formato mixto
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloVertices, tablaInicioX + 2, yPos + 3.5);
+  const anchoTituloVertices = doc.getTextWidth(tituloVertices);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoVertices, tablaInicioX + 2 + anchoTituloVertices + 5, yPos + 3.5);
+  yPos += alturaDinamicaVertices;
+
+  // === FILA: CAMPOS PULMONARES, MEDIASTINOS, HELIOS, SENOS ===
+  const tituloCamposPulmonares = "CAMPO PULMONARES ";
+  const datoCamposPulmonares = ""; // Solo título, sin datos
+  const textoCamposPulmonares = tituloCamposPulmonares + datoCamposPulmonares;
+  
+  const tituloMediastinos = "Mediastinos: ";
+  const datoMediastinos = formatearTexto(datosFinales.mediastinos || "");
+  const textoMediastinos = tituloMediastinos + datoMediastinos;
+  
+  const tituloHelios = "Helios: ";
+  const datoHelios = formatearTexto(datosFinales.helios || "");
+  const textoHelios = tituloHelios + datoHelios;
+  
+  const tituloSenos = "Senos: ";
+  const datoSenos = formatearTexto(datosFinales.senos || "");
+  const textoSenos = tituloSenos + datoSenos;
+  
+  // Calcular altura dinámica para cada columna (4 columnas)
+  const anchoDisponibleCamposPulmonares = tablaAncho / 4 - 4;
+  const anchoDisponibleMediastinos = tablaAncho / 4 - 4;
+  const anchoDisponibleHelios = tablaAncho / 4 - 4;
+  const anchoDisponibleSenos = tablaAncho / 4 - 4;
+  
+  const lineasCamposPulmonares = doc.splitTextToSize(textoCamposPulmonares, anchoDisponibleCamposPulmonares);
+  const lineasMediastinos = doc.splitTextToSize(textoMediastinos, anchoDisponibleMediastinos);
+  const lineasHelios = doc.splitTextToSize(textoHelios, anchoDisponibleHelios);
+  const lineasSenos = doc.splitTextToSize(textoSenos, anchoDisponibleSenos);
+  
+  // Usar la altura de la columna con más líneas
+  const maxLineasCampos = Math.max(lineasCamposPulmonares.length, lineasMediastinos.length, lineasHelios.length, lineasSenos.length);
+  const alturaDinamicaCampos = Math.max(filaAltura, maxLineasCampos * 2.5 + 2);
+
+  // Dibujar líneas de la fila dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaCampos);
+  doc.line(tablaInicioX + tablaAncho / 4, yPos, tablaInicioX + tablaAncho / 4, yPos + alturaDinamicaCampos);
+  doc.line(tablaInicioX + tablaAncho / 2, yPos, tablaInicioX + tablaAncho / 2, yPos + alturaDinamicaCampos);
+  doc.line(tablaInicioX + (3 * tablaAncho / 4), yPos, tablaInicioX + (3 * tablaAncho / 4), yPos + alturaDinamicaCampos);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaCampos);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaDinamicaCampos, tablaInicioX + tablaAncho, yPos + alturaDinamicaCampos);
+
+  // Contenido con formato mixto
+  // Campos Pulmonares
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloCamposPulmonares, tablaInicioX + 2, yPos + 3.5);
+  const anchoTituloCamposPulmonares = doc.getTextWidth(tituloCamposPulmonares);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoCamposPulmonares, tablaInicioX + 2 + anchoTituloCamposPulmonares + 5, yPos + 3.5);
+  
+  // Mediastinos
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloMediastinos, tablaInicioX + tablaAncho / 4 + 2, yPos + 3.5);
+  const anchoTituloMediastinos = doc.getTextWidth(tituloMediastinos);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoMediastinos, tablaInicioX + tablaAncho / 4 + 2 + anchoTituloMediastinos + 5, yPos + 3.5);
+  
+  // Helios
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloHelios, tablaInicioX + tablaAncho / 2 + 2, yPos + 3.5);
+  const anchoTituloHelios = doc.getTextWidth(tituloHelios);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoHelios, tablaInicioX + tablaAncho / 2 + 2 + anchoTituloHelios + 5, yPos + 3.5);
+  
+  // Senos
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloSenos, tablaInicioX + (3 * tablaAncho / 4) + 2, yPos + 3.5);
+  const anchoTituloSenos = doc.getTextWidth(tituloSenos);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoSenos, tablaInicioX + (3 * tablaAncho / 4) + 2 + anchoTituloSenos + 5, yPos + 3.5);
+  yPos += alturaDinamicaCampos;
+
+  // === FILA: SILUETA CARDIOVASCULAR ===
+  const tituloSilueta = "Silueta Cardiovascular: ";
+  const datoSilueta = formatearTexto(datosFinales.siluetaCardiovascular || "");
+  const textoSilueta = tituloSilueta + datoSilueta;
+  const anchoDisponibleSilueta = tablaAncho - 4;
+  const lineasSilueta = doc.splitTextToSize(textoSilueta, anchoDisponibleSilueta);
+  const alturaDinamicaSilueta = Math.max(filaAltura, lineasSilueta.length * 2.5 + 2);
+
+  // Dibujar líneas de la fila dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaSilueta);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaSilueta);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaDinamicaSilueta, tablaInicioX + tablaAncho, yPos + alturaDinamicaSilueta);
+
+  // Contenido con formato mixto
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloSilueta, tablaInicioX + 2, yPos + 3.5);
+  const anchoTituloSilueta = doc.getTextWidth(tituloSilueta);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoSilueta, tablaInicioX + 2 + anchoTituloSilueta + 5, yPos + 3.5);
+  yPos += alturaDinamicaSilueta;
+
+  // === FILA: CONCLUSIONES RADIOGRÁFICAS ===
+  const tituloConclusiones = "Conclusiones Radiográficas: ";
+  const datoConclusiones = formatearTexto(datosFinales.conclusionesRadiograficas || "");
+  const textoConclusiones = tituloConclusiones + datoConclusiones;
+  const anchoDisponibleConclusiones = tablaAncho - 4;
+  const lineasConclusiones = doc.splitTextToSize(textoConclusiones, anchoDisponibleConclusiones);
+  const alturaDinamicaConclusiones = Math.max(filaAltura, lineasConclusiones.length * 2.5 + 2);
+
+  // Dibujar líneas de la fila dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaConclusiones);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaConclusiones);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaDinamicaConclusiones, tablaInicioX + tablaAncho, yPos + alturaDinamicaConclusiones);
+
+  // Contenido con formato mixto
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(tituloConclusiones, tablaInicioX + 2, yPos + 3.5);
+  const anchoTituloConclusiones = doc.getTextWidth(tituloConclusiones);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datoConclusiones, tablaInicioX + 2 + anchoTituloConclusiones + 5 , yPos + 3.5);
+  yPos += alturaDinamicaConclusiones;
+
+  // === NUEVA SECCIÓN PARA CLASIFICACIÓN ILO NEUMOCONIOSIS (AGREGADA PARA PÁGINA 2) ===
+  yPos = dibujarHeaderSeccion("13. CLASIFICACIÓN NEUMOCONIOSIS", yPos, filaAltura);
+
+  // Definir columnas para la tabla ILO (7 columnas basadas en la descripción)
+  const numColsILO = 7;
+  const colWidthILO = tablaAncho / numColsILO;
+  const colPositionsILO = [];
+  for (let i = 0; i <= numColsILO; i++) {
+    colPositionsILO.push(tablaInicioX + (i * colWidthILO));
   }
 
-  // ABDOMEN
-  const xAbdomen = 15;
-  const yAbdomen = 58;
-  if (datosFinales.evaluacionColumnaAbdomen && datosFinales.evaluacionColumnaAbdomen.abdomen) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionColumnaAbdomen.abdomen.toUpperCase(), xAbdomen, yAbdomen, { maxWidth: 80 });
+  // Fila 1: Espacio para X (fila superior para marcar la categoría)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  for (let i = 1; i < numColsILO; i++) {
+    doc.line(colPositionsILO[i], yPos, colPositionsILO[i], yPos + filaAltura);
   }
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-  // ANILLOS INGUINALES
-  const xAnillosInguinales = 15;
-  const yAnillosInguinales = 75;
-  if (datosFinales.evaluacionColumnaAbdomen && datosFinales.evaluacionColumnaAbdomen.anillosInguinales) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionColumnaAbdomen.anillosInguinales.toUpperCase(), xAnillosInguinales, yAnillosInguinales);
+  // Agregar división en el medio de la tercera celda (índice 2)
+  const terceraCeldaMitad = colPositionsILO[2] + (colWidthILO / 2);
+  doc.line(terceraCeldaMitad, yPos, terceraCeldaMitad, yPos + filaAltura);
+
+  // Agregar dos divisiones en la cuarta celda (índice 3)
+  const cuartaCeldaTercio1 = colPositionsILO[3] + (colWidthILO / 3);
+  const cuartaCeldaTercio2 = colPositionsILO[3] + (2 * colWidthILO / 3);
+  doc.line(cuartaCeldaTercio1, yPos, cuartaCeldaTercio1, yPos + filaAltura);
+  doc.line(cuartaCeldaTercio2, yPos, cuartaCeldaTercio2, yPos + filaAltura);
+
+  // Agregar dos divisiones en la quinta celda (índice 4) para "3/2 3/3 3/+"
+  const quintaCeldaTercio1 = colPositionsILO[4] + (colWidthILO / 3);
+  const quintaCeldaTercio2 = colPositionsILO[4] + (2 * colWidthILO / 3);
+  doc.line(quintaCeldaTercio1, yPos, quintaCeldaTercio1, yPos + filaAltura);
+  doc.line(quintaCeldaTercio2, yPos, quintaCeldaTercio2, yPos + filaAltura);
+
+  // Colocar X en la columna correspondiente según datosFinales.neumoconiosisCategoria
+  let xPosILO = 0;
+  if (datosFinales.neumoconiosisCategoria) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    const anchoX = doc.getTextWidth("X");
+    
+    // Calcular posición X basada en la categoría específica
+    if (datosFinales.neumoconiosisCategoria === '0/0') {
+      xPosILO = colPositionsILO[0] + (colWidthILO / 2);
+    } else if (datosFinales.neumoconiosisCategoria === '1/0') {
+      xPosILO = colPositionsILO[1] + (colWidthILO / 2);
+    } else if (datosFinales.neumoconiosisCategoria === '1/1') {
+      xPosILO = colPositionsILO[2] + (colWidthILO / 4); // Primera mitad de la celda 2
+    } else if (datosFinales.neumoconiosisCategoria === '1/2') {
+      xPosILO = terceraCeldaMitad + (colWidthILO / 4); // Segunda mitad de la celda 2
+    } else if (datosFinales.neumoconiosisCategoria === '2/1') {
+      xPosILO = colPositionsILO[3] + (colWidthILO / 6); // Primera tercera parte de la celda 3
+    } else if (datosFinales.neumoconiosisCategoria === '2/2') {
+      xPosILO = cuartaCeldaTercio1 + (colWidthILO / 6); // Segunda tercera parte de la celda 3
+    } else if (datosFinales.neumoconiosisCategoria === '2/3') {
+      xPosILO = cuartaCeldaTercio2 + (colWidthILO / 6); // Tercera parte de la celda 3
+    } else if (datosFinales.neumoconiosisCategoria === '3/2') {
+      xPosILO = colPositionsILO[4] + (colWidthILO / 6); // Primera tercera parte de la celda 4
+    } else if (datosFinales.neumoconiosisCategoria === '3/3') {
+      xPosILO = quintaCeldaTercio1 + (colWidthILO / 6); // Segunda tercera parte de la celda 4
+    } else if (datosFinales.neumoconiosisCategoria === '3/+') {
+      xPosILO = quintaCeldaTercio2 + (colWidthILO / 6); // Tercera parte de la celda 4
+    } else if (['A', 'B', 'C'].includes(datosFinales.neumoconiosisCategoria)) {
+      xPosILO = colPositionsILO[5] + (colWidthILO / 2);
+    } else if (datosFinales.neumoconiosisCategoria === 'ST') {
+      xPosILO = colPositionsILO[6] + (colWidthILO / 2);
+    } else {
+      xPosILO = colPositionsILO[0] + (colWidthILO / 2); // Default a 0/0
+    }
+    
+    // Centrar la X verticalmente en la celda
+    doc.text("X", xPosILO - (anchoX / 2), yPos + (filaAltura / 2) + 1.5);
   }
+  yPos += filaAltura;
 
-  // ÓRGANOS GENITALES
-  const xOrganosGenitales = 15;
-  const yOrganosGenitales = 85;
-  if (datosFinales.evaluacionColumnaAbdomen && datosFinales.evaluacionColumnaAbdomen.organosGenitales) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionColumnaAbdomen.organosGenitales.toUpperCase(), xOrganosGenitales, yOrganosGenitales, { maxWidth: 80 });
+  // Fila 2: Etiquetas de categorías (0/0 | 1/0 | 1/1 1/2 | 2/1 2/2 2/3 | 3/2 3/3 3/+ | A,B,C | ST)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  for (let i = 1; i < numColsILO; i++) {
+    doc.line(colPositionsILO[i], yPos, colPositionsILO[i], yPos + filaAltura);
   }
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-  // HERNIAS
-  const xHernias = 80;
-  const yHernias = 75;
-  if (datosFinales.evaluacionRectalHernias && datosFinales.evaluacionRectalHernias.hernias) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionRectalHernias.hernias.toUpperCase(), xHernias, yHernias);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const catLabels = ['0/0', '1/0', '1/1 1/2', '2/1 2/2 2/3', '3/2 3/3 3/+', 'A B C', 'ST'];
+  for (let i = 0; i < numColsILO; i++) {
+    const label = catLabels[i];
+    const anchoLabel = doc.getTextWidth(label);
+    
+    if (i === 2) {
+      // Para la tercera celda (1/1 1/2), centrar cada parte en su subdivisión
+      const texto1 = "1/1";
+      const texto2 = "1/2";
+      const anchoTexto1 = doc.getTextWidth(texto1);
+      const anchoTexto2 = doc.getTextWidth(texto2);
+      
+      // Centrar "1/1" en la primera mitad
+      doc.text(texto1, colPositionsILO[i] + ((colWidthILO / 2 - anchoTexto1) / 2), yPos + 3.5);
+      // Centrar "1/2" en la segunda mitad
+      doc.text(texto2, terceraCeldaMitad + ((colWidthILO / 2 - anchoTexto2) / 2), yPos + 3.5);
+    } else if (i === 3) {
+      // Para la cuarta celda (2/1 2/2 2/3), centrar cada parte en su subdivisión
+      const texto1 = "2/1";
+      const texto2 = "2/2";
+      const texto3 = "2/3";
+      const anchoTexto1 = doc.getTextWidth(texto1);
+      const anchoTexto2 = doc.getTextWidth(texto2);
+      const anchoTexto3 = doc.getTextWidth(texto3);
+      
+      // Centrar "2/1" en la primera tercera parte
+      doc.text(texto1, colPositionsILO[i] + ((colWidthILO / 3 - anchoTexto1) / 2), yPos + 3.5);
+      // Centrar "2/2" en la segunda tercera parte
+      doc.text(texto2, cuartaCeldaTercio1 + ((colWidthILO / 3 - anchoTexto2) / 2), yPos + 3.5);
+      // Centrar "2/3" en la tercera parte
+      doc.text(texto3, cuartaCeldaTercio2 + ((colWidthILO / 3 - anchoTexto3) / 2), yPos + 3.5);
+    } else if (i === 4) {
+      // Para la quinta celda (3/2 3/3 3/+), centrar cada parte en su subdivisión
+      const texto1 = "3/2";
+      const texto2 = "3/3";
+      const texto3 = "3/+";
+      const anchoTexto1 = doc.getTextWidth(texto1);
+      const anchoTexto2 = doc.getTextWidth(texto2);
+      const anchoTexto3 = doc.getTextWidth(texto3);
+      
+      // Centrar "3/2" en la primera tercera parte
+      doc.text(texto1, colPositionsILO[i] + ((colWidthILO / 3 - anchoTexto1) / 2), yPos + 3.5);
+      // Centrar "3/3" en la segunda tercera parte
+      doc.text(texto2, quintaCeldaTercio1 + ((colWidthILO / 3 - anchoTexto2) / 2), yPos + 3.5);
+      // Centrar "3/+" en la tercera parte
+      doc.text(texto3, quintaCeldaTercio2 + ((colWidthILO / 3 - anchoTexto3) / 2), yPos + 3.5);
+    } else {
+      // Para las demás celdas, centrar normalmente
+      doc.text(label, colPositionsILO[i] + ((colWidthILO - anchoLabel) / 2), yPos + 3.5);
+    }
   }
+  yPos += filaAltura;
 
-  // VÁRICES
-  const xVarices = 150;
-  const yVarices = 75;
-  if (datosFinales.evaluacionRectalHernias && datosFinales.evaluacionRectalHernias.varices) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionRectalHernias.varices.toUpperCase(), xVarices, yVarices);
+  // Fila 3: Etiquetas de profusión (cero | 1/0 | uno | dos | tres | cuatro | -)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  for (let i = 1; i < numColsILO; i++) {
+    doc.line(colPositionsILO[i], yPos, colPositionsILO[i], yPos + filaAltura);
   }
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-  // GANGLIOS LINFÁTICOS
-  const xGangliosLinfaticos = 120;
-  const yGangliosLinfaticos = 85;
-  if (datosFinales.evaluacionRectalHernias && datosFinales.evaluacionRectalHernias.gangliosLinfaticos) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionRectalHernias.gangliosLinfaticos.toUpperCase(), xGangliosLinfaticos, yGangliosLinfaticos);
+  const profLabels = ['cero', '1/0', 'uno', 'dos', 'tres', 'cuatro', '-'];
+  for (let i = 0; i < numColsILO; i++) {
+    const label = profLabels[i];
+    const anchoLabel = doc.getTextWidth(label);
+    doc.text(label, colPositionsILO[i] + ((colWidthILO - anchoLabel) / 2), yPos + 3.5);
   }
+  yPos += filaAltura;
 
-  // === SECCIÓN: EVALUACIÓN RECTAL Y HERNIAS ===
-  // TACTO RECTAL - Checkboxes
-  const tactoRectalPosiciones = [
-    { tipo: "noSeHizo", x: 136.4, y: 60, texto: "NO SE HIZO" },
-    { tipo: "anormal", x: 189, y: 60, texto: "ANORMAL" },
-    { tipo: "normal", x: 136.4, y: 65.2, texto: "NORMAL" }
-  ];
+  // === SECCIÓN ADICIONAL: OTROS HALLAZGOS RADIOGRÁFICOS ===
+  yPos = dibujarHeaderSeccion("14. OTROS HALLAZGOS RADIOGRÁFICOS", yPos, filaAltura);
 
-  if (datosFinales.evaluacionRectalHernias && datosFinales.evaluacionRectalHernias.tactoRectal) {
-    doc.setTextColor(0, 0, 255); // Color azul para las X
-    doc.setFont("helvetica", "bold").setFontSize(12);
+  // Fila para "Sin neumoconiosis" y "Imagen Radiográfica de exposición de polvo" (2 columnas)
+  const colWidthOther = tablaAncho / 2;
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + colWidthOther, yPos, tablaInicioX + colWidthOther, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-    tactoRectalPosiciones.forEach(pos => {
-      if (datosFinales.evaluacionRectalHernias.tactoRectal[pos.tipo]) {
-        doc.text("X", pos.x, pos.y);
-      }
-    });
+  // Contenido con formato mixto
+  // Sin neumoconiosis
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Sin neumoconiosis:", tablaInicioX + 2, yPos + 3.5);
+  const anchoTituloSinNeumoconiosis = doc.getTextWidth("Sin neumoconiosis:");
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto(datosFinales.sinNeumoconiosis || ""), tablaInicioX + 2 + anchoTituloSinNeumoconiosis + 10, yPos + 3.5);
+  
+  // Imagen Radiográfica de exposición de polvo
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Imagen Radiográfica de exposición de polvo:", tablaInicioX + colWidthOther + 2, yPos + 3.5);
+  const anchoTituloImagenRadiografica = doc.getTextWidth("Imagen Radiográfica de exposición de polvo:");
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto(datosFinales.imagenRadiograficaExposicionPolvo || ""), tablaInicioX + colWidthOther + 2 + anchoTituloImagenRadiografica + 10, yPos + 3.5);
+  yPos += filaAltura;
 
-    doc.setTextColor(0, 0, 0); // Resetear a negro
-  }
+  // Fila para "Con neumoconiosis" (columna completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-  // === SECCIÓN: EVALUACIÓN MENTAL ===
-  // LENGUAJE, ATENCIÓN, MEMORIA, INTELIGENCIA, ORIENTACIÓN, AFECTIVIDAD
-  const xLenguajeAtencionMemoria = 15;
-  const yLenguajeAtencionMemoria = 94;
-  if (datosFinales.evaluacionMental && datosFinales.evaluacionMental.lenguajeAtencionMemoria) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionMental.lenguajeAtencionMemoria.toUpperCase(), xLenguajeAtencionMemoria, yLenguajeAtencionMemoria);
-  }
+  // Contenido con formato mixto
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Con neumoconiosis:", tablaInicioX + 2, yPos + 3.5);
+  const anchoTituloConNeumoconiosis = doc.getTextWidth("Con neumoconiosis:");
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto(datosFinales.conNeumoconiosis || ""), tablaInicioX + 2 + anchoTituloConNeumoconiosis + 10, yPos + 3.5);
+  yPos += filaAltura;
 
-  // ANAMNESIS
-  const xAnamnesis = 27;
-  const yAnamnesis = 98;
-  if (datosFinales.evaluacionMental && datosFinales.evaluacionMental.anamnesis) {
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.setTextColor(0, 0, 0);
+  // Fila para "Reacciones serológicas LUES-no LUES" (columna completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-    // Limpiar el texto: remover saltos de línea y espacios extra
-    const textoLimpio = datosFinales.evaluacionMental.anamnesis
-      .replace(/\n/g, ' ') // Reemplazar saltos de línea con espacios
-      .replace(/\r/g, ' ') // Reemplazar retornos de carro con espacios
-      .replace(/\s+/g, ' ') // Reemplazar múltiples espacios con uno solo
-      .trim(); // Remover espacios al inicio y final
-
-    doc.text(textoLimpio.toUpperCase(), xAnamnesis, yAnamnesis, { maxWidth: 180 });
-  }
-
-  // ESTADO MENTAL
-  const xEstadoMental = 35;
-  const yEstadoMental = 102;
-  if (datosFinales.evaluacionMental && datosFinales.evaluacionMental.estadoMental) {
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.setTextColor(0, 0, 0);
-
-    // Limpiar el texto: remover saltos de línea y espacios extra
-    const textoLimpio = datosFinales.evaluacionMental.estadoMental
-      .replace(/\n/g, ' ') // Reemplazar saltos de línea con espacios
-      .replace(/\r/g, ' ') // Reemplazar retornos de carro con espacios
-      .replace(/\s+/g, ' ') // Reemplazar múltiples espacios con uno solo
-      .trim(); // Remover espacios al inicio y final
-
-    doc.text(textoLimpio.toUpperCase(), xEstadoMental, yEstadoMental, { maxWidth: 180 });
-  }
-
-  // === SECCIÓN: RADIOGRAFÍA DE TÓRAX ===
-  // N° RX
-  const xNumeroRx = 26;
-  const yNumeroRx = 109;
-  if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.numeroRx) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.radiografiaTorax.numeroRx, xNumeroRx, yNumeroRx);
-  }
-
-  // FECHA
-  const xFechaRx = 26;
-  const yFechaRx = 114;
-  if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.fecha) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.radiografiaTorax.fecha, xFechaRx, yFechaRx);
-  }
-
-  // CALIDAD
-  const xCalidad = 26;
-  const yCalidad = 118.5;
-  if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.calidad) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.radiografiaTorax.calidad, xCalidad, yCalidad);
-  }
-
-  // SÍMBOLOS
-  const xSimbolos = 26;
-  const ySimbolos = 123.5;
-  if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.simbolos) {
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.radiografiaTorax.simbolos, xSimbolos, ySimbolos);
-  }
-
-  // VÉRTICES
-  const xVertices = 95;
-  const yVertices = 108;
-  if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.vertices) {
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.radiografiaTorax.vertices.toUpperCase(), xVertices, yVertices, { maxWidth: 40 });
-  }
-
-  // HILIOS NORMALES
-  const xHilios = 90;
-  const yHilios = 116;
-  if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.hilios) {
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.radiografiaTorax.hilios.toUpperCase(), xHilios, yHilios, { maxWidth: 40 });
-  }
-
-  // SENOS
-  const xSenos = 90;
-  const ySenos = 121;
-  if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.senos) {
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.radiografiaTorax.senos.toUpperCase(), xSenos, ySenos, { maxWidth: 40 });
-  }
-
-  // MEDIASTINOS
-  const xMediastinos = 170;
-  const yMediastinos = 113;
-  if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.mediastinos) {
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.radiografiaTorax.mediastinos.toUpperCase(), xMediastinos, yMediastinos, { maxWidth: 40 });
-  }
-
-  // CONCLUSIONES RADIOGRÁFICAS
-  const xConclusionesRadiograficas = 84;
-  const yConclusionesRadiograficas = 130;
-  if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.conclusionesRadiograficas) {
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.radiografiaTorax.conclusionesRadiograficas.toUpperCase(), xConclusionesRadiograficas, yConclusionesRadiograficas, { maxWidth: 40 });
-  }
-
-  // SILUETA CARDIOVASCULAR
-  const xSiluetaCardiovascular = 150;
-  const ySiluetaCardiovascular = 123;
-  if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.siluetaCardiovascular) {
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.radiografiaTorax.siluetaCardiovascular.toUpperCase(), xSiluetaCardiovascular, ySiluetaCardiovascular, { maxWidth: 40 });
-  }
-
-  // === SECCIÓN: TEXTOS DE NEUMOCONIOSIS ===
-  // Texto Neumoconiosis 1
-  const xTextoNeumoconiosis1 = 8;
-  const yTextoNeumoconiosis1 = 154;
-  if (datosFinales.textoNeumoconiosis1) {
-    doc.setFont("helvetica", "normal").setFontSize(6.5);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.textoNeumoconiosis1.toUpperCase(), xTextoNeumoconiosis1, yTextoNeumoconiosis1, { maxWidth: 35 });
-  }
-
-  // Texto Neumoconiosis 2
-  const xTextoNeumoconiosis2 = 44;
-  const yTextoNeumoconiosis2 = 154;
-  if (datosFinales.textoNeumoconiosis2) {
-    doc.setFont("helvetica", "normal").setFontSize(6.5);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.textoNeumoconiosis2.toUpperCase(), xTextoNeumoconiosis2, yTextoNeumoconiosis2, { maxWidth: 40 });
-  }
-
-  // Texto Neumoconiosis 3
-  const xTextoNeumoconiosis3 = 86;
-  const yTextoNeumoconiosis3 = 154;
-  if (datosFinales.textoNeumoconiosis3) {
-    doc.setFont("helvetica", "normal").setFontSize(6.5);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.textoNeumoconiosis3.toUpperCase(), xTextoNeumoconiosis3, yTextoNeumoconiosis3, { maxWidth: 55 });
-  }
-
-  // === SECCIÓN: REACCIONES SEROLÓGICAS ===
-  // TITULACIÓN - Checkboxes (Clasificación ILO)
-  const titulacionPosiciones = [
-    { titulo: "0/0", x: 12, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_0_0 },
-    { titulo: "1/0", x: 28.5, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_1_0 },
-    { titulo: "1/1", x: 40.2, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_1_1 },
-    { titulo: "1/2", x: 49.5, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_1_2 },
-    { titulo: "2/1", x: 59, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_2_1 },
-    { titulo: "2/2", x: 69, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_2_2 },
-    { titulo: "2/3", x: 79, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_2_3 },
-    { titulo: "3/2", x: 89, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_3_2 },
-    { titulo: "3/3", x: 98.5, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_3_3 },
-    { titulo: "3/+", x: 108.5, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_3_plus },
-    { titulo: "A,B,C", x: 122, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_abc },
-    { titulo: "St", x: 136, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_st }
-  ];
-
-  if (datosFinales.reaccionesSerologicas) {
-    doc.setTextColor(0, 0, 255); // Color azul para las X
-    doc.setFont("helvetica", "bold").setFontSize(12);
-
-    titulacionPosiciones.forEach(pos => {
-      if (pos.marcado) {
-        doc.text("X", pos.x, pos.y);
-      }
-    });
-
-    doc.setTextColor(0, 0, 0); // Resetear a negro
-  }
-
-  // === SECCIÓN: GRUPO SANGUÍNEO ===
-  const grupoSanguineoPosiciones = [
-    { tipo: "o", x: 21.2, y: 200.5, texto: "O" },
-    { tipo: "a", x: 33.3, y: 200.5, texto: "A" },
-    { tipo: "b", x: 46.4, y: 200.5, texto: "B" },
-    { tipo: "ab", x: 58.2, y: 200.5, texto: "AB" }
-  ];
-
-  if (datosFinales.grupoSanguineo && datosFinales.grupoSanguineo.grupo) {
-    doc.setTextColor(0, 0, 255);
-    doc.setFont("helvetica", "bold").setFontSize(12);
-    grupoSanguineoPosiciones.forEach(pos => {
-      if (datosFinales.grupoSanguineo.grupo[pos.tipo]) {
-        doc.text("X", pos.x, pos.y);
-      }
-    });
-    doc.setTextColor(0, 0, 0);
-  }
-
-  // FACTOR RH - Checkboxes
-  const factorRhPosiciones = [
-    { tipo: "negativo", x: 74.5, y: 200.5, texto: "Rh(-)" },
-    { tipo: "positivo", x: 92, y: 200.5, texto: "Rh(+)" }
-  ];
-
-  if (datosFinales.grupoSanguineo && datosFinales.grupoSanguineo.factorRh) {
-    doc.setTextColor(0, 0, 255);
-    doc.setFont("helvetica", "bold").setFontSize(12);
-    factorRhPosiciones.forEach(pos => {
-      if (datosFinales.grupoSanguineo.factorRh[pos.tipo]) {
-        doc.text("X", pos.x, pos.y);
-      }
-    });
-    doc.setTextColor(0, 0, 0);
-  }
-
-  // === SECCIÓN: HEMOGLOBINA/HEMATOCRITO ===
-  const xHemoglobinaHematocrito = 108;
-  const yHemoglobinaHematocrito = 200.5;
-  if (datosFinales.hemoglobinaHematocrito) {
-    doc.setFont("helvetica", "bold").setFontSize(9);
-    doc.setTextColor(255, 0, 0);
-    doc.text(datosFinales.hemoglobinaHematocrito + " gr. %", xHemoglobinaHematocrito, yHemoglobinaHematocrito);
-  }
-
-  // === SECCIÓN: APTO PARA TRABAJAR ===
-  const aptoParaTrabajarPosiciones = [
-    { tipo: "si", x: 23.2, y: 212, texto: "SI" },
-    { tipo: "no", x: 35.4, y: 212, texto: "NO" }
-  ];
-
-  if (datosFinales.aptoParaTrabajar) {
-    doc.setTextColor(0, 0, 255);
-    doc.setFont("helvetica", "bold").setFontSize(12);
-    aptoParaTrabajarPosiciones.forEach(pos => {
-      if (datosFinales.aptoParaTrabajar[pos.tipo]) {
-        doc.text("X", pos.x, pos.y);
-      }
-    });
-    doc.setTextColor(0, 0, 0);
-  }
-
-  // === FIRMA Y SELLO MÉDICO ===
-  const xFirmaMedico = 78;
-  const yFirmaMedico = 206;
-  const firmaMedicoWidth = 40;
-  const firmaMedicoHeight = 20;
-
-  try {
-    const firmaSelloImg = data.digitalizacion?.find(
-      item => item.nombreDigitalizacion === "SELLOFIRMA"
-    )?.url ?? "";
-    doc.addImage(firmaSelloImg, "PNG", xFirmaMedico, yFirmaMedico, firmaMedicoWidth, firmaMedicoHeight);
-  } catch (e) {
-    // Si no se puede cargar la imagen, mostrar texto alternativo
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text("Firma y Sello Médico", xFirmaMedico, yFirmaMedico + 8);
-  }
-
-  // === SECCIÓN: REVALUACIÓN DE EMPRESA ===
-  const xRevaluacionEmpresa = 35.4;
-  const yRevaluacionEmpresa = 219.5;
-  if (datosFinales.revaluacionEmpresa) {
-    doc.setTextColor(0, 0, 255);
-    doc.setFont("helvetica", "bold").setFontSize(12);
-    doc.text("X", xRevaluacionEmpresa, yRevaluacionEmpresa);
-    doc.setTextColor(0, 0, 0);
-  }
-
-  // === SECCIÓN: REACCIONES SEROLÓGICAS LUES ===
-  const reaccionesSerologicasLuesPosiciones = [
-    { tipo: "positivo", x: 166.1, y: 142, texto: "POSITIVO" },
-    { tipo: "negativo", x: 193, y: 142, texto: "NEGATIVO" }
-  ];
-
-  if (datosFinales.reaccionesSerologicasLues) {
-    doc.setTextColor(0, 0, 255);
-    doc.setFont("helvetica", "bold").setFontSize(12);
-    reaccionesSerologicasLuesPosiciones.forEach(pos => {
-      if (datosFinales.reaccionesSerologicasLues[pos.tipo]) {
-        doc.text("X", pos.x, pos.y);
-      }
-    });
-    doc.setTextColor(0, 0, 0);
-  }
-
-  // === SECCIÓN: OTROS EXAMENES ===
-  const xOtrosExamenes = 145.5;
-  const yOtrosExamenes = 154;
-  if (datosFinales.otrosExamenes) {
-    doc.setFont("helvetica", "normal").setFontSize(7.5);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.otrosExamenes.toUpperCase(), xOtrosExamenes, yOtrosExamenes, { maxWidth: 55 });
-  }
+  // Contenido con formato mixto
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Reacciones serológicas LUES-no LUES:", tablaInicioX + 2, yPos + 3.5);
+  const anchoTituloReaccionesSerologicas = doc.getTextWidth("Reacciones serológicas LUES-no LUES:");
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto(datosFinales.reaccionesSerologicasLues || ""), tablaInicioX + 2 + anchoTituloReaccionesSerologicas + 10, yPos + 3.5);
+  yPos += filaAltura;
 
   // === SECCIÓN: EXAMENES DE LABORATORIO ===
-  // === HEMOGRAMA COMPLETO ===
-  // VSG
-  const xVsg = 25;
-  const yVsg = 170.5;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.vsg) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.vsg.toUpperCase(), xVsg, yVsg);
-  }
+  yPos = dibujarHeaderSeccion("15. EXAMENES DE LABORATORIO", yPos, filaAltura);
 
-  // Glucosa
-  const xGlucosa = 25;
-  const yGlucosa = 175;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.glucosa) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.glucosa.toUpperCase(), xGlucosa, yGlucosa);
-  }
+  // Fila celeste: Hemograma completo
+  yPos = dibujarHeaderSeccionCeleste("Hemograma completo", yPos, filaAltura);
 
-  // Úrea
-  const xUrea = 25;
-  const yUrea = 179;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.urea) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.urea.toUpperCase(), xUrea, yUrea);
-  }
+  // Fila: VSG | Glucosa | Urea | Creatinina (4 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho / 4, yPos, tablaInicioX + tablaAncho / 4, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho / 2, yPos, tablaInicioX + tablaAncho / 2, yPos + filaAltura);
+  doc.line(tablaInicioX + (3 * tablaAncho / 4), yPos, tablaInicioX + (3 * tablaAncho / 4), yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-  // Creatinina
-  const xCreatinina = 25;
-  const yCreatinina = 183.1;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.creatinina) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.creatinina.toUpperCase(), xCreatinina, yCreatinina);
-  }
+  // Contenido VSG, Glucosa, Urea, Creatinina
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("VSG:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto(data.vsgLaboratorioClinico_txtvsg || ""), tablaInicioX + 15, yPos + 3.5);
 
-  // === PERFIL LIPÍDICO COMPLETO ===
-  // L.D.L
-  const xLdl = 75;
-  const yLdl = 170.5;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.ldl) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.ldl.toUpperCase(), xLdl, yLdl);
-  }
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Glucosa:", tablaInicioX + tablaAncho / 4 + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto(data.glucosaLaboratorioClinico_txtglucosabio || ""), tablaInicioX + tablaAncho / 4 + 25, yPos + 3.5);
 
-  // H.D.L
-  const xHdl = 75;
-  const yHdl = 175;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.hdl) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.hdl.toUpperCase(), xHdl, yHdl);
-  }
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Urea:", tablaInicioX + tablaAncho / 2 + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto("N/A"), tablaInicioX + tablaAncho / 2 + 20, yPos + 3.5);
 
-  // V.L.D.L
-  const xVldl = 75;
-  const yVldl = 179;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.vldl) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.vldl.toUpperCase(), xVldl, yVldl);
-  }
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Creatinina:", tablaInicioX + (3 * tablaAncho / 4) + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto(data.creatininaLaboratorioClinico_txtcreatininabio || ""), tablaInicioX + (3 * tablaAncho / 4) + 30, yPos + 3.5);
+  yPos += filaAltura;
 
-  // Triglicéridos
-  const xTrigliceridos = 75;
-  const yTrigliceridos = 183.1;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.trigliceridos) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.trigliceridos.toUpperCase(), xTrigliceridos, yTrigliceridos);
-  }
+  // Fila celeste: Perfil lipídico completo
+  yPos = dibujarHeaderSeccionCeleste("Perfil lipídico completo", yPos, filaAltura);
 
-  // Colesterol Total
-  const xColesterolTotal = 75;
-  const yColesterolTotal = 187;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.colesterolTotal) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.colesterolTotal.toUpperCase(), xColesterolTotal, yColesterolTotal);
-  }
+  // Fila: L.DL | H.D.L | V.L.D.L | Triglicéridos | Colesterol total (5 columnas)
+  const colWidthLipidico = tablaAncho / 5;
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + colWidthLipidico, yPos, tablaInicioX + colWidthLipidico, yPos + filaAltura);
+  doc.line(tablaInicioX + (2 * colWidthLipidico), yPos, tablaInicioX + (2 * colWidthLipidico), yPos + filaAltura);
+  doc.line(tablaInicioX + (3 * colWidthLipidico), yPos, tablaInicioX + (3 * colWidthLipidico), yPos + filaAltura);
+  doc.line(tablaInicioX + (4 * colWidthLipidico), yPos, tablaInicioX + (4 * colWidthLipidico), yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-  // === EXAMEN COMPLETO DE ORINA ===
-  // Cocaína en Orina
-  const xCocainaOrina = 127;
-  const yCocainaOrina = 170.5;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.cocainaOrina) {
-    doc.setFont("helvetica", "normal").setFontSize(7.5);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.cocainaOrina.toUpperCase(), xCocainaOrina, yCocainaOrina);
-  }
+  // Contenido perfil lipídico
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("L.DL:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto(data.ldlcolesterolAnalisisBioquimico_txtldlcolesterol || ""), tablaInicioX + 15, yPos + 3.5);
 
-  // Marihuana en Orina
-  const xMarihuanaOrina = 127;
-  const yMarihuanaOrina = 175;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.marihuanaOrina) {
-    doc.setFont("helvetica", "normal").setFontSize(7.5);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.marihuanaOrina.toUpperCase(), xMarihuanaOrina, yMarihuanaOrina);
-  }
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("H.D.L:", tablaInicioX + colWidthLipidico + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto(data.hdlcolesterolAnalisisBioquimico_txthdlcolesterol || ""), tablaInicioX + colWidthLipidico + 15, yPos + 3.5);
 
-  // Mercurio en Orina
-  const xMercurioOrina = 127;
-  const yMercurioOrina = 179;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.mercurioOrina) {
-    doc.setFont("helvetica", "normal").setFontSize(7.5);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.mercurioOrina.toUpperCase(), xMercurioOrina, yMercurioOrina);
-  }
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("V.L.D.L:", tablaInicioX + (2 * colWidthLipidico) + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto(data.vldlcolesterolAnalisisBioquimico_txtvldlcolesterol || ""), tablaInicioX + (2 * colWidthLipidico) + 20, yPos + 3.5);
 
-  // Plomo en Orina
-  const xPlomoOrina = 127;
-  const yPlomoOrina = 183.1;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.plomoOrina) {
-    doc.setFont("helvetica", "normal").setFontSize(7.5);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.plomoOrina.toUpperCase(), xPlomoOrina, yPlomoOrina);
-  }
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Triglicéridos:", tablaInicioX + (3 * colWidthLipidico) + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto(data.trigliceridosAnalisisBioquimico_txttrigliceridos || ""), tablaInicioX + (3 * colWidthLipidico) + 23, yPos + 3.5);
 
-  // === SECCIÓN: OBSERVACIONES ===
-  const xObservaciones = 10;
-  let yPosicionActual = 231; // Variable para rastrear la posición actual
-  const espacioEntreObservaciones = 0.5; // Espacio entre observaciones (muy reducido)
-  const lineHeight = 2.5; // Altura entre líneas de texto dividido (más compacto)
-  const maxWidth = 100; // Ancho máximo
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Colesterol total:", tablaInicioX + (4 * colWidthLipidico) + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto(data.colesterolAnalisisBioquimico_txtcolesterol || ""), tablaInicioX + (4 * colWidthLipidico) + 25, yPos + 3.5);
+  yPos += filaAltura;
 
-  if (datosFinales.observaciones && Array.isArray(datosFinales.observaciones)) {
-    doc.setFont("helvetica", "normal").setFontSize(5.5);
-    doc.setTextColor(0, 0, 0);
+  // Fila celeste: Examen completo de orina
+  yPos = dibujarHeaderSeccionCeleste("Examen completo de orina", yPos, filaAltura);
 
-    datosFinales.observaciones.forEach((observacion) => {
-      // Dividir texto largo en múltiples líneas si es necesario
-      const lines = doc.splitTextToSize(observacion.toUpperCase(), maxWidth);
+  // Fila: Cocaína | Marihuana | Mercurio | Plomo (4 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho / 4, yPos, tablaInicioX + tablaAncho / 4, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho / 2, yPos, tablaInicioX + tablaAncho / 2, yPos + filaAltura);
+  doc.line(tablaInicioX + (3 * tablaAncho / 4), yPos, tablaInicioX + (3 * tablaAncho / 4), yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-      // Dibujar cada línea de la observación actual
-      lines.forEach((line, lineIndex) => {
-        const yLinePosition = yPosicionActual + (lineIndex * lineHeight);
-        doc.text(line, xObservaciones, yLinePosition);
-      });
+  // Contenido examen de orina
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Cocaína:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto(data.cocainaLaboratorioClinico_txtcocaina || ""), tablaInicioX + 25, yPos + 3.5);
 
-      // Calcular la nueva posición para la siguiente observación
-      // Sumar el número de líneas de esta observación + espacio entre observaciones
-      yPosicionActual += (lines.length * lineHeight) + espacioEntreObservaciones;
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Marihuana:", tablaInicioX + tablaAncho / 4 + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto(data.marihuanaLaboratorioClinico_txtmarihuana || ""), tablaInicioX + tablaAncho / 4 + 30, yPos + 3.5);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Mercurio:", tablaInicioX + tablaAncho / 2 + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto("N/A"), tablaInicioX + tablaAncho / 2 + 30, yPos + 3.5);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Plomo:", tablaInicioX + (3 * tablaAncho / 4) + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTexto("N/A"), tablaInicioX + (3 * tablaAncho / 4) + 25, yPos + 3.5);
+  yPos += filaAltura;
+
+  // Fila: Grupo sanguíneo | Factor | Hemoglobina/Hematocrito (3 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho / 3, yPos, tablaInicioX + tablaAncho / 3, yPos + filaAltura);
+  doc.line(tablaInicioX + (2 * tablaAncho / 3), yPos, tablaInicioX + (2 * tablaAncho / 3), yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+
+  // Contenido grupo sanguíneo
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Grupo sanguíneo:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  
+  // Convertir objeto grupoSanguineo a string
+  let grupoSanguineoTexto = "";
+  const grupos = [];
+  if (data.grupoSanguineoO_chko) grupos.push("O");
+  if (data.grupoSanguineoA_chka) grupos.push("A");
+  if (data.grupoSanguineoB_chkb) grupos.push("B");
+  if (data.grupoSanguineoAB_chkab) grupos.push("AB");
+  grupoSanguineoTexto = grupos.join(", ");
+  
+  doc.text(formatearTexto(grupoSanguineoTexto), tablaInicioX + 40, yPos + 3.5);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Factor:", tablaInicioX + tablaAncho / 3 + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  
+  // Convertir objeto factorRh a string
+  let factorRhTexto = "";
+  if (data.grupoSanguineoRhPositivo_rbrhpositivo) factorRhTexto = "Rh(+) Positivo";
+  else if (data.grupoSanguineoRhNegativo_rbrhnegativo) factorRhTexto = "Rh(-) Negativo";
+  
+  doc.text(formatearTexto(factorRhTexto), tablaInicioX + tablaAncho / 3 + 25, yPos + 3.5);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Hemoglobina/Hematocrito:", tablaInicioX + (2 * tablaAncho / 3) + 2, yPos + 3.5);
+  doc.setFont("helvetica", "bold").setFontSize(9.5);
+  doc.setTextColor(255, 0, 0); // Color rojo
+  doc.text(formatearTexto((data.hemoglobina_txthemoglobina || "") + " gr. %"), tablaInicioX + (2 * tablaAncho / 3) + 45, yPos + 3.5);
+  doc.setTextColor(0, 0, 0); // Volver al color negro
+  yPos += filaAltura;
+
+  // Fila: APTO PARA TRABAJAR (columna completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("APTO PARA TRABAJAR:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  
+  // Convertir objeto aptoParaTrabajar a string
+  let aptoParaTrabajarTexto = "";
+  if (data.examenRadiograficoAptoSi_apto_si) aptoParaTrabajarTexto = "SI";
+  else if (data.examenRadiograficoAptoNo_apto_no) aptoParaTrabajarTexto = "NO";
+  
+  doc.text(formatearTexto(aptoParaTrabajarTexto), tablaInicioX + 50, yPos + 3.5);
+  yPos += filaAltura;
+
+  // === FOOTER PÁGINA 2 ===
+  footerTR(doc, { footerOffsetY: 8 });
+
+  // === CREAR PÁGINA 3 ===
+  doc.addPage();
+  numeroPagina = 3;
+  yPos = 35.5; // Posición inicial de la nueva página
+
+  // Dibujar header en la nueva página
+  drawHeader(numeroPagina);
+
+  // === SECCIÓN: OTROS EXAMENES ===
+  yPos = dibujarHeaderSeccion("16. OTROS EXAMENES", yPos, filaAltura);
+
+  // Fila creciente con altura por defecto de 35mm
+  const alturaFilaCrecientePag3 = 35; // 35mm por defecto
+  const textoOtrosExamenesPag3 = datosFinales.otrosExamenes || "";
+  const anchoDisponibleOtrosExamenesPag3 = tablaAncho - 4;
+  const lineasOtrosExamenesPag3 = doc.splitTextToSize(textoOtrosExamenesPag3, anchoDisponibleOtrosExamenesPag3);
+  
+  // Calcular altura dinámica basada en el contenido, pero mínimo 35mm
+  const alturaDinamicaOtrosExamenesPag3 = Math.max(alturaFilaCrecientePag3, lineasOtrosExamenesPag3.length * 2.5 + 2);
+
+  // Dibujar líneas de la fila creciente
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaOtrosExamenesPag3);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaOtrosExamenesPag3);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaDinamicaOtrosExamenesPag3, tablaInicioX + tablaAncho, yPos + alturaDinamicaOtrosExamenesPag3);
+
+  // Contenido de la fila creciente
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  const lineasOtrosExamenesFormateadas = lineasOtrosExamenesPag3.map(linea => formatearTexto(linea));
+  doc.text(lineasOtrosExamenesFormateadas, tablaInicioX + 2, yPos + 3.5);
+  yPos += alturaDinamicaOtrosExamenesPag3;
+
+  // === SECCIÓN: CONCLUSIONES ===
+  yPos = dibujarHeaderSeccion("17. CONCLUSIONES", yPos, filaAltura);
+
+  // Fila creciente para conclusiones
+  const textoConclusionesPag3 = datosFinales.conclusiones || "";
+  const anchoDisponibleConclusionesPag3 = tablaAncho - 4;
+  const lineasConclusionesPag3 = doc.splitTextToSize(textoConclusionesPag3, anchoDisponibleConclusionesPag3);
+  
+  // Calcular altura dinámica basada en el contenido, mínimo 35mm
+  const alturaDinamicaConclusionesPag3 = Math.max(35, lineasConclusionesPag3.length * 2.5 + 2);
+
+  // Dibujar líneas de la fila creciente
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaConclusionesPag3);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaConclusionesPag3);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaDinamicaConclusionesPag3, tablaInicioX + tablaAncho, yPos + alturaDinamicaConclusionesPag3);
+
+  // Contenido de la fila creciente
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  const lineasConclusionesFormateadas = lineasConclusionesPag3.map(linea => formatearTexto(linea));
+  doc.text(lineasConclusionesFormateadas, tablaInicioX + 2, yPos + 3.5);
+  yPos += alturaDinamicaConclusionesPag3;
+
+  // === SECCIÓN: RECOMENDACIONES / RESTRICCIONES ===
+  yPos = dibujarHeaderSeccion("18. RECOMENDACIONES / RESTRICCIONES", yPos, filaAltura);
+
+  // Fila creciente para recomendaciones
+  const textoRecomendacionesPag3 = datosFinales.recomendacionesRestricciones || "";
+  const anchoDisponibleRecomendacionesPag3 = tablaAncho - 4;
+  const lineasRecomendacionesPag3 = doc.splitTextToSize(textoRecomendacionesPag3, anchoDisponibleRecomendacionesPag3);
+  
+  // Calcular altura dinámica basada en el contenido, mínimo 35mm
+  const alturaDinamicaRecomendacionesPag3 = Math.max(35, lineasRecomendacionesPag3.length * 2.5 + 2);
+
+  // Dibujar líneas de la fila creciente
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaRecomendacionesPag3);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaRecomendacionesPag3);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaDinamicaRecomendacionesPag3, tablaInicioX + tablaAncho, yPos + alturaDinamicaRecomendacionesPag3);
+
+  // Contenido de la fila creciente
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  const lineasRecomendacionesFormateadas = lineasRecomendacionesPag3.map(linea => formatearTexto(linea));
+  doc.text(lineasRecomendacionesFormateadas, tablaInicioX + 2, yPos + 3.5);
+  yPos += alturaDinamicaRecomendacionesPag3;
+
+  // === SECCIÓN DE DECLARACIÓN, FIRMA Y HUELLA DEL TRABAJADOR ===
+  const alturaSeccionDeclaracion = 30; // Altura para la sección de declaración
+
+  // Dibujar las líneas de la sección de declaración (3 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaSeccionDeclaracion); // Línea izquierda
+  doc.line(tablaInicioX + 60, yPos, tablaInicioX + 60, yPos + alturaSeccionDeclaracion); // Primera división
+  doc.line(tablaInicioX + 120, yPos, tablaInicioX + 120, yPos + alturaSeccionDeclaracion); // Segunda división
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaSeccionDeclaracion); // Línea derecha
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
+  doc.line(tablaInicioX, yPos + alturaSeccionDeclaracion, tablaInicioX + tablaAncho, yPos + alturaSeccionDeclaracion); // Línea inferior
+
+  // === COLUMNA 1: DECLARACIÓN ===
+  doc.setFont("helvetica", "normal").setFontSize(6);
+  const textoDeclaracion = "Declaro que las respuestas son ciertas según mi leal saber y entender. En caso de ser requeridos, los resultados del examen médico pueden ser revelados, en términos generales, al departamento de salud Ocupacional de la compañía. Los resultados pueden ser enviados a mi médico particular de ser considerado necesario.";
+  
+  // Función para justificar texto
+  const justificarTexto = (texto, x, y, anchoMaximo, interlineado) => {
+    const lineas = doc.splitTextToSize(texto, anchoMaximo);
+    let yActual = y;
+    
+    lineas.forEach((linea, index) => {
+      // Solo justificar si no es la última línea y tiene más de una palabra
+      if (index < lineas.length - 1 && linea.includes(' ')) {
+        const palabras = linea.split(' ');
+        if (palabras.length > 1) {
+          const anchoTexto = doc.getTextWidth(linea);
+          const espacioDisponible = anchoMaximo - anchoTexto;
+          const espaciosEntrePalabras = palabras.length - 1;
+          const espacioExtra = espacioDisponible / espaciosEntrePalabras;
+          
+          let xActual = x;
+          palabras.forEach((palabra, i) => {
+            doc.text(palabra, xActual, yActual);
+            if (i < palabras.length - 1) {
+              const anchoPalabra = doc.getTextWidth(palabra);
+              xActual += anchoPalabra + (doc.getTextWidth(' ') + espacioExtra);
+            }
+          });
+        } else {
+          doc.text(linea, x, yActual);
+        }
+      } else {
+        doc.text(linea, x, yActual);
+      }
+      yActual += interlineado;
     });
+  };
+  
+  // Dibujar texto justificado
+  justificarTexto(textoDeclaracion, tablaInicioX + 2, yPos + 3, 55, 2.5);
+
+  // === COLUMNA 2: FIRMA Y HUELLA DEL TRABAJADOR ===
+  const firmaTrabajadorY = yPos + 3;
+  
+  // Calcular centro de la columna 2 para centrar las imágenes
+  const centroColumna2X = tablaInicioX + 60 + (60 / 2); // Centro de la columna 2
+  
+  // Agregar firma del trabajador (lado izquierdo)
+  let firmaTrabajadorUrl = getSign(data, "FIRMAP");
+  if (firmaTrabajadorUrl) {
+    try {
+      const imgWidth = 30;
+      const imgHeight = 20;
+      const x = centroColumna2X - 20;
+      const y = firmaTrabajadorY;
+      doc.addImage(firmaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando firma del trabajador:", error);
+    }
   }
 
-  // Columna derecha: RECOMENDACIONES / RESTRICCIONES
-  const xRecomendaciones2 = 120;
-  const yRecomendaciones2 = 235;
-  if (datosFinales.recomendacionesRestricciones) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(
-      datosFinales.recomendacionesRestricciones.toUpperCase(),
-      xRecomendaciones2,
-      yRecomendaciones2,
-      { maxWidth: 80 }
-    );
+  // Agregar huella del trabajador (lado derecho, vertical)
+  let huellaTrabajadorUrl = getSign(data, "HUELLA");
+  if (huellaTrabajadorUrl) {
+    try {
+      const imgWidth = 12;
+      const imgHeight = 20;
+      const x = centroColumna2X + 8;
+      const y = firmaTrabajadorY;
+      doc.addImage(huellaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando huella del trabajador:", error);
+    }
   }
+  
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const centroColumna2 = tablaInicioX + 60 + (60 / 2);
+  doc.text("Firma y Huella del trabajador", centroColumna2, yPos + 26, { align: "center" });
 
-  // === SECCIÓN: DOCUMENTO DE IDENTIDAD Y FIRMA ===
-  // Solo el DNI (sin etiqueta "Doc. de Identidad:")
-  const xDocIdentidad = 170;
-  const yDocIdentidad = 217;
-  if (datosFinales.docIdentidad) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.docIdentidad.toUpperCase(), xDocIdentidad, yDocIdentidad);
+  // === COLUMNA 3: SELLO Y FIRMA DEL MÉDICO ===
+  const firmaMedicoX = tablaInicioX + 125;
+  const firmaMedicoY = yPos + 3;
+  
+  // Agregar firma y sello médico
+  let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
+  if (firmaMedicoUrl) {
+    try {
+      const imgWidth = 45;
+      const imgHeight = 20;
+      const x = firmaMedicoX + 10;
+      const y = firmaMedicoY;
+      doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando firma del médico:", error);
+    }
   }
+  
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const centroColumna3 = tablaInicioX + 120 + (70 / 2);
+  doc.text("Sello y Firma del Médico", centroColumna3, yPos + 26, { align: "center" });
+  doc.text("Responsable de la Evaluación", centroColumna3, yPos + 28.5, { align: "center" });
 
-  // Firma del paciente (imagen)
-  const xFirmaPaciente = 150 - 5;
-  const yFirmaPaciente = 195;
-  const firmaWidth = 40;
-  const firmaHeight = 18;
-
-  try {
-    const firmaExaminadoImg = data.digitalizacion?.find(
-      item => item.nombreDigitalizacion === "FIRMAP"
-    )?.url ?? "";
-    doc.addImage(firmaExaminadoImg, "PNG", xFirmaPaciente, yFirmaPaciente, firmaWidth, firmaHeight);
-  } catch (e) {
-    // Si no se puede cargar la imagen, mostrar texto alternativo
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text("Firma del Paciente", xFirmaPaciente, yFirmaPaciente + 8);
-  }
-  const xHuellaDigital = 195 - 8;
-  const yHuellaDigital = 185;
-  try {
-    const huellaDigitalImg = data.digitalizacion?.find(
-      item => item.nombreDigitalizacion === "HUELLA"
-    )?.url ?? "";
-    doc.addImage(huellaDigitalImg, "PNG", xHuellaDigital, yHuellaDigital, 18, 25);
-  } catch (e) {
-    doc.text("Huella Digital", xHuellaDigital, yHuellaDigital + 10);
-  }
+  // === FOOTER ===
+  footerTR(doc, { footerOffsetY: 8 });
 
   // === IMPRIMIR ===
   imprimir(doc);

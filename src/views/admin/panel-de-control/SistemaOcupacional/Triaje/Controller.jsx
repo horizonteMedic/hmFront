@@ -162,9 +162,9 @@ export const handleSubmit = async (datos,edad,nro,fecha,Swal,token,setF,setT,ref
       await Swal.fire('Error','No se permite este dato en Cadera','error') 
       return}
 
-    if (datos.sat02 < 92 || datos.sat02 >= 101){ 
-      await Swal.fire('Error','No se permite este dato en Cadera','error') 
-      return}
+    // if (datos.sat02 < 92 || datos.sat02 >= 101){ 
+    //   await Swal.fire('Error','No se permite este dato en Cadera','error') 
+    //   return}
 
     if (datos.temperatura < 35){ 
       await Swal.fire('Error','No se permite este dato en Termperatura','error') 

@@ -412,8 +412,8 @@ export default function Anexo2(data = {}) {
       madre: data.madre_txtmadre ?? "",
       hermanos: data.hermanos_txthermanos ?? "",
       esposa: data.esposa_txtesposa ?? "",
-      hijosVivos: String(data.hijosVivosAnexo2_txthijosvivos ?? ""),
-      numeroHijos: String(data.hijosMuertosAnexo2_txthijosmuertos ?? "")
+      hijosVivos: data.sexo_sexo_pa === "M" ? String(data.hijosVivosAntecedentesPatologicos_txtvhijosvivos ?? "") : String(data.hijasVivasAntecedentesPatologicos_txtdhijosvivos ?? ""),
+      numeroHijos: data.sexo_sexo_pa === "M" ? String(data.hijosFallecidosAntecedentesPatologicos_txtvhijosfallecidos ?? "") : String(data.hijasFallecidasAntecedentesPatologicos_txtdhijosfallecidos ?? "")
     },
 
     // === ABSENTISMO ===
