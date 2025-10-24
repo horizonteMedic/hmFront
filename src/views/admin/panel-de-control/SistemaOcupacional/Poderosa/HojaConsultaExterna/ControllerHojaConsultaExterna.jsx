@@ -35,7 +35,7 @@ D- EXAMEN FISICO:
 - SISTEMA OSTEOMUSCULAR: MOTRICIDAD CONSERVADA. EXTREMIDADES SIMÉTRICAS. FUERZA MUSCULAR 5/5.
 - GENITALES: DIFERIDO
 - SISTEMA NERVIOSO: SENSIBILIDAD, MOTRICIDAD CONSERVADA, ROTS CONSERVADOS, BIPEDESTACIÓN CONSERVADA, EQUILIBRIO CONSERVADO, ROMBERG NEGATIVO. NO SIGNOS MENÍNGEOS. NO SIGNOS DE FOCALIZACION, NERVIOS CRANEALES CONSERVADOS, GLASGLOW 15 PTOS.
-E- EXÁMENES AUXILIARES: \n${res.anexo16OtrosExamenes || "JALARLO DE LOS EXÁMENES DE LABORATORIO."}\n
+E- EXÁMENES AUXILIARES: \n${res.anexo16OtrosExamenes || "JALARLO DE LOS EXÁMENES DE LABORATORIO."}
 F- DIAGNÓSTICOS: \n${res.anexo16ObservacionesGenerales || "JALARLO DE LOS DIAGNÓSTICOS DEL ANEXO 16."}`
   ].join("\n\n");
 };
@@ -57,6 +57,7 @@ export const GetInfoServicio = async (
     console.log(res)
     if (res) {
         console.log(res)
+        console.log(generarObservaciones(res))
         set((prev) => ({
             ...prev,
             ...res,
@@ -70,7 +71,8 @@ export const GetInfoServicio = async (
             cargoPaciente: res.cargoPaciente,
             ocupacionPaciente: res.ocupacionPaciente,
             fechaExamen: prev.fechaExamen,
-            observaciones: generarObservaciones(res)
+            observaciones: generarObservaciones(res),
+            
         }));
     }
 };
@@ -130,6 +132,7 @@ export const SubmitDataService = async (
         "otros": form.cajon === "OTROS" ? true : false,
         "otrosDescripcion": form.otrosDescripcion,
         "observaciones": form.observaciones,
+        "usuarioRegistro": user
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

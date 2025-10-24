@@ -203,7 +203,8 @@ export default function FichaInterconsulta() {
                             <label htmlFor="">Especialidades</label>
                             <select value={form.especialidad} name="especialidad" onChange={handleChangeSimple} className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" >
                                 <option value="">Selecione una Especialidad...</option>
-                                {Especialidades?.map((option, index) => (
+                                {Especialidades?.sort((a, b) => a.localeCompare(b)) // ordena alfabéticamente respetando tildes
+                                    .map((option, index) => (
                                     <option key={index} value={option.toUpperCase()}>
                                         {option}
                                     </option>
