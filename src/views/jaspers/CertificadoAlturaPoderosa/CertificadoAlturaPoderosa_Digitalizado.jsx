@@ -35,6 +35,10 @@ export default function CertificadoAlturaPoderosa_Digitalizado(data = {}) {
     // Datos específicos
     direccionPaciente: String(data.direccionPaciente),
     fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente),
+    // Datos adicionales para nueva fila
+    lugar: data.lugarExperiencia_lugar_expe,
+    anosExperiencia: data.tiempoExperiencia_t_experiencia,
+    altura: data.altura_txtaltura,
     // Datos de digitalización
     digitalizacion: data.digitalizacion,
     // Datos para secciones 2 y 3
@@ -116,61 +120,61 @@ export default function CertificadoAlturaPoderosa_Digitalizado(data = {}) {
     // Datos para TEST CAGE (sección 6)
     cageTest: [
       {
-        pregunta: "¿Ha tenido usted la impresión de que debería beber menos?",
-        si: data.impresionBeberMenosSi_chktest_si5,
-        no: data.impresionBeberMenosNo_chktest_no5,
-        puntaje: data.impresionBeberMenosPuntaje_txttest_p5
-      },
-      {
-        pregunta: "¿Le ha molestado alguna vez la gente criticándole su forma de beber?",
-        si: data.criticaFormaBeberSi_chktest_si3,
-        no: data.criticaFormaBeberNo_chktest_no3,
-        puntaje: data.criticaFormaBeberPuntaje_txttest_p3
-      },
-      {
-        pregunta: "¿Se ha sentido usted alguna vez mal o con remordimientos después de beber?",
-        si: data.costumbreBeberSi_chktest_si7,
-        no: data.costumbreBeberNo_chktest_no7,
-        puntaje: data.costumbreBeberPuntaje_txttest_p7
-      },
-      {
-        pregunta: "¿Ha necesitado beber por la mañana para calmar los nervios o librarse de una resaca?",
-        si: data.beberCalmarNerviosSi_chktest_si9,
-        no: data.beberCalmarNerviosNo_chktest_no9,
-        puntaje: data.beberCalmarNerviosPuntaje_txttest_p9
-      },
-      {
-        pregunta: "¿Piensa usted que come demasiados dulces?",
+        pregunta: "¿Le gusta salir a divertirse?",
         si: data.gustaDivertirseSi_chktest_si1,
         no: data.gustaDivertirseNo_chktest_no1,
         puntaje: data.gustaDivertirsePuntaje_txttest_p1
       },
       {
-        pregunta: "¿Considera usted que duerme las horas necesarias para estar a tono durante el día?",
-        si: data.duermeBienSi_chktest_si6,
-        no: data.duermeBienNo_chktest_no6,
-        puntaje: data.duermeBienPuntaje_txttest_p6
-      },
-      {
-        pregunta: "¿Le han ofrecido alguna vez un porro o una dosis de cocaína?",
-        si: data.reunionDivertirseReanimaSi_chktest_si4,
-        no: data.reunionDivertirseReanimaNo_chktest_no4,
-        puntaje: data.reunionDivertirseReanimaPuntaje_txttest_p4
-      },
-      {
-        pregunta: "¿Se ha planteado en alguna ocasión hacer algo de ejercicio semanalmente?",
+        pregunta: "¿Se molesta si llega tarde a algún compromiso?",
         si: data.tardeCompromisoSi_chktest_si2,
         no: data.tardeCompromisoNo_chktest_no2,
         puntaje: data.tardeCompromisoPuntaje_txttest_p2
       },
       {
-        pregunta: "¿Se ha planteado seriamente en alguna ocasión dejar de fumar?",
+        pregunta: "¿Le ha molestado alguna vez la gente que le critica su forma de beber?",
+        si: data.criticaFormaBeberSi_chktest_si3,
+        no: data.criticaFormaBeberNo_chktest_no3,
+        puntaje: data.criticaFormaBeberPuntaje_txttest_p3
+      },
+      {
+        pregunta: "¿Ha sentido que estar en una reunión divirtiéndose, lo reanima?",
+        si: data.reunionDivertirseReanimaSi_chktest_si4,
+        no: data.reunionDivertirseReanimaNo_chktest_no4,
+        puntaje: data.reunionDivertirseReanimaPuntaje_txttest_p4
+      },
+      {
+        pregunta: "¿Ha tenido usted alguna vez la impresión de que debería beber menos?",
+        si: data.impresionBeberMenosSi_chktest_si5,
+        no: data.impresionBeberMenosNo_chktest_no5,
+        puntaje: data.impresionBeberMenosPuntaje_txttest_p5
+      },
+      {
+        pregunta: "¿Duerme bien?",
+        si: data.duermeBienSi_chktest_si6,
+        no: data.duermeBienNo_chktest_no6,
+        puntaje: data.duermeBienPuntaje_txttest_p6
+      },
+      {
+        pregunta: "¿Se ha sentido alguna vez mal o culpable por su consumo de beber?",
+        si: data.costumbreBeberSi_chktest_si7,
+        no: data.costumbreBeberNo_chktest_no7,
+        puntaje: data.costumbreBeberPuntaje_txttest_p7
+      },
+      {
+        pregunta: "¿Se pone nervioso a menudo?",
         si: data.nerviosoAMenudoSi_chktest_si8,
         no: data.nerviosoAMenudoNo_chktest_no8,
         puntaje: data.nerviosoAMenudoPuntaje_txttest_p8
       },
       {
-        pregunta: "¿Le han comentado alguna vez que debería comer más frutas y verduras?",
+        pregunta: "¿Alguna vez lo primero que ha hecho por la mañana ha sido beber para calmar sus nervios o librarse de una resaca?",
+        si: data.beberCalmarNerviosSi_chktest_si9,
+        no: data.beberCalmarNerviosNo_chktest_no9,
+        puntaje: data.beberCalmarNerviosPuntaje_txttest_p9
+      },
+      {
+        pregunta: "¿Sufre de dolores en la espalda al levantarse?",
         si: data.doloresEspaldaSi_chktest_si10,
         no: data.doloresEspaldaNo_chktest_no10,
         puntaje: data.doloresEspaldaPuntaje_txttest_p10
@@ -205,6 +209,9 @@ export default function CertificadoAlturaPoderosa_Digitalizado(data = {}) {
   const formatearTextoGramatical = (texto) => {
     if (!texto || typeof texto !== 'string') return texto;
     
+    // Lista de textos que deben mantenerse en mayúsculas
+    const textosMayusculas = ['N/A', 'O.D', 'O.I', 'RCRR', 'HRH', 'B/D', 'RHA(+)'];
+    
     // Dividir por líneas para manejar listas con viñetas
     const lineas = texto.split('\n');
     const lineasFormateadas = lineas.map(linea => {
@@ -222,11 +229,57 @@ export default function CertificadoAlturaPoderosa_Digitalizado(data = {}) {
         return '. ' + contenido.charAt(0).toUpperCase() + contenido.slice(1).toLowerCase();
       }
       
-      // Para líneas normales, formatear toda la línea
-      return linea.charAt(0).toUpperCase() + linea.slice(1).toLowerCase();
+      // Para líneas normales, formatear palabra por palabra respetando textos específicos
+      const palabras = linea.split(' ');
+      const palabrasFormateadas = palabras.map((palabra, index) => {
+        // Verificar si la palabra (sin puntuación) está en la lista de mayúsculas
+        const palabraSinPuntuacion = palabra.replace(/[.,:;()[\]{}]/g, '');
+        const debeSerMayuscula = textosMayusculas.some(texto => 
+          texto.toLowerCase() === palabraSinPuntuacion.toLowerCase()
+        );
+        
+        if (debeSerMayuscula) {
+          // Mantener la palabra en mayúsculas
+          return palabra.toUpperCase();
+        } else if (index === 0) {
+          // Primera palabra: primera letra mayúscula, resto minúsculas
+          return palabra.charAt(0).toUpperCase() + palabra.slice(1).toLowerCase();
+        } else {
+          // Palabras siguientes: minúsculas
+          return palabra.toLowerCase();
+        }
+      });
+      
+      return palabrasFormateadas.join(' ');
     });
     
     return lineasFormateadas.join('\n');
+  };
+
+  // Función para convertir textos específicos a mayúsculas
+  const convertirTextosEspecificosAMayusculas = (texto) => {
+    if (!texto || typeof texto !== 'string') return texto;
+    
+    // Lista de textos que deben estar en mayúsculas
+    const textosMayusculas = [
+      'n/a', 'n/a.', 'n/a,', 'n/a:', 'n/a;', 'n/a)', 'n/a]', 'n/a}', // N/A con diferentes puntuaciones
+      'o.d', 'o.d.', 'o.d,', 'o.d:', 'o.d;', 'o.d)', 'o.d]', 'o.d}', // O.D con diferentes puntuaciones
+      'o.i', 'o.i.', 'o.i,', 'o.i:', 'o.i;', 'o.i)', 'o.i]', 'o.i}', // O.I con diferentes puntuaciones
+      'rcrr', 'rcrr.', 'rcrr,', 'rcrr:', 'rcrr;', 'rcrr)', 'rcrr]', 'rcrr}', // RCRR con diferentes puntuaciones
+      'hrh', 'hrh.', 'hrh,', 'hrh:', 'hrh;', 'hrh)', 'hrh]', 'hrh}', // HRH con diferentes puntuaciones
+      'b/d', 'b/d.', 'b/d,', 'b/d:', 'b/d;', 'b/d)', 'b/d]', 'b/d}', // B/D con diferentes puntuaciones
+      'rha(+)', 'rha(+).', 'rha(+),', 'rha(+):', 'rha(+);', 'rha(+))', 'rha(+)]', 'rha(+)}' // RHA(+) con diferentes puntuaciones
+    ];
+    
+    let textoFormateado = texto;
+    
+    // Reemplazar cada texto específico con su versión en mayúsculas
+    textosMayusculas.forEach(textoEspecifico => {
+      const regex = new RegExp('\\b' + textoEspecifico.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi'); // Word boundary
+      textoFormateado = textoFormateado.replace(regex, textoEspecifico.toUpperCase());
+    });
+    
+    return textoFormateado;
   };
 
   // Usar solo datos reales proporcionados
@@ -390,6 +443,15 @@ export default function CertificadoAlturaPoderosa_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
+  // Séptima fila: Lugar, Años de experiencia, Altura (3 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 66, yPos, tablaInicioX + 66, yPos + filaAltura); // División 1
+  doc.line(tablaInicioX + 132, yPos, tablaInicioX + 132, yPos + filaAltura); // División 2
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
   // === CONTENIDO DE LA TABLA ===
   let yTexto = 40 + 2; // Ajustar para el header
 
@@ -461,6 +523,23 @@ export default function CertificadoAlturaPoderosa_Digitalizado(data = {}) {
   doc.text("Contratista:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.contrata, tablaInicioX + 24, yTexto + 1.5);
+  yTexto += filaAltura;
+
+  // Séptima fila: Lugar, Años de experiencia, Altura
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Lugar:", tablaInicioX + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.lugar || "", tablaInicioX + 15, yTexto + 1.5);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Años de experiencia:", tablaInicioX + 68, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.anosExperiencia || "") , tablaInicioX + 100, yTexto + 1.5);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Altura:", tablaInicioX + 134, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.altura || "", tablaInicioX + 150, yTexto + 1.5);
   yTexto += filaAltura;
 
   // === SECCIÓN 2: ACCIDENTES DE TRABAJO O ENFERMEDADES PROFESIONALES ===
@@ -606,12 +685,12 @@ export default function CertificadoAlturaPoderosa_Digitalizado(data = {}) {
     doc.text(formatearTextoGramatical(habito.tipo), tablaInicioX + 2, yPos + 3.5);
     
     // Centrar CANTIDAD
-    const textoCantidadData = formatearTextoGramatical(habito.cantidad || "");
+    const textoCantidadData = convertirTextosEspecificosAMayusculas(formatearTextoGramatical(habito.cantidad || ""));
     const anchoCantidadData = doc.getTextWidth(textoCantidadData);
     doc.text(textoCantidadData, tablaInicioX + colTipoAncho + (colCantidadAncho - anchoCantidadData) / 2, yPos + 3.5);
     
     // Centrar FRECUENCIA
-    const textoFrecuenciaData = formatearTextoGramatical(habito.frecuencia || "");
+    const textoFrecuenciaData = convertirTextosEspecificosAMayusculas(formatearTextoGramatical(habito.frecuencia || ""));
     const anchoFrecuenciaData = doc.getTextWidth(textoFrecuenciaData);
     const colFrecuenciaHabitosAncho = tablaAncho - colTipoAncho - colCantidadAncho;
     doc.text(textoFrecuenciaData, tablaInicioX + colTipoAncho + colCantidadAncho + (colFrecuenciaHabitosAncho - anchoFrecuenciaData) / 2, yPos + 3.5);
@@ -625,9 +704,9 @@ export default function CertificadoAlturaPoderosa_Digitalizado(data = {}) {
   // Crear tabla de TEST CAGE
   const filaAlturaCage = 4.5; // Altura reducida
   const colNumAncho = 8; // #
-  const colPregAncho = 120; // Preguntas
-  const colSiAncho = 15; // SI
-  const colNoAncho = 15; // NO
+  const colPregAncho = 150; // Preguntas
+  const colSiAncho = 10; // SI
+  const colNoAncho = 10; // NO
 
   // Posiciones de columnas
   let xNum = tablaInicioX;
@@ -1004,8 +1083,8 @@ yPos += filaAlturaCage;
   // Dibujar fila para OJOS con altura dinámica
   const odData = data.otoscopiaOd_txtotoscopiaod;
   const oiData = data.otoscopiaOi_txtotoscopiaoi;
-  const ojosData = `OTOSCOPIA     O.D: ${odData || ''} O.I: ${oiData || ''}`;
-  const alturaOjos = (odData || oiData) ? calcularAlturaTextoCreciente(doc, ojosData, colHallazgosAncho - 4, 8) : 0;
+  const ojosData = `Otoscopia     O.D: ${odData || ''} O.I: ${oiData || ''}`;
+  const alturaOjos = (odData || oiData) ? calcularAlturaTextoCreciente(doc, formatearTextoGramatical(convertirTextosEspecificosAMayusculas(ojosData)), colHallazgosAncho - 4, 8) : 0;
   const alturaFilaOjos = (odData || oiData) ? Math.max(5, alturaOjos + 2) : filaAlturaExamenDetallado;
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaOjos);
@@ -1019,14 +1098,14 @@ yPos += filaAlturaCage;
   doc.text("OJOS:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   if (odData || oiData) {
-    dibujarTextoConSaltoLinea(formatearTextoGramatical(ojosData), tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
+    dibujarTextoConSaltoLinea(formatearTextoGramatical(convertirTextosEspecificosAMayusculas(ojosData)), tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
   }
   
   yPos += alturaFilaOjos;
   
   // Dibujar fila para NARIZ con altura dinámica
   const narizData = data.nariz_txtnariz;
-  const alturaNariz = narizData ? calcularAlturaTextoCreciente(doc, narizData, colHallazgosAncho - 4, 8) : 0;
+  const alturaNariz = narizData ? calcularAlturaTextoCreciente(doc, formatearTextoGramatical(convertirTextosEspecificosAMayusculas(narizData)), colHallazgosAncho - 4, 8) : 0;
   const alturaFilaNariz = narizData ? Math.max(5, alturaNariz + 2) : filaAlturaExamenDetallado;
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaNariz);
@@ -1040,14 +1119,14 @@ yPos += filaAlturaCage;
   doc.text("NARIZ:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   if (narizData) {
-    dibujarTextoConSaltoLinea(formatearTextoGramatical(narizData), tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
+    dibujarTextoConSaltoLinea(formatearTextoGramatical(convertirTextosEspecificosAMayusculas(narizData)), tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
   }
   
   yPos += alturaFilaNariz;
   
   // Dibujar fila para AP. RESPIRATORIO con altura dinámica
   const respiratorioData = data.apRespiratorio_txtaprespiratorio;
-  const alturaRespiratorio = respiratorioData ? calcularAlturaTextoCreciente(doc, respiratorioData, colHallazgosAncho - 4, 8) : 0;
+  const alturaRespiratorio = respiratorioData ? calcularAlturaTextoCreciente(doc, formatearTextoGramatical(convertirTextosEspecificosAMayusculas(respiratorioData)), colHallazgosAncho - 4, 8) : 0;
   const alturaFilaRespiratorio = respiratorioData ? Math.max(5, alturaRespiratorio + 2) : filaAlturaExamenDetallado;
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaRespiratorio);
@@ -1061,14 +1140,14 @@ yPos += filaAlturaCage;
   doc.text("AP. RESPIRATORIO:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   if (respiratorioData) {
-    dibujarTextoConSaltoLinea(formatearTextoGramatical(respiratorioData), tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
+    dibujarTextoConSaltoLinea(formatearTextoGramatical(convertirTextosEspecificosAMayusculas(respiratorioData)), tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
   }
   
   yPos += alturaFilaRespiratorio;
   
   // Dibujar fila para AP. CARDIOVASCULAR con altura dinámica
   const cardiovascularData = data.apCardiovascular_txtapcardiovascuar;
-  const alturaCardiovascular = cardiovascularData ? calcularAlturaTextoCreciente(doc, cardiovascularData, colHallazgosAncho - 4, 8) : 0;
+  const alturaCardiovascular = cardiovascularData ? calcularAlturaTextoCreciente(doc, formatearTextoGramatical(convertirTextosEspecificosAMayusculas(cardiovascularData)), colHallazgosAncho - 4, 8) : 0;
   const alturaFilaCardiovascular = cardiovascularData ? Math.max(5, alturaCardiovascular + 2) : filaAlturaExamenDetallado;
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaCardiovascular);
@@ -1082,14 +1161,14 @@ yPos += filaAlturaCage;
   doc.text("AP. CARDIOVASCULAR:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   if (cardiovascularData) {
-    dibujarTextoConSaltoLinea(formatearTextoGramatical(cardiovascularData), tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
+    dibujarTextoConSaltoLinea(formatearTextoGramatical(convertirTextosEspecificosAMayusculas(cardiovascularData)), tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
   }
   
   yPos += alturaFilaCardiovascular;
   
   // Dibujar fila para ABDOMEN con altura dinámica
   const abdomenData = data.abdomen_txtabdomen;
-  const alturaAbdomen = abdomenData ? calcularAlturaTextoCreciente(doc, abdomenData, colHallazgosAncho - 4, 8) : 0;
+  const alturaAbdomen = abdomenData ? calcularAlturaTextoCreciente(doc, formatearTextoGramatical(convertirTextosEspecificosAMayusculas(abdomenData)), colHallazgosAncho - 4, 8) : 0;
   const alturaFilaAbdomen = abdomenData ? Math.max(5, alturaAbdomen + 2) : filaAlturaExamenDetallado;
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaAbdomen);
@@ -1103,7 +1182,7 @@ yPos += filaAlturaCage;
   doc.text("ABDOMEN:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   if (abdomenData) {
-    dibujarTextoConSaltoLinea(formatearTextoGramatical(abdomenData), tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
+    dibujarTextoConSaltoLinea(formatearTextoGramatical(convertirTextosEspecificosAMayusculas(abdomenData)), tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
   }
   
   yPos += alturaFilaAbdomen;
@@ -1387,9 +1466,10 @@ yPos += filaAlturaCage;
   ];
   
   valoresOD.forEach((valor, index) => {
-    const anchoTexto = doc.getTextWidth(valor);
+    const valorFormateado = convertirTextosEspecificosAMayusculas(valor);
+    const anchoTexto = doc.getTextWidth(valorFormateado);
     const anchoColumna = colFrecuenciaAncho;
-    doc.text(valor, posicionesX[index] + (anchoColumna - anchoTexto) / 2, yPos + 3);
+    doc.text(valorFormateado, posicionesX[index] + (anchoColumna - anchoTexto) / 2, yPos + 3);
   });
   
   yPos += filaAlturaAudiometria;
@@ -1425,9 +1505,10 @@ yPos += filaAlturaCage;
   ];
   
   valoresOI.forEach((valor, index) => {
-    const anchoTexto = doc.getTextWidth(valor);
+    const valorFormateado = convertirTextosEspecificosAMayusculas(valor);
+    const anchoTexto = doc.getTextWidth(valorFormateado);
     const anchoColumna = colFrecuenciaAncho;
-    doc.text(valor, posicionesX[index] + (anchoColumna - anchoTexto) / 2, yPos + 3);
+    doc.text(valorFormateado, posicionesX[index] + (anchoColumna - anchoTexto) / 2, yPos + 3);
   });
   
   yPos += filaAlturaAudiometria;
