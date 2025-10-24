@@ -129,7 +129,7 @@ export const SubmitDataService = async (
         "paraiso": form.cajon === "PARAISO" ? true : false,
         "otros": form.cajon === "OTROS" ? true : false,
         "otrosDescripcion": form.otrosDescripcion,
-        "observaciones": form.observaciones
+        "observaciones": form.observaciones.toUpperCase(),
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
