@@ -49,3 +49,15 @@ export function convertirGenero(genero) { // Convierte F/M a Femenino/Masculino
     }
 }
 
+export function formatearTextoATitulo(texto) {
+    // Convierte texto a formato título: Primera letra mayúscula, resto minúsculas
+    // Ejemplo: "HOLA BUENOS DIAS" -> "Hola Buenos Dias"
+    if (!texto || typeof texto !== 'string') return texto;
+    
+    return texto
+        .toLowerCase()
+        .split(' ')
+        .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1))
+        .join(' ');
+}
+

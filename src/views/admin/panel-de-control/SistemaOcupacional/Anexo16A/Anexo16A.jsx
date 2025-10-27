@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBroom,
@@ -21,7 +20,7 @@ const tabla = "anexo16a";
 const today = getToday();
 
 export default function Anexo16A() {
-  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+  const { token, userlogued, selectedSede, datosFooter, userName, userDNI, userCMP, userDireccion } =
     useSessionData();
 
   const initialFormState = {
@@ -43,10 +42,10 @@ export default function Anexo16A() {
     temperatura: "",
     peso: "",
     talla: "",
-    medicoNombre: userCompleto?.datos?.nombres_user?.toUpperCase() ?? "",
-    medicoDNI: userCompleto?.datos?.dni_user ?? "",
-    medicoCmp: userCompleto?.datos?.cmp?.toUpperCase() ?? "",
-    medicoDireccion: userCompleto?.datos?.direccion?.toUpperCase() ?? "",
+    medicoNombre: userName,
+    medicoDNI: userDNI,
+    medicoCmp: userCMP,
+    medicoDireccion: userDireccion,
     cirugiaMayor: false,
     desordenesCoagulacion: false,
     diabetes: false,
@@ -480,7 +479,7 @@ export default function Anexo16A() {
                 />
               </div>
             </div>
-            
+
             {/* Columna 2: Observaciones */}
             <div className="bg-white border border-gray-200 rounded-lg p-3">
               <h4 className="font-semibold text-gray-800 mb-3">Observaciones</h4>
@@ -529,85 +528,85 @@ export default function Anexo16A() {
 
             {/* Corregida */}
             {/* Corregida */}
-<div className="mb-4">
-  <h5 className="font-semibold text-gray-700 mb-2">Corregida</h5>
+            <div className="mb-4">
+              <h5 className="font-semibold text-gray-700 mb-2">Corregida</h5>
 
-  {/* Fila OD y OI */}
-  <div className="grid grid-cols-2 gap-6">
-    <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        <span className="text-[11px] min-w-[35px]">V.C.</span>
-        <InputTextOneLine
-          name="vcCorregidaOD"
-          value={form?.vcCorregidaOD}
-          disabled
-          className="flex-1 w-full"
-        />
-      </div>
-      <div className="flex items-center gap-2">
-        <span className="text-[11px] min-w-[35px]">V.L.</span>
-        <InputTextOneLine
-          name="vlCorregidaOD"
-          value={form?.vlCorregidaOD}
-          disabled
-          className="flex-1 w-full"
-        />
-      </div>
-    </div>
+              {/* Fila OD y OI */}
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] min-w-[35px]">V.C.</span>
+                    <InputTextOneLine
+                      name="vcCorregidaOD"
+                      value={form?.vcCorregidaOD}
+                      disabled
+                      className="flex-1 w-full"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] min-w-[35px]">V.L.</span>
+                    <InputTextOneLine
+                      name="vlCorregidaOD"
+                      value={form?.vlCorregidaOD}
+                      disabled
+                      className="flex-1 w-full"
+                    />
+                  </div>
+                </div>
 
-    <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        <span className="text-[11px] min-w-[35px]">V.C.</span>
-        <InputTextOneLine
-          name="vcCorregidaOI"
-          value={form?.vcCorregidaOI}
-          disabled
-          className="flex-1 w-full"
-        />
-      </div>
-      <div className="flex items-center gap-2">
-        <span className="text-[11px] min-w-[35px]">V.L.</span>
-        <InputTextOneLine
-          name="vlCorregidaOI"
-          value={form?.vlCorregidaOI}
-          disabled
-          className="flex-1 w-full"
-        />
-      </div>
-    </div>
-  </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] min-w-[35px]">V.C.</span>
+                    <InputTextOneLine
+                      name="vcCorregidaOI"
+                      value={form?.vcCorregidaOI}
+                      disabled
+                      className="flex-1 w-full"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] min-w-[35px]">V.L.</span>
+                    <InputTextOneLine
+                      name="vlCorregidaOI"
+                      value={form?.vlCorregidaOI}
+                      disabled
+                      className="flex-1 w-full"
+                    />
+                  </div>
+                </div>
+              </div>
 
-  {/* Fila extra (ancho completo) */}
-  <div className="mt-4 space-y-2">
-    <div className="flex items-center gap-2">
-      <span className="text-[11px] min-w-[45px]">V.Clrs</span>
-      <InputTextOneLine
-        name="vclrs"
-        value={form?.vclrs}
-        disabled
-        className="flex-1 w-full"
-      />
-    </div>
-    <div className="flex items-center gap-2">
-      <span className="text-[11px] min-w-[45px]">V.B.</span>
-      <InputTextOneLine
-        name="vb"
-        value={form?.vb}
-        disabled
-        className="flex-1 w-full"
-      />
-    </div>
-    <div className="flex items-center gap-2">
-      <span className="text-[11px] min-w-[45px]">R.P.</span>
-      <InputTextOneLine
-        name="rp"
-        value={form?.rp}
-        disabled
-        className="flex-1 w-full"
-      />
-    </div>
-  </div>
-</div>
+              {/* Fila extra (ancho completo) */}
+              <div className="mt-4 space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] min-w-[45px]">V.Clrs</span>
+                  <InputTextOneLine
+                    name="vclrs"
+                    value={form?.vclrs}
+                    disabled
+                    className="flex-1 w-full"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] min-w-[45px]">V.B.</span>
+                  <InputTextOneLine
+                    name="vb"
+                    value={form?.vb}
+                    disabled
+                    className="flex-1 w-full"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] min-w-[45px]">R.P.</span>
+                  <InputTextOneLine
+                    name="rp"
+                    value={form?.rp}
+                    disabled
+                    className="flex-1 w-full"
+                  />
+                </div>
+              </div>
+            </div>
 
 
             {/* Enfermedades Oculares */}

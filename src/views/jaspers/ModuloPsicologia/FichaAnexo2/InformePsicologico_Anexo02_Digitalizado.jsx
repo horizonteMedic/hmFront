@@ -154,6 +154,10 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
   // === DIBUJAR HEADER ===
   drawHeader(numeroPagina);
 
+  // === VARIABLES DE TABLA ===
+  const tablaInicioX = 5;
+  const tablaAncho = 200;
+
   // === FUNCIONES AUXILIARES ===
   // Función para texto con salto de línea
   const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
@@ -197,8 +201,9 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
 
   // Función general para dibujar header de sección con fondo gris
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
-    const tablaInicioX = 10;
-    const tablaAncho = 190;
+    // Usar las variables del scope principal en lugar de valores hardcodeados
+    // const tablaInicioX = 5;
+    // const tablaAncho = 200;
     
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
@@ -223,8 +228,9 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
 
   // Función para dibujar subheader con color celeste
   const dibujarSubHeaderCeleste = (titulo, yPos, alturaHeader = 5) => {
-    const tablaInicioX = 10;
-    const tablaAncho = 190;
+    // Usar las variables del scope principal en lugar de valores hardcodeados
+    // const tablaInicioX = 10;
+    // const tablaAncho = 190;
     
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
@@ -248,10 +254,8 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
   };
 
   // === SECCIÓN 1: DATOS PERSONALES ===
-  const tablaInicioX = 10;
-  const tablaAncho = 190;
   let yPos = 35.5;
-  const filaAltura = 5;
+  const filaAltura = 4.8;
 
   // Header de datos personales
   yPos = dibujarHeaderSeccion("1. DATOS PERSONALES", yPos, filaAltura);
@@ -329,12 +333,12 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Edad:", tablaInicioX + 47, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((datosFinales.edad ? (datosFinales.edad + " Años") : ""), tablaInicioX + 58, yTexto + 1);
+  doc.text((datosFinales.edad ? (datosFinales.edad + " AÑOS") : ""), tablaInicioX + 58, yTexto + 1);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Sexo:", tablaInicioX + 92, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.sexo || "", tablaInicioX + 105, yTexto + 1);
+  doc.text((datosFinales.sexo || "").toUpperCase(), tablaInicioX + 105, yTexto + 1);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Fecha Nac.:", tablaInicioX + 137, yTexto + 1);
@@ -380,7 +384,7 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
 
   // Fila creciente para motivo de evaluación (altura inicial 10mm)
   const motivoFormateado = formatearTextoGramatical(datosFinales.motivoEvaluacion || "");
-  yPos = dibujarTextoEnFilaCreciente(doc, motivoFormateado, tablaInicioX, tablaAncho, yPos, 7, 4, 8);
+  yPos = dibujarTextoEnFilaCreciente(doc, motivoFormateado, tablaInicioX, tablaAncho, yPos, 5, 4, 8);
 
   // === SECCIÓN III: OBSERVACIÓN DE CONDUCTAS ===
   yPos = dibujarHeaderSeccion("3. OBSERVACIÓN DE CONDUCTAS", yPos, filaAltura);
@@ -451,10 +455,16 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text(opcion, xOpcion + 1, yPos + 3.5);
       
-      // Dibujar X si está seleccionado
+      // Crear cajoncito para la X: dibujar línea vertical antes de la X
+      const xPosicionX = xOpcion + anchoOpcion - 8; // Posición donde se dibujará la línea
+      doc.line(xPosicionX, yPos, xPosicionX, yPos + filaObservacionAltura);
+      
+      // Dibujar X centrada en el cajoncito si está seleccionado
       if (observacion.valores[opcionIndex]) {
+        const anchoCajoncito = (xOpcion + anchoOpcion) - xPosicionX;
+        const centroCajoncito = xPosicionX + (anchoCajoncito / 2);
         doc.setFont("helvetica", "bold").setFontSize(10);
-        doc.text("X", xOpcion + anchoOpcion - 5, yPos + 3.5);
+        doc.text("X", centroCajoncito, yPos + 3.5, { align: "center" });
       }
     });
     
@@ -514,10 +524,16 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text(opcion, xOpcion + 1, yPos + 3.5);
       
-      // Dibujar X si está seleccionado
+      // Crear cajoncito para la X: dibujar línea vertical antes de la X
+      const xPosicionXPostura = xOpcion + anchoOpcionPostura - 8; // Posición donde se dibujará la línea
+      doc.line(xPosicionXPostura, yPos, xPosicionXPostura, yPos + filaObservacionAltura);
+      
+      // Dibujar X centrada en el cajoncito si está seleccionado
       if (postura.valores[opcionIndex]) {
+        const anchoCajoncitoPostura = (xOpcion + anchoOpcionPostura) - xPosicionXPostura;
+        const centroCajoncitoPostura = xPosicionXPostura + (anchoCajoncitoPostura / 2);
         doc.setFont("helvetica", "bold").setFontSize(10);
-        doc.text("X", xOpcion + anchoOpcionPostura - 5, yPos + 3.5);
+        doc.text("X", centroCajoncitoPostura, yPos + 3.5, { align: "center" });
       }
     });
     
@@ -553,10 +569,16 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(opcion, xOpcion + 1, yPos + 3.5);
     
-    // Dibujar X si está seleccionado
+    // Crear cajoncito para la X: dibujar línea vertical antes de la X
+    const xPosicionXArticulacion = xOpcion + anchoOpcionArticulacion - 8; // Posición donde se dibujará la línea
+    doc.line(xPosicionXArticulacion, yPos, xPosicionXArticulacion, yPos + filaObservacionAltura);
+    
+    // Dibujar X centrada en el cajoncito si está seleccionado
     if (articulacion.valores[opcionIndex]) {
+      const anchoCajoncitoArticulacion = (xOpcion + anchoOpcionArticulacion) - xPosicionXArticulacion;
+      const centroCajoncitoArticulacion = xPosicionXArticulacion + (anchoCajoncitoArticulacion / 2);
       doc.setFont("helvetica", "bold").setFontSize(10);
-      doc.text("X", xOpcion + anchoOpcionArticulacion - 5, yPos + 3.5);
+      doc.text("X", centroCajoncitoArticulacion, yPos + 3.5, { align: "center" });
     }
   });
   
@@ -633,10 +655,16 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text(opcion, xOpcion + 1, yPos + 3.5);
       
-      // Dibujar X si está seleccionado
+      // Crear cajoncito para la X: dibujar línea vertical antes de la X
+      const xPosicionXOrientacion = xOpcion + anchoOpcionOrientacion - 8; // Posición donde se dibujará la línea
+      doc.line(xPosicionXOrientacion, yPos, xPosicionXOrientacion, yPos + filaObservacionAltura);
+      
+      // Dibujar X centrada en el cajoncito si está seleccionado
       if (orientacion.valores[opcionIndex]) {
+        const anchoCajoncitoOrientacion = (xOpcion + anchoOpcionOrientacion) - xPosicionXOrientacion;
+        const centroCajoncitoOrientacion = xPosicionXOrientacion + (anchoCajoncitoOrientacion / 2);
         doc.setFont("helvetica", "bold").setFontSize(10);
-        doc.text("X", xOpcion + anchoOpcionOrientacion - 5, yPos + 3.5);
+        doc.text("X", centroCajoncitoOrientacion, yPos + 3.5, { align: "center" });
       }
     });
     
@@ -812,7 +840,7 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
   yPos += alturaSeccionFirmas;
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 8});
+  footerTR(doc, { footerOffsetY: 13.5});
 
   // === IMPRIMIR ===
   imprimir(doc);
