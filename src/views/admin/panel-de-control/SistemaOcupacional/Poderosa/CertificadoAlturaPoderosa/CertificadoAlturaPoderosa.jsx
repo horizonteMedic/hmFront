@@ -75,7 +75,7 @@ export default function CertificadoAlturaPoderosa() {
         // ====================== ANTECEDENTES ======================
         // Historial
         accidentesTrabajoEnfermedades: "NIEGO ACCIDENTES DE TRABAJO",
-        antecedentesFamiliares: "NIEGO ANTECEDENTES FAMILIARES",
+        antecedentesFamiliares: "NIEGO",
 
         // Antecedentes Psiconeuroológicos
         tecModeradoGrave: false,
