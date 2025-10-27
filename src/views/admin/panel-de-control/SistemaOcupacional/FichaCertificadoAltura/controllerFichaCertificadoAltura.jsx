@@ -226,6 +226,14 @@ export const SubmitDataService = async (
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
     }
+    if (!form.conclusion) {
+        await Swal.fire("Error", "Ingrese la Conclusión", "error");
+        return;
+    }
+    if (!form.experienciaAnios || form.experienciaAnios === "") {
+        await Swal.fire("Error", "Ingrese el Tiempo de Experiencia", "error");
+        return;
+    }
     const body = {
         norden: form.norden,
         codigoCertificado: form.codigoCertificado,

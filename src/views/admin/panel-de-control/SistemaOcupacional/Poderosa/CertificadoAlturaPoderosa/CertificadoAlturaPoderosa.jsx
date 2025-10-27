@@ -96,14 +96,14 @@ export default function CertificadoAlturaPoderosa() {
         // Consumo de sustancias
         tabaco: "",
         tabacoFrecuencia: "",
-        alcohol: "",
-        alcoholFrecuencia: "",
-        drogas: "",
-        drogasFrecuencia: "",
-        hojaCoca: "",
-        hojaCocaFrecuencia: "",
-        cafe: "",
-        cafeFrecuencia: "",
+        alcohol: "CERVEZA",
+        alcoholFrecuencia: "C/MES",
+        drogas: "NO",
+        drogasFrecuencia: "N/A",
+        hojaCoca: "20 G",
+        hojaCocaFrecuencia: "C/DÍA",
+        cafe: "1 TAZA",
+        cafeFrecuencia: "C/SEMANA",
 
         // Conclusiones Finales
         diagnostico: "",

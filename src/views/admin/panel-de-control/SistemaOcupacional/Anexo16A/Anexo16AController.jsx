@@ -308,7 +308,7 @@ function evaluarObservacionesObtener(res, set) {
     // } else {
     //     problemasOftalmologicos = false;
     // }
-    if (res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNO") || res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNA")) {
+    if (!res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNO") || !res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNA")) {
         problemasOftalmologicos = true;
         problemasOftalmologicosRed = true;
         nuevasObservaciones += "- USO DE LENTES CORRECTORES.\n";
@@ -555,8 +555,8 @@ function evaluarObservacionesEditar(res, set) {
     //     }
     // }
 
-    if (res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNO") ||
-        res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNA")) {
+    if (!res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNO") ||
+        !res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNA")) {
         problemasOftalmologicos = true;
         problemasOftalmologicosRed = true;
         nuevasObservaciones += "- USO DE LENTES CORRECTORES.\n";
