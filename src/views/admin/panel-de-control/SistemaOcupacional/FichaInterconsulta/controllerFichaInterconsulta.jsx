@@ -120,6 +120,8 @@ export const GetInfoServicio = async (
             }
         }
         
+    } else {
+        Swal.fire("Error","Este paciente no tiene registros","error")
     }
 };
 
