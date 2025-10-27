@@ -311,7 +311,7 @@ export const SubmitDataService = async (
         antecedentesInsuficienciaRenalCronicaNo: !form.insuficienciaRenalCronicaGradoIV,
         antecedentesAnemiaCualquierGradoSi: form.anemiaCriteriosOMS2011,
         antecedentesAnemiaCualquierGradoNo: !form.anemiaCriteriosOMS2011,
-        usuarioRegistrar: user,
+        usuarioRegistro: user,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
