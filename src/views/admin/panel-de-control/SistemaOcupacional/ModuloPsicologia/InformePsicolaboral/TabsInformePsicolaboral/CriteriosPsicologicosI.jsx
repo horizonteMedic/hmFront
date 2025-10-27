@@ -25,7 +25,7 @@ export default function CriteriosPsicologicosI({
             ]}
             options={[
               { value: "I", label: "I" },
-              { value: "NP1", label: "NP1" },
+              { value: "NPI", label: "NPI" },
               { value: "NP", label: "NP" },
               { value: "NPS", label: "NPS" },
               { value: "S", label: "S" }

@@ -503,44 +503,74 @@ export default function Hoja_Consulta_Externa(data = {}) {
     yTexto += filaAltura; // Incrementar para mantener consistencia
   }
 
+  // === Calcular la posición base del cuadro de firmas ===
+  const alturaSeccionFirmas = 30; // Altura fija de la sección de firmas
+  const yFirmas = yPos - 30 ; // +5mm de espacio visual debajo de "Observaciones"
+  console.log(yFirmas)
+  // === Dibujar cuadro de firmas (dos columnas) ===
+  doc.line(tablaInicioX, yFirmas, tablaInicioX, yFirmas + alturaSeccionFirmas); // Línea izquierda
+  doc.line(tablaInicioX + 95, yFirmas, tablaInicioX + 95, yFirmas + alturaSeccionFirmas); // División central
+  doc.line(tablaInicioX + tablaAncho, yFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea derecha
+  doc.line(tablaInicioX, yFirmas, tablaInicioX + tablaAncho, yFirmas); // Línea superior
+  doc.line(tablaInicioX, yFirmas + alturaSeccionFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea inferior
+
+  // === COLUMNA 1: FIRMA Y HUELLA DEL TRABAJADOR ===
+  const firmaTrabajadorY = yFirmas + 3;
+  
+  // Calcular centro de la columna 1 para centrar las imágenes
+  const centroColumna1X = tablaInicioX + (95 / 2); // Centro de la columna 1
+
+  // Agregar firma del trabajador (lado izquierdo)
   let firmaTrabajadorUrl = getSign(datosFinales, "FIRMAP");
   if (firmaTrabajadorUrl) {
     try {
       const imgWidth = 30;
       const imgHeight = 20;
-      const x = 140;
-      const y = 220;
+      const x = centroColumna1X - 25;
+      const y = firmaTrabajadorY;
       doc.addImage(firmaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
     } catch (error) {
       console.log("Error cargando firma del trabajador:", error);
     }
   }
 
+  // Agregar huella del trabajador (lado derecho, vertical)
   let huellaTrabajadorUrl = getSign(datosFinales, "HUELLA");
   if (huellaTrabajadorUrl) {
     try {
       const imgWidth = 12;
       const imgHeight = 20;
-      const x = 180;
-      const y = 220;
+      const x = centroColumna1X + 8;
+      const y = firmaTrabajadorY;
       doc.addImage(huellaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
     } catch (error) {
       console.log("Error cargando huella del trabajador:", error);
     }
   }
 
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text("Firma y Huella del trabajador", centroColumna1X, yFirmas + 26, { align: "center" });
+
+  // === FIRMA DEL MÉDICO (DERECHA) ===
+  const firmaMedicoY = yFirmas + 3;
+  const centroColumnaDerechaX = tablaInicioX + (3 * tablaAncho / 4);
   let firmaMedicoUrl = getSign(datosFinales, "SELLOFIRMA");
   if (firmaMedicoUrl) {
     try {
       const imgWidth = 45;
       const imgHeight = 20;
-      const x = 135;
-      const y = 246;
+      const x = centroColumnaDerechaX - (imgWidth / 2); // Centrar horizontalmente
+      const y = firmaMedicoY;
       doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
     } catch (error) {
       console.log("Error cargando firma del médico:", error);
     }
   }
+
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text("Sello y Firma del Médico", centroColumnaDerechaX, yFirmas + 26, { align: "center" });
+  doc.text("Responsable de la Evaluación", centroColumnaDerechaX, yFirmas + 28.5, { align: "center" });
+  
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8});
 

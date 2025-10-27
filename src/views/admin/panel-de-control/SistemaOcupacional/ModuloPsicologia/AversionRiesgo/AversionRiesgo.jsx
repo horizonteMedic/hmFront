@@ -4,6 +4,7 @@ import { useForm } from "../../../../../hooks/useForm"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
 import RadioTable from "../../../../../components/reusableComponents/RadioTable";
+import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
 
 // Arrays para RadioTable de Orientación
 const orientacionItems = [
@@ -204,49 +205,76 @@ const AversionRiesgo = () => {
                                 </section>
                             </div>
                         </section>
-                        <section className="bg-white border border-gray-200 rounded-lg flex w-[40%] gap-4">
-                        
+                        <section className="bg-white  flex-col rounded-lg flex w-[40%] gap-4">
+                            <InputTextArea
+                                label="ANALISIS Y RESULTADOS"
+                                value={form.diagnostico}
+                                onChange={handleChange}
+                                rows={6}
+                                classNameLabel="text-blue-600"
+                                name="diagnostico"
+                            />
+                            <InputTextArea
+                                label="RECOMENDACIONES"
+                                value={form.diagnostico}
+                                onChange={handleChange}
+                                classNameLabel="text-blue-600"
+                                rows={6}
+                                name="diagnostico"
+                            />
+                            <h1 className="text-blue-600 font-bold mb-0 pb-0 ">Conclusión</h1>
+                            <div className="flex flex-col gap-2 p-4 border-gray-200 border rounded-lg">
+                                <InputsRadioGroup
+                                    name="razonVisita"
+                                    value={form?.razonVisita}
+                                    vertical
+                                    onChange={handleRadioButton}
+                                    options={[
+                                        { label: "CUMPLE CON EL PERFIL", value: "PRIMERA ACTITUD" },
+                                        { label: "NO CUMPLE CON EL PERFIL", value: "REVALIDACION" },
+                                    ]}
+                                />
+                            </div>
+                            <section className="flex flex-col md:flex-row justify-between items-center gap-4  px-4 pt-4">
+                                <div className=" flex gap-4">
+                                <button
+                                    type="button"
+                                    onClick={handleSave}
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                                >
+                                    <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleClear}
+                                    className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                                >
+                                    <FontAwesomeIcon icon={faBroom} /> Limpiar
+                                </button>
+                                </div>
+                                <div className="flex flex-col items-end">
+                                <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                    name="norden"
+                                    value={form.norden}
+                                    onChange={handleChange}
+                                    className="border rounded px-2 py-1 text-base w-24"
+                                    />
+                
+                                    <button
+                                    type="button"
+                                    onClick={handlePrint}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                                    >
+                                    <FontAwesomeIcon icon={faPrint} />
+                                    </button>
+                                </div>
+                                </div>
+                            </section>
                         </section>
                     </section>
 
-        
-                    <section className="flex flex-col md:flex-row justify-between items-center gap-4  px-4 pt-4">
-                        <div className=" flex gap-4">
-                        <button
-                            type="button"
-                            onClick={handleSave}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                        >
-                            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleClear}
-                            className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                        >
-                            <FontAwesomeIcon icon={faBroom} /> Limpiar
-                        </button>
-                        </div>
-                        <div className="flex flex-col items-end">
-                        <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
-                        <div className="flex items-center gap-2">
-                            <input
-                            name="norden"
-                            value={form.norden}
-                            onChange={handleChange}
-                            className="border rounded px-2 py-1 text-base w-24"
-                            />
-        
-                            <button
-                            type="button"
-                            onClick={handlePrint}
-                            className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                            >
-                            <FontAwesomeIcon icon={faPrint} />
-                            </button>
-                        </div>
-                        </div>
-                    </section>
                     </div>
                 </div>
                 </div>

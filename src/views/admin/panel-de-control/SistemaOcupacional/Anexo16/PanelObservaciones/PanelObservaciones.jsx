@@ -37,7 +37,7 @@ export default function PanelObservaciones({
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <InputTextArea
             rows={8}
-            label="Conclusiones"
+            label="Recomendaciones y Restricciones"
             name="conclusionMedico"
             value={form.conclusionMedico}
             onChange={handleChange}

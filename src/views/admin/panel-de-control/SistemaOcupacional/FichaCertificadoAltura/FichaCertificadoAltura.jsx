@@ -4,7 +4,6 @@ import {
     faUser,
     faStethoscope,
     faChartLine,
-    faCheck,
     faBroom,
     faPrint,
     faSave,
@@ -30,8 +29,7 @@ const today = getToday();
 export default function FichaCertificadoAltura() {
     const [activeTab, setActiveTab] = useState(0);
 
-    const { token, userlogued, selectedSede, datosFooter, userCompleto } =
-        useSessionData();
+    const { token, userlogued, selectedSede, datosFooter, userName, userDNI } = useSessionData();
 
     const initialFormState = {
         // Header
@@ -130,8 +128,8 @@ export default function FichaCertificadoAltura() {
         aptoHasta: getTodayPlusOneYear(),
         conclusion: null,
         observacionesRecomendaciones: "",
-        nombreMedicoColegiatura: userCompleto?.datos?.nombres_user?.toUpperCase(),
-        dniUsuario: userCompleto?.datos?.dni_user,
+        nombreMedicoColegiatura: userName,
+        dniUsuario: userDNI,
 
         // Recomendaciones
         sobrepesoDietaHipocalorica: false,

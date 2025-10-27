@@ -226,6 +226,14 @@ export const SubmitDataService = async (
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
     }
+    if (!form.conclusion) {
+        await Swal.fire("Error", "Ingrese la Conclusión", "error");
+        return;
+    }
+    if (!form.experienciaAnios || form.experienciaAnios === "") {
+        await Swal.fire("Error", "Ingrese el Tiempo de Experiencia", "error");
+        return;
+    }
     const body = {
         norden: form.norden,
         codigoCertificado: form.codigoCertificado,
@@ -303,7 +311,7 @@ export const SubmitDataService = async (
         antecedentesInsuficienciaRenalCronicaNo: !form.insuficienciaRenalCronicaGradoIV,
         antecedentesAnemiaCualquierGradoSi: form.anemiaCriteriosOMS2011,
         antecedentesAnemiaCualquierGradoNo: !form.anemiaCriteriosOMS2011,
-        usuarioRegistrar: user,
+        usuarioRegistro: user,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

@@ -50,7 +50,7 @@ export default function InformePsicolaboral() {
 
     // ====================== CRITERIOS PSICOLÓGICOS I ======================
     // ASPECTO INTELECTUAL
-    razonamientoProblemas: "", // I, NP1, NP, NPS, S
+    razonamientoProblemas: "", // I, NPI, NP, NPS, S
     memoria: "",
     atencionConcentracion: "",
     coordinacionVisoMotora: "",
@@ -67,9 +67,9 @@ export default function InformePsicolaboral() {
 
     // ====================== CRITERIOS PSICOLÓGICOS II ======================
     // ASPECTOS CONDUCTUALES
-    calidadSuenoEstres: "", // BAJO, PROMEDIO, ALTO
-    nivelAlertaRiesgo: "",
-    somnolencia: "",
+    nivelAlerta: "", // BAJO, PROMEDIO, ALTO
+    hostigamientoSexual: "",
+    consecuencia: "",
 
     // ASPECTOS PSICOLABORALES
     capacidadInfluencia: "",// PD, NM, A, D, E
@@ -133,7 +133,7 @@ export default function InformePsicolaboral() {
   };
 
   const ActiveComponent = tabs[activeTab]?.component || (() => null);
-
+  console.log(form.esApto)
   return (
     <div className="mx-auto bg-white ">
       <div className="flex h-full">
@@ -159,6 +159,7 @@ export default function InformePsicolaboral() {
               <InputTextOneLine
                 label="Tipo de Examen"
                 name="tipoExamen"
+                value={form?.tipoExamen}
                 disabled
                 onChange={handleChange}
               />

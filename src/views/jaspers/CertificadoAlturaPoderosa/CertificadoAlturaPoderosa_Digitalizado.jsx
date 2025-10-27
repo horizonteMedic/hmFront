@@ -210,7 +210,7 @@ export default function CertificadoAlturaPoderosa_Digitalizado(data = {}) {
     if (!texto || typeof texto !== 'string') return texto;
     
     // Lista de textos que deben mantenerse en mayúsculas
-    const textosMayusculas = ['N/A', 'O.D', 'O.I', 'RCRR', 'HRH', 'B/D', 'RHA(+)'];
+    const textosMayusculas = ['N/A', 'O.D', 'O.I', 'RCRR', 'HRH', 'B/D', 'RHA(+)', 'COVID-19', 'VIH', 'SIDA', 'TAC', 'RMN', 'ECG', 'EEG'];
     
     // Dividir por líneas para manejar listas con viñetas
     const lineas = texto.split('\n');
@@ -467,7 +467,7 @@ export default function CertificadoAlturaPoderosa_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("T. Examen:", tablaInicioX + 137, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.tipoExamen, tablaInicioX + 155, yTexto + 1.5);
+  doc.text(formatearTextoGramatical(datosFinales.tipoExamen), tablaInicioX + 155, yTexto + 1.5);
   yTexto += filaAltura;
 
   // Segunda fila: DNI, Edad, Sexo, Fecha Nac.
@@ -484,7 +484,7 @@ export default function CertificadoAlturaPoderosa_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Sexo:", tablaInicioX + 92, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.sexo, tablaInicioX + 105, yTexto + 1.5);
+  doc.text(formatearTextoGramatical(datosFinales.sexo), tablaInicioX + 105, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Fecha Nac.:", tablaInicioX + 137, yTexto + 1.5);
@@ -503,26 +503,26 @@ export default function CertificadoAlturaPoderosa_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.puestoTrabajo, tablaInicioX + 30, yTexto + 1.5);
+  doc.text(formatearTextoGramatical(datosFinales.puestoTrabajo), tablaInicioX + 30, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Área de Trabajo:", tablaInicioX + 92, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.areaTrabajo, tablaInicioX + 118, yTexto + 1.5);
+  doc.text(formatearTextoGramatical(datosFinales.areaTrabajo), tablaInicioX + 118, yTexto + 1.5);
   yTexto += filaAltura;
 
   // Quinta fila: Empresa
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 24, yTexto + 1.5, tablaAncho - 30);
+  dibujarTextoConSaltoLinea(formatearTextoGramatical(datosFinales.empresa), tablaInicioX + 24, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
   // Sexta fila: Contratista
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Contratista:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.contrata, tablaInicioX + 24, yTexto + 1.5);
+  doc.text(formatearTextoGramatical(datosFinales.contrata), tablaInicioX + 24, yTexto + 1.5);
   yTexto += filaAltura;
 
   // Séptima fila: Lugar, Años de experiencia, Altura
