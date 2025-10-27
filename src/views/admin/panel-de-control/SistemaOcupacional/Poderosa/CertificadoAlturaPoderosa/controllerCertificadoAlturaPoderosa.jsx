@@ -27,6 +27,19 @@ export const GetInfoServicio = async (
         onFinish
     );
     if (res) {
+        let nuevoConclusiones = ""
+        const trigliseridos = parseFloat(res.trigliseridosAnalisisBioquimico_txttrigliseridos)?.toFixed(2)
+        if (trigliseridos && trigliseridos <= 150) {
+            nuevoConclusiones += `HIPERTRIGLICERIDEMIA\n`
+        }
+        const colesterol = parseFloat(res.colesterolAnalisisBioquimico_txtcolesterol)?.toFixed(2)
+        if (colesterol && colesterol <= 200) {
+            nuevoConclusiones += `HIPECTOLESTEROLENIA\n`
+        }
+        const diagnosticoAudio = (res.diagnosticoAudiometricoCompleto_diagnostico ?? "").trim()
+        if (diagnosticoAudio != "NORMAL" && diagnosticoAudio != "") {
+            nuevoConclusiones += `HIPOACUSIA\n`
+        }
         set((prev) => ({
             ...prev,
             // Header
@@ -75,6 +88,8 @@ export const GetInfoServicio = async (
             icc: res.icctriaje_icc ?? "",
             pToracicoInspiracion: res.maximaInspiracionPtoracico_p_max_inspiracion ?? "",
             pToracicoEspiracion: res.forazadaPtoracico_p_ex_forzada ?? "",
+
+            conclusionesRecomendaciones: nuevoConclusiones,
         }));
     }
 };
@@ -94,6 +109,7 @@ export const GetInfoServicioEditar = async (
         onFinish
     );
     if (res) {
+
         set((prev) => ({
             ...prev,
             // Header

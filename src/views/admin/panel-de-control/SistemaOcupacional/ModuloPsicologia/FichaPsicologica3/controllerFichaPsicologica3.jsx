@@ -8,7 +8,6 @@ import {
     VerifyTRDefault,
 } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
-import { getFetch } from "../../../../../utils/apiHelpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/psicologia/obtenerFichaPsicologiaAnexo03";
@@ -158,6 +157,10 @@ export const SubmitDataService = async (
 ) => {
     if (!form.norden) {
         await Swal.fire("Error", "Datos Incompletos", "error");
+        return;
+    }
+    if (!form.tiempoExperiencia || form.tiempoExperiencia.trim() === "") {
+        await Swal.fire("Error", "Ingrese Tiempo Experiencia", "error");
         return;
     }
     const body = {
