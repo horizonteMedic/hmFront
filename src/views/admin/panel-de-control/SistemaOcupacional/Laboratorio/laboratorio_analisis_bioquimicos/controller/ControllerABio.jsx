@@ -68,6 +68,11 @@ export const GetInfoPacAnalisisBio = (nro,tabla,set,token,setMed) => {
   getFetch(`/api/v01/ct/laboratorio/reporteAnalisisBioquimico?nOrden=${nro}&nameService=${tabla}`,token)
   .then((res) => {
     if (res.norden) {
+      Swal.fire(
+          "Alerta",
+          "Este paciente ya cuenta con registros de Análisis Bioquímicos",
+          "warning"
+      )
       set(prev => ({
         ...prev,
         ...res,
@@ -84,9 +89,6 @@ export const GetInfoPacAnalisisBio = (nro,tabla,set,token,setMed) => {
     } else {
       Swal.fire('Error', 'Ocurrio un error al traer los datos','error')
     }
-  })
-  .finally(() => {
-    Swal.close()
   })
 }
 

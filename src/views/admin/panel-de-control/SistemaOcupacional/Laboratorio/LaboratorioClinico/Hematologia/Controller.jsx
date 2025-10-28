@@ -70,6 +70,11 @@ export const GetInfoExamenHematologia = (nro,tabla,set,token) => {
   .then((res) => {
     console.log(res)
     if (res.norden) {
+       Swal.fire(
+          "Alerta",
+          "Este paciente ya cuenta con registros de Hematología",
+          "warning"
+      )
       set(prev => ({
         ...prev,
         paciente: res.nombres,
@@ -94,9 +99,6 @@ export const GetInfoExamenHematologia = (nro,tabla,set,token) => {
         linfocitos: res.txtLinfocitos
       }))
     }
-  })
-  .finally(() => {
-    Swal.close()
   })
 }
 
