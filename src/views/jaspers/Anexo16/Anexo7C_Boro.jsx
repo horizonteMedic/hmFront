@@ -603,7 +603,7 @@ export default function Anexo7C_Boro(data = {}) {
   // Función general para dibujar header de sección con fondo gris
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
     const tablaInicioX = 5;
-    const tablaAncho = 200;
+    const tablaAncho = 195;
     
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
@@ -629,7 +629,7 @@ export default function Anexo7C_Boro(data = {}) {
   // Función para dibujar header de sección con fondo celeste (azul claro)
   const dibujarHeaderSeccionCeleste = (titulo, yPos, alturaHeader = 4) => {
     const tablaInicioX = 5;
-    const tablaAncho = 200;
+    const tablaAncho = 195;
     
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
@@ -655,7 +655,7 @@ export default function Anexo7C_Boro(data = {}) {
   // Función para dibujar fila con división de dos columnas y títulos
   const dibujarFilaConDosColumnas = (tituloCol1, tituloCol2, yPos, alturaFila = 5) => {
     const tablaInicioX = 5;
-    const tablaAncho = 200;
+    const tablaAncho = 195;
     
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
@@ -678,7 +678,7 @@ export default function Anexo7C_Boro(data = {}) {
 
   // === SECCIÓN 1: DATOS PERSONALES ===
   const tablaInicioX = 5;
-  const tablaAncho = 200;
+  const tablaAncho = 195;
   let yPos = 35.5;
   const filaAltura = 5;
 
@@ -1225,24 +1225,24 @@ export default function Anexo7C_Boro(data = {}) {
   // === CONTENIDO DE ESPIROMETRÍA ===
   let yTextoEspirometria = yPos - (2 * filaAltura) + 2.5;
 
-  // Fila de datos: FVC | {data} | FVE1/FVC | {data} | FVE1 | {data} | FEF | {data}
+  // Fila de datos: FVC | {data} | FV31 | {data} | FVE1/FVC | {data} | FEF | {data}
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("FVC", colPositions[0] + 2, yTextoEspirometria + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text((datosFinales.funcionRespiratoria?.fvc || "") + " L", colPositions[1] + 2, yTextoEspirometria + 1);
   
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("FVE1/FVC", colPositions[2] + 2, yTextoEspirometria + 1);
+  doc.text("FV31", colPositions[2] + 2, yTextoEspirometria + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((datosFinales.funcionRespiratoria?.fev1Fvc || "") + " %", colPositions[3] + 2, yTextoEspirometria + 1);
+  doc.text((datosFinales.funcionRespiratoria?.fev1 || "") + " L", colPositions[3] + 2, yTextoEspirometria + 1);
   
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("FVE1", colPositions[4] + 2, yTextoEspirometria + 1);
+  doc.text("FVE1/FVC", colPositions[4] + 2, yTextoEspirometria + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((datosFinales.funcionRespiratoria?.fev1 || "") + " L", colPositions[5] + 2, yTextoEspirometria + 1);
+  doc.text((datosFinales.funcionRespiratoria?.fev1Fvc || "") + " %", colPositions[5] + 2, yTextoEspirometria + 1);
   
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("FEF", colPositions[6] + 2, yTextoEspirometria + 1);
+  doc.text("FEF 25-75%", colPositions[6] + 2, yTextoEspirometria + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text((datosFinales.funcionRespiratoria?.fef2575 || "") + " L/s", colPositions[7] + 2, yTextoEspirometria + 1);
   yTextoEspirometria += filaAltura;
@@ -1548,8 +1548,8 @@ export default function Anexo7C_Boro(data = {}) {
   
   // Preparar texto de enfermedades oculares con wrap
   const textoEnfermedades = datosFinales.evaluacionOftalmologica?.enfermedadesOculares || "";
-  const maxWidth = colObservacionesAncho - 8; // Ancho disponible menos margen
-  const lineHeight = 3.5;
+  const maxWidth = colObservacionesAncho - 4; // Ancho disponible menos margen (reducido de 8 a 4 para evitar cortes prematuros)
+  const lineHeight = 3.8; // Interlineado aumentado para que el texto tenga más espacio
   const lines = doc.splitTextToSize(textoEnfermedades, maxWidth);
   
   // Dibujar subheader con O.D y O.I
@@ -1591,6 +1591,9 @@ export default function Anexo7C_Boro(data = {}) {
   doc.text(textoOI2, mitadCorregida + (colCorregidaAncho / 2 - anchoOI2) / 2, yPos + 3.5);
   yPos += filaAlturaAgudeza;
   
+  // Número de líneas que se mostrarán en cada fila de agudeza visual
+  const lineasPorFila = 1;
+  
   // Dibujar fila de datos para Visión de Cerca
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaAgudeza);
   doc.line(xSinCorregir, yPos, xSinCorregir, yPos + filaAlturaAgudeza);
@@ -1627,8 +1630,9 @@ export default function Anexo7C_Boro(data = {}) {
   doc.text(oiCorregida, mitadCorregida + (colCorregidaAncho / 2 - anchoOiCorregida) / 2, yPos + 3.5);
   
   // Mostrar las primeras líneas del texto de enfermedades oculares en esta fila
-  lines.slice(0, 2).forEach((line, index) => {
-    doc.text(line, xObservaciones + 4, yPos + 3.5 + (index * lineHeight));
+  // Asegurar que solo se muestren las líneas que caben en la altura disponible
+  lines.slice(0, lineasPorFila).forEach((line, index) => {
+    doc.text(line, xObservaciones + 4, yPos - 2 + (index * lineHeight));
   });
   
   yPos += filaAlturaAgudeza;
@@ -1674,10 +1678,10 @@ export default function Anexo7C_Boro(data = {}) {
   // Continuar con las líneas restantes del texto de enfermedades oculares
   doc.setFont("helvetica", "normal").setFontSize(8);
   
-  // Mostrar las líneas restantes (a partir de la línea 2) en esta fila
-  if (lines && lines.length > 2) {
-    lines.slice(2).forEach((line, index) => {
-      doc.text(line, xObservaciones + 4, yPos + 3.5 + (index * lineHeight));
+  // Mostrar las líneas restantes en esta fila
+  if (lines && lines.length > lineasPorFila) {
+    lines.slice(lineasPorFila).forEach((line, index) => {
+      doc.text(line, xObservaciones + 4, yPos - 2 + (index * lineHeight));
     });
   }
   
@@ -2846,64 +2850,82 @@ export default function Anexo7C_Boro(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("VSG:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTexto(data.vsgLaboratorioClinico_txtvsg || ""), tablaInicioX + 15, yPos + 3.5);
+  const vsgValue = data.vsgLaboratorioClinico_txtvsg || "";
+  doc.text(formatearTexto(vsgValue ? `${vsgValue} mm/h` : ""), tablaInicioX + 15, yPos + 3.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Glucosa:", tablaInicioX + tablaAncho / 4 + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTexto(data.glucosaLaboratorioClinico_txtglucosabio || ""), tablaInicioX + tablaAncho / 4 + 25, yPos + 3.5);
+  const glucosaValue = data.glucosaLaboratorioClinico_txtglucosabio || "";
+  doc.text(formatearTexto(glucosaValue ? `${glucosaValue} mg/dL` : ""), tablaInicioX + tablaAncho / 4 + 25, yPos + 3.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Urea:", tablaInicioX + tablaAncho / 2 + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTexto("N/A"), tablaInicioX + tablaAncho / 2 + 20, yPos + 3.5);
+  doc.text(("N/A mg/dL"), tablaInicioX + tablaAncho / 2 + 20, yPos + 3.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Creatinina:", tablaInicioX + (3 * tablaAncho / 4) + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTexto(data.creatininaLaboratorioClinico_txtcreatininabio || ""), tablaInicioX + (3 * tablaAncho / 4) + 30, yPos + 3.5);
+  const creatininaValue = data.creatininaLaboratorioClinico_txtcreatininabio || "";
+  doc.text(formatearTexto(creatininaValue ? `${creatininaValue} mg/dL` : ""), tablaInicioX + (3 * tablaAncho / 4) + 30, yPos + 3.5);
   yPos += filaAltura;
 
   // Fila celeste: Perfil lipídico completo
   yPos = dibujarHeaderSeccionCeleste("Perfil lipídico completo", yPos, filaAltura);
 
   // Fila: L.DL | H.D.L | V.L.D.L | Triglicéridos | Colesterol total (5 columnas)
-  const colWidthLipidico = tablaAncho / 5;
+  // Anchos personalizados para cada columna para que V.L.D.L esté más a la izquierda
+  const lipidoCol1 = 35;  // L.DL
+  const lipidoCol2 = 35;   // H.D.L (reducida)
+  const lipidoCol3 = 35;   // V.L.D.L (más a la izquierda)
+  const lipidoCol4 = 39;   // Triglicéridos
+  // Columna 5 (Colesterol total) usa el espacio restante (≈40mm)
+  
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + colWidthLipidico, yPos, tablaInicioX + colWidthLipidico, yPos + filaAltura);
-  doc.line(tablaInicioX + (2 * colWidthLipidico), yPos, tablaInicioX + (2 * colWidthLipidico), yPos + filaAltura);
-  doc.line(tablaInicioX + (3 * colWidthLipidico), yPos, tablaInicioX + (3 * colWidthLipidico), yPos + filaAltura);
-  doc.line(tablaInicioX + (4 * colWidthLipidico), yPos, tablaInicioX + (4 * colWidthLipidico), yPos + filaAltura);
+  doc.line(tablaInicioX + lipidoCol1, yPos, tablaInicioX + lipidoCol1, yPos + filaAltura);
+  doc.line(tablaInicioX + lipidoCol1 + lipidoCol2, yPos, tablaInicioX + lipidoCol1 + lipidoCol2, yPos + filaAltura);
+  doc.line(tablaInicioX + lipidoCol1 + lipidoCol2 + lipidoCol3, yPos, tablaInicioX + lipidoCol1 + lipidoCol2 + lipidoCol3, yPos + filaAltura);
+  doc.line(tablaInicioX + lipidoCol1 + lipidoCol2 + lipidoCol3 + lipidoCol4, yPos, tablaInicioX + lipidoCol1 + lipidoCol2 + lipidoCol3 + lipidoCol4, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-
-  // Contenido perfil lipídico
+  // Contenido perfil lipídico - Columna 1 (L.DL)
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("L.DL:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTexto(data.ldlcolesterolAnalisisBioquimico_txtldlcolesterol || ""), tablaInicioX + 15, yPos + 3.5);
+  doc.text(`${formatearTexto(data.ldlcolesterolAnalisisBioquimico_txtldlcolesterol || "")} mg/dL`, tablaInicioX + 12, yPos + 3.5);
 
+  // Columna 2 (H.D.L)
+  const posCol2 = tablaInicioX + lipidoCol1;
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("H.D.L:", tablaInicioX + colWidthLipidico + 2, yPos + 3.5);
+  doc.text("H.D.L:", posCol2 + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTexto(data.hdlcolesterolAnalisisBioquimico_txthdlcolesterol || ""), tablaInicioX + colWidthLipidico + 15, yPos + 3.5);
+  doc.text(`${formatearTexto(data.hdlcolesterolAnalisisBioquimico_txthdlcolesterol || "")} mg/dL`, posCol2 + 12, yPos + 3.5);
 
+  // Columna 3 (V.L.D.L) - Movida más a la izquierda
+  const posCol3 = posCol2 + lipidoCol2;
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("V.L.D.L:", tablaInicioX + (2 * colWidthLipidico) + 2, yPos + 3.5);
+  doc.text("V.L.D.L:", posCol3 + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTexto(data.vldlcolesterolAnalisisBioquimico_txtvldlcolesterol || ""), tablaInicioX + (2 * colWidthLipidico) + 20, yPos + 3.5);
+  doc.text(`${formatearTexto(data.vldlcolesterolAnalisisBioquimico_txtvldlcolesterol || "")} mg/dL`, posCol3 + 14, yPos + 3.5);
 
+  // Columna 4 (Triglicéridos)
+  const posCol4 = posCol3 + lipidoCol3;
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Triglicéridos:", tablaInicioX + (3 * colWidthLipidico) + 2, yPos + 3.5);
+  doc.text("Triglicéridos:", posCol4 + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTexto(data.trigliceridosAnalisisBioquimico_txttrigliceridos || ""), tablaInicioX + (3 * colWidthLipidico) + 23, yPos + 3.5);
+  doc.text(`${formatearTexto(data.trigliceridosAnalisisBioquimico_txttrigliceridos || "")} mg/dL`, posCol4 + 20, yPos + 3.5);
 
+  // Columna 5 (Colesterol total)
+  const posCol5 = posCol4 + lipidoCol4;
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Colesterol total:", tablaInicioX + (4 * colWidthLipidico) + 2, yPos + 3.5);
+  doc.text("Colesterol total:", posCol5 + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTexto(data.colesterolAnalisisBioquimico_txtcolesterol || ""), tablaInicioX + (4 * colWidthLipidico) + 25, yPos + 3.5);
-  yPos += filaAltura;
+  doc.text(`${formatearTexto(data.colesterolAnalisisBioquimico_txtcolesterol || "")} mg/dL`, posCol5 + 25, yPos + 3.5);
+
+yPos += filaAltura;
+
 
   // Fila celeste: Examen completo de orina
   yPos = dibujarHeaderSeccionCeleste("Examen completo de orina", yPos, filaAltura);
@@ -3035,8 +3057,11 @@ export default function Anexo7C_Boro(data = {}) {
   const anchoDisponibleOtrosExamenesPag3 = tablaAncho - 4;
   const lineasOtrosExamenesPag3 = doc.splitTextToSize(textoOtrosExamenesPag3, anchoDisponibleOtrosExamenesPag3);
   
-  // Calcular altura dinámica basada en el contenido, pero mínimo 35mm
-  const alturaDinamicaOtrosExamenesPag3 = Math.max(alturaFilaCrecientePag3, lineasOtrosExamenesPag3.length * 2.5 + 2);
+  // Interlineado para el texto
+  const interlineadoOtrosExamenes = 3;
+  
+  // Calcular altura dinámica basada en el contenido
+  const alturaDinamicaOtrosExamenesPag3 = Math.max(alturaFilaCrecientePag3, lineasOtrosExamenesPag3.length * interlineadoOtrosExamenes + 4);
 
   // Dibujar líneas de la fila creciente
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaOtrosExamenesPag3);
@@ -3044,10 +3069,12 @@ export default function Anexo7C_Boro(data = {}) {
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaDinamicaOtrosExamenesPag3, tablaInicioX + tablaAncho, yPos + alturaDinamicaOtrosExamenesPag3);
 
-  // Contenido de la fila creciente
+  // Contenido de la fila creciente con interlineado controlado
   doc.setFont("helvetica", "normal").setFontSize(8);
   const lineasOtrosExamenesFormateadas = lineasOtrosExamenesPag3.map(linea => formatearTextoGramatical(linea));
-  doc.text(lineasOtrosExamenesFormateadas, tablaInicioX + 2, yPos + 3.5);
+  lineasOtrosExamenesFormateadas.forEach((linea, index) => {
+    doc.text(linea, tablaInicioX + 2, yPos + 3.5 + (index * interlineadoOtrosExamenes));
+  });
   yPos += alturaDinamicaOtrosExamenesPag3;
 
   // === SECCIÓN: CONCLUSIONES ===
@@ -3058,8 +3085,11 @@ export default function Anexo7C_Boro(data = {}) {
   const anchoDisponibleConclusionesPag3 = tablaAncho - 4;
   const lineasConclusionesPag3 = doc.splitTextToSize(textoConclusionesPag3, anchoDisponibleConclusionesPag3);
   
-  // Calcular altura dinámica basada en el contenido, mínimo 35mm
-  const alturaDinamicaConclusionesPag3 = Math.max(35, lineasConclusionesPag3.length * 2.5 + 2);
+  // Interlineado para el texto
+  const interlineadoTexto = 3;
+  
+  // Calcular altura dinámica basada en el contenido
+  const alturaDinamicaConclusionesPag3 = Math.max(45, lineasConclusionesPag3.length * interlineadoTexto + 4);
 
   // Dibujar líneas de la fila creciente
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaConclusionesPag3);
@@ -3067,10 +3097,12 @@ export default function Anexo7C_Boro(data = {}) {
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaDinamicaConclusionesPag3, tablaInicioX + tablaAncho, yPos + alturaDinamicaConclusionesPag3);
 
-  // Contenido de la fila creciente
+  // Contenido de la fila creciente con interlineado controlado
   doc.setFont("helvetica", "normal").setFontSize(8);
   const lineasConclusionesFormateadas = lineasConclusionesPag3.map(linea => formatearTextoGramatical(linea));
-  doc.text(lineasConclusionesFormateadas, tablaInicioX + 2, yPos + 3.5);
+  lineasConclusionesFormateadas.forEach((linea, index) => {
+    doc.text(linea, tablaInicioX + 2, yPos + 3.5 + (index * interlineadoTexto));
+  });
   yPos += alturaDinamicaConclusionesPag3;
 
   // === SECCIÓN: RECOMENDACIONES / RESTRICCIONES ===
@@ -3081,8 +3113,8 @@ export default function Anexo7C_Boro(data = {}) {
   const anchoDisponibleRecomendacionesPag3 = tablaAncho - 4;
   const lineasRecomendacionesPag3 = doc.splitTextToSize(textoRecomendacionesPag3, anchoDisponibleRecomendacionesPag3);
   
-  // Calcular altura dinámica basada en el contenido, mínimo 35mm
-  const alturaDinamicaRecomendacionesPag3 = Math.max(35, lineasRecomendacionesPag3.length * 2.5 + 2);
+  // Calcular altura dinámica basada en el contenido
+  const alturaDinamicaRecomendacionesPag3 = Math.max(45, lineasRecomendacionesPag3.length * interlineadoTexto + 4);
 
   // Dibujar líneas de la fila creciente
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaRecomendacionesPag3);
@@ -3090,10 +3122,12 @@ export default function Anexo7C_Boro(data = {}) {
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaDinamicaRecomendacionesPag3, tablaInicioX + tablaAncho, yPos + alturaDinamicaRecomendacionesPag3);
 
-  // Contenido de la fila creciente
+  // Contenido de la fila creciente con interlineado controlado
   doc.setFont("helvetica", "normal").setFontSize(8);
   const lineasRecomendacionesFormateadas = lineasRecomendacionesPag3.map(linea => formatearTextoGramatical(linea));
-  doc.text(lineasRecomendacionesFormateadas, tablaInicioX + 2, yPos + 3.5);
+  lineasRecomendacionesFormateadas.forEach((linea, index) => {
+    doc.text(linea, tablaInicioX + 2, yPos + 3.5 + (index * interlineadoTexto));
+  });
   yPos += alturaDinamicaRecomendacionesPag3;
 
   // === SECCIÓN DE DECLARACIÓN, FIRMA Y HUELLA DEL TRABAJADOR ===

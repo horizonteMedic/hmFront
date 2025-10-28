@@ -5,14 +5,8 @@ export default function TabSelector({ tieneVista, tabsConfig }) {
     const tabRefs = useRef({});
     const navRef = useRef(null);
 
-    useEffect(() => {
-        // Find the first available tab based on permissions
-        const firstAvailableTab = tabsConfig.find(tab => tieneVista(tab.permission));
-        setActiveTab(firstAvailableTab ? firstAvailableTab.id : -1);
-    }, []);
-
-    // Update indicator position when active tab changes
-    useEffect(() => {
+    // Helper function to update indicator position
+    const updateIndicatorPosition = () => {
         if (activeTab !== -1 && tabRefs.current[activeTab] && navRef.current) {
             const activeTabElement = tabRefs.current[activeTab];
             const navElement = navRef.current;
@@ -24,6 +18,31 @@ export default function TabSelector({ tieneVista, tabsConfig }) {
                 width: tabRect.width
             });
         }
+    };
+
+    useEffect(() => {
+        // Find the first available tab based on permissions
+        const firstAvailableTab = tabsConfig.find(tab => tieneVista(tab.permission));
+        setActiveTab(firstAvailableTab ? firstAvailableTab.id : -1);
+    }, []);
+
+    // Update indicator position when active tab changes
+    useEffect(() => {
+        updateIndicatorPosition();
+    }, [activeTab]);
+
+    // Add window resize listener to recalculate indicator position
+    useEffect(() => {
+        const handleResize = () => {
+            updateIndicatorPosition();
+        };
+
+        window.addEventListener('resize', handleResize);
+        
+        // Cleanup listener on component unmount
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
     }, [activeTab]);
 
     // Get available tabs based on permissions
