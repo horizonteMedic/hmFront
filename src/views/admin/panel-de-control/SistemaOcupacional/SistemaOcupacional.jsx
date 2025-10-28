@@ -733,7 +733,7 @@ const TabComponent = () => {
               },
               22: { title: "Evaluación Musculoesquelética", child: <MusculoEsqueleticoTabSelector tieneVista={tieneVista} /> },
               23: { title: undefined, child: <Test_fatiga /> },
-              24: { title: "Gestion Opciones", child: <GestionOpciones /> },
+              24: { title: "Gestion Opciones", child: <AversionRiesgo /> },
               25: { title: undefined, child: <AntecedentesDeAltura /> },
               26: { title: "Anexo 2", child: <Anexo2 listas={listasCombos} /> },
               27: { title: "Anexo 16", child: <Anexo16 listas={listasCombos} /> },

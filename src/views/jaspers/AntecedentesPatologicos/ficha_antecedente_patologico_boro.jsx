@@ -28,6 +28,7 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
     sede: data.sede || "",
     // Datos específicos
     direccionPaciente: String(data.direccionpaciente_direccion_pa || ""),
+    domicilio: String(data.direccionpaciente_direccion_pa || ""), // Alias para compatibilidad
     fechaNacimiento: formatearFechaCorta(data.fechanacimientopaciente_fecha_nacimiento_pa || ""),
     // Datos adicionales para nueva fila
     anosExperiencia: data.tiempoExperiencia || null,
@@ -96,6 +97,140 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   carnetConadis: data.conadisEspecifiqueBoro_conadisdetalle || "",
   // Datos para declaración
   fechaDeclaracion: data.fechaAntecedentesPatologicos_fecha_ap || "",
+  // Página 3: campos adicionales del Digitalizado
+  observacionesAntecedentes: String(data.otrosDescripcionAntecedentesPatologicos_txtotrosap || ""),
+  antecedentesReproduccion: {
+    damas: {
+      inicioMenstruacion: String(data.inicioMestruacionDamas_txtdiniciomestruacion || ""),
+      inicioVidaSexual: String(data.inicioVidaSexualDamas_txtdiniciovidasexual || ""),
+      numeroParejas: String(data.numeroParejasSexActualidadDamas_txtdnumparejassexactualidad || ""),
+      hijosVivos: String(data.hijosVivosDamas_txtdhijosvivos || ""),
+      hijosFallecidos: String(data.hijosFallecidosDamas_txtdhijosfallecidos || ""),
+      numeroAbortos: String(data.numerosDeAbortosDamas_txtdnumerosdeabortos || ""),
+      causasAbortos: String(data.precisarCausasDamas_txtdcausas || "")
+    },
+    varones: {
+      hijosVivos: String(data.hijosVivosVarones_txtvhijosvivos || ""),
+      hijosFallecidos: String(data.hijosFallecidosVarones_txtvhijosfallecidos || ""),
+      abortosParejas: String(data.abortosParejasVarones_txtvnabortosparejas || ""),
+      causasAbortos: String(data.precisarCausasVarones_txtvcausas || "")
+    }
+  },
+  enfermedades: {
+    alergias: Boolean(data.alergias_chk1 || false),
+    amigdalitisCronica: Boolean(data.amigdalitisCronica_chk2 || false),
+    arritmiasCardiacas: Boolean(data.arritmiasCardiacas_chk3 || false),
+    asma: Boolean(data.asma_chk4 || false),
+    bocio: Boolean(data.bocio_chk5 || false),
+    bronconeumonia: Boolean(data.bronconeumonia_chk6 || false),
+    bronquitisRepeticion: Boolean(data.bronquitisARepeticion_chk7 || false),
+    cariesGingivitis: Boolean(data.cariesOGingivitis_chk8 || false),
+    colecistitis: Boolean(data.colecistitis_chk9 || false),
+    dermatitis: Boolean(data.dermatitis_chk10 || false),
+    diabetes: Boolean(data.diabetes_chk11 || false),
+    disenteria: Boolean(data.disenteria_chk12 || false),
+    enfermedadesCorazon: Boolean(data.enfermedadesCorazon_chk13 || false),
+    enfermedadesOculares: Boolean(data.enfermedadesOculares_chk14 || false),
+    epilepsiaConvulsiones: Boolean(data.epilsepsiaOConvulsiones_chk15 || false),
+    faringitisCronica: Boolean(data.faringitisCronica_chk16 || false),
+    fiebreAlta: Boolean(data.fiebreMalta_chk17 || false),
+    fiebreTifoidea: Boolean(data.fiebreTifoidea_chk18 || false),
+    fiebreReumatica: Boolean(data.fiebreReumatica_chk19 || false),
+    forunculosis: Boolean(data.foruncolois_chk20 || false),
+    gastritisCronica: Boolean(data.gastritisCronica_chk21 || false),
+    gonorrea: Boolean(data.gonorrea_chk22 || false),
+    gota: Boolean(data.gota_chk23 || false),
+    hemorroides: Boolean(data.hemorroides_chk24 || false),
+    hepatitis: Boolean(data.hepatitis_chk25 || false),
+    hernias: Boolean(data.hernias_chk26 || false),
+    hipertensionArterial: Boolean(data.hipertencionArterial_chk27 || false),
+    infeccionesUrinarias: Boolean(data.urinariasRepetidas_chk28 || false),
+    intoxicaciones: Boolean(data.intoxicaciones_chk29 || false),
+    insuficienciaCardiaca: Boolean(data.insuficienciaCardiaca_chk30 || false),
+    insuficienciaCoronaria: Boolean(data.insuficienciaCoronariaCronica_chk31 || false),
+    insuficienciaRenal: Boolean(data.insuficienciaRenalCronica_chk32 || false),
+    litiasisUrinaria: Boolean(data.litiasisUrinaria_chk33 || false),
+    meningitis: Boolean(data.meningitis_chk34 || false),
+    neuritisRepeticion: Boolean(data.neuritis_chk35 || false),
+    otitisMedia: Boolean(data.otitisMedia_chk36 || false),
+    presionAltaBaja: Boolean(data.presionAltaOBaja_chk37 || false),
+    paludismoMalaria: Boolean(data.paludismoOMalaria_chk38 || false),
+    parasitosisIntestinal: Boolean(data.parasitosisIntestinal_chk39 || false),
+    parotiditis: Boolean(data.paratiditis_chk40 || false),
+    pleuresia: Boolean(data.pleuresia_chk41 || false),
+    plunbismo: Boolean(data.plumbismo_chk42 || false),
+    poliomielitis: Boolean(data.poliomielitis_chk43 || false),
+    portadorMarcapaso: Boolean(data.portadorMarcapasos_chk44 || false),
+    protesisCardiacas: Boolean(data.protesisCardiacasValvulares_chk45 || false),
+    resfriosFrecuentes: Boolean(data.resfriosFrecuentes_chk46 || false),
+    reumatismoRepeticion: Boolean(data.reumatismo_chk47 || false),
+    sarampion: Boolean(data.sarampion_chk48 || false),
+    sifilis: Boolean(data.sifilis_chk49 || false),
+    silicosis: Boolean(data.silicosis_chk50 || false),
+    sinusitisCronica: Boolean(data.sinusitisCronica_chk51 || false),
+    tosConvulsiva: Boolean(data.tosConvulsiva_chk52 || false),
+    transtornoNerviosos: Boolean(data.transtornosNerviosos_chk53 || false),
+    traumatismoEncefalocraneano: Boolean(data.traumatismoEncefalocraneano_chk54 || false),
+    tuberculosis: Boolean(data.tuberculosis_chk55 || false),
+    tumoresQuistes: Boolean(data.tumoresQuistes_chk56 || false),
+    ulceraPeptica: Boolean(data.ulceraPeptica_chk57 || false),
+    varicela: Boolean(data.varicela_chk58 || false),
+    varices: Boolean(data.varices_chk59 || false),
+    varicoceles: Boolean(data.varicocele_chk60 || false),
+    covid19: Boolean(data.covid_chkcovid || false)
+  },
+  sintomas: {
+    perdidaMemoria: Boolean(data.perdidaMemoria_chk61 || false),
+    preocupacionesAngustia: Boolean(data.preocupacionesAngustia_chk62 || false),
+    doloresArticulares: Boolean(data.doloresArticulares_chk63 || false),
+    aumentoDisminucionPeso: Boolean(data.aumentoDisminucionPeso_chk64 || false),
+    dolorCabeza: Boolean(data.dolorCabeza_chk65 || false),
+    diarrea: Boolean(data.diarrea_chk66 || false),
+    agitacionEjercicios: Boolean(data.agitacionEjercicio_chk67 || false),
+    dolorOcular: Boolean(data.dolorOcular_chk68 || false),
+    dolorOpresivoTorax: Boolean(data.dolorOpresivoTorax_chk69 || false),
+    hinchazonPiesManos: Boolean(data.hinchazonPiesOManos_chk70 || false),
+    estrenimiento: Boolean(data.estrenimiento_chk71 || false),
+    vomitosSangre: Boolean(data.vomitosConSangre_chk72 || false),
+    sangradoOrina: Boolean(data.sangradoPorOrina_chk73 || false),
+    tosSangre: Boolean(data.tosConSangre_chk74 || false),
+    coloracionAmarilla: Boolean(data.coloracionAmarrillaPiel_chk75 || false),
+    indigestionFrecuente: Boolean(data.indigestionFrecuente_chk76 || false),
+    insomnio: Boolean(data.insomnio_chk77 || false),
+    lumbalgias: Boolean(data.lumbalgiaODolorCintura_chk78 || false),
+    mareosDesmayos: Boolean(data.mareos_chk79 || false),
+    hecesNegras: Boolean(data.hecesNegras_chk80 || false),
+    orinaDolorArdor: Boolean(data.orinaConDolor_chk81 || false),
+    orinaInvoluntaria: Boolean(data.orinaInvoluntaria_chk82 || false),
+    dolorOido: Boolean(data.dolorOido_chk83 || false),
+    secrecionesOido: Boolean(data.secrecionesOido_chk84 || false),
+    palpitaciones: Boolean(data.palpitaciones_chk85 || false),
+    adormecimiento: Boolean(data.adormecimientos_chk86 || false),
+    pesadillas: Boolean(data.pesadillasFrecuentes_chk87 || false),
+    doloresMusculares: Boolean(data.doloresMusculares_chk88 || false),
+    tosCronica: Boolean(data.tosCronica_chk89 || false),
+    sangradoEncias: Boolean(data.sangradoEncias_chk90 || false)
+  },
+  habitos: {
+    fumar: Boolean(data.fumarSi_rbfumarsi || false),
+    numeroCigarrillos: String(data.numeroCigarrillos_txtncigarrillos || ""),
+    licor: Boolean(data.licorSi_rblicorsi || false),
+    tipoLicor: String(data.licorTipoFrecuente_txtlicortipofrecuente || ""),
+    frecuenciaLicor: String(data.licorFrecuencia_txtlicorfrecuencia || ""),
+    drogas: Boolean(data.drogasSi_rbdrogassi || false),
+    tipoDrogas: String(data.drogasTipo_txtdrogastipo || ""),
+    frecuenciaDrogas: String(data.drogasFrecuencia_txtdrogasfrecuencia || ""),
+    otros: Boolean(data.otrosSiIndicarEnfermedades_rbotrossi || false),
+    tipoOtros: String(data.otrosTipoIndicarEnfermedades_txtotros || ""),
+    frecuenciaOtros: String(data.otrosFrecuenciaIndicarEnfermedades_txtotrosfrecuencia || "")
+  },
+  severidadCovid: {
+    covid19: Boolean(data.covid_chkcovid || false),
+    fechaExamen: data.covid_chkcovid ? formatearFechaCorta(data.fechaCovid_fechacovid || "") : "",
+    leve: Boolean(data.covidLevel_chkcovidl || false),
+    moderado: Boolean(data.covidModerado_chkcovidm || false),
+    severo: Boolean(data.covidSevero_chkcovids || false)
+  }
   };
 
   // Usar solo datos reales proporcionados
@@ -149,7 +284,24 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
     if (texto === texto.toUpperCase() && texto.length > 1) {
       return texto.split(' ').map(palabra => {
         if (palabra.length === 0) return palabra;
-        return palabra.charAt(0).toUpperCase() + palabra.slice(1).toLowerCase();
+        // Preservar mayúsculas si la palabra es muy corta (como siglas)
+        if (palabra.length <= 2 && /^[A-Z]+$/.test(palabra)) {
+          return palabra;
+        }
+        // Capitalizar primera letra, resto minúsculas, pero preservar la letra original
+        const primera = palabra.charAt(0).toUpperCase();
+        // Si la letra original era especial (ó, ñ, etc.), intentar preservarla
+        const original = palabra.slice(1);
+        const restoPreservado = original.split('').map((char) => {
+          const lower = char.toLowerCase();
+          const upper = char.toUpperCase();
+          // Si el carácter original tiene mayúscula especial, intentar usarla
+          if (upper !== lower && char === char.toUpperCase()) {
+            return lower;
+          }
+          return lower;
+        }).join('');
+        return primera + restoPreservado;
       }).join(' ');
     }
     
@@ -200,7 +352,7 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
     doc.setLineWidth(0.2);
     
     // Dibujar fondo gris más oscuro
-    doc.setFillColor(160, 160, 160);
+    doc.setFillColor(196, 196, 196); // #CACACA
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
     
     // Dibujar líneas del header
@@ -226,7 +378,7 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
     doc.setLineWidth(0.2);
     
     // Dibujar fondo celeste
-    doc.setFillColor(173, 216, 230);
+    doc.setFillColor(199, 241, 255);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
     
     // Dibujar líneas del header
@@ -252,7 +404,7 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
     doc.setLineWidth(0.2);
     
     // Dibujar fondo celeste
-    doc.setFillColor(173, 216, 230);
+    doc.setFillColor(199, 241, 255);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
     
     // Dibujar líneas del header
@@ -504,12 +656,12 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Edad:", tablaInicioX + 47, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.edad + " Años", tablaInicioX + 58, yTexto + 1.5);
+  doc.text(datosFinales.edad + " AÑOS", tablaInicioX + 58, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Sexo:", tablaInicioX + 92, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(capitalizarTexto(datosFinales.sexo), tablaInicioX + 105, yTexto + 1.5);
+  doc.text((datosFinales.sexo.toUpperCase()), tablaInicioX + 105, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Fecha Nac.:", tablaInicioX + 137, yTexto + 1.5);
@@ -528,12 +680,12 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(capitalizarTexto(datosFinales.puestoTrabajo), tablaInicioX + 30, yTexto + 1.5);
+  doc.text((datosFinales.puestoTrabajo), tablaInicioX + 30, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Área de Trabajo:", tablaInicioX + 92, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(capitalizarTexto(datosFinales.areaTrabajo), tablaInicioX + 118, yTexto + 1.5);
+  doc.text((datosFinales.areaTrabajo), tablaInicioX + 118, yTexto + 1.5);
   yTexto += filaAltura;
 
   // Quinta fila: Empresa
@@ -547,7 +699,7 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Contratista:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(capitalizarTexto(datosFinales.contrata), tablaInicioX + 24, yTexto + 1.5);
+  doc.text((datosFinales.contrata), tablaInicioX + 24, yTexto + 1.5);
   yTexto += filaAltura;
 
   // Séptima fila: Años de experiencia
@@ -1394,7 +1546,7 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   yPos = dibujarHeaderSeccion("6- ANTECEDENTES PATOLÓGICOS FAMILIARES:", yPos, filaAltura);
 
   // Fila celeste para el texto descriptivo
-  doc.setFillColor(173, 216, 230); // Color celeste
+  doc.setFillColor(199, 241, 255); // Color celeste
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1455,30 +1607,24 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   yPos += filaAltura;
 
   // === SECCIÓN 9: DECLARACIÓN ===
-  // Fila con fondo color #fcbd19 para la declaración
-  const alturaDeclaracion = 10; // Altura reducida para menos interlineado
+  // Banner de Declaración (igual que en Página 4)
+  const declarY2 = yPos;
+  const alturaDeclar2 = 15;
   
-  doc.setFillColor(252, 189, 25); // Color #fcbd19
-  doc.rect(tablaInicioX, yPos, tablaAncho, alturaDeclaracion, 'F');
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDeclaracion);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDeclaracion);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaDeclaracion, tablaInicioX + tablaAncho, yPos + alturaDeclaracion);
-
-  // Texto de declaración centrado y en negrita
+  doc.setFillColor(253, 208, 94); 
+  doc.rect(tablaInicioX, declarY2, tablaAncho, alturaDeclar2, 'F');
+  doc.line(tablaInicioX, declarY2, tablaInicioX, declarY2 + alturaDeclar2);
+  doc.line(tablaInicioX + tablaAncho, declarY2, tablaInicioX + tablaAncho, declarY2 + alturaDeclar2);
+  doc.line(tablaInicioX, declarY2, tablaInicioX + tablaAncho, declarY2);
+  doc.line(tablaInicioX, declarY2 + alturaDeclar2, tablaInicioX + tablaAncho, declarY2 + alturaDeclar2);
+  
   doc.setFont("helvetica", "bold").setFontSize(8);
-  const textoDeclaracionFinal = "TODA LA INFORMACIÓN QUE HE PROPORCIONADO AL SERVICIO DE MEDICINA OCUPACIONAL,";
-  const textoDeclaracionFinal2 = "ES VERDADERA NO HABIENDO OMITIDO NINGÚN DATO VOLUNTARIAMENTE.";
+  doc.text("TODA LA INFORMACIÓN QUE HE PROPORCIONADO AL SERVICIO DE MEDICINA OCUPACIONAL,", tablaInicioX + tablaAncho/2, declarY2 + 4, { align: "center" });
+  doc.text("ES VERDADERA NO HABIENDO OMITIDO NINGÚN DATO VOLUNTARIAMENTE.", tablaInicioX + tablaAncho/2, declarY2 + 7, { align: "center" });
+  doc.text("FECHA: " + (datosFinales.fechaExamen || ""), tablaInicioX + tablaAncho/2, declarY2 + 11, { align: "center" });
   
-  doc.text(textoDeclaracionFinal, tablaInicioX + tablaAncho/2, yPos + 2.5, { align: "center" });
-  doc.text(textoDeclaracionFinal2, tablaInicioX + tablaAncho/2, yPos + 5.5, { align: "center" });
-  
-  yPos += alturaDeclaracion;
-  
-  // Fecha centrada
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("FECHA: " + (datosFinales.fechaDeclaracion || ""), tablaInicioX + tablaAncho/2, yPos + 3.5, { align: "center" });
-  yPos += filaAltura;
+  // Posición después del banner de declaración
+  yPos = declarY2 + alturaDeclar2;
 
   // === SECCIÓN DE FIRMAS ===
   const alturaSeccionFirmas = 30;
@@ -1569,6 +1715,498 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   doc.text("Responsable de la Evaluación", centroColumna2X, yPos + 28.5, { align: "center" });
 
   // === FOOTER ===
+  footerTR(doc, { footerOffsetY: 8});
+
+  // === NUEVA PÁGINA 3: DATOS PERSONALES (ESTILO DIGITALIZADO) ===
+  doc.addPage();
+  
+  // Contador de página actualizado
+  const numeroPagina3 = 3;
+  
+  // Header para página 3
+  const drawHeaderPagina3 = (pageNumber) => {
+    // Logo y membrete
+    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+
+    // Título para página 3 (estilo Digitalizado)
+    doc.setFont("helvetica", "bold").setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text("FICHA DE ANTECEDENTES", pageW / 2, 32.5, { align: "center" });
+    doc.text("PATOLÓGICOS", pageW / 2, 36.5, { align: "center" });
+
+    // Número de Ficha y Página
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Nro de ficha: ", pageW - 80, 15);
+
+    doc.setFont("helvetica", "normal").setFontSize(18);
+    doc.text(datosFinales.numeroFicha, pageW - 60, 16);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Sede: " + datosFinales.sede, pageW - 80, 20);
+    doc.text("Fecha de examen: " + datosFinales.fechaExamen, pageW - 80, 25);
+
+    doc.text("Pag. " + pageNumber.toString().padStart(2, '0'), pageW - 30, 10);
+
+    // Bloque de color
+    drawColorBox(doc, {
+      color: datosFinales.codigoColor,
+      text: datosFinales.textoColor,
+      x: pageW - 30,
+      y: 10,
+      size: 22,
+      showLine: true,
+      fontSize: 30,
+      textPosition: 0.9
+    });
+  };
+
+  drawHeaderPagina3(numeroPagina3);
+
+  // Resetear posición para la página 3
+  yPos = 40;
+  const filaAltura3 = 5;
+
+  // Header de datos personales
+  yPos = dibujarHeaderSeccion("DATOS PERSONALES", yPos, filaAltura3);
+
+  // Configurar líneas para filas de datos
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+
+  // Primera fila: Apellidos y Nombres
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura3); 
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura3); 
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); 
+  doc.line(tablaInicioX, yPos + filaAltura3, tablaInicioX + tablaAncho, yPos + filaAltura3); 
+  yPos += filaAltura3;
+
+  // Segunda fila: DNI, Edad, Sexo, Fecha Nac.
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura3);
+  doc.line(tablaInicioX + 45, yPos, tablaInicioX + 45, yPos + filaAltura3);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura3);
+  doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + filaAltura3);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura3);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura3, tablaInicioX + tablaAncho, yPos + filaAltura3);
+  yPos += filaAltura3;
+
+  // Tercera fila: Domicilio
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura3);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura3);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura3, tablaInicioX + tablaAncho, yPos + filaAltura3);
+  yPos += filaAltura3;
+
+  // Cuarta fila: Puesto de Trabajo, Área de Trabajo
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura3);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura3);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura3);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura3, tablaInicioX + tablaAncho, yPos + filaAltura3);
+  yPos += filaAltura3;
+
+  // Quinta fila: Empresa
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura3);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura3);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura3, tablaInicioX + tablaAncho, yPos + filaAltura3);
+  yPos += filaAltura3;
+
+  // Sexta fila: Contrata
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura3);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura3);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura3, tablaInicioX + tablaAncho, yPos + filaAltura3);
+  yPos += filaAltura3;
+
+  // === CONTENIDO DE LA TABLA ===
+  let yTexto3 = 40 + 2;
+
+  // Primera fila: Apellidos y Nombres
+  yTexto3 += filaAltura3;
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto3 + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 40, yTexto3 + 1.5, tablaAncho - 40);
+  yTexto3 += filaAltura3;
+
+  // Segunda fila: DNI, Edad, Sexo, Fecha Nac.
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("DNI:", tablaInicioX + 2, yTexto3 + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.documentoIdentidad, tablaInicioX + 12, yTexto3 + 1.5);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Edad:", tablaInicioX + 47, yTexto3 + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.edad + " AÑOS", tablaInicioX + 58, yTexto3 + 1.5);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Sexo:", tablaInicioX + 92, yTexto3 + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.sexo.toUpperCase(), tablaInicioX + 105, yTexto3 + 1.5);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Fecha Nac.:", tablaInicioX + 137, yTexto3 + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.fechaNacimiento, tablaInicioX + 155, yTexto3 + 1.5);
+  yTexto3 += filaAltura3;
+
+  // Tercera fila: Domicilio
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Domicilio:", tablaInicioX + 2, yTexto3 + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.direccionPaciente, tablaInicioX + 25, yTexto3 + 1.5, 160);
+  yTexto3 += filaAltura3;
+
+  // Cuarta fila: Puesto de Trabajo, Área de Trabajo
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto3 + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.puestoTrabajo, tablaInicioX + 30, yTexto3 + 1.5);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Área de Trabajo:", tablaInicioX + 92, yTexto3 + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.areaTrabajo, tablaInicioX + 118, yTexto3 + 1.5);
+  yTexto3 += filaAltura3;
+
+  // Quinta fila: Empresa
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Empresa:", tablaInicioX + 2, yTexto3 + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 24, yTexto3 + 1.5, tablaAncho - 30);
+  yTexto3 += filaAltura3;
+
+  // Sexta fila: Contratista
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Contratista:", tablaInicioX + 2, yTexto3 + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.contrata, tablaInicioX + 24, yTexto3 + 1.5);
+  yTexto3 += filaAltura3;
+
+  // === SECCIÓN 2: ANTECEDENTES PATOLÓGICOS PERSONALES (DIGITALIZADO) ===
+  yPos = dibujarHeaderSeccion("2. ANTECEDENTES PATOLÓGICOS PERSONALES", yPos, filaAltura3);
+  yPos = dibujarHeaderSeccionCeleste("Marque \"X\" si posee o tuvo alguna enfermedad diagnosticada con o sin tratamiento:", yPos, filaAltura3);
+
+  // Función para dibujar fila de enfermedades con layout Digitalizado (4 columnas iguales)
+  const dibujarFilaEnfermedadesD3 = (enf1, enf2, enf3, enf4, v1, v2, v3, v4) => {
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura3);
+    doc.line(tablaInicioX + 50, yPos, tablaInicioX + 50, yPos + filaAltura3);
+    doc.line(tablaInicioX + 100, yPos, tablaInicioX + 100, yPos + filaAltura3);
+    doc.line(tablaInicioX + 150, yPos, tablaInicioX + 150, yPos + filaAltura3);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura3);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAltura3, tablaInicioX + tablaAncho, yPos + filaAltura3);
+
+    const x1 = dibujarMiniCelda(tablaInicioX + 42, yPos, filaAltura3);
+    const x2 = dibujarMiniCelda(tablaInicioX + 92, yPos, filaAltura3);
+    const x3 = dibujarMiniCelda(tablaInicioX + 142, yPos, filaAltura3);
+    const x4 = dibujarMiniCelda(tablaInicioX + 192, yPos, filaAltura3);
+
+    if (enf1) {
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      doc.text(enf1, tablaInicioX + 2, yPos + 3.5);
+      if (v1) { doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", x1, yPos + 3.5); doc.setTextColor(0,0,0); }
+    }
+    if (enf2) {
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      doc.text(enf2, tablaInicioX + 52, yPos + 3.5);
+      if (v2) { doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", x2, yPos + 3.5); doc.setTextColor(0,0,0); }
+    }
+    if (enf3) {
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      doc.text(enf3, tablaInicioX + 102, yPos + 3.5);
+      if (v3) { doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", x3, yPos + 3.5); doc.setTextColor(0,0,0); }
+    }
+    if (enf4) {
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      doc.text(enf4, tablaInicioX + 152, yPos + 3.5);
+      if (v4) { doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", x4, yPos + 3.5); doc.setTextColor(0,0,0); }
+    }
+
+    yPos += filaAltura3;
+  };
+
+  const enf = datosFinales.enfermedades || {};
+  dibujarFilaEnfermedadesD3("Alergias", "Amigdalitis Crónica", "Arritmias Cardiacas", "Asma", enf.alergias, enf.amigdalitisCronica, enf.arritmiasCardiacas, enf.asma);
+  dibujarFilaEnfermedadesD3("Bocio", "Bronconeumonia", "Bronquitis a Repeticion", "Caries o Gingivitis", enf.bocio, enf.bronconeumonia, enf.bronquitisRepeticion, enf.cariesGingivitis);
+  dibujarFilaEnfermedadesD3("Colecistitis", "Dermatitis", "Diabetes", "Disenteria", enf.colecistitis, enf.dermatitis, enf.diabetes, enf.disenteria);
+  dibujarFilaEnfermedadesD3("Enfermedades del corazon", "Enf. Oculares", "Epilepsia o convulsiones", "Faringitis crónica", enf.enfermedadesCorazon, enf.enfermedadesOculares, enf.epilepsiaConvulsiones, enf.faringitisCronica);
+  dibujarFilaEnfermedadesD3("Fiebre Alta", "Fiebre Tifoidea", "Fiebre Reumatica", "Forunculosis", enf.fiebreAlta, enf.fiebreTifoidea, enf.fiebreReumatica, enf.forunculosis);
+  dibujarFilaEnfermedadesD3("Gastritis Cronica", "Gonorrea", "Gota", "Varicoceles", enf.gastritisCronica, enf.gonorrea, enf.gota, enf.varicoceles);
+  dibujarFilaEnfermedadesD3("Hemorroides", "Hepatitis", "Hernias", "Hipertensión Arterial", enf.hemorroides, enf.hepatitis, enf.hernias, enf.hipertensionArterial);
+  dibujarFilaEnfermedadesD3("Inf. Urinarias repetidas", "Intoxicaciones", "Insuficiencia Cardiaca", "Insuficiencia Coronaria Crónica", enf.infeccionesUrinarias, enf.intoxicaciones, enf.insuficienciaCardiaca, enf.insuficienciaCoronaria);
+  dibujarFilaEnfermedadesD3("Insuficiencia Renal Crónica", "Litiasis Urinaria", "Meningitis", "Neuritis a Repeticion", enf.insuficienciaRenal, enf.litiasisUrinaria, enf.meningitis, enf.neuritisRepeticion);
+  dibujarFilaEnfermedadesD3("Otitis Media", "Presion Alta o Baja", "Paludismo o Malaria", "Parasitosis Intestinal", enf.otitisMedia, enf.presionAltaBaja, enf.paludismoMalaria, enf.parasitosisIntestinal);
+  dibujarFilaEnfermedadesD3("Parotiditis", "Pleuresía", "Plunbismo", "Poliomielitis", enf.parotiditis, enf.pleuresia, enf.plunbismo, enf.poliomielitis);
+  dibujarFilaEnfermedadesD3("Portador de Marcapaso", "Prótesis Cardiacas Valvulares", "Resfríos Frecuentes", "Reumatismo a Repetición", enf.portadorMarcapaso, enf.protesisCardiacas, enf.resfriosFrecuentes, enf.reumatismoRepeticion);
+  dibujarFilaEnfermedadesD3("Sarampion", "Sífilis", "Silicosis", "Sinusitis Crónica", enf.sarampion, enf.sifilis, enf.silicosis, enf.sinusitisCronica);
+  dibujarFilaEnfermedadesD3("Tos Convulsiva", "Transtorno Nerviosos", "Traumatismo Encefalocraneano", "Tuberculosis", enf.tosConvulsiva, enf.transtornoNerviosos, enf.traumatismoEncefalocraneano, enf.tuberculosis);
+  dibujarFilaEnfermedadesD3("Tumores_Quistes", "Úlcera Peptica", "Varicela", "Várices", enf.tumoresQuistes, enf.ulceraPeptica, enf.varicela, enf.varices);
+
+  // Fila individual COVID-19
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura3);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura3);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura3, tablaInicioX + tablaAncho, yPos + filaAltura3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("COVID 19", tablaInicioX + 2, yPos + 3.5);
+  const xCovid = dibujarMiniCelda(tablaInicioX + 42, yPos, filaAltura3);
+  if (datosFinales.severidadCovid && datosFinales.severidadCovid.covid19) {
+    doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", xCovid, yPos + 3.5); doc.setTextColor(0,0,0);
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Fecha:", tablaInicioX + 60, yPos + 3.5);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(datosFinales.severidadCovid.fechaExamen || "", tablaInicioX + 75, yPos + 3.5);
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Leve (", tablaInicioX + 100, yPos + 3.5);
+    if (datosFinales.severidadCovid.leve) { doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", tablaInicioX + 111, yPos + 3.5); doc.setTextColor(0,0,0);} doc.setFont("helvetica", "bold").setFontSize(8); doc.text(")", tablaInicioX + 116, yPos + 3.5);
+    doc.text("Moderado (", tablaInicioX + 125, yPos + 3.5);
+    if (datosFinales.severidadCovid.moderado) { doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", tablaInicioX + 141, yPos + 3.5); doc.setTextColor(0,0,0);} doc.setFont("helvetica", "bold").setFontSize(8); doc.text(")", tablaInicioX + 146, yPos + 3.5);
+    doc.text("Severo (", tablaInicioX + 155, yPos + 3.5);
+    if (datosFinales.severidadCovid.severo) { doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", tablaInicioX + 169, yPos + 3.5); doc.setTextColor(0,0,0);} doc.setFont("helvetica", "bold").setFontSize(8); doc.text(")", tablaInicioX + 174, yPos + 3.5);
+  }
+  yPos += filaAltura3;
+
+  // Observaciones dinámicas
+  const calcularAlturaObservaciones = (texto, anchoMaximo) => {
+    if (!texto) return filaAltura3;
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const lineas = doc.splitTextToSize(texto, anchoMaximo);
+    return Math.max(filaAltura3, lineas.length * 4 + 3);
+  };
+  const anchoObs = tablaAncho - 35;
+  const alturaObs = calcularAlturaObservaciones(datosFinales.observacionesAntecedentes, anchoObs);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaObs);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaObs);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaObs, tablaInicioX + tablaAncho, yPos + alturaObs);
+  doc.setFont("helvetica", "bold").setFontSize(8); doc.text("Observaciones:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8); doc.text(datosFinales.observacionesAntecedentes || "", tablaInicioX + 30, yPos + 3.5, { maxWidth: anchoObs });
+  yPos += alturaObs;
+
+  // Línea celeste para Síntomas frecuentes
+  yPos = dibujarHeaderSeccionCeleste("Indicar las enfermedades que ha tenido o tiene, con mucha frecuencia:", yPos, filaAltura3);
+
+  // Fila de síntomas (4 columnas)
+  const dibujarFilaSintomasD3 = (s1, s2, s3, s4, v1, v2, v3, v4) => {
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura3);
+    doc.line(tablaInicioX + 50, yPos, tablaInicioX + 50, yPos + filaAltura3);
+    doc.line(tablaInicioX + 100, yPos, tablaInicioX + 100, yPos + filaAltura3);
+    doc.line(tablaInicioX + 150, yPos, tablaInicioX + 150, yPos + filaAltura3);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura3);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAltura3, tablaInicioX + tablaAncho, yPos + filaAltura3);
+    const cx1 = dibujarMiniCelda(tablaInicioX + 42, yPos, filaAltura3);
+    const cx2 = dibujarMiniCelda(tablaInicioX + 92, yPos, filaAltura3);
+    const cx3 = dibujarMiniCelda(tablaInicioX + 142, yPos, filaAltura3);
+    const cx4 = dibujarMiniCelda(tablaInicioX + 192, yPos, filaAltura3);
+    if (s1) { doc.setFont("helvetica", "normal").setFontSize(7); doc.text(s1, tablaInicioX + 2, yPos + 3.5); if (v1) { doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", cx1, yPos + 3.5); doc.setTextColor(0,0,0);} }
+    if (s2) { doc.setFont("helvetica", "normal").setFontSize(7); doc.text(s2, tablaInicioX + 52, yPos + 3.5); if (v2) { doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", cx2, yPos + 3.5); doc.setTextColor(0,0,0);} }
+    if (s3) { doc.setFont("helvetica", "normal").setFontSize(7); doc.text(s3, tablaInicioX + 102, yPos + 3.5); if (v3) { doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", cx3, yPos + 3.5); doc.setTextColor(0,0,0);} }
+    if (s4) { doc.setFont("helvetica", "normal").setFontSize(7); doc.text(s4, tablaInicioX + 152, yPos + 3.5); if (v4) { doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", cx4, yPos + 3.5); doc.setTextColor(0,0,0);} }
+    yPos += filaAltura3;
+  };
+  const s = datosFinales.sintomas || {};
+  dibujarFilaSintomasD3("Pérdida de Memoria", "Preocupaciones o Angustia", "Dolores Articulares y/o Huesos", "Aumento o Disminución de Peso", s.perdidaMemoria, s.preocupacionesAngustia, s.doloresArticulares, s.aumentoDisminucionPeso);
+  dibujarFilaSintomasD3("Dolor de Cabeza", "Diarrea", "Agitación al Hacer Ejercicios", "Dolor Ocular", s.dolorCabeza, s.diarrea, s.agitacionEjercicios, s.dolorOcular);
+  dibujarFilaSintomasD3("Dolor opresivo Tórax", "Hinchazón de pies o manos", "Estreñimiento", "Vómitos con Sangre", s.dolorOpresivoTorax, s.hinchazonPiesManos, s.estrenimiento, s.vomitosSangre);
+  dibujarFilaSintomasD3("Sangrado por Orina", "Tos con Sangre", "Coloración Amarilla de la Piel", "Indigestión Frecuente", s.sangradoOrina, s.tosSangre, s.coloracionAmarilla, s.indigestionFrecuente);
+  dibujarFilaSintomasD3("Insomnio", "Lumbalgias o Dolor de Cintura", "Mareos - Desmayos - Vértigo", "Heces Negras", s.insomnio, s.lumbalgias, s.mareosDesmayos, s.hecesNegras);
+  dibujarFilaSintomasD3("Orina con Dolor o Ardor", "Orina Involuntaria", "Dolor de Oído", "Secreciones por el Oído", s.orinaDolorArdor, s.orinaInvoluntaria, s.dolorOido, s.secrecionesOido);
+  dibujarFilaSintomasD3("Palpitaciones", "Adormecimiento", "Pesadillas", "Dolores Musculares", s.palpitaciones, s.adormecimiento, s.pesadillas, s.doloresMusculares);
+  dibujarFilaSintomasD3("Tos Crónica", "Sangrado por Encías", "", "", s.tosCronica, s.sangradoEncias, false, false);
+
+  // === HÁBITOS NOCIVOS ===
+  yPos = dibujarHeaderSeccion("HÁBITOS NOCIVOS", yPos, filaAltura3);
+  const hab = datosFinales.habitos || {};
+  // Fumar
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura3); doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura3); doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); doc.line(tablaInicioX, yPos + filaAltura3, tablaInicioX + tablaAncho, yPos + filaAltura3);
+  doc.setFont("helvetica", "normal").setFontSize(8); doc.text("Fumar", tablaInicioX + 2, yPos + 3.5);
+  const fumarSiX = tablaInicioX + 25; const fumarNoX = tablaInicioX + 45;
+  doc.text("SI (", fumarSiX, yPos + 3.5); 
+  const anchoSIParentesis = doc.getTextWidth("SI ("); // Ancho de "SI ("
+  doc.setFont("helvetica", "bold").setFontSize(9); 
+  const anchoX = doc.getTextWidth("X"); 
+  if (hab.fumar) { doc.setTextColor(255,0,0); doc.text("X", fumarSiX + anchoSIParentesis + (4 - anchoX), yPos + 3.5); doc.setTextColor(0,0,0);} 
+  doc.setFont("helvetica", "normal").setFontSize(8); doc.text(")", fumarSiX + anchoSIParentesis + 6, yPos + 3.5);
+  doc.text("NO (", fumarNoX, yPos + 3.5);
+  const anchoNOParentesis = doc.getTextWidth("NO ("); // Ancho de "NO ("
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  if (!hab.fumar) { doc.setTextColor(255,0,0); doc.text("X", fumarNoX + anchoNOParentesis + (4 - anchoX), yPos + 3.5); doc.setTextColor(0,0,0);} 
+  doc.setFont("helvetica", "normal").setFontSize(8); doc.text(")", fumarNoX + anchoNOParentesis + 6, yPos + 3.5);
+  doc.setFont("helvetica", "bold").setFontSize(8); doc.text("Número de Cigarrillos:", tablaInicioX + 70, yPos + 3.5); doc.setFont("helvetica", "normal").setFontSize(8); doc.text(hab.numeroCigarrillos || "", tablaInicioX + 110, yPos + 3.5);
+  yPos += filaAltura3;
+  // Licor
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura3); doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura3); doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); doc.line(tablaInicioX, yPos + filaAltura3, tablaInicioX + tablaAncho, yPos + filaAltura3);
+  doc.setFont("helvetica", "normal").setFontSize(8); doc.text("Licor", tablaInicioX + 2, yPos + 3.5);
+  doc.text("SI (", fumarSiX, yPos + 3.5); 
+  if (hab.licor) { doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", fumarSiX + anchoSIParentesis + (4 - anchoX), yPos + 3.5); doc.setTextColor(0,0,0);} 
+  doc.setFont("helvetica", "normal").setFontSize(8); doc.text(")", fumarSiX + anchoSIParentesis + 6, yPos + 3.5);
+  doc.text("NO (", fumarNoX, yPos + 3.5);
+  if (!hab.licor) { doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", fumarNoX + anchoNOParentesis + (4 - anchoX), yPos + 3.5); doc.setTextColor(0,0,0);} 
+  doc.setFont("helvetica", "normal").setFontSize(8); doc.text(")", fumarNoX + anchoNOParentesis + 6, yPos + 3.5);
+  doc.setFont("helvetica", "bold").setFontSize(8); doc.text("Tipo:", tablaInicioX + 70, yPos + 3.5); doc.setFont("helvetica", "normal").setFontSize(8); doc.text(hab.tipoLicor || "", tablaInicioX + 85, yPos + 3.5);
+  doc.setFont("helvetica", "bold").setFontSize(8); doc.text("Fr:", tablaInicioX + 130, yPos + 3.5); doc.setFont("helvetica", "normal").setFontSize(8); doc.text(hab.frecuenciaLicor || "", tablaInicioX + 140, yPos + 3.5);
+  yPos += filaAltura3;
+  // Drogas
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura3); doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura3); doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); doc.line(tablaInicioX, yPos + filaAltura3, tablaInicioX + tablaAncho, yPos + filaAltura3);
+  doc.setFont("helvetica", "normal").setFontSize(8); doc.text("Drogas", tablaInicioX + 2, yPos + 3.5);
+  doc.text("SI (", fumarSiX, yPos + 3.5); 
+  if (hab.drogas) { doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", fumarSiX + anchoSIParentesis + (4 - anchoX), yPos + 3.5); doc.setTextColor(0,0,0);} 
+  doc.setFont("helvetica", "normal").setFontSize(8); doc.text(")", fumarSiX + anchoSIParentesis + 6, yPos + 3.5);
+  doc.text("NO (", fumarNoX, yPos + 3.5);
+  if (!hab.drogas) { doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", fumarNoX + anchoNOParentesis + (4 - anchoX), yPos + 3.5); doc.setTextColor(0,0,0);} 
+  doc.setFont("helvetica", "normal").setFontSize(8); doc.text(")", fumarNoX + anchoNOParentesis + 6, yPos + 3.5);
+  doc.setFont("helvetica", "bold").setFontSize(8); doc.text("Tipo:", tablaInicioX + 70, yPos + 3.5); doc.setFont("helvetica", "normal").setFontSize(8); doc.text(hab.tipoDrogas || "", tablaInicioX + 85, yPos + 3.5);
+  doc.setFont("helvetica", "bold").setFontSize(8); doc.text("Fr:", tablaInicioX + 130, yPos + 3.5); doc.setFont("helvetica", "normal").setFontSize(8); doc.text(hab.frecuenciaDrogas || "", tablaInicioX + 140, yPos + 3.5);
+  yPos += filaAltura3;
+  // Otros
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura3); doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura3); doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); doc.line(tablaInicioX, yPos + filaAltura3, tablaInicioX + tablaAncho, yPos + filaAltura3);
+  doc.setFont("helvetica", "normal").setFontSize(8); doc.text("Otros", tablaInicioX + 2, yPos + 3.5);
+  doc.text("SI (", fumarSiX, yPos + 3.5); 
+  if (hab.otros) { doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", fumarSiX + anchoSIParentesis + (4 - anchoX), yPos + 3.5); doc.setTextColor(0,0,0);} 
+  doc.setFont("helvetica", "normal").setFontSize(8); doc.text(")", fumarSiX + anchoSIParentesis + 6, yPos + 3.5);
+  doc.text("NO (", fumarNoX, yPos + 3.5);
+  if (!hab.otros) { doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", fumarNoX + anchoNOParentesis + (4 - anchoX), yPos + 3.5); doc.setTextColor(0,0,0);} 
+  doc.setFont("helvetica", "normal").setFontSize(8); doc.text(")", fumarNoX + anchoNOParentesis + 6, yPos + 3.5);
+  doc.setFont("helvetica", "bold").setFontSize(8); doc.text("Tipo:", tablaInicioX + 70, yPos + 3.5); doc.setFont("helvetica", "normal").setFontSize(8); doc.text(hab.tipoOtros || "", tablaInicioX + 85, yPos + 3.5);
+  doc.setFont("helvetica", "bold").setFontSize(8); doc.text("Fr:", tablaInicioX + 130, yPos + 3.5); doc.setFont("helvetica", "normal").setFontSize(8); doc.text(hab.frecuenciaOtros || "", tablaInicioX + 140, yPos + 3.5);
+  yPos += filaAltura3;
+
+  // === FOOTER PÁGINA 3 ===
+  footerTR(doc, { footerOffsetY: 5});
+
+  // === PÁGINA 4 ===
+  doc.addPage();
+  
+  // Contador de página actualizado
+  const numeroPagina4 = 4;
+  
+  // Header para página 4 (mismo estilo que página 3)
+  drawHeaderPagina3(numeroPagina4);
+  
+  // Resetear posición
+  yPos = 40;
+
+  // ANTECEDENTES QUIRÚRGICOS (encabezado y tabla como Digitalizado)
+  yPos = dibujarHeaderSeccion("ANTECEDENTES QUIRÚRGICOS:", yPos, filaAltura3);
+  // Encabezados
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura3);
+  doc.line(tablaInicioX + 30, yPos, tablaInicioX + 30, yPos + filaAltura3);
+  doc.line(tablaInicioX + 80, yPos, tablaInicioX + 80, yPos + filaAltura3);
+  doc.line(tablaInicioX + 130, yPos, tablaInicioX + 130, yPos + filaAltura3);
+  doc.line(tablaInicioX + 145, yPos, tablaInicioX + 145, yPos + filaAltura3);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura3);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura3, tablaInicioX + tablaAncho, yPos + filaAltura3);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Fecha", tablaInicioX + 15, yPos + 3.5, { align: "center" });
+  doc.text("Hospital (Nombre - Lugar)", tablaInicioX + 55, yPos + 3.5, { align: "center" });
+  doc.text("Operación", tablaInicioX + 105, yPos + 3.5, { align: "center" });
+  doc.text("Días.H.", tablaInicioX + 137.5, yPos + 3.5, { align: "center" });
+  doc.text("Complicaciones", tablaInicioX + 177.5, yPos + 3.5, { align: "center" });
+  yPos += filaAltura3;
+
+  const dibujarFilaQuirurgicoP4 = (fecha, hospital, operacion, diasH, complic) => {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const alturaMin = 5; const padTop = 3.5; const yText = yPos + padTop;
+    let alturaMax = alturaMin;
+    const medida = (texto, x, ancho) => {
+      if (!texto) return yText;
+      const textoCapitalizado = capitalizarTexto(texto);
+      const yNew = dibujarTextoConSaltoLinea(textoCapitalizado, x, yText, ancho);
+      return yNew - yText + padTop + 2;
+    };
+    alturaMax = Math.max(alturaMax, medida(hospital, tablaInicioX + 32, 48));
+    alturaMax = Math.max(alturaMax, medida(operacion, tablaInicioX + 82, 48));
+    alturaMax = Math.max(alturaMax, medida(complic, tablaInicioX + 147, 55));
+    const h = Math.max(alturaMin, alturaMax);
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + h);
+    doc.line(tablaInicioX + 30, yPos, tablaInicioX + 30, yPos + h);
+    doc.line(tablaInicioX + 80, yPos, tablaInicioX + 80, yPos + h);
+    doc.line(tablaInicioX + 130, yPos, tablaInicioX + 130, yPos + h);
+    doc.line(tablaInicioX + 145, yPos, tablaInicioX + 145, yPos + h);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + h);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + h, tablaInicioX + tablaAncho, yPos + h);
+    doc.text(fecha || "", tablaInicioX + 2, yText);
+    if (hospital) dibujarTextoConSaltoLinea(capitalizarTexto(hospital), tablaInicioX + 32, yText, 48);
+    if (operacion) dibujarTextoConSaltoLinea(capitalizarTexto(operacion), tablaInicioX + 82, yText, 48);
+    doc.text(diasH || "", tablaInicioX + 137.5, yText, { align: "center" });
+    if (complic) {
+      const w = doc.getTextWidth(capitalizarTexto(complic));
+      if (w <= 55) doc.text(capitalizarTexto(complic), tablaInicioX + 147, yText); else dibujarTextoConSaltoLinea(capitalizarTexto(complic), tablaInicioX + 147, yText, 55);
+    }
+    yPos += h;
+  };
+
+  if (datosFinales.antecedentesQuirurgicos && datosFinales.antecedentesQuirurgicos.length > 0) {
+    datosFinales.antecedentesQuirurgicos.forEach(q => {
+      dibujarFilaQuirurgicoP4(
+        formatearFechaQuirurgica(q.fechaAntecedentesPatologicosQuirurgicos || ""),
+        q.hospitalOperacion || "",
+        q.operacion || "",
+        q.diasHospitalizado || "",
+        q.complicaciones || ""
+      );
+    });
+  } else {
+    const hMsg = 8;
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + hMsg);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + hMsg);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + hMsg, tablaInicioX + tablaAncho, yPos + hMsg);
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.text("No se registran antecedentes quirúrgicos", pageW / 2, yPos + 5, { align: "center" });
+    yPos += hMsg;
+  }
+
+  // ANTECEDENTES DE REPRODUCCIÓN
+  yPos = dibujarHeaderSeccion("ANTECEDENTES DE REPRODUCCIÓN", yPos, filaAltura3);
+  yPos = dibujarHeaderSeccionCeleste("En caso de Damas:", yPos, filaAltura3);
+  const camposDamasP4 = [
+    { label: "Inicio de mestruación:", value: datosFinales.antecedentesReproduccion?.damas?.inicioMenstruacion },
+    { label: "inicio de vida sexual:", value: datosFinales.antecedentesReproduccion?.damas?.inicioVidaSexual },
+    { label: "Número de parejas sexual a la actualidad:", value: datosFinales.antecedentesReproduccion?.damas?.numeroParejas },
+    { label: "Número de hijos vivos:", value: datosFinales.antecedentesReproduccion?.damas?.hijosVivos },
+    { label: "Número de hijos fallecidos:", value: datosFinales.antecedentesReproduccion?.damas?.hijosFallecidos },
+    { label: "Número de abortos:", value: datosFinales.antecedentesReproduccion?.damas?.numeroAbortos },
+    { label: "Precisar Causas:", value: datosFinales.antecedentesReproduccion?.damas?.causasAbortos }
+  ];
+  camposDamasP4.forEach(c => { doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura3); doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura3); doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); doc.line(tablaInicioX, yPos + filaAltura3, tablaInicioX + tablaAncho, yPos + filaAltura3); doc.setFont("helvetica", "bold").setFontSize(8); doc.text(c.label, tablaInicioX + 2, yPos + 3.5); if (c.value) { doc.setFont("helvetica", "normal").setFontSize(8); doc.text(capitalizarTexto(String(c.value)), tablaInicioX + 80, yPos + 3.5);} yPos += filaAltura3; });
+  yPos = dibujarHeaderSeccionCeleste("En caso de Varones:", yPos, filaAltura3);
+  const camposVaronesP4 = [
+    { label: "Número de hijos vivos:", value: datosFinales.antecedentesReproduccion?.varones?.hijosVivos },
+    { label: "Número de hijos fallecidos:", value: datosFinales.antecedentesReproduccion?.varones?.hijosFallecidos },
+    { label: "Número de abortos en sus parejas:", value: datosFinales.antecedentesReproduccion?.varones?.abortosParejas },
+    { label: "Precisar Causas:", value: datosFinales.antecedentesReproduccion?.varones?.causasAbortos }
+  ];
+  camposVaronesP4.forEach(c => { doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura3); doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura3); doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); doc.line(tablaInicioX, yPos + filaAltura3, tablaInicioX + tablaAncho, yPos + filaAltura3); doc.setFont("helvetica", "bold").setFontSize(8); doc.text(c.label, tablaInicioX + 2, yPos + 3.5); if (c.value) { doc.setFont("helvetica", "normal").setFontSize(8); doc.text(capitalizarTexto(String(c.value)), tablaInicioX + 80, yPos + 3.5);} yPos += filaAltura3; });
+
+  // Banner de Declaración y Firmas (mismo estilo que Digitalizado p2)
+  const declarY = yPos;
+  const alturaDeclar = 15;
+  doc.setFillColor(253, 208, 94) ; doc.rect(tablaInicioX, declarY, tablaAncho, alturaDeclar, 'F');
+  doc.line(tablaInicioX, declarY, tablaInicioX, declarY + alturaDeclar); doc.line(tablaInicioX + tablaAncho, declarY, tablaInicioX + tablaAncho, declarY + alturaDeclar); doc.line(tablaInicioX, declarY, tablaInicioX + tablaAncho, declarY); doc.line(tablaInicioX, declarY + alturaDeclar, tablaInicioX + tablaAncho, declarY + alturaDeclar);
+  doc.setFont("helvetica", "bold").setFontSize(8); doc.text("TODA LA INFORMACIÓN QUE HE PROPORCIONADO AL SERVICIO DE MEDICINA OCUPACIONAL,", tablaInicioX + tablaAncho/2, declarY + 4, { align: "center" }); doc.text("ES VERDADERA NO HABIENDO OMITIDO NINGÚN DATO VOLUNTARIAMENTE.", tablaInicioX + tablaAncho/2, declarY + 7, { align: "center" });
+  doc.text("FECHA: " + (datosFinales.fechaExamen || ""), tablaInicioX + tablaAncho/2, declarY + 11, { align: "center" });
+
+  const firmasY4 = declarY + alturaDeclar; const alturaFirmas4 = 32;
+  doc.line(tablaInicioX, firmasY4, tablaInicioX, firmasY4 + alturaFirmas4); doc.line(tablaInicioX + tablaAncho/2, firmasY4, tablaInicioX + tablaAncho/2, firmasY4 + alturaFirmas4); doc.line(tablaInicioX + tablaAncho, firmasY4, tablaInicioX + tablaAncho, firmasY4 + alturaFirmas4); doc.line(tablaInicioX, firmasY4, tablaInicioX + tablaAncho, firmasY4); doc.line(tablaInicioX, firmasY4 + alturaFirmas4, tablaInicioX + tablaAncho, firmasY4 + alturaFirmas4);
+  const centro1 = tablaInicioX + (tablaAncho/2)/2; const centro2 = tablaInicioX + tablaAncho/2 + (tablaAncho/2)/2;
+  let firmaP = null, huellaP = null, firmaM = null;
+  if (data.digitalizacion && data.digitalizacion.length > 0) {
+    const f = data.digitalizacion.find(i => i.nombreDigitalizacion === "FIRMAP"); if (f && f.url) firmaP = f.url;
+    const h = data.digitalizacion.find(i => i.nombreDigitalizacion === "HUELLA"); if (h && h.url) huellaP = h.url;
+    const fm = data.digitalizacion.find(i => i.nombreDigitalizacion === "SELLOFIRMA"); if (fm && fm.url) firmaM = fm.url;
+  }
+  if (firmaP) { try { doc.addImage(firmaP, 'PNG', centro1 - 20, firmasY4 + 3, 30, 20); } catch(e) { console.log('Error cargando firma del paciente (p4):', e); } }
+  if (huellaP) { try { doc.addImage(huellaP, 'PNG', centro1 + 8, firmasY4 + 3, 12, 20); } catch(e) { console.log('Error cargando huella del paciente (p4):', e); } }
+  doc.setFont("helvetica", "normal").setFontSize(7); doc.text("Firma y Huella del Paciente", centro1, firmasY4 + 26, { align: "center" });
+  if (firmaM) { try { doc.addImage(firmaM, 'PNG', centro2 - 22.5, firmasY4 + 3, 45, 20); } catch(e) { console.log('Error cargando firma del médico (p4):', e); } }
+  doc.setFont("helvetica", "normal").setFontSize(7); doc.text("Firma del Médico", centro2, firmasY4 + 26, { align: "center" }); doc.text("Responsable de la Evaluación", centro2, firmasY4 + 28.5, { align: "center" });
+
   footerTR(doc, { footerOffsetY: 8});
 
   // === IMPRIMIR ===
