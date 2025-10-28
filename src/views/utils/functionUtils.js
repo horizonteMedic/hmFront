@@ -181,7 +181,7 @@ export const SubmitDataServiceDefault = async (
     LoadingDefault("Registrando Datos");
     SubmitData(body, registrarUrl, token).then((res) => {
         console.log(res)
-        if (res.id === 1 || res.id === 0) {
+        if (res.id === 1) {
             if (tienePrint) {
                 Swal.fire({
                     title: "Exito",
@@ -200,6 +200,8 @@ export const SubmitDataServiceDefault = async (
                 onFinish();
             }
             limpiar();
+        } else if (res.id === 0) {
+            Swal.fire("Error", "Ocurrio un error al Registrar", "error");
         } else {
             Swal.fire("Error", "Ocurrio un error al Registrar", "error");
         }
