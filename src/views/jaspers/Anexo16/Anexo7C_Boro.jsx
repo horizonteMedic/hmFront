@@ -1916,75 +1916,100 @@ export default function Anexo7C_Boro(data = {}) {
   // === SECCIÓN PULMONES ===
   yPos = dibujarHeaderSeccion("9. PULMONES", yPos, filaAltura);
 
-    // Fila: PULMONES | Normal | | Anormal | X |
-    const colPulmonesWidth = 45;
-    const colAnchoNormal = (tablaAncho - colPulmonesWidth) / 2; // Mitad del espacio restante
-    const colAnchoAnormal = colAnchoNormal; // Mismo ancho para Anormal
-    
-    let xPulmones = tablaInicioX;
-    let xNormal = xPulmones + colPulmonesWidth;
-    let xAnormal = xNormal + colAnchoNormal;
-
-    // Dibujar líneas principales de la fila
-    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-    
-    // Línea vertical después de "PULMONES"
-    doc.line(xNormal, yPos, xNormal, yPos + filaAltura);
-    
-    // Línea vertical después de "Normal" (para separar de "Anormal")
-    doc.line(xAnormal, yPos, xAnormal, yPos + filaAltura);
-    
-    // Crear cajoncitos para las X (8mm antes del final de cada columna)
-    const xPosicionXNormal = xNormal + colAnchoNormal - 8; // Línea vertical antes de la X para Normal
-    const xPosicionXAnormal = xAnormal + colAnchoAnormal - 8; // Línea vertical antes de la X para Anormal
-    
-    // Dibujar cajoncito de X para Normal
-    doc.line(xPosicionXNormal, yPos, xPosicionXNormal, yPos + filaAltura);
-    
-    // Dibujar cajoncito de X para Anormal
-    doc.line(xPosicionXAnormal, yPos, xPosicionXAnormal, yPos + filaAltura);
-
-    // Contenido de la fila
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text("PULMONES", xPulmones + 2, yPos + 3.5);
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text("Normal", xNormal + 2, yPos + 3.5);
-    doc.text("Anormal", xAnormal + 2, yPos + 3.5);
-
-    // Marcar checkboxes según los datos (centrando la X en el cajoncito)
-    if (datosFinales.evaluacionFisicaAdicional?.pulmones?.normal) {
-      const anchoCajoncitoNormal = (xNormal + colAnchoNormal) - xPosicionXNormal;
-      const centroCajoncitoNormal = xPosicionXNormal + (anchoCajoncitoNormal / 2);
-      doc.setFont("helvetica", "bold").setFontSize(10);
-      doc.text("X", centroCajoncitoNormal, yPos + 3.5);
-    }
-    if (datosFinales.evaluacionFisicaAdicional?.pulmones?.anormal) {
-      const anchoCajoncitoAnormal = (xAnormal + colAnchoAnormal) - xPosicionXAnormal;
-      const centroCajoncitoAnormal = xPosicionXAnormal + (anchoCajoncitoAnormal / 2);
-      doc.setFont("helvetica", "bold").setFontSize(10);
-      doc.text("X", centroCajoncitoAnormal, yPos + 3.5);
-    }
-    yPos += filaAltura;
-
-    // Fila de descripción de PULMONES
-    const textoPulmones = "Descripción: " + formatearTextoGramatical(datosFinales.evaluacionFisicaAdicional?.pulmones?.descripcion || "");
-    const anchoDisponiblePulmones = tablaAncho - 4;
-    const lineasPulmones = doc.splitTextToSize(textoPulmones, anchoDisponiblePulmones);
-    const alturaDinamicaPulmones = Math.max(filaAltura, lineasPulmones.length * 2.5 + 2);
-
-    // Dibujar líneas de la fila dinámica
-    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaPulmones);
-    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaPulmones);
-    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-    doc.line(tablaInicioX, yPos + alturaDinamicaPulmones, tablaInicioX + tablaAncho, yPos + alturaDinamicaPulmones);
-
-    // Contenido de descripción
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(lineasPulmones, tablaInicioX + 2, yPos + 3.5);
-    yPos += alturaDinamicaPulmones;
+  // Estructura de dos columnas: Texto a la izquierda, Imagen a la derecha
+  const anchoColDerecha = 55; // Columna derecha más estrecha para imagen
+  const anchoColIzquierda = tablaAncho - anchoColDerecha; // Columna izquierda para texto
+  const puntoDivision = tablaInicioX + anchoColIzquierda;
+  
+  // Preparar contenido
+  const textoPulmones = "Descripción: " + formatearTextoGramatical(datosFinales.evaluacionFisicaAdicional?.pulmones?.descripcion || "");
+  const anchoTextoDisponible = anchoColIzquierda - 4;
+  const lineasPulmones = doc.splitTextToSize(textoPulmones, anchoTextoDisponible);
+  
+  // Altura de la columna izquierda (texto + fila de status)
+  const alturaTexto = lineasPulmones.length * 3 + 4;
+  const alturaTotal = Math.max(30, alturaTexto + filaAltura); // Mínimo 30mm para acomodar imagen
+  
+  // Dibujar líneas principales
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaTotal);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaTotal);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaTotal, tablaInicioX + tablaAncho, yPos + alturaTotal);
+  
+  // Línea vertical divisoria
+  doc.line(puntoDivision, yPos, puntoDivision, yPos + alturaTotal);
+  
+  // === COLUMNA IZQUIERDA: Status y Descripción ===
+  const yPosInicial = yPos;
+  
+  // Fila de status dentro de la columna izquierda
+  const colPulmonesWidth = 35;
+  const colAnchoNormal = (anchoColIzquierda - colPulmonesWidth) / 2;
+  const colAnchoAnormal = colAnchoNormal;
+  
+  let xPulmones = tablaInicioX;
+  let xNormal = xPulmones + colPulmonesWidth;
+  let xAnormal = xNormal + colAnchoNormal;
+  const xFinalColumna = tablaInicioX + anchoColIzquierda;
+  
+  // Dibujar líneas de status
+  doc.line(xPulmones, yPos, xPulmones, yPos + filaAltura);
+  doc.line(xNormal, yPos, xNormal, yPos + filaAltura);
+  doc.line(xAnormal, yPos, xAnormal, yPos + filaAltura);
+  doc.line(xFinalColumna, yPos, xFinalColumna, yPos + filaAltura);
+  
+  // Cajoncitos para X
+  const xPosicionXNormal = xNormal + colAnchoNormal - 8;
+  const xPosicionXAnormal = xAnormal + colAnchoAnormal - 8;
+  
+  doc.line(xPosicionXNormal, yPos, xPosicionXNormal, yPos + filaAltura);
+  doc.line(xPosicionXAnormal, yPos, xPosicionXAnormal, yPos + filaAltura);
+  
+  // Contenido de status
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("PULMONES", xPulmones + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Normal", xNormal + 2, yPos + 3.5);
+  doc.text("Anormal", xAnormal + 2, yPos + 3.5);
+  
+  // Marcar checkboxes
+  if (datosFinales.evaluacionFisicaAdicional?.pulmones?.normal) {
+    const anchoCajoncitoNormal = (xNormal + colAnchoNormal) - xPosicionXNormal;
+    const centroCajoncitoNormal = xPosicionXNormal + (anchoCajoncitoNormal / 2);
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", centroCajoncitoNormal, yPos + 3.5);
+  }
+  if (datosFinales.evaluacionFisicaAdicional?.pulmones?.anormal) {
+    const anchoCajoncitoAnormal = (xAnormal + colAnchoAnormal) - xPosicionXAnormal;
+    const centroCajoncitoAnormal = xPosicionXAnormal + (anchoCajoncitoAnormal / 2);
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", centroCajoncitoAnormal, yPos + 3.5);
+  }
+  
+  // Descripción
+  const yPosDescripcion = yPos + filaAltura;
+  doc.line(xPulmones, yPosDescripcion, xFinalColumna, yPosDescripcion);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  const interlineadoDesc = 3;
+  lineasPulmones.forEach((linea, index) => {
+    doc.text(linea, tablaInicioX + 2, yPosDescripcion + 3.5 + (index * interlineadoDesc));
+  });
+  
+  // === COLUMNA DERECHA: Imagen centrada ===
+  try {
+    const imgPulmones = '/img/Anexo16/pulmonesFrame.png';
+    const imgWidth = 20;
+    const imgHeight = 20;
+    // Centrar horizontalmente: (ancho columna derecha - ancho imagen) / 2
+    const imgX = puntoDivision + (anchoColDerecha - imgWidth) / 2;
+    // Centrar verticalmente: (altura total - altura imagen) / 2
+    const imgY = yPosInicial + (alturaTotal - imgHeight) / 2;
+    doc.addImage(imgPulmones, 'PNG', imgX, imgY, imgWidth, imgHeight);
+  } catch (error) {
+    console.log('No se pudo cargar la imagen de pulmones:', error);
+  }
+  
+  yPos = yPosInicial + alturaTotal;
 
     // Fila: CARDIOVASCULAR dentro de la sección PULMONES
     const tituloCardiovascular = "Cardiovascular: ";
@@ -2370,11 +2395,12 @@ export default function Anexo7C_Boro(data = {}) {
 
   // === FILA: ANAMNESIS ===
   const tituloAnamnesis = "Anamnesis: ";
-  const datoAnamnesis = formatearTextoGramatical(datosFinales.evaluacionMental?.anamnesis || "");
+  const datoAnamnesis = datosFinales.evaluacionMental?.anamnesis || "";
   const textoAnamnesis = tituloAnamnesis + datoAnamnesis;
-  const anchoDisponibleAnamnesis = tablaAncho - 4;
+  const anchoDisponibleAnamnesis = tablaAncho - 8; // Aumentar el ancho disponible para usar todo el espacio
   const lineasAnamnesis = doc.splitTextToSize(textoAnamnesis, anchoDisponibleAnamnesis);
-  const alturaDinamicaAnamnesis = Math.max(filaAltura, lineasAnamnesis.length * 2.5 + 2);
+  const interlineadoAnamnesis = 3;
+  const alturaDinamicaAnamnesis = Math.max(filaAltura, lineasAnamnesis.length * interlineadoAnamnesis + 4);
 
   // Dibujar líneas de la fila dinámica
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaAnamnesis);
@@ -2382,12 +2408,23 @@ export default function Anexo7C_Boro(data = {}) {
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaDinamicaAnamnesis, tablaInicioX + tablaAncho, yPos + alturaDinamicaAnamnesis);
 
-  // Contenido con formato mixto
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text(tituloAnamnesis, tablaInicioX + 2, yPos + 3.5);
-  const anchoTituloAnamnesis = doc.getTextWidth(tituloAnamnesis);
+  // Contenido dibujado línea por línea
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datoAnamnesis, tablaInicioX + 2 + anchoTituloAnamnesis, yPos + 3.5);
+  lineasAnamnesis.forEach((linea, index) => {
+    // Primera línea con título en negrita
+    if (index === 0) {
+      doc.setFont("helvetica", "bold").setFontSize(8);
+      doc.text("Anamnesis:", tablaInicioX + 2, yPos + 3.5);
+      const anchoTitulo = doc.getTextWidth("Anamnesis: ");
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      const restoTexto = linea.replace("Anamnesis: ", "");
+      if (restoTexto.trim()) {
+        doc.text(restoTexto, tablaInicioX + 2 + anchoTitulo, yPos + 3.5);
+      }
+    } else {
+      doc.text(linea, tablaInicioX + 2, yPos + 3.5 + (index * interlineadoAnamnesis));
+    }
+  });
   yPos += alturaDinamicaAnamnesis;
 
   // === FILA: ESTADO MENTAL ===
@@ -3071,7 +3108,7 @@ yPos += filaAltura;
 
   // Contenido de la fila creciente con interlineado controlado
   doc.setFont("helvetica", "normal").setFontSize(8);
-  const lineasOtrosExamenesFormateadas = lineasOtrosExamenesPag3.map(linea => formatearTextoGramatical(linea));
+  const lineasOtrosExamenesFormateadas = lineasOtrosExamenesPag3.map(linea => linea.toUpperCase());
   lineasOtrosExamenesFormateadas.forEach((linea, index) => {
     doc.text(linea, tablaInicioX + 2, yPos + 3.5 + (index * interlineadoOtrosExamenes));
   });
@@ -3099,7 +3136,7 @@ yPos += filaAltura;
 
   // Contenido de la fila creciente con interlineado controlado
   doc.setFont("helvetica", "normal").setFontSize(8);
-  const lineasConclusionesFormateadas = lineasConclusionesPag3.map(linea => formatearTextoGramatical(linea));
+  const lineasConclusionesFormateadas = lineasConclusionesPag3.map(linea => linea.toUpperCase());
   lineasConclusionesFormateadas.forEach((linea, index) => {
     doc.text(linea, tablaInicioX + 2, yPos + 3.5 + (index * interlineadoTexto));
   });
@@ -3124,7 +3161,7 @@ yPos += filaAltura;
 
   // Contenido de la fila creciente con interlineado controlado
   doc.setFont("helvetica", "normal").setFontSize(8);
-  const lineasRecomendacionesFormateadas = lineasRecomendacionesPag3.map(linea => formatearTextoGramatical(linea));
+  const lineasRecomendacionesFormateadas = lineasRecomendacionesPag3.map(linea => linea.toUpperCase());
   lineasRecomendacionesFormateadas.forEach((linea, index) => {
     doc.text(linea, tablaInicioX + 2, yPos + 3.5 + (index * interlineadoTexto));
   });
