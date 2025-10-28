@@ -1,8 +1,17 @@
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronDown, faChevronRight, faFolder, faFile, faPlus, faExchangeAlt, faEdit, faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
-import data from './obtener.json';
+import { faChevronDown, faChevronRight, faFolder, faFile, faPlus, faExchangeAlt, faEdit, faSave, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../hooks/useSessionData';
+import ChangeParentModal from './ChangeParentModal';
+import AddChildModal from './AddChildModal';
+import { 
+    obtenerOpcionesInterfaz, 
+    registrarOpcionInterfaz, 
+    actualizarOpcionInterfaz,
+    eliminarOpcionInterfaz,
+    prepararDatosNuevaOpcion,
+    prepararDatosActualizacionOpcion
+} from './controllerGestion.jsx';
 
 // Función para obtener colores según el nivel jerárquico
 const getHierarchyColors = (level, hasChildren) => {
@@ -232,7 +241,7 @@ const buildTree = (items) => {
 };
 
 // Componente del panel de detalles
-const DetailsPanel = ({ selectedItem, onItemUpdate, onAddChild, onChangeParent }) => {
+const DetailsPanel = ({ selectedItem, onItemUpdate, onAddChild, onChangeParent, onDelete, data }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editedItem, setEditedItem] = useState(null);
 
@@ -447,6 +456,14 @@ const DetailsPanel = ({ selectedItem, onItemUpdate, onAddChild, onChangeParent }
                             <FontAwesomeIcon icon={faExchangeAlt} className="h-4 w-4 mr-2" />
                             Cambiar Padre
                         </button>
+
+                        <button
+                            onClick={() => onDelete(selectedItem)}
+                            className="w-full flex items-center justify-center px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium"
+                        >
+                            <FontAwesomeIcon icon={faTrash} className="h-4 w-4 mr-2" />
+                            Eliminar
+                        </button>
                     </div>
                 </div>
             )}
@@ -457,41 +474,200 @@ const DetailsPanel = ({ selectedItem, onItemUpdate, onAddChild, onChangeParent }
 export default function GestionOpciones() {
     const [treeData, setTreeData] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
-    const { token } = useSessionData();
+    const [isChangeParentModalOpen, setIsChangeParentModalOpen] = useState(false);
+    const [isAddChildModalOpen, setIsAddChildModalOpen] = useState(false);
+    const [data, setData] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const { userlogued,token } = useSessionData();
+
+    // Función para cargar los datos iniciales desde la API
+    const cargarDatosIniciales = async () => {
+        try {
+            setIsLoading(true);
+            setError(null);
+            
+            const opciones = await obtenerOpcionesInterfaz(token);
+            
+            if (opciones) {
+                setData(opciones);
+                const tree = buildTree(opciones);
+                setTreeData(tree);
+            } else {
+                setError('No se pudieron cargar las opciones de interfaz');
+            }
+        } catch (err) {
+            console.error('Error al cargar datos iniciales:', err);
+            setError('Error al cargar los datos iniciales');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const tree = buildTree(data);
-        setTreeData(tree);
-    }, []);
+        if (token) {
+            cargarDatosIniciales();
+        }
+    }, [token]);
 
     const handleItemSelect = (item) => {
         setSelectedItem(item);
     };
 
-    const handleItemUpdate = (updatedItem) => {
-        // Actualizar el item en el array de datos
-        const updatedData = data.map(item =>
-            item.id === updatedItem.id ? updatedItem : item
-        );
+    const handleItemUpdate = async (updatedItem) => {
+        try {
+            // Preparar los datos para la actualización usando la función del controlador
+            const datosActualizacion = prepararDatosActualizacionOpcion(
+                updatedItem,
+                selectedItem,
+                userlogued // Usar userlogued en lugar de 'admin'
+            );
 
-        // Reconstruir el árbol con los datos actualizados
-        const updatedTree = buildTree(updatedData);
-        setTreeData(updatedTree);
+            // Mostrar en consola el JSON que se enviará
+            console.log('JSON que se enviará para editar:', JSON.stringify(datosActualizacion, null, 2));
 
-        // Actualizar el item seleccionado
-        setSelectedItem(updatedItem);
+            // Llamar a la función de actualización del controlador
+            const resultado = await actualizarOpcionInterfaz(updatedItem.id, datosActualizacion, token);
 
-        console.log('Item actualizado:', updatedItem);
+            if (resultado) {
+                // Si la actualización fue exitosa, actualizar el estado local
+                const updatedData = data.map(item =>
+                    item.id === updatedItem.id ? { ...updatedItem, ...datosActualizacion } : item
+                );
+
+                setData(updatedData);
+
+                // Reconstruir el árbol con los datos actualizados
+                const updatedTree = buildTree(updatedData);
+                setTreeData(updatedTree);
+
+                // Actualizar el item seleccionado
+                setSelectedItem({ ...updatedItem, ...datosActualizacion });
+
+                console.log('Item actualizado exitosamente:', resultado);
+            }
+        } catch (error) {
+            console.error('Error al actualizar el item:', error);
+        }
     };
 
     const handleAddChild = (item) => {
-        // Placeholder para funcionalidad futura
-        console.log('Agregar hijo a:', item.nombre);
+        setIsAddChildModalOpen(true);
     };
 
     const handleChangeParent = (item) => {
-        // Placeholder para funcionalidad futura
-        console.log('Cambiar padre de:', item.nombre);
+        setIsChangeParentModalOpen(true);
+    };
+
+    const handleChangeParentConfirm = async (currentItem, newParent) => {
+        try {
+            // Crear el item actualizado con el nuevo padre
+            const updatedItem = {
+                ...currentItem,
+                idPadre: newParent.id,
+                nivel: newParent.id === null ? 0 : newParent.nivel + 1
+            };
+
+            // Preparar los datos para la actualización usando la función del controlador
+            const datosActualizacion = prepararDatosActualizacionOpcion(
+                updatedItem,
+                currentItem,
+                userlogued // Usar userlogued para el usuario de actualización
+            );
+
+            // Mostrar en consola el JSON que se enviará para la actualización
+            console.log('JSON que se enviará para cambiar padre:', JSON.stringify(datosActualizacion, null, 2));
+
+            // Llamar a la API para actualizar la opción
+            const resultado = await actualizarOpcionInterfaz(currentItem.id, datosActualizacion, token);
+
+            if (resultado) {
+                // Si la actualización fue exitosa, recargar los datos desde la API
+                await cargarDatosIniciales();
+                
+                // Buscar el elemento actualizado en los datos y seleccionarlo
+                const elementoActualizado = data.find(item => item.id === currentItem.id);
+                
+                if (elementoActualizado) {
+                    setSelectedItem(elementoActualizado);
+                }
+
+                console.log('Padre cambiado exitosamente:', {
+                    item: currentItem.nombre,
+                    newParent: newParent.nombre,
+                    resultado
+                });
+            }
+        } catch (error) {
+            console.error('Error al cambiar el padre:', error);
+        }
+    };
+
+    const handleCloseChangeParentModal = () => {
+        setIsChangeParentModalOpen(false);
+    };
+
+    const handleAddChildConfirm = async (formData) => {
+        try {
+            // Preparar los datos para la nueva opción usando el controlador
+            const datosParaRegistro = prepararDatosNuevaOpcion({
+                nombre: formData.nombre,
+                rutaVista: formData.rutaVista,
+                descripcion: formData.descripcion,
+                estado: formData.estado,
+                nivel: selectedItem ? selectedItem.nivel + 1 : 0,
+                idPadre: selectedItem ? selectedItem.id : null
+            }, userlogued);
+
+            // Mostrar en consola el JSON que se enviará para el registro
+            console.log('JSON que se enviará para crear nuevo hijo:', JSON.stringify(datosParaRegistro, null, 2));
+
+            // Llamar a la API para registrar la nueva opción
+            const resultado = await registrarOpcionInterfaz(datosParaRegistro, token);
+
+            if (resultado) {
+                // Si el registro fue exitoso, recargar los datos desde la API
+                await cargarDatosIniciales();
+                
+                // Buscar el nuevo elemento en los datos actualizados y seleccionarlo
+                const nuevoElemento = data.find(item => 
+                    item.nombre === formData.nombre && 
+                    item.idPadre === (selectedItem ? selectedItem.id : null)
+                );
+                
+                if (nuevoElemento) {
+                    setSelectedItem(nuevoElemento);
+                }
+
+                console.log('Nuevo hijo registrado exitosamente:', resultado);
+            }
+        } catch (error) {
+            console.error('Error al registrar nuevo hijo:', error);
+        }
+    };
+
+    const handleCloseAddChildModal = () => {
+        setIsAddChildModalOpen(false);
+    };
+
+    // Función para manejar la eliminación de un elemento
+    const handleDelete = async (item) => {
+        try {
+            // Llamar a la función de eliminación que ya incluye las confirmaciones
+            const resultado = await eliminarOpcionInterfaz(item.id, token);
+
+            if (resultado) {
+                // Si la eliminación fue exitosa, recargar los datos desde la API
+                await cargarDatosIniciales();
+                
+                // Limpiar la selección ya que el elemento fue eliminado
+                setSelectedItem(null);
+
+                console.log('Elemento eliminado exitosamente:', item);
+            }
+        } catch (error) {
+            console.error('Error al eliminar elemento:', error);
+        }
     };
 
     return (
@@ -516,7 +692,28 @@ export default function GestionOpciones() {
                             scrollBehavior: 'smooth'
                         }}
                     >
-                        {treeData.length > 0 ? (
+                        {isLoading ? (
+                            <div className="flex items-center justify-center h-full text-gray-500">
+                                <div className="text-center">
+                                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                                    <p className="text-lg font-medium">Cargando opciones...</p>
+                                </div>
+                            </div>
+                        ) : error ? (
+                            <div className="flex items-center justify-center h-full text-red-500">
+                                <div className="text-center">
+                                    <FontAwesomeIcon icon={faTimes} className="h-12 w-12 text-red-300 mb-4" />
+                                    <p className="text-lg font-medium">Error al cargar datos</p>
+                                    <p className="text-sm mt-2">{error}</p>
+                                    <button
+                                        onClick={cargarDatosIniciales}
+                                        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                                    >
+                                        Reintentar
+                                    </button>
+                                </div>
+                            </div>
+                        ) : treeData.length > 0 ? (
                             <div className="space-y-1 min-h-full">
                                 {treeData.map(node => (
                                     <TreeNode
@@ -556,9 +753,30 @@ export default function GestionOpciones() {
                         onItemUpdate={handleItemUpdate}
                         onAddChild={handleAddChild}
                         onChangeParent={handleChangeParent}
+                        onDelete={handleDelete}
+                        data={data}
                     />
                 </div>
             </div>
+
+            {/* Modal para cambiar padre */}
+            <ChangeParentModal
+                isOpen={isChangeParentModalOpen}
+                onClose={handleCloseChangeParentModal}
+                onConfirm={handleChangeParentConfirm}
+                currentItem={selectedItem}
+                treeData={treeData}
+                allItems={data}
+            />
+
+            {/* Modal para agregar hijo */}
+            <AddChildModal
+                isOpen={isAddChildModalOpen}
+                onClose={handleCloseAddChildModal}
+                onConfirm={handleAddChildConfirm}
+                parentItem={selectedItem}
+                allItems={data}
+            />
         </div>
     );
 }
