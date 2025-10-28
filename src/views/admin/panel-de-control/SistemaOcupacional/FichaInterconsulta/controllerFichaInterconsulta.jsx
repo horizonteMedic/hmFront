@@ -154,7 +154,7 @@ export const GetInfoEspecialidad = async (
             sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
             PA: `${res.sistolica}/${res.diastolica}`,
             edadPaciente: `${res.edadPaciente}`,
-            dniUser: res.dniUsuario,
+            dniUser: prev.dniUser,
             fechaExamen: prev.fechaExamen,
             motivo: prev.motivo
             
