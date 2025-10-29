@@ -58,8 +58,16 @@ export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporte
         token
     )
         .then(async (res) => {
-            if (res.norden || res.norden_n_orden|| res.n_orden) {
-                const nombre = res.nameJasper||res.namejasper;
+            if (res.norden || res.norden_n_orden || res.n_orden) {
+                if (!(res.dataPrincipal ?? true)) {
+                    Swal.fire(
+                        "Error",
+                        "No existe registro",
+                        "error"
+                    );
+                    return;
+                }
+                const nombre = res.nameJasper || res.namejasper;
                 console.log(nombre)
                 console.log(res)
                 const modulo = await jasperModules[
@@ -71,10 +79,11 @@ export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporte
                     modulo.default({ ...res, ...datosFooter });
                 }
             }
-        })
-        .finally(() => {
             Swal.close();
-        });
+        })
+    // .finally(() => {
+
+    // });
 };
 
 export const getInfoTablaDefault = (nombreSearch, codigoSearch, setData, token, obtenerReporteInfoTablaUrl) => {
@@ -156,7 +165,7 @@ export const GetInfoServicioDefault = async (
             `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=false`,
             token
         );
-        if (res?.norden || res?.norden_n_orden||res?.n_orden) {
+        if (res?.norden || res?.norden_n_orden || res?.n_orden) {
             return res;
         } else {
             Swal.fire("Error", "Ocurrió un error al traer los datos", "error");
