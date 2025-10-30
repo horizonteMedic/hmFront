@@ -218,7 +218,7 @@ export default function EKG() {
             </div>
             <label className="flex items-center gap-[18px]">
               <span className="font-semibold min-w-[80px] max-w-[80px]">
-                Poderosa:
+                Informe Especialista:
               </span>
               <input
                 type="checkbox"

@@ -167,7 +167,7 @@ export default function CertificadoAlturaPoderosa() {
         pToracicoEspiracion: "",
 
         // Examen físico detallado
-        apreciacionGeneral: "ABEB, DESPIERTO, OTEP",
+        apreciacionGeneral: "ABEG, DESPIERTO, OTEP",
         cabeza: "NORMOCÉFALO, CENTRAL, MÓVIL",
         piel: "TRIGUEÑO, TURGENTE, HIDRATADO",
         movilidadOcular: "CONSERVADA",

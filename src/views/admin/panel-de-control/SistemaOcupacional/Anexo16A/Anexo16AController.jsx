@@ -194,8 +194,8 @@ function evaluarObservacionesEditar(res, set) {
             if (imcValue >= 25 && imcValue < 29.91) {
                 nuevasObservaciones += "- SOBREPESO: DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
             } else if (imcValue >= 29.91 && imcValue < 35) {
-                obesidadMorbida = true;
-                obesidadMorbidaRed = true;
+                // obesidadMorbida = true;
+                // obesidadMorbidaRed = true;
                 nuevasObservaciones += "- OBESIDAD I: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
             } else if (imcValue >= 35) {
                 obesidadMorbida = true;
