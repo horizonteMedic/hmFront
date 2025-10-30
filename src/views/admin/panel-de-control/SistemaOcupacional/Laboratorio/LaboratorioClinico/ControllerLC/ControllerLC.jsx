@@ -42,6 +42,7 @@ export const VerifyTR = async (nro,tabla,token,set,setO,sede,setSearchMedico) =>
     Loading('Validando datos')
     getFetch(`/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,token)
     .then((res) => {
+      console.log(res)
         if (res.id === 0) {
             GetInfoPac(nro,set,token,sede)
         } else {
@@ -70,9 +71,12 @@ export const GetInfoPac = (nro,set,token,sede) => {
 export const GetInfoExamenHematologia = (nro,tabla,set,setO,token,setSearchMedico) => {
   getFetch(`/api/v01/ct/laboratorio/obtenerReporteLaboratorioClinico?nOrden=${nro}&nameService=${tabla}`,token)
   .then((res) => {
-    console.log(res)
-    console.log(res.chkPositivo === true ? 'POSITIVO' : res.chkNegativo === true ? 'NEGATIVO' : res.chkNegativo === false && res.chkPositivo === false ? 'N/A' : '')
     if (res.norden) {
+       Swal.fire(
+          "Alerta",
+          "Este paciente ya cuenta con registros en Laboratorio Clinico",
+          "warning"
+      )
       set(prev => ({
         ...prev,
         ...res,
@@ -148,9 +152,6 @@ export const GetInfoExamenHematologia = (nro,tabla,set,setO,token,setSearchMedic
       }))
       setSearchMedico(res.resLab)
     }
-  })
-  .finally(() => {
-    Swal.close()
   })
 }
 

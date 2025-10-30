@@ -485,7 +485,7 @@ export default function Anexo2(data = {}) {
       visionColores: data.visionColores_v_colores ?? "",
       // Hallazgos
       hallazgos: {
-        enfermedadesOculares: data.enfermedadesOcularesOftalmo_e_oculares ?? "",
+        enfermedadesOculares: `${data.enfermedadesOcularesOftalmo_e_oculares ?? ""}\n${data.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? ""}`,
         reflejosPupilares: data.reflejosPupilares_r_pupilares ?? ""
       }
     },
@@ -1089,8 +1089,8 @@ export default function Anexo2(data = {}) {
     renderCheckbox(antecedentes.diabetes, xDiabetesSi, yDiabetesSi, xDiabetesNo, yDiabetesNo);
     renderCheckbox(antecedentes.otros, xOtrosSi, yOtrosSi, xOtrosNo, yOtrosNo);
     doc.setFont("helvetica", "normal").setFontSize(5);
-    doc.text(antecedentes.otrosTextoAnte.toUpperCase(), xOtrosSi + 10, yOtrosSi-2, { maxWidth: 45 });
-doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text(antecedentes.otrosTextoAnte.toUpperCase(), xOtrosSi + 10, yOtrosSi - 2, { maxWidth: 45 });
+    doc.setFont("helvetica", "normal").setFontSize(9);
     // Hábitos Nocivos
     if (antecedentes.habitosNocivos) {
       // Alcohol - Checkbox + campos de texto
