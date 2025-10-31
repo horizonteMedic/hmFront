@@ -79,11 +79,11 @@ export default function CriteriosPsicologicosII({
               { name: "motivacion", label: "8. Motivación" }
             ]}
             options={[
-              { value: "PD", label: "PD" },
-              { value: "NM", label: "NM" },
-              { value: "A", label: "A" },
-              { value: "D", label: "D" },
-              { value: "E", label: "E" }
+              { value: "PD", label: "Poco Desarrollado" },
+              { value: "NM", label: "Necesita Mejorar" },
+              { value: "A", label: "Adecuado" },
+              { value: "D", label: "Destacado" },
+              { value: "E", label: "Excepcional" }
             ]}
             form={form}
             handleRadioButton={handleRadioButton}
