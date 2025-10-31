@@ -544,22 +544,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yPos + alturaFilaMotivo, tablaInicioX + tablaAncho, yPos + alturaFilaMotivo);
 
   // === COLUMNA 2: SELLO Y FIRMA DEL MÉDICO ===
-  const firmaMedicoX = tablaInicioX + 127 ;
-  const firmaMedicoY = yPos ;
   
-  // Agregar firma y sello médico
-  let firmaMedicoUrl = getSign(datosFinales, "SELLOFIRMA");
-  if (firmaMedicoUrl) {
-    try {
-      const imgWidth = 45;
-      const imgHeight = 20;
-      const x = firmaMedicoX;
-      const y = firmaMedicoY;
-      doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
-    } catch (error) {
-      console.log("Error cargando firma del médico:", error);
-    }
-  }
 
   doc.setFont("helvetica", "normal").setFontSize(8);
   // Dividir el texto en líneas y agregar guión a cada una
@@ -744,6 +729,23 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
       doc.addImage(huellaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
     } catch (error) {
       console.log("Error cargando huella del trabajador:", error);
+    }
+  }
+
+   const firmaMedicoX = 155  ;
+  const firmaMedicoY = 136.73666666666668 ;
+  
+  // Agregar firma y sello médico
+  let firmaMedicoUrl = getSign(datosFinales, "SELLOFIRMA");
+  if (firmaMedicoUrl) {
+    try {
+      const imgWidth = 40;
+      const imgHeight = 15;
+      const x = firmaMedicoX;
+      const y = firmaMedicoY;
+      doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando firma del médico:", error);
     }
   }
   
