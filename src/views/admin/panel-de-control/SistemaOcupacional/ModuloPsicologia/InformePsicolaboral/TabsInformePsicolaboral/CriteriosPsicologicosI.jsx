@@ -24,11 +24,11 @@ export default function CriteriosPsicologicosI({
               { name: "comprensionVerbal", label: "6. Comprensión verbal" }
             ]}
             options={[
-              { value: "I", label: "I" },
-              { value: "NPI", label: "NPI" },
-              { value: "NP", label: "NP" },
-              { value: "NPS", label: "NPS" },
-              { value: "S", label: "S" }
+              { value: "I", label: "Inferior" },
+              { value: "NPI", label: "Nivel Promedio Inferior" },
+              { value: "NP", label: "Nivel Promedio" },
+              { value: "NPS", label: "Nivel Promedio Superior" },
+              { value: "S", label: "Superior" }
             ]}
             form={form}
             handleRadioButton={handleRadioButton}
@@ -51,11 +51,11 @@ export default function CriteriosPsicologicosI({
               { name: "ansiedadRasgo", label: "6. Ansiedad RASGO" }
             ]}
             options={[
-              { value: "B", label: "B" },
-              { value: "NPB", label: "NPB" },
-              { value: "NP", label: "NP" },
-              { value: "NPA", label: "NPA" },
-              { value: "A", label: "A" }
+              { value: "B", label: "Bajo" },
+              { value: "NPB", label: "Nibel Promedio Bajo" },
+              { value: "NP", label: "Nivel Promedio" },
+              { value: "NPA", label: "Nivel Promedio Alto" },
+              { value: "A", label: "Alto" }
             ]}
             form={form}
             handleRadioButton={handleRadioButton}

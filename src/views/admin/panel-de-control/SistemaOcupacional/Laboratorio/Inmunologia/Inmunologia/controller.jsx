@@ -70,7 +70,11 @@ export const GetInfoInmunologiaLab = (nro,tabla,set,token) => {
   getFetch(`/api/v01/ct/inmunologia/obtenerReporteInmunologia?nOrden=${nro}&nameService=${tabla}`,token)
   .then((res) => {
     if (res.norden) {
-        console.log(res)
+       Swal.fire(
+          "Alerta",
+          "Este paciente ya cuenta con registros de Inmunología",
+          "warning"
+      )
       set(prev => ({
         ...prev,
         ...res,
@@ -86,9 +90,6 @@ export const GetInfoInmunologiaLab = (nro,tabla,set,token) => {
     } else {
       Swal.fire('Error', 'Ocurrio un error al traer los datos','error')
     }
-  })
-  .finally(() => {
-    Swal.close()
   })
 }
 

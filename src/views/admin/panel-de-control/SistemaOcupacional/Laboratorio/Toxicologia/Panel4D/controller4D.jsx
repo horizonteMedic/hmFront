@@ -65,10 +65,15 @@ export const GetInfoPac = (nro,set,token,sede) => {
 }
 
 export const GetInfoPanel4D = (nro,tabla,set,token) => {
+  console.log(token)
   getFetch(`/api/v01/ct/toxicologia/obtenerReportePanel4D?nOrden=${nro}&nameService=${tabla}`,token)
   .then((res) => {
     if (res.norden) {
-        console.log(res)
+       Swal.fire(
+          "Alerta",
+          "Este paciente ya cuenta con registros de Panel 4D",
+          "warning"
+      )
       set(prev => ({
         ...prev,
         ...res,

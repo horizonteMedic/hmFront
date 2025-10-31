@@ -70,7 +70,11 @@ export const GetInfoPanel5D = (nro,tabla,set,token) => {
   getFetch(`/api/v01/ct/toxicologia/obtenerReportePanel5D?nOrden=${nro}&nameService=${tabla}`,token)
   .then((res) => {
     if (res.norden) {
-        console.log(res)
+       Swal.fire(
+          "Alerta",
+          "Este paciente ya cuenta con registros de Panel 5D",
+          "warning"
+      )
       set(prev => ({
         ...prev,
         ...res,
@@ -84,9 +88,6 @@ export const GetInfoPanel5D = (nro,tabla,set,token) => {
     } else {
       Swal.fire('Error', 'Ocurrio un error al traer los datos','error')
     }
-  })
-  .finally(() => {
-    Swal.close()
   })
 }
 

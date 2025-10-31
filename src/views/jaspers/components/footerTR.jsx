@@ -37,7 +37,8 @@ function footerTR(doc,datos) {
   };
 
    // Ajustamos la fuente a normal (no negrita) y color a negro
-   doc.setFont("helvetica", "normal").setFontSize(7);
+   const fontSize = (datos && typeof datos === 'object' && datos.fontSize) ? datos.fontSize : 7;
+   doc.setFont("helvetica", "normal").setFontSize(fontSize);
    doc.setTextColor(0, 0, 0);
  
    // Crear líneas de texto centradas

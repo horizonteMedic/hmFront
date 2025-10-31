@@ -81,7 +81,11 @@ export const GetInfoCoprocultivo = (nro, tabla, set, token) => {
   )
     .then((res) => {
       if (res.norden) {
-        console.log(res);
+         Swal.fire(
+          "Alerta",
+          "Este paciente ya cuenta con registros de Coprocultivo",
+          "warning"
+      )
         set((prev) => ({
           ...prev,
           ...res,
@@ -106,9 +110,6 @@ export const GetInfoCoprocultivo = (nro, tabla, set, token) => {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
       }
     })
-    .finally(() => {
-      Swal.close();
-    });
 };
 
 export const SubmitCoprocultivoManipulador = async (
