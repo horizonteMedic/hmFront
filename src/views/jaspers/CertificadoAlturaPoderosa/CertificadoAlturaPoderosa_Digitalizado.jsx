@@ -184,11 +184,11 @@ export default function CertificadoAlturaPoderosa_Digitalizado(data = {}) {
     examenFisico: [
       {
         categoria: "SIGNOS VITALES",
-        datos: `PRESION ARTERIAL (mmHg): ${data.sistolicatriaje_sistolica}/${data.diastolicatriaje_diastolica}    PULSO x min: ${data.frecuenciacardiacatriaje_f_cardiaca}    FR x min: ${data.frecuenciarespiratoriatriaje_f_respiratoria}`
+        datos: `PRESION ARTERIAL: ${data.sistolicatriaje_sistolica}/${data.diastolicatriaje_diastolica} mmHg  |  PULSO: ${data.frecuenciacardiacatriaje_f_cardiaca} x min  |  FR: ${data.frecuenciarespiratoriatriaje_f_respiratoria} x min`
       },
       {
         categoria: "ANTROPOMETRIA",
-        datos: `Peso (kg): ${data.pesotriaje_peso}    Talla (m): ${data.tallatriaje_talla}    IMC: ${data.imctriaje_imc}    C. CUELLO en cm: ${data.perimetrocuellotriaje_perimetro_cuello}`
+        datos: `PESO: ${data.pesotriaje_peso} kg  |  TALLA: ${data.tallatriaje_talla} m  |  IMC: ${data.imctriaje_imc}  |  P. CUELLO: ${data.perimetrocuellotriaje_perimetro_cuello} cm`
       },
       {
         categoria: "APRECIACION GENERAL",
@@ -205,82 +205,39 @@ export default function CertificadoAlturaPoderosa_Digitalizado(data = {}) {
     ]
   };
 
-  // Función para convertir texto a formato gramaticalmente correcto (primera letra mayúscula, resto minúsculas)
+  // Función para convertir texto a mayúsculas
   const formatearTextoGramatical = (texto) => {
     if (!texto || typeof texto !== 'string') return texto;
-    
-    // Lista de textos que deben mantenerse en mayúsculas
-    const textosMayusculas = ['N/A', 'O.D', 'O.I', 'RCRR', 'HRH', 'B/D', 'RHA(+)', 'COVID-19', 'VIH', 'SIDA', 'TAC', 'RMN', 'ECG', 'EEG'];
-    
-    // Dividir por líneas para manejar listas con viñetas
-    const lineas = texto.split('\n');
-    const lineasFormateadas = lineas.map(linea => {
-      if (!linea.trim()) return linea; // Mantener líneas vacías
-      
-      // Si la línea empieza con "- " (viñeta), formatear después del guión
-      if (linea.trim().startsWith('- ')) {
-        const contenido = linea.trim().substring(2); // Quitar "- "
-        return '- ' + contenido.charAt(0).toUpperCase() + contenido.slice(1).toLowerCase();
-      }
-      
-      // Si la línea empieza con ". " (punto), formatear después del punto
-      if (linea.trim().startsWith('. ')) {
-        const contenido = linea.trim().substring(2); // Quitar ". "
-        return '. ' + contenido.charAt(0).toUpperCase() + contenido.slice(1).toLowerCase();
-      }
-      
-      // Para líneas normales, formatear palabra por palabra respetando textos específicos
-      const palabras = linea.split(' ');
-      const palabrasFormateadas = palabras.map((palabra, index) => {
-        // Verificar si la palabra (sin puntuación) está en la lista de mayúsculas
-        const palabraSinPuntuacion = palabra.replace(/[.,:;()[\]{}]/g, '');
-        const debeSerMayuscula = textosMayusculas.some(texto => 
-          texto.toLowerCase() === palabraSinPuntuacion.toLowerCase()
-        );
-        
-        if (debeSerMayuscula) {
-          // Mantener la palabra en mayúsculas
-          return palabra.toUpperCase();
-        } else if (index === 0) {
-          // Primera palabra: primera letra mayúscula, resto minúsculas
-          return palabra.charAt(0).toUpperCase() + palabra.slice(1).toLowerCase();
-        } else {
-          // Palabras siguientes: minúsculas
-          return palabra.toLowerCase();
-        }
-      });
-      
-      return palabrasFormateadas.join(' ');
-    });
-    
-    return lineasFormateadas.join('\n');
+    return texto.toUpperCase();
   };
 
-  // Función para convertir textos específicos a mayúsculas
-  const convertirTextosEspecificosAMayusculas = (texto) => {
+  // Función para formatear datos del examen físico preservando unidades en minúsculas
+  const formatearDatosExamenFisico = (texto) => {
     if (!texto || typeof texto !== 'string') return texto;
-    
-    // Lista de textos que deben estar en mayúsculas
-    const textosMayusculas = [
-      'n/a', 'n/a.', 'n/a,', 'n/a:', 'n/a;', 'n/a)', 'n/a]', 'n/a}', // N/A con diferentes puntuaciones
-      'o.d', 'o.d.', 'o.d,', 'o.d:', 'o.d;', 'o.d)', 'o.d]', 'o.d}', // O.D con diferentes puntuaciones
-      'o.i', 'o.i.', 'o.i,', 'o.i:', 'o.i;', 'o.i)', 'o.i]', 'o.i}', // O.I con diferentes puntuaciones
-      'rcrr', 'rcrr.', 'rcrr,', 'rcrr:', 'rcrr;', 'rcrr)', 'rcrr]', 'rcrr}', // RCRR con diferentes puntuaciones
-      'hrh', 'hrh.', 'hrh,', 'hrh:', 'hrh;', 'hrh)', 'hrh]', 'hrh}', // HRH con diferentes puntuaciones
-      'b/d', 'b/d.', 'b/d,', 'b/d:', 'b/d;', 'b/d)', 'b/d]', 'b/d}', // B/D con diferentes puntuaciones
-      'rha(+)', 'rha(+).', 'rha(+),', 'rha(+):', 'rha(+);', 'rha(+))', 'rha(+)]', 'rha(+)}' // RHA(+) con diferentes puntuaciones
-    ];
-    
-    let textoFormateado = texto;
-    
-    // Reemplazar cada texto específico con su versión en mayúsculas
-    textosMayusculas.forEach(textoEspecifico => {
-      const regex = new RegExp('\\b' + textoEspecifico.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi'); // Word boundary
-      textoFormateado = textoFormateado.replace(regex, textoEspecifico.toUpperCase());
-    });
-    
-    return textoFormateado;
+    // Convertir todo a mayúsculas primero
+    let textoMayusculas = texto.toUpperCase();
+    // Preservar unidades en minúsculas dentro de paréntesis: (mmHg), (kg), (m), (cm)
+    textoMayusculas = textoMayusculas.replace(/\(MMHG\)/gi, '(mmHg)');
+    textoMayusculas = textoMayusculas.replace(/\(KG\)/gi, '(kg)');
+    textoMayusculas = textoMayusculas.replace(/\(M\)/gi, '(m)');
+    textoMayusculas = textoMayusculas.replace(/\(CM\)/gi, '(cm)');
+    // Preservar "x min" en minúsculas
+    textoMayusculas = textoMayusculas.replace(/ X MIN/gi, ' x min');
+    // Preservar "EN cm" en minúsculas
+    textoMayusculas = textoMayusculas.replace(/ EN CM/gi, ' EN cm');
+    // Preservar terminaciones después de valores: " kg", " m", " cm", "mmHg", "x min"
+    // Buscar patrones como " 67.3 KG" o " 1.54 M" seguidos de espacio, fin de línea o |
+    textoMayusculas = textoMayusculas.replace(/(\d+(?:\.\d+)?)\s+KG(\s|$|\|)/gi, '$1 kg$2');
+    // Para "M" evitar coincidir con "IMC", buscar solo cuando está después de un número y antes de espacio, | o fin
+    textoMayusculas = textoMayusculas.replace(/(\d+(?:\.\d+)?)\s+M(\s|$|\|)/gi, '$1 m$2');
+    textoMayusculas = textoMayusculas.replace(/(\d+(?:\.\d+)?)\s+CM(\s|$|\|)/gi, '$1 cm$2');
+    // Preservar "mmHg" después de valores (formato: "118/79 mmHg")
+    textoMayusculas = textoMayusculas.replace(/(\d+\/\d+)\s+MMHG(\s|$|\|)/gi, '$1 mmHg$2');
+    // Preservar "x min" después de valores (formato: "67 x min")
+    textoMayusculas = textoMayusculas.replace(/(\d+(?:\.\d+)?)\s+X\s+MIN(\s|$|\|)/gi, '$1 x min$2');
+    return textoMayusculas;
   };
+
 
   // Usar solo datos reales proporcionados
   const datosFinales = datosReales;
@@ -367,7 +324,7 @@ export default function CertificadoAlturaPoderosa_Digitalizado(data = {}) {
     doc.setLineWidth(0.2);
     
     // Dibujar fondo gris más oscuro
-    doc.setFillColor(160, 160, 160);
+    doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
     
     // Dibujar líneas del header
@@ -479,7 +436,7 @@ export default function CertificadoAlturaPoderosa_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Edad:", tablaInicioX + 47, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.edad + " Años", tablaInicioX + 58, yTexto + 1.5);
+  doc.text(datosFinales.edad + " AÑOS", tablaInicioX + 58, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Sexo:", tablaInicioX + 92, yTexto + 1.5);
@@ -685,12 +642,12 @@ export default function CertificadoAlturaPoderosa_Digitalizado(data = {}) {
     doc.text(formatearTextoGramatical(habito.tipo), tablaInicioX + 2, yPos + 3.5);
     
     // Centrar CANTIDAD
-    const textoCantidadData = convertirTextosEspecificosAMayusculas(formatearTextoGramatical(habito.cantidad || ""));
+    const textoCantidadData = formatearTextoGramatical(habito.cantidad || "");
     const anchoCantidadData = doc.getTextWidth(textoCantidadData);
     doc.text(textoCantidadData, tablaInicioX + colTipoAncho + (colCantidadAncho - anchoCantidadData) / 2, yPos + 3.5);
     
     // Centrar FRECUENCIA
-    const textoFrecuenciaData = convertirTextosEspecificosAMayusculas(formatearTextoGramatical(habito.frecuencia || ""));
+    const textoFrecuenciaData = formatearTextoGramatical(habito.frecuencia || "");
     const anchoFrecuenciaData = doc.getTextWidth(textoFrecuenciaData);
     const colFrecuenciaHabitosAncho = tablaAncho - colTipoAncho - colCantidadAncho;
     doc.text(textoFrecuenciaData, tablaInicioX + colTipoAncho + colCantidadAncho + (colFrecuenciaHabitosAncho - anchoFrecuenciaData) / 2, yPos + 3.5);
@@ -785,7 +742,7 @@ yPos += filaAlturaCage;
     const anchoNumero = doc.getTextWidth(numeroTexto);
     const colNumAncho = xPreg - xNum;
     doc.text(numeroTexto, xNum + (colNumAncho - anchoNumero) / 2, yPos + 3);
-    dibujarTextoConSaltoLinea(formatearTextoGramatical(item.pregunta), xPreg + 2, yPos + 3, colPregAncho - 4);
+    dibujarTextoConSaltoLinea(item.pregunta, xPreg + 2, yPos + 3, colPregAncho - 4);
     
     // Marcar X en SI o NO (centradas)
     if (item.si) {
@@ -851,8 +808,12 @@ yPos += filaAlturaCage;
 
   // Dibujar filas de datos para examen físico con altura dinámica
   datosFinales.examenFisico.forEach((item) => {
+    // Preparar datos formateados para cálculos
+    const datosParaCalculo = (item.categoria === "SIGNOS VITALES" || item.categoria === "ANTROPOMETRIA") 
+      ? formatearDatosExamenFisico(item.datos) 
+      : formatearTextoGramatical(item.datos);
     // Calcular altura necesaria para el texto de datos
-    const alturaTextoDatos = calcularAlturaTextoCreciente(doc, item.datos, colDatosAncho - 4, 8);
+    const alturaTextoDatos = calcularAlturaTextoCreciente(doc, datosParaCalculo, colDatosAncho - 4, 8);
     const alturaFilaNecesaria = Math.max(5, alturaTextoDatos + 2); // Altura mínima de 5mm
     
     // Dibujar líneas de la fila con altura dinámica
@@ -867,13 +828,14 @@ yPos += filaAlturaCage;
     doc.text(formatearTextoGramatical(item.categoria), tablaInicioX + 2, yPos + 3.5);
     
     doc.setFont("helvetica", "normal").setFontSize(8);
-    dibujarTextoConSaltoLinea(formatearTextoGramatical(item.datos), tablaInicioX + colCategoriaAncho + 2, yPos + 3.5, colDatosAncho - 4);
+    // Usar datos ya formateados anteriormente
+    dibujarTextoConSaltoLinea(datosParaCalculo, tablaInicioX + colCategoriaAncho + 2, yPos + 3.5, colDatosAncho - 4);
     
     yPos += alturaFilaNecesaria;
   });
  
-  // Fila celeste para OJOS
-  doc.setFillColor(173, 216, 230); // Color celeste
+  // Fila 199, 241, 255ste para OJOS
+  doc.setFillColor(173, 216, 230); // Color 199, 241, 255ste
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -882,7 +844,7 @@ yPos += filaAlturaCage;
   
   // Contenido de la fila OJOS
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("OJOS:", tablaInicioX + 2, yPos + 3.5);
+  doc.text("OÍDOS:", tablaInicioX + 2, yPos + 3.5);
 
   yPos += filaAltura;
   
@@ -898,7 +860,7 @@ yPos += filaAlturaCage;
   
   // Contenido de la fila Motilidad
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Motilidad:", tablaInicioX + 2, yPos + 3.5);
+  doc.text("MOTILIDAD:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   if (motilidadData) {
     dibujarTextoConSaltoLinea(formatearTextoGramatical(motilidadData), tablaInicioX + 25, yPos + 3.5, tablaAncho - 30);
@@ -1080,11 +1042,12 @@ yPos += filaAlturaCage;
   const colSistemaAncho = 60; // SISTEMA
   const colHallazgosAncho = 140; // HALLAZGOS
   
-  // Dibujar fila para OJOS con altura dinámica
+  // Dibujar fila para OÍDOS con altura dinámica
   const odData = data.otoscopiaOd_txtotoscopiaod;
   const oiData = data.otoscopiaOi_txtotoscopiaoi;
-  const ojosData = `Otoscopia     O.D: ${odData || ''} O.I: ${oiData || ''}`;
-  const alturaOjos = (odData || oiData) ? calcularAlturaTextoCreciente(doc, formatearTextoGramatical(convertirTextosEspecificosAMayusculas(ojosData)), colHallazgosAncho - 4, 8) : 0;
+  // Preparar texto con divisiones para cálculo de altura
+  const textoOidosCompleto = `OTOSCOPIA  |  O.D: ${odData || ''}  |  O.I: ${oiData || ''}`;
+  const alturaOjos = (odData || oiData) ? calcularAlturaTextoCreciente(doc, formatearTextoGramatical(textoOidosCompleto), colHallazgosAncho - 4, 8) : 0;
   const alturaFilaOjos = (odData || oiData) ? Math.max(5, alturaOjos + 2) : filaAlturaExamenDetallado;
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaOjos);
@@ -1093,19 +1056,71 @@ yPos += filaAlturaCage;
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaFilaOjos, tablaInicioX + tablaAncho, yPos + alturaFilaOjos);
   
-  // Contenido de la fila OJOS
+  // Contenido de la fila OÍDOS
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("OJOS:", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("OÍDOS:", tablaInicioX + 2, yPos + 3.5);
+  
+  // Dibujar cada parte con su formato correspondiente
   if (odData || oiData) {
-    dibujarTextoConSaltoLinea(formatearTextoGramatical(convertirTextosEspecificosAMayusculas(ojosData)), tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
+    let xActual = tablaInicioX + colSistemaAncho + 2;
+    let yActual = yPos + 3.5;
+    
+    // OTOSCOPIA en negrita
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("OTOSCOPIA", xActual, yActual);
+    xActual += doc.getTextWidth("OTOSCOPIA") + 3;
+    
+    // División
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("|", xActual, yActual);
+    xActual += doc.getTextWidth("|") + 3;
+    
+    // O.D: en negrita
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("O.D:", xActual, yActual);
+    xActual += doc.getTextWidth("O.D:") + 2;
+    
+    // Datos O.D en normal (con posible salto de línea)
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const odTexto = formatearTextoGramatical(odData || '');
+    const anchoDisponibleOD = colHallazgosAncho - (xActual - tablaInicioX - colSistemaAncho) - 30; // Reservar espacio para O.I
+    const lineasOD = doc.splitTextToSize(odTexto, Math.max(anchoDisponibleOD, 30));
+    let yODActual = yActual;
+    lineasOD.forEach((linea, index) => {
+      doc.text(linea, xActual, yODActual);
+      if (index < lineasOD.length - 1) {
+        yODActual += doc.internal.getFontSize() * 0.35;
+      }
+    });
+    
+    // Guardar Y inicial para alinear O.I con la primera línea
+    const yOIInicial = yPos + 3.5;
+    
+    // Calcular posición X para O.I (aproximadamente mitad)
+    xActual = tablaInicioX + colSistemaAncho + colHallazgosAncho / 2;
+    
+    // División (alinear con primera línea de O.D)
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("|", xActual, yOIInicial);
+    xActual += doc.getTextWidth("|") + 3;
+    
+    // O.I: en negrita (alinear con primera línea de O.D)
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("O.I:", xActual, yOIInicial);
+    xActual += doc.getTextWidth("O.I:") + 2;
+    
+    // Datos O.I en normal (con posible salto de línea)
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const oiTexto = formatearTextoGramatical(oiData || '');
+    const anchoDisponibleOI = colHallazgosAncho - (xActual - tablaInicioX - colSistemaAncho) - 4;
+    dibujarTextoConSaltoLinea(oiTexto, xActual, yOIInicial, Math.max(anchoDisponibleOI, 30));
   }
   
   yPos += alturaFilaOjos;
   
   // Dibujar fila para NARIZ con altura dinámica
   const narizData = data.nariz_txtnariz;
-  const alturaNariz = narizData ? calcularAlturaTextoCreciente(doc, formatearTextoGramatical(convertirTextosEspecificosAMayusculas(narizData)), colHallazgosAncho - 4, 8) : 0;
+  const alturaNariz = narizData ? calcularAlturaTextoCreciente(doc, formatearTextoGramatical(narizData), colHallazgosAncho - 4, 8) : 0;
   const alturaFilaNariz = narizData ? Math.max(5, alturaNariz + 2) : filaAlturaExamenDetallado;
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaNariz);
@@ -1119,14 +1134,14 @@ yPos += filaAlturaCage;
   doc.text("NARIZ:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   if (narizData) {
-    dibujarTextoConSaltoLinea(formatearTextoGramatical(convertirTextosEspecificosAMayusculas(narizData)), tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
+    dibujarTextoConSaltoLinea(formatearTextoGramatical(narizData), tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
   }
   
   yPos += alturaFilaNariz;
   
   // Dibujar fila para AP. RESPIRATORIO con altura dinámica
   const respiratorioData = data.apRespiratorio_txtaprespiratorio;
-  const alturaRespiratorio = respiratorioData ? calcularAlturaTextoCreciente(doc, formatearTextoGramatical(convertirTextosEspecificosAMayusculas(respiratorioData)), colHallazgosAncho - 4, 8) : 0;
+  const alturaRespiratorio = respiratorioData ? calcularAlturaTextoCreciente(doc, formatearTextoGramatical(respiratorioData), colHallazgosAncho - 4, 8) : 0;
   const alturaFilaRespiratorio = respiratorioData ? Math.max(5, alturaRespiratorio + 2) : filaAlturaExamenDetallado;
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaRespiratorio);
@@ -1140,14 +1155,14 @@ yPos += filaAlturaCage;
   doc.text("AP. RESPIRATORIO:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   if (respiratorioData) {
-    dibujarTextoConSaltoLinea(formatearTextoGramatical(convertirTextosEspecificosAMayusculas(respiratorioData)), tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
+    dibujarTextoConSaltoLinea(formatearTextoGramatical(respiratorioData), tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
   }
   
   yPos += alturaFilaRespiratorio;
   
   // Dibujar fila para AP. CARDIOVASCULAR con altura dinámica
   const cardiovascularData = data.apCardiovascular_txtapcardiovascuar;
-  const alturaCardiovascular = cardiovascularData ? calcularAlturaTextoCreciente(doc, formatearTextoGramatical(convertirTextosEspecificosAMayusculas(cardiovascularData)), colHallazgosAncho - 4, 8) : 0;
+  const alturaCardiovascular = cardiovascularData ? calcularAlturaTextoCreciente(doc, formatearTextoGramatical(cardiovascularData), colHallazgosAncho - 4, 8) : 0;
   const alturaFilaCardiovascular = cardiovascularData ? Math.max(5, alturaCardiovascular + 2) : filaAlturaExamenDetallado;
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaCardiovascular);
@@ -1161,14 +1176,14 @@ yPos += filaAlturaCage;
   doc.text("AP. CARDIOVASCULAR:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   if (cardiovascularData) {
-    dibujarTextoConSaltoLinea(formatearTextoGramatical(convertirTextosEspecificosAMayusculas(cardiovascularData)), tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
+    dibujarTextoConSaltoLinea(formatearTextoGramatical(cardiovascularData), tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
   }
   
   yPos += alturaFilaCardiovascular;
   
   // Dibujar fila para ABDOMEN con altura dinámica
   const abdomenData = data.abdomen_txtabdomen;
-  const alturaAbdomen = abdomenData ? calcularAlturaTextoCreciente(doc, formatearTextoGramatical(convertirTextosEspecificosAMayusculas(abdomenData)), colHallazgosAncho - 4, 8) : 0;
+  const alturaAbdomen = abdomenData ? calcularAlturaTextoCreciente(doc, formatearTextoGramatical(abdomenData), colHallazgosAncho - 4, 8) : 0;
   const alturaFilaAbdomen = abdomenData ? Math.max(5, alturaAbdomen + 2) : filaAlturaExamenDetallado;
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaAbdomen);
@@ -1182,7 +1197,7 @@ yPos += filaAlturaCage;
   doc.text("ABDOMEN:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   if (abdomenData) {
-    dibujarTextoConSaltoLinea(formatearTextoGramatical(convertirTextosEspecificosAMayusculas(abdomenData)), tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
+    dibujarTextoConSaltoLinea(formatearTextoGramatical(abdomenData), tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
   }
   
   yPos += alturaFilaAbdomen;
@@ -1230,8 +1245,8 @@ yPos += filaAlturaCage;
   yPos += alturaFilaColumna;
   
   // === SECCIÓN NEUROLÓGICO ===
-  // Fila para el título NEUROLÓGICO (color celeste)
-  doc.setFillColor(173, 216, 230); // Color celeste
+  // Fila para el título NEUROLÓGICO (color 199, 241, 255ste)
+  doc.setFillColor(173, 216, 230); // Color 199, 241, 255ste
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1381,8 +1396,8 @@ yPos += filaAlturaCage;
   });
   
   // === SECCIÓN EXAMENES COMPLEMENTARIOS ===
-  // Fila para el título AUDIOMETRÍA (color celeste)
-  doc.setFillColor(173, 216, 230); // Color celeste
+  // Fila para el título AUDIOMETRÍA (color 199, 241, 255ste)
+  doc.setFillColor(173, 216, 230); // Color 199, 241, 255ste
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1466,7 +1481,7 @@ yPos += filaAlturaCage;
   ];
   
   valoresOD.forEach((valor, index) => {
-    const valorFormateado = convertirTextosEspecificosAMayusculas(valor);
+    const valorFormateado = formatearTextoGramatical(valor);
     const anchoTexto = doc.getTextWidth(valorFormateado);
     const anchoColumna = colFrecuenciaAncho;
     doc.text(valorFormateado, posicionesX[index] + (anchoColumna - anchoTexto) / 2, yPos + 3);
@@ -1505,7 +1520,7 @@ yPos += filaAlturaCage;
   ];
   
   valoresOI.forEach((valor, index) => {
-    const valorFormateado = convertirTextosEspecificosAMayusculas(valor);
+    const valorFormateado = formatearTextoGramatical(valor);
     const anchoTexto = doc.getTextWidth(valorFormateado);
     const anchoColumna = colFrecuenciaAncho;
     doc.text(valorFormateado, posicionesX[index] + (anchoColumna - anchoTexto) / 2, yPos + 3);
@@ -1528,8 +1543,8 @@ yPos += filaAlturaCage;
   yPos += filaAlturaAudiometria;
   
   // === SECCIÓN LABORATORIO ===
-  // Fila para el título LABORATORIO (color celeste)
-  doc.setFillColor(173, 216, 230); // Color celeste
+  // Fila para el título LABORATORIO (color 199, 241, 255ste)
+  doc.setFillColor(173, 216, 230); // Color 199, 241, 255ste
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1565,8 +1580,8 @@ yPos += filaAlturaCage;
   doc.text(data.glucosaLaboratorioClinico_txtglucosabio + " mg/dl", tablaInicioX + 155, yPos + 3.5);
   yPos += filaAltura;
   
-  // Fila celeste: PERFIL LIPIDICO
-  doc.setFillColor(173, 216, 230); // Color celeste
+  // Fila 199, 241, 255ste: PERFIL LIPIDICO
+  doc.setFillColor(173, 216, 230); // Color 199, 241, 255ste
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1629,8 +1644,8 @@ yPos += filaAlturaCage;
   yPos = 40;
   
   // === TEST DE EPWORTH ===
-  // Fila para el título TEST DE EPWORTH (color celeste)
-  doc.setFillColor(173, 216, 230); // Color celeste
+  // Fila para el título TEST DE EPWORTH (color 199, 241, 255ste)
+  doc.setFillColor(173, 216, 230); // Color 199, 241, 255ste
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1645,8 +1660,8 @@ yPos += filaAlturaCage;
   yPos = dibujarTextoEnFilaCreciente(doc, formatearTextoGramatical(data.tesEpworth_txttesepworth), tablaInicioX, tablaAncho, yPos, 10, 4, 8);
   
   // === DIAGNÓSTICO ===
-  // Fila para el título DIAGNÓSTICO (color celeste)
-  doc.setFillColor(173, 216, 230); // Color celeste
+  // Fila para el título DIAGNÓSTICO (color 199, 241, 255ste)
+  doc.setFillColor(173, 216, 230); // Color 199, 241, 255ste
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1661,8 +1676,8 @@ yPos += filaAlturaCage;
   yPos = dibujarTextoEnFilaCreciente(doc, formatearTextoGramatical(data.diagnostico_txtdiagnostico), tablaInicioX, tablaAncho, yPos, 10, 4, 8);
   
   // === SECCIÓN OTROS ===
-  // Fila celeste: Otros
-  doc.setFillColor(173, 216, 230); // Color celeste
+  // Fila 199, 241, 255ste: Otros
+  doc.setFillColor(173, 216, 230); // Color 199, 241, 255ste
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1677,7 +1692,7 @@ yPos += filaAlturaCage;
   yPos = dibujarTextoEnFilaCreciente(doc, formatearTextoGramatical(data.otrosExamenesLaboratorio_txtotrosexamlab), tablaInicioX, tablaAncho, yPos, 10, 4, 8);
   
   // Fila: CONCLUSIONES / RECOMENDACIONES / RESTRICCIONES (color gris)
-  doc.setFillColor(160, 160, 160); // Color gris
+  doc.setFillColor(196, 196, 196); // Color gris
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1729,7 +1744,8 @@ yPos += filaAlturaCage;
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text("X", xNoApto + 20, yPos + 3.5);
   }
-  
+
+  doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("NO APTO TEMPORAL", xNoAptoTemporal + 2, yPos + 3.5);
   if (data.aptoRestriccion_chk_apto_r) {
     doc.setFont("helvetica", "bold").setFontSize(10);

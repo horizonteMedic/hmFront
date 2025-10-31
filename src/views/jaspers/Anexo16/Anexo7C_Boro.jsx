@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
-import { getSign, formatearTextoATitulo } from "../../utils/helpers.js";
+import { getSign } from "../../utils/helpers.js";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
@@ -187,12 +187,12 @@ export default function Anexo7C_Boro(data = {}) {
         // Si ambas están vacías, mostrar "NINGUNA"
         if (!campo1 && !campo2) return "NINGUNA";
         
-        // Si solo una tiene data, devolver esa formateada
-        if (campo1 && !campo2) return formatearTextoATitulo(campo1);
-        if (!campo1 && campo2) return formatearTextoATitulo(campo2);
+        // Si solo una tiene data, devolver esa en mayúsculas
+        if (campo1 && !campo2) return campo1.toUpperCase();
+        if (!campo1 && campo2) return campo2.toUpperCase();
         
-        // Si ambas tienen data, devolver ambas formateadas y separadas por nueva línea
-        return `${formatearTextoATitulo(campo1)}\n${formatearTextoATitulo(campo2)}`;
+        // Si ambas tienen data, devolver ambas en mayúsculas y separadas por nueva línea
+        return `${campo1.toUpperCase()}\n${campo2.toUpperCase()}`;
       })(),
       reflejosPupilares: data.reflejosPupilaresAnexo7c_txtreflejospupilares ?? "",
       visionColores: data.visionColoresAnexo7c_txtvisioncolores ?? "",
@@ -485,43 +485,6 @@ export default function Anexo7C_Boro(data = {}) {
   // Usar solo datos reales
   const datosFinales = datosReales;
 
-  // Función para convertir texto a formato gramatical (primera letra mayúscula, resto minúsculas)
-  const formatearTextoGramatical = (texto) => {
-    if (!texto || typeof texto !== 'string') return texto;
-    
-    // Dividir por líneas para manejar listas con viñetas
-    const lineas = texto.split('\n');
-    const lineasFormateadas = lineas.map(linea => {
-      if (!linea.trim()) return linea; // Mantener líneas vacías
-      
-      const lineaTrim = linea.trim();
-      
-      // Si empieza con "-" (con o sin espacio), formatear después del guión
-      if (lineaTrim.startsWith('-')) {
-        const match = lineaTrim.match(/^(-\s*)(.+)/);
-        if (match) {
-          const guionEspacio = match[1]; // "-" o "- "
-          const contenido = match[2];
-          return guionEspacio + contenido.charAt(0).toUpperCase() + contenido.slice(1).toLowerCase();
-        }
-      }
-      
-      // Formatear palabra por palabra, manteniendo siglas
-      const palabras = lineaTrim.split(/(\s+)/); // Dividir preservando espacios
-      const palabrasFormateadas = palabras.map(palabra => {
-        // Si es solo espacios, mantenerlo
-        if (/^\s+$/.test(palabra)) return palabra;
-        
-        // Formatear la palabra: primera letra mayúscula, resto minúsculas
-        return palabra.charAt(0).toUpperCase() + palabra.slice(1).toLowerCase();
-      });
-      
-      return palabrasFormateadas.join('');
-    });
-    
-    return lineasFormateadas.join('\n');
-  };
-
   // Header reutilizable
   const drawHeader = (pageNumber) => {
     // Logo y membrete
@@ -603,14 +566,14 @@ export default function Anexo7C_Boro(data = {}) {
   // Función general para dibujar header de sección con fondo gris
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
     const tablaInicioX = 5;
-    const tablaAncho = 195;
+    const tablaAncho = 200;
     
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
     
     // Dibujar fondo gris más oscuro
-    doc.setFillColor(160, 160, 160);
+    doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
     
     // Dibujar líneas del header
@@ -629,14 +592,14 @@ export default function Anexo7C_Boro(data = {}) {
   // Función para dibujar header de sección con fondo celeste (azul claro)
   const dibujarHeaderSeccionCeleste = (titulo, yPos, alturaHeader = 4) => {
     const tablaInicioX = 5;
-    const tablaAncho = 195;
+    const tablaAncho = 200;
     
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
     
     // Dibujar fondo celeste
-    doc.setFillColor(173, 216, 230);
+    doc.setFillColor(199, 241, 255);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
     
     // Dibujar líneas del header
@@ -655,7 +618,7 @@ export default function Anexo7C_Boro(data = {}) {
   // Función para dibujar fila con división de dos columnas y títulos
   const dibujarFilaConDosColumnas = (tituloCol1, tituloCol2, yPos, alturaFila = 5) => {
     const tablaInicioX = 5;
-    const tablaAncho = 195;
+    const tablaAncho = 200;
     
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
@@ -678,7 +641,7 @@ export default function Anexo7C_Boro(data = {}) {
 
   // === SECCIÓN 1: DATOS PERSONALES ===
   const tablaInicioX = 5;
-  const tablaAncho = 195;
+  const tablaAncho = 200;
   let yPos = 35.5;
   const filaAltura = 5;
 
@@ -1102,14 +1065,14 @@ export default function Anexo7C_Boro(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Antecedentes personales:", tablaInicioX + 2, yTextoAntecedentes + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(datosFinales.antecedentesMedicos?.personales || ""), tablaInicioX + 40, yTextoAntecedentes + 1);
+  doc.text((datosFinales.antecedentesMedicos?.personales || "").toString().toUpperCase(), tablaInicioX + 40, yTextoAntecedentes + 1);
   yTextoAntecedentes += filaAltura;
 
   // Antecedentes familiares
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Antecedentes familiares:", tablaInicioX + 2, yTextoAntecedentes + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(datosFinales.antecedentesMedicos?.familiares || ""), tablaInicioX + 40, yTextoAntecedentes + 1);
+  doc.text((datosFinales.antecedentesMedicos?.familiares || "").toString().toUpperCase(), tablaInicioX + 40, yTextoAntecedentes + 1);
   yTextoAntecedentes += filaAltura;
 
   // Inmunizaciones
@@ -1176,10 +1139,10 @@ export default function Anexo7C_Boro(data = {}) {
   // Función para determinar frecuencia de hábitos
   const obtenerFrecuencia = (habito) => {
     if (!habito) return "";
-    if (habito.nada) return "Nada";
-    if (habito.poco) return "Poco";
-    if (habito.habitual) return "Habitual";
-    if (habito.excesivo) return "Excesivo";
+    if (habito.nada) return "NADA";
+    if (habito.poco) return "POCO";
+    if (habito.habitual) return "HABITUAL";
+    if (habito.excesivo) return "EXCESIVO";
     return "";
   };
 
@@ -1225,24 +1188,24 @@ export default function Anexo7C_Boro(data = {}) {
   // === CONTENIDO DE ESPIROMETRÍA ===
   let yTextoEspirometria = yPos - (2 * filaAltura) + 2.5;
 
-  // Fila de datos: FVC | {data} | FV31 | {data} | FVE1/FVC | {data} | FEF | {data}
+  // Fila de datos: FVC | {data} | FEV1 | {data} | FEV1/FVC | {data} | FEF | {data}
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("FVC", colPositions[0] + 2, yTextoEspirometria + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text((datosFinales.funcionRespiratoria?.fvc || "") + " L", colPositions[1] + 2, yTextoEspirometria + 1);
   
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("FV31", colPositions[2] + 2, yTextoEspirometria + 1);
+  doc.text("FEV1", colPositions[2] + 2, yTextoEspirometria + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text((datosFinales.funcionRespiratoria?.fev1 || "") + " L", colPositions[3] + 2, yTextoEspirometria + 1);
   
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("FVE1/FVC", colPositions[4] + 2, yTextoEspirometria + 1);
+  doc.text("FEV1/FVC", colPositions[4] + 2, yTextoEspirometria + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text((datosFinales.funcionRespiratoria?.fev1Fvc || "") + " %", colPositions[5] + 2, yTextoEspirometria + 1);
   
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("FEF 25-75%", colPositions[6] + 2, yTextoEspirometria + 1);
+  doc.text("FEF 25/75%", colPositions[6] + 2, yTextoEspirometria + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text((datosFinales.funcionRespiratoria?.fef2575 || "") + " L/s", colPositions[7] + 2, yTextoEspirometria + 1);
   yTextoEspirometria += filaAltura;
@@ -1251,7 +1214,7 @@ export default function Anexo7C_Boro(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Conclusión:", tablaInicioX + 2, yTextoEspirometria + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(datosFinales.funcionRespiratoria?.conclusion || ""), tablaInicioX + 25, yTextoEspirometria + 1);
+  doc.text((datosFinales.funcionRespiratoria?.conclusion || "").toString().toUpperCase(), tablaInicioX + 25, yTextoEspirometria + 1);
   yTextoEspirometria += filaAltura;
 
 
@@ -1292,8 +1255,10 @@ export default function Anexo7C_Boro(data = {}) {
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Fila 5: Presión Arterial (fila completa)
+  // Fila 5: Presión Arterial (3 columnas)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho / 3, yPos, tablaInicioX + tablaAncho / 3, yPos + filaAltura);
+  doc.line(tablaInicioX + (2 * tablaAncho / 3), yPos, tablaInicioX + (2 * tablaAncho / 3), yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1366,9 +1331,19 @@ export default function Anexo7C_Boro(data = {}) {
   // Fila 5: Presión Arterial
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Presión Arterial:", tablaInicioX + 2, yTextoVitales + 1);
-  const anchoTituloPA = doc.getTextWidth("Presión Arterial:");
+  
+  // Columna 2: Sistólica
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Sistólica:", tablaInicioX + tablaAncho / 3 + 2, yTextoVitales + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Sistólica: " + (datosFinales.presionSistolica || "") + " mmHg   Diastólica: " + (datosFinales.presionDiastolica || "") + " mmHg", tablaInicioX + 2 + anchoTituloPA + 5, yTextoVitales + 1);
+  doc.text((datosFinales.presionSistolica || "").toString().toUpperCase() + " mmHg", tablaInicioX + tablaAncho / 3 + 20, yTextoVitales + 1);
+  
+  // Columna 3: Diastólica
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Diastólica:", tablaInicioX + (2 * tablaAncho / 3) + 2, yTextoVitales + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.presionDiastolica || "").toString().toUpperCase() + " mmHg", tablaInicioX + (2 * tablaAncho / 3) + 25, yTextoVitales + 1);
+  
   yTextoVitales += filaAltura;
 
   // === SECCIÓN 6: EXAMEN FÍSICO DETALLADO ===
@@ -1402,47 +1377,11 @@ export default function Anexo7C_Boro(data = {}) {
   // === CONTENIDO DE EXAMEN FÍSICO DETALLADO ===
   let yTextoExamenDetallado = yPos - (2 * filaAltura) + 2.5;
 
-  // Función para formatear texto: primera letra mayúscula, resto minúscula, excepto siglas y palabras especiales
-  const formatearTexto = (texto) => {
-    if (!texto) return "";
-    const textoStr = texto.toString().trim();
-    if (textoStr === "N/A" || textoStr === "N/A.") return textoStr;
-    
-    // Dividir el texto en palabras
-    const palabras = textoStr.split(' ');
-    
-    // Formatear cada palabra
-    const palabrasFormateadas = palabras.map(palabra => {
-      // Limpiar signos de puntuación para la verificación
-      const palabraLimpia = palabra.replace(/[.,;:]/g, '');
-      
-      // Detectar RCRR en cualquier caso (rcrr, Rcrr, RCRR, etc.) y convertir a RCRR
-      if (palabraLimpia.toUpperCase() === 'RCRR') {
-        // Restaurar signos de puntuación si los hay
-        return 'RCRR' + palabra.substring(palabraLimpia.length);
-      }
-      
-      // Si la palabra está completamente en mayúsculas y es una sigla (2 o más letras mayúsculas), mantenerla
-      if (palabraLimpia === palabraLimpia.toUpperCase() && palabraLimpia.length >= 2 && /^[A-Z]+$/.test(palabraLimpia)) {
-        // Restaurar signos de puntuación si los hay
-        return palabraLimpia + palabra.substring(palabraLimpia.length);
-      }
-      
-      // Para el resto, formato normal: primera letra mayúscula, resto minúscula
-      if (palabra.length > 0) {
-        return palabra.charAt(0).toUpperCase() + palabra.slice(1).toLowerCase();
-      }
-      return palabra;
-    });
-    
-    return palabrasFormateadas.join(' ');
-  };
-
   // Fila 1: Cabeza | Perímetro Cuello | Cuello | Nariz
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Cabeza:", tablaInicioX + 2, yTextoExamenDetallado + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(datosFinales.evaluacionFisica?.cabeza || ""), tablaInicioX + 20, yTextoExamenDetallado + 1);
+  doc.text((datosFinales.evaluacionFisica?.cabeza || "").toString().toUpperCase(), tablaInicioX + 20, yTextoExamenDetallado + 1);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Perímetro Cuello:", tablaInicioX + tablaAncho / 4 + 2, yTextoExamenDetallado + 1);
@@ -1452,12 +1391,12 @@ export default function Anexo7C_Boro(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Cuello:", tablaInicioX + tablaAncho / 2 + 2, yTextoExamenDetallado + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(datosFinales.evaluacionFisica?.cuello || ""), tablaInicioX + tablaAncho / 2 + 15, yTextoExamenDetallado + 1);
+  doc.text((datosFinales.evaluacionFisica?.cuello || "").toString().toUpperCase(), tablaInicioX + tablaAncho / 2 + 15, yTextoExamenDetallado + 1);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Nariz:", tablaInicioX + (3 * tablaAncho / 4) + 2, yTextoExamenDetallado + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(datosFinales.evaluacionFisica?.nariz || ""), tablaInicioX + (3 * tablaAncho / 4) + 15, yTextoExamenDetallado + 1);
+  doc.text((datosFinales.evaluacionFisica?.nariz || "").toString().toUpperCase(), tablaInicioX + (3 * tablaAncho / 4) + 15, yTextoExamenDetallado + 1);
   yTextoExamenDetallado += filaAltura;
 
   // Fila 2: Boca, Amígdalas, Faringe, Laringe (un solo campo)
@@ -1468,7 +1407,7 @@ export default function Anexo7C_Boro(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Boca, Amígdalas, Faringe, Laringe:", tablaInicioX + 2, yTextoExamenDetallado + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(datosFinales.evaluacionFisica?.bocaAmigdalas || ""), tablaInicioX + 60, yTextoExamenDetallado + 1);
+  doc.text((datosFinales.evaluacionFisica?.bocaAmigdalas || "").toString().toUpperCase(), tablaInicioX + 60, yTextoExamenDetallado + 1);
   yTextoExamenDetallado += filaAltura;
 
   // Fila 3: Dentadura | Piezas en mal estado | Piezas faltantes
@@ -1489,7 +1428,7 @@ export default function Anexo7C_Boro(data = {}) {
 
   // === SECCIÓN OJOS ===
   // Fila gris: OJOS
-  doc.setFillColor(160, 160, 160); // Color gris
+  doc.setFillColor(196, 196, 196); // Color gris
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1547,9 +1486,25 @@ export default function Anexo7C_Boro(data = {}) {
   const mitadCorregida = xCorregida + (colCorregidaAncho / 2);
   
   // Preparar texto de enfermedades oculares con wrap
-  const textoEnfermedades = datosFinales.evaluacionOftalmologica?.enfermedadesOculares || "";
+  const textoEnfermedadesRaw = datosFinales.evaluacionOftalmologica?.enfermedadesOculares || "";
+  // Dividir por saltos de línea y agregar guión a cada línea (excepto si es "NINGUNA")
+  let textoEnfermedades = "";
+  if (textoEnfermedadesRaw) {
+    const lineasEnfermedades = textoEnfermedadesRaw.split('\n');
+    textoEnfermedades = lineasEnfermedades
+      .filter(linea => linea.trim()) // Filtrar líneas vacías
+      .map(linea => {
+        const lineaTrim = linea.trim();
+        // Si es "NINGUNA", no agregar guión; de lo contrario, agregar guión si no lo tiene
+        if (lineaTrim === "NINGUNA") {
+          return lineaTrim;
+        }
+        return lineaTrim.startsWith('-') ? lineaTrim : `- ${lineaTrim}`;
+      })
+      .join('\n');
+  }
   const maxWidth = colObservacionesAncho - 4; // Ancho disponible menos margen (reducido de 8 a 4 para evitar cortes prematuros)
-  const lineHeight = 3.8; // Interlineado aumentado para que el texto tenga más espacio
+  const lineHeight = 3; // Interlineado reducido un poco
   const lines = doc.splitTextToSize(textoEnfermedades, maxWidth);
   
   // Dibujar subheader con O.D y O.I
@@ -1631,8 +1586,9 @@ export default function Anexo7C_Boro(data = {}) {
   
   // Mostrar las primeras líneas del texto de enfermedades oculares en esta fila
   // Asegurar que solo se muestren las líneas que caben en la altura disponible
+  doc.setFont("helvetica", "normal").setFontSize(7);
   lines.slice(0, lineasPorFila).forEach((line, index) => {
-    doc.text(line, xObservaciones + 4, yPos - 2 + (index * lineHeight));
+    doc.text(line, xObservaciones + 4, yPos - 1 + (index * lineHeight));
   });
   
   yPos += filaAlturaAgudeza;
@@ -1676,12 +1632,12 @@ export default function Anexo7C_Boro(data = {}) {
   doc.text(oiLejosCorregida, mitadCorregida + (colCorregidaAncho / 2 - anchoOiLejosCorregida) / 2, yPos + 3.5);
   
   // Continuar con las líneas restantes del texto de enfermedades oculares
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   
   // Mostrar las líneas restantes en esta fila
   if (lines && lines.length > lineasPorFila) {
     lines.slice(lineasPorFila).forEach((line, index) => {
-      doc.text(line, xObservaciones + 4, yPos - 2 + (index * lineHeight));
+      doc.text(line, xObservaciones + 4, yPos - 1 + (index * lineHeight));
     });
   }
   
@@ -1697,7 +1653,7 @@ export default function Anexo7C_Boro(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Reflejos Pupilares:", xAgudeza + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(datosFinales.evaluacionOftalmologica?.reflejosPupilares || ""), xObservaciones - 45, yPos + 3.5);
+  doc.text((datosFinales.evaluacionOftalmologica?.reflejosPupilares || "").toString().toUpperCase(), xObservaciones - 45, yPos + 3.5);
   
   yPos += filaAlturaAgudeza;
 
@@ -1723,34 +1679,34 @@ export default function Anexo7C_Boro(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Visión de colores:", xVision + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluacionOftalmologica?.visionColores || "", xVision + 35, yPos + 3.5);
+  doc.text((datosFinales.evaluacionOftalmologica?.visionColores || "").toString().toUpperCase(), xVision + 35, yPos + 3.5);
   
   // Test de Ishihara: true = Normal, false = Anormal
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Test de Ishihara:", xIshihara + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  const ishiharaResultado = datosFinales.evaluacionOftalmologica?.testIshiharaNormal ? "Normal" : "Anormal";
+  const ishiharaResultado = datosFinales.evaluacionOftalmologica?.testIshiharaNormal ? "NORMAL" : "ANORMAL";
   doc.text(ishiharaResultado, xIshihara + 30, yPos + 3.5);
   
   // Test de colores puros: true = Normal, false = Anormal
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Test colores puros:", xColores + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  const coloresPurosResultado = datosFinales.evaluacionOftalmologica?.testColoresPurosNormal ? "Normal" : "Anormal";
+  const coloresPurosResultado = datosFinales.evaluacionOftalmologica?.testColoresPurosNormal ? "NORMAL" : "ANORMAL";
   doc.text(coloresPurosResultado, xColores + 30, yPos + 3.5);
   
   // Test de profundidad: true = Normal, false = Alterado
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Test profundidad:", xProfundidad + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  const profundidadResultado = datosFinales.evaluacionOftalmologica?.testProfundidadNormal ? "Normal" : "Alterado";
+  const profundidadResultado = datosFinales.evaluacionOftalmologica?.testProfundidadNormal ? "NORMAL" : "ALTERADO";
   doc.text(profundidadResultado, xProfundidad + 30, yPos + 3.5);
   
   yPos += filaAltura;
 
   // === SECCIÓN 8: OÍDOS ===
   // Fila gris: 8. OÍDOS
-  doc.setFillColor(160, 160, 160); // Color gris
+  doc.setFillColor(196, 196, 196); // Color gris
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1894,8 +1850,8 @@ export default function Anexo7C_Boro(data = {}) {
   doc.text("O.D:", x1 + 2, yPos + 3.5);
   doc.text("O.I:", x2 + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(datosFinales.evaluacionOidos?.otoscopia?.oidoDerecho || ""), x1 + 20, yPos + 3.5);
-  doc.text(formatearTextoGramatical(datosFinales.evaluacionOidos?.otoscopia?.oidoIzquierdo || ""), x2 + 20, yPos + 3.5);
+  doc.text((datosFinales.evaluacionOidos?.otoscopia?.oidoDerecho || "").toString().toUpperCase(), x1 + 20, yPos + 3.5);
+  doc.text((datosFinales.evaluacionOidos?.otoscopia?.oidoIzquierdo || "").toString().toUpperCase(), x2 + 20, yPos + 3.5);
   yPos += filaAltura;
 
 
@@ -1922,12 +1878,16 @@ export default function Anexo7C_Boro(data = {}) {
   const puntoDivision = tablaInicioX + anchoColIzquierda;
   
   // Preparar contenido
-  const textoPulmones = "Descripción: " + formatearTextoGramatical(datosFinales.evaluacionFisicaAdicional?.pulmones?.descripcion || "");
+  const tituloDescripcion = "Descripción: ";
+  const contenidoPulmones = (datosFinales.evaluacionFisicaAdicional?.pulmones?.descripcion || "").toString().toUpperCase();
   const anchoTextoDisponible = anchoColIzquierda - 4;
-  const lineasPulmones = doc.splitTextToSize(textoPulmones, anchoTextoDisponible);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  const anchoTituloDesc = doc.getTextWidth(tituloDescripcion);
+  const anchoContenido = anchoTextoDisponible - anchoTituloDesc - 2; // -2 para espacio entre título y contenido
+  const lineasContenido = contenidoPulmones ? doc.splitTextToSize(contenidoPulmones, anchoContenido) : [""];
   
   // Altura de la columna izquierda (texto + fila de status)
-  const alturaTexto = lineasPulmones.length * 3 + 4;
+  const alturaTexto = lineasContenido.length * 3 + 4;
   const alturaTotal = Math.max(30, alturaTexto + filaAltura); // Mínimo 30mm para acomodar imagen
   
   // Dibujar líneas principales
@@ -1969,8 +1929,8 @@ export default function Anexo7C_Boro(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("PULMONES", xPulmones + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Normal", xNormal + 2, yPos + 3.5);
-  doc.text("Anormal", xAnormal + 2, yPos + 3.5);
+  doc.text("NORMAL", xNormal + 2, yPos + 3.5);
+  doc.text("ANORMAL", xAnormal + 2, yPos + 3.5);
   
   // Marcar checkboxes
   if (datosFinales.evaluacionFisicaAdicional?.pulmones?.normal) {
@@ -1989,11 +1949,25 @@ export default function Anexo7C_Boro(data = {}) {
   // Descripción
   const yPosDescripcion = yPos + filaAltura;
   doc.line(xPulmones, yPosDescripcion, xFinalColumna, yPosDescripcion);
-  doc.setFont("helvetica", "normal").setFontSize(8);
   const interlineadoDesc = 3;
-  lineasPulmones.forEach((linea, index) => {
-    doc.text(linea, tablaInicioX + 2, yPosDescripcion + 3.5 + (index * interlineadoDesc));
-  });
+  
+  // Dibujar "Descripción:" en negritas
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Descripción:", tablaInicioX + 2, yPosDescripcion + 3.5);
+  
+  // Dibujar contenido en normal
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  if (lineasContenido.length > 0 && lineasContenido[0] !== "") {
+    lineasContenido.forEach((linea, index) => {
+      if (index === 0) {
+        // Primera línea al lado del título
+        doc.text(linea, tablaInicioX + 2 + anchoTituloDesc + 2, yPosDescripcion + 3.5);
+      } else {
+        // Resto de líneas desde el inicio
+        doc.text(linea, tablaInicioX + 2, yPosDescripcion + 3.5 + (index * interlineadoDesc));
+      }
+    });
+  }
   
   // === COLUMNA DERECHA: Imagen centrada ===
   try {
@@ -2013,7 +1987,7 @@ export default function Anexo7C_Boro(data = {}) {
 
     // Fila: CARDIOVASCULAR dentro de la sección PULMONES
     const tituloCardiovascular = "Cardiovascular: ";
-    const datoCardiovascular = formatearTextoGramatical(datosFinales.cardiovascular || "");
+    const datoCardiovascular = (datosFinales.cardiovascular || "").toString().toUpperCase();
     const textoCardiovascular = tituloCardiovascular + datoCardiovascular;
     const anchoDisponibleCardiovascular = tablaAncho - 4;
     const lineasCardiovascular = doc.splitTextToSize(textoCardiovascular, anchoDisponibleCardiovascular);
@@ -2071,8 +2045,8 @@ export default function Anexo7C_Boro(data = {}) {
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("PIEL", xPiel + 2, yPos + 3.5);
     doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text("Normal", xNormalPiel + 2, yPos + 3.5);
-    doc.text("Anormal", xAnormalPiel + 2, yPos + 3.5);
+    doc.text("NORMAL", xNormalPiel + 2, yPos + 3.5);
+    doc.text("ANORMAL", xAnormalPiel + 2, yPos + 3.5);
 
     // Marcar checkboxes según los datos (centrando la X en el cajoncito)
     if (datosFinales.evaluacionFisicaAdicional?.piel?.normal) {
@@ -2090,10 +2064,14 @@ export default function Anexo7C_Boro(data = {}) {
     yPos += filaAltura;
 
     // Fila de descripción de PIEL
-    const textoPiel = "Descripción: " + formatearTextoGramatical(datosFinales.evaluacionFisicaAdicional?.piel?.descripcion || "");
+    const tituloDescripcionPiel = "Descripción: ";
+    const contenidoPiel = (datosFinales.evaluacionFisicaAdicional?.piel?.descripcion || "").toString().toUpperCase();
     const anchoDisponiblePiel = tablaAncho - 4;
-    const lineasPiel = doc.splitTextToSize(textoPiel, anchoDisponiblePiel);
-    const alturaDinamicaPiel = Math.max(filaAltura, lineasPiel.length * 2.5 + 2);
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    const anchoTituloDescPiel = doc.getTextWidth(tituloDescripcionPiel);
+    const anchoContenidoPiel = anchoDisponiblePiel - anchoTituloDescPiel - 2; // -2 para espacio entre título y contenido
+    const lineasContenidoPiel = contenidoPiel ? doc.splitTextToSize(contenidoPiel, anchoContenidoPiel) : [""];
+    const alturaDinamicaPiel = Math.max(filaAltura, (lineasContenidoPiel.length * 2.5) + 2);
 
     // Dibujar líneas de la fila dinámica
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaPiel);
@@ -2102,8 +2080,20 @@ export default function Anexo7C_Boro(data = {}) {
     doc.line(tablaInicioX, yPos + alturaDinamicaPiel, tablaInicioX + tablaAncho, yPos + alturaDinamicaPiel);
 
     // Contenido de descripción
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Descripción:", tablaInicioX + 2, yPos + 3.5);
     doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(lineasPiel, tablaInicioX + 2, yPos + 3.5);
+    if (lineasContenidoPiel.length > 0 && lineasContenidoPiel[0] !== "") {
+      lineasContenidoPiel.forEach((linea, index) => {
+        if (index === 0) {
+          // Primera línea al lado del título
+          doc.text(linea, tablaInicioX + 2 + anchoTituloDescPiel + 2, yPos + 3.5);
+        } else {
+          // Resto de líneas desde el inicio
+          doc.text(linea, tablaInicioX + 2, yPos + 3.5 + (index * 2.5));
+        }
+      });
+    }
     yPos += alturaDinamicaPiel;
 
   // === SECCIÓN MIEMBROS SUPERIORES ===
@@ -2111,7 +2101,7 @@ export default function Anexo7C_Boro(data = {}) {
 
   // Fila de Miembros Superiores con altura dinámica
   const tituloMiembrosSuperiores = "Miembros Superiores: ";
-  const datoMiembrosSuperiores = formatearTextoGramatical(datosFinales.evaluacionFisicaAdicional?.miembrosSuperiores || "");
+  const datoMiembrosSuperiores = (datosFinales.evaluacionFisicaAdicional?.miembrosSuperiores || "").toString().toUpperCase();
   const textoMiembrosSuperiores = tituloMiembrosSuperiores + datoMiembrosSuperiores;
   const anchoDisponibleMiembrosSuperiores = tablaAncho - 4;
   const lineasMiembrosSuperiores = doc.splitTextToSize(textoMiembrosSuperiores, anchoDisponibleMiembrosSuperiores);
@@ -2136,7 +2126,7 @@ export default function Anexo7C_Boro(data = {}) {
 
   // Fila de Miembros Inferiores con altura dinámica
   const tituloMiembrosInferiores = "Miembros Inferiores: ";
-  const datoMiembrosInferiores = formatearTextoGramatical(datosFinales.evaluacionFisicaAdicional?.miembrosInferiores || "");
+  const datoMiembrosInferiores = (datosFinales.evaluacionFisicaAdicional?.miembrosInferiores || "").toString().toUpperCase();
   const textoMiembrosInferiores = tituloMiembrosInferiores + datoMiembrosInferiores;
   const anchoDisponibleMiembrosInferiores = tablaAncho - 4;
   const lineasMiembrosInferiores = doc.splitTextToSize(textoMiembrosInferiores, anchoDisponibleMiembrosInferiores);
@@ -2158,11 +2148,11 @@ export default function Anexo7C_Boro(data = {}) {
 
   // === FILA: REFLEJOS OSTEO-TENDINOSOS Y MARCHA ===
   const tituloReflejos = "Reflejos Osteotendinosos: ";
-  const datoReflejos = formatearTextoGramatical(datosFinales.evaluacionNeurologica?.reflejosOsteotendinosos || "");
+  const datoReflejos = (datosFinales.evaluacionNeurologica?.reflejosOsteotendinosos || "").toString().toUpperCase();
   const textoReflejos = tituloReflejos + datoReflejos;
   
   const tituloMarcha = "Marcha: ";
-  const datoMarcha = formatearTexto(datosFinales.evaluacionNeurologica?.marcha || "");
+  const datoMarcha = (datosFinales.evaluacionNeurologica?.marcha || "").toString().toUpperCase();
   const textoMarcha = tituloMarcha + datoMarcha;
   
   // Calcular altura dinámica para cada columna
@@ -2201,7 +2191,7 @@ export default function Anexo7C_Boro(data = {}) {
 
   // === FILA: COLUMNA VERTEBRAL ===
   const tituloColumna = "Columna Vertebral: ";
-  const datoColumna = formatearTextoGramatical(datosFinales.evaluacionColumnaAbdomen?.columnaVertebral || "");
+  const datoColumna = (datosFinales.evaluacionColumnaAbdomen?.columnaVertebral || "").toString().toUpperCase();
   const textoColumna = tituloColumna + datoColumna;
   const anchoDisponibleColumna = tablaAncho - 4;
   const lineasColumna = doc.splitTextToSize(textoColumna, anchoDisponibleColumna);
@@ -2223,13 +2213,13 @@ export default function Anexo7C_Boro(data = {}) {
 
   // === FILA: ABDOMEN Y TACTO RECTAL ===
   const tituloAbdomen = "Abdomen: ";
-  const datoAbdomen = formatearTextoGramatical(datosFinales.evaluacionColumnaAbdomen?.abdomen || "");
+  const datoAbdomen = (datosFinales.evaluacionColumnaAbdomen?.abdomen || "").toString().toUpperCase();
   const textoAbdomen = tituloAbdomen + datoAbdomen;
   // Función para determinar el estado del tacto rectal
   const obtenerEstadoTactoRectal = () => {
-    if (datosFinales.evaluacionRectalHernias?.tactoRectal?.normal) return "Normal";
-    if (datosFinales.evaluacionRectalHernias?.tactoRectal?.anormal) return "Anormal";
-    if (datosFinales.evaluacionRectalHernias?.tactoRectal?.noSeHizo) return "No se hizo";
+    if (datosFinales.evaluacionRectalHernias?.tactoRectal?.normal) return "NORMAL";
+    if (datosFinales.evaluacionRectalHernias?.tactoRectal?.anormal) return "ANORMAL";
+    if (datosFinales.evaluacionRectalHernias?.tactoRectal?.noSeHizo) return "NO SE HIZO";
     return "";
   };
   
@@ -2273,15 +2263,15 @@ export default function Anexo7C_Boro(data = {}) {
 
   // === FILA: ANILLOS INGUINALES, HERNIAS Y VARICES ===
   const tituloAnillos = "Anillos Inguinales: ";
-  const datoAnillos = formatearTextoGramatical(datosFinales.evaluacionColumnaAbdomen?.anillosInguinales || "");
+  const datoAnillos = (datosFinales.evaluacionColumnaAbdomen?.anillosInguinales || "").toString().toUpperCase();
   const textoAnillos = tituloAnillos + datoAnillos;
   
   const tituloHernias = "Hernias: ";
-  const datoHernias = formatearTexto(datosFinales.evaluacionRectalHernias?.hernias || "");
+  const datoHernias = (datosFinales.evaluacionRectalHernias?.hernias || "").toString().toUpperCase();
   const textoHernias = tituloHernias + datoHernias;
   
   const tituloVarices = "Varices: ";
-  const datoVarices = formatearTexto(datosFinales.evaluacionRectalHernias?.varices || "");
+  const datoVarices = (datosFinales.evaluacionRectalHernias?.varices || "").toString().toUpperCase();
   const textoVarices = tituloVarices + datoVarices;
   
   // Calcular altura dinámica para cada columna (3 columnas)
@@ -2330,11 +2320,11 @@ export default function Anexo7C_Boro(data = {}) {
 
   // === FILA: ÓRGANOS GENITALES Y GANGLIOS LINFÁTICOS ===
   const tituloOrganos = "Órganos Genitales: ";
-  const datoOrganos = formatearTextoGramatical(datosFinales.evaluacionColumnaAbdomen?.organosGenitales || "");
+  const datoOrganos = (datosFinales.evaluacionColumnaAbdomen?.organosGenitales || "").toString().toUpperCase();
   const textoOrganos = tituloOrganos + datoOrganos;
   
   const tituloGanglios = "Ganglios Linfáticos: ";
-  const datoGanglios = formatearTextoGramatical(datosFinales.evaluacionRectalHernias?.gangliosLinfaticos || "");
+  const datoGanglios = (datosFinales.evaluacionRectalHernias?.gangliosLinfaticos || "").toString().toUpperCase();
   const textoGanglios = tituloGanglios + datoGanglios;
   
   // Calcular altura dinámica para cada columna
@@ -2373,7 +2363,7 @@ export default function Anexo7C_Boro(data = {}) {
 
   // === FILA: LENGUAJE, ATENCIÓN, MEMORIA, INTELIGENCIA, ORIENTACIÓN, AFECTIVIDAD ===
   const tituloLenguaje = "Lenguaje, Atención, Memoria, Inteligencia, Orientación, Afectividad: ";
-  const datoLenguaje = formatearTexto(datosFinales.evaluacionMental?.lenguajeAtencionMemoria || "");
+  const datoLenguaje = (datosFinales.evaluacionMental?.lenguajeAtencionMemoria || "").toString().toUpperCase();
   const textoLenguaje = tituloLenguaje + datoLenguaje;
   const anchoDisponibleLenguaje = tablaAncho - 4;
   const lineasLenguaje = doc.splitTextToSize(textoLenguaje, anchoDisponibleLenguaje);
@@ -2429,7 +2419,7 @@ export default function Anexo7C_Boro(data = {}) {
 
   // === FILA: ESTADO MENTAL ===
   const tituloEstadoMental = "Estado Mental: ";
-  const datoEstadoMental = formatearTextoGramatical(datosFinales.evaluacionMental?.estadoMental || "");
+  const datoEstadoMental = (datosFinales.evaluacionMental?.estadoMental || "").toString().toUpperCase();
   const textoEstadoMental = tituloEstadoMental + datoEstadoMental;
   const anchoDisponibleEstadoMental = tablaAncho - 4;
   const lineasEstadoMental = doc.splitTextToSize(textoEstadoMental, anchoDisponibleEstadoMental);
@@ -2451,19 +2441,19 @@ export default function Anexo7C_Boro(data = {}) {
 
   // === FILA: NRO RX, FECHA, CALIDAD, SÍMBOLOS ===
   const tituloNroRx = "Nro Rayos X: ";
-  const datoNroRx = formatearTexto(datosFinales.nroRx || "");
+  const datoNroRx = (datosFinales.nroRx || "").toString().toUpperCase();
   const textoNroRx = tituloNroRx + datoNroRx;
   
   const tituloFechaRx = "Fecha: ";
-  const datoFechaRx = formatearTexto(datosFinales.fechaRx || "");
+  const datoFechaRx = (datosFinales.fechaRx || "").toString().toUpperCase();
   const textoFechaRx = tituloFechaRx + datoFechaRx;
   
   const tituloCalidadRx = "Calidad: ";
-  const datoCalidadRx = formatearTexto(datosFinales.calidadRx || "");
+  const datoCalidadRx = (datosFinales.calidadRx || "").toString().toUpperCase();
   const textoCalidadRx = tituloCalidadRx + datoCalidadRx;
   
   const tituloSimbolosRx = "Símbolos: ";
-  const datoSimbolosRx = formatearTexto(datosFinales.simbolosRx || "");
+  const datoSimbolosRx = (datosFinales.simbolosRx || "").toString().toUpperCase();
   const textoSimbolosRx = tituloSimbolosRx + datoSimbolosRx;
   
   // Calcular altura dinámica para cada columna (4 columnas)
@@ -2522,7 +2512,7 @@ export default function Anexo7C_Boro(data = {}) {
 
   // === FILA: VÉRTICES ===
   const tituloVertices = "Vértices: ";
-  const datoVertices = formatearTextoGramatical(datosFinales.vertices || "");
+  const datoVertices = (datosFinales.vertices || "").toString().toUpperCase();
   const textoVertices = tituloVertices + datoVertices;
   const anchoDisponibleVertices = tablaAncho - 4;
   const lineasVertices = doc.splitTextToSize(textoVertices, anchoDisponibleVertices);
@@ -2548,15 +2538,15 @@ export default function Anexo7C_Boro(data = {}) {
   const textoCamposPulmonares = tituloCamposPulmonares + datoCamposPulmonares;
   
   const tituloMediastinos = "Mediastinos: ";
-  const datoMediastinos = formatearTextoGramatical(datosFinales.mediastinos || "");
+  const datoMediastinos = (datosFinales.mediastinos || "").toString().toUpperCase();
   const textoMediastinos = tituloMediastinos + datoMediastinos;
   
   const tituloHilios = "Hilios: ";
-  const datoHilios = formatearTextoGramatical(datosFinales.hilios || "");
+  const datoHilios = (datosFinales.hilios || "").toString().toUpperCase();
   const textoHilios = tituloHilios + datoHilios;
   
   const tituloSenos = "Senos: ";
-  const datoSenos = formatearTextoGramatical(datosFinales.senos || "");
+  const datoSenos = (datosFinales.senos || "").toString().toUpperCase();
   const textoSenos = tituloSenos + datoSenos;
   
   // Calcular altura dinámica para cada columna (4 columnas)
@@ -2615,7 +2605,7 @@ export default function Anexo7C_Boro(data = {}) {
 
   // === FILA: SILUETA CARDIOVASCULAR ===
   const tituloSilueta = "Silueta Cardiovascular: ";
-  const datoSilueta = formatearTexto(datosFinales.siluetaCardiovascular || "");
+  const datoSilueta = (datosFinales.siluetaCardiovascular || "").toString().toUpperCase();
   const textoSilueta = tituloSilueta + datoSilueta;
   const anchoDisponibleSilueta = tablaAncho - 4;
   const lineasSilueta = doc.splitTextToSize(textoSilueta, anchoDisponibleSilueta);
@@ -2637,7 +2627,7 @@ export default function Anexo7C_Boro(data = {}) {
 
   // === FILA: CONCLUSIONES RADIOGRÁFICAS ===
   const tituloConclusiones = "Conclusiones Radiográficas: ";
-  const datoConclusiones = formatearTexto(datosFinales.conclusionesRadiograficas || "");
+  const datoConclusiones = (datosFinales.conclusionesRadiograficas || "").toString().toUpperCase();
   const textoConclusiones = tituloConclusiones + datoConclusiones;
   const anchoDisponibleConclusiones = tablaAncho - 4;
   const lineasConclusiones = doc.splitTextToSize(textoConclusiones, anchoDisponibleConclusiones);
@@ -2816,28 +2806,18 @@ export default function Anexo7C_Boro(data = {}) {
   // === SECCIÓN ADICIONAL: OTROS HALLAZGOS RADIOGRÁFICOS ===
   yPos = dibujarHeaderSeccion("14. OTROS HALLAZGOS RADIOGRÁFICOS", yPos, filaAltura);
 
-  // Fila para "Sin neumoconiosis" y "Imagen Radiográfica de exposición de polvo" (2 columnas)
-  const colWidthOther = tablaAncho / 2;
+  // Fila para "Sin neumoconiosis" (columna completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + colWidthOther, yPos, tablaInicioX + colWidthOther, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
   // Contenido con formato mixto
-  // Sin neumoconiosis
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Sin neumoconiosis:", tablaInicioX + 2, yPos + 3.5);
   const anchoTituloSinNeumoconiosis = doc.getTextWidth("Sin neumoconiosis:");
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(datosFinales.sinNeumoconiosis || ""), tablaInicioX + 2 + anchoTituloSinNeumoconiosis + 10, yPos + 3.5);
-  
-  // Imagen Radiográfica de exposición de polvo
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Imagen Radiográfica de exposición de polvo:", tablaInicioX + colWidthOther + 2, yPos + 3.5);
-  const anchoTituloImagenRadiografica = doc.getTextWidth("Imagen Radiográfica de exposición de polvo:");
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(datosFinales.imagenRadiograficaExposicionPolvo || ""), tablaInicioX + colWidthOther + 2 + anchoTituloImagenRadiografica + 10, yPos + 3.5);
+  doc.text((datosFinales.sinNeumoconiosis || "").toString().toUpperCase(), tablaInicioX + 2 + anchoTituloSinNeumoconiosis + 10, yPos + 3.5);
   yPos += filaAltura;
 
   // Fila para "Con neumoconiosis" (columna completa)
@@ -2851,7 +2831,21 @@ export default function Anexo7C_Boro(data = {}) {
   doc.text("Con neumoconiosis:", tablaInicioX + 2, yPos + 3.5);
   const anchoTituloConNeumoconiosis = doc.getTextWidth("Con neumoconiosis:");
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTexto(datosFinales.conNeumoconiosis || ""), tablaInicioX + 2 + anchoTituloConNeumoconiosis + 10, yPos + 3.5);
+  doc.text((datosFinales.conNeumoconiosis || "").toString().toUpperCase(), tablaInicioX + 2 + anchoTituloConNeumoconiosis + 10, yPos + 3.5);
+  yPos += filaAltura;
+
+  // Fila para "Imagen Radiográfica de exposición de polvo" (columna completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+
+  // Contenido con formato mixto
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Imagen Radiográfica de exposición de polvo:", tablaInicioX + 2, yPos + 3.5);
+  const anchoTituloImagenRadiografica = doc.getTextWidth("Imagen Radiográfica de exposición de polvo:");
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.imagenRadiograficaExposicionPolvo || "").toString().toUpperCase(), tablaInicioX + 2 + anchoTituloImagenRadiografica + 10, yPos + 3.5);
   yPos += filaAltura;
 
   // Fila para "Reacciones serológicas LUES-no LUES" (columna completa)
@@ -2865,7 +2859,7 @@ export default function Anexo7C_Boro(data = {}) {
   doc.text("Reacciones serológicas LUES-no LUES:", tablaInicioX + 2, yPos + 3.5);
   const anchoTituloReaccionesSerologicas = doc.getTextWidth("Reacciones serológicas LUES-no LUES:");
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTexto(datosFinales.reaccionesSerologicasLues || ""), tablaInicioX + 2 + anchoTituloReaccionesSerologicas + 10, yPos + 3.5);
+  doc.text((datosFinales.reaccionesSerologicasLues || "").toString().toUpperCase(), tablaInicioX + 2 + anchoTituloReaccionesSerologicas + 10, yPos + 3.5);
   yPos += filaAltura;
 
   // === SECCIÓN: EXAMENES DE LABORATORIO ===
@@ -2888,24 +2882,24 @@ export default function Anexo7C_Boro(data = {}) {
   doc.text("VSG:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   const vsgValue = data.vsgLaboratorioClinico_txtvsg || "";
-  doc.text(formatearTexto(vsgValue ? `${vsgValue} mm/h` : ""), tablaInicioX + 15, yPos + 3.5);
+  doc.text(vsgValue ? `${vsgValue.toString().toUpperCase()} mm/h` : "", tablaInicioX + 15, yPos + 3.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Glucosa:", tablaInicioX + tablaAncho / 4 + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   const glucosaValue = data.glucosaLaboratorioClinico_txtglucosabio || "";
-  doc.text(formatearTexto(glucosaValue ? `${glucosaValue} mg/dL` : ""), tablaInicioX + tablaAncho / 4 + 25, yPos + 3.5);
+  doc.text(glucosaValue ? `${glucosaValue.toString().toUpperCase()} mg/dL` : "N/A mg/dL", tablaInicioX + tablaAncho / 4 + 25, yPos + 3.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Urea:", tablaInicioX + tablaAncho / 2 + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(("N/A mg/dL"), tablaInicioX + tablaAncho / 2 + 20, yPos + 3.5);
+  doc.text("N/A mg/dL", tablaInicioX + tablaAncho / 2 + 20, yPos + 3.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Creatinina:", tablaInicioX + (3 * tablaAncho / 4) + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   const creatininaValue = data.creatininaLaboratorioClinico_txtcreatininabio || "";
-  doc.text(formatearTexto(creatininaValue ? `${creatininaValue} mg/dL` : ""), tablaInicioX + (3 * tablaAncho / 4) + 30, yPos + 3.5);
+  doc.text(creatininaValue ? `${creatininaValue.toString().toUpperCase()} mg/dL` : "N/A mg/dL", tablaInicioX + (3 * tablaAncho / 4) + 30, yPos + 3.5);
   yPos += filaAltura;
 
   // Fila celeste: Perfil lipídico completo
@@ -2931,35 +2925,35 @@ export default function Anexo7C_Boro(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("L.DL:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(`${formatearTexto(data.ldlcolesterolAnalisisBioquimico_txtldlcolesterol || "")} mg/dL`, tablaInicioX + 12, yPos + 3.5);
+  doc.text(`${(data.ldlcolesterolAnalisisBioquimico_txtldlcolesterol || "").toString().toUpperCase()} mg/dL`, tablaInicioX + 12, yPos + 3.5);
 
   // Columna 2 (H.D.L)
   const posCol2 = tablaInicioX + lipidoCol1;
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("H.D.L:", posCol2 + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(`${formatearTexto(data.hdlcolesterolAnalisisBioquimico_txthdlcolesterol || "")} mg/dL`, posCol2 + 12, yPos + 3.5);
+  doc.text(`${(data.hdlcolesterolAnalisisBioquimico_txthdlcolesterol || "").toString().toUpperCase()} mg/dL`, posCol2 + 12, yPos + 3.5);
 
   // Columna 3 (V.L.D.L) - Movida más a la izquierda
   const posCol3 = posCol2 + lipidoCol2;
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("V.L.D.L:", posCol3 + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(`${formatearTexto(data.vldlcolesterolAnalisisBioquimico_txtvldlcolesterol || "")} mg/dL`, posCol3 + 14, yPos + 3.5);
+  doc.text(`${(data.vldlcolesterolAnalisisBioquimico_txtvldlcolesterol || "").toString().toUpperCase()} mg/dL`, posCol3 + 14, yPos + 3.5);
 
   // Columna 4 (Triglicéridos)
   const posCol4 = posCol3 + lipidoCol3;
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Triglicéridos:", posCol4 + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(`${formatearTexto(data.trigliceridosAnalisisBioquimico_txttrigliceridos || "")} mg/dL`, posCol4 + 20, yPos + 3.5);
+  doc.text(`${(data.trigliceridosAnalisisBioquimico_txttrigliceridos || "").toString().toUpperCase()} mg/dL`, posCol4 + 20, yPos + 3.5);
 
   // Columna 5 (Colesterol total)
   const posCol5 = posCol4 + lipidoCol4;
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Colesterol total:", posCol5 + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(`${formatearTexto(data.colesterolAnalisisBioquimico_txtcolesterol || "")} mg/dL`, posCol5 + 25, yPos + 3.5);
+  doc.text(`${(data.colesterolAnalisisBioquimico_txtcolesterol || "").toString().toUpperCase()} mg/dL`, posCol5 + 25, yPos + 3.5);
 
 yPos += filaAltura;
 
@@ -2980,22 +2974,22 @@ yPos += filaAltura;
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Cocaína:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTexto(data.cocainaLaboratorioClinico_txtcocaina || ""), tablaInicioX + 25, yPos + 3.5);
+  doc.text((data.cocainaLaboratorioClinico_txtcocaina || "").toString().toUpperCase(), tablaInicioX + 20, yPos + 3.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Marihuana:", tablaInicioX + tablaAncho / 4 + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTexto(data.marihuanaLaboratorioClinico_txtmarihuana || ""), tablaInicioX + tablaAncho / 4 + 30, yPos + 3.5);
+  doc.text((data.marihuanaLaboratorioClinico_txtmarihuana || "").toString().toUpperCase(), tablaInicioX + tablaAncho / 4 + 20, yPos + 3.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Mercurio:", tablaInicioX + tablaAncho / 2 + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTexto("N/A"), tablaInicioX + tablaAncho / 2 + 30, yPos + 3.5);
+  doc.text("N/A", tablaInicioX + tablaAncho / 2 + 20, yPos + 3.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Plomo:", tablaInicioX + (3 * tablaAncho / 4) + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTexto("N/A"), tablaInicioX + (3 * tablaAncho / 4) + 25, yPos + 3.5);
+  doc.text("N/A", tablaInicioX + (3 * tablaAncho / 4) + 20, yPos + 3.5);
   yPos += filaAltura;
 
   // Fila: Grupo sanguíneo | Factor | Hemoglobina/Hematocrito (3 columnas)
@@ -3020,7 +3014,7 @@ yPos += filaAltura;
   if (data.grupoSanguineoAB_chkab) grupos.push("AB");
   grupoSanguineoTexto = grupos.join(", ");
   
-  doc.text(formatearTexto(grupoSanguineoTexto), tablaInicioX + 40, yPos + 3.5);
+  doc.text(grupoSanguineoTexto.toUpperCase(), tablaInicioX + 40, yPos + 3.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Factor:", tablaInicioX + tablaAncho / 3 + 2, yPos + 3.5);
@@ -3028,10 +3022,10 @@ yPos += filaAltura;
   
   // Convertir objeto factorRh a string
   let factorRhTexto = "";
-  if (data.grupoSanguineoRhPositivo_rbrhpositivo) factorRhTexto = "Rh(+) Positivo";
-  else if (data.grupoSanguineoRhNegativo_rbrhnegativo) factorRhTexto = "Rh(-) Negativo";
+  if (data.grupoSanguineoRhPositivo_rbrhpositivo) factorRhTexto = "RH(+) POSITIVO";
+  else if (data.grupoSanguineoRhNegativo_rbrhnegativo) factorRhTexto = "RH(-) NEGATIVO";
   
-  doc.text(formatearTexto(factorRhTexto), tablaInicioX + tablaAncho / 3 + 25, yPos + 3.5);
+  doc.text(factorRhTexto.toUpperCase(), tablaInicioX + tablaAncho / 3 + 25, yPos + 3.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Hemoglobina:", tablaInicioX + (2 * tablaAncho / 3) + 2, yPos + 3.5);
@@ -3052,7 +3046,7 @@ yPos += filaAltura;
   
   doc.setFont("helvetica", "bold").setFontSize(9.5);
   doc.setTextColor(colorHemoglobina[0], colorHemoglobina[1], colorHemoglobina[2]);
-  doc.text(formatearTexto((data.hemoglobina_txthemoglobina || "") + " gr. %"), tablaInicioX + (2 * tablaAncho / 3) + 35, yPos + 3.5);
+  doc.text(((data.hemoglobina_txthemoglobina || "") + " gr. %").toString().toUpperCase(), tablaInicioX + (2 * tablaAncho / 3) + 35, yPos + 3.5);
   doc.setTextColor(0, 0, 0); // Volver al color negro
   yPos += filaAltura;
 
@@ -3071,7 +3065,7 @@ yPos += filaAltura;
   if (data.examenRadiograficoAptoSi_apto_si) aptoParaTrabajarTexto = "SI";
   else if (data.examenRadiograficoAptoNo_apto_no) aptoParaTrabajarTexto = "NO";
   
-  doc.text(formatearTexto(aptoParaTrabajarTexto), tablaInicioX + 50, yPos + 3.5);
+  doc.text(aptoParaTrabajarTexto.toUpperCase(), tablaInicioX + 50, yPos + 3.5);
   yPos += filaAltura;
 
   // === FOOTER PÁGINA 2 ===
@@ -3091,7 +3085,8 @@ yPos += filaAltura;
   // Fila creciente con altura por defecto de 35mm
   const alturaFilaCrecientePag3 = 35; // 35mm por defecto
   const textoOtrosExamenesPag3 = datosFinales.otrosExamenes || "";
-  const anchoDisponibleOtrosExamenesPag3 = tablaAncho - 4;
+  // Calcular ancho máximo: tablaAncho (200) - margen texto izquierdo (2) - margen derecho (1) = 197mm para maximizar uso
+  const anchoDisponibleOtrosExamenesPag3 = tablaAncho - 3; // Usa máximo ancho posible (200 - 3 = 197mm)
   const lineasOtrosExamenesPag3 = doc.splitTextToSize(textoOtrosExamenesPag3, anchoDisponibleOtrosExamenesPag3);
   
   // Interlineado para el texto
@@ -3107,51 +3102,105 @@ yPos += filaAltura;
   doc.line(tablaInicioX, yPos + alturaDinamicaOtrosExamenesPag3, tablaInicioX + tablaAncho, yPos + alturaDinamicaOtrosExamenesPag3);
 
   // Contenido de la fila creciente con interlineado controlado
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   const lineasOtrosExamenesFormateadas = lineasOtrosExamenesPag3.map(linea => linea.toUpperCase());
   lineasOtrosExamenesFormateadas.forEach((linea, index) => {
     doc.text(linea, tablaInicioX + 2, yPos + 3.5 + (index * interlineadoOtrosExamenes));
   });
   yPos += alturaDinamicaOtrosExamenesPag3;
 
-  // === SECCIÓN: CONCLUSIONES ===
-  yPos = dibujarHeaderSeccion("17. CONCLUSIONES", yPos, filaAltura);
+// === SECCIÓN: CONCLUSIONES ===
+yPos = dibujarHeaderSeccion("17. CONCLUSIONES", yPos, filaAltura);
 
-  // Fila creciente para conclusiones
-  const textoConclusionesPag3 = datosFinales.conclusiones || "";
-  const anchoDisponibleConclusionesPag3 = tablaAncho - 4;
-  const lineasConclusionesPag3 = doc.splitTextToSize(textoConclusionesPag3, anchoDisponibleConclusionesPag3);
+const textoConclusionesPag3 = datosFinales.conclusiones || "";
+
+// Split into items respecting \n or numbered points
+let items = [];
+if (textoConclusionesPag3.includes('\n')) {
+  // If already has line breaks, use them
+  items = textoConclusionesPag3.split('\n').filter(item => item.trim() !== '');
+} else {
+  // Otherwise, split by numbered points (1., 2., etc.)
+  items = textoConclusionesPag3.split(/(?=\d+\.\s)/).filter(item => item.trim() !== '');
+}
+
+const anchoDisponible = tablaAncho - 4; // 196mm to avoid edge clipping
+const espacioEntreItems = 2; // mm space between points
+
+let yStartBox = yPos;
+let yCurrent = yPos + 3.5; // Increased top padding to 3.5mm for better spacing from gray header
+
+doc.setFont("helvetica", "normal").setFontSize(7);
+
+items.forEach((item, index) => {
+  if (index > 0) {
+    yCurrent += espacioEntreItems; // Add space only between points, not within
+  }
   
-  // Interlineado para el texto
-  const interlineadoTexto = 3;
-  
-  // Calcular altura dinámica basada en el contenido
-  const alturaDinamicaConclusionesPag3 = Math.max(45, lineasConclusionesPag3.length * interlineadoTexto + 4);
+  const itemUpper = item.trim().toUpperCase();
+  yCurrent = dibujarTextoConSaltoLinea(itemUpper, tablaInicioX + 2, yCurrent, anchoDisponible);
+});
 
-  // Dibujar líneas de la fila creciente
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaConclusionesPag3);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaConclusionesPag3);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaDinamicaConclusionesPag3, tablaInicioX + tablaAncho, yPos + alturaDinamicaConclusionesPag3);
+// Calculate dynamic height based on actual drawn content
+const alturaCalculada = yCurrent - yStartBox + 2; // Padding at bottom
 
-  // Contenido de la fila creciente con interlineado controlado
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  const lineasConclusionesFormateadas = lineasConclusionesPag3.map(linea => linea.toUpperCase());
-  lineasConclusionesFormateadas.forEach((linea, index) => {
-    doc.text(linea, tablaInicioX + 2, yPos + 3.5 + (index * interlineadoTexto));
-  });
-  yPos += alturaDinamicaConclusionesPag3;
+// Now draw the box lines using the calculated height (ensures full coverage, no cutoff)
+doc.setDrawColor(0, 0, 0);
+doc.setLineWidth(0.2);
+doc.line(tablaInicioX, yStartBox, tablaInicioX, yStartBox + alturaCalculada);
+doc.line(tablaInicioX + tablaAncho, yStartBox, tablaInicioX + tablaAncho, yStartBox + alturaCalculada);
+doc.line(tablaInicioX, yStartBox, tablaInicioX + tablaAncho, yStartBox);
+doc.line(tablaInicioX, yStartBox + alturaCalculada, tablaInicioX + tablaAncho, yStartBox + alturaCalculada);
+
+yPos += alturaCalculada;
 
   // === SECCIÓN: RECOMENDACIONES / RESTRICCIONES ===
   yPos = dibujarHeaderSeccion("18. RECOMENDACIONES / RESTRICCIONES", yPos, filaAltura);
 
   // Fila creciente para recomendaciones
   const textoRecomendacionesPag3 = datosFinales.recomendacionesRestricciones || "";
-  const anchoDisponibleRecomendacionesPag3 = tablaAncho - 4;
-  const lineasRecomendacionesPag3 = doc.splitTextToSize(textoRecomendacionesPag3, anchoDisponibleRecomendacionesPag3);
+  // Calcular ancho máximo: tablaAncho (200) - margen texto izquierdo (2) - margen derecho (1) = 197mm para maximizar uso
+  const anchoDisponibleRecomendacionesPag3 = tablaAncho - 3; // Usa máximo ancho posible (200 - 3 = 197mm)
   
-  // Calcular altura dinámica basada en el contenido
-  const alturaDinamicaRecomendacionesPag3 = Math.max(45, lineasRecomendacionesPag3.length * interlineadoTexto + 4);
+  // Procesar texto: separar por \n primero, si no hay \n, dividir por patrones de números (1., 2., etc.)
+  let itemsRecomendaciones = [];
+  if (textoRecomendacionesPag3.includes('\n')) {
+    // Si ya tiene saltos de línea, usar esos
+    itemsRecomendaciones = textoRecomendacionesPag3.split('\n').filter(item => item.trim() !== '');
+  } else {
+    // Si no tiene saltos, dividir por patrones de número seguido de punto al inicio de línea
+    itemsRecomendaciones = textoRecomendacionesPag3.split(/(?=\d+\.\s)/).filter(item => item.trim() !== '');
+  }
+  
+  // Procesar cada ítem: dividir en líneas y agregar espacio entre ítems
+  let todasLasLineasRecomendaciones = [];
+  let alturaAcumuladaRecomendaciones = 0;
+  
+  itemsRecomendaciones.forEach((item, itemIndex) => {
+    const itemFormateado = item.trim().toUpperCase();
+    if (!itemFormateado) return;
+    
+    // Dividir el ítem en líneas según el ancho disponible
+    const lineasDelItem = doc.splitTextToSize(itemFormateado, anchoDisponibleRecomendacionesPag3);
+    
+    // Agregar cada línea del ítem
+    lineasDelItem.forEach((linea) => {
+      todasLasLineasRecomendaciones.push({
+        texto: linea,
+        itemIndex: itemIndex, // Guardar índice del ítem para detectar cambios
+        alturaLinea: interlineadoTexto
+      });
+      alturaAcumuladaRecomendaciones += interlineadoTexto;
+    });
+    
+    // Agregar espacio adicional (1mm) después de cada ítem (excepto el último)
+    if (itemIndex < itemsRecomendaciones.length - 1) {
+      alturaAcumuladaRecomendaciones += espacioEntreItems;
+    }
+  });
+  
+  // Calcular altura dinámica basada en todas las líneas
+  const alturaDinamicaRecomendacionesPag3 = Math.max(45, alturaAcumuladaRecomendaciones + 4);
 
   // Dibujar líneas de la fila creciente
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaRecomendacionesPag3);
@@ -3159,12 +3208,27 @@ yPos += filaAltura;
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaDinamicaRecomendacionesPag3, tablaInicioX + tablaAncho, yPos + alturaDinamicaRecomendacionesPag3);
 
-  // Contenido de la fila creciente con interlineado controlado
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  const lineasRecomendacionesFormateadas = lineasRecomendacionesPag3.map(linea => linea.toUpperCase());
-  lineasRecomendacionesFormateadas.forEach((linea, index) => {
-    doc.text(linea, tablaInicioX + 2, yPos + 3.5 + (index * interlineadoTexto));
+  // Dibujar contenido línea por línea con espaciado entre ítems
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  let yPosActualRecomendaciones = yPos + 3.5;
+  let itemIndexAnteriorRecomendaciones = -1;
+  
+  todasLasLineasRecomendaciones.forEach((lineaObj) => {
+    // Si cambió de ítem (no es el primero), agregar espacio adicional antes
+    if (lineaObj.itemIndex !== itemIndexAnteriorRecomendaciones && itemIndexAnteriorRecomendaciones !== -1) {
+      yPosActualRecomendaciones += espacioEntreItems;
+    }
+    
+    // Dibujar la línea
+    doc.text(lineaObj.texto, tablaInicioX + 2, yPosActualRecomendaciones);
+    
+    // Avanzar posición Y con interlineado normal
+    yPosActualRecomendaciones += interlineadoTexto;
+    
+    // Actualizar índice del ítem anterior
+    itemIndexAnteriorRecomendaciones = lineaObj.itemIndex;
   });
+  
   yPos += alturaDinamicaRecomendacionesPag3;
 
   // === SECCIÓN DE DECLARACIÓN, FIRMA Y HUELLA DEL TRABAJADOR ===
