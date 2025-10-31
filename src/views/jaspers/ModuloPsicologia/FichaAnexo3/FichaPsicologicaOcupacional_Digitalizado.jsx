@@ -9,6 +9,7 @@ import footerTR from '../../components/footerTR.jsx';
 export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
   // Contador de páginas dinámico
   let numeroPagina = 1;
   
@@ -143,7 +144,8 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
         'Test Bender': String(payload?.puntajeBender_puntaje10 ?? '').toUpperCase() === 'X',
         'Inventario de la ansiedad ZUNG': String(payload?.puntajeAnsiedadZung_puntaje11 ?? '').toUpperCase() === 'X',
         'Inventario de Depresión ZUNG': String(payload?.puntajeDepresionZung_puntaje12 ?? '').toUpperCase() === 'X',
-        'Escala de Memoria de Wechsler': String(payload?.puntajeEscalaMemoriaWechsler_puntaje13 ?? '').toUpperCase() === 'X'
+        'Escala de Memoria de Wechsler': String(payload?.puntajeEscalaMemoriaWechsler_puntaje13 ?? '').toUpperCase() === 'X',
+        'Otras Pruebas': String(payload?.puntajeOtrasPruebas_puntaje14 ?? '').toUpperCase() === 'X'
       },
       otrasPruebas: []
     };
@@ -206,36 +208,56 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   };
 
   // === FUNCIONES AUXILIARES ===
-  // Función para texto con salto de línea
+  // Función para texto con salto de línea (maneja saltos de línea explícitos \n)
   const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
+    // Validar que el texto no sea undefined, null o vacío
+    if (!texto || texto === null || texto === undefined) {
+      return y;
+    }
+    
     const fontSize = doc.internal.getFontSize();
-    const palabras = texto.split(' ');
-    let lineaActual = '';
     let yPos = y;
     
-    palabras.forEach(palabra => {
-      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
-      const anchoTexto = doc.getTextWidth(textoPrueba);
+    // Primero dividir por saltos de línea explícitos (\n)
+    const lineasConSaltos = String(texto).split('\n');
+    
+    lineasConSaltos.forEach((lineaConSalto, indiceLinea) => {
+      // Si no es la primera línea y hay un salto de línea antes, hacer salto
+      if (indiceLinea > 0) {
+        yPos += fontSize * 0.35; // Salto de línea explícito
+      }
       
-      if (anchoTexto <= anchoMaximo) {
-        lineaActual = textoPrueba;
-      } else {
-        if (lineaActual) {
-          doc.text(lineaActual, x, yPos);
-          yPos += fontSize * 0.35;
-          lineaActual = palabra;
+      // Dividir cada línea por espacios para manejar el ancho máximo
+      const palabras = lineaConSalto.split(' ');
+      let lineaActual = '';
+      
+      palabras.forEach(palabra => {
+        const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+        const anchoTexto = doc.getTextWidth(textoPrueba);
+        
+        if (anchoTexto <= anchoMaximo) {
+          lineaActual = textoPrueba;
         } else {
-          doc.text(palabra, x, yPos);
-          yPos += fontSize * 0.35;
+          if (lineaActual) {
+            doc.text(lineaActual, x, yPos);
+            yPos += fontSize * 0.35; // salto real entre líneas
+            lineaActual = palabra;
+          } else {
+            // Si la palabra sola es más ancha que el máximo, igual la dibujamos
+            doc.text(palabra, x, yPos);
+            yPos += fontSize * 0.35;
+          }
         }
+      });
+      
+      // Dibujar la línea actual si quedó algo
+      if (lineaActual) {
+        doc.text(lineaActual, x, yPos);
+        // NO sumar una línea extra aquí, solo cuando hay salto explícito o nueva palabra
       }
     });
     
-    if (lineaActual) {
-      doc.text(lineaActual, x, yPos);
-    }
-    
-    return yPos;
+    return yPos; // Devuelve la posición final donde terminó el texto
   };
 
   // Función para calcular altura dinámica del texto
@@ -1325,19 +1347,19 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   });
 
   // === SECCIÓN 7.3: EVALUACIÓN ADICIONAL ===
-  // Header de evaluación adicional (solo hasta la mitad)
+  // Header de evaluación adicional (ocupa todo el ancho)
   
-  // Dibujar fondo celeste solo en la mitad izquierda
+  // Dibujar fondo celeste ocupando todo el ancho
   doc.setFillColor(173, 216, 230); // Color celeste claro
-  doc.rect(tablaInicioX, yPos, anchoMitadIzquierda, filaAltura, 'F');
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   
-  // Dibujar líneas del header solo en la mitad izquierda
+  // Dibujar líneas del header ocupando todo el ancho
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + anchoMitadIzquierda, yPos, tablaInicioX + anchoMitadIzquierda, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + anchoMitadIzquierda, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + anchoMitadIzquierda, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   
   // Dibujar texto del título
   doc.setFont("helvetica", "bold").setFontSize(8);
@@ -1380,11 +1402,11 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   ];
 
   evaluacionAdicional.forEach((evaluacion) => {
-    // Dibujar líneas de la fila
+    // Dibujar líneas de la fila (ocupando todo el ancho)
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaObservacionAltura);
-    doc.line(tablaInicioX + anchoMitadIzquierda, yPos, tablaInicioX + anchoMitadIzquierda, yPos + filaObservacionAltura);
-    doc.line(tablaInicioX, yPos, tablaInicioX + anchoMitadIzquierda, yPos);
-    doc.line(tablaInicioX, yPos + filaObservacionAltura, tablaInicioX + anchoMitadIzquierda, yPos + filaObservacionAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaObservacionAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaObservacionAltura, tablaInicioX + tablaAncho, yPos + filaObservacionAltura);
     
     // Dibujar título
     doc.setFont("helvetica", "bold").setFontSize(8);
@@ -1394,14 +1416,17 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     const espacioTituloEvaluacion = 25;
     doc.line(tablaInicioX + espacioTituloEvaluacion, yPos, tablaInicioX + espacioTituloEvaluacion, yPos + filaObservacionAltura);
     
-    // Dibujar valor
+    // Dibujar valor (con más espacio disponible)
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(evaluacion.valor, tablaInicioX + espacioTituloEvaluacion + 1, yPos + 3.5);
     
     yPos += filaObservacionAltura;
   });
 
-  // Restaurar la posición para la tabla de inventarios (debe empezar inmediatamente después del header)
+  // Guardar la posición final de la evaluación adicional (ahora ocupa todo el ancho)
+  const yPosFinalEvaluacionAdicional = yPos;
+
+  // Restaurar la posición para la tabla de inventarios (debe empezar inmediatamente después del header 7.1)
   yPos = yPosInventarios;
 
   // === TABLA DE INVENTARIOS EN LA MITAD DERECHA ===
@@ -1418,7 +1443,8 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     "Test Bender",
     "Inventario de la ansiedad ZUNG",
     "Inventario de Depresión ZUNG",
-    "Escala de Memoria de Wechsler"
+    "Escala de Memoria de Wechsler",
+    "Otras Pruebas"
   ];
   
   // Obtener datos de inventarios del examen mental
@@ -1428,7 +1454,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   const inicioXTabla = tablaInicioX + mitadAncho; // Empezar desde la nueva división
   // anchoTablaInventarios ya está definido arriba
   
-  // Dibujar filas de inventarios (excepto "Otras Pruebas")
+  // Dibujar todas las filas de inventarios (incluyendo "Otras Pruebas" como fila normal)
   inventarios.forEach((inventario) => {
     // Dibujar líneas de la fila
     doc.line(inicioXTabla, yPos, inicioXTabla, yPos + filaInventarioAltura);
@@ -1452,94 +1478,152 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     yPos += filaInventarioAltura;
   });
 
-  // === FILA ESPECIAL: OTRAS PRUEBAS (campo de texto que llega hasta el final) ===
-  // Calcular la altura necesaria para llegar hasta el final de la sección de conducta sexual
-  // La sección de evaluación adicional termina después de todas sus filas
-  const alturaOtrasPruebas = (evaluacionAdicional.length * filaObservacionAltura) + 20; // +2 para asegurar que llegue hasta el final
-  
-  // Dibujar líneas de la fila extendida (sin división interna)
-  doc.line(inicioXTabla, yPos, inicioXTabla, yPos + alturaOtrasPruebas);
-  doc.line(inicioXTabla + anchoTablaInventarios, yPos, inicioXTabla + anchoTablaInventarios, yPos + alturaOtrasPruebas);
-  doc.line(inicioXTabla, yPos, inicioXTabla + anchoTablaInventarios, yPos);
-  doc.line(inicioXTabla, yPos + alturaOtrasPruebas, inicioXTabla + anchoTablaInventarios, yPos + alturaOtrasPruebas);
-  
-  // Dibujar texto "Otras Pruebas" en la parte superior
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Otras Pruebas:", inicioXTabla + 1, yPos + 3.5);
-  
-  // Dibujar campo de texto para otras pruebas debajo del label (como lista)
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  
-  // Usar otrasObservaciones_otras_observ del payload
-  const otrasPruebasTexto = datosFinales.otrasObservaciones || '';
-  
-  // Procesar si viene como lista separada por "/"
-  let itemsOtrasPruebas;
-  if (typeof otrasPruebasTexto === 'string' && otrasPruebasTexto.includes('/')) {
-    // Convertir lista separada por "/" en texto con viñetas
-    const listaItems = otrasPruebasTexto.split('/').map(item => item.trim()).filter(item => item);
-    itemsOtrasPruebas = listaItems.map(item => `• ${item}`);
-  } else {
-    // Es texto normal, convertir en lista de un solo item
-    itemsOtrasPruebas = otrasPruebasTexto ? [`• ${otrasPruebasTexto}`] : [];
-  }
-  
-  let yPosTexto = yPos + 8;
-  itemsOtrasPruebas.forEach(item => {
-    doc.text(item, inicioXTabla + 1, yPosTexto);
-    yPosTexto += 4; // Espacio entre items
-  });
+  // Guardar la posición final de los inventarios (lado derecho)
+  const yPosFinalInventarios = yPos;
 
   // === SECCIÓN IX: DIAGNÓSTICO FINAL ===
-  // Ahora ocupamos todo el ancho de la página
-  yPos += alturaOtrasPruebas;
+  // Usar la posición más baja entre evaluación adicional e inventarios para alinear correctamente
+  yPos = Math.max(yPosFinalEvaluacionAdicional, yPosFinalInventarios);
   
   // Header gris "IX. DIAGNOSTICO FINAL"
   yPos = dibujarHeaderSeccion("IX. DIAGNOSTICO FINAL", yPos, filaAltura);
   
   // === SUBSECCIÓN: ÁREA COGNITIVA ===
+  // Verificar si necesitamos nueva página antes de Área Cognitiva
+  const espacioMinimoCognitiva = 15;
+  if (yPos + espacioMinimoCognitiva > pageHeight - 20) {
+    doc.addPage();
+    numeroPagina++;
+    yPos = 35;
+    drawHeader(numeroPagina);
+  }
+  
   // Header celeste "Área Cognitiva"
   yPos = dibujarSubHeaderCeleste("Área Cognitiva:", yPos, filaAltura);
   
   // Contenido del área cognitiva usando datos mapeados
   const diagnosticoFinal = examenMental.diagnosticoFinal || {};
   const areaCognitivaTexto = diagnosticoFinal.areaCognitiva || "El paciente presenta capacidades cognitivas preservadas con atención y concentración adecuadas. Se observa memoria inmediata y diferida dentro de parámetros normales, funciones ejecutivas eficientes y procesamiento de información adecuado para las demandas del puesto.";
-  const alturaAreaCognitiva = calcularAlturaTexto(areaCognitivaTexto, tablaAncho - 4, 15);
   
-  // Dibujar fila de contenido con altura dinámica
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaAreaCognitiva);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaAreaCognitiva);
+  // Dibujar borde superior y laterales de la fila
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaAreaCognitiva, tablaInicioX + tablaAncho, yPos + alturaAreaCognitiva);
   
-  // Dibujar texto del área cognitiva
+  // Dibujar texto del área cognitiva primero para obtener altura real (FILA DINÁMICA/CRECIENTE)
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(areaCognitivaTexto, tablaInicioX + 2, yPos + 3.5, tablaAncho - 4);
+  const yInicialCognitiva = yPos;
+  const yTextoInicioCognitiva = yPos + 3.5;
+  let yFinalCognitiva = dibujarTextoConSaltoLinea(areaCognitivaTexto, tablaInicioX + 2, yTextoInicioCognitiva, tablaAncho - 4);
   
-  yPos += alturaAreaCognitiva;
+  // Verificar si necesitamos nueva página durante el dibujado (si el texto es muy largo)
+  const alturaMaximaCognitiva = pageHeight - yInicialCognitiva - 25; // 25mm para footer y margen
+  if (yFinalCognitiva - yInicialCognitiva > alturaMaximaCognitiva) {
+    // Texto muy largo, necesitamos nueva página
+    doc.addPage();
+    numeroPagina++;
+    yPos = 35;
+    drawHeader(numeroPagina);
+    // Redibujar header celeste en nueva página
+    yPos = dibujarSubHeaderCeleste("Área Cognitiva:", yPos, filaAltura);
+    // Redibujar texto en nueva página desde el inicio
+    const yInicialCognitivaNueva = yPos;
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    yFinalCognitiva = dibujarTextoConSaltoLinea(areaCognitivaTexto, tablaInicioX + 2, yPos + 3.5, tablaAncho - 4);
+    yPos = yInicialCognitivaNueva;
+  }
+  
+  // Calcular altura real de la fila (desde el inicio hasta el final del texto + margen inferior)
+  // La fila CRECE DINÁMICAMENTE según la cantidad de texto
+  const alturaNecesariaCognitiva = (yFinalCognitiva - yInicialCognitiva) + 3.5; // +3.5 para margen inferior
+  const alturaMinimaFilaCognitiva = filaAltura;
+  const alturaRealCognitiva = Math.max(alturaMinimaFilaCognitiva, alturaNecesariaCognitiva);
+  
+  // Redibujar los bordes con la altura correcta (ajusta automáticamente al contenido)
+  doc.line(tablaInicioX, yInicialCognitiva, tablaInicioX, yInicialCognitiva + alturaRealCognitiva);
+  doc.line(tablaInicioX + tablaAncho, yInicialCognitiva, tablaInicioX + tablaAncho, yInicialCognitiva + alturaRealCognitiva);
+  doc.line(tablaInicioX, yInicialCognitiva + alturaRealCognitiva, tablaInicioX + tablaAncho, yInicialCognitiva + alturaRealCognitiva);
+  
+  yPos += alturaRealCognitiva;
   
   // === SUBSECCIÓN: ÁREA EMOCIONAL ===
+  // Verificar si necesitamos nueva página antes de Área Emocional
+  const espacioMinimoEmocional = 15;
+  if (yPos + espacioMinimoEmocional > pageHeight - 20) {
+    doc.addPage();
+    numeroPagina++;
+    yPos = 35;
+    drawHeader(numeroPagina);
+  }
+  
   // Header celeste "Área Emocional"
   yPos = dibujarSubHeaderCeleste("Área Emocional:", yPos, filaAltura);
   
   // Contenido del área emocional usando datos mapeados
   const areaEmocionalTexto = diagnosticoFinal.areaEmocional || "El paciente presenta un estado emocional estable con capacidad de regulación emocional adecuada. Se observa un nivel de ansiedad dentro de parámetros normales y habilidades sociales preservadas que le permiten mantener relaciones interpersonales satisfactorias.";
-  const alturaAreaEmocional = calcularAlturaTexto(areaEmocionalTexto, tablaAncho - 4, 15);
   
-  // Dibujar fila de contenido con altura dinámica
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaAreaEmocional);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaAreaEmocional);
+  // Dibujar borde superior y laterales de la fila
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaAreaEmocional, tablaInicioX + tablaAncho, yPos + alturaAreaEmocional);
   
-  // Dibujar texto del área emocional
+  // Dibujar texto del área emocional primero para obtener altura real (FILA DINÁMICA/CRECIENTE)
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(areaEmocionalTexto, tablaInicioX + 2, yPos + 3.5, tablaAncho - 4);
+  const yInicialEmocional = yPos;
+  const yTextoInicioEmocional = yPos + 3.5;
+  let yFinalEmocional = dibujarTextoConSaltoLinea(areaEmocionalTexto, tablaInicioX + 2, yTextoInicioEmocional, tablaAncho - 4);
   
-  yPos += alturaAreaEmocional;
+  // Verificar si necesitamos nueva página durante el dibujado (si el texto es muy largo)
+  const alturaMaximaEmocional = pageHeight - yInicialEmocional - 25; // 25mm para footer y margen
+  if (yFinalEmocional - yInicialEmocional > alturaMaximaEmocional) {
+    // Texto muy largo, necesitamos nueva página
+    doc.addPage();
+    numeroPagina++;
+    yPos = 35;
+    drawHeader(numeroPagina);
+    // Redibujar header celeste en nueva página
+    yPos = dibujarSubHeaderCeleste("Área Emocional:", yPos, filaAltura);
+    // Redibujar texto en nueva página desde el inicio
+    const yInicialEmocionalNueva = yPos;
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    yFinalEmocional = dibujarTextoConSaltoLinea(areaEmocionalTexto, tablaInicioX + 2, yPos + 3.5, tablaAncho - 4);
+    yPos = yInicialEmocionalNueva;
+  }
+  
+  // Calcular altura real de la fila (desde el inicio hasta el final del texto + margen inferior)
+  // La fila CRECE DINÁMICAMENTE según la cantidad de texto
+  const alturaNecesariaEmocional = (yFinalEmocional - yInicialEmocional) + 3.5; // +3.5 para margen inferior
+  const alturaMinimaFilaEmocional = filaAltura;
+  const alturaRealEmocional = Math.max(alturaMinimaFilaEmocional, alturaNecesariaEmocional);
+  
+  // Redibujar los bordes con la altura correcta (ajusta automáticamente al contenido)
+  doc.line(tablaInicioX, yInicialEmocional, tablaInicioX, yInicialEmocional + alturaRealEmocional);
+  doc.line(tablaInicioX + tablaAncho, yInicialEmocional, tablaInicioX + tablaAncho, yInicialEmocional + alturaRealEmocional);
+  doc.line(tablaInicioX, yInicialEmocional + alturaRealEmocional, tablaInicioX + tablaAncho, yInicialEmocional + alturaRealEmocional);
+  
+  yPos += alturaRealEmocional;
 
   // === SECCIÓN DE FIRMA DEL MÉDICO ===
-  const alturaSeccionFirma = 25; // Altura para la sección de firma
+  // Verificar si necesitamos nueva página antes de la firma
+  const espacioMinimoFirma = 30;
+  if (yPos + espacioMinimoFirma > pageHeight - 20) {
+    doc.addPage();
+    numeroPagina++;
+    yPos = 35;
+    drawHeader(numeroPagina);
+  }
+  
+  const alturaSeccionFirma = 30; // Altura para la sección de firma
   
   // Dibujar las líneas de la sección de firma (1 columna centrada)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaSeccionFirma); // Línea izquierda
@@ -1548,31 +1632,29 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yPos + alturaSeccionFirma, tablaInicioX + tablaAncho, yPos + alturaSeccionFirma); // Línea inferior
 
   // === FIRMA DEL MÉDICO CENTRADA ===
-  const firmaMedicoY = yPos + 3;
+  // Firma arriba, texto abajo
+  const firmaMedicoY = yPos + 3; // Posición inicial de la firma (arriba)
+  const imgHeight = 20; // Altura de la imagen
   
   // Agregar firma y sello médico
   const firmaMedicoUrl = getSign(data, "SELLOFIRMA");
-  console.log("Firma médico URL:", firmaMedicoUrl);
   if (firmaMedicoUrl) {
     try {
       const imgWidth = 50;
-      const imgHeight = 20;
       const x = tablaInicioX + (tablaAncho - imgWidth) / 2; // Centrar horizontalmente
       const y = firmaMedicoY;
       doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
-      console.log("Firma médico agregada exitosamente");
     } catch (error) {
       console.log("Error cargando firma del médico:", error);
     }
-  } else {
-    console.log("No se encontró URL de firma del médico");
   }
   
+  // Texto debajo de la firma (después de la imagen + espacio)
   doc.setFont("helvetica", "normal").setFontSize(7);
-  // Centrar el texto
   const centroX = tablaInicioX + tablaAncho / 2;
-  doc.text("Sello y Firma del Médico", centroX, yPos + 20, { align: "center" });
-  doc.text("Responsable de la Evaluación", centroX, yPos + 22.5, { align: "center" });
+  const textoY = firmaMedicoY + imgHeight + 3; // Texto después de la imagen (imgHeight) + 3mm de espacio
+  doc.text("Sello y Firma del Médico", centroX, textoY, { align: "center" });
+  doc.text("Responsable de la Evaluación", centroX, textoY + 2.5, { align: "center" });
 
   yPos += alturaSeccionFirma;
 

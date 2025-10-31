@@ -36,16 +36,16 @@ export function clearLocalStorageExceptAuth() { // Limpia localStorage excepto l
     }
 }
 
-export function convertirGenero(genero) { // Convierte F/M a Femenino/Masculino
+export function convertirGenero(genero) { // Convierte F/M a FEMENINO/MASCULINO
     if (!genero) return "";
     const generoUpper = String(genero).toUpperCase().trim();
     switch (generoUpper) {
         case 'F':
-            return 'Femenino';
+            return 'FEMENINO';
         case 'M':
-            return 'Masculino';
+            return 'MASCULINO';
         default:
-            return genero; // Retorna el valor original si no es F o M
+            return String(genero).toUpperCase(); // Retorna el valor en mayúsculas si no es F o M
     }
 }
 

@@ -31,6 +31,9 @@ const CelebrationAnimation = ({ show }) => {
       }, 8000);
 
       return () => clearTimeout(timer);
+    } else {
+      // Limpiar emojis si show se vuelve false
+      setEmojis([]);
     }
   }, [show]);
 

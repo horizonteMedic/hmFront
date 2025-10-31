@@ -42,11 +42,6 @@ const Navbar = () => {
     const dias = Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24));
     
     setDiasParaPago(dias);
-    
-    // Si es día de pago (0 días), activar animación
-    if (dias === 0) {
-      setShowCelebration(true);
-    }
   };
 
   // Función para calcular días hasta el fin de este mes
@@ -65,8 +60,17 @@ const Navbar = () => {
     setDiasParaFinMes(dias);
 
     // Si es el último día del mes (0 días), activar animación para Viviana
+    // Solo si no se ha mostrado hoy
     if (dias === 0) {
-      setShowCelebration(true);
+      const fechaActual = hoy.toDateString(); // Obtener fecha como string (ej: "Mon Jan 15 2024")
+      const ultimaCelebracion = localStorage.getItem('ultimaCelebracionFecha');
+      
+      // Solo mostrar si no se ha mostrado hoy
+      if (ultimaCelebracion !== fechaActual) {
+        setShowCelebration(true);
+        // Guardar que se mostró hoy
+        localStorage.setItem('ultimaCelebracionFecha', fechaActual);
+      }
     }
   };
 
