@@ -83,7 +83,11 @@ export const GetInfoCoproParasitologia = (nro, tabla, set, token,setIsCopro) => 
   )
     .then((res) => {
       if (res.norden) {
-        console.log("respuestaaa", res);
+         Swal.fire(
+          "Alerta",
+          "Este paciente ya cuenta con registros de Parasitología",
+          "warning"
+      );
         setIsCopro(res.tipoCoproparasitologico);
         set((prev) => ({
           ...prev,
@@ -133,9 +137,6 @@ export const GetInfoCoproParasitologia = (nro, tabla, set, token,setIsCopro) => 
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
       }
     })
-    .finally(() => {
-      Swal.close();
-    });
 };
 
 export const SubmitCoproParasitologiaManipulador = async (

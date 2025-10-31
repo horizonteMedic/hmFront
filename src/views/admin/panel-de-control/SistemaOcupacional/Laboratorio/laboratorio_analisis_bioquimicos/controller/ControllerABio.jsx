@@ -13,6 +13,9 @@ export const Loading = (text) => {
       showConfirmButton: false,
       allowOutsideClick: false,
       allowEscapeKey: false,
+      showCancelButton: true,
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
       customClass: {
         popup: 'swal2-border-radius',
         title: 'swal2-title-custom',

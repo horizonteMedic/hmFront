@@ -88,7 +88,11 @@ export const GetInfoService = (nro, tabla, set, token) => {
   )
     .then((res) => {
       if (res.norden) {
-        console.log(res);
+         Swal.fire(
+          "Alerta",
+          "Este paciente ya cuenta con registros de Pruebas Covid",
+          "warning"
+      )
 
          const observacionesRaw = res.txtObservaciones || '';
 
@@ -120,9 +124,6 @@ export const GetInfoService = (nro, tabla, set, token) => {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
       }
     })
-    .finally(() => {
-      Swal.close();
-    });
 };
 
 export const SubmitData = async (form, token, user, limpiar, tabla) => {

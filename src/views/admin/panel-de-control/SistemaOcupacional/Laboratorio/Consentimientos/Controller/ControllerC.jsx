@@ -62,8 +62,10 @@ export const VerifyTR = async (nro,tabla,token,set,sede, form,boro = false) => {
         console.log(res)
         if (res.id === 0) {
             GetInfoPac(nro,set,token,sede)
-        } else {
+        } else if (res.id === 1) {
             GetInfoPacLaboratorioFil(nro,tabla,set,token, boro, form)
+        } else {
+          Swal.fire("Error", "Ocurrio un error", "error")
         }
     })
 }
@@ -88,7 +90,11 @@ export const GetInfoPacLaboratorioFil = (nro,tabla,set,token, boro, form) => {
   if (boro === true) {
     getFetch(`/api/v01/ct/laboratorio/consentimientoLaboratorioBoro?nOrden=${nro}&nameConset=${tabla}`,token)
     .then((res) => {
-      console.log(res)
+       Swal.fire(
+          "Alerta",
+          "Este paciente ya cuenta con registros de Consentimiento Boro",
+          "warning"
+      )
       set(prev => ({
         ...prev,
         ...res,
@@ -100,14 +106,16 @@ export const GetInfoPacLaboratorioFil = (nro,tabla,set,token, boro, form) => {
           cuando: res.critCuandoTratQuirugODental ? res.critCuandoTratQuirugODental : '', donde: res.critDondeTratQuirugODental ? res.critDondeTratQuirugODental : '' },
       }))
     })
-    .finally(() => {
-      Swal.close()
-    })
   } else {
     getFetch(`/api/v01/ct/laboratorio/consentimiento-laboratorio?nOrden=${nro}&nameConset=${tabla}`,token)
     .then((res) => {
       if (res.norden) {
         if (tabla === 'consent_Muestra_Sangre') {
+           Swal.fire(
+            "Alerta",
+            "Este paciente ya cuenta con registros de Consentimiento Muestra de Sangre",
+            "warning"
+          )
           set(prev => ({
             ...prev,
             ...res,
@@ -121,7 +129,11 @@ export const GetInfoPacLaboratorioFil = (nro,tabla,set,token, boro, form) => {
               fecha: res[campos.fecha] ?? today
             };
           });
-          
+           Swal.fire(
+            "Alerta",
+            "Este paciente ya cuenta con registros de Consentimientos",
+            "warning"
+          )
           set(prev => ({
             ...prev,
             ...res,
@@ -132,9 +144,6 @@ export const GetInfoPacLaboratorioFil = (nro,tabla,set,token, boro, form) => {
       } else {
         Swal.fire('Error', 'Ocurrio un error al traer los datos','error')
       }
-    })
-    .finally(() => {
-      Swal.close()
     })
   }
 }
