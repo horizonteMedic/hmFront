@@ -1205,7 +1205,7 @@ export default function Anexo7C_Boro(data = {}) {
   doc.text((datosFinales.funcionRespiratoria?.fev1Fvc || "") + " %", colPositions[5] + 2, yTextoEspirometria + 1);
   
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("FEF 25/75%", colPositions[6] + 2, yTextoEspirometria + 1);
+  doc.text("FEF 25-75%", colPositions[6] + 2, yTextoEspirometria + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text((datosFinales.funcionRespiratoria?.fef2575 || "") + " L/s", colPositions[7] + 2, yTextoEspirometria + 1);
   yTextoEspirometria += filaAltura;
