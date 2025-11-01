@@ -12,7 +12,7 @@ export default function Aptitud_medico_resumen_Digitalizado( data = {} ) {
   
     const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
     const pageW = doc.internal.pageSize.getWidth();
-    console.log('jeje',data)
+    // console.log('jeje',data)
     // Datos de prueba por defecto
     const datosPrueba = {
       numeroFicha: "000000",

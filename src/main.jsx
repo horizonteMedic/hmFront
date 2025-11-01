@@ -45,7 +45,7 @@ import Anexo16A from "./views/admin/panel-de-control/SistemaOcupacional/Anexo16A
 
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/Anexo2/Anexo2_nuevo.jsx"
+import Ficha from "./views/jaspers/Anexo2/Anexo2.jsx"
 
 
 
