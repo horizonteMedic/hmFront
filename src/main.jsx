@@ -168,6 +168,7 @@ const AppContent = () => {
         path="/libro-de-reclamaciones"
         element={<LibroDeReclamaciones />}
       />
+      
       <Route path="/permisos" element={<Permisos />} />
       <Route path="/anexo16a" element={<Anexo16A />} />
       <Route path="*" element={<Navigate to="/" />} />
