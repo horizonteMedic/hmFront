@@ -45,7 +45,7 @@ import Anexo16A from "./views/admin/panel-de-control/SistemaOcupacional/Anexo16A
 
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/Anexo2/Anexo2_nuevo.jsx"
+import Ficha from "./views/jaspers/Anexo2/Anexo2.jsx"
 
 
 
@@ -168,6 +168,7 @@ const AppContent = () => {
         path="/libro-de-reclamaciones"
         element={<LibroDeReclamaciones />}
       />
+      
       <Route path="/permisos" element={<Permisos />} />
       <Route path="/anexo16a" element={<Anexo16A />} />
       <Route path="*" element={<Navigate to="/" />} />
