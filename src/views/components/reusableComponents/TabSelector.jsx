@@ -80,7 +80,7 @@ export default function TabSelector({ tieneVista, tabsConfig }) {
                 </nav>
                 {/* Tab Content */}
                 <div className="max-w-full">
-                    {ActiveComponent && <ActiveComponent />}
+                    {ActiveComponent && <ActiveComponent tieneVista={tieneVista}/>}
                     {activeTab === -1 && (
                         <div className="text-center text-gray-500">
                             No tiene permisos para ver ningún examen.

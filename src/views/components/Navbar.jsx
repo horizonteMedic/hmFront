@@ -45,34 +45,43 @@ const Navbar = () => {
   };
 
   // Función para calcular días hasta el fin de este mes
-  const calcularDiasParaFinMes = () => {
-    const hoy = new Date();
-    const añoActual = hoy.getFullYear();
-    const mesActual = hoy.getMonth(); // 0-11
-    
-    // Obtener el último día del mes actual
-    const ultimoDiaMes = new Date(añoActual, mesActual + 1, 0);
-    
-    // Calcular diferencia en días
-    const diferenciaTiempo = ultimoDiaMes.getTime() - hoy.getTime();
-    const dias = Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24));
-    
-    setDiasParaFinMes(dias);
+  const calcularDiasParaFinPeriodo = () => {
+  const hoy = new Date();
+  const añoActual = hoy.getFullYear();
+  const mesActual = hoy.getMonth(); // 0-11
 
-    // Si es el último día del mes (0 días), activar animación para Viviana
-    // Solo si no se ha mostrado hoy
-    if (dias === 0) {
-      const fechaActual = hoy.toDateString(); // Obtener fecha como string (ej: "Mon Jan 15 2024")
-      const ultimaCelebracion = localStorage.getItem('ultimaCelebracionFecha');
-      
-      // Solo mostrar si no se ha mostrado hoy
-      if (ultimaCelebracion !== fechaActual) {
-        setShowCelebration(true);
-        // Guardar que se mostró hoy
-        localStorage.setItem('ultimaCelebracionFecha', fechaActual);
-      }
+  // Día de inicio fijo: 3 del mes actual
+  const fechaInicio = new Date(añoActual, mesActual, 3);
+
+  // Fecha objetivo: 14 días después del día 3 → día 17
+  const fechaObjetivo = new Date(añoActual, mesActual, 3 + 14);
+
+  // Si hoy es antes del día 3, se empieza a contar desde el próximo día 3
+  if (hoy < fechaInicio) {
+    setDiasParaFinMes(null);
+    return;
+  }
+
+  // Calcular diferencia en días
+  const diferenciaTiempo = fechaObjetivo.getTime() - hoy.getTime();
+  const diasRestantes = Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24));
+
+  // Si ya pasó el día 17, puede reiniciarse o quedarse en 0
+  const dias = diasRestantes > 0 ? diasRestantes : 0;
+
+  setDiasParaFinMes(dias);
+
+  // Si llega al día objetivo (0 días restantes), puedes activar tu evento
+  if (dias === 0) {
+    const fechaActual = hoy.toDateString();
+    const ultimaCelebracion = localStorage.getItem('ultimaCelebracionFecha');
+
+    if (ultimaCelebracion !== fechaActual) {
+      setShowCelebration(true);
+      localStorage.setItem('ultimaCelebracionFecha', fechaActual);
     }
-  };
+  }
+};
 
   const handleClickReload = () => {
     // Ejecuta tu función
@@ -122,7 +131,7 @@ const Navbar = () => {
 
   useEffect(() => {
     calcularDiasParaPago();
-    calcularDiasParaFinMes();
+    calcularDiasParaFinPeriodo();
   }, []);
 
   const handleNavLinkClick = (to) => {
@@ -188,10 +197,10 @@ const Navbar = () => {
                  `${diasParaPago} días para pago 📅`}
               </span>
             </div>
-            <div className="text-white px-4 py-2 rounded-full flex items-center mr-5 bg-blue-500">
+            <div className="text-white px-4 py-2 rounded-full flex items-center mr-5 bg-red-500">
               <FontAwesomeIcon icon={faCalendarAlt} className="mr-2 text-lg" />
               <span className="font-bold text-lg">
-                Falta {diasParaFinMes} días para dormir a VIVIANA 🥳
+                {diasParaFinMes} Amenaza con volver... 😨
               </span>
             </div>
           </>
