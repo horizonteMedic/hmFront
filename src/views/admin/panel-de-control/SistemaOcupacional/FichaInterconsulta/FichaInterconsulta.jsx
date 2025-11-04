@@ -41,7 +41,11 @@ const Especialidades = [
   "Traumatología",
   "Reumatología",
   "Nutrición",
-  "Otorrinolaringologia"
+  "Otorrinolaringologia",
+  "Área Medica",
+  "Laboratorio",
+  "Imagenologia",
+  "Audiometria"
 ]
 
 export default function FichaInterconsulta() {
