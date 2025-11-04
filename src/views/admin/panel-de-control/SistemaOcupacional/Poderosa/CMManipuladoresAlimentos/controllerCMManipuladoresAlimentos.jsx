@@ -9,9 +9,9 @@ import {
 } from "../../../../../utils/functionUtils";
 
 const obtenerReporteUrl =
-    "";
+    "/api/v01/ct/certificadoManipuladoresAlimentos/obtenerReporteCertificadoManipuladoresAlimentos";
 const registrarUrl =
-    "";
+    "/api/v01/ct/certificadoManipuladoresAlimentos/registrarActualizarCertificadoManipuladoresAlimentos";
 
 export const GetInfoServicio = async (
     nro,
@@ -32,24 +32,22 @@ export const GetInfoServicio = async (
             ...prev,
             ...res,
             norden: res.norden,
-            fechaExam: res.fechaExamen_fecha,
-            nombreExamen: res.nombreExamen,
-            esApto: res.apto_apto,
+            fechaExam: res.fechaExamen,
+            nombreExamen: res.nombreExamen ?? "",
+            esApto: res.apto ?? false,
 
             // Datos personales
-            nombres: res.nombresPaciente,
-            dni: res.dniPaciente,
-            edad: res.edadPaciente,
-            sexo: res.sexoPaciente,
-            empresa: res.empresa,
-            contrata: res.contrata,
-            cargo: res.cargoPaciente,
-            areaTrabajo: res.areaTrabajoPaciente,
-
-            // Médico
+            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
+            dni: res.dniPaciente ?? "",
+            edad: res.edadPaciente ?? "",
+            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+            empresa: res.empresa ?? "",
+            contrata: res.contrata ?? "",
+            cargo: res.cargoPaciente ?? "",
+            areaTrabajo: res.areaPaciente ?? "",
 
             // Recomendaciones
-            recomendaciones: res.recomendaciones,
+            recomendaciones: res.recomendaciones ?? "",
         }));
     }
 };
@@ -73,25 +71,10 @@ export const SubmitDataService = async (
     const body = {
         norden: form.norden,
         fechaExamen: form.fechaExam,
-        nombreExamen: form.nombreExamen,
-        esApto: form.esApto,
-
-        // Datos personales
-        nombres: form.nombres,
-        dni: form.dni,
-        edad: form.edad,
-        sexo: form.sexo,
-        empresa: form.empresa,
-        contrata: form.contrata,
-        cargo: form.cargo,
-        areaTrabajo: form.areaTrabajo,
-
-        // Médico
-        nombre_medico: form.nombre_medico,
-
-        // Recomendaciones
+        apto: form.esApto,
+        noApto: !form.esApto,
+        observaciones: form.observaciones,
         recomendaciones: form.recomendaciones,
-
         usuarioRegistro: user,
     };
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -100,7 +83,7 @@ export const SubmitDataService = async (
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../jaspers/Poderosa/CMManipuladoresAlimentos/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../jaspers/Poderosa/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -108,7 +91,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../jaspers/Poderosa/CMManipuladoresAlimentos"
+        "../../../../../jaspers/Poderosa"
     );
 };
 
@@ -145,7 +128,7 @@ const GetInfoPac = async (nro, set, token, sede) => {
             nombres: res.nombres,
             dni: res.dni,
             edad: res.edad + " AÑOS",
-            sexo: res.sexo,
+            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
             empresa: res.empresa,
             contrata: res.contrata,
             cargo: res.cargo ?? "",

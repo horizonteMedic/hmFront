@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
-import { formatearFechaCorta } from "../../utils/formatDateUtils";
-import { convertirGenero } from "../../utils/helpers";
+import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
+import { convertirGenero } from "../../utils/helpers.js";
 import { dibujarTextoEnFilaCreciente, calcularAlturaTextoCreciente } from "../../utils/formatoParaTextoCrecienteFila.js";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';

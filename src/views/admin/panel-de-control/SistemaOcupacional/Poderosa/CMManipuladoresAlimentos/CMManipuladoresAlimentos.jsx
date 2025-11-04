@@ -12,10 +12,9 @@ import {
 import { useForm } from "../../../../../hooks/useForm";
 import { getToday } from "../../../../../utils/helpers";
 import { useSessionData } from "../../../../../hooks/useSessionData";
-import Swal from "sweetalert2";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerCMManipuladoresAlimentos";
 
-const tabla = "";
+const tabla = "certificado_manipuladores_barrick";
 const today = getToday();
 
 export default function CMManipuladoresAlimentos() {
@@ -26,7 +25,6 @@ export default function CMManipuladoresAlimentos() {
   const initialFormState = {
     // Header - Campos principales
     norden: "",
-    codigoCertificado: null,
     fechaExam: today,
     nombreExamen: "",
     esApto: undefined,
@@ -76,7 +74,6 @@ export default function CMManipuladoresAlimentos() {
       PrintHojaR(form.norden, token, tabla, datosFooter);
     });
   };
-
 
   return (
     <div className="mx-auto bg-white">
