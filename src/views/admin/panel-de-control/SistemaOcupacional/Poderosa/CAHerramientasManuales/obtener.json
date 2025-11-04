@@ -1,0 +1,39 @@
+{
+  "dniPaciente": 0,
+  "nombresPaciente": "string",
+  "apellidosPaciente": "string",
+  "direccionPaciente": "string",
+  "sexoPaciente": "string",
+  "fechaNacimientoPaciente": "2025-11-04",
+  "ocupacionPaciente": "string",
+  "cargoPaciente": "string",
+  "areaPaciente": "string",
+  "contrata": "string",
+  "norden": 0,
+  "empresa": "string",
+  "nombreExamen": "string",
+  "codigoClinica": "string",
+  "edadPaciente": "string",
+  "idCertificado": 0,
+  "apto": true,
+  "aptoRestriccion": true,
+  "explotacion": "string",
+  "aptoTemporal": true,
+  "observacion": "string",
+  "fechaCertificado": "2025-11-04",
+  "fechaCaducidad": "2025-11-04",
+  "nombreMedico": "string",
+  "nombreSede": "string",
+  "numeroSede": "string",
+  "sede": "string",
+  "color": 0,
+  "nameJasper": "string",
+  "textoColor": "string",
+  "codigoColor": "string",
+  "digitalizacion": [
+    {
+      "nombreDigitalizacion": "string",
+      "url": "string"
+    }
+  ]
+}

@@ -10,9 +10,9 @@ import {
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
-    "";
+    "/api/v01/ct/informePsicologicoAdeco/obtenerReporteInformePsicologicoAdeco";
 const registrarUrl =
-    "";
+    "/api/v01/ct/informePsicologicoAdeco/registrarActualizarInformePsicologicoAdeco";
 
 export const GetInfoServicio = async (
     nro,
@@ -33,7 +33,38 @@ export const GetInfoServicio = async (
             ...prev,
             ...res,
             norden: res.norden,
+            fechaExamen: res.fechaExamen,
+            nombreExamen: res.nombreExamen,
+            esApto: res.apto,
 
+            // Datos Personales
+            nombres: res.nombresPaciente,
+            apellidos: res.apellidosPaciente,
+            fechaNacimiento: res.fechaNacimientoPaciente,
+            edad: res.edadPaciente,
+            lugarNacimiento: res.lugarNacimientoPaciente,
+            domicilioActual: res.direccionPaciente,
+            estadoCivil: res.estadoCivilPaciente,
+            nivelEstudios: res.nivelEstudioPaciente,
+
+            // Datos Laborales
+            empresa: res.empresa,
+            contrata: res.contrata,
+            ocupacion: res.ocupacionPaciente,
+            cargoDesempenar: res.cargoPaciente,
+
+            // Criterios Psicológicos
+            escalaStress: res.escalaSintomatica,
+            somnolencia: res.somnolencia,
+            testFatiga: res.testFatiga,
+
+            // Análisis FODA
+            fortalezasOportunidades: res.fortalezasOportunidades,
+            amenazasDebilidades: res.amenazasDebilidades,
+
+            // Observaciones y Recomendaciones
+            observaciones: res.observaciones,
+            recomendaciones: res.recomendacion,
         }));
     }
 };
@@ -50,8 +81,23 @@ export const SubmitDataService = async (
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
     }
+    if (form.esApto === undefined || form.esApto === null) {
+        await Swal.fire("Error", "Debe marcar aptitud", "error");
+        return;
+    }
     const body = {
         norden: form.norden,
+        fechaExamen: form.fechaExamen,
+        nombreExamen: form.nombreExamen,
+        escalaSintomatica: form.escalaStress,
+        somnolencia: form.somnolencia,
+        testFatiga: form.testFatiga,
+        fortalezasOportunidades: form.fortalezasOportunidades,
+        amenazasDebilidades: form.amenazasDebilidades,
+        observaciones: form.observaciones,
+        recomendacion: form.recomendaciones,
+        apto: form.esApto,
+        noApto: !form.esApto,
         usuarioRegistro: user,
     };
 

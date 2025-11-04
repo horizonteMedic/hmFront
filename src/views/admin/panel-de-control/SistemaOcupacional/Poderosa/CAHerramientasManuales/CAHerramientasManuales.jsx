@@ -14,7 +14,7 @@ import { getToday, getTodayPlusOneYear } from "../../../../../utils/helpers";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerCAHerramientasManuales";
 
-const tabla = "";
+const tabla = "certificado_aptitud_herramientas_manuales";
 const today = getToday();
 
 export default function CAHerramientasManuales() {
@@ -25,7 +25,7 @@ export default function CAHerramientasManuales() {
   const initialFormState = {
     // Header - Campos principales
     norden: "",
-    codigoCertificado: null,
+    idCertificado: null,
     fechaExam: today,
     fechahasta: getTodayPlusOneYear(),
     nombreExamen: "",
@@ -45,8 +45,8 @@ export default function CAHerramientasManuales() {
     // Médico
     nombre_medico: userName,
 
-    // Recomendaciones
-    recomendaciones: "",
+    // observacion
+    observacion: "",
   };
 
   const {
@@ -209,10 +209,10 @@ export default function CAHerramientasManuales() {
               onChange={handleRadioButton}
             />
             <InputTextArea
-              label="Recomendaciones"
-              name="recomendaciones"
+              label="Observacion"
+              name="observacion"
               className="col-span-6"
-              value={form?.recomendaciones}
+              value={form?.observacion}
               onChange={handleChange}
               rows={6}
             />

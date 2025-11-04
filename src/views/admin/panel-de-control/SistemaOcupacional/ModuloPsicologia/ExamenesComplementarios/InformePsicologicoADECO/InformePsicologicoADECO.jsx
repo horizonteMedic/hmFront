@@ -9,13 +9,12 @@ import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformePsicologicoADECO";
-import Swal from "sweetalert2";
 
 const tabla = "informe_psicologico_estres";
 const today = getToday();
 
 export default function InformePsicologicoADECO() {
-    const { token, userlogued, selectedSede, datosFooter, userCompleto } = useSessionData();
+    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
 
     const initialFormState = {
         // Header - Información del examen
@@ -59,23 +58,14 @@ export default function InformePsicologicoADECO() {
         setForm,
         handleChange,
         handleChangeNumber,
-        handleRadioButton,
         handleChangeSimple,
-        handleCheckBoxChange,
         handleRadioButtonBoolean,
         handleClear,
         handleClearnotO,
         handlePrintDefault,
     } = useForm(initialFormState, { storageKey: "informePsicologicoADECOPsicologia" });
+
     const handleSave = () => {
-        if (form.esApto === undefined) {
-            Swal.fire({
-                icon: "warning",
-                title: "Advertencia",
-                text: "Por favor, marque si es apto o no apto.",
-            });
-            return;
-        }
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
@@ -116,7 +106,7 @@ export default function InformePsicologicoADECO() {
                         label="Tipo de Examen"
                         name="nombreExamen"
                         value={form.nombreExamen}
-                        disabled
+                        onChange={handleChange}
                         labelWidth="120px"
                     />
                     <div className="flex gap-4 items-center">
