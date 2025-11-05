@@ -48,6 +48,7 @@ const Especialidades = [
   "Audiometria"
 ]
 
+
 export default function FichaInterconsulta() {
 
     const { token, userlogued, selectedSede, datosFooter, userCompleto } =
