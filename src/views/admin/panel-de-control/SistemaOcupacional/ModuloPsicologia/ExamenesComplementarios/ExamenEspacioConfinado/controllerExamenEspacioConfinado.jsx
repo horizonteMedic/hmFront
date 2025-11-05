@@ -6,12 +6,13 @@ import {
     PrintHojaRDefault,
     SubmitDataServiceDefault,
     VerifyTRDefault,
-} from "../../../../../utils/functionUtils";
+} from "../../../../../../utils/functionUtils";
+import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
-    "/api/v01/ct/certificadoManipuladoresAlimentos/obtenerReporteCertificadoManipuladoresAlimentos";
+    "";
 const registrarUrl =
-    "/api/v01/ct/certificadoManipuladoresAlimentos/registrarActualizarCertificadoManipuladoresAlimentos";
+    "";
 
 export const GetInfoServicio = async (
     nro,
@@ -32,22 +33,6 @@ export const GetInfoServicio = async (
             ...prev,
             ...res,
             norden: res.norden,
-            fechaExam: res.fechaExamen,
-            nombreExamen: res.nombreExamen ?? "",
-            esApto: res.apto ?? false,
-
-            // Datos personales
-            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
-            dni: res.dniPaciente ?? "",
-            edad: res.edadPaciente ?? "",
-            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
-            empresa: res.empresa ?? "",
-            contrata: res.contrata ?? "",
-            cargo: res.cargoPaciente ?? "",
-            areaTrabajo: res.areaPaciente ?? "",
-
-            // Recomendaciones
-            recomendaciones: res.recomendaciones ?? "",
         }));
     }
 };
@@ -65,25 +50,25 @@ export const SubmitDataService = async (
         return;
     }
     if (form.esApto === undefined) {
-        await Swal.fire("Error", "Por favor, seleccione la aptitud.", "error");
+        Swal.fire({
+            icon: "warning",
+            title: "Advertencia",
+            text: "Por favor, marque si es apto o no apto.",
+        });
         return;
     }
     const body = {
         norden: form.norden,
-        fechaExamen: form.fechaExam,
-        apto: form.esApto,
-        noApto: !form.esApto,
-        observaciones: form.observaciones,
-        recomendaciones: form.recomendaciones,
         usuarioRegistro: user,
     };
+
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
         PrintHojaR(form.norden, token, tabla, datosFooter);
     });
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../jaspers/Poderosa/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/ExamenEspacioConfinado/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -91,7 +76,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../jaspers/Poderosa"
+        "../../../../../../jaspers/ModuloPsicologia/ExamenEspacioConfinado"
     );
 };
 
@@ -111,7 +96,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             GetInfoServicio(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de Certificado de Manipuladores de Alimentos.",
+                    "Este paciente ya cuenta con registros de Examen de Espacio Confinado.",
                     "warning"
                 );
             });
@@ -125,14 +110,10 @@ const GetInfoPac = async (nro, set, token, sede) => {
         set((prev) => ({
             ...prev,
             ...res,
-            nombres: res.nombres,
-            dni: res.dni,
+            fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
             edad: res.edad + " AÑOS",
-            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
-            empresa: res.empresa,
-            contrata: res.contrata,
-            cargo: res.cargo ?? "",
-            areaTrabajo: res.areaO ?? "",
+            ocupacion: res.areaO ?? "",
+            cargoDesempenar: res.cargo ?? "",
         }));
     }
 };

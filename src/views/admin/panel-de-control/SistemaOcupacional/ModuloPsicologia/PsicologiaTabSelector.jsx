@@ -1,7 +1,7 @@
 import TabSelector from "../../../../components/reusableComponents/TabSelector";
-import AnexosPsicologiaSubSelector from "./AnexosPsicologiaSubSelector";
-import PsicologiaBorooSubSelector from "./PsicologiaBorooSubSelector";
-import ExamenesComplementariosSubSelector from "./ExamenesComplementariosSubSelector";
+import AnexosPsicologiaSubSelector from "./AnexosPsicologia/AnexosPsicologiaSubSelector";
+import ExamenesComplementariosSubSelector from "./ExamenesComplementarios/ExamenesComplementariosSubSelector";
+import PsicologiaBorooSubSelector from "./PsicologiaBoroo/PsicologiaBorooSubSelector";
 
 export default function PsicologiaTabSelector({ tieneVista }) {
     const tabsConfig = [

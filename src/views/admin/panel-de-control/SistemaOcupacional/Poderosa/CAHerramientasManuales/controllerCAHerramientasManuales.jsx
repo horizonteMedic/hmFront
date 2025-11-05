@@ -9,9 +9,9 @@ import {
 } from "../../../../../utils/functionUtils";
 
 const obtenerReporteUrl =
-    "";
+    "/api/v01/ct/certificadoAptitudHerramientasManuales/obtenerReporteCertificadoAptitudHerramientasManuales";
 const registrarUrl =
-    "";
+    "/api/v01/ct/certificadoAptitudHerramientasManuales/registrarActualizarCertificadoAptitudHerramientasManuales";
 
 export const GetInfoServicio = async (
     nro,
@@ -30,9 +30,28 @@ export const GetInfoServicio = async (
     if (res) {
         set((prev) => ({
             ...prev,
-            ...res,
             norden: res.norden,
+            idCertificado: res.idCertificado,
+            fechaExam: res.fechaCertificado,
+            fechahasta: res.fechaCaducidad,
+            nombreExamen: res.nombreExamen ?? "",
+            aptitud: res.apto ? "APTO" :
+                res.aptoRestriccion ? "APTO CON RESTRICCION" :
+                    res.aptoTemporal ? "APTO TEMPORAL" : "NO APTO",
 
+            // Datos personales
+            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
+            dni: res.dniPaciente ?? "",
+            edad: `${res.edadPaciente ?? ""} AÑOS`,
+            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+            empresa: res.empresa ?? "",
+            contrata: res.contrata ?? "",
+            explotacion: res.explotacion ?? "",
+            cargo: res.cargoPaciente ?? "",
+            areaTrabajo: res.areaPaciente ?? "",
+
+            // observacion
+            observacion: res.observacion ?? "",
         }));
     }
 };
@@ -49,12 +68,19 @@ export const SubmitDataService = async (
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
     }
-    if (form.aptitud == "") {
+    if (!form.aptitud || form.aptitud == "") {
         await Swal.fire("Error", "Por favor, seleccione la aptitud.", "error");
         return;
     }
     const body = {
         norden: form.norden,
+        idCertificado: form.idCertificado,
+        apto: form.aptitud == "APTO",
+        aptoRestriccion: form.aptitud == "APTO CON RESTRICCION",
+        aptoTemporal: form.aptitud == "APTO TEMPORAL",
+        observacion: form.observacion,
+        fechaCertificado: form.fechaExam,
+        fechaCaducidad: form.fechahasta,
         usuarioRegistro: user,
     };
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -63,7 +89,7 @@ export const SubmitDataService = async (
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../jaspers/Poderosa/CAHerramientasManuales/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../jaspers/Poderosa/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -71,7 +97,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../jaspers/Poderosa/CAHerramientasManuales"
+        "../../../../../jaspers/Poderosa"
     );
 };
 
@@ -108,7 +134,7 @@ const GetInfoPac = async (nro, set, token, sede) => {
             nombres: res.nombres,
             dni: res.dni,
             edad: res.edad + " AÑOS",
-            sexo: res.sexo,
+            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
             empresa: res.empresa,
             contrata: res.contrata,
             cargo: res.cargo ?? "",

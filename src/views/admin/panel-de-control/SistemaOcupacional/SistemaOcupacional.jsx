@@ -106,9 +106,9 @@ import CertificadoMedicoOcupacional from "./CertificadoMedicoOcupacional/Certifi
 import FichaInterconsulta from "./FichaInterconsulta/FichaInterconsulta.jsx";
 import SectionWithBack from "./SectionWithBack.jsx";
 import UsoRespiradores from "./UsoRespiradores/UsoRespiradores.jsx";
-import FichaPsicologica3 from "./ModuloPsicologia/FichaPsicologica3/FichaPsicologica3.jsx";
+// import FichaPsicologica3 from "./ModuloPsicologia/FichaPsicologica3/FichaPsicologica3.jsx";
 import PoderosaTabSelector from "./Poderosa/PoderosaTabSelector.jsx";
-import AversionRiesgo from "./ModuloPsicologia/AversionRiesgo/AversionRiesgo.jsx";
+// import AversionRiesgo from "./ModuloPsicologia/AversionRiesgo/AversionRiesgo.jsx";
 import GestionOpciones from "./Playground/GestionOpciones/GestionOpciones.jsx";
 
 const hiddenExamTabs = [
