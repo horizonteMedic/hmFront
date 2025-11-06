@@ -9,50 +9,41 @@ import {
 import { useForm } from "../../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../../utils/helpers";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerEvaluacionPsicologicaPoderosa";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformeRiesgoPsicosocial";
 
-const tabla = "evaluacion_psicologica_poderosa"
+const tabla = "informe_riesgos_psicosociales";
 const today = getToday();
-// Áreas de Evaluación: Inteligencia
-const inteligenciaItems = [
-    { name: "intelCoeficiente", label: "1. Coeficiente Intelectual" },
-    { name: "intelComprension", label: "2. Comprensión" },
-    { name: "intelAtencion", label: "3. Nivel de atención / Concentración" },
-    { name: "intelMemoria", label: "4. Memoria a corto, mediano y largo plazo" },
-    { name: "intelVisomotora", label: "5. Coordinación viso-motora" },
-    { name: "intelOrientacionEspacial", label: "6. Orientación espacial" },
-    { name: "intelDiscriminarDetalles", label: "7. Capacidad para discriminar detalles" },
-    { name: "intelAprendizaje", label: "8. Capacidad de aprendizaje" },
-    { name: "intelAnalisisSintesis", label: "9. Capacidad de análisis y síntesis" }
-];
-// Áreas de Evaluación: Personalidad
-const personalidadItems = [
-    { name: "persEstabilidad", label: "1. Estabilidad emocional" },
-    { name: "persAfrontaEstres", label: "2. Afrontamiento al estrés" },
-    { name: "persAfrontaRiesgo", label: "3. Afrontamiento al riesgo" },
-    { name: "persRelaciones", label: "4. Relaciones interpersonales / Adaptación al medio" },
-    { name: "persNormasReglas", label: "5. Disposición para acatar normas y reglas" },
-];
-// Opciones estandarizadas S / NPS / NP / NPI
-const evalOptions = [
-    { value: "I", label: "I" },
-    { value: "S", label: "S" },
-    { value: "NPS", label: "NPS" },
-    { value: "NP", label: "NP" },
-    { value: "NPI", label: "NPI" },
+
+// Ítems de Riesgos Psicosociales
+const riesgosItems = [
+    { name: "exigenciasPsicologicas", label: "1. Exigencias psicológicas" },
+    { name: "trabajoActivoDesarrollo", label: "2. Trabajo activo y posibilidades de desarrollo" },
+    { name: "apoyoSocial", label: "3. Apoyo social" },
+    { name: "compensaciones", label: "4. Compensaciones" },
+    { name: "doblePresencia", label: "5. Doble presencia" },
 ];
 
-export default function EvaluacionPsicologicaPoderosa() {
+// Opciones estandarizadas
+const riesgoOptions = [
+    { value: "FAVORABLE", label: "FAVORABLE" },
+    { value: "PROMEDIO", label: "PROMEDIO" },
+    { value: "DESFAVORABLE", label: "DESFAVORABLE" },
+];
+
+const conclusionOptions = [
+    { label: "CUMPLE CON EL PERFIL", value: "CUMPLE" },
+    { label: "NO CUMPLE CON EL PERFIL", value: "NO_CUMPLE" },
+];
+
+export default function InformeRiesgoPsicosocial() {
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
 
     const initialFormState = {
         // Header
         norden: "",
-        codigoEvaluacionPsicologicaPoderosa: null,
+        codigoInformeRiesgoPsicosocial: null,
         fechaExam: today,
         nombreExamen: "",
-        tipoInforme: "NORMAL",
-        aptitud: "",
 
         // Datos personales
         nombres: "",
@@ -70,29 +61,17 @@ export default function EvaluacionPsicologicaPoderosa() {
         empresa: "",
         contrata: "",
 
-        // Áreas de Evaluación (Inteligencia)
-        intelCoeficiente: "",
-        intelComprension: "",
-        intelAtencion: "",
-        intelMemoria: "",
-        intelVisomotora: "",
-        intelOrientacionEspacial: "",
-        intelDiscriminarDetalles: "",
-        intelAprendizaje: "",
-        intelAnalisisSintesis: "",
+        // Riesgos Psicosociales
+        exigenciasPsicologicas: "",
+        trabajoActivoDesarrollo: "",
+        apoyoSocial: "",
+        compensaciones: "",
+        doblePresencia: "",
 
-        // Áreas de Evaluación (Personalidad)
-        persEstabilidad: "",
-        persAfrontaEstres: "",
-        persAfrontaRiesgo: "",
-        persRelaciones: "",
-        persNormasReglas: "",
-
-        // Campos de texto libres
-        fortalezasOportunidades: "",
-        amenazasDebilidades: "",
-        observaciones: "",
+        // Texto libre
         recomendaciones: "",
+        analisisResultados: "",
+        conclusionPerfil: "",
     };
 
     const {
@@ -105,7 +84,7 @@ export default function EvaluacionPsicologicaPoderosa() {
         handleChangeSimple,
         handleClear,
         handleRadioButton,
-    } = useForm(initialFormState, { storageKey: "EvaluacionPsicologicaPoderosa" });
+    } = useForm(initialFormState, { storageKey: "InformeRiesgoPsicosocial" });
 
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
@@ -154,46 +133,20 @@ export default function EvaluacionPsicologicaPoderosa() {
                                 disabled
                                 labelWidth="120px"
                             />
-                            <InputsRadioGroup
-                                label="Tipo Informe"
-                                name="tipoInforme"
-                                value={form.tipoInforme}
-                                labelWidth="120px"
-                                options={[
-                                    { label: "NORMAL", value: "NORMAL" },
-                                    { label: "LICENCIA", value: "LICENCIA" },
-                                    { label: "T. EN CALIENTE", value: "T. EN CALIENTE" },
-                                ]}
-                                onChange={handleRadioButton}
-                            />
-                            <InputsRadioGroup
-                                label="Aptitud"
-                                name="aptitud"
-                                value={form.aptitud}
-                                labelWidth="120px"
-                                options={[
-                                    { label: "APTO", value: "APTO" },
-                                    { label: "NO APTO", value: "NO APTO" },
-                                    { label: "EX", value: "EX" },
-                                    { label: "AP O.", value: "AP O." },
-                                ]}
-                                onChange={handleRadioButton}
-                            />
+
                         </div>
                     </div>
 
-                    {/* Datos Necesarios */}
+                    {/* Datos Personales */}
                     <fieldset className="bg-white border border-gray-200 rounded-lg p-3">
                         <legend className="font-bold mb-3 text-[10px]">Datos Personales</legend>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            {/* Izquierda */}
                             <div className="space-y-3">
                                 <InputTextOneLine label="Nombres" name="nombres" value={form.nombres} disabled labelWidth="160px" />
                                 <InputTextOneLine label="Apellidos" name="apellidos" value={form.apellidos} disabled labelWidth="160px" />
                                 <InputTextOneLine label="Fecha Nacimiento" name="fechaNacimiento" value={form.fechaNacimiento} disabled labelWidth="160px" />
                                 <InputTextOneLine label="Lugar Nacimiento" name="lugarNacimiento" value={form.lugarNacimiento} disabled labelWidth="160px" />
                             </div>
-                            {/* Derecha */}
                             <div className="space-y-3">
                                 <InputTextOneLine label="Domicilio Actual" name="domicilioActual" value={form.domicilioActual} disabled labelWidth="160px" />
                                 <InputTextOneLine label="Edad (años)" name="edad" value={form.edad} disabled labelWidth="160px" />
@@ -218,63 +171,52 @@ export default function EvaluacionPsicologicaPoderosa() {
                         </div>
                     </fieldset>
 
+                    {/* Riesgos y Recomendaciones */}
                     <div className="grid md:grid-cols-2 gap-4">
-                        {/* Áreas de Evaluación - Inteligencia */}
                         <fieldset className="bg-white border border-gray-200 rounded-lg p-3">
-                            <legend className="font-bold mb-3 text-[10px]">Áreas de Evaluación - Inteligencia</legend>
+                            <legend className="font-bold mb-3 text-[10px]">Riesgos Psicosociales</legend>
                             <RadioTable
-                                items={inteligenciaItems}
-                                options={evalOptions}
-                                labelColumns={3}
+                                items={riesgosItems}
+                                options={riesgoOptions}
                                 form={form}
                                 handleRadioButton={handleRadioButton}
                             />
                         </fieldset>
-                        {/* Áreas de Evaluación - Personalidad */}
                         <fieldset className="bg-white border border-gray-200 rounded-lg p-3">
-                            <legend className="font-bold mb-3 text-[10px]">Áreas de Evaluación - Personalidad</legend>
-                            <RadioTable
-                                items={personalidadItems}
-                                options={evalOptions}
-                                form={form}
-                                labelColumns={3}
-                                handleRadioButton={handleRadioButton} />
+                            <legend className="font-bold mb-3 text-[10px]">Recomendaciones y Conclusión</legend>
+                            <div className="space-y-3">
+                                <InputTextArea
+                                    label="Recomendaciones"
+                                    name="recomendaciones"
+                                    value={form.recomendaciones}
+                                    onChange={handleChange}
+                                    rows={10}
+                                />
+                                <InputsRadioGroup
+                                    label="Conclusión"
+                                    name="conclusionPerfil"
+                                    value={form.conclusionPerfil}
+                                    options={conclusionOptions}
+                                    labelWidth="120px"
+                                    onChange={handleRadioButton}
+                                />
+                            </div>
                         </fieldset>
                     </div>
-                    {/* Campos de texto libres */}
+
+                    {/* Análisis y Resultados */}
                     <fieldset className="bg-white border border-gray-200 rounded-lg p-3">
-                        <legend className="font-bold mb-3 text-[10px]">Conclusiones Finales</legend>
-                        <div className="grid md:grid-cols-2 gap-4">
-                            <InputTextArea
-                                label="Fortalezas y Oportunidades"
-                                name="fortalezasOportunidades"
-                                value={form.fortalezasOportunidades}
-                                onChange={handleChange}
-                                rows={5}
-                            />
-                            <InputTextArea
-                                label="Amenazas y Debilidades"
-                                name="amenazasDebilidades"
-                                value={form.amenazasDebilidades}
-                                onChange={handleChange}
-                                rows={5}
-                            />
-                            <InputTextArea
-                                label="Observaciones"
-                                name="observaciones"
-                                value={form.observaciones}
-                                onChange={handleChange}
-                                rows={5}
-                            />
-                            <InputTextArea
-                                label="Recomendaciones"
-                                name="recomendaciones"
-                                value={form.recomendaciones}
-                                onChange={handleChange}
-                                rows={5}
-                            />
-                        </div>
+                        <legend className="font-bold mb-3 text-[10px]">Análisis y Resultados</legend>
+                        <InputTextArea
+                            label=""
+                            name="analisisResultados"
+                            value={form.analisisResultados}
+                            onChange={handleChange}
+                            rows={6}
+                        />
                     </fieldset>
+
+                    {/* Footer acciones */}
                     <fieldset className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
                         <div className="flex gap-4">
                             <button

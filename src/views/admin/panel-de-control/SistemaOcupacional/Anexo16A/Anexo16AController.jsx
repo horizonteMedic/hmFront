@@ -32,7 +32,6 @@ export const GetInfoServicio = async (
         evaluarObservacionesObtener(res, set);
         set((prev) => ({
             ...prev,
-            ...res,
             norden: res.norden_n_orden,
             dni: res.dni_cod_pa,
             nombres: res.nombres_nombres_pa + " " + res.apellidos_apellidos_pa,
@@ -107,8 +106,7 @@ function evaluarObservacionesObtener(res, set) {
     const vcercacod = res.odccOftalmologia_odcc || "";
     const vcercacoi = res.oiccOftalmologia_oicc || "";
 
-    if (!res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNO") ||
-        !res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNA")) {
+    if (!res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNA")) {
         problemasOftalmologicos = true;
         problemasOftalmologicosRed = true;
         if (vlejoscod == "00" && vlejoscoi == "00" && vcercacod == "00" && vcercacoi == "00") {
@@ -135,7 +133,6 @@ function evaluarObservacionesObtener(res, set) {
             nuevasObservaciones += "- HTA NO CONTROLADA.\n";
         }
     }
-
     set(prev => ({
         ...prev,
         imcRed,
@@ -172,8 +169,7 @@ function evaluarObservacionesEditar(res, set) {
     const vcercacod = res.odccOftalmologia_odcc || "";
     const vcercacoi = res.oiccOftalmologia_oicc || "";
 
-    if (!res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNO") ||
-        !res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNA")) {
+    if (!res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNA")) {
         problemasOftalmologicos = true;
         problemasOftalmologicosRed = true;
         if (vlejoscod == "00" && vlejoscoi == "00" && vcercacod == "00" && vcercacoi == "00") {
@@ -263,7 +259,6 @@ export const GetInfoServicioEditar = async (
         evaluarObservacionesEditar(res, set);
         set((prev) => ({
             ...prev,
-            ...res,
             norden: res.norden_n_orden,
             codigoAnexo: res.codigoAnexo16a,
             fechaExam: res.fechaAnexo16a_fecha_anexo,
@@ -308,7 +303,7 @@ export const GetInfoServicioEditar = async (
             lentesCorrectivos: res.observacionesAnexo16a_observaciones?.includes("Uso de Lentes Correct. Lectura de Cerca") || false,
             contrata: res.contrata_razon_contrata,
             empresa: res.empresa_razon_empresa,
-            observaciones: res.observacionesAnexo16a_observaciones,
+            // observaciones: res.observacionesAnexo16a_observaciones,
             //Agudeza Visual
             vcOD: res.visionCercaSinCorregirOd_v_cerca_s_od,
             vlOD: res.visionLejosSinCorregirOd_v_lejos_s_od,
