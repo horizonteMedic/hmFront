@@ -5,6 +5,31 @@ import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 
+// Utilidad para eliminar duplicados sin alterar el formato original
+function dedupeText(input) {
+  if (input === null || input === undefined) return "";
+  const s = String(input);
+  if (s === "") return "";
+
+  // Caso 1: el texto completo está duplicado dos veces de forma exacta
+  const len = s.length;
+  if (len % 2 === 0) {
+    const half = s.slice(0, len / 2);
+    if (half === s.slice(len / 2)) {
+      return half; // preserva formato y mayúsculas/minúsculas exactamente
+    }
+  }
+
+  // Caso 2: duplicado con separador sencillo entre las dos mitades (espacios/puntuación)
+  // Devuelve exactamente la primera ocurrencia, preservando su forma original
+  const match = s.match(/^(.*?)[\s,;.-]+\1$/s);
+  if (match) {
+    return match[1];
+  }
+
+  return s;
+}
+
 export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
@@ -185,7 +210,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     conclusionEspirometria: (data.interpretacion_interpretacion === null || data.interpretacion_interpretacion === undefined || data.interpretacion_interpretacion === "")
       ? ((data.conclusion_txtconclusion === null || data.conclusion_txtconclusion === undefined || data.conclusion_txtconclusion === "") ? "" : data.conclusion_txtconclusion)
       : data.interpretacion_interpretacion,
-    otros: (data.otrosExamenes_txtotrosex === null || data.otrosExamenes_txtotrosex === undefined || data.otrosExamenes_txtotrosex === "") ? "" : data.otrosExamenes_txtotrosex,
+    otros: dedupeText((data.otrosExamenes_txtotrosex === null || data.otrosExamenes_txtotrosex === undefined || data.otrosExamenes_txtotrosex === "") ? "" : data.otrosExamenes_txtotrosex),
     diagnosticoMedicoOcupacional: (data.observacionesFichaMedica_txtobservacionesfm === null || data.observacionesFichaMedica_txtobservacionesfm === undefined || data.observacionesFichaMedica_txtobservacionesfm === "") ? "" : data.observacionesFichaMedica_txtobservacionesfm,
     // Datos de conclusiones finales
     apto: data.esApto_apto_si === true || data.esApto_apto_si === "true",
