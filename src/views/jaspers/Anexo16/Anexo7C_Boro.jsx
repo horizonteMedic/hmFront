@@ -300,7 +300,20 @@ export default function Anexo7C_Antiguo(data = {}) {
       },
       sinNeumoconiosis: formatNA(data.examenRadiograficoSinNeumoconiosis_txtsinneumoconiosis),
       imagenRadiograficaPolvo: formatNA(data.examenRadiograficoIrep_txtirep),
-      conNeumoconiosis: formatNA(data.examenRadiograficoConNeumoconiosis_txtconneumoconiosis)
+      conNeumoconiosis: (() => {
+        const value = data.examenRadiograficoConNeumoconiosis_txtconneumoconiosis;
+        // Si viene vacío, '', "", null, undefined → "No"
+        if (value === null || value === undefined || value === "" || value === "''" || value === '""') {
+          return "No";
+        }
+        // Si viene true o alguna data texto o solo true → "Si"
+        const strValue = String(value).trim();
+        if (strValue === "" || strValue === "null" || strValue === "undefined") {
+          return "No";
+        }
+        // Si tiene contenido (texto o true), mostrar "Si"
+        return "Si";
+      })()
     },
     // Reacciones Serológicas Lues
     reaccionesSerologicasLues: {
@@ -313,7 +326,17 @@ export default function Anexo7C_Antiguo(data = {}) {
         vsg: formatNA(data.vsgLaboratorioClinico_txtvsg),
         glucosa: formatNA(data.glucosaLaboratorioClinico_txtglucosabio),
         urea: formatNA(data.ureaAnexo7c_txturea), // Por defecto N/A
-        creatinina: formatNA(data.creatininaLaboratorioClinico_txtcreatininabio)
+        creatinina: formatNA(data.creatininaLaboratorioClinico_txtcreatininabio),
+        leucocitos: formatNA(data.leucocitos_txtleucocitosematologia),
+        hematies: formatNA(data.hematies_txthematiesematologia),
+        plaquetas: formatNA(data.plaquetas_txtplaquetas),
+        neutrofilos: formatNA(data.neutrofilos_txtneutrofilos),
+        abastonados: formatNA(data.abastonados_txtabastonados),
+        segmentados: formatNA(data.segmentados_txtsegmentadosematologia),
+        monocitos: formatNA(data.monocitos_txtmonocitosematologia),
+        eosinofilos: formatNA(data.eosinofilos_txteosinofiosematologia),
+        basofilos: formatNA(data.basofilos_txtbasofilosematologia),
+        linfocitos: formatNA(data.linfocitos_txtlinfocitosematologia)
       },
       perfilLipidico: {
         colesterolTotal: formatNA(data.colesterolAnalisisBioquimico_txtcolesterol),
@@ -354,9 +377,9 @@ export default function Anexo7C_Antiguo(data = {}) {
       revaluacionEmpresa: data.examenRadiograficoAptoRe_apto_re ?? false
     },
     // Conclusiones
-    conclusiones: data.conclusionMedicoAnexo7c_txtconclusionmed ?? "",
+    conclusiones: data.observacionesFichaMedicaAnexo7c_txtobservacionesfm ?? "",
     // Recomendaciones / Restricciones
-    recomendacionesRestricciones: data.observacionesFichaMedicaAnexo7c_txtobservacionesfm ?? "",
+    recomendacionesRestricciones: data.conclusionMedicoAnexo7c_txtconclusionmed ?? "",
   };
 
   // Header reutilizable
@@ -581,7 +604,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("SUPERFICIE", checkboxX + checkboxSize + 1, yCheckActual + 2);
   if (datosFinales.tipoTrabajo?.superficie) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     const xCentered = checkboxX + (checkboxSize / 2) - (textWidthX / 2);
     const yCentered = yCheckActual + (checkboxSize / 2) + 1;
@@ -596,7 +619,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("CONCENTRADOR", checkboxX + checkboxSize + 1, yCheckActual + 2);
   if (datosFinales.tipoTrabajo?.concentrador) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     const xCentered = checkboxX + (checkboxSize / 2) - (textWidthX / 2);
     const yCentered = yCheckActual + (checkboxSize / 2) + 1;
@@ -611,7 +634,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("SUBSUELO", checkboxX + checkboxSize + 1, yCheckActual + 2);
   if (datosFinales.tipoTrabajo?.subsuelo) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     const xCentered = checkboxX + (checkboxSize / 2) - (textWidthX / 2);
     const yCentered = yCheckActual + (checkboxSize / 2) + 1;
@@ -641,10 +664,10 @@ export default function Anexo7C_Antiguo(data = {}) {
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
     doc.rect(checkboxAlturaX1, yCheck, checkboxSize, checkboxSize);
-    doc.setFont("helvetica", "normal").setFontSize(6);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(altura.label, checkboxAlturaX1 + checkboxSize + 1, yCheck + 2);
     if (altura.value) {
-      doc.setFont("helvetica", "bold").setFontSize(8);
+      doc.setFont("helvetica", "bold").setFontSize(7);
       const textWidthX = doc.getTextWidth("X");
       const xCentered = checkboxAlturaX1 + (checkboxSize / 2) - (textWidthX / 2);
       const yCentered = yCheck + (checkboxSize / 2) + 1;
@@ -664,10 +687,10 @@ export default function Anexo7C_Antiguo(data = {}) {
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
     doc.rect(checkboxAlturaX2, yCheck, checkboxSize, checkboxSize);
-    doc.setFont("helvetica", "normal").setFontSize(6);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(altura.label, checkboxAlturaX2 + checkboxSize + 1, yCheck + 2);
     if (altura.value) {
-      doc.setFont("helvetica", "bold").setFontSize(8);
+      doc.setFont("helvetica", "bold").setFontSize(7);
       const textWidthX = doc.getTextWidth("X");
       const xCentered = checkboxAlturaX2 + (checkboxSize / 2) - (textWidthX / 2);
       const yCentered = yCheck + (checkboxSize / 2) + 1;
@@ -722,7 +745,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("M", xCheckSexo + checkboxSize + 1, yCheck + 2);
   if (datosFinales.sexoM) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("X", xCheckSexo + checkboxSize / 2 - 1, yCheck + 2.5);
   }
 
@@ -732,7 +755,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.rect(xCheckSexo, yCheck, checkboxSize, checkboxSize);
   doc.text("F", xCheckSexo + checkboxSize + 1, yCheck + 2);
   if (datosFinales.sexoF) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("X", xCheckSexo + checkboxSize / 2 - 1, yCheck + 2.5);
   }
 
@@ -754,14 +777,14 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.rect(xCol1Estado, yCheck, checkboxSize, checkboxSize);
   doc.text("SOLTERO", xCol1Estado + checkboxSize + 1, yCheck + 2);
   if (datosFinales.estadoCivil?.soltero) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("X", xCol1Estado + checkboxSize / 2 - 1, yCheck + 2.5);
   }
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.rect(xCol2Estado, yCheck, checkboxSize, checkboxSize);
   doc.text("CONVIVIENTE", xCol2Estado + checkboxSize + 1, yCheck + 2);
   if (datosFinales.estadoCivil?.conviviente) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("X", xCol2Estado + checkboxSize / 2 - 1, yCheck + 2.5);
   }
 
@@ -771,14 +794,14 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.rect(xCol1Estado, yCheck, checkboxSize, checkboxSize);
   doc.text("CASADO", xCol1Estado + checkboxSize + 1, yCheck + 2);
   if (datosFinales.estadoCivil?.casado) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("X", xCol1Estado + checkboxSize / 2 - 1, yCheck + 2.5);
   }
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.rect(xCol2Estado, yCheck, checkboxSize, checkboxSize);
   doc.text("VIUDO", xCol2Estado + checkboxSize + 1, yCheck + 2);
   if (datosFinales.estadoCivil?.viudo) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("X", xCol2Estado + checkboxSize / 2 - 1, yCheck + 2.5);
   }
 
@@ -788,7 +811,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.rect(xCol1Estado, yCheck, checkboxSize, checkboxSize);
   doc.text("DIVORCIADO", xCol1Estado + checkboxSize + 1, yCheck + 2);
   if (datosFinales.estadoCivil?.divorciado) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("X", xCol1Estado + checkboxSize / 2 - 1, yCheck + 2.5);
   }
 
@@ -803,55 +826,55 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.rect(xCol1Grado, yCheck, checkboxSize, checkboxSize);
   doc.text("Analfabeto", xCol1Grado + checkboxSize + 1, yCheck + 2);
   if (datosFinales.gradoInstruccion?.analfabeto) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("X", xCol1Grado + checkboxSize / 2 - 1, yCheck + 2.5);
   }
 
   // Línea 2: Primaria.Com., Sec.Com., Univers.
   yCheck += spacing;
-  doc.setFont("helvetica", "normal").setFontSize(6);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.rect(xCol1Grado, yCheck, checkboxSize, checkboxSize);
   doc.text("Primaria.Com.", xCol1Grado + checkboxSize + 1, yCheck + 2);
   if (datosFinales.gradoInstruccion?.primariaCom) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("X", xCol1Grado + checkboxSize / 2 - 1, yCheck + 2.5);
   }
-  doc.setFont("helvetica", "normal").setFontSize(6);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.rect(xCol2Grado, yCheck, checkboxSize, checkboxSize);
   doc.text("Sec.Com.", xCol2Grado + checkboxSize + 1, yCheck + 2);
   if (datosFinales.gradoInstruccion?.secCom) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("X", xCol2Grado + checkboxSize / 2 - 1, yCheck + 2.5);
   }
-  doc.setFont("helvetica", "normal").setFontSize(6);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.rect(xCol3Grado, yCheck, checkboxSize, checkboxSize);
   doc.text("Univers.", xCol3Grado + checkboxSize + 1, yCheck + 2);
   if (datosFinales.gradoInstruccion?.univers) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("X", xCol3Grado + checkboxSize / 2 - 1, yCheck + 2.5);
   }
 
   // Línea 3: Primaria.Inc., Sec.Inc., Técnico
   yCheck += spacing;
-  doc.setFont("helvetica", "normal").setFontSize(6);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.rect(xCol1Grado, yCheck, checkboxSize, checkboxSize);
   doc.text("Primaria.Inc.", xCol1Grado + checkboxSize + 1, yCheck + 2);
   if (datosFinales.gradoInstruccion?.primariaInc) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("X", xCol1Grado + checkboxSize / 2 - 1, yCheck + 2.5);
   }
-  doc.setFont("helvetica", "normal").setFontSize(6);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.rect(xCol2Grado, yCheck, checkboxSize, checkboxSize);
   doc.text("Sec.Inc.", xCol2Grado + checkboxSize + 1, yCheck + 2);
   if (datosFinales.gradoInstruccion?.secInc) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("X", xCol2Grado + checkboxSize / 2 - 1, yCheck + 2.5);
   }
-  doc.setFont("helvetica", "normal").setFontSize(6);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.rect(xCol3Grado, yCheck, checkboxSize, checkboxSize);
   doc.text("Técnico", xCol3Grado + checkboxSize + 1, yCheck + 2);
   if (datosFinales.gradoInstruccion?.tecnico) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("X", xCol3Grado + checkboxSize / 2 - 1, yCheck + 2.5);
   }
 
@@ -979,7 +1002,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   const yTextoSino = yCheckboxReub + (checkboxRiesgoSize / 2) + 0.5;
   doc.text("SI", xSi + checkboxRiesgoSize + 1, yTextoSino);
   if (datosFinales.reubicacionSi) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     const xCenteredX = xSi + (checkboxRiesgoSize / 2) - (textWidthX / 2);
     const yCenteredX = yCheckboxReub + (checkboxRiesgoSize / 2) + 1;
@@ -991,7 +1014,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("NO", xNo + checkboxRiesgoSize + 1, yTextoSino);
   if (datosFinales.reubicacionNo) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     const xCenteredX = xNo + (checkboxRiesgoSize / 2) - (textWidthX / 2);
     const yCenteredX = yCheckboxReub + (checkboxRiesgoSize / 2) + 1;
@@ -1170,7 +1193,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("TETANO", checkboxInmX + checkboxInmSize + 1, yCheckInm + 1.8);
   if (datosFinales.inmunizaciones?.tetano) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("X", checkboxInmX + checkboxInmSize / 2 - 1, yCheckInm + 2.2);
   }
 
@@ -1180,7 +1203,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.rect(checkboxInmX, yCheckInm, checkboxInmSize, checkboxInmSize);
   doc.text("HEPATITIS - B", checkboxInmX + checkboxInmSize + 1, yCheckInm + 1.8);
   if (datosFinales.inmunizaciones?.hepatitisB) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("X", checkboxInmX + checkboxInmSize / 2 - 1, yCheckInm + 2.2);
   }
 
@@ -1190,7 +1213,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.rect(checkboxInmX, yCheckInm, checkboxInmSize, checkboxInmSize);
   doc.text("FIEBRE AMARILLA", checkboxInmX + checkboxInmSize + 1, yCheckInm + 1.8);
   if (datosFinales.inmunizaciones?.fiebreAmarilla) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("X", checkboxInmX + checkboxInmSize / 2 - 1, yCheckInm + 2.2);
   }
 
@@ -1308,7 +1331,7 @@ export default function Anexo7C_Antiguo(data = {}) {
     doc.setLineWidth(0.2);
     doc.rect(xCheckbox, y, checkboxHabSize, checkboxHabSize);
     if (checked) {
-      doc.setFont("helvetica", "bold").setFontSize(8);
+      doc.setFont("helvetica", "bold").setFontSize(7);
       const textWidthX = doc.getTextWidth("X");
       const xCenteredX = xCheckbox + (checkboxHabSize / 2) - (textWidthX / 2);
       const yCenteredX = y + (checkboxHabSize / 2) + 1;
@@ -2153,7 +2176,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("Normal", xCheckNormal + checkboxSizePulmonesPiel + 1, checkboxYPulmones + 1);
   if (datosFinales.evaluacionFisicaAdicional?.pulmones?.normal) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     doc.text("X", xCheckNormal + checkboxSizePulmonesPiel / 2 - textWidthX / 2, yCheckNormal + checkboxSizePulmonesPiel / 2 + 1.2);
   }
@@ -2165,7 +2188,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.rect(xCheckAnormal, yCheckAnormal, checkboxSizePulmonesPiel, checkboxSizePulmonesPiel);
   doc.text("Anormal", xCheckAnormal + checkboxSizePulmonesPiel + 1, checkboxYPulmones + 1);
   if (datosFinales.evaluacionFisicaAdicional?.pulmones?.anormal) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     doc.text("X", xCheckAnormal + checkboxSizePulmonesPiel / 2 - textWidthX / 2, yCheckAnormal + checkboxSizePulmonesPiel / 2 + 1.2);
   }
@@ -2224,7 +2247,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("Normal", xCheckNormalPiel + checkboxSizePulmonesPiel + 1, checkboxYPulmones + 1);
   if (datosFinales.evaluacionFisicaAdicional?.piel?.normal) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     doc.text("X", xCheckNormalPiel + checkboxSizePulmonesPiel / 2 - textWidthX / 2, yCheckNormalPiel + checkboxSizePulmonesPiel / 2 + 1.2);
   }
@@ -2236,7 +2259,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.rect(xCheckAnormalPiel, yCheckAnormalPiel, checkboxSizePulmonesPiel, checkboxSizePulmonesPiel);
   doc.text("Anormal", xCheckAnormalPiel + checkboxSizePulmonesPiel + 1, checkboxYPulmones + 1);
   if (datosFinales.evaluacionFisicaAdicional?.piel?.anormal) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     doc.text("X", xCheckAnormalPiel + checkboxSizePulmonesPiel / 2 - textWidthX / 2, yCheckAnormalPiel + checkboxSizePulmonesPiel / 2 + 1.2);
   }
@@ -2344,7 +2367,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   
   // Verificar si necesitamos nueva página
   const alturaFilaEvaluacion = 5;
-  const alturaTotalEvaluacion = alturaFilaEvaluacion * 3; // 3 filas
+  const alturaTotalEvaluacion = alturaFilaEvaluacion * 4; // 4 filas (ABDOMEN y TACTO RECTAL separados)
   if (yPos + alturaTotalEvaluacion > pageHeight - 20) {
     footerTR(doc, { footerOffsetY: 8 });
     doc.addPage();
@@ -2388,9 +2411,8 @@ export default function Anexo7C_Antiguo(data = {}) {
 
   yPos += alturaFilaEvaluacion;
 
-  // FILA 3: Abdomen | Tacto rectal (2 columnas)
+  // FILA 3: Abdomen (columna completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaEvaluacion);
-  doc.line(divColEvaluacion, yPos, divColEvaluacion, yPos + alturaFilaEvaluacion);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaEvaluacion);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaFilaEvaluacion, tablaInicioX + tablaAncho, yPos + alturaFilaEvaluacion);
@@ -2400,98 +2422,57 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text(datosFinales.evaluacionColumnaAbdomen?.abdomen || "", tablaInicioX + 25, yPos + 3.5);
 
-  // Tacto rectal con checkboxes
+  yPos += alturaFilaEvaluacion;
+
+  // FILA 4: Tacto rectal (columna completa con checkboxes)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaEvaluacion);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaEvaluacion);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaFilaEvaluacion, tablaInicioX + tablaAncho, yPos + alturaFilaEvaluacion);
+
   doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("TACTO RECTAL:", divColEvaluacion + 2, yPos + 3.5);
+  doc.text("TACTO RECTAL:", tablaInicioX + 2, yPos + 3.5);
   
   const checkboxSizeTacto = 3;
   const checkboxYTacto = yPos + 1.5;
   const checkboxCenterY = checkboxYTacto + checkboxSizeTacto / 2;
-  const xCheckNoHizoTacto = divColEvaluacion + 25;
-  const xCheckNormalTacto = divColEvaluacion + 40;
-  const xCheckAnormalTacto = divColEvaluacion + 55;
+  const xCheckNoHizoTacto = tablaInicioX + 30;
+  const xCheckNormalTacto = tablaInicioX + 50;
+  const xCheckAnormalTacto = tablaInicioX + 70;
 
   // Checkbox "No se hizo"
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
   doc.rect(xCheckNoHizoTacto, checkboxYTacto, checkboxSizeTacto, checkboxSizeTacto);
-  doc.setFont("helvetica", "normal").setFontSize(6);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("No se hizo", xCheckNoHizoTacto + checkboxSizeTacto + 1, checkboxCenterY + 0.8);
   if (datosFinales.evaluacionRectal?.tactoRectal?.noSeHizo) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     doc.text("X", xCheckNoHizoTacto + checkboxSizeTacto / 2 - textWidthX / 2, checkboxCenterY + 1.2);
   }
 
   // Checkbox "Normal"
-  doc.setFont("helvetica", "normal").setFontSize(6);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.rect(xCheckNormalTacto, checkboxYTacto, checkboxSizeTacto, checkboxSizeTacto);
   doc.text("Normal", xCheckNormalTacto + checkboxSizeTacto + 1, checkboxCenterY + 0.8);
   if (datosFinales.evaluacionRectal?.tactoRectal?.normal) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     doc.text("X", xCheckNormalTacto + checkboxSizeTacto / 2 - textWidthX / 2, checkboxCenterY + 1.2);
   }
 
   // Checkbox "Anormal"
-  doc.setFont("helvetica", "normal").setFontSize(6);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.rect(xCheckAnormalTacto, checkboxYTacto, checkboxSizeTacto, checkboxSizeTacto);
   doc.text("Anormal", xCheckAnormalTacto + checkboxSizeTacto + 1, checkboxCenterY + 0.8);
   if (datosFinales.evaluacionRectal?.tactoRectal?.anormal) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     doc.text("X", xCheckAnormalTacto + checkboxSizeTacto / 2 - textWidthX / 2, checkboxCenterY + 1.2);
   }
 
   yPos += alturaFilaEvaluacion;
-
-  // === SECCIÓN: EVALUACIÓN MENTAL ===
-  
-  // Verificar si necesitamos nueva página
-  const alturaFilaMental = 5;
-  const alturaTotalMental = alturaFilaMental * 3; // 3 filas (agregada fila de data de lenguaje)
-  if (yPos + alturaTotalMental > pageHeight - 20) {
-    footerTR(doc, { footerOffsetY: 8 });
-    doc.addPage();
-    numeroPagina++;
-    drawHeader(numeroPagina);
-    yPos = 35.5;
-  }
-
-  // FILA 1: Lenguaje, Atención, Memoria, Inteligencia, Orientación, Afectividad
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaMental);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaMental);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaFilaMental, tablaInicioX + tablaAncho, yPos + alturaFilaMental);
-
-  doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("LENGUAJE, ATENCIÓN, MEMORIA, INTELIGENCIA, ORIENTACIÓN, AFECTIVIDAD", tablaInicioX + 2, yPos + 3.5);
-
-  yPos += alturaFilaMental;
-
-  // FILA 2: Data de Lenguaje
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaMental);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaMental);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaFilaMental, tablaInicioX + tablaAncho, yPos + alturaFilaMental);
-
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(data.lenguageAnexo7c_txtlenguage || "", tablaInicioX + 2, yPos + 3.5);
-
-  yPos += alturaFilaMental;
-
-  // FILA 3: Estado mental
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaMental);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaMental);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaFilaMental, tablaInicioX + tablaAncho, yPos + alturaFilaMental);
-
-  doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("ESTADO MENTAL:", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(datosFinales.evaluacionMental?.estadoMental || "", tablaInicioX + 35, yPos + 3.5);
-
-  yPos += alturaFilaMental;
 
   // === SECCIÓN: ANILLOS INGUINALES, HERNIAS Y VARICES ===
   
@@ -2584,6 +2565,54 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.text(data.gangliosAnexo7c_txtganglios || "", divColOrganos + 2, yPos + 3.5);
 
   yPos += alturaFilaOrganos;
+
+  // === SECCIÓN: EVALUACIÓN MENTAL ===
+  
+  // Verificar si necesitamos nueva página
+  const alturaFilaMental = 5;
+  const alturaTotalMental = alturaFilaMental * 3; // 3 filas (agregada fila de data de lenguaje)
+  if (yPos + alturaTotalMental > pageHeight - 20) {
+    footerTR(doc, { footerOffsetY: 8 });
+    doc.addPage();
+    numeroPagina++;
+    drawHeader(numeroPagina);
+    yPos = 35.5;
+  }
+
+  // FILA 1: Lenguaje, Atención, Memoria, Inteligencia, Orientación, Afectividad
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaMental);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaMental);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaFilaMental, tablaInicioX + tablaAncho, yPos + alturaFilaMental);
+
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("LENGUAJE, ATENCIÓN, MEMORIA, INTELIGENCIA, ORIENTACIÓN, AFECTIVIDAD", tablaInicioX + 2, yPos + 3.5);
+
+  yPos += alturaFilaMental;
+
+  // FILA 2: Data de Lenguaje
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaMental);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaMental);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaFilaMental, tablaInicioX + tablaAncho, yPos + alturaFilaMental);
+
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text(data.lenguageAnexo7c_txtlenguage || "", tablaInicioX + 2, yPos + 3.5);
+
+  yPos += alturaFilaMental;
+
+  // FILA 3: Estado mental
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaMental);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaMental);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaFilaMental, tablaInicioX + tablaAncho, yPos + alturaFilaMental);
+
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("ESTADO MENTAL:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text(datosFinales.evaluacionMental?.estadoMental || "", tablaInicioX + 35, yPos + 3.5);
+
+  yPos += alturaFilaMental;
 
   // === SECCIÓN: RADIOGRAFÍA DE TÓRAX ===
   
@@ -2859,7 +2888,7 @@ export default function Anexo7C_Antiguo(data = {}) {
       
       // Marcar si está seleccionado
       if (datosFinales.clasificacionNeumoconiosis?.clasificaciones?.[grupo[0]]) {
-        doc.setFont("helvetica", "bold").setFontSize(8);
+        doc.setFont("helvetica", "bold").setFontSize(7);
         const textWidth = doc.getTextWidth("X");
         const xText = xCheckbox - (textWidth / 2);
         const yText = checkboxY + (checkboxSize / 4);
@@ -2879,7 +2908,7 @@ export default function Anexo7C_Antiguo(data = {}) {
         
         // Marcar si está seleccionado
         if (datosFinales.clasificacionNeumoconiosis?.clasificaciones?.[clave]) {
-          doc.setFont("helvetica", "bold").setFontSize(8);
+          doc.setFont("helvetica", "bold").setFontSize(7);
           const textWidth = doc.getTextWidth("X");
           const xText = xCheckbox - (textWidth / 2);
           const yText = checkboxY + (checkboxSize / 4);
@@ -2965,7 +2994,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   yPos += alturaFilaCategoria;
 
   // FILA 4: Etiquetas descriptivas (3 columnas grandes)
-  doc.setFont("helvetica", "normal").setFontSize(6);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   
   // Bordes verticales izquierdo y derecho de la tabla en esta fila
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaDescripcion);
@@ -3037,7 +3066,7 @@ export default function Anexo7C_Antiguo(data = {}) {
     doc.text(linea, centroCelda2, yLinea, { align: "center" });
   });
   
-  doc.setFontSize(6); // Restaurar tamaño
+  doc.setFontSize(7); // Restaurar tamaño
   // Línea vertical entre celda 2 y 3
   doc.line(xUno, yPos, xUno, yPos + alturaFilaDescripcion);
   
@@ -3053,7 +3082,7 @@ export default function Anexo7C_Antiguo(data = {}) {
 
   // FILA 5: Espacio para datos (tamaño 5, altura mayor)
   // Configurar tamaño de fuente para datos futuros
-  doc.setFont("helvetica", "normal").setFontSize(5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   
   // Bordes verticales izquierdo y derecho de la tabla en esta fila
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaVacia);
@@ -3069,7 +3098,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.line(tablaInicioX, yPos + alturaFilaVacia, tablaInicioX + tablaAncho, yPos + alturaFilaVacia);
   
   // Mostrar datos en FILA 5
-  doc.setFont("helvetica", "normal").setFontSize(5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   
   // Celda 1: SIN NEUMOCONIOSIS
   const textoSinNeumo = datosFinales.clasificacionNeumoconiosis?.sinNeumoconiosis || "N/A";
@@ -3090,7 +3119,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   });
   
   // Celda 3: CON NEUMOCONIOSIS
-  const textoConNeumo = datosFinales.clasificacionNeumoconiosis?.conNeumoconiosis || "N/A";
+  const textoConNeumo = datosFinales.clasificacionNeumoconiosis?.conNeumoconiosis || "NO";
   const maxAnchoCelda3 = anchoColumnaPrincipal * 5 - 4;
   const lineasConNeumo = doc.splitTextToSize(textoConNeumo, maxAnchoCelda3);
   const yInicioConNeumo = yPos + (alturaFilaVacia / 2) - ((lineasConNeumo.length - 1) * 2);
@@ -3099,7 +3128,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   });
   
   // Restaurar tamaño de fuente por defecto
-  doc.setFontSize(6);
+  doc.setFontSize(7);
 
   yPos += alturaFilaVacia;
 
@@ -3139,7 +3168,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.rect(xCheckNegativo, checkboxLuesY, checkboxLuesSize, checkboxLuesSize);
   doc.text("NEGATIVO", xCheckNegativo + checkboxLuesSize + 1, yPos + 3.5);
   if (datosFinales.reaccionesSerologicasLues?.negativo) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     const xCenteredX = xCheckNegativo + (checkboxLuesSize / 2) - (textWidthX / 2);
     const yCenteredX = checkboxLuesY + (checkboxLuesSize / 2) + 1;
@@ -3152,7 +3181,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.rect(xCheckPositivo, checkboxLuesY, checkboxLuesSize, checkboxLuesSize);
   doc.text("POSITIVO", xCheckPositivo + checkboxLuesSize + 1, yPos + 3.5);
   if (datosFinales.reaccionesSerologicasLues?.positivo) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     const xCenteredX = xCheckPositivo + (checkboxLuesSize / 2) - (textWidthX / 2);
     const yCenteredX = checkboxLuesY + (checkboxLuesSize / 2) + 1;
@@ -3169,7 +3198,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   // Verificar si necesitamos nueva página
   const alturaFilaLabHeader = 5;
   const alturaFilaLab = 5;
-  const alturaTotalLab = alturaFilaLabHeader + (alturaFilaLab * 5); // Header + 5 filas de datos
+  const alturaTotalLab = alturaFilaLabHeader + (alturaFilaLab * 9); // Header + 9 filas (3 títulos celestes + 6 filas de datos: 4 hemograma + 1 lipidico + 1 orina)
   if (yPos + alturaTotalLab > pageHeight - 20) {
     footerTR(doc, { footerOffsetY: 8 });
     doc.addPage();
@@ -3179,9 +3208,8 @@ export default function Anexo7C_Antiguo(data = {}) {
   }
 
   // Bordes verticales izquierdo y derecho (completos)
-  const alturaTotalLabCompleta = alturaFilaLabHeader + (alturaFilaLab * 5);
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaTotalLabCompleta);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaTotalLabCompleta);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaTotalLab);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaTotalLab);
   
   // Línea horizontal superior
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
@@ -3194,110 +3222,325 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.line(tablaInicioX, yPos + alturaFilaLabHeader, tablaInicioX + tablaAncho, yPos + alturaFilaLabHeader);
   yPos += alturaFilaLabHeader;
 
-  // Dividir tabla en 3 columnas
-  const anchoColLab = tablaAncho / 3;
-  const divColLab1 = tablaInicioX + anchoColLab;
-  const divColLab2 = tablaInicioX + (anchoColLab * 2);
-
-  // Líneas verticales divisorias (ahora son 6 filas en lugar de 5)
-  doc.line(divColLab1, yPos, divColLab1, yPos + (alturaFilaLab * 6));
-  doc.line(divColLab2, yPos, divColLab2, yPos + (alturaFilaLab * 6));
-
-  // FILA 1: Títulos de columnas
-  doc.setFont("helvetica", "bold").setFontSize(6);
-  doc.text("Hemograma completo", tablaInicioX + 2, yPos + 3.5);
-  doc.text("Perfil lipidico completo", divColLab1 + 2, yPos + 3.5);
-  doc.text("Examen completo de orina", divColLab2 + 2, yPos + 3.5);
-  
-  // Línea horizontal después de títulos
+  // === HEMOGRAMA COMPLETO ===
+  // Fila celeste (fondo gris)
+  doc.setFillColor(196, 196, 196);
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaFilaLab, 'F');
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaLab);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaLab);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaFilaLab, tablaInicioX + tablaAncho, yPos + alturaFilaLab);
+  
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("HEMOGRAMA COMPLETO", tablaInicioX + 2, yPos + 3.5);
   yPos += alturaFilaLab;
 
-  // FILA 2: VSG | Colesterol total | Cocaina en orina
-  doc.setFont("helvetica", "bold").setFontSize(6);
+  // Fila con celdas: VSG | GLUCOSA | UREA | CREATININA
+  const numCeldasHemograma = 4;
+  const anchoCeldaHemograma = tablaAncho / numCeldasHemograma;
+  const divsHemograma = [];
+  for (let i = 1; i < numCeldasHemograma; i++) {
+    divsHemograma.push(tablaInicioX + (anchoCeldaHemograma * i));
+  }
+  
+  // Líneas verticales divisorias
+  divsHemograma.forEach(div => {
+    doc.line(div, yPos, div, yPos + alturaFilaLab);
+  });
+  
+  // Bordes de la fila
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaLab);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaLab);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaFilaLab, tablaInicioX + tablaAncho, yPos + alturaFilaLab);
+  
+  // Celda 1: VSG
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("VSG:", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(6);
-  doc.text(datosFinales.examenesLaboratorio?.hemograma?.vsg || "N/A", tablaInicioX + 30, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const vsgValue = datosFinales.examenesLaboratorio?.hemograma?.vsg || "N/A";
+  const vsgText = vsgValue === "N/A" ? vsgValue : `${vsgValue} mm/h`;
+  doc.text(vsgText, tablaInicioX + 25, yPos + 3.5);
   
-  doc.setFont("helvetica", "bold").setFontSize(6);
-  doc.text("COLESTEROL TOTAL:", divColLab1 + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(6);
-  doc.text(datosFinales.examenesLaboratorio?.perfilLipidico?.colesterolTotal || "N/A", divColLab1 + 30, yPos + 3.5);
+  // Celda 2: GLUCOSA
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("GLUCOSA:", divsHemograma[0] + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const glucosaValue = datosFinales.examenesLaboratorio?.hemograma?.glucosa || "N/A";
+  const glucosaText = glucosaValue === "N/A" ? glucosaValue : `${glucosaValue} mg/dl`;
+  doc.text(glucosaText, divsHemograma[0] + 25, yPos + 3.5);
   
-  doc.setFont("helvetica", "bold").setFontSize(6);
-  doc.text("COCAINA EN ORINA:", divColLab2 + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(6);
-  doc.text(datosFinales.examenesLaboratorio?.examenOrina?.cocaina || "N/A", divColLab2 + 30, yPos + 3.5);
+  // Celda 3: UREA
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("UREA:", divsHemograma[1] + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const ureaValue = datosFinales.examenesLaboratorio?.hemograma?.urea || "N/A";
+  const ureaText = ureaValue === "N/A" ? ureaValue : `${ureaValue} mg/dl`;
+  doc.text(ureaText, divsHemograma[1] + 25, yPos + 3.5);
   
-  // Línea horizontal
-  doc.line(tablaInicioX, yPos + alturaFilaLab, tablaInicioX + tablaAncho, yPos + alturaFilaLab);
+  // Celda 4: CREATININA
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("CREATININA:", divsHemograma[2] + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const creatininaValue = datosFinales.examenesLaboratorio?.hemograma?.creatinina || "N/A";
+  const creatininaText = creatininaValue === "N/A" ? creatininaValue : `${creatininaValue} mg/dl`;
+  doc.text(creatininaText, divsHemograma[2] + 25, yPos + 3.5);
+  
   yPos += alturaFilaLab;
 
-  // FILA 3: Glucosa | L.D.L | Marihuana en orina
-  doc.setFont("helvetica", "bold").setFontSize(6);
-  doc.text("GLUCOSA:", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(6);
-  doc.text(datosFinales.examenesLaboratorio?.hemograma?.glucosa || "N/A", tablaInicioX + 30, yPos + 3.5);
-  
-  doc.setFont("helvetica", "bold").setFontSize(6);
-  doc.text("LDL:", divColLab1 + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(6);
-  doc.text(datosFinales.examenesLaboratorio?.perfilLipidico?.ldl || "N/A", divColLab1 + 30, yPos + 3.5);
-  
-  doc.setFont("helvetica", "bold").setFontSize(6);
-  doc.text("MARIHUANA EN ORINA:", divColLab2 + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(6);
-  doc.text(datosFinales.examenesLaboratorio?.examenOrina?.marihuana || "N/A", divColLab2 + 30, yPos + 3.5);
-  
-  // Línea horizontal
+  // Fila 2: LEUCOCITOS | SEGMENTADOS | LINFOCITOS | HEMATIES
+  divsHemograma.forEach(div => {
+    doc.line(div, yPos, div, yPos + alturaFilaLab);
+  });
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaLab);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaLab);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaFilaLab, tablaInicioX + tablaAncho, yPos + alturaFilaLab);
+  
+  // Celda 1: LEUCOCITOS
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("LEUCOCITOS:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const leucocitosValue = datosFinales.examenesLaboratorio?.hemograma?.leucocitos || "N/A";
+  const leucocitosText = leucocitosValue === "N/A" ? leucocitosValue : `${leucocitosValue} /mm³`;
+  doc.text(leucocitosText, tablaInicioX + 25, yPos + 3.5);
+  
+  // Celda 2: SEGMENTADOS
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("SEGMENTADOS:", divsHemograma[0] + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const segmentadosValue = datosFinales.examenesLaboratorio?.hemograma?.segmentados || "N/A";
+  const segmentadosText = segmentadosValue === "N/A" ? segmentadosValue : `${segmentadosValue} %`;
+  doc.text(segmentadosText, divsHemograma[0] + 25, yPos + 3.5);
+  
+  // Celda 3: LINFOCITOS
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("LINFOCITOS:", divsHemograma[1] + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const linfocitosValue = datosFinales.examenesLaboratorio?.hemograma?.linfocitos || "N/A";
+  const linfocitosText = linfocitosValue === "N/A" ? linfocitosValue : `${linfocitosValue} %`;
+  doc.text(linfocitosText, divsHemograma[1] + 25, yPos + 3.5);
+  
+  // Celda 4: HEMATIES
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("HEMATIES:", divsHemograma[2] + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const hematiesValue = datosFinales.examenesLaboratorio?.hemograma?.hematies || "N/A";
+  const hematiesText = hematiesValue === "N/A" ? hematiesValue : `${hematiesValue} millones/mm³`;
+  doc.text(hematiesText, divsHemograma[2] + 25, yPos + 3.5);
+  
   yPos += alturaFilaLab;
 
-  // FILA 4: Urea | H.D.L | Mercurio en orina
-  doc.setFont("helvetica", "bold").setFontSize(6);
-  doc.text("UREA:", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(6);
-  doc.text(datosFinales.examenesLaboratorio?.hemograma?.urea || "N/A", tablaInicioX + 30, yPos + 3.5);
-  
-  doc.setFont("helvetica", "bold").setFontSize(6);
-  doc.text("H.D.L:", divColLab1 + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(6);
-  doc.text(datosFinales.examenesLaboratorio?.perfilLipidico?.hdl || "N/A", divColLab1 + 30, yPos + 3.5);
-  
-  doc.setFont("helvetica", "bold").setFontSize(6);
-  doc.text("MERCURIO EN ORINA:", divColLab2 + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(6);
-  doc.text(datosFinales.examenesLaboratorio?.examenOrina?.mercurio || "N/A", divColLab2 + 30, yPos + 3.5);
-  
-  // Línea horizontal
+  // Fila 3: NEUTROFILOS | EOSINOFILOS | MONOCITOS | PLAQUETAS
+  divsHemograma.forEach(div => {
+    doc.line(div, yPos, div, yPos + alturaFilaLab);
+  });
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaLab);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaLab);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaFilaLab, tablaInicioX + tablaAncho, yPos + alturaFilaLab);
+  
+  // Celda 1: NEUTROFILOS
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("NEUTROFILOS:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const neutrofilosValue = datosFinales.examenesLaboratorio?.hemograma?.neutrofilos || "N/A";
+  const neutrofilosText = neutrofilosValue === "N/A" ? neutrofilosValue : `${neutrofilosValue} %`;
+  doc.text(neutrofilosText, tablaInicioX + 25, yPos + 3.5);
+  
+  // Celda 2: EOSINOFILOS
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("EOSINOFILOS:", divsHemograma[0] + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const eosinofilosValue = datosFinales.examenesLaboratorio?.hemograma?.eosinofilos || "N/A";
+  const eosinofilosText = eosinofilosValue === "N/A" ? eosinofilosValue : `${eosinofilosValue} %`;
+  doc.text(eosinofilosText, divsHemograma[0] + 25, yPos + 3.5);
+  
+  // Celda 3: MONOCITOS
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("MONOCITOS:", divsHemograma[1] + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const monocitosValue = datosFinales.examenesLaboratorio?.hemograma?.monocitos || "N/A";
+  const monocitosText = monocitosValue === "N/A" ? monocitosValue : `${monocitosValue} %`;
+  doc.text(monocitosText, divsHemograma[1] + 25, yPos + 3.5);
+  
+  // Celda 4: PLAQUETAS
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("PLAQUETAS:", divsHemograma[2] + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const plaquetasValue = datosFinales.examenesLaboratorio?.hemograma?.plaquetas || "N/A";
+  const plaquetasText = plaquetasValue === "N/A" ? plaquetasValue : `${plaquetasValue} /mm³`;
+  doc.text(plaquetasText, divsHemograma[2] + 25, yPos + 3.5);
+  
   yPos += alturaFilaLab;
 
-  // FILA 5: Creatinina | V.L.D.L | Plomo en sangre
-  doc.setFont("helvetica", "bold").setFontSize(6);
-  doc.text("CREATININA:", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(6);
-  doc.text(datosFinales.examenesLaboratorio?.hemograma?.creatinina || "N/A", tablaInicioX + 30, yPos + 3.5);
-  
-  doc.setFont("helvetica", "bold").setFontSize(6);
-  doc.text("V.L.D.L:", divColLab1 + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(6);
-  doc.text(datosFinales.examenesLaboratorio?.perfilLipidico?.vldl || "N/A", divColLab1 + 30, yPos + 3.5);
-  
-  doc.setFont("helvetica", "bold").setFontSize(6);
-  doc.text("PLOMO EN SANGRE:", divColLab2 + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(6);
-  doc.text(datosFinales.examenesLaboratorio?.examenOrina?.plomo || "N/A", divColLab2 + 30, yPos + 3.5);
-  
-  // Línea horizontal
+  // Fila 4: ABASTONADOS | BASOFILOS
+  divsHemograma.forEach(div => {
+    doc.line(div, yPos, div, yPos + alturaFilaLab);
+  });
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaLab);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaLab);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaFilaLab, tablaInicioX + tablaAncho, yPos + alturaFilaLab);
+  
+  // Celda 1: ABASTONADOS
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("ABASTONADOS:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const abastonadosValue = datosFinales.examenesLaboratorio?.hemograma?.abastonados || "N/A";
+  const abastonadosText = abastonadosValue === "N/A" ? abastonadosValue : `${abastonadosValue} %`;
+  doc.text(abastonadosText, tablaInicioX + 25, yPos + 3.5);
+  
+  // Celda 2: BASOFILOS
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("BASOFILOS:", divsHemograma[0] + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const basofilosValue = datosFinales.examenesLaboratorio?.hemograma?.basofilos || "N/A";
+  const basofilosText = basofilosValue === "N/A" ? basofilosValue : `${basofilosValue} %`;
+  doc.text(basofilosText, divsHemograma[0] + 25, yPos + 3.5);
+  
   yPos += alturaFilaLab;
 
-  // FILA 6: (vacío) | Trigliceridos | (vacío)
-  doc.setFont("helvetica", "bold").setFontSize(6);
-  doc.text("TRIGLICERIDOS:", divColLab1 + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(6);
-  doc.text(datosFinales.examenesLaboratorio?.perfilLipidico?.trigliceridos || "N/A", divColLab1 + 30, yPos + 3.5);
+  // === PERFIL LIPIDICO COMPLETO ===
+  // Fila celeste (fondo gris)
+  doc.setFillColor(196, 196, 196);
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaFilaLab, 'F');
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaLab);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaLab);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaFilaLab, tablaInicioX + tablaAncho, yPos + alturaFilaLab);
+  
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("PERFIL LIPIDICO COMPLETO", tablaInicioX + 2, yPos + 3.5);
+  yPos += alturaFilaLab;
+
+  // Fila con celdas: COLESTEROL TOTAL | LDL | H.D.L | V.L.D.L | TRIGLICERIDOS
+  // Anchos proporcionales: COLESTEROL TOTAL más ancho, LDL/H.D.L/V.L.D.L más estrechas
+  const anchoColesterol = tablaAncho * 0.28; // 38% - más ancho
+  const anchoLDL = tablaAncho * 0.16; // 12% - más estrecho
+  const anchoHDL = tablaAncho * 0.16; // 12% - más estrecho
+  const anchoVLDL = tablaAncho * 0.16; // 12% - más estrecho
+  // TRIGLICERIDOS toma el espacio restante (26%)
+  
+  // Posiciones de las divisiones
+  const divLDL = tablaInicioX + anchoColesterol;
+  const divHDL = divLDL + anchoLDL;
+  const divVLDL = divHDL + anchoHDL;
+  const divTrigliceridos = divVLDL + anchoVLDL;
+  
+  // Líneas verticales divisorias
+  doc.line(divLDL, yPos, divLDL, yPos + alturaFilaLab);
+  doc.line(divHDL, yPos, divHDL, yPos + alturaFilaLab);
+  doc.line(divVLDL, yPos, divVLDL, yPos + alturaFilaLab);
+  doc.line(divTrigliceridos, yPos, divTrigliceridos, yPos + alturaFilaLab);
+  
+  // Bordes de la fila
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaLab);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaLab);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaFilaLab, tablaInicioX + tablaAncho, yPos + alturaFilaLab);
+  
+  // Celda 1: COLESTEROL TOTAL
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("COLESTEROL TOTAL:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const colesterolValue = datosFinales.examenesLaboratorio?.perfilLipidico?.colesterolTotal || "N/A";
+  const colesterolText = colesterolValue === "N/A" ? colesterolValue : `${colesterolValue} mg/dl`;
+  doc.text(colesterolText, tablaInicioX + 35, yPos + 3.5);
+  
+  // Celda 2: LDL
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("LDL:", divLDL + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const ldlValue = datosFinales.examenesLaboratorio?.perfilLipidico?.ldl || "N/A";
+  const ldlText = ldlValue === "N/A" ? ldlValue : `${ldlValue} mg/dl`;
+  doc.text(ldlText, divLDL + 15, yPos + 3.5);
+  
+  // Celda 3: H.D.L
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("H.D.L:", divHDL + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const hdlValue = datosFinales.examenesLaboratorio?.perfilLipidico?.hdl || "N/A";
+  const hdlText = hdlValue === "N/A" ? hdlValue : `${hdlValue} mg/dl`;
+  doc.text(hdlText, divHDL + 15, yPos + 3.5);
+  
+  // Celda 4: V.L.D.L
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("V.L.D.L:", divVLDL + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const vldlValue = datosFinales.examenesLaboratorio?.perfilLipidico?.vldl || "N/A";
+  const vldlText = vldlValue === "N/A" ? vldlValue : `${vldlValue} mg/dl`;
+  doc.text(vldlText, divVLDL + 15, yPos + 3.5);
+  
+  // Celda 5: TRIGLICERIDOS
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("TRIGLICERIDOS:", divTrigliceridos + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const trigliceridosValue = datosFinales.examenesLaboratorio?.perfilLipidico?.trigliceridos || "N/A";
+  const trigliceridosText = trigliceridosValue === "N/A" ? trigliceridosValue : `${trigliceridosValue} mg/dl`;
+  doc.text(trigliceridosText, divTrigliceridos + 25, yPos + 3.5);
+  
+  yPos += alturaFilaLab;
+
+  // === EXAMEN COMPLETO DE ORINA ===
+  // Fila celeste (fondo gris)
+  doc.setFillColor(196, 196, 196);
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaFilaLab, 'F');
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaLab);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaLab);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaFilaLab, tablaInicioX + tablaAncho, yPos + alturaFilaLab);
+  
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("EXAMEN COMPLETO DE ORINA", tablaInicioX + 2, yPos + 3.5);
+  yPos += alturaFilaLab;
+
+  // Fila con celdas: COCAINA EN ORINA | MARIHUANA EN ORINA | MERCURIO EN ORINA | PLOMO EN SANGRE
+  const numCeldasOrina = 4;
+  const anchoCeldaOrina = tablaAncho / numCeldasOrina;
+  const divsOrina = [];
+  for (let i = 1; i < numCeldasOrina; i++) {
+    divsOrina.push(tablaInicioX + (anchoCeldaOrina * i));
+  }
+  
+  // Líneas verticales divisorias
+  divsOrina.forEach(div => {
+    doc.line(div, yPos, div, yPos + alturaFilaLab);
+  });
+  
+  // Bordes de la fila
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaLab);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaLab);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaFilaLab, tablaInicioX + tablaAncho, yPos + alturaFilaLab);
+  
+  // Celda 1: COCAINA EN ORINA
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("COCAINA EN ORINA:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const cocainaText = datosFinales.examenesLaboratorio?.examenOrina?.cocaina || "N/A";
+  doc.text(cocainaText, tablaInicioX + 30, yPos + 3.5);
+  
+  // Celda 2: MARIHUANA EN ORINA
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("MARIHUANA EN ORINA:", divsOrina[0] + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const marihuanaText = datosFinales.examenesLaboratorio?.examenOrina?.marihuana || "N/A";
+  doc.text(marihuanaText, divsOrina[0] + 32, yPos + 3.5);
+  
+  // Celda 3: MERCURIO EN ORINA
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("MERCURIO EN ORINA:", divsOrina[1] + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const mercurioText = datosFinales.examenesLaboratorio?.examenOrina?.mercurio || "N/A";
+  doc.text(mercurioText, divsOrina[1] + 30, yPos + 3.5);
+  
+  // Celda 4: PLOMO EN SANGRE
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("PLOMO EN SANGRE:", divsOrina[2] + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const plomoText = datosFinales.examenesLaboratorio?.examenOrina?.plomo || "N/A";
+  doc.text(plomoText, divsOrina[2] + 30, yPos + 3.5);
   
   // Línea horizontal inferior
   doc.line(tablaInicioX, yPos + alturaFilaLab, tablaInicioX + tablaAncho, yPos + alturaFilaLab);
@@ -3326,113 +3569,92 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("GRUPO SANGUINEO", tablaInicioX + 2, yPos + 3.5);
   
-  // Línea horizontal inferior
-  doc.line(tablaInicioX, yPos + alturaFilaGrupoSang, tablaInicioX + tablaAncho, yPos + alturaFilaGrupoSang);
-  yPos += alturaFilaGrupoSang;
-
-  // === FILA: Checkboxes Grupo Sanguíneo ===
-  
-  // Verificar si necesitamos nueva página
-  const alturaFilaGrupoSangCheck = 6;
-  if (yPos + alturaFilaGrupoSangCheck > pageHeight - 20) {
-    footerTR(doc, { footerOffsetY: 8 });
-    doc.addPage();
-    numeroPagina++;
-    drawHeader(numeroPagina);
-    yPos = 35.5;
-  }
-
-  // Bordes verticales izquierdo y derecho
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaGrupoSangCheck);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaGrupoSangCheck);
-  
-  // Línea horizontal superior
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  
   // Checkboxes Grupo Sanguíneo: O, A, B, AB
   const checkboxGrupoSize = 2.8;
   const checkboxGrupoY = yPos + 1;
-  let xCheckActual = tablaInicioX + 2;
+  let xCheckActual = tablaInicioX + 35;
   
   // Checkbox O
   doc.rect(xCheckActual, checkboxGrupoY, checkboxGrupoSize, checkboxGrupoSize);
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("O", xCheckActual + checkboxGrupoSize + 1, yPos + 3.5);
   if (datosFinales.grupoSanguineo?.tipo?.o) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     const xCenteredX = xCheckActual + (checkboxGrupoSize / 2) - (textWidthX / 2);
     const yCenteredX = checkboxGrupoY + (checkboxGrupoSize / 2) + 1;
     doc.text("X", xCenteredX, yCenteredX);
     doc.setFont("helvetica", "normal").setFontSize(7);
   }
-  xCheckActual += checkboxGrupoSize + 8;
+  xCheckActual += checkboxGrupoSize + 8; // Reducido a 8 para juntarlos
   
   // Checkbox A
   doc.rect(xCheckActual, checkboxGrupoY, checkboxGrupoSize, checkboxGrupoSize);
   doc.text("A", xCheckActual + checkboxGrupoSize + 1, yPos + 3.5);
   if (datosFinales.grupoSanguineo?.tipo?.a) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     const xCenteredX = xCheckActual + (checkboxGrupoSize / 2) - (textWidthX / 2);
     const yCenteredX = checkboxGrupoY + (checkboxGrupoSize / 2) + 1;
     doc.text("X", xCenteredX, yCenteredX);
     doc.setFont("helvetica", "normal").setFontSize(7);
   }
-  xCheckActual += checkboxGrupoSize + 8;
+  xCheckActual += checkboxGrupoSize + 8; // Reducido a 8 para juntarlos
   
   // Checkbox B
   doc.rect(xCheckActual, checkboxGrupoY, checkboxGrupoSize, checkboxGrupoSize);
   doc.text("B", xCheckActual + checkboxGrupoSize + 1, yPos + 3.5);
   if (datosFinales.grupoSanguineo?.tipo?.b) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     const xCenteredX = xCheckActual + (checkboxGrupoSize / 2) - (textWidthX / 2);
     const yCenteredX = checkboxGrupoY + (checkboxGrupoSize / 2) + 1;
     doc.text("X", xCenteredX, yCenteredX);
     doc.setFont("helvetica", "normal").setFontSize(7);
   }
-  xCheckActual += checkboxGrupoSize + 8;
+  xCheckActual += checkboxGrupoSize + 8; // Reducido a 8 para juntarlos
   
   // Checkbox AB
   doc.rect(xCheckActual, checkboxGrupoY, checkboxGrupoSize, checkboxGrupoSize);
   doc.text("AB", xCheckActual + checkboxGrupoSize + 1, yPos + 3.5);
   if (datosFinales.grupoSanguineo?.tipo?.ab) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     const xCenteredX = xCheckActual + (checkboxGrupoSize / 2) - (textWidthX / 2);
     const yCenteredX = checkboxGrupoY + (checkboxGrupoSize / 2) + 1;
     doc.text("X", xCenteredX, yCenteredX);
     doc.setFont("helvetica", "normal").setFontSize(7);
   }
+  xCheckActual += checkboxGrupoSize + 8; // Espacio después de AB
   
-  // Línea vertical divisoria antes de Factor Rh
-  const xDivRh = tablaInicioX + 50;
-  doc.line(xDivRh, yPos, xDivRh, yPos + alturaFilaGrupoSangCheck);
+  // Línea divisoria 1: Entre GRUPO SANGUINEO y Factor Rh
+  const xDiv1 = xCheckActual + 2; // Justo después de AB
+  doc.line(xDiv1, yPos, xDiv1, yPos + alturaFilaGrupoSang);
   
-  // Factor Rh
-  let xCheckRh = xDivRh + 2;
+  // Factor Rh - posicionado después de los checkboxes de grupo sanguíneo
+  let xCheckRh = xDiv1 + 5; // Espacio adicional antes de Factor Rh
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("Factor Rh", xCheckRh, yPos + 3.5);
-  xCheckRh += 20;
+  xCheckRh += 18; // Reducido para juntarlos
   
   // Checkbox Rh(-)
   doc.rect(xCheckRh, checkboxGrupoY, checkboxGrupoSize, checkboxGrupoSize);
   doc.text("Rh(-)", xCheckRh + checkboxGrupoSize + 1, yPos + 3.5);
   if (datosFinales.grupoSanguineo?.factorRh?.negativo) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     const xCenteredX = xCheckRh + (checkboxGrupoSize / 2) - (textWidthX / 2);
     const yCenteredX = checkboxGrupoY + (checkboxGrupoSize / 2) + 1;
     doc.text("X", xCenteredX, yCenteredX);
     doc.setFont("helvetica", "normal").setFontSize(7);
   }
-  xCheckRh += checkboxGrupoSize + 15;
+  xCheckRh += checkboxGrupoSize + 12; // Reducido para juntarlos
   
   // Checkbox Rh(+)
   doc.rect(xCheckRh, checkboxGrupoY, checkboxGrupoSize, checkboxGrupoSize);
   doc.text("Rh(+)", xCheckRh + checkboxGrupoSize + 1, yPos + 3.5);
   if (datosFinales.grupoSanguineo?.factorRh?.positivo) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     const xCenteredX = xCheckRh + (checkboxGrupoSize / 2) - (textWidthX / 2);
     const yCenteredX = checkboxGrupoY + (checkboxGrupoSize / 2) + 1;
@@ -3440,16 +3662,43 @@ export default function Anexo7C_Antiguo(data = {}) {
     doc.setFont("helvetica", "normal").setFontSize(7);
   }
   
-  // Línea vertical divisoria antes de Hemoglobina/Hematocrito
-  const xDivHem = tablaInicioX + 110;
-  doc.line(xDivHem, yPos, xDivHem, yPos + alturaFilaGrupoSangCheck);
+  // Línea divisoria 2: Entre Factor Rh y Hemoglobina/Hematocrito
+  const xDiv2 = xCheckRh + checkboxGrupoSize + 15; // Justo después de Rh(+)
+  doc.line(xDiv2, yPos, xDiv2, yPos + alturaFilaGrupoSang);
   
-  // Hemoglobina/Hematocrito
-  doc.text(`Hemoglobina/hematocrito: ${datosFinales.grupoSanguineo?.hemoglobinaHematocrito || ""} gr.%`, xDivHem + 2, yPos + 3.5);
+  // Hemoglobina/Hematocrito - movido más a la izquierda
+  const xDivHem = xDiv2 + 5; // Posicionado después de la línea divisoria
+  const hemoglobinaValue = datosFinales.grupoSanguineo?.hemoglobinaHematocrito || "";
+  const hemoglobinaText = hemoglobinaValue ? `${hemoglobinaValue} mg/dl` : "N/A";
+  
+  // Determinar color según rango de hemoglobina
+  let colorHemoglobina = [0, 0, 0]; // Negro por defecto
+  const hemoglobinaValueFloat = parseFloat(hemoglobinaValue || "0");
+  const esHombre = datosFinales.sexoM;
+  const esMujer = datosFinales.sexoF;
+  
+  if (hemoglobinaValueFloat > 0) {
+    if (esHombre && (hemoglobinaValueFloat < 14 || hemoglobinaValueFloat > 20)) {
+      colorHemoglobina = [255, 0, 0]; // Rojo si hombre < 14 o > 20
+    } else if (esMujer && (hemoglobinaValueFloat < 13.5 || hemoglobinaValueFloat > 20)) {
+      colorHemoglobina = [255, 0, 0]; // Rojo si mujer < 13.5 o > 20
+    }
+  }
+  
+  // Label en tamaño normal
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text("Hemoglobina/hematocrito: ", xDivHem + 2, yPos + 3.5);
+  
+  // Data en tamaño 9 con color
+  const labelWidth = doc.getTextWidth("Hemoglobina/hematocrito: ");
+  doc.setFont("helvetica", "bold").setFontSize(8.5);
+  doc.setTextColor(colorHemoglobina[0], colorHemoglobina[1], colorHemoglobina[2]);
+  doc.text(hemoglobinaText, xDivHem + 2 + labelWidth, yPos + 3.5);
+  doc.setTextColor(0, 0, 0); // Volver al color negro
   
   // Línea horizontal inferior
-  doc.line(tablaInicioX, yPos + alturaFilaGrupoSangCheck, tablaInicioX + tablaAncho, yPos + alturaFilaGrupoSangCheck);
-  yPos += alturaFilaGrupoSangCheck;
+  doc.line(tablaInicioX, yPos + alturaFilaGrupoSang, tablaInicioX + tablaAncho, yPos + alturaFilaGrupoSang);
+  yPos += alturaFilaGrupoSang;
 
   // === SECCIÓN: APTO PARA TRABAJAR ===
   
@@ -3484,7 +3733,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("Si", xCheckApto + checkboxAptoSize + 1, yPos + 3.5);
   if (datosFinales.aptoParaTrabajar?.si) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     const xCenteredX = xCheckApto + (checkboxAptoSize / 2) - (textWidthX / 2);
     const yCenteredX = checkboxAptoY + (checkboxAptoSize / 2) + 1;
@@ -3497,7 +3746,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.rect(xCheckApto, checkboxAptoY, checkboxAptoSize, checkboxAptoSize);
   doc.text("No", xCheckApto + checkboxAptoSize + 1, yPos + 3.5);
   if (datosFinales.aptoParaTrabajar?.no) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     const xCenteredX = xCheckApto + (checkboxAptoSize / 2) - (textWidthX / 2);
     const yCenteredX = checkboxAptoY + (checkboxAptoSize / 2) + 1;
@@ -3510,7 +3759,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.rect(xCheckApto, checkboxAptoY, checkboxAptoSize, checkboxAptoSize);
   doc.text("Revaluación en empresa", xCheckApto + checkboxAptoSize + 1, yPos + 3.5);
   if (datosFinales.aptoParaTrabajar?.revaluacionEmpresa) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     const textWidthX = doc.getTextWidth("X");
     const xCenteredX = xCheckApto + (checkboxAptoSize / 2) - (textWidthX / 2);
     const yCenteredX = checkboxAptoY + (checkboxAptoSize / 2) + 1;
@@ -3522,9 +3771,19 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.line(tablaInicioX, yPos + alturaFilaApto, tablaInicioX + tablaAncho, yPos + alturaFilaApto);
   yPos += alturaFilaApto;
 
-  // === SECCIÓN: OTROS EXAMENES ===
+  // === FOOTER PÁGINA 2 ===
+  footerTR(doc, { footerOffsetY: 8 });
+
+  // === CREAR PÁGINA 3 ===
+  doc.addPage();
+  numeroPagina = 3;
+  yPos = 35.5; // Posición inicial de la nueva página
+
+  // Dibujar header en la nueva página
+  drawHeader(numeroPagina);
+
+  // === SECCIÓN: OTROS EXAMENES (PÁGINA 3) ===
   
-  // Verificar si necesitamos nueva página
   const alturaFilaOtrosHeader = 5;
   const alturaFilaCrecienteOtros = 35; // Altura por defecto
   const textoOtrosExamenes = datosFinales.otrosExamenes?.dataCreciente || "";
@@ -3533,14 +3792,6 @@ export default function Anexo7C_Antiguo(data = {}) {
   const interlineadoOtrosExamenes = 3;
   const alturaDinamicaOtrosExamenes = Math.max(alturaFilaCrecienteOtros, lineasOtrosExamenes.length * interlineadoOtrosExamenes + 4);
   const alturaTotalOtros = alturaFilaOtrosHeader + alturaDinamicaOtrosExamenes;
-  
-  if (yPos + alturaTotalOtros > pageHeight - 20) {
-    footerTR(doc, { footerOffsetY: 8 });
-    doc.addPage();
-    numeroPagina++;
-    drawHeader(numeroPagina);
-    yPos = 35.5;
-  }
 
   // Bordes verticales izquierdo y derecho (completos)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaTotalOtros);
@@ -3549,7 +3800,14 @@ export default function Anexo7C_Antiguo(data = {}) {
   // Línea horizontal superior
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   
-  // FILA HEADER: OTROS EXAMENES
+  // FILA HEADER: OTROS EXAMENES (con fondo celeste)
+  doc.setFillColor(196, 196, 196);
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaFilaOtrosHeader, 'F');
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaOtrosHeader);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaOtrosHeader);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaFilaOtrosHeader, tablaInicioX + tablaAncho, yPos + alturaFilaOtrosHeader);
+  
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("OTROS EXAMENES", tablaInicioX + 2, yPos + 3.5);
   
@@ -3567,17 +3825,6 @@ export default function Anexo7C_Antiguo(data = {}) {
   // Línea horizontal inferior
   doc.line(tablaInicioX, yPos + alturaDinamicaOtrosExamenes, tablaInicioX + tablaAncho, yPos + alturaDinamicaOtrosExamenes);
   yPos += alturaDinamicaOtrosExamenes;
-
-  // === FOOTER PÁGINA 2 ===
-  footerTR(doc, { footerOffsetY: 8 });
-
-  // === CREAR PÁGINA 3 ===
-  doc.addPage();
-  numeroPagina = 3;
-  yPos = 35.5; // Posición inicial de la nueva página
-
-  // Dibujar header en la nueva página
-  drawHeader(numeroPagina);
 
   // === SECCIÓN: CONCLUSIONES (PÁGINA 3) ===
   
@@ -3659,7 +3906,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   // Verificar si necesitamos nueva página
   const alturaFilaRecomendacionesHeader = 5;
   const textoRecomendaciones = datosFinales.recomendacionesRestricciones || "";
-  const anchoDisponibleRecomendaciones = tablaAncho - 3;
+  const anchoDisponibleRecomendaciones = tablaAncho - 8; // Margen aumentado (4mm a cada lado)
   
   // Procesar texto: separar por \n primero, si no hay \n, dividir por patrones de números (1., 2., etc.)
   let itemsRecomendaciones = [];
@@ -3694,7 +3941,7 @@ export default function Anexo7C_Antiguo(data = {}) {
     }
   });
   
-  const alturaDinamicaRecomendaciones = Math.max(45, alturaAcumuladaRecomendaciones + 4);
+  const alturaDinamicaRecomendaciones = Math.max(50, alturaAcumuladaRecomendaciones + 8); // altura mínima 50mm, margen inferior aumentado
   
   // Ya estamos en página 3, no crear nueva página aquí
   
@@ -3716,9 +3963,9 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaDinamicaRecomendaciones, tablaInicioX + tablaAncho, yPos + alturaDinamicaRecomendaciones);
   
-  // Dibujar contenido línea por línea con espaciado entre ítems
+  // Dibujar contenido línea por línea con espaciado entre ítems y márgenes adecuados
   doc.setFont("helvetica", "normal").setFontSize(7);
-  let yPosActualRecomendaciones = yPos + 3.5;
+  let yPosActualRecomendaciones = yPos + 4; // Margen superior aumentado
   let itemIndexAnteriorRecomendaciones = -1;
   
   todasLasLineasRecomendaciones.forEach((lineaObj) => {
@@ -3726,7 +3973,7 @@ export default function Anexo7C_Antiguo(data = {}) {
       yPosActualRecomendaciones += espacioEntreItems;
     }
     
-    doc.text(lineaObj.texto, tablaInicioX + 2, yPosActualRecomendaciones);
+    doc.text(lineaObj.texto, tablaInicioX + 4, yPosActualRecomendaciones); // Margen X aumentado a 4mm
     yPosActualRecomendaciones += interlineadoTexto;
     itemIndexAnteriorRecomendaciones = lineaObj.itemIndex;
   });
@@ -3754,7 +4001,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.line(tablaInicioX, yPos + alturaSeccionDeclaracion, tablaInicioX + tablaAncho, yPos + alturaSeccionDeclaracion);
   
   // === COLUMNA 1: DECLARACIÓN ===
-  doc.setFont("helvetica", "normal").setFontSize(6);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   const textoDeclaracion = "Declaro que las respuestas son ciertas según mi leal saber y entender. En caso de ser requeridos, los resultados del examen médico pueden ser revelados, en términos generales, al departamento de salud Ocupacional de la compañía. Los resultados pueden ser enviados a mi médico particular de ser considerado necesario.";
   
   // Función para justificar texto

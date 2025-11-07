@@ -49,6 +49,11 @@ export const GetInfoServicio = async (
             vlCorregidaOD: res.odlcoftalmologiaOdlc ?? "",
             vcCorregidaOI: res.oiccoftalmologiaOicc ?? "",
             vlCorregidaOI: res.oilcoftalmologiaOilc ?? "",
+
+            visionUsaLentes: ((res.oftalodccmologiaOdcc ?? "") != "" && (res.oftalodccmologiaOdcc ?? "") != "00") ||
+                ((res.odlcoftalmologiaOdlc ?? "") != "" && (res.odlcoftalmologiaOdlc ?? "") != "00") ||
+                ((res.oiccoftalmologiaOicc ?? "") != "" && (res.oiccoftalmologiaOicc ?? "") != "00") ||
+                ((res.oilcoftalmologiaOilc ?? "") != "" && (res.oilcoftalmologiaOilc ?? "") != "00"),
             vclrs: res.vcoftalmologiaVc ?? "",
             vb: res.vboftalmologiaVb ?? "",
             rp: res.rpoftalmologiaRp ?? "",
