@@ -27,6 +27,37 @@ export const GetInfoServicio = async (
         onFinish
     );
     if (res) {
+        const imc = res.imcTriaje ?? "";
+        let imcRed = false;
+        let nuevasObservaciones = "";
+        if (imc) {
+            const imcValue = parseFloat(imc);
+            if (!isNaN(imcValue) && imcValue > 25) {
+                imcRed = true;
+                if (imcValue >= 25 && imcValue < 29.91) {
+                    nuevasObservaciones += "SOBREPESO: DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+                } else if (imcValue >= 29.91 && imcValue < 35) {
+                    nuevasObservaciones += "OBESIDAD I: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+                } else if (imcValue >= 35) {
+                    nuevasObservaciones += "OBESIDAD II: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+                }
+            }
+        }
+
+        const vlejoscod = res.odlcoftalmologia_odlc || "";
+        const vlejoscoi = res.oilcoftalmologia_oilc || "";
+
+        const vcercacod = res.oftalodccmologia_odcc || "";
+        const vcercacoi = res.oiccoftalmologia_oicc || "";
+
+        if (!((res.enfermedadesOcularesOftalmo_e_oculares ?? "").trim().toUpperCase() == ("NINGUNA"))) {
+            if (vlejoscod == "00" && vlejoscoi == "00" && vcercacod == "00" && vcercacoi == "00") {
+                nuevasObservaciones += "CORREGIR AGUDEZA VISUAL.\n";
+            } else {
+                nuevasObservaciones += "USO DE LENTES CORRECTORES.\n";
+            }
+        }
+
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
@@ -70,8 +101,10 @@ export const GetInfoServicio = async (
             icc: res.iccTriaje ?? "",
             perimetroToracicoInspiracion: res.maximaInspiracionPtoracico_p_max_inspiracion ?? "",
             perimetroToracicoEspiracion: res.forazadaPtoracico_p_ex_forzada ?? "",
+            observacionesRecomendaciones: nuevasObservaciones,
+            imcRed: imcRed,
 
-            obesidadIMC30: parseFloat(res.imcTriaje) >= 30 ,
+            obesidadIMC30: parseFloat(res.imcTriaje) >= 30,
         }));
     }
 };
@@ -91,6 +124,14 @@ export const GetInfoServicioEditar = async (
         onFinish
     );
     if (res) {
+        const imc = res.imcTriaje ?? "";
+        let imcRed = false;
+        if (imc) {
+            const imcValue = parseFloat(imc);
+            if (!isNaN(imcValue) && imcValue > 25) {
+                imcRed = true;
+            }
+        }
         set((prev) => ({
             ...prev,
             // Header
@@ -132,6 +173,7 @@ export const GetInfoServicioEditar = async (
             talla: res.tallaTriaje ?? "",
             peso: res.pesoTriaje ?? "",
             imc: res.imcTriaje ?? "",
+            imcRed: imcRed,
             perimetroCuello: res.perimetroCuelloTriaje ?? "",
             perimetroCintura: res.cinturaTriaje ?? "",
             perimetroCadera: res.caderaTriaje ?? "",

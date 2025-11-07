@@ -72,6 +72,7 @@ export default function FichaConduccionVehiculos() {
         talla: "",
         peso: "",
         imc: "",
+        imcRed: false,
         perimetroCuello: "",
         perimetroCintura: "",
         perimetroCadera: "",

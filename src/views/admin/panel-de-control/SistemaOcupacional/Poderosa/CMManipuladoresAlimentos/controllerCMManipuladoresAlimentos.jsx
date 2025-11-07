@@ -48,6 +48,7 @@ export const GetInfoServicio = async (
 
             // Recomendaciones
             recomendaciones: res.recomendaciones ?? "",
+            observaciones: res.observaciones ?? "",
         }));
     }
 };
