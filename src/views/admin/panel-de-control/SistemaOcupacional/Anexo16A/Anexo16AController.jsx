@@ -106,7 +106,7 @@ function evaluarObservacionesObtener(res, set) {
     const vcercacod = res.odccOftalmologia_odcc || "";
     const vcercacoi = res.oiccOftalmologia_oicc || "";
 
-    if (!res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNA")) {
+    if (!((res.enfermedadesOcularesOftalmo_e_oculares ?? "").trim().toUpperCase() == ("NINGUNA"))) {
         problemasOftalmologicos = true;
         problemasOftalmologicosRed = true;
         if (vlejoscod == "00" && vlejoscoi == "00" && vcercacod == "00" && vcercacoi == "00") {
@@ -169,7 +169,7 @@ function evaluarObservacionesEditar(res, set) {
     const vcercacod = res.odccOftalmologia_odcc || "";
     const vcercacoi = res.oiccOftalmologia_oicc || "";
 
-    if (!res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNA")) {
+    if (!((res.enfermedadesOcularesOftalmo_e_oculares ?? "").trim().toUpperCase() == ("NINGUNA"))) {
         problemasOftalmologicos = true;
         problemasOftalmologicosRed = true;
         if (vlejoscod == "00" && vlejoscoi == "00" && vcercacod == "00" && vcercacoi == "00") {
