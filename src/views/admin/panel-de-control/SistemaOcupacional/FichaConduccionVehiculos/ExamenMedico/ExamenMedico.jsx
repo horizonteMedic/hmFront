@@ -51,6 +51,7 @@ export default function ExamenMedico({ form, handleChange, handleRadioButtonBool
                         name="imc"
                         value={form?.imc}
                         onChange={handleChange}
+                        className={form?.imcRed ? "text-red-600" : ""}
                         disabled
                     />
                     <InputTextOneLine

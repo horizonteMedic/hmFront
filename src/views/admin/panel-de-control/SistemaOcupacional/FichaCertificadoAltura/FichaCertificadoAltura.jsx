@@ -100,6 +100,7 @@ export default function FichaCertificadoAltura() {
         talla: "",
         peso: "",
         imc: "",
+        imcRed: false,
         perimetroCuello: "",
         perimetroCintura: "",
         perimetroCadera: "",

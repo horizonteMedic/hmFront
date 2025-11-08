@@ -465,12 +465,19 @@ export const GetInfoServicio = (
               : "";
 
           data.otrosExamenes += "HEMOGRAMA: " + (vsg != null && hemo != null ? "NORMAL" : "N/A") + "\n";
-          data.otrosExamenes += "GRUPO SANGUINEO: " +
-            (data.grupoSanguineo) + (res.grupoSanguineoRhPositivo_rbrhpositivo
+
+          const rh =
+            res.grupoSanguineoRhPositivo_rbrhpositivo
               ? "+"
               : res.grupoSanguineoRhNegativo_rbrhnegativo
                 ? "-"
-                : "") + "\n";
+                : "";
+          const textoGrupo =
+            data.grupoSanguineo || rh
+              ? `${data.grupoSanguineo || ""}${rh}`
+              : "N/A";
+          data.otrosExamenes += `GRUPO SANGUINEO: ${textoGrupo}\n`;
+
           data.otrosExamenes +=
             gluc == null ? "" : "GLUCOSA: " + gluc + " mg/dl.\n";
           data.otrosExamenes +=
@@ -981,12 +988,18 @@ export const GetInfoServicioEditar = (
           data.glucosa = gluc;
           data.creatinina = creat;
           data.otrosExamenes += "HEMOGRAMA: " + (vsg != null && hemo != null ? "NORMAL" : "N/A") + "\n";
-          data.otrosExamenes += "GRUPO SANGUINEO: " +
-            (data.grupoSanguineo) + (res.grupoSanguineoRhPositivo_rbrhpositivo
+          const rh =
+            res.grupoSanguineoRhPositivo_rbrhpositivo
               ? "+"
               : res.grupoSanguineoRhNegativo_rbrhnegativo
                 ? "-"
-                : "") + "\n";
+                : "";
+          const textoGrupo =
+            data.grupoSanguineo || rh
+              ? `${data.grupoSanguineo || ""}${rh}`
+              : "N/A";
+          data.otrosExamenes += `GRUPO SANGUINEO: ${textoGrupo}\n`;
+
           data.otrosExamenes +=
             gluc == null ? "" : "GLUCOSA: " + gluc + " mg/dl.\n";
           data.otrosExamenes +=
