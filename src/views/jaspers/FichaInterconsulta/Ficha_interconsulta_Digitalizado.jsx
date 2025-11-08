@@ -542,7 +542,11 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaMotivo);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaFilaMotivo, tablaInicioX + tablaAncho, yPos + alturaFilaMotivo);
-
+  
+   const firmaMedicoX = tablaInicioX + 150  ;
+  const firmaMedicoY = yPos + alturaFilaMotivo - 4 ;
+  
+  
   // === COLUMNA 2: SELLO Y FIRMA DEL MÉDICO ===
   
 
@@ -732,9 +736,6 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
     }
   }
 
-   const firmaMedicoX = 155  ;
-  const firmaMedicoY = 136.73666666666668 ;
-  
   // Agregar firma y sello médico
   let firmaMedicoUrl = getSign(datosFinales, "SELLOFIRMA");
   if (firmaMedicoUrl) {
