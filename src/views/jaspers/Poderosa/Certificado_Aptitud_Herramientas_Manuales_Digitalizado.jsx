@@ -13,45 +13,47 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
   let numeroPagina = 1;
 
   const datosReales = {
-    apellidosNombres: String((data.apellidosPaciente) + " " + (data.nombresPaciente)).trim(),
-    fechaExamen: formatearFechaCorta(data.fechaExamen),
-    tipoExamen: String(data.nombreExamen),
-    sexo: convertirGenero(data.sexoPaciente),
-    documentoIdentidad: String(data.dniPaciente),
-    edad: String(data.edadPaciente),
+    apellidosNombres: String((data.apellidosPaciente || "") + " " + (data.nombresPaciente || "")).trim(),
+    fechaExamen: formatearFechaCorta(data.fechaCertificado || data.fechaExamen),
+    tipoExamen: String(data.nombreExamen || ""),
+    sexo: convertirGenero(data.sexoPaciente || "F"),
+    documentoIdentidad: String(data.dniPaciente || ""),
+    edad: String(data.edadPaciente || ""),
     fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente || data.fechaNacimiento),
-    areaTrabajo: data.areaPaciente,
-    puestoTrabajo: data.cargoPaciente,
-    empresa: data.empresa,
-    contrata: data.contrata,
+    areaTrabajo: data.areaPaciente || "",
+    puestoTrabajo: data.cargoPaciente || "",
+    empresa: data.empresa || "",
+    contrata: data.contrata || "",
     vitalSigns: {
-      fc: String(data.frecuenciaCardiaca),
-      fr: String(data.frecuenciaRespiratoriaTriaje),
-      pa: String(data.sistolica) + "/" + String(data.diastolica),
-      satO2: String(data.saturacionOxigenoTriaje),
-      imc: String(data.imcTriaje),
-      temperatura: String(data.temperatura),
-      peso: String(data.peso),
-      talla: String(data.tallaTriaje)
+      fc: String(data.frecuenciaCardiaca || ""),
+      fr: String(data.frecuenciaRespiratoriaTriaje || ""),
+      pa: String(data.sistolica || "") + "/" + String(data.diastolica || ""),
+      satO2: String(data.saturacionOxigenoTriaje || ""),
+      imc: String(data.imcTriaje || ""),
+      temperatura: String(data.temperatura || ""),
+      peso: String(data.peso || ""),
+      talla: String(data.tallaTriaje || "")
     },
     // Datos de color
     color: data.color,
     codigoColor: data.codigoColor,
     textoColor: data.textoColor,
     // Datos adicionales para header
-    numeroFicha: String(data.norden),
-    sede: data.sede || data.nombreSede,
-    horaSalida: String(data.horaSalida),
-    direccionPaciente: String(data.direccionPaciente),
+    numeroFicha: String(data.norden || ""),
+    sede: data.sede || data.nombreSede || "",
+    horaSalida: String(data.horaSalida || ""),
+    direccionPaciente: String(data.direccionPaciente || ""),
     // Datos para tipo de trabajo
-    tipoTrabajo: data.explotacion,
+    tipoTrabajo: data.explotacion || "",
     // Datos para resultado de evaluación
     resultadoEvaluacion: data.noApto ? "noApto" : 
+                        data.aptoRestriccion ? "aptoRestriccion" :
+                        data.aptoTemporal ? "aptoTemporal" :
                         data.apto ? "apto" : "apto",
     // Datos para observaciones
-    observaciones: data.observaciones,
+    observaciones: data.observacion || data.observaciones || "",
     // Datos para fechas
-    fechaCaducidad: formatearFechaCorta(data.fechaHasta)
+    fechaCaducidad: formatearFechaCorta(data.fechaCaducidad || data.fechaHasta)
   };
 
   // Usar solo datos reales
@@ -362,8 +364,10 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("APTO", tablaInicioX + 43, yTexto3 + 1);
   
-  // Marcar X en APTO si es la condición seleccionada
-  if (datosFinales.resultadoEvaluacion === "apto") {
+  // Marcar X en APTO si es la condición seleccionada (incluye apto, aptoRestriccion, aptoTemporal)
+  if (datosFinales.resultadoEvaluacion === "apto" || 
+      datosFinales.resultadoEvaluacion === "aptoRestriccion" || 
+      datosFinales.resultadoEvaluacion === "aptoTemporal") {
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text("X", tablaInicioX + 110, yTexto3 + 1, { align: "center" });
   }

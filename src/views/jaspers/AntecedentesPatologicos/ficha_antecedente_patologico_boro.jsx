@@ -743,16 +743,16 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   if (datosFinales.hasAccident) {
     doc.text("SI (  X  )", tablaInicioX + 120, yPos + 3.5);
     doc.text("NO (      )", tablaInicioX + 135, yPos + 3.5);
+    
+    // Fecha alineada a la derecha (solo si es SI)
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Fecha:", tablaInicioX + 155, yPos + 3.5);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(datosFinales.accidentDate, tablaInicioX + 170, yPos + 3.5);
   } else {
     doc.text("SI (      )", tablaInicioX + 120, yPos + 3.5);
     doc.text("NO (  X  )", tablaInicioX + 135, yPos + 3.5);
   }
-  
-  // Fecha alineada a la derecha
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Fecha:", tablaInicioX + 155, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.accidentDate, tablaInicioX + 170, yPos + 3.5);
   
   yPos += filaAltura;
 
@@ -775,16 +775,16 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   if (datosFinales.hasLostTime) {
     doc.text("SI (  X  )", tablaInicioX + 120, yPos + 3.5);
     doc.text("NO (      )", tablaInicioX + 135, yPos + 3.5);
+    
+    // Tiempo alineado a la derecha (solo si es SI)
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Tiempo:", tablaInicioX + 155, yPos + 3.5);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(capitalizarTexto(datosFinales.lostTimePeriod), tablaInicioX + 170, yPos + 3.5);
   } else {
     doc.text("SI (      )", tablaInicioX + 120, yPos + 3.5);
     doc.text("NO (  X  )", tablaInicioX + 135, yPos + 3.5);
   }
-  
-  // Tiempo alineado a la derecha
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Tiempo:", tablaInicioX + 155, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(capitalizarTexto(datosFinales.lostTimePeriod), tablaInicioX + 170, yPos + 3.5);
   
   yPos += filaAltura;
 
@@ -850,16 +850,16 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   if (datosFinales.hasLaborDiseaseEvaluation) {
     doc.text("SI (  X  )", tablaInicioX + 120, yPos + 3.5);
     doc.text("NO (      )", tablaInicioX + 135, yPos + 3.5);
+    
+    // Fecha alineada a la derecha (solo si es SI)
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Fecha:", tablaInicioX + 155, yPos + 3.5);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(datosFinales.evaluationDate, tablaInicioX + 170, yPos + 3.5);
   } else {
     doc.text("SI (      )", tablaInicioX + 120, yPos + 3.5);
     doc.text("NO (  X  )", tablaInicioX + 135, yPos + 3.5);
   }
-  
-  // Fecha alineada a la derecha
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Fecha:", tablaInicioX + 155, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluationDate, tablaInicioX + 170, yPos + 3.5);
   
   yPos += filaAltura;
 

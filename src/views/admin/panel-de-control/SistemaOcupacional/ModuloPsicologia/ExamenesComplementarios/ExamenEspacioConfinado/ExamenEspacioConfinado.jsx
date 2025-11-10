@@ -16,7 +16,7 @@ const tabla = "psicologia_espacios_confinados";
 const today = getToday();
 
 export default function ExamenEspacioConfinado() {
-    const { token, userlogued, selectedSede, datosFooter, userCompleto } = useSessionData();
+    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
 
     const initialFormState = {
         // Header - Información del examen
@@ -165,9 +165,8 @@ export default function ExamenEspacioConfinado() {
                 </div>
             </div>
             {/* Contenido principal */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <h4 className="font-semibold mb-3 text-blue-700">Datos Necesarios</h4>
-
+            <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
+                <legend className="font-bold mb-3 text-[10px]">Datos Personales</legend>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {/* Columna Izquierda */}
                     <div className="space-y-3">
@@ -233,9 +232,9 @@ export default function ExamenEspacioConfinado() {
                         />
                     </div>
                 </div>
-            </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <h4 className="font-semibold mb-3 text-blue-700">Datos Laborales</h4>
+            </fieldset>
+            <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
+                <legend className="font-bold mb-3 text-[10px]">Datos Laborales</legend>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
                     <InputTextOneLine
                         label="Empresa"
@@ -266,83 +265,75 @@ export default function ExamenEspacioConfinado() {
                         labelWidth="120px"
                     />
                 </div>
-            </div>
+            </fieldset>
 
             {/* Criterios Psicológicos */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <h3 className="font-semibold mb-4 text-blue-700 text-center text-lg">CRITERIOS PSICOLÓGICOS</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Aspecto Intelectual */}
+                <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
+                    <legend className="font-bold mb-3 text-[10px]">Aspecto Intelectual:</legend>
+                    <RadioTable
+                        items={aspectoIntelectualItems}
+                        options={aspectoIntelectualOptions}
+                        form={form}
+                        handleRadioButton={handleRadioButton}
+                    />
+                </fieldset>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Aspecto Intelectual */}
-                    <div>
-                        <h4 className="font-semibold mb-3 text-blue-600">ASPECTO INTELECTUAL:</h4>
-                        <RadioTable
-                            items={aspectoIntelectualItems}
-                            options={aspectoIntelectualOptions}
-                            form={form}
-                            handleRadioButton={handleRadioButton}
+                {/* Aspectos Personalidad */}
+                <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
+                    <legend className="font-bold mb-3 text-[10px]">Aspectos Personalidad:</legend>
+                    <div className="space-y-8">
+                        <InputsRadioGroup
+                            label="1.- ESTABILIDAD EMOCIONAL"
+                            labelOnTop
+                            name="estabilidadEmocional"
+                            value={form.estabilidadEmocional}
+                            onChange={handleRadioButton}
+                            options={estabilidadOptions}
+                        />
+                        <InputsRadioGroup
+                            label="2.- NIVEL DE ANSIEDAD GENERAL"
+                            labelOnTop
+                            name="nivelAnsiedadGeneral"
+                            value={form.nivelAnsiedadGeneral}
+                            onChange={handleRadioButton}
+                            options={nivelAnsiedadOptions}
+                        />
+                        <InputsRadioGroup
+                            label="3.- ANSIEDAD A ESPACIOS CONFINADOS"
+                            labelOnTop
+                            name="ansiedadEspaciosConfinados"
+                            value={form.ansiedadEspaciosConfinados}
+                            onChange={handleRadioButton}
+                            options={ansiedadOptions}
+                            vertical
                         />
                     </div>
+                </fieldset>
 
-                    {/* Aspectos Personalidad */}
-                    <div>
-                        <h4 className="font-semibold mb-3 text-blue-600">ASPECTOS PERSONALIDAD:</h4>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block font-medium mb-2">1.- ESTABILIDAD EMOCIONAL:</label>
-                                <InputsRadioGroup
-                                    name="estabilidadEmocional"
-                                    value={form.estabilidadEmocional}
-                                    onChange={handleRadioButton}
-                                    options={estabilidadOptions}
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium mb-2">2.- NIVEL DE ANSIEDAD GENERAL:</label>
-                                <InputsRadioGroup
-                                    name="nivelAnsiedadGeneral"
-                                    value={form.nivelAnsiedadGeneral}
-                                    onChange={handleRadioButton}
-                                    options={nivelAnsiedadOptions}
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium mb-2">3.- ANSIEDAD A ESPACIOS CONFINADOS:</label>
-                                <div className="space-y-2">
-                                    <InputsRadioGroup
-                                        name="ansiedadEspaciosConfinados"
-                                        value={form.ansiedadEspaciosConfinados}
-                                        onChange={handleRadioButton}
-                                        options={ansiedadOptions}
-                                        vertical
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Análisis y Resultados */}
-                    <div>
-                        <div className="space-y-4">
+                {/* Análisis y Resultados */}
+                <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
+                    <legend className="font-bold mb-3 text-[10px]">Análisis y Resultados:</legend>
+                    <div className="space-y-4">
+                        <InputTextArea
+                            label="ANÁLISIS Y RESULTADOS"
+                            name="analisisResultados"
+                            value={form.analisisResultados}
+                            onChange={handleChange}
+                            rows={8}
+                        />
+                        <div className="mt-4">
                             <InputTextArea
-                                label="ANÁLISIS Y RESULTADOS"
-                                name="analisisResultados"
-                                value={form.analisisResultados}
+                                label="RECOMENDACIONES"
+                                name="recomendaciones"
+                                value={form.recomendaciones}
                                 onChange={handleChange}
-                                rows={8}
+                                rows={5}
                             />
-                            <div className="mt-4">
-                                <InputTextArea
-                                    label="RECOMENDACIONES"
-                                    name="recomendaciones"
-                                    value={form.recomendaciones}
-                                    onChange={handleChange}
-                                    rows={4}
-                                />
-                            </div>
                         </div>
                     </div>
-                </div>
+                </fieldset>
             </div>
 
             {/* Botones de acción */}
@@ -382,6 +373,6 @@ export default function ExamenEspacioConfinado() {
                     </div>
                 </div>
             </section>
-        </div>
+        </div >
     );
 }
