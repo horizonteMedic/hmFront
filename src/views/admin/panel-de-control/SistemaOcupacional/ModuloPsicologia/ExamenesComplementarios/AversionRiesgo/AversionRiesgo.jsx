@@ -1,10 +1,12 @@
 import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
-import InputTextOneLine from "../../../../../../../components/reusableComponents/InputTextOneLine";
-import { useForm } from "../../../../../../../hooks/useForm"
+import { useForm } from "../../../../../../hooks/useForm"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import InputsRadioGroup from "../../../../../../../components/reusableComponents/InputsRadioGroup";
-import RadioTable from "../../../../../../../components/reusableComponents/RadioTable";
-import InputTextArea from "../../../../../../../components/reusableComponents/InputTextArea";
+import {
+    InputTextOneLine,
+    InputsRadioGroup,
+    RadioTable,
+    InputTextArea,
+} from "../../../../../../components/reusableComponents/ResusableComponents";
 
 // Arrays para RadioTable de Orientación
 const orientacionItems = [
