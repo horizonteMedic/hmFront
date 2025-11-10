@@ -13,9 +13,10 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
 
   // Normalizador único de datos de entrada
   function buildDatosFinales(raw) {
-    const datosReales = {
+    return {
       apellidosNombres: String((((raw?.apellidosPaciente ?? '') + ' ' + (raw?.nombresPaciente ?? '')).trim())),
-      tipoExamen: String(raw?.nombreExamen ?? ''),
+      nombreExamen: String(raw?.nombreExamen ?? ''),
+      tipoExamen: String(raw?.tipoExamen ?? ''),
       fechaExamen: formatearFechaCorta(raw?.fechaExamen ?? ''), 
       sexo: convertirGenero(raw?.sexoPaciente ?? ''),
       documentoIdentidad: String(raw?.dniPaciente ?? ''),
@@ -40,50 +41,13 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
       ],
       // Análisis FODA
       fortalezasOportunidades: String(raw?.fortalezasOportunidades ?? ''),
-      debilidadesAmenazas: String(raw?.amenazasDebilidades ?? raw?.debilidadesAmenazas ?? ''),
+      debilidadesAmenazas: String(raw?.amenazasDebilidades ?? ''),
       // Observaciones y recomendaciones
       observaciones: String(raw?.observaciones ?? ''),
-      recomendaciones: String(raw?.recomendacion ?? raw?.recomendaciones ?? ''),
-      // Conclusiones (generar basado en apto si no existe)
-      conclusiones: String(raw?.conclusiones ?? (raw?.apto ? 'El trabajador es APTO para el puesto de trabajo.' : 'El trabajador NO es APTO para el puesto de trabajo.'))
+      recomendaciones: String(raw?.recomendacion ?? ''),
+      // Conclusiones
+      conclusiones: String(raw?.conclusiones ?? '')
     };
-
-    const datosPrueba = {
-      apellidosNombres: 'VIVIANA DELGADO VEGA alias "LA FIERA"',
-      tipoExamen: 'PRE-OCUPACIONAL',
-      fechaExamen: '15/10/2025',
-      sexo: 'Femenino',
-      documentoIdentidad: '66666666',
-      edad: '28',
-      fechaNacimiento: '22/03/1997',
-      domicilio: 'Asentamiento Humano El Peligro - Zona Roja',
-      areaTrabajo: 'Operaciones Nocturnas',
-      puestoTrabajo: 'Jefa de Robos Selectivos',
-      empresa: 'EXTORSIONES S.A.C.',
-      contrata: 'Servicios Oscuros Integrales E.I.R.L.',
-      sede: 'Arequipa - Cerro Verde',
-      numeroFicha: '000456',
-      color: 3,
-      codigoColor: '#FF5722',
-      textoColor: 'A',
-      apto: true,
-      // Datos de resultados
-      resultados: [
-        { numero: '1', prueba: 'Escala Sintomática de Estrés', resultado: 'BAJO' },
-        { numero: '2', prueba: 'Escala de Fatiga', resultado: 'MEDIO' },
-        { numero: '3', prueba: 'Escala de Somnolencia', resultado: 'ALTO' }
-      ],
-      // Datos de análisis FODA
-      fortalezasOportunidades: 'El trabajador demuestra habilidades técnicas sólidas en su área de especialización, mostrando capacidad de adaptación a nuevas tecnologías y procesos. Presenta buena comunicación interpersonal y trabajo en equipo, lo que facilita la colaboración efectiva. Además, tiene experiencia previa en entornos industriales similares y muestra interés en el desarrollo profesional continuo.',
-      debilidadesAmenazas: 'Se observa cierta tendencia al estrés en situaciones de alta presión laboral, especialmente cuando hay cambios inesperados en los procedimientos. Presenta dificultades ocasionales en la gestión del tiempo cuando las tareas son múltiples y simultáneas. También se identifica una necesidad de mejora en las técnicas de relajación y manejo del estrés para optimizar su rendimiento laboral.',
-      // Datos de observaciones y recomendaciones
-      observaciones: 'Durante la evaluación psicológica se observó que el trabajador presenta un perfil adecuado para el puesto de trabajo, mostrando habilidades técnicas sólidas y buena capacidad de adaptación. Sin embargo, se identificaron algunas áreas de mejora en el manejo del estrés y la gestión del tiempo. El trabajador demuestra compromiso con su desarrollo profesional y está dispuesto a implementar las recomendaciones sugeridas para optimizar su rendimiento laboral.',
-      recomendaciones: 'Se recomienda implementar un programa de capacitación en técnicas de manejo del estrés y gestión del tiempo. Es importante establecer pausas activas durante la jornada laboral y promover un ambiente de trabajo colaborativo. Se sugiere realizar seguimientos periódicos para evaluar el progreso y ajustar las estrategias según sea necesario. Además, se recomienda fomentar la comunicación abierta entre el trabajador y su supervisor para identificar oportunamente cualquier dificultad.',
-      conclusiones: 'El trabajador es APTO para el puesto de trabajo, considerando que presenta las competencias técnicas requeridas y demuestra potencial para el desarrollo de las habilidades identificadas como áreas de mejora. Con la implementación de las recomendaciones sugeridas, se espera un desempeño satisfactorio y un mejor bienestar laboral. Se recomienda un seguimiento a los 6 meses para evaluar el progreso y la efectividad de las medidas implementadas.'
-    };
-
-    const selected = (raw && (raw.norden)) ? datosReales : datosPrueba;
-    return selected;
   }
 
   const datosFinales = buildDatosFinales(data);
@@ -94,7 +58,7 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
     CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
 
     // Títulos
-    doc.setFont("helvetica", "bold").setFontSize(12);
+    doc.setFont("helvetica", "bold").setFontSize(13);
     doc.setTextColor(0, 0, 0);
     doc.text("INF. PSIC. – ESTRÉS/ FATIGA Y SOMNOLENCIA", pageW / 2, 35, { align: "center" });
 
@@ -122,6 +86,12 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   };
 
   // === FUNCIONES AUXILIARES ===
+  // Función única para obtener dimensiones de la tabla
+  const getTablaDimensiones = () => ({
+    tablaInicioX: 5,
+    tablaAncho: 200
+  });
+
   // Función para texto con salto de línea
   const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
     const fontSize = doc.internal.getFontSize();
@@ -171,8 +141,7 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
 
   // Función general para dibujar header de sección con fondo gris
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
-  const tablaInicioX = 10;
-  const tablaAncho = 190;
+    const { tablaInicioX, tablaAncho } = getTablaDimensiones();
 
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
@@ -199,8 +168,7 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   drawHeader(numeroPagina);
 
   // === SECCIÓN 1: DATOS DE FILIACIÓN ===
-  const tablaInicioX = 10;
-  const tablaAncho = 190;
+  const { tablaInicioX, tablaAncho } = getTablaDimensiones();
   let yPos = 40;
   const filaAltura = 5;
 
@@ -284,7 +252,7 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Edad:", tablaInicioX + 47, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.edad + " Años", tablaInicioX + 58, yTexto + 1.5);
+  doc.text(datosFinales.edad + " AÑOS", tablaInicioX + 58, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Sexo:", tablaInicioX + 92, yTexto + 1.5);
@@ -439,32 +407,9 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   dibujarTextoConSaltoLinea(datosFinales.debilidadesAmenazas, tablaInicioX + 2, yPos + 7, tablaAncho - 4);
   yPos += alturaFila2;
 
-  // === SECCIÓN 4: OBSERVACIONES Y RECOMENDACIONES ===
-  // Header de observaciones y recomendaciones
-  yPos = dibujarHeaderSeccion("IV.- OBSERVACIONES Y RECOMENDACIONES", yPos, filaAltura);
-
-  // Función para dibujar subheader con color celeste
-  const dibujarSubHeaderCeleste = (titulo, yPos, alturaHeader = 5) => {
-    // Configurar líneas con grosor consistente
-    doc.setDrawColor(0, 0, 0);
-    doc.setLineWidth(0.2);
-
-    // Dibujar fondo celeste
-    doc.setFillColor(199, 241, 255); // Color celeste claro
-    doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-
-    // Dibujar líneas del subheader
-    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
-    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-    doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-
-    // Dibujar texto del subtítulo
-    doc.setFont("helvetica", "bold").setFontSize(9);
-    doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
-
-    return yPos + alturaHeader;
-  };
+  // === SECCIÓN 4: OBSERVACIONES ===
+  // Header de observaciones
+  yPos = dibujarHeaderSeccion("IV.- OBSERVACIONES", yPos, filaAltura);
 
   // Fila de Observaciones (creciente)
   const alturaObservaciones = calcularAlturaTexto(datosFinales.observaciones, tablaAncho - 4);
@@ -478,8 +423,9 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   dibujarTextoConSaltoLinea(datosFinales.observaciones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
   yPos += alturaObservaciones;
 
-  // Subheader celeste: Recomendaciones
-  yPos = dibujarSubHeaderCeleste("Recomendaciones", yPos, filaAltura);
+  // === SECCIÓN 5: RECOMENDACIONES ===
+  // Header de recomendaciones
+  yPos = dibujarHeaderSeccion("V.- RECOMENDACIONES", yPos, filaAltura);
 
   // Fila de Recomendaciones (creciente)
   const alturaRecomendaciones = calcularAlturaTexto(datosFinales.recomendaciones, tablaAncho - 4);
@@ -493,21 +439,6 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   dibujarTextoConSaltoLinea(datosFinales.recomendaciones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
   yPos += alturaRecomendaciones;
 
-  // Subheader celeste: Conclusiones
-  yPos = dibujarSubHeaderCeleste("Conclusiones", yPos, filaAltura);
-
-  // Fila de Conclusiones (creciente)
-  const alturaConclusiones = calcularAlturaTexto(datosFinales.conclusiones, tablaAncho - 4);
-  
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaConclusiones);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaConclusiones);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaConclusiones, tablaInicioX + tablaAncho, yPos + alturaConclusiones);
-
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.conclusiones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
-  yPos += alturaConclusiones;
-
   // === SECCIÓN DE FIRMAS ===
   const yFirmas = yPos; // Sin separación después de la última sección
   const alturaSeccionFirmas = 30; // Altura para la sección de firmas
@@ -519,7 +450,7 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yFirmas + alturaSeccionFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea inferior
 
   // === FIRMA DEL MÉDICO ===
-  const firmaMedicoX = tablaInicioX + 80; // Centrado en la columna
+  const centroColumna = tablaInicioX + (tablaAncho / 2);
   const firmaMedicoY = yFirmas + 3;
   
   // Agregar firma y sello médico
@@ -528,6 +459,8 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
     try {
       const imgWidth = 45;
       const imgHeight = 20;
+      // Centrar la imagen: centro de la columna menos la mitad del ancho de la imagen
+      const firmaMedicoX = centroColumna - (imgWidth / 2);
       const x = firmaMedicoX;
       const y = firmaMedicoY;
       doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
@@ -537,7 +470,6 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   }
 
   doc.setFont("helvetica", "normal").setFontSize(8);
-  const centroColumna = tablaInicioX + (tablaAncho / 2);
   doc.text("Sello y Firma del Médico", centroColumna, yFirmas + 26, { align: "center" });
   doc.text("Responsable de la Evaluación", centroColumna, yFirmas + 28.5, { align: "center" });
 

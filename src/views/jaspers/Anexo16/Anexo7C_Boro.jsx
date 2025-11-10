@@ -3326,7 +3326,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.text("HEMATIES:", divsHemograma[2] + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
   const hematiesValue = datosFinales.examenesLaboratorio?.hemograma?.hematies || "N/A";
-  const hematiesText = hematiesValue === "N/A" ? hematiesValue : `${hematiesValue} millones/mm³`;
+  const hematiesText = hematiesValue === "N/A" ? hematiesValue : `${hematiesValue} /mm³`;
   doc.text(hematiesText, divsHemograma[2] + 25, yPos + 3.5);
   
   yPos += alturaFilaLab;
@@ -3669,7 +3669,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   // Hemoglobina/Hematocrito - movido más a la izquierda
   const xDivHem = xDiv2 + 5; // Posicionado después de la línea divisoria
   const hemoglobinaValue = datosFinales.grupoSanguineo?.hemoglobinaHematocrito || "";
-  const hemoglobinaText = hemoglobinaValue ? `${hemoglobinaValue} mg/dl` : "N/A";
+  const hemoglobinaText = hemoglobinaValue ? `${hemoglobinaValue} g/dl` : "N/A";
   
   // Determinar color según rango de hemoglobina
   let colorHemoglobina = [0, 0, 0]; // Negro por defecto
@@ -3687,10 +3687,10 @@ export default function Anexo7C_Antiguo(data = {}) {
   
   // Label en tamaño normal
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Hemoglobina/hematocrito: ", xDivHem + 2, yPos + 3.5);
+  doc.text("Hemoglobina: ", xDivHem + 2, yPos + 3.5);
   
   // Data en tamaño 9 con color
-  const labelWidth = doc.getTextWidth("Hemoglobina/hematocrito: ");
+  const labelWidth = doc.getTextWidth("Hemoglobina: ");
   doc.setFont("helvetica", "bold").setFontSize(8.5);
   doc.setTextColor(colorHemoglobina[0], colorHemoglobina[1], colorHemoglobina[2]);
   doc.text(hemoglobinaText, xDivHem + 2 + labelWidth, yPos + 3.5);
