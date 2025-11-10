@@ -45,7 +45,7 @@ import Anexo16A from "./views/admin/panel-de-control/SistemaOcupacional/Anexo16A
 
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/ModuloPsicologia/InformePsicologicoADECO/InformePsicologicoAdecoEstres_Digitalizado.jsx"
+import Ficha from "./views/jaspers/ModuloPsicologia/EvaluacionPsicologicaPoderosa/InformePsicologico_Digitalizado.jsx"
 
 
 

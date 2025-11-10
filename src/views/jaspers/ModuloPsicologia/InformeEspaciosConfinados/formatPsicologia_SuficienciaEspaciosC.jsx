@@ -1,9 +1,9 @@
 import jsPDF from "jspdf";
-import drawColorBox from '../components/ColorBox.jsx';
-import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
-import CabeceraLogo from '../components/CabeceraLogo.jsx';
-import { getSign, convertirGenero } from "../../utils/helpers.js";
-import footerTR from '../components/footerTR.jsx';
+import drawColorBox from '../../components/ColorBox.jsx';
+import { formatearFechaCorta } from "../../../utils/formatDateUtils.js";
+import CabeceraLogo from '../../components/CabeceraLogo.jsx';
+import { getSign, convertirGenero } from "../../../utils/helpers.js";
+import footerTR from '../../components/footerTR.jsx';
 
 export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -31,7 +31,13 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
       color: Number(raw?.color ?? 0),
       codigoColor: String(raw?.codigoColor ?? ''),
       textoColor: String(raw?.textoColor ?? ''),
-      apto: (typeof raw?.aprobo === 'boolean') ? raw.aprobo : false
+      apto: (typeof raw?.aprobo === 'boolean') ? raw.aprobo : false,
+      // Análisis y resultados
+      analisisResultados: String(raw?.analisisResultados ?? raw?.analisis ?? ''),
+      // Recomendaciones
+      recomendaciones: String(raw?.recomendaciones ?? raw?.recomendacion ?? ''),
+      // Conclusiones
+      conclusiones: String(raw?.conclusiones ?? '')
     };
 
     const datosPrueba = {
@@ -52,7 +58,10 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
       color: 1,
       codigoColor: '#4CAF50',
       textoColor: 'A',
-      apto: true
+      apto: true,
+      analisisResultados: 'Análisis de resultados de prueba',
+      recomendaciones: 'Recomendaciones de prueba',
+      conclusiones: ''
     };
 
     const selected = (raw && (raw.norden)) ? datosReales : datosPrueba;
@@ -72,7 +81,7 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
     doc.text("EVALUACIÓN PSICOLÓGICA PARA ESPACIOS CONFINADOS", pageW / 2, 35, { align: "center" });
 
     // Número de Ficha, Sede, Fecha y Página
-    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Nro de ficha: ", pageW - 70, 15);
     doc.setFont("helvetica", "normal").setFontSize(18);
     doc.text(datosFinales.numeroFicha, pageW - 50, 16);
@@ -127,17 +136,44 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
     return yPos;
   };
 
+  // Función para calcular altura dinámica de texto
+  const calcularAlturaTexto = (texto, anchoMaximo) => {
+    const palabras = texto.split(' ');
+    let lineaActual = '';
+    let lineas = 1;
+    
+    palabras.forEach(palabra => {
+      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+      const anchoTexto = doc.getTextWidth(textoPrueba);
+      
+      if (anchoTexto <= anchoMaximo) {
+        lineaActual = textoPrueba;
+      } else {
+        if (lineaActual) {
+          lineas++;
+          lineaActual = palabra;
+        } else {
+          lineas++;
+        }
+      }
+    });
+    
+    // Altura mínima de 15mm, altura por línea de 3mm
+    const alturaCalculada = lineas * 3 + 2;
+    return Math.max(alturaCalculada, 20);
+  };
+
   // Función general para dibujar header de sección con fondo gris
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
-    const tablaInicioX = 7.5;
-    const tablaAncho = 195;
+    const tablaInicioX = 5;
+    const tablaAncho = 200;
 
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
 
     // Dibujar fondo gris más oscuro
-    doc.setFillColor(160, 160, 160);
+    doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
 
     // Dibujar líneas del header
@@ -147,7 +183,7 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
 
     // Dibujar texto del título
-    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
 
     return yPos + alturaHeader;
@@ -157,8 +193,8 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   drawHeader(numeroPagina);
 
   // === SECCIÓN 1: DATOS DE FILIACIÓN ===
-  const tablaInicioX = 7.5;
-  const tablaAncho = 195;
+  const tablaInicioX = 5;
+  const tablaAncho = 200;
   let yPos = 40;
   const filaAltura = 5;
 
@@ -221,67 +257,67 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
 
   // Primera fila: Apellidos y Nombres | Tipo de Examen
   yTexto += filaAltura;
-  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 40, yTexto + 1.5, 70);
 
-  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("T. Examen:", tablaInicioX + 137, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(datosFinales.tipoExamen, tablaInicioX + 155, yTexto + 1.5, 50);
   yTexto += filaAltura;
 
   // Segunda fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
-  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("DNI:", tablaInicioX + 2, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.documentoIdentidad, tablaInicioX + 12, yTexto + 1.5);
 
-  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Edad:", tablaInicioX + 47, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.edad + " Años", tablaInicioX + 58, yTexto + 1.5);
 
-  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Sexo:", tablaInicioX + 92, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.sexo, tablaInicioX + 105, yTexto + 1.5);
 
-  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Fecha Nac.:", tablaInicioX + 137, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.fechaNacimiento, tablaInicioX + 165, yTexto + 1.5);
   yTexto += filaAltura;
 
   // Tercera fila: Domicilio
-  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Domicilio:", tablaInicioX + 2, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(datosFinales.domicilio, tablaInicioX + 25, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
   // Cuarta fila: Área de Trabajo, Puesto de Trabajo
-  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Área de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(datosFinales.areaTrabajo, tablaInicioX + 30, yTexto + 1.5, 50);
 
-  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Puesto de Trabajo:", tablaInicioX + 92, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo, tablaInicioX + 122, yTexto + 1.5, 65);
   yTexto += filaAltura;
 
   // Quinta fila: Empresa
-  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 25, yTexto + 1.5, tablaAncho - 25);
   yTexto += filaAltura;
 
   // Sexta fila: Contratista
-  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Contratista:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
   dibujarTextoConSaltoLinea(datosFinales.contrata, tablaInicioX + 25, yTexto + 1.5, tablaAncho - 30);
@@ -338,7 +374,7 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   ];
 
   // Dibujar filas de datos
-  aspectosPsicologicos.forEach((aspecto, index) => {
+  aspectosPsicologicos.forEach((aspecto) => {
     // Dibujar líneas de la fila
     doc.line(tablaInicioX, yTexto, tablaInicioX, yTexto + filaAltura); // Línea izquierda
     posicionesColumnas.forEach((pos, posIndex) => {
@@ -370,6 +406,253 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
     
     yTexto += filaAltura;
   });
+
+  // === SECCIÓN 3: ASPECTOS PERSONALIDAD ===
+  // Espacio antes de la nueva sección
+  yTexto += 3;
+  
+  // Título de la sección
+  doc.setFont("helvetica", "bold").setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.text("ASPECTOS PERSONALIDAD", pageW / 2, yTexto + 3, { align: "center" });
+  yTexto += 6; // Espacio después del título
+
+  // Datos de aspectos de personalidad (estos deberían venir del JSON)
+  const aspectosPersonalidad = [
+    {
+      aspecto: "Estabilidad emocional",
+      opciones: ["Inestable", "Estable"],
+      seleccionado: "Inestable"
+    },
+    {
+      aspecto: "Nivel de ansiedad general",
+      opciones: ["Caso", "No Caso"],
+      seleccionado: "Caso"
+    },
+    {
+      aspecto: "Ansiedad a espacios confinados",
+      opciones: ["Nada", "Poca ansiedad", "Moderadamente ansioso", "Elevadamente ansioso"],
+      seleccionado: "Elevadamente ansioso"
+    }
+  ];
+
+  // Ancho fijo para todas las columnas de X (igual para todas las filas)
+  const anchoColumnaX_Fijo = 5; // Ancho fijo y consistente para todas las celdas de X
+  
+  // Dibujar cada fila de aspecto de personalidad
+  aspectosPersonalidad.forEach((aspecto, index) => {
+    const anchoColumnaAspecto = 50; // Ancho para el nombre del aspecto
+    const numOpciones = aspecto.opciones.length;
+    
+    // Anchos personalizados para la tercera fila (Ansiedad a espacios confinados)
+    const anchosPersonalizadosFila3 = [
+      { texto: 20 },  // "Nada"
+      { texto: 30 },  // "Poca ansiedad"
+      { texto: 40 },  // "Moderadamente ansioso"
+      { texto: 40 }   // "Elevadamente ansioso"
+    ];
+    
+    // Calcular posiciones de las columnas
+    const posicionesCols = [tablaInicioX]; // Inicio (columna del aspecto)
+    posicionesCols.push(tablaInicioX + anchoColumnaAspecto); // División después del aspecto
+    
+    let posicionActual = tablaInicioX + anchoColumnaAspecto;
+    
+    if (index === 2) {
+      // Tercera fila: usar anchos personalizados para texto, pero X fijo
+      anchosPersonalizadosFila3.forEach((ancho) => {
+        posicionActual += ancho.texto;
+        posicionesCols.push(posicionActual); // Fin de columna de texto
+        posicionActual += anchoColumnaX_Fijo;
+        posicionesCols.push(posicionActual); // Fin de columna de X
+      });
+    } else {
+      // Otras filas: usar cálculo uniforme
+      const anchoRestante = tablaAncho - anchoColumnaAspecto - (numOpciones * anchoColumnaX_Fijo);
+      const anchoColumnaOpcion = anchoRestante / numOpciones; // Ancho para cada opción (distribución uniforme)
+      
+      for (let i = 0; i < numOpciones; i++) {
+        posicionActual += anchoColumnaOpcion;
+        posicionesCols.push(posicionActual); // Fin de columna de texto
+        posicionActual += anchoColumnaX_Fijo;
+        posicionesCols.push(posicionActual); // Fin de columna de X
+      }
+    }
+
+    // Dibujar líneas de la fila
+    doc.line(tablaInicioX, yTexto, tablaInicioX, yTexto + filaAltura); // Línea izquierda
+    posicionesCols.forEach((pos, posIndex) => {
+      if (posIndex > 0 && posIndex < posicionesCols.length - 1) {
+        doc.line(pos, yTexto, pos, yTexto + filaAltura); // Líneas verticales
+      }
+    });
+    doc.line(tablaInicioX + tablaAncho, yTexto, tablaInicioX + tablaAncho, yTexto + filaAltura); // Línea derecha
+    doc.line(tablaInicioX, yTexto, tablaInicioX + tablaAncho, yTexto); // Línea superior
+    doc.line(tablaInicioX, yTexto + filaAltura, tablaInicioX + tablaAncho, yTexto + filaAltura); // Línea inferior
+
+    // Contenido de la fila
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    
+    // Nombre del aspecto (alineado a la izquierda como en CRITERIOS PSICOLÓGICOS)
+    doc.text(aspecto.aspecto, tablaInicioX + 2, yTexto + 3.5);
+    
+    // Opciones: texto en una columna, X en la siguiente si está seleccionada
+    let posicionOpcion = tablaInicioX + anchoColumnaAspecto;
+    
+    aspecto.opciones.forEach((opcion, opcIndex) => {
+      let anchoTextoOpcion;
+      
+      if (index === 2) {
+        // Tercera fila: usar anchos personalizados para texto
+        anchoTextoOpcion = anchosPersonalizadosFila3[opcIndex].texto;
+      } else {
+        // Otras filas: usar cálculo uniforme
+        const anchoRestante = tablaAncho - anchoColumnaAspecto - (numOpciones * anchoColumnaX_Fijo);
+        anchoTextoOpcion = anchoRestante / numOpciones;
+      }
+      
+      const inicioOpcion = posicionOpcion;
+      const centroColumnaX = inicioOpcion + anchoTextoOpcion + (anchoColumnaX_Fijo / 2);
+      
+      // Mostrar el texto de la opción alineado a la izquierda (como en CRITERIOS PSICOLÓGICOS)
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      doc.text(opcion, inicioOpcion + 2, yTexto + 3.5);
+      
+      // Marcar con X si está seleccionada (centrada en su columna)
+      if (aspecto.seleccionado === opcion) {
+        doc.setFont("helvetica", "bold").setFontSize(10);
+        doc.text("X", centroColumnaX, yTexto + 3.5, { align: "center" });
+        doc.setFont("helvetica", "normal").setFontSize(8);
+      }
+      
+      // Actualizar posición para la siguiente opción
+      posicionOpcion += anchoTextoOpcion + anchoColumnaX_Fijo;
+    });
+    
+    yTexto += filaAltura;
+  });
+
+  // === SECCIÓN 4: ANÁLISIS Y RESULTADOS ===
+  yTexto = dibujarHeaderSeccion("ANÁLISIS Y RESULTADOS:", yTexto, filaAltura);
+
+  // Fila de Análisis y Resultados (creciente)
+  const alturaAnalisis = calcularAlturaTexto(datosFinales.analisisResultados, tablaAncho - 4);
+  
+  doc.line(tablaInicioX, yTexto, tablaInicioX, yTexto + alturaAnalisis);
+  doc.line(tablaInicioX + tablaAncho, yTexto, tablaInicioX + tablaAncho, yTexto + alturaAnalisis);
+  doc.line(tablaInicioX, yTexto, tablaInicioX + tablaAncho, yTexto);
+  doc.line(tablaInicioX, yTexto + alturaAnalisis, tablaInicioX + tablaAncho, yTexto + alturaAnalisis);
+
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.analisisResultados, tablaInicioX + 2, yTexto + 3, tablaAncho - 4);
+  yTexto += alturaAnalisis;
+
+  // === SECCIÓN 5: RECOMENDACIONES ===
+  yTexto = dibujarHeaderSeccion("RECOMENDACIONES:", yTexto, filaAltura);
+
+  // Fila de Recomendaciones (creciente)
+  const alturaRecomendaciones = calcularAlturaTexto(datosFinales.recomendaciones, tablaAncho - 4);
+  
+  doc.line(tablaInicioX, yTexto, tablaInicioX, yTexto + alturaRecomendaciones);
+  doc.line(tablaInicioX + tablaAncho, yTexto, tablaInicioX + tablaAncho, yTexto + alturaRecomendaciones);
+  doc.line(tablaInicioX, yTexto, tablaInicioX + tablaAncho, yTexto);
+  doc.line(tablaInicioX, yTexto + alturaRecomendaciones, tablaInicioX + tablaAncho, yTexto + alturaRecomendaciones);
+
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.recomendaciones, tablaInicioX + 2, yTexto + 3, tablaAncho - 4);
+  yTexto += alturaRecomendaciones;
+
+  // === SECCIÓN 6: CONCLUSIONES ===
+  yTexto = dibujarHeaderSeccion("CONCLUSIONES", yTexto, filaAltura);
+
+  // Fila con: APTO | (columna X) | NO APTO | (columna X)
+  const anchoColumnaX = 5; // Ancho fijo para las columnas de X
+  const anchoRestante = tablaAncho - (2 * anchoColumnaX);
+  const anchoColumnaApto = anchoRestante / 2; // Dividir el espacio restante entre APTO y NO APTO
+
+  // Calcular posiciones de las columnas
+  const posicionesConclusiones = [
+    tablaInicioX,
+    tablaInicioX + anchoColumnaApto,
+    tablaInicioX + anchoColumnaApto + anchoColumnaX,
+    tablaInicioX + anchoColumnaApto + anchoColumnaX + anchoColumnaApto,
+    tablaInicioX + anchoColumnaApto + anchoColumnaX + anchoColumnaApto + anchoColumnaX,
+    tablaInicioX + tablaAncho
+  ];
+
+  // Dibujar líneas de la fila
+  doc.line(tablaInicioX, yTexto, tablaInicioX, yTexto + filaAltura);
+  posicionesConclusiones.forEach((pos, posIndex) => {
+    if (posIndex > 0 && posIndex < posicionesConclusiones.length - 1) {
+      doc.line(pos, yTexto, pos, yTexto + filaAltura);
+    }
+  });
+  doc.line(tablaInicioX + tablaAncho, yTexto, tablaInicioX + tablaAncho, yTexto + filaAltura);
+  doc.line(tablaInicioX, yTexto, tablaInicioX + tablaAncho, yTexto);
+  doc.line(tablaInicioX, yTexto + filaAltura, tablaInicioX + tablaAncho, yTexto + filaAltura);
+
+  // Contenido de la fila
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  
+  // APTO
+  const centroApto = tablaInicioX + (anchoColumnaApto / 2);
+  doc.text("APTO", centroApto, yTexto + 3.5, { align: "center" });
+  
+  // X para APTO
+  const centroColumnaXApto = tablaInicioX + anchoColumnaApto + (anchoColumnaX / 2);
+  
+  // NO APTO
+  const inicioNoApto = tablaInicioX + anchoColumnaApto + anchoColumnaX;
+  const centroNoApto = inicioNoApto + (anchoColumnaApto / 2);
+  doc.text("NO APTO", centroNoApto, yTexto + 3.5, { align: "center" });
+  
+  // X para NO APTO
+  const centroColumnaXNoApto = inicioNoApto + anchoColumnaApto + (anchoColumnaX / 2);
+  
+  // Marcar X según si está apto o no apto
+  if (datosFinales.apto) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", centroColumnaXApto, yTexto + 3.5, { align: "center" });
+  } else {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", centroColumnaXNoApto, yTexto + 3.5, { align: "center" });
+  }
+  
+  yTexto += filaAltura;
+
+  // === SECCIÓN DE FIRMAS ===
+  const yFirmas = yTexto; // Sin separación después de la última sección
+  const alturaSeccionFirmas = 30; // Altura para la sección de firmas
+
+  // Dibujar las líneas de la sección de firmas (1 columna completa)
+  doc.line(tablaInicioX, yFirmas, tablaInicioX, yFirmas + alturaSeccionFirmas); // Línea izquierda
+  doc.line(tablaInicioX + tablaAncho, yFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea derecha
+  doc.line(tablaInicioX, yFirmas, tablaInicioX + tablaAncho, yFirmas); // Línea superior
+  doc.line(tablaInicioX, yFirmas + alturaSeccionFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea inferior
+
+  // === FIRMA DEL MÉDICO ===
+  const centroColumna = tablaInicioX + (tablaAncho / 2);
+  const firmaMedicoY = yFirmas + 3;
+  
+  // Agregar firma y sello médico
+  let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
+  if (firmaMedicoUrl) {
+    try {
+      const imgWidth = 45;
+      const imgHeight = 20;
+      // Centrar la imagen: centro de la columna menos la mitad del ancho de la imagen
+      const firmaMedicoX = centroColumna - (imgWidth / 2);
+      const x = firmaMedicoX;
+      const y = firmaMedicoY;
+      doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando firma del médico:", error);
+    }
+  }
+
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Sello y Firma del Médico", centroColumna, yFirmas + 26, { align: "center" });
+  doc.text("Responsable de la Evaluación", centroColumna, yFirmas + 28.5, { align: "center" });
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 5 });
