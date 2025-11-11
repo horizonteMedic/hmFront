@@ -48,6 +48,7 @@ export default function InformeRiesgoPsicosocial() {
         // Datos personales
         nombres: "",
         apellidos: "",
+        dni: "",
         fechaNacimiento: "",
         lugarNacimiento: "",
         domicilioActual: "",
@@ -108,7 +109,7 @@ export default function InformeRiesgoPsicosocial() {
             <div className="flex h-full">
                 <div className="w-full space-y-3 px-4">
                     {/* Header */}
-                    <div className="bg-white border border-gray-200 rounded-lg p-3">
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                             <InputTextOneLine
                                 label="N° Orden"
@@ -127,7 +128,7 @@ export default function InformeRiesgoPsicosocial() {
                                 labelWidth="120px"
                             />
                             <InputTextOneLine
-                                label="Nombre Examen"
+                                label="Nombre de Examen"
                                 name="nombreExamen"
                                 value={form.nombreExamen}
                                 disabled
@@ -138,26 +139,27 @@ export default function InformeRiesgoPsicosocial() {
                     </div>
 
                     {/* Datos Personales */}
-                    <fieldset className="bg-white border border-gray-200 rounded-lg p-3">
+                    <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
                         <legend className="font-bold mb-3 text-[10px]">Datos Personales</legend>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             <div className="space-y-3">
                                 <InputTextOneLine label="Nombres" name="nombres" value={form.nombres} disabled labelWidth="160px" />
                                 <InputTextOneLine label="Apellidos" name="apellidos" value={form.apellidos} disabled labelWidth="160px" />
+                                <InputTextOneLine label="Domicilio Actual" name="domicilioActual" value={form.domicilioActual} disabled labelWidth="160px" />
                                 <InputTextOneLine label="Fecha Nacimiento" name="fechaNacimiento" value={form.fechaNacimiento} disabled labelWidth="160px" />
-                                <InputTextOneLine label="Lugar Nacimiento" name="lugarNacimiento" value={form.lugarNacimiento} disabled labelWidth="160px" />
+                                <InputTextOneLine label="Nivel de Estudios" name="nivelEstudios" value={form.nivelEstudios} disabled labelWidth="160px" />
                             </div>
                             <div className="space-y-3">
-                                <InputTextOneLine label="Domicilio Actual" name="domicilioActual" value={form.domicilioActual} disabled labelWidth="160px" />
+                                <InputTextOneLine label="DNI" name="dni" value={form.dni} disabled labelWidth="160px" />
                                 <InputTextOneLine label="Edad (años)" name="edad" value={form.edad} disabled labelWidth="160px" />
                                 <InputTextOneLine label="Estado Civil" name="estadoCivil" value={form.estadoCivil} disabled labelWidth="160px" />
-                                <InputTextOneLine label="Nivel de Estudios" name="nivelEstudios" value={form.nivelEstudios} disabled labelWidth="160px" />
+                                <InputTextOneLine label="Lugar Nacimiento" name="lugarNacimiento" value={form.lugarNacimiento} disabled labelWidth="160px" />
                             </div>
                         </div>
                     </fieldset>
 
                     {/* Datos Laborales */}
-                    <fieldset className="bg-white border border-gray-200 rounded-lg p-3">
+                    <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
                         <legend className="font-bold mb-3 text-[10px]">Datos Laborales</legend>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             <div className="space-y-3">
@@ -173,7 +175,7 @@ export default function InformeRiesgoPsicosocial() {
 
                     {/* Riesgos y Recomendaciones */}
                     <div className="grid md:grid-cols-2 gap-4">
-                        <fieldset className="bg-white border border-gray-200 rounded-lg p-3">
+                        <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
                             <legend className="font-bold mb-3 text-[10px]">Riesgos Psicosociales</legend>
                             <RadioTable
                                 items={riesgosItems}
@@ -182,7 +184,7 @@ export default function InformeRiesgoPsicosocial() {
                                 handleRadioButton={handleRadioButton}
                             />
                         </fieldset>
-                        <fieldset className="bg-white border border-gray-200 rounded-lg p-3">
+                        <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
                             <legend className="font-bold mb-3 text-[10px]">Recomendaciones y Conclusión</legend>
                             <div className="space-y-3">
                                 <InputTextArea
@@ -205,7 +207,7 @@ export default function InformeRiesgoPsicosocial() {
                     </div>
 
                     {/* Análisis y Resultados */}
-                    <fieldset className="bg-white border border-gray-200 rounded-lg p-3">
+                    <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
                         <legend className="font-bold mb-3 text-[10px]">Análisis y Resultados</legend>
                         <InputTextArea
                             label=""
@@ -217,7 +219,7 @@ export default function InformeRiesgoPsicosocial() {
                     </fieldset>
 
                     {/* Footer acciones */}
-                    <fieldset className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
+                    <fieldset className="flex flex-col md:flex-row justify-between items-center gap-4 px-4">
                         <div className="flex gap-4">
                             <button
                                 type="button"
