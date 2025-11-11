@@ -55,6 +55,11 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
     observacionesAntecedentes: String(data.otrosDescripcionAntecedentesPatologicos_txtotrosap ?? ""),
     observacionesSintomas: String(data.otrosDescripcionIndicarEnfermedades_txtotros1ap ?? ""),
     observacionesHabitos: String(data.otrosTipoIndicarEnfermedades_txtotros ?? ""),
+    // Datos adicionales para nuevas filas
+    otrosPatologias: String(data.otrosDescripcionAntecedentesPatologicos_txtotrosap ?? ""),
+    especifiqueTratamiento: String(data.especifiqueTratamientoBoro_especifique_detalleenfermedades ?? ""),
+    alergiasMedicamentos: Boolean(data.alergiasAlimentosBoro_alergias_medic_alim ?? false),
+    especifiqueAlergias: String(data.alergiasAlimentosEspecifiqueBoro_alergias_medic_alimdetall ?? ""),
 
     // Mapeo de datos de color
     color: Number(data.color ?? 0),
@@ -778,6 +783,77 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   
   yPos += filaAltura;
 
+  // === FILA ADICIONAL: OTROS ===
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Otros:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTextoGramatical(datosFinales.otrosPatologias || ""), tablaInicioX + 15, yPos + 3.5);
+  yPos += filaAltura;
+
+  // === FILA ADICIONAL: ESPECIFIQUE DETALLES DE LA PATOLOGÍA O TRATAMIENTO MARCADA ===
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Especifique detalles de la patología o tratamiento marcada:", tablaInicioX + 2, yPos + 3.5);
+  yPos += filaAltura;
+
+  // === FILA ADICIONAL: ESPECIFIQUE (TRATAMIENTO) ===
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Especifique:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTextoGramatical(datosFinales.especifiqueTratamiento || ""), tablaInicioX + 25, yPos + 3.5);
+  yPos += filaAltura;
+
+  // === FILA ADICIONAL: ALERGIAS A MEDICAMENTOS / ALIMENTOS SI/NO ===
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Alergias a Medicamentos / Alimentos", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  
+  // Marcar SI si corresponde
+  if (datosFinales.alergiasMedicamentos) {
+    doc.text("SI (  X  )", tablaInicioX + 80, yPos + 3.5);
+  } else {
+    doc.text("SI (      )", tablaInicioX + 80, yPos + 3.5);
+  }
+  
+  // Marcar NO si corresponde
+  if (!datosFinales.alergiasMedicamentos) {
+    doc.text("NO (  X  )", tablaInicioX + 95, yPos + 3.5);
+  } else {
+    doc.text("NO (      )", tablaInicioX + 95, yPos + 3.5);
+  }
+  yPos += filaAltura;
+
+  // === FILA ADICIONAL: ESPECIFIQUE (ALERGIAS) ===
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Especifique:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTextoGramatical(datosFinales.especifiqueAlergias || ""), tablaInicioX + 25, yPos + 3.5);
+  yPos += filaAltura;
+
   // === OBSERVACIONES ANTECEDENTES PATOLÓGICOS ===
   // Función para calcular altura dinámica de observaciones
   const calcularAlturaObservaciones = (texto, anchoMaximo, doc) => {
@@ -965,10 +1041,26 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   yPos += filaAltura;
 
   // Fila de Licor
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  // Calcular altura necesaria para el campo de frecuencia (si tiene texto largo)
+  let alturaNecesariaLicor = filaAltura;
+  const yTextoInicioLicor = yPos + 3.5;
+  const xInicioFrecuenciaLicor = tablaInicioX + 140; // Posición X donde comienza el texto de frecuencia
+  const anchoDisponibleFrecuenciaLicor = tablaAncho + tablaInicioX - xInicioFrecuenciaLicor - 2; // Ancho disponible: desde inicio hasta final menos margen
+  
+  // Calcular altura necesaria para frecuencia usando splitTextToSize
+  const frecuenciaLicorTexto = habitosNosivosMarcados.frecuenciaLicor ? formatearTextoGramatical(habitosNosivosMarcados.frecuenciaLicor) : "";
+  if (frecuenciaLicorTexto) {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const lineasFrecuenciaLicor = doc.splitTextToSize(frecuenciaLicorTexto, anchoDisponibleFrecuenciaLicor);
+    const alturaFrecuenciaLicor = Math.max(filaAltura, lineasFrecuenciaLicor.length * 2.8 + 2);
+    alturaNecesariaLicor = Math.max(alturaNecesariaLicor, alturaFrecuenciaLicor);
+  }
+  
+  // Dibujar líneas de la fila con altura dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesariaLicor);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesariaLicor);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos + alturaNecesariaLicor, tablaInicioX + tablaAncho, yPos + alturaNecesariaLicor);
   
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Licor", tablaInicioX + 2, yPos + 3.5);
@@ -1006,15 +1098,38 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Fr:", tablaInicioX + 130, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(habitosNosivosMarcados.frecuenciaLicor || ""), tablaInicioX + 140, yPos + 3.5);
+  // Frecuencia con salto de línea si es necesario
+  if (frecuenciaLicorTexto) {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const lineasFrecuenciaLicor = doc.splitTextToSize(frecuenciaLicorTexto, anchoDisponibleFrecuenciaLicor);
+    lineasFrecuenciaLicor.forEach((linea, index) => {
+      doc.text(linea, xInicioFrecuenciaLicor, yTextoInicioLicor + (index * 2.8));
+    });
+  }
   
-  yPos += filaAltura;
+  yPos += alturaNecesariaLicor;
 
   // Fila de Drogas
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  // Calcular altura necesaria para el campo de frecuencia (si tiene texto largo)
+  let alturaNecesariaDrogas = filaAltura;
+  const yTextoInicioDrogas = yPos + 3.5;
+  const xInicioFrecuenciaDrogas = tablaInicioX + 140; // Posición X donde comienza el texto de frecuencia
+  const anchoDisponibleFrecuenciaDrogas = tablaAncho + tablaInicioX - xInicioFrecuenciaDrogas - 2; // Ancho disponible: desde inicio hasta final menos margen
+  
+  // Calcular altura necesaria para frecuencia usando splitTextToSize
+  const frecuenciaDrogasTexto = habitosNosivosMarcados.frecuenciaDrogas ? formatearTextoGramatical(habitosNosivosMarcados.frecuenciaDrogas) : "";
+  if (frecuenciaDrogasTexto) {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const lineasFrecuenciaDrogas = doc.splitTextToSize(frecuenciaDrogasTexto, anchoDisponibleFrecuenciaDrogas);
+    const alturaFrecuenciaDrogas = Math.max(filaAltura, lineasFrecuenciaDrogas.length * 2.8 + 2);
+    alturaNecesariaDrogas = Math.max(alturaNecesariaDrogas, alturaFrecuenciaDrogas);
+  }
+  
+  // Dibujar líneas de la fila con altura dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesariaDrogas);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesariaDrogas);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos + alturaNecesariaDrogas, tablaInicioX + tablaAncho, yPos + alturaNecesariaDrogas);
   
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Drogas", tablaInicioX + 2, yPos + 3.5);
@@ -1052,15 +1167,38 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Fr:", tablaInicioX + 130, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(habitosNosivosMarcados.frecuenciaDrogas || ""), tablaInicioX + 140, yPos + 3.5);
+  // Frecuencia con salto de línea si es necesario
+  if (frecuenciaDrogasTexto) {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const lineasFrecuenciaDrogas = doc.splitTextToSize(frecuenciaDrogasTexto, anchoDisponibleFrecuenciaDrogas);
+    lineasFrecuenciaDrogas.forEach((linea, index) => {
+      doc.text(linea, xInicioFrecuenciaDrogas, yTextoInicioDrogas + (index * 2.8));
+    });
+  }
   
-  yPos += filaAltura;
+  yPos += alturaNecesariaDrogas;
 
   // Fila de Otros
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  // Calcular altura necesaria para el campo de frecuencia (si tiene texto largo)
+  let alturaNecesariaOtros = filaAltura;
+  const yTextoInicioOtros = yPos + 3.5;
+  const xInicioFrecuenciaOtros = tablaInicioX + 140; // Posición X donde comienza el texto de frecuencia
+  const anchoDisponibleFrecuenciaOtros = tablaAncho + tablaInicioX - xInicioFrecuenciaOtros - 2; // Ancho disponible: desde inicio hasta final menos margen
+  
+  // Calcular altura necesaria para frecuencia usando splitTextToSize
+  const frecuenciaOtrosTexto = habitosNosivosMarcados.frecuenciaOtros ? formatearTextoGramatical(habitosNosivosMarcados.frecuenciaOtros) : "";
+  if (frecuenciaOtrosTexto) {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const lineasFrecuenciaOtros = doc.splitTextToSize(frecuenciaOtrosTexto, anchoDisponibleFrecuenciaOtros);
+    const alturaFrecuenciaOtros = Math.max(filaAltura, lineasFrecuenciaOtros.length * 2.8 + 2);
+    alturaNecesariaOtros = Math.max(alturaNecesariaOtros, alturaFrecuenciaOtros);
+  }
+  
+  // Dibujar líneas de la fila con altura dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesariaOtros);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesariaOtros);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos + alturaNecesariaOtros, tablaInicioX + tablaAncho, yPos + alturaNecesariaOtros);
   
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Otros", tablaInicioX + 2, yPos + 3.5);
@@ -1098,9 +1236,16 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Fr:", tablaInicioX + 130, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(habitosNosivosMarcados.frecuenciaOtros || ""), tablaInicioX + 140, yPos + 3.5);
+  // Frecuencia con salto de línea si es necesario
+  if (frecuenciaOtrosTexto) {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const lineasFrecuenciaOtros = doc.splitTextToSize(frecuenciaOtrosTexto, anchoDisponibleFrecuenciaOtros);
+    lineasFrecuenciaOtros.forEach((linea, index) => {
+      doc.text(linea, xInicioFrecuenciaOtros, yTextoInicioOtros + (index * 2.8));
+    });
+  }
   
-  yPos += filaAltura;
+  yPos += alturaNecesariaOtros;
 
   // === FOOTER PÁGINA 1 ===
   footerTR(doc, { footerOffsetY: 5});
