@@ -50,7 +50,7 @@ export const GetInfoServicio = async (
         const vcercacod = res.oftalodccmologia_odcc || "";
         const vcercacoi = res.oiccoftalmologia_oicc || "";
 
-        if (!((res.enfermedadesOcularesOftalmo_e_oculares ?? "").trim().toUpperCase() == ("NINGUNA"))) {
+        if (!((res.enfermedadesocularesoftalmo_e_oculares ?? "").trim().toUpperCase() == ("NINGUNA"))) {
             if (vlejoscod == "00" && vlejoscoi == "00" && vcercacod == "00" && vcercacoi == "00") {
                 nuevasObservaciones += "CORREGIR AGUDEZA VISUAL.\n";
             } else {
