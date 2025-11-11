@@ -11,11 +11,106 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   // Contador de páginas dinámico
   let numeroPagina = 1;
 
+  // Función para obtener la evaluación de un criterio basado en los campos booleanos
+  function obtenerEvaluacion(raw, prefijo) {
+    if (!raw || !prefijo) return null;
+    
+    // Verificar explícitamente si el valor es true (ignorar null, false, undefined)
+    const checkValue = (value) => {
+      if (value === null || value === undefined) return false;
+      return value === true || value === "true" || value === 1;
+    };
+    
+    // Acceder directamente a los campos sin optional chaining para evitar problemas
+    const campoI = raw[`${prefijo}I`];
+    const campoS = raw[`${prefijo}S`];
+    const campoNPS = raw[`${prefijo}NPS`];
+    const campoNP = raw[`${prefijo}NP`];
+    const campoNPI = raw[`${prefijo}NPI`];
+    
+    // Verificar cada evaluación en el orden: I, S, NPS, NP, NPI
+    if (checkValue(campoI)) return 'I';
+    if (checkValue(campoS)) return 'S';
+    if (checkValue(campoNPS)) return 'NPS';
+    if (checkValue(campoNP)) return 'NP';
+    if (checkValue(campoNPI)) return 'NPI';
+    
+    // Si no hay ninguna evaluación marcada, retornar null
+    return null;
+  }
+
   // Normalizador único de datos de entrada
   function buildDatosFinales(raw) {
+    // Construir criterios de inteligencia desde campos individuales
+    const criteriosInteligencia = [];
+    const criteriosInteligenciaMap = [
+      { numero: 1, campo: 'coeficienteIntelectual', nombre: 'Coeficiente intelectual' },
+      { numero: 2, campo: 'compresion', nombre: 'Comprensión' },
+      { numero: 3, campo: 'nivelAtencion', nombre: 'Nivel Atención / Concentración' },
+      { numero: 4, campo: 'memoria', nombre: 'Memoria a corto, mediano y largo plazo' },
+      { numero: 5, campo: 'coordinacionViso', nombre: 'Coordinación visio- motora' },
+      { numero: 6, campo: 'orientacionEspacial', nombre: 'Orientación espacial' },
+      { numero: 7, campo: 'capacidadDetalles', nombre: 'Capacidad para discriminar detalles' },
+      { numero: 8, campo: 'capacidadAprendizaje', nombre: 'Capacidad de aprendizaje' },
+      { numero: 9, campo: 'capacidadAnalisis', nombre: 'Capacidad de Análisis y síntesis' }
+    ];
+
+    criteriosInteligenciaMap.forEach(criterio => {
+      const evaluacion = obtenerEvaluacion(raw, criterio.campo);
+      // Debug temporal para verificar el mapeo
+      if (criterio.numero === 1) {
+        console.log(`Criterio 1 (${criterio.campo}):`, {
+          evaluacion,
+          campoI: raw[`${criterio.campo}I`],
+          campoS: raw[`${criterio.campo}S`],
+          campoNPS: raw[`${criterio.campo}NPS`],
+          campoNP: raw[`${criterio.campo}NP`],
+          campoNPI: raw[`${criterio.campo}NPI`]
+        });
+      }
+      // Agregar todos los criterios, incluso si no tienen evaluación
+      criteriosInteligencia.push({
+        numero: criterio.numero,
+        criterio: criterio.nombre,
+        evaluacion: evaluacion
+      });
+    });
+
+    // Construir criterios de personalidad desde campos individuales
+    const criteriosPersonalidad = [];
+    const criteriosPersonalidadMap = [
+      { numero: 1, campo: 'estabilidadEmocional', nombre: 'Estabilidad emocional' },
+      { numero: 2, campo: 'afrontamientoEstres', nombre: 'Afrontamiento al estrés' },
+      { numero: 3, campo: 'afrontamientoRiesgo', nombre: 'Afrontamiento al riesgo' },
+      { numero: 4, campo: 'relacionesInterpersonales', nombre: 'Relaciones interpersonales / Adaptación al medio' },
+      { numero: 5, campo: 'disposicionNormas', nombre: 'Disposición para acatar normas y reglas' }
+    ];
+
+    criteriosPersonalidadMap.forEach(criterio => {
+      const evaluacion = obtenerEvaluacion(raw, criterio.campo);
+      // Debug temporal para verificar el mapeo
+      if (criterio.numero === 1) {
+        console.log(`Criterio Personalidad 1 (${criterio.campo}):`, {
+          evaluacion,
+          campoI: raw[`${criterio.campo}I`],
+          campoS: raw[`${criterio.campo}S`],
+          campoNPS: raw[`${criterio.campo}NPS`],
+          campoNP: raw[`${criterio.campo}NP`],
+          campoNPI: raw[`${criterio.campo}NPI`]
+        });
+      }
+      // Agregar todos los criterios, incluso si no tienen evaluación
+      criteriosPersonalidad.push({
+        numero: criterio.numero,
+        criterio: criterio.nombre,
+        evaluacion: evaluacion
+      });
+    });
+
     const datosReales = {
       apellidosNombres: String((((raw?.apellidosPaciente ?? '') + ' ' + (raw?.nombresPaciente ?? '')).trim())),
-      fechaExamen: formatearFechaCorta(raw?.fechaEntrevista ?? raw?.fechaExamen ?? ''),
+      codigoClinica: String(raw?.codigoClinica ?? ''),
+      fechaExamen: formatearFechaCorta(raw?.fechaEntrevista ?? raw?.fechaExamen ?? raw?.fecha ?? ''),
       sexo: convertirGenero(raw?.sexoPaciente ?? ''),
       documentoIdentidad: String(raw?.dniPaciente ?? ''),
       edad: String(raw?.edadPaciente ?? ''),
@@ -31,8 +126,12 @@ export default function InformePsicologico_Digitalizado(data = {}) {
       codigoColor: String(raw?.codigoColor ?? ''),
       textoColor: String(raw?.textoColor ?? ''),
       // Criterios psicológicos
-      criteriosInteligencia: raw?.criteriosInteligencia ?? [],
-      criteriosPersonalidad: raw?.criteriosPersonalidad ?? [],
+      criteriosInteligencia: raw?.criteriosInteligencia && Array.isArray(raw.criteriosInteligencia) && raw.criteriosInteligencia.length > 0 
+        ? raw.criteriosInteligencia 
+        : criteriosInteligencia,
+      criteriosPersonalidad: raw?.criteriosPersonalidad && Array.isArray(raw.criteriosPersonalidad) && raw.criteriosPersonalidad.length > 0 
+        ? raw.criteriosPersonalidad 
+        : criteriosPersonalidad,
       // Análisis FODA
       fortalezasOportunidades: String(raw?.fortalezasOportunidades ?? ''),
       debilidadesAmenazas: String(raw?.amenazasDebilidades ?? raw?.debilidadesAmenazas ?? ''),
@@ -41,12 +140,16 @@ export default function InformePsicologico_Digitalizado(data = {}) {
       recomendaciones: String(raw?.recomendacion ?? raw?.recomendaciones ?? ''),
       // Conclusiones
       apto: (typeof raw?.apto === 'boolean') ? raw.apto : false,
-      aptoConObservacion: (typeof raw?.aptoConObservacion === 'boolean') ? raw.aptoConObservacion : false,
-      noApto: (typeof raw?.noApto === 'boolean') ? raw.noApto : false
+      aptoConObservacion: (typeof raw?.aptoConObservacion === 'boolean') ? raw.aptoConObservacion : (typeof raw?.aptoObservacion === 'boolean') ? raw.aptoObservacion : false,
+      noApto: (typeof raw?.noApto === 'boolean') ? raw.noApto : false,
+      // Flags para título
+      trabajosCaliente: (typeof raw?.trabajosCaliente === 'boolean') ? raw.trabajosCaliente : false,
+      licencia: (typeof raw?.licencia === 'boolean') ? raw.licencia : false
     };
 
     const datosPrueba = {
       apellidosNombres: 'GARCÍA LÓPEZ, MARÍA ELENA',
+      codigoClinica: '4353-H',
       fechaExamen: '25/11/2025',
       sexo: 'Femenino',
       documentoIdentidad: '87654321',
@@ -90,7 +193,10 @@ export default function InformePsicologico_Digitalizado(data = {}) {
       // Conclusiones de prueba
       apto: false,
       aptoConObservacion: true,
-      noApto: false
+      noApto: false,
+      // Flags para título
+      trabajosCaliente: false,
+      licencia: false
     };
 
     const selected = (raw && (raw.norden)) ? datosReales : datosPrueba;
@@ -104,10 +210,21 @@ export default function InformePsicologico_Digitalizado(data = {}) {
     // Logo y membrete
     CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
 
-    // Títulos
+    // Títulos dinámicos según los checks
+    let titulo = "INFORME PSICOLÓGICO";
+    if (datosFinales.trabajosCaliente && datosFinales.licencia) {
+      titulo = "INFORME PSICOLÓGICO - TRABAJOS EN CALIENTE Y LICENCIA";
+    } else if (datosFinales.trabajosCaliente) {
+      titulo = "INFORME PSICOLÓGICO - TRABAJOS EN CALIENTE";
+    } else if (datosFinales.licencia) {
+      titulo = "INFORME PSICOLÓGICO - LICENCIA";
+    } else if (!datosFinales.trabajosCaliente && !datosFinales.licencia) {
+      titulo = "EVALUACION PSICOLOGICA PODEROSA";
+    }
+
     doc.setFont("helvetica", "bold").setFontSize(12);
     doc.setTextColor(0, 0, 0);
-    doc.text("INFORME PSICOLÓGICO", pageW / 2, 35, { align: "center" });
+    doc.text(titulo, pageW / 2, 35, { align: "center" });
 
     // Número de Ficha, Sede, Fecha y Página
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -166,7 +283,12 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   };
 
   // Función para calcular altura dinámica de texto
-  const calcularAlturaTexto = (texto, anchoMaximo) => {
+  const calcularAlturaTexto = (texto, anchoMaximo, alturaMinima = 5) => {
+    if (!texto || texto.trim() === '') {
+      // Si no hay texto, usar altura mínima de fila
+      return alturaMinima;
+    }
+    
     const palabras = texto.split(' ');
     let lineaActual = '';
     let lineas = 1;
@@ -187,9 +309,9 @@ export default function InformePsicologico_Digitalizado(data = {}) {
       }
     });
     
-    // Altura mínima de 15mm, altura por línea de 3mm
+    // Altura por línea de 3mm, con altura mínima personalizable
     const alturaCalculada = lineas * 3 + 2;
-    return Math.max(alturaCalculada, 20);
+    return Math.max(alturaCalculada, alturaMinima);
   };
 
   // Función general para dibujar header de sección con fondo gris
@@ -234,8 +356,12 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
 
-  // Primera fila: Apellidos y Nombres
+  // Primera fila: Apellidos y Nombres (dividida con código de clínica)
+  const anchoColumnaNombres = tablaAncho * 0.75; // 75% para nombres
+  const posicionDivisionCodigo = tablaInicioX + anchoColumnaNombres;
+  
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(posicionDivisionCodigo, yPos, posicionDivisionCodigo, yPos + filaAltura); // Línea divisoria
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -283,12 +409,18 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   // === CONTENIDO DE LA TABLA ===
   let yTexto = 40 + 2; // Ajustar para el header
 
-  // Primera fila: Apellidos y Nombres
+  // Primera fila: Apellidos y Nombres (con código de clínica)
   yTexto += filaAltura;
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 40, yTexto + 1.5, 160);
+  dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 40, yTexto + 1.5, anchoColumnaNombres - 45);
+  
+  // Código de clínica en la columna derecha
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Código:", posicionDivisionCodigo + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.codigoClinica, posicionDivisionCodigo + 15, yTexto + 1.5);
   yTexto += filaAltura;
 
   // Segunda fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
@@ -354,23 +486,22 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   // Configurar dimensiones de la tabla de criterios
   const anchoColumnaNumero = 15;
   const anchoColumnaCriterio = 100;
-  const anchoColumnaEvaluacion = (tablaAncho - anchoColumnaNumero - anchoColumnaCriterio) / 5; // 5 columnas: S, NPS, NP, NPI, I
+  const anchoColumnaEvaluacion = (tablaAncho - anchoColumnaNumero - anchoColumnaCriterio) / 5; // 5 columnas: I, S, NPS, NP, NPI
 
-  // Posiciones de las columnas
+  // Definir las evaluaciones disponibles en el orden correcto: I, S, NPS, NP, NPI
+  const evaluaciones = ["I", "S", "NPS", "NP", "NPI"];
+
+  // Posiciones de las columnas (orden: I, S, NPS, NP, NPI)
   const posicionesColumnas = [
     tablaInicioX, // Inicio
     tablaInicioX + anchoColumnaNumero, // Después del número
-    tablaInicioX + anchoColumnaNumero + anchoColumnaCriterio, // Después del criterio
+    tablaInicioX + anchoColumnaNumero + anchoColumnaCriterio, // I (inicio de primera columna de evaluación)
     tablaInicioX + anchoColumnaNumero + anchoColumnaCriterio + anchoColumnaEvaluacion, // S
     tablaInicioX + anchoColumnaNumero + anchoColumnaCriterio + anchoColumnaEvaluacion * 2, // NPS
     tablaInicioX + anchoColumnaNumero + anchoColumnaCriterio + anchoColumnaEvaluacion * 3, // NP
     tablaInicioX + anchoColumnaNumero + anchoColumnaCriterio + anchoColumnaEvaluacion * 4, // NPI
-    tablaInicioX + anchoColumnaNumero + anchoColumnaCriterio + anchoColumnaEvaluacion * 5, // I
     tablaInicioX + tablaAncho // Final
   ];
-
-  // Definir las evaluaciones disponibles
-  const evaluaciones = ["S", "NPS", "NP", "NPI", "I"];
 
   // Función para dibujar una fila de criterio
   const dibujarFilaCriterio = (criterio) => {
@@ -395,34 +526,30 @@ export default function InformePsicologico_Digitalizado(data = {}) {
     doc.text(criterio.criterio, tablaInicioX + anchoColumnaNumero + 2, yTexto + 3.5);
     
     // Marcar la evaluación correspondiente con X
-    evaluaciones.forEach((evaluacion, evalIndex) => {
-      if (criterio.evaluacion === evaluacion) {
-        const centroColumna = posicionesColumnas[evalIndex + 3] + (anchoColumnaEvaluacion / 2);
+    if (criterio.evaluacion) {
+      // Buscar el índice de la evaluación en el array evaluaciones
+      // El array evaluaciones es: ["I", "S", "NPS", "NP", "NPI"]
+      // El índice 0 = I, índice 1 = S, índice 2 = NPS, índice 3 = NP, índice 4 = NPI
+      const evalIndex = evaluaciones.indexOf(criterio.evaluacion);
+      
+      // Si se encontró la evaluación, marcar la X en la columna correspondiente
+      // posicionesColumnas[2] = I, [3] = S, [4] = NPS, [5] = NP, [6] = NPI
+      if (evalIndex !== -1) {
+        const indiceColumna = evalIndex + 2; // evalIndex 0 (I) → indiceColumna 2, evalIndex 1 (S) → indiceColumna 3, etc.
+        const centroColumna = posicionesColumnas[indiceColumna] + (anchoColumnaEvaluacion / 2);
         doc.setFont("helvetica", "bold").setFontSize(10);
         doc.text("X", centroColumna, yTexto + 3.5, { align: "center" });
         doc.setFont("helvetica", "normal").setFontSize(8);
       }
-    });
+    }
     
     yTexto += filaAltura;
   };
 
   // Configuración para las filas de título (INTELIGENCIA y PERSONALIDAD)
   // Para estas filas, el título va directamente sin columna de número
-  const anchoColumnaTitulo = anchoColumnaNumero + anchoColumnaCriterio; // Título ocupa número + criterio
-  const anchoColumnaEvaluacionTitulo = (tablaAncho - anchoColumnaTitulo) / 5; // 5 columnas: S, NPS, NP, NPI, I
-  
-  // Posiciones de columnas para la fila de título (sin columna de número)
-  const posicionesColumnasTitulo = [
-    tablaInicioX, // Inicio
-    tablaInicioX + anchoColumnaTitulo, // Después del título
-    tablaInicioX + anchoColumnaTitulo + anchoColumnaEvaluacionTitulo, // S
-    tablaInicioX + anchoColumnaTitulo + anchoColumnaEvaluacionTitulo * 2, // NPS
-    tablaInicioX + anchoColumnaTitulo + anchoColumnaEvaluacionTitulo * 3, // NP
-    tablaInicioX + anchoColumnaTitulo + anchoColumnaEvaluacionTitulo * 4, // NPI
-    tablaInicioX + anchoColumnaTitulo + anchoColumnaEvaluacionTitulo * 5, // I
-    tablaInicioX + tablaAncho // Final
-  ];
+  // Usamos las mismas posicionesColumnas para mantener alineación perfecta
+  // Las columnas de evaluación en posicionesColumnas empiezan en el índice 3 (I)
 
   // Subsección INTELIGENCIA
   // Dibujar fila de subsección con INTELIGENCIA y las columnas de evaluación en la misma fila
@@ -430,12 +557,14 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   doc.setFillColor(199, 241, 255); // Celeste claro
   doc.rect(tablaInicioX, yTexto, tablaAncho, filaAltura, 'F');
   
-  // Dibujar líneas de la tabla
+  // Dibujar líneas de la tabla usando posicionesColumnas para alineación perfecta
+  // Omitir la línea de la columna de número (posicionesColumnas[1]) ya que esta fila no tiene columna de número
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
   doc.line(tablaInicioX, yTexto, tablaInicioX, yTexto + filaAltura);
-  posicionesColumnasTitulo.forEach((pos, posIndex) => {
-    if (posIndex > 0 && posIndex < posicionesColumnasTitulo.length - 1) {
+  posicionesColumnas.forEach((pos, posIndex) => {
+    // Omitir posIndex 1 (columna de número) y dibujar desde posIndex 2 (inicio de columnas de evaluación)
+    if (posIndex > 1 && posIndex < posicionesColumnas.length - 1) {
       doc.line(pos, yTexto, pos, yTexto + filaAltura);
     }
   });
@@ -447,9 +576,11 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   // Título directamente en la primera columna (sin columna de número)
   doc.text("INTELIGENCIA", tablaInicioX + 2, yTexto + 3.5);
-  // Escribir las letras S, NPS, NP, NPI, I en sus respectivas columnas
+  // Escribir las letras I, S, NPS, NP, NPI en sus respectivas columnas
+  // posicionesColumnas[2] = I, [3] = S, [4] = NPS, [5] = NP, [6] = NPI
   evaluaciones.forEach((evaluacion, index) => {
-    const centroColumna = posicionesColumnasTitulo[index + 1] + (anchoColumnaEvaluacionTitulo / 2);
+    const indiceColumna = index + 2; // index 0 (I) → indiceColumna 2, index 1 (S) → indiceColumna 3, etc.
+    const centroColumna = posicionesColumnas[indiceColumna] + (anchoColumnaEvaluacion / 2);
     doc.text(evaluacion, centroColumna, yTexto + 3.5, { align: "center" });
   });
   yTexto += filaAltura;
@@ -461,17 +592,19 @@ export default function InformePsicologico_Digitalizado(data = {}) {
 
   // Subsección PERSONALIDAD
   // Dibujar fila de subsección con PERSONALIDAD y las columnas de evaluación en la misma fila
-  // Usar las mismas posiciones de columnas que INTELIGENCIA (sin columna de número)
+  // Usar las mismas posicionesColumnas para mantener alineación perfecta
   // Fondo celeste claro
   doc.setFillColor(199, 241, 255); // Celeste claro
   doc.rect(tablaInicioX, yTexto, tablaAncho, filaAltura, 'F');
   
-  // Dibujar líneas de la tabla
+  // Dibujar líneas de la tabla usando posicionesColumnas para alineación perfecta
+  // Omitir la línea de la columna de número (posicionesColumnas[1]) ya que esta fila no tiene columna de número
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
   doc.line(tablaInicioX, yTexto, tablaInicioX, yTexto + filaAltura);
-  posicionesColumnasTitulo.forEach((pos, posIndex) => {
-    if (posIndex > 0 && posIndex < posicionesColumnasTitulo.length - 1) {
+  posicionesColumnas.forEach((pos, posIndex) => {
+    // Omitir posIndex 1 (columna de número) y dibujar desde posIndex 2 (inicio de columnas de evaluación)
+    if (posIndex > 1 && posIndex < posicionesColumnas.length - 1) {
       doc.line(pos, yTexto, pos, yTexto + filaAltura);
     }
   });
@@ -483,9 +616,11 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   // Título directamente en la primera columna (sin columna de número)
   doc.text("PERSONALIDAD", tablaInicioX + 2, yTexto + 3.5);
-  // Escribir las letras S, NPS, NP, NPI, I en sus respectivas columnas
+  // Escribir las letras I, S, NPS, NP, NPI en sus respectivas columnas
+  // posicionesColumnas[2] = I, [3] = S, [4] = NPS, [5] = NP, [6] = NPI
   evaluaciones.forEach((evaluacion, index) => {
-    const centroColumna = posicionesColumnasTitulo[index + 1] + (anchoColumnaEvaluacionTitulo / 2);
+    const indiceColumna = index + 2; // index 0 (I) → indiceColumna 2, index 1 (S) → indiceColumna 3, etc.
+    const centroColumna = posicionesColumnas[indiceColumna] + (anchoColumnaEvaluacion / 2);
     doc.text(evaluacion, centroColumna, yTexto + 3.5, { align: "center" });
   });
   yTexto += filaAltura;
@@ -502,8 +637,8 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   // Header de análisis FODA
   yPos = dibujarHeaderSeccion("III. ANÁLISIS FODA", yPos, filaAltura);
 
-  // Fila 1: Fortalezas / Oportunidades
-  const alturaFila1 = calcularAlturaTexto(datosFinales.fortalezasOportunidades, tablaAncho - 4);
+  // Fila 1: Fortalezas / Oportunidades (altura mínima 10mm)
+  const alturaFila1 = calcularAlturaTexto(datosFinales.fortalezasOportunidades, tablaAncho - 4, 10);
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila1);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFila1);
@@ -518,8 +653,8 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   dibujarTextoConSaltoLinea(datosFinales.fortalezasOportunidades, tablaInicioX + 2, yPos + 7, tablaAncho - 4);
   yPos += alturaFila1;
 
-  // Fila 2: Debilidades / Amenazas
-  const alturaFila2 = calcularAlturaTexto(datosFinales.debilidadesAmenazas, tablaAncho - 4);
+  // Fila 2: Debilidades / Amenazas (altura mínima 10mm)
+  const alturaFila2 = calcularAlturaTexto(datosFinales.debilidadesAmenazas, tablaAncho - 4, 10);
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila2);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFila2);
@@ -538,8 +673,8 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   // Header de observaciones
   yPos = dibujarHeaderSeccion("IV. OBSERVACIONES", yPos, filaAltura);
 
-  // Fila de Observaciones (creciente)
-  const alturaObservaciones = calcularAlturaTexto(datosFinales.observaciones, tablaAncho - 4);
+  // Fila de Observaciones (creciente, altura mínima 10mm)
+  const alturaObservaciones = calcularAlturaTexto(datosFinales.observaciones, tablaAncho - 4, 10);
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaObservaciones);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaObservaciones);
@@ -651,7 +786,7 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   }
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 5 });
+  footerTR(doc, { footerOffsetY: 10 });
 
   // Imprimir
   imprimir(doc);

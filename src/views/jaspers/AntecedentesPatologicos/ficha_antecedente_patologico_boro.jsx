@@ -1341,8 +1341,74 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
     data.gripeInfluenzaBoro_gripe_influenza, data.influenzaBoro_influenza, data.neumococoBoro_neumococo, data.rabiaBoro_rabia);
 
   // Fila 3: Hepatitis A, Covid-19 (solo 2 columnas)
-  dibujarFilaVacunas("Hepatitis A", "Covid-19", null, null,
-    data.hepatitisABoro_hepatitisa, data.covid_chkcovid, null, null);
+  const covidMarcado = datosFinales.severidadCovid && datosFinales.severidadCovid.covid19;
+  
+  if (covidMarcado) {
+    // Si COVID está marcado, dibujar fila extendida con información adicional
+    // Redistribuir el espacio: Hepatitis A (40mm), COVID (30mm), Dosis (30mm), Severidad (40mm), Fecha (60mm)
+    const posHepatitis = tablaInicioX + 40;
+    const posCovid = tablaInicioX + 70;
+    const posDosis = tablaInicioX + 100;
+    const posSeveridad = tablaInicioX + 140;
+    
+    // Dibujar líneas de la fila extendida
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(posHepatitis, yPos, posHepatitis, yPos + filaAltura); // División Hepatitis A / COVID
+    doc.line(posCovid, yPos, posCovid, yPos + filaAltura); // División COVID / Dosis
+    doc.line(posDosis, yPos, posDosis, yPos + filaAltura); // División Dosis / Severidad
+    doc.line(posSeveridad, yPos, posSeveridad, yPos + filaAltura); // División Severidad / Fecha
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+    
+    // Dibujar mini celda para Hepatitis A
+    const xCentradaHepatitisA = dibujarMiniCelda(tablaInicioX + 30, yPos, filaAltura);
+    
+    // Contenido Hepatitis A
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Hepatitis A", tablaInicioX + 2, yPos + 3.5);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    if (data.hepatitisABoro_hepatitisa) doc.text("X", xCentradaHepatitisA, yPos + 3.5);
+    
+    // Dibujar mini celda para COVID-19
+    const xCentradaCovid = dibujarMiniCelda(posHepatitis + 20, yPos, filaAltura);
+    
+    // Contenido COVID-19
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Covid-19", posHepatitis + 2, yPos + 3.5);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("X", xCentradaCovid, yPos + 3.5);
+    
+    // Número de dosis
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Dosis:", posCovid + 2, yPos + 3.5);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(datosFinales.severidadCovid.dosis || "", posCovid + 12, yPos + 3.5);
+    
+    // Severidad (solo el texto, sin etiqueta)
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    let severidadTexto = "";
+    if (datosFinales.severidadCovid.leve) {
+      severidadTexto = "Leve";
+    } else if (datosFinales.severidadCovid.moderado) {
+      severidadTexto = "Moderada";
+    } else if (datosFinales.severidadCovid.severo) {
+      severidadTexto = "Severa";
+    }
+    doc.text(severidadTexto, posDosis + 2, yPos + 3.5);
+    
+    // Fecha
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Fecha:", posSeveridad + 2, yPos + 3.5);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(datosFinales.severidadCovid.fechaExamen || "", posSeveridad + 15, yPos + 3.5);
+  } else {
+    // Si COVID no está marcado, usar la función normal
+    dibujarFilaVacunas("Hepatitis A", "Covid-19", null, null,
+      data.hepatitisABoro_hepatitisa, data.covid_chkcovid, null, null);
+  }
+  
+  yPos += filaAltura;
 
   // === NUEVA PÁGINA 2 ===
   doc.addPage();
