@@ -26,6 +26,14 @@ export const GetInfoServicio = async (
         onFinish
     );
     if (res) {
+        let presion_sistolica = parseFloat(res.sistolicaTriaje);
+        let presion_diastolica = parseFloat(res.diastolicaTriaje);
+        let htaNueva = false;
+        if (!isNaN(presion_sistolica) && !isNaN(presion_diastolica) &&
+            (presion_diastolica >= 140 || presion_sistolica >= 90)) {
+            htaNueva = true
+        }
+
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
@@ -48,6 +56,7 @@ export const GetInfoServicio = async (
             presion_sistolica: res.sistolicaTriaje ?? "",
             presion_diastolica: res.diastolicaTriaje ?? "",
 
+            hta_nueva: htaNueva,
             observaciones: res.conclusionObservaciones_txtobservaciones ?? "",
         }));
     }

@@ -86,7 +86,7 @@ export default function FichaSas() {
         cuello_mujer_normal: true, // true para SI, false para NO
         presion_sistolica: "",
         presion_diastolica: "",
-        hta_nueva: true, // true para SI, false para NO
+        hta_nueva: false, // true para SI, false para NO
 
         // Evaluación de vía aérea superior MALLAMPATI
         mallampati_grado: "1", // "1", "2", "3", "4"

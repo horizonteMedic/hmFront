@@ -130,7 +130,9 @@ const HistoriaOcupacional = ({
 
   const [form, setForm] = useState({
     norden: "",
+    codHo: null,
     nombres: "",
+    eliminados: [],
     fecha: today,
     //Area de trabajo
     areaO: "",
@@ -222,6 +224,7 @@ const HistoriaOcupacional = ({
     });
     setRegistros(nuevaLista);
     setRowData({
+      historiaDetalleId: null,
       fecha: "",
       empresa: "",
       altitud: "",
@@ -245,6 +248,8 @@ const HistoriaOcupacional = ({
   const handleClean = () => {
     setForm({
       norden: "",
+      codHo: null,
+      eliminados: [],
       nombres: "",
       fecha: today,
       areaO: "",
@@ -329,6 +334,12 @@ const HistoriaOcupacional = ({
     });
 
     if (confirm.isConfirmed) {
+      if(registros[indexToRemove].historiaDetalleId != null){
+        setForm((prev) => ({
+          ...prev,
+          eliminados: [...prev.eliminados, registros[indexToRemove].historiaDetalleId]
+        }));
+      }
       setRegistros((prev) =>
         prev.filter((_, index) => index !== indexToRemove)
       );

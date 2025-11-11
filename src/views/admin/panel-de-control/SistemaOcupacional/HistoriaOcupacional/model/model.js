@@ -9,6 +9,7 @@ export function SubmitHistoriaOcupacional(data,registros,user,token) {
         "dniUser": data.dniUser,
         "dniPa": data.dni,
         "userRegistro": user,
+        "codigosDetallesEliminar": data.codHo ? data.eliminados: null,
         "detalles": registros.map(reg => ({
             fecha: reg.fecha || '',
             empresa: reg.empresa || '',
@@ -20,7 +21,8 @@ export function SubmitHistoriaOcupacional(data,registros,user,token) {
             socavon: reg.socavon || '',
             riesgo: reg.riesgo || '',
             proteccion: reg.proteccion || '',
-            causaRetiro: reg.causaRetiro || ''
+            causaRetiro: reg.causaRetiro || '',
+            historiaDetalleId: data.codHo ? reg.historiaDetalleId ?? null : null,
         }))
     };    
 
