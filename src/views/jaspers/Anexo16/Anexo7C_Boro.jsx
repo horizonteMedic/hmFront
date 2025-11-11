@@ -1409,7 +1409,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("IMC:", divHabitos + 2, yIMC);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(datosFinales.medidasCorporales?.imc || "", divHabitos + 10, yIMC);
+  doc.text((datosFinales.medidasCorporales?.imc || "") + " kg/m²", divHabitos + 10, yIMC);
 
   // === COLUMNA 3: FUNCIÓN RESPIRATORIA (Espirometría) ===
   doc.setFont("helvetica", "bold").setFontSize(7); // Reducido para evitar cortes
@@ -1436,13 +1436,13 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("FVC:", divMedidas + 2, yFuncion);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  const fvcTexto = datosFinales.funcionRespiratoria?.fvc ? `${datosFinales.funcionRespiratoria.fvc}%` : "";
+  const fvcTexto = datosFinales.funcionRespiratoria?.fvc ? `${datosFinales.funcionRespiratoria.fvc}l` : "";
   doc.text(fvcTexto, divMedidas + 12, yFuncion);
 
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("FEV1:", divMedidas + 2, yFuncion + spacingFuncion);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  const fev1Texto = datosFinales.funcionRespiratoria?.fev1 ? `${datosFinales.funcionRespiratoria.fev1}%` : "";
+  const fev1Texto = datosFinales.funcionRespiratoria?.fev1 ? `${datosFinales.funcionRespiratoria.fev1}l` : "";
   doc.text(fev1Texto, divMedidas + 12, yFuncion + spacingFuncion);
 
   // Columna derecha
@@ -1455,7 +1455,7 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("FEF 25-75%:", divMedidas + anchoFuncionCol + 2, yFuncion + spacingFuncion);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  const fef2575Texto = datosFinales.funcionRespiratoria?.fef2575 ? `${datosFinales.funcionRespiratoria.fef2575}%` : "";
+  const fef2575Texto = datosFinales.funcionRespiratoria?.fef2575 ? `${datosFinales.funcionRespiratoria.fef2575}l/s` : "";
   doc.text(fef2575Texto, divMedidas + anchoFuncionCol + 20, yFuncion + spacingFuncion);
 
   // Línea horizontal separadora antes de "Conclusión"

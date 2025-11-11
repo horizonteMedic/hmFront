@@ -22,11 +22,22 @@ export default function InformeBurnout() {
         fechaExamen: today,
         nombreExamen: "",
 
-        // Datos Personales
+        // Datos personales
         nombres: "",
         apellidos: "",
         dni: "",
+        fechaNacimiento: "",
+        lugarNacimiento: "",
+        domicilioActual: "",
         edad: "",
+        estadoCivil: "",
+        nivelEstudios: "",
+
+        // Datos laborales
+        ocupacion: "",
+        cargoDesempenar: "",
+        empresa: "",
+        contrata: "",
 
         // Síndrome de Burnout
         sindromeBurnout: "",
@@ -72,105 +83,104 @@ export default function InformeBurnout() {
     return (
         <div className="space-y-6 px-4 pt-4">
             {/* Header con información del examen */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4 ">
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-                    <InputTextOneLine
-                        label="N° Orden"
-                        name="norden"
-                        value={form.norden}
-                        onKeyUp={handleSearch}
-                        onChange={handleChangeNumber}
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Fecha Entrevista"
-                        name="fechaExamen"
-                        type="date"
-                        value={form.fechaExamen}
-                        onChange={handleChangeSimple}
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Tipo de Examen"
-                        name="nombreExamen"
-                        value={form.nombreExamen}
-                        onChange={handleChange}
-                        labelWidth="120px"
-                    />
+            <div className="w-full space-y-3">
+                {/* Header */}
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        <InputTextOneLine
+                            label="N° Orden"
+                            name="norden"
+                            value={form.norden}
+                            onKeyUp={handleSearch}
+                            onChange={handleChangeNumber}
+                            labelWidth="120px"
+                        />
+                        <InputTextOneLine
+                            label="Fecha Examen"
+                            name="fechaExamen"
+                            type="date"
+                            value={form.fechaExamen}
+                            onChange={handleChangeSimple}
+                            labelWidth="120px"
+                        />
+                        <InputTextOneLine
+                            label="Nombre de Examen"
+                            name="nombreExamen"
+                            value={form.nombreExamen}
+                            disabled
+                            labelWidth="120px"
+                        />
+
+                    </div>
                 </div>
+
+                {/* Datos Personales */}
+                <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
+                    <legend className="font-bold mb-3 text-[10px]">Datos Personales</legend>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div className="space-y-3">
+                            <InputTextOneLine label="Nombres" name="nombres" value={form.nombres} disabled labelWidth="160px" />
+                            <InputTextOneLine label="Apellidos" name="apellidos" value={form.apellidos} disabled labelWidth="160px" />
+                            <InputTextOneLine label="Domicilio Actual" name="domicilioActual" value={form.domicilioActual} disabled labelWidth="160px" />
+                            <InputTextOneLine label="Fecha Nacimiento" name="fechaNacimiento" value={form.fechaNacimiento} disabled labelWidth="160px" />
+                            <InputTextOneLine label="Nivel de Estudios" name="nivelEstudios" value={form.nivelEstudios} disabled labelWidth="160px" />
+                        </div>
+                        <div className="space-y-3">
+                            <InputTextOneLine label="DNI" name="dni" value={form.dni} disabled labelWidth="160px" />
+                            <InputTextOneLine label="Edad (años)" name="edad" value={form.edad} disabled labelWidth="160px" />
+                            <InputTextOneLine label="Estado Civil" name="estadoCivil" value={form.estadoCivil} disabled labelWidth="160px" />
+                            <InputTextOneLine label="Lugar Nacimiento" name="lugarNacimiento" value={form.lugarNacimiento} disabled labelWidth="160px" />
+                        </div>
+                    </div>
+                </fieldset>
+
+                {/* Datos Laborales */}
+                <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
+                    <legend className="font-bold mb-3 text-[10px]">Datos Laborales</legend>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div className="space-y-3">
+                            <InputTextOneLine label="Ocupación" name="ocupacion" value={form.ocupacion} disabled labelWidth="160px" />
+                            <InputTextOneLine label="Cargo a desempeñar" name="cargoDesempenar" value={form.cargoDesempenar} disabled labelWidth="160px" />
+                        </div>
+                        <div className="space-y-3">
+                            <InputTextOneLine label="Empresa" name="empresa" value={form.empresa} disabled labelWidth="160px" />
+                            <InputTextOneLine label="Contrata" name="contrata" value={form.contrata} disabled labelWidth="160px" />
+                        </div>
+                    </div>
+                </fieldset>
             </div>
 
-            {/* Datos necesarios */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <h4 className="font-semibold mb-3 text-blue-700">Datos Necesarios</h4>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {/* Columna Izquierda */}
-                    <div className="space-y-3">
-                        <InputTextOneLine
-                            label="Nombres"
-                            name="nombres"
-                            value={form.nombres}
-                            disabled
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Apellidos"
-                            name="apellidos"
-                            value={form.apellidos}
-                            disabled
-                            labelWidth="120px"
-                        />
-                    </div>
-                    {/* Columna Derecha */}
-                    <div className="space-y-3">
-                        <InputTextOneLine
-                            label="DNI"
-                            name="dni"
-                            value={form.dni}
-                            disabled
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Edad"
-                            name="edad"
-                            value={form.edad}
-                            disabled
-                            labelWidth="120px"
-                        />
-                    </div>
-                </div>
-            </div>
 
             {/* Criterios Psicológicos */}
-            <section className="bg-white border border-gray-200 rounded-lg p-4">
-                <h3 className="font-semibold mb-3 text-blue-700">Criterios Psicológicos</h3>
+            <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
+                <legend className="font-bold mb-3 text-[10px]">Criterios Psicológicos</legend>
                 <div className="space-y-4">
                     <InputTextOneLine
                         label="Síndrome de Burnout"
                         name="sindromeBurnout"
                         value={form?.sindromeBurnout}
                         onChange={handleChange}
-                        labelWidth="160px"
+                        labelWidth="170px"
                     />
                     <div className="pt-2">
-                        <h5 className="font-semibold text-gray-700 mb-2">III. Sub Escalas</h5>
-                        <div className="grid grid-cols-1 gap-3">
+                        <h5 className="font-bold  mb-3">III. Sub Escalas</h5>
+                        <div className="grid grid-cols-1 gap-3 ml-4">
                             <InputTextOneLine
-                                label="Agotamiento Emocional"
+                                label="-Agotamiento Emocional"
                                 name="agotamientoEmocional"
                                 value={form?.agotamientoEmocional}
                                 onChange={handleChange}
                                 labelWidth="160px"
                             />
                             <InputTextOneLine
-                                label="Despersonalización"
+                                label="-Despersonalización"
                                 name="despersonalizacion"
                                 value={form?.despersonalizacion}
                                 onChange={handleChange}
                                 labelWidth="160px"
                             />
                             <InputTextOneLine
-                                label="Realización Personal"
+                                label="-Realización Personal"
                                 name="realizacionPersonal"
                                 value={form?.realizacionPersonal}
                                 onChange={handleChange}
@@ -179,11 +189,11 @@ export default function InformeBurnout() {
                         </div>
                     </div>
                 </div>
-            </section>
+            </fieldset>
 
             {/* Resultados */}
-            <section className="bg-white border border-gray-200 rounded-lg p-4">
-                <h3 className="font-semibold mb-3 text-blue-700">Resultados</h3>
+            <fieldset className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
+                <legend className="font-bold mb-3 text-[10px]">Conclusiones Finales</legend>
                 <InputTextArea
                     label="Resultados"
                     name="resultados"
@@ -191,10 +201,6 @@ export default function InformeBurnout() {
                     onChange={handleChange}
                     rows={4}
                 />
-            </section>
-
-            {/* Conclusiones y Recomendaciones */}
-            <section className="bg-white border border-gray-200 rounded-lg p-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <InputTextArea
                         label="Conclusiones"
@@ -211,7 +217,7 @@ export default function InformeBurnout() {
                         rows={4}
                     />
                 </div>
-            </section>
+            </fieldset>
 
             {/* Acciones */}
             <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-4">

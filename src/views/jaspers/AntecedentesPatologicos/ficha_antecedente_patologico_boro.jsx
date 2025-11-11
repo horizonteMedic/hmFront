@@ -227,6 +227,7 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   severidadCovid: {
     covid19: Boolean(data.covid_chkcovid || false),
     fechaExamen: data.covid_chkcovid ? formatearFechaCorta(data.fechaCovid_fechacovid || "") : "",
+    dosis: String(data.dosisVacunas_txtdosis || ""),
     leve: Boolean(data.covidLevel_chkcovidl || false),
     moderado: Boolean(data.covidModerado_chkcovidm || false),
     severo: Boolean(data.covidSevero_chkcovids || false)
@@ -1952,19 +1953,48 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("COVID 19", tablaInicioX + 2, yPos + 3.5);
   const xCovid = dibujarMiniCelda(tablaInicioX + 42, yPos, filaAltura3);
+  
+  // Si está marcado, agregar celda para número de dosis y severidad
   if (datosFinales.severidadCovid && datosFinales.severidadCovid.covid19) {
+    // Línea vertical para separar la celda de dosis (después de la mini celda que termina en ~52)
+    const posicionDivisionDosis = tablaInicioX + 52; // Después de la mini celda
+    const anchoCeldaDosis = 30; // Ancho de la celda de dosis
+    const posicionFinCeldaDosis = posicionDivisionDosis + anchoCeldaDosis;
+    const anchoCeldaSeveridad = 35; // Ancho de la celda de severidad
+    const posicionFinCeldaSeveridad = posicionFinCeldaDosis + anchoCeldaSeveridad;
+    
+    // Dibujar líneas divisorias
+    doc.line(posicionDivisionDosis, yPos, posicionDivisionDosis, yPos + filaAltura3);
+    doc.line(posicionFinCeldaDosis, yPos, posicionFinCeldaDosis, yPos + filaAltura3);
+    doc.line(posicionFinCeldaSeveridad, yPos, posicionFinCeldaSeveridad, yPos + filaAltura3);
+    
     doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", xCovid, yPos + 3.5); doc.setTextColor(0,0,0);
+    
+    // Mostrar número de dosis en la nueva celda
     doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text("Fecha:", tablaInicioX + 60, yPos + 3.5);
+    doc.text("N° de dosis:", posicionDivisionDosis + 2, yPos + 3.5);
     doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(datosFinales.severidadCovid.fechaExamen || "", tablaInicioX + 75, yPos + 3.5);
+    doc.text(datosFinales.severidadCovid.dosis || "", posicionDivisionDosis + 24, yPos + 3.5);
+    
+    // Mostrar severidad en celda separada
     doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text("Leve (", tablaInicioX + 100, yPos + 3.5);
-    if (datosFinales.severidadCovid.leve) { doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", tablaInicioX + 111, yPos + 3.5); doc.setTextColor(0,0,0);} doc.setFont("helvetica", "bold").setFontSize(8); doc.text(")", tablaInicioX + 116, yPos + 3.5);
-    doc.text("Moderado (", tablaInicioX + 125, yPos + 3.5);
-    if (datosFinales.severidadCovid.moderado) { doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", tablaInicioX + 141, yPos + 3.5); doc.setTextColor(0,0,0);} doc.setFont("helvetica", "bold").setFontSize(8); doc.text(")", tablaInicioX + 146, yPos + 3.5);
-    doc.text("Severo (", tablaInicioX + 155, yPos + 3.5);
-    if (datosFinales.severidadCovid.severo) { doc.setFont("helvetica", "bold").setFontSize(9); doc.setTextColor(255,0,0); doc.text("X", tablaInicioX + 169, yPos + 3.5); doc.setTextColor(0,0,0);} doc.setFont("helvetica", "bold").setFontSize(8); doc.text(")", tablaInicioX + 174, yPos + 3.5);
+    doc.text("Severidad:", posicionFinCeldaDosis + 2, yPos + 3.5);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    let severidadTexto = "";
+    if (datosFinales.severidadCovid.leve) {
+      severidadTexto = "Leve";
+    } else if (datosFinales.severidadCovid.moderado) {
+      severidadTexto = "Moderada";
+    } else if (datosFinales.severidadCovid.severo) {
+      severidadTexto = "Severa";
+    }
+    doc.text(severidadTexto, posicionFinCeldaDosis + 20, yPos + 3.5);
+    
+    // Fecha después de la severidad
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Fecha:", posicionFinCeldaSeveridad + 2, yPos + 3.5);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(datosFinales.severidadCovid.fechaExamen || "", posicionFinCeldaSeveridad + 17, yPos + 3.5);
   }
   yPos += filaAltura3;
 
