@@ -257,6 +257,7 @@ export default function AntecedentesPatologicos({ listas }) {
     diasHospitalizacion: "",
     complicaciones: "",
     antecedentes: [],
+    antecedentesEliminados: [],
 
     hijosVivos: "",
     hijosFallecidos: "",

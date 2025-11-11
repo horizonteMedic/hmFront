@@ -801,11 +801,27 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
 
   // Filas de hábitos
   habitosNocivos.forEach((habito) => {
-    // Líneas de la fila
+    // Calcular altura necesaria para el campo de cantidad/frecuencia (si tiene texto largo)
+    let alturaNecesaria = filaAltura;
+    const yTextoInicio = yPos + 3.5;
+    const xInicioCantidad = 137; // Posición X donde comienza el texto de cantidad/frecuencia
+    const anchoDisponibleCantidad = colCantWidth - 2; // Ancho disponible: ancho de columna menos márgenes
+    
+    // Calcular altura necesaria para cantidad usando splitTextToSize
+    let lineasCantidad = [];
+    const cantidadTexto = (habito.cantidad === null || habito.cantidad === undefined || habito.cantidad === "") ? "-" : habito.cantidad;
+    if (cantidadTexto && cantidadTexto !== "-") {
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      lineasCantidad = doc.splitTextToSize(cantidadTexto, anchoDisponibleCantidad);
+      const alturaCantidad = Math.max(filaAltura, lineasCantidad.length * 2.8 + 2);
+      alturaNecesaria = Math.max(alturaNecesaria, alturaCantidad);
+    }
+    
+    // Dibujar líneas de la fila con altura dinámica
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos + alturaNecesaria, tablaInicioX + tablaAncho, yPos + alturaNecesaria);
     verticalLinesHab.forEach(x => {
-      doc.line(x, yPos, x, yPos + filaAltura);
+      doc.line(x, yPos, x, yPos + alturaNecesaria);
     });
 
     // Contenido
@@ -823,9 +839,19 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     doc.setFont("helvetica", "normal").setFontSize(7);
     const tipoTexto = (habito.tipo === null || habito.tipo === undefined || habito.tipo === "") ? "-" : habito.tipo;
     doc.text(tipoTexto, 82, yPos + 3.5);
-    const cantidadTexto = (habito.cantidad === null || habito.cantidad === undefined || habito.cantidad === "") ? "-" : habito.cantidad;
-    doc.text(cantidadTexto, 137, yPos + 3.5);
-    yPos += filaAltura;
+    
+    // Cantidad/Frecuencia con salto de línea si es necesario
+    if (cantidadTexto && cantidadTexto !== "-" && lineasCantidad.length > 0) {
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      // Dibujar cada línea usando splitTextToSize
+      lineasCantidad.forEach((linea, index) => {
+        doc.text(linea, xInicioCantidad, yTextoInicio + (index * 2.8));
+      });
+    } else {
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      doc.text(cantidadTexto, xInicioCantidad, yPos + 3.5);
+    }
+    yPos += alturaNecesaria;
   });
 
   // === SECCIÓN 4: ANTECEDENTES PATOLÓGICOS FAMILIARES ===
@@ -1860,10 +1886,37 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
 
   // Fila dinámica para restricciones
   const textoRestricciones = (datosFinales.restricciones || "").toString();
-  const datosRestricciones = textoRestricciones ? textoRestricciones.toUpperCase() : "-";
+  
+  // Preservar símbolos especiales como ≥, ≤, etc. antes de convertir a mayúsculas
+  // Reemplazar temporalmente los símbolos, convertir a mayúsculas, y luego restaurarlos
+  const simbolosEspeciales = [
+    { original: '≥', temporal: '___MAYOR_IGUAL___' },
+    { original: '≤', temporal: '___MENOR_IGUAL___' },
+    { original: '≠', temporal: '___DIFERENTE___' },
+    { original: '±', temporal: '___MAS_MENOS___' }
+  ];
+  
+  let textoProcesado = textoRestricciones;
+  // Guardar los símbolos originales
+  simbolosEspeciales.forEach(simbolo => {
+    textoProcesado = textoProcesado.replace(new RegExp(simbolo.original, 'g'), simbolo.temporal);
+  });
+  
+  // Convertir a mayúsculas
+  const datosRestricciones = textoProcesado ? textoProcesado.toUpperCase() : "-";
+  
+  // Restaurar los símbolos originales
+  let datosFinalesRestricciones = datosRestricciones;
+  simbolosEspeciales.forEach(simbolo => {
+    datosFinalesRestricciones = datosFinalesRestricciones.replace(new RegExp(simbolo.temporal, 'g'), simbolo.original);
+  });
+  
+  // Si jsPDF no renderiza bien "≥", reemplazarlo por ">=" para mejor compatibilidad
+  // Comentar esta línea si el símbolo se renderiza correctamente
+  datosFinalesRestricciones = datosFinalesRestricciones.replace(/≥/g, '>=');
 
   const anchoDisponibleRestricciones = tablaAncho - 4;
-  const lineasRestricciones = doc.splitTextToSize(datosRestricciones, anchoDisponibleRestricciones);
+  const lineasRestricciones = doc.splitTextToSize(datosFinalesRestricciones, anchoDisponibleRestricciones);
   const alturaDinamicaRestricciones = Math.max(20, lineasRestricciones.length * interlineadoConclusiones + 4);
 
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaRestricciones);
