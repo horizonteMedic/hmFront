@@ -33,7 +33,7 @@ export default function Oftalmologia(datos = {}) {
     sede: datos.sede || "",
     // Datos adicionales
     direccionPaciente: String(datos.direccion || ""),
-    fechaNacimiento: formatearFechaCorta(datos.fechaNacimiento),
+    fechaNacimiento: formatearFechaCorta(datos.fechaNac),
   };
 
   // Función para convertir texto a mayúsculas
@@ -441,7 +441,6 @@ export default function Oftalmologia(datos = {}) {
   // Texto debajo del cuadro
   doc.setFont("helvetica", "normal").setFontSize(8);
   const centroFirmaMedico = firmaMedicoX + (firmaMedicoWidth / 2);
-  doc.text("Firma del Médico", centroFirmaMedico, firmaMedicoY + firmaMedicoHeight + 5, { align: "center" });
   
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8});
