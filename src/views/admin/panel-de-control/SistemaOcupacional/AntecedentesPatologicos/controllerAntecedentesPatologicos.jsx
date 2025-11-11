@@ -4,7 +4,6 @@ import {
     LoadingDefault,
     PrintHojaRDefault,
     SubmitDataServiceDefault,
-    VerifyTRDefault,
 } from "../../../../utils/functionUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
 
@@ -30,7 +29,6 @@ export const GetInfoServicio = async (
     if (res) {
         set((prev) => ({
             ...prev,
-            ...res,
             norden: res.n_orden,
             codigoAntecedentesPatologicos_cod_ap: res.codigoAntecedentesPatologicos_cod_ap,
             nombres: res.nombres_nombres_pa + " " + res.apellidos_apellidos_pa,
@@ -55,6 +53,16 @@ export const GetInfoServicio = async (
             cocainaRed: (res.cocainaLaboratorioClinico_txtcocaina ?? "") == "POSITIVO",
             marihuana: res.marihuanaLaboratorioClinico_txtmarihuana,
             marihuanaRed: (res.marihuanaLaboratorioClinico_txtmarihuana ?? "") == "POSITIVO",
+
+            antecedentes: res.antecedentesPatologicosQuirurjicos.map((item) => ({
+                codAntecedentesPatologicosQuirurgicos: item.codAntecedentesPatologicosQuirurgicos,
+                quirurjicosId: item.quirurjicosId,
+                fecha: item.fecha,
+                hospitalOperacion: item.hospitalOperacion,
+                operacion: item.operacion,
+                diasHospitalizado: item.diasHospitalizado,
+                complicaciones: item.complicaciones,
+            })) || [],
         }));
     }
 };
@@ -76,7 +84,6 @@ export const GetInfoServicioEditar = async (
     if (res) {
         set((prev) => ({
             ...prev,
-            ...res,
             //PRIMERA TAB==========================================================================
             norden: res.n_orden,
             codigoAntecedentesPatologicos_cod_ap: res.codigoAntecedentesPatologicos_cod_ap,
@@ -309,8 +316,9 @@ export const GetInfoServicioEditar = async (
             //TERCERA TAB==========================================================================
             // antecedentes: res.antecedentesPatologicosQuirurjicos || [],
             antecedentes: res.antecedentesPatologicosQuirurjicos.map((item) => ({
-                codAntecedentesPatologicosQuirurgicos: item.codigoAntecedentesPatologicosQuirurgicos,
-                fecha: item.fechaAntecedentesPatologicosQuirurgicos,
+                codAntecedentesPatologicosQuirurgicos: item.codAntecedentesPatologicosQuirurgicos,
+                quirurjicosId: item.quirurjicosId,
+                fecha: item.fecha,
                 hospitalOperacion: item.hospitalOperacion,
                 operacion: item.operacion,
                 diasHospitalizado: item.diasHospitalizado,
@@ -352,7 +360,7 @@ export const SubmitDataService = async (
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
     }
-    console.log({ ff: form.severidadCovid })
+    console.log({ ff: form.antecedentesEliminados })
     const body = {
         norden: form.norden,
         codigoAntecedentesPatologicos: form.codigoAntecedentesPatologicos_cod_ap,
@@ -565,7 +573,12 @@ export const SubmitDataService = async (
         electricos: form.electricos,
         otros: form.otrosAgentes,
 
-        antecedentesPatologicosQuirurgicos: form.antecedentes || null,
+        antecedentesPatologicosQuirurgicos: form.antecedentes.map(reg => ({
+            ...reg,
+            quirurjicosId: form.codigoAntecedentesPatologicos_cod_ap ? reg.quirurjicosId : null,
+        })),//form.antecedentes || null,
+        eliminarPatologicosQuirurjicos:
+            form.codigoAntecedentesPatologicos_cod_ap ? form.antecedentesEliminados : null,
         userRegistro: user,
     };
     console.log(body)
