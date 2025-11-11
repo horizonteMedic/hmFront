@@ -13,150 +13,6 @@ export default function B_FichaDetencionSAS2(data = {}) {
   // Contador de páginas dinámico
   let numeroPagina = 1;
 
-  // Datos de prueba por defecto
-  const datosPrueba = {
-    numeroHistoria: "96639",
-    tipoExamen: "PRE-OCUPACIONAL",
-    apellidosNombres: "HADY KATHERINE CASTILLO PLASENCIA",
-    documentoIdentidad: "72384273",
-    genero: "FEMENINO",
-    edad: "31",
-    tipoLicencia: "A1",
-    empresa: "MINERA BOROO MISQUICHILCA S.A.C",
-    contratista: "LIMALA S.A.C",
-    puestoTrabajo: "OPERADOR DE MAQUINARIA PESADA",
-    trabajaNoche: true,
-    diasTrabajo: "5",
-    diasDescanso: "2",
-    anosTrabajoHorario: "3",
-    fechaExamen: "04/11/2024",
-    // Datos de color
-    color: 1,
-    codigoColor: "#008f39",
-    textoColor: "F",
-    // Datos adicionales para header
-    numeroFicha: "99164",
-    sede: "Trujillo-Pierola",
-    // Datos de checkboxes para SAS
-    apneaSueno: {
-      si: false,
-      no: true,
-      aplica: false
-    },
-    hta: {
-      si: true,
-      no: false,
-      aplica: true
-    },
-    medicacionRiesgo: "",
-    polisomnografia: {
-      si: true,
-      no: false,
-      fecha: "17/10/2025",
-      aplica: false
-    },
-    choqueVehiculo: {
-      enMina: {
-        si: false,
-        no: true
-      },
-      fueraMina: {
-        si: false,
-        no: true
-      },
-      aplica: true
-    },
-    // Detalle de choques
-    detalleChoques: "Accidente ocurrido en la mina el 15 de marzo de 2023. El vehículo se deslizó por una pendiente pronunciada debido a las condiciones climáticas adversas. No hubo heridos graves, solo daños materiales menores al vehículo. Se implementaron medidas correctivas inmediatas para evitar futuros incidentes similares.",
-    // Criterio 1
-    criterio1: {
-      cabeceoAccidente: true
-    },
-    // Criterio 2 (2 o más es positivo)
-    criterio2: {
-      accidenteUltimas5Horas: false,
-      ausenciaManiobraEvasiva: true,
-      colisionFrontal: false,
-      vehiculoInvadioCarril: false,
-      conductorNoRecuerda: false,
-      conductorTomoMedicacion: false,
-      conductorHorasExtra: false
-    },
-    // Clasificación de choques
-    clasificacionChoques: {
-      accidenteConfirmadoSomnolencia: true,
-      accidenteAltaSospechaSomnolencia: false,
-      accidenteEscasaEvidenciaSomnolencia: false,
-      noDatosSuficientes: true,
-      accidenteNoDebidoSomnolencia: false
-    },
-    // Entrevista al paciente
-    entrevistaPaciente: {
-      parejaComentoRonca: true,
-      parejaComentoRuidosRespirar: false,
-      parejaComentoPausaRespiratoria: false,
-      masSueñoQueCompañeros: true
-    },
-    // Escala de Epworth
-    escalaEpworth: {
-      puntuacionTotal: 3
-    },
-    // Datos de examen físico para página 2
-    pesoPaciente: "75",
-    tallaPaciente: "1.75",
-    imcPaciente: "24.49",
-    circunferenciaCuello: "44",
-    circunferenciaVaronNormal: true,
-    circunferenciaMujerNormal: false,
-    presionSistolica: "120",
-    presionDiastolica: "80",
-    htaNueva: false,
-    // Grados de Mallampati
-    mallampatiGradoI: true,
-    mallampatiGradoII: true,
-    mallampatiGradoIII: true,
-    mallampatiGradoIV: true,
-    // Datos de conclusión de evaluación
-    riesgoAlto: {
-      criterioA: {
-        si: false,
-        no: true
-      },
-      criterioB: {
-        si: false,
-        no: true
-      }
-    },
-    riesgoMedio: {
-      criterioC: {
-        si: false,
-        no: true
-      },
-      criterioD: {
-        si: false,
-        no: true,
-        subcriterios: [
-          { si: false, no: true }, // IMC mayor o igual a 30
-          { si: false, no: true }, // Hipertensión Arterial
-          { si: false, no: true }, // Circunferencia del cuello anormal
-          { si: false, no: true }, // Puntuación de Epworth 10-16
-          { si: false, no: true }, // Antecedente de transtorno del sueño
-          { si: false, no: true }  // Índice de ápnea-hipopnea
-        ]
-      },
-      criterioE: {
-        si: false,
-        no: true
-      }
-    },
-    riesgoBajo: {
-      si: false,
-      no: true
-    },
-    // Observaciones/Recomendaciones
-    observaciones: "El paciente presenta factores de riesgo moderados para apnea del sueño. "
-  };
-
   const datosReales = {
     numeroHistoria: String(data.norden ?? ""),
     tipoExamen: String(data.nombreExamen ?? ""),
@@ -253,7 +109,8 @@ export default function B_FichaDetencionSAS2(data = {}) {
     circunferenciaMujerNormal: Boolean(data.examenFisicoMujerSi_chkmujersi ?? false),
     presionSistolica: String(data.sistolicaTriaje ?? ""),
     presionDiastolica: String(data.diastolicaTriaje ?? ""),
-    htaNueva: Boolean(data.examenFisicoHtaNuevaSi_chkhtanuevasi ?? false),
+    htaNueva: (data.examenFisicoHtaNuevaSi_chkhtanuevasi === true) ? true : 
+              (data.examenFisicoHtaNuevaNo_chkhtanuevano === true) ? false : false,
     // Grados de Mallampati
     mallampatiGradoI: Boolean(data.examenFisicoGradoI_chkgradoi ?? false),
     mallampatiGradoII: Boolean(data.examenFisicoGradoII_chkgradoii ?? false),
@@ -301,8 +158,8 @@ export default function B_FichaDetencionSAS2(data = {}) {
   };
 
   console.log(datosReales)
-  // Usar datos reales si existen, sino usar datos de prueba
-  const datosFinales = data && Object.keys(data).length > 0 ? datosReales : datosPrueba;
+  // Usar datos reales
+  const datosFinales = datosReales;
 
 
   // Header reutilizable (igual que Aptitud_Agroindustrial.jsx)
@@ -1524,7 +1381,7 @@ export default function B_FichaDetencionSAS2(data = {}) {
   doc.text("P. Diastólica :", tablaExamenInicioX + 52, yTextoExamen + 1);
   doc.text(datosFinales.presionDiastolica + " mmHg.", tablaExamenInicioX + 70, yTextoExamen + 1);
 
-  doc.text("HTA nueva:", tablaExamenInicioX + 112, yTextoExamen + 1);
+  doc.text("HTA:", tablaExamenInicioX + 112, yTextoExamen + 1);
   const htaNueva = datosFinales.htaNueva;
   const htaNuevaSiTexto = crearCheckboxFijo(htaNueva, "Si");
   const htaNuevaNoTexto = crearCheckboxFijo(!htaNueva, "No");
