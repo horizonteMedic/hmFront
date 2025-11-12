@@ -48,7 +48,6 @@ export default function AntecedentesPatologicosTab({
                   ...prev,
                   severidadCovid: "",
                   fechaCovid: today,
-                  dosisVacunas: "",
                 }));
                 handleCheckBoxChange(e)
               }}
@@ -80,7 +79,6 @@ export default function AntecedentesPatologicosTab({
             name="dosisVacunas"
             value={form?.dosisVacunas}
             onChange={handleChangeNumber}
-            disabled={!form?.covid19}
             labelWidth="120px" />
         </div>
 
