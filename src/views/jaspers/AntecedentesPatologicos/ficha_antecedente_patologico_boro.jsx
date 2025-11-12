@@ -1585,7 +1585,7 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   yPos = dibujarHeaderSeccion("5. HÁBITOS:", yPos, filaAltura);
 
   // Función para dibujar una fila de hábito
-  const dibujarFilaHabito = (nombreHabito, si, no, tipo, frecuencia) => {
+  const dibujarFilaHabito = (nombreHabito, si, no, tipo, frecuencia, especifique = null) => {
     // Calcular altura necesaria para el campo de frecuencia (si tiene texto largo)
     let alturaNecesaria = filaAltura;
     const yTextoInicio = yPos + 3.5;
@@ -1600,6 +1600,29 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
       lineasFrecuencia = doc.splitTextToSize(frecuenciaTexto, anchoDisponibleFrecuencia);
       const alturaFrecuencia = Math.max(filaAltura, lineasFrecuencia.length * 2.8 + 2);
       alturaNecesaria = Math.max(alturaNecesaria, alturaFrecuencia);
+    }
+    
+    // Calcular altura necesaria para especifique (si existe y no hay tipo ni frecuencia)
+    let lineasEspecifique = [];
+    let textoEspecifiqueLimpio = "";
+    if (!tipo && especifique) {
+      // Limpiar el texto de especifique (remover "Especifique:" si ya está incluido)
+      textoEspecifiqueLimpio = String(especifique).trim();
+      if (textoEspecifiqueLimpio.toLowerCase().startsWith("especifique:")) {
+        textoEspecifiqueLimpio = textoEspecifiqueLimpio.substring(12).trim();
+      }
+      
+      if (textoEspecifiqueLimpio) {
+        const textoCapitalizado = capitalizarTexto(textoEspecifiqueLimpio);
+        const xInicioEspecifique = tablaInicioX + 80;
+        const anchoDisponibleEspecifique = tablaAncho + tablaInicioX - xInicioEspecifique - 2;
+        
+        // Calcular altura necesaria para especifique usando splitTextToSize
+        doc.setFont("helvetica", "normal").setFontSize(8);
+        lineasEspecifique = doc.splitTextToSize(textoCapitalizado, anchoDisponibleEspecifique);
+        const alturaEspecifique = Math.max(filaAltura, lineasEspecifique.length * 2.8 + 2);
+        alturaNecesaria = Math.max(alturaNecesaria, alturaEspecifique);
+      }
     }
     
     // Dibujar líneas de la fila con altura dinámica
@@ -1657,10 +1680,17 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
       lineasFrecuencia.forEach((linea, index) => {
         doc.text(linea, xInicioFrecuencia, yTextoInicio + (index * 2.8));
       });
-    } else if (!tipo) {
-      // Si no hay tipo ni frecuencia, usar el campo especifique antiguo (para compatibilidad)
-      doc.setFont("helvetica", "normal").setFontSize(8);
+    } else if (!tipo && especifique && textoEspecifiqueLimpio && lineasEspecifique.length > 0) {
+      // Si no hay tipo ni frecuencia pero hay especifique, dibujar especifique con su valor
+      // Dibujar "Especifique:" y el texto
+      doc.setFont("helvetica", "bold").setFontSize(8);
       doc.text("Especifique:", tablaInicioX + 60, yPos + 3.5);
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      // Dibujar cada línea del texto de especifique
+      const xInicioEspecifique = tablaInicioX + 80;
+      lineasEspecifique.forEach((linea, index) => {
+        doc.text(linea, xInicioEspecifique, yTextoInicio + (index * 2.8));
+      });
     }
     
     yPos += alturaNecesaria;
@@ -1688,22 +1718,10 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   dibujarFilaHabito("Drogas", datosFinales.drogasSi, datosFinales.drogasNo, tipoDrogas || null, frecuenciaDrogas || null);
   
   // Medicamentos: usar medicamentosEspecifique (sin separar tipo/frecuencia)
-  dibujarFilaHabito("Medicamentos", datosFinales.medicamentosSi, datosFinales.medicamentosNo, null, null);
-  if (datosFinales.medicamentosEspecifique) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text("Especifique:", tablaInicioX + 60, yPos - filaAltura + 3.5);
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(capitalizarTexto(datosFinales.medicamentosEspecifique), tablaInicioX + 80, yPos - filaAltura + 3.5);
-  }
+  dibujarFilaHabito("Medicamentos", datosFinales.medicamentosSi, datosFinales.medicamentosNo, null, null, datosFinales.medicamentosEspecifique || null);
   
   // Actividad Física: usar actividadFisicaEspecifique (sin separar tipo/frecuencia)
-  dibujarFilaHabito("Actividad Física", datosFinales.actividadFisicaSi, datosFinales.actividadFisicaNo, null, null);
-  if (datosFinales.actividadFisicaEspecifique) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text("Especifique:", tablaInicioX + 60, yPos - filaAltura + 3.5);
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(capitalizarTexto(datosFinales.actividadFisicaEspecifique), tablaInicioX + 80, yPos - filaAltura + 3.5);
-  }
+  dibujarFilaHabito("Actividad Física", datosFinales.actividadFisicaSi, datosFinales.actividadFisicaNo, null, null, datosFinales.actividadFisicaEspecifique || null);
   
   // Otros: usar tipoOtros y frecuenciaOtros
   const tipoOtros = datosFinales.habitos?.tipoOtros || "";
