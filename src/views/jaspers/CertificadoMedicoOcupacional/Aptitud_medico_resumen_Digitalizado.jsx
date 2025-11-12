@@ -137,7 +137,7 @@ export default function Aptitud_medico_resumen_Digitalizado( data = {} ) {
 
     // Header de sección filiación (datos personales)
     const dibujarHeaderSeccion = (titulo, yPosLocal, alturaHeader = 4) => {
-      doc.setFillColor(160, 160, 160);
+      doc.setFillColor(196, 196, 196);
       doc.rect(tablaInicioX, yPosLocal, tablaAncho, alturaHeader, 'F');
       doc.line(tablaInicioX, yPosLocal, tablaInicioX + tablaAncho, yPosLocal);
       doc.line(tablaInicioX, yPosLocal + alturaHeader, tablaInicioX + tablaAncho, yPosLocal + alturaHeader);

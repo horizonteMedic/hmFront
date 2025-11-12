@@ -471,7 +471,7 @@ export default function UsoRespiradores(data = {}) {
   // Función general para dibujar header de sección con fondo gris
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
     // Dibujar fondo gris más oscuro
-    doc.setFillColor(160, 160, 160); // Gris más oscuro
+    doc.setFillColor(196, 196, 196); // Gris más oscuro
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
 
     // Dibujar líneas del header
@@ -494,7 +494,7 @@ export default function UsoRespiradores(data = {}) {
     const colSi = 10;
 
     // Dibujar fondo gris más oscuro
-    doc.setFillColor(160, 160, 160); // Gris más oscuro
+    doc.setFillColor(196, 196, 196); // Gris más oscuro
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
 
     // Configurar líneas con grosor consistente
@@ -698,11 +698,11 @@ export default function UsoRespiradores(data = {}) {
 
   // Fila con división central y dos textos con fondos de colores
   // Primero dibujar el fondo verde para la primera mitad
-  doc.setFillColor(173, 216, 230); // Verde claro
+  doc.setFillColor(199, 241, 255); // Verde claro
   doc.rect(tablaInicioX, yPos, tablaAncho / 2, filaAltura, 'F');
 
   // Luego dibujar el fondo azul claro para la segunda mitad
-  doc.setFillColor(173, 216, 230); // Azul claro (light blue)
+  doc.setFillColor(199, 241, 255); // Azul claro (light blue)
   doc.rect(tablaInicioX + tablaAncho / 2, yPos, tablaAncho / 2, filaAltura, 'F');
 
   // Luego dibujar las líneas
@@ -856,7 +856,7 @@ export default function UsoRespiradores(data = {}) {
 
   // Fila 7 - Solo dos textos con fondo de color solo en la parte derecha
   // Primero dibujar el fondo azul claro solo para la parte derecha (después de la división central)
-  doc.setFillColor(173, 216, 230); // Azul claro (light blue)
+  doc.setFillColor(199, 241, 255); // Azul claro (light blue)
   doc.rect(tablaInicioX + tablaAncho / 2, yPos, tablaAncho / 2, filaAltura, 'F');
 
   // Luego dibujar las líneas
@@ -1031,7 +1031,7 @@ export default function UsoRespiradores(data = {}) {
 
   // Fila 12 - Tipo de Protección con fondo gris en la primera mitad
   // Primero dibujar el fondo gris solo para la primera mitad
-  doc.setFillColor(173, 216, 230); // Gris más oscuro (igual que dibujarHeaderSeccion)
+  doc.setFillColor(199, 241, 255); // Gris más oscuro (igual que dibujarHeaderSeccion)
   doc.rect(tablaInicioX, yPos, tablaAncho / 2, filaAltura, 'F');
 
   // Luego dibujar las líneas
@@ -1166,7 +1166,7 @@ export default function UsoRespiradores(data = {}) {
   yPos += filaAltura;
 
   // Fondo azul claro para la mitad derecha (como en otras filas de ejemplo)
-  doc.setFillColor(173, 216, 230);
+  doc.setFillColor(199, 241, 255);
   doc.rect(tablaInicioX + tablaAncho / 2, yPos - filaAltura, tablaAncho / 2, filaAltura, 'F');
 
   // Re-dibujar líneas de la fila 16 para que queden sobre el fondo
@@ -1234,7 +1234,7 @@ export default function UsoRespiradores(data = {}) {
   yPos += filaAltura;
 
   // Fondo celeste para la parte izquierda de la fila (Esfuerzo Físico Esperado Requerido)
-  doc.setFillColor(173, 216, 230);
+  doc.setFillColor(199, 241, 255);
   doc.rect(tablaInicioX, yPos - filaAltura, tablaAncho / 2, filaAltura, 'F');
 
   // Re-dibujar líneas de la fila 18 para que queden sobre el fondo
@@ -1485,7 +1485,7 @@ export default function UsoRespiradores(data = {}) {
     doc.setLineWidth(0.2);
 
     // Dibujar fondo gris para el header
-    doc.setFillColor(160, 160, 160);
+    doc.setFillColor(196, 196, 196);
     doc.rect(leftMargin, yPos, colTexto + colNo + colSi, alturaFila, 'F');
 
     // Dibujar líneas del header
@@ -1799,7 +1799,7 @@ export default function UsoRespiradores(data = {}) {
   doc.line(tablaInicioX, yPos + alturaFilaExtendida, tablaInicioX + tablaAncho, yPos + alturaFilaExtendida); // Línea inferior
 
   // Dibujar fondo gris para el header
-  doc.setFillColor(160, 160, 160);
+  doc.setFillColor(196, 196, 196);
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaFilaExtendida, 'F');
 
   // Dibujar el texto con salto de línea

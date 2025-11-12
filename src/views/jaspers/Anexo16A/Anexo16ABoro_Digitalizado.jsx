@@ -228,7 +228,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     doc.setLineWidth(0.2);
     
     // Dibujar fondo gris más oscuro
-    doc.setFillColor(160, 160, 160);
+    doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
     
     // Dibujar líneas del header
@@ -444,7 +444,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     doc.setLineWidth(0.2);
     
     // Dibujar fondo gris más oscuro
-    doc.setFillColor(160, 160, 160);
+    doc.setFillColor(196, 196, 196);
     doc.rect(leftMargin, yPos, colTexto + colNo + colSi, alturaHeader, 'F');
     
     // Dibujar líneas del header

@@ -317,7 +317,7 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   // Función general para dibujar header de sección con fondo gris
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
     // Dibujar fondo gris más oscuro
-    doc.setFillColor(160, 160, 160); // Gris más oscuro
+    doc.setFillColor(196, 196, 196); // Gris más oscuro
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
 
     // Dibujar líneas del header

@@ -200,7 +200,7 @@ export default function Hoja_Consulta_Externa(data = {}) {
     doc.setLineWidth(0.2);
     
     // Dibujar fondo gris más oscuro
-    doc.setFillColor(160, 160, 160);
+    doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
     
     // Dibujar líneas del header

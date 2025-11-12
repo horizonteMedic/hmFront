@@ -368,7 +368,7 @@ export default function B_FichaDetencionSAS2(data = {}) {
 
   // Primera fila: I.- FILIACION (fila completa)
   // Fondo gris solo para el header de sección
-  doc.setFillColor(160, 160, 160); // Gris oscuro (igual que certificaciondeconduccion_Digitalizado.jsx)
+  doc.setFillColor(196, 196, 196); // Gris oscuro (igual que certificaciondeconduccion_Digitalizado.jsx)
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
 
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
@@ -441,7 +441,7 @@ export default function B_FichaDetencionSAS2(data = {}) {
 
   // Novena fila: II.- ANTECEDENTES PERSONALES (fila completa)
   // Fondo gris para el header de sección
-  doc.setFillColor(160, 160, 160); // Gris oscuro (igual que certificaciondeconduccion_Digitalizado.jsx)
+  doc.setFillColor(196, 196, 196); // Gris oscuro (igual que certificaciondeconduccion_Digitalizado.jsx)
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
 
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
@@ -693,7 +693,7 @@ export default function B_FichaDetencionSAS2(data = {}) {
 
   // Trigésima fila: Título Entrevista al paciente (fila completa)
   // Fondo gris para el header de sección
-  doc.setFillColor(160, 160, 160); // Gris oscuro (igual que certificaciondeconduccion_Digitalizado.jsx)
+  doc.setFillColor(196, 196, 196); // Gris oscuro (igual que certificaciondeconduccion_Digitalizado.jsx)
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
 
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
@@ -742,7 +742,7 @@ export default function B_FichaDetencionSAS2(data = {}) {
   const alturaFilaEpworth = filaAltura + 5; // Hacer la fila más alta
 
   // Fondo gris solo hasta la división (130mm)
-  doc.setFillColor(160, 160, 160); // Gris oscuro
+  doc.setFillColor(196, 196, 196); // Gris oscuro
   doc.rect(tablaInicioX, yPos, 130, alturaFilaEpworth, 'F');
 
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaEpworth); // Línea izquierda
@@ -1266,7 +1266,7 @@ export default function B_FichaDetencionSAS2(data = {}) {
 
   // === FILA DE TÍTULO 4. EXÁMEN FÍSICO ===
   // Fondo gris para el header de sección
-  doc.setFillColor(160, 160, 160); // Gris oscuro (igual que certificaciondeconduccion_Digitalizado.jsx)
+  doc.setFillColor(196, 196, 196); // Gris oscuro (igual que certificaciondeconduccion_Digitalizado.jsx)
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
 
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
@@ -1447,7 +1447,7 @@ export default function B_FichaDetencionSAS2(data = {}) {
   const alturaTituloConclusión = filaAltura;
 
   // Fondo gris para el header de sección
-  doc.setFillColor(160, 160, 160); // Gris oscuro (igual que certificaciondeconduccion_Digitalizado.jsx)
+  doc.setFillColor(196, 196, 196); // Gris oscuro (igual que certificaciondeconduccion_Digitalizado.jsx)
   doc.rect(tablaExamenInicioX, yTextoExamen, tablaExamenAncho, alturaTituloConclusión, 'F');
 
   doc.line(tablaExamenInicioX, yTextoExamen, tablaExamenInicioX, yTextoExamen + alturaTituloConclusión);
