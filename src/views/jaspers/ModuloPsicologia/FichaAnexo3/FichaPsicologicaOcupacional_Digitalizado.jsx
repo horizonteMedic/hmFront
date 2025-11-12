@@ -337,7 +337,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     doc.setLineWidth(0.2);
     
     // Dibujar fondo gris más oscuro
-    doc.setFillColor(160, 160, 160);
+    doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
     
     // Dibujar líneas del header
@@ -363,7 +363,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     doc.setLineWidth(0.2);
     
     // Dibujar fondo celeste
-    doc.setFillColor(173, 216, 230); // Color celeste claro
+    doc.setFillColor(199, 241, 255); // Color celeste claro
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
     
     // Dibujar líneas del subheader
@@ -527,7 +527,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   doc.setLineWidth(0.2);
   
   // Dibujar fondo gris más oscuro
-  doc.setFillColor(160, 160, 160);
+  doc.setFillColor(196, 196, 196);
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   
   // Dibujar líneas del header
@@ -942,7 +942,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   const mitadAncho = tablaAncho * 0.60; // 60% para la izquierda, 40% para la derecha
   
   // Dibujar fondo celeste
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, tablaAncho, filaCelesteAltura, 'F');
   
   // Dibujar líneas de la fila
@@ -1154,7 +1154,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
 
   // Dibujar fila principal de Orientación (celeste, sin división)
   // Dibujar fondo celeste
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, anchoMitadIzquierda, filaObservacionAltura, 'F');
   
   // Dibujar líneas de la fila (sin división vertical interna)
@@ -1218,7 +1218,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   // Header de procesos cognitivos (solo hasta la mitad)
   
   // Dibujar fondo celeste solo en la mitad izquierda
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, anchoMitadIzquierda, filaAltura, 'F');
   
   // Dibujar líneas del header solo en la mitad izquierda
@@ -1350,7 +1350,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   // Header de evaluación adicional (ocupa todo el ancho)
   
   // Dibujar fondo celeste ocupando todo el ancho
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   
   // Dibujar líneas del header ocupando todo el ancho

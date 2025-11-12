@@ -30,7 +30,7 @@ export const GetInfoServicio = async (
         let presion_diastolica = parseFloat(res.diastolicaTriaje);
         let htaNueva = false;
         if (!isNaN(presion_sistolica) && !isNaN(presion_diastolica) &&
-            (presion_diastolica >= 140 || presion_sistolica >= 90)) {
+            (presion_sistolica >= 140 || presion_diastolica >= 90)) {
             htaNueva = true
         }
 

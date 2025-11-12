@@ -163,7 +163,7 @@ export default function InformePsicologico_Digitalizado(data = {}) {
     doc.setLineWidth(0.2);
 
     // Dibujar fondo gris más oscuro
-    doc.setFillColor(160, 160, 160);
+    doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
 
     // Dibujar líneas del header
@@ -321,7 +321,7 @@ export default function InformePsicologico_Digitalizado(data = {}) {
     doc.setLineWidth(0.2);
 
     // Dibujar fondo celeste
-    doc.setFillColor(173, 216, 230); // Color celeste claro
+    doc.setFillColor(199, 241, 255); // Color celeste claro
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
 
     // Dibujar líneas del subheader

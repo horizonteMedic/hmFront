@@ -207,7 +207,7 @@ export default function CertificadoAlturaPoderosa_Digitalizado(data = {}) {
 
   // Función para convertir texto a mayúsculas
   const formatearTextoGramatical = (texto) => {
-    if (!texto || typeof texto !== 'string') return texto;
+    if (!texto || typeof texto !== 'string') return '';
     return texto.toUpperCase();
   };
 
@@ -284,6 +284,11 @@ export default function CertificadoAlturaPoderosa_Digitalizado(data = {}) {
   // === FUNCIONES AUXILIARES ===
   // Función para texto con salto de línea
   const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
+    // Manejar valores null o undefined
+    if (!texto || typeof texto !== 'string') {
+      return y;
+    }
+    
     const fontSize = doc.internal.getFontSize();
     const palabras = texto.split(' ');
     let lineaActual = '';
@@ -835,7 +840,7 @@ yPos += filaAlturaCage;
   });
  
   // Fila 199, 241, 255ste para OJOS
-  doc.setFillColor(173, 216, 230); // Color 199, 241, 255ste
+  doc.setFillColor(199, 241, 255); // Color 199, 241, 255ste
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1019,7 +1024,7 @@ yPos += filaAlturaCage;
   doc.text(odLejosCorregida, xCorregida + (colCorregidaAncho / 2 - anchoOdLejosCorregida) / 2, yPos + 3.5);
   doc.text(oiLejosCorregida, mitadCorregida + (colCorregidaAncho / 2 - anchoOiLejosCorregida) / 2, yPos + 3.5);
   
-  dibujarTextoConSaltoLinea(formatearTextoGramatical(data.enfermedadesocularesoftalmo_e_oculares), xObservaciones + 2, yPos + 3.5, colObservacionesAncho - 4);
+  dibujarTextoConSaltoLinea(formatearTextoGramatical(data.enfermedadesocularesoftalmo_e_oculares1), xObservaciones + 2, yPos + 3.5, colObservacionesAncho - 4);
   
   yPos += filaAlturaAgudeza;
 
@@ -1246,7 +1251,7 @@ yPos += filaAlturaCage;
   
   // === SECCIÓN NEUROLÓGICO ===
   // Fila para el título NEUROLÓGICO (color 199, 241, 255ste)
-  doc.setFillColor(173, 216, 230); // Color 199, 241, 255ste
+  doc.setFillColor(199, 241, 255); // Color 199, 241, 255ste
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1397,7 +1402,7 @@ yPos += filaAlturaCage;
   
   // === SECCIÓN EXAMENES COMPLEMENTARIOS ===
   // Fila para el título AUDIOMETRÍA (color 199, 241, 255ste)
-  doc.setFillColor(173, 216, 230); // Color 199, 241, 255ste
+  doc.setFillColor(199, 241, 255); // Color 199, 241, 255ste
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1544,7 +1549,7 @@ yPos += filaAlturaCage;
   
   // === SECCIÓN LABORATORIO ===
   // Fila para el título LABORATORIO (color 199, 241, 255ste)
-  doc.setFillColor(173, 216, 230); // Color 199, 241, 255ste
+  doc.setFillColor(199, 241, 255); // Color 199, 241, 255ste
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1581,7 +1586,7 @@ yPos += filaAlturaCage;
   yPos += filaAltura;
   
   // Fila 199, 241, 255ste: PERFIL LIPIDICO
-  doc.setFillColor(173, 216, 230); // Color 199, 241, 255ste
+  doc.setFillColor(199, 241, 255); // Color 199, 241, 255ste
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1645,7 +1650,7 @@ yPos += filaAlturaCage;
   
   // === TEST DE EPWORTH ===
   // Fila para el título TEST DE EPWORTH (color 199, 241, 255ste)
-  doc.setFillColor(173, 216, 230); // Color 199, 241, 255ste
+  doc.setFillColor(199, 241, 255); // Color 199, 241, 255ste
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1661,7 +1666,7 @@ yPos += filaAlturaCage;
   
   // === DIAGNÓSTICO ===
   // Fila para el título DIAGNÓSTICO (color 199, 241, 255ste)
-  doc.setFillColor(173, 216, 230); // Color 199, 241, 255ste
+  doc.setFillColor(199, 241, 255); // Color 199, 241, 255ste
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1677,7 +1682,7 @@ yPos += filaAlturaCage;
   
   // === SECCIÓN OTROS ===
   // Fila 199, 241, 255ste: Otros
-  doc.setFillColor(173, 216, 230); // Color 199, 241, 255ste
+  doc.setFillColor(199, 241, 255); // Color 199, 241, 255ste
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);

@@ -1,102 +1,70 @@
-@keyframes ring1 {
-  from {
-      stroke-dashoffset: -376.237129776;
-      transform: rotate(-0.25turn);
-      animation-timing-function: ease-in;
-  }
-
-  23% {
-      stroke-dashoffset: -94.247778;
-      transform: rotate(1turn);
-      animation-timing-function: ease-out;
-  }
-
-  /* Ajusta el porcentaje y el transform según tus necesidades para que la animación sea más lenta */
-  46%, 50% {
-      stroke-dashoffset: -376.237129776;
-      transform: rotate(2.5turn); /* Cambia el valor para que la animación sea más lenta */
-      animation-timing-function: ease-in;
-  }
-
-  73% {
-      stroke-dashoffset: -94.247778;
-      transform: rotate(4turn); /* Cambia el valor para que la animación sea más lenta */
-      animation-timing-function: ease-out;
-  }
-
-  96%, to {
-      stroke-dashoffset: -376.237129776;
-      transform: rotate(6.25turn); /* Cambia el valor para que la animación sea más lenta */
-  }
-}
-
-/* Repite lo mismo para las otras animaciones ring2, ring3, etc. */
-
+/* Spinner Container */
 .pl {
   width: 5em;
   height: 5em;
- }
- 
- .pl circle {
+}
+
+.pl circle {
   transform-box: fill-box;
   transform-origin: 50% 50%;
- }
- 
- .pl__ring1 {
+}
+
+/* Ring Animations */
+.pl__ring1 {
   animation: ring1 4s 0s ease-in-out infinite;
- }
- 
- .pl__ring2 {
+}
+
+.pl__ring2 {
   animation: ring2 4s 0.04s ease-in-out infinite;
- }
- 
- .pl__ring3 {
+}
+
+.pl__ring3 {
   animation: ring3 4s 0.08s ease-in-out infinite;
- }
- 
- .pl__ring4 {
+}
+
+.pl__ring4 {
   animation: ring4 4s 0.12s ease-in-out infinite;
- }
- 
- .pl__ring5 {
+}
+
+.pl__ring5 {
   animation: ring5 4s 0.16s ease-in-out infinite;
- }
- 
- .pl__ring6 {
+}
+
+.pl__ring6 {
   animation: ring6 4s 0.2s ease-in-out infinite;
- }
- 
- /* Animations */
- @keyframes ring1 {
+}
+
+/* Keyframe Animations */
+@keyframes ring1 {
   from {
-   stroke-dashoffset: -376.237129776;
-   transform: rotate(-0.25turn);
-   animation-timing-function: ease-in;
+    stroke-dashoffset: -376.237129776;
+    transform: rotate(-0.25turn);
+    animation-timing-function: ease-in;
   }
- 
+
   23% {
-   stroke-dashoffset: -94.247778;
-   transform: rotate(1turn);
-   animation-timing-function: ease-out;
+    stroke-dashoffset: -94.247778;
+    transform: rotate(1turn);
+    animation-timing-function: ease-out;
   }
- 
+
   46%, 50% {
-   stroke-dashoffset: -376.237129776;
-   transform: rotate(2.25turn);
-   animation-timing-function: ease-in;
+    stroke-dashoffset: -376.237129776;
+    transform: rotate(2.25turn);
+    animation-timing-function: ease-in;
   }
- 
+
   73% {
-   stroke-dashoffset: -94.247778;
-   transform: rotate(3.5turn);
-   animation-timing-function: ease-out;
+    stroke-dashoffset: -94.247778;
+    transform: rotate(3.5turn);
+    animation-timing-function: ease-out;
   }
- 
+
   96%, to {
-   stroke-dashoffset: -376.237129776;
-   transform: rotate(4.75turn);
+    stroke-dashoffset: -376.237129776;
+    transform: rotate(4.75turn);
   }
- }
+}
  
  @keyframes ring2 {
   from {
@@ -253,18 +221,34 @@
   }
  }
 
- @keyframes slideIn {
+ /* Text Animation */
+@keyframes slideIn {
   from {
-      transform: translateX(-100%);
-      opacity: 0;
+    transform: translateX(-100%);
+    opacity: 0;
   }
   to {
-      transform: translateX(0);
-      opacity: 1;
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 
 .slide-in {
   animation: slideIn 0.5s forwards;
   display: inline-block;
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
 }

@@ -53,7 +53,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     resideEnLugarTrabajo: data.residenciaSi_chkresidenciasi ? 'SI' : 'NO',
     tiempoResidencia: data.residenciaTiempo_txttiemporesidencia || "",
     correoElectronico: data.emailPaciente_email_pa || "",
-    telefono: data.telefonoPaciente_telefono_pa || data.celularPaciente_celular_pa || data.telefono || "",
+    telefono: data.celularPaciente_cel_pa || data.telefonoPaciente_telefono_pa || data.celularPaciente_celular_pa || data.telefono || "",
     estadoCivil: data.estadoCivilPaciente_estado_civil_pa || "",
     numTotalHijos: data.totalHijos_txttotalhijos || "",
     numDependientes: data.numeroDependientes_txtndependientes || "",
@@ -454,7 +454,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Nueva Fila: Correo electrónico | Teléfono (2 columnas)
+  // Nueva Fila: Correo electrónico | Celular (2 columnas)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + 100, yPos, tablaInicioX + 100, yPos + filaAltura); // División media
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -571,14 +571,14 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   }
   yTexto += filaAltura;
 
-  // Nueva: Correo electrónico | Teléfono
+  // Nueva: Correo electrónico | Celular
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Correo electrónico:", tablaInicioX + 2, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.correoElectronico || "", tablaInicioX + 32, yTexto + 1);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Teléfono:", tablaInicioX + 102, yTexto + 1);
+  doc.text("Celular:", tablaInicioX + 102, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.telefono || "", tablaInicioX + 118, yTexto + 1);
   yTexto += filaAltura;
@@ -747,7 +747,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
 
   // === FILA CELESTE: HÁBITOS NOCIVOS ===
   // Dibujar fondo celeste
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
 
   // Dibujar líneas de la fila celeste
@@ -918,7 +918,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
 
   // === FILA CELESTE: ABSENTISMO ===
   // Dibujar fondo celeste
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
 
   // Dibujar líneas de la fila celeste
@@ -1050,7 +1050,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
 
   // === FILA CELESTE: ANAMNESIS ===
   // Dibujar fondo celeste
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
 
   // Dibujar líneas de la fila celeste
@@ -1081,7 +1081,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
 
   // === FILA CELESTE: ÍNICO ===
   // Dibujar fondo celeste
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
 
   // Dibujar líneas de la fila celeste
@@ -1321,7 +1321,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
 
   // === SECCIÓN OJOS ===
   // Fila gris: OJOS
-  doc.setFillColor(173, 216, 230); // Color gris (igual que otras secciones)
+  doc.setFillColor(199, 241, 255); // Color gris (igual que otras secciones)
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);

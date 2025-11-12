@@ -307,7 +307,7 @@ export default function GenerarDatosPacienteBoro(data = {}) {
       doc.setLineWidth(0.2); // Líneas un poco más gruesas para headers
       
       // Dibujar fondo gris más oscuro
-      doc.setFillColor(160, 160, 160); // Gris más oscuro
+      doc.setFillColor(196, 196, 196); // Gris más oscuro
       doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
       
       // Dibujar líneas del header
@@ -492,7 +492,7 @@ export default function GenerarDatosPacienteBoro(data = {}) {
      doc.setLineWidth(0.2); // Líneas más gruesas para headers
      
      // Dibujar fondo gris más oscuro
-     doc.setFillColor(160, 160, 160); // Gris más oscuro
+     doc.setFillColor(196, 196, 196); // Gris más oscuro
      doc.rect(leftMargin, yPos, colTexto + colNo + colSi, alturaHeader, 'F');
      
      // Dibujar líneas del header

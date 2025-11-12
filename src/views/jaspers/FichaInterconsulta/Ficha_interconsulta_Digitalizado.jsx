@@ -194,7 +194,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
     doc.setLineWidth(0.2);
     
     // Dibujar fondo gris más oscuro
-    doc.setFillColor(160, 160, 160);
+    doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
     
     // Dibujar líneas del header
@@ -523,7 +523,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   yPos = dibujarHeaderSeccion("4. MOTIVO DE INTERCONSULTA", yPos, filaAltura);
 
   // Fila "Motivo de Interconsulta:" (fila celeste)
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -564,7 +564,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   yPos += alturaFilaMotivo;
 
   // Fila "EVALUACIÓN DE ESPECIALISTA (medicina interna)" (fila gris)
-  doc.setFillColor(160, 160, 160);
+  doc.setFillColor(196, 196, 196);
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -588,7 +588,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   yPos += filaAltura;
 
   // Fila "Hallazgos relevantes:" (fila celeste)
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -624,7 +624,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   yPos += alturaFilaHallazgos;
 
   // Fila "Diagnóstico:" (fila celeste)
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -658,7 +658,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   yPos += alturaFilaDiagnostico;
 
   // Fila "Tratamiento y recomendaciones vinculadas a la actividad laboral:" (fila celeste)
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
