@@ -11,12 +11,14 @@ import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAlturaPsicologica";
+import { useTailwindBreakpoints } from "../../../../../../hooks/useTailwindBreakpoints";
 
 const tabla = "";
 const today = getToday();
 
 export default function AlturaPsicologica() {
   const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+  const { isLgUp } = useTailwindBreakpoints();
 
   const initialFormState = {
     // Header - Información del examen
@@ -30,6 +32,8 @@ export default function AlturaPsicologica() {
     apellidos: "",
     fechaNacimiento: "",
     edad: "",
+    dni: "",
+    sexo: "",
     lugarNacimiento: "",
     domicilioActual: "",
     estadoCivil: "",
@@ -153,57 +157,44 @@ export default function AlturaPsicologica() {
           />
         </div>
       </div>
-
       {/* Datos necesarios */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4">
-        <h4 className="font-semibold mb-3 text-blue-700">Datos Necesarios</h4>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Columna Izquierda */}
-          <div className="space-y-3">
-            <InputTextOneLine
-              label="Nombres"
-              name="nombres"
-              value={form.nombres}
-              disabled
-              labelWidth="120px"
-            />
-            <InputTextOneLine
-              label="Apellidos"
-              name="apellidos"
-              value={form.apellidos}
-              disabled
-              labelWidth="120px"
-            />
-            <InputTextOneLine
-              label="Fecha Nacimiento"
-              name="fechaNacimiento"
-              value={form.fechaNacimiento}
-              disabled
-              labelWidth="120px"
-            />
-            <InputTextOneLine
-              label="Lugar Nacimiento"
-              name="lugarNacimiento"
-              value={form.lugarNacimiento}
-              disabled
-              labelWidth="120px"
-            />
-          </div>
-
-          {/* Columna Derecha */}
-          <div className="space-y-3">
-            <InputTextOneLine
-              label="Domicilio Actual"
-              name="domicilioActual"
-              value={form.domicilioActual}
-              disabled
-              labelWidth="120px"
-            />
+      <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
+        <legend className="font-bold mb-3 text-[10px]">Datos Personales</legend>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          <InputTextOneLine
+            label="Nombres"
+            name="nombres"
+            value={form.nombres}
+            disabled
+            labelWidth="120px"
+          />
+          <div className="grid lg:grid-cols-2 gap-3">
             <InputTextOneLine
               label="Edad"
               name="edad"
               value={form.edad}
+              disabled
+              labelWidth="120px"
+            />
+            <InputTextOneLine
+              label="Sexo"
+              name="sexo"
+              value={form.sexo}
+              disabled
+              labelWidth="120px" />
+          </div>
+          <InputTextOneLine
+            label="Apellidos"
+            name="apellidos"
+            value={form.apellidos}
+            disabled
+            labelWidth="120px"
+          />
+          <div className="grid lg:grid-cols-2 gap-3">
+            <InputTextOneLine
+              label="DNI"
+              name="dni"
+              value={form.dni}
               disabled
               labelWidth="120px"
             />
@@ -214,21 +205,42 @@ export default function AlturaPsicologica() {
               disabled
               labelWidth="120px"
             />
-            <InputTextOneLine
-              label="Nivel Estudios"
-              name="nivelEstudios"
-              value={form.nivelEstudios}
-              disabled
-              labelWidth="120px"
-            />
           </div>
+          <InputTextOneLine
+            label="Fecha Nacimiento"
+            name="fechaNacimiento"
+            value={form.fechaNacimiento}
+            disabled
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Lugar Nacimiento"
+            name="lugarNacimiento"
+            value={form.lugarNacimiento}
+            disabled
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Domicilio Actual"
+            name="domicilioActual"
+            value={form.domicilioActual}
+            disabled
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Nivel Estudios"
+            name="nivelEstudios"
+            value={form.nivelEstudios}
+            disabled
+            labelWidth="120px"
+          />
         </div>
-      </div>
+      </fieldset>
 
       {/* Datos Laborales */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4">
-        <h4 className="font-semibold mb-3 text-blue-700">Datos Laborales</h4>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
+      <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
+        <legend className="font-bold mb-3 text-[10px]">Datos Laborales</legend>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           <InputTextOneLine
             label="Empresa"
             name="empresa"
@@ -258,80 +270,76 @@ export default function AlturaPsicologica() {
             labelWidth="120px"
           />
         </div>
+      </fieldset>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
+          <legend className="font-bold mb-3 text-[10px]">Aspecto Intelectual</legend>
+          <RadioTable
+            items={itemsIntelectual}
+            options={opcionesIntelectual}
+            form={form}
+            handleRadioButton={handleRadioButton}
+            labelColumns={2}
+          />
+        </fieldset>
+        <fieldset className="bg-white border border-gray-200 rounded-lg p-4 space-y-8">
+          <legend className="font-bold mb-3 text-[10px]">Aspecto Personalidad</legend>
+          {/* Aspectos de Personalidad */}
+          <InputsRadioGroup
+            label="1.- Estabilidad"
+            name="estabilidad"
+            value={form.estabilidad}
+            onChange={handleRadioButton}
+            options={[
+              { label: "INESTABLE", value: "INESTABLE" },
+              { label: "ESTABLE", value: "ESTABLE" },
+            ]}
+            labelOnTop
+          />
+          <InputsRadioGroup
+            label="2.- Nivel de ansiedad y tendencias"
+            name="ansiedadTendencias"
+            value={form.ansiedadTendencias}
+            onChange={handleRadioButton}
+            options={[
+              { label: "CASO", value: "CASO" },
+              { label: "NO CASO", value: "NO CASO" },
+            ]}
+            labelOnTop
+          />
+          <InputsRadioGroup
+            label="3.- Consumo de alcohol"
+            name="consumoAlcohol"
+            value={form.consumoAlcohol}
+            onChange={handleRadioButton}
+            options={[
+              { label: "CASO", value: "CASO" },
+              { label: "NO CASO", value: "NO CASO" },
+            ]}
+            labelOnTop
+          />
+          <InputsRadioGroup
+            label="4.- Fobia a la altura"
+            name="fobiaAltura"
+            value={form.fobiaAltura}
+            onChange={handleRadioButton}
+            options={[
+              { label: "NADA", value: "NADA" },
+              { label: "LIGERAMENTE", value: "LIGERAMENTE" },
+              { label: "MODERADAMENTE", value: "MODERADAMENTE" },
+              { label: "MARCADAMENTE", value: "MARCADAMENTE" },
+              { label: "MIEDO EXTREMO", value: "MIEDO EXTREMO" },
+            ]}
+            labelOnTop
+            vertical={!isLgUp}
+          />
+        </fieldset>
       </div>
 
-      {/* Criterios Psicológicos */}
-      <section className="bg-white border border-gray-200 rounded-lg p-4">
-        <h3 className="font-semibold mb-3 text-blue-700">Criterios Psicológicos</h3>
-
-        <div className="space-y-6">
-          {/* Aspecto Intelectual */}
-          <div>
-            <h4 className="font-semibold mb-2 text-gray-700">Aspecto Intelectual</h4>
-            <RadioTable
-              items={itemsIntelectual}
-              options={opcionesIntelectual}
-              form={form}
-              handleRadioButton={handleRadioButton}
-              labelColumns={2}
-            />
-          </div>
-
-          {/* Aspectos de Personalidad */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <InputsRadioGroup
-              label="1.- Estabilidad"
-              name="estabilidad"
-              value={form.estabilidad}
-              onChange={handleRadioButton}
-              options={[
-                { label: "INESTABLE", value: "INESTABLE" },
-                { label: "ESTABLE", value: "ESTABLE" },
-              ]}
-              labelWidth="180px"
-            />
-            <InputsRadioGroup
-              label="2.- Nivel de ansiedad y tendencias"
-              name="ansiedadTendencias"
-              value={form.ansiedadTendencias}
-              onChange={handleRadioButton}
-              options={[
-                { label: "CASO", value: "CASO" },
-                { label: "NO CASO", value: "NO CASO" },
-              ]}
-              labelWidth="180px"
-            />
-            <InputsRadioGroup
-              label="3.- Consumo de alcohol"
-              name="consumoAlcohol"
-              value={form.consumoAlcohol}
-              onChange={handleRadioButton}
-              options={[
-                { label: "CASO", value: "CASO" },
-                { label: "NO CASO", value: "NO CASO" },
-              ]}
-              labelWidth="180px"
-            />
-            <InputsRadioGroup
-              label="4.- Fobia a la altura"
-              name="fobiaAltura"
-              value={form.fobiaAltura}
-              onChange={handleRadioButton}
-              options={[
-                { label: "NADA", value: "NADA" },
-                { label: "LIGERAMENTE", value: "LIGERAMENTE" },
-                { label: "MODERADAMENTE", value: "MODERADAMENTE" },
-                { label: "MARCADAMENTE", value: "MARCADAMENTE" },
-                { label: "MIEDO EXTREMO", value: "MIEDO EXTREMO" },
-              ]}
-              labelWidth="180px"
-            />
-          </div>
-        </div>
-      </section>
-
       {/* Análisis y Recomendaciones */}
-      <section className="bg-white border border-gray-200 rounded-lg p-4">
+      <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
+        <legend className="font-bold mb-3 text-[10px]">Conclusiones Finales</legend>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <InputTextArea
             label="Análisis y Resultados"
@@ -348,7 +356,7 @@ export default function AlturaPsicologica() {
             rows={4}
           />
         </div>
-      </section>
+      </fieldset>
 
       {/* Acciones */}
       <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-4">
