@@ -1414,8 +1414,8 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
       xActual += doc.getTextWidth("Dosis: " + covidData.dosis) + 5;
     }
     
-    // Mostrar fecha si existe (incluso si COVID-19 no está marcado)
-    if (tieneFecha) {
+    // Mostrar fecha solo si COVID-19 está marcado y tiene fecha
+    if (tieneCovid && tieneFecha) {
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text("Fecha: " + covidData.fechaExamen, xActual, yPos + 3.5);
       xActual += doc.getTextWidth("Fecha: " + covidData.fechaExamen) + 5;
@@ -2175,8 +2175,8 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
       xActual += doc.getTextWidth("Dosis: " + covidDataP3.dosis) + 5;
     }
     
-    // Mostrar fecha si existe (incluso si COVID-19 no está marcado)
-    if (tieneFechaP3) {
+    // Mostrar fecha solo si COVID-19 está marcado y tiene fecha
+    if (tieneCovidP3 && tieneFechaP3) {
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text("Fecha: " + covidDataP3.fechaExamen, xActual, yPos + 3.5);
       xActual += doc.getTextWidth("Fecha: " + covidDataP3.fechaExamen) + 5;

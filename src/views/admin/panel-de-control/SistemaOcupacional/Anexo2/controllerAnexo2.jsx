@@ -628,6 +628,11 @@ export const GetInfoServicio = (
               data.observacionesGenerales +=
                 "OBESIDAD II.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
             }
+            else if (imc >= 40) {
+              data.imcRed = true;
+              data.observacionesGenerales +=
+                "OBESIDAD II.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
+            }
           }
 
           // Medidas Generales
