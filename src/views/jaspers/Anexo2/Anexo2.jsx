@@ -1066,18 +1066,40 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   doc.text("ANAMNESIS", tablaInicioX + 2, yPos + 3.5);
   yPos += filaAltura;
 
-  // === FILA DE ANAMNESIS ===
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  // === FILA DE ANAMNESIS (ALTURA DINÁMICA) ===
+  // Calcular altura necesaria para el texto de anamnesis
+  let alturaFilaAnamnesis = filaAltura;
+  let lineasAnamnesis = [];
+  
   if (datosFinales.anamnesis) {
     const anamnesisMayusculas = String(datosFinales.anamnesis).toUpperCase();
-    doc.text(anamnesisMayusculas, tablaInicioX + 2, yPos + 3.5);
+    const anchoDisponibleAnamnesis = tablaAncho - 4; // Ancho disponible menos márgenes
+    
+    // Calcular líneas necesarias usando splitTextToSize
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    lineasAnamnesis = doc.splitTextToSize(anamnesisMayusculas, anchoDisponibleAnamnesis);
+    
+    // Calcular altura dinámica: interlineado de 3mm por línea, altura mínima de filaAltura
+    const interlineadoAnamnesis = 3;
+    const alturaCalculada = Math.max(filaAltura, lineasAnamnesis.length * interlineadoAnamnesis + 4);
+    alturaFilaAnamnesis = alturaCalculada;
   }
-  yPos += filaAltura;
+  
+  // Dibujar líneas de la fila con altura dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaFilaAnamnesis, tablaInicioX + tablaAncho, yPos + alturaFilaAnamnesis);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaAnamnesis);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaAnamnesis);
+
+  // Dibujar texto línea por línea
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  if (lineasAnamnesis.length > 0) {
+    const interlineadoAnamnesis = 3;
+    lineasAnamnesis.forEach((linea, index) => {
+      doc.text(linea, tablaInicioX + 2, yPos + 3.5 + (index * interlineadoAnamnesis));
+    });
+  }
+  yPos += alturaFilaAnamnesis;
 
   // === FILA CELESTE: ÍNICO ===
   // Dibujar fondo celeste
@@ -1122,7 +1144,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     },
     {
       label: "P.:",
-      value: datosFinales.pulso ? `${datosFinales.pulso} bpm` : ''
+      value: datosFinales.pulso ? `${datosFinales.pulso} ppm` : ''
     },
     {
       label: "F.Resp.:",
@@ -1212,7 +1234,10 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   doc.text("Otros:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
   if (datosFinales.otrosExamenClinico) {
-    const otrosTexto = `SAT O2: ${datosFinales.otrosExamenClinico}`;
+    // Agregar % si no está presente
+    const valorSatO2 = String(datosFinales.otrosExamenClinico).trim();
+    const valorConPorcentaje = valorSatO2.endsWith('%') ? valorSatO2 : `${valorSatO2}%`;
+    const otrosTexto = `SAT O2: ${valorConPorcentaje}`;
     const labelWidth = doc.getTextWidth("Otros:");
     doc.text(otrosTexto, tablaInicioX + labelWidth + 5, yPos + 3.5);
   }

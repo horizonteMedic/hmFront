@@ -105,16 +105,21 @@ function evaluarObservacionesObtener(res, set) {
     const vlejoscoi = res.oilcOftalmologia_oilc || "";
     const vcercacod = res.odccOftalmologia_odcc || "";
     const vcercacoi = res.oiccOftalmologia_oicc || "";
+    const textoEnfermedadOftalmo = (res.enfermedadesOcularesOftalmo_e_oculares ?? "").trim().toUpperCase();
 
-    if (!((res.enfermedadesOcularesOftalmo_e_oculares ?? "").trim().toUpperCase() == ("NINGUNA"))) {
-        problemasOftalmologicos = true;
-        problemasOftalmologicosRed = true;
-        if (vlejoscod == "00" && vlejoscoi == "00" && vcercacod == "00" && vcercacoi == "00") {
-            nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
-        } else {
-            nuevasObservaciones += "- USO DE LENTES CORRECTORES.\n";
+    if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
+        const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
+        if (enfermedadesRefractarias.some(e => textoEnfermedadOftalmo.includes(e))) {
+            problemasOftalmologicos = true;
+            problemasOftalmologicosRed = true;
+            const visionLejosNormal = vlejoscod === "00" && vlejoscoi === "00";
+            const visionCercaNormal = vcercacod === "00" && vcercacoi === "00";
+            nuevasObservaciones += visionLejosNormal && visionCercaNormal
+                ? "- CORREGIR AGUDEZA VISUAL.\n"
+                : "- USO DE LENTES CORRECTORES.\n";
         }
     }
+
     // Evaluación de presión arterial - Convertido desde Java (líneas 176-181)
     let hipertension = false;
     let hipertensionRed = false;
@@ -168,17 +173,20 @@ function evaluarObservacionesEditar(res, set) {
 
     const vcercacod = res.odccOftalmologia_odcc || "";
     const vcercacoi = res.oiccOftalmologia_oicc || "";
+    const textoEnfermedadOftalmo = (res.enfermedadesOcularesOftalmo_e_oculares ?? "").trim().toUpperCase();
 
-    if (!((res.enfermedadesOcularesOftalmo_e_oculares ?? "").trim().toUpperCase() == ("NINGUNA"))) {
-        problemasOftalmologicos = true;
-        problemasOftalmologicosRed = true;
-        if (vlejoscod == "00" && vlejoscoi == "00" && vcercacod == "00" && vcercacoi == "00") {
-            nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
-        } else {
-            nuevasObservaciones += "- USO DE LENTES CORRECTORES.\n";
+    if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
+        const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
+        if (enfermedadesRefractarias.some(e => textoEnfermedadOftalmo.includes(e))) {
+            problemasOftalmologicos = true;
+            problemasOftalmologicosRed = true;
+            const visionLejosNormal = vlejoscod === "00" && vlejoscoi === "00";
+            const visionCercaNormal = vcercacod === "00" && vcercacoi === "00";
+            nuevasObservaciones += visionLejosNormal && visionCercaNormal
+                ? "- CORREGIR AGUDEZA VISUAL.\n"
+                : "- USO DE LENTES CORRECTORES.\n";
         }
     }
-
 
     // Evaluación del IMC - Convertido desde Java
     let imc = res.imcTriaje_imc || "";
