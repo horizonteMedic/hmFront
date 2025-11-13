@@ -26,7 +26,6 @@ export default function FichaAptitudAnexo2({ MedicosMulti }) {
     // Datos básicos
     norden: "",
     tipoExamen: "",
-    fechaExam: today,
     nombres: "",
     dni: "",
     edad: "",
@@ -170,13 +169,6 @@ export default function FichaAptitudAnexo2({ MedicosMulti }) {
           name="tipoExamen"
           value={form?.tipoExamen}
           disabled
-        />
-        <InputTextOneLine
-          label="Fecha Examen"
-          type="date"
-          name="fechaExam"
-          value={form?.fechaExam}
-          onChange={handleChangeSimple}
         />
         <InputTextOneLine
           label="Hora"
