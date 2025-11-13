@@ -77,16 +77,21 @@ function evaluarObservacionesObtener(res, set) {
     // Evaluación IMC - Convertido desde Java (líneas 150-165)
     if (!isNaN(imcValue) && imcValue > 25) {
         imcRed = true;
-        if (imcValue >= 25 && imcValue < 29.91) {
+        if (imcValue >= 25 && imcValue < 30) {
             nuevasObservaciones += "- SOBREPESO: DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
-        } else if (imcValue >= 29.91 && imcValue < 35) {
+        } else if (imcValue >= 30 && imcValue < 35) {
             // obesidadMorbida = true;
             // obesidadMorbidaRed = true;
             nuevasObservaciones += "- OBESIDAD I: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
-        } else if (imcValue >= 35) {
+        } else if (imcValue >= 35 && imcValue < 40) {
             obesidadMorbida = true;
             obesidadMorbidaRed = true;
             nuevasObservaciones += "- OBESIDAD II: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+        }
+        else if (imcValue >= 40) {
+            obesidadMorbida = true;
+            obesidadMorbidaRed = true;
+            nuevasObservaciones += "- OBESIDAD III: NO HACER TRABAJOS EN ESPACIOS CONFINADOS. NO HACER TRABAJOS SOBRE 1.8 M.S.N PISO. DIETA HIPOCALORICA, HIPOGRASA Y EJERCICIOS.\n";
         }
     }
 
