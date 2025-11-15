@@ -29,12 +29,12 @@ export const GetInfoServicio = async (
     if (res) {
         let nuevoConclusiones = ""
         const trigliseridos = parseFloat(res.trigliseridosAnalisisBioquimico_txttrigliseridos)?.toFixed(2)
-        if (trigliseridos && trigliseridos <= 150) {
+        if (trigliseridos && trigliseridos > 150) {
             nuevoConclusiones += `HIPERTRIGLICERIDEMIA\n`
         }
         const colesterol = parseFloat(res.colesterolAnalisisBioquimico_txtcolesterol)?.toFixed(2)
-        if (colesterol && colesterol <= 200) {
-            nuevoConclusiones += `HIPECTOLESTEROLENIA\n`
+        if (colesterol && colesterol > 200) {
+            nuevoConclusiones += `HIPERCOLESTEROLEMIA\n`
         }
         const diagnosticoAudio = (res.diagnosticoAudiometricoCompleto_diagnostico ?? "").trim()
         if (diagnosticoAudio != "NORMAL" && diagnosticoAudio != "") {

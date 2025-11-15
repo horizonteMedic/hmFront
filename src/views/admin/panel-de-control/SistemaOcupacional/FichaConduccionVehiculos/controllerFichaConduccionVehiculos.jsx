@@ -51,7 +51,7 @@ export const GetInfoServicio = async (
 
         const vcercacod = res.oftalodccmologia_odcc || "";
         const vcercacoi = res.oiccoftalmologia_oicc || "";
-        const textoEnfermedadOftalmo = (res.enfermedadesOcularesOftalmo_e_oculares ?? "").trim().toUpperCase();
+        const textoEnfermedadOftalmo = (res.enfermedadesocularesoftalmo_e_oculares ?? "").trim().toUpperCase();
 
         if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
             const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
@@ -59,8 +59,8 @@ export const GetInfoServicio = async (
                 const visionLejosNormal = vlejoscod === "00" && vlejoscoi === "00";
                 const visionCercaNormal = vcercacod === "00" && vcercacoi === "00";
                 nuevasObservaciones += visionLejosNormal && visionCercaNormal
-                    ? "- CORREGIR AGUDEZA VISUAL.\n"
-                    : "- USO DE LENTES CORRECTORES.\n";
+                    ? "CORREGIR AGUDEZA VISUAL.\n"
+                    : "USO DE LENTES CORRECTORES.\n";
             }
         }
 

@@ -291,6 +291,7 @@ export const GetInfoServicioEditar = async (
             neumococo: res.neumococoBoro_neumococo,
             rabia: res.rabiaBoro_rabia,
             papilomaHumano: res.papilomaHumanoBoro_papiloma_humano,
+            covidAntecedentePatologico: res.covidAntecedentePatologicoBoro_covid_antepatologico,
 
             drogas: res.drogasSi_rbdrogassi ?? false,
             tipoDrogas: res.drogasTipo_txtdrogastipo ?? "",
@@ -536,6 +537,7 @@ export const SubmitDataService = async (
         neumococoBoro: form.neumococo,
         rabiaBoro: form.rabia,
         papilomaHumanoBoro: form.papilomaHumano,
+        covidAntecedentePatologico: form.covidAntecedentePatologico,
         cantidosisBoro: false, //enviar false
         medicamentoBoro: form.medicamentos,
         medicamentoEspecifiqueBoro: form.especifiqueMedicamentos,
