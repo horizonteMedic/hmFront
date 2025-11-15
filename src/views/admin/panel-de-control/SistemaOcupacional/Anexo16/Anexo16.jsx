@@ -19,10 +19,8 @@ import Abdomen from "./Abdomen/Abdomen";
 const tabla = "anexo7c";
 const today = getToday();
 
-export default function Anexo16({ listas }) {
-  const { MedicosMulti } = listas || {};
-
-  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+export default function Anexo16() {
+  const { token, userlogued, selectedSede, datosFooter, userName} =
     useSessionData();
 
   const initialFormState = {
@@ -182,8 +180,8 @@ export default function Anexo16({ listas }) {
     perimetro: "",
     bocaAmigdalasFaringeLaringe: "HUMECTADA, NO HIPERTROFICAS, NO CONGESTIVAS",
 
-    piel:"NORMAL",
-    pielObservaciones:"NORMAL. NO MANCHAS, AUSENCIA DE LUNARES SOSPECHOSOS DE MALIGNIDAD.",
+    piel: "NORMAL",
+    pielObservaciones: "NORMAL. NO MANCHAS, AUSENCIA DE LUNARES SOSPECHOSOS DE MALIGNIDAD.",
     //Miembros y reflejos
     miembrosSuperiores: "SIMETRICOS, NO DEFORMIDADES, MOTRICIDAD CONSERVADA.",
     miembrosInferiores: "SIMETRICOS, NO DEFORMIDADES, MOTRICIDAD CONSERVADA.",
@@ -319,8 +317,8 @@ export default function Anexo16({ listas }) {
     trigliceridosRed: "",
 
     // Médico que Certifica //BUSCADOR
-    nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
-    filteredNombresMedicos: [],
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
   const {
@@ -328,6 +326,7 @@ export default function Anexo16({ listas }) {
     setForm,
     handleChange,
     handleChangeNumber,
+    handleChangeSimple,
     handleRadioButton,
     handleCheckBoxChange,
     handleRadioButtonBoolean,
@@ -359,7 +358,6 @@ export default function Anexo16({ listas }) {
       GetExamenesRealizados(form.nordenEstadoPaciente, setForm, token, () => { Swal.close() });
     }
   };
-
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
@@ -429,11 +427,11 @@ export default function Anexo16({ listas }) {
                       handleClear={handleClear}
                       handleClearnotO={handleClearnotO}
                       handleRadioButtonBoolean={handleRadioButtonBoolean}
-                      MedicosMulti={MedicosMulti}
                       handlePrint={handlePrint}
                       handleSearch={handleSearch}
                       handleSave={handleSave}
                       handleSearchExamenesRealizados={handleSearchExamenesRealizados}
+                      handleChangeSimple={handleChangeSimple}
                     />
                   )
                 );
