@@ -850,6 +850,7 @@ export const GetInfoServicio = (
             data.observacionesGenerales +=
               data.contador + "-" + "NO PASO EXAMEN DE ESPIROMETRIA.\n";
             data.contador++;
+            data.conclusionRespiratoria = interpretacionEspirometria;
           } else {
             if (
               interpretacionEspirometria &&

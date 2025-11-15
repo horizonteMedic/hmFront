@@ -74,15 +74,7 @@ export default function AntecedentesPatologicosTab({
               onChange={handleRadioButton}
             />
           </div>
-          <InputTextOneLine
-            label="Dosis de vacunas"
-            name="dosisVacunas"
-            value={form?.dosisVacunas}
-            onChange={handleChangeNumber}
-            labelWidth="120px" />
         </div>
-
-
         <div className="mb-2 font-semibold text-red-600">
           Marcar todas las enfermedades que ha tenido o tiene
         </div>

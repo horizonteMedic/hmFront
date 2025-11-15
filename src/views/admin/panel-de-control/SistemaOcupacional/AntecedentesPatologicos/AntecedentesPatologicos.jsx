@@ -228,6 +228,7 @@ export default function AntecedentesPatologicos({ listas }) {
     neumococo: false,
     rabia: false,
     papilomaHumano: false,
+    covidAntecedentePatologico: false,
 
     drogas: false,
     tipoDrogas: "",

@@ -46,6 +46,7 @@ export const GetInfoServicio = async (
     );
     if (res) {
         const imc = res.imcTriaje ?? "";
+        let obesidadIMC30 = false;
         let imcRed = false;
         let nuevasObservaciones = "";
         if (imc) {
@@ -55,10 +56,13 @@ export const GetInfoServicio = async (
                 if (imcValue >= 25 && imcValue < 30) {
                     nuevasObservaciones += "SOBREPESO: DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
                 } else if (imcValue >= 30 && imcValue < 35) {
+                    obesidadIMC30 = true;
                     nuevasObservaciones += "OBESIDAD I: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
                 } else if (imcValue >= 35 && imcValue < 40) {
+                    obesidadIMC30 = true;
                     nuevasObservaciones += "OBESIDAD II: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
                 } else if (imcValue >= 40) {
+                    obesidadIMC30 = true;
                     nuevasObservaciones += "OBESIDAD III: NO HACER TRABAJOS EN ESPACIOS CONFINADOS. NO HACER TRABAJOS SOBRE 1.8 M.S.N PISO. DIETA HIPOCALORICA, HIPOGRASA Y EJERCICIOS.\n";
                 }
             }
@@ -69,7 +73,8 @@ export const GetInfoServicio = async (
 
         const vcercacod = res.oftalodccmologia_odcc || "";
         const vcercacoi = res.oiccoftalmologia_oicc || "";
-        const textoEnfermedadOftalmo = (res.enfermedadesOcularesOftalmo_e_oculares ?? "").trim().toUpperCase();
+        const textoEnfermedadOftalmo = (res.enfermedadesocularesoftalmo_e_oculares ?? "").trim().toUpperCase();
+        console.log({ vlejoscod, vlejoscoi, vcercacod, vcercacoi, textoEnfermedadOftalmo })
 
         if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
             const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
@@ -77,8 +82,8 @@ export const GetInfoServicio = async (
                 const visionLejosNormal = vlejoscod === "00" && vlejoscoi === "00";
                 const visionCercaNormal = vcercacod === "00" && vcercacoi === "00";
                 nuevasObservaciones += visionLejosNormal && visionCercaNormal
-                    ? "- CORREGIR AGUDEZA VISUAL.\n"
-                    : "- USO DE LENTES CORRECTORES.\n";
+                    ? "CORREGIR AGUDEZA VISUAL.\n"
+                    : "USO DE LENTES CORRECTORES.\n";
             }
         }
 
@@ -117,6 +122,7 @@ export const GetInfoServicio = async (
             peso: res.pesoTriaje ?? "",
             imc: res.imcTriaje ?? "",
             observacionesRecomendaciones: nuevasObservaciones,
+            obesidadIMC30: obesidadIMC30,
             imcRed: imcRed,
             perimetroCuello: res.perimetroCuelloTriaje ?? "",
             perimetroCintura: res.cinturaTriaje ?? "",
