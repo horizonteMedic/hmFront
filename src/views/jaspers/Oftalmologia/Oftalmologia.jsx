@@ -427,21 +427,6 @@ export default function Oftalmologia(datos = {}) {
     { nombre: "SELLOFIRMA", x: 120, y: y + boxH + 20, maxw: 50 },
   ];
   
-  // === CUADRO PARA FIRMA DEL MÉDICO ===
-  const firmaMedicoX = 120;
-  const firmaMedicoY = y + boxH + 20;
-  const firmaMedicoWidth = 50;
-  const firmaMedicoHeight = 35;
-  
-  // Dibujar cuadro alrededor de la firma del médico
-  doc.setDrawColor(0, 0, 0);
-  doc.setLineWidth(0.2);
-  doc.rect(firmaMedicoX, firmaMedicoY, firmaMedicoWidth, firmaMedicoHeight);
-  
-  // Texto debajo del cuadro
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  const centroFirmaMedico = firmaMedicoX + (firmaMedicoWidth / 2);
-  
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8});
   

@@ -69,6 +69,9 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   rabia: data.rabiaBoro_rabia || false,
   hepatitisA: data.hepatitisABoro_hepatitisa || false,
   covid19: data.covid_chkcovid || false,
+  // COVID-19 para sección de vacunas
+  covidVacunas: data.covidAntecedentePatologicoBoro_covid_antepatologico || false,
+  dosisVacunas: String(data.dosisVacunas_txtdosis || ""),
   // Datos para antecedentes quirúrgicos
   antecedentesQuirurgicos: data.antecedentesPatologicosQuirurjicos || [],
   fechaQuirurgica: data.fechaAntecedentesPatologicosQuirurgicos || "",
@@ -1359,54 +1362,45 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
     data.gripeInfluenzaBoro_gripe_influenza, data.influenzaBoro_influenza, data.neumococoBoro_neumococo, data.rabiaBoro_rabia);
 
   // Fila 3: Hepatitis A, Covid-19
-  const covidData = datosFinales.severidadCovid || {};
-  const tieneCovid = covidData.covid19 || false;
-  const tieneDosis = covidData.dosis && covidData.dosis.trim() !== "";
+  const tieneCovidVacunas = datosFinales.covidVacunas || false;
+  const dosisCovidVacunas = datosFinales.dosisVacunas || "";
+  const tieneDosisVacunas = dosisCovidVacunas.trim() !== "";
   
-  // Siempre mostrar la fila extendida (incluso si COVID no está marcado)
-  // Dibujar líneas de la fila extendida (sin divisiones internas, solo bordes)
+  // Estructura: Columna 1 (50mm): Hepatitis A + mini celda | Columna 2 (50mm): Covid-19 + mini celda | Resto: Dosis
+  const col1End = tablaInicioX + 50;  // Fin columna 1 (Hepatitis A con mini celda)
+  const col2End = tablaInicioX + 100; // Fin columna 2 (Covid-19 con mini celda)
+  
+  // Dibujar líneas de la fila
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(col1End, yPos, col1End, yPos + filaAltura); // División entre columna 1 y 2
+  // Si COVID está marcado, dibujar línea divisoria antes de la dosis
+  if (tieneCovidVacunas) {
+    doc.line(col2End, yPos, col2End, yPos + filaAltura); // División entre columna 2 y dosis
+  }
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   
-  // Dibujar mini celda para Hepatitis A
-  const xCentradaHepatitisA = dibujarMiniCelda(tablaInicioX + 30, yPos, filaAltura);
-  
-  // Cerrar la mini celda de Hepatitis A (línea derecha)
-  const anchoMiniCeldaVacunas = 6;
-  const xFinHepatitisA = tablaInicioX + 44 + anchoMiniCeldaVacunas;
-  doc.line(xFinHepatitisA, yPos, xFinHepatitisA, yPos + filaAltura);
-  
-  // Contenido Hepatitis A
+  // Columna 1: Hepatitis A + mini celda (igual formato que otras vacunas)
+  const xCentradaHepatitisA = dibujarMiniCelda(tablaInicioX + 40, yPos, filaAltura);
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Hepatitis A", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   if (data.hepatitisABoro_hepatitisa) doc.text("X", xCentradaHepatitisA, yPos + 3.5);
   
-  // Dibujar mini celda para COVID-19
-  const xCentradaCovid = dibujarMiniCelda(xFinHepatitisA + 20, yPos, filaAltura);
-  
-  // Cerrar la mini celda de COVID-19 (línea derecha)
-  const xFinMiniCeldaCovid = xFinHepatitisA + 20 + anchoMiniCeldaVacunas + 2;
-  doc.line(xFinMiniCeldaCovid, yPos, xFinMiniCeldaCovid, yPos + filaAltura);
-  
-  // Contenido COVID-19
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Covid-19", xFinHepatitisA + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  if (tieneCovid) {
-    doc.text("X", xCentradaCovid, yPos + 3.5);
-  }
-  
-  // Calcular posición X inicial para datos adicionales (después de la mini celda de COVID)
-  let xActualVacunas = xFinMiniCeldaCovid + 3;
-  
-  // Mostrar dosis SOLO si COVID-19 está marcado Y tiene dosis
-  if (tieneCovid && tieneDosis) {
+  // Columna 2: Covid-19 + mini celda (solo si está marcado)
+  if (tieneCovidVacunas) {
+    const xCentradaCovid = dibujarMiniCelda(tablaInicioX + 90, yPos, filaAltura);
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Covid-19", tablaInicioX + 52, yPos + 3.5);
     doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text("Dosis: " + covidData.dosis, xActualVacunas, yPos + 3.5);
-    xActualVacunas += doc.getTextWidth("Dosis: " + covidData.dosis) + 5;
+    doc.text("X", xCentradaCovid, yPos + 3.5);
+    
+    // Mostrar dosis después de la columna 2
+    if (tieneDosisVacunas) {
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      doc.text("Dosis: " + dosisCovidVacunas, col2End + 2, yPos + 3.5);
+    }
   }
   
   yPos += filaAltura;
