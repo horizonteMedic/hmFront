@@ -29,12 +29,14 @@ export default function InformePsicologico() {
         norden: "",
         codigoInforme: null,
         fechaEntrevista: today,
+        nombreExamen: "",
         nombres: "",
         apellidos: "",
         fechaNacimiento: "",
         lugarNacimiento: "",
         domicilioActual: "",
         edad: "",
+        sexo: "",
         estadoCivil: "",
         nivelEstudios: "",
 
@@ -313,7 +315,7 @@ export default function InformePsicologico() {
                             {/* Header con información del examen */}
                             <div className="bg-white border border-gray-200 rounded-lg p-3 ">
                                 <h3 className="font-semibold mb-2">Informe Psicológico</h3>
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                                <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
                                     <InputTextOneLine
                                         label="N° Orden"
                                         name="norden"
@@ -330,14 +332,19 @@ export default function InformePsicologico() {
                                         onChange={handleChange}
                                         labelWidth="120px"
                                     />
-                                    <div className="flex gap-4 items-center">
-                                        <h4 className="font-semibold min-w-[120px] max-w-[120px]">Aprobó Test :</h4>
-                                        <InputsBooleanRadioGroup
-                                            name="aproboTest"
-                                            value={form.aproboTest}
-                                            onChange={handleRadioButtonBoolean}
-                                        />
-                                    </div>
+                                    <InputTextOneLine
+                                        label="Nombre Examen"
+                                        name="nombreExamen"
+                                        value={form.nombreExamen}
+                                        disabled
+                                        labelWidth="120px"
+                                    />
+                                    <InputsBooleanRadioGroup
+                                        label="Aprobó Test"
+                                        name="aproboTest"
+                                        value={form.aproboTest}
+                                        onChange={handleRadioButtonBoolean}
+                                    />
                                 </div>
                             </div>
                             {/* Contenido principal */}
@@ -385,13 +392,22 @@ export default function InformePsicologico() {
                                             disabled
                                             labelWidth="120px"
                                         />
+                                        <div className="grid md:grid-cols-2 gap-3">
                                         <InputTextOneLine
-                                            label="Edad"
+                                            label="Edad (Años)"
                                             name="edad"
                                             value={form.edad}
                                             disabled
                                             labelWidth="120px"
                                         />
+                                        <InputTextOneLine
+                                            label="Sexo"
+                                            name="sexo"
+                                            value={form.sexo}
+                                            disabled
+                                            labelWidth="120px"
+                                        />
+                                        </div>
                                         <InputTextOneLine
                                             label="Estado Civil"
                                             name="estadoCivil"
