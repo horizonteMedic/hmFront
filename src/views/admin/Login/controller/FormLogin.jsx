@@ -22,6 +22,7 @@ export function FormLogin() {
   const setlistView = useAuthStore((state) => state.setlistView);
   const setlistAccesos = useAuthStore((state) => state.setlistAccesos);
   const setdatosFooter = useAuthStore((state) => state.setdatosFooter);
+  const setListaEmpleados = useAuthStore((state) => state.setListaEmpleados);
   const [loading, setloadign] = useState(false);
   const [errormess, setErrormess] = useState("");
 
@@ -95,11 +96,19 @@ export function FormLogin() {
       ...UserLogued,
       sedes: ListSedesxUser  // o usa el nombre que desees
     };
-    const datosFooter=await getFetch(`/api/v01/st/registros/obtenerInformacionSedes`,token)
+    const datosFooter=await getFetch(`/api/v01/st/registros/obtenerInformacionSedes`,token) 
+    let listaEmpleados=await getFetch(`/api/v01/st/empleado/listadoUsuarioEmpleado`,token)
+    if(listaEmpleados){
+      listaEmpleados = listaEmpleados.map(item => ({
+        ...item,
+        nombres: item.nombres ? item.nombres.toUpperCase() : ""
+      }))
+    }
     // console.log("datosFooter",datosFooter)
     setdatosFooter(datosFooter)
     setlistView(todasLasVistas);
     setlistAccesos(todosLosPermisos)
+    setListaEmpleados(listaEmpleados)
     setuserlogued(userConSedes);
     setToken(token);
     Loginvnigate(token);
