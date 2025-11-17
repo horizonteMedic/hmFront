@@ -297,7 +297,7 @@ const ComboboxEmpresasMulti = (sede) => {
     const token = useAuthStore((state) => state.token);
     useEffect(() => { 
         
-          fetch(`${URLAzure}/api/v01/ct/ocupacional/listadoEmpresasMutisucursal/${sede}`,{
+          fetch(`${URLAzure}/api/v01/ct/ocupacional/listadoEmpresasConRucMutisucursal/${sede}`,{
           method: 'GET', 
           headers: {
               'Authorization': `Bearer ${token}`

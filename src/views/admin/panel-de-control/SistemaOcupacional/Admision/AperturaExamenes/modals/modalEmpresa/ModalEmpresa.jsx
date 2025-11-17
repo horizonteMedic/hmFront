@@ -183,6 +183,7 @@ const ModalEmpresa = ({
   };
 
   const ReturnRS = (e) => {
+    console.log(e)
     GetRazonS(e);
     handleClose();
   };
@@ -483,7 +484,7 @@ const ModalEmpresa = ({
                         setExisteRUC(false);
                       }}
                       onContextMenu={(e) => {
-                        e.preventDefault(), ReturnRS(item.razonEmpresa);
+                        e.preventDefault(), ReturnRS(item);
                       }}
                       className="cursor-pointer hover:bg-gray-50"
                     >

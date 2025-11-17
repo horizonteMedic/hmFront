@@ -48,6 +48,7 @@ const AperturaExamenesPreOcup = (props) => {
     nombres: "",
     apellidos: "",
     razonEmpresa: "",
+    rucEmpresa: "",
     razonContrata: "",
     n_medico: "",
     n_hora: "",
@@ -59,6 +60,7 @@ const AperturaExamenesPreOcup = (props) => {
     mineralPo: "",
     alturaPo: "",
     precioPo: "",
+    protocolo: "",
     tipoPago: "",
     precioAdic: "",
     autoriza: "",
@@ -84,8 +86,9 @@ const AperturaExamenesPreOcup = (props) => {
     tcocaina:false,
 
     nombreMiUsuario: fixEncodingModern(userCompleto?.datos?.nombres_user),
-    userRegistroDatos: "",    
+    userRegistroDatos: ""
   })
+  
   const [searchHC, setSearchHC] = useState([])
   const [showEdit, setShowEdit] = useState(false)
   const [habilitar, setHabilitar] = useState(false)
@@ -99,7 +102,8 @@ const AperturaExamenesPreOcup = (props) => {
   const [refresh, setRefresh] = useState(0)
   const [CanP, setCanP] = useState({Completos: 0, Faltantes: 0})
   const [FechaCanP, setFechaCanP] = useState(format(today, 'dd/MM/yyyy'))
-
+  //lista de Protocolos
+  const [protocoloOptions, setProtocoloOptions] = useState([]) 
   useEffect(() => {
     getFetch(`/api/v01/ct/consentDigit/resumenAdmPacientesConFiltros?nomSede=${props.selectedSede}&fecha=${FechaCanP}`,props.token)
     .then((res) => {
@@ -107,6 +111,18 @@ const AperturaExamenesPreOcup = (props) => {
     })
   },[FechaCanP])
 
+  //Traer listas de protocolos
+  useEffect(() => {
+    if (datos.rucEmpresa) {
+      getFetch(`/api/v01/ct/protocolo/obtenerProtocoloRucEmpresa/empresa/${datos.rucEmpresa}`,props.token)
+      .then((res) => {
+        EnlistarProtos(res)
+      })
+    }
+    
+  },[datos.rucEmpresa])
+
+  
 
   // Autocompletado Empresa
   const [searchEmpresa, setSearchEmpresa] = useState(datos.razonEmpresa);
@@ -120,6 +136,7 @@ const AperturaExamenesPreOcup = (props) => {
 
   const handleEmpresaSearch = e => {
     const v = e.target.value.toUpperCase();
+    
     if (v === "") {
       setDatos(d => ({ ...d, razonEmpresa: "" }));
     }
@@ -136,7 +153,7 @@ const AperturaExamenesPreOcup = (props) => {
 
   const handleSelectEmpresa = emp => {
     setSearchEmpresa(emp.mensaje);
-    setDatos(d => ({ ...d, razonEmpresa: emp.mensaje }));
+    setDatos(d => ({ ...d, razonEmpresa: emp.mensaje, rucEmpresa: emp.rucEmpresa }));
     setFilteredEmpresas([]);
     // mueve el foco al siguiente campo Contrata
     document.getElementById('razonContrata')?.focus();
@@ -299,27 +316,27 @@ const AperturaExamenesPreOcup = (props) => {
   // Explotación
 
   // Protocolo (reemplaza estos valores por los tuyos)
-  const protocoloOptions = [
-    { id: 1, mensaje: 'Protocolo A' },
-    { id: 2, mensaje: 'Protocolo B' },
-    // …
-  ];
+  
   const [searchProtocolo, setSearchProtocolo] = useState(datos.protocolo || '');
   const [filteredProtocolos, setFilteredProtocolos] = useState([]);
   const handleProtocoloSearch = e => {
     const v = e.target.value.toUpperCase();
+    if (v === "") {
+      setDatos(d => ({ ...d, protocolo: "" }));
+    }
     setSearchProtocolo(v);
     setFilteredProtocolos(
       v
         ? protocoloOptions.filter(p =>
-            p.mensaje.toLowerCase().includes(v.toLowerCase())
+            p.nombre.toLowerCase().includes(v.toLowerCase())
           )
         : []
     );
   };
   const handleSelectProtocolo = p => {
-    setSearchProtocolo(p.mensaje);
-    setDatos(d => ({ ...d, protocolo: p.mensaje }));
+    console.log(p)
+    setSearchProtocolo(p.nombre);
+    setDatos(d => ({ ...d, protocolo: p.nombre }));
     setFilteredProtocolos([]);
   };
 
@@ -409,7 +426,8 @@ const AperturaExamenesPreOcup = (props) => {
         nombresPa: res.nombres,
         apellidosPa: res.apellidos,
         fechaAperturaPo: formatDate(res.fechaAperturaPo),
-        userRegistroDatos: res.usuarioRegistro ?? ""
+        userRegistroDatos: res.usuarioRegistro ?? "",
+        protocolo: res.protocolo
       });
       setSearchEmpresa(res.razonEmpresa || "");
       setSearchContrata(res.razonContrata || "")
@@ -418,6 +436,7 @@ const AperturaExamenesPreOcup = (props) => {
       setSearchCargo(res.cargoDe || "")
       setSearchArea(res.areaO || "")
       setSearchExamenMedico(res.nomExamen || "")
+      setSearchProtocolo(res.protocolo || "")
     })
     
     setRegister(false)
@@ -673,7 +692,7 @@ const AperturaExamenesPreOcup = (props) => {
       }
     })
   }
-
+  
   const SearchClickRight = (n_orden) => {
     Swal.fire({
       title: `<span style="font-size:1.3em;font-weight:bold;">Cargando Hoja de Ruta</span>`,
@@ -907,7 +926,37 @@ const AperturaExamenesPreOcup = (props) => {
 
     return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
   };
-  
+
+  const EnlistarProtos = (res) => {
+    console.log(res)
+    setDatos(d => ({ ...d, protocolo: "" }));
+    setSearchProtocolo("");
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-start",
+      showConfirmButton: false,
+      timer: 7000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+      }
+    });
+    if (res.estatus === "OK") {
+      setProtocoloOptions(res.resultado)
+      Toast.fire({
+        icon: "success",
+        title: `Lista de Protocolos Activa para Empresa: ${datos.razonEmpresa}`
+      });
+    } else {
+      setProtocoloOptions([])
+      Toast.fire({
+        icon: "error",
+        title: `No Existe Lista de Protocolos para Empresa: ${datos.razonEmpresa}`
+      });
+    }
+  }
+  console.log(datos)
   return (
     <div >
         <div className="grid md:grid-cols-2 sm:flex-col gap-5 px-4">
@@ -1501,18 +1550,18 @@ const AperturaExamenesPreOcup = (props) => {
                   id="protocolo" name="protocolo"
                   type="text" value={searchProtocolo}
                   placeholder="Escribe para buscar protocolo..."
-                  disabled={habilitar} onChange={handleProtocoloSearch}
-                  className="border border-gray-300 px-3 py-1 rounded-md bg-white w-full"
+                  disabled={habilitar || !(protocoloOptions?.length > 0)} onChange={handleProtocoloSearch}
+                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${!(protocoloOptions?.length > 0) ? "bg-slate-300" : "bg-slate-100"}`}
                   onKeyDown={e=>{ if(e.key==='Enter'&&filteredProtocolos.length>0){e.preventDefault();handleSelectProtocolo(filteredProtocolos[0]);} }}
-                  onFocus={()=>setFilteredProtocolos(protocoloOptions.filter(p=>p.mensaje.toLowerCase().includes(searchProtocolo.toLowerCase())))}
+                  onFocus={()=>setFilteredProtocolos(protocoloOptions.filter(p=>p.nombre.toLowerCase().includes(searchProtocolo.toLowerCase())))}
                   onBlur={()=>setTimeout(()=>setFilteredProtocolos([]),100)}
                 />
                 {searchProtocolo&&filteredProtocolos.length>0&&(
                   <ul className="absolute inset-x-0 top-full bg-white border rounded-md mt-1 max-h-40 overflow-y-auto z-10">
                     {filteredProtocolos.map(p=>(
-                      <li key={p.id} className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                      <li key={p.idProtocolo} className="cursor-pointer px-3 py-2 hover:bg-gray-100"
                           onMouseDown={()=>handleSelectProtocolo(p)}>
-                        {p.mensaje}
+                        {p.nombre}
                       </li>
                     ))}
                   </ul>
@@ -1693,10 +1742,11 @@ const AperturaExamenesPreOcup = (props) => {
           Swal={Swal}
           Get={getFetch}
           token={props.token}
-          GetRazonS={(e) => {setDatos({...datos,
-            razonEmpresa: e
+          GetRazonS={(e) => {console.log(e),setDatos({...datos,
+            razonEmpresa: e.razonEmpresa,
+            rucEmpresa: e.rucEmpresa
           });
-          setSearchEmpresa(e)}}
+          setSearchEmpresa(e.razonEmpresa)}}
         />
         <ModalContrata 
           isOpen={isContrataModalOpen}

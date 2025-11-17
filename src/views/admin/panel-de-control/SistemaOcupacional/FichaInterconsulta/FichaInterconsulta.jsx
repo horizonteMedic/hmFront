@@ -83,7 +83,7 @@ export default function FichaInterconsulta() {
         cmpUsuario: "",
         direccionClinica: "",
         //Cuadros
-        motivo: "SE SOLICITA EVALUACION POR ESPECIALIDAD PARA DIAGNOSTICO, TRATAMIENTO, CONTROLES POSTERIORES Y DEFINIR APTITUD PARA ELABORAR",
+        motivo: "SE SOLICITA EVALUACION POR ESPECIALIDAD PARA DIAGNOSTICO, TRATAMIENTO, CONTROLES POSTERIORES Y DEFINIR APTITUD PARA LABORAR",
         hallazgo: "",
         diagnostico: "",
         tratamiento: "",

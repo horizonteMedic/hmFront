@@ -436,16 +436,16 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   // Datos para la fila "Cerca" - usando datos reales
   const datosCerca = {
     agudezaVisual: "Cerca",
-    sinCorrectores: `OD: ${datosFinales.agudezaVisualCercaOD || ""}  OI: ${datosFinales.agudezaVisualCercaOI || ""}`,
-    conCorrectores: `OD: ${datosFinales.agudezaVisualCercaConOD || ""}  OI: ${datosFinales.agudezaVisualCercaConOI || ""}`,
+    sinCorrectores: `OD: ${datosFinales.agudezaVisualCercaOD || ""}\nOI: ${datosFinales.agudezaVisualCercaOI || ""}`,
+    conCorrectores: `OD: ${datosFinales.agudezaVisualCercaConOD || ""}\nOI: ${datosFinales.agudezaVisualCercaConOI || ""}`,
     binocular: `Test de Ishihara: ${datosFinales.testIshihara || ""}`
   };
 
   // Datos para la fila "Lejos" - usando datos reales
   const datosLejos = {
     agudezaVisual: "Lejos",
-    sinCorrectores: `OD: ${datosFinales.agudezaVisualLejosOD || ""}  OI: ${datosFinales.agudezaVisualLejosOI || ""}`,
-    conCorrectores: `OD: ${datosFinales.agudezaVisualLejosConOD || ""}  OI: ${datosFinales.agudezaVisualLejosConOI || ""}`,
+    sinCorrectores: `OD: ${datosFinales.agudezaVisualLejosOD || ""}\nOI: ${datosFinales.agudezaVisualLejosOI || ""}`,
+    conCorrectores: `OD: ${datosFinales.agudezaVisualLejosConOD || ""}\nOI: ${datosFinales.agudezaVisualLejosConOI || ""}`,
     binocular: `Ref. Pupilares: ${datosFinales.refPupilares || ""}`
   };
 
