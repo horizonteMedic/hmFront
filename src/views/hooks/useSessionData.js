@@ -3,10 +3,11 @@ import { useAuthStore } from "../../store/auth";
 import { fixEncodingModern } from "../utils/helpers";
 
 export const useSessionData = () => {
-    const { token, userlogued, datosFooter } = useAuthStore((state) => ({
+    const { token, userlogued, datosFooter, listaEmpleados } = useAuthStore((state) => ({
         token: state.token,
         userlogued: state.userlogued,
-        datosFooter: state.datosFooter
+        datosFooter: state.datosFooter,
+        listaEmpleados: state.listaEmpleados
     }));
 
     const [selectedSede, setSelectedSede] = useState("");
@@ -31,5 +32,6 @@ export const useSessionData = () => {
         userlogued: userlogued?.sub ?? "",
         selectedSede,
         datosFooter,
+        listaEmpleados,
     };
 };

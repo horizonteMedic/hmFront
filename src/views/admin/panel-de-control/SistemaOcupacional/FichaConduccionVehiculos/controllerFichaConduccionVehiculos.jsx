@@ -34,12 +34,14 @@ export const GetInfoServicio = async (
             const imcValue = parseFloat(imc);
             if (!isNaN(imcValue) && imcValue > 25) {
                 imcRed = true;
-                if (imcValue >= 25 && imcValue < 29.91) {
+                if (imcValue >= 25 && imcValue < 30) {
                     nuevasObservaciones += "SOBREPESO: DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
-                } else if (imcValue >= 29.91 && imcValue < 35) {
+                } else if (imcValue >= 30 && imcValue < 35) {
                     nuevasObservaciones += "OBESIDAD I: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
-                } else if (imcValue >= 35) {
+                } else if (imcValue >= 35 && imcValue < 40) {
                     nuevasObservaciones += "OBESIDAD II: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+                } else if (imcValue >= 40) {
+                    nuevasObservaciones += "OBESIDAD III: NO HACER TRABAJOS EN ESPACIOS CONFINADOS. NO HACER TRABAJOS SOBRE 1.8 M.S.N PISO. DIETA HIPOCALORICA, HIPOGRASA Y EJERCICIOS.\n";
                 }
             }
         }
@@ -49,12 +51,16 @@ export const GetInfoServicio = async (
 
         const vcercacod = res.oftalodccmologia_odcc || "";
         const vcercacoi = res.oiccoftalmologia_oicc || "";
+        const textoEnfermedadOftalmo = (res.enfermedadesocularesoftalmo_e_oculares ?? "").trim().toUpperCase();
 
-        if (!((res.enfermedadesocularesoftalmo_e_oculares ?? "").trim().toUpperCase() == ("NINGUNA"))) {
-            if (vlejoscod == "00" && vlejoscoi == "00" && vcercacod == "00" && vcercacoi == "00") {
-                nuevasObservaciones += "CORREGIR AGUDEZA VISUAL.\n";
-            } else {
-                nuevasObservaciones += "USO DE LENTES CORRECTORES.\n";
+        if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
+            const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
+            if (enfermedadesRefractarias.some(e => textoEnfermedadOftalmo.includes(e))) {
+                const visionLejosNormal = vlejoscod === "00" && vlejoscoi === "00";
+                const visionCercaNormal = vcercacod === "00" && vcercacoi === "00";
+                nuevasObservaciones += visionLejosNormal && visionCercaNormal
+                    ? "CORREGIR AGUDEZA VISUAL.\n"
+                    : "USO DE LENTES CORRECTORES.\n";
             }
         }
 

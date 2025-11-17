@@ -252,6 +252,7 @@ const HistoriaOcupacional = ({
       eliminados: [],
       nombres: "",
       fecha: today,
+      dniUser: userDatos.datos.dni_user,
       areaO: "",
       dni: "",
     });
@@ -334,7 +335,7 @@ const HistoriaOcupacional = ({
     });
 
     if (confirm.isConfirmed) {
-      if(registros[indexToRemove].historiaDetalleId != null){
+      if (registros[indexToRemove].historiaDetalleId != null) {
         setForm((prev) => ({
           ...prev,
           eliminados: [...prev.eliminados, registros[indexToRemove].historiaDetalleId]

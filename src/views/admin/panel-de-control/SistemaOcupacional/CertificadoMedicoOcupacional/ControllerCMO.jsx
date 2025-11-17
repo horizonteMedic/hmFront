@@ -285,7 +285,7 @@ export const Valores = {
 `,
 
   Check5: `- LABORATORIO: Hma, Hb /Hto, Grupo Sanguineo y Factor ({grupoFactor})
-  - TEST CUALITATIVO: COLESTEROL Y TRIGLICÉRIDOS
+- Glucosa, Creatinina /dl, Ex. Orina, RPR, Test cualitativo: Cocaína y Marihuana, Colesterol y Triglicéridos
 - APTITUD MÉDICA
 - ANEXO 16
 - ANT. ENFERMEDADES ALTURA
@@ -308,6 +308,7 @@ export const Valores = {
 - PSICOLOGIA
 - CONSENTIMIENTO INFORMADO
 - COPIA DE DNI
+- COPIA DE LICENCIA DE CONDUCIR
 
 `,
 

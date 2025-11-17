@@ -13,7 +13,6 @@ export default function IndicarEnfermedades({
       {/* Sección normal - solo se muestra cuando BOROO NO está activado */}
       <div className="bg-white border border-gray-200 rounded-lg p-3">
         <h4 className="font-semibold mb-3">Indicar las enfermedades que ha tenido o tiene, con cierta frecuencia</h4>
-
         {/* Lista de síntomas en 3 columnas */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           {/* Columna 1 */}
@@ -97,53 +96,59 @@ export default function IndicarEnfermedades({
         />
       </div>
 
-      {/* Secciones adicionales cuando BOROO está activado */}
-      <>
-        {/* Antecedentes Inmunológicos / Vacunas */}
-        <div className="bg-white border border-gray-200 rounded-lg p-3">
-          <h4 className="font-semibold mb-4">ANTECEDENTES INMUNOLÓGICOS / VACUNAS:</h4>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Columna 1 - Vacunas */}
-            <div className="space-y-1">
-              {[
-                ["antitetanica", "Antitetánica"],
-                ["fiebreAmarilla", "Fiebre Amarilla"],
-                ["influenza", "Influenza"],
-                ["hepatitisA", "Hepatitis A"],
-                ["hepatitisB", "Hepatitis B"],
-              ].map(([name, label]) => (
-                <InputCheckbox
-                  key={name}
-                  label={label}
-                  name={name}
-                  checked={form?.[name]}
-                  onChange={handleCheckBoxChange}
-                />
-              ))}
-            </div>
-
-            {/* Columna 2 - Vacunas */}
-            <div className="space-y-1">
-              {[
-                ["gripeInfluenza", "Gripe/Influenza"],
-                ["neumococo", "Neumococo"],
-                ["rabia", "Rabia"],
-                ["papilomaHumano", "Papiloma Humano"],
-              ].map(([name, label]) => (
-                <InputCheckbox
-                  key={name}
-                  label={label}
-                  name={name}
-                  checked={form?.[name]}
-                  onChange={handleCheckBoxChange}
-                />
-              ))}
-
-            </div>
+      {/* Antecedentes Inmunológicos / Vacunas */}
+      <div className="bg-white border border-gray-200 rounded-lg p-3">
+        <h4 className="font-semibold mb-4">ANTECEDENTES INMUNOLÓGICOS / VACUNAS:</h4>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Columna 1 - Vacunas */}
+          <div className="space-y-1">
+            {[
+              ["antitetanica", "Antitetánica"],
+              ["fiebreAmarilla", "Fiebre Amarilla"],
+              ["influenza", "Influenza"],
+              ["hepatitisA", "Hepatitis A"],
+              ["hepatitisB", "Hepatitis B"],
+            ].map(([name, label]) => (
+              <InputCheckbox
+                key={name}
+                label={label}
+                name={name}
+                checked={form?.[name]}
+                onChange={handleCheckBoxChange}
+              />
+            ))}
           </div>
+
+          {/* Columna 2 - Vacunas */}
+          <div className="space-y-1">
+            {[
+              ["gripeInfluenza", "Gripe/Influenza"],
+              ["neumococo", "Neumococo"],
+              ["rabia", "Rabia"],
+              ["papilomaHumano", "Papiloma Humano"],
+              ["covidAntecedentePatologico", "COVID-19"],
+            ].map(([name, label]) => (
+              <InputCheckbox
+                key={name}
+                label={label}
+                name={name}
+                checked={form?.[name]}
+                onChange={handleCheckBoxChange}
+              />
+            ))}
+          </div>
+          <div />
+          <InputTextOneLine
+            label="Dosis de vacunas COVID-19"
+            name="dosisVacunas"
+            value={form?.dosisVacunas}
+            onChange={handleChangeNumber}
+            disabled={!form?.covidAntecedentePatologico}
+            labelWidth="120px"
+            className="-mt-3"
+          />
         </div>
-      </>
+      </div>
 
       {/* Hábitos Nocivos */}
       <div className="bg-white border border-gray-200 rounded-lg p-3">
@@ -387,60 +392,57 @@ export default function IndicarEnfermedades({
           </div>
         </div>
       </div>
-      {/* Secciones adicionales cuando BOROO está activado - Solo Medicamentos y Actividad Física */}
-      <>
-        {/* Medicamentos y Actividad Física */}
-        <div className="mt-6 bg-white border border-gray-200 rounded-lg p-3">
-          <div className="space-y-6">
-            {/* Medicamentos */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-4">
-                <span className="font-semibold">Medicamentos:</span>
-                <InputsBooleanRadioGroup
-                  name="medicamentos"
-                  value={form?.medicamentos}
-                  onChange={(e, value) => {
-                    if (value == false)
-                      setForm(prev => ({ ...prev, especifiqueMedicamentos: "" }));
-                    handleRadioButtonBoolean(e, value)
-                  }
-                  }
-                />
-              </div>
-              <InputTextOneLine
-                label="Especifique"
-                name="especifiqueMedicamentos"
-                value={form?.especifiqueMedicamentos}
-                disabled={!form?.medicamentos}
-                onChange={handleChange}
+      {/* Medicamentos y Actividad Física */}
+      <div className="mt-6 bg-white border border-gray-200 rounded-lg p-3">
+        <div className="space-y-6">
+          {/* Medicamentos */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-4">
+              <span className="font-semibold">Medicamentos:</span>
+              <InputsBooleanRadioGroup
+                name="medicamentos"
+                value={form?.medicamentos}
+                onChange={(e, value) => {
+                  if (value == false)
+                    setForm(prev => ({ ...prev, especifiqueMedicamentos: "" }));
+                  handleRadioButtonBoolean(e, value)
+                }
+                }
               />
             </div>
+            <InputTextOneLine
+              label="Especifique"
+              name="especifiqueMedicamentos"
+              value={form?.especifiqueMedicamentos}
+              disabled={!form?.medicamentos}
+              onChange={handleChange}
+            />
+          </div>
 
-            {/* Actividad Física */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-4">
-                <span className="font-semibold">Actividad Física:</span>
-                <InputsBooleanRadioGroup
-                  name="actividadFisica"
-                  value={form?.actividadFisica}
-                  onChange={(e, value) => {
-                    if (value == false)
-                      setForm(prev => ({ ...prev, especifiqueActividadFisica: "" }));
-                    handleRadioButtonBoolean(e, value)
-                  }}
-                />
-              </div>
-              <InputTextOneLine
-                label="Especifique"
-                name="especifiqueActividadFisica"
-                value={form?.especifiqueActividadFisica}
-                disabled={!form?.actividadFisica}
-                onChange={handleChange}
+          {/* Actividad Física */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-4">
+              <span className="font-semibold">Actividad Física:</span>
+              <InputsBooleanRadioGroup
+                name="actividadFisica"
+                value={form?.actividadFisica}
+                onChange={(e, value) => {
+                  if (value == false)
+                    setForm(prev => ({ ...prev, especifiqueActividadFisica: "" }));
+                  handleRadioButtonBoolean(e, value)
+                }}
               />
             </div>
+            <InputTextOneLine
+              label="Especifique"
+              name="especifiqueActividadFisica"
+              value={form?.especifiqueActividadFisica}
+              disabled={!form?.actividadFisica}
+              onChange={handleChange}
+            />
           </div>
         </div>
-      </>
+      </div>
     </div>
   );
 }

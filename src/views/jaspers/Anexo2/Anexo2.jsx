@@ -79,6 +79,10 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     diabetes_si: data.diabetes || false,
     otros_si: data.antecedentesPersonalesOtros_chkapotros || false,
     otros_descripcion: data.antecedentesPersonalesOtrosDescripcion_txtotrosantecendetes ?? "",
+    neoplasia_descripcion: data.neoplasiaDescripcion_txtneoplasia || data.neoplasiaDescripcion || "",
+    quemaduras_descripcion: data.quemadurasDescripcion_txtquemaduras || data.quemadurasDescripcion || "",
+    its_descripcion: data.itsDescripcion_txtits || data.itsDescripcion || "",
+    cirugias_descripcion: data.cirugiasDescripcion_txtcirugias || data.cirugiasDescripcion || "",
     // Hábitos nocivos
     alcohol_si: data.alcohol || false,
     alcohol_tipo: data.alcoholTipo || "",
@@ -226,21 +230,21 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
 
   // Lista de antecedentes
   const antecedentes = [
-    { name: 'Alergias', si: datosFinales.alergias_si },
-    { name: 'Asma', si: datosFinales.asma_si },
-    { name: 'Bronquitis', si: datosFinales.bronquitis_si },
-    { name: 'Quemaduras', si: datosFinales.quemaduras_si },
-    { name: 'Cirugias', si: datosFinales.cirugias_si },
-    { name: 'TBC', si: datosFinales.tbc_si },
-    { name: 'ITS', si: datosFinales.its_si },
-    { name: 'Convulciones', si: datosFinales.convulciones_si },
-    { name: 'Neoplasia', si: datosFinales.neoplasia_si },
-    { name: 'Intoxicaciones', si: datosFinales.intoxicaciones_si },
-    { name: 'Hepatitis', si: datosFinales.hepatitis_si },
-    { name: 'Tifoidea', si: datosFinales.tifoidea_si },
-    { name: 'HTA', si: datosFinales.hta_si },
-    { name: 'Diabetes', si: datosFinales.diabetes_si },
-    { name: 'Otros', si: datosFinales.otros_si }
+    { name: 'Alergias', si: datosFinales.alergias_si, descripcion: '' },
+    { name: 'Asma', si: datosFinales.asma_si, descripcion: '' },
+    { name: 'Bronquitis', si: datosFinales.bronquitis_si, descripcion: '' },
+    { name: 'Quemaduras', si: datosFinales.quemaduras_si, descripcion: datosFinales.quemaduras_descripcion },
+    { name: 'Cirugias', si: datosFinales.cirugias_si, descripcion: datosFinales.cirugias_descripcion },
+    { name: 'TBC', si: datosFinales.tbc_si, descripcion: '' },
+    { name: 'ITS', si: datosFinales.its_si, descripcion: datosFinales.its_descripcion },
+    { name: 'Convulciones', si: datosFinales.convulciones_si, descripcion: '' },
+    { name: 'Neoplasia', si: datosFinales.neoplasia_si, descripcion: datosFinales.neoplasia_descripcion },
+    { name: 'Intoxicaciones', si: datosFinales.intoxicaciones_si, descripcion: '' },
+    { name: 'Hepatitis', si: datosFinales.hepatitis_si, descripcion: '' },
+    { name: 'Tifoidea', si: datosFinales.tifoidea_si, descripcion: '' },
+    { name: 'HTA', si: datosFinales.hta_si, descripcion: '' },
+    { name: 'Diabetes', si: datosFinales.diabetes_si, descripcion: '' },
+    { name: 'Otros', si: datosFinales.otros_si, descripcion: datosFinales.otros_descripcion }
   ];
 
   // Lista de hábitos nocivos
@@ -675,10 +679,14 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   yPos = dibujarHeaderSeccion("3. ANTECEDENTES PATOLÓGICOS PERSONALES", yPos, filaAltura);
 
   // Configuración de columnas para la tabla de antecedentes
-  const colAnteWidth = 49;
+  const colAnteWidth = 54; // Aumentado de 49 a 54 (+5mm)
   const colSiNoWidth = 7;
-  const groupWidth = 63;
-  const verticalLinesAnte = [5, 54, 61, 68, 117, 124, 131, 180, 187, 205];
+  const groupWidth = 68; // Aumentado de 63 a 68 (+5mm)
+  // Ajuste: el tercer grupo se ajusta al ancho disponible (205 - 141 = 64mm)
+  // colAnteWidth3 = 64 - 7 - 7 = 50mm (reducido para que quepa)
+  const colAnteWidth3 = 50; // Tercer grupo: columna de antecedente ajustada
+  const groupWidth3 = 64; // Tercer grupo ajustado para que quepa en el ancho total
+  const verticalLinesAnte = [5, 59, 66, 73, 127, 134, 141, 191, 198, 205];
 
   // Fila de encabezado de columnas
   doc.setDrawColor(0, 0, 0);
@@ -693,13 +701,14 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   let currentX = tablaInicioX;
   for (let g = 0; g < 3; g++) {
-    // Centrar "ANTECEDENTE" en la columna de nombre (ancho 49mm, centro en +24.5)
-    doc.text("ANTECEDENTE", currentX + 24.5, yPos + 3.5, { align: "center" });
+    const colAnteWidthActual = (g === 2) ? colAnteWidth3 : colAnteWidth; // Tercer grupo usa ancho ajustado
+    // Centrar "ANTECEDENTE" en la columna de nombre
+    doc.text("ANTECEDENTE", currentX + colAnteWidthActual / 2, yPos + 3.5, { align: "center" });
     // Centrar "SI" en su columna (ancho 7mm, centro en +3.5 desde inicio de columna)
-    doc.text("SI", currentX + colAnteWidth + 3.5, yPos + 3, { align: "center" });
+    doc.text("SI", currentX + colAnteWidthActual + 3.5, yPos + 3, { align: "center" });
     // Centrar "NO" en su columna
-    doc.text("NO", currentX + colAnteWidth + colSiNoWidth + 3.5, yPos + 3, { align: "center" });
-    currentX += groupWidth;
+    doc.text("NO", currentX + colAnteWidthActual + colSiNoWidth + 3.5, yPos + 3, { align: "center" });
+    currentX += (g === 2) ? groupWidth3 : groupWidth; // Tercer grupo usa ancho ajustado
   }
   yPos += filaAltura;
 
@@ -722,16 +731,32 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
       const idx = startIdx + g;
       if (idx < antecedentes.length) {
         const ant = antecedentes[idx];
+        const colAnteWidthActual = (g === 2) ? colAnteWidth3 : colAnteWidth; // Tercer grupo usa ancho ajustado
         doc.text(ant.name, currentX + 1, yPos + 3.5);
-        const xSi = currentX + colAnteWidth + 3.5;
-        const xNo = currentX + colAnteWidth + colSiNoWidth + 3.5;
+        const xSi = currentX + colAnteWidthActual + 3.5;
+        const xNo = currentX + colAnteWidthActual + colSiNoWidth + 3.5;
         if (ant.si) {
           doc.setFont("helvetica", "bold").setFontSize(10);
           doc.text('X', xSi, yPos + 3.5, { align: "center" });
           doc.setFont("helvetica", "normal").setFontSize(8);
-          if (ant.name === "Otros") {
+          // Mostrar descripción al costado si existe
+          if (ant.descripcion && ant.descripcion.trim() !== "") {
             doc.setFont("helvetica", "normal").setFontSize(5);
-            doc.text(datosFinales.otros_descripcion, xSi - 42, yPos + 2.5, { maxWidth: 37 });
+            // Ajustar posición según el antecedente (ajustado para colAnteWidth de 54mm o 50mm)
+            let xTexto = xSi - (colAnteWidthActual + 5); // Posición base ajustada
+            const maxWidthTexto = colAnteWidthActual - 12; // Ancho máximo ajustado
+            if (ant.name === "Quemaduras") {
+              xTexto = xSi - (colAnteWidthActual + 5) + 20; // Mover 8mm al costado derecho
+            } else if (ant.name === "Cirugias") {
+              xTexto = xSi - (colAnteWidthActual + 5) + 15; // Mover 3mm al costado derecho
+            } else if (ant.name === "Neoplasia") {
+              xTexto = xSi - (colAnteWidthActual + 5) + 18; // Mover 4mm al costado derecho
+            } else if (ant.name === "ITS") {
+              xTexto = xSi - (colAnteWidthActual + 5) + 10; // Mover 10mm al costado derecho
+            } else if (ant.name === "Otros") {
+              xTexto = xSi - (colAnteWidthActual + 5) + 12; // Mover 10mm al costado derecho
+            }
+            doc.text(ant.descripcion, xTexto, yPos + 2.5, { maxWidth: maxWidthTexto });
             doc.setFont("helvetica", "normal").setFontSize(8);
           }
         } else {
@@ -740,10 +765,14 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
           doc.setFont("helvetica", "normal").setFontSize(8);
         }
       }
-      currentX += groupWidth;
+      currentX += (g === 2) ? groupWidth3 : groupWidth; // Tercer grupo usa ancho ajustado
     }
     yPos += filaAltura;
   }
+
+  // === FILAS ADICIONALES: DETALLES DE ANTECEDENTES ===
+  // Nota: Los detalles ahora se muestran directamente en la tabla de antecedentes
+  // al costado de cada checkbox marcado como "SI", similar a como funciona "Otros"
 
   // === FILA CELESTE: HÁBITOS NOCIVOS ===
   // Dibujar fondo celeste
@@ -1066,18 +1095,40 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   doc.text("ANAMNESIS", tablaInicioX + 2, yPos + 3.5);
   yPos += filaAltura;
 
-  // === FILA DE ANAMNESIS ===
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  // === FILA DE ANAMNESIS (ALTURA DINÁMICA) ===
+  // Calcular altura necesaria para el texto de anamnesis
+  let alturaFilaAnamnesis = filaAltura;
+  let lineasAnamnesis = [];
+  
   if (datosFinales.anamnesis) {
     const anamnesisMayusculas = String(datosFinales.anamnesis).toUpperCase();
-    doc.text(anamnesisMayusculas, tablaInicioX + 2, yPos + 3.5);
+    const anchoDisponibleAnamnesis = tablaAncho - 4; // Ancho disponible menos márgenes
+    
+    // Calcular líneas necesarias usando splitTextToSize
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    lineasAnamnesis = doc.splitTextToSize(anamnesisMayusculas, anchoDisponibleAnamnesis);
+    
+    // Calcular altura dinámica: interlineado de 3mm por línea, altura mínima de filaAltura
+    const interlineadoAnamnesis = 3;
+    const alturaCalculada = Math.max(filaAltura, lineasAnamnesis.length * interlineadoAnamnesis + 4);
+    alturaFilaAnamnesis = alturaCalculada;
   }
-  yPos += filaAltura;
+  
+  // Dibujar líneas de la fila con altura dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaFilaAnamnesis, tablaInicioX + tablaAncho, yPos + alturaFilaAnamnesis);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaAnamnesis);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaAnamnesis);
+
+  // Dibujar texto línea por línea
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  if (lineasAnamnesis.length > 0) {
+    const interlineadoAnamnesis = 3;
+    lineasAnamnesis.forEach((linea, index) => {
+      doc.text(linea, tablaInicioX + 2, yPos + 3.5 + (index * interlineadoAnamnesis));
+    });
+  }
+  yPos += alturaFilaAnamnesis;
 
   // === FILA CELESTE: ÍNICO ===
   // Dibujar fondo celeste
@@ -1122,7 +1173,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     },
     {
       label: "P.:",
-      value: datosFinales.pulso ? `${datosFinales.pulso} bpm` : ''
+      value: datosFinales.pulso ? `${datosFinales.pulso} ppm` : ''
     },
     {
       label: "F.Resp.:",
@@ -1212,7 +1263,10 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   doc.text("Otros:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
   if (datosFinales.otrosExamenClinico) {
-    const otrosTexto = `SAT O2: ${datosFinales.otrosExamenClinico}`;
+    // Agregar % si no está presente
+    const valorSatO2 = String(datosFinales.otrosExamenClinico).trim();
+    const valorConPorcentaje = valorSatO2.endsWith('%') ? valorSatO2 : `${valorSatO2}%`;
+    const otrosTexto = `SAT O2: ${valorConPorcentaje}`;
     const labelWidth = doc.getTextWidth("Otros:");
     doc.text(otrosTexto, tablaInicioX + labelWidth + 5, yPos + 3.5);
   }

@@ -113,8 +113,8 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
     perimetroCintura: String(data.cinturaTriaje ?? ""),
     perimetroCadera: String(data.caderaTriaje ?? ""),
     icc: String(data.iccTriaje ?? ""),
-    ptInspiracion: String(data.maximaInspiracionPtoracico ?? ""),
-    ptAspiracion: String(data.forazadaPtoracico ?? ""),
+    ptInspiracion: String(data.maximaInspiracionPtoracico_p_max_inspiracion ?? ""),
+    ptAspiracion: String(data.forazadaPtoracico_p_ex_forzada ?? ""),
     // Conclusión evaluación
     conclusionDesde: formatearFechaCorta(data.fechaDesde_f_desde ?? ""),
     conclusionHasta: formatearFechaCorta(data.fechaHasta_f_hasta ?? ""),
@@ -549,14 +549,14 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
       numero: 5,
       textoIzquierdo: "Diabetes mellitus o hipoglicemia no controlada",
       textoDerecho: "Obesidad (IMC > o igual a 30)",
-      alturaFila: 3.5,    // Altura exacta en mm (normal)
+      alturaFila: 5,    // Altura exacta en mm (normal)
       posicionY: 2.5
     },
     {
       numero: 6,
       textoIzquierdo: "Insuficiencia renal crónica grado IV",
       textoDerecho: "Anemia de cualquier grado, según criterios OMS 2011.",
-      alturaFila: 3.5,    // Altura exacta en mm (normal)
+      alturaFila: 5,    // Altura exacta en mm (normal)
       posicionY: 2.5
     }
   ];
@@ -617,11 +617,7 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
     yPos += alturaFila;
   });
 
-  // === FILA DE DETALLE INFORMACIÓN ===
-  // Fila sin divisiones para información adicional
-  const textoDetalle = "Detalle información: " + (datosFinales.detalleInformacion || "Sin información adicional");
-
-  // Calcular altura dinámica para el texto de detalle
+  // Función para calcular altura dinámica para el texto de detalle
   const calcularAlturaDetalle = (texto, anchoMaximo, fontSize) => {
     const palabras = texto.split(' ');
     let lineaActual = '';
@@ -647,20 +643,25 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
     return Math.max(lineas * fontSize * 0.35 + 1.5, 4);
   };
 
-  const anchoMaximoDetalle = tablaAncho - 4; // Ancho total menos márgenes
-  const alturaFilaDetalle = calcularAlturaDetalle(textoDetalle, anchoMaximoDetalle, 7);
+  // === FILA DE DETALLE INFORMACIÓN ===
+  // Fila sin divisiones para información adicional
+  if (datosFinales.detalleInformacion && datosFinales.detalleInformacion.trim() !== "") {
+    const textoDetalle = "Detalle información: " + datosFinales.detalleInformacion;
+    const anchoMaximoDetalle = tablaAncho - 4; // Ancho total menos márgenes
+    const alturaFilaDetalle = calcularAlturaDetalle(textoDetalle, anchoMaximoDetalle, 7);
 
-  // Dibujar líneas de la fila de detalle (sin divisiones internas)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaDetalle); // Línea izquierda
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaDetalle); // Línea derecha
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
-  doc.line(tablaInicioX, yPos + alturaFilaDetalle, tablaInicioX + tablaAncho, yPos + alturaFilaDetalle); // Línea inferior
+    // Dibujar líneas de la fila de detalle (sin divisiones internas)
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaDetalle); // Línea izquierda
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaDetalle); // Línea derecha
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
+    doc.line(tablaInicioX, yPos + alturaFilaDetalle, tablaInicioX + tablaAncho, yPos + alturaFilaDetalle); // Línea inferior
 
-  // Contenido de la fila de detalle
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  dibujarTextoConSaltoLinea(textoDetalle, tablaInicioX + 2, yPos + 2.5, anchoMaximoDetalle);
+    // Contenido de la fila de detalle
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    dibujarTextoConSaltoLinea(textoDetalle, tablaInicioX + 2, yPos + 2.5, anchoMaximoDetalle);
 
-  yPos += alturaFilaDetalle;
+    yPos += alturaFilaDetalle;
+  }
 
   // === SECCIÓN 3: PRUEBAS COMPLEMENTARIAS ===
   // Continuar directamente después del detalle información
@@ -710,14 +711,14 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
       numero: 3,
       textoIzquierdo: "Temor a las alturas.",
       textoDerecho: "Campimetría Anormal (Test de confrontación alterada)",
-      alturaFila: 3.5,
+      alturaFila: 5,
       posicionY: 2.5
     },
     {
       numero: 4,
       textoIzquierdo: "Test de SAS : Anormal",
       textoDerecho: "Campimetría Anormal (Test de confrontación alterada)",
-      alturaFila: 3.5,
+      alturaFila: 5,
       posicionY: 2.5
     },
 
@@ -730,21 +731,23 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   });
 
   // === FILA DE DETALLE PARA PRUEBAS COMPLEMENTARIAS ===
-  const textoDetallePruebas = "Detalle información: " + (datosFinales.detallePruebasComplementarias || "Sin información adicional de pruebas complementarias");
+  if (datosFinales.detallePruebasComplementarias && datosFinales.detallePruebasComplementarias.trim() !== "") {
+    const textoDetallePruebas = "Detalle información: " + datosFinales.detallePruebasComplementarias;
+    const anchoMaximoDetalle = tablaAncho - 4;
+    const alturaFilaDetallePruebas = calcularAlturaDetalle(textoDetallePruebas, anchoMaximoDetalle, 6);
 
-  const alturaFilaDetallePruebas = calcularAlturaDetalle(textoDetallePruebas, anchoMaximoDetalle, 6);
+    // Dibujar líneas de la fila de detalle (sin divisiones internas)
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaDetallePruebas); // Línea izquierda
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaDetallePruebas); // Línea derecha
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
+    doc.line(tablaInicioX, yPos + alturaFilaDetallePruebas, tablaInicioX + tablaAncho, yPos + alturaFilaDetallePruebas); // Línea inferior
 
-  // Dibujar líneas de la fila de detalle (sin divisiones internas)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaDetallePruebas); // Línea izquierda
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaDetallePruebas); // Línea derecha
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
-  doc.line(tablaInicioX, yPos + alturaFilaDetallePruebas, tablaInicioX + tablaAncho, yPos + alturaFilaDetallePruebas); // Línea inferior
+    // Contenido de la fila de detalle
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    dibujarTextoConSaltoLinea(textoDetallePruebas, tablaInicioX + 2, yPos + 2.5, anchoMaximoDetalle);
 
-  // Contenido de la fila de detalle
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  dibujarTextoConSaltoLinea(textoDetallePruebas, tablaInicioX + 2, yPos + 2.5, anchoMaximoDetalle);
-
-  yPos += alturaFilaDetallePruebas;
+    yPos += alturaFilaDetallePruebas;
+  }
 
   // === SECCIÓN 4: EXAMEN FISICO ===
   // Continuar directamente después del detalle información de la sección 3
@@ -772,37 +775,37 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("FC :", tablaInicioX + 2, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((datosFinales.fc || "60") + " lpm", tablaInicioX + 8, yPos + 3);
+  doc.text(datosFinales.fc ? (datosFinales.fc + " lpm") : "", tablaInicioX + 8, yPos + 3);
   
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("FR :", tablaInicioX + 25, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((datosFinales.fr || "60") + " rpm", tablaInicioX + 32, yPos + 3);
+  doc.text(datosFinales.fr ? (datosFinales.fr + " rpm") : "", tablaInicioX + 32, yPos + 3);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("PA :", tablaInicioX + 49.5, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((datosFinales.pa || "50/60") + " mmHg", tablaInicioX + 56.5, yPos + 3);
+  doc.text(datosFinales.pa ? (datosFinales.pa + " mmHg") : "", tablaInicioX + 56.5, yPos + 3);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Talla :", tablaInicioX + 82, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((datosFinales.talla || "170") + " cm", tablaInicioX + 92, yPos + 3);
+  doc.text(datosFinales.talla ? (datosFinales.talla + " cm") : "", tablaInicioX + 92, yPos + 3);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Peso :", tablaInicioX + 110, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((datosFinales.peso || "65") + " kg", tablaInicioX + 120, yPos + 3);
+  doc.text(datosFinales.peso ? (datosFinales.peso + " kg") : "", tablaInicioX + 120, yPos + 3);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("IMC :", tablaInicioX + 137, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((datosFinales.imc || "0.00") + " kg/m²", tablaInicioX + 145, yPos + 3);
+  doc.text(datosFinales.imc ? (datosFinales.imc + " kg/m²") : "", tablaInicioX + 145, yPos + 3);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("P. Cuello :", tablaInicioX + 164, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((datosFinales.perimetroCuello || "44") + " cm", tablaInicioX + 178, yPos + 3);
+  doc.text(datosFinales.perimetroCuello ? (datosFinales.perimetroCuello + " cm") : "", tablaInicioX + 178, yPos + 3);
 
   yPos += alturaFilaSignos;
 
@@ -823,27 +826,27 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("P. Cintura:", tablaInicioX + 2, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((datosFinales.perimetroCintura || "75") + " cm", tablaInicioX + 20, yPos + 3);
+  doc.text(datosFinales.perimetroCintura ? (datosFinales.perimetroCintura + " cm") : "", tablaInicioX + 20, yPos + 3);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("P. Cadera:", tablaInicioX + 42, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((datosFinales.perimetroCadera || "80") + " cm", tablaInicioX + 60, yPos + 3);
+  doc.text(datosFinales.perimetroCadera ? (datosFinales.perimetroCadera + " cm") : "", tablaInicioX + 60, yPos + 3);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("ICC:", tablaInicioX + 82, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.icc || "0.85", tablaInicioX + 95, yPos + 3);
+  doc.text(datosFinales.icc || "", tablaInicioX + 95, yPos + 3);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("P.T Inspiración:", tablaInicioX + 113, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((datosFinales.ptInspiracion || "95") + " cm", tablaInicioX + 135, yPos + 3);
+  doc.text(datosFinales.ptInspiracion ? (datosFinales.ptInspiracion + " cm") : "", tablaInicioX + 135, yPos + 3);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("P.T Aspiración:", tablaInicioX + 150, yPos + 3);
+  doc.text("P.T Espiración:", tablaInicioX + 150, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((datosFinales.ptAspiracion || "90") + " cm", tablaInicioX + 175, yPos + 3);
+  doc.text(datosFinales.ptAspiracion ? (datosFinales.ptAspiracion + " cm") : "", tablaInicioX + 175, yPos + 3);
 
   yPos += alturaFilaPerimetros;
 
@@ -917,21 +920,23 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   });
 
   // === FILA DE DETALLE PARA NUEVA SECCIÓN ===
-  const textoDetalleNuevaSeccion = "Detalle información: " + (datosFinales.detalleNuevaSeccion || "Sin información adicional de la nueva sección");
+  if (datosFinales.detalleNuevaSeccion && datosFinales.detalleNuevaSeccion.trim() !== "") {
+    const textoDetalleNuevaSeccion = "Detalle información: " + datosFinales.detalleNuevaSeccion;
+    const anchoMaximoDetalle = tablaAncho - 4;
+    const alturaFilaDetalleNuevaSeccion = calcularAlturaDetalle(textoDetalleNuevaSeccion, anchoMaximoDetalle, 6);
 
-  const alturaFilaDetalleNuevaSeccion = calcularAlturaDetalle(textoDetalleNuevaSeccion, anchoMaximoDetalle, 6);
+    // Dibujar líneas de la fila de detalle (sin divisiones internas)
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaDetalleNuevaSeccion); // Línea izquierda
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaDetalleNuevaSeccion); // Línea derecha
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
+    doc.line(tablaInicioX, yPos + alturaFilaDetalleNuevaSeccion, tablaInicioX + tablaAncho, yPos + alturaFilaDetalleNuevaSeccion); // Línea inferior
 
-  // Dibujar líneas de la fila de detalle (sin divisiones internas)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaDetalleNuevaSeccion); // Línea izquierda
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaDetalleNuevaSeccion); // Línea derecha
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
-  doc.line(tablaInicioX, yPos + alturaFilaDetalleNuevaSeccion, tablaInicioX + tablaAncho, yPos + alturaFilaDetalleNuevaSeccion); // Línea inferior
+    // Contenido de la fila de detalle
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    dibujarTextoConSaltoLinea(textoDetalleNuevaSeccion, tablaInicioX + 2, yPos + 2.5, anchoMaximoDetalle);
 
-  // Contenido de la fila de detalle
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  dibujarTextoConSaltoLinea(textoDetalleNuevaSeccion, tablaInicioX + 2, yPos + 2.5, anchoMaximoDetalle);
-
-  yPos += alturaFilaDetalleNuevaSeccion;
+    yPos += alturaFilaDetalleNuevaSeccion;
+  }
 
   // === SECCIÓN 5: CONCLUSIÓN DE LA PRESENTE EVALUACIÓN ===
   const alturaHeaderConclusion = 4;

@@ -31,16 +31,17 @@ export const GetInfoServicio = async (
     if (res) {
         set((prev) => ({
             ...prev,
-            ...res,
             norden: res.norden,
             codigoInforme: res.codigoInforme,
             fechaEntrevista: res.fechaEntrevista || "",
+            nombreExamen: res.nombreExamen ?? "",
             nombres: res.nombresPaciente,
             apellidos: res.apellidosPaciente,
             fechaNacimiento: res.fechaNacimientoPaciente,
             lugarNacimiento: res.lugarNacimientoPaciente,
             domicilioActual: res.direccionPaciente,
             edad: res.edadPaciente,
+            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
             estadoCivil: res.estadoCivilPaciente,
             nivelEstudios: res.nivelEstudioPaciente,
 
@@ -100,6 +101,8 @@ export const GetInfoServicio = async (
             // Recomendaciones
             recomendaciones: res.recomendaciones,
 
+
+
             // Aprobó Test
             aproboTest: res.aprobo ?? false,
         }));
@@ -116,6 +119,10 @@ export const SubmitDataService = async (
 ) => {
     if (!form.norden) {
         await Swal.fire("Error", "Datos Incompletos", "error");
+        return;
+    }
+    if (form.aproboTest == undefined || form.aproboTest == null) {
+        await Swal.fire("Datos Incompletos", "Seleccione si Aprobó Test", "error");
         return;
     }
     const body = {
@@ -184,7 +191,9 @@ const GetInfoPac = async (nro, set, token, sede) => {
             fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
             edad: res.edad + " años",
             ocupacion: res.areaO ?? "",
+            nombreExamen: res.nomExam ?? "",
             cargoDesempenar: res.cargo ?? "",
+            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
         }));
     }
 };

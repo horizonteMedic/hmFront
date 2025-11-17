@@ -37,6 +37,12 @@ export function SubmitHistoriaOcupacional(data,registros,user,token) {
     }
     return fetch(url,options).then(res =>  {
         if (!res.ok) {
-            return res
-        } return res.json()}).then(response => response) 
+            throw new Error(`HTTP error! status: ${res.status}`)
+        } 
+        return res.json()
+    }).then(response => response)
+    .catch(error => {
+        console.error('Error en SubmitHistoriaOcupacional:', error)
+        throw error
+    }) 
 }

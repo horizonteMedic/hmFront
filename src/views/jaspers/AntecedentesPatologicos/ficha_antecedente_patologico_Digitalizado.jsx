@@ -709,12 +709,11 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   // Obtener datos de COVID-19
   const covidData = datosFinales.severidadCovid || {};
   const tieneCovid = covidData.covid19 || false;
-  const tieneDosis = covidData.dosis && covidData.dosis.trim() !== "";
   const tieneFecha = covidData.fechaExamen && covidData.fechaExamen.trim() !== "";
   const tieneSeveridad = covidData.leve || covidData.moderado || covidData.severo;
   
-  // Determinar qué mostrar: si hay dosis, fecha o severidad, o si COVID está marcado
-  const debeMostrar = tieneCovid || tieneDosis || tieneFecha || tieneSeveridad;
+  // Determinar qué mostrar: si hay fecha o severidad, o si COVID está marcado
+  const debeMostrar = tieneCovid || tieneFecha || tieneSeveridad;
   
   if (debeMostrar) {
     // Dibujar líneas de la fila individual de COVID-19
@@ -746,15 +745,8 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
     // Calcular posición X inicial para datos adicionales (después de la mini celda)
     let xActual = xFinMiniCelda + 3;
     
-    // Mostrar dosis si existe (incluso si COVID-19 no está marcado)
-    if (tieneDosis) {
-      doc.setFont("helvetica", "normal").setFontSize(8);
-      doc.text("Dosis: " + covidData.dosis, xActual, yPos + 3.5);
-      xActual += doc.getTextWidth("Dosis: " + covidData.dosis) + 5;
-    }
-    
-    // Mostrar fecha si existe (incluso si COVID-19 no está marcado)
-    if (tieneFecha) {
+    // Mostrar fecha solo si COVID-19 está marcado y tiene fecha
+    if (tieneCovid && tieneFecha) {
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text("Fecha: " + covidData.fechaExamen, xActual, yPos + 3.5);
       xActual += doc.getTextWidth("Fecha: " + covidData.fechaExamen) + 5;

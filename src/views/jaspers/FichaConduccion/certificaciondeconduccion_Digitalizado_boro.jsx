@@ -733,7 +733,6 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
 
   yPos += alturaFilaPerimetros;
 
-  // === FILA 3: ICC, P.T INSPIRACIÓN, P.T ASPIRACIÓN (3 divisiones) ===
   const alturaFilaICC = 4;
 
   // Dibujar líneas de la fila con 3 divisiones
