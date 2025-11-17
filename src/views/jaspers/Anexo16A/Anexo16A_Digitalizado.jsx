@@ -747,8 +747,10 @@ export default function Anexo16A_Digitalizado(data = {}) {
   doc.text("Firma y Huella del trabajador", centroColumna2, yPos + 26, { align: "center" }); // Texto debajo de las imágenes
 
   // === COLUMNA 3: SELLO Y FIRMA DEL MÉDICO ===
-  const firmaMedicoX = tablaInicioX + 125;
   const firmaMedicoY = yPos + 3;
+  
+  // Calcular centro de la columna 3 para centrar la imagen
+  const centroColumna3 = tablaInicioX + 120 + (80 / 2); // Centro de la columna 3 (160mm desde tablaInicioX)
   
   // Agregar firma y sello médico
   const firmaMedicoUrl = getSign(data, "SELLOFIRMA");
@@ -756,7 +758,8 @@ export default function Anexo16A_Digitalizado(data = {}) {
     try {
       const imgWidth = 50;
       const imgHeight = 20;
-      const x = firmaMedicoX;
+      // Centrar la imagen: centro de la columna menos la mitad del ancho de la imagen
+      const x = centroColumna3 - (imgWidth / 2);
       const y = firmaMedicoY;
       doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
     } catch (error) {
@@ -765,8 +768,6 @@ export default function Anexo16A_Digitalizado(data = {}) {
   }
   
   doc.setFont("helvetica", "normal").setFontSize(7);
-  // Centrar en la columna 3 (ancho de columna: 80mm, desde tablaInicioX + 120 hasta tablaInicioX + 200)
-  const centroColumna3 = tablaInicioX + 120 + (80 / 2); // Centro de la columna 3
   doc.text("Sello y Firma del Médico", centroColumna3, yPos + 26, { align: "center" }); // Texto debajo de la imagen
   doc.text("Responsable de la Evaluación", centroColumna3, yPos + 28.5, { align: "center" }); // Texto debajo de la imagen
 
