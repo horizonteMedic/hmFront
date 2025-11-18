@@ -16,7 +16,7 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     documentoIdentidad: String(data.dniPaciente ?? ""),
     genero: data.sexoPaciente === "M" ? "MASCULINO" : data.sexoPaciente === "F" ? "FEMENINO" : String(data.sexoPaciente ?? ""),
     edad: String(`${data.edadPaciente ?? ""} AÑOS`),
-    grupoSanguineo: String(data.grupoSanguineo ?? ""),
+    grupoSanguineo: String(data.grupoFactor ?? ""),
     empresa: String(data.empresa ?? ""),
     contratista: String(data.contrata ?? ""),
     puestoPostula: String(data.cargoPaciente ?? ""),

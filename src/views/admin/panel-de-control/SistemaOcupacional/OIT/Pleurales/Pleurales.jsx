@@ -11,7 +11,92 @@ const Pleurales = ({form,setForm}) => {
             [name]: checked
         }));
     };
-    console.log(form)
+
+    const NOPleurales = (set) => {
+        set(prev => ({...prev,
+            chk2Si: false,
+            chk2No: true,
+            chk2Si: false,
+            chk2No: true,
+            chkE1: false,
+            chkE2: false,
+            chkE3: false,
+            chkE4: false,
+            chkE5: false,
+            chkE6: false,
+            //a
+            chk2_1: true,
+            chk2_2: true,
+            chk2_3: true,
+            chk2_4: false,
+            chk2_5: false,
+            chk2_6: false,
+            chk2_7: false,
+            chk2_8: false,
+            chk2_9: false,
+            chk2_10: true,
+            chk2_11: true,
+            chk2_12: true,
+            chk2_13: false,
+            chk2_14: false,
+            chk2_15: false,
+            chk2_16: false,
+            chk2_17: false,
+            chk2_18: false,
+            chk2_19: false,
+            chk2_20: true,
+            chk2_21: false,
+            chk2_22: false,
+            chk2_23: false,
+            chk2_24: false,
+            chk2_25: true,
+            chk2_26: false,
+            chk2_27: false,
+            chk2_28: false,
+            chk2_29: false,
+            chk2_30: false,
+            chk2_31: false,
+            chk2_32: false,
+            chk2_33: false,
+            chk2_34: false,
+            chk2_35: false,
+            chk2_36: false,
+            chk2_37: true,
+            chk2_38: false,
+            chk2_39: false,
+            chk2_40: false,
+            chk2_41: true,
+            chk2_42: false,
+            chk2_43: false,
+            chk2_44: false,
+            chk2_45: false,
+            chk2_46: false,
+            chk2_47: true,
+            chk2_48: false,
+            chk2_49: false,
+            chk2_50: false,
+            chk2_51: false,
+            chk2_52: false,
+            chk2_53: true,
+            chk2_54: false,
+            chk2_55: false,
+            chk2_56: false,
+            chk2_57: false,
+            chk2_58: true,
+            chk2_59: false,
+            chk2_60: false,
+            chk2_61: false,
+            chk2_62: false,
+            chk2_63: false,
+            chk2_64: false,
+            chk2_65: false,
+            chk2_66: false,
+            chk2_67: false,
+            chk2_68: false,
+            chk2_69: false,
+        }))
+    }
+    
     return(
             <>
                 <div className="w-auto">
@@ -21,7 +106,7 @@ const Pleurales = ({form,setForm}) => {
                             <input type="checkbox" name="chk2radio" className="mr-2" checked={form.chk2Si} onChange={() =>setForm(prev => ({...prev,chk2Si: true,chk2No: false,}))} id="chk2Si" />
                             <label htmlFor="" >SI</label>
 
-                            <input type="checkbox" name="chk2radio" className="mr-2 ml-4" checked={form.chk2No} onChange={() =>setForm(prev => ({...prev,chk2Si: false,chk2No: true,}))} id="chk2No" />
+                            <input type="checkbox" name="chk2radio" className="mr-2 ml-4" checked={form.chk2No} onChange={() =>NOPleurales(setForm)} id="chk2No" />
                             <label htmlFor="" >NO</label>
                         </div>
                     </div>

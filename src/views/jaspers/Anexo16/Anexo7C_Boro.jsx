@@ -73,15 +73,30 @@ export default function Anexo7C_Antiguo(data = {}) {
       viudo: data.estadoCivilPaciente_estado_civil_pa === "VIUDO",
       divorciado: data.estadoCivilPaciente_estado_civil_pa === "DIVORCIADO"
     },
-    gradoInstruccion: {
-      analfabeto: data.nivelEstudioPaciente_nivel_est_pa === "ANALFABETO",
-      primariaCom: data.nivelEstudioPaciente_nivel_est_pa === "PRIMARIA.COM",
-      secCom: data.nivelEstudioPaciente_nivel_est_pa === "SEC.COM",
-      univers: data.nivelEstudioPaciente_nivel_est_pa === "UNIVERS" || data.nivelEstudioPaciente_nivel_est_pa === "UNIVERSITARIO",
-      primariaInc: data.nivelEstudioPaciente_nivel_est_pa === "PRIMARIA.INC",
-      secInc: data.nivelEstudioPaciente_nivel_est_pa === "SEC.INC",
-      tecnico: data.nivelEstudioPaciente_nivel_est_pa === "TECNICO"
-    },
+    gradoInstruccion: (() => {
+      const nivelEstudio = String(data.nivelEstudioPaciente_nivel_est_pa || "").toUpperCase().trim();
+      if (!nivelEstudio) {
+        return {
+          analfabeto: false,
+          primariaCom: false,
+          secCom: false,
+          univers: false,
+          primariaInc: false,
+          secInc: false,
+          tecnico: false
+        };
+      }
+      
+      return {
+        analfabeto: nivelEstudio.includes("ANALFABETO"),
+        primariaCom: nivelEstudio.includes("PRIMARIA") && nivelEstudio.includes("COMPLETA") && !nivelEstudio.includes("INCOMPLETA"),
+        primariaInc: nivelEstudio.includes("PRIMARIA") && nivelEstudio.includes("INCOMPLETA"),
+        secCom: nivelEstudio.includes("SECUNDARIA") && nivelEstudio.includes("COMPLETA") && !nivelEstudio.includes("INCOMPLETA"),
+        secInc: nivelEstudio.includes("SECUNDARIA") && nivelEstudio.includes("INCOMPLETA"),
+        univers: nivelEstudio.includes("UNIVERSITARIO") || nivelEstudio.includes("UNIVERS"),
+        tecnico: nivelEstudio.includes("TECNICO") || nivelEstudio.includes("TÉCNICO")
+      };
+    })(),
     // Datos adicionales para la fila de riesgos ocupacionales
     riesgos: {
       ruido: data.ruidoAnexo7c_chkruido ?? false,
@@ -186,6 +201,7 @@ export default function Anexo7C_Antiguo(data = {}) {
         corregidaOI: data.oilc_oilc ?? "",
       },
       enfermedadesOculares: data.enfermedadesOcularesAnexo7c_txtenfermedadesoculares ?? "",
+      enfermedadesOcularesOtros: data.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "",
       reflejosPupilares: (data.rp_rp || data.reflejosPupilaresAnexo7c_txtreflejospupilares) ?? "",
       testIshihara: data.tecishiharaNormal_rbtecishihara_normal ? "NORMAL" : (data.tecishiharaAnormal_rbtecishihara_anormal ? "ANORMAL" : ""),
       testColoresPuros: data.teccoleresNormal_rbteccoleres_normal ? "NORMAL" : (data.teccoleresAnormal_rbteccoleres_anormal ? "ANORMAL" : ""),
@@ -827,7 +843,10 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.text("Analfabeto", xCol1Grado + checkboxSize + 1, yCheck + 2);
   if (datosFinales.gradoInstruccion?.analfabeto) {
     doc.setFont("helvetica", "bold").setFontSize(7);
-    doc.text("X", xCol1Grado + checkboxSize / 2 - 1, yCheck + 2.5);
+    const textWidthX = doc.getTextWidth("X");
+    const xCentered = xCol1Grado + (checkboxSize / 2) - (textWidthX / 2);
+    const yCentered = yCheck + (checkboxSize / 2) + 1;
+    doc.text("X", xCentered, yCentered);
   }
 
   // Línea 2: Primaria.Com., Sec.Com., Univers.
@@ -837,21 +856,30 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.text("Primaria.Com.", xCol1Grado + checkboxSize + 1, yCheck + 2);
   if (datosFinales.gradoInstruccion?.primariaCom) {
     doc.setFont("helvetica", "bold").setFontSize(7);
-    doc.text("X", xCol1Grado + checkboxSize / 2 - 1, yCheck + 2.5);
+    const textWidthX = doc.getTextWidth("X");
+    const xCentered = xCol1Grado + (checkboxSize / 2) - (textWidthX / 2);
+    const yCentered = yCheck + (checkboxSize / 2) + 1;
+    doc.text("X", xCentered, yCentered);
   }
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.rect(xCol2Grado, yCheck, checkboxSize, checkboxSize);
   doc.text("Sec.Com.", xCol2Grado + checkboxSize + 1, yCheck + 2);
   if (datosFinales.gradoInstruccion?.secCom) {
     doc.setFont("helvetica", "bold").setFontSize(7);
-    doc.text("X", xCol2Grado + checkboxSize / 2 - 1, yCheck + 2.5);
+    const textWidthX = doc.getTextWidth("X");
+    const xCentered = xCol2Grado + (checkboxSize / 2) - (textWidthX / 2);
+    const yCentered = yCheck + (checkboxSize / 2) + 1;
+    doc.text("X", xCentered, yCentered);
   }
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.rect(xCol3Grado, yCheck, checkboxSize, checkboxSize);
   doc.text("Univers.", xCol3Grado + checkboxSize + 1, yCheck + 2);
   if (datosFinales.gradoInstruccion?.univers) {
     doc.setFont("helvetica", "bold").setFontSize(7);
-    doc.text("X", xCol3Grado + checkboxSize / 2 - 1, yCheck + 2.5);
+    const textWidthX = doc.getTextWidth("X");
+    const xCentered = xCol3Grado + (checkboxSize / 2) - (textWidthX / 2);
+    const yCentered = yCheck + (checkboxSize / 2) + 1;
+    doc.text("X", xCentered, yCentered);
   }
 
   // Línea 3: Primaria.Inc., Sec.Inc., Técnico
@@ -861,21 +889,30 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.text("Primaria.Inc.", xCol1Grado + checkboxSize + 1, yCheck + 2);
   if (datosFinales.gradoInstruccion?.primariaInc) {
     doc.setFont("helvetica", "bold").setFontSize(7);
-    doc.text("X", xCol1Grado + checkboxSize / 2 - 1, yCheck + 2.5);
+    const textWidthX = doc.getTextWidth("X");
+    const xCentered = xCol1Grado + (checkboxSize / 2) - (textWidthX / 2);
+    const yCentered = yCheck + (checkboxSize / 2) + 1;
+    doc.text("X", xCentered, yCentered);
   }
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.rect(xCol2Grado, yCheck, checkboxSize, checkboxSize);
   doc.text("Sec.Inc.", xCol2Grado + checkboxSize + 1, yCheck + 2);
   if (datosFinales.gradoInstruccion?.secInc) {
     doc.setFont("helvetica", "bold").setFontSize(7);
-    doc.text("X", xCol2Grado + checkboxSize / 2 - 1, yCheck + 2.5);
+    const textWidthX = doc.getTextWidth("X");
+    const xCentered = xCol2Grado + (checkboxSize / 2) - (textWidthX / 2);
+    const yCentered = yCheck + (checkboxSize / 2) + 1;
+    doc.text("X", xCentered, yCentered);
   }
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.rect(xCol3Grado, yCheck, checkboxSize, checkboxSize);
   doc.text("Técnico", xCol3Grado + checkboxSize + 1, yCheck + 2);
   if (datosFinales.gradoInstruccion?.tecnico) {
     doc.setFont("helvetica", "bold").setFontSize(7);
-    doc.text("X", xCol3Grado + checkboxSize / 2 - 1, yCheck + 2.5);
+    const textWidthX = doc.getTextWidth("X");
+    const xCentered = xCol3Grado + (checkboxSize / 2) - (textWidthX / 2);
+    const yCentered = yCheck + (checkboxSize / 2) + 1;
+    doc.text("X", xCentered, yCentered);
   }
 
   yPos += alturaFilaPersonal;
@@ -1750,17 +1787,53 @@ export default function Anexo7C_Antiguo(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("ENFERMEDADES OCULARES:", xColumnaDerecha + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  const textoEnfermedades = datosFinales.examenOjos?.enfermedadesOculares || "";
-  if (textoEnfermedades) {
-    const anchoDisponible = anchoColumnaDerecha - 4;
-    const lineasEnfermedades = doc.splitTextToSize(textoEnfermedades, anchoDisponible);
-    const yTextoInicio = yPos + 6.5; // Más espacio después del título
-    lineasEnfermedades.forEach((linea, index) => {
-      const yLineaTexto = yTextoInicio + (index * 3); // Más espacio entre líneas (3 en lugar de 2.5)
-      if (yLineaTexto + 3 <= yPos + alturaDivisoria - 1) {
-        doc.text(linea, xColumnaDerecha + 2, yLineaTexto);
+  
+  // Obtener la variable directamente de data
+  const enfermedades = String(data.enfermedadesOcularesAnexo7c_txtenfermedadesoculares || "").trim();
+  
+  // Función para dividir texto por \n y crear items con guión
+  const dividirEnItems = (texto) => {
+    if (!texto || texto.length === 0) return [];
+    // Dividir por \n y limpiar cada línea
+    return texto.split('\n')
+      .map(linea => linea.trim())
+      .filter(linea => linea.length > 0);
+  };
+  
+  const items = dividirEnItems(enfermedades);
+  
+  const anchoDisponible = anchoColumnaDerecha - 6; // Menos espacio para el guión
+  const yTextoInicio = yPos + 6.5; // Más espacio después del título
+  let yActual = yTextoInicio;
+  const interlineado = 3;
+  const anchoGuion = doc.getTextWidth("- ");
+  
+  // Mostrar todos los items con guión
+  if (items.length > 0) {
+    items.forEach((item) => {
+      // Dibujar el guión
+      doc.text("- ", xColumnaDerecha + 2, yActual);
+      
+      // Dividir el texto del item en líneas si es necesario
+      const lineas = doc.splitTextToSize(item, anchoDisponible);
+      
+      // Dibujar la primera línea del item (después del guión)
+      if (lineas.length > 0) {
+        doc.text(lineas[0], xColumnaDerecha + 2 + anchoGuion, yActual);
+        yActual += interlineado;
+        
+        // Dibujar las líneas siguientes del mismo item (sin guión, indentadas)
+        for (let i = 1; i < lineas.length; i++) {
+          if (yActual + interlineado <= yPos + alturaDivisoria - 1) {
+            doc.text(lineas[i], xColumnaDerecha + 2 + anchoGuion, yActual);
+            yActual += interlineado;
+          }
+        }
       }
     });
+  } else {
+    // Si no hay items, mostrar "NINGUNA"
+    doc.text("NINGUNA", xColumnaDerecha + 2, yActual);
   }
 
   // REFLEJOS PUPILARES (parte inferior derecha)
@@ -2326,9 +2399,22 @@ export default function Anexo7C_Antiguo(data = {}) {
 
   // === SECCIÓN: MIEMBROS SUPERIORES E INFERIORES ===
   
-  // Verificar si necesitamos nueva página
-  const alturaFilaMiembros = 5;
-  const alturaTotalMiembros = alturaFilaMiembros * 2; // 2 filas
+  // Calcular altura dinámica para miembros superiores
+  const textoMiembrosSuperiores = String(datosFinales.evaluacionFisicaAdicional?.miembrosSuperiores || "").trim();
+  const anchoDisponibleMiembrosSuperiores = tablaAncho - 40 - 4; // Ancho total menos label y márgenes
+  const lineasMiembrosSuperiores = doc.splitTextToSize(textoMiembrosSuperiores, anchoDisponibleMiembrosSuperiores);
+  const alturaMinimaMiembros = 5;
+  const interlineadoMiembros = 2.5;
+  const alturaDinamicaMiembrosSuperiores = Math.max(alturaMinimaMiembros, lineasMiembrosSuperiores.length * interlineadoMiembros + 4);
+  
+  // Calcular altura dinámica para miembros inferiores
+  const textoMiembrosInferiores = String(datosFinales.evaluacionFisicaAdicional?.miembrosInferiores || "").trim();
+  const anchoDisponibleMiembrosInferiores = tablaAncho - 40 - 4; // Ancho total menos label y márgenes
+  const lineasMiembrosInferiores = doc.splitTextToSize(textoMiembrosInferiores, anchoDisponibleMiembrosInferiores);
+  const alturaDinamicaMiembrosInferiores = Math.max(alturaMinimaMiembros, lineasMiembrosInferiores.length * interlineadoMiembros + 4);
+  
+  // Verificar si necesitamos nueva página (usando alturas dinámicas)
+  const alturaTotalMiembros = alturaDinamicaMiembrosSuperiores + alturaDinamicaMiembrosInferiores;
   if (yPos + alturaTotalMiembros > pageHeight - 20) {
     footerTR(doc, { footerOffsetY: 8 });
     doc.addPage();
@@ -2338,30 +2424,34 @@ export default function Anexo7C_Antiguo(data = {}) {
   }
 
   // FILA 1: Miembros superiores
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaMiembros);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaMiembros);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaMiembrosSuperiores);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaMiembrosSuperiores);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaFilaMiembros, tablaInicioX + tablaAncho, yPos + alturaFilaMiembros);
+  doc.line(tablaInicioX, yPos + alturaDinamicaMiembrosSuperiores, tablaInicioX + tablaAncho, yPos + alturaDinamicaMiembrosSuperiores);
 
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("MIEMBROS SUPERIORES:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(datosFinales.evaluacionFisicaAdicional?.miembrosSuperiores || "", tablaInicioX + 40, yPos + 3.5);
+  lineasMiembrosSuperiores.forEach((linea, index) => {
+    doc.text(linea, tablaInicioX + 40, yPos + 3.5 + (index * interlineadoMiembros));
+  });
 
-  yPos += alturaFilaMiembros;
+  yPos += alturaDinamicaMiembrosSuperiores;
 
   // FILA 2: Miembros inferiores
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaMiembros);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaMiembros);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaMiembrosInferiores);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaMiembrosInferiores);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaFilaMiembros, tablaInicioX + tablaAncho, yPos + alturaFilaMiembros);
+  doc.line(tablaInicioX, yPos + alturaDinamicaMiembrosInferiores, tablaInicioX + tablaAncho, yPos + alturaDinamicaMiembrosInferiores);
 
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("MIEMBROS INFERIORES:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(datosFinales.evaluacionFisicaAdicional?.miembrosInferiores || "", tablaInicioX + 40, yPos + 3.5);
+  lineasMiembrosInferiores.forEach((linea, index) => {
+    doc.text(linea, tablaInicioX + 40, yPos + 3.5 + (index * interlineadoMiembros));
+  });
 
-  yPos += alturaFilaMiembros;
+  yPos += alturaDinamicaMiembrosInferiores;
 
   // === SECCIÓN: EVALUACIÓN NEUROLÓGICA, COLUMNA Y ABDOMEN ===
   

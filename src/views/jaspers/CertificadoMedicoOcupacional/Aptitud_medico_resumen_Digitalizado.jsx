@@ -1,8 +1,6 @@
 import jsPDF from "jspdf";
-import { useEffect } from "react";
 import PropTypes from "prop-types";
 import { formatearFechaCorta } from "../../utils/formatDateUtils";
-import { normalizeList } from "../../utils/listUtils";
 import { getSign } from "../../utils/helpers";
 import CabeceraLogo from "../components/CabeceraLogo.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
@@ -12,48 +10,9 @@ export default function Aptitud_medico_resumen_Digitalizado( data = {} ) {
   
     const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
     const pageW = doc.internal.pageSize.getWidth();
-    // console.log('jeje',data)
-    // Datos de prueba por defecto
-    const datosPrueba = {
-      numeroFicha: "000000",
-      sede: "Trujillo-Piérola",
-      fechaExamen: "01/01/2025",
-      apellidosNombres: "APELLIDO PATERNO APELLIDO MATERNO NOMBRES",
-      documentoIdentidad: "00000000",
-      genero: "MASCULINO",
-      edad: "00",
-      fechaNacimiento: "01/01/1990",
-      domicilio: "AV. EJEMPLO 123 - URB. DEMO",
-      puestoTrabajo: "CARGO",
-      areaTrabajo: "AREA",
-      empresa: "EMPRESA S.A.C.",
-      contratista: "CONTRATA S.A.C.",
-      tipoExamen: "PRE-OCUPACIONAL",
-      examenesRealizados: [
-        "Radiografía de tórax",
-        "Oftalmología",
-        "Audiometría",
-        "Electrocardiograma",
-        "Laboratorio completo",
-        "Espirometría",
-        "Examen neurológico",
-        "Examen cardiovascular",
-        "Examen osteomuscular",
-        "Examen dermatológico",
-        "Examen psiquiátrico",
-        "Tomografía computada",
-        "Resonancia magnética",
-        "Ultrasonido abdominal",
-        "Pruebas de función hepática"
-      ],
-      resultadosResumen: "APTO",
-      color: 1,
-      codigoColor: "#008f39",
-      textoColor: "F"
-    };
 
     // Datos reales mapeados
-    const datosReales = {
+    const datosFinales = {
       numeroFicha: String(data.norden ?? data.n_orden ?? data.norden_n_orden ?? ""),
       sede: data.sede || data.nombreSede || "",
       fechaExamen: formatearFechaCorta(data.fechaDesde ?? data.fechaExamen ?? data.fechaAnexo16a_fecha_anexo ?? ""),
@@ -83,9 +42,6 @@ export default function Aptitud_medico_resumen_Digitalizado( data = {} ) {
       // Datos de digitalización
       digitalizacion: data.digitalizacion || []
     };
-
-    // Usar datos reales si existen, sino usar datos de prueba
-    const datosFinales = (data && (data.norden || data.n_orden || data.norden_n_orden)) ? datosReales : datosPrueba;
 
     // Header reutilizable
     const drawHeader = (pageNumber) => {
@@ -202,9 +158,15 @@ export default function Aptitud_medico_resumen_Digitalizado( data = {} ) {
     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
     yPos += filaAltura;
 
-    // Fila: Puesto de Trabajo, Área de Trabajo (2 columnas)
+    // Fila: Puesto de Trabajo (completa)
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-    doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+    yPos += filaAltura;
+
+    // Fila: Área de Trabajo (completa)
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -270,16 +232,18 @@ export default function Aptitud_medico_resumen_Digitalizado( data = {} ) {
     dibujarTextoConSaltoLinea(datosFinales.domicilio || "", tablaInicioX + 25, yTexto + 1, 160);
     yTexto += filaAltura;
 
-    // Puesto de Trabajo, Área de Trabajo
+    // Puesto de Trabajo
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1);
     doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(datosFinales.puestoTrabajo || "", tablaInicioX + 30, yTexto + 1);
+    dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo || "", tablaInicioX + 30, yTexto + 1, 160);
+    yTexto += filaAltura;
 
+    // Área de Trabajo
     doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text("Área de Trabajo:", tablaInicioX + 92, yTexto + 1);
+    doc.text("Área de Trabajo:", tablaInicioX + 2, yTexto + 1);
     doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(datosFinales.areaTrabajo || "", tablaInicioX + 118, yTexto + 1);
+    dibujarTextoConSaltoLinea(datosFinales.areaTrabajo || "", tablaInicioX + 30, yTexto + 1, 160);
     yTexto += filaAltura;
 
     // Empresa

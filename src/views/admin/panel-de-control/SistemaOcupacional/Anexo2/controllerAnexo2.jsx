@@ -115,6 +115,7 @@ export const SubmitDataService = async (
     fechaDesde: form.fechaAptitud,
     fechaVence: form.fechaVencimiento,
     medico: form.nombre_medico,
+    usuarioFirma: form.user_medicoFirma,
     userRegistro: user,
     accidentes: form.dataEnfermedades.map((item) => ({
       ...item,
@@ -935,7 +936,8 @@ export const GetInfoServicioEditar = (
                   : "",
             fechaAptitud: res.fechaDesde_fechadesde ?? "",
             fechaVencimiento: res.fechaHasta_fechahasta ?? "",
-            nombre_medico: res.medico_medico ?? "",
+            // nombre_medico: res.medico_medico ?? "",
+            user_medicoFirma: res.usuarioFirma,
             dataEnfermedades: res.accidentes ?? [],
           };
 

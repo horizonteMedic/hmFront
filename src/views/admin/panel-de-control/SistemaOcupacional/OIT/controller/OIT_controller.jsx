@@ -107,6 +107,7 @@ export const SubmitOIT = async (form,token,user,limpiar,tabla) => {
       })
         
     } else {
+      console.log('formulario',form)
     SubmitOITModel(form,user,token)
       .then((res) => {
           console.log(res)

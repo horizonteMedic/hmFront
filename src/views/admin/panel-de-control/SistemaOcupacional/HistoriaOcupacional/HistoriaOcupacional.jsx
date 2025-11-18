@@ -174,7 +174,7 @@ const HistoriaOcupacional = ({
   const { EmpresasMulti, AlturaMulti, AreaMulti, CargosMulti } = listas;
   // Opciones random de ejemplo para los selects
   //ALGUNOS YA TREEN DATOS DE VERITAS
-
+  console.log('Empresas en Historia Ocupacional',EmpresasMulti)
   const handleRowChange = (field, value) => {
     const numero = Number(value); // solo para lógica de control
 

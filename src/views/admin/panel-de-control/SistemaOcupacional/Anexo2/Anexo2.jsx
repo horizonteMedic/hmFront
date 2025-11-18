@@ -20,11 +20,9 @@ import Swal from "sweetalert2";
 const tabla = "anexo_agroindustrial";
 const today = getToday();
 
-export default function Anexo2({ listas }) {
-  const { MedicosMulti } = listas;
-  // console.log(MedicosMulti);
+export default function Anexo2() {
 
-  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+  const { token, userlogued, selectedSede, datosFooter, userName } =
     useSessionData();
 
   const initialFormState = {
@@ -300,9 +298,9 @@ export default function Anexo2({ listas }) {
     perimetroToraxico: "",
     oftalmologia: "",
 
-    // Médico que Certifica //BUSCADOR
-    nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
-    filteredNombresMedicos: [],
+  // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
   const {
@@ -310,6 +308,7 @@ export default function Anexo2({ listas }) {
     setForm,
     handleChange,
     handleChangeNumber,
+    handleChangeSimple,
     handleRadioButton,
     handleCheckBoxChange,
     handleRadioButtonBoolean,
@@ -402,11 +401,11 @@ export default function Anexo2({ listas }) {
                       handleClear={handleClear}
                       handleClearnotO={handleClearnotO}
                       handleRadioButtonBoolean={handleRadioButtonBoolean}
-                      MedicosMulti={MedicosMulti}
                       handlePrint={handlePrint}
                       handleSave={handleSave}
                       handleSearch={handleSearch}
                       handleSearchExamenesRealizados={handleSearchExamenesRealizados}
+                      handleChangeSimple={handleChangeSimple}
                     />
                   )
                 );

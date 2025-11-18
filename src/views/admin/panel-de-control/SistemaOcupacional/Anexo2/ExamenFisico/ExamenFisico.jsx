@@ -1,3 +1,4 @@
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import {
   InputTextArea,
   InputTextOneLine,
@@ -5,30 +6,9 @@ import {
 
 export default function ExamenFisico({
   form,
-  setForm,
   handleChange,
-  MedicosMulti,
+  handleChangeSimple,
 }) {
-  const handleNombreMedicoSearch = (e) => {
-    const v = e.target.value.toUpperCase();
-    setForm((d) => ({
-      ...d,
-      nombre_medico: v,
-      filteredNombresMedicos: v
-        ? MedicosMulti.filter((medico) =>
-            medico.mensaje.toLowerCase().includes(v.toLowerCase())
-          )
-        : [],
-    }));
-  };
-  const handleSelectNombreMedico = (medico) => {
-    setForm((d) => ({
-      ...d,
-      nombre_medico: medico.mensaje,
-      filteredNombresMedicos: [],
-    }));
-  };
-
   return (
     <div className="p-6" style={{ fontSize: "11px" }}>
       <h3 className="font-semibold mb-6 text-gray-800">
@@ -194,66 +174,11 @@ export default function ExamenFisico({
         />
 
         {/* Médico que Certifica */}
-        <div>
-          <label className="block font-semibold  mb-1">
-            Medico que Certifica:
-          </label>
-          <div className="relative flex-grow flex items-center">
-            <input
-              id="nombre_medico"
-              name="nombre_medico"
-              type="text"
-              autoComplete="off"
-              value={form.nombre_medico || ""}
-              onChange={handleNombreMedicoSearch}
-              className="border rounded px-2 py-1 w-full"
-              onKeyDown={(e) => {
-                if (
-                  e.key === "Enter" &&
-                  form.filteredNombresMedicos.length > 0
-                ) {
-                  e.preventDefault();
-                  handleSelectNombreMedico(form.filteredNombresMedicos[0]);
-                }
-              }}
-              onFocus={() => {
-                if (form.nombre_medico) {
-                  setForm((prev) => ({
-                    ...prev,
-                    filteredNombresMedicos: MedicosMulti.filter((emp) =>
-                      emp.mensaje
-                        .toLowerCase()
-                        .includes(form.nombre_medico.toLowerCase())
-                    ),
-                  }));
-                }
-              }}
-              onBlur={() =>
-                setTimeout(
-                  () =>
-                    setForm((prev) => ({
-                      ...prev,
-                      filteredNombresMedicos: [],
-                    })),
-                  100
-                )
-              }
-            />
-            {form.nombre_medico && form.filteredNombresMedicos.length > 0 && (
-              <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded max-h-40 overflow-y-auto z-10">
-                {form.filteredNombresMedicos.map((medico) => (
-                  <li
-                    key={medico.id}
-                    className="cursor-pointer px-3 py-2 hover:bg-gray-100"
-                    onMouseDown={() => handleSelectNombreMedico(medico)}
-                  >
-                    {medico.mensaje}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
+        <EmpleadoComboBox
+          value={form.nombre_medico}
+          form={form}
+          onChange={handleChangeSimple}
+        />
       </div>
     </div>
   );

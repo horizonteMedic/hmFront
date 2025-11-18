@@ -79,21 +79,50 @@ const Parenquimatosas = ({form,setForm}) => {
         }));
     };
 
-    const handleParenquimatosasChange = (value) => {
-        if (value === "SI") {
-            setForm(prev => ({
-            ...prev,
-            anormalidades_parenquimatosas_si: true,
-            anormalidades_parenquimatosas_no: false
-            }));
-        } else {
-            setForm(prev => ({
+    const AnormalidadesNo = (set) => {
+        set(prev => ({
             ...prev,
             anormalidades_parenquimatosas_si: false,
-            anormalidades_parenquimatosas_no: true
-            }));
-        }
-        };
+            anormalidades_parenquimatosas_no: true,
+            chk1D: false,
+            chk1I: false,
+            chk2D: false,
+            chk2I: false,
+            chk3D: false,
+            chk3I: false,
+            //a
+            chk1: false,
+            chk2: false,
+            chk3: false,
+            chk4: false,
+            chk5: true,
+            chk6: false,
+            chk7: false,
+            chk8: false,
+            chk9: false,
+            chk10: false,
+            chk11: false,
+            chk12: false,
+            //b
+            chkP1: false,
+            chkP2: false,
+            chkP3: false,
+            chkP4: false,
+            chkP5: false,
+            chkP6: false,
+            chkS1: false,
+            chkS2: false,
+            chkS3: false,
+            chkS4: false,
+            chkS5: false,
+            chkS6: false,
+            //c
+            chko: true,
+            chka: false,
+            chkb: false,
+            chkc: false,
+        }))
+    }
 
     return(
         <>
@@ -199,11 +228,7 @@ const Parenquimatosas = ({form,setForm}) => {
                         <label htmlFor="">SI</label>
 
                         <input type="checkbox" name="chkParenradio" checked={form.anormalidades_parenquimatosas_no} onChange={() =>
-                            setForm(prev => ({
-                            ...prev,
-                            anormalidades_parenquimatosas_si: false,
-                            anormalidades_parenquimatosas_no: true,
-                            }))
+                            AnormalidadesNo(setForm)
                         } id="chk2No" 
                         className="mr-2 ml-4"/>
                         <label htmlFor="">NO</label>
