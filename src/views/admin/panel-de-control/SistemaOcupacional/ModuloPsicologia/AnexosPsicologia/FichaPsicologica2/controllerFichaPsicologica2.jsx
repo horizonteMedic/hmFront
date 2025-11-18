@@ -37,12 +37,14 @@ export const GetInfoServicio = async (
             esApto: res.apto_apto,
             nombres: res.nombresPaciente,
             apellidos: res.apellidosPaciente,
-            fechaNacimiento: res.fechaNacimientoPaciente,
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente),
             lugarNacimiento: res.lugarNacimientoPaciente,
             domicilioActual: res.direccionPaciente,
             edad: res.edadPaciente,
             estadoCivil: res.estadoCivil,
             nivelEstudios: res.nivelEstudioPaciente,
+            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+            estadoCivil: res.estadoCivilPaciente,
 
             // Datos laborales
             empresa: res.empresa,
@@ -98,7 +100,7 @@ export const SubmitDataService = async (
     tabla,
     datosFooter
 ) => {
-    if (form.esApto === undefined||form.esApto === "") {
+    if (form.esApto === undefined || form.esApto === "") {
         Swal.fire({
             icon: "Error",
             title: "Datos Incompletos",
@@ -193,9 +195,13 @@ const GetInfoPac = async (nro, set, token, sede) => {
             ...prev,
             ...res,
             fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
-            edad: res.edad + " AÑOS",
+            edad: res.edad,
             ocupacion: res.areaO ?? "",
+            nombreExamen: res.nomExam ?? "",
             cargoDesempenar: res.cargo ?? "",
+            lugarNacimiento: res.lugarNacimiento ?? "",
+            domicilioActual: res.direccion ?? "",
+            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
         }));
     }
 };

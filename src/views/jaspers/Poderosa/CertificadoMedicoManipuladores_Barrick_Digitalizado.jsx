@@ -382,7 +382,10 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
     // Usar función de texto justificado
     yPos = dibujarTextoJustificado(datosFinales.consideracion, tablaInicioX + 35, yPos, tablaAncho - 35, 10);
   } else {
-    yPos += 2;
+    // Si no hay consideración, mostrar el estado APTO/NO APTO
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text(datosFinales.aptitud, tablaInicioX + 35, yPos);
+    yPos += 4;
   }
   yPos += 10; // Separación de 10mm antes de OBSERVACIONES
 

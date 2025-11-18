@@ -61,6 +61,7 @@ export default function EvaluacionPsicologicaPoderosa() {
         lugarNacimiento: "",
         domicilioActual: "",
         edad: "",
+        sexo: "",
         estadoCivil: "",
         nivelEstudios: "",
 
@@ -196,7 +197,10 @@ export default function EvaluacionPsicologicaPoderosa() {
                             {/* Derecha */}
                             <div className="space-y-3">
                                 <InputTextOneLine label="Domicilio Actual" name="domicilioActual" value={form.domicilioActual} disabled labelWidth="160px" />
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                                 <InputTextOneLine label="Edad (años)" name="edad" value={form.edad} disabled labelWidth="160px" />
+                                <InputTextOneLine label="Sexo" name="sexo" value={form.sexo} disabled labelWidth="160px" />
+                                </div>
                                 <InputTextOneLine label="Estado Civil" name="estadoCivil" value={form.estadoCivil} disabled labelWidth="160px" />
                                 <InputTextOneLine label="Nivel de Estudios" name="nivelEstudios" value={form.nivelEstudios} disabled labelWidth="160px" />
                             </div>

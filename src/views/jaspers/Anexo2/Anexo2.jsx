@@ -1360,38 +1360,62 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   const anchoColOrgano = puntoDivision - tablaInicioX;
 
   // === FILA: PIEL ===
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(puntoDivision, yPos, puntoDivision, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  let yInicioFilaPiel = yPos;
 
+  // Dibujar línea superior
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+
+  // Dibujar etiqueta
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Piel:", tablaInicioX + 2, yPos + 3.5);
 
-  // Mostrar datos o guion si no hay datos
+  // Renderizar texto de hallazgos con altura dinámica
   const textoPiel = datosFinales.piel || "-";
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(textoPiel, puntoDivision + 2, yPos + 3.5);
 
-  yPos += filaAltura;
+  // Calcular posición Y inicial para el texto
+  const yInicioTextoPiel = yPos + 2.5;
+  const yFinalTextoPiel = dibujarTextoConSaltoLinea(textoPiel, puntoDivision + 2, yInicioTextoPiel, anchoColHallazgos - 4);
+
+  // Calcular altura de fila dinámica
+  const alturaTextoPiel = yFinalTextoPiel - yInicioTextoPiel;
+  const alturaFilaPiel = Math.max(filaAltura, alturaTextoPiel + 2);
+  yPos = yInicioFilaPiel + alturaFilaPiel;
+
+  // Dibujar todas las líneas verticales y línea inferior con la altura correcta
+  doc.line(tablaInicioX, yInicioFilaPiel, tablaInicioX, yPos); // Línea izquierda
+  doc.line(puntoDivision, yInicioFilaPiel, puntoDivision, yPos); // División central
+  doc.line(tablaInicioX + tablaAncho, yInicioFilaPiel, tablaInicioX + tablaAncho, yPos); // Línea derecha
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea inferior
 
   // === FILA: CABELLO ===
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(puntoDivision, yPos, puntoDivision, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  let yInicioFilaCabello = yPos;
 
+  // Dibujar línea superior
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+
+  // Dibujar etiqueta
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Cabello:", tablaInicioX + 2, yPos + 3.5);
 
-  // Mostrar datos o guion si no hay datos
+  // Renderizar texto de hallazgos con altura dinámica
   const textoCabello = datosFinales.cabello || "-";
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(textoCabello, puntoDivision + 2, yPos + 3.5);
 
-  yPos += filaAltura;
+  // Calcular posición Y inicial para el texto
+  const yInicioTextoCabello = yPos + 2.5;
+  const yFinalTextoCabello = dibujarTextoConSaltoLinea(textoCabello, puntoDivision + 2, yInicioTextoCabello, anchoColHallazgos - 4);
+
+  // Calcular altura de fila dinámica
+  const alturaTextoCabello = yFinalTextoCabello - yInicioTextoCabello;
+  const alturaFilaCabello = Math.max(filaAltura, alturaTextoCabello + 2);
+  yPos = yInicioFilaCabello + alturaFilaCabello;
+
+  // Dibujar todas las líneas verticales y línea inferior con la altura correcta
+  doc.line(tablaInicioX, yInicioFilaCabello, tablaInicioX, yPos); // Línea izquierda
+  doc.line(puntoDivision, yInicioFilaCabello, puntoDivision, yPos); // División central
+  doc.line(tablaInicioX + tablaAncho, yInicioFilaCabello, tablaInicioX + tablaAncho, yPos); // Línea derecha
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea inferior
 
   // === SECCIÓN OJOS ===
   // Fila gris: OJOS
