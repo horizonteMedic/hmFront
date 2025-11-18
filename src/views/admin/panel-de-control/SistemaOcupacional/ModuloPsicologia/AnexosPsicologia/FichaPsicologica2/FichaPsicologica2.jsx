@@ -35,20 +35,23 @@ export default function FichaPsicologica2() {
         norden: "",
         fechaExamen: today,
         esApto: undefined,
+        nombreExamen: "",
+        // Datos personales
         nombres: "",
         apellidos: "",
         fechaNacimiento: "",
         lugarNacimiento: "",
         domicilioActual: "",
         edad: "",
+        sexo: "",
         estadoCivil: "",
         nivelEstudios: "",
 
         // Datos laborales
-        empresa: "",
-        contrata: "",
         ocupacion: "",
         cargoDesempenar: "",
+        empresa: "",
+        contrata: "",
 
         // Motivo de evaluación
         motivoEvaluacion: "",
@@ -114,7 +117,7 @@ export default function FichaPsicologica2() {
                         <div className="p-4 text-[10px] space-y-3">
                             {/* Header con información del examen */}
                             <div className="bg-white border border-gray-200 rounded-lg p-3 ">
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                                <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
                                     <InputTextOneLine
                                         label="N° Orden"
                                         name="norden"
@@ -131,121 +134,63 @@ export default function FichaPsicologica2() {
                                         onChange={handleChangeSimple}
                                         labelWidth="120px"
                                     />
-                                    <div className="flex gap-4 items-center">
-                                        <h4 className="font-semibold min-w-[120px] max-w-[120px]">Aptitud:</h4>
-                                        <InputsBooleanRadioGroup
-                                            name="esApto"
-                                            value={form.esApto}
-                                            trueLabel="APTO"
-                                            falseLabel="NO APTO"
-                                            onChange={handleRadioButtonBoolean}
-                                        />
-                                    </div>
+                                    <InputTextOneLine
+                                        label="Nombre Examen"
+                                        name="nombreExamen"
+                                        value={form.nombreExamen}
+                                        disabled
+                                        labelWidth="120px"
+                                    />
+                                    <InputsBooleanRadioGroup
+                                        label="Aptitud"
+                                        labelWidth="120px"
+                                        name="esApto"
+                                        value={form.esApto}
+                                        trueLabel="APTO"
+                                        falseLabel="NO APTO"
+                                        onChange={handleRadioButtonBoolean}
+                                    />
                                 </div>
                             </div>
                             {/* Contenido principal */}
-                            <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                <h4 className="font-semibold mb-2">Datos Necesarios</h4>
-
+                            {/* Datos Necesarios */}
+                            <fieldset className="bg-white border border-gray-200 rounded-lg p-3">
+                                <legend className="font-bold mb-3 text-[10px]">Datos Personales</legend>
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                    {/* Columna Izquierda */}
+                                    {/* Izquierda */}
                                     <div className="space-y-3">
-                                        <InputTextOneLine
-                                            label="Nombres"
-                                            name="nombres"
-                                            value={form.nombres}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
-                                        <InputTextOneLine
-                                            label="Apellidos"
-                                            name="apellidos"
-                                            value={form.apellidos}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
-                                        <InputTextOneLine
-                                            label="Fecha Nacimiento"
-                                            name="fechaNacimiento"
-                                            value={form.fechaNacimiento}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
-                                        <InputTextOneLine
-                                            label="Lugar Nacimiento"
-                                            name="lugarNacimiento"
-                                            value={form.lugarNacimiento}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
+                                        <InputTextOneLine label="Nombres" name="nombres" value={form.nombres} disabled labelWidth="160px" />
+                                        <InputTextOneLine label="Apellidos" name="apellidos" value={form.apellidos} disabled labelWidth="160px" />
+                                        <InputTextOneLine label="Fecha Nacimiento" name="fechaNacimiento" value={form.fechaNacimiento} disabled labelWidth="160px" />
+                                        <InputTextOneLine label="Lugar Nacimiento" name="lugarNacimiento" value={form.lugarNacimiento} disabled labelWidth="160px" />
                                     </div>
-
-                                    {/* Columna Derecha */}
+                                    {/* Derecha */}
                                     <div className="space-y-3">
-                                        <InputTextOneLine
-                                            label="Domicilio Actual"
-                                            name="domicilioActual"
-                                            value={form.domicilioActual}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
-                                        <InputTextOneLine
-                                            label="Edad"
-                                            name="edad"
-                                            value={form.edad}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
-                                        <InputTextOneLine
-                                            label="Estado Civil"
-                                            name="estadoCivil"
-                                            value={form.estadoCivil}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
-                                        <InputTextOneLine
-                                            label="Nivel Estudios"
-                                            name="nivelEstudios"
-                                            value={form.nivelEstudios}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
+                                        <InputTextOneLine label="Domicilio Actual" name="domicilioActual" value={form.domicilioActual} disabled labelWidth="160px" />
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                                            <InputTextOneLine label="Edad (años)" name="edad" value={form.edad} disabled labelWidth="160px" />
+                                            <InputTextOneLine label="Sexo" name="sexo" value={form.sexo} disabled labelWidth="160px" />
+                                        </div>
+                                        <InputTextOneLine label="Estado Civil" name="estadoCivil" value={form.estadoCivil} disabled labelWidth="160px" />
+                                        <InputTextOneLine label="Nivel de Estudios" name="nivelEstudios" value={form.nivelEstudios} disabled labelWidth="160px" />
                                     </div>
                                 </div>
-                            </div>
-                            <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                <h4 className="font-semibold mb-3">Datos Laborales</h4>
+                            </fieldset>
+
+                            {/* Datos Laborales */}
+                            <fieldset className="bg-white border border-gray-200 rounded-lg p-3">
+                                <legend className="font-bold mb-3 text-[10px]">Datos Laborales</legend>
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                    <InputTextOneLine
-                                        label="Empresa"
-                                        name="empresa"
-                                        value={form.empresa}
-                                        disabled
-                                        labelWidth="120px"
-                                    />
-                                    <InputTextOneLine
-                                        label="Contrata"
-                                        name="contrata"
-                                        value={form.contrata}
-                                        disabled
-                                        labelWidth="120px"
-                                    />
-                                    <InputTextOneLine
-                                        label="Ocupación"
-                                        name="ocupacion"
-                                        value={form.ocupacion}
-                                        disabled
-                                        labelWidth="120px"
-                                    />
-                                    <InputTextOneLine
-                                        label="Cargo Desempeñar"
-                                        name="cargoDesempenar"
-                                        value={form.cargoDesempenar}
-                                        disabled
-                                        labelWidth="120px"
-                                    />
+                                    <div className="space-y-3">
+                                        <InputTextOneLine label="Ocupación" name="ocupacion" value={form.ocupacion} disabled labelWidth="160px" />
+                                        <InputTextOneLine label="Cargo a desempeñar" name="cargoDesempenar" value={form.cargoDesempenar} disabled labelWidth="160px" />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <InputTextOneLine label="Empresa" name="empresa" value={form.empresa} disabled labelWidth="160px" />
+                                        <InputTextOneLine label="Contrata" name="contrata" value={form.contrata} disabled labelWidth="160px" />
+                                    </div>
                                 </div>
-                            </div>
+                            </fieldset>
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="grid gap-3">
                                     {/* Motivo Evaluación */}
