@@ -47,7 +47,6 @@ export const GetInfoServicio = async (
             fechaExamen: `${res.fechaExamen ? res.fechaExamen : today}`,
             fechaDesde: `${res.fechaDesde ? res.fechaDesde : today}`,
             fechahasta: `${res.fechahasta ? res.fechahasta : today}`,
-            nombreMedico: res.nombreMedico ? res.nombreMedico : prev.nombreMedico
 
         }));
     }
@@ -74,6 +73,7 @@ export const GetInfoServicioEditar = async (
             ...res,
             // Header
             nombres: `${res.nombrePaciente} ${res.apellidoPaciente}`,
+            user_medicoFirma: res.usuarioFirma,
             sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
             PA: `${res.sistolica}/${res.diastolica}`,
             edadPaciente: res.edadPaciente,
@@ -100,13 +100,14 @@ export const SubmitDataService = async (
         "norden": form.norden,
         "dniPaciente": form.dniPaciente,
         "fecha": form.fechaDesde,
-        "nombreMedico": form.nombreMedico,
+        "nombreMedico": "",
         "apto": form.apto === "APTO" ? true : false,
         "aptoConRestriccion": form.apto === "APTOCONRESTRICCION" ? true : false,
         "noApto": form.apto === "NOAPTO" ? true : false,
         "horaSalida": getHoraActual(),
         "fechaHasta": form.fechahasta,
         "conclusiones": form.conclusiones,
+        usuarioFirma: form.user_medicoFirma,
         "usuarioRegistro": user
     };
 
@@ -197,7 +198,7 @@ export const Loading = (mensaje) => {
 };
 
 export const Valores = {
-  Check1: `- LABORATORIO: Hb / Hto, Grupo Sanguíneo y Factor ({grupoFactor}), Glucosa, Ex. orina, 
+    Check1: `- LABORATORIO: Hb / Hto, Grupo Sanguíneo y Factor ({grupoFactor}), Glucosa, Ex. orina, 
         - APTITUD
 - ANEXO 16
 - ANTECEDENTES ENFERMEDADES EN ALTURA
@@ -220,7 +221,7 @@ export const Valores = {
 
         `,
 
-  Check2: `- LABORATORIO: Hma, Hb / Hto, Grupo Sanguíneo y Factor ({grupoFactor}), Glucosa, Ex. orina, 
+    Check2: `- LABORATORIO: Hma, Hb / Hto, Grupo Sanguíneo y Factor ({grupoFactor}), Glucosa, Ex. orina, 
         - APTITUD MÉDICA
 - ANEXO 16
 - ANTECEDENTES ENFERMEDADES EN ALTURA
@@ -247,7 +248,7 @@ export const Valores = {
 
 `,
 
-  Check3: `- LABORATORIO: Hma, Hb / Hto, Glucosa, Ex. Orina,Grupo Sanguineo y Factor ({grupoFactor})
+    Check3: `- LABORATORIO: Hma, Hb / Hto, Glucosa, Ex. Orina,Grupo Sanguineo y Factor ({grupoFactor})
   - APTITUD MÉDICA
 - ANEXO 16
 - HISTORIA OCUPACIONAL 
@@ -266,7 +267,7 @@ export const Valores = {
 
 `,
 
-  Check4: `- LABORATORIO: Hma, Hb / Hto, Glucosa, Ex. Orina.
+    Check4: `- LABORATORIO: Hma, Hb / Hto, Glucosa, Ex. Orina.
   - APTITUD MÉDICA
 - ANEXO 16
 -  HISTORIA OCUPACIONAL 
@@ -284,7 +285,7 @@ export const Valores = {
 
 `,
 
-  Check5: `- LABORATORIO: Hma, Hb /Hto, Grupo Sanguineo y Factor ({grupoFactor})
+    Check5: `- LABORATORIO: Hma, Hb /Hto, Grupo Sanguineo y Factor ({grupoFactor})
 - Glucosa, Creatinina /dl, Ex. Orina, RPR, Test cualitativo: Cocaína y Marihuana, Colesterol y Triglicéridos
 - APTITUD MÉDICA
 - ANEXO 16
@@ -312,7 +313,7 @@ export const Valores = {
 
 `,
 
-  Check6: `- LABORATORIO:  Hb /Hto, Glucosa, Ex. Orina NORMAL, 
+    Check6: `- LABORATORIO:  Hb /Hto, Glucosa, Ex. Orina NORMAL, 
   - APTITUD MÉDICA
 - ANEXO 16
 - HISTORIA OCUPACIONAL 
@@ -328,7 +329,7 @@ export const Valores = {
 
 `,
 
-  Check7: `- LABORATORIO: Hma, Hb /Hto, Grupo Sanguineo y Factor ({grupoFactor}), Glucosa, Creatinina /dl, Ex. Orina NORMAL, Vsg , RPR,
+    Check7: `- LABORATORIO: Hma, Hb /Hto, Grupo Sanguineo y Factor ({grupoFactor}), Glucosa, Creatinina /dl, Ex. Orina NORMAL, Vsg , RPR,
   - TEST CUALITATIVO: COLESTEROL Y TRIGLICÉRIDOS
 - APTITUD MÉDICA
 - ANEXO 16
