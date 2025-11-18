@@ -21,13 +21,13 @@ export default function AnexosPsicologiaSubSelector({ tieneVista }) {
         {
             id: 2,
             permission: "Ficha Psicologica 2",
-            label: "Ficha Psicológica 2",
+            label: "Ficha Anexo 2",
             component: FichaPsicologica2
         },
         {
             id: 3,
             permission: "Ficha Psicologica 3",
-            label: "Ficha Psicológica 3",
+            label: "Ficha Anexo 3",
             component: FichaPsicologica3
         },
     ];

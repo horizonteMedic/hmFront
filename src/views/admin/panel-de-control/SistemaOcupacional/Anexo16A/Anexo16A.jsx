@@ -330,10 +330,10 @@ export default function Anexo16A() {
                   <InputsBooleanRadioGroup
                     name="embarazo"
                     value={form?.embarazo}
-                    onChange={(e, value) => { if (value == false) setForm(prev => ({ ...prev, furDescripcion: "" })); handleRadioButtonBoolean(e, value) }}
+                    onChange={handleRadioButtonBoolean}
                   />
                 </div>
-                <InputTextOneLine label="FUR" name="furDescripcion" value={form?.furDescripcion} onChange={handleChange} disabled={!form.embarazo} />
+                <InputTextOneLine label="FUR" name="furDescripcion" value={form?.furDescripcion} onChange={handleChange}  />
                 <div className="flex items-center justify-between">
                   <span>Problemas Neurológicos: Epilepsia, vértigo, etc</span>
                   <InputsBooleanRadioGroup
