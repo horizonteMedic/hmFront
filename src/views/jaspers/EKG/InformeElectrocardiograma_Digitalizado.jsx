@@ -49,7 +49,7 @@ export default function InformeElectrocardiograma_Digitalizado(data = {}) {
     // Título principal
     doc.setFont("helvetica", "bold").setFontSize(12);
     doc.setTextColor(0, 0, 0);
-    doc.text("INFORME DE ELECTROCARDIOGRAMA", pageW / 2, 32.5, { align: "center" });
+    doc.text("INFORME DE ELECTROCARDIOGRAMA", pageW / 2, 37, { align: "center" });
 
     // Número de Ficha y Página
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -109,7 +109,7 @@ export default function InformeElectrocardiograma_Digitalizado(data = {}) {
   // === SECCIÓN 1: DATOS PERSONALES ===
   const tablaInicioX = 5;
   const tablaAncho = 200;
-  let yPos = 100; // Posición inicial después del header
+  let yPos = 45; // Posición inicial después del header
   const filaAltura = 5; // Altura fija de 5mm para datos personales
 
   // Header de datos personales
@@ -257,16 +257,13 @@ export default function InformeElectrocardiograma_Digitalizado(data = {}) {
     yPos += filaAltura;
   };
 
-  // Dibujar filas de parámetros EKG
+  // Dibujar filas de parámetros EKG (solo los solicitados)
   dibujarFilaParametroEKG("RITMO", datosFinales.ritmo);
-  dibujarFilaParametroEKG("FRECUENCIA", datosFinales.frecuencia);
+  dibujarFilaParametroEKG("F.C.", datosFinales.frecuencia);
+  dibujarFilaParametroEKG("P.R.", datosFinales.segmentoPR);
+  dibujarFilaParametroEKG("Q.R.S.", datosFinales.ondaQRS);
+  dibujarFilaParametroEKG("Q.T.C.", datosFinales.segmentoQT);
   dibujarFilaParametroEKG("EJE", datosFinales.eje);
-  dibujarFilaParametroEKG("ONDA P", datosFinales.ondaP);
-  dibujarFilaParametroEKG("SEGMENTO PR", datosFinales.segmentoPR);
-  dibujarFilaParametroEKG("ONDA QRS", datosFinales.ondaQRS);
-  dibujarFilaParametroEKG("SEGMENTO ST", datosFinales.segmentoST);
-  dibujarFilaParametroEKG("ONDA T", datosFinales.ondaT);
-  dibujarFilaParametroEKG("SEGMENTO QTC", datosFinales.segmentoQT);
 
   // === SECCIÓN 3: HALLAZGOS ===
   yPos = dibujarHeaderSeccion("3. HALLAZGOS", yPos, 5);
