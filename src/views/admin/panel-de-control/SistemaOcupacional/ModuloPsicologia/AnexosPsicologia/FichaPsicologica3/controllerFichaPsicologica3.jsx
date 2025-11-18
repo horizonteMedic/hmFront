@@ -47,7 +47,7 @@ export const GetInfoServicio = async (
             apellidos: res.apellidosPaciente,
             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente),
             lugarNacimiento: res.lugarNacimientoPaciente,
-            edad: `${res.edadPaciente} AÑOS`,
+            edad: res.edadPaciente,
             estadoCivil: res.estadoCivilPaciente,
             gradoInstruccion: res.nivelEstudioPaciente,
 
@@ -284,12 +284,18 @@ const GetInfoPac = async (nro, set, token, sede) => {
             ...prev,
             ...res,
             fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
-            edad: res.edad + " AÑOS",
-            lugarNacimiento: res.lugarNac ?? "",
-            empresa: res.empresa ?? "",
-            contrata: res.contrata ?? "",
-            puesto: res.cargo ?? "",
+            edad: res.edad,
             area: res.areaO ?? "",
+            puesto: res.cargo ?? "",
+            nombreExamen: res.nomExam ?? "",
+            cargoDesempenar: res.cargo ?? "",
+            explotacionEn: res.explotacion ?? "",
+            mineral:res.mineralExp ?? "",
+            alturaLabor: res.alturaLabor ?? "",
+            lugarNacimiento: res.lugarNacimiento ?? "",
+            domicilioActual: res.direccion ?? "",
+            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
+            gradoInstruccion: res.nivelEstudios,
         }));
     }
 };
