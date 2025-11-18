@@ -29,7 +29,7 @@ export const GetInfoServicio = (
   tabla,
   set,
   token,
-  onFinish = () => {}
+  onFinish = () => { }
 ) => {
   getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
     .then((res) => {
@@ -223,6 +223,7 @@ export const GetInfoServicio = (
           conclusion: leerBoolSI(res.conclusionAsintomaticoSi),
           diagnostico: res.diagnostico ?? "",
           recomendaciones: res.recomendaciones ?? "",
+          user_medicoFirma: res.usuarioFirma,
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -513,6 +514,7 @@ export const SubmitDataService = async (
     conclusionAsintomaticoSi: form.conclusion == "SI",
     conclusionAsintomaticoNo: form.conclusion == "NO",
     recomendaciones: form.recomendaciones,
+    usuarioFirma: form.user_medicoFirma,
     userRegistro: user,
   };
   SubmitData(body, registrarUrl, token).then((res) => {

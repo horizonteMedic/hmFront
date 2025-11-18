@@ -23,13 +23,14 @@ import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import Swal from "sweetalert2";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaConduccionVehiculos";
+import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "b_certificado_conduccion";
 const today = getToday();
 export default function FichaConduccionVehiculos() {
     const [activeTab, setActiveTab] = useState(0);
 
-    const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+    const { token, userlogued, selectedSede, datosFooter, userCompleto, userName } =
         useSessionData();
 
     const initialFormState = {
@@ -138,6 +139,10 @@ export default function FichaConduccionVehiculos() {
         obesidadDietaHipocalorica: false,
         usoLentesCorrectoresLectura: false,
         corregirAgudezaLectura: false,
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
     };
 
     const {
@@ -431,12 +436,10 @@ export default function FichaConduccionVehiculos() {
                                         onChange={handleChange}
                                         rows={6}
                                     />
-                                    <InputTextOneLine
-                                        label="Nombre y Apellidos del Médico"
-                                        name="nombreMedicoColegiatura"
-                                        labelOnTop
-                                        value={form?.nombreMedicoColegiatura}
-                                        disabled
+                                    <EmpleadoComboBox
+                                        value={form.nombre_medico}
+                                        form={form}
+                                        onChange={handleChangeSimple}
                                     />
                                 </div>
 
