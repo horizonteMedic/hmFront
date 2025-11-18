@@ -75,14 +75,26 @@ export default function Anexo7C_Antiguo(data = {}) {
     },
     gradoInstruccion: (() => {
       const nivelEstudio = String(data.nivelEstudioPaciente_nivel_est_pa || "").toUpperCase().trim();
+      if (!nivelEstudio) {
+        return {
+          analfabeto: false,
+          primariaCom: false,
+          secCom: false,
+          univers: false,
+          primariaInc: false,
+          secInc: false,
+          tecnico: false
+        };
+      }
+      
       return {
-        analfabeto: nivelEstudio === "ANALFABETO",
-        primariaCom: nivelEstudio === "PRIMARIA.COM" || nivelEstudio === "PRIMARIA COMPLETA" || (nivelEstudio.includes("PRIMARIA") && nivelEstudio.includes("COMPLETA")),
-        secCom: nivelEstudio === "SEC.COM" || nivelEstudio === "SECUNDARIA COMPLETA" || (nivelEstudio.includes("SECUNDARIA") && nivelEstudio.includes("COMPLETA")),
-        univers: nivelEstudio === "UNIVERS" || nivelEstudio === "UNIVERSITARIO" || nivelEstudio.includes("UNIVERSITARIO"),
-        primariaInc: nivelEstudio === "PRIMARIA.INC" || nivelEstudio === "PRIMARIA INCOMPLETA" || (nivelEstudio.includes("PRIMARIA") && nivelEstudio.includes("INCOMPLETA")),
-        secInc: nivelEstudio === "SEC.INC" || nivelEstudio === "SECUNDARIA INCOMPLETA" || (nivelEstudio.includes("SECUNDARIA") && nivelEstudio.includes("INCOMPLETA")),
-        tecnico: nivelEstudio === "TECNICO" || nivelEstudio === "TÉCNICO" || nivelEstudio.includes("TECNICO")
+        analfabeto: nivelEstudio.includes("ANALFABETO"),
+        primariaCom: nivelEstudio.includes("PRIMARIA") && nivelEstudio.includes("COMPLETA") && !nivelEstudio.includes("INCOMPLETA"),
+        primariaInc: nivelEstudio.includes("PRIMARIA") && nivelEstudio.includes("INCOMPLETA"),
+        secCom: nivelEstudio.includes("SECUNDARIA") && nivelEstudio.includes("COMPLETA") && !nivelEstudio.includes("INCOMPLETA"),
+        secInc: nivelEstudio.includes("SECUNDARIA") && nivelEstudio.includes("INCOMPLETA"),
+        univers: nivelEstudio.includes("UNIVERSITARIO") || nivelEstudio.includes("UNIVERS"),
+        tecnico: nivelEstudio.includes("TECNICO") || nivelEstudio.includes("TÉCNICO")
       };
     })(),
     // Datos adicionales para la fila de riesgos ocupacionales
@@ -2387,9 +2399,22 @@ export default function Anexo7C_Antiguo(data = {}) {
 
   // === SECCIÓN: MIEMBROS SUPERIORES E INFERIORES ===
   
-  // Verificar si necesitamos nueva página
-  const alturaFilaMiembros = 5;
-  const alturaTotalMiembros = alturaFilaMiembros * 2; // 2 filas
+  // Calcular altura dinámica para miembros superiores
+  const textoMiembrosSuperiores = String(datosFinales.evaluacionFisicaAdicional?.miembrosSuperiores || "").trim();
+  const anchoDisponibleMiembrosSuperiores = tablaAncho - 40 - 4; // Ancho total menos label y márgenes
+  const lineasMiembrosSuperiores = doc.splitTextToSize(textoMiembrosSuperiores, anchoDisponibleMiembrosSuperiores);
+  const alturaMinimaMiembros = 5;
+  const interlineadoMiembros = 2.5;
+  const alturaDinamicaMiembrosSuperiores = Math.max(alturaMinimaMiembros, lineasMiembrosSuperiores.length * interlineadoMiembros + 4);
+  
+  // Calcular altura dinámica para miembros inferiores
+  const textoMiembrosInferiores = String(datosFinales.evaluacionFisicaAdicional?.miembrosInferiores || "").trim();
+  const anchoDisponibleMiembrosInferiores = tablaAncho - 40 - 4; // Ancho total menos label y márgenes
+  const lineasMiembrosInferiores = doc.splitTextToSize(textoMiembrosInferiores, anchoDisponibleMiembrosInferiores);
+  const alturaDinamicaMiembrosInferiores = Math.max(alturaMinimaMiembros, lineasMiembrosInferiores.length * interlineadoMiembros + 4);
+  
+  // Verificar si necesitamos nueva página (usando alturas dinámicas)
+  const alturaTotalMiembros = alturaDinamicaMiembrosSuperiores + alturaDinamicaMiembrosInferiores;
   if (yPos + alturaTotalMiembros > pageHeight - 20) {
     footerTR(doc, { footerOffsetY: 8 });
     doc.addPage();
@@ -2399,30 +2424,34 @@ export default function Anexo7C_Antiguo(data = {}) {
   }
 
   // FILA 1: Miembros superiores
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaMiembros);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaMiembros);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaMiembrosSuperiores);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaMiembrosSuperiores);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaFilaMiembros, tablaInicioX + tablaAncho, yPos + alturaFilaMiembros);
+  doc.line(tablaInicioX, yPos + alturaDinamicaMiembrosSuperiores, tablaInicioX + tablaAncho, yPos + alturaDinamicaMiembrosSuperiores);
 
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("MIEMBROS SUPERIORES:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(datosFinales.evaluacionFisicaAdicional?.miembrosSuperiores || "", tablaInicioX + 40, yPos + 3.5);
+  lineasMiembrosSuperiores.forEach((linea, index) => {
+    doc.text(linea, tablaInicioX + 40, yPos + 3.5 + (index * interlineadoMiembros));
+  });
 
-  yPos += alturaFilaMiembros;
+  yPos += alturaDinamicaMiembrosSuperiores;
 
   // FILA 2: Miembros inferiores
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaMiembros);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaMiembros);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaMiembrosInferiores);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaMiembrosInferiores);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaFilaMiembros, tablaInicioX + tablaAncho, yPos + alturaFilaMiembros);
+  doc.line(tablaInicioX, yPos + alturaDinamicaMiembrosInferiores, tablaInicioX + tablaAncho, yPos + alturaDinamicaMiembrosInferiores);
 
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("MIEMBROS INFERIORES:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(datosFinales.evaluacionFisicaAdicional?.miembrosInferiores || "", tablaInicioX + 40, yPos + 3.5);
+  lineasMiembrosInferiores.forEach((linea, index) => {
+    doc.text(linea, tablaInicioX + 40, yPos + 3.5 + (index * interlineadoMiembros));
+  });
 
-  yPos += alturaFilaMiembros;
+  yPos += alturaDinamicaMiembrosInferiores;
 
   // === SECCIÓN: EVALUACIÓN NEUROLÓGICA, COLUMNA Y ABDOMEN ===
   

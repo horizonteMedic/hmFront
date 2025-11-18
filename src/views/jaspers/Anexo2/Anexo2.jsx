@@ -833,8 +833,20 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     // Calcular altura necesaria para el campo de cantidad/frecuencia (si tiene texto largo)
     let alturaNecesaria = filaAltura;
     const yTextoInicio = yPos + 3.5;
+    const xInicioTipo = 82; // Posición X donde comienza el texto de tipo
+    const anchoDisponibleTipo = colTipoWidth - 2; // Ancho disponible: ancho de columna menos márgenes
     const xInicioCantidad = 137; // Posición X donde comienza el texto de cantidad/frecuencia
     const anchoDisponibleCantidad = colCantWidth - 2; // Ancho disponible: ancho de columna menos márgenes
+    
+    // Calcular altura necesaria para tipo usando splitTextToSize
+    let lineasTipo = [];
+    const tipoTexto = (habito.tipo === null || habito.tipo === undefined || habito.tipo === "") ? "-" : habito.tipo;
+    if (tipoTexto && tipoTexto !== "-") {
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      lineasTipo = doc.splitTextToSize(tipoTexto, anchoDisponibleTipo);
+      const alturaTipo = Math.max(filaAltura, lineasTipo.length * 2.8 + 2);
+      alturaNecesaria = Math.max(alturaNecesaria, alturaTipo);
+    }
     
     // Calcular altura necesaria para cantidad usando splitTextToSize
     let lineasCantidad = [];
@@ -865,9 +877,17 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
       doc.setFont("helvetica", "bold").setFontSize(10);
       doc.text('X', xNo, yPos + 3.5, { align: "center" });
     }
+    
+    // TIPO con salto de línea si es necesario
     doc.setFont("helvetica", "normal").setFontSize(7);
-    const tipoTexto = (habito.tipo === null || habito.tipo === undefined || habito.tipo === "") ? "-" : habito.tipo;
-    doc.text(tipoTexto, 82, yPos + 3.5);
+    if (tipoTexto && tipoTexto !== "-" && lineasTipo.length > 0) {
+      // Dibujar cada línea usando splitTextToSize
+      lineasTipo.forEach((linea, index) => {
+        doc.text(linea, xInicioTipo, yTextoInicio + (index * 2.8));
+      });
+    } else {
+      doc.text(tipoTexto, xInicioTipo, yPos + 3.5);
+    }
     
     // Cantidad/Frecuencia con salto de línea si es necesario
     if (cantidadTexto && cantidadTexto !== "-" && lineasCantidad.length > 0) {
