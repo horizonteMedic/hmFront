@@ -1,14 +1,22 @@
-import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
-import { PrintHojaR, SubmitPanel4D, VerifyTR } from './controller4D';
-import Swal from 'sweetalert2';
+import { useSessionData } from '../../../../../../hooks/useSessionData';
+import { useForm } from '../../../../../../hooks/useForm';
+import { getToday } from '../../../../../../utils/helpers';
+import { PrintHojaR, SubmitDataService, VerifyTR } from './controller4D';
+import {
+  InputTextOneLine,
+  InputsRadioGroup,
+} from '../../../../../../components/reusableComponents/ResusableComponents';
+import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 
-const Resultado_Panel4D = ({ token, selectedSede, userlogued }) => {
-  const tabla = 'toxicologia'
-  const date = new Date();
-  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-  const [form, setForm] = useState({
+const tabla = 'panel4d';
+
+export default function Resultado_Panel4D() {
+  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+  const today = getToday();
+
+  const initialFormState = {
     norden: '',
     fecha: today,
     nombres: '',
@@ -17,263 +25,206 @@ const Resultado_Panel4D = ({ token, selectedSede, userlogued }) => {
     valueM: 'NEGATIVO',
     valueO: 'NEGATIVO',
     valueMet: 'NEGATIVO',
-  });
-
-  // Refs para navegación
-  const fechaRef = useRef(null);
-  const valueCRef = useRef(null);
-  const valueMRef = useRef(null);
-  const valueORef = useRef(null);
-  const valueMetRef = useRef(null);
-  const printRef = useRef(null);
-
-  const handleChange = e => {
-    const { name, value } = e.target;
-    setForm(f => ({ ...f, [name]: value.toUpperCase() }));
   };
 
-  const handleLimpiar = () => {
-    setForm({
-      norden: '',
-      fecha: today,
-      nombres: '',
-      edad: '',
-      valueC: 'NEGATIVO',
-      valueM: 'NEGATIVO',
-      valueO: 'NEGATIVO',
-      valueMet: 'NEGATIVO',
-    });
+  const {
+    form,
+    setForm,
+    handleChange,
+    handleClear,
+    handlePrintDefault,
+    handleRadioButton,
+  } = useForm(initialFormState, { storageKey: 'panel4d' });
+
+  const handleSave = () => {
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
 
-  const handleSeat = () => {
-    setForm(prev => ({
-      ...prev,
-      fecha: today,
-      nombres: '',
-      edad: '',
-      valueC: 'NEGATIVO',
-      valueM: 'NEGATIVO',
-      valueO: 'NEGATIVO',
-      valueMet: 'NEGATIVO',
-    }));
-  };
-
-  const handleFechaFocus = e => {
-    e.target.showPicker?.();
+  const handleSearch = (e) => {
+    if (e.key === 'Enter') {
+      setForm((prev) => ({
+        ...prev,
+        fecha: today,
+        nombres: '',
+        edad: '',
+        valueC: 'NEGATIVO',
+        valueM: 'NEGATIVO',
+        valueO: 'NEGATIVO',
+        valueMet: 'NEGATIVO',
+      }));
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    }
   };
 
   const handlePrint = () => {
-    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
-    Swal.fire({
-      title: '¿Desea Imprimir Panel 4D?',
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, Imprimir',
-      cancelButtonText: 'Cancelar',
-      customClass: {
-        title: 'swal2-title',
-        confirmButton: 'swal2-confirm',
-        cancelButton: 'swal2-cancel'
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        PrintHojaR(form.norden,tabla,token);
-      }
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla, datosFooter);
     });
   };
 
-  const nameWidth = Math.min(400, Math.max(120, (form.nombres?.length || 0) * 10));
+  const handleRadioChange = (e, value) => {
+    handleRadioButton(e, value);
+  };
 
   return (
-    <form className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
-      <h2 className="text-2xl font-bold mb-6 text-center">PANEL DROGAS 4D</h2>
-
-      <div className="flex flex-wrap items-center gap-6 mb-6">
-        <div className="flex items-center gap-2">
-          <label className="font-semibold">Nro Ficha:</label>
-          <input
+    <div className="w-full space-y-4 px-4">
+      <h2 className="text-2xl font-bold text-center mb-4">PANEL DROGAS 4D</h2>
+      
+      <form className="space-y-4">
+        {/* Información del Examen */}
+        <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <InputTextOneLine
+            label="Nro Ficha"
             name="norden"
             value={form.norden}
-            onKeyUp={(event) => {
-              if(event.key === 'Enter') {
-                handleSeat()
-                VerifyTR(form.norden, tabla, token, setForm, selectedSede);
-              }
-            }}
             onChange={handleChange}
-            className="border rounded px-3 py-2 w-32"
+            onKeyUp={handleSearch}
+            labelWidth="120px"
           />
-        </div>
-        <div className="flex items-center gap-2">
-          <label className="font-semibold">Fecha:</label>
-          <input
+          <InputTextOneLine
+            label="Fecha"
             name="fecha"
             type="date"
             value={form.fecha}
             onChange={handleChange}
-            className="border rounded px-3 py-2 w-40"
-            ref={fechaRef}
-            onFocus={handleFechaFocus}
-            onKeyUp={e => {
-              if (e.key === 'Enter') {
-                valueCRef.current?.focus();
-              }
-            }}
+            labelWidth="120px"
           />
-        </div>
-        <div className="flex items-center gap-2">
-          <label className="font-semibold">Nombres:</label>
-          <input
+          <InputTextOneLine
+            label="Nombres"
             name="nombres"
             value={form.nombres}
-            onChange={handleChange}
             disabled
-            style={{ width: nameWidth }}
-            className="border rounded px-3 py-2"
+            labelWidth="120px"
           />
-        </div>
-        <div className="flex items-center gap-2">
-          <label className="font-semibold">Edad:</label>
-          <input
+          <InputTextOneLine
+            label="Edad"
             name="edad"
             value={form.edad}
-            onChange={handleChange}
             disabled
-            className="border rounded px-3 py-2 w-20"
+            labelWidth="120px"
+            inputClassName="w-20"
           />
-        </div>
-      </div>
+        </SectionFieldset>
 
-      <div className="grid grid-cols-3 gap-x-4 gap-y-2 mb-8">
-        <div className="font-bold">PRUEBA CUALITATIVO</div>
-        <div className="font-bold"> </div>
-        <div className="font-bold">RESULTADOS</div>
-        
-        <div className="flex items-center">COCAÍNA (COC)</div>
-        <div className="flex items-center gap-2">
-          <label className="flex items-center gap-1">
-            <input type="checkbox" checked={form.valueC === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueC: 'POSITIVO'}))} /> Positivo
-          </label>
-          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
-            <input type="checkbox" checked={form.valueC === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueC: 'NEGATIVO'}))} /> Negativo
-          </label>
-        </div>
-        <input
-          name='valueC'
-          className="border rounded px-3 py-2 w-32"
-          value={form.valueC}
-          onChange={handleChange}
-          ref={valueCRef}
-          onKeyUp={e => {
-            if (e.key === 'Enter') {
-              valueMRef.current?.focus();
-            }
-          }}
-        />
-        
-        <div className="flex items-center">MARIHUANA (THC)</div>
-        <div className="flex items-center gap-2">
-          <label className="flex items-center gap-1">
-            <input type="checkbox" checked={form.valueM === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueM: 'POSITIVO'}))} /> Positivo
-          </label>
-          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
-            <input type="checkbox" checked={form.valueM === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueM: 'NEGATIVO'}))} /> Negativo
-          </label>
-        </div>
-        <input
-          name='valueM'
-          className="border rounded px-3 py-2 w-32"
-          value={form.valueM}
-          onChange={handleChange}
-          ref={valueMRef}
-          onKeyUp={e => {
-            if (e.key === 'Enter') {
-              valueORef.current?.focus();
-            }
-          }}
-        />
-        
-        <div className="flex items-center">OPIÁCEOS</div>
-        <div className="flex items-center gap-2">
-          <label className="flex items-center gap-1">
-            <input type="checkbox" checked={form.valueO === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueO: 'POSITIVO'}))} /> Positivo
-          </label>
-          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
-            <input type="checkbox" checked={form.valueO === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueO: 'NEGATIVO'}))} /> Negativo
-          </label>
-        </div>
-        <input
-          name='valueO'
-          className="border rounded px-3 py-2 w-32"
-          value={form.valueO}
-          onChange={handleChange}
-          ref={valueORef}
-          onKeyUp={e => {
-            if (e.key === 'Enter') {
-              valueMetRef.current?.focus();
-            }
-          }}
-        />
-        
-        <div className="flex items-center">METHANFETAMINAS</div>
-        <div className="flex items-center gap-2">
-          <label className="flex items-center gap-1">
-            <input type="checkbox" checked={form.valueMet === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueMet: 'POSITIVO'}))} /> Positivo
-          </label>
-          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
-            <input type="checkbox" checked={form.valueMet === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueMet: 'NEGATIVO'}))} /> Negativo
-          </label>
-        </div>
-        <input
-          name='valueMet'
-          className="border rounded px-3 py-2 w-32"
-          value={form.valueMet}
-          onChange={handleChange}
-          ref={valueMetRef}
-          onKeyUp={e => {
-            if (e.key === 'Enter') {
-              printRef.current?.focus();
-            }
-          }}
-        />
-      </div>
+        {/* Resultados */}
+        <SectionFieldset legend="Prueba Cualitativo - Resultados">
+          <div className="grid grid-cols-3 gap-x-4 gap-y-4">
+            <div className="font-bold">PRUEBA CUALITATIVO</div>
+            <div className="font-bold"></div>
+            <div className="font-bold">RESULTADOS</div>
+            
+            <div className="flex items-center">COCAÍNA (COC)</div>
+            <InputsRadioGroup
+              name="valueC"
+              value={form.valueC}
+              onChange={handleRadioChange}
+              options={[
+                { label: 'Positivo', value: 'POSITIVO' },
+                { label: 'Negativo', value: 'NEGATIVO' }
+              ]}
+              groupClassName="gap-6"
+            />
+            <InputTextOneLine
+              name="valueC"
+              value={form.valueC}
+              onChange={handleChange}
+              inputClassName="w-32"
+            />
+            
+            <div className="flex items-center">MARIHUANA (THC)</div>
+            <InputsRadioGroup
+              name="valueM"
+              value={form.valueM}
+              onChange={handleRadioChange}
+              options={[
+                { label: 'Positivo', value: 'POSITIVO' },
+                { label: 'Negativo', value: 'NEGATIVO' }
+              ]}
+              groupClassName="gap-6"
+            />
+            <InputTextOneLine
+              name="valueM"
+              value={form.valueM}
+              onChange={handleChange}
+              inputClassName="w-32"
+            />
+            
+            <div className="flex items-center">OPIÁCEOS</div>
+            <InputsRadioGroup
+              name="valueO"
+              value={form.valueO}
+              onChange={handleRadioChange}
+              options={[
+                { label: 'Positivo', value: 'POSITIVO' },
+                { label: 'Negativo', value: 'NEGATIVO' }
+              ]}
+              groupClassName="gap-6"
+            />
+            <InputTextOneLine
+              name="valueO"
+              value={form.valueO}
+              onChange={handleChange}
+              inputClassName="w-32"
+            />
+            
+            <div className="flex items-center">METHANFETAMINAS</div>
+            <InputsRadioGroup
+              name="valueMet"
+              value={form.valueMet}
+              onChange={handleRadioChange}
+              options={[
+                { label: 'Positivo', value: 'POSITIVO' },
+                { label: 'Negativo', value: 'NEGATIVO' }
+              ]}
+              groupClassName="gap-6"
+            />
+            <InputTextOneLine
+              name="valueMet"
+              value={form.valueMet}
+              onChange={handleChange}
+              inputClassName="w-32"
+            />
+          </div>
+        </SectionFieldset>
 
-      <div className="flex flex-wrap items-center justify-end gap-4">
-        <div className="flex items-center gap-2 mr-8">
-          <span className="font-semibold text-blue-900 italic">IMPRIMIR</span>
-          <input 
-            className="border rounded px-3 py-2 w-28" 
-            name='norden' 
-            value={form.norden} 
-            onChange={handleChange}
-            ref={printRef}
-          />
-          <button
-            type="button"
-            onClick={handlePrint}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            <FontAwesomeIcon icon={faPrint} />
-          </button>
-        </div>
-        <button
-          type="button"
-          onClick={() => {SubmitPanel4D(form,userlogued,token,handleLimpiar,tabla)}}
-          className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
-        >
-          <FontAwesomeIcon icon={faSave} /> Guardar
-        </button>
-        <button
-          type="button"
-          onClick={handleLimpiar}
-          className="bg-yellow-400 text-white px-6 py-2 rounded hover:bg-yellow-500"
-        >
-          <FontAwesomeIcon icon={faBroom} /> Limpiar
-        </button>
-      </div>
-    </form>
+        {/* Acciones */}
+        <fieldset className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={handleSave}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+            </button>
+            <button
+              type="button"
+              onClick={handleClear}
+              className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faBroom} /> Limpiar
+            </button>
+          </div>
+          <div className="flex flex-col items-end">
+            <span className="font-bold italic mb-2">IMPRIMIR</span>
+            <div className="flex items-center gap-2">
+              <InputTextOneLine
+                name="norden"
+                value={form.norden}
+                onChange={handleChange}
+                inputClassName="w-28"
+              />
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faPrint} />
+              </button>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+    </div>
   );
-};
-
-export default Resultado_Panel4D;
+}

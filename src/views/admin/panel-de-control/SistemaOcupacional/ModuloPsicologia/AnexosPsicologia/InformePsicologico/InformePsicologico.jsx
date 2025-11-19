@@ -300,7 +300,7 @@ export default function InformePsicologico() {
         });
     };
     return (
-        <div className="w-full space-y-3 p-4">
+        <div className="w-full space-y-3 px-4">
             {/* ===== SECCIÓN: DATOS NECESARIOS ===== */}
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
                 <InputTextOneLine
