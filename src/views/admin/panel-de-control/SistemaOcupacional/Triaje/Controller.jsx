@@ -2,7 +2,7 @@ import { useRef } from "react"
 import { GetHistoriaC } from "../Admision/model/AdminHistoriaC.js"
 import { GetHistoriaCTriaje, SubmitTriaje } from './model';
 import Swal from "sweetalert2";
-import ReporteTriaje from "../../../../jaspers/ReporteTriaje";
+import ReporteTriaje from "../../../../jaspers/Triaje/ReporteTriaje";
 const Loading = (text) => {
     Swal.fire({
       title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,
@@ -42,10 +42,8 @@ export const VerifyTR = async (form,get,token,set,setTR,sede,setHTR,setH) => {
     get(`/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${form.nro}&nomService=${'triaje'}`,token)
     .then((res) => {
         if (res.id === 0) {
-          console.log('asdasd')
           GetInfoPac(form,set,get,token,sede)
         } else {
-          console.log('registrado')
           GetListTriajeMult(form.nro,set,setTR,get,token,false,setHTR)
         }
     })
@@ -127,7 +125,6 @@ export const handleNombreChange = (e,set,setTable,sede,token,debounceTimeout) =>
         GetHistoriaCTriaje(data, sede, token)
           .then((res) => {
             if (res && res.length) {
-                console.log(res)
               setTable(res);
             } else {
               setTable([]);
@@ -216,7 +213,6 @@ export const handleSubmit = async (datos,edad,nro,fecha,Swal,token,setF,setT,ref
     });
     SubmitTriaje(datos,edad,nro,fecha,token)
     .then((res) => {
-      console.log(res)
         if (res.id === 1) {
           refreshtable()
           Clean(setF,setT)
@@ -266,7 +262,6 @@ export const GetListTriajeMult = async (nro,set,setTR,get,token,jasper,setHTR) =
   get(`/api/v01/ct/triaje/listarFormatoTriaje/${nro}`,token)
   .then(async(res) => {
     if (res.n_orden) {
-      console.log(res)
       if (jasper) {
         await GetJasper(res,token)
         return
@@ -310,7 +305,6 @@ export const GetListTriajeMulttable = async (nro,set,setTR,get,token,setHTR,setH
     if (res.n_orden) {
       setH(true)
       setHTR(true)
-      console.log(res)
       set({
         nro: res.n_orden,
         nomExam: res.nom_examen,
