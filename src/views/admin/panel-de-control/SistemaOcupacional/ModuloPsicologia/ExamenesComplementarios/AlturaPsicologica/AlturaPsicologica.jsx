@@ -111,7 +111,7 @@ export default function AlturaPsicologica() {
   ];
 
   return (
-    <SectionFieldset className="space-y-6 px-4 pt-4">
+    <div className="space-y-6 p-4">
       {/* Header con información del examen */}
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
         <InputTextOneLine
@@ -385,6 +385,6 @@ export default function AlturaPsicologica() {
           </div>
         </div>
       </section>
-    </SectionFieldset>
+    </div>
   );
 }

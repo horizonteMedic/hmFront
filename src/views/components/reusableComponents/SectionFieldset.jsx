@@ -12,7 +12,7 @@ export default function SectionFieldset({
                     {legend}
                 </legend>
             ) : null}
-            <div className={`px-4 pb-4 ${className}`}>
+            <div className={`px-4 ${legend ? "mb-4" : "my-4"} ${className}`}>
                 {children}
             </div>
         </fieldset>

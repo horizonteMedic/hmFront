@@ -17,13 +17,13 @@ import { useForm } from "../../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformePsicologico";
+import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 
 const tabla = "informe_psicologico";
 const today = getToday();
 
 export default function InformePsicologico() {
-    const { token, userlogued, selectedSede, datosFooter, userCompleto } =
-        useSessionData();
+    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
 
     const initialFormState = {
         norden: "",
@@ -105,7 +105,6 @@ export default function InformePsicologico() {
         setForm,
         handleChange,
         handleChangeNumber,
-        handleRadioButton,
         handleClear,
         handleRadioButtonBoolean,
         handleClearnotO,
@@ -306,93 +305,84 @@ export default function InformePsicologico() {
                 <div className="w-full space-y-3 p-4">
                     {/*==========================Datos Necesarios Section==========================*/}
                     <div>
-                        <div className="flex items-center px-6">
-                            <FontAwesomeIcon icon={faUser} className="mr-2 text-[#233245]" />
-                            <h2 className="text-lg font-semibold text-[#233245] uppercase tracking-wider">Datos Necesarios</h2>
-                        </div>
                         {/* ===== SECCIÓN: DATOS NECESARIOS ===== */}
                         <div className="p-4 text-[10px] space-y-3">
                             {/* Header con información del examen */}
-                            <div className="bg-white border border-gray-200 rounded-lg p-3 ">
-                                <h3 className="font-semibold mb-2">Informe Psicológico</h3>
-                                <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+                            <SectionFieldset legend="Informe Psicológico" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+                                <InputTextOneLine
+                                    label="N° Orden"
+                                    name="norden"
+                                    value={form.norden}
+                                    onKeyUp={handleSearch}
+                                    onChange={handleChangeNumber}
+                                    labelWidth="120px"
+                                />
+                                <InputTextOneLine
+                                    label="Fecha Entrevista"
+                                    name="fechaEntrevista"
+                                    type="date"
+                                    value={form.fechaEntrevista}
+                                    onChange={handleChange}
+                                    labelWidth="120px"
+                                />
+                                <InputTextOneLine
+                                    label="Nombre Examen"
+                                    name="nombreExamen"
+                                    value={form.nombreExamen}
+                                    disabled
+                                    labelWidth="120px"
+                                />
+                                <InputsBooleanRadioGroup
+                                    label="Aprobó Test"
+                                    name="aproboTest"
+                                    value={form.aproboTest}
+                                    onChange={handleRadioButtonBoolean}
+                                />
+                            </SectionFieldset>
+                            {/* Contenido principal */}
+                            <SectionFieldset legend="Datos Necesarios" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                {/* Columna Izquierda */}
+                                <div className="space-y-3">
                                     <InputTextOneLine
-                                        label="N° Orden"
-                                        name="norden"
-                                        value={form.norden}
-                                        onKeyUp={handleSearch}
-                                        onChange={handleChangeNumber}
-                                        labelWidth="120px"
-                                    />
-                                    <InputTextOneLine
-                                        label="Fecha Entrevista"
-                                        name="fechaEntrevista"
-                                        type="date"
-                                        value={form.fechaEntrevista}
-                                        onChange={handleChange}
-                                        labelWidth="120px"
-                                    />
-                                    <InputTextOneLine
-                                        label="Nombre Examen"
-                                        name="nombreExamen"
-                                        value={form.nombreExamen}
+                                        label="Nombres"
+                                        name="nombres"
+                                        value={form.nombres}
                                         disabled
                                         labelWidth="120px"
                                     />
-                                    <InputsBooleanRadioGroup
-                                        label="Aprobó Test"
-                                        name="aproboTest"
-                                        value={form.aproboTest}
-                                        onChange={handleRadioButtonBoolean}
+                                    <InputTextOneLine
+                                        label="Apellidos"
+                                        name="apellidos"
+                                        value={form.apellidos}
+                                        disabled
+                                        labelWidth="120px"
+                                    />
+                                    <InputTextOneLine
+                                        label="Fecha Nacimiento"
+                                        name="fechaNacimiento"
+                                        value={form.fechaNacimiento}
+                                        disabled
+                                        labelWidth="120px"
+                                    />
+                                    <InputTextOneLine
+                                        label="Lugar Nacimiento"
+                                        name="lugarNacimiento"
+                                        value={form.lugarNacimiento}
+                                        disabled
+                                        labelWidth="120px"
                                     />
                                 </div>
-                            </div>
-                            {/* Contenido principal */}
-                            <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                <h4 className="font-semibold mb-2">Datos Necesarios</h4>
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                    {/* Columna Izquierda */}
-                                    <div className="space-y-3">
-                                        <InputTextOneLine
-                                            label="Nombres"
-                                            name="nombres"
-                                            value={form.nombres}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
-                                        <InputTextOneLine
-                                            label="Apellidos"
-                                            name="apellidos"
-                                            value={form.apellidos}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
-                                        <InputTextOneLine
-                                            label="Fecha Nacimiento"
-                                            name="fechaNacimiento"
-                                            value={form.fechaNacimiento}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
-                                        <InputTextOneLine
-                                            label="Lugar Nacimiento"
-                                            name="lugarNacimiento"
-                                            value={form.lugarNacimiento}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
-                                    </div>
 
-                                    {/* Columna Derecha */}
-                                    <div className="space-y-3">
-                                        <InputTextOneLine
-                                            label="Domicilio Actual"
-                                            name="domicilioActual"
-                                            value={form.domicilioActual}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
-                                        <div className="grid md:grid-cols-2 gap-3">
+                                {/* Columna Derecha */}
+                                <div className="space-y-3">
+                                    <InputTextOneLine
+                                        label="Domicilio Actual"
+                                        name="domicilioActual"
+                                        value={form.domicilioActual}
+                                        disabled
+                                        labelWidth="120px"
+                                    />
+                                    <div className="grid md:grid-cols-2 gap-3">
                                         <InputTextOneLine
                                             label="Edad (Años)"
                                             name="edad"
@@ -407,24 +397,23 @@ export default function InformePsicologico() {
                                             disabled
                                             labelWidth="120px"
                                         />
-                                        </div>
-                                        <InputTextOneLine
-                                            label="Estado Civil"
-                                            name="estadoCivil"
-                                            value={form.estadoCivil}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
-                                        <InputTextOneLine
-                                            label="Nivel Estudios"
-                                            name="nivelEstudios"
-                                            value={form.nivelEstudios}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
                                     </div>
+                                    <InputTextOneLine
+                                        label="Estado Civil"
+                                        name="estadoCivil"
+                                        value={form.estadoCivil}
+                                        disabled
+                                        labelWidth="120px"
+                                    />
+                                    <InputTextOneLine
+                                        label="Nivel Estudios"
+                                        name="nivelEstudios"
+                                        value={form.nivelEstudios}
+                                        disabled
+                                        labelWidth="120px"
+                                    />
                                 </div>
-                            </div>
+                            </SectionFieldset>
                             {/* ===== SECCIÓN: DATOS LABORALES ===== */}
                             <div className="bg-white border border-gray-200 rounded-lg p-3">
                                 <h4 className="font-semibold mb-3">Datos Laborales</h4>
