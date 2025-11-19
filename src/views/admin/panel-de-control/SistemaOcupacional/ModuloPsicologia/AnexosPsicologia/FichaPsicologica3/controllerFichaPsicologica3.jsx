@@ -176,7 +176,7 @@ export const SubmitDataService = async (
         habitos: form.habitos,
         otrasObservaciones: form.otrasObservaciones,
         presentacionAdecuado: form.presentacion === 'ADECUADO',
-        presentacionIndecuado: form.presentacion === 'INDECUADO',
+        presentacionIndecuado: form.presentacion === 'INADECUADO',
         posturaErguida: form.postura === 'ERGUIDA',
         posturaEncorvada: form.postura === 'ENCORVADA',
         ritmoLento: form.ritmo === 'LENTO',
