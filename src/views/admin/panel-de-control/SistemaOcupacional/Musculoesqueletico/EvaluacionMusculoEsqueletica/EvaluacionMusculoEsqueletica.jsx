@@ -11,6 +11,7 @@ import {
 } from "./controllerEvaluacionMusculoEsqueletica";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "evaluacion_musculo_esqueletica";
 const date = new Date();
@@ -25,7 +26,7 @@ function fixEncodingModern(str) {
 }
 
 export default function EvaluacionMusculoEsqueletica() {
-  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+  const { token, userlogued, selectedSede, datosFooter, userCompleto, userName } =
     useSessionData();
 
   const initialFormState = {
@@ -169,6 +170,10 @@ export default function EvaluacionMusculoEsqueletica() {
     nombreMedico: `${fixEncodingModern(
       userCompleto?.datos?.nombres_user ?? ""
     )} - ${userCompleto?.datos?.cmp ?? ""}`,
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
   const {
@@ -176,6 +181,7 @@ export default function EvaluacionMusculoEsqueletica() {
     setForm,
     handleChange,
     handleChangeNumber,
+    handleChangeSimple,
     handleRadioButton,
     handleClear,
     handleClearnotO,
@@ -545,20 +551,11 @@ export default function EvaluacionMusculoEsqueletica() {
                 </label>
               </div>
             </div>
-
-            <div>
-              <div className="mb-3">
-                <label className="font-semibold block mb-1">
-                  Nombre y Apellidos del Médico - N° Colegiatura:
-                </label>
-                <input
-                  className="border rounded px-3 py-1 w-full capitalize"
-                  name="nombreMedico"
-                  value={form.nombreMedico || ""}
-                  disabled
-                />
-              </div>
-            </div>
+            <EmpleadoComboBox
+              value={form.nombre_medico}
+              form={form}
+              onChange={handleChangeSimple}
+            />
           </div>
           <div className="mb-3">
             <label className="font-semibold block mb-1">Diagnóstico:</label>

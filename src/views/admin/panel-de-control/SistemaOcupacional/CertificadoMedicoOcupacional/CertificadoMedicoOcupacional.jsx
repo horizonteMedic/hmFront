@@ -67,7 +67,7 @@ export default function CertificadoMedicoOcupacional() {
         user_medicoFirma: userlogued,
     }
 
-    const { form, setForm, handleChangeNumber, handleChange, handleChangeSimple,handleClearnotO, handleClear, handlePrintDefault } = useForm(InitialForm, { storageKey: "Certificado_Medico_Ocupacional_form" })
+    const { form, setForm, handleChangeNumber,handleChange, handleRadioButton, handleClearnotO, handleClear, handlePrintDefault } = useForm(InitialForm, { storageKey: "Certificado_Medico_Ocupacional_form" })
 
     const handleClearnotOandEspecialidad = () => {
         setForm((prev) => ({ ...InitialForm, norden: prev.norden, fechaDesde: today, fechahasta: today }));
@@ -98,7 +98,7 @@ export default function CertificadoMedicoOcupacional() {
         console.log("Guardando datos:", form);
     };
 
-    const handleRadioButton = (e) => {
+    const handleRadioButton2 = (e) => {
         const { name, value } = e.target;
 
         // value ya trae el texto del Check seleccionado (por ejemplo valores.Check1)
@@ -356,40 +356,40 @@ export default function CertificadoMedicoOcupacional() {
                                 </section>
                                 <section className="bg-white rounded-lg p-4 pt-1 gap-4 mt-0 m-4">
                                     <InputsRadioGroup
-                                        name="conclusiones" value={form.conclusiones} className="py-2"
-                                        onChange={handleRadioButton} options={[
-                                            { label: "1. MARSA - OPERATIVA, SUPERVISOR, AYUDANTE", value: "Check1" }
-                                        ]}
+                                    name="conclusiones" value={form.conclusiones} className="py-2"
+                                    onChange={handleRadioButton2} options={[
+                                        { label: "1. MARSA - OPERATIVA, SUPERVISOR, AYUDANTE", value: "Check1" }
+                                    ]}
                                     />
                                     <InputsRadioGroup
-                                        name="conclusiones" value={form.conclusiones} className="py-2"
-                                        onChange={handleRadioButton} options={[
-                                            { label: "2. MARSA - CONDUCTOR u OPERADOR MAQUINARIA", value: "Check2" }
-                                        ]}
+                                    name="conclusiones" value={form.conclusiones} className="py-2"
+                                    onChange={handleRadioButton2} options={[
+                                        { label: "2. MARSA - CONDUCTOR u OPERADOR MAQUINARIA", value: "Check2" }
+                                    ]}
                                     />
                                     <div className="w-full grid grid-cols-2">
                                         <InputsRadioGroup
-                                            name="conclusiones" value={form.conclusiones} className="py-2"
-                                            onChange={handleRadioButton} options={[{ label: "3. MARSA - RETIRO ", value: "Check3" }]}
+                                        name="conclusiones" value={form.conclusiones} className="py-2"
+                                        onChange={handleRadioButton2} options={[{ label: "3. MARSA - RETIRO ", value: "Check3" }]}
                                         />
                                         <InputsRadioGroup
-                                            name="conclusiones" value={form.conclusiones} className="py-2"
-                                            onChange={handleRadioButton} options={[{ label: "6. PROTOCOLO PODEROSA RETIRO", value: "Check6" }]}
+                                        name="conclusiones" value={form.conclusiones} className="py-2"
+                                        onChange={handleRadioButton2} options={[{ label: "6. PROTOCOLO PODEROSA RETIRO", value: "Check6"}]}
                                         />
                                     </div>
                                     <div className="w-full grid grid-cols-2">
                                         <InputsRadioGroup
-                                            name="conclusiones" value={form.conclusiones} className="py-2"
-                                            onChange={handleRadioButton} options={[{ label: "4. RETIRO BOROO", value: "Check4" }]}
+                                        name="conclusiones" value={form.conclusiones} className="py-2"
+                                        onChange={handleRadioButton2} options={[{ label: "4. RETIRO BOROO", value: "Check4" }]}
                                         />
                                         <InputsRadioGroup
-                                            name="conclusiones" value={form.conclusiones} className="py-2"
-                                            onChange={handleRadioButton} options={[{ label: "7. PROTOCOLO PODEROSA", value: "Check7" }]}
+                                        name="conclusiones" value={form.conclusiones} className="py-2"
+                                        onChange={handleRadioButton2} options={[{ label: "7. PROTOCOLO PODEROSA", value: "Check7" }]}
                                         />
                                     </div>
                                     <InputsRadioGroup
-                                        name="conclusiones" value={form.conclusiones} className="py-2"
-                                        onChange={handleRadioButton} options={[{ label: "5. BOROO - PSICONSENSOMETRICO Y ALTURA   Perfil Lipidico. ", value: "Check5" }]}
+                                    name="conclusiones" value={form.conclusiones} className="py-2"
+                                    onChange={handleRadioButton2} options={[{ label: "5. BOROO - PSICONSENSOMETRICO Y ALTURA   Perfil Lipidico. ", value: "Check5" }]}
                                     />
                                     <EmpleadoComboBox
                                         value={form.nombre_medico}

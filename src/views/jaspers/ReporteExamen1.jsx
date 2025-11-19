@@ -120,6 +120,10 @@ export default function ReporteExamen1 (datos){
         drawC(doc,"RX COLUMNA\nLUMBOSACRA F y L", leftspace+120, headspace+97, 35, 10, !datos.albo ? true : datos.rxc_lumbo ? true : false);
         drawC(doc,"METALES PESADOS ", leftspace+160, headspace+97, 35, 10, !datos.aplomo || !datos.amercurio ? true : !datos.plomos || !datos.mercurioo ? true : false);
 
+        drawC(doc,"ESPACIOS\nCONFINADOS", leftspace, headspace+118, 35, 10, !datos.espaciosConfinados ? true : false);
+        drawC(doc,"TEST\nCOCAINA", leftspace+40, headspace+118, 35, 10, !datos.cocaina ? true : false);
+        drawC(doc,"TEST\nMARIHUANA", leftspace+80, headspace+118, 35, 10, !datos.marihuana ? true : false);
+
         drawLine(leftspace+35, headspace+102, leftspace+40, headspace+102);
         drawLine(leftspace+75, headspace+102, leftspace+80, headspace+102);
         drawLine(leftspace+115, headspace+102, leftspace+120, headspace+102);

@@ -381,17 +381,26 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("GENERO :", tablaInicioX + 47, yTexto + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.genero, tablaInicioX + 60, yTexto + 4);
+  doc.text(datosFinales.genero, tablaInicioX + 65, yTexto + 4);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("EDAD :", tablaInicioX + 92, yTexto + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.edad, tablaInicioX + 105, yTexto + 4);
 
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  // Calcular posición del valor después del label para evitar superposición
+  const anchoLabelGrupo = doc.getTextWidth("GRUPO SANGUÍNEO :");
   doc.text("GRUPO SANGUÍNEO :", tablaInicioX + 137, yTexto + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.grupoSanguineo, tablaInicioX + 160, yTexto + 4);
+  // Calcular posición X del valor, asegurándose de que quepa dentro de la columna
+  const xValorGrupo = tablaInicioX + 137 + anchoLabelGrupo + 2;
+  const anchoDisponibleGrupo = (tablaInicioX + tablaAncho) - xValorGrupo - 2; // Margen de 2mm del borde
+  // Si el valor es muy largo, usar splitTextToSize para que se ajuste
+  if (datosFinales.grupoSanguineo) {
+    const lineasGrupo = doc.splitTextToSize(datosFinales.grupoSanguineo, anchoDisponibleGrupo);
+    doc.text(lineasGrupo, xValorGrupo, yTexto + 4);
+  }
   yTexto += alturaFila4;
 
   // Quinta fila: Empresa (fila completa)
