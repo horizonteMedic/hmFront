@@ -12,6 +12,7 @@ import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAlturaPsicologica";
 import { useTailwindBreakpoints } from "../../../../../../hooks/useTailwindBreakpoints";
+import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 
 const tabla = "";
 const today = getToday();
@@ -110,171 +111,163 @@ export default function AlturaPsicologica() {
   ];
 
   return (
-    <div className="space-y-6 px-4 pt-4">
+    <SectionFieldset className="space-y-6 px-4 pt-4">
       {/* Header con información del examen */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4 ">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-          <InputTextOneLine
-            label="N° Orden"
-            name="norden"
-            value={form.norden}
-            onKeyUp={handleSearch}
-            onChange={handleChangeNumber}
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Fecha Entrevista"
-            name="fechaExamen"
-            type="date"
-            value={form.fechaExamen}
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+        <InputTextOneLine
+          label="N° Orden"
+          name="norden"
+          value={form.norden}
+          onKeyUp={handleSearch}
+          onChange={handleChangeNumber}
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Fecha Entrevista"
+          name="fechaExamen"
+          type="date"
+          value={form.fechaExamen}
+          onChange={handleChangeSimple}
+          labelWidth="120px"
+        />
+        <div className="flex gap-4 items-center col-span-2">
+          <h4 className="font-semibold min-w-[120px] max-w-[120px]">Nombre del Examen:</h4>
+          <select
+            name="nombreExamen"
+            value={form.nombreExamen}
             onChange={handleChangeSimple}
-            labelWidth="120px"
-          />
-          <div className="flex gap-4 items-center col-span-2">
-            <h4 className="font-semibold min-w-[120px] max-w-[120px]">Nombre del examen:</h4>
-            <select
-              name="nombreExamen"
-              value={form.nombreExamen}
-              onChange={handleChangeSimple}
-              className="border rounded px-2 py-1 text-base w-full"
-            >
-              <option value="INFORME PSICOLÓGICO - TRABAJO EN ALTURA">
-                INFORME PSICOLÓGICO - TRABAJO EN ALTURA
-              </option>
-              <option value="INFORME PSICOLÓGICO - TRABAJO EN ALTURA/OBRAS">
-                INFORME PSICOLÓGICO - TRABAJO EN ALTURA/OBRAS
-              </option>
-            </select>
-          </div>
-          <InputsBooleanRadioGroup
-            name="esApto"
-            label="Aptitud"
-            labelWidth="120px"
-            value={form.esApto}
-            trueLabel="APTO"
-            falseLabel="NO APTO"
-            onChange={handleRadioButtonBoolean}
-          />
+            className="border rounded px-2 py-1 text-base w-full"
+          >
+            <option value="INFORME PSICOLÓGICO - TRABAJO EN ALTURA">
+              INFORME PSICOLÓGICO - TRABAJO EN ALTURA
+            </option>
+            <option value="INFORME PSICOLÓGICO - TRABAJO EN ALTURA/OBRAS">
+              INFORME PSICOLÓGICO - TRABAJO EN ALTURA/OBRAS
+            </option>
+          </select>
         </div>
-      </div>
+        <InputsBooleanRadioGroup
+          name="esApto"
+          label="Aptitud"
+          labelWidth="120px"
+          value={form.esApto}
+          trueLabel="APTO"
+          falseLabel="NO APTO"
+          onChange={handleRadioButtonBoolean}
+        />
+      </SectionFieldset>
+
       {/* Datos necesarios */}
-      <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
-        <legend className="font-bold mb-3 text-[10px]">Datos Personales</legend>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+      <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <InputTextOneLine
+          label="Nombres"
+          name="nombres"
+          value={form.nombres}
+          disabled
+          labelWidth="120px"
+        />
+        <div className="grid lg:grid-cols-2 gap-3">
           <InputTextOneLine
-            label="Nombres"
-            name="nombres"
-            value={form.nombres}
-            disabled
-            labelWidth="120px"
-          />
-          <div className="grid lg:grid-cols-2 gap-3">
-            <InputTextOneLine
-              label="Edad"
-              name="edad"
-              value={form.edad}
-              disabled
-              labelWidth="120px"
-            />
-            <InputTextOneLine
-              label="Sexo"
-              name="sexo"
-              value={form.sexo}
-              disabled
-              labelWidth="120px" />
-          </div>
-          <InputTextOneLine
-            label="Apellidos"
-            name="apellidos"
-            value={form.apellidos}
-            disabled
-            labelWidth="120px"
-          />
-          <div className="grid lg:grid-cols-2 gap-3">
-            <InputTextOneLine
-              label="DNI"
-              name="dni"
-              value={form.dni}
-              disabled
-              labelWidth="120px"
-            />
-            <InputTextOneLine
-              label="Estado Civil"
-              name="estadoCivil"
-              value={form.estadoCivil}
-              disabled
-              labelWidth="120px"
-            />
-          </div>
-          <InputTextOneLine
-            label="Fecha Nacimiento"
-            name="fechaNacimiento"
-            value={form.fechaNacimiento}
+            label="Edad"
+            name="edad"
+            value={form.edad}
             disabled
             labelWidth="120px"
           />
           <InputTextOneLine
-            label="Lugar Nacimiento"
-            name="lugarNacimiento"
-            value={form.lugarNacimiento}
+            label="Sexo"
+            name="sexo"
+            value={form.sexo}
+            disabled
+            labelWidth="120px" />
+        </div>
+        <InputTextOneLine
+          label="Apellidos"
+          name="apellidos"
+          value={form.apellidos}
+          disabled
+          labelWidth="120px"
+        />
+        <div className="grid lg:grid-cols-2 gap-3">
+          <InputTextOneLine
+            label="DNI"
+            name="dni"
+            value={form.dni}
             disabled
             labelWidth="120px"
           />
           <InputTextOneLine
-            label="Domicilio Actual"
-            name="domicilioActual"
-            value={form.domicilioActual}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Nivel Estudios"
-            name="nivelEstudios"
-            value={form.nivelEstudios}
+            label="Estado Civil"
+            name="estadoCivil"
+            value={form.estadoCivil}
             disabled
             labelWidth="120px"
           />
         </div>
-      </fieldset>
+        <InputTextOneLine
+          label="Fecha Nacimiento"
+          name="fechaNacimiento"
+          value={form.fechaNacimiento}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Lugar Nacimiento"
+          name="lugarNacimiento"
+          value={form.lugarNacimiento}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Domicilio Actual"
+          name="domicilioActual"
+          value={form.domicilioActual}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Nivel Estudios"
+          name="nivelEstudios"
+          value={form.nivelEstudios}
+          disabled
+          labelWidth="120px"
+        />
+      </SectionFieldset>
 
       {/* Datos Laborales */}
-      <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
-        <legend className="font-bold mb-3 text-[10px]">Datos Laborales</legend>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          <InputTextOneLine
-            label="Empresa"
-            name="empresa"
-            value={form.empresa}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Contrata"
-            name="contrata"
-            value={form.contrata}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Ocupación"
-            name="ocupacion"
-            value={form.ocupacion}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Cargo Desempeñar"
-            name="cargoDesempenar"
-            value={form.cargoDesempenar}
-            disabled
-            labelWidth="120px"
-          />
-        </div>
-      </fieldset>
+      <SectionFieldset legend="Datos Laborales" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <InputTextOneLine
+          label="Empresa"
+          name="empresa"
+          value={form.empresa}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Contrata"
+          name="contrata"
+          value={form.contrata}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Ocupación"
+          name="ocupacion"
+          value={form.ocupacion}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Cargo Desempeñar"
+          name="cargoDesempenar"
+          value={form.cargoDesempenar}
+          disabled
+          labelWidth="120px"
+        />
+      </SectionFieldset>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
-          <legend className="font-bold mb-3 text-[10px]">Aspecto Intelectual</legend>
+        <SectionFieldset legend="Aspecto Intelectual">
           <RadioTable
             items={itemsIntelectual}
             options={opcionesIntelectual}
@@ -282,9 +275,8 @@ export default function AlturaPsicologica() {
             handleRadioButton={handleRadioButton}
             labelColumns={2}
           />
-        </fieldset>
-        <fieldset className="bg-white border border-gray-200 rounded-lg p-4 space-y-8">
-          <legend className="font-bold mb-3 text-[10px]">Aspecto Personalidad</legend>
+        </SectionFieldset>
+        <SectionFieldset legend="Aspecto Personalidad" className="space-y-8">
           {/* Aspectos de Personalidad */}
           <InputsRadioGroup
             label="1.- Estabilidad"
@@ -334,29 +326,26 @@ export default function AlturaPsicologica() {
             labelOnTop
             vertical={!isLgUp}
           />
-        </fieldset>
+        </SectionFieldset>
       </div>
 
       {/* Análisis y Recomendaciones */}
-      <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
-        <legend className="font-bold mb-3 text-[10px]">Conclusiones Finales</legend>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <InputTextArea
-            label="Análisis y Resultados"
-            name="analisisResultados"
-            value={form.analisisResultados}
-            onChange={handleChange}
-            rows={4}
-          />
-          <InputTextArea
-            label="Recomendaciones"
-            name="recomendaciones"
-            value={form.recomendaciones}
-            onChange={handleChange}
-            rows={4}
-          />
-        </div>
-      </fieldset>
+      <SectionFieldset legend="Conclusiones Finales" className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <InputTextArea
+          label="Análisis y Resultados"
+          name="analisisResultados"
+          value={form.analisisResultados}
+          onChange={handleChange}
+          rows={4}
+        />
+        <InputTextArea
+          label="Recomendaciones"
+          name="recomendaciones"
+          value={form.recomendaciones}
+          onChange={handleChange}
+          rows={4}
+        />
+      </SectionFieldset>
 
       {/* Acciones */}
       <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-4">
@@ -396,6 +385,6 @@ export default function AlturaPsicologica() {
           </div>
         </div>
       </section>
-    </div>
+    </SectionFieldset>
   );
 }
