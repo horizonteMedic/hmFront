@@ -107,7 +107,7 @@ export default function ReporteTriaje(datos) {
     doc.text("Género:", tablaInicioX + 62, textoY2);
     doc.setFont("helvetica", "normal").setFontSize(8);
     const sexoText = datos.sexo_pa === "M" ? "MASCULINO" : datos.sexo_pa === "F" ? "FEMENINO" : "";
-    doc.text(sexoText, tablaInicioX + 72, textoY2);
+    doc.text(sexoText, tablaInicioX + 78, textoY2);
 
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("Fecha Nac.:", tablaInicioX + 122, textoY2);

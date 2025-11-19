@@ -188,15 +188,32 @@ export const HematologiaBioquimicaSIEO = ({
         <div className="flex flex-wrap items-center gap-6 flex-1 min-w-0">
           <label className="font-bold flex items-center whitespace-nowrap">
             {" "}
-            <input type="checkbox" className="mr-1" /> Consultas{" "}
+            <input 
+              type="checkbox" 
+              className="mr-1" 
+              checked={false}
+              onChange={() => {}}
+              readOnly
+            /> Consultas{" "}
           </label>
           <label className="font-bold flex items-center whitespace-nowrap">
             {" "}
-            <input type="checkbox" className="mr-1" /> Particular{" "}
+            <input 
+              type="checkbox" 
+              className="mr-1" 
+              checked={false}
+              onChange={() => {}}
+              readOnly
+            /> Particular{" "}
           </label>
           <label className="font-bold flex items-center whitespace-nowrap">
             {" "}
-            <input type="checkbox" className="mr-1" defaultChecked /> Ficha
+            <input 
+              type="checkbox" 
+              className="mr-1" 
+              defaultChecked 
+              readOnly
+            /> Ficha
             Médica Ocupacional{" "}
           </label>
           <label className="font-bold flex items-center whitespace-nowrap">
@@ -204,7 +221,7 @@ export const HematologiaBioquimicaSIEO = ({
             N° Orden:{" "}
             <input
               name="norden"
-              value={form.norden}
+              value={form.norden || ""}
               onChange={handleInputChange}
               onKeyUp={(event) => {
                 if (event.key === "Enter") {
@@ -246,8 +263,11 @@ export const HematologiaBioquimicaSIEO = ({
             {" "}
             DNI:{" "}
             <input
-              value={form.dni}
-              className="border rounded px-2 py-1 w-36 text-md ml-1"
+              name="dni"
+              value={form.dni || ""}
+              onChange={handleInputChange}
+              className="border rounded px-2 py-1 w-36 text-md ml-1 bg-gray-100"
+              disabled
             />{" "}
           </label>
           <label className="font-bold flex items-center whitespace-nowrap">
@@ -256,7 +276,7 @@ export const HematologiaBioquimicaSIEO = ({
             <input
               name="fecha"
               type="date"
-              value={form.fecha}
+              value={form.fecha || ""}
               onChange={handleInputChange}
               className="border rounded px-2 py-1 w-44 text-md ml-1"
             />{" "}
@@ -331,7 +351,7 @@ export const HematologiaBioquimicaSIEO = ({
                 <label className="w-44 font-bold mb-0">Nombres</label>
                 <input
                   name="paciente"
-                  value={form.paciente}
+                  value={form.paciente || ""}
                   className="border border-gray-400 rounded-sm px-1 w-full text-md bg-gray-100 font-bold"
                   disabled
                 />
@@ -342,7 +362,7 @@ export const HematologiaBioquimicaSIEO = ({
                 </label>
                 <input
                   name="gfSangPedido"
-                  value={form.gfSangPedido}
+                  value={form.gfSangPedido || ""}
                   className="border border-gray-400 rounded-sm px-1 w-44 bg-gray-100 text-md font-bold"
                   disabled
                 />
@@ -352,7 +372,7 @@ export const HematologiaBioquimicaSIEO = ({
               <label className="w-44 font-bold mb-0">Emp. Contratista</label>
               <input
                 name="empContratista"
-                value={form.empContratista}
+                value={form.empContratista || ""}
                 className="border border-gray-400 rounded-sm px-1 w-full text-md bg-gray-100 font-bold"
                 disabled
               />
@@ -361,7 +381,7 @@ export const HematologiaBioquimicaSIEO = ({
               <label className="w-44 font-bold mb-0">Empresa</label>
               <input
                 name="empresa"
-                value={form.empresa}
+                value={form.empresa || ""}
                 className="border border-gray-400 rounded-sm px-1 w-full text-md bg-gray-100 font-bold"
                 disabled
               />
@@ -472,7 +492,7 @@ export const HematologiaBioquimicaSIEO = ({
                     </label>
                     <input
                       name={key}
-                      value={form[key]}
+                      value={form[key] || ""}
                       onChange={handleInputChange}
                       className={`border border-gray-300 rounded-lg px-3 py-1 w-44 text-md shadow-sm bg-white focus:ring-2 focus:ring-gray-300 transition-all font-medium ${
                         form.empresaNA
@@ -512,7 +532,7 @@ export const HematologiaBioquimicaSIEO = ({
                     </label>
                     <input
                       name={key}
-                      value={form[key]}
+                      value={form[key] || ""}
                       onChange={handleInputChange}
                       className={`border border-gray-300 rounded-lg px-3 py-1 w-44 text-md shadow-sm bg-white focus:ring-2 focus:ring-gray-300 transition-all font-medium ${
                         form.empresaNA
@@ -551,11 +571,11 @@ export const HematologiaBioquimicaSIEO = ({
                 <label className="w-40 font-medium text-[#233245]">
                   Glucosa :
                 </label>
-                <input
-                  name="glucosa"
-                  ref={glucosaRef}
-                  value={form.glucosa}
-                  onChange={handleInputChange}
+                  <input
+                    name="glucosa"
+                    ref={glucosaRef}
+                    value={form.glucosa || ""}
+                    onChange={handleInputChange}
                   className={`border border-gray-300 rounded-lg px-3 py-1 w-44 text-md shadow-sm bg-white focus:ring-2 focus:ring-gray-300 transition-all font-medium ${
                     form.glucosaNA
                       ? "bg-gray-200 text-gray-500"
@@ -588,11 +608,11 @@ export const HematologiaBioquimicaSIEO = ({
                 <label className="w-40 font-medium text-[#233245]">
                   Creatinina :
                 </label>
-                <input
-                  name="creatinina"
-                  ref={creatininaRef}
-                  value={form.creatinina}
-                  onChange={handleInputChange}
+                  <input
+                    name="creatinina"
+                    ref={creatininaRef}
+                    value={form.creatinina || ""}
+                    onChange={handleInputChange}
                   className={`border border-gray-300 rounded-lg px-3 py-1 w-44 text-md shadow-sm bg-white focus:ring-2 focus:ring-gray-300 transition-all font-medium ${
                     form.creatininaNA
                       ? "bg-gray-200 text-gray-500"
@@ -631,7 +651,7 @@ export const HematologiaBioquimicaSIEO = ({
                   </label>
                   <input
                     name="rpr"
-                    value={form.rpr}
+                    value={form.rpr || ""}
                     onChange={handleInputChange}
                     className={`border border-gray-300 rounded-lg px-3 py-1 flex-1 text-md shadow-sm font-medium bg-white focus:ring-2 focus:ring-gray-300 transition-all ${
                       rprNA ? "bg-gray-200 text-gray-500" : "text-gray-900"
@@ -674,7 +694,7 @@ export const HematologiaBioquimicaSIEO = ({
                   </label>
                   <input
                     name="vih"
-                    value={form.vih}
+                    value={form.vih || ""}
                     onChange={handleInputChange}
                     className={`border border-gray-300 rounded-lg px-3 py-1 flex-1 text-md shadow-sm font-medium bg-white focus:ring-2 focus:ring-gray-300 transition-all ${
                       vihNA ? "bg-gray-200 text-gray-500" : "text-gray-900"

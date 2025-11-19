@@ -1,144 +1,147 @@
 import Swal from "sweetalert2";
-import { getFetch } from '../../../../getFetch/getFetch.js';
-import { SubmitToxPanel10D } from "../model/model.js";
+import {
+  GetInfoPacDefault,
+  GetInfoServicioDefault,
+  LoadingDefault,
+  PrintHojaRDefault,
+  SubmitDataServiceDefault,
+  VerifyTRDefault,
+} from "../../../../../../utils/functionUtils";
 
-export const Loading = (text) => {
-    Swal.fire({
-      title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,
-      html: `<div style=\"font-size:1.1em;\"><span style='color:#0d9488;font-weight:bold;'></span></div><div class='mt-2'>Espere por favor...</div>` ,
-      icon: 'info',
-      background: '#f0f6ff',
-      color: '#22223b',
-      showConfirmButton: false,
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      showCancelButton: true,
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-      customClass: {
-        popup: 'swal2-border-radius',
-        title: 'swal2-title-custom',
-        htmlContainer: 'swal2-html-custom',
-      },
-      showClass: {
-        popup: 'animate__animated animate__fadeInDown'
-      },
-      hideClass: {
-        popup: 'animate__animated animate__fadeOutUp'
-      },
-      didOpen: () => {
-        Swal.showLoading();
-      }
-    });
-}
+const obtenerReporteUrl =
+  "/api/v01/ct/toxicologia/obtenerReportePanel10D";
+const registrarUrl =
+  "/api/v01/ct/toxicologia/registrarActualizarPanel10D";
 
-
-export const VerifyTR = async (nro,tabla,token,set,sede) => {
-    if (!nro) { 
-      await Swal.fire('Error', 'Debe Introducir un Nro de Historia Clinica valido', 'error') 
-      return
-    }
-    Loading('Validando datos')
-    getFetch(`/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,token)
-    .then((res) => {
-        console.log(res)
-        if (res.id === 0) {
-            GetInfoPac(nro,set,token,sede)
-        } else {
-            GetInfoPanel10D(nro,tabla,set,token)
-        }
-    })
-}
-
-export const GetInfoPac = (nro,set,token,sede) => {
-    getFetch(`/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`,token)
-    .then((res) => {
-        console.log('pros',res)
-        set(prev => ({
-        ...prev,
-        ...res,
-        nombres: res.nombresApellidos,
-        }));
-    })
-    .finally(() => {
-      Swal.close()
-    })
-}
-
-
-export const GetInfoPanel10D = (nro,tabla,set,token) => {
-  getFetch(`/api/v01/ct/toxicologia/obtenerReportePanel10D?nOrden=${nro}&nameService=${tabla}`,token)
-  .then((res) => {
-    if (res.norden) {
-       Swal.fire(
-          "Alerta",
-          "Este paciente ya cuenta con registros de Panel 10D",
-          "warning"
-      )
-      set(prev => ({
-        ...prev,
-        ...res,
-        fecha: res.fechaExamen,
-        valueM: res.txtMarihuana,
-        valueC: res.txtCocaina,
-        valueAn: res.txtAnfetamina,
-        valueMet: res.txtMetanfetamina,
-        valueBen: res.txtBenzodiacepina,
-        valueOpi: res.txtOpiaceos,
-        valueBar: res.txtBarbituricos,
-        valueMetadona: res.txtMetadona,
-        valueFenci: res.txtFenciclidina,
-        valueAnti: res.txtAntidepresivos,
-        metodo: res.txtMetodo,
-      }));
-    } else {
-      Swal.fire('Error', 'Ocurrio un error al traer los datos','error')
-    }
-  })
-}
-
-export const SubmitPanel10D = async (form,user,token,limpiar,tabla) => {
-  if (!form.norden) {
-    await Swal.fire('Error', 'Datos Incompletos','error')
-    return
+export const GetInfoServicio = async (
+  nro,
+  tabla,
+  set,
+  token,
+  onFinish = () => { }
+) => {
+  const res = await GetInfoServicioDefault(
+    nro,
+    tabla,
+    token,
+    obtenerReporteUrl,
+    onFinish
+  );
+  if (res) {
+    set((prev) => ({
+      ...prev,
+      norden: res.norden ?? "",
+      fecha: res.fechaExamen ?? prev.fecha,
+      nombres: res.nombres ?? prev.nombres,
+      edad: res.edad ?? prev.edad,
+      valueM: res.txtMarihuana ?? "NEGATIVO",
+      valueC: res.txtCocaina ?? "NEGATIVO",
+      valueAn: res.txtAnfetamina ?? "NEGATIVO",
+      valueMet: res.txtMetanfetamina ?? "NEGATIVO",
+      valueBen: res.txtBenzodiacepina ?? "NEGATIVO",
+      valueOpi: res.txtOpiaceos ?? "NEGATIVO",
+      valueBar: res.txtBarbituricos ?? "NEGATIVO",
+      valueMetadona: res.txtMetadona ?? "NEGATIVO",
+      valueFenci: res.txtFenciclidina ?? "NEGATIVO",
+      valueAnti: res.txtAntidepresivos ?? "NEGATIVO",
+      metodo: res.txtMetodo ?? "INMUNOCROMATOGRAFICO",
+    }));
   }
-  Loading('Registrando Datos')
-  SubmitToxPanel10D(form,user, token)
-  .then((res) => {
-    console.log(res)
-    if (res.id === 1 || res.id === 0) {
-      Swal.fire({title: 'Exito', text:`Se ha Registrado/Actualizado con Exito,\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          PrintHojaR(form.norden,tabla,token)
-          limpiar()
-        }
-      })
-    }
-  })
-}
+};
 
-export const PrintHojaR = async (norden,tabla,token) => {
-  Loading('Cargando Formato a Imprimir')
-   // Ej: 'ConsentimientoPanel10D'
-  getFetch(`/api/v01/ct/toxicologia/obtenerReportePanel10D?nOrden=${norden}&nameService=${tabla}`,token)
-  .then(async (res) => {
-    if (res.norden) {
-      const nombre = res.nameJasper;
-      console.log(nombre)
-      const jasperModules = import.meta.glob('../../../../../../jaspers/Toxicologia/*.jsx');
-      const modulo = await jasperModules[`../../../../../../jaspers/Toxicologia/${nombre}.jsx`]();
-      // Ejecuta la función exportada por default con los datos
-      if (typeof modulo.default === 'function') {
-        modulo.default(res);
-      } else {
-        console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
-      }
+export const SubmitDataService = async (
+  form,
+  token,
+  user,
+  limpiar,
+  tabla,
+  datosFooter
+) => {
+  if (!form.norden) {
+    await Swal.fire("Error", "Datos Incompletos", "error");
+    return;
+  }
+
+  const body = {
+    norden: form.norden,
+    fechaExamen: form.fecha,
+    txtMetodo: form.metodo,
+    txtCocaina: form.valueC,
+    txtMarihuana: form.valueM,
+    txtAnfetamina: form.valueAn,
+    txtMetanfetamina: form.valueMet,
+    txtBenzodiacepina: form.valueBen,
+    txtOpiaceos: form.valueOpi,
+    txtBarbituricos: form.valueBar,
+    txtMetadona: form.valueMetadona,
+    txtFenciclidina: form.valueFenci,
+    txtAntidepresivos: form.valueAnti,
+    userMedicoOcup: "",
+    userRegistro: user,
+  };
+
+  await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
+    PrintHojaR(form.norden, token, tabla, datosFooter);
+  });
+};
+
+export const GetInfoServicioTabla = (nro, tabla, set, token) => {
+  GetInfoServicio(nro, tabla, set, token, () => {
+    Swal.close();
+  });
+};
+
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+  const jasperModules = import.meta.glob(
+    "../../../../../../jaspers/Toxicologia/*.jsx"
+  );
+  PrintHojaRDefault(
+    nro,
+    token,
+    tabla,
+    datosFooter,
+    obtenerReporteUrl,
+    jasperModules,
+    "../../../../../../jaspers/Toxicologia"
+  );
+};
+
+export const VerifyTR = async (nro, tabla, token, set, sede) => {
+  VerifyTRDefault(
+    nro,
+    tabla,
+    token,
+    set,
+    sede,
+    () => {
+      //NO Tiene registro
+      GetInfoPac(nro, set, token, sede);
+    },
+    () => {
+      //Tiene registro
+      GetInfoServicio(nro, tabla, set, token, () => {
+        Swal.fire(
+          "Alerta",
+          "Este paciente ya cuenta con registros de Panel 10D.",
+          "warning"
+        );
+      });
     }
-  })
-  .finally(() => {
-    Swal.close()
-  })
-}
+  );
+};
+
+const GetInfoPac = async (nro, set, token, sede) => {
+  const res = await GetInfoPacDefault(nro, token, sede);
+  if (res) {
+    set((prev) => ({
+      ...prev,
+      ...res,
+      nombres: res.nombresApellidos ?? "",
+      edad: res.edad ?? "",
+    }));
+  }
+};
+
+export const Loading = (mensaje) => {
+  LoadingDefault(mensaje);
+};
