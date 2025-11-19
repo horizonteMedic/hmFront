@@ -250,36 +250,56 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   };
 
   // === FUNCIONES AUXILIARES ===
-  // Función para texto con salto de línea
+  // Función para texto con salto de línea (maneja saltos de línea explícitos \n)
   const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
+    // Validar que el texto no sea undefined, null o vacío
+    if (!texto || texto === null || texto === undefined) {
+      return y;
+    }
+    
     const fontSize = doc.internal.getFontSize();
-    const palabras = texto.split(' ');
-    let lineaActual = '';
     let yPos = y;
-
-    palabras.forEach(palabra => {
-      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
-      const anchoTexto = doc.getTextWidth(textoPrueba);
-
-      if (anchoTexto <= anchoMaximo) {
-        lineaActual = textoPrueba;
-      } else {
-        if (lineaActual) {
-          doc.text(lineaActual, x, yPos);
-          yPos += fontSize * 0.35;
-          lineaActual = palabra;
+    
+    // Primero dividir por saltos de línea explícitos (\n)
+    const lineasConSaltos = String(texto).split('\n');
+    
+    lineasConSaltos.forEach((lineaConSalto, indiceLinea) => {
+      // Si no es la primera línea y hay un salto de línea antes, hacer salto
+      if (indiceLinea > 0) {
+        yPos += fontSize * 0.35; // Salto de línea explícito
+      }
+      
+      // Dividir cada línea por espacios para manejar el ancho máximo
+      const palabras = lineaConSalto.split(' ');
+      let lineaActual = '';
+      
+      palabras.forEach(palabra => {
+        const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+        const anchoTexto = doc.getTextWidth(textoPrueba);
+        
+        if (anchoTexto <= anchoMaximo) {
+          lineaActual = textoPrueba;
         } else {
-          doc.text(palabra, x, yPos);
-          yPos += fontSize * 0.35;
+          if (lineaActual) {
+            doc.text(lineaActual, x, yPos);
+            yPos += fontSize * 0.35; // salto real entre líneas
+            lineaActual = palabra;
+          } else {
+            // Si la palabra sola es más ancha que el máximo, igual la dibujamos
+            doc.text(palabra, x, yPos);
+            yPos += fontSize * 0.35;
+          }
         }
+      });
+      
+      // Dibujar la línea actual si quedó algo
+      if (lineaActual) {
+        doc.text(lineaActual, x, yPos);
+        // NO sumar una línea extra aquí, solo cuando hay salto explícito o nueva palabra
       }
     });
-
-    if (lineaActual) {
-      doc.text(lineaActual, x, yPos);
-    }
-
-    return yPos;
+    
+    return yPos; // Devuelve la posición final donde terminó el texto
   };
 
   // Función para calcular altura dinámica de texto
@@ -289,28 +309,66 @@ export default function InformePsicologico_Digitalizado(data = {}) {
       return alturaMinima;
     }
     
-    const palabras = texto.split(' ');
-    let lineaActual = '';
-    let lineas = 1;
+    const fontSize = doc.internal.getFontSize();
+    let lineas = 0;
     
-    palabras.forEach(palabra => {
-      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
-      const anchoTexto = doc.getTextWidth(textoPrueba);
-      
-      if (anchoTexto <= anchoMaximo) {
-        lineaActual = textoPrueba;
-      } else {
-        if (lineaActual) {
-          lineas++;
-          lineaActual = palabra;
-        } else {
-          lineas++;
+    // Si el texto contiene saltos de línea (listas), procesar cada línea por separado
+    if (texto.includes('\n')) {
+      const lineasTexto = texto.split('\n');
+      lineasTexto.forEach(linea => {
+        if (linea.trim()) {
+          const palabras = linea.split(' ');
+          let lineaActual = '';
+          
+          palabras.forEach(palabra => {
+            const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+            const anchoTexto = doc.getTextWidth(textoPrueba);
+            
+            if (anchoTexto <= anchoMaximo) {
+              lineaActual = textoPrueba;
+            } else {
+              if (lineaActual) {
+                lineas++;
+                lineaActual = palabra;
+              } else {
+                lineas++;
+              }
+            }
+          });
+          
+          if (lineaActual) {
+            lineas++;
+          }
         }
+      });
+    } else {
+      // Texto normal sin saltos de línea
+      const palabras = texto.split(' ');
+      let lineaActual = '';
+      
+      palabras.forEach(palabra => {
+        const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+        const anchoTexto = doc.getTextWidth(textoPrueba);
+        
+        if (anchoTexto <= anchoMaximo) {
+          lineaActual = textoPrueba;
+        } else {
+          if (lineaActual) {
+            lineas++;
+            lineaActual = palabra;
+          } else {
+            lineas++;
+          }
+        }
+      });
+      
+      if (lineaActual) {
+        lineas++;
       }
-    });
+    }
     
-    // Altura por línea de 3mm, con altura mínima personalizable
-    const alturaCalculada = lineas * 3 + 2;
+    // Calcular altura: padding superior + (líneas * altura por línea) + padding inferior
+    const alturaCalculada = 3 + (lineas * fontSize * 0.35) + 3;
     return Math.max(alturaCalculada, alturaMinima);
   };
 

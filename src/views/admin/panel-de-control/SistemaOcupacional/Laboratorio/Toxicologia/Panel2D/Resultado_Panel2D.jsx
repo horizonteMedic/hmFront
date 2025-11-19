@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
@@ -9,6 +8,7 @@ import {
   InputTextOneLine,
   InputsRadioGroup,
 } from '../../../../../../components/reusableComponents/ResusableComponents';
+import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 
 const tabla = 'panel2d';
 
@@ -36,12 +36,6 @@ export default function Resultado_Panel2D() {
     handleRadioButton,
   } = useForm(initialFormState, { storageKey: 'panel2d' });
 
-  // Refs para navegación
-  const fechaRef = useRef(null);
-  const valueMRef = useRef(null);
-  const valueCRef = useRef(null);
-  const printRef = useRef(null);
-
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
@@ -63,19 +57,19 @@ export default function Resultado_Panel2D() {
   };
 
   return (
-    <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
-      <h2 className="text-2xl font-bold text-center mb-6">PANEL 2D</h2>
-      <form className="space-y-6">
-        {/* Encabezado */}
-        <div className="flex flex-col md:flex-row gap-4">
+    <div className="w-full space-y-4 px-4">
+      <h2 className="text-2xl font-bold text-center mb-4">PANEL 2D</h2>
+      
+      <form className="space-y-4">
+        {/* Información del Examen */}
+        <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <InputTextOneLine
             label="Nro Ficha"
             name="norden"
             value={form.norden}
             onChange={handleChange}
             onKeyUp={handleSearch}
-            labelWidth="100px"
-            className="flex-1"
+            labelWidth="120px"
           />
           <InputTextOneLine
             label="Fecha"
@@ -83,113 +77,95 @@ export default function Resultado_Panel2D() {
             type="date"
             value={form.fecha}
             onChange={handleChange}
-            onKeyUp={e => {
-              if (e.key === 'Enter') {
-                valueMRef.current?.focus();
-              }
-            }}
-            labelWidth="100px"
-            className="flex-1"
-            ref={fechaRef}
+            labelWidth="120px"
           />
-        </div>
-        
-        {/* Paciente */}
-        <div className="flex flex-col md:flex-row gap-4">
           <InputTextOneLine
             label="Nombres"
             name="nombres"
             value={form.nombres}
             disabled
-            labelWidth="100px"
-            className="flex-1"
+            labelWidth="120px"
           />
           <InputTextOneLine
             label="Edad"
             name="edad"
             value={form.edad}
             disabled
-            labelWidth="100px"
-            className="flex-1"
+            labelWidth="120px"
             inputClassName="w-32"
           />
-        </div>
-        
-        {/* Pruebas */}
-        <div className="font-bold mb-2">PRUEBA RÁPIDA CUALITATIVA</div>
-        <InputTextOneLine
-          name="metodo"
-          value={form.metodo}
-          onChange={handleChange}
-          className="mb-4"
-        />
+        </SectionFieldset>
+
+        {/* Prueba Rápida Cualitativa */}
+        <SectionFieldset legend="Prueba Rápida Cualitativa">
+          <InputTextOneLine
+            name="metodo"
+            value={form.metodo}
+            onChange={handleChange}
+          />
+        </SectionFieldset>
+
         {/* Resultados */}
-        <div className="grid grid-cols-3 gap-x-4 gap-y-4 mb-6">
-          <div className="font-bold">PRUEBAS</div>
-          <div className="font-bold"></div>
-          <div className="font-bold">RESULTADOS</div>
-          
-          <div className="flex items-center">MARIHUANA (THC)</div>
-          <InputsRadioGroup
-            name="valueM"
-            value={form.valueM}
-            onChange={handleRadioChange}
-            options={[
-              { label: 'Positivo', value: 'POSITIVO' },
-              { label: 'Negativo', value: 'NEGATIVO' }
-            ]}
-            groupClassName="gap-6"
-          />
-          <InputTextOneLine
-            name="valueM"
-            value={form.valueM}
-            onChange={handleChange}
-            onKeyUp={e => {
-              if (e.key === 'Enter') {
-                valueCRef.current?.focus();
-              }
-            }}
-            inputClassName="w-32"
-            ref={valueMRef}
-          />
-          
-          <div className="flex items-center">COCAINA (COC)</div>
-          <InputsRadioGroup
-            name="valueC"
-            value={form.valueC}
-            onChange={handleRadioChange}
-            options={[
-              { label: 'Positivo', value: 'POSITIVO' },
-              { label: 'Negativo', value: 'NEGATIVO' }
-            ]}
-            groupClassName="gap-6"
-          />
-          <InputTextOneLine
-            name="valueC"
-            value={form.valueC}
-            onChange={handleChange}
-            onKeyUp={e => {
-              if (e.key === 'Enter') {
-                printRef.current?.focus();
-              }
-            }}
-            inputClassName="w-32"
-            ref={valueCRef}
-          />
-        </div>
+        <SectionFieldset legend="Resultados">
+          <div className="grid grid-cols-3 gap-x-4 gap-y-4">
+            <div className="font-bold">PRUEBAS</div>
+            <div className="font-bold"></div>
+            <div className="font-bold">RESULTADOS</div>
+            
+            <div className="flex items-center">MARIHUANA (THC)</div>
+            <InputsRadioGroup
+              name="valueM"
+              value={form.valueM}
+              onChange={handleRadioChange}
+              options={[
+                { label: 'Positivo', value: 'POSITIVO' },
+                { label: 'Negativo', value: 'NEGATIVO' }
+              ]}
+              groupClassName="gap-6"
+            />
+            <InputTextOneLine
+              name="valueM"
+              value={form.valueM}
+              onChange={handleChange}
+              inputClassName="w-32"
+            />
+            
+            <div className="flex items-center">COCAINA (COC)</div>
+            <InputsRadioGroup
+              name="valueC"
+              value={form.valueC}
+              onChange={handleRadioChange}
+              options={[
+                { label: 'Positivo', value: 'POSITIVO' },
+                { label: 'Negativo', value: 'NEGATIVO' }
+              ]}
+              groupClassName="gap-6"
+            />
+            <InputTextOneLine
+              name="valueC"
+              value={form.valueC}
+              onChange={handleChange}
+              inputClassName="w-32"
+            />
+          </div>
+        </SectionFieldset>
+
         {/* Médico */}
-        <div className="flex items-center gap-2">
-          <label className="font-semibold min-w-[100px]">ASIGNAR MÉDICO:</label>
-          <select 
-            disabled 
-            value={form.medico} 
-            className="border rounded px-2 py-1 flex-1 bg-gray-100"
-          >
-            <option value="">-- N/A --</option>
-          </select>
-        </div>
+        <SectionFieldset legend="Asignación de Médico">
+          <div className="flex items-center gap-2">
+            <label className="font-semibold min-w-[120px]">ASIGNAR MÉDICO:</label>
+            <select 
+              disabled 
+              value={form.medico} 
+              className="border rounded px-2 py-1 flex-1 bg-gray-100"
+            >
+              <option value="">-- N/A --</option>
+            </select>
+          </div>
+        </SectionFieldset>
+
         {/* Acciones */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-6">
+        <fieldset className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
           <div className="flex gap-3">
             <button
               type="button"
@@ -214,7 +190,6 @@ export default function Resultado_Panel2D() {
                 value={form.norden}
                 onChange={handleChange}
                 inputClassName="w-24"
-                ref={printRef}
               />
               <button
                 type="button"
@@ -225,7 +200,7 @@ export default function Resultado_Panel2D() {
               </button>
             </div>
           </div>
-        </div>
+        </fieldset>
       </form>
     </div>
   );
