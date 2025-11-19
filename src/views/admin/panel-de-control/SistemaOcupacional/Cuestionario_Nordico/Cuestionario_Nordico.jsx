@@ -24,7 +24,7 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
 const tabla = "cuestionario_nordico"
 
 const Cuestionario_Nordico = () => {
-  const { token, selectedSede, datosFooter, userlogued, userCompleto } =
+  const { token, selectedSede, datosFooter, userlogued, userCompleto ,userName} =
     useSessionData();
   const initialFormState = {
     norden: "",
@@ -210,10 +210,14 @@ const Cuestionario_Nordico = () => {
     //8
     pregunta8ProblemasCuelloNo: false,
     pregunta8ProblemasCuelloSi: false,
+
+     // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
   
-  const { form, setForm, handleChange, handleChangeNumber, handleClear, handleClearnotO, handleInputChangeChecked } = useForm(initialFormState)
+  const { form, setForm, handleChange, handleChangeNumber, handleClear,handleChangeSimple, handleClearnotO, handleInputChangeChecked } = useForm(initialFormState)
   
   const handlePrint = () => {
     if (!form.norden) return Swal.fire("Error", "Debe colocar un N° Orden", "error");
@@ -299,6 +303,7 @@ const Cuestionario_Nordico = () => {
               handleClear={handleClear}
               handleChange={handleChange}
               handlePrint={handlePrint}
+              handleChangeSimple={handleChangeSimple}
             />
 
         </div>

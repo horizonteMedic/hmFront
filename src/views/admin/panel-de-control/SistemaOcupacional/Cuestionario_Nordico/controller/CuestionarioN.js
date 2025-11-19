@@ -1,6 +1,6 @@
 import { URLAzure } from "../../../../../config/config";
 
-export function SubmitCuestionarioNordicoJS(data,user,token) {
+export function SubmitCuestionarioNordicoJS(data, user, token) {
     const body = {
         "codigoCuestionario": data.codigoCuestionario ? data.codigoCuestionario : null,
         "norden": data.norden,
@@ -147,20 +147,22 @@ export function SubmitCuestionarioNordicoJS(data,user,token) {
         "pregunta6CProblemasCuello": data.pregunta6CProblemasCuello,
         "pregunta6DProblemasCuello": data.pregunta6DProblemasCuello,
         "fechaCuestionario": data.fechaCuestionario,
+        usuarioFirma: data.user_medicoFirma,
         "userRegistro": user
-    };    
+    };
 
     const url = `${URLAzure}/api/v01/ct/cuestionarioNordico/registrarActualizarCuestionarioNordico`
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(body)
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(body)
     }
-    return fetch(url,options).then(res =>  {
+    return fetch(url, options).then(res => {
         if (!res.ok) {
             return res
-        } return res.json()}).then(response => response) 
+        } return res.json()
+    }).then(response => response)
 }

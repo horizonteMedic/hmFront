@@ -111,6 +111,7 @@ export const GetInfoServicio = async (
             imcRed: imcRed,
 
             obesidadIMC30: parseFloat(res.imcTriaje) >= 30,
+
         }));
     }
 };
@@ -247,6 +248,7 @@ export const GetInfoServicioEditar = async (
             obesidadDietaHipocalorica: (res.observacionesRecomendaciones_b_c_observaciones ?? "").includes("OBESIDAD I. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS."),
             usoLentesCorrectoresLectura: (res.observacionesRecomendaciones_b_c_observaciones ?? "").includes("USO DE LENTES CORRECTORES PARA LECTURA DE CERCA."),
             corregirAgudezaLectura: (res.observacionesRecomendaciones_b_c_observaciones ?? "").includes("CORREGIR AGUDEZA VISUAL PARA LECTURA DE CERCA."),
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -340,6 +342,8 @@ export const SubmitDataService = async (
         pcomplementariasTestSas: form.testSASAnormal,
         examenFisicoSustentacionPie: form.sustentacionUnPie,
         antecedentesComentariosDetalles: form.comentariosDetalleAntecedentes,
+
+        usuarioFirma: form.user_medicoFirma,
         usuarioRegistro: user,
     };
 

@@ -8,6 +8,7 @@ import {
   VerifyTR,
 } from "./controllerAntecedentesDeAltura";
 import { fixEncodingModern } from "../../../../utils/helpers";
+import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "antece_enfermedades_altura";
 const date = new Date();
@@ -17,7 +18,7 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
 )}-${String(date.getDate()).padStart(2, "0")}`;
 
 export default function AntecedentesDeAltura() {
-  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+  const { token, userlogued, selectedSede, datosFooter, userCompleto, userName } =
     useSessionData();
   const initialFormState = {
     norden: "",
@@ -71,6 +72,10 @@ export default function AntecedentesDeAltura() {
     comentarios: "",
 
     usuario: userlogued ?? "",
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
   const {
@@ -79,6 +84,7 @@ export default function AntecedentesDeAltura() {
     handleChange,
     handleChangeNumber,
     handleClear,
+    handleChangeSimple,
     handleClearnotO,
     handlePrintDefault,
     handleRadioButton,
@@ -525,7 +531,13 @@ export default function AntecedentesDeAltura() {
                 placeholder="Comentarios y observaciones del médico evaluador..."
               />
             </div>
+            <EmpleadoComboBox
+              value={form.nombre_medico}
+              form={form}
+              onChange={handleChangeSimple}
+            />
           </div>
+
 
           {/* BOTONES DE ACCIÓN */}
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 px-4 pt-4">

@@ -19,7 +19,7 @@ export const GetInfoServicio = async (
   tabla,
   set,
   token,
-  onFinish = () => {}
+  onFinish = () => { }
 ) => {
   const res = await GetInfoServicioDefault(
     nro,
@@ -73,6 +73,8 @@ export const GetInfoServicio = async (
       otros: res.antecedentes?.otrosSi,
       otrosDescripcion: res.antecedentes?.otrosDescripcion ?? "",
       comentarios: res.antecedentes?.observaciones ?? "",
+
+      user_medicoFirma: res.antecedentes.usuarioFirma,
     }));
   }
 };
@@ -154,6 +156,8 @@ export const SubmitDataService = async (
     otrosSi: form.otros,
     otrosDescripcion: form.otrosDescripcion,
     observaciones: form.comentarios,
+
+    usuarioFirma: form.user_medicoFirma,
     usuarioRegistro: user,
   };
 
