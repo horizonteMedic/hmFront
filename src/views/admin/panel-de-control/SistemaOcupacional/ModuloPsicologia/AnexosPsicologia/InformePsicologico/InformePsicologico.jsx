@@ -300,502 +300,468 @@ export default function InformePsicologico() {
         });
     };
     return (
-        <div className="mx-auto bg-white overflow-hidden ">
-            <div className="flex h-full">
-                <div className="w-full space-y-3 p-4">
-                    {/*==========================Datos Necesarios Section==========================*/}
-                    <div>
-                        {/* ===== SECCIÓN: DATOS NECESARIOS ===== */}
-                        <div className="p-4 text-[10px] space-y-3">
-                            {/* Header con información del examen */}
-                            <SectionFieldset legend="Informe Psicológico" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-                                <InputTextOneLine
-                                    label="N° Orden"
-                                    name="norden"
-                                    value={form.norden}
-                                    onKeyUp={handleSearch}
-                                    onChange={handleChangeNumber}
-                                    labelWidth="120px"
-                                />
-                                <InputTextOneLine
-                                    label="Fecha Entrevista"
-                                    name="fechaEntrevista"
-                                    type="date"
-                                    value={form.fechaEntrevista}
-                                    onChange={handleChange}
-                                    labelWidth="120px"
-                                />
-                                <InputTextOneLine
-                                    label="Nombre Examen"
-                                    name="nombreExamen"
-                                    value={form.nombreExamen}
-                                    disabled
-                                    labelWidth="120px"
-                                />
-                                <InputsBooleanRadioGroup
-                                    label="Aprobó Test"
-                                    name="aproboTest"
-                                    value={form.aproboTest}
-                                    onChange={handleRadioButtonBoolean}
-                                />
-                            </SectionFieldset>
-                            {/* Contenido principal */}
-                            <SectionFieldset legend="Datos Necesarios" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                {/* Columna Izquierda */}
-                                <div className="space-y-3">
-                                    <InputTextOneLine
-                                        label="Nombres"
-                                        name="nombres"
-                                        value={form.nombres}
-                                        disabled
-                                        labelWidth="120px"
-                                    />
-                                    <InputTextOneLine
-                                        label="Apellidos"
-                                        name="apellidos"
-                                        value={form.apellidos}
-                                        disabled
-                                        labelWidth="120px"
-                                    />
-                                    <InputTextOneLine
-                                        label="Fecha Nacimiento"
-                                        name="fechaNacimiento"
-                                        value={form.fechaNacimiento}
-                                        disabled
-                                        labelWidth="120px"
-                                    />
-                                    <InputTextOneLine
-                                        label="Lugar Nacimiento"
-                                        name="lugarNacimiento"
-                                        value={form.lugarNacimiento}
-                                        disabled
-                                        labelWidth="120px"
-                                    />
-                                </div>
+        <div className="w-full space-y-3 p-4">
+            {/* ===== SECCIÓN: DATOS NECESARIOS ===== */}
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+                <InputTextOneLine
+                    label="N° Orden"
+                    name="norden"
+                    value={form.norden}
+                    onKeyUp={handleSearch}
+                    onChange={handleChangeNumber}
+                    labelWidth="120px"
+                />
+                <InputTextOneLine
+                    label="Fecha Entrevista"
+                    name="fechaEntrevista"
+                    type="date"
+                    value={form.fechaEntrevista}
+                    onChange={handleChange}
+                    labelWidth="120px"
+                />
+                <InputTextOneLine
+                    label="Nombre Examen"
+                    name="nombreExamen"
+                    value={form.nombreExamen}
+                    disabled
+                    labelWidth="120px"
+                />
+                <InputsBooleanRadioGroup
+                    label="Aprobó Test"
+                    name="aproboTest"
+                    value={form.aproboTest}
+                    onChange={handleRadioButtonBoolean}
+                />
+            </SectionFieldset>
+            {/* Contenido principal */}
+            <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Columna Izquierda */}
+                <div className="space-y-3">
+                    <InputTextOneLine
+                        label="Nombres"
+                        name="nombres"
+                        value={form.nombres}
+                        disabled
+                        labelWidth="120px"
+                    />
+                    <InputTextOneLine
+                        label="Apellidos"
+                        name="apellidos"
+                        value={form.apellidos}
+                        disabled
+                        labelWidth="120px"
+                    />
+                    <InputTextOneLine
+                        label="Fecha Nacimiento"
+                        name="fechaNacimiento"
+                        value={form.fechaNacimiento}
+                        disabled
+                        labelWidth="120px"
+                    />
+                    <InputTextOneLine
+                        label="Lugar Nacimiento"
+                        name="lugarNacimiento"
+                        value={form.lugarNacimiento}
+                        disabled
+                        labelWidth="120px"
+                    />
+                </div>
 
-                                {/* Columna Derecha */}
-                                <div className="space-y-3">
-                                    <InputTextOneLine
-                                        label="Domicilio Actual"
-                                        name="domicilioActual"
-                                        value={form.domicilioActual}
-                                        disabled
-                                        labelWidth="120px"
-                                    />
-                                    <div className="grid md:grid-cols-2 gap-3">
-                                        <InputTextOneLine
-                                            label="Edad (Años)"
-                                            name="edad"
-                                            value={form.edad}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
-                                        <InputTextOneLine
-                                            label="Sexo"
-                                            name="sexo"
-                                            value={form.sexo}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
-                                    </div>
-                                    <InputTextOneLine
-                                        label="Estado Civil"
-                                        name="estadoCivil"
-                                        value={form.estadoCivil}
-                                        disabled
-                                        labelWidth="120px"
-                                    />
-                                    <InputTextOneLine
-                                        label="Nivel Estudios"
-                                        name="nivelEstudios"
-                                        value={form.nivelEstudios}
-                                        disabled
-                                        labelWidth="120px"
-                                    />
-                                </div>
-                            </SectionFieldset>
-                            {/* ===== SECCIÓN: DATOS LABORALES ===== */}
-                            <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                <h4 className="font-semibold mb-3">Datos Laborales</h4>
+                {/* Columna Derecha */}
+                <div className="space-y-3">
+                    <InputTextOneLine
+                        label="Domicilio Actual"
+                        name="domicilioActual"
+                        value={form.domicilioActual}
+                        disabled
+                        labelWidth="120px"
+                    />
+                    <div className="grid md:grid-cols-2 gap-3">
+                        <InputTextOneLine
+                            label="Edad (Años)"
+                            name="edad"
+                            value={form.edad}
+                            disabled
+                            labelWidth="120px"
+                        />
+                        <InputTextOneLine
+                            label="Sexo"
+                            name="sexo"
+                            value={form.sexo}
+                            disabled
+                            labelWidth="120px"
+                        />
+                    </div>
+                    <InputTextOneLine
+                        label="Estado Civil"
+                        name="estadoCivil"
+                        value={form.estadoCivil}
+                        disabled
+                        labelWidth="120px"
+                    />
+                    <InputTextOneLine
+                        label="Nivel Estudios"
+                        name="nivelEstudios"
+                        value={form.nivelEstudios}
+                        disabled
+                        labelWidth="120px"
+                    />
+                </div>
+            </SectionFieldset>
+            {/* ===== SECCIÓN: DATOS LABORALES ===== */}
+            <SectionFieldset legend="Datos Laborales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <InputTextOneLine
+                    label="Empresa"
+                    name="empresa"
+                    value={form.empresa}
+                    disabled
+                    labelWidth="120px"
+                />
+                <InputTextOneLine
+                    label="Contrata"
+                    name="contrata"
+                    value={form.contrata}
+                    disabled
+                    labelWidth="120px"
+                />
+                <InputTextOneLine
+                    label="Ocupación"
+                    name="ocupacion"
+                    value={form.ocupacion}
+                    disabled
+                    labelWidth="120px"
+                />
+                <InputTextOneLine
+                    label="Cargo Desempeñar"
+                    name="cargoDesempenar"
+                    value={form.cargoDesempenar}
+                    disabled
+                    labelWidth="120px"
+                />
+            </SectionFieldset>
 
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                    <InputTextOneLine
-                                        label="Empresa"
-                                        name="empresa"
-                                        value={form.empresa}
-                                        disabled
-                                        labelWidth="120px"
+
+            {/*==========================Área Intelectual Section==========================*/}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Columna Izquierda */}
+                <div className="space-y-4">
+                    {/* Área Intelectual */}
+                    <SectionFieldset legend="Área Intelectual">
+                        <div className="space-y-2">
+                            <InputTextArea
+                                rows={5}
+                                label="Test de inteligencia de barranquilla / test de Otis Intermedia"
+                                name="areaIntelectual"
+                                value={form.areaIntelectual}
+                                onChange={handleChange}
+                            />
+                            <div className="grid grid-cols-4 gap-2 ">
+                                <SectionFieldset>
+                                    <InputCheckbox
+                                        label="PROMEDIO"
+                                        name="promedio"
+                                        checked={form.promedio}
+                                        onChange={handleIntellectualCheckboxChange}
                                     />
-                                    <InputTextOneLine
-                                        label="Contrata"
-                                        name="contrata"
-                                        value={form.contrata}
-                                        disabled
-                                        labelWidth="120px"
+                                    <InputCheckbox
+                                        label="SUPERIOR"
+                                        name="superior"
+                                        checked={form.superior}
+                                        onChange={handleIntellectualCheckboxChange}
                                     />
-                                    <InputTextOneLine
-                                        label="Ocupación"
-                                        name="ocupacion"
-                                        value={form.ocupacion}
-                                        disabled
-                                        labelWidth="120px"
+                                    <InputCheckbox
+                                        label="N. INFERIOR"
+                                        name="nInferior"
+                                        checked={form.nInferior}
+                                        onChange={handleIntellectualCheckboxChange}
                                     />
-                                    <InputTextOneLine
-                                        label="Cargo Desempeñar"
-                                        name="cargoDesempenar"
-                                        value={form.cargoDesempenar}
-                                        disabled
-                                        labelWidth="120px"
+                                    <InputCheckbox
+                                        label="ALTO"
+                                        name="alto"
+                                        checked={form.alto}
+                                        onChange={handleIntellectualCheckboxChange}
                                     />
-                                </div>
+                                </SectionFieldset>
+                                <SectionFieldset>
+                                    <InputCheckbox
+                                        label="FACILIDAD"
+                                        name="facilidad"
+                                        checked={form.facilidad}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="DIFICULTAD"
+                                        name="dificultad"
+                                        checked={form.dificultad}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                </SectionFieldset>
+                                <SectionFieldset fieldsetClassName="col-span-2">
+                                    <InputCheckbox
+                                        label="Y EN CAPACIDAD NUMÉRICA"
+                                        name="yNumerica"
+                                        checked={form.yNumerica}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="Y EN CAPACIDAD DE CÁLCULO"
+                                        name="yCalculo"
+                                        checked={form.yCalculo}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                </SectionFieldset>
+                                <SectionFieldset>
+                                    <InputCheckbox
+                                        label="P. SUPERIOR"
+                                        name="pSuperior"
+                                        checked={form.pSuperior}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="P. MEDIO"
+                                        name="pMedio"
+                                        checked={form.pMedio}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="P. BAJO"
+                                        name="pBajo"
+                                        checked={form.pBajo}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="BAJO"
+                                        name="bajo"
+                                        checked={form.bajo}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                </SectionFieldset>
+                                <SectionFieldset>
+                                    <InputCheckbox
+                                        label="P.N. ADECUADO"
+                                        name="pnAdecuado"
+                                        checked={form.pnAdecuado}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="N. ALTO"
+                                        name="nAlto"
+                                        checked={form.nAlto}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="N. BAJO"
+                                        name="nBajo"
+                                        checked={form.nBajo}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                </SectionFieldset>
+                                <SectionFieldset fieldsetClassName="col-span-2">
+                                    <InputCheckbox
+                                        label="ADECUADA RETENCIÓN DE DÍGITOS"
+                                        name="adecuadaR"
+                                        checked={form.adecuadaR}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="INADECUADA"
+                                        name="inadecuada"
+                                        checked={form.inadecuada}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                </SectionFieldset>
                             </div>
                         </div>
-                    </div>
-                    {/*==========================Área Intelectual Section==========================*/}
-                    <div>
-                        <div className="flex items-center mb-2 px-6">
-                            <FontAwesomeIcon icon={faHeartbeat} className="mr-2 text-[#233245]" />
-                            <h2 className="text-lg font-semibold text-[#233245] uppercase tracking-wider">Áreas</h2>
-                        </div>
-                        {/* ===== SECCIÓN: ÁREA INTELECTUAL ===== */}
-                        <div className="p-4" style={{ fontSize: "10px" }}>
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                {/* Columna Izquierda */}
-                                <div className="space-y-4">
-                                    {/* Área Intelectual */}
-                                    <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                        <h4 className="font-semibold">Área Intelectual</h4>
-                                        <div className="space-y-2">
-                                            <p className="">Test de inteligencia de barranquilla / test de Otis Intermedia</p>
-                                            <InputTextArea
-                                                rows={5}
-                                                name="areaIntelectual"
-                                                value={form.areaIntelectual}
-                                                onChange={handleChange}
-                                            />
-                                            <div className="grid grid-cols-4 gap-2 ">
-                                                <div className="border rounded p-3">
-                                                    <InputCheckbox
-                                                        label="PROMEDIO"
-                                                        name="promedio"
-                                                        checked={form.promedio}
-                                                        onChange={handleIntellectualCheckboxChange}
-                                                    />
-                                                    <InputCheckbox
-                                                        label="SUPERIOR"
-                                                        name="superior"
-                                                        checked={form.superior}
-                                                        onChange={handleIntellectualCheckboxChange}
-                                                    />
-                                                    <InputCheckbox
-                                                        label="N. INFERIOR"
-                                                        name="nInferior"
-                                                        checked={form.nInferior}
-                                                        onChange={handleIntellectualCheckboxChange}
-                                                    />
-                                                    <InputCheckbox
-                                                        label="ALTO"
-                                                        name="alto"
-                                                        checked={form.alto}
-                                                        onChange={handleIntellectualCheckboxChange}
-                                                    />
-                                                </div>
+                    </SectionFieldset>
 
-                                                <div className="border rounded p-3">
-                                                    <InputCheckbox
-                                                        label="FACILIDAD"
-                                                        name="facilidad"
-                                                        checked={form.facilidad}
-                                                        onChange={handleIntellectualCheckboxChange}
-                                                    />
-                                                    <InputCheckbox
-                                                        label="DIFICULTAD"
-                                                        name="dificultad"
-                                                        checked={form.dificultad}
-                                                        onChange={handleIntellectualCheckboxChange}
-                                                    />
-                                                </div>
-                                                <div className="border rounded p-3 col-span-2">
-                                                    <InputCheckbox
-                                                        label="Y EN CAPACIDAD NUMÉRICA"
-                                                        name="yNumerica"
-                                                        checked={form.yNumerica}
-                                                        onChange={handleIntellectualCheckboxChange}
-                                                    />
-                                                    <InputCheckbox
-                                                        label="Y EN CAPACIDAD DE CÁLCULO"
-                                                        name="yCalculo"
-                                                        checked={form.yCalculo}
-                                                        onChange={handleIntellectualCheckboxChange}
-                                                    />
-                                                </div>
-                                                <div className="border rounded p-3">
-                                                    <InputCheckbox
-                                                        label="P. SUPERIOR"
-                                                        name="pSuperior"
-                                                        checked={form.pSuperior}
-                                                        onChange={handleIntellectualCheckboxChange}
-                                                    />
-                                                    <InputCheckbox
-                                                        label="P. MEDIO"
-                                                        name="pMedio"
-                                                        checked={form.pMedio}
-                                                        onChange={handleIntellectualCheckboxChange}
-                                                    />
-                                                    <InputCheckbox
-                                                        label="P. BAJO"
-                                                        name="pBajo"
-                                                        checked={form.pBajo}
-                                                        onChange={handleIntellectualCheckboxChange}
-                                                    />
-                                                    <InputCheckbox
-                                                        label="BAJO"
-                                                        name="bajo"
-                                                        checked={form.bajo}
-                                                        onChange={handleIntellectualCheckboxChange}
-                                                    />
-                                                </div>
-                                                <div className="border rounded p-3">
-                                                    <InputCheckbox
-                                                        label="P.N. ADECUADO"
-                                                        name="pnAdecuado"
-                                                        checked={form.pnAdecuado}
-                                                        onChange={handleIntellectualCheckboxChange}
-                                                    />
-                                                    <InputCheckbox
-                                                        label="N. ALTO"
-                                                        name="nAlto"
-                                                        checked={form.nAlto}
-                                                        onChange={handleIntellectualCheckboxChange}
-                                                    />
-                                                    <InputCheckbox
-                                                        label="N. BAJO"
-                                                        name="nBajo"
-                                                        checked={form.nBajo}
-                                                        onChange={handleIntellectualCheckboxChange}
-                                                    />
-                                                </div>
-                                                <div className="border rounded p-3 col-span-2">
-                                                    <InputCheckbox
-                                                        label="ADECUADA RETENCIÓN DE DÍGITOS"
-                                                        name="adecuadaR"
-                                                        checked={form.adecuadaR}
-                                                        onChange={handleIntellectualCheckboxChange}
-                                                    />
-                                                    <InputCheckbox
-                                                        label="INADECUADA"
-                                                        name="inadecuada"
-                                                        checked={form.inadecuada}
-                                                        onChange={handleIntellectualCheckboxChange}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Área de Organicidad */}
-                                    <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                        <h4 className="font-semibold">Área de Organicidad</h4>
-                                        <div className="space-y-2">
-                                            <p >Test de Bender para adultos / test de Benton Forma C</p>
-                                            <InputTextArea
-                                                rows={5}
-                                                name="areaOrganicidad"
-                                                value={form.areaOrganicidad}
-                                                onChange={handleChange}
-                                            />
-                                            <div className="grid grid-cols-2 gap-2">
-                                                <div className="border rounded p-3">
-                                                    <InputCheckbox
-                                                        label="ALTO MANEJO DE FACULTADES MENTALES"
-                                                        name="poseeAltoManejo"
-                                                        checked={form.poseeAltoManejo}
-                                                        onChange={handleOrganicidadCheckboxChange}
-                                                    />
-                                                    <InputCheckbox
-                                                        label="ADECUADO MANEJO DE FACULTADES MENTALES"
-                                                        name="pAdecuadoManejo"
-                                                        checked={form.pAdecuadoManejo}
-                                                        onChange={handleOrganicidadCheckboxChange}
-                                                    />
-                                                    <InputCheckbox
-                                                        label="BAJO MANEJO DE FACULTADES MENTALES"
-                                                        name="pBajoManejo"
-                                                        checked={form.pBajoManejo}
-                                                        onChange={handleOrganicidadCheckboxChange}
-                                                    />
-                                                </div>
-                                                <div className="gap-2 grid">
-                                                    <div className="border rounded p-3">
-                                                        <InputCheckbox
-                                                            label="ORIENTADO EN TIEMPO, ESPACIO, Y PERSONA"
-                                                            name="orientadoEnTiempo"
-                                                            checked={form.orientadoEnTiempo}
-                                                            onChange={handleOrganicidadCheckboxChange}
-                                                        />
-                                                    </div>
-                                                    <div className="border rounded p-3">
-                                                        <InputCheckbox
-                                                            label="NO SE EVIDENCIA DAÑO ORGÁNICO"
-                                                            name="noSeEnvidencia"
-                                                            checked={form.noSeEnvidencia}
-                                                            onChange={handleOrganicidadCheckboxChange}
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Columna Derecha */}
-                                <div className="space-y-4">
-                                    {/* Área Personalidad */}
-                                    <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                        <h4 className="font-semibold">Área Personalidad</h4>
-                                        <div className="space-y-2">
-                                            <p>
-                                                Test de la figura humana de Machover / MV Multifásico de Personalidad
-                                            </p>
-                                            <InputTextArea
-                                                rows={5}
-                                                name="areaPersonalidad"
-                                                value={form.areaPersonalidad}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Área de Psicomotricidad */}
-                                    <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                        <h4 className="font-semibold">Área Psicomotricidad</h4>
-                                        <div className="space-y-2">
-                                            <p>Prueba de Laberintos de Weschler</p>
-                                            <InputTextArea
-                                                rows={5}
-                                                name="areaPsicomotricidad"
-                                                value={form.areaPsicomotricidad}
-                                                onChange={handleChange}
-                                            />
-                                            <div className="grid grid-cols-2 gap-2">
-                                                <div className="border rounded p-3">
-                                                    <InputCheckbox
-                                                        label="NIVEL ALTO"
-                                                        name="nivelAltoPs"
-                                                        checked={form.nivelAltoPs}
-                                                        onChange={handlePsicomotricidadCheckboxChange}
-                                                    />
-                                                    <InputCheckbox
-                                                        label="NIVEL ADECUADO"
-                                                        name="nivelAdecuadoPs"
-                                                        checked={form.nivelAdecuadoPs}
-                                                        onChange={handlePsicomotricidadCheckboxChange}
-                                                    />
-                                                    <InputCheckbox
-                                                        label="NIVEL BAJO"
-                                                        name="nivelBajoPs"
-                                                        checked={form.nivelBajoPs}
-                                                        onChange={handlePsicomotricidadCheckboxChange}
-                                                    />
-                                                </div>
-                                                <div className="border rounded p-3">
-                                                    <InputCheckbox
-                                                        label="FACILIDAD"
-                                                        name="facilidadPs"
-                                                        checked={form.facilidadPs}
-                                                        onChange={handlePsicomotricidadCheckboxChange}
-                                                    />
-                                                    <InputCheckbox
-                                                        label="DIFICULTAD"
-                                                        name="dificultadPs"
-                                                        checked={form.dificultadPs}
-                                                        onChange={handlePsicomotricidadCheckboxChange}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Recomendaciones */}
-                                    <div className="bg-white border border-gray-200 rounded-lg p-3 mt-4">
-                                        <h4 className="font-semibold mb-3">Recomendaciones:</h4>
-
-                                        {/* Select y botón para agregar recomendaciones predefinidas */}
-                                        <div className="flex gap-2 mb-3">
-                                            <select
-                                                value={selectedRecomendacion}
-                                                onChange={(e) => setSelectedRecomendacion(e.target.value)}
-                                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                            >
-                                                <option value="">Seleccionar recomendación predefinida...</option>
-                                                {opcionesRecomendaciones.map((opcion, index) => (
-                                                    <option key={index} value={opcion}>
-                                                        {opcion}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            <button
-                                                type="button"
-                                                onClick={agregarRecomendacion}
-                                                disabled={!selectedRecomendacion}
-                                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-                                            >
-                                                Agregar
-                                            </button>
-                                        </div>
-
-                                        <InputTextArea
-                                            rows={4}
-                                            name="recomendaciones"
-                                            value={form.recomendaciones}
-                                            onChange={handleChange}
+                    {/* Área de Organicidad */}
+                    <SectionFieldset legend="Área de Organicidad">
+                        <div className="space-y-2">
+                            <InputTextArea
+                                rows={5}
+                                label="Test de Bender para adultos / test de Benton Forma C"
+                                name="areaOrganicidad"
+                                value={form.areaOrganicidad}
+                                onChange={handleChange}
+                            />
+                            <fieldset className="grid grid-cols-2 gap-2">
+                                <SectionFieldset >
+                                    <InputCheckbox
+                                        label="ALTO MANEJO DE FACULTADES MENTALES"
+                                        name="poseeAltoManejo"
+                                        checked={form.poseeAltoManejo}
+                                        onChange={handleOrganicidadCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="ADECUADO MANEJO DE FACULTADES MENTALES"
+                                        name="pAdecuadoManejo"
+                                        checked={form.pAdecuadoManejo}
+                                        onChange={handleOrganicidadCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="BAJO MANEJO DE FACULTADES MENTALES"
+                                        name="pBajoManejo"
+                                        checked={form.pBajoManejo}
+                                        onChange={handleOrganicidadCheckboxChange}
+                                    />
+                                </SectionFieldset>
+                                <div className="space-y-3">
+                                    <SectionFieldset>
+                                        <InputCheckbox
+                                            label="ORIENTADO EN TIEMPO, ESPACIO, Y PERSONA"
+                                            name="orientadoEnTiempo"
+                                            checked={form.orientadoEnTiempo}
+                                            onChange={handleOrganicidadCheckboxChange}
                                         />
-                                    </div>
+                                    </SectionFieldset>
+                                    <SectionFieldset>
+                                        <InputCheckbox
+                                            label="NO SE EVIDENCIA DAÑO ORGÁNICO"
+                                            name="noSeEnvidencia"
+                                            checked={form.noSeEnvidencia}
+                                            onChange={handleOrganicidadCheckboxChange}
+                                        />
+                                    </SectionFieldset>
                                 </div>
-                            </div>
 
-
+                            </fieldset>
                         </div>
-                    </div>
+                    </SectionFieldset>
+                </div>
 
-                    {/* BOTONES DE ACCIÓN */}
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 px-12">
-                        <div className="flex gap-4">
+                {/* Columna Derecha */}
+                <div className="space-y-4">
+                    {/* Área Personalidad */}
+                    <SectionFieldset legend="Área Personalidad">
+                        <InputTextArea
+                            rows={5}
+                            label="Test de la figura humana de Machover / MV Multifásico de Personalidad"
+                            name="areaPersonalidad"
+                            value={form.areaPersonalidad}
+                            onChange={handleChange}
+                        />
+                    </SectionFieldset>
+
+                    {/* Área de Psicomotricidad */}
+                    <SectionFieldset legend="Área Psicomotricidad">
+                        <div className="space-y-2">
+                            <InputTextArea
+                                rows={5}
+                                label="Prueba de Laberintos de Weschler"
+                                name="areaPsicomotricidad"
+                                value={form.areaPsicomotricidad}
+                                onChange={handleChange}
+                            />
+                            <div className="grid grid-cols-2 gap-2">
+                                <SectionFieldset>
+                                    <InputCheckbox
+                                        label="NIVEL ALTO"
+                                        name="nivelAltoPs"
+                                        checked={form.nivelAltoPs}
+                                        onChange={handlePsicomotricidadCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="NIVEL ADECUADO"
+                                        name="nivelAdecuadoPs"
+                                        checked={form.nivelAdecuadoPs}
+                                        onChange={handlePsicomotricidadCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="NIVEL BAJO"
+                                        name="nivelBajoPs"
+                                        checked={form.nivelBajoPs}
+                                        onChange={handlePsicomotricidadCheckboxChange}
+                                    />
+                                </SectionFieldset>
+                                <SectionFieldset>
+                                    <InputCheckbox
+                                        label="FACILIDAD"
+                                        name="facilidadPs"
+                                        checked={form.facilidadPs}
+                                        onChange={handlePsicomotricidadCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="DIFICULTAD"
+                                        name="dificultadPs"
+                                        checked={form.dificultadPs}
+                                        onChange={handlePsicomotricidadCheckboxChange}
+                                    />
+                                </SectionFieldset>
+                            </div>
+                        </div>
+                    </SectionFieldset>
+
+                    {/* Recomendaciones */}
+                    <SectionFieldset legend="Recomendaciones">
+                        {/* Select y botón para agregar recomendaciones predefinidas */}
+                        <div className="flex gap-2 mb-3">
+                            <select
+                                value={selectedRecomendacion}
+                                onChange={(e) => setSelectedRecomendacion(e.target.value)}
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            >
+                                <option value="">Seleccionar recomendación predefinida...</option>
+                                {opcionesRecomendaciones.map((opcion, index) => (
+                                    <option key={index} value={opcion}>
+                                        {opcion}
+                                    </option>
+                                ))}
+                            </select>
                             <button
                                 type="button"
-                                onClick={handleSave}
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                                onClick={agregarRecomendacion}
+                                disabled={!selectedRecomendacion}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
                             >
-                                <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                            </button>
-                            <button
-                                type="button"
-                                onClick={handleClear}
-                                className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                            >
-                                <FontAwesomeIcon icon={faBroom} /> Limpiar
+                                Agregar
                             </button>
                         </div>
-                        <div className="flex flex-col items-end">
-                            <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
-                            <div className="flex items-center gap-2">
-                                <input
-                                    name="norden"
-                                    value={form.norden}
-                                    onChange={handleChange}
-                                    className="border rounded px-2 py-1 text-base w-24"
-                                />
 
-                                <button
-                                    type="button"
-                                    onClick={handlePrint}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                                >
-                                    <FontAwesomeIcon icon={faPrint} />
-                                </button>
-                            </div>
-                        </div>
+                        <InputTextArea
+                            rows={4}
+                            name="recomendaciones"
+                            value={form.recomendaciones}
+                            onChange={handleChange}
+                        />
+                    </SectionFieldset>
+                </div>
+            </div>
+
+            {/* BOTONES DE ACCIÓN */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 px-12">
+                <div className="flex gap-4">
+                    <button
+                        type="button"
+                        onClick={handleSave}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                    >
+                        <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleClear}
+                        className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                    >
+                        <FontAwesomeIcon icon={faBroom} /> Limpiar
+                    </button>
+                </div>
+                <div className="flex flex-col items-end">
+                    <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+                    <div className="flex items-center gap-2">
+                        <input
+                            name="norden"
+                            value={form.norden}
+                            onChange={handleChange}
+                            className="border rounded px-2 py-1 text-base w-24"
+                        />
+
+                        <button
+                            type="button"
+                            onClick={handlePrint}
+                            className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                        >
+                            <FontAwesomeIcon icon={faPrint} />
+                        </button>
                     </div>
                 </div>
             </div>
