@@ -13,17 +13,14 @@ import {
   VerifyTR,
 } from "./controllerEKG";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
+import { getToday } from "../../../../utils/helpers";
 
 const tabla = "informe_electrocardiograma";
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
+const today = getToday();
 
 export default function EKG() {
-  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
-    useSessionData();
+  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+
   const initialFormState = {
     norden: "",
     codigoElectroCardiograma: null,
@@ -51,7 +48,7 @@ export default function EKG() {
 
     nombres_search: "",
     codigo_search: "",
-    usuario: userlogued ?? "",
+    usuario: userlogued,
   };
 
   const {
@@ -59,7 +56,6 @@ export default function EKG() {
     setForm,
     handleChange,
     handleChangeNumber,
-    handleRadioButton,
     handleCheckBoxChange,
     handleClear,
     handleClearnotO,
@@ -78,6 +74,7 @@ export default function EKG() {
       VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
+  
   const handlePrint = () => {
     handlePrintDefault(() => {
       PrintHojaR(form.norden, token, tabla, datosFooter);
@@ -104,8 +101,6 @@ export default function EKG() {
   };
 
   const obtenerInfoTabla = () => {
-    console.log("usuario", form.usuario);
-
     getInfoTabla(
       form.nombres_search,
       form.codigo_search,
@@ -114,6 +109,7 @@ export default function EKG() {
       token
     );
   };
+
   useEffect(() => {
     obtenerInfoTabla();
   }, []);

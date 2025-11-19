@@ -134,7 +134,6 @@ const Triaje = ({ token, selectedSede }) => {
       }
     });
   };
-  console.log(triaje)
   return (
     <div className="flex flex-col md:flex-row w-full">
       {/* Columna 1 */}

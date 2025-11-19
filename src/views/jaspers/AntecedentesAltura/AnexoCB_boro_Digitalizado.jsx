@@ -10,24 +10,24 @@ export default function GenerarDatosPacienteBoro(data = {}) {
   const pageW = doc.internal.pageSize.getWidth();
 
   const datosReales = {
-    apellidosNombres: String((data.apellidos_apellidos_pa || "") + " " + (data.nombres_nombres_pa || "")).trim(),
-    documentoIdentidad: String(data.dni_cod_pa || ""),
-    genero: convertirGenero(data.sexo_sexo_pa || "") || "",
-    edad: data.edad_edad ? String(data.edad_edad) + " AÑOS" : "",
-    fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente_fecha_nacimiento_pa || ""),
-    direccionPaciente: String(data.direccionPaciente_direccion || ""),
-    puestoTrabajo: String(data.cargo_cargo_de || ""),
-    areaTrabajo: String(data.area_area_o || ""),
-    empresa: String(data.empresa_razon_empresa || ""),
-    contratista: String(data.contrata_razon_contrata || ""),
-    fechaExamen: formatearFechaCorta(data.antecedentes?.fechaAntecedente || data.fechaApertura_fecha_apertura_po || ""),
+    apellidosNombres: String((data.apellidos || "") + " " + (data.nombres || "")).trim(),
+    documentoIdentidad: String(data.dni || ""),
+    genero: convertirGenero(data.sexo || "") || "",
+    edad: data.edad ? String(data.edad) + " AÑOS" : (data.antecedentes?.edad ? String(data.antecedentes.edad) + " AÑOS" : ""),
+    fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente || ""),
+    direccionPaciente: String(data.direccionPaciente || ""),
+    puestoTrabajo: String(data.cargo || ""),
+    areaTrabajo: String(data.area || ""),
+    empresa: String(data.empresa || ""),
+    contratista: String(data.contrata || ""),
+    fechaExamen: formatearFechaCorta(data.antecedentes?.fechaAntecedente || ""),
     // Datos de color
     color: data.color || data.informacionSede?.color || 1,
     codigoColor: data.codigoColor || data.informacionSede?.codigoColor || "#008f39",
     textoColor: data.textoColor || data.informacionSede?.textoColor || "F",
     // Datos adicionales para header
-    numeroFicha: String(data.norden_n_orden || ""),
-    sede: data.nombreSede || "",
+    numeroFicha: String(data.norden || ""),
+    sede: data.sede || "",
     // Datos de antecedentes
     antecedentes: [
       { texto: "Accidente cerebrovascular", 
@@ -211,7 +211,7 @@ export default function GenerarDatosPacienteBoro(data = {}) {
   // === TABLA DE DATOS PERSONALES ===
   const tablaInicioX = 5;
   const tablaAncho = 200;
-  let yPos = 48; // Posición inicial después del título
+  let yPos = 36.5; // Posición inicial después del título
   const filaAltura = 5;
 
   // Primera fila: AFILIACION usando función general
@@ -245,22 +245,28 @@ export default function GenerarDatosPacienteBoro(data = {}) {
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Quinta fila: Puesto de Trabajo, Área de Trabajo (2 columnas)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + 100, yPos, tablaInicioX + 100, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Sexta fila: Empresa (fila completa)
+  // Quinta fila: Puesto de Trabajo (fila completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Séptima fila: Contrata (fila completa)
+  // Sexta fila: Área de Trabajo (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Séptima fila: Empresa (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Octava fila: Contrata (fila completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
@@ -268,7 +274,7 @@ export default function GenerarDatosPacienteBoro(data = {}) {
   yPos += filaAltura;
 
   // === CONTENIDO DE LA TABLA ===
-  let yTexto = 48 + 2; // Ajustar para el header
+  let yTexto = 36.5 + 2; // Ajustar para el header
 
   // Primera fila: AFILIACION (ya dibujada por dibujarHeaderSeccion)
   yTexto += filaAltura;
@@ -309,26 +315,28 @@ export default function GenerarDatosPacienteBoro(data = {}) {
   dibujarTextoConSaltoLinea(datosFinales.direccionPaciente || "", tablaInicioX + 25, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
-  // Quinta fila: Puesto de Trabajo, Área de Trabajo (2 columnas)
+  // Quinta fila: Puesto de Trabajo
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo || "", tablaInicioX + 35, yTexto + 1.5, 60);
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Área de Trabajo:", tablaInicioX + 102, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo || "", tablaInicioX + 135, yTexto + 1.5, 60);
+  dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo || "", tablaInicioX + 35, yTexto + 1.5, tablaAncho - 40);
   yTexto += filaAltura;
 
-  // Sexta fila: Empresa
+  // Sexta fila: Área de Trabajo
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Área de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo || "", tablaInicioX + 35, yTexto + 1.5, tablaAncho - 40);
+  yTexto += filaAltura;
+
+  // Séptima fila: Empresa
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 24, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
-  // Séptima fila: Contrata
+  // Octava fila: Contrata
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Contrata:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -644,7 +652,7 @@ export default function GenerarDatosPacienteBoro(data = {}) {
   yPos += alturaSeccionFirmas;
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 8});
+  footerTR(doc, { footerOffsetY: 11});
 
   // === IMPRIMIR ===
   imprimir(doc);

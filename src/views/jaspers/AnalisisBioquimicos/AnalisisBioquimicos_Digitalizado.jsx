@@ -1,15 +1,51 @@
 // src/views/jaspers/AnalisisBioquimicos/AnalisisBioquimicos_Digitalizado.jsx
 import jsPDF from "jspdf";
-import headerAnalisisBioquimicos from "./Header/headerAnalisisBioquimicos";
-import footer from "../components/footer";
+import CabeceraLogo from '../components/CabeceraLogo.jsx';
+import drawColorBox from '../components/ColorBox.jsx';
+import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
+import footerTR from '../components/footerTR.jsx';
 
 export default function AnalisisBioquimicos_Digitalizado(datos = {}) {
   const doc = new jsPDF({ unit: "mm", format: "letter" });
   const pageW = doc.internal.pageSize.getWidth();
-  const margin = 15;
 
   // ==== HEADER ====
-  headerAnalisisBioquimicos(doc, datos);
+  const drawHeader = () => {
+    // Logo y membrete
+    CabeceraLogo(doc, { tieneMembrete: false, yOffset: 12 });
+
+    // Número de Ficha
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text("Nro de ficha: ", pageW - 70, 15);
+    doc.setFont("helvetica", "normal").setFontSize(18);
+    doc.text(String(datos.norden || ""), pageW - 50, 16);
+
+    // Código AB (codAb)
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Cod. AB: " + (datos.codAb || ""), pageW - 70, 20);
+
+    // Sede
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Sede: " + (datos.sede || ""), pageW - 70, 25);
+
+    // Fecha de examen
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Fecha de examen: " + formatearFechaCorta(datos.fecha || ""), pageW - 70, 30);
+
+    // Bloque de color
+    drawColorBox(doc, {
+      color: datos.codigoColor || "#008f39",
+      text: datos.textoColor || "F",
+      x: pageW - 30,
+      y: 10,
+      size: 22,
+      showLine: true,
+      fontSize: 30,
+      textPosition: 0.9
+    });
+  };
+
+  drawHeader();
 
   const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
   const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
@@ -168,7 +204,7 @@ export default function AnalisisBioquimicos_Digitalizado(datos = {}) {
     }
 
     // ==== FOOTER ====
-    footer(doc, datos);
+    footerTR(doc, { footerOffsetY: 10 });
 
     // ==== IMPRIMIR ====
     const pdfBlob = doc.output("blob");

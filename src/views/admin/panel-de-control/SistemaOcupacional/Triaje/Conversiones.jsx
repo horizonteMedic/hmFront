@@ -83,7 +83,6 @@ export const GetCC = async (event,triaje,set) => {
     }
     if (event.key === 'Enter') {
         const Temperatura = triaje.temperatura
-        console.log(Temperatura)
         if (Temperatura <= 16) {
             set(d => ({ ...d, temperatura: '' }))
             await Swal.fire('Valor Absurdo','Ingrese otro dato por favor.','error')

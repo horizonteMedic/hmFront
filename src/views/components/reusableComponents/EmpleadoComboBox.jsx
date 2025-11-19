@@ -30,12 +30,12 @@ export default function EmpleadoComboBox({
 
     useEffect(() => {
         if (!form.user_medicoFirma) return
-        const nombreEmpleado = empleados.find((emp) => emp.username === form.user_medicoFirma).nombres;
-        if (nombreEmpleado) {
+        const empleadoEncontrado = empleados.find((emp) => emp.username === form.user_medicoFirma);
+        if (empleadoEncontrado && empleadoEncontrado.nombres) {
             onChange({
                 target: {
                     name: "nombre_medico",
-                    value: nombreEmpleado
+                    value: empleadoEncontrado.nombres
                 }
             });
         }

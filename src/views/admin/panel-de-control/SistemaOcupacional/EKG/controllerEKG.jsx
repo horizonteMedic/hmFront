@@ -2,7 +2,6 @@ import Swal from "sweetalert2";
 import {
   GetInfoPacDefault,
   GetInfoServicioDefault,
-  getInfoTablaDefault,
   LoadingDefault,
   PrintHojaRDefault,
   SubmitDataServiceDefault,
@@ -158,15 +157,6 @@ const GetInfoPac = async (nro, set, token, sede) => {
   }
 };
 
-// export const getInfoTabla = (nombreSearch, codigoSearch, setData, token) => {
-//   getInfoTablaDefault(
-//     nombreSearch,
-//     codigoSearch,
-//     setData,
-//     token,
-//     obtenerReporteInfoTablaUrl
-//   );
-// };
 export const getInfoTabla = (
   nombreSearch,
   codigoSearch,
