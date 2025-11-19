@@ -119,19 +119,18 @@ export default function Resultado_Panel10D() {
           />
         </SectionFieldset>
 
-        {/* Prueba Rápida Cualitativa */}
-        <SectionFieldset legend="Prueba Rápida Cualitativa">
-          <InputTextOneLine
-            name="metodo"
-            value={form.metodo}
-            onChange={handleChange}
-          />
-        </SectionFieldset>
-
         {/* Resultados */}
         <SectionFieldset legend="Resultados">
+          <div className="mb-4">
+            <label className="font-semibold mb-2 block">Prueba Rápida Cualitativa:</label>
+            <InputTextOneLine
+              name="metodo"
+              value={form.metodo}
+              onChange={handleChange}
+            />
+          </div>
           <div className="grid grid-cols-3 gap-x-4 gap-y-4">
-          <div className="font-bold">PRUEBAS</div>
+            <div className="font-bold">PRUEBAS</div>
           <div className="font-bold"></div>
           <div className="font-bold">RESULTADOS</div>
           
