@@ -67,7 +67,7 @@ export default function CertificadoMedicoOcupacional() {
         user_medicoFirma: userlogued,
     }
 
-    const { form, setForm, handleChangeNumber,handleChange, handleRadioButton, handleClearnotO, handleClear, handlePrintDefault } = useForm(InitialForm, { storageKey: "Certificado_Medico_Ocupacional_form" })
+    const { form, setForm, handleChangeNumber,handleChange, handleRadioButton, handleClearnotO, handleClear, handlePrintDefault, handleChangeSimple } = useForm(InitialForm, { storageKey: "Certificado_Medico_Ocupacional_form" })
 
     const handleClearnotOandEspecialidad = () => {
         setForm((prev) => ({ ...InitialForm, norden: prev.norden, fechaDesde: today, fechahasta: today }));
