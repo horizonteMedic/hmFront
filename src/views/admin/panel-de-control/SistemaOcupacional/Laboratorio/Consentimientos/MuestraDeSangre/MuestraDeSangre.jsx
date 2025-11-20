@@ -1,61 +1,26 @@
-import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
-import { PrintHojaR, SubmitConsentimientoLab, VerifyTR } from '../Controller/ControllerC';
-import Swal from 'sweetalert2';
+import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { useSessionData } from '../../../../../../hooks/useSessionData';
+import { useForm } from '../../../../../../hooks/useForm';
+import { InputTextOneLine } from '../../../../../../components/reusableComponents/ResusableComponents';
+import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
+import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerMuestraDeSangre';
+import { getToday } from '../../../../../../utils/helpers';
 
-const antecedentesList = [
-  { label: 'CONSUME MARIHUANA (THC)' },
-  { label: 'CONSUME COCAINA (COC)' },
-  { label: 'CONSUMO HOJA DE COCA EN LOS 14 DIAS PREVIOS' },
-  { label: 'CONSUME ANFETAMINAS (AMP)' },
-  { label: 'CONSUME METHANFETAMINAS (MET)' },
-  { label: 'CONSUME BENZODIAZEPINAS (BZO)' },
-  { label: 'CONSUME OPIÁCEOS (OPI)' },
-  { label: 'CONSUME BARBITÚRICOS (BAR)' },
-  { label: 'CONSUME METADONA (MTD)' },
-  { label: 'CONSUME FENCICLIDINA (PCP)' },
-  { label: 'CONSUME ANTIDEPRESIVOS TRICÍCLICOS (TCA)' },
-];
+const MuestraDeSangre = () => {
+  const { token, userlogued, selectedSede } = useSessionData();
+  const today = getToday();
 
-const MuestraDeSangre = ({token,selectedSede,userlogued}) => {
-  const date = new Date();
-  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-  const createAntecedentesObject = () => {
-    const obj = {};
-    antecedentesList.forEach(({ label }) => {
-      obj[label] = false;
-    });
-    return obj;
-  };
-
-
-  const [form, setForm] = useState({
+  const initialFormState = {
     norden: '',
     fecha: today,
     nombres: '',
     edad: '',
     dni: '',
     empresa: '',
-    antecedentes: []
-  });
-
-  const fechaRef = useRef(null);
-
-  const handleInputChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleLimpiar = () => {
-    setForm({
-      norden: '',
-      fecha: today,
-      nombres: '',
-      edad: '',
-      dni: '',
-      empresa: '',
-    });
-  };
+  const { form, setForm, handleChange, handleClear, handlePrintDefault } = useForm(initialFormState);
 
   const handleset = () => {
     setForm(prev => ({
@@ -65,107 +30,136 @@ const MuestraDeSangre = ({token,selectedSede,userlogued}) => {
       edad: '',
       dni: '',
       empresa: '',
-      antecedentes: createAntecedentesObject(),
     }));
-  }
-
-  const handleAntecedenteChange = (label, value) => {
-    setForm(prev => ({
-      ...prev,
-      antecedentes: {
-        ...prev.antecedentes,
-        [label]: value,
-      }
-    }));
-  };
-
-  const handleFechaFocus = (e) => {
-    e.target.showPicker && e.target.showPicker();
   };
 
   const handlePrint = () => {
-    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
-    Swal.fire({
-      title: '¿Desea Imprimir Consentimiento Muestra de Sangre?',
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, Imprimir',
-      cancelButtonText: 'Cancelar',
-      customClass: {
-        title: 'swal2-title',
-        confirmButton: 'swal2-confirm',
-        cancelButton: 'swal2-cancel'
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        PrintHojaR(form,'consent_Muestra_Sangre',token);
-      }
-    });
+    handlePrintDefault(() => {
+      PrintHojaR(form, token);
+    }, '¿Desea Imprimir Consentimiento Muestra de Sangre?', form.norden);
+  };
+
+  const handleSubmit = () => {
+    SubmitDataService(form, token, userlogued, handleClear);
   };
 
   return (
-    <form className="w-full max-w-7xl mx-auto bg-white p-8 rounded shadow">
-      <div className="flex flex-wrap items-center gap-6 mb-6">
-        <div className="flex items-center gap-2">
-          <label className="font-semibold text-lg">Nro Orden :</label>
-          <input name="norden" value={form.norden} onChange={handleInputChange} className="border rounded px-3 py-2 w-48 text-base"
-          onKeyUp={(event) => {if(event.key === 'Enter')handleset(),VerifyTR(form.norden,'consent_Muestra_Sangre',token,setForm,selectedSede)}} />
+    <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
+      <h2 className="text-2xl font-bold text-center mb-6">CONSENTIMIENTO INFORMADO PARA LA TOMA DE MUESTRA DE SANGRE</h2>
+      
+      <form className="space-y-6">
+        <SectionFieldset legend="Datos del Paciente" className="space-y-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <InputTextOneLine
+              label="Nro Orden"
+              name="norden"
+              value={form.norden}
+              onChange={handleChange}
+              onKeyUp={(event) => {
+                if (event.key === 'Enter') {
+                  handleset();
+                  VerifyTR(form.norden, token, setForm, selectedSede);
+                }
+              }}
+              labelWidth="120px"
+              className="flex-1"
+            />
+            <InputTextOneLine
+              label="Fecha"
+              name="fecha"
+              type="date"
+              value={form.fecha}
+              onChange={handleChange}
+              labelWidth="120px"
+              className="flex-1"
+            />
+          </div>
+        </SectionFieldset>
+
+        <SectionFieldset legend="Información Personal" className="space-y-4">
+          <div className="flex flex-wrap items-center gap-2 text-base">
+            <span>YO,</span>
+            <input
+              name="nombres"
+              value={form.nombres || ''}
+              readOnly
+              className="border-b border-gray-400 px-3 py-2 min-w-[120px] max-w-[400px] text-base bg-gray-100 cursor-not-allowed"
+              style={{ width: `${Math.min(400, Math.max(120, (form.nombres?.length || 0) * 10))}px` }}
+            />
+            <span>de,</span>
+            <input
+              name="edad"
+              value={form.edad || ''}
+              readOnly
+              className="border-b border-gray-400 px-3 py-2 min-w-[50px] max-w-[80px] text-base bg-gray-100 cursor-not-allowed"
+              style={{ width: `${Math.min(80, Math.max(50, (String(form.edad)?.length || 0) * 14))}px` }}
+            />
+            <span>años de edad, identificado con DNI nº</span>
+            <input
+              name="dni"
+              value={form.dni || ''}
+              readOnly
+              className="border-b border-gray-400 px-3 py-2 min-w-[80px] max-w-[120px] text-base bg-gray-100 cursor-not-allowed"
+              style={{ width: `${Math.min(120, Math.max(80, (String(form.dni)?.length || 0) * 10))}px` }}
+            />
+          </div>
+          <div className="text-justify text-base">
+            ; habiendo recibido consejería e información acerca de los exámenes en sangre que se me va ha realizar según solicitud del protocolo médico de la empresa
+          </div>
+          <div className="flex justify-center">
+            <input
+              name="empresa"
+              value={form.empresa || ''}
+              readOnly
+              className="border-b border-gray-400 px-3 py-2 w-96 text-base bg-gray-100 cursor-not-allowed"
+              placeholder="Protocolo médico de la empresa"
+            />
+          </div>
+          <div className="text-justify text-base">
+            ; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra de sangre para cumplir con los exámenes pertinentes.
+          </div>
+        </SectionFieldset>
+
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+            </button>
+            <button
+              type="button"
+              className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2"
+              onClick={handleClear}
+            >
+              <FontAwesomeIcon icon={faBroom} /> Limpiar
+            </button>
+          </div>
+
+          <div className="flex flex-col items-end">
+            <span className="font-bold italic mb-2">Imprimir</span>
+            <div className="flex items-center gap-2">
+              <input
+                name="norden"
+                value={form.norden}
+                onChange={handleChange}
+                className="border rounded px-2 py-1 text-base w-24"
+              />
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faPrint} />
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <label className="font-semibold text-lg">Fecha :</label>
-          <input
-            name="fecha"
-            type="date"
-            value={form.fecha}
-            onChange={handleInputChange}
-            className="border rounded px-3 py-2 w-56 text-base"
-            ref={fechaRef}
-            onFocus={handleFechaFocus}
-          />
-        </div>
-      </div>
-
-      <div className="text-center font-bold text-xl mb-4">
-        CONSENTIMIENTO INFORMADO PARA LA TOMA DE MUESTRA DE SANGRE
-      </div>
-
-      <div className="flex flex-wrap items-center gap-2 mb-4 justify-start text-base">
-        <span>YO,</span>
-        <input name="nombres" value={form.nombres} readOnly className="border-b border-gray-400 px-3 py-2 min-w-[120px] max-w-[400px] text-base bg-gray-100 cursor-not-allowed" style={{width: `${Math.min(400, Math.max(120, (form.nombres?.length || 0) * 10))}px`}} />
-        <span>de,</span>
-        <input name="edad" value={form.edad} readOnly className="border-b border-gray-400 px-3 py-2 min-w-[50px] max-w-[80px] text-base bg-gray-100 cursor-not-allowed" style={{width: `${Math.min(80, Math.max(50, (String(form.edad)?.length || 0) * 14))}px`}} />
-        <span>años de edad, identificado con DNI nº</span>
-        <input name="dni" value={form.dni} readOnly className="border-b border-gray-400 px-3 py-2 min-w-[80px] max-w-[120px] text-base bg-gray-100 cursor-not-allowed" style={{width: `${Math.min(120, Math.max(80, (String(form.dni)?.length || 0) * 10))}px`}} />
-      </div>
-
-      <div className="text-justify text-base mb-2">
-        ; habiendo recibido consejería e información acerca de los exámenes en sangre que se me va ha realizar según solicitud del protocolo médico de la empresa
-      </div>
-      <div className="mb-2 flex justify-center">
-        <input name="protocolo" value={form.empresa} readOnly onChange={handleInputChange} className="border-b border-gray-400 px-3 py-2 w-96 text-base bg-gray-100 cursor-not-allowed" placeholder="Protocolo médico de la empresa" />
-      </div>
-      <div className="text-justify text-base mb-4">
-        ; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra de sangre para cumplir con los exámenes pertinentes.
-      </div>
-
-      <div className="flex flex-wrap items-center gap-4 mb-4">
-        <button type="button" onClick={(() => {SubmitConsentimientoLab(form,"consent_Muestra_Sangre",token, userlogued,null,false,handleLimpiar)})} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded flex items-center gap-2 text-lg shadow-md transition-colors">
-          <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-        </button>
-        <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-3 rounded flex items-center gap-2 text-lg shadow-md transition-colors" onClick={handleLimpiar}>
-          <FontAwesomeIcon icon={faBroom} /> Limpiar
-        </button>
-        <div className="ml-auto flex items-center gap-2">
-          <span className="font-semibold text-blue-900 text-lg">IMPRIMIR</span>
-          <input className="border rounded px-3 py-2 w-32 text-base" value={form.norden} name="norden" onChange={handleInputChange}/>
-          <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded border border-blue-700 flex items-center shadow-md transition-colors" onClick={handlePrint}>
-            <FontAwesomeIcon icon={faPrint} />
-          </button>
-        </div>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 };
 
-export default MuestraDeSangre; 
+export default MuestraDeSangre;

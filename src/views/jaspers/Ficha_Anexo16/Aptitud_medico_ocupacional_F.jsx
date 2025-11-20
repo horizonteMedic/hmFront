@@ -793,7 +793,7 @@ export default function Aptitud_Agroindustrial(data = {}) {
   // Llamar al footer (los datos de prueba están dentro del componente)
   footerTR(doc);
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

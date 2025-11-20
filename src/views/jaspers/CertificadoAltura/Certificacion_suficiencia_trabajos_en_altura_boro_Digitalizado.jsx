@@ -1231,7 +1231,7 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

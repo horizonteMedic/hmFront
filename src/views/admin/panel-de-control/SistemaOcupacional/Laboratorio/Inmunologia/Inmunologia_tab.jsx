@@ -1,27 +1,27 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/Inmunologia/Inmunologia_tab.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMars, faMicroscope, faVirus, faSyringe } from '@fortawesome/free-solid-svg-icons';
 import Gonadotropina from './Gonadotropina/Gonadotropina';
 import Microbiologia from './Microbiologia/Microbiologia';
 import Inmunologia from './Inmunologia/Inmunologia';
 import Hepatitis from './Hepatitis/Hepatitis';
-import VDRL from './VDRL/VDRL';
+// import VDRL from './VDRL/VDRL';
 
 const InmunologiaTab = ({token, selectedSede, userlogued, permiso}) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [
     { label: 'L. Gonadotropina', icon: faMars, vista: 'Inmunologia',
-      permiso: 'Acceso L. Gonadotropina',component: <Gonadotropina token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+      permiso: 'Acceso L. Gonadotropina',component: <Gonadotropina /> },
     { label: 'Microbiología', icon: faMicroscope, vista: 'Inmunologia',
-      permiso: 'Acceso Microbiologia', component: <Microbiologia token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+      permiso: 'Acceso Microbiologia', component: <Microbiologia /> },
     { label: 'Inmunología', icon: faVirus,vista: 'Inmunologia',
-      permiso: 'Acceso Inmunologia', component: <Inmunologia  token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+      permiso: 'Acceso Inmunologia', component: <Inmunologia /> },
     { label: 'L. Hepatitis', icon: faSyringe,vista: 'Inmunologia',
-      permiso: 'Acceso L. Hepatitis', component: <Hepatitis token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
-    { label: 'VDRL', icon: faVirus,vista: 'Inmunologia',
-      permiso: 'Acceso VDRL', component: <VDRL token={token} selectedSede={selectedSede} userlogued={userlogued}/> }
+      permiso: 'Acceso L. Hepatitis', component: <Hepatitis /> },
+    // { label: 'VDRL', icon: faVirus,vista: 'Inmunologia',
+    //   permiso: 'Acceso VDRL', component: <VDRL /> }
   ];
     const tabsConPermiso = tabs.filter(tab => permiso(tab.vista, tab.permiso));
 

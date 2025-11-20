@@ -839,7 +839,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 7});
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

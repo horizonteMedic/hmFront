@@ -218,7 +218,7 @@ const CertificadoTrabajosCaliente = () => {
                                                 </button>
                                             </div>
                                             <div className="flex gap-1 items-center">
-                                                <span className="font-bold italic text-base mb-1 mx-4">IMPRIMIR</span>
+                                                <span className="font-bold italic text-base mb-1 mx-4">Imprimir</span>
                                                 <input
                                                     name="norden"
                                                     value={form?.norden}

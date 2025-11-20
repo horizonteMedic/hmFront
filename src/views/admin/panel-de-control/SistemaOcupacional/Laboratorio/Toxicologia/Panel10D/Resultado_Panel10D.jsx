@@ -335,7 +335,7 @@ export default function Resultado_Panel10D() {
             </button>
           </div>
           <div className="flex flex-col items-end">
-            <span className="font-bold italic mb-2">IMPRIMIR</span>
+            <span className="font-bold italic mb-2">Imprimir</span>
             <div className="flex items-center gap-2">
               <InputTextOneLine
                 name="norden"

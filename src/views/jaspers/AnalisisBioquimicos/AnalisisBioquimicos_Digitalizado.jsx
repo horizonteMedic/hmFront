@@ -206,7 +206,7 @@ export default function AnalisisBioquimicos_Digitalizado(datos = {}) {
     // ==== FOOTER ====
     footerTR(doc, { footerOffsetY: 10 });
 
-    // ==== IMPRIMIR ====
+    // ==== Imprimir ====
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
     const iframe = document.createElement("iframe");

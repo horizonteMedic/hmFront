@@ -432,7 +432,7 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
     }
 
-    // === IMPRIMIR ===
+    // === Imprimir ===
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
     const iframe = document.createElement("iframe");

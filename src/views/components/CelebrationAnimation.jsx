@@ -65,7 +65,7 @@ const CelebrationAnimation = ({ show }) => {
         <div className="bg-gradient-to-r from-green-500 to-yellow-500 text-white px-12 py-8 rounded-2xl shadow-2xl animate-pulse border-4 border-yellow-300">
           <div className="text-center">
             <div className="text-6xl mb-4 animate-bounce">💰</div>
-            <div className="text-4xl font-black mb-2 text-shadow-lg" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.5)'}}>
+            <div className="text-2xl font-black mb-2 text-shadow-lg" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.5)'}}>
               HOY PAGAN GENTE!!
             </div>
           </div>

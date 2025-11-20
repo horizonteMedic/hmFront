@@ -2114,7 +2114,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   // === FOOTER PÁGINA 3 ===
   footerTR(doc, { footerOffsetY: 8 });
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

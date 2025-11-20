@@ -191,7 +191,7 @@ export default function Panel3d_Digitalizado(datos = {}) {
     // === FOOTER ===
     footer(doc, datos);
 
-    // === IMPRIMIR ===
+    // === Imprimir ===
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
     const iframe = document.createElement("iframe");

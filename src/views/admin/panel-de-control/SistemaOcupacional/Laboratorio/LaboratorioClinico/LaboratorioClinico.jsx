@@ -1,15 +1,14 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/LaboratorioClinico/LaboratorioClinico.jsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMicroscope, faTint, faHeartbeat } from '@fortawesome/free-solid-svg-icons';
-import { useNavigate } from 'react-router-dom';
 import HematologiaBioquimicaSIEO from './Hematologia-bioquimicaSI-EO/Hematologia-bioquimicaSI-EO';
 import ExamenOrina from './ExamenOrina/ExamenOrina';
 import Hematologia from './Hematologia/Hematologia';
 import { getFetch } from '../../../getFetch/getFetch';
+
 const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
   const [activeTab, setActiveTab] = useState(0);
-  const navigate = useNavigate();
   const date = new Date();
   const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   //ESTADO PARA HEMATOLOGIA Y EXAMEN DE ORINA
@@ -193,6 +192,7 @@ const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
         setSearchMedico(res[0])
       })
       .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
 
   const tabs = [
@@ -209,19 +209,25 @@ const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
       icon: faTint,
       vista: 'Laboratorio Clinico Formulario',
       permiso: 'Acceso Hematologia - Bioquimica SI-EO',
-      component: <ExamenOrina token={token} selectedSede={selectedSede} userlogued={userlogued} form={formO} setForm={setFormO} formH={form} ClearForm={ClearForm} setFormH={setForm} ClearFormO={ClearFormO} />
+      component: <ExamenOrina form={formO} setForm={setFormO} formH={form} ClearForm={ClearForm} setFormH={setForm} ClearFormO={ClearFormO} />
     },
     {
       label: 'Hemograma',
       icon: faHeartbeat,
       vista: 'Laboratorio Clinico Formulario',
       permiso: 'Acceso Hematograma',
-      component: <Hematologia token={token} selectedSede={selectedSede} userlogued={userlogued} />
+      component: <Hematologia />
     }
   ];
 
   const tabsConPermiso = tabs.filter(tab => permiso(tab.vista, tab.permiso));
 
+  // Ajustar activeTab si el tab actual no tiene permiso
+  useEffect(() => {
+    if (activeTab >= tabsConPermiso.length && tabsConPermiso.length > 0) {
+      setActiveTab(0);
+    }
+  }, [tabsConPermiso.length, activeTab]);
 
   return (
     <div className="w-full">
@@ -244,8 +250,8 @@ const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
       </div>
 
       {/* Active Content */}
-      <div className="border border-gray-200 border-t-0 p-4 bg-white rounded-b-lg text-lg">
-        {tabs[activeTab].component}
+      <div className="border border-gray-200 border-t-0 bg-white rounded-b-lg">
+        {tabsConPermiso[activeTab]?.component}
       </div>
     </div>
   );

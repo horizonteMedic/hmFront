@@ -299,7 +299,7 @@ export default function InformePsicolaboral() {
                 </button>
               </div>
               <div className="flex flex-col items-end">
-                <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+                <span className="font-bold italic text-base mb-1">Imprimir</span>
                 <div className="flex items-center gap-2">
                   <input
                     name="norden"

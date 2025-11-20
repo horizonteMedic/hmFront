@@ -187,7 +187,7 @@ const Cuello = ({ token, userlogued, form, setForm, handleInputChangeChecked, ha
                     />
                     <div className="flex justify-between my-3">
                         <div className="flex items-center gap-1">
-                            <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+                            <span className="font-bold italic text-base mb-1">Imprimir</span>
                             <div className="flex items-center gap-2">
                                 <input
                                     name="norden"

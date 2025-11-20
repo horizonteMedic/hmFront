@@ -842,7 +842,7 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 13.5});
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

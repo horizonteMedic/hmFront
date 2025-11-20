@@ -397,7 +397,7 @@ export default function InformeElectrocardiograma2023(data = {}) {
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

@@ -468,7 +468,7 @@ export default function HistoriaOcupacional_Digitalizado(
     // === FOOTER ===
     // footerEnHeader(doc, datos);
 
-    // === IMPRIMIR ===
+    // === Imprimir ===
     const blob = doc.output("blob");
     const url = URL.createObjectURL(blob);
     const iframe = document.createElement("iframe");

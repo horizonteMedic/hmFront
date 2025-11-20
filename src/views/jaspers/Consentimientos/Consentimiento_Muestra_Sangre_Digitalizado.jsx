@@ -236,7 +236,7 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
 
     footer(doc, datos);
 
-    // ─── 6) IMPRIMIR ───────────────────────────────────
+    // ─── 6) Imprimir ───────────────────────────────────
     const blob = doc.output("blob");
     const url  = URL.createObjectURL(blob);
     const iframe = document.createElement('iframe');

@@ -924,7 +924,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8});
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

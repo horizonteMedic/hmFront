@@ -1635,7 +1635,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8});
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

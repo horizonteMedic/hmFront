@@ -58,7 +58,7 @@ const Altura = ({ token, selectedSede }) => {
           </div>
         </div>
         <div className="flex flex-col items-end mt-6">
-          <span className="font-bold text-blue-900 text-xs italic">IMPRIMIR</span>
+          <span className="font-bold text-blue-900 text-xs italic">Imprimir</span>
           <div className="flex gap-1 mt-1">
             <input className="border rounded px-2 py-1 w-24" />
             <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded border border-blue-700 flex items-center shadow-md transition-colors"><FontAwesomeIcon icon={faPrint} /></button>

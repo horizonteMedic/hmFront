@@ -80,7 +80,7 @@ export default function Panel4d_Digitalizado(datos = {}) {
 
     // Título del Panel
     doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
-    doc.text("PANEL DROGAS 4D", config.col1X, y);
+    doc.text("PANEL 4D", config.col1X, y);
     y += config.lineHeight;
 
     // Datos
@@ -179,7 +179,7 @@ export default function Panel4d_Digitalizado(datos = {}) {
     // === FOOTER ===
     footer(doc, datos);
 
-    // === IMPRIMIR ===
+    // === Imprimir ===
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
     const iframe = document.createElement("iframe");

@@ -224,7 +224,7 @@ const HojaConsultaExterna = () => {
                                     >
                                         <FontAwesomeIcon icon={faBroom} /> Limpiar
                                     </button>
-                                    <span className="font-bold italic text-center text-base  mx-4">IMPRIMIR</span>
+                                    <span className="font-bold italic text-center text-base  mx-4">Imprimir</span>
                                     <input
                                         name="norden"
                                         value={form?.norden}

@@ -1,5 +1,5 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/Manipuladores/Manipuladores.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faVial, faBug, faMicroscope, faVirus, faSyringe } from '@fortawesome/free-solid-svg-icons';
 import Coproparasitologia from './Coproparasitologia/Coproparasitologia';
@@ -7,13 +7,15 @@ import Coprocultivo from './Coprocultivo/Coprocultivo';
 import Microbiologia from '../Inmunologia/Microbiologia/Microbiologia';
 import Inmunologia from '../Inmunologia/Inmunologia/Inmunologia';
 import Hepatitis from '../Inmunologia/Hepatitis/Hepatitis';
+import { useSessionData } from '../../../../../hooks/useSessionData';
 
-const Manipuladores = ({ token, selectedSede, userlogued }) => {
+const Manipuladores = () => {
   const [activeTab, setActiveTab] = useState(0);
+  const { token, selectedSede, userlogued } = useSessionData();
 
   const tabs = [
-    { label: 'Coprocultivo', icon: faVial, component: <Coprocultivo token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
-    { label: 'Parasitología', icon: faBug, component: <Coproparasitologia token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+    { label: 'Coprocultivo', icon: faVial, component: <Coprocultivo /> },
+    { label: 'Parasitología', icon: faBug, component: <Coproparasitologia /> },
     { label: 'Microbiología', icon: faMicroscope, component: <Microbiologia token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
     { label: 'Inmunología', icon: faVirus, component: <Inmunologia token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
     { label: 'Hepatitis', icon: faSyringe, component: <Hepatitis token={token} selectedSede={selectedSede} userlogued={userlogued} /> }
