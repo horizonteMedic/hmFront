@@ -6,6 +6,7 @@ import {
     InputsRadioGroup,
     RadioTable,
 } from "../../../../../../components/reusableComponents/ResusableComponents";
+import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 import { useForm } from "../../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../../utils/helpers";
@@ -108,8 +109,7 @@ export default function InformeRiesgoPsicosocial() {
         <div className="mx-auto bg-white overflow-hidden">
             <div className="flex h-full">
                 <div className="w-full space-y-3 px-4">
-                    {/* Header */}
-                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <SectionFieldset legend="Información del Examen">
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                             <InputTextOneLine
                                 label="N° Orden"
@@ -134,13 +134,10 @@ export default function InformeRiesgoPsicosocial() {
                                 disabled
                                 labelWidth="120px"
                             />
-
                         </div>
-                    </div>
+                    </SectionFieldset>
 
-                    {/* Datos Personales */}
-                    <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
-                        <legend className="font-bold mb-3 text-[10px]">Datos Personales</legend>
+                    <SectionFieldset legend="Datos Personales">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             <div className="space-y-3">
                                 <InputTextOneLine label="Nombres" name="nombres" value={form.nombres} disabled labelWidth="160px" />
@@ -156,11 +153,9 @@ export default function InformeRiesgoPsicosocial() {
                                 <InputTextOneLine label="Lugar Nacimiento" name="lugarNacimiento" value={form.lugarNacimiento} disabled labelWidth="160px" />
                             </div>
                         </div>
-                    </fieldset>
+                    </SectionFieldset>
 
-                    {/* Datos Laborales */}
-                    <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
-                        <legend className="font-bold mb-3 text-[10px]">Datos Laborales</legend>
+                    <SectionFieldset legend="Datos Laborales">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             <div className="space-y-3">
                                 <InputTextOneLine label="Ocupación" name="ocupacion" value={form.ocupacion} disabled labelWidth="160px" />
@@ -171,21 +166,18 @@ export default function InformeRiesgoPsicosocial() {
                                 <InputTextOneLine label="Contrata" name="contrata" value={form.contrata} disabled labelWidth="160px" />
                             </div>
                         </div>
-                    </fieldset>
+                    </SectionFieldset>
 
-                    {/* Riesgos y Recomendaciones */}
                     <div className="grid md:grid-cols-2 gap-4">
-                        <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
-                            <legend className="font-bold mb-3 text-[10px]">Riesgos Psicosociales</legend>
+                        <SectionFieldset legend="Riesgos Psicosociales">
                             <RadioTable
                                 items={riesgosItems}
                                 options={riesgoOptions}
                                 form={form}
                                 handleRadioButton={handleRadioButton}
                             />
-                        </fieldset>
-                        <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
-                            <legend className="font-bold mb-3 text-[10px]">Recomendaciones y Conclusión</legend>
+                        </SectionFieldset>
+                        <SectionFieldset legend="Recomendaciones y Conclusión">
                             <div className="space-y-3">
                                 <InputTextArea
                                     label="Recomendaciones"
@@ -203,12 +195,10 @@ export default function InformeRiesgoPsicosocial() {
                                     onChange={handleRadioButton}
                                 />
                             </div>
-                        </fieldset>
+                        </SectionFieldset>
                     </div>
 
-                    {/* Análisis y Resultados */}
-                    <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
-                        <legend className="font-bold mb-3 text-[10px]">Análisis y Resultados</legend>
+                    <SectionFieldset legend="Análisis y Resultados">
                         <InputTextArea
                             label=""
                             name="analisisResultados"
@@ -216,7 +206,7 @@ export default function InformeRiesgoPsicosocial() {
                             onChange={handleChange}
                             rows={6}
                         />
-                    </fieldset>
+                    </SectionFieldset>
 
                     {/* Footer acciones */}
                     <fieldset className="flex flex-col md:flex-row justify-between items-center gap-4 px-4">

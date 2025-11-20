@@ -1,4 +1,5 @@
 import RadioTable from "../../../../../../../components/reusableComponents/RadioTable";
+import SectionFieldset from "../../../../../../../components/reusableComponents/SectionFieldset";
 
 const opcionesFrecuencia = [
   { value: "NUNCA", label: "Ninguna vez" },
@@ -21,8 +22,7 @@ export default function ParteII({ form, handleRadioButton }) {
   ];
 
   return (
-    <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
-      <legend className="font-bold mb-4 text-[10px]">5. Problemas para dormir durante el último mes</legend>
+    <SectionFieldset legend="5. Problemas para dormir durante el último mes">
       <RadioTable
         items={items}
         options={opcionesFrecuencia}
@@ -30,6 +30,6 @@ export default function ParteII({ form, handleRadioButton }) {
         handleRadioButton={handleRadioButton}
         labelColumns={1}
       />
-    </fieldset>
+    </SectionFieldset>
   );
 }

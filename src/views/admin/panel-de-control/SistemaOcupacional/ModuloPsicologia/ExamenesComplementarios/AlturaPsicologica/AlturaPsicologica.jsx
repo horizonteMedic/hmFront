@@ -111,7 +111,7 @@ export default function AlturaPsicologica() {
   ];
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-3 px-4">
       {/* Header con información del examen */}
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
         <InputTextOneLine

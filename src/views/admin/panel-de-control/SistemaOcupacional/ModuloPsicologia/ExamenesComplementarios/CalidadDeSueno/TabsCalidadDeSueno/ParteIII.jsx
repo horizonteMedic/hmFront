@@ -1,9 +1,9 @@
 import InputsRadioGroup from "../../../../../../../components/reusableComponents/InputsRadioGroup";
+import SectionFieldset from "../../../../../../../components/reusableComponents/SectionFieldset";
 
 export default function ParteIII({ form, handleRadioButton }) {
   return (
-    <fieldset className="bg-white border border-gray-200 rounded-lg p-4 space-y-6">
-      <legend className="font-bold mb-4 text-[10px]">Preguntas (durante el último mes)</legend>
+    <SectionFieldset legend="Preguntas (durante el último mes)" className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-6">
           <InputsRadioGroup
@@ -98,6 +98,6 @@ export default function ParteIII({ form, handleRadioButton }) {
           />
         </div>
       </div>
-    </fieldset>
+    </SectionFieldset>
   );
 }

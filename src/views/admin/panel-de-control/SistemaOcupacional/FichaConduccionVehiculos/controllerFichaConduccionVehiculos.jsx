@@ -45,6 +45,12 @@ export const GetInfoServicio = async (
                 }
             }
         }
+        const promedioOidoDerecho = res.promedioOidoDerecho ?? 0;
+        const promedioOidoIzquierdo = res.promedioOidoIzquierdo ?? 0;
+        let oidoMayor40 = false;
+        if (promedioOidoDerecho > 40 || promedioOidoIzquierdo > 40) {
+            oidoMayor40 = true;
+        }
 
         const vlejoscod = res.odlcoftalmologia_odlc || "";
         const vlejoscoi = res.oilcoftalmologia_oilc || "";
@@ -89,6 +95,9 @@ export const GetInfoServicio = async (
             vlCorregidaOD: res.odlcoftalmologia_odlc ?? "",
             vcCorregidaOI: res.oiccoftalmologia_oicc ?? "",
             vlCorregidaOI: res.oilcoftalmologia_oilc ?? "",
+
+            hipoacusiaFrecuenciasConversacionales: oidoMayor40,
+            conclusion: oidoMayor40 ? "NO APTO" : null,
 
             vclrs: res.vcoftalmologia_vc ?? "",
             vb: res.vboftalmologia_vb ?? "",
