@@ -29,7 +29,10 @@ export const GetInfoServicio = async (
     if (res) {
         const imc = res.imcTriaje ?? "";
         let imcRed = false;
-        let nuevasObservaciones = "";
+        let nuevasObservaciones = (res.diagnosticoAudiometria ?? "").toUpperCase();
+        if (nuevasObservaciones != "") {
+            nuevasObservaciones += "\n";
+        }
         if (imc) {
             const imcValue = parseFloat(imc);
             if (!isNaN(imcValue) && imcValue > 25) {
@@ -70,6 +73,14 @@ export const GetInfoServicio = async (
             }
         }
 
+        let anemia = false;
+        const hemoglobina = parseFloat(res.laboratorioClinicoHemoglobina);
+
+        if (!isNaN(hemoglobina)) {
+            const umbral = res.sexoPaciente === "M" ? 13 : 12;
+            anemia = hemoglobina < umbral;
+        }
+
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
@@ -98,6 +109,7 @@ export const GetInfoServicio = async (
 
             hipoacusiaFrecuenciasConversacionales: oidoMayor40,
             conclusion: oidoMayor40 ? "NO APTO" : null,
+            anemiaCriteriosOMS2011: anemia,
 
             vclrs: res.vcoftalmologia_vc ?? "",
             vb: res.vboftalmologia_vb ?? "",

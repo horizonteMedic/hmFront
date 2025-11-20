@@ -74,7 +74,7 @@ export default function EKG() {
       VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
-  
+
   const handlePrint = () => {
     handlePrintDefault(() => {
       PrintHojaR(form.norden, token, tabla, datosFooter);
@@ -224,10 +224,17 @@ export default function EKG() {
                   handleCheckBoxChange(e);
                   setForm((prev) => ({
                     ...prev,
+                    conclusiones: "",
+
+                    ritmo: "",
+                    fc: "",
+                    eje: "",
+                    pr: "",
+                    qrs: "",
                     ondaP: "",
                     st: "",
                     ondaT: "",
-                    conclusiones: "",
+                    qtc: "",
                   }));
                 }}
               />
@@ -441,9 +448,9 @@ export default function EKG() {
                   <input
                     type="checkbox"
                     name="bradicardiaSinusalFisiologica"
-                    checked={form.hallazgos.includes("B.S. FISIOLÓGICA")}
+                    checked={form.hallazgos.includes("BRADICARDIA SINUSAL FISIOLOGICA")}
                     onChange={(e) => {
-                      handleHallazgosChange(e, "B.S. FISIOLÓGICA");
+                      handleHallazgosChange(e, "BRADICARDIA SINUSAL FISIOLOGICA");
                       setForm((prev) => ({
                         ...prev,
                         recomendaciones: e.target.checked
@@ -458,9 +465,9 @@ export default function EKG() {
                   <input
                     type="checkbox"
                     name="bradicardiaSinusalAsintomatica"
-                    checked={form.hallazgos.includes("B.S. ASINTOMÁTICA")}
+                    checked={form.hallazgos.includes("BRADICARDIA SINUSAL ASINTOMATICA")}
                     onChange={(e) => {
-                      handleHallazgosChange(e, "B.S. ASINTOMÁTICA");
+                      handleHallazgosChange(e, "BRADICARDIA SINUSAL ASINTOMATICA");
                       setForm((prev) => ({
                         ...prev,
                         recomendaciones: e.target.checked
@@ -475,9 +482,9 @@ export default function EKG() {
                   <input
                     type="checkbox"
                     name="bloqueoRamaDerecha"
-                    checked={form.hallazgos.includes("B.I. RAMA DERECHA")}
+                    checked={form.hallazgos.includes("BLOQUEO INCOMPLETO RAMA DERECHA")}
                     onChange={(e) => {
-                      handleHallazgosChange(e, "B.I. RAMA DERECHA");
+                      handleHallazgosChange(e, "BLOQUEO INCOMPLETO RAMA DERECHA");
                       setForm((prev) => ({
                         ...prev,
                         recomendaciones: e.target.checked
@@ -492,9 +499,9 @@ export default function EKG() {
                   <input
                     type="checkbox"
                     name="desviacionEjeCardiacoIzquierda"
-                    checked={form.hallazgos.includes("D.I. EJE CARDÍACO")}
+                    checked={form.hallazgos.includes("DESVIACIÓN IZQUIERDA DEL EJE CARDIACO")}
                     onChange={(e) => {
-                      handleHallazgosChange(e, "D.I. EJE CARDÍACO");
+                      handleHallazgosChange(e, "DESVIACIÓN IZQUIERDA DEL EJE CARDIACO");
                       setForm((prev) => ({
                         ...prev,
                         recomendaciones: e.target.checked
@@ -509,9 +516,9 @@ export default function EKG() {
                   <input
                     type="checkbox"
                     name="desviacionEjeCardiacoDerecha"
-                    checked={form.hallazgos.includes("D.D. EJE CARDÍACO")}
+                    checked={form.hallazgos.includes("DESVIACIÓN DERECHA EJE CARDIACO")}
                     onChange={(e) => {
-                      handleHallazgosChange(e, "D.D. EJE CARDÍACO");
+                      handleHallazgosChange(e, "DESVIACIÓN DERECHA EJE CARDIACO");
                       setForm((prev) => ({
                         ...prev,
                         recomendaciones: e.target.checked

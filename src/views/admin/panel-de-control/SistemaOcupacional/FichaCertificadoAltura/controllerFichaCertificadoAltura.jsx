@@ -48,7 +48,10 @@ export const GetInfoServicio = async (
         const imc = res.imcTriaje ?? "";
         let obesidadIMC30 = false;
         let imcRed = false;
-        let nuevasObservaciones = "";
+        let nuevasObservaciones = (res.diagnosticoAudiometria ?? "").toUpperCase();
+        if (nuevasObservaciones != "") {
+            nuevasObservaciones += "\n";
+        }
         if (imc) {
             const imcValue = parseFloat(imc);
             if (!isNaN(imcValue) && imcValue > 25) {
@@ -92,7 +95,14 @@ export const GetInfoServicio = async (
         if (promedioOidoDerecho > 40 || promedioOidoIzquierdo > 40) {
             oidoMayor40 = true;
         }
-        console.log({ oidoMayor40})
+
+        let anemia = false;
+        const hemoglobina = parseFloat(res.laboratorioClinicoHemoglobina);
+
+        if (!isNaN(hemoglobina)) {
+            const umbral = res.sexoPaciente === "M" ? 13 : 12;
+            anemia = hemoglobina < umbral;
+        }
 
         set((prev) => ({
             ...prev,
@@ -123,6 +133,7 @@ export const GetInfoServicio = async (
 
             hipoacusiaFrecuenciasConversacionales: oidoMayor40,
             conclusion: oidoMayor40 ? "NO APTO" : null,
+            anemiaCriteriosOMS2011: anemia,
             //==========================TAB EXAMEN FISICO===========================
             // Examen Médico - Medidas Antropométricas y Signos Vitales
             frecuenciaCardiaca: res.frecuenciaCardiaca ?? "",
