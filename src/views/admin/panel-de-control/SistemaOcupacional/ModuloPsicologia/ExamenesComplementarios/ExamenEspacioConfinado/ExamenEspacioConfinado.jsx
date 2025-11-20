@@ -126,7 +126,7 @@ export default function ExamenEspacioConfinado() {
     ];
 
     return (
-        <div className="space-y-6 px-4 pt-4">
+        <div className="space-y-3 px-4 ">
             <SectionFieldset legend="Información del Examen">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
                     <InputTextOneLine

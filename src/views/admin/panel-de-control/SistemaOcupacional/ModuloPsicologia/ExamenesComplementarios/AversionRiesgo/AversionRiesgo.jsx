@@ -80,7 +80,7 @@ export default function AversionRiesgo() {
     };
 
     return (
-        <div className="p-4 space-y-3">
+        <div className="px-4 space-y-3">
             <SectionFieldset legend="Información del Examen">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <InputTextOneLine
