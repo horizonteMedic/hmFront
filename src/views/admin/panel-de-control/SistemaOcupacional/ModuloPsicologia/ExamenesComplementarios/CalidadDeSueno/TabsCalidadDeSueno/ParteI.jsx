@@ -1,10 +1,10 @@
 import { InputTextOneLine } from "../../../../../../../components/reusableComponents/ResusableComponents";
 import InputsRadioGroup from "../../../../../../../components/reusableComponents/InputsRadioGroup";
+import SectionFieldset from "../../../../../../../components/reusableComponents/SectionFieldset";
 
 export default function ParteI({ form, handleChange, handleRadioButton }) {
   return (
-    <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
-      <legend className="font-bold mb-4 text-[10px]">Preguntas (durante el último mes)</legend>
+    <SectionFieldset legend="Preguntas (durante el último mes)">
       <div className="space-y-4">
         <InputTextOneLine
           label="1. Hora de acostarse habitualmente"
@@ -41,6 +41,6 @@ export default function ParteI({ form, handleChange, handleRadioButton }) {
           labelWidth="200px"
         />
       </div>
-    </fieldset>
+    </SectionFieldset>
   );
 }

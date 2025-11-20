@@ -1,4 +1,5 @@
 import RadioTable from "../../../../../../../components/reusableComponents/RadioTable";
+import SectionFieldset from "../../../../../../../components/reusableComponents/SectionFieldset";
 
 export default function CriteriosPsicologicosI({
   form,
@@ -8,12 +9,7 @@ export default function CriteriosPsicologicosI({
   return (
     <div className="bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* ASPECTO INTELECTUAL */}
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <h3 className="text-lg font-semibold mb-4 text-center bg-red-100 text-red-800 py-2 rounded">
-            ASPECTO INTELECTUAL
-          </h3>
-          {/* Tabla de aspectos intelectuales */}
+        <SectionFieldset legend="ASPECTO INTELECTUAL">
           <RadioTable
             items={[
               { name: "razonamientoProblemas", label: "1. Razonamiento y resolución de problemas" },
@@ -33,14 +29,9 @@ export default function CriteriosPsicologicosI({
             form={form}
             handleRadioButton={handleRadioButton}
           />
-        </div>
+        </SectionFieldset>
 
-        {/* ASPECTOS PERSONALIDAD */}
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <h3 className="text-lg font-semibold mb-4 text-center bg-blue-100 text-blue-800 py-2 rounded">
-            ASPECTOS PERSONALIDAD
-          </h3>
-          {/* Tabla de aspectos personalidad */}
+        <SectionFieldset legend="ASPECTOS PERSONALIDAD">
           <RadioTable
             items={[
               { name: "estabilidadEmocional", label: "1. Estabilidad Emocional" },
@@ -60,7 +51,7 @@ export default function CriteriosPsicologicosI({
             form={form}
             handleRadioButton={handleRadioButton}
           />
-        </div>
+        </SectionFieldset>
       </div>
     </div>
   );

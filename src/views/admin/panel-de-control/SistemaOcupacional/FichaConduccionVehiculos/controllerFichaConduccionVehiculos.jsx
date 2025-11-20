@@ -29,7 +29,10 @@ export const GetInfoServicio = async (
     if (res) {
         const imc = res.imcTriaje ?? "";
         let imcRed = false;
-        let nuevasObservaciones = "";
+        let nuevasObservaciones = (res.diagnosticoAudiometria ?? "").toUpperCase();
+        if (nuevasObservaciones != "") {
+            nuevasObservaciones += "\n";
+        }
         if (imc) {
             const imcValue = parseFloat(imc);
             if (!isNaN(imcValue) && imcValue > 25) {
@@ -44,6 +47,12 @@ export const GetInfoServicio = async (
                     nuevasObservaciones += "OBESIDAD III: NO HACER TRABAJOS EN ESPACIOS CONFINADOS. NO HACER TRABAJOS SOBRE 1.8 M.S.N PISO. DIETA HIPOCALORICA, HIPOGRASA Y EJERCICIOS.\n";
                 }
             }
+        }
+        const promedioOidoDerecho = res.promedioOidoDerecho ?? 0;
+        const promedioOidoIzquierdo = res.promedioOidoIzquierdo ?? 0;
+        let oidoMayor40 = false;
+        if (promedioOidoDerecho > 40 || promedioOidoIzquierdo > 40) {
+            oidoMayor40 = true;
         }
 
         const vlejoscod = res.odlcoftalmologia_odlc || "";
@@ -62,6 +71,14 @@ export const GetInfoServicio = async (
                     ? "CORREGIR AGUDEZA VISUAL.\n"
                     : "USO DE LENTES CORRECTORES.\n";
             }
+        }
+
+        let anemia = false;
+        const hemoglobina = parseFloat(res.laboratorioClinicoHemoglobina);
+
+        if (!isNaN(hemoglobina)) {
+            const umbral = res.sexoPaciente === "M" ? 13 : 12;
+            anemia = hemoglobina < umbral;
         }
 
         set((prev) => ({
@@ -89,6 +106,10 @@ export const GetInfoServicio = async (
             vlCorregidaOD: res.odlcoftalmologia_odlc ?? "",
             vcCorregidaOI: res.oiccoftalmologia_oicc ?? "",
             vlCorregidaOI: res.oilcoftalmologia_oilc ?? "",
+
+            hipoacusiaFrecuenciasConversacionales: oidoMayor40,
+            conclusion: oidoMayor40 ? "NO APTO" : null,
+            anemiaCriteriosOMS2011: anemia,
 
             vclrs: res.vcoftalmologia_vc ?? "",
             vb: res.vboftalmologia_vb ?? "",
@@ -396,7 +417,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             //Necesita Agudeza visual 
             Swal.fire(
                 "Alerta",
-                "El paciente necesita pasar por Triaje.",
+                "El paciente necesita pasar por Ficha SAS.",
                 "warning"
             );
         }

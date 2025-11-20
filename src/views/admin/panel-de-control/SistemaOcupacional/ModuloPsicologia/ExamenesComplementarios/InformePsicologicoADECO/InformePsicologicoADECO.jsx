@@ -5,6 +5,7 @@ import {
     InputTextArea,
     InputsBooleanRadioGroup,
 } from "../../../../../../components/reusableComponents/ResusableComponents";
+import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
@@ -82,9 +83,8 @@ export default function InformePsicologicoADECO() {
         });
     };
     return (
-        <div className="space-y-6 px-4 pt-4">
-            {/* Header con información del examen */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4 ">
+        <div className="space-y-3 px-4">
+            <SectionFieldset legend="Información del Examen">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
                     <InputTextOneLine
                         label="N° Orden"
@@ -120,11 +120,8 @@ export default function InformePsicologicoADECO() {
                         />
                     </div>
                 </div>
-            </div>
-            {/* Contenido principal */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <h4 className="font-semibold mb-3 text-blue-700">Datos Necesarios</h4>
-
+            </SectionFieldset>
+            <SectionFieldset legend="Datos Necesarios">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {/* Columna Izquierda */}
                     <div className="space-y-3">
@@ -190,9 +187,8 @@ export default function InformePsicologicoADECO() {
                         />
                     </div>
                 </div>
-            </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <h4 className="font-semibold mb-3 text-blue-700">Datos Laborales</h4>
+            </SectionFieldset>
+            <SectionFieldset legend="Datos Laborales">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
                     <InputTextOneLine
                         label="Empresa"
@@ -223,11 +219,8 @@ export default function InformePsicologicoADECO() {
                         labelWidth="120px"
                     />
                 </div>
-            </div>
-            {/* Criterios Psicológicos */}
-            <section className="bg-white border border-gray-200 rounded-lg p-4">
-                <h3 className="font-semibold mb-3 text-blue-700">Criterios Psicológicos</h3>
-
+            </SectionFieldset>
+            <SectionFieldset legend="Criterios Psicológicos">
                 <div className="space-y-4">
                     <div className="grid grid-cols-1 gap-4">
                         <InputTextOneLine
@@ -253,11 +246,8 @@ export default function InformePsicologicoADECO() {
                         />
                     </div>
                 </div>
-            </section>
-            {/* Análisis FODA */}
-            <section className="bg-white border border-gray-200 rounded-lg p-4">
-                <h3 className="font-semibold mb-3 text-blue-700">Análisis FODA</h3>
-
+            </SectionFieldset>
+            <SectionFieldset legend="Análisis FODA">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <InputTextArea
                         label="Fortalezas / Oportunidades"
@@ -274,10 +264,9 @@ export default function InformePsicologicoADECO() {
                         rows={4}
                     />
                 </div>
-            </section>
+            </SectionFieldset>
 
-            {/* Observaciones y Recomendaciones */}
-            <section className="bg-white border border-gray-200 rounded-lg p-4">
+            <SectionFieldset legend="Observaciones y Recomendaciones">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <InputTextArea
                         label="Observaciones"
@@ -294,7 +283,7 @@ export default function InformePsicologicoADECO() {
                         rows={4}
                     />
                 </div>
-            </section>
+            </SectionFieldset>
             <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-4">
                 <div className="flex gap-4">
                     <button

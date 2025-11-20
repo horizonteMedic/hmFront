@@ -1,5 +1,6 @@
 import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
 import { useForm } from "../../../../../../hooks/useForm"
+import { getToday } from "../../../../../../utils/helpers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     InputTextOneLine,
@@ -7,24 +8,48 @@ import {
     RadioTable,
     InputTextArea,
 } from "../../../../../../components/reusableComponents/ResusableComponents";
+import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 
-// Arrays para RadioTable de Orientación
-const orientacionItems = [
-    { name: "orientacionTiempo", label: "Practica y Funcional" },
-    { name: "orientacionEspacio", label: "Recursividad" },
-    { name: "orientacionPersona", label: "Capacidad de atención y concentración" }
-];
+const tabla = ""
+const today = getToday();
 
-const orientacionOptions = [
-    { value: "DESORIENTADO", label: "Bajo" },
-    { value: "ORIENTADO", label: "Medio" },
-    { value: "ORIENTADO", label: "Alto" }
-];
+export default function AversionRiesgo() {
+    const initialFormState = {
+        norden: "",
+        fechaExam: today,
 
-const AversionRiesgo = () => {
+        nombres: "",
+        dni: "",
+        edad: "",
+        sexo: "",
 
-    const initialFormState = {}
+        empresa: "",
+        contrata: "",
+        areaTrabajo: "",
+        puestoActual: "",
 
+        practicaFuncional: "",
+        recursividad: "",
+        capacidadAtencion: "",
+
+        estabilidadEmocional: "",
+        flexibilidadEmociones: "",
+        controlImpulsos: "",
+
+        subordinacion: "",
+        adecuacionNormas: "",
+        consideracionTerceros: "",
+        autonomiaTrabajo: "",
+        proactividad: "",
+        capacidadPresion: "",
+        evaluacionRiesgos: "",
+        motivacionCargo: "",
+
+        analisisResultados: "",
+        recomendaciones: "",
+
+        conclusion: "",
+    }
     const {
         form,
         setForm,
@@ -32,8 +57,6 @@ const AversionRiesgo = () => {
         handleChangeNumber,
         handleRadioButton,
         handleChangeSimple,
-        handleRadioButtonBoolean,
-        handleCheckBoxChange,
         handleClear,
         handleClearnotO,
         handlePrintDefault,
@@ -56,56 +79,50 @@ const AversionRiesgo = () => {
         });
     };
 
-    return(
-        <>
-            <div className="mx-auto bg-white ">
-                <div className="flex h-full">
-                {/* Contenido principal - 100% */}
-                <div className="w-full">
-                    <div className="w-full">
-                    {/* Datos del trabajador */}
-                    <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <InputTextOneLine
+    return (
+        <div className="px-4 space-y-3">
+            <SectionFieldset legend="Información del Examen">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <InputTextOneLine
                         label="N° Orden"
                         name="norden"
                         value={form?.norden}
                         onChange={handleChangeNumber}
                         onKeyUp={handleSearch}
-                        />
-                        <InputTextOneLine
+                    />
+                    <InputTextOneLine
                         label="Fecha"
                         name="fechaExam"
                         type="date"
                         value={form?.fechaExam}
                         onChange={handleChangeSimple}
-                        />
-                    </section>
-        
-                    {/* Información del trabajador */}
-                    <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 gap-4">
-                        <h3 className="text-lg font-semibold mb-3">Datos del Paciente</h3>
-                        {/* Fila 1: Nombres, DNI, Edad, Género */}
-                        <div className="grid grid-cols-1 md:grid-cols-2  gap-3 mb-3">
+                    />
+                </div>
+            </SectionFieldset>
+
+            <SectionFieldset legend="Datos del Paciente" >
+                {/* Fila 1: Nombres, DNI, Edad, Género */}
+                <div className="grid grid-cols-1 md:grid-cols-2  gap-3 mb-3">
+                    <InputTextOneLine
+                        label="Nombres y Apellidos"
+                        name="nombres"
+                        value={form?.nombres}
+                        disabled
+                    />
+                    <div className="grid grid-cols-3 gap-4">
                         <InputTextOneLine
-                            label="Nombres y Apellidos"
-                            name="nombres"
-                            value={form?.nombres}
-                            disabled
-                        />
-                        <div className="grid grid-cols-3 gap-4">
-                            <InputTextOneLine
                             label="DNI"
                             name="dni"
                             value={form?.dni}
                             disabled
-                            />
-                            <InputTextOneLine
+                        />
+                        <InputTextOneLine
                             label="Edad"
                             name="edad"
                             value={form?.edad}
                             disabled
-                            />
-                            <InputTextOneLine
+                        />
+                        <InputTextOneLine
                             label="Sexo"
                             name="sexo"
                             value={form?.sexo}
@@ -255,7 +272,7 @@ const AversionRiesgo = () => {
                                 </button>
                                 </div>
                                 <div className="flex flex-col items-end">
-                                <span className="font-bold italic text-base mb-1">Imprimir</span>
+                                <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
                                 <div className="flex items-center gap-2">
                                     <input
                                     name="norden"
@@ -284,5 +301,3 @@ const AversionRiesgo = () => {
         </>
     )
 }
-
-export default AversionRiesgo

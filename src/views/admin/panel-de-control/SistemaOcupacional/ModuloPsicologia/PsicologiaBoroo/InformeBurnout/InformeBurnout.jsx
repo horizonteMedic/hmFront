@@ -3,8 +3,8 @@ import { faSave, faPrint, faBroom } from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
     InputTextArea,
-    InputsBooleanRadioGroup,
 } from "../../../../../../components/reusableComponents/ResusableComponents";
+import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
@@ -81,11 +81,10 @@ export default function InformeBurnout() {
     };
 
     return (
-        <div className="space-y-6 px-4 pt-4">
+        <div className="px-4 space-y-3">
             {/* Header con información del examen */}
             <div className="w-full space-y-3">
-                {/* Header */}
-                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                <SectionFieldset legend="Información del Examen">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                         <InputTextOneLine
                             label="N° Orden"
@@ -110,13 +109,10 @@ export default function InformeBurnout() {
                             disabled
                             labelWidth="120px"
                         />
-
                     </div>
-                </div>
+                </SectionFieldset>
 
-                {/* Datos Personales */}
-                <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
-                    <legend className="font-bold mb-3 text-[10px]">Datos Personales</legend>
+                <SectionFieldset legend="Datos Personales">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div className="space-y-3">
                             <InputTextOneLine label="Nombres" name="nombres" value={form.nombres} disabled labelWidth="160px" />
@@ -132,11 +128,9 @@ export default function InformeBurnout() {
                             <InputTextOneLine label="Lugar Nacimiento" name="lugarNacimiento" value={form.lugarNacimiento} disabled labelWidth="160px" />
                         </div>
                     </div>
-                </fieldset>
+                </SectionFieldset>
 
-                {/* Datos Laborales */}
-                <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
-                    <legend className="font-bold mb-3 text-[10px]">Datos Laborales</legend>
+                <SectionFieldset legend="Datos Laborales">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div className="space-y-3">
                             <InputTextOneLine label="Ocupación" name="ocupacion" value={form.ocupacion} disabled labelWidth="160px" />
@@ -147,13 +141,10 @@ export default function InformeBurnout() {
                             <InputTextOneLine label="Contrata" name="contrata" value={form.contrata} disabled labelWidth="160px" />
                         </div>
                     </div>
-                </fieldset>
+                </SectionFieldset>
             </div>
 
-
-            {/* Criterios Psicológicos */}
-            <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
-                <legend className="font-bold mb-3 text-[10px]">Criterios Psicológicos</legend>
+            <SectionFieldset legend="Criterios Psicológicos">
                 <div className="space-y-4">
                     <InputTextOneLine
                         label="Síndrome de Burnout"
@@ -189,11 +180,9 @@ export default function InformeBurnout() {
                         </div>
                     </div>
                 </div>
-            </fieldset>
+            </SectionFieldset>
 
-            {/* Resultados */}
-            <fieldset className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
-                <legend className="font-bold mb-3 text-[10px]">Conclusiones Finales</legend>
+            <SectionFieldset legend="Conclusiones Finales" className="space-y-3">
                 <InputTextArea
                     label="Resultados"
                     name="resultados"
@@ -217,7 +206,7 @@ export default function InformeBurnout() {
                         rows={4}
                     />
                 </div>
-            </fieldset>
+            </SectionFieldset>
 
             {/* Acciones */}
             <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-4">

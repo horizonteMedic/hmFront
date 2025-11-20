@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faListCheck, faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
 import { InputTextOneLine } from "../../../../../../components/reusableComponents/ResusableComponents";
+import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 import { useForm } from "../../../../../../hooks/useForm";
 import { getToday } from "../../../../../../utils/helpers";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
@@ -98,84 +99,79 @@ export default function CalidadDeSueno() {
     const ActiveComponent = tabs[activeTab]?.component || (() => null);
 
     return (
-        <div className="mx-auto bg-white">
-            <div className="flex h-full">
-                {/* Contenido principal - ancho completo */}
-                <div className="w-full">
-                    <div className="w-full">
-                        {/* Datos del trabajador */}
-                        <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <InputTextOneLine
-                                label="N° Orden"
-                                name="norden"
-                                value={form?.norden}
-                                onChange={handleChangeNumber}
-                                onKeyUp={handleSearch}
-                            />
-                            <InputTextOneLine
-                                label="Fecha"
-                                name="fechaExam"
-                                type="date"
-                                value={form?.fechaExam}
-                                onChange={handleChange}
-                            />
-                            <InputTextOneLine
-                                label="Tipo de Examen"
-                                name="nombreExamen"
-                                value={form?.nombreExamen}
-                                disabled
-                            />
-                        </section>
+        <div className="px-4 space-y-3">
+            <SectionFieldset legend="Información del Examen" className="m-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form?.norden}
+                        onChange={handleChangeNumber}
+                        onKeyUp={handleSearch}
+                    />
+                    <InputTextOneLine
+                        label="Fecha"
+                        name="fechaExam"
+                        type="date"
+                        value={form?.fechaExam}
+                        onChange={handleChange}
+                    />
+                    <InputTextOneLine
+                        label="Tipo de Examen"
+                        name="nombreExamen"
+                        value={form?.nombreExamen}
+                        disabled
+                    />
+                </div>
+            </SectionFieldset>
 
-                        {/* Información del trabajador */}
-                        <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 gap-4">
-                            <h3 className="text-lg font-semibold mb-3">Datos del Paciente</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                                <InputTextOneLine label="Nombres y Apellidos" name="nombres" value={form?.nombres} disabled />
-                                <div className="grid grid-cols-3 gap-4">
-                                    <InputTextOneLine label="DNI" name="dni" value={form?.dni} disabled />
-                                    <InputTextOneLine label="Edad" name="edad" value={form?.edad} disabled />
-                                    <InputTextOneLine label="Sexo" name="sexo" value={form?.sexo} disabled />
-                                </div>
-                                <InputTextOneLine label="Empresa" name="empresa" value={form?.empresa} disabled />
-                                <InputTextOneLine label="Contrata" name="contrata" value={form?.contrata} disabled />
-                                <InputTextOneLine label="Area de Trabajo" name="puestoPostula" value={form?.puestoPostula} disabled />
-                                <InputTextOneLine label="Puesto de Trabajo" name="puestoActual" value={form?.puestoActual} disabled />
-                                <InputTextOneLine label="Grado de Instruccion" name="gradoInstruccion" value={form?.gradoInstruccion} disabled />
-                            </div>
-                        </section>
+            <SectionFieldset legend="Datos del Paciente" className="m-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                    <InputTextOneLine label="Nombres y Apellidos" name="nombres" value={form?.nombres} disabled />
+                    <div className="grid grid-cols-3 gap-4">
+                        <InputTextOneLine label="DNI" name="dni" value={form?.dni} disabled />
+                        <InputTextOneLine label="Edad" name="edad" value={form?.edad} disabled />
+                        <InputTextOneLine label="Sexo" name="sexo" value={form?.sexo} disabled />
+                    </div>
+                    <InputTextOneLine label="Empresa" name="empresa" value={form?.empresa} disabled />
+                    <InputTextOneLine label="Contrata" name="contrata" value={form?.contrata} disabled />
+                    <InputTextOneLine label="Area de Trabajo" name="puestoPostula" value={form?.puestoPostula} disabled />
+                    <InputTextOneLine label="Puesto de Trabajo" name="puestoActual" value={form?.puestoActual} disabled />
+                    <InputTextOneLine label="Grado de Instruccion" name="gradoInstruccion" value={form?.gradoInstruccion} disabled />
+                </div>
+            </SectionFieldset>
 
-                        {/* Navegación de pestañas */}
-                        <nav className="flex bg-white border-b border-gray-200 sticky top-0 z-20">
-                            {tabs.map((tab) => (
-                                <button
-                                    key={tab.id}
-                                    className={`flex-1 px-4 py-3 uppercase tracking-wider text=[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${activeTab === tab.id
-                                        ? "border-[#233245] text-[#233245] font-semibold"
-                                        : "border-transparent"
-                                        }`}
-                                    onClick={() => setActiveTab(tab.id)}
-                                >
-                                    <FontAwesomeIcon icon={tab.icon} className="mr-2" />
-                                    {tab.name}
-                                </button>
-                            ))}
-                        </nav>
+            {/* Navegación de pestañas */}
+            <nav className="flex bg-white border-b border-gray-200 sticky top-0 z-20">
+                {tabs.map((tab) => (
+                    <button
+                        key={tab.id}
+                        className={`flex-1 px-4 py-3 uppercase tracking-wider text=[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${activeTab === tab.id
+                            ? "border-[#233245] text-[#233245] font-semibold"
+                            : "border-transparent"
+                            }`}
+                        onClick={() => setActiveTab(tab.id)}
+                    >
+                        <FontAwesomeIcon icon={tab.icon} className="mr-2" />
+                        {tab.name}
+                    </button>
+                ))}
+            </nav>
 
-                        {/* Contenido de la pestaña activa */}
-                        <div className="px-4 pt-4">
-                            <ActiveComponent
-                                form={form}
-                                setForm={setForm}
-                                handleChange={handleChange}
-                                handleChangeNumber={handleChangeNumber}
-                                handleClear={handleClear}
-                                handleSave={handleSave}
-                                handlePrint={handlePrint}
-                                handleRadioButton={handleRadioButton}
-                                handleChangeSimple={handleChangeSimple}
-                            />
-                        </div>
+            {/* Contenido de la pestaña activa */}
+            <div className="px-4 pt-4">
+                <ActiveComponent
+                    form={form}
+                    setForm={setForm}
+                    handleChange={handleChange}
+                    handleChangeNumber={handleChangeNumber}
+                    handleClear={handleClear}
+                    handleSave={handleSave}
+                    handlePrint={handlePrint}
+                    handleRadioButton={handleRadioButton}
+                    handleChangeSimple={handleChangeSimple}
+                />
+            </div>
 
                         {/* Acciones */}
                         <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-4 pt-4">
@@ -196,7 +192,7 @@ export default function CalidadDeSueno() {
                                 </button>
                             </div>
                             <div className="flex flex-col items-end">
-                                <span className="font-bold italic text-base mb-1">Imprimir</span>
+                                <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
                                 <div className="flex items-center gap-2">
                                     <input
                                         name="norden"

@@ -48,7 +48,10 @@ export const GetInfoServicio = async (
         const imc = res.imcTriaje ?? "";
         let obesidadIMC30 = false;
         let imcRed = false;
-        let nuevasObservaciones = "";
+        let nuevasObservaciones = (res.diagnosticoAudiometria ?? "").toUpperCase();
+        if (nuevasObservaciones != "") {
+            nuevasObservaciones += "\n";
+        }
         if (imc) {
             const imcValue = parseFloat(imc);
             if (!isNaN(imcValue) && imcValue > 25) {
@@ -74,7 +77,7 @@ export const GetInfoServicio = async (
         const vcercacod = res.oftalodccmologia_odcc || "";
         const vcercacoi = res.oiccoftalmologia_oicc || "";
         const textoEnfermedadOftalmo = (res.enfermedadesocularesoftalmo_e_oculares ?? "").trim().toUpperCase();
-        console.log({ vlejoscod, vlejoscoi, vcercacod, vcercacoi, textoEnfermedadOftalmo })
+
 
         if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
             const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
@@ -85,6 +88,20 @@ export const GetInfoServicio = async (
                     ? "CORREGIR AGUDEZA VISUAL.\n"
                     : "USO DE LENTES CORRECTORES.\n";
             }
+        }
+        const promedioOidoDerecho = res.promedioOidoDerecho ?? 0;
+        const promedioOidoIzquierdo = res.promedioOidoIzquierdo ?? 0;
+        let oidoMayor40 = false;
+        if (promedioOidoDerecho > 40 || promedioOidoIzquierdo > 40) {
+            oidoMayor40 = true;
+        }
+
+        let anemia = false;
+        const hemoglobina = parseFloat(res.laboratorioClinicoHemoglobina);
+
+        if (!isNaN(hemoglobina)) {
+            const umbral = res.sexoPaciente === "M" ? 13 : 12;
+            anemia = hemoglobina < umbral;
         }
 
         set((prev) => ({
@@ -113,6 +130,10 @@ export const GetInfoServicio = async (
             vb: res.vboftalmologia_vb ?? "",
             rp: res.rpoftalmologia_rp ?? "",
             enfermedadesOculares: res.enfermedadesocularesoftalmo_e_oculares ?? "",
+
+            hipoacusiaFrecuenciasConversacionales: oidoMayor40,
+            conclusion: oidoMayor40 ? "NO APTO" : null,
+            anemiaCriteriosOMS2011: anemia,
             //==========================TAB EXAMEN FISICO===========================
             // Examen Médico - Medidas Antropométricas y Signos Vitales
             frecuenciaCardiaca: res.frecuenciaCardiaca ?? "",
@@ -408,7 +429,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             //Necesita Agudeza visual 
             Swal.fire(
                 "Alerta",
-                "El paciente necesita pasar por Triaje.",
+                "El paciente necesita pasar por Ficha SAS.",
                 "warning"
             );
         }
