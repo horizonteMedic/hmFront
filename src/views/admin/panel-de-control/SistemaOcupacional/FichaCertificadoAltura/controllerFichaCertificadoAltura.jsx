@@ -74,7 +74,7 @@ export const GetInfoServicio = async (
         const vcercacod = res.oftalodccmologia_odcc || "";
         const vcercacoi = res.oiccoftalmologia_oicc || "";
         const textoEnfermedadOftalmo = (res.enfermedadesocularesoftalmo_e_oculares ?? "").trim().toUpperCase();
-        console.log({ vlejoscod, vlejoscoi, vcercacod, vcercacoi, textoEnfermedadOftalmo })
+
 
         if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
             const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
@@ -86,6 +86,13 @@ export const GetInfoServicio = async (
                     : "USO DE LENTES CORRECTORES.\n";
             }
         }
+        const promedioOidoDerecho = res.promedioOidoDerecho ?? 0;
+        const promedioOidoIzquierdo = res.promedioOidoIzquierdo ?? 0;
+        let oidoMayor40 = false;
+        if (promedioOidoDerecho > 40 || promedioOidoIzquierdo > 40) {
+            oidoMayor40 = true;
+        }
+        console.log({ oidoMayor40})
 
         set((prev) => ({
             ...prev,
@@ -113,6 +120,9 @@ export const GetInfoServicio = async (
             vb: res.vboftalmologia_vb ?? "",
             rp: res.rpoftalmologia_rp ?? "",
             enfermedadesOculares: res.enfermedadesocularesoftalmo_e_oculares ?? "",
+
+            hipoacusiaFrecuenciasConversacionales: oidoMayor40,
+            conclusion: oidoMayor40 ? "NO APTO" : null,
             //==========================TAB EXAMEN FISICO===========================
             // Examen Médico - Medidas Antropométricas y Signos Vitales
             frecuenciaCardiaca: res.frecuenciaCardiaca ?? "",

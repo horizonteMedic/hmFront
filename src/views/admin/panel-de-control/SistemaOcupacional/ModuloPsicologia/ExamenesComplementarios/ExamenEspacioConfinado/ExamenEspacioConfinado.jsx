@@ -7,6 +7,7 @@ import {
     InputsRadioGroup,
     RadioTable,
 } from "../../../../../../components/reusableComponents/ResusableComponents";
+import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
@@ -126,8 +127,7 @@ export default function ExamenEspacioConfinado() {
 
     return (
         <div className="space-y-6 px-4 pt-4">
-            {/* Header con información del examen */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4 ">
+            <SectionFieldset legend="Información del Examen">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
                     <InputTextOneLine
                         label="N° Orden"
@@ -163,10 +163,8 @@ export default function ExamenEspacioConfinado() {
                         />
                     </div>
                 </div>
-            </div>
-            {/* Contenido principal */}
-            <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
-                <legend className="font-bold mb-3 text-[10px]">Datos Personales</legend>
+            </SectionFieldset>
+            <SectionFieldset legend="Datos Personales">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {/* Columna Izquierda */}
                     <div className="space-y-3">
@@ -232,9 +230,8 @@ export default function ExamenEspacioConfinado() {
                         />
                     </div>
                 </div>
-            </fieldset>
-            <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
-                <legend className="font-bold mb-3 text-[10px]">Datos Laborales</legend>
+            </SectionFieldset>
+            <SectionFieldset legend="Datos Laborales">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
                     <InputTextOneLine
                         label="Empresa"
@@ -265,24 +262,19 @@ export default function ExamenEspacioConfinado() {
                         labelWidth="120px"
                     />
                 </div>
-            </fieldset>
+            </SectionFieldset>
 
-            {/* Criterios Psicológicos */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Aspecto Intelectual */}
-                <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
-                    <legend className="font-bold mb-3 text-[10px]">Aspecto Intelectual:</legend>
+                <SectionFieldset legend="Aspecto Intelectual">
                     <RadioTable
                         items={aspectoIntelectualItems}
                         options={aspectoIntelectualOptions}
                         form={form}
                         handleRadioButton={handleRadioButton}
                     />
-                </fieldset>
+                </SectionFieldset>
 
-                {/* Aspectos Personalidad */}
-                <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
-                    <legend className="font-bold mb-3 text-[10px]">Aspectos Personalidad:</legend>
+                <SectionFieldset legend="Aspectos Personalidad">
                     <div className="space-y-8">
                         <InputsRadioGroup
                             label="1.- ESTABILIDAD EMOCIONAL"
@@ -310,11 +302,9 @@ export default function ExamenEspacioConfinado() {
                             vertical
                         />
                     </div>
-                </fieldset>
+                </SectionFieldset>
 
-                {/* Análisis y Resultados */}
-                <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
-                    <legend className="font-bold mb-3 text-[10px]">Análisis y Resultados:</legend>
+                <SectionFieldset legend="Análisis y Resultados">
                     <div className="space-y-4">
                         <InputTextArea
                             label="ANÁLISIS Y RESULTADOS"
@@ -332,8 +322,8 @@ export default function ExamenEspacioConfinado() {
                                 rows={5}
                             />
                         </div>
-                    </div>
-                </fieldset>
+                        </div>
+                </SectionFieldset>
             </div>
 
             {/* Botones de acción */}

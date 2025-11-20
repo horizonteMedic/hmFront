@@ -29,8 +29,8 @@ const orientacionOptions = [
 ];
 
 export default function FichaPsicologica2() {
-    const { token, userlogued, selectedSede, datosFooter, userCompleto } =
-        useSessionData();
+    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+
     const initialFormState = {
         // Datos personales
         norden: "",
@@ -146,156 +146,130 @@ export default function FichaPsicologica2() {
                     onChange={handleRadioButtonBoolean}
                 />
             </SectionFieldset>
-            {/* Contenido principal */}
-            {/* Datos Necesarios */}
-            <fieldset className="bg-white border border-gray-200 rounded-lg p-3">
-                <legend className="font-bold mb-3 text-[10px]">Datos Personales</legend>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {/* Izquierda */}
-                    <div className="space-y-3">
-                        <InputTextOneLine label="Nombres" name="nombres" value={form.nombres} disabled labelWidth="160px" />
-                        <InputTextOneLine label="Apellidos" name="apellidos" value={form.apellidos} disabled labelWidth="160px" />
-                        <InputTextOneLine label="Fecha Nacimiento" name="fechaNacimiento" value={form.fechaNacimiento} disabled labelWidth="160px" />
-                        <InputTextOneLine label="Lugar Nacimiento" name="lugarNacimiento" value={form.lugarNacimiento} disabled labelWidth="160px" />
-                    </div>
-                    {/* Derecha */}
-                    <div className="space-y-3">
-                        <InputTextOneLine label="Domicilio Actual" name="domicilioActual" value={form.domicilioActual} disabled labelWidth="160px" />
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                            <InputTextOneLine label="Edad (años)" name="edad" value={form.edad} disabled labelWidth="160px" />
-                            <InputTextOneLine label="Sexo" name="sexo" value={form.sexo} disabled labelWidth="160px" />
-                        </div>
-                        <InputTextOneLine label="Estado Civil" name="estadoCivil" value={form.estadoCivil} disabled labelWidth="160px" />
-                        <InputTextOneLine label="Nivel de Estudios" name="nivelEstudios" value={form.nivelEstudios} disabled labelWidth="160px" />
-                    </div>
+            {/* Datos Personales */}
+            <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                    <InputTextOneLine label="Nombres" name="nombres" value={form.nombres} disabled labelWidth="160px" />
+                    <InputTextOneLine label="Apellidos" name="apellidos" value={form.apellidos} disabled labelWidth="160px" />
+                    <InputTextOneLine label="Fecha Nacimiento" name="fechaNacimiento" value={form.fechaNacimiento} disabled labelWidth="160px" />
+                    <InputTextOneLine label="Lugar Nacimiento" name="lugarNacimiento" value={form.lugarNacimiento} disabled labelWidth="160px" />
                 </div>
-            </fieldset>
+                <div className="space-y-3">
+                    <InputTextOneLine label="Domicilio Actual" name="domicilioActual" value={form.domicilioActual} disabled labelWidth="160px" />
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                        <InputTextOneLine label="Edad (años)" name="edad" value={form.edad} disabled labelWidth="160px" />
+                        <InputTextOneLine label="Sexo" name="sexo" value={form.sexo} disabled labelWidth="160px" />
+                    </div>
+                    <InputTextOneLine label="Estado Civil" name="estadoCivil" value={form.estadoCivil} disabled labelWidth="160px" />
+                    <InputTextOneLine label="Nivel de Estudios" name="nivelEstudios" value={form.nivelEstudios} disabled labelWidth="160px" />
+                </div>
+            </SectionFieldset>
 
             {/* Datos Laborales */}
-            <fieldset className="bg-white border border-gray-200 rounded-lg p-3">
-                <legend className="font-bold mb-3 text-[10px]">Datos Laborales</legend>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div className="space-y-3">
-                        <InputTextOneLine label="Ocupación" name="ocupacion" value={form.ocupacion} disabled labelWidth="160px" />
-                        <InputTextOneLine label="Cargo a desempeñar" name="cargoDesempenar" value={form.cargoDesempenar} disabled labelWidth="160px" />
-                    </div>
-                    <div className="space-y-3">
-                        <InputTextOneLine label="Empresa" name="empresa" value={form.empresa} disabled labelWidth="160px" />
-                        <InputTextOneLine label="Contrata" name="contrata" value={form.contrata} disabled labelWidth="160px" />
-                    </div>
+            <SectionFieldset legend="Datos Laborales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                    <InputTextOneLine label="Ocupación" name="ocupacion" value={form.ocupacion} disabled labelWidth="160px" />
+                    <InputTextOneLine label="Cargo a desempeñar" name="cargoDesempenar" value={form.cargoDesempenar} disabled labelWidth="160px" />
                 </div>
-            </fieldset>
-            <div className="grid grid-cols-2 gap-3">
-                <div className="grid gap-3">
+                <div className="space-y-3">
+                    <InputTextOneLine label="Empresa" name="empresa" value={form.empresa} disabled labelWidth="160px" />
+                    <InputTextOneLine label="Contrata" name="contrata" value={form.contrata} disabled labelWidth="160px" />
+                </div>
+            </SectionFieldset>
+            <div className="grid md:grid-cols-2 gap-3">
+                <div className="space-y-3">
                     {/* Motivo Evaluación */}
-                    <section className="bg-white border border-gray-200 rounded-lg p-3">
+                    <SectionFieldset legend="Motivo Evaluación" fieldsetClassName="border-gray-200 rounded-lg">
                         <InputTextArea
-                            label="Motivo Evaluación"
                             rows={4}
                             name="motivoEvaluacion"
                             value={form.motivoEvaluacion}
                             onChange={handleChange}
                         />
-                    </section>
+                    </SectionFieldset>
 
                     {/* Observación de Conductas */}
-                    <section className="bg-white border border-gray-200 rounded-lg p-3">
-                        <h4 className="font-semibold mb-2">Observación de Conductas</h4>
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-                            {/* Presentación */}
-                            <div className="border rounded p-3">
-                                <h5 className="font-semibold mb-2">Presentación</h5>
-                                <InputsRadioGroup
-                                    name="presentacion"
-                                    value={form.presentacion}
-                                    vertical
-                                    onChange={handleRadioButton}
-                                    options={[
-                                        { label: "Adecuado", value: "ADECUADO" },
-                                        { label: "Inadecuado", value: "INADECUADO" },
-                                    ]}
-                                />
-                            </div>
+                    <SectionFieldset legend="Observación de Conductas" className="grid xl:grid-cols-4 gap-4">
+                        <SectionFieldset legend="Presentación">
+                            <InputsRadioGroup
+                                name="presentacion"
+                                value={form.presentacion}
+                                vertical
+                                onChange={handleRadioButton}
+                                options={[
+                                    { label: "Adecuado", value: "ADECUADO" },
+                                    { label: "Inadecuado", value: "INADECUADO" },
+                                ]}
+                            />
+                        </SectionFieldset>
 
-                            {/* Postura */}
-                            <div className="border rounded p-3">
-                                <h5 className="font-semibold mb-2">Postura</h5>
-                                <InputsRadioGroup
-                                    name="postura"
-                                    value={form.postura}
-                                    vertical
-                                    onChange={handleRadioButton}
-                                    options={[
-                                        { label: "Erguida", value: "ERGUIDA" },
-                                        { label: "Encorvada", value: "ENCORVADA" },
-                                    ]}
-                                />
-                            </div>
+                        <SectionFieldset legend="Postura">
+                            <InputsRadioGroup
+                                name="postura"
+                                value={form.postura}
+                                vertical
+                                onChange={handleRadioButton}
+                                options={[
+                                    { label: "Erguida", value: "ERGUIDA" },
+                                    { label: "Encorvada", value: "ENCORVADA" },
+                                ]}
+                            />
+                        </SectionFieldset>
 
-                            {/* Discurso - Ritmo */}
-                            <div className="border rounded p-3">
-                                <h5 className="font-semibold mb-2">Discurso: Ritmo</h5>
-                                <InputsRadioGroup
-                                    name="discursoRitmo"
-                                    value={form.discursoRitmo}
-                                    onChange={handleRadioButton}
-                                    vertical
-                                    options={[
-                                        { label: "Lento", value: "LENTO" },
-                                        { label: "Rápido", value: "RAPIDO" },
-                                        { label: "Fluido", value: "FLUIDO" },
-                                    ]}
-                                />
-                            </div>
+                        <SectionFieldset legend="Discurso: Ritmo">
+                            <InputsRadioGroup
+                                name="discursoRitmo"
+                                value={form.discursoRitmo}
+                                onChange={handleRadioButton}
+                                vertical
+                                options={[
+                                    { label: "Lento", value: "LENTO" },
+                                    { label: "Rápido", value: "RAPIDO" },
+                                    { label: "Fluido", value: "FLUIDO" },
+                                ]}
+                            />
+                        </SectionFieldset>
 
-                            {/* Discurso - Tono */}
-                            <div className="border rounded p-3">
-                                <h5 className="font-semibold mb-2">Discurso: Tono</h5>
-                                <InputsRadioGroup
-                                    name="discursoTono"
-                                    value={form.discursoTono}
-                                    onChange={handleRadioButton}
-                                    vertical
-                                    options={[
-                                        { label: "Bajo", value: "BAJO" },
-                                        { label: "Moderado", value: "MODERADO" },
-                                        { label: "Alto", value: "ALTO" },
-                                    ]}
-                                />
-                            </div>
+                        <SectionFieldset legend="Discurso: Tono">
+                            <InputsRadioGroup
+                                name="discursoTono"
+                                value={form.discursoTono}
+                                onChange={handleRadioButton}
+                                vertical
+                                options={[
+                                    { label: "Bajo", value: "BAJO" },
+                                    { label: "Moderado", value: "MODERADO" },
+                                    { label: "Alto", value: "ALTO" },
+                                ]}
+                            />
+                        </SectionFieldset>
 
-                            {/* Discurso - Articulación */}
-                            <div className="border rounded p-3">
-                                <h5 className="font-semibold mb-2">Discurso: Articulación</h5>
-                                <InputsRadioGroup
-                                    name="discursoArticulacion"
-                                    value={form.discursoArticulacion}
-                                    onChange={handleRadioButton}
-                                    vertical
-                                    options={[
-                                        { label: "Con dificultad", value: "CON_DIFICULTAD" },
-                                        { label: "Sin dificultad", value: "SIN_DIFICULTAD" },
-                                    ]}
-                                />
-                            </div>
+                        <SectionFieldset legend="Discurso: Articulación">
+                            <InputsRadioGroup
+                                name="discursoArticulacion"
+                                value={form.discursoArticulacion}
+                                onChange={handleRadioButton}
+                                vertical
+                                options={[
+                                    { label: "Con dificultad", value: "CON_DIFICULTAD" },
+                                    { label: "Sin dificultad", value: "SIN_DIFICULTAD" },
+                                ]}
+                            />
+                        </SectionFieldset>
 
-                            {/* Orientación */}
-                            <div className="border rounded p-3 col-span-3">
-                                <h5 className="font-semibold mb-4">Orientación</h5>
-                                <RadioTable
-                                    items={orientacionItems}
-                                    options={orientacionOptions}
-                                    form={form}
-                                    handleRadioButton={handleRadioButton}
-                                    labelColumns={1}
-                                />
-                            </div>
-                        </div>
-                    </section>
+                        <SectionFieldset legend="Orientación" fieldsetClassName="md:col-span-3">
+                            <RadioTable
+                                items={orientacionItems}
+                                options={orientacionOptions}
+                                form={form}
+                                handleRadioButton={handleRadioButton}
+                                labelColumns={1}
+                            />
+                        </SectionFieldset>
+                    </SectionFieldset>
                 </div>
                 {/* Resultados de Evaluación */}
-                <section className="bg-white border border-gray-200 rounded-lg p-3">
-                    <h4 className="font-semibold mb-2">Resultados de Evaluación</h4>
+                <SectionFieldset legend="Resultados de Evaluación" fieldsetClassName="border-gray-200 rounded-lg">
                     <div className="grid gap-4">
                         <InputTextOneLine
                             label="Nivel Intelectual"
@@ -333,21 +307,19 @@ export default function FichaPsicologica2() {
                             onChange={handleChange}
                         />
                     </div>
-                </section>
+                </SectionFieldset>
             </div>
             {/* Recomendaciones y Conclusiones */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="bg-white border border-gray-200 rounded-lg p-3">
-                    <h4 className="font-semibold mb-2">Recomendaciones</h4>
+                <SectionFieldset legend="Recomendaciones" fieldsetClassName="border-gray-200 rounded-lg">
                     <InputTextArea
                         rows={9}
                         name="recomendaciones"
                         value={form.recomendaciones}
                         onChange={handleChange}
                     />
-                </div>
-                <div className="bg-white border border-gray-200 rounded-lg p-3">
-                    <h4 className="font-semibold mb-2">Conclusiones</h4>
+                </SectionFieldset>
+                <SectionFieldset legend="Conclusiones" fieldsetClassName="border-gray-200 rounded-lg">
                     <div className="space-y-3">
                         <InputTextArea
                             rows={4}
@@ -364,7 +336,7 @@ export default function FichaPsicologica2() {
                             onChange={handleChange}
                         />
                     </div>
-                </div>
+                </SectionFieldset>
             </div>
             <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
                 <div className="flex gap-4">
