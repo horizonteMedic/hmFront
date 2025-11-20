@@ -262,6 +262,8 @@ export const GetInfoServicioEditar = async (
 
             // Examen Físico - Información Adicional
             detalleInformacionExamenFisico: res.detalleInformacion_d_informacion ?? "",
+
+            user_medicoFirma: res.usuarioFirma,
             //===============PARTE INFERIOR=======================
             // Conclusión y Comentarios
             aptoDesde: res.fechaDesde_f_desde ?? today,
@@ -377,6 +379,8 @@ export const SubmitDataService = async (
         antecedentesInsuficienciaRenalCronicaNo: !form.insuficienciaRenalCronicaGradoIV,
         antecedentesAnemiaCualquierGradoSi: form.anemiaCriteriosOMS2011,
         antecedentesAnemiaCualquierGradoNo: !form.anemiaCriteriosOMS2011,
+
+        usuarioFirma: form.user_medicoFirma,
         usuarioRegistro: user,
     };
 

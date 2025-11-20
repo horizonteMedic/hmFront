@@ -58,6 +58,8 @@ export const GetInfoServicio = async (
 
             hta_nueva: htaNueva,
             observaciones: res.conclusionObservaciones_txtobservaciones ?? "",
+
+
         }));
     }
 };
@@ -178,7 +180,8 @@ export const GetInfoServicioEditar = async (
             // Apto con bajo riesgo de Apnea del sueño
             apto_bajo_riesgo: res.conclusionAptoBajoRiesgoSi_chkaptobajosi ?? false,
             observaciones: res.conclusionObservaciones_txtobservaciones ?? "",
-            nombre_medico: res.nombreMedico ?? "",
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -302,6 +305,8 @@ export const SubmitDataService = async (
         conclusionAptoCriterioENo: !form.criterio_e,
         conclusionAptoCriterioCSi: form.criterio_c,
         conclusionAptoCriterioCNo: !form.criterio_c,
+
+        usuarioFirma: form.user_medicoFirma,
         usuarioRegistrar: user,
     };
 

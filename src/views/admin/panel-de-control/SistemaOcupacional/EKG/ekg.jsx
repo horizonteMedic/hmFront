@@ -14,12 +14,13 @@ import {
 } from "./controllerEKG";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getToday } from "../../../../utils/helpers";
+import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "informe_electrocardiograma";
 const today = getToday();
 
 export default function EKG() {
-  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+  const { token, userlogued, selectedSede, datosFooter,userName } = useSessionData();
 
   const initialFormState = {
     norden: "",
@@ -49,6 +50,10 @@ export default function EKG() {
     nombres_search: "",
     codigo_search: "",
     usuario: userlogued,
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
   const {
@@ -56,6 +61,7 @@ export default function EKG() {
     setForm,
     handleChange,
     handleChangeNumber,
+    handleChangeSimple,
     handleCheckBoxChange,
     handleClear,
     handleClearnotO,
@@ -557,6 +563,11 @@ export default function EKG() {
                   placeholder="Describa las recomendaciones..."
                 />
               </div>
+              <EmpleadoComboBox
+                                      value={form.nombre_medico}
+                                      form={form}
+                                      onChange={handleChangeSimple}
+                                  />
             </div>
           </div>
           {/* BOTONES DE ACCIÓN */}
