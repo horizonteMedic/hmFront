@@ -288,7 +288,7 @@ export default function Consentimiento_Panel4d_Digitalizado(datos = {}) {
     
     // Siempre mostrar la firma de prueba
     const sigW = 70;
-    const sigH = 30;
+    const sigH = 23;
     const sigX = centerXP - sigW / 2;
     const sigY = lineYP - sigH;
 

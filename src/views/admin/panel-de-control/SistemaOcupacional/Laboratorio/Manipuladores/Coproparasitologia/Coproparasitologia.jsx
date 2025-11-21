@@ -11,7 +11,6 @@ import {
 } from "./controllerCoproParasitologia";
 import {
   InputTextOneLine,
-  InputTextArea,
 } from "../../../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 
@@ -53,7 +52,6 @@ const createInitialState = (today) => {
     fecha: today,
     nombres: "",
     edad: "",
-    observaciones: "",
     tipoCoproparasitologico: false,
   };
   muestrasConfig.forEach(({ id }) => {
@@ -335,16 +333,6 @@ export default function Coproparasitologia() {
             );
           })}
         </div>
-      </SectionFieldset>
-
-      <SectionFieldset legend="Observaciones">
-        <InputTextArea
-          label="Observaciones"
-          name="observaciones"
-          value={form.observaciones}
-          onChange={handleChange}
-          rows={4}
-        />
       </SectionFieldset>
 
       <SectionFieldset legend="Asignar Médico">

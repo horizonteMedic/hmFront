@@ -365,7 +365,7 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     // Firma paciente centrada sobre la línea
     if (firmap) {
       const sigW = 70;
-      const sigH = 30;
+      const sigH = 23;
       const sigX = centerXP - sigW / 2 -20;
       const sigY = lineYP - sigH;
 

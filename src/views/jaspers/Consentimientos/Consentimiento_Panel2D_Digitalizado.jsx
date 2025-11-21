@@ -279,7 +279,7 @@ export default function Consentimiento_Panel2D_Digitalizado(datos) {
     doc.text('Firma del Paciente', centerXP, lineYP + 6, { align: 'center' });
     if (firmap) {
       const sigW = 70;
-      const sigH = 30;
+      const sigH = 23;
       const sigX = centerXP - sigW / 2;
       const sigY = lineYP - sigH;
 
@@ -342,7 +342,7 @@ export default function Consentimiento_Panel2D_Digitalizado(datos) {
     doc.text('Firma y sello del Consejero', centerX, lineY + 6, { align: 'center' });
     if (sellop) {
       const sigW = 70;
-      const sigH = 30;
+      const sigH = 23;
       const sigX = centerX - sigW / 2;
       const sigY = lineY - sigH;
 
