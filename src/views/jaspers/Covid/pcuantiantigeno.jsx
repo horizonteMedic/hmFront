@@ -1,6 +1,8 @@
 import jsPDF from "jspdf";
-import header_PCuantiAntigeno from "./header/header_PCuantiAntigeno";
-import footer from "../components/footer";
+import CabeceraLogo from "../components/CabeceraLogo.jsx";
+import footerTR from "../components/footerTR.jsx";
+import drawColorBox from "../components/ColorBox.jsx";
+import { getSign } from "../../utils/helpers.js";
 
 // --- Configuración Centralizada ---
 const config = {
@@ -35,35 +37,87 @@ const drawReferenceValues = (doc, y) => {
   return y;
 };
 
+// --- Función para formatear fecha a DD/MM/YYYY ---
+const toDDMMYYYY = (fecha) => {
+  if (!fecha) return '';
+  if (fecha.includes('/')) return fecha; // ya está en formato correcto
+  const [anio, mes, dia] = fecha.split('-');
+  if (!anio || !mes || !dia) return fecha;
+  return `${dia}/${mes}/${anio}`;
+};
+
 // --- Componente Principal ---
 export default function pcuantiantigeno(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
-  console.log("Datos recibidos:", datos);
 
   // === HEADER ===
-  header_PCuantiAntigeno(doc, datos);
-  const sello1 = datos.digitalizacion?.find(
-    (d) => d.nombreDigitalizacion === "FIRMAP"
-  );
-  const sello2 = datos.digitalizacion?.find(
-    (d) => d.nombreDigitalizacion === "HUELLA"
-  );
-  const isValidUrl = (url) => url && url !== "Sin registro";
-  const loadImg = (src) =>
-    new Promise((res, rej) => {
-      const img = new Image();
-      img.src = src;
-      img.crossOrigin = "anonymous";
-      img.onload = () => res(img);
-      img.onerror = () => rej(`No se pudo cargar ${src}`);
+  const drawHeader = () => {
+    CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+    
+    // Número de Ficha
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Nro de ficha: ", pageW - 80, 15);
+    doc.setFont("helvetica", "bold").setFontSize(18);
+    doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
+    
+    // Sede
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
+    
+    // Fecha de examen
+    const fechaExamen = toDDMMYYYY(datos.fechaExamen || datos.fecha_examen || datos.fecha || "");
+    doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
+    
+    // Página
+    doc.text("Pag. 01", pageW - 30, 10);
+
+    // Bloque de color
+    drawColorBox(doc, {
+      color: datos.codigoColor || "#008f39",
+      text: datos.textoColor || "F",
+      x: pageW - 30,
+      y: 10,
+      size: 22,
+      showLine: true,
+      fontSize: 30,
+      textPosition: 0.9
     });
-  Promise.all([
-    isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
-    isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-  ]).then(([s1, s2]) => {
-    // === CUERPO ===
-    let y = 80; // <-- lo subimos de 70 a 80 para bajarlo aún más
+
+    // Datos del paciente (debajo del logo)
+    let dataY = 48;
+    const patientDataX = config.margin;
+    const lineHeight = 6;
+
+    const drawPatientDataRow = (label, value) => {
+      doc.setFontSize(11).setFont("helvetica", "bold");
+      doc.text(label, patientDataX, dataY);
+      doc.setFont("helvetica", "normal");
+      const labelWidth = doc.getTextWidth(label);
+      const extraSpace = label === "Apellidos y Nombres :" ? 8 : 2;
+      doc.text(
+        String(value || "").toUpperCase(),
+        patientDataX + labelWidth + extraSpace,
+        dataY
+      );
+      dataY += lineHeight;
+    };
+
+    drawPatientDataRow("Apellidos y Nombres :", datos.nombres);
+    drawPatientDataRow("Edad :", datos.edad ? `${datos.edad} AÑOS` : "");
+    drawPatientDataRow("DNI :", String(datos.dni || ""));
+    doc.setFontSize(11).setFont("helvetica", "bold");
+    const fechaLabel = "Fecha :";
+    doc.text(fechaLabel, patientDataX, dataY);
+    doc.setFont("helvetica", "normal");
+    const fechaLabelWidth = doc.getTextWidth(fechaLabel);
+    doc.text(fechaExamen, patientDataX + fechaLabelWidth + 2, dataY);
+  };
+
+  drawHeader();
+  
+  // === CUERPO ===
+  let y = 75;
 
     // Título principal
     drawUnderlinedTitle(doc, "PRUEBA CUANTITATIVA DE ANTÍGENOS", y);
@@ -112,95 +166,64 @@ export default function pcuantiantigeno(datos = {}) {
       maxWidth: pageW - 2 * config.margin,
     });
 
-    if (s1) {
-      const canvas = document.createElement("canvas");
-      canvas.width = s1.width;
-      canvas.height = s1.height;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(s1, 0, 0);
-      const selloBase64 = canvas.toDataURL("image/png");
-
-      // Dimensiones del área del sello - Primera firma (más pequeña)
-      const sigW = 60;
-      const sigH = 35;
-      const sigX = (pageW - 160) / 2;
-      const sigY = y + 70;
-
-      // Tamaño máximo dentro del área
-      const maxImgW = sigW - 10;
-      const maxImgH = sigH - 10;
-
-      let imgW = s1.width;
-      let imgH = s1.height;
-
-      const scaleW = maxImgW / imgW;
-      const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1); // para no escalar de más
-
-      imgW *= scale;
-      imgH *= scale;
-
-      // Centramos dentro del rectángulo
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
-
-      // Dibujar el borde si quieres
-
-      // Insertar la imagen del sello
-      doc.addImage(selloBase64, "PNG", imgX, imgY, imgW, imgH);
-
-      // Actualiza Y si después quieres seguir dibujando debajo
+  // Firma y huella digital (centrado, sin cuadros, solo imágenes y textos)
+  y += 13; // Subido 7mm para no chocar con el footer (original y += 20, ahora y += 13)
+  const centroX = pageW / 2;
+  const firmaY = y;
+  
+  // Obtener URLs de firma y huella
+  const firmaUrl = getSign(datos, "FIRMAP");
+  const huellaUrl = getSign(datos, "HUELLA");
+  
+  // Agregar firma del paciente (izquierda del centro)
+  if (firmaUrl) {
+    try {
+      const imgWidth = 30;
+      const imgHeight = 20;
+      const x = centroX - 25; // A la izquierda del centro
+      doc.addImage(firmaUrl, 'PNG', x, firmaY, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando firma del paciente:", error);
     }
-
-    if (s2) {
-      const canvas = document.createElement("canvas");
-      canvas.width = s2.width;
-      canvas.height = s2.height;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(s2, 0, 0);
-      const selloBase64 = canvas.toDataURL("image/png");
-
-      // Dimensiones del área del sello - Segunda firma (más ancha)
-      const sigW = 100;
-      const sigH = 35;
-      const sigX = (pageW - 160) / 2 + 60;
-      const sigY = y + 70;
-
-      // Tamaño máximo dentro del área
-      const maxImgW = sigW - 10;
-      const maxImgH = sigH - 10;
-
-      let imgW = s2.width;
-      let imgH = s2.height;
-
-      const scaleW = maxImgW / imgW;
-      const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1); // para no escalar de más
-
-      imgW *= scale;
-      imgH *= scale;
-
-      // Centramos dentro del rectángulo
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
-
-      // Dibujar el borde si quieres
-
-      // Insertar la imagen del sello
-      doc.addImage(selloBase64, "PNG", imgX, imgY, imgW, imgH);
-
-      // Actualiza Y si después quieres seguir dibujando debajo
+  }
+  
+  // Agregar huella del paciente (derecha de la firma)
+  if (huellaUrl) {
+    try {
+      const imgWidth = 12;
+      const imgHeight = 20;
+      const x = centroX + 5; // A la derecha de la firma
+      doc.addImage(huellaUrl, 'PNG', x, firmaY, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando huella del paciente:", error);
     }
+  }
+  
+  // Línea de firma debajo de las imágenes
+  const lineY = firmaY + 22;
+  doc.setLineWidth(0.2);
+  doc.line(centroX - 30, lineY, centroX + 30, lineY);
+  
+  // Texto "Firma y Huella del Paciente" centrado
+  doc.setFont(config.font, "normal").setFontSize(9);
+  doc.text("Firma y Huella del Paciente", centroX, lineY + 6, { align: "center" });
+  
+  // DNI debajo del texto
+  if (datos.dni) {
+    doc.setFont(config.font, "normal").setFontSize(8);
+    doc.text("DNI:", centroX - 15, lineY + 12);
+    doc.setFont(config.font, "bold").setFontSize(9);
+    doc.text(String(datos.dni || ""), centroX - 8, lineY + 12);
+  }
 
-    // === FOOTER ===
-    footer(doc, datos);
+  // === FOOTER ===
+  footerTR(doc, datos);
 
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    iframe.onload = () => iframe.contentWindow.print();
-  });
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
 }

@@ -116,7 +116,7 @@ export default function Aptitud_Agroindustrial(data = {}) {
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Nro de ficha: ", pageW - 80, 15);
 
-    doc.setFont("helvetica", "bold").setFontSize(18);
+    doc.setFont("helvetica", "normal").setFontSize(18);
     doc.text(datosFinales.numeroFicha, pageW - 50, 16);
     doc.setFont("helvetica", "normal").setFontSize(8);
 

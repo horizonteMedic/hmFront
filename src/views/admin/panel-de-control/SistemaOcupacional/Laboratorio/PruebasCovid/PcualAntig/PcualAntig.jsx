@@ -159,43 +159,43 @@ export default function PcualAntig() {
         <SectionFieldset legend="Información del Examen" className="space-y-4">
           {/* Fila 1: N° Orden, Fecha, MARSA */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <InputTextOneLine
-              label="N° Orden"
-              name="norden"
-              value={form.norden}
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            value={form.norden}
+            onChange={handleChange}
+            onKeyUp={handleSearch}
+            disabled={carga}
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Fecha"
+            name="fecha"
+            type="date"
+            value={form.fecha}
+            onChange={handleChange}
+            labelWidth="120px"
+          />
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="marsa"
+              checked={form.marsa}
               onChange={handleChange}
-              onKeyUp={handleSearch}
-              disabled={carga}
-              labelWidth="120px"
+              className="scale-110"
             />
-            <InputTextOneLine
-              label="Fecha"
-              name="fecha"
-              type="date"
-              value={form.fecha}
-              onChange={handleChange}
-              labelWidth="120px"
-            />
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                name="marsa"
-                checked={form.marsa}
-                onChange={handleChange}
-                className="scale-110"
-              />
-              <span className="font-semibold text-red-600">MARSA</span>
-            </div>
+            <span className="font-semibold text-red-600">MARSA</span>
+          </div>
           </div>
           {/* Fila 2: Nombres y Apellidos, DNI, Edad */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <InputTextOneLine
-              label="Nombres y Apellidos"
-              name="nombres"
-              value={form.nombres}
-              disabled
-              labelWidth="120px"
-            />
+          <InputTextOneLine
+            label="Nombres y Apellidos"
+            name="nombres"
+            value={form.nombres}
+            disabled
+            labelWidth="120px"
+          />
             <InputTextOneLine
               label="DNI"
               name="dni"

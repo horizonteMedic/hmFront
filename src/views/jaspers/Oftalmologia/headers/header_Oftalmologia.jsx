@@ -113,7 +113,7 @@ const header_Oftalmologia = (doc, datos = {}) => {
   }
   
   // Título centrado
-  doc.setFont("helvetica", "bold").setFontSize(18);
+  doc.setFont("helvetica", "normal").setFontSize(18);
   const titulo = "Ficha Oftalmológica";
   const tituloY = y + 40;
   doc.text(titulo, pageW / 2, tituloY, { align: "center" });
