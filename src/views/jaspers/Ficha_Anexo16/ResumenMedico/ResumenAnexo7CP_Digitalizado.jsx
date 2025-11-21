@@ -120,29 +120,29 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
     fechaVencimiento: formatearFechaCorta(data.fechaHastaFichaAnexo16_fecha_hasta),
     // Evaluaciones médicas
     evaluaciones: {
-      oftalmologica: data.enfermedadesocularesoftalmo_e_oculares,
-      auditiva: data.diagnosticoAudiometria_diagnostico,
-      radiografia: data.conclusionesRadiograficas,
+      oftalmologica: data.enfermedadesocularesoftalmo_e_oculares || "N/A",
+      auditiva: data.diagnosticoAudiometria_diagnostico || "N/A",
+      radiografia: data.conclusionesRadiograficas || "N/A",
       espirometria: "NORMAL",
-      electrocardiograma: data.hallazgosInformeElectroCardiograma_hallazgo,
-      dental: data.observacionesOdontograma_txtobservaciones,
+      electrocardiograma: data.hallazgosInformeElectroCardiograma_hallazgo || "N/A",
+      dental: data.observacionesOdontograma_txtobservaciones || "N/A",
       psicologico: data.aptoEvaluacionPsicoPoderosa_rbapto ? "CUMPLE CON EL PERFIL DEL PUESTO" : "NO CUMPLE",
-      trabajosAltura: data.observacionTrabajosAltura_obsvaltura,
-      trabajosCaliente: data.observacionAptitudCaliente_obsvtencaliente,
-      conduccion: data.observacionAptitudConducir_obsvlicencia
+      trabajosAltura: data.observacionTrabajosAltura_obsvaltura || "N/A",
+      trabajosCaliente: data.observacionAptitudCaliente_obsvtencaliente || "N/A",
+      conduccion: data.observacionAptitudConducir_obsvlicencia || "N/A"
     },
     // Laboratorio
     laboratorio: {
-      grupoSanguineo: data.grupoFactorSanguineo_grupofactor,
-      hemoglobina: data.hemoglobinaLaboratorioClinico_txthemoglobina,
-      hematies: data.hematiesematologiaLabClinico_txthematiesematologia,
-      glucosa: data.glucosaLaboratorioClinico_txtglucosabio,
-      cocaina: data.cocainaLaboratorioClinico_txtcocaina,
-      marihuana: data.marihuanaLaboratorioClinico_txtmarihuana,
+      grupoSanguineo: data.grupoFactorSanguineo_grupofactor || "N/A",
+      hemoglobina: data.hemoglobinaLaboratorioClinico_txthemoglobina || "",
+      hematies: data.hematiesematologiaLabClinico_txthematiesematologia || "",
+      glucosa: data.glucosaLaboratorioClinico_txtglucosabio || "",
+      cocaina: data.cocainaLaboratorioClinico_txtcocaina || "N/A",
+      marihuana: data.marihuanaLaboratorioClinico_txtmarihuana || "N/A",
       vdrl: (data.positivoLaboratorioClinico_chkpositivo === true) ? "REACTIVO" : "NO REACTIVO",
-      vsg: data.vsgLaboratorioClinico_txtvsg,
-      colesterol: data.colesterolAnalisisBioquimico_txtcolesterol,
-      trigliceridos: data.trigliseridosAnalisisBioquimico_txttrigliseridos
+      vsg: data.vsgLaboratorioClinico_txtvsg || "",
+      colesterol: data.colesterolAnalisisBioquimico_txtcolesterol || "",
+      trigliceridos: data.trigliseridosAnalisisBioquimico_txttrigliseridos || ""
     },
     // Conclusiones y recomendaciones
     conclusion: data.conclusionAnexo7c_txtconclusion,
@@ -198,8 +198,13 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   // === FUNCIONES AUXILIARES ===
   // Función para texto con salto de línea
   const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
+    // Validar que el texto no sea undefined, null o vacío
+    if (!texto || texto === null || texto === undefined) {
+      return y;
+    }
+    
     const fontSize = doc.internal.getFontSize();
-    const palabras = texto.split(' ');
+    const palabras = String(texto).split(' ');
     let lineaActual = '';
     let yPos = y;
     
@@ -243,6 +248,11 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
 
   // Función mejorada para manejar textos con saltos de línea numerados
   const dibujarTextoConSaltosLinea = (texto, x, y, anchoMaximo) => {
+    // Validar que el texto no sea undefined, null o vacío
+    if (!texto || texto === null || texto === undefined) {
+      return y;
+    }
+    
     const fontSize = doc.internal.getFontSize();
     let yPos = y;
     
@@ -386,62 +396,62 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 40, yTexto + 1.5, tablaAncho - 40);
+  dibujarTextoConSaltoLinea(datosFinales.apellidosNombres || "", tablaInicioX + 40, yTexto + 1.5, tablaAncho - 40);
   yTexto += filaAltura;
 
   // Segunda fila: DNI, Edad, Sexo, Fecha Nac.
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("DNI:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.documentoIdentidad, tablaInicioX + 12, yTexto + 1.5);
+  doc.text(datosFinales.documentoIdentidad || "", tablaInicioX + 12, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Edad:", tablaInicioX + 47, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.edad + " Años", tablaInicioX + 58, yTexto + 1.5);
+  doc.text((datosFinales.edad || "") + " Años", tablaInicioX + 58, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Sexo:", tablaInicioX + 92, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.sexo, tablaInicioX + 105, yTexto + 1.5);
+  doc.text(datosFinales.sexo || "", tablaInicioX + 105, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Fecha Nac.:", tablaInicioX + 137, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.fechaNacimiento, tablaInicioX + 155, yTexto + 1.5);
+  doc.text(datosFinales.fechaNacimiento || "", tablaInicioX + 155, yTexto + 1.5);
   yTexto += filaAltura;
 
   // Tercera fila: Domicilio
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Domicilio:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.direccionPaciente, tablaInicioX + 25, yTexto + 1.5, 160);
+  dibujarTextoConSaltoLinea(datosFinales.direccionPaciente || "", tablaInicioX + 25, yTexto + 1.5, 160);
   yTexto += filaAltura;
 
   // Cuarta fila: Puesto de Trabajo, Área de Trabajo
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.puestoTrabajo, tablaInicioX + 30, yTexto + 1.5);
+  doc.text(datosFinales.puestoTrabajo || "", tablaInicioX + 30, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Área de Trabajo:", tablaInicioX + 92, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.areaTrabajo, tablaInicioX + 118, yTexto + 1.5);
+  doc.text(datosFinales.areaTrabajo || "", tablaInicioX + 118, yTexto + 1.5);
   yTexto += filaAltura;
 
   // Quinta fila: Empresa
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 24, yTexto + 1.5, tablaAncho - 30);
+  dibujarTextoConSaltoLinea(datosFinales.empresa || "", tablaInicioX + 24, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
   // Sexta fila: Contratista
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Contratista:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.contrata, tablaInicioX + 24, yTexto + 1.5);
+  doc.text(datosFinales.contrata || "", tablaInicioX + 24, yTexto + 1.5);
   yTexto += filaAltura;
 
   // Séptima fila: Carta (fila completa con altura mayor)
@@ -505,43 +515,43 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("FC:", tablaInicioX + 2, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.vitalSigns.fc + " x min", tablaInicioX + 8, yPos + 3);
+  doc.text((datosFinales.vitalSigns.fc || "") + " x min", tablaInicioX + 8, yPos + 3);
 
   // FR (Frecuencia Respiratoria)
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("FR:", tablaInicioX + col1 + 2, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.vitalSigns.fr + " x min", tablaInicioX + col1 + 8, yPos + 3);
+  doc.text((datosFinales.vitalSigns.fr || "") + " x min", tablaInicioX + col1 + 8, yPos + 3);
 
   // PA (Presión Arterial)
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("PA:", tablaInicioX + col2 + 2, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.vitalSigns.pa + " mmHg", tablaInicioX + col2 + 8, yPos + 3);
+  doc.text((datosFinales.vitalSigns.pa || "") + " mmHg", tablaInicioX + col2 + 8, yPos + 3);
 
   // Sat. O2 (Saturación de Oxígeno)
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Sat. O2:", tablaInicioX + col3 + 2, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.vitalSigns.satO2 + " %", tablaInicioX + col3 + 15, yPos + 3);
+  doc.text((datosFinales.vitalSigns.satO2 || "") + " %", tablaInicioX + col3 + 15, yPos + 3);
 
   // IMC (Índice de Masa Corporal)
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("IMC:", tablaInicioX + col4 + 2, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.vitalSigns.imc + " kg/m2", tablaInicioX + col4 + 10, yPos + 3);
+  doc.text((datosFinales.vitalSigns.imc || "") + " kg/m2", tablaInicioX + col4 + 10, yPos + 3);
 
   // Peso
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Peso:", tablaInicioX + col5 + 2, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.vitalSigns.peso + " kg", tablaInicioX + col5 + 10, yPos + 3);
+  doc.text((datosFinales.vitalSigns.peso || "") + " kg", tablaInicioX + col5 + 10, yPos + 3);
 
   // Talla
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Talla:", tablaInicioX + col6 + 2, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.vitalSigns.talla + " cm", tablaInicioX + col6 + 10, yPos + 3);
+  doc.text((datosFinales.vitalSigns.talla || "") + " cm", tablaInicioX + col6 + 10, yPos + 3);
 
   yPos += filaAltura;
 
@@ -661,7 +671,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("ELECTROCARDIOGRAMA:", tablaInicioX + 2, yTextoEval + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.electrocardiograma, tablaInicioX + 52, yTextoEval + 1.5);
+  doc.text(datosFinales.evaluaciones.electrocardiograma || "N/A", tablaInicioX + 52, yTextoEval + 1.5);
   yTextoEval += filaAltura;
 
   // Fila 6: Evaluación Dental
@@ -755,24 +765,24 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Grupo sanguíneo:", tablaInicioX + 2, yTextoLab + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.laboratorio.grupoSanguineo, tablaInicioX + 30, yTextoLab + 1.5);
+  doc.text(datosFinales.laboratorio.grupoSanguineo || "N/A", tablaInicioX + 30, yTextoLab + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Hemoglobina:", tablaInicioX + 102, yTextoLab + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.laboratorio.hemoglobina + " gr %", tablaInicioX + 150, yTextoLab + 1.5);
+  doc.text((datosFinales.laboratorio.hemoglobina || "") + " gr %", tablaInicioX + 150, yTextoLab + 1.5);
   yTextoLab += filaAltura;
 
   // Fila 2: Hematíes y Glucosa
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Hematíes:", tablaInicioX + 2, yTextoLab + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.laboratorio.hematies + " x mm³", tablaInicioX + 30, yTextoLab + 1.5);
+  doc.text((datosFinales.laboratorio.hematies || "") + " x mm³", tablaInicioX + 30, yTextoLab + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Glucosa:", tablaInicioX + 102, yTextoLab + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.laboratorio.glucosa + " mg/dl", tablaInicioX + 150, yTextoLab + 1.5);
+  doc.text((datosFinales.laboratorio.glucosa || "") + " mg/dl", tablaInicioX + 150, yTextoLab + 1.5);
   yTextoLab += filaAltura;
 
   // Fila 3: Drogas en Orina y Examen de Orina
@@ -785,16 +795,18 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   
   // Dibujar valor de cocaína en normal
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.laboratorio.cocaina, tablaInicioX + 30 + doc.getTextWidth("Cocaina :   "), yTextoLab + 1.5);
+  const cocainaValue = datosFinales.laboratorio.cocaina || "N/A";
+  doc.text(cocainaValue, tablaInicioX + 30 + doc.getTextWidth("Cocaina :   "), yTextoLab + 1.5);
   
   // Dibujar "Marihuana" en negrita
   doc.setFont("helvetica", "bold").setFontSize(8);
-  const posicionMarihuana = tablaInicioX + 30 + doc.getTextWidth("Cocaina :   ") + doc.getTextWidth(datosFinales.laboratorio.cocaina) + 5;
+  const posicionMarihuana = tablaInicioX + 30 + doc.getTextWidth("Cocaina :   ") + doc.getTextWidth(cocainaValue) + 5;
   doc.text("Marihuana :   ", posicionMarihuana, yTextoLab + 1.5);
   
   // Dibujar valor de marihuana en normal
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.laboratorio.marihuana, posicionMarihuana + doc.getTextWidth("Marihuana :   "), yTextoLab + 1.5);
+  const marihuanaValue = datosFinales.laboratorio.marihuana || "N/A";
+  doc.text(marihuanaValue, posicionMarihuana + doc.getTextWidth("Marihuana :   "), yTextoLab + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Examen de Orina:", tablaInicioX + 102, yTextoLab + 1.5);
@@ -806,12 +818,12 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("VDRL:", tablaInicioX + 2, yTextoLab + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.laboratorio.vdrl, tablaInicioX + 30, yTextoLab + 1.5);
+  doc.text(datosFinales.laboratorio.vdrl || "N/A", tablaInicioX + 30, yTextoLab + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("VSG:", tablaInicioX + 102, yTextoLab + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.laboratorio.vsg + " mm", tablaInicioX + 150, yTextoLab + 1.5);
+  doc.text((datosFinales.laboratorio.vsg || "") + " mm", tablaInicioX + 150, yTextoLab + 1.5);
 
   // === SECCIÓN 5: CONCLUSION Y RECOMENDACIONES ===
   // Header gris: CONCLUSION Y RECOMENDACIONES
@@ -820,7 +832,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   // === CONTENIDO DE CONCLUSION Y RECOMENDACIONES ===
   // Primero calcular la altura necesaria para el texto
   doc.setFont("helvetica", "normal").setFontSize(7);
-  const textoConclusion = datosFinales.observacionesFichaMedicaAnexo7c_txtobservacionesfm;
+  const textoConclusion = datosFinales.observacionesFichaMedicaAnexo7c_txtobservacionesfm || "";
   
   // Calcular altura necesaria simulando el texto
   const alturaMinima = 15; // Altura mínima de la fila
@@ -845,7 +857,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   // === CONTENIDO DE RESTRICCIONES ===
   // Primero calcular la altura necesaria para el texto
   doc.setFont("helvetica", "normal").setFontSize(7);
-  const textoRestricciones = datosFinales.restricciones;
+  const textoRestricciones = datosFinales.restricciones || "";
   
   // Calcular altura necesaria simulando el texto
   const alturaMinimaRestricciones = 15; // Altura mínima de la fila
@@ -880,13 +892,13 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("APTITUD LABORAL:", tablaInicioX + 2, yTextoAptitud);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.aptitud, tablaInicioX + 35, yTextoAptitud);
+  doc.text(datosFinales.aptitud || "", tablaInicioX + 35, yTextoAptitud);
 
   // Segunda columna: FECHA DE VENCIMIENTO
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("FECHA DE VENCIMIENTO:", tablaInicioX + 102, yTextoAptitud);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.fechaVencimiento, tablaInicioX + 155, yTextoAptitud);
+  doc.text(datosFinales.fechaVencimiento || "", tablaInicioX + 155, yTextoAptitud);
 
   // === SECCIÓN DE FIRMAS ===
   const yFirmas = yPos; // Sin separación después de la fila de aptitud

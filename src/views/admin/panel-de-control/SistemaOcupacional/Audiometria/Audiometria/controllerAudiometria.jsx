@@ -1,6 +1,8 @@
 import Swal from "sweetalert2";
 import { getFetch } from "../../../getFetch/getFetch";
 import { SubmitData } from "../model";
+import { GetInfoPacDefault } from "../../../../../utils/functionUtils";
+import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 
 //===============Zona Modificación===============
 const obtenerReporteUrl = "/api/v01/ct/manipuladores/obtenerReporteAudiometria";
@@ -18,7 +20,7 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
 
           codAu: res.codAu,
           fecha: res.fechaAu,
-          fechaNac: res.fechaNac ? convertirFecha(res.fechaNac) : "",
+          fechaNac: formatearFechaCorta(res.fechaNac ?? ""),
           sordera: res.rbsasorderaSi ? "SI" : "NO",
           acufenos: res.rbsaacufenosSi ? "SI" : "NO",
           vertigo: res.rbsavertigoSi ? "SI" : "NO",
@@ -299,11 +301,6 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     }
   });
 };
-function convertirFecha(fecha) {
-  if (fecha === "") return "";
-  const [dia, mes, anio] = fecha.split("-");
-  return `${anio}/${mes.padStart(2, "0")}/${dia.padStart(2, "0")}`;
-}
 
 export const PrintHojaR = (nro, token, tabla) => {
   Loading("Cargando Formato a Imprimir");
@@ -390,21 +387,14 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
   });
 };
 
-export const GetInfoPac = (nro, set, token, sede) => {
-  getFetch(
-    `/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`,
-    token
-  )
-    .then((res) => {
-      console.log("pros", res);
-      set((prev) => ({
-        ...prev,
-        ...res,
-        fechaNac: convertirFecha(res.fechaNac),
-        nombres: res.nombresApellidos,
-      }));
-    })
-    .finally(() => {
-      Swal.close();
-    });
+export const GetInfoPac = async (nro, set, token, sede) => {
+  const res = await GetInfoPacDefault(nro, token, sede);
+  if (res) {
+    set((prev) => ({
+      ...prev,
+      ...res,
+      fechaNac: formatearFechaCorta(res.fechaNac ?? ""),
+      nombres: res.nombresApellidos ?? "",
+    }));
+  }
 };
