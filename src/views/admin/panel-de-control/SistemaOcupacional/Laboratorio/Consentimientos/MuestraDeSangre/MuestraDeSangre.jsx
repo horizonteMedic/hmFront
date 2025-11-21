@@ -4,8 +4,10 @@ import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { InputTextOneLine } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerMuestraDeSangre';
+import { PrintHojaR, SubmitConsentimientoLab, VerifyTR } from './controllerMuestraDeSangre';
 import { getToday } from '../../../../../../utils/helpers';
+
+const tabla = 'consent_Muestra_Sangre';
 
 const MuestraDeSangre = () => {
   const { token, userlogued, selectedSede } = useSessionData();
@@ -35,12 +37,12 @@ const MuestraDeSangre = () => {
 
   const handlePrint = () => {
     handlePrintDefault(() => {
-      PrintHojaR(form, token);
+      PrintHojaR(form, tabla, token);
     }, '¿Desea Imprimir Consentimiento Muestra de Sangre?', form.norden);
   };
 
   const handleSubmit = () => {
-    SubmitDataService(form, token, userlogued, handleClear);
+    SubmitConsentimientoLab(form, tabla, token, userlogued, handleClear);
   };
 
   return (
@@ -58,7 +60,7 @@ const MuestraDeSangre = () => {
               onKeyUp={(event) => {
                 if (event.key === 'Enter') {
                   handleset();
-                  VerifyTR(form.norden, token, setForm, selectedSede);
+                  VerifyTR(form.norden, tabla, token, setForm, selectedSede);
                 }
               }}
               labelWidth="120px"

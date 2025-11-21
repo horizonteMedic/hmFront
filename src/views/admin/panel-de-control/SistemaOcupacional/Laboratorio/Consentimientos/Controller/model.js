@@ -24,20 +24,22 @@ export function GetInfoLaboratioEx(data, tabla, token, user) {
         nOrden: data.norden
     };
     
-    const antecedentes = Array.isArray(data.antecedentes)
-        ? data.antecedentes
-        : Object.entries(data.antecedentes).map(([key, value]) => ({
-            key,
-            value: typeof value === 'object' && value !== null ? value.value : value,
-            fecha: typeof value === 'object' && value !== null ? value.fecha : null,
-            }));
-    antecedentes.forEach(({ key, value, fecha }) => {
-        const campos = camposAPI[key];
-        if (campos) {
-        body[campos.valor] = value ?? false;
-        body[campos.fecha] = fecha ?? null;
-        }
-    });
+    if (data.antecedentes) {
+        const antecedentes = Array.isArray(data.antecedentes)
+            ? data.antecedentes
+            : Object.entries(data.antecedentes).map(([key, value]) => ({
+                key,
+                value: typeof value === 'object' && value !== null ? value.value : value,
+                fecha: typeof value === 'object' && value !== null ? value.fecha : null,
+                }));
+        antecedentes.forEach(({ key, value, fecha }) => {
+            const campos = camposAPI[key];
+            if (campos) {
+            body[campos.valor] = value ?? false;
+            body[campos.fecha] = fecha ?? null;
+            }
+        });
+    }
 
    
     const url = `${URLAzure}/api/v01/ct/laboratorio/registrarActualizarConsentimientos`
