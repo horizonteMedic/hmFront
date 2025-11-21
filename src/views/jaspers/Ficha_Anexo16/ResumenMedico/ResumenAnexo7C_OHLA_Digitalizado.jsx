@@ -147,10 +147,10 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.text("Nro de ficha: ", pageW - 70, 15);
     doc.setFont("helvetica", "normal").setFontSize(18);
-    doc.text(datosFinales.numeroFicha, pageW - 50, 16);
+    doc.text(datosFinales.numeroFicha || "", pageW - 50, 16);
 
     doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text("Sede: " + datosFinales.sede, pageW - 70, 20);
+    doc.text("Sede: " + (datosFinales.sede || ""), pageW - 70, 20);
     doc.text("Fecha de examen: " + (datosFinales.fechaExamen || ""), pageW - 70, 25);
     doc.text("Pag. " + pageNumber.toString().padStart(2, '0'), pageW - 25, 8);
 
@@ -170,11 +170,16 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
   // === FUNCIONES AUXILIARES ===
   // Función para texto con salto de línea mejorada para listas numeradas
   const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
+    // Validar que el texto no sea undefined, null o vacío
+    if (!texto || texto === null || texto === undefined) {
+      return y;
+    }
+    
     const fontSize = doc.internal.getFontSize();
     let yPos = y;
 
     // Dividir por saltos de línea explícitos (\n)
-    const lineas = texto.split('\n');
+    const lineas = String(texto).split('\n');
     
     lineas.forEach((linea, index) => {
       // Verificar si la línea comienza con un número seguido de punto (lista numerada)
@@ -343,67 +348,67 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 40, yTexto + 1.5, 70);
+  dibujarTextoConSaltoLinea(datosFinales.apellidosNombres || "", tablaInicioX + 40, yTexto + 1.5, 70);
 
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("T. Examen:", tablaInicioX + 137, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.tipoExamen, tablaInicioX + 155, yTexto + 1.5, 50);
+  dibujarTextoConSaltoLinea(datosFinales.tipoExamen || "", tablaInicioX + 155, yTexto + 1.5, 50);
   yTexto += filaAltura;
 
   // Segunda fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("DNI:", tablaInicioX + 2, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.documentoIdentidad, tablaInicioX + 12, yTexto + 1.5);
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text(datosFinales.documentoIdentidad || "", tablaInicioX + 12, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Edad:", tablaInicioX + 47, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.edad + " Años", tablaInicioX + 58, yTexto + 1.5);
+  doc.text((datosFinales.edad || "") + " Años", tablaInicioX + 58, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Sexo:", tablaInicioX + 92, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.sexo, tablaInicioX + 105, yTexto + 1.5);
+  doc.text(datosFinales.sexo || "", tablaInicioX + 105, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Fecha Nac.:", tablaInicioX + 137, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.fechaNacimiento, tablaInicioX + 165, yTexto + 1.5);
+  doc.text(datosFinales.fechaNacimiento || "", tablaInicioX + 165, yTexto + 1.5);
   yTexto += filaAltura;
 
   // Tercera fila: Domicilio
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Domicilio:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.domicilio, tablaInicioX + 25, yTexto + 1.5, tablaAncho - 30);
+  dibujarTextoConSaltoLinea(datosFinales.domicilio || "", tablaInicioX + 25, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
   // Cuarta fila: Área de Trabajo, Puesto de Trabajo
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Área de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo, tablaInicioX + 30, yTexto + 1.5, 50);
+  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo || "", tablaInicioX + 30, yTexto + 1.5, 50);
 
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Puesto de Trabajo:", tablaInicioX + 92, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo, tablaInicioX + 122, yTexto + 1.5, 65);
+  dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo || "", tablaInicioX + 122, yTexto + 1.5, 65);
   yTexto += filaAltura;
 
   // Quinta fila: Empresa
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 25, yTexto + 1.5, tablaAncho - 25);
+  dibujarTextoConSaltoLinea(datosFinales.empresa || "", tablaInicioX + 25, yTexto + 1.5, tablaAncho - 25);
   yTexto += filaAltura;
 
   // Sexta fila: Contratista
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Contratista:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.contrata, tablaInicioX + 25, yTexto + 1.5, tablaAncho - 30);
+  dibujarTextoConSaltoLinea(datosFinales.contrata || "", tablaInicioX + 25, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
   // === SECCIÓN: RESULTADOS DE EVALUACIÓN MÉDICA ===
@@ -435,10 +440,15 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
 
   // Función para calcular altura dinámica de texto mejorada para listas numeradas
   const calcularAlturaTexto = (texto, anchoMaximo) => {
+    // Validar que el texto no sea undefined, null o vacío
+    if (!texto || texto === null || texto === undefined) {
+      return 15; // Altura mínima
+    }
+    
     let lineas = 0;
     
     // Dividir por saltos de línea explícitos (\n)
-    const lineasTexto = texto.split('\n');
+    const lineasTexto = String(texto).split('\n');
     
     lineasTexto.forEach((linea, index) => {
       // Verificar si la línea comienza con un número seguido de punto (lista numerada)
@@ -505,10 +515,15 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
 
   // Función específica para calcular altura de hallazgos y recomendaciones con altura mínima de 55mm
   const calcularAlturaTextoEspecial = (texto, anchoMaximo) => {
+    // Validar que el texto no sea undefined, null o vacío
+    if (!texto || texto === null || texto === undefined) {
+      return 55; // Altura mínima
+    }
+    
     let lineas = 0;
     
     // Dividir por saltos de línea explícitos (\n)
-    const lineasTexto = texto.split('\n');
+    const lineasTexto = String(texto).split('\n');
     
     lineasTexto.forEach((linea, index) => {
       // Verificar si la línea comienza con un número seguido de punto (lista numerada)
@@ -577,7 +592,8 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
   yPos = dibujarSubHeaderCeleste("Antecedentes Personales Importantes", yPos, filaAltura);
 
   // Fila de Antecedentes Personales (creciente)
-  const alturaAntecedentesPersonales = calcularAlturaTexto(datosFinales.antecedentesPersonales, tablaAncho - 9);
+  const antecedentesPersonalesTexto = datosFinales.antecedentesPersonales || "";
+  const alturaAntecedentesPersonales = calcularAlturaTexto(antecedentesPersonalesTexto, tablaAncho - 9);
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaAntecedentesPersonales);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaAntecedentesPersonales);
@@ -585,14 +601,15 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yPos + alturaAntecedentesPersonales, tablaInicioX + tablaAncho, yPos + alturaAntecedentesPersonales);
 
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.antecedentesPersonales, tablaInicioX + 3, yPos + 6, tablaAncho - 4);
+  dibujarTextoConSaltoLinea(antecedentesPersonalesTexto, tablaInicioX + 3, yPos + 6, tablaAncho - 4);
   yPos += alturaAntecedentesPersonales;
 
   // Subheader celeste: Antecedentes Patológicos Importantes
   yPos = dibujarSubHeaderCeleste("Antecedentes Patológicos Importantes", yPos, filaAltura);
 
   // Fila de Antecedentes Patológicos (creciente)
-  const alturaAntecedentesPatologicos = calcularAlturaTexto(datosFinales.antecedentesPatologicos, tablaAncho - 9);
+  const antecedentesPatologicosTexto = datosFinales.antecedentesPatologicos || "";
+  const alturaAntecedentesPatologicos = calcularAlturaTexto(antecedentesPatologicosTexto, tablaAncho - 9);
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaAntecedentesPatologicos);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaAntecedentesPatologicos);
@@ -600,14 +617,15 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yPos + alturaAntecedentesPatologicos, tablaInicioX + tablaAncho, yPos + alturaAntecedentesPatologicos);
 
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.antecedentesPatologicos, tablaInicioX + 3, yPos + 6, tablaAncho - 4);
+  dibujarTextoConSaltoLinea(antecedentesPatologicosTexto, tablaInicioX + 3, yPos + 6, tablaAncho - 4);
   yPos += alturaAntecedentesPatologicos;
 
   // Subheader celeste: Antecedentes Familiares Importantes
   yPos = dibujarSubHeaderCeleste("Antecedentes Familiares Importantes", yPos, filaAltura);
 
   // Fila de Antecedentes Familiares (creciente)
-  const alturaAntecedentesFamiliares = calcularAlturaTexto(datosFinales.antecedentesFamiliares, tablaAncho - 9);
+  const antecedentesFamiliaresTexto = datosFinales.antecedentesFamiliares || "";
+  const alturaAntecedentesFamiliares = calcularAlturaTexto(antecedentesFamiliaresTexto, tablaAncho - 9);
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaAntecedentesFamiliares);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaAntecedentesFamiliares);
@@ -615,7 +633,7 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yPos + alturaAntecedentesFamiliares, tablaInicioX + tablaAncho, yPos + alturaAntecedentesFamiliares);
 
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.antecedentesFamiliares, tablaInicioX + 3, yPos + 6, tablaAncho - 4);
+  dibujarTextoConSaltoLinea(antecedentesFamiliaresTexto, tablaInicioX + 3, yPos + 6, tablaAncho - 4);
   yPos += alturaAntecedentesFamiliares;
 
   // === SECCIÓN: EXAMEN FÍSICO ===
@@ -642,37 +660,37 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("FC :", tablaInicioX + 2, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.fc + " lpm", tablaInicioX + 10, yPos + 3);
+  doc.text((datosFinales.fc || "") + " lpm", tablaInicioX + 10, yPos + 3);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("FR :", tablaInicioX + 28, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.fr + " rpm", tablaInicioX + 35, yPos + 3);
+  doc.text((datosFinales.fr || "") + " rpm", tablaInicioX + 35, yPos + 3);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("PA :", tablaInicioX + 52, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.pa + " mmHg", tablaInicioX + 59, yPos + 3);
+  doc.text((datosFinales.pa || "") + " mmHg", tablaInicioX + 59, yPos + 3);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Talla :", tablaInicioX + 88, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.talla + " cm", tablaInicioX + 96, yPos + 3);
+  doc.text((datosFinales.talla || "") + " cm", tablaInicioX + 96, yPos + 3);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Peso :", tablaInicioX + 114, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.peso + " kg", tablaInicioX + 124, yPos + 3);
+  doc.text((datosFinales.peso || "") + " kg", tablaInicioX + 124, yPos + 3);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("IMC :", tablaInicioX + 138, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.imc + " kg/m²", tablaInicioX + 148, yPos + 3);
+  doc.text((datosFinales.imc || "") + " kg/m²", tablaInicioX + 148, yPos + 3);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("SAT O2 :", tablaInicioX + 170, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.satO2 + " %", tablaInicioX + 184, yPos + 3);
+  doc.text((datosFinales.satO2 || "") + " %", tablaInicioX + 184, yPos + 3);
 
   yPos += alturaFilaSignos;
 
@@ -696,7 +714,7 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(titulo + ":", tablaInicioX + 2, yPos + 3);
     doc.setFont("helvetica", "normal").setFontSize(8);
-    dibujarTextoConSaltoLinea(valor, posicionDivision + 2, yPos + 3, tablaAncho - posicionDivision - 4);
+    dibujarTextoConSaltoLinea(valor || "", posicionDivision + 2, yPos + 3, tablaAncho - posicionDivision - 4);
 
     return yPos + alturaFilaExamen;
   };
@@ -728,7 +746,7 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
   // Fila de Glucosa con valores de referencia fijos
   const separacionGlucosa = 80; // mm de separación (puedes cambiar este valor)
   const espaciosSeparacion = " ".repeat(separacionGlucosa); // Convierte mm a espacios
-  const valorGlucosaConReferencia = datosFinales.glucosa + espaciosSeparacion + "(Valores de referencia: 70.00 - 110.00 mg/dl)";
+  const valorGlucosaConReferencia = (datosFinales.glucosa || "") + espaciosSeparacion + "(Valores de referencia: 70.00 - 110.00 mg/dl)";
   yPos = dibujarFilaExamen("Glucosa", valorGlucosaConReferencia, yPos);
 
   // === SECCIÓN: COLINESTERASA SÉRICA ===
@@ -736,7 +754,8 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
   yPos = dibujarSubHeaderCeleste("Colinesterasa Sérica:", yPos, filaAltura);
 
   // Fila de datos creciente para Colinesterasa Sérica
-  const alturaColinesterasa = calcularAlturaTexto(datosFinales.colinesterasaSerica, tablaAncho - 4);
+  const colinesterasaTexto = datosFinales.colinesterasaSerica || "";
+  const alturaColinesterasa = calcularAlturaTexto(colinesterasaTexto, tablaAncho - 4);
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaColinesterasa);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaColinesterasa);
@@ -744,7 +763,7 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yPos + alturaColinesterasa, tablaInicioX + tablaAncho, yPos + alturaColinesterasa);
 
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.colinesterasaSerica, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
+  dibujarTextoConSaltoLinea(colinesterasaTexto, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
   yPos += alturaColinesterasa;
 
   // Fila instructiva con valores de referencia (color #f5ae67)
