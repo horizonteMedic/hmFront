@@ -8,6 +8,7 @@ import {
   InputCheckbox,
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
+import { getToday } from "../../../../../../utils/helpers";
 
 export const HematologiaBioquimicaSIEO = ({
   form,
@@ -19,8 +20,7 @@ export const HematologiaBioquimicaSIEO = ({
 }) => {
   const { token, selectedSede } = useSessionData();
   const tabla = "lab_clinico";
-  const date = new Date();
-  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  const today = getToday();
 
   const [tableLab, settableLab] = useState([]);
   const [filteredMedicos, setFilteredMedicos] = useState([]);
@@ -176,250 +176,121 @@ export const HematologiaBioquimicaSIEO = ({
   };
 
   return (
-    <div className="w-full max-w-[100vw] mx-auto bg-white rounded shadow p-6 space-y-6">
-      <h2 className="text-2xl font-bold text-center mb-4">HEMATOLOGÍA - BIOQUÍMICA SI-EO</h2>
-
+    <div className=" p-4 space-y-3">
       {/* Barra superior */}
-      <SectionFieldset legend="Información General" className="space-y-4">
+      <SectionFieldset legend="Información del Examen" className="space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <InputTextOneLine
             label="N° Orden"
             name="norden"
-            value={form.norden || ""}
+            value={form.norden}
             onChange={handleInputChange}
             onKeyUp={handleSearch}
-            labelWidth="100px"
-            inputClassName="w-36"
-          />
-          <InputCheckbox
-            label="Consultas"
-            checked={false}
-            onChange={() => {}}
-            disabled
-          />
-          <InputCheckbox
-            label="Particular"
-            checked={false}
-            onChange={() => {}}
-            disabled
           />
           <InputCheckbox
             label="Ficha Médica Ocupacional"
             checked={true}
-            onChange={() => {}}
             disabled
           />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <InputTextOneLine
-            label="N° Recibo"
-            name="recibo"
-            value=""
-            disabled
-            labelWidth="100px"
-            inputClassName="w-36"
-          />
-          <InputTextOneLine
             label="DNI"
             name="dni"
-            value={form.dni || ""}
+            value={form.dni}
             disabled
-            labelWidth="60px"
-            inputClassName="w-36"
           />
           <InputTextOneLine
             label="Fecha"
             name="fecha"
             type="date"
-            value={form.fecha || ""}
+            value={form.fecha}
             onChange={handleInputChange}
             labelWidth="80px"
             inputClassName="w-44"
           />
         </div>
-        <div className="flex items-center gap-4 justify-end pt-2 border-t">
-          <button
-            onClick={() => setField("ficha", !form.ficha)}
-            className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded font-bold"
-          >
-            Editar
-          </button>
-          <InputCheckbox
-            label={<span className="text-red-600 font-bold">INCOMPLETO</span>}
-            checked={!form.ficha}
-            onChange={(e) => setField("ficha", !e.target.checked)}
+        <InputCheckbox
+          label={<span className="text-red-600 font-bold">INCOMPLETO</span>}
+          checked={!form.ficha}
+          onChange={(e) => setField("ficha", !e.target.checked)}
+        />
+      </SectionFieldset>
+      <SectionFieldset legend="Datos Personales" className="space-y-3">
+        <div className="relative">
+          <InputTextOneLine
+            label="Responsable Lab"
+            name="responsable"
+            value={searchMedico}
+            onChange={handleMedicoSearch}
+            labelWidth="140px"
+            inputClassName="bg-gray-100 font-bold"
+            onKeyUp={(e) => {
+              if (e.key === "Enter" && filteredMedicos.length > 0) {
+                e.preventDefault();
+                handleSelectMedico(filteredMedicos[0]);
+              }
+            }}
+            onFocus={() => {
+              if (searchMedico) {
+                setFilteredMedicos(
+                  listDoc.filter((m) =>
+                    m.toLowerCase().includes(searchMedico.toLowerCase())
+                  )
+                );
+              }
+            }}
+            onBlur={() => setTimeout(() => setFilteredMedicos([]), 100)}
+          />
+          {searchMedico && filteredMedicos.length > 0 && (
+            <ul className="absolute left-[140px] right-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10 shadow-lg">
+              {filteredMedicos.map((m) => (
+                <li
+                  key={m}
+                  className="cursor-pointer px-3 py-2 hover:bg-gray-100 font-bold"
+                  onMouseDown={() => handleSelectMedico(m)}
+                >
+                  {m}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div className="space-y-4">
+          <InputTextOneLine
+            label="Nombres"
+            name="paciente"
+            value={form.paciente || ""}
+            disabled
+            labelWidth="140px"
+          />
+          <InputTextOneLine
+            label="G.F. Sang. Pedido"
+            name="gfSangPedido"
+            value={form.gfSangPedido || ""}
+            disabled
+            labelWidth="140px"
+            inputClassName="w-44"
+          />
+          <InputTextOneLine
+            label="Emp. Contratista"
+            name="empContratista"
+            value={form.empContratista || ""}
+            disabled
+            labelWidth="140px"
+          />
+          <InputTextOneLine
+            label="Empresa"
+            name="empresa"
+            value={form.empresa || ""}
+            disabled
+            labelWidth="140px"
           />
         </div>
       </SectionFieldset>
-
       {/* Contenido principal en dos columnas */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Columna 1 - Datos del Paciente */}
-        <div className="space-y-6">
-          {/* Datos del Paciente */}
-          <SectionFieldset legend="Datos del Paciente" className="space-y-4">
-            <div className="relative">
-              <InputTextOneLine
-                label="Responsable Lab"
-                name="responsable"
-                value={searchMedico}
-                onChange={handleMedicoSearch}
-                labelWidth="140px"
-                inputClassName="bg-gray-100 font-bold"
-                onKeyUp={(e) => {
-                  if (e.key === "Enter" && filteredMedicos.length > 0) {
-                    e.preventDefault();
-                    handleSelectMedico(filteredMedicos[0]);
-                  }
-                }}
-                onFocus={() => {
-                  if (searchMedico) {
-                    setFilteredMedicos(
-                      listDoc.filter((m) =>
-                        m.toLowerCase().includes(searchMedico.toLowerCase())
-                      )
-                    );
-                  }
-                }}
-                onBlur={() => setTimeout(() => setFilteredMedicos([]), 100)}
-              />
-              {searchMedico && filteredMedicos.length > 0 && (
-                <ul className="absolute left-[140px] right-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10 shadow-lg">
-                  {filteredMedicos.map((m) => (
-                    <li
-                      key={m}
-                      className="cursor-pointer px-3 py-2 hover:bg-gray-100 font-bold"
-                      onMouseDown={() => handleSelectMedico(m)}
-                    >
-                      {m}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-            <div className="space-y-4">
-              <InputTextOneLine
-                label="Nombres"
-                name="paciente"
-                value={form.paciente || ""}
-                disabled
-                labelWidth="140px"
-              />
-              <InputTextOneLine
-                label="G.F. Sang. Pedido"
-                name="gfSangPedido"
-                value={form.gfSangPedido || ""}
-                disabled
-                labelWidth="140px"
-                inputClassName="w-44"
-              />
-              <InputTextOneLine
-                label="Emp. Contratista"
-                name="empContratista"
-                value={form.empContratista || ""}
-                disabled
-                labelWidth="140px"
-              />
-              <InputTextOneLine
-                label="Empresa"
-                name="empresa"
-                value={form.empresa || ""}
-                disabled
-                labelWidth="140px"
-              />
-            </div>
-          </SectionFieldset>
-
-          {/* Bioquímica */}
-          <SectionFieldset legend="Bioquímica" className="space-y-4">
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <label className="font-medium min-w-[100px] ">Glucosa:</label>
-                <input
-                  name="glucosa"
-                  value={form.glucosa || ""}
-                  onChange={handleInputChange}
-                  className={`border rounded px-2 py-1 w-32 ${
-                    form.glucosaNA ? "bg-gray-200 text-gray-500" : ""
-                  }`}
-                  disabled={form.glucosaNA}
-                />
-                <span className="ml-2 w-12 font-medium ">mg/dl</span>
-                <InputCheckbox
-                  label={<span className="font-medium">N/A</span>}
-                  checked={form.glucosaNA || form.glucosa === "N/A"}
-                  onChange={(e) => {
-                    const v = e.target.checked;
-                    setField("glucosaNA", v);
-                    setField("glucosa", v ? "N/A".trim() : "");
-                  }}
-                />
-                <span className="ml-6  text-gray-600 font-medium">
-                  Valores normales 70 - 110 mg/dl
-                </span>
-              </div>
-              <div className="flex items-center gap-4">
-                <label className="font-medium min-w-[100px] ">Creatinina:</label>
-                <input
-                  name="creatinina"
-                  value={form.creatinina || ""}
-                  onChange={handleInputChange}
-                  className={`border rounded px-2 py-1 w-32 ${
-                    form.creatininaNA ? "bg-gray-200 text-gray-500" : ""
-                  }`}
-                  disabled={form.creatininaNA}
-                />
-                <span className="ml-2 w-12 font-medium ">mg/dl</span>
-                <InputCheckbox
-                  label={<span className="font-medium">N/A</span>}
-                  checked={form.creatininaNA || form.creatinina === "N/A"}
-                  onChange={(e) => {
-                    const v = e.target.checked;
-                    setField("creatininaNA", v);
-                    setField("creatinina", v ? "N/A".trim() : "");
-                  }}
-                />
-                <span className="ml-6  text-gray-600 font-medium">
-                  Valores normales 0.8 - 1.4 mg/dl
-                </span>
-              </div>
-            </div>
-          </SectionFieldset>
-
-          {/* Registros anteriores */}
-          <SectionFieldset legend="Registros anteriores" className="space-y-4">
-            <div className="overflow-x-auto">
-              <table className="w-full  border border-gray-300 rounded-lg overflow-hidden">
-                <thead>
-                  <tr className=" text-center">
-                    <th className="border px-2 py-1">Fecha Lab</th>
-                    <th className="border px-2 py-1">Grupo</th>
-                    <th className="border px-2 py-1">RH</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tableLab.length === 0 ? (
-                    <tr>
-                      <td className="border border-gray-300 px-2 py-1 text-center" colSpan={3}>
-                        Sin Datos...
-                      </td>
-                    </tr>
-                  ) : (
-                    tableLab.map((row, i) => (
-                      <tr key={i} className="text-center">
-                        <td className="font-bold border-b border-gray-200 py-1 ">{row.fechaLab}</td>
-                        <td className="border-b border-gray-200 py-1 ">{row.grupoSanguineo}</td>
-                        <td className="border-b border-gray-200 py-1 ">{row.factorRh}</td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </SectionFieldset>
-        </div>
-
-        {/* Columna 2 - Hematología */}
         <div className="space-y-6">
           {/* Hematología */}
           <SectionFieldset legend="Hematología" className="space-y-4">
@@ -496,9 +367,8 @@ export const HematologiaBioquimicaSIEO = ({
                       name={key}
                       value={form[key] || ""}
                       onChange={handleInputChange}
-                      className={`border rounded px-2 py-1 w-32 ${
-                        form.empresaNA ? "bg-gray-200 text-gray-500" : ""
-                      }`}
+                      className={`border rounded px-2 py-1 w-32 ${form.empresaNA ? "bg-gray-200 text-gray-500" : ""
+                        }`}
                       disabled={form.empresaNA}
                     />
                     <span className="ml-2 w-16 font-medium ">{unit}</span>
@@ -521,9 +391,8 @@ export const HematologiaBioquimicaSIEO = ({
                       name={key}
                       value={form[key] || ""}
                       onChange={handleInputChange}
-                      className={`border rounded px-2 py-1 w-32 ${
-                        form.empresaNA ? "bg-gray-200 text-gray-500" : ""
-                      }`}
+                      className={`border rounded px-2 py-1 w-32 ${form.empresaNA ? "bg-gray-200 text-gray-500" : ""
+                        }`}
                       disabled={form.empresaNA}
                     />
                     <span className="ml-2 w-16 font-medium ">{unit}</span>
@@ -532,7 +401,10 @@ export const HematologiaBioquimicaSIEO = ({
               </div>
             </div>
           </SectionFieldset>
+        </div>
 
+        {/* Columna 2 - Hematología */}
+        <div className="space-y-6">
           {/* Reacciones Serológicas */}
           <SectionFieldset legend="Reacciones Serológicas" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -618,8 +490,95 @@ export const HematologiaBioquimicaSIEO = ({
               </div>
             </div>
           </SectionFieldset>
+          {/* Bioquímica */}
+          <SectionFieldset legend="Bioquímica" className="space-y-4">
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <label className="font-medium min-w-[100px] ">Glucosa:</label>
+                <input
+                  name="glucosa"
+                  value={form.glucosa || ""}
+                  onChange={handleInputChange}
+                  className={`border rounded px-2 py-1 w-32 ${form.glucosaNA ? "bg-gray-200 text-gray-500" : ""
+                    }`}
+                  disabled={form.glucosaNA}
+                />
+                <span className="ml-2 w-12 font-medium ">mg/dl</span>
+                <InputCheckbox
+                  label={<span className="font-medium">N/A</span>}
+                  checked={form.glucosaNA || form.glucosa === "N/A"}
+                  onChange={(e) => {
+                    const v = e.target.checked;
+                    setField("glucosaNA", v);
+                    setField("glucosa", v ? "N/A".trim() : "");
+                  }}
+                />
+                <span className="ml-6  text-gray-600 font-medium">
+                  Valores normales 70 - 110 mg/dl
+                </span>
+              </div>
+              <div className="flex items-center gap-4">
+                <label className="font-medium min-w-[100px] ">Creatinina:</label>
+                <input
+                  name="creatinina"
+                  value={form.creatinina || ""}
+                  onChange={handleInputChange}
+                  className={`border rounded px-2 py-1 w-32 ${form.creatininaNA ? "bg-gray-200 text-gray-500" : ""
+                    }`}
+                  disabled={form.creatininaNA}
+                />
+                <span className="ml-2 w-12 font-medium ">mg/dl</span>
+                <InputCheckbox
+                  label={<span className="font-medium">N/A</span>}
+                  checked={form.creatininaNA || form.creatinina === "N/A"}
+                  onChange={(e) => {
+                    const v = e.target.checked;
+                    setField("creatininaNA", v);
+                    setField("creatinina", v ? "N/A".trim() : "");
+                  }}
+                />
+                <span className="ml-6  text-gray-600 font-medium">
+                  Valores normales 0.8 - 1.4 mg/dl
+                </span>
+              </div>
+            </div>
+          </SectionFieldset>
+
+          {/* Registros anteriores */}
+          <SectionFieldset legend="Registros anteriores" className="space-y-4">
+            <div className="overflow-x-auto">
+              <table className="w-full  border border-gray-300 rounded-lg overflow-hidden">
+                <thead>
+                  <tr className=" text-center">
+                    <th className="border px-2 py-1">Fecha Lab</th>
+                    <th className="border px-2 py-1">Grupo</th>
+                    <th className="border px-2 py-1">RH</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tableLab.length === 0 ? (
+                    <tr>
+                      <td className="border border-gray-300 px-2 py-1 text-center" colSpan={3}>
+                        Sin Datos...
+                      </td>
+                    </tr>
+                  ) : (
+                    tableLab.map((row, i) => (
+                      <tr key={i} className="text-center">
+                        <td className="font-bold border-b border-gray-200 py-1 ">{row.fechaLab}</td>
+                        <td className="border-b border-gray-200 py-1 ">{row.grupoSanguineo}</td>
+                        <td className="border-b border-gray-200 py-1 ">{row.factorRh}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </SectionFieldset>
         </div>
       </div>
+
+
 
       {/* Botón Limpiar al final */}
       <div className="flex justify-start">

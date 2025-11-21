@@ -52,7 +52,7 @@ const initialForm = {
   ConfirmNeg: false,
   ConfirmNA: false,
   observaciones: '',
-  printValue: ''
+  // printValue: ''
 };
 
 export default function ExamenOrina({ form, setForm, formH, ClearForm, setFormH, ClearFormO }) {
@@ -124,9 +124,7 @@ export default function ExamenOrina({ form, setForm, formH, ClearForm, setFormH,
   };
 
   return (
-    <div className="w-full max-w-[100vw] mx-auto bg-white rounded shadow p-6 space-y-6">
-      <h2 className="text-2xl font-bold text-center mb-4">EXAMEN DE ORINA</h2>
-
+    <div className="p-4 space-y-3">
       {/* Dos columnas: Examen Físico | Examen Químico, Sedimento Unitario | Drogas */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Columna 1 */}

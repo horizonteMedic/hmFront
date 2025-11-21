@@ -89,9 +89,9 @@ const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
     // Observaciones
     observaciones: '',
     // Imprimir
-    printOrden: false,
-    printRecibo: false,
-    printValue: ''
+    // printOrden: false,
+    // printRecibo: false,
+    // printValue: ''
   })
   
   const ClearForm = () => {
@@ -174,9 +174,9 @@ const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
       // Observaciones
       observaciones: '',
       // Imprimir
-      printOrden: false,
-      printRecibo: false,
-      printValue: ''
+      // printOrden: false,
+      // printRecibo: false,
+      // printValue: ''
     })
   }
 

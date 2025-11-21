@@ -10,7 +10,7 @@ import {
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 
-const tabla = 'panel5d';
+const tabla = 'toxicologia';
 
 export default function Resultado_Panel5D() {
   const { token, userlogued, selectedSede, datosFooter } = useSessionData();
