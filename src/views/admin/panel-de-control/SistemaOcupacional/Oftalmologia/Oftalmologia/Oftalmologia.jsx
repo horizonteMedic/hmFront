@@ -12,13 +12,10 @@ import {
   VerifyTR,
 } from "./controllerOftalmologia";
 import Swal from "sweetalert2";
+import { getToday } from "../../../../../utils/helpers";
 
 const tabla = "oftalmologia2021";
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
+const today = getToday();
 
 const initialFormState = {
   norden: "",
@@ -1520,7 +1517,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
             </button>
           </div>
           <div className="flex flex-col items-end">
-            <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+            <span className="font-bold italic text-base mb-1">Imprimir</span>
             <div className="flex items-center gap-2">
               <input
                 name="norden"

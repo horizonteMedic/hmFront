@@ -75,7 +75,7 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Nro de ficha: ", pageW - 80, 15);
 
-    doc.setFont("helvetica", "bold").setFontSize(18);
+    doc.setFont("helvetica", "normal").setFontSize(18);
     doc.text(datosFinales.numeroFicha, pageW - 50, 16);
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Sede: " + datosFinales.sede, pageW - 80, 20);
@@ -782,7 +782,7 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   // Llamar al footer (los datos de prueba están dentro del componente)
   footerTR(doc);
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

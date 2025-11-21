@@ -1,11 +1,58 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import headerConsentimiento from "./header/headerConsentimiento.jsx";
-import footer from "../components/footer";
+import CabeceraLogo from "../components/CabeceraLogo.jsx";
+import footerTR from "../components/footerTR.jsx";
+import drawColorBox from "../components/ColorBox.jsx";
 
 export default function Consentimiento_Panel10D_Digitalizado(datos) {
   const doc = new jsPDF();
-  headerConsentimiento(doc, datos);
+  const pageW = doc.internal.pageSize.getWidth();
+
+  // Función para formatear fecha a DD/MM/YYYY
+  const toDDMMYYYY = (fecha) => {
+    if (!fecha) return '';
+    if (fecha.includes('/')) return fecha; // ya está en formato correcto
+    const [anio, mes, dia] = fecha.split('-');
+    if (!anio || !mes || !dia) return fecha;
+    return `${dia}/${mes}/${anio}`;
+  };
+
+  // Header con datos de ficha, sede y fecha
+  const drawHeader = () => {
+    CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+    
+    // Número de Ficha
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Nro de ficha: ", pageW - 80, 15);
+    doc.setFont("helvetica", "normal").setFontSize(18);
+    doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
+    
+    // Sede
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
+    
+    // Fecha de examen
+    const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
+    doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
+    
+    // Página
+    doc.text("Pag. 01", pageW - 30, 10);
+
+    // Bloque de color
+    drawColorBox(doc, {
+      color: datos.codigoColor || "#008f39",
+      text: datos.textoColor || "F",
+      x: pageW - 30,
+      y: 10,
+      size: 22,
+      showLine: true,
+      fontSize: 30,
+      textPosition: 0.9
+    });
+  };
+
+  drawHeader();
+
   const huella = datos.digitalizacion.find(d => d.nombreDigitalizacion === "HUELLA");
   const firma = datos.digitalizacion.find(d => d.nombreDigitalizacion === "FIRMAP");
   const sello = datos.digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
@@ -25,7 +72,6 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
   ])
    .then(([huellap, firmap, sellop]) => {
     let y = 44;
-    const pageW = doc.internal.pageSize.getWidth();
     const margin = 18;
 
     // Título principal en dos líneas, con subrayado y tamaño 14
@@ -312,7 +358,7 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
       doc.addImage(selloBase64, 'PNG', selloX, selloY, selloW, selloH);
     }
 
-    footer(doc, datos);
+    footerTR(doc, datos);
 
     // Mostrar PDF
     const pdfBlob = doc.output("blob");

@@ -1894,7 +1894,7 @@ yPos += filaAlturaCage;
   // === FOOTER PÁGINA 3 ===
   footerTR(doc, { footerOffsetY: 8});
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

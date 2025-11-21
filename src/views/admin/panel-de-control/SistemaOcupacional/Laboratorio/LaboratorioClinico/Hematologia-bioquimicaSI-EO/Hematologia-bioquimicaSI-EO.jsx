@@ -1,12 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
-import microscopioImg from "./microscopio.webp";
+import { useState, useEffect } from "react";
 import { VerifyTR } from "../ControllerLC/ControllerLC";
+import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { getFetch } from "../../../../getFetch/getFetch";
+import Swal from 'sweetalert2';
+import {
+  InputTextOneLine,
+  InputCheckbox,
+} from '../../../../../../components/reusableComponents/ResusableComponents';
+import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
+import { getToday } from "../../../../../../utils/helpers";
 
 export const HematologiaBioquimicaSIEO = ({
-  token,
-  selectedSede,
-  userlogued,
   form,
   setForm,
   setFormO,
@@ -14,16 +18,17 @@ export const HematologiaBioquimicaSIEO = ({
   setSearchMedico,
   searchMedico,
 }) => {
+  const { token, selectedSede } = useSessionData();
   const tabla = "lab_clinico";
-  const date = new Date();
-  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-    2,
-    "0"
-  )}-${String(date.getDate()).padStart(2, "0")}`;
+  const today = getToday();
 
   const [tableLab, settableLab] = useState([]);
+  const [filteredMedicos, setFilteredMedicos] = useState([]);
+  const [hematologiaNA, setHematologiaNA] = useState(false);
+  const [rprNA, setRprNA] = useState(true);
+  const [vihNA, setVihNA] = useState(true);
+
   const setField = (field, value) => {
-    // Si el valor es "N/A" (con o sin espacios), aplicar trim
     if (value && value.trim && value.trim().toUpperCase() === "N/A") {
       value = "N/A";
     }
@@ -32,7 +37,6 @@ export const HematologiaBioquimicaSIEO = ({
 
   const handleInputChange = (e) => {
     let value = e.target.value;
-    // Si el valor es "N/A" (con o sin espacios), aplicar trim
     if (value && value.trim().toUpperCase() === "N/A") {
       value = "N/A";
     }
@@ -75,29 +79,20 @@ export const HematologiaBioquimicaSIEO = ({
     settableLab([]);
   };
 
-  const handlePrint = () => {
-    console.log("Printing form:", form);
-  };
-
   const GetTable = (nro) => {
     getFetch(
       `/api/v01/ct/laboratorio/listadoGrupoFactorSanguineo?nOrden=${nro}`,
       token
     ).then((res) => {
-      settableLab(res);
+      settableLab(res || []);
     });
   };
-
-  const [status, setStatus] = useState("");
 
   useEffect(() => {
     const grupo = form.grupo || "";
     const rh = (form.rh || "").replace("Rh", "");
     setField("gfSangPedido", `${grupo} ${rh}`.trim());
   }, [form.grupo, form.rh]);
-
-  //AUTOCOMPLETAR DEL DOC
-  const [filteredMedicos, setFilteredMedicos] = useState([]);
 
   const handleMedicoSearch = (e) => {
     const v = e.target.value.toUpperCase();
@@ -114,22 +109,6 @@ export const HematologiaBioquimicaSIEO = ({
     setFilteredMedicos([]);
   };
 
-  // Estado para N/A de Hematología
-  const [hematologiaNA, setHematologiaNA] = useState(false);
-
-  // Desmarcar N/A si se traen datos reales
-  useEffect(() => {
-    // Si alguno de los campos de Hematología o Bioquímica tiene valor distinto de '' y distinto de 'N/A', desmarcar N/A
-    const hematoCampos = [...hematologiaKeys, "glucosa", "creatinina"];
-    const hayDatos = hematoCampos.some((k) => form[k] && form[k] !== "N/A");
-    if (hayDatos) {
-      if (hematologiaNA) setHematologiaNA(false);
-      if (form.glucosaNA) setField("glucosaNA", false);
-      if (form.creatininaNA) setField("creatininaNA", false);
-    }
-  }, [form]);
-
-  // Refs para inputs de Hematología
   const hematologiaKeys = [
     "hemoglobina",
     "hematocrito",
@@ -145,9 +124,17 @@ export const HematologiaBioquimicaSIEO = ({
     "basofilos",
     "linfocitos",
   ];
-  const hematologiaRefs = hematologiaKeys.map(() => useRef());
 
-  // Función para setear todos los campos de Hematología a 'N/A' o restaurar
+  useEffect(() => {
+    const hematoCampos = [...hematologiaKeys, "glucosa", "creatinina"];
+    const hayDatos = hematoCampos.some((k) => form[k] && form[k] !== "N/A");
+    if (hayDatos) {
+      if (hematologiaNA) setHematologiaNA(false);
+      if (form.glucosaNA) setField("glucosaNA", false);
+      if (form.creatininaNA) setField("creatininaNA", false);
+    }
+  }, [form]);
+
   const handleHematologiaNA = (checked) => {
     setHematologiaNA(checked);
     const value = checked ? "N/A".trim() : "";
@@ -160,7 +147,6 @@ export const HematologiaBioquimicaSIEO = ({
           newFields[k] = value;
         }
       });
-      // Bioquímica: glucosa libre, creatinina sí N/A
       newFields["glucosa"] = checked ? "" : "";
       newFields["glucosaNA"] = false;
       newFields["creatinina"] = value;
@@ -173,271 +159,173 @@ export const HematologiaBioquimicaSIEO = ({
     }
   };
 
-  // Ref para glucosa y creatinina
-  const glucosaRef = useRef();
-  const creatininaRef = useRef();
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      if (!form.norden) {
+        Swal.fire("Error", "Debe Introducir un Nro de Historia Clínica válido", "error");
+        return;
+      }
+      handleClear();
+      VerifyTR(form.norden, tabla, token, setForm, setFormO, selectedSede, setSearchMedico);
+      GetTable(form.norden);
+    }
+  };
 
-  // Reacciones Serológicas: N/A marcado por defecto
-  const [rprNA, setRprNA] = useState(true);
-  const [vihNA, setVihNA] = useState(true);
+  const capitalize = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
 
   return (
-    <div className="flex flex-col gap-2 w-full text-md">
+    <div className=" p-4 space-y-3">
       {/* Barra superior */}
-      <div className="flex flex-wrap items-center w-full gap-6 p-2 justify-between">
-        <div className="flex flex-wrap items-center gap-6 flex-1 min-w-0">
-          <label className="font-bold flex items-center whitespace-nowrap">
-            {" "}
-            <input 
-              type="checkbox" 
-              className="mr-1" 
-              checked={false}
-              onChange={() => {}}
-              readOnly
-            /> Consultas{" "}
-          </label>
-          <label className="font-bold flex items-center whitespace-nowrap">
-            {" "}
-            <input 
-              type="checkbox" 
-              className="mr-1" 
-              checked={false}
-              onChange={() => {}}
-              readOnly
-            /> Particular{" "}
-          </label>
-          <label className="font-bold flex items-center whitespace-nowrap">
-            {" "}
-            <input 
-              type="checkbox" 
-              className="mr-1" 
-              defaultChecked 
-              readOnly
-            /> Ficha
-            Médica Ocupacional{" "}
-          </label>
-          <label className="font-bold flex items-center whitespace-nowrap">
-            {" "}
-            N° Orden:{" "}
-            <input
-              name="norden"
-              value={form.norden || ""}
-              onChange={handleInputChange}
-              onKeyUp={(event) => {
-                if (event.key === "Enter") {
-                  if (!form.norden) {
-                    window.Swal &&
-                      window.Swal.fire(
-                        "Error",
-                        "Debe Introducir un Nro de Historia Clínica válido",
-                        "error"
-                      );
-                    event.preventDefault();
-                    return;
-                  }
-                  handleClear();
-                  VerifyTR(
-                    form.norden,
-                    tabla,
-                    token,
-                    setForm,
-                    setFormO,
-                    selectedSede,
-                    setSearchMedico
-                  );
-                  GetTable(form.norden);
-                }
-              }}
-              className="border rounded px-2 py-1 w-36 text-md ml-1"
-            />{" "}
-          </label>
-          <label className="font-bold flex items-center whitespace-nowrap">
-            {" "}
-            N° Recibo:{" "}
-            <input
-              className="border rounded px-2 py-1 w-36 text-md ml-1 bg-gray-100"
-              disabled
-            />{" "}
-          </label>
-          <label className="font-bold flex items-center whitespace-nowrap">
-            {" "}
-            DNI:{" "}
-            <input
-              name="dni"
-              value={form.dni || ""}
-              onChange={handleInputChange}
-              className="border rounded px-2 py-1 w-36 text-md ml-1 bg-gray-100"
-              disabled
-            />{" "}
-          </label>
-          <label className="font-bold flex items-center whitespace-nowrap">
-            {" "}
-            Fecha:{" "}
-            <input
-              name="fecha"
-              type="date"
-              value={form.fecha || ""}
-              onChange={handleInputChange}
-              className="border rounded px-2 py-1 w-44 text-md ml-1"
-            />{" "}
-          </label>
-        </div>
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => setField("ficha", !form.ficha)}
-            className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-1 rounded text-md font-bold"
-          >
-            Editar
-          </button>
-          <Checkbox
-            label={
-              <span className="text-red-600 font-bold text-md">INCOMPLETO</span>
-            }
-            checked={!form.ficha}
-            onChange={(v) => setField("ficha", !v)}
+      <SectionFieldset legend="Información del Examen" className="space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            value={form.norden}
+            onChange={handleInputChange}
+            onKeyUp={handleSearch}
+          />
+          <InputCheckbox
+            label="Ficha Médica Ocupacional"
+            checked={true}
+            disabled
           />
         </div>
-      </div>
-
-      {/* Contenido principal */}
-      <div className="flex flex-col lg:flex-row gap-4">
-        <div className="flex-1 bg-white p-4 rounded shadow font-sans text-md">
-          {/* Top general section */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-4">
-              <label className="w-44 font-bold mb-0">Responsable Lab</label>
-              <div className="flex-1 relative">
-                <input
-                  type="text"
-                  autoComplete="off"
-                  name="responsable"
-                  value={searchMedico}
-                  onChange={handleMedicoSearch}
-                  className={`border rounded px-2 py-1 w-full bg-gray-100 font-bold`}
-                  onKeyUp={(e) => {
-                    if (e.key === "Enter" && filteredMedicos.length > 0) {
-                      e.preventDefault();
-                      handleSelectMedico(filteredMedicos[0]);
-                    }
-                  }}
-                  onFocus={() => {
-                    if (searchMedico) {
-                      setFilteredMedicos(
-                        listDoc.filter((m) =>
-                          m.toLowerCase().includes(searchMedico.toLowerCase())
-                        )
-                      );
-                    }
-                  }}
-                  onBlur={() => setTimeout(() => setFilteredMedicos([]), 100)}
-                />
-                {searchMedico && filteredMedicos.length > 0 && (
-                  <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
-                    {filteredMedicos.map((m) => (
-                      <li
-                        key={m}
-                        className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                        onMouseDown={() => handleSelectMedico(m)}
-                      >
-                        {m}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center flex-1">
-                <label className="w-44 font-bold mb-0">Nombres</label>
-                <input
-                  name="paciente"
-                  value={form.paciente || ""}
-                  className="border border-gray-400 rounded-sm px-1 w-full text-md bg-gray-100 font-bold"
-                  disabled
-                />
-              </div>
-              <div className="flex items-center">
-                <label className="w-44 font-bold mb-0 ml-4">
-                  G.F. Sang. Pedido
-                </label>
-                <input
-                  name="gfSangPedido"
-                  value={form.gfSangPedido || ""}
-                  className="border border-gray-400 rounded-sm px-1 w-44 bg-gray-100 text-md font-bold"
-                  disabled
-                />
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="w-44 font-bold mb-0">Emp. Contratista</label>
-              <input
-                name="empContratista"
-                value={form.empContratista || ""}
-                className="border border-gray-400 rounded-sm px-1 w-full text-md bg-gray-100 font-bold"
-                disabled
-              />
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="w-44 font-bold mb-0">Empresa</label>
-              <input
-                name="empresa"
-                value={form.empresa || ""}
-                className="border border-gray-400 rounded-sm px-1 w-full text-md bg-gray-100 font-bold"
-                disabled
-              />
-            </div>
-          </div>
-
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <InputTextOneLine
+            label="DNI"
+            name="dni"
+            value={form.dni}
+            disabled
+          />
+          <InputTextOneLine
+            label="Fecha"
+            name="fecha"
+            type="date"
+            value={form.fecha}
+            onChange={handleInputChange}
+            labelWidth="80px"
+            inputClassName="w-44"
+          />
+        </div>
+        <InputCheckbox
+          label={<span className="text-red-600 font-bold">INCOMPLETO</span>}
+          checked={!form.ficha}
+          onChange={(e) => setField("ficha", !e.target.checked)}
+        />
+      </SectionFieldset>
+      <SectionFieldset legend="Datos Personales" className="space-y-3">
+        <div className="relative">
+          <InputTextOneLine
+            label="Responsable Lab"
+            name="responsable"
+            value={searchMedico}
+            onChange={handleMedicoSearch}
+            labelWidth="140px"
+            inputClassName="bg-gray-100 font-bold"
+            onKeyUp={(e) => {
+              if (e.key === "Enter" && filteredMedicos.length > 0) {
+                e.preventDefault();
+                handleSelectMedico(filteredMedicos[0]);
+              }
+            }}
+            onFocus={() => {
+              if (searchMedico) {
+                setFilteredMedicos(
+                  listDoc.filter((m) =>
+                    m.toLowerCase().includes(searchMedico.toLowerCase())
+                  )
+                );
+              }
+            }}
+            onBlur={() => setTimeout(() => setFilteredMedicos([]), 100)}
+          />
+          {searchMedico && filteredMedicos.length > 0 && (
+            <ul className="absolute left-[140px] right-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10 shadow-lg">
+              {filteredMedicos.map((m) => (
+                <li
+                  key={m}
+                  className="cursor-pointer px-3 py-2 hover:bg-gray-100 font-bold"
+                  onMouseDown={() => handleSelectMedico(m)}
+                >
+                  {m}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div className="space-y-4">
+          <InputTextOneLine
+            label="Nombres"
+            name="paciente"
+            value={form.paciente || ""}
+            disabled
+            labelWidth="140px"
+          />
+          <InputTextOneLine
+            label="G.F. Sang. Pedido"
+            name="gfSangPedido"
+            value={form.gfSangPedido || ""}
+            disabled
+            labelWidth="140px"
+            inputClassName="w-44"
+          />
+          <InputTextOneLine
+            label="Emp. Contratista"
+            name="empContratista"
+            value={form.empContratista || ""}
+            disabled
+            labelWidth="140px"
+          />
+          <InputTextOneLine
+            label="Empresa"
+            name="empresa"
+            value={form.empresa || ""}
+            disabled
+            labelWidth="140px"
+          />
+        </div>
+      </SectionFieldset>
+      {/* Contenido principal en dos columnas */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Columna 1 - Datos del Paciente */}
+        <div className="space-y-6">
           {/* Hematología */}
-          <div className="mt-8 mb-2">
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-bold text-xl text-[#233245]">
-                Hematología
-              </span>
-              <Checkbox
+          <SectionFieldset legend="Hematología" className="space-y-4">
+            <div className="flex items-center justify-between mb-4">
+              <InputCheckbox
                 label={<span className="font-medium">N/A</span>}
                 checked={hematologiaNA}
-                onChange={handleHematologiaNA}
+                onChange={(e) => handleHematologiaNA(e.target.checked)}
               />
             </div>
-            <div className="grid grid-cols-2 gap-x-8">
-              {/* Left Column */}
-              <div className="flex flex-col gap-2">
-                <div className="flex flex-row items-center h-12 mb-0">
-                  <label className="w-40 font-medium text-[#233245]">
-                    Grupo Sanguíneo
-                  </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <div className="flex items-center gap-4">
+                  <label className="w-40 font-medium text-[#233245]">Grupo Sanguíneo:</label>
                   <div className="flex gap-4 bg-white rounded-lg border border-gray-200 px-3 py-2 shadow-sm">
                     {["O", "A", "B", "AB"].map((opt) => (
-                      <label
-                        key={opt}
-                        className="flex items-center gap-1 text-gray-900 font-medium"
-                      >
+                      <label key={opt} className="flex items-center gap-1 text-gray-900 font-medium">
                         <input
                           type="radio"
                           name="grupo"
                           value={opt}
                           checked={form.grupo === opt}
-                          onClick={(e) =>
-                            setField(
-                              "grupo",
-                              form.grupo === e.target.value
-                                ? ""
-                                : e.target.value
-                            )
+                          onChange={(e) =>
+                            setField("grupo", form.grupo === e.target.value ? "" : e.target.value)
                           }
                           disabled={form.empresaNA}
-                          className="accent-blue-600 w-5 h-5 rounded-full border-2 border-gray-400"
+                          className="accent-blue-600 w-5 h-5"
                         />
                         {opt}
                       </label>
                     ))}
                   </div>
                 </div>
-                <div className="flex flex-row items-center h-12 mb-0">
-                  <label className="w-40 font-medium text-[#233245]">
-                    Factor Rh :
-                  </label>
+                <div className="flex items-center gap-4">
+                  <label className="w-40 font-medium text-[#233245]">Factor Rh:</label>
                   <div className="flex gap-4 bg-white rounded-lg border border-gray-200 px-3 py-2 shadow-sm">
                     <label className="flex items-center gap-1 text-gray-900 font-medium">
                       <input
@@ -445,14 +333,9 @@ export const HematologiaBioquimicaSIEO = ({
                         name="rh"
                         value="Rh(+)"
                         checked={form.rh === "Rh(+)"}
-                        onClick={(e) =>
-                          setField(
-                            "rh",
-                            form.rh === e.target.value ? "" : e.target.value
-                          )
-                        }
+                        onChange={(e) => setField("rh", form.rh === e.target.value ? "" : e.target.value)}
                         disabled={form.empresaNA}
-                        className="accent-blue-600 w-5 h-5 rounded-full border-2 border-gray-400"
+                        className="accent-blue-600 w-5 h-5"
                       />
                       Rh(+)
                     </label>
@@ -462,14 +345,9 @@ export const HematologiaBioquimicaSIEO = ({
                         name="rh"
                         value="Rh(-)"
                         checked={form.rh === "Rh(-)"}
-                        onClick={(e) =>
-                          setField(
-                            "rh",
-                            form.rh === e.target.value ? "" : e.target.value
-                          )
-                        }
+                        onChange={(e) => setField("rh", form.rh === e.target.value ? "" : e.target.value)}
                         disabled={form.empresaNA}
-                        className="accent-blue-600 w-5 h-5 rounded-full border-2 border-gray-400"
+                        className="accent-blue-600 w-5 h-5"
                       />
                       Rh(-)
                     </label>
@@ -482,38 +360,22 @@ export const HematologiaBioquimicaSIEO = ({
                   ["leucocitos", "mm³"],
                   ["hematies", "mm³"],
                   ["plaquetas", "mm³"],
-                ].map(([key, unit], idx) => (
-                  <div
-                    key={key}
-                    className="flex flex-row items-center h-12 mb-0"
-                  >
-                    <label className="w-40 font-medium text-[#233245]">
-                      {capitalize(key)} :
-                    </label>
+                ].map(([key, unit]) => (
+                  <div key={key} className="flex items-center gap-4">
+                    <label className="font-medium min-w-[100px] ">{capitalize(key)}:</label>
                     <input
                       name={key}
                       value={form[key] || ""}
                       onChange={handleInputChange}
-                      className={`border border-gray-300 rounded-lg px-3 py-1 w-44 text-md shadow-sm bg-white focus:ring-2 focus:ring-gray-300 transition-all font-medium ${
-                        form.empresaNA
-                          ? "bg-gray-200 text-gray-500"
-                          : "text-gray-900"
-                      }`}
+                      className={`border rounded px-2 py-1 w-32 ${form.empresaNA ? "bg-gray-200 text-gray-500" : ""
+                        }`}
                       disabled={form.empresaNA}
-                      ref={hematologiaRefs[idx]}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          const next = hematologiaRefs[idx + 1];
-                          if (next && next.current) next.current.focus();
-                        }
-                      }}
                     />
-                    <span className="ml-2 w-16 font-medium">{unit}</span>
+                    <span className="ml-2 w-16 font-medium ">{unit}</span>
                   </div>
                 ))}
               </div>
-              {/* Right Column alineado */}
-              <div className="flex flex-col gap-2">
+              <div className="space-y-3">
                 {[
                   ["neutrofilos", "%"],
                   ["abastonados", "%"],
@@ -522,145 +384,43 @@ export const HematologiaBioquimicaSIEO = ({
                   ["eosinofilos", "%"],
                   ["basofilos", "%"],
                   ["linfocitos", "%"],
-                ].map(([key, unit], idx) => (
-                  <div
-                    key={key}
-                    className="flex flex-row items-center h-12 mb-0"
-                  >
-                    <label className="w-40 font-medium text-[#233245] text-right pr-2">
-                      {capitalize(key)} :
-                    </label>
+                ].map(([key, unit]) => (
+                  <div key={key} className="flex items-center gap-4">
+                    <label className="font-medium min-w-[100px] ">{capitalize(key)}:</label>
                     <input
                       name={key}
                       value={form[key] || ""}
                       onChange={handleInputChange}
-                      className={`border border-gray-300 rounded-lg px-3 py-1 w-44 text-md shadow-sm bg-white focus:ring-2 focus:ring-gray-300 transition-all font-medium ${
-                        form.empresaNA
-                          ? "bg-gray-200 text-gray-500"
-                          : "text-gray-900"
-                      }`}
+                      className={`border rounded px-2 py-1 w-32 ${form.empresaNA ? "bg-gray-200 text-gray-500" : ""
+                        }`}
                       disabled={form.empresaNA}
-                      ref={hematologiaRefs[idx + 6]}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          // Si es linfocitos, focus a glucosa
-                          if (key === "linfocitos") {
-                            if (glucosaRef && glucosaRef.current)
-                              glucosaRef.current.focus();
-                          } else {
-                            const next = hematologiaRefs[idx + 7];
-                            if (next && next.current) next.current.focus();
-                          }
-                        }
-                      }}
                     />
-                    <span className="ml-2 w-16 font-medium">{unit}</span>
+                    <span className="ml-2 w-16 font-medium ">{unit}</span>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
+          </SectionFieldset>
+        </div>
 
-          {/* Bioquímica */}
-          <div className="mt-8 mb-2">
-            <span className="font-bold text-xl mb-4 text-[#233245] block">
-              Bioquímica
-            </span>
-            <div className="space-y-3">
-              <div className="flex flex-row items-center h-12 mb-0 gap-x-4">
-                <label className="w-40 font-medium text-[#233245]">
-                  Glucosa :
-                </label>
-                  <input
-                    name="glucosa"
-                    ref={glucosaRef}
-                    value={form.glucosa || ""}
-                    onChange={handleInputChange}
-                  className={`border border-gray-300 rounded-lg px-3 py-1 w-44 text-md shadow-sm bg-white focus:ring-2 focus:ring-gray-300 transition-all font-medium ${
-                    form.glucosaNA
-                      ? "bg-gray-200 text-gray-500"
-                      : "text-gray-900"
-                  }`}
-                  disabled={form.glucosaNA}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      if (creatininaRef && creatininaRef.current)
-                        creatininaRef.current.focus();
-                    }
-                  }}
-                />
-                <span className="ml-4 w-12 font-medium">mg/dl</span>
-                <span className="ml-4">
-                  <Checkbox
-                    label={<span className="font-medium">N/A</span>}
-                    checked={form.glucosaNA || form.glucosa === "N/A"}
-                    onChange={(v) => {
-                      setField("glucosaNA", v);
-                      setField("glucosa", v ? "N/A".trim() : "");
-                    }}
-                  />
-                </span>
-                <span className="ml-6 text-md text-gray-600 font-medium">
-                  Valores normales 70 - 110 mg/dl
-                </span>
-              </div>
-              <div className="flex flex-row items-center h-12 mb-0 gap-x-4">
-                <label className="w-40 font-medium text-[#233245]">
-                  Creatinina :
-                </label>
-                  <input
-                    name="creatinina"
-                    ref={creatininaRef}
-                    value={form.creatinina || ""}
-                    onChange={handleInputChange}
-                  className={`border border-gray-300 rounded-lg px-3 py-1 w-44 text-md shadow-sm bg-white focus:ring-2 focus:ring-gray-300 transition-all font-medium ${
-                    form.creatininaNA
-                      ? "bg-gray-200 text-gray-500"
-                      : "text-gray-900"
-                  }`}
-                  disabled={form.creatininaNA}
-                />
-                <span className="ml-4 w-12 font-medium">mg/dl</span>
-                <span className="ml-4">
-                  <Checkbox
-                    label={<span className="font-medium">N/A</span>}
-                    checked={form.creatininaNA || form.creatinina === "N/A"}
-                    onChange={(v) => {
-                      setField("creatininaNA", v);
-                      setField("creatinina", v ? "N/A".trim() : "");
-                    }}
-                  />
-                </span>
-                <span className="ml-6 text-md text-gray-600 font-medium">
-                  Valores normales 0.8 - 1.4 mg/dl
-                </span>
-              </div>
-            </div>
-          </div>
-
+        {/* Columna 2 - Hematología */}
+        <div className="space-y-6">
           {/* Reacciones Serológicas */}
-          <div className="mt-8 mb-2">
-            <span className="font-bold text-xl mb-4 text-[#233245] block">
-              Reacciones Serológicas
-            </span>
-            <div className="grid grid-cols-2 divide-x divide-gray-200">
-              <div className="pr-4 space-y-2">
-                <div className="flex flex-row items-center mb-2">
-                  <label className="w-20 font-medium text-[#233245]">
-                    RPR :
-                  </label>
-                  <input
+          <SectionFieldset legend="Reacciones Serológicas" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <div className="flex items-center gap-4">
+                  <label className="w-20 font-medium text-[#233245]">RPR:</label>
+                  <InputTextOneLine
                     name="rpr"
                     value={form.rpr || ""}
                     onChange={handleInputChange}
-                    className={`border border-gray-300 rounded-lg px-3 py-1 flex-1 text-md shadow-sm font-medium bg-white focus:ring-2 focus:ring-gray-300 transition-all ${
-                      rprNA ? "bg-gray-200 text-gray-500" : "text-gray-900"
-                    }`}
                     disabled={rprNA}
+                    inputClassName={`flex-1 ${rprNA ? "bg-gray-200 text-gray-500" : ""}`}
                   />
                 </div>
                 <div className="flex items-center gap-4 justify-center">
-                  <Checkbox
+                  <InputCheckbox
                     label={<span className="font-medium">-</span>}
                     checked={form.rpr === "NEGATIVO"}
                     onChange={() => {
@@ -668,7 +428,7 @@ export const HematologiaBioquimicaSIEO = ({
                       setField("rprNA", false);
                     }}
                   />
-                  <Checkbox
+                  <InputCheckbox
                     label={<span className="font-medium">+</span>}
                     checked={form.rpr === "POSITIVO"}
                     onChange={() => {
@@ -676,10 +436,11 @@ export const HematologiaBioquimicaSIEO = ({
                       setField("rprNA", false);
                     }}
                   />
-                  <Checkbox
+                  <InputCheckbox
                     label={<span className="font-medium">N/A</span>}
                     checked={form.rpr === "N/A"}
-                    onChange={(v) => {
+                    onChange={(e) => {
+                      const v = e.target.checked;
                       setRprNA(v);
                       setField("rprNA", v);
                       setField("rpr", v ? "N/A".trim() : "");
@@ -687,23 +448,19 @@ export const HematologiaBioquimicaSIEO = ({
                   />
                 </div>
               </div>
-              <div className="pl-4 space-y-2">
-                <div className="flex flex-row items-center mb-2">
-                  <label className="w-20 font-medium text-[#233245]">
-                    VIH :
-                  </label>
-                  <input
+              <div className="space-y-3">
+                <div className="flex items-center gap-4">
+                  <label className="w-20 font-medium text-[#233245]">VIH:</label>
+                  <InputTextOneLine
                     name="vih"
                     value={form.vih || ""}
                     onChange={handleInputChange}
-                    className={`border border-gray-300 rounded-lg px-3 py-1 flex-1 text-md shadow-sm font-medium bg-white focus:ring-2 focus:ring-gray-300 transition-all ${
-                      vihNA ? "bg-gray-200 text-gray-500" : "text-gray-900"
-                    }`}
                     disabled={vihNA}
+                    inputClassName={`flex-1 ${vihNA ? "bg-gray-200 text-gray-500" : ""}`}
                   />
                 </div>
                 <div className="flex items-center gap-4 justify-center">
-                  <Checkbox
+                  <InputCheckbox
                     label={<span className="font-medium">-</span>}
                     checked={form.vih === "NEGATIVO"}
                     onChange={() => {
@@ -711,7 +468,7 @@ export const HematologiaBioquimicaSIEO = ({
                       setField("vihNA", false);
                     }}
                   />
-                  <Checkbox
+                  <InputCheckbox
                     label={<span className="font-medium">+</span>}
                     checked={form.vih === "POSITIVO"}
                     onChange={() => {
@@ -719,10 +476,11 @@ export const HematologiaBioquimicaSIEO = ({
                       setField("vihNA", false);
                     }}
                   />
-                  <Checkbox
+                  <InputCheckbox
                     label={<span className="font-medium">N/A</span>}
                     checked={form.vih === "N/A"}
-                    onChange={(v) => {
+                    onChange={(e) => {
+                      const v = e.target.checked;
                       setVihNA(v);
                       setField("vihNA", v);
                       setField("vih", v ? "N/A".trim() : "");
@@ -731,149 +489,108 @@ export const HematologiaBioquimicaSIEO = ({
                 </div>
               </div>
             </div>
-          </div>
-          <div className="flex justify-between mt-6">
-            <button
-              onClick={handleClear}
-              className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded text-md"
-            >
-              Limpiar
-            </button>
-          </div>
-        </div>
+          </SectionFieldset>
+          {/* Bioquímica */}
+          <SectionFieldset legend="Bioquímica" className="space-y-4">
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <label className="font-medium min-w-[100px] ">Glucosa:</label>
+                <input
+                  name="glucosa"
+                  value={form.glucosa || ""}
+                  onChange={handleInputChange}
+                  className={`border rounded px-2 py-1 w-32 ${form.glucosaNA ? "bg-gray-200 text-gray-500" : ""
+                    }`}
+                  disabled={form.glucosaNA}
+                />
+                <span className="ml-2 w-12 font-medium ">mg/dl</span>
+                <InputCheckbox
+                  label={<span className="font-medium">N/A</span>}
+                  checked={form.glucosaNA || form.glucosa === "N/A"}
+                  onChange={(e) => {
+                    const v = e.target.checked;
+                    setField("glucosaNA", v);
+                    setField("glucosa", v ? "N/A".trim() : "");
+                  }}
+                />
+                <span className="ml-6  text-gray-600 font-medium">
+                  Valores normales 70 - 110 mg/dl
+                </span>
+              </div>
+              <div className="flex items-center gap-4">
+                <label className="font-medium min-w-[100px] ">Creatinina:</label>
+                <input
+                  name="creatinina"
+                  value={form.creatinina || ""}
+                  onChange={handleInputChange}
+                  className={`border rounded px-2 py-1 w-32 ${form.creatininaNA ? "bg-gray-200 text-gray-500" : ""
+                    }`}
+                  disabled={form.creatininaNA}
+                />
+                <span className="ml-2 w-12 font-medium ">mg/dl</span>
+                <InputCheckbox
+                  label={<span className="font-medium">N/A</span>}
+                  checked={form.creatininaNA || form.creatinina === "N/A"}
+                  onChange={(e) => {
+                    const v = e.target.checked;
+                    setField("creatininaNA", v);
+                    setField("creatinina", v ? "N/A".trim() : "");
+                  }}
+                />
+                <span className="ml-6  text-gray-600 font-medium">
+                  Valores normales 0.8 - 1.4 mg/dl
+                </span>
+              </div>
+            </div>
+          </SectionFieldset>
 
-
-        <div className="bg-white p-4 rounded shadow w-full lg:w-1/3 flex flex-col justify-between">
-          <Section title="Registros anteriores">
-            <table className="w-full text-md border border-gray-300 rounded-lg overflow-hidden">
-              <thead>
-                <tr className="bg-gradient-to-r from-blue-100 to-blue-300 text-center">
-                  <th>Fecha Laboratorio</th>
-                  <th>Grupo Sanguineo</th>
-                  <th>Factor RH</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tableLab.length == 0 && (
-                  <tr>
-                    <td
-                      className="border border-gray-300 px-2 py-1 mb-1 text-center"
-                      colSpan={7}
-                    >
-                      Sin Datos...
-                    </td>
+          {/* Registros anteriores */}
+          <SectionFieldset legend="Registros anteriores" className="space-y-4">
+            <div className="overflow-x-auto">
+              <table className="w-full  border border-gray-300 rounded-lg overflow-hidden">
+                <thead>
+                  <tr className=" text-center">
+                    <th className="border px-2 py-1">Fecha Lab</th>
+                    <th className="border px-2 py-1">Grupo</th>
+                    <th className="border px-2 py-1">RH</th>
                   </tr>
-                )}
-                {tableLab.map((row, i) => (
-                  <tr
-                    key={i}
-                    className={`text-center transition-all duration-200 relative after:content-[""] after:absolute after:inset-0 }`}
-                    style={{ zIndex: 1, position: "relative" }}
-                  >
-                    <td className="font-bold border-b border-gray-200 py-1">
-                      {row.fechaLab}
-                    </td>
-                    <td className="border-b border-gray-200 py-1">
-                      {row.grupoSanguineo}
-                    </td>
-                    <td className="border-b border-gray-200 py-1">
-                      {row.factorRh}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </Section>
+                </thead>
+                <tbody>
+                  {tableLab.length === 0 ? (
+                    <tr>
+                      <td className="border border-gray-300 px-2 py-1 text-center" colSpan={3}>
+                        Sin Datos...
+                      </td>
+                    </tr>
+                  ) : (
+                    tableLab.map((row, i) => (
+                      <tr key={i} className="text-center">
+                        <td className="font-bold border-b border-gray-200 py-1 ">{row.fechaLab}</td>
+                        <td className="border-b border-gray-200 py-1 ">{row.grupoSanguineo}</td>
+                        <td className="border-b border-gray-200 py-1 ">{row.factorRh}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </SectionFieldset>
         </div>
       </div>
 
-      {status && <p className="text-center text-green-600 text-md">{status}</p>}
+
+
+      {/* Botón Limpiar al final */}
+      <div className="flex justify-start">
+        <button
+          onClick={handleClear}
+          className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded"
+        >
+          Limpiar
+        </button>
+      </div>
     </div>
   );
 };
-
-// Componentes auxiliares
-function Field({
-  label,
-  name,
-  type = "text",
-  unit = "",
-  value,
-  onChange,
-  children,
-  disabled,
-}) {
-  return (
-    <div className="flex flex-col">
-      <label className="font-medium mb-1 text-md">
-        {label}
-        {unit && <span className="text-md ml-1">{unit}</span>}
-      </label>
-      <div className="flex items-center gap-2">
-        <input
-          type={type}
-          name={name}
-          value={value}
-          disabled={disabled}
-          onChange={onChange}
-          className={`border rounded px-2 py-1 flex-1 text-md ${
-            disabled ? "bg-gray-100" : ""
-          }`}
-        />
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function Checkbox({ label, checked, onChange, ...props }) {
-  return (
-    <label className="flex items-center gap-1 text-md">
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        className="accent-blue-600"
-        {...props}
-      />
-      {label}
-    </label>
-  );
-}
-
-function RadioGroup({ label, name, options, value, onChange }) {
-  return (
-    <div className="flex flex-col">
-      <span className="font-medium mb-1 text-md">{label}</span>
-      <div className="flex items-center gap-2">
-        {options.map((opt) => (
-          <label key={opt} className="flex items-center gap-1 text-md">
-            <input
-              type="radio"
-              name={name}
-              value={opt}
-              checked={value === opt}
-              onChange={(e) => onChange(e.target.value)}
-            />
-            {opt}
-          </label>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Section({ title, children }) {
-  return (
-    <div className="space-y-2">
-      <h3 className="text-blue-700 font-semibold text-md">{title}</h3>
-      {children}
-    </div>
-  );
-}
-
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
 
 export default HematologiaBioquimicaSIEO;

@@ -297,7 +297,7 @@ export default function OdontogramaLevantarObservacion({
           LEVANTAR OBSERVACION
         </h2>
         <button
-          className=" text-gray-500 hover:text-gray-700 text-4xl "
+          className=" text-gray-500 hover:text-gray-700 text-2xl "
           onClick={closeModal}
         >
           ×

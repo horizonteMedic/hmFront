@@ -1,211 +1,172 @@
 import Swal from "sweetalert2";
-import { getFetch } from "../../../../getFetch/getFetch.js";
-import { SubmitCoproParasitologia } from "../model.js";
-// import { SubmitCoprocultivo } from "../model.js";
+import {
+  GetInfoPacDefault,
+  GetInfoServicioDefault,
+  LoadingDefault,
+  PrintHojaRDefault,
+  SubmitDataServiceDefault,
+  VerifyTRDefault,
+} from "../../../../../../utils/functionUtils";
 
-export const Loading = (text) => {
-  Swal.fire({
-    title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,
-    html: `<div style=\"font-size:1.1em;\"><span style='color:#0d9488;font-weight:bold;'></span></div><div class='mt-2'>Espere por favor...</div>`,
-    icon: "info",
-    background: "#f0f6ff",
-    color: "#22223b",
-    showConfirmButton: false,
-    allowOutsideClick: false,
-    allowEscapeKey: false,
-    showCancelButton: true,
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Yes, delete it!",
-    customClass: {
-      popup: "swal2-border-radius",
-      title: "swal2-title-custom",
-      htmlContainer: "swal2-html-custom",
-    },
-    showClass: {
-      popup: "animate__animated animate__fadeInDown",
-    },
-    hideClass: {
-      popup: "animate__animated animate__fadeOutUp",
-    },
-    didOpen: () => {
-      Swal.showLoading();
-    },
-  });
-};
+const obtenerReporteUrl =
+  "/api/v01/ct/manipuladores/obtenerReporteCoproparasitologico";
+const registrarUrl =
+  "/api/v01/ct/manipuladores/registrarActualizarManipuladoresCoproparasitologico";
 
-export const VerifyTR = async (nro, tabla, token, set, sede, setIsCopro) => {
-  if (!nro) {
-    await Swal.fire(
-      "Error",
-      "Debe Introducir un Nro de Historia Clinica válido",
-      "error"
-    );
-    return;
+export const GetInfoServicio = async (
+  nro,
+  tabla,
+  set,
+  token,
+  onFinish = () => {}
+) => {
+  const res = await GetInfoServicioDefault(
+    nro,
+    tabla,
+    token,
+    obtenerReporteUrl,
+    onFinish
+  );
+  if (res) {
+    set((prev) => ({
+      ...prev,
+      norden: res.norden ?? "",
+      fecha: res.fecha ?? prev.fecha,
+      nombres: res.nombres ?? prev.nombres,
+      edad: res.edad ?? prev.edad,
+      tipoCoproparasitologico: Boolean(res.tipoCoproparasitologico),
+      heces1_color: res.txtcolor ?? "",
+      heces1_aspecto: res.txtaspecto ?? "",
+      heces1_moco: res.txtmocoFecal ?? "",
+      heces1_sangre: res.txtsangrev ?? "",
+      heces1_restos: res.txtrestosa ?? "",
+      heces1_grasa: res.txtgrasa ?? "",
+      heces2_color: res.txtcolor1 ?? "",
+      heces2_aspecto: res.txtaspecto1 ?? "",
+      heces2_moco: res.txtmocoFecal1 ?? "",
+      heces2_sangre: res.txtsangrev1 ?? "",
+      heces2_restos: res.txtrestosa1 ?? "",
+      heces2_grasa: res.txtgrasa1 ?? "",
+      heces3_color: res.txtcolor2 ?? "",
+      heces3_aspecto: res.txtaspecto2 ?? "",
+      heces3_moco: res.txtmocoFecal2 ?? "",
+      heces3_sangre: res.txtsangrev2 ?? "",
+      heces3_restos: res.txtrestosa2 ?? "",
+      heces3_grasa: res.txtgrasa2 ?? "",
+      micro1_leucocitos: res.txtleucocitos ?? "",
+      micro1_hematies: res.txthematies ?? "",
+      micro1_parasitos: res.txtlugol ?? "",
+      micro2_leucocitos: res.txtleucocitos1 ?? "",
+      micro2_hematies: res.txthematies1 ?? "",
+      micro2_parasitos: res.txtlugol1 ?? "",
+      micro3_leucocitos: res.txtleucocitos2 ?? "",
+      micro3_hematies: res.txthematies2 ?? "",
+      micro3_parasitos: res.txtlugol2 ?? "",
+    }));
   }
-  Loading("Validando datos");
-  getFetch(
-    `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
-    token
-  ).then((res) => {
-    console.log(res);
-    if (res.id === 0) {
-      //No tiene registro previo
-      GetInfoPac(nro, set, token, sede);
-    } else {
-      GetInfoCoproParasitologia(nro, tabla, set, token,setIsCopro);
-    }
-  });
 };
 
-export const GetInfoPac = (nro, set, token, sede) => {
-  getFetch(
-    `/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`,
-    token
-  )
-    .then((res) => {
-      console.log("pros", res);
-      set((prev) => ({
-        ...prev,
-        ...res,
-        nombres: res.nombresApellidos,
-      }));
-    })
-    .finally(() => {
-      Swal.close();
-    });
-};
-
-export const GetInfoCoproParasitologia = (nro, tabla, set, token,setIsCopro) => {
-
-  getFetch(
-    `/api/v01/ct/manipuladores/obtenerReporteCoproparasitologico?nOrden=${nro}&nameService=${tabla}`,
-    token
-  )
-    .then((res) => {
-      if (res.norden) {
-         Swal.fire(
-          "Alerta",
-          "Este paciente ya cuenta con registros de Parasitología",
-          "warning"
-      );
-        setIsCopro(res.tipoCoproparasitologico);
-        set((prev) => ({
-          ...prev,
-          ...res,
-          fecha: res.fecha,
-          heces1: {
-            color: res.txtcolor,
-            aspecto: res.txtaspecto,
-            moco: res.txtmocoFecal,
-            sangre: res.txtsangrev,
-            restos: res.txtrestosa,
-            grasa: res.txtgrasa,
-          },
-          micro1: {
-            leucocitos: res.txtleucocitos,
-            hematies: res.txthematies,
-            parasitos: res.txtlugol,
-          },
-          heces2: {
-            color: res.txtcolor1,
-            aspecto: res.txtaspecto1,
-            moco: res.txtmocoFecal1,
-            sangre: res.txtsangrev1,
-            restos: res.txtrestosa1,
-            grasa: res.txtgrasa1,
-          },
-          micro2: {
-            leucocitos: res.txtleucocitos1,
-            hematies: res.txthematies1,
-            parasitos: res.txtlugol1,
-          },
-          heces3: {
-            color: res.txtcolor2,
-            aspecto: res.txtaspecto2,
-            moco: res.txtmocoFecal2,
-            sangre: res.txtsangrev2,
-            restos: res.txtrestosa2,
-            grasa: res.txtgrasa2,
-          },
-          micro3: {
-            leucocitos: res.txtleucocitos2,
-            hematies: res.txthematies2,
-            parasitos: res.txtlugol2,
-          },
-        }));
-      } else {
-        Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
-      }
-    })
-};
-
-export const SubmitCoproParasitologiaManipulador = async (
+export const SubmitDataService = async (
   form,
   token,
   user,
   limpiar,
-  tabla
+  tabla,
+  datosFooter
 ) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
     return;
   }
-  Loading("Registrando Datos");
-  console.log("formulario", form);
-  SubmitCoproParasitologia(form, user, token).then((res) => {
-    console.log(res);
-    if (res.id === 1 || res.id === 0) {
-      Swal.fire({
-        title: "Exito",
-        text: `${res.mensaje},\n¿Desea imprimir?`,
-        icon: "success",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-      }).then((result) => {
-        limpiar();
-        if (result.isConfirmed) {
-          PrintHojaR(form.norden, token, tabla);
-        }
-      });
-    } else {
-      Swal.fire("Error", "Ocurrio un error al Registrar", "error");
-    }
+
+  const body = {
+    norden: form.norden,
+    fecha: form.fecha,
+    txtcolor: form.heces1_color,
+    txtaspecto: form.heces1_aspecto,
+    txtmocoFecal: form.heces1_moco,
+    txtsangrev: form.heces1_sangre,
+    txtrestosa: form.heces1_restos,
+    txtgrasa: form.heces1_grasa,
+    txtleucocitos: form.micro1_leucocitos,
+    txthematies: form.micro1_hematies,
+    txtlugol: form.micro1_parasitos,
+    txtcolor1: form.heces2_color,
+    txtaspecto1: form.heces2_aspecto,
+    txtmocoFecal1: form.heces2_moco,
+    txtsangrev1: form.heces2_sangre,
+    txtrestosa1: form.heces2_restos,
+    txtgrasa1: form.heces2_grasa,
+    txtleucocitos1: form.micro2_leucocitos,
+    txthematies1: form.micro2_hematies,
+    txtlugol1: form.micro2_parasitos,
+    txtcolor2: form.heces3_color,
+    txtaspecto2: form.heces3_aspecto,
+    txtmocoFecal2: form.heces3_moco,
+    txtsangrev2: form.heces3_sangre,
+    txtrestosa2: form.heces3_restos,
+    txtgrasa2: form.heces3_grasa,
+    txtleucocitos2: form.micro3_leucocitos,
+    txthematies2: form.micro3_hematies,
+    txtlugol2: form.micro3_parasitos,
+    tipoCoproparasitologico: form.tipoCoproparasitologico,
+    userRegistro: user,
+    userMedicoOcup: "",
+  };
+
+  await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
+    PrintHojaR(form.norden, token, tabla, datosFooter);
   });
 };
 
-export const PrintHojaR = (nro, token, tabla) => {
-  Loading("Cargando Formato a Imprimir");
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+  const jasperModules = import.meta.glob(
+    "../../../../../../jaspers/Manipuladores/*.jsx"
+  );
+  PrintHojaRDefault(
+    nro,
+    token,
+    tabla,
+    datosFooter,
+    obtenerReporteUrl,
+    jasperModules,
+    "../../../../../../jaspers/Manipuladores"
+  );
+};
 
-  getFetch(
-    `/api/v01/ct/manipuladores/obtenerReporteCoproparasitologico?nOrden=${nro}&nameService=${tabla}`, //revisar
-    token
-  )
-  .then(async (res) => {
-    if (res.norden) {
-      console.log(res);
-      const nombre = res.nameJasper;
-      console.log(nombre);
-      const jasperModules = import.meta.glob(
-        "../../../../../../jaspers/Manipuladores/*.jsx"
-      );
-      const modulo = await jasperModules[
-        `../../../../../../jaspers/Manipuladores/${nombre}.jsx`
-      ]();
-      // Ejecuta la función exportada por default con los datos
-      if (typeof modulo.default === "function") {
-        modulo.default(res);
-      } else {
-        console.error(
-          `El archivo ${nombre}.jsx no exporta una función por defecto`
+export const VerifyTR = async (nro, tabla, token, set, sede) => {
+  VerifyTRDefault(
+    nro,
+    tabla,
+    token,
+    set,
+    sede,
+    () => {
+      GetInfoPac(nro, set, token, sede);
+    },
+    () => {
+      GetInfoServicio(nro, tabla, set, token, () => {
+        Swal.fire(
+          "Alerta",
+          "Este paciente ya cuenta con registros de Parasitología.",
+          "warning"
         );
-      }
-      Swal.close()
-    } else {
-      Swal.close()
+      });
     }
-  })
-  .catch(async() => {
-    await Swal.fire('Error','No se encontro el registro','error')
-  })
+  );
+};
+
+const GetInfoPac = async (nro, set, token, sede) => {
+  const res = await GetInfoPacDefault(nro, token, sede);
+  if (res) {
+    set((prev) => ({
+      ...prev,
+      nombres: res.nombresApellidos ?? prev.nombres,
+      edad: res.edad ?? prev.edad,
+    }));
+  }
+};
+
+export const Loading = (mensaje) => {
+  LoadingDefault(mensaje);
 };

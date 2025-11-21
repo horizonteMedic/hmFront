@@ -190,11 +190,11 @@ export const SubmitDataServiceDefault = async (
     LoadingDefault("Registrando Datos");
     SubmitData(body, registrarUrl, token).then((res) => {
         console.log(res)
-        if (res.id === 1) {
+        if (res.id === 1 || res.nOrden) {
             if (tienePrint) {
                 Swal.fire({
                     title: "Exito",
-                    text: `${res.mensaje},\n¿Desea imprimir?`,
+                    text: `${res.mensaje ?? ""},\n¿Desea imprimir?`,
                     icon: "success",
                     showCancelButton: true,
                     confirmButtonColor: "#3085d6",

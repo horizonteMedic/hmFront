@@ -10,7 +10,7 @@ import {
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 
-const tabla = 'panel5d';
+const tabla = 'toxicologia';
 
 export default function Resultado_Panel5D() {
   const { token, userlogued, selectedSede, datosFooter } = useSessionData();
@@ -226,7 +226,7 @@ export default function Resultado_Panel5D() {
             </button>
           </div>
           <div className="flex flex-col items-end">
-            <span className="font-bold italic mb-2">IMPRIMIR</span>
+            <span className="font-bold italic mb-2">Imprimir</span>
             <div className="flex items-center gap-2">
               <InputTextOneLine
                 name="norden"

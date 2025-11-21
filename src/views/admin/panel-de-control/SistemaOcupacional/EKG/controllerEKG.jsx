@@ -22,7 +22,7 @@ export const GetInfoServicio = async (
   tabla,
   set,
   token,
-  onFinish = () => {}
+  onFinish = () => { }
 ) => {
   const res = await GetInfoServicioDefault(
     nro,
@@ -59,6 +59,8 @@ export const GetInfoServicio = async (
       conclusiones: res.conclusion ?? "",
       hallazgos: res.hallazgo ?? "",
       recomendaciones: res.recomendaciones ?? "",
+
+      user_medicoFirma: res.usuarioFirma,
     }));
   }
 };
@@ -93,6 +95,8 @@ export const SubmitDataService = async (
     conclusion: form.conclusiones,
     recomendaciones: form.recomendaciones,
     edadPaciente: form.edad?.replace(" años", ""),
+
+    usuarioFirma: form.user_medicoFirma,
     userRegistro: user,
   };
 

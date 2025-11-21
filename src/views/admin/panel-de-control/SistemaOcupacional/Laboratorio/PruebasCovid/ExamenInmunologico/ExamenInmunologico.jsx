@@ -317,7 +317,7 @@ export default function ExamenInmunologico({ apiBase, token, selectedSede }) {
             </button>
           </div>
           <div className="flex flex-col items-center">
-            <span className="font-bold text-blue-900 text-xs italic">IMPRIMIR</span>
+            <span className="font-bold text-blue-900 text-xs italic">Imprimir</span>
             <div className="flex gap-1 mt-1">
               <input className="border rounded px-2 py-1 w-24" value={form.norden} name="norden" onChange={handleChange}/>
               <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded border border-blue-700 flex items-center shadow-md transition-colors" onClick={handlePrint}>

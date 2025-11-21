@@ -65,7 +65,7 @@ const Dashboard = ({ TotalView }) => {
 
       <div className="main-content flex flex-col items-center justify-center p-5" style={{ marginTop: '5em' }}>
         <div className="relative w-full mb-12">
-          <h1 className="text-4xl font-extrabold text-center">
+          <h1 className="text-2xl font-extrabold text-center">
             Bienvenido, <span style={{ color: '#fc6b03' }}>{userLogued.sub}!</span>
           </h1>
           <a

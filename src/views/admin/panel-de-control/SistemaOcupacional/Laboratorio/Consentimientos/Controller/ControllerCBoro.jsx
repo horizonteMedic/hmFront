@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 import { getFetch } from '../../../getFetch/getFetch.js';
-import { GetInfoLaboratioEx } from "./model";
+import { GetInfoLaboratioEx } from "./model.js";
 
 const Loading = (text) => {
     Swal.fire({

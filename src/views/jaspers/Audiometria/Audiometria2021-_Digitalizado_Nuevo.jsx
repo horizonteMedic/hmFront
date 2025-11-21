@@ -1053,7 +1053,7 @@ export default function Audiometria2021_Digitalizado_Nuevo(data = {}) {
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8});
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

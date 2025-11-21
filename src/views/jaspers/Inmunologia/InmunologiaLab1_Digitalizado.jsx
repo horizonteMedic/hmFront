@@ -61,7 +61,7 @@ export default function InmunologiaLab1_Digitalizado(datos = {}) {
   // === FOOTER ===
   footer(doc, datos);
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
   const iframe = document.createElement("iframe");

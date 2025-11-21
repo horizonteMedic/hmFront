@@ -48,7 +48,10 @@ export const GetInfoServicio = async (
         const imc = res.imcTriaje ?? "";
         let obesidadIMC30 = false;
         let imcRed = false;
-        let nuevasObservaciones = "";
+        let nuevasObservaciones = (res.diagnosticoAudiometria ?? "").toUpperCase();
+        if (nuevasObservaciones != "") {
+            nuevasObservaciones += "\n";
+        }
         if (imc) {
             const imcValue = parseFloat(imc);
             if (!isNaN(imcValue) && imcValue > 25) {
@@ -92,7 +95,14 @@ export const GetInfoServicio = async (
         if (promedioOidoDerecho > 40 || promedioOidoIzquierdo > 40) {
             oidoMayor40 = true;
         }
-        console.log({ oidoMayor40})
+
+        let anemia = false;
+        const hemoglobina = parseFloat(res.laboratorioClinicoHemoglobina);
+
+        if (!isNaN(hemoglobina)) {
+            const umbral = res.sexoPaciente === "M" ? 13 : 12;
+            anemia = hemoglobina < umbral;
+        }
 
         set((prev) => ({
             ...prev,
@@ -123,6 +133,7 @@ export const GetInfoServicio = async (
 
             hipoacusiaFrecuenciasConversacionales: oidoMayor40,
             conclusion: oidoMayor40 ? "NO APTO" : null,
+            anemiaCriteriosOMS2011: anemia,
             //==========================TAB EXAMEN FISICO===========================
             // Examen Médico - Medidas Antropométricas y Signos Vitales
             frecuenciaCardiaca: res.frecuenciaCardiaca ?? "",
@@ -251,6 +262,8 @@ export const GetInfoServicioEditar = async (
 
             // Examen Físico - Información Adicional
             detalleInformacionExamenFisico: res.detalleInformacion_d_informacion ?? "",
+
+            user_medicoFirma: res.usuarioFirma,
             //===============PARTE INFERIOR=======================
             // Conclusión y Comentarios
             aptoDesde: res.fechaDesde_f_desde ?? today,
@@ -366,6 +379,8 @@ export const SubmitDataService = async (
         antecedentesInsuficienciaRenalCronicaNo: !form.insuficienciaRenalCronicaGradoIV,
         antecedentesAnemiaCualquierGradoSi: form.anemiaCriteriosOMS2011,
         antecedentesAnemiaCualquierGradoNo: !form.anemiaCriteriosOMS2011,
+
+        usuarioFirma: form.user_medicoFirma,
         usuarioRegistro: user,
     };
 
@@ -418,7 +433,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             //Necesita Agudeza visual 
             Swal.fire(
                 "Alerta",
-                "El paciente necesita pasar por Triaje.",
+                "El paciente necesita pasar por Ficha SAS.",
                 "warning"
             );
         }

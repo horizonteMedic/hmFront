@@ -1,15 +1,22 @@
-import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
-import { PrintHojaR, SubmitVDRLLab, VerifyTR } from './controller';
-import Swal from 'sweetalert2';
+import { useSessionData } from '../../../../../../hooks/useSessionData';
+import { useForm } from '../../../../../../hooks/useForm';
+import { getToday } from '../../../../../../utils/helpers';
+import { PrintHojaR, SubmitDataService, VerifyTR } from './controller';
+import {
+  InputTextOneLine,
+  InputsRadioGroup,
+} from '../../../../../../components/reusableComponents/ResusableComponents';
+import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 
-const VDRL = ({ token, selectedSede, userlogued }) => {
-  const tabla = 'inmunologia';
-  const date = new Date();
-  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+const tabla = 'inmunologia';
 
-  const [form, setForm] = useState({
+export default function VDRL() {
+  const { token, userlogued, selectedSede } = useSessionData();
+  const today = getToday();
+
+  const initialFormState = {
     norden: '',
     fecha: today,
     nombres: '',
@@ -19,261 +26,184 @@ const VDRL = ({ token, selectedSede, userlogued }) => {
     metodo: 'Aglutinación de lípidos complejos',
     resultado: 'NO REACTIVO',
     medico: ''
-  });
-
-  // Refs para navegación
-  const fechaRef = useRef(null);
-  const resultadoRef = useRef(null);
-  const medicoRef = useRef(null);
-  const printRef = useRef(null);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value.toUpperCase() }));
   };
 
-  const handleResultadoChange = (newValue) => {
-    setForm(prev => ({ ...prev, resultado: newValue }));
+  const {
+    form,
+    setForm,
+    handleChange,
+    handleClear,
+    handlePrintDefault,
+  } = useForm(initialFormState);
+
+  const handleSave = () => {
+    SubmitDataService(form, token, userlogued, handleClear);
   };
 
-  const handleLimpiar = () => {
-    setForm({
-      norden: '',
-      fecha: today,
-      nombres: '',
-      edad: '',
-      muestra: 'SUERO',
-      examen: 'VDRL',
-      metodo: 'Aglutinación de lípidos complejos',
-      resultado: 'NO REACTIVO',
-      medico: ''
-    });
-  };
-
-  const handleSeat = () => {
-    setForm(prev => ({
-      ...prev,
-      fecha: today,
-      nombres: '',
-      edad: '',
-      muestra: 'SUERO',
-      examen: 'VDRL',
-      metodo: 'Aglutinación de lípidos complejos',
-      resultado: 'NO REACTIVO',
-      medico: ''
-    }));
-  };
-
-  const handleFechaFocus = (e) => {
-    e.target.showPicker && e.target.showPicker();
+  const handleSearch = (e) => {
+    if (e.key === 'Enter') {
+      setForm(prev => ({
+        ...prev,
+        fecha: today,
+        nombres: '',
+        edad: '',
+        muestra: 'SUERO',
+        examen: 'VDRL',
+        metodo: 'Aglutinación de lípidos complejos',
+        resultado: 'NO REACTIVO',
+        medico: ''
+      }));
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    }
   };
 
   const handlePrint = () => {
-    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
-    Swal.fire({
-      title: '¿Desea Imprimir VDRL?',
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, Imprimir',
-      cancelButtonText: 'Cancelar',
-      customClass: {
-        title: 'swal2-title',
-        confirmButton: 'swal2-confirm',
-        cancelButton: 'swal2-cancel'
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        PrintHojaR(form.norden, tabla, token);
-      }
-    });
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token);
+    }, '¿Desea Imprimir VDRL?', form.norden);
   };
 
-  const nameWidth = Math.min(400, Math.max(120, (form.nombres?.length || 0) * 10));
+  const handleResultadoChange = (value) => {
+    setForm(prev => ({ ...prev, resultado: value }));
+  };
 
   return (
-    <form className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
+    <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
       <h2 className="text-2xl font-bold mb-6 text-center underline">INMUNOLOGÍA</h2>
-
-      <div className="flex flex-wrap items-center gap-6 mb-6">
-        <div className="flex items-center gap-2">
-          <label className="font-semibold">Nro Ficha:</label>
-          <input
+      
+      <form className="space-y-6">
+        <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <InputTextOneLine
+            label="Nro Ficha"
             name="norden"
             value={form.norden}
-            onKeyUp={(event) => {
-              if(event.key === 'Enter') {
-                handleSeat();
-                VerifyTR(form.norden, tabla, token, setForm, selectedSede);
-              }
-            }}
-            onChange={handleInputChange}
-            className="border rounded px-3 py-2 w-32"
+            onChange={handleChange}
+            onKeyUp={handleSearch}
+            labelWidth="120px"
           />
-        </div>
-        <div className="flex items-center gap-2">
-          <label className="font-semibold">Fecha:</label>
-          <input
+          <InputTextOneLine
+            label="Fecha"
             name="fecha"
             type="date"
             value={form.fecha}
-            onChange={handleInputChange}
-            className="border rounded px-3 py-2 w-40"
-            ref={fechaRef}
-            onFocus={handleFechaFocus}
-            onKeyUp={e => {
-              if (e.key === 'Enter') {
-                resultadoRef.current?.focus();
-              }
-            }}
+            onChange={handleChange}
+            labelWidth="120px"
           />
-        </div>
-        <div className="flex items-center gap-2">
-          <label className="font-semibold">Nombres:</label>
-          <input
+          <InputTextOneLine
+            label="Nombres"
             name="nombres"
             value={form.nombres}
-            onChange={handleInputChange}
             disabled
-            style={{ width: nameWidth }}
-            className="border rounded px-3 py-2 bg-gray-100"
+            labelWidth="120px"
           />
-        </div>
-        <div className="flex items-center gap-2">
-          <label className="font-semibold">Edad:</label>
-          <input
+          <InputTextOneLine
+            label="Edad"
             name="edad"
             value={form.edad}
-            onChange={handleInputChange}
             disabled
-            className="border rounded px-3 py-2 w-20 bg-gray-100"
+            labelWidth="120px"
+            inputClassName="w-20"
           />
-        </div>
-      </div>
+        </SectionFieldset>
 
-      <div className="mb-6">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="flex items-center gap-2">
-            <label className="font-semibold">MUESTRA:</label>
-            <input
+        <SectionFieldset legend="Datos del Examen" className="space-y-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <InputTextOneLine
+              label="MUESTRA"
               name="muestra"
               value={form.muestra}
-              onChange={handleInputChange}
-              className="border rounded px-3 py-2 w-32 bg-gray-100"
               disabled
+              labelWidth="120px"
+              inputClassName="w-32"
             />
-          </div>
-          <div className="flex items-center gap-2">
-            <label className="font-semibold">EXAMEN SOLICITADO:</label>
-            <input
+            <InputTextOneLine
+              label="EXAMEN SOLICITADO"
               name="examen"
               value={form.examen}
-              onChange={handleInputChange}
-              className="border rounded px-3 py-2 w-32 bg-gray-100"
               disabled
+              labelWidth="150px"
+              inputClassName="w-32"
             />
           </div>
-        </div>
-      </div>
+        </SectionFieldset>
 
-      <hr className="border-gray-300 mb-6" />
-
-      <div className="grid grid-cols-2 gap-x-8 gap-y-4 mb-8">
-        <div className="font-bold text-lg">EXAMEN</div>
-        <div className="font-bold text-lg">RESULTADO</div>
-        
-        <div className="text-base">
-          {form.examen} (Método: {form.metodo})
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <label className="flex items-center gap-1">
-              <input
-                type="radio"
+        <SectionFieldset legend="Resultados" className="space-y-4">
+          <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+            <div className="font-bold text-lg">EXAMEN</div>
+            <div className="font-bold text-lg">RESULTADO</div>
+            
+            <div className="text-base">
+              {form.examen} (Método: {form.metodo})
+            </div>
+            <div className="flex items-center gap-4">
+              <InputsRadioGroup
                 name="resultado"
-                checked={form.resultado === 'REACTIVO'}
-                onChange={() => handleResultadoChange('REACTIVO')}
+                value={form.resultado}
+                onChange={(e, value) => handleResultadoChange(value)}
+                options={[
+                  { label: 'REACTIVO', value: 'REACTIVO' },
+                  { label: 'NO REACTIVO', value: 'NO REACTIVO' }
+                ]}
+                groupClassName="gap-6"
               />
-              REACTIVO
-            </label>
-            <label className="flex items-center gap-1 ml-4">
-              <input
-                type="radio"
+              <InputTextOneLine
                 name="resultado"
-                checked={form.resultado === 'NO REACTIVO'}
-                onChange={() => handleResultadoChange('NO REACTIVO')}
+                value={form.resultado}
+                onChange={handleChange}
+                inputClassName="w-40"
               />
-              NO REACTIVO
-            </label>
+            </div>
           </div>
-          <input
-            name="resultado"
-            value={form.resultado}
-            onChange={handleInputChange}
-            className="border rounded px-3 py-2 w-40"
-            ref={resultadoRef}
-            onKeyUp={e => {
-              if (e.key === 'Enter') {
-                medicoRef.current?.focus();
-              }
-            }}
-          />
-        </div>
-      </div>
+        </SectionFieldset>
 
-      <div className="flex flex-wrap items-center gap-6 mb-6">
-        <div className="flex items-center gap-2">
-          <label className="font-semibold">Médico:</label>
-          <input
+        <SectionFieldset legend="Médico" className="space-y-4">
+          <InputTextOneLine
+            label="Médico"
             name="medico"
             value={form.medico}
-            onChange={handleInputChange}
-            className="border rounded px-3 py-2 w-64"
-            ref={medicoRef}
-            onKeyUp={e => {
-              if (e.key === 'Enter') {
-                printRef.current?.focus();
-              }
-            }}
+            onChange={handleChange}
+            labelWidth="120px"
+            className="w-64"
           />
-        </div>
-      </div>
+        </SectionFieldset>
 
-      <div className="flex flex-wrap items-center justify-end gap-4">
-        <div className="flex items-center gap-2 mr-8">
-          <span className="font-semibold text-blue-900 italic">IMPRIMIR</span>
-          <input 
-            className="border rounded px-3 py-2 w-28" 
-            name="norden" 
-            value={form.norden} 
-            onChange={handleInputChange}
-            ref={printRef}
-          />
-          <button
-            type="button"
-            onClick={handlePrint}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            <FontAwesomeIcon icon={faPrint} />
-          </button>
-        </div>
-        <button
-          type="button"
-          onClick={() => {SubmitVDRLLab(form, userlogued, token, handleLimpiar, tabla)}}
-          className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
-        >
-          <FontAwesomeIcon icon={faSave} /> Guardar
-        </button>
-        <button
-          type="button"
-          onClick={handleLimpiar}
-          className="bg-yellow-400 text-white px-6 py-2 rounded hover:bg-yellow-500"
-        >
-          <FontAwesomeIcon icon={faBroom} /> Limpiar
-        </button>
-      </div>
-    </form>
+        <fieldset className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={handleSave}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faSave} /> Guardar
+            </button>
+            <button
+              type="button"
+              onClick={handleClear}
+              className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faBroom} /> Limpiar
+            </button>
+          </div>
+          <div className="flex flex-col items-end">
+            <span className="font-bold italic mb-2">Imprimir</span>
+            <div className="flex items-center gap-2">
+              <InputTextOneLine
+                name="norden"
+                value={form.norden}
+                onChange={handleChange}
+                inputClassName="w-28"
+              />
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faPrint} />
+              </button>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+    </div>
   );
-};
-
-export default VDRL;
+}

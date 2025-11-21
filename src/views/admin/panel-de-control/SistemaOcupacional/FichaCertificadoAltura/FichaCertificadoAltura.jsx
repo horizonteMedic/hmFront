@@ -22,6 +22,7 @@ import ExamenFisico from "./ExamenFisico/ExamenFisico";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaCertificadoAltura";
 import Swal from "sweetalert2";
+import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "b_certificado_altura"
 const today = getToday();
@@ -129,7 +130,6 @@ export default function FichaCertificadoAltura() {
         aptoHasta: getTodayPlusOneYear(),
         conclusion: null,
         observacionesRecomendaciones: "",
-        nombreMedicoColegiatura: userName,
         dniUsuario: userDNI,
 
         // Recomendaciones
@@ -139,6 +139,10 @@ export default function FichaCertificadoAltura() {
         obesidadDietaHipocalorica: false,
         usoLentesCorrectoresLectura: false,
         corregirAgudezaLectura: false,
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
     };
 
     const {
@@ -434,12 +438,10 @@ export default function FichaCertificadoAltura() {
                                         onChange={handleChange}
                                         rows={5}
                                     />
-                                    <InputTextOneLine
-                                        label="Nombre y Apellidos del Médico"
-                                        name="nombreMedicoColegiatura"
-                                        labelOnTop
-                                        value={form?.nombreMedicoColegiatura}
-                                        disabled
+                                    <EmpleadoComboBox
+                                        value={form.nombre_medico}
+                                        form={form}
+                                        onChange={handleChangeSimple}
                                     />
                                 </div>
                                 {/* Columna Derecha - Recomendaciones */}
@@ -505,7 +507,7 @@ export default function FichaCertificadoAltura() {
                                     </button>
                                 </div>
                                 <div className="flex flex-col items-end">
-                                    <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+                                    <span className="font-bold italic text-base mb-1">Imprimir</span>
                                     <div className="flex items-center gap-2">
                                         <input
                                             name="norden"

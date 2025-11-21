@@ -653,7 +653,7 @@ export default function GenerarDatosPaciente(data = {}) {
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8});
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

@@ -331,6 +331,8 @@ export const GetInfoServicioEditar = async (
             vlCorregidaOI: res.oilcOftalmologia_oilc,
             enfermedadesOculares: res.enfermedadesOcularesOftalmo_e_oculares,
             medicacionActual: res.medicacionActualAnexo16a_m_actual,
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -391,6 +393,8 @@ export const SubmitDataService = async (
         usoMedicacionActualSi: form.usoMedicacion,
         medicacionActual: form.medicacionActual,
         observaciones: form.observaciones,
+
+        usuarioFirma: form.user_medicoFirma,
         userRegistro: user,
     };
 

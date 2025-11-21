@@ -365,7 +365,7 @@ const signatureTop = finalY + spacingAfterTable;
 
     // === FOOTER ===
 
-    // === IMPRIMIR ===
+    // === Imprimir ===
     const blob = doc.output("blob");
     const url = URL.createObjectURL(blob);
     const iframe = document.createElement("iframe");

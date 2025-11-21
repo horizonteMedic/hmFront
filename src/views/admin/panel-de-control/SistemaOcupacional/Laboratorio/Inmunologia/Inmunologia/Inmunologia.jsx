@@ -1,18 +1,22 @@
-// src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/Analisis_bioquimicos/Inmunologia.jsx
-import React, { useState, useEffect, useRef } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
-import Swal from 'sweetalert2'
-import { PrintHojaR, SubmitInmunologiaLab, VerifyTR } from './controller'
+import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { useSessionData } from '../../../../../../hooks/useSessionData';
+import { useForm } from '../../../../../../hooks/useForm';
+import { getToday } from '../../../../../../utils/helpers';
+import { PrintHojaR, SubmitDataService, VerifyTR } from './controller';
+import {
+  InputTextOneLine,
+} from '../../../../../../components/reusableComponents/ResusableComponents';
+import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 
+const tabla = 'inmunologia';
 
-const date = new Date();
-  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+export default function Inmunologia() {
+  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+  const today = getToday();
 
-export default function Inmunologia({ token, selectedSede, userlogued }) {
-  // Individual useState hooks for each form field
-  const tabla = 'inmunologia'
-  const [form, setForm] = useState({
+  const initialFormState = {
     norden: '',
     fecha: today,
     nombres: '',
@@ -24,290 +28,198 @@ export default function Inmunologia({ token, selectedSede, userlogued }) {
     brucella: '1/40',
     hepatitis: false,
     hepatitisA: '',
-    printCount: '',
     medico: ''
-  });
-  
-  // Refs para cada campo
-  const fechaRef = useRef(null);
-  const tificoORef = useRef(null);
-  const tificoHRef = useRef(null);
-  const paratificoARef = useRef(null);
-  const paratificoBRef = useRef(null);
-  const brucellaRef = useRef(null);
-  const hepatitisARef = useRef(null);
-  const medicoRef = useRef(null);
-  const printRef = useRef(null);
-
-  const handleFormChange = e => {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleResultadoChange = (idx, value) => {
-    const arr = [...resultados]
-    arr[idx] = value
-    setResultados(arr)
-  }
+  const {
+    form,
+    setForm,
+    handleChange,
+    handleClear,
+    handleClearnotO,
+    handlePrintDefault,
+  } = useForm(initialFormState);
 
-  const handleSave = async () => {
-    try {
-      // await fetch...
-      Swal.fire('Guardado','Inmunología guardada','success')
-    } catch {
-      Swal.fire('Error','No se pudo guardar','error')
+  const handleSave = () => {
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+  };
+
+  const handleSearch = (e) => {
+    if (e.key === 'Enter') {
+      handleClearnotO();
+      setForm((prev) => ({
+        ...prev,
+        fecha: today,
+        nombres: '',
+        edad: '',
+        tificoO: '1/40',
+        tificoH: '1/40',
+        paratificoA: '1/40',
+        paratificoB: '1/40',
+        brucella: '1/40',
+        hepatitis: false,
+        hepatitisA: '',
+      }));
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
-  }
-
-  const handleClear = () => {
-   setForm({
-      norden: '',
-      fecha: today,
-      nombres: '',
-      edad: '',
-      tificoO: '1/40',
-      tificoH: '1/40',
-      paratificoA: '1/40',
-      paratificoB: '1/40',
-      brucella: '1/40',
-      hepatitis: false,
-      hepatitisA: '',
-      printCount: '',
-      medico: ''
-    });
-  }
-
-  const handleSeat = () => {
-   setForm(prev => ({
-      ...prev,
-      fecha: today,
-      nombres: '',
-      edad: '',
-      tificoO: '1/40',
-      tificoH: '1/40',
-      paratificoA: '1/40',
-      paratificoB: '1/40',
-      brucella: '1/40',
-      hepatitis: false,
-      hepatitisA: '',
-      printCount: '',
-      medico: ''
-    }));
-  }
+  };
 
   const handlePrint = () => {
-    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
-    Swal.fire({
-      title: '¿Desea Imprimir Inmunologia?',
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, Imprimir',
-      cancelButtonText: 'Cancelar',
-      customClass: {
-        title: 'swal2-title',
-        confirmButton: 'swal2-confirm',
-        cancelButton: 'swal2-cancel'
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        PrintHojaR(form.norden,token,tabla);
-      }
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla, datosFooter);
     });
-  }
+  };
+
+  const handleHepatitisChange = (checked) => {
+    setForm(prev => ({
+      ...prev,
+      hepatitis: checked,
+      hepatitisA: checked ? prev.hepatitisA : ''
+    }));
+  };
+
+  const pruebas = [
+    { name: 'tificoO', label: 'TIFICO O' },
+    { name: 'tificoH', label: 'TIFICO H' },
+    { name: 'paratificoA', label: 'PARATIFICO A' },
+    { name: 'paratificoB', label: 'PARATIFICO B' },
+    { name: 'brucella', label: 'Brucella abortus' },
+  ];
 
   return (
-    <div className="max-w-6xl w-[950px] mx-auto bg-white rounded shadow p-8 space-y-6">
-      <h2 className="text-2xl font-bold text-center">INMUNOLOGÍA</h2>
+    <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
+      <h2 className="text-2xl font-bold text-center mb-6">INMUNOLOGÍA</h2>
+      <form className="space-y-6">
+        <SectionFieldset
+          legend="Información del Examen"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-4"
+        >
+          <InputTextOneLine
+            label="Nro Ficha"
+            name="norden"
+            value={form.norden}
+            onChange={handleChange}
+            onKeyUp={handleSearch}
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Fecha"
+            name="fecha"
+            type="date"
+            value={form.fecha}
+            onChange={handleChange}
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Nombres"
+            name="nombres"
+            value={form.nombres}
+            disabled
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Edad"
+            name="edad"
+            value={form.edad}
+            disabled
+            labelWidth="120px"
+            inputClassName="w-24"
+          />
+        </SectionFieldset>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field
-          label="Nro Ficha"
-          name="norden"
-          value={form.norden}
-          onChange={handleFormChange}
-          onKeyUp={e => {
-            if (e.key === 'Enter') {
-              handleSeat()
-              VerifyTR(form.norden,tabla,token,setForm, selectedSede)
-              fechaRef.current?.focus();
-            }
-          }}
-        />
-        <Field
-          label="Fecha"
-          name="fecha"
-          type="date"
-          value={form.fecha}
-          onChange={handleFormChange}
-          inputRef={fechaRef}
-          onKeyUp={e => {
-            if (e.key === 'Enter') {
-              tificoORef.current?.focus();
-            }
-          }}
-        />
-      </div>
+        <SectionFieldset legend="MÉTODO EN LÁMINA PORTAOBJETO" className="space-y-4">
+          <div className="grid grid-cols-12 gap-2 items-center">
+            <div className="col-span-2 font-bold flex items-center">PRUEBAS</div>
+            <div className="col-span-3 font-bold flex items-center">RESULTADOS</div>
+            <div className="col-span-7"></div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field
-          label="Nombres"
-          name="nombres"
-          value={form.nombres}
-          onChange={handleFormChange}
-          disabled
-          dynamicWidth
-        />
-        <Field
-          label="Edad"
-          name="edad"
-          value={form.edad}
-          onChange={handleFormChange}
-          disabled
-        />
-      </div>
+            {pruebas.map(({ name, label }) => (
+              <React.Fragment key={name}>
+                <div className="col-span-2 flex items-center">{label}</div>
+                <div className="col-span-3">
+                  <InputTextOneLine
+                    name={name}
+                    value={form[name]}
+                    onChange={handleChange}
+                    inputClassName="w-full"
+                  />
+                </div>
+                <div className="col-span-7"></div>
+              </React.Fragment>
+            ))}
+          </div>
+        </SectionFieldset>
 
-      <Section>
-        <h3 className="font-semibold text-center">MÉTODO EN LÁMINA PORTAOBJETO</h3>
-      </Section>
-
-      <div className="grid grid-cols-12 gap-2 items-center">
-        <div className="col-span-2 font-bold flex items-center">PRUEBAS</div>
-        <div className="col-span-2 font-bold flex items-center">RESULTADOS</div>
-        <div className="col-span-8"></div>
-
-        {[
-          { name: 'tificoO', label: 'TIFICO O', ref: tificoORef, nextRef: tificoHRef },
-          { name: 'tificoH', label: 'TIFICO H', ref: tificoHRef, nextRef: paratificoARef },
-          { name: 'paratificoA', label: 'PARATIFICO A', ref: paratificoARef, nextRef: paratificoBRef },
-          { name: 'paratificoB', label: 'PARATIFICO B', ref: paratificoBRef, nextRef: brucellaRef },
-          { name: 'brucella', label: 'Brucella abortus', ref: brucellaRef, nextRef: medicoRef },
-        ].map(({ name, label, ref, nextRef }) => (
-          <React.Fragment key={name}>
-            <div className="col-span-2 flex items-center">{label}</div>
-            <div className="col-span-2">
-              <input
-                name={name}
-                className="border rounded px-2 py-1 w-full"
-                value={form[name]}
-                onChange={handleFormChange}
-                ref={ref}
-                onKeyUp={e => {
-                  if (e.key === 'Enter' && nextRef) {
-                    nextRef.current?.focus();
-                  }
-                }}
-              />
-            </div>
-            <div className="col-span-8"></div>
-          </React.Fragment>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-12 gap-2 items-center mt-4">
-        
-        <div className="col-span-4 flex items-center">
-          {form.hepatitis && (
+        <SectionFieldset legend="Hepatitis">
+          <label className="flex items-center gap-2 mb-3">
             <input
-              className="border rounded px-2 py-1 ml-4 w-full"
+              type="checkbox"
+              checked={form.hepatitis}
+              onChange={(e) => handleHepatitisChange(e.target.checked)}
+            />
+            <span className="font-semibold">Prueba Rápida HEPATITIS A</span>
+          </label>
+          {form.hepatitis && (
+            <InputTextOneLine
+              label="Resultado"
               name="hepatitisA"
               value={form.hepatitisA}
-              onChange={handleFormChange}
-              placeholder="Prueba Rápida HEPATITIS A"
-              disabled={!form.hepatitis}
-              ref={hepatitisARef}
-              onKeyUp={e => {
-                if (e.key === 'Enter') {
-                  medicoRef.current?.focus();
-                }
-              }}
+              onChange={handleChange}
+              labelWidth="120px"
             />
           )}
-        </div>
-        <div className="col-span-4"></div>
-      </div>
+        </SectionFieldset>
 
-      {/* Campo ASIGNAR MEDICO */}
-      <div className="flex items-center mt-6 mb-2">
-        <label className="font-medium mr-2" htmlFor="asignarMedico">ASIGNAR MEDICO:</label>
-        <select
-          id="asignarMedico"
-          className="border rounded px-2 py-1 min-w-[220px]"
-          name="medico"
-          value={form.medico}
-          onChange={handleFormChange}
-          disabled
-        >
-          <option value="">Seleccionar medico</option>
-          <option value="medico1">Dr. Juan Pérez</option>
-          <option value="medico2">Dra. Ana Torres</option>
-          <option value="medico3">Dr. Luis Gómez</option>
-        </select>
-      </div>
+        <SectionFieldset legend="Asignar Médico">
+          <select
+            disabled
+            className="w-full border rounded px-3 py-2 bg-gray-100 text-sm"
+            name="medico"
+            value={form.medico}
+            onChange={handleChange}
+          >
+            <option value="">-- Seleccionar --</option>
+          </select>
+        </SectionFieldset>
 
-      {/* Botones y área de imprimir */}
-      <div className="flex justify-between items-end mt-6">
-        <div className="flex gap-4">
-          <ActionButton color="green" icon={faSave} onClick={() => {SubmitInmunologiaLab(form,token,userlogued,handleClear,tabla)}}>Guardar/Actualizar</ActionButton>
-          <ActionButton color="yellow" icon={faBroom} onClick={handleClear}>Limpiar</ActionButton>
-        </div>
-        <div className="flex flex-col items-end">
-          <div className="font-bold italic text-blue-800 mb-1">IMPRIMIR</div>
-          <div className="flex items-center gap-2">
-            <input
-              name="norden"
-              value={form.norden}
-              onChange={handleFormChange}
-              className="border rounded px-2 py-1 w-24"
-              ref={printRef}
-            />
-            <ActionButton color="blue" icon={faPrint} onClick={handlePrint} />
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={handleSave}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+            </button>
+            <button
+              type="button"
+              onClick={handleClear}
+              className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faBroom} /> Limpiar
+            </button>
+          </div>
+
+          <div className="flex flex-col items-end">
+            <span className="font-bold italic mb-2">Imprimir</span>
+            <div className="flex items-center gap-2">
+              <InputTextOneLine
+                name="norden"
+                value={form.norden}
+                onChange={handleChange}
+                inputClassName="w-24"
+              />
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faPrint} />
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </form>
     </div>
-  )
-}
-
-// Aux
-function Field({ label, name, type='text', value, onChange, disabled, inputRef, onKeyUp, dynamicWidth }) {
-  return (
-    <div className="flex flex-col min-w-0">
-      <label className="font-medium mb-1">{label}</label>
-      <input
-        ref={inputRef}
-        type={type}
-        name={name}
-        value={value}
-        disabled={disabled}
-        onChange={onChange}
-        onKeyUp={onKeyUp}
-        className={`border rounded px-2 py-1 ${disabled?'bg-gray-100':''} ${dynamicWidth?'min-w-0 truncate overflow-x-auto':''}`}
-        style={dynamicWidth ? { width: '100%' } : {}}
-      />
-    </div>
-  )
-}
-function Checkbox({ label, checked, onChange }) {
-  return (
-    <label className="flex items-center gap-2">
-      <input type="checkbox" checked={checked} onChange={e=>onChange(e.target.checked)} />
-      {label}
-    </label>
-  )
-}
-function Section({ children }) {
-  return <div className="mb-2">{children}</div>
-}
-function ActionButton({ color, icon, onClick, children }) {
-  const bg = {
-    green:  'bg-emerald-600 hover:bg-emerald-700',
-    yellow: 'bg-yellow-400 hover:bg-yellow-500',
-    blue:   'bg-blue-600 hover:bg-blue-700'
-  }[color]
-  return (
-    <button onClick={onClick} className={`${bg} text-white px-4 py-2 rounded flex items-center gap-2`}>
-      <FontAwesomeIcon icon={icon} /> {children}
-    </button>
-  )
+  );
 }

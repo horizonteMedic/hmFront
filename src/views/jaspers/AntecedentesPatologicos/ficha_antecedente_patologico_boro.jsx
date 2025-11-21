@@ -2401,7 +2401,7 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
 
   footerTR(doc, { footerOffsetY: 8});
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

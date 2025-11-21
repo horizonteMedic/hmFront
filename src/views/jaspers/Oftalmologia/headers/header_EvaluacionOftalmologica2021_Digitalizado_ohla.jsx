@@ -169,7 +169,7 @@ const header_EvaluacionOftalmologica2021_Digitalizado_ohla = (
 
   doc.setFont("helvetica", "normal").setFontSize(10);
   doc.text("Nro Orden:", fichaX - 35, fichaY, { align: "right" });
-  doc.setFont("helvetica", "bold").setFontSize(18); // Reducido de 22 a 18
+  doc.setFont("helvetica", "normal").setFontSize(18); // Reducido de 22 a 18
   doc.text(`${datos.norden || ""}`, fichaX, fichaY, { align: "right" });
 
   doc.setFont("helvetica", "normal").setFontSize(10);

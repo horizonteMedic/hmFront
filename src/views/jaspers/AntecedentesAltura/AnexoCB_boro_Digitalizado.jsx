@@ -654,7 +654,7 @@ export default function GenerarDatosPacienteBoro(data = {}) {
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 11});
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

@@ -626,7 +626,7 @@ export default function Aptitud_Poderosa_Digitalizado(data = {}) {
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8});
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

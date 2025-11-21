@@ -1,5 +1,5 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/Toxicologia/Consentimientos.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTint, faSquare, faCube, faLayerGroup, faThLarge, faLeaf, faFlask, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { Loading } from '../../../../../components/Loading';
@@ -19,21 +19,21 @@ const Consentimientos = ({ token, selectedSede, userlogued, permiso }) => {
   const [norden, setNorden] = useState('')
   const tabs = [
     { label: 'Muestra Sangre', icon: faTint,vista: 'Consentimientos',
-      permiso: 'Acceso Cons - Muestra Sangre',   component: <MuestraDeSangre token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+      permiso: 'Acceso Cons - Muestra Sangre',   component: <MuestraDeSangre /> },
     { label: 'Panel 2D',       icon: faSquare,vista: 'Consentimientos',
-      permiso: 'Acceso Cons - Panel 2D', component: <Panel2D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+      permiso: 'Acceso Cons - Panel 2D', component: <Panel2D /> },
     { label: 'Panel 3D',       icon: faCube,vista: 'Consentimientos',
-      permiso: 'Acceso Cons - Panel 3D',   component: <Panel3D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+      permiso: 'Acceso Cons - Panel 3D',   component: <Panel3D /> },
     { label: 'Panel 4D',       icon: faThLarge,vista: 'Consentimientos',
-      permiso: 'Acceso Cons - Panel 4D',   component: <Panel4D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+      permiso: 'Acceso Cons - Panel 4D',   component: <Panel4D /> },
     { label: 'Panel 5D',       icon: faLayerGroup,vista: 'Consentimientos',
-      permiso: 'Acceso Cons - Panel 5D', component: <Panel5D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+      permiso: 'Acceso Cons - Panel 5D', component: <Panel5D /> },
     { label: 'Panel 10D',      icon: faLayerGroup,vista: 'Consentimientos',
-      permiso: 'Acceso Cons - Panel 10D', component: <Panel10D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+      permiso: 'Acceso Cons - Panel 10D', component: <Panel10D /> },
     { label: 'Cons. Marihuana',icon: faLeaf,vista: 'Consentimientos',
-      permiso: 'Acceso Cons - Cons. Marihuana',   component: <ConsMarihuana token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+      permiso: 'Acceso Cons - Cons. Marihuana',   component: <ConsMarihuana /> },
     { label: 'BORO',           icon: faFlask,vista: 'Consentimientos',
-      permiso: 'Acceso Cons - BORO',  component: <Boro token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+      permiso: 'Acceso Cons - BORO',  component: <Boro /> },
   ];
     const tabsConPermiso = tabs.filter(tab => permiso(tab.vista, tab.permiso));
 
@@ -60,7 +60,7 @@ const Consentimientos = ({ token, selectedSede, userlogued, permiso }) => {
           ))}
         </div>
        <div className="flex items-center space-x-2 pr-2">
-        <span className="font-semibold text-blue-900 text-lg">IMPRIMIR MASIVO</span>
+        <span className="font-semibold text-bg-[#233245] text-lg">Impresión Masiva</span>
         <input
           className="border rounded px-3 py-2 w-32 text-base"
           value={norden}
@@ -70,7 +70,7 @@ const Consentimientos = ({ token, selectedSede, userlogued, permiso }) => {
         <button
           type="button"
           onClick={() => {PrintHojaRMasivo(norden,token)}}
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded border border-green-700 flex items-center shadow-md transition-colors"
+          className="bg-[#059668] hover:bg-green-700 text-white px-4 py-3 rounded border border-green-700 flex items-center shadow-md transition-colors"
         >
           <FontAwesomeIcon icon={faPrint} />
         </button>

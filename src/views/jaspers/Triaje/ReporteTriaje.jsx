@@ -209,7 +209,7 @@ export default function ReporteTriaje(datos) {
     // === FOOTER ===
     footerTR(doc, datos);
 
-    // === IMPRIMIR ===
+    // === Imprimir ===
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
     const iframe = document.createElement('iframe');

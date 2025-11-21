@@ -141,7 +141,7 @@ const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLO
     // === FOOTER ===
     footer(doc, datos);
 
-    // === IMPRIMIR ===
+    // === Imprimir ===
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
     const iframe = document.createElement('iframe');

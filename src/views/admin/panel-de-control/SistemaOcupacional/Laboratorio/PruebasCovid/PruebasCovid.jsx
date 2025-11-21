@@ -1,20 +1,13 @@
-// src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/PruebasCovid/PruebasCovid.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import PcuanAntigenos from './PcuanAntigenos/PcuanAntigenos';
-import PcuanAnticuerpos from './PcuanAnticuerpos/PcuanAnticuerpos';
 import PcualAntig from './PcualAntig/PcualAntig';
-import ExamenInmunologico from './ExamenInmunologico/ExamenInmunologico';
-import PruebasCovidCuantitativo from './ExamenCuantitativo/ExamenCuantitativo';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faVirus,
-  faDroplet,
   faVial,
-  faBiohazard,
-  faChartLine
 } from '@fortawesome/free-solid-svg-icons';
 
-export default function PruebasCovid({ apiBase, token, selectedSede }) {
+export default function PruebasCovid() {
   const tabs = [
     {
       id: 'antigenos-cual',
@@ -28,7 +21,6 @@ export default function PruebasCovid({ apiBase, token, selectedSede }) {
       icon: faVirus,
       Component: PcuanAntigenos
     },
-    
   ];
 
   const [activeTab, setActiveTab] = useState(tabs[0].id);
@@ -38,7 +30,7 @@ export default function PruebasCovid({ apiBase, token, selectedSede }) {
     <div className="w-full">
       {/* Tabs */}
       <div className="flex space-x-1">
-        {tabs.map(({ id, label, icon }, idx) => (
+        {tabs.map(({ id, label, icon }) => (
           <button
             key={id}
             onClick={() => setActiveTab(id)}
@@ -56,11 +48,7 @@ export default function PruebasCovid({ apiBase, token, selectedSede }) {
 
       {/* Active Tab Content */}
       <div className="border border-gray-200 border-t-0 p-4 bg-white rounded-b-lg">
-        <ActiveComponent
-          apiBase={apiBase}
-          token={token}
-          selectedSede={selectedSede}
-        />
+        <ActiveComponent />
       </div>
     </div>
   );

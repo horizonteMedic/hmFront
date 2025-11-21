@@ -68,7 +68,7 @@ export default function Resultado_Panel4D() {
 
   return (
     <div className="w-full space-y-4 px-4">
-      <h2 className="text-2xl font-bold text-center mb-4">PANEL DROGAS 4D</h2>
+      <h2 className="text-2xl font-bold text-center mb-4">PANEL 4D</h2>
       
       <form className="space-y-4">
         {/* Información del Examen */}
@@ -206,7 +206,7 @@ export default function Resultado_Panel4D() {
             </button>
           </div>
           <div className="flex flex-col items-end">
-            <span className="font-bold italic mb-2">IMPRIMIR</span>
+            <span className="font-bold italic mb-2">Imprimir</span>
             <div className="flex items-center gap-2">
               <InputTextOneLine
                 name="norden"

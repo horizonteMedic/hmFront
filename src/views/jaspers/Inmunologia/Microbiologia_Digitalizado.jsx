@@ -154,7 +154,7 @@ export default function Microbiologia_Digitalizado(datos = {}) {
     // El footer se encarga de su propio posicionamiento en la parte inferior.
     footer(doc, datos);
 
-    // === IMPRIMIR ===
+    // === Imprimir ===
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
     const iframe = document.createElement("iframe");

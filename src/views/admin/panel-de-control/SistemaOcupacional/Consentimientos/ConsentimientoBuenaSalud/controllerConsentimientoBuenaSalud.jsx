@@ -31,11 +31,13 @@ export const GetInfoServicio = async (
     set((prev) => ({
       ...prev,
       ...res,
-      norden: res.norden ?? "",
-      fecha: res.fecha,
-      nombres: res.nombres ?? "",
-      edad: res.edad ?? "",
-      dni: res.dni ?? "",
+      norden: res.norden ?? prev.norden ?? "",
+      fecha: res.fecha ?? prev.fecha,
+      nombres: res.nombres ?? prev.nombres ?? "",
+      edad: res.edad ?? prev.edad ?? "",
+      dni: res.dni ?? prev.dni ?? "",
+      // Preservar el texto estático si no viene del backend
+      textoFinalConsentimiento: res.textoFinalConsentimiento ?? prev.textoFinalConsentimiento ?? "",
     }));
   }
 };
@@ -118,9 +120,11 @@ const GetInfoPac = async (nro, set, token, sede) => {
     set((prev) => ({
       ...prev,
       ...res,
-      // fechaNac: formatearFechaCorta(res.fechaNac ?? ""),
-      // edad: res.edad,
-      // nombres: res.nombresApellidos,
+      nombres: res.nombresApellidos ?? prev.nombres ?? "",
+      dni: res.dni ?? prev.dni ?? "",
+      edad: res.edad ? `${res.edad} años` : prev.edad ?? "",
+      // Preservar el texto estático
+      textoFinalConsentimiento: prev.textoFinalConsentimiento ?? "",
     }));
   }
 };

@@ -1856,7 +1856,7 @@ export default function B_FichaDetencionSAS2(data = {}) {
   // Llamar al footer (los datos de prueba están dentro del componente)
   footerTR(doc, { footerOffsetY: 5 });
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

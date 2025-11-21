@@ -931,7 +931,7 @@ export default function Informe_PsicolaboralBoroo_Digitalizado(data = {}) {
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

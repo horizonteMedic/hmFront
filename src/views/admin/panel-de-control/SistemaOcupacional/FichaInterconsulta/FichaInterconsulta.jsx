@@ -482,7 +482,7 @@ export default function FichaInterconsulta() {
                                     </button>
                                 </div>
                                 <div className="flex justify-center gap-1 text-center p-2 border items-center">
-                                    <span className="font-bold italic text-base mb-1 mx-4">IMPRIMIR</span>
+                                    <span className="font-bold italic text-base mb-1 mx-4">Imprimir</span>
                                     <div className="flex items-center gap-2">
                                         <input
                                             name="norden"

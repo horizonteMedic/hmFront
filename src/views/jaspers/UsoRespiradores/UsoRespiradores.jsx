@@ -2155,7 +2155,7 @@ export default function UsoRespiradores(data = {}) {
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 
