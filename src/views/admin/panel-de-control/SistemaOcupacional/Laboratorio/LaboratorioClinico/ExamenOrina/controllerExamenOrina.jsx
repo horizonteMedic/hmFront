@@ -11,7 +11,6 @@ import { SubmitHematologia } from "../ControllerLC/model.js";
 
 const obtenerReporteUrl = "/api/v01/ct/laboratorio/obtenerReporteLaboratorioClinico";
 const registrarUrl = "/api/v01/ct/laboratorio/registrarActualizarLaboratorioClinicp";
-const tabla = 'lab_clinico';
 
 export const GetInfoServicio = async (nro, tabla, set, setO, token, setSearchMedico, onFinish = () => { }) => {
   const res = await GetInfoServicioDefault(
@@ -24,7 +23,6 @@ export const GetInfoServicio = async (nro, tabla, set, setO, token, setSearchMed
   if (res) {
     set((prev) => ({
       ...prev,
-      ...res,
       paciente: res.nombres ?? "",
       fecha: res.fechaLab ?? prev.fecha,
       responsable: res.resLab ?? "",

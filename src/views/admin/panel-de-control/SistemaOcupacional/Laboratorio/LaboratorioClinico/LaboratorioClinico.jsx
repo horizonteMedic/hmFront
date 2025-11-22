@@ -201,8 +201,7 @@ const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
       vista: 'Laboratorio Clinico Formulario',
       permiso: 'Acceso Hematologia - Bioquimica SI-EO',
       // Integración: Pasamos estados de Hematología y Examen de Orina al componente unificado
-      component: <HematologiaBioquimicaSIEO token={token} selectedSede={selectedSede} userlogued={userlogued} form={form} setForm={setForm} formO={formO} setFormO={setFormO}
-      listDoc={listDoc} setSearchMedico={setSearchMedico} searchMedico={searchMedico} ClearForm={ClearForm} ClearFormO={ClearFormO} />
+      component: <HematologiaBioquimicaSIEO  />
     },
     {
       label: 'Hemograma',
