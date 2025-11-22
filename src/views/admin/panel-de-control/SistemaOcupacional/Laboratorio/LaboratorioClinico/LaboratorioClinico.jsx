@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMicroscope, faTint, faHeartbeat } from '@fortawesome/free-solid-svg-icons';
 import HematologiaBioquimicaSIEO from './Hematologia-bioquimicaSI-EO/Hematologia-bioquimicaSI-EO';
-import ExamenOrina from './ExamenOrina/ExamenOrina';
 import Hematologia from './Hematologia/Hematologia';
 import { getFetch } from '../../../getFetch/getFetch';
 
@@ -201,15 +200,9 @@ const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
       icon: faMicroscope,
       vista: 'Laboratorio Clinico Formulario',
       permiso: 'Acceso Hematologia - Bioquimica SI-EO',
-      component: <HematologiaBioquimicaSIEO token={token} selectedSede={selectedSede} userlogued={userlogued} form={form} setForm={setForm} setFormO={setFormO}
-      listDoc={listDoc} setSearchMedico={setSearchMedico} searchMedico={searchMedico}/>
-    },
-    {
-      label: 'Examen de Orina',
-      icon: faTint,
-      vista: 'Laboratorio Clinico Formulario',
-      permiso: 'Acceso Hematologia - Bioquimica SI-EO',
-      component: <ExamenOrina form={formO} setForm={setFormO} formH={form} ClearForm={ClearForm} setFormH={setForm} ClearFormO={ClearFormO} />
+      // Integración: Pasamos estados de Hematología y Examen de Orina al componente unificado
+      component: <HematologiaBioquimicaSIEO token={token} selectedSede={selectedSede} userlogued={userlogued} form={form} setForm={setForm} formO={formO} setFormO={setFormO}
+      listDoc={listDoc} setSearchMedico={setSearchMedico} searchMedico={searchMedico} ClearForm={ClearForm} ClearFormO={ClearFormO} />
     },
     {
       label: 'Hemograma',
