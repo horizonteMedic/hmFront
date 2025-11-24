@@ -590,10 +590,12 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
     doc.setFont("helvetica", "normal").setFontSize(7);
     dibujarTextoConSaltoLinea(config.textoIzquierdo, posicionTextoIzquierdo, yPos + config.posicionY, maxWidthIzquierdo);
 
-    // Marca X izquierda
+    // Marca X izquierda - usar variables si están disponibles
     doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text("X", tablaInicioX + 86.3, yPos + alturaFila / 2 + 1);
-    doc.text("", tablaInicioX + 91.5, yPos + alturaFila / 2 + 1);
+    const siIzquierdo = config.siIzquierdo !== undefined ? config.siIzquierdo : false;
+    const noIzquierdo = config.noIzquierdo !== undefined ? config.noIzquierdo : true;
+    doc.text(siIzquierdo ? "X" : "", tablaInicioX + 86.3, yPos + alturaFila / 2 + 1);
+    doc.text(noIzquierdo ? "X" : "", tablaInicioX + 91.5, yPos + alturaFila / 2 + 1);
 
     // Contenido texto derecho
     doc.setFont("helvetica", "normal").setFontSize(7);
@@ -602,10 +604,12 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
     const posYTextoDerecho = esTextoDerechoCorto ? yPos + calcularPosicionYCentrada(alturaFila, 6) : yPos + config.posicionY;
     dibujarTextoConSaltoLinea(config.textoDerecho, posicionTextoDerecho, posYTextoDerecho, maxWidthDerecho);
 
-    // Marca X derecha
+    // Marca X derecha - usar variables si están disponibles
     doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text("", tablaInicioX + 181.3, yPos + alturaFila / 2 + 1);
-    doc.text("X", tablaInicioX + 186.5, yPos + alturaFila / 2 + 1);
+    const siDerecho = config.siDerecho !== undefined ? config.siDerecho : false;
+    const noDerecho = config.noDerecho !== undefined ? config.noDerecho : true;
+    doc.text(siDerecho ? "X" : "", tablaInicioX + 181.3, yPos + alturaFila / 2 + 1);
+    doc.text(noDerecho ? "X" : "", tablaInicioX + 186.5, yPos + alturaFila / 2 + 1);
 
     return alturaFila;
   };
@@ -698,28 +702,52 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
       textoIzquierdo: "Se encuentra usted resfriado o con algún cuadro respiratorio",
       textoDerecho: "Hipoacusia con compromiso de frecuencias conversacionales con promedio mayor de 40 dB uni o bilateral (no incluye audífonos).",
       alturaFila: 8.5,
-      posicionY: 2.5
+      posicionY: 2.5,
+      // Variables para checkbox izquierdo (resfriado)
+      siIzquierdo: datosFinales.pcomplementariasResfriadoSi,
+      noIzquierdo: datosFinales.pcomplementariasResfriadoNo,
+      // Variables para checkbox derecho (hipoacusia)
+      siDerecho: datosFinales.pcomplementariasHipoacusiaSi,
+      noDerecho: datosFinales.pcomplementariasHipoacusiaNo
     },
     {
       numero: 2,
       textoIzquierdo: "Sufre de vértigo o mareos.",
       textoDerecho: "Alteración de la agudeza visual (de lejos diferente a 20/30 en cada ojo) y/o de la visión de profundidad incluso con lentes correctores.",
       alturaFila: 8.5,
-      posicionY: 2.5
+      posicionY: 2.5,
+      // Variables para checkbox izquierdo (vértigo)
+      siIzquierdo: datosFinales.pcomplementariasVertigoSi,
+      noIzquierdo: datosFinales.pcomplementariasVertigoNo,
+      // Variables para checkbox derecho (alteración agudeza visual)
+      siDerecho: datosFinales.pcomplementariasAlteracionAgudezaVisualSi,
+      noDerecho: datosFinales.pcomplementariasAlteracionAgudezaVisualNo
     },
     {
       numero: 3,
       textoIzquierdo: "Temor a las alturas.",
       textoDerecho: "Campimetría Anormal (Test de confrontación alterada)",
       alturaFila: 5,
-      posicionY: 2.5
+      posicionY: 2.5,
+      // Variables para checkbox izquierdo (temor alturas)
+      siIzquierdo: datosFinales.pcomplementariasTemorAlturasSi,
+      noIzquierdo: datosFinales.pcomplementariasTemorAlturasNo,
+      // Variables para checkbox derecho (campimetría)
+      siDerecho: datosFinales.pcomplementariaCampimetriaSi,
+      noDerecho: datosFinales.pcomplementariaCampimetriaNo
     },
     {
       numero: 4,
       textoIzquierdo: "Test de SAS : Anormal",
       textoDerecho: "Campimetría Anormal (Test de confrontación alterada)",
       alturaFila: 5,
-      posicionY: 2.5
+      posicionY: 2.5,
+      // Variables para checkbox izquierdo (SAS - no hay variable específica, usar false por defecto)
+      siIzquierdo: false,
+      noIzquierdo: true,
+      // Variables para checkbox derecho (campimetría)
+      siDerecho: datosFinales.pcomplementariaCampimetriaSi,
+      noDerecho: datosFinales.pcomplementariaCampimetriaNo
     },
 
   ];
