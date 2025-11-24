@@ -210,7 +210,7 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
     doc.setLineWidth(0.2);
     
     // Dibujar fondo gris más oscuro
-    doc.setFillColor(160, 160, 160);
+    doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
     
     // Dibujar líneas del header
@@ -237,7 +237,7 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
     doc.setLineWidth(0.2);
     
     // Dibujar fondo celeste
-    doc.setFillColor(173, 216, 230); // Color celeste claro
+    doc.setFillColor(199, 241, 255); // Color celeste claro
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
     
     // Dibujar líneas del subheader
@@ -478,7 +478,7 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
   // === DISCURSO (fila celeste simple) ===
   // Dibujar fila de Discurso (celeste, solo título)
   // Dibujar fondo celeste
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, anchoTablaCompleta, filaObservacionAltura, 'F');
   
   // Dibujar líneas de la fila (sin división vertical interna)
@@ -609,7 +609,7 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
 
   // Dibujar fila principal de Orientación (celeste, sin división)
   // Dibujar fondo celeste
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, anchoTablaCompleta, filaObservacionAltura, 'F');
   
   // Dibujar líneas de la fila (sin división vertical interna)
@@ -842,7 +842,7 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 13.5});
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

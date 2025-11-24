@@ -56,6 +56,7 @@ const MusculoEsqueleticoTabSelector = ({tieneVista}) => {
           <div className="text-center text-gray-500">
             No tiene permisos para ver ningún examen.
           </div>
+          
         )}
         </div>
       </div>

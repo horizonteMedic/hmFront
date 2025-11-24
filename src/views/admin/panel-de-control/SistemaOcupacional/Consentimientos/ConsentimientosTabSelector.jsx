@@ -1,31 +1,22 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBone,
-  faFileContract,
-  faUserMd,
-} from "@fortawesome/free-solid-svg-icons";
+import { faFileContract } from "@fortawesome/free-solid-svg-icons";
 import ConsentimientoInformadoOcupacional from "./ConsentimientoInformado/Consentimiento_informado_digitalizado";
 import ConsentimientoBuenaSalud from "./ConsentimientoBuenaSalud/ConsentimientoBuenaSalud";
 
 export default function ConsentimientosTabSelector({ tieneVista }) {
-  const [activeTab, setActiveTab] = useState(0);
+    const [activeTab, setActiveTab] = useState(0);
 
-  useEffect(
-    () => {
-      // Encontrar el primer tab permitido
-      if (tieneVista("Consentimiento Informado")) {
-        setActiveTab(0);
-      } else if (tieneVista("Consentimiento Buena Salud")) {
-        setActiveTab(1);
-      } else {
-        setActiveTab(-1); // -1 significa que no tiene permisos
-      }
-    },
-    [
-      /* aquí puedes poner dependencias si cambian los permisos */
-    ]
-  );
+    useEffect(() => {
+        // Encontrar el primer tab permitido
+        if (tieneVista("Consentimiento Informado")) {
+            setActiveTab(0);
+        } else if (tieneVista("Consentimiento Buena Salud")) {
+            setActiveTab(1);
+        } else {
+            setActiveTab(-1); // -1 significa que no tiene permisos
+        }
+    }, [tieneVista]);
 
   return (
     <div className="mx-auto bg-white rounded-lg overflow-hidden pt-8">

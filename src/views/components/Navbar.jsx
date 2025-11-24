@@ -15,7 +15,6 @@ const Navbar = () => {
   const setuserlogued = useAuthStore((state) => state.setuserlogued);
 
   const [diasParaPago, setDiasParaPago] = useState(0);
-  const [diasParaFinMes, setDiasParaFinMes] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
 
   // Función para calcular días hasta el próximo pago (5 de cada mes)
@@ -43,45 +42,6 @@ const Navbar = () => {
     
     setDiasParaPago(dias);
   };
-
-  // Función para calcular días hasta el fin de este mes
-  const calcularDiasParaFinPeriodo = () => {
-  const hoy = new Date();
-  const añoActual = hoy.getFullYear();
-  const mesActual = hoy.getMonth(); // 0-11
-
-  // Día de inicio fijo: 3 del mes actual
-  const fechaInicio = new Date(añoActual, mesActual, 3);
-
-  // Fecha objetivo: 14 días después del día 3 → día 17
-  const fechaObjetivo = new Date(añoActual, mesActual, 3 + 14);
-
-  // Si hoy es antes del día 3, se empieza a contar desde el próximo día 3
-  if (hoy < fechaInicio) {
-    setDiasParaFinMes(null);
-    return;
-  }
-
-  // Calcular diferencia en días
-  const diferenciaTiempo = fechaObjetivo.getTime() - hoy.getTime();
-  const diasRestantes = Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24));
-
-  // Si ya pasó el día 17, puede reiniciarse o quedarse en 0
-  const dias = diasRestantes > 0 ? diasRestantes : 0;
-
-  setDiasParaFinMes(dias);
-
-  // Si llega al día objetivo (0 días restantes), puedes activar tu evento
-  if (dias === 0) {
-    const fechaActual = hoy.toDateString();
-    const ultimaCelebracion = localStorage.getItem('ultimaCelebracionFecha');
-
-    if (ultimaCelebracion !== fechaActual) {
-      setShowCelebration(true);
-      localStorage.setItem('ultimaCelebracionFecha', fechaActual);
-    }
-  }
-};
 
   const handleClickReload = () => {
     // Ejecuta tu función
@@ -131,7 +91,6 @@ const Navbar = () => {
 
   useEffect(() => {
     calcularDiasParaPago();
-    calcularDiasParaFinPeriodo();
   }, []);
 
   const handleNavLinkClick = (to) => {
@@ -182,7 +141,7 @@ const Navbar = () => {
       <div className="hidden md:flex items-center">
         {URLAzure == "https://testbackendhm.azurewebsites.net" && (
           <>
-            <p className='font-bold mr-5'>DEVELOPER</p>
+            <p className='font-bold mr-5'>HOST DESARROLLO</p>
             <div className={`text-white px-4 py-2 rounded-full flex items-center mr-5 ${
               diasParaPago === 0 ? 'bg-green-600' : 
               diasParaPago <= 3 ? 'bg-yellow-500' : 
@@ -195,12 +154,6 @@ const Navbar = () => {
                  diasParaPago <= 3 ? `${diasParaPago} días para pago 🚀` : 
                  diasParaPago <= 7 ? `${diasParaPago} días para pago ⏰` : 
                  `${diasParaPago} días para pago 📅`}
-              </span>
-            </div>
-            <div className="text-white px-4 py-2 rounded-full flex items-center mr-5 bg-red-500">
-              <FontAwesomeIcon icon={faCalendarAlt} className="mr-2 text-lg" />
-              <span className="font-bold text-lg">
-                {diasParaFinMes} Amenaza con volver... 😨
               </span>
             </div>
           </>

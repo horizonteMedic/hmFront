@@ -45,6 +45,65 @@ export const GetInfoServicio = async (
         onFinish
     );
     if (res) {
+        const imc = res.imcTriaje ?? "";
+        let obesidadIMC30 = false;
+        let imcRed = false;
+        let nuevasObservaciones = (res.diagnosticoAudiometria ?? "").toUpperCase();
+        if (nuevasObservaciones != "") {
+            nuevasObservaciones += "\n";
+        }
+        if (imc) {
+            const imcValue = parseFloat(imc);
+            if (!isNaN(imcValue) && imcValue > 25) {
+                imcRed = true;
+                if (imcValue >= 25 && imcValue < 30) {
+                    nuevasObservaciones += "SOBREPESO: DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+                } else if (imcValue >= 30 && imcValue < 35) {
+                    obesidadIMC30 = true;
+                    nuevasObservaciones += "OBESIDAD I: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+                } else if (imcValue >= 35 && imcValue < 40) {
+                    obesidadIMC30 = true;
+                    nuevasObservaciones += "OBESIDAD II: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+                } else if (imcValue >= 40) {
+                    obesidadIMC30 = true;
+                    nuevasObservaciones += "OBESIDAD III: NO HACER TRABAJOS EN ESPACIOS CONFINADOS. NO HACER TRABAJOS SOBRE 1.8 M.S.N PISO. DIETA HIPOCALORICA, HIPOGRASA Y EJERCICIOS.\n";
+                }
+            }
+        }
+
+        const vlejoscod = res.odlcoftalmologia_odlc || "";
+        const vlejoscoi = res.oilcoftalmologia_oilc || "";
+
+        const vcercacod = res.oftalodccmologia_odcc || "";
+        const vcercacoi = res.oiccoftalmologia_oicc || "";
+        const textoEnfermedadOftalmo = (res.enfermedadesocularesoftalmo_e_oculares ?? "").trim().toUpperCase();
+
+
+        if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
+            const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
+            if (enfermedadesRefractarias.some(e => textoEnfermedadOftalmo.includes(e))) {
+                const visionLejosNormal = vlejoscod === "00" && vlejoscoi === "00";
+                const visionCercaNormal = vcercacod === "00" && vcercacoi === "00";
+                nuevasObservaciones += visionLejosNormal && visionCercaNormal
+                    ? "CORREGIR AGUDEZA VISUAL.\n"
+                    : "USO DE LENTES CORRECTORES.\n";
+            }
+        }
+        const promedioOidoDerecho = res.promedioOidoDerecho ?? 0;
+        const promedioOidoIzquierdo = res.promedioOidoIzquierdo ?? 0;
+        let oidoMayor40 = false;
+        if (promedioOidoDerecho > 40 || promedioOidoIzquierdo > 40) {
+            oidoMayor40 = true;
+        }
+
+        let anemia = false;
+        const hemoglobina = parseFloat(res.laboratorioClinicoHemoglobina);
+
+        if (!isNaN(hemoglobina)) {
+            const umbral = res.sexoPaciente === "M" ? 13 : 12;
+            anemia = hemoglobina < umbral;
+        }
+
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
@@ -71,6 +130,10 @@ export const GetInfoServicio = async (
             vb: res.vboftalmologia_vb ?? "",
             rp: res.rpoftalmologia_rp ?? "",
             enfermedadesOculares: res.enfermedadesocularesoftalmo_e_oculares ?? "",
+
+            hipoacusiaFrecuenciasConversacionales: oidoMayor40,
+            conclusion: oidoMayor40 ? "NO APTO" : null,
+            anemiaCriteriosOMS2011: anemia,
             //==========================TAB EXAMEN FISICO===========================
             // Examen Médico - Medidas Antropométricas y Signos Vitales
             frecuenciaCardiaca: res.frecuenciaCardiaca ?? "",
@@ -79,6 +142,9 @@ export const GetInfoServicio = async (
             talla: res.tallaTriaje ?? "",
             peso: res.pesoTriaje ?? "",
             imc: res.imcTriaje ?? "",
+            observacionesRecomendaciones: nuevasObservaciones,
+            obesidadIMC30: obesidadIMC30,
+            imcRed: imcRed,
             perimetroCuello: res.perimetroCuelloTriaje ?? "",
             perimetroCintura: res.cinturaTriaje ?? "",
             perimetroCadera: res.caderaTriaje ?? "",
@@ -196,6 +262,8 @@ export const GetInfoServicioEditar = async (
 
             // Examen Físico - Información Adicional
             detalleInformacionExamenFisico: res.detalleInformacion_d_informacion ?? "",
+
+            user_medicoFirma: res.usuarioFirma,
             //===============PARTE INFERIOR=======================
             // Conclusión y Comentarios
             aptoDesde: res.fechaDesde_f_desde ?? today,
@@ -311,6 +379,8 @@ export const SubmitDataService = async (
         antecedentesInsuficienciaRenalCronicaNo: !form.insuficienciaRenalCronicaGradoIV,
         antecedentesAnemiaCualquierGradoSi: form.anemiaCriteriosOMS2011,
         antecedentesAnemiaCualquierGradoNo: !form.anemiaCriteriosOMS2011,
+
+        usuarioFirma: form.user_medicoFirma,
         usuarioRegistro: user,
     };
 
@@ -363,7 +433,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             //Necesita Agudeza visual 
             Swal.fire(
                 "Alerta",
-                "El paciente necesita pasar por Triaje.",
+                "El paciente necesita pasar por Audiometria.",
                 "warning"
             );
         }

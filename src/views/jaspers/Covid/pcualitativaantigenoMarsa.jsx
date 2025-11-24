@@ -1,6 +1,8 @@
 import jsPDF from "jspdf";
-import header_PCualitativoAntigenoMarsa from "./header/header_PCualitativoAntigenoMarsa";
-import footer from "../components/footer";
+import CabeceraLogo from "../components/CabeceraLogo.jsx";
+import footerTR from "../components/footerTR.jsx";
+import drawColorBox from "../components/ColorBox.jsx";
+import { getSign } from "../../utils/helpers.js";
 
 const config = {
   margin: 15,
@@ -17,39 +19,81 @@ const config = {
   lineHeight: 8,
 };
 
+// --- Función para formatear fecha a DD/MM/YYYY ---
+const toDDMMYYYY = (fecha) => {
+  if (!fecha) return '';
+  if (fecha.includes('/')) return fecha; // ya está en formato correcto
+  const [anio, mes, dia] = fecha.split('-');
+  if (!anio || !mes || !dia) return fecha;
+  return `${dia}/${mes}/${anio}`;
+};
+
 export default function pcualitativaantigenoMarsa(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
-  header_PCualitativoAntigenoMarsa(doc, datos);
+  const drawHeader = () => {
+    CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+    
+    // Número de Ficha
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Nro de ficha: ", pageW - 80, 15);
+    doc.setFont("helvetica", "bold").setFontSize(18);
+    doc.text(String(datos.norden || datos.numeroFicha || datos.numero || ""), pageW - 50, 16);
+    
+    // Sede
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
+    
+    // Fecha de examen
+    const fechaExamen = toDDMMYYYY(datos.fecha_examen || datos.fechaExamen || datos.fecha || "");
+    doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
+    
+    // Página
+    doc.text("Pag. 01", pageW - 30, 10);
 
-  const sello1 = datos.digitalizacion?.find(
-    (d) => d.nombreDigitalizacion === "FIRMAP"
-  );
-  const sello2 = datos.digitalizacion?.find(
-    (d) => d.nombreDigitalizacion === "HUELLA"
-  );
-  const isValidUrl = (url) => url && url !== "Sin registro";
-  const loadImg = (src) =>
-    new Promise((res, rej) => {
-      const img = new Image();
-      img.src = src;
-      img.crossOrigin = "anonymous";
-      img.onload = () => res(img);
-      img.onerror = () => rej(`No se pudo cargar ${src}`);
+    // Bloque de color
+    drawColorBox(doc, {
+      color: datos.codigoColor || "#008f39",
+      text: datos.textoColor || "F",
+      x: pageW - 30,
+      y: 10,
+      size: 22,
+      showLine: true,
+      fontSize: 30,
+      textPosition: 0.9
     });
-  Promise.all([
-    isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
-    isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-  ]).then(([s1, s2]) => {
 
-      // === CUERPO ===
-  let y = 90;
-  // Título
-  doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
-  // Bajo el título y MARCA un poco más
-  y = 80;
+    // Datos del paciente (debajo del logo)
+    let dataY = 40;
+    const labelX = config.margin;
+    const valueX = labelX + 35;
+    doc.setFontSize(11).setFont('helvetica', 'bold');
+    doc.text("PACIENTE:", labelX, dataY);
+    doc.setFont('helvetica', 'normal');
+    doc.text(String(datos.nombre || datos.nombres || ''), valueX, dataY);
+    dataY += 8;
+    doc.setFont('helvetica', 'bold');
+    doc.text("EDAD :", labelX, dataY);
+    doc.setFont('helvetica', 'normal');
+    doc.text(datos.edad ? `${datos.edad} años` : '', valueX, dataY);
+    dataY += 8;
+    doc.setFont('helvetica', 'bold');
+    doc.text("DNI:", labelX, dataY);
+    doc.setFont('helvetica', 'normal');
+    doc.text(String(datos.dni || datos.cod_pa || ''), valueX, dataY);
+    dataY += 8;
+    doc.setFont('helvetica', 'bold');
+    doc.text("FECHA :", labelX, dataY);
+    doc.setFont('helvetica', 'normal');
+    doc.text(fechaExamen, valueX, dataY);
+  };
+
+  drawHeader();
+
+  // === CUERPO ===
+  let y = 75;
   doc.text("PRUEBA CUALITATIVA DE ANTIGENOS", config.margin, y);
   y += config.lineHeight + 2;
 
@@ -116,96 +160,58 @@ export default function pcualitativaantigenoMarsa(datos = {}) {
   doc.text("Firmo en conformidad de lo anteriormente declarado.", config.margin, y);
   y += config.lineHeight * 2;
 
-  // Firma y huella digital (solo baja la línea y DNI, huella queda igual)
+  // Firma y huella digital (centrado, sin cuadros, solo imágenes y textos)
+  y += 3; // Subido 7mm para no chocar con el footer (original y += 10, ahora y += 3)
+  const centroX = pageW / 2;
+  const firmaY = y;
+  
+  // Obtener URLs de firma y huella
+  const firmaUrl = getSign(datos, "FIRMAP");
+  const huellaUrl = getSign(datos, "HUELLA");
+  
+  // Agregar firma del paciente (izquierda del centro)
+  if (firmaUrl) {
+    try {
+      const imgWidth = 30;
+      const imgHeight = 20;
+      const x = centroX - 25; // A la izquierda del centro
+      doc.addImage(firmaUrl, 'PNG', x, firmaY, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando firma del paciente:", error);
+    }
+  }
+  
+  // Agregar huella del paciente (derecha de la firma)
+  if (huellaUrl) {
+    try {
+      const imgWidth = 12;
+      const imgHeight = 20;
+      const x = centroX + 5; // A la derecha de la firma
+      doc.addImage(huellaUrl, 'PNG', x, firmaY, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando huella del paciente:", error);
+    }
+  }
+  
+  // Línea de firma debajo de las imágenes
+  const lineY = firmaY + 22;
   doc.setLineWidth(0.2);
-  const firmaW = 60;
-  const firmaH = 18;
-  const huellaW = 30;
-  const huellaH = 30;
-  const gap = 18;
-  const totalBlockW = firmaW + gap + huellaW;
-  const startX = pageW - config.margin - totalBlockW;
-  // Offset solo para la línea y DNI
-  const blockYOffset = 20;
-  const blockY = y + blockYOffset;
-  // Línea de firma (más larga)
-  const lineY = blockY + 8;
-  doc.line(startX, lineY, startX + firmaW, lineY);
-  // 'DNI:' alineado a la izquierda debajo de la línea
-  const dniY = lineY + 8;
-  doc.setFont(config.font, "normal").setFontSize(10);
-  doc.text("DNI :", startX, dniY);
-  // Número de DNI en negrita y subrayado con puntos
+  doc.line(centroX - 30, lineY, centroX + 30, lineY);
+  
+  // Texto "Firma y Huella del Paciente" centrado
+  doc.setFont(config.font, "normal").setFontSize(9);
+  doc.text("Firma y Huella del Paciente", centroX, lineY + 6, { align: "center" });
+  
+  // DNI debajo del texto
   if (datos.dni) {
-    doc.setFont(config.font, "bold").setFontSize(11);
-    const dniNumX = startX + 18;
-    doc.text(`${datos.dni}`, dniNumX, dniY);
-    // Subrayado con puntos
-    const dniWidth = doc.getTextWidth(`${datos.dni}`);
-    const dots = ".".repeat(22);
-    doc.setFont(config.font, "normal").setFontSize(10);
-    doc.text(dots, dniNumX + dniWidth + 2, dniY + 0.5);
-  }
-  // HUELLA DIGITAL (derecha, sin offset)
-  const huellaX = startX + firmaW + gap;
-  doc.rect(huellaX, y, huellaW, huellaH); // Cuadro
-  doc.setFont(config.font, "normal").setFontSize(11);
-  doc.text("Huella Digital", huellaX + huellaW / 2, y + huellaH + 6, { align: "center" });
-
-  // Firma
-  if (s1) {
-    const canvas = document.createElement("canvas");
-    canvas.width = s1.width;
-    canvas.height = s1.height;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(s1, 0, 0);
-    const selloBase64 = canvas.toDataURL("image/png");
-    // Área del rectángulo donde irá la firma
-    const sigX = startX;
-    const sigY = y;
-    const sigW = firmaW;
-    const sigH = firmaH;
-    const maxImgW = sigW - 4;
-    const maxImgH = sigH - 4;
-    let imgW = s1.width;
-    let imgH = s1.height;
-    const scaleW = maxImgW / imgW;
-    const scaleH = maxImgH / imgH;
-    const scale = Math.min(scaleW, scaleH, 1);
-    imgW *= scale;
-    imgH *= scale;
-    const imgX = sigX + (sigW - imgW) / 2;
-    const imgY = sigY + (sigH - imgH) / 2;
-    doc.addImage(selloBase64, "PNG", imgX, imgY, imgW, imgH);
-  }
-  // Huella
-  if (s2) {
-    const canvas = document.createElement("canvas");
-    canvas.width = s2.width;
-    canvas.height = s2.height;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(s2, 0, 0);
-    const selloBase64 = canvas.toDataURL("image/png");
-    const sigX = startX + firmaW + gap;
-    const sigY = y;
-    const sigW = huellaW;
-    const sigH = huellaH;
-    const maxImgW = sigW - 4;
-    const maxImgH = sigH - 4;
-    let imgW = s2.width;
-    let imgH = s2.height;
-    const scaleW = maxImgW / imgW;
-    const scaleH = maxImgH / imgH;
-    const scale = Math.min(scaleW, scaleH, 1);
-    imgW *= scale;
-    imgH *= scale;
-    const imgX = sigX + (sigW - imgW) / 2;
-    const imgY = sigY + (sigH - imgH) / 2;
-    doc.addImage(selloBase64, "PNG", imgX, imgY, imgW, imgH);
+    doc.setFont(config.font, "normal").setFontSize(8);
+    doc.text("DNI:", centroX - 15, lineY + 12);
+    doc.setFont(config.font, "bold").setFontSize(9);
+    doc.text(String(datos.dni || ""), centroX - 8, lineY + 12);
   }
 
   // Footer
-  footer(doc, datos);
+  footerTR(doc, datos);
 
   const pdfBlob = doc.output("blob");
   const pdfUrl = URL.createObjectURL(pdfBlob);
@@ -214,5 +220,4 @@ export default function pcualitativaantigenoMarsa(datos = {}) {
   iframe.src = pdfUrl;
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
-  })
 }

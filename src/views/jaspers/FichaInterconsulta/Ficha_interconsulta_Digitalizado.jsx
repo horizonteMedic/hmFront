@@ -194,7 +194,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
     doc.setLineWidth(0.2);
     
     // Dibujar fondo gris más oscuro
-    doc.setFillColor(160, 160, 160);
+    doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
     
     // Dibujar líneas del header
@@ -436,16 +436,16 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   // Datos para la fila "Cerca" - usando datos reales
   const datosCerca = {
     agudezaVisual: "Cerca",
-    sinCorrectores: `OD: ${datosFinales.agudezaVisualCercaOD || ""}  OI: ${datosFinales.agudezaVisualCercaOI || ""}`,
-    conCorrectores: `OD: ${datosFinales.agudezaVisualCercaConOD || ""}  OI: ${datosFinales.agudezaVisualCercaConOI || ""}`,
+    sinCorrectores: `OD: ${datosFinales.agudezaVisualCercaOD || ""}\nOI: ${datosFinales.agudezaVisualCercaOI || ""}`,
+    conCorrectores: `OD: ${datosFinales.agudezaVisualCercaConOD || ""}\nOI: ${datosFinales.agudezaVisualCercaConOI || ""}`,
     binocular: `Test de Ishihara: ${datosFinales.testIshihara || ""}`
   };
 
   // Datos para la fila "Lejos" - usando datos reales
   const datosLejos = {
     agudezaVisual: "Lejos",
-    sinCorrectores: `OD: ${datosFinales.agudezaVisualLejosOD || ""}  OI: ${datosFinales.agudezaVisualLejosOI || ""}`,
-    conCorrectores: `OD: ${datosFinales.agudezaVisualLejosConOD || ""}  OI: ${datosFinales.agudezaVisualLejosConOI || ""}`,
+    sinCorrectores: `OD: ${datosFinales.agudezaVisualLejosOD || ""}\nOI: ${datosFinales.agudezaVisualLejosOI || ""}`,
+    conCorrectores: `OD: ${datosFinales.agudezaVisualLejosConOD || ""}\nOI: ${datosFinales.agudezaVisualLejosConOI || ""}`,
     binocular: `Ref. Pupilares: ${datosFinales.refPupilares || ""}`
   };
 
@@ -523,7 +523,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   yPos = dibujarHeaderSeccion("4. MOTIVO DE INTERCONSULTA", yPos, filaAltura);
 
   // Fila "Motivo de Interconsulta:" (fila celeste)
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -542,7 +542,11 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaMotivo);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaFilaMotivo, tablaInicioX + tablaAncho, yPos + alturaFilaMotivo);
-
+  
+   const firmaMedicoX = tablaInicioX + 150  ;
+  const firmaMedicoY = yPos + alturaFilaMotivo - 4 ;
+  
+  
   // === COLUMNA 2: SELLO Y FIRMA DEL MÉDICO ===
   
 
@@ -560,7 +564,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   yPos += alturaFilaMotivo;
 
   // Fila "EVALUACIÓN DE ESPECIALISTA (medicina interna)" (fila gris)
-  doc.setFillColor(160, 160, 160);
+  doc.setFillColor(196, 196, 196);
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -584,7 +588,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   yPos += filaAltura;
 
   // Fila "Hallazgos relevantes:" (fila celeste)
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -620,7 +624,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   yPos += alturaFilaHallazgos;
 
   // Fila "Diagnóstico:" (fila celeste)
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -654,7 +658,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   yPos += alturaFilaDiagnostico;
 
   // Fila "Tratamiento y recomendaciones vinculadas a la actividad laboral:" (fila celeste)
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -732,9 +736,6 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
     }
   }
 
-   const firmaMedicoX = 155  ;
-  const firmaMedicoY = 136.73666666666668 ;
-  
   // Agregar firma y sello médico
   let firmaMedicoUrl = getSign(datosFinales, "SELLOFIRMA");
   if (firmaMedicoUrl) {
@@ -786,7 +787,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8});
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

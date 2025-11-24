@@ -1,15 +1,79 @@
 // src/views/jaspers/AnalisisBioquimicos/AnalisisBioquimicos_Digitalizado.jsx
 import jsPDF from "jspdf";
-import headerAnalisisBioquimicos from "./Header/headerAnalisisBioquimicos";
-import footer from "../components/footer";
+import CabeceraLogo from '../components/CabeceraLogo.jsx';
+import drawColorBox from '../components/ColorBox.jsx';
+import footerTR from '../components/footerTR.jsx';
+
+// Función para formatear fecha a DD/MM/YYYY
+const toDDMMYYYY = (fecha) => {
+  if (!fecha) return '';
+  if (fecha.includes('/')) return fecha; // ya está en formato correcto
+  const [anio, mes, dia] = fecha.split('-');
+  if (!anio || !mes || !dia) return fecha;
+  return `${dia}/${mes}/${anio}`;
+};
+
+// Función para formatear fecha larga
+const formatDateToLong = (dateString) => {
+  if (!dateString) return '';
+  try {
+    const date = new Date(`${dateString}T00:00:00`);
+    return date.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  } catch (error) {
+    return toDDMMYYYY(dateString) || '';
+  }
+};
+
+// Header con datos de ficha, sede y fecha
+const drawHeader = (doc, datos = {}) => {
+  const pageW = doc.internal.pageSize.getWidth();
+  
+  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+  
+  // Número de Ficha
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Nro de ficha: ", pageW - 80, 15);
+  doc.setFont("helvetica", "normal").setFontSize(18);
+  doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
+  
+  // Código AB (codAb)
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Cod. AB: " + (datos.codAb || ""), pageW - 80, 20);
+  
+  // Sede
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 25);
+  
+  // Fecha de examen
+  const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
+  doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 30);
+  
+  // Página
+  doc.text("Pag. 01", pageW - 30, 10);
+
+  // Bloque de color
+  drawColorBox(doc, {
+    color: datos.codigoColor || "#008f39",
+    text: datos.textoColor || "F",
+    x: pageW - 30,
+    y: 10,
+    size: 22,
+    showLine: true,
+    fontSize: 30,
+    textPosition: 0.9
+  });
+};
 
 export default function AnalisisBioquimicos_Digitalizado(datos = {}) {
   const doc = new jsPDF({ unit: "mm", format: "letter" });
   const pageW = doc.internal.pageSize.getWidth();
-  const margin = 15;
 
-  // ==== HEADER ====
-  headerAnalisisBioquimicos(doc, datos);
+  // === HEADER ===
+  drawHeader(doc, datos);
 
   const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
   const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
@@ -40,7 +104,40 @@ export default function AnalisisBioquimicos_Digitalizado(datos = {}) {
        .line((pageW - titleW) / 2, y + 1.5, (pageW + titleW) / 2, y + 1.5);
     y += 12;
 
-    // ==== TABLA ====
+    // ==== DATOS PERSONALES ====
+    const margin = 26; // Márgenes laterales aumentados
+    const lineHeight = 7;
+    const startX = margin;
+    
+   
+    
+    // Apellidos y Nombres
+    doc.setFontSize(11).setFont('helvetica', 'bold');
+    doc.text("Apellidos y Nombres :", startX, y);
+    doc.setFont('helvetica', 'normal');
+    const nombresX = startX + 50;
+    doc.text(String(datos.nombres || datos.nombresPaciente || '').toUpperCase(), nombresX, y);
+    y += lineHeight;
+    
+    // Fecha
+    doc.setFontSize(11).setFont('helvetica', 'bold');
+    doc.text("Fecha :", startX, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(formatDateToLong(datos.fechaExamen || datos.fecha || '').toUpperCase(), nombresX, y);
+    y += lineHeight + 3;
+    
+    // Línea divisoria
+    doc.setLineWidth(0.3);
+    doc.line(startX, y, pageW - margin, y);
+    y += lineHeight + 2;
+
+    // ==== RESULTADOS ====
+    // Título "RESULTADOS:"
+    doc.setFontSize(12).setFont('helvetica', 'bold');
+    doc.text("RESULTADOS:", startX, y);
+    y += lineHeight + 2;
+
+    // ==== PRUEBAS (texto ordenado, sin tabla) ====
     const tests = [
       { label: "CREATININA", key: "txtCreatinina", range: "(V.N. 0.8 - 1.4 mg/dl)" },
       { label: "COLESTEROL TOTAL", key: "txtColesterol", range: "(V.N. < 200 mg/dl)" },
@@ -50,127 +147,74 @@ export default function AnalisisBioquimicos_Digitalizado(datos = {}) {
       { label: "V.L.D.L. COLESTEROL", key: "txtVldlColesterol", range: "(V.N. < 30 mg/dl)" },
     ];
 
-    // ancho total de tabla
-    const tableW = pageW * 0.75;
-    const tableX = (pageW - tableW) / 2;
-    const rowH = 8;
-    const totalRows = 2 + tests.length;
-    const tableH = totalRows * rowH;
-
-    // contorno y líneas horizontales
-    doc.setLineWidth(0.3).roundedRect(tableX, y, tableW, tableH, 2, 2);
-    for (let i = 1; i <= totalRows; i++) {
-      const yy = y + i * rowH;
-      doc.line(tableX, yy, tableX + tableW, yy);
-    }
-
-    // columnas
-    const labelX = tableX + 3;
-    const colonX = tableX + tableW * 0.35;   // ahora el ":" está al 30% del ancho de la tabla
-    const valueX = tableX + tableW * 0.45;
-    const rangeX = tableX + tableW - 3;
+    // Posiciones para alinear el texto
+    const labelX = startX;
+    const colonX = startX + 60;
+    const valueX = startX + 70;
+    const rangeX = pageW - margin;
 
     doc.setFontSize(11);
 
-    // —— PACIENTE ——
-    let textY = y + rowH - 2;
-    doc.setFont("helvetica", "bold")
-       .text("PACIENTE", labelX, textY, { align: "left" });
-    doc.setFont("helvetica", "normal")
-       .text(":", colonX, textY, { align: "center" });
-    doc.text(datos.nombres || "-", valueX, textY, { align: "left" });
-
-    // —— FECHA ——
-    textY += rowH;
-    doc.setFont("helvetica", "bold")
-       .text("FECHA", labelX, textY, { align: "left" });
-    doc.setFont("helvetica", "normal")
-       .text(":", colonX, textY, { align: "center" });
-    // Formato de fecha dd/mm/yyyy
-    const formatDateToShort = (dateString) => {
-      if (!dateString) return '';
-      const date = new Date(`${dateString}T00:00:00`);
-      const day = String(date.getDate()).padStart(2, '0');
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const year = date.getFullYear();
-      return `${day}/${month}/${year}`;
-    };
-    doc.text(formatDateToShort(datos.fecha), valueX, textY, { align: "left" });
-
-    // —— TESTS ——
-    let currentY = y + rowH * 2 - 2;
+    // Dibujar pruebas como texto ordenado
     tests.forEach(({ label, key, range }) => {
-      currentY += rowH;
       const val = datos[key] != null ? String(datos[key]) : "-";
       doc.setFont("helvetica", "bold")
-         .text(label, labelX, currentY, { align: "left" });
+         .text(label, labelX, y, { align: "left" });
       doc.setFont("helvetica", "normal")
-         .text(":", colonX, currentY, { align: "center" });
-      doc.text(val, valueX, currentY, { align: "left" });
-      doc.text(range, rangeX, currentY, { align: "right" });
+         .text(":", colonX, y, { align: "left" });
+      doc.text(val, valueX, y, { align: "left" });
+      doc.text(range, rangeX, y, { align: "right" });
+      y += lineHeight;
     });
 
-    // ==== FIRMA ====
-    const recW = 150, recH = 30;
-    const recX = (pageW - recW) / 2;
-    const recY = y + tableH + 30; // más abajo
-
-    doc.setLineWidth(0.3).roundedRect(recX, recY, recW, recH, 2, 2);
-
-    const imgW = 60, imgH = 25;
-    const smallW = 30, smallH = 25;
-    const marginInterno = 10;
+    // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos (sin recuadro)
+    const sigW = 53; // Tamaño fijo width
+    const sigH = 23; // Tamaño fijo height
+    const sigY = y + 20; // Espacio después de las pruebas
+    const gap = 16; // Espacio entre sellos (reducido 4mm: 20 - 4 = 16)
+    
     if (s1 && s2) {
-      // Dos firmas, una a la izquierda (normal) y otra a la derecha (más pequeña) dentro del recuadro
-      // Primera firma (sello1) - tamaño normal
-      const canvas1 = document.createElement('canvas');
-      canvas1.width = s1.width;
-      canvas1.height = s1.height;
-      const ctx1 = canvas1.getContext('2d');
-      ctx1.drawImage(s1, 0, 0);
-      const selloBase64_1 = canvas1.toDataURL('image/png');
-      const imgX1 = recX + marginInterno;
-      const imgY1 = recY + (recH - imgH) / 2;
-      doc.addImage(selloBase64_1, 'PNG', imgX1, imgY1, imgW, imgH);
-
-      // Segunda firma (sello2) - más pequeña
-      const canvas2 = document.createElement('canvas');
-      canvas2.width = s2.width;
-      canvas2.height = s2.height;
-      const ctx2 = canvas2.getContext('2d');
-      ctx2.drawImage(s2, 0, 0);
-      const selloBase64_2 = canvas2.toDataURL('image/png');
-      const imgX2 = recX + recW - marginInterno - smallW;
-      const imgY2 = recY + (recH - smallH) / 2;
-      doc.addImage(selloBase64_2, 'PNG', imgX2, imgY2, smallW, smallH);
+      // Si hay dos sellos, centrarlos juntos
+      const totalWidth = sigW * 2 + gap;
+      const startX = (pageW - totalWidth) / 2;
+      
+      const addSello = (img, xPos) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const selloBase64 = canvas.toDataURL('image/png');
+        doc.addImage(selloBase64, 'PNG', xPos, sigY + (sigH - sigH) / 2, sigW, sigH);
+      };
+      addSello(s1, startX);
+      addSello(s2, startX + sigW + gap);
     } else if (s1) {
-      // Solo una firma, centrada en el recuadro
+      // Si solo hay un sello, centrarlo con tamaño fijo
       const canvas = document.createElement('canvas');
       canvas.width = s1.width;
       canvas.height = s1.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = recX + (recW - imgW) / 2;
-      const imgY = recY + (recH - imgH) / 2;
-      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+      const imgX = (pageW - sigW) / 2; // Center single stamp
+      doc.addImage(selloBase64, 'PNG', imgX, sigY + (sigH - sigH) / 2, sigW, sigH);
     } else if (s2) {
-      // Solo la segunda firma, centrada y más pequeña
+      // Si solo hay el segundo sello, centrarlo con tamaño fijo
       const canvas = document.createElement('canvas');
       canvas.width = s2.width;
       canvas.height = s2.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s2, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = recX + (recW - smallW) / 2;
-      const imgY = recY + (recH - smallH) / 2;
-      doc.addImage(selloBase64, 'PNG', imgX, imgY, smallW, smallH);
+      const imgX = (pageW - sigW) / 2; // Center single stamp
+      doc.addImage(selloBase64, 'PNG', imgX, sigY + (sigH - sigH) / 2, sigW, sigH);
     }
 
-    // ==== FOOTER ====
-    footer(doc, datos);
+    // === FOOTER ===
+    footerTR(doc, datos);
 
-    // ==== IMPRIMIR ====
+    // ==== Imprimir ====
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
     const iframe = document.createElement("iframe");

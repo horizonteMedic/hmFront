@@ -28,13 +28,13 @@ const Anexo16ATestAlturaPsicosensometrico = ({ token, selectedSede }) => {
           </div>
         </div>
         <div className="mt-6">
-          <span className="font-bold text-blue-900 text-base italic">IMPRIMIR</span>
+          <span className="font-bold text-blue-900 text-base italic">Imprimir</span>
           <div className="bg-gray-100 border rounded p-4 mt-2">
             <p className="italic text-sm mb-4 text-gray-700"><b>Recuerda:</b> Antes de imprimir fichas debes haber llenado laboratorio, para Psicosensometría también llenar análisis bioquímicos.</p>
             <div className="flex flex-col gap-3 items-center">
-              <button type="button" className="bg-gray-200 px-6 py-2 rounded border border-gray-300 flex items-center gap-2 w-full md:w-1/2 justify-center"><FontAwesomeIcon icon={faPrint} /> IMPRIMIR ANEXO 16 A</button>
-              <button type="button" className="bg-gray-200 px-6 py-2 rounded border border-gray-300 flex items-center gap-2 w-full md:w-1/2 justify-center"><FontAwesomeIcon icon={faPrint} /> IMPRIMIR TEST DE ALTURA</button>
-              <button type="button" className="bg-gray-200 px-6 py-2 rounded border border-gray-300 flex items-center gap-2 w-full md:w-1/2 justify-center"><FontAwesomeIcon icon={faPrint} /> IMPRIMIR PSICOSENSOMETRIA</button>
+              <button type="button" className="bg-gray-200 px-6 py-2 rounded border border-gray-300 flex items-center gap-2 w-full md:w-1/2 justify-center"><FontAwesomeIcon icon={faPrint} /> Imprimir ANEXO 16 A</button>
+              <button type="button" className="bg-gray-200 px-6 py-2 rounded border border-gray-300 flex items-center gap-2 w-full md:w-1/2 justify-center"><FontAwesomeIcon icon={faPrint} /> Imprimir TEST DE ALTURA</button>
+              <button type="button" className="bg-gray-200 px-6 py-2 rounded border border-gray-300 flex items-center gap-2 w-full md:w-1/2 justify-center"><FontAwesomeIcon icon={faPrint} /> Imprimir PSICOSENSOMETRIA</button>
             </div>
           </div>
         </div>

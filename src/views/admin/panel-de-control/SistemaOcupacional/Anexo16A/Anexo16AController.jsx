@@ -32,7 +32,6 @@ export const GetInfoServicio = async (
         evaluarObservacionesObtener(res, set);
         set((prev) => ({
             ...prev,
-            ...res,
             norden: res.norden_n_orden,
             dni: res.dni_cod_pa,
             nombres: res.nombres_nombres_pa + " " + res.apellidos_apellidos_pa,
@@ -78,16 +77,21 @@ function evaluarObservacionesObtener(res, set) {
     // Evaluación IMC - Convertido desde Java (líneas 150-165)
     if (!isNaN(imcValue) && imcValue > 25) {
         imcRed = true;
-        if (imcValue >= 25 && imcValue < 29.91) {
+        if (imcValue >= 25 && imcValue < 30) {
             nuevasObservaciones += "- SOBREPESO: DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
-        } else if (imcValue >= 29.91 && imcValue < 35) {
+        } else if (imcValue >= 30 && imcValue < 35) {
             // obesidadMorbida = true;
             // obesidadMorbidaRed = true;
             nuevasObservaciones += "- OBESIDAD I: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
-        } else if (imcValue >= 35) {
+        } else if (imcValue >= 35 && imcValue < 40) {
             obesidadMorbida = true;
             obesidadMorbidaRed = true;
             nuevasObservaciones += "- OBESIDAD II: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+        }
+        else if (imcValue >= 40) {
+            obesidadMorbida = true;
+            obesidadMorbidaRed = true;
+            nuevasObservaciones += "- OBESIDAD III: NO HACER TRABAJOS EN ESPACIOS CONFINADOS. NO HACER TRABAJOS SOBRE 1.8 M.S.N PISO. DIETA HIPOCALORICA, HIPOGRASA Y EJERCICIOS.\n";
         }
     }
 
@@ -106,17 +110,21 @@ function evaluarObservacionesObtener(res, set) {
     const vlejoscoi = res.oilcOftalmologia_oilc || "";
     const vcercacod = res.odccOftalmologia_odcc || "";
     const vcercacoi = res.oiccOftalmologia_oicc || "";
+    const textoEnfermedadOftalmo = (res.enfermedadesOcularesOftalmo_e_oculares ?? "").trim().toUpperCase();
 
-    if (!res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNO") ||
-        !res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNA")) {
-        problemasOftalmologicos = true;
-        problemasOftalmologicosRed = true;
-        if (vlejoscod == "00" && vlejoscoi == "00" && vcercacod == "00" && vcercacoi == "00") {
-            nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
-        } else {
-            nuevasObservaciones += "- USO DE LENTES CORRECTORES.\n";
+    if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
+        const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
+        if (enfermedadesRefractarias.some(e => textoEnfermedadOftalmo.includes(e))) {
+            problemasOftalmologicos = true;
+            problemasOftalmologicosRed = true;
+            const visionLejosNormal = vlejoscod === "00" && vlejoscoi === "00";
+            const visionCercaNormal = vcercacod === "00" && vcercacoi === "00";
+            nuevasObservaciones += visionLejosNormal && visionCercaNormal
+                ? "- CORREGIR AGUDEZA VISUAL.\n"
+                : "- USO DE LENTES CORRECTORES.\n";
         }
     }
+
     // Evaluación de presión arterial - Convertido desde Java (líneas 176-181)
     let hipertension = false;
     let hipertensionRed = false;
@@ -135,7 +143,6 @@ function evaluarObservacionesObtener(res, set) {
             nuevasObservaciones += "- HTA NO CONTROLADA.\n";
         }
     }
-
     set(prev => ({
         ...prev,
         imcRed,
@@ -171,18 +178,20 @@ function evaluarObservacionesEditar(res, set) {
 
     const vcercacod = res.odccOftalmologia_odcc || "";
     const vcercacoi = res.oiccOftalmologia_oicc || "";
+    const textoEnfermedadOftalmo = (res.enfermedadesOcularesOftalmo_e_oculares ?? "").trim().toUpperCase();
 
-    if (!res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNO") ||
-        !res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNA")) {
-        problemasOftalmologicos = true;
-        problemasOftalmologicosRed = true;
-        if (vlejoscod == "00" && vlejoscoi == "00" && vcercacod == "00" && vcercacoi == "00") {
-            nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
-        } else {
-            nuevasObservaciones += "- USO DE LENTES CORRECTORES.\n";
+    if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
+        const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
+        if (enfermedadesRefractarias.some(e => textoEnfermedadOftalmo.includes(e))) {
+            problemasOftalmologicos = true;
+            problemasOftalmologicosRed = true;
+            const visionLejosNormal = vlejoscod === "00" && vlejoscoi === "00";
+            const visionCercaNormal = vcercacod === "00" && vcercacoi === "00";
+            nuevasObservaciones += visionLejosNormal && visionCercaNormal
+                ? "- CORREGIR AGUDEZA VISUAL.\n"
+                : "- USO DE LENTES CORRECTORES.\n";
         }
     }
-
 
     // Evaluación del IMC - Convertido desde Java
     let imc = res.imcTriaje_imc || "";
@@ -263,7 +272,6 @@ export const GetInfoServicioEditar = async (
         evaluarObservacionesEditar(res, set);
         set((prev) => ({
             ...prev,
-            ...res,
             norden: res.norden_n_orden,
             codigoAnexo: res.codigoAnexo16a,
             fechaExam: res.fechaAnexo16a_fecha_anexo,
@@ -308,7 +316,7 @@ export const GetInfoServicioEditar = async (
             lentesCorrectivos: res.observacionesAnexo16a_observaciones?.includes("Uso de Lentes Correct. Lectura de Cerca") || false,
             contrata: res.contrata_razon_contrata,
             empresa: res.empresa_razon_empresa,
-            observaciones: res.observacionesAnexo16a_observaciones,
+            // observaciones: res.observacionesAnexo16a_observaciones,
             //Agudeza Visual
             vcOD: res.visionCercaSinCorregirOd_v_cerca_s_od,
             vlOD: res.visionLejosSinCorregirOd_v_lejos_s_od,
@@ -323,6 +331,8 @@ export const GetInfoServicioEditar = async (
             vlCorregidaOI: res.oilcOftalmologia_oilc,
             enfermedadesOculares: res.enfermedadesOcularesOftalmo_e_oculares,
             medicacionActual: res.medicacionActualAnexo16a_m_actual,
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -383,6 +393,8 @@ export const SubmitDataService = async (
         usoMedicacionActualSi: form.usoMedicacion,
         medicacionActual: form.medicacionActual,
         observaciones: form.observaciones,
+
+        usuarioFirma: form.user_medicoFirma,
         userRegistro: user,
     };
 

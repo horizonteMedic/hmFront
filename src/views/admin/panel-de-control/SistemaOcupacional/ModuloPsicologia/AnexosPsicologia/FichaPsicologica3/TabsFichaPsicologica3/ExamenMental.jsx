@@ -7,6 +7,7 @@ import {
   InputCheckbox,
   RadioTable
 } from "../../../../../../../components/reusableComponents/ResusableComponents";
+import SectionFieldset from "../../../../../../../components/reusableComponents/SectionFieldset";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 // Arrays para RadioTable de Orientación
@@ -37,112 +38,83 @@ export default function ExamenMental({
         <div className="w-full space-y-3 px-3 ">
           {/* Header */}
           {/* Content - 3 Columnas */}
-          <div className=" text-[11px] space-y-3 p-4">
+          <div className=" space-y-3 p-4">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              {/* ===== COLUMNA 1: OBSERVACIÓN DE CONDUCTAS ===== */}
               <div className="space-y-3">
-                <h3 className="text-blue-600 font-semibold text-[11px] mb-2">Observación de Conductas</h3>
-                {/* Presentación */}
-                <div className="bg-gray-50 border border-gray-300 rounded p-3">
-                  <h4 className="text-blue-600 font-semibold text-[11px] mb-2">Presentación</h4>
-                  <div className="flex gap-4">
+                <SectionFieldset legend="Observación de Conductas" className="grid xl:grid-cols-4 gap-4">
+                  <SectionFieldset legend="Presentación">
                     <InputsRadioGroup
                       name="presentacion"
                       value={form.presentacion}
                       onChange={handleRadioButton}
+                      vertical
                       options={[
                         { label: "Adecuado", value: "ADECUADO" },
                         { label: "Inadecuado", value: "INADECUADO" }
                       ]}
                     />
-                  </div>
-                </div>
-
-                {/* Postura */}
-                <div className="bg-gray-50 border border-gray-300 rounded p-3">
-                  <h4 className="text-blue-600 font-semibold text-[11px] mb-2">Postura</h4>
-                  <div className="flex gap-4">
+                  </SectionFieldset>
+                  <SectionFieldset legend="Postura">
                     <InputsRadioGroup
                       name="postura"
                       value={form.postura}
                       onChange={handleRadioButton}
+                      vertical
                       options={[
                         { label: "Erguida", value: "ERGUIDA" },
                         { label: "Encorvada", value: "ENCORVADA" }
                       ]}
                     />
-                  </div>
-                </div>
+                  </SectionFieldset>
+                  <SectionFieldset legend="Discurso: Ritmo">
+                    <InputsRadioGroup
+                      name="ritmo"
+                      value={form.ritmo}
+                      onChange={handleRadioButton}
+                      vertical
+                      options={[
+                        { label: "Lento", value: "LENTO" },
+                        { label: "Rápido", value: "RAPIDO" },
+                        { label: "Fluido", value: "FLUIDO" }
+                      ]}
+                    />
+                  </SectionFieldset>
+                  <SectionFieldset legend="Discurso: Tono">
+                    <InputsRadioGroup
+                      name="tono"
+                      value={form.tono}
+                      onChange={handleRadioButton}
+                      vertical
+                      options={[
+                        { label: "Bajo", value: "BAJO" },
+                        { label: "Moderado", value: "MODERADO" },
+                        { label: "Alto", value: "ALTO" }
+                      ]}
+                    />
+                  </SectionFieldset>
+                  <SectionFieldset legend="Discurso: Articulación">
+                    <InputsRadioGroup
+                      name="articulacion"
+                      value={form.articulacion}
+                      onChange={handleRadioButton}
+                      vertical
+                      options={[
+                        { label: "Con dificultad", value: "CON_DIFICULTAD" },
+                        { label: "Sin dificultad", value: "SIN_DIFICULTAD" }
+                      ]}
+                    />
+                  </SectionFieldset>
+                  <SectionFieldset legend="Orientación" fieldsetClassName="md:col-span-3">
+                    <RadioTable
+                      items={orientacionItems}
+                      options={orientacionOptions}
+                      form={form}
+                      handleRadioButton={handleRadioButton}
+                    />
+                  </SectionFieldset>
+                </SectionFieldset>
 
-                {/* Discurso */}
-                <div className="bg-gray-50 border border-gray-300 rounded p-3">
-                  <h4 className="text-blue-600 font-semibold text-[11px] mb-2">Discurso</h4>
-
-                  {/* Ritmo */}
-                  <div className="mb-3">
-                    <h5 className="font-semibold text-[11px] mb-1">Ritmo</h5>
-                    <div className="flex gap-4">
-                      <InputsRadioGroup
-                        name="ritmo"
-                        value={form.ritmo}
-                        onChange={handleRadioButton}
-                        options={[
-                          { label: "Lento", value: "LENTO" },
-                          { label: "Rápido", value: "RAPIDO" },
-                          { label: "Fluido", value: "FLUIDO" }
-                        ]}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Tono */}
-                  <div className="mb-3">
-                    <h5 className="font-semibold text-[11px] mb-1">Tono</h5>
-                    <div className="flex gap-4">
-                      <InputsRadioGroup
-                        name="tono"
-                        value={form.tono}
-                        onChange={handleRadioButton}
-                        options={[
-                          { label: "Bajo", value: "BAJO" },
-                          { label: "Moderado", value: "MODERADO" },
-                          { label: "Alto", value: "ALTO" }
-                        ]}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Articulación */}
-                  <div>
-                    <h5 className="font-semibold text-[11px] mb-1">Articulación</h5>
-                    <div className="flex gap-4">
-                      <InputsRadioGroup
-                        name="articulacion"
-                        value={form.articulacion}
-                        onChange={handleRadioButton}
-                        options={[
-                          { label: "Con dificultad", value: "CON_DIFICULTAD" },
-                          { label: "Sin dificultad", value: "SIN_DIFICULTAD" }
-                        ]}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Orientación */}
-                <div className="border rounded p-3 ">
-                  <h5 className="font-semibold mb-4">Orientación</h5>
-                  <RadioTable
-                    items={orientacionItems}
-                    options={orientacionOptions}
-                    form={form}
-                    handleRadioButton={handleRadioButton}
-                  />
-                </div>
-
-                {/* Área Cognitiva */}
-                <div className="bg-gray-50 border border-gray-300 rounded p-3">
-                  <h4 className="text-blue-600 font-semibold text-[11px] mb-2">Área Cognitiva</h4>
+                <SectionFieldset legend="Área Cognitiva" fieldsetClassName="md:col-span-4">
                   <InputTextArea
                     name="areaCognitiva"
                     value={form.areaCognitiva}
@@ -150,13 +122,12 @@ export default function ExamenMental({
                     rows={6}
                     className="w-full"
                   />
-                </div>
+                </SectionFieldset>
               </div>
 
               {/* ===== COLUMNA 2: PROCESOS COGNITIVOS ===== */}
               <div className="space-y-3">
-                <h3 className="text-blue-600 font-semibold text-[11px] mb-2">Procesos Cognitivos</h3>
-                <div className="bg-gray-50 border border-gray-300 rounded p-3 space-y-2">
+                <SectionFieldset legend="Procesos Cognitivos" className="space-y-3">
                   <InputTextOneLine
                     label="Lucido, atento"
                     name="lucidoAtento"
@@ -178,12 +149,9 @@ export default function ExamenMental({
                     onChange={handleChange}
                     labelWidth="120px"
                   />
-                </div>
+                </SectionFieldset>
 
-
-                {/* Memoria */}
-                <div className="bg-gray-50 border border-gray-300 rounded p-3">
-                  <h4 className="text-blue-600 font-semibold text-[11px] mb-2">Memoria</h4>
+                <SectionFieldset legend="Memoria">
                   <InputsRadioGroup
                     name="memoria"
                     value={form.memoria}
@@ -194,11 +162,9 @@ export default function ExamenMental({
                       { label: "Largo Plazo", value: "LARGO_PLAZO" }
                     ]}
                   />
-                </div>
+                </SectionFieldset>
 
-                {/* Inteligencia */}
-                <div className="bg-gray-50 border border-gray-300 rounded p-3">
-                  <h4 className="text-blue-600 font-semibold text-[11px] mb-2">Inteligencia</h4>
+                <SectionFieldset legend="Inteligencia" className="space-y-3">
                   <InputsRadioGroup
                     name="inteligencia"
                     value={form.inteligencia}
@@ -208,7 +174,7 @@ export default function ExamenMental({
                       { label: "Superior", value: "SUPERIOR" },
                       { label: "Normal Brillante", value: "NORMAL_BRILLANTE" },
                       { label: "Promedio", value: "PROMEDIO" },
-                      { label: "N.Torpe", value: "N_TORPE" },
+                      { label: "N.Torpe", value: "N_TORPE" }
                     ]}
                   />
                   <InputsRadioGroup
@@ -220,11 +186,12 @@ export default function ExamenMental({
                       { label: "RM Leve", value: "RM_LEVE" },
                       { label: "RM Moderado", value: "RM_MODERADO" },
                       { label: "RM Severo", value: "RM_SEVERO" },
-                      { label: "RM Profundo", value: "RM_PROFUNDO" },
+                      { label: "RM Profundo", value: "RM_PROFUNDO" }
                     ]}
                   />
-                </div>
-                <div className="bg-gray-50 border border-gray-300 rounded p-3 space-y-2">
+                </SectionFieldset>
+
+                <SectionFieldset legend="Otros Procesos" className="space-y-3">
                   <InputTextOneLine
                     label="Apetito"
                     name="apetito"
@@ -260,116 +227,107 @@ export default function ExamenMental({
                     onChange={handleChange}
                     labelWidth="120px"
                   />
-                </div>
+                </SectionFieldset>
               </div>
 
               {/* ===== COLUMNA 3: PRUEBAS PSICOLÓGICAS Y ÁREA EMOCIONAL ===== */}
               <div className="space-y-3">
-                <h3 className="text-blue-600 font-semibold text-[11px] mb-2">Pruebas Psicológicas</h3>
+                <SectionFieldset legend="Puntaje Nombre" className="space-y-3">
+                  <InputCheckbox
+                    label="Inventario Millón de Estilos de Personalidad - MIPS"
+                    name="mips"
+                    checked={form.mips}
+                    onChange={handleCheckBoxChange}
+                  />
+                  <InputCheckbox
+                    label="Escala de Motivaciones Psicosociales - MPS"
+                    name="mps"
+                    checked={form.mps}
+                    onChange={handleCheckBoxChange}
+                  />
+                  <InputCheckbox
+                    label="Luria - DNA Diagnóstico neuropsicológico de Adultos"
+                    name="luria"
+                    checked={form.luria}
+                    onChange={handleCheckBoxChange}
+                  />
+                  <InputCheckbox
+                    label="Escala de Apreciación del Estrés EAE"
+                    name="eae"
+                    checked={form.eae}
+                    onChange={handleCheckBoxChange}
+                  />
+                  <InputCheckbox
+                    label="Inventario de Burnout de Maslach"
+                    name="maslach"
+                    checked={form.maslach}
+                    onChange={handleCheckBoxChange}
+                  />
+                  <InputCheckbox
+                    label="Clima laboral"
+                    name="climaLaboral"
+                    checked={form.climaLaboral}
+                    onChange={handleCheckBoxChange}
+                  />
+                  <InputCheckbox
+                    label="Batería de Conductores"
+                    name="conductores"
+                    checked={form.conductores}
+                    onChange={handleCheckBoxChange}
+                  />
+                  <InputCheckbox
+                    label="WAIS"
+                    name="wais"
+                    checked={form.wais}
+                    onChange={handleCheckBoxChange}
+                  />
+                  <InputCheckbox
+                    label="Test BENTON"
+                    name="benton"
+                    checked={form.benton}
+                    onChange={handleCheckBoxChange}
+                  />
+                  <InputCheckbox
+                    label="Test Bender"
+                    name="bender"
+                    checked={form.bender}
+                    onChange={handleCheckBoxChange}
+                  />
+                  <InputCheckbox
+                    label="Inventario de la ansiedad ZUNG"
+                    name="zungAnsiedad"
+                    checked={form.zungAnsiedad}
+                    onChange={handleCheckBoxChange}
+                  />
+                  <InputCheckbox
+                    label="Inventario de Depresión ZUNG"
+                    name="zungDepresion"
+                    checked={form.zungDepresion}
+                    onChange={handleCheckBoxChange}
+                  />
+                  <InputCheckbox
+                    label="Escala de Memoria de Wechsler"
+                    name="wechsler"
+                    checked={form.wechsler}
+                    onChange={handleCheckBoxChange}
+                  />
+                  <InputCheckbox
+                    label="Otras Pruebas"
+                    name="otrasPruebas"
+                    checked={form.otrasPruebas}
+                    onChange={handleCheckBoxChange}
+                  />
+                </SectionFieldset>
 
-                {/* Ptje Nombre - Pruebas Psicológicas */}
-                <div className="bg-gray-50 border border-gray-300 rounded p-3">
-                  <h4 className="text-blue-600 font-semibold text-[11px] mb-2">Ptje Nombre</h4>
-                  <div className="space-y-1">
-                    <InputCheckbox
-                      label="Inventario Millón de Estilos de Personalidad - MIPS"
-                      name="mips"
-                      checked={form.mips}
-                      onChange={handleCheckBoxChange}
-                    />
-                    <InputCheckbox
-                      label="Escala de Motivaciones Psicosociales - MPS"
-                      name="mps"
-                      checked={form.mps}
-                      onChange={handleCheckBoxChange}
-                    />
-                    <InputCheckbox
-                      label="Luria - DNA Diagnóstico neuropsicológico de Adultos"
-                      name="luria"
-                      checked={form.luria}
-                      onChange={handleCheckBoxChange}
-                    />
-                    <InputCheckbox
-                      label="Escala de Apreciación del Estrés EAE"
-                      name="eae"
-                      checked={form.eae}
-                      onChange={handleCheckBoxChange}
-                    />
-                    <InputCheckbox
-                      label="Inventario de Burnout de Maslach"
-                      name="maslach"
-                      checked={form.maslach}
-                      onChange={handleCheckBoxChange}
-                    />
-                    <InputCheckbox
-                      label="Clima laboral"
-                      name="climaLaboral"
-                      checked={form.climaLaboral}
-                      onChange={handleCheckBoxChange}
-                    />
-                    <InputCheckbox
-                      label="Batería de Conductores"
-                      name="conductores"
-                      checked={form.conductores}
-                      onChange={handleCheckBoxChange}
-                    />
-                    <InputCheckbox
-                      label="WAIS"
-                      name="wais"
-                      checked={form.wais}
-                      onChange={handleCheckBoxChange}
-                    />
-                    <InputCheckbox
-                      label="Test BENTON"
-                      name="benton"
-                      checked={form.benton}
-                      onChange={handleCheckBoxChange}
-                    />
-                    <InputCheckbox
-                      label="Test Bender"
-                      name="bender"
-                      checked={form.bender}
-                      onChange={handleCheckBoxChange}
-                    />
-                    <InputCheckbox
-                      label="Inventario de la ansiedad ZUNG"
-                      name="zungAnsiedad"
-                      checked={form.zungAnsiedad}
-                      onChange={handleCheckBoxChange}
-                    />
-                    <InputCheckbox
-                      label="Inventario de Depresión ZUNG"
-                      name="zungDepresion"
-                      checked={form.zungDepresion}
-                      onChange={handleCheckBoxChange}
-                    />
-                    <InputCheckbox
-                      label="Escala de Memoria de Wechsler"
-                      name="wechsler"
-                      checked={form.wechsler}
-                      onChange={handleCheckBoxChange}
-                    />
-                    <InputCheckbox
-                      label="Otras Pruebas"
-                      name="otrasPruebas"
-                      checked={form.otrasPruebas}
-                      onChange={handleCheckBoxChange}
-                    />
-                  </div>
-                </div>
-
-                {/* Área Emocional */}
-                <div className="bg-gray-50 border border-gray-300 rounded p-3">
-                  <h4 className="text-blue-600 font-semibold text-[11px] mb-2">Área Emocional</h4>
+                <SectionFieldset legend="Área Emocional">
                   <InputTextArea
                     name="areaEmocional"
                     value={form.areaEmocional}
                     onChange={handleChange}
                     rows={8}
                     className="w-full"
-                    placeholder="Describir el estado emocional del paciente..."
                   />
-                </div>
+                </SectionFieldset>
               </div>
 
             </div>
@@ -392,7 +350,7 @@ export default function ExamenMental({
                 </button>
               </div>
               <div className="flex flex-col items-end">
-                <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+                <span className="font-bold italic text-base mb-1">Imprimir</span>
                 <div className="flex items-center gap-2">
                   <input
                     name="norden"

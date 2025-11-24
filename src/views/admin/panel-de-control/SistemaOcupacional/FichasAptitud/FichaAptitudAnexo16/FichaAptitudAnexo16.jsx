@@ -27,7 +27,6 @@ export default function FichaAptitudAnexo16({ MedicosMulti }) {
     // Datos básicos
     norden: "",
     tipoExamen: "",
-    fechaExam: today,
     nombres: "",
     dni: "",
     edad: "",
@@ -198,13 +197,6 @@ export default function FichaAptitudAnexo16({ MedicosMulti }) {
             name="tipoExamen"
             value={form?.tipoExamen}
             disabled
-          />
-          <InputTextOneLine
-            label="Fecha Examen"
-            type="date"
-            name="fechaExam"
-            value={form?.fechaExam}
-            onChange={handleChangeSimple}
           />
           <InputTextOneLine
             label="Hora"
@@ -517,7 +509,7 @@ export default function FichaAptitudAnexo16({ MedicosMulti }) {
                   </button>
                 </div>
                 <div className="flex flex-col items-end">
-                  <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+                  <span className="font-bold italic text-base mb-1">Imprimir</span>
                   <div className="flex items-center gap-2">
                     <InputTextOneLine
                       name="norden"

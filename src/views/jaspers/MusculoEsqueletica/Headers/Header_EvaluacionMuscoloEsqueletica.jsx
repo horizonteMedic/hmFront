@@ -57,7 +57,7 @@ const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, num
     const fichaY = y + 10.5; // Posición Y independiente
     
     // Número de ficha grande (sin subrayado) - sin etiqueta
-    doc.setFont("helvetica", "bold").setFontSize(18);
+    doc.setFont("helvetica", "normal").setFontSize(18);
     doc.text(fichaNum, fichaX, fichaY);
     
     // Subrayado del número de ficha QUITADO

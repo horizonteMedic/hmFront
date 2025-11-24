@@ -1,18 +1,22 @@
-// src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/Analisis_bioquimicos/Hepatitis.jsx
-import React, { useState, useEffect } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
-import Swal from 'sweetalert2'
-import { PrintHojaR, SubmitHepatitisLab, VerifyTR } from './controller';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { useSessionData } from '../../../../../../hooks/useSessionData';
+import { useForm } from '../../../../../../hooks/useForm';
+import { getToday } from '../../../../../../utils/helpers';
+import { PrintHojaR, SubmitDataService, VerifyTR } from './controller';
+import {
+  InputTextOneLine,
+  InputsRadioGroup,
+} from '../../../../../../components/reusableComponents/ResusableComponents';
+import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 
-const date = new Date();
-  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+const tabla = 'lhepatitis';
 
-export default function Hepatitis({ token, selectedSede, userlogued }) {
-  // Individual useState hooks for each form field
-    const tabla = 'lhepatitis'
+export default function Hepatitis() {
+  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+  const today = getToday();
 
-  const [form, setForm] = useState({
+  const initialFormState = {
     norden: '',
     fecha: today,
     nombres: '',
@@ -24,268 +28,267 @@ export default function Hepatitis({ token, selectedSede, userlogued }) {
     resultadoHAVRadio: '',
     resultadoHBsAg: '',
     resultadoHBsAgRadio: '',
-    printCount: '',
     medico: ''
-  });
-
-  const handleFormChange = e => {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleClear = () => {
-    setForm({
-      norden: '',
-      fecha: today,
-      nombres: '',
-      edad: '',
-      hav: true,
-      hbsag: false,
-      marca: 'RAPID TEST - MONTEST',
-      resultadoHAV: '',
-      resultadoHAVRadio: '',
-      resultadoHBsAg: '',
-      resultadoHBsAgRadio: '',
-      printCount: '',
-      medico: ''
-    })
-  }
+  const {
+    form,
+    setForm,
+    handleChange,
+    handleClear,
+    handleClearnotO,
+    handlePrintDefault,
+    handleRadioButton,
+  } = useForm(initialFormState);
 
-  const handleSeat = () => {
-    setForm(prev => ({
-      ...prev,
-      fecha: today,
-      nombres: '',
-      edad: '',
-      hav: true,
-      hbsag: false,
-      marca: 'RAPID TEST - MONTEST',
-      resultadoHAV: '',
-      resultadoHAVRadio: '',
-      resultadoHBsAg: '',
-      resultadoHBsAgRadio: '',
-      printCount: '',
-      medico: ''
-    }))
-  }
+  const handleSave = () => {
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+  };
+
+  const handleSearch = (e) => {
+    if (e.key === 'Enter') {
+      handleClearnotO();
+      setForm((prev) => ({
+        ...prev,
+        fecha: today,
+        nombres: '',
+        edad: '',
+        hav: true,
+        hbsag: false,
+        marca: 'RAPID TEST - MONTEST',
+        resultadoHAV: '',
+        resultadoHAVRadio: '',
+        resultadoHBsAg: '',
+        resultadoHBsAgRadio: '',
+      }));
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    }
+  };
 
   const handlePrint = () => {
-    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
-    Swal.fire({
-      title: '¿Desea Imprimir Hepatitis?',
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, Imprimir',
-      cancelButtonText: 'Cancelar',
-      customClass: {
-        title: 'swal2-title',
-        confirmButton: 'swal2-confirm',
-        cancelButton: 'swal2-cancel'
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        PrintHojaR(form.norden,token,tabla);
-      }
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla, datosFooter);
     });
-  }
+  };
 
-  // Lógica para habilitar/deshabilitar campos según el check (mejorada para cambio instantáneo y limpieza al desmarcar)
+  const handleHavChange = (checked) => {
+    setForm(prev => ({
+      ...prev,
+      hav: checked,
+      hbsag: checked ? false : prev.hbsag,
+      resultadoHBsAg: checked ? '' : prev.resultadoHBsAg,
+      resultadoHBsAgRadio: checked ? '' : prev.resultadoHBsAgRadio
+    }));
+  };
+
+  const handleHbsagChange = (checked) => {
+    setForm(prev => ({
+      ...prev,
+      hbsag: checked,
+      hav: checked ? false : prev.hav,
+      resultadoHAV: checked ? '' : prev.resultadoHAV,
+      resultadoHAVRadio: checked ? '' : prev.resultadoHAVRadio
+    }));
+  };
+
+  const handleResultadoHAVRadio = (e, value) => {
+    handleRadioButton(e, value);
+    setForm(prev => ({
+      ...prev,
+      resultadoHAV: value,
+      resultadoHAVRadio: value
+    }));
+  };
+
+  const handleResultadoHBsAgRadio = (e, value) => {
+    handleRadioButton(e, value);
+    setForm(prev => ({
+      ...prev,
+      resultadoHBsAg: value,
+      resultadoHBsAgRadio: value
+    }));
+  };
 
   return (
-    <div className="max-w-6xl w-[950px] mx-auto bg-white rounded shadow p-8 space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nro Ficha" name="norden" value={form.norden} onChange={handleFormChange} 
-        onKeyUp={e => {
-          if (e.key === 'Enter') {
-            handleSeat()
-            VerifyTR(form.norden,tabla,token,setForm, selectedSede)
-          }
-        }}/>
-        <Field label="Fecha" name="fecha" type="date" value={form.fecha} onChange={handleFormChange} />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nombres" name="nombres" value={form.nombres} onChange={handleFormChange} disabled dynamicWidth />
-        <Field label="Edad" name="edad" value={form.edad} onChange={handleFormChange} disabled />
-      </div>
-
-      <div className="flex items-center gap-6 mt-2">
-        <Checkbox label="HEPATITIS A (HAV)" checked={form.hav} onChange={v => setForm(p => ({ ...p, hav: v, hbsag: false, resultadoHBsAg: ''  }))} />
-        <Checkbox label="HEPATITIS B (HBsAg)" checked={form.hbsag} onChange={v => setForm(p => ({ ...p, hbsag: v, hav: false, resultadoHAV: '' }))} />
-      </div>
-
-      <div className="flex items-center gap-2 mt-2">
-        <span className="font-bold">MARCA :</span>
-        <input
-          className="border rounded px-2 py-1 min-w-[220px]"
-          name="marca"
-          value={form.marca}
-          onChange={handleFormChange}
-        />
-      </div>
-
-      <div className="grid grid-cols-12 gap-2 items-center mt-4">
-        <div className="col-span-4 font-bold flex items-center">PRUEBAS</div>
-        <div className="col-span-4 font-bold flex items-center">RESULTADOS</div>
-        <div className="col-span-4"></div>
-
-        {/* HAV */}
-        <div className="col-span-4 flex items-center">HEPATITIS A (HAV) - RAPID TEST</div>
-        <div className="col-span-4">
-          <input
-            className="border rounded px-2 py-1 w-full"
-            name="resultadoHAV"
-            value={form.resultadoHAV}
-            onChange={handleFormChange}
-            disabled={!form.hav}
+    <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
+      <h2 className="text-2xl font-bold text-center mb-6">HEPATITIS</h2>
+      <form className="space-y-6">
+        <SectionFieldset
+          legend="Información del Examen"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-4"
+        >
+          <InputTextOneLine
+            label="Nro Ficha"
+            name="norden"
+            value={form.norden}
+            onChange={handleChange}
+            onKeyUp={handleSearch}
+            labelWidth="120px"
           />
-        </div>
-        <div className="col-span-4 flex gap-4">
-          {["POSITIVO", "NEGATIVO"].map(opt => (
-            <label key={opt} className="flex items-center gap-1">
+          <InputTextOneLine
+            label="Fecha"
+            name="fecha"
+            type="date"
+            value={form.fecha}
+            onChange={handleChange}
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Nombres"
+            name="nombres"
+            value={form.nombres}
+            disabled
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Edad"
+            name="edad"
+            value={form.edad}
+            disabled
+            labelWidth="120px"
+            inputClassName="w-24"
+          />
+        </SectionFieldset>
+
+        <SectionFieldset legend="Tipo de Prueba">
+          <div className="flex items-center gap-6">
+            <label className="flex items-center gap-2">
               <input
                 type="radio"
-                name="resultadoHAVRadio"
-                checked={form.resultadoHAVRadio === opt}
-                onChange={e => {
-                  if (e.target.checked) {
-                    setForm(prev => ({
-                      ...prev,
-                      resultadoHAVRadio: opt,
-                      resultadoHAV: opt
-                    }));
-                  }
-                }}
+                checked={form.hav}
+                onChange={(e) => handleHavChange(e.target.checked)}
+              />
+              <span className="font-semibold">HEPATITIS A (HAV)</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                checked={form.hbsag}
+                onChange={(e) => handleHbsagChange(e.target.checked)}
+              />
+              <span className="font-semibold">HEPATITIS B (HBsAg)</span>
+            </label>
+          </div>
+        </SectionFieldset>
+
+        <SectionFieldset legend="Marca">
+          <InputTextOneLine
+            label="Marca"
+            name="marca"
+            value={form.marca}
+            onChange={handleChange}
+            labelWidth="120px"
+          />
+        </SectionFieldset>
+
+        <SectionFieldset legend="Resultados" className="space-y-4">
+          <div className="grid grid-cols-12 gap-2 items-center">
+            <div className="col-span-4 font-bold flex items-center">PRUEBAS</div>
+            <div className="col-span-3 font-bold flex items-center">RESULTADOS</div>
+            <div className="col-span-5 font-bold flex items-center">OPCIONES</div>
+
+            {/* HAV */}
+            <div className="col-span-4 flex items-center">HEPATITIS A (HAV) - RAPID TEST</div>
+            <div className="col-span-3">
+              <InputTextOneLine
+                name="resultadoHAV"
+                value={form.resultadoHAV}
+                onChange={handleChange}
                 disabled={!form.hav}
+                inputClassName="w-full"
               />
-              <span className="font-bold">{opt}</span>
-            </label>
-          ))}
-        </div>
+            </div>
+            <div className="col-span-5">
+              <InputsRadioGroup
+                name="resultadoHAVRadio"
+                value={form.resultadoHAVRadio}
+                onChange={handleResultadoHAVRadio}
+                options={[
+                  { label: 'Positivo', value: 'POSITIVO' },
+                  { label: 'Negativo', value: 'NEGATIVO' }
+                ]}
+                disabled={!form.hav}
+                groupClassName="gap-4"
+              />
+            </div>
 
-        {/* HBsAg */}
-        <div className="col-span-4 flex items-center">HEPATITIS B (HBsAg) - RAPID TEST</div>
-        <div className="col-span-4">
-          <input
-            className="border rounded px-2 py-1 w-full"
-            name="resultadoHBsAg"
-            value={form.resultadoHBsAg}
-            onChange={handleFormChange}
-            disabled={!form.hbsag}
-          />
-        </div>
-        <div className="col-span-4 flex gap-4">
-          {["POSITIVO", "NEGATIVO"].map(opt => (
-            <label key={opt} className="flex items-center gap-1">
-              <input
-                type="radio"
-                name="resultadoHBsAgRadio"
-                checked={form.resultadoHBsAgRadio === opt}
-                onChange={e => {
-                  if (e.target.checked) {
-                    setForm(prev => ({
-                      ...prev,
-                      resultadoHBsAgRadio: opt,
-                      resultadoHBsAg: opt
-                    }));
-                  }
-                }}
+            {/* HBsAg */}
+            <div className="col-span-4 flex items-center">HEPATITIS B (HBsAg) - RAPID TEST</div>
+            <div className="col-span-3">
+              <InputTextOneLine
+                name="resultadoHBsAg"
+                value={form.resultadoHBsAg}
+                onChange={handleChange}
                 disabled={!form.hbsag}
+                inputClassName="w-full"
               />
-              <span className="font-bold">{opt}</span>
-            </label>
-          ))}
-        </div>
-      </div>
+            </div>
+            <div className="col-span-5">
+              <InputsRadioGroup
+                name="resultadoHBsAgRadio"
+                value={form.resultadoHBsAgRadio}
+                onChange={handleResultadoHBsAgRadio}
+                options={[
+                  { label: 'Positivo', value: 'POSITIVO' },
+                  { label: 'Negativo', value: 'NEGATIVO' }
+                ]}
+                disabled={!form.hbsag}
+                groupClassName="gap-4"
+              />
+            </div>
+          </div>
+        </SectionFieldset>
 
-      {/* Área de imprimir */}
-      <div className="flex justify-end items-end mt-2">
-        <div className="flex flex-col items-end">
-          <div className="font-bold italic text-blue-800 mb-1">IMPRIMIR</div>
-          <div className="flex items-center gap-2">
-            <input
-              name="norden"
-              value={form.norden}
-              onChange={handleFormChange}
-              className="border rounded px-2 py-1 w-24"
-            />
-            <ActionButton color="blue" icon={faPrint} onClick={handlePrint} />
+        <SectionFieldset legend="Asignar Médico">
+          <select
+            disabled
+            className="w-full border rounded px-3 py-2 bg-gray-100 text-sm"
+            name="medico"
+            value={form.medico}
+            onChange={handleChange}
+          >
+            <option value="">-- Seleccionar --</option>
+          </select>
+        </SectionFieldset>
+
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={handleSave}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+            </button>
+            <button
+              type="button"
+              onClick={handleClear}
+              className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faBroom} /> Limpiar
+            </button>
+          </div>
+
+          <div className="flex flex-col items-end">
+            <span className="font-bold italic mb-2">Imprimir</span>
+            <div className="flex items-center gap-2">
+              <InputTextOneLine
+                name="norden"
+                value={form.norden}
+                onChange={handleChange}
+                inputClassName="w-24"
+              />
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faPrint} />
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Campo ASIGNAR MEDICO */}
-      <div className="flex items-center mt-6 mb-2">
-        <label className="font-medium mr-2" htmlFor="asignarMedico">ASIGNAR MEDICO:</label>
-        <select
-          id="asignarMedico"
-          className="border rounded px-2 py-1 min-w-[220px]"
-          name="medico"
-          value={form.medico}
-          onChange={handleFormChange}
-          disabled
-        >
-          <option value="">Seleccionar medico</option>
-          <option value="medico1">Dr. Juan Pérez</option>
-          <option value="medico2">Dra. Ana Torres</option>
-          <option value="medico3">Dr. Luis Gómez</option>
-        </select>
-      </div>
-
-      {/* Botones */}
-      <div className="flex gap-4 mt-2">
-        <ActionButton color="green" icon={faSave} onClick={() => {SubmitHepatitisLab(form,token,userlogued,handleClear,tabla)}}>Guardar/Actualizar</ActionButton>
-        <ActionButton color="yellow" icon={faBroom} onClick={handleClear}>Limpiar</ActionButton>
-      </div>
+      </form>
     </div>
-  )
-}
-
-// Reusable
-function Field({ label, name, type='text', value, onChange, disabled, dynamicWidth, onKeyUp }) {
-  return (
-    <div className="flex flex-col min-w-0">
-      <label className="font-medium mb-1">{label}</label>
-      <input
-        type={type}
-        name={name}
-        onKeyUp={onKeyUp}
-        value={value}
-        disabled={disabled}
-        onChange={onChange}
-        className={`border rounded px-2 py-1 ${disabled?'bg-gray-100':''} ${dynamicWidth?'min-w-0 truncate overflow-x-auto':''}`}
-        style={dynamicWidth ? { width: '100%' } : {}}
-      />
-    </div>
-  )
-}
-function Checkbox({ label, checked, onChange }) {
-  return (
-    <label className="flex items-center gap-2">
-      <input type="radio" checked={checked} onChange={e=>onChange(e.target.checked)} />
-      {label}
-    </label>
-  )
-}
-function Section({ title, children }) {
-  return (
-    <div className="space-y-2">
-      {title && <h3 className="font-semibold text-blue-700">{title}</h3>}
-      {children}
-    </div>
-  )
-}
-function ActionButton({ color, icon, onClick, children }) {
-  const bg = {
-    green:  'bg-emerald-600 hover:bg-emerald-700',
-    yellow: 'bg-yellow-400 hover:bg-yellow-500',
-    blue:   'bg-blue-600 hover:bg-blue-700'
-  }[color]
-  return (
-    <button onClick={onClick} className={`${bg} text-white px-4 py-2 rounded flex items-center gap-2`}>
-      <FontAwesomeIcon icon={icon} />
-      {children}
-    </button>
-  )
+  );
 }

@@ -5,6 +5,31 @@ import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 
+// Utilidad para eliminar duplicados sin alterar el formato original
+function dedupeText(input) {
+  if (input === null || input === undefined) return "";
+  const s = String(input);
+  if (s === "") return "";
+
+  // Caso 1: el texto completo está duplicado dos veces de forma exacta
+  const len = s.length;
+  if (len % 2 === 0) {
+    const half = s.slice(0, len / 2);
+    if (half === s.slice(len / 2)) {
+      return half; // preserva formato y mayúsculas/minúsculas exactamente
+    }
+  }
+
+  // Caso 2: duplicado con separador sencillo entre las dos mitades (espacios/puntuación)
+  // Devuelve exactamente la primera ocurrencia, preservando su forma original
+  const match = s.match(/^(.*?)[\s,;.-]+\1$/s);
+  if (match) {
+    return match[1];
+  }
+
+  return s;
+}
+
 export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
@@ -28,7 +53,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     resideEnLugarTrabajo: data.residenciaSi_chkresidenciasi ? 'SI' : 'NO',
     tiempoResidencia: data.residenciaTiempo_txttiemporesidencia || "",
     correoElectronico: data.emailPaciente_email_pa || "",
-    telefono: data.telefonoPaciente_telefono_pa || data.celularPaciente_celular_pa || data.telefono || "",
+    telefono: data.celularPaciente_cel_pa || data.telefonoPaciente_telefono_pa || data.celularPaciente_celular_pa || data.telefono || "",
     estadoCivil: data.estadoCivilPaciente_estado_civil_pa || "",
     numTotalHijos: data.totalHijos_txttotalhijos || "",
     numDependientes: data.numeroDependientes_txtndependientes || "",
@@ -53,6 +78,11 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     hta_si: data.hta || false,
     diabetes_si: data.diabetes || false,
     otros_si: data.antecedentesPersonalesOtros_chkapotros || false,
+    otros_descripcion: data.antecedentesPersonalesOtrosDescripcion_txtotrosantecendetes ?? "",
+    neoplasia_descripcion: data.neoplasiaDescripcion_txtneoplasia || data.neoplasiaDescripcion || "",
+    quemaduras_descripcion: data.quemadurasDescripcion_txtquemaduras || data.quemadurasDescripcion || "",
+    its_descripcion: data.itsDescripcion_txtits || data.itsDescripcion || "",
+    cirugias_descripcion: data.cirugiasDescripcion_txtcirugias || data.cirugiasDescripcion || "",
     // Hábitos nocivos
     alcohol_si: data.alcohol || false,
     alcohol_tipo: data.alcoholTipo || "",
@@ -67,19 +97,19 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     medicamento_tipo: data.tipoMedicamento_txttipomedicamento || "",
     medicamento_cantidad_frecuencia: data.frecuenciaMedicamentos_txtfrecuenciamed || "",
     // Antecedentes familiares
-    padre_antecedentes: (data.padreAntecedentesPatologicos_padre_detall === null || data.padreAntecedentesPatologicos_padre_detall === undefined || data.padreAntecedentesPatologicos_padre_detall === "") 
+    padre_antecedentes: (data.padreAntecedentesPatologicos_padre_detall === null || data.padreAntecedentesPatologicos_padre_detall === undefined || data.padreAntecedentesPatologicos_padre_detall === "")
       ? ((data.padre_txtpadre === null || data.padre_txtpadre === undefined || data.padre_txtpadre === "") ? "" : data.padre_txtpadre)
       : data.padreAntecedentesPatologicos_padre_detall,
-    madre_antecedentes: (data.madreAntecedentesPatologicos_madre_detall === null || data.madreAntecedentesPatologicos_madre_detall === undefined || data.madreAntecedentesPatologicos_madre_detall === "") 
+    madre_antecedentes: (data.madreAntecedentesPatologicos_madre_detall === null || data.madreAntecedentesPatologicos_madre_detall === undefined || data.madreAntecedentesPatologicos_madre_detall === "")
       ? ((data.madre_txtmadre === null || data.madre_txtmadre === undefined || data.madre_txtmadre === "") ? "" : data.madre_txtmadre)
       : data.madreAntecedentesPatologicos_madre_detall,
-    hermanos_antecedentes: (data.hermanosAntecedentesPatologicos_hermanos_detall === null || data.hermanosAntecedentesPatologicos_hermanos_detall === undefined || data.hermanosAntecedentesPatologicos_hermanos_detall === "") 
+    hermanos_antecedentes: (data.hermanosAntecedentesPatologicos_hermanos_detall === null || data.hermanosAntecedentesPatologicos_hermanos_detall === undefined || data.hermanosAntecedentesPatologicos_hermanos_detall === "")
       ? ((data.hermanos_txthermanos === null || data.hermanos_txthermanos === undefined || data.hermanos_txthermanos === "") ? "" : data.hermanos_txthermanos)
       : data.hermanosAntecedentesPatologicos_hermanos_detall,
-    esposo_antecedentes: (data.esposaAntecedentesPatologicos_espos_cony_detall === null || data.esposaAntecedentesPatologicos_espos_cony_detall === undefined || data.esposaAntecedentesPatologicos_espos_cony_detall === "") 
+    esposo_antecedentes: (data.esposaAntecedentesPatologicos_espos_cony_detall === null || data.esposaAntecedentesPatologicos_espos_cony_detall === undefined || data.esposaAntecedentesPatologicos_espos_cony_detall === "")
       ? ((data.esposa_txtesposa === null || data.esposa_txtesposa === undefined || data.esposa_txtesposa === "") ? "" : data.esposa_txtesposa)
       : data.esposaAntecedentesPatologicos_espos_cony_detall,
-    hijos_vivos: (data.hijosVivosAnexo2_txthijosvivos === null || data.hijosVivosAnexo2_txthijosvivos === undefined || data.hijosVivosAnexo2_txthijosvivos === "") 
+    hijos_vivos: (data.hijosVivosAnexo2_txthijosvivos === null || data.hijosVivosAnexo2_txthijosvivos === undefined || data.hijosVivosAnexo2_txthijosvivos === "")
       ? ((data.hijasVivasAntecedentesPatologicos_txtdhijosvivos === null || data.hijasVivasAntecedentesPatologicos_txtdhijosvivos === undefined || data.hijasVivasAntecedentesPatologicos_txtdhijosvivos === "") ? "" : data.hijasVivasAntecedentesPatologicos_txtdhijosvivos)
       : data.hijosVivosAnexo2_txthijosvivos,
     numero_hijos: (data.totalHijos_txttotalhijos === null || data.totalHijos_txttotalhijos === undefined || data.totalHijos_txttotalhijos === "") ? "" : data.totalHijos_txttotalhijos,
@@ -88,19 +118,19 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     enfermedad_accidente_1: (data.accidentes && data.accidentes[0]?.enfermedad) || "",
     asociado_trabajo_1: (data.accidentes && data.accidentes[0] && (data.accidentes[0].asociadoTrabajo === "true" || data.accidentes[0].asociadoTrabajo === true)) || false,
     año_1: (data.accidentes && data.accidentes[0]?.anio) || (data.accidentes && data.accidentes[0]?.año) || "",
-    dias_descanso_1: (data.accidentes && data.accidentes[0]?.diasDescanso) 
+    dias_descanso_1: (data.accidentes && data.accidentes[0]?.diasDescanso)
       ? `${data.accidentes[0].diasDescanso} dias`
       : ((data.accidentes && data.accidentes[0]?.dias) ? `${data.accidentes[0].dias} dias` : ""),
     enfermedad_accidente_2: (data.accidentes && data.accidentes[1]?.enfermedad) || "",
     asociado_trabajo_2: (data.accidentes && data.accidentes[1] && (data.accidentes[1].asociadoTrabajo === "true" || data.accidentes[1].asociadoTrabajo === true)) || false,
     año_2: (data.accidentes && data.accidentes[1]?.anio) || (data.accidentes && data.accidentes[1]?.año) || "",
-    dias_descanso_2: (data.accidentes && data.accidentes[1]?.diasDescanso) 
+    dias_descanso_2: (data.accidentes && data.accidentes[1]?.diasDescanso)
       ? `${data.accidentes[1].diasDescanso} dias`
       : ((data.accidentes && data.accidentes[1]?.dias) ? `${data.accidentes[1].dias} dias` : ""),
     enfermedad_accidente_3: (data.accidentes && data.accidentes[2]?.enfermedad) || "",
     asociado_trabajo_3: (data.accidentes && data.accidentes[2] && (data.accidentes[2].asociadoTrabajo === "true" || data.accidentes[2].asociadoTrabajo === true)) || false,
     año_3: (data.accidentes && data.accidentes[2]?.anio) || (data.accidentes && data.accidentes[2]?.año) || "",
-    dias_descanso_3: (data.accidentes && data.accidentes[2]?.diasDescanso) 
+    dias_descanso_3: (data.accidentes && data.accidentes[2]?.diasDescanso)
       ? `${data.accidentes[2].diasDescanso} dias`
       : ((data.accidentes && data.accidentes[2]?.dias) ? `${data.accidentes[2].dias} dias` : ""),
     // Datos adicionales para header
@@ -118,7 +148,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     talla: (data.talla_talla === null || data.talla_talla === undefined || data.talla_talla === "") ? "" : data.talla_talla,
     peso: (data.peso_peso === null || data.peso_peso === undefined || data.peso_peso === "") ? "" : data.peso_peso,
     imc: (data.imc_imc === null || data.imc_imc === undefined || data.imc_imc === "") ? "" : data.imc_imc,
-    pulso: (data.pulso_pulso === null || data.pulso_pulso === undefined || data.pulso_pulso === "") 
+    pulso: (data.pulso_pulso === null || data.pulso_pulso === undefined || data.pulso_pulso === "")
       ? ((data.cintura_cintura === null || data.cintura_cintura === undefined || data.cintura_cintura === "") ? "" : data.cintura_cintura)
       : data.pulso_pulso,
     frecuenciaRespiratoria: (data.frespiratoria_f_respiratoria === null || data.frespiratoria_f_respiratoria === undefined || data.frespiratoria_f_respiratoria === "") ? "" : data.frespiratoria_f_respiratoria,
@@ -147,14 +177,14 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     enfermedadesOculares: (() => {
       const campo1 = data.enfermedadesOcularesOftalmo_e_oculares?.trim() ?? "";
       const campo2 = data.enfermedadesOcularesOtrosOftalmo_e_oculares1?.trim() ?? "";
-      
+
       // Si ambas están vacías, mostrar "NINGUNA"
       if (!campo1 && !campo2) return "NINGUNA";
-      
+
       // Si solo una tiene data, devolver esa en mayúsculas
       if (campo1 && !campo2) return campo1.toUpperCase();
       if (!campo1 && campo2) return campo2.toUpperCase();
-      
+
       // Si ambas tienen data, devolver ambas en mayúsculas y separadas por nueva línea
       return `${campo1.toUpperCase()}\n${campo2.toUpperCase()}`;
     })(),
@@ -181,11 +211,11 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     conclusionesRadiograficas: (data.conclusionesRadiograficas_txtconclusionesradiograficas === null || data.conclusionesRadiograficas_txtconclusionesradiograficas === undefined || data.conclusionesRadiograficas_txtconclusionesradiograficas === "") ? "" : data.conclusionesRadiograficas_txtconclusionesradiograficas,
     hallazgosPatologicosLaboratorio: (data.observacionesLabClinico_txtobservacioneslb === null || data.observacionesLabClinico_txtobservacioneslb === undefined || data.observacionesLabClinico_txtobservacioneslb === "") ? "" : data.observacionesLabClinico_txtobservacioneslb,
     conclusionAudiometria: (data.diagnosticoAudiometria_diagnostico === null || data.diagnosticoAudiometria_diagnostico === undefined || data.diagnosticoAudiometria_diagnostico === "") ? "" : data.diagnosticoAudiometria_diagnostico,
-    conclusionEspirometria: (data.interpretacion_interpretacion === null || data.interpretacion_interpretacion === undefined || data.interpretacion_interpretacion === "") 
+    conclusionEspirometria: (data.interpretacion_interpretacion === null || data.interpretacion_interpretacion === undefined || data.interpretacion_interpretacion === "")
       ? ((data.conclusion_txtconclusion === null || data.conclusion_txtconclusion === undefined || data.conclusion_txtconclusion === "") ? "" : data.conclusion_txtconclusion)
       : data.interpretacion_interpretacion,
-    otros: (data.otrosExamenes_txtotrosex === null || data.otrosExamenes_txtotrosex === undefined || data.otrosExamenes_txtotrosex === "") ? "" : data.otrosExamenes_txtotrosex,
-    diagnosticoMedicoOcupacional: (data.recomendacionesInfoPsicologico_recomendaciones === null || data.recomendacionesInfoPsicologico_recomendaciones === undefined || data.recomendacionesInfoPsicologico_recomendaciones === "") ? "" : data.recomendacionesInfoPsicologico_recomendaciones,
+    otros: dedupeText((data.otrosExamenes_txtotrosex === null || data.otrosExamenes_txtotrosex === undefined || data.otrosExamenes_txtotrosex === "") ? "" : data.otrosExamenes_txtotrosex),
+    diagnosticoMedicoOcupacional: (data.observacionesFichaMedica_txtobservacionesfm === null || data.observacionesFichaMedica_txtobservacionesfm === undefined || data.observacionesFichaMedica_txtobservacionesfm === "") ? "" : data.observacionesFichaMedica_txtobservacionesfm,
     // Datos de conclusiones finales
     apto: data.esApto_apto_si === true || data.esApto_apto_si === "true",
     aptoConRestriccion: data.aptoRestriccion_apto_re === true || data.aptoRestriccion_apto_re === "true",
@@ -200,21 +230,21 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
 
   // Lista de antecedentes
   const antecedentes = [
-    { name: 'Alergias', si: datosFinales.alergias_si },
-    { name: 'Asma', si: datosFinales.asma_si },
-    { name: 'Bronquitis', si: datosFinales.bronquitis_si },
-    { name: 'Quemaduras', si: datosFinales.quemaduras_si },
-    { name: 'Cirugias', si: datosFinales.cirugias_si },
-    { name: 'TBC', si: datosFinales.tbc_si },
-    { name: 'ITS', si: datosFinales.its_si },
-    { name: 'Convulciones', si: datosFinales.convulciones_si },
-    { name: 'Neoplasia', si: datosFinales.neoplasia_si },
-    { name: 'Intoxicaciones', si: datosFinales.intoxicaciones_si },
-    { name: 'Hepatitis', si: datosFinales.hepatitis_si },
-    { name: 'Tifoidea', si: datosFinales.tifoidea_si },
-    { name: 'HTA', si: datosFinales.hta_si },
-    { name: 'Diabetes', si: datosFinales.diabetes_si },
-    { name: 'Otros', si: datosFinales.otros_si }
+    { name: 'Alergias', si: datosFinales.alergias_si, descripcion: '' },
+    { name: 'Asma', si: datosFinales.asma_si, descripcion: '' },
+    { name: 'Bronquitis', si: datosFinales.bronquitis_si, descripcion: '' },
+    { name: 'Quemaduras', si: datosFinales.quemaduras_si, descripcion: datosFinales.quemaduras_descripcion },
+    { name: 'Cirugias', si: datosFinales.cirugias_si, descripcion: datosFinales.cirugias_descripcion },
+    { name: 'TBC', si: datosFinales.tbc_si, descripcion: '' },
+    { name: 'ITS', si: datosFinales.its_si, descripcion: datosFinales.its_descripcion },
+    { name: 'Convulciones', si: datosFinales.convulciones_si, descripcion: '' },
+    { name: 'Neoplasia', si: datosFinales.neoplasia_si, descripcion: datosFinales.neoplasia_descripcion },
+    { name: 'Intoxicaciones', si: datosFinales.intoxicaciones_si, descripcion: '' },
+    { name: 'Hepatitis', si: datosFinales.hepatitis_si, descripcion: '' },
+    { name: 'Tifoidea', si: datosFinales.tifoidea_si, descripcion: '' },
+    { name: 'HTA', si: datosFinales.hta_si, descripcion: '' },
+    { name: 'Diabetes', si: datosFinales.diabetes_si, descripcion: '' },
+    { name: 'Otros', si: datosFinales.otros_si, descripcion: datosFinales.otros_descripcion }
   ];
 
   // Lista de hábitos nocivos
@@ -269,16 +299,16 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     if (!texto || texto === null || texto === undefined) {
       return y;
     }
-    
+
     const fontSize = doc.internal.getFontSize();
     const palabras = String(texto).split(' ');
     let lineaActual = '';
     let yPos = y;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -292,12 +322,12 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
         }
       }
     });
-    
+
     if (lineaActual) {
       doc.text(lineaActual, x, yPos);
       yPos += fontSize * 0.35;
     }
-    
+
     return yPos; // Devuelve la nueva posición final
   };
 
@@ -305,25 +335,25 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
     const tablaInicioX = 5;
     const tablaAncho = 200;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo gris más oscuro
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
+
     // Dibujar líneas del header
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
-    
+
     return yPos + alturaHeader;
   };
 
@@ -331,20 +361,20 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   const dibujarFilaCelesteConColumnas = (tituloCol1, tituloCol2, yPos, alturaFila = 5) => {
     const tablaInicioX = 5;
     const tablaAncho = 200;
-    
+
     // Proporciones de columnas: Órgano más estrecha, Hallazgos más ancha
     const anchoColOrgano = 40; // Columna estrecha para Órgano o Sistema
     const anchoColHallazgos = tablaAncho - anchoColOrgano; // Resto para Hallazgos (140mm)
     const puntoDivision = tablaInicioX + anchoColOrgano;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo celeste
     doc.setFillColor(199, 241, 255);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaFila, 'F');
-    
+
     // Dibujar líneas de la fila
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila); // Línea izquierda
     doc.line(puntoDivision, yPos, puntoDivision, yPos + alturaFila); // División central
@@ -428,7 +458,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Nueva Fila: Correo electrónico | Teléfono (2 columnas)
+  // Nueva Fila: Correo electrónico | Celular (2 columnas)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + 100, yPos, tablaInicioX + 100, yPos + filaAltura); // División media
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -545,14 +575,14 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   }
   yTexto += filaAltura;
 
-  // Nueva: Correo electrónico | Teléfono
+  // Nueva: Correo electrónico | Celular
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Correo electrónico:", tablaInicioX + 2, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.correoElectronico || "", tablaInicioX + 32, yTexto + 1);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Teléfono:", tablaInicioX + 102, yTexto + 1);
+  doc.text("Celular:", tablaInicioX + 102, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.telefono || "", tablaInicioX + 118, yTexto + 1);
   yTexto += filaAltura;
@@ -649,10 +679,14 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   yPos = dibujarHeaderSeccion("3. ANTECEDENTES PATOLÓGICOS PERSONALES", yPos, filaAltura);
 
   // Configuración de columnas para la tabla de antecedentes
-  const colAnteWidth = 49;
+  const colAnteWidth = 54; // Aumentado de 49 a 54 (+5mm)
   const colSiNoWidth = 7;
-  const groupWidth = 63;
-  const verticalLinesAnte = [5, 54, 61, 68, 117, 124, 131, 180, 187, 205];
+  const groupWidth = 68; // Aumentado de 63 a 68 (+5mm)
+  // Ajuste: el tercer grupo se ajusta al ancho disponible (205 - 141 = 64mm)
+  // colAnteWidth3 = 64 - 7 - 7 = 50mm (reducido para que quepa)
+  const colAnteWidth3 = 50; // Tercer grupo: columna de antecedente ajustada
+  const groupWidth3 = 64; // Tercer grupo ajustado para que quepa en el ancho total
+  const verticalLinesAnte = [5, 59, 66, 73, 127, 134, 141, 191, 198, 205];
 
   // Fila de encabezado de columnas
   doc.setDrawColor(0, 0, 0);
@@ -667,13 +701,14 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   let currentX = tablaInicioX;
   for (let g = 0; g < 3; g++) {
-    // Centrar "ANTECEDENTE" en la columna de nombre (ancho 49mm, centro en +24.5)
-    doc.text("ANTECEDENTE", currentX + 24.5, yPos + 3.5, { align: "center" });
+    const colAnteWidthActual = (g === 2) ? colAnteWidth3 : colAnteWidth; // Tercer grupo usa ancho ajustado
+    // Centrar "ANTECEDENTE" en la columna de nombre
+    doc.text("ANTECEDENTE", currentX + colAnteWidthActual / 2, yPos + 3.5, { align: "center" });
     // Centrar "SI" en su columna (ancho 7mm, centro en +3.5 desde inicio de columna)
-    doc.text("SI", currentX + colAnteWidth + 3.5, yPos + 3, { align: "center" });
+    doc.text("SI", currentX + colAnteWidthActual + 3.5, yPos + 3, { align: "center" });
     // Centrar "NO" en su columna
-    doc.text("NO", currentX + colAnteWidth + colSiNoWidth + 3.5, yPos + 3, { align: "center" });
-    currentX += groupWidth;
+    doc.text("NO", currentX + colAnteWidthActual + colSiNoWidth + 3.5, yPos + 3, { align: "center" });
+    currentX += (g === 2) ? groupWidth3 : groupWidth; // Tercer grupo usa ancho ajustado
   }
   yPos += filaAltura;
 
@@ -696,29 +731,54 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
       const idx = startIdx + g;
       if (idx < antecedentes.length) {
         const ant = antecedentes[idx];
+        const colAnteWidthActual = (g === 2) ? colAnteWidth3 : colAnteWidth; // Tercer grupo usa ancho ajustado
         doc.text(ant.name, currentX + 1, yPos + 3.5);
-        const xSi = currentX + colAnteWidth + 3.5;
-        const xNo = currentX + colAnteWidth + colSiNoWidth + 3.5;
+        const xSi = currentX + colAnteWidthActual + 3.5;
+        const xNo = currentX + colAnteWidthActual + colSiNoWidth + 3.5;
         if (ant.si) {
           doc.setFont("helvetica", "bold").setFontSize(10);
           doc.text('X', xSi, yPos + 3.5, { align: "center" });
           doc.setFont("helvetica", "normal").setFontSize(8);
+          // Mostrar descripción al costado si existe
+          if (ant.descripcion && ant.descripcion.trim() !== "") {
+            doc.setFont("helvetica", "normal").setFontSize(5);
+            // Ajustar posición según el antecedente (ajustado para colAnteWidth de 54mm o 50mm)
+            let xTexto = xSi - (colAnteWidthActual + 5); // Posición base ajustada
+            const maxWidthTexto = colAnteWidthActual - 12; // Ancho máximo ajustado
+            if (ant.name === "Quemaduras") {
+              xTexto = xSi - (colAnteWidthActual + 5) + 20; // Mover 8mm al costado derecho
+            } else if (ant.name === "Cirugias") {
+              xTexto = xSi - (colAnteWidthActual + 5) + 15; // Mover 3mm al costado derecho
+            } else if (ant.name === "Neoplasia") {
+              xTexto = xSi - (colAnteWidthActual + 5) + 18; // Mover 4mm al costado derecho
+            } else if (ant.name === "ITS") {
+              xTexto = xSi - (colAnteWidthActual + 5) + 10; // Mover 10mm al costado derecho
+            } else if (ant.name === "Otros") {
+              xTexto = xSi - (colAnteWidthActual + 5) + 12; // Mover 10mm al costado derecho
+            }
+            doc.text(ant.descripcion, xTexto, yPos + 2.5, { maxWidth: maxWidthTexto });
+            doc.setFont("helvetica", "normal").setFontSize(8);
+          }
         } else {
           doc.setFont("helvetica", "bold").setFontSize(10);
           doc.text('X', xNo, yPos + 3, { align: "center" });
           doc.setFont("helvetica", "normal").setFontSize(8);
         }
       }
-      currentX += groupWidth;
+      currentX += (g === 2) ? groupWidth3 : groupWidth; // Tercer grupo usa ancho ajustado
     }
     yPos += filaAltura;
   }
 
+  // === FILAS ADICIONALES: DETALLES DE ANTECEDENTES ===
+  // Nota: Los detalles ahora se muestran directamente en la tabla de antecedentes
+  // al costado de cada checkbox marcado como "SI", similar a como funciona "Otros"
+
   // === FILA CELESTE: HÁBITOS NOCIVOS ===
   // Dibujar fondo celeste
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
-  
+
   // Dibujar líneas de la fila celeste
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
@@ -770,11 +830,39 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
 
   // Filas de hábitos
   habitosNocivos.forEach((habito) => {
-    // Líneas de la fila
+    // Calcular altura necesaria para el campo de cantidad/frecuencia (si tiene texto largo)
+    let alturaNecesaria = filaAltura;
+    const yTextoInicio = yPos + 3.5;
+    const xInicioTipo = 82; // Posición X donde comienza el texto de tipo
+    const anchoDisponibleTipo = colTipoWidth - 2; // Ancho disponible: ancho de columna menos márgenes
+    const xInicioCantidad = 137; // Posición X donde comienza el texto de cantidad/frecuencia
+    const anchoDisponibleCantidad = colCantWidth - 2; // Ancho disponible: ancho de columna menos márgenes
+    
+    // Calcular altura necesaria para tipo usando splitTextToSize
+    let lineasTipo = [];
+    const tipoTexto = (habito.tipo === null || habito.tipo === undefined || habito.tipo === "") ? "-" : habito.tipo;
+    if (tipoTexto && tipoTexto !== "-") {
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      lineasTipo = doc.splitTextToSize(tipoTexto, anchoDisponibleTipo);
+      const alturaTipo = Math.max(filaAltura, lineasTipo.length * 2.8 + 2);
+      alturaNecesaria = Math.max(alturaNecesaria, alturaTipo);
+    }
+    
+    // Calcular altura necesaria para cantidad usando splitTextToSize
+    let lineasCantidad = [];
+    const cantidadTexto = (habito.cantidad === null || habito.cantidad === undefined || habito.cantidad === "") ? "-" : habito.cantidad;
+    if (cantidadTexto && cantidadTexto !== "-") {
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      lineasCantidad = doc.splitTextToSize(cantidadTexto, anchoDisponibleCantidad);
+      const alturaCantidad = Math.max(filaAltura, lineasCantidad.length * 2.8 + 2);
+      alturaNecesaria = Math.max(alturaNecesaria, alturaCantidad);
+    }
+    
+    // Dibujar líneas de la fila con altura dinámica
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos + alturaNecesaria, tablaInicioX + tablaAncho, yPos + alturaNecesaria);
     verticalLinesHab.forEach(x => {
-      doc.line(x, yPos, x, yPos + filaAltura);
+      doc.line(x, yPos, x, yPos + alturaNecesaria);
     });
 
     // Contenido
@@ -789,13 +877,31 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
       doc.setFont("helvetica", "bold").setFontSize(10);
       doc.text('X', xNo, yPos + 3.5, { align: "center" });
     }
+    
+    // TIPO con salto de línea si es necesario
     doc.setFont("helvetica", "normal").setFontSize(7);
-    const tipoTexto = (habito.tipo === null || habito.tipo === undefined || habito.tipo === "") ? "-" : habito.tipo;
-    doc.text(tipoTexto, 82, yPos + 3.5);
-    const cantidadTexto = (habito.cantidad === null || habito.cantidad === undefined || habito.cantidad === "") ? "-" : habito.cantidad;
-    doc.text(cantidadTexto, 137, yPos + 3.5);
-     yPos += filaAltura;
-   });
+    if (tipoTexto && tipoTexto !== "-" && lineasTipo.length > 0) {
+      // Dibujar cada línea usando splitTextToSize
+      lineasTipo.forEach((linea, index) => {
+        doc.text(linea, xInicioTipo, yTextoInicio + (index * 2.8));
+      });
+    } else {
+      doc.text(tipoTexto, xInicioTipo, yPos + 3.5);
+    }
+    
+    // Cantidad/Frecuencia con salto de línea si es necesario
+    if (cantidadTexto && cantidadTexto !== "-" && lineasCantidad.length > 0) {
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      // Dibujar cada línea usando splitTextToSize
+      lineasCantidad.forEach((linea, index) => {
+        doc.text(linea, xInicioCantidad, yTextoInicio + (index * 2.8));
+      });
+    } else {
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      doc.text(cantidadTexto, xInicioCantidad, yPos + 3.5);
+    }
+    yPos += alturaNecesaria;
+  });
 
   // === SECCIÓN 4: ANTECEDENTES PATOLÓGICOS FAMILIARES ===
   yPos = dibujarHeaderSeccion("4. ANTECEDENTES PATOLÓGICOS FAMILIARES", yPos, filaAltura);
@@ -861,9 +967,9 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
 
   // === FILA CELESTE: ABSENTISMO ===
   // Dibujar fondo celeste
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
-  
+
   // Dibujar líneas de la fila celeste
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
@@ -924,24 +1030,24 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     } else if (accidente.asociadoTrabajo === "false" || accidente.asociadoTrabajo === false) {
       asociado = false;
     }
-    
+
     // Formatear días de descanso
     const diasDescanso = accidente.diasDescanso || accidente.dias || '';
     const diasFormateado = diasDescanso ? `${diasDescanso} dias` : '';
-    
+
     return {
       enfermedad: accidente.enfermedad || '',
       asociado: asociado,
       año: accidente.anio || accidente.año || '',
       dias: diasFormateado
     };
-  }).filter(item => 
+  }).filter(item =>
     // Filtrar solo items que tengan al menos un dato
     item.enfermedad.trim() !== '' || item.año.trim() !== '' || item.dias.trim() !== ''
   );
 
   // Verificar si hay datos (al menos una enfermedad, año o días con contenido)
-  const hayDatos = enfermedadesAccidentes.some(item => 
+  const hayDatos = enfermedadesAccidentes.some(item =>
     item.enfermedad.trim() !== '' || item.año.trim() !== '' || item.dias.trim() !== ''
   );
 
@@ -971,7 +1077,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
       // Contenido de la fila
       doc.setFont("helvetica", "normal").setFontSize(7);
       dibujarTextoConSaltoLinea(item.enfermedad || '', tablaInicioX + 2, yPos + 3.5, 78);
-      
+
       // Marcar SI o NO según el valor (true = SI, false = NO)
       if (item.asociado === true) {
         doc.setFont("helvetica", "bold").setFontSize(10);
@@ -980,7 +1086,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
         doc.setFont("helvetica", "bold").setFontSize(10);
         doc.text('X', 115, yPos + 4, { align: "center" });
       }
-      
+
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text(item.año || '', 137.5, yPos + 4, { align: "center" });
       doc.text(item.dias || '', 172.5, yPos + 4, { align: "center" });
@@ -993,9 +1099,9 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
 
   // === FILA CELESTE: ANAMNESIS ===
   // Dibujar fondo celeste
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
-  
+
   // Dibujar líneas de la fila celeste
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
@@ -1009,24 +1115,46 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   doc.text("ANAMNESIS", tablaInicioX + 2, yPos + 3.5);
   yPos += filaAltura;
 
-  // === FILA DE ANAMNESIS ===
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  // === FILA DE ANAMNESIS (ALTURA DINÁMICA) ===
+  // Calcular altura necesaria para el texto de anamnesis
+  let alturaFilaAnamnesis = filaAltura;
+  let lineasAnamnesis = [];
   
-  doc.setFont("helvetica", "normal").setFontSize(7);
   if (datosFinales.anamnesis) {
     const anamnesisMayusculas = String(datosFinales.anamnesis).toUpperCase();
-    doc.text(anamnesisMayusculas, tablaInicioX + 2, yPos + 3.5);
+    const anchoDisponibleAnamnesis = tablaAncho - 4; // Ancho disponible menos márgenes
+    
+    // Calcular líneas necesarias usando splitTextToSize
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    lineasAnamnesis = doc.splitTextToSize(anamnesisMayusculas, anchoDisponibleAnamnesis);
+    
+    // Calcular altura dinámica: interlineado de 3mm por línea, altura mínima de filaAltura
+    const interlineadoAnamnesis = 3;
+    const alturaCalculada = Math.max(filaAltura, lineasAnamnesis.length * interlineadoAnamnesis + 4);
+    alturaFilaAnamnesis = alturaCalculada;
   }
-  yPos += filaAltura;
+  
+  // Dibujar líneas de la fila con altura dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaFilaAnamnesis, tablaInicioX + tablaAncho, yPos + alturaFilaAnamnesis);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaAnamnesis);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaAnamnesis);
+
+  // Dibujar texto línea por línea
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  if (lineasAnamnesis.length > 0) {
+    const interlineadoAnamnesis = 3;
+    lineasAnamnesis.forEach((linea, index) => {
+      doc.text(linea, tablaInicioX + 2, yPos + 3.5 + (index * interlineadoAnamnesis));
+    });
+  }
+  yPos += alturaFilaAnamnesis;
 
   // === FILA CELESTE: ÍNICO ===
   // Dibujar fondo celeste
-  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
-  
+
   // Dibujar líneas de la fila celeste
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
@@ -1046,42 +1174,42 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   const verticalLinesVitales = [5, 55, 105, 155, 205]; // 4 divisiones para 4 columnas
 
   // Formatear presión arterial
-  const presionArterial = datosFinales.presionArterialSistolica && datosFinales.presionArterialDiastolica 
+  const presionArterial = datosFinales.presionArterialSistolica && datosFinales.presionArterialDiastolica
     ? `${datosFinales.presionArterialSistolica}/${datosFinales.presionArterialDiastolica}`
     : datosFinales.presionArterialSistolica || datosFinales.presionArterialDiastolica || '';
-  
+
   const vitales = [
-    { 
-      label: "Talla:", 
-      value: datosFinales.talla ? `${datosFinales.talla} cm` : '' 
+    {
+      label: "Talla:",
+      value: datosFinales.talla ? `${datosFinales.talla} cm` : ''
     },
-    { 
-      label: "Peso:", 
-      value: datosFinales.peso ? `${datosFinales.peso} kg` : '' 
+    {
+      label: "Peso:",
+      value: datosFinales.peso ? `${datosFinales.peso} kg` : ''
     },
-    { 
-      label: "IMC:", 
-      value: datosFinales.imc ? `${datosFinales.imc}` : '' 
+    {
+      label: "IMC:",
+      value: datosFinales.imc ? `${datosFinales.imc} kg/m²` : ''
     },
-    { 
-      label: "P.:", 
-      value: datosFinales.pulso ? `${datosFinales.pulso} bpm` : '' 
+    {
+      label: "P.:",
+      value: datosFinales.pulso ? `${datosFinales.pulso} ppm` : ''
     },
-    { 
-      label: "F.Resp.:", 
-      value: datosFinales.frecuenciaRespiratoria ? `${datosFinales.frecuenciaRespiratoria} rpm` : '' 
+    {
+      label: "F.Resp.:",
+      value: datosFinales.frecuenciaRespiratoria ? `${datosFinales.frecuenciaRespiratoria} rpm` : ''
     },
-    { 
-      label: "F.Card.:", 
-      value: datosFinales.frecuenciaCardiaca ? `${datosFinales.frecuenciaCardiaca} lpm` : '' 
+    {
+      label: "F.Card.:",
+      value: datosFinales.frecuenciaCardiaca ? `${datosFinales.frecuenciaCardiaca} lpm` : ''
     },
-    { 
-      label: "PA:", 
-      value: presionArterial ? `${presionArterial} mmHg` : '' 
+    {
+      label: "PA:",
+      value: presionArterial ? `${presionArterial} mmHg` : ''
     },
-    { 
-      label: "Temperatura:", 
-      value: datosFinales.temperatura ? `${datosFinales.temperatura} °C` : '' 
+    {
+      label: "Temperatura:",
+      value: datosFinales.temperatura ? `${datosFinales.temperatura} °C` : ''
     }
   ];
 
@@ -1104,7 +1232,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.setTextColor(0, 0, 0); // Color negro en negrita
     doc.text(vital.label, xVital + 1, yPos + 3.5);
-    
+
     // Valor en normal (sin negrita)
     if (vital.value) {
       doc.setFont("helvetica", "normal").setFontSize(8);
@@ -1132,7 +1260,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.setTextColor(0, 0, 0); // Color negro en negrita
     doc.text(vital.label, xVital + 1, yPos + 3.5);
-    
+
     // Valor en normal (sin negrita)
     if (vital.value) {
       doc.setFont("helvetica", "normal").setFontSize(8);
@@ -1150,12 +1278,15 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Otros:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
   if (datosFinales.otrosExamenClinico) {
-    const otrosTexto = `SAT O2: ${datosFinales.otrosExamenClinico}`;
+    // Agregar % si no está presente
+    const valorSatO2 = String(datosFinales.otrosExamenClinico).trim();
+    const valorConPorcentaje = valorSatO2.endsWith('%') ? valorSatO2 : `${valorSatO2}%`;
+    const otrosTexto = `SAT O2: ${valorConPorcentaje}`;
     const labelWidth = doc.getTextWidth("Otros:");
     doc.text(otrosTexto, tablaInicioX + labelWidth + 5, yPos + 3.5);
   }
@@ -1166,7 +1297,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Ectoscopia:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
@@ -1181,7 +1312,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Estado mental:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
@@ -1193,11 +1324,11 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
 
   // Verificar si necesitamos nueva página antes de continuar
   const alturaMaximaPag1 = doc.internal.pageSize.getHeight() - 25; // Margen inferior para footer
-  
+
   if (yPos > alturaMaximaPag1) {
     // === FOOTER PÁGINA 1 ===
     footerTR(doc, { footerOffsetY: 8 });
-    
+
     // === CREAR PÁGINA INTERMEDIA ===
     doc.addPage();
     numeroPagina++;
@@ -1206,7 +1337,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   } else {
     // === FOOTER PÁGINA 1 ===
     footerTR(doc, { footerOffsetY: 8 });
-    
+
     // === CREAR PÁGINA 2 ===
     doc.addPage();
     numeroPagina = 2;
@@ -1229,48 +1360,72 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   const anchoColOrgano = puntoDivision - tablaInicioX;
 
   // === FILA: PIEL ===
+  let yInicioFilaPiel = yPos;
+
+  // Dibujar línea superior
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(puntoDivision, yPos, puntoDivision, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
+  // Dibujar etiqueta
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Piel:", tablaInicioX + 2, yPos + 3.5);
-  
-  // Mostrar datos o guion si no hay datos
+
+  // Renderizar texto de hallazgos con altura dinámica
   const textoPiel = datosFinales.piel || "-";
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(textoPiel, puntoDivision + 2, yPos + 3.5);
-  
-  yPos += filaAltura;
+
+  // Calcular posición Y inicial para el texto
+  const yInicioTextoPiel = yPos + 2.5;
+  const yFinalTextoPiel = dibujarTextoConSaltoLinea(textoPiel, puntoDivision + 2, yInicioTextoPiel, anchoColHallazgos - 4);
+
+  // Calcular altura de fila dinámica
+  const alturaTextoPiel = yFinalTextoPiel - yInicioTextoPiel;
+  const alturaFilaPiel = Math.max(filaAltura, alturaTextoPiel + 2);
+  yPos = yInicioFilaPiel + alturaFilaPiel;
+
+  // Dibujar todas las líneas verticales y línea inferior con la altura correcta
+  doc.line(tablaInicioX, yInicioFilaPiel, tablaInicioX, yPos); // Línea izquierda
+  doc.line(puntoDivision, yInicioFilaPiel, puntoDivision, yPos); // División central
+  doc.line(tablaInicioX + tablaAncho, yInicioFilaPiel, tablaInicioX + tablaAncho, yPos); // Línea derecha
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea inferior
 
   // === FILA: CABELLO ===
+  let yInicioFilaCabello = yPos;
+
+  // Dibujar línea superior
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(puntoDivision, yPos, puntoDivision, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
+  // Dibujar etiqueta
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Cabello:", tablaInicioX + 2, yPos + 3.5);
-  
-  // Mostrar datos o guion si no hay datos
+
+  // Renderizar texto de hallazgos con altura dinámica
   const textoCabello = datosFinales.cabello || "-";
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(textoCabello, puntoDivision + 2, yPos + 3.5);
-  
-  yPos += filaAltura;
+
+  // Calcular posición Y inicial para el texto
+  const yInicioTextoCabello = yPos + 2.5;
+  const yFinalTextoCabello = dibujarTextoConSaltoLinea(textoCabello, puntoDivision + 2, yInicioTextoCabello, anchoColHallazgos - 4);
+
+  // Calcular altura de fila dinámica
+  const alturaTextoCabello = yFinalTextoCabello - yInicioTextoCabello;
+  const alturaFilaCabello = Math.max(filaAltura, alturaTextoCabello + 2);
+  yPos = yInicioFilaCabello + alturaFilaCabello;
+
+  // Dibujar todas las líneas verticales y línea inferior con la altura correcta
+  doc.line(tablaInicioX, yInicioFilaCabello, tablaInicioX, yPos); // Línea izquierda
+  doc.line(puntoDivision, yInicioFilaCabello, puntoDivision, yPos); // División central
+  doc.line(tablaInicioX + tablaAncho, yInicioFilaCabello, tablaInicioX + tablaAncho, yPos); // Línea derecha
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea inferior
 
   // === SECCIÓN OJOS ===
   // Fila gris: OJOS
-  doc.setFillColor(173, 216, 230); // Color gris (igual que otras secciones)
+  doc.setFillColor(199, 241, 255); // Color gris (igual que otras secciones)
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Ojos", tablaInicioX + 2, yPos + 3.5);
   yPos += filaAltura;
@@ -1281,13 +1436,13 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   const colSinCorregirAncho = 30; // SIN CORREGIR
   const colCorregidaAncho = 30; // CORREGIDA
   const colObservacionesAncho = 110; // ENFERMEDADES OCULARES (ajustado para tablaAncho 200)
-  
+
   // Posiciones de columnas
   let xAgudeza = tablaInicioX;
   let xSinCorregir = xAgudeza + colAgudezaAncho;
   let xCorregida = xSinCorregir + colSinCorregirAncho;
   let xObservaciones = xCorregida + colCorregidaAncho;
-  
+
   // Dibujar header de la tabla de agudeza visual
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaAgudeza);
   doc.line(xSinCorregir, yPos, xSinCorregir, yPos + filaAlturaAgudeza);
@@ -1296,31 +1451,31 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAlturaAgudeza, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
-  
+
   // Contenido del header
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("AGUDEZA VISUAL", xAgudeza + 2, yPos + 3.5);
-  
+
   // Centrar "SIN CORREGIR"
   const textoSinCorregir = "SIN CORREGIR";
   const anchoSinCorregir = doc.getTextWidth(textoSinCorregir);
   doc.text(textoSinCorregir, xSinCorregir + (colSinCorregirAncho - anchoSinCorregir) / 2, yPos + 3.5);
-  
+
   // Centrar "CORREGIDA"
   const textoCorregida = "CORREGIDA";
   const anchoCorregida = doc.getTextWidth(textoCorregida);
   doc.text(textoCorregida, xCorregida + (colCorregidaAncho - anchoCorregida) / 2, yPos + 3.5);
-  
+
   // Centrar "ENFERMEDADES OCULARES"
   const textoObservaciones = "ENFERMEDADES OCULARES";
   const anchoObservaciones = doc.getTextWidth(textoObservaciones);
   doc.text(textoObservaciones, xObservaciones + (colObservacionesAncho - anchoObservaciones) / 2, yPos + 3.5);
   yPos += filaAlturaAgudeza;
-  
+
   // Calcular posiciones de las mitades de las columnas antes de usarlas
   const mitadSinCorregir = xSinCorregir + (colSinCorregirAncho / 2);
   const mitadCorregida = xCorregida + (colCorregidaAncho / 2);
-  
+
   // Preparar texto de enfermedades oculares con wrap
   const textoEnfermedadesRaw = datosFinales.enfermedadesOculares || "";
   // Dividir por saltos de línea y agregar guión a cada línea (excepto si es "NINGUNA")
@@ -1342,7 +1497,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   const maxWidth = colObservacionesAncho - 4; // Ancho disponible menos margen
   const lineHeight = 3; // Interlineado
   const lines = doc.splitTextToSize(textoEnfermedades, maxWidth);
-  
+
   // Dibujar subheader con O.D y O.I
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaAgudeza);
   doc.line(xSinCorregir, yPos, xSinCorregir, yPos + filaAlturaAgudeza);
@@ -1353,38 +1508,38 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   doc.line(tablaInicioX, yPos, xObservaciones, yPos);
   // Línea horizontal inferior solo hasta el final de CORREGIDA
   doc.line(tablaInicioX, yPos + filaAlturaAgudeza, xObservaciones, yPos + filaAlturaAgudeza);
-  
+
   // Dibujar líneas verticales para dividir O.D y O.I
   doc.line(mitadSinCorregir, yPos, mitadSinCorregir, yPos + filaAlturaAgudeza);
   doc.line(mitadCorregida, yPos, mitadCorregida, yPos + filaAlturaAgudeza);
-  
+
   // Contenido del subheader
   doc.setFont("helvetica", "bold").setFontSize(8);
-  
+
   // Centrar "O.D" en la primera celda de SIN CORREGIR
   const textoOD1 = "O.D";
   const anchoOD1 = doc.getTextWidth(textoOD1);
   doc.text(textoOD1, xSinCorregir + (colSinCorregirAncho / 2 - anchoOD1) / 2, yPos + 3.5);
-  
+
   // Centrar "O.I" en la segunda celda de SIN CORREGIR
   const textoOI1 = "O.I";
   const anchoOI1 = doc.getTextWidth(textoOI1);
   doc.text(textoOI1, mitadSinCorregir + (colSinCorregirAncho / 2 - anchoOI1) / 2, yPos + 3.5);
-  
+
   // Centrar "O.D" en la primera celda de CORREGIDA
   const textoOD2 = "O.D";
   const anchoOD2 = doc.getTextWidth(textoOD2);
   doc.text(textoOD2, xCorregida + (colCorregidaAncho / 2 - anchoOD2) / 2, yPos + 3.5);
-  
+
   // Centrar "O.I" en la segunda celda de CORREGIDA
   const textoOI2 = "O.I";
   const anchoOI2 = doc.getTextWidth(textoOI2);
   doc.text(textoOI2, mitadCorregida + (colCorregidaAncho / 2 - anchoOI2) / 2, yPos + 3.5);
   yPos += filaAlturaAgudeza;
-  
+
   // Número de líneas que se mostrarán en cada fila de agudeza visual
   const lineasPorFila = 1;
-  
+
   // Dibujar fila de datos para Visión de Cerca
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaAgudeza);
   doc.line(xSinCorregir, yPos, xSinCorregir, yPos + filaAlturaAgudeza);
@@ -1395,11 +1550,11 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   doc.line(tablaInicioX, yPos, xObservaciones, yPos);
   // Línea horizontal inferior solo hasta el final de CORREGIDA
   doc.line(tablaInicioX, yPos + filaAlturaAgudeza, xObservaciones, yPos + filaAlturaAgudeza);
-  
+
   // Dibujar líneas verticales para dividir O.D y O.I en la fila de datos
   doc.line(mitadSinCorregir, yPos, mitadSinCorregir, yPos + filaAlturaAgudeza);
   doc.line(mitadCorregida, yPos, mitadCorregida, yPos + filaAlturaAgudeza);
-  
+
   // Contenido de la fila Visión de Cerca
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Visión de Cerca:", xAgudeza + 2, yPos + 3.5);
@@ -1411,7 +1566,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   const anchoOiSinCorregir = doc.getTextWidth(oiSinCorregir);
   doc.text(odSinCorregir, xSinCorregir + (colSinCorregirAncho / 2 - anchoOdSinCorregir) / 2, yPos + 3.5);
   doc.text(oiSinCorregir, mitadSinCorregir + (colSinCorregirAncho / 2 - anchoOiSinCorregir) / 2, yPos + 3.5);
-  
+
   // Centrar datos O.D y O.I en CORREGIDA
   const odCorregida = datosFinales.visionCercaCorregidaOd || "";
   const oiCorregida = datosFinales.visionCercaCorregidaOi || "";
@@ -1419,13 +1574,13 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   const anchoOiCorregida = doc.getTextWidth(oiCorregida);
   doc.text(odCorregida, xCorregida + (colCorregidaAncho / 2 - anchoOdCorregida) / 2, yPos + 3.5);
   doc.text(oiCorregida, mitadCorregida + (colCorregidaAncho / 2 - anchoOiCorregida) / 2, yPos + 3.5);
-  
+
   // Mostrar las primeras líneas del texto de enfermedades oculares en esta fila
   doc.setFont("helvetica", "normal").setFontSize(7);
   lines.slice(0, lineasPorFila).forEach((line, index) => {
     doc.text(line, xObservaciones + 4, yPos - 1 + (index * lineHeight));
   });
-  
+
   yPos += filaAlturaAgudeza;
 
   // Línea horizontal separadora entre filas de datos (solo hasta el final de CORREGIDA)
@@ -1441,11 +1596,11 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   doc.line(tablaInicioX, yPos, xObservaciones, yPos);
   // Línea horizontal inferior solo hasta el final de CORREGIDA
   doc.line(tablaInicioX, yPos + filaAlturaAgudeza, xObservaciones, yPos + filaAlturaAgudeza);
-  
+
   // Dibujar líneas verticales para dividir O.D y O.I en la fila de datos
   doc.line(mitadSinCorregir, yPos, mitadSinCorregir, yPos + filaAlturaAgudeza);
   doc.line(mitadCorregida, yPos, mitadCorregida, yPos + filaAlturaAgudeza);
-  
+
   // Contenido de la fila Visión de Lejos
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Visión de Lejos:", xAgudeza + 2, yPos + 3.5);
@@ -1457,7 +1612,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   const anchoOiLejosSinCorregir = doc.getTextWidth(oiLejosSinCorregir);
   doc.text(odLejosSinCorregir, xSinCorregir + (colSinCorregirAncho / 2 - anchoOdLejosSinCorregir) / 2, yPos + 3.5);
   doc.text(oiLejosSinCorregir, mitadSinCorregir + (colSinCorregirAncho / 2 - anchoOiLejosSinCorregir) / 2, yPos + 3.5);
-  
+
   // Centrar datos O.D y O.I en CORREGIDA
   const odLejosCorregida = datosFinales.visionLejosCorregidaOd || "";
   const oiLejosCorregida = datosFinales.visionLejosCorregidaOi || "";
@@ -1465,17 +1620,17 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   const anchoOiLejosCorregida = doc.getTextWidth(oiLejosCorregida);
   doc.text(odLejosCorregida, xCorregida + (colCorregidaAncho / 2 - anchoOdLejosCorregida) / 2, yPos + 3.5);
   doc.text(oiLejosCorregida, mitadCorregida + (colCorregidaAncho / 2 - anchoOiLejosCorregida) / 2, yPos + 3.5);
-  
+
   // Continuar con las líneas restantes del texto de enfermedades oculares
   doc.setFont("helvetica", "normal").setFontSize(7);
-  
+
   // Mostrar las líneas restantes en esta fila
   if (lines && lines.length > lineasPorFila) {
     lines.slice(lineasPorFila).forEach((line, index) => {
       doc.text(line, xObservaciones + 4, yPos - 1 + (index * lineHeight));
     });
   }
-  
+
   yPos += filaAlturaAgudeza;
 
   // === FILA: REFLEJOS PUPILARES Y VISIÓN DE COLORES ===
@@ -1483,25 +1638,25 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   const anchoColReflejos = 60; // Columna estrecha
   const anchoColVision = tablaAncho - anchoColReflejos; // Resto para Visión de colores
   const puntoDivisionReflejos = tablaInicioX + anchoColReflejos;
-  
+
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(puntoDivisionReflejos, yPos, puntoDivisionReflejos, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   // Contenido de Reflejos Pupilares
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Reflejos Pupilares:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text((datosFinales.reflejosPupilares || "").toString().toUpperCase(), tablaInicioX + 35, yPos + 3.5);
-  
+
   // Contenido de Visión de Colores
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Visión de colores:", puntoDivisionReflejos + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text((datosFinales.visionColores || "").toString().toUpperCase(), puntoDivisionReflejos + 35, yPos + 3.5);
-  
+
   yPos += filaAltura;
 
   // === FILA CELESTE: HEADER DE COLUMNAS (EXAMEN FÍSICO POR SISTEMAS) ===
@@ -1532,29 +1687,29 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
 
   sistemasExamen.forEach((sistema) => {
     let yInicioFila = yPos;
-    
+
     // Dibujar línea superior
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-    
+
     // Dibujar etiqueta
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(`${sistema.label}:`, tablaInicioX + 2, yPos + 3.5);
-    
+
     // Renderizar texto de hallazgos con altura dinámica
     const textoHallazgo = sistema.data || "-";
     doc.setFont("helvetica", "normal").setFontSize(7); // Tamaño de fuente 7 para datos
-    
+
     // Calcular posición Y inicial para el texto (desde donde empieza el texto)
     const yInicioTexto = yPos + 2.5;
     const yFinalTexto = dibujarTextoConSaltoLinea(textoHallazgo, puntoDivisionSistemas + 2, yInicioTexto, anchoColHallazgosSistemas - 4);
-    
+
     // Calcular altura de fila dinámica
     // Altura mínima: 15mm, pero crece según el contenido
     // Sumamos un pequeño margen inferior para que el texto no quede pegado
     const alturaTexto = yFinalTexto - yInicioTexto;
     const alturaFila = Math.max(7, alturaTexto + 2);
     yPos = yInicioFila + alturaFila;
-    
+
     // Dibujar todas las líneas verticales y línea inferior con la altura correcta
     doc.line(tablaInicioX, yInicioFila, tablaInicioX, yPos); // Línea izquierda
     doc.line(puntoDivisionSistemas, yInicioFila, puntoDivisionSistemas, yPos); // División central
@@ -1591,15 +1746,15 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   // Estructura de dos columnas
   const anchoCol = tablaAncho / 2;
   const puntoDivisionCols = tablaInicioX + anchoCol;
-  
+
   // Preparar datos
   const textoConclusionesRadiograficas = (datosFinales.conclusionesRadiograficas || "").toString();
   const textoHallazgosLaboratorio = (datosFinales.hallazgosPatologicosLaboratorio || "").toString();
-  
+
   // Convertir a mayúsculas y manejar vacíos
   const datosCol1 = textoConclusionesRadiograficas ? textoConclusionesRadiograficas.toUpperCase() : "-";
   const datosCol2 = textoHallazgosLaboratorio ? textoHallazgosLaboratorio.toUpperCase() : "-";
-  
+
   // Calcular altura dinámica para cada columna
   const anchoDisponibleCol = anchoCol - 4;
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -1607,33 +1762,33 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   const lineasCol2 = doc.splitTextToSize(datosCol2, anchoDisponibleCol);
   const maxLineas = Math.max(lineasCol1.length, lineasCol2.length);
   const alturaDinamica = Math.max(8, maxLineas * interlineadoConclusiones + 4);
-  
+
   const yPosInicial = yPos;
-  
+
   // Dibujar headers de sección (filas grises)
   doc.setFillColor(196, 196, 196);
   doc.rect(tablaInicioX, yPos, anchoCol, filaAltura, 'F');
   doc.rect(puntoDivisionCols, yPos, anchoCol, filaAltura, 'F');
-  
+
   // Líneas de los headers
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(puntoDivisionCols, yPos, puntoDivisionCols, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   // Textos de headers
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("7. CONCLUSIONES RADIOGRÁFICAS", tablaInicioX + 2, yPos + 3.5);
   doc.text("8. HALLAZGOS PATOLÓGICOS DE LABORATORIO", puntoDivisionCols + 2, yPos + 3.5);
   yPos += filaAltura;
-  
+
   // Dibujar líneas de contenido
   doc.line(tablaInicioX, yPosInicial, tablaInicioX, yPosInicial + filaAltura + alturaDinamica);
   doc.line(puntoDivisionCols, yPosInicial, puntoDivisionCols, yPosInicial + filaAltura + alturaDinamica);
   doc.line(tablaInicioX + tablaAncho, yPosInicial, tablaInicioX + tablaAncho, yPosInicial + filaAltura + alturaDinamica);
   doc.line(tablaInicioX, yPosInicial + filaAltura + alturaDinamica, tablaInicioX + tablaAncho, yPosInicial + filaAltura + alturaDinamica);
-  
+
   // Contenido (font size 7)
   doc.setFont("helvetica", "normal").setFontSize(7);
   lineasCol1.forEach((linea, index) => {
@@ -1659,15 +1814,15 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   // Estructura de dos columnas
   const anchoColPag3 = tablaAncho / 2;
   const puntoDivisionColsPag3 = tablaInicioX + anchoColPag3;
-  
+
   // Preparar datos
   const textoAudiometria = (datosFinales.conclusionAudiometria || "").toString();
   const textoEspirometria = (datosFinales.conclusionEspirometria || "").toString();
-  
+
   // Convertir a mayúsculas y manejar vacíos
   const datosAudiometria = textoAudiometria ? textoAudiometria.toUpperCase() : "-";
   const datosEspirometria = textoEspirometria ? textoEspirometria.toUpperCase() : "-";
-  
+
   // Calcular altura dinámica para cada columna
   const anchoDisponibleColPag3 = anchoColPag3 - 4;
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -1675,33 +1830,33 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   const lineasEspirometria = doc.splitTextToSize(datosEspirometria, anchoDisponibleColPag3);
   const maxLineas2 = Math.max(lineasAudiometria.length, lineasEspirometria.length);
   const alturaDinamica2 = Math.max(8, maxLineas2 * interlineadoConclusiones + 4);
-  
+
   const yPosInicial2 = yPos;
-  
+
   // Dibujar headers de sección (filas grises)
   doc.setFillColor(196, 196, 196);
   doc.rect(tablaInicioX, yPos, anchoColPag3, filaAltura, 'F');
   doc.rect(puntoDivisionColsPag3, yPos, anchoColPag3, filaAltura, 'F');
-  
+
   // Líneas de los headers
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(puntoDivisionColsPag3, yPos, puntoDivisionColsPag3, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   // Textos de headers
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("9. CONCLUSIÓN AUDIOMETRÍA", tablaInicioX + 2, yPos + 3.5);
   doc.text("10. CONCLUSIÓN DE ESPIROMETRÍA", puntoDivisionColsPag3 + 2, yPos + 3.5);
   yPos += filaAltura;
-  
+
   // Dibujar líneas de contenido
   doc.line(tablaInicioX, yPosInicial2, tablaInicioX, yPosInicial2 + filaAltura + alturaDinamica2);
   doc.line(puntoDivisionColsPag3, yPosInicial2, puntoDivisionColsPag3, yPosInicial2 + filaAltura + alturaDinamica2);
   doc.line(tablaInicioX + tablaAncho, yPosInicial2, tablaInicioX + tablaAncho, yPosInicial2 + filaAltura + alturaDinamica2);
   doc.line(tablaInicioX, yPosInicial2 + filaAltura + alturaDinamica2, tablaInicioX + tablaAncho, yPosInicial2 + filaAltura + alturaDinamica2);
-  
+
   // Contenido (font size 7)
   doc.setFont("helvetica", "normal").setFontSize(7);
   lineasAudiometria.forEach((linea, index) => {
@@ -1715,18 +1870,18 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   // === PÁGINA 3: SECCIÓN XI: OTROS ===
   const textoOtros = (datosFinales.otros || "").toString();
   const datosOtros = textoOtros ? textoOtros.toUpperCase() : "-";
-  
+
   yPos = dibujarHeaderSeccion("11. OTROS", yPos, filaAltura);
-  
+
   const anchoDisponibleOtros = tablaAncho - 4;
   const lineasOtros = doc.splitTextToSize(datosOtros, anchoDisponibleOtros);
   const alturaDinamicaOtros = Math.max(40, lineasOtros.length * interlineadoConclusiones + 4);
-  
+
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaOtros);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaOtros);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaDinamicaOtros, tablaInicioX + tablaAncho, yPos + alturaDinamicaOtros);
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
   lineasOtros.forEach((linea, index) => {
     doc.text(linea, tablaInicioX + 2, yPos + 3.5 + (index * interlineadoConclusiones));
@@ -1736,18 +1891,18 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   // === SECCIÓN XII: DIAGNÓSTICO MÉDICO OCUPACIONAL Y RECOMENDACIONES ===
   const textoDiagnostico = (datosFinales.diagnosticoMedicoOcupacional || "").toString();
   const datosDiagnostico = textoDiagnostico ? textoDiagnostico.toUpperCase() : "-";
-  
+
   yPos = dibujarHeaderSeccion("12. DIAGNÓSTICO MÉDICO OCUPACIONAL Y RECOMENDACIONES", yPos, filaAltura);
-  
+
   const anchoDisponibleDiagnostico = tablaAncho - 4;
   const lineasDiagnostico = doc.splitTextToSize(datosDiagnostico, anchoDisponibleDiagnostico);
   const alturaDinamicaDiagnostico = Math.max(40, lineasDiagnostico.length * interlineadoConclusiones + 4);
-  
+
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaDiagnostico);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaDiagnostico);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaDinamicaDiagnostico, tablaInicioX + tablaAncho, yPos + alturaDinamicaDiagnostico);
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
   lineasDiagnostico.forEach((linea, index) => {
     doc.text(linea, tablaInicioX + 2, yPos + 3.5 + (index * interlineadoConclusiones));
@@ -1786,7 +1941,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text('X', tablaInicioX + colConclusWidth + colCheckWidth / 2, yPos + 3.5, { align: "center" });
   }
-  
+
   // Apto con restricción
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("APTO CON RESTRICCIÓN", tablaInicioX + colConclusWidth + colCheckWidth + 2, yPos + 3.5);
@@ -1794,7 +1949,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text('X', tablaInicioX + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth / 2, yPos + 3.5, { align: "center" });
   }
-  
+
   // No apto
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("NO APTO", tablaInicioX + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth + 2, yPos + 3.5);
@@ -1802,7 +1957,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text('X', tablaInicioX + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth / 2, yPos + 3.5, { align: "center" });
   }
-  
+
   yPos += filaAltura;
 
   // === FILA: FECHA DESDE | FECHA HASTA ===
@@ -1811,17 +1966,17 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Fecha desde:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text(datosFinales.fechaDesde || "", tablaInicioX + 25, yPos + 3.5);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Fecha hasta:", tablaInicioX + 102, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text(datosFinales.fechaHasta || "", tablaInicioX + 125, yPos + 3.5);
-  
+
   yPos += filaAltura;
 
   // === FILA GRIS: RESTRICCIONES ===
@@ -1829,17 +1984,44 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
 
   // Fila dinámica para restricciones
   const textoRestricciones = (datosFinales.restricciones || "").toString();
-  const datosRestricciones = textoRestricciones ? textoRestricciones.toUpperCase() : "-";
   
+  // Preservar símbolos especiales como ≥, ≤, etc. antes de convertir a mayúsculas
+  // Reemplazar temporalmente los símbolos, convertir a mayúsculas, y luego restaurarlos
+  const simbolosEspeciales = [
+    { original: '≥', temporal: '___MAYOR_IGUAL___' },
+    { original: '≤', temporal: '___MENOR_IGUAL___' },
+    { original: '≠', temporal: '___DIFERENTE___' },
+    { original: '±', temporal: '___MAS_MENOS___' }
+  ];
+  
+  let textoProcesado = textoRestricciones;
+  // Guardar los símbolos originales
+  simbolosEspeciales.forEach(simbolo => {
+    textoProcesado = textoProcesado.replace(new RegExp(simbolo.original, 'g'), simbolo.temporal);
+  });
+  
+  // Convertir a mayúsculas
+  const datosRestricciones = textoProcesado ? textoProcesado.toUpperCase() : "-";
+  
+  // Restaurar los símbolos originales
+  let datosFinalesRestricciones = datosRestricciones;
+  simbolosEspeciales.forEach(simbolo => {
+    datosFinalesRestricciones = datosFinalesRestricciones.replace(new RegExp(simbolo.temporal, 'g'), simbolo.original);
+  });
+  
+  // Si jsPDF no renderiza bien "≥", reemplazarlo por ">=" para mejor compatibilidad
+  // Comentar esta línea si el símbolo se renderiza correctamente
+  datosFinalesRestricciones = datosFinalesRestricciones.replace(/≥/g, '>=');
+
   const anchoDisponibleRestricciones = tablaAncho - 4;
-  const lineasRestricciones = doc.splitTextToSize(datosRestricciones, anchoDisponibleRestricciones);
+  const lineasRestricciones = doc.splitTextToSize(datosFinalesRestricciones, anchoDisponibleRestricciones);
   const alturaDinamicaRestricciones = Math.max(20, lineasRestricciones.length * interlineadoConclusiones + 4);
-  
+
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaRestricciones);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaRestricciones);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaDinamicaRestricciones, tablaInicioX + tablaAncho, yPos + alturaDinamicaRestricciones);
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
   lineasRestricciones.forEach((linea, index) => {
     doc.text(linea, tablaInicioX + 2, yPos + 3.5 + (index * interlineadoConclusiones));
@@ -1870,10 +2052,10 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
 
   // === COLUMNA 1: FIRMA Y HUELLA DEL TRABAJADOR ===
   const firmaTrabajadorY = yPos + 3;
-  
+
   // Calcular centro de la columna 1 para centrar las imágenes
   const centroColumna1X = tablaInicioX + (anchoColumnaFirmas / 2); // Centro de la columna 1
-  
+
   // Agregar firma del trabajador (lado izquierdo)
   let firmaTrabajadorUrl = getSign(data, "FIRMAP");
   if (firmaTrabajadorUrl) {
@@ -1901,16 +2083,16 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
       console.log("Error cargando huella del trabajador:", error);
     }
   }
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("Firma y Huella del trabajador", centroColumna1X, yPos + 26, { align: "center" });
 
   // === COLUMNA 2: SELLO Y FIRMA DEL MÉDICO ===
   const firmaMedicoY = yPos + 3;
-  
+
   // Calcular centro de la columna 2
   const centroColumna2X = tablaInicioX + anchoColumnaFirmas + (anchoColumnaFirmas / 2); // Centro de la columna 2
-  
+
   // Agregar firma y sello médico
   let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
   if (firmaMedicoUrl) {
@@ -1924,7 +2106,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
       console.log("Error cargando firma del médico:", error);
     }
   }
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("Sello y Firma del Médico", centroColumna2X, yPos + 26, { align: "center" });
   doc.text("Responsable de la Evaluación", centroColumna2X, yPos + 28.5, { align: "center" });
@@ -1932,7 +2114,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   // === FOOTER PÁGINA 3 ===
   footerTR(doc, { footerOffsetY: 8 });
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

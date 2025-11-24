@@ -1,265 +1,404 @@
 import jsPDF from "jspdf";
-import HeaderInformeElectrocardiogramaPoderosa from "./Header/header_InformeElectrocardiograma_DigitalizadoPoderosa.jsx";
+import { formatearFechaCorta } from "../../utils/formatDateUtils";
+import { getSign, convertirGenero } from "../../utils/helpers";
+import CabeceraLogo from "../components/CabeceraLogo.jsx";
+import drawColorBox from "../components/ColorBox.jsx";
+import footerTR from "../components/footerTR.jsx";
 
 export default function InformeElectrocardiograma2023(data = {}) {
-  // Datos de prueba por defecto
-  const datosPrueba = {
-    ritmo: "2",
-    frecuencia: "2 x min",
-    eje: "2°",
-    ondaP: "2 ms",
-    segmentoPR: "2ms",
-    ondaQRS: "2ms",
-    segmentoST: "2",
-    ondaT: "2",
-    segmentoQT: "N/E2ms",
-    observaciones: "BRADICARDIA SINUSAL ASINTOMATICA.",
-    conclusion: "",
-    recomendaciones: "EVALUACION ANUAL.\nEVALUACION EN 6 MESES.",
-  };
-  const datosReales = {
-    ritmo: data.mensajeRitmo ?? "",
-    frecuencia: `${data.mensajeFC ?? ""} x min`,
-    eje: `${data.mensajeEje ?? ""} °`,
-    ondaP: `${data.mensajeOndaP ?? ""} ms`,
-    segmentoPR: `${data.mensajePr ?? ""} ms`,
-    ondaQRS: `${data.mensajeQrs ?? ""} ms`,
-    segmentoST: data.mensajeSt ?? "",
-    ondaT: data.mensajeOndaT ?? "",
-    segmentoQT: `${data.mensajeQtC ?? ""} ms`,
-    observaciones: data.hallazgo ?? "",
-    conclusion: data.conclusion ?? "",
-    recomendaciones: data.recomendaciones ?? "",
-  };
-
-  // Combinar datos de prueba con datos reales
-  const datosFinales =
-    data && Object.keys(data).length > 0 ? datosReales : datosPrueba;
-
-  const doc = new jsPDF();
-  const margin = 8;
+  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
-  let y = 80;
 
-  // 1) Header
-  HeaderInformeElectrocardiogramaPoderosa(doc, data);
-
-  // Función para obtener datos con valor por defecto
-  const obtener = (name, defaultValue = "") => {
-    return datosFinales[name] ?? defaultValue;
+  // Datos reales mapeados
+  const datosFinales = {
+    ritmo: String(data.mensajeRitmo ?? ""),
+    frecuencia: data.mensajeFC ? `${String(data.mensajeFC)} x min` : "",
+    eje: data.mensajeEje ? `${String(data.mensajeEje)} °` : "",
+    ondaP: data.mensajeOndaP ? `${String(data.mensajeOndaP)} ms` : "",
+    segmentoPR: data.mensajePr ? `${String(data.mensajePr)} ms` : "",
+    ondaQRS: data.mensajeQrs ? `${String(data.mensajeQrs)} ms` : "",
+    segmentoST: String(data.mensajeSt ?? ""),
+    ondaT: String(data.mensajeOndaT ?? ""),
+    segmentoQT: data.mensajeQtC ? `${String(data.mensajeQtC)} ms` : "",
+    observaciones: String(data.hallazgo ?? ""),
+    conclusion: String(data.conclusion ?? ""),
+    recomendaciones: String(data.recomendaciones ?? ""),
+    // Datos personales
+    nombres: String(data.nombres ?? ""),
+    dni: String(data.dni ?? ""),
+    edad: String(data.edad ?? ""),
+    sexo: convertirGenero(data.sexo ?? ""),
+    fechaNac: formatearFechaCorta(data.fechaNac ?? ""),
+    procedencia: String(data.procedencia ?? ""),
+    empresa: String(data.empresa ?? ""),
+    contrata: String(data.contrata ?? ""),
+    presionArterial: String(data.presionArterial ?? ""),
+    // Datos para header
+    numeroFicha: String(data.norden ?? data.n_orden ?? data.norden_n_orden ?? ""),
+    sede: data.sede || data.nombreSede || "",
+    fechaExamen: formatearFechaCorta(data.fechaExamen ?? data.fechaInforme ?? data.fechaApertura_fecha_apertura_po ?? ""),
+    color: data.color || data.informacionSede?.color || 1,
+    codigoColor: data.codigoColor || data.informacionSede?.codigoColor || "#008f39",
+    textoColor: data.textoColor || data.informacionSede?.textoColor || "F",
   };
 
-  // -------------------------------
-  // Función genérica para dibujar filas tipo "Label : Valor"
-  function dibujarFilas(doc, rows, startX, startY, espaciado = 5) {
-    const colLabelX = startX;
-    const colPuntosX = startX + 35; // columna fija para los ':'
-    const colValueX = startX + 45; // columna fija para los valores
+  // Header reutilizable
+  const drawHeader = (pageNumber) => {
+    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
-    let y = startY;
+    // Título principal
+    doc.setFont("helvetica", "bold").setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text("INFORME DE ELECTROCARDIOGRAMA", pageW / 2, 32.5, { align: "center" });
 
-    rows.forEach((row) => {
-      // Label en negrita
-      doc.setFont("helvetica", "bold").setFontSize(9);
-      doc.text(row.label, colLabelX, y, { baseline: "top" });
+    // Número de Ficha y Página
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Nro de ficha: ", pageW - 80, 15);
 
-      // Dos puntos
-      doc.setFont("helvetica", "normal").setFontSize(9);
-      doc.text(":", colPuntosX, y, { baseline: "top" });
+    doc.setFont("helvetica", "normal").setFontSize(18);
+    doc.text(datosFinales.numeroFicha || "", pageW - 60, 16);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Sede: " + (datosFinales.sede || ""), pageW - 80, 20);
+    doc.text("Fecha de examen: " + (datosFinales.fechaExamen || ""), pageW - 80, 25);
 
-      // Valor
-      doc.text(row.value, colValueX, y, { baseline: "top" });
+    doc.text("Pag. " + pageNumber.toString().padStart(2, '0'), pageW - 30, 10);
 
-      y += espaciado;
+    // Bloque de color
+    drawColorBox(doc, {
+      color: datosFinales.codigoColor,
+      text: datosFinales.textoColor,
+      x: pageW - 30,
+      y: 10,
+      size: 22,
+      showLine: true,
+      fontSize: 30,
+      textPosition: 0.9
     });
+  };
 
-    return y; // devuelve la Y final
+  // === DIBUJAR HEADER ===
+  drawHeader(1);
+
+  // === FUNCIONES AUXILIARES ===
+  // Función general para dibujar header de sección con fondo gris
+  const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
+    const tablaInicioX = 5;
+    const tablaAncho = 200;
+
+    // Configurar líneas con grosor consistente
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
+
+    // Dibujar fondo gris
+    doc.setFillColor(196, 196, 196);
+    doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
+
+    // Dibujar líneas del header
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
+
+    // Dibujar texto del título
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
+
+    return yPos + alturaHeader;
+  };
+
+  // === SECCIÓN 1: DATOS PERSONALES ===
+  const tablaInicioX = 5;
+  const tablaAncho = 200;
+  let yPos = 40; // Posición inicial después del título
+  const filaAltura = 5; // Altura fija de 5mm para datos personales
+
+  // Header de datos personales
+  yPos = dibujarHeaderSeccion("1. DATOS PERSONALES", yPos, filaAltura);
+
+  // Configurar líneas para filas de datos
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+
+  // Primera fila: Apellidos y Nombres
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  
+  // Contenido - centrado verticalmente en fila de 5mm
+  const textoY = yPos + (filaAltura / 2) + (8 * 0.35) / 2; // Centrado vertical
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Apellidos y Nombres:", tablaInicioX + 2, textoY);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  if (datosFinales.nombres) {
+    const lineasNombres = doc.splitTextToSize(datosFinales.nombres.toUpperCase(), tablaAncho - 45);
+    doc.text(lineasNombres, tablaInicioX + 40, textoY);
+  }
+  yPos += filaAltura;
+
+  // Segunda fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 45, yPos, tablaInicioX + 45, yPos + filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  
+  // Contenido - centrado verticalmente
+  const textoY2 = yPos + (filaAltura / 2) + (8 * 0.35) / 2;
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("DNI:", tablaInicioX + 2, textoY2);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.dni, tablaInicioX + 12, textoY2);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Edad:", tablaInicioX + 47, textoY2);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.edad ? `${datosFinales.edad} AÑOS` : "", tablaInicioX + 58, textoY2);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Sexo:", tablaInicioX + 92, textoY2);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.sexo ? datosFinales.sexo.toUpperCase() : "", tablaInicioX + 105, textoY2);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Fecha Nac.:", tablaInicioX + 137, textoY2);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.fechaNac, tablaInicioX + 155, textoY2);
+  yPos += filaAltura;
+
+  // Tercera fila: Procedencia (si existe)
+  if (datosFinales.procedencia) {
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+    
+    // Contenido - centrado verticalmente
+    const textoY3 = yPos + (filaAltura / 2) + (8 * 0.35) / 2;
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Procedencia:", tablaInicioX + 2, textoY3);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const lineasProcedencia = doc.splitTextToSize(datosFinales.procedencia.toUpperCase(), tablaAncho - 35);
+    doc.text(lineasProcedencia, tablaInicioX + 30, textoY3);
+    yPos += filaAltura;
   }
 
-  // -------------------------------
-  // 2) Línea divisoria después del header
-  y = y + 30;
-  // const lineaDivisoriaY = y;
-  // const lineaDivisoriaW = pageW - 2 * (margin + 25);
-  // const lineaDivisoriaX = margin + 25;
-
-  // doc.setLineWidth(0.3);
-  // doc.line(lineaDivisoriaX, lineaDivisoriaY, lineaDivisoriaX + lineaDivisoriaW, lineaDivisoriaY);
-  // y += 10;
-
-  // -------------------------------
-  // 3) Parámetros EKG
-  const parametrosEKG = [
-    { label: "RITMO", value: obtener("ritmo", "") },
-    { label: "FRECUENCIA", value: obtener("frecuencia", "") },
-    { label: "EJE", value: obtener("eje", "") },
-    { label: "ONDA P", value: obtener("ondaP", "") },
-    { label: "SEGMENTO PR", value: obtener("segmentoPR", "") },
-    { label: "ONDA QRS", value: obtener("ondaQRS", "") },
-    { label: "SEGMENTO ST", value: obtener("segmentoST", "") },
-    { label: "ONDA T", value: obtener("ondaT", "") },
-    { label: "SEGMENTO QTC", value: obtener("segmentoQT", "") },
-  ];
-  y = dibujarFilas(doc, parametrosEKG, margin + 25, y);
-
-  // -------------------------------
-  // 4) Línea divisoria después de parámetros EKG
-  y += 5;
-  const lineaParametrosY = y;
-  const lineaDivisoriaX = margin + 25;
-  const lineaDivisoriaW = pageW - 2 * (margin + 25);
-  doc.setLineWidth(0.3);
-  doc.line(
-    lineaDivisoriaX,
-    lineaParametrosY,
-    lineaDivisoriaX + lineaDivisoriaW,
-    lineaParametrosY
-  );
-  y += 5;
-
-  // -------------------------------
-  // 5) Hallazgos
-  const hallazgosValue = obtener("observaciones");
-
-  // Label en negrita
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("HALLAZGOS", margin + 25, y, { baseline: "top" });
-
-  // Dos puntos alineados
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(":", margin + 25 + 35, y, { baseline: "top" });
-
-  // Valor
-  const hallazgosX = margin + 25 + 45;
-  const hallazgosMaxWidth = pageW - hallazgosX - margin - 10;
-
-  if (hallazgosValue) {
-    const lines = doc.splitTextToSize(hallazgosValue, hallazgosMaxWidth);
-
-    lines.forEach((line, index) => {
-      doc.text(line, hallazgosX, y + index * 3, { baseline: "top" });
-    });
-
-    y += lines.length * 3 + 5;
-  } else {
-    y += 5;
+  // Cuarta fila: Empresa (si existe)
+  if (datosFinales.empresa) {
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+    
+    // Contenido - centrado verticalmente
+    const textoY4 = yPos + (filaAltura / 2) + (8 * 0.35) / 2;
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Empresa:", tablaInicioX + 2, textoY4);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const lineasEmpresa = doc.splitTextToSize(datosFinales.empresa.toUpperCase(), tablaAncho - 30);
+    doc.text(lineasEmpresa, tablaInicioX + 24, textoY4);
+    yPos += filaAltura;
   }
 
-  // -------------------------------
-  // 6) Línea divisoria después de observaciones
-  const lineaObservacionesY = y;
-  doc.setLineWidth(0.3);
-  doc.line(
-    lineaDivisoriaX,
-    lineaObservacionesY,
-    lineaDivisoriaX + lineaDivisoriaW,
-    lineaObservacionesY
-  );
-  y += 5;
-
-  // -------------------------------
-  // 7) Conclusión
-  const conclusionValue = obtener("conclusion");
-
-  // Label en negrita
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("CONCLUSION", margin + 25, y, { baseline: "top" });
-
-  // Dos puntos alineados
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(":", margin + 25 + 35, y, { baseline: "top" });
-
-  // Valor
-  const conclusionX = margin + 25 + 45;
-  const conclusionMaxWidth = pageW - conclusionX - margin - 10;
-
-  if (conclusionValue) {
-    const lines = doc.splitTextToSize(conclusionValue, conclusionMaxWidth);
-
-    lines.forEach((line, index) => {
-      doc.text(line, conclusionX, y + index * 3, { baseline: "top" });
-    });
-
-    y += lines.length * 3 + 5;
-  } else {
-    y += 5;
+  // Quinta fila: Contratista (si existe)
+  if (datosFinales.contrata) {
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+    
+    // Contenido - centrado verticalmente
+    const textoY5 = yPos + (filaAltura / 2) + (8 * 0.35) / 2;
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Contratista:", tablaInicioX + 2, textoY5);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const lineasContrata = doc.splitTextToSize(datosFinales.contrata.toUpperCase(), tablaAncho - 30);
+    doc.text(lineasContrata, tablaInicioX + 24, textoY5);
+    yPos += filaAltura;
   }
 
-  // -------------------------------
-  // 8) Línea divisoria después de conclusión
-  const lineaConclusionY = y;
-  doc.setLineWidth(0.3);
-  doc.line(
-    lineaDivisoriaX,
-    lineaConclusionY,
-    lineaDivisoriaX + lineaDivisoriaW,
-    lineaConclusionY
-  );
-  y += 5;
+  // Sexta fila: Presión Arterial (si existe)
+  if (datosFinales.presionArterial) {
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+    
+    // Contenido - centrado verticalmente
+    const textoY6 = yPos + (filaAltura / 2) + (8 * 0.35) / 2;
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Presión Arterial:", tablaInicioX + 2, textoY6);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(datosFinales.presionArterial, tablaInicioX + 35, textoY6);
+    yPos += filaAltura;
+  }
 
-  // -------------------------------
-  // 9) Recomendaciones
-  const recomendacionesValue = obtener("recomendaciones");
-  if (recomendacionesValue) {
-    // Label en negrita
-    doc.setFont("helvetica", "bold").setFontSize(9);
-    doc.text("RECOMENDACIONES:", margin + 25, y, { baseline: "top" });
+  // === SECCIÓN 2: PARÁMETROS EKG ===
+  yPos = dibujarHeaderSeccion("2. PARÁMETROS ELECTROCARDIOGRÁFICOS", yPos, 5);
 
-    // Procesar recomendaciones como lista
-    const items = procesarRecomendaciones(recomendacionesValue);
-    const recomendacionesX = margin + 25 + 45;
-    const recomendacionesMaxWidth = pageW - recomendacionesX - margin - 10;
+  // Función para dibujar una fila de parámetro EKG
+  const dibujarFilaParametroEKG = (label, valor) => {
+    // Dibujar líneas de la fila
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + 60, yPos, tablaInicioX + 60, yPos + filaAltura); // División label/valor
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-    items.forEach((item, index) => {
+    // Contenido de la fila
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text(label + ":", tablaInicioX + 2, yPos + 3.5);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(valor || "", tablaInicioX + 65, yPos + 3.5);
+
+    yPos += filaAltura;
+  };
+
+  // Dibujar filas de parámetros EKG
+  dibujarFilaParametroEKG("RITMO", datosFinales.ritmo);
+  dibujarFilaParametroEKG("FRECUENCIA", datosFinales.frecuencia);
+  dibujarFilaParametroEKG("EJE", datosFinales.eje);
+  dibujarFilaParametroEKG("ONDA P", datosFinales.ondaP);
+  dibujarFilaParametroEKG("SEGMENTO PR", datosFinales.segmentoPR);
+  dibujarFilaParametroEKG("ONDA QRS", datosFinales.ondaQRS);
+  dibujarFilaParametroEKG("SEGMENTO ST", datosFinales.segmentoST);
+  dibujarFilaParametroEKG("ONDA T", datosFinales.ondaT);
+  dibujarFilaParametroEKG("SEGMENTO QTC", datosFinales.segmentoQT);
+
+  // === SECCIÓN 3: HALLAZGOS ===
+  yPos = dibujarHeaderSeccion("3. HALLAZGOS", yPos, 5);
+
+  // Calcular altura dinámica para hallazgos (mínimo 20mm)
+  const alturaMinimaHallazgos = 20;
+  const calcularAlturaHallazgos = (texto, anchoMaximo) => {
+    if (!texto) return alturaMinimaHallazgos;
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const lineas = doc.splitTextToSize(texto, anchoMaximo);
+    return Math.max(alturaMinimaHallazgos, lineas.length * 3.5 + 3);
+  };
+
+  const anchoDisponibleHallazgos = tablaAncho - 4;
+  const alturaHallazgos = calcularAlturaHallazgos(datosFinales.observaciones, anchoDisponibleHallazgos);
+
+  // Dibujar líneas de la fila dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHallazgos);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHallazgos);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaHallazgos, tablaInicioX + tablaAncho, yPos + alturaHallazgos);
+
+  // Contenido de hallazgos
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  if (datosFinales.observaciones) {
+    const lineasHallazgos = doc.splitTextToSize(datosFinales.observaciones, anchoDisponibleHallazgos);
+    doc.text(lineasHallazgos, tablaInicioX + 2, yPos + 3.5);
+  }
+  yPos += alturaHallazgos;
+
+  // === SECCIÓN 4: CONCLUSIÓN ===
+  yPos = dibujarHeaderSeccion("4. CONCLUSIÓN", yPos, 5);
+
+  // Calcular altura dinámica para conclusión
+  const alturaConclusion = calcularAlturaHallazgos(datosFinales.conclusion, anchoDisponibleHallazgos);
+
+  // Dibujar líneas de la fila dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaConclusion);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaConclusion);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaConclusion, tablaInicioX + tablaAncho, yPos + alturaConclusion);
+
+  // Contenido de conclusión
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  if (datosFinales.conclusion) {
+    const lineasConclusion = doc.splitTextToSize(datosFinales.conclusion, anchoDisponibleHallazgos);
+    doc.text(lineasConclusion, tablaInicioX + 2, yPos + 3.5);
+  }
+  yPos += alturaConclusion;
+
+  // === SECCIÓN 5: RECOMENDACIONES ===
+  if (datosFinales.recomendaciones) {
+    yPos = dibujarHeaderSeccion("5. RECOMENDACIONES", yPos, 5);
+
+    // Procesar recomendaciones
+    const items = procesarRecomendaciones(datosFinales.recomendaciones);
+    
+    // Calcular altura necesaria para todas las recomendaciones (mínimo 20mm)
+    const alturaMinimaRecomendaciones = 20;
+    let alturaTotalRecomendaciones = 0;
+    items.forEach(item => {
+      const lineas = doc.splitTextToSize(item, anchoDisponibleHallazgos - 5);
+      alturaTotalRecomendaciones += Math.max(alturaMinimaRecomendaciones, lineas.length * 3.5 + 2);
+    });
+
+    const alturaRecomendaciones = Math.max(alturaMinimaRecomendaciones, alturaTotalRecomendaciones);
+
+    // Dibujar líneas de la fila dinámica
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRecomendaciones);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRecomendaciones);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + alturaRecomendaciones, tablaInicioX + tablaAncho, yPos + alturaRecomendaciones);
+
+    // Contenido de recomendaciones
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    let yActualRecomendaciones = yPos + 3.5;
+    items.forEach((item) => {
       // Viñeta
-      doc.setFont("helvetica", "normal").setFontSize(9);
-      doc.text("-", recomendacionesX - 5, y + index * 3, { baseline: "top" });
-
-      // Texto del item
-      const lines = doc.splitTextToSize(item, recomendacionesMaxWidth - 5);
-      lines.forEach((line, lineIndex) => {
-        doc.text(line, recomendacionesX, y + index * 3 + lineIndex * 2.5, {
-          baseline: "top",
-        });
+      doc.text("-", tablaInicioX + 2, yActualRecomendaciones);
+      
+      // Texto del item (puede ser multilínea)
+      const lineas = doc.splitTextToSize(item, anchoDisponibleHallazgos - 5);
+      lineas.forEach((line, lineIndex) => {
+        doc.text(line, tablaInicioX + 7, yActualRecomendaciones + lineIndex * 3.5);
       });
-
-      y += lines.length * 2.5;
+      
+      yActualRecomendaciones += Math.max(alturaMinimaRecomendaciones - 3.5, lineas.length * 3.5);
     });
 
-    y += 5;
+    yPos += alturaRecomendaciones;
   }
 
-  // -------------------------------
-  // 10) Línea divisoria después de recomendaciones
-  const lineaRecomendacionesY = y;
-  doc.setLineWidth(0.3);
-  doc.line(
-    lineaDivisoriaX,
-    lineaRecomendacionesY,
-    lineaDivisoriaX + lineaDivisoriaW,
-    lineaRecomendacionesY
-  );
-  y += 10;
+  // === SECCIÓN 6: FIRMA Y SELLO DEL MÉDICO ===
+  const alturaSeccionFirma = 30; // Altura para la sección de firma
+  const yFirmas = yPos;
 
-  // -------------------------------
-  // 11) Firma y Sello del Evaluador
-  const firmaSelloX = pageW - margin - 80; // Posición a la derecha
-  const firmaSelloY = y;
+  // Dibujar líneas de la sección de firma (bordes)
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.line(tablaInicioX, yFirmas, tablaInicioX, yFirmas + alturaSeccionFirma); // Línea izquierda
+  doc.line(tablaInicioX + tablaAncho, yFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirma); // Línea derecha
+  doc.line(tablaInicioX, yFirmas, tablaInicioX + tablaAncho, yFirmas); // Línea superior
+  doc.line(tablaInicioX, yFirmas + alturaSeccionFirma, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirma); // Línea inferior
 
-  const firmasAPintar = [
-    {
-      nombre: "SELLOFIRMA",
-      x: firmaSelloX,
-      y: firmaSelloY,
-      maxw: 50,
-    },
-  ];
+  // === SELLO Y FIRMA DEL MÉDICO (CENTRADO) ===
+  const firmaMedicoY = yFirmas + 3;
+  const centroX = tablaInicioX + tablaAncho / 2; // Centro de la tabla
 
-  // Validar que data.informacionSede exista antes de acceder a sus propiedades
-  const digitalizacion = data?.digitalizacion || [];
-  agregarFirmas(doc, digitalizacion, firmasAPintar).then(() => {
-    imprimir(doc);
-  });
+  // Agregar firma y sello médico
+  const firmaMedicoUrl = getSign(data, "SELLOFIRMA");
+  if (firmaMedicoUrl) {
+    try {
+      const imgWidth = 45;
+      const imgHeight = 20;
+      const x = centroX - (imgWidth / 2); // Centrar horizontalmente
+      const y = firmaMedicoY;
+      doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando firma del médico:", error);
+    }
+  }
+
+  // Texto debajo de la firma
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text("Sello y Firma del Médico", centroX, yFirmas + 26, { align: "center" });
+
+  yPos += alturaSeccionFirma;
+
+  // === FOOTER ===
+  footerTR(doc, { footerOffsetY: 8 });
+
+  // === Imprimir ===
+  imprimir(doc);
 }
 
 // -------------------------------
@@ -290,53 +429,4 @@ function imprimir(doc) {
   iframe.src = url;
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
-}
-
-function agregarFirmas(doc, digitalizacion = [], firmasAPintar = []) {
-  const addSello = (imagenUrl, x, y, maxw = 100) => {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = imagenUrl;
-      img.onload = () => {
-        const sigH = 35; // alto máximo
-        const maxW = maxw; // ancho máximo como parámetro
-        const baseX = x;
-        const baseY = y;
-
-        let imgW = img.width;
-        let imgH = img.height;
-
-        // Escala proporcional en base a ancho y alto máximos
-        const scale = Math.min(maxW / imgW, sigH / imgH, 1);
-        imgW *= scale;
-        imgH *= scale;
-
-        // Ahora el ancho se adapta
-        const sigW = imgW;
-
-        // Centrar la imagen
-        const imgX = baseX + (sigW - imgW) / 2;
-        const imgY = baseY + (sigH - imgH) / 2;
-
-        doc.addImage(imagenUrl, "PNG", imgX, imgY, imgW, imgH);
-        resolve();
-      };
-      img.onerror = (e) => {
-        console.error("Error al cargar la imagen:", e);
-        resolve();
-      };
-    });
-  };
-
-  const firmas = digitalizacion.reduce(
-    (acc, d) => ({ ...acc, [d.nombreDigitalizacion]: d.url }),
-    {}
-  );
-
-  const promesasFirmas = firmasAPintar
-    .filter((f) => firmas[f.nombre])
-    .map((f) => addSello(firmas[f.nombre], f.x, f.y, f.maxw));
-
-  return Promise.all(promesasFirmas);
 }

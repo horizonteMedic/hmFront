@@ -15,13 +15,13 @@ import { getToday } from "../../../../utils/helpers";
 import { useForm } from "../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./Anexo16AController";
 import Swal from "sweetalert2";
+import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "anexo16a";
 const today = getToday();
 
 export default function Anexo16A() {
-  const { token, userlogued, selectedSede, datosFooter, userName, userDNI, userCMP, userDireccion } =
-    useSessionData();
+  const { token, userlogued, selectedSede, datosFooter, userName, userDireccion } = useSessionData();
 
   const initialFormState = {
     norden: "",
@@ -42,9 +42,6 @@ export default function Anexo16A() {
     temperatura: "",
     peso: "",
     talla: "",
-    medicoNombre: userName,
-    medicoDNI: userDNI,
-    medicoCmp: userCMP,
     medicoDireccion: userDireccion,
     cirugiaMayor: false,
     desordenesCoagulacion: false,
@@ -91,6 +88,10 @@ export default function Anexo16A() {
     obesidadMorbidaRed: false,
     hipertensionRed: false,
     problemasOftalmologicosRed: false,
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   }
   const {
     form,
@@ -279,12 +280,11 @@ export default function Anexo16A() {
 
           {/* Médico */}
           <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-3">Médico</h4>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-              <InputTextOneLine label="Nombre completo" name="medicoNombre" value={form?.medicoNombre} disabled className="uppercase" />
-              <InputTextOneLine label="CMP" name="medicoCmp" value={form?.medicoCmp} disabled className="uppercase" />
-              <InputTextOneLine label="Dirección" name="medicoDireccion" value={form?.medicoDireccion} disabled className="uppercase" />
-            </div>
+           <EmpleadoComboBox
+                value={form.nombre_medico}
+                form={form}
+                onChange={handleChangeSimple}
+              />
           </div>
 
           {/* Antecedentes Médicos */}
@@ -330,10 +330,10 @@ export default function Anexo16A() {
                   <InputsBooleanRadioGroup
                     name="embarazo"
                     value={form?.embarazo}
-                    onChange={(e, value) => { if (value == false) setForm(prev => ({ ...prev, furDescripcion: "" })); handleRadioButtonBoolean(e, value) }}
+                    onChange={handleRadioButtonBoolean}
                   />
                 </div>
-                <InputTextOneLine label="FUR" name="furDescripcion" value={form?.furDescripcion} onChange={handleChange} disabled={!form.embarazo} />
+                <InputTextOneLine label="FUR" name="furDescripcion" value={form?.furDescripcion} onChange={handleChange} />
                 <div className="flex items-center justify-between">
                   <span>Problemas Neurológicos: Epilepsia, vértigo, etc</span>
                   <InputsBooleanRadioGroup

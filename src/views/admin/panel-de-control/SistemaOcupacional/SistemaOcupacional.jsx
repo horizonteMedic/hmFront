@@ -262,41 +262,41 @@ const TabComponent = () => {
               {(() => {
                 const items = [
                   { vista: "Admision", tab: 0, icons: [{ icon: faUserCheck }], label: "Admisión" },
-                  { vista: "Triaje", tab: 1, icons: [{ icon: faStethoscope }], label: "Triaje" },
-                  { vista: "Laboratorio Clinico", tab: 2, icons: [{ icon: faVial }], label: "Laboratorio" },
-                  { vista: "Historia Ocupacional", tab: 16, icons: [{ icon: faFileWaveform }], label: "Historia Ocupacional" },
+                  { vista: "Anexo 16", tab: 27, icons: [{ icon: fa1 }, { icon: fa6 }], label: "Anexo 16" },
+                  { vista: "Anexo 16 A", tab: 28, icons: [{ icon: fa1 }, { icon: fa6 }, { icon: faA, className: "ml-2" }], label: "Anexo 16 A" },
+                  { vista: "Anexo 2", tab: 26, icons: [{ icon: fa2 }], label: "Anexo 2" },
+                  { vista: "Antecedentes de Altura", tab: 25, icons: [{ icon: faMountain }], label: "Antecedentes de Altura" },
+                  { vista: "Antecedentes Patologicos", tab: 29, icons: [{ icon: faBacterium }], label: "Antecedentes Patológicos" },
+                  { vista: "Audiometria", tab: 15, icons: [{ icon: faDeaf }], label: "Audiometría" },
+                  { vista: "Constancia Certificado Medico Ocupacional", tab: 34, icons: [{ icon: faSuitcaseMedical }], label: "Certificado Medico Ocupacional" },
                   { vista: "Coproparasitologico", tab: 3, icons: [{ icon: faClipboardList }], label: "Coproparasitológico" },
-                  { vista: "Psicologia", tab: 10, icons: [{ icon: faUserMd }], label: "Psicología" },
-                  { vista: "Medicina General", tab: 11, icons: [{ icon: faUserMd }], label: "Medicina General" },
-                  { vista: "Rayos X", tab: 12, icons: [{ icon: faXRay }], label: "Rayos X" },
+                  { vista: "Cuestionario Nordico", tab: 21, icons: [{ icon: faSkiingNordic }], label: "Cuestionario Nordico" },
                   { vista: "EKG", tab: 13, icons: [{ icon: faHeartbeat }], label: "EKG" },
                   { vista: "Espirometria", tab: 14, icons: [{ icon: faLungs }], label: "Espirometría" },
-                  { vista: "Audiometria", tab: 15, icons: [{ icon: faDeaf }], label: "Audiometría" },
+                  { vista: "Evaluación Musculoesquelética", tab: 22, icons: [{ icon: faSkull }], label: "Evaluación Musculoesquelética" },
+                  { vista: "Ficha Certificado de Altura", tab: 33, icons: [{ icon: faStairs }], label: "Ficha Certificado de Trabajos en Altura" },
+                  { vista: "Ficha Conduccion de Vehiculos", tab: 32, icons: [{ icon: faCarSide }], label: "Ficha de Conducción de Vehiculos" },
+                  { vista: "Ficha Interconsulta", tab: 35, icons: [{ icon: faTruckMedical }], label: "Ficha Interconsulta" },
+                  { vista: "Ficha SAS", tab: 31, icons: [{ icon: faMoon }], label: "Ficha S.A.S." },
+                  { vista: "Fichas Aptitud", tab: 30, icons: [{ icon: faFileMedical }], label: "Fichas Aptitud" },
+                  { vista: "Historia Ocupacional", tab: 16, icons: [{ icon: faFileWaveform }], label: "Historia Ocupacional" },
+                  { vista: "Laboratorio Clinico", tab: 2, icons: [{ icon: faVial }], label: "Laboratorio" },
+                  { vista: "Medicina General", tab: 11, icons: [{ icon: faUserMd }], label: "Medicina General" },
+                  { vista: "Modulo de Consentimientos", tab: 20, icons: [{ icon: faCheckToSlot }], label: "Modulo de Consentimientos" },
                   { vista: "Odontologia", tab: 18, icons: [{ icon: faTooth }], label: "Odontología" },
                   { vista: "Oftalmologia", tab: 17, icons: [{ icon: faEye }], label: "Oftalmología" },
                   { vista: "OIT", tab: 19, icons: [{ icon: faAnchor }], label: "OIT" },
-                  { vista: "Modulo de Consentimientos", tab: 20, icons: [{ icon: faCheckToSlot }], label: "Modulo de Consentimientos" },
-                  { vista: "Cuestionario Nordico", tab: 21, icons: [{ icon: faSkiingNordic }], label: "Cuestionario Nordico" },
-                  { vista: "Evaluación Musculoesquelética", tab: 22, icons: [{ icon: faSkull }], label: "Evaluación Musculoesquelética" },
+                  { vista: "Playground", tab: 24, icons: [{ icon: faGamepad }], label: "Playground" },
+                  { vista: "Poderosa", tab: 37, icons: [{ icon: faPersonRifle }], label: "Poderosa" },
+                  { vista: "Psicologia", tab: 10, icons: [{ icon: faUserMd }], label: "Psicología" },
+                  { vista: "Rayos X", tab: 12, icons: [{ icon: faXRay }], label: "Rayos X" },
                   { vista: "Test Fatiga", tab: 23, icons: [{ icon: faBed }], label: "Test Fatiga y Somnolencia" },
-                  { vista: "Antecedentes de Altura", tab: 25, icons: [{ icon: faMountain }], label: "Antecedentes de Altura" },
-                  { vista: "Anexo 2", tab: 26, icons: [{ icon: fa2 }], label: "Anexo 2" },
-                  { vista: "Anexo 16", tab: 27, icons: [{ icon: fa1 }, { icon: fa6 }], label: "Anexo 16" },
-                  { vista: "Anexo 16 A", tab: 28, icons: [{ icon: fa1 }, { icon: fa6 }, { icon: faA, className: "ml-2" }], label: "Anexo 16 A" },
-                  { vista: "Antecedentes Patologicos", tab: 29, icons: [{ icon: faBacterium }], label: "Antecedentes Patológicos" },
-                  { vista: "Fichas Aptitud", tab: 30, icons: [{ icon: faFileMedical }], label: "Fichas Aptitud" },
-                  { vista: "Ficha SAS", tab: 31, icons: [{ icon: faMoon }], label: "Ficha S.A.S." },
-                  { vista: "Ficha Conduccion de Vehiculos", tab: 32, icons: [{ icon: faCarSide }], label: "Ficha de Conducción de Vehiculos" },
-                  { vista: "Ficha Certificado de Altura", tab: 33, icons: [{ icon: faStairs }], label: "Ficha Certificado de Trabajos en Altura" },
-                  { vista: "Constancia Certificado Medico Ocupacional", tab: 34, icons: [{ icon: faSuitcaseMedical }], label: "Certificado Medico Ocupacional" },
-                  { vista: "Ficha Interconsulta", tab: 35, icons: [{ icon: faTruckMedical }], label: "Ficha Interconsulta" },
+                  { vista: "Triaje", tab: 1, icons: [{ icon: faStethoscope }], label: "Triaje" },
                   { vista: "Uso de Respiradores", tab: 36, icons: [{ icon: faMaskVentilator }], label: "Uso de Respiradores" },
                   // { vista: "Certificado Trabajos en Caliente", tab: 37, icons: [{ icon: faFireFlameCurved }], label: "Certificado Trabajos en Caliente" },
                   // { vista: "Licencia Interna", tab: 38, icons: [{ icon: faIdCard }], label: "Licencia Interna" },
                   // { vista: "Certificado Altura Poderosa", tab: 39, icons: [{ icon: faP }], label: "Certificado Altura Poderosa" },
                   // { vista: "Certificado Aptitud Poderosa", tab: 40, icons: [{ icon: faP }], label: "Certificado Aptitud Poderosa" },
-                  { vista: "Poderosa", tab: 37, icons: [{ icon: faPersonRifle }], label: "Poderosa" },
-                  { vista: "Playground", tab: 24, icons: [{ icon: faGamepad }], label: "Playground" },
                 ];
                 return items
                   .filter((item) => tieneVista(item.vista))
@@ -543,10 +543,7 @@ const TabComponent = () => {
               <div className={styles.labContent}>
                 {labTab === 0 && (
                   <LaboratorioClinico
-                    token={token}
-                    selectedSede={selectSede}
-                    userlogued={userlogued.sub}
-                    permiso={tienePermisoEnVista}
+                    tieneVista={tieneVista}
                   />
                 )}
                 {labTab === 1 && (
@@ -666,7 +663,7 @@ const TabComponent = () => {
             const displayedInterfaces = {
               1: { title: "Triaje", child: <Triaje token={token} selectedSede={selectSede} /> },
               3: { title: "Coproparasitológico", child: <ParasitologiaCoprologico /> },
-              4: { title: "Laboratorio Clínico", child: <LaboratorioClinico /> },
+              // 4: { title: "Laboratorio Clínico", child: <LaboratorioClinico/> },
               5: { title: "Análisis Bioquímicos", child: <LaboratorioAnalisisBioquimicos /> },
               6: {
                 title: "Consentimientos", child: (

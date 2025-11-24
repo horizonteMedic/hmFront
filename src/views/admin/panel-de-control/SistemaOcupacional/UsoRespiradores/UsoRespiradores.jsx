@@ -90,9 +90,9 @@ export default function UsoRespiradores() {
     expArsenico: false,
     expAmoniaco: false,
     expPlomo: false,
-    expPolvoRespirable: false,
+    expPolvoRespirable: true,
     expAsbesto: false,
-    expSilice: false,
+    expSilice: true,
     expDpm: false,
     expMercurio: false,
     expMonoxidoCarbono: false,
@@ -100,9 +100,9 @@ export default function UsoRespiradores() {
     expOtros: false,
 
     // Condiciones Especiales de Trabajo
-    elevacionesAltas: false,
-    temperaturasExtremas: false,
-    atmosferasHumidas: false,
+    elevacionesAltas: true,
+    temperaturasExtremas: true,
+    atmosferasHumidas: true,
     espaciosConfirmados: false,
     atmosferasIDLH: false,
     hazmatFuegoRescate: false,
@@ -432,7 +432,7 @@ export default function UsoRespiradores() {
                 </button>
               </div>
               <div className="flex flex-col items-end">
-                <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+                <span className="font-bold italic text-base mb-1">Imprimir</span>
                 <div className="flex items-center gap-2">
                   <input
                     name="norden"

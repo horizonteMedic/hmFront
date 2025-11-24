@@ -8,16 +8,16 @@ import {
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import { useForm } from "../../../../hooks/useForm";
-import MedicoSearch from "../../../../components/reusableComponents/MedicoSearch";
 import Mallampati from "../../../../../../public/img/Mallampati.jpg"
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaSas";
 import Swal from "sweetalert2";
+import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "ficha_sas"
 const today = getToday();
 
 export default function FichaSas() {
-    const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+    const { token, userlogued, selectedSede, datosFooter, userName, userDNI } =
         useSessionData();
 
     const initialFormState = {
@@ -86,7 +86,7 @@ export default function FichaSas() {
         cuello_mujer_normal: true, // true para SI, false para NO
         presion_sistolica: "",
         presion_diastolica: "",
-        hta_nueva: true, // true para SI, false para NO
+        hta_nueva: false, // true para SI, false para NO
 
         // Evaluación de vía aérea superior MALLAMPATI
         mallampati_grado: "1", // "1", "2", "3", "4"
@@ -114,8 +114,11 @@ export default function FichaSas() {
 
         observaciones: "",
 
-        dniUsuario: userCompleto?.datos?.dni_user,
-        nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
+        dniUsuario: userDNI,
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
     };
 
     const {
@@ -1015,12 +1018,10 @@ export default function FichaSas() {
             {/* Médico y Botones */}
             <div className="grid grid-cols-1 gap-6">
                 <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
-                    <InputTextOneLine
-                        label="Médico que Certifica"
-                        labelOnTop
+                    <EmpleadoComboBox
                         value={form.nombre_medico}
-                        name="nombre_medico"
-                        disabled
+                        form={form}
+                        onChange={handleChangeSimple}
                     />
                     <InputTextArea
                         label="Observaciones"
@@ -1049,7 +1050,7 @@ export default function FichaSas() {
                         </button>
                     </div>
                     <div className="flex flex-col items-end">
-                        <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+                        <span className="font-bold italic text-base mb-1">Imprimir</span>
                         <div className="flex items-center gap-2">
                             <input
                                 name="norden"

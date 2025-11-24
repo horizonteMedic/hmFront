@@ -144,7 +144,7 @@ const header_ReporteOftalmologico = (doc, datos = {}) => {
   const fichaDato = `${datos.norden || "97800"}`;
   const fichaY = sedeY + 8;
   const fichaX = pageW - margin - 20;
-  doc.setFont("helvetica", "bold").setFontSize(18);
+  doc.setFont("helvetica", "normal").setFontSize(18);
   doc.text(fichaDato, fichaX, fichaY + 1, { align: "right" });
   // Título perfectamente centrado
   doc.setFont("helvetica", "bold").setFontSize(13);

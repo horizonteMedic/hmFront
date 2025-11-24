@@ -14,7 +14,7 @@ const today = getToday();
 export default function FichaPsicologica3() {
   const [activeTab, setActiveTab] = useState(0);
 
-  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+  const { token, userlogued, selectedSede, datosFooter } =
     useSessionData();
 
   const initialFormState = {

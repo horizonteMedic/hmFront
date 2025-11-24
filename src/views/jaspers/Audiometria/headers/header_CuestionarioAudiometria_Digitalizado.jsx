@@ -171,7 +171,7 @@ const header_FichaAudiologica_Maqueta = (doc,datos) => {
   
   // Agregar label "N° Ficha:" antes del valor
   doc.text("N° Ficha:", fichaLabelX, fichaY + 1, { align: "left" });
-  doc.setFont("helvetica", "bold").setFontSize(18);
+  doc.setFont("helvetica", "normal").setFontSize(18);
   doc.text(fichaDato, fichaX, fichaY + 1, { align: "right" });
 
   // === Datos del paciente con posicionamiento libre ===

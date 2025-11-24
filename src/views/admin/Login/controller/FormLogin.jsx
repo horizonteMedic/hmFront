@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import SubmitLogin from "../model/SubmitLogin";
 import EstadoSolicitud from "./EstadoLogin";
 import { useAuthStore } from "../../../../store/auth";
@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { Loading } from "../../../components/Loading";
 import Errors from "../../../components/Errors";
-import Swal from "sweetalert2";
+// import Swal from "sweetalert2"; // Deshabilitado temporalmente
 import { getFetch } from "../../panel-de-control/getFetch/getFetch";
 
 export function FormLogin() {
@@ -22,82 +22,57 @@ export function FormLogin() {
   const setlistView = useAuthStore((state) => state.setlistView);
   const setlistAccesos = useAuthStore((state) => state.setlistAccesos);
   const setdatosFooter = useAuthStore((state) => state.setdatosFooter);
+  const setListaEmpleados = useAuthStore((state) => state.setListaEmpleados);
   const [loading, setloadign] = useState(false);
   const [errormess, setErrormess] = useState("");
 
-  // Estilos para el Toast
-  const toastStyles = {
-    container: {
-      fontSize: "13px",
-      lineHeight: "1.5",
-    },
-    title: {
-      textAlign: "center", // Centrado
-      fontWeight: "bold",
-      marginBottom: "10px",
-    },
-    paragraph: {
-      textAlign: "justify", // Justificado
-      marginBottom: "10px",
-    },
-    textStart: {
-      textAlign: "start", // Alineado a la izquierda
-      marginBottom: "5px",
-    },
-  };
+  // Estilos y configuración del Toast deshabilitados temporalmente
+  // const toastStyles = {
+  //   container: {
+  //     fontSize: "13px",
+  //     lineHeight: "1.5",
+  //   },
+  //   title: {
+  //     textAlign: "center",
+  //     fontWeight: "bold",
+  //     marginBottom: "10px",
+  //   },
+  //   paragraph: {
+  //     textAlign: "justify",
+  //     marginBottom: "10px",
+  //   },
+  //   textStart: {
+  //     textAlign: "start",
+  //     marginBottom: "5px",
+  //   },
+  // };
 
-  const Toast = Swal.mixin({
-    toast: false,
-    position: "center",
-    showConfirmButton: true,
-    confirmButtonText: "De Acuerdo!",
-    confirmButtonColor: "#233245",
-    showCloseButton: true,
-    width: "600px",
-    timerProgressBar: true,
-    backdrop: `rgba(0, 0, 0, 0.6)`, // Fondo opaco
-    customClass: {
-      popup: "swal2-toast-style", // Clase personalizada para el popup
-    },
-    didOpen: (popup) => {
-      popup.onmouseenter = Swal.stopTimer;
-      popup.onmouseleave = Swal.resumeTimer;
-    },
-  });
+  // const Toast = Swal.mixin({
+  //   toast: false,
+  //   position: "center",
+  //   showConfirmButton: true,
+  //   confirmButtonText: "De Acuerdo!",
+  //   confirmButtonColor: "#233245",
+  //   showCloseButton: true,
+  //   width: "600px",
+  //   timerProgressBar: true,
+  //   backdrop: `rgba(0, 0, 0, 0.6)`,
+  //   customClass: {
+  //     popup: "swal2-toast-style",
+  //   },
+  //   didOpen: (popup) => {
+  //     popup.onmouseenter = Swal.stopTimer;
+  //     popup.onmouseleave = Swal.resumeTimer;
+  //   },
+  // });
 
   function Loginvnigate(token) {
     if (token !== null) {
       navigate("/panel-de-control");
-      Toast.fire({
-        html: `
-          <div style="font-size: ${toastStyles.container.fontSize}; line-height: ${toastStyles.container.lineHeight};">
-            <div style="text-align: center; margin-bottom: 10px;">
-              <img src="/img/logo-color.png" alt="Horizonte Medic" style="width: 150px; margin-bottom: 15px;" />
-            </div>
-            <p style="text-align: ${toastStyles.title.textAlign}; font-weight: ${toastStyles.title.fontWeight}; margin-bottom: ${toastStyles.title.marginBottom};">
-              COMUNICADO MATRIZ / MALLA OCOPACIONAL
-            </p>
-            <p style="text-align: ${toastStyles.textStart.textAlign}; font-weight: bold; margin-bottom: ${toastStyles.textStart.marginBottom};">
-              Estimados usuarios:
-            </p>
-            <p style="text-align: ${toastStyles.paragraph.textAlign}; margin-bottom: ${toastStyles.paragraph.marginBottom};">
-              Se les comunica que, a partir del 23 de enero del 2025, la matriz/malla ocupacional
-              está disponible para visualización y descarga en el apartado de matriz. También
-              indicarles que el manual de usuario está disponible para su descarga.
-            </p>
-            <p style="text-align: ${toastStyles.textStart.textAlign}; margin-bottom: ${toastStyles.textStart.marginBottom};">
-              Estamos trabajando para brindar un mejor servicio.
-            </p>
-            <p style="text-align: ${toastStyles.textStart.textAlign}; margin-top: 15px; margin-bottom: ${toastStyles.textStart.marginBottom};">
-              Atentamente,
-            </p>
-            <p style="text-align: ${toastStyles.textStart.textAlign}; margin-bottom: ${toastStyles.textStart.marginBottom};">
-              Área de Sistemas Horizonte Medic
-            </p>
-
-          </div>
-        `,
-      });
+      // Comunicado de matriz/malla ocupacional deshabilitado temporalmente
+      // Toast.fire({
+      //   html: `...`,
+      // });
     }
   }
   
@@ -121,11 +96,19 @@ export function FormLogin() {
       ...UserLogued,
       sedes: ListSedesxUser  // o usa el nombre que desees
     };
-    const datosFooter=await getFetch(`/api/v01/st/registros/obtenerInformacionSedes`,token)
+    const datosFooter=await getFetch(`/api/v01/st/registros/obtenerInformacionSedes`,token) 
+    let listaEmpleados=await getFetch(`/api/v01/st/empleado/listadoUsuarioEmpleado`,token)
+    if(listaEmpleados){
+      listaEmpleados = listaEmpleados.map(item => ({
+        ...item,
+        nombres: item.nombres ? item.nombres.toUpperCase() : ""
+      }))
+    }
     // console.log("datosFooter",datosFooter)
     setdatosFooter(datosFooter)
     setlistView(todasLasVistas);
     setlistAccesos(todosLosPermisos)
+    setListaEmpleados(listaEmpleados)
     setuserlogued(userConSedes);
     setToken(token);
     Loginvnigate(token);

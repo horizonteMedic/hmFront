@@ -8,11 +8,13 @@ export const useAuthStore = create(
     userlogued: null,
     listView: [],
     listAccesos: [],
+    listaEmpleados: [],
     datosFooter:null,
     setdatosFooter: (datosFooter) => set({datosFooter}),
     setlistView: (listView) => set({listView}),
     setlistAccesos: (listAccesos) => set({listAccesos}),
     setuserlogued: (userlogued) => set({userlogued}),
+    setListaEmpleados: (listaEmpleados) => set({listaEmpleados}),
     setToken: (token) => set({token}),
     }),
     {

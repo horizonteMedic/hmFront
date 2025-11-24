@@ -122,6 +122,7 @@ export const SubmitDataService = async (
     quimicos: form.quimicos,
     electricos: form.electricos,
     vibraciones: form.vibraciones,
+    usuarioFirma: form.user_medicoFirma,
     examenRadiograficoSanguineo: {
       codigoExamenRadiograficoSanguineo: form.codigoExamenRadiograficoSanguineo,
       nrx: form.numeroRx,
@@ -850,6 +851,7 @@ export const GetInfoServicio = (
             data.observacionesGenerales +=
               data.contador + "-" + "NO PASO EXAMEN DE ESPIROMETRIA.\n";
             data.contador++;
+            data.conclusionRespiratoria = interpretacionEspirometria;
           } else {
             if (
               interpretacionEspirometria &&
@@ -1718,6 +1720,8 @@ export const GetInfoServicioEditar = (
             res.anillosInguinalesAnexo7c_txtanillosinguinales ?? "";
           data.organosGenitales =
             res.organosGenitalesAnexo7c_txtorganosgenitales ?? "";
+
+          data.user_medicoFirma = res.usuarioFirma;
 
           // Tacto rectal examination
           data.tactoRectal = res.tactoRectalNoHizoAnexo7c_rbtnohizo

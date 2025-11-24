@@ -48,6 +48,7 @@ const Especialidades = [
   "Audiometria"
 ]
 
+
 export default function FichaInterconsulta() {
 
     const { token, userlogued, selectedSede, datosFooter, userCompleto } =
@@ -82,7 +83,7 @@ export default function FichaInterconsulta() {
         cmpUsuario: "",
         direccionClinica: "",
         //Cuadros
-        motivo: "SE SOLICITA EVALUACION POR ESPECIALIDAD PARA DIAGNOSTICO, TRATAMIENTO, CONTROLES POSTERIORES Y DEFINIR APTITUD PARA ELABORAR",
+        motivo: "SE SOLICITA EVALUACION POR ESPECIALIDAD PARA DIAGNOSTICO, TRATAMIENTO, CONTROLES POSTERIORES Y DEFINIR APTITUD PARA LABORAR",
         hallazgo: "",
         diagnostico: "",
         tratamiento: "",
@@ -481,7 +482,7 @@ export default function FichaInterconsulta() {
                                     </button>
                                 </div>
                                 <div className="flex justify-center gap-1 text-center p-2 border items-center">
-                                    <span className="font-bold italic text-base mb-1 mx-4">IMPRIMIR</span>
+                                    <span className="font-bold italic text-base mb-1 mx-4">Imprimir</span>
                                     <div className="flex items-center gap-2">
                                         <input
                                             name="norden"

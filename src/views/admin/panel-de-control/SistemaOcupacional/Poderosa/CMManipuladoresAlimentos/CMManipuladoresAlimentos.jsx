@@ -44,6 +44,7 @@ export default function CMManipuladoresAlimentos() {
 
     // Recomendaciones
     recomendaciones: "",
+    observaciones: ""
   };
 
   const {
@@ -57,7 +58,7 @@ export default function CMManipuladoresAlimentos() {
     handleClearnotO,
     handlePrintDefault,
   } = useForm(initialFormState, { storageKey: "CMManipuladoresAlimentos" });
-  
+
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
@@ -181,13 +182,22 @@ export default function CMManipuladoresAlimentos() {
           <legend className="font-bold mb-2 text-gray-800 text-[10px]">
             Conclusiones Finales
           </legend>
-          <InputTextArea
-            label="Recomendaciones"
-            name="recomendaciones"
-            value={form?.recomendaciones}
-            onChange={handleChange}
-            rows={4}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <InputTextArea
+              label="Observaciones"
+              name="observaciones"
+              value={form?.observaciones}
+              onChange={handleChange}
+              rows={4}
+            />
+            <InputTextArea
+              label="Recomendaciones"
+              name="recomendaciones"
+              value={form?.recomendaciones}
+              onChange={handleChange}
+              rows={4}
+            />
+          </div>
           {/* Médico */}
           <InputTextOneLine
             label="Médico que Certifica"
@@ -216,7 +226,7 @@ export default function CMManipuladoresAlimentos() {
             </button>
           </div>
           <div className="flex flex-col items-end">
-            <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+            <span className="font-bold italic text-base mb-1">Imprimir</span>
             <div className="flex items-center gap-2">
               <input
                 name="norden"

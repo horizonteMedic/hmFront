@@ -2,7 +2,6 @@ import Swal from "sweetalert2";
 import {
   GetInfoPacDefault,
   GetInfoServicioDefault,
-  getInfoTablaDefault,
   LoadingDefault,
   PrintHojaRDefault,
   SubmitDataServiceDefault,
@@ -23,7 +22,7 @@ export const GetInfoServicio = async (
   tabla,
   set,
   token,
-  onFinish = () => {}
+  onFinish = () => { }
 ) => {
   const res = await GetInfoServicioDefault(
     nro,
@@ -60,6 +59,8 @@ export const GetInfoServicio = async (
       conclusiones: res.conclusion ?? "",
       hallazgos: res.hallazgo ?? "",
       recomendaciones: res.recomendaciones ?? "",
+
+      user_medicoFirma: res.usuarioFirma,
     }));
   }
 };
@@ -94,6 +95,8 @@ export const SubmitDataService = async (
     conclusion: form.conclusiones,
     recomendaciones: form.recomendaciones,
     edadPaciente: form.edad?.replace(" años", ""),
+
+    usuarioFirma: form.user_medicoFirma,
     userRegistro: user,
   };
 
@@ -158,15 +161,6 @@ const GetInfoPac = async (nro, set, token, sede) => {
   }
 };
 
-// export const getInfoTabla = (nombreSearch, codigoSearch, setData, token) => {
-//   getInfoTablaDefault(
-//     nombreSearch,
-//     codigoSearch,
-//     setData,
-//     token,
-//     obtenerReporteInfoTablaUrl
-//   );
-// };
 export const getInfoTabla = (
   nombreSearch,
   codigoSearch,

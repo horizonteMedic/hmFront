@@ -55,6 +55,11 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
     observacionesAntecedentes: String(data.otrosDescripcionAntecedentesPatologicos_txtotrosap ?? ""),
     observacionesSintomas: String(data.otrosDescripcionIndicarEnfermedades_txtotros1ap ?? ""),
     observacionesHabitos: String(data.otrosTipoIndicarEnfermedades_txtotros ?? ""),
+    // Datos adicionales para nuevas filas
+    otrosPatologias: String(data.otrosDescripcionAntecedentesPatologicos_txtotrosap ?? ""),
+    especifiqueTratamiento: String(data.especifiqueTratamientoBoro_especifique_detalleenfermedades ?? ""),
+    alergiasMedicamentos: Boolean(data.alergiasAlimentosBoro_alergias_medic_alim ?? false),
+    especifiqueAlergias: String(data.alergiasAlimentosEspecifiqueBoro_alergias_medic_alimdetall ?? ""),
 
     // Mapeo de datos de color
     color: Number(data.color ?? 0),
@@ -178,7 +183,8 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
 
     // Mapeo de antecedentes quirúrgicos
     antecedentesQuirurgicos: (data.antecedentesPatologicosQuirurjicos || []).map(item => ({
-      fechaAntecedentesPatologicosQuirurgicos: String(item.fechaAntecedentesPatologicosQuirurgicos ?? ""),
+      fecha: String(item.fecha ?? item.fechaAntecedentesPatologicosQuirurgicos ?? ""),
+      fechaAntecedentesPatologicosQuirurgicos: String(item.fecha ?? item.fechaAntecedentesPatologicosQuirurgicos ?? ""),
       hospitalOperacion: String(item.hospitalOperacion ?? ""),
       operacion: String(item.operacion ?? ""),
       diasHospitalizado: String(item.diasHospitalizado ?? ""),
@@ -207,7 +213,8 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
     // Mapeo de severidad COVID-19
     severidadCovid: {
       covid19: Boolean(data.covid_chkcovid ?? false),
-      fechaExamen: (data.covid_chkcovid ?? false) ? formatearFechaCorta(data.fechaCovid_fechacovid ?? "") : "",
+      fechaExamen: formatearFechaCorta(data.fechaCovid_fechacovid ?? ""),
+      dosis: String(data.dosisVacunas_txtdosis ?? ""),
       leve: Boolean(data.covidLevel_chkcovidl ?? false),
       moderado: Boolean(data.covidModerado_chkcovidm ?? false),
       severo: Boolean(data.covidSevero_chkcovids ?? false)
@@ -351,7 +358,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
     doc.setLineWidth(0.2);
     
     // Dibujar fondo gris más oscuro
-    doc.setFillColor(160, 160, 160);
+    doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
     
     // Dibujar líneas del header
@@ -377,7 +384,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
     doc.setLineWidth(0.2);
     
     // Dibujar fondo celeste
-    doc.setFillColor(173, 216, 230);
+    doc.setFillColor(199, 241, 255);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
     
     // Dibujar líneas del header
@@ -699,83 +706,171 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
 
   // === FILA INDIVIDUAL COVID-19 ===
   
-  // Dibujar líneas de la fila individual de COVID-19
+  // Obtener datos de COVID-19
+  const covidData = datosFinales.severidadCovid || {};
+  const tieneCovid = covidData.covid19 || false;
+  const tieneFecha = covidData.fechaExamen && covidData.fechaExamen.trim() !== "";
+  const tieneSeveridad = covidData.leve || covidData.moderado || covidData.severo;
+  
+  // Determinar qué mostrar: si hay fecha o severidad, o si COVID está marcado
+  const debeMostrar = tieneCovid || tieneFecha || tieneSeveridad;
+  
+  if (debeMostrar) {
+    // Dibujar líneas de la fila individual de COVID-19
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+    
+    // COVID-19 con mini celda
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("COVID 19", tablaInicioX + 2, yPos + 3.5);
+    
+    // Dibujar mini celda para COVID-19
+    const xCentradaCovid = dibujarMiniCelda(tablaInicioX + 42, yPos, filaAltura);
+    
+    // Cerrar la mini celda de COVID-19 (línea derecha)
+    const anchoMiniCelda = 6;
+    const xFinMiniCelda = tablaInicioX + 44 + anchoMiniCelda;
+    doc.line(xFinMiniCelda, yPos, xFinMiniCelda, yPos + filaAltura);
+    
+    // Marcar X en la mini celda si COVID-19 está marcado
+    if (tieneCovid) {
+      doc.setFont("helvetica", "bold").setFontSize(9);
+      doc.setTextColor(255, 0, 0);
+      doc.text("X", xCentradaCovid, yPos + 3.5);
+      doc.setTextColor(0, 0, 0);
+    }
+    
+    // Calcular posición X inicial para datos adicionales (después de la mini celda)
+    let xActual = xFinMiniCelda + 3;
+    
+    // Mostrar fecha solo si COVID-19 está marcado y tiene fecha
+    if (tieneCovid && tieneFecha) {
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      doc.text("Fecha: " + covidData.fechaExamen, xActual, yPos + 3.5);
+      xActual += doc.getTextWidth("Fecha: " + covidData.fechaExamen) + 5;
+    }
+    
+    // Mostrar severidad solo si COVID-19 está marcado y tiene severidad
+    if (tieneCovid && tieneSeveridad) {
+      // Severidad: Leve
+      if (covidData.leve) {
+        doc.setFont("helvetica", "bold").setFontSize(8);
+        doc.text("Leve (", xActual, yPos + 3.5);
+        xActual += doc.getTextWidth("Leve (");
+        doc.setFont("helvetica", "bold").setFontSize(9);
+        doc.setTextColor(255, 0, 0);
+        doc.text("X", xActual, yPos + 3.5);
+        doc.setTextColor(0, 0, 0);
+        xActual += doc.getTextWidth("X") + 1;
+        doc.setFont("helvetica", "bold").setFontSize(8);
+        doc.text(")", xActual, yPos + 3.5);
+        xActual += doc.getTextWidth(")") + 3;
+      }
+      
+      // Severidad: Moderado
+      if (covidData.moderado) {
+        doc.setFont("helvetica", "bold").setFontSize(8);
+        doc.text("Moderado (", xActual, yPos + 3.5);
+        xActual += doc.getTextWidth("Moderado (");
+        doc.setFont("helvetica", "bold").setFontSize(9);
+        doc.setTextColor(255, 0, 0);
+        doc.text("X", xActual, yPos + 3.5);
+        doc.setTextColor(0, 0, 0);
+        xActual += doc.getTextWidth("X") + 1;
+        doc.setFont("helvetica", "bold").setFontSize(8);
+        doc.text(")", xActual, yPos + 3.5);
+        xActual += doc.getTextWidth(")") + 3;
+      }
+      
+      // Severidad: Severo
+      if (covidData.severo) {
+        doc.setFont("helvetica", "bold").setFontSize(8);
+        doc.text("Severo (", xActual, yPos + 3.5);
+        xActual += doc.getTextWidth("Severo (");
+        doc.setFont("helvetica", "bold").setFontSize(9);
+        doc.setTextColor(255, 0, 0);
+        doc.text("X", xActual, yPos + 3.5);
+        doc.setTextColor(0, 0, 0);
+        xActual += doc.getTextWidth("X") + 1;
+        doc.setFont("helvetica", "bold").setFontSize(8);
+        doc.text(")", xActual, yPos + 3.5);
+      }
+    }
+    
+    yPos += filaAltura;
+  }
+
+  // === FILA ADICIONAL: OTROS ===
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   
-  // COVID-19 con mini celda
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Otros:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("COVID 19", tablaInicioX + 2, yPos + 3.5);
+  doc.text(formatearTextoGramatical(datosFinales.otrosPatologias || ""), tablaInicioX + 15, yPos + 3.5);
+  yPos += filaAltura;
+
+  // === FILA ADICIONAL: ESPECIFIQUE DETALLES DE LA PATOLOGÍA O TRATAMIENTO MARCADA ===
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   
-  // Dibujar mini celda para COVID-19
-  const xCentradaCovid = dibujarMiniCelda(tablaInicioX + 42, yPos, filaAltura);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Especifique detalles de la patología o tratamiento marcada:", tablaInicioX + 2, yPos + 3.5);
+  yPos += filaAltura;
+
+  // === FILA ADICIONAL: ESPECIFIQUE (TRATAMIENTO) ===
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   
-  // Cerrar la mini celda de COVID-19 (línea derecha) - usando el mismo ancho que la función
-  const anchoMiniCelda = 6; // Mismo ancho que en dibujarMiniCelda
-  doc.line(tablaInicioX + 44 + anchoMiniCelda, yPos, tablaInicioX + 44 + anchoMiniCelda, yPos + filaAltura);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Especifique:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTextoGramatical(datosFinales.especifiqueTratamiento || ""), tablaInicioX + 25, yPos + 3.5);
+  yPos += filaAltura;
+
+  // === FILA ADICIONAL: ALERGIAS A MEDICAMENTOS / ALIMENTOS SI/NO ===
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   
-  // Marcar X en la mini celda si COVID-19 está marcado
-  if (datosFinales.severidadCovid && datosFinales.severidadCovid.covid19) {
-    doc.setFont("helvetica", "bold").setFontSize(9);
-    doc.setTextColor(255, 0, 0);
-    doc.text("X", xCentradaCovid, yPos + 3.5);
-    doc.setTextColor(0, 0, 0);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Alergias a Medicamentos / Alimentos", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  
+  // Marcar SI si corresponde
+  if (datosFinales.alergiasMedicamentos) {
+    doc.text("SI (  X  )", tablaInicioX + 80, yPos + 3.5);
+  } else {
+    doc.text("SI (      )", tablaInicioX + 80, yPos + 3.5);
   }
   
-  // Mostrar fecha y severidad si COVID-19 está marcado
-  if (datosFinales.severidadCovid && datosFinales.severidadCovid.covid19) {
-    // Fecha de COVID-19
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text("Fecha:", tablaInicioX + 60, yPos + 3.5);
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    const fechaCovid = datosFinales.severidadCovid.fechaExamen || "";
-    doc.text(fechaCovid, tablaInicioX + 75, yPos + 3.5);
-    
-    // Severidad: Leve
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text("Leve (", tablaInicioX + 100, yPos + 3.5);
-    doc.setFont("helvetica", "bold").setFontSize(9);
-    if (datosFinales.severidadCovid.leve) {
-      doc.setTextColor(255, 0, 0);
-      doc.text("X", tablaInicioX + 111, yPos + 3.5);
-      doc.setTextColor(0, 0, 0);
-    } else {
-      doc.text(" ", tablaInicioX + 111, yPos + 3.5);
-    }
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text(")", tablaInicioX + 116, yPos + 3.5);
-    
-    // Severidad: Moderado
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text("Moderado (", tablaInicioX + 125, yPos + 3.5);
-    doc.setFont("helvetica", "bold").setFontSize(9);
-    if (datosFinales.severidadCovid.moderado) {
-      doc.setTextColor(255, 0, 0);
-      doc.text("X", tablaInicioX + 141, yPos + 3.5);
-      doc.setTextColor(0, 0, 0);
-    } else {
-      doc.text(" ", tablaInicioX + 141, yPos + 3.5);
-    }
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text(")", tablaInicioX + 146, yPos + 3.5);
-    
-    // Severidad: Severo
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text("Severo (", tablaInicioX + 155, yPos + 3.5);
-    doc.setFont("helvetica", "bold").setFontSize(9);
-    if (datosFinales.severidadCovid.severo) {
-      doc.setTextColor(255, 0, 0);
-      doc.text("X", tablaInicioX + 169, yPos + 3.5);
-      doc.setTextColor(0, 0, 0);
-    } else {
-      doc.text(" ", tablaInicioX + 169, yPos + 3.5);
-    }
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text(")", tablaInicioX + 174, yPos + 3.5);
+  // Marcar NO si corresponde
+  if (!datosFinales.alergiasMedicamentos) {
+    doc.text("NO (  X  )", tablaInicioX + 95, yPos + 3.5);
+  } else {
+    doc.text("NO (      )", tablaInicioX + 95, yPos + 3.5);
   }
+  yPos += filaAltura;
+
+  // === FILA ADICIONAL: ESPECIFIQUE (ALERGIAS) ===
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Especifique:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTextoGramatical(datosFinales.especifiqueAlergias || ""), tablaInicioX + 25, yPos + 3.5);
   yPos += filaAltura;
 
   // === OBSERVACIONES ANTECEDENTES PATOLÓGICOS ===
@@ -965,10 +1060,26 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   yPos += filaAltura;
 
   // Fila de Licor
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  // Calcular altura necesaria para el campo de frecuencia (si tiene texto largo)
+  let alturaNecesariaLicor = filaAltura;
+  const yTextoInicioLicor = yPos + 3.5;
+  const xInicioFrecuenciaLicor = tablaInicioX + 140; // Posición X donde comienza el texto de frecuencia
+  const anchoDisponibleFrecuenciaLicor = tablaAncho + tablaInicioX - xInicioFrecuenciaLicor - 2; // Ancho disponible: desde inicio hasta final menos margen
+  
+  // Calcular altura necesaria para frecuencia usando splitTextToSize
+  const frecuenciaLicorTexto = habitosNosivosMarcados.frecuenciaLicor ? formatearTextoGramatical(habitosNosivosMarcados.frecuenciaLicor) : "";
+  if (frecuenciaLicorTexto) {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const lineasFrecuenciaLicor = doc.splitTextToSize(frecuenciaLicorTexto, anchoDisponibleFrecuenciaLicor);
+    const alturaFrecuenciaLicor = Math.max(filaAltura, lineasFrecuenciaLicor.length * 2.8 + 2);
+    alturaNecesariaLicor = Math.max(alturaNecesariaLicor, alturaFrecuenciaLicor);
+  }
+  
+  // Dibujar líneas de la fila con altura dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesariaLicor);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesariaLicor);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos + alturaNecesariaLicor, tablaInicioX + tablaAncho, yPos + alturaNecesariaLicor);
   
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Licor", tablaInicioX + 2, yPos + 3.5);
@@ -1006,15 +1117,38 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Fr:", tablaInicioX + 130, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(habitosNosivosMarcados.frecuenciaLicor || ""), tablaInicioX + 140, yPos + 3.5);
+  // Frecuencia con salto de línea si es necesario
+  if (frecuenciaLicorTexto) {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const lineasFrecuenciaLicor = doc.splitTextToSize(frecuenciaLicorTexto, anchoDisponibleFrecuenciaLicor);
+    lineasFrecuenciaLicor.forEach((linea, index) => {
+      doc.text(linea, xInicioFrecuenciaLicor, yTextoInicioLicor + (index * 2.8));
+    });
+  }
   
-  yPos += filaAltura;
+  yPos += alturaNecesariaLicor;
 
   // Fila de Drogas
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  // Calcular altura necesaria para el campo de frecuencia (si tiene texto largo)
+  let alturaNecesariaDrogas = filaAltura;
+  const yTextoInicioDrogas = yPos + 3.5;
+  const xInicioFrecuenciaDrogas = tablaInicioX + 140; // Posición X donde comienza el texto de frecuencia
+  const anchoDisponibleFrecuenciaDrogas = tablaAncho + tablaInicioX - xInicioFrecuenciaDrogas - 2; // Ancho disponible: desde inicio hasta final menos margen
+  
+  // Calcular altura necesaria para frecuencia usando splitTextToSize
+  const frecuenciaDrogasTexto = habitosNosivosMarcados.frecuenciaDrogas ? formatearTextoGramatical(habitosNosivosMarcados.frecuenciaDrogas) : "";
+  if (frecuenciaDrogasTexto) {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const lineasFrecuenciaDrogas = doc.splitTextToSize(frecuenciaDrogasTexto, anchoDisponibleFrecuenciaDrogas);
+    const alturaFrecuenciaDrogas = Math.max(filaAltura, lineasFrecuenciaDrogas.length * 2.8 + 2);
+    alturaNecesariaDrogas = Math.max(alturaNecesariaDrogas, alturaFrecuenciaDrogas);
+  }
+  
+  // Dibujar líneas de la fila con altura dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesariaDrogas);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesariaDrogas);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos + alturaNecesariaDrogas, tablaInicioX + tablaAncho, yPos + alturaNecesariaDrogas);
   
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Drogas", tablaInicioX + 2, yPos + 3.5);
@@ -1052,15 +1186,38 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Fr:", tablaInicioX + 130, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(habitosNosivosMarcados.frecuenciaDrogas || ""), tablaInicioX + 140, yPos + 3.5);
+  // Frecuencia con salto de línea si es necesario
+  if (frecuenciaDrogasTexto) {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const lineasFrecuenciaDrogas = doc.splitTextToSize(frecuenciaDrogasTexto, anchoDisponibleFrecuenciaDrogas);
+    lineasFrecuenciaDrogas.forEach((linea, index) => {
+      doc.text(linea, xInicioFrecuenciaDrogas, yTextoInicioDrogas + (index * 2.8));
+    });
+  }
   
-  yPos += filaAltura;
+  yPos += alturaNecesariaDrogas;
 
   // Fila de Otros
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  // Calcular altura necesaria para el campo de frecuencia (si tiene texto largo)
+  let alturaNecesariaOtros = filaAltura;
+  const yTextoInicioOtros = yPos + 3.5;
+  const xInicioFrecuenciaOtros = tablaInicioX + 140; // Posición X donde comienza el texto de frecuencia
+  const anchoDisponibleFrecuenciaOtros = tablaAncho + tablaInicioX - xInicioFrecuenciaOtros - 2; // Ancho disponible: desde inicio hasta final menos margen
+  
+  // Calcular altura necesaria para frecuencia usando splitTextToSize
+  const frecuenciaOtrosTexto = habitosNosivosMarcados.frecuenciaOtros ? formatearTextoGramatical(habitosNosivosMarcados.frecuenciaOtros) : "";
+  if (frecuenciaOtrosTexto) {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const lineasFrecuenciaOtros = doc.splitTextToSize(frecuenciaOtrosTexto, anchoDisponibleFrecuenciaOtros);
+    const alturaFrecuenciaOtros = Math.max(filaAltura, lineasFrecuenciaOtros.length * 2.8 + 2);
+    alturaNecesariaOtros = Math.max(alturaNecesariaOtros, alturaFrecuenciaOtros);
+  }
+  
+  // Dibujar líneas de la fila con altura dinámica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesariaOtros);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesariaOtros);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos + alturaNecesariaOtros, tablaInicioX + tablaAncho, yPos + alturaNecesariaOtros);
   
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Otros", tablaInicioX + 2, yPos + 3.5);
@@ -1098,9 +1255,16 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Fr:", tablaInicioX + 130, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(habitosNosivosMarcados.frecuenciaOtros || ""), tablaInicioX + 140, yPos + 3.5);
+  // Frecuencia con salto de línea si es necesario
+  if (frecuenciaOtrosTexto) {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const lineasFrecuenciaOtros = doc.splitTextToSize(frecuenciaOtrosTexto, anchoDisponibleFrecuenciaOtros);
+    lineasFrecuenciaOtros.forEach((linea, index) => {
+      doc.text(linea, xInicioFrecuenciaOtros, yTextoInicioOtros + (index * 2.8));
+    });
+  }
   
-  yPos += filaAltura;
+  yPos += alturaNecesariaOtros;
 
   // === FOOTER PÁGINA 1 ===
   footerTR(doc, { footerOffsetY: 5});
@@ -1125,10 +1289,17 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
     
     const fechaTrimmed = fechaStr.trim();
     
-    // Si es un rango de años como "2020-2025" o "2020-2025", devolverlo tal como está
-    const rangoAnosRegex = /^\d{4}-\d{4}$/;
-    if (rangoAnosRegex.test(fechaTrimmed)) {
+    // Si es solo un año (4 dígitos), devolverlo tal como está
+    const soloAnoRegex = /^\d{4}$/;
+    if (soloAnoRegex.test(fechaTrimmed)) {
       return fechaTrimmed;
+    }
+    
+    // Si es un rango de años como "2020-2025" o "2020 - 2025", normalizar espacios
+    const rangoAnosRegex = /^\d{4}\s*-\s*\d{4}$/;
+    if (rangoAnosRegex.test(fechaTrimmed)) {
+      // Normalizar: quitar espacios alrededor del guión
+      return fechaTrimmed.replace(/\s*-\s*/, "-");
     }
     
     // Si es una fecha válida en formato yyyy-MM-dd, usar formatearFechaCorta
@@ -1252,7 +1423,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   if (datosFinales.antecedentesQuirurgicos && datosFinales.antecedentesQuirurgicos.length > 0) {
     datosFinales.antecedentesQuirurgicos.forEach(quirurgico => {
       dibujarFilaQuirurgico(
-        formatearFechaQuirurgica(quirurgico.fechaAntecedentesPatologicosQuirurgicos || ""),
+        formatearFechaQuirurgica(quirurgico.fecha || quirurgico.fechaAntecedentesPatologicosQuirurgicos || ""),
         quirurgico.hospitalOperacion || "",
         quirurgico.operacion || "",
         quirurgico.diasHospitalizado || "",
@@ -1464,7 +1635,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8});
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

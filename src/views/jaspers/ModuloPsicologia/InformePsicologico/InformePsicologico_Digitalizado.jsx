@@ -14,7 +14,7 @@ export default function InformePsicologico_Digitalizado(data = {}) {
 
   // Normalizador único de datos de entrada
   function buildDatosFinales(raw) {
-    const datosReales = {
+    const datosFinales = {
       apellidosNombres: String((((raw?.apellidosPaciente ?? '') + ' ' + (raw?.nombresPaciente ?? '')).trim())),
       fechaExamen: formatearFechaCorta(raw?.fechaEntrevista ?? ''), 
       sexo: convertirGenero(raw?.sexoPaciente ?? ''),
@@ -29,6 +29,8 @@ export default function InformePsicologico_Digitalizado(data = {}) {
       sede: String(raw?.sede ?? ''),
       numeroFicha: String(raw?.norden ?? ""),
       codigoEntrevista: String(raw?.codigoInforme ?? ''), 
+      tipoExamen: String(raw?.nombreExamen ?? ''),
+      codigoClinica: String(raw?.codigoClinica ?? ''),
       color: Number(raw?.color ?? 0),
       codigoColor: String(raw?.codigoColor ?? ''),
       textoColor: String(raw?.textoColor ?? ''),
@@ -42,45 +44,15 @@ export default function InformePsicologico_Digitalizado(data = {}) {
       apto: (typeof raw?.aprobo === 'boolean') ? raw.aprobo : false 
     };
 
-    const datosPrueba = {
-      apellidosNombres: 'PÉREZ QUISPE, JUAN CARLOS',
-      fechaExamen: '30/09/2025',
-      sexo: 'Masculino',
-      documentoIdentidad: '12345678',
-      edad: '32',
-      fechaNacimiento: '15/04/1993',
-      domicilio: 'Av. Los Olivos 123 - Lima',
-      areaTrabajo: 'Planta Concentradora',
-      puestoTrabajo: 'Operador de Volquete',
-      empresa: 'MINERA ANDINA S.A.C.',
-      contrata: 'SERVICIOS INTEGRALES S.R.L.',
-      sede: 'Trujillo Nicolas de Pierola',
-      numeroFicha: '000123',
-      codigoEntrevista: '63183',
-      color: 2,
-      codigoColor: '#2E7D32',
-      textoColor: 'L',
-      cuerpo: {
-        // Datos de prueba como string con 7 ítems y separadores mixtos
-        areaIntelectual: 'Razonamiento verbal\\nCálculo básico ',
-        areaPersonalidad: 'Responsable \\n Colaborador /n Proactivo 7n Tolerante a la presión \\n Comunicación asertiva /n Trabajo en equipo 7n Adaptabilidad',
-        areaOrganicidad: 'Orientado en tiempo \\n Orientado en espacio /n Orientado en persona 7n Juicio conservado \\n Memoria íntegra /n Conciencia clara 7n No hay signos neurológicos focales',
-        areaPsicomotricidad: 'Coordinación fina adecuada \\n Coordinación gruesa adecuada /n Ritmo y secuencia 7n Trazos firmes ',
-        recomendaciones: 'Pausas activas diarias \\n Higiene del sueño '
-      },
-      apto: true
-    };
-
-    const selected = (raw && (raw.norden)) ? datosReales : datosPrueba;
     // Asegurar que las secciones de cuerpo sean arrays listables
-    selected.cuerpo = {
-      areaIntelectual: normalizeList(selected.cuerpo.areaIntelectual),
-      areaPersonalidad: normalizeList(selected.cuerpo.areaPersonalidad),
-      areaOrganicidad: normalizeList(selected.cuerpo.areaOrganicidad),
-      areaPsicomotricidad: normalizeList(selected.cuerpo.areaPsicomotricidad),
-      recomendaciones: normalizeList(selected.cuerpo.recomendaciones)
+    datosFinales.cuerpo = {
+      areaIntelectual: normalizeList(datosFinales.cuerpo.areaIntelectual),
+      areaPersonalidad: normalizeList(datosFinales.cuerpo.areaPersonalidad),
+      areaOrganicidad: normalizeList(datosFinales.cuerpo.areaOrganicidad),
+      areaPsicomotricidad: normalizeList(datosFinales.cuerpo.areaPsicomotricidad),
+      recomendaciones: normalizeList(datosFinales.cuerpo.recomendaciones)
     };
-    return selected;
+    return datosFinales;
   }
 
   const datosFinales = buildDatosFinales(data);
@@ -154,17 +126,22 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   };
 
   // Función general para dibujar header de sección con fondo gris
-  const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
-    const tablaInicioX = 10;
-    const tablaAncho = 190;
+  const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4, infoAdicional = null) => {
+    const tablaInicioX = 5;
+    const tablaAncho = 200;
 
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
 
     // Dibujar fondo gris más oscuro
-    doc.setFillColor(160, 160, 160);
+    doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
+
+    // Si hay información adicional, dibujar división
+    if (infoAdicional) {
+      doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + alturaHeader);
+    }
 
     // Dibujar líneas del header
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
@@ -172,9 +149,17 @@ export default function InformePsicologico_Digitalizado(data = {}) {
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
 
-    // Dibujar texto del título
+    // Dibujar texto del título (centrado verticalmente)
     doc.setFont("helvetica", "bold").setFontSize(9);
-    doc.text(titulo, tablaInicioX + 2, yPos + 3);
+    doc.text(titulo, tablaInicioX + 2, yPos + alturaHeader / 2 + 1.2);
+
+    // Dibujar información adicional a la derecha si existe
+    if (infoAdicional) {
+      doc.setFont("helvetica", "bold").setFontSize(9);
+      doc.text(infoAdicional.label + ":", tablaInicioX + 137, yPos + alturaHeader / 2 + 1.2);
+      doc.setFont("helvetica", "normal").setFontSize(9);
+      doc.text(infoAdicional.valor || "", tablaInicioX + 175, yPos + alturaHeader / 2 + 1.2);
+    }
 
     return yPos + alturaHeader;
   };
@@ -183,20 +168,24 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   drawHeader(numeroPagina);
 
   // === SECCIÓN 1: DATOS DE FILIACIÓN ===
-  const tablaInicioX = 10;
-  const tablaAncho = 190;
+  const tablaInicioX = 5;
+  const tablaAncho = 200;
   let yPos = 35;
   const filaAltura = 5;
 
   // Header de datos de filiación
-  yPos = dibujarHeaderSeccion("I. DATOS DE FILIACIÓN", yPos, filaAltura);
+  yPos = dibujarHeaderSeccion("I. DATOS DE FILIACIÓN", yPos, filaAltura, {
+    label: "Código Clínica",
+    valor: datosFinales.codigoClinica
+  });
 
   // Configurar líneas para filas de datos
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
 
-  // Primera fila: Apellidos y Nombres (fila completa)
+  // Primera fila: Apellidos y Nombres con división para Tipo de examen
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + filaAltura); // División para Tipo de examen
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -219,9 +208,15 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Cuarta fila: Área de Trabajo, Puesto de Trabajo (2 columnas)
+  // Cuarta fila: Área de Trabajo (fila completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Quinta fila: Puesto de Trabajo (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -249,7 +244,14 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 40, yTexto + 1.5, tablaAncho - 40);
+  // Ajustar ancho para la nueva división (hasta x = tablaInicioX + 135)
+  dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 40, yTexto + 1.5, 95);
+
+  // Columna derecha: Tipo de examen
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("T. Examen:", tablaInicioX + 137, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text(datosFinales.tipoExamen || "", tablaInicioX + 155, yTexto + 1.5);
   yTexto += filaAltura;
 
   // Tercera fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
@@ -281,16 +283,18 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   dibujarTextoConSaltoLinea(datosFinales.domicilio, tablaInicioX + 25, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
-  // Cuarta fila: Área de Trabajo, Puesto de Trabajo
+  // Cuarta fila: Área de Trabajo
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Área de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo, tablaInicioX + 30, yTexto + 1.5, 50);
+  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo, tablaInicioX + 30, yTexto + 1.5, tablaAncho - 35);
+  yTexto += filaAltura;
 
+  // Quinta fila: Puesto de Trabajo
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Puesto de Trabajo:", tablaInicioX + 92, yTexto + 1.5);
+  doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo, tablaInicioX + 122, yTexto + 1.5, 65);
+  dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo, tablaInicioX + 35, yTexto + 1.5, tablaAncho - 40);
   yTexto += filaAltura;
 
   // Quinta fila: Empresa
@@ -313,15 +317,15 @@ export default function InformePsicologico_Digitalizado(data = {}) {
 
   // Función para dibujar subheader con color celeste
   const dibujarSubHeaderCeleste = (titulo, yPos, alturaHeader = 5) => {
-    const tablaInicioX = 10;
-    const tablaAncho = 190;
+    const tablaInicioX = 5;
+    const tablaAncho = 200;
 
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
 
     // Dibujar fondo celeste
-    doc.setFillColor(173, 216, 230); // Color celeste claro
+    doc.setFillColor(199, 241, 255); // Color celeste claro
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
 
     // Dibujar líneas del subheader
@@ -534,7 +538,7 @@ export default function InformePsicologico_Digitalizado(data = {}) {
 
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 5 });
+  footerTR(doc, { footerOffsetY: 10 });
 
   // Imprimir
   imprimir(doc);

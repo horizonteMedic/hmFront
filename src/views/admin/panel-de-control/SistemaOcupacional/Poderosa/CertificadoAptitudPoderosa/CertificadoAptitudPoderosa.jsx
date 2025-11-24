@@ -212,6 +212,7 @@ const CertificadoAptitudPoderosa = () => {
                                     />
                                 </div>
                             </section>
+                            
                             <div className="flex w-full">
                                 <div className="w-1/2">
                                     <section className="bg-white border border-gray-200 rounded-lg p-4 gap-4 mt-0 m-4">
@@ -271,7 +272,7 @@ const CertificadoAptitudPoderosa = () => {
                                                 </button>
                                             </div>
                                             <div className="flex gap-1 items-center">
-                                                <span className="font-bold italic text-base mb-1 mx-4">IMPRIMIR</span>
+                                                <span className="font-bold italic text-base mb-1 mx-4">Imprimir</span>
                                                 <input
                                                     name="norden"
                                                     value={form?.norden}

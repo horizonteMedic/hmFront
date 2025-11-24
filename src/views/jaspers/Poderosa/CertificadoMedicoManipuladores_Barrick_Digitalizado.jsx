@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
-import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
-import { convertirGenero } from "../../utils/helpers.js";
-import { dibujarTextoEnFilaCreciente, calcularAlturaTextoCreciente } from "../../utils/formatoParaTextoCrecienteFila.js";
+import { formatearFechaCorta, formatearFechaLargaConDia } from "../../utils/formatDateUtils.js";
+import { convertirGenero, getSign } from "../../utils/helpers.js";
+import { calcularAlturaTextoCreciente } from "../../utils/formatoParaTextoCrecienteFila.js";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
@@ -11,32 +11,38 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   const pageW = doc.internal.pageSize.getWidth();
 
   const datosReales = {
-    apellidosNombres: String((data.apellidos_apellidos_pa || "CASTILLO PLASENCIA") + " " + (data.nombres_nombres_pa || "HADY KATHERINE")).trim(),
-    fechaExamen: formatearFechaCorta(data.fechaExamen_f_examen || new Date()),
+    apellidosNombres: String((data.apellidosPaciente || "CASTILLO PLASENCIA") + " " + (data.nombresPaciente || "HADY KATHERINE")).trim(),
+    fechaExamen: formatearFechaCorta(data.fechaExamen || new Date().toISOString().split('T')[0]),
+    fechaExamenCompleta: formatearFechaLargaConDia(data.fechaExamen || new Date().toISOString().split('T')[0]),
     tipoExamen: String(data.nombreExamen || "EXAMEN MEDICO OCUPACIONAL"),
-    sexo: convertirGenero(data.sexo_sexo_pa || "F"),
-    documentoIdentidad: String(data.dni_cod_pa || "72384273"),
-    edad: String(data.edad_edad || "31"),
-    areaTrabajo: data.area_area_o || "OPERACIONES",
-    puestoTrabajo: data.cargo_cargo_de || "DAD",
-    empresa: data.empresa_razon_empresa || "MINERA BOROO MISQUICHILCA S.A.",
-    contrata: data.contrata_razon_contrata || "N/A",
+    sexo: convertirGenero(data.sexoPaciente || "F"),
+    documentoIdentidad: String(data.dniPaciente || "72384273"),
+    edad: String(data.edadPaciente || "31"),
+    areaTrabajo: data.areaPaciente || "OPERACIONES",
+    puestoTrabajo: data.cargoPaciente || "DAD",
+    empresa: data.empresa || "MINERA BOROO MISQUICHILCA S.A.",
+    contrata: data.contrata || "N/A",
     // Datos de color
     color: data.color || 1534,
     codigoColor: data.codigoColor || "",
     textoColor: data.textoColor || " ",
     // Datos adicionales para header
-    numeroFicha: String(data.n_orden || "96639"),
-    sede: data.sede || "TRUJILLO-NICOLAS DE PIEROLA",
+    numeroFicha: String(data.norden || "96639"),
+    sede: data.sede || data.nombreSede || "TRUJILLO-NICOLAS DE PIEROLA",
     // Datos específicos
-    direccionPaciente: String(data.direccionpaciente_direccion_pa || "SAC1 URB PARQUE INDUSTRIAL MZ D LT 3"),
-    fechaNacimiento: formatearFechaCorta(data.fechanacimientopaciente_fecha_nacimiento_pa || "1994-01-23"),
+    direccionPaciente: String(data.direccionPaciente || "SAC1 URB PARQUE INDUSTRIAL MZ D LT 3"),
+    fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente || "1994-01-23"),
     // Datos adicionales para nueva fila
     lugar: data.lugarExperiencia_lugar_expe || "",
     anosExperiencia: data.tiempoExperiencia || null,
     altura: data.altura_txtaltura || "",
     // Datos de digitalización
     digitalizacion: data.digitalizacion || [],
+    // Datos del certificado
+    aptitud: data.noApto ? "NO APTO" : (data.apto ? "APTO" : "APTO"),
+    consideracion: data.consideracion || "",
+    observaciones: data.observaciones || "",
+    recomendaciones: data.recomendaciones || "",
   };
 
   // Usar solo datos reales proporcionados
@@ -48,10 +54,10 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
     CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
     // Título principal (en todas las páginas)
-    doc.setFont("helvetica", "bold").setFontSize(12);
+    doc.setFont("helvetica", "bold").setFontSize(13);
     doc.setTextColor(0, 0, 0);
-    doc.text("DECLARACIÓN JURADA DE DATOS MÉDICOS", pageW / 2, 32.5, { align: "center" });
-    doc.text("Y ANTECEDENTES PATOLÓGICOS", pageW / 2, 36.5, { align: "center" });
+    doc.text("CERTIFICADO MEDICO DE BUENA SALUD PARA", pageW / 2, 41, { align: "center" });
+    doc.text("MANIPULADORES DE ALIMENTOS - PROTOCOLO BARRICK", pageW / 2, 46.5, { align: "center" });
 
     // Número de Ficha y Página (alineación automática mejorada)
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -82,28 +88,174 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   drawHeader(1);
 
   // === FUNCIONES AUXILIARES ===
-  // Función para texto con salto de línea
-  const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
+  // Función para texto con salto de línea y datos en negrita
+  const dibujarTextoConSaltoLineaYBold = (textoBase, datos, x, y, anchoMaximo, fontSize = 11) => {
+    if (!textoBase) return y;
+    doc.setFontSize(fontSize);
+    const interlineado = fontSize * 0.4;
+    let yPos = y;
+    
+    // Dividir el texto en partes: texto normal y datos (que van en negrita)
+    const partes = [];
+    const regex = /\{([^}]+)\}/g;
+    let lastIndex = 0;
+    let match;
+    
+    while ((match = regex.exec(textoBase)) !== null) {
+      if (match.index > lastIndex) {
+        partes.push({ tipo: 'texto', contenido: textoBase.substring(lastIndex, match.index) });
+      }
+      partes.push({ tipo: 'dato', contenido: datos[match[1]] || '' });
+      lastIndex = regex.lastIndex;
+    }
+    
+    if (lastIndex < textoBase.length) {
+      partes.push({ tipo: 'texto', contenido: textoBase.substring(lastIndex) });
+    }
+    
+    // Si no hay marcadores, usar el texto completo como texto normal
+    if (partes.length === 0) {
+      partes.push({ tipo: 'texto', contenido: textoBase });
+    }
+    
+    // Construir líneas con datos en negrita
+    let lineaActual = [];
+    let anchoLineaActual = 0;
+    const espacioAncho = doc.getTextWidth(' ');
+    
+    partes.forEach(parte => {
+      const esDato = parte.tipo === 'dato';
+      const palabras = parte.contenido.split(' ');
+      
+      palabras.forEach(palabra => {
+        doc.setFont("helvetica", esDato ? "bold" : "normal");
+        const anchoPalabra = doc.getTextWidth(palabra);
+        const espacioNecesario = lineaActual.length > 0 ? espacioAncho : 0;
+        const anchoTotal = anchoLineaActual + espacioNecesario + anchoPalabra;
+        
+        // Si la palabra sola es más larga que el ancho máximo, dividirla
+        if (anchoPalabra > anchoMaximo) {
+          // Dibujar línea actual si hay contenido
+          if (lineaActual.length > 0) {
+            let xActual = x;
+            lineaActual.forEach(item => {
+              doc.setFont("helvetica", item.esDato ? "bold" : "normal");
+              doc.text(item.texto, xActual, yPos);
+              xActual += doc.getTextWidth(item.texto) + espacioAncho;
+            });
+            yPos += interlineado;
+            lineaActual = [];
+            anchoLineaActual = 0;
+          }
+          // Dividir palabra en caracteres
+          let palabraRestante = palabra;
+          while (palabraRestante.length > 0) {
+            let caracteres = '';
+            for (let i = 0; i < palabraRestante.length; i++) {
+              const testCaracteres = caracteres + palabraRestante[i];
+              if (doc.getTextWidth(testCaracteres) <= anchoMaximo) {
+                caracteres = testCaracteres;
+              } else {
+                break;
+              }
+            }
+            if (caracteres.length === 0) {
+              caracteres = palabraRestante[0];
+            }
+            doc.setFont("helvetica", esDato ? "bold" : "normal");
+            doc.text(caracteres, x, yPos);
+            yPos += interlineado;
+            palabraRestante = palabraRestante.substring(caracteres.length);
+          }
+        } else if (anchoTotal <= anchoMaximo) {
+          lineaActual.push({ texto: palabra, esDato: esDato });
+          anchoLineaActual = anchoTotal;
+        } else {
+          // Dibujar línea actual
+          if (lineaActual.length > 0) {
+            let xActual = x;
+            lineaActual.forEach(item => {
+              doc.setFont("helvetica", item.esDato ? "bold" : "normal");
+              doc.text(item.texto, xActual, yPos);
+              xActual += doc.getTextWidth(item.texto) + espacioAncho;
+            });
+            yPos += interlineado;
+          }
+          // Nueva línea con esta palabra
+          lineaActual = [{ texto: palabra, esDato: esDato }];
+          anchoLineaActual = anchoPalabra;
+        }
+      });
+    });
+    
+    // Dibujar última línea
+    if (lineaActual.length > 0) {
+      let xActual = x;
+      lineaActual.forEach(item => {
+        doc.setFont("helvetica", item.esDato ? "bold" : "normal");
+        doc.text(item.texto, xActual, yPos);
+        xActual += doc.getTextWidth(item.texto) + espacioAncho;
+      });
+    }
+    
+    return yPos;
+  };
+
+  // Función para texto con salto de línea (sin negrita)
+  const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo, fontSize = 10) => {
     if (!texto) return y;
-    const fontSize = doc.internal.getFontSize();
+    // Asegurar que el tamaño de fuente esté configurado
+    doc.setFontSize(fontSize);
     const palabras = texto.split(' ');
     let lineaActual = '';
     let yPos = y;
+    const interlineado = fontSize * 0.4;
     
     palabras.forEach(palabra => {
-      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
-      const anchoTexto = doc.getTextWidth(textoPrueba);
+      const anchoPalabra = doc.getTextWidth(palabra);
       
-      if (anchoTexto <= anchoMaximo) {
-        lineaActual = textoPrueba;
-      } else {
+      // Si la palabra sola es más larga que el ancho máximo, dividirla
+      if (anchoPalabra > anchoMaximo) {
+        // Dibujar línea actual si hay contenido
         if (lineaActual) {
           doc.text(lineaActual, x, yPos);
-          yPos += fontSize * 0.35;
-          lineaActual = palabra;
+          yPos += interlineado;
+          lineaActual = '';
+        }
+        // Dividir palabra en caracteres
+        let palabraRestante = palabra;
+        while (palabraRestante.length > 0) {
+          let caracteres = '';
+          for (let i = 0; i < palabraRestante.length; i++) {
+            const testCaracteres = caracteres + palabraRestante[i];
+            if (doc.getTextWidth(testCaracteres) <= anchoMaximo) {
+              caracteres = testCaracteres;
+            } else {
+              break;
+            }
+          }
+          if (caracteres.length === 0) {
+            caracteres = palabraRestante[0];
+          }
+          doc.text(caracteres, x, yPos);
+          yPos += interlineado;
+          palabraRestante = palabraRestante.substring(caracteres.length);
+        }
+      } else {
+        const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+        const anchoTexto = doc.getTextWidth(textoPrueba);
+        
+        if (anchoTexto <= anchoMaximo) {
+          lineaActual = textoPrueba;
         } else {
-          doc.text(palabra, x, yPos);
-          yPos += fontSize * 0.35;
+          if (lineaActual) {
+            doc.text(lineaActual, x, yPos);
+            yPos += interlineado;
+            lineaActual = palabra;
+          } else {
+            doc.text(palabra, x, yPos);
+            yPos += interlineado;
+          }
         }
       }
     });
@@ -115,357 +267,221 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
     return yPos;
   };
 
-  // Función general para dibujar header de sección con fondo gris
-  const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
-    const tablaInicioX = 5;
-    const tablaAncho = 200;
+  // Función para texto justificado
+  const dibujarTextoJustificado = (texto, x, y, anchoMaximo, fontSize = 10) => {
+    if (!texto) return y;
+    doc.setFontSize(fontSize);
+    const interlineado = fontSize * 0.4;
+    const palabras = texto.split(' ');
+    let lineas = [];
+    let lineaActual = '';
     
-    // Configurar líneas con grosor consistente
-    doc.setDrawColor(0, 0, 0);
-    doc.setLineWidth(0.2);
-    
-    // Dibujar fondo gris más oscuro
-    doc.setFillColor(160, 160, 160);
-    doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
-    // Dibujar líneas del header
-    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
-    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-    doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
-    // Dibujar texto del título
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
-    
-    return yPos + alturaHeader;
-  };
-
-  // Función para parsear el template en unidades atómicas (palabras)
-  const parseTemplate = (textoBase, datos, doc) => {
-    const segments = [];
-    const regex = /\{([^}]+)\}/g;
-    let i = 0;
-    let match;
-    while ((match = regex.exec(textoBase)) !== null) {
-      const start = match.index;
-      if (start > i) {
-        segments.push({ type: 'text', content: textoBase.substring(i, start) });
-      }
-      segments.push({ type: 'data', key: match[1] });
-      i = regex.lastIndex;
-    }
-    if (i < textoBase.length) {
-      segments.push({ type: 'text', content: textoBase.substring(i) });
-    }
-
-    // Construir unidades atómicas (palabras)
-    const atomicUnits = [];
-    segments.forEach((seg) => {
-      let content;
-      let isBold = false;
-      if (seg.type === 'text') {
-        content = seg.content;
-      } else {
-        content = datos[seg.key] || '';
-        isBold = true;
-      }
+    // Dividir en líneas
+    palabras.forEach(palabra => {
+      const anchoPalabra = doc.getTextWidth(palabra);
       
-      if (content) {
-        const words = content.match(/(\S+)/g) || [];
-        words.forEach((word) => {
-          let width;
-          const prevFont = doc.getFont();
-          if (isBold) {
-            doc.setFont("helvetica", "bold");
+      // Si la palabra sola es más larga que el ancho máximo, dividirla
+      if (anchoPalabra > anchoMaximo) {
+        // Guardar línea actual si hay contenido
+        if (lineaActual) {
+          lineas.push(lineaActual);
+          lineaActual = '';
+        }
+        // Dividir palabra en caracteres
+        let palabraRestante = palabra;
+        while (palabraRestante.length > 0) {
+          let caracteres = '';
+          for (let i = 0; i < palabraRestante.length; i++) {
+            const testCaracteres = caracteres + palabraRestante[i];
+            if (doc.getTextWidth(testCaracteres) <= anchoMaximo) {
+              caracteres = testCaracteres;
+            } else {
+              break;
+            }
           }
-          width = doc.getTextWidth(word);
-          doc.setFont(prevFont.fontName, prevFont.fontStyle);
-          
-          atomicUnits.push({
-            type: 'word',
-            text: word,
-            isBold: isBold,
-            width: width
-          });
-        });
-      }
-    });
-
-    return atomicUnits;
-  };
-
-  // Función para dibujar texto justificado con datos en negrita
-  const dibujarTextoJustificadoConBold = (textoBase, datos, xStart, yStart, maxWidth, justified = true) => {
-    doc.setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.setFont("helvetica", "normal");
-
-    const atomicUnits = parseTemplate(textoBase, datos, doc);
-    if (atomicUnits.length === 0) return yStart;
-
-    const spaceWidth = doc.getTextWidth(' ');
-    const interlineado = 3.5; // Interlineado ajustado para fontSize 8
-    const punctRegex = /^[.,;:!?\)\]\}"]/;
-
-    // Construir líneas
-    const lines = [];
-    let currentLine = [];
-    let currentWidth = 0;
-
-    atomicUnits.forEach((unit) => {
-      let addedSpace = 0;
-      if (currentLine.length > 0) {
-        addedSpace = punctRegex.test(unit.text.charAt(0)) ? 0 : spaceWidth;
-      }
-      const addedWidth = addedSpace + unit.width;
-
-      if (currentWidth + addedWidth > maxWidth && currentLine.length > 0) {
-        lines.push([...currentLine]);
-        currentLine = [unit];
-        currentWidth = unit.width;
+          if (caracteres.length === 0) {
+            caracteres = palabraRestante[0];
+          }
+          lineas.push(caracteres);
+          palabraRestante = palabraRestante.substring(caracteres.length);
+        }
       } else {
-        currentLine.push(unit);
-        currentWidth += addedWidth;
-      }
-    });
-
-    if (currentLine.length > 0) {
-      lines.push(currentLine);
-    }
-
-    // Dibujar líneas
-    let yActual = yStart;
-
-    lines.forEach((line) => {
-      if (line.length === 0) return;
-
-      // Calcular totalTextWidth
-      let totalTextWidth = 0;
-      for (let idx = 0; idx < line.length; idx++) {
-        totalTextWidth += line[idx].width;
-        if (idx < line.length - 1) {
-          const nextText = line[idx + 1].text;
-          const baseGap = punctRegex.test(nextText.charAt(0)) ? 0 : spaceWidth;
-          totalTextWidth += baseGap;
-        }
-      }
-
-      // Contar gaps flexibles (donde se distribuye extra)
-      let numFlexGaps = 0;
-      for (let idx = 0; idx < line.length - 1; idx++) {
-        const nextText = line[idx + 1].text;
-        if (!punctRegex.test(nextText.charAt(0))) {
-          numFlexGaps++;
-        }
-      }
-
-      let extraPerFlex = 0;
-      if (numFlexGaps > 0 && justified) {
-        const extra = maxWidth - totalTextWidth;
-        extraPerFlex = extra / numFlexGaps;
-      }
-
-      // Dibujar
-      let xCurrent = xStart;
-      line.forEach((unit, idx) => {
-        if (unit.isBold) {
-          doc.setFont("helvetica", "bold");
+        const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+        const anchoTexto = doc.getTextWidth(textoPrueba);
+        
+        if (anchoTexto <= anchoMaximo) {
+          lineaActual = textoPrueba;
         } else {
-          doc.setFont("helvetica", "normal");
+          if (lineaActual) {
+            lineas.push(lineaActual);
+            lineaActual = palabra;
+          } else {
+            lineas.push(palabra);
+            lineaActual = '';
+          }
         }
-        doc.text(unit.text, xCurrent, yActual);
-
-        if (idx < line.length - 1) {
-          const nextText = line[idx + 1].text;
-          const isPunctNext = punctRegex.test(nextText.charAt(0));
-          const baseGap = isPunctNext ? 0 : spaceWidth;
-          const thisExtra = isPunctNext ? 0 : (justified ? extraPerFlex : 0);
-          xCurrent += unit.width + baseGap + thisExtra;
-        }
-      });
-
-      yActual += interlineado;
+      }
     });
-
-    return yActual;
+    
+    if (lineaActual) {
+      lineas.push(lineaActual);
+    }
+    
+    // Dibujar líneas justificadas
+    let yPos = y;
+    lineas.forEach((linea, index) => {
+      if (index === lineas.length - 1) {
+        // Última línea no se justifica
+        doc.text(linea, x, yPos);
+      } else {
+        // Justificar línea
+        const palabrasLinea = linea.split(' ');
+        if (palabrasLinea.length > 1) {
+          const anchoLinea = doc.getTextWidth(linea);
+          const espacioExtra = anchoMaximo - anchoLinea;
+          const espaciosEntrePalabras = espacioExtra / (palabrasLinea.length - 1);
+          
+          let xPos = x;
+          palabrasLinea.forEach((palabra, i) => {
+            doc.text(palabra, xPos, yPos);
+            if (i < palabrasLinea.length - 1) {
+              xPos += doc.getTextWidth(palabra + ' ') + espaciosEntrePalabras;
+            }
+          });
+        } else {
+          doc.text(linea, x, yPos);
+        }
+      }
+      yPos += interlineado;
+    });
+    
+    return yPos;
   };
 
-  // === SECCIÓN 1: DATOS PERSONALES ===
-  const tablaInicioX = 5;
-  const tablaAncho = 200;
-  let yPos = 40; // Posición inicial después del título
-  const filaAltura = 5;
+  // === CONTENIDO DEL CERTIFICADO ===
+  const tablaInicioX = 25;
+  const tablaAncho = 165;
+  let yPos = 65; // Posición inicial después del título
 
-  // Header de datos personales
-  yPos = dibujarHeaderSeccion("1. DATOS PERSONALES", yPos, filaAltura);
+  // Texto completo del párrafo (todo en uno para mantener interlineado consistente)
+  doc.setFont("helvetica", "normal").setFontSize(11);
+  const textoCompleto = "El que suscribe en representación de Corporación Peruana de Centros Médicos S.A.C. con RUC 20477167561, Certifica que: Sr.(a): {apellidosNombres} identificado con DNI: {documentoIdentidad}, postulante al cargo de {puestoTrabajo} colaborador de la empresa {empresa} para el cargo que postula ha sido declarado {aptitud} de acuerdo a los resultados obtenidos en los examenes de laboratorio clínico y Evaluación Médica General realizado en el POLICLINICO HORIZONTE MEDIC.";
+  yPos = dibujarTextoConSaltoLineaYBold(textoCompleto, datosFinales, tablaInicioX, yPos, tablaAncho, 11);
+  yPos += 10; // Separación antes de "Se anexan los resultados..."
 
-  // Configurar líneas para filas de datos
+  // Se anexan los resultados
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text("Se anexan los resultados al final del presente documento.", tablaInicioX, yPos);
+  yPos += 10; // Separación antes de "Considerandolo(a)"
+
+  // Considerandolo(a)
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text("Considerandolo(a): ", tablaInicioX, yPos);
+  if (datosFinales.consideracion) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    // Usar función de texto justificado
+    yPos = dibujarTextoJustificado(datosFinales.consideracion, tablaInicioX + 35, yPos, tablaAncho - 35, 10);
+  } else {
+    // Si no hay consideración, mostrar el estado APTO/NO APTO
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text(datosFinales.aptitud, tablaInicioX + 35, yPos);
+    yPos += 4;
+  }
+  yPos += 10; // Separación de 10mm antes de OBSERVACIONES
+
+  // Observaciones con texto creciente
+  doc.setFont("helvetica", "bold").setFontSize(10);
+  doc.text("OBSERVACIONES:", tablaInicioX, yPos);
+  yPos += 1;
+  
+  if (datosFinales.observaciones) {
+    // Establecer fontSize 10 antes de calcular altura
+    doc.setFontSize(9);
+    const alturaObservaciones = calcularAlturaTextoCreciente(doc, datosFinales.observaciones, tablaAncho - 4, 9);
+    const alturaMinimaObs = Math.max(15, alturaObservaciones + 4);
+    
+    // Dibujar texto de observaciones en normal y justificado
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    // Usar función de texto justificado
+    dibujarTextoJustificado(datosFinales.observaciones, tablaInicioX, yPos + 4, tablaAncho - 4, 9); 
+    // Restaurar tamaño de fuente después de dibujar
+    doc.setFontSize(9);
+    yPos += alturaMinimaObs;
+  } else {
+    const alturaMinimaObs = 15;
+    yPos += alturaMinimaObs;
+  }
+  yPos += 10; // Separación de 10mm antes de RECOMENDACIONES
+
+  // Recomendaciones con texto creciente
+  doc.setFont("helvetica", "bold").setFontSize(10);
+  doc.text("RECOMENDACIONES:", tablaInicioX, yPos);
+  yPos += 1;
+  
+  if (datosFinales.recomendaciones) {
+    // Establecer fontSize 10 antes de calcular altura
+    doc.setFontSize(9);
+    const alturaRecomendaciones = calcularAlturaTextoCreciente(doc, datosFinales.recomendaciones, tablaAncho - 4, 9);
+    const alturaMinimaRec = Math.max(15, alturaRecomendaciones + 4);
+    
+    // Dibujar texto de recomendaciones en normal y justificado
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    // Usar función de texto justificado
+    dibujarTextoJustificado(datosFinales.recomendaciones, tablaInicioX, yPos + 4, tablaAncho - 4, 9);
+    // Restaurar tamaño de fuente después de dibujar
+    doc.setFontSize(9);
+    yPos += alturaMinimaRec;
+        } else {
+    const alturaMinimaRec = 15;
+    yPos += alturaMinimaRec;
+  }
+  yPos += 8;
+
+  // Fecha al lado derecho (bajada 30mm y movida más a la izquierda)
+  yPos += 30; // Bajar la fecha 30mm más
+  const fechaTexto = datosFinales.fechaExamenCompleta || datosFinales.fechaExamen;
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  // Mover la fecha más a la izquierda para aprovechar el margen de 165mm
+  doc.text(`(${fechaTexto})`, tablaInicioX + tablaAncho - 10, yPos, { align: "right" });
+  yPos += 10;
+
+  // Firma y sello del médico (bajado 30mm más desde donde estaba)
+  yPos += 15; // Bajar el bloque 30mm más (ya estaba 15mm abajo, ahora 30mm más = 45mm total)
+  
+  // Dibujar la firma primero (subida 1.5mm)
+  const firmaMedicoY = yPos - 1.5; // Subir la firma 1.5mm
+  let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
+  if (firmaMedicoUrl) {
+    try {
+      const imgWidth = 50;
+      const imgHeight = 25;
+      const x = tablaInicioX + (tablaAncho / 2) - (imgWidth / 2);
+      const y = firmaMedicoY;
+      doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando firma del médico:", error);
+    }
+  }
+  
+  // Posición para la línea y el texto
+  const lineaY = yPos + 22;
+  const textoY = lineaY + 4; // Bajado 1mm más (de 3 a 4)
+  
+  // Dibujar línea horizontal arriba del texto (ancho reducido)
+  const lineaInicioX = tablaInicioX + (tablaAncho / 2) - 30; // Reducido de 40 a 30
+  const lineaFinX = tablaInicioX + (tablaAncho / 2) + 30; // Reducido de 40 a 30
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
-
-  // Primera fila: Apellidos y Nombres con división para Tipo de examen
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); 
-  doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + filaAltura); // División para Tipo de examen
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); 
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); 
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); 
-  yPos += filaAltura;
-
-  // Segunda fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + 45, yPos, tablaInicioX + 45, yPos + filaAltura);
-  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
-  doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Tercera fila: Domicilio (completa)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Cuarta fila: Puesto de Trabajo, Área de Trabajo (2 columnas)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Quinta fila: Empresa (fila completa)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Sexta fila: Contrata (fila completa)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Séptima fila: Lugar, Años de experiencia, Altura (3 columnas)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + 66, yPos, tablaInicioX + 66, yPos + filaAltura); // División 1
-  doc.line(tablaInicioX + 132, yPos, tablaInicioX + 132, yPos + filaAltura); // División 2
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // === CONTENIDO DE LA TABLA ===
-  let yTexto = 40 + 2; // Ajustar para el header
-
-  // Primera fila: Apellidos y Nombres con Tipo de examen
-  yTexto += filaAltura;
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  // Ajustar ancho para la nueva división (hasta x = tablaInicioX + 140)
-  dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 35, yTexto + 1.5, 95);
-
-  // Columna derecha: Tipo de examen
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("T. Examen:", tablaInicioX + 137, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.tipoExamen, tablaInicioX + 155, yTexto + 1.5);
-  yTexto += filaAltura;
-
-  // Segunda fila: DNI, Edad, Sexo, Fecha Nac.
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("DNI:", tablaInicioX + 2, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.documentoIdentidad, tablaInicioX + 12, yTexto + 1.5);
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Edad:", tablaInicioX + 47, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.edad + " Años", tablaInicioX + 58, yTexto + 1.5);
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Sexo:", tablaInicioX + 92, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.sexo, tablaInicioX + 105, yTexto + 1.5);
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Fecha Nac.:", tablaInicioX + 137, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.fechaNacimiento, tablaInicioX + 155, yTexto + 1.5);
-  yTexto += filaAltura;
-
-  // Tercera fila: Domicilio
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Domicilio:", tablaInicioX + 2, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.direccionPaciente, tablaInicioX + 25, yTexto + 1.5, 160);
-  yTexto += filaAltura;
-
-  // Cuarta fila: Puesto de Trabajo, Área de Trabajo
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.puestoTrabajo, tablaInicioX + 30, yTexto + 1.5);
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Área de Trabajo:", tablaInicioX + 92, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.areaTrabajo, tablaInicioX + 118, yTexto + 1.5);
-  yTexto += filaAltura;
-
-  // Quinta fila: Empresa
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Empresa:", tablaInicioX + 2, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 24, yTexto + 1.5, tablaAncho - 30);
-  yTexto += filaAltura;
-
-  // Sexta fila: Contratista
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Contratista:", tablaInicioX + 2, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.contrata, tablaInicioX + 24, yTexto + 1.5);
-  yTexto += filaAltura;
-
-  // Séptima fila: Lugar, Años de experiencia, Altura
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Lugar:", tablaInicioX + 2, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.lugar || "", tablaInicioX + 15, yTexto + 1.5);
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Años de experiencia:", tablaInicioX + 68, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((datosFinales.anosExperiencia || "") , tablaInicioX + 100, yTexto + 1.5);
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Altura:", tablaInicioX + 134, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.altura || "", tablaInicioX + 150, yTexto + 1.5);
-  yTexto += filaAltura;
-
-  // Octava fila: Declaración (fila completa, altura mayor)
-  const filaAlturaDeclaracion = 20;
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaDeclaracion);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaDeclaracion);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAlturaDeclaracion, tablaInicioX + tablaAncho, yPos + filaAlturaDeclaracion);
-  yPos += filaAlturaDeclaracion;
-
-  // Contenido de la declaración usando el método justificado con bold
-  const textoDeclaracion = "Yo; {apellidosNombres} de {edad} de edad, con DNI/CE/PASAPORTE:{documentoIdentidad}, declaro que toda la información proporcionada en esta declaración jurada es verdadera no habiendo omitido ningún dato personal ni laboral relevante de forma voluntaria.";
-  yTexto = dibujarTextoJustificadoConBold(textoDeclaracion, datosFinales, tablaInicioX + 2, yTexto + 2, tablaAncho - 4, true);
+  doc.line(lineaInicioX, lineaY, lineaFinX, lineaY);
+  
+  // Dibujar texto debajo de la línea
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text("Firma y sello del médico", tablaInicioX + (tablaAncho / 2), textoY, { align: "center" });
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8});
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

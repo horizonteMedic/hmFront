@@ -16,28 +16,28 @@ const LaboratorioAnalisisBioquimicos = ({ token, selectedSede, userlogued, permi
       icon: faFlask,
       vista: 'Analisis Bioquimico',
       permiso: 'Acceso Analisis Bioquimicos',
-      component: <AnalisisBioquimicos token={token} selectedSede={selectedSede} userlogued={userlogued} />
+      component: <AnalisisBioquimicos />
     },
     {
       label: 'Perfil Renal',
       icon: faFilter,
       vista: 'Analisis Bioquimico',
       permiso: 'Acceso Perfil Renal',
-      component: <Bioquimica token={token} selectedSede={selectedSede} userlogued={userlogued} />
+      component: <Bioquimica />
     },
     {
       label: 'Ácido Úrico',
       icon: faTint,
       vista: 'Analisis Bioquimico',
       permiso: 'Acceso Acido Urico',
-      component: <BioquimicaAcidoUrico token={token} selectedSede={selectedSede} userlogued={userlogued} />
+      component: <BioquimicaAcidoUrico />
     },
     {
       label: 'Perfil Hepático',
       icon: faLungs,
       vista: 'Analisis Bioquimico',
       permiso: 'Acceso Perfil Hepatico',
-      component: <PerfilHepatico token={token} selectedSede={selectedSede} userlogued={userlogued} />
+      component: <PerfilHepatico />
     }
   ];
 

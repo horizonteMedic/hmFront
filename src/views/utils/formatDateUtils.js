@@ -2,10 +2,20 @@ import { parse, format } from "date-fns";
 import { es } from "date-fns/locale";
 
 export function formatearFechaCorta(fechaStr) {//INPUT 2025-01-28 //OUTPUT 28/01/2025
-    if (!fechaStr || fechaStr.trim() === "") return "";
+    if (!fechaStr) return "";
+    
+    // Handle Date objects
+    if (fechaStr instanceof Date) {
+        if (isNaN(fechaStr.getTime())) return "";
+        return format(fechaStr, "dd/MM/yyyy");
+    }
+    
+    // Handle strings
+    const fechaStrTrimmed = String(fechaStr).trim();
+    if (fechaStrTrimmed === "") return "";
     
     try {
-        const parsedDate = parse(fechaStr, "yyyy-MM-dd", new Date());
+        const parsedDate = parse(fechaStrTrimmed, "yyyy-MM-dd", new Date());
         if (isNaN(parsedDate.getTime())) {
             return "";
         }

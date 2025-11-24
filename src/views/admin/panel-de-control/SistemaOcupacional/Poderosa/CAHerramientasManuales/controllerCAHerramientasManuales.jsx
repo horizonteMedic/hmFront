@@ -139,6 +139,7 @@ const GetInfoPac = async (nro, set, token, sede) => {
             contrata: res.contrata,
             cargo: res.cargo ?? "",
             areaTrabajo: res.areaO ?? "",
+            nombreExamen: res.nomExam ?? "",
         }));
     }
 };

@@ -27,6 +27,60 @@ export const GetInfoServicio = async (
         onFinish
     );
     if (res) {
+        const imc = res.imcTriaje ?? "";
+        let imcRed = false;
+        let nuevasObservaciones = (res.diagnosticoAudiometria ?? "").toUpperCase();
+        if (nuevasObservaciones != "") {
+            nuevasObservaciones += "\n";
+        }
+        if (imc) {
+            const imcValue = parseFloat(imc);
+            if (!isNaN(imcValue) && imcValue > 25) {
+                imcRed = true;
+                if (imcValue >= 25 && imcValue < 30) {
+                    nuevasObservaciones += "SOBREPESO: DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+                } else if (imcValue >= 30 && imcValue < 35) {
+                    nuevasObservaciones += "OBESIDAD I: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+                } else if (imcValue >= 35 && imcValue < 40) {
+                    nuevasObservaciones += "OBESIDAD II: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+                } else if (imcValue >= 40) {
+                    nuevasObservaciones += "OBESIDAD III: NO HACER TRABAJOS EN ESPACIOS CONFINADOS. NO HACER TRABAJOS SOBRE 1.8 M.S.N PISO. DIETA HIPOCALORICA, HIPOGRASA Y EJERCICIOS.\n";
+                }
+            }
+        }
+        const promedioOidoDerecho = res.promedioOidoDerecho ?? 0;
+        const promedioOidoIzquierdo = res.promedioOidoIzquierdo ?? 0;
+        let oidoMayor40 = false;
+        if (promedioOidoDerecho > 40 || promedioOidoIzquierdo > 40) {
+            oidoMayor40 = true;
+        }
+
+        const vlejoscod = res.odlcoftalmologia_odlc || "";
+        const vlejoscoi = res.oilcoftalmologia_oilc || "";
+
+        const vcercacod = res.oftalodccmologia_odcc || "";
+        const vcercacoi = res.oiccoftalmologia_oicc || "";
+        const textoEnfermedadOftalmo = (res.enfermedadesocularesoftalmo_e_oculares ?? "").trim().toUpperCase();
+
+        if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
+            const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
+            if (enfermedadesRefractarias.some(e => textoEnfermedadOftalmo.includes(e))) {
+                const visionLejosNormal = vlejoscod === "00" && vlejoscoi === "00";
+                const visionCercaNormal = vcercacod === "00" && vcercacoi === "00";
+                nuevasObservaciones += visionLejosNormal && visionCercaNormal
+                    ? "CORREGIR AGUDEZA VISUAL.\n"
+                    : "USO DE LENTES CORRECTORES.\n";
+            }
+        }
+
+        let anemia = false;
+        const hemoglobina = parseFloat(res.laboratorioClinicoHemoglobina);
+
+        if (!isNaN(hemoglobina)) {
+            const umbral = res.sexoPaciente === "M" ? 13 : 12;
+            anemia = hemoglobina < umbral;
+        }
+
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
@@ -53,6 +107,10 @@ export const GetInfoServicio = async (
             vcCorregidaOI: res.oiccoftalmologia_oicc ?? "",
             vlCorregidaOI: res.oilcoftalmologia_oilc ?? "",
 
+            hipoacusiaFrecuenciasConversacionales: oidoMayor40,
+            conclusion: oidoMayor40 ? "NO APTO" : null,
+            anemiaCriteriosOMS2011: anemia,
+
             vclrs: res.vcoftalmologia_vc ?? "",
             vb: res.vboftalmologia_vb ?? "",
             rp: res.rpoftalmologia_rp ?? "",
@@ -70,8 +128,11 @@ export const GetInfoServicio = async (
             icc: res.iccTriaje ?? "",
             perimetroToracicoInspiracion: res.maximaInspiracionPtoracico_p_max_inspiracion ?? "",
             perimetroToracicoEspiracion: res.forazadaPtoracico_p_ex_forzada ?? "",
+            observacionesRecomendaciones: nuevasObservaciones,
+            imcRed: imcRed,
 
-            obesidadIMC30: parseFloat(res.imcTriaje) >= 30 ,
+            obesidadIMC30: parseFloat(res.imcTriaje) >= 30,
+
         }));
     }
 };
@@ -91,6 +152,14 @@ export const GetInfoServicioEditar = async (
         onFinish
     );
     if (res) {
+        const imc = res.imcTriaje ?? "";
+        let imcRed = false;
+        if (imc) {
+            const imcValue = parseFloat(imc);
+            if (!isNaN(imcValue) && imcValue > 25) {
+                imcRed = true;
+            }
+        }
         set((prev) => ({
             ...prev,
             // Header
@@ -132,6 +201,7 @@ export const GetInfoServicioEditar = async (
             talla: res.tallaTriaje ?? "",
             peso: res.pesoTriaje ?? "",
             imc: res.imcTriaje ?? "",
+            imcRed: imcRed,
             perimetroCuello: res.perimetroCuelloTriaje ?? "",
             perimetroCintura: res.cinturaTriaje ?? "",
             perimetroCadera: res.caderaTriaje ?? "",
@@ -199,6 +269,7 @@ export const GetInfoServicioEditar = async (
             obesidadDietaHipocalorica: (res.observacionesRecomendaciones_b_c_observaciones ?? "").includes("OBESIDAD I. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS."),
             usoLentesCorrectoresLectura: (res.observacionesRecomendaciones_b_c_observaciones ?? "").includes("USO DE LENTES CORRECTORES PARA LECTURA DE CERCA."),
             corregirAgudezaLectura: (res.observacionesRecomendaciones_b_c_observaciones ?? "").includes("CORREGIR AGUDEZA VISUAL PARA LECTURA DE CERCA."),
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -292,6 +363,8 @@ export const SubmitDataService = async (
         pcomplementariasTestSas: form.testSASAnormal,
         examenFisicoSustentacionPie: form.sustentacionUnPie,
         antecedentesComentariosDetalles: form.comentariosDetalleAntecedentes,
+
+        usuarioFirma: form.user_medicoFirma,
         usuarioRegistro: user,
     };
 
@@ -344,7 +417,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             //Necesita Agudeza visual 
             Swal.fire(
                 "Alerta",
-                "El paciente necesita pasar por Triaje.",
+                "El paciente necesita pasar por Ficha SAS.",
                 "warning"
             );
         }

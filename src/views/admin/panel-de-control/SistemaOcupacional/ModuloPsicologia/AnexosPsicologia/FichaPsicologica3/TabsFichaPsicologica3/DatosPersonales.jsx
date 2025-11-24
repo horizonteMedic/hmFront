@@ -2,6 +2,7 @@ import {
     InputTextOneLine,
     InputTextArea,
 } from "../../../../../../../components/reusableComponents/ResusableComponents";
+import SectionFieldset from "../../../../../../../components/reusableComponents/SectionFieldset";
 
 export default function DatosPersonales({
     form,
@@ -14,13 +15,9 @@ export default function DatosPersonales({
         <div className="mx-auto bg-white overflow-hidden">
             <div className="flex h-full">
                 <div className="w-full space-y-3 px-3">
-                    {/*==========================Datos Personales Section==========================*/}
                     <div>
-                        {/* ===== SECCIÓN: DATOS PERSONALES ===== */}
                         <div className="p-4 text-[10px] space-y-2">
-                            {/* Header con información básica */}
-                            <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                <h3 className="font-semibold mb-2">Información General</h3>
+                            <SectionFieldset legend="Información del Examen">
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                     <InputTextOneLine
                                         label="N° Orden"
@@ -47,10 +44,9 @@ export default function DatosPersonales({
                                         labelWidth="120px"
                                     />
                                 </div>
-                            </div>
-                            {/* Contenido principal - Datos Personales */}
-                            <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                <h4 className="font-semibold mb-2">Datos Personales</h4>
+                            </SectionFieldset>
+
+                            <SectionFieldset legend="Datos Personales">
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 space-y-2">
                                     <InputTextOneLine
                                         label="Nombres"
@@ -99,7 +95,7 @@ export default function DatosPersonales({
                                         labelWidth="120px"
                                     />
                                     <InputTextOneLine
-                                        label="Edad"
+                                        label="Edad (Años)"
                                         name="edad"
                                         value={form.edad}
                                         disabled
@@ -120,12 +116,9 @@ export default function DatosPersonales({
                                         labelWidth="120px"
                                     />
                                 </div>
-                            </div>
+                            </SectionFieldset>
 
-                            {/* ===== SECCIÓN: DATOS LABORALES ===== */}
-                            <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                <h4 className="font-semibold mb-3">Datos Laborales</h4>
-
+                            <SectionFieldset legend="Datos Laborales">
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 space-y-2">
                                     <InputTextOneLine
                                         label="Empresa"
@@ -191,81 +184,59 @@ export default function DatosPersonales({
                                         labelWidth="120px"
                                     />
                                 </div>
-                            </div>
+                            </SectionFieldset>
 
-                            {/* ===== SECCIÓN: EVALUACIÓN Y RIESGOS ===== */}
-                            <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                <h4 className="font-semibold mb-3">Evaluación y Riesgos</h4>
+                            <SectionFieldset legend="Evaluación y Riesgos" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4">
+                                <InputTextArea
+                                    rows={5}
+                                    label="Motivo Evaluación"
+                                    name="motivoEvaluacion"
+                                    value={form.motivoEvaluacion}
+                                    onChange={handleChange}
+                                />
+                                <InputTextArea
+                                    rows={5}
+                                    label="Principales Riesgos"
+                                    name="principalesRiesgos"
+                                    value={form.principalesRiesgos}
+                                    onChange={handleChange}
+                                />
+                                <InputTextArea
+                                    rows={5}
+                                    label="Medidas de Seguridad"
+                                    name="medidasSeguridad"
+                                    value={form.medidasSeguridad}
+                                    onChange={handleChange}
+                                />
+                            </SectionFieldset>
 
+                            <SectionFieldset legend="Historia y Observaciones">
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-4">
-                                    <div>
-                                        <h5 className="font-semibold mb-2">Motivo Evaluación</h5>
-                                        <InputTextArea
-                                            rows={5}
-                                            name="motivoEvaluacion"
-                                            value={form.motivoEvaluacion}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div>
-                                        <h5 className="font-semibold mb-2">Principales Riesgos</h5>
-                                        <InputTextArea
-                                            rows={5}
-                                            name="principalesRiesgos"
-                                            value={form.principalesRiesgos}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div>
-                                        <h5 className="font-semibold mb-2">Medidas de Seguridad</h5>
-                                        <InputTextArea
-                                            rows={5}
-                                            name="medidasSeguridad"
-                                            value={form.medidasSeguridad}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
+                                    <InputTextArea
+                                        rows={5}
+                                        label="Historia Familiar"
+                                        name="historiaFamiliar"
+                                        value={form.historiaFamiliar}
+                                        onChange={handleChange}
+                                    />
+                                    <InputTextArea
+                                        rows={5}
+                                        label="Hábitos"
+                                        name="habitos"
+                                        value={form.habitos}
+                                        onChange={handleChange}
+                                    />
+                                    <InputTextArea
+                                        rows={5}
+                                        label="Otras Observaciones"
+                                        name="otrasObservaciones"
+                                        value={form.otrasObservaciones}
+                                        onChange={handleChange}
+                                    />
                                 </div>
-                            </div>
+                            </SectionFieldset>
 
-                            {/* ===== SECCIÓN: HISTORIA Y OBSERVACIONES ===== */}
-                            <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                <h4 className="font-semibold mb-3">Historia y Observaciones</h4>
-
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-4">
-                                    <div>
-                                        <h5 className="font-semibold mb-2">Historia Familiar</h5>
-                                        <InputTextArea
-                                            rows={5}
-                                            name="historiaFamiliar"
-                                            value={form.historiaFamiliar}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div>
-                                        <h5 className="font-semibold mb-2">Hábitos</h5>
-                                        <InputTextArea
-                                            rows={5}
-                                            name="habitos"
-                                            value={form.habitos}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div>
-                                        <h5 className="font-semibold mb-2">Otras Observaciones</h5>
-                                        <InputTextArea
-                                            rows={5}
-                                            name="otrasObservaciones"
-                                            value={form.otrasObservaciones}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                            {/* ===== SECCIÓN: ANTERIORES EMPRESAS ===== */}
-                            <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                <h4 className="font-semibold mb-3 text-[11px]">ANTERIORES EMPRESAS (experiencia laboral)</h4>
-                                {/* Tabla de empresas anteriores */}
+                            <SectionFieldset legend="Experiencia Laboral">
                                 <div className="overflow-x-auto">
                                     <table className="w-full border-collapse border border-gray-300 text-[11px]">
                                         <thead>
@@ -302,7 +273,7 @@ export default function DatosPersonales({
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
+                            </SectionFieldset>
                         </div>
                     </div>
                 </div>

@@ -55,6 +55,7 @@ export default function ExamenFisico({ form, handleChange, handleRadioButtonBool
                         label="IMC"
                         name="imc"
                         value={form?.imc}
+                        className={form?.imcRed ? "text-red-600" : ""}
                         disabled
                         labelWidth="120px"
                     />

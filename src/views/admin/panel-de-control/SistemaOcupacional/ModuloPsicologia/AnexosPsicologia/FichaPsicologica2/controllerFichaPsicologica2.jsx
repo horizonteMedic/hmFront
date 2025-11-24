@@ -37,12 +37,14 @@ export const GetInfoServicio = async (
             esApto: res.apto_apto,
             nombres: res.nombresPaciente,
             apellidos: res.apellidosPaciente,
-            fechaNacimiento: res.fechaNacimientoPaciente,
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente),
             lugarNacimiento: res.lugarNacimientoPaciente,
             domicilioActual: res.direccionPaciente,
             edad: res.edadPaciente,
             estadoCivil: res.estadoCivil,
             nivelEstudios: res.nivelEstudioPaciente,
+            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+            estadoCivil: res.estadoCivilPaciente,
 
             // Datos laborales
             empresa: res.empresa,
@@ -65,8 +67,8 @@ export const GetInfoServicio = async (
                 res.tonoBajo_rb_bajo ? "BAJO" :
                     res.tonoAlto_rb_alto ? "ALTO" : "",
 
-            discursoArticulacion: res.marchaSinDificultad_rb_sindificultad ? "SIN_DIFICULTAD" :
-                res.marchaConDificultad_rb_condificultad ? "CON_DIFICULTAD" : "",
+            discursoArticulacion: res.articulacionSinDificultad_rb_sindificultad ? "SIN_DIFICULTAD" :
+                res.articulacionConDificultad_rb_condificultad ? "CON_DIFICULTAD" : "",
             orientacionTiempo: res.tiempoOrientado_rb_tiempo_orientado ? "ORIENTADO" :
                 res.tiempoDesorientado_rb_tiempo_desorientado ? "DESORIENTADO" : "",
             orientacionEspacio: res.espacioOrientado_rb_espacio_orientado ? "ORIENTADO" :
@@ -98,7 +100,7 @@ export const SubmitDataService = async (
     tabla,
     datosFooter
 ) => {
-    if (form.esApto === undefined||form.esApto === "") {
+    if (form.esApto === undefined || form.esApto === "") {
         Swal.fire({
             icon: "Error",
             title: "Datos Incompletos",
@@ -124,8 +126,8 @@ export const SubmitDataService = async (
         tonoBajo: form.discursoTono == "BAJO", //revisar - mapear con form.discursoTono
         tonoModerado: form.discursoTono == "MODERADO", //revisar - mapear con form.discursoTono
         tonoAlto: form.discursoTono == "ALTO", //revisar - mapear con form.discursoTono
-        marchaconDificultad: form.discursoArticulacion == "CON_DIFICULTAD", //revisar - mapear con form.discursoArticulacion
-        marchasinDificultad: form.discursoArticulacion == "SIN_DIFICULTAD", //revisar - mapear con form.discursoArticulacion
+        articulacionConDificultad: form.discursoArticulacion == "CON_DIFICULTAD", //revisar - mapear con form.discursoArticulacion
+        articulacionSinDificultad: form.discursoArticulacion == "SIN_DIFICULTAD", //revisar - mapear con form.discursoArticulacion
         tiempoOrientado: form.orientacionTiempo == "ORIENTADO", //revisar - mapear con form.orientacionTiempo
         tiempoDesorientado: form.orientacionTiempo == "DESORIENTADO", //revisar - mapear con form.orientacionTiempo
         espacioOrientado: form.orientacionEspacio == "ORIENTADO", //revisar - mapear con form.orientacionEspacio
@@ -150,7 +152,7 @@ export const SubmitDataService = async (
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../jaspers/ModuloPsicologia/FichaAnexo2/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/FichaAnexo2/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -158,7 +160,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../jaspers/ModuloPsicologia/FichaAnexo2"
+        "../../../../../../jaspers/ModuloPsicologia/FichaAnexo2"
     );
 };
 
@@ -193,9 +195,13 @@ const GetInfoPac = async (nro, set, token, sede) => {
             ...prev,
             ...res,
             fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
-            edad: res.edad + " AÑOS",
+            edad: res.edad,
             ocupacion: res.areaO ?? "",
+            nombreExamen: res.nomExam ?? "",
             cargoDesempenar: res.cargo ?? "",
+            lugarNacimiento: res.lugarNacimiento ?? "",
+            domicilioActual: res.direccion ?? "",
+            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
         }));
     }
 };

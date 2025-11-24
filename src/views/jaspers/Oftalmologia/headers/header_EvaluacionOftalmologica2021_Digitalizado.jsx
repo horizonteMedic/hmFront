@@ -142,7 +142,7 @@ const header_EvaluacionOftalmologica2021_Digitalizado = (doc, datos = {}) => {
 
   // Agregar label "N° Ficha:" antes del valor
   doc.text("N° Ficha:", fichaLabelX, bloqueY, { align: "left" });
-  doc.setFont("helvetica", "bold").setFontSize(18);
+  doc.setFont("helvetica", "normal").setFontSize(18);
   doc.text(fichaValue, fichaX, bloqueY, { align: "right" });
 
   // Sede debajo

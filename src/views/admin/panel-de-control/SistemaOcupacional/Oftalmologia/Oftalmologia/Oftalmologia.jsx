@@ -12,13 +12,10 @@ import {
   VerifyTR,
 } from "./controllerOftalmologia";
 import Swal from "sweetalert2";
+import { getToday } from "../../../../../utils/helpers";
 
 const tabla = "oftalmologia2021";
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
+const today = getToday();
 
 const initialFormState = {
   norden: "",
@@ -80,10 +77,10 @@ const initialFormState = {
   oiejeC: "-",
   dipC: "-",
 
-  agudezaOdLejos: "",
-  agudezaOiLejos: "",
-  agudezaOdCerca: "",
-  agudezaOiCerca: "",
+  agudezaOdLejos: "00",
+  agudezaOiLejos: "00",
+  agudezaOdCerca: "00",
+  agudezaOiCerca: "00",
   diagnostico: "",
 
   ninguna: false,
@@ -101,20 +98,20 @@ const initialFormState = {
   noTrabajosCableElectrico: false,
   noConduccion: false,
 
-  vc_sinc_od: "",
-  vc_sinc_oi: "",
-  vc_conc_od: "",
-  vc_conc_oi: "",
-  vc_agujero_od: "",
-  vc_agujero_oi: "",
-  vl_sinc_od: "",
-  vl_sinc_oi: "",
-  vl_conc_od: "",
-  vl_conc_oi: "",
-  vl_agujero_od: "",
-  vl_agujero_oi: "",
-  bino_sinc: "",
-  bino_conc: "",
+  vc_sinc_od: "00",
+  vc_sinc_oi: "00",
+  vc_conc_od: "00",
+  vc_conc_oi: "00",
+  vc_agujero_od: "00",
+  vc_agujero_oi: "00",
+  vl_sinc_od: "00",
+  vl_sinc_oi: "00",
+  vl_conc_od: "00",
+  vl_conc_oi: "00",
+  vl_agujero_od: "00",
+  vl_agujero_oi: "00",
+  bino_sinc: "00",
+  bino_conc: "00",
   reflejos_pupilares: "",
 
   ptosisPalpebralOd: false,
@@ -1520,7 +1517,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
             </button>
           </div>
           <div className="flex flex-col items-end">
-            <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+            <span className="font-bold italic text-base mb-1">Imprimir</span>
             <div className="flex items-center gap-2">
               <input
                 name="norden"

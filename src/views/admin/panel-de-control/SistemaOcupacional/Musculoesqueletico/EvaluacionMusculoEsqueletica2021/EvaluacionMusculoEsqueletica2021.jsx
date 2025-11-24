@@ -12,6 +12,7 @@ import {
   SubmitDataService,
   VerifyTR,
 } from "./controllerEvaluacionMusculoEsqueletica2021";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "evaluacion_musculo_esqueletica2021";
 const date = new Date();
@@ -26,7 +27,7 @@ function fixEncodingModern(str) {
 }
 
 const EvaluacionMusculoEsqueletica2021 = () => {
-  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+  const { token, userlogued, selectedSede, datosFooter, userCompleto, userName } =
     useSessionData();
   const initialFormState = {
     norden: "",
@@ -158,12 +159,17 @@ const EvaluacionMusculoEsqueletica2021 = () => {
     )} - ${userCompleto?.datos?.cmp ?? ""}`,
     conclusiones: "",
     recomendaciones: "-EVALUACIÓN ANUAL",
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
   const {
     form,
     setForm,
     handleChange,
     handleChangeNumber,
+    handleChangeSimple,
     handleRadioButton,
     handleClear,
     handleClearnotO,
@@ -385,19 +391,11 @@ const EvaluacionMusculoEsqueletica2021 = () => {
               </div>
             </div>
 
-            <div>
-              <div className="mb-3">
-                <label className="font-semibold block mb-1">
-                  Nombre y Apellidos del Médico - N° Colegiatura:
-                </label>
-                <input
-                  className="border rounded px-3 py-1 w-full capitalize"
-                  name="nombreMedico"
-                  value={form.nombreMedico || ""}
-                  disabled
-                />
-              </div>
-            </div>
+            <EmpleadoComboBox
+              value={form.nombre_medico}
+              form={form}
+              onChange={handleChangeSimple}
+            />
           </div>
           <div className="mb-3">
             <label className="font-semibold block mb-1">Conclusiones:</label>
@@ -457,7 +455,7 @@ const EvaluacionMusculoEsqueletica2021 = () => {
           </div>
 
           <div className="flex flex-col items-end">
-            <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+            <span className="font-bold italic text-base mb-1">Imprimir</span>
             <div className="flex items-center gap-2">
               <input
                 name="norden"

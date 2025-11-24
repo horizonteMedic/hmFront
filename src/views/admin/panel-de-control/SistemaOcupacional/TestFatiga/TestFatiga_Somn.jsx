@@ -326,7 +326,7 @@ const Test_fatiga = () => {
                           </button>
                       </div>
                       <div className="flex flex-col p-2 ">
-                        <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+                        <span className="font-bold italic text-base mb-1">Imprimir</span>
                         <div className="flex items-center gap-2">
                             <input
                             name="norden"

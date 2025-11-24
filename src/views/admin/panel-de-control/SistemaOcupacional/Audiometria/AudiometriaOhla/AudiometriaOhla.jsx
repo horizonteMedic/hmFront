@@ -899,6 +899,7 @@ export default function AudiometriaOhla({
                       oi_4000: newValue ? "N/A" : "",
                       oi_6000: newValue ? "N/A" : "",
                       oi_8000: newValue ? "N/A" : "",
+                      diagnostico: newValue ? "NO SE REALIZO AUDIOMETRIA" : "",
                     };
                   });
                 }}

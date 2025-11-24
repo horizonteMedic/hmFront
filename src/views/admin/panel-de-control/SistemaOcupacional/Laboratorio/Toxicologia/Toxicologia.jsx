@@ -1,5 +1,4 @@
-// src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/Toxicologia/Toxicologia.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquare, faCube, faLayerGroup, faThLarge } from '@fortawesome/free-solid-svg-icons';
 import Resultado_Panel2D from './Panel2D/Resultado_Panel2D';
@@ -8,20 +7,20 @@ import Resultado_Panel4D from './Panel4D/Resultado_Panel4D';
 import Resultado_Panel5D from './Panel5D/Resultado_Panel5D';
 import Resultado_Panel10D from './Panel10D/Resultado_Panel10D';
 
-const Toxicologia = ({token, selectedSede, userlogued, permiso}) => {
+const Toxicologia = ({ permiso }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [
     { label: 'Panel 2D', icon: faCube,vista: 'Toxicologia',
-      permiso: 'Acceso Tox - Panel 2D', component: <Resultado_Panel2D token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+      permiso: 'Acceso Tox - Panel 2D', component: <Resultado_Panel2D /> },
     { label: 'Panel 3D', icon: faThLarge, vista: 'Toxicologia',
-      permiso: 'Acceso Tox - Panel 3D', component: <Resultado_Panel3D token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+      permiso: 'Acceso Tox - Panel 3D', component: <Resultado_Panel3D /> },
     { label: 'Panel 4D', icon: faSquare, vista: 'Toxicologia',
-      permiso: 'Acceso Tox - Panel 4D', component: <Resultado_Panel4D token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+      permiso: 'Acceso Tox - Panel 4D', component: <Resultado_Panel4D /> },
     { label: 'Panel 5D', icon: faLayerGroup, vista: 'Toxicologia',
-      permiso: 'Acceso Tox - Panel 5D', component: <Resultado_Panel5D token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+      permiso: 'Acceso Tox - Panel 5D', component: <Resultado_Panel5D /> },
     { label: 'Panel 10D', icon: faLayerGroup, vista: 'Toxicologia',
-      permiso: 'Acceso Tox - Panel 10D', component: <Resultado_Panel10D token={token} selectedSede={selectedSede} userlogued={userlogued}/> }
+      permiso: 'Acceso Tox - Panel 10D', component: <Resultado_Panel10D /> }
   ];
     const tabsConPermiso = tabs.filter(tab => permiso(tab.vista, tab.permiso));
 

@@ -89,7 +89,6 @@ export const GetInfoServicioEditar = async (
             ...prev,
             norden: res.norden,
             tipoExamen: res.nombreExamen,
-            fechaExam: res.fechaDesde,
             nombres: res.nombresPaciente + " " + res.apellidosPaciente,
             dni: res.dniPaciente,
             edad: res.edadPaciente,
@@ -167,7 +166,7 @@ export const SubmitDataService = async (
     const body = {
         norden: form.norden,
         dni: form.dni,
-        fecha: form.fechaExam,
+        fecha: form.fechaValido,
         nombreMedico: form.nombre_medico,
         apto: form.apto === "APTO",
         aptoRestriccion: form.apto === "APTO CON RESTRICCION",

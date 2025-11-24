@@ -78,7 +78,7 @@ export default function RayosXColumna() {
               </h1>
               <div className="flex flex-col items-end">
                 <span className="font-bold italic text-base mb-1">
-                  IMPRIMIR
+                  Imprimir
                 </span>
                 <div className="flex items-center gap-2">
                   <input

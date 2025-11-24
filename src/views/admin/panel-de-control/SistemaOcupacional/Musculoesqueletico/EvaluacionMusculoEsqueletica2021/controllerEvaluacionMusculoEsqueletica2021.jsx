@@ -33,7 +33,7 @@ export const GetInfoServicio = (
   tabla,
   set,
   token,
-  onFinish = () => {}
+  onFinish = () => { }
 ) => {
   getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
     .then((res) => {
@@ -91,7 +91,7 @@ export const GetInfoServicio = (
 
           // PARTE 2: COLUMNA VERTEBRAL
           desviacionEje: leerBoolSINO(res, "columnaVertebralDesviacion"),
-          testAdams: leerBoolPOSITIVO(res, "columnaVertebralAdams"), 
+          testAdams: leerBoolPOSITIVO(res, "columnaVertebralAdams"),
           dandy: leerBoolPOSITIVO(res, "columnaVertebralDandy"),
           lasegue: leerBoolPOSITIVO(res, "columnaVertebralLasegue"),
           contracturaMuscular: leerBoolSINO(res, "columnaVertebralContractura"),
@@ -186,6 +186,8 @@ export const GetInfoServicio = (
           cie10: res.cie10,
           conclusiones: res.conclusiones,
           recomendaciones: res.recomendaciones,
+
+          user_medicoFirma: res.usuarioFirma,
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -355,6 +357,8 @@ export const SubmitDataService = async (
     cie10: form.cie10,
     recomendaciones: form.recomendaciones,
     medico: form.nombreMedico,
+
+    usuarioFirma: form.user_medicoFirma,
     dniUser: dniUser,
     userRegistro: user,
   };

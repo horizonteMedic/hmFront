@@ -4,6 +4,7 @@ import {
   InputTextOneLine,
 } from "../../../../../../../components/reusableComponents/ResusableComponents";
 import RadioTable from "../../../../../../../components/reusableComponents/RadioTable";
+import SectionFieldset from "../../../../../../../components/reusableComponents/SectionFieldset";
 
 export default function CriteriosPsicologicosII({
   form,
@@ -18,12 +19,7 @@ export default function CriteriosPsicologicosII({
   return (
     <div className="bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* ASPECTOS CONDUCTUALES */}
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <h3 className="text-lg font-semibold mb-4 text-center bg-red-100 text-red-800 py-2 rounded">
-            ASPECTOS CONDUCTUALES
-          </h3>
-
+        <SectionFieldset legend="ASPECTOS CONDUCTUALES">
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -58,15 +54,9 @@ export default function CriteriosPsicologicosII({
               />
             </div>
           </div>
-        </div>
+        </SectionFieldset>
 
-        {/* ASPECTOS PSICOLABORALES */}
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <h3 className="text-lg font-semibold mb-4 text-center bg-blue-100 text-blue-800 py-2 rounded">
-            ASPECTOS PSICOLABORALES
-          </h3>
-
-          {/* Tabla de aspectos psicolaborales */}
+        <SectionFieldset legend="ASPECTOS PSICOLABORALES">
           <RadioTable
             items={[
               { name: "capacidadInfluencia", label: "1. Capacidad de influencia" },
@@ -88,7 +78,7 @@ export default function CriteriosPsicologicosII({
             form={form}
             handleRadioButton={handleRadioButton}
           />
-        </div>
+        </SectionFieldset>
       </div>
     </div>
   );

@@ -13,73 +13,13 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   // Contador de páginas dinámico
   let numeroPagina = 1;
 
-  // Datos de prueba por defecto
-  const datosPrueba = {
-    apellidosNombres: "CASTILLO PLASENCIA HADY KATHERINE",
-    fechaExamen: "04/11/2024",
-    tipoExamen: "PRE-OCUPACIONAL",
-    sexo: "Femenino",
-    documentoIdentidad: "72384273",
-    edad: "31",
-    areaTrabajo: "MINERÍA",
-    puestoTrabajo: "DAD",
-    empresa: "MINERA BOROO MISQUICHILCA S.A.",
-    contrata: "CONTRATA EJEMPLO S.A.C.",
-    vitalSigns: {
-      fc: "64",
-      fr: "19",
-      pa: "120/60",
-      satO2: "99",
-      imc: "23.48",
-      temperatura: "36.5",
-      peso: "70",
-      talla: "1.75"
-    },
-    condiciones: {
-      cirugiaMayor: false,
-      desordenesCoagulacion: false,
-      diabetes: false,
-      hipertension: false,
-      embarazo: false,
-      problemasNeurologicos: false,
-      infeccionesRecientes: true,
-      obesidadMorbida: false,
-      problemasCardiacos: false,
-      problemasRespiratorios: false,
-      problemasOftalmologicos: true,
-      problemasDigestivos: false,
-      apneaSueño: false,
-      alergias: false,
-      otraCondicion: false
-    },
-    medicacionActual: "Paracetamol 500mg cada 8 horas",
-    fur: "15/08/2024", // Fecha de última regla
-    observaciones: [
-      "USO DE LENTES CORRECTORES",
-      "ALERGIA A PENICILINA",
-      "SE RECOMIENDA SEGUIMIENTO MÉDICO CADA 6 MESES"
-    ],
-    medico: {
-      nombres: "SANCHEZ QUIÑONES JOSE ALEJANDRO",
-      direccion: "Av. Nicolas de Piérola N°1106 Urb. San Fernando",
-      cmp: "80135",
-      fecha: "04/11/2024"
-    },
-    // Datos de color
-    color: 1,
-    codigoColor: "#008f39",
-    textoColor: "F",
-    // Datos adicionales para header
-    numeroFicha: "99164",
-    sede: "Trujillo-Pierola"
-  };
   const datosReales = {
     apellidosNombres: String((data.apellidos_apellidos_pa || "") + " " + (data.nombres_nombres_pa || "")),
     fechaExamen: formatearFechaCorta(data.fechaAnexo16a_fecha_anexo || ""),
     tipoExamen: String(data.nombreExamen || ""),
     sexo: convertirGenero(data.sexo_sexo_pa) || "",
     documentoIdentidad: String(data.dni_cod_pa || ""),
-    edad: String(data.edad_edad ?? ""),
+    edad: data.edad_edad ? String(data.edad_edad) : "",
     areaTrabajo: data.area_area_o || "",
     puestoTrabajo: data.cargo_cargo_de || "",
     empresa: data.empresa_razon_empresa || "",
@@ -88,7 +28,9 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     vitalSigns: {
       fc: String(data.frecuenciaCardiacaTriaje_f_cardiaca || ""),
       fr: String(data.frecuenciaRespiratoriaTriaje_f_respiratoria || ""),
-      pa: String(data.sistolicaTriaje_sistolica || "") + "/" + String(data.diastolicaTriaje_diastolica || ""), //revisar - combinación de sistólica y diastólica
+      pa: (data.sistolicaTriaje_sistolica || data.diastolicaTriaje_diastolica) 
+        ? String(data.sistolicaTriaje_sistolica || "") + "/" + String(data.diastolicaTriaje_diastolica || "")
+        : "",
       satO2: String(data.saturacionOxigenoTriaje_sat_02 || ""),
       imc: String(data.imcTriaje_imc || ""),
       temperatura: String(data.temperaturaTriaje_temperatura || ""),
@@ -118,14 +60,22 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     medico: {
       nombres: String((data.apellidoUsuario_apellido_user || "") + " " + (data.nombreUsuario_nombre_user || "")),
       direccion: data.direccionSede || "",
-      cmp: data.cmpUsuario_cmp_user || "",
+      cmp: data.cmpUsuario_cmp_user ? String(data.cmpUsuario_cmp_user) : "",
       fecha: formatearFechaCorta(data.fechaAnexo16a_fecha_anexo || "")
     },
     laboratorio: {
-      hemoglobina: String(data.hemoglobinaLaboratorioClinico_txthemoglobina ?? "") + " g/dl",
-      hematocrito: String(data.hematocritoLaboratorioClinico_txthematocrito ?? "") + "%",
-      glucosa: String(data.glucosaLaboratorioClinico_txtglucosabio ?? "") + " mg/dl",
-      ekg: String(data.hallazgosInformeElectroCardiograma_hallazgo ?? "N/A")
+      hemoglobina: data.hemoglobinaLaboratorioClinico_txthemoglobina 
+        ? String(data.hemoglobinaLaboratorioClinico_txthemoglobina).trim() + " g/dl"
+        : "",
+      hematocrito: data.hematocritoLaboratorioClinico_txthematocrito 
+        ? String(data.hematocritoLaboratorioClinico_txthematocrito).trim() + "%"
+        : "",
+      glucosa: data.glucosaLaboratorioClinico_txtglucosabio 
+        ? String(data.glucosaLaboratorioClinico_txtglucosabio).trim() + " mg/dl"
+        : "",
+      ekg: data.hallazgosInformeElectroCardiograma_hallazgo 
+        ? String(data.hallazgosInformeElectroCardiograma_hallazgo)
+        : ""
     },
 
     // Datos de color
@@ -137,8 +87,8 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     sede: data.nombreSede || ""
   };
 
-  // Usar datos reales si existen, sino usar datos de prueba
-  const datosFinales = data && data.norden_n_orden ? datosReales : datosPrueba;
+  // Usar datos reales
+  const datosFinales = datosReales;
 
   // Header reutilizable (similar a FichaDetencionSAS_boro_Digitalizado.jsx)
   const drawHeader = (pageNumber) => {
@@ -228,7 +178,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     doc.setLineWidth(0.2);
     
     // Dibujar fondo gris más oscuro
-    doc.setFillColor(160, 160, 160);
+    doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
     
     // Dibujar líneas del header
@@ -444,7 +394,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     doc.setLineWidth(0.2);
     
     // Dibujar fondo gris más oscuro
-    doc.setFillColor(160, 160, 160);
+    doc.setFillColor(196, 196, 196);
     doc.rect(leftMargin, yPos, colTexto + colNo + colSi, alturaHeader, 'F');
     
     // Dibujar líneas del header
@@ -529,7 +479,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     if (condicion.campo === "embarazo" && datosFinales.condiciones[condicion.campo]) {
       doc.setFont("helvetica", "normal").setFontSize(9);
       doc.text("FUR:", leftMargin + colTexto + colNo + colSi + 5, yPos + 3);
-      doc.text(datosFinales.fur || "00/00/0000", leftMargin + colTexto + colNo + colSi + 15, yPos + 3);
+      doc.text(datosFinales.fur || "", leftMargin + colTexto + colNo + colSi + 15, yPos + 3);
     }
 
     yPos += altura;
@@ -565,7 +515,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     return Math.max(lineas * fontSize * 0.35 + 1.5, 5);
   };
 
-  const textoMedicacion = datosFinales.medicacionActual || "Sin medicación actual";
+  const textoMedicacion = datosFinales.medicacionActual || "";
   const anchoMaximoMedicacion = tablaAncho - 4;
   const alturaFilaMedicacion = calcularAlturaMedicacion(textoMedicacion, anchoMaximoMedicacion, 8);
 
@@ -889,7 +839,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 7});
 
-  // === IMPRIMIR ===
+  // === Imprimir ===
   imprimir(doc);
 }
 

@@ -1,8 +1,8 @@
 import jsPDF from "jspdf";
-import footerConsentimientoBuenaSalud from "./footerConsentimientoBuenaSalud.jsx";
-import headerConsentimientoBuenaSalud from "./headerConsentimientoBuenaSalud.jsx";
+import CabeceraLogo from "../../components/CabeceraLogo.jsx";
+import footerTR from "../../components/footerTR.jsx";
+import drawColorBox from "../../components/ColorBox.jsx";
 import { formatearFechaLargaConDia } from "../../../utils/formatDateUtils.js";
-
 
 export default function ConsentimientoBuenaSalud2021_Digitalizado(data = {}) {
     const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -10,13 +10,13 @@ export default function ConsentimientoBuenaSalud2021_Digitalizado(data = {}) {
     const pageW = doc.internal.pageSize.getWidth();
     const pageH = doc.internal.pageSize.getHeight();
 
-    // Datos de prueba
-    const datosPrueba = {
-        nombre: "VIVIANA DELGADO VEGA",
-        edad: "25",
-        dni: "75461024",
-        fecha: "2025-08-22",
-        codigoSede: "Sede 1",
+    // Función para formatear fecha a DD/MM/YYYY
+    const toDDMMYYYY = (fecha) => {
+        if (!fecha) return "";
+        if (fecha.includes("/")) return fecha; // ya está en formato correcto
+        const [anio, mes, dia] = fecha.split("-");
+        if (!anio || !mes || !dia) return fecha;
+        return `${dia}/${mes}/${anio}`;
     };
 
     // Función para obtener string de datos
@@ -36,15 +36,45 @@ export default function ConsentimientoBuenaSalud2021_Digitalizado(data = {}) {
         dni: obtenerString("dni"),
         edad: obtenerString("edad"),
         fecha: obtenerString("fecha"),
-        codigoSede: obtenerString("codigoSede"),
+        codigoSede: obtenerString("codigoSede") || obtenerString("nombreSede") || obtenerString("sedeDescripcion") || "",
     };
 
-    const sello1 = data.digitalizacion?.find(
-        (d) => d.nombreDigitalizacion === "FIRMAP"
-    );
-    const sello2 = data.digitalizacion?.find(
-        (d) => d.nombreDigitalizacion === "HUELLA"
-    );
+    // Header con datos de ficha, sede y fecha
+    const drawHeader = () => {
+        CabeceraLogo(doc, { ...data, tieneMembrete: false });
+
+        // Número de Ficha
+        doc.setFont("helvetica", "normal").setFontSize(8);
+        doc.text("Nro de ficha: ", pageW - 80, 15);
+        doc.setFont("helvetica", "normal").setFontSize(18);
+        doc.text(String(data.norden || data.numeroFicha || ""), pageW - 50, 16);
+
+        // Sede
+        doc.setFont("helvetica", "normal").setFontSize(8);
+        doc.text("Sede: " + (data.sedeDescripcion || data.nombreSede || data.codigoSede || ""), pageW - 80, 20);
+
+        // Fecha de examen
+        const fechaExamen = toDDMMYYYY(data.fecha || data.fechaExamen || "");
+        doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
+
+        // Página
+        doc.text("Pag. 01", pageW - 30, 10);
+
+        // Bloque de color
+        drawColorBox(doc, {
+            color: data.codigoColor || "#008f39",
+            text: data.textoColor || "F",
+            x: pageW - 30,
+            y: 10,
+            size: 22,
+            showLine: true,
+            fontSize: 30,
+            textPosition: 0.9,
+        });
+    };
+
+    const sello1 = data.digitalizacion?.find((d) => d.nombreDigitalizacion === "FIRMAP");
+    const sello2 = data.digitalizacion?.find((d) => d.nombreDigitalizacion === "HUELLA");
     const isValidUrl = (url) => url && url !== "Sin registro";
     const loadImg = (src) =>
         new Promise((res, rej) => {
@@ -54,16 +84,16 @@ export default function ConsentimientoBuenaSalud2021_Digitalizado(data = {}) {
             img.onload = () => res(img);
             img.onerror = () => rej(`No se pudo cargar ${src}`);
         });
+
     Promise.all([
         isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
         isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
     ]).then(([s1, s2]) => {
-        // Usar datos reales o datos de prueba
-        const datosFinales =
-            data && Object.keys(data).length > 0 ? datosReales : datosPrueba;
+        // Usar datos reales
+        const datosFinales = datosReales;
 
         // === 0) HEADER CON LOGO, N° FICHA, SEDE Y BLOQUE DE COLOR ===
-        headerConsentimientoBuenaSalud(doc, data);
+        drawHeader();
 
         // === 1) TÍTULO PRINCIPAL ===
         const titulo = "Consentimiento de Buena Salud".toUpperCase();
@@ -75,12 +105,7 @@ export default function ConsentimientoBuenaSalud2021_Digitalizado(data = {}) {
         doc.setDrawColor(0, 0, 0);
         doc.setLineWidth(0.5);
         const tituloWidth = doc.getTextWidth(titulo);
-        doc.line(
-            (pageW - tituloWidth) / 2,
-            margin + 27,
-            (pageW + tituloWidth) / 2,
-            margin + 27
-        );
+        doc.line((pageW - tituloWidth) / 2, margin + 27, (pageW + tituloWidth) / 2, margin + 27);
 
         // === 2) PÁRRAFO CON TEXTO EN NEGRITA PARA NOMBRE, DNI Y EDAD ===
         let currentY = margin + 55;
@@ -150,15 +175,9 @@ export default function ConsentimientoBuenaSalud2021_Digitalizado(data = {}) {
         const cuerpoEndY = cuerpoY + 25; // Espacio aproximado para el texto del consentimiento
 
         doc.setFont("helvetica", "normal").setFontSize(11);
-        doc.text(
-            "Por lo que soy responsable de lo anteriormente declarado.",
-            margin,
-            cuerpoEndY + 5
-        );
-
+        doc.text("Por lo que soy responsable de lo anteriormente declarado.", margin, cuerpoEndY + 5);
 
         // === 4) FECHA Y HORA ===
-
         const fechaHoraY = cuerpoEndY + 15;
         doc.setFont("helvetica", "normal").setFontSize(11);
         doc.text(`${formatearFechaLargaConDia(datosFinales.fecha)}`, pageW - margin, fechaHoraY, { align: "right" });
@@ -255,19 +274,7 @@ export default function ConsentimientoBuenaSalud2021_Digitalizado(data = {}) {
         }
 
         // === 6) FOOTER CON LÍNEA PÚRPURA Y DATOS DE CONTACTO ===
-        const footerContactY = pageH - 25;
-
-        // Línea separadora horizontal
-        doc.setDrawColor(51, 0, 153); // Color #330099
-        doc.setLineWidth(1);
-        doc.line(margin, footerContactY - 5, pageW - margin, footerContactY - 5);
-
-        // Restaurar color negro para el texto
-        doc.setDrawColor(0, 0, 0);
-        doc.setTextColor(0, 0, 0);
-
-        // Agregar footer con datos de contacto
-        footerConsentimientoBuenaSalud(doc, data);
+        footerTR(doc, data);
 
         // === 7) Generar blob y abrir en iframe para imprimir automáticamente ===
         const blob = doc.output("blob");

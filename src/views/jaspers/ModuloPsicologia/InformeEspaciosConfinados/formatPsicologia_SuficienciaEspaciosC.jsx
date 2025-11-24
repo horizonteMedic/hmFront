@@ -1,0 +1,672 @@
+import jsPDF from "jspdf";
+import drawColorBox from '../../components/ColorBox.jsx';
+import { formatearFechaCorta } from "../../../utils/formatDateUtils.js";
+import CabeceraLogo from '../../components/CabeceraLogo.jsx';
+import { getSign, convertirGenero } from "../../../utils/helpers.js";
+import footerTR from '../../components/footerTR.jsx';
+
+export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
+  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+  const pageW = doc.internal.pageSize.getWidth();
+  // Contador de páginas dinámico
+  let numeroPagina = 1;
+
+  // Normalizador único de datos de entrada
+  function buildDatosFinales(raw) {
+    const datosReales = {
+      apellidosNombres: String((((raw?.apellidosPaciente ?? '') + ' ' + (raw?.nombresPaciente ?? '')).trim())),
+      fechaExamen: formatearFechaCorta(raw?.fechaEntrevista ?? ''), 
+      tipoExamen: String(raw?.nombreExamen ?? ''),
+      sexo: convertirGenero(raw?.sexoPaciente ?? ''),
+      documentoIdentidad: String(raw?.dniPaciente ?? ''),
+      edad: String(raw?.edadPaciente ?? ''),
+      fechaNacimiento: formatearFechaCorta(raw?.fechaNacimientoPaciente ?? ''),
+      domicilio: String(raw?.direccionPaciente ?? ''),
+      areaTrabajo: String(raw?.areaPaciente ?? ''),
+      puestoTrabajo: String(raw?.cargoPaciente ?? ''),
+      empresa: String(raw?.empresa ?? ''),
+      contrata: String(raw?.contrata ?? ''),
+      sede: String(raw?.sede ?? ''),
+      numeroFicha: String(raw?.norden ?? ""),
+      color: Number(raw?.color ?? 0),
+      codigoColor: String(raw?.codigoColor ?? ''),
+      textoColor: String(raw?.textoColor ?? ''),
+      apto: (typeof raw?.aprobo === 'boolean') ? raw.aprobo : false,
+      // Análisis y resultados
+      analisisResultados: String(raw?.analisisResultados ?? raw?.analisis ?? ''),
+      // Recomendaciones
+      recomendaciones: String(raw?.recomendaciones ?? raw?.recomendacion ?? ''),
+      // Conclusiones
+      conclusiones: String(raw?.conclusiones ?? '')
+    };
+
+    const datosPrueba = {
+      apellidosNombres: 'GARCÍA LÓPEZ, MARÍA ELENA',
+      fechaExamen: '25/11/2025',
+      tipoExamen: 'PRE-OCUPACIONAL',
+      sexo: 'Femenino',
+      documentoIdentidad: '87654321',
+      edad: '32',
+      fechaNacimiento: '15/06/1993',
+      domicilio: 'Av. Industrial 456 - Lima',
+      areaTrabajo: 'Operaciones Mineras',
+      puestoTrabajo: 'Supervisora de Espacios Confinados',
+      empresa: 'MINERA CONFINADA S.A.C.',
+      contrata: 'SERVICIOS ESPECIALIZADOS E.I.R.L.',
+      sede: 'Lima - San Isidro',
+      numeroFicha: '000123',
+      color: 1,
+      codigoColor: '#4CAF50',
+      textoColor: 'A',
+      apto: true,
+      analisisResultados: 'Análisis de resultados de prueba',
+      recomendaciones: 'Recomendaciones de prueba',
+      conclusiones: ''
+    };
+
+    const selected = (raw && (raw.norden)) ? datosReales : datosPrueba;
+    return selected;
+  }
+
+  const datosFinales = buildDatosFinales(data);
+
+  // Header reutilizable
+  const drawHeader = (pageNumber) => {
+    // Logo y membrete
+    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
+
+    // Títulos
+    doc.setFont("helvetica", "bold").setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text("EVALUACIÓN PSICOLÓGICA PARA ESPACIOS CONFINADOS", pageW / 2, 35, { align: "center" });
+
+    // Número de Ficha, Sede, Fecha y Página
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Nro de ficha: ", pageW - 70, 15);
+    doc.setFont("helvetica", "normal").setFontSize(18);
+    doc.text(datosFinales.numeroFicha, pageW - 50, 16);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Sede: " + datosFinales.sede, pageW - 70, 20);
+    doc.text("Fecha de examen: " + (datosFinales.fechaExamen || ""), pageW - 70, 25);
+    doc.text("Pag. " + pageNumber.toString().padStart(2, '0'), pageW - 25, 8);
+
+    // Bloque de color
+    drawColorBox(doc, {
+      color: datosFinales.codigoColor,
+      text: datosFinales.textoColor,
+      x: pageW - 30,
+      y: 10,
+      size: 22,
+      showLine: true,
+      fontSize: 30,
+      textPosition: 0.9
+    });
+  };
+
+  // === FUNCIONES AUXILIARES ===
+  // Función para texto con salto de línea
+  const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
+    const fontSize = doc.internal.getFontSize();
+    const palabras = texto.split(' ');
+    let lineaActual = '';
+    let yPos = y;
+
+    palabras.forEach(palabra => {
+      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+      const anchoTexto = doc.getTextWidth(textoPrueba);
+
+      if (anchoTexto <= anchoMaximo) {
+        lineaActual = textoPrueba;
+      } else {
+        if (lineaActual) {
+          doc.text(lineaActual, x, yPos);
+          yPos += fontSize * 0.35;
+          lineaActual = palabra;
+        } else {
+          doc.text(palabra, x, yPos);
+          yPos += fontSize * 0.35;
+        }
+      }
+    });
+
+    if (lineaActual) {
+      doc.text(lineaActual, x, yPos);
+    }
+
+    return yPos;
+  };
+
+  // Función para calcular altura dinámica de texto
+  const calcularAlturaTexto = (texto, anchoMaximo) => {
+    const palabras = texto.split(' ');
+    let lineaActual = '';
+    let lineas = 1;
+    
+    palabras.forEach(palabra => {
+      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+      const anchoTexto = doc.getTextWidth(textoPrueba);
+      
+      if (anchoTexto <= anchoMaximo) {
+        lineaActual = textoPrueba;
+      } else {
+        if (lineaActual) {
+          lineas++;
+          lineaActual = palabra;
+        } else {
+          lineas++;
+        }
+      }
+    });
+    
+    // Altura mínima de 15mm, altura por línea de 3mm
+    const alturaCalculada = lineas * 3 + 2;
+    return Math.max(alturaCalculada, 20);
+  };
+
+  // Función general para dibujar header de sección con fondo gris
+  const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
+    const tablaInicioX = 5;
+    const tablaAncho = 200;
+
+    // Configurar líneas con grosor consistente
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
+
+    // Dibujar fondo gris más oscuro
+    doc.setFillColor(196, 196, 196);
+    doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
+
+    // Dibujar líneas del header
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
+
+    // Dibujar texto del título
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
+
+    return yPos + alturaHeader;
+  };
+
+  // === PÁGINA 1 ===
+  drawHeader(numeroPagina);
+
+  // === SECCIÓN 1: DATOS DE FILIACIÓN ===
+  const tablaInicioX = 5;
+  const tablaAncho = 200;
+  let yPos = 40;
+  const filaAltura = 5;
+
+  // Header de datos de filiación
+  yPos = dibujarHeaderSeccion("I. DATOS DE FILIACIÓN", yPos, filaAltura);
+
+  // Configurar líneas para filas de datos
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+
+  // Primera fila: Apellidos y Nombres | Tipo de Examen (2 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Segunda fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 45, yPos, tablaInicioX + 45, yPos + filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Tercera fila: Domicilio (completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Cuarta fila: Área de Trabajo, Puesto de Trabajo (2 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Quinta fila: Empresa (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Sexta fila: Contratista (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // === CONTENIDO DE LA TABLA ===
+  let yTexto = 40 + 2; // Ajustar para el header
+
+  // Primera fila: Apellidos y Nombres | Tipo de Examen
+  yTexto += filaAltura;
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 40, yTexto + 1.5, 70);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("T. Examen:", tablaInicioX + 137, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.tipoExamen, tablaInicioX + 155, yTexto + 1.5, 50);
+  yTexto += filaAltura;
+
+  // Segunda fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("DNI:", tablaInicioX + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.documentoIdentidad, tablaInicioX + 12, yTexto + 1.5);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Edad:", tablaInicioX + 47, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.edad + " Años", tablaInicioX + 58, yTexto + 1.5);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Sexo:", tablaInicioX + 92, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.sexo, tablaInicioX + 105, yTexto + 1.5);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Fecha Nac.:", tablaInicioX + 137, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.fechaNacimiento, tablaInicioX + 165, yTexto + 1.5);
+  yTexto += filaAltura;
+
+  // Tercera fila: Domicilio
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Domicilio:", tablaInicioX + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.domicilio, tablaInicioX + 25, yTexto + 1.5, tablaAncho - 30);
+  yTexto += filaAltura;
+
+  // Cuarta fila: Área de Trabajo, Puesto de Trabajo
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Área de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo, tablaInicioX + 30, yTexto + 1.5, 50);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Puesto de Trabajo:", tablaInicioX + 92, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo, tablaInicioX + 122, yTexto + 1.5, 65);
+  yTexto += filaAltura;
+
+  // Quinta fila: Empresa
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Empresa:", tablaInicioX + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 25, yTexto + 1.5, tablaAncho - 25);
+  yTexto += filaAltura;
+
+  // Sexta fila: Contratista
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Contratista:", tablaInicioX + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  dibujarTextoConSaltoLinea(datosFinales.contrata, tablaInicioX + 25, yTexto + 1.5, tablaAncho - 30);
+  yTexto += filaAltura;
+
+  // === SECCIÓN 2: CRITERIOS PSICOLÓGICOS ===
+  // Fila de texto centrado sin color de fondo
+  doc.setFont("helvetica", "bold").setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.text("CRITERIOS PSICOLÓGICOS", pageW / 2, yTexto + 3, { align: "center" });
+  yTexto += 6; // Espacio después del título
+
+  // Fila con 5 divisiones: Aspecto Intelectual (más ancho) | I | NPI | NP | NPS | S
+  const anchoAspectoIntelectual = 80; // Columna más ancha para el aspecto
+  const anchoColumnaEvaluacion = (tablaAncho - anchoAspectoIntelectual) / 5; // Las 5 columnas de evaluación
+  
+  const posicionesColumnas = [
+    tablaInicioX, // Aspecto Intelectual
+    tablaInicioX + anchoAspectoIntelectual, // I
+    tablaInicioX + anchoAspectoIntelectual + anchoColumnaEvaluacion, // NPI
+    tablaInicioX + anchoAspectoIntelectual + anchoColumnaEvaluacion * 2, // NP
+    tablaInicioX + anchoAspectoIntelectual + anchoColumnaEvaluacion * 3, // NPS
+    tablaInicioX + anchoAspectoIntelectual + anchoColumnaEvaluacion * 4, // S
+    tablaInicioX + tablaAncho // Final
+  ];
+
+  // Dibujar líneas de la tabla de criterios
+  doc.line(tablaInicioX, yTexto, tablaInicioX, yTexto + filaAltura); // Línea izquierda
+  posicionesColumnas.forEach((pos, index) => {
+    if (index > 0) {
+      doc.line(pos, yTexto, pos, yTexto + filaAltura); // Líneas verticales
+    }
+  });
+  doc.line(tablaInicioX, yTexto, tablaInicioX + tablaAncho, yTexto); // Línea superior
+  doc.line(tablaInicioX, yTexto + filaAltura, tablaInicioX + tablaAncho, yTexto + filaAltura); // Línea inferior
+
+  // Contenido de los headers
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Aspecto Intelectual", tablaInicioX + 2, yTexto + 3.5);
+  doc.text("I", posicionesColumnas[1] + anchoColumnaEvaluacion/2, yTexto + 3.5, { align: "center" });
+  doc.text("NPI", posicionesColumnas[2] + anchoColumnaEvaluacion/2, yTexto + 3.5, { align: "center" });
+  doc.text("NP", posicionesColumnas[3] + anchoColumnaEvaluacion/2, yTexto + 3.5, { align: "center" });
+  doc.text("NPS", posicionesColumnas[4] + anchoColumnaEvaluacion/2, yTexto + 3.5, { align: "center" });
+  doc.text("S", posicionesColumnas[5] + anchoColumnaEvaluacion/2, yTexto + 3.5, { align: "center" });
+  yTexto += filaAltura;
+
+  // Datos de aspectos psicológicos
+  const aspectosPsicologicos = [
+    { numero: 1, aspecto: "Razonamiento", evaluacion: "I" },
+    { numero: 2, aspecto: "Memoria", evaluacion: "NPI" },
+    { numero: 3, aspecto: "Atención", evaluacion: "NP" },
+    { numero: 4, aspecto: "Concentración", evaluacion: "NPS" },
+    { numero: 5, aspecto: "Percepción", evaluacion: "S" }
+  ];
+
+  // Dibujar filas de datos
+  aspectosPsicologicos.forEach((aspecto) => {
+    // Dibujar líneas de la fila
+    doc.line(tablaInicioX, yTexto, tablaInicioX, yTexto + filaAltura); // Línea izquierda
+    posicionesColumnas.forEach((pos, posIndex) => {
+      if (posIndex > 0) {
+        doc.line(pos, yTexto, pos, yTexto + filaAltura); // Líneas verticales
+      }
+    });
+    doc.line(tablaInicioX, yTexto, tablaInicioX + tablaAncho, yTexto); // Línea superior
+    doc.line(tablaInicioX, yTexto + filaAltura, tablaInicioX + tablaAncho, yTexto + filaAltura); // Línea inferior
+
+    // Contenido de la fila
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    
+    // Número
+    doc.text(aspecto.numero.toString(), tablaInicioX + 2, yTexto + 3.5);
+    
+    // Aspecto psicológico
+    doc.text(aspecto.aspecto, tablaInicioX + 12, yTexto + 3.5);
+    
+    // Marcar la evaluación correspondiente con X
+    const evaluaciones = ["I", "NPI", "NP", "NPS", "S"];
+    evaluaciones.forEach((evaluacion, evalIndex) => {
+      if (aspecto.evaluacion === evaluacion) {
+        doc.setFont("helvetica", "bold").setFontSize(10);
+        doc.text("X", posicionesColumnas[evalIndex + 1] + anchoColumnaEvaluacion/2, yTexto + 3.5, { align: "center" });
+        doc.setFont("helvetica", "normal").setFontSize(8);
+      }
+    });
+    
+    yTexto += filaAltura;
+  });
+
+  // === SECCIÓN 3: ASPECTOS PERSONALIDAD ===
+  // Espacio antes de la nueva sección
+  yTexto += 3;
+  
+  // Título de la sección
+  doc.setFont("helvetica", "bold").setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.text("ASPECTOS PERSONALIDAD", pageW / 2, yTexto + 3, { align: "center" });
+  yTexto += 6; // Espacio después del título
+
+  // Datos de aspectos de personalidad (estos deberían venir del JSON)
+  const aspectosPersonalidad = [
+    {
+      aspecto: "Estabilidad emocional",
+      opciones: ["Inestable", "Estable"],
+      seleccionado: "Inestable"
+    },
+    {
+      aspecto: "Nivel de ansiedad general",
+      opciones: ["Caso", "No Caso"],
+      seleccionado: "Caso"
+    },
+    {
+      aspecto: "Ansiedad a espacios confinados",
+      opciones: ["Nada", "Poca ansiedad", "Moderadamente ansioso", "Elevadamente ansioso"],
+      seleccionado: "Elevadamente ansioso"
+    }
+  ];
+
+  // Ancho fijo para todas las columnas de X (igual para todas las filas)
+  const anchoColumnaX_Fijo = 5; // Ancho fijo y consistente para todas las celdas de X
+  
+  // Dibujar cada fila de aspecto de personalidad
+  aspectosPersonalidad.forEach((aspecto, index) => {
+    const anchoColumnaAspecto = 50; // Ancho para el nombre del aspecto
+    const numOpciones = aspecto.opciones.length;
+    
+    // Anchos personalizados para la tercera fila (Ansiedad a espacios confinados)
+    const anchosPersonalizadosFila3 = [
+      { texto: 20 },  // "Nada"
+      { texto: 30 },  // "Poca ansiedad"
+      { texto: 40 },  // "Moderadamente ansioso"
+      { texto: 40 }   // "Elevadamente ansioso"
+    ];
+    
+    // Calcular posiciones de las columnas
+    const posicionesCols = [tablaInicioX]; // Inicio (columna del aspecto)
+    posicionesCols.push(tablaInicioX + anchoColumnaAspecto); // División después del aspecto
+    
+    let posicionActual = tablaInicioX + anchoColumnaAspecto;
+    
+    if (index === 2) {
+      // Tercera fila: usar anchos personalizados para texto, pero X fijo
+      anchosPersonalizadosFila3.forEach((ancho) => {
+        posicionActual += ancho.texto;
+        posicionesCols.push(posicionActual); // Fin de columna de texto
+        posicionActual += anchoColumnaX_Fijo;
+        posicionesCols.push(posicionActual); // Fin de columna de X
+      });
+    } else {
+      // Otras filas: usar cálculo uniforme
+      const anchoRestante = tablaAncho - anchoColumnaAspecto - (numOpciones * anchoColumnaX_Fijo);
+      const anchoColumnaOpcion = anchoRestante / numOpciones; // Ancho para cada opción (distribución uniforme)
+      
+      for (let i = 0; i < numOpciones; i++) {
+        posicionActual += anchoColumnaOpcion;
+        posicionesCols.push(posicionActual); // Fin de columna de texto
+        posicionActual += anchoColumnaX_Fijo;
+        posicionesCols.push(posicionActual); // Fin de columna de X
+      }
+    }
+
+    // Dibujar líneas de la fila
+    doc.line(tablaInicioX, yTexto, tablaInicioX, yTexto + filaAltura); // Línea izquierda
+    posicionesCols.forEach((pos, posIndex) => {
+      if (posIndex > 0 && posIndex < posicionesCols.length - 1) {
+        doc.line(pos, yTexto, pos, yTexto + filaAltura); // Líneas verticales
+      }
+    });
+    doc.line(tablaInicioX + tablaAncho, yTexto, tablaInicioX + tablaAncho, yTexto + filaAltura); // Línea derecha
+    doc.line(tablaInicioX, yTexto, tablaInicioX + tablaAncho, yTexto); // Línea superior
+    doc.line(tablaInicioX, yTexto + filaAltura, tablaInicioX + tablaAncho, yTexto + filaAltura); // Línea inferior
+
+    // Contenido de la fila
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    
+    // Nombre del aspecto (alineado a la izquierda como en CRITERIOS PSICOLÓGICOS)
+    doc.text(aspecto.aspecto, tablaInicioX + 2, yTexto + 3.5);
+    
+    // Opciones: texto en una columna, X en la siguiente si está seleccionada
+    let posicionOpcion = tablaInicioX + anchoColumnaAspecto;
+    
+    aspecto.opciones.forEach((opcion, opcIndex) => {
+      let anchoTextoOpcion;
+      
+      if (index === 2) {
+        // Tercera fila: usar anchos personalizados para texto
+        anchoTextoOpcion = anchosPersonalizadosFila3[opcIndex].texto;
+      } else {
+        // Otras filas: usar cálculo uniforme
+        const anchoRestante = tablaAncho - anchoColumnaAspecto - (numOpciones * anchoColumnaX_Fijo);
+        anchoTextoOpcion = anchoRestante / numOpciones;
+      }
+      
+      const inicioOpcion = posicionOpcion;
+      const centroColumnaX = inicioOpcion + anchoTextoOpcion + (anchoColumnaX_Fijo / 2);
+      
+      // Mostrar el texto de la opción alineado a la izquierda (como en CRITERIOS PSICOLÓGICOS)
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      doc.text(opcion, inicioOpcion + 2, yTexto + 3.5);
+      
+      // Marcar con X si está seleccionada (centrada en su columna)
+      if (aspecto.seleccionado === opcion) {
+        doc.setFont("helvetica", "bold").setFontSize(10);
+        doc.text("X", centroColumnaX, yTexto + 3.5, { align: "center" });
+        doc.setFont("helvetica", "normal").setFontSize(8);
+      }
+      
+      // Actualizar posición para la siguiente opción
+      posicionOpcion += anchoTextoOpcion + anchoColumnaX_Fijo;
+    });
+    
+    yTexto += filaAltura;
+  });
+
+  // === SECCIÓN 4: ANÁLISIS Y RESULTADOS ===
+  yTexto = dibujarHeaderSeccion("ANÁLISIS Y RESULTADOS:", yTexto, filaAltura);
+
+  // Fila de Análisis y Resultados (creciente)
+  const alturaAnalisis = calcularAlturaTexto(datosFinales.analisisResultados, tablaAncho - 4);
+  
+  doc.line(tablaInicioX, yTexto, tablaInicioX, yTexto + alturaAnalisis);
+  doc.line(tablaInicioX + tablaAncho, yTexto, tablaInicioX + tablaAncho, yTexto + alturaAnalisis);
+  doc.line(tablaInicioX, yTexto, tablaInicioX + tablaAncho, yTexto);
+  doc.line(tablaInicioX, yTexto + alturaAnalisis, tablaInicioX + tablaAncho, yTexto + alturaAnalisis);
+
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.analisisResultados, tablaInicioX + 2, yTexto + 3, tablaAncho - 4);
+  yTexto += alturaAnalisis;
+
+  // === SECCIÓN 5: RECOMENDACIONES ===
+  yTexto = dibujarHeaderSeccion("RECOMENDACIONES:", yTexto, filaAltura);
+
+  // Fila de Recomendaciones (creciente)
+  const alturaRecomendaciones = calcularAlturaTexto(datosFinales.recomendaciones, tablaAncho - 4);
+  
+  doc.line(tablaInicioX, yTexto, tablaInicioX, yTexto + alturaRecomendaciones);
+  doc.line(tablaInicioX + tablaAncho, yTexto, tablaInicioX + tablaAncho, yTexto + alturaRecomendaciones);
+  doc.line(tablaInicioX, yTexto, tablaInicioX + tablaAncho, yTexto);
+  doc.line(tablaInicioX, yTexto + alturaRecomendaciones, tablaInicioX + tablaAncho, yTexto + alturaRecomendaciones);
+
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.recomendaciones, tablaInicioX + 2, yTexto + 3, tablaAncho - 4);
+  yTexto += alturaRecomendaciones;
+
+  // === SECCIÓN 6: CONCLUSIONES ===
+  yTexto = dibujarHeaderSeccion("CONCLUSIONES", yTexto, filaAltura);
+
+  // Fila con: APTO | (columna X) | NO APTO | (columna X)
+  const anchoColumnaX = 5; // Ancho fijo para las columnas de X
+  const anchoRestante = tablaAncho - (2 * anchoColumnaX);
+  const anchoColumnaApto = anchoRestante / 2; // Dividir el espacio restante entre APTO y NO APTO
+
+  // Calcular posiciones de las columnas
+  const posicionesConclusiones = [
+    tablaInicioX,
+    tablaInicioX + anchoColumnaApto,
+    tablaInicioX + anchoColumnaApto + anchoColumnaX,
+    tablaInicioX + anchoColumnaApto + anchoColumnaX + anchoColumnaApto,
+    tablaInicioX + anchoColumnaApto + anchoColumnaX + anchoColumnaApto + anchoColumnaX,
+    tablaInicioX + tablaAncho
+  ];
+
+  // Dibujar líneas de la fila
+  doc.line(tablaInicioX, yTexto, tablaInicioX, yTexto + filaAltura);
+  posicionesConclusiones.forEach((pos, posIndex) => {
+    if (posIndex > 0 && posIndex < posicionesConclusiones.length - 1) {
+      doc.line(pos, yTexto, pos, yTexto + filaAltura);
+    }
+  });
+  doc.line(tablaInicioX + tablaAncho, yTexto, tablaInicioX + tablaAncho, yTexto + filaAltura);
+  doc.line(tablaInicioX, yTexto, tablaInicioX + tablaAncho, yTexto);
+  doc.line(tablaInicioX, yTexto + filaAltura, tablaInicioX + tablaAncho, yTexto + filaAltura);
+
+  // Contenido de la fila
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  
+  // APTO
+  const centroApto = tablaInicioX + (anchoColumnaApto / 2);
+  doc.text("APTO", centroApto, yTexto + 3.5, { align: "center" });
+  
+  // X para APTO
+  const centroColumnaXApto = tablaInicioX + anchoColumnaApto + (anchoColumnaX / 2);
+  
+  // NO APTO
+  const inicioNoApto = tablaInicioX + anchoColumnaApto + anchoColumnaX;
+  const centroNoApto = inicioNoApto + (anchoColumnaApto / 2);
+  doc.text("NO APTO", centroNoApto, yTexto + 3.5, { align: "center" });
+  
+  // X para NO APTO
+  const centroColumnaXNoApto = inicioNoApto + anchoColumnaApto + (anchoColumnaX / 2);
+  
+  // Marcar X según si está apto o no apto
+  if (datosFinales.apto) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", centroColumnaXApto, yTexto + 3.5, { align: "center" });
+  } else {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", centroColumnaXNoApto, yTexto + 3.5, { align: "center" });
+  }
+  
+  yTexto += filaAltura;
+
+  // === SECCIÓN DE FIRMAS ===
+  const yFirmas = yTexto; // Sin separación después de la última sección
+  const alturaSeccionFirmas = 30; // Altura para la sección de firmas
+
+  // Dibujar las líneas de la sección de firmas (1 columna completa)
+  doc.line(tablaInicioX, yFirmas, tablaInicioX, yFirmas + alturaSeccionFirmas); // Línea izquierda
+  doc.line(tablaInicioX + tablaAncho, yFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea derecha
+  doc.line(tablaInicioX, yFirmas, tablaInicioX + tablaAncho, yFirmas); // Línea superior
+  doc.line(tablaInicioX, yFirmas + alturaSeccionFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea inferior
+
+  // === FIRMA DEL MÉDICO ===
+  const centroColumna = tablaInicioX + (tablaAncho / 2);
+  const firmaMedicoY = yFirmas + 3;
+  
+  // Agregar firma y sello médico
+  let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
+  if (firmaMedicoUrl) {
+    try {
+      const imgWidth = 45;
+      const imgHeight = 20;
+      // Centrar la imagen: centro de la columna menos la mitad del ancho de la imagen
+      const firmaMedicoX = centroColumna - (imgWidth / 2);
+      const x = firmaMedicoX;
+      const y = firmaMedicoY;
+      doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando firma del médico:", error);
+    }
+  }
+
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Sello y Firma del Médico", centroColumna, yFirmas + 26, { align: "center" });
+  doc.text("Responsable de la Evaluación", centroColumna, yFirmas + 28.5, { align: "center" });
+
+  // === FOOTER ===
+  footerTR(doc, { footerOffsetY: 5 });
+
+  // Imprimir
+  imprimir(doc);
+}
+
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
+}

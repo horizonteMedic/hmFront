@@ -53,33 +53,46 @@ export default function Antecedentes({
       });
       return;
     }
-    setForm({
-      ...form,
-      antecedentes: [...form.antecedentes, {
+    setForm(prev => ({
+      ...prev,
+      antecedentes: [...prev.antecedentes, {
         codAntecedentesPatologicosQuirurgicos: 0,
-        fecha: form.fechaAntecedente,
-        hospitalOperacion: form.hospital,
-        operacion: form.operacion,
-        diasHospitalizado: form.diasHospitalizacion,
-        complicaciones: form.complicaciones,
+        quirurjicosId: null,
+        fecha: prev.fechaAntecedente,
+        hospitalOperacion: prev.hospital,
+        operacion: prev.operacion,
+        diasHospitalizado: prev.diasHospitalizacion,
+        complicaciones: prev.complicaciones,
       }],
       fechaAntecedente: "",
       hospital: "",
       operacion: "",
       diasHospitalizacion: "",
       complicaciones: "",
-    });
+    }));
   };
   const handleLimpiar = () => {
-    setForm({
-      ...form,
+    console.log( "antecedentesEliminados", [
+        ...form.antecedentesEliminados,
+        ...form.antecedentes
+          .filter(reg => reg.quirurjicosId != null)
+          .map(reg => reg.quirurjicosId)
+      ])
+    setForm(prev => ({
+      ...prev,
+      antecedentesEliminados: [
+        ...prev.antecedentesEliminados,
+        ...prev.antecedentes
+          .filter(reg => reg.quirurjicosId != null)
+          .map(reg => reg.quirurjicosId)
+      ],
       antecedentes: [],
       fechaAntecedente: "",
       hospital: "",
       operacion: "",
       diasHospitalizacion: "",
       complicaciones: "",
-    });
+    }));
   };
 
   return (

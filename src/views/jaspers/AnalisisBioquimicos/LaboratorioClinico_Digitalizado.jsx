@@ -1,15 +1,126 @@
 // src/views/jaspers/AnalisisBioquimicos/HematologiaBioquimica_digitalizado.jsx
 import jsPDF from "jspdf";
-import Header_HematologiaBioquimica from "./Header/Header_HematologiaBioquimica ";
-import footer from "../components/footer";
+import CabeceraLogo from '../components/CabeceraLogo.jsx';
+import drawColorBox from '../components/ColorBox.jsx';
+import footerTR from '../components/footerTR.jsx';
+
+// Función para formatear fecha a DD/MM/YYYY
+const toDDMMYYYY = (fecha) => {
+  if (!fecha) return '';
+  if (fecha.includes('/')) return fecha; // ya está en formato correcto
+  const [anio, mes, dia] = fecha.split('-');
+  if (!anio || !mes || !dia) return fecha;
+  return `${dia}/${mes}/${anio}`;
+};
+
+// Función para formatear fecha larga
+const formatDateToLong = (dateString) => {
+  if (!dateString) return '';
+  try {
+    const date = new Date(`${dateString}T00:00:00`);
+    return date.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  } catch (error) {
+    return toDDMMYYYY(dateString) || '';
+  }
+};
+
+// Header con datos de ficha, sede y fecha
+const drawHeader = (doc, datos = {}) => {
+  const pageW = doc.internal.pageSize.getWidth();
+  
+  CabeceraLogo(doc, { ...datos, tieneMembrete: false, yOffset: 3 }); // Subido 7mm (de 10 a 3) para que sea visible
+  
+  // Número de Ficha
+  doc.setFont("helvetica", "normal").setFontSize(8.5);
+  doc.text("Nro de ficha: ", pageW - 80, 8); // Ajustado para que sea visible
+  doc.setFont("helvetica", "normal").setFontSize(18);
+  doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 9); // Ajustado para que sea visible
+  
+  // Sede
+  doc.setFont("helvetica", "normal").setFontSize(8.5);
+  doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 13); // Ajustado para que sea visible
+  
+  // Fecha de examen
+  const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || datos.fechaLab || "");
+  doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 18); // Ajustado para que sea visible
+  
+  // Página
+  doc.text("Pag. 01", pageW - 30, 3); // Ajustado para que sea visible
+
+  // Bloque de color
+  drawColorBox(doc, {
+    color: datos.codigoColor || "#008f39",
+    text: datos.textoColor || "F",
+    x: pageW - 30,
+    y: 3, // Ajustado para que sea visible
+    size: 22,
+    showLine: true,
+    fontSize: 30,
+    textPosition: 0.9
+  });
+};
+
+// Función para dibujar datos del paciente
+const drawPatientData = (doc, datos = {}) => {
+  const margin = 15;
+  let y = 28; // Ajustado para alinearse con el header subido
+  const lineHeight = 5.5; // Reducido de 6 a 5.5
+  const patientDataX = margin;
+  
+  const drawPatientDataRow = (label, value) => {
+    const labelWithColon = label.endsWith(':') ? label : label + ' :';
+    doc.setFontSize(8.5).setFont('helvetica', 'bold');
+    doc.text(labelWithColon, patientDataX, y);
+    let valueX = patientDataX + doc.getTextWidth(labelWithColon) + 2;
+    if (label.toLowerCase().includes('apellidos y nombres')) {
+      const minGap = 23;
+      if (doc.getTextWidth(labelWithColon) < minGap) valueX = patientDataX + minGap;
+    }
+    doc.setFont('helvetica', 'normal');
+    doc.text(String(value || '').toUpperCase(), valueX, y);
+    y += lineHeight;
+  };
+  
+  drawPatientDataRow("Apellidos y Nombres :", datos.nombres || datos.nombresPaciente || '');
+  
+  // Solo mostrar Edad si está presente
+  if (datos.edad || datos.edadPaciente) {
+    drawPatientDataRow("Edad :", `${datos.edad || datos.edadPaciente} AÑOS`);
+  }
+  
+  // Solo mostrar DNI si está presente
+  if (datos.dni || datos.dniPaciente) {
+    drawPatientDataRow("DNI :", datos.dni || datos.dniPaciente);
+  }
+  
+  // Fecha
+  doc.setFontSize(8.5).setFont('helvetica', 'bold');
+  const fechaLabel = "Fecha :";
+  doc.text(fechaLabel, patientDataX, y);
+  doc.setFont('helvetica', 'normal');
+  const fechaLabelWidth = doc.getTextWidth(fechaLabel);
+  doc.text(formatDateToLong(datos.fechaExamen || datos.fecha || datos.fechaLab || ''), patientDataX + fechaLabelWidth + 2, y);
+  
+  // Reseteo
+  doc.setFont('helvetica', 'normal').setFontSize(8.5).setLineWidth(0.2);
+  
+  return y + lineHeight;
+};
 
 export default function LaboratorioClinico_Digitalizado(datos = {}) {
   const doc = new jsPDF({ unit: "mm", format: "letter" });
   const pageW = doc.internal.pageSize.getWidth();
   const margin = 15;
 
-  // === HEADER personalizado ===
-  Header_HematologiaBioquimica(doc, datos);
+  // === HEADER ===
+  drawHeader(doc, datos);
+  
+  // === DATOS DEL PACIENTE ===
+  drawPatientData(doc, datos);
 
    const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
   const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
@@ -27,12 +138,12 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
-    let y = 55;
+    let y = 42; // Ajustado para alinearse con el header y datos del paciente subidos
 
     // === TÍTULO HEMATOLOGÍA ===
-    doc.setFont("helvetica", "bold").setFontSize(12);
+    doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text("HEMATOLOGÍA", pageW / 2, y, { align: "center" });
-    y += 5;
+    y += 4; // Reducido de 5 a 4
 
     // === TABLA HEMATOLOGÍA (formato clásico laboratorio) ===
     const leftX = margin * 2;
@@ -40,7 +151,7 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
     const labelW = 38;
     const valueW = 32;
     let yTable = y;
-    doc.setFontSize(11);
+    doc.setFontSize(8.5); // Reducido de 11 a 10
     const leftItems = [
       { label: "Grupo Sanguíneo", value: `${datos.chko ? 'O' : datos.chka ? 'A' : datos.chkb ? 'B' : datos.chkab ? 'AB' : ''}`, suffix: "" },
       { label: "Factor Rh",       value: `${datos.rbrhpositivo === true ? 'POSITIVO' : datos.rbrhnegativo === true ? 'NEGATIVO' : ''}`,      suffix: "" },
@@ -62,7 +173,7 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
     ];
 
     const totalRows = Math.max(leftItems.length, rightItems.length);
-    const rowH = 7; // compacto
+    const rowH = 5.5; // Reducido de 7 a 5.5 para hacer la tabla más compacta
     const tableW = (rightX + labelW + valueW + 8) - leftX;
     const tableH = rowH * totalRows;
     // Contorno exterior
@@ -80,10 +191,10 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
           ? value + suffix
           : (key && datos[key] != null ? key=="txtVsg" && datos[key]=="N/A"? datos[key] : datos[key] + suffix : "N/A");
         doc.setFont("helvetica", "normal");
-        doc.text(label, leftX + labelW, yTable + rowH * (i + 0.7), { align: "right" });
-        doc.text(":", leftX + labelW + 2, yTable + rowH * (i + 0.7), { align: "left" });
+        doc.text(label, leftX + labelW, yTable + rowH * (i + 0.65), { align: "right" });
+        doc.text(":", leftX + labelW + 2, yTable + rowH * (i + 0.65), { align: "left" });
         doc.setFont("helvetica", "bold");
-        doc.text(val, leftX + labelW + 8, yTable + rowH * (i + 0.7), { align: "left" });
+        doc.text(val, leftX + labelW + 8, yTable + rowH * (i + 0.65), { align: "left" });
       }
       // Derecha
       if (rightItems[i]) {
@@ -92,10 +203,10 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
           ? value + suffix
           : (key && datos[key] != null ? datos[key] + suffix : "N/A");
         doc.setFont("helvetica", "normal");
-        doc.text(label, rightX + labelW, yTable + rowH * (i + 0.7), { align: "right" });
-        doc.text(":", rightX + labelW + 2, yTable + rowH * (i + 0.7), { align: "left" });
+        doc.text(label, rightX + labelW, yTable + rowH * (i + 0.65), { align: "right" });
+        doc.text(":", rightX + labelW + 2, yTable + rowH * (i + 0.65), { align: "left" });
         doc.setFont("helvetica", "bold");
-        doc.text(val, rightX + labelW + 8, yTable + rowH * (i + 0.7), { align: "left" });
+        doc.text(val, rightX + labelW + 8, yTable + rowH * (i + 0.65), { align: "left" });
       }
       // Línea horizontal debajo de Leucocitos (derecha)
       if (rightItems[i] && rightItems[i].label === "Leucocitos") {
@@ -111,16 +222,16 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
         doc.setLineWidth(0.5);
       }
     }
-    y = yTable + tableH + 8; // avanza Y para el siguiente bloque
+    y = yTable + tableH + 5; // Reducido de 8 a 5
 
     // === BIOQUÍMICA ===
     const contentMargin = margin + 20; // margen lateral aún más amplio
-    doc.setFont("helvetica", "bold").setFontSize(12);
+    doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text("BIOQUÍMICA", pageW / 2, y, { align: "center" });
-    doc.setFont("helvetica", "normal").setFontSize(10);
+    doc.setFont("helvetica", "normal").setFontSize(8.5);
     const bioqMargin = contentMargin;
     const bioqRight = pageW - contentMargin;
-    y += 5;
+    y += 4; // Reducido de 5 a 4
     // Formato tabla clásico: dos columnas, etiquetas a la derecha, valores a la izquierda, valores normales a la derecha
     const bioqItems = [
       {
@@ -137,8 +248,6 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
       },
     ];
     const bioqLabelW = 32;
-    const bioqValueW = 22;
-    const bioqNormW = 38;
     for (let i = 0; i < bioqItems.length; i++) {
       const { label, value, unidad, normales } = bioqItems[i];
       // Etiqueta
@@ -151,15 +260,15 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
       // Valores normales a la derecha
       doc.setFont("helvetica", "normal");
       doc.text(`Valores Normales ${normales}`, bioqRight, y, { align: "right" });
-      y += 5;
+      y += 4; // Reducido de 5 a 4
     }
 
     // === SERO - INMUNOLÓGICO ===
-    y += 10;
-    doc.setFont("helvetica", "bold").setFontSize(12);
+    y += 6; // Reducido de 10 a 6
+    doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text("SUERO - INMUNOLÓGICO", pageW / 2, y, { align: "center" });
-    doc.setFont("helvetica", "normal").setFontSize(10);
-    y += 5;
+    doc.setFont("helvetica", "normal").setFontSize(8.5);
+    y += 4; // Reducido de 5 a 4
     // Formato tabla clásico: dos columnas, etiquetas a la derecha, valores a la izquierda
     const sueroL = [
       { label: "RPR", value: datos.chkPositivo === true ? 'REACTIVO' : datos.chkNegativo === true ? 'NO REACTIVO' : datos.chkNegativo === false && datos.chkPositivo === false ? 'N/A' : '' || "N/A" },
@@ -190,13 +299,13 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
     }
 
     // === EXAMEN DE ORINA ===
-    y += 10;
-    doc.setFont("helvetica", "bold").setFontSize(12);
+    y += 6; // Reducido de 10 a 6
+    doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text("EXAMEN DE ORINA", pageW / 2, y, { align: "center" });
 
     // Examen Físico
-    doc.setFont("helvetica", "bold").setFontSize(10);
-    y += 7;
+    doc.setFont("helvetica", "bold").setFontSize(8.5);
+    y += 5; // Reducido de 7 a 5
     doc.text("Examen Físico :", bioqMargin, y);
     doc.setFont("helvetica", "normal");
     const fisicoL = [
@@ -209,7 +318,7 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
     ];
     const fisicoLabelW = 38;
     for (let i = 0; i < Math.max(fisicoL.length, fisicoR.length); i++) {
-      y += 5;
+      y += 4; // Reducido de 5 a 4
       // Lado izquierdo
       if (fisicoL[i]) {
         const { label, key } = fisicoL[i];
@@ -233,8 +342,8 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
     }
 
     // Examen Químico
-    doc.setFont("helvetica", "bold").setFontSize(10);
-    y += 9;
+    doc.setFont("helvetica", "bold").setFontSize(8.5);
+    y += 6; // Reducido de 9 a 6
     doc.text("Examen Químico :", bioqMargin, y);
     doc.setFont("helvetica", "normal");
     const chemL = [
@@ -252,7 +361,7 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
     ];
     const chemLabelW = 38;
     for (let i = 0; i < Math.max(chemL.length, chemR.length); i++) {
-      y += 5;
+      y += 4; // Reducido de 5 a 4
       // Lado izquierdo
       if (chemL[i]) {
         const { label, key } = chemL[i];
@@ -276,8 +385,8 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
     }
 
     // Sedimento Unitario
-    y += 9;
-    doc.setFont("helvetica", "bold").setFontSize(10);
+    y += 6; // Reducido de 9 a 6
+    doc.setFont("helvetica", "bold").setFontSize(8.5);
     doc.text("Sedimento Urinario :", bioqMargin, y);
     doc.setFont("helvetica", "normal");
     const sedL = [
@@ -293,13 +402,14 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
       { label: "Otros",            key: "txtOtrosSu" },
     ];
     const sedLabelW = 38;
+    let maxY = y;
     for (let i = 0; i < Math.max(sedL.length, sedR.length); i++) {
-      y += 5;
+      y += 4; // Reducido de 5 a 4
       // Lado izquierdo
       if (sedL[i]) {
         const { label, key, campo } = sedL[i];
         let v = datos[key] || "N/A";
-        if (campo && v !== "N/A" && v !== "") {
+        if (campo && v !== "N/A" && v !== "" && v !== null) {
           v = `${v} x campo`;
         }
         doc.setFont("helvetica", "normal");
@@ -307,10 +417,16 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
         doc.text(":", bioqMargin + sedLabelW + 2, y, { align: "left" });
         doc.setFont("helvetica", "bold");
         if (label === "Cristales") {
-          const lineasCristales = doc.splitTextToSize(v, 38);
-          doc.text(lineasCristales, bioqMargin + sedLabelW + 8, y);
+          const lineasCristales = doc.splitTextToSize(v, 50);
+          let currentY = y;
+          lineasCristales.forEach((linea) => {
+            doc.text(linea, bioqMargin + sedLabelW + 8, currentY, { align: "left" });
+            currentY += 4;
+          });
+          maxY = Math.max(maxY, currentY);
         } else {
           doc.text(v, bioqMargin + sedLabelW + 8, y, { align: "left" });
+          maxY = Math.max(maxY, y);
         }
       }
       // Lado derecho
@@ -322,20 +438,47 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
         doc.text(":", bioqRight - sedLabelW + 2, y, { align: "left" });
         doc.setFont("helvetica", "bold");
         if (label === "Otros") {
-          const lineasOtros = doc.splitTextToSize(v, 38);
-          doc.text(lineasOtros, bioqRight - sedLabelW + 8, y);
+          const lineasOtros = doc.splitTextToSize(v, 50);
+          let currentY = y;
+          lineasOtros.forEach((linea) => {
+            doc.text(linea, bioqRight - sedLabelW + 8, currentY, { align: "left" });
+            currentY += 4;
+          });
+          maxY = Math.max(maxY, currentY);
         } else {
           doc.text(v, bioqRight - sedLabelW + 8, y, { align: "left" });
+          maxY = Math.max(maxY, y);
         }
       }
     }
+    // Observaciones adicionales del sedimento (si hay datos de Hematíes, Cristales u Otros)
+    y = maxY + 4;
+    const obsSedimento = [];
+    if (datos.txtHematiesSu && datos.txtHematiesSu !== "N/A" && datos.txtHematiesSu !== "") {
+      obsSedimento.push(`Hematíes N° ${datos.txtHematiesSu} x campo`);
+    }
+    if (datos.txtCristalesSu && datos.txtCristalesSu !== "N/A" && datos.txtCristalesSu !== "") {
+      obsSedimento.push(datos.txtCristalesSu);
+    }
+    if (datos.txtOtrosSu && datos.txtOtrosSu !== "N/A" && datos.txtOtrosSu !== "") {
+      obsSedimento.push(datos.txtOtrosSu);
+    }
+    if (obsSedimento.length > 0) {
+      const textoObs = obsSedimento.join(" ");
+      const lineasObs = doc.splitTextToSize(textoObs, pageW - contentMargin * 2);
+      doc.setFont("helvetica", "normal");
+      lineasObs.forEach((linea) => {
+        doc.text(linea, bioqMargin, y, { align: "left" });
+        y += 4;
+      });
+    }
 
     // === DROGAS & OBSERVACIONES ===
-    y += 8;
+    y += 5; // Reducido de 8 a 5
     // Label principal
-    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.setFont("helvetica", "bold").setFontSize(8.5);
     doc.text("Drogas :", bioqMargin, y);
-    y += 6;
+    y += 5; // Reducido de 6 a 5
     // Resultados en dos columnas
     const drogaCol1Label = "Cocaína:";
     const drogaCol1Value = String(datos.txtCocaina || "N/A");
@@ -349,90 +492,67 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
     doc.text(drogaCol2Label, bioqRight - 60, y);
     doc.setFont("helvetica", "normal");
     doc.text(drogaCol2Value, bioqRight - 60 + doc.getTextWidth(drogaCol2Label) + 4, y);
-    y += 6;
-    doc.setFont("helvetica", "bold").setFontSize(10);
+    y += 5; // Reducido de 6 a 5
+    doc.setFont("helvetica", "bold").setFontSize(8.5);
     doc.text("Observaciones :", bioqMargin, y);
-    y += 6; // Espacio después del título
+    y += 5; // Reducido de 6 a 5
     doc.setFont("helvetica", "normal");
     const obs = doc.splitTextToSize(datos.txtObservacionesLb || "", pageW - contentMargin * 2);
-    doc.text(obs, bioqMargin, y);
-    y += obs.length * 5 + 10; // Mantén el espacio extra debajo
+    if (obs && obs.length > 0) {
+      doc.text(obs, bioqMargin, y);
+      y += obs.length * 4 + 5; // Reducido el espacio
+    } else {
+      y += 2; // Si no hay observaciones, solo un pequeño espacio
+    }
 
-    if (s1) {
+    // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
+    const sigW = 53; // Reducido de 60 a 56 (4mm menos)
+    const sigH = 23; // Reducido de 30 a 26 (4mm menos)
+    const sigY = y + 2; // Reducido de 8 a 5 para acercar la firma
+    const gap = 16; // Espacio entre sellos (reducido 4mm: 20 - 4 = 16)
+    
+    if (s1 && s2) {
+      // Si hay dos sellos, centrarlos juntos
+      const totalWidth = sigW * 2 + gap;
+      const startX = (pageW - totalWidth) / 2;
+      
+      const addSello = (img, xPos) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const selloBase64 = canvas.toDataURL('image/png');
+        doc.addImage(selloBase64, 'PNG', xPos, sigY, sigW, sigH);
+      };
+      addSello(s1, startX);
+      addSello(s2, startX + sigW + gap);
+    } else if (s1) {
+      // Si solo hay un sello, centrarlo con tamaño fijo
       const canvas = document.createElement('canvas');
       canvas.width = s1.width;
       canvas.height = s1.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-
-      // Dimensiones del área del sello
-      const sigW = 70;
-      const sigH = 30;
-      // Apilar a la derecha
-      const sigX = pageW - sigW + 3;
-      const sigY = y - 85;
-
-      // Tamaño máximo dentro del área
-      const maxImgW = sigW - 10;
-      const maxImgH = sigH - 10;
-
-      let imgW = s1.width;
-      let imgH = s1.height;
-
-      const scaleW = maxImgW / imgW;
-      const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1); // para no escalar de más
-
-      imgW *= scale;
-      imgH *= scale;
-
-      // Centramos dentro del rectángulo
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
-
-      // Insertar la imagen del sello
-      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-    }
-
-    if (s2) {
+      const imgX = (pageW - sigW) / 2; // Center single stamp
+      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
+    } else if (s2) {
+      // Si solo hay el segundo sello, centrarlo con tamaño fijo
       const canvas = document.createElement('canvas');
       canvas.width = s2.width;
       canvas.height = s2.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s2, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-
-      // Dimensiones del área del sello
-      const sigW = 70;
-      const sigH = 30;
-      // Apilar a la derecha, debajo del primero
-      const sigX = pageW - sigW + 3;
-      const sigY = y - 80 + sigH;
-
-      // Tamaño máximo dentro del área
-      const maxImgW = sigW - 10;
-      const maxImgH = sigH - 10;
-
-      let imgW = s2.width;
-      let imgH = s2.height;
-
-      const scaleW = maxImgW / imgW;
-      const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1); // para no escalar de más
-
-      imgW *= scale;
-      imgH *= scale;
-
-      // Centramos dentro del rectángulo
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
-
-      // Insertar la imagen del sello
-      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+      const imgX = (pageW - sigW) / 2; // Center single stamp
+      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
     }
+    
+    // === FOOTER ===
+    footerTR(doc, { ...datos, footerOffsetY: 16 }); // Bajado 12 puntos
 
-    // === IMPRIMIR ===
+    // === Imprimir ===
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
     const iframe = document.createElement("iframe");
