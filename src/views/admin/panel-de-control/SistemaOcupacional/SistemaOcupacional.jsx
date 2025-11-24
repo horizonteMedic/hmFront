@@ -543,10 +543,7 @@ const TabComponent = () => {
               <div className={styles.labContent}>
                 {labTab === 0 && (
                   <LaboratorioClinico
-                    token={token}
-                    selectedSede={selectSede}
-                    userlogued={userlogued.sub}
-                    permiso={tienePermisoEnVista}
+                    tieneVista={tieneVista}
                   />
                 )}
                 {labTab === 1 && (
@@ -666,7 +663,7 @@ const TabComponent = () => {
             const displayedInterfaces = {
               1: { title: "Triaje", child: <Triaje token={token} selectedSede={selectSede} /> },
               3: { title: "Coproparasitológico", child: <ParasitologiaCoprologico /> },
-              4: { title: "Laboratorio Clínico", child: <LaboratorioClinico /> },
+              // 4: { title: "Laboratorio Clínico", child: <LaboratorioClinico/> },
               5: { title: "Análisis Bioquímicos", child: <LaboratorioAnalisisBioquimicos /> },
               6: {
                 title: "Consentimientos", child: (

@@ -1,6 +1,5 @@
 import Swal from "sweetalert2";
 import { getFetch } from '../../../../getFetch/getFetch.js';
-import { SubmitHematologia } from "./model.js";
 
 const Loading = (text) => {
     Swal.fire({
@@ -155,30 +154,6 @@ export const GetInfoExamenHematologia = (nro,tabla,set,setO,token,setSearchMedic
   })
 }
 
-export const SubmitHematologiaLabCLinico = async (form,formO,token,user,limpiar) => {
-   if (!form.norden) {
-    await Swal.fire('Error', 'Datos Incompletos','error')
-    return
-  }
-  Loading('Registrando Datos')
-  SubmitHematologia(form,formO,token,user)
-  .then((res) => {
-    console.log(res)
-    if (res.id === 1 || res.id === 0) {
-      Swal.fire({title: 'Exito', text:`${res.mensaje},\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-      }).then((result) => {
-        limpiar()
-        if (result.isConfirmed) {
-          PrintHojaR(form.norden,token)
-        }
-      })
-    } else {
-      Swal.fire('Error','Ocurrio un error al Registrar','error')
-    }
-  })
-}
 
 export const PrintHojaR = (nro,token) => {
   Loading('Cargando Formato a Imprimir')

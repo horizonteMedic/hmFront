@@ -1,7 +1,8 @@
 // src/views/jaspers/Microbiologia/InmunologiaRapida_Digitalizado.jsx
 import jsPDF from "jspdf";
-import header_Inmunologia_Digitalizado from "./Header/header_Inmunologia_Digitalizado";
-import footer from "../components/footer";
+import CabeceraLogo from '../components/CabeceraLogo.jsx';
+import drawColorBox from '../components/ColorBox.jsx';
+import footerTR from '../components/footerTR.jsx';
 
 const config = {
   margin: 15,
@@ -14,12 +15,113 @@ const config = {
   lineHeight: 8,
 };
 
+// Función para formatear fecha a DD/MM/YYYY
+const toDDMMYYYY = (fecha) => {
+  if (!fecha) return '';
+  if (fecha.includes('/')) return fecha; // ya está en formato correcto
+  const [anio, mes, dia] = fecha.split('-');
+  if (!anio || !mes || !dia) return fecha;
+  return `${dia}/${mes}/${anio}`;
+};
+
+// Función para formatear fecha larga
+const formatDateToLong = (dateString) => {
+  if (!dateString) return '';
+  try {
+    const date = new Date(`${dateString}T00:00:00`);
+    return date.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  } catch (error) {
+    return toDDMMYYYY(dateString) || '';
+  }
+};
+
+// Header con datos de ficha, sede y fecha
+const drawHeader = (doc, datos = {}) => {
+  const pageW = doc.internal.pageSize.getWidth();
+  
+  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+  
+  // Número de Ficha
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Nro de ficha: ", pageW - 80, 15);
+  doc.setFont("helvetica", "normal").setFontSize(18);
+  doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
+  
+  // Sede
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
+  
+  // Fecha de examen
+  const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
+  doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
+  
+  // Página
+  doc.text("Pag. 01", pageW - 30, 10);
+
+  // Bloque de color
+  drawColorBox(doc, {
+    color: datos.codigoColor || "#008f39",
+    text: datos.textoColor || "F",
+    x: pageW - 30,
+    y: 10,
+    size: 22,
+    showLine: true,
+    fontSize: 30,
+    textPosition: 0.9
+  });
+};
+
+// Función para dibujar datos del paciente
+const drawPatientData = (doc, datos = {}) => {
+  const margin = 15;
+  let y = 40;
+  const lineHeight = 6;
+  const patientDataX = margin;
+  
+  const drawPatientDataRow = (label, value) => {
+    const labelWithColon = label.endsWith(':') ? label : label + ' :';
+    doc.setFontSize(11).setFont('helvetica', 'bold');
+    doc.text(labelWithColon, patientDataX, y);
+    let valueX = patientDataX + doc.getTextWidth(labelWithColon) + 2;
+    if (label.toLowerCase().includes('apellidos y nombres')) {
+      const minGap = 23;
+      if (doc.getTextWidth(labelWithColon) < minGap) valueX = patientDataX + minGap;
+    }
+    doc.setFont('helvetica', 'normal');
+    doc.text(String(value || '').toUpperCase(), valueX, y);
+    y += lineHeight;
+  };
+  
+  drawPatientDataRow("Apellidos y Nombres :", datos.nombres || datos.nombresPaciente || '');
+  drawPatientDataRow("Edad :", datos.edad || datos.edadPaciente ? `${datos.edad || datos.edadPaciente} AÑOS` : '');
+  
+  // Fecha
+  doc.setFontSize(11).setFont('helvetica', 'bold');
+  const fechaLabel = "Fecha :";
+  doc.text(fechaLabel, patientDataX, y);
+  doc.setFont('helvetica', 'normal');
+  const fechaLabelWidth = doc.getTextWidth(fechaLabel);
+  doc.text(formatDateToLong(datos.fechaExamen || datos.fecha || ''), patientDataX + fechaLabelWidth + 2, y);
+  
+  // Reseteo
+  doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);
+  
+  return y + lineHeight;
+};
+
 export default function InmunologiaLab1_Digitalizado(datos = {}) {
   const doc = new jsPDF({ unit: "mm", format: "letter" });
   const pageW = doc.internal.pageSize.getWidth();
   
   // === HEADER ===
-  header_Inmunologia_Digitalizado(doc, datos);
+  drawHeader(doc, datos);
+  
+  // === DATOS DEL PACIENTE ===
+  drawPatientData(doc, datos);
 
   // === CUERPO ===
   let y = 90; // Posición Y inicial después del nuevo header
@@ -59,7 +161,7 @@ export default function InmunologiaLab1_Digitalizado(datos = {}) {
   doc.text(testValue, col2X, resultY, { align: "center" });
 
   // === FOOTER ===
-  footer(doc, datos);
+  footerTR(doc, datos);
 
   // === Imprimir ===
   const blob = doc.output("blob");

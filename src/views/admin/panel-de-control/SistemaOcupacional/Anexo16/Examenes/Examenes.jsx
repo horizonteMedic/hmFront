@@ -178,13 +178,13 @@ export default function Examenes({
                 label="O.D:"
                 name="otoscopiaOd"
                 value={form.otoscopiaOd}
-                disabled
+                onChange={handleChange}
               />
               <InputTextOneLine
                 label="O.I:"
                 name="otoscopiaOi"
                 value={form.otoscopiaOi}
-                disabled
+                onChange={handleChange}
               />
             </div>
           </div>
