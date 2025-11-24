@@ -75,6 +75,33 @@ export const useForm = (initialFormState, options = {}) => {
     }));
   };
 
+  const handleFocusNext = (e, nextName) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+
+      // 1. Si se envía nextName, tratar de enfocarlo
+      if (nextName) {
+        const target = document.getElementsByName(nextName)?.[0];
+        if (target) {
+          target.focus();
+          return;
+        }
+      }
+
+      // 2. Si nextName no existe → saltar al siguiente enfocable (como TAB)
+      const focusable = Array.from(
+        document.querySelectorAll(
+          'input, select, textarea, button, [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter(el => !el.disabled && el.tabIndex !== -1);
+
+      const index = focusable.indexOf(e.target);
+      if (index !== -1) {
+        focusable[index + 1]?.focus();
+      }
+    }
+  };
+
   const handleClear = () => {
     setForm(initialFormState);
     if (typeof window !== "undefined" && storageKey) {
@@ -165,6 +192,7 @@ export const useForm = (initialFormState, options = {}) => {
     handleRadioButton,
     handleInputChangeChecked,
     handleCheckBoxChange,
+    handleFocusNext,
     handleClear,
     handleClearnotO,
     handlePrintDefault,

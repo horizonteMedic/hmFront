@@ -1,9 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPrint, faSave, faBroom } from '@fortawesome/free-solid-svg-icons';
-import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { getFetch } from "../../../../getFetch/getFetch";
-
 import {
   InputTextOneLine,
   InputTextArea,
@@ -11,19 +9,22 @@ import {
   SectionFieldset,
   InputsRadioGroup
 } from '../../../../../../components/reusableComponents/ResusableComponents';
-
 import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
+import { useSessionData } from '../../../../../../hooks/useSessionData';
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerHematologiaBioquimicaSIEO";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "lab_clinico";
 
 export default function HematologiaBioquimicaSIEO() {
   const today = getToday();
 
-  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+  const { token, userlogued, selectedSede, userName } = useSessionData();
 
   const initialFormState = {
     norden: "",
+    codLabclinico: null,
     fechaExamen: today,
     dni: "",
     incompleto: false,
@@ -86,6 +87,10 @@ export default function HematologiaBioquimicaSIEO() {
     marihuana: '',
 
     observaciones: '',
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
   const {
@@ -94,27 +99,28 @@ export default function HematologiaBioquimicaSIEO() {
     handleChange,
     handleClearnotO,
     handlePrintDefault,
+    handleInputChangeChecked,
     handleChangeNumber,
     handleChangeSimple,
     handleClear,
-    handleRadioButtonBoolean,
+    handleFocusNext,
     handleRadioButton,
   } = useForm(initialFormState);
 
   const handleSave = () => {
-    // SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, token, userlogued, handleClear, tabla);
   };
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
       handleClearnotO();
-      // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
 
   const handlePrint = () => {
     handlePrintDefault(() => {
-      // PrintHojaR(form.norden, token, tabla, datosFooter);
+      PrintHojaR(form.norden, token, tabla);
     });
   };
 
@@ -127,6 +133,11 @@ export default function HematologiaBioquimicaSIEO() {
       setForm(prev => ({ ...prev, dataTabla: res || [] }));
     });
   };
+
+  useEffect(() => {
+    if (!form.nombres || !form.norden) return;
+    GetTable(form.norden)
+  }, [form.nombres]);
 
   useEffect(() => {
     const grupo = form.grupoSanguineo;
@@ -142,6 +153,7 @@ export default function HematologiaBioquimicaSIEO() {
           name="norden"
           value={form.norden}
           onChange={handleChangeNumber}
+          onKeyUp={handleSearch}
         />
         <InputTextOneLine
           label="Fecha"
@@ -163,18 +175,12 @@ export default function HematologiaBioquimicaSIEO() {
         />
         <InputCheckbox
           label={<span className="text-red-600 font-bold">INCOMPLETO</span>}
+          name="incompleto"
+          onChange={handleInputChangeChecked}
           checked={form.incompleto}
         />
       </SectionFieldset>
       <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-        <InputTextOneLine
-          label="Responsable Lab"
-          name="responsable"
-          value={form.responsable}
-          className="col-span-2"
-          labelWidth="140px"
-          disabled
-        />
         <InputTextOneLine
           label="Nombres"
           name="nombres"
@@ -207,7 +213,7 @@ export default function HematologiaBioquimicaSIEO() {
       {/* Contenido principal en dos columnas */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Hematología */}
-        <SectionFieldset legend="Hematología" className="space-y-3 w-full">
+        <SectionFieldset legend="Hematología" className="space-y-3">
           <div className="flex justify-end">
             <button
               className="bg-red-600 text-white px-4 py-2 rounded-md"
@@ -267,6 +273,7 @@ export default function HematologiaBioquimicaSIEO() {
                   value={form[key.toLowerCase()]}
                   labelWidth="120px"
                   onChange={handleChange}
+                  onKeyUp={handleFocusNext}
                 />
               ))}
             </div>
@@ -287,6 +294,7 @@ export default function HematologiaBioquimicaSIEO() {
                   value={form[key.toLowerCase()]}
                   labelWidth="120px"
                   onChange={handleChange}
+                  onKeyUp={handleFocusNext}
                 />
               ))}
             </div>
@@ -372,21 +380,21 @@ export default function HematologiaBioquimicaSIEO() {
                   </tr>
                 </thead>
                 <tbody>
-                  {/* {tableLab.length === 0 ? (
+                  {form.dataTabla.length === 0 ? (
                     <tr>
                       <td className="border border-gray-300 px-2 py-1 text-center" colSpan={3}>
                         Sin Datos...
                       </td>
                     </tr>
                   ) : (
-                    tableLab.map((row, i) => (
+                    form.dataTabla.map((row, i) => (
                       <tr key={i} className="text-center">
                         <td className="font-bold border-b border-gray-200 py-1 ">{row.fechaLab}</td>
                         <td className="border-b border-gray-200 py-1 ">{row.grupoSanguineo}</td>
                         <td className="border-b border-gray-200 py-1 ">{row.factorRh}</td>
                       </tr>
                     ))
-                  )} */}
+                  )}
                 </tbody>
               </table>
             </div>
@@ -478,16 +486,29 @@ export default function HematologiaBioquimicaSIEO() {
               </div>
             </SectionFieldset>
 
-            <SectionFieldset legend="Sedimento Unitario" className="space-y-4 flex-1">
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+            <SectionFieldset legend="Sedimento Unitario" className="space-y-2 grid xl:grid-cols-2 gap-x-4">
+              <div className="grid gap-y-2">
                 {[
                   { label: 'Leucocitos (x campos)', key: 'leucocitosSedimentoUnitario' },
-                  { label: 'Hematies (x campos)', key: 'hematiesSedimentoUnitario' },
                   { label: 'CelEpiteliales', key: 'celEpiteliales' },
-                  { label: 'Cristales', key: 'cristales' },
                   { label: 'Cilindros', key: 'cilindros' },
-                  { label: 'Bacterias', key: 'bacterias' },
                   { label: 'Gram SC', key: 'gramSc' },
+                ].map((item) => (
+                  <InputTextOneLine
+                    label={item.label}
+                    name={item.key}
+                    key={item.key}
+                    value={form[item.key]}
+                    onChange={handleChange}
+                    onKeyUp={handleFocusNext}
+                  />
+                ))}
+              </div>
+              <div className="grid gap-y-2">
+                {[
+                  { label: 'Hematies (x campos)', key: 'hematiesSedimentoUnitario' },
+                  { label: 'Cristales', key: 'cristales' },
+                  { label: 'Bacterias', key: 'bacterias' },
                   { label: 'Otros', key: 'otros' },
                 ].map((item) => (
                   <InputTextOneLine
@@ -496,23 +517,20 @@ export default function HematologiaBioquimicaSIEO() {
                     key={item.key}
                     value={form[item.key]}
                     onChange={handleChange}
+                    onKeyUp={handleFocusNext}
                   />
                 ))}
               </div>
             </SectionFieldset>
           </div>
           <div className="space-y-6 flex flex-col">
-            <SectionFieldset legend="Examen Químico" className="space-y-4 flex-1">
-              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+            <SectionFieldset legend="Examen Químico" className="grid xl:grid-cols-2 gap-y-2 xl:gap-y-0 gap-x-4">
+              <div className="grid gap-y-2 ">
                 {[
                   { label: 'Nitritos', key: 'nitritos' },
-                  { label: 'Proteínas', key: 'proteinas' },
                   { label: 'Cetonas', key: 'cetonas' },
-                  { label: 'Leucocitos', key: 'leucocitosExamenQuimico' },
                   { label: 'Ác. Ascórbico', key: 'acAscorbico' },
-                  { label: 'Urobilinógeno', key: 'urobilinogeno' },
                   { label: 'Bilirrubina', key: 'bilirrubina' },
-                  { label: 'Glucosa', key: 'glucosaExamenQuimico' },
                   { label: 'Sangre', key: 'sangre' },
                 ].map((item) => (
                   <InputTextOneLine
@@ -521,6 +539,25 @@ export default function HematologiaBioquimicaSIEO() {
                     key={item.key}
                     value={form[item.key]}
                     onChange={handleChange}
+                    onKeyUp={handleFocusNext}
+                  />
+                ))}
+              </div>
+              <div className="flex flex-col gap-y-2 ">
+                {[
+                  { label: 'Proteínas', key: 'proteinas' },
+                  { label: 'Leucocitos', key: 'leucocitosExamenQuimico' },
+                  { label: 'Urobilinógeno', key: 'urobilinogeno' },
+                  { label: 'Glucosa', key: 'glucosaExamenQuimico' },
+
+                ].map((item) => (
+                  <InputTextOneLine
+                    label={item.label}
+                    name={item.key}
+                    key={item.key}
+                    value={form[item.key]}
+                    onChange={handleChange}
+                    onKeyUp={handleFocusNext}
                   />
                 ))}
               </div>
@@ -556,12 +593,18 @@ export default function HematologiaBioquimicaSIEO() {
           </div>
         </div>
 
-        <SectionFieldset legend="Observaciones" className="space-y-4">
+        <SectionFieldset legend="Conclusiones" className="space-y-4">
           <InputTextArea
+            label="Observaciones"
             name="observaciones"
             value={form.observaciones}
             rows={4}
             onChange={handleChange}
+          />
+          <EmpleadoComboBox
+            value={form.nombre_medico}
+            form={form}
+            onChange={handleChangeSimple}
           />
         </SectionFieldset>
 

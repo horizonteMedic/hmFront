@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export default function TabSelector({ tieneVista, tabsConfig }) {
+export default function SubTabSelector({ tieneVista, tabsConfig }) {
     const [activeTab, setActiveTab] = useState(0);
 
     useEffect(() => {
