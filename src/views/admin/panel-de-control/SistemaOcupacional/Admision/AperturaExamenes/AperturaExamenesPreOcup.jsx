@@ -62,6 +62,7 @@ const AperturaExamenesPreOcup = (props) => {
     alturaPo: "",
     precioPo: "",
     protocolo: "",
+    idProtocolo: "",
     tipoPago: "",
     precioAdic: "",
     autoriza: "",
@@ -86,9 +87,14 @@ const AperturaExamenesPreOcup = (props) => {
     tmarihuana:false,
     tcocaina:false,
 
+    //Examenes Adicionales
+    examenesAdicionales : [],
     nombreMiUsuario: fixEncodingModern(userCompleto?.datos?.nombres_user),
     userRegistroDatos: ""
   })
+
+  //Examenes Adicionales
+  const [listaExamenes, setListaExamenes] = useState([])
   
   const [searchHC, setSearchHC] = useState([])
   const [showEdit, setShowEdit] = useState(false)
@@ -339,9 +345,46 @@ const AperturaExamenesPreOcup = (props) => {
   const handleSelectProtocolo = p => {
     console.log(p)
     setSearchProtocolo(p.nombre);
-    setDatos(d => ({ ...d, protocolo: p.nombre }));
+    setDatos(d => ({ ...d, protocolo: p.nombre, idProtocolo: p.idProtocolo }));
     setFilteredProtocolos([]);
+    SearchExamenesAdicionales(p.idProtocolo)
   };
+
+  const SearchExamenesAdicionales = async (id) => {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: "top-start",
+      showConfirmButton: false,
+      timer: 7000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+      }
+    });
+    getFetch(`/api/v01/ct/protocolo/examenAdicional/obtenerExamenesAdicionales/${id}`,props.token)
+    .then((res) => {
+      if (res.estatus === "OK") {
+          if (res.resultado.length > 0) {
+              setListaExamenes(res.resultado)
+              Toast.fire({
+                icon: "success",
+                title: `Lista de Examenes Adicionales Activa`
+              });
+          } else {
+              Toast.fire({
+                icon: "warning",
+                title: `No Tiene Lista de Examenes Adicionales`
+              });
+          }
+      } else {
+          Toast.fire({
+            icon: "warning",
+            title: `No Tiene Lista de Examenes Adicionales`
+          });
+      }
+    })
+  }
 
 
   useEffect(() => {
@@ -959,6 +1002,13 @@ const AperturaExamenesPreOcup = (props) => {
       });
     }
   }
+
+  const removeExamen = (id) => {
+    setDatos(prev => ({
+        ...prev,
+        examenesAdicionales: prev.examenesAdicionales.filter(ex => ex.id !== id)
+    }));
+  };
   console.log(datos)
   return (
     <div >
@@ -1228,6 +1278,33 @@ const AperturaExamenesPreOcup = (props) => {
                   </div>
                 </div>
               </div>
+              
+              {/*AUTOCOMPLETABLE DE PROTOCOLOS */}
+              <div className="flex items-center space-x-2 mb-1">
+                <label htmlFor="protocolo" className="block w-32">Protocolo:</label>
+                <div className="relative flex-grow">
+                  <input autoComplete="off"
+                    id="protocolo" name="protocolo"
+                    type="text" value={searchProtocolo}
+                    placeholder="Escribe para buscar protocolo..."
+                    disabled={habilitar || !(protocoloOptions?.length > 0)} onChange={handleProtocoloSearch}
+                    className={`border border-gray-300 px-3 py-1 rounded-md w-full ${!(protocoloOptions?.length > 0) ? "bg-slate-300" : "bg-slate-100"}`}
+                    onKeyDown={e=>{ if(e.key==='Enter'&&filteredProtocolos.length>0){e.preventDefault();handleSelectProtocolo(filteredProtocolos[0]);} }}
+                    onFocus={()=>setFilteredProtocolos(protocoloOptions.filter(p=>p.nombre.toLowerCase().includes(searchProtocolo.toLowerCase())))}
+                    onBlur={()=>setTimeout(()=>setFilteredProtocolos([]),100)}
+                  />
+                  {searchProtocolo&&filteredProtocolos.length>0&&(
+                    <ul className="absolute inset-x-0 top-full bg-white border rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                      {filteredProtocolos.map(p=>(
+                        <li key={p.idProtocolo} className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                            onMouseDown={()=>handleSelectProtocolo(p)}>
+                          {p.nombre}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>  
 
             <div className="mb-1 mt-5">
               <h2 className="text-lg font-bold">Área Pre-Ocupacional</h2>
@@ -1342,13 +1419,21 @@ const AperturaExamenesPreOcup = (props) => {
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="examenAdicional" className="block w-[15em] ">Examen Adicional:</label>
               <div className="flex flex-wrap pt-2 pb-2">
-                {/*<div className='flex px-3'>
-                  <button onClick={() => {setModalexam(true)}} className='flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800  mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none'>
+                <div className='flex px-3'>
+                  <button onClick={() => {setModalexam(true)}} disabled={listaExamenes.length === 0} className={`flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800  mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none ${listaExamenes.length === 0 ? 'opacity-60' : ""}`}>
                     + Seleccionar Exámenes
                   </button>
-                </div>*/}
-
-                <div className="flex items-center mr-8 mb-2">
+                </div>
+                {datos.examenesAdicionales.length > 0 && <div  className='w-full flex flex-wrap bg-[#f1f5f980] rounded-lg p-3 gap-2' >
+                  {datos.examenesAdicionales?.map((examen) => (
+                    <div className='py-2 px-3 flex items-center bg-slate-300 .bg-slate-300 border-2 rounded-xl font-semibold gap-3'>
+                      <label className='' htmlFor="">{examen.nombre}</label>
+                      <button onClick={() => {removeExamen(examen.id)}}>X</button>
+                    </div>
+                  ))}
+                  
+                </div>}
+                {/*<div className="flex items-center mr-8 mb-2">
                   <input type="checkbox"  title="FIST-TEST" disabled={habilitar} checked={datos.n_fisttest} onChange={handleCheack}  id="examenAdicional4" name="n_fisttest" className="mr-2" />
                   <label htmlFor="examenAdicional4" title="FIST-TEST">FIST-TEST</label>
                 </div>
@@ -1407,7 +1492,7 @@ const AperturaExamenesPreOcup = (props) => {
                 <div className="flex items-center mr-4 mb-2">
                   <input type="checkbox" title='COCAINA' disabled={habilitar} checked={datos.tcocaina} onChange={handleCheack} id="examenAdicional18" name="tcocaina" className="mr-2" />
                   <label htmlFor="examenAdicional18" title='COCAINA'>COCAINA</label>
-                </div>
+                </div>*/}
                 
               </div>
             </div>
@@ -1552,7 +1637,7 @@ const AperturaExamenesPreOcup = (props) => {
             </div>
             
             {/* — Autocomplete Protocolo — */}
-            <div className="flex items-center space-x-2 mb-1">
+            {/*<div className="flex items-center space-x-2 mb-1">
               <label htmlFor="protocolo" className="block w-32">Protocolo:</label>
               <div className="relative flex-grow">
                 <input autoComplete="off"
@@ -1576,7 +1661,7 @@ const AperturaExamenesPreOcup = (props) => {
                   </ul>
                 )}
               </div>
-            </div>            
+            </div>*/  }          
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="userRegistroDatos" className="block w-36">Registrado por :</label>
               <input 
@@ -1769,7 +1854,7 @@ const AperturaExamenesPreOcup = (props) => {
           });
           setSearchContrata(e)}}
         />
-        {/*modalExam && <ModalExamenes close={() => setModalexam(false)}/>*/}
+        {modalExam && <ModalExamenes close={() => setModalexam(false)} idProtocolo={datos.idProtocolo} fetch={getFetch} token={props.token} set={setDatos} datos={datos} listaExamenes={listaExamenes} />}
     </div>
   );
 };

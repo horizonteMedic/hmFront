@@ -1,5 +1,6 @@
 import { faX } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState } from "react";
 
 const EXAMENES_MOCK = [
   { id: "1", nombre: "FIST-TEST" },
@@ -24,7 +25,29 @@ const EXAMENES_MOCK = [
   { id: "20", nombre: "PERFIL LIPÍDICO" },
 ];
 
-const ModalExamenes = ({close}) => {
+const ModalExamenes = ({close,idProtocolo,fetch,token,set,datos,listaExamenes = []}) => {
+    const [busqueda, setBusqueda] = useState("");
+
+    const listaFiltrada = listaExamenes?.filter(ex =>
+        ex.nombre.toLowerCase().includes(busqueda.toLowerCase())
+    );
+
+    const handleCheck = (examen) => {
+        set(prev => {
+            const existe = prev.examenesAdicionales.some(e => e.id === examen.idExamenAdicionalProtocolo);
+
+            return {
+                ...prev,
+                examenesAdicionales: existe
+                    ? prev.examenesAdicionales.filter(item => item.id !== examen.idExamenAdicionalProtocolo)
+                    : [...prev.examenesAdicionales, {
+                        id: examen.idExamenAdicionalProtocolo,
+                        nombre: examen.nombre
+                    }]
+            };
+        });
+    };
+    console.log(datos.examenesAdicionales)
     return(
         <>
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -33,7 +56,7 @@ const ModalExamenes = ({close}) => {
                         <h2 className="text-blue-600 text-xl font-semibold">
                         Seleccionar Exámenes Adicionales
                         </h2>
-                        <div className="text-lg cursor-pointer text-gray-500">
+                        <div className="text-xl font-bold cursor-pointer text-gray-500">
                             <FontAwesomeIcon onClick={close} icon={faX} />
                         </div>
                     </div>
@@ -43,25 +66,28 @@ const ModalExamenes = ({close}) => {
                             type="text"
                             className="w-full border rounded-lg text-lg px-3 py-3"
                             placeholder="Buscar examen..."
-                            
+                            value={busqueda}
+                            onChange={(e) => setBusqueda(e.target.value)}
                             />
                         </div>
                     </div>
                     <div className="grid grid-cols-2 px-3 py-3 gap-2">
-                        {EXAMENES_MOCK.map((examen) => (
+                        {listaFiltrada?.map((examen) => (
                             <div
-                                key={examen.id}
-                                className="flex items-center space-x-3 rounded-lg border border-border bg-card p-3 hover:bg-accent/50 transition-colors"
+                                key={examen.idExamenAdicionalProtocolo}
+                                className="group flex items-center space-x-3 rounded-lg border border-border bg-card p-3 hover:bg-blue-500 !text-white transition-colors"
                             >
                             <input
                                 type="checkbox"
-                                id={examen.id}
-                                checked={false}
+                                
+                                 checked={datos.examenesAdicionales.some(e => e.id === examen.idExamenAdicionalProtocolo)}
+                                onChange={() => handleCheck(examen)}
+                                id={examen.idExamenAdicionalProtocolo}
                                 
                             />
                             <label
-                                htmlFor={examen.id}
-                                className="flex-1 text-sm font-medium leading-none cursor-pointer select-none"
+                                htmlFor={examen.idExamenAdicionalProtocolo}
+                                className="flex-1 !text-lg !font-medium leading-none cursor-pointer select-none group-hover:!text-white"
                             >
                                 {examen.nombre}
                             </label>
