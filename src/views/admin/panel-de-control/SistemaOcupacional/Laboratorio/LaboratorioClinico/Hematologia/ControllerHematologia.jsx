@@ -2,14 +2,13 @@ import Swal from "sweetalert2";
 import {
   GetInfoPacDefault,
   GetInfoServicioDefault,
-  LoadingDefault,
   PrintHojaRDefault,
+  SubmitDataServiceDefault,
   VerifyTRDefault,
-} from "../../../../../../utils/functionUtils";
-import { SubmitHematograma } from "../ControllerLC/model.js";
+} from "../../../../../../utils/functionUtils.js";
 
 const obtenerReporteUrl = "/api/v01/ct/laboratorio/obtenerReporteLabHematograma";
-const tabla = 'hemograma_autom';
+const registrarUrl = "/api/v01/ct/laboratorio/registrarActualizarLabHematograma"
 
 export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
   const res = await GetInfoServicioDefault(
@@ -46,39 +45,45 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
   }
 };
 
-export const SubmitDataService = async (form, token, user, limpiar) => {
+export const SubmitDataService = async (
+  form,
+  token,
+  user,
+  limpiar,
+  tabla
+) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
     return;
   }
+  const body = {
+    fechaExamen: form.fecha,
+    txtHemoglobina: form.hemoglobina,
+    txtHematocrito: form.hematocrito,
+    txtHematies: form.hematies,
+    txtVolumen: form.volumen_corpuscular_medio,
+    txtHemocorpuscular: form.hemoglobina_corpuscular_media,
+    txtConcentracion: form.concentracion_hemoglobina_corpuscular,
+    txtLeucocitos: form.leucocitos,
+    txtNeutrofilos: form.neutrofilos,
+    txtAbastonados: form.abastonados,
+    txtSegmentados: form.segmentados,
+    txtMonocitos: form.monocitos,
+    txtEosinofios: form.eosinofilos,
+    txtBasofilos: form.basofilos,
+    txtLinfocitos: form.linfocitos,
+    txtPlaquetas: form.plaquetas,
+    userRegistro: user,
+    userMedicoOcup: "",
+    norden: form.norden
+  };
 
-  LoadingDefault('Registrando Datos');
-  try {
-    const res = await SubmitHematograma(form, token, user);
-    if (res.id === 1 || res.id === 0) {
-      const result = await Swal.fire({
-        title: 'Exito',
-        text: `${res.mensaje},\n¿Desea imprimir?`,
-        icon: 'success',
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-      });
-      limpiar();
-      if (result.isConfirmed) {
-        await PrintHojaR(form.norden, token);
-      }
-    } else {
-      Swal.fire('Error', 'Ocurrio un error al Registrar', 'error');
-    }
-  } catch (error) {
-    Swal.fire('Error', 'Ocurrio un error al Registrar', 'error');
-  } finally {
-    Swal.close();
-  }
+  await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
+    PrintHojaR(form.norden, token, tabla);
+  });
 };
 
-export const PrintHojaR = async (nro, token) => {
+export const PrintHojaR = async (nro, token, tabla) => {
   const jasperModules = import.meta.glob(
     "../../../../../../jaspers/LaboratorioClinico/*.jsx"
   );
@@ -92,7 +97,6 @@ export const PrintHojaR = async (nro, token) => {
     "../../../../../../jaspers/LaboratorioClinico"
   );
 };
-
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
   await VerifyTRDefault(
     nro,
