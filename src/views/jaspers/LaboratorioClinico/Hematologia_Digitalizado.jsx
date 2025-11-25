@@ -2,311 +2,395 @@ import jsPDF from "jspdf";
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
+import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
+import { convertirGenero } from "../../utils/helpers.js";
 
-// Función para formatear fecha a DD/MM/YYYY
-const toDDMMYYYY = (fecha) => {
-  if (!fecha) return '';
-  if (fecha.includes('/')) return fecha; // ya está en formato correcto
-  const [anio, mes, dia] = fecha.split('-');
-  if (!anio || !mes || !dia) return fecha;
-  return `${dia}/${mes}/${anio}`;
-};
-
-// Función para formatear fecha larga
-const formatDateToLong = (dateString) => {
-  if (!dateString) return '';
-  try {
-    const date = new Date(`${dateString}T00:00:00`);
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  } catch (error) {
-    return toDDMMYYYY(dateString) || '';
-  }
-};
-
-// Header con datos de ficha, sede y fecha
-const drawHeader = (doc, datos = {}) => {
+export default function Hematologia_Digitalizado_nuevo(data = {}) {
+  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
-  
-  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-  
-  // Número de Ficha
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Nro de ficha: ", pageW - 80, 15);
-  doc.setFont("helvetica", "normal").setFontSize(18);
-  doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
-  
-  // Sede
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
-  
-  // Fecha de examen
-  const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
-  doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
-  
-  // Página
-  doc.text("Pag. 01", pageW - 30, 10);
 
-  // Bloque de color
-  drawColorBox(doc, {
-    color: datos.codigoColor || "#008f39",
-    text: datos.textoColor || "F",
-    x: pageW - 30,
-    y: 10,
-    size: 22,
-    showLine: true,
-    fontSize: 30,
-    textPosition: 0.9
-  });
-};
-
-// Función para dibujar datos del paciente
-const drawPatientData = (doc, datos = {}) => {
-  const margin = 15;
-  let y = 40;
-  const lineHeight = 6;
-  const patientDataX = margin;
-  
-  const drawPatientDataRow = (label, value) => {
-    const labelWithColon = label.endsWith(':') ? label : label + ' :';
-    doc.setFontSize(11).setFont('helvetica', 'bold');
-    doc.text(labelWithColon, patientDataX, y);
-    let valueX = patientDataX + doc.getTextWidth(labelWithColon) + 2;
-    if (label.toLowerCase().includes('apellidos y nombres')) {
-      const minGap = 23;
-      if (doc.getTextWidth(labelWithColon) < minGap) valueX = patientDataX + minGap;
-    }
-    doc.setFont('helvetica', 'normal');
-    doc.text(String(value || '').toUpperCase(), valueX, y);
-    y += lineHeight;
+  // === MAPEO DE DATOS ===
+  const datosReales = {
+    // Datos Personales del Paciente
+    apellidosNombres: String(data.nombres || ""),
+    documentoIdentidad: String(data.dni || ""),
+    edad: String(data.edad || ""),
+    sexo: convertirGenero(data.sexoPaciente || ""),
+    fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente || ""),
+    lugarNacimiento: String(data.lugarNacimientoPaciente || ""),
+    estadoCivil: String(data.estadoCivilPaciente || ""),
+    nivelEstudio: String(data.nivelEstudioPaciente || ""),
+    ocupacion: String(data.ocupacionPaciente || ""),
+    // Datos Laborales
+    cargo: String(data.cargoPaciente || ""),
+    areaTrabajo: String(data.areaPaciente || ""),
+    // Datos del Documento/Examen
+    numeroFicha: String(data.norden || ""),
+    codigoClinica: String(data.codigoClinica || ""),
+    nombreExamen: String(data.nombreExamen || ""),
+    fechaExamen: formatearFechaCorta(data.fechaExamen || ""),
+    sede: String(data.sede || ""),
+    // Datos de Color
+    color: data.color || "",
+    codigoColor: data.codigoColor || "",
+    textoColor: data.textoColor || "",
+    // Digitalización
+    digitalizacion: data.digitalizacion || [],
   };
+
+  // === FUNCIONES AUXILIARES ===
+  const tablaInicioX = 5;
+  const tablaAncho = 200;
+  const filaAltura = 6;
+
+  // Header reutilizable
+  const drawHeader = (pageNumber) => {
+    CabeceraLogo(doc, { ...datosReales, tieneMembrete: false, yOffset: 13 });
+
+    // Título principal
+    doc.setFont("helvetica", "bold").setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text("HEMOGRAMA AUTOMATIZADO", pageW / 2, 42, { align: "center" });
+
+    // Número de Ficha y Página
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text("Nro de ficha: ", pageW - 80, 13);
+    doc.setFont("helvetica", "normal").setFontSize(18);
+    doc.text(datosReales.numeroFicha, pageW - 60, 14);
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text("Sede: " + datosReales.sede, pageW - 80, 18);
+    doc.text("Fecha de examen: " + datosReales.fechaExamen, pageW - 80, 23);
+    doc.text("Código Clínica: " + datosReales.codigoClinica, pageW - 80, 28);
+
+    // Bloque de color
+    drawColorBox(doc, {
+      color: datosReales.codigoColor,
+      text: datosReales.textoColor,
+      x: pageW - 30,
+      y: 8,
+      size: 22,
+      showLine: true,
+      fontSize: 30,
+      textPosition: 0.9
+    });
+  };
+
+  // Función para dibujar header de sección con fondo gris
+  const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
+    doc.setFillColor(196, 196, 196);
+    doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
+    return yPos + alturaHeader;
+  };
+
+  // Función para dibujar texto con superíndices (ej: "10^6" -> "10" con "6" arriba)
+  const drawTextWithSuperscript = (text, x, y) => {
+    const parts = text.split(/(\^[0-9]+)/);
+    let currentX = x;
+    
+    parts.forEach((part) => {
+      if (part.startsWith('^')) {
+        // Superíndice
+        const superNum = part.substring(1);
+        doc.setFontSize(6);
+        doc.text(superNum, currentX, y - 1.5);
+        currentX += doc.getTextWidth(superNum);
+        doc.setFontSize(9);
+      } else {
+        doc.setFontSize(9);
+        doc.text(part, currentX, y);
+        currentX += doc.getTextWidth(part);
+      }
+    });
+  };
+
+  // === DIBUJAR HEADER ===
+  drawHeader(1);
+
+  // === SECCIÓN 1: DATOS PERSONALES ===
+  let yPos = 46;
+
+  yPos = dibujarHeaderSeccion("DATOS PERSONALES", yPos, filaAltura);
+
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+
+  // Primera fila: Apellidos y Nombres | T. Examen (2 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 130, yPos, tablaInicioX + 130, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text(datosReales.apellidosNombres, tablaInicioX + 40, yPos + 3.5);
   
-  drawPatientDataRow("Apellidos y Nombres :", datos.nombres || datos.nombresPaciente || '');
-  drawPatientDataRow("Edad :", datos.edad || datos.edadPaciente ? `${datos.edad || datos.edadPaciente} AÑOS` : '');
-  drawPatientDataRow("DNI :", datos.dni || datos.dniPaciente || '');
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("T. Examen:", tablaInicioX + 132, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text(datosReales.nombreExamen, tablaInicioX + 152, yPos + 3.5);
+  yPos += filaAltura;
+
+  // Segunda fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 45, yPos, tablaInicioX + 45, yPos + filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("DNI:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datosReales.documentoIdentidad, tablaInicioX + 12, yPos + 3.5);
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Edad:", tablaInicioX + 47, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datosReales.edad + " Años", tablaInicioX + 58, yPos + 3.5);
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Sexo:", tablaInicioX + 92, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datosReales.sexo.toUpperCase(), tablaInicioX + 105, yPos + 3.5);
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Fecha Nac.:", tablaInicioX + 137, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datosReales.fechaNacimiento, tablaInicioX + 155, yPos + 3.5);
+  yPos += filaAltura;
+
+  // Tercera fila: Lugar Nacimiento, Estado Civil (2 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 100, yPos, tablaInicioX + 100, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Lugar de Nacimiento:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datosReales.lugarNacimiento, tablaInicioX + 38, yPos + 3.5);
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Estado Civil:", tablaInicioX + 102, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datosReales.estadoCivil, tablaInicioX + 125, yPos + 3.5);
+  yPos += filaAltura;
+
+  // Cuarta fila: Nivel de Estudio (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Nivel de Estudio:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datosReales.nivelEstudio, tablaInicioX + 32, yPos + 3.5);
+  yPos += filaAltura;
+
+  // Quinta fila: Ocupación (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Ocupación:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datosReales.ocupacion, tablaInicioX + 25, yPos + 3.5);
+  yPos += filaAltura;
+
+  // Sexta fila: Cargo (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Cargo:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datosReales.cargo, tablaInicioX + 18, yPos + 3.5);
+  yPos += filaAltura;
+
+  // Séptima fila: Área (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Área:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datosReales.areaTrabajo, tablaInicioX + 15, yPos + 3.5);
+  yPos += filaAltura;
+
+  // Sexta fila: T. Examen (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Tipo de Examen:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datosReales.nombreExamen, tablaInicioX + 32, yPos + 3.5);
+  yPos += filaAltura;
+
+  // === SECCIÓN 2: HEMOGRAMA (Tabla 3 columnas: PRUEBA | RESULTADO | VALORES NORMALES) ===
+  const mitadTabla = tablaAncho / 2;
+
+  // Header de la tabla
+  doc.setFillColor(196, 196, 196);
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'FD');
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("PRUEBA", tablaInicioX + 35, yPos + 3.5, { align: "center" });
+  doc.text("RESULTADO", tablaInicioX + 95, yPos + 3.5, { align: "center" });
+  doc.text("VALORES NORMALES", tablaInicioX + 155, yPos + 3.5, { align: "center" });
   
-  // Fecha
-  doc.setFontSize(11).setFont('helvetica', 'bold');
-  const fechaLabel = "Fecha :";
-  doc.text(fechaLabel, patientDataX, y);
-  doc.setFont('helvetica', 'normal');
-  const fechaLabelWidth = doc.getTextWidth(fechaLabel);
-  doc.text(formatDateToLong(datos.fechaExamen || datos.fecha || ''), patientDataX + fechaLabelWidth + 2, y);
-  
-  // Reseteo
-  doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);
-  
-  return y + lineHeight;
-};
+  // Líneas verticales del header
+  doc.line(tablaInicioX + 70, yPos, tablaInicioX + 70, yPos + filaAltura);
+  doc.line(tablaInicioX + 120, yPos, tablaInicioX + 120, yPos + filaAltura);
+  yPos += filaAltura;
 
-export default function Hematologia_Digitalizado(datos = {}) {
-  const doc = new jsPDF();
-  const pageW = doc.internal.pageSize.getWidth();
+  // Datos del hemograma (3 columnas)
+  const hemogramaData = [
+    { prueba: "Hemoglobina", resultado: data.txtHemoglobina || "", normal: "Mujeres 12 - 16 g/dL\nHombres 14 - 18 g/dL", bold: true },
+    { prueba: "Hematocrito", resultado: data.txtHematocrito || "", normal: "Mujeres 38 - 50 %\nHombres 40 - 54 %", bold: true },
+    { prueba: "Hematíes", resultado: data.txtHematies || "", normal: "4.0 - 5.5 x 10^6/mm3", bold: true },
+    { prueba: "Volumen Corpuscular Medio", resultado: data.txtVolumen || "", normal: "80 - 100 fL", bold: false },
+    { prueba: "Hemoglobina Corpuscular Media", resultado: data.txtHemocorpuscular || "", normal: "26 - 34 pg", bold: false },
+    { prueba: "Concentración de la Hemoglobina\nCorpuscular Media", resultado: data.txtConcentracion || "", normal: "31 - 37 g/dl", bold: false },
+    { prueba: "Leucocitos", resultado: data.txtLeucocitos || "", normal: "4 - 10 x 10^3/mm3", bold: true },
+    { prueba: "Plaquetas", resultado: data.txtPlaquetas || "", normal: "1.5 - 4.5 x 10^5/mm3", bold: true },
+    { prueba: "Recuento Diferencial", resultado: "", normal: "", bold: true, isHeader: true, grayBg: true },
+    { prueba: "Neutrófilos (%)", resultado: data.txtNeutrofilos || "", normal: "55-65 %", bold: true, indent: true },
+    { prueba: "Abastonados (%)", resultado: data.txtAbastonados || "", normal: "0 - 5 %", bold: true, indent: true },
+    { prueba: "Segmentados (%)", resultado: data.txtSegmentados || "", normal: "55 - 65 %", bold: true, indent: true },
+    { prueba: "Monocitos (%)", resultado: data.txtMonocitos || "", normal: "4 - 8 %", bold: true, indent: true },
+    { prueba: "Eosinófilos (%)", resultado: data.txtEosinofios || "", normal: "0 - 4 %", bold: true, indent: true },
+    { prueba: "Basófilos (%)", resultado: data.txtBasofilos || "", normal: "0 - 1 %", bold: true, indent: true },
+    { prueba: "Linfocitos (%)", resultado: data.txtLinfocitos || "", normal: "20 - 40 %", bold: true, indent: true },
+  ];
 
-  // === HEADER ===
-  drawHeader(doc, datos);
-  
-  // === DATOS DEL PACIENTE ===
-  drawPatientData(doc, datos);
-    const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-    const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
-    const isValidUrl = url => url && url !== "Sin registro";
-    const loadImg = src =>
-        new Promise((res, rej) => {
-        const img = new Image();
-        img.src = src;
-        img.crossOrigin = 'anonymous';
-        img.onload = () => res(img);
-        img.onerror = () => rej(`No se pudo cargar ${src}`);
-        });
-    Promise.all([
-        isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
-        isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-    ]).then(([s1, s2]) => {
+  // Calcular altura de cada fila (algunas tienen 2 líneas)
+  hemogramaData.forEach((item) => {
+    const lines = item.prueba.split('\n').length;
+    const normalLines = item.normal.split('\n').length;
+    const maxLines = Math.max(lines, normalLines);
+    const rowHeight = maxLines > 1 ? filaAltura * 1.8 : filaAltura;
 
-        // Márgenes y estilos
-        const margin = 15;
-        let y = 70; // Posición inicial más cerca de los datos del paciente
-        const lineHeight = 6;
-        const lineHeightSmall = 5;
-        const col1 = margin;
-        const col2 = margin + 75;
-        const col3 = margin + 120;
-        const indent = 8;
+    // Dibujar celda
+    doc.setLineWidth(0.2);
+    
+    // Fondo gris para RECUENTO DIFERENCIAL
+    if (item.grayBg) {
+      doc.setFillColor(196, 196, 196);
+      doc.rect(tablaInicioX, yPos, tablaAncho, rowHeight, 'FD');
+    } else {
+      doc.rect(tablaInicioX, yPos, tablaAncho, rowHeight);
+    }
+    
+    doc.line(tablaInicioX + 70, yPos, tablaInicioX + 70, yPos + rowHeight);
+    doc.line(tablaInicioX + 120, yPos, tablaInicioX + 120, yPos + rowHeight);
 
-        // Título principal
-        doc.setFontSize(13);
-        doc.setFont('helvetica', 'bold');
-        doc.text("HEMOGRAMA AUTOMATIZADO", doc.internal.pageSize.getWidth() / 2, y, { align: 'center' });
-        y += lineHeight + 2;
+    // Contenido
+    doc.setFontSize(9);
+    
+    // Calcular centrado vertical
+    const textHeight = maxLines * 3.5;
+    const centroY = yPos + (rowHeight - textHeight) / 2 + 3;
+    
+    // Prueba
+    if (item.bold) {
+      doc.setFont("helvetica", "bold");
+    } else {
+      doc.setFont("helvetica", "normal");
+    }
+    
+    // Los textos no bold o con indent van 4mm más a la derecha
+    const pruebaX = (!item.bold || item.indent) ? tablaInicioX + 6 : tablaInicioX + 2;
+    
+    if (item.prueba.includes('\n')) {
+      const pruebaLines = item.prueba.split('\n');
+      pruebaLines.forEach((line, idx) => {
+        doc.text(line, pruebaX, centroY + (idx * 3.5));
+      });
+    } else {
+      // Centrado vertical para filas de 1 línea en celdas altas
+      const singleLineY = yPos + rowHeight / 2 + 1;
+      doc.text(item.prueba, pruebaX, singleLineY);
+    }
 
-        // Encabezados
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        doc.text("PRUEBA", col1, y);
-        doc.text("RESULTADO", col2 + 17.5, y, { align: 'center' });
-        doc.text("VALORES NORMALES", col3, y);
-        y += lineHeight + 1;
+    // Resultado (centrado horizontal y vertical)
+    doc.setFont("helvetica", "normal");
+    const resultadoY = yPos + rowHeight / 2 + 1;
+    doc.text(item.resultado, tablaInicioX + 95, resultadoY, { align: "center" });
 
-        // --- BLOQUE 1 ---
-        doc.setFont('helvetica', 'bold');
-        doc.text("HEMOGLOBINA", col1, y); doc.setFont('helvetica', 'normal');
-        doc.text(`${datos.txtHemoglobina}`, col2 + 17.5, y, { align: 'center' }); doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.text("Mujeres 12 - 16 g/dL", col3, y);
-        y += lineHeightSmall;
-        doc.text("Hombres 14 - 18 g/dL", col3, y);
-        y += lineHeight + 1;
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        doc.text("HEMATOCRITO", col1, y); doc.setFont('helvetica', 'normal');
-        doc.text(`${datos.txtHematocrito}`, col2 + 17.5, y, { align: 'center' }); doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.text("Mujeres 38 - 50 %", col3, y);
-        y += lineHeightSmall;
-        doc.text("Hombres 40 - 54 %", col3, y);
-        y += lineHeight + 1;
-
-        // --- BLOQUE 2 ---
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        doc.text("HEMATÍES", col1, y); doc.setFont('helvetica', 'normal');
-        doc.text(`${datos.txtHematies}`, col2 + 17.5, y, { align: 'center' }); doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.text("4.0 - 5.5 x 10^6/mm³", col3, y);
-        y += lineHeight;
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text("Volumen Corpuscular Medio", col1 + indent, y);
-        doc.text(`${datos.txtVolumen}`, col2 + 17.5, y, { align: 'center' }); doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.text("80 - 100 fL", col3, y);
-        y += lineHeight;
-        doc.setFontSize(10);
-        doc.text("Hemoglobina Corpuscular Media", col1 + indent, y);
-        doc.text(`${datos.txtHemocorpuscular}`, col2 + 17.5, y, { align: 'center' }); doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.text("26 - 34 pg", col3, y);
-        y += lineHeight;
-        doc.setFontSize(10);
-        doc.text("Concentración de la Hemoglobina", col1 + indent, y);
-        y += lineHeightSmall;
-        doc.text("Corpuscular Media", col1 + indent, y);
-        doc.text(`${datos.txtConcentracion}`, col2 + 17.5, y, { align: 'center' }); doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.text("31 - 37 g/dl", col3, y - lineHeightSmall);
-        y += lineHeight + 1;
-
-        // --- BLOQUE 3 ---
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        doc.text("LEUCOCITOS", col1, y); doc.setFont('helvetica', 'normal');
-        doc.text(`${datos.txtLeucocitos}`, col2 + 17.5, y, { align: 'center' }); doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.text("4 - 10 x 10^3/mm³", col3, y);
-        y += lineHeight + 1;
-
-        // --- BLOQUE 4 ---
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        doc.text("RECUENTO DIFERENCIAL", col1, y);
-        y += lineHeight;
-        // Subgrupos
-        const subgrupos = [
-            { label: "NEUTRÓFILOS (%)", key: "txtNeutrofilos", normal: "55 - 65 %" },
-            { label: "ABASTONADOS (%)", key: "txtAbastonados", normal: "0 - 5 %" },
-            { label: "SEGMENTADOS (%)", key: "txtSegmentados", normal: "55 - 65 %" },
-            { label: "MONOCITOS (%)", key: "txtMonocitos", normal: "4 - 8 %" },
-            { label: "EOSINÓFILOS (%)", key: "txtEosinofios", normal: "0 - 4 %" },
-            { label: "BASÓFILOS (%)", key: "txtBasofilos", normal: "0 - 1 %" },
-            { label: "LINFOCITOS (%)", key: "txtLinfocitos", normal: "20 - 40 %" },
-        ];
-        subgrupos.forEach(({ label, normal, key }) => {
-            doc.setFont('helvetica', 'bold');
-            doc.text(label, col1 + indent, y);
-
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(9);
-
-            // Muestra el valor desde datos, si no existe muestra "-"
-            const value = datos[key] ?? "-";
-            doc.text(String(value), col2 + 17.5, y, { align: 'center' });  // Valor centrado
-            doc.text(normal, col3, y);         // Rango normal
-
-            doc.setFontSize(10);
-            y += lineHeight;
-            });
-        y += 1;
-
-        // --- BLOQUE 5 ---
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        doc.text("PLAQUETAS", col1, y); doc.setFont('helvetica', 'normal');
-        doc.text(`${datos.txtPlaquetas}`, col2 + 17.5, y, { align: 'center' }); doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.text("1.5 - 4.5 x 10^5/mm³", col3, y);
-        y += lineHeight;
-
-        // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
-        const sigW = 53; // Tamaño fijo width
-        const sigH = 23; // Tamaño fijo height
-        const sigY = y + 8; // Reducido de 20 a 8 para acercar la firma
-        const gap = 16; // Espacio entre sellos (reducido 4mm: 20 - 4 = 16)
-        
-        if (s1 && s2) {
-          // Si hay dos sellos, centrarlos juntos
-          const totalWidth = sigW * 2 + gap;
-          const startX = (pageW - totalWidth) / 2;
-          
-          const addSello = (img, xPos) => {
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-            const selloBase64 = canvas.toDataURL('image/png');
-            doc.addImage(selloBase64, 'PNG', xPos, sigY + (sigH - sigH) / 2, sigW, sigH);
-          };
-          addSello(s1, startX);
-          addSello(s2, startX + sigW + gap);
-        } else if (s1) {
-          // Si solo hay un sello, centrarlo con tamaño fijo
-          const canvas = document.createElement('canvas');
-          canvas.width = s1.width;
-          canvas.height = s1.height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(s1, 0, 0);
-          const selloBase64 = canvas.toDataURL('image/png');
-          const imgX = (pageW - sigW) / 2; // Center single stamp
-          doc.addImage(selloBase64, 'PNG', imgX, sigY + (sigH - sigH) / 2, sigW, sigH);
-        } else if (s2) {
-          // Si solo hay el segundo sello, centrarlo con tamaño fijo
-          const canvas = document.createElement('canvas');
-          canvas.width = s2.width;
-          canvas.height = s2.height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(s2, 0, 0);
-          const selloBase64 = canvas.toDataURL('image/png');
-          const imgX = (pageW - sigW) / 2; // Center single stamp
-          doc.addImage(selloBase64, 'PNG', imgX, sigY + (sigH - sigH) / 2, sigW, sigH);
+    // Valores normales (centrado vertical)
+    if (item.normal.includes('\n')) {
+      const normalLinesArr = item.normal.split('\n');
+      normalLinesArr.forEach((line, idx) => {
+        if (line.includes('^')) {
+          drawTextWithSuperscript(line, tablaInicioX + 126, centroY + (idx * 3.5));
+        } else {
+          doc.text(line, tablaInicioX + 126, centroY + (idx * 3.5));
         }
-        
-        // === FOOTER ===
-        footerTR(doc, datos);
+      });
+    } else {
+      const normalY = yPos + rowHeight / 2 + 1;
+      if (item.normal.includes('^')) {
+        drawTextWithSuperscript(item.normal, tablaInicioX + 126, normalY);
+      } else {
+        doc.text(item.normal, tablaInicioX + 126, normalY);
+      }
+    }
 
-        const pdfBlob = doc.output("blob");
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = pdfUrl;
-        document.body.appendChild(iframe);
-        iframe.onload = function () {
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print();
-        };
-    })
-        
+    yPos += rowHeight;
+  });
+
+  // === SECCIÓN 4: FIRMA ===
+  const alturaFilaFirmas = 30;
+  
+  // Dibujar fila de firma (centrada)
+  doc.setLineWidth(0.2);
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaFilaFirmas);
+
+  // Firma centrada en toda la fila
+  const centroFirma = tablaInicioX + tablaAncho / 2;
+  const sello1 = data.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
+  if (sello1 && sello1.url && sello1.url !== "Sin registro") {
+    try {
+      doc.addImage(sello1.url, 'PNG', centroFirma - 22, yPos + 5, 45, 20);
+    } catch (error) {
+      console.log("Error cargando firma:", error);
+    }
+  }
+
+  // === FOOTER ===
+  footerTR(doc, { footerOffsetY: 7 });
+
+  // === IMPRIMIR ===
+  imprimir(doc);
+}
+
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
 }

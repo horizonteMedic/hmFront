@@ -10,43 +10,34 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
-  const datosReales = {
-    apellidosNombres: String((data.apellidosPaciente || "CASTILLO PLASENCIA") + " " + (data.nombresPaciente || "HADY KATHERINE")).trim(),
-    fechaExamen: formatearFechaCorta(data.fechaExamen || new Date().toISOString().split('T')[0]),
-    fechaExamenCompleta: formatearFechaLargaConDia(data.fechaExamen || new Date().toISOString().split('T')[0]),
-    tipoExamen: String(data.nombreExamen || "EXAMEN MEDICO OCUPACIONAL"),
-    sexo: convertirGenero(data.sexoPaciente || "F"),
-    documentoIdentidad: String(data.dniPaciente || "72384273"),
-    edad: String(data.edadPaciente || "31"),
-    areaTrabajo: data.areaPaciente || "OPERACIONES",
-    puestoTrabajo: data.cargoPaciente || "DAD",
-    empresa: data.empresa || "MINERA BOROO MISQUICHILCA S.A.",
-    contrata: data.contrata || "N/A",
-    // Datos de color
-    color: data.color || 1534,
-    codigoColor: data.codigoColor || "",
-    textoColor: data.textoColor || " ",
-    // Datos adicionales para header
-    numeroFicha: String(data.norden || "96639"),
-    sede: data.sede || data.nombreSede || "TRUJILLO-NICOLAS DE PIEROLA",
-    // Datos específicos
-    direccionPaciente: String(data.direccionPaciente || "SAC1 URB PARQUE INDUSTRIAL MZ D LT 3"),
-    fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente || "1994-01-23"),
-    // Datos adicionales para nueva fila
-    lugar: data.lugarExperiencia_lugar_expe || "",
-    anosExperiencia: data.tiempoExperiencia || null,
-    altura: data.altura_txtaltura || "",
-    // Datos de digitalización
-    digitalizacion: data.digitalizacion || [],
-    // Datos del certificado
-    aptitud: data.noApto ? "NO APTO" : (data.apto ? "APTO" : "APTO"),
-    consideracion: data.consideracion || "",
-    observaciones: data.observaciones || "",
-    recomendaciones: data.recomendaciones || "",
+  const datosFinales = {
+    apellidosNombres: String(`${data.apellidosPaciente ?? ""} ${data.nombresPaciente ?? ""}`).trim(),
+    fechaExamen: formatearFechaCorta(data.fechaExamen ?? ""),
+    fechaExamenCompleta: formatearFechaLargaConDia(data.fechaExamen ?? ""),
+    tipoExamen: String(data.nombreExamen ?? ""),
+    sexo: convertirGenero(data.sexoPaciente) || "",
+    documentoIdentidad: String(data.dniPaciente ?? ""),
+    edad: String(data.edadPaciente ?? ""),
+    areaTrabajo: String(data.areaPaciente ?? ""),
+    puestoTrabajo: String(data.cargoPaciente ?? ""),
+    empresa: String(data.empresa ?? ""),
+    contrata: String(data.contrata ?? ""),
+    color: Number(data.color ?? 0),
+    codigoColor: String(data.codigoColor ?? ""),
+    textoColor: String(data.textoColor ?? ""),
+    numeroFicha: String(data.norden ?? ""),
+    sede: String(data.sede ?? data.nombreSede ?? ""),
+    direccionPaciente: String(data.direccionPaciente ?? ""),
+    fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente ?? ""),
+    lugar: String(data.lugarExperiencia_lugar_expe ?? ""),
+    anosExperiencia: data.tiempoExperiencia ?? null,
+    altura: String(data.altura_txtaltura ?? ""),
+    digitalizacion: Array.isArray(data.digitalizacion) ? data.digitalizacion : [],
+    aptitud: data.noApto ? "NO APTO" : data.apto ? "APTO" : "",
+    consideracion: String(data.consideracion ?? ""),
+    observaciones: String(data.observaciones ?? ""),
+    recomendaciones: String(data.recomendaciones ?? "")
   };
-
-  // Usar solo datos reales proporcionados
-  const datosFinales = datosReales;
 
   // Header reutilizable
   const drawHeader = (pageNumber) => {
