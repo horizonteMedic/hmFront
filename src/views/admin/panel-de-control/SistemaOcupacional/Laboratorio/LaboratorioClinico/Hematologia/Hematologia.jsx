@@ -65,6 +65,7 @@ export default function Hematologia() {
     form,
     setForm,
     handleChange,
+    handleClearnotO,
     handleChangeNumber,
     handleChangeSimple,
     handleFocusNext,
@@ -78,6 +79,7 @@ export default function Hematologia() {
 
   const handleSearch = (e) => {
     if (e.key === 'Enter') {
+      handleClearnotO();
       VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };

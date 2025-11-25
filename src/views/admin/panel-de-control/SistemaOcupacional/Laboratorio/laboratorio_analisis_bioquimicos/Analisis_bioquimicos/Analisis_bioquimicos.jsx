@@ -1,390 +1,263 @@
-import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom } from '@fortawesome/free-solid-svg-icons';
-import { GetInfoPacAnalisisBio, Loading, PrintHojaR, SubmitDataService, VerifyTR, GetTableAnalBio } from '../controller/ControllerABio';
+import { GetInfoPacAnalisisBio, GetTableAnalBio, Loading, PrintHojaR, SubmitDataService, VerifyTR } from '../controller/ControllerABio';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { getToday } from '../../../../../../utils/helpers';
-import { getFetch } from '../../../../getFetch/getFetch';
 import Swal from 'sweetalert2';
 import {
   InputTextOneLine,
-  InputsRadioGroup,
+  SectionFieldset
 } from '../../../../../../components/reusableComponents/ResusableComponents';
-import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
+import { useEffect, useState } from 'react';
+import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 
 const tabla = 'analisis_bioquimicos';
 
 export default function AnalisisBioquimicos() {
-  const { token, userlogued, selectedSede } = useSessionData();
+  const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
   const initialFormState = {
-    examType: 'ficha',
     norden: '',
-    medico: '',
-    paciente: '',
+    codAb: null,
+    nombreExamen: 'FICHA MÉDICA OCUPACIONAL',
+    nombres: '',
     fecha: today,
-    creatinina: '',
+
     colesterolTotal: '',
     ldl: '',
     hdl: '',
     vldl: '',
-    trigliceridos: ''
+    trigliceridos: '',
+
+    nombres_search: "",
+    codigo_search: "",
+
+
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
+  const [dataTabla, setDataTabla] = useState([]);
 
   const {
     form,
     setForm,
     handleChange,
+    handleChangeNumberDecimals,
+    handleChangeSimple,
+    handleClearnotO,
     handleClear,
   } = useForm(initialFormState);
 
-  const [searchParams, setSearchParams] = useState({ nombre: '', code: '' });
-  const [listDoc, setListDoc] = useState([]);
-  const [refresh, setRefresh] = useState(0);
-  const [exams, setExams] = useState([]);
-  const [searchMedico, setSearchMedico] = useState('');
-  const [filteredMedicos, setFilteredMedicos] = useState([]);
-
-  // Calcula VLDL, HDL y LDL automáticamente
-  useEffect(() => {
-    if (!form.colesterolTotal && !form.trigliceridos && !form.hdl && !form.vldl) {
-      setForm(f => ({ ...f, hdl: '', vldl: '', ldl: '' }));
-      return;
-    }
-
-    let hdl = '';
-    if (form.colesterolTotal === '-') {
-      hdl = '-';
-    } else if (form.colesterolTotal) {
-      const colesterolTotal = parseFloat(form.colesterolTotal);
-      hdl = !isNaN(colesterolTotal) ? (colesterolTotal * 0.25).toFixed(1) : '';
-    }
-
-    let vldl = '';
-    if (form.trigliceridos === '-') {
-      vldl = '-';
-    } else if (form.trigliceridos) {
-      const trigliceridos = parseFloat(form.trigliceridos);
-      vldl = !isNaN(trigliceridos) ? (trigliceridos / 5).toFixed(1) : '';
-    }
-
-    let ldl = '';
-    if (form.colesterolTotal === '-' || vldl === '-' || hdl === '-') {
-      ldl = '-';
-    } else if (form.colesterolTotal && vldl && hdl) {
-      const colesterolTotal = parseFloat(form.colesterolTotal);
-      const vldlNum = parseFloat(vldl);
-      const hdlNum = parseFloat(hdl);
-      if (!isNaN(colesterolTotal) && !isNaN(vldlNum) && !isNaN(hdlNum)) {
-        ldl = (colesterolTotal - vldlNum - hdlNum).toFixed(1);
-      }
-    }
-
-    setForm(f => {
-      if (f.vldl === vldl && f.hdl === hdl && f.ldl === ldl) return f;
-      return { ...f, vldl, hdl, ldl };
-    });
-  }, [form.trigliceridos, form.colesterolTotal]);
-
-  // Datos de tabla
-  useEffect(() => {
-    if (searchParams.code === "" && searchParams.nombre === "") {
-      const data = {
-        opcion_id_p: 1,
-        norden_p: 0,
-        nombres_apellidos_p: ""
-      };
-      GetTableAnalBio(data, selectedSede, token)
-        .then((res) => {
-          setExams(res || []);
-        })
-        .catch(() => {
-          setExams([]);
-        });
-    }
-  }, [searchParams.code, searchParams.nombre, refresh, selectedSede, token]);
-
-  // NOMBRES DEL DOCTOR
-  useEffect(() => {
-    getFetch(`/api/v01/ct/laboratorio/listadoUsuariosPorPrioridadNameUser?nameUser=${userlogued}`, token)
-      .then((res) => {
-        setListDoc(res || []);
-        if (res && res.length > 0) {
-          setForm(f => ({ ...f, medico: res[0] }));
-          setSearchMedico(res[0]);
-        }
-      })
-      .catch(() => {});
-  }, [userlogued, token]);
-
-  const handleChangeNumber = (e) => {
-    const { name, value } = e.target;
-    if (/^\d*$/.test(value)) {
-      setForm((f) => ({ ...f, [name]: value }));
-    }
-  };
-
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla, () => setRefresh(prev => prev + 1));
+    SubmitDataService(form, token, userlogued, handleClear, tabla, obtenerInfoTabla);
   };
 
   const handleSearch = (e) => {
     if (e.key === 'Enter') {
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede, setSearchMedico);
+      handleClearnotO();
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
 
-  // Debounce para evitar demasiadas llamadas
-  const debounceTimeout = useRef(null);
-  const handleNombreChange = (e) => {
-    const value = e.target.value.toUpperCase();
-    setSearchParams(prev => ({ ...prev, nombre: value, code: "" }));
-
-    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
-
-    debounceTimeout.current = setTimeout(() => {
-      if (value.trim() !== "") {
-        const data = {
-          opcion_id_p: 3,
-          norden: "",
-          nombres_apellidos_p: value
-        };
-        GetTableAnalBio(data, selectedSede, token)
-          .then((res) => {
-            setExams(res || []);
-          })
-          .catch(() => setExams([]));
-      } else {
-        setExams([]);
-      }
-    }, 400);
+  const obtenerInfoTabla = () => {
+    const data = {
+      opcion_id_p: form.codigo_search === "" && form.nombres_search === ""
+        ? 1
+        : form.nombres_search !== "" && form.codigo_search === ""
+          ? 3
+          : form.codigo_search !== "" && form.nombres_search === ""
+            ? 2
+            : 1,
+      norden: form.codigo_search,
+      nombres_apellidos_p: form.nombres_search
+    };
+    GetTableAnalBio(data, selectedSede, token)
+      .then((res) => {
+        setDataTabla(res || []);
+      })
+      .catch(() => setDataTabla([]));
   };
 
-  const SearchCode = (event) => {
-    if (event.key === 'Enter') {
-      if (searchParams.code === "" && searchParams.nombre === "") return;
-      Loading('Realizando Busqueda');
-      const data = {
-        opcion_id_p: 2,
-        norden: Number(searchParams.code),
-        nombres_apellidos_p: ""
-      };
-      GetTableAnalBio(data, selectedSede, token)
-        .then((res) => {
-          if (res && res.length) {
-            setExams(res);
-          } else {
-            Swal.fire('Sin Resultado', 'No se encontraron registros', 'warning');
-          }
-          Swal.close();
-        })
-        .catch(() => {
-          setExams([]);
-          Swal.close();
-        });
+  useEffect(() => {
+    if (selectedSede) obtenerInfoTabla();
+  }, [selectedSede]);
+
+  useEffect(() => {
+    const ct = form.colesterolTotal;
+    const tg = form.trigliceridos;
+    const nCT = parseFloat(String(ct).replace(',', '.'));
+    const nTG = parseFloat(String(tg).replace(',', '.'));
+    const updates = {};
+    if (ct !== '' && Number.isFinite(nCT)) {
+      const h = nCT * 0.25;
+      updates.hdl = h.toFixed(1);
+    } else {
+      updates.hdl = '';
     }
-  };
-
-  const handleMedicoSearch = (e) => {
-    const v = e.target.value.toUpperCase();
-    setSearchMedico(v);
-    setForm(d => ({ ...d, medico: v }));
-    setFilteredMedicos(
-      v
-        ? listDoc.filter(m => m.toLowerCase().includes(v.toLowerCase()))
-        : []
-    );
-  };
-
-  const handleSelectMedico = (m) => {
-    setSearchMedico(m);
-    setForm(d => ({ ...d, medico: m }));
-    setFilteredMedicos([]);
-  };
-
-
-  const bioquimicosFields = [
-    { key: 'creatinina', label: 'Creatinina', hint: '0.8 - 1.4 mg/dl' },
-    { key: 'colesterolTotal', label: 'Colesterol Total', hint: '< 200 mg/dl' },
-    { key: 'trigliceridos', label: 'Triglicéridos', hint: '< 150 mg/dl' },
-    { key: 'hdl', label: 'H.D.L. Colesterol', hint: '40 - 60 mg/dl' },
-    { key: 'ldl', label: 'L.D.L. Colesterol', hint: '< 129 mg/dl' },
-    { key: 'vldl', label: 'V.L.D.L. Colesterol', hint: '< 30 mg/dl' },
-  ];
+    if (tg !== '' && Number.isFinite(nTG)) {
+      const v = nTG / 5;
+      updates.vldl = v.toFixed(1);
+    } else {
+      updates.vldl = '';
+    }
+    if (ct !== '' && tg !== '' && Number.isFinite(nCT) && Number.isFinite(nTG)) {
+      const h = nCT * 0.25;
+      const v = nTG / 5;
+      updates.ldl = (nCT - h - v).toFixed(1);
+    } else {
+      updates.ldl = '';
+    }
+    setForm((prev) => ({
+      ...prev,
+      ...updates
+    }));
+  }, [form.colesterolTotal, form.trigliceridos]);
 
   return (
-    <div className="w-full p-4 space-y-6">
-      <h2 className="text-2xl font-bold text-center mb-6">ANÁLISIS BIOQUÍMICOS</h2>
-
-      <div className="flex gap-4 w-full">
-        {/* IZQUIERDA 50% */}
-        <div className="w-1/2 bg-white rounded shadow p-6 space-y-6">
-          <SectionFieldset legend="Tipo de Examen" className="space-y-4">
-            <InputsRadioGroup
-              name="examType"
-              value={form.examType}
-              onChange={(e, value) => setForm(prev => ({ ...prev, examType: value }))}
-              options={[
-                { label: 'No recibo', value: 'norecibo' },
-                { label: 'Ficha Médica Ocupacional', value: 'ficha' }
-              ]}
-              groupClassName="gap-6"
+    <div className="p-4 grid xl:grid-cols-2 gap-4">
+      <div className="space-y-3">
+        <SectionFieldset legend="Datos Generales" className="grid md:grid-cols-2 gap-3">
+          <div className='grid md:grid-cols-2 gap-3 col-span-2'>
+            <InputTextOneLine
+              label="N° Orden"
+              name="norden"
+              value={form.norden}
+              onChange={handleChangeNumberDecimals}
+              onKeyUp={handleSearch}
             />
-          </SectionFieldset>
-
-          <SectionFieldset legend="Datos Generales" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InputTextOneLine
-                label="N° Ficha"
-                name="norden"
-                value={form.norden}
-                onChange={handleChangeNumber}
-                onKeyUp={handleSearch}
-                labelWidth="120px"
-                inputClassName="text-xl font-bold"
-              />
-              <InputTextOneLine
-                label="Fecha"
-                name="fecha"
-                type="date"
-                value={form.fecha}
-                onChange={handleChange}
-                labelWidth="120px"
-              />
-            </div>
-
-            <div className="space-y-4">
-              <InputTextOneLine
-                label="Paciente"
-                name="paciente"
-                value={form.paciente}
-                onChange={handleChange}
-                disabled
-                labelWidth="120px"
-              />
-              <div className="relative">
-                <label className="block font-medium mb-1">Médico / Técnico:</label>
-                <input
-                  name="medico"
-                  autoComplete='off'
-                  value={searchMedico}
-                  onChange={handleMedicoSearch}
-                  className="border rounded px-2 py-1 w-full text-lg"
-                  onKeyUp={e => {
-                    if (e.key === 'Enter' && filteredMedicos.length > 0) {
-                      e.preventDefault();
-                      handleSelectMedico(filteredMedicos[0]);
-                    }
-                  }}
-                  onFocus={() => {
-                    if (searchMedico) {
-                      setFilteredMedicos(
-                        listDoc.filter(m => m.toLowerCase().includes(searchMedico.toLowerCase()))
-                      );
-                    }
-                  }}
-                  onBlur={() => setTimeout(() => setFilteredMedicos([]), 100)}
-                />
-                {searchMedico && filteredMedicos.length > 0 && (
-                  <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10 shadow-lg">
-                    {filteredMedicos.map(m => (
-                      <li
-                        key={m}
-                        className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg"
-                        onMouseDown={() => handleSelectMedico(m)}
-                      >
-                        {m}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-          </SectionFieldset>
-
-          <SectionFieldset legend="Parámetros Bioquímicos" className="space-y-4">
-            <div className="grid grid-cols-1 gap-3">
-              {bioquimicosFields.map(({ key, label, hint }) => (
-                <div key={key} className="flex flex-col gap-1">
-                  <div className="flex items-center gap-4">
-                    <label className="font-medium min-w-[180px] text-base">{label}:</label>
-                    <InputTextOneLine
-                      name={key}
-                      value={form[key]}
-                      onChange={handleChange}
-                      inputClassName="w-32"
-                    />
-                    <span className="text-gray-500 text-sm">(V.N. {hint})</span>
-                  </div>
-                  {['hdl', 'ldl', 'vldl'].includes(key) && form[key] && form[key] !== '-' && !/^-?\d*\.\d{1}$/.test(form[key]) && (
-                    <span className="text-red-500 text-xs ml-[180px]">Debe tener dos decimales, ej: 9.00</span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </SectionFieldset>
-
-          <div className="flex gap-4 pt-4 border-t border-gray-200">
-            <button
-              onClick={handleSave}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded flex items-center gap-2 text-lg"
-            >
-              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-            </button>
-            <button
-              onClick={handleClear}
-              className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded flex items-center gap-2 text-lg"
-            >
-              <FontAwesomeIcon icon={faBroom} /> Limpiar
-            </button>
+            <InputTextOneLine
+              label="Fecha"
+              name="fecha"
+              type="date"
+              value={form.fecha}
+              onChange={handleChangeSimple}
+            />
+            <InputTextOneLine
+              label="Nombres"
+              name="nombres"
+              value={form.nombres}
+              disabled
+            />
+            <InputTextOneLine
+              label="Nombre Examen"
+              name="nombreExamen"
+              value={form.nombreExamen}
+              disabled
+            />
           </div>
-        </div>
+          <EmpleadoComboBox
+            value={form.nombre_medico}
+            form={form}
+            label='Especialista que Certifica'
+            className='col-span-2'
+            onChange={handleChangeSimple}
+          />
+        </SectionFieldset>
 
-        {/* DERECHA 50% */}
-        <div className="w-1/2 bg-white rounded shadow p-6 flex flex-col gap-4">
-          <SectionFieldset legend="Búsqueda" className="space-y-4">
-            <div className="flex flex-col md:flex-row gap-3 items-center">
-              <div className="flex-1 flex items-center gap-2">
-                <label className="font-medium text-base whitespace-nowrap">Buscar:</label>
-                <input
-                  name="nombre"
-                  value={searchParams.nombre}
-                  onChange={handleNombreChange}
-                  className="border rounded px-2 py-1 text-base flex-1"
-                  placeholder="Buscar por nombre..."
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="font-medium text-base whitespace-nowrap">Código:</label>
-                <input
-                  name="code"
-                  value={searchParams.code}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (/^\d*$/.test(value)) {
-                      setSearchParams(prev => ({ ...prev, code: value, nombre: "" }));
-                    }
-                  }}
-                  onKeyUp={SearchCode}
-                  className="border rounded px-2 py-1 text-base w-32"
-                  placeholder="N° Orden"
-                />
-              </div>
+        <SectionFieldset legend="Parámetros Bioquímicos" className="grid grid-cols-1 gap-3">
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-4">
+              <InputTextOneLine
+                label="Colesterol Total"
+                name="colesterolTotal"
+                value={form.colesterolTotal}
+                labelWidth="120px"
+                onChange={(e) => handleChangeNumberDecimals(e, 1)}
+              />
+              <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 200 mg/dl)"}</span>
             </div>
-          </SectionFieldset>
+          </div>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-4">
+              <InputTextOneLine
+                label="Triglicéridos"
+                name="trigliceridos"
+                value={form.trigliceridos}
+                labelWidth="120px"
+                onChange={(e) => handleChangeNumberDecimals(e, 1)}
+              />
+              <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 150 mg/dl)"}</span>
+            </div>
+          </div>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-4">
+              <InputTextOneLine
+                label="H.D.L. Colesterol"
+                name="hdl"
+                value={form.hdl}
+                labelWidth="120px"
+                disabled
+              />
+              <span className="text-gray-500 text-[10px] font-medium">(Valor Normal 40 - 60 mg/dl)</span>
+            </div>
+          </div>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-4">
+              <InputTextOneLine
+                label="L.D.L. Colesterol"
+                name="ldl"
+                value={form.ldl}
+                labelWidth="120px"
+                disabled
+              />
+              <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 129 mg/dl)"}</span>
+            </div>
+          </div>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-4">
+              <InputTextOneLine
+                label="V.L.D.L. Colesterol"
+                name="vldl"
+                value={form.vldl}
+                labelWidth="120px"
+                disabled
+              />
+              <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 30 mg/dl)"}</span>
+            </div>
+          </div>
+        </SectionFieldset>
 
-          <SectionFieldset legend="Lista de Exámenes" className="space-y-4">
-            <Table data={exams} tabla={tabla} set={setForm} token={token} clean={handleClear} setMed={setSearchMedico} />
-          </SectionFieldset>
+        <div className="flex gap-4 pt-4 border-t border-gray-200">
+          <button
+            onClick={handleSave}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded flex items-center gap-2 text-lg"
+          >
+            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+          </button>
+          <button
+            onClick={handleClear}
+            className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded flex items-center gap-2 text-lg"
+          >
+            <FontAwesomeIcon icon={faBroom} /> Limpiar
+          </button>
         </div>
       </div>
+      <SectionFieldset legend="Búsqueda de Examenes" className="grid md:grid-cols-2 gap-3">
+        <InputTextOneLine
+          label="Nombres"
+          name="nombres_search"
+          value={form.nombres_search}
+          onKeyUp={(e) => { if (e.key === "Enter") obtenerInfoTabla(); }}
+          onChange={(e) => { handleChange(e); setForm(prev => ({ ...prev, codigo_search: "" })) }}
+        />
+        <InputTextOneLine
+          label="Código"
+          name="codigo_search"
+          value={form.codigo_search}
+          onKeyUp={(e) => { if (e.key === "Enter") obtenerInfoTabla(); }}
+          onChange={(e) => { handleChangeNumberDecimals(e, 0); setForm(prev => ({ ...prev, nombres_search: "" })) }}
+        />
+        <Table data={dataTabla} tabla={tabla} set={setForm} token={token} clean={handleClear} />
+      </SectionFieldset>
     </div>
   );
 }
 
-function Table({ data, tabla, set, token, clean, setMed }) {
+function Table({ data, tabla, set, token, clean }) {
   const handlePrintConfirm = (nro) => {
     Swal.fire({
       title: 'Confirmar impresión',
@@ -395,7 +268,7 @@ function Table({ data, tabla, set, token, clean, setMed }) {
       cancelButtonText: 'No'
     }).then((result) => {
       if (result.isConfirmed) {
-        PrintHojaR(nro, token);
+        PrintHojaR(nro, token, tabla);
       }
     });
   };
@@ -403,11 +276,11 @@ function Table({ data, tabla, set, token, clean, setMed }) {
   function clicktable(nro) {
     clean();
     Loading('Importando Datos');
-    GetInfoPacAnalisisBio(nro, tabla, set, token, setMed);
+    GetInfoPacAnalisisBio(nro, tabla, set, token);
   }
 
   return (
-    <div className="overflow-y-auto" style={{ maxHeight: 'calc(12 * 4rem)' }}>
+    <div className="overflow-y-auto col-span-2" style={{ maxHeight: 'calc(12 * 4rem)' }}>
       <table className="w-full table-auto border-collapse">
         <thead>
           <tr className="bg-gray-100">
