@@ -9,50 +9,6 @@ export default function Aptitud_Agroindustrial(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
-  // Datos de prueba por defecto
-  const datosPrueba = {
-    numeroHistoria: "96639",
-    tipoExamen: "PRE-OCUPACIONAL",
-    apellidosNombres: "HADY KATHERINE CASTILLO PLASENCIA",
-    documentoIdentidad: "72384273",
-    genero: "FEMENINO",
-    edad: "31 AÑOS",
-    empresa: "MINERA BOROO MISQUICHILCA S.A.C",
-    contratista: "LIMALA S.A.C MINERA BOROO MMINERA BOROO MMINERA",
-    puestoPostula: "ASISTENTE ADMINISTRATIVA",
-    ocupacionActual: "ADMINISTRACION",
-    fechaExamen: "04/11/2024",
-    // Datos de color
-    color: 1,
-    codigoColor: "#008f39",
-    textoColor: "F",
-    // Datos adicionales para header
-    numeroFicha: "99164",
-    sede: "Trujillo-Pierola Nicoldo de Pierola",
-    // Datos de conclusiones
-    conclusiones: [
-      "INFORME RADIOGRAFICO: Radiografía de tórax realizada en proyección posteroanterior.",
-      "CONCLUCIONES: RADIOAGRAFIA DE COLUMNA LUMBOSACRA AP-L",
-      "ODONTOGRAMA: Paciente con varias piezas tratadas. Se recomienda seguimiento. prueba Campos claros, sin alteraciones pruebaHilios normales, sin adenopatíasSenos costofrénicos libresCampos pulmonares bien aireadosMediastinos sin desplazamientoSilueta cardiaca normalEstructuras óseas conservadasRadiografía de tórax sin hallazgos patológicos evidentes-RADIOGRAFIA: Paciente sin síntomas respiratorios al momento del examen",
-    ],
-    // Datos de aptitud
-    apto: "APTO", // Caso APTO sin restricciones
-    restricciones: "NINGUNO.", // No se usa cuando es APTO, se muestra "SIN RESTRICCIONES"
-    recomendaciones: [
-      "Se recomienda seguimiento médico cada 6 meses.",
-      "Evitar exposición prolongada a ruidos superiores a 85 dB.",
-      "Usar equipo de protección personal según protocolo de seguridad.",
-      "Se recomienda seguimiento médico cada 6 meses.",
-      "Evitar exposición prolongada a ruidos superiores a 85 dB.",
-      "Usar equipo de protección personal según protocolo de seguridad.",
-      "Se recomienda seguimiento médico cada 6 meses.",
-      "Evitar exposición prolongada a ruidos superiores a 85 dB.",
-      "Usar equipo de protección personal según protocolo de seguridad.",
-    ],
-    fechaDesde: "",
-    fechaHasta: "",
-  };
-
   const datosReales = {
     numeroHistoria: String(data.norden ?? ""), //revisar - podría ser norden del JSON
     tipoExamen: String(data.nombreExamen ?? ""),
@@ -82,8 +38,8 @@ export default function Aptitud_Agroindustrial(data = {}) {
     fechaHasta: formatearFechaCorta(data.fechaHasta ?? ""),
   };
 
-  // Usar datos reales si existen, sino usar datos de prueba
-  const datosFinales = data && data.norden ? datosReales : datosPrueba;
+  // Usar únicamente los datos reales entregados
+  const datosFinales = datosReales;
 
   // Función para determinar qué checkbox está marcado
   const getAptitudCheckbox = (apto) => {

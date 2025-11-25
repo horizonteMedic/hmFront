@@ -275,37 +275,6 @@ export default function Odontograma_lo_Digitalizado(data = {}) {
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
 
-  // Datos de prueba basados en la imagen
-  const datosPrueba = {
-    norden: "96639",
-    sede: "trujillo-pierola",
-    nombres: "hady katherine castillo plasencia",
-    empresa:
-      "servicios industriales mmj empresa individual de responsabilidad limitada- servicios industriales mm",
-    contratista:
-      "asociacion de transportistas mineria y construccion huamachuco - asmychuamachuco",
-    sexo: "femenino",
-    edad: "39",
-    fecha: "lunes 04 noviembre 2024",
-    // Dental status counts - Datos de prueba con diferentes condiciones
-    piezasMalEstado: "5",
-    pprMetalicas: "2",
-    pprAcrilicas: "1",
-    ausentes: "3",
-    puentes: "2",
-    coronas: "4",
-    porExtraer: "1",
-    pTotales: "1",
-    normales: "18",
-    obturacionesEfectuadas: "6",
-    cariadasPorOturar: "2",
-    fracturadas: "1",
-    // Observaciones y lugar fecha
-    observaciones:
-      "paciente presenta buena higiene bucal. se recomienda control cada 6 meses. se observa ligera acumulación de sarro en molares inferiores. necesita limpieza profesional.",
-    lugarFecha: "trujillo, lunes 04 noviembre 2024",
-  };
-
   // Función para obtener string de datos
   const obtenerString = (nombre) => {
     return data[nombre] != null ? `${data[nombre]}` : "";
@@ -380,34 +349,7 @@ export default function Odontograma_lo_Digitalizado(data = {}) {
     d32: interpretarUrlParaLeer(data.lbl38),
   };
 
-  // Usar datos reales o datos de prueba
-  const datosFinales =
-    data && Object.keys(data).length > 0
-      ? datosReales
-      : {
-          norden: datosPrueba.norden,
-          sede: datosPrueba.sede.toUpperCase(),
-          nombres: datosPrueba.nombres.toUpperCase(),
-          empresa: datosPrueba.empresa.toUpperCase(),
-          contratista: datosPrueba.contratista.toUpperCase(),
-          sexo: interpretarSexo(datosPrueba.sexo),
-          edad: datosPrueba.edad,
-          fecha: formatearFecha(datosPrueba.fecha),
-          piezasMalEstado: datosPrueba.piezasMalEstado,
-          pprMetalicas: datosPrueba.pprMetalicas,
-          pprAcrilicas: datosPrueba.pprAcrilicas,
-          ausentes: datosPrueba.ausentes,
-          puentes: datosPrueba.puentes,
-          coronas: datosPrueba.coronas,
-          porExtraer: datosPrueba.porExtraer,
-          pTotales: datosPrueba.pTotales,
-          normales: datosPrueba.normales,
-          obturacionesEfectuadas: datosPrueba.obturacionesEfectuadas,
-          cariadasPorOturar: datosPrueba.cariadasPorOturar,
-          fracturadas: datosPrueba.fracturadas,
-          observaciones: datosPrueba.observaciones.toUpperCase(),
-          lugarFecha: (datosPrueba.lugarFecha.split(',')[0] + ', ' + formatearFecha(datosPrueba.lugarFecha.split(',')[1]?.trim() || '')).toUpperCase(),
-        };
+  const datosFinales = datosReales;
 
   // === 0) HEADER CON LOGO, DATOS DE CONTACTO Y BLOQUE DE COLOR ===
   headerOdontograma(doc, data);

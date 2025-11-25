@@ -12,148 +12,93 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   // Contador de páginas dinámico
   let numeroPagina = 1;
 
-  // Datos de prueba por defecto
-  const datosPrueba = {
-    apellidosNombres: "CASTILLO PLASENCIA HADY KATHERINE",
-    fechaExamen: "04/11/2024",
-    tipoExamen: "PRE-OCUPACIONAL",
-    sexo: "Femenino",
-    documentoIdentidad: "72384273",
-    edad: "31",
-    areaTrabajo: "MINERÍA",
-    puestoTrabajo: "DAD",
-    empresa: "MINERA BOROO MISQUICHILCA S.A.",
-    contrata: "CONTRATA EJEMPLO S.A.C.",
-    // Datos de color
-    color: 1,
-    codigoColor: "#008f39",
-    textoColor: "F",
-    // Datos adicionales para header
-    numeroFicha: "99164",
-    sede: "Trujillo-Pierola",
-    horaSalida: "9:33:43 PM",
-    // Signos vitales de prueba
-    vitalSigns: {
-      fc: "64",
-      fr: "19",
-      pa: "120/60",
-      satO2: "99",
-      imc: "23.48",
-      peso: "70",
-      talla: "1.75"
-    },
-    // Evaluaciones médicas de prueba
-    evaluaciones: {
-      oftalmologica: "NORMAL",
-      auditiva: "NORMAL",
-      radiografia: "NORMAL",
-      espirometria: "NORMAL",
-      electrocardiograma: "NORMAL",
-      dental: "NORMAL",
-      psicologico: "CUMPLE CON EL PERFIL DEL PUESTO",
-      trabajosAltura: "N/A",
-      trabajosCaliente: "N/A",
-      conduccion: "APTO PARA CONDUCCIÓN DE VEHICULOS Y OPERAR EQUIPOS"
-    },
-    // Laboratorio de prueba
-    laboratorio: {
-      grupoSanguineo: "O+",
-      hemoglobina: "14.5",
-      hematies: "4.5",
-      glucosa: "85",
-      cocaina: "NEGATIVO",
-      marihuana: "NEGATIVO",
-      vdrl: "NEGATIVO",
-      vsg: "15",
-      colesterol: "180",
-      trigliceridos: "120"
-    },
-    // Datos adicionales de prueba
-    antecedentesPersonales: "NORMAL",
-    conclusion: "1. HIPOACUSIA NEUROSENSORIAL LEVE EN OIDO IZQUIERDO. USO DE EPP AUDITIVO ANTE EXPOSICION A RUIDO >=80 DB. EVALUACION ANUAL POR OTORRINOLARINGOLOGIA.\n2. SOBREPESO. DIETA HIPOCALORICA Y EJERCICIOS.\n3. ODONTOGRAMA : 1 CARIES DENTAL SIMPLE (PZA. 47). TRATAMIENTO SUGERIDO: RESTAURACION SIMPLE.\n4. ELECTROCARDIOGRAMA: BLOQUEO INCOMPLETO DE RAMA DERECHA. EVALUACION ANUAL.",
-    restricciones: "1. EVITAR EXPOSICION A RUIDO >=80 DB SIN PROTECCION AUDITIVA.\n2. REALIZAR PAUSAS ACTIVAS DURANTE LA JORNADA LABORAL.\n3. MANTENER CONTROLES MEDICOS REGULARES.",
-    recomendaciones: "Mantener controles médicos regulares.",
-    observaciones: "Sin observaciones especiales.",
-    aptitud: "APTO",
-    fechaVencimiento: "04/11/2025",
-    fechaNacimiento: "15/03/1993"
+  const formatearPresionArterial = (sistolica, diastolica) => {
+    const s = sistolica ?? "";
+    const d = diastolica ?? "";
+    if (!s && !d) return "";
+    if (!s) return String(d);
+    if (!d) return String(s);
+    return `${s}/${d}`;
   };
 
   const datosReales = {
-    apellidosNombres: String((data.apellidosPaciente || "") + " " + (data.nombresPaciente || "")).trim(),
-    fechaExamen: formatearFechaCorta(data.fechaFichaAnexo16_fecha),
-    tipoExamen: String(data.nombreExamen),
-    sexo: convertirGenero(data.sexoPaciente),
-    documentoIdentidad: String(data.dniPaciente),
-    edad: String(data.edadPaciente),
-    areaTrabajo: data.areaPaciente,
-    puestoTrabajo: data.cargoPaciente,
-    empresa: data.empresa,
-    contrata: data.contrata,
+    apellidosNombres: String(`${data.apellidosPaciente ?? ""} ${data.nombresPaciente ?? ""}`).trim(),
+    fechaExamen: formatearFechaCorta(data.fechaFichaAnexo16_fecha ?? ""),
+    tipoExamen: String(data.nombreExamen ?? ""),
+    sexo: convertirGenero(data.sexoPaciente) || "",
+    documentoIdentidad: String(data.dniPaciente ?? ""),
+    edad: String(data.edadPaciente ?? ""),
+    areaTrabajo: String(data.areaPaciente ?? ""),
+    puestoTrabajo: String(data.cargoPaciente ?? ""),
+    empresa: String(data.empresa ?? ""),
+    contrata: String(data.contrata ?? ""),
     // Datos de color
-    color: data.color,
-    codigoColor: data.codigoColor,
-    textoColor: data.textoColor,
+    color: Number(data.color ?? 0),
+    codigoColor: String(data.codigoColor ?? ""),
+    textoColor: String(data.textoColor ?? ""),
     // Datos adicionales para header
-    numeroFicha: String(data.norden),
-    sede: data.sede || data.nombreSede,
+    numeroFicha: String(data.norden ?? ""),
+    sede: String(data.sede ?? data.nombreSede ?? ""),
     // Datos específicos
-    direccionPaciente: String(data.direccionPaciente),
-    fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente),
+    direccionPaciente: String(data.direccionPaciente ?? ""),
+    fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente ?? ""),
     // Datos de digitalización
-    digitalizacion: data.digitalizacion,
+    digitalizacion: Array.isArray(data.digitalizacion) ? data.digitalizacion : [],
     // Signos vitales
     vitalSigns: {
-      fc: String(data.frecuenciaCardiacaTriaje_f_cardiaca),
-      fr: String(data.frecuenciaRespiratoriaTriaje_f_respiratoria),
-      pa: String(data.sistolicatriaje_sistolica) + "/" + String(data.diastolicatriaje_diastolica),
-      satO2: String(data.saturacionoxigenotriaje_sat_02),
-      imc: String(data.imctriaje_imc),
-      peso: String(data.pesotriaje_peso),
-      talla: String(data.tallatriaje_talla)
+      fc: String(data.frecuenciaCardiacaTriaje_f_cardiaca ?? ""),
+      fr: String(data.frecuenciaRespiratoriaTriaje_f_respiratoria ?? ""),
+      pa: formatearPresionArterial(data.sistolicatriaje_sistolica, data.diastolicatriaje_diastolica),
+      satO2: String(data.saturacionoxigenotriaje_sat_02 ?? ""),
+      imc: String(data.imctriaje_imc ?? ""),
+      peso: String(data.pesotriaje_peso ?? ""),
+      talla: String(data.tallatriaje_talla ?? "")
     },
     // Datos médicos específicos
-    antecedentesFamiliares: data.antecedentesFamiliaresAnexo7c_txtantecedentesfamiliares,
-    antecedentesPatologicos: data.antecedentesPatologicos_ante_patologicos,
-    antecedentesPersonales: data.antecedentesPersonales2Anexo7c_txtantecedentespersonales2,
-    aptitud: data.aptitud,
-    fechaVencimiento: formatearFechaCorta(data.fechaHastaFichaAnexo16_fecha_hasta),
+    antecedentesFamiliares: String(data.antecedentesFamiliaresAnexo7c_txtantecedentesfamiliares ?? ""),
+    antecedentesPatologicos: String(data.antecedentesPatologicos_ante_patologicos ?? ""),
+    antecedentesPersonales: String(data.antecedentesPersonales2Anexo7c_txtantecedentespersonales2 ?? ""),
+    aptitud: String(data.aptitud ?? ""),
+    fechaVencimiento: formatearFechaCorta(data.fechaHastaFichaAnexo16_fecha_hasta ?? ""),
     // Evaluaciones médicas
     evaluaciones: {
-      oftalmologica: data.enfermedadesocularesoftalmo_e_oculares || "N/A",
-      auditiva: data.diagnosticoAudiometria_diagnostico || "N/A",
-      radiografia: data.conclusionesRadiograficas || "N/A",
-      espirometria: "NORMAL",
-      electrocardiograma: data.hallazgosInformeElectroCardiograma_hallazgo || "N/A",
-      dental: data.observacionesOdontograma_txtobservaciones || "N/A",
-      psicologico: data.aptoEvaluacionPsicoPoderosa_rbapto ? "CUMPLE CON EL PERFIL DEL PUESTO" : "NO CUMPLE",
-      trabajosAltura: data.observacionTrabajosAltura_obsvaltura || "N/A",
-      trabajosCaliente: data.observacionAptitudCaliente_obsvtencaliente || "N/A",
-      conduccion: data.observacionAptitudConducir_obsvlicencia || "N/A"
+      oftalmologica: String(data.enfermedadesocularesoftalmo_e_oculares ?? ""),
+      auditiva: String(data.diagnosticoAudiometria_diagnostico ?? ""),
+      radiografia: String(data.conclusionesRadiograficas ?? ""),
+      espirometria: String(data.espirometriaResultado ?? ""),
+      electrocardiograma: String(data.hallazgosInformeElectroCardiograma_hallazgo ?? ""),
+      dental: String(data.observacionesOdontograma_txtobservaciones ?? ""),
+      psicologico: data.aptoEvaluacionPsicoPoderosa_rbapto ? "CUMPLE CON EL PERFIL DEL PUESTO" : String(data.observacionPsicologica ?? ""),
+      trabajosAltura: String(data.observacionTrabajosAltura_obsvaltura ?? ""),
+      trabajosCaliente: String(data.observacionAptitudCaliente_obsvtencaliente ?? ""),
+      conduccion: String(data.observacionAptitudConducir_obsvlicencia ?? "")
     },
     // Laboratorio
     laboratorio: {
-      grupoSanguineo: data.grupoFactorSanguineo_grupofactor || "N/A",
-      hemoglobina: data.hemoglobinaLaboratorioClinico_txthemoglobina || "",
-      hematies: data.hematiesematologiaLabClinico_txthematiesematologia || "",
-      glucosa: data.glucosaLaboratorioClinico_txtglucosabio || "",
-      cocaina: data.cocainaLaboratorioClinico_txtcocaina || "N/A",
-      marihuana: data.marihuanaLaboratorioClinico_txtmarihuana || "N/A",
-      vdrl: (data.positivoLaboratorioClinico_chkpositivo === true) ? "REACTIVO" : "NO REACTIVO",
-      vsg: data.vsgLaboratorioClinico_txtvsg || "",
-      colesterol: data.colesterolAnalisisBioquimico_txtcolesterol || "",
-      trigliceridos: data.trigliseridosAnalisisBioquimico_txttrigliseridos || ""
+      grupoSanguineo: String(data.grupoFactorSanguineo_grupofactor ?? ""),
+      hemoglobina: String(data.hemoglobinaLaboratorioClinico_txthemoglobina ?? ""),
+      hematies: String(data.hematiesematologiaLabClinico_txthematiesematologia ?? ""),
+      glucosa: String(data.glucosaLaboratorioClinico_txtglucosabio ?? ""),
+      cocaina: String(data.cocainaLaboratorioClinico_txtcocaina ?? ""),
+      marihuana: String(data.marihuanaLaboratorioClinico_txtmarihuana ?? ""),
+      vdrl: data.positivoLaboratorioClinico_chkpositivo === true
+        ? "REACTIVO"
+        : data.positivoLaboratorioClinico_chkpositivo === false
+          ? "NO REACTIVO"
+          : "",
+      vsg: String(data.vsgLaboratorioClinico_txtvsg ?? ""),
+      colesterol: String(data.colesterolAnalisisBioquimico_txtcolesterol ?? ""),
+      trigliceridos: String(data.trigliseridosAnalisisBioquimico_txttrigliseridos ?? "")
     },
     // Conclusiones y recomendaciones
-    conclusion: data.conclusionAnexo7c_txtconclusion,
-    recomendaciones: data.recomendacionesAnalisisBioquimico_txtrecomendaciones,
-    restricciones: data.restriccionesAnalisisBioquimico_atxtrestricciones,
-    observaciones: data.observacionesFichaMedicaAnexo7c_txtobservacionesfm,
-    observacionesFichaMedicaAnexo7c_txtobservacionesfm: data.observacionesFichaMedicaAnexo7c_txtobservacionesfm
+    conclusion: String(data.conclusionAnexo7c_txtconclusion ?? ""),
+    recomendaciones: String(data.recomendacionesAnalisisBioquimico_txtrecomendaciones ?? ""),
+    restricciones: String(data.restriccionesAnalisisBioquimico_atxtrestricciones ?? ""),
+    observaciones: String(data.observacionesFichaMedicaAnexo7c_txtobservacionesfm ?? ""),
+    observacionesFichaMedicaAnexo7c_txtobservacionesfm: String(data.observacionesFichaMedicaAnexo7c_txtobservacionesfm ?? "")
   };
 
-  // Usar datos reales si existen, sino usar datos de prueba
-  const datosFinales = data && data.norden ? datosReales : datosPrueba;
+  const datosFinales = datosReales;
 
   // Header reutilizable
   const drawHeader = (pageNumber) => {
@@ -699,7 +644,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("ANTECEDENTES DE IMPORTANCIA:", tablaInicioX + 2, yTextoEval + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("NORMAL", tablaInicioX + 52, yTextoEval + 1.5);
+  doc.text(datosFinales.antecedentesPersonales || "", tablaInicioX + 52, yTextoEval + 1.5);
   yTextoEval += filaAltura;
 
   // Fila 9: Trabajos en Altura
@@ -811,7 +756,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Examen de Orina:", tablaInicioX + 102, yTextoLab + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("NORMAL", tablaInicioX + 150, yTextoLab + 1.5);
+  doc.text(datosFinales.laboratorio.examenOrina || "", tablaInicioX + 150, yTextoLab + 1.5);
   yTextoLab += filaAltura;
 
   // Fila 4: VDRL y VSG
