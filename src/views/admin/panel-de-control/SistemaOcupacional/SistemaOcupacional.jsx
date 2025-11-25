@@ -8,7 +8,6 @@ import ConsentimientoDigitalizacion from "./Admision/ConsentimientoDigitalizacio
 import Triaje from "./Triaje/Triaje";
 import Consentimientos from "./Laboratorio/Consentimientos/Consentimientos.jsx";
 import ParasitologiaCoprologico from "./Parasitologia/ParasitologiaCoprologico";
-import LaboratorioClinico from "./Laboratorio/LaboratorioClinico/LaboratorioClinico";
 import LaboratorioAnalisisBioquimicos from "./Laboratorio/laboratorio_analisis_bioquimicos/LaboratorioAnalisisBioquimicos";
 import InmunologiaTab from "./Laboratorio/Inmunologia/Inmunologia_tab.jsx";
 import Toxicologia from "./Laboratorio/Toxicologia/Toxicologia";
@@ -110,6 +109,7 @@ import UsoRespiradores from "./UsoRespiradores/UsoRespiradores.jsx";
 import PoderosaTabSelector from "./Poderosa/PoderosaTabSelector.jsx";
 // import AversionRiesgo from "./ModuloPsicologia/AversionRiesgo/AversionRiesgo.jsx";
 import GestionOpciones from "./Playground/GestionOpciones/GestionOpciones.jsx";
+import LaboratorioClinicoSubTabSelector from "./Laboratorio/LaboratorioClinico/LaboratorioClinicoSubTabSelector.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -542,7 +542,7 @@ const TabComponent = () => {
               {/* ——— Contenido según pestaña ——— CONSENTIMIENTOS */}
               <div className={styles.labContent}>
                 {labTab === 0 && (
-                  <LaboratorioClinico
+                  <LaboratorioClinicoSubTabSelector
                     tieneVista={tieneVista}
                   />
                 )}
