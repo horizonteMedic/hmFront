@@ -7,13 +7,16 @@ import footerTR from '../components/footerTR.jsx';
 // --- Configuración Centralizada ---
 const config = {
   margin: 15,
+  col1X: 15,
+  col2X: 115,
+  col3X: 155,
   fontSize: {
     title: 14,
-    header: 11,
-    body: 11,
+    header: 9,
+    body: 9,
   },
   font: 'helvetica',
-  lineHeight: 8,
+  lineHeight: 7,
 };
 
 // --- Funciones de Ayuda ---
@@ -96,49 +99,107 @@ const drawHeader = (doc, datos = {}) => {
   });
 };
 
-// Función para dibujar datos del paciente
+// Función para dibujar datos del paciente en tabla
 const drawPatientData = (doc, datos = {}) => {
-  const margin = 15;
-  let y = 40;
-  const lineHeight = 6;
-  const patientDataX = margin;
-  
-  const drawPatientDataRow = (label, value) => {
-    const labelWithColon = label.endsWith(':') ? label : label + ' :';
-    doc.setFontSize(11).setFont('helvetica', 'bold');
-    doc.text(labelWithColon, patientDataX, y);
-    let valueX = patientDataX + doc.getTextWidth(labelWithColon) + 2;
-    if (label.toLowerCase().includes('apellidos y nombres')) {
-      const minGap = 23;
-      if (doc.getTextWidth(labelWithColon) < minGap) valueX = patientDataX + minGap;
-    }
-    doc.setFont('helvetica', 'normal');
-    doc.text(String(value || '').toUpperCase(), valueX, y);
-    y += lineHeight;
-  };
-  
-  drawPatientDataRow("Apellidos y Nombres :", datos.nombres || datos.nombresPaciente || '');
-  drawPatientDataRow("Edad :", datos.edad || datos.edadPaciente ? `${datos.edad || datos.edadPaciente} AÑOS` : '');
-  
-  // Fecha
-  doc.setFontSize(11).setFont('helvetica', 'bold');
-  const fechaLabel = "Fecha :";
-  doc.text(fechaLabel, patientDataX, y);
-  doc.setFont('helvetica', 'normal');
-  const fechaLabelWidth = doc.getTextWidth(fechaLabel);
-  doc.text(formatDateToLong(datos.fechaExamen || datos.fecha || ''), patientDataX + fechaLabelWidth + 2, y);
-  
-  // Reseteo
-  doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);
-  
-  return y + lineHeight;
+  const tablaInicioX = 15;
+  const tablaAncho = 180;
+  const filaAltura = 5;
+  let yPos = 46; // +5mm
+
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.setFillColor(196, 196, 196);
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'FD');
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("DATOS PERSONALES", tablaInicioX + 2, yPos + 3.5);
+  yPos += filaAltura;
+
+  const sexo = datos.sexoPaciente === 'F' ? 'FEMENINO' : datos.sexoPaciente === 'M' ? 'MASCULINO' : '';
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.nombres || '', tablaInicioX + 40, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.line(tablaInicioX + 45, yPos, tablaInicioX + 45, yPos + filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("DNI:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(String(datos.dniPaciente || datos.dni || ''), tablaInicioX + 12, yPos + 3.5);
+  doc.setFont("helvetica", "bold");
+  doc.text("Edad:", tablaInicioX + 47, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text((datos.edad || '') + " AÑOS", tablaInicioX + 58, yPos + 3.5);
+  doc.setFont("helvetica", "bold");
+  doc.text("Sexo:", tablaInicioX + 92, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(sexo, tablaInicioX + 105, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Lugar de Nacimiento:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.lugarNacimientoPaciente || '', tablaInicioX + 38, yPos + 3.5);
+  doc.setFont("helvetica", "bold");
+  doc.text("Estado Civil:", tablaInicioX + 92, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.estadoCivilPaciente || '', tablaInicioX + 115, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Tipo Examen:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.nombreExamen || '', tablaInicioX + 28, yPos + 3.5);
+  doc.setFont("helvetica", "bold");
+  doc.text("Fecha Nac.:", tablaInicioX + 92, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(toDDMMYYYY(datos.fechaNacimientoPaciente || ''), tablaInicioX + 115, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Nivel de Estudio:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.nivelEstudioPaciente || '', tablaInicioX + 32, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Ocupación:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.ocupacionPaciente || '', tablaInicioX + 25, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Cargo:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.cargoPaciente || '', tablaInicioX + 18, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Área:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.areaPaciente || '', tablaInicioX + 15, yPos + 3.5);
+  yPos += filaAltura;
+
+  return yPos;
 };
 
 
 // --- Componente Principal ---
 
 export default function Microbiologia_Digitalizado(datos = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "letter" });
+  const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
   
   // === HEADER ===
@@ -163,46 +224,41 @@ export default function Microbiologia_Digitalizado(datos = {}) {
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
-    let y = 80; // Bajar el contenido
+    // === TÍTULO ===
+    doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
+    doc.text("MICROBIOLOGÍA", pageW / 2, 43, { align: "center" }); // +5mm
 
-    // === TÍTULO con subrayado ===
-    drawUnderlinedTitle(doc, "MICROBIOLOGÍA", y, config.fontSize.title);
-
-    y += config.lineHeight * 2;
+    let y = 100; // Posición inicial después de la tabla de datos (+5mm)
 
     // === MUESTRA ===
     doc.setFontSize(config.fontSize.header).setFont(config.font, "bold");
     doc.text("MUESTRA :", config.margin, y);
     doc.setFont(config.font, "normal");
-    doc.text(datos.muestra || "ESPUTO", config.margin + 25, y);
+    doc.text(datos.muestra || "ESPUTO", config.margin + 22, y);
 
-    y += config.lineHeight * 2;
+    y += config.lineHeight * 1.5;
 
     // === ENCABEZADO DE TABLA ===
-    doc.setFont(config.font, "bold");
-    doc.text("PRUEBA", config.margin, y);
-    const resultColX = pageW / 2 + 10;
-    doc.text("RESULTADO", resultColX, y, { align: "left" });
-    y += 4;
-    doc.setLineWidth(0.5);
+    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+    doc.text("PRUEBA", config.col1X, y);
+    doc.text("RESULTADO", config.col2X, y, { align: "center" });
+    y += 3;
+    doc.setLineWidth(0.4);
     doc.line(config.margin, y, pageW - config.margin, y);
-    doc.setLineWidth(0.2); // reset line width
 
     y += config.lineHeight;
     doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
 
     // === Datos de pruebas (Condicional) ===
-    // Dependiendo de si es un examen directo o no, se muestran diferentes pruebas.
     if (datos.examenDirecto) {
-      // Resultado más a la izquierda
-      doc.text("EXAMEN DIRECTO (KOH)", config.margin, y);
-      doc.text(datos.txtKoh ?? "N/A", resultColX, y, { align: "left" });
+      doc.text("EXAMEN DIRECTO (KOH)", config.col1X, y);
+      doc.text(datos.txtKoh ?? "N/A", config.col2X, y, { align: "center" });
     } else {
-      doc.text("Examen de BK - BACILOSCOPIA 1° Muestra", config.margin, y);
-      doc.text(datos.txtMuestra1 ?? "N/A", resultColX, y, { align: "left" });
+      doc.text("Examen de BK - BACILOSCOPIA 1° Muestra", config.col1X, y);
+      doc.text(datos.txtMuestra1 ?? "N/A", config.col2X, y, { align: "center" });
       y += config.lineHeight;
-      doc.text("Examen de BK - BACILOSCOPIA 2° Muestra", config.margin, y);
-      doc.text(datos.txtMuestra2 ?? "N/A", resultColX, y, { align: "left" });
+      doc.text("Examen de BK - BACILOSCOPIA 2° Muestra", config.col1X, y);
+      doc.text(datos.txtMuestra2 ?? "N/A", config.col2X, y, { align: "center" });
     }
     // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
     const sigW = 53; // Tamaño fijo width

@@ -224,7 +224,7 @@ export default function LBioquimica_Digitalizado(datos) {
     const tableCols = {
       col1: tablaInicioX,
       col2: 100,
-      col3: 135,
+      col3: 153,
     };
 
     doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
@@ -272,24 +272,30 @@ export default function LBioquimica_Digitalizado(datos) {
     const sigW = 53; // Tamaño fijo width
     const sigH = 23; // Tamaño fijo height
     const sigY = y + 45;
-    const gap = 16; // Espacio entre sellos (reducido 4mm: 20 - 4 = 16)
+    const gap = 16; // Espacio entre sellos
     
     if (s1 && s2) {
       // Si hay dos sellos, centrarlos juntos
       const totalWidth = sigW * 2 + gap;
       const startX = (pageW - totalWidth) / 2;
       
-      const addSello = (img, xPos) => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        const selloBase64 = canvas.toDataURL('image/png');
-        doc.addImage(selloBase64, 'PNG', xPos, sigY, sigW, sigH);
-      };
-      addSello(s1, startX);
-      addSello(s2, startX + sigW + gap);
+      // Sello 1 (izquierda) - Tamaño fijo
+      const canvas1 = document.createElement('canvas');
+      canvas1.width = s1.width;
+      canvas1.height = s1.height;
+      const ctx1 = canvas1.getContext('2d');
+      ctx1.drawImage(s1, 0, 0);
+      const selloBase64_1 = canvas1.toDataURL('image/png');
+      doc.addImage(selloBase64_1, 'PNG', startX, sigY, sigW, sigH);
+      
+      // Sello 2 (derecha) - Mismo tamaño fijo
+      const canvas2 = document.createElement('canvas');
+      canvas2.width = s2.width;
+      canvas2.height = s2.height;
+      const ctx2 = canvas2.getContext('2d');
+      ctx2.drawImage(s2, 0, 0);
+      const selloBase64_2 = canvas2.toDataURL('image/png');
+      doc.addImage(selloBase64_2, 'PNG', startX + sigW + gap, sigY, sigW, sigH);
     } else if (s1) {
       // Si solo hay un sello, centrarlo con tamaño fijo
       const canvas = document.createElement('canvas');
@@ -298,7 +304,7 @@ export default function LBioquimica_Digitalizado(datos) {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = (pageW - sigW) / 2; // Center single stamp
+      const imgX = (pageW - sigW) / 2;
       doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
     } else if (s2) {
       // Si solo hay el segundo sello, colocarlo a la izquierda
