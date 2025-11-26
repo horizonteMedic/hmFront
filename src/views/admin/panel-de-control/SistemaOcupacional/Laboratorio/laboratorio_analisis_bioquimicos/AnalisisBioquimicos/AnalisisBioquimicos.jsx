@@ -131,7 +131,7 @@ export default function AnalisisBioquimicos() {
   }, [form.colesterolTotal, form.trigliceridos]);
 
   return (
-    <div className="p-4 grid xl:grid-cols-2 gap-4">
+    <div className="py-4 grid xl:grid-cols-2 gap-x-4 gap-y-3">
       <div className="space-y-3">
         <SectionFieldset legend="Información del Examen" className="grid md:grid-cols-2 gap-3 col-span-2">
           <InputTextOneLine
@@ -249,65 +249,60 @@ export default function AnalisisBioquimicos() {
         </SectionFieldset>
 
         <SectionFieldset legend="Parámetros Bioquímicos" className="grid grid-cols-1 gap-3">
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-4">
-              <InputTextOneLine
-                label="Colesterol Total"
-                name="colesterolTotal"
-                value={form.colesterolTotal}
-                labelWidth="120px"
-                onChange={(e) => handleChangeNumberDecimals(e, 1)}
-              />
-              <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 200 mg/dl)"}</span>
-            </div>
+          <div className="flex items-center gap-4">
+            <InputTextOneLine
+              label="Colesterol Total"
+              name="colesterolTotal"
+              value={form.colesterolTotal}
+              labelWidth="120px"
+              onChange={(e) => handleChangeNumberDecimals(e, 1)}
+              className='w-[75%]'
+            />
+            <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 200 mg/dl)"}</span>
           </div>
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-4">
-              <InputTextOneLine
-                label="Triglicéridos"
-                name="trigliceridos"
-                value={form.trigliceridos}
-                labelWidth="120px"
-                onChange={(e) => handleChangeNumberDecimals(e, 1)}
-              />
-              <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 150 mg/dl)"}</span>
-            </div>
+          <div className="flex items-center gap-4">
+            <InputTextOneLine
+              label="Triglicéridos"
+              name="trigliceridos"
+              value={form.trigliceridos}
+              labelWidth="120px"
+              onChange={(e) => handleChangeNumberDecimals(e, 1)}
+              className='w-[75%]'
+            />
+            <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 150 mg/dl)"}</span>
           </div>
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-4">
-              <InputTextOneLine
-                label="H.D.L. Colesterol"
-                name="hdl"
-                value={form.hdl}
-                labelWidth="120px"
-                disabled
-              />
-              <span className="text-gray-500 text-[10px] font-medium">(Valor Normal 40 - 60 mg/dl)</span>
-            </div>
+          <div className="flex items-center gap-4">
+            <InputTextOneLine
+              label="H.D.L. Colesterol"
+              name="hdl"
+              value={form.hdl}
+              labelWidth="120px"
+              disabled
+              className='w-[75%]'
+            />
+            <span className="text-gray-500 text-[10px] font-medium">(Valor Normal 40 - 60 mg/dl)</span>
           </div>
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-4">
-              <InputTextOneLine
-                label="L.D.L. Colesterol"
-                name="ldl"
-                value={form.ldl}
-                labelWidth="120px"
-                disabled
-              />
-              <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 129 mg/dl)"}</span>
-            </div>
+          <div className="flex items-center gap-4">
+            <InputTextOneLine
+              label="L.D.L. Colesterol"
+              name="ldl"
+              value={form.ldl}
+              labelWidth="120px"
+              disabled
+              className='w-[75%]'
+            />
+            <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 129 mg/dl)"}</span>
           </div>
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-4">
-              <InputTextOneLine
-                label="V.L.D.L. Colesterol"
-                name="vldl"
-                value={form.vldl}
-                labelWidth="120px"
-                disabled
-              />
-              <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 30 mg/dl)"}</span>
-            </div>
+          <div className="flex items-center gap-4">
+            <InputTextOneLine
+              label="V.L.D.L. Colesterol"
+              name="vldl"
+              value={form.vldl}
+              labelWidth="120px"
+              disabled
+                className='w-[75%]'
+            />
+            <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 30 mg/dl)"}</span>
           </div>
         </SectionFieldset>
         <SectionFieldset legend="Especialista">

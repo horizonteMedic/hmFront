@@ -153,9 +153,6 @@ export const Loading = (mensaje) => {
   LoadingDefault(mensaje);
 };
 
-
-
-
 export function GetTableAnalBio(data, sede, token) {
   const body = {
     opcion_id_p: data.opcion_id_p,

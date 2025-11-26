@@ -1,37 +1,23 @@
-import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { getToday } from '../../../../../../utils/helpers';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerPerfilHepatico';
+import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerAcidoUrico';
 import {
   InputTextOneLine,
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 
-const testFields = [
-  { label: 'FOSFATASA ALCALINA', name: 'fosfAlc' },
-  { label: 'GGT', name: 'ggt' },
-  { label: 'TGP', name: 'tgp' },
-  { label: 'TGO', name: 'tgo' },
-  { label: 'BILIRRUBINA TOTAL', name: 'biliTotal' },
-  { label: 'BILIRRUBINA DIRECTA', name: 'biliDir' },
-  { label: 'BILIRRUBINA INDIRECTA', name: 'biliInd' },
-  { label: 'PROTEINAS TOTALES', name: 'protTot' },
-  { label: 'ALBUMINA', name: 'albumina' },
-  { label: 'GLOBULINA SERICA', name: 'globSer' },
-];
+const tabla = 'ac_bioquimica2022';
 
-const tabla = 'perfil_hepatico';
-
-export default function PerfilHepatico() {
+export default function BioquimicaAcidoUrico() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
   const initialFormState = {
-    norden: "",
+    norden: '',
     fecha: today,
 
     nombreExamen: "",
@@ -52,16 +38,7 @@ export default function PerfilHepatico() {
     ocupacion: "",
     cargoDesempenar: "",
 
-    tgo: '',
-    tgp: '',
-    ggt: '',
-    fosfAlc: '',
-    biliTotal: '',
-    biliInd: '',
-    biliDir: '',
-    protTot: '',
-    albumina: '',
-    globSer: '',
+    resultado: '',
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
@@ -72,15 +49,15 @@ export default function PerfilHepatico() {
     form,
     setForm,
     handleChange,
-    handleChangeSimple,
     handleChangeNumberDecimals,
+    handleChangeSimple,
     handleClearnotO,
     handleClear,
     handlePrintDefault,
   } = useForm(initialFormState);
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear);
+    SubmitDataService(form, token, userlogued, handleClear, tabla);
   };
 
   const handleSearch = (e) => {
@@ -103,7 +80,7 @@ export default function PerfilHepatico() {
           label="N° Orden"
           name="norden"
           value={form.norden}
-          onChange={handleChange}
+          onChange={handleChangeNumberDecimals}
           onKeyUp={handleSearch}
           labelWidth="120px"
         />
@@ -217,20 +194,27 @@ export default function PerfilHepatico() {
         />
       </SectionFieldset>
 
-      <SectionFieldset legend="Resultados" className="space-y-4">
-        {testFields.map(({ label, name }) => (
-          <InputTextOneLine
-            key={name}
-            label={label}
-            name={name}
-            value={form[name]}
-            onChange={(e) => handleChangeNumberDecimals(e, 2)}
-            labelWidth="120px"
-          />
-        ))}
+      <div className="font-semibold text-center bg-gray-100 p-3 rounded">
+        PRUEBA: ÁCIDO ÚRICO SÉRICO<br />
+        MUESTRA: SUERO
+      </div>
+
+      <SectionFieldset legend="Resultados" className="flex items-center gap-4">
+        <InputTextOneLine
+          label='Resultado'
+          name="resultado"
+          value={form.resultado}
+          labelWidth='120px'
+          className='w-[90%]'
+          onChange={handleChange}
+        />
+        <div className='flex flex-col items-start text-gray-500 text-[10px] font-medium'>
+          <span>{"Mujeres : 2.5 - 6.8 mg/dl"}</span>
+          <span>{"Hombres : 3.6 - 7.7 mg/dl"}</span>
+        </div>
       </SectionFieldset>
 
-      <SectionFieldset legend="Asignación de Médico" className="space-y-4">
+      <SectionFieldset legend="Asignación de Médico">
         <EmpleadoComboBox
           value={form.nombre_medico}
           label="Especialista"
