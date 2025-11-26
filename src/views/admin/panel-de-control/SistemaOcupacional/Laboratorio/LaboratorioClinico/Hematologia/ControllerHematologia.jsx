@@ -6,6 +6,7 @@ import {
   SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../../../utils/functionUtils.js";
+import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils.js";
 
 const obtenerReporteUrl = "/api/v01/ct/laboratorio/obtenerReporteLabHematograma";
 const registrarUrl = "/api/v01/ct/laboratorio/registrarActualizarLabHematograma"
@@ -21,9 +22,24 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
   if (res) {
     set((prev) => ({
       ...prev,
-      paciente: res.nombres ?? "",
-      edad: res.edad ?? "",
       fecha: res.fechaExamen ?? prev.fecha,
+
+      nombreExamen: res.nombreExamen ?? "",
+      dni: res.dni ?? "",
+
+      nombres: res.nombres ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+      lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+      edad: res.edad ?? "",
+      sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+      estadoCivil: res.estadoCivilPaciente,
+      nivelEstudios: res.nivelEstudioPaciente,
+      // Datos Laborales
+      empresa: res.empresa,
+      contrata: res.contrata,
+      ocupacion: res.ocupacionPaciente,
+      cargoDesempenar: res.cargoPaciente,
+
       // Pruebas
       hemoglobina: res.txtHemoglobina ?? "",
       hematocrito: res.txtHematocrito ?? "",
@@ -104,18 +120,11 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
     token,
     set,
     sede,
-    async () => {
-      const res = await GetInfoPacDefault(nro, token, sede);
-      if (res) {
-        set((prev) => ({
-          ...prev,
-          ...res,
-          paciente: res.nombresApellidos ?? "",
-        }));
-      }
+    () => {
+      GetInfoPac(nro, set, token, sede);
     },
-    async () => {
-      await GetInfoServicio(nro, tabla, set, token, () => {
+    () => {
+      GetInfoServicio(nro, tabla, set, token, () => {
         Swal.fire(
           "Alerta",
           "Este paciente ya cuenta con registros de Hematología",
@@ -126,4 +135,21 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
   );
 };
 
-export const SubmitHematogramaLabClinic = SubmitDataService;
+
+const GetInfoPac = async (nro, set, token, sede) => {
+  const res = await GetInfoPacDefault(nro, token, sede);
+  if (res) {
+    set((prev) => ({
+      ...prev,
+      ...res,
+      nombres: res.nombresApellidos ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+      edad: res.edad,
+      ocupacion: res.areaO ?? "",
+      nombreExamen: res.nomExam ?? "",
+      cargoDesempenar: res.cargo ?? "",
+      lugarNacimiento: res.lugarNacimiento ?? "",
+      sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
+    }));
+  }
+};

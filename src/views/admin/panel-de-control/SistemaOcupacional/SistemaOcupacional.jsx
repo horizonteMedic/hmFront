@@ -74,6 +74,7 @@ import {
   faTruckMedical,
   faMaskVentilator,
   faPersonRifle,
+  faFolderMinus,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -110,6 +111,7 @@ import PoderosaTabSelector from "./Poderosa/PoderosaTabSelector.jsx";
 // import AversionRiesgo from "./ModuloPsicologia/AversionRiesgo/AversionRiesgo.jsx";
 import GestionOpciones from "./Playground/GestionOpciones/GestionOpciones.jsx";
 import LaboratorioClinicoSubTabSelector from "./Laboratorio/LaboratorioClinico/LaboratorioClinicoSubTabSelector.jsx";
+import EliminarExamenes from "./EliminarExamenes/EliminarExamenes.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -293,10 +295,7 @@ const TabComponent = () => {
                   { vista: "Test Fatiga", tab: 23, icons: [{ icon: faBed }], label: "Test Fatiga y Somnolencia" },
                   { vista: "Triaje", tab: 1, icons: [{ icon: faStethoscope }], label: "Triaje" },
                   { vista: "Uso de Respiradores", tab: 36, icons: [{ icon: faMaskVentilator }], label: "Uso de Respiradores" },
-                  // { vista: "Certificado Trabajos en Caliente", tab: 37, icons: [{ icon: faFireFlameCurved }], label: "Certificado Trabajos en Caliente" },
-                  // { vista: "Licencia Interna", tab: 38, icons: [{ icon: faIdCard }], label: "Licencia Interna" },
-                  // { vista: "Certificado Altura Poderosa", tab: 39, icons: [{ icon: faP }], label: "Certificado Altura Poderosa" },
-                  // { vista: "Certificado Aptitud Poderosa", tab: 40, icons: [{ icon: faP }], label: "Certificado Aptitud Poderosa" },
+                  { vista: "Eliminar Examenes", tab: 38, icons: [{ icon: faFolderMinus }], label: "Eliminar Examenes" },
                 ];
                 return items
                   .filter((item) => tieneVista(item.vista))
@@ -744,10 +743,7 @@ const TabComponent = () => {
               35: { title: "Ficha Interconsulta", child: <FichaInterconsulta /> },
               36: { title: "Uso de Respiradores", child: <UsoRespiradores /> },
               37: { title: "Poderosa", child: <PoderosaTabSelector tieneVista={tieneVista} /> },
-              // 37: { title: "Certificado Trabajos en Caliente", child: <CertificadoTrabajosCaliente /> },
-              // 38: { title: "Licencia Interna", child: <LicenciaInterna /> },
-              // 39: { title: "Certificado Altura Poderosa", child: <CertificadoAlturaPoderosa /> },
-              // 40: { title: "Certificado Aptitud Poderosa", child: <CertificadoAptitudPoderosa /> },
+              38: { title: "Eliminar Examenes", child: <EliminarExamenes /> },
             };
             const section = displayedInterfaces[activeTab];
             return section ? (
@@ -804,10 +800,7 @@ const TabComponent = () => {
             "Ficha Interconsulta": { activeTab: 35, subTab: 0 },
             "Uso de Respiradores": { activeTab: 36, subTab: 0 },
             "Poderosa": { activeTab: 37, subTab: 0 },
-            // "Certificado Trabajos en Caliente": { activeTab: 37, subTab: 0 },
-            // "Licencia Interna": { activeTab: 38, subTab: 0 },
-            // "Certificado Altura Poderosa": { activeTab: 39, subTab: 0 },
-            // "Certificado Aptitud Poderosa": { activeTab: 40, subTab: 0 },
+            "Eliminar Examenes": { activeTab: 38, subTab: 0 },
           };
 
           const config = navConfig[idx];

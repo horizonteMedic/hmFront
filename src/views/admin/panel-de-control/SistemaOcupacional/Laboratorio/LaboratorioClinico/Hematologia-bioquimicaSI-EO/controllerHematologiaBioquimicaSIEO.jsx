@@ -7,6 +7,7 @@ import {
   SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../../../utils/functionUtils.js";
+import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils.js";
 
 const obtenerReporteUrl = "/api/v01/ct/laboratorio/obtenerReporteLaboratorioClinico";
 const registrarUrl = "/api/v01/ct/laboratorio/registrarActualizarLaboratorioClinicp";
@@ -22,12 +23,26 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
   if (res) {
     set((prev) => ({
       ...prev,
-      nombres: res.nombres ?? "",
       codLabclinico: res.codLabclinico ?? null,
       fechaExamen: res.fechaLab,
       responsable: res.resLab ?? "",
-      empresa: res.empresa ?? "",
-      contrata: res.contrata ?? "",
+
+      nombreExamen: res.nombreExamen ?? "",
+      dni: res.dniPaciente ?? "",
+
+      nombres: res.nombres ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+      lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+      edad: res.edadPaciente ?? "",
+      sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+      estadoCivil: res.estadoCivilPaciente,
+      nivelEstudios: res.nivelEstudioPaciente,
+      // Datos Laborales
+      empresa: res.empresa,
+      contrata: res.contrata,
+      ocupacion: res.ocupacionPaciente,
+      cargoDesempenar: res.cargoPaciente,
+
       grupoSanguineo: res.chka ? 'A' : res.chkab ? 'AB' : res.chkb ? 'B' : res.chko ? 'O' : '',
       factorRh: res.rbrhpositivo === true ? 'RH(+)' : res.rbrhnegativo === true ? 'RH(-)' : '',
       //HEMATOLOGIA
@@ -206,6 +221,13 @@ const GetInfoPac = async (nro, set, token, sede) => {
       ...prev,
       ...res,
       nombres: res.nombresApellidos ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+      edad: res.edad,
+      ocupacion: res.areaO ?? "",
+      nombreExamen: res.nomExam ?? "",
+      cargoDesempenar: res.cargo ?? "",
+      lugarNacimiento: res.lugarNacimiento ?? "",
+      sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
     }));
   }
 };

@@ -6,6 +6,7 @@ import CertificadoAlturaPoderosa from "./CertificadoAlturaPoderosa/CertificadoAl
 import HojaConsultaExterna from "./HojaConsultaExterna/HojaConsultaExterna";
 import CMManipuladoresAlimentos from "./CMManipuladoresAlimentos/CMManipuladoresAlimentos";
 import CAHerramientasManuales from "./CAHerramientasManuales/CAHerramientasManuales";
+import FichaDatosPacientes from "./FichaDatosPacientes/FichaDatosPacientes";
 
 export default function PoderosaTabSelector({ tieneVista }) {
     const tabsConfig = [
@@ -50,6 +51,12 @@ export default function PoderosaTabSelector({ tieneVista }) {
             permission: "Certificado Aptitud Para Herramientas Manuales",
             label: "Aptitud Herramientas Manuales",
             component: CAHerramientasManuales
+        },
+        {
+            id: 7,
+            permission: "Ficha Datos Pacientes",
+            label: "Ficha Datos Pacientes",
+            component: FichaDatosPacientes
         },
     ];
     return (
