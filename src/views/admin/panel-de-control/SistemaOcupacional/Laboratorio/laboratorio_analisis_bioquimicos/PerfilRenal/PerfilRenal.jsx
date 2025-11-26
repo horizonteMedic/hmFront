@@ -1,44 +1,23 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './ControllerHematologia';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { getToday } from '../../../../../../utils/helpers';
+import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerPerfilRenal';
 import {
   InputTextOneLine,
-  SectionFieldset
 } from '../../../../../../components/reusableComponents/ResusableComponents';
+import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 
-const PRUEBAS = [
-  { key: 'hemoglobina', label: 'Hemoglobina' },
-  { key: 'hematocrito', label: 'Hematocrito' },
-  { key: 'hematies', label: 'Hematíes' },
-  { key: 'volumen_corpuscular_medio', label: 'Volumen Corpuscular medio' },
-  { key: 'hemoglobina_corpuscular_media', label: 'Hemoglobina Corpuscular media' },
-  { key: 'concentracion_hemoglobina_corpuscular', label: 'Concentración de Hemoglobina Corp' },
-  { key: 'leucocitos', label: 'Leucocitos' },
-  { key: 'plaquetas', label: 'Plaquetas' }
-];
+const tabla = 'l_bioquimica';
 
-const DIFERENCIAL = [
-  { key: 'neutrofilos', label: 'Neutrófilos (%)' },
-  { key: 'abastonados', label: 'Abastonados (%)' },
-  { key: 'segmentados', label: 'Segmentados (%)' },
-  { key: 'monocitos', label: 'Monocitos (%)' },
-  { key: 'eosinofilos', label: 'Eosinófilos (%)' },
-  { key: 'basofilos', label: 'Basófilos (%)' },
-  { key: 'linfocitos', label: 'Linfocitos (%)' }
-];
-
-const tabla = 'hemograma_autom';
-
-export default function Hematologia() {
+export default function PerfilRenal() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
   const initialFormState = {
-    norden: "",
+    norden: '',
     fecha: today,
     nombreExamen: "",
 
@@ -58,23 +37,10 @@ export default function Hematologia() {
     ocupacion: "",
     cargoDesempenar: "",
 
-    // Pruebas
-    hemoglobina: "",
-    hematocrito: "",
-    hematies: "",
-    volumen_corpuscular_medio: "",
-    hemoglobina_corpuscular_media: "",
-    concentracion_hemoglobina_corpuscular: "",
-    leucocitos: "",
-    plaquetas: "",
-    // Diferencial
-    neutrofilos: "",
-    abastonados: "",
-    segmentados: "",
-    monocitos: "",
-    eosinofilos: "",
-    basofilos: "",
-    linfocitos: "",
+    creatinina: '',
+    urea: '',
+    acidoUrico: '',
+    printCount: '',
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
@@ -86,9 +52,7 @@ export default function Hematologia() {
     setForm,
     handleChange,
     handleClearnotO,
-    handleChangeNumber,
     handleChangeSimple,
-    handleFocusNext,
     handleClear,
     handlePrintDefault,
   } = useForm(initialFormState);
@@ -109,15 +73,14 @@ export default function Hematologia() {
       PrintHojaR(form.norden, token, tabla);
     });
   };
-
   return (
-    <div className="p-4 space-y-3">
-      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4">
+    <form className="py-4 space-y-3">
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <InputTextOneLine
-          label="Nro Ficha"
+          label="N° Orden"
           name="norden"
           value={form.norden}
-          onChange={handleChangeNumber}
+          onChange={handleChange}
           onKeyUp={handleSearch}
           labelWidth="120px"
         />
@@ -126,17 +89,18 @@ export default function Hematologia() {
           name="fecha"
           type="date"
           value={form.fecha}
-          onChange={handleChangeSimple}
+          onChange={handleChange}
           labelWidth="120px"
         />
         <InputTextOneLine
-          label="Nombre Examen"
+          label="Nombre del Examen"
           name="nombreExamen"
           value={form.nombreExamen}
           disabled
           labelWidth="120px"
         />
       </SectionFieldset>
+
       <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
         <InputTextOneLine
           label="Nombres"
@@ -161,20 +125,22 @@ export default function Hematologia() {
             labelWidth="120px"
           />
         </div>
-        <InputTextOneLine
-          label="DNI"
-          name="dni"
-          value={form.dni}
-          labelWidth="120px"
-          disabled
-        />
-        <InputTextOneLine
-          label="Fecha Nacimiento"
-          name="fechaNacimiento"
-          value={form.fechaNacimiento}
-          disabled
-          labelWidth="120px"
-        />
+        <div className="grid md:grid-cols-2 gap-3">
+          <InputTextOneLine
+            label="DNI"
+            name="dni"
+            value={form.dni}
+            labelWidth="120px"
+            disabled
+          />
+          <InputTextOneLine
+            label="Fecha Nacimiento"
+            name="fechaNacimiento"
+            value={form.fechaNacimiento}
+            disabled
+            labelWidth="120px"
+          />
+        </div>
         <InputTextOneLine
           label="Lugar Nacimiento"
           name="lugarNacimiento"
@@ -182,22 +148,20 @@ export default function Hematologia() {
           disabled
           labelWidth="120px"
         />
-        <div className="grid md:grid-cols-2 gap-3">
-          <InputTextOneLine
-            label="Estado Civil"
-            name="estadoCivil"
-            value={form.estadoCivil}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Nivel Estudios"
-            name="nivelEstudios"
-            value={form.nivelEstudios}
-            disabled
-            labelWidth="120px"
-          />
-        </div>
+        <InputTextOneLine
+          label="Estado Civil"
+          name="estadoCivil"
+          value={form.estadoCivil}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Nivel Estudios"
+          name="nivelEstudios"
+          value={form.nivelEstudios}
+          disabled
+          labelWidth="120px"
+        />
       </SectionFieldset>
       <SectionFieldset legend="Datos Laborales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <InputTextOneLine
@@ -231,72 +195,70 @@ export default function Hematologia() {
       </SectionFieldset>
 
       <div className="font-semibold text-center bg-gray-100 p-3 rounded">
-        MUESTRA: SANGRE TOTAL C/ EDTA
+        MUESTRA: SUERO
       </div>
 
-      <SectionFieldset legend="Resultados" className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <SectionFieldset legend="Pruebas" className="space-y-3">
-          {PRUEBAS.map(({ key, label }) => (
-            <InputTextOneLine
-              label={label}
-              key={key}
-              name={key}
-              value={form[key]}
-              onChange={handleChange}
-              onKeyUp={handleFocusNext}
-              labelWidth='200px'
-            />
-          ))}
-        </SectionFieldset>
-        <SectionFieldset legend="Recuento Diferencial" className="space-y-3">
-          {DIFERENCIAL.map(({ key, label }) => (
-            <InputTextOneLine
-              label={label}
-              key={key}
-              name={key}
-              value={form[key]}
-              onChange={handleChange}
-              onKeyUp={handleFocusNext}
-              labelWidth='200px'
-            />
-          ))}
-        </SectionFieldset>
+      <SectionFieldset legend="Pruebas y Resultados" className="space-y-3">
+        <InputTextOneLine
+          label='Creatinina Sérica'
+          name="creatinina"
+          value={form.creatinina}
+          onChange={handleChange}
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label='Urea Sérica'
+          name="urea"
+          value={form.urea}
+          onChange={handleChange}
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label='Acido Urico Sérico'
+          name="acidoUrico"
+          value={form.acidoUrico}
+          onChange={handleChange}
+          labelWidth="120px"
+        />
       </SectionFieldset>
 
-      <SectionFieldset legend="Especialista">
+      <SectionFieldset legend="Asignación de Médico" className="space-y-4">
         <EmpleadoComboBox
           value={form.nombre_medico}
+          label="Especialista"
           form={form}
-          label='Especialista que Certifica'
           onChange={handleChangeSimple}
         />
       </SectionFieldset>
 
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4 border-t">
+      <fieldset className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
         <div className="flex gap-3">
           <button
+            type="button"
             onClick={handleSave}
             className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
           >
             <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
           </button>
           <button
+            type="button"
             onClick={handleClear}
             className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2"
           >
             <FontAwesomeIcon icon={faBroom} /> Limpiar
           </button>
         </div>
-        <div className="flex flex-col items-end gap-2">
-          <span className="font-bold italic">Imprimir</span>
+        <div className="flex flex-col items-end">
+          <span className="font-bold italic mb-2">Imprimir</span>
           <div className="flex items-center gap-2">
             <InputTextOneLine
               name="norden"
               value={form.norden}
               onChange={handleChange}
-              inputClassName="w-28"
+              inputClassName="w-24"
             />
             <button
+              type="button"
               onClick={handlePrint}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
             >
@@ -304,7 +266,7 @@ export default function Hematologia() {
             </button>
           </div>
         </div>
-      </div>
-    </div>
+      </fieldset>
+    </form>
   );
 }

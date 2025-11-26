@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom } from '@fortawesome/free-solid-svg-icons';
-import { GetInfoPacAnalisisBio, GetTableAnalBio, Loading, PrintHojaR, SubmitDataService, VerifyTR } from '../controller/ControllerABio';
+import { GetInfoPacAnalisisBio, GetTableAnalBio, Loading, PrintHojaR, SubmitDataService, VerifyTR } from './controllerAnalisisBioquimicos';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { getToday } from '../../../../../../utils/helpers';
@@ -20,10 +20,26 @@ export default function AnalisisBioquimicos() {
 
   const initialFormState = {
     norden: '',
-    codAb: null,
-    nombreExamen: 'FICHA MÉDICA OCUPACIONAL',
-    nombres: '',
     fecha: today,
+    nombreExamen: '',
+
+    codAb: null,
+
+    dni: "",
+    nombres: "",
+    apellidos: "",
+    fechaNacimiento: "",
+    lugarNacimiento: "",
+    edad: "",
+    sexo: "",
+    estadoCivil: "",
+    nivelEstudios: "",
+
+    // Datos Laborales
+    empresa: "",
+    contrata: "",
+    ocupacion: "",
+    cargoDesempenar: "",
 
     colesterolTotal: '',
     ldl: '',
@@ -33,9 +49,6 @@ export default function AnalisisBioquimicos() {
 
     nombres_search: "",
     codigo_search: "",
-
-
-
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
@@ -120,41 +133,118 @@ export default function AnalisisBioquimicos() {
   return (
     <div className="p-4 grid xl:grid-cols-2 gap-4">
       <div className="space-y-3">
-        <SectionFieldset legend="Datos Generales" className="grid md:grid-cols-2 gap-3">
-          <div className='grid md:grid-cols-2 gap-3 col-span-2'>
-            <InputTextOneLine
-              label="N° Orden"
-              name="norden"
-              value={form.norden}
-              onChange={handleChangeNumberDecimals}
-              onKeyUp={handleSearch}
-            />
-            <InputTextOneLine
-              label="Fecha"
-              name="fecha"
-              type="date"
-              value={form.fecha}
-              onChange={handleChangeSimple}
-            />
-            <InputTextOneLine
-              label="Nombres"
-              name="nombres"
-              value={form.nombres}
-              disabled
-            />
-            <InputTextOneLine
-              label="Nombre Examen"
-              name="nombreExamen"
-              value={form.nombreExamen}
-              disabled
-            />
-          </div>
-          <EmpleadoComboBox
-            value={form.nombre_medico}
-            form={form}
-            label='Especialista que Certifica'
-            className='col-span-2'
+        <SectionFieldset legend="Información del Examen" className="grid md:grid-cols-2 gap-3 col-span-2">
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            value={form.norden}
+            onChange={handleChangeNumberDecimals}
+            onKeyUp={handleSearch}
+          />
+          <InputTextOneLine
+            label="Fecha"
+            name="fecha"
+            type="date"
+            value={form.fecha}
             onChange={handleChangeSimple}
+          />
+          <InputTextOneLine
+            label="Nombre Examen"
+            name="nombreExamen"
+            value={form.nombreExamen}
+            className='col-span-2'
+            disabled
+          />
+
+        </SectionFieldset>
+        <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+          <InputTextOneLine
+            label="Nombres"
+            name="nombres"
+            value={form.nombres}
+            disabled
+            className='col-span-2'
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="DNI"
+            name="dni"
+            value={form.dni}
+            labelWidth="120px"
+            disabled
+          />
+          <InputTextOneLine
+            label="Edad (Años)"
+            name="edad"
+            value={form.edad}
+            disabled
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Sexo"
+            name="sexo"
+            value={form.sexo}
+            disabled
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Fecha Nacimiento"
+            name="fechaNacimiento"
+            value={form.fechaNacimiento}
+            disabled
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Lugar Nacimiento"
+            name="lugarNacimiento"
+            value={form.lugarNacimiento}
+            className='col-span-2'
+            disabled
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Estado Civil"
+            name="estadoCivil"
+            value={form.estadoCivil}
+            disabled
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Nivel Estudios"
+            name="nivelEstudios"
+            value={form.nivelEstudios}
+            disabled
+            labelWidth="120px"
+          />
+        </SectionFieldset>
+        <SectionFieldset legend="Datos Laborales" className="grid gap-3">
+          <InputTextOneLine
+            label="Empresa"
+            name="empresa"
+            value={form.empresa}
+            disabled
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Contrata"
+            name="contrata"
+            value={form.contrata}
+            disabled
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Ocupación"
+            name="ocupacion"
+            value={form.ocupacion}
+            disabled
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Cargo Desempeñar"
+            name="cargoDesempenar"
+            value={form.cargoDesempenar}
+            disabled
+            labelWidth="120px"
           />
         </SectionFieldset>
 
@@ -220,6 +310,14 @@ export default function AnalisisBioquimicos() {
             </div>
           </div>
         </SectionFieldset>
+        <SectionFieldset legend="Especialista">
+          <EmpleadoComboBox
+            value={form.nombre_medico}
+            form={form}
+            label='Especialista que Certifica'
+            onChange={handleChangeSimple}
+          />
+        </SectionFieldset>
 
         <div className="flex gap-4 pt-4 border-t border-gray-200">
           <button
@@ -253,6 +351,7 @@ export default function AnalisisBioquimicos() {
         />
         <Table data={dataTabla} tabla={tabla} set={setForm} token={token} clean={handleClear} />
       </SectionFieldset>
+
     </div>
   );
 }
@@ -280,7 +379,7 @@ function Table({ data, tabla, set, token, clean }) {
   }
 
   return (
-    <div className="overflow-y-auto col-span-2" style={{ maxHeight: 'calc(12 * 4rem)' }}>
+    <div className="overflow-y-auto col-span-2" style={{ maxHeight: 'calc(18 * 4rem)' }}>
       <table className="w-full table-auto border-collapse">
         <thead>
           <tr className="bg-gray-100">

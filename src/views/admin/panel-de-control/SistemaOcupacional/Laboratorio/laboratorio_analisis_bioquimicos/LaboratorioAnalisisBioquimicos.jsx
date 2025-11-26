@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlask, faFilter, faTint, faLungs } from '@fortawesome/free-solid-svg-icons';
 import AnalisisBioquimicos from './Analisis_bioquimicos/Analisis_bioquimicos';
-import Bioquimica from './Bioquimica/Perfil_Renal';
 import BioquimicaAcidoUrico from './BioquimicaAcidoUrico/BioquimicaAcidoUrico';
 import PerfilHepatico from './PerfilHepatico/PerfilHepatico';
+import PerfilRenal from './PerfilRenal/PerfilRenal';
 
 const LaboratorioAnalisisBioquimicos = ({ token, selectedSede, userlogued, permiso }) => {
   const [activeTab, setActiveTab] = useState(0);
@@ -23,7 +23,7 @@ const LaboratorioAnalisisBioquimicos = ({ token, selectedSede, userlogued, permi
       icon: faFilter,
       vista: 'Analisis Bioquimico',
       permiso: 'Acceso Perfil Renal',
-      component: <Bioquimica />
+      component: <PerfilRenal />
     },
     {
       label: 'Ácido Úrico',

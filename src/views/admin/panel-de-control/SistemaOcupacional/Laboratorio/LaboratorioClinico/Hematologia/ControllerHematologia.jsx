@@ -57,6 +57,8 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
       eosinofilos: res.txtEosinofios ?? "",
       basofilos: res.txtBasofilos ?? "",
       linfocitos: res.txtLinfocitos ?? "",
+
+      user_medicoFirma: res.usuarioFirma,
     }));
   }
 };
@@ -91,7 +93,9 @@ export const SubmitDataService = async (
     txtPlaquetas: form.plaquetas,
     userRegistro: user,
     userMedicoOcup: "",
-    norden: form.norden
+    norden: form.norden,
+
+    usuarioFirma: form.user_medicoFirma,
   };
 
   await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

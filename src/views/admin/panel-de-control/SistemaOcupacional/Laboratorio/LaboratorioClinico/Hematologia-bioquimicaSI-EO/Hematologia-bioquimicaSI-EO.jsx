@@ -176,7 +176,7 @@ export default function HematologiaBioquimicaSIEO() {
           labelWidth="120px"
         />
         <InputTextOneLine
-          label="Nombre Examen"
+          label="Nombre del Examen"
           name="nombreExamen"
           value={form.nombreExamen}
           disabled
