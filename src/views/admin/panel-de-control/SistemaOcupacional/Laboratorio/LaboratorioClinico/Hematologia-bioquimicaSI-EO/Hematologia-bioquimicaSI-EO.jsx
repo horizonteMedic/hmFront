@@ -26,14 +26,27 @@ export default function HematologiaBioquimicaSIEO() {
     norden: "",
     codLabclinico: null,
     fechaExamen: today,
-    dni: "",
-    incompleto: false,
+
+    nombreExamen: "",
 
     responsable: "",
-    nombres: "",
     gfSangPedido: "",
-    contrata: "",
+
+    dni: "",
+    nombres: "",
+    apellidos: "",
+    fechaNacimiento: "",
+    lugarNacimiento: "",
+    edad: "",
+    sexo: "",
+    estadoCivil: "",
+    nivelEstudios: "",
+
+    // Datos Laborales
     empresa: "",
+    contrata: "",
+    ocupacion: "",
+    cargoDesempenar: "",
 
     grupoSanguineo: "",
     factorRh: "",
@@ -99,7 +112,6 @@ export default function HematologiaBioquimicaSIEO() {
     handleChange,
     handleClearnotO,
     handlePrintDefault,
-    handleInputChangeChecked,
     handleChangeNumber,
     handleChangeSimple,
     handleClear,
@@ -124,7 +136,6 @@ export default function HematologiaBioquimicaSIEO() {
     });
   };
 
-
   const GetTable = (nro) => {
     getFetch(
       `/api/v01/ct/laboratorio/listadoGrupoFactorSanguineo?nOrden=${nro}`,
@@ -147,13 +158,14 @@ export default function HematologiaBioquimicaSIEO() {
 
   return (
     <div className="p-4 space-y-3">
-      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 xl:grid-cols-5 gap-3 md:gap-4">
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4">
         <InputTextOneLine
           label="N° Orden"
           name="norden"
           value={form.norden}
           onChange={handleChangeNumber}
           onKeyUp={handleSearch}
+          labelWidth="120px"
         />
         <InputTextOneLine
           label="Fecha"
@@ -161,23 +173,14 @@ export default function HematologiaBioquimicaSIEO() {
           type="date"
           value={form.fechaExamen}
           onChange={handleChangeSimple}
+          labelWidth="120px"
         />
         <InputTextOneLine
-          label="DNI"
-          name="dni"
-          value={form.dni}
+          label="Nombre del Examen"
+          name="nombreExamen"
+          value={form.nombreExamen}
           disabled
-        />
-        <InputCheckbox
-          label="Ficha Médica Ocupacional"
-          checked={true}
-          disabled
-        />
-        <InputCheckbox
-          label={<span className="text-red-600 font-bold">INCOMPLETO</span>}
-          name="incompleto"
-          onChange={handleInputChangeChecked}
-          checked={form.incompleto}
+          labelWidth="120px"
         />
       </SectionFieldset>
       <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
@@ -186,28 +189,95 @@ export default function HematologiaBioquimicaSIEO() {
           name="nombres"
           value={form.nombres}
           disabled
-          labelWidth="140px"
+          labelWidth="120px"
         />
         <InputTextOneLine
           label="G.F. Sang. Pedido"
           name="gfSangPedido"
           value={form.gfSangPedido}
           disabled
-          labelWidth="140px"
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="DNI"
+          name="dni"
+          value={form.dni}
+          labelWidth="120px"
+          disabled
+        />
+        <div className="grid md:grid-cols-2 gap-3">
+          <InputTextOneLine
+            label="Edad (Años)"
+            name="edad"
+            value={form.edad}
+            disabled
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Sexo"
+            name="sexo"
+            value={form.sexo}
+            disabled
+            labelWidth="120px"
+          />
+        </div>
+        <InputTextOneLine
+          label="Fecha Nacimiento"
+          name="fechaNacimiento"
+          value={form.fechaNacimiento}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Lugar Nacimiento"
+          name="lugarNacimiento"
+          value={form.lugarNacimiento}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Estado Civil"
+          name="estadoCivil"
+          value={form.estadoCivil}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Nivel Estudios"
+          name="nivelEstudios"
+          value={form.nivelEstudios}
+          disabled
+          labelWidth="120px"
+        />
+      </SectionFieldset>
+      <SectionFieldset legend="Datos Laborales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <InputTextOneLine
+          label="Empresa"
+          name="empresa"
+          value={form.empresa}
+          disabled
+          labelWidth="120px"
         />
         <InputTextOneLine
           label="Contrata"
           name="contrata"
           value={form.contrata}
           disabled
-          labelWidth="140px"
+          labelWidth="120px"
         />
         <InputTextOneLine
-          label="Empresa"
-          name="empresa"
-          value={form.empresa}
+          label="Ocupación"
+          name="ocupacion"
+          value={form.ocupacion}
           disabled
-          labelWidth="140px"
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Cargo Desempeñar"
+          name="cargoDesempenar"
+          value={form.cargoDesempenar}
+          disabled
+          labelWidth="120px"
         />
       </SectionFieldset>
       {/* Contenido principal en dos columnas */}
@@ -603,6 +673,7 @@ export default function HematologiaBioquimicaSIEO() {
           />
           <EmpleadoComboBox
             value={form.nombre_medico}
+            label="Especialista"
             form={form}
             onChange={handleChangeSimple}
           />

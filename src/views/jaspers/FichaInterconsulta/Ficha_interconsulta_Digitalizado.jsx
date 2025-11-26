@@ -13,102 +13,72 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   // Contador de páginas dinámico
   let numeroPagina = 1;
 
-  // Datos de prueba por defecto
-  const datosPrueba = {
-    apellidosNombres: "CASTILLO PLASENCIA HADY KATHERINE",
-    fechaExamen: "04/11/2024",
-    tipoExamen: "INTERCONSULTA",
-    sexo: "Femenino",
-    documentoIdentidad: "72384273",
-    edad: "31",
-    areaTrabajo: "MINERÍA",
-    puestoTrabajo: "DAD",
-    empresa: "MINERA BOROO MISQUICHILCA S.A.",
-    contrata: "CONTRATA EJEMPLO S.A.C.",
-    vitalSigns: {
-      fc: "64",
-      fr: "19",
-      pa: "120/60",
-      satO2: "99",
-      imc: "23.48",
-      temperatura: "36.5",
-      peso: "70",
-      talla: "1.75"
-    },
-    // Datos de color
-    color: 1,
-    codigoColor: "#008f39",
-    textoColor: "F",
-    // Datos adicionales para header
-    numeroFicha: "99164",
-    sede: "Trujillo-Pierola",
-    horaSalida: "9:33:43 PM"
-  };
-
   const datosReales = {
-    apellidosNombres: String((data.apellidosPaciente || "") + " " + (data.nombresPaciente || "")).trim(),
-    fechaExamen: formatearFechaCorta(data.fechaExamen || ""),
-    tipoExamen: String(data.nombreExamen || "INTERCONSULTA"),
+    apellidosNombres: String(`${data.apellidosPaciente ?? ""} ${data.nombresPaciente ?? ""}`).trim(),
+    fechaExamen: formatearFechaCorta(data.fechaExamen ?? ""),
+    tipoExamen: String(data.nombreExamen ?? ""),
     sexo: convertirGenero(data.sexoPaciente) || "",
-    documentoIdentidad: String(data.dniPaciente || ""),
+    documentoIdentidad: String(data.dniPaciente ?? ""),
     edad: String(data.edadPaciente ?? ""),
-    areaTrabajo: data.areaPaciente || "",
-    puestoTrabajo: data.cargoPaciente || "",
-    empresa: data.empresa || "",
-    contrata: data.contrata || "",
+    areaTrabajo: String(data.areaPaciente ?? ""),
+    puestoTrabajo: String(data.cargoPaciente ?? ""),
+    empresa: String(data.empresa ?? ""),
+    contrata: String(data.contrata ?? ""),
     vitalSigns: {
-      fc: String(data.frecuenciaCardiaca || ""),
-      fr: String(data.frecuenciaRespiratoriaTriaje || ""),
-      pa: String(data.sistolica || "") + "/" + String(data.diastolica || ""),
-      satO2: String(data.saturacionOxigenoTriaje || ""),
-      imc: String(data.imcTriaje || ""),
-      temperatura: String(data.temperatura || ""),
-      peso: String(data.peso || ""),
-      talla: String(data.tallaTriaje || "")
+      fc: String(data.frecuenciaCardiaca ?? ""),
+      fr: String(data.frecuenciaRespiratoriaTriaje ?? ""),
+      pa: [data.sistolica, data.diastolica].some(v => v !== undefined && v !== null)
+        ? `${data.sistolica ?? ""}/${data.diastolica ?? ""}`
+        : "",
+      satO2: String(data.saturacionOxigenoTriaje ?? ""),
+      imc: String(data.imcTriaje ?? ""),
+      temperatura: String(data.temperatura ?? ""),
+      peso: String(data.peso ?? ""),
+      talla: String(data.tallaTriaje ?? "")
     },
     // Datos de color
-    color: data.color || 1,
-    codigoColor: data.codigoColor || "#008f39",
-    textoColor: data.textoColor || "F",
+    color: Number(data.color ?? 0),
+    codigoColor: String(data.codigoColor ?? ""),
+    textoColor: String(data.textoColor ?? ""),
     // Datos adicionales para header
-    numeroFicha: String(data.norden || ""),
-    sede: data.sede || data.nombreSede || "",
+    numeroFicha: String(data.norden ?? ""),
+    sede: String(data.sede ?? data.nombreSede ?? ""),
     // Datos específicos de interconsulta
-    codigoFichaInterconsulta: String(data.codigoFichaInterconsulta || ""),
-    especialidad: String(data.especialidad || ""),
-    motivoInterconsulta: String(data.motivo || ""),
-    fechaAtencion: formatearFechaCorta(data.fechaApertura || ""),
-    hallazgosRelevantes: String(data.hallazgo || ""),
-    diagnostico: String(data.diagnostico || ""),
-    tratamientoRecomendaciones: String(data.tratamiento || ""),
+    codigoFichaInterconsulta: String(data.codigoFichaInterconsulta ?? ""),
+    especialidad: String(data.especialidad ?? ""),
+    motivoInterconsulta: String(data.motivo ?? ""),
+    fechaAtencion: formatearFechaCorta(data.fechaApertura ?? ""),
+    hallazgosRelevantes: String(data.hallazgo ?? ""),
+    diagnostico: String(data.diagnostico ?? ""),
+    tratamientoRecomendaciones: String(data.tratamiento ?? ""),
     // Conclusión evaluación
-    conclusionApto: Boolean(data.apto || false),
-    conclusionNoApto: Boolean(data.noApto || false),
+    conclusionApto: Boolean(data.apto),
+    conclusionNoApto: Boolean(data.noApto),
     // Datos oftalmológicos
-    agudezaVisualCercaOD: String(data.visioncercasincorregirod_v_cerca_s_od || ""),
-    agudezaVisualCercaOI: String(data.visioncercasincorregiroi_v_cerca_s_oi || ""),
-    agudezaVisualCercaConOD: String(data.oftalodccmologia_odcc || ""),
-    agudezaVisualCercaConOI: String(data.oiccoftalmologia_oicc || ""),
-    agudezaVisualLejosOD: String(data.visionlejossincorregirod_v_lejos_s_od || ""),
-    agudezaVisualLejosOI: String(data.visionlejossincorregiroi_v_lejos_s_oi || ""),
-    agudezaVisualLejosConOD: String(data.odlcoftalmologia_odlc || ""),
-    agudezaVisualLejosConOI: String(data.oilcoftalmologia_oilc || ""),
-    testIshihara: String(data.vcoftalmologia_vc || ""),
-    refPupilares: String(data.rpoftalmologia_rp || ""),
-    enfermedadesOculares: String(data.enfermedadesocularesoftalmo_e_oculares || ""),
+    agudezaVisualCercaOD: String(data.visioncercasincorregirod_v_cerca_s_od ?? ""),
+    agudezaVisualCercaOI: String(data.visioncercasincorregiroi_v_cerca_s_oi ?? ""),
+    agudezaVisualCercaConOD: String(data.oftalodccmologia_odcc ?? ""),
+    agudezaVisualCercaConOI: String(data.oiccoftalmologia_oicc ?? ""),
+    agudezaVisualLejosOD: String(data.visionlejossincorregirod_v_lejos_s_od ?? ""),
+    agudezaVisualLejosOI: String(data.visionlejossincorregiroi_v_lejos_s_oi ?? ""),
+    agudezaVisualLejosConOD: String(data.odlcoftalmologia_odlc ?? ""),
+    agudezaVisualLejosConOI: String(data.oilcoftalmologia_oilc ?? ""),
+    testIshihara: String(data.vcoftalmologia_vc ?? ""),
+    refPupilares: String(data.rpoftalmologia_rp ?? ""),
+    enfermedadesOculares: String(data.enfermedadesocularesoftalmo_e_oculares ?? ""),
     // Datos del usuario médico
-    nombreUsuario: String(data.nombreUsuario || ""),
-    apellidoUsuario: String(data.apellidoUsuario || ""),
-    cmpUsuario: String(data.cmpUsuario || ""),
-    dniUsuario: String(data.dniUsuario || ""),
+    nombreUsuario: String(data.nombreUsuario ?? ""),
+    apellidoUsuario: String(data.apellidoUsuario ?? ""),
+    cmpUsuario: String(data.cmpUsuario ?? ""),
+    dniUsuario: String(data.dniUsuario ?? ""),
     // Datos de digitalización
-    digitalizacion: data.digitalizacion || [],
-    horaSalida: String(data.horaSalida || ""),
-    direccionPaciente: String(data.direccionPaciente || "")
+    digitalizacion: Array.isArray(data.digitalizacion) ? data.digitalizacion : [],
+    horaSalida: String(data.horaSalida ?? ""),
+    direccionPaciente: String(data.direccionPaciente ?? ""),
+    telefonoPaciente: String(data.celularPaciente ?? data.telefonoPaciente ?? "")
   };
 
-  // Usar datos reales si existen, sino usar datos de prueba
-  const datosFinales = data && data.norden ? datosReales : datosPrueba;
+  const datosFinales = datosReales;
 
   // Header reutilizable (similar a Anexo16ABoro_Digitalizado.jsx)
   const drawHeader = (pageNumber) => {
@@ -341,12 +311,14 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Dirección:", tablaInicioX + 2, yTexto + 2);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.direccionPaciente, tablaInicioX + 25, yTexto + 2, tablaAncho - 30);
+  dibujarTextoConSaltoLinea(datosFinales.direccionPaciente, tablaInicioX + 25, yTexto + 2, tablaAncho - 60);
 
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Cel:", tablaInicioX + 146, yTexto + 2);
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea("963164925", tablaInicioX + 155, yTexto + 2, tablaAncho - 30);
+  if (datosFinales.telefonoPaciente) {
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.text("Tel:", tablaInicioX + 140, yTexto + 2);
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text(datosFinales.telefonoPaciente, tablaInicioX + 150, yTexto + 2);
+  }
   yTexto += filaAltura;
 
   // === SECCIÓN 2: FUNCIONES VITALES ===

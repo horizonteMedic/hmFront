@@ -45,7 +45,7 @@ import Anexo16A from "./views/admin/panel-de-control/SistemaOcupacional/Anexo16A
 
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/Ficha_Anexo16/Aptitud_medico_ocupacional_F.jsx"
+import Ficha from "./views/jaspers/FichaDatosPersonales/FichaDatosPersonales.jsx"
 
 
 

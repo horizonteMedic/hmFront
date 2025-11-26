@@ -11,30 +11,6 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   // Contador de páginas dinámico
   let numeroPagina = 1;
 
-  // Datos de prueba por defecto
-  const datosPrueba = {
-    apellidosNombres: "CASTILLO PLASENCIA HADY KATHERINE",
-    fechaExamen: "04/11/2024",
-    sexo: "Femenino",
-    documentoIdentidad: "72384273",
-    edad: "31 años",
-    fechaNacimiento: "15/03/1993",
-    domicilio: "Av. Los Olivos 123, Urbanización San Miguel, Trujillo",
-    areaTrabajo: "MINERÍA",
-    puestoTrabajo: "INGENIERO DE SEGURIDAD",
-    empresa: "MINERA BOROO MISQUICHILCA S.A.",
-    contrata: "CONTRATA",
-    sede: "Trujillo-Pierola",
-    numeroFicha: "99164",
-    // Mapeo de observaciones para cada sección
-    observacionesAntecedentes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    observacionesSintomas: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    observacionesHabitos: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    // Mapeo de datos de color
-    color: 1,
-    codigoColor: "#008f39",
-    textoColor: "F"
-  };
   const datosReales = {
     // Datos personales básicos (mantener en mayúsculas)
     apellidosNombres: String((data.apellidos_apellidos_pa ?? "") + " " + (data.nombres_nombres_pa ?? "")).trim(),
@@ -168,15 +144,15 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
 
     // Mapeo de hábitos nocivos
     habitos: {
-      fumar: Boolean(data.fumarSi_rbfumarsi ?? true), // Cambiado a true para mostrar en datos de prueba
-      numeroCigarrillos: String(data.numeroCigarrillos_txtncigarrillos ?? "3 a la semana"),
-      licor: Boolean(data.licorSi_rblicorsi ?? true), // Cambiado a true para mostrar en datos de prueba
-      tipoLicor: String(data.licorTipoFrecuente_txtlicortipofrecuente ?? "cerveza"),
-      frecuenciaLicor: String(data.licorFrecuencia_txtlicorfrecuencia ?? "diario"),
-      drogas: Boolean(data.drogasSi_rbdrogassi ?? true), // Cambiado a true para mostrar en datos de prueba
-      tipoDrogas: String(data.drogasTipo_txtdrogastipo ?? "Chaccha hoja de coca"),
+      fumar: Boolean(data.fumarSi_rbfumarsi),
+      numeroCigarrillos: String(data.numeroCigarrillos_txtncigarrillos ?? ""),
+      licor: Boolean(data.licorSi_rblicorsi),
+      tipoLicor: String(data.licorTipoFrecuente_txtlicortipofrecuente ?? ""),
+      frecuenciaLicor: String(data.licorFrecuencia_txtlicorfrecuencia ?? ""),
+      drogas: Boolean(data.drogasSi_rbdrogassi),
+      tipoDrogas: String(data.drogasTipo_txtdrogastipo ?? ""),
       frecuenciaDrogas: String(data.drogasFrecuencia_txtdrogasfrecuencia ?? ""),
-      otros: Boolean(data.otrosSiIndicarEnfermedades_rbotrossi ?? false), // Mantener false para mostrar NO marcado
+      otros: Boolean(data.otrosSiIndicarEnfermedades_rbotrossi),
       tipoOtros: String(data.otrosTipoIndicarEnfermedades_txtotros ?? ""),
       frecuenciaOtros: String(data.otrosFrecuenciaIndicarEnfermedades_txtotrosfrecuencia ?? "")
     },
@@ -222,7 +198,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   };
 
   // Usar datos reales si existen, sino usar datos de prueba
-  const datosFinales = data && data.n_orden ? datosReales : datosPrueba;
+  const datosFinales = datosReales;
 
   // Header reutilizable
   const drawHeader = (pageNumber) => {

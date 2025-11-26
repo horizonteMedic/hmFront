@@ -15,6 +15,7 @@ import ModalContrata from './modals/modalContrata/ModalContrata';
 import { format } from 'date-fns';
 import { useSessionData } from '../../../../../hooks/useSessionData.js';
 import { fixEncodingModern } from '../../../../../utils/helpers.js';
+import ModalExamenes from './modals/modalExamenes+/ModalExamenes'
 
 const AperturaExamenesPreOcup = (props) => {
   const today = new Date();
@@ -102,6 +103,8 @@ const AperturaExamenesPreOcup = (props) => {
   const [refresh, setRefresh] = useState(0)
   const [CanP, setCanP] = useState({Completos: 0, Faltantes: 0})
   const [FechaCanP, setFechaCanP] = useState(format(today, 'dd/MM/yyyy'))
+  //Examenes Adicionales
+  const [modalExam, setModalexam] = useState(false)
   //lista de Protocolos
   const [protocoloOptions, setProtocoloOptions] = useState([]) 
   useEffect(() => {
@@ -1339,6 +1342,12 @@ const AperturaExamenesPreOcup = (props) => {
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="examenAdicional" className="block w-[15em] ">Examen Adicional:</label>
               <div className="flex flex-wrap pt-2 pb-2">
+                {/*<div className='flex px-3'>
+                  <button onClick={() => {setModalexam(true)}} className='flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800  mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none'>
+                    + Seleccionar Exámenes
+                  </button>
+                </div>*/}
+
                 <div className="flex items-center mr-8 mb-2">
                   <input type="checkbox"  title="FIST-TEST" disabled={habilitar} checked={datos.n_fisttest} onChange={handleCheack}  id="examenAdicional4" name="n_fisttest" className="mr-2" />
                   <label htmlFor="examenAdicional4" title="FIST-TEST">FIST-TEST</label>
@@ -1760,6 +1769,7 @@ const AperturaExamenesPreOcup = (props) => {
           });
           setSearchContrata(e)}}
         />
+        {/*modalExam && <ModalExamenes close={() => setModalexam(false)}/>*/}
     </div>
   );
 };

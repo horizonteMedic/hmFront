@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserCheck, faStethoscope, faVial, faUserMd, faXRay, faHeartbeat, faLungs, faDeaf, faTooth, faEye, faHome, faTimes, faFileWaveform, faSkull, faSkiingNordic, faBed, faMountain, fa2, fa6, fa1, faA, faBacterium, faMoon, faFileMedical, faTruckMedical, faSuitcaseMedical, faStairs, faCarSide, faMaskVentilator, faP, faPersonRifle } from '@fortawesome/free-solid-svg-icons';
+import { faUserCheck, faStethoscope, faVial, faUserMd, faXRay, faHeartbeat, faLungs, faDeaf, faTooth, faEye, faHome, faTimes, faFileWaveform, faSkull, faSkiingNordic, faBed, faMountain, fa2, fa6, fa1, faA, faBacterium, faMoon, faFileMedical, faTruckMedical, faSuitcaseMedical, faStairs, faCarSide, faMaskVentilator, faP, faPersonRifle, faFolderMinus } from '@fortawesome/free-solid-svg-icons';
 import styles from './DrawerOverlay.module.css';
 
 const accesos = [
@@ -32,6 +32,7 @@ const accesos = [
   { icon: faTruckMedical, label: "Ficha Interconsulta", key: "Ficha Interconsulta" },
   { icon: faMaskVentilator, label: "Uso de Respiradores", key: "Uso de Respiradores" },
   { icon: faPersonRifle, label: "Poderosa", key: "Poderosa" },
+  { icon: faFolderMinus, label: "Eliminar Examenes", key: "Eliminar Examenes" },
 ];
 
 const DrawerQuickAccess = ({ open, onClose, onNavigate, activeIndex, tieneVista }) => (
