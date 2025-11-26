@@ -73,6 +73,16 @@ export default function FichaDatosPacientes() {
         emergenciaTelefono: "",
         emergenciaDomicilio: "",
         emergenciaOtraReferencia: "",
+        // Composición Familiar
+        familiarPadreNombre: "-", familiarPadreVive: "-", familiarPadreFechaNac: "", familiarPadreEdad: "-", familiarPadreDni: "-", familiarPadreGrado: "-", familiarPadreAutogenerado: "-",
+        familiarMadreNombre: "-", familiarMadreVive: "-", familiarMadreFechaNac: "", familiarMadreEdad: "-", familiarMadreDni: "-", familiarMadreGrado: "-", familiarMadreAutogenerado: "-",
+        familiarConvivienteNombre: "-", familiarConvivienteVive: "-", familiarConvivienteFechaNac: "", familiarConvivienteEdad: "-", familiarConvivienteDni: "-", familiarConvivienteGrado: "-", familiarConvivienteAutogenerado: "-",
+        familiarEsposaNombre: "-", familiarEsposaVive: "-", familiarEsposaFechaNac: "", familiarEsposaEdad: "-", familiarEsposaDni: "-", familiarEsposaGrado: "-", familiarEsposaAutogenerado: "-",
+        familiarHijo1Nombre: "-", familiarHijo1Vive: "-", familiarHijo1FechaNac: "", familiarHijo1Edad: "-", familiarHijo1Dni: "-", familiarHijo1Grado: "-", familiarHijo1Autogenerado: "-",
+        familiarHijo2Nombre: "-", familiarHijo2Vive: "-", familiarHijo2FechaNac: "", familiarHijo2Edad: "-", familiarHijo2Dni: "-", familiarHijo2Grado: "-", familiarHijo2Autogenerado: "-",
+        familiarHijo3Nombre: "-", familiarHijo3Vive: "-", familiarHijo3FechaNac: "", familiarHijo3Edad: "-", familiarHijo3Dni: "-", familiarHijo3Grado: "-", familiarHijo3Autogenerado: "-",
+        familiarHijo4Nombre: "-", familiarHijo4Vive: "-", familiarHijo4FechaNac: "", familiarHijo4Edad: "-", familiarHijo4Dni: "-", familiarHijo4Grado: "-", familiarHijo4Autogenerado: "-",
+        familiarHijo5Nombre: "-", familiarHijo5Vive: "-", familiarHijo5FechaNac: "", familiarHijo5Edad: "-", familiarHijo5Dni: "-", familiarHijo5Grado: "-", familiarHijo5Autogenerado: "-",
         // Instrucción Adquirida
         instruccionPrimariaCentro: "-",
         instruccionPrimariaInicio: "",
@@ -246,6 +256,9 @@ export default function FichaDatosPacientes() {
 
     return (
         <div className="w-full space-y-3 px-4">
+            {/* ===== PARTE I ===== */}
+            <h2 className="text-xl font-bold text-center bg-gray-200 py-2 rounded">PARTE I</h2>
+
             {/* ===== SECCIÓN: N° ORDEN Y FECHA ===== */}
             <SectionFieldset legend="Información General" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
                 <InputTextOneLine
@@ -312,239 +325,314 @@ export default function FichaDatosPacientes() {
                 />
             </SectionFieldset>
 
-            {/* ===== SECCIÓN: DATOS PERSONALES ===== */}
-            <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="space-y-3">
-                    <InputTextOneLine
-                        label="Nombres"
-                        name="nombres"
-                        value={form.nombres}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Apellidos"
-                        name="apellidos"
-                        value={form.apellidos}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <div className="grid grid-cols-3 gap-2">
+            {/* ===== SECCIÓN: DATOS PERSONALES Y DOMICILIO ===== */}
+            <SectionFieldset legend="Datos Personales">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div className="space-y-3">
                         <InputTextOneLine
-                            label="Día Nac."
-                            name="diaNacimiento"
-                            value={form.diaNacimiento}
+                            label="Nombres"
+                            name="nombres"
+                            value={form.nombres}
                             disabled
-                            labelWidth="60px"
+                            labelWidth="120px"
                         />
                         <InputTextOneLine
-                            label="Mes"
-                            name="mesNacimiento"
-                            value={form.mesNacimiento}
+                            label="Apellidos"
+                            name="apellidos"
+                            value={form.apellidos}
                             disabled
-                            labelWidth="40px"
+                            labelWidth="120px"
+                        />
+                        <div className="grid grid-cols-3 gap-2">
+                            <InputTextOneLine
+                                label="Día Nac."
+                                name="diaNacimiento"
+                                value={form.diaNacimiento}
+                                disabled
+                                labelWidth="60px"
+                            />
+                            <InputTextOneLine
+                                label="Mes"
+                                name="mesNacimiento"
+                                value={form.mesNacimiento}
+                                disabled
+                                labelWidth="40px"
+                            />
+                            <InputTextOneLine
+                                label="Año"
+                                name="anioNacimiento"
+                                value={form.anioNacimiento}
+                                disabled
+                                labelWidth="40px"
+                            />
+                        </div>
+                        <InputTextOneLine
+                            label="Distrito Nac."
+                            name="distritoNacimiento"
+                            value={form.distritoNacimiento}
+                            disabled
+                            labelWidth="120px"
                         />
                         <InputTextOneLine
-                            label="Año"
-                            name="anioNacimiento"
-                            value={form.anioNacimiento}
+                            label="Provincia Nac."
+                            name="provinciaNacimiento"
+                            value={form.provinciaNacimiento}
                             disabled
-                            labelWidth="40px"
+                            labelWidth="120px"
+                        />
+                        <InputTextOneLine
+                            label="Depart. Nac."
+                            name="departamentoNacimiento"
+                            value={form.departamentoNacimiento}
+                            disabled
+                            labelWidth="120px"
                         />
                     </div>
-                    <InputTextOneLine
-                        label="Distrito Nac."
-                        name="distritoNacimiento"
-                        value={form.distritoNacimiento}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Provincia Nac."
-                        name="provinciaNacimiento"
-                        value={form.provinciaNacimiento}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Depart. Nac."
-                        name="departamentoNacimiento"
-                        value={form.departamentoNacimiento}
-                        disabled
-                        labelWidth="120px"
-                    />
+                    <div className="space-y-3">
+                        <InputTextOneLine
+                            label="DNI / C.Ext Nº"
+                            name="dni"
+                            value={form.dni}
+                            disabled
+                            labelWidth="120px"
+                        />
+                        <InputTextOneLine
+                            label="L.M. No."
+                            name="lmNo"
+                            value={form.lmNo}
+                            onChange={handleChange}
+                            labelWidth="120px"
+                        />
+                        <InputTextOneLine
+                            label="Autogenerado"
+                            name="autogenerado"
+                            value={form.autogenerado}
+                            onChange={handleChange}
+                            labelWidth="120px"
+                        />
+                        <InputTextOneLine
+                            label="Estado Civil"
+                            name="estadoCivil"
+                            value={form.estadoCivil}
+                            disabled
+                            labelWidth="120px"
+                        />
+                        <div className="grid grid-cols-2 gap-2">
+                            <InputTextOneLine
+                                label="AFP/SNP"
+                                name="afpSnp"
+                                value={form.afpSnp}
+                                onChange={handleChange}
+                                labelWidth="80px"
+                            />
+                            <InputTextOneLine
+                                label="Estatura"
+                                name="estatura"
+                                value={form.estatura}
+                                onChange={handleChange}
+                                labelWidth="80px"
+                            />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                            <InputTextOneLine
+                                label="Lic.Conducir"
+                                name="licConducirNo"
+                                value={form.licConducirNo}
+                                onChange={handleChange}
+                                labelWidth="100px"
+                            />
+                            <InputTextOneLine
+                                label="CUSSP No."
+                                name="cusspNo"
+                                value={form.cusspNo}
+                                onChange={handleChange}
+                                labelWidth="80px"
+                            />
+                        </div>
+                        <InputTextOneLine
+                            label="Peso"
+                            name="peso"
+                            value={form.peso}
+                            onChange={handleChange}
+                            labelWidth="120px"
+                        />
+                    </div>
                 </div>
-                <div className="space-y-3">
-                    <InputTextOneLine
-                        label="DNI / C.Ext Nº"
-                        name="dni"
-                        value={form.dni}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="L.M. No."
-                        name="lmNo"
-                        value={form.lmNo}
-                        onChange={handleChange}
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Autogenerado"
-                        name="autogenerado"
-                        value={form.autogenerado}
-                        onChange={handleChange}
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Estado Civil"
-                        name="estadoCivil"
-                        value={form.estadoCivil}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <div className="grid grid-cols-2 gap-2">
+                {/* Dirección del Domicilio */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+                    <div className="space-y-3">
                         <InputTextOneLine
-                            label="AFP/SNP"
-                            name="afpSnp"
-                            value={form.afpSnp}
-                            onChange={handleChange}
-                            labelWidth="80px"
+                            label="Dirección"
+                            name="direccionDomicilio"
+                            value={form.direccionDomicilio}
+                            disabled
+                            labelWidth="120px"
                         />
                         <InputTextOneLine
-                            label="Estatura"
-                            name="estatura"
-                            value={form.estatura}
+                            label="Distrito"
+                            name="distritoDomicilio"
+                            value={form.distritoDomicilio}
+                            disabled
+                            labelWidth="120px"
+                        />
+                        <InputTextOneLine
+                            label="Provincia"
+                            name="provinciaDomicilio"
+                            value={form.provinciaDomicilio}
+                            disabled
+                            labelWidth="120px"
+                        />
+                        <InputTextOneLine
+                            label="Departamento"
+                            name="departamentoDomicilio"
+                            value={form.departamentoDomicilio}
+                            disabled
+                            labelWidth="120px"
+                        />
+                        <InputTextOneLine
+                            label="Referencia"
+                            name="referenciaDomiciliaria"
+                            value={form.referenciaDomiciliaria}
                             onChange={handleChange}
-                            labelWidth="80px"
+                            labelWidth="120px"
                         />
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-3">
                         <InputTextOneLine
-                            label="Lic.Conducir"
-                            name="licConducirNo"
-                            value={form.licConducirNo}
+                            label="Teléfono 1"
+                            name="telefono1"
+                            value={form.telefono1}
                             onChange={handleChange}
-                            labelWidth="100px"
+                            labelWidth="120px"
                         />
                         <InputTextOneLine
-                            label="CUSSP No."
-                            name="cusspNo"
-                            value={form.cusspNo}
+                            label="Teléfono 2"
+                            name="telefono2"
+                            value={form.telefono2}
                             onChange={handleChange}
-                            labelWidth="80px"
+                            labelWidth="120px"
                         />
+                        <InputsRadioGroup
+                            label="Tipo Vivienda"
+                            name="tipoVivienda"
+                            value={form.tipoVivienda}
+                            onChange={handleChange}
+                            options={tipoViviendaOptions}
+                        />
+                        <InputTextOneLine
+                            label="E-mail"
+                            name="email"
+                            value={form.email}
+                            onChange={handleChange}
+                            labelWidth="120px"
+                        />
+                        <div className="grid grid-cols-2 gap-2">
+                            <InputTextOneLine
+                                label="Radio Frec."
+                                name="radioFrec"
+                                value={form.radioFrec}
+                                onChange={handleChange}
+                                labelWidth="90px"
+                            />
+                            <InputTextOneLine
+                                label="Celular"
+                                name="celular"
+                                value={form.celular}
+                                onChange={handleChange}
+                                labelWidth="70px"
+                            />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                            <InputTextOneLine
+                                label="Nº Cuenta"
+                                name="numeroCuentaAhorro"
+                                value={form.numeroCuentaAhorro}
+                                onChange={handleChange}
+                                labelWidth="90px"
+                            />
+                            <InputTextOneLine
+                                label="Banco"
+                                name="banco"
+                                value={form.banco}
+                                onChange={handleChange}
+                                labelWidth="70px"
+                            />
+                        </div>
                     </div>
-                    <InputTextOneLine
-                        label="Peso"
-                        name="peso"
-                        value={form.peso}
-                        onChange={handleChange}
-                        labelWidth="120px"
-                    />
                 </div>
             </SectionFieldset>
 
-            {/* ===== SECCIÓN: DOMICILIO ===== */}
-            <SectionFieldset legend="Dirección del Domicilio" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="space-y-3">
-                    <InputTextOneLine
-                        label="Dirección"
-                        name="direccionDomicilio"
-                        value={form.direccionDomicilio}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Distrito"
-                        name="distritoDomicilio"
-                        value={form.distritoDomicilio}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Provincia"
-                        name="provinciaDomicilio"
-                        value={form.provinciaDomicilio}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Departamento"
-                        name="departamentoDomicilio"
-                        value={form.departamentoDomicilio}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Referencia"
-                        name="referenciaDomiciliaria"
-                        value={form.referenciaDomiciliaria}
-                        onChange={handleChange}
-                        labelWidth="120px"
-                    />
-                </div>
-                <div className="space-y-3">
-                    <InputTextOneLine
-                        label="Teléfono 1"
-                        name="telefono1"
-                        value={form.telefono1}
-                        onChange={handleChange}
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Teléfono 2"
-                        name="telefono2"
-                        value={form.telefono2}
-                        onChange={handleChange}
-                        labelWidth="120px"
-                    />
-                    <InputsRadioGroup
-                        label="Tipo Vivienda"
-                        name="tipoVivienda"
-                        value={form.tipoVivienda}
-                        onChange={handleChange}
-                        options={tipoViviendaOptions}
-                    />
-                    <InputTextOneLine
-                        label="E-mail"
-                        name="email"
-                        value={form.email}
-                        onChange={handleChange}
-                        labelWidth="120px"
-                    />
-                    <div className="grid grid-cols-2 gap-2">
-                        <InputTextOneLine
-                            label="Radio Frec."
-                            name="radioFrec"
-                            value={form.radioFrec}
-                            onChange={handleChange}
-                            labelWidth="90px"
-                        />
-                        <InputTextOneLine
-                            label="Celular"
-                            name="celular"
-                            value={form.celular}
-                            onChange={handleChange}
-                            labelWidth="70px"
-                        />
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                        <InputTextOneLine
-                            label="Nº Cuenta"
-                            name="numeroCuentaAhorro"
-                            value={form.numeroCuentaAhorro}
-                            onChange={handleChange}
-                            labelWidth="90px"
-                        />
-                        <InputTextOneLine
-                            label="Banco"
-                            name="banco"
-                            value={form.banco}
-                            onChange={handleChange}
-                            labelWidth="70px"
-                        />
-                    </div>
+            {/* ===== SECCIÓN: COMPOSICIÓN FAMILIAR ===== */}
+            <SectionFieldset legend="Composición Familiar">
+                <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border border-gray-300">
+                        <thead className="bg-gray-100">
+                            <tr>
+                                <th className="border border-gray-300 px-2 py-1"></th>
+                                <th className="border border-gray-300 px-2 py-1">Apellidos y Nombres</th>
+                                <th className="border border-gray-300 px-2 py-1">Vive? Si o No</th>
+                                <th className="border border-gray-300 px-2 py-1">Fecha Nacimiento</th>
+                                <th className="border border-gray-300 px-2 py-1">Edad</th>
+                                <th className="border border-gray-300 px-2 py-1">DNI Part. Nac.</th>
+                                <th className="border border-gray-300 px-2 py-1">Grado Instruc.</th>
+                                <th className="border border-gray-300 px-2 py-1">Autogenerado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td className="border border-gray-300 px-2 py-1 font-semibold">Padre:</td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarPadreNombre" value={form.familiarPadreNombre ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarPadreVive" value={form.familiarPadreVive ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input type="date" name="familiarPadreFechaNac" value={form.familiarPadreFechaNac ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarPadreEdad" value={form.familiarPadreEdad ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarPadreDni" value={form.familiarPadreDni ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarPadreGrado" value={form.familiarPadreGrado ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarPadreAutogenerado" value={form.familiarPadreAutogenerado ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                            </tr>
+                            <tr>
+                                <td className="border border-gray-300 px-2 py-1 font-semibold">Madre:</td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarMadreNombre" value={form.familiarMadreNombre ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarMadreVive" value={form.familiarMadreVive ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input type="date" name="familiarMadreFechaNac" value={form.familiarMadreFechaNac ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarMadreEdad" value={form.familiarMadreEdad ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarMadreDni" value={form.familiarMadreDni ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarMadreGrado" value={form.familiarMadreGrado ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarMadreAutogenerado" value={form.familiarMadreAutogenerado ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                            </tr>
+                            <tr>
+                                <td className="border border-gray-300 px-2 py-1 font-semibold">Conviviente:</td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarConvivienteNombre" value={form.familiarConvivienteNombre ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarConvivienteVive" value={form.familiarConvivienteVive ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input type="date" name="familiarConvivienteFechaNac" value={form.familiarConvivienteFechaNac ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarConvivienteEdad" value={form.familiarConvivienteEdad ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarConvivienteDni" value={form.familiarConvivienteDni ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarConvivienteGrado" value={form.familiarConvivienteGrado ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarConvivienteAutogenerado" value={form.familiarConvivienteAutogenerado ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                            </tr>
+                            <tr>
+                                <td className="border border-gray-300 px-2 py-1 font-semibold">Esposa:</td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarEsposaNombre" value={form.familiarEsposaNombre ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarEsposaVive" value={form.familiarEsposaVive ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input type="date" name="familiarEsposaFechaNac" value={form.familiarEsposaFechaNac ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarEsposaEdad" value={form.familiarEsposaEdad ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarEsposaDni" value={form.familiarEsposaDni ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarEsposaGrado" value={form.familiarEsposaGrado ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                <td className="border border-gray-300 px-2 py-1"><input name="familiarEsposaAutogenerado" value={form.familiarEsposaAutogenerado ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                            </tr>
+                            {[1, 2, 3, 4, 5].map((num) => (
+                                <tr key={num}>
+                                    <td className="border border-gray-300 px-2 py-1 font-semibold">Hijo:</td>
+                                    <td className="border border-gray-300 px-2 py-1"><input name={`familiarHijo${num}Nombre`} value={form[`familiarHijo${num}Nombre`] ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                    <td className="border border-gray-300 px-2 py-1"><input name={`familiarHijo${num}Vive`} value={form[`familiarHijo${num}Vive`] ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                    <td className="border border-gray-300 px-2 py-1"><input type="date" name={`familiarHijo${num}FechaNac`} value={form[`familiarHijo${num}FechaNac`] ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                    <td className="border border-gray-300 px-2 py-1"><input name={`familiarHijo${num}Edad`} value={form[`familiarHijo${num}Edad`] ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                    <td className="border border-gray-300 px-2 py-1"><input name={`familiarHijo${num}Dni`} value={form[`familiarHijo${num}Dni`] ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                    <td className="border border-gray-300 px-2 py-1"><input name={`familiarHijo${num}Grado`} value={form[`familiarHijo${num}Grado`] ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                    <td className="border border-gray-300 px-2 py-1"><input name={`familiarHijo${num}Autogenerado`} value={form[`familiarHijo${num}Autogenerado`] ?? "-"} onChange={handleChange} className="w-full border-0 bg-transparent" /></td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </SectionFieldset>
 
@@ -591,10 +679,13 @@ export default function FichaDatosPacientes() {
                 </div>
             </SectionFieldset>
 
+            {/* ===== PARTE II ===== */}
+            <h2 className="text-xl font-bold text-center bg-gray-200 py-2 rounded">PARTE II</h2>
+
             {/* ===== SECCIÓN: INSTRUCCIÓN ADQUIRIDA ===== */}
             <SectionFieldset legend="Instrucción Adquirida">
                 <div className="overflow-x-auto">
-                    <table className="w-full border-collapse border border-gray-300 text-sm">
+                    <table className="w-full border-collapse border border-gray-300 ">
                         <thead className="bg-gray-100">
                             <tr>
                                 <th className="border border-gray-300 px-2 py-1">Instrucción</th>
@@ -741,7 +832,7 @@ export default function FichaDatosPacientes() {
                 {/* Tabla de capacitaciones agregadas */}
                 {capacitaciones.length > 0 && (
                     <div className="overflow-x-auto">
-                        <table className="w-full border-collapse border border-gray-300 text-sm">
+                        <table className="w-full border-collapse border border-gray-300 ">
                             <thead className="bg-gray-100">
                                 <tr>
                                     <th className="border border-gray-300 px-2 py-1">Titulo</th>
@@ -840,7 +931,7 @@ export default function FichaDatosPacientes() {
                 {/* Tabla de experiencias agregadas */}
                 {experiencias.length > 0 && (
                     <div className="overflow-x-auto">
-                        <table className="w-full border-collapse border border-gray-300 text-sm">
+                        <table className="w-full border-collapse border border-gray-300 ">
                             <thead className="bg-gray-100">
                                 <tr>
                                     <th className="border border-gray-300 px-2 py-1">Nombre de la Empresa</th>
@@ -877,6 +968,9 @@ export default function FichaDatosPacientes() {
                     </div>
                 )}
             </SectionFieldset>
+
+            {/* ===== PARTE III ===== */}
+            <h2 className="text-xl font-bold text-center bg-gray-200 py-2 rounded">PARTE III</h2>
 
             {/* ===== SECCIÓN: REFERENCIAS PERSONALES ===== */}
             <SectionFieldset legend="Referencias Personales">
@@ -932,7 +1026,7 @@ export default function FichaDatosPacientes() {
                 {/* Tabla de referencias agregadas */}
                 {referencias.length > 0 && (
                     <div className="overflow-x-auto">
-                        <table className="w-full border-collapse border border-gray-300 text-sm">
+                        <table className="w-full border-collapse border border-gray-300 ">
                             <thead className="bg-gray-100">
                                 <tr>
                                     <th className="border border-gray-300 px-2 py-1">Apellidos y Nombres</th>
