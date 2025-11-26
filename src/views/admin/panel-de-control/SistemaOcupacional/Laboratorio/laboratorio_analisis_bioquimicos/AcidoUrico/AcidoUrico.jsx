@@ -12,7 +12,7 @@ import EmpleadoComboBox from '../../../../../../components/reusableComponents/Em
 
 const tabla = 'ac_bioquimica2022';
 
-export default function BioquimicaAcidoUrico() {
+export default function AcidoUrico() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 

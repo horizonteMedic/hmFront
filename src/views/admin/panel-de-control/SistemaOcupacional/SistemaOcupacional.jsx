@@ -8,7 +8,7 @@ import ConsentimientoDigitalizacion from "./Admision/ConsentimientoDigitalizacio
 import Triaje from "./Triaje/Triaje";
 import Consentimientos from "./Laboratorio/Consentimientos/Consentimientos.jsx";
 import ParasitologiaCoprologico from "./Parasitologia/ParasitologiaCoprologico";
-import LaboratorioAnalisisBioquimicos from "./Laboratorio/laboratorio_analisis_bioquimicos/LaboratorioAnalisisBioquimicos";
+import LaboratorioAnalisisBioquimicos from "./Laboratorio/laboratorio_analisis_bioquimicos/AnalisisBioquimicosSubTabSelector.jsx";
 import InmunologiaTab from "./Laboratorio/Inmunologia/Inmunologia_tab.jsx";
 import Toxicologia from "./Laboratorio/Toxicologia/Toxicologia";
 import Manipuladores from "./Laboratorio/Manipuladores/Manipuladores";
@@ -112,6 +112,7 @@ import PoderosaTabSelector from "./Poderosa/PoderosaTabSelector.jsx";
 import GestionOpciones from "./Playground/GestionOpciones/GestionOpciones.jsx";
 import LaboratorioClinicoSubTabSelector from "./Laboratorio/LaboratorioClinico/LaboratorioClinicoSubTabSelector.jsx";
 import EliminarExamenes from "./EliminarExamenes/EliminarExamenes.jsx";
+import AnalisisBioquimicosSubTabSelector from "./Laboratorio/laboratorio_analisis_bioquimicos/AnalisisBioquimicosSubTabSelector.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -546,11 +547,8 @@ const TabComponent = () => {
                   />
                 )}
                 {labTab === 1 && (
-                  <LaboratorioAnalisisBioquimicos
-                    token={token}
-                    selectedSede={selectSede}
-                    userlogued={userlogued.sub}
-                    permiso={tienePermisoEnVista}
+                  <AnalisisBioquimicosSubTabSelector
+                    tieneVista={tieneVista}
                   />
                 )}
                 {labTab === 2 && (
