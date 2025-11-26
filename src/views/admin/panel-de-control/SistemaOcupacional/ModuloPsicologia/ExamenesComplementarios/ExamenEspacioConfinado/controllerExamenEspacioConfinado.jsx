@@ -218,7 +218,7 @@ export const SubmitDataService = async (
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/ExamenEspacioConfinado/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformeEspaciosConfinados/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -226,7 +226,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../../jaspers/ModuloPsicologia/ExamenEspacioConfinado"
+        "../../../../../../jaspers/ModuloPsicologia/InformeEspaciosConfinados"
     );
 };
 

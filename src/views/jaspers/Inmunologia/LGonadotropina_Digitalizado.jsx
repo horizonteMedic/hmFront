@@ -3,53 +3,27 @@ import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 
-// --- Configuración Centralizada (Estándar Microbiología) ---
+// --- Configuración Centralizada ---
 const config = {
   margin: 15,
+  col1X: 15,
+  col2X: 160,
   fontSize: {
     title: 14,
-    header: 11,
-    body: 11,
+    header: 9,
+    body: 9,
   },
   font: 'helvetica',
-  lineHeight: 8, // Valor estandarizado
-};
-
-// --- Funciones de Ayuda (Estándar Microbiología) ---
-
-const drawUnderlinedTitle = (doc, text, y) => {
-  const pageW = doc.internal.pageSize.getWidth();
-  doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
-  doc.text(text, pageW / 2, y, { align: "center" });
-  const textWidth = doc.getTextWidth(text);
-  const x = (pageW - textWidth) / 2;
-  doc.setLineWidth(0.5);
-  doc.line(x, y + 1.5, x + textWidth, y + 1.5);
-  doc.setLineWidth(0.2); // Reset
+  lineHeight: 7,
 };
 
 // Función para formatear fecha a DD/MM/YYYY
 const toDDMMYYYY = (fecha) => {
   if (!fecha) return '';
-  if (fecha.includes('/')) return fecha; // ya está en formato correcto
+  if (fecha.includes('/')) return fecha;
   const [anio, mes, dia] = fecha.split('-');
   if (!anio || !mes || !dia) return fecha;
   return `${dia}/${mes}/${anio}`;
-};
-
-// Función para formatear fecha larga
-const formatDateToLong = (dateString) => {
-  if (!dateString) return '';
-  try {
-    const date = new Date(`${dateString}T00:00:00`);
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  } catch (error) {
-    return toDDMMYYYY(dateString) || '';
-  }
 };
 
 // Header con datos de ficha, sede y fecha
@@ -77,8 +51,8 @@ const drawHeader = (doc, datos = {}) => {
 
   // Bloque de color
   drawColorBox(doc, {
-    color: datos.codigoColor || "#008f39",
-    text: datos.textoColor || "F",
+    color: datos.codigoColor,
+    text: datos.textoColor,
     x: pageW - 30,
     y: 10,
     size: 22,
@@ -88,42 +62,100 @@ const drawHeader = (doc, datos = {}) => {
   });
 };
 
-// Función para dibujar datos del paciente
+// Función para dibujar datos del paciente en tabla
 const drawPatientData = (doc, datos = {}) => {
-  const margin = 15;
-  let y = 40;
-  const lineHeight = 6;
-  const patientDataX = margin;
-  
-  const drawPatientDataRow = (label, value) => {
-    const labelWithColon = label.endsWith(':') ? label : label + ' :';
-    doc.setFontSize(11).setFont('helvetica', 'bold');
-    doc.text(labelWithColon, patientDataX, y);
-    let valueX = patientDataX + doc.getTextWidth(labelWithColon) + 2;
-    if (label.toLowerCase().includes('apellidos y nombres')) {
-      const minGap = 23;
-      if (doc.getTextWidth(labelWithColon) < minGap) valueX = patientDataX + minGap;
-    }
-    doc.setFont('helvetica', 'normal');
-    doc.text(String(value || '').toUpperCase(), valueX, y);
-    y += lineHeight;
-  };
-  
-  drawPatientDataRow("Apellidos y Nombres :", datos.nombres || datos.nombresPaciente || '');
-  drawPatientDataRow("Edad :", datos.edad || datos.edadPaciente ? `${datos.edad || datos.edadPaciente} AÑOS` : '');
-  
-  // Fecha
-  doc.setFontSize(11).setFont('helvetica', 'bold');
-  const fechaLabel = "Fecha :";
-  doc.text(fechaLabel, patientDataX, y);
-  doc.setFont('helvetica', 'normal');
-  const fechaLabelWidth = doc.getTextWidth(fechaLabel);
-  doc.text(formatDateToLong(datos.fechaExamen || datos.fecha || ''), patientDataX + fechaLabelWidth + 2, y);
-  
-  // Reseteo
-  doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);
-  
-  return y + lineHeight;
+  const tablaInicioX = 15;
+  const tablaAncho = 180;
+  const filaAltura = 5;
+  let yPos = 46; // +5mm
+
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.setFillColor(196, 196, 196);
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'FD');
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("DATOS PERSONALES", tablaInicioX + 2, yPos + 3.5);
+  yPos += filaAltura;
+
+  const sexo = datos.sexoPaciente === 'F' ? 'FEMENINO' : datos.sexoPaciente === 'M' ? 'MASCULINO' : '';
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.nombres || '', tablaInicioX + 40, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.line(tablaInicioX + 45, yPos, tablaInicioX + 45, yPos + filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("DNI:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(String(datos.dni || ''), tablaInicioX + 12, yPos + 3.5);
+  doc.setFont("helvetica", "bold");
+  doc.text("Edad:", tablaInicioX + 47, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text((datos.edad || '') + " AÑOS", tablaInicioX + 58, yPos + 3.5);
+  doc.setFont("helvetica", "bold");
+  doc.text("Sexo:", tablaInicioX + 92, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(sexo, tablaInicioX + 105, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Lugar de Nacimiento:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.lugarNacimientoPaciente || '', tablaInicioX + 38, yPos + 3.5);
+  doc.setFont("helvetica", "bold");
+  doc.text("Estado Civil:", tablaInicioX + 92, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.estadoCivilPaciente || '', tablaInicioX + 115, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("T. Examen:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.nombreExamen || '', tablaInicioX + 25, yPos + 3.5);
+  doc.setFont("helvetica", "bold");
+  doc.text("Fecha Nac.:", tablaInicioX + 92, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(toDDMMYYYY(datos.fechaNacimientoPaciente || ''), tablaInicioX + 115, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Nivel de Estudio:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.nivelEstudioPaciente || '', tablaInicioX + 32, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Ocupación:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.ocupacionPaciente || '', tablaInicioX + 25, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Cargo:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.cargoPaciente || '', tablaInicioX + 18, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Área:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.areaPaciente || '', tablaInicioX + 15, yPos + 3.5);
+  yPos += filaAltura;
+
+  return yPos;
 };
 
 // --- Componente Principal ---
@@ -149,41 +181,37 @@ export default function LGonadotropina_Digitalizado(datos) {
       img.onload = () => res(img);
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
+
   Promise.all([
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
-    let y = 90; 
-
     // === TÍTULO ===
-    drawUnderlinedTitle(doc, 'INMUNOLOGÍA', y);
-    y += config.lineHeight * 2;
+    doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
+    doc.text("INMUNOLOGÍA", pageW / 2, 43, { align: "center" }); // +5mm
+
+    let y = 100; // Posición inicial después de la tabla de datos (+5mm)
     
     // === MUESTRA Y MÉTODO ===
-    doc.setFontSize(config.fontSize.header);
-    doc.setFont(config.font, 'bold');
-    doc.text('MUESTRA :', config.margin, y);
-    doc.setFont(config.font, 'normal');
-    doc.text('SUERO', config.margin + 25, y);
+    doc.setFontSize(config.fontSize.header).setFont(config.font, "bold");
+    doc.text("MUESTRA:", config.margin, y);
+    doc.setFont(config.font, "normal");
+    doc.text("SUERO", config.margin + 20, y);
     y += config.lineHeight;
 
-    doc.setFont(config.font, 'bold');
-    doc.text('MÉTODO :', config.margin, y);
-    doc.setFont(config.font, 'normal');
-    doc.text('INMUNOCROMATOGRÁFICO', config.margin + 25, y);
-    y += config.lineHeight * 2;
+    doc.setFont(config.font, "bold");
+    doc.text("MÉTODO:", config.margin, y);
+    doc.setFont(config.font, "normal");
+    doc.text("INMUNOCROMATOGRÁFICO", config.margin + 18, y);
+    y += config.lineHeight * 1.5;
 
     // === ENCABEZADO DE TABLA ===
-    doc.setFont(config.font, 'bold');
-    doc.setFontSize(config.fontSize.header);
-    doc.text('PRUEBA CUALITATIVO', config.margin, y);
-    const resultColX = pageW / 2 + 40;
-    doc.text('RESULTADO', resultColX, y, { align: 'left' });
-    
+    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+    doc.text("PRUEBA CUALITATIVO", config.col1X, y);
+    doc.text("RESULTADO", config.col2X, y, { align: "center" });
     y += 3;
-    doc.setLineWidth(0.3);
-    doc.line(config.margin, y, pageW - config.margin, y);
+    doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
     y += config.lineHeight;
 
     // === CUERPO DE TABLA ===
@@ -191,18 +219,18 @@ export default function LGonadotropina_Digitalizado(datos) {
     const imgPath = './img/textogonabeta.png';
     const imgWTest = 100, imgHTest = 15;
     doc.addImage(imgPath, 'PNG', config.margin, y - 2, imgWTest, imgHTest);
+    
     // Resultado
-    doc.setFont(config.font, 'normal');
-    doc.text(datos.txtResultado || '', resultColX, y + 6, { align: 'left' });
+    doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
+    doc.text(datos.txtResultado || '', config.col2X, y + 6, { align: "center" });
 
     // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
-    const sigW = 53; // Tamaño fijo width
-    const sigH = 23; // Tamaño fijo height
+    const sigW = 53;
+    const sigH = 23;
     const sigY = 210;
-    const gap = 16; // Espacio entre sellos (reducido 4mm: 20 - 4 = 16)
+    const gap = 16;
     
     if (s1 && s2) {
-      // Si hay dos sellos, centrarlos juntos
       const totalWidth = sigW * 2 + gap;
       const startX = (pageW - totalWidth) / 2;
       
@@ -213,30 +241,28 @@ export default function LGonadotropina_Digitalizado(datos) {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0);
         const selloBase64 = canvas.toDataURL('image/png');
-        doc.addImage(selloBase64, 'PNG', xPos, sigY + (sigH - sigH) / 2, sigW, sigH);
+        doc.addImage(selloBase64, 'PNG', xPos, sigY, sigW, sigH);
       };
       addSello(s1, startX);
       addSello(s2, startX + sigW + gap);
     } else if (s1) {
-      // Si solo hay un sello, centrarlo con tamaño fijo
       const canvas = document.createElement('canvas');
       canvas.width = s1.width;
       canvas.height = s1.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = (pageW - sigW) / 2; // Center single stamp
-      doc.addImage(selloBase64, 'PNG', imgX, sigY + (sigH - sigH) / 2, sigW, sigH);
+      const imgX = (pageW - sigW) / 2;
+      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
     } else if (s2) {
-      // Si solo hay el segundo sello, centrarlo con tamaño fijo
       const canvas = document.createElement('canvas');
       canvas.width = s2.width;
       canvas.height = s2.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s2, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = (pageW - sigW) / 2; // Center single stamp
-      doc.addImage(selloBase64, 'PNG', imgX, sigY + (sigH - sigH) / 2, sigW, sigH);
+      const imgX = (pageW - sigW) / 2;
+      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
     }
 
     // === FOOTER ===
@@ -253,8 +279,5 @@ export default function LGonadotropina_Digitalizado(datos) {
       iframe.contentWindow.focus();
       iframe.contentWindow.print();
     };
-
-  })
-
-  
-} 
+  });
+}

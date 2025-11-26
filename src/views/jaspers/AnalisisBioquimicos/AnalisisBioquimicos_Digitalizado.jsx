@@ -4,28 +4,28 @@ import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 
+// --- Configuración Centralizada ---
+const config = {
+  margin: 15,
+  col1X: 15,
+  col2X: 115,
+  col3X: 155,
+  fontSize: {
+    title: 14,
+    header: 9,
+    body: 9,
+  },
+  font: 'helvetica',
+  lineHeight: 7,
+};
+
 // Función para formatear fecha a DD/MM/YYYY
 const toDDMMYYYY = (fecha) => {
   if (!fecha) return '';
-  if (fecha.includes('/')) return fecha; // ya está en formato correcto
+  if (fecha.includes('/')) return fecha;
   const [anio, mes, dia] = fecha.split('-');
   if (!anio || !mes || !dia) return fecha;
   return `${dia}/${mes}/${anio}`;
-};
-
-// Función para formatear fecha larga
-const formatDateToLong = (dateString) => {
-  if (!dateString) return '';
-  try {
-    const date = new Date(`${dateString}T00:00:00`);
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  } catch (error) {
-    return toDDMMYYYY(dateString) || '';
-  }
 };
 
 // Header con datos de ficha, sede y fecha
@@ -45,7 +45,6 @@ const drawHeader = (doc, datos = {}) => {
   doc.text("Cod. AB: " + (datos.codAb || ""), pageW - 80, 20);
   
   // Sede
-  doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 25);
   
   // Fecha de examen
@@ -57,8 +56,8 @@ const drawHeader = (doc, datos = {}) => {
 
   // Bloque de color
   drawColorBox(doc, {
-    color: datos.codigoColor || "#008f39",
-    text: datos.textoColor || "F",
+    color: datos.codigoColor,
+    text: datos.textoColor,
     x: pageW - 30,
     y: 10,
     size: 22,
@@ -68,12 +67,111 @@ const drawHeader = (doc, datos = {}) => {
   });
 };
 
+// Función para dibujar datos del paciente en tabla
+const drawPatientData = (doc, datos = {}) => {
+  const tablaInicioX = 15;
+  const tablaAncho = 180;
+  const filaAltura = 5;
+  let yPos = 46; // +5mm
+
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.setFillColor(196, 196, 196);
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'FD');
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("DATOS PERSONALES", tablaInicioX + 2, yPos + 3.5);
+  yPos += filaAltura;
+
+  const sexo = datos.sexoPaciente === 'F' ? 'FEMENINO' : datos.sexoPaciente === 'M' ? 'MASCULINO' : '';
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.nombres || '', tablaInicioX + 40, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.line(tablaInicioX + 45, yPos, tablaInicioX + 45, yPos + filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("DNI:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(String(datos.dniPaciente || datos.dni || ''), tablaInicioX + 12, yPos + 3.5);
+  doc.setFont("helvetica", "bold");
+  doc.text("Edad:", tablaInicioX + 47, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text((datos.edadPaciente || datos.edad || '') + " AÑOS", tablaInicioX + 58, yPos + 3.5);
+  doc.setFont("helvetica", "bold");
+  doc.text("Sexo:", tablaInicioX + 92, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(sexo, tablaInicioX + 105, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Lugar de Nacimiento:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.lugarNacimientoPaciente || '', tablaInicioX + 38, yPos + 3.5);
+  doc.setFont("helvetica", "bold");
+  doc.text("Estado Civil:", tablaInicioX + 92, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.estadoCivilPaciente || '', tablaInicioX + 115, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Tipo Examen:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.nombreExamen || '', tablaInicioX + 28, yPos + 3.5);
+  doc.setFont("helvetica", "bold");
+  doc.text("Fecha Nac.:", tablaInicioX + 92, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(toDDMMYYYY(datos.fechaNacimientoPaciente || ''), tablaInicioX + 115, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Nivel de Estudio:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.nivelEstudioPaciente || '', tablaInicioX + 32, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Ocupación:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.ocupacionPaciente || '', tablaInicioX + 25, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Cargo:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.cargoPaciente || '', tablaInicioX + 18, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Área:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.areaPaciente || '', tablaInicioX + 15, yPos + 3.5);
+  yPos += filaAltura;
+
+  return yPos;
+};
+
 export default function AnalisisBioquimicos_Digitalizado(datos = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "letter" });
+  const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
   drawHeader(doc, datos);
+  
+  // === DATOS DEL PACIENTE ===
+  drawPatientData(doc, datos);
 
   const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
   const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
@@ -92,89 +190,51 @@ export default function AnalisisBioquimicos_Digitalizado(datos = {}) {
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
-    // ==== TÍTULOS ====
-    let y = 50;
-    doc.setFont("helvetica", "bold").setFontSize(16);
-    doc.text("LABORATORIO CLÍNICO", pageW / 2, y, { align: "center" });
-    y += 8;
-    doc.setFontSize(14);
-    doc.text("ANÁLISIS BIOQUÍMICOS", pageW / 2, y, { align: "center" });
-    const titleW = doc.getTextWidth("ANÁLISIS BIOQUÍMICOS");
-    doc.setLineWidth(0.5)
-       .line((pageW - titleW) / 2, y + 1.5, (pageW + titleW) / 2, y + 1.5);
-    y += 12;
+    // === TÍTULO ===
+    doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
+    doc.text("LABORATORIO CLÍNICO", pageW / 2, 43, { align: "center" }); // +5mm
 
-    // ==== DATOS PERSONALES ====
-    const margin = 26; // Márgenes laterales aumentados
-    const lineHeight = 7;
-    const startX = margin;
-    
-   
-    
-    // Apellidos y Nombres
-    doc.setFontSize(11).setFont('helvetica', 'bold');
-    doc.text("Apellidos y Nombres :", startX, y);
-    doc.setFont('helvetica', 'normal');
-    const nombresX = startX + 50;
-    doc.text(String(datos.nombres || datos.nombresPaciente || '').toUpperCase(), nombresX, y);
-    y += lineHeight;
-    
-    // Fecha
-    doc.setFontSize(11).setFont('helvetica', 'bold');
-    doc.text("Fecha :", startX, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text(formatDateToLong(datos.fechaExamen || datos.fecha || '').toUpperCase(), nombresX, y);
-    y += lineHeight + 3;
-    
-    // Línea divisoria
-    doc.setLineWidth(0.3);
-    doc.line(startX, y, pageW - margin, y);
-    y += lineHeight + 2;
+    let y = 100; // Posición inicial después de la tabla de datos (+5mm)
 
-    // ==== RESULTADOS ====
-    // Título "RESULTADOS:"
-    doc.setFontSize(12).setFont('helvetica', 'bold');
-    doc.text("RESULTADOS:", startX, y);
-    y += lineHeight + 2;
+    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+    doc.text("ANÁLISIS BIOQUÍMICOS", config.margin, y);
+    y += config.lineHeight * 1.5;
 
-    // ==== PRUEBAS (texto ordenado, sin tabla) ====
+    // === ENCABEZADO DE TABLA ===
+    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+    doc.text("PRUEBA", config.col1X, y);
+    doc.text("RESULTADO", config.col2X, y, { align: "center" });
+    doc.text("RANGO REFERENCIAL", config.col3X, y, { align: "left" });
+    y += 3;
+    doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
+    y += config.lineHeight;
+
+    // === PRUEBAS ===
     const tests = [
-      { label: "CREATININA", key: "txtCreatinina", range: "(V.N. 0.8 - 1.4 mg/dl)" },
-      { label: "COLESTEROL TOTAL", key: "txtColesterol", range: "(V.N. < 200 mg/dl)" },
-      { label: "TRIGLICÉRIDOS", key: "txtTrigliseridos", range: "(V.N. < 150 mg/dl)" },
-      { label: "H.D.L. COLESTEROL", key: "txtHdlColesterol", range: "(V.N. 40 - 60 mg/dl)" },
-      { label: "L.D.L. COLESTEROL", key: "txtLdlColesterol", range: "(V.N. < 129 mg/dl)" },
-      { label: "V.L.D.L. COLESTEROL", key: "txtVldlColesterol", range: "(V.N. < 30 mg/dl)" },
+      { label: "CREATININA", key: "txtCreatinina", ref: "0.8 - 1.4 mg/dL" },
+      { label: "COLESTEROL TOTAL", key: "txtColesterol", ref: "< 200 mg/dL" },
+      { label: "TRIGLICÉRIDOS", key: "txtTrigliseridos", ref: "< 150 mg/dL" },
+      { label: "H.D.L. COLESTEROL", key: "txtHdlColesterol", ref: "40 - 60 mg/dL" },
+      { label: "L.D.L. COLESTEROL", key: "txtLdlColesterol", ref: "< 129 mg/dL" },
+      { label: "V.L.D.L. COLESTEROL", key: "txtVldlColesterol", ref: "< 30 mg/dL" },
     ];
 
-    // Posiciones para alinear el texto
-    const labelX = startX;
-    const colonX = startX + 60;
-    const valueX = startX + 70;
-    const rangeX = pageW - margin;
-
-    doc.setFontSize(11);
-
-    // Dibujar pruebas como texto ordenado
-    tests.forEach(({ label, key, range }) => {
+    doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
+    tests.forEach(({ label, key, ref }) => {
       const val = datos[key] != null ? String(datos[key]) : "-";
-      doc.setFont("helvetica", "bold")
-         .text(label, labelX, y, { align: "left" });
-      doc.setFont("helvetica", "normal")
-         .text(":", colonX, y, { align: "left" });
-      doc.text(val, valueX, y, { align: "left" });
-      doc.text(range, rangeX, y, { align: "right" });
-      y += lineHeight;
+      doc.text(label, config.col1X, y);
+      doc.text(val, config.col2X, y, { align: "center" });
+      doc.text(ref, config.col3X, y, { align: "left" });
+      y += config.lineHeight;
     });
 
-    // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos (sin recuadro)
-    const sigW = 53; // Tamaño fijo width
-    const sigH = 23; // Tamaño fijo height
-    const sigY = y + 20; // Espacio después de las pruebas
-    const gap = 16; // Espacio entre sellos (reducido 4mm: 20 - 4 = 16)
+    // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
+    const sigW = 53;
+    const sigH = 23;
+    const sigY = 210;
+    const gap = 16;
     
     if (s1 && s2) {
-      // Si hay dos sellos, centrarlos juntos
       const totalWidth = sigW * 2 + gap;
       const startX = (pageW - totalWidth) / 2;
       
@@ -185,30 +245,28 @@ export default function AnalisisBioquimicos_Digitalizado(datos = {}) {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0);
         const selloBase64 = canvas.toDataURL('image/png');
-        doc.addImage(selloBase64, 'PNG', xPos, sigY + (sigH - sigH) / 2, sigW, sigH);
+        doc.addImage(selloBase64, 'PNG', xPos, sigY, sigW, sigH);
       };
       addSello(s1, startX);
       addSello(s2, startX + sigW + gap);
     } else if (s1) {
-      // Si solo hay un sello, centrarlo con tamaño fijo
       const canvas = document.createElement('canvas');
       canvas.width = s1.width;
       canvas.height = s1.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = (pageW - sigW) / 2; // Center single stamp
-      doc.addImage(selloBase64, 'PNG', imgX, sigY + (sigH - sigH) / 2, sigW, sigH);
+      const imgX = (pageW - sigW) / 2;
+      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
     } else if (s2) {
-      // Si solo hay el segundo sello, centrarlo con tamaño fijo
       const canvas = document.createElement('canvas');
       canvas.width = s2.width;
       canvas.height = s2.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s2, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = (pageW - sigW) / 2; // Center single stamp
-      doc.addImage(selloBase64, 'PNG', imgX, sigY + (sigH - sigH) / 2, sigW, sigH);
+      const imgX = (pageW - sigW) / 2;
+      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
     }
 
     // === FOOTER ===
