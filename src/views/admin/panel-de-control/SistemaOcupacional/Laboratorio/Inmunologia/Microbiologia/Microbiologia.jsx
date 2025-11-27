@@ -5,21 +5,40 @@ import { useForm } from '../../../../../../hooks/useForm';
 import { getToday } from '../../../../../../utils/helpers';
 import { PrintHojaR, SubmitDataService, VerifyTR } from './controller';
 import {
+  InputCheckbox,
+  InputsRadioGroup,
   InputTextOneLine,
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
+import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 
 const tabla = 'microbiologia';
 
 export default function Microbiologia() {
-  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+  const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
   const initialFormState = {
     norden: '',
     fecha: today,
-    nombres: '',
-    edad: '',
+    nombreExamen: "",
+
+    dni: "",
+    nombres: "",
+    apellidos: "",
+    fechaNacimiento: "",
+    lugarNacimiento: "",
+    edad: "",
+    sexo: "",
+    estadoCivil: "",
+    nivelEstudios: "",
+
+    // Datos Laborales
+    empresa: "",
+    contrata: "",
+    ocupacion: "",
+    cargoDesempenar: "",
+
     examenDirecto: false,
     bk1: '',
     bk1Radio: '',
@@ -27,38 +46,26 @@ export default function Microbiologia() {
     bk2Radio: '',
     koh: '',
     kohRadio: '',
-    medico: ''
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
   const {
     form,
     setForm,
     handleChange,
-    handleClear,
     handleClearnotO,
+    handleRadioButton,
+    handleChangeNumber,
+    handleChangeSimple,
+    handleClear,
     handlePrintDefault,
   } = useForm(initialFormState);
 
-  const handleExamenDirectoChange = (checked) => {
-    setForm(prev => {
-      const newState = { ...prev, examenDirecto: checked };
-      if (checked) {
-        // Examen Directo is checked, so BK1 and BK2 fields are disabled and should be cleared
-        newState.bk1 = '';
-        newState.bk1Radio = '';
-        newState.bk2 = '';
-        newState.bk2Radio = '';
-      } else {
-        // Examen Directo is unchecked, so KOH fields are disabled and should be cleared
-        newState.koh = '';
-        newState.kohRadio = '';
-      }
-      return newState;
-    });
-  };
-
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, token, userlogued, handleClear, tabla);
   };
 
   const handleSearch = (e) => {
@@ -70,7 +77,7 @@ export default function Microbiologia() {
 
   const handlePrint = () => {
     handlePrintDefault(() => {
-      PrintHojaR(form.norden, token, tabla, datosFooter);
+      PrintHojaR(form.norden, token, tabla);
     });
   };
 
@@ -102,196 +109,263 @@ export default function Microbiologia() {
   const kohOptions = ["NEGATIVO", "POSITIVO", "N/A"];
 
   return (
-    <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
-      <h2 className="text-2xl font-bold text-center mb-6">MICROBIOLOGÍA</h2>
-      <form className="space-y-6">
-        <SectionFieldset
-          legend="Información del Examen"
-          className="grid grid-cols-1 lg:grid-cols-2 gap-4"
-        >
+    <form className="p-4 space-y-3">
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4">
+        <InputTextOneLine
+          label="N° Orden"
+          name="norden"
+          value={form.norden}
+          onChange={handleChangeNumber}
+          onKeyUp={handleSearch}
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Fecha"
+          name="fecha"
+          type="date"
+          value={form.fecha}
+          onChange={handleChangeSimple}
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Nombre Examen"
+          name="nombreExamen"
+          value={form.nombreExamen}
+          disabled
+          labelWidth="120px"
+        />
+      </SectionFieldset>
+      <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+        <InputTextOneLine
+          label="Nombres"
+          name="nombres"
+          value={form.nombres}
+          disabled
+          labelWidth="120px"
+        />
+        <div className="grid md:grid-cols-2 gap-3">
           <InputTextOneLine
-            label="Nro Ficha"
-            name="norden"
-            value={form.norden}
-            onChange={handleChange}
-            onKeyUp={handleSearch}
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Fecha"
-            name="fecha"
-            type="date"
-            value={form.fecha}
-            onChange={handleChange}
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Nombres"
-            name="nombres"
-            value={form.nombres}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Edad"
+            label="Edad (Años)"
             name="edad"
             value={form.edad}
             disabled
             labelWidth="120px"
-            inputClassName="w-24"
           />
-        </SectionFieldset>
-
-        <SectionFieldset legend="Configuración">
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={form.examenDirecto}
-              onChange={(e) => handleExamenDirectoChange(e.target.checked)}
-            />
-            <span className="font-semibold">Examen Directo</span>
-          </label>
-        </SectionFieldset>
-
-        <div className="text-center font-semibold text-lg mb-4">MUESTRA: ESPUTO</div>
-
-        <SectionFieldset legend="Pruebas" className="space-y-4">
-          <div className="grid grid-cols-12 gap-2 items-center">
-            <div className="col-span-4 font-bold flex items-center">PRUEBA</div>
-            <div className="col-span-2 font-bold flex items-center">RESULTADO</div>
-            <div className="col-span-6 font-bold flex items-center">OPCIONES</div>
-
-            {/* BK 1 */}
-            <div className="col-span-4 flex items-center">
-              Examen de BK - BACILOSCOPIA 1ª:
-            </div>
-            <div className="col-span-2">
-              <InputTextOneLine
-                name="bk1"
-                value={form.bk1}
-                onChange={handleChange}
-                disabled={form.examenDirecto}
-                inputClassName="w-full"
-              />
-            </div>
-            <div className="col-span-6 flex flex-wrap gap-3">
-              {bkOptions.map(opt => (
-                <label key={opt} className="flex items-center gap-2 text-xs md:text-sm">
-                  <input
-                    type="checkbox"
-                    checked={form.bk1Radio === opt}
-                    disabled={form.examenDirecto}
-                    onChange={() => handleBk1RadioChange(opt)}
-                  />
-                  {opt}
-                </label>
-              ))}
-            </div>
-
-            {/* BK 2 */}
-            <div className="col-span-4 flex items-center">
-              Examen de BK - BACILOSCOPIA 2ª:
-            </div>
-            <div className="col-span-2">
-              <InputTextOneLine
-                name="bk2"
-                value={form.bk2}
-                onChange={handleChange}
-                disabled={form.examenDirecto}
-                inputClassName="w-full"
-              />
-            </div>
-            <div className="col-span-6 flex flex-wrap gap-3">
-              {bkOptions.map(opt => (
-                <label key={opt} className="flex items-center gap-2 text-xs md:text-sm">
-                  <input
-                    type="checkbox"
-                    checked={form.bk2Radio === opt}
-                    disabled={form.examenDirecto}
-                    onChange={() => handleBk2RadioChange(opt)}
-                  />
-                  {opt}
-                </label>
-              ))}
-            </div>
-
-            {/* KOH */}
-            <div className="col-span-4 flex items-center">KOH:</div>
-            <div className="col-span-2">
-              <InputTextOneLine
-                name="koh"
-                value={form.koh}
-                onChange={handleChange}
-                disabled={!form.examenDirecto}
-                inputClassName="w-full"
-              />
-            </div>
-            <div className="col-span-6 flex flex-wrap gap-3">
-              {kohOptions.map(opt => (
-                <label key={opt} className="flex items-center gap-2 text-xs md:text-sm">
-                  <input
-                    type="checkbox"
-                    checked={form.kohRadio === opt}
-                    disabled={!form.examenDirecto}
-                    onChange={() => handleKohRadioChange(opt)}
-                  />
-                  {opt}
-                </label>
-              ))}
-            </div>
-          </div>
-        </SectionFieldset>
-
-        <SectionFieldset legend="Asignar Médico">
-          <select
+          <InputTextOneLine
+            label="Sexo"
+            name="sexo"
+            value={form.sexo}
             disabled
-            className="w-full border rounded px-3 py-2 bg-gray-100 text-sm"
-            name="medico"
-            value={form.medico}
-            onChange={handleChange}
+            labelWidth="120px"
+          />
+        </div>
+        <InputTextOneLine
+          label="DNI"
+          name="dni"
+          value={form.dni}
+          labelWidth="120px"
+          disabled
+        />
+        <InputTextOneLine
+          label="Fecha Nacimiento"
+          name="fechaNacimiento"
+          value={form.fechaNacimiento}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Lugar Nacimiento"
+          name="lugarNacimiento"
+          value={form.lugarNacimiento}
+          disabled
+          labelWidth="120px"
+        />
+        <div className="grid md:grid-cols-2 gap-3">
+          <InputTextOneLine
+            label="Estado Civil"
+            name="estadoCivil"
+            value={form.estadoCivil}
+            disabled
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Nivel Estudios"
+            name="nivelEstudios"
+            value={form.nivelEstudios}
+            disabled
+            labelWidth="120px"
+          />
+        </div>
+      </SectionFieldset>
+      <SectionFieldset legend="Datos Laborales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <InputTextOneLine
+          label="Empresa"
+          name="empresa"
+          value={form.empresa}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Contrata"
+          name="contrata"
+          value={form.contrata}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Ocupación"
+          name="ocupacion"
+          value={form.ocupacion}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Cargo Desempeñar"
+          name="cargoDesempenar"
+          value={form.cargoDesempenar}
+          disabled
+          labelWidth="120px"
+        />
+      </SectionFieldset>
+
+      <SectionFieldset legend="Configuración">
+        <InputCheckbox
+          label="Examen Directo"
+          checked={form.examenDirecto}
+          name="examenDirecto"
+          onChange={(e) => {
+            const checked = e.target.checked;
+            setForm(prev => {
+              const newState = { ...prev, examenDirecto: checked };
+              if (checked) {
+                newState.bk1 = '';
+                newState.bk2 = '';
+              } else {
+                newState.koh = '';
+              }
+              return newState;
+            });
+          }}
+        />
+
+      </SectionFieldset>
+
+      <div className="text-center font-semibold text-lg my-4">MUESTRA: ESPUTO</div>
+      <SectionFieldset legend="Pruebas" className="grid grid-cols-12 gap-2 items-center">
+        <InputTextOneLine
+          label='Examen de BK - BACILOSCOPIA 1ª'
+          labelWidth='180px'
+          name="bk1"
+          value={form.bk1}
+          onChange={handleChange}
+          className="col-span-6"
+          disabled={form.examenDirecto}
+        />
+        <InputsRadioGroup
+          name="bk1"
+          value={form.bk1}
+          options={[
+            { label: 'BAAR - NEGATIVO', value: 'BAAR - NEGATIVO' },
+            { label: 'BAAR - POSITIVO', value: 'BAAR - POSITIVO' },
+            { label: 'N/A', value: 'N/A' }
+          ]}
+          onChange={handleRadioButton}
+          disabled={form.examenDirecto}
+          className='col-span-6'
+        />
+        {/* BK 2 */}
+        <InputTextOneLine
+          label='Examen de BK - BACILOSCOPIA 2ª'
+          labelWidth='180px'
+          name="bk2"
+          value={form.bk2}
+          className="col-span-6"
+          onChange={handleChange}
+          disabled={form.examenDirecto}
+        />
+        <InputsRadioGroup
+          name="bk2"
+          value={form.bk2}
+          options={[
+            { label: 'BAAR - NEGATIVO', value: 'BAAR - NEGATIVO' },
+            { label: 'BAAR - POSITIVO', value: 'BAAR - POSITIVO' },
+            { label: 'N/A', value: 'N/A' }
+          ]}
+          onChange={handleRadioButton}
+          disabled={form.examenDirecto}
+          className='col-span-6'
+        />
+
+        {/* KOH */}
+        <InputTextOneLine
+          label='KOH'
+          labelWidth='180px'
+          className="col-span-6"
+          name="koh"
+          value={form.koh}
+          onChange={handleChange}
+          disabled={!form.examenDirecto}
+        />
+        <InputsRadioGroup
+          name="koh"
+          value={form.koh}
+          options={[
+            { label: 'NEGATIVO', value: 'NEGATIVO' },
+            { label: 'POSITIVO', value: 'POSITIVO' },
+            { label: 'N/A', value: 'N/A' }
+          ]}
+          onChange={handleRadioButton}
+          disabled={!form.examenDirecto}
+          className='col-span-6'
+        />
+      </SectionFieldset>
+
+      <SectionFieldset legend="Especialista">
+        <EmpleadoComboBox
+          value={form.nombre_medico}
+          form={form}
+          label='Especialista que Certifica'
+          onChange={handleChangeSimple}
+        />
+      </SectionFieldset>
+
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={handleSave}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
           >
-            <option value="">-- Seleccionar --</option>
-          </select>
-        </SectionFieldset>
+            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+          </button>
+          <button
+            type="button"
+            onClick={handleClear}
+            className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2"
+          >
+            <FontAwesomeIcon icon={faBroom} /> Limpiar
+          </button>
+        </div>
 
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex flex-wrap gap-3">
+        <div className="flex flex-col items-end">
+          <span className="font-bold italic mb-2">Imprimir</span>
+          <div className="flex items-center gap-2">
+            <InputTextOneLine
+              name="norden"
+              value={form.norden}
+              onChange={handleChange}
+              inputClassName="w-24"
+            />
             <button
               type="button"
-              onClick={handleSave}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
+              onClick={handlePrint}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
             >
-              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+              <FontAwesomeIcon icon={faPrint} />
             </button>
-            <button
-              type="button"
-              onClick={handleClear}
-              className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faBroom} /> Limpiar
-            </button>
-          </div>
-
-          <div className="flex flex-col items-end">
-            <span className="font-bold italic mb-2">Imprimir</span>
-            <div className="flex items-center gap-2">
-              <InputTextOneLine
-                name="norden"
-                value={form.norden}
-                onChange={handleChange}
-                inputClassName="w-24"
-              />
-              <button
-                type="button"
-                onClick={handlePrint}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faPrint} />
-              </button>
-            </div>
           </div>
         </div>
-      </form>
-    </div>
+      </div>
+    </form>
   );
 }

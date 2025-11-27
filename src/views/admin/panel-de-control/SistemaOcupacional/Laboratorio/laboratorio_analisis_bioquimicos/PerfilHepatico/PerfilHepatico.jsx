@@ -72,9 +72,9 @@ export default function PerfilHepatico() {
     form,
     setForm,
     handleChange,
+    handleChangeNumberDecimals,
     handleChangeSimple,
     handleFocusNext,
-    handleChangeNumberDecimals,
     handleClearnotO,
     handleClear,
     handlePrintDefault,
@@ -104,7 +104,7 @@ export default function PerfilHepatico() {
           label="N° Orden"
           name="norden"
           value={form.norden}
-          onChange={handleChange}
+          onChange={handleChangeNumberDecimals}
           onKeyUp={handleSearch}
           labelWidth="120px"
         />
