@@ -74,7 +74,7 @@ export default function AcidoUrico() {
   };
 
   return (
-    <form className="space-y-3 py-4">
+    <form className="space-y-3 p-4">
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <InputTextOneLine
           label="N° Orden"

@@ -60,6 +60,7 @@ export default function AnalisisBioquimicos() {
     setForm,
     handleChange,
     handleChangeNumberDecimals,
+    handleFocusNext,
     handleChangeSimple,
     handleClearnotO,
     handleClear,
@@ -131,7 +132,7 @@ export default function AnalisisBioquimicos() {
   }, [form.colesterolTotal, form.trigliceridos]);
 
   return (
-    <div className="py-4 grid xl:grid-cols-2 gap-x-4 gap-y-3">
+    <div className="p-4 grid xl:grid-cols-2 gap-x-4 gap-y-3">
       <div className="space-y-3">
         <SectionFieldset legend="Información del Examen" className="grid md:grid-cols-2 gap-3 col-span-2">
           <InputTextOneLine
@@ -153,7 +154,7 @@ export default function AnalisisBioquimicos() {
             name="nombreExamen"
             value={form.nombreExamen}
             className='col-span-2'
-            disabled
+            onChange={handleChangeNumberDecimals}
           />
 
         </SectionFieldset>
@@ -255,7 +256,8 @@ export default function AnalisisBioquimicos() {
               name="colesterolTotal"
               value={form.colesterolTotal}
               labelWidth="120px"
-              onChange={(e) => handleChangeNumberDecimals(e, 1)}
+              onChange={handleChange}
+              onKeyUp={handleFocusNext}
               className='w-[75%]'
             />
             <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 200 mg/dl)"}</span>
@@ -266,7 +268,8 @@ export default function AnalisisBioquimicos() {
               name="trigliceridos"
               value={form.trigliceridos}
               labelWidth="120px"
-              onChange={(e) => handleChangeNumberDecimals(e, 1)}
+              onChange={handleChange}
+              onKeyUp={handleFocusNext}
               className='w-[75%]'
             />
             <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 150 mg/dl)"}</span>
@@ -277,7 +280,8 @@ export default function AnalisisBioquimicos() {
               name="hdl"
               value={form.hdl}
               labelWidth="120px"
-              disabled
+              onChange={handleChange}
+              onKeyUp={handleFocusNext}
               className='w-[75%]'
             />
             <span className="text-gray-500 text-[10px] font-medium">(Valor Normal 40 - 60 mg/dl)</span>
@@ -288,7 +292,8 @@ export default function AnalisisBioquimicos() {
               name="ldl"
               value={form.ldl}
               labelWidth="120px"
-              disabled
+              onChange={handleChange}
+              onKeyUp={handleFocusNext}
               className='w-[75%]'
             />
             <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 129 mg/dl)"}</span>
@@ -299,8 +304,8 @@ export default function AnalisisBioquimicos() {
               name="vldl"
               value={form.vldl}
               labelWidth="120px"
-              disabled
-                className='w-[75%]'
+              onChange={handleChangeNumberDecimals}
+              className='w-[75%]'
             />
             <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 30 mg/dl)"}</span>
           </div>

@@ -30,34 +30,6 @@ export default function AnalisisBioquimicosSubTabSelector({ tieneVista }) {
       label: "Perfil Hepático",
       component: PerfilHepatico
     },
-    //     {
-    //       label: 'Análisis Bioquímicos',
-    //       icon: faFlask,
-    //       vista: 'Analisis Bioquimico',
-    //       permiso: 'Acceso Analisis Bioquimicos',
-    //       component: <AnalisisBioquimicos />
-    //     },
-    //     {
-    //       label: 'Perfil Renal',
-    //       icon: faFilter,
-    //       vista: 'Analisis Bioquimico',
-    //       permiso: 'Acceso Perfil Renal',
-    //       component: <PerfilRenal />
-    //     },
-    //     {
-    //       label: 'Ácido Úrico',
-    //       icon: faTint,
-    //       vista: 'Analisis Bioquimico',
-    //       permiso: 'Acceso Acido Urico',
-    //       component: <AcidoUrico />
-    //     },
-    //     {
-    //       label: 'Perfil Hepático',
-    //       icon: faLungs,
-    //       vista: 'Analisis Bioquimico',
-    //       permiso: 'Acceso Perfil Hepatico',
-    //       component: <PerfilHepatico />
-    //     }
   ];
   return (
     <SubTabSelector
