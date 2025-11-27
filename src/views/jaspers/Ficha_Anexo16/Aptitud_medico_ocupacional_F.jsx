@@ -23,8 +23,8 @@ export default function Aptitud_Agroindustrial(data = {}) {
     fechaExamen: formatearFechaCorta(data.fechaDesde ?? ""),
     // Datos de color
     color: data.color || 1,
-    codigoColor: data.codigoColor || "#008f39",
-    textoColor: data.textoColor || "F",
+    codigoColor: data.codigoColor || "",
+    textoColor: data.textoColor || "",
     // Datos adicionales para header
     numeroFicha: String(data.norden ?? ""), //revisar - usando norden como numeroFicha
     sede: data.sede || data.nombreSede || "",

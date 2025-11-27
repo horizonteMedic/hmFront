@@ -499,18 +499,6 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
   });
   yPos += filaAltura * sedimentoItems.length;
 
-  // Línea resumen de sedimento
-  const resumenSedimento = [];
-  if (data.txtHematiesSu && data.txtHematiesSu !== "N/A") resumenSedimento.push(`Hematíes N° ${data.txtHematiesSu} x campo`);
-  if (data.txtCristalesSu && data.txtCristalesSu !== "N/A") resumenSedimento.push(data.txtCristalesSu);
-  if (data.txtOtrosSu && data.txtOtrosSu !== "N/A") resumenSedimento.push(data.txtOtrosSu);
-  
-  if (resumenSedimento.length > 0) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(resumenSedimento.join(" "), tablaInicioX + 2, yPos + 3.5);
-    yPos += filaAltura;
-  }
-
   // === SECCIÓN 7: DROGAS ===
   yPos = dibujarHeaderSeccion("DROGAS", yPos, filaAltura);
 
@@ -553,28 +541,44 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
   // === SECCIÓN 9: FIRMAS ===
   const alturaFilaFirmas = 30;
   
-  // Dibujar fila de firmas (2 columnas)
+  // Dibujar fila de firmas (sin división)
   doc.setLineWidth(0.2);
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaFilaFirmas);
-  doc.line(tablaInicioX + mitadTabla, yPos, tablaInicioX + mitadTabla, yPos + alturaFilaFirmas);
 
-  // Columna izquierda: Firma 1
-  const centroColumna1X = tablaInicioX + mitadTabla / 2;
+  // Obtener firmas disponibles
   const sello1 = data.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  if (sello1 && sello1.url && sello1.url !== "Sin registro") {
+  const sello2 = data.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
+  
+  const tieneFirma1 = sello1 && sello1.url && sello1.url !== "Sin registro";
+  const tieneFirma2 = sello2 && sello2.url && sello2.url !== "Sin registro";
+  
+  const firmasCentro = tablaInicioX + tablaAncho / 2;
+  const firmasIzq = tablaInicioX + tablaAncho / 4;
+  const firmasDer = tablaInicioX + (3 * tablaAncho / 4);
+
+  if (tieneFirma1 && tieneFirma2) {
+    // 2 firmas: una izquierda, otra derecha
     try {
-      doc.addImage(sello1.url, 'PNG', centroColumna1X - 22, yPos + 5, 45, 20);
+      doc.addImage(sello1.url, 'PNG', firmasIzq - 22, yPos + 5, 45, 20);
     } catch (error) {
       console.log("Error cargando firma 1:", error);
     }
-  }
-
-  // Columna derecha: Firma 2
-  const centroColumna2X = tablaInicioX + mitadTabla + mitadTabla / 2;
-  const sello2 = data.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
-  if (sello2 && sello2.url && sello2.url !== "Sin registro") {
     try {
-      doc.addImage(sello2.url, 'PNG', centroColumna2X - 22, yPos + 5, 45, 20);
+      doc.addImage(sello2.url, 'PNG', firmasDer - 22, yPos + 5, 45, 20);
+    } catch (error) {
+      console.log("Error cargando firma 2:", error);
+    }
+  } else if (tieneFirma1) {
+    // Solo firma 1: centrada
+    try {
+      doc.addImage(sello1.url, 'PNG', firmasCentro - 22, yPos + 5, 45, 20);
+    } catch (error) {
+      console.log("Error cargando firma 1:", error);
+    }
+  } else if (tieneFirma2) {
+    // Solo firma 2: centrada
+    try {
+      doc.addImage(sello2.url, 'PNG', firmasCentro - 22, yPos + 5, 45, 20);
     } catch (error) {
       console.log("Error cargando firma 2:", error);
     }

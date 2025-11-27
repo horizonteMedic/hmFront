@@ -89,8 +89,8 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
     fechaExamen: formatearFechaCorta(data.fechaExamen_f_examen ?? ""),
     // Datos de color
     color: data.color || 1,
-    codigoColor: data.codigoColor || "#008f39",
-    textoColor: data.textoColor || "F",
+    codigoColor: data.codigoColor || "",
+    textoColor: data.textoColor || "",
     // Datos adicionales para header
     numeroFicha: String(data.norden ?? ""),
     sede: data.sede || data.nombreSede || "",
