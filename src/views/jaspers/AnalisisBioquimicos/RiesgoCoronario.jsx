@@ -1,4 +1,4 @@
-// src/views/jaspers/Toxicologia/Panel4d_Digitalizado.jsx
+// src/views/jaspers/AnalisisBioquimicos/RiesgoCoronario.jsx
 import jsPDF from "jspdf";
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
@@ -27,36 +27,13 @@ const drawUnderlinedTitle = (doc, text, y) => {
   doc.text(text, pageW / 2, y, { align: "center" });
 };
 
-const drawResultRow = (doc, y, label, result, units) => {
-  doc.setFont(config.font, 'normal').setFontSize(config.fontSize.body);
-  doc.text(label || "", config.col1X, y);
-  doc.text(String(result || ""), config.col2X, y, { align: "center" });
-  doc.text(String(units || ""), config.col3X, y, { align: "center" });
-  return y + config.lineHeight;
-};
-
 // Función para formatear fecha a DD/MM/YYYY
 const toDDMMYYYY = (fecha) => {
   if (!fecha) return '';
-  if (fecha.includes('/')) return fecha; // ya está en formato correcto
+  if (fecha.includes('/')) return fecha;
   const [anio, mes, dia] = fecha.split('-');
   if (!anio || !mes || !dia) return fecha;
   return `${dia}/${mes}/${anio}`;
-};
-
-// Función para formatear fecha larga
-const formatDateToLong = (dateString) => {
-  if (!dateString) return '';
-  try {
-    const date = new Date(`${dateString}T00:00:00`);
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  } catch (error) {
-    return toDDMMYYYY(dateString) || '';
-  }
 };
 
 // Header con datos de ficha, sede y fecha
@@ -202,7 +179,7 @@ const drawPatientData = (doc, datos = {}) => {
 
 // --- Componente Principal ---
 
-export default function Panel4d_Digitalizado(datos = {}) {
+export default function RiesgoCoronario(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -210,7 +187,7 @@ export default function Panel4d_Digitalizado(datos = {}) {
   drawHeader(doc, datos);
   
   // === TÍTULO ===
-  drawUnderlinedTitle(doc, "TOXICOLÓGICO", 38);
+  drawUnderlinedTitle(doc, "BIOQUIMICA", 38);
   
   // === DATOS DEL PACIENTE ===
   drawPatientData(doc, datos);
@@ -235,60 +212,74 @@ export default function Panel4d_Digitalizado(datos = {}) {
     // === CUERPO ===
     let y = 95;
 
-    // Muestra y Método
+    // Muestra
     doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
     doc.text("MUESTRA :", config.margin, y);
     doc.setFont(config.font, "normal");
-    doc.text(datos.muestra || "ORINA", config.margin + 30, y);
-    y += config.lineHeight;
-
-    doc.setFont(config.font, "bold");
-    doc.text("MÉTODO :", config.margin, y);
-    doc.setFont(config.font, "normal");
-    doc.text(datos.txtMetodo || "", config.margin + 30, y);
+    doc.text(datos.muestra || "SUERO", config.margin + 30, y);
     y += config.lineHeight * 2;
 
-    // Encabezado de tabla
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
-    doc.text("PRUEBA CUALITATIVO", config.col1X, y);
-    doc.text("RESULTADOS", config.col2X, y, { align: 'center' });
-    doc.text("UNIDADES", config.col3X, y, { align: 'center' });
-    y += 3;
+    // === SECCIÓN: RIESGO CORONARIO ===
+    doc.setFont(config.font, "bold").setFontSize(10);
+    doc.text("RIESGO CORONARIO", config.margin, y);
+    y += config.lineHeight;
 
-    // Línea
+    // === TABLA DE RESULTADOS ===
+    const colPrueba = config.margin;
+    const colResultado = config.margin + 50;
+    const colValores = config.margin + 90;
+    const colUnidades = config.margin + 160;
+
+    // Header de la tabla
+    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+    doc.text("PRUEBA", colPrueba, y);
+    doc.text("RESULTADO", colResultado, y);
+    doc.text("VALORES NORMALES", colValores, y);
+    doc.text("UNIDADES", colUnidades, y);
+    y += 2;
+
+    // Línea debajo del header
     doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
     y += config.lineHeight;
 
-    // Título del Panel
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
-    doc.text("DROGAS PANEL 4D", config.col1X, y);
-    y += config.lineHeight;
+    // Fila de datos
+    doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
+    doc.text("Riesgo Coronario", colPrueba, y);
+    doc.text("(Método: " + (datos.txtMetodo || "SN-CAL") + ")", colPrueba, y + 4);
 
-    // Datos
-    const tests = [
-      { label: "COCAINA", key: "txtCocaina" },
-      { label: "MARIHUANA", key: "txtMarihuana" },
-      { label: "OPIACEOS", key: "txtOpiacios" },
-      { label: "METHANFETAMINA", key: "txtMethanfetaminas" },
-    ];
+    // Resultado con elipse
+    doc.setFont(config.font, "bold").setFontSize(10);
+    const resultadoX = colResultado + 10;
+    const resultado = String(datos.txtRiesgoCoronario || "");
+    doc.text(resultado, resultadoX, y + 2);
     
-    tests.forEach(({ label, key }) => {
-      const value = datos[key] != null ? datos[key] : "NEGATIVO";
-      y = drawResultRow(doc, y, label, value, "S/U");
-    });
+    if (resultado) {
+      const resultadoWidth = doc.getTextWidth(resultado);
+      doc.setDrawColor(0, 0, 0);
+      doc.setLineWidth(0.3);
+      doc.ellipse(resultadoX + resultadoWidth / 2, y + 1, resultadoWidth / 2 + 3, 4);
+    }
+
+    // Valores normales
+    doc.setFont(config.font, "normal").setFontSize(8);
+    doc.text("Nivel bajo 3.3-4.3", colValores, y);
+    doc.text("Nivel promedio 4.4-7.1", colValores, y + 4);
+    doc.text("Nivel moderado 7.2-11.0", colValores, y + 8);
+    doc.text("Riesgo alto >11.0", colValores, y + 12);
+
+    // Unidades
+    doc.text("S/U", colUnidades, y + 4);
 
     // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
-    const sigW = 53; // Tamaño fijo width
-    const sigH = 23; // Tamaño fijo height
+    const sigW = 53;
+    const sigH = 23;
     const sigY = 210;
-    const gap = 16; // Espacio entre sellos (reducido 4mm: 20 - 4 = 16)
+    const gap = 16;
     
     if (s1 && s2) {
-      // Si hay dos sellos, centrarlos juntos
       const totalWidth = sigW * 2 + gap;
       const startX = (pageW - totalWidth) / 2;
       
-      // Sello 1 (izquierda) - Tamaño fijo
       const canvas1 = document.createElement('canvas');
       canvas1.width = s1.width;
       canvas1.height = s1.height;
@@ -296,12 +287,8 @@ export default function Panel4d_Digitalizado(datos = {}) {
       ctx1.drawImage(s1, 0, 0);
       const selloBase64_1 = canvas1.toDataURL('image/png');
       
-      // Usar tamaño fijo para ambos sellos
-      const imgX1 = startX;
-      const imgY1 = sigY;
-      doc.addImage(selloBase64_1, 'PNG', imgX1, imgY1, sigW, sigH);
+      doc.addImage(selloBase64_1, 'PNG', startX, sigY, sigW, sigH);
       
-      // Sello 2 (derecha) - Mismo tamaño fijo
       const canvas2 = document.createElement('canvas');
       canvas2.width = s2.width;
       canvas2.height = s2.height;
@@ -309,12 +296,8 @@ export default function Panel4d_Digitalizado(datos = {}) {
       ctx2.drawImage(s2, 0, 0);
       const selloBase64_2 = canvas2.toDataURL('image/png');
       
-      const sigX2 = startX + sigW + gap;
-      const imgX2 = sigX2;
-      const imgY2 = sigY;
-      doc.addImage(selloBase64_2, 'PNG', imgX2, imgY2, sigW, sigH);
+      doc.addImage(selloBase64_2, 'PNG', startX + sigW + gap, sigY, sigW, sigH);
     } else if (s1) {
-      // Si solo hay un sello, centrarlo con tamaño fijo
       const canvas = document.createElement('canvas');
       canvas.width = s1.width;
       canvas.height = s1.height;
@@ -322,12 +305,8 @@ export default function Panel4d_Digitalizado(datos = {}) {
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
       
-      const sigX = (pageW - sigW) / 2;
-      const imgX = sigX;
-      const imgY = sigY;
-      doc.addImage(selloBase64, 'PNG', imgX, imgY, sigW, sigH);
+      doc.addImage(selloBase64, 'PNG', (pageW - sigW) / 2, sigY, sigW, sigH);
     } else if (s2) {
-      // Si solo hay el segundo sello, centrarlo con tamaño fijo
       const canvas = document.createElement('canvas');
       canvas.width = s2.width;
       canvas.height = s2.height;
@@ -335,10 +314,7 @@ export default function Panel4d_Digitalizado(datos = {}) {
       ctx.drawImage(s2, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
       
-      const sigX = (pageW - sigW) / 2;
-      const imgX = sigX;
-      const imgY = sigY;
-      doc.addImage(selloBase64, 'PNG', imgX, imgY, sigW, sigH);
+      doc.addImage(selloBase64, 'PNG', (pageW - sigW) / 2, sigY, sigW, sigH);
     }
 
     // === FOOTER ===
@@ -357,7 +333,6 @@ export default function Panel4d_Digitalizado(datos = {}) {
     };
   }).catch(error => {
     console.error("Error al cargar imágenes:", error);
-    // Continuar con la impresión aunque falle la carga de imágenes
     footerTR(doc, { footerOffsetY: 8 });
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
