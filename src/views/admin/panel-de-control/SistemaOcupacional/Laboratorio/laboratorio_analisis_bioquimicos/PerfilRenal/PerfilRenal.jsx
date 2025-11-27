@@ -52,6 +52,7 @@ export default function PerfilRenal() {
     setForm,
     handleChange,
     handleClearnotO,
+    handleFocusNext,
     handleChangeSimple,
     handleClear,
     handlePrintDefault,
@@ -74,7 +75,7 @@ export default function PerfilRenal() {
     });
   };
   return (
-    <form className="py-4 space-y-3">
+    <form className="p-4 space-y-3">
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <InputTextOneLine
           label="N° Orden"
@@ -199,30 +200,51 @@ export default function PerfilRenal() {
       </div>
 
       <SectionFieldset legend="Pruebas y Resultados" className="space-y-3">
-        <InputTextOneLine
-          label='Creatinina Sérica'
-          name="creatinina"
-          value={form.creatinina}
-          onChange={handleChange}
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label='Urea Sérica'
-          name="urea"
-          value={form.urea}
-          onChange={handleChange}
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label='Acido Urico Sérico'
-          name="acidoUrico"
-          value={form.acidoUrico}
-          onChange={handleChange}
-          labelWidth="120px"
-        />
+
+        <div className="flex items-center gap-4">
+          <InputTextOneLine
+            label='Creatinina Sérica'
+            name="creatinina"
+            value={form.creatinina}
+            onChange={handleChange}
+            onKeyUp={handleFocusNext}
+            labelWidth="120px"
+            className='w-[90%]'
+          />
+          <div className='flex flex-col items-start text-gray-500 text-[10px] font-medium'>
+            <span>{"Adulto: 0.8 - 1.4 mg/dl"}</span>
+            <span>{"Niño: 0.24 - 0.84 mg/dl"}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          <InputTextOneLine
+            label='Urea Sérica'
+            name="urea"
+            value={form.urea}
+            onChange={handleChange}
+            onKeyUp={handleFocusNext}
+            labelWidth="120px"
+            className='w-[90%]'
+          />
+          <span className="text-gray-500 text-[10px] font-medium">{"10 - 50 mg/dl"}</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <InputTextOneLine
+            label='Acido Urico Sérico'
+            name="acidoUrico"
+            value={form.acidoUrico}
+            onChange={handleChange}
+            labelWidth="120px"
+            className='w-[90%]'
+          />
+          <div className='flex flex-col items-start text-gray-500 text-[10px] font-medium'>
+            <span>{"Mujeres: 2.5 - 6.8 mg/dl"}</span>
+            <span>{"Hombres: 3.6 - 7.7 mg/dl"}</span>
+          </div>
+        </div>
       </SectionFieldset>
 
-      <SectionFieldset legend="Asignación de Médico" className="space-y-4">
+      <SectionFieldset legend="Asignación de Médico">
         <EmpleadoComboBox
           value={form.nombre_medico}
           label="Especialista"

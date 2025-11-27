@@ -33,8 +33,8 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
     fechaExamen: formatearFechaCorta(data.fechaExamen_f_examen ?? ""),
     // Datos de color
     color: data.color || 1,
-    codigoColor: data.codigoColor || "#008f39",
-    textoColor: data.textoColor || "F",
+    codigoColor: data.codigoColor || "",
+    textoColor: data.textoColor || "",
     // Datos adicionales para header
     numeroFicha: String(data.norden ?? ""), //revisar - podría ser codigoCertificado_cod_certificado
     sede: data.sede || data.nombreSede || "",

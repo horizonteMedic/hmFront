@@ -114,7 +114,7 @@ export default function Hematologia() {
     <div className="p-4 space-y-3">
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4">
         <InputTextOneLine
-          label="Nro Ficha"
+          label="N° Orden"
           name="norden"
           value={form.norden}
           onChange={handleChangeNumber}

@@ -53,7 +53,11 @@ export default function Consentimiento_Panel4d_Digitalizado(datos = {}) {
 
   drawHeader();
 
-  // Usar imágenes de prueba para cuadrar el Jasper
+  const huella = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "HUELLA");
+  const firma = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "FIRMAP");
+  const sello = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
+  const isValidUrl = url => url && url !== "Sin registro";
+
   const loadImg = src =>
     new Promise((res, rej) => {
       const img = new Image();
@@ -64,9 +68,9 @@ export default function Consentimiento_Panel4d_Digitalizado(datos = {}) {
     });
   
   Promise.all([
-    loadImg("./img/firmas_sellos_prueba/HUELLA_DIGITAL.png"),
-    loadImg("./img/firmas_sellos_prueba/firma_de_prueba_jaspers.png"),
-    loadImg("./img/firmas_sellos_prueba/firma_sello.png")
+    isValidUrl(huella?.url) ? loadImg(huella.url) : Promise.resolve(null),
+    isValidUrl(firma?.url) ? loadImg(firma.url) : Promise.resolve(null),
+    isValidUrl(sello?.url) ? loadImg(sello.url) : Promise.resolve(null)
   ])
    .then(([huellap, firmap, sellop]) => {
     let y = 44;
@@ -95,20 +99,19 @@ export default function Consentimiento_Panel4d_Digitalizado(datos = {}) {
     doc.setFontSize(11);
 
     // Cuerpo del consentimiento con campos en negrita
-    y += 10;
-    // Datos de prueba para visualizar mejor el formato
-    const nombre = String(datos.nombres || 'JUAN CARLOS PÉREZ GONZÁLEZ');
-    const edad = String(datos.edad || '28');
-    const dni = String(datos.dni || '12345678');
+    doc.setFontSize(11);
+    const nombre = String(datos.nombres || '_________________________');
+    const edad = String(datos.edad || '___');
+    const dni = String(datos.dni || '__________');
     // Construir bloques de texto (normales y negrita)
     const bloques = [
       { text: 'Yo' + '\u00A0\u00A0', bold: false },
       { text: nombre, bold: true },
-      { text: ', de ', bold: false },
+      { text: ' de ', bold: false },
       { text: edad, bold: true },
-      { text: ' años de edad, identificado con DNI Nº ', bold: false },
+      { text: ' años de edad, identificado con DNI N° ', bold: false },
       { text: dni, bold: true },
-      { text: 'habiendo recibido consejería e información acerca de la prueba para Cocaína, Marihuana, Opiáceos y Methanfetaminas en orina; y en pleno uso de mis facultades mentales ', bold: false },
+      { text: '; habiendo recibido consejería e información acerca de la prueba para cocaína, marihuana, opiáceos y methanfetaminas en orina; y en pleno uso de mis facultades mentales ', bold: false },
       { text: 'AUTORIZO', bold: true },
       { text: ' se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.', bold: false },
     ];
@@ -279,67 +282,66 @@ export default function Consentimiento_Panel4d_Digitalizado(datos = {}) {
     const baseY = y + 10;
 
     // Firma paciente
-    const lineX1P = 65;
-    const lineX2P = 115;
+    const lineX1P = 70;
+    const lineX2P = 120;
     const lineYP = baseY + 32;
     const centerXP = (lineX1P + lineX2P) / 2;
     doc.line(lineX1P, lineYP, lineX2P, lineYP);
     doc.text('Firma del Paciente', centerXP, lineYP + 6, { align: 'center' });
-    
-    // Siempre mostrar la firma de prueba
-    const sigW = 70;
-    const sigH = 23;
-    const sigX = centerXP - sigW / 2;
-    const sigY = lineYP - sigH;
+    if (firmap) {
+      const sigW = 70;
+      const sigH = 23;
+      const sigX = centerXP - sigW / 2;
+      const sigY = lineYP - sigH;
 
-    const maxImgW = sigW - 10;
-    const maxImgH = sigH - 10;
-    let imgW = firmap.width;
-    let imgH = firmap.height;
-    const scaleW = maxImgW / imgW;
-    const scaleH = maxImgH / imgH;
-    const scale = Math.min(scaleW, scaleH, 1);
-    imgW *= scale;
-    imgH *= scale;
-    const imgX = sigX + (sigW - imgW) / 2;
-    const imgY = sigY + (sigH - imgH) / 2;
+      const maxImgW = sigW - 10;
+      const maxImgH = sigH - 10;
+      let imgW = firmap.width;
+      let imgH = firmap.height;
+      const scaleW = maxImgW / imgW;
+      const scaleH = maxImgH / imgH;
+      const scale = Math.min(scaleW, scaleH, 1);
+      imgW *= scale;
+      imgH *= scale;
+      const imgX = sigX + (sigW - imgW) / 2;
+      const imgY = sigY + (sigH - imgH) / 2;
 
-    const canvasFirma = document.createElement('canvas');
-    canvasFirma.width = firmap.width;
-    canvasFirma.height = firmap.height;
-    const ctxFirma = canvasFirma.getContext('2d');
-    ctxFirma.drawImage(firmap, 0, 0);
-    const firmaBase64 = canvasFirma.toDataURL('image/png');
-    doc.addImage(firmaBase64, 'PNG', imgX, imgY, imgW, imgH);
+      const canvas = document.createElement('canvas');
+      canvas.width = firmap.width;
+      canvas.height = firmap.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(firmap, 0, 0);
+      const firmaBase64 = canvas.toDataURL('image/png');
+      doc.addImage(firmaBase64, 'PNG', imgX, imgY, imgW, imgH);
+    }
 
     // Huella
     doc.rect(25, baseY, 28, 32);
     doc.setFontSize(10);
     doc.text('Huella', 39, baseY + 38, { align: 'center' });
-    
-    // Siempre mostrar la huella de prueba
-    const maxW = 28;
-    const maxH = 32;
-    let huellaW = maxW;
-    let huellaH = (huellap.height / huellap.width) * huellaW;
+    if (huellap) {
+      const maxW = 28;
+      const maxH = 32;
+      let huellaW = maxW;
+      let huellaH = (huellap.height / huellap.width) * huellaW;
 
-    // Si excede la altura máxima, reajustar proporciones
-    if (huellaH > maxH) {
-      huellaH = maxH;
-      huellaW = (huellap.width / huellap.height) * huellaH;
+      if (huellaH > maxH) {
+        huellaH = maxH;
+        huellaW = (huellap.width / huellap.height) * huellaH;
+      }
+
+      const huellaX = 25 + (maxW - huellaW) / 2;
+      const huellaY = baseY + (maxH - huellaH) / 2;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = huellap.width;
+      canvas.height = huellap.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(huellap, 0, 0);
+      const huellaBase64 = canvas.toDataURL('image/png');
+
+      doc.addImage(huellaBase64, 'PNG', huellaX, huellaY, huellaW, huellaH);
     }
-
-    const huellaX = 25 + (maxW - huellaW) / 2;
-    const huellaY = baseY + (maxH - huellaH) / 2;
-
-    const canvasHuella = document.createElement('canvas');
-    canvasHuella.width = huellap.width;
-    canvasHuella.height = huellap.height;
-    const ctxHuella = canvasHuella.getContext('2d');
-    ctxHuella.drawImage(huellap, 0, 0);
-    const huellaBase64 = canvasHuella.toDataURL('image/png');
-
-    doc.addImage(huellaBase64, 'PNG', huellaX, huellaY, huellaW, huellaH);
 
     // Firma consejero
     const lineX1 = 135;
@@ -348,32 +350,32 @@ export default function Consentimiento_Panel4d_Digitalizado(datos = {}) {
     const centerX = (lineX1 + lineX2) / 2;
     doc.line(lineX1, lineY, lineX2, lineY);
     doc.text('Firma y sello del Consejero', centerX, lineY + 6, { align: 'center' });
-    
-    // Siempre mostrar el sello de prueba
-    const sigWSello = 70;
-    const sigHSello = 30;
-    const sigXSello = centerX - sigWSello / 2;
-    const sigYSello = lineY - sigHSello;
+    if (sellop) {
+      const sigW = 70;
+      const sigH = 23;
+      const sigX = centerX - sigW / 2;
+      const sigY = lineY - sigH;
 
-    const maxImgWSello = sigWSello - 10;
-    const maxImgHSello = sigHSello - 10;
-    let imgWSello = sellop.width;
-    let imgHSello = sellop.height;
-    const scaleWSello = maxImgWSello / imgWSello;
-    const scaleHSello = maxImgHSello / imgHSello;
-    const scaleSello = Math.min(scaleWSello, scaleHSello, 1);
-    imgWSello *= scaleSello;
-    imgHSello *= scaleSello;
-    const imgXSello = sigXSello + (sigWSello - imgWSello) / 2;
-    const imgYSello = sigYSello + (sigHSello - imgHSello) / 2;
+      const maxImgW = sigW - 10;
+      const maxImgH = sigH - 10;
+      let imgW = sellop.width;
+      let imgH = sellop.height;
+      const scaleW = maxImgW / imgW;
+      const scaleH = maxImgH / imgH;
+      const scale = Math.min(scaleW, scaleH, 1);
+      imgW *= scale;
+      imgH *= scale;
+      const imgX = sigX + (sigW - imgW) / 2;
+      const imgY = sigY + (sigH - imgH) / 2;
 
-    const canvasSello = document.createElement('canvas');
-    canvasSello.width = sellop.width;
-    canvasSello.height = sellop.height;
-    const ctxSello = canvasSello.getContext('2d');
-    ctxSello.drawImage(sellop, 0, 0);
-    const selloBase64 = canvasSello.toDataURL('image/png');
-    doc.addImage(selloBase64, 'PNG', imgXSello, imgYSello, imgWSello, imgHSello);
+      const canvas = document.createElement('canvas');
+      canvas.width = sellop.width;
+      canvas.height = sellop.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(sellop, 0, 0);
+      const selloBase64 = canvas.toDataURL('image/png');
+      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+    }
     footerTR(doc, datos);
 
     // Mostrar PDF

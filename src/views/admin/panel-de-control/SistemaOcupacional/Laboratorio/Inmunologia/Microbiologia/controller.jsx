@@ -7,6 +7,7 @@ import {
   SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
+import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl = "/api/v01/ct/inmunologia/obtenerReporteMicrobiologia";
 const registrarUrl = "/api/v01/ct/inmunologia/registrarActualizarMicrobiologia";
@@ -23,21 +24,35 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
     set((prev) => ({
       ...prev,
       norden: res.norden ?? "",
-      fecha: res.fecha ?? prev.fecha,
-      nombres: res.nombres ?? prev.nombres,
-      edad: res.edad ?? prev.edad,
+      fecha: res.fecha,
+
+      nombreExamen: res.nombreExamen ?? "",
+      dni: res.dniPaciente ?? "",
+
+      nombres: res.nombres ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+      lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+      edad: res.edadPaciente ?? "",
+      sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+      estadoCivil: res.estadoCivilPaciente,
+      nivelEstudios: res.nivelEstudioPaciente,
+      // Datos Laborales
+      empresa: res.empresa,
+      contrata: res.contrata,
+      ocupacion: res.ocupacionPaciente,
+      cargoDesempenar: res.cargoPaciente,
+
       examenDirecto: res.txtKoh ? true : false,
       bk1: res.txtMuestra1 ?? "",
-      bk1Radio: res.txtMuestra1 ?? "",
       bk2: res.txtMuestra2 ?? "",
-      bk2Radio: res.txtMuestra2 ?? "",
       koh: res.txtKoh ?? "",
-      kohRadio: res.txtKoh ?? "",
+
+      user_medicoFirma: res.usuarioFirma,
     }));
   }
 };
 
-export const SubmitDataService = async (form, token, user, limpiar, tabla, datosFooter) => {
+export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
     return;
@@ -51,14 +66,16 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla, datos
     txtKoh: form.koh,
     userRegistro: user,
     userMedicoOcup: "",
+
+    usuarioFirma: form.user_medicoFirma,
   };
 
   await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-    PrintHojaR(form.norden, token, tabla, datosFooter);
+    PrintHojaR(form.norden, token, tabla);
   });
 };
 
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+export const PrintHojaR = (nro, token, tabla) => {
   const jasperModules = import.meta.glob(
     "../../../../../../jaspers/Inmunologia/*.jsx"
   );
@@ -66,7 +83,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     nro,
     token,
     tabla,
-    datosFooter,
+    null,
     obtenerReporteUrl,
     jasperModules,
     "../../../../../../jaspers/Inmunologia"
@@ -104,7 +121,13 @@ const GetInfoPac = async (nro, set, token, sede) => {
       ...prev,
       ...res,
       nombres: res.nombresApellidos ?? "",
-      edad: res.edad ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+      edad: res.edad,
+      ocupacion: res.areaO ?? "",
+      nombreExamen: res.nomExam ?? "",
+      cargoDesempenar: res.cargo ?? "",
+      lugarNacimiento: res.lugarNacimiento ?? "",
+      sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
     }));
   }
 };

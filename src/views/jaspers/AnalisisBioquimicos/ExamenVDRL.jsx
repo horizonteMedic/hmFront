@@ -1,4 +1,4 @@
-// src/views/jaspers/Toxicologia/Panel4d_Digitalizado.jsx
+// src/views/jaspers/AnalisisBioquimicos/ExamenVDRL.jsx
 import jsPDF from "jspdf";
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
@@ -7,9 +7,6 @@ import footerTR from '../components/footerTR.jsx';
 // --- Configuración Centralizada ---
 const config = {
   margin: 15,
-  col1X: 15,
-  col2X: 100,
-  col3X: 170,
   fontSize: {
     title: 14,
     header: 9,
@@ -27,62 +24,32 @@ const drawUnderlinedTitle = (doc, text, y) => {
   doc.text(text, pageW / 2, y, { align: "center" });
 };
 
-const drawResultRow = (doc, y, label, result, units) => {
-  doc.setFont(config.font, 'normal').setFontSize(config.fontSize.body);
-  doc.text(label || "", config.col1X, y);
-  doc.text(String(result || ""), config.col2X, y, { align: "center" });
-  doc.text(String(units || ""), config.col3X, y, { align: "center" });
-  return y + config.lineHeight;
-};
-
-// Función para formatear fecha a DD/MM/YYYY
 const toDDMMYYYY = (fecha) => {
   if (!fecha) return '';
-  if (fecha.includes('/')) return fecha; // ya está en formato correcto
+  if (fecha.includes('/')) return fecha;
   const [anio, mes, dia] = fecha.split('-');
   if (!anio || !mes || !dia) return fecha;
   return `${dia}/${mes}/${anio}`;
 };
 
-// Función para formatear fecha larga
-const formatDateToLong = (dateString) => {
-  if (!dateString) return '';
-  try {
-    const date = new Date(`${dateString}T00:00:00`);
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  } catch (error) {
-    return toDDMMYYYY(dateString) || '';
-  }
-};
-
-// Header con datos de ficha, sede y fecha
 const drawHeader = (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
   
   CabeceraLogo(doc, { ...datos, tieneMembrete: false });
   
-  // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Nro de ficha: ", pageW - 80, 15);
   doc.setFont("helvetica", "normal").setFontSize(18);
   doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
   
-  // Sede
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
   
-  // Fecha de examen
   const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
   doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
   
-  // Página
   doc.text("Pag. 01", pageW - 30, 10);
 
-  // Bloque de color
   drawColorBox(doc, {
     color: datos.codigoColor || "#008f39",
     text: datos.textoColor || "F",
@@ -95,14 +62,12 @@ const drawHeader = (doc, datos = {}) => {
   });
 };
 
-// Función para dibujar datos del paciente en tabla
 const drawPatientData = (doc, datos = {}) => {
   const tablaInicioX = 15;
   const tablaAncho = 180;
   const filaAltura = 5;
   let yPos = 41;
 
-  // Header DATOS PERSONALES
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
   doc.setFillColor(196, 196, 196);
@@ -113,7 +78,6 @@ const drawPatientData = (doc, datos = {}) => {
 
   const sexo = datos.sexoPaciente === 'F' ? 'FEMENINO' : datos.sexoPaciente === 'M' ? 'MASCULINO' : '';
 
-  // Fila 1: Apellidos y Nombres (fila completa)
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Apellidos y Nombres:", tablaInicioX + 2, yPos + 3.5);
@@ -121,7 +85,6 @@ const drawPatientData = (doc, datos = {}) => {
   doc.text(datos.nombres || '', tablaInicioX + 40, yPos + 3.5);
   yPos += filaAltura;
 
-  // Fila 2: DNI | Edad | Sexo
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.line(tablaInicioX + 45, yPos, tablaInicioX + 45, yPos + filaAltura);
   doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
@@ -139,7 +102,6 @@ const drawPatientData = (doc, datos = {}) => {
   doc.text(sexo, tablaInicioX + 105, yPos + 3.5);
   yPos += filaAltura;
 
-  // Fila 3: Lugar Nacimiento | Estado Civil
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
   doc.setFont("helvetica", "bold");
@@ -152,7 +114,6 @@ const drawPatientData = (doc, datos = {}) => {
   doc.text(datos.estadoCivilPaciente || '', tablaInicioX + 115, yPos + 3.5);
   yPos += filaAltura;
 
-  // Fila 4: Tipo Examen | Fecha Nac.
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
   doc.setFont("helvetica", "bold");
@@ -165,7 +126,6 @@ const drawPatientData = (doc, datos = {}) => {
   doc.text(toDDMMYYYY(datos.fechaNacimientoPaciente || ''), tablaInicioX + 115, yPos + 3.5);
   yPos += filaAltura;
 
-  // Fila 5: Nivel de Estudio (fila completa)
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.setFont("helvetica", "bold");
   doc.text("Nivel de Estudio:", tablaInicioX + 2, yPos + 3.5);
@@ -173,7 +133,6 @@ const drawPatientData = (doc, datos = {}) => {
   doc.text(datos.nivelEstudioPaciente || '', tablaInicioX + 32, yPos + 3.5);
   yPos += filaAltura;
 
-  // Fila 6: Ocupación (fila completa)
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.setFont("helvetica", "bold");
   doc.text("Ocupación:", tablaInicioX + 2, yPos + 3.5);
@@ -181,7 +140,6 @@ const drawPatientData = (doc, datos = {}) => {
   doc.text(datos.ocupacionPaciente || '', tablaInicioX + 25, yPos + 3.5);
   yPos += filaAltura;
 
-  // Fila 7: Cargo (fila completa)
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.setFont("helvetica", "bold");
   doc.text("Cargo:", tablaInicioX + 2, yPos + 3.5);
@@ -189,7 +147,6 @@ const drawPatientData = (doc, datos = {}) => {
   doc.text(datos.cargoPaciente || '', tablaInicioX + 18, yPos + 3.5);
   yPos += filaAltura;
 
-  // Fila 8: Área (fila completa)
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.setFont("helvetica", "bold");
   doc.text("Área:", tablaInicioX + 2, yPos + 3.5);
@@ -202,17 +159,12 @@ const drawPatientData = (doc, datos = {}) => {
 
 // --- Componente Principal ---
 
-export default function Panel4d_Digitalizado(datos = {}) {
+export default function ExamenVDRL(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
-  // === HEADER ===
   drawHeader(doc, datos);
-  
-  // === TÍTULO ===
-  drawUnderlinedTitle(doc, "TOXICOLÓGICO", 38);
-  
-  // === DATOS DEL PACIENTE ===
+  drawUnderlinedTitle(doc, "BIOQUIMICA", 38);
   drawPatientData(doc, datos);
 
   const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
@@ -232,119 +184,86 @@ export default function Panel4d_Digitalizado(datos = {}) {
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
-    // === CUERPO ===
     let y = 95;
 
-    // Muestra y Método
+    // Muestra
     doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
     doc.text("MUESTRA :", config.margin, y);
     doc.setFont(config.font, "normal");
-    doc.text(datos.muestra || "ORINA", config.margin + 30, y);
+    doc.text(datos.muestra || "SUERO", config.margin + 30, y);
     y += config.lineHeight;
 
+    // Examen solicitado
     doc.setFont(config.font, "bold");
-    doc.text("MÉTODO :", config.margin, y);
+    doc.text("Examen solicitado:", config.margin, y);
     doc.setFont(config.font, "normal");
-    doc.text(datos.txtMetodo || "", config.margin + 30, y);
+    doc.text("VDRL", config.margin + 35, y);
     y += config.lineHeight * 2;
 
-    // Encabezado de tabla
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
-    doc.text("PRUEBA CUALITATIVO", config.col1X, y);
-    doc.text("RESULTADOS", config.col2X, y, { align: 'center' });
-    doc.text("UNIDADES", config.col3X, y, { align: 'center' });
-    y += 3;
+    // === TABLA DE RESULTADOS ===
+    const colExamen = config.margin;
+    const colResultado = config.margin + 140;
 
-    // Línea
+    // Header de la tabla
+    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+    doc.text("EXAMEN", colExamen, y);
+    doc.text("RESULTADO", colResultado, y);
+    y += 2;
+
+    // Línea debajo del header
     doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
     y += config.lineHeight;
 
-    // Título del Panel
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
-    doc.text("DROGAS PANEL 4D", config.col1X, y);
-    y += config.lineHeight;
+    // Fila de datos
+    doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
+    doc.text("VDRL (Método: aglutinación de lípidos complejos)", colExamen, y);
+    doc.text(datos.txtVdrl || "NO REACTIVO", colResultado, y);
 
-    // Datos
-    const tests = [
-      { label: "COCAINA", key: "txtCocaina" },
-      { label: "MARIHUANA", key: "txtMarihuana" },
-      { label: "OPIACEOS", key: "txtOpiacios" },
-      { label: "METHANFETAMINA", key: "txtMethanfetaminas" },
-    ];
-    
-    tests.forEach(({ label, key }) => {
-      const value = datos[key] != null ? datos[key] : "NEGATIVO";
-      y = drawResultRow(doc, y, label, value, "S/U");
-    });
-
-    // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
-    const sigW = 53; // Tamaño fijo width
-    const sigH = 23; // Tamaño fijo height
+    // Sellos
+    const sigW = 53;
+    const sigH = 23;
     const sigY = 210;
-    const gap = 16; // Espacio entre sellos (reducido 4mm: 20 - 4 = 16)
+    const gap = 16;
     
     if (s1 && s2) {
-      // Si hay dos sellos, centrarlos juntos
       const totalWidth = sigW * 2 + gap;
       const startX = (pageW - totalWidth) / 2;
       
-      // Sello 1 (izquierda) - Tamaño fijo
       const canvas1 = document.createElement('canvas');
       canvas1.width = s1.width;
       canvas1.height = s1.height;
       const ctx1 = canvas1.getContext('2d');
       ctx1.drawImage(s1, 0, 0);
       const selloBase64_1 = canvas1.toDataURL('image/png');
+      doc.addImage(selloBase64_1, 'PNG', startX, sigY, sigW, sigH);
       
-      // Usar tamaño fijo para ambos sellos
-      const imgX1 = startX;
-      const imgY1 = sigY;
-      doc.addImage(selloBase64_1, 'PNG', imgX1, imgY1, sigW, sigH);
-      
-      // Sello 2 (derecha) - Mismo tamaño fijo
       const canvas2 = document.createElement('canvas');
       canvas2.width = s2.width;
       canvas2.height = s2.height;
       const ctx2 = canvas2.getContext('2d');
       ctx2.drawImage(s2, 0, 0);
       const selloBase64_2 = canvas2.toDataURL('image/png');
-      
-      const sigX2 = startX + sigW + gap;
-      const imgX2 = sigX2;
-      const imgY2 = sigY;
-      doc.addImage(selloBase64_2, 'PNG', imgX2, imgY2, sigW, sigH);
+      doc.addImage(selloBase64_2, 'PNG', startX + sigW + gap, sigY, sigW, sigH);
     } else if (s1) {
-      // Si solo hay un sello, centrarlo con tamaño fijo
       const canvas = document.createElement('canvas');
       canvas.width = s1.width;
       canvas.height = s1.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-      
-      const sigX = (pageW - sigW) / 2;
-      const imgX = sigX;
-      const imgY = sigY;
-      doc.addImage(selloBase64, 'PNG', imgX, imgY, sigW, sigH);
+      doc.addImage(selloBase64, 'PNG', (pageW - sigW) / 2, sigY, sigW, sigH);
     } else if (s2) {
-      // Si solo hay el segundo sello, centrarlo con tamaño fijo
       const canvas = document.createElement('canvas');
       canvas.width = s2.width;
       canvas.height = s2.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s2, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-      
-      const sigX = (pageW - sigW) / 2;
-      const imgX = sigX;
-      const imgY = sigY;
-      doc.addImage(selloBase64, 'PNG', imgX, imgY, sigW, sigH);
+      doc.addImage(selloBase64, 'PNG', (pageW - sigW) / 2, sigY, sigW, sigH);
     }
 
-    // === FOOTER ===
     footerTR(doc, { footerOffsetY: 8 });
 
-    // === Imprimir ===
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
     const iframe = document.createElement("iframe");
@@ -357,7 +276,6 @@ export default function Panel4d_Digitalizado(datos = {}) {
     };
   }).catch(error => {
     console.error("Error al cargar imágenes:", error);
-    // Continuar con la impresión aunque falle la carga de imágenes
     footerTR(doc, { footerOffsetY: 8 });
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
@@ -371,3 +289,4 @@ export default function Panel4d_Digitalizado(datos = {}) {
     };
   });
 }
+

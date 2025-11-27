@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
-import { convertirGenero } from "../../utils/helpers.js";
+import { convertirGenero, getSign } from "../../utils/helpers.js";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
@@ -482,24 +482,31 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
   doc.line(tablaInicioX, yFirmas + alturaSeccionFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea inferior
 
   // === FIRMA Y HUELLA DEL PACIENTE (IZQUIERDA) ===
-  const firmaPacienteY = yFirmas + 3;
+  // Orden: [HUELLA] [FIRMA] lado a lado
+  const firmaPacienteY = yFirmas + 7;
   const centroColumnaIzquierdaX = tablaInicioX + (tablaAncho / 4);
   
-  // Función para obtener URL de digitalización por nombre
-  const getDigitalizacionUrl = (digitalizaciones, nombre) => {
-    if (!digitalizaciones || !Array.isArray(digitalizaciones)) return null;
-    const item = digitalizaciones.find(d => d.nombreDigitalizacion === nombre);
-    return item ? item.url : null;
-  };
+  // Agregar huella del paciente (izquierda)
+  let huellaPacienteUrl = getSign(data, "HUELLA");
+  if (huellaPacienteUrl) {
+    try {
+      const imgWidth = 12;
+      const imgHeight = 20;
+      const x = centroColumnaIzquierdaX - 20;
+      const y = firmaPacienteY;
+      doc.addImage(huellaPacienteUrl, 'PNG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando huella del paciente:", error);
+    }
+  }
 
-  // Agregar firma del paciente
-  let firmaPacienteUrl = getDigitalizacionUrl(data.digitalizacion, "FIRMA_PACIENTE");
-  
+  // Agregar firma del paciente (derecha de la huella)
+  let firmaPacienteUrl = getSign(data, "FIRMAP");
   if (firmaPacienteUrl) {
     try {
-      const imgWidth = 35;
-      const imgHeight = 15;
-      const x = centroColumnaIzquierdaX - (imgWidth / 2); // Centrar horizontalmente
+      const imgWidth = 30;
+      const imgHeight = 20;
+      const x = centroColumnaIzquierdaX - 5;
       const y = firmaPacienteY;
       doc.addImage(firmaPacienteUrl, 'PNG', x, y, imgWidth, imgHeight);
     } catch (error) {
@@ -507,32 +514,15 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
     }
   }
 
-  // Agregar huella del paciente
-  let huellaPacienteUrl = getDigitalizacionUrl(data.digitalizacion, "HUELLA_PACIENTE");
-  
-  if (huellaPacienteUrl) {
-    try {
-      const imgWidth = 25;
-      const imgHeight = 15;
-      const x = centroColumnaIzquierdaX - (imgWidth / 2); // Centrar horizontalmente
-      const y = firmaPacienteY + 18;
-      doc.addImage(huellaPacienteUrl, 'PNG', x, y, imgWidth, imgHeight);
-    } catch (error) {
-      console.log("Error cargando huella del paciente:", error);
-    }
-  }
-
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Firma del Paciente", centroColumnaIzquierdaX, yFirmas + 15, { align: "center" });
-  doc.text("Huella Digital", centroColumnaIzquierdaX, yFirmas + 35, { align: "center" });
+  doc.text("Firma y Huella del Paciente", centroColumnaIzquierdaX, yFirmas + 30, { align: "center" });
 
   // === FIRMA DEL MÉDICO (DERECHA) ===
-  const firmaMedicoY = yFirmas + 3;
+  const firmaMedicoY = yFirmas + 7;
   const centroColumnaDerechaX = tablaInicioX + (3 * tablaAncho / 4);
   
   // Agregar firma y sello médico
-  let firmaMedicoUrl = getDigitalizacionUrl(data.digitalizacion, "SELLOFIRMA");
-  
+  let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
   if (firmaMedicoUrl) {
     try {
       const imgWidth = 45;
@@ -546,8 +536,8 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
   }
 
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Sello y Firma del Médico", centroColumnaDerechaX, yFirmas + 26, { align: "center" });
-  doc.text("Responsable de la Evaluación", centroColumnaDerechaX, yFirmas + 28.5, { align: "center" });
+  doc.text("Sello y Firma del Médico", centroColumnaDerechaX, yFirmas + 28.5, { align: "center" });
+  doc.text("Responsable de la Evaluación", centroColumnaDerechaX, yFirmas + 31, { align: "center" });
 
   yPos += alturaSeccionFirmas;
 

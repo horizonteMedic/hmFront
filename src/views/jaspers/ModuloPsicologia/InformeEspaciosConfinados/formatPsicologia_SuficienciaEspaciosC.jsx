@@ -364,13 +364,23 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   doc.text("S", posicionesColumnas[5] + anchoColumnaEvaluacion/2, yTexto + 3.5, { align: "center" });
   yTexto += filaAltura;
 
-  // Datos de aspectos psicológicos
+  // Función para obtener evaluación desde data
+  const getEvaluacion = (prefix) => {
+    if (data[`${prefix}I`]) return "I";
+    if (data[`${prefix}NPI`]) return "NPI";
+    if (data[`${prefix}NP`]) return "NP";
+    if (data[`${prefix}NPS`]) return "NPS";
+    if (data[`${prefix}S`]) return "S";
+    return "";
+  };
+
+  // Datos de aspectos psicológicos desde data
   const aspectosPsicologicos = [
-    { numero: 1, aspecto: "Razonamiento", evaluacion: "I" },
-    { numero: 2, aspecto: "Memoria", evaluacion: "NPI" },
-    { numero: 3, aspecto: "Atención", evaluacion: "NP" },
-    { numero: 4, aspecto: "Concentración", evaluacion: "NPS" },
-    { numero: 5, aspecto: "Percepción", evaluacion: "S" }
+    { numero: 1, aspecto: "Razonamiento", evaluacion: getEvaluacion("razonamiento") },
+    { numero: 2, aspecto: "Memoria", evaluacion: getEvaluacion("memoria") },
+    { numero: 3, aspecto: "Atención", evaluacion: getEvaluacion("atencion") },
+    { numero: 4, aspecto: "Orientación Espacial", evaluacion: getEvaluacion("orientacionEspacial") },
+    { numero: 5, aspecto: "Viso Motora", evaluacion: getEvaluacion("visoMotora") }
   ];
 
   // Dibujar filas de datos
@@ -417,22 +427,42 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   doc.text("ASPECTOS PERSONALIDAD", pageW / 2, yTexto + 3, { align: "center" });
   yTexto += 6; // Espacio después del título
 
-  // Datos de aspectos de personalidad (estos deberían venir del JSON)
+  // Datos de aspectos de personalidad desde data
+  const getEstabilidadEmocional = () => {
+    if (data.estabilidadEmocionalInestable) return "Inestable";
+    if (data.estabilidadEmocionalEstable) return "Estable";
+    return "";
+  };
+
+  const getAnsiedadGeneral = () => {
+    if (data.ansiedadGeneralCaso) return "Caso";
+    if (data.ansiedadGeneralNoCaso) return "No Caso";
+    return "";
+  };
+
+  const getAnsiedadEspacios = () => {
+    if (data.ansiedadEspaciosConfinadosNada) return "Nada";
+    if (data.ansiedadEspaciosConfinadosPoca) return "Poca ansiedad";
+    if (data.ansiedadEspaciosConfinadosModerada) return "Moderadamente ansioso";
+    if (data.ansiedadEspaciosConfinadosElevada) return "Elevadamente ansioso";
+    return "";
+  };
+
   const aspectosPersonalidad = [
     {
       aspecto: "Estabilidad emocional",
       opciones: ["Inestable", "Estable"],
-      seleccionado: "Inestable"
+      seleccionado: getEstabilidadEmocional()
     },
     {
       aspecto: "Nivel de ansiedad general",
       opciones: ["Caso", "No Caso"],
-      seleccionado: "Caso"
+      seleccionado: getAnsiedadGeneral()
     },
     {
       aspecto: "Ansiedad a espacios confinados",
       opciones: ["Nada", "Poca ansiedad", "Moderadamente ansioso", "Elevadamente ansioso"],
-      seleccionado: "Elevadamente ansioso"
+      seleccionado: getAnsiedadEspacios()
     }
   ];
 

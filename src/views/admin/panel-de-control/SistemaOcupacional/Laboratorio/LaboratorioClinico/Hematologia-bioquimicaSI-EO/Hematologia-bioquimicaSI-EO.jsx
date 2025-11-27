@@ -183,7 +183,7 @@ export default function HematologiaBioquimicaSIEO() {
           labelWidth="120px"
         />
       </SectionFieldset>
-      <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+      <SectionFieldset legend="Datos Personales" collapsible defaultOpen={false} className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
         <InputTextOneLine
           label="Nombres"
           name="nombres"
@@ -562,7 +562,7 @@ export default function HematologiaBioquimicaSIEO() {
                   { label: 'Leucocitos (x campos)', key: 'leucocitosSedimentoUnitario' },
                   { label: 'CelEpiteliales', key: 'celEpiteliales' },
                   { label: 'Cilindros', key: 'cilindros' },
-                  { label: 'Gram SC', key: 'gramSc' },
+                  { label: 'Gram S/C', key: 'gramSc' },
                 ].map((item) => (
                   <InputTextOneLine
                     label={item.label}

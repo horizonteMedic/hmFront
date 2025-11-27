@@ -65,7 +65,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
       oftalmologica: String(data.enfermedadesocularesoftalmo_e_oculares ?? ""),
       auditiva: String(data.diagnosticoAudiometria_diagnostico ?? ""),
       radiografia: String(data.conclusionesRadiograficas ?? ""),
-      espirometria: String(data.espirometriaResultado ?? ""),
+      espirometria: String(data.conclusionAnexo7c_txtconclusion || data.txtconclusion || "N/A"),
       electrocardiograma: String(data.hallazgosInformeElectroCardiograma_hallazgo ?? ""),
       dental: String(data.observacionesOdontograma_txtobservaciones ?? ""),
       psicologico: data.aptoEvaluacionPsicoPoderosa_rbapto ? "CUMPLE CON EL PERFIL DEL PUESTO" : String(data.observacionPsicologica ?? ""),
@@ -81,6 +81,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
       glucosa: String(data.glucosaLaboratorioClinico_txtglucosabio ?? ""),
       cocaina: String(data.cocainaLaboratorioClinico_txtcocaina ?? ""),
       marihuana: String(data.marihuanaLaboratorioClinico_txtmarihuana ?? ""),
+      examenOrina: "NORMAL",
       vdrl: data.positivoLaboratorioClinico_chkpositivo === true
         ? "REACTIVO"
         : data.positivoLaboratorioClinico_chkpositivo === false
@@ -504,168 +505,54 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   // Header de evaluaciones médicas
   yPos = dibujarHeaderSeccion("3. EVALUACIONES MÉDICAS", yPos, filaAltura);
 
-  // Fila 1: Evaluación Oftalmológica
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
+  // Función para dibujar fila dinámica
+  const dibujarFilaDinamica = (label, valor, yInicio) => {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const anchoDisponible = tablaAncho - 54; // Ancho para el valor
+    const texto = valor || "";
+    
+    // Calcular altura necesaria
+    let alturaFila = filaAltura;
+    if (texto && doc.getTextWidth(texto) > anchoDisponible) {
+      const lineas = doc.splitTextToSize(texto, anchoDisponible);
+      alturaFila = Math.max(filaAltura, lineas.length * 3.5 + 2);
+    }
+    
+    // Dibujar bordes
+    doc.line(tablaInicioX, yInicio, tablaInicioX, yInicio + alturaFila);
+    doc.line(tablaInicioX + tablaAncho, yInicio, tablaInicioX + tablaAncho, yInicio + alturaFila);
+    doc.line(tablaInicioX, yInicio, tablaInicioX + tablaAncho, yInicio);
+    doc.line(tablaInicioX, yInicio + alturaFila, tablaInicioX + tablaAncho, yInicio + alturaFila);
+    
+    // Dibujar contenido
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text(label, tablaInicioX + 2, yInicio + 3.5);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    
+    if (texto && doc.getTextWidth(texto) > anchoDisponible) {
+      const lineas = doc.splitTextToSize(texto, anchoDisponible);
+      lineas.forEach((linea, idx) => {
+        doc.text(linea, tablaInicioX + 52, yInicio + 3.5 + (idx * 3.5));
+      });
+    } else {
+      doc.text(texto, tablaInicioX + 52, yInicio + 3.5);
+    }
+    
+    return yInicio + alturaFila;
+  };
 
-  // Fila 2: Examen Auditiva
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Fila 3: Radiografía de Tórax
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Fila 4: Espirometría
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Fila 5: Electrocardiograma
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Fila 6: Evaluación Dental
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Fila 7: Test Psicológico
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Fila 8: Antecedentes de Importancia
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Fila 9: Trabajos en Altura
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Fila 10: Trabajos en Caliente
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Fila 11: Ficha de Conducción
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // === CONTENIDO DE EVALUACIONES MÉDICAS ===
-  let yTextoEval = yPos - (11 * filaAltura) + 2; // Posición inicial para el texto
-
-  // Fila 1: Evaluación Oftalmológica
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("EVALUACIÓN OFTALMOLÓGICA:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.oftalmologica, tablaInicioX + 52, yTextoEval + 1.5);
-  yTextoEval += filaAltura;
-
-  // Fila 2: Examen Auditiva
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("EXAMEN AUDITIVA:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.auditiva, tablaInicioX + 52, yTextoEval + 1.5);
-  yTextoEval += filaAltura;
-
-  // Fila 3: Radiografía de Tórax
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("RADIOGRAFÍA DE TÓRAX:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.radiografia, tablaInicioX + 52, yTextoEval + 1.5);
-  yTextoEval += filaAltura;
-
-  // Fila 4: Espirometría
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("ESPIROMETRÍA:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.espirometria, tablaInicioX + 52, yTextoEval + 1.5);
-  yTextoEval += filaAltura;
-
-  // Fila 5: Electrocardiograma
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("ELECTROCARDIOGRAMA:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.electrocardiograma || "N/A", tablaInicioX + 52, yTextoEval + 1.5);
-  yTextoEval += filaAltura;
-
-  // Fila 6: Evaluación Dental
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("EVALUACIÓN DENTAL:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.dental, tablaInicioX + 52, yTextoEval + 1.5);
-  yTextoEval += filaAltura;
-
-  // Fila 7: Test Psicológico
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("TEST PSICOLÓGICO:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.psicologico, tablaInicioX + 52, yTextoEval + 1.5);
-  yTextoEval += filaAltura;
-
-  // Fila 8: Antecedentes de Importancia
-  // doc.setFont("helvetica", "bold").setFontSize(8);
-  // doc.text("ANTECEDENTES DE IMPORTANCIA:", tablaInicioX + 2, yTextoEval + 1.5);
-  // doc.setFont("helvetica", "normal").setFontSize(8);
-  // doc.text(datosFinales.antecedentesPersonales, tablaInicioX + 52, yTextoEval + 1.5);
-  // yTextoEval += filaAltura;
-
-  // Fila 8: Antecedentes de Importancia
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("ANTECEDENTES DE IMPORTANCIA:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.antecedentesPersonales || "", tablaInicioX + 52, yTextoEval + 1.5);
-  yTextoEval += filaAltura;
-
-  // Fila 9: Trabajos en Altura
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("TRABAJOS EN ALTURA:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.trabajosAltura, tablaInicioX + 52, yTextoEval + 1.5);
-  yTextoEval += filaAltura;
-
-  // Fila 10: Trabajos en Caliente
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("TRABAJOS EN CALIENTE:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.trabajosCaliente, tablaInicioX + 52, yTextoEval + 1.5);
-  yTextoEval += filaAltura;
-
-  // Fila 11: Ficha de Conducción
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("FICHA DE CONDUCCIÓN:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.conduccion, tablaInicioX + 52, yTextoEval + 1.5);
+  // Dibujar todas las filas dinámicamente
+  yPos = dibujarFilaDinamica("EVALUACIÓN OFTALMOLÓGICA:", datosFinales.evaluaciones.oftalmologica, yPos);
+  yPos = dibujarFilaDinamica("EXAMEN AUDITIVA:", datosFinales.evaluaciones.auditiva, yPos);
+  yPos = dibujarFilaDinamica("RADIOGRAFÍA DE TÓRAX:", datosFinales.evaluaciones.radiografia, yPos);
+  yPos = dibujarFilaDinamica("ESPIROMETRÍA:", datosFinales.evaluaciones.espirometria, yPos);
+  yPos = dibujarFilaDinamica("ELECTROCARDIOGRAMA:", datosFinales.evaluaciones.electrocardiograma, yPos);
+  yPos = dibujarFilaDinamica("EVALUACIÓN DENTAL:", datosFinales.evaluaciones.dental, yPos);
+  yPos = dibujarFilaDinamica("TEST PSICOLÓGICO:", datosFinales.evaluaciones.psicologico, yPos);
+  yPos = dibujarFilaDinamica("ANTECEDENTES DE IMPORTANCIA:", datosFinales.antecedentesPersonales, yPos);
+  yPos = dibujarFilaDinamica("TRABAJOS EN ALTURA:", datosFinales.evaluaciones.trabajosAltura, yPos);
+  yPos = dibujarFilaDinamica("TRABAJOS EN CALIENTE:", datosFinales.evaluaciones.trabajosCaliente, yPos);
+  yPos = dibujarFilaDinamica("FICHA DE CONDUCCIÓN:", datosFinales.evaluaciones.conduccion, yPos);
 
   // === SECCIÓN 4: EXAMENES DE LABORATORIO ===
   // Header de exámenes de laboratorio

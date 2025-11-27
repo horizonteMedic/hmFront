@@ -7,10 +7,10 @@ import {
   SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
+import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl = "/api/v01/ct/analisisBioquimico/obtenerReporteAcidoUrico";
 const registrarUrl = "/api/v01/ct/analisisBioquimico/registrarActualizarAcidoUrico";
-const tabla = 'ac_bioquimica2022';
 
 export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
   const res = await GetInfoServicioDefault(
@@ -24,17 +24,32 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
     set((prev) => ({
       ...prev,
       norden: res.norden ?? "",
-      fecha: res.fecha ?? prev.fecha,
-      nombres: res.nombres ?? prev.nombres,
-      edad: res.edad ?? prev.edad,
-      prueba: res.txtPrueba ?? "ÁCIDO ÚRICO SÉRICO",
-      muestra: res.txtMuestra ?? "SUERO",
+      fecha: res.fecha,
+
+      nombreExamen: res.nombreExamen ?? "",
+      dni: res.dni ?? "",
+
+      nombres: res.nombres ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+      lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+      edad: res.edad ?? "",
+      sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+      estadoCivil: res.estadoCivilPaciente,
+      nivelEstudios: res.nivelEstudioPaciente,
+      // Datos Laborales
+      empresa: res.empresa,
+      contrata: res.contrata,
+      ocupacion: res.ocupacionPaciente,
+      cargoDesempenar: res.cargoPaciente,
+
       resultado: res.txtResultado ?? "",
+
+      user_medicoFirma: res.usuarioFirma,
     }));
   }
 };
 
-export const SubmitDataService = async (form, token, user, limpiar) => {
+export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
     return;
@@ -43,19 +58,22 @@ export const SubmitDataService = async (form, token, user, limpiar) => {
   const body = {
     norden: form.norden,
     fecha: form.fecha,
-    txtPrueba: form.prueba,
-    txtMuestra: form.muestra,
+
+    txtPrueba: "",
+    txtMuestra: "",
     txtResultado: form.resultado,
     userRegistro: user,
     userMedicoOcup: "",
+
+    usuarioFirma: form.user_medicoFirma,
   };
 
   await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-    PrintHojaR(form.norden, token);
+    PrintHojaR(form.norden, token, tabla);
   });
 };
 
-export const PrintHojaR = (nro, token) => {
+export const PrintHojaR = (nro, token, tabla) => {
   const jasperModules = import.meta.glob(
     "../../../../../../jaspers/AnalisisBioquimicos/*.jsx"
   );
@@ -101,7 +119,13 @@ const GetInfoPac = async (nro, set, token, sede) => {
       ...prev,
       ...res,
       nombres: res.nombresApellidos ?? "",
-      edad: res.edad ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+      edad: res.edad,
+      ocupacion: res.areaO ?? "",
+      nombreExamen: res.nomExam ?? "",
+      cargoDesempenar: res.cargo ?? "",
+      lugarNacimiento: res.lugarNacimiento ?? "",
+      sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
     }));
   }
 };
