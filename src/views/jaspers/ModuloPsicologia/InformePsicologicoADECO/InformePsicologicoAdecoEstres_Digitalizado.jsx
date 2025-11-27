@@ -94,49 +94,16 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
 
   // Función para texto con salto de línea
   const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
-    const fontSize = doc.internal.getFontSize();
-    let yPos = y;
-
-    // Primero dividir por saltos de línea explícitos
-    const lineas = texto.split('\n');
+    if (!texto) return y;
+    
+    const lineas = doc.splitTextToSize(texto, anchoMaximo);
+    const interlineado = 3.5;
     
     lineas.forEach((linea, index) => {
-      if (index > 0) {
-        yPos += fontSize * 0.5; // Espacio adicional para saltos de línea explícitos
-      }
-      
-      // Luego dividir cada línea por palabras para ajustar al ancho
-      const palabras = linea.split(' ');
-      let lineaActual = '';
-
-      palabras.forEach(palabra => {
-        const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
-        const anchoTexto = doc.getTextWidth(textoPrueba);
-
-        if (anchoTexto <= anchoMaximo) {
-          lineaActual = textoPrueba;
-        } else {
-          if (lineaActual) {
-            doc.text(lineaActual, x, yPos);
-            yPos += fontSize * 0.35;
-            lineaActual = palabra;
-          } else {
-            doc.text(palabra, x, yPos);
-            yPos += fontSize * 0.35;
-          }
-        }
-      });
-
-      if (lineaActual) {
-        doc.text(lineaActual, x, yPos);
-        // Solo agregar espacio si hay más líneas por procesar
-        if (index < lineas.length - 1) {
-          yPos += fontSize * 0.35;
-        }
-      }
+      doc.text(linea, x, y + (index * interlineado));
     });
 
-    return yPos;
+    return y + (lineas.length * interlineado);
   };
 
   // Función general para dibujar header de sección con fondo gris
@@ -349,30 +316,16 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   yPos = dibujarHeaderSeccion("III.- ANÁLISIS FODA", yPos, filaAltura);
 
   // Función para calcular altura dinámica de texto
-  const calcularAlturaTexto = (texto, anchoMaximo) => {
-    const palabras = texto.split(' ');
-    let lineaActual = '';
-    let lineas = 1;
+  const calcularAlturaTexto = (texto, anchoMaximo, alturaMinima = 30) => {
+    if (!texto) return alturaMinima;
     
-    palabras.forEach(palabra => {
-      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
-      const anchoTexto = doc.getTextWidth(textoPrueba);
-      
-      if (anchoTexto <= anchoMaximo) {
-        lineaActual = textoPrueba;
-      } else {
-        if (lineaActual) {
-          lineas++;
-          lineaActual = palabra;
-        } else {
-          lineas++;
-        }
-      }
-    });
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const lineas = doc.splitTextToSize(texto, anchoMaximo);
+    const interlineado = 3.5;
     
-    // Altura mínima de 15mm, altura por línea de 3mm
-    const alturaCalculada = lineas * 3 + 2;
-    return Math.max(alturaCalculada, 20);
+    // Altura calculada + padding superior
+    const alturaCalculada = lineas.length * interlineado + 2;
+    return Math.max(alturaCalculada, alturaMinima);
   };
 
   // Fila 1: Fortalezas / Oportunidades
@@ -412,7 +365,7 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   yPos = dibujarHeaderSeccion("IV.- OBSERVACIONES", yPos, filaAltura);
 
   // Fila de Observaciones (creciente)
-  const alturaObservaciones = calcularAlturaTexto(datosFinales.observaciones, tablaAncho - 4);
+  const alturaObservaciones = calcularAlturaTexto(datosFinales.observaciones, tablaAncho - 5);
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaObservaciones);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaObservaciones);
@@ -420,7 +373,7 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yPos + alturaObservaciones, tablaInicioX + tablaAncho, yPos + alturaObservaciones);
 
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.observaciones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
+  dibujarTextoConSaltoLinea(datosFinales.observaciones, tablaInicioX + 2, yPos + 3.6, tablaAncho - 5);
   yPos += alturaObservaciones;
 
   // === SECCIÓN 5: RECOMENDACIONES ===
@@ -428,7 +381,7 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   yPos = dibujarHeaderSeccion("V.- RECOMENDACIONES", yPos, filaAltura);
 
   // Fila de Recomendaciones (creciente)
-  const alturaRecomendaciones = calcularAlturaTexto(datosFinales.recomendaciones, tablaAncho - 4);
+  const alturaRecomendaciones = calcularAlturaTexto(datosFinales.recomendaciones, tablaAncho - 5);
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRecomendaciones);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRecomendaciones);
@@ -436,7 +389,7 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yPos + alturaRecomendaciones, tablaInicioX + tablaAncho, yPos + alturaRecomendaciones);
 
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.recomendaciones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
+  dibujarTextoConSaltoLinea(datosFinales.recomendaciones, tablaInicioX + 2, yPos + 3.6, tablaAncho - 5);
   yPos += alturaRecomendaciones;
 
   // === SECCIÓN DE FIRMAS ===
