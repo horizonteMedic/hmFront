@@ -8,7 +8,6 @@ import ConsentimientoDigitalizacion from "./Admision/ConsentimientoDigitalizacio
 import Triaje from "./Triaje/Triaje";
 import Consentimientos from "./Laboratorio/Consentimientos/Consentimientos.jsx";
 import ParasitologiaCoprologico from "./Parasitologia/ParasitologiaCoprologico";
-import LaboratorioAnalisisBioquimicos from "./Laboratorio/laboratorio_analisis_bioquimicos/AnalisisBioquimicosSubTabSelector.jsx";
 import InmunologiaTab from "./Laboratorio/Inmunologia/Inmunologia_tab.jsx";
 import Toxicologia from "./Laboratorio/Toxicologia/Toxicologia";
 import Manipuladores from "./Laboratorio/Manipuladores/Manipuladores";
@@ -112,8 +111,7 @@ import PoderosaTabSelector from "./Poderosa/PoderosaTabSelector.jsx";
 import GestionOpciones from "./Playground/GestionOpciones/GestionOpciones.jsx";
 import LaboratorioClinicoSubTabSelector from "./Laboratorio/LaboratorioClinico/LaboratorioClinicoSubTabSelector.jsx";
 import EliminarExamenes from "./EliminarExamenes/EliminarExamenes.jsx";
-import AnalisisBioquimicosSubTabSelector from "./Laboratorio/laboratorio_analisis_bioquimicos/AnalisisBioquimicosSubTabSelector.jsx";
-
+import AnalisisBioquimicosSubTabSelector from "./Laboratorio/AnalisisBioquimicos/AnalisisBioquimicosSubTabSelector.jsx";
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
   { key: 7, label: "Test Altura" },
@@ -661,7 +659,7 @@ const TabComponent = () => {
               1: { title: "Triaje", child: <Triaje token={token} selectedSede={selectSede} /> },
               3: { title: "Coproparasitológico", child: <ParasitologiaCoprologico /> },
               // 4: { title: "Laboratorio Clínico", child: <LaboratorioClinico/> },
-              5: { title: "Análisis Bioquímicos", child: <LaboratorioAnalisisBioquimicos /> },
+              // 5: { title: "Análisis Bioquímicos", child: <AnalisisBioquimicosSubTabSelector /> },
               6: {
                 title: "Consentimientos", child: (
                   <Consentimientos

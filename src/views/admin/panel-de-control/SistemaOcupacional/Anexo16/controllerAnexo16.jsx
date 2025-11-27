@@ -1741,7 +1741,7 @@ export const GetInfoServicioEditar = (
           data.observacionesGenerales =
             res.observacionesFichaMedicaAnexo7c_txtobservacionesfm ?? "";
           data.conclusionRespiratoria =
-            res.conclusionAnexo7c_txtconclusion ?? "";
+            res.interpretacionFuncionRespiratoria_interpretacion ?? "";
 
           // Vaccinations
           data.tetano = res.tetanoAnexo7c_tetano ?? false;
