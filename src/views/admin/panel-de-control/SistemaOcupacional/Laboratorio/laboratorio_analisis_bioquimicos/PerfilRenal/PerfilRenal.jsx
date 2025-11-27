@@ -52,6 +52,7 @@ export default function PerfilRenal() {
     setForm,
     handleChange,
     handleClearnotO,
+    handleFocusNext,
     handleChangeSimple,
     handleClear,
     handlePrintDefault,
@@ -74,7 +75,7 @@ export default function PerfilRenal() {
     });
   };
   return (
-    <form className="py-4 space-y-3">
+    <form className="p-4 space-y-3">
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <InputTextOneLine
           label="N° Orden"
@@ -206,6 +207,7 @@ export default function PerfilRenal() {
             name="creatinina"
             value={form.creatinina}
             onChange={handleChange}
+            onKeyUp={handleFocusNext}
             labelWidth="120px"
             className='w-[90%]'
           />
@@ -220,6 +222,7 @@ export default function PerfilRenal() {
             name="urea"
             value={form.urea}
             onChange={handleChange}
+            onKeyUp={handleFocusNext}
             labelWidth="120px"
             className='w-[90%]'
           />

@@ -562,7 +562,7 @@ export default function HematologiaBioquimicaSIEO() {
                   { label: 'Leucocitos (x campos)', key: 'leucocitosSedimentoUnitario' },
                   { label: 'CelEpiteliales', key: 'celEpiteliales' },
                   { label: 'Cilindros', key: 'cilindros' },
-                  { label: 'Gram SC', key: 'gramSc' },
+                  { label: 'Gram S/C', key: 'gramSc' },
                 ].map((item) => (
                   <InputTextOneLine
                     label={item.label}

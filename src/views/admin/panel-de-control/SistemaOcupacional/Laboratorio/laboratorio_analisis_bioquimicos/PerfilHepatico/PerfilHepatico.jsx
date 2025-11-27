@@ -12,16 +12,16 @@ import SectionFieldset from '../../../../../../components/reusableComponents/Sec
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 
 const testFields = [
-  { label: 'FOSFATASA ALCALINA', name: 'fosfAlc' },
+  { label: 'Fosfatasa Alcalina', name: 'fosfAlc' },
   { label: 'GGT', name: 'ggt' },
   { label: 'TGP', name: 'tgp' },
   { label: 'TGO', name: 'tgo' },
-  { label: 'BILIRRUBINA TOTAL', name: 'biliTotal' },
-  { label: 'BILIRRUBINA DIRECTA', name: 'biliDir' },
-  { label: 'BILIRRUBINA INDIRECTA', name: 'biliInd' },
-  { label: 'PROTEINAS TOTALES', name: 'protTot' },
-  { label: 'ALBUMINA', name: 'albumina' },
-  { label: 'GLOBULINA SERICA', name: 'globSer' },
+  { label: 'Bilirrubina Total', name: 'biliTotal' },
+  { label: 'Bilirrubina Directa', name: 'biliDir' },
+  { label: 'Bilirrubina Indirecta', name: 'biliInd' },
+  { label: 'Proteínas Totales', name: 'protTot' },
+  { label: 'Albumina', name: 'albumina' },
+  { label: 'Globulina Sérica', name: 'globSer' },
 ];
 
 const tabla = 'perfil_hepatico';
@@ -73,6 +73,7 @@ export default function PerfilHepatico() {
     setForm,
     handleChange,
     handleChangeSimple,
+    handleFocusNext,
     handleChangeNumberDecimals,
     handleClearnotO,
     handleClear,
@@ -97,7 +98,7 @@ export default function PerfilHepatico() {
   };
 
   return (
-    <form className="space-y-3 py-4">
+    <form className="space-y-3 p-4">
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <InputTextOneLine
           label="N° Orden"
@@ -217,17 +218,33 @@ export default function PerfilHepatico() {
         />
       </SectionFieldset>
 
-      <SectionFieldset legend="Resultados" className="space-y-4">
-        {testFields.map(({ label, name }) => (
-          <InputTextOneLine
-            key={name}
-            label={label}
-            name={name}
-            value={form[name]}
-            onChange={(e) => handleChangeNumberDecimals(e, 2)}
-            labelWidth="120px"
-          />
-        ))}
+      <SectionFieldset legend="Resultados" className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className='space-y-4'>
+          {testFields.slice(0, 5).map(({ label, name }) => (
+            <InputTextOneLine
+              key={name}
+              label={label}
+              name={name}
+              value={form[name]}
+              onChange={handleChange}
+              onKeyUp={handleFocusNext}
+              labelWidth="120px"
+            />
+          ))}
+        </div>
+        <div className='space-y-4'>
+          {testFields.slice(5, 10).map(({ label, name }) => (
+            <InputTextOneLine
+              key={name}
+              label={label}
+              name={name}
+              value={form[name]}
+              onChange={handleChange}
+              onKeyUp={handleFocusNext}
+              labelWidth="120px"
+            />
+          ))}
+        </div>
       </SectionFieldset>
 
       <SectionFieldset legend="Asignación de Médico" className="space-y-4">
