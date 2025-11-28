@@ -43,6 +43,7 @@ export default function Hepatitis() {
     marca: 'RAPID TEST - MONTEST',
     resultadoHAV: '',
     resultadoHBsAg: '',
+    resultadoVHC: "",
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
@@ -56,7 +57,6 @@ export default function Hepatitis() {
     handleChangeNumberDecimals,
     handleChangeSimple,
     handleRadioButton,
-    handleFocusNext,
     handleClearnotO,
     handleClear,
     handlePrintDefault,
@@ -79,47 +79,9 @@ export default function Hepatitis() {
     });
   };
 
-  const handleHavChange = (checked) => {
-    setForm(prev => ({
-      ...prev,
-      hav: checked,
-      hbsag: checked ? false : prev.hbsag,
-      resultadoHBsAg: checked ? '' : prev.resultadoHBsAg,
-      resultadoHBsAgRadio: checked ? '' : prev.resultadoHBsAgRadio
-    }));
-  };
-
-  const handleHbsagChange = (checked) => {
-    setForm(prev => ({
-      ...prev,
-      hbsag: checked,
-      hav: checked ? false : prev.hav,
-      resultadoHAV: checked ? '' : prev.resultadoHAV,
-      resultadoHAVRadio: checked ? '' : prev.resultadoHAVRadio
-    }));
-  };
-
-  const handleResultadoHAVRadio = (e, value) => {
-    handleRadioButton(e, value);
-    setForm(prev => ({
-      ...prev,
-      resultadoHAV: value,
-      resultadoHAVRadio: value
-    }));
-  };
-
-  const handleResultadoHBsAgRadio = (e, value) => {
-    handleRadioButton(e, value);
-    setForm(prev => ({
-      ...prev,
-      resultadoHBsAg: value,
-      resultadoHBsAgRadio: value
-    }));
-  };
-
   return (
     <form className="space-y-3 p-4">
-      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <InputTextOneLine
           label="N° Orden"
           name="norden"
@@ -145,7 +107,7 @@ export default function Hepatitis() {
         />
       </SectionFieldset>
 
-      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
         <InputTextOneLine
           label="Nombres"
           name="nombres"
@@ -153,7 +115,7 @@ export default function Hepatitis() {
           disabled
           labelWidth="120px"
         />
-        <div className="grid md:grid-cols-2 gap-3">
+        <div className="grid lg:grid-cols-2 gap-3">
           <InputTextOneLine
             label="Edad (Años)"
             name="edad"
@@ -169,7 +131,7 @@ export default function Hepatitis() {
             labelWidth="120px"
           />
         </div>
-        <div className="grid md:grid-cols-2 gap-3">
+        <div className="grid lg:grid-cols-2 gap-3">
           <InputTextOneLine
             label="DNI"
             name="dni"
@@ -247,12 +209,14 @@ export default function Hepatitis() {
             setForm(prev => ({
               ...prev,
               resultadoHAV: value != "A" ? "" : prev.resultadoHAV,
-              resultadoHBsAg: value != "B" ? "" : prev.resultadoHBsAg
+              resultadoHBsAg: value != "B" ? "" : prev.resultadoHBsAg,
+              resultadoVHC: value != "C" ? "" : prev.resultadoVHC,
             }))
           }}
           options={[
             { label: "HEPATITIS A (HAV)", value: "A" },
             { label: "HEPATITIS B (HBsAg)", value: "B" },
+            { label: "HEPATITIS C (VHC)", value: "C" },
           ]}
         />
       </SectionFieldset>
@@ -263,21 +227,21 @@ export default function Hepatitis() {
           name="marca"
           value={form.marca}
           onChange={handleChange}
-          labelWidth="180px"
+          labelWidth="120px"
         />
       </SectionFieldset>
 
-      <SectionFieldset legend="Resultados" className="space-y-4">
-        <div className="grid grid-cols-11 gap-x-4 gap-y-3 items-center">
+      <SectionFieldset legend="Resultados Rapid Test" className="grid space-y-3">
+        <div className='flex gap-4'>
           {/* HAV */}
           <InputTextOneLine
-            label='HEPATITIS A (HAV) - RAPID TEST'
+            label='Hepatitis A (HAV)'
             name="resultadoHAV"
             value={form.resultadoHAV}
             onChange={handleChange}
             disabled={form.tipoHepatitis != "A"}
-            labelWidth='180px'
-            className='col-span-7'
+            labelWidth='120px'
+            className='w-full max-w-[85%]'
           />
           <InputsRadioGroup
             name="resultadoHAV"
@@ -289,16 +253,17 @@ export default function Hepatitis() {
             ]}
             disabled={form.tipoHepatitis != "A"}
           />
-
+        </div>
+        <div className='flex gap-4'>
           {/* HBsAg */}
           <InputTextOneLine
-            label='HEPATITIS B (HBsAg) - RAPID TEST'
+            label='Hepatitis B (HBsAg)'
             name="resultadoHBsAg"
             value={form.resultadoHBsAg}
             onChange={handleChange}
             disabled={form.tipoHepatitis != "B"}
-            labelWidth='180px'
-            className='col-span-7'
+            labelWidth='120px'
+            className='w-full max-w-[85%]'
           />
           <InputsRadioGroup
             name="resultadoHBsAg"
@@ -309,6 +274,27 @@ export default function Hepatitis() {
               { label: 'Negativo', value: 'NEGATIVO' }
             ]}
             disabled={form.tipoHepatitis != "B"}
+          />
+        </div>
+        <div className='flex gap-4'>
+          <InputTextOneLine
+            label='Hepatitis C (VHC)'
+            name="resultadoVHC"
+            value={form.resultadoVHC}
+            onChange={handleChange}
+            disabled={form.tipoHepatitis != "C"}
+            labelWidth='120px'
+            className='w-full max-w-[85%]'
+          />
+          <InputsRadioGroup
+            name="resultadoVHC"
+            value={form.resultadoVHC}
+            onChange={handleRadioButton}
+            options={[
+              { label: 'Positivo', value: 'POSITIVO' },
+              { label: 'Negativo', value: 'NEGATIVO' }
+            ]}
+            disabled={form.tipoHepatitis != "C"}
           />
         </div>
       </SectionFieldset>

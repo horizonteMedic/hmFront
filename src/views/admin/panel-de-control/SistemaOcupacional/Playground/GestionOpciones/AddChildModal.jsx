@@ -58,8 +58,9 @@ const AddChildModal = ({
         }
 
         // Validar que el nombre no exista ya en el mismo nivel
+        const parentId = parentItem ? parentItem.id : null;
         const existingNames = allItems
-            .filter(item => item.idPadre === parentItem?.id)
+            .filter(item => item.idPadre === parentId)
             .map(item => item.nombre.toLowerCase());
         
         if (formData.nombre.trim() && existingNames.includes(formData.nombre.trim().toLowerCase())) {

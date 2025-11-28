@@ -35,7 +35,7 @@ const validarDatosOpcion = (datos) => {
         errores.push("El estado debe ser un valor booleano");
     }
 
-    if (!datos.nivel || typeof datos.nivel !== "number") {
+    if (typeof datos.nivel !== "number" || Number.isNaN(datos.nivel)) {
         errores.push("El nivel debe ser un número válido");
     }
 

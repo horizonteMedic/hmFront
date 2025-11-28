@@ -16,13 +16,28 @@ export default function SectionFieldset({
 
     useEffect(() => {
         if (!collapsible) return;
-        if (open && contentRef.current) {
-            const h = contentRef.current.scrollHeight;
-            setMaxHeight(h + "px");
+        if (!contentRef.current) return;
+        if (open) {
+            const measure = () => {
+                const h = contentRef.current.scrollHeight;
+                setMaxHeight(h + "px");
+            };
+            measure();
+            let ro;
+            if (typeof ResizeObserver !== "undefined") {
+                ro = new ResizeObserver(() => measure());
+                ro.observe(contentRef.current);
+            }
+            const onWindowResize = () => measure();
+            window.addEventListener("resize", onWindowResize);
+            return () => {
+                window.removeEventListener("resize", onWindowResize);
+                if (ro) ro.disconnect();
+            };
         } else {
             setMaxHeight("0px");
         }
-    }, [open, collapsible]);
+    }, [open, collapsible, children]);
 
     const contentSpacing = legend ? (open ? "mb-4" : "mb-0") : (open ? "my-4" : "my-0");
     return (

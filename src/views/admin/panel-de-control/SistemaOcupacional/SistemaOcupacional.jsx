@@ -8,7 +8,6 @@ import ConsentimientoDigitalizacion from "./Admision/ConsentimientoDigitalizacio
 import Triaje from "./Triaje/Triaje";
 import Consentimientos from "./Laboratorio/Consentimientos/Consentimientos.jsx";
 import ParasitologiaCoprologico from "./Parasitologia/ParasitologiaCoprologico";
-import InmunologiaTab from "./Laboratorio/Inmunologia/Inmunologia_tab.jsx";
 import Toxicologia from "./Laboratorio/Toxicologia/Toxicologia";
 import Manipuladores from "./Laboratorio/Manipuladores/Manipuladores";
 import PruebasCovid from "./Laboratorio/PruebasCovid/PruebasCovid";
@@ -112,6 +111,7 @@ import GestionOpciones from "./Playground/GestionOpciones/GestionOpciones.jsx";
 import LaboratorioClinicoSubTabSelector from "./Laboratorio/LaboratorioClinico/LaboratorioClinicoSubTabSelector.jsx";
 import EliminarExamenes from "./EliminarExamenes/EliminarExamenes.jsx";
 import AnalisisBioquimicosSubTabSelector from "./Laboratorio/AnalisisBioquimicos/AnalisisBioquimicosSubTabSelector.jsx";
+import InmunologiaSubTabSelector from "./Laboratorio/Inmunologia/InmunologiaSubTabSelector.jsx";
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
   { key: 7, label: "Test Altura" },
@@ -550,11 +550,8 @@ const TabComponent = () => {
                   />
                 )}
                 {labTab === 2 && (
-                  <InmunologiaTab
-                    token={token}
-                    selectedSede={selectSede}
-                    userlogued={userlogued.sub}
-                    permiso={tienePermisoEnVista}
+                  <InmunologiaSubTabSelector
+                    tieneVista={tieneVista}
                   />
                 )}
                 {labTab === 3 && (

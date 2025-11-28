@@ -1,4 +1,3 @@
-import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
@@ -99,7 +98,7 @@ export default function PerfilHepatico() {
 
   return (
     <form className="space-y-3 p-4">
-      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <InputTextOneLine
           label="N° Orden"
           name="norden"
@@ -125,7 +124,7 @@ export default function PerfilHepatico() {
         />
       </SectionFieldset>
 
-      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
         <InputTextOneLine
           label="Nombres"
           name="nombres"
@@ -133,7 +132,7 @@ export default function PerfilHepatico() {
           disabled
           labelWidth="120px"
         />
-        <div className="grid md:grid-cols-2 gap-3">
+        <div className="grid lg:grid-cols-2 gap-3">
           <InputTextOneLine
             label="Edad (Años)"
             name="edad"
@@ -149,7 +148,7 @@ export default function PerfilHepatico() {
             labelWidth="120px"
           />
         </div>
-        <div className="grid md:grid-cols-2 gap-3">
+        <div className="grid lg:grid-cols-2 gap-3">
           <InputTextOneLine
             label="DNI"
             name="dni"
