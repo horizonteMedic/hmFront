@@ -334,13 +334,13 @@ export default function DatosPersonales({
                 label="Puesto Actual"
                 name="puestoActual"
                 value={form.puestoActual}
-                disabled
+                onChange={handleChange}
               />
               <InputTextOneLine
                 label="Tiempo"
                 name="tiempoPuesto"
                 value={form.tiempoPuesto}
-                onChange={handleChangeNumber}
+                onChange={handleChange}
               />
               <InputTextOneLine
                 label="Area"

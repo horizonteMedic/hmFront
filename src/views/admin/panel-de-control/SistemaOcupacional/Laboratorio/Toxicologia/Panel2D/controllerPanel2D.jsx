@@ -7,6 +7,7 @@ import {
   SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
+import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
   "/api/v01/ct/toxicologia/obtenerReportePanel2D";
@@ -31,12 +32,29 @@ export const GetInfoServicio = async (
     set((prev) => ({
       ...prev,
       norden: res.norden ?? "",
-      fecha: res.fechaExamen ?? prev.fecha,
-      nombres: res.nombres ?? prev.nombres,
-      edad: res.edad ?? prev.edad,
+      fecha: res.fechaExamen,
+
+      nombreExamen: res.nombreExamen ?? "",
+      dni: res.dni ?? "",
+
+      nombres: res.nombres ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+      lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+      edad: res.edad ?? "",
+      sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+      estadoCivil: res.estadoCivilPaciente,
+      nivelEstudios: res.nivelEstudioPaciente,
+      // Datos Laborales
+      empresa: res.empresa,
+      contrata: res.contrata,
+      ocupacion: res.ocupacionPaciente,
+      cargoDesempenar: res.cargoPaciente,
+
       valueM: res.reMarihuana ?? "NEGATIVO",
       valueC: res.reCocaina ?? "NEGATIVO",
       metodo: res.txtMetodo ?? "INMUNOCROMATOGRAFICO",
+
+      user_medicoFirma: res.usuarioFirma,
     }));
   }
 };
@@ -62,6 +80,8 @@ export const SubmitDataService = async (
     txtMetodo: form.metodo,
     userMedicoOcup: "",
     userRegistro: user,
+
+    usuarioFirma: form.user_medicoFirma,
   };
 
   await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -75,7 +95,7 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
   });
 };
 
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+export const PrintHojaR = (nro, token, tabla) => {
   const jasperModules = import.meta.glob(
     "../../../../../../jaspers/Toxicologia/*.jsx"
   );
@@ -83,7 +103,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     nro,
     token,
     tabla,
-    datosFooter,
+    null,
     obtenerReporteUrl,
     jasperModules,
     "../../../../../../jaspers/Toxicologia"
@@ -121,7 +141,13 @@ const GetInfoPac = async (nro, set, token, sede) => {
       ...prev,
       ...res,
       nombres: res.nombresApellidos ?? "",
-      edad: res.edad ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+      edad: res.edad,
+      ocupacion: res.areaO ?? "",
+      nombreExamen: res.nomExam ?? "",
+      cargoDesempenar: res.cargo ?? "",
+      lugarNacimiento: res.lugarNacimiento ?? "",
+      sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
     }));
   }
 };
