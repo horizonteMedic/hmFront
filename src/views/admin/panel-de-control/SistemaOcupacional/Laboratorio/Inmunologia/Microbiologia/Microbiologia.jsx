@@ -110,7 +110,7 @@ export default function Microbiologia() {
 
   return (
     <form className="p-4 space-y-3">
-      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 xl:grid-cols-3 gap-3 md:gap-4">
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 xl:grid-cols-3 gap-3 lg:gap-4">
         <InputTextOneLine
           label="N° Orden"
           name="norden"
@@ -135,7 +135,7 @@ export default function Microbiologia() {
           labelWidth="120px"
         />
       </SectionFieldset>
-      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
         <InputTextOneLine
           label="Nombres"
           name="nombres"
@@ -143,7 +143,7 @@ export default function Microbiologia() {
           disabled
           labelWidth="120px"
         />
-        <div className="grid md:grid-cols-2 gap-3">
+        <div className="grid lg:grid-cols-2 gap-3">
           <InputTextOneLine
             label="Edad (Años)"
             name="edad"
@@ -180,7 +180,7 @@ export default function Microbiologia() {
           disabled
           labelWidth="120px"
         />
-        <div className="grid md:grid-cols-2 gap-3">
+        <div className="grid lg:grid-cols-2 gap-3">
           <InputTextOneLine
             label="Estado Civil"
             name="estadoCivil"

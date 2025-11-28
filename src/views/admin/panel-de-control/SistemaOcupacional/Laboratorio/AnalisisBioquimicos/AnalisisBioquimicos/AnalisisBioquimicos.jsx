@@ -134,7 +134,7 @@ export default function AnalisisBioquimicos() {
   return (
     <div className="p-4 grid xl:grid-cols-2 gap-x-4 gap-y-3">
       <div className="space-y-3">
-        <SectionFieldset legend="Información del Examen" className="grid md:grid-cols-2 gap-3 col-span-2">
+        <SectionFieldset legend="Información del Examen" className="grid lg:grid-cols-2 gap-3 col-span-2">
           <InputTextOneLine
             label="N° Orden"
             name="norden"
@@ -158,14 +158,14 @@ export default function AnalisisBioquimicos() {
           />
 
         </SectionFieldset>
-        <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+        <SectionFieldset legend="Datos Personales" collapsible className="grid lg:grid-cols-2 gap-3 lg:gap-4">
           <InputTextOneLine
             label="Nombres"
             name="nombres"
             value={form.nombres}
             disabled
-            className='col-span-2'
             labelWidth="120px"
+            className='lg:col-span-2'
           />
           <InputTextOneLine
             label="DNI"
@@ -199,7 +199,7 @@ export default function AnalisisBioquimicos() {
             label="Lugar Nacimiento"
             name="lugarNacimiento"
             value={form.lugarNacimiento}
-            className='col-span-2'
+            className='lg:col-span-2'
             disabled
             labelWidth="120px"
           />
@@ -334,7 +334,7 @@ export default function AnalisisBioquimicos() {
           </button>
         </div>
       </div>
-      <SectionFieldset legend="Búsqueda de Examenes" className="grid md:grid-cols-2 gap-3">
+      <SectionFieldset legend="Búsqueda de Examenes" className="grid xl:grid-cols-2 gap-3">
         <InputTextOneLine
           label="Nombres"
           name="nombres_search"

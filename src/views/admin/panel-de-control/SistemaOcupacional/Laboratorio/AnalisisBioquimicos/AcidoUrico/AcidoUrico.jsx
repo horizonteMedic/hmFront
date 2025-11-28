@@ -75,7 +75,7 @@ export default function AcidoUrico() {
 
   return (
     <form className="space-y-3 p-4">
-      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <InputTextOneLine
           label="N° Orden"
           name="norden"
@@ -101,7 +101,7 @@ export default function AcidoUrico() {
         />
       </SectionFieldset>
 
-      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
         <InputTextOneLine
           label="Nombres"
           name="nombres"
@@ -109,7 +109,7 @@ export default function AcidoUrico() {
           disabled
           labelWidth="120px"
         />
-        <div className="grid md:grid-cols-2 gap-3">
+        <div className="grid lg:grid-cols-2 gap-3">
           <InputTextOneLine
             label="Edad (Años)"
             name="edad"
@@ -125,7 +125,7 @@ export default function AcidoUrico() {
             labelWidth="120px"
           />
         </div>
-        <div className="grid md:grid-cols-2 gap-3">
+        <div className="grid lg:grid-cols-2 gap-3">
           <InputTextOneLine
             label="DNI"
             name="dni"
@@ -208,7 +208,7 @@ export default function AcidoUrico() {
           className='w-[90%]'
           onChange={handleChange}
         />
-        <div className='flex flex-col items-start text-gray-500 text-[10px] font-medium'>
+        <div className='flex flex-col items-start text-gray-500 text-[10px] font-medium min-w-[130px]'>
           <span>{"Mujeres : 2.5 - 6.8 mg/dl"}</span>
           <span>{"Hombres : 3.6 - 7.7 mg/dl"}</span>
         </div>

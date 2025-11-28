@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronDown, faChevronRight, faFolder, faFile, faPlus, faExchangeAlt, faEdit, faSave, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronRight, faFolder, faFile, faPlus, faEdit, faSave, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../hooks/useSessionData';
-import ChangeParentModal from './ChangeParentModal';
+ 
 import AddChildModal from './AddChildModal';
 import { 
     obtenerOpcionesInterfaz, 
@@ -89,7 +89,7 @@ const getHierarchyColors = (level, hasChildren) => {
 };
 
 // Componente para un elemento individual del árbol
-const TreeItem = ({ item, children, level = 0, onItemSelect, selectedItem }) => {
+const TreeItem = ({ item, children, level = 0, onItemSelect, selectedItem, onDragStartItem, onDropOnItem }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const hasChildren = children && children.length > 0;
     const colors = getHierarchyColors(level, hasChildren);
@@ -120,6 +120,10 @@ const TreeItem = ({ item, children, level = 0, onItemSelect, selectedItem }) => 
                     }`}
                 style={getIndentStyle()}
                 onClick={handleItemClick}
+                draggable
+                onDragStart={() => onDragStartItem(item)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => { e.preventDefault(); onDropOnItem(item); }}
             >
                 <div className="flex items-center min-w-0 flex-1">
                     {hasChildren ? (
@@ -171,6 +175,8 @@ const TreeItem = ({ item, children, level = 0, onItemSelect, selectedItem }) => 
                                 level={level + 1}
                                 onItemSelect={onItemSelect}
                                 selectedItem={selectedItem}
+                                onDragStartItem={onDragStartItem}
+                                onDropOnItem={onDropOnItem}
                             />
                         ))}
                     </div>
@@ -181,7 +187,7 @@ const TreeItem = ({ item, children, level = 0, onItemSelect, selectedItem }) => 
 };
 
 // Componente para un nodo del árbol (wrapper que incluye hijos)
-const TreeNode = ({ node, level, onItemSelect, selectedItem }) => {
+const TreeNode = ({ node, level, onItemSelect, selectedItem, onDragStartItem, onDropOnItem }) => {
     return (
         <TreeItem
             item={node.item}
@@ -189,6 +195,8 @@ const TreeNode = ({ node, level, onItemSelect, selectedItem }) => {
             level={level}
             onItemSelect={onItemSelect}
             selectedItem={selectedItem}
+            onDragStartItem={onDragStartItem}
+            onDropOnItem={onDropOnItem}
         />
     );
 };
@@ -240,8 +248,20 @@ const buildTree = (items) => {
     return tree;
 };
 
+const isDescendant = (potentialChild, potentialParent, allItems) => {
+    if (!potentialChild || !potentialParent) return false;
+    let currentItem = potentialChild;
+    while (currentItem && currentItem.idPadre !== null) {
+        if (currentItem.idPadre === potentialParent.id) {
+            return true;
+        }
+        currentItem = allItems.find(i => i.id === currentItem.idPadre);
+    }
+    return false;
+};
+
 // Componente del panel de detalles
-const DetailsPanel = ({ selectedItem, onItemUpdate, onAddChild, onChangeParent, onDelete, data }) => {
+const DetailsPanel = ({ selectedItem, onItemUpdate, onAddChild, onDelete, data }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editedItem, setEditedItem] = useState(null);
 
@@ -440,21 +460,13 @@ const DetailsPanel = ({ selectedItem, onItemUpdate, onAddChild, onChangeParent, 
             {/* Botones de acción */}
             {!isEditing && (
                 <div className="border-t border-gray-200 p-6 bg-gray-50">
-                    <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-4">
                         <button
                             onClick={() => onAddChild(selectedItem)}
                             className="w-full flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium"
                         >
                             <FontAwesomeIcon icon={faPlus} className="h-4 w-4 mr-2" />
                             Agregar Hijo
-                        </button>
-
-                        <button
-                            onClick={() => onChangeParent(selectedItem)}
-                            className="w-full flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
-                        >
-                            <FontAwesomeIcon icon={faExchangeAlt} className="h-4 w-4 mr-2" />
-                            Cambiar Padre
                         </button>
 
                         <button
@@ -474,8 +486,9 @@ const DetailsPanel = ({ selectedItem, onItemUpdate, onAddChild, onChangeParent, 
 export default function GestionOpciones() {
     const [treeData, setTreeData] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
-    const [isChangeParentModalOpen, setIsChangeParentModalOpen] = useState(false);
+    const [draggingItem, setDraggingItem] = useState(null);
     const [isAddChildModalOpen, setIsAddChildModalOpen] = useState(false);
+    const [isAddToRoot, setIsAddToRoot] = useState(false);
     const [data, setData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -552,45 +565,46 @@ export default function GestionOpciones() {
     };
 
     const handleAddChild = (item) => {
+        setIsAddToRoot(false);
         setIsAddChildModalOpen(true);
     };
 
-    const handleChangeParent = (item) => {
-        setIsChangeParentModalOpen(true);
+    const handleAddRoot = () => {
+        setIsAddToRoot(true);
+        setIsAddChildModalOpen(true);
     };
 
     const handleChangeParentConfirm = async (currentItem, newParent) => {
         try {
-            // Crear el item actualizado con el nuevo padre
             const updatedItem = {
                 ...currentItem,
                 idPadre: newParent.id,
                 nivel: newParent.id === null ? 0 : newParent.nivel + 1
             };
 
-            // Preparar los datos para la actualización usando la función del controlador
             const datosActualizacion = prepararDatosActualizacionOpcion(
                 updatedItem,
                 currentItem,
-                userlogued // Usar userlogued para el usuario de actualización
+                userlogued
             );
 
-            // Mostrar en consola el JSON que se enviará para la actualización
             console.log('JSON que se enviará para cambiar padre:', JSON.stringify(datosActualizacion, null, 2));
 
-            // Llamar a la API para actualizar la opción
             const resultado = await actualizarOpcionInterfaz(currentItem.id, datosActualizacion, token);
 
             if (resultado) {
-                // Si la actualización fue exitosa, recargar los datos desde la API
-                await cargarDatosIniciales();
-                
-                // Buscar el elemento actualizado en los datos y seleccionarlo
-                const elementoActualizado = data.find(item => item.id === currentItem.id);
-                
-                if (elementoActualizado) {
-                    setSelectedItem(elementoActualizado);
-                }
+                // Actualización local sin recargar toda la vista
+                setData(prev => {
+                    const updatedData = prev.map(it => it.id === currentItem.id ? { ...it, ...datosActualizacion } : it);
+                    setTreeData(buildTree(updatedData));
+                    return updatedData;
+                });
+
+                // Mantener el elemento actual seleccionado tras el cambio de padre
+                setSelectedItem(prev => {
+                    if (!prev) return updatedItem;
+                    return prev.id === currentItem.id ? { ...currentItem, ...datosActualizacion } : prev;
+                });
 
                 console.log('Padre cambiado exitosamente:', {
                     item: currentItem.nombre,
@@ -603,41 +617,49 @@ export default function GestionOpciones() {
         }
     };
 
-    const handleCloseChangeParentModal = () => {
-        setIsChangeParentModalOpen(false);
+    const handleDragStart = (item) => {
+        setDraggingItem(item);
+    };
+
+    const handleDropOnItem = async (targetItem) => {
+        if (!draggingItem) return;
+        if (draggingItem.id === targetItem.id) return;
+        if (isDescendant(targetItem, draggingItem, data)) return;
+        await handleChangeParentConfirm(draggingItem, targetItem);
+        setDraggingItem(null);
+    };
+
+    const handleDropToRoot = async () => {
+        if (!draggingItem) return;
+        await handleChangeParentConfirm(draggingItem, { id: null });
+        setDraggingItem(null);
     };
 
     const handleAddChildConfirm = async (formData) => {
         try {
-            // Preparar los datos para la nueva opción usando el controlador
+            const isRoot = isAddToRoot || !selectedItem;
             const datosParaRegistro = prepararDatosNuevaOpcion({
                 nombre: formData.nombre,
                 rutaVista: formData.rutaVista,
                 descripcion: formData.descripcion,
                 estado: formData.estado,
-                nivel: selectedItem ? selectedItem.nivel + 1 : 0,
-                idPadre: selectedItem ? selectedItem.id : null
+                nivel: isRoot ? 0 : (selectedItem.nivel + 1),
+                idPadre: isRoot ? null : selectedItem.id
             }, userlogued);
 
-            // Mostrar en consola el JSON que se enviará para el registro
             console.log('JSON que se enviará para crear nuevo hijo:', JSON.stringify(datosParaRegistro, null, 2));
 
-            // Llamar a la API para registrar la nueva opción
             const resultado = await registrarOpcionInterfaz(datosParaRegistro, token);
 
             if (resultado) {
-                // Si el registro fue exitoso, recargar los datos desde la API
-                await cargarDatosIniciales();
-                
-                // Buscar el nuevo elemento en los datos actualizados y seleccionarlo
-                const nuevoElemento = data.find(item => 
-                    item.nombre === formData.nombre && 
-                    item.idPadre === (selectedItem ? selectedItem.id : null)
-                );
-                
-                if (nuevoElemento) {
-                    setSelectedItem(nuevoElemento);
-                }
+                // Agregar el nuevo hijo localmente y mantener el padre seleccionado
+                setData(prev => {
+                    const updatedData = [...prev, resultado];
+                    setTreeData(buildTree(updatedData));
+                    return updatedData;
+                });
+
+                setSelectedItem(prev => prev);
 
                 console.log('Nuevo hijo registrado exitosamente:', resultado);
             }
@@ -648,20 +670,27 @@ export default function GestionOpciones() {
 
     const handleCloseAddChildModal = () => {
         setIsAddChildModalOpen(false);
+        setIsAddToRoot(false);
     };
 
     // Función para manejar la eliminación de un elemento
     const handleDelete = async (item) => {
         try {
-            // Llamar a la función de eliminación que ya incluye las confirmaciones
             const resultado = await eliminarOpcionInterfaz(item.id, token);
 
             if (resultado) {
-                // Si la eliminación fue exitosa, recargar los datos desde la API
-                await cargarDatosIniciales();
-                
-                // Limpiar la selección ya que el elemento fue eliminado
-                setSelectedItem(null);
+                const parentId = item.idPadre;
+                const padre = data.find(it => it.id === parentId) || null;
+
+                // Eliminar localmente y reconstruir árbol sin perder el contexto visual
+                setData(prev => {
+                    const updatedData = prev.filter(it => it.id !== item.id);
+                    setTreeData(buildTree(updatedData));
+                    return updatedData;
+                });
+
+                // Mantener la selección del padre del elemento eliminado
+                setSelectedItem(padre);
 
                 console.log('Elemento eliminado exitosamente:', item);
             }
@@ -671,15 +700,24 @@ export default function GestionOpciones() {
     };
 
     return (
-        <div className="flex justify-center w-full min-h-screen bg-gray-50 p-4">
-            <div className="flex w-full max-w-7xl bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="flex justify-center w-full px-4">
+            <div className="flex w-full  bg-white rounded-lg shadow-lg overflow-hidden">
                 {/* Panel izquierdo - Árbol */}
                 <div className="w-[500px] flex-shrink-0 border-r border-gray-200">
                     {/* Header */}
                     <div className="border-b border-gray-200 p-4 bg-gradient-to-r from-slate-800 to-slate-700">
-                        <h1 className="text-xl font-bold text-white">
-                            Gestión de Opciones del Sistema
-                        </h1>
+                        <div className="flex items-center justify-between">
+                            <h1 className="text-xl font-bold text-white">
+                                Gestión de Opciones del Sistema
+                            </h1>
+                            <button
+                                onClick={handleAddRoot}
+                                className="flex items-center px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200"
+                            >
+                                <FontAwesomeIcon icon={faPlus} className="h-4 w-4 mr-2" />
+                                Agregar a raíz
+                            </button>
+                        </div>
                     </div>
 
                     {/* Contenido del árbol con dimensiones fijas y scroll mejorado */}
@@ -715,6 +753,13 @@ export default function GestionOpciones() {
                             </div>
                         ) : treeData.length > 0 ? (
                             <div className="space-y-1 min-h-full">
+                                <div
+                                    className="mb-2 p-3 border-2 border-dashed border-gray-300 rounded text-gray-600 text-sm flex items-center justify-center"
+                                    onDragOver={(e) => e.preventDefault()}
+                                    onDrop={(e) => { e.preventDefault(); handleDropToRoot(); }}
+                                >
+                                    Soltar aquí para asignar a raíz
+                                </div>
                                 {treeData.map(node => (
                                     <TreeNode
                                         key={node.item.id}
@@ -722,6 +767,8 @@ export default function GestionOpciones() {
                                         level={0}
                                         onItemSelect={handleItemSelect}
                                         selectedItem={selectedItem}
+                                        onDragStartItem={handleDragStart}
+                                        onDropOnItem={handleDropOnItem}
                                     />
                                 ))}
                             </div>
@@ -752,29 +799,20 @@ export default function GestionOpciones() {
                         selectedItem={selectedItem}
                         onItemUpdate={handleItemUpdate}
                         onAddChild={handleAddChild}
-                        onChangeParent={handleChangeParent}
                         onDelete={handleDelete}
                         data={data}
                     />
                 </div>
             </div>
 
-            {/* Modal para cambiar padre */}
-            <ChangeParentModal
-                isOpen={isChangeParentModalOpen}
-                onClose={handleCloseChangeParentModal}
-                onConfirm={handleChangeParentConfirm}
-                currentItem={selectedItem}
-                treeData={treeData}
-                allItems={data}
-            />
+                
 
             {/* Modal para agregar hijo */}
             <AddChildModal
                 isOpen={isAddChildModalOpen}
                 onClose={handleCloseAddChildModal}
                 onConfirm={handleAddChildConfirm}
-                parentItem={selectedItem}
+                parentItem={isAddToRoot ? null : selectedItem}
                 allItems={data}
             />
         </div>

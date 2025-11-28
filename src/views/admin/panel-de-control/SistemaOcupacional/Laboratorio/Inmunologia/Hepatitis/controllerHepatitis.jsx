@@ -43,11 +43,13 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
       cargoDesempenar: res.cargoPaciente,
 
       tipoHepatitis: res.txtHepatitisa !== null && res.txtHepatitisa !== "" ? "A" :
-        res.txtHepatitisb !== null && res.txtHepatitisb !== "" ? "B" : "A",
+        res.txtHepatitisb !== null && res.txtHepatitisb !== "" ? "B" :
+          res.txtHepatitisc !== null && res.txtHepatitisc !== "" ? "C" : "A",
 
       marca: res.txtMarca ?? "RAPID TEST - MONTEST",
       resultadoHAV: res.txtHepatitisa ?? "",
       resultadoHBsAg: res.txtHepatitisb ?? "",
+      resultadoVHC: res.txtHepatitisc ?? "",
 
       user_medicoFirma: res.usuarioFirma,
     }));
@@ -66,6 +68,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla, datos
     txtMarca: form.marca,
     txtHepatitisa: form.resultadoHAV,
     txtHepatitisb: form.resultadoHBsAg,
+    hepatitisc: form.resultadoVHC,
     userRegistro: user,
     userMedicoOcup: "",
 

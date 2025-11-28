@@ -3,34 +3,22 @@ import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { getToday } from '../../../../../../utils/helpers';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerPerfilHepatico';
+import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerPanel2D';
 import {
   InputTextOneLine,
+  InputsRadioGroup,
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 
-const testFields = [
-  { label: 'Fosfatasa Alcalina', name: 'fosfAlc' },
-  { label: 'GGT', name: 'ggt' },
-  { label: 'TGP', name: 'tgp' },
-  { label: 'TGO', name: 'tgo' },
-  { label: 'Bilirrubina Total', name: 'biliTotal' },
-  { label: 'Bilirrubina Directa', name: 'biliDir' },
-  { label: 'Bilirrubina Indirecta', name: 'biliInd' },
-  { label: 'Proteínas Totales', name: 'protTot' },
-  { label: 'Albumina', name: 'albumina' },
-  { label: 'Globulina Sérica', name: 'globSer' },
-];
+const tabla = 'panel2d';
 
-const tabla = 'perfil_hepatico';
-
-export default function PerfilHepatico() {
+export default function Panel2D() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
   const initialFormState = {
-    norden: "",
+    norden: '',
     fecha: today,
 
     nombreExamen: "",
@@ -51,16 +39,10 @@ export default function PerfilHepatico() {
     ocupacion: "",
     cargoDesempenar: "",
 
-    tgo: '',
-    tgp: '',
-    ggt: '',
-    fosfAlc: '',
-    biliTotal: '',
-    biliInd: '',
-    biliDir: '',
-    protTot: '',
-    albumina: '',
-    globSer: '',
+    valueM: 'NEGATIVO',
+    valueC: 'NEGATIVO',
+    metodo: 'INMUNOCROMATOGRAFICO',
+
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
@@ -73,37 +55,12 @@ export default function PerfilHepatico() {
     handleChange,
     handleChangeNumberDecimals,
     handleChangeSimple,
+    handleRadioButton,
     handleFocusNext,
     handleClearnotO,
     handleClear,
     handlePrintDefault,
   } = useForm(initialFormState);
-
-  const handleChangeBilirrubina = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => {
-      const next = { ...prev, [name]: value };
-      const total = parseFloat(next.biliTotal);
-      const directa = parseFloat(next.biliDir);
-      const diff = total - directa;
-      const result = Number.isFinite(diff) ? (Math.round(diff * 100) / 100).toString() : '';
-      next.biliInd = result;
-      return next;
-    });
-  };
-
-  const handleChangeGlobulina = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => {
-      const next = { ...prev, [name]: value };
-      const prot = parseFloat(next.protTot);
-      const alb = parseFloat(next.albumina);
-      const diff = prot - alb;
-      const result = Number.isFinite(diff) ? (Math.round(diff * 100) / 100).toString() : '';
-      next.globSer = result;
-      return next;
-    });
-  };
 
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear);
@@ -122,8 +79,11 @@ export default function PerfilHepatico() {
     });
   };
 
+
+
   return (
-    <form className="space-y-3 p-4">
+    <form className="space-y-3 p-4 text-[10px]">
+      {/* Información del Examen */}
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <InputTextOneLine
           label="N° Orden"
@@ -242,48 +202,60 @@ export default function PerfilHepatico() {
           labelWidth="120px"
         />
       </SectionFieldset>
+      {/* Resultados */}
+      <SectionFieldset legend="Resultados" className='grid gap-y-3'>
+        <InputTextOneLine
+          label='Prueba Rápida Cualitativa'
+          name="metodo"
+          value={form.metodo}
+          onChange={handleChange}
+          labelWidth='120px'
+        />
+        <div className="grid  gap-x-4 gap-y-3">
 
-      <SectionFieldset legend="Resultados" className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className='space-y-4'>
-          {testFields.slice(0, 5).map(({ label, name }) => (
+          <div className="flex gap-4">
             <InputTextOneLine
-              key={name}
-              label={label}
-              name={name}
-              value={form[name]}
-              onChange={
-                name === 'biliTotal' || name === 'biliDir'
-                  ? handleChangeBilirrubina
-                  : name === 'protTot' || name === 'albumina'
-                  ? handleChangeGlobulina
-                  : handleChange
-              }
-              onKeyUp={handleFocusNext}
-              labelWidth="120px"
+              label='MARIHUANA (THC)'
+              name="valueM"
+              value={form.valueM}
+              onChange={handleChange}
+              labelWidth='120px'
+              className='w-full max-w-[85%]'
             />
-          ))}
-        </div>
-        <div className='space-y-4'>
-          {testFields.slice(5, 10).map(({ label, name }) => (
+            <InputsRadioGroup
+              name="valueM"
+              value={form.valueM}
+              onChange={handleRadioButton}
+              options={[
+                { label: 'Positivo', value: 'POSITIVO' },
+                { label: 'Negativo', value: 'NEGATIVO' }
+              ]}
+            />
+          </div>
+
+          <div className="flex gap-4">
             <InputTextOneLine
-              key={name}
-              label={label}
-              name={name}
-              value={form[name]}
-              onChange={
-                name === 'biliTotal' || name === 'biliDir'
-                  ? handleChangeBilirrubina
-                  : name === 'protTot' || name === 'albumina'
-                  ? handleChangeGlobulina
-                  : handleChange
-              }
-              onKeyUp={handleFocusNext}
-              labelWidth="120px"
+              label='COCAINA (COC)'
+              name="valueC"
+              value={form.valueC}
+              onChange={handleChange}
+              labelWidth='120px'
+              className='w-full max-w-[85%]'
             />
-          ))}
+            <InputsRadioGroup
+              name="valueC"
+              value={form.valueC}
+              onChange={handleRadioButton}
+              options={[
+                { label: 'Positivo', value: 'POSITIVO' },
+                { label: 'Negativo', value: 'NEGATIVO' }
+              ]}
+            />
+          </div>
         </div>
       </SectionFieldset>
 
+      {/* Médico */}
       <SectionFieldset legend="Asignación de Médico" className="space-y-4">
         <EmpleadoComboBox
           value={form.nombre_medico}
@@ -293,6 +265,7 @@ export default function PerfilHepatico() {
         />
       </SectionFieldset>
 
+      {/* Acciones */}
       <fieldset className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
         <div className="flex gap-3">
           <button
