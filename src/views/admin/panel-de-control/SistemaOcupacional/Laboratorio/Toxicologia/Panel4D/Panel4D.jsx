@@ -3,7 +3,7 @@ import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { getToday } from '../../../../../../utils/helpers';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerPanel2D';
+import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerPanel4D';
 import {
   InputTextOneLine,
   InputsRadioGroup,
@@ -11,9 +11,9 @@ import {
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 
-const tabla = 'panel2d';
+const tabla = 'panel4d';
 
-export default function Panel2D() {
+export default function Panel4D() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
@@ -39,10 +39,10 @@ export default function Panel2D() {
     ocupacion: "",
     cargoDesempenar: "",
 
-    valueM: 'NEGATIVO',
     valueC: 'NEGATIVO',
-    metodo: 'INMUNOCROMATOGRAFICO',
-
+    valueM: 'NEGATIVO',
+    valueO: 'NEGATIVO',
+    valueMet: 'NEGATIVO',
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
@@ -54,9 +54,8 @@ export default function Panel2D() {
     setForm,
     handleChange,
     handleChangeNumberDecimals,
-    handleChangeSimple,
     handleRadioButton,
-    handleFocusNext,
+    handleChangeSimple,
     handleClearnotO,
     handleClear,
     handlePrintDefault,
@@ -78,8 +77,6 @@ export default function Panel2D() {
       PrintHojaR(form.norden, token, tabla);
     });
   };
-
-
 
   return (
     <form className="space-y-3 p-4 text-[10px]">
@@ -202,16 +199,10 @@ export default function Panel2D() {
           labelWidth="120px"
         />
       </SectionFieldset>
+
       {/* Resultados */}
-      <SectionFieldset legend="Resultados" className='grid gap-y-3'>
-        <InputTextOneLine
-          label='Prueba Rápida Cualitativa'
-          name="metodo"
-          value={form.metodo}
-          onChange={handleChange}
-          labelWidth='120px'
-        />
-        <div className="grid  gap-x-4 gap-y-3">
+      <SectionFieldset legend="Resultados">
+        <div className="grid gap-x-4 gap-y-3">
           <div className="flex gap-4">
             <InputTextOneLine
               label='Marihuana (THC)'
@@ -231,7 +222,6 @@ export default function Panel2D() {
               ]}
             />
           </div>
-
           <div className="flex gap-4">
             <InputTextOneLine
               label='Cocaína (COC)'
@@ -251,6 +241,44 @@ export default function Panel2D() {
               ]}
             />
           </div>
+          <div className="flex gap-4">
+            <InputTextOneLine
+              label='Opiáceos'
+              name="valueO"
+              value={form.valueO}
+              onChange={handleChange}
+              labelWidth='120px'
+              className='w-full max-w-[85%]'
+            />
+            <InputsRadioGroup
+              name="valueO"
+              value={form.valueO}
+              onChange={handleRadioButton}
+              options={[
+                { label: 'Positivo', value: 'POSITIVO' },
+                { label: 'Negativo', value: 'NEGATIVO' }
+              ]}
+            />
+          </div>
+          <div className="flex gap-4">
+            <InputTextOneLine
+              label='Metanfetaminas'
+              name="valueMet"
+              value={form.valueMet}
+              onChange={handleChange}
+              labelWidth='120px'
+              className='w-full max-w-[85%]'
+            />
+            <InputsRadioGroup
+              name="valueMet"
+              value={form.valueMet}
+              onChange={handleRadioButton}
+              options={[
+                { label: 'Positivo', value: 'POSITIVO' },
+                { label: 'Negativo', value: 'NEGATIVO' }
+              ]}
+            />
+          </div>
         </div>
       </SectionFieldset>
 
@@ -263,7 +291,6 @@ export default function Panel2D() {
           onChange={handleChangeSimple}
         />
       </SectionFieldset>
-
       {/* Acciones */}
       <fieldset className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
         <div className="flex gap-3">
@@ -289,7 +316,7 @@ export default function Panel2D() {
               name="norden"
               value={form.norden}
               onChange={handleChange}
-              inputClassName="w-24"
+              inputClassName="w-28"
             />
             <button
               type="button"

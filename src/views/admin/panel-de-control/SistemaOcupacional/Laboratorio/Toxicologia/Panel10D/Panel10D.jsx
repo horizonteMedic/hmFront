@@ -3,7 +3,7 @@ import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { getToday } from '../../../../../../utils/helpers';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerPanel2D';
+import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerPanel10D';
 import {
   InputTextOneLine,
   InputsRadioGroup,
@@ -11,9 +11,9 @@ import {
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 
-const tabla = 'panel2d';
+const tabla = 'panel10d';
 
-export default function Panel2D() {
+export default function Panel10D() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
@@ -41,8 +41,15 @@ export default function Panel2D() {
 
     valueM: 'NEGATIVO',
     valueC: 'NEGATIVO',
+    valueAn: 'NEGATIVO',
+    valueMet: 'NEGATIVO',
+    valueBen: 'NEGATIVO',
+    valueOpi: 'NEGATIVO',
+    valueBar: 'NEGATIVO',
+    valueMetadona: 'NEGATIVO',
+    valueFenci: 'NEGATIVO',
+    valueAnti: 'NEGATIVO',
     metodo: 'INMUNOCROMATOGRAFICO',
-
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
@@ -54,9 +61,8 @@ export default function Panel2D() {
     setForm,
     handleChange,
     handleChangeNumberDecimals,
-    handleChangeSimple,
     handleRadioButton,
-    handleFocusNext,
+    handleChangeSimple,
     handleClearnotO,
     handleClear,
     handlePrintDefault,
@@ -78,8 +84,6 @@ export default function Panel2D() {
       PrintHojaR(form.norden, token, tabla);
     });
   };
-
-
 
   return (
     <form className="space-y-3 p-4 text-[10px]">
@@ -202,8 +206,9 @@ export default function Panel2D() {
           labelWidth="120px"
         />
       </SectionFieldset>
+
       {/* Resultados */}
-      <SectionFieldset legend="Resultados" className='grid gap-y-3'>
+      <SectionFieldset legend="Resultados">
         <InputTextOneLine
           label='Prueba Rápida Cualitativa'
           name="metodo"
@@ -211,27 +216,7 @@ export default function Panel2D() {
           onChange={handleChange}
           labelWidth='120px'
         />
-        <div className="grid  gap-x-4 gap-y-3">
-          <div className="flex gap-4">
-            <InputTextOneLine
-              label='Marihuana (THC)'
-              name="valueM"
-              value={form.valueM}
-              onChange={handleChange}
-              labelWidth='120px'
-              className='w-full max-w-[85%]'
-            />
-            <InputsRadioGroup
-              name="valueM"
-              value={form.valueM}
-              onChange={handleRadioButton}
-              options={[
-                { label: 'Positivo', value: 'POSITIVO' },
-                { label: 'Negativo', value: 'NEGATIVO' }
-              ]}
-            />
-          </div>
-
+        <div className="grid gap-x-4 gap-y-3">
           <div className="flex gap-4">
             <InputTextOneLine
               label='Cocaína (COC)'
@@ -251,10 +236,181 @@ export default function Panel2D() {
               ]}
             />
           </div>
+          <div className="flex gap-4">
+            <InputTextOneLine
+              label='Marihuana (THC)'
+              name="valueM"
+              value={form.valueM}
+              onChange={handleChange}
+              labelWidth='120px'
+              className='w-full max-w-[85%]'
+            />
+            <InputsRadioGroup
+              name="valueM"
+              value={form.valueM}
+              onChange={handleRadioButton}
+              options={[
+                { label: 'Positivo', value: 'POSITIVO' },
+                { label: 'Negativo', value: 'NEGATIVO' }
+              ]}
+            />
+          </div>
+          <div className="flex gap-4">
+            <InputTextOneLine
+              label='Anfetamina (AMP)'
+              name="valueAn"
+              value={form.valueAn}
+              onChange={handleChange}
+              labelWidth='120px'
+              className='w-full max-w-[85%]'
+            />
+            <InputsRadioGroup
+              name="valueAn"
+              value={form.valueAn}
+              onChange={handleRadioButton}
+              options={[
+                { label: 'Positivo', value: 'POSITIVO' },
+                { label: 'Negativo', value: 'NEGATIVO' }
+              ]}
+            />
+          </div>
+          <div className="flex gap-4">
+            <InputTextOneLine
+              label='Metanfetaminas'
+              name="valueMet"
+              value={form.valueMet}
+              onChange={handleChange}
+              labelWidth='120px'
+              className='w-full max-w-[85%]'
+            />
+            <InputsRadioGroup
+              name="valueMet"
+              value={form.valueMet}
+              onChange={handleRadioButton}
+              options={[
+                { label: 'Positivo', value: 'POSITIVO' },
+                { label: 'Negativo', value: 'NEGATIVO' }
+              ]}
+            />
+          </div>
+          <div className="flex gap-4">
+            <InputTextOneLine
+              label='Benzodiazepina'
+              name="valueBen"
+              value={form.valueBen}
+              onChange={handleChange}
+              labelWidth='120px'
+              className='w-full max-w-[85%]'
+            />
+            <InputsRadioGroup
+              name="valueBen"
+              value={form.valueBen}
+              onChange={handleRadioButton}
+              options={[
+                { label: 'Positivo', value: 'POSITIVO' },
+                { label: 'Negativo', value: 'NEGATIVO' }
+              ]}
+            />
+          </div>
+          <div className="flex gap-4">
+            <InputTextOneLine
+              label='Opiáceos (OPI)'
+              name="valueOpi"
+              value={form.valueOpi}
+              onChange={handleChange}
+              labelWidth='120px'
+              className='w-full max-w-[85%]'
+            />
+            <InputsRadioGroup
+              name="valueOpi"
+              value={form.valueOpi}
+              onChange={handleRadioButton}
+              options={[
+                { label: 'Positivo', value: 'POSITIVO' },
+                { label: 'Negativo', value: 'NEGATIVO' }
+              ]}
+            />
+          </div>
+          <div className="flex gap-4">
+            <InputTextOneLine
+              label='Barbitúricos (BAR)'
+              name="valueBar"
+              value={form.valueBar}
+              onChange={handleChange}
+              labelWidth='120px'
+              className='w-full max-w-[85%]'
+            />
+            <InputsRadioGroup
+              name="valueBar"
+              value={form.valueBar}
+              onChange={handleRadioButton}
+              options={[
+                { label: 'Positivo', value: 'POSITIVO' },
+                { label: 'Negativo', value: 'NEGATIVO' }
+              ]}
+            />
+          </div>
+          <div className="flex gap-4">
+            <InputTextOneLine
+              label='Metadona (MTD)'
+              name="valueMetadona"
+              value={form.valueMetadona}
+              onChange={handleChange}
+              labelWidth='120px'
+              className='w-full max-w-[85%]'
+            />
+            <InputsRadioGroup
+              name="valueMetadona"
+              value={form.valueMetadona}
+              onChange={handleRadioButton}
+              options={[
+                { label: 'Positivo', value: 'POSITIVO' },
+                { label: 'Negativo', value: 'NEGATIVO' }
+              ]}
+            />
+          </div>
+          <div className="flex gap-4">
+            <InputTextOneLine
+              label='Fenciclidina (PCP)'
+              name="valueFenci"
+              value={form.valueFenci}
+              onChange={handleChange}
+              labelWidth='120px'
+              className='w-full max-w-[85%]'
+            />
+            <InputsRadioGroup
+              name="valueFenci"
+              value={form.valueFenci}
+              onChange={handleRadioButton}
+              options={[
+                { label: 'Positivo', value: 'POSITIVO' },
+                { label: 'Negativo', value: 'NEGATIVO' }
+              ]}
+            />
+          </div>
+
+          <div className="flex gap-4">
+            <InputTextOneLine
+              label='Antidepresivos Ticíclicos (TCA)'
+              name="valueAnti"
+              value={form.valueAnti}
+              onChange={handleChange}
+              labelWidth='120px'
+              className='w-full max-w-[85%]'
+            />
+            <InputsRadioGroup
+              name="valueAnti"
+              value={form.valueAnti}
+              onChange={handleRadioButton}
+              options={[
+                { label: 'Positivo', value: 'POSITIVO' },
+                { label: 'Negativo', value: 'NEGATIVO' }
+              ]}
+            />
+          </div>
         </div>
       </SectionFieldset>
 
-      {/* Médico */}
       <SectionFieldset legend="Asignación de Médico" className="space-y-4">
         <EmpleadoComboBox
           value={form.nombre_medico}
@@ -289,7 +445,7 @@ export default function Panel2D() {
               name="norden"
               value={form.norden}
               onChange={handleChange}
-              inputClassName="w-24"
+              inputClassName="w-28"
             />
             <button
               type="button"
