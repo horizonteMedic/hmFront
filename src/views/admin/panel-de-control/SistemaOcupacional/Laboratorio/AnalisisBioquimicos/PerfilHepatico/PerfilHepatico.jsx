@@ -79,6 +79,32 @@ export default function PerfilHepatico() {
     handlePrintDefault,
   } = useForm(initialFormState);
 
+  const handleChangeBilirrubina = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => {
+      const next = { ...prev, [name]: value };
+      const total = parseFloat(next.biliTotal);
+      const directa = parseFloat(next.biliDir);
+      const diff = total - directa;
+      const result = Number.isFinite(diff) ? (Math.round(diff * 100) / 100).toString() : '';
+      next.biliInd = result;
+      return next;
+    });
+  };
+
+  const handleChangeGlobulina = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => {
+      const next = { ...prev, [name]: value };
+      const prot = parseFloat(next.protTot);
+      const alb = parseFloat(next.albumina);
+      const diff = prot - alb;
+      const result = Number.isFinite(diff) ? (Math.round(diff * 100) / 100).toString() : '';
+      next.globSer = result;
+      return next;
+    });
+  };
+
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear);
   };
@@ -225,7 +251,13 @@ export default function PerfilHepatico() {
               label={label}
               name={name}
               value={form[name]}
-              onChange={handleChange}
+              onChange={
+                name === 'biliTotal' || name === 'biliDir'
+                  ? handleChangeBilirrubina
+                  : name === 'protTot' || name === 'albumina'
+                  ? handleChangeGlobulina
+                  : handleChange
+              }
               onKeyUp={handleFocusNext}
               labelWidth="120px"
             />
@@ -238,7 +270,13 @@ export default function PerfilHepatico() {
               label={label}
               name={name}
               value={form[name]}
-              onChange={handleChange}
+              onChange={
+                name === 'biliTotal' || name === 'biliDir'
+                  ? handleChangeBilirrubina
+                  : name === 'protTot' || name === 'albumina'
+                  ? handleChangeGlobulina
+                  : handleChange
+              }
               onKeyUp={handleFocusNext}
               labelWidth="120px"
             />

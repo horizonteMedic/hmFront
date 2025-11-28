@@ -460,7 +460,7 @@ const DetailsPanel = ({ selectedItem, onItemUpdate, onAddChild, onDelete, data }
             {/* Botones de acción */}
             {!isEditing && (
                 <div className="border-t border-gray-200 p-6 bg-gray-50">
-                    <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-4">
                         <button
                             onClick={() => onAddChild(selectedItem)}
                             className="w-full flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium"
@@ -700,8 +700,8 @@ export default function GestionOpciones() {
     };
 
     return (
-        <div className="flex justify-center w-full min-h-screen bg-gray-50 p-4">
-            <div className="flex w-full max-w-7xl bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="flex justify-center w-full px-4">
+            <div className="flex w-full  bg-white rounded-lg shadow-lg overflow-hidden">
                 {/* Panel izquierdo - Árbol */}
                 <div className="w-[500px] flex-shrink-0 border-r border-gray-200">
                     {/* Header */}
