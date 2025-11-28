@@ -9,8 +9,8 @@ import {
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
-const obtenerReporteUrl = "/api/v01/ct/inmunologia/obtenerReporteMicrobiologia";
-const registrarUrl = "/api/v01/ct/inmunologia/registrarActualizarMicrobiologia";
+const obtenerReporteUrl = "/api/v01/ct/inmunologia/obtenerReporteHepatitis";
+const registrarUrl = "/api/v01/ct/inmunologia/registrarActualizarHepatitis";
 
 export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
   const res = await GetInfoServicioDefault(
@@ -24,15 +24,15 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
     set((prev) => ({
       ...prev,
       norden: res.norden ?? "",
-      fecha: res.fecha,
+      fecha: res.fechaExamen,
 
       nombreExamen: res.nombreExamen ?? "",
-      dni: res.dniPaciente ?? "",
+      dni: res.dni ?? "",
 
       nombres: res.nombres ?? "",
       fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
       lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-      edad: res.edadPaciente ?? "",
+      edad: res.edad ?? "",
       sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
       estadoCivil: res.estadoCivilPaciente,
       nivelEstudios: res.nivelEstudioPaciente,
@@ -42,17 +42,19 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
       ocupacion: res.ocupacionPaciente,
       cargoDesempenar: res.cargoPaciente,
 
-      examenDirecto: res.txtKoh ? true : false,
-      bk1: res.txtMuestra1 ?? "",
-      bk2: res.txtMuestra2 ?? "",
-      koh: res.txtKoh ?? "",
+      tipoHepatitis: res.txtHepatitisa !== null && res.txtHepatitisa !== "" ? "A" :
+        res.txtHepatitisb !== null && res.txtHepatitisb !== "" ? "B" : "A",
+
+      marca: res.txtMarca ?? "RAPID TEST - MONTEST",
+      resultadoHAV: res.txtHepatitisa ?? "",
+      resultadoHBsAg: res.txtHepatitisb ?? "",
 
       user_medicoFirma: res.usuarioFirma,
     }));
   }
 };
 
-export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
+export const SubmitDataService = async (form, token, user, limpiar, tabla, datosFooter) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
     return;
@@ -60,10 +62,10 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
 
   const body = {
     norden: form.norden,
-    fecha: form.fecha,
-    txtMuestra1: form.bk1,
-    txtMuestra2: form.bk2,
-    txtKoh: form.koh,
+    fechaExamen: form.fecha,
+    txtMarca: form.marca,
+    txtHepatitisa: form.resultadoHAV,
+    txtHepatitisb: form.resultadoHBsAg,
     userRegistro: user,
     userMedicoOcup: "",
 
@@ -71,11 +73,11 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
   };
 
   await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-    PrintHojaR(form.norden, token, tabla);
+    PrintHojaR(form.norden, token, tabla, datosFooter);
   });
 };
 
-export const PrintHojaR = (nro, token, tabla) => {
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
   const jasperModules = import.meta.glob(
     "../../../../../../jaspers/Inmunologia/*.jsx"
   );
@@ -83,7 +85,7 @@ export const PrintHojaR = (nro, token, tabla) => {
     nro,
     token,
     tabla,
-    null,
+    datosFooter,
     obtenerReporteUrl,
     jasperModules,
     "../../../../../../jaspers/Inmunologia"
@@ -106,7 +108,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
       GetInfoServicio(nro, tabla, set, token, () => {
         Swal.fire(
           "Alerta",
-          "Este paciente ya cuenta con registros de Microbiología.",
+          "Este paciente ya cuenta con registros de Hepatitis.",
           "warning"
         );
       });

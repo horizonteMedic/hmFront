@@ -3,23 +3,22 @@ import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { getToday } from '../../../../../../utils/helpers';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerAcidoUrico';
+import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerPerfilRenal';
 import {
   InputTextOneLine,
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 
-const tabla = 'ac_bioquimica2022';
+const tabla = 'l_bioquimica';
 
-export default function AcidoUrico() {
+export default function PerfilRenal() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
   const initialFormState = {
     norden: '',
     fecha: today,
-
     nombreExamen: "",
 
     dni: "",
@@ -38,7 +37,10 @@ export default function AcidoUrico() {
     ocupacion: "",
     cargoDesempenar: "",
 
-    resultado: '',
+    creatinina: '',
+    urea: '',
+    acidoUrico: '',
+    printCount: '',
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
@@ -49,9 +51,9 @@ export default function AcidoUrico() {
     form,
     setForm,
     handleChange,
-    handleChangeNumberDecimals,
-    handleChangeSimple,
     handleClearnotO,
+    handleFocusNext,
+    handleChangeSimple,
     handleClear,
     handlePrintDefault,
   } = useForm(initialFormState);
@@ -72,15 +74,14 @@ export default function AcidoUrico() {
       PrintHojaR(form.norden, token, tabla);
     });
   };
-
   return (
-    <form className="space-y-3 p-4">
+    <form className="p-4 space-y-3">
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <InputTextOneLine
           label="N° Orden"
           name="norden"
           value={form.norden}
-          onChange={handleChangeNumberDecimals}
+          onChange={handleChange}
           onKeyUp={handleSearch}
           labelWidth="120px"
         />
@@ -89,7 +90,7 @@ export default function AcidoUrico() {
           name="fecha"
           type="date"
           value={form.fecha}
-          onChange={handleChangeSimple}
+          onChange={handleChange}
           labelWidth="120px"
         />
         <InputTextOneLine
@@ -101,7 +102,7 @@ export default function AcidoUrico() {
         />
       </SectionFieldset>
 
-      <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
         <InputTextOneLine
           label="Nombres"
           name="nombres"
@@ -163,7 +164,7 @@ export default function AcidoUrico() {
           labelWidth="120px"
         />
       </SectionFieldset>
-      <SectionFieldset legend="Datos Laborales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <SectionFieldset legend="Datos Laborales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <InputTextOneLine
           label="Empresa"
           name="empresa"
@@ -195,22 +196,51 @@ export default function AcidoUrico() {
       </SectionFieldset>
 
       <div className="font-semibold text-center bg-gray-100 p-3 rounded">
-        PRUEBA: ÁCIDO ÚRICO SÉRICO<br />
         MUESTRA: SUERO
       </div>
 
-      <SectionFieldset legend="Resultados" className="flex items-center gap-4">
-        <InputTextOneLine
-          label='Resultado'
-          name="resultado"
-          value={form.resultado}
-          labelWidth='120px'
-          className='w-[90%]'
-          onChange={handleChange}
-        />
-        <div className='flex flex-col items-start text-gray-500 text-[10px] font-medium'>
-          <span>{"Mujeres : 2.5 - 6.8 mg/dl"}</span>
-          <span>{"Hombres : 3.6 - 7.7 mg/dl"}</span>
+      <SectionFieldset legend="Pruebas y Resultados" className="space-y-3">
+
+        <div className="flex items-center gap-4">
+          <InputTextOneLine
+            label='Creatinina Sérica'
+            name="creatinina"
+            value={form.creatinina}
+            onChange={handleChange}
+            onKeyUp={handleFocusNext}
+            labelWidth="120px"
+            className='w-[90%]'
+          />
+          <div className='flex flex-col items-start text-gray-500 text-[10px] font-medium'>
+            <span>{"Adulto: 0.8 - 1.4 mg/dl"}</span>
+            <span>{"Niño: 0.24 - 0.84 mg/dl"}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          <InputTextOneLine
+            label='Urea Sérica'
+            name="urea"
+            value={form.urea}
+            onChange={handleChange}
+            onKeyUp={handleFocusNext}
+            labelWidth="120px"
+            className='w-[90%]'
+          />
+          <span className="text-gray-500 text-[10px] font-medium">{"10 - 50 mg/dl"}</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <InputTextOneLine
+            label='Acido Urico Sérico'
+            name="acidoUrico"
+            value={form.acidoUrico}
+            onChange={handleChange}
+            labelWidth="120px"
+            className='w-[90%]'
+          />
+          <div className='flex flex-col items-start text-gray-500 text-[10px] font-medium'>
+            <span>{"Mujeres: 2.5 - 6.8 mg/dl"}</span>
+            <span>{"Hombres: 3.6 - 7.7 mg/dl"}</span>
+          </div>
         </div>
       </SectionFieldset>
 

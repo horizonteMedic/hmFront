@@ -3,7 +3,7 @@ import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { getToday } from '../../../../../../utils/helpers';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controller';
+import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerMicrobiologia';
 import {
   InputCheckbox,
   InputsRadioGroup,
@@ -135,7 +135,7 @@ export default function Microbiologia() {
           labelWidth="120px"
         />
       </SectionFieldset>
-      <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
         <InputTextOneLine
           label="Nombres"
           name="nombres"
@@ -197,7 +197,7 @@ export default function Microbiologia() {
           />
         </div>
       </SectionFieldset>
-      <SectionFieldset legend="Datos Laborales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <SectionFieldset legend="Datos Laborales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <InputTextOneLine
           label="Empresa"
           name="empresa"
