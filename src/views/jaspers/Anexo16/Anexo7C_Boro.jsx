@@ -87,14 +87,15 @@ export default function Anexo7C_Antiguo(data = {}) {
         };
       }
       
+      // Comparación exacta como en JasperReports: $F{nivel_est_pa}.equals("VALOR")?"X":""
       return {
-        analfabeto: nivelEstudio.includes("ANALFABETO"),
-        primariaCom: nivelEstudio.includes("PRIMARIA") && nivelEstudio.includes("COMPLETA") && !nivelEstudio.includes("INCOMPLETA"),
-        primariaInc: nivelEstudio.includes("PRIMARIA") && nivelEstudio.includes("INCOMPLETA"),
-        secCom: nivelEstudio.includes("SECUNDARIA") && nivelEstudio.includes("COMPLETA") && !nivelEstudio.includes("INCOMPLETA"),
-        secInc: nivelEstudio.includes("SECUNDARIA") && nivelEstudio.includes("INCOMPLETA"),
-        univers: nivelEstudio.includes("UNIVERSITARIO") || nivelEstudio.includes("UNIVERS"),
-        tecnico: nivelEstudio.includes("TECNICO") || nivelEstudio.includes("TÉCNICO")
+        analfabeto: nivelEstudio === "ANALFABETO",
+        primariaCom: nivelEstudio === "PRIMARIA COMPLETA",
+        primariaInc: nivelEstudio === "PRIMARIA INCOMPLETA",
+        secCom: nivelEstudio === "SECUNDARIA COMPLETA",
+        secInc: nivelEstudio === "SECUNDARIA INCOMPLETA",
+        univers: nivelEstudio === "UNIVERSITARIO",
+        tecnico: nivelEstudio === "TECNICO"
       };
     })(),
     // Datos adicionales para la fila de riesgos ocupacionales
@@ -170,7 +171,7 @@ export default function Anexo7C_Antiguo(data = {}) {
       fev1: data.fev1FuncionRespiratoria_fev1 ?? "",
       fev1Fvc: data.fev1FvcFuncionRespiratoria_fev1fvc ?? "",
       fef2575: data.fef2575FuncionRespiratoria_fef25_75 ?? "",
-      conclusion: data.conclusionAnexo7c_txtconclusion ?? "",
+      conclusion: data.interpretacionFuncionRespiratoria_interpretacion ?? "",
     },
     // Temperatura
     temperatura: data.temperaturaTriaje_temperatura ?? "",

@@ -72,7 +72,7 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
   function buildDatosFinales(raw) {
     const datosReales = {
       apellidosNombres: String((((raw?.apellidosPaciente ?? '') + ' ' + (raw?.nombresPaciente ?? '')).trim())),
-      fechaExamen: formatearFechaCorta(raw?.fechaEntrevista), 
+      fechaExamen: formatearFechaCorta(raw?.fechaFichaAnexo16_fecha), 
       tipoExamen: String(raw?.nombreExamen),
       sexo: convertirGenero(raw?.sexoPaciente),
       documentoIdentidad: String(raw?.dniPaciente),
@@ -141,7 +141,7 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
     // Títulos
     doc.setFont("helvetica", "bold").setFontSize(12);
     doc.setTextColor(0, 0, 0);
-    doc.text("INFORME MÉDICO", pageW / 2, 34, { align: "center" });
+    doc.text("RESUMEN MÉDICO PODEROSA", pageW / 2, 34, { align: "center" });
 
     // Número de Ficha, Sede, Fecha y Página
     doc.setFont("helvetica", "normal").setFontSize(9);
@@ -151,7 +151,7 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
 
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Sede: " + (datosFinales.sede || ""), pageW - 70, 20);
-    doc.text("Fecha de examen: " + (datosFinales.fechaExamen || ""), pageW - 70, 25);
+    doc.text("Fecha de examen: " + (formatearFechaCorta(data?.fechaFichaAnexo16_fecha) || ""), pageW - 70, 25);
     doc.text("Pag. " + pageNumber.toString().padStart(2, '0'), pageW - 25, 8);
 
     // Bloque de color
@@ -253,8 +253,8 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
 
   // Función general para dibujar header de sección con fondo gris
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
-    const tablaInicioX = 7.5;
-    const tablaAncho = 195;
+    const tablaInicioX = 5;
+    const tablaAncho = 200;
 
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
@@ -281,8 +281,8 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
   drawHeader(numeroPagina);
 
   // === SECCIÓN 1: DATOS DE FILIACIÓN ===
-  const tablaInicioX = 7.5;
-  const tablaAncho = 195;
+  const tablaInicioX = 5;
+  const tablaAncho = 200;
   let yPos = 35;
   const filaAltura = 5;
 
@@ -609,7 +609,7 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
 
   // Fila de Antecedentes Patológicos (creciente)
   const antecedentesPatologicosTexto = datosFinales.antecedentesPatologicos || "";
-  const alturaAntecedentesPatologicos = calcularAlturaTexto(antecedentesPatologicosTexto, tablaAncho - 9);
+  const alturaAntecedentesPatologicos = calcularAlturaTexto(antecedentesPatologicosTexto, tablaAncho - 12);
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaAntecedentesPatologicos);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaAntecedentesPatologicos);
@@ -617,7 +617,7 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yPos + alturaAntecedentesPatologicos, tablaInicioX + tablaAncho, yPos + alturaAntecedentesPatologicos);
 
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(antecedentesPatologicosTexto, tablaInicioX + 3, yPos + 6, tablaAncho - 4);
+  dibujarTextoConSaltoLinea(antecedentesPatologicosTexto, tablaInicioX + 3, yPos + 6, tablaAncho - 7);
   yPos += alturaAntecedentesPatologicos;
 
   // Subheader celeste: Antecedentes Familiares Importantes
@@ -698,12 +698,92 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
   // Fila gris: Exámenes Complementarios
   yPos = dibujarHeaderSeccion("EXÁMENES COMPLEMENTARIOS", yPos, filaAltura);
 
-  // Función para dibujar una fila de examen
+  // Función para calcular altura de filas de examen (con altura mínima menor)
+  const calcularAlturaFilaExamen = (texto, anchoMaximo) => {
+    // Validar que el texto no sea undefined, null o vacío
+    if (!texto || texto === null || texto === undefined || texto === '') {
+      return 4.5; // Altura mínima para filas vacías
+    }
+    
+    let lineas = 0;
+    
+    // Dividir por saltos de línea explícitos (\n)
+    const lineasTexto = String(texto).split('\n');
+    
+    lineasTexto.forEach((linea, index) => {
+      // Verificar si la línea comienza con un número seguido de punto (lista numerada)
+      const esListaNumerada = /^\d+\./.test(linea.trim());
+      
+      if (esListaNumerada) {
+        // Agregar espacio extra entre elementos de lista (excepto el primero)
+        if (index > 0) {
+          lineas += 0.2; // Espacio adicional entre elementos
+        }
+        
+        // Para listas numeradas, calcular líneas considerando el ancho
+        const palabras = linea.split(' ');
+        let lineaActual = '';
+        let lineasEnEstaSeccion = 1;
+        
+        palabras.forEach(palabra => {
+          const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+          const anchoTexto = doc.getTextWidth(textoPrueba);
+          
+          if (anchoTexto <= anchoMaximo) {
+            lineaActual = textoPrueba;
+          } else {
+            if (lineaActual) {
+              lineasEnEstaSeccion++;
+              lineaActual = palabra;
+            } else {
+              lineasEnEstaSeccion++;
+            }
+          }
+        });
+        
+        lineas += lineasEnEstaSeccion;
+      } else {
+        // Para texto normal, usar el método original
+        const palabras = linea.split(' ');
+        let lineaActual = '';
+        let lineasEnEstaSeccion = 1;
+        
+        palabras.forEach(palabra => {
+          const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+          const anchoTexto = doc.getTextWidth(textoPrueba);
+          
+          if (anchoTexto <= anchoMaximo) {
+            lineaActual = textoPrueba;
+          } else {
+            if (lineaActual) {
+              lineasEnEstaSeccion++;
+              lineaActual = palabra;
+            } else {
+              lineasEnEstaSeccion++;
+            }
+          }
+        });
+        
+        lineas += lineasEnEstaSeccion;
+      }
+    });
+    
+    // Altura mínima de 4.5mm, altura por línea de 3mm
+    const alturaCalculada = lineas * 3 + 2;
+    return Math.max(alturaCalculada, 4.5);
+  };
+
+  // Función para dibujar una fila de examen con altura dinámica
   const dibujarFilaExamen = (titulo, valor, yPos) => {
-    const alturaFilaExamen = 4.5;
+    // Calcular altura dinámica basada en el contenido
+    const posicionDivision = tablaInicioX + tablaAncho/2 - 55; // 15mm hacia la izquierda del centro
+    const anchoMaximoTexto = tablaAncho - posicionDivision - 4;
+    
+    // Calcular altura necesaria para el texto
+    const textoValor = valor || "";
+    const alturaFilaExamen = calcularAlturaFilaExamen(textoValor, anchoMaximoTexto);
     
     // Dibujar líneas de la fila con división vertical (15mm hacia la izquierda del centro)
-    const posicionDivision = tablaInicioX + tablaAncho/2 - 55; // 15mm hacia la izquierda del centro
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaExamen); // Línea izquierda
     doc.line(posicionDivision, yPos, posicionDivision, yPos + alturaFilaExamen); // Línea divisoria vertical
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaExamen); // Línea derecha
@@ -714,7 +794,7 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(titulo + ":", tablaInicioX + 2, yPos + 3);
     doc.setFont("helvetica", "normal").setFontSize(8);
-    dibujarTextoConSaltoLinea(valor || "", posicionDivision + 2, yPos + 3, tablaAncho - posicionDivision - 4);
+    dibujarTextoConSaltoLinea(textoValor, posicionDivision + 2, yPos + 3, anchoMaximoTexto);
 
     return yPos + alturaFilaExamen;
   };
@@ -766,6 +846,19 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
   dibujarTextoConSaltoLinea(colinesterasaTexto, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
   yPos += alturaColinesterasa;
 
+  // === FOOTER PÁGINA 1 ===
+  footerTR(doc, { footerOffsetY: 5 });
+
+  // === PÁGINA 2 ===
+  // Verificar si necesitamos nueva página
+  if (yPos > 250) { // Si el contenido excede el límite de la página
+    doc.addPage();
+    numeroPagina = 2;
+    drawHeader(numeroPagina);
+    yPos = 35; // Resetear posición Y para la nueva página
+  }
+
+  // === SECCIÓN: VALORES DE REFERENCIA COLINESTERASA SÉRICA ===
   // Fila instructiva con valores de referencia (color #f5ae67)
   const alturaFilaInstructiva = 20; // Altura fija para la fila instructiva
   
@@ -788,7 +881,7 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
     "-HOMBRES: (5500 - 13400) U/L",
     "-MUJERES DE MÁS DE 40 AÑOS: (5500 - 13400) U/L", 
     "-MUJERES DE 16-39 AÑOS no embarazadas o tomando anticonceptivos orales: (4400 - 11700) U/L",
-    "-MUJERES DE 18-41 AÑOS embarazadas o tomando anticonceptivos orales: (3800 - 9500) U/L"
+    "-MUJERES DE 18-41 AÑOS embarazadas"
   ];
   
   let yTextoInstructivo = yPos + 7;
@@ -798,18 +891,6 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
   });
   
   yPos += alturaFilaInstructiva;
-
-  // === FOOTER PÁGINA 1 ===
-  footerTR(doc, { footerOffsetY: 5 });
-
-  // === PÁGINA 2 ===
-  // Verificar si necesitamos nueva página
-  if (yPos > 250) { // Si el contenido excede el límite de la página
-    doc.addPage();
-    numeroPagina = 2;
-    drawHeader(numeroPagina);
-    yPos = 35; // Resetear posición Y para la nueva página
-  }
 
   // === SECCIÓN: HALLAZGOS ===
   // Fila gris: HALLAZGOS
@@ -935,7 +1016,7 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
   doc.text("Responsable de la Evaluación", centroColumna, yFirmas + 28.5, { align: "center" });
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 5 });
+  footerTR(doc, { footerOffsetY: 12 });
 
   // Imprimir
   imprimir(doc);

@@ -155,25 +155,59 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
     let yPos = y;
     
     palabras.forEach(palabra => {
-      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
-      const anchoTexto = doc.getTextWidth(textoPrueba);
-      
-      if (anchoTexto <= anchoMaximo) {
-        lineaActual = textoPrueba;
-      } else {
+      // Si la palabra sola es más larga que el ancho máximo, dividirla por caracteres
+      const anchoPalabra = doc.getTextWidth(palabra);
+      if (anchoPalabra > anchoMaximo) {
+        // Si hay una línea actual, dibujarla primero
         if (lineaActual) {
           doc.text(lineaActual, x, yPos);
           yPos += fontSize * 0.35;
-          lineaActual = palabra;
+          lineaActual = '';
+        }
+        // Dividir la palabra larga por caracteres
+        let palabraActual = '';
+        for (let i = 0; i < palabra.length; i++) {
+          const char = palabra[i];
+          const textoPrueba = palabraActual + char;
+          const anchoTexto = doc.getTextWidth(textoPrueba);
+          
+          if (anchoTexto <= anchoMaximo) {
+            palabraActual = textoPrueba;
+          } else {
+            if (palabraActual) {
+              doc.text(palabraActual, x, yPos);
+              yPos += fontSize * 0.35;
+            }
+            palabraActual = char;
+          }
+        }
+        if (palabraActual) {
+          lineaActual = palabraActual;
+        }
+      } else {
+        // Palabra normal
+        const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+        const anchoTexto = doc.getTextWidth(textoPrueba);
+        
+        if (anchoTexto <= anchoMaximo) {
+          lineaActual = textoPrueba;
         } else {
-          doc.text(palabra, x, yPos);
-          yPos += fontSize * 0.35;
+          if (lineaActual) {
+            doc.text(lineaActual, x, yPos);
+            yPos += fontSize * 0.35;
+            lineaActual = palabra;
+          } else {
+            doc.text(palabra, x, yPos);
+            yPos += fontSize * 0.35;
+          }
         }
       }
     });
     
     if (lineaActual) {
       doc.text(lineaActual, x, yPos);
+      // Siempre agregar espacio después de dibujar texto
+      yPos += fontSize * 0.35;
     }
     
     return yPos;
@@ -207,11 +241,21 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
     
     lineasProcesadas.forEach((linea, index) => {
       // Verificar si es una línea numerada (empieza con número seguido de punto)
+      const anchoLinea = doc.getTextWidth(linea);
       const esLineaNumerada = /^\d+\./.test(linea);
       
-      // Si la línea es muy larga, usar la función de salto de línea por palabras
-      if (doc.getTextWidth(linea) > anchoMaximo) {
-        yPos = dibujarTextoConSaltoLinea(linea, x, yPos, anchoMaximo);
+      // Usar un margen de seguridad (95% del ancho máximo) para asegurar que el texto no se salga
+      const anchoMaximoConMargen = anchoMaximo * 0.95;
+      
+      // Si la línea es muy larga o está cerca del límite, usar la función de salto de línea por palabras
+      if (anchoLinea > anchoMaximoConMargen) {
+        const yPosAntes = yPos;
+        yPos = dibujarTextoConSaltoLinea(linea, x, yPos, anchoMaximoConMargen);
+        
+        // Si la función no agregó espacio al final, agregarlo
+        if (yPos === yPosAntes) {
+          yPos += fontSize * 0.35;
+        }
         
         // Espacio moderado después de una línea numerada que hizo salto
         if (esLineaNumerada) {
@@ -238,7 +282,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
       }
       
       // Espacio adicional entre líneas numeradas consecutivas (solo si no hizo salto)
-      if (index < lineasProcesadas.length - 1 && doc.getTextWidth(linea) <= anchoMaximo) {
+      if (index < lineasProcesadas.length - 1 && anchoLinea <= anchoMaximoConMargen) {
         const siguienteLinea = lineasProcesadas[index + 1];
         if (esLineaNumerada && /^\d+\./.test(siguienteLinea)) {
           yPos += fontSize * 0.15; // Espacio moderado entre líneas numeradas
@@ -662,50 +706,72 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   yPos = dibujarHeaderSeccion("5. CONCLUSION Y RECOMENDACIONES", yPos, filaAltura);
 
   // === CONTENIDO DE CONCLUSION Y RECOMENDACIONES ===
-  // Primero calcular la altura necesaria para el texto
+  // Guardar la posición inicial del header para dibujar los bordes después
+  const yPosInicioConclusion = yPos;
+  
   doc.setFont("helvetica", "normal").setFontSize(7);
   const textoConclusion = datosFinales.observacionesFichaMedicaAnexo7c_txtobservacionesfm || "";
   
-  // Calcular altura necesaria simulando el texto
+  // Configuración de padding
   const alturaMinima = 15; // Altura mínima de la fila
   const paddingSuperior = 4; // Padding superior 
+  const paddingInferior = 2; // Padding inferior
+  const paddingLateral = 2; // Padding lateral
   const yTextoInicio = yPos + paddingSuperior;
-  const nuevaYPosConcl = dibujarTextoConSaltosLinea(textoConclusion, tablaInicioX + 2, yTextoInicio, tablaAncho - 4);
-  const alturaTextoUsada = nuevaYPosConcl - yTextoInicio;
-  const alturaFilaFinal = Math.max(alturaMinima, alturaTextoUsada + paddingSuperior + 2); // +padding superior + margen inferior
-
-  // Dibujar la fila con la altura calculada
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaFinal);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaFinal);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaFilaFinal, tablaInicioX + tablaAncho, yPos + alturaFilaFinal);
+  const xTextoInicio = tablaInicioX + paddingLateral;
+  // Calcular ancho máximo disponible: ancho de tabla menos padding lateral izquierdo y derecho
+  const anchoMaximoDisponible = tablaAncho - (paddingLateral * 2);
   
-  yPos += alturaFilaFinal;
+  // Dibujar el texto primero para obtener la posición final real
+  const yPosFinalTexto = dibujarTextoConSaltosLinea(textoConclusion, xTextoInicio, yTextoInicio, anchoMaximoDisponible);
+  
+  // Calcular la altura final de la fila basándose en la posición real del texto
+  const alturaTextoUsada = yPosFinalTexto - yTextoInicio;
+  const alturaFilaFinal = Math.max(alturaMinima, alturaTextoUsada + paddingSuperior + paddingInferior);
+
+  // Dibujar los bordes de la fila basándose en la altura real calculada
+  doc.line(tablaInicioX, yPosInicioConclusion, tablaInicioX, yPosInicioConclusion + alturaFilaFinal);
+  doc.line(tablaInicioX + tablaAncho, yPosInicioConclusion, tablaInicioX + tablaAncho, yPosInicioConclusion + alturaFilaFinal);
+  doc.line(tablaInicioX, yPosInicioConclusion, tablaInicioX + tablaAncho, yPosInicioConclusion);
+  doc.line(tablaInicioX, yPosInicioConclusion + alturaFilaFinal, tablaInicioX + tablaAncho, yPosInicioConclusion + alturaFilaFinal);
+  
+  yPos = yPosInicioConclusion + alturaFilaFinal;
 
   // === SECCIÓN 6: RESTRICCIONES ===
   // Header gris: RESTRICCIONES
   yPos = dibujarHeaderSeccion("6. RESTRICCIONES", yPos, filaAltura);
 
   // === CONTENIDO DE RESTRICCIONES ===
-  // Primero calcular la altura necesaria para el texto
+  // Guardar la posición inicial del header para dibujar los bordes después
+  const yPosInicioRestricciones = yPos;
+  
   doc.setFont("helvetica", "normal").setFontSize(7);
   const textoRestricciones = datosFinales.restricciones || "";
   
-  // Calcular altura necesaria simulando el texto
+  // Configuración de padding
   const alturaMinimaRestricciones = 15; // Altura mínima de la fila
   const paddingSuperiorRestricciones = 4; // Padding superior 
+  const paddingInferiorRestricciones = 2; // Padding inferior
+  const paddingLateralRestricciones = 2; // Padding lateral
   const yTextoInicioRestricciones = yPos + paddingSuperiorRestricciones;
-  const nuevaYPosRestricciones = dibujarTextoConSaltosLinea(textoRestricciones, tablaInicioX + 2, yTextoInicioRestricciones, tablaAncho - 4);
-  const alturaTextoRestriccionesUsada = nuevaYPosRestricciones - yTextoInicioRestricciones;
-  const alturaFilaRestriccionesFinal = Math.max(alturaMinimaRestricciones, alturaTextoRestriccionesUsada + paddingSuperiorRestricciones + 2); // +padding superior + margen inferior
-
-  // Dibujar la fila con la altura calculada
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaRestriccionesFinal);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaRestriccionesFinal);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaFilaRestriccionesFinal, tablaInicioX + tablaAncho, yPos + alturaFilaRestriccionesFinal);
+  const xTextoInicioRestricciones = tablaInicioX + paddingLateralRestricciones;
+  // Calcular ancho máximo disponible: ancho de tabla menos padding lateral izquierdo y derecho
+  const anchoMaximoDisponibleRestricciones = tablaAncho - (paddingLateralRestricciones * 2);
   
-  yPos += alturaFilaRestriccionesFinal;
+  // Dibujar el texto primero para obtener la posición final real
+  const yPosFinalTextoRestricciones = dibujarTextoConSaltosLinea(textoRestricciones, xTextoInicioRestricciones, yTextoInicioRestricciones, anchoMaximoDisponibleRestricciones);
+  
+  // Calcular la altura final de la fila basándose en la posición real del texto
+  const alturaTextoRestriccionesUsada = yPosFinalTextoRestricciones - yTextoInicioRestricciones;
+  const alturaFilaRestriccionesFinal = Math.max(alturaMinimaRestricciones, alturaTextoRestriccionesUsada + paddingSuperiorRestricciones + paddingInferiorRestricciones);
+
+  // Dibujar los bordes de la fila basándose en la altura real calculada
+  doc.line(tablaInicioX, yPosInicioRestricciones, tablaInicioX, yPosInicioRestricciones + alturaFilaRestriccionesFinal);
+  doc.line(tablaInicioX + tablaAncho, yPosInicioRestricciones, tablaInicioX + tablaAncho, yPosInicioRestricciones + alturaFilaRestriccionesFinal);
+  doc.line(tablaInicioX, yPosInicioRestricciones, tablaInicioX + tablaAncho, yPosInicioRestricciones);
+  doc.line(tablaInicioX, yPosInicioRestricciones + alturaFilaRestriccionesFinal, tablaInicioX + tablaAncho, yPosInicioRestricciones + alturaFilaRestriccionesFinal);
+  
+  yPos = yPosInicioRestricciones + alturaFilaRestriccionesFinal;
 
   // === SECCIÓN 7: APTITUD LABORAL ===
   // Fila: APTITUD LABORAL y FECHA DE VENCIMIENTO (2 columnas)
@@ -766,7 +832,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   doc.text("Responsable de la Evaluación", centroColumna, yFirmas + 28.5, { align: "center" });
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 8});
+  footerTR(doc, { footerOffsetY: 12});
 
   // === Imprimir ===
   imprimir(doc);
