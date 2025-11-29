@@ -9,31 +9,26 @@ import VDRL from "./VDRL/VDRL";
 export default function InmunologiaSubTabSelector({ tieneVista }) {
   const tabsConfig = [
     {
-      id: 0,
       permission: "Gonadotropina",
-      label: "L. Gonadotropina",
+      label: "Gonadotropina",
       component: Gonadotropina
     },
     {
-      id: 1,
       permission: "Microbiologia",
       label: "Microbiología",
       component: Microbiologia
     },
     {
-      id: 2,
       permission: "Inmunologia Subtab",
       label: "Inmunología",
       component: Inmunologia
     },
     {
-      id: 3,
       permission: "Hepatitis",
-      label: "L. Hepatitis",
+      label: "Hepatitis",
       component: Hepatitis
     },
     {
-      id: 4,
       permission: "VDRL",
       label: "VDRL",
       component: VDRL

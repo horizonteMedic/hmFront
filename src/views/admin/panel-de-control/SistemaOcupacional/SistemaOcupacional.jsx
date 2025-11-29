@@ -8,7 +8,6 @@ import ConsentimientoDigitalizacion from "./Admision/ConsentimientoDigitalizacio
 import Triaje from "./Triaje/Triaje";
 import Consentimientos from "./Laboratorio/Consentimientos/Consentimientos.jsx";
 import ParasitologiaCoprologico from "./Parasitologia/ParasitologiaCoprologico";
-import Toxicologia from "./Laboratorio/Toxicologia/Toxicologia";
 import Manipuladores from "./Laboratorio/Manipuladores/Manipuladores";
 import PruebasCovid from "./Laboratorio/PruebasCovid/PruebasCovid";
 import {
@@ -112,6 +111,7 @@ import LaboratorioClinicoSubTabSelector from "./Laboratorio/LaboratorioClinico/L
 import EliminarExamenes from "./EliminarExamenes/EliminarExamenes.jsx";
 import AnalisisBioquimicosSubTabSelector from "./Laboratorio/AnalisisBioquimicos/AnalisisBioquimicosSubTabSelector.jsx";
 import InmunologiaSubTabSelector from "./Laboratorio/Inmunologia/InmunologiaSubTabSelector.jsx";
+import ToxicologiaSubTabSelector from "./Laboratorio/Toxicologia/ToxicologiaSubTabSelector.jsx";
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
   { key: 7, label: "Test Altura" },
@@ -555,11 +555,8 @@ const TabComponent = () => {
                   />
                 )}
                 {labTab === 3 && (
-                  <Toxicologia
-                    token={token}
-                    selectedSede={selectSede}
-                    userlogued={userlogued.sub}
-                    permiso={tienePermisoEnVista}
+                  <ToxicologiaSubTabSelector
+                    tieneVista={tieneVista}
                   />
                 )}
                 {labTab === 4 && (
