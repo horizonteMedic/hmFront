@@ -397,8 +397,16 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   const xValorGrupo = tablaInicioX + 137 + anchoLabelGrupo + 2;
   const anchoDisponibleGrupo = (tablaInicioX + tablaAncho) - xValorGrupo - 2; // Margen de 2mm del borde
   // Si el valor es muy largo, usar splitTextToSize para que se ajuste
-  if (datosFinales.grupoSanguineo) {
-    const lineasGrupo = doc.splitTextToSize(datosFinales.grupoSanguineo, anchoDisponibleGrupo);
+  const grupoSanguineoTexto = datosFinales.grupoSanguineo && datosFinales.grupoSanguineo.trim() 
+    ? datosFinales.grupoSanguineo 
+    : "(No Aplica)";
+  // Si es "(No Aplica)", usar fuente más pequeña para que quepa en una línea
+  if (grupoSanguineoTexto === "(No Aplica)") {
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.text(grupoSanguineoTexto, xValorGrupo, yTexto + 4);
+  } else {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const lineasGrupo = doc.splitTextToSize(grupoSanguineoTexto, anchoDisponibleGrupo);
     doc.text(lineasGrupo, xValorGrupo, yTexto + 4);
   }
   yTexto += alturaFila4;

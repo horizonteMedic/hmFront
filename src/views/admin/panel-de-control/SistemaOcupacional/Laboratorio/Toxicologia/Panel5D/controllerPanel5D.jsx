@@ -7,11 +7,12 @@ import {
   SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
+import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
-  "/api/v01/ct/toxicologia/obtenerReportePanel4D";
+  "/api/v01/ct/toxicologia/obtenerReportePanel5D";
 const registrarUrl =
-  "/api/v01/ct/toxicologia/registrarActualizarPanel4D";
+  "/api/v01/ct/toxicologia/registrarActualizarPanel5D";
 
 export const GetInfoServicio = async (
   nro,
@@ -31,13 +32,31 @@ export const GetInfoServicio = async (
     set((prev) => ({
       ...prev,
       norden: res.norden ?? "",
-      fecha: res.fechaExamen ?? prev.fecha,
-      nombres: res.nombres ?? prev.nombres,
-      edad: res.edad ?? prev.edad,
-      valueC: res.txtrCocaina ?? "NEGATIVO",
+      fecha: res.fechaExamen,
+
+      nombreExamen: res.nombreExamen ?? "",
+      dni: res.dni ?? "",
+
+      nombres: res.nombres ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+      lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+      edad: res.edad ?? "",
+      sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+      estadoCivil: res.estadoCivilPaciente,
+      nivelEstudios: res.nivelEstudioPaciente,
+      // Datos Laborales
+      empresa: res.empresa,
+      contrata: res.contrata,
+      ocupacion: res.ocupacionPaciente,
+      cargoDesempenar: res.cargoPaciente,
+
       valueM: res.txtrMarihuana ?? "NEGATIVO",
-      valueO: res.txtrOpiaceos ?? "NEGATIVO",
+      valueC: res.txtrCocaina ?? "NEGATIVO",
+      valueAn: res.txtrAnfetamina ?? "NEGATIVO",
       valueMet: res.txtrMethanfetamina ?? "NEGATIVO",
+      valueBen: res.txtrBenzodiacepina ?? "NEGATIVO",
+
+      user_medicoFirma: res.usuarioFirma,
     }));
   }
 };
@@ -47,8 +66,7 @@ export const SubmitDataService = async (
   token,
   user,
   limpiar,
-  tabla,
-  datosFooter
+  tabla
 ) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
@@ -60,14 +78,17 @@ export const SubmitDataService = async (
     fechaExamen: form.fecha,
     txtrCocaina: form.valueC,
     txtrMarihuana: form.valueM,
-    txtrOpiaceos: form.valueO,
+    txtrAnfetamina: form.valueAn,
     txtrMethanfetamina: form.valueMet,
+    txtrBenzodiacepina: form.valueBen,
     userMedicoOcup: "",
     userRegistro: user,
+
+    usuarioFirma: form.user_medicoFirma,
   };
 
   await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-    PrintHojaR(form.norden, token, tabla, datosFooter);
+    PrintHojaR(form.norden, token, tabla);
   });
 };
 
@@ -77,7 +98,7 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
   });
 };
 
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+export const PrintHojaR = (nro, token, tabla) => {
   const jasperModules = import.meta.glob(
     "../../../../../../jaspers/Toxicologia/*.jsx"
   );
@@ -85,7 +106,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     nro,
     token,
     tabla,
-    datosFooter,
+    null,
     obtenerReporteUrl,
     jasperModules,
     "../../../../../../jaspers/Toxicologia"
@@ -108,7 +129,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
       GetInfoServicio(nro, tabla, set, token, () => {
         Swal.fire(
           "Alerta",
-          "Este paciente ya cuenta con registros de Panel 4D.",
+          "Este paciente ya cuenta con registros de Panel 5D.",
           "warning"
         );
       });
@@ -123,7 +144,13 @@ const GetInfoPac = async (nro, set, token, sede) => {
       ...prev,
       ...res,
       nombres: res.nombresApellidos ?? "",
-      edad: res.edad ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+      edad: res.edad,
+      ocupacion: res.areaO ?? "",
+      nombreExamen: res.nomExam ?? "",
+      cargoDesempenar: res.cargo ?? "",
+      lugarNacimiento: res.lugarNacimiento ?? "",
+      sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
     }));
   }
 };

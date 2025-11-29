@@ -214,7 +214,7 @@ export default function Resultado_Panel3D() {
 
           <div className="flex gap-4">
             <InputTextOneLine
-              label='MARIHUANA (THC)'
+              label='Marihuana (THC)'
               name="valueM"
               value={form.valueM}
               onChange={handleChange}
@@ -234,7 +234,7 @@ export default function Resultado_Panel3D() {
 
           <div className="flex gap-4">
             <InputTextOneLine
-              label='COCAINA (COC)'
+              label='Cocaína (COC)'
               name="valueC"
               value={form.valueC}
               onChange={handleChange}
@@ -254,7 +254,7 @@ export default function Resultado_Panel3D() {
 
           <div className="flex gap-4">
             <InputTextOneLine
-              label='EXTASIS (MDMA)'
+              label='Éxtasis (MDMA)'
               name="valueE"
               value={form.valueE}
               onChange={handleChange}
