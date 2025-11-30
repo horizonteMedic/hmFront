@@ -4,16 +4,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 export default function SubTabSelector({ tieneVista, tabsConfig }) {
     const [activeTab, setActiveTab] = useState(0);
 
-    const normalizedTabs = tabsConfig.map((tab, idx) => ({ ...tab, id: tab.id ?? idx }));
-
-    const availableTabs = normalizedTabs.filter(tab => tieneVista(tab.permission));
-
-    const ActiveComponent = normalizedTabs.find(tab => tab.id === activeTab)?.component;
-
     useEffect(() => {
-        const firstAvailableTab = availableTabs[0];
+        // Find the first available tab based on permissions
+        const firstAvailableTab = tabsConfig.find(tab => tieneVista(tab.permission));
         setActiveTab(firstAvailableTab ? firstAvailableTab.id : -1);
-    }, [availableTabs]);
+    }, []);
+
+    // Get available tabs based on permissions
+    const availableTabs = tabsConfig.filter(tab => tieneVista(tab.permission));
+
+    // Get active tab component
+    const ActiveComponent = tabsConfig.find(tab => tab.id === activeTab)?.component;
 
     return (
         <div className="space-y-4">
