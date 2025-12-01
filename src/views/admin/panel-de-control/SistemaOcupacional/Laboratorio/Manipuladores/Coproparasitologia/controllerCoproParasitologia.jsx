@@ -7,6 +7,7 @@ import {
   SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
+import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
   "/api/v01/ct/manipuladores/obtenerReporteCoproparasitologico";
@@ -18,7 +19,7 @@ export const GetInfoServicio = async (
   tabla,
   set,
   token,
-  onFinish = () => {}
+  onFinish = () => { }
 ) => {
   const res = await GetInfoServicioDefault(
     nro,
@@ -31,9 +32,24 @@ export const GetInfoServicio = async (
     set((prev) => ({
       ...prev,
       norden: res.norden ?? "",
-      fecha: res.fecha ?? prev.fecha,
-      nombres: res.nombres ?? prev.nombres,
-      edad: res.edad ?? prev.edad,
+      fecha: res.fecha,
+
+      nombreExamen: res.nombreExamen ?? "",
+      dni: res.dni ?? "",
+
+      nombres: res.nombres ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+      lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+      edad: res.edad ?? "",
+      sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+      estadoCivil: res.estadoCivilPaciente,
+      nivelEstudios: res.nivelEstudioPaciente,
+      // Datos Laborales
+      empresa: res.empresa,
+      contrata: res.contrata,
+      ocupacion: res.ocupacionPaciente,
+      cargoDesempenar: res.cargoPaciente,
+
       tipoCoproparasitologico: Boolean(res.tipoCoproparasitologico),
       heces1_color: res.txtcolor ?? "",
       heces1_aspecto: res.txtaspecto ?? "",
@@ -62,6 +78,8 @@ export const GetInfoServicio = async (
       micro3_leucocitos: res.txtleucocitos2 ?? "",
       micro3_hematies: res.txthematies2 ?? "",
       micro3_parasitos: res.txtlugol2 ?? "",
+
+      user_medicoFirma: res.usuarioFirma,
     }));
   }
 };
@@ -71,8 +89,7 @@ export const SubmitDataService = async (
   token,
   user,
   limpiar,
-  tabla,
-  datosFooter
+  tabla
 ) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
@@ -112,14 +129,16 @@ export const SubmitDataService = async (
     tipoCoproparasitologico: form.tipoCoproparasitologico,
     userRegistro: user,
     userMedicoOcup: "",
+
+    usuarioFirma: form.user_medicoFirma,
   };
 
   await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-    PrintHojaR(form.norden, token, tabla, datosFooter);
+    PrintHojaR(form.norden, token, tabla);
   });
 };
 
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+export const PrintHojaR = (nro, token, tabla) => {
   const jasperModules = import.meta.glob(
     "../../../../../../jaspers/Manipuladores/*.jsx"
   );
@@ -127,7 +146,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     nro,
     token,
     tabla,
-    datosFooter,
+    null,
     obtenerReporteUrl,
     jasperModules,
     "../../../../../../jaspers/Manipuladores"
@@ -161,8 +180,15 @@ const GetInfoPac = async (nro, set, token, sede) => {
   if (res) {
     set((prev) => ({
       ...prev,
-      nombres: res.nombresApellidos ?? prev.nombres,
-      edad: res.edad ?? prev.edad,
+      ...res,
+      nombres: res.nombresApellidos ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+      edad: res.edad,
+      ocupacion: res.areaO ?? "",
+      nombreExamen: res.nomExam ?? "",
+      cargoDesempenar: res.cargo ?? "",
+      lugarNacimiento: res.lugarNacimiento ?? "",
+      sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
     }));
   }
 };

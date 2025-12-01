@@ -16,14 +16,14 @@ export default function InmunologiaSubTabSelector({ tieneVista }) {
     },
     {
       id: 1,
-      permission: "Microbiologia",
-      label: "Microbiología",
+      permission: "BK - KOH",
+      label: "BK - KOH",
       component: Microbiologia
     },
     {
       id: 2,
-      permission: "Inmunologia Subtab",
-      label: "Inmunología",
+      permission: "Aglutinaciones",
+      label: "Aglutinaciones",
       component: Inmunologia
     },
     {

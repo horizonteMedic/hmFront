@@ -8,7 +8,7 @@ import ConsentimientoDigitalizacion from "./Admision/ConsentimientoDigitalizacio
 import Triaje from "./Triaje/Triaje";
 import Consentimientos from "./Laboratorio/Consentimientos/Consentimientos.jsx";
 import ParasitologiaCoprologico from "./Parasitologia/ParasitologiaCoprologico";
-import Manipuladores from "./Laboratorio/Manipuladores/Manipuladores";
+import ManipuladoresSubTabSelector from "./Laboratorio/Manipuladores/ManipuladoresSubTabSelector";
 import PruebasCovid from "./Laboratorio/PruebasCovid/PruebasCovid";
 import {
   ComboboxEmpresasMulti,
@@ -568,10 +568,8 @@ const TabComponent = () => {
                   />
                 )}
                 {labTab === 5 && (
-                  <Manipuladores
-                    token={token}
-                    selectedSede={selectSede}
-                    userlogued={userlogued.sub}
+                  <ManipuladoresSubTabSelector
+                    tieneVista={tieneVista}
                   />
                 )}
                 {labTab === 6 && (
