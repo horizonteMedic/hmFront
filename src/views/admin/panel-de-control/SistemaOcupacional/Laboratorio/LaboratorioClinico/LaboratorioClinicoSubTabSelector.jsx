@@ -7,7 +7,7 @@ export default function LaboratorioClinicoSubTabSelector({ tieneVista }) {
     {
       id: 0,
       permission: "Acceso Hematologia - Bioquimica SI-EO",
-      label: "Hematología - Bioquímica SI-EO",
+      label: "Hematología - Bioquímica - ECO",
       component: HematologiaBioquimicaSIEO
     },
     {

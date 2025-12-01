@@ -56,7 +56,6 @@ export default function Panel2D() {
     handleChangeNumberDecimals,
     handleChangeSimple,
     handleRadioButton,
-    handleFocusNext,
     handleClearnotO,
     handleClear,
     handlePrintDefault,

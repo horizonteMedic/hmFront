@@ -9,6 +9,7 @@ import {
 } from "../../../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 import { PrintHojaR, VerifyTR, SubmitDataService } from "./controllerCoprocultivo";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "ac_coprocultivo";
 const colorOptions = ["Marrón", "Mostaza", "Verdoso"];
@@ -18,40 +19,61 @@ const floraOptions = ["Presente", "Regular cantidad"];
 const resultadoOptions = ["Negativo", "Positivo"];
 
 export default function Coprocultivo() {
-  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+  const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
   const initialFormState = {
     norden: "",
     fecha: today,
+
+    nombreExamen: "",
+
+    dni: "",
     nombres: "",
+    apellidos: "",
+    fechaNacimiento: "",
+    lugarNacimiento: "",
     edad: "",
+    sexo: "",
+    estadoCivil: "",
+    nivelEstudios: "",
+
+    // Datos Laborales
+    empresa: "",
+    contrata: "",
+    ocupacion: "",
+    cargoDesempenar: "",
+
     muestra: "HECES",
-    color: "",
-    consistencia: "",
-    moco_fecal: "",
-    sangrev: "",
-    restosa: "",
+    color: "-",
+    consistencia: "-",
+    moco_fecal: "-",
+    sangrev: "-",
+    restosa: "-",
     leucocitos: "",
-    leucocitos_count: "",
-    hematies: "",
-    hematies_count: "",
-    parasitos: "",
-    gotasg: "",
-    levaduras: "",
-    identificacion: "Escherichia coli(*)",
-    florac: "",
-    resultado: "",
+    hematies: "-",
+    parasitos: "-",
+    gotasg: "-",
+    levaduras: "-",
+    identificacion: "ESCHERICHIA COLI(*)",
+    florac: "-",
+    resultado: "-",
     observaciones:
-      "No se aisló Escherichia Coli Enteroinvasiva - Enteropatógena - Enterohemorrágica.\nNo se aisló bacteria patógenas.",
+      "NO SE AISLÓ ESCHERICHIA COLI ENTEROINVASIVA - ENTEROPATÓGENA - ENTEROHEMORRÁGICA.\nNO SE AISLÓ BACTERIA PATÓGENAS.",
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
   const {
     form,
     setForm,
     handleChange,
-    handleClear,
+    handleChangeNumberDecimals,
+    handleChangeSimple,
     handleClearnotO,
+    handleClear,
     handlePrintDefault,
   } = useForm(initialFormState);
 
@@ -59,7 +81,7 @@ export default function Coprocultivo() {
     const normalized = value.toUpperCase();
     setForm((prev) => ({
       ...prev,
-      [field]: prev[field] === normalized ? "" : normalized,
+      [field]: prev[field] === normalized ? "-" : normalized,
     }));
   };
 
@@ -78,11 +100,11 @@ export default function Coprocultivo() {
   };
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, token, userlogued, handleClear);
   };
 
   const handleSearch = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       handleClearnotO();
       VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
@@ -90,9 +112,10 @@ export default function Coprocultivo() {
 
   const handlePrint = () => {
     handlePrintDefault(() => {
-      PrintHojaR(form.norden, token, tabla, datosFooter);
+      PrintHojaR(form.norden, token, tabla);
     });
   };
+
 
   const renderPresenceGroup = (label, field, options = presenceOptions, disabledInput = true) => (
     <div className="space-y-2">
@@ -126,47 +149,129 @@ export default function Coprocultivo() {
   );
 
   return (
-    <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
-      <h2 className="text-2xl font-bold text-center mb-6">COPROCULTIVO</h2>
-      <form className="space-y-6">
-        <SectionFieldset
-          legend="Información del Examen"
-          className="grid grid-cols-1 lg:grid-cols-2 gap-4"
-        >
+    <form className="space-y-3 p-4 text-[10px]">
+      {/* Información del Examen */}
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <InputTextOneLine
+          label="N° Orden"
+          name="norden"
+          value={form.norden}
+          onChange={handleChangeNumberDecimals}
+          onKeyUp={handleSearch}
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Fecha"
+          name="fecha"
+          type="date"
+          value={form.fecha}
+          onChange={handleChangeSimple}
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Nombre del Examen"
+          name="nombreExamen"
+          value={form.nombreExamen}
+          disabled
+          labelWidth="120px"
+        />
+      </SectionFieldset>
+
+      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
+        <InputTextOneLine
+          label="Nombres"
+          name="nombres"
+          value={form.nombres}
+          disabled
+          labelWidth="120px"
+        />
+        <div className="grid lg:grid-cols-2 gap-3">
           <InputTextOneLine
-            label="N° Ficha"
-            name="norden"
-            value={form.norden}
-            onChange={handleChange}
-            onKeyUp={handleSearch}
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Fecha"
-            name="fecha"
-            type="date"
-            value={form.fecha}
-            onChange={handleChange}
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Nombres"
-            name="nombres"
-            value={form.nombres}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Edad"
+            label="Edad (Años)"
             name="edad"
             value={form.edad}
             disabled
             labelWidth="120px"
-            inputClassName="w-24"
           />
-        </SectionFieldset>
+          <InputTextOneLine
+            label="Sexo"
+            name="sexo"
+            value={form.sexo}
+            disabled
+            labelWidth="120px"
+          />
+        </div>
+        <div className="grid lg:grid-cols-2 gap-3">
+          <InputTextOneLine
+            label="DNI"
+            name="dni"
+            value={form.dni}
+            labelWidth="120px"
+            disabled
+          />
+          <InputTextOneLine
+            label="Fecha Nacimiento"
+            name="fechaNacimiento"
+            value={form.fechaNacimiento}
+            disabled
+            labelWidth="120px"
+          />
+        </div>
+        <InputTextOneLine
+          label="Lugar Nacimiento"
+          name="lugarNacimiento"
+          value={form.lugarNacimiento}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Estado Civil"
+          name="estadoCivil"
+          value={form.estadoCivil}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Nivel Estudios"
+          name="nivelEstudios"
+          value={form.nivelEstudios}
+          disabled
+          labelWidth="120px"
+        />
+      </SectionFieldset>
+      <SectionFieldset legend="Datos Laborales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <InputTextOneLine
+          label="Empresa"
+          name="empresa"
+          value={form.empresa}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Contrata"
+          name="contrata"
+          value={form.contrata}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Ocupación"
+          name="ocupacion"
+          value={form.ocupacion}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Cargo Desempeñar"
+          name="cargoDesempenar"
+          value={form.cargoDesempenar}
+          disabled
+          labelWidth="120px"
+        />
+      </SectionFieldset>
 
-        <SectionFieldset legend="Muestra" className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <SectionFieldset legend="Muestra" className="space-y-3">
           <InputTextOneLine
             label="Muestra"
             name="muestra"
@@ -181,7 +286,7 @@ export default function Coprocultivo() {
           {renderPresenceGroup("Restos Alimenticios", "restosa")}
         </SectionFieldset>
 
-        <SectionFieldset legend="Examen Microscópico" className="space-y-4">
+        <SectionFieldset legend="Examen Microscópico" className="space-y-3">
           <div className="space-y-2">
             <InputTextOneLine
               label="Leucocitos"
@@ -249,81 +354,82 @@ export default function Coprocultivo() {
           {renderPresenceGroup("Levaduras", "levaduras")}
         </SectionFieldset>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <SectionFieldset legend="Identificación y Antibiograma" className="space-y-4">
-            <InputTextOneLine
-              label="Identificación"
-              name="identificacion"
-              value={form.identificacion}
-              onChange={handleChange}
-              labelWidth="120px"
-            />
-            {renderPresenceGroup("Flora Coliforme", "florac", floraOptions)}
-          </SectionFieldset>
+      </div>
 
-          <SectionFieldset legend="Resultado" className="space-y-4">
-            {renderPresenceGroup("Resultado", "resultado", resultadoOptions)}
-          </SectionFieldset>
-        </div>
-
-        <SectionFieldset legend="Observaciones">
-          <InputTextArea
-            label="Observaciones"
-            name="observaciones"
-            value={form.observaciones}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <SectionFieldset legend="Identificación y Antibiograma" className="space-y-4">
+          <InputTextOneLine
+            label="Identificación"
+            name="identificacion"
+            value={form.identificacion}
             onChange={handleChange}
-            rows={4}
+            labelWidth="120px"
           />
+          {renderPresenceGroup("Flora Coliforme", "florac", floraOptions)}
         </SectionFieldset>
 
-        <SectionFieldset legend="Asignar Médico">
-          <select
-            disabled
-            className="w-full border rounded px-2 py-1 bg-gray-100"
+        <SectionFieldset legend="Resultado" className="space-y-4">
+          {renderPresenceGroup("Resultado", "resultado", resultadoOptions)}
+        </SectionFieldset>
+      </div>
+
+      <SectionFieldset legend="Observaciones">
+        <InputTextArea
+          label="Observaciones"
+          name="observaciones"
+          value={form.observaciones}
+          onChange={handleChange}
+          rows={4}
+        />
+      </SectionFieldset>
+
+      <SectionFieldset legend="Asignación de Médico">
+        <EmpleadoComboBox
+          value={form.nombre_medico}
+          label="Especialista"
+          form={form}
+          onChange={handleChangeSimple}
+        />
+      </SectionFieldset>
+
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={handleSave}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
           >
-            <option>-- Seleccionar --</option>
-          </select>
-        </SectionFieldset>
+            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+          </button>
+          <button
+            type="button"
+            onClick={handleClear}
+            className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2"
+          >
+            <FontAwesomeIcon icon={faBroom} /> Limpiar
+          </button>
+        </div>
 
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex flex-wrap gap-3">
+        <div className="flex flex-col items-end">
+          <span className="font-bold italic mb-2">Imprimir</span>
+          <div className="flex items-center gap-2">
+            <InputTextOneLine
+              name="norden"
+              value={form.norden}
+              onChange={handleChange}
+              inputClassName="w-24"
+            />
             <button
               type="button"
-              onClick={handleSave}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
+              onClick={handlePrint}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
             >
-              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+              <FontAwesomeIcon icon={faPrint} />
             </button>
-            <button
-              type="button"
-              onClick={handleClear}
-              className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faBroom} /> Limpiar
-            </button>
-          </div>
-
-          <div className="flex flex-col items-end">
-            <span className="font-bold italic mb-2">Imprimir</span>
-            <div className="flex items-center gap-2">
-              <InputTextOneLine
-                name="norden"
-                value={form.norden}
-                onChange={handleChange}
-                inputClassName="w-24"
-              />
-              <button
-                type="button"
-                onClick={handlePrint}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faPrint} />
-              </button>
-            </div>
           </div>
         </div>
-      </form>
-    </div>
+      </div>
+    </form>
   );
 }
 

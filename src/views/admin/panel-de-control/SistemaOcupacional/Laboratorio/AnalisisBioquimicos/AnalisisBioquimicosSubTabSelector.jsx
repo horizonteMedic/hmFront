@@ -9,7 +9,7 @@ export default function AnalisisBioquimicosSubTabSelector({ tieneVista }) {
     {
       id: 0,
       permission: "Analisis Bioquimicos Subtab",
-      label: "Análisis Bioquímicos",
+      label: "Perfil Lipídico",
       component: AnalisisBioquimicos
     },
     {

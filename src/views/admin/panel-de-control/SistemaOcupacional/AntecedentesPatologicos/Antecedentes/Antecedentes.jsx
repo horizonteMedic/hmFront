@@ -95,6 +95,21 @@ export default function Antecedentes({
     }));
   };
 
+  const handleEliminarAntecedente = (index) => {
+    setForm(prev => {
+      const reg = prev.antecedentes[index];
+      const antecedentesEliminados = reg && reg.quirurjicosId != null
+        ? [...prev.antecedentesEliminados, reg.quirurjicosId]
+        : prev.antecedentesEliminados;
+      const antecedentes = prev.antecedentes.filter((_, i) => i !== index);
+      return {
+        ...prev,
+        antecedentes,
+        antecedentesEliminados,
+      };
+    });
+  };
+
   return (
     <div className="space-y-4">
       <div className="bg-white border border-gray-200 rounded-lg p-3">
@@ -168,12 +183,13 @@ export default function Antecedentes({
                 <th className="px-4 py-3 text-left font-semibold border-b border-gray-300">Operación</th>
                 <th className="px-4 py-3 text-left font-semibold border-b border-gray-300">Días</th>
                 <th className="px-4 py-3 text-left font-semibold border-b border-gray-300">Complicaciones</th>
+                <th className="px-4 py-3 text-left font-semibold border-b border-gray-300">Acciones</th>
               </tr>
             </thead>
             <tbody>
               {form.antecedentes.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-4 py-8 text-center text-gray-500 border-b border-gray-200">
+                  <td colSpan="6" className="px-4 py-8 text-center text-gray-500 border-b border-gray-200">
                     No hay antecedentes quirúrgicos registrados
                   </td>
                 </tr>
@@ -184,7 +200,15 @@ export default function Antecedentes({
                     <td className="px-4 py-3 border-r border-gray-200">{antecedente.hospitalOperacion}</td>
                     <td className="px-4 py-3 border-r border-gray-200">{antecedente.operacion}</td>
                     <td className="px-4 py-3 border-r border-gray-200">{antecedente.diasHospitalizado}</td>
-                    <td className="px-4 py-3">{antecedente.complicaciones}</td>
+                    <td className="px-4 py-3 border-r border-gray-200">{antecedente.complicaciones}</td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => handleEliminarAntecedente(index)}
+                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded flex items-center gap-2"
+                      >
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
+                    </td>
                   </tr>
                 ))
               )}
