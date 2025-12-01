@@ -68,40 +68,28 @@ export default function PcualAntig() {
     form,
     setForm,
     handleChange,
-    handleClear,
+    handleChangeNumberDecimals,
+    handleChangeSimple,
+    handleRadioButton,
     handleClearnotO,
+    handleClear,
     handlePrintDefault,
   } = useForm(initialFormState);
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, token, userlogued, handleClear);
   };
 
   const handleSearch = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       handleClearnotO();
-      setForm((prev) => ({
-        ...prev,
-        fecha: today,
-        nombres: '',
-        dni: '',
-        edad: '',
-        marca: '',
-        doctor: 'N/A',
-        positivo: false,
-        negativo: false,
-        fechaSintomas: today,
-        sintomas: [],
-        marsa: false,
-        observaciones: ''
-      }));
       VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
 
   const handlePrint = () => {
     handlePrintDefault(() => {
-      PrintHojaR(form.norden, token, tabla, datosFooter);
+      PrintHojaR(form.norden, token, tabla);
     });
   };
 
@@ -159,43 +147,43 @@ export default function PcualAntig() {
         <SectionFieldset legend="Información del Examen" className="space-y-4">
           {/* Fila 1: N° Orden, Fecha, MARSA */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <InputTextOneLine
-            label="N° Orden"
-            name="norden"
-            value={form.norden}
-            onChange={handleChange}
-            onKeyUp={handleSearch}
-            disabled={carga}
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Fecha"
-            name="fecha"
-            type="date"
-            value={form.fecha}
-            onChange={handleChange}
-            labelWidth="120px"
-          />
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="marsa"
-              checked={form.marsa}
+            <InputTextOneLine
+              label="N° Orden"
+              name="norden"
+              value={form.norden}
               onChange={handleChange}
-              className="scale-110"
+              onKeyUp={handleSearch}
+              disabled={carga}
+              labelWidth="120px"
             />
-            <span className="font-semibold text-red-600">MARSA</span>
-          </div>
+            <InputTextOneLine
+              label="Fecha"
+              name="fecha"
+              type="date"
+              value={form.fecha}
+              onChange={handleChange}
+              labelWidth="120px"
+            />
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name="marsa"
+                checked={form.marsa}
+                onChange={handleChange}
+                className="scale-110"
+              />
+              <span className="font-semibold text-red-600">MARSA</span>
+            </div>
           </div>
           {/* Fila 2: Nombres y Apellidos, DNI, Edad */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <InputTextOneLine
-            label="Nombres y Apellidos"
-            name="nombres"
-            value={form.nombres}
-            disabled
-            labelWidth="120px"
-          />
+            <InputTextOneLine
+              label="Nombres y Apellidos"
+              name="nombres"
+              value={form.nombres}
+              disabled
+              labelWidth="120px"
+            />
             <InputTextOneLine
               label="DNI"
               name="dni"
