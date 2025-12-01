@@ -115,7 +115,7 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
       grupoFactorSanguineo: String(raw?.grupoFactorSanguineo_grupofactor || ''),
       hemograma: "NORMAL",
       hemoglobina: (raw?.hemoglobinaLaboratorioClinico_txthemoglobina || '') + " gr %",
-      hematocrito: String(raw?.vsgLaboratorioClinico_txtvsg || ''),
+      hematocrito: String(raw?.hematocritoLaboratorioClinico_txthematocrito || ''),
       colesterol: (raw?.colesterolAnalisisBioquimico_txtcolesterol || '') + " mg/dl",
       trigliceridos: (raw?.trigliseridosAnalisisBioquimico_txttrigliseridos || '') + " mg/dl",
       examenOrina: "NORMAL",
@@ -141,7 +141,7 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
     // Títulos
     doc.setFont("helvetica", "bold").setFontSize(12);
     doc.setTextColor(0, 0, 0);
-    doc.text("RESUMEN MÉDICO PODEROSA", pageW / 2, 34, { align: "center" });
+    doc.text("RESUMEN MÉDICO", pageW / 2, 34, { align: "center" });
 
     // Número de Ficha, Sede, Fecha y Página
     doc.setFont("helvetica", "normal").setFontSize(9);
