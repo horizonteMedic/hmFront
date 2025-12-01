@@ -6,13 +6,13 @@ export default function LaboratorioClinicoSubTabSelector({ tieneVista }) {
   const tabsConfig = [
     {
       id: 0,
-      permission: "Acceso Hematologia - Bioquimica SI-EO",
+      permission: "Hematología - Bioquímica - ECO",
       label: "Hematología - Bioquímica - ECO",
       component: HematologiaBioquimicaSIEO
     },
     {
       id: 1,
-      permission: "Acceso Hematograma",
+      permission: "Hematograma",
       label: "Hemograma",
       component: Hematologia
     },

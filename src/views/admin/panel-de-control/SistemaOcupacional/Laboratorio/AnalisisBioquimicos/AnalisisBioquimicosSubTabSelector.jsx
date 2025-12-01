@@ -8,7 +8,7 @@ export default function AnalisisBioquimicosSubTabSelector({ tieneVista }) {
   const tabsConfig = [
     {
       id: 0,
-      permission: "Analisis Bioquimicos Subtab",
+      permission: "Perfil Lipídico",
       label: "Perfil Lipídico",
       component: AnalisisBioquimicos
     },
