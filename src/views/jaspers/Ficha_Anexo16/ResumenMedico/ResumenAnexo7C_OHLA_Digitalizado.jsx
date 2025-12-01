@@ -114,8 +114,8 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
       // Mapeo de exámenes de laboratorio - usando los campos correctos
       grupoFactorSanguineo: String(raw?.grupoFactorSanguineo_grupofactor || ''),
       hemograma: "NORMAL",
-      hemoglobina: (raw?.hemoglobinaLaboratorioClinico_txthemoglobina || '') + " gr %",
-      hematocrito: String(raw?.hematocritoLaboratorioClinico_txthematocrito || ''),
+      hemoglobina: (raw?.hemoglobinaLaboratorioClinico_txthemoglobina || '') + " g/dl",
+      hematocrito: (raw?.hematocritoLaboratorioClinico_txthematocrito || '') + " % ",
       colesterol: (raw?.colesterolAnalisisBioquimico_txtcolesterol || '') + " mg/dl",
       trigliceridos: (raw?.trigliseridosAnalisisBioquimico_txttrigliseridos || '') + " mg/dl",
       examenOrina: "NORMAL",
