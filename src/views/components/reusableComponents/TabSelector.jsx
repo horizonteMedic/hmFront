@@ -54,8 +54,8 @@ export default function TabSelector({ tieneVista, tabsConfig }) {
 
     return (
         <div className="space-y-4">
-            <div className="bg-white border-t border-gray-200 rounded-lg p-3">
-                {/* Tab Navigation */}
+            <div className="bg-white border-t border-gray-200 rounded-lg px-3">
+                {/* Tab Navigation */}  
                 <nav ref={navRef} className="flex bg-white border-b border-gray-200 mb-4 relative">
                     {/* Animated sliding indicator */}
                     <div 
