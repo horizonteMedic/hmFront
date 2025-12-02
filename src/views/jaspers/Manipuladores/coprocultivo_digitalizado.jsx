@@ -68,7 +68,7 @@ const drawPatientData = (doc, datos = {}) => {
   const tablaInicioX = 15;
   const tablaAncho = 180;
   const filaAltura = 5;
-  let yPos = 46; // +5mm
+  let yPos = 43;
 
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
@@ -82,7 +82,7 @@ const drawPatientData = (doc, datos = {}) => {
 
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yPos + 3.5);
+  doc.text("Nombres y Apellidos:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
   doc.text(datos.nombres || '', tablaInicioX + 40, yPos + 3.5);
   yPos += filaAltura;
@@ -156,6 +156,20 @@ const drawPatientData = (doc, datos = {}) => {
   doc.text(datos.areaPaciente || '', tablaInicioX + 15, yPos + 3.5);
   yPos += filaAltura;
 
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Empresa:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.empresa || '', tablaInicioX + 20, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Contrata:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.contrata || '', tablaInicioX + 22, yPos + 3.5);
+  yPos += filaAltura;
+
   return yPos;
 };
 
@@ -166,8 +180,12 @@ export default function Coprocultivo_Digitalizado(datos = {}) {
   // === HEADER ===
   drawHeader(doc, datos);
   
+  // === TÍTULO ===
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
+  doc.text("COPROCULTIVO", pageW / 2, 38, { align: "center" });
+  
   // === DATOS DEL PACIENTE ===
-  drawPatientData(doc, datos);
+  const finalYPos = drawPatientData(doc, datos);
 
   const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
   const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
@@ -186,11 +204,7 @@ export default function Coprocultivo_Digitalizado(datos = {}) {
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
-    // === TÍTULO ===
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
-    doc.text("COPROCULTIVO", pageW / 2, 43, { align: "center" }); // +5mm
-
-    let y = 100; // Posición inicial después de la tabla de datos (+5mm)
+    let y = finalYPos + 10; // Posición inicial después de la tabla de datos con espacio adicional
 
     // --- COPROCULTIVO – MUESTRA ---
     doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
