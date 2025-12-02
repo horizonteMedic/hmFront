@@ -5,9 +5,8 @@ export default function EmpleadoComboBox({
     value,
     onChange,
     form,
-    className = "border rounded px-2 py-1 w-full",
-    label = "Médico que Certifica:",
-    placeholder = ""
+    className = "",
+    label = "Médico que Certifica",
 }) {
     const { listaEmpleados: empleados } = useSessionData();
     const [filteredEmpleados, setFilteredEmpleados] = useState([]);
@@ -58,8 +57,8 @@ export default function EmpleadoComboBox({
     };
 
     return (
-        <div>
-            <label className="block font-semibold mb-1">{label}</label>
+        <div className={className}>
+            <label className="block font-semibold mb-1">{label} :</label>
             <div className="relative flex-grow flex items-center">
                 <input
                     id="nombre_medico"
@@ -68,8 +67,7 @@ export default function EmpleadoComboBox({
                     autoComplete="off"
                     value={value || ""}
                     onChange={handleSearch}
-                    className={className}
-                    placeholder={placeholder}
+                    className={`border rounded px-2 py-1 w-full`}
                     onKeyDown={(e) => {
                         if (e.key === "Enter" && filteredEmpleados.length > 0) {
                             e.preventDefault();

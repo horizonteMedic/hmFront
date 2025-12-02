@@ -27,7 +27,6 @@ export default function HematologiaBioquimicaSIEO() {
     codLabclinico: null,
     fechaExamen: today,
     dni: "",
-    incompleto: false,
 
     responsable: "",
     nombres: "",
@@ -147,7 +146,7 @@ export default function HematologiaBioquimicaSIEO() {
 
   return (
     <div className="p-4 space-y-3">
-      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 xl:grid-cols-5 gap-3 md:gap-4">
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 xl:grid-cols-4 gap-3 md:gap-4">
         <InputTextOneLine
           label="N° Orden"
           name="norden"
@@ -172,12 +171,6 @@ export default function HematologiaBioquimicaSIEO() {
           label="Ficha Médica Ocupacional"
           checked={true}
           disabled
-        />
-        <InputCheckbox
-          label={<span className="text-red-600 font-bold">INCOMPLETO</span>}
-          name="incompleto"
-          onChange={handleInputChangeChecked}
-          checked={form.incompleto}
         />
       </SectionFieldset>
       <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
@@ -603,6 +596,7 @@ export default function HematologiaBioquimicaSIEO() {
           />
           <EmpleadoComboBox
             value={form.nombre_medico}
+            label="Especialista"
             form={form}
             onChange={handleChangeSimple}
           />

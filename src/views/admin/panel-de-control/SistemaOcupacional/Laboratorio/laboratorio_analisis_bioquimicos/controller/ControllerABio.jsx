@@ -7,13 +7,11 @@ import {
   SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
-import { GetTableAnalBio } from "../model/model";
-
+import { URLAzure } from "../../../../../../config/config";
 const obtenerReporteUrl = "/api/v01/ct/laboratorio/reporteAnalisisBioquimico";
 const registrarUrl = "/api/v01/ct/laboratorio/registrarActualizarAnalisisBioquimico";
-const tabla = 'analisis_bioquimicos';
 
-export const GetInfoServicio = async (nro, tabla, set, token, setMed, onFinish = () => { }) => {
+export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
   const res = await GetInfoServicioDefault(
     nro,
     tabla,
@@ -25,18 +23,16 @@ export const GetInfoServicio = async (nro, tabla, set, token, setMed, onFinish =
     set((prev) => ({
       ...prev,
       norden: res.norden ?? "",
-      paciente: res.nombres ?? "",
-      medico: res.txtReponsable ?? "",
-      creatinina: res.txtCreatinina ?? "",
+      codAb: res.codAb ?? null,
+      nombres: res.nombres ?? "",
+      fecha: res.fecha ?? "",
       colesterolTotal: res.txtColesterol ?? "",
       ldl: res.txtLdlColesterol !== undefined && res.txtLdlColesterol !== null && res.txtLdlColesterol !== '' ? (parseFloat(res.txtLdlColesterol).toFixed(2)) : '',
       hdl: res.txtHdlColesterol !== undefined && res.txtHdlColesterol !== null && res.txtHdlColesterol !== '' ? (parseFloat(res.txtHdlColesterol).toFixed(2)) : '',
       vldl: res.txtVldlColesterol !== undefined && res.txtVldlColesterol !== null && res.txtVldlColesterol !== '' ? (parseFloat(res.txtVldlColesterol).toFixed(2)) : '',
       trigliceridos: res.txtTrigliseridos ?? "",
     }));
-    if (setMed && res.txtReponsable) {
-      setMed(res.txtReponsable);
-    }
+
   }
 };
 
@@ -63,11 +59,11 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla, Refre
 
   await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
     if (RefreshTable) RefreshTable();
-    PrintHojaR(form.norden, token);
+    PrintHojaR(form.norden, token, tabla);
   });
 };
 
-export const PrintHojaR = (nro, token) => {
+export const PrintHojaR = (nro, token, tabla) => {
   const jasperModules = import.meta.glob(
     "../../../../../../jaspers/AnalisisBioquimicos/*.jsx"
   );
@@ -82,7 +78,7 @@ export const PrintHojaR = (nro, token) => {
   );
 };
 
-export const VerifyTR = async (nro, tabla, token, set, sede, setMed) => {
+export const VerifyTR = async (nro, tabla, token, set, sede) => {
   VerifyTRDefault(
     nro,
     tabla,
@@ -95,7 +91,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede, setMed) => {
     },
     () => {
       //Tiene registro
-      GetInfoServicio(nro, tabla, set, token, setMed, () => {
+      GetInfoServicio(nro, tabla, set, token, () => {
         Swal.fire(
           "Alerta",
           "Este paciente ya cuenta con registros de Análisis Bioquímicos",
@@ -111,15 +107,14 @@ const GetInfoPac = async (nro, set, token, sede) => {
   if (res) {
     set((prev) => ({
       ...prev,
-      ...res,
-      paciente: res.nombresApellidos ?? "",
+      nombres: res.nombresApellidos ?? "",
     }));
   }
 };
 
-export const GetInfoPacAnalisisBio = async (nro, tabla, set, token, setMed) => {
+export const GetInfoPacAnalisisBio = async (nro, tabla, set, token) => {
   LoadingDefault('Importando Datos');
-  await GetInfoServicio(nro, tabla, set, token, setMed, () => {
+  await GetInfoServicio(nro, tabla, set, token, () => {
     Swal.close();
   });
 };
@@ -128,4 +123,28 @@ export const Loading = (mensaje) => {
   LoadingDefault(mensaje);
 };
 
-export { GetTableAnalBio };
+
+
+
+export function GetTableAnalBio(data, sede, token) {
+  const body = {
+    opcion_id_p: data.opcion_id_p,
+    norden_p: data.norden,
+    nombres_apellidos_p: data.nombres_apellidos_p,
+    cod_sede_p: sede
+  };
+  const url = `${URLAzure}/api/v01/ct/laboratorio/listadoHistoriasOcupacionalesAnalisisBioquimicos`
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(body)
+  }
+  return fetch(url, options).then(res => {
+    if (!res.ok) {
+      return res
+    } return res.json()
+  }).then(response => response)
+}

@@ -12,51 +12,10 @@ export default function Aptitud_Poderosa_Digitalizado(data = {}) {
   // Contador de páginas dinámico
   let numeroPagina = 1;
 
-  // Datos de prueba por defecto
-  const datosPrueba = {
-    apellidosNombres: "CASTILLO PLASENCIA HADY KATHERINE",
-    fechaExamen: "04/11/2024",
-    tipoExamen: "APTITUD PODEROSA",
-    sexo: "Femenino",
-    documentoIdentidad: "72384273",
-    edad: "31",
-    fechaNacimiento: "01/01/1993",
-    areaTrabajo: "MINERÍA",
-    puestoTrabajo: "DAD",
-    empresa: "MINERA BOROO MISQUICHILCA S.A.",
-    contrata: "CONTRATA EJEMPLO S.A.C.",
-    vitalSigns: {
-      fc: "64",
-      fr: "19",
-      pa: "120/60",
-      satO2: "99",
-      imc: "23.48",
-      temperatura: "36.5",
-      peso: "70",
-      talla: "1.75"
-    },
-    // Datos de color
-    color: 1,
-    codigoColor: "#008f39",
-    textoColor: "F",
-    // Datos adicionales para header
-    numeroFicha: "99164",
-    sede: "Trujillo-Pierola",
-    horaSalida: "9:33:43 PM",
-    // Datos para tipo de trabajo
-    tipoTrabajo: "subsuelo", // "superficie", "planta", "subsuelo"
-    // Datos para resultado de evaluación
-    resultadoEvaluacion: "noApto", // "apto", "aptoConRestriccion", "noAptoTemporal", "noApto"
-    // Datos para observaciones
-    observaciones: "El trabajador presenta condiciones adecuadas para realizar trabajos en altura.\nSe recomienda seguimiento médico periódico.\nCumple con los requisitos de seguridad establecidos.",
-    // Datos para fechas
-    fechaCaducidad: "13/10/2026"
-  };
-
   const datosReales = {
     apellidosNombres: String((data.apellidosPaciente || "") + " " + (data.nombresPaciente || "")).trim(),
     fechaExamen: formatearFechaCorta(data.fechaExamen || ""),
-    tipoExamen: String(data.nombreExamen || "APTITUD PODEROSA"),
+    tipoExamen: String(data.nombreExamen ?? ""),
     sexo: convertirGenero(data.sexoPaciente) || "",
     documentoIdentidad: String(data.dniPaciente || ""),
     edad: String(data.edadPaciente ?? ""),
@@ -76,22 +35,23 @@ export default function Aptitud_Poderosa_Digitalizado(data = {}) {
       talla: String(data.tallaTriaje || "")
     },
     // Datos de color
-    color: data.color || 1,
-    codigoColor: data.codigoColor || "#008f39",
-    textoColor: data.textoColor || "F",
+    color: Number(data.color ?? 0),
+    codigoColor: String(data.codigoColor ?? ""),
+    textoColor: String(data.textoColor ?? ""),
     // Datos adicionales para header
-    numeroFicha: String(data.norden || ""),
-    sede: data.sede || data.nombreSede || "",
-    horaSalida: String(data.horaSalida || ""),
-    direccionPaciente: String(data.direccionPaciente || ""),
+    numeroFicha: String(data.norden ?? ""),
+    sede: String(data.sede ?? data.nombreSede ?? ""),
+    horaSalida: String(data.horaSalida ?? ""),
+    direccionPaciente: String(data.direccionPaciente ?? ""),
     // Datos para tipo de trabajo
-    tipoTrabajo: data.tipoTrabajo || "superficie", // "superficie", "planta", "subsuelo"
+    tipoTrabajo: String(data.tipoTrabajo ?? ""),
     // Datos para resultado de evaluación
     resultadoEvaluacion: (() => {
       if (data.apto) return "apto";
       if (data.aptoRestriccion) return "aptoConRestriccion";
       if (data.aptoTemporal) return "noAptoTemporal";
-      return "noApto";
+      if (data.noApto) return "noApto";
+      return "";
     })(),
     // Datos para observaciones
     observaciones: data.observaciones || "",
@@ -99,8 +59,8 @@ export default function Aptitud_Poderosa_Digitalizado(data = {}) {
     fechaCaducidad: formatearFechaCorta(data.fechaHasta || "")
   };
 
-  // Usar datos reales si existen, sino usar datos de prueba
-  const datosFinales = data && data.norden ? datosReales : datosPrueba;
+  // Usar únicamente los datos reales proporcionados
+  const datosFinales = datosReales;
 
   // Header reutilizable
   const drawHeader = (pageNumber) => {
@@ -512,9 +472,6 @@ export default function Aptitud_Poderosa_Digitalizado(data = {}) {
       yTextoObservaciones = dibujarTextoConSaltoLinea(textoConGuion, tablaInicioX + 2, yTextoObservaciones, anchoMaximoObservaciones);
       yTextoObservaciones += 3; // Espaciado entre líneas
     });
-  } else {
-    // Si no hay observaciones, mostrar texto por defecto
-    doc.text("- Sin observaciones registradas", tablaInicioX + 2, yTextoObservaciones);
   }
   
   yPos += alturaFilaObservaciones;

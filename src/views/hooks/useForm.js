@@ -59,6 +59,16 @@ export const useForm = (initialFormState, options = {}) => {
     }
   };
 
+  const handleChangeNumberDecimals = (e, maxDecimals = 0) => {
+    const { name, value } = e.target;
+    const md = Number.isInteger(maxDecimals) && maxDecimals >= 0 ? maxDecimals : 1;
+    const decimalPart = md === 0 ? '' : `(?:[.,]\\d{0,${md}})?`;
+    const regex = new RegExp(`^\\d*${decimalPart}$`);
+    if (regex.test(value)) {
+      setForm((f) => ({ ...f, [name]: value }));
+    }
+  };
+
   const handleRadioButton = (e, value) => {
     const { name } = e.target;
     setForm((f) => ({
@@ -189,6 +199,7 @@ export const useForm = (initialFormState, options = {}) => {
     handleChangeSimple,
     handleChange,
     handleChangeNumber,
+    handleChangeNumberDecimals,
     handleRadioButton,
     handleInputChangeChecked,
     handleCheckBoxChange,

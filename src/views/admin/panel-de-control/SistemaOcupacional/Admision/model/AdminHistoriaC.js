@@ -1,6 +1,6 @@
 import { URLAzure } from "../../../../../config/config";
 
-export function SubmitHistoriaC(data, sede, token, operacion) {
+export function SubmitHistoriaC(data, sede, token, operacion, originalExams = []) {
 
   const removePrefix = (str, prefix) => {
     if (typeof str !== "string") return ""; // o puedes lanzar un error si prefieres
@@ -18,6 +18,65 @@ export function SubmitHistoriaC(data, sede, token, operacion) {
 
   const [dd, mm, yyyy] = data.fechaAperturaPo.split('/');
   const fechaFormateada = `${yyyy}/${mm}/${dd}`;
+
+  // ---- CALCULAR versionRegistro ----
+  let version = 1;
+  if (data.versionRegistro && Number(data.versionRegistro) > 0) {
+    version = Number(data.versionRegistro) + 1;
+  }
+
+  // -------- VALIDACIÓN DE CAMBIOS EN EXÁMENES (SOLO PARA EDICIÓN) --------
+  let examenesBody = [];
+
+  if (operacion === 2 && originalExams) {
+    // Función auxiliar para obtener IDs de exámenes
+    const getExamIds = (list) => {
+      if (!list) return new Set();
+      return new Set(list.map(ex => ex.idExamen || ex.id));
+    };
+
+    const currentIds = getExamIds(data.examenesAdicionales);
+    const originalIds = getExamIds(originalExams);
+
+    // Verificar si hay cambios
+    let hasChanges = false;
+    if (currentIds.size !== originalIds.size) {
+      hasChanges = true;
+    } else {
+      for (let id of currentIds) {
+        if (!originalIds.has(id)) {
+          hasChanges = true;
+          break;
+        }
+      }
+    }
+
+    if (hasChanges) {
+      // Si hay cambios, armamos la lista con la nueva versión
+      examenesBody = data.examenesAdicionales.map(ex => ({
+        id: null,
+        idExamenAdicionalProtocolo: ex.idExamenAdicionalProtocolo,
+        versionRegistro: version,
+        usuarioRegistro: data.user_registro,
+        norden: null
+      }));
+    } else {
+      // Si no hay cambios, enviamos lista vacía y mantenemos la versión anterior (o no enviamos nada si el backend lo maneja)
+      // El requerimiento dice: "si no hago ningun cambio... debe enviar una lista vacia []"
+      examenesBody = [];
+      // Nota: Si enviamos lista vacía, el backend probablemente no actualizará los exámenes ni la versión.
+    }
+  } else {
+    // Para registro nuevo (operacion 1) o si no se pasaron originalExams, comportamiento normal
+    examenesBody = data.examenesAdicionales.map(ex => ({
+      id: null,
+      idExamenAdicionalProtocolo: ex.idExamenAdicionalProtocolo,
+      versionRegistro: version,
+      usuarioRegistro: data.user_registro,
+      norden: null
+    }));
+  }
+
 
   const body = {
 
@@ -38,39 +97,42 @@ export function SubmitHistoriaC(data, sede, token, operacion) {
     n_medico: data.n_medico,
     n_hora: `${hours}:${minutes}:${seconds}`,
     tipoPago: data.tipoPago,
-    n_fisttest: data.n_fisttest, //1
-    n_psicosen: data.n_psicosen, //2
-    n_testaltura: data.n_testaltura, //3
+    n_fisttest: false, //1
+    n_psicosen: false, //2
+    n_testaltura: false, //3
     color: 30,
     grupoSan: null,
     grupoFactorSan: null,
     codClinica: "4353-H",
-    visualCompl: data.visualCompl,//6
-    trabCalientes: data.trabCalientes, //4
+    visualCompl: false,//6
+    trabCalientes: false, //4
     chk_covid1: false,
     chk_covid2: false,
-    manipAlimentos: data.manipAlimentos, //7
+    manipAlimentos: false, //7
     textObserv1: data.textObserv1,
     textObserv2: data.textObserv2,
     codSede: sede,
     tipoPruebaCovid: "RA",
     tipoPrueba: "N/A",
     nombreHotel: "N/A",
-    protocolo: data.protocolo,
+    protocolo: data.idProtocolo, //Protocolooooo ID
     precioAdic: `${precioAdic ? 'S/.' + precioAdic : 'S/.0'}`,
     autoriza: data.autoriza,
     n_operacion: null,
-    herraManuales: data.herraManuales, //8
-    rxcDorsoLumbar: data.rxcDorsoLumbar, //9
-    rxcKLumbar: data.rxcKLumbar, //10
-    rxcLumbosacra: data.rxcLumbosacra, //5
-    rxcPlomos: data.rxcPlomos,//12
-    mercurioo: data.mercurioo,//13
-    tmarihuana: data.tmarihuana,
-    tcocaina: data.tcocaina, 
-    espaciosConfinados: data.espaciosConfinados, 
+    herraManuales: false, //8
+    rxcDorsoLumbar: false, //9
+    rxcKLumbar: false, //10
+    rxcLumbosacra: false, //5
+    rxcPlomos: false,//12
+    mercurioo: false,//13
+    tmarihuana: false,
+    tcocaina: false,
+    espaciosConfinados: false,
     user_registro: data.user_registro,
+    examenesAdicionales: examenesBody
   };
+
+  console.log(body)
 
   const url = `${URLAzure}/api/v01/ct/registroPacientes/historiaClinicaOcupacional`
   const options = {
