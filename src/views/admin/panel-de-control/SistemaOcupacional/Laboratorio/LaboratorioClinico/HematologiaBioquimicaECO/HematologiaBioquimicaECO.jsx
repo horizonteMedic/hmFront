@@ -12,12 +12,12 @@ import {
 import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
 import { useSessionData } from '../../../../../../hooks/useSessionData';
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerHematologiaBioquimicaSIEO";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerHematologiaBioquimicaECO";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "lab_clinico";
 
-export default function HematologiaBioquimicaSIEO() {
+export default function HematologiaBioquimicaECO() {
   const today = getToday();
 
   const { token, userlogued, selectedSede, userName } = useSessionData();

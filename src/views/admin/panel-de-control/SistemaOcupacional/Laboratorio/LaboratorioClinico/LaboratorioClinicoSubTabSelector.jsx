@@ -1,6 +1,6 @@
 import SubTabSelector from "../../../../../components/reusableComponents/SubTabSelector";
-import HematologiaBioquimicaSIEO from "./Hematologia-bioquimicaSI-EO/Hematologia-bioquimicaSI-EO";
 import Hematologia from "./Hematologia/Hematologia";
+import HematologiaBioquimicaECO from "./HematologiaBioquimicaECO/HematologiaBioquimicaECO";
 
 export default function LaboratorioClinicoSubTabSelector({ tieneVista }) {
   const tabsConfig = [
@@ -8,7 +8,7 @@ export default function LaboratorioClinicoSubTabSelector({ tieneVista }) {
       id: 0,
       permission: "Hematología - Bioquímica - ECO",
       label: "Hematología - Bioquímica - ECO",
-      component: HematologiaBioquimicaSIEO
+      component: HematologiaBioquimicaECO
     },
     {
       id: 1,
