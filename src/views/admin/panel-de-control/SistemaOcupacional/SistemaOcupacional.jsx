@@ -6,10 +6,9 @@ import ImportacionModalBasica from "./Admision/ImportacionModalBasica.jsx";
 import ReservaPacientes from "./Admision/ReservaPacientes.jsx";
 import ConsentimientoDigitalizacion from "./Admision/ConsentimientoDigitalizacion/ConsentimientoDigitalizacion.jsx";
 import Triaje from "./Triaje/Triaje";
-import Consentimientos from "./Laboratorio/Consentimientos/Consentimientos.jsx";
+import ConsentimientosSubTabSelector from "./Laboratorio/Consentimientos/ConsentimientosSubTabSelector.jsx";
 import ParasitologiaCoprologico from "./Parasitologia/ParasitologiaCoprologico";
 import ManipuladoresSubTabSelector from "./Laboratorio/Manipuladores/ManipuladoresSubTabSelector";
-import PruebasCovid from "./Laboratorio/PruebasCovid/PruebasCovid";
 import {
   ComboboxEmpresasMulti,
   ComboboxContratasMulti,
@@ -112,6 +111,8 @@ import EliminarExamenes from "./EliminarExamenes/EliminarExamenes.jsx";
 import AnalisisBioquimicosSubTabSelector from "./Laboratorio/AnalisisBioquimicos/AnalisisBioquimicosSubTabSelector.jsx";
 import InmunologiaSubTabSelector from "./Laboratorio/Inmunologia/InmunologiaSubTabSelector.jsx";
 import ToxicologiaSubTabSelector from "./Laboratorio/Toxicologia/ToxicologiaSubTabSelector.jsx";
+import PruebasCovidSubTabSelector from "./Laboratorio/PruebasCovid/PruebasCovidSubTabSelector.jsx";
+import LaboratorioTabSelector from "./Laboratorio/LaboratorioTabSelector.jsx";
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
   { key: 7, label: "Test Altura" },
@@ -136,7 +137,6 @@ const TabComponent = () => {
   const Vista = useAuthStore((state) => state.listView);
   const Acceso = useAuthStore((state) => state.listAccesos);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [labTab, setLabTab] = useState(0); // Para tabs internos de Laboratorio
   const [activeTabExamenes, setActiveTabExamenes] = useState(1); // Para ExamenesLaboratorio
   const [contextMenu, setContextMenu] = useState({
     visible: false,
@@ -439,158 +439,6 @@ const TabComponent = () => {
               </div>
             </div>
           )}
-          {activeTab === 2 && (
-            <div>
-              {/* ——— Header con botón "Atrás" y título ——— */}
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Laboratorio
-                </h2>
-              </div>
-
-              {/* ——— Sub-menú fijo ——— CONSENTIMIENTOS */}
-              <nav className={styles.labNav}>
-                {tieneVista("Laboratorio Clinico Formulario") && (
-                  <button
-                    className={`${styles.labNavButton} ${labTab === 0 ? styles.labNavButtonActive : ""
-                      }`}
-                    onClick={() => setLabTab(0)}
-                  >
-                    <FontAwesomeIcon icon={faFlask} className="mr-2" />
-                    LABORATORIO CLÍNICO
-                  </button>
-                )}
-                {tieneVista("Laboratorio Clinico Formulario") && (
-                  <button
-                    className={`${styles.labNavButton} ${labTab === 1 ? styles.labNavButtonActive : ""
-                      }`}
-                    onClick={() => setLabTab(1)}
-                  >
-                    <FontAwesomeIcon icon={faFilter} className="mr-2" />
-                    ANÁLISIS BIOQUÍMICOS
-                  </button>
-                )}
-                {tieneVista("Inmunologia") && (
-                  <button
-                    className={`${styles.labNavButton} ${labTab === 2 ? styles.labNavButtonActive : ""
-                      }`}
-                    onClick={() => setLabTab(2)}
-                  >
-                    <FontAwesomeIcon icon={faVirus} className="mr-2" />
-                    INMUNOLOGÍA
-                  </button>
-                )}
-                {tieneVista("Toxicologia") && (
-                  <button
-                    className={`${styles.labNavButton} ${labTab === 3 ? styles.labNavButtonActive : ""
-                      }`}
-                    onClick={() => setLabTab(3)}
-                  >
-                    <FontAwesomeIcon icon={faSyringe} className="mr-2" />
-                    TOXICOLOGÍA
-                  </button>
-                )}
-                {tieneVista("Consentimientos") && (
-                  <button
-                    className={`${styles.labNavButton} ${labTab === 4 ? styles.labNavButtonActive : ""
-                      }`}
-                    onClick={() => setLabTab(4)}
-                  >
-                    <FontAwesomeIcon icon={faFileAlt} className="mr-2" />
-                    CONSENTIMIENTOS
-                  </button>
-                )}
-                {tieneVista("Manipuladores") && (
-                  <button
-                    className={`${styles.labNavButton} ${labTab === 5 ? styles.labNavButtonActive : ""
-                      }`}
-                    onClick={() => setLabTab(5)}
-                  >
-                    <FontAwesomeIcon icon={faMicroscope} className="mr-2" />
-                    MANIPULADORES
-                  </button>
-                )}
-                {tieneVista("Pruebas Covid") && (
-                  <button
-                    className={`${styles.labNavButton} ${labTab === 6 ? styles.labNavButtonActive : ""
-                      }`}
-                    onClick={() => setLabTab(6)}
-                  >
-                    <FontAwesomeIcon icon={faVialVirus} className="mr-2" />
-                    PRUEBAS COVID
-                  </button>
-                )}
-                {/* <button
-                  className={`${styles.labNavButton} ${labTab === 7 ? styles.labNavButtonActive : ''}`}
-                  onClick={() => setLabTab(7)}
-                >
-                  <FontAwesomeIcon icon={faNotesMedical} className="mr-2" />
-                  EXÁMENES
-                </button> */}
-              </nav>
-
-              {/* ——— Contenido según pestaña ——— CONSENTIMIENTOS */}
-              <div className={styles.labContent}>
-                {labTab === 0 && (
-                  <LaboratorioClinicoSubTabSelector
-                    tieneVista={tieneVista}
-                  />
-                )}
-                {labTab === 1 && (
-                  <AnalisisBioquimicosSubTabSelector
-                    tieneVista={tieneVista}
-                  />
-                )}
-                {labTab === 2 && (
-                  <InmunologiaSubTabSelector
-                    tieneVista={tieneVista}
-                  />
-                )}
-                {labTab === 3 && (
-                  <ToxicologiaSubTabSelector
-                    tieneVista={tieneVista}
-                  />
-                )}
-                {labTab === 4 && (
-                  <Consentimientos
-                    token={token}
-                    selectedSede={selectSede}
-                    userlogued={userlogued.sub}
-                    permiso={tienePermisoEnVista}
-                  />
-                )}
-                {labTab === 5 && (
-                  <ManipuladoresSubTabSelector
-                    tieneVista={tieneVista}
-                  />
-                )}
-                {labTab === 6 && (
-                  <PruebasCovid
-                    token={token}
-                    selectedSede={selectSede}
-                    userlogued={userlogued.sub}
-                  />
-                )}
-                {/* {labTab === 7 && (
-                  <ExamenesLaboratorio
-                    token={token}
-                    selectedSede={selectSede}
-                    userlogued={userlogued.sub}
-                    activeTabExamenes={activeTabExamenes}
-                    setActiveTabExamenes={setActiveTabExamenes}
-                  />
-                )} */}
-              </div>
-            </div>
-          )}
           {activeTab === 15 && (
             <div>
               <div className="w-full flex items-center justify-end gap-4 mb-2">
@@ -649,15 +497,12 @@ const TabComponent = () => {
           {(() => {
             const displayedInterfaces = {
               1: { title: "Triaje", child: <Triaje token={token} selectedSede={selectSede} /> },
+              2: { title: "Laboratorio", child: <LaboratorioTabSelector tieneVista={tieneVista} /> },
               3: { title: "Coproparasitológico", child: <ParasitologiaCoprologico /> },
-              // 4: { title: "Laboratorio Clínico", child: <LaboratorioClinico/> },
-              // 5: { title: "Análisis Bioquímicos", child: <AnalisisBioquimicosSubTabSelector /> },
               6: {
                 title: "Consentimientos", child: (
-                  <Consentimientos
-                    token={token}
-                    selectedSede={selectSede}
-                    userlogued={userlogued.sub}
+                  <ConsentimientosSubTabSelector
+                    tieneVista={tieneVista}
                   />
                 )
               },
