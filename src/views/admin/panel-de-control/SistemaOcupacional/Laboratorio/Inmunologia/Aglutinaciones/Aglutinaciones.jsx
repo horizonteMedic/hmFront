@@ -3,7 +3,7 @@ import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { getToday } from '../../../../../../utils/helpers';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerInmunologia';
+import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerAglutinaciones';
 import {
   InputTextOneLine,
 } from '../../../../../../components/reusableComponents/ResusableComponents';
@@ -12,7 +12,7 @@ import EmpleadoComboBox from '../../../../../../components/reusableComponents/Em
 
 const tabla = 'inmunologia';
 
-export default function Inmunologia() {
+export default function Aglutinaciones() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
@@ -212,6 +212,7 @@ export default function Inmunologia() {
           {pruebas.slice(0, 3).map(({ name, label }) => (
             <InputTextOneLine
               label={label}
+              key={name}
               name={name}
               value={form[name]}
               onChange={handleChange}
@@ -224,6 +225,7 @@ export default function Inmunologia() {
           {pruebas.slice(3, 5).map(({ name, label }) => (
             <InputTextOneLine
               label={label}
+              key={name}
               name={name}
               value={form[name]}
               onChange={handleChange}

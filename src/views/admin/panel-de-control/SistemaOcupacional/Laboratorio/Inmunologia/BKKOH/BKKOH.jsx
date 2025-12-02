@@ -3,7 +3,7 @@ import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { getToday } from '../../../../../../utils/helpers';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerMicrobiologia';
+import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerBKKOH';
 import {
   InputCheckbox,
   InputsRadioGroup,
@@ -14,7 +14,7 @@ import EmpleadoComboBox from '../../../../../../components/reusableComponents/Em
 
 const tabla = 'microbiologia';
 
-export default function Microbiologia() {
+export default function BKKOH() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
@@ -80,33 +80,6 @@ export default function Microbiologia() {
       PrintHojaR(form.norden, token, tabla);
     });
   };
-
-  const handleBk1RadioChange = (opt) => {
-    setForm(prev => ({
-      ...prev,
-      bk1Radio: prev.bk1Radio === opt ? '' : opt,
-      bk1: prev.bk1Radio === opt ? '' : opt
-    }));
-  };
-
-  const handleBk2RadioChange = (opt) => {
-    setForm(prev => ({
-      ...prev,
-      bk2Radio: prev.bk2Radio === opt ? '' : opt,
-      bk2: prev.bk2Radio === opt ? '' : opt
-    }));
-  };
-
-  const handleKohRadioChange = (opt) => {
-    setForm(prev => ({
-      ...prev,
-      kohRadio: prev.kohRadio === opt ? '' : opt,
-      koh: prev.kohRadio === opt ? '' : opt
-    }));
-  };
-
-  const bkOptions = ["BAAR - NEGATIVO", "BAAR - POSITIVO", "N/A"];
-  const kohOptions = ["NEGATIVO", "POSITIVO", "N/A"];
 
   return (
     <form className="p-4 space-y-3">

@@ -87,7 +87,7 @@ export const PrintHojaR = (nro, token, tabla) => {
     nro,
     token,
     tabla,
-    datosFooter,
+    null,
     obtenerReporteUrl,
     jasperModules,
     "../../../../../../jaspers/Inmunologia"
