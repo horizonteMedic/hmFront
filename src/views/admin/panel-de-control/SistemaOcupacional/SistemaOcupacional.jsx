@@ -6,13 +6,9 @@ import ImportacionModalBasica from "./Admision/ImportacionModalBasica.jsx";
 import ReservaPacientes from "./Admision/ReservaPacientes.jsx";
 import ConsentimientoDigitalizacion from "./Admision/ConsentimientoDigitalizacion/ConsentimientoDigitalizacion.jsx";
 import Triaje from "./Triaje/Triaje";
-import Consentimientos from "./Laboratorio/Consentimientos/Consentimientos.jsx";
+import ConsentimientosSubTabSelector from "./Laboratorio/Consentimientos/ConsentimientosSubTabSelector.jsx";
 import ParasitologiaCoprologico from "./Parasitologia/ParasitologiaCoprologico";
-import LaboratorioAnalisisBioquimicos from "./Laboratorio/laboratorio_analisis_bioquimicos/LaboratorioAnalisisBioquimicos";
-import InmunologiaTab from "./Laboratorio/Inmunologia/Inmunologia_tab.jsx";
-import Toxicologia from "./Laboratorio/Toxicologia/Toxicologia";
-import Manipuladores from "./Laboratorio/Manipuladores/Manipuladores";
-import PruebasCovid from "./Laboratorio/PruebasCovid/PruebasCovid";
+import ManipuladoresSubTabSelector from "./Laboratorio/Manipuladores/ManipuladoresSubTabSelector";
 import {
   ComboboxEmpresasMulti,
   ComboboxContratasMulti,
@@ -74,6 +70,7 @@ import {
   faTruckMedical,
   faMaskVentilator,
   faPersonRifle,
+  faFolderMinus,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -110,7 +107,12 @@ import PoderosaTabSelector from "./Poderosa/PoderosaTabSelector.jsx";
 // import AversionRiesgo from "./ModuloPsicologia/AversionRiesgo/AversionRiesgo.jsx";
 import GestionOpciones from "./Playground/GestionOpciones/GestionOpciones.jsx";
 import LaboratorioClinicoSubTabSelector from "./Laboratorio/LaboratorioClinico/LaboratorioClinicoSubTabSelector.jsx";
-
+import EliminarExamenes from "./EliminarExamenes/EliminarExamenes.jsx";
+import AnalisisBioquimicosSubTabSelector from "./Laboratorio/AnalisisBioquimicos/AnalisisBioquimicosSubTabSelector.jsx";
+import InmunologiaSubTabSelector from "./Laboratorio/Inmunologia/InmunologiaSubTabSelector.jsx";
+import ToxicologiaSubTabSelector from "./Laboratorio/Toxicologia/ToxicologiaSubTabSelector.jsx";
+import PruebasCovidSubTabSelector from "./Laboratorio/PruebasCovid/PruebasCovidSubTabSelector.jsx";
+import LaboratorioTabSelector from "./Laboratorio/LaboratorioTabSelector.jsx";
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
   { key: 7, label: "Test Altura" },
@@ -135,7 +137,6 @@ const TabComponent = () => {
   const Vista = useAuthStore((state) => state.listView);
   const Acceso = useAuthStore((state) => state.listAccesos);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [labTab, setLabTab] = useState(0); // Para tabs internos de Laboratorio
   const [activeTabExamenes, setActiveTabExamenes] = useState(1); // Para ExamenesLaboratorio
   const [contextMenu, setContextMenu] = useState({
     visible: false,
@@ -293,10 +294,7 @@ const TabComponent = () => {
                   { vista: "Test Fatiga", tab: 23, icons: [{ icon: faBed }], label: "Test Fatiga y Somnolencia" },
                   { vista: "Triaje", tab: 1, icons: [{ icon: faStethoscope }], label: "Triaje" },
                   { vista: "Uso de Respiradores", tab: 36, icons: [{ icon: faMaskVentilator }], label: "Uso de Respiradores" },
-                  // { vista: "Certificado Trabajos en Caliente", tab: 37, icons: [{ icon: faFireFlameCurved }], label: "Certificado Trabajos en Caliente" },
-                  // { vista: "Licencia Interna", tab: 38, icons: [{ icon: faIdCard }], label: "Licencia Interna" },
-                  // { vista: "Certificado Altura Poderosa", tab: 39, icons: [{ icon: faP }], label: "Certificado Altura Poderosa" },
-                  // { vista: "Certificado Aptitud Poderosa", tab: 40, icons: [{ icon: faP }], label: "Certificado Aptitud Poderosa" },
+                  { vista: "Eliminar Examenes", tab: 38, icons: [{ icon: faFolderMinus }], label: "Eliminar Examenes" },
                 ];
                 return items
                   .filter((item) => tieneVista(item.vista))
@@ -441,169 +439,6 @@ const TabComponent = () => {
               </div>
             </div>
           )}
-          {activeTab === 2 && (
-            <div>
-              {/* ——— Header con botón "Atrás" y título ——— */}
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Laboratorio
-                </h2>
-              </div>
-
-              {/* ——— Sub-menú fijo ——— CONSENTIMIENTOS */}
-              <nav className={styles.labNav}>
-                {tieneVista("Laboratorio Clinico Formulario") && (
-                  <button
-                    className={`${styles.labNavButton} ${labTab === 0 ? styles.labNavButtonActive : ""
-                      }`}
-                    onClick={() => setLabTab(0)}
-                  >
-                    <FontAwesomeIcon icon={faFlask} className="mr-2" />
-                    LABORATORIO CLÍNICO
-                  </button>
-                )}
-                {tieneVista("Laboratorio Clinico Formulario") && (
-                  <button
-                    className={`${styles.labNavButton} ${labTab === 1 ? styles.labNavButtonActive : ""
-                      }`}
-                    onClick={() => setLabTab(1)}
-                  >
-                    <FontAwesomeIcon icon={faFilter} className="mr-2" />
-                    ANÁLISIS BIOQUÍMICOS
-                  </button>
-                )}
-                {tieneVista("Inmunologia") && (
-                  <button
-                    className={`${styles.labNavButton} ${labTab === 2 ? styles.labNavButtonActive : ""
-                      }`}
-                    onClick={() => setLabTab(2)}
-                  >
-                    <FontAwesomeIcon icon={faVirus} className="mr-2" />
-                    INMUNOLOGÍA
-                  </button>
-                )}
-                {tieneVista("Toxicologia") && (
-                  <button
-                    className={`${styles.labNavButton} ${labTab === 3 ? styles.labNavButtonActive : ""
-                      }`}
-                    onClick={() => setLabTab(3)}
-                  >
-                    <FontAwesomeIcon icon={faSyringe} className="mr-2" />
-                    TOXICOLOGÍA
-                  </button>
-                )}
-                {tieneVista("Consentimientos") && (
-                  <button
-                    className={`${styles.labNavButton} ${labTab === 4 ? styles.labNavButtonActive : ""
-                      }`}
-                    onClick={() => setLabTab(4)}
-                  >
-                    <FontAwesomeIcon icon={faFileAlt} className="mr-2" />
-                    CONSENTIMIENTOS
-                  </button>
-                )}
-                {tieneVista("Manipuladores") && (
-                  <button
-                    className={`${styles.labNavButton} ${labTab === 5 ? styles.labNavButtonActive : ""
-                      }`}
-                    onClick={() => setLabTab(5)}
-                  >
-                    <FontAwesomeIcon icon={faMicroscope} className="mr-2" />
-                    MANIPULADORES
-                  </button>
-                )}
-                {tieneVista("Pruebas Covid") && (
-                  <button
-                    className={`${styles.labNavButton} ${labTab === 6 ? styles.labNavButtonActive : ""
-                      }`}
-                    onClick={() => setLabTab(6)}
-                  >
-                    <FontAwesomeIcon icon={faVialVirus} className="mr-2" />
-                    PRUEBAS COVID
-                  </button>
-                )}
-                {/* <button
-                  className={`${styles.labNavButton} ${labTab === 7 ? styles.labNavButtonActive : ''}`}
-                  onClick={() => setLabTab(7)}
-                >
-                  <FontAwesomeIcon icon={faNotesMedical} className="mr-2" />
-                  EXÁMENES
-                </button> */}
-              </nav>
-
-              {/* ——— Contenido según pestaña ——— CONSENTIMIENTOS */}
-              <div className={styles.labContent}>
-                {labTab === 0 && (
-                  <LaboratorioClinicoSubTabSelector
-                    tieneVista={tieneVista}
-                  />
-                )}
-                {labTab === 1 && (
-                  <LaboratorioAnalisisBioquimicos
-                    token={token}
-                    selectedSede={selectSede}
-                    userlogued={userlogued.sub}
-                    permiso={tienePermisoEnVista}
-                  />
-                )}
-                {labTab === 2 && (
-                  <InmunologiaTab
-                    token={token}
-                    selectedSede={selectSede}
-                    userlogued={userlogued.sub}
-                    permiso={tienePermisoEnVista}
-                  />
-                )}
-                {labTab === 3 && (
-                  <Toxicologia
-                    token={token}
-                    selectedSede={selectSede}
-                    userlogued={userlogued.sub}
-                    permiso={tienePermisoEnVista}
-                  />
-                )}
-                {labTab === 4 && (
-                  <Consentimientos
-                    token={token}
-                    selectedSede={selectSede}
-                    userlogued={userlogued.sub}
-                    permiso={tienePermisoEnVista}
-                  />
-                )}
-                {labTab === 5 && (
-                  <Manipuladores
-                    token={token}
-                    selectedSede={selectSede}
-                    userlogued={userlogued.sub}
-                  />
-                )}
-                {labTab === 6 && (
-                  <PruebasCovid
-                    token={token}
-                    selectedSede={selectSede}
-                    userlogued={userlogued.sub}
-                  />
-                )}
-                {/* {labTab === 7 && (
-                  <ExamenesLaboratorio
-                    token={token}
-                    selectedSede={selectSede}
-                    userlogued={userlogued.sub}
-                    activeTabExamenes={activeTabExamenes}
-                    setActiveTabExamenes={setActiveTabExamenes}
-                  />
-                )} */}
-              </div>
-            </div>
-          )}
           {activeTab === 15 && (
             <div>
               <div className="w-full flex items-center justify-end gap-4 mb-2">
@@ -662,15 +497,12 @@ const TabComponent = () => {
           {(() => {
             const displayedInterfaces = {
               1: { title: "Triaje", child: <Triaje token={token} selectedSede={selectSede} /> },
+              2: { title: "Laboratorio", child: <LaboratorioTabSelector tieneVista={tieneVista} /> },
               3: { title: "Coproparasitológico", child: <ParasitologiaCoprologico /> },
-              // 4: { title: "Laboratorio Clínico", child: <LaboratorioClinico/> },
-              5: { title: "Análisis Bioquímicos", child: <LaboratorioAnalisisBioquimicos /> },
               6: {
                 title: "Consentimientos", child: (
-                  <Consentimientos
-                    token={token}
-                    selectedSede={selectSede}
-                    userlogued={userlogued.sub}
+                  <ConsentimientosSubTabSelector
+                    tieneVista={tieneVista}
                   />
                 )
               },
@@ -744,10 +576,7 @@ const TabComponent = () => {
               35: { title: "Ficha Interconsulta", child: <FichaInterconsulta /> },
               36: { title: "Uso de Respiradores", child: <UsoRespiradores /> },
               37: { title: "Poderosa", child: <PoderosaTabSelector tieneVista={tieneVista} /> },
-              // 37: { title: "Certificado Trabajos en Caliente", child: <CertificadoTrabajosCaliente /> },
-              // 38: { title: "Licencia Interna", child: <LicenciaInterna /> },
-              // 39: { title: "Certificado Altura Poderosa", child: <CertificadoAlturaPoderosa /> },
-              // 40: { title: "Certificado Aptitud Poderosa", child: <CertificadoAptitudPoderosa /> },
+              38: { title: "Eliminar Examenes", child: <EliminarExamenes /> },
             };
             const section = displayedInterfaces[activeTab];
             return section ? (
@@ -804,10 +633,7 @@ const TabComponent = () => {
             "Ficha Interconsulta": { activeTab: 35, subTab: 0 },
             "Uso de Respiradores": { activeTab: 36, subTab: 0 },
             "Poderosa": { activeTab: 37, subTab: 0 },
-            // "Certificado Trabajos en Caliente": { activeTab: 37, subTab: 0 },
-            // "Licencia Interna": { activeTab: 38, subTab: 0 },
-            // "Certificado Altura Poderosa": { activeTab: 39, subTab: 0 },
-            // "Certificado Aptitud Poderosa": { activeTab: 40, subTab: 0 },
+            "Eliminar Examenes": { activeTab: 38, subTab: 0 },
           };
 
           const config = navConfig[idx];

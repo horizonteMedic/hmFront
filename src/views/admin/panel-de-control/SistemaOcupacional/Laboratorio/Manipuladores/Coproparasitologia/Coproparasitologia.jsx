@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faBroom, faPrint } from "@fortawesome/free-solid-svg-icons";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
@@ -10,9 +10,11 @@ import {
   SubmitDataService,
 } from "./controllerCoproParasitologia";
 import {
+  InputCheckbox,
   InputTextOneLine,
 } from "../../../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "ac_coproparasitologico";
 const colorOptions = ["MARRON", "MOSTAZA", "VERDOSO"];
@@ -46,54 +48,65 @@ const microsFields = [
   { key: "parasitos", label: "Parásitos", type: "presence" },
 ];
 
-const createInitialState = (today) => {
-  const base = {
-    norden: "",
-    fecha: today,
-    nombres: "",
-    edad: "",
-    tipoCoproparasitologico: false,
-  };
-  muestrasConfig.forEach(({ id }) => {
-    muestraFields.forEach(({ key }) => {
-      base[`heces${id}_${key}`] = "";
-    });
-  });
-  microsConfig.forEach(({ id }) => {
-    microsFields.forEach(({ key }) => {
-      base[`micro${id}_${key}`] = "";
-    });
-  });
-  return base;
-};
-
 export default function Coproparasitologia() {
-  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+  const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
+
+  const createInitialState = (today) => {
+    const base = {
+      norden: "",
+      fecha: today,
+
+      nombreExamen: "",
+
+      dni: "",
+      nombres: "",
+      apellidos: "",
+      fechaNacimiento: "",
+      lugarNacimiento: "",
+      edad: "",
+      sexo: "",
+      estadoCivil: "",
+      nivelEstudios: "",
+
+      // Datos Laborales
+      empresa: "",
+      contrata: "",
+      ocupacion: "",
+      cargoDesempenar: "",
+
+      tipoCoproparasitologico: false,
+
+      // Médico que Certifica //BUSCADOR
+      nombre_medico: userName,
+      user_medicoFirma: userlogued,
+    };
+    muestrasConfig.forEach(({ id }) => {
+      muestraFields.forEach(({ key }) => {
+        base[`heces${id}_${key}`] = "";
+      });
+    });
+    microsConfig.forEach(({ id }) => {
+      microsFields.forEach(({ key }) => {
+        base[`micro${id}_${key}`] = "";
+      });
+    });
+    return base;
+  };
+
   const initialFormState = useMemo(() => createInitialState(today), [today]);
 
   const {
     form,
     setForm,
+    handleChangeNumberDecimals,
     handleChange,
+    handleCheckBoxChange,
+    handleChangeSimple,
     handleClear,
     handleClearnotO,
     handlePrintDefault,
   } = useForm(initialFormState);
-
-  const [isCopro, setIsCopro] = useState(false);
-
-  useEffect(() => {
-    setIsCopro(Boolean(form.tipoCoproparasitologico));
-  }, [form.tipoCoproparasitologico]);
-
-  const handleToggleIsCopro = (checked) => {
-    setIsCopro(checked);
-    setForm((prev) => ({
-      ...prev,
-      tipoCoproparasitologico: checked,
-    }));
-  };
 
   const toggleValue = (field, value) => {
     const normalized = value.toUpperCase();
@@ -117,22 +130,13 @@ export default function Coproparasitologia() {
     });
   };
 
+
   const handleSave = () => {
-    SubmitDataService(
-      form,
-      token,
-      userlogued,
-      () => {
-        handleClear();
-        setIsCopro(false);
-      },
-      tabla,
-      datosFooter
-    );
+    SubmitDataService(form, token, userlogued, handleClear);
   };
 
   const handleSearch = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       handleClearnotO();
       VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
@@ -140,7 +144,7 @@ export default function Coproparasitologia() {
 
   const handlePrint = () => {
     handlePrintDefault(() => {
-      PrintHojaR(form.norden, token, tabla, datosFooter);
+      PrintHojaR(form.norden, token, tabla);
     });
   };
 
@@ -243,30 +247,14 @@ export default function Coproparasitologia() {
   };
 
   return (
-    <div className="w-full max-w-[90vw] mx-auto bg-white rounded shadow p-6">
-      <h2 className="text-2xl font-bold text-center mb-6">PARASITOLOGÍA</h2>
-
-      <SectionFieldset legend="Configuración">
-        <label className="flex items-center gap-3 text-sm font-semibold text-red-700">
-          <input
-            type="checkbox"
-            className="scale-110"
-            checked={isCopro}
-            onChange={(e) => handleToggleIsCopro(e.target.checked)}
-          />
-          COPROPARASITOLÓGICO
-        </label>
-      </SectionFieldset>
-
-      <SectionFieldset
-        legend="Información del Examen"
-        className="grid grid-cols-1 lg:grid-cols-2 gap-4"
-      >
+    <form className="space-y-3 p-4 text-[10px]">
+      {/* Información del Examen */}
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <InputTextOneLine
-          label="N° Ficha"
+          label="N° Orden"
           name="norden"
           value={form.norden}
-          onChange={handleChange}
+          onChange={handleChangeNumberDecimals}
           onKeyUp={handleSearch}
           labelWidth="120px"
         />
@@ -275,9 +263,25 @@ export default function Coproparasitologia() {
           name="fecha"
           type="date"
           value={form.fecha}
-          onChange={handleChange}
+          onChange={handleChangeSimple}
           labelWidth="120px"
         />
+        <InputTextOneLine
+          label="Nombre del Examen"
+          name="nombreExamen"
+          value={form.nombreExamen}
+          disabled
+          labelWidth="120px"
+        />
+        <InputCheckbox
+          label="COPROPARASITOLÓGICO"
+          name="tipoCoproparasitologico"
+          checked={form.tipoCoproparasitologico}
+          onChange={handleCheckBoxChange}
+        />
+      </SectionFieldset>
+
+      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
         <InputTextOneLine
           label="Nombres"
           name="nombres"
@@ -285,25 +289,99 @@ export default function Coproparasitologia() {
           disabled
           labelWidth="120px"
         />
+        <div className="grid lg:grid-cols-2 gap-3">
+          <InputTextOneLine
+            label="Edad (Años)"
+            name="edad"
+            value={form.edad}
+            disabled
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Sexo"
+            name="sexo"
+            value={form.sexo}
+            disabled
+            labelWidth="120px"
+          />
+        </div>
+        <div className="grid lg:grid-cols-2 gap-3">
+          <InputTextOneLine
+            label="DNI"
+            name="dni"
+            value={form.dni}
+            labelWidth="120px"
+            disabled
+          />
+          <InputTextOneLine
+            label="Fecha Nacimiento"
+            name="fechaNacimiento"
+            value={form.fechaNacimiento}
+            disabled
+            labelWidth="120px"
+          />
+        </div>
         <InputTextOneLine
-          label="Edad"
-          name="edad"
-          value={form.edad}
+          label="Lugar Nacimiento"
+          name="lugarNacimiento"
+          value={form.lugarNacimiento}
           disabled
           labelWidth="120px"
-          inputClassName="w-20"
+        />
+        <InputTextOneLine
+          label="Estado Civil"
+          name="estadoCivil"
+          value={form.estadoCivil}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Nivel Estudios"
+          name="nivelEstudios"
+          value={form.nivelEstudios}
+          disabled
+          labelWidth="120px"
+        />
+      </SectionFieldset>
+      <SectionFieldset legend="Datos Laborales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <InputTextOneLine
+          label="Empresa"
+          name="empresa"
+          value={form.empresa}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Contrata"
+          name="contrata"
+          value={form.contrata}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Ocupación"
+          name="ocupacion"
+          value={form.ocupacion}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Cargo Desempeñar"
+          name="cargoDesempenar"
+          value={form.cargoDesempenar}
+          disabled
+          labelWidth="120px"
         />
       </SectionFieldset>
 
       <SectionFieldset legend="Muestras" className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {muestrasConfig.map((sample, idx) => {
-            const disabled = isCopro && idx > 0;
+            const disabled = form.tipoCoproparasitologico && idx > 0;
             return (
               <SectionFieldset
                 key={sample.id}
                 legend={sample.label}
-                fieldsetClassName="border border-gray-200"
                 className="space-y-4"
               >
                 {muestraFields.map((field) =>
@@ -318,12 +396,11 @@ export default function Coproparasitologia() {
       <SectionFieldset legend="Examen Microscópico" className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {microsConfig.map((sample, idx) => {
-            const disabled = isCopro && idx > 0;
+            const disabled = form.tipoCoproparasitologico && idx > 0;
             return (
               <SectionFieldset
                 key={sample.id}
                 legend={sample.label}
-                fieldsetClassName="border border-gray-200"
                 className="space-y-4"
               >
                 {microsFields.map((field) =>
@@ -336,12 +413,12 @@ export default function Coproparasitologia() {
       </SectionFieldset>
 
       <SectionFieldset legend="Asignar Médico">
-        <select
-          disabled
-          className="w-full border rounded px-3 py-2 bg-gray-100 text-sm"
-        >
-          <option>-- Seleccionar --</option>
-        </select>
+        <EmpleadoComboBox
+          value={form.nombre_medico}
+          label="Especialista"
+          form={form}
+          onChange={handleChangeSimple}
+        />
       </SectionFieldset>
 
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-6">
@@ -355,10 +432,7 @@ export default function Coproparasitologia() {
           </button>
           <button
             type="button"
-            onClick={() => {
-              handleClear();
-              setIsCopro(false);
-            }}
+            onClick={handleClear}
             className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2"
           >
             <FontAwesomeIcon icon={faBroom} /> Limpiar
@@ -371,7 +445,7 @@ export default function Coproparasitologia() {
               label=""
               name="norden"
               value={form.norden}
-              onChange={handleChange}
+              onChange={handleChangeNumberDecimals}
               inputClassName="w-24"
               labelWidth="0px"
               className="w-28"
@@ -386,6 +460,6 @@ export default function Coproparasitologia() {
           </div>
         </div>
       </div>
-    </div>
+    </form>
   );
 }

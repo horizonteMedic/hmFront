@@ -45,7 +45,7 @@ import Anexo16A from "./views/admin/panel-de-control/SistemaOcupacional/Anexo16A
 
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/HojadeRutaDinamico/HojadeRutaDinamico.jsx"
+import Ficha from "./views/jaspers/LaboratorioClinico/Hemoglobina.jsx";
 
 
 
@@ -156,23 +156,23 @@ const AppContent = () => {
             path="/HistoriaOcupacional"
             element={<HistoriaOcupacional />}
           /> */}
-                  {/* <Route path="/rayosx" element={<RayosXTabSelector />} />
+          {/* <Route path="/rayosx" element={<RayosXTabSelector />} />
         <Route path="/consentimiento-informado" element={<ConsentimientoInformadoOcupacional />} /> */}
-      </Route>
-      {/* <Route path="/Espirometria" element={<Espirometria />} />
+        </Route>
+        {/* <Route path="/Espirometria" element={<Espirometria />} />
       <Route path="/Oftalmologia" element={<OftalmologiaTabSelector />} />
       <Route path="/musculoesqueletico" element={<MusculoEsqueleticoTabSelector />} />
       <Route path="/ekg" element={<EKG />} /> */}
-      <Route path="/RegistroP" element={<Formulario />} />
-      <Route
-        path="/libro-de-reclamaciones"
-        element={<LibroDeReclamaciones />}
-      />
-      
-      <Route path="/permisos" element={<Permisos />} />
-      <Route path="/anexo16a" element={<Anexo16A />} />
-      <Route path="/fichapi" element={<Ficha />} />
-      <Route path="*" element={<Navigate to="/" />} />
+        <Route path="/RegistroP" element={<Formulario />} />
+        <Route
+          path="/libro-de-reclamaciones"
+          element={<LibroDeReclamaciones />}
+        />
+
+        <Route path="/permisos" element={<Permisos />} />
+        <Route path="/anexo16a" element={<Anexo16A />} />
+        <Route path="/fichapi" element={<Ficha />} />
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       {!isLoginPage && !isHiddenRoute && <Footer />}
     </>

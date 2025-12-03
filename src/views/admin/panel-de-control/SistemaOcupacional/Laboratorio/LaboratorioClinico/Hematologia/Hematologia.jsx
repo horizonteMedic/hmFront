@@ -8,6 +8,7 @@ import {
   InputTextOneLine,
   SectionFieldset
 } from '../../../../../../components/reusableComponents/ResusableComponents';
+import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 
 const PRUEBAS = [
   { key: 'hemoglobina', label: 'Hemoglobina' },
@@ -33,32 +34,51 @@ const DIFERENCIAL = [
 const tabla = 'hemograma_autom';
 
 export default function Hematologia() {
-  const { token, userlogued, selectedSede } = useSessionData();
+  const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
   const initialFormState = {
-    norden: '',
+    norden: "",
     fecha: today,
-    paciente: '',
-    edad: '',
-    medico: '',
+    nombreExamen: "",
+
+    dni: "",
+    nombres: "",
+    apellidos: "",
+    fechaNacimiento: "",
+    lugarNacimiento: "",
+    edad: "",
+    sexo: "",
+    estadoCivil: "",
+    nivelEstudios: "",
+
+    // Datos Laborales
+    empresa: "",
+    contrata: "",
+    ocupacion: "",
+    cargoDesempenar: "",
+
     // Pruebas
-    hemoglobina: '',
-    hematocrito: '',
-    hematies: '',
-    volumen_corpuscular_medio: '',
-    hemoglobina_corpuscular_media: '',
-    concentracion_hemoglobina_corpuscular: '',
-    leucocitos: '',
-    plaquetas: '',
+    hemoglobina: "",
+    hematocrito: "",
+    hematies: "",
+    volumen_corpuscular_medio: "",
+    hemoglobina_corpuscular_media: "",
+    concentracion_hemoglobina_corpuscular: "",
+    leucocitos: "",
+    plaquetas: "",
     // Diferencial
-    neutrofilos: '',
-    abastonados: '',
-    segmentados: '',
-    monocitos: '',
-    eosinofilos: '',
-    basofilos: '',
-    linfocitos: ''
+    neutrofilos: "",
+    abastonados: "",
+    segmentados: "",
+    monocitos: "",
+    eosinofilos: "",
+    basofilos: "",
+    linfocitos: "",
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
   const {
@@ -92,9 +112,9 @@ export default function Hematologia() {
 
   return (
     <div className="p-4 space-y-3">
-      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 xl:grid-cols-3 gap-3 lg:gap-4">
         <InputTextOneLine
-          label="Nro Ficha"
+          label="N° Orden"
           name="norden"
           value={form.norden}
           onChange={handleChangeNumber}
@@ -110,19 +130,103 @@ export default function Hematologia() {
           labelWidth="120px"
         />
         <InputTextOneLine
-          label="Paciente"
-          name="paciente"
-          value={form.paciente}
+          label="Nombre Examen"
+          name="nombreExamen"
+          value={form.nombreExamen}
+          disabled
+          labelWidth="120px"
+        />
+      </SectionFieldset>
+      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
+        <InputTextOneLine
+          label="Nombres"
+          name="nombres"
+          value={form.nombres}
+          disabled
+          labelWidth="120px"
+        />
+        <div className="grid lg:grid-cols-2 gap-3">
+          <InputTextOneLine
+            label="Edad (Años)"
+            name="edad"
+            value={form.edad}
+            disabled
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Sexo"
+            name="sexo"
+            value={form.sexo}
+            disabled
+            labelWidth="120px"
+          />
+        </div>
+        <InputTextOneLine
+          label="DNI"
+          name="dni"
+          value={form.dni}
+          labelWidth="120px"
+          disabled
+        />
+        <InputTextOneLine
+          label="Fecha Nacimiento"
+          name="fechaNacimiento"
+          value={form.fechaNacimiento}
           disabled
           labelWidth="120px"
         />
         <InputTextOneLine
-          label="Edad"
-          name="edad"
-          value={form.edad}
+          label="Lugar Nacimiento"
+          name="lugarNacimiento"
+          value={form.lugarNacimiento}
           disabled
           labelWidth="120px"
-          inputClassName="w-20"
+        />
+        <div className="grid lg:grid-cols-2 gap-3">
+          <InputTextOneLine
+            label="Estado Civil"
+            name="estadoCivil"
+            value={form.estadoCivil}
+            disabled
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Nivel Estudios"
+            name="nivelEstudios"
+            value={form.nivelEstudios}
+            disabled
+            labelWidth="120px"
+          />
+        </div>
+      </SectionFieldset>
+      <SectionFieldset legend="Datos Laborales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <InputTextOneLine
+          label="Empresa"
+          name="empresa"
+          value={form.empresa}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Contrata"
+          name="contrata"
+          value={form.contrata}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Ocupación"
+          name="ocupacion"
+          value={form.ocupacion}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Cargo Desempeñar"
+          name="cargoDesempenar"
+          value={form.cargoDesempenar}
+          disabled
+          labelWidth="120px"
         />
       </SectionFieldset>
 
@@ -157,6 +261,15 @@ export default function Hematologia() {
             />
           ))}
         </SectionFieldset>
+      </SectionFieldset>
+
+      <SectionFieldset legend="Especialista">
+        <EmpleadoComboBox
+          value={form.nombre_medico}
+          form={form}
+          label='Especialista que Certifica'
+          onChange={handleChangeSimple}
+        />
       </SectionFieldset>
 
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4 border-t">

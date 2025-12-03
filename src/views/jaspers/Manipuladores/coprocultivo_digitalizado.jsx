@@ -1,8 +1,22 @@
-// src/views/jaspers/AnalisisBioquimicos/coprocultivo_digitalizado.jsx
+// src/views/jaspers/Manipuladores/coprocultivo_digitalizado.jsx
 import jsPDF from "jspdf";
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
+
+// --- Configuración Centralizada ---
+const config = {
+  margin: 15,
+  col1X: 15,
+  col2X: 115,
+  fontSize: {
+    title: 14,
+    header: 9,
+    body: 9,
+  },
+  font: 'helvetica',
+  lineHeight: 7,
+};
 
 // Función para formatear fecha a DD/MM/YYYY
 const toDDMMYYYY = (fecha) => {
@@ -13,50 +27,35 @@ const toDDMMYYYY = (fecha) => {
   return `${dia}/${mes}/${anio}`;
 };
 
-// Función para formatear fecha larga
-const formatDateToLong = (dateString) => {
-  if (!dateString) return '';
-  try {
-    const date = new Date(`${dateString}T00:00:00`);
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  } catch (error) {
-    return toDDMMYYYY(dateString) || '';
-  }
-};
-
 // Header con datos de ficha, sede y fecha
 const drawHeader = (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
   
-  CabeceraLogo(doc, { ...datos, tieneMembrete: false, yOffset: 3 });
+  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
   
   // Número de Ficha
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Nro de ficha: ", pageW - 80, 8);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Nro de ficha: ", pageW - 80, 15);
   doc.setFont("helvetica", "normal").setFontSize(18);
-  doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 9);
+  doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
   
   // Sede
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 13);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
   
   // Fecha de examen
-  const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || datos.fechaLab || "");
-  doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 18);
+  const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
+  doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
   
   // Página
-  doc.text("Pag. 01", pageW - 30, 3);
+  doc.text("Pag. 01", pageW - 30, 10);
 
   // Bloque de color
   drawColorBox(doc, {
-    color: datos.codigoColor || "#008f39",
-    text: datos.textoColor || "F",
+    color: datos.codigoColor,
+    text: datos.textoColor,
     x: pageW - 30,
-    y: 3,
+    y: 10,
     size: 22,
     showLine: true,
     fontSize: 30,
@@ -64,66 +63,111 @@ const drawHeader = (doc, datos = {}) => {
   });
 };
 
-// Función para dibujar datos del paciente (alineados con xLeft para coincidir con el contenido)
-const drawPatientData = (doc, datos = {}, xLeft, yStart = 28) => {
-  let y = yStart;
-  const lineHeight = 5.5;
-  const patientDataX = xLeft; // Alineado con el contenido
-  
-  const drawPatientDataRow = (label, value) => {
-    const labelWithColon = label.endsWith(':') ? label : label + ' :';
-    doc.setFontSize(9).setFont('helvetica', 'bold');
-    doc.text(labelWithColon, patientDataX, y);
-    let valueX = patientDataX + doc.getTextWidth(labelWithColon) + 2;
-    if (label.toLowerCase().includes('apellidos y nombres')) {
-      const minGap = 23;
-      if (doc.getTextWidth(labelWithColon) < minGap) valueX = patientDataX + minGap;
-    }
-    doc.setFont('helvetica', 'normal');
-    doc.text(String(value || '').toUpperCase(), valueX, y);
-    y += lineHeight;
-  };
-  
-  drawPatientDataRow("Apellidos y Nombres :", datos.nombres || datos.nombresPaciente || '');
-  
-  // Solo mostrar Edad si está presente
-  if (datos.edad || datos.edadPaciente) {
-    drawPatientDataRow("Edad :", `${datos.edad || datos.edadPaciente} AÑOS`);
-  }
-  
-  // Solo mostrar DNI si está presente
-  if (datos.dni || datos.dniPaciente) {
-    drawPatientDataRow("DNI :", datos.dni || datos.dniPaciente);
-  }
-  
-  // Fecha
-  doc.setFontSize(9).setFont('helvetica', 'bold');
-  const fechaLabel = "Fecha :";
-  doc.text(fechaLabel, patientDataX, y);
-  doc.setFont('helvetica', 'normal');
-  const fechaLabelWidth = doc.getTextWidth(fechaLabel);
-  doc.text(formatDateToLong(datos.fechaExamen || datos.fecha || datos.fechaLab || ''), patientDataX + fechaLabelWidth + 2, y);
-  y += lineHeight;
-  
-  // Línea divisoria
-  y += 2;
-  const pageW = doc.internal.pageSize.getWidth();
-  const margin = 15;
-  doc.setDrawColor(0);
-  doc.setLineWidth(0.3);
-  doc.line(margin * 2, y, pageW - margin * 2, y);
-  y += 4;
-  
-  // Reseteo
-  doc.setFont('helvetica', 'normal').setFontSize(9).setLineWidth(0.2);
-  
-  return y;
+// Función para dibujar datos del paciente en tabla
+const drawPatientData = (doc, datos = {}) => {
+  const tablaInicioX = 15;
+  const tablaAncho = 180;
+  const filaAltura = 5;
+  let yPos = 46; // +5mm
+
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.setFillColor(196, 196, 196);
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'FD');
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("DATOS PERSONALES", tablaInicioX + 2, yPos + 3.5);
+  yPos += filaAltura;
+
+  const sexo = datos.sexoPaciente === 'F' ? 'FEMENINO' : datos.sexoPaciente === 'M' ? 'MASCULINO' : '';
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.nombres || '', tablaInicioX + 40, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.line(tablaInicioX + 45, yPos, tablaInicioX + 45, yPos + filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("DNI:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(String(datos.dni || ''), tablaInicioX + 12, yPos + 3.5);
+  doc.setFont("helvetica", "bold");
+  doc.text("Edad:", tablaInicioX + 47, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text((datos.edad || '') + " AÑOS", tablaInicioX + 58, yPos + 3.5);
+  doc.setFont("helvetica", "bold");
+  doc.text("Sexo:", tablaInicioX + 92, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(sexo, tablaInicioX + 105, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Lugar de Nacimiento:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.lugarNacimientoPaciente || '', tablaInicioX + 38, yPos + 3.5);
+  doc.setFont("helvetica", "bold");
+  doc.text("Estado Civil:", tablaInicioX + 92, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.estadoCivilPaciente || '', tablaInicioX + 115, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("T. Examen:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.nombreExamen || '', tablaInicioX + 25, yPos + 3.5);
+  doc.setFont("helvetica", "bold");
+  doc.text("Fecha Nac.:", tablaInicioX + 92, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(toDDMMYYYY(datos.fechaNacimientoPaciente || ''), tablaInicioX + 115, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Nivel de Estudio:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.nivelEstudioPaciente || '', tablaInicioX + 32, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Ocupación:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.ocupacionPaciente || '', tablaInicioX + 25, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Cargo:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.cargoPaciente || '', tablaInicioX + 18, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Área:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.areaPaciente || '', tablaInicioX + 15, yPos + 3.5);
+  yPos += filaAltura;
+
+  return yPos;
 };
 
 export default function Coprocultivo_Digitalizado(datos = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "letter" });
+  const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
-  const margin = 15;
+
+  // === HEADER ===
+  drawHeader(doc, datos);
+  
+  // === DATOS DEL PACIENTE ===
+  drawPatientData(doc, datos);
 
   const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
   const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
@@ -136,77 +180,112 @@ export default function Coprocultivo_Digitalizado(datos = {}) {
       img.onload = () => res(img);
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
+
   Promise.all([
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
-    // === HEADER ===
-    drawHeader(doc, datos);
-    
+
     // === TÍTULO ===
-    let y = 28;
-    doc.setFont("helvetica", "bold").setFontSize(14);
-    doc.text("COPROCULTIVO", pageW / 2, y, { align: "center" });
-    y += 12; // Aumentado de 10 a 12 para más separación
-    
-    // === DATOS DEL PACIENTE ===
-    const xLeft = margin * 2;
-    y = drawPatientData(doc, datos, xLeft, y);
-    
-    // === RESULTADOS ===
-    doc.setFont("helvetica", "bold").setFontSize(10);
-    doc.text("RESULTADOS:", xLeft, y);
-    y += 8;
+    doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
+    doc.text("COPROCULTIVO", pageW / 2, 43, { align: "center" }); // +5mm
+
+    let y = 100; // Posición inicial después de la tabla de datos (+5mm)
 
     // --- COPROCULTIVO – MUESTRA ---
-    doc.setFont("helvetica", "bold").setFontSize(10);
-    doc.text("COPROCULTIVO – MUESTRA", xLeft, y);
-    y += 8;
-    doc.setFont("helvetica", "normal");
-    [
-      ["Muestra", datos.txtmuestra ? ":  "+ datos.txtmuestra.toUpperCase() : "Heces"],
-      ["Color", datos.txtcolor ? ":  "+ datos.txtcolor.toUpperCase() : ""],
-      ["Consistencia", datos.txtconsistencia ? ":  "+ datos.txtconsistencia.toUpperCase() : ""],
-      ["Moco Fecal", datos.txtmoco_fecal ? ":  "+ datos.txtmoco_fecal.toUpperCase() : ""],
-      ["Sangre Visible", datos.txtsangrev ? ":  "+ datos.txtsangrev.toUpperCase() : ""],
-      ["Restos Alimenticios", datos.txtrestosa ? ":  "+ datos.txtrestosa.toUpperCase() : ""],
-    ].forEach(([label, val]) => {
-      doc.text(label, xLeft, y);
-      doc.text(val, xLeft + 45, y, { align: "left" });
-      y += 7;
+    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+    doc.text("COPROCULTIVO – MUESTRA", config.margin, y);
+    y += config.lineHeight;
+
+    doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
+    const colData = 55; // Posición fija para los datos (alineados)
+    const muestraData = [
+      ["Muestra", datos.txtmuestra || ""],
+      ["Color", datos.txtcolor || ""],
+      ["Consistencia", datos.txtconsistencia || ""],
+      ["Moco Fecal", datos.txtmoco_fecal || ""],
+      ["Sangre Visible", datos.txtsangrev || ""],
+      ["Restos Alimenticios", datos.txtrestosa || ""],
+    ];
+    muestraData.forEach(([label, val]) => {
+      doc.text(label, config.margin, y);
+      doc.text(":", colData - 5, y);
+      doc.text(String(val).toUpperCase(), colData, y);
+      y += config.lineHeight;
     });
 
     // --- COPROCULTIVO – EXAMEN MICROSCÓPICO ---
-    y += 4;
-    doc.setFont("helvetica", "bold");
-    doc.text("COPROCULTIVO – EXAMEN MICROSCÓPICO", xLeft, y);
-    y += 8;
-    doc.setFont("helvetica", "normal");
-    [
-      ["Leucocitos", datos.txtleucocitos ? ":  " + datos.txtleucocitos.toUpperCase() : ""],
-      ["Hematíes", datos.txthematies ? ":  " + datos.txthematies.toUpperCase() : ""],
-      ["Parásitos", datos.txtparasitos ? ":  " + datos.txtparasitos.toUpperCase() : ""],
-      ["Gotas de grasa", datos.txtgotasg ? ":  " + datos.txtgotasg.toUpperCase() : ""],
-      ["Levaduras", datos.txtlevaduras ? ":  " + datos.txtlevaduras.toUpperCase() : ""],
-    ].forEach(([label, val]) => {
-      doc.text(label, xLeft, y);
-      doc.text(val, xLeft + 45, y, { align: "left" });
-      y += 7;
+    y += 3;
+    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+    doc.text("COPROCULTIVO – EXAMEN MICROSCÓPICO", config.margin, y);
+    y += config.lineHeight;
+
+    doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
+    const microscopicoData = [
+      ["Leucocitos", datos.txtleucocitos || ""],
+      ["Hematíes", datos.txthematies || ""],
+      ["Parásitos", datos.txtparasitos || ""],
+      ["Gotas de grasa", datos.txtgotasg || ""],
+      ["Levaduras", datos.txtlevaduras || ""],
+    ];
+    microscopicoData.forEach(([label, val]) => {
+      doc.text(label, config.margin, y);
+      doc.text(":", colData - 5, y);
+      doc.text(String(val).toUpperCase(), colData, y);
+      y += config.lineHeight;
     });
 
     // --- COPROCULTIVO – IDENTIFICACIÓN Y ANTIBIOGRAMA ---
-    y += 4;
-    doc.setFont("helvetica", "bold");
-    doc.text("COPROCULTIVO – IDENTIFICACIÓN Y ANTIBIOGRAMA", xLeft, y);
-    // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
+    y += 3;
+    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+    doc.text("COPROCULTIVO – IDENTIFICACIÓN Y ANTIBIOGRAMA", config.margin, y);
+    y += config.lineHeight;
+
+    doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
+    doc.text("Identificación", config.margin, y);
+    doc.text(":", colData - 5, y);
+    doc.text(datos.txtidentificacion || "", colData, y);
+    y += config.lineHeight;
+    doc.text("Flora Coliforme", config.margin, y);
+    doc.text(":", colData - 5, y);
+    doc.text(datos.txtflorac || "", colData, y);
+    y += config.lineHeight;
+
+    // Comentario
+    doc.setFont(config.font, "italic").setFontSize(config.fontSize.body);
+    doc.text("Comentario: (*) Pertenece a la flora normal", config.margin, y);
+    y += config.lineHeight * 1.5;
+
+    // --- COPROCULTIVO – RESULTADO ---
+    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+    doc.text("COPROCULTIVO – RESULTADO", config.margin, y);
+    y += config.lineHeight;
+
+    doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
+    doc.text("Resultado", config.margin, y);
+    doc.text(":", colData - 5, y);
+    doc.text(datos.txtresultado || "", colData, y);
+    y += config.lineHeight;
+
+    // Observaciones (con salto de línea)
+    if (datos.txtobservaciones) {
+      const lineas = datos.txtobservaciones.split('\n');
+      lineas.forEach(linea => {
+        doc.text(linea, config.margin, y);
+        y += config.lineHeight;
+      });
+    }
+
+    // Sellos a la derecha - Mismo tamaño fijo para ambos
     const sigW = 53;
     const sigH = 23;
-    const sigY = y + 2;
+    const sigY = 210;
     const gap = 16;
+    const sigXOffset = 25; // 25mm más a la derecha
     
     if (s1 && s2) {
       const totalWidth = sigW * 2 + gap;
-      const startX = (pageW - totalWidth) / 2;
+      const startX = (pageW - totalWidth) / 2 + sigXOffset;
       
       const addSello = (img, xPos) => {
         const canvas = document.createElement('canvas');
@@ -226,7 +305,7 @@ export default function Coprocultivo_Digitalizado(datos = {}) {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = (pageW - sigW) / 2;
+      const imgX = (pageW - sigW) / 2 + sigXOffset;
       doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
     } else if (s2) {
       const canvas = document.createElement('canvas');
@@ -235,43 +314,12 @@ export default function Coprocultivo_Digitalizado(datos = {}) {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s2, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = (pageW - sigW) / 2;
+      const imgX = (pageW - sigW) / 2 + sigXOffset;
       doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
     }
-    y += 8;
-    doc.setFont("helvetica", "normal");
-    doc.text("Identificación :", xLeft, y);
-    doc.text(datos.txtidentificacion || "", xLeft + 45, y, { align: "left" });
-    y += 7;
-    doc.text("Flora Coliforme :", xLeft, y);
-    doc.text(datos.txtflorac || "", xLeft + 45, y, { align: "left" });
-    y += 8;
-
-    // Comentario
-    doc.setFont("helvetica", "italic");
-    doc.text("Comentario: (*) Pertenece a la flora normal", xLeft, y);
-    y += 12;
-
-    // --- COPROCULTIVO – RESULTADO ---
-    doc.setFont("helvetica", "bold");
-    doc.text("COPROCULTIVO – RESULTADO", xLeft, y-2);
-    y += 8;
-    doc.setFont("helvetica", "normal");
-    doc.text("Resultado :", xLeft, y-2);
-    doc.text(datos.txtresultado, xLeft + 85, y-2, { align: "right" });
-    y += 8;
-
-    // Mensajes fijos de resultados
-    doc.text(
-      datos.txtobservaciones ||" ",
-      xLeft,
-      y-2
-    );
-
-    
 
     // === FOOTER ===
-    footerTR(doc, { ...datos, footerOffsetY: 16 });
+    footerTR(doc, datos);
 
     // === Imprimir ===
     const blob = doc.output("blob");
@@ -281,7 +329,5 @@ export default function Coprocultivo_Digitalizado(datos = {}) {
     iframe.src = url;
     document.body.appendChild(iframe);
     iframe.onload = () => iframe.contentWindow.print();
-
-  })
-  
+  });
 }

@@ -62,7 +62,9 @@ export const useForm = (initialFormState, options = {}) => {
   const handleChangeNumberDecimals = (e, maxDecimals = 0) => {
     const { name, value } = e.target;
     const md = Number.isInteger(maxDecimals) && maxDecimals >= 0 ? maxDecimals : 1;
-    const decimalPart = md === 0 ? '' : `(?:[.,]\\d{0,${md}})?`;
+    // Solo permite punto como separador decimal
+    const decimalPart = md === 0 ? '' : `(?:\\.\\d{0,${md}})?`;
+    // Regex que acepta solo números + punto opcional
     const regex = new RegExp(`^\\d*${decimalPart}$`);
     if (regex.test(value)) {
       setForm((f) => ({ ...f, [name]: value }));

@@ -31,8 +31,8 @@ export default function B_FichaDetencionSAS2(data = {}) {
     fechaExamen: formatearFechaCorta(data.fechaSas_fecha_sas ?? ""),
     // Datos de color
     color: data.color || 1,
-    codigoColor: data.codigoColor || "#008f39",
-    textoColor: data.textoColor || "F",
+    codigoColor: data.codigoColor || "",
+    textoColor: data.textoColor || "",
     // Datos adicionales para header
     numeroFicha: String(data.norden ?? ""),
     sede: data.sede || data.nombreSede || "",

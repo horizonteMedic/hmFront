@@ -215,8 +215,8 @@ export default function UsoRespiradores(data = {}) {
     expiraEn: formatearFechaCorta(data.datosRespiradores?.fechaExpira_fecha_expira ?? ""),
     // Datos de color
     color: data.color || 1,
-    codigoColor: data.codigoColor || "#008f39",
-    textoColor: data.textoColor || "F",
+    codigoColor: data.codigoColor || "",
+    textoColor: data.textoColor || "",
     // Datos adicionales para header
     numeroFicha: String(data.norden ?? ""),
     sede: data.sede || data.nombreSede || "",

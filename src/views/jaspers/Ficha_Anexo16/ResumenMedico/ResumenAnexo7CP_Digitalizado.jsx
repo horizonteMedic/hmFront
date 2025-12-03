@@ -65,7 +65,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
       oftalmologica: String(data.enfermedadesocularesoftalmo_e_oculares ?? ""),
       auditiva: String(data.diagnosticoAudiometria_diagnostico ?? ""),
       radiografia: String(data.conclusionesRadiograficas ?? ""),
-      espirometria: String(data.espirometriaResultado ?? ""),
+      espirometria: String(data.conclusionAnexo7c_txtconclusion || data.txtconclusion || "N/A"),
       electrocardiograma: String(data.hallazgosInformeElectroCardiograma_hallazgo ?? ""),
       dental: String(data.observacionesOdontograma_txtobservaciones ?? ""),
       psicologico: data.aptoEvaluacionPsicoPoderosa_rbapto ? "CUMPLE CON EL PERFIL DEL PUESTO" : String(data.observacionPsicologica ?? ""),
@@ -81,6 +81,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
       glucosa: String(data.glucosaLaboratorioClinico_txtglucosabio ?? ""),
       cocaina: String(data.cocainaLaboratorioClinico_txtcocaina ?? ""),
       marihuana: String(data.marihuanaLaboratorioClinico_txtmarihuana ?? ""),
+      examenOrina: "NORMAL",
       vdrl: data.positivoLaboratorioClinico_chkpositivo === true
         ? "REACTIVO"
         : data.positivoLaboratorioClinico_chkpositivo === false
@@ -154,25 +155,59 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
     let yPos = y;
     
     palabras.forEach(palabra => {
-      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
-      const anchoTexto = doc.getTextWidth(textoPrueba);
-      
-      if (anchoTexto <= anchoMaximo) {
-        lineaActual = textoPrueba;
-      } else {
+      // Si la palabra sola es más larga que el ancho máximo, dividirla por caracteres
+      const anchoPalabra = doc.getTextWidth(palabra);
+      if (anchoPalabra > anchoMaximo) {
+        // Si hay una línea actual, dibujarla primero
         if (lineaActual) {
           doc.text(lineaActual, x, yPos);
           yPos += fontSize * 0.35;
-          lineaActual = palabra;
+          lineaActual = '';
+        }
+        // Dividir la palabra larga por caracteres
+        let palabraActual = '';
+        for (let i = 0; i < palabra.length; i++) {
+          const char = palabra[i];
+          const textoPrueba = palabraActual + char;
+          const anchoTexto = doc.getTextWidth(textoPrueba);
+          
+          if (anchoTexto <= anchoMaximo) {
+            palabraActual = textoPrueba;
+          } else {
+            if (palabraActual) {
+              doc.text(palabraActual, x, yPos);
+              yPos += fontSize * 0.35;
+            }
+            palabraActual = char;
+          }
+        }
+        if (palabraActual) {
+          lineaActual = palabraActual;
+        }
+      } else {
+        // Palabra normal
+        const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+        const anchoTexto = doc.getTextWidth(textoPrueba);
+        
+        if (anchoTexto <= anchoMaximo) {
+          lineaActual = textoPrueba;
         } else {
-          doc.text(palabra, x, yPos);
-          yPos += fontSize * 0.35;
+          if (lineaActual) {
+            doc.text(lineaActual, x, yPos);
+            yPos += fontSize * 0.35;
+            lineaActual = palabra;
+          } else {
+            doc.text(palabra, x, yPos);
+            yPos += fontSize * 0.35;
+          }
         }
       }
     });
     
     if (lineaActual) {
       doc.text(lineaActual, x, yPos);
+      // Siempre agregar espacio después de dibujar texto
+      yPos += fontSize * 0.35;
     }
     
     return yPos;
@@ -206,11 +241,21 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
     
     lineasProcesadas.forEach((linea, index) => {
       // Verificar si es una línea numerada (empieza con número seguido de punto)
+      const anchoLinea = doc.getTextWidth(linea);
       const esLineaNumerada = /^\d+\./.test(linea);
       
-      // Si la línea es muy larga, usar la función de salto de línea por palabras
-      if (doc.getTextWidth(linea) > anchoMaximo) {
-        yPos = dibujarTextoConSaltoLinea(linea, x, yPos, anchoMaximo);
+      // Usar un margen de seguridad (95% del ancho máximo) para asegurar que el texto no se salga
+      const anchoMaximoConMargen = anchoMaximo * 0.95;
+      
+      // Si la línea es muy larga o está cerca del límite, usar la función de salto de línea por palabras
+      if (anchoLinea > anchoMaximoConMargen) {
+        const yPosAntes = yPos;
+        yPos = dibujarTextoConSaltoLinea(linea, x, yPos, anchoMaximoConMargen);
+        
+        // Si la función no agregó espacio al final, agregarlo
+        if (yPos === yPosAntes) {
+          yPos += fontSize * 0.35;
+        }
         
         // Espacio moderado después de una línea numerada que hizo salto
         if (esLineaNumerada) {
@@ -237,7 +282,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
       }
       
       // Espacio adicional entre líneas numeradas consecutivas (solo si no hizo salto)
-      if (index < lineasProcesadas.length - 1 && doc.getTextWidth(linea) <= anchoMaximo) {
+      if (index < lineasProcesadas.length - 1 && anchoLinea <= anchoMaximoConMargen) {
         const siguienteLinea = lineasProcesadas[index + 1];
         if (esLineaNumerada && /^\d+\./.test(siguienteLinea)) {
           yPos += fontSize * 0.15; // Espacio moderado entre líneas numeradas
@@ -504,168 +549,54 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   // Header de evaluaciones médicas
   yPos = dibujarHeaderSeccion("3. EVALUACIONES MÉDICAS", yPos, filaAltura);
 
-  // Fila 1: Evaluación Oftalmológica
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
+  // Función para dibujar fila dinámica
+  const dibujarFilaDinamica = (label, valor, yInicio) => {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const anchoDisponible = tablaAncho - 54; // Ancho para el valor
+    const texto = valor || "";
+    
+    // Calcular altura necesaria
+    let alturaFila = filaAltura;
+    if (texto && doc.getTextWidth(texto) > anchoDisponible) {
+      const lineas = doc.splitTextToSize(texto, anchoDisponible);
+      alturaFila = Math.max(filaAltura, lineas.length * 3.5 + 2);
+    }
+    
+    // Dibujar bordes
+    doc.line(tablaInicioX, yInicio, tablaInicioX, yInicio + alturaFila);
+    doc.line(tablaInicioX + tablaAncho, yInicio, tablaInicioX + tablaAncho, yInicio + alturaFila);
+    doc.line(tablaInicioX, yInicio, tablaInicioX + tablaAncho, yInicio);
+    doc.line(tablaInicioX, yInicio + alturaFila, tablaInicioX + tablaAncho, yInicio + alturaFila);
+    
+    // Dibujar contenido
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text(label, tablaInicioX + 2, yInicio + 3.5);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    
+    if (texto && doc.getTextWidth(texto) > anchoDisponible) {
+      const lineas = doc.splitTextToSize(texto, anchoDisponible);
+      lineas.forEach((linea, idx) => {
+        doc.text(linea, tablaInicioX + 52, yInicio + 3.5 + (idx * 3.5));
+      });
+    } else {
+      doc.text(texto, tablaInicioX + 52, yInicio + 3.5);
+    }
+    
+    return yInicio + alturaFila;
+  };
 
-  // Fila 2: Examen Auditiva
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Fila 3: Radiografía de Tórax
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Fila 4: Espirometría
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Fila 5: Electrocardiograma
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Fila 6: Evaluación Dental
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Fila 7: Test Psicológico
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Fila 8: Antecedentes de Importancia
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Fila 9: Trabajos en Altura
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Fila 10: Trabajos en Caliente
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Fila 11: Ficha de Conducción
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // === CONTENIDO DE EVALUACIONES MÉDICAS ===
-  let yTextoEval = yPos - (11 * filaAltura) + 2; // Posición inicial para el texto
-
-  // Fila 1: Evaluación Oftalmológica
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("EVALUACIÓN OFTALMOLÓGICA:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.oftalmologica, tablaInicioX + 52, yTextoEval + 1.5);
-  yTextoEval += filaAltura;
-
-  // Fila 2: Examen Auditiva
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("EXAMEN AUDITIVA:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.auditiva, tablaInicioX + 52, yTextoEval + 1.5);
-  yTextoEval += filaAltura;
-
-  // Fila 3: Radiografía de Tórax
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("RADIOGRAFÍA DE TÓRAX:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.radiografia, tablaInicioX + 52, yTextoEval + 1.5);
-  yTextoEval += filaAltura;
-
-  // Fila 4: Espirometría
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("ESPIROMETRÍA:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.espirometria, tablaInicioX + 52, yTextoEval + 1.5);
-  yTextoEval += filaAltura;
-
-  // Fila 5: Electrocardiograma
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("ELECTROCARDIOGRAMA:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.electrocardiograma || "N/A", tablaInicioX + 52, yTextoEval + 1.5);
-  yTextoEval += filaAltura;
-
-  // Fila 6: Evaluación Dental
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("EVALUACIÓN DENTAL:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.dental, tablaInicioX + 52, yTextoEval + 1.5);
-  yTextoEval += filaAltura;
-
-  // Fila 7: Test Psicológico
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("TEST PSICOLÓGICO:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.psicologico, tablaInicioX + 52, yTextoEval + 1.5);
-  yTextoEval += filaAltura;
-
-  // Fila 8: Antecedentes de Importancia
-  // doc.setFont("helvetica", "bold").setFontSize(8);
-  // doc.text("ANTECEDENTES DE IMPORTANCIA:", tablaInicioX + 2, yTextoEval + 1.5);
-  // doc.setFont("helvetica", "normal").setFontSize(8);
-  // doc.text(datosFinales.antecedentesPersonales, tablaInicioX + 52, yTextoEval + 1.5);
-  // yTextoEval += filaAltura;
-
-  // Fila 8: Antecedentes de Importancia
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("ANTECEDENTES DE IMPORTANCIA:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.antecedentesPersonales || "", tablaInicioX + 52, yTextoEval + 1.5);
-  yTextoEval += filaAltura;
-
-  // Fila 9: Trabajos en Altura
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("TRABAJOS EN ALTURA:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.trabajosAltura, tablaInicioX + 52, yTextoEval + 1.5);
-  yTextoEval += filaAltura;
-
-  // Fila 10: Trabajos en Caliente
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("TRABAJOS EN CALIENTE:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.trabajosCaliente, tablaInicioX + 52, yTextoEval + 1.5);
-  yTextoEval += filaAltura;
-
-  // Fila 11: Ficha de Conducción
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("FICHA DE CONDUCCIÓN:", tablaInicioX + 2, yTextoEval + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.evaluaciones.conduccion, tablaInicioX + 52, yTextoEval + 1.5);
+  // Dibujar todas las filas dinámicamente
+  yPos = dibujarFilaDinamica("EVALUACIÓN OFTALMOLÓGICA:", datosFinales.evaluaciones.oftalmologica, yPos);
+  yPos = dibujarFilaDinamica("EXAMEN AUDITIVA:", datosFinales.evaluaciones.auditiva, yPos);
+  yPos = dibujarFilaDinamica("RADIOGRAFÍA DE TÓRAX:", datosFinales.evaluaciones.radiografia, yPos);
+  yPos = dibujarFilaDinamica("ESPIROMETRÍA:", datosFinales.evaluaciones.espirometria, yPos);
+  yPos = dibujarFilaDinamica("ELECTROCARDIOGRAMA:", datosFinales.evaluaciones.electrocardiograma, yPos);
+  yPos = dibujarFilaDinamica("EVALUACIÓN DENTAL:", datosFinales.evaluaciones.dental, yPos);
+  yPos = dibujarFilaDinamica("TEST PSICOLÓGICO:", datosFinales.evaluaciones.psicologico, yPos);
+  yPos = dibujarFilaDinamica("ANTECEDENTES DE IMPORTANCIA:", datosFinales.antecedentesPersonales, yPos);
+  yPos = dibujarFilaDinamica("TRABAJOS EN ALTURA:", datosFinales.evaluaciones.trabajosAltura, yPos);
+  yPos = dibujarFilaDinamica("TRABAJOS EN CALIENTE:", datosFinales.evaluaciones.trabajosCaliente, yPos);
+  yPos = dibujarFilaDinamica("FICHA DE CONDUCCIÓN:", datosFinales.evaluaciones.conduccion, yPos);
 
   // === SECCIÓN 4: EXAMENES DE LABORATORIO ===
   // Header de exámenes de laboratorio
@@ -775,50 +706,72 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   yPos = dibujarHeaderSeccion("5. CONCLUSION Y RECOMENDACIONES", yPos, filaAltura);
 
   // === CONTENIDO DE CONCLUSION Y RECOMENDACIONES ===
-  // Primero calcular la altura necesaria para el texto
+  // Guardar la posición inicial del header para dibujar los bordes después
+  const yPosInicioConclusion = yPos;
+  
   doc.setFont("helvetica", "normal").setFontSize(7);
   const textoConclusion = datosFinales.observacionesFichaMedicaAnexo7c_txtobservacionesfm || "";
   
-  // Calcular altura necesaria simulando el texto
+  // Configuración de padding
   const alturaMinima = 15; // Altura mínima de la fila
   const paddingSuperior = 4; // Padding superior 
+  const paddingInferior = 2; // Padding inferior
+  const paddingLateral = 2; // Padding lateral
   const yTextoInicio = yPos + paddingSuperior;
-  const nuevaYPosConcl = dibujarTextoConSaltosLinea(textoConclusion, tablaInicioX + 2, yTextoInicio, tablaAncho - 4);
-  const alturaTextoUsada = nuevaYPosConcl - yTextoInicio;
-  const alturaFilaFinal = Math.max(alturaMinima, alturaTextoUsada + paddingSuperior + 2); // +padding superior + margen inferior
-
-  // Dibujar la fila con la altura calculada
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaFinal);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaFinal);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaFilaFinal, tablaInicioX + tablaAncho, yPos + alturaFilaFinal);
+  const xTextoInicio = tablaInicioX + paddingLateral;
+  // Calcular ancho máximo disponible: ancho de tabla menos padding lateral izquierdo y derecho
+  const anchoMaximoDisponible = tablaAncho - (paddingLateral * 2);
   
-  yPos += alturaFilaFinal;
+  // Dibujar el texto primero para obtener la posición final real
+  const yPosFinalTexto = dibujarTextoConSaltosLinea(textoConclusion, xTextoInicio, yTextoInicio, anchoMaximoDisponible);
+  
+  // Calcular la altura final de la fila basándose en la posición real del texto
+  const alturaTextoUsada = yPosFinalTexto - yTextoInicio;
+  const alturaFilaFinal = Math.max(alturaMinima, alturaTextoUsada + paddingSuperior + paddingInferior);
+
+  // Dibujar los bordes de la fila basándose en la altura real calculada
+  doc.line(tablaInicioX, yPosInicioConclusion, tablaInicioX, yPosInicioConclusion + alturaFilaFinal);
+  doc.line(tablaInicioX + tablaAncho, yPosInicioConclusion, tablaInicioX + tablaAncho, yPosInicioConclusion + alturaFilaFinal);
+  doc.line(tablaInicioX, yPosInicioConclusion, tablaInicioX + tablaAncho, yPosInicioConclusion);
+  doc.line(tablaInicioX, yPosInicioConclusion + alturaFilaFinal, tablaInicioX + tablaAncho, yPosInicioConclusion + alturaFilaFinal);
+  
+  yPos = yPosInicioConclusion + alturaFilaFinal;
 
   // === SECCIÓN 6: RESTRICCIONES ===
   // Header gris: RESTRICCIONES
   yPos = dibujarHeaderSeccion("6. RESTRICCIONES", yPos, filaAltura);
 
   // === CONTENIDO DE RESTRICCIONES ===
-  // Primero calcular la altura necesaria para el texto
+  // Guardar la posición inicial del header para dibujar los bordes después
+  const yPosInicioRestricciones = yPos;
+  
   doc.setFont("helvetica", "normal").setFontSize(7);
   const textoRestricciones = datosFinales.restricciones || "";
   
-  // Calcular altura necesaria simulando el texto
+  // Configuración de padding
   const alturaMinimaRestricciones = 15; // Altura mínima de la fila
   const paddingSuperiorRestricciones = 4; // Padding superior 
+  const paddingInferiorRestricciones = 2; // Padding inferior
+  const paddingLateralRestricciones = 2; // Padding lateral
   const yTextoInicioRestricciones = yPos + paddingSuperiorRestricciones;
-  const nuevaYPosRestricciones = dibujarTextoConSaltosLinea(textoRestricciones, tablaInicioX + 2, yTextoInicioRestricciones, tablaAncho - 4);
-  const alturaTextoRestriccionesUsada = nuevaYPosRestricciones - yTextoInicioRestricciones;
-  const alturaFilaRestriccionesFinal = Math.max(alturaMinimaRestricciones, alturaTextoRestriccionesUsada + paddingSuperiorRestricciones + 2); // +padding superior + margen inferior
-
-  // Dibujar la fila con la altura calculada
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaRestriccionesFinal);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaRestriccionesFinal);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaFilaRestriccionesFinal, tablaInicioX + tablaAncho, yPos + alturaFilaRestriccionesFinal);
+  const xTextoInicioRestricciones = tablaInicioX + paddingLateralRestricciones;
+  // Calcular ancho máximo disponible: ancho de tabla menos padding lateral izquierdo y derecho
+  const anchoMaximoDisponibleRestricciones = tablaAncho - (paddingLateralRestricciones * 2);
   
-  yPos += alturaFilaRestriccionesFinal;
+  // Dibujar el texto primero para obtener la posición final real
+  const yPosFinalTextoRestricciones = dibujarTextoConSaltosLinea(textoRestricciones, xTextoInicioRestricciones, yTextoInicioRestricciones, anchoMaximoDisponibleRestricciones);
+  
+  // Calcular la altura final de la fila basándose en la posición real del texto
+  const alturaTextoRestriccionesUsada = yPosFinalTextoRestricciones - yTextoInicioRestricciones;
+  const alturaFilaRestriccionesFinal = Math.max(alturaMinimaRestricciones, alturaTextoRestriccionesUsada + paddingSuperiorRestricciones + paddingInferiorRestricciones);
+
+  // Dibujar los bordes de la fila basándose en la altura real calculada
+  doc.line(tablaInicioX, yPosInicioRestricciones, tablaInicioX, yPosInicioRestricciones + alturaFilaRestriccionesFinal);
+  doc.line(tablaInicioX + tablaAncho, yPosInicioRestricciones, tablaInicioX + tablaAncho, yPosInicioRestricciones + alturaFilaRestriccionesFinal);
+  doc.line(tablaInicioX, yPosInicioRestricciones, tablaInicioX + tablaAncho, yPosInicioRestricciones);
+  doc.line(tablaInicioX, yPosInicioRestricciones + alturaFilaRestriccionesFinal, tablaInicioX + tablaAncho, yPosInicioRestricciones + alturaFilaRestriccionesFinal);
+  
+  yPos = yPosInicioRestricciones + alturaFilaRestriccionesFinal;
 
   // === SECCIÓN 7: APTITUD LABORAL ===
   // Fila: APTITUD LABORAL y FECHA DE VENCIMIENTO (2 columnas)
@@ -879,7 +832,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   doc.text("Responsable de la Evaluación", centroColumna, yFirmas + 28.5, { align: "center" });
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 8});
+  footerTR(doc, { footerOffsetY: 12});
 
   // === Imprimir ===
   imprimir(doc);

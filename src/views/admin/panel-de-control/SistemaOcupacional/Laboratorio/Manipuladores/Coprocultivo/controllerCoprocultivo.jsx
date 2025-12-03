@@ -7,6 +7,7 @@ import {
   SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
+import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
   "/api/v01/ct/manipuladores/obtenerReporteCoprocultivo";
@@ -18,7 +19,7 @@ export const GetInfoServicio = async (
   tabla,
   set,
   token,
-  onFinish = () => {}
+  onFinish = () => { }
 ) => {
   const res = await GetInfoServicioDefault(
     nro,
@@ -31,9 +32,24 @@ export const GetInfoServicio = async (
     set((prev) => ({
       ...prev,
       norden: res.norden ?? "",
-      fecha: res.fecha ?? prev.fecha,
-      nombres: res.nombres ?? prev.nombres,
-      edad: res.edad ?? prev.edad,
+      fecha: res.fecha,
+
+      nombreExamen: res.nombreExamen ?? "",
+      dni: res.dni ?? "",
+
+      nombres: res.nombres ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+      lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+      edad: res.edad ?? "",
+      sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+      estadoCivil: res.estadoCivilPaciente,
+      nivelEstudios: res.nivelEstudioPaciente,
+      // Datos Laborales
+      empresa: res.empresa,
+      contrata: res.contrata,
+      ocupacion: res.ocupacionPaciente,
+      cargoDesempenar: res.cargoPaciente,
+
       muestra: res.txtmuestra ?? "HECES",
       color: res.txtcolor ?? "",
       consistencia: res.txtconsistencia ?? "",
@@ -41,9 +57,7 @@ export const GetInfoServicio = async (
       sangrev: res.txtsangrev ?? "",
       restosa: res.txtrestosa ?? "",
       leucocitos: res.txtleucocitos ?? "",
-      leucocitos_count: res.leucocitos_count ?? "",
       hematies: res.txthematies ?? "",
-      hematies_count: res.hematies_count ?? "",
       parasitos: res.txtparasitos ?? "",
       gotasg: res.txtgotasg ?? "",
       levaduras: res.txtlevaduras ?? "",
@@ -51,6 +65,8 @@ export const GetInfoServicio = async (
       florac: res.txtflorac ?? "",
       resultado: res.txtresultado ?? "",
       observaciones: res.txtobservaciones ?? prev.observaciones,
+
+      user_medicoFirma: res.usuarioFirma,
     }));
   }
 };
@@ -60,8 +76,7 @@ export const SubmitDataService = async (
   token,
   user,
   limpiar,
-  tabla,
-  datosFooter
+  tabla
 ) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
@@ -78,9 +93,7 @@ export const SubmitDataService = async (
     txtsangrev: form.sangrev,
     txtrestosa: form.restosa,
     txtleucocitos: form.leucocitos,
-    leucocitos_count: form.leucocitos_count,
     txthematies: form.hematies,
-    hematies_count: form.hematies_count,
     txtparasitos: form.parasitos,
     txtgotasg: form.gotasg,
     txtlevaduras: form.levaduras,
@@ -90,14 +103,16 @@ export const SubmitDataService = async (
     txtobservaciones: form.observaciones,
     user_registro: user,
     user_medico_ocup: "",
+
+    usuarioFirma: form.user_medicoFirma,
   };
 
   await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-    PrintHojaR(form.norden, token, tabla, datosFooter);
+    PrintHojaR(form.norden, token, tabla);
   });
 };
 
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+export const PrintHojaR = (nro, token, tabla) => {
   const jasperModules = import.meta.glob(
     "../../../../../../jaspers/Manipuladores/*.jsx"
   );
@@ -105,7 +120,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     nro,
     token,
     tabla,
-    datosFooter,
+    null,
     obtenerReporteUrl,
     jasperModules,
     "../../../../../../jaspers/Manipuladores"
@@ -141,7 +156,13 @@ const GetInfoPac = async (nro, set, token, sede) => {
       ...prev,
       ...res,
       nombres: res.nombresApellidos ?? "",
-      edad: res.edad ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+      edad: res.edad,
+      ocupacion: res.areaO ?? "",
+      nombreExamen: res.nomExam ?? "",
+      cargoDesempenar: res.cargo ?? "",
+      lugarNacimiento: res.lugarNacimiento ?? "",
+      sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
     }));
   }
 };
