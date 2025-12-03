@@ -7,13 +7,7 @@ import {
   SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
-
-const sintomasList = [
-  'Tos', 'Dolor de garganta', 'Congestión nasal', 'Dificultad respiratoria',
-  'Fiebre/Escalofrío', 'Malestar general', 'Pérdida olfato o gusto',
-  'Diarrea', 'Náuseas/vómitos', 'Cefalea', 'Irritabilidad/confusión',
-  'Dolor', 'Expectoración'
-];
+import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl = "/api/v01/ct/pruebasCovid/obtenerReporteExamenInmunologico";
 const registrarUrl = "/api/v01/ct/pruebasCovid/registrarActualizarExamenInmunologico";
@@ -27,39 +21,37 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
     onFinish
   );
   if (res) {
-    const observacionesRaw = res.txtObservaciones || '';
-
-    // Normaliza: quita guiones, espacios y pasa a minúsculas
-    const observacionesNormalizadas = observacionesRaw
-      .split('\n')
-      .map(linea => linea.replace(/^-\s*/, '').trim().toLowerCase());
-
-    // Normaliza la lista de síntomas también
-    const sintomasMarcados = sintomasList.filter(sintoma => {
-      const sintomaNorm = sintoma.trim().toLowerCase();
-      return observacionesNormalizadas.some(obs => obs === sintomaNorm);
-    });
-
     set((prev) => ({
       ...prev,
       norden: res.norden ?? "",
       fecha: res.fechaExamen ?? prev.fecha,
-      nombres: res.nombres ?? prev.nombres,
-      dni: res.dni ?? prev.dni,
-      edad: res.edad ?? prev.edad,
+
+      nombreExamen: res.nombreExamen ?? "",
+      dni: res.dni ?? "",
+
+      nombres: res.nombres ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+      lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+      edad: res.edad ?? "",
+      sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+      estadoCivil: res.estadoCivilPaciente,
+      nivelEstudios: res.nivelEstudioPaciente,
+      // Datos Laborales
+      empresa: res.empresa,
+      contrata: res.contrata,
+      ocupacion: res.ocupacionPaciente,
+      cargoDesempenar: res.cargoPaciente,
+
       marca: res.cboMarca ?? "",
       doctor: res.medico ?? "N/A",
-      positivo: res.chkIgmReactivo === true ? true : false,
-      negativo: res.chkIggReactivo === true ? true : false,
-      fechaSintomas: res.fechaSintomas ?? prev.fechaSintomas,
-      marsa: res.formatoMarsa ?? false,
-      observaciones: res.txtObservaciones ?? "",
-      sintomas: sintomasMarcados,
+      valor: res.valorIgm ?? "",
+
+      user_medicoFirma: res.usuarioFirma,
     }));
   }
 };
 
-export const SubmitDataService = async (form, token, user, limpiar, tabla, datosFooter) => {
+export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
     return;
@@ -67,23 +59,30 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla, datos
 
   const body = {
     norden: form.norden,
-    chkIgmReactivo: form.positivo === true ? true : false,
-    chkIggReactivo: form.negativo === true ? true : false,
     fechaExamen: form.fecha,
-    cuantitativoAntigeno: false,
+    cuantitativoAntigeno: true,
     cboMarca: form.marca,
-    txtObservaciones: form.observaciones,
-    fechaSintomas: form.fechaSintomas,
-    formatoMarsa: form.marsa,
+    valorIgm: form.valor || "",
+    chkIgmReactivo: false,
+    chkIgmNoReactivo: false,
+    chkIggReactivo: false,
+    chkIggNoReactivo: false,
+    chkInvalido: false,
+    valorIgg: 0,
+    medico: "",
+    fechaSintomas: form.fecha,
+    formatoMarsa: false,
     user_registro: user,
+
+    usuarioFirma: form.user_medicoFirma,
   };
 
   await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-    PrintHojaR(form.norden, token, tabla, datosFooter);
+    PrintHojaR(form.norden, token, tabla);
   });
 };
 
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+export const PrintHojaR = (nro, token, tabla) => {
   const jasperModules = import.meta.glob(
     "../../../../../../jaspers/Covid/*.jsx"
   );
@@ -91,7 +90,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     nro,
     token,
     tabla,
-    datosFooter,
+    null,
     obtenerReporteUrl,
     jasperModules,
     "../../../../../../jaspers/Covid"
@@ -114,7 +113,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
       GetInfoServicio(nro, tabla, set, token, () => {
         Swal.fire(
           "Alerta",
-          "Este paciente ya cuenta con registros de Prueba Cualitativa de Antígenos.",
+          "Este paciente ya cuenta con registros de Prueba Cuantitativa de Antígenos.",
           "warning"
         );
       });
@@ -129,8 +128,13 @@ const GetInfoPac = async (nro, set, token, sede) => {
       ...prev,
       ...res,
       nombres: res.nombresApellidos ?? "",
-      dni: res.dni ?? "",
-      edad: res.edad ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+      edad: res.edad,
+      ocupacion: res.areaO ?? "",
+      nombreExamen: res.nomExam ?? "",
+      cargoDesempenar: res.cargo ?? "",
+      lugarNacimiento: res.lugarNacimiento ?? "",
+      sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
     }));
   }
 };

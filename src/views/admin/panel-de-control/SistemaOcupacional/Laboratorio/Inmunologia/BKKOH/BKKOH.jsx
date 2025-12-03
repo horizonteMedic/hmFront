@@ -3,24 +3,24 @@ import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { getToday } from '../../../../../../utils/helpers';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerGonadotropina';
+import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerBKKOH';
 import {
-  InputTextOneLine,
+  InputCheckbox,
   InputsRadioGroup,
+  InputTextOneLine,
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 
-const tabla = 'lgonadotropina';
+const tabla = 'microbiologia';
 
-export default function Gonadotropina() {
+export default function BKKOH() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
   const initialFormState = {
     norden: '',
     fecha: today,
-
     nombreExamen: "",
 
     dni: "",
@@ -39,7 +39,14 @@ export default function Gonadotropina() {
     ocupacion: "",
     cargoDesempenar: "",
 
-    resultado: 'NEGATIVO',
+    examenDirecto: false,
+    bk1: '',
+    bk1Radio: '',
+    bk2: '',
+    bk2Radio: '',
+    koh: '',
+    kohRadio: '',
+
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
@@ -49,10 +56,10 @@ export default function Gonadotropina() {
     form,
     setForm,
     handleChange,
-    handleChangeSimple,
-    handleRadioButton,
-    handleChangeNumberDecimals,
     handleClearnotO,
+    handleRadioButton,
+    handleChangeNumber,
+    handleChangeSimple,
     handleClear,
     handlePrintDefault,
   } = useForm(initialFormState);
@@ -76,12 +83,12 @@ export default function Gonadotropina() {
 
   return (
     <form className="p-4 space-y-3">
-      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 xl:grid-cols-3 gap-3 lg:gap-4">
         <InputTextOneLine
           label="N° Orden"
           name="norden"
           value={form.norden}
-          onChange={handleChangeNumberDecimals}
+          onChange={handleChangeNumber}
           onKeyUp={handleSearch}
           labelWidth="120px"
         />
@@ -94,14 +101,13 @@ export default function Gonadotropina() {
           labelWidth="120px"
         />
         <InputTextOneLine
-          label="Nombre del Examen"
+          label="Nombre Examen"
           name="nombreExamen"
           value={form.nombreExamen}
           disabled
           labelWidth="120px"
         />
       </SectionFieldset>
-
       <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
         <InputTextOneLine
           label="Nombres"
@@ -126,22 +132,20 @@ export default function Gonadotropina() {
             labelWidth="120px"
           />
         </div>
-        <div className="grid lg:grid-cols-2 gap-3">
-          <InputTextOneLine
-            label="DNI"
-            name="dni"
-            value={form.dni}
-            labelWidth="120px"
-            disabled
-          />
-          <InputTextOneLine
-            label="Fecha Nacimiento"
-            name="fechaNacimiento"
-            value={form.fechaNacimiento}
-            disabled
-            labelWidth="120px"
-          />
-        </div>
+        <InputTextOneLine
+          label="DNI"
+          name="dni"
+          value={form.dni}
+          labelWidth="120px"
+          disabled
+        />
+        <InputTextOneLine
+          label="Fecha Nacimiento"
+          name="fechaNacimiento"
+          value={form.fechaNacimiento}
+          disabled
+          labelWidth="120px"
+        />
         <InputTextOneLine
           label="Lugar Nacimiento"
           name="lugarNacimiento"
@@ -149,20 +153,22 @@ export default function Gonadotropina() {
           disabled
           labelWidth="120px"
         />
-        <InputTextOneLine
-          label="Estado Civil"
-          name="estadoCivil"
-          value={form.estadoCivil}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Nivel Estudios"
-          name="nivelEstudios"
-          value={form.nivelEstudios}
-          disabled
-          labelWidth="120px"
-        />
+        <div className="grid lg:grid-cols-2 gap-3">
+          <InputTextOneLine
+            label="Estado Civil"
+            name="estadoCivil"
+            value={form.estadoCivil}
+            disabled
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Nivel Estudios"
+            name="nivelEstudios"
+            value={form.nivelEstudios}
+            disabled
+            labelWidth="120px"
+          />
+        </div>
       </SectionFieldset>
       <SectionFieldset legend="Datos Laborales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <InputTextOneLine
@@ -195,24 +201,98 @@ export default function Gonadotropina() {
         />
       </SectionFieldset>
 
-      <SectionFieldset legend="Resultado" className="flex gap-4">
+      <SectionFieldset legend="Configuración">
+        <InputCheckbox
+          label="Examen Directo"
+          checked={form.examenDirecto}
+          name="examenDirecto"
+          onChange={(e) => {
+            const checked = e.target.checked;
+            setForm(prev => {
+              const newState = { ...prev, examenDirecto: checked };
+              if (checked) {
+                newState.bk1 = '';
+                newState.bk2 = '';
+              } else {
+                newState.koh = '';
+              }
+              return newState;
+            });
+          }}
+        />
+
+      </SectionFieldset>
+
+      <div className="text-center font-semibold text-lg my-4">MUESTRA: ESPUTO</div>
+      <SectionFieldset legend="Pruebas" className="grid grid-cols-12 gap-2 items-center">
         <InputTextOneLine
-          label='Resultado'
-          name="resultado"
-          value={form.resultado}
+          label='Examen de BK - BACILOSCOPIA 1ª'
+          labelWidth='180px'
+          name="bk1"
+          value={form.bk1}
           onChange={handleChange}
-          className='w-full max-w-[90%]'
+          className="col-span-6"
+          disabled={form.examenDirecto}
         />
         <InputsRadioGroup
-          name="resultado"
-          value={form.resultado}
-          onChange={handleRadioButton}
+          name="bk1"
+          value={form.bk1}
           options={[
-            { label: 'Positivo', value: 'POSITIVO' },
-            { label: 'Negativo', value: 'NEGATIVO' }
+            { label: 'BAAR - NEGATIVO', value: 'BAAR - NEGATIVO' },
+            { label: 'BAAR - POSITIVO', value: 'BAAR - POSITIVO' },
+            { label: 'N/A', value: 'N/A' }
           ]}
+          onChange={handleRadioButton}
+          disabled={form.examenDirecto}
+          className='col-span-6'
+        />
+        {/* BK 2 */}
+        <InputTextOneLine
+          label='Examen de BK - BACILOSCOPIA 2ª'
+          labelWidth='180px'
+          name="bk2"
+          value={form.bk2}
+          className="col-span-6"
+          onChange={handleChange}
+          disabled={form.examenDirecto}
+        />
+        <InputsRadioGroup
+          name="bk2"
+          value={form.bk2}
+          options={[
+            { label: 'BAAR - NEGATIVO', value: 'BAAR - NEGATIVO' },
+            { label: 'BAAR - POSITIVO', value: 'BAAR - POSITIVO' },
+            { label: 'N/A', value: 'N/A' }
+          ]}
+          onChange={handleRadioButton}
+          disabled={form.examenDirecto}
+          className='col-span-6'
+        />
+
+        {/* KOH */}
+        <InputTextOneLine
+          label='KOH'
+          labelWidth='180px'
+          className="col-span-6"
+          name="koh"
+          value={form.koh}
+          onChange={handleChange}
+          disabled={!form.examenDirecto}
+        />
+        <InputsRadioGroup
+          name="koh"
+          value={form.koh}
+          options={[
+            { label: 'NEGATIVO', value: 'NEGATIVO' },
+            { label: 'POSITIVO', value: 'POSITIVO' },
+            { label: 'N/A', value: 'N/A' }
+          ]}
+          onChange={handleRadioButton}
+          disabled={!form.examenDirecto}
+          className='col-span-6'
         />
       </SectionFieldset>
+
       <SectionFieldset legend="Especialista">
         <EmpleadoComboBox
           value={form.nombre_medico}
@@ -222,14 +302,14 @@ export default function Gonadotropina() {
         />
       </SectionFieldset>
 
-      <fieldset className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
-        <div className="flex gap-3">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex flex-wrap gap-3">
           <button
             type="button"
             onClick={handleSave}
             className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
           >
-            <FontAwesomeIcon icon={faSave} /> Guardar
+            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
           </button>
           <button
             type="button"
@@ -239,6 +319,7 @@ export default function Gonadotropina() {
             <FontAwesomeIcon icon={faBroom} /> Limpiar
           </button>
         </div>
+
         <div className="flex flex-col items-end">
           <span className="font-bold italic mb-2">Imprimir</span>
           <div className="flex items-center gap-2">
@@ -257,7 +338,7 @@ export default function Gonadotropina() {
             </button>
           </div>
         </div>
-      </fieldset>
+      </div>
     </form>
   );
 }

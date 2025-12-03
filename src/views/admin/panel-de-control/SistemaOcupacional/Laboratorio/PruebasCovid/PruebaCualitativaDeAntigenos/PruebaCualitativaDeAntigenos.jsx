@@ -1,21 +1,52 @@
+import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { getToday } from '../../../../../../utils/helpers';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerGonadotropina';
+import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerPruebaCualitativaDeAntigenos';
 import {
   InputTextOneLine,
-  InputsRadioGroup,
+  InputTextArea,
+  InputCheckbox,
+  InputsBooleanRadioGroup,
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
+import { getFetch } from '../../../../getFetch/getFetch';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 
-const tabla = 'lgonadotropina';
+const sintomasList = [
+  'Tos', 'Dolor de garganta', 'Congestión nasal', 'Dificultad respiratoria',
+  'Fiebre/Escalofrío', 'Malestar general', 'Pérdida olfato o gusto',
+  'Diarrea', 'Náuseas/vómitos', 'Cefalea', 'Irritabilidad/confusión',
+  'Dolor', 'Expectoración'
+];
 
-export default function Gonadotropina() {
+const DEFAULT_METODO = {
+  metodo: 'Inmunocromatografía',
+  sensibilidad: '94.55%',
+  especificidad: '100.00%'
+};
+
+const tabla = 'examen_inmunologico';
+
+export default function PruebaCualitativaDeAntigenos() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
+
+  const [marcas, setMarcas] = useState([]);
+
+  useEffect(() => {
+    if (token) {
+      getFetch(`/api/v01/ct/pruebasCovid/obtenerMarcasCovid`, token)
+        .then((res) => {
+          setMarcas(res);
+        })
+        .catch(() => {
+          console.log('Error al obtener marcas de COVID-19');
+        });
+    }
+  }, []);
 
   const initialFormState = {
     norden: '',
@@ -39,7 +70,15 @@ export default function Gonadotropina() {
     ocupacion: "",
     cargoDesempenar: "",
 
-    resultado: 'NEGATIVO',
+    marca: '',
+    doctor: 'N/A',
+    positivo: false,
+    negativo: false,
+    fechaSintomas: today,
+    sintomas: [],
+    marsa: false,
+    observaciones: '',
+
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
@@ -49,16 +88,18 @@ export default function Gonadotropina() {
     form,
     setForm,
     handleChange,
+    handleChangeNumberDecimals,
     handleChangeSimple,
     handleRadioButton,
-    handleChangeNumberDecimals,
+    handleRadioButtonBoolean,
+    handleCheckBoxChange,
     handleClearnotO,
     handleClear,
     handlePrintDefault,
   } = useForm(initialFormState);
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla);
+    SubmitDataService(form, token, userlogued, handleClear);
   };
 
   const handleSearch = (e) => {
@@ -74,9 +115,46 @@ export default function Gonadotropina() {
     });
   };
 
+  const handleSintomaChange = (sintoma, checked) => {
+    const sintomasActuales = new Set(form.sintomas);
+    checked ? sintomasActuales.add(sintoma) : sintomasActuales.delete(sintoma);
+    const sintomasArray = [...sintomasActuales];
+
+    // Obtener líneas actuales del campo observaciones
+    const lineasActuales = (form.observaciones || "").split("\n");
+
+    // Filtrar: deja todas las líneas que NO son síntomas conocidos
+    const lineasNoSintomas = lineasActuales.filter((linea) => {
+      const contenido = linea.trim().replace(/^- /, "").toLowerCase();
+      return !sintomasList.some((s) => s.toLowerCase() === contenido);
+    });
+
+    // Agregar los síntomas seleccionados como nuevas líneas
+    const nuevasLineasSintomas = sintomasArray.map((s) => `- ${s}`);
+
+    // Combinar y limpiar doble salto de línea
+    const nuevasObservaciones = [...lineasNoSintomas, ...nuevasLineasSintomas]
+      .filter((linea, index, arr) => arr.indexOf(linea) === index)
+      .join("\n");
+
+    setForm(prev => ({
+      ...prev,
+      sintomas: sintomasArray,
+      observaciones: nuevasObservaciones,
+    }));
+  };
+
+  const handleObservacionesChange = (e) => {
+    setForm(prev => ({
+      ...prev,
+      observaciones: e.target.value,
+    }));
+  };
+
   return (
-    <form className="p-4 space-y-3">
-      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <form className="space-y-3 p-4 text-[10px]">
+      {/* Información del Examen */}
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <InputTextOneLine
           label="N° Orden"
           name="norden"
@@ -99,6 +177,12 @@ export default function Gonadotropina() {
           value={form.nombreExamen}
           disabled
           labelWidth="120px"
+        />
+        <InputCheckbox
+          label="MARSA"
+          name="marsa"
+          checked={form.marsa}
+          onChange={handleCheckBoxChange}
         />
       </SectionFieldset>
 
@@ -194,42 +278,103 @@ export default function Gonadotropina() {
           labelWidth="120px"
         />
       </SectionFieldset>
+      <SectionFieldset legend="Marca y Método" className="space-y-4">
+        <div className="grid grid-cols-1  gap-6">
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <label className="font-semibold min-w-[120px] max-w-[120px]">
+                Marca:
+              </label>
+              <select
+                name="marca"
+                value={form.marca}
+                onChange={handleChangeSimple}
+                className="border rounded px-2 py-1 w-full"
+              >
+                <option value="">--Seleccione--</option>
+                {marcas.map((option) => (
+                  <option key={option.id} value={option.mensaje}>
+                    {option.mensaje}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="border rounded bg-gray-50 p-4 text-base min-h-[80px]">
+            <div>
+              <span className="font-semibold">Método:</span> {DEFAULT_METODO.metodo}
+            </div>
+            <div>
+              <span className="font-semibold">Sensibilidad:</span> {DEFAULT_METODO.sensibilidad}
+            </div>
+            <div>
+              <span className="font-semibold">Especificidad:</span> {DEFAULT_METODO.especificidad}
+            </div>
+          </div>
+        </div>
+      </SectionFieldset>
 
-      <SectionFieldset legend="Resultado" className="flex gap-4">
-        <InputTextOneLine
-          label='Resultado'
-          name="resultado"
-          value={form.resultado}
-          onChange={handleChange}
-          className='w-full max-w-[90%]'
-        />
-        <InputsRadioGroup
-          name="resultado"
-          value={form.resultado}
-          onChange={handleRadioButton}
-          options={[
-            { label: 'Positivo', value: 'POSITIVO' },
-            { label: 'Negativo', value: 'NEGATIVO' }
-          ]}
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3'>
+        <SectionFieldset legend="Resultado">
+          <InputsBooleanRadioGroup
+            name="resultado"
+            value={form.resultado}
+            onChange={handleRadioButtonBoolean}
+            trueLabel='Positivo'
+            falseLabel='Negativo'
+          />
+        </SectionFieldset>
+
+        <SectionFieldset legend="Fecha de Síntomas">
+          <InputTextOneLine
+            label="Fecha Síntomas"
+            name="fechaSintomas"
+            type="date"
+            value={form.fechaSintomas}
+            onChange={handleChangeSimple}
+            labelWidth="140px"
+          />
+        </SectionFieldset>
+      </div>
+      <SectionFieldset legend="Síntomas y Observaciones" className="space-y-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+          {sintomasList.map(s => (
+            <label key={s} className="flex items-center gap-2 ">
+              <input
+                type="checkbox"
+                checked={form.sintomas.includes(s)}
+                onChange={(e) => handleSintomaChange(s, e.target.checked)}
+              />
+              {s}
+            </label>
+          ))}
+        </div>
+        <InputTextArea
+          label="Observaciones"
+          name="observaciones"
+          value={form.observaciones}
+          onChange={handleObservacionesChange}
+          rows={4}
         />
       </SectionFieldset>
-      <SectionFieldset legend="Especialista">
+      {/* Médico */}
+      <SectionFieldset legend="Asignación de Médico" className="space-y-4">
         <EmpleadoComboBox
           value={form.nombre_medico}
+          label="Especialista"
           form={form}
-          label='Especialista que Certifica'
           onChange={handleChangeSimple}
         />
       </SectionFieldset>
 
-      <fieldset className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
-        <div className="flex gap-3">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex flex-wrap gap-3">
           <button
             type="button"
             onClick={handleSave}
             className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
           >
-            <FontAwesomeIcon icon={faSave} /> Guardar
+            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
           </button>
           <button
             type="button"
@@ -239,6 +384,7 @@ export default function Gonadotropina() {
             <FontAwesomeIcon icon={faBroom} /> Limpiar
           </button>
         </div>
+
         <div className="flex flex-col items-end">
           <span className="font-bold italic mb-2">Imprimir</span>
           <div className="flex items-center gap-2">
@@ -257,7 +403,7 @@ export default function Gonadotropina() {
             </button>
           </div>
         </div>
-      </fieldset>
+      </div>
     </form>
   );
 }

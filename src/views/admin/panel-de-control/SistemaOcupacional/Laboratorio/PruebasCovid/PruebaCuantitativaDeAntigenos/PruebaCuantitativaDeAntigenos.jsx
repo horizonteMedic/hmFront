@@ -1,23 +1,44 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
-import { useSessionData } from '../../../../../../hooks/useSessionData';
-import { useForm } from '../../../../../../hooks/useForm';
-import { getToday } from '../../../../../../utils/helpers';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerInmunologia';
+import { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSave, faBroom, faPrint } from "@fortawesome/free-solid-svg-icons";
+import { useSessionData } from "../../../../../../hooks/useSessionData";
+import { useForm } from "../../../../../../hooks/useForm";
+import { getToday } from "../../../../../../utils/helpers";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerPruebaCuantitativaDeAntigenos";
 import {
   InputTextOneLine,
-} from '../../../../../../components/reusableComponents/ResusableComponents';
-import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
-import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
+} from "../../../../../../components/reusableComponents/ResusableComponents";
+import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
+import { getFetch } from "../../../../../../utils/apiHelpers";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
-const tabla = 'inmunologia';
+const DEFAULT_TECNICA = {
+  tecnica: "Inmunofluorescencia",
+  sensibilidad: "95.00%",
+  especificidad: "95.00%",
+};
+const tabla = "examen_inmunologico";
 
-export default function Inmunologia() {
+export default function PruebaCuantitativaDeAntigenos() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
+  const [marcas, setMarcas] = useState([]);
+
+  useEffect(() => {
+    if (token) {
+      getFetch(`/api/v01/ct/pruebasCovid/obtenerMarcasCovid`, token)
+        .then((res) => {
+          setMarcas(res);
+        })
+        .catch(() => {
+          console.log('Error al obtener marcas de COVID-19');
+        });
+    }
+  }, []);
+
   const initialFormState = {
-    norden: '',
+    norden: "",
     fecha: today,
 
     nombreExamen: "",
@@ -38,24 +59,20 @@ export default function Inmunologia() {
     ocupacion: "",
     cargoDesempenar: "",
 
-    tificoO: '1/40',
-    tificoH: '1/40',
-    paratificoA: '1/40',
-    paratificoB: '1/40',
-    brucella: '1/40',
+    marca: "",
+    doctor: "N/A",
+    valor: "",
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
   };
-
   const {
     form,
     setForm,
     handleChange,
     handleChangeNumberDecimals,
     handleChangeSimple,
-    handleFocusNext,
     handleClearnotO,
     handleClear,
     handlePrintDefault,
@@ -78,16 +95,11 @@ export default function Inmunologia() {
     });
   };
 
-  const pruebas = [
-    { name: 'tificoO', label: 'Tifico O' },
-    { name: 'tificoH', label: 'Tifico H' },
-    { name: 'paratificoA', label: 'Paratifico A' },
-    { name: 'paratificoB', label: 'Paratifico B' },
-    { name: 'brucella', label: 'Brucella Abortus' },
-  ];
+  const selectedMarca =
+    marcas.find((m) => m.mensaje === form.marca) || DEFAULT_TECNICA;
 
   return (
-    <form className="space-y-3 p-4">
+    <form className="space-y-3 p-4 text-[10px]">
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <InputTextOneLine
           label="N° Orden"
@@ -114,7 +126,7 @@ export default function Inmunologia() {
         />
       </SectionFieldset>
 
-      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
+      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
         <InputTextOneLine
           label="Nombres"
           name="nombres"
@@ -206,34 +218,53 @@ export default function Inmunologia() {
           labelWidth="120px"
         />
       </SectionFieldset>
-
-      <SectionFieldset legend="MÉTODO EN LÁMINA PORTAOBJETO" className="grid md:grid-cols-2 gap-x-4 gap-y-3 ">
-        <div className='flex flex-col gap-y-3'>
-          {pruebas.slice(0, 3).map(({ name, label }) => (
+      <SectionFieldset legend="COVID - 19 Prueba Rápida" className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <label className="font-semibold min-w-[120px] max-w-[120px]">
+                Marca:
+              </label>
+              <select
+                name="marca"
+                value={form.marca}
+                onChange={handleChangeSimple}
+                className="border rounded px-2 py-1 w-full"
+              >
+                <option value="">--Seleccione--</option>
+                {marcas.map((m) => (
+                  <option key={m.id} value={m.mensaje}>
+                    {m.mensaje}
+                  </option>
+                ))}
+              </select>
+            </div>
             <InputTextOneLine
-              label={label}
-              name={name}
-              value={form[name]}
+              label="Valor"
+              name="valor"
+              value={form.valor}
               onChange={handleChange}
-              onKeyUp={handleFocusNext}
-              labelWidth='120px'
+              labelWidth="120px"
             />
-          ))}
-        </div>
-        <div className='flex flex-col gap-y-3'>
-          {pruebas.slice(3, 5).map(({ name, label }) => (
-            <InputTextOneLine
-              label={label}
-              name={name}
-              value={form[name]}
-              onChange={handleChange}
-              onKeyUp={handleFocusNext}
-              labelWidth='120px'
-            />
-          ))}
+          </div>
+          <div className="border rounded bg-gray-50 p-4 text-base min-h-[100px]">
+            <div>
+              <span className="font-semibold">Tecnica:</span>{" "}
+              {selectedMarca.tecnica || DEFAULT_TECNICA.tecnica}
+            </div>
+            <div>
+              <span className="font-semibold">SENSIBILIDAD:</span>{" "}
+              {selectedMarca.sensibilidad || DEFAULT_TECNICA.sensibilidad}
+            </div>
+            <div>
+              <span className="font-semibold">ESPECIFICIDAD:</span>{" "}
+              {selectedMarca.especificidad || DEFAULT_TECNICA.especificidad}
+            </div>
+          </div>
         </div>
       </SectionFieldset>
 
+      {/* Médico */}
       <SectionFieldset legend="Asignación de Médico" className="space-y-4">
         <EmpleadoComboBox
           value={form.nombre_medico}

@@ -3,24 +3,23 @@ import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { getToday } from '../../../../../../utils/helpers';
-import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerMicrobiologia';
+import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerAglutinaciones';
 import {
-  InputCheckbox,
-  InputsRadioGroup,
   InputTextOneLine,
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 
-const tabla = 'microbiologia';
+const tabla = 'inmunologia';
 
-export default function Microbiologia() {
+export default function Aglutinaciones() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
   const initialFormState = {
     norden: '',
     fecha: today,
+
     nombreExamen: "",
 
     dni: "",
@@ -39,13 +38,11 @@ export default function Microbiologia() {
     ocupacion: "",
     cargoDesempenar: "",
 
-    examenDirecto: false,
-    bk1: '',
-    bk1Radio: '',
-    bk2: '',
-    bk2Radio: '',
-    koh: '',
-    kohRadio: '',
+    tificoO: '1/40',
+    tificoH: '1/40',
+    paratificoA: '1/40',
+    paratificoB: '1/40',
+    brucella: '1/40',
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
@@ -56,16 +53,16 @@ export default function Microbiologia() {
     form,
     setForm,
     handleChange,
-    handleClearnotO,
-    handleRadioButton,
-    handleChangeNumber,
+    handleChangeNumberDecimals,
     handleChangeSimple,
+    handleFocusNext,
+    handleClearnotO,
     handleClear,
     handlePrintDefault,
   } = useForm(initialFormState);
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla);
+    SubmitDataService(form, token, userlogued, handleClear);
   };
 
   const handleSearch = (e) => {
@@ -81,41 +78,22 @@ export default function Microbiologia() {
     });
   };
 
-  const handleBk1RadioChange = (opt) => {
-    setForm(prev => ({
-      ...prev,
-      bk1Radio: prev.bk1Radio === opt ? '' : opt,
-      bk1: prev.bk1Radio === opt ? '' : opt
-    }));
-  };
-
-  const handleBk2RadioChange = (opt) => {
-    setForm(prev => ({
-      ...prev,
-      bk2Radio: prev.bk2Radio === opt ? '' : opt,
-      bk2: prev.bk2Radio === opt ? '' : opt
-    }));
-  };
-
-  const handleKohRadioChange = (opt) => {
-    setForm(prev => ({
-      ...prev,
-      kohRadio: prev.kohRadio === opt ? '' : opt,
-      koh: prev.kohRadio === opt ? '' : opt
-    }));
-  };
-
-  const bkOptions = ["BAAR - NEGATIVO", "BAAR - POSITIVO", "N/A"];
-  const kohOptions = ["NEGATIVO", "POSITIVO", "N/A"];
+  const pruebas = [
+    { name: 'tificoO', label: 'Tifico O' },
+    { name: 'tificoH', label: 'Tifico H' },
+    { name: 'paratificoA', label: 'Paratifico A' },
+    { name: 'paratificoB', label: 'Paratifico B' },
+    { name: 'brucella', label: 'Brucella Abortus' },
+  ];
 
   return (
-    <form className="p-4 space-y-3">
-      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 xl:grid-cols-3 gap-3 lg:gap-4">
+    <form className="space-y-3 p-4">
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <InputTextOneLine
           label="N° Orden"
           name="norden"
           value={form.norden}
-          onChange={handleChangeNumber}
+          onChange={handleChangeNumberDecimals}
           onKeyUp={handleSearch}
           labelWidth="120px"
         />
@@ -128,14 +106,15 @@ export default function Microbiologia() {
           labelWidth="120px"
         />
         <InputTextOneLine
-          label="Nombre Examen"
+          label="Nombre del Examen"
           name="nombreExamen"
           value={form.nombreExamen}
           disabled
           labelWidth="120px"
         />
       </SectionFieldset>
-      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
+
+      <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
         <InputTextOneLine
           label="Nombres"
           name="nombres"
@@ -159,20 +138,22 @@ export default function Microbiologia() {
             labelWidth="120px"
           />
         </div>
-        <InputTextOneLine
-          label="DNI"
-          name="dni"
-          value={form.dni}
-          labelWidth="120px"
-          disabled
-        />
-        <InputTextOneLine
-          label="Fecha Nacimiento"
-          name="fechaNacimiento"
-          value={form.fechaNacimiento}
-          disabled
-          labelWidth="120px"
-        />
+        <div className="grid lg:grid-cols-2 gap-3">
+          <InputTextOneLine
+            label="DNI"
+            name="dni"
+            value={form.dni}
+            labelWidth="120px"
+            disabled
+          />
+          <InputTextOneLine
+            label="Fecha Nacimiento"
+            name="fechaNacimiento"
+            value={form.fechaNacimiento}
+            disabled
+            labelWidth="120px"
+          />
+        </div>
         <InputTextOneLine
           label="Lugar Nacimiento"
           name="lugarNacimiento"
@@ -180,22 +161,20 @@ export default function Microbiologia() {
           disabled
           labelWidth="120px"
         />
-        <div className="grid lg:grid-cols-2 gap-3">
-          <InputTextOneLine
-            label="Estado Civil"
-            name="estadoCivil"
-            value={form.estadoCivil}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Nivel Estudios"
-            name="nivelEstudios"
-            value={form.nivelEstudios}
-            disabled
-            labelWidth="120px"
-          />
-        </div>
+        <InputTextOneLine
+          label="Estado Civil"
+          name="estadoCivil"
+          value={form.estadoCivil}
+          disabled
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Nivel Estudios"
+          name="nivelEstudios"
+          value={form.nivelEstudios}
+          disabled
+          labelWidth="120px"
+        />
       </SectionFieldset>
       <SectionFieldset legend="Datos Laborales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <InputTextOneLine
@@ -228,103 +207,40 @@ export default function Microbiologia() {
         />
       </SectionFieldset>
 
-      <SectionFieldset legend="Configuración">
-        <InputCheckbox
-          label="Examen Directo"
-          checked={form.examenDirecto}
-          name="examenDirecto"
-          onChange={(e) => {
-            const checked = e.target.checked;
-            setForm(prev => {
-              const newState = { ...prev, examenDirecto: checked };
-              if (checked) {
-                newState.bk1 = '';
-                newState.bk2 = '';
-              } else {
-                newState.koh = '';
-              }
-              return newState;
-            });
-          }}
-        />
-
+      <SectionFieldset legend="MÉTODO EN LÁMINA PORTAOBJETO" className="grid md:grid-cols-2 gap-x-4 gap-y-3 ">
+        <div className='flex flex-col gap-y-3'>
+          {pruebas.slice(0, 3).map(({ name, label }) => (
+            <InputTextOneLine
+              label={label}
+              key={name}
+              name={name}
+              value={form[name]}
+              onChange={handleChange}
+              onKeyUp={handleFocusNext}
+              labelWidth='120px'
+            />
+          ))}
+        </div>
+        <div className='flex flex-col gap-y-3'>
+          {pruebas.slice(3, 5).map(({ name, label }) => (
+            <InputTextOneLine
+              label={label}
+              key={name}
+              name={name}
+              value={form[name]}
+              onChange={handleChange}
+              onKeyUp={handleFocusNext}
+              labelWidth='120px'
+            />
+          ))}
+        </div>
       </SectionFieldset>
 
-      <div className="text-center font-semibold text-lg my-4">MUESTRA: ESPUTO</div>
-      <SectionFieldset legend="Pruebas" className="grid grid-cols-12 gap-2 items-center">
-        <InputTextOneLine
-          label='Examen de BK - BACILOSCOPIA 1ª'
-          labelWidth='180px'
-          name="bk1"
-          value={form.bk1}
-          onChange={handleChange}
-          className="col-span-6"
-          disabled={form.examenDirecto}
-        />
-        <InputsRadioGroup
-          name="bk1"
-          value={form.bk1}
-          options={[
-            { label: 'BAAR - NEGATIVO', value: 'BAAR - NEGATIVO' },
-            { label: 'BAAR - POSITIVO', value: 'BAAR - POSITIVO' },
-            { label: 'N/A', value: 'N/A' }
-          ]}
-          onChange={handleRadioButton}
-          disabled={form.examenDirecto}
-          className='col-span-6'
-        />
-        {/* BK 2 */}
-        <InputTextOneLine
-          label='Examen de BK - BACILOSCOPIA 2ª'
-          labelWidth='180px'
-          name="bk2"
-          value={form.bk2}
-          className="col-span-6"
-          onChange={handleChange}
-          disabled={form.examenDirecto}
-        />
-        <InputsRadioGroup
-          name="bk2"
-          value={form.bk2}
-          options={[
-            { label: 'BAAR - NEGATIVO', value: 'BAAR - NEGATIVO' },
-            { label: 'BAAR - POSITIVO', value: 'BAAR - POSITIVO' },
-            { label: 'N/A', value: 'N/A' }
-          ]}
-          onChange={handleRadioButton}
-          disabled={form.examenDirecto}
-          className='col-span-6'
-        />
-
-        {/* KOH */}
-        <InputTextOneLine
-          label='KOH'
-          labelWidth='180px'
-          className="col-span-6"
-          name="koh"
-          value={form.koh}
-          onChange={handleChange}
-          disabled={!form.examenDirecto}
-        />
-        <InputsRadioGroup
-          name="koh"
-          value={form.koh}
-          options={[
-            { label: 'NEGATIVO', value: 'NEGATIVO' },
-            { label: 'POSITIVO', value: 'POSITIVO' },
-            { label: 'N/A', value: 'N/A' }
-          ]}
-          onChange={handleRadioButton}
-          disabled={!form.examenDirecto}
-          className='col-span-6'
-        />
-      </SectionFieldset>
-
-      <SectionFieldset legend="Especialista">
+      <SectionFieldset legend="Asignación de Médico" className="space-y-4">
         <EmpleadoComboBox
           value={form.nombre_medico}
+          label="Especialista"
           form={form}
-          label='Especialista que Certifica'
           onChange={handleChangeSimple}
         />
       </SectionFieldset>

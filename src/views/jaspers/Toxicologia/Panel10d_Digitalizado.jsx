@@ -8,7 +8,7 @@ import footerTR from '../components/footerTR.jsx';
 const config = {
   margin: 15,
   col1X: 15,
-  col2X: 115,
+  col2X: 105,
   col3X: 170,
   fontSize: {
     title: 14,
@@ -20,12 +20,6 @@ const config = {
 };
 
 // --- Funciones de Ayuda ---
-
-const drawUnderlinedTitle = (doc, text, y) => {
-  const pageW = doc.internal.pageSize.getWidth();
-  doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
-  doc.text(text, pageW / 2, y, { align: "center" });
-};
 
 const drawResultRow = (doc, y, label, result, units) => {
   doc.setFont(config.font, 'normal').setFontSize(config.fontSize.body);
@@ -44,20 +38,6 @@ const toDDMMYYYY = (fecha) => {
   return `${dia}/${mes}/${anio}`;
 };
 
-// Función para formatear fecha larga
-const formatDateToLong = (dateString) => {
-  if (!dateString) return '';
-  try {
-    const date = new Date(`${dateString}T00:00:00`);
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  } catch (error) {
-    return toDDMMYYYY(dateString) || '';
-  }
-};
 
 // Header con datos de ficha, sede y fecha
 const drawHeader = (doc, datos = {}) => {
@@ -83,9 +63,9 @@ const drawHeader = (doc, datos = {}) => {
   doc.text("Pag. 01", pageW - 30, 10);
 
   // Bloque de color
-  drawColorBox(doc, {
-    color: datos.codigoColor || "#008f39",
-    text: datos.textoColor || "F",
+   drawColorBox(doc, {
+    color: datos.codigoColor,
+    text: datos.textoColor ,
     x: pageW - 30,
     y: 10,
     size: 22,
@@ -100,7 +80,7 @@ const drawPatientData = (doc, datos = {}) => {
   const tablaInicioX = 15;
   const tablaAncho = 180;
   const filaAltura = 5;
-  let yPos = 41;
+  let yPos = 43;
 
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
@@ -114,9 +94,9 @@ const drawPatientData = (doc, datos = {}) => {
 
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yPos + 3.5);
+  doc.text("Nombres y Apellidos:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.nombres || '', tablaInicioX + 40, yPos + 3.5);
+  doc.text(datos.nombres || datos.nombresPaciente || '', tablaInicioX + 40, yPos + 3.5);
   yPos += filaAltura;
 
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
@@ -188,6 +168,20 @@ const drawPatientData = (doc, datos = {}) => {
   doc.text(datos.areaPaciente || '', tablaInicioX + 15, yPos + 3.5);
   yPos += filaAltura;
 
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Empresa:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.empresa || '', tablaInicioX + 20, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Contrata:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.contrata || '', tablaInicioX + 22, yPos + 3.5);
+  yPos += filaAltura;
+
   return yPos;
 };
 
@@ -201,10 +195,11 @@ export default function Panel10d_Digitalizado(datos = {}) {
   drawHeader(doc, datos);
   
   // === TÍTULO ===
-  drawUnderlinedTitle(doc, "TOXICOLÓGICO", 38);
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
+  doc.text("TOXICOLÓGICO", pageW / 2, 38, { align: "center" });
   
   // === DATOS DEL PACIENTE ===
-  drawPatientData(doc, datos);
+  const finalYPos = drawPatientData(doc, datos);
   
   const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
   const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
@@ -218,13 +213,28 @@ export default function Panel10d_Digitalizado(datos = {}) {
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
   
+  // Función helper para imprimir el PDF
+  const imprimirPDF = () => {
+    footerTR(doc, { footerOffsetY: 5 });
+    const pdfBlob = doc.output("blob");
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.src = pdfUrl;
+    document.body.appendChild(iframe);
+    iframe.onload = () => {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    };
+  };
+
   Promise.all([
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
     // === CUERPO ===
-    let y = 95;
+    let y = finalYPos + 10;
 
     // Muestra y Método
     doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
@@ -236,7 +246,7 @@ export default function Panel10d_Digitalizado(datos = {}) {
     doc.setFont(config.font, "bold");
     doc.text("MÉTODO :", config.margin, y);
     doc.setFont(config.font, "normal");
-    doc.text(datos.txtMetodo || "", config.margin + 30, y);
+    doc.text((datos.txtMetodo || "").toUpperCase(), config.margin + 30, y);
     y += config.lineHeight * 2;
 
     // Encabezado de tabla
@@ -277,7 +287,7 @@ export default function Panel10d_Digitalizado(datos = {}) {
     // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
     const sigW = 53; // Tamaño fijo width
     const sigH = 23; // Tamaño fijo height
-    const sigY = 210;
+    const sigY = 230; // Bajado 10mm
     const gap = 16; // Espacio entre sellos (reducido 4mm: 20 - 4 = 16)
     
     if (s1 && s2) {
@@ -338,33 +348,11 @@ export default function Panel10d_Digitalizado(datos = {}) {
       doc.addImage(selloBase64, 'PNG', imgX, imgY, sigW, sigH);
     }
 
-    // === FOOTER ===
-    footerTR(doc, { footerOffsetY: 8 });
-
-    // === Imprimir ===
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = pdfUrl;
-    document.body.appendChild(iframe);
-    iframe.onload = () => {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
+    // === FOOTER E IMPRIMIR ===
+    imprimirPDF();
   }).catch(error => {
     console.error("Error al cargar imágenes:", error);
     // Continuar con la impresión aunque falle la carga de imágenes
-    footerTR(doc, { footerOffsetY: 8 });
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = pdfUrl;
-    document.body.appendChild(iframe);
-    iframe.onload = () => {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
+    imprimirPDF();
   });
 }
