@@ -24,7 +24,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
     set((prev) => ({
       ...prev,
       norden: res.norden ?? "",
-      fecha: res.fecha,
+      fecha: res.fechaExamen,
 
       nombreExamen: res.nombreExamen ?? "",
       dni: res.dni ?? "",
