@@ -40,7 +40,7 @@ const drawHeader = (doc, datos = {}, pageNum = 1) => {
   // Bloque de color
    drawColorBox(doc, {
     color: datos.codigoColor,
-    text: datos.textoColor ,
+    text: datos.textoColor,
     x: pageW - 30,
     y: 10,
     size: 22,
@@ -174,8 +174,8 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
     sede: datos.sede || datos.nombreSede || "",
     
     // Datos de color
-    codigocolor: datos.codigoColor || ""
-    textoColor: datos.textoColor || "F",
+    codigocolor: datos.codigoColor,
+    textoColor: datos.textoColor,
     color: datos.color || 1,
     
     // Muestra I - Examen Macroscópico
