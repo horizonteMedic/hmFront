@@ -132,7 +132,7 @@ export default function Coproparasitologia() {
 
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear);
+    SubmitDataService(form, token, userlogued, handleClear, tabla);
   };
 
   const handleSearch = (e) => {

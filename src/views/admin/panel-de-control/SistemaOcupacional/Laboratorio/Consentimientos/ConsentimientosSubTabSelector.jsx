@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTint, faSquare, faCube, faLayerGroup, faThLarge, faLeaf, faFlask, faPrint } from '@fortawesome/free-solid-svg-icons';
-import { Loading } from '../../../../../components/Loading';
+import { faTint, faSquare, faCube, faLayerGroup, faThLarge, faFlask, faPrint, faCannabis } from '@fortawesome/free-solid-svg-icons';
 import SubTabSelector from '../../../../../components/reusableComponents/SubTabSelector';
 import Panel10D from './Panel10D/Panel10D';
 import Panel5D from './Panel5D/Panel5D';
@@ -25,7 +24,7 @@ export default function ConsentimientosSubTabSelector({ tieneVista }) {
     { id: 3, label: 'Panel 4D', permission: 'Consentimiento Panel 4D', icon: faThLarge, component: Panel4D },
     { id: 4, label: 'Panel 5D', permission: 'Consentimiento Panel 5D', icon: faLayerGroup, component: Panel5D },
     { id: 5, label: 'Panel 10D', permission: 'Consentimiento Panel 10D', icon: faLayerGroup, component: Panel10D },
-    { id: 6, label: 'Cons. Marihuana', permission: 'Consentimiento Cons. Marihuana', icon: faLeaf, component: ConsMarihuana },
+    { id: 6, label: 'Cons. Marihuana', permission: 'Consentimiento Cons. Marihuana', icon: faCannabis, component: ConsMarihuana },
     { id: 7, label: 'BORO', permission: 'Consentimiento BORO', icon: faFlask, component: Boro },
   ];
 

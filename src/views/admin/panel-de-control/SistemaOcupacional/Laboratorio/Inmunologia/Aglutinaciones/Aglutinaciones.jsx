@@ -62,7 +62,7 @@ export default function Aglutinaciones() {
   } = useForm(initialFormState);
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear);
+    SubmitDataService(form, token, userlogued, handleClear,tabla);
   };
 
   const handleSearch = (e) => {

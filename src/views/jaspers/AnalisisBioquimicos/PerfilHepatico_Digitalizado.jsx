@@ -7,7 +7,7 @@ import footerTR from '../components/footerTR.jsx';
 const config = {
   margin: 15,
   col1X: 15,
-  col2X: 115,
+  col2X: 105,
   col3X: 155,
   fontSize: {
     title: 14,
@@ -26,21 +26,6 @@ const toDDMMYYYY = (fecha) => {
   const [anio, mes, dia] = fecha.split('-');
   if (!anio || !mes || !dia) return fecha;
   return `${dia}/${mes}/${anio}`;
-};
-
-// Función para formatear fecha larga
-const formatDateToLong = (dateString) => {
-  if (!dateString) return '';
-  try {
-    const date = new Date(`${dateString}T00:00:00`);
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  } catch (error) {
-    return toDDMMYYYY(dateString) || '';
-  }
 };
 
 // Header con datos de ficha, sede y fecha
@@ -67,9 +52,9 @@ const drawHeader = (doc, datos = {}) => {
   doc.text("Pag. 01", pageW - 30, 10);
 
   // Bloque de color
-  drawColorBox(doc, {
-    color: datos.codigoColor || "#008f39",
-    text: datos.textoColor || "F",
+   drawColorBox(doc, {
+    color: datos.codigoColor,
+    text: datos.textoColor ,
     x: pageW - 30,
     y: 10,
     size: 22,
@@ -98,9 +83,9 @@ const drawPatientData = (doc, datos = {}) => {
 
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yPos + 3.5);
+  doc.text("Nombres y Apellidos:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.nombres || '', tablaInicioX + 40, yPos + 3.5);
+  doc.text(datos.nombres || datos.nombresPaciente || '', tablaInicioX + 40, yPos + 3.5);
   yPos += filaAltura;
 
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
@@ -172,6 +157,20 @@ const drawPatientData = (doc, datos = {}) => {
   doc.text(datos.areaPaciente || '', tablaInicioX + 15, yPos + 3.5);
   yPos += filaAltura;
 
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Empresa:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.empresa || '', tablaInicioX + 20, yPos + 3.5);
+  yPos += filaAltura;
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Contrata:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.contrata || '', tablaInicioX + 22, yPos + 3.5);
+  yPos += filaAltura;
+
   return yPos;
 };
 
@@ -205,8 +204,12 @@ export default function PerfilHepatico_Digitalizado(datos = {}) {
   // === HEADER ===
   drawHeader(doc, datos);
   
+  // === TÍTULO ===
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
+  doc.text("BIOQUÍMICA", pageW / 2, 38, { align: "center" });
+  
   // === DATOS DEL PACIENTE ===
-  drawPatientData(doc, datos);
+  const finalYPos = drawPatientData(doc, datos);
 
   const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
   const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
@@ -224,11 +227,7 @@ export default function PerfilHepatico_Digitalizado(datos = {}) {
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
-    // === TÍTULO ===
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
-    doc.text("BIOQUÍMICA", pageW / 2, 38, { align: "center" });
-    
-    let y = 95; // Posición inicial después de la tabla de datos
+    let y = finalYPos + 10; // Posición inicial después de la tabla de datos con espacio adicional
 
     doc.setFont(config.font, "bold").setFontSize(config.fontSize.subtitle);
     doc.text(`MUESTRA: ${datos.muestra || "SUERO"}`, config.margin, y);

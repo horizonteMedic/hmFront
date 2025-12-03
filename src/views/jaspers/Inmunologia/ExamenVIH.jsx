@@ -39,7 +39,7 @@ const drawHeader = (doc, datos = {}) => {
 
 const drawPatientData = (doc, datos = {}) => {
   const tablaInicioX = 15, tablaAncho = 180, filaAltura = 5;
-  let yPos = 46;
+  let yPos = 43;
   doc.setDrawColor(0, 0, 0).setLineWidth(0.2).setFillColor(196, 196, 196);
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'FD');
   doc.setFont("helvetica", "bold").setFontSize(9);
@@ -114,6 +114,18 @@ const drawPatientData = (doc, datos = {}) => {
   doc.setFont("helvetica", "normal");
   doc.text(datos.areaPaciente || '', tablaInicioX + 15, yPos + 3.5);
   yPos += filaAltura;
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Empresa:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.empresa || '', tablaInicioX + 20, yPos + 3.5);
+  yPos += filaAltura;
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold");
+  doc.text("Contrata:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.contrata || '', tablaInicioX + 22, yPos + 3.5);
+  yPos += filaAltura;
   return yPos;
 };
 
@@ -126,7 +138,7 @@ export default function ExamenVIH(datos = {}) {
   doc.text("INMUNOLOGÍA", pageW / 2, 38, { align: "center" });
   doc.setFont(config.font, "bold").setFontSize(12);
   doc.text("VIH", pageW / 2, 44, { align: "center" });
-  drawPatientData(doc, datos);
+  const finalYPos = drawPatientData(doc, datos);
 
   const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
   const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
@@ -143,7 +155,7 @@ export default function ExamenVIH(datos = {}) {
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
-    let y = 100;
+    let y = finalYPos + 10;
     const colData = 55;
 
     // MUESTRA

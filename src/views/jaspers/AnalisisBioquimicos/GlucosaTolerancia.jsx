@@ -60,9 +60,9 @@ const drawHeader = (doc, datos = {}) => {
   doc.text("Pag. 01", pageW - 30, 10);
 
   // Bloque de color
-  drawColorBox(doc, {
-    color: datos.codigoColor || "#008f39",
-    text: datos.textoColor || "F",
+   drawColorBox(doc, {
+    color: datos.codigoColor,
+    text: datos.textoColor ,
     x: pageW - 30,
     y: 10,
     size: 22,

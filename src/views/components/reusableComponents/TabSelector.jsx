@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 export default function TabSelector({ tieneVista, tabsConfig }) {
     const [activeTab, setActiveTab] = useState(0);
     const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
@@ -53,8 +54,8 @@ export default function TabSelector({ tieneVista, tabsConfig }) {
 
     return (
         <div className="space-y-4">
-            <div className="bg-white border-t border-gray-200 rounded-lg p-3">
-                {/* Tab Navigation */}
+            <div className="bg-white border-t border-gray-200 rounded-lg px-3">
+                {/* Tab Navigation */}  
                 <nav ref={navRef} className="flex bg-white border-b border-gray-200 mb-4 relative">
                     {/* Animated sliding indicator */}
                     <div 
@@ -69,11 +70,14 @@ export default function TabSelector({ tieneVista, tabsConfig }) {
                             key={tab.id}
                             ref={el => tabRefs.current[tab.id] = el}
                             className={`flex-1 px-4 py-3 uppercase tracking-wider transition-colors duration-200 cursor-pointer hover:bg-gray-100 ${activeTab === tab.id
-                                ? "font-semibold text-[#233245]"
+                                ? "font-semibold text[#233245]"
                                 : "text-gray-600"
                                 }`}
                             onClick={() => setActiveTab(tab.id)}
                         >
+                            {tab.icon && (
+                                <FontAwesomeIcon icon={tab.icon} className="mr-2" />
+                            )}
                             {tab.label}
                         </button>
                     ))}

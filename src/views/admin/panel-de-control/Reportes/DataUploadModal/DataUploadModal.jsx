@@ -91,7 +91,11 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
     
     for (const folder of uparchFile) {
       try {
+          console.log("Tamaño PDF:", folder.size / 1024 / 1024, "MB");
+
           const fileBase64 = await toBase64(folder);
+          console.log("Tamaño base64:", fileBase64.length / 1024 / 1024, "MB");
+
           const base64WithoutHeader = fileBase64.split(',')[1];
           const datos = {
               nombre: folder.name,
@@ -102,6 +106,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
           };
 
           const response = await ArchivosMasivos(datos, user, token);
+          console.log(response)
           if (response.id) {
             if (response.id === 1) {
             } else {
@@ -121,6 +126,10 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
           
       } catch (error) {
           console.error(`Error uploading ${folder.name}:`, error);
+          setUploadStatus((prevStatus) => ({
+              ...prevStatus,
+              [folder.name]: 'error',
+            }));
           failedUploads.push(folder.name);
       }
 
@@ -396,8 +405,8 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   };
   
   
-  console.log(indice)
-
+  console.log(uploadedFiles)
+  console.log(uploadStatus)
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[800px] relative">
