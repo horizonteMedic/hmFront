@@ -152,6 +152,8 @@ const GetInfoPac = async (nro, set, token, sede) => {
             fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
             edad: res.edad + " AÑOS",
             ocupacion: res.areaO ?? "",
+            domicilioActual: res.direccion ?? "",
+            nombreExamen: res.nomExam ?? "",
             cargoDesempenar: res.cargo ?? "",
         }));
     }

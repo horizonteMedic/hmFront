@@ -8,19 +8,19 @@ export default function PsicologiaTabSelector({ tieneVista }) {
         {
             id: 0,
             permission: "Anexos Psicologia",
-            label: "Anexos Psicologia",
+            label: "Anexos",
             component: AnexosPsicologiaSubSelector
         },
         {
             id: 1,
             permission: "Psicologia Boroo",
-            label: "Psicologia Boroo",
+            label: "Boroo",
             component: PsicologiaBorooSubSelector
         },
         {
             id: 2,
             permission: "Examenes Complementarios Psicologia",
-            label: "Examenes Complementarios Psicologia",
+            label: "Examenes Complementarios",
             component: ExamenesComplementariosSubSelector
         },
     ];
