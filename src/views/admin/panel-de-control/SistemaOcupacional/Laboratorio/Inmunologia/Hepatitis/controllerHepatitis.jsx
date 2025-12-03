@@ -44,12 +44,12 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
 
       tipoHepatitis: res.txtHepatitisa !== null && res.txtHepatitisa !== "" ? "A" :
         res.txtHepatitisb !== null && res.txtHepatitisb !== "" ? "B" :
-          res.txtHepatitisc !== null && res.txtHepatitisc !== "" ? "C" : "A",
+          res.hepatitisc !== null && res.hepatitisc !== "" ? "C" : "A",
 
       marca: res.txtMarca ?? "RAPID TEST - MONTEST",
       resultadoHAV: res.txtHepatitisa ?? "",
       resultadoHBsAg: res.txtHepatitisb ?? "",
-      resultadoVHC: res.txtHepatitisc ?? "",
+      resultadoVHC: res.hepatitisc ?? "",
 
       user_medicoFirma: res.usuarioFirma,
     }));
