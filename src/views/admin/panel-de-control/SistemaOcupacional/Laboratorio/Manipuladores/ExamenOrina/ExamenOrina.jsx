@@ -14,7 +14,7 @@ import EmpleadoComboBox from '../../../../../../components/reusableComponents/Em
 
 const tabla = '';
 
-export default function VDRL() {
+export default function ExamenOrina() {
     const { token, userlogued, selectedSede, userName } = useSessionData();
     const today = getToday();
 
@@ -40,7 +40,32 @@ export default function VDRL() {
         ocupacion: "",
         cargoDesempenar: "",
 
-        
+        // Campos de Examen de Orina - Estados iniciales
+        color: 'AMARILLO CLARO',
+        aspecto: 'TRANSPARENTE',
+        densidad: '',
+        ph: '',
+
+        nitritos: 'NEGATIVO',
+        proteinas: 'NEGATIVO',
+        cetonas: 'NEGATIVO',
+        leucocitosExamenQuimico: 'NEGATIVO',
+        acAscorbico: 'NEGATIVO',
+        urobilinogeno: 'NEGATIVO',
+        bilirrubina: 'NEGATIVO',
+        glucosaExamenQuimico: 'NEGATIVO',
+        sangre: 'NEGATIVO',
+
+        leucocitosSedimentoUnitario: '0-1',
+        hematiesSedimentoUnitario: '0-0',
+        celEpiteliales: 'ESCASAS',
+        cristales: 'NO SE OBSERVAN',
+        almidon: 'NO SE OBSERVAN',
+        levadura: "NO SE OBSERVAN",
+        cilindros: 'NO SE OBSERVAN',
+        bacterias: 'NO SE OBSERVAN',
+        gramSc: 'NO SE OBSERVAN',
+        otros: 'NO SE OBSERVAN',
 
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
@@ -52,7 +77,7 @@ export default function VDRL() {
         setForm,
         handleChange,
         handleChangeNumberDecimals,
-        handleRadioButton,
+        handleFocusNext,
         handleChangeSimple,
         handleClearnotO,
         handleClear,
@@ -77,7 +102,7 @@ export default function VDRL() {
     };
 
     return (
-        <form className="space-y-3 p-4">
+        <div className="space-y-3 p-4">
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <InputTextOneLine
                     label="N° Orden"
@@ -106,38 +131,191 @@ export default function VDRL() {
 
             <DatosPersonalesLaborales form={form} />
 
-            <SectionFieldset legend="Muestra" className="grid xl:grid-cols-3 gap-x-4 gap-y-3">
+            <div className="font-semibold text-center bg-gray-100 p-3 rounded">
+                MUESTRA: ORINA
+            </div>
 
-            </SectionFieldset>
+            {/*Examen de Orina */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
+                <div className="space-y-3 flex flex-col">
+                    <SectionFieldset legend="Examen Físico" className="space-y-4 flex-1">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="flex items-center gap-4">
+                                <label className="font-semibold min-w-[100px] max-w-[100px]">Color :</label>
+                                <select name="color" value={form.color} className="border rounded p-1 w-full" onChange={handleChange}>
+                                    <option>N/A</option>
+                                    <option>AMARILLO CLARO</option>
+                                    <option>AMARILLO PAJIZO</option>
+                                    <option>AMARILLO AMBAR</option>
+                                    <option>AMBAR</option>
+                                    <option>INCOLORO</option>
+                                    <option>MEDICAMENTOSO</option>
+                                    <option>SANGUINOLENTO</option>
+                                </select>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <label className="font-semibold min-w-[100px] max-w-[100px]">Aspecto:</label>
+                                <select name="aspecto" value={form.aspecto} className="border rounded p-1 w-full" onChange={handleChange}>
+                                    <option>N/A</option>
+                                    <option>LIGERAMENTE TURBIO</option>
+                                    <option>TRANSPARENTE</option>
+                                    <option>TURBIO</option>
+                                </select>
+                            </div>
+                            <InputTextOneLine
+                                label="Densidad"
+                                name="densidad"
+                                value={form.densidad}
+                                labelWidth="100px"
+                                onChange={handleChange}
+                            />
+                            <InputTextOneLine
+                                label="PH"
+                                name="ph"
+                                value={form.ph}
+                                labelWidth="100px"
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div className="flex justify-end">
+                            <button
+                                className="bg-red-600 text-white px-4 py-2 rounded-md"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setForm(prev => {
+                                        const isNA = form.color === "N/A";
 
-            <SectionFieldset legend="Resultado" className="flex gap-4">
-                <InputTextOneLine
-                    label='VDRL'
-                    name="resultado"
-                    value={form.resultado}
-                    onChange={handleChange}
-                    className='w-full max-w-[80%]'
-                    labelWidth='120px'
-                />
-                <InputsRadioGroup
-                    name="resultado"
-                    value={form.resultado}
-                    onChange={handleRadioButton}
-                    options={[
-                        { label: 'Reactivo', value: 'REACTIVO' },
-                        { label: 'No Reactivo', value: 'NO REACTIVO' },
-                    ]}
-                />
-            </SectionFieldset>
+                                        const defaults = {
+                                            color: "AMARILLO CLARO",
+                                            aspecto: "TRANSPARENTE",
+                                            densidad: "",
+                                            ph: "",
+                                            nitritos: "NEGATIVO",
+                                            proteinas: "NEGATIVO",
+                                            cetonas: "NEGATIVO",
+                                            leucocitosExamenQuimico: "NEGATIVO",
+                                            acAscorbico: "NEGATIVO",
+                                            urobilinogeno: "NEGATIVO",
+                                            bilirrubina: "NEGATIVO",
+                                            glucosaExamenQuimico: "NEGATIVO",
+                                            sangre: "NEGATIVO",
+                                            leucocitosSedimentoUnitario: "0-1",
+                                            hematiesSedimentoUnitario: "0-0",
+                                            celEpiteliales: "ESCASAS",
+                                            cristales: "NO SE OBSERVAN",
+                                            almidon: "NO SE OBSERVAN",
+                                            levadura: "NO SE OBSERVAN",
+                                            cilindros: "NO SE OBSERVAN",
+                                            bacterias: "NO SE OBSERVAN",
+                                            gramSc: "NO SE OBSERVAN",
+                                            otros: "NO SE OBSERVAN",
+                                        };
+                                        const cleared = Object.fromEntries(
+                                            Object.keys(defaults).map(key => [key, "N/A"])
+                                        );
+                                        return {
+                                            ...prev,
+                                            ...(isNA ? defaults : cleared)
+                                        };
+                                    });
 
-            <SectionFieldset legend="Especialista">
-                <EmpleadoComboBox
-                    value={form.nombre_medico}
-                    form={form}
-                    label='Especialista que Certifica'
-                    onChange={handleChangeSimple}
-                />
-            </SectionFieldset>
+                                }}
+                            >
+                                No Aplica
+                            </button>
+                        </div>
+                    </SectionFieldset>
+
+                    <SectionFieldset legend="Sedimento Urinario" className="space-y-2 grid xl:grid-cols-2 gap-x-4">
+                        <div className="grid gap-y-2">
+                            {[
+                                { label: 'Leucocitos (x campos)', key: 'leucocitosSedimentoUnitario' },
+                                { label: 'CelEpiteliales', key: 'celEpiteliales' },
+                                { label: 'Cilindros', key: 'cilindros' },
+                                { label: 'Almidon', key: 'almidon' },
+                                { label: 'Gram S/C', key: 'gramSc' },
+                            ].map((item) => (
+                                <InputTextOneLine
+                                    label={item.label}
+                                    name={item.key}
+                                    key={item.key}
+                                    value={form[item.key]}
+                                    onChange={handleChange}
+                                    onKeyUp={handleFocusNext}
+                                />
+                            ))}
+                        </div>
+                        <div className="grid gap-y-2">
+                            {[
+                                { label: 'Hematies (x campos)', key: 'hematiesSedimentoUnitario' },
+                                { label: 'Cristales', key: 'cristales' },
+                                { label: 'Bacterias', key: 'bacterias' },
+                                { label: 'Levadura', key: 'levadura' },
+                                { label: 'Otros', key: 'otros' },
+                            ].map((item) => (
+                                <InputTextOneLine
+                                    label={item.label}
+                                    name={item.key}
+                                    key={item.key}
+                                    value={form[item.key]}
+                                    onChange={handleChange}
+                                    onKeyUp={handleFocusNext}
+                                />
+                            ))}
+                        </div>
+                    </SectionFieldset>
+                </div>
+                <div className="space-y-3 flex flex-col">
+                    <SectionFieldset legend="Examen Químico" className="grid xl:grid-cols-2 gap-y-2 xl:gap-y-0 gap-x-4">
+                        <div className="grid gap-y-2 ">
+                            {[
+                                { label: 'Nitritos', key: 'nitritos' },
+                                { label: 'Cetonas', key: 'cetonas' },
+                                { label: 'Ác. Ascórbico', key: 'acAscorbico' },
+                                { label: 'Bilirrubina', key: 'bilirrubina' },
+                                { label: 'Sangre', key: 'sangre' },
+                            ].map((item) => (
+                                <InputTextOneLine
+                                    label={item.label}
+                                    name={item.key}
+                                    key={item.key}
+                                    value={form[item.key]}
+                                    onChange={handleChange}
+                                    onKeyUp={handleFocusNext}
+                                />
+                            ))}
+                        </div>
+                        <div className="flex flex-col gap-y-2 ">
+                            {[
+                                { label: 'Proteínas', key: 'proteinas' },
+                                { label: 'Leucocitos', key: 'leucocitosExamenQuimico' },
+                                { label: 'Urobilinógeno', key: 'urobilinogeno' },
+                                { label: 'Glucosa', key: 'glucosaExamenQuimico' },
+
+                            ].map((item) => (
+                                <InputTextOneLine
+                                    label={item.label}
+                                    name={item.key}
+                                    key={item.key}
+                                    value={form[item.key]}
+                                    onChange={handleChange}
+                                    onKeyUp={handleFocusNext}
+                                />
+                            ))}
+                        </div>
+                    </SectionFieldset>
+                    <SectionFieldset legend="Especialista">
+                        <EmpleadoComboBox
+                            value={form.nombre_medico}
+                            form={form}
+                            label='Especialista que Certifica'
+                            onChange={handleChangeSimple}
+                        />
+                    </SectionFieldset>
+                </div>
+            </div>
+
+
 
             <fieldset className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
                 <div className="flex gap-3">
@@ -175,6 +353,6 @@ export default function VDRL() {
                     </div>
                 </div>
             </fieldset>
-        </form>
+        </div>
     );
 }

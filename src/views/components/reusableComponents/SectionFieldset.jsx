@@ -41,7 +41,7 @@ export default function SectionFieldset({
 
     const contentSpacing = legend ? (open ? "mb-4" : "mb-0") : (open ? "my-4" : "my-0");
     return (
-        <fieldset className={`bg-white border  rounded ${fieldsetClassName}`}>
+        <fieldset className={`bg-[#e9ebec] border  rounded ${fieldsetClassName}`}>
             {legend ? (
                 <legend
                     aria-expanded={open}
