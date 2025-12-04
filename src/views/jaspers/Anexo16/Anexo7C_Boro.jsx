@@ -6,6 +6,22 @@ import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 
 export default function Anexo7C_Antiguo(data = {}) {
+  // Normalizar estructura de datos: si viene con anexo16Reporte, aplanar la estructura
+  if (data.anexo16Reporte && typeof data.anexo16Reporte === 'object') {
+    // Combinar anexo16Reporte con las propiedades de nivel superior
+    // Priorizar propiedades de nivel superior sobre anexo16Reporte
+    const { anexo16Reporte, digitalizacion, textoColor, codigoColor, norden, ...topLevelProps } = data;
+    data = {
+      ...anexo16Reporte,
+      ...topLevelProps,
+      // Asegurar que estas propiedades específicas se mantengan del nivel superior si existen
+      digitalizacion: digitalizacion || anexo16Reporte.digitalizacion,
+      textoColor: textoColor || anexo16Reporte.textoColor,
+      codigoColor: codigoColor || anexo16Reporte.codigoColor,
+      norden: norden || anexo16Reporte.norden
+    };
+  }
+
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -28,9 +44,10 @@ export default function Anexo7C_Antiguo(data = {}) {
     return strValue;
   };
 
+
   const datosFinales = {
     // Datos básicos para header
-    apellidosNombres: String(data.nombres_nombres ?? "").trim(),
+    apellidosNombres: `${String(data.apellidos_apellidos_pa ?? "").trim()} ${String(data.nombres_nombres_pa ?? "").trim()}`.trim(),
     numeroFicha: String(data.numero ?? ""),
     sede: data.sede || data.nombreSede || "",
     direccionPaciente: String(data.direccionPaciente_direccion ?? ""),
@@ -45,7 +62,7 @@ export default function Anexo7C_Antiguo(data = {}) {
     empresa: data.empresa_razon_empresa || "",
     contrata: data.contrata_razon_contrata || "",
     lugarFechaNacimiento: `${data.lugarNacimientoPaciente_lugar_nac_pa ?? ""}\n${formatearFechaCorta(data.fechaNacimientoPaciente_fecha_nacimiento_pa ?? "")}`,
-    domicilioHabitual: data.direccionPaciente_direccion ?? "",
+    domicilioHabitual: data.direccionPaciente_direccion_pa ?? "",
     mineralesExplotados: data.mineral_mineral_po ?? "",
     tipoTrabajo: {
       superficie: data.explotacion_nom_ex === "SUPERFICIE" || data.explotacion_nom_ex === "SUPERFICIAL",
@@ -61,7 +78,7 @@ export default function Anexo7C_Antiguo(data = {}) {
       mas4501: data.altura_altura_po === "MAS DE 4501"
     },
     // Datos adicionales para la fila personal
-    edad: data.edad_edad ?? "",
+    edad: data.edad ?? "",
     sexoM: data.sexo_sexo_pa === "M",
     sexoF: data.sexo_sexo_pa === "F",
     dni: String(data.dni_cod_pa ?? ""),
@@ -132,8 +149,8 @@ export default function Anexo7C_Antiguo(data = {}) {
       fiebreAmarilla: data.fiebreAmarillaAnexo7c_fiebreamarilla ?? false,
     },
     numeroHijos: {
-      vivos: data.hijosVivosAnexo7c_txthijosvivos ?? "",
-      muertos: data.hijosMuertosAnexo7c ?? "",
+      vivos: data.detalleHijosVivosAntecedentes_txtdhijosvivos ?? data.hijosVivosAnexo7c_txthijosvivos ?? "",
+      muertos: data.detalleHijosFallecidosAntecedentes_txtdhijosfallecidos ?? data.hijosMuertosAnexo7c ?? "",
     },
     // Hábitos
     habitos: {
@@ -192,21 +209,21 @@ export default function Anexo7C_Antiguo(data = {}) {
       visionCerca: {
         sinCorregirOD: data.visionCercaSinCorregirOd_v_cerca_s_od ?? "",
         sinCorregirOI: data.visionCercaSinCorregirOi_v_cerca_s_oi ?? "",
-        corregidaOD: data.odcc_odcc ?? "",
-        corregidaOI: data.oicc_oicc ?? "",
+        corregidaOD: data.visionCercaCorregidaOd_v_cerca_c_od ?? data.odcc_odcc ?? "",
+        corregidaOI: data.visionCercaCorregidaOi_v_cerca_c_oi ?? data.oicc_oicc ?? "",
       },
       visionLejos: {
         sinCorregirOD: data.visionLejosSinCorregirOd_v_lejos_s_od ?? "",
         sinCorregirOI: data.visionLejosSinCorregirOi_v_lejos_s_oi ?? "",
-        corregidaOD: data.odlc_odlc ?? "",
-        corregidaOI: data.oilc_oilc ?? "",
+        corregidaOD: data.visionLejosCorregidaOd_v_lejos_c_od ?? data.odlc_odlc ?? "",
+        corregidaOI: data.visionLejosCorregidaOi_v_lejos_c_oi ?? data.oilc_oilc ?? "",
       },
       enfermedadesOculares: data.enfermedadesOcularesAnexo7c_txtenfermedadesoculares ?? "",
       enfermedadesOcularesOtros: data.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "",
       reflejosPupilares: (data.rp_rp || data.reflejosPupilaresAnexo7c_txtreflejospupilares) ?? "",
       testIshihara: data.tecishiharaNormal_rbtecishihara_normal ? "NORMAL" : (data.tecishiharaAnormal_rbtecishihara_anormal ? "ANORMAL" : ""),
-      testColoresPuros: data.teccoleresNormal_rbteccoleres_normal ? "NORMAL" : (data.teccoleresAnormal_rbteccoleres_anormal ? "ANORMAL" : ""),
-      testProfundidad: data.tecestereopsiaNormal_rbtecestereopsia_normal ? "NORMAL" : (data.tecestereopsiaAnormal_rbtecestereopsia_anormal ? "ANORMAL" : ""),
+      testColoresPuros: data.visionColoresAnexo7c_txtvisioncolores || (data.teccoleresNormal_rbteccoleres_normal ? "NORMAL" : (data.teccoleresAnormal_rbteccoleres_anormal ? "ANORMAL" : "")) || "",
+      testProfundidad: data.vc_vc || (data.tecestereopsiaNormal_rbtecestereopsia_normal ? "NORMAL" : (data.tecestereopsiaAnormal_rbtecestereopsia_anormal ? "ANORMAL" : "")) || "",
     },
     // Evaluación de oídos
     evaluacionOidos: {

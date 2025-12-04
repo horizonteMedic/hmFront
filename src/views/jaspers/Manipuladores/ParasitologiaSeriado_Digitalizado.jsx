@@ -55,7 +55,7 @@ const drawPatientData = (doc, datos = {}) => {
   const tablaInicioX = 15;
   const tablaAncho = 180;
   const filaAltura = 5;
-  let yPos = 43;
+  let yPos = 35;
 
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
@@ -165,16 +165,35 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
   const datosReales = {
     // Datos del paciente
     nombres: String(datos.nombres || datos.nombresPaciente || ""),
+    nombresPaciente: String(datos.nombres || datos.nombresPaciente || ""),
     edad: datos.edad || datos.edadPaciente || "",
+    edadPaciente: datos.edad || datos.edadPaciente || "",
     dni: datos.dni || datos.dniPaciente || "",
+    dniPaciente: datos.dni || datos.dniPaciente || "",
+    sexoPaciente: datos.sexoPaciente || "",
+    lugarNacimientoPaciente: datos.lugarNacimientoPaciente || "",
+    estadoCivilPaciente: datos.estadoCivilPaciente || "",
+    fechaNacimientoPaciente: datos.fechaNacimientoPaciente || "",
+    nivelEstudioPaciente: datos.nivelEstudioPaciente || "",
+    ocupacionPaciente: datos.ocupacionPaciente || "",
+    cargoPaciente: datos.cargoPaciente || "",
+    areaPaciente: datos.areaPaciente || "",
+    empresa: datos.empresa || "",
+    contrata: datos.contrata || "",
+    nombreExamen: datos.nombreExamen || "",
+    codigoClinica: datos.codigoClinica || "",
     fecha: datos.fecha || datos.fechaExamen || datos.fechaLab || "",
+    fechaExamen: datos.fecha || datos.fechaExamen || datos.fechaLab || "",
     
     // Datos de ficha
     norden: String(datos.norden || datos.numeroFicha || ""),
+    numeroFicha: String(datos.norden || datos.numeroFicha || ""),
     sede: datos.sede || datos.nombreSede || "",
+    nombreSede: datos.sede || datos.nombreSede || "",
     
     // Datos de color
     codigocolor: datos.codigoColor,
+    codigoColor: datos.codigoColor,
     textoColor: datos.textoColor,
     color: datos.color || 1,
     
@@ -230,7 +249,23 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
     },
     
     // Digitalizaciones
-    digitalizacion: datos.digitalizacion || []
+    digitalizacion: datos.digitalizacion || [],
+    
+    // Datos adicionales para footer
+    dirTruPierola: datos.dirTruPierola || "",
+    emailTruPierola: datos.emailTruPierola || "",
+    telfTruPierola: datos.telfTruPierola || "",
+    celTrujilloPie: datos.celTrujilloPie || "",
+    dirHuancayo: datos.dirHuancayo || "",
+    emailHuancayo: datos.emailHuancayo || "",
+    telfHuancayo: datos.telfHuancayo || "",
+    dirHuamachuco: datos.dirHuamachuco || "",
+    emailHuamachuco: datos.emailHuamachuco || "",
+    telfHuamachuco: datos.telfHuamachuco || "",
+    celHuamachuco: datos.celHuamachuco || "",
+    dirTrujillo: datos.dirTrujillo || "",
+    emailTrujillo: datos.emailTrujillo || "",
+    telfTrujillo: datos.telfTrujillo || ""
   };
 
   // Usar datos reales
@@ -244,9 +279,17 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
   // Definir columna para los datos
   const xDato = xLeft + 65;
 
-  const sello1 = datosFinales.digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  const sello2 = datosFinales.digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
+  const digitalizacion = datosFinales.digitalizacion || [];
+  const sello1 = digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
+  const sello2 = digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
   const isValidUrl = url => url && url !== "Sin registro";
+  
+  // Función para extraer el nombre del profesional de la URL
+  const extraerNombreProfesional = (url) => {
+    if (!url) return null;
+    const match = url.match(/Firma_([^._]+)/);
+    return match ? match[1] : null;
+  };
   const loadImg = src =>
     new Promise((res, rej) => {
       const img = new Image();
@@ -259,12 +302,70 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
+    // Extraer nombres de profesionales de las URLs
+    const nombreProf1 = sello1?.url ? extraerNombreProfesional(sello1.url) : null;
+    const nombreProf2 = sello2?.url ? extraerNombreProfesional(sello2.url) : null;
+    const tieneNombreProfesional = nombreProf1 || nombreProf2;
+    
+    // Función auxiliar para agregar sello al PDF
+    const agregarSello = (img, xPos, yPos, width, height) => {
+      if (!img) return;
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const selloBase64 = canvas.toDataURL('image/png');
+      doc.addImage(selloBase64, 'PNG', xPos, yPos, width, height);
+    };
+    
+    // Función auxiliar para dibujar línea y texto debajo del sello
+    const dibujarLineaYTexto = (centroX, lineY, tieneNombre) => {
+      doc.setLineWidth(0.2);
+      doc.line(centroX - 25, lineY, centroX + 25, lineY);
+      doc.setFont('helvetica', 'normal').setFontSize(9);
+      if (tieneNombre) {
+        doc.text("Sello y Firma del Médico", centroX, lineY + 5, { align: "center" });
+        doc.text("Responsable de la Evaluación", centroX, lineY + 8, { align: "center" });
+      } else {
+        doc.text("Sello y Firma", centroX, lineY + 5, { align: "center" });
+      }
+    };
+    
+    // Función auxiliar para dibujar sellos (uno o dos)
+    const dibujarSellos = (sello1, sello2, sigW, sigH, sigY, lineY, nombreProf1, nombreProf2, tieneNombre) => {
+      if (sello1 && sello2) {
+        // Dos sellos lado a lado
+        const gap = 16;
+        const totalWidth = sigW * 2 + gap;
+        const startX = (pageW - totalWidth) / 2;
+        
+        agregarSello(sello1, startX, sigY, sigW, sigH);
+        agregarSello(sello2, startX + sigW + gap, sigY, sigW, sigH);
+        
+        const centroSello1X = startX + sigW / 2;
+        const centroSello2X = startX + sigW + gap + sigW / 2;
+        dibujarLineaYTexto(centroSello1X, lineY, tieneNombre);
+        dibujarLineaYTexto(centroSello2X, lineY, tieneNombre);
+      } else if (sello1) {
+        // Un solo sello centrado
+        const imgX = (pageW - sigW) / 2;
+        agregarSello(sello1, imgX, sigY, sigW, sigH);
+        dibujarLineaYTexto(pageW / 2, lineY, nombreProf1);
+      } else if (sello2) {
+        // Un solo sello centrado
+        const imgX = (pageW - sigW) / 2;
+        agregarSello(sello2, imgX, sigY, sigW, sigH);
+        dibujarLineaYTexto(pageW / 2, lineY, nombreProf2);
+      }
+    };
+    
     // === PRIMERA PÁGINA (con header) ===
     drawHeader(doc, datosFinales, 1);
     
     // === TÍTULO ===
     doc.setFont("helvetica", "bold").setFontSize(14);
-    doc.text("COPROPARASITOLÓGICO SERIADO", pageW / 2, 38, { align: "center" });
+    doc.text("COPROPARASITOLÓGICO SERIADO", pageW / 2, 31.8, { align: "center" });
     
     // === DATOS DEL PACIENTE ===
     const finalYPos = drawPatientData(doc, datosFinales);
@@ -277,7 +378,7 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
 
   // MUESTRA: HECES I
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("MUESTRA: HECES I", xLeft, y);
+  doc.text("MUESTRA: HECES I", pageW / 2, y, { align: "center" });
   y += 5;
   // EXAMEN MACROSCÓPICO I
   doc.setFont("helvetica", "bold");
@@ -318,7 +419,7 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
   // MUESTRA: HECES II
   y += 6;
   doc.setFont("helvetica", "bold");
-  doc.text("MUESTRA: HECES II", xLeft, y);
+  doc.text("MUESTRA: HECES II", pageW / 2, y, { align: "center" });
   y += 5;
   // EXAMEN MACROSCÓPICO II
   doc.setFont("helvetica", "bold");
@@ -337,47 +438,15 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
     doc.text(":", xDato, y);
     doc.text(value != null && value !== "" ? String(value) : "", xDato + 4, y);
     y += 5;
-  });
+  });  
    // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
-    const sigW = 53;
-    const sigH = 23;
-    const sigY = y + 2;
-    const gap = 16;
+    const sigW = 48;
+    const sigH = 20;
+    // Ajustar posición: subir más cuando hay texto adicional para evitar pisar el footer
+    const sigY = tieneNombreProfesional ? y + 4 : y + 12;
+    const lineY = sigY + sigH + 3;
     
-    if (s1 && s2) {
-      const totalWidth = sigW * 2 + gap;
-      const startX = (pageW - totalWidth) / 2;
-      
-      const addSello = (img, xPos) => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        const selloBase64 = canvas.toDataURL('image/png');
-        doc.addImage(selloBase64, 'PNG', xPos, sigY, sigW, sigH);
-      };
-      addSello(s1, startX);
-      addSello(s2, startX + sigW + gap);
-    } else if (s1) {
-      const canvas = document.createElement('canvas');
-      canvas.width = s1.width;
-      canvas.height = s1.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(s1, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = (pageW - sigW) / 2;
-      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
-    } else if (s2) {
-      const canvas = document.createElement('canvas');
-      canvas.width = s2.width;
-      canvas.height = s2.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(s2, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = (pageW - sigW) / 2;
-      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
-    }
+    dibujarSellos(s1, s2, sigW, sigH, sigY, lineY, nombreProf1, nombreProf2, tieneNombreProfesional);
     
     // === FOOTER PRIMERA PÁGINA ===
     footerTR(doc, { ...datosFinales, footerOffsetY: 8 });
@@ -389,7 +458,7 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
   
   // === TÍTULO ===
   doc.setFont("helvetica", "bold").setFontSize(14);
-  doc.text("COPROPARASITOLÓGICO SERIADO", pageW / 2, 38, { align: "center" });
+  doc.text("COPROPARASITOLÓGICO SERIADO", pageW / 2, 31.8, { align: "center" });
   
   // === DATOS DEL PACIENTE ===
   const finalYPos2 = drawPatientData(doc, datosFinales);
@@ -417,7 +486,7 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
   y += 6;
   // MUESTRA: HECES III
   doc.setFont("helvetica", "bold");
-  doc.text("MUESTRA: HECES III", xLeft, y);
+  doc.text("MUESTRA: HECES III", pageW / 2, y, { align: "center" });
   y += 5;
   // EXAMEN MACROSCÓPICO III
   doc.setFont("helvetica", "bold");
@@ -454,45 +523,12 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
   });
 
   // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
-    const sigW2 = 53;
-    const sigH2 = 23;
-    const sigY2 = y + 2;
-    const gap2 = 16;
+    const sigW2 = 48;
+    const sigH2 = 20;
+    const sigY2 = y + 12;
+    const lineY2 = sigY2 + sigH2 + 3;
     
-    if (s1 && s2) {
-      const totalWidth = sigW2 * 2 + gap2;
-      const startX = (pageW - totalWidth) / 2;
-      
-      const addSello = (img, xPos) => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        const selloBase64 = canvas.toDataURL('image/png');
-        doc.addImage(selloBase64, 'PNG', xPos, sigY2, sigW2, sigH2);
-      };
-      addSello(s1, startX);
-      addSello(s2, startX + sigW2 + gap2);
-    } else if (s1) {
-      const canvas = document.createElement('canvas');
-      canvas.width = s1.width;
-      canvas.height = s1.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(s1, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = (pageW - sigW2) / 2;
-      doc.addImage(selloBase64, 'PNG', imgX, sigY2, sigW2, sigH2);
-    } else if (s2) {
-      const canvas = document.createElement('canvas');
-      canvas.width = s2.width;
-      canvas.height = s2.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(s2, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = (pageW - sigW2) / 2;
-      doc.addImage(selloBase64, 'PNG', imgX, sigY2, sigW2, sigH2);
-    }
+    dibujarSellos(s1, s2, sigW2, sigH2, sigY2, lineY2, nombreProf1, nombreProf2, tieneNombreProfesional);
 
   // Footer de segunda página
   footerTR(doc, { ...datosFinales, footerOffsetY: 8 });
