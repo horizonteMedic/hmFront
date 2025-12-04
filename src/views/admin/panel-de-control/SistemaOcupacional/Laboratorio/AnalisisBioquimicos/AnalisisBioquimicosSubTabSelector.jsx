@@ -1,9 +1,12 @@
-import { faFilter, faFlask, faLungs} from "@fortawesome/free-solid-svg-icons";
+import { faCandyCane, faCrown, faFilter, faFlask, faGlassWater, faLungs } from "@fortawesome/free-solid-svg-icons";
 import SubTabSelector from "../../../../../components/reusableComponents/SubTabSelector";
 import AcidoUrico from "./AcidoUrico/AcidoUrico";
-import AnalisisBioquimicos from "./AnalisisBioquimicos/AnalisisBioquimicos";
 import PerfilHepatico from "./PerfilHepatico/PerfilHepatico";
 import PerfilRenal from "./PerfilRenal/PerfilRenal";
+import RiesgoCoronario from "./RiesgoCoronario/RiesgoCoronario";
+import ToleranciaGlucosa from "./ToleranciaGlucosa/ToleranciaGlucosa";
+import GlucosaBasal from "./GlucosaBasal/GlucosaBasal";
+import PerfilLipidico from "./PerfilLipidico/PerfilLipidico";
 
 export default function AnalisisBioquimicosSubTabSelector({ tieneVista }) {
   const tabsConfig = [
@@ -12,7 +15,7 @@ export default function AnalisisBioquimicosSubTabSelector({ tieneVista }) {
       permission: "Perfil Lipídico",
       label: "Perfil Lipídico",
       icon: faFlask,
-      component: AnalisisBioquimicos
+      component: PerfilLipidico
     },
     {
       id: 1,
@@ -34,6 +37,27 @@ export default function AnalisisBioquimicosSubTabSelector({ tieneVista }) {
       label: "Perfil Hepático",
       icon: faLungs,
       component: PerfilHepatico
+    },
+    {
+      id: 4,
+      permission: "Riesgo Coronario",
+      label: "Riesgo Coronario",
+      icon: faCrown,
+      component: RiesgoCoronario
+    },
+    {
+      id: 5,
+      permission: "Tolerancia Glucosa",
+      label: "Tolerancia a la Glucosa",
+      icon: faCandyCane,
+      component: ToleranciaGlucosa
+    },
+    {
+      id: 6,
+      permission: "Glucosa Basal",
+      label: "Glucosa Basal",
+      icon: faGlassWater,
+      component: GlucosaBasal
     },
   ];
   return (

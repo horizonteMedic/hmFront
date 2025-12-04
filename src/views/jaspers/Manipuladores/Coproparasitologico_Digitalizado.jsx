@@ -174,8 +174,8 @@ export default function Coproparasitologico_Digitalizado(datos = {}) {
     sede: datos.sede || datos.nombreSede || "",
     
     // Datos de color
-    codigocolor: datos.codigoColor || ""
-    textoColor: datos.textoColor || "F",
+    codigocolor: datos.codigoColor,
+    textoColor: datos.textoColor,
     color: datos.color || 1,
     
     // Muestra I - Examen Macroscópico

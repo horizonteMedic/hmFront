@@ -48,7 +48,7 @@ export default function InformePsicologico() {
 
         // Área Intelectual
         areaIntelectual: "EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO.",
-        promedio: false,
+        promedio: true,
         superior: false,
         nInferior: false,
         alto: false,

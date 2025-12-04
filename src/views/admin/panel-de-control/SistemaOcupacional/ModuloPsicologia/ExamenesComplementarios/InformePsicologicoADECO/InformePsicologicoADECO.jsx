@@ -106,7 +106,7 @@ export default function InformePsicologicoADECO() {
                         label="Tipo de Examen"
                         name="nombreExamen"
                         value={form.nombreExamen}
-                        onChange={handleChange}
+                        disabled
                         labelWidth="120px"
                     />
                     <div className="flex gap-4 items-center">

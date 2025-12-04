@@ -45,7 +45,7 @@ import Anexo16A from "./views/admin/panel-de-control/SistemaOcupacional/Anexo16A
 
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/Consentimientos/Consentimiento_Marihuana_Digitalizado.jsx";
+import Ficha from "./views/jaspers/AnalisisBioquimicos/AnalisisClinicosB_Digitalizado.jsx";
 
 
 

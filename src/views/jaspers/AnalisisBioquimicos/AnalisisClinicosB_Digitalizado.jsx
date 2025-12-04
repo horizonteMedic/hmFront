@@ -238,44 +238,60 @@ export default function AnalisisClinicosB_Digitalizado(datos = {}) {
     });
 
     // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
-    const sigW = 53;
-    const sigH = 23;
-    const sigY = 210;
+    const sigW = 48;
+    const sigH = 20;
+    const sigY = y + 70;
     const gap = 16;
+    const lineY = sigY + sigH + 3;
+    
+    // Función auxiliar para agregar sello al PDF
+    const agregarSello = (img, xPos, yPos, width, height) => {
+      if (!img) return;
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const selloBase64 = canvas.toDataURL('image/png');
+      doc.addImage(selloBase64, 'PNG', xPos, yPos, width, height);
+    };
+    
+    // Función auxiliar para dibujar línea y texto debajo del sello
+    const dibujarLineaYTexto = (centroX, lineY, tipoSello) => {
+      doc.setLineWidth(0.2);
+      doc.line(centroX - 25, lineY, centroX + 25, lineY);
+      doc.setFont('helvetica', 'normal').setFontSize(9);
+      if (tipoSello === 'SELLOFIRMA') {
+        // SELLOFIRMA: Firma y Sello del Profesional / Responsable de la Evaluación
+        doc.text("Firma y Sello del Profesional", centroX, lineY + 5, { align: "center" });
+        doc.text("Responsable de la Evaluación", centroX, lineY + 8, { align: "center" });
+      } else if (tipoSello === 'SELLOFIRMADOCASIG') {
+        // SELLOFIRMADOCASIG: Firma y Sello Médico Asignado
+        doc.text("Firma y Sello Médico Asignado", centroX, lineY + 5, { align: "center" });
+      } else {
+        doc.text("Firma y Sello", centroX, lineY + 5, { align: "center" });
+      }
+    };
     
     if (s1 && s2) {
       const totalWidth = sigW * 2 + gap;
       const startX = (pageW - totalWidth) / 2;
       
-      const addSello = (img, xPos) => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        const selloBase64 = canvas.toDataURL('image/png');
-        doc.addImage(selloBase64, 'PNG', xPos, sigY, sigW, sigH);
-      };
-      addSello(s1, startX);
-      addSello(s2, startX + sigW + gap);
+      agregarSello(s1, startX, sigY, sigW, sigH);
+      agregarSello(s2, startX + sigW + gap, sigY, sigW, sigH);
+      
+      const centroSello1X = startX + sigW / 2;
+      const centroSello2X = startX + sigW + gap + sigW / 2;
+      dibujarLineaYTexto(centroSello1X, lineY, 'SELLOFIRMA');
+      dibujarLineaYTexto(centroSello2X, lineY, 'SELLOFIRMADOCASIG');
     } else if (s1) {
-      const canvas = document.createElement('canvas');
-      canvas.width = s1.width;
-      canvas.height = s1.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(s1, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
       const imgX = (pageW - sigW) / 2;
-      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
+      agregarSello(s1, imgX, sigY, sigW, sigH);
+      dibujarLineaYTexto(pageW / 2, lineY, 'SELLOFIRMA');
     } else if (s2) {
-      const canvas = document.createElement('canvas');
-      canvas.width = s2.width;
-      canvas.height = s2.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(s2, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
       const imgX = (pageW - sigW) / 2;
-      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
+      agregarSello(s2, imgX, sigY, sigW, sigH);
+      dibujarLineaYTexto(pageW / 2, lineY, 'SELLOFIRMADOCASIG');
     }
 
     // === FOOTER ===

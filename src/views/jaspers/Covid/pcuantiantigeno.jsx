@@ -75,7 +75,7 @@ export default function pcuantiantigeno(datos = {}) {
     // Bloque de color
      drawColorBox(doc, {
     color: datos.codigoColor,
-    text: datos.textoColor ,
+    text: datos.textoColor,
     x: pageW - 30,
     y: 10,
     size: 22,

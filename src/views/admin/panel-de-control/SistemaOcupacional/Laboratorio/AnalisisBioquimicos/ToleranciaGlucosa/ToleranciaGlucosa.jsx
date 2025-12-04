@@ -1,44 +1,22 @@
-import { useState, useEffect } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faBroom, faPrint } from "@fortawesome/free-solid-svg-icons";
-import { useSessionData } from "../../../../../../hooks/useSessionData";
-import { useForm } from "../../../../../../hooks/useForm";
-import { getToday } from "../../../../../../utils/helpers";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerPruebaCuantitativaDeAntigenos";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { useSessionData } from '../../../../../../hooks/useSessionData';
+import { useForm } from '../../../../../../hooks/useForm';
+import { getToday } from '../../../../../../utils/helpers';
+import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerToleranciaGlucosa';
 import {
-  InputTextOneLine,
-} from "../../../../../../components/reusableComponents/ResusableComponents";
-import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
-import { getFetch } from "../../../../../../utils/apiHelpers";
-import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
+  InputTextOneLine, SectionFieldset
+} from '../../../../../../components/reusableComponents/ResusableComponents';
+import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 
-const DEFAULT_TECNICA = {
-  tecnica: "Inmunofluorescencia",
-  sensibilidad: "95.00%",
-  especificidad: "95.00%",
-};
-const tabla = "examen_inmunologico";
+const tabla = 'glucosatolerancia';
 
-export default function PruebaCuantitativaDeAntigenos() {
+export default function ToleranciaGlucosa() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
-  const [marcas, setMarcas] = useState([]);
-
-  useEffect(() => {
-    if (token) {
-      getFetch(`/api/v01/ct/pruebasCovid/obtenerMarcasCovid`, token)
-        .then((res) => {
-          setMarcas(res);
-        })
-        .catch(() => {
-          console.log('Error al obtener marcas de COVID-19');
-        });
-    }
-  }, []);
-
   const initialFormState = {
-    norden: "",
+    norden: '',
     fecha: today,
 
     nombreExamen: "",
@@ -59,14 +37,16 @@ export default function PruebaCuantitativaDeAntigenos() {
     ocupacion: "",
     cargoDesempenar: "",
 
-    marca: "",
-    doctor: "N/A",
-    valor: "",
+    muestra: 'SUERO',
+    glucosa: '',
+    glucosa60: '',
+    glucosa120: '',
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
   };
+
   const {
     form,
     setForm,
@@ -95,11 +75,8 @@ export default function PruebaCuantitativaDeAntigenos() {
     });
   };
 
-  const selectedMarca =
-    marcas.find((m) => m.mensaje === form.marca) || DEFAULT_TECNICA;
-
   return (
-    <form className="space-y-3 p-4 text-[10px]">
+    <form className="space-y-3 p-4">
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <InputTextOneLine
           label="N° Orden"
@@ -218,54 +195,39 @@ export default function PruebaCuantitativaDeAntigenos() {
           labelWidth="120px"
         />
       </SectionFieldset>
-      <SectionFieldset legend="COVID - 19 Prueba Rápida" className="space-y-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <label className="font-semibold min-w-[120px] max-w-[120px]">
-                Marca:
-              </label>
-              <select
-                name="marca"
-                value={form.marca}
-                onChange={handleChangeSimple}
-                className="border rounded px-2 py-1 w-full"
-              >
-                <option value="">--Seleccione--</option>
-                {marcas.map((m) => (
-                  <option key={m.id} value={m.mensaje}>
-                    {m.mensaje}
-                  </option>
-                ))}
-              </select>
-            </div>
+
+      <SectionFieldset legend="Tipo Muestra y Resultados" className='grid gap-y-3'>
+        <InputTextOneLine
+          label='Muestra'
+          name="muestra"
+          value={form.muestra}
+          labelWidth='120px'
+          onChange={handleChange}
+        />
+        {[
+          { label: 'Glucosa', name: 'glucosa', valoresNormales: "70 - 110 mg/dL" },
+          { label: 'Glucosa 60 Minutos', name: 'glucosa60', valoresNormales: "120 - 170 mg/dL" },
+          { label: 'Glucosa 120 Minutos', name: 'glucosa120', valoresNormales: "70 - 120 mg/dL" }
+        ].map(({ label, name, valoresNormales }) => (
+          <div className="flex items-center gap-4" key={name}>
             <InputTextOneLine
-              label="Valor"
-              name="valor"
-              value={form.valor}
-              onChange={handleChange}
-              labelWidth="120px"
+              label={label}
+              name={name}
+              value={form[name]}
+              labelWidth='120px'
+              className='w-[90%]'
+              onChange={(e) => handleChangeNumberDecimals(e, 1)}
             />
-          </div>
-          <div className="border rounded bg-gray-50 p-4 text-base min-h-[100px]">
-            <div>
-              <span className="font-semibold">Tecnica:</span>{" "}
-              {selectedMarca.tecnica || DEFAULT_TECNICA.tecnica}
-            </div>
-            <div>
-              <span className="font-semibold">SENSIBILIDAD:</span>{" "}
-              {selectedMarca.sensibilidad || DEFAULT_TECNICA.sensibilidad}
-            </div>
-            <div>
-              <span className="font-semibold">ESPECIFICIDAD:</span>{" "}
-              {selectedMarca.especificidad || DEFAULT_TECNICA.especificidad}
+            <div className='flex flex-col items-start text-gray-500 text-[10px] font-medium min-w-[130px]'>
+              <span>{valoresNormales}</span>
             </div>
           </div>
-        </div>
+        ))
+        }
+
       </SectionFieldset>
 
-      {/* Médico */}
-      <SectionFieldset legend="Asignación de Médico" className="space-y-4">
+      <SectionFieldset legend="Asignación de Médico">
         <EmpleadoComboBox
           value={form.nombre_medico}
           label="Especialista"
@@ -274,8 +236,8 @@ export default function PruebaCuantitativaDeAntigenos() {
         />
       </SectionFieldset>
 
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-        <div className="flex flex-wrap gap-3">
+      <fieldset className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
+        <div className="flex gap-3">
           <button
             type="button"
             onClick={handleSave}
@@ -291,7 +253,6 @@ export default function PruebaCuantitativaDeAntigenos() {
             <FontAwesomeIcon icon={faBroom} /> Limpiar
           </button>
         </div>
-
         <div className="flex flex-col items-end">
           <span className="font-bold italic mb-2">Imprimir</span>
           <div className="flex items-center gap-2">
@@ -310,7 +271,7 @@ export default function PruebaCuantitativaDeAntigenos() {
             </button>
           </div>
         </div>
-      </div>
+      </fieldset>
     </form>
   );
 }
