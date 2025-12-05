@@ -5,6 +5,8 @@ import InformePsicologicoADECO from "./InformePsicologicoADECO/InformePsicologic
 import AlturaPsicologica from "./AlturaPsicologica/AlturaPsicologica";
 import InformeDeFobias from "./InformeDeFobias/InformeDeFobias";
 import AversionRiesgo from "./AversionRiesgo/AversionRiesgo";
+import TrastornoDePersonalidad from "./TrastornoDePersonalidad/TrastornoDePersonalidad";
+import InformeConductores from "./InformeConductores/InformeConductores";
 export default function ExamenesComplementariosSubSelector({ tieneVista }) {
     const tabsConfig = [
         {
@@ -42,6 +44,18 @@ export default function ExamenesComplementariosSubSelector({ tieneVista }) {
             permission: "Altura Psicologica",
             label: "Formato Altura Psicologica",
             component: AlturaPsicologica
+        },
+        {
+            id: 6,
+            permission: "Trastorno de Personalidad",
+            label: "Trastorno de Personalidad",
+            component: TrastornoDePersonalidad
+        },
+        {
+            id: 7,
+            permission: "Informe Conductores",
+            label: "Informe Conductores",
+            component: InformeConductores
         },
     ];
     return (
