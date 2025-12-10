@@ -6,8 +6,8 @@ import {
     PrintHojaRDefault,
     SubmitDataServiceDefault,
     VerifyTRDefault,
-} from "../../../../../../utils/functionUtils";
-import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
+} from "../../../../utils/functionUtils";
+import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
     "";
@@ -113,7 +113,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             GetInfoServicio(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de Informe Conductores.",
+                    "Este paciente ya cuenta con registros de Altura 1.8.",
                     "warning"
                 );
             });

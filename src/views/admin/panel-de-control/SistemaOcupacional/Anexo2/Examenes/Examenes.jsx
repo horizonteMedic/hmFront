@@ -56,7 +56,7 @@ export default function Examenes({
             label="Conclusión"
             name="conclusionRespiratoria"
             value={form.conclusionRespiratoria}
-            onChange={handleChange}
+            disabled
           />
         </div>
 
