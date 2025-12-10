@@ -8,7 +8,6 @@ import ConsentimientoDigitalizacion from "./Admision/ConsentimientoDigitalizacio
 import Triaje from "./Triaje/Triaje";
 import ConsentimientosSubTabSelector from "./Laboratorio/Consentimientos/ConsentimientosSubTabSelector.jsx";
 import ParasitologiaCoprologico from "./Parasitologia/ParasitologiaCoprologico";
-import ManipuladoresSubTabSelector from "./Laboratorio/Manipuladores/ManipuladoresSubTabSelector";
 import {
   ComboboxEmpresasMulti,
   ComboboxContratasMulti,
@@ -64,6 +63,8 @@ import {
   faMaskVentilator,
   faPersonRifle,
   faFolderMinus,
+  faBrain,
+  faArrowUp,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -95,16 +96,9 @@ import CertificadoMedicoOcupacional from "./CertificadoMedicoOcupacional/Certifi
 import FichaInterconsulta from "./FichaInterconsulta/FichaInterconsulta.jsx";
 import SectionWithBack from "./SectionWithBack.jsx";
 import UsoRespiradores from "./UsoRespiradores/UsoRespiradores.jsx";
-// import FichaPsicologica3 from "./ModuloPsicologia/FichaPsicologica3/FichaPsicologica3.jsx";
 import PoderosaTabSelector from "./Poderosa/PoderosaTabSelector.jsx";
-// import AversionRiesgo from "./ModuloPsicologia/AversionRiesgo/AversionRiesgo.jsx";
 import GestionOpciones from "./Playground/GestionOpciones/GestionOpciones.jsx";
-import LaboratorioClinicoSubTabSelector from "./Laboratorio/LaboratorioClinico/LaboratorioClinicoSubTabSelector.jsx";
 import EliminarExamenes from "./EliminarExamenes/EliminarExamenes.jsx";
-import AnalisisBioquimicosSubTabSelector from "./Laboratorio/AnalisisBioquimicos/AnalisisBioquimicosSubTabSelector.jsx";
-import InmunologiaSubTabSelector from "./Laboratorio/Inmunologia/InmunologiaSubTabSelector.jsx";
-import ToxicologiaSubTabSelector from "./Laboratorio/Toxicologia/ToxicologiaSubTabSelector.jsx";
-import PruebasCovidSubTabSelector from "./Laboratorio/PruebasCovid/PruebasCovidSubTabSelector.jsx";
 import LaboratorioTabSelector from "./Laboratorio/LaboratorioTabSelector.jsx";
 import Folio from "./Folio/Folio.jsx";
 const hiddenExamTabs = [
@@ -283,7 +277,7 @@ const TabComponent = () => {
                   { vista: "OIT", tab: 19, icons: [{ icon: faAnchor }], label: "OIT" },
                   { vista: "Playground", tab: 24, icons: [{ icon: faGamepad }], label: "Playground" },
                   { vista: "Poderosa", tab: 37, icons: [{ icon: faPersonRifle }], label: "Poderosa" },
-                  { vista: "Psicologia", tab: 10, icons: [{ icon: faUserMd }], label: "Psicología" },
+                  { vista: "Psicologia", tab: 10, icons: [{ icon: faBrain }], label: "Psicología" },
                   { vista: "Rayos X", tab: 12, icons: [{ icon: faXRay }], label: "Rayos X" },
                   { vista: "Test Fatiga", tab: 23, icons: [{ icon: faBed }], label: "Test Fatiga y Somnolencia" },
                   { vista: "Triaje", tab: 1, icons: [{ icon: faStethoscope }], label: "Triaje" },
@@ -628,6 +622,7 @@ const TabComponent = () => {
             "Uso de Respiradores": { activeTab: 36, subTab: 0 },
             "Poderosa": { activeTab: 37, subTab: 0 },
             "Eliminar Examenes": { activeTab: 38, subTab: 0 },
+            "Altura 1.8": { activeTab: 39, subTab: 0 },
           };
 
           const config = navConfig[idx];
