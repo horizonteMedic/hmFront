@@ -106,6 +106,7 @@ import InmunologiaSubTabSelector from "./Laboratorio/Inmunologia/InmunologiaSubT
 import ToxicologiaSubTabSelector from "./Laboratorio/Toxicologia/ToxicologiaSubTabSelector.jsx";
 import PruebasCovidSubTabSelector from "./Laboratorio/PruebasCovid/PruebasCovidSubTabSelector.jsx";
 import LaboratorioTabSelector from "./Laboratorio/LaboratorioTabSelector.jsx";
+import Folio from "./Folio/Folio.jsx";
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
   { key: 7, label: "Test Altura" },
@@ -287,7 +288,7 @@ const TabComponent = () => {
                   { vista: "Test Fatiga", tab: 23, icons: [{ icon: faBed }], label: "Test Fatiga y Somnolencia" },
                   { vista: "Triaje", tab: 1, icons: [{ icon: faStethoscope }], label: "Triaje" },
                   { vista: "Uso de Respiradores", tab: 36, icons: [{ icon: faMaskVentilator }], label: "Uso de Respiradores" },
-                  { vista: "Eliminar Examenes", tab: 38, icons: [{ icon: faFolderMinus }], label: "Eliminar Examenes" },
+                  { vista: "Eliminar Examenes", tab: 38, icons: [{ icon: faFolderMinus }], label: "Folio" },
                 ];
                 return items
                   .filter((item) => tieneVista(item.vista))
@@ -569,7 +570,7 @@ const TabComponent = () => {
               35: { title: "Ficha Interconsulta", child: <FichaInterconsulta /> },
               36: { title: "Uso de Respiradores", child: <UsoRespiradores /> },
               37: { title: "Poderosa", child: <PoderosaTabSelector tieneVista={tieneVista} /> },
-              38: { title: "Eliminar Examenes", child: <EliminarExamenes /> },
+              38: { title: "Folio", child: <Folio /> },
             };
             const section = displayedInterfaces[activeTab];
             return section ? (
