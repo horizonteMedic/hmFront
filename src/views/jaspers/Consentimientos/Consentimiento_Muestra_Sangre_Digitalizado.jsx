@@ -1,8 +1,8 @@
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import CabeceraLogo from "../components/CabeceraLogo.jsx";
 import footerTR from "../components/footerTR.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
+import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
 
 export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
   const doc = new jsPDF();
@@ -53,41 +53,39 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
 
   drawHeader();
 
-  // Carga de imágenes (huella, firma, sello)
-  const digitalizacion = datos.digitalizacion || [];
-  const huella = digitalizacion.find(d => d.nombreDigitalizacion === "HUELLA");
-  const firma  = digitalizacion.find(d => d.nombreDigitalizacion === "FIRMAP");
-  const sello  = digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  const isValid = url => url && url !== "Sin registro";
-  const loadImg = src =>
-    new Promise((res, rej) => {
-      const img = new Image();
-      img.src = src; img.crossOrigin = 'anonymous';
-      img.onload  = () => res(img);
-      img.onerror = () => rej(`No se pudo cargar ${src}`);
-    });
-
-  Promise.all([
-    isValid(huella?.url) ? loadImg(huella.url) : Promise.resolve(null),
-    isValid(firma?.url)  ? loadImg(firma.url)  : Promise.resolve(null),
-    isValid(sello?.url)  ? loadImg(sello.url)  : Promise.resolve(null)
-  ]).then(([huellap, firmap, sellop]) => {
+  // Contenido del documento
 
     const margin = 15;
     let y        = 44;
+    // ─── 1) TÍTULO CON SUBRAYADO (más fino y más compacto) ─────
+    doc.setFont('helvetica', 'bold').setFontSize(13);
 
-    // ─── 1) TÍTULO CON SUBRAYADO ─────────────────────────
-    const titulo = 'CONSENTIMIENTO INFORMADO PARA LA TOMA DE MUESTRA DE SANGRE';
-    doc.setFont('helvetica','bold').setFontSize(14);
-    doc.text(titulo, pageW/2, y, { align:'center' });
-    // Subrayado (línea recta debajo del título)
-    const wT = doc.getTextWidth(titulo);
-    const xT = (pageW - wT) / 2;
-    doc.setLineWidth(0.7);
-    doc.line(xT, y + 2, xT + wT, y + 2);
-    doc.setLineWidth(0.2);
+    // Primera línea del título
+    const titulo1 = 'CONSENTIMIENTO INFORMADO PARA LA';
+    doc.text(titulo1, pageW / 2, y, { align: 'center' });
 
-    y += 18;
+    const wT1 = doc.getTextWidth(titulo1);
+    const xT1 = (pageW - wT1) / 2;
+
+    // Línea muy fina (0.4 pt) y muy cerca del texto
+    doc.setLineWidth(0.4);
+    doc.line(xT1, y + 1, xT1 + wT1, y + 1);   // solo 1 mm debajo del texto
+
+    y += 8;   // menos espacio entre las dos líneas del título
+
+    // Segunda línea del título
+    const titulo2 = 'TOMA DE MUESTRA DE SANGRE';
+    doc.text(titulo2, pageW / 2, y, { align: 'center' });
+
+    const wT2 = doc.getTextWidth(titulo2);
+    const xT2 = (pageW - wT2) / 2;
+
+    doc.setLineWidth(0.4);                     // línea fina también aquí
+    doc.line(xT2, y + 1, xT2 + wT2, y + 1);   // pegada al texto
+
+    // Espacio final mucho más reducido antes del siguiente bloque
+    y += 20;   // antes tenías 18, ahora solo 12 (ajusta a gusto: 10-14 queda bien)
+
     doc.setFontSize(11);
 
     // ─── 2) PREPARAR DATOS Y TEXTO ────────────────────
@@ -118,7 +116,6 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
       let lineas = [];
       let lineaActual = [];
       let anchoActual = 0;
-      let espacio = doc.getTextWidth(' ');
       let i = 0;
       while (i < bloques.length) {
         let bloque = bloques[i];
@@ -182,189 +179,33 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
     y = yL + 3;
 
     // ─── 4) FECHA ─────────────────────────────────────
-    doc.setFont('helvetica','normal').setFontSize(10);
-    if (datos.fecha) {
-      const f = new Date(datos.fecha);
-      const dia = f.getDate();
-      const mes = f.getMonth();
-      const anio = f.getFullYear();
-      const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-      const rightMargin = 20;
-      doc.text(`${datos.fecha}`, pageW - rightMargin, y, { align: 'right' });
-    }
-    y += 15;
+    // doc.setFont('helvetica','normal').setFontSize(10);
+    // if (datos.fecha) {
+    //   const rightMargin = 20;
+    //   doc.text(`${datos.fecha}`, pageW - rightMargin, y, { align: 'right' });
+    // }
+    // y += 15;
 
     // ─── 5) FIRMA Y HUELLA DEL PACIENTE, FIRMA Y SELLO DEL PROFESIONAL ────────────────────
-    const baseY = y + 50;
-    const firmaY = baseY + 3;
+    const baseY = y + 70;
 
-    // Verificar si hay sello del médico para decidir el layout
-    const tieneSelloMedico = sellop !== null;
+    // Usar helper para dibujar firmas
+    dibujarFirmas({ doc, datos, y: baseY, pageW }).then(() => {
+      footerTR(doc, datos);
 
-    if (tieneSelloMedico) {
-      // === LAYOUT CON DOS COLUMNAS (Paciente y Médico) ===
-      const anchoColumna = 60;
-      const espacioEntreColumnas = 20;
-      const totalAncho = (anchoColumna * 2) + espacioEntreColumnas;
-      const inicioX = (pageW - totalAncho) / 2;
-      
-      // === COLUMNA 1: FIRMA Y HUELLA DEL PACIENTE ===
-      const centroColumna1X = inicioX + (anchoColumna / 2);
-      
-      // Altura máxima para alinear ambas secciones (usar la del sello del médico)
-      const alturaMaxima = 28;
-      
-      // Agregar firma del paciente (izquierda)
-      if (firmap) {
-        try {
-          const imgWidth = 30;
-          const imgHeight = 20;
-          const x = centroColumna1X - 20;
-          const canvas = document.createElement('canvas');
-          canvas.width = firmap.width;
-          canvas.height = firmap.height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(firmap, 0, 0);
-          const firmaBase64 = canvas.toDataURL('image/png');
-          doc.addImage(firmaBase64, 'PNG', x, firmaY, imgWidth, imgHeight);
-        } catch (error) {
-          console.log("Error cargando firma del paciente:", error);
-        }
-      }
-      
-      // Agregar huella del paciente (derecha de la firma)
-      if (huellap) {
-        try {
-          const imgWidth = 12;
-          const imgHeight = 20;
-          const x = centroColumna1X + 10;
-          const canvas = document.createElement('canvas');
-          canvas.width = huellap.width;
-          canvas.height = huellap.height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(huellap, 0, 0);
-          const huellaBase64 = canvas.toDataURL('image/png');
-          doc.addImage(huellaBase64, 'PNG', x, firmaY, imgWidth, imgHeight);
-        } catch (error) {
-          console.log("Error cargando huella del paciente:", error);
-        }
-      }
-      
-      // Línea de firma debajo de las imágenes (alineada con la del médico)
-      const lineY = firmaY + alturaMaxima + 3; // Misma altura que la del médico
-      doc.setLineWidth(0.2);
-      doc.line(centroColumna1X - 30, lineY, centroColumna1X + 30, lineY);
-      
-      // Texto "Firma y Huella del Paciente" centrado
-      doc.setFont('helvetica', 'normal').setFontSize(9);
-      doc.text("Firma y Huella del Paciente", centroColumna1X, lineY + 6, { align: "center" });
-
-      // === COLUMNA 2: FIRMA Y SELLO DEL PROFESIONAL ===
-      const centroColumna2X = inicioX + anchoColumna + espacioEntreColumnas + (anchoColumna / 2);
-      
-      // Agregar sello y firma del profesional
-      if (sellop) {
-        try {
-          const sigW = 55;
-          const sigH = alturaMaxima;
-          const sigX = centroColumna2X - sigW / 2;
-          const sigY = firmaY;
-
-          const maxImgW = sigW - 5;
-          const maxImgH = sigH - 5;
-          let imgW = sellop.width;
-          let imgH = sellop.height;
-          const scaleW = maxImgW / imgW;
-          const scaleH = maxImgH / imgH;
-          const scale = Math.min(scaleW, scaleH, 1);
-          imgW *= scale;
-          imgH *= scale;
-          const imgX = sigX + (sigW - imgW) / 2;
-          const imgY = sigY + (sigH - imgH) / 2;
-
-          const canvas = document.createElement('canvas');
-          canvas.width = sellop.width;
-          canvas.height = sellop.height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(sellop, 0, 0);
-          const selloBase64 = canvas.toDataURL('image/png');
-          doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-        } catch (error) {
-          console.log("Error cargando sello del profesional:", error);
-        }
-      }
-      
-      // Línea de firma debajo de la imagen (alineada con la del paciente)
-      doc.setLineWidth(0.2);
-      doc.line(centroColumna2X - 30, lineY, centroColumna2X + 30, lineY);
-      
-      // Texto "Sello y Firma del Médico" y "Responsable de la Evaluación"
-      doc.setFont('helvetica', 'normal').setFontSize(9);
-      doc.text("Sello y Firma del Médico", centroColumna2X, lineY + 6, { align: "center" });
-      doc.text("Responsable de la Evaluación", centroColumna2X, lineY + 10, { align: "center" });
-    } else {
-      // === LAYOUT CON UNA SOLA COLUMNA CENTRADA (Solo Paciente) ===
-      const centroColumnaX = pageW / 2;
-      
-      // Agregar firma del paciente (izquierda)
-      if (firmap) {
-        try {
-          const imgWidth = 30;
-          const imgHeight = 20;
-          const x = centroColumnaX - 20;
-          const canvas = document.createElement('canvas');
-          canvas.width = firmap.width;
-          canvas.height = firmap.height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(firmap, 0, 0);
-          const firmaBase64 = canvas.toDataURL('image/png');
-          doc.addImage(firmaBase64, 'PNG', x, firmaY, imgWidth, imgHeight);
-        } catch (error) {
-          console.log("Error cargando firma del paciente:", error);
-        }
-      }
-      
-      // Agregar huella del paciente (derecha de la firma)
-      if (huellap) {
-        try {
-          const imgWidth = 12;
-          const imgHeight = 20;
-          const x = centroColumnaX + 10;
-          const canvas = document.createElement('canvas');
-          canvas.width = huellap.width;
-          canvas.height = huellap.height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(huellap, 0, 0);
-          const huellaBase64 = canvas.toDataURL('image/png');
-          doc.addImage(huellaBase64, 'PNG', x, firmaY, imgWidth, imgHeight);
-        } catch (error) {
-          console.log("Error cargando huella del paciente:", error);
-        }
-      }
-      
-      // Línea de firma debajo de las imágenes
-      const lineYP = firmaY + 22;
-      doc.setLineWidth(0.2);
-      doc.line(centroColumnaX - 30, lineYP, centroColumnaX + 30, lineYP);
-      
-      // Texto "Firma y Huella del Paciente" centrado
-      doc.setFont('helvetica', 'normal').setFontSize(9);
-      doc.text("Firma y Huella del Paciente", centroColumnaX, lineYP + 6, { align: "center" });
-    }
-
-    footerTR(doc, datos);
-
-    // ─── 6) Imprimir ───────────────────────────────────
-    const blob = doc.output("blob");
-    const url  = URL.createObjectURL(blob);
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    iframe.onload = () => {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
-
-  });
+      // ─── 6) Imprimir ───────────────────────────────────
+      const blob = doc.output("blob");
+      const url  = URL.createObjectURL(blob);
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = url;
+      document.body.appendChild(iframe);
+      iframe.onload = () => {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      };
+    }).catch(err => {
+      console.error(err);
+      alert('Error generando PDF: ' + err);
+    });
 }

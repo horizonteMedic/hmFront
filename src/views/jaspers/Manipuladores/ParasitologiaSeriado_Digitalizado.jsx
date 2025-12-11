@@ -284,12 +284,6 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
   const sello2 = digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
   const isValidUrl = url => url && url !== "Sin registro";
   
-  // Función para extraer el nombre del profesional de la URL
-  const extraerNombreProfesional = (url) => {
-    if (!url) return null;
-    const match = url.match(/Firma_([^._]+)/);
-    return match ? match[1] : null;
-  };
   const loadImg = src =>
     new Promise((res, rej) => {
       const img = new Image();
@@ -302,11 +296,6 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
-    // Extraer nombres de profesionales de las URLs
-    const nombreProf1 = sello1?.url ? extraerNombreProfesional(sello1.url) : null;
-    const nombreProf2 = sello2?.url ? extraerNombreProfesional(sello2.url) : null;
-    const tieneNombreProfesional = nombreProf1 || nombreProf2;
-    
     // Función auxiliar para agregar sello al PDF
     const agregarSello = (img, xPos, yPos, width, height) => {
       if (!img) return;
@@ -320,20 +309,24 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
     };
     
     // Función auxiliar para dibujar línea y texto debajo del sello
-    const dibujarLineaYTexto = (centroX, lineY, tieneNombre) => {
+    const dibujarLineaYTexto = (centroX, lineY, tipoSello) => {
       doc.setLineWidth(0.2);
       doc.line(centroX - 25, lineY, centroX + 25, lineY);
       doc.setFont('helvetica', 'normal').setFontSize(9);
-      if (tieneNombre) {
-        doc.text("Sello y Firma del Médico", centroX, lineY + 5, { align: "center" });
+      if (tipoSello === 'SELLOFIRMA') {
+        // SELLOFIRMA: Firma y Sello del Profesional / Responsable de la Evaluación
+        doc.text("Firma y Sello del Profesional", centroX, lineY + 5, { align: "center" });
         doc.text("Responsable de la Evaluación", centroX, lineY + 8, { align: "center" });
+      } else if (tipoSello === 'SELLOFIRMADOCASIG') {
+        // SELLOFIRMADOCASIG: Firma y Sello Médico Asignado
+        doc.text("Firma y Sello Médico Asignado", centroX, lineY + 5, { align: "center" });
       } else {
-        doc.text("Sello y Firma", centroX, lineY + 5, { align: "center" });
+        doc.text("Firma y Sello", centroX, lineY + 5, { align: "center" });
       }
     };
     
     // Función auxiliar para dibujar sellos (uno o dos)
-    const dibujarSellos = (sello1, sello2, sigW, sigH, sigY, lineY, nombreProf1, nombreProf2, tieneNombre) => {
+    const dibujarSellos = (sello1, sello2, sigW, sigH, sigY, lineY) => {
       if (sello1 && sello2) {
         // Dos sellos lado a lado
         const gap = 16;
@@ -345,18 +338,18 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
         
         const centroSello1X = startX + sigW / 2;
         const centroSello2X = startX + sigW + gap + sigW / 2;
-        dibujarLineaYTexto(centroSello1X, lineY, tieneNombre);
-        dibujarLineaYTexto(centroSello2X, lineY, tieneNombre);
+        dibujarLineaYTexto(centroSello1X, lineY, 'SELLOFIRMA');
+        dibujarLineaYTexto(centroSello2X, lineY, 'SELLOFIRMADOCASIG');
       } else if (sello1) {
         // Un solo sello centrado
         const imgX = (pageW - sigW) / 2;
         agregarSello(sello1, imgX, sigY, sigW, sigH);
-        dibujarLineaYTexto(pageW / 2, lineY, nombreProf1);
+        dibujarLineaYTexto(pageW / 2, lineY, 'SELLOFIRMA');
       } else if (sello2) {
         // Un solo sello centrado
         const imgX = (pageW - sigW) / 2;
         agregarSello(sello2, imgX, sigY, sigW, sigH);
-        dibujarLineaYTexto(pageW / 2, lineY, nombreProf2);
+        dibujarLineaYTexto(pageW / 2, lineY, 'SELLOFIRMADOCASIG');
       }
     };
     
@@ -442,11 +435,10 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
    // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
     const sigW = 48;
     const sigH = 20;
-    // Ajustar posición: subir más cuando hay texto adicional para evitar pisar el footer
-    const sigY = tieneNombreProfesional ? y + 4 : y + 12;
+    const sigY = y + 12;
     const lineY = sigY + sigH + 3;
     
-    dibujarSellos(s1, s2, sigW, sigH, sigY, lineY, nombreProf1, nombreProf2, tieneNombreProfesional);
+    dibujarSellos(s1, s2, sigW, sigH, sigY, lineY);
     
     // === FOOTER PRIMERA PÁGINA ===
     footerTR(doc, { ...datosFinales, footerOffsetY: 8 });
@@ -528,7 +520,7 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
     const sigY2 = y + 12;
     const lineY2 = sigY2 + sigH2 + 3;
     
-    dibujarSellos(s1, s2, sigW2, sigH2, sigY2, lineY2, nombreProf1, nombreProf2, tieneNombreProfesional);
+    dibujarSellos(s1, s2, sigW2, sigH2, sigY2, lineY2);
 
   // Footer de segunda página
   footerTR(doc, { ...datosFinales, footerOffsetY: 8 });
