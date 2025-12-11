@@ -1381,7 +1381,7 @@ export default function B_FichaDetencionSAS2(data = {}) {
   doc.text("P. Diastólica :", tablaExamenInicioX + 52, yTextoExamen + 1);
   doc.text(datosFinales.presionDiastolica + " mmHg.", tablaExamenInicioX + 70, yTextoExamen + 1);
 
-  doc.text("HTA:", tablaExamenInicioX + 112, yTextoExamen + 1);
+  doc.text("HTA NUEVA:", tablaExamenInicioX + 112, yTextoExamen + 1);
   const htaNueva = datosFinales.htaNueva;
   const htaNuevaSiTexto = crearCheckboxFijo(htaNueva, "Si");
   const htaNuevaNoTexto = crearCheckboxFijo(!htaNueva, "No");
