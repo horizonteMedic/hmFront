@@ -1,4 +1,4 @@
-import { faCandyCane, faCrown, faFilter, faFlask, faGlassWater, faLungs } from "@fortawesome/free-solid-svg-icons";
+import { faCandyCane, faCrown, faFlask, faGlassWater, faHandHoldingDroplet, faKiwiBird, faLungs } from "@fortawesome/free-solid-svg-icons";
 import SubTabSelector from "../../../../../components/reusableComponents/SubTabSelector";
 import AcidoUrico from "./AcidoUrico/AcidoUrico";
 import PerfilHepatico from "./PerfilHepatico/PerfilHepatico";
@@ -21,21 +21,21 @@ export default function AnalisisBioquimicosSubTabSelector({ tieneVista }) {
       id: 1,
       permission: "Perfil Renal",
       label: "Perfil Renal",
-      icon: faFlask,
+      icon: faLungs,
       component: PerfilRenal
     },
     {
       id: 2,
       permission: "Acido Urico",
       label: "Ácido Úrico",
-      icon: faFilter,
+      icon: faHandHoldingDroplet,
       component: AcidoUrico
     },
     {
       id: 3,
       permission: "Perfil Hepatico",
       label: "Perfil Hepático",
-      icon: faLungs,
+      icon: faKiwiBird,
       component: PerfilHepatico
     },
     {

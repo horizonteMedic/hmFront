@@ -24,7 +24,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
-            fecha: res.fechaExamen,
+            fecha: res.fecha,
 
             nombreExamen: res.nombreExamen ?? "",
             dni: res.dni ?? "",
@@ -57,8 +57,9 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
 
     const body = {
         norden: form.norden,
-        fechaExamen: form.fecha,
+        fecha: form.fecha,
         userRegistro: user,
+        //AGREGAR
 
         usuarioFirma: form.user_medicoFirma,
     };
@@ -70,7 +71,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
 
 export const PrintHojaR = (nro, token, tabla) => {
     const jasperModules = import.meta.glob(
-        "../../../../../../jaspers/Inmunologia/*.jsx"
+        "../../../../../../jaspers/AnalisisBioquimicos/*.jsx"
     );
     PrintHojaRDefault(
         nro,
@@ -79,7 +80,7 @@ export const PrintHojaR = (nro, token, tabla) => {
         null,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../../jaspers/Inmunologia"
+        "../../../../../../jaspers/AnalisisBioquimicos"
     );
 };
 
@@ -99,7 +100,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             GetInfoServicio(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de Examen de Orina",
+                    "Este paciente ya cuenta con registros de Trastorno de Personalidad",
                     "warning"
                 );
             });

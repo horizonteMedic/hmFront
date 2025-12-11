@@ -1,7 +1,8 @@
 import SubTabSelector from '../../../../../components/reusableComponents/SubTabSelector';
 import Coproparasitologia from './Coproparasitologia/Coproparasitologia';
 import Coprocultivo from './Coprocultivo/Coprocultivo';
-import { faPrescriptionBottle, faSpider } from '@fortawesome/free-solid-svg-icons';
+import { faDroplet, faPrescriptionBottle, faSpider } from '@fortawesome/free-solid-svg-icons';
+import ExamenOrina from './ExamenOrina/ExamenOrina';
 
 export default function ManipuladoresSubTabSelector({ tieneVista }) {
   const tabsConfig = [
@@ -18,6 +19,13 @@ export default function ManipuladoresSubTabSelector({ tieneVista }) {
       permission: 'Parasitología',
       icon: faSpider,
       component: Coproparasitologia
+    },
+    {
+      id: 2,
+      label: 'Examen de Orina',
+      permission: 'Examen Orina',
+      icon: faDroplet,
+      component: ExamenOrina
     }
   ];
 

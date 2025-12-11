@@ -9,10 +9,18 @@ import {
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
-const obtenerReporteUrl = "";
-const registrarUrl = "";
+const obtenerReporteUrl =
+    "";
+const registrarUrl =
+    "";
 
-export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
+export const GetInfoServicio = async (
+    nro,
+    tabla,
+    set,
+    token,
+    onFinish = () => { }
+) => {
     const res = await GetInfoServicioDefault(
         nro,
         tabla,
@@ -24,7 +32,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
-            fecha: res.fechaExamen,
+            fecha: res.fecha,
 
             nombreExamen: res.nombreExamen ?? "",
             dni: res.dni ?? "",
@@ -42,14 +50,20 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             ocupacion: res.ocupacionPaciente,
             cargoDesempenar: res.cargoPaciente,
 
-            //AGREGAR
+
 
             user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
 
-export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
+export const SubmitDataService = async (
+    form,
+    token,
+    user,
+    limpiar,
+    tabla
+) => {
     if (!form.norden) {
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
@@ -57,8 +71,9 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
 
     const body = {
         norden: form.norden,
-        fechaExamen: form.fecha,
-        userRegistro: user,
+        fecha: form.fecha,
+
+        user_registro: user,
 
         usuarioFirma: form.user_medicoFirma,
     };
@@ -70,7 +85,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
 
 export const PrintHojaR = (nro, token, tabla) => {
     const jasperModules = import.meta.glob(
-        "../../../../../../jaspers/Inmunologia/*.jsx"
+        "../../../../../../jaspers/Manipuladores/*.jsx"
     );
     PrintHojaRDefault(
         nro,
@@ -79,7 +94,7 @@ export const PrintHojaR = (nro, token, tabla) => {
         null,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../../jaspers/Inmunologia"
+        "../../../../../../jaspers/Manipuladores"
     );
 };
 
@@ -91,15 +106,13 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         set,
         sede,
         () => {
-            //NO Tiene registro
             GetInfoPac(nro, set, token, sede);
         },
         () => {
-            //Tiene registro
             GetInfoServicio(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de Examen de Orina",
+                    "Este paciente ya cuenta con registros de Prueva Thevenon",
                     "warning"
                 );
             });

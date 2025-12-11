@@ -6,13 +6,21 @@ import {
     PrintHojaRDefault,
     SubmitDataServiceDefault,
     VerifyTRDefault,
-} from "../../../../../../utils/functionUtils";
-import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
+} from "../../../../utils/functionUtils";
+import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 
-const obtenerReporteUrl = "";
-const registrarUrl = "";
+const obtenerReporteUrl =
+    "";
+const registrarUrl =
+    "";
 
-export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
+export const GetInfoServicio = async (
+    nro,
+    tabla,
+    set,
+    token,
+    onFinish = () => { }
+) => {
     const res = await GetInfoServicioDefault(
         nro,
         tabla,
@@ -24,7 +32,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
-            fecha: res.fechaExamen,
+            fecha: res.fecha,
 
             nombreExamen: res.nombreExamen ?? "",
             dni: res.dni ?? "",
@@ -42,44 +50,50 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             ocupacion: res.ocupacionPaciente,
             cargoDesempenar: res.cargoPaciente,
 
-            //AGREGAR
-
-            user_medicoFirma: res.usuarioFirma,
+            //agregar
         }));
     }
 };
 
-export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
+export const SubmitDataService = async (
+    form,
+    token,
+    user,
+    limpiar,
+    tabla,
+    datosFooter
+) => {
     if (!form.norden) {
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
     }
-
+    if (form.esApto === undefined || form.esApto === null) {
+        await Swal.fire("Error", "Debe marcar aptitud", "error");
+        return;
+    }
     const body = {
         norden: form.norden,
-        fechaExamen: form.fecha,
-        userRegistro: user,
+        fecha: form.fecha,
 
-        usuarioFirma: form.user_medicoFirma,
+        //agregar
+        usuarioRegistro: user,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden, token, tabla);
+        PrintHojaR(form.norden, token, tabla, datosFooter);
     });
 };
 
-export const PrintHojaR = (nro, token, tabla) => {
-    const jasperModules = import.meta.glob(
-        "../../../../../../jaspers/Inmunologia/*.jsx"
-    );
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformePsicologicoADECO/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
         tabla,
-        null,
+        datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../../jaspers/Inmunologia"
+        "../../../../../../jaspers/ModuloPsicologia/InformePsicologicoADECO"
     );
 };
 
@@ -99,7 +113,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             GetInfoServicio(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de Examen de Orina",
+                    "Este paciente ya cuenta con registros de Altura 1.8.",
                     "warning"
                 );
             });
