@@ -58,12 +58,12 @@ export default function InformePsicolaboral() {
     comprensionVerbal: "",
 
     // ASPECTOS PERSONALIDAD
-    estabilidadEmocional: "", // B, NPB, NP, NPA, A
-    toleranciaFrustracion: "",
-    autoestima: "",
-    asertividad: "",
-    ansiedadEstado: "",
-    ansiedadRasgo: "",
+    estabilidadEmocional: "NP", // B, NPB, NP, NPA, A
+    toleranciaFrustracion: "NP",
+    autoestima: "NP",
+    asertividad: "NP",
+    ansiedadEstado: "NPB",
+    ansiedadRasgo: "NPB",
 
     // ====================== CRITERIOS PSICOLÓGICOS II ======================
     // ASPECTOS CONDUCTUALES

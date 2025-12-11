@@ -54,10 +54,10 @@ export default function AlturaPsicologica() {
     orientacionEspacial: "",
 
     // Aspectos de Personalidad
-    estabilidad: "",
-    ansiedadTendencias: "",
-    consumoAlcohol: "",
-    fobiaAltura: "",
+    estabilidad: "ESTABLE",
+    ansiedadTendencias: "NO CASO",
+    consumoAlcohol: "NO CASO",
+    fobiaAltura: "NADA",
 
     // Analisis y recomendaciones
     analisisResultados: "",
