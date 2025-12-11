@@ -220,7 +220,8 @@ export default function LHepatitisC_Digitalizado(datos) {
   doc.text(`Hepatitis C (VHC) - ${datos.txtMarca || ''}`, 15, yTable);
   
   // Convertir resultado a Positivo/Negativo
-  const resultadoHepatitisC = datos.txtHepatitisc || datos.txtHepatitisC || '';
+  // El campo correcto es 'hepatitisc' (sin prefijo txt)
+  const resultadoHepatitisC = datos.hepatitisc || '';
   let resultadoTexto = '';
   if (resultadoHepatitisC) {
     const resultadoLower = String(resultadoHepatitisC).toLowerCase().trim();
