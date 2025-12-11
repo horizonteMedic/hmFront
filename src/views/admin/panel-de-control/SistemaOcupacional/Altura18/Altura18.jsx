@@ -23,7 +23,7 @@ export default function Altura18() {
         norden: "",
         fecha: today,
         nombreExamen: "",
-        examen: "",
+        examen: "PRIMERA ACTITUD",
         aniosExperiencia: "",
 
         dni: "",
@@ -41,6 +41,88 @@ export default function Altura18() {
         contrata: "",
         ocupacion: "",
         cargoDesempenar: "",
+
+        //Antecedentes del Registro Médico
+        miedoAlturas: "NO",
+        epilepsiaa: "NO",
+        alcoholismo: "NO",
+        enfermedadPsiquiatrica: "NO",
+        diabetesNoControlada: "NO",
+        migrañaNoControlada: "NO",
+
+        insuficienciaCardiaca: "NO",
+        asma: "NO",
+        hipertensionNoControlada: "NO",
+        hipoacusia: "NO",
+        alteracionVisual: "NO",
+        noAptoAltura: "NO",
+
+        comentarios: "",
+
+        //Antecedentes de la Entrevista con el Paciente
+        resfriado: "NO",
+        epilepsia: "NO",
+
+        alcohol24h: "NO",
+        frecuenciaCefaleas: "NO",
+
+        medicinasTomando: "",
+
+        //Examen Físico
+        limitacionFuerzaMovilidad: "NO",
+        alteracionEquilibrio: "NO",
+        anormalidadMarcha: "NO",
+        anormalidadFuerzaMiembros: "NO",
+        lenguajeAnormal: "NO",
+        alteracionCoordinacion: "NO",
+        nistagmus: "NO",
+        anormalidadMovOculares: "NO",
+        pupilasCIRLA: "SI",
+        asimetriaFacial: "NO",
+        hallazgoHombro: "NO",
+        hallazgoCodo: "NO",
+        hallazgoRodilla: "NO",
+        hallazgoTobillo: "NO",
+        otrosHallazgosMusculoEsqueleticos: "NO",
+
+        hallazgosAnormales: "",
+
+        //Conclusión
+        apto18: "SI",
+        usoPermanenteLentesCorrectores: "NO",
+        usoPermanenteAudifonos: "NO",
+
+        otraRestriccion: "",
+
+        //oftalmo
+        vcOD: "",
+        vlOD: "",
+        vcOI: "",
+        vlOI: "",
+
+        vcCorregidaOD: "",
+        vlCorregidaOD: "",
+        vcCorregidaOI: "",
+        vlCorregidaOI: "",
+
+        vclrs: "",
+        vb: "",
+        rp: "",
+        enfermedadesOculares: "",
+
+        //Altura
+        alturaLabor: "",
+        alturaPara: "",
+
+        frecuenciaCardiaca: "",
+        frecuenciaRespiratoria: "",
+        saturacionO2: "",
+        talla: "",
+        peso: "",
+        imc: "",
+        presionArterial: "",
+
+        observacionesYRecomendaciones: "",
 
         // Recomendaciones específicas
         sobrepesoObesidadHipocalorica: false,
@@ -149,7 +231,7 @@ export default function Altura18() {
                     <RadioTable
                         items={[
                             { name: "miedoAlturas", label: "Tiene fobia (miedo) a las alturas" },
-                            { name: "epilepsia", label: "Epilepsia/convulsiones u otra enfermedad que condiciona pérdida de conciencia" },
+                            { name: "epilepsiaa", label: "Epilepsia/convulsiones u otra enfermedad que condiciona pérdida de conciencia" },
                             { name: "alcoholismo", label: "Alcoholismo o abuso de sustancias (adicción)" },
                             { name: "enfermedadPsiquiatrica", label: "Portador de enfermedad psiquiátrica o hallazgo psicológico como rasgos de ansiedad, trastornos impulsivos o compulsivos" },
                             { name: "diabetesNoControlada", label: "Diabetes mellitus o hipoglicemia no controlada" },
@@ -264,8 +346,8 @@ export default function Altura18() {
                         />
                         <InputTextArea
                             label="Hallazos Anormales en Articulaciones Específicas (Alteraciones Musculoesqueléticas)"
-                            name="medicinasTomando"
-                            value={form.medicinasTomando}
+                            name="hallazgosAnormales"
+                            value={form.hallazgosAnormales}
                             onChange={handleChange}
                             className="ml-4 mt-4"
                             rows={4}
@@ -275,7 +357,7 @@ export default function Altura18() {
                     <SectionFieldset legend="Conclusión" collapsible>
                         <RadioTable
                             items={[
-                                { name: "apto18", label: "Apto para trabajar encima de los 18 metros" },
+                                { name: "apto18", label: "Apto para trabajar encima de los 1.8 metros" },
                                 { name: "usoPermanenteLentesCorrectores", label: "Uso Permanente de Lentes Correctores" },
                                 { name: "usoPermanenteAudifonos", label: "Uso Permanente de Audífonos" },
                             ]}
