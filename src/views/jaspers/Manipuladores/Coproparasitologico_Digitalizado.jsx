@@ -165,16 +165,35 @@ export default function Coproparasitologico_Digitalizado(datos = {}) {
   const datosReales = {
     // Datos del paciente
     nombres: String(datos.nombres || datos.nombresPaciente || ""),
+    nombresPaciente: String(datos.nombres || datos.nombresPaciente || ""),
     edad: datos.edad || datos.edadPaciente || "",
+    edadPaciente: datos.edad || datos.edadPaciente || "",
     dni: datos.dni || datos.dniPaciente || "",
+    dniPaciente: datos.dni || datos.dniPaciente || "",
     fecha: datos.fecha || datos.fechaExamen || datos.fechaLab || "",
+    
+    // Datos adicionales del paciente
+    sexoPaciente: datos.sexoPaciente || "",
+    lugarNacimientoPaciente: datos.lugarNacimientoPaciente || "",
+    estadoCivilPaciente: datos.estadoCivilPaciente || "",
+    fechaNacimientoPaciente: datos.fechaNacimientoPaciente || "",
+    nivelEstudioPaciente: datos.nivelEstudioPaciente || "",
+    ocupacionPaciente: datos.ocupacionPaciente || "",
+    cargoPaciente: datos.cargoPaciente || "",
+    areaPaciente: datos.areaPaciente || "",
+    empresa: datos.empresa || "",
+    contrata: datos.contrata || "",
+    nombreExamen: datos.nombreExamen || "",
     
     // Datos de ficha
     norden: String(datos.norden || datos.numeroFicha || ""),
+    numeroFicha: String(datos.norden || datos.numeroFicha || ""),
     sede: datos.sede || datos.nombreSede || "",
+    nombreSede: datos.sede || datos.nombreSede || "",
     
     // Datos de color
     codigocolor: datos.codigoColor,
+    codigoColor: datos.codigoColor,
     textoColor: datos.textoColor,
     color: datos.color || 1,
     
