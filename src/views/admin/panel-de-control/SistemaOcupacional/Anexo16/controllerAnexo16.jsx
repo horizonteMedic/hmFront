@@ -186,7 +186,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     `${obtenerParaJasperUrl}?nOrden=${nro}&nameService=${tabla}`,
     token
   ).then(async (res) => {
-    if (res.norden) {
+    if (res.norden_n_orden) {
       const nombre = res.nameJasper;
       console.log(nombre);
       const jasperModules = import.meta.glob(
