@@ -83,8 +83,8 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
     doc.setLineWidth(0.4);                     // línea fina también aquí
     doc.line(xT2, y + 1, xT2 + wT2, y + 1);   // pegada al texto
 
-    // Espacio final mucho más reducido antes del siguiente bloque
-    y += 20;   // antes tenías 18, ahora solo 12 (ajusta a gusto: 10-14 queda bien)
+    // Espacio final antes del siguiente bloque
+    y += 12;
 
     doc.setFontSize(11);
 
@@ -94,89 +94,146 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
     const dni     = String(datos.dni      || '__________').trim();
     const empresa = String(datos.empresa  || '_________________________').trim();
 
-    // Construir bloques de texto (normales y negrita)
-    const bloques = [
-      { text: 'Yo  ', bold: false },
-      { text: nombre, bold: true },
-      { text: ', de ', bold: false },
-      { text: edad, bold: true },
-      { text: ' años de edad, identificado con DNI N° ', bold: false },
-      { text: dni, bold: true },
-      { text: '; habiendo recibido consejería e información acerca de los exámenes en sangre que se me va a realizar según solicitud del protocolo médico de la empresa ', bold: false },
-      { text: empresa, bold: true },
-      { text: '; y en pleno uso de mis facultades mentales ', bold: false },
-      { text: 'AUTORIZO', bold: true },
-      { text: ' se me tome la muestra de sangre para cumplir con los exámenes pertinentes.', bold: false },
-    ];
-    const maxWidth = pageW - 2 * margin;
-    const interlineado = 7;
+    // Usar formato con marcadores similar al otro archivo
+    const datosTexto = {
+      nombre: nombre,
+      edad: edad,
+      dni: dni,
+      empresa: empresa
+    };
 
-    // Algoritmo para armar líneas respetando bloques
-    function armarLineas(bloques, maxWidth) {
+    // Texto con marcadores para datos en negrita
+    const textoCompleto = 'Yo  {nombre}, de {edad} años de edad, identificado con DNI N° {dni}; habiendo recibido consejería e información acerca de los exámenes en sangre que se me va a realizar según solicitud del protocolo médico de la empresa {empresa}; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra de sangre para cumplir con los exámenes pertinentes.';
+    
+    const maxWidth = pageW - 2 * margin;
+
+    // Función mejorada para dibujar texto con datos en negrita
+    const dibujarTextoConSaltoLineaYBold = (textoBase, datosTexto, x, y, anchoMaximo, fontSize = 10) => {
+      if (!textoBase) return y;
+      doc.setFontSize(fontSize);
+      const interlineado = fontSize * 0.4;
+      let yPos = y;
+      
+      // Dividir el texto en partes: texto normal y datos (que van en negrita)
+      const partes = [];
+      const regex = /\{([^}]+)\}/g;
+      let lastIndex = 0;
+      let match;
+      
+      while ((match = regex.exec(textoBase)) !== null) {
+        if (match.index > lastIndex) {
+          partes.push({ tipo: 'texto', contenido: textoBase.substring(lastIndex, match.index) });
+        }
+        partes.push({ tipo: 'dato', contenido: String(datosTexto[match[1]] || '') });
+        lastIndex = regex.lastIndex;
+      }
+      
+      if (lastIndex < textoBase.length) {
+        partes.push({ tipo: 'texto', contenido: textoBase.substring(lastIndex) });
+      }
+      
+      // Si no hay marcadores, usar el texto completo como texto normal
+      if (partes.length === 0) {
+        partes.push({ tipo: 'texto', contenido: textoBase });
+      }
+      
+      // Construir líneas con datos en negrita (primero construir todas las líneas)
       let lineas = [];
       let lineaActual = [];
-      let anchoActual = 0;
-      let i = 0;
-      while (i < bloques.length) {
-        let bloque = bloques[i];
-        // Si el bloque es largo, partirlo en palabras
-        if (!bloque.bold && bloque.text.includes(' ')) {
-          let palabras = bloque.text.split(/(\s+)/);
-          for (let j = 0; j < palabras.length; j++) {
-            let palabra = palabras[j];
-            if (palabra === '') continue;
-            let anchoPalabra = doc.getTextWidth(palabra);
-            if (anchoActual + anchoPalabra > maxWidth && lineaActual.length > 0) {
-              lineas.push(lineaActual);
+      let anchoLineaActual = 0;
+      const espacioAncho = doc.getTextWidth(' ');
+      
+      partes.forEach(parte => {
+        const esDato = parte.tipo === 'dato';
+        const palabras = parte.contenido.split(' ');
+        
+        palabras.forEach(palabra => {
+          if (!palabra) return; // Saltar palabras vacías
+          
+          doc.setFont("helvetica", esDato ? "bold" : "normal");
+          const anchoPalabra = doc.getTextWidth(palabra);
+          const espacioNecesario = lineaActual.length > 0 ? espacioAncho : 0;
+          const anchoTotal = anchoLineaActual + espacioNecesario + anchoPalabra;
+          
+          // Si la palabra sola es más larga que el ancho máximo, dividirla
+          if (anchoPalabra > anchoMaximo) {
+            // Guardar línea actual si hay contenido
+            if (lineaActual.length > 0) {
+              lineas.push([...lineaActual]);
               lineaActual = [];
-              anchoActual = 0;
+              anchoLineaActual = 0;
             }
-            lineaActual.push({ text: palabra, bold: false });
-            anchoActual += anchoPalabra;
+            // Dividir palabra en caracteres
+            let palabraRestante = palabra;
+            while (palabraRestante.length > 0) {
+              let caracteres = '';
+              for (let i = 0; i < palabraRestante.length; i++) {
+                const testCaracteres = caracteres + palabraRestante[i];
+                doc.setFont("helvetica", esDato ? "bold" : "normal");
+                if (doc.getTextWidth(testCaracteres) <= anchoMaximo) {
+                  caracteres = testCaracteres;
+                } else {
+                  break;
+                }
+              }
+              if (caracteres.length === 0) {
+                caracteres = palabraRestante[0];
+              }
+              lineas.push([{ texto: caracteres, esDato: esDato }]);
+              palabraRestante = palabraRestante.substring(caracteres.length);
+            }
+          } else if (anchoTotal <= anchoMaximo) {
+            lineaActual.push({ texto: palabra, esDato: esDato });
+            anchoLineaActual = anchoTotal;
+          } else {
+            // Guardar línea actual
+            if (lineaActual.length > 0) {
+              lineas.push([...lineaActual]);
+            }
+            // Nueva línea con esta palabra
+            lineaActual = [{ texto: palabra, esDato: esDato }];
+            anchoLineaActual = anchoPalabra;
           }
-        } else {
-          // Bloque negrita o bloque sin espacios
-          let anchoBloque = doc.getTextWidth(bloque.text);
-          if (anchoActual + anchoBloque > maxWidth && lineaActual.length > 0) {
-            lineas.push(lineaActual);
-            lineaActual = [];
-            anchoActual = 0;
-          }
-          lineaActual.push(bloque);
-          anchoActual += anchoBloque;
-        }
-        i++;
-      }
-      if (lineaActual.length > 0) lineas.push(lineaActual);
-      return lineas;
-    }
-
-    // Renderizar líneas justificadas
-    let yL = y;
-    const lineas = armarLineas(bloques, maxWidth);
-    lineas.forEach((linea, idx) => {
-      // Calcular ancho total de la línea
-      const totalW = linea.reduce((sum, b) => sum + doc.getTextWidth(b.text), 0);
-      // Contar espacios para justificar
-      const espacios = linea.filter(b => !b.bold && /^\s+$/.test(b.text)).length;
-      // Espacio extra para justificar (no en la última línea)
-      const extraSpace = (idx < lineas.length - 1 && espacios > 0)
-        ? (maxWidth - totalW) / espacios
-        : 0;
-      let x = margin;
-      linea.forEach(b => {
-        doc.setFont('helvetica', b.bold ? 'bold' : 'normal');
-        doc.text(b.text, x, yL);
-        let w = doc.getTextWidth(b.text);
-        if (!b.bold && /^\s+$/.test(b.text) && extraSpace) {
-          x += w + extraSpace;
-        } else {
-          x += w;
-        }
+        });
       });
-      yL += interlineado;
-    });
-    y = yL + 3;
+      
+      // Agregar última línea
+      if (lineaActual.length > 0) {
+        lineas.push(lineaActual);
+      }
+      
+      // Dibujar líneas justificadas
+      lineas.forEach((linea, index) => {
+        const esUltimaLinea = index === lineas.length - 1;
+        const anchoTotalLinea = linea.reduce((sum, item) => {
+          doc.setFont("helvetica", item.esDato ? "bold" : "normal");
+          return sum + doc.getTextWidth(item.texto);
+        }, 0);
+        const espaciosEntreItems = linea.length - 1;
+        const espacioDisponible = anchoMaximo - anchoTotalLinea;
+        
+        // Justificar solo si no es la última línea y hay más de un item
+        const espacioExtra = (!esUltimaLinea && espaciosEntreItems > 0 && espacioDisponible > 0)
+          ? espacioDisponible / espaciosEntreItems
+          : espacioAncho;
+        
+        let xActual = x;
+        linea.forEach((item, i) => {
+          doc.setFont("helvetica", item.esDato ? "bold" : "normal");
+          doc.text(item.texto, xActual, yPos);
+          if (i < linea.length - 1) {
+            xActual += doc.getTextWidth(item.texto) + espacioExtra;
+          }
+        });
+        yPos += interlineado;
+      });
+      
+      return yPos;
+    };
+
+    // Renderizar texto con datos en negrita
+    y = dibujarTextoConSaltoLineaYBold(textoCompleto, datosTexto, margin, y, maxWidth, 10);
+    y += 5;
 
     // ─── 4) FECHA ─────────────────────────────────────
     // doc.setFont('helvetica','normal').setFontSize(10);
