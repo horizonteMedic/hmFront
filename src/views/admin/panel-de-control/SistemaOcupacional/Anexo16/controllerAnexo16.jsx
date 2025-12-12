@@ -11,7 +11,7 @@ import { getToday } from "../../../../utils/helpers";
 const registrarUrl = "/api/v01/ct/anexos/anexo16/registrarActualizarAnexo7c";
 const obtenerSimpleUrl = "/api/v01/ct/anexos/anexo16/obtenerAnexo16";
 const obtenerParaEditarUrl = "/api/v01/ct/anexos/anexo16/reporteEditarAnexo16";
-const obtenerParaJasperUrl = "/api/v01/ct/anexos/anexo16/obtenerReporte2Anexo16";
+const obtenerParaJasperUrl = "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16";
 
 const obtenerExamenesRealizadosUrl =
   "/api/v01/ct/anexos/anexo2/obtenerExamenesRealizados";
@@ -186,8 +186,8 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     `${obtenerParaJasperUrl}?nOrden=${nro}&nameService=${tabla}`,
     token
   ).then(async (res) => {
-    if (res.norden) {
-      const nombre = res.anexo16Reporte.nameJasper;
+    if (res.norden_n_orden) {
+      const nombre = res.nameJasper;
       console.log(nombre);
       const jasperModules = import.meta.glob(
         "../../../../jaspers/Anexo16/*.jsx"

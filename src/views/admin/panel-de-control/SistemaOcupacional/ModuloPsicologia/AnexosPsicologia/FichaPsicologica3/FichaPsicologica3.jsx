@@ -704,40 +704,40 @@ export default function FichaPsicologica3() {
 
     // ===== TAB: EXAMEN MENTAL =====
     // Observación de Conductas - Presentación
-    presentacion: null,
+    presentacion: "ADECUADO",
 
     // Observación de Conductas - Postura
-    postura: null,
+    postura: "ERGUIDA",
 
     // Observación de Conductas - Discurso
-    ritmo: null,
-    tono: null,
-    articulacion: null,
+    ritmo: "FLUIDO",
+    tono: "MODERADO",
+    articulacion: "SIN_DIFICULTAD",
 
     // Observación de Conductas - Orientación
-    orientacionTiempo: null,
-    orientacionEspacio: null,
-    orientacionPersona: null,
+    orientacionTiempo: "ORIENTADO",
+    orientacionEspacio: "ORIENTADO",
+    orientacionPersona: "ORIENTADO",
 
     // Observación de Conductas - Área Cognitiva
     areaCognitiva: "",
 
     // Procesos Cognitivos
-    lucidoAtento: "",
-    pensamiento: "",
-    percepcion: "",
+    lucidoAtento: "NORMOPROSEXICO",
+    pensamiento: "CONCRETO",
+    percepcion: "NIEGA ALUCINACIONES",
     memoria: null,
     inteligencia: null,
-    apetito: "",
-    sueno: "",
-    personalidad: "",
-    afectividad: "",
-    conductaSexual: "",
+    apetito: "ADECUADO",
+    sueno: "SIN DIFICULTAD",
+    personalidad: "CUENTA CON RECUERDOS PERSONALES",
+    afectividad: "EUTIMICO",
+    conductaSexual: "NORMAL",
 
     // Pruebas Psicológicas - Ptje Nombre
-    mips: false,
-    mps: false,
-    luria: false,
+    mips: true,
+    mps: true,
+    luria: true,
     eae: false,
     maslach: false,
     climaLaboral: false,
@@ -745,10 +745,10 @@ export default function FichaPsicologica3() {
     wais: false,
     benton: false,
     bender: false,
-    zungAnsiedad: false,
-    zungDepresion: false,
-    wechsler: false,
-    otrasPruebas: false,
+    zungAnsiedad: true,
+    zungDepresion: true,
+    wechsler: true,
+    otrasPruebas: true,
 
     // Pruebas Psicológicas - Área Emocional
     areaEmocional: "",
