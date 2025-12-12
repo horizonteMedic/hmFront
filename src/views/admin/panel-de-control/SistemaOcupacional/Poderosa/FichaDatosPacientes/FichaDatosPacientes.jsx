@@ -144,6 +144,7 @@ export default function FichaDatosPacientes() {
         setForm,
         handleChange,
         handleChangeNumber,
+        handleRadioButton,
         handleClear,
         handleClearnotO,
         handlePrintDefault,
@@ -255,12 +256,9 @@ export default function FichaDatosPacientes() {
     };
 
     return (
-        <div className="w-full space-y-3 px-4">
-            {/* ===== PARTE I ===== */}
-            <h2 className="text-xl font-bold text-center bg-gray-200 py-2 rounded">PARTE I</h2>
-
+        <div className=" space-y-3 p-4">
             {/* ===== SECCIÓN: N° ORDEN Y FECHA ===== */}
-            <SectionFieldset legend="Información General" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+            <SectionFieldset legend="Información General" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
                 <InputTextOneLine
                     label="N° Orden"
                     name="norden"
@@ -277,49 +275,29 @@ export default function FichaDatosPacientes() {
                     onChange={handleChange}
                     labelWidth="120px"
                 />
-                <InputTextOneLine
-                    label="Empresa"
-                    name="empresa"
-                    value={form.empresa}
-                    onChange={handleChange}
-                    labelWidth="120px"
-                />
                 <InputsRadioGroup
-                    label="Tipo Trabajador"
+                    label="Tipo de Trabajador"
                     name="tipoTrabajador"
+                    labelWidth="120px"
                     value={form.tipoTrabajador}
-                    onChange={handleChange}
+                    onChange={handleRadioButton}
                     options={tipoTrabajadorOptions}
                 />
             </SectionFieldset>
 
             {/* ===== SECCIÓN: DATOS LABORALES ===== */}
-            <SectionFieldset legend="Datos Laborales" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+            <SectionFieldset legend="Datos Laborales" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
+                <InputTextOneLine
+                    label="Empresa"
+                    name="empresa"
+                    value={form.empresa}
+                    disabled
+                    labelWidth="120px"
+                />
                 <InputTextOneLine
                     label="Cargo"
                     name="cargo"
                     value={form.cargo}
-                    onChange={handleChange}
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Código Actividad"
-                    name="codigoActividad"
-                    value={form.codigoActividad}
-                    onChange={handleChange}
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Zona"
-                    name="zona"
-                    value={form.zona}
-                    onChange={handleChange}
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Código DPTO"
-                    name="codigoDpto"
-                    value={form.codigoDpto}
                     onChange={handleChange}
                     labelWidth="120px"
                 />
@@ -343,48 +321,32 @@ export default function FichaDatosPacientes() {
                             disabled
                             labelWidth="120px"
                         />
-                        <div className="grid grid-cols-3 gap-2">
-                            <InputTextOneLine
-                                label="Día Nac."
-                                name="diaNacimiento"
-                                value={form.diaNacimiento}
-                                disabled
-                                labelWidth="60px"
-                            />
-                            <InputTextOneLine
-                                label="Mes"
-                                name="mesNacimiento"
-                                value={form.mesNacimiento}
-                                disabled
-                                labelWidth="40px"
-                            />
-                            <InputTextOneLine
-                                label="Año"
-                                name="anioNacimiento"
-                                value={form.anioNacimiento}
-                                disabled
-                                labelWidth="40px"
-                            />
-                        </div>
                         <InputTextOneLine
-                            label="Distrito Nac."
+                            label="Fecha Nacimiento"
+                            name="fechaNacimiento"
+                            value={form.fechaNacimiento}
+                            disabled
+                            labelWidth="120px"
+                        />
+                        <InputTextOneLine
+                            label="Distrito de Nacimiento"
                             name="distritoNacimiento"
                             value={form.distritoNacimiento}
-                            disabled
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
-                            label="Provincia Nac."
+                            label="Provincia de Nacimiento"
                             name="provinciaNacimiento"
                             value={form.provinciaNacimiento}
-                            disabled
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
-                            label="Depart. Nac."
+                            label="Departamento de Nacimiento"
                             name="departamentoNacimiento"
                             value={form.departamentoNacimiento}
-                            disabled
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
                     </div>
@@ -417,43 +379,43 @@ export default function FichaDatosPacientes() {
                             disabled
                             labelWidth="120px"
                         />
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-x-4">
                             <InputTextOneLine
                                 label="AFP/SNP"
                                 name="afpSnp"
                                 value={form.afpSnp}
                                 onChange={handleChange}
-                                labelWidth="80px"
+                                labelWidth="120px"
                             />
                             <InputTextOneLine
                                 label="Estatura"
                                 name="estatura"
                                 value={form.estatura}
-                                onChange={handleChange}
-                                labelWidth="80px"
+                                disabled
+                                labelWidth="120px"
                             />
                         </div>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-x-4">
                             <InputTextOneLine
                                 label="Lic.Conducir"
                                 name="licConducirNo"
                                 value={form.licConducirNo}
                                 onChange={handleChange}
-                                labelWidth="100px"
+                                labelWidth="120px"
                             />
                             <InputTextOneLine
                                 label="CUSSP No."
                                 name="cusspNo"
                                 value={form.cusspNo}
                                 onChange={handleChange}
-                                labelWidth="80px"
+                                labelWidth="120px"
                             />
                         </div>
                         <InputTextOneLine
                             label="Peso"
                             name="peso"
                             value={form.peso}
-                            onChange={handleChange}
+                            disabled
                             labelWidth="120px"
                         />
                     </div>
@@ -516,8 +478,9 @@ export default function FichaDatosPacientes() {
                             label="Tipo Vivienda"
                             name="tipoVivienda"
                             value={form.tipoVivienda}
-                            onChange={handleChange}
+                            onChange={handleRadioButton}
                             options={tipoViviendaOptions}
+                            labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="E-mail"
@@ -526,36 +489,36 @@ export default function FichaDatosPacientes() {
                             onChange={handleChange}
                             labelWidth="120px"
                         />
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-x-4">
                             <InputTextOneLine
                                 label="Radio Frec."
                                 name="radioFrec"
                                 value={form.radioFrec}
                                 onChange={handleChange}
-                                labelWidth="90px"
+                                labelWidth="120px"
                             />
                             <InputTextOneLine
                                 label="Celular"
                                 name="celular"
                                 value={form.celular}
                                 onChange={handleChange}
-                                labelWidth="70px"
+                                labelWidth="120px"
                             />
                         </div>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-x-4">
                             <InputTextOneLine
                                 label="Nº Cuenta"
                                 name="numeroCuentaAhorro"
                                 value={form.numeroCuentaAhorro}
                                 onChange={handleChange}
-                                labelWidth="90px"
+                                labelWidth="120px"
                             />
                             <InputTextOneLine
                                 label="Banco"
                                 name="banco"
                                 value={form.banco}
                                 onChange={handleChange}
-                                labelWidth="70px"
+                                labelWidth="120px"
                             />
                         </div>
                     </div>
@@ -678,9 +641,6 @@ export default function FichaDatosPacientes() {
                     />
                 </div>
             </SectionFieldset>
-
-            {/* ===== PARTE II ===== */}
-            <h2 className="text-xl font-bold text-center bg-gray-200 py-2 rounded">PARTE II</h2>
 
             {/* ===== SECCIÓN: INSTRUCCIÓN ADQUIRIDA ===== */}
             <SectionFieldset legend="Instrucción Adquirida">
@@ -969,9 +929,6 @@ export default function FichaDatosPacientes() {
                 )}
             </SectionFieldset>
 
-            {/* ===== PARTE III ===== */}
-            <h2 className="text-xl font-bold text-center bg-gray-200 py-2 rounded">PARTE III</h2>
-
             {/* ===== SECCIÓN: REFERENCIAS PERSONALES ===== */}
             <SectionFieldset legend="Referencias Personales">
                 <div className="grid grid-cols-5 gap-2 mb-3 items-end">
@@ -1084,7 +1041,7 @@ export default function FichaDatosPacientes() {
                             label="G.Sang."
                             name="grupoSanguineo"
                             value={form.grupoSanguineo}
-                            onChange={handleChange}
+                            disabled
                             labelWidth="100px"
                         />
                     </div>
