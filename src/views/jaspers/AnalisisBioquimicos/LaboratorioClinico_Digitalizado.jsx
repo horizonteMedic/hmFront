@@ -4,7 +4,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 import { convertirGenero } from "../../utils/helpers.js";
-
+import { getSign } from "../../utils/helpers.js";
 export default function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExistente = null) {
 
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -547,39 +547,39 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExis
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaFilaFirmas);
 
   // Obtener firmas disponibles
-  const sello1 = data.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  const sello2 = data.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
+  const firma1Url = getSign(data, "SELLOFIRMA");
+  const firma2Url = getSign(data, "SELLOFIRMADOCASIG");
 
-  const tieneFirma1 = sello1 && sello1.url && sello1.url !== "Sin registro";
-  const tieneFirma2 = sello2 && sello2.url && sello2.url !== "Sin registro";
+  const tieneFirma1 = firma1Url && firma1Url !== "Sin registro";
+  const tieneFirma2 = firma2Url && firma2Url !== "Sin registro";
 
   const firmasCentro = tablaInicioX + tablaAncho / 2;
   const firmasIzq = tablaInicioX + tablaAncho / 4;
   const firmasDer = tablaInicioX + (3 * tablaAncho / 4);
 
-  if (tieneFirma1 && tieneFirma2) {
+  if (firma1Url && firma2Url) {
     // 2 firmas: una izquierda, otra derecha
     try {
-      doc.addImage(sello1.url, 'PNG', firmasIzq - 22, yPos + 5, 45, 20);
+      doc.addImage(firma1Url, 'PNG', firmasIzq - 22, yPos + 5, 45, 20);
     } catch (error) {
       console.log("Error cargando firma 1:", error);
     }
     try {
-      doc.addImage(sello2.url, 'PNG', firmasDer - 22, yPos + 5, 45, 20);
+      doc.addImage(firma2Url, 'PNG', firmasDer - 22, yPos + 5, 45, 20);
     } catch (error) {
       console.log("Error cargando firma 2:", error);
     }
-  } else if (tieneFirma1) {
+  } else if (firma1Url) {
     // Solo firma 1: centrada
     try {
-      doc.addImage(sello1.url, 'PNG', firmasCentro - 22, yPos + 5, 45, 20);
+      doc.addImage(firma1Url, 'PNG', firmasCentro - 22, yPos + 5, 45, 20);
     } catch (error) {
       console.log("Error cargando firma 1:", error);
     }
-  } else if (tieneFirma2) {
+  } else if (firma2Url) {
     // Solo firma 2: centrada
     try {
-      doc.addImage(sello2.url, 'PNG', firmasCentro - 22, yPos + 5, 45, 20);
+      doc.addImage(firma2Url, 'PNG', firmasCentro - 22, yPos + 5, 45, 20);
     } catch (error) {
       console.log("Error cargando firma 2:", error);
     }
@@ -589,7 +589,12 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExis
   footerTR(doc, { footerOffsetY: 12 });
 
   // === IMPRIMIR ===
-  imprimir(doc);
+  // === Imprimir ===
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {

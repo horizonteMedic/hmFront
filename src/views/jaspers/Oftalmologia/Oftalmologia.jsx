@@ -431,7 +431,11 @@ export default function Oftalmologia(datos = {}, docExistente = null) {
   footerTR(doc, { footerOffsetY: 8 });
 
   agregarFirmas(doc, datos.digitalizacion, firmasAPintar).then(() => {
-    imprimir(doc);
+    if (docExistente) {
+      return doc;
+    } else {
+      imprimir(doc);
+    }
   });
 }
 function imprimir(doc) {

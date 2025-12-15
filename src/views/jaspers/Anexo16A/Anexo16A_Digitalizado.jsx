@@ -777,7 +777,11 @@ export default function Anexo16A_Digitalizado(data = {}, docExistente = null) {
   footerTR(doc, { footerOffsetY: 8 });
 
   // === Imprimir ===
-  imprimir(doc);
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {

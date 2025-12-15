@@ -198,7 +198,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
 
       // Ejecuta la función exportada por default con los datos
       if (typeof modulo.default === "function") {
-        modulo.default(doc, { ...res, datosFooter });
+        modulo.default({ ...res, datosFooter });
       } else {
         console.error(
           `El archivo ${nombre}.jsx no exporta una función por defecto`

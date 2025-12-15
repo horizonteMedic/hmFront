@@ -2,7 +2,7 @@ import Swal from "sweetalert2";
 import { getFetch } from "../../../getFetch/getFetch";
 import { SubmitData } from "../model";
 import jsPDF from "jspdf";
-const doc = new jsPDF();
+
 //===============Zona Modificación===============
 const obtenerReporteUrl =
   "/api/v01/ct/audiometria/obtenerInformacionAudiometriaPo";
@@ -509,7 +509,7 @@ export const PrintHojaR = (nro, token, tabla, mostrarGrafico, firmaExtra) => {
         ]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
-          modulo.default(res, mostrarGrafico, firmaExtra, doc);
+          modulo.default(res, null, mostrarGrafico, firmaExtra);
         } else {
           console.error(
             `El archivo ${nombre}.jsx no exporta una función por defecto`

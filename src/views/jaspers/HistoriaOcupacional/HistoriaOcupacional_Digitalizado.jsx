@@ -475,13 +475,16 @@ export default function HistoriaOcupacional_Digitalizado(
     // footerEnHeader(doc, datos);
 
     // === Imprimir ===
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    iframe.onload = () => iframe.contentWindow.print();
+    if (!docExistente) {
+      const blob = doc.output("blob");
+      const url = URL.createObjectURL(blob);
+      const iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      iframe.src = url;
+      document.body.appendChild(iframe);
+      iframe.onload = () => iframe.contentWindow.print();
+    }
+
     return doc;
   });
 }

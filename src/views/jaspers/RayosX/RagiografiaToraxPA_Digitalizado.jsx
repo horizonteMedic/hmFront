@@ -188,7 +188,11 @@ export default function RagiografiaToraxPA_Digitalizado(data = {}, docExistente 
   });
 
   agregarFirmas(doc, data.digitalizacion, firmasAPintar).then(() => {
-    imprimir(doc);
+    if (docExistente) {
+      return doc;
+    } else {
+      imprimir(doc);
+    }
   });
 }
 function imprimir(doc) {

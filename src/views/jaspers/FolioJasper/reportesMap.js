@@ -29,7 +29,7 @@ export const reportesMap = {
     lab_clinico: LaboratorioClinico_Digitalizado_nuevo,
     analisis_bioquimicos: AnalisisBioquimicos_Digitalizado,
     radiografia_torax: RagiografiaToraxPA_Digitalizado,
-    ficha_audiologica: FichaAudiologica_Digitalizado,
+    audiometria_po: FichaAudiologica_Digitalizado,
     informe_psicologico: InformePsicologico_Digitalizado,
     oftalmologia: Oftalmologia,
     consentimientoInformado: conInformadoOcupacional_Digitalizado

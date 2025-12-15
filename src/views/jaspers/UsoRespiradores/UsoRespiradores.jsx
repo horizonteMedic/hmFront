@@ -2156,7 +2156,12 @@ export default function UsoRespiradores(data = {}, docExistente = null) {
   footerTR(doc, { footerOffsetY: 8 });
 
   // === Imprimir ===
-  imprimir(doc);
+  // === Imprimir ===
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {

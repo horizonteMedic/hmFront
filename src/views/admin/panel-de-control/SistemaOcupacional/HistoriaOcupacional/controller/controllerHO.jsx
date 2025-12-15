@@ -2,11 +2,6 @@ import Swal from "sweetalert2";
 import { getFetch } from "../../../getFetch/getFetch.js";
 import { SubmitHistoriaOcupacional } from "../model/model.js";
 import jsPDF from "jspdf";
-const doc = new jsPDF({
-  unit: "mm",
-  format: "letter",
-  orientation: "landscape",
-});
 export const Loading = (text) => {
   Swal.fire({
     title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,
@@ -162,7 +157,7 @@ export const PrintHojaR = (nro, token, tabla) => {
         const modulo = await jasperModules[`../../../../../jaspers/HistoriaOcupacional/${nombre}.jsx`]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === 'function') {
-          modulo.default(res, doc);
+          modulo.default(res);
         } else {
           console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
         }

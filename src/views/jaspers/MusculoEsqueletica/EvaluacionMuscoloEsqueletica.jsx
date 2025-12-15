@@ -2385,7 +2385,13 @@ export default function EvaluacionMuscoloEsqueletica(data = {}, docExistente = n
   // Validar que data.informacionSede exista antes de acceder a sus propiedades
   const digitalizacion = data?.informacionSede?.digitalizacion || [];
   agregarFirmas(doc, digitalizacion, firmasAPintar).then(() => {
-    imprimir(doc);
+    // === Imprimir ===
+    console.log("docExistente", docExistente);
+    if (docExistente) {
+      return doc;
+    } else {
+      imprimir(doc);
+    }
   });
 }
 function imprimir(doc) {

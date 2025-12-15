@@ -1,11 +1,12 @@
 import jsPDF from "jspdf";
 import headerFicha from "./headers/header_FichaAudiologica_Digitalizado.jsx";
+import { getSign } from "../../utils/helpers.js";
 
 export default function FichaAudiologica_Digitalizado(
   data = {},
+  docExistente = null,
   mostrarGrafico = true,
   firmaExtra = true,
-  docExistente = null
 ) {
   const doc = docExistente || new jsPDF();
   const margin = 8;
@@ -13,6 +14,7 @@ export default function FichaAudiologica_Digitalizado(
   const usableW = pageW - 2 * margin;
   let y = 32;
 
+  // DEBUG: Ver en qué página estamos
   // 1) Header
   headerFicha(doc, data);
 
@@ -967,7 +969,7 @@ export default function FichaAudiologica_Digitalizado(
     }
   );
 
-  // Función para agregar la firma y esperar a que cargue o falle
+
   const addSello = (imagenUrl, x, y, maxw = 100) => {
     return new Promise((resolve) => {
       const img = new Image();
@@ -1022,21 +1024,26 @@ export default function FichaAudiologica_Digitalizado(
     .filter((f) => firmas[f.nombre])
     .map((f) => addSello(firmas[f.nombre], f.x, f.y, f.maxw));
 
-  Promise.all(promesasFirmas).then(() => {
+  return Promise.all(promesasFirmas).then(() => {
+
     // 4) Imprimir automáticamente
     // Dibujar el footer
     if (typeof footerFichaAudiologica === "function") {
       footerFichaAudiologica(doc);
     }
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    iframe.onload = () => {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
+    if (!docExistente) {
+      const blob = doc.output("blob");
+      const url = URL.createObjectURL(blob);
+      const iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      iframe.src = url;
+      document.body.appendChild(iframe);
+      iframe.onload = () => {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      };
+    }
+
+    return doc;
   });
 }

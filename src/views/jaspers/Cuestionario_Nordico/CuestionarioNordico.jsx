@@ -1417,14 +1417,16 @@ export default function CuestionarioNordico(datos = {}, docExistente = null) {
     });
 
 
-
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    iframe.onload = () => iframe.contentWindow.print();
+    console.log(docExistente);
+    if (!docExistente) {
+      const blob = doc.output("blob");
+      const url = URL.createObjectURL(blob);
+      const iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      iframe.src = url;
+      document.body.appendChild(iframe);
+      iframe.onload = () => iframe.contentWindow.print();
+    }
     return doc;
   })
 

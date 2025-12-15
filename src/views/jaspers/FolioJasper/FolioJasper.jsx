@@ -40,10 +40,11 @@ export default async function FolioJasper(nro, token, ListaExamenes = []) {
                     pdfFinal.internal.pageSize.height = 215.9; // letter height en mm
                 }
             }
-
+            console.log(`📄 Antes de generar: ${examen.tabla}`)
             const generarReporte = reportesMap[examen.tabla];
             if (generarReporte) {
                 await generarReporte(data, pdfFinal);
+                console.log(`✅ Después de generar: ${examen.tabla}`);
             } else {
                 console.warn("No existe generador para:", examen.tabla);
             }
@@ -55,6 +56,16 @@ export default async function FolioJasper(nro, token, ListaExamenes = []) {
             console.error("Error cargando:", examen.nombre, err);
         }
     }
-
+    imprimir(pdfFinal);
     pdfFinal.save(`Folio_${nro}.pdf`);
+}
+
+function imprimir(doc) {
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.src = url;
+    document.body.appendChild(iframe);
+    iframe.onload = () => iframe.contentWindow.print();
 }

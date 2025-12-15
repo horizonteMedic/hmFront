@@ -541,7 +541,11 @@ export default function InformePsicologico_Digitalizado(data = {}, docExistente 
   footerTR(doc, { footerOffsetY: 10 });
 
   // Imprimir
-  imprimir(doc);
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {

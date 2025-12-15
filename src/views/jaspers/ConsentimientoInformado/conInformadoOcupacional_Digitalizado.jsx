@@ -294,16 +294,19 @@ export default function conInformadoOcupacional_Digitalizado(data = {}, docExist
         footerTR(doc, data);
 
         // === 7) Generar blob y abrir en iframe para imprimir automáticamente ===
-        const blob = doc.output("blob");
-        const url = URL.createObjectURL(blob);
-        const iframe = document.createElement("iframe");
-        iframe.style.display = "none";
-        iframe.src = url;
-        document.body.appendChild(iframe);
-        iframe.onload = () => {
-            iframe.contentWindow.focus();
-            iframe.contentWindow.print();
-        };
-        return doc;
+        if (docExistente) {
+            return doc;
+        } else {
+            const blob = doc.output("blob");
+            const url = URL.createObjectURL(blob);
+            const iframe = document.createElement("iframe");
+            iframe.style.display = "none";
+            iframe.src = url;
+            document.body.appendChild(iframe);
+            iframe.onload = () => {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+            };
+        }
     });
 }

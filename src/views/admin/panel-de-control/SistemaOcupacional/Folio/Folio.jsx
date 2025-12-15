@@ -89,7 +89,7 @@ const ExamenesList = [
     {
         nombre: "FICHA AUDIOLOGICA",
         resultado: false,
-        tabla: "ficha_audiologica",
+        tabla: "audiometria_po",
         url: "/api/v01/ct/audiometria/obtenerReporteAudiometriaM"
     },
     {
