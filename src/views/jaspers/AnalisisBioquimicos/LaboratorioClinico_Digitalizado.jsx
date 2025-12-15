@@ -254,7 +254,7 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExis
     { label: "Hematocrito", value: data.txtHematocrito || "N/A", suffix: "%" },
     { label: "Hemoglobina", value: data.txtHemoglobina || "N/A", suffix: "g/dl" },
     { label: "Hematíes", value: data.txtHematiesHematologia || "N/A" },
-    { label: "V.S.G", value: data.txtVsg || "N/A" },
+    { label: "V.S.G", value: data.txtVsg || "N/A", suffix: "mm/hora" },
     { label: "Plaquetas", value: data.txtPlaquetas || "N/A", suffix: "mm³" },
   ];
 
@@ -466,8 +466,8 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExis
 
   const sedimentoItems = [
     { labelL: "Cel. Epiteliales", valueL: data.txtCelEpitelialesSu || "N/A", labelR: "Cilindros", valueR: data.txtCilindrosSu || "N/A" },
-    { labelL: "Leucocitos", valueL: data.txtLeucocitosSu || "N/A", labelR: "Bacterias", valueR: data.txtBacteriasSu || "N/A" },
-    { labelL: "Hematíes", valueL: (data.txtHematiesSu && data.txtHematiesSu !== "N/A" ? data.txtHematiesSu + " x campo" : "N/A"), labelR: "Gram S/C", valueR: data.txtPusSu || "N/A" },
+    { labelL: "Leucocitos", valueL: (data.txtLeucocitosSu && data.txtLeucocitosSu !== "N/A" ? data.txtLeucocitosSu + " X CAMPO" : "N/A"), labelR: "Bacterias", valueR: data.txtBacteriasSu || "N/A" },
+    { labelL: "Hematíes", valueL: (data.txtHematiesSu && data.txtHematiesSu !== "N/A" ? data.txtHematiesSu + " X CAMPO" : "N/A"), labelR: "Gram S/C", valueR: data.txtPusSu || "N/A" },
     { labelL: "Cristales", valueL: data.txtCristalesSu || "N/A", labelR: "Otros", valueR: data.txtOtrosSu || "N/A" },
   ];
 

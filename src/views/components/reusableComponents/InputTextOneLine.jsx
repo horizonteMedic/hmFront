@@ -25,7 +25,7 @@ export default function InputTextOneLine({
       )}
       <input
         type={type}
-        className={`border rounded px-2 py-1 w-full ${disabled ? "bg-gray-100" : ""
+        className={`border rounded px-2 py-1 w-full ${disabled ? "bg-gray-300" : ""
           } ${inputClassName}`}
         id={name}
         name={name}

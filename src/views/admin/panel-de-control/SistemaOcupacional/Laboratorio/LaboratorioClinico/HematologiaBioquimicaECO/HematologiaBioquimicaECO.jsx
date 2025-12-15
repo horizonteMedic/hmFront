@@ -364,7 +364,7 @@ export default function HematologiaBioquimicaECO() {
                   value={form[key.toLowerCase()]}
                   labelWidth="120px"
                   onChange={handleChange}
-                  onKeyUp={handleFocusNext}
+                  onKeyUp={(e) => { handleFocusNext(e, key == "Linfocitos" ? "glucosa" : "") }}
                 />
               ))}
             </div>
@@ -405,6 +405,7 @@ export default function HematologiaBioquimicaECO() {
                 value={form.glucosa}
                 labelWidth="120px"
                 onChange={handleChange}
+                onKeyUp={(e) => { handleFocusNext(e,"creatinina") }}
               />
               <div className="flex gap-4 items-center">
                 <InputCheckbox
