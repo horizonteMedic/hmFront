@@ -5,6 +5,7 @@ import { useSessionData } from "../../../../hooks/useSessionData";
 import FolioJasper from "../../../../jaspers/FolioJasper/FolioJasper";
 import { getToday } from "../../../../utils/helpers";
 import { GetInfoPac } from "./controllerFolio";
+import Swal from "sweetalert2";
 
 const tabla = "informe_psicologico";
 const today = getToday();
@@ -154,6 +155,73 @@ const Folio = () => {
             handleClearnotO();
             GetInfoPac(form.norden, setForm, token, selectedSede, ExamenesList);
             //VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        }
+    };
+
+    const handleGenerarFolio = async () => {
+        // Mostrar alerta de carga con barra de progreso
+        Swal.fire({
+            title: 'Generando Folio',
+            html: `
+                <div class="mb-4">
+                    <p class="text-gray-700 mb-2">Procesando reportes...</p>
+                    <div class="w-full bg-gray-200 rounded-full h-6 mb-2">
+                        <div id="progress-bar" class="bg-gradient-to-r from-blue-500 to-purple-600 h-6 rounded-full transition-all duration-300 flex items-center justify-center text-white text-sm font-semibold" style="width: 0%">
+                            0%
+                        </div>
+                    </div>
+                    <p id="current-report" class="text-sm text-gray-600">Iniciando...</p>
+                    <p id="report-count" class="text-xs text-gray-500 mt-1">0 de 0 reportes completados</p>
+                </div>
+            `,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        try {
+            // Función callback para actualizar el progreso
+            const updateProgress = (current, total, percentage, reportName) => {
+                const progressBar = document.getElementById('progress-bar');
+                const currentReport = document.getElementById('current-report');
+                const reportCount = document.getElementById('report-count');
+
+                if (progressBar) {
+                    progressBar.style.width = `${percentage}%`;
+                    progressBar.textContent = `${percentage}%`;
+                }
+
+                if (currentReport) {
+                    currentReport.textContent = `Generando: ${reportName}`;
+                }
+
+                if (reportCount) {
+                    reportCount.textContent = `${current} de ${total} reportes completados`;
+                }
+            };
+
+            // Llamar a FolioJasper con el callback de progreso
+            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress);
+
+            // Cerrar la alerta de carga y mostrar éxito
+            Swal.fire({
+                icon: 'success',
+                title: '¡Folio Generado!',
+                text: 'El folio se ha generado correctamente',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } catch (error) {
+            console.error('Error generando folio:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Hubo un error al generar el folio. Por favor, intenta nuevamente.',
+                confirmButtonText: 'Aceptar'
+            });
         }
     };
 
@@ -312,7 +380,7 @@ const Folio = () => {
                     </button>
                     <button
                         className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-md mt-4 text-semibold"
-                        onClick={() => { FolioJasper(form.norden, token, form.listaExamenes) }}
+                        onClick={handleGenerarFolio}
                     >
                         Generar Folio
                     </button>
