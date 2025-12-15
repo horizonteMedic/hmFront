@@ -4,9 +4,10 @@ import headerFicha from "./headers/header_FichaAudiologica_Digitalizado.jsx";
 export default function FichaAudiologica_Digitalizado(
   data = {},
   mostrarGrafico = true,
-  firmaExtra = true
+  firmaExtra = true,
+  docExistente = null
 ) {
-  const doc = new jsPDF();
+  const doc = docExistente || new jsPDF();
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
   const usableW = pageW - 2 * margin;
@@ -365,7 +366,7 @@ export default function FichaAudiologica_Digitalizado(
     `${datos.aniosTrabajo ?? "0"} Años, ${datos.txtMesesTrabajo ?? "0"} Meses`,
     xAniosTrabajo,
     yAniosTrabajo,
-    {maxWidth:12}
+    { maxWidth: 12 }
   );
   doc.setFont("helvetica", "normal").setFontSize(7);
   // Empresa Contrata
@@ -483,7 +484,7 @@ export default function FichaAudiologica_Digitalizado(
   ySint += 4.5;
   if (datos.otros) doc.text("X", xSintSI, ySint);
   else doc.text("X", xSintNO, ySint);
-  
+
   // Mostrar texto descriptivo de "Otros" si está marcado
   if (datos.otros && datos.OtrosTexto) {
     const xOtrosTexto = margin + 108;

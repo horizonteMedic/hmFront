@@ -5,8 +5,9 @@ import footerTR from '../components/footerTR.jsx';
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 import { convertirGenero } from "../../utils/helpers.js";
 
-export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExistente = null) {
+
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // === MAPEO DE DATOS ===
@@ -276,7 +277,7 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
   // Contorno exterior de la tabla
   doc.setLineWidth(0.3);
   doc.rect(tablaInicioX, yPos, tablaAncho, tableH);
-  
+
   // Línea vertical central
   doc.line(tablaInicioX + mitadTabla, yPos, tablaInicioX + mitadTabla, yPos + tableH);
 
@@ -284,15 +285,15 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
   doc.setFontSize(8);
   const centroIzq = tablaInicioX + mitadTabla / 2; // Centro de la columna izquierda
   const centroDer = tablaInicioX + mitadTabla + mitadTabla / 2; // Centro de la columna derecha
-  
+
   for (let i = 0; i < totalRows; i++) {
     const rowY = yPos + rowH * i;
-    
+
     // Columna izquierda
     if (hematoLeft[i]) {
       const { label, value, suffix } = hematoLeft[i];
       const displayValue = value + (suffix && value !== "N/A" && value !== "" ? " " + suffix : "");
-      
+
       doc.setFont("helvetica", "normal");
       doc.text(label, centroIzq - 5, rowY + 3.5, { align: "right" });
       doc.text(":", centroIzq - 3, rowY + 3.5);
@@ -304,7 +305,7 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
     if (hematoRight[i]) {
       const { label, value, suffix } = hematoRight[i];
       const displayValue = value + (suffix && value !== "N/A" && value !== "" ? " " + suffix : "");
-      
+
       doc.setFont("helvetica", "normal");
       doc.text(label, centroDer - 5, rowY + 3.5, { align: "right" });
       doc.text(":", centroDer - 3, rowY + 3.5);
@@ -362,7 +363,7 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
   const rprValue = data.chkPositivo ? "REACTIVO" : data.chkNegativo ? "NO REACTIVO" : "N/A";
   const sueroCentroIzq = tablaInicioX + mitadTabla / 2;
   const sueroCentroDer = tablaInicioX + mitadTabla + mitadTabla / 2;
-  
+
   doc.setFontSize(8);
   doc.setFont("helvetica", "normal");
   doc.text("RPR", sueroCentroIzq - 5, yPos + 3.5, { align: "right" });
@@ -480,7 +481,7 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
   sedimentoItems.forEach((item, idx) => {
     const rowY = yPos + filaAltura * idx;
     const esCristalesOtros = item.labelL === "Cristales";
-    
+
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
     doc.text(item.labelL, sedCentroIzq - 5, rowY + 3.5, { align: "right" });
@@ -531,16 +532,16 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(6.5);
   const obsLines = doc.splitTextToSize(data.txtObservacionesLb || "", tablaAncho - 4);
   const obsHeight = Math.max(filaAltura, obsLines.length * 3 + 2);
-  
+
   doc.setLineWidth(0.2);
   doc.rect(tablaInicioX, yPos, tablaAncho, obsHeight);
-  
+
   doc.text(obsLines, tablaInicioX + 2, yPos + 3.5);
   yPos += obsHeight;
 
   // === SECCIÓN 9: FIRMAS ===
   const alturaFilaFirmas = 30;
-  
+
   // Dibujar fila de firmas (sin división)
   doc.setLineWidth(0.2);
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaFilaFirmas);
@@ -548,10 +549,10 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
   // Obtener firmas disponibles
   const sello1 = data.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
   const sello2 = data.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
-  
+
   const tieneFirma1 = sello1 && sello1.url && sello1.url !== "Sin registro";
   const tieneFirma2 = sello2 && sello2.url && sello2.url !== "Sin registro";
-  
+
   const firmasCentro = tablaInicioX + tablaAncho / 2;
   const firmasIzq = tablaInicioX + tablaAncho / 4;
   const firmasDer = tablaInicioX + (3 * tablaAncho / 4);

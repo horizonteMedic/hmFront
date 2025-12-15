@@ -1,7 +1,8 @@
 import { getFetch } from "../../../getFetch/getFetch";
 import Swal from "sweetalert2";
 import { SubmitCuestionarioNordicoJS } from "./CuestionarioN";
-
+import jsPDF from "jspdf";
+const doc = new jsPDF({ unit: "mm", format: "a4" });
 const Loading = (text) => {
   Swal.fire({
     title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,

@@ -1,8 +1,8 @@
 import jsPDF from "jspdf";
 import HeaderRagiografiaToraxPA from "./Headers/header_RagiografiaToraxPA_Digitalizado.jsx";
 
-export default function RagiografiaToraxPA_Digitalizado(data = {}) {
-  const doc = new jsPDF();
+export default function RagiografiaToraxPA_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF();
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 100;
@@ -48,7 +48,7 @@ export default function RagiografiaToraxPA_Digitalizado(data = {}) {
   const tableW = pageW - 2 * (margin + 10);
   const tableY = y;
   const rowHeight = 8;
-  
+
   // Datos de la tabla
   const tablaDatos = [
     { categoria: "VÉRTICES", hallazgo: datos.vertices },
@@ -71,14 +71,14 @@ export default function RagiografiaToraxPA_Digitalizado(data = {}) {
   // Calcular la altura real de cada fila basada en el contenido
   const filasAlturas = [];
   let alturaTotal = 0;
-  
+
   tablaDatos.forEach((fila) => {
     const hallazgoW = (tableW * 0.55) - 10; // Ancho de la columna derecha
     const maxWidth = hallazgoW * 0.95; // Aumentado de 0.9 a 0.95 para más ancho
-    
+
     // Dividir texto en líneas
     const hallazgoLines = doc.splitTextToSize(fila.hallazgo, maxWidth);
-    
+
     // Calcular altura dinámica para cada fila
     const lineHeight = 4; // Altura por línea
     const minHeight = rowHeight; // Altura mínima
@@ -86,13 +86,13 @@ export default function RagiografiaToraxPA_Digitalizado(data = {}) {
       minHeight,
       hallazgoLines.length * lineHeight + 4
     );
-    
+
     filasAlturas.push({
       ...fila,
       lines: hallazgoLines,
       height: dynamicHeight
     });
-    
+
     alturaTotal += dynamicHeight;
   });
 
@@ -113,24 +113,24 @@ export default function RagiografiaToraxPA_Digitalizado(data = {}) {
   );
 
   // Dibujar filas y contenido con altura dinámica
-let currentY = tableY;
+  let currentY = tableY;
 
-filasAlturas.forEach((fila, index) => {
+  filasAlturas.forEach((fila, index) => {
     // Dibujar línea horizontal si no es la primera fila
     if (index > 0) {
-        doc.line(tableX, currentY, tableX + tableW, currentY);
+      doc.line(tableX, currentY, tableX + tableW, currentY);
     }
 
     // Categoría (columna izquierda) - CENTRADO VERTICAL PERFECTO
     doc.setFont("helvetica", "bold").setFontSize(9);
-    
+
     // Calcular posición Y exacta para centrado - SUBIDO 2 PUNTOS
     const categoriaTextHeight = 4; // Altura aproximada del texto en 9pt
     const categoriaY = currentY + (fila.height / 2) - (categoriaTextHeight / 2) + 1; // Cambiado de +2 a +0 (subido 2 puntos)
-    
+
     doc.text(fila.categoria + " :", tableX + 5, categoriaY, {
-        align: "left",
-        baseline: "top" // Usamos 'top' para mayor control
+      align: "left",
+      baseline: "top" // Usamos 'top' para mayor control
     });
 
     // Hallazgo (columna derecha)
@@ -138,38 +138,38 @@ filasAlturas.forEach((fila, index) => {
     const hallazgoX = tableX + col1Width + 5;
 
     if (fila.lines.length === 1) {
-        // Centrado vertical exacto para hallazgos de una línea - SUBIDO 2 PUNTOS
-        const hallazgoTextHeight = 4;
-        const hallazgoY = currentY + (fila.height / 2) - (hallazgoTextHeight / 2) + 1; // Cambiado de +2 a +0 (subido 2 puntos)
-        doc.text(fila.lines[0], hallazgoX, hallazgoY, {
-            align: "left",
-            baseline: "top"
-        });
+      // Centrado vertical exacto para hallazgos de una línea - SUBIDO 2 PUNTOS
+      const hallazgoTextHeight = 4;
+      const hallazgoY = currentY + (fila.height / 2) - (hallazgoTextHeight / 2) + 1; // Cambiado de +2 a +0 (subido 2 puntos)
+      doc.text(fila.lines[0], hallazgoX, hallazgoY, {
+        align: "left",
+        baseline: "top"
+      });
     } else {
-        // Múltiples líneas - alineado arriba con espaciado consistente - SUBIDO 2 PUNTOS
-        let lineY = currentY + 2; // Cambiado de +4 a +2 (subido 2 puntos)
-        fila.lines.forEach((line) => {
-            doc.text(line, hallazgoX, lineY, {
-                align: "left",
-                baseline: "top"
-            });
-            lineY += 4.5; // Espaciado ligeramente mayor entre líneas
+      // Múltiples líneas - alineado arriba con espaciado consistente - SUBIDO 2 PUNTOS
+      let lineY = currentY + 2; // Cambiado de +4 a +2 (subido 2 puntos)
+      fila.lines.forEach((line) => {
+        doc.text(line, hallazgoX, lineY, {
+          align: "left",
+          baseline: "top"
         });
+        lineY += 4.5; // Espaciado ligeramente mayor entre líneas
+      });
     }
 
     // Actualizar la posición Y para la siguiente fila
     currentY += fila.height;
-});
+  });
 
   // 5) Sección de firmas (opcional) - BLOQUE COMPLETO QUE SE MUEVE JUNTO
   y = tableY + alturaTotal + 28; // Bajado 8 puntos (de 20 a 28)
 
   // Arreglo de firmas con posición Y dinámica - IMAGEN ARRIBA
-  const firmasAPintar = [{ 
-    nombre: "SELLOFIRMA", 
-    x: 80, 
+  const firmasAPintar = [{
+    nombre: "SELLOFIRMA",
+    x: 80,
     y: y - 3, // Subido 2.5 puntos para mejor posicionamiento
-    maxw: 50 
+    maxw: 50
   }];
 
   // Línea para firma centrada - DEBAJO DE LA IMAGEN

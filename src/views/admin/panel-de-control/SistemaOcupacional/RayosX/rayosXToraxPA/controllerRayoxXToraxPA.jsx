@@ -1,6 +1,7 @@
 import Swal from "sweetalert2";
 import { getFetch, SubmitData } from "../../../../../utils/apiHelpers";
-
+import jsPDF from "jspdf";
+const doc = new jsPDF();
 //===============Zona Modificación===============
 const obtenerReporteUrl = "/api/v01/ct/rayosX/obtenerReporteRadiografiaTorax";
 const registrarUrl = "/api/v01/ct/rayosX/registrarActualizarRadiografiaTorax";
@@ -12,7 +13,7 @@ export const GetInfoServicio = (
   tabla,
   set,
   token,
-  onFinish = () => {}
+  onFinish = () => { }
 ) => {
   getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
     .then((res) => {
@@ -209,7 +210,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         ]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
-          modulo.default({ ...res, ...datosFooter });
+          modulo.default({ ...res, ...datosFooter }, doc);
         } else {
           console.error(
             `El archivo ${nombre}.jsx no exporta una función por defecto`
@@ -225,8 +226,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
 export const getInfoTabla = (nombreSearch, codigoSearch, setData, token) => {
   try {
     getFetch(
-      `/api/v01/ct/rayosX/obtenerRadiografiaToraxPorFiltros?${
-        codigoSearch == "" ? "" : `nOrden=${codigoSearch}`
+      `/api/v01/ct/rayosX/obtenerRadiografiaToraxPorFiltros?${codigoSearch == "" ? "" : `nOrden=${codigoSearch}`
       }
     ${nombreSearch == "" ? "" : `&nombres=${nombreSearch}`}`,
       token

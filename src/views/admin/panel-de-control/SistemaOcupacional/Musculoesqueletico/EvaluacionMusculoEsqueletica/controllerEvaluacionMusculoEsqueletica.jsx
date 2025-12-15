@@ -1,13 +1,14 @@
 import Swal from "sweetalert2";
 import { getFetch } from "../../../getFetch/getFetch";
 import { SubmitData } from "../model";
+import jsPDF from "jspdf";
 
 //===============Zona Modificación===============
 const obtenerReporteUrl =
   "/api/v01/ct/evaluacionMusculoEsqueletica/obtenerReporteEvaluacionMusculoEsqueletica";
 const registrarUrl =
   "/api/v01/ct/evaluacionMusculoEsqueletica/registrarActualizarEvaluacionMusculoEsqueletica";
-
+const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
 const leerBoolSI = (bool) => {
   return bool ? "SI" : "NO";
 };
@@ -561,7 +562,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         ]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
-          modulo.default({ ...res, ...datosFooter });
+          modulo.default({ ...res, ...datosFooter }, doc);
         } else {
           console.error(
             `El archivo ${nombre}.jsx no exporta una función por defecto`

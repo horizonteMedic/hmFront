@@ -5,8 +5,8 @@ import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 
-export default function Anexo16A_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default function Anexo16A_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   const datosReales = {
@@ -23,7 +23,7 @@ export default function Anexo16A_Digitalizado(data = {}) {
     vitalSigns: {
       fc: String(data.frecuenciaCardiacaTriaje_f_cardiaca || ""),
       fr: String(data.frecuenciaRespiratoriaTriaje_f_respiratoria || ""),
-      pa: (data.sistolicaTriaje_sistolica || data.diastolicaTriaje_diastolica) 
+      pa: (data.sistolicaTriaje_sistolica || data.diastolicaTriaje_diastolica)
         ? String(data.sistolicaTriaje_sistolica || "") + "/" + String(data.diastolicaTriaje_diastolica || "")
         : "",
       satO2: String(data.saturacionOxigenoTriaje_sat_02 || ""),
@@ -81,11 +81,11 @@ export default function Anexo16A_Digitalizado(data = {}) {
     const palabras = texto.split(' ');
     let lineaActual = '';
     let yPos = y;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -99,11 +99,11 @@ export default function Anexo16A_Digitalizado(data = {}) {
         }
       }
     });
-    
+
     if (lineaActual) {
       doc.text(lineaActual, x, yPos);
     }
-    
+
     return yPos;
   };
 
@@ -111,25 +111,25 @@ export default function Anexo16A_Digitalizado(data = {}) {
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
     const tablaInicioX = 5;
     const tablaAncho = 200;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo gris más oscuro
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
+
     // Dibujar líneas del header
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
-    
+
     return yPos + alturaHeader;
   };
 
@@ -323,15 +323,15 @@ export default function Anexo16A_Digitalizado(data = {}) {
     const colTexto = 180;
     const colNo = 10;
     const colSi = 10;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo gris más oscuro
     doc.setFillColor(196, 196, 196);
     doc.rect(leftMargin, yPos, colTexto + colNo + colSi, alturaHeader, 'F');
-    
+
     // Dibujar líneas del header
     doc.line(leftMargin, yPos, leftMargin + colTexto + colNo + colSi, yPos); // Superior
     doc.line(leftMargin, yPos + alturaHeader, leftMargin + colTexto + colNo + colSi, yPos + alturaHeader); // Inferior
@@ -339,14 +339,14 @@ export default function Anexo16A_Digitalizado(data = {}) {
     doc.line(leftMargin + colTexto, yPos, leftMargin + colTexto, yPos + alturaHeader); // División texto/opciones
     doc.line(leftMargin + colTexto + colNo, yPos, leftMargin + colTexto + colNo, yPos + alturaHeader); // División NO/SI
     doc.line(leftMargin + colTexto + colNo + colSi, yPos, leftMargin + colTexto + colNo + colSi, yPos + alturaHeader); // Derecha
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.setTextColor(0, 0, 0);
     doc.text(titulo, leftMargin + 2, yPos + 3.5);
-    doc.text("SI", leftMargin + colTexto + colNo/2, yPos + 3.5, { align: "center" });
-    doc.text("NO", leftMargin + colTexto + colNo + colSi/2, yPos + 3.5, { align: "center" });
-    
+    doc.text("SI", leftMargin + colTexto + colNo / 2, yPos + 3.5, { align: "center" });
+    doc.text("NO", leftMargin + colTexto + colNo + colSi / 2, yPos + 3.5, { align: "center" });
+
     return yPos + alturaHeader;
   };
 
@@ -379,7 +379,7 @@ export default function Anexo16A_Digitalizado(data = {}) {
 
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.setLineWidth(0.2);
-  
+
   condiciones.forEach((condicion) => {
     let textoDividido = doc.splitTextToSize(condicion.texto, colTexto - 4);
     let altura = textoDividido.length * 3 + 2;
@@ -399,14 +399,14 @@ export default function Anexo16A_Digitalizado(data = {}) {
     // NO
     if (datosFinales.condiciones[condicion.campo] === false) {
       doc.setFont("helvetica", "bold").setFontSize(10);
-      doc.text("X", leftMargin + colTexto + colNo + colSi/2, yPos + altura/2 + 1, { align: "center" });
+      doc.text("X", leftMargin + colTexto + colNo + colSi / 2, yPos + altura / 2 + 1, { align: "center" });
       doc.setFont("helvetica", "normal").setFontSize(8);
     }
 
     // SI
     if (datosFinales.condiciones[condicion.campo] === true) {
       doc.setFont("helvetica", "bold").setFontSize(10);
-      doc.text("X", leftMargin + colTexto + colNo/2, yPos + altura/2 + 1, { align: "center" });
+      doc.text("X", leftMargin + colTexto + colNo / 2, yPos + altura / 2 + 1, { align: "center" });
       doc.setFont("helvetica", "normal").setFontSize(8);
     }
 
@@ -430,11 +430,11 @@ export default function Anexo16A_Digitalizado(data = {}) {
     const palabras = texto.split(' ');
     let lineaActual = '';
     let lineas = 1;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -446,7 +446,7 @@ export default function Anexo16A_Digitalizado(data = {}) {
         }
       }
     });
-    
+
     return Math.max(lineas * fontSize * 0.35 + 1.5, filaAltura);
   };
 
@@ -525,7 +525,7 @@ export default function Anexo16A_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Apellidos y Nombres:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -537,7 +537,7 @@ export default function Anexo16A_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Dirección:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -550,7 +550,7 @@ export default function Anexo16A_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("CMP:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -572,20 +572,20 @@ export default function Anexo16A_Digitalizado(data = {}) {
 
   // Combinar todo el texto
   const textoCompletoCertificacion = `${textoCertificacion}${estadoTexto}${textoDespues}`;
-  
+
   // Calcular altura dinámica para la certificación
   const anchoMaximoCertificacion = tablaAncho - 8;
-  
+
   // Dibujar fondo naranja para la certificación (altura inicial, se ajustará después)
   doc.setFillColor(245, 174, 103); // Color naranja
-  
+
   // Dividir el texto en líneas usando splitTextToSize
   doc.setFont("helvetica", "normal").setFontSize(8);
   const certificacionLineas = doc.splitTextToSize(textoCompletoCertificacion, anchoMaximoCertificacion);
-  
+
   // Calcular altura real basada en las líneas
   let alturaFilaCertificacion = Math.max(certificacionLineas.length * 3.5 + 2, filaAltura);
-  
+
   // Dibujar rectángulo naranja
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaFilaCertificacion, 'F');
 
@@ -657,7 +657,7 @@ export default function Anexo16A_Digitalizado(data = {}) {
 
   // === SECCIÓN DE DECLARACIÓN, FIRMA Y HUELLA DEL TRABAJADOR ===
   const alturaSeccionDeclaracion = 30; // Altura para la sección de declaración
-  
+
   // Dibujar las líneas de la sección de declaración (3 columnas)
   // Columna 1: 60mm, Columna 2: 60mm, Columna 3: 80mm (total 200mm)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaSeccionDeclaracion);
@@ -670,12 +670,12 @@ export default function Anexo16A_Digitalizado(data = {}) {
   // === COLUMNA 1: DECLARACIÓN ===
   doc.setFont("helvetica", "normal").setFontSize(6);
   const textoDeclaracion = "Declaro que las respuestas son ciertas según mi leal saber y entender. En caso de ser requeridos, los resultados del examen médico pueden ser revelados, en términos generales, al departamento de salud Ocupacional de la compañía. Los resultados pueden ser enviados a mi médico particular de ser considerado necesario.";
-  
+
   // Función para justificar texto
   const justificarTexto = (texto, x, y, anchoMaximo, interlineado) => {
     const lineas = doc.splitTextToSize(texto, anchoMaximo);
     let yActual = y;
-    
+
     lineas.forEach((linea, index) => {
       // Solo justificar si no es la última línea y tiene más de una palabra
       if (index < lineas.length - 1 && linea.includes(' ')) {
@@ -685,7 +685,7 @@ export default function Anexo16A_Digitalizado(data = {}) {
           const espacioDisponible = anchoMaximo - anchoTexto;
           const espaciosEntrePalabras = palabras.length - 1;
           const espacioExtra = espacioDisponible / espaciosEntrePalabras;
-          
+
           let xActual = x;
           palabras.forEach((palabra, i) => {
             doc.text(palabra, xActual, yActual);
@@ -703,16 +703,16 @@ export default function Anexo16A_Digitalizado(data = {}) {
       yActual += interlineado;
     });
   };
-  
+
   // Dibujar texto justificado
   justificarTexto(textoDeclaracion, tablaInicioX + 2, yPos + 3, 55, 2.5);
 
   // === COLUMNA 2: FIRMA Y HUELLA DEL TRABAJADOR ===
   const firmaTrabajadorY = yPos + 3;
-  
+
   // Calcular centro de la columna 2 para centrar las imágenes
   const centroColumna2X = tablaInicioX + 60 + (60 / 2); // Centro de la columna 2
-  
+
   // Agregar firma del trabajador (lado izquierdo)
   const firmaTrabajadorUrl = getSign(data, "FIRMAP");
   if (firmaTrabajadorUrl) {
@@ -740,7 +740,7 @@ export default function Anexo16A_Digitalizado(data = {}) {
       console.log("Error cargando huella del trabajador:", error);
     }
   }
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
   // Centrar en la columna 2 (ancho de columna: 60mm, desde tablaInicioX + 60 hasta tablaInicioX + 120)
   const centroColumna2 = tablaInicioX + 60 + (60 / 2); // Centro de la columna 2
@@ -748,10 +748,10 @@ export default function Anexo16A_Digitalizado(data = {}) {
 
   // === COLUMNA 3: SELLO Y FIRMA DEL MÉDICO ===
   const firmaMedicoY = yPos + 3;
-  
+
   // Calcular centro de la columna 3 para centrar la imagen
   const centroColumna3 = tablaInicioX + 120 + (80 / 2); // Centro de la columna 3 (160mm desde tablaInicioX)
-  
+
   // Agregar firma y sello médico
   const firmaMedicoUrl = getSign(data, "SELLOFIRMA");
   if (firmaMedicoUrl) {
@@ -766,7 +766,7 @@ export default function Anexo16A_Digitalizado(data = {}) {
       console.log("Error cargando firma del médico:", error);
     }
   }
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("Sello y Firma del Médico", centroColumna3, yPos + 26, { align: "center" }); // Texto debajo de la imagen
   doc.text("Responsable de la Evaluación", centroColumna3, yPos + 28.5, { align: "center" }); // Texto debajo de la imagen
@@ -774,7 +774,7 @@ export default function Anexo16A_Digitalizado(data = {}) {
   yPos += alturaSeccionDeclaracion;
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 8});
+  footerTR(doc, { footerOffsetY: 8 });
 
   // === Imprimir ===
   imprimir(doc);

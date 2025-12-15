@@ -7,7 +7,7 @@ import {
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
 import { getToday } from "../../../../utils/helpers";
-
+import jsPDF from "jspdf";
 const registrarUrl = "/api/v01/ct/anexos/anexo16/registrarActualizarAnexo7c";
 const obtenerSimpleUrl = "/api/v01/ct/anexos/anexo16/obtenerAnexo16";
 const obtenerParaEditarUrl = "/api/v01/ct/anexos/anexo16/reporteEditarAnexo16";
@@ -15,7 +15,7 @@ const obtenerParaJasperUrl = "/api/v01/ct/anexos/anexo16/obtenerReporte2Anexo16"
 
 const obtenerExamenesRealizadosUrl =
   "/api/v01/ct/anexos/anexo2/obtenerExamenesRealizados";
-
+const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
 export const SubmitDataService = async (
   form,
   setForm,
@@ -187,6 +187,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     token
   ).then(async (res) => {
     if (res.norden) {
+      console.log(doc);
       const nombre = res.anexo16Reporte.nameJasper;
       console.log(nombre);
       const jasperModules = import.meta.glob(
@@ -198,7 +199,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
 
       // Ejecuta la función exportada por default con los datos
       if (typeof modulo.default === "function") {
-        modulo.default({ ...res, datosFooter });
+        modulo.default(doc, { ...res, datosFooter });
       } else {
         console.error(
           `El archivo ${nombre}.jsx no exporta una función por defecto`
