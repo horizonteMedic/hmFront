@@ -155,7 +155,7 @@ function DatosPersonales({
                     label="Tiempo de Experiencia"
                     name="tiempoExperiencia"
                     value={form.tiempoExperiencia}
-                    onChange={handleChange}
+                    disabled
                     labelWidth="120px"
                   />
                   <InputTextOneLine

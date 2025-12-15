@@ -42,3 +42,13 @@ export default function BotonesAccion({ form, handleSave, handleClear, handlePri
         </section>
     )
 }
+
+{/* 
+    <BotonesAccion
+    form={form}
+    handleSave={handleSave}
+    handleClear={handleClear}
+    handlePrint={handlePrint}
+    handleChangeNumberDecimals={handleChangeNumberDecimals}
+    /> 
+*/}

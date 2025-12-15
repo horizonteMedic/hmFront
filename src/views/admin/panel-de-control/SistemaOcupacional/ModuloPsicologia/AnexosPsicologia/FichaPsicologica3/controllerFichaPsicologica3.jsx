@@ -159,10 +159,6 @@ export const SubmitDataService = async (
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
     }
-    if (!form.tiempoExperiencia || form.tiempoExperiencia.trim() === "") {
-        await Swal.fire("Error", "Ingrese Tiempo Experiencia", "error");
-        return;
-    }
     const body = {
         norden: form.norden,
         codigoAnexo: form.codigoAnexo,
