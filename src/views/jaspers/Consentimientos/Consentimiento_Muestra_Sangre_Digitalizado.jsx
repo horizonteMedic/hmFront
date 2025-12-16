@@ -108,7 +108,7 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
     const maxWidth = pageW - 2 * margin;
 
     // Función mejorada para dibujar texto con datos en negrita
-    const dibujarTextoConSaltoLineaYBold = (textoBase, datosTexto, x, y, anchoMaximo, fontSize = 10) => {
+    const dibujarTextoConSaltoLineaYBold = (textoBase, datosTexto, x, y, anchoMaximo, fontSize = 11) => {
       if (!textoBase) return y;
       doc.setFontSize(fontSize);
       const interlineado = fontSize * 0.4;
@@ -232,7 +232,7 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
     };
 
     // Renderizar texto con datos en negrita
-    y = dibujarTextoConSaltoLineaYBold(textoCompleto, datosTexto, margin, y, maxWidth, 10);
+    y = dibujarTextoConSaltoLineaYBold(textoCompleto, datosTexto, margin, y, maxWidth, 11);
     y += 5;
 
     // ─── 4) FECHA ─────────────────────────────────────

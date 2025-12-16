@@ -4,7 +4,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 import { convertirGenero } from "../../utils/helpers.js";
-import { getSign } from "../../utils/helpers.js";
+import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
 export default function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExistente = null) {
 
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -47,7 +47,7 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExis
   const filaAltura = 5;
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = () => {
     CabeceraLogo(doc, { ...datosReales, tieneMembrete: false, yOffset: 7 });
 
     // Título principal
@@ -95,7 +95,7 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExis
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(1);
+  drawHeader();
 
   // === SECCIÓN 1: DATOS PERSONALES ===
   let yPos = 30;
@@ -540,60 +540,35 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExis
   yPos += obsHeight;
 
   // === SECCIÓN 9: FIRMAS ===
-  const alturaFilaFirmas = 30;
+  const alturaSeccionFirmas = 32; // Altura ajustada para que quepa el texto completo dentro
+  const baseY = yPos;
 
-  // Dibujar fila de firmas (sin división)
+  // Dibujar los bordes de la fila de firmas
+  doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
-  doc.rect(tablaInicioX, yPos, tablaAncho, alturaFilaFirmas);
+  doc.rect(tablaInicioX, baseY, tablaAncho, alturaSeccionFirmas);
 
-  // Obtener firmas disponibles
-  const firma1Url = getSign(data, "SELLOFIRMA");
-  const firma2Url = getSign(data, "SELLOFIRMADOCASIG");
+  // Usar helper para dibujar firmas (ajustar Y para que queden dentro de la fila, más cerca)
+  dibujarFirmas({ doc, datos: data, y: baseY + 2, pageW }).then(() => {
+    // === FOOTER ===
+    footerTR(doc, { footerOffsetY: 12 });
 
-  const tieneFirma1 = firma1Url && firma1Url !== "Sin registro";
-  const tieneFirma2 = firma2Url && firma2Url !== "Sin registro";
-
-  const firmasCentro = tablaInicioX + tablaAncho / 2;
-  const firmasIzq = tablaInicioX + tablaAncho / 4;
-  const firmasDer = tablaInicioX + (3 * tablaAncho / 4);
-
-  if (firma1Url && firma2Url) {
-    // 2 firmas: una izquierda, otra derecha
-    try {
-      doc.addImage(firma1Url, 'PNG', firmasIzq - 22, yPos + 5, 45, 20);
-    } catch (error) {
-      console.log("Error cargando firma 1:", error);
+    // === IMPRIMIR ===
+    if (!docExistente) {
+      imprimir(doc);
     }
-    try {
-      doc.addImage(firma2Url, 'PNG', firmasDer - 22, yPos + 5, 45, 20);
-    } catch (error) {
-      console.log("Error cargando firma 2:", error);
+  }).catch(err => {
+    console.error(err);
+    if (!docExistente) {
+      alert('Error generando PDF: ' + err);
     }
-  } else if (firma1Url) {
-    // Solo firma 1: centrada
-    try {
-      doc.addImage(firma1Url, 'PNG', firmasCentro - 22, yPos + 5, 45, 20);
-    } catch (error) {
-      console.log("Error cargando firma 1:", error);
-    }
-  } else if (firma2Url) {
-    // Solo firma 2: centrada
-    try {
-      doc.addImage(firma2Url, 'PNG', firmasCentro - 22, yPos + 5, 45, 20);
-    } catch (error) {
-      console.log("Error cargando firma 2:", error);
-    }
-  }
+  });
 
-  // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 12 });
-
-  // === IMPRIMIR ===
-  // === Imprimir ===
+  // Si hay docExistente, agregar footer y retornar el doc inmediatamente
+  // (las firmas se agregarán asíncronamente)
   if (docExistente) {
+    footerTR(doc, { footerOffsetY: 12 });
     return doc;
-  } else {
-    imprimir(doc);
   }
 }
 

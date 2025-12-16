@@ -134,11 +134,11 @@ export function dibujarFirmas({ doc, datos, y, pageW }) {
         // Dibujar línea
         doc.line(centroX - anchoLinea / 2, lineY, centroX + anchoLinea / 2, lineY);
         
-        // Dibujar texto
+        // Dibujar texto (más cerca de la firma)
         doc.setFont('helvetica', 'normal').setFontSize(9);
-        doc.text(texto1, centroX, lineY + 5, { align: "center" });
+        doc.text(texto1, centroX, lineY + 3, { align: "center" });
         if (texto2) {
-          doc.text(texto2, centroX, lineY + 8, { align: "center" });
+          doc.text(texto2, centroX, lineY + 6, { align: "center" });
         }
       };
       
@@ -170,9 +170,9 @@ export function dibujarFirmas({ doc, datos, y, pageW }) {
       }
     }
 
-    // Retornar posición Y final
+    // Retornar posición Y final (ajustado para texto más junto)
     return tieneSelloProfesional 
-      ? Math.max(lineYPaciente + 10, lineY + 15)
+      ? Math.max(lineYPaciente + 10, lineY + 9)
       : lineYPaciente + 10;
   });
 }

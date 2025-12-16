@@ -35,7 +35,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
       areaTrabajoEmpresa: String(payload?.areaPaciente ?? ''),
       superficie: String((String(payload?.explotacionEn ?? '').toUpperCase() === 'SUPERFICIE') ? 'X' : ''),
       subsuelo: String((String(payload?.explotacionEn ?? '').toUpperCase() === 'SUBSUELO') ? 'X' : ''),
-      tiempoLaborando: String(payload?.tiempoTrabajo_timpo_trab ?? ''),
+      tiempoLaborando: String(payload?.tiempoExperiencia ?? ''),
       puestoEmpresa: String(payload?.cargoPaciente ?? ''),
       principalesRiesgos: String(payload?.principalRiesgo_princ_riesgo ?? ''),
       medidasSeguridad: String(payload?.medidasSeguridad_med_seguridad ?? ''),
