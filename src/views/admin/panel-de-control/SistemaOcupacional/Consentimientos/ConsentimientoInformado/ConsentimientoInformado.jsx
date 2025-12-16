@@ -1,38 +1,45 @@
 import { InputTextOneLine } from "../../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
+import { useForm } from "../../../../../hooks/useForm";
+import { useSessionData } from "../../../../../hooks/useSessionData";
+import { getToday } from "../../../../../utils/helpers";
 import {
     PrintHojaR,
     SubmitDataService,
     VerifyTR,
-} from "./controllerConsentimientoBuenaSalud";
-import { getToday } from "../../../../../utils/helpers";
-import { useForm } from "../../../../../hooks/useForm";
-import { useSessionData } from "../../../../../hooks/useSessionData";
+} from "./controllerConsentimientoInformado";
 import BotonesAccion from "../../../../../components/templates/BotonesAccion";
 
-const tabla = "consentimientobuenasalud";
+const tabla = "consentimientoInformado";
 
-export default function ConsentimientoBuenaSalud() {
+const textoConsentimiento = `certifico que he sido informado/a acerca de la naturaleza y propósito del examen médico ocupacional así como pruebas complementarias determinada por la empresa:`;
+const textoFinalConsentimiento = `De acuerdo a los peligros y riesgos identificados en mi puesto de trabajo. En ese sentido en forma consciente y voluntaria doy mi consentimiento, para que se me realice el examen médico ocupacional de acuerdo a la Resolución ministerial N° 312-2011/MINSA. Y doy fe que la información brindada a HORIZONTE MEDIC es verídica. Así mismo, autorizo a HORIZONTE MEDIC para que brinde mi historia clínica y toda información resultante de mi examen médico ocupacional al Médico Ocupacional de mi empresa para que tenga acceso a mi Historia Clínica de acuerdo a la N.T.N° 022 MINSA/dgsp-V.02 y Ley N° 26842, Ley general de salud.`;
+
+export default function ConsentimientoInformado() {
     const today = getToday();
-    const { token, userlogued, selectedSede, datosFooter, hora } = useSessionData();
+    const { token, selectedSede, userlogued, datosFooter, hora } = useSessionData();
+
     const initialFormState = {
         norden: "",
+        codCons: null,
         fecha: today,
         nombres: "",
-        edad: "",
         dni: "",
-        textoFinalConsentimiento: `NO PADEZCO DE ENFERMEDAD ALGUNA, NI PRESENTO SÍNTOMAS DE NINGÚN TIPO, por lo cual me considero un persona completamente SANA.`,
+        empresa: "",
+        ocupacion: "",
     };
 
     const {
         form,
         setForm,
-        handleChangeNumberDecimals,
+        handleChange,
         handleChangeSimple,
+        handleChangeNumberDecimals,
         handleClear,
         handleClearnotO,
         handlePrintDefault,
-    } = useForm(initialFormState, { storageKey: "consentimientoBuenaSalud" });
+    } = useForm(initialFormState, { storageKey: "consentimientoInformado" });
+
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
@@ -77,44 +84,52 @@ export default function ConsentimientoBuenaSalud() {
             </SectionFieldset>
 
             {/* Contenido del Consentimiento */}
-            <SectionFieldset legend="Consentimiento de Buena Salud" className="space-y-3">
+            <SectionFieldset legend="Consentimiento Informado Ocupacional" className="space-y-3">
                 {/* Información Personal */}
                 <div className="space-y-3">
                     <InputTextOneLine
                         label="Yo"
                         name="nombres"
                         value={form.nombres}
+                        onChange={handleChange}
                         disabled
                         labelWidth="30px"
                     />
-                    <div className="flex items-center flex-wrap">
-                        <InputTextOneLine
-                            label="de"
-                            name="edad"
-                            value={form.edad}
-                            disabled
-                            labelWidth="30px"
-                            className="mr-4"
-                        />
-                        <label className="font-semibold min-w-[50px]">años de edad,</label>
-                        <InputTextOneLine
-                            label="identificado con DNI"
-                            name="dni"
-                            value={form.dni}
-                            disabled
-                            labelWidth="110px"
-                        />
-                    </div>
+                    <InputTextOneLine
+                        label="Identificado con DNI"
+                        name="dni"
+                        value={form.dni}
+                        disabled
+                        labelWidth="140px"
+                    />
+                    <InputTextOneLine
+                        label="Con ocupación laboral de"
+                        name="ocupacion"
+                        value={form.ocupacion}
+                        onChange={handleChange}
+                        disabled
+                        labelWidth="140px"
+                    />
                 </div>
 
                 {/* Texto del Consentimiento */}
                 <div className="space-y-4">
                     <div className="text-justify leading-relaxed">
                         <p className="mb-3">
-                            {form.textoFinalConsentimiento}
+                            {textoConsentimiento}
                         </p>
-                        <p className="text-justify leading-relaxed mt-3">
-                            Por lo que soy responsable de lo anteriormente declarado.
+
+                        <div className="mb-3">
+                            <InputTextOneLine
+                                label="Empresa"
+                                name="empresa"
+                                value={form.empresa}
+                                disabled
+                                labelWidth="140px"
+                            />
+                        </div>
+                        <p className="text-justify">
+                            {textoFinalConsentimiento}
                         </p>
                     </div>
                 </div>

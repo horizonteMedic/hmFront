@@ -177,7 +177,7 @@ export default function Altura18() {
     }
 
     return (
-        <div className="space-y-3 px-4">
+        <div className="space-y-3 px-4 max-w-[90%]  xl:max-w-[80%] mx-auto">
             <SectionFieldset legend="Información del Examen">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                     <InputTextOneLine
