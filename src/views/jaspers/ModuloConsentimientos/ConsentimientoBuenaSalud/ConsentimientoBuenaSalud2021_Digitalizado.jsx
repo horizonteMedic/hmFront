@@ -62,8 +62,8 @@ export default function ConsentimientoBuenaSalud2021_Digitalizado(data = {}) {
 
         // Bloque de color
         drawColorBox(doc, {
-            color: data.codigoColor,
-            text: data.textoColor,
+            color: data.codigoColor || "#008f39",
+            text: data.textoColor || "F",
             x: pageW - 30,
             y: 10,
             size: 22,

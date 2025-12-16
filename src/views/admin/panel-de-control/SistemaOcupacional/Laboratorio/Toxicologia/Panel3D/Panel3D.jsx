@@ -63,7 +63,7 @@ export default function Resultado_Panel3D() {
   } = useForm(initialFormState);
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla);
+    SubmitDataService(form, token, userlogued, handleClear);
   };
 
   const handleSearch = (e) => {

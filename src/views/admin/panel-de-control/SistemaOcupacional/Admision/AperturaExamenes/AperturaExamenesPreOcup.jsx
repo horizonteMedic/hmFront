@@ -153,6 +153,7 @@ const AperturaExamenesPreOcup = (props) => {
         .then((res) => {
           if (res.estatus === "OK") {
             if (res.resultado.length > 0) {
+              console.log(res.resultado)
               setListaExamenes(res.resultado)
               Toast.fire({
                 icon: "success",

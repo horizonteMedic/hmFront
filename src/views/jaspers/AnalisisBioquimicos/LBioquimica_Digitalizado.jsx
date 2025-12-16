@@ -8,7 +8,7 @@ const config = {
   fontSize: {
     title: 14,
     subtitle: 11,
-    header: 9,
+    header: 11,
     body: 9,
   },
   lineHeight: {
@@ -27,6 +27,20 @@ const toDDMMYYYY = (fecha) => {
   return `${dia}/${mes}/${anio}`;
 };
 
+// Función para formatear fecha larga
+const formatDateToLong = (dateString) => {
+  if (!dateString) return '';
+  try {
+    const date = new Date(`${dateString}T00:00:00`);
+    return date.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  } catch (error) {
+    return toDDMMYYYY(dateString) || '';
+  }
+};
 
 // Header con datos de ficha, sede y fecha
 const drawHeader = (doc, datos = {}) => {
@@ -52,9 +66,9 @@ const drawHeader = (doc, datos = {}) => {
   doc.text("Pag. 01", pageW - 30, 10);
 
   // Bloque de color
-   drawColorBox(doc, {
-    color: datos.codigoColor,
-    text: datos.textoColor,
+  drawColorBox(doc, {
+    color: datos.codigoColor || "#008f39",
+    text: datos.textoColor || "F",
     x: pageW - 30,
     y: 10,
     size: 22,
@@ -69,7 +83,7 @@ const drawPatientData = (doc, datos = {}) => {
   const tablaInicioX = 15;
   const tablaAncho = 180;
   const filaAltura = 5;
-  let yPos = 43;
+  let yPos = 41;
 
   // Header DATOS PERSONALES
   doc.setDrawColor(0, 0, 0);
@@ -82,12 +96,12 @@ const drawPatientData = (doc, datos = {}) => {
 
   const sexo = datos.sexoPaciente === 'F' ? 'FEMENINO' : datos.sexoPaciente === 'M' ? 'MASCULINO' : '';
 
-  // Fila 1: Nombres y Apellidos (fila completa)
+  // Fila 1: Apellidos y Nombres (fila completa)
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Nombres y Apellidos:", tablaInicioX + 2, yPos + 3.5);
+  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.nombres || datos.nombresPaciente || '', tablaInicioX + 40, yPos + 3.5);
+  doc.text(datos.nombres || '', tablaInicioX + 40, yPos + 3.5);
   yPos += filaAltura;
 
   // Fila 2: DNI | Edad | Sexo
@@ -97,11 +111,11 @@ const drawPatientData = (doc, datos = {}) => {
   doc.setFont("helvetica", "bold");
   doc.text("DNI:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(String(datos.dniPaciente || datos.dni || ''), tablaInicioX + 12, yPos + 3.5);
+  doc.text(String(datos.dni || ''), tablaInicioX + 12, yPos + 3.5);
   doc.setFont("helvetica", "bold");
   doc.text("Edad:", tablaInicioX + 47, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text((datos.edadPaciente || datos.edad || '') + " AÑOS", tablaInicioX + 58, yPos + 3.5);
+  doc.text((datos.edad || '') + " AÑOS", tablaInicioX + 58, yPos + 3.5);
   doc.setFont("helvetica", "bold");
   doc.text("Sexo:", tablaInicioX + 92, yPos + 3.5);
   doc.setFont("helvetica", "normal");
@@ -166,20 +180,6 @@ const drawPatientData = (doc, datos = {}) => {
   doc.text(datos.areaPaciente || '', tablaInicioX + 15, yPos + 3.5);
   yPos += filaAltura;
 
-  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
-  doc.setFont("helvetica", "bold");
-  doc.text("Empresa:", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal");
-  doc.text(datos.empresa || '', tablaInicioX + 20, yPos + 3.5);
-  yPos += filaAltura;
-
-  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
-  doc.setFont("helvetica", "bold");
-  doc.text("Contrata:", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal");
-  doc.text(datos.contrata || '', tablaInicioX + 22, yPos + 3.5);
-  yPos += filaAltura;
-
   return yPos;
 };
 
@@ -195,7 +195,7 @@ export default function LBioquimica_Digitalizado(datos) {
   doc.text('BIOQUÍMICA', pageW / 2, 38, { align: 'center' });
 
   // === DATOS DEL PACIENTE ===
-  const finalYPos = drawPatientData(doc, datos);
+  drawPatientData(doc, datos);
 
   const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
   const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
@@ -213,7 +213,7 @@ export default function LBioquimica_Digitalizado(datos) {
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
-    let y = finalYPos + 10;
+    let y = 95;
     const tablaInicioX = 15;
     const tablaAncho = 180;
 

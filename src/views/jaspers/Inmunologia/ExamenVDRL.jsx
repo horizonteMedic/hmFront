@@ -50,9 +50,9 @@ const drawHeader = (doc, datos = {}) => {
   
   doc.text("Pag. 01", pageW - 30, 10);
 
-   drawColorBox(doc, {
-    color: datos.codigoColor,
-    text: datos.textoColor ,
+  drawColorBox(doc, {
+    color: datos.codigoColor || "#008f39",
+    text: datos.textoColor || "F",
     x: pageW - 30,
     y: 10,
     size: 22,
@@ -152,20 +152,6 @@ const drawPatientData = (doc, datos = {}) => {
   doc.text("Área:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
   doc.text(datos.areaPaciente || '', tablaInicioX + 15, yPos + 3.5);
-  yPos += filaAltura;
-
-  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
-  doc.setFont("helvetica", "bold");
-  doc.text("Empresa:", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal");
-  doc.text(datos.empresa || '', tablaInicioX + 20, yPos + 3.5);
-  yPos += filaAltura;
-
-  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
-  doc.setFont("helvetica", "bold");
-  doc.text("Contrata:", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal");
-  doc.text(datos.contrata || '', tablaInicioX + 22, yPos + 3.5);
   yPos += filaAltura;
 
   return yPos;

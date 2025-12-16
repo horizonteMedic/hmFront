@@ -11,7 +11,7 @@ import { getToday } from "../../../../utils/helpers";
 const registrarUrl = "/api/v01/ct/anexos/anexo16/registrarActualizarAnexo7c";
 const obtenerSimpleUrl = "/api/v01/ct/anexos/anexo16/obtenerAnexo16";
 const obtenerParaEditarUrl = "/api/v01/ct/anexos/anexo16/reporteEditarAnexo16";
-const obtenerParaJasperUrl = "/api/v01/ct/anexos/anexo16/obtenerReporte2Anexo16";
+const obtenerParaJasperUrl = "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16";
 
 const obtenerExamenesRealizadosUrl =
   "/api/v01/ct/anexos/anexo2/obtenerExamenesRealizados";

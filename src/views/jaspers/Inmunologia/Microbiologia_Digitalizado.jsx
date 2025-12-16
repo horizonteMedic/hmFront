@@ -21,6 +21,24 @@ const config = {
 
 // --- Funciones de Ayuda ---
 
+/**
+ * Dibuja un título centrado y subrayado.
+ * @param {jsPDF} doc - La instancia del documento jsPDF.
+ * @param {string} text - El texto del título.
+ * @param {number} y - La posición Y inicial.
+ * @param {number} fontSize - El tamaño de la fuente.
+ */
+const drawUnderlinedTitle = (doc, text, y, fontSize) => {
+  const pageW = doc.internal.pageSize.getWidth();
+  doc.setFont(config.font, "bold").setFontSize(fontSize);
+  doc.text(text, pageW / 2, y, { align: "center" });
+  const textWidth = doc.getTextWidth(text);
+  const x = (pageW - textWidth) / 2;
+  doc.setLineWidth(0.5);
+  doc.line(x, y + 1.5, x + textWidth, y + 1.5);
+  doc.setLineWidth(0.2); // Resetear grosor de línea
+};
+
 // Función para formatear fecha a DD/MM/YYYY
 const toDDMMYYYY = (fecha) => {
   if (!fecha) return '';
@@ -28,6 +46,21 @@ const toDDMMYYYY = (fecha) => {
   const [anio, mes, dia] = fecha.split('-');
   if (!anio || !mes || !dia) return fecha;
   return `${dia}/${mes}/${anio}`;
+};
+
+// Función para formatear fecha larga
+const formatDateToLong = (dateString) => {
+  if (!dateString) return '';
+  try {
+    const date = new Date(`${dateString}T00:00:00`);
+    return date.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  } catch (error) {
+    return toDDMMYYYY(dateString) || '';
+  }
 };
 
 // Header con datos de ficha, sede y fecha
@@ -54,9 +87,9 @@ const drawHeader = (doc, datos = {}) => {
   doc.text("Pag. 01", pageW - 30, 10);
 
   // Bloque de color
-   drawColorBox(doc, {
-    color: datos.codigoColor,
-    text: datos.textoColor ,
+  drawColorBox(doc, {
+    color: datos.codigoColor || "#008f39",
+    text: datos.textoColor || "F",
     x: pageW - 30,
     y: 10,
     size: 22,
@@ -71,13 +104,13 @@ const drawPatientData = (doc, datos = {}) => {
   const tablaInicioX = 15;
   const tablaAncho = 180;
   const filaAltura = 5;
-  let yPos = 43;
+  let yPos = 46; // +5mm
 
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
   doc.setFillColor(196, 196, 196);
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'FD');
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("DATOS PERSONALES", tablaInicioX + 2, yPos + 3.5);
   yPos += filaAltura;
 
@@ -85,9 +118,9 @@ const drawPatientData = (doc, datos = {}) => {
 
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Nombres y Apellidos:", tablaInicioX + 2, yPos + 3.5);
+  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.nombres || datos.nombresPaciente || '', tablaInicioX + 40, yPos + 3.5);
+  doc.text(datos.nombres || '', tablaInicioX + 40, yPos + 3.5);
   yPos += filaAltura;
 
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
@@ -159,20 +192,6 @@ const drawPatientData = (doc, datos = {}) => {
   doc.text(datos.areaPaciente || '', tablaInicioX + 15, yPos + 3.5);
   yPos += filaAltura;
 
-  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
-  doc.setFont("helvetica", "bold");
-  doc.text("Empresa:", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal");
-  doc.text(datos.empresa || '', tablaInicioX + 20, yPos + 3.5);
-  yPos += filaAltura;
-
-  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
-  doc.setFont("helvetica", "bold");
-  doc.text("Contrata:", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal");
-  doc.text(datos.contrata || '', tablaInicioX + 22, yPos + 3.5);
-  yPos += filaAltura;
-
   return yPos;
 };
 
@@ -186,12 +205,8 @@ export default function Microbiologia_Digitalizado(datos = {}) {
   // === HEADER ===
   drawHeader(doc, datos);
   
-  // === TÍTULO ===
-  doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
-  doc.text("MICROBIOLOGÍA", pageW / 2, 38, { align: "center" });
-  
   // === DATOS DEL PACIENTE ===
-  const finalYPos = drawPatientData(doc, datos);
+  drawPatientData(doc, datos);
 
    const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
   const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
@@ -209,16 +224,19 @@ export default function Microbiologia_Digitalizado(datos = {}) {
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
-    let y = finalYPos + 10; // Posición inicial después de la tabla de datos con espacio adicional
+    // === TÍTULO ===
+    doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
+    doc.text("MICROBIOLOGÍA", pageW / 2, 43, { align: "center" }); // +5mm
+
+    let y = 100; // Posición inicial después de la tabla de datos (+5mm)
 
     // === MUESTRA ===
-    const colData = 55;
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
-    doc.text("MUESTRA", config.margin, y);
-    doc.text(":", colData - 5, y);
+    doc.setFontSize(config.fontSize.header).setFont(config.font, "bold");
+    doc.text("MUESTRA :", config.margin, y);
     doc.setFont(config.font, "normal");
-    doc.text(datos.muestra || "ESPUTO", colData, y);
-    y += config.lineHeight * 2;
+    doc.text(datos.muestra || "ESPUTO", config.margin + 22, y);
+
+    y += config.lineHeight * 1.5;
 
     // === ENCABEZADO DE TABLA ===
     doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);

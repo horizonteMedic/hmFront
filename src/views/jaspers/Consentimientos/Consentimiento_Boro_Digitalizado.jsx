@@ -39,9 +39,9 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     doc.text("Pag. 01", pageW - 30, 10);
 
     // Bloque de color
-      drawColorBox(doc, {
-      color: datos.codigoColor,
-      text: datos.textoColor,
+    drawColorBox(doc, {
+      color: datos.codigoColor || "#008f39",
+      text: datos.textoColor || "F",
       x: pageW - 30,
       y: 10,
       size: 22,
@@ -53,10 +53,9 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
 
   drawHeader();
 
-  const digitalizacion = datos.digitalizacion || [];
-  const huella = digitalizacion.find(d => d.nombreDigitalizacion === "HUELLA");
-  const firma = digitalizacion.find(d => d.nombreDigitalizacion === "FIRMAP");
-  const sello = digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
+  const huella = datos.digitalizacion.find(d => d.nombreDigitalizacion === "HUELLA");
+  const firma = datos.digitalizacion.find(d => d.nombreDigitalizacion === "FIRMAP");
+  const sello = datos.digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
   const isValidUrl = url => url && url !== "Sin registro";
 
   const loadImg = src =>

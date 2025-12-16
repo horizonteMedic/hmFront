@@ -25,9 +25,9 @@ export default function ReporteTriaje(datos) {
         doc.text("Sede: " + (datos.sede || ""), pageW - 80, 20);
         doc.text("Fecha de examen: " + formatearFechaCorta(datos.fecha_triaje || ""), pageW - 80, 25);
 
-         drawColorBox(doc, {
-            color: datos.codigoColor,
-            text: datos.textoColor,
+        drawColorBox(doc, {
+            color: datos.codigoColor || "#008f39",
+            text: datos.textoColor || "F",
             x: pageW - 30,
             y: 10,
             size: 22,

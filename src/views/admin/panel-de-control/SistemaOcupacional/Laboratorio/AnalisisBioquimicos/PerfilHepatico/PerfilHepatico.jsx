@@ -106,7 +106,7 @@ export default function PerfilHepatico() {
   };
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear,tabla);
+    SubmitDataService(form, token, userlogued, handleClear);
   };
 
   const handleSearch = (e) => {

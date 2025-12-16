@@ -73,16 +73,16 @@ export default function pcuantiantigeno(datos = {}) {
     doc.text("Pag. 01", pageW - 30, 10);
 
     // Bloque de color
-     drawColorBox(doc, {
-    color: datos.codigoColor,
-    text: datos.textoColor ,
-    x: pageW - 30,
-    y: 10,
-    size: 22,
-    showLine: true,
-    fontSize: 30,
-    textPosition: 0.9
-  });
+    drawColorBox(doc, {
+      color: datos.codigoColor || "#008f39",
+      text: datos.textoColor || "F",
+      x: pageW - 30,
+      y: 10,
+      size: 22,
+      showLine: true,
+      fontSize: 30,
+      textPosition: 0.9
+    });
 
     // Datos del paciente (debajo del logo)
     let dataY = 48;
