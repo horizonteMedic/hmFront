@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuthStore } from "../../store/auth";
 import { fixEncodingModern } from "../utils/helpers";
+import useRealTime from "./useRealTime";
 
 export const useSessionData = () => {
     const { token, userlogued, datosFooter, listaEmpleados } = useAuthStore((state) => ({
@@ -11,6 +12,7 @@ export const useSessionData = () => {
     }));
 
     const [selectedSede, setSelectedSede] = useState("");
+    const hora = useRealTime();
 
     useEffect(() => {
         if (userlogued?.sedes?.length) {
@@ -33,5 +35,6 @@ export const useSessionData = () => {
         selectedSede,
         datosFooter,
         listaEmpleados,
+        hora,
     };
 };

@@ -7,6 +7,7 @@ import {
   SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../../utils/functionUtils";
+import { getHoraActual } from "../../../../../utils/helpers";
 
 const obtenerReporteUrl =
   "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoBuenaSalud";
@@ -57,12 +58,7 @@ export const SubmitDataService = async (
   const body = {
     norden: form.norden,
     fecha: form.fecha,
-    hora: new Date().toLocaleTimeString('en-US', {
-      hour12: false,
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    }),
+    hora: getHoraActual(),
     userRegistro: user
   };
 

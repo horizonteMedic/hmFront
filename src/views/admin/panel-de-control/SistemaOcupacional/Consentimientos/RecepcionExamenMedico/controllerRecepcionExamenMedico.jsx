@@ -10,24 +10,20 @@ import {
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import { getHoraActual } from "../../../../../utils/helpers";
 
-const obtenerReporteUrl = "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoInformado";
-const registrarUrl = "/api/v01/ct/anexos/anexo16/registrarActualizarConsentimientoInformado";
+const obtenerReporteUrl = "";
+const registrarUrl = "";
 
 export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {}) => {
     const res = await GetInfoServicioDefault(nro, tabla, token, obtenerReporteUrl, onFinish);
     if (res) {
         set((prev) => ({
             ...prev,
-            ...res,
             norden: res.norden ?? prev.norden ?? "",
             fecha: res.fecha ?? prev.fecha ?? "",
             nombres: res.nombres ?? prev.nombres ?? "",
             dni: res.dni ?? prev.dni ?? "",
             ocupacion: res.ocupacion ?? prev.ocupacion ?? "",
             empresa: res.empresa ?? prev.empresa ?? "",
-            // Preservar los textos estáticos si no vienen del backend
-            textoConsentimiento: res.textoConsentimiento ?? prev.textoConsentimiento ?? "",
-            textoFinalConsentimiento: res.textoFinalConsentimiento ?? prev.textoFinalConsentimiento ?? "",
         }));
     }
 };
@@ -79,7 +75,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             GetInfoServicio(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de Consentimiento Informado.",
+                    "Este paciente ya cuenta con registros de Sintomatico Respiratorio.",
                     "warning"
                 );
             });
@@ -93,13 +89,11 @@ const GetInfoPac = async (nro, set, token, sede) => {
         set((prev) => ({
             ...prev,
             ...res,
+            fechaNac: formatearFechaCorta(res.fechaNac ?? ""),
             nombres: res.nombresApellidos ?? prev.nombres ?? "",
             ocupacion: res.cargo ?? prev.ocupacion ?? "",
             dni: res.dni ?? prev.dni ?? "",
             empresa: res.empresa ?? prev.empresa ?? "",
-            // Preservar los textos estáticos
-            textoConsentimiento: prev.textoConsentimiento ?? "",
-            textoFinalConsentimiento: prev.textoFinalConsentimiento ?? "",
         }));
     }
 };
