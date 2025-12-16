@@ -1,7 +1,8 @@
 import jsPDF from "jspdf";
 import headerEvaluacionMuscoloEsqueletica from "./Headers/Header_EvaluacionMuscoloEsqueletica.jsx";
+import { compressImage } from "../../utils/helpers.js";
 
-export default function EvaluacionMuscoloEsqueletica(data = {}, docExistente = null) {
+export default async function EvaluacionMuscoloEsqueletica(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
@@ -507,8 +508,10 @@ export default function EvaluacionMuscoloEsqueletica(data = {}, docExistente = n
   const yOffset = pageH - imgHeight; // Posición original sin ajustes
 
   try {
-    doc.addImage(fondoImg, "PNG", xOffset, yOffset, imgWidth, imgHeight);
+    const imgCompressed = await compressImage(fondoImg);
+    doc.addImage(imgCompressed, "JPEG", xOffset, yOffset, imgWidth, imgHeight);
   } catch (e) {
+    console.error("Error al agregar imagen de fondo:", e);
     doc.text("Imagen de evaluación músculo esquelética no disponible", margin, yOffset + 10);
   }
 
@@ -1679,7 +1682,8 @@ export default function EvaluacionMuscoloEsqueletica(data = {}, docExistente = n
   const yOffsetPag2 = 0; // Desde la parte superior
 
   try {
-    doc.addImage(fondoImgPag2, "PNG", xOffsetPag2, yOffsetPag2, imgWidthPag2, imgHeightPag2);
+    const imgCompressed2 = await compressImage(fondoImgPag2);
+    doc.addImage(imgCompressed2, "JPEG", xOffsetPag2, yOffsetPag2, imgWidthPag2, imgHeightPag2);
   } catch (e) {
     doc.text("Imagen de evaluación músculo esquelética página 2 no disponible", margin, yOffsetPag2 + 10);
   }

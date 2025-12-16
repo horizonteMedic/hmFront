@@ -12,6 +12,9 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
     const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true);
     const totalReportes = examenesFiltrados.length;
 
+    // Array para almacenar estadísticas de peso
+    const estadisticasPeso = [];
+
     for (let i = 0; i < examenesFiltrados.length; i++) {
         const examen = examenesFiltrados[i];
         const apiUrl = examen.esJasper
@@ -21,6 +24,9 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         try {
             const data = await getFetch(apiUrl, token);
             if (!data) continue;
+
+            // Medir tamaño ANTES de agregar el reporte
+            const pesoAntes = pdfFinal.output('arraybuffer').byteLength;
 
             const isHorizontal = reportesConHorizontal.includes(examen.tabla);
 
@@ -47,6 +53,18 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
                 console.warn("No existe generador para:", examen.tabla);
             }
 
+            // Medir tamaño DESPUÉS de agregar el reporte
+            const pesoDespues = pdfFinal.output('arraybuffer').byteLength;
+            const pesoReporte = pesoDespues - pesoAntes;
+
+            // Guardar estadísticas
+            estadisticasPeso.push({
+                nombre: examen.nombre,
+                tabla: examen.tabla,
+                pesoKB: (pesoReporte / 1024).toFixed(2),
+                pesoMB: (pesoReporte / (1024 * 1024)).toFixed(3)
+            });
+
             // Reportar progreso
             const porcentaje = Math.round(((i + 1) / totalReportes) * 100);
             if (onProgress) {
@@ -57,6 +75,29 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             console.error("Error cargando:", examen.nombre, err);
         }
     }
+
+    // Mostrar estadísticas de peso
+    console.log("\n📊 ESTADÍSTICAS DE PESO POR REPORTE:");
+    console.log("═".repeat(80));
+
+    // Ordenar por peso (mayor a menor)
+    const reportesOrdenados = [...estadisticasPeso].sort((a, b) => parseFloat(b.pesoKB) - parseFloat(a.pesoKB));
+
+    reportesOrdenados.forEach((reporte, index) => {
+        const emoji = index === 0 ? "🔴" : index === 1 ? "🟡" : "🟢";
+        console.log(`${emoji} ${reporte.nombre}`);
+        console.log(`   Tabla: ${reporte.tabla}`);
+        console.log(`   Peso: ${reporte.pesoKB} KB (${reporte.pesoMB} MB)`);
+        console.log("─".repeat(80));
+    });
+
+    // Calcular peso total
+    const pesoTotal = pdfFinal.output('arraybuffer').byteLength;
+    console.log(`\n📦 PESO TOTAL DEL FOLIO: ${(pesoTotal / 1024).toFixed(2)} KB (${(pesoTotal / (1024 * 1024)).toFixed(2)} MB)`);
+    console.log(`📄 Total de reportes: ${estadisticasPeso.length}`);
+    console.log(`📈 Promedio por reporte: ${(pesoTotal / estadisticasPeso.length / 1024).toFixed(2)} KB`);
+    console.log("═".repeat(80) + "\n");
+
     imprimir(pdfFinal);
     pdfFinal.save(`Folio_${nro}.pdf`);
 }

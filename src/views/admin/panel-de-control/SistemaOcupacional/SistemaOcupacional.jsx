@@ -144,7 +144,7 @@ const TabComponent = () => {
       setSelectSede(sedeTNP?.cod_sede || userlogued.sedes[0].cod_sede);
     }
   }, [userlogued.sedes]);
-
+  console.log(selectSede);
   //AVVESO A LAS TARJETAS VIEWS
 
   const tieneVista = (nombreVista) => {
