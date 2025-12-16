@@ -28,7 +28,7 @@ export default function RadioTable({
         <div
           key={itemIndex}
           className={`grid ${gridColsClass} ${itemIndex < items.length - 1 ? 'border-b border-gray-200 ' : 'rounded-b-lg'
-            } hover:bg-gray-200 `}
+            } hover:bg-gray-300 `}
         >
           {/* Columna de texto (ocupa labelColumns columnas) */}
           <div className={`p-3 font-semibold ${labelColSpanClass}`}>

@@ -364,7 +364,7 @@ export default function HematologiaBioquimicaECO() {
                   value={form[key.toLowerCase()]}
                   labelWidth="120px"
                   onChange={handleChange}
-                  onKeyUp={handleFocusNext}
+                  onKeyUp={(e) => { handleFocusNext(e, key == "Linfocitos" ? "glucosa" : "") }}
                 />
               ))}
             </div>
@@ -405,6 +405,7 @@ export default function HematologiaBioquimicaECO() {
                 value={form.glucosa}
                 labelWidth="120px"
                 onChange={handleChange}
+                onKeyUp={(e) => { handleFocusNext(e,"creatinina") }}
               />
               <div className="flex gap-4 items-center">
                 <InputCheckbox
@@ -556,7 +557,7 @@ export default function HematologiaBioquimicaECO() {
               </div>
             </SectionFieldset>
 
-            <SectionFieldset legend="Sedimento Unitario" className="space-y-2 grid xl:grid-cols-2 gap-x-4">
+            <SectionFieldset legend="Sedimento Urinario" className="space-y-2 grid xl:grid-cols-2 gap-x-4">
               <div className="grid gap-y-2">
                 {[
                   { label: 'Leucocitos (x campos)', key: 'leucocitosSedimentoUnitario' },

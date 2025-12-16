@@ -31,23 +31,23 @@ const formatDateToLong = (dateString) => {
 // Header con datos de ficha, sede y fecha
 const drawHeader = (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
-  
+
   CabeceraLogo(doc, { ...datos, tieneMembrete: false, yOffset: 3 });
-  
+
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("Nro de ficha: ", pageW - 80, 8);
   doc.setFont("helvetica", "normal").setFontSize(18);
   doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 9);
-  
+
   // Sede
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 13);
-  
+
   // Fecha de examen
   const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || datos.fechaLab || "");
   doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 18);
-  
+
   // Página
   doc.text("Pag. 01", pageW - 30, 3);
 
@@ -69,7 +69,7 @@ const drawPatientData = (doc, datos = {}, xLeft, yStart = 28) => {
   let y = yStart;
   const lineHeight = 5.5;
   const patientDataX = xLeft; // Alineado con el contenido
-  
+
   const drawPatientDataRow = (label, value) => {
     const labelWithColon = label.endsWith(':') ? label : label + ' :';
     doc.setFontSize(9).setFont('helvetica', 'bold');
@@ -83,19 +83,19 @@ const drawPatientData = (doc, datos = {}, xLeft, yStart = 28) => {
     doc.text(String(value || '').toUpperCase(), valueX, y);
     y += lineHeight;
   };
-  
+
   drawPatientDataRow("Apellidos y Nombres :", datos.nombres || datos.nombresPaciente || '');
-  
+
   // Solo mostrar Edad si está presente
   if (datos.edad || datos.edadPaciente) {
     drawPatientDataRow("Edad :", `${datos.edad || datos.edadPaciente} AÑOS`);
   }
-  
+
   // Solo mostrar DNI si está presente
   if (datos.dni || datos.dniPaciente) {
     drawPatientDataRow("DNI :", datos.dni || datos.dniPaciente);
   }
-  
+
   // Fecha
   doc.setFontSize(9).setFont('helvetica', 'bold');
   const fechaLabel = "Fecha :";
@@ -104,7 +104,7 @@ const drawPatientData = (doc, datos = {}, xLeft, yStart = 28) => {
   const fechaLabelWidth = doc.getTextWidth(fechaLabel);
   doc.text(formatDateToLong(datos.fechaExamen || datos.fecha || datos.fechaLab || ''), patientDataX + fechaLabelWidth + 2, y);
   y += lineHeight;
-  
+
   // Línea divisoria
   y += 2;
   const pageW = doc.internal.pageSize.getWidth();
@@ -113,10 +113,10 @@ const drawPatientData = (doc, datos = {}, xLeft, yStart = 28) => {
   doc.setLineWidth(0.3);
   doc.line(margin * 2, y, pageW - margin * 2, y);
   y += 4;
-  
+
   // Reseteo
   doc.setFont('helvetica', 'normal').setFontSize(9).setLineWidth(0.2);
-  
+
   return y;
 };
 
@@ -125,19 +125,37 @@ export default function Coproparasitologico_Digitalizado(datos = {}) {
   const datosReales = {
     // Datos del paciente
     nombres: String(datos.nombres || datos.nombresPaciente || ""),
+    nombresPaciente: String(datos.nombres || datos.nombresPaciente || ""),
     edad: datos.edad || datos.edadPaciente || "",
+    edadPaciente: datos.edad || datos.edadPaciente || "",
     dni: datos.dni || datos.dniPaciente || "",
+    dniPaciente: datos.dni || datos.dniPaciente || "",
     fecha: datos.fecha || datos.fechaExamen || datos.fechaLab || "",
-    
+
+    // Datos adicionales del paciente
+    sexoPaciente: datos.sexoPaciente || "",
+    lugarNacimientoPaciente: datos.lugarNacimientoPaciente || "",
+    estadoCivilPaciente: datos.estadoCivilPaciente || "",
+    fechaNacimientoPaciente: datos.fechaNacimientoPaciente || "",
+    nivelEstudioPaciente: datos.nivelEstudioPaciente || "",
+    ocupacionPaciente: datos.ocupacionPaciente || "",
+    cargoPaciente: datos.cargoPaciente || "",
+    areaPaciente: datos.areaPaciente || "",
+    empresa: datos.empresa || "",
+    contrata: datos.contrata || "",
+    nombreExamen: datos.nombreExamen || "",
+
     // Datos de ficha
     norden: String(datos.norden || datos.numeroFicha || ""),
+    numeroFicha: String(datos.norden || datos.numeroFicha || ""),
     sede: datos.sede || datos.nombreSede || "",
-    
+    nombreSede: datos.sede || datos.nombreSede || "",
+
     // Datos de color
-    codigoColor: datos.codigoColor || "#008f39",
-    textoColor: datos.textoColor || "F",
+    codigoColor: datos.codigoColor,
+    textoColor: datos.textoColor,
     color: datos.color || 1,
-    
+
     // Muestra I - Examen Macroscópico
     muestra1: {
       color: String(datos.txtcolor || ""),
@@ -147,14 +165,14 @@ export default function Coproparasitologico_Digitalizado(datos = {}) {
       restosAlimenticios: String(datos.txtrestosa || ""),
       grasa: String(datos.txtgrasa || "")
     },
-    
+
     // Muestra I - Examen Microscópico
     microscopico1: {
       leucocitos: String(datos.txtleucocitos || ""),
       hematies: String(datos.txthematies || ""),
       parasitos: String(datos.txtlugol || "")
     },
-    
+
     // Digitalizaciones
     digitalizacion: datos.digitalizacion || []
   };
@@ -185,117 +203,133 @@ export default function Coproparasitologico_Digitalizado(datos = {}) {
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
-      // HEADER
-      drawHeader(doc, datosFinales);
-      
-      // === TÍTULO ===
-      let y = 28;
-      doc.setFont("helvetica", "bold").setFontSize(14);
-      doc.text("COPROPARASITOLÓGICO", pageW / 2, y, { align: "center" });
-      y += 12; // Aumentado de 10 a 12 para más separación
-      
-      // === DATOS DEL PACIENTE ===
-      const xLeft = margin * 2;
-      y = drawPatientData(doc, datosFinales, xLeft, y);
-      
-      // === RESULTADOS ===
-      doc.setFont("helvetica", "bold").setFontSize(9);
-      doc.text("RESULTADOS:", xLeft, y);
-      y += 8;
+    // HEADER
+    drawHeader(doc, datosFinales);
 
-      // MUESTRA I
-      doc.setFont("helvetica", "bold").setFontSize(9);
-      doc.text("MUESTRA: HECES I", xLeft, y);
+    // === TÍTULO ===
+    let y = 28;
+    doc.setFont("helvetica", "bold").setFontSize(14);
+    doc.text("COPROPARASITOLÓGICO", pageW / 2, y, { align: "center" });
+    y += 12; // Aumentado de 10 a 12 para más separación
+
+    // === DATOS DEL PACIENTE ===
+    const xLeft = margin * 2;
+    y = drawPatientData(doc, datosFinales, xLeft, y);
+
+    // === RESULTADOS ===
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.text("RESULTADOS:", xLeft, y);
+    y += 8;
+
+    // MUESTRA I
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.text("MUESTRA: HECES I", xLeft, y);
+    y += 7;
+
+    // EXAMEN MACROSCÓPICO I
+    doc.setFont("helvetica", "bold");
+    doc.text("EXAMEN MACROSCÓPICO I", xLeft, y);
+    y += 7;
+    doc.setFont("helvetica", "normal");
+    [
+      ["COLOR", datosFinales.muestra1.color],
+      ["ASPECTO", datosFinales.muestra1.aspecto],
+      ["MOCO FECAL", datosFinales.muestra1.mocoFecal],
+      ["SANGRE VISIBLE", datosFinales.muestra1.sangreVisible],
+      ["RESTOS ALIMENTICIOS", datosFinales.muestra1.restosAlimenticios],
+      ["GRASA", datosFinales.muestra1.grasa]
+    ].forEach(([lbl, value]) => {
+      doc.text(lbl, xLeft, y);
+      doc.text(":", xDato, y);
+      doc.text(value != null && value !== "" ? String(value) : "", xDato + 4, y);
       y += 7;
+    });
 
-      // EXAMEN MACROSCÓPICO I
-      doc.setFont("helvetica", "bold");
-      doc.text("EXAMEN MACROSCÓPICO I", xLeft, y);
+    // EXAMEN MICROSCÓPICO I
+    y += 6;
+    doc.setFont("helvetica", "bold");
+    doc.text("EXAMEN MICROSCÓPICO I", xLeft, y);
+    y += 7;
+    doc.setFont("helvetica", "normal");
+    [
+      ["LEUCOCITOS", datosFinales.microscopico1.leucocitos],
+      ["HEMATÍES", datosFinales.microscopico1.hematies],
+      ["INVESTIGACIÓN DE PARÁSITOS", datosFinales.microscopico1.parasitos]
+    ].forEach(([lbl, value]) => {
+      doc.text(lbl, xLeft, y);
+      doc.text(":", xDato, y);
+      doc.text(value != null && value !== "" ? String(value) : "", xDato + 4, y);
       y += 7;
-      doc.setFont("helvetica", "normal");
-      [
-        ["COLOR", datosFinales.muestra1.color],
-        ["ASPECTO", datosFinales.muestra1.aspecto],
-        ["MOCO FECAL", datosFinales.muestra1.mocoFecal],
-        ["SANGRE VISIBLE", datosFinales.muestra1.sangreVisible],
-        ["RESTOS ALIMENTICIOS", datosFinales.muestra1.restosAlimenticios],
-        ["GRASA", datosFinales.muestra1.grasa]
-      ].forEach(([lbl, value]) => {
-        doc.text(lbl, xLeft, y);
-        doc.text(":", xDato, y);
-        doc.text(value != null && value !== "" ? String(value) : "", xDato + 4, y);
-        y += 7;
-      });
+    });
 
-      // EXAMEN MICROSCÓPICO I
-      y += 6;
-      doc.setFont("helvetica", "bold");
-      doc.text("EXAMEN MICROSCÓPICO I", xLeft, y);
-      y += 7;
-      doc.setFont("helvetica", "normal");
-      [
-        ["LEUCOCITOS", datosFinales.microscopico1.leucocitos],
-        ["HEMATÍES", datosFinales.microscopico1.hematies],
-        ["INVESTIGACIÓN DE PARÁSITOS", datosFinales.microscopico1.parasitos]
-      ].forEach(([lbl, value]) => {
-        doc.text(lbl, xLeft, y);
-        doc.text(":", xDato, y);
-        doc.text(value != null && value !== "" ? String(value) : "", xDato + 4, y);
-        y += 7;
-      });
+    // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
+    const sigW = 48;
+    const sigH = 20;
+    const sigY = y + 12;
+    const gap = 16;
+    const lineY = sigY + sigH + 3;
 
-      // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
-      const sigW = 53;
-      const sigH = 23;
-      const sigY = y + 12;
-      const gap = 16;
-      
-      if (s1 && s2) {
-        const totalWidth = sigW * 2 + gap;
-        const startX = (pageW - totalWidth) / 2;
-        
-        const addSello = (img, xPos) => {
-          const canvas = document.createElement('canvas');
-          canvas.width = img.width;
-          canvas.height = img.height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0);
-          const selloBase64 = canvas.toDataURL('image/png');
-          doc.addImage(selloBase64, 'PNG', xPos, sigY, sigW, sigH);
-        };
-        addSello(s1, startX);
-        addSello(s2, startX + sigW + gap);
-      } else if (s1) {
-        const canvas = document.createElement('canvas');
-        canvas.width = s1.width;
-        canvas.height = s1.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(s1, 0, 0);
-        const selloBase64 = canvas.toDataURL('image/png');
-        const imgX = (pageW - sigW) / 2;
-        doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
-      } else if (s2) {
-        const canvas = document.createElement('canvas');
-        canvas.width = s2.width;
-        canvas.height = s2.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(s2, 0, 0);
-        const selloBase64 = canvas.toDataURL('image/png');
-        const imgX = (pageW - sigW) / 2;
-        doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
+    // Función auxiliar para agregar sello al PDF
+    const agregarSello = (img, xPos, yPos, width, height) => {
+      if (!img) return;
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const selloBase64 = canvas.toDataURL('image/png');
+      doc.addImage(selloBase64, 'PNG', xPos, yPos, width, height);
+    };
+
+    // Función auxiliar para dibujar línea y texto debajo del sello
+    const dibujarLineaYTexto = (centroX, lineY, tipoSello) => {
+      doc.setLineWidth(0.2);
+      doc.line(centroX - 25, lineY, centroX + 25, lineY);
+      doc.setFont('helvetica', 'normal').setFontSize(9);
+      if (tipoSello === 'SELLOFIRMA') {
+        // SELLOFIRMA: Firma y Sello del Profesional / Responsable de la Evaluación
+        doc.text("Firma y Sello del Profesional", centroX, lineY + 5, { align: "center" });
+        doc.text("Responsable de la Evaluación", centroX, lineY + 8, { align: "center" });
+      } else if (tipoSello === 'SELLOFIRMADOCASIG') {
+        // SELLOFIRMADOCASIG: Firma y Sello Médico Asignado
+        doc.text("Firma y Sello Médico Asignado", centroX, lineY + 5, { align: "center" });
+      } else {
+        doc.text("Firma y Sello", centroX, lineY + 5, { align: "center" });
       }
+    };
 
-      // FOOTER
-      footerTR(doc, { ...datosFinales, footerOffsetY: 16 });
+    if (s1 && s2) {
+      const totalWidth = sigW * 2 + gap;
+      const startX = (pageW - totalWidth) / 2;
 
-      // PRINT
-      const blob = doc.output("blob");
-      const url = URL.createObjectURL(blob);
-      const iframe = document.createElement("iframe");
-      iframe.style.display = "none";
-      iframe.src = url;
-      document.body.appendChild(iframe);
-      iframe.onload = () => iframe.contentWindow.print();
+      agregarSello(s1, startX, sigY, sigW, sigH);
+      agregarSello(s2, startX + sigW + gap, sigY, sigW, sigH);
+
+      const centroSello1X = startX + sigW / 2;
+      const centroSello2X = startX + sigW + gap + sigW / 2;
+      dibujarLineaYTexto(centroSello1X, lineY, 'SELLOFIRMA');
+      dibujarLineaYTexto(centroSello2X, lineY, 'SELLOFIRMADOCASIG');
+    } else if (s1) {
+      const imgX = (pageW - sigW) / 2;
+      agregarSello(s1, imgX, sigY, sigW, sigH);
+      dibujarLineaYTexto(pageW / 2, lineY, 'SELLOFIRMA');
+    } else if (s2) {
+      const imgX = (pageW - sigW) / 2;
+      agregarSello(s2, imgX, sigY, sigW, sigH);
+      dibujarLineaYTexto(pageW / 2, lineY, 'SELLOFIRMADOCASIG');
+    }
+
+    // FOOTER
+    footerTR(doc, { ...datosFinales, footerOffsetY: 16 });
+
+    // PRINT
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.src = url;
+    document.body.appendChild(iframe);
+    iframe.onload = () => iframe.contentWindow.print();
   })
-  
+
 }

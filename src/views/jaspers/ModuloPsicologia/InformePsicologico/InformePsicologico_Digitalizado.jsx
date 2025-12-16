@@ -6,8 +6,8 @@ import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import { getSign, convertirGenero } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
 
-export default function InformePsicologico_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default function InformePsicologico_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   // Contador de páginas dinámico
   let numeroPagina = 1;
@@ -16,7 +16,7 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   function buildDatosFinales(raw) {
     const datosFinales = {
       apellidosNombres: String((((raw?.apellidosPaciente ?? '') + ' ' + (raw?.nombresPaciente ?? '')).trim())),
-      fechaExamen: formatearFechaCorta(raw?.fechaEntrevista ?? ''), 
+      fechaExamen: formatearFechaCorta(raw?.fechaEntrevista ?? ''),
       sexo: convertirGenero(raw?.sexoPaciente ?? ''),
       documentoIdentidad: String(raw?.dniPaciente ?? ''),
       edad: String(raw?.edadPaciente ?? ''),
@@ -28,7 +28,7 @@ export default function InformePsicologico_Digitalizado(data = {}) {
       contrata: String(raw?.contrata ?? ''),
       sede: String(raw?.sede ?? ''),
       numeroFicha: String(raw?.norden ?? ""),
-      codigoEntrevista: String(raw?.codigoInforme ?? ''), 
+      codigoEntrevista: String(raw?.codigoInforme ?? ''),
       tipoExamen: String(raw?.nombreExamen ?? ''),
       codigoClinica: String(raw?.codigoClinica ?? ''),
       color: Number(raw?.color ?? 0),
@@ -41,7 +41,7 @@ export default function InformePsicologico_Digitalizado(data = {}) {
         areaPsicomotricidad: raw?.areaPsicomotricidad,
         recomendaciones: raw?.recomendaciones
       },
-      apto: (typeof raw?.aprobo === 'boolean') ? raw.aprobo : false 
+      apto: (typeof raw?.aprobo === 'boolean') ? raw.aprobo : false
     };
 
     // Asegurar que las secciones de cuerpo sean arrays listables
@@ -260,13 +260,13 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(datosFinales.documentoIdentidad, tablaInicioX + 12, yTexto + 1.5);
 
-  doc.setFont("helvetica", "bold").setFontSize(9);    
+  doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Edad:", tablaInicioX + 47, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(datosFinales.edad + " Años", tablaInicioX + 58, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Sexo:", tablaInicioX + 92, yTexto + 1.5 );
+  doc.text("Sexo:", tablaInicioX + 92, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(datosFinales.sexo, tablaInicioX + 105, yTexto + 1.5);
 
@@ -541,7 +541,11 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   footerTR(doc, { footerOffsetY: 10 });
 
   // Imprimir
-  imprimir(doc);
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {

@@ -5,8 +5,8 @@ import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 
-export default function Oftalmologia(datos = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default function Oftalmologia(datos = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // Contador de páginas dinámico
@@ -87,11 +87,11 @@ export default function Oftalmologia(datos = {}) {
     const palabras = texto.split(' ');
     let lineaActual = '';
     let yPos = y;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -105,11 +105,11 @@ export default function Oftalmologia(datos = {}) {
         }
       }
     });
-    
+
     if (lineaActual) {
       doc.text(lineaActual, x, yPos);
     }
-    
+
     return yPos;
   };
 
@@ -117,25 +117,25 @@ export default function Oftalmologia(datos = {}) {
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
     const tablaInicioX = 5;
     const tablaAncho = 200;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo gris más oscuro
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
+
     // Dibujar líneas del header
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
-    
+
     return yPos + alturaHeader;
   };
 
@@ -153,11 +153,11 @@ export default function Oftalmologia(datos = {}) {
   doc.setLineWidth(0.2);
 
   // Primera fila: Apellidos y Nombres con división para Tipo de examen
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); 
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + filaAltura); // División para Tipo de examen
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); 
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); 
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); 
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
   // Segunda fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
@@ -273,13 +273,13 @@ export default function Oftalmologia(datos = {}) {
 
   // === SECCIÓN 2: EXAMEN OFTALMOLÓGICO ===
   yPos = dibujarHeaderSeccion("2. EXAMEN OFTALMOLÓGICO", yPos, filaAltura);
-  
+
   // Calcular altura dinámica del cuadro basada en el contenido
   const calcularAlturaCuadro = () => {
     doc.setFontSize(8); // Establecer tamaño de fuente para cálculos precisos
     let alturaBase = 75; // altura mínima aumentada hasta "Enfermedades Oculares"
     const lineHeight = 6;
-    
+
     // Verificar si hay texto en enfermedades oculares y calcular líneas adicionales
     if (datos.eoculares) {
       const texto = datos.eoculares.toString();
@@ -293,7 +293,7 @@ export default function Oftalmologia(datos = {}) {
     } else {
       alturaBase += 12; // espacio mínimo aumentado si no hay texto
     }
-    
+
     // Verificar si hay texto adicional en eoculares1
     if (datos.eoculares1) {
       const texto = datos.eoculares1.toString();
@@ -305,10 +305,10 @@ export default function Oftalmologia(datos = {}) {
       }
       alturaBase += 12; // espacio aumentado para texto adicional
     }
-    
+
     return Math.max(alturaBase, 90); // altura mínima aumentada de 90mm
   };
-  
+
   // Caja principal con altura dinámica
   const boxH = calcularAlturaCuadro();
   const margin = tablaInicioX;
@@ -426,12 +426,16 @@ export default function Oftalmologia(datos = {}) {
     { nombre: "SELLOFIRMADOCASIG", x: 50, y: y + boxH + 20, maxw: 50 },
     { nombre: "SELLOFIRMA", x: 120, y: y + boxH + 20, maxw: 50 },
   ];
-  
+
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 8});
-  
+  footerTR(doc, { footerOffsetY: 8 });
+
   agregarFirmas(doc, datos.digitalizacion, firmasAPintar).then(() => {
-    imprimir(doc);
+    if (docExistente) {
+      return doc;
+    } else {
+      imprimir(doc);
+    }
   });
 }
 function imprimir(doc) {

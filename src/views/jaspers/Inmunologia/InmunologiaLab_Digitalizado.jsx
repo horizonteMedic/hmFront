@@ -51,30 +51,30 @@ const formatDateToLong = (dateString) => {
 // Header con datos de ficha, sede y fecha
 const drawHeader = (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
-  
+
   CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-  
+
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Nro de ficha: ", pageW - 80, 15);
   doc.setFont("helvetica", "normal").setFontSize(18);
   doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
-  
+
   // Sede
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
-  
+
   // Fecha de examen
   const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
   doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
-  
+
   // Página
   doc.text("Pag. 01", pageW - 30, 10);
 
   // Bloque de color
   drawColorBox(doc, {
-    color: datos.codigoColor || "#008f39",
-    text: datos.textoColor || "F",
+    color: datos.codigoColor,
+    text: datos.textoColor,
     x: pageW - 30,
     y: 10,
     size: 22,
@@ -90,7 +90,7 @@ const drawPatientData = (doc, datos = {}) => {
   let y = 40;
   const lineHeight = 6;
   const patientDataX = margin;
-  
+
   const drawPatientDataRow = (label, value) => {
     const labelWithColon = label.endsWith(':') ? label : label + ' :';
     doc.setFontSize(11).setFont('helvetica', 'bold');
@@ -104,10 +104,10 @@ const drawPatientData = (doc, datos = {}) => {
     doc.text(String(value || '').toUpperCase(), valueX, y);
     y += lineHeight;
   };
-  
+
   drawPatientDataRow("Apellidos y Nombres :", datos.nombres || datos.nombresPaciente || '');
   drawPatientDataRow("Edad :", datos.edad || datos.edadPaciente ? `${datos.edad || datos.edadPaciente} AÑOS` : '');
-  
+
   // Fecha
   doc.setFontSize(11).setFont('helvetica', 'bold');
   const fechaLabel = "Fecha :";
@@ -115,10 +115,10 @@ const drawPatientData = (doc, datos = {}) => {
   doc.setFont('helvetica', 'normal');
   const fechaLabelWidth = doc.getTextWidth(fechaLabel);
   doc.text(formatDateToLong(datos.fechaExamen || datos.fecha || ''), patientDataX + fechaLabelWidth + 2, y);
-  
+
   // Reseteo
   doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);
-  
+
   return y + lineHeight;
 };
 
@@ -130,7 +130,7 @@ export default function InmunologiaLab_Digitalizado(datos = {}) {
 
   // === HEADER ===
   drawHeader(doc, datos);
-  
+
   // === DATOS DEL PACIENTE ===
   drawPatientData(doc, datos);
 
@@ -207,12 +207,12 @@ export default function InmunologiaLab_Digitalizado(datos = {}) {
     const sigH = 23; // Tamaño fijo height
     const sigY = 210;
     const gap = 16; // Espacio entre sellos (reducido 4mm: 20 - 4 = 16)
-    
+
     if (s1 && s2) {
       // Si hay dos sellos, centrarlos juntos
       const totalWidth = sigW * 2 + gap;
       const startX = (pageW - totalWidth) / 2;
-      
+
       const addSello = (img, xPos) => {
         const canvas = document.createElement('canvas');
         canvas.width = img.width;
@@ -258,5 +258,5 @@ export default function InmunologiaLab_Digitalizado(datos = {}) {
     document.body.appendChild(iframe);
     iframe.onload = () => iframe.contentWindow.print();
   })
-  
+
 }

@@ -6,8 +6,8 @@ import footerTR from '../components/footerTR.jsx';
 import PropTypes from 'prop-types';
 import { getSign } from '../../utils/helpers';
 
-export default function UsoRespiradores(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default function UsoRespiradores(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // Contador de páginas dinámico
@@ -551,11 +551,11 @@ export default function UsoRespiradores(data = {}) {
 
     // Determinar si hay datos para mostrar
     const tieneDatos = datosOtros && datosOtros.trim().length > 0;
-    
+
     // Texto con font size 7
     doc.setTextColor(0, 0, 0);
     doc.setFont("helvetica", "normal").setFontSize(7);
-    
+
     if (tieneDatos) {
       // Si hay datos, mostrar "Otros: [datos]"
       doc.text(textoOtros, leftMargin + 2, yPos + 2.5);
@@ -2156,7 +2156,12 @@ export default function UsoRespiradores(data = {}) {
   footerTR(doc, { footerOffsetY: 8 });
 
   // === Imprimir ===
-  imprimir(doc);
+  // === Imprimir ===
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {

@@ -3,8 +3,8 @@ import CabeceraLogo from "../components/CabeceraLogo.jsx";
 import footerTR from "../components/footerTR.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
 
-export default function conInformadoOcupacional_Digitalizado(data = {}) {
-    const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default function conInformadoOcupacional_Digitalizado(data = {}, docExistente = null) {
+    const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
     const margin = 20;
     const pageW = doc.internal.pageSize.getWidth();
     const pageH = doc.internal.pageSize.getHeight();
@@ -85,7 +85,7 @@ export default function conInformadoOcupacional_Digitalizado(data = {}) {
             img.onerror = () => rej(`No se pudo cargar ${src}`);
         });
 
-    Promise.all([
+    return Promise.all([
         isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
         isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
     ]).then(([s1, s2]) => {
@@ -294,15 +294,19 @@ export default function conInformadoOcupacional_Digitalizado(data = {}) {
         footerTR(doc, data);
 
         // === 7) Generar blob y abrir en iframe para imprimir automáticamente ===
-        const blob = doc.output("blob");
-        const url = URL.createObjectURL(blob);
-        const iframe = document.createElement("iframe");
-        iframe.style.display = "none";
-        iframe.src = url;
-        document.body.appendChild(iframe);
-        iframe.onload = () => {
-            iframe.contentWindow.focus();
-            iframe.contentWindow.print();
-        };
+        if (docExistente) {
+            return doc;
+        } else {
+            const blob = doc.output("blob");
+            const url = URL.createObjectURL(blob);
+            const iframe = document.createElement("iframe");
+            iframe.style.display = "none";
+            iframe.src = url;
+            document.body.appendChild(iframe);
+            iframe.onload = () => {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+            };
+        }
     });
 }

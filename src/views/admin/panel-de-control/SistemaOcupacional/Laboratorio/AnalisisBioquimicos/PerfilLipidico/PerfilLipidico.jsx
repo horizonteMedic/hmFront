@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom } from '@fortawesome/free-solid-svg-icons';
-import { GetInfoPacAnalisisBio, GetTableAnalBio, Loading, PrintHojaR, SubmitDataService, VerifyTR } from './controllerAnalisisBioquimicos';
+import { GetInfoPacAnalisisBio, GetTableAnalBio, Loading, PrintHojaR, SubmitDataService, VerifyTR } from './controllerPerfilLipidico';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { getToday } from '../../../../../../utils/helpers';
@@ -14,7 +14,7 @@ import EmpleadoComboBox from '../../../../../../components/reusableComponents/Em
 
 const tabla = 'analisis_bioquimicos';
 
-export default function AnalisisBioquimicos() {
+export default function PerfilLipidico() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 

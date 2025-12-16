@@ -26,12 +26,46 @@ export const GetInfoServicio = async (
         onFinish
     );
     if (res) {
+        let concatenacionObservacion = ""
+
+        //Validacion presion
         let presion_sistolica = parseFloat(res.sistolicaTriaje);
         let presion_diastolica = parseFloat(res.diastolicaTriaje);
         let htaNueva = false;
         if (!isNaN(presion_sistolica) && !isNaN(presion_diastolica) &&
             (presion_sistolica >= 140 || presion_diastolica >= 90)) {
             htaNueva = true
+        }
+
+        //Validacion cuello
+        let cuello_varon_normal = true;
+        let cuello_mujer_normal = true;
+        let criterio_d_cuello = false;
+        const sexo = res.sexoPaciente ?? "";
+        const textoCuello = "EVALUACIÓN POR NEUROLOGÍA"
+        if (res.perimetroCuelloTriaje) {
+            let cuello = parseFloat(res.perimetroCuelloTriaje);
+            if (!isNaN(cuello)) {
+                if (sexo == "M" && cuello >= 43.2) {
+                    cuello_varon_normal = false;
+                    criterio_d_cuello = true;
+                    concatenacionObservacion += textoCuello + "\n"
+                }
+                else if (sexo == "F" && cuello >= 40.6) {
+                    cuello_mujer_normal = false;
+                    criterio_d_cuello = true;
+                    concatenacionObservacion += textoCuello + "\n"
+                }
+            }
+        }
+        //Validacion imc
+        let imc = res.imcTriaje ?? "";
+        let criterio_d_imc = false;
+        if (imc) {
+            imc = parseFloat(imc);
+            if (!isNaN(imc) && imc >= 30) {
+                criterio_d_imc = true;
+            }
         }
 
         set((prev) => ({
@@ -57,9 +91,12 @@ export const GetInfoServicio = async (
             presion_diastolica: res.diastolicaTriaje ?? "",
 
             hta_nueva: htaNueva,
-            observaciones: res.conclusionObservaciones_txtobservaciones ?? "",
-
-
+            cuello_varon_normal: cuello_varon_normal,
+            cuello_mujer_normal: cuello_mujer_normal,
+            criterio_d_cuello: criterio_d_cuello,
+            criterio_d_imc: criterio_d_imc,
+            criterio_d: criterio_d_cuello && criterio_d_imc,
+            observaciones: concatenacionObservacion,
         }));
     }
 };

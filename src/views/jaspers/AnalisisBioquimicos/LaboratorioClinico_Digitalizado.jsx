@@ -4,9 +4,10 @@ import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 import { convertirGenero } from "../../utils/helpers.js";
+import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
+export default function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExistente = null) {
 
-export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // === MAPEO DE DATOS ===
@@ -46,7 +47,7 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
   const filaAltura = 5;
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = () => {
     CabeceraLogo(doc, { ...datosReales, tieneMembrete: false, yOffset: 7 });
 
     // Título principal
@@ -94,7 +95,7 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(1);
+  drawHeader();
 
   // === SECCIÓN 1: DATOS PERSONALES ===
   let yPos = 30;
@@ -253,7 +254,7 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
     { label: "Hematocrito", value: data.txtHematocrito || "N/A", suffix: "%" },
     { label: "Hemoglobina", value: data.txtHemoglobina || "N/A", suffix: "g/dl" },
     { label: "Hematíes", value: data.txtHematiesHematologia || "N/A" },
-    { label: "V.S.G", value: data.txtVsg || "N/A" },
+    { label: "V.S.G", value: data.txtVsg || "N/A", suffix: "mm/hora" },
     { label: "Plaquetas", value: data.txtPlaquetas || "N/A", suffix: "mm³" },
   ];
 
@@ -276,7 +277,7 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
   // Contorno exterior de la tabla
   doc.setLineWidth(0.3);
   doc.rect(tablaInicioX, yPos, tablaAncho, tableH);
-  
+
   // Línea vertical central
   doc.line(tablaInicioX + mitadTabla, yPos, tablaInicioX + mitadTabla, yPos + tableH);
 
@@ -284,15 +285,15 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
   doc.setFontSize(8);
   const centroIzq = tablaInicioX + mitadTabla / 2; // Centro de la columna izquierda
   const centroDer = tablaInicioX + mitadTabla + mitadTabla / 2; // Centro de la columna derecha
-  
+
   for (let i = 0; i < totalRows; i++) {
     const rowY = yPos + rowH * i;
-    
+
     // Columna izquierda
     if (hematoLeft[i]) {
       const { label, value, suffix } = hematoLeft[i];
       const displayValue = value + (suffix && value !== "N/A" && value !== "" ? " " + suffix : "");
-      
+
       doc.setFont("helvetica", "normal");
       doc.text(label, centroIzq - 5, rowY + 3.5, { align: "right" });
       doc.text(":", centroIzq - 3, rowY + 3.5);
@@ -304,7 +305,7 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
     if (hematoRight[i]) {
       const { label, value, suffix } = hematoRight[i];
       const displayValue = value + (suffix && value !== "N/A" && value !== "" ? " " + suffix : "");
-      
+
       doc.setFont("helvetica", "normal");
       doc.text(label, centroDer - 5, rowY + 3.5, { align: "right" });
       doc.text(":", centroDer - 3, rowY + 3.5);
@@ -362,7 +363,7 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
   const rprValue = data.chkPositivo ? "REACTIVO" : data.chkNegativo ? "NO REACTIVO" : "N/A";
   const sueroCentroIzq = tablaInicioX + mitadTabla / 2;
   const sueroCentroDer = tablaInicioX + mitadTabla + mitadTabla / 2;
-  
+
   doc.setFontSize(8);
   doc.setFont("helvetica", "normal");
   doc.text("RPR", sueroCentroIzq - 5, yPos + 3.5, { align: "right" });
@@ -465,8 +466,8 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
 
   const sedimentoItems = [
     { labelL: "Cel. Epiteliales", valueL: data.txtCelEpitelialesSu || "N/A", labelR: "Cilindros", valueR: data.txtCilindrosSu || "N/A" },
-    { labelL: "Leucocitos", valueL: data.txtLeucocitosSu || "N/A", labelR: "Bacterias", valueR: data.txtBacteriasSu || "N/A" },
-    { labelL: "Hematíes", valueL: (data.txtHematiesSu && data.txtHematiesSu !== "N/A" ? data.txtHematiesSu + " x campo" : "N/A"), labelR: "Gram S/C", valueR: data.txtPusSu || "N/A" },
+    { labelL: "Leucocitos", valueL: (data.txtLeucocitosSu && data.txtLeucocitosSu !== "N/A" ? data.txtLeucocitosSu + " X CAMPO" : "N/A"), labelR: "Bacterias", valueR: data.txtBacteriasSu || "N/A" },
+    { labelL: "Hematíes", valueL: (data.txtHematiesSu && data.txtHematiesSu !== "N/A" ? data.txtHematiesSu + " X CAMPO" : "N/A"), labelR: "Gram S/C", valueR: data.txtPusSu || "N/A" },
     { labelL: "Cristales", valueL: data.txtCristalesSu || "N/A", labelR: "Otros", valueR: data.txtOtrosSu || "N/A" },
   ];
 
@@ -480,7 +481,7 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
   sedimentoItems.forEach((item, idx) => {
     const rowY = yPos + filaAltura * idx;
     const esCristalesOtros = item.labelL === "Cristales";
-    
+
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
     doc.text(item.labelL, sedCentroIzq - 5, rowY + 3.5, { align: "right" });
@@ -531,64 +532,44 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(6.5);
   const obsLines = doc.splitTextToSize(data.txtObservacionesLb || "", tablaAncho - 4);
   const obsHeight = Math.max(filaAltura, obsLines.length * 3 + 2);
-  
+
   doc.setLineWidth(0.2);
   doc.rect(tablaInicioX, yPos, tablaAncho, obsHeight);
-  
+
   doc.text(obsLines, tablaInicioX + 2, yPos + 3.5);
   yPos += obsHeight;
 
   // === SECCIÓN 9: FIRMAS ===
-  const alturaFilaFirmas = 30;
-  
-  // Dibujar fila de firmas (sin división)
+  const alturaSeccionFirmas = 32; // Altura ajustada para que quepa el texto completo dentro
+  const baseY = yPos;
+
+  // Dibujar los bordes de la fila de firmas
+  doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
-  doc.rect(tablaInicioX, yPos, tablaAncho, alturaFilaFirmas);
+  doc.rect(tablaInicioX, baseY, tablaAncho, alturaSeccionFirmas);
 
-  // Obtener firmas disponibles
-  const sello1 = data.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  const sello2 = data.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
-  
-  const tieneFirma1 = sello1 && sello1.url && sello1.url !== "Sin registro";
-  const tieneFirma2 = sello2 && sello2.url && sello2.url !== "Sin registro";
-  
-  const firmasCentro = tablaInicioX + tablaAncho / 2;
-  const firmasIzq = tablaInicioX + tablaAncho / 4;
-  const firmasDer = tablaInicioX + (3 * tablaAncho / 4);
+  // Usar helper para dibujar firmas (ajustar Y para que queden dentro de la fila, más cerca)
+  dibujarFirmas({ doc, datos: data, y: baseY + 2, pageW }).then(() => {
+    // === FOOTER ===
+    footerTR(doc, { footerOffsetY: 12 });
 
-  if (tieneFirma1 && tieneFirma2) {
-    // 2 firmas: una izquierda, otra derecha
-    try {
-      doc.addImage(sello1.url, 'PNG', firmasIzq - 22, yPos + 5, 45, 20);
-    } catch (error) {
-      console.log("Error cargando firma 1:", error);
+    // === IMPRIMIR ===
+    if (!docExistente) {
+      imprimir(doc);
     }
-    try {
-      doc.addImage(sello2.url, 'PNG', firmasDer - 22, yPos + 5, 45, 20);
-    } catch (error) {
-      console.log("Error cargando firma 2:", error);
+  }).catch(err => {
+    console.error(err);
+    if (!docExistente) {
+      alert('Error generando PDF: ' + err);
     }
-  } else if (tieneFirma1) {
-    // Solo firma 1: centrada
-    try {
-      doc.addImage(sello1.url, 'PNG', firmasCentro - 22, yPos + 5, 45, 20);
-    } catch (error) {
-      console.log("Error cargando firma 1:", error);
-    }
-  } else if (tieneFirma2) {
-    // Solo firma 2: centrada
-    try {
-      doc.addImage(sello2.url, 'PNG', firmasCentro - 22, yPos + 5, 45, 20);
-    } catch (error) {
-      console.log("Error cargando firma 2:", error);
-    }
+  });
+
+  // Si hay docExistente, agregar footer y retornar el doc inmediatamente
+  // (las firmas se agregarán asíncronamente)
+  if (docExistente) {
+    footerTR(doc, { footerOffsetY: 12 });
+    return doc;
   }
-
-  // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 12 });
-
-  // === IMPRIMIR ===
-  imprimir(doc);
 }
 
 function imprimir(doc) {

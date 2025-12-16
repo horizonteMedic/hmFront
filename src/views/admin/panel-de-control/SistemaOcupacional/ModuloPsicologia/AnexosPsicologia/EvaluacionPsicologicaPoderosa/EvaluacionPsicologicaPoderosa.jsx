@@ -85,11 +85,11 @@ export default function EvaluacionPsicologicaPoderosa() {
         intelAnalisisSintesis: "",
 
         // Áreas de Evaluación (Personalidad)
-        persEstabilidad: "",
-        persAfrontaEstres: "",
-        persAfrontaRiesgo: "",
-        persRelaciones: "",
-        persNormasReglas: "",
+        persEstabilidad: "NP",
+        persAfrontaEstres: "NP",
+        persAfrontaRiesgo: "NP",
+        persRelaciones: "NP",
+        persNormasReglas: "NP",
 
         // Campos de texto libres
         fortalezasOportunidades: "",

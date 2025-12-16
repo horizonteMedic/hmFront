@@ -3,6 +3,7 @@ import autoTable from "jspdf-autotable";
 import CabeceraLogo from "../components/CabeceraLogo.jsx";
 import footerTR from "../components/footerTR.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
+import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
 
 export default function Consentimiento_Marihuana_Digitalizado(datos) {
   const doc = new jsPDF();
@@ -20,21 +21,21 @@ export default function Consentimiento_Marihuana_Digitalizado(datos) {
   // Header con datos de ficha, sede y fecha
   const drawHeader = () => {
     CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-    
+
     // Número de Ficha
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Nro de ficha: ", pageW - 80, 15);
     doc.setFont("helvetica", "normal").setFontSize(18);
     doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
-    
+
     // Sede
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
-    
+
     // Fecha de examen
     const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
     doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
-    
+
     // Página
     doc.text("Pag. 01", pageW - 30, 10);
 
@@ -53,256 +54,155 @@ export default function Consentimiento_Marihuana_Digitalizado(datos) {
 
   drawHeader();
 
-  const huella = datos.digitalizacion.find(d => d.nombreDigitalizacion === "HUELLA");
-  const firma = datos.digitalizacion.find(d => d.nombreDigitalizacion === "FIRMAP");
-  const sello = datos.digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  const isValidUrl = url => url && url !== "Sin registro";
+  // Contenido del documento
+  let y = 44;
+  const margin = 15;
 
-  const loadImg = src =>
-    new Promise((res, rej) => {
-      const img = new Image();
-      img.src = src;
-      img.crossOrigin = 'anonymous';
-      img.onload = () => res(img);
-      img.onerror = () => rej(`No se pudo cargar ${src}`);
-    });
-  Promise.all([
-    isValidUrl(huella?.url) ? loadImg(huella.url) : Promise.resolve(null),
-    isValidUrl(firma?.url) ? loadImg(firma.url) : Promise.resolve(null),
-    isValidUrl(sello?.url) ? loadImg(sello.url) : Promise.resolve(null)
-  ])
-   .then(([huellap, firmap, sellop]) => {
-    let y = 44;
-    const margin = 15;
+  // Título subrayado y negrita con salto de línea
+  doc.setFont(undefined, 'bold');
+  doc.setFontSize(13);
+  // Primera línea del título
+  doc.text('CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE', pageW / 2, y, { align: 'center' });
+  let wT1 = doc.getTextWidth('CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE');
+  let xT1 = (pageW - wT1) / 2;
+  doc.setLineWidth(0.7);
+  doc.line(xT1, y + 2, xT1 + wT1, y + 2);
+  doc.setLineWidth(0.2);
+  y += 10;
+  // Segunda línea del título
+  doc.text('DOSAJE DE MARIHUANA', pageW / 2, y, { align: 'center' });
+  let wT2 = doc.getTextWidth('DOSAJE DE MARIHUANA');
+  let xT2 = (pageW - wT2) / 2;
+  doc.setLineWidth(0.7);
+  doc.line(xT2, y + 2, xT2 + wT2, y + 2);
+  doc.setLineWidth(0.2);
+  y += 12;
+  doc.setFontSize(11);
 
-    // Título subrayado y negrita con salto de línea
-    doc.setFont(undefined, 'bold');
-    doc.setFontSize(13);
-    // Primera línea del título
-    doc.text('CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE', pageW / 2, y, { align: 'center' });
-    let wT1 = doc.getTextWidth('CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE');
-    let xT1 = (pageW - wT1) / 2;
-    doc.setLineWidth(0.7);
-    doc.line(xT1, y + 2, xT1 + wT1, y + 2);
-    doc.setLineWidth(0.2);
-    y += 10;
-    // Segunda línea del título
-    doc.text('DOSAJE DE MARIHUANA', pageW / 2, y, { align: 'center' });
-    let wT2 = doc.getTextWidth('DOSAJE DE MARIHUANA');
-    let xT2 = (pageW - wT2) / 2;
-    doc.setLineWidth(0.7);
-    doc.line(xT2, y + 2, xT2 + wT2, y + 2);
-    doc.setLineWidth(0.2);
-    y += 12;
-    doc.setFontSize(11);
-
-    // Cuerpo del consentimiento con campos en negrita
-    // Texto de consentimiento con bloques dinámicos en negrita y justificado
-    const nombre = String(datos.nombres || '_________________________');
-    const edad = String(datos.edad || '___');
-    const dni = String(datos.dni || '__________');
-    const bloques = [
-      { text: 'Yo  ', bold: false },
-      { text: nombre, bold: true },
-      { text: ', de ', bold: false },
-      { text: edad, bold: true },
-      { text: ' años de edad, identificado con DNI N° ', bold: false },
-      { text: dni, bold: true },
-      { text: '; habiendo recibido consejería e información acerca de la prueba para Marihuana en orina; y en pleno uso de mis facultades mentales ', bold: false },
-      { text: 'AUTORIZO', bold: true },
-      { text: ' se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.', bold: false },
-    ];
-    const maxWidth = pageW - 2 * margin - 4;
-    const interlineado = 7;
-    function armarLineas(bloques, maxWidth) {
-      let lineas = [];
-      let lineaActual = [];
-      let anchoActual = 0;
-      let espacio = doc.getTextWidth(' ');
-      let i = 0;
-      while (i < bloques.length) {
-        let bloque = bloques[i];
-        if (!bloque.bold && bloque.text.includes(' ')) {
-          let palabras = bloque.text.split(/(\s+)/);
-          for (let j = 0; j < palabras.length; j++) {
-            let palabra = palabras[j];
-            if (palabra === '') continue;
-            let anchoPalabra = doc.getTextWidth(palabra);
-            if (anchoActual + anchoPalabra > maxWidth && lineaActual.length > 0) {
-              lineas.push(lineaActual);
-              lineaActual = [];
-              anchoActual = 0;
-            }
-            lineaActual.push({ text: palabra, bold: false });
-            anchoActual += anchoPalabra;
-          }
-        } else {
-          let anchoBloque = doc.getTextWidth(bloque.text);
-          if (anchoActual + anchoBloque > maxWidth && lineaActual.length > 0) {
+  // Cuerpo del consentimiento con campos en negrita
+  // Texto de consentimiento con bloques dinámicos en negrita y justificado
+  const nombre = String(datos.nombres || '_________________________');
+  const edad = String(datos.edad || '___');
+  const dni = String(datos.dni || '__________');
+  const bloques = [
+    { text: 'Yo  ', bold: false },
+    { text: nombre, bold: true },
+    { text: ', de ', bold: false },
+    { text: edad, bold: true },
+    { text: ' años de edad, identificado con DNI N° ', bold: false },
+    { text: dni, bold: true },
+    { text: '; habiendo recibido consejería e información acerca de la prueba para Marihuana en orina; y en pleno uso de mis facultades mentales ', bold: false },
+    { text: 'AUTORIZO', bold: true },
+    { text: ' se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.', bold: false },
+  ];
+  const maxWidth = pageW - 2 * margin - 4;
+  const interlineado = 7;
+  function armarLineas(bloques, maxWidth) {
+    let lineas = [];
+    let lineaActual = [];
+    let anchoActual = 0;
+    let i = 0;
+    while (i < bloques.length) {
+      let bloque = bloques[i];
+      if (!bloque.bold && bloque.text.includes(' ')) {
+        let palabras = bloque.text.split(/(\s+)/);
+        for (let j = 0; j < palabras.length; j++) {
+          let palabra = palabras[j];
+          if (palabra === '') continue;
+          let anchoPalabra = doc.getTextWidth(palabra);
+          if (anchoActual + anchoPalabra > maxWidth && lineaActual.length > 0) {
             lineas.push(lineaActual);
             lineaActual = [];
             anchoActual = 0;
           }
-          lineaActual.push(bloque);
-          anchoActual += anchoBloque;
+          lineaActual.push({ text: palabra, bold: false });
+          anchoActual += anchoPalabra;
         }
-        i++;
+      } else {
+        let anchoBloque = doc.getTextWidth(bloque.text);
+        if (anchoActual + anchoBloque > maxWidth && lineaActual.length > 0) {
+          lineas.push(lineaActual);
+          lineaActual = [];
+          anchoActual = 0;
+        }
+        lineaActual.push(bloque);
+        anchoActual += anchoBloque;
       }
-      if (lineaActual.length > 0) lineas.push(lineaActual);
-      return lineas;
+      i++;
     }
-    let yBloque = y;
-    const lineas = armarLineas(bloques, maxWidth);
-    lineas.forEach((linea, idx) => {
-      const totalW = linea.reduce((sum, b) => sum + doc.getTextWidth(b.text), 0);
-      const espacios = linea.filter(b => !b.bold && /^\s+$/.test(b.text)).length;
-      const extraSpace = (idx < lineas.length - 1 && espacios > 0)
-        ? (maxWidth - totalW) / espacios
-        : 0;
-      let x = margin;
-      linea.forEach(b => {
-        doc.setFont('helvetica', b.bold ? 'bold' : 'normal');
-        doc.text(b.text, x, yBloque);
-        let w = doc.getTextWidth(b.text);
-        if (!b.bold && /^\s+$/.test(b.text) && extraSpace) {
-          x += w + extraSpace;
-        } else {
-          x += w;
-        }
-      });
-      yBloque += interlineado;
+    if (lineaActual.length > 0) lineas.push(lineaActual);
+    return lineas;
+  }
+  let yBloque = y;
+  const lineas = armarLineas(bloques, maxWidth);
+  lineas.forEach((linea, idx) => {
+    const totalW = linea.reduce((sum, b) => sum + doc.getTextWidth(b.text), 0);
+    const espacios = linea.filter(b => !b.bold && /^\s+$/.test(b.text)).length;
+    const extraSpace = (idx < lineas.length - 1 && espacios > 0)
+      ? (maxWidth - totalW) / espacios
+      : 0;
+    let x = margin;
+    linea.forEach(b => {
+      doc.setFont('helvetica', b.bold ? 'bold' : 'normal');
+      doc.text(b.text, x, yBloque);
+      let w = doc.getTextWidth(b.text);
+      if (!b.bold && /^\s+$/.test(b.text) && extraSpace) {
+        x += w + extraSpace;
+      } else {
+        x += w;
+      }
     });
-    y = yBloque + 10;
+    yBloque += interlineado;
+  });
+  y = yBloque + 10;
 
-    // Antecedentes (tabla)
-    doc.setFont(undefined, 'bold');
-    doc.setFontSize(12);
-    doc.text('ANTECEDENTES:', margin, y);
-    doc.setFont(undefined, 'normal');
-    y += 6;
-    function formatearFecha(fecha) {
-      if (!fecha) return '';
-      const [anio, mes, dia] = fecha.split('-');
-      return `${dia}/${mes}/${anio}`;
-    }
-    function checkBox(checked) {
-      const filler = '\u00A0';
-      return `(  ${checked ? 'X' : filler + filler}  )`;
-    }
-    autoTable(doc, {
-      startY: y,
-      body: [
-        [
-          'CONSUME MARIHUANA (THC)',
-          `NO ${checkBox(!datos.antConsumeMarih)}`,
-          `SI ${checkBox(datos.antConsumeMarih)}`,
-          datos.antConsumeMarih && datos.fechaConsumeMarih ? `Cuando: ${formatearFecha(datos.fechaConsumeMarih)}` : ''
-        ],
+  // Antecedentes (tabla)
+  doc.setFont(undefined, 'bold');
+  doc.setFontSize(12);
+  doc.text('ANTECEDENTES:', margin, y);
+  doc.setFont(undefined, 'normal');
+  y += 6;
+  function formatearFecha(fecha) {
+    if (!fecha) return '';
+    const [anio, mes, dia] = fecha.split('-');
+    return `${dia}/${mes}/${anio}`;
+  }
+  function checkBox(checked) {
+    const filler = '\u00A0';
+    return `(  ${checked ? 'X' : filler + filler}  )`;
+  }
+  autoTable(doc, {
+    startY: y,
+    body: [
+      [
+        'CONSUME MARIHUANA (THC)',
+        `NO ${checkBox(!datos.antConsumeMarih)}`,
+        `SI ${checkBox(datos.antConsumeMarih)}`,
+        datos.antConsumeMarih && datos.fechaConsumeMarih ? `Cuando: ${formatearFecha(datos.fechaConsumeMarih)}` : ''
       ],
-      theme: 'plain',
-      styles: { fontSize: 11, cellPadding: 1 },
-      columnStyles: { 0: { cellWidth: 95 }, 1: { cellWidth: 20 }, 2: { cellWidth: 20 }, 3: { cellWidth: 50 } },
-      margin: { left: 14 },
-      didDrawPage: () => {}
-    });
+    ],
+    theme: 'plain',
+    styles: { fontSize: 11, cellPadding: 1 },
+    columnStyles: { 0: { cellWidth: 95 }, 1: { cellWidth: 20 }, 2: { cellWidth: 20 }, 3: { cellWidth: 50 } },
+    margin: { left: 14 },
+    didDrawPage: () => { }
+  });
 
-    // Fecha del examen en la parte inferior
-    y = doc.lastAutoTable.finalY + 10;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    if (datos.fecha) {
-      const f = new Date(datos.fecha);
-      const dia = f.getDate();
-      const mes = f.getMonth();
-      const anio = f.getFullYear();
-      const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-      const rightMargin = 20;
-      doc.text(`${datos.fecha}`, pageW - rightMargin, y, { align: 'right' });
-    }
-    y += 12;
+  // Fecha del examen en la parte inferior
+  y = doc.lastAutoTable.finalY + 10;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  if (datos.fecha) {
+    const rightMargin = 20;
+    doc.text(`${datos.fecha}`, pageW - rightMargin, y, { align: 'right' });
+  }
+  y += 12;
 
-    // Espacio extra antes de las firmas y huella
-    const baseY = y + 10;
+  // ─── 5) FIRMA Y HUELLA DEL PACIENTE, FIRMA Y SELLO DEL PROFESIONAL ────────────────────
+  y += 50;
 
-    // Firma paciente
-    const lineX1P = 65;
-    const lineX2P = 115;
-    const lineYP = baseY + 32;
-    const centerXP = (lineX1P + lineX2P) / 2;
-    doc.line(lineX1P, lineYP, lineX2P, lineYP);
-    doc.text('Firma del Paciente', centerXP, lineYP + 6, { align: 'center' });
-    if (firmap) {
-      const sigW = 70;
-      const sigH = 23;
-      const sigX = centerXP - sigW / 2;
-      const sigY = lineYP - sigH;
-
-      const maxImgW = sigW - 10;
-      const maxImgH = sigH - 10;
-      let imgW = firmap.width;
-      let imgH = firmap.height;
-      const scaleW = maxImgW / imgW;
-      const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1);
-      imgW *= scale;
-      imgH *= scale;
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
-
-      const canvas = document.createElement('canvas');
-      canvas.width = firmap.width;
-      canvas.height = firmap.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(firmap, 0, 0);
-      const firmaBase64 = canvas.toDataURL('image/png');
-      doc.addImage(firmaBase64, 'PNG', imgX, imgY, imgW, imgH);
-    }
-
-    // Huella
-    doc.rect(25, baseY, 28, 32);
-    doc.setFontSize(10);
-    doc.text('Huella', 39, baseY + 38, { align: 'center' });
-    if (huellap) {
-      const maxW = 28;
-      const maxH = 32;
-      let huellaW = maxW;
-      let huellaH = (huellap.height / huellap.width) * huellaW;
-
-      // Si excede la altura máxima, reajustar proporciones
-      if (huellaH > maxH) {
-        huellaH = maxH;
-        huellaW = (huellap.width / huellap.height) * huellaH;
-      }
-
-      const huellaX = 25 + (maxW - huellaW) / 2;
-      const huellaY = baseY + (maxH - huellaH) / 2;
-
-      const canvas = document.createElement('canvas');
-      canvas.width = huellap.width;
-      canvas.height = huellap.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(huellap, 0, 0);
-      const huellaBase64 = canvas.toDataURL('image/png');
-
-      doc.addImage(huellaBase64, 'PNG', huellaX, huellaY, huellaW, huellaH);
-    }
-
-    // Firma consejero
-    doc.line(135, baseY + 32, 185, baseY + 32);
-    doc.text('Firma y sello del Consejero', 160, baseY + 38, { align: 'center' });
-    if (sellop) {
-      const selloW = 35;
-      const selloH = (sellop.height / sellop.width) * selloW;
-      const selloX = 135 + (50 - selloW) / 2;
-      const selloY = baseY + 32 - selloH - 2;
-      const canvas = document.createElement('canvas');
-      canvas.width = sellop.width;
-      canvas.height = sellop.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(sellop, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-      doc.addImage(selloBase64, 'PNG', selloX, selloY, selloW, selloH);
-    }
+  // Usar helper para dibujar firmas
+  dibujarFirmas({ doc, datos, y, pageW }).then(() => {
     footerTR(doc, datos);
 
     // Mostrar PDF
@@ -316,6 +216,8 @@ export default function Consentimiento_Marihuana_Digitalizado(datos) {
       iframe.contentWindow.focus();
       iframe.contentWindow.print();
     };
-   })
-  
+  }).catch(err => {
+    console.error(err);
+    alert('Error generando PDF: ' + err);
+  });
 } 

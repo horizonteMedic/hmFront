@@ -1,8 +1,8 @@
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import CabeceraLogo from "../components/CabeceraLogo.jsx";
 import footerTR from "../components/footerTR.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
+import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
 
 export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
   const doc = new jsPDF();
@@ -20,21 +20,21 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
   // Header con datos de ficha, sede y fecha
   const drawHeader = () => {
     CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-    
+
     // Número de Ficha
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Nro de ficha: ", pageW - 80, 15);
     doc.setFont("helvetica", "normal").setFontSize(18);
     doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
-    
+
     // Sede
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
-    
+
     // Fecha de examen
     const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
     doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
-    
+
     // Página
     doc.text("Pag. 01", pageW - 30, 10);
 
@@ -53,237 +53,206 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
 
   drawHeader();
 
-  // Carga de imágenes (huella, firma, sello)
-  const huella = datos.digitalizacion.find(d => d.nombreDigitalizacion === "HUELLA");
-  const firma  = datos.digitalizacion.find(d => d.nombreDigitalizacion === "FIRMAP");
-  const sello  = datos.digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  const isValid = url => url && url !== "Sin registro";
-  const loadImg = src =>
-    new Promise((res, rej) => {
-      const img = new Image();
-      img.src = src; img.crossOrigin = 'anonymous';
-      img.onload  = () => res(img);
-      img.onerror = () => rej(`No se pudo cargar ${src}`);
-    });
+  // Contenido del documento
 
-  Promise.all([
-    isValid(huella?.url) ? loadImg(huella.url) : Promise.resolve(null),
-    isValid(firma?.url)  ? loadImg(firma.url)  : Promise.resolve(null),
-    isValid(sello?.url)  ? loadImg(sello.url)  : Promise.resolve(null)
-  ]).then(([huellap, firmap, sellop]) => {
+  const margin = 15;
+  let y = 44;
+  // ─── 1) TÍTULO CON SUBRAYADO (más fino y más compacto) ─────
+  doc.setFont('helvetica', 'bold').setFontSize(13);
 
-    const margin = 15;
-    let y        = 44;
+  // Primera línea del título
+  const titulo1 = 'CONSENTIMIENTO INFORMADO PARA LA';
+  doc.text(titulo1, pageW / 2, y, { align: 'center' });
 
-    // ─── 1) TÍTULO CON SUBRAYADO ─────────────────────────
-    const titulo = 'CONSENTIMIENTO INFORMADO PARA LA TOMA DE MUESTRA DE SANGRE';
-    doc.setFont('helvetica','bold').setFontSize(14);
-    doc.text(titulo, pageW/2, y, { align:'center' });
-    // Subrayado (línea recta debajo del título)
-    const wT = doc.getTextWidth(titulo);
-    const xT = (pageW - wT) / 2;
-    doc.setLineWidth(0.7);
-    doc.line(xT, y + 2, xT + wT, y + 2);
-    doc.setLineWidth(0.2);
+  const wT1 = doc.getTextWidth(titulo1);
+  const xT1 = (pageW - wT1) / 2;
 
-    y += 18;
-    doc.setFontSize(11);
+  // Línea muy fina (0.4 pt) y muy cerca del texto
+  doc.setLineWidth(0.4);
+  doc.line(xT1, y + 1, xT1 + wT1, y + 1);   // solo 1 mm debajo del texto
 
-    // ─── 2) PREPARAR DATOS Y TEXTO ────────────────────
-    const nombre  = String(datos.nombres  || '_________________________').trim();
-    const edad    = String(datos.edad     || '___').trim();
-    const dni     = String(datos.dni      || '__________').trim();
-    const empresa = String(datos.empresa  || '_________________________').trim();
+  y += 8;   // menos espacio entre las dos líneas del título
 
-    // Construir bloques de texto (normales y negrita)
-    const bloques = [
-      { text: 'Yo  ', bold: false },
-      { text: nombre, bold: true },
-      { text: ', de ', bold: false },
-      { text: edad, bold: true },
-      { text: ' años de edad, identificado con DNI N° ', bold: false },
-      { text: dni, bold: true },
-      { text: '; habiendo recibido consejería e información acerca de los exámenes en sangre que se me va a realizar según solicitud del protocolo médico de la empresa ', bold: false },
-      { text: empresa, bold: true },
-      { text: '; y en pleno uso de mis facultades mentales ', bold: false },
-      { text: 'AUTORIZO', bold: true },
-      { text: ' se me tome la muestra de sangre para cumplir con los exámenes pertinentes.', bold: false },
-    ];
-    const maxWidth = pageW - 2 * margin;
-    const interlineado = 7;
+  // Segunda línea del título
+  const titulo2 = 'TOMA DE MUESTRA DE SANGRE';
+  doc.text(titulo2, pageW / 2, y, { align: 'center' });
 
-    // Algoritmo para armar líneas respetando bloques
-    function armarLineas(bloques, maxWidth) {
-      let lineas = [];
-      let lineaActual = [];
-      let anchoActual = 0;
-      let espacio = doc.getTextWidth(' ');
-      let i = 0;
-      while (i < bloques.length) {
-        let bloque = bloques[i];
-        // Si el bloque es largo, partirlo en palabras
-        if (!bloque.bold && bloque.text.includes(' ')) {
-          let palabras = bloque.text.split(/(\s+)/);
-          for (let j = 0; j < palabras.length; j++) {
-            let palabra = palabras[j];
-            if (palabra === '') continue;
-            let anchoPalabra = doc.getTextWidth(palabra);
-            if (anchoActual + anchoPalabra > maxWidth && lineaActual.length > 0) {
-              lineas.push(lineaActual);
-              lineaActual = [];
-              anchoActual = 0;
-            }
-            lineaActual.push({ text: palabra, bold: false });
-            anchoActual += anchoPalabra;
-          }
-        } else {
-          // Bloque negrita o bloque sin espacios
-          let anchoBloque = doc.getTextWidth(bloque.text);
-          if (anchoActual + anchoBloque > maxWidth && lineaActual.length > 0) {
-            lineas.push(lineaActual);
-            lineaActual = [];
-            anchoActual = 0;
-          }
-          lineaActual.push(bloque);
-          anchoActual += anchoBloque;
-        }
-        i++;
+  const wT2 = doc.getTextWidth(titulo2);
+  const xT2 = (pageW - wT2) / 2;
+
+  doc.setLineWidth(0.4);                     // línea fina también aquí
+  doc.line(xT2, y + 1, xT2 + wT2, y + 1);   // pegada al texto
+
+  // Espacio final antes del siguiente bloque
+  y += 12;
+
+  doc.setFontSize(11);
+
+  // ─── 2) PREPARAR DATOS Y TEXTO ────────────────────
+  const nombre = String(datos.nombres || '_________________________').trim();
+  const edad = String(datos.edad || '___').trim();
+  const dni = String(datos.dni || '__________').trim();
+  const empresa = String(datos.empresa || '_________________________').trim();
+
+  // Usar formato con marcadores similar al otro archivo
+  const datosTexto = {
+    nombre: nombre,
+    edad: edad,
+    dni: dni,
+    empresa: empresa
+  };
+
+  // Texto con marcadores para datos en negrita
+  const textoCompleto = 'Yo  {nombre}, de {edad} años de edad, identificado con DNI N° {dni}; habiendo recibido consejería e información acerca de los exámenes en sangre que se me va a realizar según solicitud del protocolo médico de la empresa {empresa}; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra de sangre para cumplir con los exámenes pertinentes.';
+
+  const maxWidth = pageW - 2 * margin;
+
+  // Función mejorada para dibujar texto con datos en negrita
+  const dibujarTextoConSaltoLineaYBold = (textoBase, datosTexto, x, y, anchoMaximo, fontSize = 11) => {
+    if (!textoBase) return y;
+    doc.setFontSize(fontSize);
+    const interlineado = fontSize * 0.4;
+    let yPos = y;
+
+    // Dividir el texto en partes: texto normal y datos (que van en negrita)
+    const partes = [];
+    const regex = /\{([^}]+)\}/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(textoBase)) !== null) {
+      if (match.index > lastIndex) {
+        partes.push({ tipo: 'texto', contenido: textoBase.substring(lastIndex, match.index) });
       }
-      if (lineaActual.length > 0) lineas.push(lineaActual);
-      return lineas;
+      partes.push({ tipo: 'dato', contenido: String(datosTexto[match[1]] || '') });
+      lastIndex = regex.lastIndex;
     }
 
-    // Renderizar líneas justificadas
-    let yL = y;
-    const lineas = armarLineas(bloques, maxWidth);
-    lineas.forEach((linea, idx) => {
-      // Calcular ancho total de la línea
-      const totalW = linea.reduce((sum, b) => sum + doc.getTextWidth(b.text), 0);
-      // Contar espacios para justificar
-      const espacios = linea.filter(b => !b.bold && /^\s+$/.test(b.text)).length;
-      // Espacio extra para justificar (no en la última línea)
-      const extraSpace = (idx < lineas.length - 1 && espacios > 0)
-        ? (maxWidth - totalW) / espacios
-        : 0;
-      let x = margin;
-      linea.forEach(b => {
-        doc.setFont('helvetica', b.bold ? 'bold' : 'normal');
-        doc.text(b.text, x, yL);
-        let w = doc.getTextWidth(b.text);
-        if (!b.bold && /^\s+$/.test(b.text) && extraSpace) {
-          x += w + extraSpace;
+    if (lastIndex < textoBase.length) {
+      partes.push({ tipo: 'texto', contenido: textoBase.substring(lastIndex) });
+    }
+
+    // Si no hay marcadores, usar el texto completo como texto normal
+    if (partes.length === 0) {
+      partes.push({ tipo: 'texto', contenido: textoBase });
+    }
+
+    // Construir líneas con datos en negrita (primero construir todas las líneas)
+    let lineas = [];
+    let lineaActual = [];
+    let anchoLineaActual = 0;
+    const espacioAncho = doc.getTextWidth(' ');
+
+    partes.forEach(parte => {
+      const esDato = parte.tipo === 'dato';
+      const palabras = parte.contenido.split(' ');
+
+      palabras.forEach(palabra => {
+        if (!palabra) return; // Saltar palabras vacías
+
+        doc.setFont("helvetica", esDato ? "bold" : "normal");
+        const anchoPalabra = doc.getTextWidth(palabra);
+        const espacioNecesario = lineaActual.length > 0 ? espacioAncho : 0;
+        const anchoTotal = anchoLineaActual + espacioNecesario + anchoPalabra;
+
+        // Si la palabra sola es más larga que el ancho máximo, dividirla
+        if (anchoPalabra > anchoMaximo) {
+          // Guardar línea actual si hay contenido
+          if (lineaActual.length > 0) {
+            lineas.push([...lineaActual]);
+            lineaActual = [];
+            anchoLineaActual = 0;
+          }
+          // Dividir palabra en caracteres
+          let palabraRestante = palabra;
+          while (palabraRestante.length > 0) {
+            let caracteres = '';
+            for (let i = 0; i < palabraRestante.length; i++) {
+              const testCaracteres = caracteres + palabraRestante[i];
+              doc.setFont("helvetica", esDato ? "bold" : "normal");
+              if (doc.getTextWidth(testCaracteres) <= anchoMaximo) {
+                caracteres = testCaracteres;
+              } else {
+                break;
+              }
+            }
+            if (caracteres.length === 0) {
+              caracteres = palabraRestante[0];
+            }
+            lineas.push([{ texto: caracteres, esDato: esDato }]);
+            palabraRestante = palabraRestante.substring(caracteres.length);
+          }
+        } else if (anchoTotal <= anchoMaximo) {
+          lineaActual.push({ texto: palabra, esDato: esDato });
+          anchoLineaActual = anchoTotal;
         } else {
-          x += w;
+          // Guardar línea actual
+          if (lineaActual.length > 0) {
+            lineas.push([...lineaActual]);
+          }
+          // Nueva línea con esta palabra
+          lineaActual = [{ texto: palabra, esDato: esDato }];
+          anchoLineaActual = anchoPalabra;
         }
       });
-      yL += interlineado;
     });
-    y = yL + 3;
 
-    // ─── 4) FECHA ─────────────────────────────────────
-    doc.setFont('helvetica','normal').setFontSize(10);
-    if (datos.fecha) {
-      const f = new Date(datos.fecha);
-      const dia = f.getDate();
-      const mes = f.getMonth();
-      const anio = f.getFullYear();
-      const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-      const rightMargin = 20;
-      doc.text(`${datos.fecha}`, pageW - rightMargin, y, { align: 'right' });
-    }
-    y += 15;
-
-    // ─── 5) HUELLA, FIRMAS Y SELLO ────────────────────
-    const baseY = y + 18;
-
-    // Huella
-    doc.rect(25, baseY, 28, 32)
-       .setFontSize(10)
-       .text('Huella', 39, baseY+38, { align:'center' });
-    if (huellap) {
-      const maxW=28, maxH=32;
-      let hW=maxW, hH=(huellap.height/huellap.width)*hW;
-      if (hH>maxH){hH=maxH;hW=(huellap.width/huellap.height)*hH;}
-      const xH=25+(maxW-hW)/2, yH=baseY+(maxH-hH)/2;
-      const cv= document.createElement('canvas');
-      cv.width=huellap.width;cv.height=huellap.height;
-      cv.getContext('2d').drawImage(huellap,0,0);
-      doc.addImage(cv.toDataURL('image/png'),'PNG',xH,yH,hW,hH);
+    // Agregar última línea
+    if (lineaActual.length > 0) {
+      lineas.push(lineaActual);
     }
 
-    // Firma paciente
-    const lineX1P = 65;
-    const lineX2P = 115;
-    const lineYP = baseY + 32;
-    const centerXP = (lineX1P + lineX2P) / 2;
-    doc.line(lineX1P, lineYP, lineX2P, lineYP)
-       .text('Firma del Paciente', centerXP, lineYP + 6, {align:'center'});
-    if (firmap) {
-      const sigW = 70;
-      const sigH = 23;
-      const sigX = centerXP - sigW / 2;
-      const sigY = lineYP - sigH;
+    // Dibujar líneas justificadas
+    lineas.forEach((linea, index) => {
+      const esUltimaLinea = index === lineas.length - 1;
+      const anchoTotalLinea = linea.reduce((sum, item) => {
+        doc.setFont("helvetica", item.esDato ? "bold" : "normal");
+        return sum + doc.getTextWidth(item.texto);
+      }, 0);
+      const espaciosEntreItems = linea.length - 1;
+      const espacioDisponible = anchoMaximo - anchoTotalLinea;
 
-      const maxImgW = sigW - 10;
-      const maxImgH = sigH - 10;
-      let imgW = firmap.width;
-      let imgH = firmap.height;
-      const scaleW = maxImgW / imgW;
-      const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1);
-      imgW *= scale;
-      imgH *= scale;
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
+      // Justificar solo si no es la última línea y hay más de un item
+      const espacioExtra = (!esUltimaLinea && espaciosEntreItems > 0 && espacioDisponible > 0)
+        ? espacioDisponible / espaciosEntreItems
+        : espacioAncho;
 
-      const canvas = document.createElement('canvas');
-      canvas.width = firmap.width;
-      canvas.height = firmap.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(firmap, 0, 0);
-      const firmaBase64 = canvas.toDataURL('image/png');
-      doc.addImage(firmaBase64, 'PNG', imgX, imgY, imgW, imgH);
-    }
+      let xActual = x;
+      linea.forEach((item, i) => {
+        doc.setFont("helvetica", item.esDato ? "bold" : "normal");
+        doc.text(item.texto, xActual, yPos);
+        if (i < linea.length - 1) {
+          xActual += doc.getTextWidth(item.texto) + espacioExtra;
+        }
+      });
+      yPos += interlineado;
+    });
 
-    // Firma y sello consejero
-    const lineX1 = 135;
-    const lineX2 = 185;
-    const lineY = baseY + 32;
-    const centerX = (lineX1 + lineX2) / 2;
-    doc.line(lineX1, lineY, lineX2, lineY)
-       .text('Firma y sello del Consejero', centerX, lineY + 6, {align:'center'});
-    if (sellop) {
-      const sigW = 70;
-      const sigH = 23;
-      const sigX = centerX - sigW / 2;
-      const sigY = lineY - sigH;
+    return yPos;
+  };
 
-      const maxImgW = sigW - 10;
-      const maxImgH = sigH - 10;
-      let imgW = sellop.width;
-      let imgH = sellop.height;
-      const scaleW = maxImgW / imgW;
-      const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1);
-      imgW *= scale;
-      imgH *= scale;
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
+  // Renderizar texto con datos en negrita
+  y = dibujarTextoConSaltoLineaYBold(textoCompleto, datosTexto, margin, y, maxWidth, 11);
+  y += 5;
 
-      const canvas = document.createElement('canvas');
-      canvas.width = sellop.width;
-      canvas.height = sellop.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(sellop, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-    }
+  // ─── 4) FECHA ─────────────────────────────────────
+  // doc.setFont('helvetica','normal').setFontSize(10);
+  // if (datos.fecha) {
+  //   const rightMargin = 20;
+  //   doc.text(`${datos.fecha}`, pageW - rightMargin, y, { align: 'right' });
+  // }
+  // y += 15;
 
+  // ─── 5) FIRMA Y HUELLA DEL PACIENTE, FIRMA Y SELLO DEL PROFESIONAL ────────────────────
+  const baseY = y + 70;
+
+  // Usar helper para dibujar firmas
+  dibujarFirmas({ doc, datos, y: baseY, pageW }).then(() => {
     footerTR(doc, datos);
 
     // ─── 6) Imprimir ───────────────────────────────────
     const blob = doc.output("blob");
-    const url  = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
     const iframe = document.createElement('iframe');
     iframe.style.display = 'none';
     iframe.src = url;
@@ -292,6 +261,8 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
       iframe.contentWindow.focus();
       iframe.contentWindow.print();
     };
-
+  }).catch(err => {
+    console.error(err);
+    alert('Error generando PDF: ' + err);
   });
 }

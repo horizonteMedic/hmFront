@@ -14,7 +14,8 @@ import CriteriosPsicologicosI from "./TabsInformePsicolaboral/CriteriosPsicologi
 import CriteriosPsicologicosII from "./TabsInformePsicolaboral/CriteriosPsicologicosII";
 import Swal from "sweetalert2";
 import {
-  InputTextArea, InputsBooleanRadioGroup, InputTextOneLine
+  InputTextArea, InputsBooleanRadioGroup, InputTextOneLine,
+  InputCheckbox
 } from "../../../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformePsicolaboral";
@@ -35,6 +36,7 @@ export default function InformePsicolaboral() {
     tipoExamen: "",
     // Aptitud
     esApto: undefined,
+    anual: false,
     // Datos personales
     nombres: "",
     dni: "",
@@ -58,12 +60,12 @@ export default function InformePsicolaboral() {
     comprensionVerbal: "",
 
     // ASPECTOS PERSONALIDAD
-    estabilidadEmocional: "", // B, NPB, NP, NPA, A
-    toleranciaFrustracion: "",
-    autoestima: "",
-    asertividad: "",
-    ansiedadEstado: "",
-    ansiedadRasgo: "",
+    estabilidadEmocional: "NP", // B, NPB, NP, NPA, A
+    toleranciaFrustracion: "NP",
+    autoestima: "NP",
+    asertividad: "NP",
+    ansiedadEstado: "NPB",
+    ansiedadRasgo: "NPB",
 
     // ====================== CRITERIOS PSICOLÓGICOS II ======================
     // ASPECTOS CONDUCTUALES
@@ -133,11 +135,11 @@ export default function InformePsicolaboral() {
   };
 
   const ActiveComponent = tabs[activeTab]?.component || (() => null);
-  
+
   return (
     <div className="px-4 space-y-3">
       <SectionFieldset legend="Información del Examen" className="m-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-3">
           <InputTextOneLine
             label="N° Orden"
             name="norden"
@@ -159,22 +161,27 @@ export default function InformePsicolaboral() {
             disabled
             onChange={handleChange}
           />
-          <div className="flex gap-4 items-center">
-            <h4 className="font-semibold min-w-[80px] max-w-[80px]">Aptitud:</h4>
-            <InputsBooleanRadioGroup
-              name="esApto"
-              value={form.esApto}
-              trueLabel="APTO"
-              falseLabel="NO APTO"
-              onChange={handleRadioButtonBoolean}
-            />
-          </div>
+          <InputsBooleanRadioGroup
+            label="Aptitud"
+            name="esApto"
+            value={form.esApto}
+            trueLabel="APTO"
+            falseLabel="NO APTO"
+            onChange={handleRadioButtonBoolean}
+          />
+          <InputCheckbox
+            label={<p className="text-red-500 text-[10px]">Examen Anual</p>}
+            name="anual"
+            checked={form?.anual}
+
+            onChange={handleCheckBoxChange}
+          />
         </div>
       </SectionFieldset>
 
       <SectionFieldset legend="Datos del Paciente" className="m-4">
         {/* Fila 1: Nombres, DNI, Edad, Género */}
-        <div className="grid grid-cols-1 md:grid-cols-2  gap-3 mb-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
           <InputTextOneLine
             label="Nombres y Apellidos"
             name="nombres"
