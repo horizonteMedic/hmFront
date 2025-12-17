@@ -82,6 +82,7 @@ export default function InformePsicologicoADECO() {
             PrintHojaR(form.norden, token, tabla, datosFooter);
         });
     };
+    
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
@@ -281,6 +282,7 @@ export default function InformePsicologicoADECO() {
                     />
                 </div>
             </SectionFieldset>
+            
             <BotonesAccion
                 form={form}
                 handleSave={handleSave}

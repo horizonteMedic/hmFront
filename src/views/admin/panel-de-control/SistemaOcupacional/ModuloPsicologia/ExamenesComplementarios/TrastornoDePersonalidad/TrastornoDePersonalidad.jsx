@@ -1,5 +1,3 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { getToday } from '../../../../../../utils/helpers';
@@ -117,7 +115,7 @@ export default function TrastornoDePersonalidad() {
     };
 
     return (
-        <form className="space-y-3 p-4">
+        <form className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <InputTextOneLine
                     label="N° Orden"

@@ -12,9 +12,9 @@ import { BotonesAccion, DatosPersonalesLaborales } from "../../../../../../compo
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "";
-const today = getToday();
 
 export default function InformeConductores() {
+    const today = getToday();
     const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
     const initialFormState = {
@@ -87,47 +87,45 @@ export default function InformeConductores() {
         });
     };
     return (
-        <div className="space-y-3 px-4">
-            <SectionFieldset legend="Información del Examen">
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-                    <InputTextOneLine
-                        label="N° Orden"
-                        name="norden"
-                        value={form.norden}
-                        onChange={handleChangeNumberDecimals}
-                        onKeyUp={handleSearch}
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Fecha"
-                        name="fecha"
-                        type="date"
-                        value={form.fecha}
-                        onChange={handleChangeSimple}
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Nombre del Examen"
-                        name="nombreExamen"
-                        value={form.nombreExamen}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputsBooleanRadioGroup
-                        label="Aptitud"
-                        name="esApto"
-                        value={form.esApto}
-                        trueLabel="APTO"
-                        falseLabel="NO APTO"
-                        onChange={handleRadioButtonBoolean}
-                    />
-                </div>
+        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+                <InputTextOneLine
+                    label="N° Orden"
+                    name="norden"
+                    value={form.norden}
+                    onChange={handleChangeNumberDecimals}
+                    onKeyUp={handleSearch}
+                    labelWidth="120px"
+                />
+                <InputTextOneLine
+                    label="Fecha"
+                    name="fecha"
+                    type="date"
+                    value={form.fecha}
+                    onChange={handleChangeSimple}
+                    labelWidth="120px"
+                />
+                <InputTextOneLine
+                    label="Nombre del Examen"
+                    name="nombreExamen"
+                    value={form.nombreExamen}
+                    disabled
+                    labelWidth="120px"
+                />
+                <InputsBooleanRadioGroup
+                    label="Aptitud"
+                    name="esApto"
+                    value={form.esApto}
+                    trueLabel="APTO"
+                    falseLabel="NO APTO"
+                    onChange={handleRadioButtonBoolean}
+                />
             </SectionFieldset>
 
             <DatosPersonalesLaborales form={form} />
 
             <SectionFieldset legend="Criterios Psicológicos">
-                <div className="space-y-4">
+                <div className="space-y-3">
                     <div className="grid grid-cols-1 gap-4">
                         <InputTextOneLine
                             label="1.- Atención"
