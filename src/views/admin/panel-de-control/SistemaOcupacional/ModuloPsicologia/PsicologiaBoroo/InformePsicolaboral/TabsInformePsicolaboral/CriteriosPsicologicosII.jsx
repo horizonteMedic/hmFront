@@ -19,7 +19,7 @@ export default function CriteriosPsicologicosII({
   return (
     <div className="bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <SectionFieldset legend="ASPECTOS CONDUCTUALES">
+        <SectionFieldset legend="Apecto Conductuales">
           <div className="space-y-4">
             <InputTextOneLine
               label="1. Nivel de Alerta ante el riesgo"
@@ -45,7 +45,7 @@ export default function CriteriosPsicologicosII({
           </div>
         </SectionFieldset>
 
-        <SectionFieldset legend="ASPECTOS PSICOLABORALES">
+        <SectionFieldset legend="Aspectos Psicolaborales">
           <RadioTable
             items={[
               { name: "capacidadInfluencia", label: "1. Capacidad de influencia" },

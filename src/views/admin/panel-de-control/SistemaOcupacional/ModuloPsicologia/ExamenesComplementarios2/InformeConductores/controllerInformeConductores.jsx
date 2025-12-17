@@ -12,7 +12,7 @@ import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 const obtenerReporteUrl =
     "";
 const registrarUrl =
-    "";
+    "/api/v01/ct/informeConductores/registrarActualizarInformeConductores";
 
 export const GetInfoServicio = async (
     nro,
@@ -50,7 +50,7 @@ export const GetInfoServicio = async (
             ocupacion: res.ocupacionPaciente,
             cargoDesempenar: res.cargoPaciente,
 
-            //agregar
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -63,20 +63,34 @@ export const SubmitDataService = async (
     tabla,
     datosFooter
 ) => {
+    let mensajeError = ""
     if (!form.norden) {
-        await Swal.fire("Error", "Datos Incompletos", "error");
+        mensajeError = "Datos Incompletos"
+    }
+    else if (form.esApto === undefined || form.esApto === null) {
+        mensajeError = "Debe marcar aptitud"
+    }
+    if (mensajeError != "") {
+        await Swal.fire("Error", mensajeError, "error");
         return;
     }
-    if (form.esApto === undefined || form.esApto === null) {
-        await Swal.fire("Error", "Debe marcar aptitud", "error");
-        return;
-    }
+
     const body = {
         norden: form.norden,
         fecha: form.fecha,
+        critAtencion: form.atencion,
+        critConcentracion: form.concentracion,
+        critSeguridadControlConduc: form.seguridadYControl,
+        analisisFodaFortalezasOportunidades: form.fortalezasOportunidades,
+        analisisFodaAmenazasDebilidades: form.amenazasDebilidades,
+        observacion: form.observaciones,
+        recomendacion: form.recomendaciones,
+        perfilCumple: true,
+        perfilNoCumple: true,
 
-        //agregar
         usuarioRegistro: user,
+
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

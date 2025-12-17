@@ -9,12 +9,13 @@ import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformeConductores";
 import { BotonesAccion, DatosPersonalesLaborales } from "../../../../../../components/templates/Templates";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "";
 const today = getToday();
 
 export default function InformeConductores() {
-    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+    const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
     const initialFormState = {
         // Header - Información del examen
@@ -51,6 +52,10 @@ export default function InformeConductores() {
         // Observaciones y Recomendaciones
         observaciones: "",
         recomendaciones: "",
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
     };
 
     const {
@@ -184,6 +189,15 @@ export default function InformeConductores() {
                         rows={4}
                     />
                 </div>
+            </SectionFieldset>
+
+            <SectionFieldset legend="Asignación de Médico">
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Especialista"
+                    form={form}
+                    onChange={handleChangeSimple}
+                />
             </SectionFieldset>
 
             <BotonesAccion

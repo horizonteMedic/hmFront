@@ -9,8 +9,8 @@ import {
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
-const obtenerReporteUrl = "";
-const registrarUrl = "";
+const obtenerReporteUrl = "/api/v01/ct/transtornoPersonalidad/obtenerReporteTranstornoPersonalidad";
+const registrarUrl = "/api/v01/ct/transtornoPersonalidad/registrarActualizarTranstornoPersonalidad";
 
 export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
     const res = await GetInfoServicioDefault(
@@ -42,7 +42,23 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             ocupacion: res.ocupacionPaciente,
             cargoDesempenar: res.cargoPaciente,
 
-            //AGREGAR
+            paranoide: "",
+            esquizoide: "",
+            esquizotipico: "",
+            inestabilidadImpulsivo: "",
+            inestabilidadLimite: "",
+
+            histrionico: "",
+            antisocial: "",
+            narcisista: "",
+
+            anancastico: "",
+            dependiente: "",
+            ansioso: "",
+
+            analisisYResultados: "",
+            recomendaciones: "",
+            interpretacion: "",
 
             user_medicoFirma: res.usuarioFirma,
         }));
@@ -50,16 +66,73 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
 };
 
 export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
+    let mensajeError = ""
     if (!form.norden) {
-        await Swal.fire("Error", "Datos Incompletos", "error");
+        mensajeError = "Datos Incompletos"
+    }
+    else if (form.cumpleConPerfil == undefined || form.cumpleConPerfil == null) {
+        mensajeError = "Datos Seleccione Cumple o No Cumple con el Perfil"
+    }
+    if (mensajeError != "") {
+        await Swal.fire("Error", mensajeError, "error");
         return;
     }
 
     const body = {
         norden: form.norden,
         fecha: form.fecha,
+
+        paranoideBajo: form.paranoide == "BAJO",
+        paranoideMedio: form.paranoide == "MEDIO",
+        paranoideAlto: form.paranoide == "ALTO",
+
+        esquizoideBajo: form.esquizoide == "BAJO",
+        esquizoideMedio: form.esquizoide == "MEDIO",
+        esquizoideAlto: form.esquizoide == "ALTO",
+
+        esquizoTipicoBajo: form.esquizotipico == "BAJO",
+        esquizoTipicoMedio: form.esquizotipico == "MEDIO",
+        esquizoTipicoAlto: form.esquizotipico == "ALTO",
+
+        subtipoImpulsivoBajo: form.inestabilidadImpulsivo == "BAJO",
+        subtipoImpulsivoMedio: form.inestabilidadImpulsivo == "MEDIO",
+        subtipoImpulsivoAlto: form.inestabilidadImpulsivo == "ALTO",
+
+        subtipoLimiteBajo: form.inestabilidadLimite == "BAJO",
+        subtipoLimiteMedio: form.inestabilidadLimite == "MEDIO",
+        subtipoLimiteAto: form.inestabilidadLimite == "ALTO",
+
+        histrionicoBajo: form.histrionico == "BAJO",
+        histrionicoMedio: form.histrionico == "MEDIO",
+        histrionicoAlto: form.histrionico == "ALTO",
+
+        antisocialBajo: form.antisocial == "BAJO",
+        antisocialMedio: form.antisocial == "MEDIO",
+        antisocialAlto: form.antisocial == "ALTO",
+
+        narcicistaBajo: form.narcisista == "BAJO",
+        narcicistaMedio: form.narcisista == "MEDIO",
+        narcicistaAlto: form.narcisista == "ALTO",
+
+        anancasticoBajo: form.anancastico == "BAJO",
+        anancasticoMedio: form.anancastico == "MEDIO",
+        anancasticoAlto: form.anancastico == "ALTO",
+
+        dependienteBajo: form.dependiente == "BAJO",
+        dependienteMedio: form.dependiente == "MEDIO",
+        dependienteAlto: form.dependiente == "ALTO",
+
+        ansiosoBajo: form.ansioso == "BAJO",
+        ansiosoMedio: form.ansioso == "MEDIO",
+        ansiosoAlto: form.ansioso == "ALTO",
+
+        analisisResultado: form.analisisYResultados,
+        recomendaciones: form.recomendaciones,
+        perfilCumple: form.cumpleConPerfil,
+        perfilNoCumple: !form.cumpleConPerfil,
+        interpretacionParainoide: form.interpretacion,
+
         userRegistro: user,
-        //AGREGAR
 
         usuarioFirma: form.user_medicoFirma,
     };
