@@ -40,7 +40,6 @@ export default function ConsentimientoInformado() {
         handlePrintDefault,
     } = useForm(initialFormState, { storageKey: "consentimientoInformado" });
 
-
     const handleSearch = (e) => {
         if (e.key === "Enter") {
             handleClearnotO();

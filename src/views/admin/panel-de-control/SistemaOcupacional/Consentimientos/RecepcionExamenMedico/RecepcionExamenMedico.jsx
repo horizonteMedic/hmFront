@@ -84,7 +84,7 @@ export default function RecepcionExamenMedico() {
       </SectionFieldset>
 
       {/* Contenido del Consentimiento */}
-      <SectionFieldset legend="Consentimiento Evaluación Médica" className="space-y-3">
+      <SectionFieldset legend="Recepción de Examen Médico" className="space-y-3">
         {/* Información Personal */}
         <div className="space-y-3">
           <InputTextOneLine

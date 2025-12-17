@@ -7,7 +7,6 @@ import {
     SubmitDataServiceDefault,
     VerifyTRDefault,
 } from "../../../../../utils/functionUtils";
-import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import { getHoraActual } from "../../../../../utils/helpers";
 
 const obtenerReporteUrl = "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoInformado";
