@@ -71,13 +71,13 @@ export const GetInfoServicio = async (
             }
         }
 
+        
         const vlejoscod = res.odlcoftalmologia_odlc || "";
         const vlejoscoi = res.oilcoftalmologia_oilc || "";
 
         const vcercacod = res.oftalodccmologia_odcc || "";
         const vcercacoi = res.oiccoftalmologia_oicc || "";
         const textoEnfermedadOftalmo = (res.enfermedadesocularesoftalmo_e_oculares ?? "").trim().toUpperCase();
-
 
         if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
             const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
@@ -89,6 +89,8 @@ export const GetInfoServicio = async (
                     : "USO DE LENTES CORRECTORES.\n";
             }
         }
+
+
         const promedioOidoDerecho = res.promedioOidoDerecho ?? 0;
         const promedioOidoIzquierdo = res.promedioOidoIzquierdo ?? 0;
         let oidoMayor40 = false;

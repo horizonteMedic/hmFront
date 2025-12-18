@@ -10,7 +10,7 @@ export default function CriteriosPsicologicosI({
     <div className="bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {!form.anual && (
-          <SectionFieldset legend="ASPECTO INTELECTUAL">
+          <SectionFieldset legend="Aspecto Intelectual">
             <RadioTable
               items={[
                 { name: "razonamientoProblemas", label: "1. Razonamiento y resolución de problemas" },
@@ -33,8 +33,7 @@ export default function CriteriosPsicologicosI({
           </SectionFieldset>
         )}
 
-
-        <SectionFieldset legend="ASPECTOS PERSONALIDAD">
+        <SectionFieldset legend="Aspectos Personalidad">
           <RadioTable
             items={[
               { name: "estabilidadEmocional", label: "1. Estabilidad Emocional" },

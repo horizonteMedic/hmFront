@@ -81,6 +81,22 @@ export const GetInfoServicio = async (
             anemia = hemoglobina < umbral;
         }
 
+
+        //Validacion cuello
+        const sexo = res.sexoPaciente ?? "";
+        const textoCuello = "AL EX FISICO: CUELLO ANORMAL. PROBABLE APNEA OBSTRUCTIVA DE SUEÑO. APTO POR 3 MESES. PARA CONDUCIR. EVALUACION POR NEUROLOGIA. REQUIERE PSG Y/U OXIMETRIA DE PULSO Y/O CERTIFICACION DE CUMPLIMIENTO DE TRATAMIENTO DE APNEA DEL SUEÑO ANTES DE DAR APTITUD DE 12 MESES."
+        if (res.perimetroCuelloTriaje) {
+            let cuello = parseFloat(res.perimetroCuelloTriaje);
+            if (!isNaN(cuello)) {
+                if (sexo == "M" && cuello >= 43.2) {
+                    nuevasObservaciones += textoCuello + "\n"
+                }
+                else if (sexo == "F" && cuello >= 40.6) {
+                    nuevasObservaciones += textoCuello + "\n"
+                }
+            }
+        }
+
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",

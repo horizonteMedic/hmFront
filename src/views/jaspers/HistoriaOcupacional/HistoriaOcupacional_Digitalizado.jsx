@@ -21,15 +21,21 @@ const config = {
 
 export default function HistoriaOcupacional_Digitalizado(
   datos = {},
-  tabla = []
+  docExistente = null
 ) {
-  const doc = new jsPDF({
+  const doc = docExistente || new jsPDF({
     unit: "mm",
     format: "letter",
     orientation: "landscape",
   });
   const pageW = doc.internal.pageSize.getWidth();
-
+  const getAñoInicial = (fecha) => {
+    const match = fecha?.match(/\d{4}/);
+    return match ? parseInt(match[0], 10) : Infinity;
+  };
+  const tabla = [...datos.detalles].sort(
+    (a, b) => getAñoInicial(a.fecha) - getAñoInicial(b.fecha)
+  );
   const datoss = {
     detalles: [
       {
@@ -126,7 +132,7 @@ export default function HistoriaOcupacional_Digitalizado(
       img.onload = () => res(img);
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
-  Promise.all([
+  return Promise.all([
     isValidUrl(firmap?.url) ? loadImg(firmap.url) : Promise.resolve(null),
     isValidUrl(huellap?.url) ? loadImg(huellap.url) : Promise.resolve(null),
     isValidUrl(sellofirma?.url)
@@ -469,12 +475,16 @@ export default function HistoriaOcupacional_Digitalizado(
     // footerEnHeader(doc, datos);
 
     // === Imprimir ===
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    iframe.onload = () => iframe.contentWindow.print();
+    if (!docExistente) {
+      const blob = doc.output("blob");
+      const url = URL.createObjectURL(blob);
+      const iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      iframe.src = url;
+      document.body.appendChild(iframe);
+      iframe.onload = () => iframe.contentWindow.print();
+    }
+
+    return doc;
   });
 }

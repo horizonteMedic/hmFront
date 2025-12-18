@@ -28,7 +28,7 @@ export default function InputTextArea({
         onChange={onChange}
         disabled={disabled}
         className={`border rounded px-2 py-1 w-full resize-none ${classNameArea} ${
-          disabled ? "bg-gray-100" : ""
+          disabled ? "bg-gray-300" : ""
         }`}
       />
     </div>

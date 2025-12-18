@@ -7,7 +7,7 @@ import {
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
 import { getToday } from "../../../../utils/helpers";
-
+import jsPDF from "jspdf";
 const registrarUrl = "/api/v01/ct/anexos/anexo16/registrarActualizarAnexo7c";
 const obtenerSimpleUrl = "/api/v01/ct/anexos/anexo16/obtenerAnexo16";
 const obtenerParaEditarUrl = "/api/v01/ct/anexos/anexo16/reporteEditarAnexo16";
@@ -15,7 +15,7 @@ const obtenerParaJasperUrl = "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16";
 
 const obtenerExamenesRealizadosUrl =
   "/api/v01/ct/anexos/anexo2/obtenerExamenesRealizados";
-
+const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
 export const SubmitDataService = async (
   form,
   setForm,

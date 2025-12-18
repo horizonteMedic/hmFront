@@ -370,7 +370,27 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     const notasFinalY = dibujarTextoPegado(notas, margin, notasInicioY, anchoMaximoNotas);
     
     // Usar helper para dibujar firmas
-    dibujarFirmas({ doc, datos, y: notasFinalY + 10, pageW }).then(() => {
+    dibujarFirmas({ doc, datos, y: notasFinalY + 10, pageW }).then((yFinalFirmas) => {
+      // Agregar campos de nombre completo y DNI debajo de la firma del responsable
+      const tieneSelloProfesional = datos.digitalizacion?.some(d => 
+        d.nombreDigitalizacion === "SELLOFIRMA" || d.nombreDigitalizacion === "SELLOFIRMADOCASIG"
+      );
+      
+      if (tieneSelloProfesional) {
+        // Posición del responsable (lado derecho - 2/3 de la página)
+        const centroProfesionalX = (pageW / 3) * 2;
+        const yCamposResponsable = yFinalFirmas - 3; // Justo debajo del texto "Responsable de la Evaluación"
+        
+        // Nombre Completo
+        const nombreCompleto = String(datos.usuarioRegistrado || '');
+        doc.setFont('helvetica', 'normal').setFontSize(7);
+        doc.text('Nombre Completo: ' + nombreCompleto, centroProfesionalX, yCamposResponsable, { align: "center" });
+        
+        // DNI
+        const dniResponsable = String(datos.dniUsuario || '');
+        doc.text('DNI: ' + dniResponsable, centroProfesionalX, yCamposResponsable + 4, { align: "center" });
+      }
+      
       footerTR(doc, datos);
       // Mostrar PDF
       const pdfBlob = doc.output("blob");
