@@ -421,22 +421,13 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   const anchoCol4 = 50; // V. Binocular
   const anchoCol5 = 40; // E. Oculares
   
-  // Preparar textos para calcular altura dinámica
+  // Preparar textos
   doc.setFont("helvetica", "normal").setFontSize(8);
   const textosBinocularCerca = `Test de Ishihara: ${datosFinales.testIshihara || ""}`;
   const textosBinocularLejos = `Ref. Pupilares: ${datosFinales.refPupilares || ""}`;
   
-  // Calcular altura necesaria para cada fila basada en el contenido más largo
-  const calcularAlturaTexto = (texto, anchoMaximo) => {
-    if (!texto) return filaAltura;
-    const lineas = doc.splitTextToSize(texto, anchoMaximo);
-    return Math.max(filaAltura, lineas.length * 3 + 2);
-  };
-  
-  const alturaBinocularCerca = calcularAlturaTexto(textosBinocularCerca, anchoCol4 - 4);
-  const alturaBinocularLejos = calcularAlturaTexto(textosBinocularLejos, anchoCol4 - 4);
-  // Todas las filas usan la misma altura (la máxima necesaria)
-  const alturaFilaComun = Math.max(filaAltura, alturaBinocularCerca, alturaBinocularLejos);
+  // Cada fila completa tiene 10mm (5mm para OD + 5mm para OI)
+  const alturaFilaComun = filaAltura * 2; // 10mm total (5mm por sub-fila)
   const alturaTotal = alturaFilaHeader + (alturaFilaComun * 2);
   
   // Dibujar líneas del header
@@ -487,16 +478,16 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   doc.line(xSinCorrectores, yFila1, xSinCorrectores + anchoCol2, yFila1); // Línea superior celda
   doc.line(xSinCorrectores, mitadFila1, xSinCorrectores + anchoCol2, mitadFila1); // Línea divisoria OD/OI
   doc.line(xSinCorrectores, yFila1 + alturaFilaComun, xSinCorrectores + anchoCol2, yFila1 + alturaFilaComun); // Línea inferior celda
-  doc.text(`OD: ${datosFinales.agudezaVisualCercaOD || ""}`, xSinCorrectores + 2, yFila1 + alturaFilaComun / 4 + 1);
-  doc.text(`OI: ${datosFinales.agudezaVisualCercaOI || ""}`, xSinCorrectores + 2, mitadFila1 + alturaFilaComun / 4 + 1);
+  doc.text(`OD: ${datosFinales.agudezaVisualCercaOD || ""}`, xSinCorrectores + 2, yFila1 + alturaFilaComun / 4 + 1.5);
+  doc.text(`OI: ${datosFinales.agudezaVisualCercaOI || ""}`, xSinCorrectores + 2, mitadFila1 + alturaFilaComun / 4 + 1.5);
   
   // Con correctores - con línea divisoria
   const xConCorrectores = tablaInicioX + anchoCol1 + anchoCol2;
   doc.line(xConCorrectores, yFila1, xConCorrectores + anchoCol3, yFila1); // Línea superior celda
   doc.line(xConCorrectores, mitadFila1, xConCorrectores + anchoCol3, mitadFila1); // Línea divisoria OD/OI
   doc.line(xConCorrectores, yFila1 + alturaFilaComun, xConCorrectores + anchoCol3, yFila1 + alturaFilaComun); // Línea inferior celda
-  doc.text(`OD: ${datosFinales.agudezaVisualCercaConOD || ""}`, xConCorrectores + 2, yFila1 + alturaFilaComun / 4 + 1);
-  doc.text(`OI: ${datosFinales.agudezaVisualCercaConOI || ""}`, xConCorrectores + 2, mitadFila1 + alturaFilaComun / 4 + 1);
+  doc.text(`OD: ${datosFinales.agudezaVisualCercaConOD || ""}`, xConCorrectores + 2, yFila1 + alturaFilaComun / 4 + 1.5);
+  doc.text(`OI: ${datosFinales.agudezaVisualCercaConOI || ""}`, xConCorrectores + 2, mitadFila1 + alturaFilaComun / 4 + 1.5);
   
   // V. Binocular - Cerca
   doc.text(textosBinocularCerca, tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3 + 2, yFila1 + 3.5, { maxWidth: anchoCol4 - 4, align: "left" });
@@ -529,15 +520,15 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   doc.line(xSinCorrectores, yFila2, xSinCorrectores + anchoCol2, yFila2); // Línea superior celda
   doc.line(xSinCorrectores, mitadFila2, xSinCorrectores + anchoCol2, mitadFila2); // Línea divisoria OD/OI
   doc.line(xSinCorrectores, yFila2 + alturaFilaComun, xSinCorrectores + anchoCol2, yFila2 + alturaFilaComun); // Línea inferior celda
-  doc.text(`OD: ${datosFinales.agudezaVisualLejosOD || ""}`, xSinCorrectores + 2, yFila2 + alturaFilaComun / 4 + 1);
-  doc.text(`OI: ${datosFinales.agudezaVisualLejosOI || ""}`, xSinCorrectores + 2, mitadFila2 + alturaFilaComun / 4 + 1);
+  doc.text(`OD: ${datosFinales.agudezaVisualLejosOD || ""}`, xSinCorrectores + 2, yFila2 + alturaFilaComun / 4 + 1.5);
+  doc.text(`OI: ${datosFinales.agudezaVisualLejosOI || ""}`, xSinCorrectores + 2, mitadFila2 + alturaFilaComun / 4 + 1.5);
   
   // Con correctores - con línea divisoria
   doc.line(xConCorrectores, yFila2, xConCorrectores + anchoCol3, yFila2); // Línea superior celda
   doc.line(xConCorrectores, mitadFila2, xConCorrectores + anchoCol3, mitadFila2); // Línea divisoria OD/OI
   doc.line(xConCorrectores, yFila2 + alturaFilaComun, xConCorrectores + anchoCol3, yFila2 + alturaFilaComun); // Línea inferior celda
-  doc.text(`OD: ${datosFinales.agudezaVisualLejosConOD || ""}`, xConCorrectores + 2, yFila2 + alturaFilaComun / 4 + 1);
-  doc.text(`OI: ${datosFinales.agudezaVisualLejosConOI || ""}`, xConCorrectores + 2, mitadFila2 + alturaFilaComun / 4 + 1);
+  doc.text(`OD: ${datosFinales.agudezaVisualLejosConOD || ""}`, xConCorrectores + 2, yFila2 + alturaFilaComun / 4 + 1.5);
+  doc.text(`OI: ${datosFinales.agudezaVisualLejosConOI || ""}`, xConCorrectores + 2, mitadFila2 + alturaFilaComun / 4 + 1.5);
   
   // V. Binocular - Lejos
   doc.text(textosBinocularLejos, tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3 + 2, yFila2 + 3.5, { maxWidth: anchoCol4 - 4, align: "left" });
@@ -603,14 +594,16 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   doc.text("Motivo de Interconsulta:", tablaInicioX + 2, yPos + 3);
   yPos += filaAltura;
 
-  // Fila de contenido del motivo (fila completa con altura dinámica)
+  // Fila de contenido del motivo (2 columnas: motivo y firma del médico)
   const motivoTexto = datosFinales.motivoInterconsulta || "";
+  const anchoColumnaMotivo = 140; // Ancho para el texto del motivo
+  const anchoColumnaFirma = tablaAncho - anchoColumnaMotivo; // Ancho restante para la firma
   
   // Calcular altura considerando el texto con saltos de línea
   doc.setFont("helvetica", "normal").setFontSize(8);
   const lineasMotivo = motivoTexto.split('\n').filter(linea => linea.trim() !== '');
   let alturaTotalTexto = 0;
-  const anchoMaximoTexto = tablaAncho - 4;
+  const anchoMaximoTexto = anchoColumnaMotivo - 4;
   
   lineasMotivo.forEach((linea) => {
     const lineaTrim = linea.trim();
@@ -619,14 +612,16 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
     alturaTotalTexto += lineasTexto.length * 2.5 + 0.5;
   });
   
-  const alturaFilaMotivo = Math.max(15, alturaTotalTexto + 2);
+  const alturaFilaMotivo = Math.max(30, alturaTotalTexto + 2); // Altura mínima de 30mm
 
+  // Dibujar líneas de la fila con dos columnas
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaMotivo);
+  doc.line(tablaInicioX + anchoColumnaMotivo, yPos, tablaInicioX + anchoColumnaMotivo, yPos + alturaFilaMotivo);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaMotivo);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaFilaMotivo, tablaInicioX + tablaAncho, yPos + alturaFilaMotivo);
   
-  // Dibujar el texto del motivo
+  // Dibujar el texto del motivo (columna izquierda)
   let yTextoMotivo = yPos + 3;
   
   lineasMotivo.forEach((linea) => {
@@ -636,6 +631,24 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
     yTextoMotivo = dibujarTextoConSaltoLinea(textoFinal, tablaInicioX + 2, yTextoMotivo, anchoMaximoTexto);
     yTextoMotivo += 0.5;
   });
+  
+  // Agregar firma del médico (columna derecha)
+  const xFirmaMedico = tablaInicioX + anchoColumnaMotivo;
+  const centroColumnaFirma = xFirmaMedico + (anchoColumnaFirma / 2);
+  const firmaMedicoY = yPos + 2;
+  
+  let firmaMedicoUrl = getSign(datosFinales, "SELLOFIRMA");
+  if (firmaMedicoUrl) {
+    try {
+      const imgWidth = 38;
+      const imgHeight = 22; // Aumentado para mejor visualización
+      const x = centroColumnaFirma - 19; // Centrado
+      const y = firmaMedicoY + (alturaFilaMotivo - imgHeight) / 2; // Centrado verticalmente
+      doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando firma del médico:", error);
+    }
+  }
   
   yPos += alturaFilaMotivo;
 
@@ -771,18 +784,17 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   const yFirmas = yPos; // Continuar directamente desde la sección anterior
   const alturaSeccionFirmas = 22; // Reducido de 28 a 22 para más compacto
 
-  // Dibujar las líneas de la sección de firmas (2 columnas)
+  // Dibujar las líneas de la sección de firmas (solo columna del trabajador)
   doc.line(tablaInicioX, yFirmas, tablaInicioX, yFirmas + alturaSeccionFirmas); // Línea izquierda
-  doc.line(tablaInicioX + 95, yFirmas, tablaInicioX + 95, yFirmas + alturaSeccionFirmas); // División central
   doc.line(tablaInicioX + tablaAncho, yFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea derecha
   doc.line(tablaInicioX, yFirmas, tablaInicioX + tablaAncho, yFirmas); // Línea superior
   doc.line(tablaInicioX, yFirmas + alturaSeccionFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea inferior
 
-  // === COLUMNA 1: FIRMA Y HUELLA DEL TRABAJADOR ===
+  // === FIRMA Y HUELLA DEL TRABAJADOR ===
   const firmaTrabajadorY = yFirmas + 2; // Reducido de 3 a 2
   
-  // Calcular centro de la columna 1 para centrar las imágenes
-  const centroColumna1X = tablaInicioX + (95 / 2); // Centro de la columna 1
+  // Calcular centro de la sección para centrar las imágenes
+  const centroSeccionX = tablaInicioX + (tablaAncho / 2);
   
   // Agregar firma del trabajador (lado izquierdo)
   let firmaTrabajadorUrl = getSign(datosFinales, "FIRMAP");
@@ -790,7 +802,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
     try {
       const imgWidth = 28; // Reducido de 30 a 28
       const imgHeight = 18; // Reducido de 20 a 18
-      const x = centroColumna1X - 18; // Ajustado
+      const x = centroSeccionX - 18; // Ajustado
       const y = firmaTrabajadorY;
       doc.addImage(firmaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
     } catch (error) {
@@ -804,40 +816,17 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
     try {
       const imgWidth = 11; // Reducido de 12 a 11
       const imgHeight = 18; // Reducido de 20 a 18
-      const x = centroColumna1X + 7; // Ajustado
+      const x = centroSeccionX + 7; // Ajustado
       const y = firmaTrabajadorY;
       doc.addImage(huellaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
     } catch (error) {
       console.log("Error cargando huella del trabajador:", error);
     }
   }
-
-  // === COLUMNA 2: SELLO Y FIRMA DEL MÉDICO ===
-  const centroColumna2 = tablaInicioX + 95 + ((tablaAncho - 95) / 2);
-  const firmaMedicoY = yFirmas + 2; // Posición más arriba
-  
-  // Agregar firma y sello médico
-  let firmaMedicoUrl = getSign(datosFinales, "SELLOFIRMA");
-  if (firmaMedicoUrl) {
-    try {
-      const imgWidth = 38; // Reducido de 40 a 38
-      const imgHeight = 14; // Reducido de 15 a 14
-      const x = centroColumna2 - 19; // Centrado
-      const y = firmaMedicoY;
-      doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
-    } catch (error) {
-      console.log("Error cargando firma del médico:", error);
-    }
-  }
   
   // Texto del trabajador - más cerca de las imágenes
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Firma y Huella del trabajador", centroColumna1X, yFirmas + 20, { align: "center" }); // Reducido de 26 a 20
-
-  // Texto del médico - más cerca del área de firma
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Sello y Firma del Médico", centroColumna2, yFirmas + 16.5, { align: "center" }); // Reducido de 26 a 16.5
-  doc.text("Responsable de la Evaluación", centroColumna2, yFirmas + 19, { align: "center" }); // Reducido de 28.5 a 19
+  doc.text("Firma y Huella del trabajador", centroSeccionX, yFirmas + 20, { align: "center" }); // Reducido de 26 a 20
 
    autoTable(doc, {
     startY: yFirmas + alturaSeccionFirmas + 2, // Reducido espacio después de firmas
