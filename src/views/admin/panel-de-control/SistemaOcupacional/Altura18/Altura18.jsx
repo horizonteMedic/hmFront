@@ -10,18 +10,20 @@ import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import { useForm } from "../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAltura18";
-import { BotonesAccion, DatosPersonalesLaborales } from "../../../../components/templates/Templates";
+import { BotonesAccion, DatosPersonalesLaborales} from "../../../../components/templates/Templates";
+import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
-const tabla = "";
-const today = getToday();
+const tabla = "certificacion_medica_altura";
 
 export default function Altura18() {
-    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+    const today = getToday();
+    const { token, userlogued, selectedSede, datosFooter, userName, userDNI } = useSessionData();
 
     const initialFormState = {
         // Header - Información del examen
         norden: "",
         fecha: today,
+        codigoCertificadoAltura: null,
         nombreExamen: "",
         examen: "PRIMERA ACTITUD",
         aniosExperiencia: "",
@@ -48,7 +50,7 @@ export default function Altura18() {
         alcoholismo: "NO",
         enfermedadPsiquiatrica: "NO",
         diabetesNoControlada: "NO",
-        migrañaNoControlada: "NO",
+        migranaNoControlada: "NO",
 
         insuficienciaCardiaca: "NO",
         asma: "NO",
@@ -61,7 +63,7 @@ export default function Altura18() {
 
         //Antecedentes de la Entrevista con el Paciente
         resfriado: "NO",
-        epilepsia: "NO",
+        vertigoMareo: "NO",
 
         alcohol24h: "NO",
         frecuenciaCefaleas: "NO",
@@ -131,6 +133,12 @@ export default function Altura18() {
         obesidadDietaHipocalorica: false,
         usoLentesCorrectoresLecturaCerca: false,
         corregirAgudezaLecturaCerca: false,
+
+        dniusuario: userDNI,
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
     };
 
     const {
@@ -235,7 +243,7 @@ export default function Altura18() {
                             { name: "alcoholismo", label: "Alcoholismo o abuso de sustancias (adicción)" },
                             { name: "enfermedadPsiquiatrica", label: "Portador de enfermedad psiquiátrica o hallazgo psicológico como rasgos de ansiedad, trastornos impulsivos o compulsivos" },
                             { name: "diabetesNoControlada", label: "Diabetes mellitus o hipoglicemia no controlada" },
-                            { name: "migrañaNoControlada", label: "Migraña no controlada" },
+                            { name: "migranaNoControlada", label: "Migraña no controlada" },
                         ]}
                         options={[
                             { value: "SI", label: "SI" },
@@ -279,7 +287,7 @@ export default function Altura18() {
                     <RadioTable
                         items={[
                             { name: "resfriado", label: "Se encuentra resfriado o con algún cuadro respiratorio" },
-                            { name: "epilepsia", label: "Sufre de vértigos o mareos diagnosticados recientemente" },
+                            { name: "vertigoMareo", label: "Sufre de vértigos o mareos diagnosticados recientemente" },
                         ]}
                         options={[
                             { value: "SI", label: "SI" },
@@ -481,14 +489,14 @@ export default function Altura18() {
                             label="Altura del Labor"
                             name="alturaLabor"
                             value={form?.alturaLabor}
-                            onChange={handleChange}
+                            disabled
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Para"
                             name="alturaPara"
                             value={form?.alturaPara}
-                            onChange={handleChange}
+                            disabled
                             labelWidth="120px"
                         />
                     </SectionFieldset>
@@ -589,6 +597,15 @@ export default function Altura18() {
                                 onChange={handleCheckboxRecomendaciones}
                             />
                         </div>
+
+                    </SectionFieldset>
+                    <SectionFieldset legend="Asignación de Médico" className="space-y-4">
+                        <EmpleadoComboBox
+                            value={form.nombre_medico}
+                            label="Especialista"
+                            form={form}
+                            onChange={handleChangeSimple}
+                        />
                     </SectionFieldset>
                 </div>
             </div>
