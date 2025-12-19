@@ -26,10 +26,12 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             norden: res.norden ?? "",
             fecha: res.fecha,
 
-            nombreExamen: res.nombreExamen ?? "",
-            dni: res.dni ?? "",
+            cumpleConPerfil: res.perfilCumple ?? false,
 
-            nombres: res.nombres ?? "",
+            nombreExamen: res.tipoExamen ?? "",
+            dni: res.dniPaciente ?? "",
+
+            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
             lugarNacimiento: res.lugarNacimientoPaciente ?? "",
             edad: res.edad ?? "",
@@ -42,23 +44,23 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             ocupacion: res.ocupacionPaciente,
             cargoDesempenar: res.cargoPaciente,
 
-            paranoide: "",
-            esquizoide: "",
-            esquizotipico: "",
-            inestabilidadImpulsivo: "",
-            inestabilidadLimite: "",
+            paranoide: res.paranoideBajo ? "BAJO" : res.paranoideMedio ? "MEDIO" : res.paranoideAlto ? "ALTO" : "",
+            esquizoide: res.esquizoideBajo ? "BAJO" : res.esquizoideMedio ? "MEDIO" : res.esquizoideAlto ? "ALTO" : "",
+            esquizotipico: res.esquizoTipicoBajo ? "BAJO" : res.esquizoTipicoMedio ? "MEDIO" : res.esquizoTipicoAlto ? "ALTO" : "",
+            inestabilidadImpulsivo: res.subtipoImpulsivoBajo ? "BAJO" : res.subtipoImpulsivoMedio ? "MEDIO" : res.subtipoImpulsivoAlto ? "ALTO" : "",
+            inestabilidadLimite: res.subtipoLimiteBajo ? "BAJO" : res.subtipoLimiteMedio ? "MEDIO" : res.subtipoLimiteAlto ? "ALTO" : "",
 
-            histrionico: "",
-            antisocial: "",
-            narcisista: "",
+            histrionico: res.histrionicoBajo ? "BAJO" : res.histrionicoMedio ? "MEDIO" : res.histrionicoAlto ? "ALTO" : "",
+            antisocial: res.antisocialBajo ? "BAJO" : res.antisocialMedio ? "MEDIO" : res.antisocialAlto ? "ALTO" : "",
+            narcisista: res.narcicistaBajo ? "BAJO" : res.narcicistaMedio ? "MEDIO" : res.narcicistaAlto ? "ALTO" : "",
 
-            anancastico: "",
-            dependiente: "",
-            ansioso: "",
+            anancastico: res.anancasticoBajo ? "BAJO" : res.anancasticoMedio ? "MEDIO" : res.anancasticoAlto ? "ALTO" : "",
+            dependiente: res.dependienteBajo ? "BAJO" : res.dependienteMedio ? "MEDIO" : res.dependienteAlto ? "ALTO" : "",
+            ansioso: res.ansiosoBajo ? "BAJO" : res.ansiosoMedio ? "MEDIO" : res.ansiosoAlto ? "ALTO" : "",
 
-            analisisYResultados: "",
-            recomendaciones: "",
-            interpretacion: "",
+            analisisYResultados: res.analisisResultado ?? "",
+            recomendaciones: res.recomendaciones ?? "",
+            interpretacion: res.interpretacionParainoide ?? "",
 
             user_medicoFirma: res.usuarioFirma,
         }));

@@ -1,0 +1,41 @@
+{
+  "codigoClinica": "string",
+  "tipoExamen": "string",
+  "dniPaciente": 0,
+  "nombresPaciente": "string",
+  "apellidosPaciente": "string",
+  "direccionPaciente": "string",
+  "sexoPaciente": "string",
+  "fechaNacimientoPaciente": "2025-12-18",
+  "ocupacionPaciente": "string",
+  "lugarNacimientoPaciente": "string",
+  "nivelEstudioPaciente": "string",
+  "estadoCivilPaciente": "string",
+  "edadPaciente": "string",
+  "cargoPaciente": "string",
+  "areaPaciente": "string",
+  "contrata": "string",
+  "empresa": "string",
+  "critTemorRiesgoElectrico": "string",
+  "critTemorAlturasIzaje": "string",
+  "critTemorEspacConfi": "string",
+  "analisisFodaFortalezasOportunidades": "string",
+  "analisisFodaAmenazasDebilidades": "string",
+  "observaciones": "string",
+  "recomendaciones": "string",
+  "perfilCumple": true,
+  "perfilNoCumple": true,
+  "usuarioFirma": "string",
+  "usuarioRegistro": "string",
+  "nombreSede": "string",
+  "sede": "string",
+  "color": 0,
+  "nameJasper": "string",
+  "digitalizacion": [
+    {
+      "nombreDigitalizacion": "string",
+      "url": "string"
+    }
+  ],
+  "norden": 0
+}

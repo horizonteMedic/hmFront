@@ -282,6 +282,10 @@ export const SubmitDataService = async (
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
     }
+    if (!form.examen || form.examen === "") {
+        await Swal.fire("Error", "Seleccione Examen", "error");
+        return;
+    }
     const body = {
         norden: form.norden,
         codigoCertificadoAltura: form.codigoCertificadoAltura,
