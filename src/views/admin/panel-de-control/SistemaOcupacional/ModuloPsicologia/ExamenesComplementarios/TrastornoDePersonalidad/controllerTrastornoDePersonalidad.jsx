@@ -9,8 +9,8 @@ import {
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
-const obtenerReporteUrl = "";
-const registrarUrl = "";
+const obtenerReporteUrl = "/api/v01/ct/transtornoPersonalidad/obtenerReporteTranstornoPersonalidad";
+const registrarUrl = "/api/v01/ct/transtornoPersonalidad/registrarActualizarTranstornoPersonalidad";
 
 export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
     const res = await GetInfoServicioDefault(
@@ -26,10 +26,12 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             norden: res.norden ?? "",
             fecha: res.fecha,
 
-            nombreExamen: res.nombreExamen ?? "",
-            dni: res.dni ?? "",
+            cumpleConPerfil: res.perfilCumple ?? false,
 
-            nombres: res.nombres ?? "",
+            nombreExamen: res.tipoExamen ?? "",
+            dni: res.dniPaciente ?? "",
+
+            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
             lugarNacimiento: res.lugarNacimientoPaciente ?? "",
             edad: res.edad ?? "",
@@ -42,7 +44,23 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             ocupacion: res.ocupacionPaciente,
             cargoDesempenar: res.cargoPaciente,
 
-            //AGREGAR
+            paranoide: res.paranoideBajo ? "BAJO" : res.paranoideMedio ? "MEDIO" : res.paranoideAlto ? "ALTO" : "",
+            esquizoide: res.esquizoideBajo ? "BAJO" : res.esquizoideMedio ? "MEDIO" : res.esquizoideAlto ? "ALTO" : "",
+            esquizotipico: res.esquizoTipicoBajo ? "BAJO" : res.esquizoTipicoMedio ? "MEDIO" : res.esquizoTipicoAlto ? "ALTO" : "",
+            inestabilidadImpulsivo: res.subtipoImpulsivoBajo ? "BAJO" : res.subtipoImpulsivoMedio ? "MEDIO" : res.subtipoImpulsivoAlto ? "ALTO" : "",
+            inestabilidadLimite: res.subtipoLimiteBajo ? "BAJO" : res.subtipoLimiteMedio ? "MEDIO" : res.subtipoLimiteAlto ? "ALTO" : "",
+
+            histrionico: res.histrionicoBajo ? "BAJO" : res.histrionicoMedio ? "MEDIO" : res.histrionicoAlto ? "ALTO" : "",
+            antisocial: res.antisocialBajo ? "BAJO" : res.antisocialMedio ? "MEDIO" : res.antisocialAlto ? "ALTO" : "",
+            narcisista: res.narcicistaBajo ? "BAJO" : res.narcicistaMedio ? "MEDIO" : res.narcicistaAlto ? "ALTO" : "",
+
+            anancastico: res.anancasticoBajo ? "BAJO" : res.anancasticoMedio ? "MEDIO" : res.anancasticoAlto ? "ALTO" : "",
+            dependiente: res.dependienteBajo ? "BAJO" : res.dependienteMedio ? "MEDIO" : res.dependienteAlto ? "ALTO" : "",
+            ansioso: res.ansiosoBajo ? "BAJO" : res.ansiosoMedio ? "MEDIO" : res.ansiosoAlto ? "ALTO" : "",
+
+            analisisYResultados: res.analisisResultado ?? "",
+            recomendaciones: res.recomendaciones ?? "",
+            interpretacion: res.interpretacionParainoide ?? "",
 
             user_medicoFirma: res.usuarioFirma,
         }));
@@ -50,16 +68,73 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
 };
 
 export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
+    let mensajeError = ""
     if (!form.norden) {
-        await Swal.fire("Error", "Datos Incompletos", "error");
+        mensajeError = "Datos Incompletos"
+    }
+    else if (form.cumpleConPerfil == undefined || form.cumpleConPerfil == null) {
+        mensajeError = "Datos Seleccione Cumple o No Cumple con el Perfil"
+    }
+    if (mensajeError != "") {
+        await Swal.fire("Error", mensajeError, "error");
         return;
     }
 
     const body = {
         norden: form.norden,
         fecha: form.fecha,
+
+        paranoideBajo: form.paranoide == "BAJO",
+        paranoideMedio: form.paranoide == "MEDIO",
+        paranoideAlto: form.paranoide == "ALTO",
+
+        esquizoideBajo: form.esquizoide == "BAJO",
+        esquizoideMedio: form.esquizoide == "MEDIO",
+        esquizoideAlto: form.esquizoide == "ALTO",
+
+        esquizoTipicoBajo: form.esquizotipico == "BAJO",
+        esquizoTipicoMedio: form.esquizotipico == "MEDIO",
+        esquizoTipicoAlto: form.esquizotipico == "ALTO",
+
+        subtipoImpulsivoBajo: form.inestabilidadImpulsivo == "BAJO",
+        subtipoImpulsivoMedio: form.inestabilidadImpulsivo == "MEDIO",
+        subtipoImpulsivoAlto: form.inestabilidadImpulsivo == "ALTO",
+
+        subtipoLimiteBajo: form.inestabilidadLimite == "BAJO",
+        subtipoLimiteMedio: form.inestabilidadLimite == "MEDIO",
+        subtipoLimiteAto: form.inestabilidadLimite == "ALTO",
+
+        histrionicoBajo: form.histrionico == "BAJO",
+        histrionicoMedio: form.histrionico == "MEDIO",
+        histrionicoAlto: form.histrionico == "ALTO",
+
+        antisocialBajo: form.antisocial == "BAJO",
+        antisocialMedio: form.antisocial == "MEDIO",
+        antisocialAlto: form.antisocial == "ALTO",
+
+        narcicistaBajo: form.narcisista == "BAJO",
+        narcicistaMedio: form.narcisista == "MEDIO",
+        narcicistaAlto: form.narcisista == "ALTO",
+
+        anancasticoBajo: form.anancastico == "BAJO",
+        anancasticoMedio: form.anancastico == "MEDIO",
+        anancasticoAlto: form.anancastico == "ALTO",
+
+        dependienteBajo: form.dependiente == "BAJO",
+        dependienteMedio: form.dependiente == "MEDIO",
+        dependienteAlto: form.dependiente == "ALTO",
+
+        ansiosoBajo: form.ansioso == "BAJO",
+        ansiosoMedio: form.ansioso == "MEDIO",
+        ansiosoAlto: form.ansioso == "ALTO",
+
+        analisisResultado: form.analisisYResultados,
+        recomendaciones: form.recomendaciones,
+        perfilCumple: form.cumpleConPerfil,
+        perfilNoCumple: !form.cumpleConPerfil,
+        interpretacionParainoide: form.interpretacion,
+
         userRegistro: user,
-        //AGREGAR
 
         usuarioFirma: form.user_medicoFirma,
     };

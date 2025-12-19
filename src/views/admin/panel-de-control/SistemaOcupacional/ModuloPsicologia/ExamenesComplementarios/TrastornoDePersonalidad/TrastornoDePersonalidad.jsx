@@ -1,5 +1,3 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { getToday } from '../../../../../../utils/helpers';
@@ -7,12 +5,13 @@ import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerTrastornoDe
 import { InputsBooleanRadioGroup, InputTextArea, InputTextOneLine, RadioTable, SectionFieldset } from '../../../../../../components/reusableComponents/ResusableComponents';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 import DatosPersonalesLaborales from '../../../../../../components/templates/DatosPersonalesLaborales';
+import BotonesAccion from '../../../../../../components/templates/BotonesAccion';
 
-const tabla = '';
+const tabla = 'trastornos_personalidad';
 
 const opGrupoA = [
     { name: "paranoide", label: "1.- Paranoide" },
-    { name: "memoria", label: "2.- Esquizoide" },
+    { name: "esquizoide", label: "2.- Esquizoide" },
     { name: "esquizotipico", label: "3.- Esquizotípico" },
     { name: "inestabilidadImpulsivo", label: "4.- T. Inestabilidad Emocional Subtipo Impulsivo" },
     { name: "inestabilidadLimite", label: "5.- T. Inestabilidad Emocional Subtipo Límite" },
@@ -42,7 +41,7 @@ export default function TrastornoDePersonalidad() {
         norden: '',
         fecha: today,
 
-        cumpleConPerfil: "",
+        cumpleConPerfil: undefined,
 
         nombreExamen: "",
 
@@ -63,7 +62,7 @@ export default function TrastornoDePersonalidad() {
         cargoDesempenar: "",
 
         paranoide: "",
-        memoria: "",
+        esquizoide: "",
         esquizotipico: "",
         inestabilidadImpulsivo: "",
         inestabilidadLimite: "",
@@ -91,6 +90,7 @@ export default function TrastornoDePersonalidad() {
         handleChange,
         handleChangeNumberDecimals,
         handleRadioButton,
+        handleRadioButtonBoolean,
         handleChangeSimple,
         handleClearnotO,
         handleClear,
@@ -115,7 +115,7 @@ export default function TrastornoDePersonalidad() {
     };
 
     return (
-        <form className="space-y-3 p-4">
+        <form className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <InputTextOneLine
                     label="N° Orden"
@@ -145,23 +145,13 @@ export default function TrastornoDePersonalidad() {
                     name="cumpleConPerfil"
                     value={form.cumpleConPerfil}
                     labelWidth='120px'
-                    onChange={handleChange}
+                    onChange={handleRadioButtonBoolean}
                     trueLabel='Cumple'
                     falseLabel='No Cumple'
                 />
             </SectionFieldset>
 
             <DatosPersonalesLaborales form={form} />
-
-            <SectionFieldset legend="Muestra" className="grid gap-3">
-                <InputTextOneLine
-                    label='Muestra'
-                    name="muestra"
-                    value={form.muestra}
-                    labelWidth='120px'
-                    onChange={handleChange}
-                />
-            </SectionFieldset>
 
             <SectionFieldset legend="Grupos" className='grid space-y-3'>
                 <SectionFieldset legend="Grupo A">
@@ -228,42 +218,13 @@ export default function TrastornoDePersonalidad() {
                 />
             </SectionFieldset>
 
-            <fieldset className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
-                <div className="flex gap-3">
-                    <button
-                        type="button"
-                        onClick={handleSave}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
-                    >
-                        <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                    </button>
-                    <button
-                        type="button"
-                        onClick={handleClear}
-                        className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2"
-                    >
-                        <FontAwesomeIcon icon={faBroom} /> Limpiar
-                    </button>
-                </div>
-                <div className="flex flex-col items-end">
-                    <span className="font-bold italic mb-2">Imprimir</span>
-                    <div className="flex items-center gap-2">
-                        <InputTextOneLine
-                            name="norden"
-                            value={form.norden}
-                            onChange={handleChange}
-                            inputClassName="w-24"
-                        />
-                        <button
-                            type="button"
-                            onClick={handlePrint}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
-                        >
-                            <FontAwesomeIcon icon={faPrint} />
-                        </button>
-                    </div>
-                </div>
-            </fieldset>
+            <BotonesAccion
+                form={form}
+                handleSave={handleSave}
+                handleClear={handleClear}
+                handlePrint={handlePrint}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+            />
         </form>
     );
 }

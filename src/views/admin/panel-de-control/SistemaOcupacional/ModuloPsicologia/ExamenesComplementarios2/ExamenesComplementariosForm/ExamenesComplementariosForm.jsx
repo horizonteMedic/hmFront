@@ -11,9 +11,9 @@ import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerExamenesCom
 import { BotonesAccion, DatosPersonalesLaborales } from "../../../../../../components/templates/Templates";
 
 const tabla = "";
-const today = getToday();
 
 export default function ExamenesComplementariosForm() {
+  const today = getToday();
   const { token, userlogued, selectedSede, datosFooter } = useSessionData();
 
   const initialFormState = {
@@ -84,10 +84,9 @@ export default function ExamenesComplementariosForm() {
     });
   };
   return (
-    <div className="space-y-3 px-4">
-      <SectionFieldset legend="Información del Examen">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-          <InputTextOneLine
+    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-4 gap-3">
+        <InputTextOneLine
             label="N° Orden"
             name="norden"
             value={form.norden}
@@ -118,7 +117,6 @@ export default function ExamenesComplementariosForm() {
             falseLabel="NO APTO"
             onChange={handleRadioButtonBoolean}
           />
-        </div>
       </SectionFieldset>
 
       <DatosPersonalesLaborales form={form} />

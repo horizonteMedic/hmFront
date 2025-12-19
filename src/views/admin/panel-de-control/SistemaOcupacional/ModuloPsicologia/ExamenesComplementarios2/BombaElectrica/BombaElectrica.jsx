@@ -11,9 +11,9 @@ import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerBombaElectr
 import { BotonesAccion, DatosPersonalesLaborales } from "../../../../../../components/templates/Templates";
 
 const tabla = "";
-const today = getToday();
 
 export default function BombaElectrica() {
+  const today = getToday();
   const { token, userlogued, selectedSede, datosFooter } = useSessionData();
 
   const initialFormState = {
@@ -83,41 +83,39 @@ export default function BombaElectrica() {
   };
 
   return (
-    <div className="space-y-3 px-4">
-      <SectionFieldset legend="Información del Examen">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-          <InputTextOneLine
-            label="N° Orden"
-            name="norden"
-            value={form.norden}
-            onChange={handleChangeNumberDecimals}
-            onKeyUp={handleSearch}
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Fecha"
-            name="fecha"
-            type="date"
-            value={form.fecha}
-            onChange={handleChangeSimple}
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Nombre del Examen"
-            name="nombreExamen"
-            value={form.nombreExamen}
-            disabled
-            labelWidth="120px"
-          />
-          <InputsBooleanRadioGroup
-            label="Aptitud"
-            name="esApto"
-            value={form.esApto}
-            trueLabel="APTO"
-            falseLabel="NO APTO"
-            onChange={handleRadioButtonBoolean}
-          />
-        </div>
+    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-4 gap-3">
+        <InputTextOneLine
+          label="N° Orden"
+          name="norden"
+          value={form.norden}
+          onChange={handleChangeNumberDecimals}
+          onKeyUp={handleSearch}
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Fecha"
+          name="fecha"
+          type="date"
+          value={form.fecha}
+          onChange={handleChangeSimple}
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Nombre del Examen"
+          name="nombreExamen"
+          value={form.nombreExamen}
+          disabled
+          labelWidth="120px"
+        />
+        <InputsBooleanRadioGroup
+          label="Aptitud"
+          name="esApto"
+          value={form.esApto}
+          trueLabel="APTO"
+          falseLabel="NO APTO"
+          onChange={handleRadioButtonBoolean}
+        />
       </SectionFieldset>
 
       <DatosPersonalesLaborales form={form} />
@@ -146,7 +144,7 @@ export default function BombaElectrica() {
               onChange={handleChange}
               labelWidth="200px"
             />
-              <InputTextOneLine
+            <InputTextOneLine
               label="4.- Manejo de Herramientas"
               name="manejoDeHerramientas"
               value={form?.manejoDeHerramientas}

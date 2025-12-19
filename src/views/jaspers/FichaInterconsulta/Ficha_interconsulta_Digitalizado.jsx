@@ -603,7 +603,7 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
   doc.text("Motivo de Interconsulta:", tablaInicioX + 2, yPos + 3);
   yPos += filaAltura;
 
-  // Fila de contenido del motivo (fila completa con altura dinámica)
+  // Fila de contenido del motivo (2 columnas: motivo y firma del médico)
   const motivoTexto = datosFinales.motivoInterconsulta || "";
 
   // Calcular altura considerando el texto con saltos de línea
@@ -621,7 +621,9 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
 
   const alturaFilaMotivo = Math.max(15, alturaTotalTexto + 2);
 
+  // Dibujar líneas de la fila con dos columnas
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaMotivo);
+  doc.line(tablaInicioX + anchoColumnaMotivo, yPos, tablaInicioX + anchoColumnaMotivo, yPos + alturaFilaMotivo);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaMotivo);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaFilaMotivo, tablaInicioX + tablaAncho, yPos + alturaFilaMotivo);
@@ -771,14 +773,13 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
   const yFirmas = yPos; // Continuar directamente desde la sección anterior
   const alturaSeccionFirmas = 22; // Reducido de 28 a 22 para más compacto
 
-  // Dibujar las líneas de la sección de firmas (2 columnas)
+  // Dibujar las líneas de la sección de firmas (solo columna del trabajador)
   doc.line(tablaInicioX, yFirmas, tablaInicioX, yFirmas + alturaSeccionFirmas); // Línea izquierda
-  doc.line(tablaInicioX + 95, yFirmas, tablaInicioX + 95, yFirmas + alturaSeccionFirmas); // División central
   doc.line(tablaInicioX + tablaAncho, yFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea derecha
   doc.line(tablaInicioX, yFirmas, tablaInicioX + tablaAncho, yFirmas); // Línea superior
   doc.line(tablaInicioX, yFirmas + alturaSeccionFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea inferior
 
-  // === COLUMNA 1: FIRMA Y HUELLA DEL TRABAJADOR ===
+  // === FIRMA Y HUELLA DEL TRABAJADOR ===
   const firmaTrabajadorY = yFirmas + 2; // Reducido de 3 a 2
 
   // Calcular centro de la columna 1 para centrar las imágenes
@@ -790,7 +791,7 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
     try {
       const imgWidth = 28; // Reducido de 30 a 28
       const imgHeight = 18; // Reducido de 20 a 18
-      const x = centroColumna1X - 18; // Ajustado
+      const x = centroSeccionX - 18; // Ajustado
       const y = firmaTrabajadorY;
       doc.addImage(firmaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
     } catch (error) {
@@ -804,7 +805,7 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
     try {
       const imgWidth = 11; // Reducido de 12 a 11
       const imgHeight = 18; // Reducido de 20 a 18
-      const x = centroColumna1X + 7; // Ajustado
+      const x = centroSeccionX + 7; // Ajustado
       const y = firmaTrabajadorY;
       doc.addImage(huellaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
     } catch (error) {
@@ -832,12 +833,7 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
 
   // Texto del trabajador - más cerca de las imágenes
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Firma y Huella del trabajador", centroColumna1X, yFirmas + 20, { align: "center" }); // Reducido de 26 a 20
-
-  // Texto del médico - más cerca del área de firma
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Sello y Firma del Médico", centroColumna2, yFirmas + 16.5, { align: "center" }); // Reducido de 26 a 16.5
-  doc.text("Responsable de la Evaluación", centroColumna2, yFirmas + 19, { align: "center" }); // Reducido de 28.5 a 19
+  doc.text("Firma y Huella del trabajador", centroSeccionX, yFirmas + 20, { align: "center" }); // Reducido de 26 a 20
 
   autoTable(doc, {
     startY: yFirmas + alturaSeccionFirmas + 2, // Reducido espacio después de firmas

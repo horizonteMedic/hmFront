@@ -548,8 +548,122 @@ export default async function LaboratorioClinico_Digitalizado_nuevo(data = {}, d
   doc.setLineWidth(0.2);
   doc.rect(tablaInicioX, baseY, tablaAncho, alturaSeccionFirmas);
 
-  // Usar helper para dibujar firmas (ajustar Y para que queden dentro de la fila, más cerca)
-  dibujarFirmas({ doc, datos: data, y: baseY + 2, pageW }).then(() => {
+  // Función personalizada para dibujar solo firmas profesionales (sin paciente)
+  const dibujarFirmasProfesionales = () => {
+    const digitalizacion = data.digitalizacion || [];
+    const sello1 = digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
+    const sello2 = digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
+    const isValidUrl = url => url && url !== "Sin registro";
+
+    // Función para cargar y comprimir imágenes
+    const loadImg = src =>
+      new Promise((res, rej) => {
+        const img = new Image();
+        img.src = src;
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxWidth = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
+          res(compressedDataUrl);
+        };
+        img.onerror = () => rej(`No se pudo cargar ${src}`);
+      });
+
+    return Promise.all([
+      isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
+      isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
+    ]).then(([s1, s2]) => {
+      const tieneSelloProfesional = s1 !== null || s2 !== null;
+      let lineY = 0;
+
+      if (tieneSelloProfesional) {
+        const sigW = 48;
+        const sigH = 20;
+        const sigY = baseY + 2;
+        const gap = 16;
+        lineY = sigY + sigH + 3;
+
+        // Función auxiliar para agregar sello al PDF
+        const agregarSello = (dataUrl, xPos, yPos, width, height) => {
+          if (!dataUrl) return;
+          doc.addImage(dataUrl, 'JPEG', xPos, yPos, width, height);
+        };
+
+        // Función auxiliar para dibujar línea y texto debajo del sello
+        const dibujarLineaYTexto = (centroX, lineY, tipoSello) => {
+          doc.setLineWidth(0.2);
+          let texto1, texto2;
+          if (tipoSello === 'SELLOFIRMA') {
+            texto1 = "Firma y Sello del Profesional";
+            texto2 = "Responsable de la Evaluación";
+          } else if (tipoSello === 'SELLOFIRMADOCASIG') {
+            texto1 = "Firma y Sello Médico Asignado";
+            texto2 = null;
+          } else {
+            texto1 = "Firma y Sello";
+            texto2 = null;
+          }
+
+          const textoWidth = doc.getTextWidth(texto1);
+          const anchoLinea = Math.max(textoWidth, texto2 ? doc.getTextWidth(texto2) : 0);
+
+          doc.line(centroX - anchoLinea / 2, lineY, centroX + anchoLinea / 2, lineY);
+          doc.setFont('helvetica', 'normal').setFontSize(9);
+          doc.text(texto1, centroX, lineY + 3, { align: "center" });
+          if (texto2) {
+            doc.text(texto2, centroX, lineY + 6, { align: "center" });
+          }
+        };
+
+        // Centrar los sellos profesionales en la página
+        const centroProfesionalX = pageW / 2;
+
+        if (s1 && s2) {
+          // Dos sellos lado a lado
+          const totalWidth = sigW * 2 + gap;
+          const startX = centroProfesionalX - totalWidth / 2;
+
+          agregarSello(s1, startX, sigY, sigW, sigH);
+          agregarSello(s2, startX + sigW + gap, sigY, sigW, sigH);
+
+          const centroSello1X = startX + sigW / 2;
+          const centroSello2X = startX + sigW + gap + sigW / 2;
+          dibujarLineaYTexto(centroSello1X, lineY, 'SELLOFIRMA');
+          dibujarLineaYTexto(centroSello2X, lineY, 'SELLOFIRMADOCASIG');
+        } else if (s1) {
+          // Un solo sello centrado
+          const imgX = centroProfesionalX - sigW / 2;
+          agregarSello(s1, imgX, sigY, sigW, sigH);
+          dibujarLineaYTexto(centroProfesionalX, lineY, 'SELLOFIRMA');
+        } else if (s2) {
+          // Un solo sello centrado
+          const imgX = centroProfesionalX - sigW / 2;
+          agregarSello(s2, imgX, sigY, sigW, sigH);
+          dibujarLineaYTexto(centroProfesionalX, lineY, 'SELLOFIRMADOCASIG');
+        }
+      }
+
+      return lineY + 9;
+    });
+  };
+
+  // Dibujar solo firmas profesionales (sin paciente)
+  dibujarFirmasProfesionales().then(() => {
     // === FOOTER ===
     footerTR(doc, { footerOffsetY: 12 });
 
