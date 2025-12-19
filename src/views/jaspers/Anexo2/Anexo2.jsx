@@ -30,7 +30,7 @@ function dedupeText(input) {
   return s;
 }
 
-export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
+export default async function InformePsicologico_Anexo02_Nuevo(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -256,9 +256,9 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   ];
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
     // Título principal (en todas las páginas)
     doc.setFont("helvetica", "bold").setFontSize(13);
@@ -290,7 +290,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === FUNCIONES AUXILIARES ===
   // Función para texto con salto de línea
@@ -837,7 +837,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     const anchoDisponibleTipo = colTipoWidth - 2; // Ancho disponible: ancho de columna menos márgenes
     const xInicioCantidad = 137; // Posición X donde comienza el texto de cantidad/frecuencia
     const anchoDisponibleCantidad = colCantWidth - 2; // Ancho disponible: ancho de columna menos márgenes
-    
+
     // Calcular altura necesaria para tipo usando splitTextToSize
     let lineasTipo = [];
     const tipoTexto = (habito.tipo === null || habito.tipo === undefined || habito.tipo === "") ? "-" : habito.tipo;
@@ -847,7 +847,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
       const alturaTipo = Math.max(filaAltura, lineasTipo.length * 2.8 + 2);
       alturaNecesaria = Math.max(alturaNecesaria, alturaTipo);
     }
-    
+
     // Calcular altura necesaria para cantidad usando splitTextToSize
     let lineasCantidad = [];
     const cantidadTexto = (habito.cantidad === null || habito.cantidad === undefined || habito.cantidad === "") ? "-" : habito.cantidad;
@@ -857,7 +857,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
       const alturaCantidad = Math.max(filaAltura, lineasCantidad.length * 2.8 + 2);
       alturaNecesaria = Math.max(alturaNecesaria, alturaCantidad);
     }
-    
+
     // Dibujar líneas de la fila con altura dinámica
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaNecesaria, tablaInicioX + tablaAncho, yPos + alturaNecesaria);
@@ -877,7 +877,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
       doc.setFont("helvetica", "bold").setFontSize(10);
       doc.text('X', xNo, yPos + 3.5, { align: "center" });
     }
-    
+
     // TIPO con salto de línea si es necesario
     doc.setFont("helvetica", "normal").setFontSize(7);
     if (tipoTexto && tipoTexto !== "-" && lineasTipo.length > 0) {
@@ -888,7 +888,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     } else {
       doc.text(tipoTexto, xInicioTipo, yPos + 3.5);
     }
-    
+
     // Cantidad/Frecuencia con salto de línea si es necesario
     if (cantidadTexto && cantidadTexto !== "-" && lineasCantidad.length > 0) {
       doc.setFont("helvetica", "normal").setFontSize(7);
@@ -1119,21 +1119,21 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   // Calcular altura necesaria para el texto de anamnesis
   let alturaFilaAnamnesis = filaAltura;
   let lineasAnamnesis = [];
-  
+
   if (datosFinales.anamnesis) {
     const anamnesisMayusculas = String(datosFinales.anamnesis).toUpperCase();
     const anchoDisponibleAnamnesis = tablaAncho - 4; // Ancho disponible menos márgenes
-    
+
     // Calcular líneas necesarias usando splitTextToSize
     doc.setFont("helvetica", "normal").setFontSize(7);
     lineasAnamnesis = doc.splitTextToSize(anamnesisMayusculas, anchoDisponibleAnamnesis);
-    
+
     // Calcular altura dinámica: interlineado de 3mm por línea, altura mínima de filaAltura
     const interlineadoAnamnesis = 3;
     const alturaCalculada = Math.max(filaAltura, lineasAnamnesis.length * interlineadoAnamnesis + 4);
     alturaFilaAnamnesis = alturaCalculada;
   }
-  
+
   // Dibujar líneas de la fila con altura dinámica
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaFilaAnamnesis, tablaInicioX + tablaAncho, yPos + alturaFilaAnamnesis);
@@ -1332,7 +1332,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     // === CREAR PÁGINA INTERMEDIA ===
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   } else {
     // === FOOTER PÁGINA 1 ===
@@ -1344,7 +1344,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     yPos = 35.5; // Posición inicial de la nueva página
 
     // Dibujar header en la nueva página
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
   }
 
   // === PÁGINA 2: EXAMEN FÍSICO ===
@@ -1808,7 +1808,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
   yPos = 35.5; // Posición inicial de la nueva página
 
   // Dibujar header en la nueva página
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === SECCIÓN IX Y X: DOS COLUMNAS ===
   // Estructura de dos columnas
@@ -1984,7 +1984,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
 
   // Fila dinámica para restricciones
   const textoRestricciones = (datosFinales.restricciones || "").toString();
-  
+
   // Preservar símbolos especiales como ≥, ≤, etc. antes de convertir a mayúsculas
   // Reemplazar temporalmente los símbolos, convertir a mayúsculas, y luego restaurarlos
   const simbolosEspeciales = [
@@ -1993,22 +1993,22 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     { original: '≠', temporal: '___DIFERENTE___' },
     { original: '±', temporal: '___MAS_MENOS___' }
   ];
-  
+
   let textoProcesado = textoRestricciones;
   // Guardar los símbolos originales
   simbolosEspeciales.forEach(simbolo => {
     textoProcesado = textoProcesado.replace(new RegExp(simbolo.original, 'g'), simbolo.temporal);
   });
-  
+
   // Convertir a mayúsculas
   const datosRestricciones = textoProcesado ? textoProcesado.toUpperCase() : "-";
-  
+
   // Restaurar los símbolos originales
   let datosFinalesRestricciones = datosRestricciones;
   simbolosEspeciales.forEach(simbolo => {
     datosFinalesRestricciones = datosFinalesRestricciones.replace(new RegExp(simbolo.temporal, 'g'), simbolo.original);
   });
-  
+
   // Si jsPDF no renderiza bien "≥", reemplazarlo por ">=" para mejor compatibilidad
   // Comentar esta línea si el símbolo se renderiza correctamente
   datosFinalesRestricciones = datosFinalesRestricciones.replace(/≥/g, '>=');
@@ -2035,7 +2035,7 @@ export default function InformePsicologico_Anexo02_Nuevo(data = {}) {
     footerTR(doc, { footerOffsetY: 8 });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 

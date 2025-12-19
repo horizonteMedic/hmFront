@@ -3,7 +3,7 @@ import autoTable from "jspdf-autotable";
 import header from "./components/header";
 import footer from "./components/footer";
 
-export default function LPsicosensometria_Digitalizado(datos) {
+export default async function LPsicosensometria_Digitalizado(datos) {
   const doc = new jsPDF();
   header(doc, datos);
 
@@ -25,14 +25,14 @@ export default function LPsicosensometria_Digitalizado(datos) {
     ]],
     body: [
       [
-        { content: 'HEMATOLOGIA', colSpan: 3, styles: { fontStyle: 'bold', halign: 'center', fillColor: [240,240,240] } }
+        { content: 'HEMATOLOGIA', colSpan: 3, styles: { fontStyle: 'bold', halign: 'center', fillColor: [240, 240, 240] } }
       ],
       ['GRUPO SANGUINEO', datos.txtgrupo_sang || '', 'Mujeres 38 - 50 %\nHombres 40 - 55 %'],
       ['FACTOR (RH)', datos.txtfactor || '', ''],
       ['HEMATOCRITO', datos.txthematocrito || '', 'Mujeres 38 - 50 %\nHombres 40 - 55 %'],
       ['HEMOGLOBINA', datos.txthemoglobina || '', 'Mujeres 12 - 16 g/dL\nHombres 13 - 18 g/dL'],
       [
-        { content: 'BIOQUIMICA', colSpan: 3, styles: { fontStyle: 'bold', halign: 'center', fillColor: [240,240,240] } }
+        { content: 'BIOQUIMICA', colSpan: 3, styles: { fontStyle: 'bold', halign: 'center', fillColor: [240, 240, 240] } }
       ],
       ['COLESTEROL TOTAL', datos.txtcolesterolt || '', '< 200 mg/dl'],
       ['TRIGLICERIDOS', datos.txttrigliceridos || '', '< 150 mg/dl'],
@@ -50,7 +50,7 @@ export default function LPsicosensometria_Digitalizado(datos) {
     },
     margin: { left: 15, right: 15 },
     tableWidth: 180,
-    didDrawPage: () => {}
+    didDrawPage: () => { }
   });
 
   footer(doc, datos);

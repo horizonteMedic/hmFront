@@ -26,7 +26,7 @@ const drawUnderlinedTitle = (doc, text, y) => {
     .setFont(config.font, "bold")
     .setFontSize(config.fontSize.title)
     .text(text, pageW / 2, y, { align: "center" });
-  
+
   // Dibujar línea debajo del texto
   const textWidth = doc.getTextWidth(text);
   const x = (pageW - textWidth) / 2;
@@ -54,28 +54,28 @@ const toDDMMYYYY = (fecha) => {
 };
 
 // --- Componente Principal ---
-export default function pcuantiantigeno(datos = {}) {
+export default async function pcuantiantigeno(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
-  const drawHeader = () => {
-    CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-    
+  const drawHeader = async () => {
+    await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+
     // Número de Ficha
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Nro de ficha: ", pageW - 80, 15);
     doc.setFont("helvetica", "bold").setFontSize(18);
     doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
-    
+
     // Sede
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
-    
+
     // Fecha de examen
     const fechaExamen = toDDMMYYYY(datos.fechaExamen || datos.fecha_examen || datos.fecha || "");
     doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
-    
+
     // Página
     doc.text("Pag. 01", pageW - 30, 10);
 
@@ -202,7 +202,7 @@ export default function pcuantiantigeno(datos = {}) {
     return yPos;
   };
 
-  drawHeader();
+  await drawHeader();
 
   // === TÍTULO ===
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
@@ -214,52 +214,52 @@ export default function pcuantiantigeno(datos = {}) {
 
   // === DATOS DEL PACIENTE ===
   const finalYPos = drawPatientData(doc, datos);
-  
+
   // === CUERPO ===
   let y = finalYPos + 10;
 
-    // Marca
-    doc
-      .setFont(config.font, "bold")
-      .setFontSize(config.fontSize.body)
-      .text("MARCA:", config.margin, y);
-    doc
-      .setFont(config.font, "normal")
-      .text(String(datos.cboMarca || ""), config.margin + 25, y);
-    y += config.lineHeight * 2;
+  // Marca
+  doc
+    .setFont(config.font, "bold")
+    .setFontSize(config.fontSize.body)
+    .text("MARCA:", config.margin, y);
+  doc
+    .setFont(config.font, "normal")
+    .text(String(datos.cboMarca || ""), config.margin + 25, y);
+  y += config.lineHeight * 2;
 
-    // Encabezados de tabla
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
-    doc.text("PRUEBA", config.col1X, y);
-    doc.text("RESULTADOS", config.col2X, y);
-    doc.text("VALORES DE REFERENCIA", config.col3X, y);
-    y += 3;
-    doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
-    y += config.lineHeight;
+  // Encabezados de tabla
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+  doc.text("PRUEBA", config.col1X, y);
+  doc.text("RESULTADOS", config.col2X, y);
+  doc.text("VALORES DE REFERENCIA", config.col3X, y);
+  y += 3;
+  doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
+  y += config.lineHeight;
 
-    // Fila de resultado
-    doc
-      .setFont(config.font, "bold")
-      .setFontSize(config.fontSize.body)
-      .text("COVID-19 ANTÍGENO", config.col1X, y);
-    doc
-      .setFont(config.font, "normal")
-      .text(String(datos.valorIgm || ""), config.col2X, y);
+  // Fila de resultado
+  doc
+    .setFont(config.font, "bold")
+    .setFontSize(config.fontSize.body)
+    .text("COVID-19 ANTÍGENO", config.col1X, y);
+  doc
+    .setFont(config.font, "normal")
+    .text(String(datos.valorIgm || ""), config.col2X, y);
 
-    // Valores de referencia (sin repetir el título)
-    y = drawReferenceValues(doc, y);
-    y += config.lineHeight * 2;
+  // Valores de referencia (sin repetir el título)
+  y = drawReferenceValues(doc, y);
+  y += config.lineHeight * 2;
 
-    // Resultado destacado
-    doc.setFont(config.font, "bold").setFontSize(12);
-    doc.text(String(datos.resultado || ""), config.margin, y);
-    y += config.lineHeight * 2;
+  // Resultado destacado
+  doc.setFont(config.font, "bold").setFontSize(12);
+  doc.text(String(datos.resultado || ""), config.margin, y);
+  y += config.lineHeight * 2;
 
-    // Observaciones o texto libre
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
-    doc.text("Método: Inmunofluorescencia\nSensibilidad: 95.00%\nEspecificidad: 95.00%", config.margin, y, {
-      maxWidth: pageW - 2 * config.margin,
-    });
+  // Observaciones o texto libre
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
+  doc.text("Método: Inmunofluorescencia\nSensibilidad: 95.00%\nEspecificidad: 95.00%", config.margin, y, {
+    maxWidth: pageW - 2 * config.margin,
+  });
 
   // Firma y huella digital usando dibujarFirmas
   y += 13; // Subido 7mm para no chocar con el footer (original y += 20, ahora y += 13)

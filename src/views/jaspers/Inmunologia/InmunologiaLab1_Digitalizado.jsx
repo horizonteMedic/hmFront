@@ -25,30 +25,30 @@ const toDDMMYYYY = (fecha) => {
 };
 
 // Header con datos de ficha, sede y fecha
-const drawHeader = (doc, datos = {}) => {
+const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
-  
-  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-  
+
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Nro de ficha: ", pageW - 80, 15);
   doc.setFont("helvetica", "normal").setFontSize(18);
   doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
-  
+
   // Sede
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
-  
+
   // Fecha de examen
   const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
   doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
-  
+
   // Página
   doc.text("Pag. 01", pageW - 30, 10);
 
   // Bloque de color
-   drawColorBox(doc, {
+  drawColorBox(doc, {
     color: datos.codigoColor,
     text: datos.textoColor,
     x: pageW - 30,
@@ -170,17 +170,17 @@ const drawPatientData = (doc, datos = {}) => {
   return yPos;
 };
 
-export default function InmunologiaLab1_Digitalizado(datos = {}) {
+export default async function InmunologiaLab1_Digitalizado(datos = {}) {
   const doc = new jsPDF({ unit: "mm", format: "letter" });
   const pageW = doc.internal.pageSize.getWidth();
-  
+
   // === HEADER ===
-  drawHeader(doc, datos);
-  
+  await drawHeader(doc, datos);
+
   // === TÍTULO ===
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
   doc.text("INMUNOLOGÍA", pageW / 2, 38, { align: "center" });
-  
+
   // === DATOS DEL PACIENTE ===
   const finalYPos = drawPatientData(doc, datos);
 
@@ -195,23 +195,23 @@ export default function InmunologiaLab1_Digitalizado(datos = {}) {
   doc.text("PRUEBA", col1X, y);
   doc.text("RESULTADO", col2X, y, { align: "center" });
   y += 2;
-  
+
   // Línea
   doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
   y += 10;
 
   // Datos de la prueba (con etiqueta de 2 líneas)
   doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
-  
+
   const testLabel1 = "Prueba Rápida";
   const testLabel2 = "HEPATITIS A";
   const testValue = datos.hepatitisA != null ? datos.hepatitisA : "N/A";
-  
+
   // Dibujar etiquetas de prueba alineadas a la izquierda
   doc.text(testLabel1, col1X, y);
   y += 5;
   doc.text(testLabel2, col1X, y);
-  
+
   // Dibujar el resultado centrado
   const resultY = y - 2.5;
   doc.text(testValue, col2X, resultY, { align: "center" });

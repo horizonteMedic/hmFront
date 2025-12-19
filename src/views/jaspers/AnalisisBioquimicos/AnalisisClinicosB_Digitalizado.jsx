@@ -28,25 +28,25 @@ const toDDMMYYYY = (fecha) => {
 };
 
 // Header con datos de ficha, sede y fecha
-const drawHeader = (doc, datos = {}) => {
+const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
-  
-  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-  
+
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Nro de ficha: ", pageW - 80, 15);
   doc.setFont("helvetica", "normal").setFontSize(18);
   doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
-  
+
   // Sede
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
-  
+
   // Fecha de examen
   const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
   doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
-  
+
   // Página
   doc.text("Pag. 01", pageW - 30, 10);
 
@@ -173,17 +173,17 @@ const drawPatientData = (doc, datos = {}) => {
   return yPos;
 };
 
-export default function AnalisisClinicosB_Digitalizado(datos = {}) {
+export default async function AnalisisClinicosB_Digitalizado(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
-  drawHeader(doc, datos);
-  
+  await drawHeader(doc, datos);
+
   // === TÍTULO ===
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
   doc.text("BIOQUÍMICA", pageW / 2, 38, { align: "center" });
-  
+
   // === DATOS DEL PACIENTE ===
   const finalYPos = drawPatientData(doc, datos);
 
@@ -198,7 +198,7 @@ export default function AnalisisClinicosB_Digitalizado(datos = {}) {
       img.onload = () => res(img);
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
-  
+
   Promise.all([
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
@@ -226,7 +226,7 @@ export default function AnalisisClinicosB_Digitalizado(datos = {}) {
     doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
     doc.text("ÁCIDO ÚRICO SÉRICO", config.col1X, y);
     doc.text(String(datos.txtResultado || ''), config.col2X, y, { align: "center" });
-    
+
     // Valores normales (dos líneas)
     const valoresNormales = ["Mujeres : 2.5 - 6.8 mg/dL", "Hombres : 3.6 - 7.7 mg/dL"];
     let tempY = y;
@@ -243,7 +243,7 @@ export default function AnalisisClinicosB_Digitalizado(datos = {}) {
     const sigY = y + 70;
     const gap = 16;
     const lineY = sigY + sigH + 3;
-    
+
     // Función auxiliar para agregar sello al PDF
     const agregarSello = (img, xPos, yPos, width, height) => {
       if (!img) return;
@@ -255,7 +255,7 @@ export default function AnalisisClinicosB_Digitalizado(datos = {}) {
       const selloBase64 = canvas.toDataURL('image/png');
       doc.addImage(selloBase64, 'PNG', xPos, yPos, width, height);
     };
-    
+
     // Función auxiliar para dibujar línea y texto debajo del sello
     const dibujarLineaYTexto = (centroX, lineY, tipoSello) => {
       doc.setLineWidth(0.2);
@@ -272,14 +272,14 @@ export default function AnalisisClinicosB_Digitalizado(datos = {}) {
         doc.text("Firma y Sello", centroX, lineY + 5, { align: "center" });
       }
     };
-    
+
     if (s1 && s2) {
       const totalWidth = sigW * 2 + gap;
       const startX = (pageW - totalWidth) / 2;
-      
+
       agregarSello(s1, startX, sigY, sigW, sigH);
       agregarSello(s2, startX + sigW + gap, sigY, sigW, sigH);
-      
+
       const centroSello1X = startX + sigW / 2;
       const centroSello2X = startX + sigW + gap + sigW / 2;
       dibujarLineaYTexto(centroSello1X, lineY, 'SELLOFIRMA');

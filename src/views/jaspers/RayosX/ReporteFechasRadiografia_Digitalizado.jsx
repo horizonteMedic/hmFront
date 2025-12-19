@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import HeaderReporteFechasRadiografia from "./Headers/header_ReporteFechasRadiografia.jsx";
 
-export default function ReporteFechasRadiografia_Digitalizado(data = {}) {
+export default async function ReporteFechasRadiografia_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
@@ -85,7 +85,7 @@ export default function ReporteFechasRadiografia_Digitalizado(data = {}) {
 
   // Variables de control de página
   let paginaActual = 1;
-  
+
   // Calcular total de páginas ANTES de empezar
   const registrosPorPagina = 64; // Máximo 64 registros por página (32 + 32)
   const totalRegistros = data.fechas ? data.fechas.length : 0;
@@ -224,14 +224,14 @@ export default function ReporteFechasRadiografia_Digitalizado(data = {}) {
 
   // Procesar datos por páginas de forma dinámica
   const datosRestantes = [...data.fechas];
-  
+
   while (datosRestantes.length > 0) {
     // Tomar máximo 64 registros por página (32 + 32)
     const registrosEnPagina = Math.min(datosRestantes.length, 64);
-    
+
     // Tomar los registros para esta página
     const datosPagina = datosRestantes.splice(0, registrosEnPagina);
-    
+
     // Dibujar página actual
     dibujarPagina(datosPagina);
 

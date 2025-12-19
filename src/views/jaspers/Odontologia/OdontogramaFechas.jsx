@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import header_OdontogramaFechas from "./headers/header_OdontogramaFechas.jsx";
 
-export default function OdontogramaFechas(data = {}) {
+export default async function OdontogramaFechas(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();

@@ -5,7 +5,7 @@ import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import footerTR from '../../components/footerTR.jsx';
 import drawColorBox from '../../components/ColorBox.jsx';
 
-export default function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}) {
+export default async function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -58,7 +58,7 @@ export default function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}) {
   };
 
   // === HEADER / CABECERA ===
-  CabeceraLogo(doc, { ...datosReales, tieneMembrete: false });
+  await CabeceraLogo(doc, { ...datosReales, tieneMembrete: false });
 
   // Número de Ficha y Página
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -201,7 +201,7 @@ export default function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}) {
     const dataW = tablaAncho - labelW;
     const padding = 2;
     doc.setFont("helvetica", "normal").setFontSize(8);
-    
+
     // Calcular altura necesaria para el valor
     let alturaFila = filaAltura;
     if (valor && doc.getTextWidth(valor) > dataW - 4) {
@@ -209,15 +209,15 @@ export default function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}) {
       const alturaTexto = lineas.length * 3.5 + padding * 2;
       alturaFila = Math.max(filaAltura, alturaTexto);
     }
-    
+
     // Dibujar celdas
     doc.rect(tablaInicioX, y, labelW, alturaFila, 'S');
     doc.rect(tablaInicioX + labelW, y, dataW, alturaFila, 'S');
-    
+
     // Dibujar label
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(label, tablaInicioX + 2, y + 4);
-    
+
     // Dibujar valor (con salto de línea si es necesario)
     doc.setFont("helvetica", "normal").setFontSize(8);
     if (valor) {
@@ -230,7 +230,7 @@ export default function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}) {
         doc.text(valor, tablaInicioX + labelW + 2, y + 4);
       }
     }
-    
+
     return y + alturaFila;
   };
 
@@ -239,16 +239,16 @@ export default function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}) {
     const alturaMinima = 35;
     const padding = 3;
     doc.setFont("helvetica", "normal").setFontSize(8);
-    
+
     let alturaFila = alturaMinima;
     if (texto && doc.getTextWidth(texto) > tablaAncho - 4) {
       const lineas = doc.splitTextToSize(texto, tablaAncho - 4);
       const alturaTexto = lineas.length * 3.5 + padding * 2;
       alturaFila = Math.max(alturaMinima, alturaTexto);
     }
-    
+
     doc.rect(tablaInicioX, y, tablaAncho, alturaFila, 'S');
-    
+
     if (texto) {
       if (doc.getTextWidth(texto) > tablaAncho - 4) {
         const lineas = doc.splitTextToSize(texto, tablaAncho - 4);
@@ -259,7 +259,7 @@ export default function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}) {
         doc.text(texto, tablaInicioX + 2, y + padding + 2);
       }
     }
-    
+
     return y + alturaFila;
   };
 
@@ -284,7 +284,7 @@ export default function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}) {
   // === FILA DE FIRMA DEL MÉDICO ===
   const alturaFirma = 25;
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaFirma, 'S');
-  
+
   // Agregar firma del médico (imagen)
   let firmaMedicoUrl = getSign(dataFinal, "SELLOFIRMA");
   if (firmaMedicoUrl) {
@@ -302,7 +302,7 @@ export default function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}) {
 
   // === SECCIÓN VI: CONCLUSIONES ===
   yPos = dibujarHeaderGris("VI. CONCLUSIONES", yPos);
-  
+
   // Fila de APTO / NO APTO con checkboxes
   const colAptoW = 47.5;
   doc.rect(tablaInicioX, yPos, colAptoW, filaAltura, 'S');

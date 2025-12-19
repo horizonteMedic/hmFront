@@ -6,7 +6,7 @@ import drawColorBox from '../../components/ColorBox.jsx';
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import footerTR from '../../components/footerTR.jsx';
 
-export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
+export default async function InformePsicologico_Anexo02_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -87,37 +87,37 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
   // Función para convertir texto a formato gramaticalmente correcto (primera letra mayúscula, resto minúsculas)
   const formatearTextoGramatical = (texto) => {
     if (!texto || typeof texto !== 'string') return texto;
-    
+
     // Dividir por líneas para manejar listas con viñetas
     const lineas = texto.split('\n');
     const lineasFormateadas = lineas.map(linea => {
       if (!linea.trim()) return linea; // Mantener líneas vacías
-      
+
       // Si la línea empieza con "- " (viñeta), formatear después del guión
       if (linea.trim().startsWith('- ')) {
         const contenido = linea.trim().substring(2); // Quitar "- "
         return '- ' + contenido.charAt(0).toUpperCase() + contenido.slice(1).toLowerCase();
       }
-      
+
       // Si la línea empieza con ". " (punto), formatear después del punto
       if (linea.trim().startsWith('. ')) {
         const contenido = linea.trim().substring(2); // Quitar ". "
         return '. ' + contenido.charAt(0).toUpperCase() + contenido.slice(1).toLowerCase();
       }
-      
+
       // Para líneas normales, formatear toda la línea
       return linea.charAt(0).toUpperCase() + linea.slice(1).toLowerCase();
     });
-    
+
     return lineasFormateadas.join('\n');
   };
 
   const datosFinales = datosReales;
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
     // Título principal (solo en página 1)
     if (pageNumber === 1) {
@@ -152,7 +152,7 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === VARIABLES DE TABLA ===
   const tablaInicioX = 5;
@@ -165,16 +165,16 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
     if (!texto || texto === null || texto === undefined) {
       return y;
     }
-    
+
     const fontSize = doc.internal.getFontSize();
     const palabras = String(texto).split(' ');
     let lineaActual = '';
     let yPos = y;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -188,12 +188,12 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
         }
       }
     });
-    
+
     if (lineaActual) {
       doc.text(lineaActual, x, yPos);
       yPos += fontSize * 0.35;
     }
-    
+
     return yPos; // Devuelve la nueva posición final
   };
 
@@ -204,25 +204,25 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
     // Usar las variables del scope principal en lugar de valores hardcodeados
     // const tablaInicioX = 5;
     // const tablaAncho = 200;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo gris más oscuro
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
+
     // Dibujar líneas del header
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(9);
     doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
-    
+
     return yPos + alturaHeader;
   };
 
@@ -231,25 +231,25 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
     // Usar las variables del scope principal en lugar de valores hardcodeados
     // const tablaInicioX = 10;
     // const tablaAncho = 190;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo celeste
     doc.setFillColor(199, 241, 255); // Color celeste claro
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
+
     // Dibujar líneas del subheader
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
+
     // Dibujar texto del subtítulo
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
-    
+
     return yPos + alturaHeader;
   };
 
@@ -391,7 +391,7 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
 
   // === TABLA DE OBSERVACIÓN DE CONDUCTAS ===
   const examenMental = datosFinales.examenMental || {};
-  
+
   const observacionesConductas = [
     {
       titulo: "Presentación:",
@@ -407,14 +407,14 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
 
   // Subcategorías de Postura (Ritmo y Tono)
   const posturas = [
-    { 
-      subtitulo: "Ritmo:", 
-      opciones: ["lento", "rapido", "fluido"], 
+    {
+      subtitulo: "Ritmo:",
+      opciones: ["lento", "rapido", "fluido"],
       valores: [examenMental.ritmo?.lento || false, examenMental.ritmo?.rapido || false, examenMental.ritmo?.fluido || false]
     },
-    { 
-      subtitulo: "Tono:", 
-      opciones: ["Bajo", "Moderado", "Alto"], 
+    {
+      subtitulo: "Tono:",
+      opciones: ["Bajo", "Moderado", "Alto"],
       valores: [examenMental.tono?.bajo || false, examenMental.tono?.moderado || false, examenMental.tono?.alto || false]
     }
   ];
@@ -429,36 +429,36 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
 
   const filaObservacionAltura = 5;
   const anchoTablaCompleta = tablaAncho; // Usar todo el ancho de la tabla
-  
+
   observacionesConductas.forEach((observacion) => {
     // Dibujar líneas de la fila
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaObservacionAltura);
     doc.line(tablaInicioX + anchoTablaCompleta, yPos, tablaInicioX + anchoTablaCompleta, yPos + filaObservacionAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + anchoTablaCompleta, yPos);
     doc.line(tablaInicioX, yPos + filaObservacionAltura, tablaInicioX + anchoTablaCompleta, yPos + filaObservacionAltura);
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(observacion.titulo, tablaInicioX + 1, yPos + 3.5);
-    
+
     // Dibujar opciones con X marcada
     const espacioTitulo = 25;
     const anchoOpcion = (anchoTablaCompleta - espacioTitulo) / observacion.opciones.length;
-    
+
     observacion.opciones.forEach((opcion, opcionIndex) => {
       const xOpcion = tablaInicioX + espacioTitulo + (opcionIndex * anchoOpcion);
-      
+
       // Dibujar línea vertical para separar opciones
       doc.line(xOpcion, yPos, xOpcion, yPos + filaObservacionAltura);
-      
+
       // Dibujar texto de la opción
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text(opcion, xOpcion + 1, yPos + 3.5);
-      
+
       // Crear cajoncito para la X: dibujar línea vertical antes de la X
       const xPosicionX = xOpcion + anchoOpcion - 8; // Posición donde se dibujará la línea
       doc.line(xPosicionX, yPos, xPosicionX, yPos + filaObservacionAltura);
-      
+
       // Dibujar X centrada en el cajoncito si está seleccionado
       if (observacion.valores[opcionIndex]) {
         const anchoCajoncito = (xOpcion + anchoOpcion) - xPosicionX;
@@ -467,11 +467,11 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
         doc.text("X", centroCajoncito, yPos + 3.5, { align: "center" });
       }
     });
-    
+
     // Dibujar línea vertical final para cerrar la última columna
     const xFinal = tablaInicioX + espacioTitulo + (observacion.opciones.length * anchoOpcion);
     doc.line(xFinal, yPos, xFinal, yPos + filaObservacionAltura);
-    
+
     yPos += filaObservacionAltura;
   });
 
@@ -480,7 +480,7 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
   // Dibujar fondo celeste
   doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, anchoTablaCompleta, filaObservacionAltura, 'F');
-  
+
   // Dibujar líneas de la fila (sin división vertical interna)
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
@@ -488,11 +488,11 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
   doc.line(tablaInicioX + anchoTablaCompleta, yPos, tablaInicioX + anchoTablaCompleta, yPos + filaObservacionAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + anchoTablaCompleta, yPos);
   doc.line(tablaInicioX, yPos + filaObservacionAltura, tablaInicioX + anchoTablaCompleta, yPos + filaObservacionAltura);
-  
+
   // Dibujar título "Discurso:"
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Discurso:", tablaInicioX + 1, yPos + 3.5);
-  
+
   yPos += filaObservacionAltura;
 
   // === SECCIÓN ESPECIAL: POSTURA (Ritmo y Tono) ===
@@ -503,31 +503,31 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
     doc.line(tablaInicioX + anchoTablaCompleta, yPos, tablaInicioX + anchoTablaCompleta, yPos + filaObservacionAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + anchoTablaCompleta, yPos);
     doc.line(tablaInicioX, yPos + filaObservacionAltura, tablaInicioX + anchoTablaCompleta, yPos + filaObservacionAltura);
-    
+
     // Dibujar subtítulo (Ritmo:, Tono:)
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(postura.subtitulo, tablaInicioX + 1, yPos + 3.5);
-    
+
     // Dibujar línea vertical después del subtítulo
     doc.line(tablaInicioX + espacioTituloPostura, yPos, tablaInicioX + espacioTituloPostura, yPos + filaObservacionAltura);
-    
+
     // Dibujar opciones
     const anchoOpcionPostura = (anchoTablaCompleta - espacioTituloPostura) / postura.opciones.length;
-    
+
     postura.opciones.forEach((opcion, opcionIndex) => {
       const xOpcion = tablaInicioX + espacioTituloPostura + (opcionIndex * anchoOpcionPostura);
-      
+
       // Dibujar línea vertical para separar opciones
       doc.line(xOpcion, yPos, xOpcion, yPos + filaObservacionAltura);
-      
+
       // Dibujar texto de la opción
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text(opcion, xOpcion + 1, yPos + 3.5);
-      
+
       // Crear cajoncito para la X: dibujar línea vertical antes de la X
       const xPosicionXPostura = xOpcion + anchoOpcionPostura - 8; // Posición donde se dibujará la línea
       doc.line(xPosicionXPostura, yPos, xPosicionXPostura, yPos + filaObservacionAltura);
-      
+
       // Dibujar X centrada en el cajoncito si está seleccionado
       if (postura.valores[opcionIndex]) {
         const anchoCajoncitoPostura = (xOpcion + anchoOpcionPostura) - xPosicionXPostura;
@@ -536,11 +536,11 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
         doc.text("X", centroCajoncitoPostura, yPos + 3.5, { align: "center" });
       }
     });
-    
+
     // Dibujar línea vertical final para cerrar la última columna
     const xFinalPostura = tablaInicioX + espacioTituloPostura + (postura.opciones.length * anchoOpcionPostura);
     doc.line(xFinalPostura, yPos, xFinalPostura, yPos + filaObservacionAltura);
-    
+
     yPos += filaObservacionAltura;
   });
 
@@ -550,29 +550,29 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
   doc.line(tablaInicioX + anchoTablaCompleta, yPos, tablaInicioX + anchoTablaCompleta, yPos + filaObservacionAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + anchoTablaCompleta, yPos);
   doc.line(tablaInicioX, yPos + filaObservacionAltura, tablaInicioX + anchoTablaCompleta, yPos + filaObservacionAltura);
-  
+
   // Dibujar título "Articulación:"
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text(articulacion.titulo, tablaInicioX + 1, yPos + 3.5);
-  
+
   // Dibujar opciones
   const espacioTituloArticulacion = 25;
   const anchoOpcionArticulacion = (anchoTablaCompleta - espacioTituloArticulacion) / articulacion.opciones.length;
-  
+
   articulacion.opciones.forEach((opcion, opcionIndex) => {
     const xOpcion = tablaInicioX + espacioTituloArticulacion + (opcionIndex * anchoOpcionArticulacion);
-    
+
     // Dibujar línea vertical para separar opciones
     doc.line(xOpcion, yPos, xOpcion, yPos + filaObservacionAltura);
-    
+
     // Dibujar texto de la opción
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(opcion, xOpcion + 1, yPos + 3.5);
-    
+
     // Crear cajoncito para la X: dibujar línea vertical antes de la X
     const xPosicionXArticulacion = xOpcion + anchoOpcionArticulacion - 8; // Posición donde se dibujará la línea
     doc.line(xPosicionXArticulacion, yPos, xPosicionXArticulacion, yPos + filaObservacionAltura);
-    
+
     // Dibujar X centrada en el cajoncito si está seleccionado
     if (articulacion.valores[opcionIndex]) {
       const anchoCajoncitoArticulacion = (xOpcion + anchoOpcionArticulacion) - xPosicionXArticulacion;
@@ -581,28 +581,28 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
       doc.text("X", centroCajoncitoArticulacion, yPos + 3.5, { align: "center" });
     }
   });
-  
+
   // Dibujar línea vertical final para cerrar la última columna
   const xFinalArticulacion = tablaInicioX + espacioTituloArticulacion + (articulacion.opciones.length * anchoOpcionArticulacion);
   doc.line(xFinalArticulacion, yPos, xFinalArticulacion, yPos + filaObservacionAltura);
-  
+
   yPos += filaObservacionAltura;
 
   // === SECCIÓN ESPECIAL: ORIENTACIÓN ===
   const orientaciones = [
-    { 
-      subtitulo: "Tiempo:", 
-      opciones: ["Orientado", "Desorientado"], 
+    {
+      subtitulo: "Tiempo:",
+      opciones: ["Orientado", "Desorientado"],
       valores: [examenMental.orientacion?.tiempo?.orientado || false, examenMental.orientacion?.tiempo?.desorientado || false]
     },
-    { 
-      subtitulo: "Espacio:", 
-      opciones: ["Orientado", "Desorientado"], 
+    {
+      subtitulo: "Espacio:",
+      opciones: ["Orientado", "Desorientado"],
       valores: [examenMental.orientacion?.espacio?.orientado || false, examenMental.orientacion?.espacio?.desorientado || false]
     },
-    { 
-      subtitulo: "Persona:", 
-      opciones: ["Orientado", "Desorientado"], 
+    {
+      subtitulo: "Persona:",
+      opciones: ["Orientado", "Desorientado"],
       valores: [examenMental.orientacion?.persona?.orientado || false, examenMental.orientacion?.persona?.desorientado || false]
     }
   ];
@@ -611,7 +611,7 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
   // Dibujar fondo celeste
   doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, anchoTablaCompleta, filaObservacionAltura, 'F');
-  
+
   // Dibujar líneas de la fila (sin división vertical interna)
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
@@ -619,11 +619,11 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
   doc.line(tablaInicioX + anchoTablaCompleta, yPos, tablaInicioX + anchoTablaCompleta, yPos + filaObservacionAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + anchoTablaCompleta, yPos);
   doc.line(tablaInicioX, yPos + filaObservacionAltura, tablaInicioX + anchoTablaCompleta, yPos + filaObservacionAltura);
-  
+
   // Dibujar título "Orientación:"
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Orientación:", tablaInicioX + 1, yPos + 3.5);
-  
+
   yPos += filaObservacionAltura;
 
   // Dibujar subcategorías de orientación
@@ -634,31 +634,31 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
     doc.line(tablaInicioX + anchoTablaCompleta, yPos, tablaInicioX + anchoTablaCompleta, yPos + filaObservacionAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + anchoTablaCompleta, yPos);
     doc.line(tablaInicioX, yPos + filaObservacionAltura, tablaInicioX + anchoTablaCompleta, yPos + filaObservacionAltura);
-    
+
     // Dibujar subtítulo (Tiempo:, Espacio:, Persona:)
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(orientacion.subtitulo, tablaInicioX + 1, yPos + 3.5);
-    
+
     // Dibujar línea vertical después del subtítulo
     doc.line(tablaInicioX + espacioTituloOrientacion, yPos, tablaInicioX + espacioTituloOrientacion, yPos + filaObservacionAltura);
-    
+
     // Dibujar opciones
     const anchoOpcionOrientacion = (anchoTablaCompleta - espacioTituloOrientacion) / orientacion.opciones.length;
-    
+
     orientacion.opciones.forEach((opcion, opcionIndex) => {
       const xOpcion = tablaInicioX + espacioTituloOrientacion + (opcionIndex * anchoOpcionOrientacion);
-      
+
       // Dibujar línea vertical para separar opciones
       doc.line(xOpcion, yPos, xOpcion, yPos + filaObservacionAltura);
-      
+
       // Dibujar texto de la opción
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text(opcion, xOpcion + 1, yPos + 3.5);
-      
+
       // Crear cajoncito para la X: dibujar línea vertical antes de la X
       const xPosicionXOrientacion = xOpcion + anchoOpcionOrientacion - 8; // Posición donde se dibujará la línea
       doc.line(xPosicionXOrientacion, yPos, xPosicionXOrientacion, yPos + filaObservacionAltura);
-      
+
       // Dibujar X centrada en el cajoncito si está seleccionado
       if (orientacion.valores[opcionIndex]) {
         const anchoCajoncitoOrientacion = (xOpcion + anchoOpcionOrientacion) - xPosicionXOrientacion;
@@ -667,11 +667,11 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
         doc.text("X", centroCajoncitoOrientacion, yPos + 3.5, { align: "center" });
       }
     });
-    
+
     // Dibujar línea vertical final para cerrar la última columna
     const xFinalOrientacion = tablaInicioX + espacioTituloOrientacion + (orientacion.opciones.length * anchoOpcionOrientacion);
     doc.line(xFinalOrientacion, yPos, xFinalOrientacion, yPos + filaObservacionAltura);
-    
+
     yPos += filaObservacionAltura;
   });
 
@@ -707,27 +707,27 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
     const valorFormateado = formatearTextoGramatical(resultado.valor);
     const espacioTitulo = 60; // Espacio para el título
     const anchoValor = tablaAncho - espacioTitulo - 4; // Ancho disponible para el valor
-    
+
     const alturaValor = calcularAlturaTextoCreciente(doc, valorFormateado, anchoValor, 8);
     const alturaFilaNecesaria = valorFormateado ? Math.max(5, alturaValor + 2) : filaAltura;
-    
+
     // Dibujar líneas de la fila con altura dinámica
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaNecesaria);
     doc.line(tablaInicioX + espacioTitulo, yPos, tablaInicioX + espacioTitulo, yPos + alturaFilaNecesaria);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaNecesaria);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaFilaNecesaria, tablaInicioX + tablaAncho, yPos + alturaFilaNecesaria);
-    
+
     // Dibujar título
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(resultado.titulo, tablaInicioX + 2, yPos + 3.5);
-    
+
     // Dibujar valor con texto con salto de línea
     doc.setFont("helvetica", "normal").setFontSize(8);
     if (valorFormateado) {
       dibujarTextoConSaltoLinea(valorFormateado, tablaInicioX + espacioTitulo + 2, yPos + 3.5, anchoValor);
     }
-    
+
     yPos += alturaFilaNecesaria;
   });
 
@@ -763,7 +763,7 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
   const columna2Ancho = 15; // X
   const columna3Ancho = 80; // NO CUMPLE CON EL PERFIL
   const columna4Ancho = 15; // X
-  
+
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + columna1Ancho, yPos, tablaInicioX + columna1Ancho, yPos + filaAltura); // División 1
   doc.line(tablaInicioX + columna1Ancho + columna2Ancho, yPos, tablaInicioX + columna1Ancho + columna2Ancho, yPos + filaAltura); // División 2
@@ -776,7 +776,7 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
   // CUMPLE CON EL PERFIL
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("CUMPLE CON EL PERFIL", tablaInicioX + 2, yPos + 3.5);
-  
+
   // Marcar X en CUMPLE CON EL PERFIL si cumple
   if (datosFinales.cumplePerfil === true) {
     doc.setFont("helvetica", "bold").setFontSize(10);
@@ -786,7 +786,7 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
   // NO CUMPLE CON EL PERFIL
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("NO CUMPLE CON EL PERFIL", tablaInicioX + columna1Ancho + columna2Ancho + 2, yPos + 3.5);
-  
+
   // Marcar X en NO CUMPLE CON EL PERFIL si no cumple
   if (datosFinales.cumplePerfil === false) {
     doc.setFont("helvetica", "bold").setFontSize(10);
@@ -807,7 +807,7 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
 
   // === FIRMA DEL MÉDICO CENTRADA ===
   const firmaMedicoY = yFirmas + 3;
-  
+
   // Función para obtener URL de digitalización por nombre
   const getDigitalizacionUrl = (digitalizaciones, nombre) => {
     if (!digitalizaciones || !Array.isArray(digitalizaciones)) return null;
@@ -817,10 +817,10 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
 
   // Calcular centro de la fila para centrar la firma
   const centroFilaX = tablaInicioX + (tablaAncho / 2);
-  
+
   // Agregar firma y sello médico centrada
   let firmaMedicoUrl = getDigitalizacionUrl(data.digitalizacion, "SELLOFIRMA");
-  
+
   if (firmaMedicoUrl) {
     try {
       const imgWidth = 45;
@@ -840,7 +840,7 @@ export default function InformePsicologico_Anexo02_Digitalizado(data = {}) {
   yPos += alturaSeccionFirmas;
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 13.5});
+  footerTR(doc, { footerOffsetY: 13.5 });
 
   // === Imprimir ===
   imprimir(doc);

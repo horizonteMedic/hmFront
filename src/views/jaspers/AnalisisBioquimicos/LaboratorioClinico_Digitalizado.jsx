@@ -5,7 +5,7 @@ import footerTR from '../components/footerTR.jsx';
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 import { convertirGenero } from "../../utils/helpers.js";
 import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
-export default function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExistente = null) {
+export default async function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExistente = null) {
 
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
@@ -47,8 +47,8 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExis
   const filaAltura = 5;
 
   // Header reutilizable
-  const drawHeader = () => {
-    CabeceraLogo(doc, { ...datosReales, tieneMembrete: false, yOffset: 7 });
+  const drawHeader = async () => {
+    await CabeceraLogo(doc, { ...datosReales, tieneMembrete: false, yOffset: 7 });
 
     // Título principal
     doc.setFont("helvetica", "bold").setFontSize(12);
@@ -95,7 +95,7 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExis
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader();
+  await drawHeader();
 
   // === SECCIÓN 1: DATOS PERSONALES ===
   let yPos = 30;

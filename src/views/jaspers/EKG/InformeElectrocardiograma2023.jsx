@@ -5,7 +5,7 @@ import CabeceraLogo from "../components/CabeceraLogo.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
 import footerTR from "../components/footerTR.jsx";
 
-export default function InformeElectrocardiograma2023(data = {}) {
+export default async function InformeElectrocardiograma2023(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -43,8 +43,8 @@ export default function InformeElectrocardiograma2023(data = {}) {
   };
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+  const drawHeader = async (pageNumber) => {
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
     // Título principal
     doc.setFont("helvetica", "bold").setFontSize(12);
@@ -77,7 +77,7 @@ export default function InformeElectrocardiograma2023(data = {}) {
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(1);
+  await drawHeader(1);
 
   // === FUNCIONES AUXILIARES ===
   // Función general para dibujar header de sección con fondo gris
@@ -124,7 +124,7 @@ export default function InformeElectrocardiograma2023(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   // Contenido - centrado verticalmente en fila de 5mm
   const textoY = yPos + (filaAltura / 2) + (8 * 0.35) / 2; // Centrado vertical
   doc.setFont("helvetica", "bold").setFontSize(8);
@@ -144,7 +144,7 @@ export default function InformeElectrocardiograma2023(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   // Contenido - centrado verticalmente
   const textoY2 = yPos + (filaAltura / 2) + (8 * 0.35) / 2;
   doc.setFont("helvetica", "bold").setFontSize(8);
@@ -174,7 +174,7 @@ export default function InformeElectrocardiograma2023(data = {}) {
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-    
+
     // Contenido - centrado verticalmente
     const textoY3 = yPos + (filaAltura / 2) + (8 * 0.35) / 2;
     doc.setFont("helvetica", "bold").setFontSize(8);
@@ -191,7 +191,7 @@ export default function InformeElectrocardiograma2023(data = {}) {
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-    
+
     // Contenido - centrado verticalmente
     const textoY4 = yPos + (filaAltura / 2) + (8 * 0.35) / 2;
     doc.setFont("helvetica", "bold").setFontSize(8);
@@ -208,7 +208,7 @@ export default function InformeElectrocardiograma2023(data = {}) {
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-    
+
     // Contenido - centrado verticalmente
     const textoY5 = yPos + (filaAltura / 2) + (8 * 0.35) / 2;
     doc.setFont("helvetica", "bold").setFontSize(8);
@@ -225,7 +225,7 @@ export default function InformeElectrocardiograma2023(data = {}) {
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-    
+
     // Contenido - centrado verticalmente
     const textoY6 = yPos + (filaAltura / 2) + (8 * 0.35) / 2;
     doc.setFont("helvetica", "bold").setFontSize(8);
@@ -322,7 +322,7 @@ export default function InformeElectrocardiograma2023(data = {}) {
 
     // Procesar recomendaciones
     const items = procesarRecomendaciones(datosFinales.recomendaciones);
-    
+
     // Calcular altura necesaria para todas las recomendaciones (mínimo 20mm)
     const alturaMinimaRecomendaciones = 20;
     let alturaTotalRecomendaciones = 0;
@@ -345,13 +345,13 @@ export default function InformeElectrocardiograma2023(data = {}) {
     items.forEach((item) => {
       // Viñeta
       doc.text("-", tablaInicioX + 2, yActualRecomendaciones);
-      
+
       // Texto del item (puede ser multilínea)
       const lineas = doc.splitTextToSize(item, anchoDisponibleHallazgos - 5);
       lineas.forEach((line, lineIndex) => {
         doc.text(line, tablaInicioX + 7, yActualRecomendaciones + lineIndex * 3.5);
       });
-      
+
       yActualRecomendaciones += Math.max(alturaMinimaRecomendaciones - 3.5, lineas.length * 3.5);
     });
 

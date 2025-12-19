@@ -5,7 +5,7 @@ import drawColorBox from '../../components/ColorBox.jsx';
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import footerTR from '../../components/footerTR.jsx';
 
-export default function ResumenAnexo7CP_Digitalizado(data = {}) {
+export default async function ResumenAnexo7CP_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -102,9 +102,9 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   const datosFinales = datosReales;
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
     // Título principal (solo en página 1)
     if (pageNumber === 1) {
@@ -139,7 +139,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === FUNCIONES AUXILIARES ===
   // Función para texto con salto de línea
@@ -148,12 +148,12 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
     if (!texto || texto === null || texto === undefined) {
       return y;
     }
-    
+
     const fontSize = doc.internal.getFontSize();
     const palabras = String(texto).split(' ');
     let lineaActual = '';
     let yPos = y;
-    
+
     palabras.forEach(palabra => {
       // Si la palabra sola es más larga que el ancho máximo, dividirla por caracteres
       const anchoPalabra = doc.getTextWidth(palabra);
@@ -170,7 +170,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
           const char = palabra[i];
           const textoPrueba = palabraActual + char;
           const anchoTexto = doc.getTextWidth(textoPrueba);
-          
+
           if (anchoTexto <= anchoMaximo) {
             palabraActual = textoPrueba;
           } else {
@@ -188,7 +188,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
         // Palabra normal
         const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
         const anchoTexto = doc.getTextWidth(textoPrueba);
-        
+
         if (anchoTexto <= anchoMaximo) {
           lineaActual = textoPrueba;
         } else {
@@ -203,23 +203,23 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
         }
       }
     });
-    
+
     if (lineaActual) {
       doc.text(lineaActual, x, yPos);
       // Siempre agregar espacio después de dibujar texto
       yPos += fontSize * 0.35;
     }
-    
+
     return yPos;
   };
 
   // Función para procesar texto con saltos de línea numerados
   const procesarTextoConSaltosLinea = (texto) => {
     if (!texto) return [];
-    
+
     // Dividir por saltos de línea reales (\n, \r\n) y otros separadores
     const partes = texto.split(/\r\n|\r|\n|\\n|\/n/g);
-    
+
     // Procesar cada parte y mantener el formato original
     return partes
       .map(parte => parte.trim())
@@ -232,36 +232,36 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
     if (!texto || texto === null || texto === undefined) {
       return y;
     }
-    
+
     const fontSize = doc.internal.getFontSize();
     let yPos = y;
-    
+
     // Procesar el texto manteniendo el formato original
     const lineasProcesadas = procesarTextoConSaltosLinea(texto);
-    
+
     lineasProcesadas.forEach((linea, index) => {
       // Verificar si es una línea numerada (empieza con número seguido de punto)
       const anchoLinea = doc.getTextWidth(linea);
       const esLineaNumerada = /^\d+\./.test(linea);
-      
+
       // Usar un margen de seguridad (95% del ancho máximo) para asegurar que el texto no se salga
       const anchoMaximoConMargen = anchoMaximo * 0.95;
-      
+
       // Si la línea es muy larga o está cerca del límite, usar la función de salto de línea por palabras
       if (anchoLinea > anchoMaximoConMargen) {
         const yPosAntes = yPos;
         yPos = dibujarTextoConSaltoLinea(linea, x, yPos, anchoMaximoConMargen);
-        
+
         // Si la función no agregó espacio al final, agregarlo
         if (yPos === yPosAntes) {
           yPos += fontSize * 0.35;
         }
-        
+
         // Espacio moderado después de una línea numerada que hizo salto
         if (esLineaNumerada) {
           yPos += fontSize * 0.25; // Espacio moderado después de línea numerada con salto
         }
-        
+
         // Si hay una siguiente línea numerada, agregar espacio adicional moderado
         if (index < lineasProcesadas.length - 1) {
           const siguienteLinea = lineasProcesadas[index + 1];
@@ -272,7 +272,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
       } else {
         // Si la línea cabe, dibujarla directamente
         doc.text(linea, x, yPos);
-        
+
         // Espaciado equilibrado para líneas numeradas
         if (esLineaNumerada) {
           yPos += fontSize * 0.4; // Espacio equilibrado para líneas numeradas
@@ -280,7 +280,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
           yPos += fontSize * 0.35; // Espacio normal
         }
       }
-      
+
       // Espacio adicional entre líneas numeradas consecutivas (solo si no hizo salto)
       if (index < lineasProcesadas.length - 1 && anchoLinea <= anchoMaximoConMargen) {
         const siguienteLinea = lineasProcesadas[index + 1];
@@ -289,7 +289,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
         }
       }
     });
-    
+
     return yPos;
   };
 
@@ -297,25 +297,25 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
     const tablaInicioX = 5;
     const tablaAncho = 200;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo gris más oscuro
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
+
     // Dibujar líneas del header
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(9);
     doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
-    
+
     return yPos + alturaHeader;
   };
 
@@ -333,10 +333,10 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   doc.setLineWidth(0.2);
 
   // Primera fila: Apellidos y Nombres (fila completa) 
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); 
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); 
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); 
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); 
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
   // Segunda fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
@@ -454,21 +454,21 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
 
   // Contenido de la carta con formato específico
   doc.setFont("helvetica", "normal").setFontSize(8);
-  
+
   // Primera línea
   doc.text("Estimados Señores de: ", tablaInicioX + 2, yTexto + 2);
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text(`${datosFinales.empresa || ""}`, tablaInicioX + 2 + doc.getTextWidth("Estimados Señores de: "), yTexto + 2);
-  
+
   // Segunda línea - usando todo el ancho disponible
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Enviamos el informe: ", tablaInicioX + 2, yTexto + 5.5);
-  
+
   // Calcular posición del nombre en negrita
   const posicionNombre = tablaInicioX + 2 + doc.getTextWidth("Enviamos el informe: ");
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text(`${datosFinales.apellidosNombres || ""}`, posicionNombre, yTexto + 5.5);
-  
+
   // Calcular posición del texto final usando el ancho del nombre en negrita
   const anchoNombreNegrita = doc.getTextWidth(`${datosFinales.apellidosNombres || ""}`);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -554,25 +554,25 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
     doc.setFont("helvetica", "normal").setFontSize(8);
     const anchoDisponible = tablaAncho - 54; // Ancho para el valor
     const texto = valor || "";
-    
+
     // Calcular altura necesaria
     let alturaFila = filaAltura;
     if (texto && doc.getTextWidth(texto) > anchoDisponible) {
       const lineas = doc.splitTextToSize(texto, anchoDisponible);
       alturaFila = Math.max(filaAltura, lineas.length * 3.5 + 2);
     }
-    
+
     // Dibujar bordes
     doc.line(tablaInicioX, yInicio, tablaInicioX, yInicio + alturaFila);
     doc.line(tablaInicioX + tablaAncho, yInicio, tablaInicioX + tablaAncho, yInicio + alturaFila);
     doc.line(tablaInicioX, yInicio, tablaInicioX + tablaAncho, yInicio);
     doc.line(tablaInicioX, yInicio + alturaFila, tablaInicioX + tablaAncho, yInicio + alturaFila);
-    
+
     // Dibujar contenido
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(label, tablaInicioX + 2, yInicio + 3.5);
     doc.setFont("helvetica", "normal").setFontSize(8);
-    
+
     if (texto && doc.getTextWidth(texto) > anchoDisponible) {
       const lineas = doc.splitTextToSize(texto, anchoDisponible);
       lineas.forEach((linea, idx) => {
@@ -581,7 +581,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
     } else {
       doc.text(texto, tablaInicioX + 52, yInicio + 3.5);
     }
-    
+
     return yInicio + alturaFila;
   };
 
@@ -664,21 +664,21 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   // Fila 3: Drogas en Orina y Examen de Orina
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Drogas en Orina:", tablaInicioX + 2, yTextoLab + 1.5);
-  
+
   // Dibujar "Cocaina" en negrita
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Cocaina :   ", tablaInicioX + 30, yTextoLab + 1.5);
-  
+
   // Dibujar valor de cocaína en normal
   doc.setFont("helvetica", "normal").setFontSize(8);
   const cocainaValue = datosFinales.laboratorio.cocaina || "N/A";
   doc.text(cocainaValue, tablaInicioX + 30 + doc.getTextWidth("Cocaina :   "), yTextoLab + 1.5);
-  
+
   // Dibujar "Marihuana" en negrita
   doc.setFont("helvetica", "bold").setFontSize(8);
   const posicionMarihuana = tablaInicioX + 30 + doc.getTextWidth("Cocaina :   ") + doc.getTextWidth(cocainaValue) + 5;
   doc.text("Marihuana :   ", posicionMarihuana, yTextoLab + 1.5);
-  
+
   // Dibujar valor de marihuana en normal
   doc.setFont("helvetica", "normal").setFontSize(8);
   const marihuanaValue = datosFinales.laboratorio.marihuana || "N/A";
@@ -708,10 +708,10 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   // === CONTENIDO DE CONCLUSION Y RECOMENDACIONES ===
   // Guardar la posición inicial del header para dibujar los bordes después
   const yPosInicioConclusion = yPos;
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
   const textoConclusion = datosFinales.observacionesFichaMedicaAnexo7c_txtobservacionesfm || "";
-  
+
   // Configuración de padding
   const alturaMinima = 15; // Altura mínima de la fila
   const paddingSuperior = 4; // Padding superior 
@@ -721,10 +721,10 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   const xTextoInicio = tablaInicioX + paddingLateral;
   // Calcular ancho máximo disponible: ancho de tabla menos padding lateral izquierdo y derecho
   const anchoMaximoDisponible = tablaAncho - (paddingLateral * 2);
-  
+
   // Dibujar el texto primero para obtener la posición final real
   const yPosFinalTexto = dibujarTextoConSaltosLinea(textoConclusion, xTextoInicio, yTextoInicio, anchoMaximoDisponible);
-  
+
   // Calcular la altura final de la fila basándose en la posición real del texto
   const alturaTextoUsada = yPosFinalTexto - yTextoInicio;
   const alturaFilaFinal = Math.max(alturaMinima, alturaTextoUsada + paddingSuperior + paddingInferior);
@@ -734,7 +734,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPosInicioConclusion, tablaInicioX + tablaAncho, yPosInicioConclusion + alturaFilaFinal);
   doc.line(tablaInicioX, yPosInicioConclusion, tablaInicioX + tablaAncho, yPosInicioConclusion);
   doc.line(tablaInicioX, yPosInicioConclusion + alturaFilaFinal, tablaInicioX + tablaAncho, yPosInicioConclusion + alturaFilaFinal);
-  
+
   yPos = yPosInicioConclusion + alturaFilaFinal;
 
   // === SECCIÓN 6: RESTRICCIONES ===
@@ -744,10 +744,10 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   // === CONTENIDO DE RESTRICCIONES ===
   // Guardar la posición inicial del header para dibujar los bordes después
   const yPosInicioRestricciones = yPos;
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
   const textoRestricciones = datosFinales.restricciones || "";
-  
+
   // Configuración de padding
   const alturaMinimaRestricciones = 15; // Altura mínima de la fila
   const paddingSuperiorRestricciones = 4; // Padding superior 
@@ -757,10 +757,10 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   const xTextoInicioRestricciones = tablaInicioX + paddingLateralRestricciones;
   // Calcular ancho máximo disponible: ancho de tabla menos padding lateral izquierdo y derecho
   const anchoMaximoDisponibleRestricciones = tablaAncho - (paddingLateralRestricciones * 2);
-  
+
   // Dibujar el texto primero para obtener la posición final real
   const yPosFinalTextoRestricciones = dibujarTextoConSaltosLinea(textoRestricciones, xTextoInicioRestricciones, yTextoInicioRestricciones, anchoMaximoDisponibleRestricciones);
-  
+
   // Calcular la altura final de la fila basándose en la posición real del texto
   const alturaTextoRestriccionesUsada = yPosFinalTextoRestricciones - yTextoInicioRestricciones;
   const alturaFilaRestriccionesFinal = Math.max(alturaMinimaRestricciones, alturaTextoRestriccionesUsada + paddingSuperiorRestricciones + paddingInferiorRestricciones);
@@ -770,7 +770,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPosInicioRestricciones, tablaInicioX + tablaAncho, yPosInicioRestricciones + alturaFilaRestriccionesFinal);
   doc.line(tablaInicioX, yPosInicioRestricciones, tablaInicioX + tablaAncho, yPosInicioRestricciones);
   doc.line(tablaInicioX, yPosInicioRestricciones + alturaFilaRestriccionesFinal, tablaInicioX + tablaAncho, yPosInicioRestricciones + alturaFilaRestriccionesFinal);
-  
+
   yPos = yPosInicioRestricciones + alturaFilaRestriccionesFinal;
 
   // === SECCIÓN 7: APTITUD LABORAL ===
@@ -811,7 +811,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   // === FIRMA DEL MÉDICO ===
   const firmaMedicoX = tablaInicioX + 80; // Centrado en la columna
   const firmaMedicoY = yFirmas + 3;
-  
+
   // Agregar firma y sello médico
   let firmaMedicoUrl = getSign(datosFinales, "SELLOFIRMA");
   if (firmaMedicoUrl) {
@@ -832,7 +832,7 @@ export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   doc.text("Responsable de la Evaluación", centroColumna, yFirmas + 28.5, { align: "center" });
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 12});
+  footerTR(doc, { footerOffsetY: 12 });
 
   // === Imprimir ===
   imprimir(doc);

@@ -1,14 +1,14 @@
 import jsPDF from "jspdf";
 import HeaderRagiografiaToraxPA from "./Headers/header_RagiografiaToraxPA_Digitalizado.jsx";
 
-export default function RagiografiaToraxPA_Digitalizado(data = {}, docExistente = null) {
+export default async function RagiografiaToraxPA_Digitalizado(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF();
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 100;
 
   // 1) Header
-  HeaderRagiografiaToraxPA(doc, data);
+  await HeaderRagiografiaToraxPA(doc, data);
 
   // Función para obtener datos con valor por defecto
   const obtener = (name, defaultValue = "") => {

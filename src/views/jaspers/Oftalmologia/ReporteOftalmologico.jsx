@@ -53,25 +53,25 @@ function drawOftalmoTable(doc, datos = {}) {
   doc.text(
     "CORREGIDA",
     x +
-      colWScaled[2] +
-      colWScaled[3] +
-      colWScaled[4] +
-      colWScaled[5] +
-      (colWScaled[6] + colWScaled[7] + colWScaled[8] + colWScaled[9]) / 2,
+    colWScaled[2] +
+    colWScaled[3] +
+    colWScaled[4] +
+    colWScaled[5] +
+    (colWScaled[6] + colWScaled[7] + colWScaled[8] + colWScaled[9]) / 2,
     y + rowH / 2 + 1,
     { align: "center" }
   );
   // VISION DE COLORES
   doc.rect(
     x +
-      colWScaled[2] +
-      colWScaled[3] +
-      colWScaled[4] +
-      colWScaled[5] +
-      colWScaled[6] +
-      colWScaled[7] +
-      colWScaled[8] +
-      colWScaled[9],
+    colWScaled[2] +
+    colWScaled[3] +
+    colWScaled[4] +
+    colWScaled[5] +
+    colWScaled[6] +
+    colWScaled[7] +
+    colWScaled[8] +
+    colWScaled[9],
     y,
     colWScaled[10],
     rowH * 3
@@ -79,30 +79,30 @@ function drawOftalmoTable(doc, datos = {}) {
   doc.text(
     "VISION DE\nCOLORES",
     x +
-      colWScaled[2] +
-      colWScaled[3] +
-      colWScaled[4] +
-      colWScaled[5] +
-      colWScaled[6] +
-      colWScaled[7] +
-      colWScaled[8] +
-      colWScaled[9] +
-      colWScaled[10] / 2,
+    colWScaled[2] +
+    colWScaled[3] +
+    colWScaled[4] +
+    colWScaled[5] +
+    colWScaled[6] +
+    colWScaled[7] +
+    colWScaled[8] +
+    colWScaled[9] +
+    colWScaled[10] / 2,
     y + rowH * 1.5,
     { align: "center", baseline: "middle" }
   );
   // VISION BINOCULAR
   doc.rect(
     x +
-      colWScaled[2] +
-      colWScaled[3] +
-      colWScaled[4] +
-      colWScaled[5] +
-      colWScaled[6] +
-      colWScaled[7] +
-      colWScaled[8] +
-      colWScaled[9] +
-      colWScaled[10],
+    colWScaled[2] +
+    colWScaled[3] +
+    colWScaled[4] +
+    colWScaled[5] +
+    colWScaled[6] +
+    colWScaled[7] +
+    colWScaled[8] +
+    colWScaled[9] +
+    colWScaled[10],
     y,
     colWScaled[11],
     rowH * 3
@@ -110,32 +110,32 @@ function drawOftalmoTable(doc, datos = {}) {
   doc.text(
     "VISION\nBINOCULAR",
     x +
-      colWScaled[2] +
-      colWScaled[3] +
-      colWScaled[4] +
-      colWScaled[5] +
-      colWScaled[6] +
-      colWScaled[7] +
-      colWScaled[8] +
-      colWScaled[9] +
-      colWScaled[10] +
-      colWScaled[11] / 2,
+    colWScaled[2] +
+    colWScaled[3] +
+    colWScaled[4] +
+    colWScaled[5] +
+    colWScaled[6] +
+    colWScaled[7] +
+    colWScaled[8] +
+    colWScaled[9] +
+    colWScaled[10] +
+    colWScaled[11] / 2,
     y + rowH * 1.5,
     { align: "center", baseline: "middle" }
   );
   // REFLEJOS PUPILARES
   doc.rect(
     x +
-      colWScaled[2] +
-      colWScaled[3] +
-      colWScaled[4] +
-      colWScaled[5] +
-      colWScaled[6] +
-      colWScaled[7] +
-      colWScaled[8] +
-      colWScaled[9] +
-      colWScaled[10] +
-      colWScaled[11],
+    colWScaled[2] +
+    colWScaled[3] +
+    colWScaled[4] +
+    colWScaled[5] +
+    colWScaled[6] +
+    colWScaled[7] +
+    colWScaled[8] +
+    colWScaled[9] +
+    colWScaled[10] +
+    colWScaled[11],
     y,
     colWScaled[12],
     rowH * 3
@@ -143,34 +143,34 @@ function drawOftalmoTable(doc, datos = {}) {
   doc.text(
     "REFLEJOS\nPUPILARES",
     x +
-      colWScaled[2] +
-      colWScaled[3] +
-      colWScaled[4] +
-      colWScaled[5] +
-      colWScaled[6] +
-      colWScaled[7] +
-      colWScaled[8] +
-      colWScaled[9] +
-      colWScaled[10] +
-      colWScaled[11] +
-      colWScaled[12] / 2,
+    colWScaled[2] +
+    colWScaled[3] +
+    colWScaled[4] +
+    colWScaled[5] +
+    colWScaled[6] +
+    colWScaled[7] +
+    colWScaled[8] +
+    colWScaled[9] +
+    colWScaled[10] +
+    colWScaled[11] +
+    colWScaled[12] / 2,
     y + rowH * 1.5,
     { align: "center", baseline: "middle" }
   );
   // ENFERMEDADES OCULARES
   doc.rect(
     x +
-      colWScaled[2] +
-      colWScaled[3] +
-      colWScaled[4] +
-      colWScaled[5] +
-      colWScaled[6] +
-      colWScaled[7] +
-      colWScaled[8] +
-      colWScaled[9] +
-      colWScaled[10] +
-      colWScaled[11] +
-      colWScaled[12],
+    colWScaled[2] +
+    colWScaled[3] +
+    colWScaled[4] +
+    colWScaled[5] +
+    colWScaled[6] +
+    colWScaled[7] +
+    colWScaled[8] +
+    colWScaled[9] +
+    colWScaled[10] +
+    colWScaled[11] +
+    colWScaled[12],
     y,
     colWScaled[13],
     rowH * 3
@@ -178,18 +178,18 @@ function drawOftalmoTable(doc, datos = {}) {
   doc.text(
     "ENFERMEDADES\nOCULARES",
     x +
-      colWScaled[2] +
-      colWScaled[3] +
-      colWScaled[4] +
-      colWScaled[5] +
-      colWScaled[6] +
-      colWScaled[7] +
-      colWScaled[8] +
-      colWScaled[9] +
-      colWScaled[10] +
-      colWScaled[11] +
-      colWScaled[12] +
-      colWScaled[13] / 2,
+    colWScaled[2] +
+    colWScaled[3] +
+    colWScaled[4] +
+    colWScaled[5] +
+    colWScaled[6] +
+    colWScaled[7] +
+    colWScaled[8] +
+    colWScaled[9] +
+    colWScaled[10] +
+    colWScaled[11] +
+    colWScaled[12] +
+    colWScaled[13] / 2,
     y + rowH * 1.5,
     { align: "center", baseline: "middle" }
   );
@@ -360,7 +360,7 @@ function drawOftalmoTable(doc, datos = {}) {
   }
 }
 
-export default function ReporteOftalmologico(datos = {}) {
+export default async function ReporteOftalmologico(datos = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "landscape" });
   header_ReporteOftalmologico(doc, datos);
   drawOftalmoTable(doc, datos);

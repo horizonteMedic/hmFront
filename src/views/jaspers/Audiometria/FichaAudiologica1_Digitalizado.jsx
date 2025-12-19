@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import headerFicha from "./headers/header_FichaAudiologica_Digitalizado.jsx";
 
-export default function FichaAudiologica_Digitalizado(data = {}) {
+export default async function FichaAudiologica_Digitalizado(data = {}) {
   const doc = new jsPDF();
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
@@ -213,14 +213,14 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
 
   // === NUEVO: Usar imagen de fondo para la cabecera ===
   const fondoImg = "/img/frame_ficha.png";
-  const fondoH =95; // altura aproximada de la cabecera en mm (ajusta si es necesario)
+  const fondoH = 95; // altura aproximada de la cabecera en mm (ajusta si es necesario)
   let yHeader = 40;
   try {
     doc.addImage(fondoImg, "PNG", margin, yHeader, usableW, fondoH);
   } catch (e) {
     doc.text("Imagen de cabecera no disponible", margin, yHeader + 10);
   }
-  
+
   // === 2) Datos de cabecera (cada uno con su propia posición para moverlos individualmente) ===
   // Puedes ajustar cada x/y a tu gusto
   doc.setFont("helvetica", "normal").setFontSize(9);
@@ -231,7 +231,7 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(15);
   doc.text(String(datos.norden || "95899"), xNorden, yNorden);
   doc.setFont("helvetica", "normal").setFontSize(9); // restaurar tamaño para los demás
-  
+
   // Fecha Examen
   const xFechaExamen = margin + 25;
   const yFechaExamen = margin + 49;
@@ -329,7 +329,7 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   const yEdad = margin + 64.5;
   doc.text(String(datos.edad || "29"), xEdad, yEdad);
 
- 
+
   // Sexo
   const xSexo = margin + 69.5;
   const ySexo = margin + 64.5;
@@ -340,20 +340,20 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   const yOcupacion = margin + 64.5;
   doc.text(String(datos.ocupacion || "ADMINISTRADOR ESPECIALISTA"), xOcupacion, yOcupacion, { maxWidth: 60 });
 
-   // Años de trabajo
-   const xAniosTrabajo = margin + 188;
-   const yAniosTrabajo = margin + 64.5;
-   doc.text(String(datos.aniosTrabajo || "5"), xAniosTrabajo, yAniosTrabajo);
+  // Años de trabajo
+  const xAniosTrabajo = margin + 188;
+  const yAniosTrabajo = margin + 64.5;
+  doc.text(String(datos.aniosTrabajo || "5"), xAniosTrabajo, yAniosTrabajo);
 
-   
+
   // Empresa Contrata
   const xContrata = margin + 35;
   const yContrata = margin + 70;
-  doc.text(String(datos.contrata || "CONSTRUCTORA E INMOBILIARIA JAMELY E.I. R.L."), xContrata, yContrata, { maxWidth: 50});
+  doc.text(String(datos.contrata || "CONSTRUCTORA E INMOBILIARIA JAMELY E.I. R.L."), xContrata, yContrata, { maxWidth: 50 });
 
   // Empresa
   const xEmpresa = margin + 105;
-  const yEmpresa = margin +  70;
+  const yEmpresa = margin + 70;
   doc.text(String(datos.empresa || "EMPRESA DEL AREA PRINCIPAL DE GRANDES ZONAS XYZ S.A.C."), xEmpresa, yEmpresa, { maxWidth: 55 });
 
   // Tiempo de Exposición
@@ -361,7 +361,7 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   const yTiempoExposicion = margin + 72;
   doc.text(String(datos.tiempoExposicion || "5 H/D"), xTiempoExposicion, yTiempoExposicion);
 
-  
+
   // === Uso de Protectores Auditivos y Apreciación del Ruido ===
   doc.setFont("helvetica", "bold").setFontSize(9);
 
@@ -455,7 +455,7 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   ySint += 4.5;
   if (datos.otros) doc.text("X", xSintSI, ySint);
   else doc.text("X", xSintNO, ySint);
-  
+
   // Mostrar texto descriptivo de "Otros" si está marcado
   if (datos.otros && datos.OtrosTexto) {
     const xOtrosTexto = margin + 108;
@@ -476,7 +476,7 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   doc.text(
     String(
       datos.otoscopia ||
-        "Membrana timpánica integra, conducto auditivo externo sin alteraciones, sin presencia de cuerpos extraños ni secreciones. Se observa leve enrojecimiento en la región superior, sin signos de perforación ni exudado."
+      "Membrana timpánica integra, conducto auditivo externo sin alteraciones, sin presencia de cuerpos extraños ni secreciones. Se observa leve enrojecimiento en la región superior, sin signos de perforación ni exudado."
     ),
     xOtoscopia,
     yOtoscopia,
@@ -578,34 +578,34 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
     { tipo: "x", color: "blue" },
   ];
   const prevLineWidth = doc.getLineWidth();
-  
+
   // Función para dibujar líneas con separación solo cuando hay puntos superpuestos
   const dibujarLineasConSeparacion = (pts, tipo, color) => {
     if (pts.length < 2) return;
-    
+
     doc.setLineWidth(0.4);
     if (color === "red") doc.setDrawColor(255, 0, 0);
     else if (color === "blue") doc.setDrawColor(0, 0, 255);
     else doc.setDrawColor(0, 0, 0);
     doc.setLineCap(1);
-    
+
     let prev = null;
     for (let i = 0; i < pts.length; i++) {
       const freqIdx = freqs.indexOf(pts[i].freq);
       if (freqIdx === -1) continue;
-      
+
       let x = graphX + freqIdx * (graphW / 8);
       let y = graphY + ((pts[i].db + 10) / 130) * graphH;
-      
+
       // Verificar si hay otro punto en la misma frecuencia y dB (superpuesto)
-      const haySuperposicion = puntos.some(p => 
-        p.freq === pts[i].freq && 
-        p.db === pts[i].db && 
-        p.tipo !== pts[i].tipo && 
-        p.db !== null && 
+      const haySuperposicion = puntos.some(p =>
+        p.freq === pts[i].freq &&
+        p.db === pts[i].db &&
+        p.tipo !== pts[i].tipo &&
+        p.db !== null &&
         p.db !== undefined
       );
-      
+
       // Solo aplicar separación si hay superposición
       if (haySuperposicion) {
         if (tipo === "x") {
@@ -614,20 +614,20 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
           x -= 1; // 1mm a la izquierda para líneas rojas (círculo)
         }
       }
-      
+
       if (prev) {
         doc.line(prev.x, prev.y, x, y);
       }
       prev = { x, y };
     }
   };
-  
+
   tipos.forEach(({ tipo, color }) => {
     // Filtrar puntos de este tipo y color, y ordenarlos por frecuencia
     const pts = puntos
       .filter((p) => p.tipo === tipo && p.color === color && p.db !== null && p.db !== undefined)
       .sort((a, b) => a.freq - b.freq);
-    
+
     dibujarLineasConSeparacion(pts, tipo, color);
   });
   // Dibujar los puntos (círculo, X, [, ])

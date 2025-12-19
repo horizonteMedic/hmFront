@@ -29,10 +29,10 @@ const toDDMMYYYY = (fecha) => {
 };
 
 // Header con datos de ficha, sede y fecha
-const drawHeader = (doc, datos = {}) => {
+const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
 
-  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
 
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -177,13 +177,13 @@ const drawPatientData = (doc, datos = {}) => {
   return yPos;
 };
 
-export default function AnalisisBioquimicos_Digitalizado(datos = {}, docExistente = null) {
+export default async function AnalisisBioquimicos_Digitalizado(datos = {}, docExistente = null) {
 
   const doc = docExistente || new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
-  drawHeader(doc, datos);
+  await drawHeader(doc, datos);
 
   // === TÍTULO ===
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);

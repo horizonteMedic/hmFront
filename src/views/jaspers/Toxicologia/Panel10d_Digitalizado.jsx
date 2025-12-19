@@ -40,30 +40,30 @@ const toDDMMYYYY = (fecha) => {
 
 
 // Header con datos de ficha, sede y fecha
-const drawHeader = (doc, datos = {}) => {
+const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
-  
-  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-  
+
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Nro de ficha: ", pageW - 80, 15);
   doc.setFont("helvetica", "normal").setFontSize(18);
   doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
-  
+
   // Sede
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
-  
+
   // Fecha de examen
   const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
   doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
-  
+
   // Página
   doc.text("Pag. 01", pageW - 30, 10);
 
   // Bloque de color
-   drawColorBox(doc, {
+  drawColorBox(doc, {
     color: datos.codigoColor,
     text: datos.textoColor,
     x: pageW - 30,
@@ -187,20 +187,20 @@ const drawPatientData = (doc, datos = {}) => {
 
 // --- Componente Principal ---
 
-export default function Panel10d_Digitalizado(datos = {}) {
+export default async function Panel10d_Digitalizado(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
-  drawHeader(doc, datos);
-  
+  await drawHeader(doc, datos);
+
   // === TÍTULO ===
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
   doc.text("TOXICOLÓGICO", pageW / 2, 38, { align: "center" });
-  
+
   // === DATOS DEL PACIENTE ===
   const finalYPos = drawPatientData(doc, datos);
-  
+
   const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
   const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
   const isValidUrl = url => url && url !== "Sin registro" && url;
@@ -212,7 +212,7 @@ export default function Panel10d_Digitalizado(datos = {}) {
       img.onload = () => res(img);
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
-  
+
   // Función helper para imprimir el PDF
   const imprimirPDF = () => {
     footerTR(doc, { footerOffsetY: 5 });
@@ -278,23 +278,23 @@ export default function Panel10d_Digitalizado(datos = {}) {
       { label: "FENCICLIDINA (PCP)", key: "txtFenciclidina" },
       { label: "ANTIDEPRESIVOS TRICÍCLICOS (TCA)", key: "txtAntidepresivos" },
     ];
-    
+
     tests.forEach(({ label, key }) => {
       const value = datos[key] != null ? datos[key] : "NEGATIVO";
       y = drawResultRow(doc, y, label, value.toUpperCase(), "S/U");
     });
-    
+
     // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
     const sigW = 53; // Tamaño fijo width
     const sigH = 23; // Tamaño fijo height
     const sigY = 230; // Bajado 10mm
     const gap = 16; // Espacio entre sellos (reducido 4mm: 20 - 4 = 16)
-    
+
     if (s1 && s2) {
       // Si hay dos sellos, centrarlos juntos
       const totalWidth = sigW * 2 + gap;
       const startX = (pageW - totalWidth) / 2;
-      
+
       // Sello 1 (izquierda) - Tamaño fijo
       const canvas1 = document.createElement('canvas');
       canvas1.width = s1.width;
@@ -302,12 +302,12 @@ export default function Panel10d_Digitalizado(datos = {}) {
       const ctx1 = canvas1.getContext('2d');
       ctx1.drawImage(s1, 0, 0);
       const selloBase64_1 = canvas1.toDataURL('image/png');
-      
+
       // Usar tamaño fijo para ambos sellos
       const imgX1 = startX;
       const imgY1 = sigY;
       doc.addImage(selloBase64_1, 'PNG', imgX1, imgY1, sigW, sigH);
-      
+
       // Sello 2 (derecha) - Mismo tamaño fijo
       const canvas2 = document.createElement('canvas');
       canvas2.width = s2.width;
@@ -315,7 +315,7 @@ export default function Panel10d_Digitalizado(datos = {}) {
       const ctx2 = canvas2.getContext('2d');
       ctx2.drawImage(s2, 0, 0);
       const selloBase64_2 = canvas2.toDataURL('image/png');
-      
+
       const sigX2 = startX + sigW + gap;
       const imgX2 = sigX2;
       const imgY2 = sigY;
@@ -328,7 +328,7 @@ export default function Panel10d_Digitalizado(datos = {}) {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-      
+
       const sigX = (pageW - sigW) / 2;
       const imgX = sigX;
       const imgY = sigY;
@@ -341,7 +341,7 @@ export default function Panel10d_Digitalizado(datos = {}) {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s2, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-      
+
       const sigX = (pageW - sigW) / 2;
       const imgX = sigX;
       const imgY = sigY;

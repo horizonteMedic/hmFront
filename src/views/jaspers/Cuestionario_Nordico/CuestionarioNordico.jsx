@@ -1,8 +1,9 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import header_Cuestionario from "./Header_CuestionarioN";
+import { compressImage } from "../../utils/helpers";
 
-export default function CuestionarioNordico(datos = {}, docExistente = null) {
+export default async function CuestionarioNordico(datos = {}, docExistente = null) {
 
   function drawXInBox(doc, x, y, width, height, color = [0, 0, 255], scale = 3) {
     const centerX = x + width / 2;
@@ -68,11 +69,23 @@ export default function CuestionarioNordico(datos = {}, docExistente = null) {
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
     isValidUrl(sello3?.url) ? loadImg(sello3.url) : Promise.resolve(null),
-  ]).then(([s1, s2, s3]) => {
+  ]).then(async ([s1, s2, s3]) => {
     // 2) Encabezado (logo, campos, título)
-    header_Cuestionario(doc, datos);
+    await header_Cuestionario(doc, datos);
     doc.setFont("helvetica", "bold").setFontSize(11);
     doc.text("CUESTIONARIO NÓRDICO DE SIGNOS Y SÍNTOMAS OSTEOMUSCULARES", pageW / 2, y, { align: "center" })
+    const imgNordico = "img/Nordico/nordico.png";
+    const imgNordicoCompressed = await compressImage(imgNordico);
+
+    const imgEspaldabaja = "img/Nordico/Espaldabaja.png";
+    const imgEspaldabajaCompressed = await compressImage(imgEspaldabaja);
+
+    const imgHombros = "img/Nordico/hombros.png";
+    const imgHombrosCompressed = await compressImage(imgHombros);
+
+    const imgCuello = "img/Nordico/cuello.png";
+    const imgCuelloCompressed = await compressImage(imgCuello);
+
 
     autoTable(doc, {
       startY: y + 3,
@@ -111,14 +124,14 @@ export default function CuestionarioNordico(datos = {}, docExistente = null) {
           }
         ]
       ],
-      didDrawCell: (data) => {
+      didDrawCell: async (data) => {
         // Dibuja imagen en la segunda columna
         if (data.row.index === 1 && data.column.index === 1) {
           const imgWidth = 40;
           const imgHeight = 55;
           const x = data.cell.x + (data.cell.width - imgWidth) / 2;
           const y = data.cell.y + (data.cell.height - imgHeight) / 2;
-          doc.addImage("img/Nordico/nordico.png", "PNG", x, y, imgWidth, imgHeight);
+          doc.addImage(imgNordicoCompressed, "jpeg", x, y, imgWidth, imgHeight);
         }
         // Texto alineado dentro del cuadro vacío (fila 1, col 0)
         if (data.row.index === 1 && data.column.index === 0) {
@@ -594,14 +607,15 @@ export default function CuestionarioNordico(datos = {}, docExistente = null) {
           }
         ]
       ],
-      didDrawCell: (data) => {
+      didDrawCell: async (data) => {
         // Fila 1, columna 1 (contando desde 0) -> la celda de la imagen
         if (data.row.index === 0 && data.column.index === 1) {
           const imgWidth = 24;
           const imgHeight = 20;
           const x = data.cell.x + (data.cell.width - imgWidth) / 2;
           const y = data.cell.y + (data.cell.height - imgHeight) / 2;
-          doc.addImage("img/Nordico/Espaldabaja.png", "PNG", x, y, imgWidth, imgHeight);
+
+          doc.addImage(imgEspaldabajaCompressed, "PNG", x, y, imgWidth, imgHeight);
         }
       }
     });
@@ -840,14 +854,15 @@ export default function CuestionarioNordico(datos = {}, docExistente = null) {
           }
         ]
       ],
-      didDrawCell: (data) => {
+      didDrawCell: async (data) => {
         // Fila 1, columna 1 (contando desde 0) -> la celda de la imagen
         if (data.row.index === 0 && data.column.index === 1) {
           const imgWidth = 24;
           const imgHeight = 20;
           const x = data.cell.x + (data.cell.width - imgWidth) / 2;
           const y = data.cell.y + (data.cell.height - imgHeight) / 2;
-          doc.addImage("img/Nordico/hombros.png", "PNG", x, y, imgWidth, imgHeight);
+
+          doc.addImage(imgHombrosCompressed, "PNG", x, y, imgWidth, imgHeight);
         }
       }
     });
@@ -1099,14 +1114,15 @@ export default function CuestionarioNordico(datos = {}, docExistente = null) {
           }
         ]
       ],
-      didDrawCell: (data) => {
+      didDrawCell: async (data) => {
         // Fila 1, columna 1 (contando desde 0) -> la celda de la imagen
         if (data.row.index === 0 && data.column.index === 1) {
           const imgWidth = 24;
           const imgHeight = 20;
           const x = data.cell.x + (data.cell.width - imgWidth) / 2;
           const y = data.cell.y + (data.cell.height - imgHeight) / 2;
-          doc.addImage("img/Nordico/cuello.png", "PNG", x, y, imgWidth, imgHeight);
+
+          doc.addImage(imgCuelloCompressed, "PNG", x, y, imgWidth, imgHeight);
         }
       }
     });
