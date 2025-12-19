@@ -51,27 +51,6 @@ const urlsEliminar = {
     fAptitudAnexo2: "",
     fMedAgro: "",
     fAptitudAgro: "",
-    // COVID-19
-    constancia: "",
-    constanciaTamizajeMarsa: "",
-    registroPruebaRapidas: "",
-    cartaCompromiso: "",
-    constanciaMedica: "",
-    resultadosPruebaRapida: "",
-    // COVID MARZA
-    constanciaSalud: "",
-    fichaMedica: "",
-    fResultadoPP: "",
-    constanciaAlta: "",
-    consentimientoI: "",
-    certificadoM: "",
-    // COVID-19 (derecha)
-    fichaSintomatologica: "",
-    constanciaEncofrados: "",
-    hojaReferencia: "",
-    indicacionesMedicas: "",
-    constanciaDeAlta: "",
-    epidemiologica: "",
 }
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {

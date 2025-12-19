@@ -9,12 +9,13 @@ import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerCuestionarioBerlin";
 import { BotonesAccion, DatosPersonalesLaborales } from "../../../../../../components/templates/Templates";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
-const tabla = "";
+const tabla = "cuestionario_berlin";
 
 export default function CuestionarioBerlin() {
   const today = getToday();
-  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+  const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
   const initialFormState = {
     // Header - Información del examen
@@ -39,9 +40,9 @@ export default function CuestionarioBerlin() {
     ocupacion: "",
     cargoDesempenar: "",
 
-    temorRiesgoElectrico: "",
-    temorTareaAltura: "",
-    temorEspaciosConfinados: "",
+    criterioApneaObstructivaSueno: "",
+    criterioFatigaSomnolencia: "",
+    criterioHipertensionArterial: "",
 
     // Análisis FODA
     fortalezasOportunidades: "",
@@ -50,6 +51,10 @@ export default function CuestionarioBerlin() {
     // Observaciones y Recomendaciones
     observaciones: "",
     recomendaciones: "",
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
   const {
@@ -62,7 +67,7 @@ export default function CuestionarioBerlin() {
     handleClear,
     handleClearnotO,
     handlePrintDefault,
-  } = useForm(initialFormState, { storageKey: "informeConductores" });
+  } = useForm(initialFormState, { storageKey: "cuestionario_berlin" });
 
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
@@ -123,23 +128,23 @@ export default function CuestionarioBerlin() {
         <div className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
             <InputTextOneLine
-              label="1.- Temor a Riesgo Eléctrico"
-              name="temorRiesgoElectrico"
-              value={form?.temorRiesgoElectrico}
+              label="1.- Apnea Obstructiva del Sueño"
+              name="criterioApneaObstructivaSueno"
+              value={form?.criterioApneaObstructivaSueno}
               onChange={handleChange}
               labelWidth="200px"
             />
             <InputTextOneLine
-              label="2.- Temor a Tareas en Altura / Izaje"
-              name="temorTareaAltura"
-              value={form?.temorTareaAltura}
+              label="2.- Fatiga y Somnolencia"
+              name="criterioFatigaSomnolencia"
+              value={form?.criterioFatigaSomnolencia}
               onChange={handleChange}
               labelWidth="200px"
             />
             <InputTextOneLine
-              label="3.- Temor a Espacios Confinados"
-              name="temorEspaciosConfinados"
-              value={form?.temorEspaciosConfinados}
+              label="3.- Hipertensión Arterial"
+              name="criterioHipertensionArterial"
+              value={form?.criterioHipertensionArterial}
               onChange={handleChange}
               labelWidth="200px"
             />
@@ -182,6 +187,15 @@ export default function CuestionarioBerlin() {
             rows={4}
           />
         </div>
+      </SectionFieldset>
+
+      <SectionFieldset legend="Asignación de Médico">
+        <EmpleadoComboBox
+          value={form.nombre_medico}
+          label="Especialista"
+          form={form}
+          onChange={handleChangeSimple}
+        />
       </SectionFieldset>
 
       <BotonesAccion

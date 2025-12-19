@@ -43,15 +43,6 @@ export default function EliminarExamenes() {
         // Fichas Sin Restricción
         fMedica: "", fAptitudMedOcup: "", fMedicaAnexo2: "", fAptitudAnexo2: "",
         fMedAgro: "", fAptitudAgro: "",
-        // COVID-19
-        constancia: "", constanciaTamizajeMarsa: "", registroPruebaRapidas: "", cartaCompromiso: "",
-        constanciaMedica: "", resultadosPruebaRapida: "",
-        // COVID MARZA
-        constanciaSalud: "", fichaMedica: "", fResultadoPP: "", constanciaAlta: "",
-        consentimientoI: "", certificadoM: "",
-        // COVID-19 (derecha)
-        fichaSintomatologica: "", constanciaEncofrados: "", hojaReferencia: "", indicacionesMedicas: "",
-        constanciaDeAlta: "", epidemiologica: "",
     };
 
     const {
@@ -157,7 +148,7 @@ export default function EliminarExamenes() {
                         <ExamenRow label="Ev.Musc.Esqueletico" name="evMuscEsqueletico" value={form.evMuscEsqueletico} />
                         <ExamenRow label="Cuest.CalidadSueño" name="cuestCalidadSueno" value={form.cuestCalidadSueno} />
                         <ExamenRow label="TestFatSomnolencia" name="testFatSomnolencia" value={form.testFatSomnolencia} />
-                         <ExamenRow label="Eval. Oftalmologica" name="evalOftalmologica" value={form.evalOftalmologica} />
+                        <ExamenRow label="Eval. Oftalmologica" name="evalOftalmologica" value={form.evalOftalmologica} />
                         <ExamenRow label="Cert. Manipuladores" name="certManipuladores" value={form.certManipuladores} />
                         <ExamenRow label="Cuest. Audiometria" name="cuestAudiometria" value={form.cuestAudiometria} />
                         <ExamenRow label="Informe Audiometria" name="informeAudiometria" value={form.informeAudiometria} />
@@ -179,33 +170,6 @@ export default function EliminarExamenes() {
                         <ExamenRow label="F.Aptitud Anexo2" name="fAptitudAnexo2" value={form.fAptitudAnexo2} />
                         <ExamenRow label="F.Med Agro" name="fMedAgro" value={form.fMedAgro} />
                         <ExamenRow label="F.Aptitud Agro" name="fAptitudAgro" value={form.fAptitudAgro} />
-                    </SectionFieldset>
-
-                    <SectionFieldset legend="COVID-19">
-                        <ExamenRow label="Constancia" name="constancia" value={form.constancia} />
-                        <ExamenRow label="Constancia Tamizaje Marsa" name="constanciaTamizajeMarsa" value={form.constanciaTamizajeMarsa} />
-                        <ExamenRow label="Registro prueba rápidas" name="registroPruebaRapidas" value={form.registroPruebaRapidas} />
-                        <ExamenRow label="Carta Compromiso" name="cartaCompromiso" value={form.cartaCompromiso} />
-                        <ExamenRow label="Constancia Médica" name="constanciaMedica" value={form.constanciaMedica} />
-                        <ExamenRow label="Resultados Prueba Rapida" name="resultadosPruebaRapida" value={form.resultadosPruebaRapida} />
-                        <ExamenRow label="Ficha Sintomatologica" name="fichaSintomatologica" value={form.fichaSintomatologica} />
-                        <ExamenRow label="Constancia Encofrados" name="constanciaEncofrados" value={form.constanciaEncofrados} />
-                        <ExamenRow label="Hoja de Referencia" name="hojaReferencia" value={form.hojaReferencia} />
-                        <ExamenRow label="Indicaciones Médicas" name="indicacionesMedicas" value={form.indicacionesMedicas} />
-                        <ExamenRow label="Constancia de Alta" name="constanciaDeAlta" value={form.constanciaDeAlta} />
-                        <ExamenRow label="Epidemiologica" name="epidemiologica" value={form.epidemiologica} />
-                    </SectionFieldset>
-                </div>
-
-                {/* Columna 4: COVID MARZA */}
-                <div className="flex-1">
-                    <SectionFieldset legend="COVID MARZA">
-                        <ExamenRow label="Constancia Salud" name="constanciaSalud" value={form.constanciaSalud} />
-                        <ExamenRow label="Ficha Medica" name="fichaMedica" value={form.fichaMedica} />
-                        <ExamenRow label="F.Resultado PP" name="fResultadoPP" value={form.fResultadoPP} />
-                        <ExamenRow label="Constancia Alta" name="constanciaAlta" value={form.constanciaAlta} />
-                        <ExamenRow label="Consentimiento I" name="consentimientoI" value={form.consentimientoI} />
-                        <ExamenRow label="Certificado M" name="certificadoM" value={form.certificadoM} />
                     </SectionFieldset>
                 </div>
             </div>
