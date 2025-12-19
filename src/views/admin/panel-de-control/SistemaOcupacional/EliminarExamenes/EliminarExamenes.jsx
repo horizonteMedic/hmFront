@@ -1,10 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faBroom, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faBroom, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { InputTextOneLine } from "../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
 import { VerifyTR, DeleteExamen } from "./controllerEliminarExamenes";
+import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
 
 const tabla = "eliminar_examenes";
 
@@ -13,8 +14,18 @@ export default function EliminarExamenes() {
 
     const initialFormState = {
         norden: "",
-        nombre: "",
-        examen: "",
+        nombreExamen: "",
+
+        nombres: "",
+        dni: "",
+        edad: "",
+        sexo: "",
+
+        empresa: "",
+        contrata: "",
+        areaTrabajo: "",
+        puestoActual: "",
+
         // Examen Ocupacional
         triaje: "", labClinico: "", rxTorax: "", fichaAudiologica: "", audiometria: "",
         espirometria: "", odontograma: "", psicologia: "", fichaOIT: "", exRxSanguineos: "",
@@ -24,7 +35,7 @@ export default function EliminarExamenes() {
         // Trabajos en Altura
         certTrabAlturaBarrik: "", certTrabajoAltura: "",
         // Otros Formatos
-        evMuscEsqueletico: "", cuestCalidadSueno: "", testFatSomnolencia: "", audiometriaBorooo: "",
+        evMuscEsqueletico: "", cuestCalidadSueno: "", testFatSomnolencia: "",
         evalOftalmologica: "", certManipuladores: "", cuestAudiometria: "", informeAudiometria: "",
         perimetroToraxico: "",
         // Conducción de Vehículos
@@ -47,8 +58,8 @@ export default function EliminarExamenes() {
         form,
         setForm,
         handleChange,
-        handleChangeNumber,
         handleClear,
+        handleChangeNumberDecimals,
         handleClearnotO,
     } = useForm(initialFormState, { storageKey: "eliminarExamenesOcupacional" });
 
@@ -85,33 +96,26 @@ export default function EliminarExamenes() {
     );
 
     return (
-        <div className="w-full space-y-3 px-4">
+        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
             {/* Búsqueda */}
-            <SectionFieldset legend="Búsqueda" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
                 <InputTextOneLine
-                    label="Nro Orden"
+                    label="N° Orden"
                     name="norden"
-                    value={form.norden}
+                    value={form?.norden}
+                    onChange={handleChangeNumberDecimals}
                     onKeyUp={handleSearch}
-                    onChange={handleChangeNumber}
-                    labelWidth="80px"
                 />
                 <InputTextOneLine
-                    label="Nombre"
-                    name="nombre"
-                    value={form.nombre}
+                    label="Tipo de Examen"
+                    name="nombreExamen"
+                    value={form.nombreExamen}
                     disabled
-                    labelWidth="70px"
-                    className="lg:col-span-2"
-                />
-                <InputTextOneLine
-                    label="Examen"
-                    name="examen"
-                    value={form.examen}
-                    disabled
-                    labelWidth="70px"
+                    labelWidth="120px"
                 />
             </SectionFieldset>
+
+            <DatosPersonalesLaborales form={form} />
 
             {/* Layout principal con flex */}
             <div className="flex gap-3 items-start">
@@ -125,7 +129,7 @@ export default function EliminarExamenes() {
                         <ExamenRow label="Audiometria" name="audiometria" value={form.audiometria} />
                         <ExamenRow label="Espirometria" name="espirometria" value={form.espirometria} />
                         <ExamenRow label="Odontograma" name="odontograma" value={form.odontograma} />
-                        <ExamenRow label="Psicologia" name="psicologia" value={form.psicologia} />
+                        <ExamenRow label="Informe Psicologico" name="psicologia" value={form.psicologia} />
                         <ExamenRow label="Ficha OIT" name="fichaOIT" value={form.fichaOIT} />
                         <ExamenRow label="Ex. Rx Sanguineos" name="exRxSanguineos" value={form.exRxSanguineos} />
                         <ExamenRow label="Ficha Ant. Patológicos" name="fichaAntPatologicos" value={form.fichaAntPatologicos} />
@@ -153,8 +157,7 @@ export default function EliminarExamenes() {
                         <ExamenRow label="Ev.Musc.Esqueletico" name="evMuscEsqueletico" value={form.evMuscEsqueletico} />
                         <ExamenRow label="Cuest.CalidadSueño" name="cuestCalidadSueno" value={form.cuestCalidadSueno} />
                         <ExamenRow label="TestFatSomnolencia" name="testFatSomnolencia" value={form.testFatSomnolencia} />
-                        <ExamenRow label="Audiometria Boroo" name="audiometriaBorooo" value={form.audiometriaBorooo} />
-                        <ExamenRow label="Eval. Oftalmologica" name="evalOftalmologica" value={form.evalOftalmologica} />
+                         <ExamenRow label="Eval. Oftalmologica" name="evalOftalmologica" value={form.evalOftalmologica} />
                         <ExamenRow label="Cert. Manipuladores" name="certManipuladores" value={form.certManipuladores} />
                         <ExamenRow label="Cuest. Audiometria" name="cuestAudiometria" value={form.cuestAudiometria} />
                         <ExamenRow label="Informe Audiometria" name="informeAudiometria" value={form.informeAudiometria} />
@@ -206,6 +209,18 @@ export default function EliminarExamenes() {
                     </SectionFieldset>
                 </div>
             </div>
+
+            <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-4">
+                <div className="flex gap-4">
+                    <button
+                        type="button"
+                        onClick={handleClear}
+                        className="bg-amber-500 hover:bg-amber-600 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                    >
+                        <FontAwesomeIcon icon={faBroom} /> Limpiar
+                    </button>
+                </div>
+            </section>
         </div>
     );
 }
