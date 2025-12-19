@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import HeaderRagiografiaToraxPA from "./Headers/header_RagiografiaToraxPA_Digitalizado.jsx";
+import { getSignCompressed } from "../../utils/helpers";
 
 export default async function RagiografiaToraxPA_Digitalizado(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF();
@@ -164,13 +165,21 @@ export default async function RagiografiaToraxPA_Digitalizado(data = {}, docExis
   // 5) Sección de firmas (opcional) - BLOQUE COMPLETO QUE SE MUEVE JUNTO
   y = tableY + alturaTotal + 28; // Bajado 8 puntos (de 20 a 28)
 
-  // Arreglo de firmas con posición Y dinámica - IMAGEN ARRIBA
-  const firmasAPintar = [{
-    nombre: "SELLOFIRMA",
-    x: 80,
-    y: y - 3, // Subido 2.5 puntos para mejor posicionamiento
-    maxw: 50
-  }];
+  // Obtener la firma comprimida
+  const sellofirma = await getSignCompressed(data, "SELLOFIRMA");
+
+  // Dibujar firma si existe
+  if (sellofirma) {
+    const imgX = 80;
+    const imgY = y - 3;
+    const maxW = 50;
+    const maxH = 35;
+
+    // Como getSignCompressed ya devuelve la imagen optimizada, 
+    // podemos usar dimensiones fijas o ajustadas si es necesario, 
+    // pero para mantener la consistencia con el código anterior intentaremos respetar el ancho/alto
+    doc.addImage(sellofirma, "JPEG", imgX, imgY, maxW, maxH);
+  }
 
   // Línea para firma centrada - DEBAJO DE LA IMAGEN
   const firmaY = y + 25; // 25 puntos debajo de la imagen para evitar superposición
@@ -187,14 +196,13 @@ export default async function RagiografiaToraxPA_Digitalizado(data = {}, docExis
     align: "center",
   });
 
-  agregarFirmas(doc, data.digitalizacion, firmasAPintar).then(() => {
-    if (docExistente) {
-      return doc;
-    } else {
-      imprimir(doc);
-    }
-  });
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
+
 function imprimir(doc) {
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
@@ -203,71 +211,4 @@ function imprimir(doc) {
   iframe.src = url;
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
-}
-
-function agregarFirmas(doc, digitalizacion = [], firmasAPintar = []) {
-  const addSello = (imagenUrl, x, y, maxw = 100) => {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = imagenUrl;
-
-      // img.onload = () => {
-      //   let sigW = maxw;
-      //   const sigH = 35;
-      //   const baseX = x;
-      //   const baseY = y;
-      //   const maxW = sigW - 10;
-      //   const maxH = sigH - 10;
-      //   let imgW = img.width;
-      //   let imgH = img.height;
-      //   const scale = Math.min(maxW / imgW, maxH / imgH, 1);
-      //   imgW *= scale;
-      //   imgH *= scale;
-      //   const imgX = baseX + (sigW - imgW) / 2;
-      //   const imgY = baseY + (sigH - imgH) / 2;
-      //   doc.addImage(imagenUrl, "PNG", imgX, imgY, imgW, imgH);
-      //   resolve();
-      // };
-      img.onload = () => {
-        const sigH = 35; // alto máximo
-        const maxW = maxw; // ancho máximo como parámetro
-        const baseX = x;
-        const baseY = y;
-
-        let imgW = img.width;
-        let imgH = img.height;
-
-        // Escala proporcional en base a ancho y alto máximos
-        const scale = Math.min(maxW / imgW, sigH / imgH, 1);
-        imgW *= scale;
-        imgH *= scale;
-
-        // Ahora el ancho se adapta
-        const sigW = imgW;
-
-        // Centrar la imagen
-        const imgX = baseX + (sigW - imgW) / 2;
-        const imgY = baseY + (sigH - imgH) / 2;
-
-        doc.addImage(imagenUrl, "PNG", imgX, imgY, imgW, imgH);
-        resolve();
-      };
-      img.onerror = (e) => {
-        console.error("Error al cargar la imagen:", e);
-        resolve();
-      };
-    });
-  };
-
-  const firmas = digitalizacion.reduce(
-    (acc, d) => ({ ...acc, [d.nombreDigitalizacion]: d.url }),
-    {}
-  );
-
-  const promesasFirmas = firmasAPintar
-    .filter((f) => firmas[f.nombre])
-    .map((f) => addSello(firmas[f.nombre], f.x, f.y, f.maxw));
-
-  return Promise.all(promesasFirmas);
 }

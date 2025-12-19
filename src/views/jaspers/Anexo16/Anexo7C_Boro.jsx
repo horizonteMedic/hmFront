@@ -27,7 +27,7 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
 
   // Contador de páginas dinámico
   let numeroPagina = 1;
-  
+
   // Función helper para obtener el offset del footer según la página
   const getFooterOffset = () => {
     return numeroPagina === 1 ? 13 : 8; // Footer primera página 3mm más cerca del contenido (offset reducido)
@@ -2090,7 +2090,7 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
 
   // === COLUMNA 1: OTOSCOPÍA y CARDIOVASCULAR ===
   // La altura de OTOSCOPÍA será dinámica, y CARDIOVASCULAR será creciente
-  
+
   // OTOSCOPÍA - Header
   const alturaFilaHeaderOtoscopia = 5;
   doc.setFont("helvetica", "bold").setFontSize(7);
@@ -2102,25 +2102,25 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
   const odValue = (datosFinales.evaluacionOidos?.otoscopia?.oidoDerecho || "").toUpperCase();
   const oiValue = (datosFinales.evaluacionOidos?.otoscopia?.oidoIzquierdo || "").toUpperCase();
   const textoOtoscopia = `O.D.: ${odValue}  |  O.I.: ${oiValue}`;
-  
+
   // Calcular altura dinámica para otoscopía
   const alturaFilaCrecienteOtoscopia = 8; // Altura mínima
   const anchoDisponibleOtoscopia = anchoColVitales1 - 4;
   const lineasOtoscopia = doc.splitTextToSize(textoOtoscopia, anchoDisponibleOtoscopia);
   const interlineadoOtoscopia = 2.5;
   const alturaDinamicaOtoscopia = Math.max(alturaFilaCrecienteOtoscopia, lineasOtoscopia.length * interlineadoOtoscopia + 4);
-  
+
   // Dibujar líneas de la fila de otoscopía (solo columna izquierda)
   doc.line(tablaInicioX, yOtoscopiaData, tablaInicioX, yOtoscopiaData + alturaDinamicaOtoscopia);
   doc.line(divColVitales1, yOtoscopiaData, divColVitales1, yOtoscopiaData + alturaDinamicaOtoscopia);
   doc.line(tablaInicioX, yOtoscopiaData, divColVitales1, yOtoscopiaData);
   doc.line(tablaInicioX, yOtoscopiaData + alturaDinamicaOtoscopia, divColVitales1, yOtoscopiaData + alturaDinamicaOtoscopia);
-  
+
   // Contenido de la fila de otoscopía con saltos de línea
   lineasOtoscopia.forEach((linea, index) => {
     doc.text(linea, tablaInicioX + 2, yOtoscopiaData + 3.5 + (index * interlineadoOtoscopia));
   });
-  
+
   // Calcular altura total de otoscopía
   const alturaOtoscopia = alturaFilaHeaderOtoscopia + alturaDinamicaOtoscopia;
 

@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import headerEvaluacionMuscoloEsqueletica from "./Headers/Header_EvaluacionMuscoloEsqueletica.jsx";
-import { compressImage, getSignCompressed } from "../../utils/helpers.js";
+import { compressImage, getSign, getSignCompressed } from "../../utils/helpers.js";
 
 export default async function EvaluacionMuscoloEsqueletica(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -2378,9 +2378,9 @@ export default async function EvaluacionMuscoloEsqueletica(data = {}, docExisten
   const sedeData = data?.informacionSede || {};
 
   // Obtener firmas comprimidas (JPEG por defecto)
-  const firmap = await getSignCompressed(sedeData, "FIRMAP");
-  const huellap = await getSignCompressed(sedeData, "HUELLA");
-  const sellofirma = await getSignCompressed(sedeData, "SELLOFIRMA");
+  const firmap = await getSign(sedeData, "FIRMAP");
+  const huellap = await getSign(sedeData, "HUELLA");
+  const sellofirma = await getSign(sedeData, "SELLOFIRMA");
 
   // Definir altura base y margenes fijos
   const sigH = 35;

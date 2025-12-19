@@ -38,8 +38,9 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
     const res = await getFetch(`${GetExamenURL}?nOrden=${nro}`, token);
     if (res) {
         console.log(res);
+        const resArray = Object.values(res);
         const listaActualizada = ExamenesList.map(examen => {
-            const match = res.find(item => item.nameService === examen.tabla);
+            const match = resArray.find(item => item.nameService === examen.tabla);
             return {
                 ...examen,
                 resultado: match ? match.existe : false

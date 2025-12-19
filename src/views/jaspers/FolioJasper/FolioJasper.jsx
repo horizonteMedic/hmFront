@@ -3,7 +3,7 @@ import { getFetch } from "../../utils/apiHelpers";
 import { reportesMap } from "./reportesMap";
 
 export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null) {
-    const pdfFinal = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+    const pdfFinal = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
 
     const reportesConHorizontal = [
         "historia_oc_info"
@@ -97,9 +97,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
     console.log(`📄 Total de reportes: ${estadisticasPeso.length}`);
     console.log(`📈 Promedio por reporte: ${(pesoTotal / estadisticasPeso.length / 1024).toFixed(2)} KB`);
     console.log("═".repeat(80) + "\n");
-
-    imprimir(pdfFinal);
     pdfFinal.save(`Folio_${nro}.pdf`);
+    imprimir(pdfFinal);
 }
 
 function imprimir(doc) {
