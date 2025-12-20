@@ -146,7 +146,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
 
 export const PrintHojaR = (nro, token, tabla) => {
     const jasperModules = import.meta.glob(
-        "../../../../../../jaspers/AnalisisBioquimicos/*.jsx"
+        "../../../../../../jaspers/ModuloPsicologia/PsicoTrastorPersonalidad/*.jsx"
     );
     PrintHojaRDefault(
         nro,
@@ -155,7 +155,7 @@ export const PrintHojaR = (nro, token, tabla) => {
         null,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../../jaspers/AnalisisBioquimicos"
+        "../../../../../../jaspers/ModuloPsicologia/PsicoTrastorPersonalidad"
     );
 };
 
