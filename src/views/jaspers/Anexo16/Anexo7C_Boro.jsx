@@ -213,14 +213,14 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
       visionCerca: {
         sinCorregirOD: data.visionCercaSinCorregirOd_v_cerca_s_od ?? "",
         sinCorregirOI: data.visionCercaSinCorregirOi_v_cerca_s_oi ?? "",
-        corregidaOD: data.visionCercaCorregidaOd_v_cerca_c_od ?? "",
-        corregidaOI: data.visionCercaCorregidaOi_v_cerca_c_oi ?? "",
+        corregidaOD: data.visionCercaCorregidaOd_v_cerca_c_od ? data.visionCercaCorregidaOd_v_cerca_c_od : data.odcc_odcc,
+        corregidaOI: data.visionCercaCorregidaOi_v_cerca_c_oi ? data.visionCercaCorregidaOi_v_cerca_c_oi : data.oicc_oicc,
       },
       visionLejos: {
         sinCorregirOD: data.visionLejosSinCorregirOd_v_lejos_s_od ?? "",
         sinCorregirOI: data.visionLejosSinCorregirOi_v_lejos_s_oi ?? "",
-        corregidaOD: data.visionLejosCorregidaOd_v_lejos_c_od ?? "",
-        corregidaOI: data.visionLejosCorregidaOi_v_lejos_c_oi ?? "",
+        corregidaOD: data.visionLejosCorregidaOd_v_lejos_c_od ? data.visionLejosCorregidaOd_v_lejos_c_od : data.odlc_odlc,
+        corregidaOI: data.visionLejosCorregidaOi_v_lejos_c_oi ? data.visionLejosCorregidaOi_v_lejos_c_oi : data.oilc_oilc,
       },
       enfermedadesOculares: data.enfermedadesOcularesAnexo7c_txtenfermedadesoculares ?? "",
       enfermedadesOcularesOtros: data.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "",
