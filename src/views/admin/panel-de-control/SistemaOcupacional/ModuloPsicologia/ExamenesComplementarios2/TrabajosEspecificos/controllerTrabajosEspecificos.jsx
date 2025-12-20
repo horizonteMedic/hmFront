@@ -113,7 +113,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             GetInfoServicio(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de Informe Conductores.",
+                    "Este paciente ya cuenta con registros de Trabajos Específicos.",
                     "warning"
                 );
             });

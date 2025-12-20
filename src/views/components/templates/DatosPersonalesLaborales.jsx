@@ -1,11 +1,11 @@
 import InputTextOneLine from "../reusableComponents/InputTextOneLine";
 import SectionFieldset from "../reusableComponents/SectionFieldset";
 
-export default function DatosPersonalesLaborales(form, personales = true, laborales = true) {
+export default function DatosPersonalesLaborales({form, personales = true, laborales = true}) {
     return (
         <>
             {personales &&
-                (<SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
+                (<SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
                     <InputTextOneLine
                         label="Nombres"
                         name="nombres"
@@ -69,7 +69,7 @@ export default function DatosPersonalesLaborales(form, personales = true, labora
                 </SectionFieldset>)
             }
             {laborales &&
-                (<SectionFieldset legend="Datos Laborales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                (<SectionFieldset legend="Datos Laborales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
                     <InputTextOneLine
                         label="Empresa"
                         name="empresa"

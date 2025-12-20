@@ -4,8 +4,8 @@ import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 
-export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default function ficha_antecedente_patologico_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // Contador de páginas dinámico
@@ -243,27 +243,27 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   // Función para convertir texto a formato gramaticalmente correcto (primera letra mayúscula, resto minúsculas)
   const formatearTextoGramatical = (texto) => {
     if (!texto || typeof texto !== 'string') return texto;
-    
+
     // Lista de textos que deben mantenerse en mayúsculas
     const textosMayusculas = ['N/A', 'O.D', 'O.I', 'RCRR', 'HRH', 'B/D', 'RHA(+)', 'COVID-19', 'VIH', 'SIDA', 'TAC', 'RMN', 'ECG', 'EEG'];
-    
+
     // Dividir por líneas para manejar listas con viñetas
     const lineas = texto.split('\n');
     const lineasFormateadas = lineas.map(linea => {
       if (!linea.trim()) return linea; // Mantener líneas vacías
-      
+
       // Si la línea empieza con "- " (viñeta), formatear después del guión
       if (linea.trim().startsWith('- ')) {
         const contenido = linea.trim().substring(2); // Quitar "- "
         return '- ' + contenido.charAt(0).toUpperCase() + contenido.slice(1).toLowerCase();
       }
-      
+
       // Si la línea empieza con ". " (punto), formatear después del punto
       if (linea.trim().startsWith('. ')) {
         const contenido = linea.trim().substring(2); // Quitar ". "
         return '. ' + contenido.charAt(0).toUpperCase() + contenido.slice(1).toLowerCase();
       }
-      
+
       // Para líneas normales, formatear palabra por palabra respetando textos específicos
       // Primero eliminar espacios al inicio y final, luego dividir por comas
       const lineaTrimmed = linea.trim();
@@ -273,10 +273,10 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
         const palabrasFormateadas = palabras.map((palabra) => {
           // Verificar si la palabra (sin puntuación) está en la lista de mayúsculas
           const palabraSinPuntuacion = palabra.replace(/[.,:;()[\]{}]/g, '');
-          const debeSerMayuscula = textosMayusculas.some(texto => 
+          const debeSerMayuscula = textosMayusculas.some(texto =>
             texto.toLowerCase() === palabraSinPuntuacion.toLowerCase()
           );
-          
+
           if (debeSerMayuscula) {
             // Mantener la palabra en mayúsculas
             return palabra.toUpperCase();
@@ -288,20 +288,20 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
             return palabra;
           }
         });
-        
+
         return palabrasFormateadas.join(' ');
       });
-      
+
       return segmentosFormateados.join(', ');
     });
-    
+
     return lineasFormateadas.join('\n');
   };
 
   // Función para convertir textos específicos a mayúsculas
   const convertirTextosEspecificosAMayusculas = (texto) => {
     if (!texto || typeof texto !== 'string') return texto;
-    
+
     // Lista de textos que deben estar en mayúsculas
     const textosMayusculas = [
       'n/a', 'n/a.', 'n/a,', 'n/a:', 'n/a;', 'n/a)', 'n/a]', 'n/a}', // N/A con diferentes puntuaciones
@@ -312,15 +312,15 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
       'b/d', 'b/d.', 'b/d,', 'b/d:', 'b/d;', 'b/d)', 'b/d]', 'b/d}', // B/D con diferentes puntuaciones
       'rha(+)', 'rha(+).', 'rha(+),', 'rha(+):', 'rha(+);', 'rha(+))', 'rha(+)]', 'rha(+)}' // RHA(+) con diferentes puntuaciones
     ];
-    
+
     let textoFormateado = texto;
-    
+
     // Reemplazar cada texto específico con su versión en mayúsculas
     textosMayusculas.forEach(textoEspecifico => {
       const regex = new RegExp('\\b' + textoEspecifico.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi'); // Word boundary
       textoFormateado = textoFormateado.replace(regex, textoEspecifico.toUpperCase());
     });
-    
+
     return textoFormateado;
   };
 
@@ -328,25 +328,25 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
     const tablaInicioX = 5;
     const tablaAncho = 200;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo gris más oscuro
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
+
     // Dibujar líneas del header
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
-    
+
     return yPos + alturaHeader;
   };
 
@@ -354,25 +354,25 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   const dibujarHeaderSeccionCeleste = (titulo, yPos, alturaHeader = 4) => {
     const tablaInicioX = 5;
     const tablaAncho = 200;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo celeste
     doc.setFillColor(199, 241, 255);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
+
     // Dibujar líneas del header
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
-    
+
     return yPos + alturaHeader;
   };
 
@@ -383,11 +383,11 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
     const palabras = texto.split(' ');
     let lineaActual = '';
     let yPos = y;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -401,11 +401,11 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
         }
       }
     });
-    
+
     if (lineaActual) {
       doc.text(lineaActual, x, yPos);
     }
-    
+
     return yPos;
   };
 
@@ -423,10 +423,10 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   doc.setLineWidth(0.2);
 
   // Primera fila: Apellidos y Nombres (fila completa) 
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); 
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); 
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); 
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); 
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
   // Segunda fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
@@ -562,13 +562,13 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-    
+
     // Dibujar líneas internas para mini celdas usando la función estandarizada
     const xCentrada1 = dibujarMiniCelda(tablaInicioX + 42, yPos, filaAltura);
     const xCentrada2 = dibujarMiniCelda(tablaInicioX + 92, yPos, filaAltura);
     const xCentrada3 = dibujarMiniCelda(tablaInicioX + 142, yPos, filaAltura);
     const xCentrada4 = dibujarMiniCelda(tablaInicioX + 192, yPos, filaAltura);
-    
+
     // Contenido de la fila - validar que las enfermedades no sean null/undefined
     if (enfermedad1) {
       doc.setFont("helvetica", "normal").setFontSize(7);
@@ -580,7 +580,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
         doc.setTextColor(0, 0, 0); // Volver a color negro
       }
     }
-    
+
     if (enfermedad2) {
       doc.setFont("helvetica", "normal").setFontSize(7);
       doc.text(enfermedad2, tablaInicioX + 52, yPos + 3.5);
@@ -591,7 +591,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
         doc.setTextColor(0, 0, 0); // Volver a color negro
       }
     }
-    
+
     if (enfermedad3) {
       doc.setFont("helvetica", "normal").setFontSize(7);
       doc.text(enfermedad3, tablaInicioX + 102, yPos + 3.5);
@@ -602,7 +602,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
         doc.setTextColor(0, 0, 0); // Volver a color negro
       }
     }
-    
+
     if (enfermedad4) {
       doc.setFont("helvetica", "normal").setFontSize(7);
       doc.text(enfermedad4, tablaInicioX + 152, yPos + 3.5);
@@ -613,7 +613,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
         doc.setTextColor(0, 0, 0); // Volver a color negro
       }
     }
-    
+
     yPos += filaAltura;
   };
 
@@ -681,35 +681,35 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
     enfermedadesMarcadas.tumoresQuistes, enfermedadesMarcadas.ulceraPeptica, enfermedadesMarcadas.varicela, enfermedadesMarcadas.varices);
 
   // === FILA INDIVIDUAL COVID-19 ===
-  
+
   // Obtener datos de COVID-19
   const covidData = datosFinales.severidadCovid || {};
   const tieneCovid = covidData.covid19 || false;
   const tieneFecha = covidData.fechaExamen && covidData.fechaExamen.trim() !== "";
   const tieneSeveridad = covidData.leve || covidData.moderado || covidData.severo;
-  
+
   // Determinar qué mostrar: si hay fecha o severidad, o si COVID está marcado
   const debeMostrar = tieneCovid || tieneFecha || tieneSeveridad;
-  
+
   if (debeMostrar) {
     // Dibujar líneas de la fila individual de COVID-19
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-    
+
     // COVID-19 con mini celda
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("COVID 19", tablaInicioX + 2, yPos + 3.5);
-    
+
     // Dibujar mini celda para COVID-19
     const xCentradaCovid = dibujarMiniCelda(tablaInicioX + 42, yPos, filaAltura);
-    
+
     // Cerrar la mini celda de COVID-19 (línea derecha)
     const anchoMiniCelda = 6;
     const xFinMiniCelda = tablaInicioX + 44 + anchoMiniCelda;
     doc.line(xFinMiniCelda, yPos, xFinMiniCelda, yPos + filaAltura);
-    
+
     // Marcar X en la mini celda si COVID-19 está marcado
     if (tieneCovid) {
       doc.setFont("helvetica", "bold").setFontSize(9);
@@ -717,17 +717,17 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
       doc.text("X", xCentradaCovid, yPos + 3.5);
       doc.setTextColor(0, 0, 0);
     }
-    
+
     // Calcular posición X inicial para datos adicionales (después de la mini celda)
     let xActual = xFinMiniCelda + 3;
-    
+
     // Mostrar fecha solo si COVID-19 está marcado y tiene fecha
     if (tieneCovid && tieneFecha) {
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text("Fecha: " + covidData.fechaExamen, xActual, yPos + 3.5);
       xActual += doc.getTextWidth("Fecha: " + covidData.fechaExamen) + 5;
     }
-    
+
     // Mostrar severidad solo si COVID-19 está marcado y tiene severidad
     if (tieneCovid && tieneSeveridad) {
       // Severidad: Leve
@@ -744,7 +744,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
         doc.text(")", xActual, yPos + 3.5);
         xActual += doc.getTextWidth(")") + 3;
       }
-      
+
       // Severidad: Moderado
       if (covidData.moderado) {
         doc.setFont("helvetica", "bold").setFontSize(8);
@@ -759,7 +759,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
         doc.text(")", xActual, yPos + 3.5);
         xActual += doc.getTextWidth(")") + 3;
       }
-      
+
       // Severidad: Severo
       if (covidData.severo) {
         doc.setFont("helvetica", "bold").setFontSize(8);
@@ -774,7 +774,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
         doc.text(")", xActual, yPos + 3.5);
       }
     }
-    
+
     yPos += filaAltura;
   }
 
@@ -783,7 +783,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Otros:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -795,7 +795,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Especifique detalles de la patología o tratamiento marcada:", tablaInicioX + 2, yPos + 3.5);
   yPos += filaAltura;
@@ -805,7 +805,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Especifique:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -817,18 +817,18 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Alergias a Medicamentos / Alimentos", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  
+
   // Marcar SI si corresponde
   if (datosFinales.alergiasMedicamentos) {
     doc.text("SI (  X  )", tablaInicioX + 80, yPos + 3.5);
   } else {
     doc.text("SI (      )", tablaInicioX + 80, yPos + 3.5);
   }
-  
+
   // Marcar NO si corresponde
   if (!datosFinales.alergiasMedicamentos) {
     doc.text("NO (  X  )", tablaInicioX + 95, yPos + 3.5);
@@ -842,7 +842,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Especifique:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -853,32 +853,32 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   // Función para calcular altura dinámica de observaciones
   const calcularAlturaObservaciones = (texto, anchoMaximo, doc) => {
     if (!texto) return filaAltura; // Altura mínima si no hay texto
-    
+
     doc.setFont("helvetica", "normal").setFontSize(8);
     const lineas = doc.splitTextToSize(texto, anchoMaximo);
     const alturaTexto = lineas.length * 4; // 4mm por línea
     const margenSuperior = 1.5;
     const margenInferior = 1.5;
-    
+
     return Math.max(filaAltura, alturaTexto + margenSuperior + margenInferior);
   };
 
   // Calcular altura dinámica para observaciones
   const anchoTextoObservaciones = tablaAncho - 35;
   const alturaObservaciones = calcularAlturaObservaciones(datosFinales.observacionesAntecedentes, anchoTextoObservaciones, doc);
-  
+
   // Dibujar líneas de la fila de observaciones con altura dinámica
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaObservaciones);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaObservaciones);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaObservaciones, tablaInicioX + tablaAncho, yPos + alturaObservaciones);
-  
+
   // Dibujar texto con altura dinámica
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Observaciones:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(convertirTextosEspecificosAMayusculas(formatearTextoGramatical(datosFinales.observacionesAntecedentes)), tablaInicioX + 30, yPos + 3.5, { maxWidth: anchoTextoObservaciones });
-  
+
   yPos += alturaObservaciones;
 
   // === LÍNEA CELESTE PARA SÍNTOMAS FRECUENTES ===
@@ -895,13 +895,13 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-    
+
     // Dibujar líneas internas para mini celdas usando la función estandarizada
     const xCentrada1 = dibujarMiniCelda(tablaInicioX + 42, yPos, filaAltura);
     const xCentrada2 = dibujarMiniCelda(tablaInicioX + 92, yPos, filaAltura);
     const xCentrada3 = dibujarMiniCelda(tablaInicioX + 142, yPos, filaAltura);
     const xCentrada4 = dibujarMiniCelda(tablaInicioX + 192, yPos, filaAltura);
-    
+
     // Contenido de la fila - validar que los síntomas no sean null/undefined
     if (sintoma1) {
       doc.setFont("helvetica", "normal").setFontSize(7);
@@ -913,7 +913,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
         doc.setTextColor(0, 0, 0); // Volver a color negro
       }
     }
-    
+
     if (sintoma2) {
       doc.setFont("helvetica", "normal").setFontSize(7);
       doc.text(sintoma2, tablaInicioX + 52, yPos + 3.5);
@@ -924,7 +924,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
         doc.setTextColor(0, 0, 0); // Volver a color negro
       }
     }
-    
+
     if (sintoma3) {
       doc.setFont("helvetica", "normal").setFontSize(7);
       doc.text(sintoma3, tablaInicioX + 102, yPos + 3.5);
@@ -935,7 +935,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
         doc.setTextColor(0, 0, 0); // Volver a color negro
       }
     }
-    
+
     if (sintoma4) {
       doc.setFont("helvetica", "normal").setFontSize(7);
       doc.text(sintoma4, tablaInicioX + 152, yPos + 3.5);
@@ -946,7 +946,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
         doc.setTextColor(0, 0, 0); // Volver a color negro
       }
     }
-    
+
     yPos += filaAltura;
   };
 
@@ -995,17 +995,17 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Fumar", tablaInicioX + 2, yPos + 3.5);
-  
+
   // SI/NO para Fumar con paréntesis del mismo ancho
   const fumarSiX = tablaInicioX + 25;
   const fumarNoX = tablaInicioX + 45;
-  
+
   doc.text("SI (", fumarSiX, yPos + 3.5);
   if (habitosNosivosMarcados.fumar) {
-  doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.setFont("helvetica", "bold").setFontSize(9);
     doc.setTextColor(255, 0, 0);
     doc.text("X", fumarSiX + 7, yPos + 3.5);
     doc.setTextColor(0, 0, 0);
@@ -1014,7 +1014,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   }
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(")", fumarSiX + 10, yPos + 3.5);
-  
+
   doc.text("NO (", fumarNoX, yPos + 3.5);
   if (!habitosNosivosMarcados.fumar) {
     doc.setFont("helvetica", "bold").setFontSize(9);
@@ -1026,13 +1026,13 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   }
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(")", fumarNoX + 10, yPos + 3.5);
-  
+
   // Número de cigarrillos (movido 10mm a la izquierda)
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Número de Cigarrillos:", tablaInicioX + 70, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(formatearTextoGramatical(habitosNosivosMarcados.numeroCigarrillos || ""), tablaInicioX + 110, yPos + 3.5);
-  
+
   yPos += filaAltura;
 
   // Fila de Licor
@@ -1041,7 +1041,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   const yTextoInicioLicor = yPos + 3.5;
   const xInicioFrecuenciaLicor = tablaInicioX + 140; // Posición X donde comienza el texto de frecuencia
   const anchoDisponibleFrecuenciaLicor = tablaAncho + tablaInicioX - xInicioFrecuenciaLicor - 2; // Ancho disponible: desde inicio hasta final menos margen
-  
+
   // Calcular altura necesaria para frecuencia usando splitTextToSize
   const frecuenciaLicorTexto = habitosNosivosMarcados.frecuenciaLicor ? formatearTextoGramatical(habitosNosivosMarcados.frecuenciaLicor) : "";
   if (frecuenciaLicorTexto) {
@@ -1050,41 +1050,41 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
     const alturaFrecuenciaLicor = Math.max(filaAltura, lineasFrecuenciaLicor.length * 2.8 + 2);
     alturaNecesariaLicor = Math.max(alturaNecesariaLicor, alturaFrecuenciaLicor);
   }
-  
+
   // Dibujar líneas de la fila con altura dinámica
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesariaLicor);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesariaLicor);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaNecesariaLicor, tablaInicioX + tablaAncho, yPos + alturaNecesariaLicor);
-  
+
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Licor", tablaInicioX + 2, yPos + 3.5);
-  
+
   // SI/NO para Licor con paréntesis del mismo ancho
   doc.text("SI (", fumarSiX, yPos + 3.5);
   if (habitosNosivosMarcados.licor) {
     doc.setFont("helvetica", "bold").setFontSize(9);
-      doc.setTextColor(255, 0, 0);
+    doc.setTextColor(255, 0, 0);
     doc.text("X", fumarSiX + 7, yPos + 3.5);
-      doc.setTextColor(0, 0, 0);
-    } else {
+    doc.setTextColor(0, 0, 0);
+  } else {
     doc.text(" ", fumarSiX + 7, yPos + 3.5);
   }
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(")", fumarSiX + 10, yPos + 3.5);
-  
+
   doc.text("NO (", fumarNoX, yPos + 3.5);
   if (!habitosNosivosMarcados.licor) {
     doc.setFont("helvetica", "bold").setFontSize(9);
-      doc.setTextColor(255, 0, 0);
+    doc.setTextColor(255, 0, 0);
     doc.text("X", fumarNoX + 7, yPos + 3.5);
-      doc.setTextColor(0, 0, 0);
-    } else {
+    doc.setTextColor(0, 0, 0);
+  } else {
     doc.text(" ", fumarNoX + 7, yPos + 3.5);
   }
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(")", fumarNoX + 10, yPos + 3.5);
-  
+
   // Tipo y frecuencia de licor (movidos 10mm a la izquierda)
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Tipo:", tablaInicioX + 70, yPos + 3.5);
@@ -1101,7 +1101,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
       doc.text(linea, xInicioFrecuenciaLicor, yTextoInicioLicor + (index * 2.8));
     });
   }
-  
+
   yPos += alturaNecesariaLicor;
 
   // Fila de Drogas
@@ -1110,7 +1110,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   const yTextoInicioDrogas = yPos + 3.5;
   const xInicioFrecuenciaDrogas = tablaInicioX + 140; // Posición X donde comienza el texto de frecuencia
   const anchoDisponibleFrecuenciaDrogas = tablaAncho + tablaInicioX - xInicioFrecuenciaDrogas - 2; // Ancho disponible: desde inicio hasta final menos margen
-  
+
   // Calcular altura necesaria para frecuencia usando splitTextToSize
   const frecuenciaDrogasTexto = habitosNosivosMarcados.frecuenciaDrogas ? formatearTextoGramatical(habitosNosivosMarcados.frecuenciaDrogas) : "";
   if (frecuenciaDrogasTexto) {
@@ -1119,20 +1119,20 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
     const alturaFrecuenciaDrogas = Math.max(filaAltura, lineasFrecuenciaDrogas.length * 2.8 + 2);
     alturaNecesariaDrogas = Math.max(alturaNecesariaDrogas, alturaFrecuenciaDrogas);
   }
-  
+
   // Dibujar líneas de la fila con altura dinámica
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesariaDrogas);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesariaDrogas);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaNecesariaDrogas, tablaInicioX + tablaAncho, yPos + alturaNecesariaDrogas);
-  
+
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Drogas", tablaInicioX + 2, yPos + 3.5);
-  
+
   // SI/NO para Drogas con paréntesis del mismo ancho
   doc.text("SI (", fumarSiX, yPos + 3.5);
   if (habitosNosivosMarcados.drogas) {
-      doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.setFont("helvetica", "bold").setFontSize(9);
     doc.setTextColor(255, 0, 0);
     doc.text("X", fumarSiX + 7, yPos + 3.5);
     doc.setTextColor(0, 0, 0);
@@ -1141,10 +1141,10 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   }
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(")", fumarSiX + 10, yPos + 3.5);
-  
+
   doc.text("NO (", fumarNoX, yPos + 3.5);
   if (!habitosNosivosMarcados.drogas) {
-  doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.setFont("helvetica", "bold").setFontSize(9);
     doc.setTextColor(255, 0, 0);
     doc.text("X", fumarNoX + 7, yPos + 3.5);
     doc.setTextColor(0, 0, 0);
@@ -1153,7 +1153,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   }
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(")", fumarNoX + 10, yPos + 3.5);
-  
+
   // Tipo y frecuencia de drogas (movidos 10mm a la izquierda)
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Tipo:", tablaInicioX + 70, yPos + 3.5);
@@ -1170,7 +1170,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
       doc.text(linea, xInicioFrecuenciaDrogas, yTextoInicioDrogas + (index * 2.8));
     });
   }
-  
+
   yPos += alturaNecesariaDrogas;
 
   // Fila de Otros
@@ -1179,7 +1179,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   const yTextoInicioOtros = yPos + 3.5;
   const xInicioFrecuenciaOtros = tablaInicioX + 140; // Posición X donde comienza el texto de frecuencia
   const anchoDisponibleFrecuenciaOtros = tablaAncho + tablaInicioX - xInicioFrecuenciaOtros - 2; // Ancho disponible: desde inicio hasta final menos margen
-  
+
   // Calcular altura necesaria para frecuencia usando splitTextToSize
   const frecuenciaOtrosTexto = habitosNosivosMarcados.frecuenciaOtros ? formatearTextoGramatical(habitosNosivosMarcados.frecuenciaOtros) : "";
   if (frecuenciaOtrosTexto) {
@@ -1188,16 +1188,16 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
     const alturaFrecuenciaOtros = Math.max(filaAltura, lineasFrecuenciaOtros.length * 2.8 + 2);
     alturaNecesariaOtros = Math.max(alturaNecesariaOtros, alturaFrecuenciaOtros);
   }
-  
+
   // Dibujar líneas de la fila con altura dinámica
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesariaOtros);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesariaOtros);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaNecesariaOtros, tablaInicioX + tablaAncho, yPos + alturaNecesariaOtros);
-  
+
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Otros", tablaInicioX + 2, yPos + 3.5);
-  
+
   // SI/NO para Otros con paréntesis del mismo ancho
   doc.text("SI (", fumarSiX, yPos + 3.5);
   if (habitosNosivosMarcados.otros) {
@@ -1210,7 +1210,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   }
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(")", fumarSiX + 10, yPos + 3.5);
-  
+
   doc.text("NO (", fumarNoX, yPos + 3.5);
   if (!habitosNosivosMarcados.otros) {
     doc.setFont("helvetica", "bold").setFontSize(9);
@@ -1222,7 +1222,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   }
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(")", fumarNoX + 10, yPos + 3.5);
-  
+
   // Tipo y frecuencia de otros (movidos 10mm a la izquierda)
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Tipo:", tablaInicioX + 70, yPos + 3.5);
@@ -1239,11 +1239,11 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
       doc.text(linea, xInicioFrecuenciaOtros, yTextoInicioOtros + (index * 2.8));
     });
   }
-  
+
   yPos += alturaNecesariaOtros;
 
   // === FOOTER PÁGINA 1 ===
-  footerTR(doc, { footerOffsetY: 5});
+  footerTR(doc, { footerOffsetY: 5 });
 
   // === PÁGINA 2 ===
   doc.addPage();
@@ -1262,22 +1262,22 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   // Función auxiliar para formatear fechas quirúrgicas que pueden venir en diferentes formatos
   const formatearFechaQuirurgica = (fechaStr) => {
     if (!fechaStr || fechaStr.trim() === "") return "";
-    
+
     const fechaTrimmed = fechaStr.trim();
-    
+
     // Si es solo un año (4 dígitos), devolverlo tal como está
     const soloAnoRegex = /^\d{4}$/;
     if (soloAnoRegex.test(fechaTrimmed)) {
       return fechaTrimmed;
     }
-    
+
     // Si es un rango de años como "2020-2025" o "2020 - 2025", normalizar espacios
     const rangoAnosRegex = /^\d{4}\s*-\s*\d{4}$/;
     if (rangoAnosRegex.test(fechaTrimmed)) {
       // Normalizar: quitar espacios alrededor del guión
       return fechaTrimmed.replace(/\s*-\s*/, "-");
     }
-    
+
     // Si es una fecha válida en formato yyyy-MM-dd, usar formatearFechaCorta
     try {
       const fechaFormateada = formatearFechaCorta(fechaTrimmed);
@@ -1303,7 +1303,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
   // Contenido de los encabezados
-    doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Fecha", tablaInicioX + 15, yPos + 3.5, { align: "center" }); // Centrado en columna de 30mm
   doc.text("Hospital (Nombre - Lugar)", tablaInicioX + 55, yPos + 3.5, { align: "center" }); // Centrado en columna de 50mm
   doc.text("Operación", tablaInicioX + 105, yPos + 3.5, { align: "center" }); // Centrado en columna de 50mm
@@ -1315,14 +1315,14 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   const dibujarFilaQuirurgico = (fecha, hospital, operacion, diasHospitalizacion, complicaciones) => {
     // Calcular altura necesaria para cada columna de texto
     doc.setFont("helvetica", "normal").setFontSize(8);
-    
+
     const alturaMinima = 5; // Altura mínima de la fila
     const paddingSuperior = 3.5; // Padding superior aumentado
     const yTextoInicio = yPos + paddingSuperior;
-    
+
     // Calcular altura necesaria para cada campo de texto
     let alturaMaxima = alturaMinima;
-    
+
     // Calcular altura para hospital (columna más ancha)
     if (hospital) {
       const hospitalTexto = formatearTextoGramatical(hospital);
@@ -1330,7 +1330,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
       const alturaHospital = nuevaYHospital - yTextoInicio + paddingSuperior + 2;
       alturaMaxima = Math.max(alturaMaxima, alturaHospital);
     }
-    
+
     // Calcular altura para operación (columna más ancha)
     if (operacion) {
       const operacionTexto = formatearTextoGramatical(operacion);
@@ -1338,7 +1338,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
       const alturaOperacion = nuevaYOperacion - yTextoInicio + paddingSuperior + 2;
       alturaMaxima = Math.max(alturaMaxima, alturaOperacion);
     }
-    
+
     // Calcular altura para complicaciones (columna más ancha)
     if (complicaciones) {
       const complicacionesTexto = formatearTextoGramatical(complicaciones);
@@ -1346,7 +1346,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
       const alturaComplicaciones = nuevaYComplicaciones - yTextoInicio + paddingSuperior + 2;
       alturaMaxima = Math.max(alturaMaxima, alturaComplicaciones);
     }
-    
+
     const alturaFilaFinal = Math.max(alturaMinima, alturaMaxima);
 
     // Dibujar líneas de la fila con altura calculada
@@ -1362,25 +1362,25 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
     // Contenido de la fila con formato de texto correcto y márgenes
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(fecha || "", tablaInicioX + 2, yTextoInicio); // Margen mínimo izquierdo
-    
+
     // Dibujar texto con salto de línea para campos largos con márgenes
     if (hospital) {
       doc.setFont("helvetica", "normal").setFontSize(8); // Asegurar fuente normal
       dibujarTextoConSaltoLinea(formatearTextoGramatical(hospital), tablaInicioX + 32, yTextoInicio, 48); // Sin margen derecho, ancho completo
     }
-    
+
     if (operacion) {
       doc.setFont("helvetica", "normal").setFontSize(8); // Asegurar fuente normal
       dibujarTextoConSaltoLinea(formatearTextoGramatical(operacion), tablaInicioX + 82, yTextoInicio, 48); // Sin margen derecho, ancho completo
     }
-    
+
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(diasHospitalizacion || "", tablaInicioX + 137.5, yTextoInicio, { align: "center" }); // Centrado en la celda
-    
+
     if (complicaciones) {
       doc.setFont("helvetica", "normal").setFontSize(8); // Asegurar fuente normal
       const textoComplicaciones = formatearTextoGramatical(complicaciones);
-      
+
       // Verificar si el texto cabe en una línea
       const anchoTexto = doc.getTextWidth(textoComplicaciones);
       if (anchoTexto <= 55) {
@@ -1391,7 +1391,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
         dibujarTextoConSaltoLinea(textoComplicaciones, tablaInicioX + 147, yTextoInicio, 55);
       }
     }
-    
+
     yPos += alturaFilaFinal;
   };
 
@@ -1409,17 +1409,17 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   } else {
     // Si no hay datos, mostrar mensaje informativo
     const alturaFilaMensaje = 8; // Altura para el mensaje
-    
+
     // Dibujar líneas de la fila del mensaje
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaMensaje);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaMensaje);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaFilaMensaje, tablaInicioX + tablaAncho, yPos + alturaFilaMensaje);
-    
+
     // Mensaje centrado en la fila en negrita
     doc.setFont("helvetica", "bold").setFontSize(9);
     doc.text("No se registran antecedentes quirúrgicos", pageW / 2, yPos + 5, { align: "center" });
-    
+
     yPos += alturaFilaMensaje;
   }
 
@@ -1451,13 +1451,13 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
     // Contenido de la fila
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(campo.label, tablaInicioX + 2, yPos + 3.5);
-    
+
     // Mostrar valor si existe
     if (campo.value) {
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text(campo.value, tablaInicioX + 80, yPos + 3.5);
     }
-    
+
     yPos += filaAltura;
   });
 
@@ -1482,13 +1482,13 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
     // Contenido de la fila
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(campo.label, tablaInicioX + 2, yPos + 3.5);
-    
+
     // Mostrar valor si existe
     if (campo.value) {
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text(campo.value, tablaInicioX + 80, yPos + 3.5);
     }
-    
+
     yPos += filaAltura;
   });
 
@@ -1497,7 +1497,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
 
   // Fila con fondo color #fcbd19 para la declaración
   const alturaDeclaracion = 15; // Más altura para incluir la fecha
-  
+
   doc.setFillColor(252, 189, 25); // Color #fcbd19
   doc.rect(tablaInicioX, declaracionY, tablaAncho, alturaDeclaracion, 'F');
   doc.line(tablaInicioX, declaracionY, tablaInicioX, declaracionY + alturaDeclaracion);
@@ -1509,47 +1509,47 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   const textoDeclaracionFinal = "TODA LA INFORMACIÓN QUE HE PROPORCIONADO AL SERVICIO DE MEDICINA OCUPACIONAL,";
   const textoDeclaracionFinal2 = "ES VERDADERA NO HABIENDO OMITIDO NINGÚN DATO VOLUNTARIAMENTE.";
-  
-  doc.text(textoDeclaracionFinal, tablaInicioX + tablaAncho/2, declaracionY + 4, { align: "center" });
-  doc.text(textoDeclaracionFinal2, tablaInicioX + tablaAncho/2, declaracionY + 7, { align: "center" });
-  
+
+  doc.text(textoDeclaracionFinal, tablaInicioX + tablaAncho / 2, declaracionY + 4, { align: "center" });
+  doc.text(textoDeclaracionFinal2, tablaInicioX + tablaAncho / 2, declaracionY + 7, { align: "center" });
+
   // Fecha centrada dentro del mismo banner
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("FECHA: " + (datosFinales.fechaExamen || ""), tablaInicioX + tablaAncho/2, declaracionY + 11, { align: "center" });
+  doc.text("FECHA: " + (datosFinales.fechaExamen || ""), tablaInicioX + tablaAncho / 2, declaracionY + 11, { align: "center" });
 
   // === SECCIÓN DE FIRMAS ===
-  const firmasY = declaracionY + alturaDeclaracion ; // Posición después del banner
-  
+  const firmasY = declaracionY + alturaDeclaracion; // Posición después del banner
+
   // Fila de firmas con dos columnas
   const alturaFilaFirmas = 32;
-  
+
   // Dibujar líneas de la fila de firmas (2 columnas)
   doc.line(tablaInicioX, firmasY, tablaInicioX, firmasY + alturaFilaFirmas);
-  doc.line(tablaInicioX + tablaAncho/2, firmasY, tablaInicioX + tablaAncho/2, firmasY + alturaFilaFirmas);
+  doc.line(tablaInicioX + tablaAncho / 2, firmasY, tablaInicioX + tablaAncho / 2, firmasY + alturaFilaFirmas);
   doc.line(tablaInicioX + tablaAncho, firmasY, tablaInicioX + tablaAncho, firmasY + alturaFilaFirmas);
   doc.line(tablaInicioX, firmasY, tablaInicioX + tablaAncho, firmasY);
   doc.line(tablaInicioX, firmasY + alturaFilaFirmas, tablaInicioX + tablaAncho, firmasY + alturaFilaFirmas);
 
   // === COLUMNA 1: FIRMA Y HUELLA DEL PACIENTE ===
-  const centroColumna1X = tablaInicioX + (tablaAncho/2) / 2;
-  
+  const centroColumna1X = tablaInicioX + (tablaAncho / 2) / 2;
+
   // Agregar firma del paciente
   let firmaPacienteUrl = null;
   let huellaPacienteUrl = null;
-  
+
   if (data.digitalizacion && data.digitalizacion.length > 0) {
     const firmaData = data.digitalizacion.find(item => item.nombreDigitalizacion === "FIRMAP");
     const huellaData = data.digitalizacion.find(item => item.nombreDigitalizacion === "HUELLA");
-    
+
     if (firmaData && firmaData.url) {
       firmaPacienteUrl = firmaData.url;
     }
-    
+
     if (huellaData && huellaData.url) {
       huellaPacienteUrl = huellaData.url;
     }
   }
-  
+
   if (firmaPacienteUrl) {
     try {
       const imgWidth = 30;
@@ -1561,7 +1561,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
       console.log("Error cargando firma del paciente:", error);
     }
   }
-  
+
   // Agregar huella del paciente
   if (huellaPacienteUrl) {
     try {
@@ -1574,24 +1574,24 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
       console.log("Error cargando huella del paciente:", error);
     }
   }
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("Firma y Huella del Paciente", centroColumna1X, firmasY + 26, { align: "center" });
 
   // === COLUMNA 2: FIRMA DEL MÉDICO ===
-  const centroColumna2X = tablaInicioX + tablaAncho/2 + (tablaAncho/2) / 2;
-  
+  const centroColumna2X = tablaInicioX + tablaAncho / 2 + (tablaAncho / 2) / 2;
+
   // Agregar firma y sello médico
   let firmaMedicoUrl = null;
-  
+
   if (data.digitalizacion && data.digitalizacion.length > 0) {
     const firmaMedicoData = data.digitalizacion.find(item => item.nombreDigitalizacion === "SELLOFIRMA");
-    
+
     if (firmaMedicoData && firmaMedicoData.url) {
       firmaMedicoUrl = firmaMedicoData.url;
     }
   }
-  
+
   if (firmaMedicoUrl) {
     try {
       const imgWidth = 45;
@@ -1603,16 +1603,20 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
       console.log("Error cargando firma del médico:", error);
     }
   }
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("Firma del Médico", centroColumna2X, firmasY + 26, { align: "center" });
   doc.text("Responsable de la Evaluación", centroColumna2X, firmasY + 28.5, { align: "center" });
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 8});
+  footerTR(doc, { footerOffsetY: 8 });
 
   // === Imprimir ===
-  imprimir(doc);
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {

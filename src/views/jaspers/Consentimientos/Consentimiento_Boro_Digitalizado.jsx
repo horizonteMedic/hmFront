@@ -3,6 +3,7 @@ import autoTable from "jspdf-autotable";
 import CabeceraLogo from "../components/CabeceraLogo.jsx";
 import footerTR from "../components/footerTR.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
+import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
 
 export default function Consentimiento_Boro_Digitalizado(datos) {
   const doc = new jsPDF();
@@ -53,28 +54,41 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
 
   drawHeader();
 
-  const digitalizacion = datos.digitalizacion || [];
-  const huella = digitalizacion.find(d => d.nombreDigitalizacion === "HUELLA");
-  const firma = digitalizacion.find(d => d.nombreDigitalizacion === "FIRMAP");
-  const sello = digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  const isValidUrl = url => url && url !== "Sin registro";
+  // Función para dibujar texto con salto de línea automático (similar a Aptitud_medico_ocupacional_11.jsx)
+  const dibujarTextoPegado = (texto, x, y, anchoMaximo) => {
+    if (!texto || texto.trim() === '') return y;
 
-  const loadImg = src =>
-    new Promise((res, rej) => {
-      const img = new Image();
-      img.src = src;
-      img.crossOrigin = 'anonymous';
-      img.onload = () => res(img);
-      img.onerror = () => rej(`No se pudo cargar ${src}`);
+    const fontSize = doc.internal.getFontSize();
+    const palabras = texto.split(' ');
+    let linea = '';
+    let yActual = y;
+    const lineHeight = fontSize * 0.5;
+
+    palabras.forEach((palabra, i) => {
+      const prueba = linea + (linea ? ' ' : '') + palabra;
+      if (doc.getTextWidth(prueba) > anchoMaximo) {
+        if (linea) {
+          doc.text(linea, x, yActual);
+          yActual += lineHeight;
+          linea = palabra;
+        } else {
+          doc.text(palabra, x, yActual);
+          yActual += lineHeight;
+          linea = '';
+        }
+      } else {
+        linea = prueba;
+      }
+      if (i === palabras.length - 1 && linea) {
+        doc.text(linea, x, yActual);
+      }
     });
-  Promise.all([
-    isValidUrl(huella?.url) ? loadImg(huella.url) : Promise.resolve(null),
-    isValidUrl(firma?.url) ? loadImg(firma.url) : Promise.resolve(null),
-    isValidUrl(sello?.url) ? loadImg(sello.url) : Promise.resolve(null)
-  ])
-   .then(([huellap, firmap, sellop]) => {
-    let y = 44;
-    const margin = 18;
+
+    return yActual + lineHeight;
+  };
+
+  let y = 44;
+  const margin = 18;
 
     // Título principal subrayado
     doc.setFont(undefined, 'bold');
@@ -93,13 +107,6 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     y += 2;
     // Tabla centrada para Fecha, Hora, Ciudad
     let fechaStr = datos.fecha || '';
-    function toDDMMYYYY(fecha) {
-      if (!fecha) return '';
-      if (fecha.includes('/')) return fecha; // ya está en formato correcto
-      const [anio, mes, dia] = fecha.split('-');
-      if (!anio || !mes || !dia) return fecha;
-      return `${dia}/${mes}/${anio}`;
-    }
     if (datos.fecha) {
       fechaStr = toDDMMYYYY(datos.fecha);
     }
@@ -184,7 +191,6 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
       let lineas = [];
       let lineaActual = [];
       let anchoActual = 0;
-      let espacio = doc.getTextWidth(' ');
       let i = 0;
       while (i < bloques.length) {
         let bloque = bloques[i];
@@ -316,29 +322,28 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
       y += 6;
     });
     y += 1;
-    // Mostrar bloque con etiquetas y respuestas pegadas y alineadas a la derecha, todo en negrita
+    // Mostrar bloque con etiquetas y respuestas alineadas a la izquierda
     let yCampos = y;
-    const rightX = pageW - margin;
-    const etiquetaX = rightX - 40;
-    const respuestaX = etiquetaX + 5;
+    const etiquetaX = margin;
+    const respuestaX = margin + 35;
     doc.setFont('helvetica', 'bold');
-    doc.text('CUAL', etiquetaX, yCampos, { align: 'right' });
+    doc.text('CUAL', etiquetaX, yCampos);
     doc.setFont('helvetica', 'normal');
-    doc.text(':', etiquetaX + 2, yCampos);
+    doc.text(':', etiquetaX + 20, yCampos);
     doc.text(`${datos.critCualTratQuirugODental || ''}`, respuestaX, yCampos);
 
     yCampos += 8;
     doc.setFont('helvetica', 'bold');
-    doc.text('DONDE', etiquetaX, yCampos, { align: 'right' });
+    doc.text('DONDE', etiquetaX, yCampos);
     doc.setFont('helvetica', 'normal');
-    doc.text(':', etiquetaX + 2, yCampos);
+    doc.text(':', etiquetaX + 20, yCampos);
     doc.text(`${datos.critDondeTratQuirugODental || ''}`, respuestaX, yCampos);
 
     yCampos += 8;
     doc.setFont('helvetica', 'bold');
-    doc.text('CUANDO', etiquetaX, yCampos, { align: 'right' });
+    doc.text('CUANDO', etiquetaX, yCampos);
     doc.setFont('helvetica', 'normal');
-    doc.text(':', etiquetaX + 2, yCampos);
+    doc.text(':', etiquetaX + 20, yCampos);
     doc.text(`${datos.critCuandoTratQuirugODental || ''}`, respuestaX, yCampos);
     y = yCampos + 2;
 
@@ -348,126 +353,58 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     
     y += 2;
 
-    // Más espacio antes de la firma y huella
-    y +=2;
+    // Espacio antes de las notas
+    y += 5;
 
-    // Línea horizontal antes del texto de firma
-    const firmaText = 'Firma y Huella del trabajador / paciente evaluado';
-    const firmaTextWidth = doc.getTextWidth(firmaText);
-    const lineX1P = 18;
-    const lineX2P = 18 + firmaTextWidth;
-    const lineYP = y - 4;
-    const centerXP = (lineX1P + lineX2P) / 2;
-    doc.setDrawColor(100);
-    doc.line(lineX1P, lineYP, lineX2P, lineYP);
+    // Notas como texto dinámico (sin caja)
     doc.setFont(undefined, 'bold');
-    doc.text(firmaText, centerXP, y, { align: 'center' });
-
-    // Firma paciente centrada sobre la línea
-    if (firmap) {
-      const sigW = 70;
-      const sigH = 23;
-      const sigX = centerXP - sigW / 2 -20;
-      const sigY = lineYP - sigH;
-
-      const maxImgW = sigW - 10;
-      const maxImgH = sigH - 10;
-      let imgW = firmap.width;
-      let imgH = firmap.height;
-      const scaleW = maxImgW / imgW;
-      const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1);
-      imgW *= scale;
-      imgH *= scale;
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
-
-      const canvas = document.createElement('canvas');
-      canvas.width = firmap.width;
-      canvas.height = firmap.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(firmap, 0, 0);
-      const firmaBase64 = canvas.toDataURL('image/png');
-      doc.addImage(firmaBase64, 'PNG', imgX, imgY, imgW, imgH);
-    }
-
-    // Huella (sin cambios)
-    if (huellap) {
-      const huellaW = 16;
-      const huellaH = (huellap.height / huellap.width) * huellaW;
-      const huellaX = 18 + firmaTextWidth * 0.75 - huellaW / 2;
-      const huellaY = lineYP - huellaH - 2;
-
-      const canvas = document.createElement('canvas');
-      canvas.width = huellap.width;
-      canvas.height = huellap.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(huellap, 0, 0);
-      const huellaBase64 = canvas.toDataURL('image/png');
-      doc.addImage(huellaBase64, 'PNG', huellaX, huellaY, huellaW, huellaH);
-    }
-
-    // Notas como cuadro
-    y += 10;
-    doc.setFont(undefined, 'normal');
-    doc.setFontSize(10);  // Aseguramos que las notas también estén en 10pt
-    doc.text('Notas:', 18, y);
+    doc.setFontSize(10);
+    doc.text('Notas:', margin, y);
+    
     const notas = datos.notas || '';
-    const notasLines = doc.splitTextToSize(notas, 170);
-    doc.setDrawColor(100);
-    doc.rect(35, y - 5, 160, notasLines.length * 6 + 5);
-    doc.text(notasLines, 40, y, { maxWidth: 150, align: 'justify' });
-
-    //sello
-    y += 31
-    const SelloText = 'Firma del testigo o responsable de la toma de muestra';
-    const SelloTextWidth = doc.getTextWidth(SelloText);
-    const SellolineaBaseY = y - 4;
-    doc.setDrawColor(100);
-    doc.line(100, SellolineaBaseY, 100 + SelloTextWidth, SellolineaBaseY);
-    doc.setFont(undefined, 'bold');
-    doc.text(SelloText, 100, y);
-    if (sellop) {
-      const selloW = 50;
-      const selloH = (sellop.height / sellop.width) * selloW;
-      const selloX = 100 + (SelloTextWidth - selloW) / 2;
-      const selloY = SellolineaBaseY - selloH - 2;
-
-      const canvas = document.createElement('canvas');
-      canvas.width = sellop.width;
-      canvas.height = sellop.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(sellop, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-      doc.addImage(selloBase64, 'PNG', selloX, selloY, selloW, selloH);
-    }
-    // Definir variables para nombre y DNI del testigo
-    const nombreTestigo = datos.usuarioRegistrado || '______________________________';
-    const dniTestigo = String(datos.dniUsuario) || '__________';
-    // Mostrar solo Nombre Completo y DNI debajo de la firma del testigo
+    const notasInicioY = y + 5;
     doc.setFont(undefined, 'normal');
-    doc.setFontSize(8);
-    // Nombre Completo
-    doc.text(`Nombre Completo:`, 100, y + 4);
-    doc.line(125, y + 4.5, 175, y + 4.5); // Línea para el nombre
-    doc.text(nombreTestigo, 127, y + 3.8); // El valor encima de la línea
-
-    // DNI
-    doc.text(`DNI:`, 100, y + 9);
-    doc.line(110, y + 9.5, 140, y + 9.5); // Línea para el DNI
-    doc.text(dniTestigo, 112, y + 8.8); // El valor encima de la línea
-    footerTR(doc, datos);
-    // Mostrar PDF
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = pdfUrl;
-    document.body.appendChild(iframe);
-    iframe.onload = function () {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
-  })
-  
+    doc.setFontSize(10);
+    // Ancho máximo para notas: desde el margen izquierdo hasta el margen derecho
+    const anchoMaximoNotas = pageW - 2 * margin - 10;
+    const notasFinalY = dibujarTextoPegado(notas, margin, notasInicioY, anchoMaximoNotas);
+    
+    // Usar helper para dibujar firmas
+    dibujarFirmas({ doc, datos, y: notasFinalY + 10, pageW }).then((yFinalFirmas) => {
+      // Agregar campos de nombre completo y DNI debajo de la firma del responsable
+      const tieneSelloProfesional = datos.digitalizacion?.some(d => 
+        d.nombreDigitalizacion === "SELLOFIRMA" || d.nombreDigitalizacion === "SELLOFIRMADOCASIG"
+      );
+      
+      if (tieneSelloProfesional) {
+        // Posición del responsable (lado derecho - 2/3 de la página)
+        const centroProfesionalX = (pageW / 3) * 2;
+        const yCamposResponsable = yFinalFirmas - 3; // Justo debajo del texto "Responsable de la Evaluación"
+        
+        // Nombre Completo
+        const nombreCompleto = String(datos.usuarioRegistrado || '');
+        doc.setFont('helvetica', 'normal').setFontSize(7);
+        doc.text('Nombre Completo: ' + nombreCompleto, centroProfesionalX, yCamposResponsable, { align: "center" });
+        
+        // DNI
+        const dniResponsable = String(datos.dniUsuario || '');
+        doc.text('DNI: ' + dniResponsable, centroProfesionalX, yCamposResponsable + 4, { align: "center" });
+      }
+      
+      footerTR(doc, datos);
+      // Mostrar PDF
+      const pdfBlob = doc.output("blob");
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = pdfUrl;
+      document.body.appendChild(iframe);
+      iframe.onload = function () {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      };
+    }).catch(err => {
+      console.error(err);
+      alert('Error generando PDF: ' + err);
+    });
 } 

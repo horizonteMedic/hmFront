@@ -1,6 +1,7 @@
 import Swal from "sweetalert2";
 import { getFetch, SubmitData } from "../../../../../utils/apiHelpers";
-
+import jsPDF from "jspdf";
+const doc = new jsPDF();
 //===============Zona Modificación===============
 const obtenerReporteUrl = "/api/v01/ct/rayosX/obtenerReporteRadiografiaTorax";
 const registrarUrl = "/api/v01/ct/rayosX/registrarActualizarRadiografiaTorax";
@@ -12,7 +13,7 @@ export const GetInfoServicio = (
   tabla,
   set,
   token,
-  onFinish = () => {}
+  onFinish = () => { }
 ) => {
   getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
     .then((res) => {
@@ -225,8 +226,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
 export const getInfoTabla = (nombreSearch, codigoSearch, setData, token) => {
   try {
     getFetch(
-      `/api/v01/ct/rayosX/obtenerRadiografiaToraxPorFiltros?${
-        codigoSearch == "" ? "" : `nOrden=${codigoSearch}`
+      `/api/v01/ct/rayosX/obtenerRadiografiaToraxPorFiltros?${codigoSearch == "" ? "" : `nOrden=${codigoSearch}`
       }
     ${nombreSearch == "" ? "" : `&nombres=${nombreSearch}`}`,
       token

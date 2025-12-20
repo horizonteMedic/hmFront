@@ -10,20 +10,22 @@ import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import { useForm } from "../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAltura18";
-import { BotonesAccion, DatosPersonalesLaborales } from "../../../../components/templates/Templates";
+import { BotonesAccion, DatosPersonalesLaborales} from "../../../../components/templates/Templates";
+import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
-const tabla = "";
-const today = getToday();
+const tabla = "certificacion_medica_altura";
 
 export default function Altura18() {
-    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+    const today = getToday();
+    const { token, userlogued, selectedSede, datosFooter, userName, userDNI } = useSessionData();
 
     const initialFormState = {
         // Header - Información del examen
         norden: "",
         fecha: today,
+        codigoCertificadoAltura: null,
         nombreExamen: "",
-        examen: "",
+        examen: "PRIMERA ACTITUD",
         aniosExperiencia: "",
 
         dni: "",
@@ -42,6 +44,88 @@ export default function Altura18() {
         ocupacion: "",
         cargoDesempenar: "",
 
+        //Antecedentes del Registro Médico
+        miedoAlturas: "NO",
+        epilepsiaa: "NO",
+        alcoholismo: "NO",
+        enfermedadPsiquiatrica: "NO",
+        diabetesNoControlada: "NO",
+        migranaNoControlada: "NO",
+
+        insuficienciaCardiaca: "NO",
+        asma: "NO",
+        hipertensionNoControlada: "NO",
+        hipoacusia: "NO",
+        alteracionVisual: "NO",
+        noAptoAltura: "NO",
+
+        comentarios: "",
+
+        //Antecedentes de la Entrevista con el Paciente
+        resfriado: "NO",
+        vertigoMareo: "NO",
+
+        alcohol24h: "NO",
+        frecuenciaCefaleas: "NO",
+
+        medicinasTomando: "",
+
+        //Examen Físico
+        limitacionFuerzaMovilidad: "NO",
+        alteracionEquilibrio: "NO",
+        anormalidadMarcha: "NO",
+        anormalidadFuerzaMiembros: "NO",
+        lenguajeAnormal: "NO",
+        alteracionCoordinacion: "NO",
+        nistagmus: "NO",
+        anormalidadMovOculares: "NO",
+        pupilasCIRLA: "SI",
+        asimetriaFacial: "NO",
+        hallazgoHombro: "NO",
+        hallazgoCodo: "NO",
+        hallazgoRodilla: "NO",
+        hallazgoTobillo: "NO",
+        otrosHallazgosMusculoEsqueleticos: "NO",
+
+        hallazgosAnormales: "",
+
+        //Conclusión
+        apto18: "SI",
+        usoPermanenteLentesCorrectores: "NO",
+        usoPermanenteAudifonos: "NO",
+
+        otraRestriccion: "",
+
+        //oftalmo
+        vcOD: "",
+        vlOD: "",
+        vcOI: "",
+        vlOI: "",
+
+        vcCorregidaOD: "",
+        vlCorregidaOD: "",
+        vcCorregidaOI: "",
+        vlCorregidaOI: "",
+
+        vclrs: "",
+        vb: "",
+        rp: "",
+        enfermedadesOculares: "",
+
+        //Altura
+        alturaLabor: "",
+        alturaPara: "",
+
+        frecuenciaCardiaca: "",
+        frecuenciaRespiratoria: "",
+        saturacionO2: "",
+        talla: "",
+        peso: "",
+        imc: "",
+        presionArterial: "",
+
+        observacionesYRecomendaciones: "",
+
         // Recomendaciones específicas
         sobrepesoObesidadHipocalorica: false,
         corregirAgudezaVisual: false,
@@ -49,6 +133,12 @@ export default function Altura18() {
         obesidadDietaHipocalorica: false,
         usoLentesCorrectoresLecturaCerca: false,
         corregirAgudezaLecturaCerca: false,
+
+        dniusuario: userDNI,
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
     };
 
     const {
@@ -95,7 +185,7 @@ export default function Altura18() {
     }
 
     return (
-        <div className="space-y-3 px-4">
+        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
             <SectionFieldset legend="Información del Examen">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                     <InputTextOneLine
@@ -149,11 +239,11 @@ export default function Altura18() {
                     <RadioTable
                         items={[
                             { name: "miedoAlturas", label: "Tiene fobia (miedo) a las alturas" },
-                            { name: "epilepsia", label: "Epilepsia/convulsiones u otra enfermedad que condiciona pérdida de conciencia" },
+                            { name: "epilepsiaa", label: "Epilepsia/convulsiones u otra enfermedad que condiciona pérdida de conciencia" },
                             { name: "alcoholismo", label: "Alcoholismo o abuso de sustancias (adicción)" },
                             { name: "enfermedadPsiquiatrica", label: "Portador de enfermedad psiquiátrica o hallazgo psicológico como rasgos de ansiedad, trastornos impulsivos o compulsivos" },
                             { name: "diabetesNoControlada", label: "Diabetes mellitus o hipoglicemia no controlada" },
-                            { name: "migrañaNoControlada", label: "Migraña no controlada" },
+                            { name: "migranaNoControlada", label: "Migraña no controlada" },
                         ]}
                         options={[
                             { value: "SI", label: "SI" },
@@ -197,7 +287,7 @@ export default function Altura18() {
                     <RadioTable
                         items={[
                             { name: "resfriado", label: "Se encuentra resfriado o con algún cuadro respiratorio" },
-                            { name: "epilepsia", label: "Sufre de vértigos o mareos diagnosticados recientemente" },
+                            { name: "vertigoMareo", label: "Sufre de vértigos o mareos diagnosticados recientemente" },
                         ]}
                         options={[
                             { value: "SI", label: "SI" },
@@ -264,8 +354,8 @@ export default function Altura18() {
                         />
                         <InputTextArea
                             label="Hallazos Anormales en Articulaciones Específicas (Alteraciones Musculoesqueléticas)"
-                            name="medicinasTomando"
-                            value={form.medicinasTomando}
+                            name="hallazgosAnormales"
+                            value={form.hallazgosAnormales}
                             onChange={handleChange}
                             className="ml-4 mt-4"
                             rows={4}
@@ -275,7 +365,7 @@ export default function Altura18() {
                     <SectionFieldset legend="Conclusión" collapsible>
                         <RadioTable
                             items={[
-                                { name: "apto18", label: "Apto para trabajar encima de los 18 metros" },
+                                { name: "apto18", label: "Apto para trabajar encima de los 1.8 metros" },
                                 { name: "usoPermanenteLentesCorrectores", label: "Uso Permanente de Lentes Correctores" },
                                 { name: "usoPermanenteAudifonos", label: "Uso Permanente de Audífonos" },
                             ]}
@@ -399,14 +489,14 @@ export default function Altura18() {
                             label="Altura del Labor"
                             name="alturaLabor"
                             value={form?.alturaLabor}
-                            onChange={handleChange}
+                            disabled
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Para"
                             name="alturaPara"
                             value={form?.alturaPara}
-                            onChange={handleChange}
+                            disabled
                             labelWidth="120px"
                         />
                     </SectionFieldset>
@@ -507,6 +597,15 @@ export default function Altura18() {
                                 onChange={handleCheckboxRecomendaciones}
                             />
                         </div>
+
+                    </SectionFieldset>
+                    <SectionFieldset legend="Asignación de Médico" className="space-y-4">
+                        <EmpleadoComboBox
+                            value={form.nombre_medico}
+                            label="Especialista"
+                            form={form}
+                            onChange={handleChangeSimple}
+                        />
                     </SectionFieldset>
                 </div>
             </div>

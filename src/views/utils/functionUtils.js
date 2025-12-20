@@ -1,6 +1,7 @@
 import Swal from "sweetalert2";
 import { getFetch, SubmitData } from "./apiHelpers";
-
+import jsPDF from "jspdf";
+const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
 export const LoadingDefault = (text) => {
     Swal.fire({
         title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,
@@ -76,7 +77,7 @@ export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporte
                 console.log(modulo)
                 // Ejecuta la función exportada por default con los datos
                 if (typeof modulo.default === "function") {
-                    modulo.default({ ...res, ...datosFooter });
+                    modulo.default({ ...res, ...datosFooter }, null);
                 }
             }
             Swal.close();

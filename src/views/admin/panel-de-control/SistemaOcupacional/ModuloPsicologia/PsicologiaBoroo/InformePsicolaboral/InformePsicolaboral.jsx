@@ -3,9 +3,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBrain,
   faUsers,
-  faBroom,
-  faPrint,
-  faSave,
 } from "@fortawesome/free-solid-svg-icons";
 import { useForm } from "../../../../../../hooks/useForm";
 import { getToday } from "../../../../../../utils/helpers";
@@ -14,18 +11,20 @@ import CriteriosPsicologicosI from "./TabsInformePsicolaboral/CriteriosPsicologi
 import CriteriosPsicologicosII from "./TabsInformePsicolaboral/CriteriosPsicologicosII";
 import Swal from "sweetalert2";
 import {
-  InputTextArea, InputsBooleanRadioGroup, InputTextOneLine
+  InputTextArea, InputsBooleanRadioGroup, InputTextOneLine,
+  InputCheckbox
 } from "../../../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformePsicolaboral";
+import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
 
 const tabla = "informe_psicolaboral";
-const today = getToday();
 
 export default function InformePsicolaboral() {
+  const today = getToday();
   const [activeTab, setActiveTab] = useState(0);
 
-  const { token, userlogued, selectedSede, datosFooter, userCompleto } = useSessionData();
+  const { token, userlogued, selectedSede, datosFooter, userDNI } = useSessionData();
 
   const initialFormState = {
     // Header
@@ -35,6 +34,7 @@ export default function InformePsicolaboral() {
     tipoExamen: "",
     // Aptitud
     esApto: undefined,
+    anual: false,
     // Datos personales
     nombres: "",
     dni: "",
@@ -46,7 +46,7 @@ export default function InformePsicolaboral() {
     puestoPostula: "",
     puestoActual: "",
 
-    dniUsuario: userCompleto?.datos?.dni_user ?? "",
+    dniUsuario: userDNI,
 
     // ====================== CRITERIOS PSICOLÓGICOS I ======================
     // ASPECTO INTELECTUAL
@@ -58,12 +58,12 @@ export default function InformePsicolaboral() {
     comprensionVerbal: "",
 
     // ASPECTOS PERSONALIDAD
-    estabilidadEmocional: "", // B, NPB, NP, NPA, A
-    toleranciaFrustracion: "",
-    autoestima: "",
-    asertividad: "",
-    ansiedadEstado: "",
-    ansiedadRasgo: "",
+    estabilidadEmocional: "NP", // B, NPB, NP, NPA, A
+    toleranciaFrustracion: "NP",
+    autoestima: "NP",
+    asertividad: "NP",
+    ansiedadEstado: "NPB",
+    ansiedadRasgo: "NPB",
 
     // ====================== CRITERIOS PSICOLÓGICOS II ======================
     // ASPECTOS CONDUCTUALES
@@ -92,6 +92,7 @@ export default function InformePsicolaboral() {
     form,
     setForm,
     handleChange,
+    handleChangeNumberDecimals,
     handleChangeNumber,
     handleRadioButton,
     handleChangeSimple,
@@ -133,11 +134,11 @@ export default function InformePsicolaboral() {
   };
 
   const ActiveComponent = tabs[activeTab]?.component || (() => null);
-  
+
   return (
-    <div className="px-4 space-y-3">
+    <div className="space-y-3 px-4 max-w-[90%]  xl:max-w-[80%] mx-auto">
       <SectionFieldset legend="Información del Examen" className="m-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-3">
           <InputTextOneLine
             label="N° Orden"
             name="norden"
@@ -159,22 +160,27 @@ export default function InformePsicolaboral() {
             disabled
             onChange={handleChange}
           />
-          <div className="flex gap-4 items-center">
-            <h4 className="font-semibold min-w-[80px] max-w-[80px]">Aptitud:</h4>
-            <InputsBooleanRadioGroup
-              name="esApto"
-              value={form.esApto}
-              trueLabel="APTO"
-              falseLabel="NO APTO"
-              onChange={handleRadioButtonBoolean}
-            />
-          </div>
+          <InputsBooleanRadioGroup
+            label="Aptitud"
+            name="esApto"
+            value={form.esApto}
+            trueLabel="APTO"
+            falseLabel="NO APTO"
+            onChange={handleRadioButtonBoolean}
+          />
+          <InputCheckbox
+            label={<p className="text-red-500 text-[10px]">Examen Anual</p>}
+            name="anual"
+            checked={form?.anual}
+
+            onChange={handleCheckBoxChange}
+          />
         </div>
       </SectionFieldset>
 
       <SectionFieldset legend="Datos del Paciente" className="m-4">
         {/* Fila 1: Nombres, DNI, Edad, Género */}
-        <div className="grid grid-cols-1 md:grid-cols-2  gap-3 mb-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
           <InputTextOneLine
             label="Nombres y Apellidos"
             name="nombres"
@@ -245,75 +251,39 @@ export default function InformePsicolaboral() {
         ))}
       </nav>
       {/* Contenido de la pestaña activa */}
-      <div className="px-4 pt-4">
-        <ActiveComponent
-          form={form}
-          handleChange={handleChange}
-          handleChangeNumber={handleChangeNumber}
-          handleCheckBoxChange={handleCheckBoxChange}
-          handleRadioButtonBoolean={handleRadioButtonBoolean}
-          handleRadioButton={handleRadioButton}
-          handleChangeSimple={handleChangeSimple}
+      <ActiveComponent
+        form={form}
+        handleChange={handleChange}
+        handleChangeNumber={handleChangeNumber}
+        handleCheckBoxChange={handleCheckBoxChange}
+        handleRadioButtonBoolean={handleRadioButtonBoolean}
+        handleRadioButton={handleRadioButton}
+        handleChangeSimple={handleChangeSimple}
+      />
+      <SectionFieldset legend="Observaciones y Recomendaciones" className="grid gap-x-4 gap-y-3 grid-cols-1 md:grid-cols-2">
+        <InputTextArea
+          label="Observaciones"
+          name="observaciones"
+          value={form?.observaciones}
+          onChange={handleChange}
+          rows={4}
         />
-      </div>
-      <SectionFieldset legend="Observaciones y Recomendaciones" className="mx-4 mt-6">
-        <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
-          <InputTextArea
-            label="Observaciones"
-            name="observaciones"
-            value={form?.observaciones}
-            onChange={handleChange}
-            rows={4}
-            placeholder="Escriba sus observaciones aquí..."
-          />
-          <InputTextArea
-            label="Recomendaciones"
-            name="recomendaciones"
-            value={form?.recomendaciones}
-            onChange={handleChange}
-            rows={4}
-            placeholder="Escriba sus recomendaciones aquí..."
-          />
-        </div>
+        <InputTextArea
+          label="Recomendaciones"
+          name="recomendaciones"
+          value={form?.recomendaciones}
+          onChange={handleChange}
+          rows={4}
+        />
       </SectionFieldset>
 
-      <section className="flex flex-col md:flex-row justify-between items-center gap-4  px-4 pt-4">
-        <div className=" flex gap-4">
-          <button
-            type="button"
-            onClick={handleSave}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-          </button>
-          <button
-            type="button"
-            onClick={handleClear}
-            className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faBroom} /> Limpiar
-          </button>
-        </div>
-        <div className="flex flex-col items-end">
-          <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
-          <div className="flex items-center gap-2">
-            <input
-              name="norden"
-              value={form.norden}
-              onChange={handleChange}
-              className="border rounded px-2 py-1 text-base w-24"
-            />
-
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faPrint} />
-            </button>
-          </div>
-        </div>
-      </section>
+      <BotonesAccion
+        form={form}
+        handleSave={handleSave}
+        handleClear={handleClear}
+        handlePrint={handlePrint}
+        handleChangeNumberDecimals={handleChangeNumberDecimals}
+      />
     </div>
   );
 }

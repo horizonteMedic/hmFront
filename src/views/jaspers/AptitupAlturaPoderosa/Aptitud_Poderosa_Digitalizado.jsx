@@ -43,8 +43,8 @@ export default function Aptitud_Poderosa_Digitalizado(data = {}) {
     sede: String(data.sede ?? data.nombreSede ?? ""),
     horaSalida: String(data.horaSalida ?? ""),
     direccionPaciente: String(data.direccionPaciente ?? ""),
-    // Datos para tipo de trabajo
-    tipoTrabajo: String(data.tipoTrabajo ?? ""),
+    // Datos para tipo de trabajo (mapear desde explotacion o tipoTrabajo)
+    tipoTrabajo: String((data.explotacion || data.tipoTrabajo || "").toLowerCase()),
     // Datos para resultado de evaluación
     resultadoEvaluacion: (() => {
       if (data.apto) return "apto";
