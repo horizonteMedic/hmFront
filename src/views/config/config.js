@@ -6,4 +6,3 @@ export const URLAPIREST = 'http://go.server.net.pe:3000/api/v2'
 export const TokenURL = 'horizontemedic_dtcm9'
 
 
-
