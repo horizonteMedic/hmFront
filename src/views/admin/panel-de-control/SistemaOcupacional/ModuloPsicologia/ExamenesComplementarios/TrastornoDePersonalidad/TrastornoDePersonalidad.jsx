@@ -7,7 +7,7 @@ import EmpleadoComboBox from '../../../../../../components/reusableComponents/Em
 import DatosPersonalesLaborales from '../../../../../../components/templates/DatosPersonalesLaborales';
 import BotonesAccion from '../../../../../../components/templates/BotonesAccion';
 
-const tabla = '';
+const tabla = 'trastornos_personalidad';
 
 const opGrupoA = [
     { name: "paranoide", label: "1.- Paranoide" },
@@ -152,16 +152,6 @@ export default function TrastornoDePersonalidad() {
             </SectionFieldset>
 
             <DatosPersonalesLaborales form={form} />
-
-            <SectionFieldset legend="Muestra" className="grid gap-3">
-                <InputTextOneLine
-                    label='Muestra'
-                    name="muestra"
-                    value={form.muestra}
-                    labelWidth='120px'
-                    onChange={handleChange}
-                />
-            </SectionFieldset>
 
             <SectionFieldset legend="Grupos" className='grid space-y-3'>
                 <SectionFieldset legend="Grupo A">

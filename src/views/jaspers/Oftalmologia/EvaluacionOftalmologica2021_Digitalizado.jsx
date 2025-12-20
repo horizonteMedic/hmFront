@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import header_EvaluacionOftalmologica2021_Digitalizado from "./headers/header_EvaluacionOftalmologica2021_Digitalizado.jsx";
 
-export default function EvaluacionOftalmologica2021_Digitalizado(data = {}) {
+export default async function EvaluacionOftalmologica2021_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();

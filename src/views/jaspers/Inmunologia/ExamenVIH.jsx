@@ -19,9 +19,9 @@ const toDDMMYYYY = (fecha) => {
   return `${dia}/${mes}/${anio}`;
 };
 
-const drawHeader = (doc, datos = {}) => {
+const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
-  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Nro de ficha: ", pageW - 80, 15);
   doc.setFont("helvetica", "normal").setFontSize(18);
@@ -129,11 +129,11 @@ const drawPatientData = (doc, datos = {}) => {
   return yPos;
 };
 
-export default function ExamenVIH(datos = {}) {
+export default async function ExamenVIH(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
-  drawHeader(doc, datos);
+  await drawHeader(doc, datos);
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
   doc.text("INMUNOLOGÍA", pageW / 2, 38, { align: "center" });
   doc.setFont(config.font, "bold").setFontSize(12);

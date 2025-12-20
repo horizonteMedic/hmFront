@@ -5,7 +5,7 @@ import drawBox from "./components/drawBox";
 import drawC from "./components/drawC";
 import footer from "./components/footer";
 
-export default function TestAltura(datos) {
+export default async function TestAltura(datos) {
   const doc = new jsPDF();
   // componente header
   headerHR(doc, datos);
@@ -54,13 +54,13 @@ export default function TestAltura(datos) {
   const maxW = doc.internal.pageSize.getWidth() - indX * 2;
 
   doc.setFont("helvetica", "bold")
-     .setFontSize(8)
-     .setTextColor(200, 0, 0)
-     .text("INDICACIONES:", indX, indY);
+    .setFontSize(8)
+    .setTextColor(200, 0, 0)
+    .text("INDICACIONES:", indX, indY);
 
   doc.setFont("helvetica", "normal")
-     .setFontSize(8)
-     .setTextColor(0, 0, 0);
+    .setFontSize(8)
+    .setTextColor(0, 0, 0);
 
   let cursor = indY + 4;
   [
@@ -76,8 +76,8 @@ export default function TestAltura(datos) {
   // ── Footer e impresión ───────────────────────────────
   footer(doc, datos);
   const pdfBlob = doc.output("blob");
-  const pdfUrl  = URL.createObjectURL(pdfBlob);
-  const iframe  = document.createElement("iframe");
+  const pdfUrl = URL.createObjectURL(pdfBlob);
+  const iframe = document.createElement("iframe");
   iframe.style.display = "none";
   iframe.src = pdfUrl;
   document.body.appendChild(iframe);

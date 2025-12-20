@@ -20,12 +20,12 @@ const config = {
 
 // --- Componente Principal ---
 
-export default function HistoriaOcupacional_Digitalizado_boro(datos = {}, tabla = []) {
+export default async function HistoriaOcupacional_Digitalizado_boro(datos = {}, tabla = []) {
   const doc = new jsPDF({ unit: "mm", format: "letter", orientation: "landscape" });
   const pageW = doc.internal.pageSize.getWidth();
   const datoss = {
     detalles: [
-    {
+      {
         "fecha": "2023-01-11",
         "empresa": "Minerales del Sur",
         "actividad": "Perforación y voladura",
@@ -36,8 +36,8 @@ export default function HistoriaOcupacional_Digitalizado_boro(datos = {}, tabla 
         "riesgo": "Polvo, gases",
         "proteccion": "Mascarilla, gafas de seguridad",
         "altitud": "2800 msnm"
-    },
-    {
+      },
+      {
         "fecha": "2021-03-16",
         "empresa": "Minera Andina Del Peru SAC",
         "actividad": "Extracción de minerales",
@@ -48,8 +48,8 @@ export default function HistoriaOcupacional_Digitalizado_boro(datos = {}, tabla 
         "riesgo": "Ruido, vibraciones",
         "proteccion": "Casco, tapones auditivos",
         "altitud": "3000 msnm"
-    },
-    {
+      },
+      {
         "fecha": null,
         "empresa": null,
         "actividad": null,
@@ -60,8 +60,8 @@ export default function HistoriaOcupacional_Digitalizado_boro(datos = {}, tabla 
         "riesgo": null,
         "proteccion": null,
         "altitud": null
-    },
-    {
+      },
+      {
         "fecha": null,
         "empresa": null,
         "actividad": null,
@@ -72,8 +72,8 @@ export default function HistoriaOcupacional_Digitalizado_boro(datos = {}, tabla 
         "riesgo": null,
         "proteccion": null,
         "altitud": null
-    },
-    {
+      },
+      {
         "fecha": null,
         "empresa": null,
         "actividad": null,
@@ -84,8 +84,8 @@ export default function HistoriaOcupacional_Digitalizado_boro(datos = {}, tabla 
         "riesgo": null,
         "proteccion": null,
         "altitud": null
-    },
-    {
+      },
+      {
         "fecha": null,
         "empresa": null,
         "actividad": null,
@@ -96,8 +96,8 @@ export default function HistoriaOcupacional_Digitalizado_boro(datos = {}, tabla 
         "riesgo": null,
         "proteccion": null,
         "altitud": null
-    }
-]
+      }
+    ]
   }
   // === HEADER ===
   // header_HistoriaOcupacional_Boro(doc, datos);
@@ -124,47 +124,47 @@ export default function HistoriaOcupacional_Digitalizado_boro(datos = {}, tabla 
     let y = 53;
     autoTable(doc, {
       startY: y,
-       margin: { top: y, left: 3, right: 3 }, // MÁRGENES PERSONALIZADOS
-        columnStyles: {
-          0: { cellWidth: 15 }, // Fecha
-          1: { cellWidth: 35 }, // Empresa
-          2: { cellWidth: 15 }, // Altitud
-          3: { cellWidth: 25 }, // Actividad
-          4: { cellWidth: 30 }, // Área de Trabajo
-          5: { cellWidth: 25 }, // Ocupación
-          6: { cellWidth: 15 }, // Subsuelo
-          7: { cellWidth: 15 }, // Superficie
-          8: { cellWidth: 49 }, // Peligros
-          9: { cellWidth: 49 }, // EPP
-        },
+      margin: { top: y, left: 3, right: 3 }, // MÁRGENES PERSONALIZADOS
+      columnStyles: {
+        0: { cellWidth: 15 }, // Fecha
+        1: { cellWidth: 35 }, // Empresa
+        2: { cellWidth: 15 }, // Altitud
+        3: { cellWidth: 25 }, // Actividad
+        4: { cellWidth: 30 }, // Área de Trabajo
+        5: { cellWidth: 25 }, // Ocupación
+        6: { cellWidth: 15 }, // Subsuelo
+        7: { cellWidth: 15 }, // Superficie
+        8: { cellWidth: 49 }, // Peligros
+        9: { cellWidth: 49 }, // EPP
+      },
       head: [
         [
-          { content: 'Fecha', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold',fillColor: [220, 220, 220], } },
-          { content: 'Empresa', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' ,fillColor: [220, 220, 220],} },
-          { content: 'Altitud', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' ,fillColor: [220, 220, 220],} },
-          { content: 'Actividad', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold',fillColor: [220, 220, 220], } },
-          { content: 'Área de Trabajo', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold',fillColor: [220, 220, 220], } },
-          { content: 'Ocupación', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' ,fillColor: [220, 220, 220],} },
-          { content: 'Tiempo de labor', colSpan: 2, styles: { halign: 'center', fontStyle: 'bold',fillColor: [220, 220, 220], } },
-          { content: 'Peligros/Agentes Ocupacionales', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold',fillColor: [220, 220, 220],} },
-          { content: 'Uso EPP Tipo EPP', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold',fillColor: [220, 220, 220], } },
+          { content: 'Fecha', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold', fillColor: [220, 220, 220], } },
+          { content: 'Empresa', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold', fillColor: [220, 220, 220], } },
+          { content: 'Altitud', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold', fillColor: [220, 220, 220], } },
+          { content: 'Actividad', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold', fillColor: [220, 220, 220], } },
+          { content: 'Área de Trabajo', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold', fillColor: [220, 220, 220], } },
+          { content: 'Ocupación', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold', fillColor: [220, 220, 220], } },
+          { content: 'Tiempo de labor', colSpan: 2, styles: { halign: 'center', fontStyle: 'bold', fillColor: [220, 220, 220], } },
+          { content: 'Peligros/Agentes Ocupacionales', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold', fillColor: [220, 220, 220], } },
+          { content: 'Uso EPP Tipo EPP', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold', fillColor: [220, 220, 220], } },
         ],
         [
-          { content: 'Subsuelo', styles: { halign: 'center', fontStyle: 'bold' ,fillColor: [220, 220, 220],} },
-          { content: 'Superficie', styles: { halign: 'center', fontStyle: 'bold' ,fillColor: [220, 220, 220],} },
+          { content: 'Subsuelo', styles: { halign: 'center', fontStyle: 'bold', fillColor: [220, 220, 220], } },
+          { content: 'Superficie', styles: { halign: 'center', fontStyle: 'bold', fillColor: [220, 220, 220], } },
         ]
       ],
       body: tabla?.map(d => [
-            d.fecha?.toUpperCase() ?? '',
-            d.empresa?.toUpperCase() ?? '',
-            d.altitud?.toUpperCase() ?? '',
-            d.actividad?.toUpperCase() ?? '',
-            d.areaEmpresa?.toUpperCase() ?? '',
-            d.ocupacion?.toUpperCase() ?? '',
-            d.socavon?.toUpperCase() ?? '',
-            d.superficie?.toUpperCase() ?? '',
-            d.riesgo?.toUpperCase() ?? '',
-            d.proteccion?.toUpperCase() ?? ''
+        d.fecha?.toUpperCase() ?? '',
+        d.empresa?.toUpperCase() ?? '',
+        d.altitud?.toUpperCase() ?? '',
+        d.actividad?.toUpperCase() ?? '',
+        d.areaEmpresa?.toUpperCase() ?? '',
+        d.ocupacion?.toUpperCase() ?? '',
+        d.socavon?.toUpperCase() ?? '',
+        d.superficie?.toUpperCase() ?? '',
+        d.riesgo?.toUpperCase() ?? '',
+        d.proteccion?.toUpperCase() ?? ''
       ]),
       theme: "grid",
       styles: {
@@ -183,22 +183,22 @@ export default function HistoriaOcupacional_Digitalizado_boro(datos = {}, tabla 
         lineColor: [0, 0, 0],
       },
       didDrawPage: (data) => {
-    // Agrega el header personalizado en cada página
-    header_HistoriaOcupacional_Boro(doc, datos);
+        // Agrega el header personalizado en cada página
+        header_HistoriaOcupacional_Boro(doc, datos);
 
-    // Modifica el startY si estás en una nueva página
-    if (data.pageNumber > 1) {
-      data.settings.margin.top = 53;
-    }
-  },
+        // Modifica el startY si estás en una nueva página
+        if (data.pageNumber > 1) {
+          data.settings.margin.top = 53;
+        }
+      },
     });
 
     let finalY = doc.lastAutoTable.finalY; // ✅ usar let en vez de const
-const signatureBlockHeight = 50; // espacio estimado total (firma + texto + margen)
-const spacingAfterTable = 1;
-const totalRequired = spacingAfterTable + signatureBlockHeight;
+    const signatureBlockHeight = 50; // espacio estimado total (firma + texto + margen)
+    const spacingAfterTable = 1;
+    const totalRequired = spacingAfterTable + signatureBlockHeight;
 
- const tablaVacia =
+    const tablaVacia =
       !tabla.length ||
       tabla.every(
         (d) =>
@@ -214,27 +214,27 @@ const totalRequired = spacingAfterTable + signatureBlockHeight;
           !d.proteccion
       );
 
-const pageHeight = doc.internal.pageSize.getHeight();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
-// Si no cabe el bloque de firmas, agrega página antes de imprimirlas
-if ((pageHeight - finalY) < totalRequired) {
-  doc.addPage(); // 🟡 CREA LA NUEVA HOJA
+    // Si no cabe el bloque de firmas, agrega página antes de imprimirlas
+    if ((pageHeight - finalY) < totalRequired) {
+      doc.addPage(); // 🟡 CREA LA NUEVA HOJA
 
-  header_HistoriaOcupacional_Boro(doc, datos); // 🔵 REDIBUJA EL HEADER EN LA NUEVA HOJA
+      header_HistoriaOcupacional_Boro(doc, datos); // 🔵 REDIBUJA EL HEADER EN LA NUEVA HOJA
 
-  const newY = 53; // 👈 Usa 53 para mantener consistencia con el resto del documento
-  finalY = newY;   // ✅ Ajusta para que la firma comience debajo del header
-}
+      const newY = 53; // 👈 Usa 53 para mantener consistencia con el resto del documento
+      finalY = newY;   // ✅ Ajusta para que la firma comience debajo del header
+    }
 
-const signatureTop = finalY + spacingAfterTable;
- if (tablaVacia) {
+    const signatureTop = finalY + spacingAfterTable;
+    if (tablaVacia) {
       doc.setFontSize(20);
       doc.setTextColor(255, 0, 0); // Rojo en RGB
       doc.text("SIN EXPERIENCIA LABORAL", 95, signatureTop + 7);
       doc.setFontSize(9);
       doc.setTextColor(0, 0, 0); // Color negro
-}
-    doc.text(`Fecha: ${datos.fechaHo}`,15, signatureTop + 35)
+    }
+    doc.text(`Fecha: ${datos.fechaHo}`, 15, signatureTop + 35)
     //FIRMA
     const lineY = signatureTop + 35; // 5px debajo de la imagen
     const lineX1 = 70;           // inicio de la línea
@@ -277,7 +277,7 @@ const signatureTop = finalY + spacingAfterTable;
     const textYS = lineYS + 4.5; // Ajusta según altura visual
     const selloW = lineX2S - lineX1S; // 80 px
     const selloH = 35;                // Alto reservado
-    const selloY = 110;    
+    const selloY = 110;
     doc.text(labelS, textXS, textYS);
     if (s1) {
       const canvas = document.createElement('canvas');
@@ -304,7 +304,7 @@ const signatureTop = finalY + spacingAfterTable;
       const imgX = sigX1 + (sigW - imgW) / 2;
       const imgY = signatureTop + (sigH - imgH) / 2;
 
-      doc.addImage(selloBase64, 'PNG', imgX, imgY+5, imgW, imgH);
+      doc.addImage(selloBase64, 'PNG', imgX, imgY + 5, imgW, imgH);
     }
 
     if (s2) {
@@ -332,7 +332,7 @@ const signatureTop = finalY + spacingAfterTable;
       const imgX = sigX2 + (sigW - imgW) / 2;
       const imgY = signatureTop + (sigH - imgH) / 2;
 
-      doc.addImage(selloBase64, 'PNG', imgX, imgY+5, imgW, imgH);
+      doc.addImage(selloBase64, 'PNG', imgX, imgY + 5, imgW, imgH);
     }
 
     if (s3) {
@@ -360,7 +360,7 @@ const signatureTop = finalY + spacingAfterTable;
       const imgX = lineX1S + (selloW - imgW) / 2;
       const imgY = signatureTop + (selloH - imgH) / 2;
 
-      doc.addImage(selloBase64, 'PNG', imgX, imgY+5, imgW, imgH);
+      doc.addImage(selloBase64, 'PNG', imgX, imgY + 5, imgW, imgH);
     }
 
     // === FOOTER ===
@@ -374,5 +374,5 @@ const signatureTop = finalY + spacingAfterTable;
     document.body.appendChild(iframe);
     iframe.onload = () => iframe.contentWindow.print();
   })
-  
+
 }

@@ -5,7 +5,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 
-export default function CertificadoAptitudHerramientasManuales(data = {}) {
+export default async function CertificadoAptitudHerramientasManuales(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -46,10 +46,10 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
     // Datos para tipo de trabajo
     tipoTrabajo: data.explotacion || "",
     // Datos para resultado de evaluación
-    resultadoEvaluacion: data.noApto ? "noApto" : 
-                        data.aptoRestriccion ? "aptoRestriccion" :
-                        data.aptoTemporal ? "aptoTemporal" :
-                        data.apto ? "apto" : "apto",
+    resultadoEvaluacion: data.noApto ? "noApto" :
+      data.aptoRestriccion ? "aptoRestriccion" :
+        data.aptoTemporal ? "aptoTemporal" :
+          data.apto ? "apto" : "apto",
     // Datos para observaciones
     observaciones: data.observacion || data.observaciones || "",
     // Datos para fechas
@@ -60,16 +60,16 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
   const datosFinales = datosReales;
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
     // Título principal (solo en página 1)
     if (pageNumber === 1) {
       doc.setFont("helvetica", "bold").setFontSize(12);
       doc.setTextColor(0, 0, 0);
       doc.text("CERTIFICADO DE APTITUD PARA USO DE HERRAMIENTAS MANUALES", pageW / 2, 40, { align: "center" });
-     
+
     }
 
     // Número de Ficha y Página (alineación automática mejorada)
@@ -98,7 +98,7 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === FUNCIONES AUXILIARES ===
   // Función para texto con salto de línea
@@ -107,16 +107,16 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
     if (!texto || texto === null || texto === undefined) {
       return y;
     }
-    
+
     const fontSize = doc.internal.getFontSize();
     const palabras = String(texto).split(' ');
     let lineaActual = '';
     let yPos = y;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -130,12 +130,12 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
         }
       }
     });
-    
+
     if (lineaActual) {
       doc.text(lineaActual, x, yPos);
       yPos += fontSize * 0.35;
     }
-    
+
     return yPos; // Devuelve la nueva posición final
   };
 
@@ -143,25 +143,25 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
     const tablaInicioX = 10;
     const tablaAncho = 190;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo gris más oscuro
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
+
     // Dibujar líneas del header
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(9);
     doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
-    
+
     return yPos + alturaHeader;
   };
 
@@ -312,7 +312,7 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
   // Superficie
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("SUPERFICIE", tablaInicioX + 2, yTexto2 + 1);
-  
+
   // Marcar X en Superficie si es el tipo seleccionado
   if (datosFinales.tipoTrabajo === "SUPERFICIE") {
     doc.setFont("helvetica", "bold").setFontSize(10);
@@ -322,7 +322,7 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
   // PLANTA (centrado en la tercera columna)
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("PLANTA", tablaInicioX + 63, yTexto2 + 1);
-  
+
   // Marcar X en Planta si es el tipo seleccionado
   if (datosFinales.tipoTrabajo === "PLANTA") {
     doc.setFont("helvetica", "bold").setFontSize(10);
@@ -332,7 +332,7 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
   // SUBSUELO (centrado en la cuarta columna)
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("SUBSUELO", tablaInicioX + 122, yTexto2 + 1);
-  
+
   // Marcar X en Subsuelo si es el tipo seleccionado
   if (datosFinales.tipoTrabajo === "SUBSUELO") {
     doc.setFont("helvetica", "bold").setFontSize(10);
@@ -363,11 +363,11 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
   // APTO
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("APTO", tablaInicioX + 43, yTexto3 + 1);
-  
+
   // Marcar X en APTO si es la condición seleccionada (incluye apto, aptoRestriccion, aptoTemporal)
-  if (datosFinales.resultadoEvaluacion === "apto" || 
-      datosFinales.resultadoEvaluacion === "aptoRestriccion" || 
-      datosFinales.resultadoEvaluacion === "aptoTemporal") {
+  if (datosFinales.resultadoEvaluacion === "apto" ||
+    datosFinales.resultadoEvaluacion === "aptoRestriccion" ||
+    datosFinales.resultadoEvaluacion === "aptoTemporal") {
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text("X", tablaInicioX + 110, yTexto3 + 1, { align: "center" });
   }
@@ -375,7 +375,7 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
   // NO APTO
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("NO APTO", tablaInicioX + 122, yTexto3 + 1);
-  
+
   // Marcar X en NO APTO si es la condición seleccionada
   if (datosFinales.resultadoEvaluacion === "noApto") {
     doc.setFont("helvetica", "bold").setFontSize(10);
@@ -388,19 +388,19 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
   // Fila de observaciones con altura dinámica
   const observacionesTexto = datosFinales.observaciones || "";
   const anchoMaximoObservaciones = tablaAncho - 4;
-  
+
   // Función para calcular altura dinámica de observaciones
   const calcularAlturaObservaciones = (texto, anchoMaximo) => {
     if (!texto || texto.trim() === "") return 110; // Altura fija mínima si no hay texto
-    
+
     const palabras = texto.split(' ');
     let lineaActual = '';
     let lineas = 1;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -412,7 +412,7 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
         }
       }
     });
-    
+
     // Altura fija mínima de 20mm, altura por línea de 3mm
     const alturaCalculada = lineas * 3 + 2;
     return Math.max(alturaCalculada, 20); // Altura fija mínima de 20mm
@@ -428,11 +428,11 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
 
   // Contenido de la fila de observaciones
   doc.setFont("helvetica", "normal").setFontSize(8);
-  
+
   // Dividir el texto en líneas y agregar guión a cada una
   const lineasObservaciones = observacionesTexto.split('\n').filter(linea => linea.trim() !== '');
   let yTextoObservaciones = yPos + 5;
-  
+
   if (lineasObservaciones.length > 0) {
     lineasObservaciones.forEach(linea => {
       const textoConGuion = `- ${linea.trim()}`;
@@ -443,7 +443,7 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
     // Si no hay observaciones, mostrar texto por defecto
     doc.text("- Sin observaciones registradas", tablaInicioX + 2, yTextoObservaciones);
   }
-  
+
   yPos += alturaFilaObservaciones;
 
   // === FILA DE FECHAS ===
@@ -485,7 +485,7 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
   // Orden: [HUELLA] [FIRMA] lado a lado
   const firmaPacienteY = yFirmas + 7;
   const centroColumnaIzquierdaX = tablaInicioX + (tablaAncho / 4);
-  
+
   // Agregar huella del paciente (izquierda)
   let huellaPacienteUrl = getSign(data, "HUELLA");
   if (huellaPacienteUrl) {
@@ -520,7 +520,7 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
   // === FIRMA DEL MÉDICO (DERECHA) ===
   const firmaMedicoY = yFirmas + 7;
   const centroColumnaDerechaX = tablaInicioX + (3 * tablaAncho / 4);
-  
+
   // Agregar firma y sello médico
   let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
   if (firmaMedicoUrl) {
@@ -542,7 +542,7 @@ export default function CertificadoAptitudHerramientasManuales(data = {}) {
   yPos += alturaSeccionFirmas;
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 8});
+  footerTR(doc, { footerOffsetY: 8 });
 
   // === Imprimir ===
   imprimir(doc);

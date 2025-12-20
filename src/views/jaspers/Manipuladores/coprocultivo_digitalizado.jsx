@@ -28,25 +28,25 @@ const toDDMMYYYY = (fecha) => {
 };
 
 // Header con datos de ficha, sede y fecha
-const drawHeader = (doc, datos = {}) => {
+const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
-  
-  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-  
+
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Nro de ficha: ", pageW - 80, 15);
   doc.setFont("helvetica", "normal").setFontSize(18);
   doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
-  
+
   // Sede
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
-  
+
   // Fecha de examen
   const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
   doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
-  
+
   // Página
   doc.text("Pag. 01", pageW - 30, 10);
 
@@ -173,17 +173,17 @@ const drawPatientData = (doc, datos = {}) => {
   return yPos;
 };
 
-export default function Coprocultivo_Digitalizado(datos = {}) {
+export default async function Coprocultivo_Digitalizado(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
-  drawHeader(doc, datos);
-  
+  await drawHeader(doc, datos);
+
   // === TÍTULO ===
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
   doc.text("COPROCULTIVO", pageW / 2, 38, { align: "center" });
-  
+
   // === DATOS DEL PACIENTE ===
   const finalYPos = drawPatientData(doc, datos);
 
@@ -296,11 +296,11 @@ export default function Coprocultivo_Digitalizado(datos = {}) {
     const sigY = 210;
     const gap = 16;
     const sigXOffset = 25; // 25mm más a la derecha
-    
+
     if (s1 && s2) {
       const totalWidth = sigW * 2 + gap;
       const startX = (pageW - totalWidth) / 2 + sigXOffset;
-      
+
       const addSello = (img, xPos) => {
         const canvas = document.createElement('canvas');
         canvas.width = img.width;

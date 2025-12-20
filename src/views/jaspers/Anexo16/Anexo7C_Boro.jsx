@@ -5,7 +5,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 
-export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
+export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
   // Normalizar estructura de datos: si viene con anexo16Reporte, aplanar la estructura
   if (data.anexo16Reporte && typeof data.anexo16Reporte === 'object') {
     // Combinar anexo16Reporte con las propiedades de nivel superior
@@ -27,7 +27,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
 
   // Contador de páginas dinámico
   let numeroPagina = 1;
-  
+
   // Función helper para obtener el offset del footer según la página
   const getFooterOffset = () => {
     return numeroPagina === 1 ? 13 : 8; // Footer primera página 3mm más cerca del contenido (offset reducido)
@@ -421,9 +421,9 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
   };
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
     // Título principal (solo en página 1)
     // Título en todas las páginas
@@ -457,7 +457,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === FUNCIONES AUXILIARES ===
   // Función para texto con salto de línea
@@ -1091,7 +1091,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -1191,7 +1191,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -1322,7 +1322,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -1589,7 +1589,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -1713,7 +1713,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -1875,7 +1875,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -1934,7 +1934,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -2072,7 +2072,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -2090,7 +2090,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
 
   // === COLUMNA 1: OTOSCOPÍA y CARDIOVASCULAR ===
   // La altura de OTOSCOPÍA será dinámica, y CARDIOVASCULAR será creciente
-  
+
   // OTOSCOPÍA - Header
   const alturaFilaHeaderOtoscopia = 5;
   doc.setFont("helvetica", "bold").setFontSize(7);
@@ -2102,25 +2102,25 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
   const odValue = (datosFinales.evaluacionOidos?.otoscopia?.oidoDerecho || "").toUpperCase();
   const oiValue = (datosFinales.evaluacionOidos?.otoscopia?.oidoIzquierdo || "").toUpperCase();
   const textoOtoscopia = `O.D.: ${odValue}  |  O.I.: ${oiValue}`;
-  
+
   // Calcular altura dinámica para otoscopía
   const alturaFilaCrecienteOtoscopia = 8; // Altura mínima
   const anchoDisponibleOtoscopia = anchoColVitales1 - 4;
   const lineasOtoscopia = doc.splitTextToSize(textoOtoscopia, anchoDisponibleOtoscopia);
   const interlineadoOtoscopia = 2.5;
   const alturaDinamicaOtoscopia = Math.max(alturaFilaCrecienteOtoscopia, lineasOtoscopia.length * interlineadoOtoscopia + 4);
-  
+
   // Dibujar líneas de la fila de otoscopía (solo columna izquierda)
   doc.line(tablaInicioX, yOtoscopiaData, tablaInicioX, yOtoscopiaData + alturaDinamicaOtoscopia);
   doc.line(divColVitales1, yOtoscopiaData, divColVitales1, yOtoscopiaData + alturaDinamicaOtoscopia);
   doc.line(tablaInicioX, yOtoscopiaData, divColVitales1, yOtoscopiaData);
   doc.line(tablaInicioX, yOtoscopiaData + alturaDinamicaOtoscopia, divColVitales1, yOtoscopiaData + alturaDinamicaOtoscopia);
-  
+
   // Contenido de la fila de otoscopía con saltos de línea
   lineasOtoscopia.forEach((linea, index) => {
     doc.text(linea, tablaInicioX + 2, yOtoscopiaData + 3.5 + (index * interlineadoOtoscopia));
   });
-  
+
   // Calcular altura total de otoscopía
   const alturaOtoscopia = alturaFilaHeaderOtoscopia + alturaDinamicaOtoscopia;
 
@@ -2257,7 +2257,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -2459,7 +2459,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -2502,7 +2502,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -2613,7 +2613,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -2661,7 +2661,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -2705,7 +2705,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -2753,7 +2753,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -2851,7 +2851,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     });
 
   // Función para continuar con el código después de cargar la imagen
-  function continuarConRadiografia() {
+  async function continuarConRadiografia() {
 
     // Línea horizontal superior (completa)
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
@@ -2971,7 +2971,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
       footerTR(doc, { footerOffsetY: getFooterOffset() });
       doc.addPage();
       numeroPagina++;
-      drawHeader(numeroPagina);
+      await drawHeader(numeroPagina);
       yPos = 35.5;
     }
 
@@ -3270,7 +3270,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
       footerTR(doc, { footerOffsetY: getFooterOffset() });
       doc.addPage();
       numeroPagina++;
-      drawHeader(numeroPagina);
+      await drawHeader(numeroPagina);
       yPos = 35.5;
     }
 
@@ -3333,7 +3333,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
       footerTR(doc, { footerOffsetY: getFooterOffset() });
       doc.addPage();
       numeroPagina++;
-      drawHeader(numeroPagina);
+      await drawHeader(numeroPagina);
       yPos = 35.5;
     }
 
@@ -3684,7 +3684,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
       footerTR(doc, { footerOffsetY: getFooterOffset() });
       doc.addPage();
       numeroPagina++;
-      drawHeader(numeroPagina);
+      await drawHeader(numeroPagina);
       yPos = 35.5;
     }
 
@@ -3838,7 +3838,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
       footerTR(doc, { footerOffsetY: getFooterOffset() });
       doc.addPage();
       numeroPagina++;
-      drawHeader(numeroPagina);
+      await drawHeader(numeroPagina);
       yPos = 35.5;
     }
 
@@ -3910,7 +3910,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     yPos = 35.5; // Posición inicial de la nueva página
 
     // Dibujar header en la nueva página
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
 
     // === SECCIÓN: OTROS EXAMENES (PÁGINA 3) ===
 
@@ -4118,7 +4118,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
       footerTR(doc, { footerOffsetY: getFooterOffset() });
       doc.addPage();
       numeroPagina++;
-      drawHeader(numeroPagina);
+      await drawHeader(numeroPagina);
       yPos = 35.5;
     }
 

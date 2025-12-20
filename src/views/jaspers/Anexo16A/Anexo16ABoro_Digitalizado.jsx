@@ -6,7 +6,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 
-export default function Anexo16ABoro_Digitalizado(data = {}) {
+export default async function Anexo16ABoro_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -28,7 +28,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     vitalSigns: {
       fc: String(data.frecuenciaCardiacaTriaje_f_cardiaca || ""),
       fr: String(data.frecuenciaRespiratoriaTriaje_f_respiratoria || ""),
-      pa: (data.sistolicaTriaje_sistolica || data.diastolicaTriaje_diastolica) 
+      pa: (data.sistolicaTriaje_sistolica || data.diastolicaTriaje_diastolica)
         ? String(data.sistolicaTriaje_sistolica || "") + "/" + String(data.diastolicaTriaje_diastolica || "")
         : "",
       satO2: String(data.saturacionOxigenoTriaje_sat_02 || ""),
@@ -64,16 +64,16 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
       fecha: formatearFechaCorta(data.fechaAnexo16a_fecha_anexo || "")
     },
     laboratorio: {
-      hemoglobina: data.hemoglobinaLaboratorioClinico_txthemoglobina 
+      hemoglobina: data.hemoglobinaLaboratorioClinico_txthemoglobina
         ? String(data.hemoglobinaLaboratorioClinico_txthemoglobina).trim() + " g/dl"
         : "",
-      hematocrito: data.hematocritoLaboratorioClinico_txthematocrito 
+      hematocrito: data.hematocritoLaboratorioClinico_txthematocrito
         ? String(data.hematocritoLaboratorioClinico_txthematocrito).trim() + "%"
         : "",
-      glucosa: data.glucosaLaboratorioClinico_txtglucosabio 
+      glucosa: data.glucosaLaboratorioClinico_txtglucosabio
         ? String(data.glucosaLaboratorioClinico_txtglucosabio).trim() + " mg/dl"
         : "",
-      ekg: data.hallazgosInformeElectroCardiograma_hallazgo 
+      ekg: data.hallazgosInformeElectroCardiograma_hallazgo
         ? String(data.hallazgosInformeElectroCardiograma_hallazgo)
         : ""
     },
@@ -91,9 +91,9 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   const datosFinales = datosReales;
 
   // Header reutilizable (similar a FichaDetencionSAS_boro_Digitalizado.jsx)
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
     // Título principal (solo en página 1)
     if (pageNumber === 1) {
@@ -132,7 +132,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
 
   // === FUNCIONES AUXILIARES ===
@@ -142,29 +142,29 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     if (!texto || texto === null || texto === undefined) {
       return y;
     }
-    
+
     const fontSize = doc.internal.getFontSize();
     let yPos = y;
-    
+
     // Primero dividir por saltos de línea explícitos (\n, \r\n)
     const lineasConSaltos = String(texto).split(/\r\n|\r|\n/);
-    
+
     lineasConSaltos.forEach((lineaConSalto, indiceLinea) => {
       // Si no es la primera línea y hay un salto de línea antes, hacer salto
       if (indiceLinea > 0) {
         yPos += fontSize * 0.35; // Salto de línea explícito
       }
-      
+
       // Dividir cada línea por espacios para manejar el ancho máximo
       const palabras = lineaConSalto.trim().split(' ');
       let lineaActual = '';
-      
+
       palabras.forEach(palabra => {
         if (!palabra) return; // Saltar palabras vacías
-        
+
         const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
         const anchoTexto = doc.getTextWidth(textoPrueba);
-        
+
         if (anchoTexto <= anchoMaximo) {
           lineaActual = textoPrueba;
         } else {
@@ -179,14 +179,14 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
           }
         }
       });
-      
+
       // Dibujar la línea actual si quedó algo
       if (lineaActual) {
         doc.text(lineaActual, x, yPos);
         // NO sumar una línea extra aquí, solo cuando hay salto explícito o nueva palabra
       }
     });
-    
+
     return yPos; // Devuelve la posición final donde terminó el texto
   };
 
@@ -195,12 +195,12 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     if (!texto || texto === null || texto === undefined) {
       return 5; // Altura mínima
     }
-    
+
     // Usar splitTextToSize de jsPDF que es más preciso
     const lineas = doc.splitTextToSize(String(texto), anchoMaximo);
     const alturaPorLinea = fontSize * 0.35;
     const alturaTotal = lineas.length * alturaPorLinea + 2; // +2 para padding
-    
+
     return Math.max(alturaTotal, 5); // Altura mínima de 5mm
   };
 
@@ -208,25 +208,25 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
     const tablaInicioX = 10;
     const tablaAncho = 190;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo gris más oscuro
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
+
     // Dibujar líneas del header
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(titulo, tablaInicioX + 2, yPos + 3);
-    
+
     return yPos + alturaHeader;
   };
 
@@ -363,7 +363,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   // === CONTENIDO DE FUNCIONES VITALES ===
   // Primera fila: FC, FR, PA, Sat. O2, IMC
   const yPrimeraFila = yPos - filaAltura; // Ajustar para la primera fila
-  
+
   // FC (Frecuencia Cardíaca)
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("FC:", tablaInicioX + 2, yPrimeraFila + 3);
@@ -396,7 +396,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
 
   // Segunda fila: T°, Peso, Talla
   const ySegundaFila = yPos; // La segunda fila está en la posición actual de yPos
-  
+
   // Temperatura
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("T°:", tablaInicioX + 2, ySegundaFila + 3);
@@ -424,15 +424,15 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     const colTexto = 170;
     const colNo = 10;
     const colSi = 10;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo gris más oscuro
     doc.setFillColor(196, 196, 196);
     doc.rect(leftMargin, yPos, colTexto + colNo + colSi, alturaHeader, 'F');
-    
+
     // Dibujar líneas del header
     doc.line(leftMargin, yPos, leftMargin + colTexto + colNo + colSi, yPos); // Superior
     doc.line(leftMargin, yPos + alturaHeader, leftMargin + colTexto + colNo + colSi, yPos + alturaHeader); // Inferior
@@ -440,14 +440,14 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     doc.line(leftMargin + colTexto, yPos, leftMargin + colTexto, yPos + alturaHeader); // División texto/opciones
     doc.line(leftMargin + colTexto + colNo, yPos, leftMargin + colTexto + colNo, yPos + alturaHeader); // División NO/SI
     doc.line(leftMargin + colTexto + colNo + colSi, yPos, leftMargin + colTexto + colNo + colSi, yPos + alturaHeader); // Derecha
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.setTextColor(0, 0, 0);
     doc.text(titulo, leftMargin + 2, yPos + 3);
-    doc.text("SI", leftMargin + colTexto + colNo/2, yPos + 3, { align: "center" });
-    doc.text("NO", leftMargin + colTexto + colNo + colSi/2, yPos + 3, { align: "center" });
-    
+    doc.text("SI", leftMargin + colTexto + colNo / 2, yPos + 3, { align: "center" });
+    doc.text("NO", leftMargin + colTexto + colNo + colSi / 2, yPos + 3, { align: "center" });
+
     return yPos + alturaHeader;
   };
 
@@ -480,7 +480,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
 
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.setLineWidth(0.2);
-  
+
   condiciones.forEach((condicion) => {
     let textoDividido = doc.splitTextToSize(condicion.texto, colTexto - 4);
     let altura = textoDividido.length * 3 + 2;
@@ -500,14 +500,14 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     // NO
     if (datosFinales.condiciones[condicion.campo] === false) {
       doc.setFont("helvetica", "bold").setFontSize(10);
-      doc.text("X", leftMargin + colTexto + colNo + colSi/2, yPos + altura/2 + 1, { align: "center" });
+      doc.text("X", leftMargin + colTexto + colNo + colSi / 2, yPos + altura / 2 + 1, { align: "center" });
       doc.setFont("helvetica", "normal").setFontSize(8);
     }
 
     // SI
     if (datosFinales.condiciones[condicion.campo] === true) {
       doc.setFont("helvetica", "bold").setFontSize(10);
-      doc.text("X", leftMargin + colTexto + colNo/2, yPos + altura/2 + 1, { align: "center" });
+      doc.text("X", leftMargin + colTexto + colNo / 2, yPos + altura / 2 + 1, { align: "center" });
       doc.setFont("helvetica", "normal").setFontSize(8);
     }
 
@@ -530,11 +530,11 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     const palabras = texto.split(' ');
     let lineaActual = '';
     let lineas = 1;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -546,7 +546,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
         }
       }
     });
-    
+
     // Altura mínima de 5mm, altura máxima de 20mm (5 líneas)
     return Math.max(lineas * fontSize * 0.35 + 1.5, 5);
   };
@@ -575,7 +575,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   // Verificar si existe laboratorio, sino usar valores por defecto
   const laboratorio = datosFinales.laboratorio || {
     hemoglobina: "N/A",
-    hematocrito: "N/A", 
+    hematocrito: "N/A",
     glucosa: "N/A",
     ekg: "N/A"
   };
@@ -643,12 +643,12 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
 
   // Procesar observaciones usando normalizeList
   let observacionesLista = normalizeList(datosFinales.observaciones);
-  
+
   // Si no hay observaciones, usar observación por defecto
   if (observacionesLista.length === 0) {
     observacionesLista = ["Sin observaciones adicionales"];
   }
-  
+
   // Crear texto con formato de lista (cada item en una línea con guión)
   // Agregar guión al inicio de cada observación si no lo tiene
   const observacionesTexto = observacionesLista
@@ -672,7 +672,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
 
   // Dibujar el texto de las observaciones en formato de lista
   dibujarTextoConSaltoLinea(observacionesTexto, tablaInicioX + 2, yPos + 3, anchoMaximoObservaciones);
-  
+
   yPos += alturaFilaObservaciones;
 
   // === CERTIFICACIÓN MÉDICA CON FONDO NARANJA ===
@@ -685,17 +685,17 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
 
   // Combinar todo el texto
   const textoCompletoCertificacion = `${textoCertificacion}${estadoTexto}${textoDespues}`;
-  
+
   // Calcular altura dinámica para la certificación
   const calcularAlturaCertificacion = (texto, anchoMaximo, fontSize) => {
     const palabras = texto.split(' ');
     let lineaActual = '';
     let lineas = 1;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -707,7 +707,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
         }
       }
     });
-    
+
     // Altura mínima de 8mm, altura máxima de 25mm (6 líneas)
     return Math.max(lineas * fontSize * 0.35 + 1.5, 8);
   };
@@ -766,7 +766,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
 
   // === SECCIÓN DE DECLARACIÓN, FIRMA Y HUELLA DEL TRABAJADOR ===
   const alturaSeccionDeclaracion = 30; // Altura para la sección de declaración (aumentada a 30 para más espacio)
-  
+
   // Dibujar las líneas de la sección de declaración (3 columnas)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaSeccionDeclaracion); // Línea izquierda
   doc.line(tablaInicioX + 60, yPos, tablaInicioX + 60, yPos + alturaSeccionDeclaracion); // Primera división
@@ -778,12 +778,12 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   // === COLUMNA 1: DECLARACIÓN ===
   doc.setFont("helvetica", "normal").setFontSize(6);
   const textoDeclaracion = "Declaro que las respuestas son ciertas según mi leal saber y entender. En caso de ser requeridos, los resultados del examen médico pueden ser revelados, en términos generales, al departamento de salud Ocupacional de la compañía. Los resultados pueden ser enviados a mi médico particular de ser considerado necesario.";
-  
+
   // Función para justificar texto
   const justificarTexto = (texto, x, y, anchoMaximo, interlineado) => {
     const lineas = doc.splitTextToSize(texto, anchoMaximo);
     let yActual = y;
-    
+
     lineas.forEach((linea, index) => {
       // Solo justificar si no es la última línea y tiene más de una palabra
       if (index < lineas.length - 1 && linea.includes(' ')) {
@@ -793,7 +793,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
           const espacioDisponible = anchoMaximo - anchoTexto;
           const espaciosEntrePalabras = palabras.length - 1;
           const espacioExtra = espacioDisponible / espaciosEntrePalabras;
-          
+
           let xActual = x;
           palabras.forEach((palabra, i) => {
             doc.text(palabra, xActual, yActual);
@@ -811,16 +811,16 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
       yActual += interlineado;
     });
   };
-  
+
   // Dibujar texto justificado
   justificarTexto(textoDeclaracion, tablaInicioX + 2, yPos + 3, 55, 2.5);
 
   // === COLUMNA 2: FIRMA Y HUELLA DEL TRABAJADOR ===
   const firmaTrabajadorY = yPos + 3; // Subido 5 puntos más arriba
-  
+
   // Calcular centro de la columna 2 para centrar las imágenes
   const centroColumna2X = tablaInicioX + 60 + (60 / 2); // Centro de la columna 2
-  
+
   // Agregar firma del trabajador (lado izquierdo)
   const firmaTrabajadorUrl = getSign(data, "FIRMAP");
   console.log("Firma trabajador URL:", firmaTrabajadorUrl);
@@ -856,7 +856,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   } else {
     console.log("No se encontró URL de huella del trabajador");
   }
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
   // Centrar en la columna 2 (ancho de columna: 60px, desde tablaInicioX + 60 hasta tablaInicioX + 120)
   const centroColumna2 = tablaInicioX + 60 + (60 / 2); // Centro de la columna 2
@@ -865,7 +865,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   // === COLUMNA 3: SELLO Y FIRMA DEL MÉDICO ===
   const firmaMedicoX = tablaInicioX + 125;
   const firmaMedicoY = yPos + 3; // Subido 5 puntos más arriba
-  
+
   // Agregar firma y sello médico
   const firmaMedicoUrl = getSign(data, "SELLOFIRMA");
   console.log("Firma médico URL:", firmaMedicoUrl);
@@ -883,7 +883,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   } else {
     console.log("No se encontró URL de firma del médico");
   }
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
   // Centrar en la columna 3 (ancho de columna: 70px, desde tablaInicioX + 120 hasta tablaInicioX + 190)
   const centroColumna3 = tablaInicioX + 120 + (70 / 2); // Centro de la columna 3
@@ -899,7 +899,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
 
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 7});
+  footerTR(doc, { footerOffsetY: 7 });
 
   // === Imprimir ===
   imprimir(doc);

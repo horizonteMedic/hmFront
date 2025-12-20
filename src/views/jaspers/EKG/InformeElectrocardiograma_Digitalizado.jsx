@@ -5,7 +5,7 @@ import CabeceraLogo from "../components/CabeceraLogo.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
 import footerTR from "../components/footerTR.jsx";
 
-export default function InformeElectrocardiograma_Digitalizado(data = {}) {
+export default async function InformeElectrocardiograma_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -43,8 +43,8 @@ export default function InformeElectrocardiograma_Digitalizado(data = {}) {
   };
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+  const drawHeader = async (pageNumber) => {
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
     // Título principal
     doc.setFont("helvetica", "bold").setFontSize(12);
@@ -77,7 +77,7 @@ export default function InformeElectrocardiograma_Digitalizado(data = {}) {
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(1);
+  await drawHeader(1);
 
   // === FUNCIONES AUXILIARES ===
   // Función general para dibujar header de sección con fondo gris
@@ -124,7 +124,7 @@ export default function InformeElectrocardiograma_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   // Contenido - centrado verticalmente en fila de 5mm
   const textoY = yPos + (filaAltura / 2) + (8 * 0.35) / 2; // Centrado vertical
   doc.setFont("helvetica", "bold").setFontSize(8);
@@ -144,7 +144,7 @@ export default function InformeElectrocardiograma_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   // Contenido - centrado verticalmente
   const textoY2 = yPos + (filaAltura / 2) + (8 * 0.35) / 2;
   doc.setFont("helvetica", "bold").setFontSize(8);
@@ -174,7 +174,7 @@ export default function InformeElectrocardiograma_Digitalizado(data = {}) {
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-    
+
     // Contenido - centrado verticalmente
     const textoY3 = yPos + (filaAltura / 2) + (8 * 0.35) / 2;
     doc.setFont("helvetica", "bold").setFontSize(8);
@@ -191,7 +191,7 @@ export default function InformeElectrocardiograma_Digitalizado(data = {}) {
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-    
+
     // Contenido - centrado verticalmente
     const textoY4 = yPos + (filaAltura / 2) + (8 * 0.35) / 2;
     doc.setFont("helvetica", "bold").setFontSize(8);
@@ -208,7 +208,7 @@ export default function InformeElectrocardiograma_Digitalizado(data = {}) {
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-    
+
     // Contenido - centrado verticalmente
     const textoY5 = yPos + (filaAltura / 2) + (8 * 0.35) / 2;
     doc.setFont("helvetica", "bold").setFontSize(8);
@@ -225,7 +225,7 @@ export default function InformeElectrocardiograma_Digitalizado(data = {}) {
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-    
+
     // Contenido - centrado verticalmente
     const textoY6 = yPos + (filaAltura / 2) + (8 * 0.35) / 2;
     doc.setFont("helvetica", "bold").setFontSize(8);
@@ -320,7 +320,7 @@ export default function InformeElectrocardiograma_Digitalizado(data = {}) {
 
     // Procesar recomendaciones
     const items = procesarRecomendaciones(datosFinales.recomendaciones);
-    
+
     // Calcular altura necesaria para todas las recomendaciones (mínimo 20mm)
     const alturaMinimaRecomendaciones = 20;
     let alturaTotalRecomendaciones = 0;
@@ -341,15 +341,15 @@ export default function InformeElectrocardiograma_Digitalizado(data = {}) {
     doc.setFont("helvetica", "normal").setFontSize(8);
     let yActualRecomendaciones = yPos + 3.5;
     items.forEach((item) => {
-          // Viñeta
+      // Viñeta
       doc.text("-", tablaInicioX + 2, yActualRecomendaciones);
-      
+
       // Texto del item (puede ser multilínea)
       const lineas = doc.splitTextToSize(item, anchoDisponibleHallazgos - 5);
       lineas.forEach((line, lineIndex) => {
         doc.text(line, tablaInicioX + 7, yActualRecomendaciones + lineIndex * 3.5);
       });
-      
+
       yActualRecomendaciones += Math.max(alturaMinimaRecomendaciones - 3.5, lineas.length * 3.5);
     });
 
@@ -401,22 +401,22 @@ export default function InformeElectrocardiograma_Digitalizado(data = {}) {
 
 // -------------------------------
 // Helpers
-  function procesarRecomendaciones(texto) {
-    if (!texto) return [];
+function procesarRecomendaciones(texto) {
+  if (!texto) return [];
 
   // Dividir por saltos de línea y limpiar
-    let items = texto
+  let items = texto
     .split("\n") // Dividir por saltos de línea
-      .map((item) => item.trim()) // Limpiar espacios
-      .filter((item) => item.length > 0) // Eliminar items vacíos
+    .map((item) => item.trim()) // Limpiar espacios
+    .filter((item) => item.length > 0) // Eliminar items vacíos
     .map((item) => (item.endsWith(".") ? item : item + ".")); // Agregar punto si no lo tiene
 
-    // Si no hay items, crear uno con el texto original
-    if (items.length === 0) {
-      items = [texto];
-    }
+  // Si no hay items, crear uno con el texto original
+  if (items.length === 0) {
+    items = [texto];
+  }
 
-    return items;
+  return items;
 }
 
 function imprimir(doc) {

@@ -3,7 +3,7 @@ import autoTable from "jspdf-autotable";
 import header from "./components/header";
 import footer from "./components/footer";
 
-export default function LtestAltura_digitalizado(datos) {
+export default async function LtestAltura_digitalizado(datos) {
   const doc = new jsPDF();
   header(doc, datos);
 
@@ -40,7 +40,7 @@ export default function LtestAltura_digitalizado(datos) {
     },
     margin: { left: 15, right: 15 },
     tableWidth: 180,
-    didDrawPage: () => {}
+    didDrawPage: () => { }
   });
 
   footer(doc, datos);

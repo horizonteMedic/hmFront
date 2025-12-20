@@ -9,12 +9,13 @@ import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAltoRiesgo";
 import { BotonesAccion, DatosPersonalesLaborales } from "../../../../../../components/templates/Templates";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
-const tabla = "";
+const tabla = "alto_riesgo";
 
 export default function AltoRiesgo() {
   const today = getToday();
-  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+  const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
   const initialFormState = {
     // Header - Información del examen
@@ -50,6 +51,10 @@ export default function AltoRiesgo() {
     // Observaciones y Recomendaciones
     observaciones: "",
     recomendaciones: "",
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
   const {
@@ -62,7 +67,7 @@ export default function AltoRiesgo() {
     handleClear,
     handleClearnotO,
     handlePrintDefault,
-  } = useForm(initialFormState, { storageKey: "informeConductores" });
+  } = useForm(initialFormState, { storageKey: "AltoRiesgo" });
 
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
@@ -82,7 +87,7 @@ export default function AltoRiesgo() {
   };
   return (
     <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-4 gap-3">
         <InputTextOneLine
           label="N° Orden"
           name="norden"
@@ -181,6 +186,15 @@ export default function AltoRiesgo() {
             rows={4}
           />
         </div>
+      </SectionFieldset>
+      
+      <SectionFieldset legend="Asignación de Médico">
+        <EmpleadoComboBox
+          value={form.nombre_medico}
+          label="Especialista"
+          form={form}
+          onChange={handleChangeSimple}
+        />
       </SectionFieldset>
 
       <BotonesAccion

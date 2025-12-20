@@ -28,28 +28,28 @@ const toDDMMYYYY = (fecha) => {
   return `${dia}/${mes}/${anio}`;
 };
 
-export default function pcualitativaantigenoMarsa(datos = {}) {
+export default async function pcualitativaantigenoMarsa(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
-  const drawHeader = () => {
-    CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-    
+  const drawHeader = async () => {
+    await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+
     // Número de Ficha
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Nro de ficha: ", pageW - 80, 15);
     doc.setFont("helvetica", "bold").setFontSize(18);
     doc.text(String(datos.norden || datos.numeroFicha || datos.numero || ""), pageW - 50, 16);
-    
+
     // Sede
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
-    
+
     // Fecha de examen
     const fechaExamen = toDDMMYYYY(datos.fecha_examen || datos.fechaExamen || datos.fecha || "");
     doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
-    
+
     // Página
     doc.text("Pag. 01", pageW - 30, 10);
 
@@ -176,7 +176,7 @@ export default function pcualitativaantigenoMarsa(datos = {}) {
     return yPos;
   };
 
-  drawHeader();
+  await drawHeader();
 
   // === TÍTULO ===
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);

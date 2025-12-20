@@ -6,7 +6,7 @@ import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import { getSign, convertirGenero } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
 
-export default function InformePsicologico_Digitalizado(data = {}, docExistente = null) {
+export default async function InformePsicologico_Digitalizado(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   // Contador de páginas dinámico
@@ -58,9 +58,9 @@ export default function InformePsicologico_Digitalizado(data = {}, docExistente 
   const datosFinales = buildDatosFinales(data);
 
   // Header reutilizable (igual que otros formatos)
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
 
     // Títulos
     doc.setFont("helvetica", "bold").setFontSize(12);
@@ -165,7 +165,7 @@ export default function InformePsicologico_Digitalizado(data = {}, docExistente 
   };
 
   // === PÁGINA 1 ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === SECCIÓN 1: DATOS DE FILIACIÓN ===
   const tablaInicioX = 5;

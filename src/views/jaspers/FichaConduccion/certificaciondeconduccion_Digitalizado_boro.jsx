@@ -5,7 +5,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import { getSign } from '../../utils/helpers.js';
 
-export default function Certificaciondeconduccion_Digitalizado(data = {}) {
+export default async function Certificaciondeconduccion_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -75,9 +75,9 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
   const datosFinales = datosReales;
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete - Subido 3 puntos
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 6.5 }); // 10 - 3 = 6.5
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 6.5 }); // 10 - 3 = 6.5
 
     // Título principal (solo en página 1)
     if (pageNumber === 1) {
@@ -145,7 +145,7 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === TABLA DE DATOS PERSONALES ===
   const tablaInicioX = 10;
@@ -312,7 +312,7 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Años de experiencia:", tablaInicioX + 2, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.anosExperiencia , tablaInicioX + 45, yTexto + 1);
+  doc.text(datosFinales.anosExperiencia, tablaInicioX + 45, yTexto + 1);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Primera aptitud:", tablaInicioX + 62, yTexto + 1);
@@ -847,7 +847,7 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
       siDerecho: data.examenFisicoMovimientoInvoluntarioSi_chk_29_si || false,
       noDerecho: data.examenFisicoMovimientoInvoluntarioNo_chk_29_no || false
     },
-    
+
   ];
 
   // Dibujar todas las filas de la nueva sección
@@ -880,14 +880,14 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
 
   // === Fila única: Fechas + Opciones de Aptitud (6 columnas con anchos variables) ===
   const alturaFilaCombinada = 4.5;
-  
+
   // Definir anchos de columnas proporcionales al contenido
   const anchoDesde = 35;      // "Desde:" + fecha
   const anchoHasta = 35;      // "Hasta:" + fecha  
   const anchoApto = 25;       // "Apto" (más estrecho)
   const anchoObservado = 30;   // "Observado"
   const anchoNoApto = 25;     // "No Apto"
-  
+
   // Calcular posiciones de las divisiones
   const posDesde = tablaInicioX;
   const posHasta = posDesde + anchoDesde;
@@ -895,7 +895,7 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
   const posObservado = posApto + anchoApto;
   const posNoApto = posObservado + anchoObservado;
   const posRestriccion = posNoApto + anchoNoApto;
-  
+
   // Líneas verticales para la fila combinada
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaCombinada); // izquierda
   doc.line(posHasta, yPos, posHasta, yPos + alturaFilaCombinada); // división 1
@@ -904,57 +904,57 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
   doc.line(posNoApto, yPos, posNoApto, yPos + alturaFilaCombinada); // división 4
   doc.line(posRestriccion, yPos, posRestriccion, yPos + alturaFilaCombinada); // división 5
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaCombinada); // derecha
-  
+
   // Líneas horizontales para la fila combinada
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // superior
   doc.line(tablaInicioX, yPos + alturaFilaCombinada, tablaInicioX + tablaAncho, yPos + alturaFilaCombinada); // inferior
 
   // Contenido de la fila combinada
   doc.setFont("helvetica", "normal").setFontSize(8);
-  
+
   // Columna 1: Desde
   doc.text("Desde:", posDesde + 2, yPos + 3);
   doc.text(datosFinales.conclusionDesde || "", posDesde + 15, yPos + 3);
-  
+
   // Columna 2: Hasta
   doc.text("Hasta:", posHasta + 2, yPos + 3);
   doc.text(datosFinales.conclusionHasta || "", posHasta + 15, yPos + 3);
-  
-   // Columna 3: Apto (más estrecho)
-   doc.text("Apto", posApto + 3, yPos + 3);
-   doc.setFont("helvetica", "normal").setFontSize(8);
-   doc.text("(", posApto + 15, yPos + 3);
-   doc.setFont("helvetica", "bold").setFontSize(8);
-   doc.text(datosFinales.conclusionApto ? "X" : "   ", posApto + 17, yPos + 3);
-   doc.setFont("helvetica", "normal").setFontSize(8);
-   doc.text(")", posApto + 20, yPos + 3);
-   
-   // Columna 4: Observado
-   doc.text("Observado", posObservado + 2, yPos + 3);
-   doc.setFont("helvetica", "normal").setFontSize(8);
-   doc.text("(", posObservado + 20, yPos + 3);
-   doc.setFont("helvetica", "bold").setFontSize(8);
-   doc.text(datosFinales.conclusionObservado ? "X" : "   ", posObservado + 22, yPos + 3);
-   doc.setFont("helvetica", "normal").setFontSize(8);
-   doc.text(")", posObservado + 25, yPos + 3);
-   
-   // Columna 5: No Apto
-   doc.text("No Apto", posNoApto + 2, yPos + 3);
-   doc.setFont("helvetica", "normal").setFontSize(8);
-   doc.text("(", posNoApto + 18, yPos + 3);
-   doc.setFont("helvetica", "bold").setFontSize(8);
-   doc.text(datosFinales.conclusionNoApto ? "X" : "   ", posNoApto + 20, yPos + 3);
-   doc.setFont("helvetica", "normal").setFontSize(8);
-   doc.text(")", posNoApto + 23, yPos + 3);
-   
-   // Columna 6: Apto con Restricción (más ancho)
-   doc.text("Apto c/Restricción", posRestriccion + 2, yPos + 3);
-   doc.setFont("helvetica", "normal").setFontSize(8);
-   doc.text("(", posRestriccion + 30, yPos + 3);
-   doc.setFont("helvetica", "bold").setFontSize(8);
-   doc.text(datosFinales.conclusionAptoConRestriccion ? "X" : "   ", posRestriccion + 32, yPos + 3);
-   doc.setFont("helvetica", "normal").setFontSize(8);
-   doc.text(")", posRestriccion + 35, yPos + 3);
+
+  // Columna 3: Apto (más estrecho)
+  doc.text("Apto", posApto + 3, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("(", posApto + 15, yPos + 3);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(datosFinales.conclusionApto ? "X" : "   ", posApto + 17, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(")", posApto + 20, yPos + 3);
+
+  // Columna 4: Observado
+  doc.text("Observado", posObservado + 2, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("(", posObservado + 20, yPos + 3);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(datosFinales.conclusionObservado ? "X" : "   ", posObservado + 22, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(")", posObservado + 25, yPos + 3);
+
+  // Columna 5: No Apto
+  doc.text("No Apto", posNoApto + 2, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("(", posNoApto + 18, yPos + 3);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(datosFinales.conclusionNoApto ? "X" : "   ", posNoApto + 20, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(")", posNoApto + 23, yPos + 3);
+
+  // Columna 6: Apto con Restricción (más ancho)
+  doc.text("Apto c/Restricción", posRestriccion + 2, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("(", posRestriccion + 30, yPos + 3);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(datosFinales.conclusionAptoConRestriccion ? "X" : "   ", posRestriccion + 32, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(")", posRestriccion + 35, yPos + 3);
 
   yPos += alturaFilaCombinada;
 
@@ -967,23 +967,23 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
     if (!texto || texto.trim() === "") {
       return "";
     }
-    
+
     // Dividir por saltos de línea y filtrar líneas vacías
     const lineas = texto.split('\n').filter(linea => linea.trim() !== '');
-    
+
     // Numerar cada línea
     const lineasNumeradas = lineas.map((linea, index) => {
       const numero = index + 1;
       return `${numero}. ${linea.trim()}`;
     });
-    
+
     return lineasNumeradas.join('\n');
   };
 
   // === Fila de observaciones y recomendaciones (sin divisiones internas) ===
   if (datosFinales.observacionesRecomendaciones && datosFinales.observacionesRecomendaciones.trim() !== "") {
     const textoObservacionesRecomendaciones = procesarRecomendaciones(datosFinales.observacionesRecomendaciones);
-    
+
     // Función específica para calcular altura con fuente 6
     const calcularAlturaTextoFuente6 = (texto, anchoMaximo) => {
       if (!texto || texto.trim() === "") return 0;
@@ -1024,7 +1024,7 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
       const alturaCalculada = totalLineas * 2.5 + 4; // 3mm arriba + 1mm abajo de margen
       return Math.max(alturaCalculada, 8);
     };
-    
+
     const alturaFilaObservaciones = calcularAlturaTextoFuente6(textoObservacionesRecomendaciones, tablaAncho - 4);
 
     if (alturaFilaObservaciones > 0) {
@@ -1036,7 +1036,7 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
 
       // Contenido de la fila de observaciones y recomendaciones
       doc.setFont("helvetica", "normal").setFontSize(6.5);
-      
+
       // Función específica para dibujar texto con fuente 6 y interlineado correcto
       const dibujarTextoConSaltoLineaFuente6 = (texto, x, y, anchoMaximo) => {
         // Primero dividir por saltos de línea para manejar cada línea numerada por separado
@@ -1078,7 +1078,7 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
 
         return yPos;
       };
-      
+
       dibujarTextoConSaltoLineaFuente6(textoObservacionesRecomendaciones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
 
       yPos += alturaFilaObservaciones;
@@ -1087,7 +1087,7 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
 
   // === SECCIÓN DE DECLARACIÓN, FIRMA Y HUELLA DEL TRABAJADOR ===
   const alturaSeccionDeclaracion = 30; // Altura para la sección de declaración
-  
+
   // Dibujar las líneas de la sección de declaración (3 columnas)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaSeccionDeclaracion); // Línea izquierda
   doc.line(tablaInicioX + 60, yPos, tablaInicioX + 60, yPos + alturaSeccionDeclaracion); // Primera división
@@ -1099,12 +1099,12 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
   // === COLUMNA 1: DECLARACIÓN ===
   doc.setFont("helvetica", "normal").setFontSize(6);
   const textoDeclaracion = "Declaro que las respuestas son ciertas según mi leal saber y entender. En caso de ser requeridos, los resultados del examen médico pueden ser revelados, en términos generales, al departamento de salud Ocupacional de la compañía. Los resultados pueden ser enviados a mi médico particular de ser considerado necesario.";
-  
+
   // Función para justificar texto
   const justificarTexto = (texto, x, y, anchoMaximo, interlineado) => {
     const lineas = doc.splitTextToSize(texto, anchoMaximo);
     let yActual = y;
-    
+
     lineas.forEach((linea, index) => {
       // Solo justificar si no es la última línea y tiene más de una palabra
       if (index < lineas.length - 1 && linea.includes(' ')) {
@@ -1114,7 +1114,7 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
           const espacioDisponible = anchoMaximo - anchoTexto;
           const espaciosEntrePalabras = palabras.length - 1;
           const espacioExtra = espacioDisponible / espaciosEntrePalabras;
-          
+
           let xActual = x;
           palabras.forEach((palabra, i) => {
             doc.text(palabra, xActual, yActual);
@@ -1132,16 +1132,16 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
       yActual += interlineado;
     });
   };
-  
+
   // Dibujar texto justificado
   justificarTexto(textoDeclaracion, tablaInicioX + 2, yPos + 3, 55, 2.5);
 
   // === COLUMNA 2: FIRMA Y HUELLA DEL TRABAJADOR ===
   const firmaTrabajadorY = yPos + 3;
-  
+
   // Calcular centro de la columna 2 para centrar las imágenes
   const centroColumna2X = tablaInicioX + 60 + (60 / 2); // Centro de la columna 2
-  
+
   // Agregar firma del trabajador (lado izquierdo)
   let firmaTrabajadorUrl = getSign(data, "FIRMAP");
   if (firmaTrabajadorUrl) {
@@ -1169,7 +1169,7 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
       console.log("Error cargando huella del trabajador:", error);
     }
   }
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
   const centroColumna2 = tablaInicioX + 60 + (60 / 2);
   doc.text("Firma y Huella del trabajador", centroColumna2, yPos + 26, { align: "center" });
@@ -1177,7 +1177,7 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
   // === COLUMNA 3: SELLO Y FIRMA DEL MÉDICO ===
   const firmaMedicoX = tablaInicioX + 125;
   const firmaMedicoY = yPos + 3;
-  
+
   // Agregar firma y sello médico
   let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
   if (firmaMedicoUrl) {
@@ -1191,7 +1191,7 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
       console.log("Error cargando firma del médico:", error);
     }
   }
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
   const centroColumna3 = tablaInicioX + 120 + (70 / 2);
   doc.text("Sello y Firma del Médico", centroColumna3, yPos + 26, { align: "center" });

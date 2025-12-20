@@ -1,4 +1,6 @@
-const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, numeroPagina = 1) => {
+import { compressImage } from "../../../utils/helpers";
+
+const headerEvaluacionMuscoloEsqueletica = async (doc, datos, mostrarFrame = true, numeroPagina = 1) => {
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 12;
@@ -36,11 +38,12 @@ const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, num
 
   // === NUEVO: Usar imagen de fondo para la cabecera ===
   if (mostrarFrame) {
-    const fondoImg = "/img/Header_EvaluacionMusculoEsqueletica.png";
+    const fondoImg = "/img/Header_EvaluacionMusculoEsqueletica.webp";
+    const imgCompressed = await compressImage(fondoImg);
     const fondoH = 47; // altura aproximada de la cabecera en mm (ajusta si es necesario)
     let yHeader = 0; // Pegado a la parte superior
     try {
-      doc.addImage(fondoImg, "PNG", 0, yHeader, pageW, fondoH); // Todo el ancho de la hoja
+      doc.addImage(imgCompressed, "WEBP", 0, yHeader, pageW, fondoH); // Todo el ancho de la hoja
     } catch (e) {
       doc.text("Imagen de cabecera no disponible", margin, yHeader + 10);
     }
@@ -50,18 +53,18 @@ const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, num
   if (numeroPagina === 1) {
     // 3) Información de sede y número de ficha a la derecha
     const sedeValue = datosFinales.sede || '';
-    
+
     // Número de ficha primero - con posiciones independientes
-    const fichaNum = String(datosFinales.norden ?? "") ;
+    const fichaNum = String(datosFinales.norden ?? "");
     const fichaX = pageW - margin - 20; // Posición X independiente
     const fichaY = y + 10.5; // Posición Y independiente
-    
+
     // Número de ficha grande (sin subrayado) - sin etiqueta
     doc.setFont("helvetica", "normal").setFontSize(18);
     doc.text(fichaNum, fichaX, fichaY);
-    
+
     // Subrayado del número de ficha QUITADO
-    
+
     // Sede debajo del número de ficha - con posiciones independientes
     const sedeX2 = pageW - margin - 18; // Posición X independiente
     const sedeY2 = y + 4; // Posición Y independiente
@@ -76,7 +79,7 @@ const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, num
       let boxSize = 15;
       let boxX = pageW - margin - boxSize; // Posición X independiente
       let boxY = y - 11; // Subido 20 puntos (antes y + 2, ahora y - 18)
-      
+
       // Draw box outline in black
       doc.setDrawColor(0);
       doc.setLineWidth(0.5);
@@ -134,13 +137,13 @@ const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, num
     const xFecha = margin + 132;
     const yFecha = margin + 19;
     let fechaFormateada = datosFinales.fecha || "";
-    
+
     // Formatear fecha a DD/MM/YYYY si viene en formato YYYY-MM-DD
     if (fechaFormateada && fechaFormateada.includes("-")) {
       const [yyyy, mm, dd] = fechaFormateada.split("-");
       fechaFormateada = `${dd}/${mm}/${yyyy}`;
     }
-    
+
     doc.text(fechaFormateada, xFecha, yFecha);
 
     // Edad
@@ -168,7 +171,7 @@ const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, num
   } else {
     // Para la página 2, mostrar solo: número de página, sede y bloque de color
     const sedeValue = datosFinales.sede || 'Trujillo-Pierola';
-    
+
     // Sede en la esquina superior derecha
     const sedeX2 = pageW - margin - 18;
     const sedeY2 = y + 4;
@@ -181,7 +184,7 @@ const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, num
     let boxSize = 15;
     let boxX = pageW - margin - boxSize;
     let boxY = y - 11;
-    
+
     // Draw box outline in black
     doc.setDrawColor(0);
     doc.setLineWidth(0.5);

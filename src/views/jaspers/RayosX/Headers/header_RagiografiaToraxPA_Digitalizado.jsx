@@ -2,6 +2,9 @@
  * Header maqueta para RADIOGRAFÍA DE TORAX P.A
  * @param {jsPDF} doc - Instancia de jsPDF
  */
+
+import { compressImage } from "../../../utils/helpers";
+
 // === FOOTER FICHA RADIOGRAFÍA CABECERA ===
 function footerFichaRadiografiaCabecera(doc, opts = {}, datos = {}) {
   const margin = 15;
@@ -76,13 +79,13 @@ function footerFichaRadiografiaCabecera(doc, opts = {}, datos = {}) {
     }
     yFila += rowH;
   });
-  
+
   // Agregar website
   doc.setFont('helvetica', 'normal').setFontSize(6);
   doc.text("Web : www.horizontemedic.com", baseX, yFila + 2);
 }
 
-const HeaderRagiografiaToraxPA = (doc, datos) => {
+const HeaderRagiografiaToraxPA = async (doc, datos) => {
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 12;
@@ -91,8 +94,10 @@ const HeaderRagiografiaToraxPA = (doc, datos) => {
   const logoW = 60,
     logoH = 20;
   const logoY = y + 10;
+  const img = "/img/logo-color.webp";
+  const imgCompressed = await compressImage(img);
   try {
-    doc.addImage("./img/logo-color.png", "PNG", margin, logoY, logoW, logoH);
+    doc.addImage(imgCompressed, "WEBP", margin, logoY, logoW, logoH);
   } catch {
     doc
       .setFont("helvetica", "normal")
@@ -105,41 +110,41 @@ const HeaderRagiografiaToraxPA = (doc, datos) => {
   // 3) Sección de datos del paciente
   const datosPacienteY = y + 35; // Bajado de 35 a 45
   const datosPacienteX = margin + 25;
-  
+
   // Título "EXAMEN" centrado y con fuente más grande
   doc.setFont("helvetica", "normal").setFontSize(15);
   const examTitle = "EXAMEN : RADIOGRAFIA DE TORAX P.A";
   const examTitleX = pageW / 2;
   doc.text(examTitle, examTitleX, datosPacienteY + 5, { align: "center" }); // Bajado 5 puntos
-  
+
   // Subrayar el texto del examen - LÍNEA ARRIBA DEL TEXTO
   const examWidth = doc.getTextWidth(examTitle);
   const examX = examTitleX - examWidth / 2;
   doc.setLineWidth(0.3);
   doc.line(examX, datosPacienteY + 6, examX + examWidth, datosPacienteY + 6); // Línea arriba del texto
-  
-    function formatearFecha(fechaStr) {
-  if (!fechaStr) return ""; // Si está vacío
-  
-  const [anio, mes, dia] = fechaStr.split("-").map(Number);
-  const fecha = new Date(anio, mes - 1, dia); // Fecha local
-  
-  const diasSemana = [
-    "DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", 
-    "JUEVES", "VIERNES", "SÁBADO"
-  ];
-  
-  const meses = [
-    "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", 
-    "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"
-  ];
-  
-  const diaSemana = diasSemana[fecha.getDay()];
-  const diaMes = fecha.getDate();
-  const nombreMes = meses[fecha.getMonth()];
-  
-  return `${diaSemana} ${diaMes} DE ${nombreMes} DEL ${anio}`;
-}
+
+  function formatearFecha(fechaStr) {
+    if (!fechaStr) return ""; // Si está vacío
+
+    const [anio, mes, dia] = fechaStr.split("-").map(Number);
+    const fecha = new Date(anio, mes - 1, dia); // Fecha local
+
+    const diasSemana = [
+      "DOMINGO", "LUNES", "MARTES", "MIÉRCOLES",
+      "JUEVES", "VIERNES", "SÁBADO"
+    ];
+
+    const meses = [
+      "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO",
+      "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"
+    ];
+
+    const diaSemana = diasSemana[fecha.getDay()];
+    const diaMes = fecha.getDate();
+    const nombreMes = meses[fecha.getMonth()];
+
+    return `${diaSemana} ${diaMes} DE ${nombreMes} DEL ${anio}`;
+  }
   // Datos del paciente - todos en mayúsculas y labels en negrita
   const pacienteData = [
     { label: "NOMBRES", value: (datos.nombres || "").toUpperCase() },
@@ -147,25 +152,25 @@ const HeaderRagiografiaToraxPA = (doc, datos) => {
     { label: "FECHA", value: formatearFecha(datos.fechaExamen || "") },
     { label: "EDAD", value: datos.edad ? `${datos.edad} AÑOS` : "" }
   ];
-  
+
   // Calcular el ancho máximo de los labels para alinearlos
   const maxLabelWidth = Math.max(...pacienteData.map(item => doc.getTextWidth(item.label)));
   const labelSpacing = 15; // Espacio entre label y valor
-  
+
   let pacienteY = datosPacienteY + 20; // Ajustar posición después del título centrado
   pacienteData.forEach(item => {
     // Label en negrita con fuente más grande (9 + 1.5 = 10.5)
     doc.setFont("helvetica", "bold").setFontSize(10.5);
     doc.text(item.label, datosPacienteX, pacienteY);
-    
+
     // Agregar los dos puntos alineados
     const labelX = datosPacienteX + maxLabelWidth + 5; // 5 puntos de separación
     doc.text(":", labelX, pacienteY);
-    
+
     // Valor en normal con fuente más grande (9 + 1.5 = 10.5)
     doc.setFont("helvetica", "normal").setFontSize(10.5);
     doc.text(item.value, labelX + 5 + labelSpacing, pacienteY);
-    
+
     pacienteY += 5;
   });
 
@@ -173,27 +178,27 @@ const HeaderRagiografiaToraxPA = (doc, datos) => {
   const sedeValue = `${datos.sede || ''}`;
   const sedeX = pageW - margin - 20;
   const sedeY = y + 6;
-  
+
   // Número de ficha primero
   const fichaNum = `${datos.norden || ""}`;
 
   const fichaY = sedeY;
-  
+
   // Texto "N° Ficha :" delante del número
   const fichaLabelX = sedeX - 40;
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("N° Ficha :", fichaLabelX, fichaY);
-  
+
   // Número de ficha grande y subrayado
   const fichaNumX = fichaLabelX + doc.getTextWidth("N° Ficha :") + 5;
   doc.setFont("helvetica", "bold").setFontSize(22);
   doc.text(fichaNum, fichaNumX, fichaY);
-  
+
   // Subrayar el número de ficha
   const fichaWidth = doc.getTextWidth(fichaNum);
   doc.setLineWidth(0.3);
   doc.line(fichaNumX, fichaY + 1, fichaNumX + fichaWidth, fichaY + 1);
-  
+
   // Sede debajo del número de ficha
   const sedeY2 = sedeY + 8;
   doc.setFont("helvetica", "normal").setFontSize(9);
@@ -207,7 +212,7 @@ const HeaderRagiografiaToraxPA = (doc, datos) => {
     let boxSize = 15;
     let boxX = pageW - margin - boxSize;
     let boxY = y + 2;
-    
+
     // Draw box outline in black
     doc.setDrawColor(0);
     doc.setLineWidth(0.5);

@@ -15,7 +15,7 @@ export default function BotonesAccion({ form, handleSave, handleClear, handlePri
                 <button
                     type="button"
                     onClick={handleClear}
-                    className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                    className="bg-amber-500 hover:bg-amber-600 text-white text-base px-6 py-2 rounded flex items-center gap-2"
                 >
                     <FontAwesomeIcon icon={faBroom} /> Limpiar
                 </button>
@@ -27,6 +27,7 @@ export default function BotonesAccion({ form, handleSave, handleClear, handlePri
                         name="norden"
                         value={form.norden}
                         onChange={handleChangeNumberDecimals}
+                        onKeyUp={(e) => e.key === "Enter" && handlePrint()}
                         className="border rounded px-2 py-1 text-base w-24"
                     />
 

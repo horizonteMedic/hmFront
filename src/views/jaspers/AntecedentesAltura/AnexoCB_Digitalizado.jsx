@@ -5,7 +5,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 
-export default function GenerarDatosPaciente(data = {}, docExistente = null) {
+export default async function GenerarDatosPaciente(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -237,7 +237,7 @@ export default function GenerarDatosPaciente(data = {}, docExistente = null) {
   };
 
   // === HEADER ===
-  CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+  await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
   doc.setFont("helvetica", "normal").setFontSize(13);
   doc.setTextColor(0, 0, 0);

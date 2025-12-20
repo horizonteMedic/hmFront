@@ -29,7 +29,7 @@ const drawUnderlinedTitle = (doc, text, y) => {
 
 // --- Componente Principal ---
 
-export default function PruebaVDRL_Digitalizado(datos) {
+export default async function PruebaVDRL_Digitalizado(datos) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -52,12 +52,12 @@ export default function PruebaVDRL_Digitalizado(datos) {
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
-    let y = 90; 
+    let y = 90;
 
     // === TÍTULO ===
     drawUnderlinedTitle(doc, 'INMUNOLOGÍA', y);
     y += config.lineHeight * 2;
-    
+
     // === MUESTRA Y MÉTODO ===
     doc.setFontSize(config.fontSize.header);
     doc.setFont(config.font, 'bold');
@@ -78,7 +78,7 @@ export default function PruebaVDRL_Digitalizado(datos) {
     doc.text('EXAMEN', config.margin, y);
     const resultColX = pageW / 2 + 40;
     doc.text('RESULTADO', resultColX, y, { align: 'left' });
-    
+
     y += 3;
     doc.setLineWidth(0.3);
     doc.line(config.margin, y, pageW - config.margin, y);
@@ -89,7 +89,7 @@ export default function PruebaVDRL_Digitalizado(datos) {
     doc.setFont(config.font, 'normal');
     doc.setFontSize(config.fontSize.body);
     doc.text('VDRL (Método: Aglutinación de lípidos complejos)', config.margin, y + 6);
-    
+
     // Resultado
     doc.setFont(config.font, 'bold');
     doc.text(datos.txtResultado || 'NO REACTIVO', resultColX, y + 6, { align: 'left' });
@@ -165,5 +165,5 @@ export default function PruebaVDRL_Digitalizado(datos) {
 
   })
 
-  
+
 }

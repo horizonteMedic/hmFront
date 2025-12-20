@@ -6,7 +6,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import { getSign } from '../../utils/helpers.js';
 
-export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digitalizado(data = {}) {
+export default async function Certificacion_suficiencia_trabajos_en_altura_boro_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -231,9 +231,9 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   const datosFinales = data && data.norden ? datosReales : datosPrueba;
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete - Subido 3.5 puntos
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 6.5 }); // 10 - 3.5 = 6.5
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 6.5 }); // 10 - 3.5 = 6.5
 
     // Título principal (solo en página 1)
     if (pageNumber === 1) {
@@ -303,7 +303,7 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === TABLA DE DATOS PERSONALES ===
   const tablaInicioX = 10;
@@ -804,7 +804,7 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   doc.text("FC :", tablaInicioX + 2, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.fc ? (datosFinales.fc + " lpm") : "", tablaInicioX + 8, yPos + 3);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("FR :", tablaInicioX + 25, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -972,14 +972,14 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
 
   // === Fila única: Fechas + Opciones de Aptitud (6 columnas con anchos variables) ===
   const alturaFilaCombinada = 4.5;
-  
+
   // Definir anchos de columnas proporcionales al contenido
   const anchoDesde = 35;      // "Desde:" + fecha
   const anchoHasta = 35;      // "Hasta:" + fecha  
   const anchoApto = 25;       // "Apto" (más estrecho)
   const anchoObservado = 30;   // "Observado"
   const anchoNoApto = 25;     // "No Apto"
-  
+
   // Calcular posiciones de las divisiones
   const posDesde = tablaInicioX;
   const posHasta = posDesde + anchoDesde;
@@ -987,7 +987,7 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   const posObservado = posApto + anchoApto;
   const posNoApto = posObservado + anchoObservado;
   const posRestriccion = posNoApto + anchoNoApto;
-  
+
   // Líneas verticales para la fila combinada
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaCombinada); // izquierda
   doc.line(posHasta, yPos, posHasta, yPos + alturaFilaCombinada); // división 1
@@ -996,22 +996,22 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   doc.line(posNoApto, yPos, posNoApto, yPos + alturaFilaCombinada); // división 4
   doc.line(posRestriccion, yPos, posRestriccion, yPos + alturaFilaCombinada); // división 5
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaCombinada); // derecha
-  
+
   // Líneas horizontales para la fila combinada
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // superior
   doc.line(tablaInicioX, yPos + alturaFilaCombinada, tablaInicioX + tablaAncho, yPos + alturaFilaCombinada); // inferior
 
   // Contenido de la fila combinada
   doc.setFont("helvetica", "normal").setFontSize(8);
-  
+
   // Columna 1: Desde
   doc.text("Desde:", posDesde + 2, yPos + 3);
   doc.text(datosFinales.conclusionDesde || "", posDesde + 15, yPos + 3);
-  
+
   // Columna 2: Hasta
   doc.text("Hasta:", posHasta + 2, yPos + 3);
   doc.text(datosFinales.conclusionHasta || "", posHasta + 15, yPos + 3);
-  
+
   // Columna 3: Apto (más estrecho)
   doc.text("Apto", posApto + 3, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -1020,7 +1020,7 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   doc.text(datosFinales.conclusionApto ? "X" : "   ", posApto + 17, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(")", posApto + 20, yPos + 3);
-  
+
   // Columna 4: Observado
   doc.text("Observado", posObservado + 2, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -1029,7 +1029,7 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   doc.text(datosFinales.conclusionObservado ? "X" : "   ", posObservado + 22, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(")", posObservado + 25, yPos + 3);
-  
+
   // Columna 5: No Apto
   doc.text("No Apto", posNoApto + 2, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -1038,7 +1038,7 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   doc.text(datosFinales.conclusionNoApto ? "X" : "   ", posNoApto + 18, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(")", posNoApto + 21, yPos + 3);
-  
+
   // Columna 6: Apto con Restricción (más ancho)
   doc.text("Apto c/Restricción", posRestriccion + 2, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -1056,12 +1056,12 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
 
   // Procesar observaciones usando normalizeList
   let observacionesLista = normalizeList(datosFinales.observacionesRecomendaciones);
-  
+
   // Si no hay observaciones, usar observación por defecto
   if (observacionesLista.length === 0) {
     observacionesLista = ["Sin observaciones adicionales"];
   }
-  
+
   // Crear texto con formato de lista (cada item en una línea)
   const observacionesTexto = observacionesLista.map(item => `${item}`).join('\n');
 
@@ -1079,7 +1079,7 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
 
   // Dibujar el texto de las observaciones en formato de lista con fuente 6
   doc.setFont("helvetica", "normal").setFontSize(6);
-  
+
   // Función específica para dibujar texto con fuente 6 y interlineado correcto
   const dibujarTextoConSaltoLineaFuente6 = (texto, x, y, anchoMaximo) => {
     // Primero dividir por saltos de línea para manejar cada línea numerada por separado
@@ -1121,9 +1121,9 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
 
     return yPos;
   };
-  
+
   dibujarTextoConSaltoLineaFuente6(observacionesTexto, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
-  
+
   yPos += alturaFilaObservaciones;
 
 
@@ -1158,12 +1158,12 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   // === COLUMNA 1: DECLARACIÓN ===
   doc.setFont("helvetica", "normal").setFontSize(6);
   const textoDeclaracion = "Declaro que las respuestas son ciertas según mi leal saber y entender. En caso de ser requeridos, los resultados del examen médico pueden ser revelados, en términos generales, al departamento de salud Ocupacional de la compañía. Los resultados pueden ser enviados a mi médico particular de ser considerado necesario.";
-  
+
   // Función para justificar texto
   const justificarTexto = (texto, x, y, anchoMaximo, interlineado) => {
     const lineas = doc.splitTextToSize(texto, anchoMaximo);
     let yActual = y;
-    
+
     lineas.forEach((linea, index) => {
       // Solo justificar si no es la última línea y tiene más de una palabra
       if (index < lineas.length - 1 && linea.includes(' ')) {
@@ -1173,7 +1173,7 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
           const espacioDisponible = anchoMaximo - anchoTexto;
           const espaciosEntrePalabras = palabras.length - 1;
           const espacioExtra = espacioDisponible / espaciosEntrePalabras;
-          
+
           let xActual = x;
           palabras.forEach((palabra, i) => {
             doc.text(palabra, xActual, yActual);
@@ -1191,16 +1191,16 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
       yActual += interlineado;
     });
   };
-  
+
   // Dibujar texto justificado
   justificarTexto(textoDeclaracion, tablaInicioX + 2, yDeclaracion + 3, 55, 2.5);
 
   // === COLUMNA 2: FIRMA Y HUELLA DEL TRABAJADOR ===
   const firmaTrabajadorY = yDeclaracion + 3;
-  
+
   // Calcular centro de la columna 2 para centrar las imágenes
   const centroColumna2X = tablaInicioX + 60 + (60 / 2); // Centro de la columna 2
-  
+
   // Agregar firma del trabajador (lado izquierdo)
   let firmaTrabajadorUrl = getSign(data, "FIRMAP");
   if (firmaTrabajadorUrl) {
@@ -1228,7 +1228,7 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
       console.log("Error cargando huella del trabajador:", error);
     }
   }
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
   const centroColumna2 = tablaInicioX + 60 + (60 / 2);
   doc.text("Firma y Huella del trabajador", centroColumna2, yDeclaracion + 26, { align: "center" });
@@ -1236,7 +1236,7 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   // === COLUMNA 3: SELLO Y FIRMA DEL MÉDICO ===
   const firmaMedicoX = tablaInicioX + 125;
   const firmaMedicoY = yDeclaracion + 3;
-  
+
   // Agregar firma y sello médico
   let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
   if (firmaMedicoUrl) {
@@ -1250,7 +1250,7 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
       console.log("Error cargando firma del médico:", error);
     }
   }
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
   const centroColumna3 = tablaInicioX + 120 + (70 / 2);
   doc.text("Sello y Firma del Médico", centroColumna3, yDeclaracion + 26, { align: "center" });

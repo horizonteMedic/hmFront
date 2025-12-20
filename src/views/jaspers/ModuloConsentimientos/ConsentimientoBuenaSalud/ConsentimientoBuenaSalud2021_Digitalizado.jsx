@@ -4,7 +4,7 @@ import footerTR from "../../components/footerTR.jsx";
 import drawColorBox from "../../components/ColorBox.jsx";
 import { formatearFechaLargaConDia } from "../../../utils/formatDateUtils.js";
 
-export default function ConsentimientoBuenaSalud2021_Digitalizado(data = {}) {
+export default async function ConsentimientoBuenaSalud2021_Digitalizado(data = {}) {
     const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
     const margin = 20;
     const pageW = doc.internal.pageSize.getWidth();
@@ -40,8 +40,8 @@ export default function ConsentimientoBuenaSalud2021_Digitalizado(data = {}) {
     };
 
     // Header con datos de ficha, sede y fecha
-    const drawHeader = () => {
-        CabeceraLogo(doc, { ...data, tieneMembrete: false });
+    const drawHeader = async () => {
+        await CabeceraLogo(doc, { ...data, tieneMembrete: false });
 
         // Número de Ficha
         doc.setFont("helvetica", "normal").setFontSize(8);
@@ -93,7 +93,7 @@ export default function ConsentimientoBuenaSalud2021_Digitalizado(data = {}) {
         const datosFinales = datosReales;
 
         // === 0) HEADER CON LOGO, N° FICHA, SEDE Y BLOQUE DE COLOR ===
-        drawHeader();
+        await drawHeader();
 
         // === 1) TÍTULO PRINCIPAL ===
         const titulo = "Consentimiento de Buena Salud".toUpperCase();

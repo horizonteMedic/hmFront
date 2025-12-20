@@ -1,0 +1,42 @@
+{
+  "dniPaciente": 0,
+  "nombresPaciente": "string",
+  "apellidosPaciente": "string",
+  "direccionPaciente": "string",
+  "sexoPaciente": "string",
+  "fechaNacimientoPaciente": "2025-12-19",
+  "ocupacionPaciente": "string",
+  "lugarNacimientoPaciente": "string",
+  "nivelEstudioPaciente": "string",
+  "estadoCivilPaciente": "string",
+  "edadPaciente": "string",
+  "norden": 0,
+  "empresa": "string",
+  "cargoPaciente": "string",
+  "areaPaciente": "string",
+  "contrata": "string",
+  "codigoClinica": "string",
+  "tipoExamen": "string",
+  "criterioApneaObstructivaSueno": "string",
+  "criterioFatigaSomnolencia": "string",
+  "criterioHipertensionArterial": "string",
+  "analisisFodaFortalezasOportunidades": "string",
+  "analisisFodaAmenazasDebilidades": "string",
+  "observaciones": "string",
+  "recomendaciones": "string",
+  "perfilCumple": true,
+  "perfilNoCumple": true,
+  "userRegistro": "string",
+  "fechaRegistro": "2025-12-19",
+  "usuarioFirma": "string",
+  "nombreSede": "string",
+  "sede": "string",
+  "color": 0,
+  "nameJasper": "string",
+  "digitalizacion": [
+    {
+      "nombreDigitalizacion": "string",
+      "url": "string"
+    }
+  ]
+}

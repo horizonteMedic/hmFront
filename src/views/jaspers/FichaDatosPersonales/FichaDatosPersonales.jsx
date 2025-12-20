@@ -4,7 +4,7 @@ import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 
-export default function FichaDatosPersonales(data = {}) {
+export default async function FichaDatosPersonales(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -145,7 +145,7 @@ export default function FichaDatosPersonales(data = {}) {
   };
 
   // Header con logo
-  CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+  await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
   // Título principal
   doc.setFont("helvetica", "bold").setFontSize(14);
@@ -927,7 +927,7 @@ export default function FichaDatosPersonales(data = {}) {
   doc.addPage();
 
   // Header página 2
-  CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+  await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
   doc.setFont("helvetica", "bold").setFontSize(14);
   doc.setTextColor(0, 0, 0);
@@ -1205,12 +1205,12 @@ export default function FichaDatosPersonales(data = {}) {
 
   // Fila 1: Sueldo/Jornal | Transporte Terrestre | Viaticos
   doc.setFont("helvetica", "normal").setFontSize(8);
-  
+
   // Sueldo/Jornal
   doc.text("Sueldo/Jornal:", tablaInicioX, yPos + 3.5);
   doc.text("S/.", tablaInicioX + 28, yPos + 3.5);
   doc.rect(tablaInicioX + 35, yPos + 0.5, 30, filaAltura - 1);
-  
+
   // Transporte Terrestre
   doc.text("Transporte Terrestre", tablaInicioX + 70, yPos + 3.5);
   doc.text("Si", tablaInicioX + 102, yPos + 3.5);
@@ -1218,7 +1218,7 @@ export default function FichaDatosPersonales(data = {}) {
   doc.text("X", tablaInicioX + 108.5, yPos + 3.5);
   doc.text("No", tablaInicioX + 114, yPos + 3.5);
   doc.rect(tablaInicioX + 120, yPos + 0.5, 5, filaAltura - 1);
-  
+
   // Viaticos
   doc.text("Viaticos", tablaInicioX + 130, yPos + 3.5);
   doc.text("Si", tablaInicioX + 148, yPos + 3.5);
@@ -1227,13 +1227,13 @@ export default function FichaDatosPersonales(data = {}) {
   doc.rect(tablaInicioX + 167, yPos + 0.5, 5, filaAltura - 1);
   doc.text("S/.", tablaInicioX + 175, yPos + 3.5);
   doc.rect(tablaInicioX + 182, yPos + 0.5, 18, filaAltura - 1);
-  
+
   yPos += filaAltura;
 
   // Fila 2: Sistema Trabajo | Transporte Aéreo
   doc.text("Sistema Trabajo", tablaInicioX, yPos + 3.5);
   doc.rect(tablaInicioX + 35, yPos + 0.5, 30, filaAltura - 1);
-  
+
   // Transporte Aéreo
   doc.text("Transporte Aéreo", tablaInicioX + 70, yPos + 3.5);
   doc.text("Si", tablaInicioX + 102, yPos + 3.5);
@@ -1242,7 +1242,7 @@ export default function FichaDatosPersonales(data = {}) {
   doc.text("No", tablaInicioX + 114, yPos + 3.5);
   doc.rect(tablaInicioX + 120, yPos + 0.5, 5, filaAltura - 1);
   doc.text("X", tablaInicioX + 121.5, yPos + 3.5);
-  
+
   yPos += filaAltura;
 
   // Fila 3: Alimentación A cta. Contrata
@@ -1292,7 +1292,7 @@ export default function FichaDatosPersonales(data = {}) {
 
   // === SECCIÓN: FIRMAS ===
   yPos += 3; // Bajar 3mm
-  
+
   // Cuadro Huella Digital (centro)
   const huellaAncho = 20;
   const huellaAlto = 25;
@@ -1313,13 +1313,13 @@ export default function FichaDatosPersonales(data = {}) {
 
   // Fecha y Lugar (centrado)
   doc.setFont("helvetica", "bold").setFontSize(8);
-  
+
   // Obtener fecha actual formateada
   const fechaActual = new Date();
   const diasSemana = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
   const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
   const fechaFormateada = `${diasSemana[fechaActual.getDay()]} ${fechaActual.getDate()} ${meses[fechaActual.getMonth()]} ${fechaActual.getFullYear()}`;
-  
+
   const textoFechaLugar = `Fecha y Lugar:        ${datosFinales.sede},        ${fechaFormateada}`;
   doc.text(textoFechaLugar, pageW / 2, yPos, { align: "center" });
 

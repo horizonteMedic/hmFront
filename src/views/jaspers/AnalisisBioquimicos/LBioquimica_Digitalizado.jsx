@@ -29,30 +29,30 @@ const toDDMMYYYY = (fecha) => {
 
 
 // Header con datos de ficha, sede y fecha
-const drawHeader = (doc, datos = {}) => {
+const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
-  
-  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-  
+
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Nro de ficha: ", pageW - 80, 15);
   doc.setFont("helvetica", "normal").setFontSize(18);
   doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
-  
+
   // Sede
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
-  
+
   // Fecha de examen
   const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
   doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
-  
+
   // Página
   doc.text("Pag. 01", pageW - 30, 10);
 
   // Bloque de color
-   drawColorBox(doc, {
+  drawColorBox(doc, {
     color: datos.codigoColor,
     text: datos.textoColor,
     x: pageW - 30,
@@ -183,13 +183,13 @@ const drawPatientData = (doc, datos = {}) => {
   return yPos;
 };
 
-export default function LBioquimica_Digitalizado(datos) {
+export default async function LBioquimica_Digitalizado(datos) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
-  drawHeader(doc, datos);
-  
+  await drawHeader(doc, datos);
+
   // === TÍTULO BIOQUÍMICA ===
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
   doc.text('BIOQUÍMICA', pageW / 2, 38, { align: 'center' });
@@ -238,7 +238,7 @@ export default function LBioquimica_Digitalizado(datos) {
     const dataRows = [
       {
         prueba: 'CREATININA SÉRICA',
-        resultado: datos.txtCreatinina  || '',
+        resultado: datos.txtCreatinina || '',
         normales: 'Adulto: 0.8 - 1.4 mg/dl\nNiño: 0.24 - 0.84 mg/dl'
       },
       {
@@ -248,7 +248,7 @@ export default function LBioquimica_Digitalizado(datos) {
       },
       {
         prueba: 'ÁCIDO ÚRICO SÉRICO',
-        resultado: datos.txtAcidoUrico  || '',
+        resultado: datos.txtAcidoUrico || '',
         normales: 'Mujeres: 2.5 - 6.8 mg/dl\nHombres 3.6 - 7.7 mg/dl'
       }
     ];
@@ -274,7 +274,7 @@ export default function LBioquimica_Digitalizado(datos) {
     const sigY = y + 12;
     const gap = 16;
     const lineY = sigY + sigH + 3;
-    
+
     // Función auxiliar para agregar sello al PDF
     const agregarSello = (img, xPos, yPos, width, height) => {
       if (!img) return;
@@ -286,7 +286,7 @@ export default function LBioquimica_Digitalizado(datos) {
       const selloBase64 = canvas.toDataURL('image/png');
       doc.addImage(selloBase64, 'PNG', xPos, yPos, width, height);
     };
-    
+
     // Función auxiliar para dibujar línea y texto debajo del sello
     const dibujarLineaYTexto = (centroX, lineY, tipoSello) => {
       doc.setLineWidth(0.2);
@@ -303,14 +303,14 @@ export default function LBioquimica_Digitalizado(datos) {
         doc.text("Firma y Sello", centroX, lineY + 5, { align: "center" });
       }
     };
-    
+
     if (s1 && s2) {
       const totalWidth = sigW * 2 + gap;
       const startX = (pageW - totalWidth) / 2;
-      
+
       agregarSello(s1, startX, sigY, sigW, sigH);
       agregarSello(s2, startX + sigW + gap, sigY, sigW, sigH);
-      
+
       const centroSello1X = startX + sigW / 2;
       const centroSello2X = startX + sigW + gap + sigW / 2;
       dibujarLineaYTexto(centroSello1X, lineY, 'SELLOFIRMA');

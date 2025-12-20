@@ -28,32 +28,32 @@ const interpretarUrlParaLeer = (url) => {
 // Función para formatear fechas de YYYY-MM-DD, YYYY/MM/DD, DD/MM/YYYY o texto como "lunes 04 noviembre 2024" a "LUNES DD DE MES DEL YYYY"
 const formatearFecha = (fecha) => {
   if (!fecha || fecha.trim() === "") return "";
-  
+
   const meses = {
     "01": "ENERO", "02": "FEBRERO", "03": "MARZO", "04": "ABRIL",
     "05": "MAYO", "06": "JUNIO", "07": "JULIO", "08": "AGOSTO",
     "09": "SEPTIEMBRE", "10": "OCTUBRE", "11": "NOVIEMBRE", "12": "DICIEMBRE"
   };
-  
+
   const mesesTexto = {
     "enero": "01", "febrero": "02", "marzo": "03", "abril": "04",
     "mayo": "05", "junio": "06", "julio": "07", "agosto": "08",
     "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12"
   };
-  
+
   const diasSemanaES = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
-  
+
   // Función para obtener el día de la semana de una fecha
   const obtenerDiaSemana = (año, mes, dia) => {
     const fechaObj = new Date(año, mes - 1, dia); // mes - 1 porque Date usa 0-11
     return diasSemanaES[fechaObj.getDay()];
   };
-  
+
   const fechaLimpia = fecha.trim().toLowerCase();
-  
+
   // Verificar si es formato de texto (contiene nombres de meses)
   const contieneTextoMes = Object.keys(mesesTexto).some(mes => fechaLimpia.includes(mes));
-  
+
   if (contieneTextoMes) {
     // Formato de texto: "lunes 04 noviembre 2024", "martes 5 de agosto del 2025", etc.
     // INCLUIR el día de la semana en el resultado final
@@ -62,22 +62,22 @@ const formatearFecha = (fecha) => {
     const todasLasPalabras = fechaLimpia.split(/\s+/);
     const palabras = todasLasPalabras.filter(palabra => !palabrasIgnorar.includes(palabra));
     let dia, mesTexto, año, diaSemana;
-    
+
     // Buscar día de la semana
     diaSemana = todasLasPalabras.find(palabra => diasSemana.includes(palabra));
     if (diaSemana) diaSemana = diaSemana.toUpperCase();
-    
+
     // Buscar día (número de 1-2 dígitos)
     const diaMatch = palabras.find(palabra => /^\d{1,2}$/.test(palabra));
     if (diaMatch) dia = diaMatch.padStart(2, "0");
-    
+
     // Buscar mes (nombre del mes)
     mesTexto = palabras.find(palabra => mesesTexto[palabra]);
-    
+
     // Buscar año (número de 4 dígitos)
     const añoMatch = palabras.find(palabra => /^\d{4}$/.test(palabra));
     if (añoMatch) año = añoMatch;
-    
+
     if (dia && mesTexto && año) {
       const numeroMes = mesesTexto[mesTexto];
       const nombreMes = meses[numeroMes];
@@ -89,15 +89,15 @@ const formatearFecha = (fecha) => {
       }
     }
   }
-  
+
   // Formato numérico: YYYY-MM-DD, YYYY/MM/DD o DD/MM/YYYY
   let separador = fechaLimpia.includes('-') ? '-' : '/';
   const partes = fechaLimpia.split(separador);
-  
+
   if (partes.length !== 3) return fecha; // Si no tiene formato correcto, devolver original
-  
+
   let dia, mes, año;
-  
+
   // Detectar formato: si el primer elemento tiene 4 dígitos es YYYY-MM-DD o YYYY/MM/DD
   if (partes[0].length === 4) {
     // Formato YYYY-MM-DD o YYYY/MM/DD
@@ -110,13 +110,13 @@ const formatearFecha = (fecha) => {
     mes = partes[1].padStart(2, "0");
     año = partes[2];
   }
-  
+
   const nombreMes = meses[mes];
   if (!nombreMes) return fecha; // Si el mes no es válido, devolver original
-  
+
   // CALCULAR el día de la semana para fechas numéricas
   const diaSemanaCalculado = obtenerDiaSemana(parseInt(año), parseInt(mes), parseInt(dia));
-  
+
   return `${diaSemanaCalculado} ${parseInt(dia)} DE ${nombreMes} DEL ${año}`;
 };
 
@@ -234,11 +234,11 @@ const headerOdontograma = (doc, datos) => {
     // const color = datos.codigoColor || "#008f39";
     // const boxText = (datos.textoColor || "F").toUpperCase();
     const color = (datos.codigoColor?.trim() && datos.codigoColor.trim() !== ""
-            ? datos.codigoColor.trim()
-            : "#008f39");
+      ? datos.codigoColor.trim()
+      : "#008f39");
     const boxText = (datos.textoColor?.trim() && datos.textoColor.trim() !== ""
-            ? datos.textoColor.trim().toUpperCase()
-            : "F");
+      ? datos.textoColor.trim().toUpperCase()
+      : "F");
     let boxSize = 15;
     let boxX = pageW - margin - boxSize;
     let boxY = y + 2;
@@ -270,7 +270,7 @@ const headerOdontograma = (doc, datos) => {
   doc.setFont("helvetica", "normal").setFontSize(10);
 };
 
-export default function Odontograma_lo_Digitalizado(data = {}) {
+export default async function Odontograma_lo_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "landscape" });
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
@@ -559,9 +559,9 @@ export default function Odontograma_lo_Digitalizado(data = {}) {
     align: "right",
   });
 
-   // === OBSERVACIONES Y LUGAR FECHA ===
+  // === OBSERVACIONES Y LUGAR FECHA ===
   // Observaciones - Coordenadas individuales
-     const xObservaciones = margin + 138; // AJUSTAR POSICIÓN X DE OBSERVACIONES AQUÍ
+  const xObservaciones = margin + 138; // AJUSTAR POSICIÓN X DE OBSERVACIONES AQUÍ
   const yObservaciones = margin + 142; // AJUSTAR POSICIÓN Y DE OBSERVACIONES AQUÍ
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.observaciones, xObservaciones, yObservaciones, {
@@ -570,7 +570,7 @@ export default function Odontograma_lo_Digitalizado(data = {}) {
 
   // Lugar y Fecha - Coordenadas individuales
   const xLugarFecha = margin + 134; // AJUSTAR POSICIÓN X DE LUGAR Y FECHA AQUÍ
-     const yLugarFecha = margin + 156.5; // AJUSTAR POSICIÓN Y DE LUGAR Y FECHA AQUÍ
+  const yLugarFecha = margin + 156.5; // AJUSTAR POSICIÓN Y DE LUGAR Y FECHA AQUÍ
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(datosFinales.lugarFecha, xLugarFecha, yLugarFecha);
 

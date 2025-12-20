@@ -26,22 +26,22 @@ const toDDMMYYYY = (fecha) => {
 };
 
 // Header con datos de ficha, sede y fecha
-const drawHeader = (doc, datos = {}) => {
+const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
-  
-  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-  
+
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Nro de ficha: ", pageW - 80, 15);
   doc.setFont("helvetica", "normal").setFontSize(18);
   doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
-  
+
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
-  
+
   const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
   doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
-  
+
   doc.text("Pag. 01", pageW - 30, 10);
 
   drawColorBox(doc, {
@@ -152,13 +152,13 @@ const drawPatientData = (doc, datos = {}) => {
   return yPos;
 };
 
-export default function ExamenCompletoOrina(datos = {}) {
+export default async function ExamenCompletoOrina(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
-  drawHeader(doc, datos);
-  
+  await drawHeader(doc, datos);
+
   // === TÍTULO ===
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
   doc.text("ANALISIS BIOQUIMICOS", pageW / 2, 38, { align: "center" });
@@ -192,7 +192,7 @@ export default function ExamenCompletoOrina(datos = {}) {
     doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
     doc.text("Examen Macroscópico de la orina", config.margin, y);
     y += config.lineHeight;
-    
+
     doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
     const macroscopico = [
       ["Color", datos.txtColor || ""],
@@ -209,21 +209,21 @@ export default function ExamenCompletoOrina(datos = {}) {
       ["Sangre", datos.txtSangre || ""],
       ["Leucocitos", datos.txtLeucocitos || ""],
     ];
-    
+
     macroscopico.forEach(([lbl, value]) => {
       doc.text(lbl, config.margin, y);
       doc.text(":", colData - 5, y);
       doc.text(String(value), colData, y);
       y += 5;
     });
-    
+
     y += 4;
-    
+
     // === SEDIMENTO URINARIO ===
     doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
     doc.text("Sedimento urinario", config.margin, y);
     y += config.lineHeight;
-    
+
     doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
     const sedimento = [
       ["Células epiteliales", datos.txtCelulasEpiteliales || ""],
@@ -235,7 +235,7 @@ export default function ExamenCompletoOrina(datos = {}) {
       ["Bacterias", datos.txtBacterias || ""],
       ["Gram S/C", datos.txtGramSC || ""],
     ];
-    
+
     sedimento.forEach(([lbl, value]) => {
       doc.text(lbl, config.margin, y);
       doc.text(":", colData - 5, y);
@@ -248,11 +248,11 @@ export default function ExamenCompletoOrina(datos = {}) {
     const sigH = 23;
     const sigY = 210;
     const gap = 16;
-    
+
     if (s1 && s2) {
       const totalWidth = sigW * 2 + gap;
       const startX = (pageW - totalWidth) / 2;
-      
+
       const addSello = (img, xPos) => {
         const canvas = document.createElement('canvas');
         canvas.width = img.width;

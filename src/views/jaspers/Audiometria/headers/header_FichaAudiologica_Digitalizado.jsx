@@ -1,10 +1,13 @@
 // Header para Ficha Audiológica: logo izquierda, número ficha grande derecha, sede debajo
+
+import { compressImage } from "../../../utils/helpers";
+
 /**
  * Dibuja el header de la ficha audiológica: logo izquierda, número ficha grande derecha, sede debajo
  * @param {jsPDF} doc - Instancia de jsPDF
  * @param {object} datos - { norden: string|number, sede: string }
  */
-const header_FichaAudiologica = (doc, datos = {}) => {
+const header_FichaAudiologica = async (doc, datos = {}) => {
   const margin = 18;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 12;
@@ -13,8 +16,10 @@ const header_FichaAudiologica = (doc, datos = {}) => {
   const logoW = 37,
     logoH = 15; // Más pequeño y ancho
   const logoY = y + 10; // bajar un poco el logo
+  const img = "/img/logo-color.webp";
+  const imgCompressed = await compressImage(img);
   try {
-    doc.addImage("./img/logo-color.png", "PNG", margin, logoY, logoW, logoH);
+    doc.addImage(imgCompressed, "WEBP", margin, logoY, logoW, logoH);
   } catch {
     doc
       .setFont("helvetica", "bold")
@@ -36,7 +41,7 @@ const header_FichaAudiologica = (doc, datos = {}) => {
   let boxSize = 15;
   let boxX = pageW - margin - boxSize;
   let boxY = y + 2;
-  if (colorValido ) {
+  if (colorValido) {
     // Forzar a mostrar para prueba visual
     // Draw box outline in black
     doc.setDrawColor(0);
@@ -64,31 +69,31 @@ const header_FichaAudiologica = (doc, datos = {}) => {
   // Sede arriba
   const sedeX = pageW - margin - 17; // más a la izquierda
   const sedeY = y + 8;
-  
+
   // Calcular el ancho del label "Sede:" para posicionarlo correctamente
   doc.setFont("helvetica", "bold").setFontSize(9);
   const sedeLabelWidth = doc.getTextWidth("Sede:");
   const sedeLabelX = sedeX - sedeLabelWidth - 50; // 25 unidades de separación hacia la izquierda
-  
+
   // Agregar label "Sede:" antes del valor
   doc.text("Sede:", sedeLabelX, sedeY, { align: "left" });
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(`${datos.sede || ""}`, sedeX, sedeY, { align: "right" });
-  
+
   // Número de ficha grande, negrita, subrayado, abajo
   const fichaX = sedeX; // misma posición X
   const fichaY = sedeY + 6;
-  
+
   // Calcular el ancho del label "N° Ficha:" para posicionarlo correctamente
   doc.setFont("helvetica", "bold").setFontSize(9);
   const fichaLabelWidth = doc.getTextWidth("N° Ficha:");
   const fichaLabelX = fichaX - fichaLabelWidth - 25; // 25 unidades de separación hacia la izquierda
-  
+
   // Agregar label "N° Ficha:" antes del valor
   doc.text("N° Ficha:", fichaLabelX, fichaY, { align: "left" });
   doc.setFont("helvetica", "normal").setFontSize(18);
   doc.text(`${datos.norden || ""}`, fichaX, fichaY, { align: "right" });
-  
+
   // Subrayado
   const fichaWidth = doc.getTextWidth(`${datos.norden || ""}`);
   doc.setLineWidth(1.2);

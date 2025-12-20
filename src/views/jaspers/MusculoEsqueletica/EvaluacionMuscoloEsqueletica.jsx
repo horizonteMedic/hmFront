@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import headerEvaluacionMuscoloEsqueletica from "./Headers/Header_EvaluacionMuscoloEsqueletica.jsx";
-import { compressImage } from "../../utils/helpers.js";
+import { compressImage, getSign, getSignCompressed } from "../../utils/helpers.js";
 
 export default async function EvaluacionMuscoloEsqueletica(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -494,7 +494,7 @@ export default async function EvaluacionMuscoloEsqueletica(data = {}, docExisten
 
   // === PÁGINA 1 ===
   // === 0) HEADER ===
-  headerEvaluacionMuscoloEsqueletica(doc, data, true, 1);
+  await headerEvaluacionMuscoloEsqueletica(doc, data, true, 1);
 
   // === 1) Imagen de fondo para la evaluación músculo esquelética ===
   const fondoImg = "/img/EvaluacionMusculoEsqueletica_pag1.png";
@@ -509,7 +509,7 @@ export default async function EvaluacionMuscoloEsqueletica(data = {}, docExisten
 
   try {
     const imgCompressed = await compressImage(fondoImg);
-    doc.addImage(imgCompressed, "JPEG", xOffset, yOffset, imgWidth, imgHeight);
+    doc.addImage(imgCompressed, "jpeg", xOffset, yOffset, imgWidth, imgHeight);
   } catch (e) {
     console.error("Error al agregar imagen de fondo:", e);
     doc.text("Imagen de evaluación músculo esquelética no disponible", margin, yOffset + 10);
@@ -1683,7 +1683,7 @@ export default async function EvaluacionMuscoloEsqueletica(data = {}, docExisten
 
   try {
     const imgCompressed2 = await compressImage(fondoImgPag2);
-    doc.addImage(imgCompressed2, "JPEG", xOffsetPag2, yOffsetPag2, imgWidthPag2, imgHeightPag2);
+    doc.addImage(imgCompressed2, "png", xOffsetPag2, yOffsetPag2, imgWidthPag2, imgHeightPag2);
   } catch (e) {
     doc.text("Imagen de evaluación músculo esquelética página 2 no disponible", margin, yOffsetPag2 + 10);
   }
@@ -2374,29 +2374,103 @@ export default async function EvaluacionMuscoloEsqueletica(data = {}, docExisten
   //   iframe.contentWindow.focus();
   //   iframe.contentWindow.print();
   // };
-  const firmasAPintar = [
-    {
-      nombre: "FIRMAP", x: margin + 21, y: margin + 235, maxw: 50
-    },
-    {
-      nombre: "HUELLA", x: margin + 80, y: margin + 235, maxw: 20
-    },
-    {
-      nombre: "SELLOFIRMA", x: margin + 120, y: margin + 235, maxw: 50
-    }
-  ];
-
   // Validar que data.informacionSede exista antes de acceder a sus propiedades
-  const digitalizacion = data?.informacionSede?.digitalizacion || [];
-  agregarFirmas(doc, digitalizacion, firmasAPintar).then(() => {
-    // === Imprimir ===
-    console.log("docExistente", docExistente);
-    if (docExistente) {
-      return doc;
-    } else {
-      imprimir(doc);
-    }
-  });
+  const sedeData = data?.informacionSede || {};
+
+  // Obtener firmas comprimidas (JPEG por defecto)
+  const firmap = await getSign(sedeData, "FIRMAP");
+  const huellap = await getSign(sedeData, "HUELLA");
+  const sellofirma = await getSign(sedeData, "SELLOFIRMA");
+
+  // Definir altura base y margenes fijos
+  const sigH = 35;
+  const yBase = margin + 235;
+
+  // FIRMAP
+  if (firmap) {
+    const maxW = 50;
+    const xBase = margin + 21;
+
+    // Obtener dimensiones reales para escalar
+    await new Promise((resolve) => {
+      const img = new Image();
+      img.src = firmap;
+      img.onload = () => {
+        let imgW = img.width;
+        let imgH = img.height;
+        const scale = Math.min(maxW / imgW, sigH / imgH, 1);
+        imgW *= scale;
+        imgH *= scale;
+
+        // Centrado horizontal en su caja (opcional, pero en original era xBase) -> xBase + (maxW - imgW)/2 ?
+        // La lógica previa usaba: imgX = baseX + (imgW - imgW)/2 = baseX.
+        // Asi que usaremos xBase directo como estaba antes.
+        const imgX = xBase;
+        const imgY = yBase + (sigH - imgH) / 2;
+
+        doc.addImage(firmap, "JPEG", imgX, imgY, imgW, imgH);
+        resolve();
+      };
+      img.onerror = () => resolve();
+    });
+  }
+
+  // HUELLA
+  if (huellap) {
+    const maxW = 20;
+    const xBase = margin + 80;
+
+    await new Promise((resolve) => {
+      const img = new Image();
+      img.src = huellap;
+      img.onload = () => {
+        let imgW = img.width;
+        let imgH = img.height;
+        const scale = Math.min(maxW / imgW, sigH / imgH, 1);
+        imgW *= scale;
+        imgH *= scale;
+
+        const imgX = xBase;
+        const imgY = yBase + (sigH - imgH) / 2;
+
+        doc.addImage(huellap, "JPEG", imgX, imgY, imgW, imgH);
+        resolve();
+      };
+      img.onerror = () => resolve();
+    });
+  }
+
+  // SELLOFIRMA
+  if (sellofirma) {
+    const maxW = 50;
+    const xBase = margin + 120;
+
+    await new Promise((resolve) => {
+      const img = new Image();
+      img.src = sellofirma;
+      img.onload = () => {
+        let imgW = img.width;
+        let imgH = img.height;
+        const scale = Math.min(maxW / imgW, sigH / imgH, 1);
+        imgW *= scale;
+        imgH *= scale;
+
+        const imgX = xBase;
+        const imgY = yBase + (sigH - imgH) / 2;
+
+        doc.addImage(sellofirma, "JPEG", imgX, imgY, imgW, imgH);
+        resolve();
+      };
+      img.onerror = () => resolve();
+    });
+  }
+
+  // === Imprimir ===
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 function imprimir(doc) {
   const blob = doc.output("blob");
@@ -2408,51 +2482,4 @@ function imprimir(doc) {
   iframe.onload = () => iframe.contentWindow.print();
 }
 
-function agregarFirmas(doc, digitalizacion = [], firmasAPintar = []) {
-  const addSello = (imagenUrl, x, y, maxw = 100) => {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = imagenUrl;
-      img.onload = () => {
-        const sigH = 35; // alto máximo
-        const maxW = maxw; // ancho máximo como parámetro
-        const baseX = x;
-        const baseY = y;
 
-        let imgW = img.width;
-        let imgH = img.height;
-
-        // Escala proporcional en base a ancho y alto máximos
-        const scale = Math.min(maxW / imgW, sigH / imgH, 1);
-        imgW *= scale;
-        imgH *= scale;
-
-        // Ahora el ancho se adapta
-        const sigW = imgW;
-
-        // Centrar la imagen
-        const imgX = baseX + (sigW - imgW) / 2;
-        const imgY = baseY + (sigH - imgH) / 2;
-
-        doc.addImage(imagenUrl, "PNG", imgX, imgY, imgW, imgH);
-        resolve();
-      };
-      img.onerror = (e) => {
-        console.error("Error al cargar la imagen:", e);
-        resolve();
-      };
-    });
-  };
-
-  const firmas = digitalizacion.reduce(
-    (acc, d) => ({ ...acc, [d.nombreDigitalizacion]: d.url }),
-    {}
-  );
-
-  const promesasFirmas = firmasAPintar
-    .filter((f) => firmas[f.nombre])
-    .map((f) => addSello(firmas[f.nombre], f.x, f.y, f.maxw));
-
-  return Promise.all(promesasFirmas);
-}

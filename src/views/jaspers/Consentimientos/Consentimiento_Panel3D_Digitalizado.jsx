@@ -5,7 +5,7 @@ import footerTR from "../components/footerTR.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
 import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
 
-export default function Consentimiento_Panel3D_Digitalizado(datos) {
+export default async function Consentimiento_Panel3D_Digitalizado(datos) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -19,28 +19,28 @@ export default function Consentimiento_Panel3D_Digitalizado(datos) {
   };
 
   // Header con datos de ficha, sede y fecha
-  const drawHeader = () => {
-    CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-    
+  const drawHeader = async () => {
+    await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+
     // Número de Ficha
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Nro de ficha: ", pageW - 80, 15);
     doc.setFont("helvetica", "normal").setFontSize(18);
     doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
-    
+
     // Sede
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
-    
+
     // Fecha de examen
     const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
     doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
-    
+
     // Página
     doc.text("Pag. 01", pageW - 30, 10);
 
     // Bloque de color
-     drawColorBox(doc, {
+    drawColorBox(doc, {
       color: datos.codigoColor,
       text: datos.textoColor,
       x: pageW - 30,
@@ -52,7 +52,7 @@ export default function Consentimiento_Panel3D_Digitalizado(datos) {
     });
   };
 
-  drawHeader();
+  await drawHeader();
 
   // Contenido del documento
   let y = 44;
@@ -167,7 +167,7 @@ export default function Consentimiento_Panel3D_Digitalizado(datos) {
   function formatearFecha(fecha) {
     if (!fecha) return '';
     const [anio, mes, dia] = fecha.split('-');
-      return `${dia}/${mes}/${anio}`;
+    return `${dia}/${mes}/${anio}`;
   }
   function checkBox(checked) {
     // Usar espacios duros para igualar el ancho visual
@@ -212,7 +212,7 @@ export default function Consentimiento_Panel3D_Digitalizado(datos) {
     styles: { fontSize: 11, cellPadding: 1 },
     columnStyles: { 0: { cellWidth: 105 }, 1: { cellWidth: 20 }, 2: { cellWidth: 20 }, 3: { cellWidth: 50 } },
     margin: { left: 14 },
-    didDrawPage: () => {}
+    didDrawPage: () => { }
   });
 
   // Fecha del examen en la parte inferior

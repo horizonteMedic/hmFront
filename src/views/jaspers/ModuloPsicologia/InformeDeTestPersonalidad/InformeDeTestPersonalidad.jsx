@@ -6,7 +6,7 @@ import { convertirGenero } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
 import { dibujarFirmas } from "../../../utils/dibujarFirmas.js";
 
-export default function InformeDeTestPersonalidad(data = {}, docExistente = null) {
+export default async function InformeDeTestPersonalidad(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   // Contador de páginas dinámico
@@ -42,9 +42,9 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
   const datosFinales = buildDatosFinales(data);
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
 
     // Títulos
     doc.setFont("helvetica", "bold").setFontSize(12);
@@ -81,7 +81,7 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
     if (!texto || texto === null || texto === undefined) {
       return y;
     }
-    
+
     const fontSize = doc.internal.getFontSize();
     const palabras = String(texto).split(' ');
     let lineaActual = '';
@@ -152,7 +152,7 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
   };
 
   // === PÁGINA 1 ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === SECCIÓN 1: DATOS DE FILIACIÓN ===
   const tablaInicioX = 5;
@@ -309,17 +309,17 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
   doc.setFillColor(196, 196, 196);
   doc.rect(tablaInicioX, yPos, colGrupo + colAspecto, filaAltura, 'F');
   doc.rect(tablaInicioX, yPos, colGrupo + colAspecto, filaAltura, 'S');
-  
+
   // Columna Bajo (Rojo)
   doc.setFillColor(255, 0, 0);
   doc.rect(tablaInicioX + colGrupo + colAspecto, yPos, colBajo, filaAltura, 'F');
   doc.rect(tablaInicioX + colGrupo + colAspecto, yPos, colBajo, filaAltura, 'S');
-  
+
   // Columna Medio (Amarillo)
   doc.setFillColor(255, 255, 0);
   doc.rect(tablaInicioX + colGrupo + colAspecto + colBajo, yPos, colMedio, filaAltura, 'F');
   doc.rect(tablaInicioX + colGrupo + colAspecto + colBajo, yPos, colMedio, filaAltura, 'S');
-  
+
   // Columna Alto (Verde)
   doc.setFillColor(0, 255, 0);
   doc.rect(tablaInicioX + colGrupo + colAspecto + colBajo + colMedio, yPos, colAlto, filaAltura, 'F');
@@ -338,7 +338,7 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
   const dibujarGrupo = (tituloGrupo, aspectos, y) => {
     const numFilas = aspectos.length;
     const alturaGrupo = filaAltura * numFilas;
-    
+
     // Celda del grupo que se extiende verticalmente
     doc.rect(tablaInicioX, y, colGrupo, alturaGrupo, 'S');
     doc.setFont("helvetica", "bold").setFontSize(8);
@@ -348,10 +348,10 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
     lineas.forEach((linea, idx) => {
       doc.text(linea, tablaInicioX + colGrupo / 2, yTexto + idx * 3, { align: "center" });
     });
-    
-      // Dibujar cada aspecto del grupo
-      let currentY = y;
-      aspectos.forEach((aspecto) => {
+
+    // Dibujar cada aspecto del grupo
+    let currentY = y;
+    aspectos.forEach((aspecto) => {
       // Celda aspecto
       doc.rect(tablaInicioX + colGrupo, currentY, colAspecto, filaAltura, 'S');
       doc.setFont("helvetica", "normal").setFontSize(8);
@@ -365,12 +365,12 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
           doc.text(linea, tablaInicioX + colGrupo + 2, currentY + 2 + (idx * 3));
         });
       }
-      
+
       // Celdas Bajo, Medio, Alto
       doc.rect(tablaInicioX + colGrupo + colAspecto, currentY, colBajo, filaAltura, 'S');
       doc.rect(tablaInicioX + colGrupo + colAspecto + colBajo, currentY, colMedio, filaAltura, 'S');
       doc.rect(tablaInicioX + colGrupo + colAspecto + colBajo + colMedio, currentY, colAlto, filaAltura, 'S');
-      
+
       // Marcar X según valor
       const valor = data[aspecto.campo] || '';
       const valorLower = String(valor).toLowerCase();
@@ -381,10 +381,10 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
       } else if (valorLower === "alto") {
         doc.text("X", tablaInicioX + colGrupo + colAspecto + colBajo + colMedio + colAlto / 2, currentY + 4, { align: "center" });
       }
-      
+
       currentY += filaAltura;
     });
-    
+
     return currentY;
   };
 
@@ -411,7 +411,7 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
     { nombre: "ANSIOSO", campo: "ansioso" }
   ], yPos);
 
-  
+
   doc.setFillColor(196, 196, 196);
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
@@ -428,20 +428,20 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
 
     const padding = 3;
     doc.setFont("helvetica", "normal").setFontSize(8);
-    
+
     // Dividir texto en líneas
     const lineas = doc.splitTextToSize(String(texto), anchoMaximo - 4);
     const alturaTexto = lineas.length * 3.5 + padding * 2;
     const alturaFinal = Math.max(alturaMinima, alturaTexto);
-    
+
     // Dibujar borde
     doc.rect(tablaInicioX, y, tablaAncho, alturaFinal, 'S');
-    
+
     // Dibujar texto
     lineas.forEach((linea, idx) => {
       doc.text(linea, x + 2, y + padding + 2 + (idx * 3.5));
     });
-    
+
     return y + alturaFinal;
   };
 
@@ -459,25 +459,25 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
   // Función para procesar recomendaciones (separar por líneas o guiones)
   const procesarRecomendaciones = (texto) => {
     if (!texto || texto.trim() === '') return [];
-    
+
     // Si tiene saltos de línea, dividir por ellos
     if (texto.includes('\n')) {
       return texto.split('\n').filter(item => item.trim() !== '');
     }
-    
+
     // Si tiene guiones al inicio, dividir por ellos
     if (texto.includes('-')) {
       const items = texto.split(/-/).filter(item => item.trim() !== '');
       return items.map(item => item.trim());
     }
-    
+
     // Si no, devolver como un solo item
     return [texto];
   };
 
   // Procesar recomendaciones
   const itemsRecomendaciones = procesarRecomendaciones(datosFinales.recomendaciones);
-  
+
   // Calcular altura necesaria
   let alturaRecomendaciones = 20;
   if (itemsRecomendaciones.length > 0) {
@@ -488,10 +488,10 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
     });
     alturaRecomendaciones = Math.max(20, alturaTotal + 4);
   }
-  
+
   // Dibujar borde
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaRecomendaciones, 'S');
-  
+
   // Dibujar recomendaciones
   doc.setFont("helvetica", "normal").setFontSize(8);
   let yRecomendaciones = yPos + 3;
@@ -518,7 +518,7 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
   const colXW = 15; // Ancho para columna de X
   const colVaciaW = 15; // Ancho para columna vacía
   const colTextoW = (tablaAncho - colVaciaW - colXW) / 2; // Ancho para columnas de texto
-  
+
   // Dibujar las 4 columnas
   doc.rect(tablaInicioX, yPos, colTextoW, filaAltura, 'S'); // Columna 1: CUMPLE CON EL PERFIL
   doc.rect(tablaInicioX + colTextoW, yPos, colVaciaW, filaAltura, 'S'); // Columna 2: Vacía
@@ -526,21 +526,21 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
   doc.rect(tablaInicioX + colTextoW * 2 + colVaciaW, yPos, colXW, filaAltura, 'S'); // Columna 4: X
 
   const cumplePerfil = datosFinales.cumplePerfil ?? true;
-  
+
   // Columna 1: CUMPLE CON EL PERFIL
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("CUMPLE CON EL PERFIL", tablaInicioX + colTextoW / 2, yPos + 4, { align: "center" });
-  
+
   // Columna 2: Vacía
-  
+
   // Columna 3: NO CUMPLE CON EL PERFIL
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("NO CUMPLE CON EL PERFIL", tablaInicioX + colTextoW + colVaciaW + colTextoW / 2, yPos + 4, { align: "center" });
-  
+
   // Columna 4: X (si NO cumple)
   doc.setFont("helvetica", "bold").setFontSize(12);
   doc.text(!cumplePerfil ? "X" : "", tablaInicioX + colTextoW * 2 + colVaciaW + colXW / 2, yPos + 4, { align: "center" });
-  
+
   yPos += filaAltura;
 
   // === SECCIÓN 6: FIRMAS ===
@@ -565,7 +565,7 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
     console.error(err);
     // === FOOTER ===
     footerTR(doc, { footerOffsetY: 10 });
-    
+
     if (!docExistente) {
       imprimir(doc);
     }

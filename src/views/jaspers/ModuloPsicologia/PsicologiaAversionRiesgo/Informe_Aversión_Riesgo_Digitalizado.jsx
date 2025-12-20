@@ -5,7 +5,7 @@ import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import footerTR from '../../components/footerTR.jsx';
 import drawColorBox from '../../components/ColorBox.jsx';
 
-export default function Informe_Aversion_Riesgo_Digitalizado(data = {}) {
+export default async function Informe_Aversion_Riesgo_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -71,7 +71,7 @@ export default function Informe_Aversion_Riesgo_Digitalizado(data = {}) {
   };
 
   // === HEADER / CABECERA ===
-  CabeceraLogo(doc, { ...datosReales, tieneMembrete: false });
+  await CabeceraLogo(doc, { ...datosReales, tieneMembrete: false });
 
   // Número de Ficha y Página
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -223,16 +223,16 @@ export default function Informe_Aversion_Riesgo_Digitalizado(data = {}) {
   doc.setFillColor(196, 196, 196);
   doc.rect(tablaInicioX, yPos, colCategoria + colAspecto, filaAltura, 'F');
   doc.rect(tablaInicioX, yPos, colCategoria + colAspecto, filaAltura, 'S');
-  
+
   // Columnas de colores
   doc.setFillColor(255, 0, 0); // Rojo - Bajo
   doc.rect(tablaInicioX + colCategoria + colAspecto, yPos, colBajo, filaAltura, 'F');
   doc.rect(tablaInicioX + colCategoria + colAspecto, yPos, colBajo, filaAltura, 'S');
-  
+
   doc.setFillColor(255, 255, 0); // Amarillo - Medio
   doc.rect(tablaInicioX + colCategoria + colAspecto + colBajo, yPos, colMedio, filaAltura, 'F');
   doc.rect(tablaInicioX + colCategoria + colAspecto + colBajo, yPos, colMedio, filaAltura, 'S');
-  
+
   doc.setFillColor(0, 255, 0); // Verde - Alto
   doc.rect(tablaInicioX + colCategoria + colAspecto + colBajo + colMedio, yPos, colAlto, filaAltura, 'F');
   doc.rect(tablaInicioX + colCategoria + colAspecto + colBajo + colMedio, yPos, colAlto, filaAltura, 'S');
@@ -258,17 +258,17 @@ export default function Informe_Aversion_Riesgo_Digitalizado(data = {}) {
         doc.text(linea, tablaInicioX + colCategoria / 2, yTexto + idx * 3, { align: "center" });
       });
     }
-    
+
     // Celda aspecto
     doc.rect(tablaInicioX + colCategoria, y, colAspecto, filaAltura, 'S');
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(aspecto, tablaInicioX + colCategoria + 2, y + 4);
-    
+
     // Celdas Bajo, Medio, Alto
     doc.rect(tablaInicioX + colCategoria + colAspecto, y, colBajo, filaAltura, 'S');
     doc.rect(tablaInicioX + colCategoria + colAspecto + colBajo, y, colMedio, filaAltura, 'S');
     doc.rect(tablaInicioX + colCategoria + colAspecto + colBajo + colMedio, y, colAlto, filaAltura, 'S');
-    
+
     // Marcar X según valor
     const valorLower = valor.toLowerCase();
     if (valorLower === "bajo") {
@@ -278,7 +278,7 @@ export default function Informe_Aversion_Riesgo_Digitalizado(data = {}) {
     } else if (valorLower === "alto") {
       doc.text("X", tablaInicioX + colCategoria + colAspecto + colBajo + colMedio + colAlto / 2, y + 4, { align: "center" });
     }
-    
+
     return y + filaAltura;
   };
 
@@ -314,16 +314,16 @@ export default function Informe_Aversion_Riesgo_Digitalizado(data = {}) {
   const alturaMinima = 20;
   const padding = 3;
   doc.setFont("helvetica", "normal").setFontSize(8);
-  
+
   let alturaAnalisis = alturaMinima;
   if (datosAdicionales.analisisResultados && doc.getTextWidth(datosAdicionales.analisisResultados) > tablaAncho - 4) {
     const lineas = doc.splitTextToSize(datosAdicionales.analisisResultados, tablaAncho - 4);
     const alturaTexto = lineas.length * 3.5 + padding * 2;
     alturaAnalisis = Math.max(alturaMinima, alturaTexto);
   }
-  
+
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaAnalisis, 'S');
-  
+
   if (datosAdicionales.analisisResultados) {
     if (doc.getTextWidth(datosAdicionales.analisisResultados) > tablaAncho - 4) {
       const lineas = doc.splitTextToSize(datosAdicionales.analisisResultados, tablaAncho - 4);
@@ -351,9 +351,9 @@ export default function Informe_Aversion_Riesgo_Digitalizado(data = {}) {
     const alturaTexto = lineas.length * 3.5 + padding * 2;
     alturaRecomendaciones = Math.max(alturaMinima, alturaTexto);
   }
-  
+
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaRecomendaciones, 'S');
-  
+
   if (datosAdicionales.recomendaciones) {
     if (doc.getTextWidth(datosAdicionales.recomendaciones) > tablaAncho - 4) {
       const lineas = doc.splitTextToSize(datosAdicionales.recomendaciones, tablaAncho - 4);
@@ -369,7 +369,7 @@ export default function Informe_Aversion_Riesgo_Digitalizado(data = {}) {
   // === FILA DE FIRMA DEL PSICÓLOGO ===
   const alturaFirma = 25;
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaFirma, 'S');
-  
+
   // Agregar firma del psicólogo (imagen)
   let firmaPsicologoUrl = getSign(dataFinal, "SELLOFIRMA");
   if (firmaPsicologoUrl) {
@@ -401,7 +401,7 @@ export default function Informe_Aversion_Riesgo_Digitalizado(data = {}) {
   doc.rect(tablaInicioX + colCumpleW * 3, yPos, colCumpleW, filaAltura, 'S');
 
   const cumplePerfil = dataFinal.cumplePerfil ?? true;
-  
+
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("CUMPLE CON EL PERFIL", tablaInicioX + colCumpleW / 2, yPos + 4, { align: "center" });
   doc.setFont("helvetica", "normal").setFontSize(8);

@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 import footerCons from "./FooterCons.jsx";
 import headerConInformadoOcupacional from "./Header/header_conInformadoOcupacional_Digitalizado.jsx";
 
-export default function ConsentimientoRayosX_Digitalizado(data = {}) {
+export default async function ConsentimientoRayosX_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const margin = 20;
   const pageW = doc.internal.pageSize.getWidth();
@@ -59,7 +59,7 @@ export default function ConsentimientoRayosX_Digitalizado(data = {}) {
     ocupacion: obtenerStringMayus("ocupacion"),
     empresa: obtenerStringMayus("empresa"),
     fecha: obtenerString("fecha"),
-    codigoSede:obtenerString("codigoSede"), 
+    codigoSede: obtenerString("codigoSede"),
   };
 
   const sello1 = data.digitalizacion?.find(
@@ -121,15 +121,15 @@ export default function ConsentimientoRayosX_Digitalizado(data = {}) {
 
     // Texto completo dividido en partes para rayos X
     const textoPartes = [
-        {text: "Yo, ", bold: false},
-        {text:  datosFinales.nombre, bold: true},
-        {text: " de ", bold: false},
-        {text: `${datosFinales.edad} años de edad`, bold: true},
-        {text: ", identificado con DNI: ", bold: false},
-        {text:   datosFinales.dni, bold: true},
-        {text: " con ocupación laboral de  ", bold: false},
-        {text:   datosFinales.ocupacion, bold: true},
-        {text: "  de la Empresa:  ", bold: false}
+      { text: "Yo, ", bold: false },
+      { text: datosFinales.nombre, bold: true },
+      { text: " de ", bold: false },
+      { text: `${datosFinales.edad} años de edad`, bold: true },
+      { text: ", identificado con DNI: ", bold: false },
+      { text: datosFinales.dni, bold: true },
+      { text: " con ocupación laboral de  ", bold: false },
+      { text: datosFinales.ocupacion, bold: true },
+      { text: "  de la Empresa:  ", bold: false }
     ];
 
     // Configuración de formato
@@ -139,28 +139,28 @@ export default function ConsentimientoRayosX_Digitalizado(data = {}) {
 
     // Función para agregar una línea completa
     const agregarLinea = (texto, esNegrita) => {
-        doc.setFont("helvetica", esNegrita ? "bold" : "normal");
-        doc.text(texto, currentX, currentY);
-        currentX += doc.getTextWidth(texto);
+      doc.setFont("helvetica", esNegrita ? "bold" : "normal");
+      doc.text(texto, currentX, currentY);
+      currentX += doc.getTextWidth(texto);
     };
 
     // Procesar cada parte del texto
     textoPartes.forEach((parte) => {
-        const palabras = parte.text.split(' ');
-        palabras.forEach((palabra, i) => {
-            const palabraConEspacio = i > 0 ? ' ' + palabra : palabra;
-            const anchoPalabra = doc.getTextWidth(palabraConEspacio);
-            
-            if (currentX + anchoPalabra <= maxWidth + margin) {
-                // Agregar a la línea actual
-                agregarLinea(palabraConEspacio, parte.bold);
-            } else {
-                // Nueva línea
-                currentY += lineHeight;
-                currentX = margin;
-                agregarLinea(palabra, parte.bold);
-            }
-        });
+      const palabras = parte.text.split(' ');
+      palabras.forEach((palabra, i) => {
+        const palabraConEspacio = i > 0 ? ' ' + palabra : palabra;
+        const anchoPalabra = doc.getTextWidth(palabraConEspacio);
+
+        if (currentX + anchoPalabra <= maxWidth + margin) {
+          // Agregar a la línea actual
+          agregarLinea(palabraConEspacio, parte.bold);
+        } else {
+          // Nueva línea
+          currentY += lineHeight;
+          currentX = margin;
+          agregarLinea(palabra, parte.bold);
+        }
+      });
     });
 
     // Ajustar posición Y para siguiente sección
@@ -173,18 +173,18 @@ export default function ConsentimientoRayosX_Digitalizado(data = {}) {
 
     // === 4) NOMBRE DE LA EMPRESA ===
     doc.setFont("helvetica", "bold").setFontSize(12);
-    
+
     // Calcular el ancho máximo disponible para la empresa
     const maxEmpresaWidth = pageW - 2 * margin - 20;
     const empresaLines = doc.splitTextToSize(datosFinales.empresa, maxEmpresaWidth);
-    
+
     // Usar la posición final del párrafo + espaciado
     const empresaStartY = currentY + 5;
-    
+
     empresaLines.forEach((line, index) => {
       doc.text(line, pageW / 2, empresaStartY + (index * 6), { align: "center" });
     });
-    
+
     // Ajustar la posición Y para la siguiente sección basándose en el número de líneas
     const empresaEndY = empresaStartY + (empresaLines.length * 6);
 
@@ -195,23 +195,23 @@ export default function ConsentimientoRayosX_Digitalizado(data = {}) {
 
     // Usar la posición final de la empresa + espaciado para el cuerpo del consentimiento
     const cuerpoY = empresaEndY + 5; // 5 puntos de separación después de la empresa
-    
+
     // Usar el mismo método simple que en conInformadoOcupacional_Digitalizado.jsx
     doc.text(consentimiento, margin, cuerpoY, { maxWidth: pageW - 2 * margin, align: "justify" });
-    
+
     // Calcular la posición final del cuerpo del consentimiento (aproximada)
     const cuerpoEndY = cuerpoY + 60; // Espacio aproximado para el texto del consentimiento
 
     doc.text(
       "Y para que así conste, firmo el presente consentimiento.",
       margin,
-      cuerpoEndY -10
+      cuerpoEndY - 10
     );
 
     doc.text(
       `${datosFinales.codigoSede}, ${formatearFechaLarga(datosFinales.fecha)}`,
       margin,
-      cuerpoEndY -4
+      cuerpoEndY - 4
     );
 
     // === 6) FOOTER CON FECHA, Y FIRMAS ===

@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 import header_OIT from "./HeaderOIT";
 import autoTable from "jspdf-autotable";
 
-export default function OIT_Digitalizado(datos = {}) {
+export default async function OIT_Digitalizado(datos = {}) {
 
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const margin = 8;
@@ -34,12 +34,12 @@ export default function OIT_Digitalizado(datos = {}) {
       startY: y + 3,
       body: [
         [
-          { content: "PLACA N°:", styles: { valign: "middle", cellWidth: 30 ,fillColor:[242, 242, 242]} },
-          { content: `${datos.norden ? datos.norden  : ""}`,styles: { valign: "middle",fillColor:[242, 242, 242] }  },
-          { content: "HCL:" ,styles: { valign: "middle",fillColor:[242, 242, 242] } },
-          { content: `${datos.norden ? datos.norden : ""}`,styles: { valign: "middle",fillColor:[242, 242, 242] }  },
-          { content: "LECTOR:", styles: { cellWidth: 25 ,fillColor:[242, 242, 242]} },
-          { content: `${datos.doctor ? datos.doctor : ""}`,styles: { valign: "middle",fillColor:[242, 242, 242] }  }
+          { content: "PLACA N°:", styles: { valign: "middle", cellWidth: 30, fillColor: [242, 242, 242] } },
+          { content: `${datos.norden ? datos.norden : ""}`, styles: { valign: "middle", fillColor: [242, 242, 242] } },
+          { content: "HCL:", styles: { valign: "middle", fillColor: [242, 242, 242] } },
+          { content: `${datos.norden ? datos.norden : ""}`, styles: { valign: "middle", fillColor: [242, 242, 242] } },
+          { content: "LECTOR:", styles: { cellWidth: 25, fillColor: [242, 242, 242] } },
+          { content: `${datos.doctor ? datos.doctor : ""}`, styles: { valign: "middle", fillColor: [242, 242, 242] } }
         ],
         [
           { content: "NOMBRE:" },
@@ -68,47 +68,47 @@ export default function OIT_Digitalizado(datos = {}) {
       startY: doc.lastAutoTable.finalY,
       body: [
         [
-          { content: "I. CALIDAD RADIOGRAFICA", rowSpan: 4, styles: { halign: 'center', valign: 'middle',fillColor:[242, 242, 242] } },
-          { content: "1", styles: {valign:"middle"}},
+          { content: "I. CALIDAD RADIOGRAFICA", rowSpan: 4, styles: { halign: 'center', valign: 'middle', fillColor: [242, 242, 242] } },
+          { content: "1", styles: { valign: "middle" } },
           { content: "BUENA" },
-          { content: `${datos.rbBuena ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
+          { content: `${datos.rbBuena ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255] } },
           { content: "CAUSAS", rowSpan: 7, styles: { halign: 'center', valign: 'middle' } },
-          { content: "1", styles: {valign:"middle"}},
+          { content: "1", styles: { valign: "middle" } },
           { content: "SOBRE EXPOSICIÓN" },
-          { content: `${datos.rbSobreexposicion ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
-          { content: "5", styles: {valign:"middle"}},
+          { content: `${datos.rbSobreexposicion ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255] } },
+          { content: "5", styles: { valign: "middle" } },
           { content: "ESCÁPULAS" },
-          { content: `${datos.rbEscapulas ? 'X' : ""}`, styles: { cellWidth: 5, halign: 'center', valign: 'middle', textColor: [0,0,255] } }
+          { content: `${datos.rbEscapulas ? 'X' : ""}`, styles: { cellWidth: 5, halign: 'center', valign: 'middle', textColor: [0, 0, 255] } }
         ],
         [
-          { content: "2", styles: {valign:"middle"}},
+          { content: "2", styles: { valign: "middle" } },
           { content: "ACEPTABLE" },
-          { content: `${datos.rbAceptable ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
-          { content: "2", styles: {valign:"middle"}},
+          { content: `${datos.rbAceptable ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255] } },
+          { content: "2", styles: { valign: "middle" } },
           { content: "SUBEXPOSICIÓN" },
-          { content: `${datos.rbSubexposicion ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' , textColor: [0,0,255]} },
-          { content: "6", styles: {valign:"middle"}},
+          { content: `${datos.rbSubexposicion ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255] } },
+          { content: "6", styles: { valign: "middle" } },
           { content: "ARTEFACTOS" },
-          { content: `${datos.rbArtefactos ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } }
+          { content: `${datos.rbArtefactos ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255] } }
         ],
         [
-          { content: "3", styles: {valign:"middle"}},
+          { content: "3", styles: { valign: "middle" } },
           { content: "BAJA CALIDAD" },
-          { content: `${datos.rbBajacalidad ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
-          { content: "3", styles: {valign:"middle"}},
+          { content: `${datos.rbBajacalidad ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255] } },
+          { content: "3", styles: { valign: "middle" } },
           { content: "POSICIÓN CENTRADO" },
-          { content: `${datos.rbPosicioncentrado ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
-          { content: "7", styles: {valign:"middle"}},
+          { content: `${datos.rbPosicioncentrado ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255] } },
+          { content: "7", styles: { valign: "middle" } },
           { content: "OTROS" },
           { content: `${datos.rbOtros ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } }
         ],
         [
-          { content: "4", styles: {valign:"middle"}},
+          { content: "4", styles: { valign: "middle" } },
           { content: "INACEPTABLE" },
-          { content: `${datos.rbInaceptable ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
-          { content: "4", styles: {valign:"middle"}},
+          { content: `${datos.rbInaceptable ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255] } },
+          { content: "4", styles: { valign: "middle" } },
           { content: "INSPIRACIÓN" },
-          { content: `${datos.rbInspiracionInsuficiente ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } }
+          { content: `${datos.rbInspiracionInsuficiente ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255] } }
         ],
 
       ],
@@ -146,15 +146,15 @@ export default function OIT_Digitalizado(datos = {}) {
       startY: doc.lastAutoTable.finalY,
       body: [
         [
-          { content: "II. ANORMALIDADES PARENQUIMATOSAS (si NO hay anormalidades pase a III. A. Pleurales)", styles: {minCellWidth: 100} },
+          { content: "II. ANORMALIDADES PARENQUIMATOSAS (si NO hay anormalidades pase a III. A. Pleurales)", styles: { minCellWidth: 100 } },
           { content: "SI", styles: { halign: 'center', valign: 'middle' } },
-          { content: `${datos.anormalidades_parenquimatosas_si ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
+          { content: `${datos.anormalidades_parenquimatosas_si ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255] } },
           { content: "NO", styles: { halign: 'center', valign: 'middle' } },
-          { content: `${datos.anormalidades_parenquimatosas_no ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } }
+          { content: `${datos.anormalidades_parenquimatosas_no ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255] } }
         ]
       ],
       theme: "grid",
-      styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0],fillColor:[242, 242, 242] },
+      styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0], fillColor: [242, 242, 242] },
       margin: { left: 10, right: 10 }
     });
 
@@ -217,8 +217,8 @@ export default function OIT_Digitalizado(datos = {}) {
         ],
         [
           { content: "SUPERIOR", styles: { cellWidth: 30 } },
-          { content: `${datos.chk1D ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
-          { content: `${datos.chk1I ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
+          { content: `${datos.chk1D ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255] } },
+          { content: `${datos.chk1I ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255] } },
           { content: "1/0", styles: { halign: 'center', valign: 'middle' } },
           { content: "1/1", styles: { halign: 'center', valign: 'middle' } },
           { content: "1/2", styles: { halign: 'center', valign: 'middle' } },
@@ -230,8 +230,8 @@ export default function OIT_Digitalizado(datos = {}) {
         ],
         [
           { content: "MEDIO" },
-          { content: `${datos.chk2D ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
-          { content: `${datos.chk2I ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
+          { content: `${datos.chk2D ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255] } },
+          { content: `${datos.chk2I ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255] } },
           { content: "2/1", styles: { halign: 'center', valign: 'middle' } },
           { content: "2/2", styles: { halign: 'center', valign: 'middle' } },
           { content: "2/3", styles: { halign: 'center', valign: 'middle' } },
@@ -243,8 +243,8 @@ export default function OIT_Digitalizado(datos = {}) {
         ],
         [
           { content: "INFERIOR" },
-          { content: `${datos.chk3D ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
-          { content: `${datos.chk3I ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
+          { content: `${datos.chk3D ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255] } },
+          { content: `${datos.chk3I ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255] } },
           { content: "3/2", styles: { halign: 'center', valign: 'middle' } },
           { content: "3/3", styles: { halign: 'center', valign: 'middle' } },
           { content: "3/+", styles: { halign: 'center', valign: 'middle' } },
@@ -255,11 +255,11 @@ export default function OIT_Digitalizado(datos = {}) {
           { content: "C", styles: { halign: 'center', valign: 'middle' } },
         ],
         [
-          { content: "III. ANORMALIDADES PLEURALES (si NO hay anormalidades pase a símbolos)", colSpan: 9 ,styles:{fillColor:[242, 242, 242]  }},
-          { content: "SI",styles:{fillColor:[242, 242, 242] } },
-          { content: `${datos.chk2Si ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] ,fillColor:[242, 242, 242] } },
-          { content: "NO" ,styles:{fillColor:[242, 242, 242] }},
-          { content: `${datos.chk2No ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255],fillColor:[242, 242, 242]  } }
+          { content: "III. ANORMALIDADES PLEURALES (si NO hay anormalidades pase a símbolos)", colSpan: 9, styles: { fillColor: [242, 242, 242] } },
+          { content: "SI", styles: { fillColor: [242, 242, 242] } },
+          { content: `${datos.chk2Si ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255], fillColor: [242, 242, 242] } },
+          { content: "NO", styles: { fillColor: [242, 242, 242] } },
+          { content: `${datos.chk2No ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255], fillColor: [242, 242, 242] } }
         ],
         [
           { content: "               3.1 PLACAS PLEURALES (0 = NINGUNA, D = HEMITÓRAX DRECHO, I = HEMITÓRAX IZQUIERDO", colSpan: 13 }
@@ -299,7 +299,7 @@ export default function OIT_Digitalizado(datos = {}) {
       //
       { row: 3, col: 2, key: "chkE3" },
       { row: 3, col: 4, key: "chkE6" },
-      
+
     ];
 
     autoTable(doc, {
@@ -366,7 +366,7 @@ export default function OIT_Digitalizado(datos = {}) {
       { row: 0, col: 15, key: "chk2_30" },
       { row: 0, col: 18, key: "chk2_34" },
       //
-      { row: 1, col: 8, key: "chk2_19" }, 
+      { row: 1, col: 8, key: "chk2_19" },
       { row: 1, col: 9, key: "chk2_21" },
       { row: 1, col: 10, key: "chk2_23" },
       { row: 1, col: 11, key: "chk2_24" },
@@ -379,28 +379,28 @@ export default function OIT_Digitalizado(datos = {}) {
       { row: 1, col: 19, key: "chk2_35" },
       { row: 1, col: 20, key: "chk2_36" },
       //
-      { row: 2, col: 1, key: "chk2_1" }, 
+      { row: 2, col: 1, key: "chk2_1" },
       { row: 2, col: 2, key: "chk2_4" },
       { row: 2, col: 3, key: "chk2_7" },
       { row: 2, col: 4, key: "chk2_10" },
       { row: 2, col: 5, key: "chk2_13" },
       { row: 2, col: 6, key: "chk2_16" },
-       //
-      { row: 3, col: 1, key: "chk2_2" }, 
+      //
+      { row: 3, col: 1, key: "chk2_2" },
       { row: 3, col: 2, key: "chk2_5" },
       { row: 3, col: 3, key: "chk2_6" },
       { row: 3, col: 4, key: "chk2_11" },
       { row: 3, col: 5, key: "chk2_14" },
       { row: 3, col: 6, key: "chk2_17" },
-       //
-      { row: 4, col: 1, key: "chk2_3" }, 
+      //
+      { row: 4, col: 1, key: "chk2_3" },
       { row: 4, col: 2, key: "chk2_6" },
       { row: 4, col: 3, key: "chk2_9" },
       { row: 4, col: 4, key: "chk2_12" },
       { row: 4, col: 5, key: "chk2_15" },
       { row: 4, col: 6, key: "chk2_18" },
       //
-      { row: 5, col: 4, key: "chk2_37" }, 
+      { row: 5, col: 4, key: "chk2_37" },
       { row: 5, col: 5, key: "chk2_38" },
       { row: 5, col: 6, key: "chk2_39" },
     ];
@@ -541,7 +541,7 @@ export default function OIT_Digitalizado(datos = {}) {
       { row: 2, col: 12, key: "chk2_59" },
       { row: 2, col: 13, key: "chk2_61" },
       { row: 2, col: 14, key: "chk2_62" },
-      { row: 2, col: 15, key: "chk2_64" },  
+      { row: 2, col: 15, key: "chk2_64" },
       { row: 2, col: 16, key: "chk2_65" },
       { row: 2, col: 17, key: "chk2_66" },
       { row: 2, col: 18, key: "chk2_68" },
@@ -611,12 +611,12 @@ export default function OIT_Digitalizado(datos = {}) {
           { content: "", styles: { lineWidth: 0 }, colSpan: 13 },
         ],
         [
-          { content: "IV SIMBOLOS *", colSpan: 16, styles: { valign: 'middle',fillColor:[242, 242, 242] } },
+          { content: "IV SIMBOLOS *", colSpan: 16, styles: { valign: 'middle', fillColor: [242, 242, 242] } },
 
-          { content: "SI", styles: { halign: 'center', valign: 'middle',fillColor:[242, 242, 242] } },
-          { content: `${datos.chk3Si ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255],fillColor:[242, 242, 242] } },
-          { content: "NO", styles: { halign: 'center', valign: 'middle',fillColor:[242, 242, 242] } },
-          { content: `${datos.chk3No ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] ,fillColor:[242, 242, 242]} }
+          { content: "SI", styles: { halign: 'center', valign: 'middle', fillColor: [242, 242, 242] } },
+          { content: `${datos.chk3Si ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255], fillColor: [242, 242, 242] } },
+          { content: "NO", styles: { halign: 'center', valign: 'middle', fillColor: [242, 242, 242] } },
+          { content: `${datos.chk3No ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0, 0, 255], fillColor: [242, 242, 242] } }
         ]
       ],
       theme: "grid",
@@ -748,87 +748,87 @@ export default function OIT_Digitalizado(datos = {}) {
     //   }
     // });
     autoTable(doc, {
-    startY: doc.lastAutoTable.finalY,
-    body: [
-      [
-        {
-          content:
-            "(Rodee con un circulo la respuesta adecuada, si rodea od, escriba a continuación un COMENTARIO)",
-          colSpan: 15,
-          styles: { valign: "middle" }
-        },
+      startY: doc.lastAutoTable.finalY,
+      body: [
+        [
+          {
+            content:
+              "(Rodee con un circulo la respuesta adecuada, si rodea od, escriba a continuación un COMENTARIO)",
+            colSpan: 15,
+            styles: { valign: "middle" }
+          },
+        ],
+        [
+          { content: "aa", styles: { halign: "center", valign: "middle" } },
+          { content: "at", styles: { halign: "center", valign: "middle" } },
+          { content: "ax", styles: { halign: "center", valign: "middle" } },
+          { content: "bu", styles: { halign: "center", valign: "middle" } },
+          { content: "ca", styles: { halign: "center", valign: "middle" } },
+          { content: "cg", styles: { halign: "center", valign: "middle" } },
+          { content: "cn", styles: { halign: "center", valign: "middle" } },
+          { content: "co", styles: { halign: "center", valign: "middle" } },
+          { content: "cp", styles: { halign: "center", valign: "middle" } },
+          { content: "cv", styles: { halign: "center", valign: "middle" } },
+          { content: "di", styles: { halign: "center", valign: "middle" } },
+          { content: "ef", styles: { halign: "center", valign: "middle" } },
+          { content: "em", styles: { halign: "center", valign: "middle" } },
+          { content: "es", styles: { halign: "center", valign: "middle" } },
+          { content: "OD", styles: { halign: "center", valign: "middle" }, rowSpan: 2 },
+        ],
+        [
+          { content: "fr", styles: { halign: "center", valign: "middle" } },
+          { content: "hi", styles: { halign: "center", valign: "middle" } },
+          { content: "ho", styles: { halign: "center", valign: "middle" } },
+          { content: "id", styles: { halign: "center", valign: "middle" } },
+          { content: "ih", styles: { halign: "center", valign: "middle" } },
+          { content: "kl", styles: { halign: "center", valign: "middle" } },
+          { content: "me", styles: { halign: "center", valign: "middle" } },
+          { content: "pa", styles: { halign: "center", valign: "middle" } },
+          { content: "pb", styles: { halign: "center", valign: "middle" } },
+          { content: "pi", styles: { halign: "center", valign: "middle" } },
+          { content: "px", styles: { halign: "center", valign: "middle" } },
+          { content: "ra", styles: { halign: "center", valign: "middle" } },
+          { content: "rp", styles: { halign: "center", valign: "middle" } },
+          { content: "tb", styles: { halign: "center", valign: "middle" } },
+        ],
+        [
+          {
+            content: `Comentarios: ${datos.txtSComentarios}`,
+            colSpan: 12,
+            styles: { fontSize: 6, cellPadding: 1 }
+          },
+          { content: "", colSpan: 13, }
+        ],
+        [
+          { content: "Firma y Sello de Médico", colSpan: 15 }
+        ]
       ],
-      [
-        { content: "aa", styles: { halign: "center", valign: "middle" } },
-        { content: "at", styles: { halign: "center", valign: "middle" } },
-        { content: "ax", styles: { halign: "center", valign: "middle" } },
-        { content: "bu", styles: { halign: "center", valign: "middle" } },
-        { content: "ca", styles: { halign: "center", valign: "middle" } },
-        { content: "cg", styles: { halign: "center", valign: "middle" } },
-        { content: "cn", styles: { halign: "center", valign: "middle" } },
-        { content: "co", styles: { halign: "center", valign: "middle" } },
-        { content: "cp", styles: { halign: "center", valign: "middle" } },
-        { content: "cv", styles: { halign: "center", valign: "middle" } },
-        { content: "di", styles: { halign: "center", valign: "middle" } },
-        { content: "ef", styles: { halign: "center", valign: "middle" } },
-        { content: "em", styles: { halign: "center", valign: "middle" } },
-        { content: "es", styles: { halign: "center", valign: "middle" } },
-        { content: "OD", styles: { halign: "center", valign: "middle" }, rowSpan: 2 },
-      ],
-      [
-        { content: "fr", styles: { halign: "center", valign: "middle" } },
-        { content: "hi", styles: { halign: "center", valign: "middle" } },
-        { content: "ho", styles: { halign: "center", valign: "middle" } },
-        { content: "id", styles: { halign: "center", valign: "middle" } },
-        { content: "ih", styles: { halign: "center", valign: "middle" } },
-        { content: "kl", styles: { halign: "center", valign: "middle" } },
-        { content: "me", styles: { halign: "center", valign: "middle" } },
-        { content: "pa", styles: { halign: "center", valign: "middle" } },
-        { content: "pb", styles: { halign: "center", valign: "middle" } },
-        { content: "pi", styles: { halign: "center", valign: "middle" } },
-        { content: "px", styles: { halign: "center", valign: "middle" } },
-        { content: "ra", styles: { halign: "center", valign: "middle" } },
-        { content: "rp", styles: { halign: "center", valign: "middle" } },
-        { content: "tb", styles: { halign: "center", valign: "middle" } },
-      ],
-      [
-        {
-          content: `Comentarios: ${datos.txtSComentarios}`,
-          colSpan: 12,
-          styles: { fontSize: 6, cellPadding: 1 }
-        },
-        { content: "", colSpan: 13,}
-      ],
-      [
-        { content: "Firma y Sello de Médico", colSpan: 15 }
-      ]
-    ],
-    theme: "grid",
-    styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0], minCellHeight: 6 },
-    margin: { left: 10, right: 10 },
-    didDrawCell: function (data) {
-      const { cell, row, column, doc } = data;
+      theme: "grid",
+      styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0], minCellHeight: 6 },
+      margin: { left: 10, right: 10 },
+      didDrawCell: function (data) {
+        const { cell, row, column, doc } = data;
 
-      // Buscar si la celda actual tiene una validación
-      const validacion = validacionesCeldasSimbolos.find(
-        (v) => v.row === row.index && v.col === column.index
-      );
+        // Buscar si la celda actual tiene una validación
+        const validacion = validacionesCeldasSimbolos.find(
+          (v) => v.row === row.index && v.col === column.index
+        );
 
-      if (validacion && datos[validacion.key]) {
-        // Coordenadas para centrar la X
-        const x = cell.x + cell.width / 2;
-        const y = cell.y + cell.height / 2;
+        if (validacion && datos[validacion.key]) {
+          // Coordenadas para centrar la X
+          const x = cell.x + cell.width / 2;
+          const y = cell.y + cell.height / 2;
 
-        // Dibujar la X azul
-        doc.setTextColor(0, 0, 255);
-        doc.setFontSize(10);
-        doc.text("X", x, y, { align: "center", baseline: "middle" });
+          // Dibujar la X azul
+          doc.setTextColor(0, 0, 255);
+          doc.setFontSize(10);
+          doc.text("X", x, y, { align: "center", baseline: "middle" });
 
-        // Restaurar color original
-        doc.setTextColor(0, 0, 0);
+          // Restaurar color original
+          doc.setTextColor(0, 0, 0);
+        }
       }
-    }
-  });
+    });
 
     if (s1) {
       const canvas = document.createElement('canvas');
