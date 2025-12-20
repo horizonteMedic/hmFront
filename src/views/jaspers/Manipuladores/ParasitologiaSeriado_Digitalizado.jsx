@@ -294,7 +294,7 @@ export default async function ParasitologiaSeriado_Digitalizado(datos = {}) {
   Promise.all([
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-  ]).then(([s1, s2]) => {
+  ]).then(async ([s1, s2]) => {
     // Función auxiliar para agregar sello al PDF
     const agregarSello = (img, xPos, yPos, width, height) => {
       if (!img) return;
