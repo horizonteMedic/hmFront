@@ -20,7 +20,7 @@ const config = {
 
 // --- Componente Principal ---
 
-export default async function HistoriaOcupacional_Digitalizado_boro(datos = {}, tabla = []) {
+export default async function HistoriaOcupacional_Digitalizado_boro(datos = {},docExistente = null) {
   const doc = new jsPDF({ unit: "mm", format: "letter", orientation: "landscape" });
   const pageW = doc.internal.pageSize.getWidth();
   const datoss = {
@@ -99,6 +99,13 @@ export default async function HistoriaOcupacional_Digitalizado_boro(datos = {}, 
       }
     ]
   }
+  const getAñoInicial = (fecha) => {
+    const match = fecha?.match(/\d{4}/);
+    return match ? parseInt(match[0], 10) : Infinity;
+  };
+  const tabla = [...datos.detalles].sort(
+    (a, b) => getAñoInicial(a.fecha) - getAñoInicial(b.fecha)
+  );
   // === HEADER ===
   // header_HistoriaOcupacional_Boro(doc, datos);
   header_HistoriaOcupacional_Boro(doc, datos);
