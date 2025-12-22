@@ -647,6 +647,7 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
     yTextoMotivo += 0.5; // Espaciado extra entre items
   });
 
+
   // Agregar sello y firma del médico en la segunda columna
   let firmaMedicoMotivo = getSign(datosFinales, "SELLOFIRMA");
   if (firmaMedicoMotivo) {
