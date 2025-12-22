@@ -10,9 +10,9 @@ import {
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
-    "";
+    "/api/v01/ct/psiBrigadista/obtenerReporteBrigadista";
 const registrarUrl =
-    "";
+    "/api/v01/ct/psiBrigadista/registrarActualizarBrigadista";
 
 export const GetInfoServicio = async (
     nro,
@@ -52,18 +52,18 @@ export const GetInfoServicio = async (
             ocupacion: res.ocupacionPaciente,
             cargoDesempenar: res.cargoPaciente,
 
-            afrontamientoTomaDecisiones: "",
-            estiloDeConflicto: "",
-            afrontamientoSituacionesRiesgo: "",
-            nivelAnsiedad: "",
+            afrontamientoTomaDecisiones: res.afronTdd ?? "",
+            estiloDeConflicto: res.estiloConflicto ?? "",
+            afrontamientoSituacionesRiesgo: res.afronSitRiesgo ?? "",
+            nivelAnsiedad: res.levelAnsiedad ?? "",
 
             // Análisis FODA
-            fortalezasOportunidades: "",
-            amenazasDebilidades: "",
+            fortalezasOportunidades: res.fodaForOpor ?? "",
+            amenazasDebilidades: res.fodaAmenDebi ?? "",
 
             // Observaciones y Recomendaciones
-            observaciones: "",
-            recomendaciones: "",
+            observaciones: res.observacion ?? "",
+            recomendaciones: res.recomenda ?? "",
 
             user_medicoFirma: res.usuarioFirma,
         }));
@@ -89,15 +89,15 @@ export const SubmitDataService = async (
     const body = {
         norden: form.norden,
         fechaRegistro: form.fecha,
-        "afronTdd": "string",
-        "estiloConflicto": "string",
-        "afronSitRiesgo": "string",
-        "levelAnsiedad": "string",
-        "fodaForOpor": "string",
-        "fodaAmenDebi": "string",
-        "observacion": "string",
-        "recomenda": "string",
-        "cumplePerfil": true,
+        afronTdd: form.afrontamientoTomaDecisiones,
+        estiloConflicto: form.estiloDeConflicto,
+        afronSitRiesgo: form.afrontamientoSituacionesRiesgo,
+        levelAnsiedad: form.nivelAnsiedad,
+        fodaForOpor: form.fortalezasOportunidades,
+        fodaAmenDebi: form.amenazasDebilidades,
+        observacion: form.observaciones,
+        recomenda: form.recomendaciones,
+        cumplePerfil: true,
         //agregar
         userRegistro: user,
         usuarioFirma: form.user_medicoFirma,
