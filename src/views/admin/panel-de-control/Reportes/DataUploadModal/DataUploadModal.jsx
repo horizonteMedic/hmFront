@@ -91,7 +91,6 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
     
     for (const folder of uparchFile) {
       try {
-          console.log("Tamaño PDF:", folder.size / 1024 / 1024, "MB");
 
           const fileBase64 = await toBase64(folder);
           console.log("Tamaño base64:", fileBase64.length / 1024 / 1024, "MB");

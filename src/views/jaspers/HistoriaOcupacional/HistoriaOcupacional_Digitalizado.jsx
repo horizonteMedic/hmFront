@@ -115,7 +115,7 @@ export default async function HistoriaOcupacional_Digitalizado(
   };
   // === HEADER ===
   await header_HistoriaOcupacional(doc, datos);
-
+  console.log(tabla)
   // Obtener firmas comprimidas (JPEG por defecto)
   // getSignCompressed toma el objeto de datos completo, ya que internamente accede a data.digitalizacion
   const firmap = await getSignCompressed(datos, "FIRMAP");

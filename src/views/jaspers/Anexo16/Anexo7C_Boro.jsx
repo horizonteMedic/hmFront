@@ -213,14 +213,14 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
       visionCerca: {
         sinCorregirOD: data.visionCercaSinCorregirOd_v_cerca_s_od ?? "",
         sinCorregirOI: data.visionCercaSinCorregirOi_v_cerca_s_oi ?? "",
-        corregidaOD: data.odcc_odcc ?? "",
-        corregidaOI: data.oicc_oicc ?? "",
+        corregidaOD: data.visionCercaCorregidaOd_v_cerca_c_od ? data.visionCercaCorregidaOd_v_cerca_c_od : data.odcc_odcc,
+        corregidaOI: data.visionCercaCorregidaOi_v_cerca_c_oi ? data.visionCercaCorregidaOi_v_cerca_c_oi : data.oicc_oicc,
       },
       visionLejos: {
         sinCorregirOD: data.visionLejosSinCorregirOd_v_lejos_s_od ?? "",
         sinCorregirOI: data.visionLejosSinCorregirOi_v_lejos_s_oi ?? "",
-        corregidaOD: data.odlc_odlc ?? "",
-        corregidaOI: data.oilc_oilc ?? "",
+        corregidaOD: data.visionLejosCorregidaOd_v_lejos_c_od ? data.visionLejosCorregidaOd_v_lejos_c_od : data.odlc_odlc,
+        corregidaOI: data.visionLejosCorregidaOi_v_lejos_c_oi ? data.visionLejosCorregidaOi_v_lejos_c_oi : data.oilc_oilc,
       },
       enfermedadesOculares: data.enfermedadesOcularesAnexo7c_txtenfermedadesoculares ?? "",
       enfermedadesOcularesOtros: data.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "",
@@ -419,7 +419,8 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     // Recomendaciones / Restricciones
     recomendacionesRestricciones: data.conclusionMedicoAnexo7c_txtconclusionmed ?? "",
   };
-
+  console.log('data anexo16', data)
+  console.log(datosFinales.examenOjos)
   // Header reutilizable
   const drawHeader = async (pageNumber) => {
     // Logo y membrete
@@ -2798,8 +2799,8 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
   const imgPath = "/img/Anexo16/pulmonesFrame.png";
 
   // Cargar imagen de forma asíncrona pero asegurarse de que se añada
-  loadImg(imgPath)
-    .then((img) => {
+  await loadImg(imgPath)
+    .then(async (img) => {
       try {
         // Calcular altura manteniendo el aspect ratio original de la imagen
         const aspectRatio = img.height / img.width;
@@ -2833,7 +2834,7 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
       }
 
       // Continuar con el resto del código después de añadir la imagen
-      continuarConRadiografia();
+      await continuarConRadiografia();
     })
     .catch((error) => {
       // Si la imagen no se puede cargar, intentar añadirla directamente con la ruta

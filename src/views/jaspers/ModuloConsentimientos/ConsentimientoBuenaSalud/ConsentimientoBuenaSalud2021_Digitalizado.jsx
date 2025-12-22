@@ -88,7 +88,7 @@ export default async function ConsentimientoBuenaSalud2021_Digitalizado(data = {
     Promise.all([
         isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
         isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-    ]).then(([s1, s2]) => {
+    ]).then(async ([s1, s2]) => {
         // Usar datos reales
         const datosFinales = datosReales;
 
