@@ -605,12 +605,14 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
 
   // Fila de contenido del motivo (2 columnas: motivo y firma del médico)
   const motivoTexto = datosFinales.motivoInterconsulta || "";
+  const anchoColumnaMotivo = 150;
+  const anchoColumnaFirma = tablaAncho - anchoColumnaMotivo;
 
   // Calcular altura considerando el texto con saltos de línea
   doc.setFont("helvetica", "normal").setFontSize(8);
   const lineasMotivo = motivoTexto.split('\n').filter(linea => linea.trim() !== '');
   let alturaTotalTexto = 0;
-  const anchoMaximoTexto = tablaAncho - 4;
+  const anchoMaximoTexto = anchoColumnaMotivo - 6; // Ancho de la primera columna menos padding (más margen para evitar overflow)
 
   lineasMotivo.forEach((linea) => {
     const lineaTrim = linea.trim();
@@ -628,16 +630,36 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaFilaMotivo, tablaInicioX + tablaAncho, yPos + alturaFilaMotivo);
 
-  // Dibujar el texto del motivo
+  // Dibujar el texto del motivo en la primera columna
   let yTextoMotivo = yPos + 3;
 
   lineasMotivo.forEach((linea) => {
     const lineaTrim = linea.trim();
     // Si la línea ya empieza con guión, mantenerlo; si no, agregarlo
     const textoFinal = lineaTrim.startsWith('-') ? lineaTrim : `- ${lineaTrim}`;
-    yTextoMotivo = dibujarTextoConSaltoLinea(textoFinal, tablaInicioX + 2, yTextoMotivo, anchoMaximoTexto);
-    yTextoMotivo += 0.5;
+
+    // Usar splitTextToSize para garantizar que el texto no exceda el ancho de la columna
+    const lineasWrapped = doc.splitTextToSize(textoFinal, anchoMaximoTexto);
+    lineasWrapped.forEach((lineaWrapped) => {
+      doc.text(lineaWrapped, tablaInicioX + 2, yTextoMotivo);
+      yTextoMotivo += 2.5; // Espaciado entre líneas
+    });
+    yTextoMotivo += 0.5; // Espaciado extra entre items
   });
+
+  // Agregar sello y firma del médico en la segunda columna
+  let firmaMedicoMotivo = getSign(datosFinales, "SELLOFIRMA");
+  if (firmaMedicoMotivo) {
+    try {
+      const imgWidth = 35;
+      const imgHeight = 13;
+      const xFirmaMotivo = tablaInicioX + anchoColumnaMotivo + (anchoColumnaFirma / 2) - (imgWidth / 2); // Centrado en la segunda columna
+      const yFirmaMotivo = yPos + (alturaFilaMotivo / 2) - (imgHeight / 2); // Centrado verticalmente
+      doc.addImage(firmaMedicoMotivo, 'PNG', xFirmaMotivo, yFirmaMotivo, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando firma del médico en motivo:", error);
+    }
+  }
 
   yPos += alturaFilaMotivo;
 
@@ -817,23 +839,11 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
   const centroColumna2 = tablaInicioX + 95 + ((tablaAncho - 95) / 2);
   const firmaMedicoY = yFirmas + 2; // Posición más arriba
 
-  // Agregar firma y sello médico
-  let firmaMedicoUrl = getSign(datosFinales, "SELLOFIRMA");
-  if (firmaMedicoUrl) {
-    try {
-      const imgWidth = 38; // Reducido de 40 a 38
-      const imgHeight = 14; // Reducido de 15 a 14
-      const x = centroColumna2 - 19; // Centrado
-      const y = firmaMedicoY;
-      doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
-    } catch (error) {
-      console.log("Error cargando firma del médico:", error);
-    }
-  }
+
 
   // Texto del trabajador - más cerca de las imágenes
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Firma y Huella del trabajador", centroSeccionX, yFirmas + 20, { align: "center" }); // Reducido de 26 a 20
+  doc.text("Firma y Huella del trabajador", 50, yFirmas + 20, { align: "center" }); // Reducido de 26 a 20
 
   autoTable(doc, {
     startY: yFirmas + alturaSeccionFirmas + 2, // Reducido espacio después de firmas
