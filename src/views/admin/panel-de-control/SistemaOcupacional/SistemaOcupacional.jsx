@@ -124,6 +124,9 @@ const TabComponent = () => {
   const [DNIG, setDNIG] = useState("");
   const token = useAuthStore((state) => state.token);
   const userlogued = useAuthStore((state) => state.userlogued);
+  //Sede
+  const selectedSede = useAuthStore((state) => state.selectedSede);
+  const setSelectedSede = useAuthStore((state) => state.setSelectedSede);
   const Vista = useAuthStore((state) => state.listView);
   const Acceso = useAuthStore((state) => state.listAccesos);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -137,11 +140,11 @@ const TabComponent = () => {
 
   //Sede
   const [selectSede, setSelectSede] = useState("");
-
   useEffect(() => {
     if (userlogued?.sedes?.length > 0) {
       const sedeTNP = userlogued.sedes.find((sede) => sede.cod_sede === "T-NP");
       setSelectSede(sedeTNP?.cod_sede || userlogued.sedes[0].cod_sede);
+      setSelectedSede(sedeTNP?.cod_sede || userlogued.sedes[0].cod_sede);
     }
   }, [userlogued.sedes]);
   //AVVESO A LAS TARJETAS VIEWS
@@ -238,7 +241,7 @@ const TabComponent = () => {
             <div className={styles.sedeSelector}>
               <select
                 className={styles.sedeSelect}
-                onChange={(e) => setSelectSede(e.target.value)}
+                onChange={(e) => { setSelectSede(e.target.value), setSelectedSede(e.target.value) }}
                 value={selectSede}
               >
                 {userlogued.sedes.map((option, index) => (

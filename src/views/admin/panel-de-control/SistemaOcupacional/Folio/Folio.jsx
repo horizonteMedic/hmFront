@@ -224,7 +224,7 @@ const Folio = () => {
             });
         }
     };
-
+    console.log(selectedSede)
     return (
         <div className="w-full space-y-3 px-4">
             {/* ===== SECCIÓN: DATOS NECESARIOS ===== */}
