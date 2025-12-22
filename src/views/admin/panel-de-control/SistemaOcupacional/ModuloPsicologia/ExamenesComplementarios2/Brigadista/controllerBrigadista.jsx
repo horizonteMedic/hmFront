@@ -32,15 +32,17 @@ export const GetInfoServicio = async (
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
-            fecha: res.fecha,
+            fecha: res.fechaRegistro,
 
-            nombreExamen: res.nombreExamen ?? "",
-            dni: res.dni ?? "",
+            esApto: res.cumplePerfil,
 
-            nombres: res.nombres ?? "",
+            nombreExamen: res.tipoExamen ?? "",
+            dni: res.dniPaciente ?? "",
+
+            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
             lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-            edad: res.edad ?? "",
+            edad: res.edadPaciente ?? "",
             sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
             estadoCivil: res.estadoCivilPaciente,
             nivelEstudios: res.nivelEstudioPaciente,
@@ -50,7 +52,20 @@ export const GetInfoServicio = async (
             ocupacion: res.ocupacionPaciente,
             cargoDesempenar: res.cargoPaciente,
 
-            //agregar
+            afrontamientoTomaDecisiones: "",
+            estiloDeConflicto: "",
+            afrontamientoSituacionesRiesgo: "",
+            nivelAnsiedad: "",
+
+            // Análisis FODA
+            fortalezasOportunidades: "",
+            amenazasDebilidades: "",
+
+            // Observaciones y Recomendaciones
+            observaciones: "",
+            recomendaciones: "",
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -73,10 +88,19 @@ export const SubmitDataService = async (
     }
     const body = {
         norden: form.norden,
-        fecha: form.fecha,
-
+        fechaRegistro: form.fecha,
+        "afronTdd": "string",
+        "estiloConflicto": "string",
+        "afronSitRiesgo": "string",
+        "levelAnsiedad": "string",
+        "fodaForOpor": "string",
+        "fodaAmenDebi": "string",
+        "observacion": "string",
+        "recomenda": "string",
+        "cumplePerfil": true,
         //agregar
-        usuarioRegistro: user,
+        userRegistro: user,
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
