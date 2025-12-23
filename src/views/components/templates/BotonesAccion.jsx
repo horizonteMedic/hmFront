@@ -1,48 +1,66 @@
 import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export default function BotonesAccion({ form, handleSave, handleClear, handlePrint, handleChangeNumberDecimals }) {
+export default function BotonesAccion({
+    form,
+    handleSave,
+    handleClear,
+    handlePrint,
+    handleChangeNumberDecimals,
+    hideSave = false,
+    hideClear = false,
+    hidePrint = false,
+}) {
     return (
         <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-4">
             <div className="flex gap-4">
-                <button
-                    type="button"
-                    onClick={handleSave}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                >
-                    <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                </button>
-                <button
-                    type="button"
-                    onClick={handleClear}
-                    className="bg-amber-500 hover:bg-amber-600 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                >
-                    <FontAwesomeIcon icon={faBroom} /> Limpiar
-                </button>
-            </div>
-            <div className="flex flex-col items-end">
-                <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
-                <div className="flex items-center gap-2">
-                    <input
-                        name="norden"
-                        value={form.norden}
-                        onChange={handleChangeNumberDecimals}
-                        onKeyUp={(e) => e.key === "Enter" && handlePrint()}
-                        className="border rounded px-2 py-1 text-base w-24"
-                    />
-
+                {!hideSave && (
                     <button
                         type="button"
-                        onClick={handlePrint}
-                        className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                        onClick={handleSave}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
                     >
-                        <FontAwesomeIcon icon={faPrint} />
+                        <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
                     </button>
-                </div>
+                )}
+
+                {!hideClear && (
+                    <button
+                        type="button"
+                        onClick={handleClear}
+                        className="bg-amber-500 hover:bg-amber-600 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                    >
+                        <FontAwesomeIcon icon={faBroom} /> Limpiar
+                    </button>
+                )}
             </div>
+
+            {!hidePrint && (
+                <div className="flex flex-col items-end">
+                    <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+                    <div className="flex items-center gap-2">
+                        <input
+                            name="norden"
+                            value={form.norden}
+                            onChange={handleChangeNumberDecimals}
+                            onKeyUp={(e) => e.key === "Enter" && handlePrint()}
+                            className="border rounded px-2 py-1 text-base w-24"
+                        />
+
+                        <button
+                            type="button"
+                            onClick={handlePrint}
+                            className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                        >
+                            <FontAwesomeIcon icon={faPrint} />
+                        </button>
+                    </div>
+                </div>
+            )}
         </section>
-    )
+    );
 }
+
 
 {/* 
     <BotonesAccion
