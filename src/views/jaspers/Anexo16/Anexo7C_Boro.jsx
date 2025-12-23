@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
-import { getSign } from "../../utils/helpers.js";
+import { getSign, compressImage, getSignCompressed } from "../../utils/helpers.js";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
@@ -2798,8 +2798,11 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
   // Ruta de la imagen
   const imgPath = "/img/Anexo16/pulmonesFrame.png";
 
+  // Comprimir la imagen para reducir el tamaño del PDF
+  const imgPathCompressed = await compressImage(imgPath);
+
   // Cargar imagen de forma asíncrona pero asegurarse de que se añada
-  await loadImg(imgPath)
+  await loadImg(imgPathCompressed)
     .then(async (img) => {
       try {
         // Calcular altura manteniendo el aspect ratio original de la imagen
@@ -2813,11 +2816,11 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
           // Ajustar ancho proporcionalmente si la altura se limita
           const anchoFinal = alturaFinal / aspectRatio;
           const xImagenCentrada = divColRX1 + (anchoColRX2 - anchoFinal) / 2;
-          doc.addImage(img, "PNG", xImagenCentrada, yImagen, anchoFinal, alturaFinal);
+          doc.addImage(img, "JPEG", xImagenCentrada, yImagen, anchoFinal, alturaFinal);
         } else {
           // Centrar verticalmente si la imagen es más pequeña que la altura disponible
           const yImagenCentrada = yPos + (alturaTotalRX - alturaFinal) / 2;
-          doc.addImage(img, "PNG", xImagen, yImagenCentrada, anchoImagen, alturaFinal);
+          doc.addImage(img, "JPEG", xImagen, yImagenCentrada, anchoImagen, alturaFinal);
         }
       } catch (imgError) {
         console.warn("Error al añadir imagen al PDF:", imgError);
@@ -2827,7 +2830,7 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
           const alturaMaxima = alturaTotalRX - 1;
           const alturaFinal = alturaImagenEstimada > alturaMaxima ? alturaMaxima : alturaImagenEstimada;
           const yImagenCentrada = yPos + (alturaTotalRX - alturaFinal) / 2;
-          doc.addImage(imgPath, "PNG", xImagen, yImagenCentrada, anchoImagen, alturaFinal);
+          doc.addImage(imgPath, "JPEG", xImagen, yImagenCentrada, anchoImagen, alturaFinal);
         } catch (directError) {
           console.warn("No se pudo añadir imagen directamente:", directError);
         }
@@ -4210,7 +4213,7 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     const firmaMedicoY = yPos + 3;
 
     // Agregar firma y sello médico
-    let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
+    let firmaMedicoUrl = await getSignCompressed(data, "SELLOFIRMA");
     if (firmaMedicoUrl) {
       try {
         const imgWidth = 45;

@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils";
-import { getSign, convertirGenero } from "../../utils/helpers";
+import { getSign, convertirGenero, getSignCompressed } from "../../utils/helpers";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
@@ -682,7 +682,8 @@ export default async function GenerarDatosPaciente(data = {}, docExistente = nul
   const centroColumna3 = tablaInicioX + 120 + (80 / 2); // Centro de la columna 3 (160mm desde tablaInicioX)
 
   // Agregar firma y sello médico
-  const firmaMedicoUrl = getSign(data, "SELLOFIRMA");
+  const firmaMedicoUrl = await getSignCompressed(data, "SELLOFIRMA");
+  console.log(firmaMedicoUrl)
   if (firmaMedicoUrl) {
     try {
       const imgWidth = 50;
@@ -690,7 +691,7 @@ export default async function GenerarDatosPaciente(data = {}, docExistente = nul
       // Centrar la imagen: centro de la columna menos la mitad del ancho de la imagen
       const x = centroColumna3 - (imgWidth / 2);
       const y = firmaMedicoY;
-      doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
+      doc.addImage(firmaMedicoUrl, 'JPEG', x, y, imgWidth, imgHeight);
     } catch (error) {
       console.log("Error cargando firma del médico:", error);
     }

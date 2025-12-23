@@ -3,7 +3,7 @@ import drawColorBox from '../../components/ColorBox.jsx';
 import { formatearFechaCorta } from "../../../utils/formatDateUtils.js";
 import { normalizeList } from "../../../utils/listUtils.js";
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
-import { getSign, convertirGenero } from "../../../utils/helpers.js";
+import { getSign, convertirGenero, getSignCompressed } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
 
 export default async function InformePsicologico_Digitalizado(data = {}, docExistente = null) {
@@ -492,7 +492,7 @@ export default async function InformePsicologico_Digitalizado(data = {}, docExis
   });
 
   // Firma dentro de la fila de recomendaciones
-  const placeSignaturesInRecomendaciones = () => {
+  const placeSignaturesInRecomendaciones = async () => {
     // Calcular posición dentro de la fila de recomendaciones
     const firmaX = tablaInicioX + tablaAncho - 50; // Posición a la derecha
     const firmaY = yPos + (alturaFilaRecomendaciones / 2) - 10; // Centrada verticalmente
@@ -501,9 +501,9 @@ export default async function InformePsicologico_Digitalizado(data = {}, docExis
 
     let imagenPintada = false;
     try {
-      const firma = getSign(data, "SELLOFIRMA") || getSign(data, "FIRMAP");
+      const firma = await getSignCompressed(data, "SELLOFIRMA")
       if (firma) {
-        doc.addImage(firma, 'PNG', firmaX, firmaY, firmaW, firmaH);
+        doc.addImage(firma, 'JPEG', firmaX, firmaY, firmaW, firmaH);
         imagenPintada = true;
       }
     } catch (e) {
@@ -516,7 +516,7 @@ export default async function InformePsicologico_Digitalizado(data = {}, docExis
   };
 
   // Llamar a la función después de dibujar la fila de recomendaciones
-  placeSignaturesInRecomendaciones();
+  await placeSignaturesInRecomendaciones();
 
   yPos += alturaFilaRecomendaciones;
 
