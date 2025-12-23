@@ -1,5 +1,3 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { PrintHojaR, SubmitDataService, VerifyTR } from './ControllerHematologia';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
@@ -9,6 +7,7 @@ import {
   SectionFieldset
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
+import BotonesAccion from '../../../../../../components/templates/BotonesAccion';
 
 const PRUEBAS = [
   { key: 'hemoglobina', label: 'Hemoglobina' },
@@ -87,6 +86,7 @@ export default function Hematologia() {
     handleChange,
     handleClearnotO,
     handleChangeNumber,
+    handleChangeNumberDecimals,
     handleChangeSimple,
     handleFocusNext,
     handleClear,
@@ -111,13 +111,13 @@ export default function Hematologia() {
   };
 
   return (
-    <div className="p-4 space-y-3">
+    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 xl:grid-cols-3 gap-3 lg:gap-4">
         <InputTextOneLine
           label="N° Orden"
           name="norden"
           value={form.norden}
-          onChange={handleChangeNumber}
+          onChange={handleChangeNumberDecimals}
           onKeyUp={handleSearch}
           labelWidth="120px"
         />
@@ -272,39 +272,13 @@ export default function Hematologia() {
         />
       </SectionFieldset>
 
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4 border-t">
-        <div className="flex gap-3">
-          <button
-            onClick={handleSave}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-          </button>
-          <button
-            onClick={handleClear}
-            className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faBroom} /> Limpiar
-          </button>
-        </div>
-        <div className="flex flex-col items-end gap-2">
-          <span className="font-bold italic">Imprimir</span>
-          <div className="flex items-center gap-2">
-            <InputTextOneLine
-              name="norden"
-              value={form.norden}
-              onChange={handleChange}
-              inputClassName="w-28"
-            />
-            <button
-              onClick={handlePrint}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faPrint} />
-            </button>
-          </div>
-        </div>
-      </div>
+      <BotonesAccion
+        form={form}
+        handleSave={handleSave}
+        handleClear={handleClear}
+        handlePrint={handlePrint}
+        handleChangeNumberDecimals={handleChangeNumberDecimals}
+      />
     </div>
   );
 }
