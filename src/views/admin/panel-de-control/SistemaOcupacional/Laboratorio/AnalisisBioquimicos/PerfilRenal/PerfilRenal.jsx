@@ -1,5 +1,3 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
 import { getToday } from '../../../../../../utils/helpers';
@@ -9,6 +7,7 @@ import {
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
+import BotonesAccion from '../../../../../../components/templates/BotonesAccion';
 
 const tabla = 'l_bioquimica';
 
@@ -53,6 +52,7 @@ export default function PerfilRenal() {
     handleChange,
     handleClearnotO,
     handleFocusNext,
+    handleChangeNumberDecimals,
     handleChangeSimple,
     handleClear,
     handlePrintDefault,
@@ -75,13 +75,13 @@ export default function PerfilRenal() {
     });
   };
   return (
-    <form className="p-4 space-y-3">
+    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <InputTextOneLine
           label="N° Orden"
           name="norden"
           value={form.norden}
-          onChange={handleChange}
+          onChange={handleChangeNumberDecimals}
           onKeyUp={handleSearch}
           labelWidth="120px"
         />
@@ -90,7 +90,7 @@ export default function PerfilRenal() {
           name="fecha"
           type="date"
           value={form.fecha}
-          onChange={handleChange}
+          onChange={handleChangeSimple}
           labelWidth="120px"
         />
         <InputTextOneLine
@@ -255,42 +255,13 @@ export default function PerfilRenal() {
         />
       </SectionFieldset>
 
-      <fieldset className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={handleSave}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-          </button>
-          <button
-            type="button"
-            onClick={handleClear}
-            className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faBroom} /> Limpiar
-          </button>
-        </div>
-        <div className="flex flex-col items-end">
-          <span className="font-bold italic mb-2">Imprimir</span>
-          <div className="flex items-center gap-2">
-            <InputTextOneLine
-              name="norden"
-              value={form.norden}
-              onChange={handleChange}
-              inputClassName="w-24"
-            />
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faPrint} />
-            </button>
-          </div>
-        </div>
-      </fieldset>
-    </form>
+      <BotonesAccion
+        form={form}
+        handleSave={handleSave}
+        handleClear={handleClear}
+        handlePrint={handlePrint}
+        handleChangeNumberDecimals={handleChangeNumberDecimals}
+      />
+    </div>
   );
 }
