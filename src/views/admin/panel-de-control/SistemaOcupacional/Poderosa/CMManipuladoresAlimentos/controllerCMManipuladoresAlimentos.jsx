@@ -127,6 +127,7 @@ const GetInfoPac = async (nro, set, token, sede) => {
             ...prev,
             ...res,
             nombres: res.nombres,
+            nombreExamen: res.nomExam ?? "",
             dni: res.dni,
             edad: res.edad + " AÑOS",
             sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
