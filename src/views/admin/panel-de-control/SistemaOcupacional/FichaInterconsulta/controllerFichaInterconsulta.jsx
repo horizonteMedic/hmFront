@@ -56,7 +56,7 @@ export const GetInfoServicio = async (
         if (totalRadios > 5) height += (totalRadios - 5) * 30; // suma 40px por cada extra
         // Mostrar SweetAlert con radios
         const { value: seleccion } = await Swal.fire({
-             title: "Selecciona una especialidad",
+            title: "Selecciona una especialidad",
             input: "radio",
             inputOptions,
             inputValidator: (value) => {
@@ -96,19 +96,20 @@ export const GetInfoServicio = async (
                     jasperModules,
                     "../../../../jaspers/FichaInterconsulta"
                 );
-                
+
             } else {
                 GetInfoServicioEditar(nro, especialidadSeleccionada, tabla, set, token, () => {
-                Swal.fire(
-                    "Alerta",
-                    "Este paciente ya cuenta con registros de Ficha Interconsulta",
-                    "warning"
-                )})
+                    Swal.fire(
+                        "Alerta",
+                        "Este paciente ya cuenta con registros de Ficha Interconsulta",
+                        "warning"
+                    )
+                })
 
-                
+
                 // Aquí puedes retornar o usar especialidadSeleccionada.mensaje
-            }   
-            
+            }
+
         }
 
         // Si presiona "Nuevo registro"
@@ -119,9 +120,9 @@ export const GetInfoServicio = async (
                 GetInfoServicioNewEditar(nro, Object.values(inputOptions)[0], tabla, set, token, () => { Swal.close(); }, totalRadios + 1)
             }
         }
-        
+
     } else {
-        Swal.fire("Error","Este paciente no tiene registros","error")
+        Swal.fire("Error", "Este paciente no tiene registros", "error")
     }
 };
 
@@ -157,7 +158,7 @@ export const GetInfoEspecialidad = async (
             dniUser: prev.dniUser,
             fechaExamen: prev.fechaExamen,
             motivo: prev.motivo
-            
+
         }));
     }
 };
@@ -188,9 +189,9 @@ export const GetInfoServicioEditar = async (
             sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
             PA: `${res.sistolica}/${res.diastolica}`,
             edadPaciente: `${res.edadPaciente}`,
-            dniUser: res.dniUsuario,
+            dniUser: prev.dniUser,
             SubirDoc: true,
-            
+
         }));
     }
 };
@@ -217,7 +218,7 @@ export const GetInfoServicioNewEditar = async (
         console.log(res)
         set((prev) => ({
             ...prev,
-             ...res,
+            ...res,
             codigoFichaInterconsulta: null,
             especialidad: "",
             // Header
@@ -259,15 +260,15 @@ export const SubmitDataService = async (
         "hallazgo": form.hallazgo,
         "diagnostico": form.diagnostico,
         "tratamiento": form.tratamiento,
-        "apto":  false,
-        "noApto":  false,
+        "apto": false,
+        "noApto": false,
         "horaSalida": getHoraActual(),
         "orden": null,
         "nomenclatura": `INTERCONSULTA${form.NewNomenclatura ? ` ${form.NewNomenclatura}` : ""}`
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden,  token, tabla, datosFooter);
+        PrintHojaR(form.norden, token, tabla, datosFooter);
     });
 };
 
@@ -295,13 +296,13 @@ export const VerifyTR = async (nro, especialidad, tabla, token, set, sede) => {
         },
         () => {
             //Tiene registro
-                GetInfoServicio(nro, tabla, set, token, () => { Swal.close(); })
-                /*GetInfoServicioEditar(nro, especialidad, tabla, set, token, () => {
-                Swal.fire(
-                    "Alerta",
-                    "Este paciente ya cuenta con registros de Ficha Interconsulta",
-                    "warning"
-                );*/  
+            GetInfoServicio(nro, tabla, set, token, () => { Swal.close(); })
+            /*GetInfoServicioEditar(nro, especialidad, tabla, set, token, () => {
+            Swal.fire(
+                "Alerta",
+                "Este paciente ya cuenta con registros de Ficha Interconsulta",
+                "warning"
+            );*/
         },
         () => {
             //Necesita Agudeza visual Triaje
@@ -353,12 +354,12 @@ export const GetInfoServicioInterconsulta = async (
     onFinish = () => { }
 ) => {
     try {
-        console.log('llegue a consultar causam',especialidad)
+        console.log('llegue a consultar causam', especialidad)
         const res = await getFetch(
             `${obtenerReporteUrl}?nOrden=${nro}&especialidad=${especialidad}&nameService=${tabla}&esJasper=false`,
             token
         );
-        if (res?.norden || res?.norden_n_orden||res?.n_orden) {
+        if (res?.norden || res?.norden_n_orden || res?.n_orden) {
             return res;
         } else {
             Swal.fire("Error", "Ocurrió un error al traer los datos", "error");
@@ -385,7 +386,7 @@ export const GetInfoNoRegisterInterconsulta = async (
             `${obtenerReporteUrl}?nOrden=${nro}&especialidad=${especialidad}&nameService=${tabla}&esJasper=false`,
             token
         );
-        if (res?.norden || res?.norden_n_orden||res?.n_orden) {
+        if (res?.norden || res?.norden_n_orden || res?.n_orden) {
             return res;
         } else {
             Swal.fire("Error", "Ocurrió un error al traer los datos", "error");
@@ -411,7 +412,7 @@ export const PrintHojaRFichaInterconsulta = (nro, especialidad, token, tabla, da
     )
         .then(async (res) => {
             console.log(res)
-            if (res.norden || res.norden_n_orden|| res.n_orden) {
+            if (res.norden || res.norden_n_orden || res.n_orden) {
                 const nombre = res.nameJasper;
                 console.log(nombre)
                 const modulo = await jasperModules[

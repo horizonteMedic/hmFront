@@ -805,15 +805,15 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
   const firmaTrabajadorY = yFirmas + 2; // Reducido de 3 a 2
 
   // Calcular centro de la columna 1 para centrar las imágenes
-  const centroColumna1X = tablaInicioX + (95 / 2); // Centro de la columna 1
+  const centroColumna1X = tablaInicioX + (70 / 2); // Centro de la columna 1
 
   // Agregar firma del trabajador (lado izquierdo)
-  let firmaTrabajadorUrl = getSign(datosFinales, "FIRMAP");
+  let firmaTrabajadorUrl = await getSign(datosFinales, "FIRMAP");
   if (firmaTrabajadorUrl) {
     try {
       const imgWidth = 28; // Reducido de 30 a 28
       const imgHeight = 18; // Reducido de 20 a 18
-      const x = centroSeccionX - 18; // Ajustado
+      const x = centroColumna1X - 18; // Ajustado
       const y = firmaTrabajadorY;
       doc.addImage(firmaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
     } catch (error) {
@@ -822,12 +822,12 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
   }
 
   // Agregar huella del trabajador (lado derecho, vertical)
-  let huellaTrabajadorUrl = getSign(datosFinales, "HUELLA");
+  let huellaTrabajadorUrl = await getSign(datosFinales, "HUELLA");
   if (huellaTrabajadorUrl) {
     try {
       const imgWidth = 11; // Reducido de 12 a 11
       const imgHeight = 18; // Reducido de 20 a 18
-      const x = centroSeccionX + 7; // Ajustado
+      const x = centroColumna1X + 10; // Ajustado
       const y = firmaTrabajadorY;
       doc.addImage(huellaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
     } catch (error) {
