@@ -35,7 +35,7 @@ export const GetInfoServicio = async (
             fecha: res.fecha,
 
             nombreExamen: res.nombreExamen ?? "",
-            dni: res.dni ?? "",
+            dni: res.dniPaciente ?? "",
 
             nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),

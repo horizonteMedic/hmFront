@@ -7,12 +7,11 @@ import {
     SubmitDataServiceDefault,
     VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
-import { getToday } from "../../../../../../utils/helpers";
+import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 // Endpoints (placeholder, ajustar cuando estén disponibles)
-const obtenerReporteUrl = "";
-const registrarUrl = "";
-const today = getToday();
+const obtenerReporteUrl = "/api/v01/ct/informeBurnout/obtenerReporteInformeBurnout";
+const registrarUrl = "/api/v01/ct/informeBurnout/registrarActualizarInformeBurnout";
 
 export const GetInfoServicio = async (
     nro,
@@ -31,19 +30,32 @@ export const GetInfoServicio = async (
     if (res) {
         set((prev) => ({
             ...prev,
-            ...res,
-            norden: res.norden,
-            nombreExamen: res.nombreExamen,
-            fechaExamen: res.fecha ?? prev.fechaExamen ?? today,
-            nombres: res.nombresPaciente ?? "",
-            apellidos: res.apellidosPaciente ?? "",
+            norden: res.norden ?? "",
+            fecha: res.fecha,
+
+            nombreExamen: res.nombreExamen ?? "",
             dni: res.dniPaciente ?? "",
+
+            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
             edad: res.edadPaciente ?? "",
-            esApto: res.apto ? true : false,
+            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+            estadoCivil: res.estadoCivilPaciente ?? "",
+            nivelEstudios: res.nivelEstudioPaciente ?? "",
+            // Datos Laborales
+            empresa: res.empresa ?? "",
+            contrata: res.contrata ?? "",
+            ocupacion: res.ocupacionPaciente ?? "",
+            cargoDesempenar: res.cargoPaciente ?? "",
+
+            // Síndrome de Burnout
             sindromeBurnout: res.sindromeBurnout ?? "",
             agotamientoEmocional: res.agotamientoEmocional ?? "",
             despersonalizacion: res.despersonalizacion ?? "",
             realizacionPersonal: res.realizacionPersonal ?? "",
+
+            // Textos libres
             resultados: res.resultados ?? "",
             conclusiones: res.conclusiones ?? "",
             recomendaciones: res.recomendaciones ?? "",
@@ -61,14 +73,7 @@ export const SubmitDataService = async (
 ) => {
     const body = {
         norden: form.norden,
-        fecha: form.fechaExamen,
-        nombreExamen: form.nombreExamen,
-        nombresPaciente: form.nombres,
-        apellidosPaciente: form.apellidos,
-        dniPaciente: form.dni,
-        edadPaciente: form.edad,
-
-        // Burnout
+        fecha: form.fecha,
         sindromeBurnout: form.sindromeBurnout,
         agotamientoEmocional: form.agotamientoEmocional,
         despersonalizacion: form.despersonalizacion,
@@ -76,10 +81,6 @@ export const SubmitDataService = async (
         resultados: form.resultados,
         conclusiones: form.conclusiones,
         recomendaciones: form.recomendaciones,
-
-        // Aptitud
-        apto: form.esApto ? true : false,
-        noApto: form.esApto ? true : false,
         usuarioRegistro: user,
     };
 
@@ -133,12 +134,14 @@ const GetInfoPac = async (nro, set, token, sede) => {
         set((prev) => ({
             ...prev,
             ...res,
-            nombres: res.nombresPaciente ?? res.nombresApellidos ?? "",
-            apellidos: res.apellidosPaciente ?? "",
-            dni: res.dni ?? res.dniPaciente ?? "",
-            edad: res.edad ?? res.edadPaciente ?? "",
-            nombreExamen: res.nomExam ?? prev.nombreExamen ?? "",
-            fechaExamen: prev.fechaExamen,
+            nombres: res.nombresApellidos ?? "",
+            fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+            edad: res.edad,
+            ocupacion: res.areaO ?? "",
+            nombreExamen: res.nomExam ?? "",
+            cargoDesempenar: res.cargo ?? "",
+            lugarNacimiento: res.lugarNacimiento ?? "",
+            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
         }));
     }
 };
