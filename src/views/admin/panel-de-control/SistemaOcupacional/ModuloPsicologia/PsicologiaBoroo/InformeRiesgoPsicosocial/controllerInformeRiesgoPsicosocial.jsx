@@ -10,9 +10,9 @@ import {
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
-    "";
+    "/api/v01/ct/informeRiesgoPsicosocial/obtenerReporteInformeRiesgoPsicosocial";
 const registrarUrl =
-    "";
+    "/api/v01/ct/informeRiesgoPsicosocial/registrarActualizarInformeRiesgoPsicosocial";
 
 export const GetInfoServicio = async (
     nro,
@@ -31,7 +31,50 @@ export const GetInfoServicio = async (
     if (res) {
         set((prev) => ({
             ...prev,
-            norden: res.norden,
+            norden: res.norden ?? "",
+            fecha: res.fecha,
+
+            nombreExamen: res.nombreExamen ?? "",
+            dni: res.dni ?? "",
+
+            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+            edad: res.edadPaciente ?? "",
+            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+            estadoCivil: res.estadoCivilPaciente,
+            nivelEstudios: res.nivelEstudioPaciente,
+            // Datos Laborales
+            empresa: res.empresa,
+            contrata: res.contrata,
+            ocupacion: res.ocupacionPaciente,
+            cargoDesempenar: res.cargoPaciente,
+
+            // Riesgos Psicosociales
+            exigenciasPsicologicas: res.exigenciasPsicologicasFavorable ? "FAVORABLE" :
+                res.exigenciasPsicologicasPromedio ? "PROMEDIO" :
+                    res.exigenciasPsicologicasDesfavorable ? "DESFAVORABLE" : "",
+
+            trabajoActivoDesarrollo: res.trabajoActivoFavorable ? "FAVORABLE" :
+                res.trabajoActivoPromedio ? "PROMEDIO" :
+                    res.trabajoActivoDesfavorable ? "DESFAVORABLE" : "",
+
+            apoyoSocial: res.apoyoSocialFavorable ? "FAVORABLE" :
+                res.apoyoSocialPromedio ? "PROMEDIO" :
+                    res.apoyoSocialDesfavorable ? "DESFAVORABLE" : "",
+
+            compensaciones: res.compensacionesFavorable ? "FAVORABLE" :
+                res.compensacionesPromedio ? "PROMEDIO" :
+                    res.compensacionesDesfavorable ? "DESFAVORABLE" : "",
+
+            doblePresencia: res.doblePresenciaFavorable ? "FAVORABLE" :
+                res.doblePresenciaPromedio ? "PROMEDIO" :
+                    res.doblePresenciaDesfavorable ? "DESFAVORABLE" : "",
+
+            // Texto libre
+            recomendaciones: res.recomendaciones ?? "",
+            analisisResultados: res.analisis ?? "",
+            conclusionPerfil: res.apto ?? false,
         }));
     }
 };
@@ -48,12 +91,38 @@ export const SubmitDataService = async (
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
     }
-    if (!form.conclusionPerfil || form.conclusionPerfil == "") {
+    if (form.conclusionPerfil == undefined || form.conclusionPerfil == null) {
         await Swal.fire("Error", "Debe ingresar la conclusión del perfil del paciente", "error");
         return;
     }
     const body = {
         norden: form.norden,
+        fecha: form.fecha,
+
+        exigenciasPsicologicasFavorable: form.exigenciasPsicologicas == "FAVORABLE",
+        exigenciasPsicologicasPromedio: form.exigenciasPsicologicas == "PROMEDIO",
+        exigenciasPsicologicasDesfavorable: form.exigenciasPsicologicas == "DESFAVORABLE",
+
+        trabajoActivoFavorable: form.trabajoActivoDesarrollo == "FAVORABLE",
+        trabajoActivoPromedio: form.trabajoActivoDesarrollo == "PROMEDIO",
+        trabajoActivoDesfavorable: form.trabajoActivoDesarrollo == "DESFAVORABLE",
+
+        apoyoSocialFavorable: form.apoyoSocial == "FAVORABLE",
+        apoyoSocialPromedio: form.apoyoSocial == "PROMEDIO",
+        apoyoSocialDesfavorable: form.apoyoSocial == "DESFAVORABLE",
+
+        compensacionesFavorable: form.compensaciones == "FAVORABLE",
+        compensacionesPromedio: form.compensaciones == "PROMEDIO",
+        compensacionesDesfavorable: form.compensaciones == "DESFAVORABLE",
+
+        doblePresenciaFavorable: form.doblePresencia == "FAVORABLE",
+        doblePresenciaPromedio: form.doblePresencia == "PROMEDIO",
+        doblePresenciaDesfavorable: form.doblePresencia == "DESFAVORABLE",
+
+        analisis: form.analisisResultados,
+        recomendaciones: form.recomendaciones,
+        apto: form.conclusionPerfil,
+        noApto: !form.conclusionPerfil,
         usuarioRegistro: user,
     };
 
@@ -107,10 +176,14 @@ const GetInfoPac = async (nro, set, token, sede) => {
         set((prev) => ({
             ...prev,
             ...res,
+            nombres: res.nombresApellidos ?? "",
             fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
-            edad: res.edad ?? "",
+            edad: res.edad,
             ocupacion: res.areaO ?? "",
+            nombreExamen: res.nomExam ?? "",
             cargoDesempenar: res.cargo ?? "",
+            lugarNacimiento: res.lugarNacimiento ?? "",
+            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
         }));
     }
 };

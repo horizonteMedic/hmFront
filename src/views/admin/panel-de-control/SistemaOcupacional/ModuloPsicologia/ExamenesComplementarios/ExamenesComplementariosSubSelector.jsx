@@ -12,7 +12,7 @@ export default function ExamenesComplementariosSubSelector({ tieneVista }) {
         {
             id: 0,
             permission: "Informe Psicologico ADECO",
-            label: "Informe Psico. Estres / Fatiga Somnolencia",
+            label: "Estrés / Fatiga / Somnolencia",
             component: InformePsicologicoADECO
         },
         {
