@@ -166,52 +166,20 @@ export default async function ConsentAdmisionEvaluacionMedica(data = {}, docExis
   doc.text("Certifico haber sido informado que:", margin, yPos);
   yPos += lineHeight + 5;
 
-  // Función para justificar texto
-  const justificarTexto = (texto, x, y, anchoMaximo, interlineado) => {
-    const lineas = doc.splitTextToSize(texto, anchoMaximo);
-    let yActual = y;
-
-    lineas.forEach((linea, index) => {
-      // Solo justificar si no es la última línea y tiene más de una palabra
-      if (index < lineas.length - 1 && linea.includes(' ')) {
-        const palabras = linea.split(' ');
-        if (palabras.length > 1) {
-          const anchoTexto = doc.getTextWidth(linea);
-          const espacioDisponible = anchoMaximo - anchoTexto;
-          const espaciosEntrePalabras = palabras.length - 1;
-          const espacioExtra = espacioDisponible / espaciosEntrePalabras;
-
-          let xActual = x;
-          palabras.forEach((palabra, i) => {
-            doc.text(palabra, xActual, yActual);
-            if (i < palabras.length - 1) {
-              const anchoPalabra = doc.getTextWidth(palabra);
-              xActual += anchoPalabra + (doc.getTextWidth(' ') + espacioExtra);
-            }
-          });
-        } else {
-          doc.text(linea, x, yActual);
-        }
-      } else {
-        // Última línea no se justifica
-        doc.text(linea, x, yActual);
-      }
-      yActual += interlineado;
-    });
-
-    return yActual;
-  };
-
-  // Texto del consentimiento (entre comillas) - JUSTIFICADO
+  // Texto del consentimiento (entre comillas)
   doc.setFont("helvetica", "normal");
   const textoConsentimiento = `"De acuerdo con lo dispuesto en la Ley 29733 (Ley de Protección de Datos Personales), declaro haber tomado conocimiento que los exámenes médicos efectuados por el Centro Médico Evaluador y la información contenida en los mismos, a fin de evaluar mi condición médica para postular a un puesto de trabajo en el campamento minero es registrada por la Compañía Minera y/o la Compañía Aseguradora que tenga a su cargo la cobertura del Seguro Complementario de Trabajo de Riesgo o la que esta designe para los efectos de control de dicho seguro. En ese sentido, mediante la suscripción del presente documento, otorgo consentimiento expreso e inequívoco para que la Compañía Minera efectúe el tratamiento de los datos personales facilitados y los transfiera a la Compañía Aseguradora a fin de la evaluación y otorgamiento de la Cobertura del Seguro Complementario de Trabajo de Riesgo, pudiendo esta última informar a la Compañía Minera, Contratistas o Corredor de Seguros de ambos el estado de la cobertura del Seguro Complementario de Trabajo de Riesgo. Esta declaración autoriza al Centro Médico Evaluador la transferencia al empleador y/o Compañía Aseguradora de la información de la historia clínica y exámenes médicos confidenciales de conformidad con la Ley 26842 (Ley General de Salud), y de la Ley 29783 (Ley de Seguridad y Salud en el Trabajo) y su Reglamento aprobado por Decreto Supremo 005-2012-TR."`;
   
-  yPos = justificarTexto(textoConsentimiento, margin, yPos, anchoTexto, lineHeight);
-  yPos += 15;
+  const lineasConsentimiento = doc.splitTextToSize(textoConsentimiento, anchoTexto);
+  lineasConsentimiento.forEach((linea, idx) => {
+    doc.text(linea, margin, yPos + (idx * lineHeight));
+  });
+  yPos += lineasConsentimiento.length * lineHeight + 15;
 
-  // Fecha al final (alineada a la derecha): "[día] de [mes] del [año]"
+  // Fecha al final (alineada a la derecha): "de [día] de [mes] del [año]"
   doc.setFont("helvetica", "normal");
-  const textoFecha = `${dia} de ${mes} del ${anio}`;
+  const textoFecha = `de ${dia} de ${mes} del ${anio}`;
+  const textoFechaWidth = doc.getTextWidth(textoFecha);
   doc.text(textoFecha, pageW - margin, yPos, { align: "right" });
   yPos += 20;
 

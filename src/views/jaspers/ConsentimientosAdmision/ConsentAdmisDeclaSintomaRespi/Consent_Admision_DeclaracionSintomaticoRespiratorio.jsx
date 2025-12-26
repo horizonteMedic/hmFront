@@ -70,7 +70,7 @@ export default async function ConsentAdmisionDeclaracionSintomaticoRespiratorio(
     // Título
     doc.setFont("helvetica", "bold").setFontSize(14);
     doc.setTextColor(0, 0, 0);
-    doc.text("DECLARACIÓN DE SINTOMÁTICO RESPIRATORIO", pageW / 2, 40, { align: "center" });
+    doc.text("DECLARACIÓN DE SINTOMÁTICO RESPIRATORIO", pageW / 2, 35, { align: "center" });
 
     // Número de Ficha, Sede, Fecha y Página
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -110,7 +110,7 @@ export default async function ConsentAdmisionDeclaracionSintomaticoRespiratorio(
   drawHeader();
 
   // === CONTENIDO DEL DOCUMENTO ===
-  let yPos = 60; // Bajado 10mm
+  let yPos = 50;
   const margin = 15;
   const anchoTexto = pageW - (2 * margin);
   const lineHeight = 5;
@@ -233,8 +233,8 @@ export default async function ConsentAdmisionDeclaracionSintomaticoRespiratorio(
   });
   yPos += lineas2.length * lineHeight + 10;
 
-  // Tercera línea: "Trujillo, [día] de [mes] de 2025." (bajada 35mm: 15mm original + 20mm adicional)
-  yPos += 35;
+  // Tercera línea: "Trujillo, [día] de [mes] de 2025." (bajada 15mm)
+  yPos += 15;
   doc.setFont("helvetica", "normal");
   const texto3 = `Trujillo, ${dia} de ${mes} 2025.`;
   doc.text(texto3, margin, yPos);
@@ -252,7 +252,7 @@ export default async function ConsentAdmisionDeclaracionSintomaticoRespiratorio(
   });
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 7, fontSize: 7 });
+  footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
 
   // === Imprimir ===
   if (!docExistente) {

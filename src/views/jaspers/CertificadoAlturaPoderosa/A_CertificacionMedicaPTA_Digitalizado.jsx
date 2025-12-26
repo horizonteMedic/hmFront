@@ -48,6 +48,9 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
       puestoTrabajo: String(raw?.cargoPaciente ?? ''),
       empresa: String(raw?.empresa ?? ''),
       contrata: String(raw?.contrata ?? ''),
+      labor: String(raw?.ocupacionPaciente ?? ''),
+      primeraActitud: raw?.primeraActitud === true,
+      revalidacion: raw?.revalidacion === true,
       sede: String(raw?.sede ?? ''),
       numeroFicha: String(raw?.norden ?? ""),
       tipoExamen: String(raw?.tipoExamen ?? ''),
@@ -631,6 +634,25 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
+  // Fila: Labor (completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Fila: Primera Actitud y Revalidación (2 columnas con checkboxes)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 100, yPos, tablaInicioX + 100, yPos + filaAltura); // División entre Primera Actitud y Revalidación
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  // Líneas verticales para checkboxes (celdas de 6mm de ancho)
+  doc.line(tablaInicioX + 94, yPos, tablaInicioX + 94, yPos + filaAltura); // Checkbox Primera Actitud (inicio)
+  doc.line(tablaInicioX + 100, yPos, tablaInicioX + 100, yPos + filaAltura); // División central
+  doc.line(tablaInicioX + 194, yPos, tablaInicioX + 194, yPos + filaAltura); // Checkbox Revalidación (inicio)
+  yPos += filaAltura;
+
   // Apellidos y Nombres
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto + 1);
@@ -703,6 +725,29 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   doc.text("Contratista:", tablaInicioX + 2, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.contrata || "", tablaInicioX + 24, yTexto + 1);
+  yTexto += filaAltura;
+
+  // Labor
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Labor:", tablaInicioX + 2, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.labor || "", tablaInicioX + 24, yTexto + 1);
+  yTexto += filaAltura;
+
+  // Primera Actitud y Revalidación
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Primera Actitud:", tablaInicioX + 2, yTexto + 1);
+  // Checkbox Primera Actitud (centrado en celda de 6mm, desde 94 hasta 100)
+  if (datosFinales.primeraActitud === true) {
+    dibujarX(tablaInicioX + 94 + 3, yTexto + 1.2);
+  }
+  
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Revalidación:", tablaInicioX + 102, yTexto + 1);
+  // Checkbox Revalidación (centrado en celda de 6mm, desde 194 hasta 200)
+  if (datosFinales.revalidacion === true) {
+    dibujarX(tablaInicioX + 194 + 3, yTexto + 1.2);
+  }
   yTexto += filaAltura;
 
   // === SECCIÓN 2: ANTECEDENTES (DEL REGISTRO MÉDICO) ===
@@ -926,7 +971,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   xActual += anchoColumnaSignos;
   doc.text("Peso: " + (datosFinales.peso || "") + " Kg.", xActual + 2, yPos + 3.5);
   xActual += anchoColumnaSignos;
-  doc.text("IMC: " + (datosFinales.imc || ""), xActual + 2, yPos + 3.5);
+  doc.text("IMC: " + (datosFinales.imc || "") + (datosFinales.imc ? " kg/m²" : ""), xActual + 2, yPos + 3.5);
   
   yPos += alturaFilaSignos; // Reducir espacio superior
 

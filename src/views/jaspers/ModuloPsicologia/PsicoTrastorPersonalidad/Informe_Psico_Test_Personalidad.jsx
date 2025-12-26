@@ -35,6 +35,7 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
       analisisResultados: String(raw?.analisisResultado ?? raw?.analisisResultados ?? ''),
       recomendaciones: String(raw?.recomendaciones ?? ''),
       interpretacionParanoide: String(raw?.interpretacionParainoide ?? ''),
+      conclusiones: String(raw?.conclusiones ?? ''),
       cumplePerfil: (typeof raw?.perfilCumple === 'boolean') ? raw.perfilCumple : (raw?.perfilCumple === true || raw?.perfilCumple === 'true' || raw?.perfilCumple === 1),
     };
     return datosFinales;
@@ -44,13 +45,13 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
 
   // Header reutilizable
   const drawHeader = (pageNumber) => {
-    // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
+    // Logo y membrete (ajustado para evitar sobreposición)
+    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 2 });
 
-    // Títulos
+    // Títulos (movido más abajo para evitar sobreposición con logo)
     doc.setFont("helvetica", "bold").setFontSize(12);
     doc.setTextColor(0, 0, 0);
-    doc.text("INFORME DE TEST DE PERSONALIDAD", pageW / 2, 30, { align: "center" });
+    doc.text("INFORME DE TEST DE PERSONALIDAD", pageW / 2, 35, { align: "center" });
 
     // Número de Ficha, Sede, Fecha y Página
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -158,7 +159,7 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
   // === SECCIÓN 1: DATOS DE FILIACIÓN ===
   const tablaInicioX = 5;
   const tablaAncho = 200;
-  let yPos = 35;
+  let yPos = 40; // Ajustado para coincidir con el título movido
   const filaAltura = 5;
 
   // Header de datos de filiación
@@ -222,7 +223,7 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
   yPos += filaAltura;
 
   // === CONTENIDO DE LA TABLA ===
-  let yTexto = 35 + 2; // Ajustar para el header
+  let yTexto = 40 + 2; // Ajustar para el header
 
   // Primera fila: Apellidos y Nombres
   yTexto += filaAltura;
@@ -549,6 +550,9 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
   doc.text("CONCLUSIONES", tablaInicioX + 2, yPos + 4);
   yPos += filaAltura;
 
+  // Fila creciente para texto de conclusiones
+  yPos = dibujarTextoJustificado(datosFinales.conclusiones, tablaInicioX, yPos, tablaAncho - 4, 20);
+
   // Fila de CUMPLE / NO CUMPLE CON EL PERFIL (4 columnas)
   // Estructura: CUMPLE CON EL PERFIL | (vacía) | NO CUMPLE CON EL PERFIL | X
   const colXW = 15; // Ancho para columna de X
@@ -585,7 +589,7 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
   if (yPos + espacioMinimoFirmas > doc.internal.pageSize.getHeight() - 20) {
     doc.addPage();
     numeroPagina++;
-    yPos = 35;
+    yPos = 40;
     drawHeader(numeroPagina);
   }
   

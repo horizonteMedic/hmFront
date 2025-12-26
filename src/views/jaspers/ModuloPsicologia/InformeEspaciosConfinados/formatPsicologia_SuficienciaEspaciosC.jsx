@@ -15,8 +15,8 @@ export default async function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   function buildDatosFinales(raw) {
     const datosReales = {
       apellidosNombres: String((((raw?.apellidosPaciente ?? '') + ' ' + (raw?.nombresPaciente ?? '')).trim())),
-      fechaExamen: formatearFechaCorta(raw?.fechaEntrevista ?? ''),
-      tipoExamen: String(raw?.nombreExamen ?? ''),
+      fechaExamen: formatearFechaCorta(raw?.fechaExamen ?? raw?.fechaEntrevista ?? raw?.fecha ?? ''),
+      tipoExamen: String(raw?.nombreExamen ?? raw?.tipoExamen ?? ''),
       sexo: convertirGenero(raw?.sexoPaciente ?? ''),
       documentoIdentidad: String(raw?.dniPaciente ?? ''),
       edad: String(raw?.edadPaciente ?? ''),
@@ -376,11 +376,12 @@ export default async function formatPsicologia_SuficienciaEspaciosC(data = {}) {
 
   // Datos de aspectos psicológicos desde data
   const aspectosPsicologicos = [
-    { numero: 1, aspecto: "Razonamiento", evaluacion: getEvaluacion("razonamiento") },
+    { numero: 1, aspecto: "Razonamiento y Resolucion de problemas", evaluacion: getEvaluacion("razonamiento") },
     { numero: 2, aspecto: "Memoria", evaluacion: getEvaluacion("memoria") },
-    { numero: 3, aspecto: "Atención", evaluacion: getEvaluacion("atencion") },
-    { numero: 4, aspecto: "Orientación Espacial", evaluacion: getEvaluacion("orientacionEspacial") },
-    { numero: 5, aspecto: "Viso Motora", evaluacion: getEvaluacion("visoMotora") }
+    { numero: 3, aspecto: "Atencion y Concentración", evaluacion: getEvaluacion("atencion") },
+    { numero: 4, aspecto: "Coordinación viso-motora", evaluacion: getEvaluacion("visoMotora") },
+    { numero: 5, aspecto: "Orientación Espacial", evaluacion: getEvaluacion("orientacionEspacial") },
+    { numero: 6, aspecto: "Comprensión verbal", evaluacion: getEvaluacion("comprensionVerbal") }
   ];
 
   // Dibujar filas de datos
@@ -680,9 +681,17 @@ export default async function formatPsicologia_SuficienciaEspaciosC(data = {}) {
     }
   }
 
+  // Dibujar línea debajo de la firma
+  const textoFirma = "FIRMA Y SELLO DEL PROFESIONAL RESPONSABLE DE LA EVALUACION";
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Sello y Firma del Médico", centroColumna, yFirmas + 26, { align: "center" });
-  doc.text("Responsable de la Evaluación", centroColumna, yFirmas + 28.5, { align: "center" });
+  const anchoTextoFirma = doc.getTextWidth(textoFirma);
+  const lineaY = yFirmas + 25;
+  doc.setLineWidth(0.2);
+  doc.line(centroColumna - anchoTextoFirma / 2, lineaY, centroColumna + anchoTextoFirma / 2, lineaY);
+  
+  // Texto del pie de firma
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(textoFirma, centroColumna, lineaY + 4, { align: "center" });
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 5 });
