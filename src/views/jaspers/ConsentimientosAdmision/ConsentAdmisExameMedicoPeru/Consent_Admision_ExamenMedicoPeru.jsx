@@ -328,9 +328,9 @@ export default async function ConsentAdmisionExamenMedicoPeru(data = {}, docExis
   yPos = justificarTexto(textoConsentimiento2, margin, yPos, anchoTexto, lineHeight);
   yPos += 15;
 
-  // Fecha al final: "En..... a los ...... dias de..... del {año }"
+  // Fecha al final: "a los [día] días de [mes] del [año]"
   doc.setFont("helvetica", "normal");
-  const textoFecha = `En..... a los ${dia} días de ${mes} del ${anio}`;
+  const textoFecha = `a los ${dia} días de ${mes} del ${anio}`;
   doc.text(textoFecha, pageW - margin, yPos, { align: "right" });
   yPos += 20;
 
@@ -349,86 +349,6 @@ export default async function ConsentAdmisionExamenMedicoPeru(data = {}, docExis
   const centroX = pageW / 2;
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(`DNI: ${datosFinales.documentoIdentidad}`, centroX, yPosFinalFirmas + 3, { align: "center" });
-
-  // === TEXTO DE ARTÍCULOS (casi con el footer) ===
-  // Calcular posición cerca del footer
-  const pageHeight = doc.internal.pageSize.getHeight();
-  const marginBottom = 25;
-  const footerOffsetY = 7;
-  const baseYFooter = pageHeight - marginBottom + footerOffsetY;
-  const lineaDivisoraY = baseYFooter - 3.6;
-  
-  // Calcular altura total del texto de artículos
-  doc.setFont("helvetica", "normal").setFontSize(6);
-  const textoArticulo1 = "Artículo 71. Obligaciones del Empleador";
-  const textoArticulo1b = "b) A título personal, sobre los resultados de los informes médicos, previos a la asignación de un puesto de trabajo, y los relativos a la evaluación de su salud. Los resultados de los exámenes médicos, al ser confidenciales, no pueden ser utilizados para ejercer discriminación alguna, contra los trabajadores en ninguna circunstancia o momento.";
-  const textoRM = "RM 312 - 2011 - MINSA - Protocolo de Exámenes médicos ocupacionales y guías de diagnóstico.";
-  const textoArticulo2 = "\"Artículo 6.4.62.-El Médico Ocupacional determina la aptitud del trabajador en las evaluaciones médico ocupacional en relación al puesto de trabajo.";
-  const textoArticulo2b = "b) Apto con Restricciones. Aquel trabajador que a pesar de tener algunas patologías, o condiciones pre-patológicas puede desarrollar la labor habitual teniendo ciertas precauciones, para que éstas no pongan en riesgo su seguridad, disminuyan su rendimiento, o puedan verse agravadas. Deben ser incluidos en programas de vigilancia específicos.\"";
-
-  const interlineadoPequeño = 3;
-  const textos = [
-    { texto: textoArticulo1, bold: true, espacioDespues: 2 },
-    { texto: textoArticulo1b, bold: false, espacioDespues: 3 },
-    { texto: textoRM, bold: false, espacioDespues: 3 },
-    { texto: textoArticulo2, bold: false, espacioDespues: 2 },
-    { texto: textoArticulo2b, bold: false, espacioDespues: 0 }
-  ];
-
-  // Calcular altura total aproximada
-  let alturaTotal = 0;
-  textos.forEach(({ texto, espacioDespues }) => {
-    const lineas = doc.splitTextToSize(texto, anchoTexto);
-    alturaTotal += lineas.length * interlineadoPequeño + espacioDespues;
-  });
-
-  // Posicionar el texto justo antes de la línea divisora del footer
-  yPos = lineaDivisoraY - alturaTotal - 2;
-
-  // Función para justificar texto pequeño
-  const justificarTextoPequeño = (texto, x, y, anchoMaximo, interlineado) => {
-    const lineas = doc.splitTextToSize(texto, anchoMaximo);
-    let yActual = y;
-
-    lineas.forEach((linea, index) => {
-      if (index < lineas.length - 1 && linea.includes(' ')) {
-        const palabras = linea.split(' ');
-        if (palabras.length > 1) {
-          doc.setFont("helvetica", "normal");
-          const anchoTexto = doc.getTextWidth(linea);
-          const espacioDisponible = anchoMaximo - anchoTexto;
-          const espaciosEntrePalabras = palabras.length - 1;
-          const espacioExtra = espacioDisponible / espaciosEntrePalabras;
-
-          let xActual = x;
-          palabras.forEach((palabra, i) => {
-            doc.text(palabra, xActual, yActual);
-            if (i < palabras.length - 1) {
-              const anchoPalabra = doc.getTextWidth(palabra);
-              xActual += anchoPalabra + (doc.getTextWidth(' ') + espacioExtra);
-            }
-          });
-        } else {
-          doc.text(linea, x, yActual);
-        }
-      } else {
-        doc.text(linea, x, yActual);
-      }
-      yActual += interlineado;
-    });
-
-    return yActual;
-  };
-
-  doc.setFontSize(6);
-  doc.setTextColor(0, 0, 0);
-  
-  // Dibujar todos los textos
-  textos.forEach(({ texto, bold, espacioDespues }) => {
-    doc.setFont("helvetica", bold ? "bold" : "normal");
-    yPos = justificarTextoPequeño(texto, margin, yPos, anchoTexto, interlineadoPequeño);
-    yPos += espacioDespues;
-  });
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 7, fontSize: 7 });

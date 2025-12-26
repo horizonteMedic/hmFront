@@ -379,8 +379,7 @@ export default async function Consentimiento_Boro_Digitalizado(datos) {
     if (tieneSelloProfesional) {
       // Posición del responsable (lado derecho - 2/3 de la página)
       const centroProfesionalX = (pageW / 3) * 2;
-      // Colocar los campos DESPUÉS del texto "Responsable de la Evaluación" (que está en yFinalFirmas - 3)
-      const yCamposResponsable = yFinalFirmas + 2; // Espacio después del texto "Responsable de la Evaluación"
+      const yCamposResponsable = yFinalFirmas - 3; // Justo debajo del texto "Responsable de la Evaluación"
 
       // Nombre Completo
       const nombreCompleto = String(datos.usuarioRegistrado || '');

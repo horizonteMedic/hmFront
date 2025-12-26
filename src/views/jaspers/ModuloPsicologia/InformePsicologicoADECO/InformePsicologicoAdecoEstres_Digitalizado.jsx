@@ -392,6 +392,22 @@ export default async function InformePsicologicoAdecoEstres_Digitalizado(data = 
   dibujarTextoConSaltoLinea(datosFinales.recomendaciones, tablaInicioX + 2, yPos + 3.6, tablaAncho - 5);
   yPos += alturaRecomendaciones;
 
+  // === SECCIÓN 6: CONCLUSIONES ===
+  // Header de conclusiones
+  yPos = dibujarHeaderSeccion("VI.- CONCLUSIONES", yPos, filaAltura);
+
+  // Fila de Conclusiones (creciente)
+  const alturaConclusiones = calcularAlturaTexto(datosFinales.conclusiones, tablaAncho - 5);
+
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaConclusiones);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaConclusiones);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaConclusiones, tablaInicioX + tablaAncho, yPos + alturaConclusiones);
+
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.conclusiones, tablaInicioX + 2, yPos + 3.6, tablaAncho - 5);
+  yPos += alturaConclusiones;
+
   // === SECCIÓN DE FIRMAS ===
   const yFirmas = yPos; // Sin separación después de la última sección
   const alturaSeccionFirmas = 30; // Altura para la sección de firmas
