@@ -11,9 +11,9 @@ import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 // Reutilizamos los endpoints generales de Informe Psicológico
 const obtenerReporteUrl =
-    "";
+    "/api/v01/ct/aversionRiesgo/obtenerReporteAversionRiesgo";
 const registrarUrl =
-    "";
+    "/api/v01/ct/aversionRiesgo/registrarActualizar";
 
 export const GetInfoServicio = async (
     nro,
@@ -33,7 +33,85 @@ export const GetInfoServicio = async (
         set((prev) => ({
             ...prev,
             norden: res.norden,
+            fechaExam: res.fechaRegistro,
+            nombreExamen: res.tipoExamen ?? "",
+            dni: res.dniPaciente ?? "",
 
+            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+            edad: res.edadPaciente ?? "",
+            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+            estadoCivil: res.estadoCivilPaciente ?? "",
+            nivelEstudios: res.nivelEstudioPaciente ?? "",
+            // Datos Laborales
+            empresa: res.empresa ?? "",
+            contrata: res.contrata ?? "",
+            ocupacion: res.ocupacionPaciente ?? "",
+            cargoDesempenar: res.cargoPaciente ?? "",
+
+            practicaFuncional: res.aspIntelPractFuncBajo ? "BAJO" :
+                res.aspIntelPractFuncMedio ? "MEDIO" :
+                    res.aspIntelPractFuncAlto ? "ALTO" : "",
+
+            recursividad: res.aspIntelRecurBajo ? "BAJO" :
+                res.aspIntelRecurMedio ? "MEDIO" :
+                    res.aspIntelRecurAlto ? "ALTO" : "",
+
+            capacidadAtencion: res.aspIntelAtenciConcBajo ? "BAJO" :
+                res.aspIntelAtenciConcMedio ? "MEDIO" :
+                    res.aspIntelAtenciConcAlto ? "ALTO" : "",
+
+            estabilidadEmocional: res.aspEmocEstabilEmocMadBajo ? "BAJO" :
+                res.aspEmocEstabilEmocMadMedio ? "MEDIO" :
+                    res.aspEmocEstabilEmocMadAlto ? "ALTO" : "",
+
+            flexibilidadEmociones: res.aspFlexibManjEmocBajo ? "BAJO" :
+                res.aspFlexibManjEmocMedio ? "MEDIO" :
+                    res.aspFlexibManjEmocAlto ? "ALTO" : "",
+
+            controlImpulsos: res.aspCtrlImpulBajo ? "BAJO" :
+                res.aspCtrlImpulMedio ? "MEDIO" :
+                    res.aspCtrlImpulAlto ? "ALTO" : "",
+
+            subordinacion: res.compEspecfCapSuborBajo ? "BAJO" :
+                res.compEspecfCapSuborMedio ? "MEDIO" :
+                    res.compEspecfCapSuborAlto ? "ALTO" : "",
+
+            adecuacionNormas: res.compEspecfAdecNorProcedBajo ? "BAJO" :
+                res.compEspecfAdecNorProcedMedio ? "MEDIO" :
+                    res.compEspecfAdecNorProcedAlto ? "ALTO" : "",
+
+            consideracionTerceros: res.compEspecfConsideraTercerosBajo ? "BAJO" :
+                res.compEspecfConsideraTercerosMedio ? "MEDIO" :
+                    res.compEspecfConsideraTercerosAlto ? "ALTO" : "",
+
+            autonomiaTrabajo: res.compEspecfAutonomiaTrabajarBajo ? "BAJO" :
+                res.compEspecfAutonomiaTrabajarMedio ? "MEDIO" :
+                    res.compEspecfAutonomiaTrabajarAlto ? "ALTO" : "",
+
+            proactividad: res.compEspecfProactividadBajo ? "BAJO" :
+                res.compEspecfProactividadMedio ? "MEDIO" :
+                    res.compEspecfProactividadAlto ? "ALTO" : "",
+
+            capacidadPresion: res.compEspecfCapTrabjoBajoPresionBajo ? "BAJO" :
+                res.compEspecfCapTrabjoBajoPresionMedio ? "MEDIO" :
+                    res.compEspecfCapTrabjoBajoPresionAlto ? "ALTO" : "",
+
+            evaluacionRiesgos: res.compEspecfCapEvaluarRiesgosBajo ? "BAJO" :
+                res.compEspecfCapEvaluarRiesgosMedio ? "MEDIO" :
+                    res.compEspecfCapEvaluarRiesgosAlto ? "ALTO" : "",
+
+            motivacionCargo: res.compEspecfMotPorCarBajo ? "BAJO" :
+                res.compEspecfMotPorCarMedio ? "MEDIO" :
+                    res.compEspecfMotPorCarAlto ? "ALTO" : "",
+
+            analisisResultados: res.analisisResultados ?? "",
+            recomendaciones: res.recomendaciones ?? "",
+
+            conclusion: res.conclusionesCumple,
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -50,11 +128,78 @@ export const SubmitDataService = async (
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
     }
-
+    if (form.conclusion === undefined || form.conclusion === null) {
+        await Swal.fire("Error", "Debe seleccionar el cumplimiento del perfil", "error");
+        return;
+    }
     const body = {
-        norden: form.norden,
+        numeroOrden: form.norden,
+        fechaRegistro: form.fechaExam,
+
+        aspectoIntelectualPracticoFuncionalBajo: form.practicaFuncional == "BAJO",
+        aspectoIntelectualPracticoFuncionalMedio: form.practicaFuncional == "MEDIO",
+        aspectoIntelectualPracticoFuncionalAlto: form.practicaFuncional == "ALTO",
+
+        aspectoIntelectualRecursosBajo: form.recursividad == "BAJO",
+        aspectoIntelectualRecursosMedio: form.recursividad == "MEDIO",
+        aspectoIntelectualRecursosAlto: form.recursividad == "ALTO",
+
+        aspectoIntelectualAtencionConcentracionBajo: form.capacidadAtencion == "BAJO",
+        aspectoIntelectualAtencionConcentracionMedio: form.capacidadAtencion == "MEDIO",
+        aspectoIntelectualAtencionConcentracionAlto: form.capacidadAtencion == "ALTO",
+
+        aspectoEmocionalEstabilidadMadurezBajo: form.estabilidadEmocional == "BAJO",
+        aspectoEmocionalEstabilidadMadurezMedio: form.estabilidadEmocional == "MEDIO",
+        aspectoEmocionalEstabilidadMadurezAlto: form.estabilidadEmocional == "ALTO",
+
+        aspectoFlexibilidadManejoEmocionalBajo: form.flexibilidadEmociones == "BAJO",
+        aspectoFlexibilidadManejoEmocionalMedio: form.flexibilidadEmociones == "MEDIO",
+        aspectoFlexibilidadManejoEmocionalAlto: form.flexibilidadEmociones == "ALTO",
+
+        aspectoControlImpulsosBajo: form.controlImpulsos == "BAJO",
+        aspectoControlImpulsosMedio: form.controlImpulsos == "MEDIO",
+        aspectoControlImpulsosAlto: form.controlImpulsos == "ALTO",
+
+        competenciaCapacidadSubordinacionBajo: form.subordinacion == "BAJO",
+        competenciaCapacidadSubordinacionMedio: form.subordinacion == "MEDIO",
+        competenciaCapacidadSubordinacionAlto: form.subordinacion == "ALTO",
+
+        competenciaAdecuacionNormasProcedimientosBajo: form.adecuacionNormas == "BAJO",
+        competenciaAdecuacionNormasProcedimientosMedio: form.adecuacionNormas == "MEDIO",
+        competenciaAdecuacionNormasProcedimientosAlto: form.adecuacionNormas == "ALTO",
+
+        competenciaConsideracionTercerosBajo: form.consideracionTerceros == "BAJO",
+        competenciaConsideracionTercerosMedio: form.consideracionTerceros == "MEDIO",
+        competenciaConsideracionTercerosAlto: form.consideracionTerceros == "ALTO",
+
+        competenciaAutonomiaTrabajoBajo: form.autonomiaTrabajo == "BAJO",
+        competenciaAutonomiaTrabajoMedio: form.autonomiaTrabajo == "MEDIO",
+        competenciaAutonomiaTrabajoAlto: form.autonomiaTrabajo == "ALTO",
+
+        competenciaProactividadBajo: form.proactividad == "BAJO",
+        competenciaProactividadMedio: form.proactividad == "MEDIO",
+        competenciaProactividadAlto: form.proactividad == "ALTO",
+
+        competenciaCapacidadTrabajoBajoPresionBajo: form.capacidadPresion == "BAJO",
+        competenciaCapacidadTrabajoBajoPresionMedio: form.capacidadPresion == "MEDIO",
+        competenciaCapacidadTrabajoBajoPresionAlto: form.capacidadPresion == "ALTO",
+
+        competenciaCapacidadEvaluarRiesgosBajo: form.evaluacionRiesgos == "BAJO",
+        competenciaCapacidadEvaluarRiesgosMedio: form.evaluacionRiesgos == "MEDIO",
+        competenciaCapacidadEvaluarRiesgosAlto: form.evaluacionRiesgos == "ALTO",
+
+        competenciaMotivacionPorCargoBajo: form.motivacionCargo == "BAJO",
+        competenciaMotivacionPorCargoMedio: form.motivacionCargo == "MEDIO",
+        competenciaMotivacionPorCargoAlto: form.motivacionCargo == "ALTO",
+
+        analisisResultados: form.analisisResultados,
+        recomendaciones: form.recomendaciones,
+        conclusionesCumple: form.conclusion,
+        conclusionesNoCumple: !form.conclusion,
 
         usuarioRegistro: user,
+
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -105,10 +250,14 @@ const GetInfoPac = async (nro, set, token, sede) => {
         set((prev) => ({
             ...prev,
             ...res,
+            nombres: res.nombresApellidos ?? "",
             fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
-            edad: (res.edad ? `${res.edad} AÑOS` : prev.edad),
-            ocupacion: res.areaO ?? prev.ocupacion,
-            cargoDesempenar: res.cargo ?? prev.cargoDesempenar,
+            edad: res.edad,
+            ocupacion: res.areaO ?? "",
+            nombreExamen: res.nomExam ?? "",
+            cargoDesempenar: res.cargo ?? "",
+            lugarNacimiento: res.lugarNacimiento ?? "",
+            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
         }));
     }
 };

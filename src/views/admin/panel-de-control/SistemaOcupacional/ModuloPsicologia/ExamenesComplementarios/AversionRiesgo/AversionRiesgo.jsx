@@ -2,32 +2,42 @@ import { useForm } from "../../../../../../hooks/useForm"
 import { getToday } from "../../../../../../utils/helpers";
 import {
     InputTextOneLine,
-    InputsRadioGroup,
     RadioTable,
     InputTextArea,
+    InputsBooleanRadioGroup,
 } from "../../../../../../components/reusableComponents/ResusableComponents";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAversionRiesgo";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
+import { useSessionData } from "../../../../../../hooks/useSessionData";
 
-const tabla = ""
+const tabla = "aversionalriesgo"
 
 export default function AversionRiesgo() {
     const today = getToday();
+    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+
     const initialFormState = {
         norden: "",
         fechaExam: today,
         nombreExamen: "",
 
-        nombres: "",
         dni: "",
+        nombres: "",
+        apellidos: "",
+        fechaNacimiento: "",
+        lugarNacimiento: "",
         edad: "",
         sexo: "",
+        estadoCivil: "",
+        nivelEstudios: "",
 
+        // Datos Laborales
         empresa: "",
         contrata: "",
-        areaTrabajo: "",
-        puestoActual: "",
+        ocupacion: "",
+        cargoDesempenar: "",
 
         practicaFuncional: "",
         recursividad: "",
@@ -49,7 +59,7 @@ export default function AversionRiesgo() {
         analisisResultados: "",
         recomendaciones: "",
 
-        conclusion: "",
+        conclusion: undefined,
     }
     const {
         form,
@@ -57,6 +67,7 @@ export default function AversionRiesgo() {
         handleChange,
         handleChangeNumberDecimals,
         handleRadioButton,
+        handleRadioButtonBoolean,
         handleChangeSimple,
         handleClear,
         handleClearnotO,
@@ -82,13 +93,14 @@ export default function AversionRiesgo() {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-3">
                 <InputTextOneLine
                     label="N° Orden"
                     name="norden"
                     value={form?.norden}
                     onChange={handleChangeNumberDecimals}
                     onKeyUp={handleSearch}
+                    labelWidth="120px"
                 />
                 <InputTextOneLine
                     label="Fecha"
@@ -96,6 +108,7 @@ export default function AversionRiesgo() {
                     type="date"
                     value={form?.fechaExam}
                     onChange={handleChangeSimple}
+                    labelWidth="120px"
                 />
                 <InputTextOneLine
                     label="Tipo de Examen"
@@ -106,61 +119,7 @@ export default function AversionRiesgo() {
                 />
             </SectionFieldset>
 
-            <SectionFieldset legend="Datos del Paciente" >
-                {/* Fila 1: Nombres, DNI, Edad, Género */}
-                <div className="grid grid-cols-1 md:grid-cols-2  gap-3 mb-3">
-                    <InputTextOneLine
-                        label="Nombres y Apellidos"
-                        name="nombres"
-                        value={form?.nombres}
-                        disabled
-                    />
-                    <div className="grid grid-cols-3 gap-4">
-                        <InputTextOneLine
-                            label="DNI"
-                            name="dni"
-                            value={form?.dni}
-                            disabled
-                        />
-                        <InputTextOneLine
-                            label="Edad"
-                            name="edad"
-                            value={form?.edad}
-                            disabled
-                        />
-                        <InputTextOneLine
-                            label="Sexo"
-                            name="sexo"
-                            value={form?.sexo}
-                            disabled
-                        />
-                    </div>
-                    <InputTextOneLine
-                        label="Empresa"
-                        name="empresa"
-                        value={form?.empresa}
-                        disabled
-                    />
-                    <InputTextOneLine
-                        label="Contrata"
-                        name="contrata"
-                        value={form?.contrata}
-                        disabled
-                    />
-                    <InputTextOneLine
-                        label="Area de Trabajo"
-                        name="areaTrabajo"
-                        value={form?.areaTrabajo}
-                        disabled
-                    />
-                    <InputTextOneLine
-                        label="Puesto de Trabajo"
-                        name="puestoActual"
-                        value={form?.puestoActual}
-                        disabled
-                    />
-                </div>
-            </SectionFieldset>
+            <DatosPersonalesLaborales form={form} />
 
             {/* Contenido*/}
             <div className="space-y-3 grid grid-cols-1 xl:grid-cols-3 gap-4">
@@ -240,15 +199,13 @@ export default function AversionRiesgo() {
                         />
                     </SectionFieldset>
                     <SectionFieldset legend="Conclusión">
-                        <InputsRadioGroup
+                        <InputsBooleanRadioGroup
                             name="conclusion"
                             value={form?.conclusion}
                             vertical
-                            onChange={handleRadioButton}
-                            options={[
-                                { label: "CUMPLE CON EL PERFIL", value: "CUMPLE" },
-                                { label: "NO CUMPLE CON EL PERFIL", value: "NO_CUMPLE" },
-                            ]}
+                            onChange={handleRadioButtonBoolean}
+                            trueLabel="CUMPLE CON EL PERFIL"
+                            falseLabel="NO CUMPLE CON EL PERFIL"
                         />
                     </SectionFieldset>
                 </section>
