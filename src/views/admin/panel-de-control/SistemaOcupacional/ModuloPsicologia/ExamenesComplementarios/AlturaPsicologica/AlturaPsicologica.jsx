@@ -60,7 +60,6 @@ export default function AlturaPsicologica() {
     // Analisis y recomendaciones
     analisisResultados: "",
     recomendaciones: "",
-
   };
 
   const {
