@@ -109,7 +109,7 @@ export const SubmitDataService = async (
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformePsicologicoADECO/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformePsicoBombaElectrica/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -117,7 +117,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../../jaspers/ModuloPsicologia/InformePsicologicoADECO"
+        "../../../../../../jaspers/ModuloPsicologia/InformePsicoBombaElectrica"
     );
 };
 

@@ -5,7 +5,7 @@ import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import { convertirGenero } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
 
-export default function InformePsicoCuestionarioBerlin(data = {}, docExistente = null) {
+export default async function InformePsicoCuestionarioBerlin(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -16,7 +16,7 @@ export default function InformePsicoCuestionarioBerlin(data = {}, docExistente =
   function buildDatosFinales(raw) {
     const datosFinales = {
       apellidosNombres: String((((raw?.apellidosPaciente ?? '') + ' ' + (raw?.nombresPaciente ?? '')).trim())),
-      fechaExamen: formatearFechaCorta(raw?.fechaRegistro ?? raw?.fecha ?? ''),
+      fechaExamen: formatearFechaCorta(raw?.fechaRegistro ?? ''),
       sexo: convertirGenero(raw?.sexoPaciente ?? ''),
       documentoIdentidad: String(raw?.dniPaciente ?? ''),
       edad: String(raw?.edadPaciente ?? ''),
@@ -36,10 +36,10 @@ export default function InformePsicoCuestionarioBerlin(data = {}, docExistente =
       apneaObstructivaSueno: String(raw?.criterioApneaObstructivaSueno ?? ''),
       fatigaSomnolencia: String(raw?.criterioFatigaSomnolencia ?? ''),
       hipertensionArterial: String(raw?.criterioHipertensionArterial ?? ''),
-      fortalezasOportunidades: String(raw?.analisisFodaFortalezasOportunidades ?? raw?.analisisFodaFortaOport ?? ''),
-      amenazasDebilidades: String(raw?.analisisFodaAmenazasDebilidades ?? raw?.analisisFodaAmenazDebili ?? ''),
-      observaciones: String(raw?.observacion ?? raw?.observaciones ?? ''),
-      recomendaciones: String(raw?.recomendacion ?? raw?.recomendaciones ?? ''),
+      fortalezasOportunidades: String(raw?.analisisFodaFortalezasOportunidades ?? ''),
+      amenazasDebilidades: String(raw?.analisisFodaAmenazasDebilidades ?? ''),
+      observaciones: String(raw?.observaciones ?? ''),
+      recomendaciones: String(raw?.recomendaciones ?? ''),
       cumplePerfil: (typeof raw?.perfilCumple === 'boolean') ? raw.perfilCumple : (raw?.perfilCumple === true || raw?.perfilCumple === 'true' || raw?.perfilCumple === 1),
     };
     return datosFinales;
@@ -48,9 +48,9 @@ export default function InformePsicoCuestionarioBerlin(data = {}, docExistente =
   const datosFinales = buildDatosFinales(data);
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
 
     // Títulos
     doc.setFont("helvetica", "bold").setFontSize(14);
@@ -186,7 +186,7 @@ export default function InformePsicoCuestionarioBerlin(data = {}, docExistente =
   };
 
   // === PÁGINA 1 ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === SECCIÓN 1: DATOS DE FILIACIÓN ===
   const tablaInicioX = 5;
@@ -335,7 +335,7 @@ export default function InformePsicoCuestionarioBerlin(data = {}, docExistente =
     doc.addPage();
     numeroPagina++;
     yPos = 35;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
   }
 
   yPos = dibujarHeaderSeccion("II. CRITERIOS DE EVALUACIÓN", yPos, filaAltura);
@@ -400,26 +400,48 @@ export default function InformePsicoCuestionarioBerlin(data = {}, docExistente =
     doc.addPage();
     numeroPagina++;
     yPos = 35;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
   }
 
   yPos = dibujarHeaderSeccion("III. ANÁLISIS FODA", yPos, filaAltura);
 
   // Fila: FORTALEZAS / OPORTUNIDADES
-  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  const anchoDisponibleFoda = tablaAncho - 60 - 4;
+  const lineasFortalezas = doc.splitTextToSize(datosFinales.fortalezasOportunidades || "-", anchoDisponibleFoda);
+  const alturaFortalezas = Math.max(filaAltura, lineasFortalezas.length * 3.5 + 1);
+  
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaFortalezas, 'S');
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("FORTALEZAS / OPORTUNIDADES:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.fortalezasOportunidades || "-", tablaInicioX + 60, yPos + 3.5);
-  yPos += filaAltura;
+  if (lineasFortalezas.length === 1) {
+    doc.text(lineasFortalezas[0], tablaInicioX + 60, yPos + 3.5);
+  } else {
+    const yInicioTexto = yPos + alturaFortalezas / 2 - ((lineasFortalezas.length - 1) * 3.5) / 2;
+    lineasFortalezas.forEach((linea, lineIdx) => {
+      doc.text(linea, tablaInicioX + 60, yInicioTexto + (lineIdx * 3.5));
+    });
+  }
+  yPos += alturaFortalezas;
 
   // Fila: AMENAZAS / DEBILIDADES
-  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
+  const lineasAmenazas = doc.splitTextToSize(datosFinales.amenazasDebilidades || "-", anchoDisponibleFoda);
+  const alturaAmenazas = Math.max(filaAltura, lineasAmenazas.length * 3.5 + 1);
+  
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaAmenazas, 'S');
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("AMENAZAS / DEBILIDADES:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.amenazasDebilidades || "-", tablaInicioX + 60, yPos + 3.5);
-  yPos += filaAltura;
+  if (lineasAmenazas.length === 1) {
+    doc.text(lineasAmenazas[0], tablaInicioX + 60, yPos + 3.5);
+  } else {
+    const yInicioTexto = yPos + alturaAmenazas / 2 - ((lineasAmenazas.length - 1) * 3.5) / 2;
+    lineasAmenazas.forEach((linea, lineIdx) => {
+      doc.text(linea, tablaInicioX + 60, yInicioTexto + (lineIdx * 3.5));
+    });
+  }
+  yPos += alturaAmenazas;
 
   // === SECCIÓN 4: OBSERVACIONES ===
   // Verificar si necesitamos nueva página
@@ -427,7 +449,7 @@ export default function InformePsicoCuestionarioBerlin(data = {}, docExistente =
     doc.addPage();
     numeroPagina++;
     yPos = 35;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
   }
 
   yPos = dibujarHeaderSeccion("IV. OBSERVACIONES", yPos, filaAltura);
@@ -441,7 +463,7 @@ export default function InformePsicoCuestionarioBerlin(data = {}, docExistente =
     doc.addPage();
     numeroPagina++;
     yPos = 35;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
   }
 
   yPos = dibujarHeaderSeccion("V. RECOMENDACIONES:", yPos, filaAltura);
@@ -472,15 +494,17 @@ export default function InformePsicoCuestionarioBerlin(data = {}, docExistente =
   const anchoFirma = 60; // Ancho reservado para la firma
   const anchoRecomendaciones = tablaAncho - anchoFirma - 2; // Ancho disponible para recomendaciones
   
-  // Calcular altura necesaria
+  // Calcular altura necesaria (con padding igual que OBSERVACIONES)
+  const padding = 3;
   let alturaRecomendaciones = 20;
   if (itemsRecomendaciones.length > 0) {
     let alturaTotal = 0;
     itemsRecomendaciones.forEach(item => {
-      const lineas = doc.splitTextToSize(item, anchoRecomendaciones - 4);
-      alturaTotal += lineas.length * 3.5 + 2;
+      const textoItem = item.trim().startsWith('-') ? item.trim() : '- ' + item.trim();
+      const lineas = doc.splitTextToSize(textoItem, anchoRecomendaciones - 4);
+      alturaTotal += lineas.length * 3.5;
     });
-    alturaRecomendaciones = Math.max(20, alturaTotal + 4);
+    alturaRecomendaciones = Math.max(20, alturaTotal + padding * 2); // padding arriba y abajo
   }
   
   // Asegurar altura mínima para la firma
@@ -493,9 +517,9 @@ export default function InformePsicoCuestionarioBerlin(data = {}, docExistente =
   // Línea divisoria entre recomendaciones y firma
   doc.line(tablaInicioX + anchoRecomendaciones, yPos, tablaInicioX + anchoRecomendaciones, yPos + alturaRecomendaciones);
   
-  // Dibujar recomendaciones
+  // Dibujar recomendaciones (con padding arriba igual que OBSERVACIONES)
   doc.setFont("helvetica", "normal").setFontSize(9);
-  let yRecomendaciones = yPos + 3;
+  let yRecomendaciones = yPos + padding + 2; // Mismo padding que OBSERVACIONES (3 + 2 = 5)
   itemsRecomendaciones.forEach(item => {
     const textoItem = item.trim().startsWith('-') ? item.trim() : '- ' + item.trim();
     const lineas = doc.splitTextToSize(textoItem, anchoRecomendaciones - 4);
@@ -543,10 +567,12 @@ export default function InformePsicoCuestionarioBerlin(data = {}, docExistente =
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
 
-  Promise.all([
-    isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
-    isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-  ]).then(([s1, s2]) => {
+  try {
+    const [s1, s2] = await Promise.all([
+      isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
+      isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
+    ]);
+
     const sigW = 48;
     const sigH = 20;
     const sigY = yPos + (alturaRecomendaciones / 2) - (sigH / 2); // Centrar verticalmente
@@ -576,7 +602,7 @@ export default function InformePsicoCuestionarioBerlin(data = {}, docExistente =
       doc.addPage();
       numeroPagina++;
       yPos = 35;
-      drawHeader(numeroPagina);
+      await drawHeader(numeroPagina);
     } else {
       yPos = yPosDespuesRecomendaciones;
     }
@@ -618,7 +644,7 @@ export default function InformePsicoCuestionarioBerlin(data = {}, docExistente =
     if (!docExistente) {
       imprimir(doc);
     }
-  }).catch(err => {
+  } catch (err) {
     console.error("Error al cargar firma del médico:", err);
     
     // Continuar con la sección VI aunque falle la carga de la firma
@@ -627,7 +653,7 @@ export default function InformePsicoCuestionarioBerlin(data = {}, docExistente =
       doc.addPage();
       numeroPagina++;
       yPos = 35;
-      drawHeader(numeroPagina);
+      await drawHeader(numeroPagina);
     } else {
       yPos = yPosDespuesRecomendaciones;
     }
@@ -662,7 +688,7 @@ export default function InformePsicoCuestionarioBerlin(data = {}, docExistente =
     if (!docExistente) {
       imprimir(doc);
     }
-  });
+  }
 
   // Si hay docExistente, retornar el doc (las firmas se agregarán asíncronamente)
   if (docExistente) {
