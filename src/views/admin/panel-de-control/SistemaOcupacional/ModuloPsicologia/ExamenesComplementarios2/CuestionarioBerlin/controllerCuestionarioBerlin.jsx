@@ -43,7 +43,7 @@ export const GetInfoServicio = async (
             nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
             lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-            edad: res.edad ?? "",
+            edad: res.edadPaciente ?? "",
             sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
             estadoCivil: res.estadoCivilPaciente,
             nivelEstudios: res.nivelEstudioPaciente,

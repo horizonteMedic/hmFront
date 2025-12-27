@@ -1,5 +1,3 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faPrint, faBroom } from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
     InputTextArea,
@@ -11,28 +9,36 @@ import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformeDeFobias";
 import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
-const tabla = "";
-const today = getToday();
+const tabla = "fobias";
 
 export default function InformeDeFobias() {
-    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+    const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
+    const today = getToday();
 
     const initialFormState = {
-        // Encabezado del examen
         norden: "",
-        fechaEvaluacion: today,
+        fecha: today,
+        nombreExamen: "",
         esApto: undefined,
 
-        // Datos necesarios
+        dni: "",
         nombres: "",
         apellidos: "",
+        fechaNacimiento: "",
+        lugarNacimiento: "",
         edad: "",
-        gradoEstudios: "",
+        sexo: "",
+        estadoCivil: "",
+        nivelEstudios: "",
 
-        // Datos laborales
+        // Datos Laborales
         empresa: "",
-        cargo: "",
+        contrata: "",
+        ocupacion: "",
+        cargoDesempenar: "",
 
         // Criterios psicológicos
         inteligencia: "",
@@ -45,6 +51,10 @@ export default function InformeDeFobias() {
         // Observaciones y recomendaciones
         observaciones: "",
         recomendaciones: "",
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
     };
 
     const {
@@ -78,7 +88,7 @@ export default function InformeDeFobias() {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-4 gap-x-4 gap-y-3">
                 <InputTextOneLine
                     label="N° Orden"
                     name="norden"
@@ -88,11 +98,18 @@ export default function InformeDeFobias() {
                     labelWidth="120px"
                 />
                 <InputTextOneLine
-                    label="Fecha Evaluación"
-                    name="fechaEvaluacion"
+                    label="Fecha"
+                    name="fecha"
                     type="date"
-                    value={form.fechaEvaluacion}
+                    value={form.fecha}
                     onChange={handleChangeSimple}
+                    labelWidth="120px"
+                />
+                <InputTextOneLine
+                    label="Nombre del Examen"
+                    name="nombreExamen"
+                    value={form.nombreExamen}
+                    disabled
                     labelWidth="120px"
                 />
                 <InputsBooleanRadioGroup
@@ -106,122 +123,66 @@ export default function InformeDeFobias() {
                 />
             </SectionFieldset>
 
-            <SectionFieldset legend="Datos Necesarios">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    {/* Columna Izquierda */}
-                    <div className="space-y-3">
-                        <InputTextOneLine
-                            label="Nombres"
-                            name="nombres"
-                            value={form.nombres}
-                            disabled
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Apellidos"
-                            name="apellidos"
-                            value={form.apellidos}
-                            disabled
-                            labelWidth="120px"
-                        />
-                    </div>
+            <DatosPersonalesLaborales form={form} />
 
-                    {/* Columna Derecha */}
-                    <div className="space-y-3">
-                        <InputTextOneLine
-                            label="Edad"
-                            name="edad"
-                            value={form.edad}
-                            disabled
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="Grado de Estudios"
-                            name="gradoEstudios"
-                            value={form.gradoEstudios}
-                            disabled
-                            labelWidth="120px"
-                        />
-                    </div>
-                </div>
+            <SectionFieldset legend="Criterios Psicológicos" className="grid gap-x-4 gap-y-3">
+                <InputTextOneLine
+                    label="1.- Inteligencia"
+                    name="inteligencia"
+                    value={form?.inteligencia}
+                    onChange={handleChange}
+                    labelWidth="120px"
+                />
+                <InputTextOneLine
+                    label="2.- Fobias"
+                    name="fobias"
+                    value={form?.fobias}
+                    onChange={handleChange}
+                    labelWidth="120px"
+                />
             </SectionFieldset>
 
-            <SectionFieldset legend="Datos Laborales">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
-                    <InputTextOneLine
-                        label="Empresa"
-                        name="empresa"
-                        value={form.empresa}
-                        disabled
-                        labelWidth="120px"
-                    />
-                    <InputTextOneLine
-                        label="Cargo"
-                        name="cargo"
-                        value={form.cargo}
-                        disabled
-                        labelWidth="120px"
-                    />
-                </div>
+            <SectionFieldset legend="Observaciones y Recomendaciones" className="grid md:grid-cols-2 gap-x-4 gap-y-3">
+                <InputTextArea
+                    label="Observaciones"
+                    name="observaciones"
+                    value={form?.observaciones}
+                    onChange={handleChange}
+                    rows={4}
+                />
+                <InputTextArea
+                    label="Recomendaciones"
+                    name="recomendaciones"
+                    value={form?.recomendaciones}
+                    onChange={handleChange}
+                    rows={4}
+                />
             </SectionFieldset>
 
-            <SectionFieldset legend="Criterios Psicológicos">
-                <div className="space-y-4">
-                    <div className="grid grid-cols-1 gap-4">
-                        <InputTextOneLine
-                            label="1.- Inteligencia"
-                            name="inteligencia"
-                            value={form?.inteligencia}
-                            onChange={handleChange}
-                            labelWidth="120px"
-                        />
-                        <InputTextOneLine
-                            label="2.- Fobias"
-                            name="fobias"
-                            value={form?.fobias}
-                            onChange={handleChange}
-                            labelWidth="120px"
-                        />
-                    </div>
-                </div>
+            <SectionFieldset legend="Análisis FODA" className="grid md:grid-cols-2 gap-x-4 gap-y-3">
+                <InputTextArea
+                    label="Fortalezas / Oportunidades"
+                    name="fortalezasOportunidades"
+                    value={form?.fortalezasOportunidades}
+                    onChange={handleChange}
+                    rows={4}
+                />
+                <InputTextArea
+                    label="Amenazas / Debilidades"
+                    name="amenazasDebilidades"
+                    value={form?.amenazasDebilidades}
+                    onChange={handleChange}
+                    rows={4}
+                />
             </SectionFieldset>
 
-            <SectionFieldset legend="Observaciones y Recomendaciones">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <InputTextArea
-                        label="Observaciones"
-                        name="observaciones"
-                        value={form?.observaciones}
-                        onChange={handleChange}
-                        rows={4}
-                    />
-                    <InputTextArea
-                        label="Recomendaciones"
-                        name="recomendaciones"
-                        value={form?.recomendaciones}
-                        onChange={handleChange}
-                        rows={4}
-                    />
-                </div>
-            </SectionFieldset>
-
-            <SectionFieldset legend="Análisis FODA">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <InputTextArea
-                        label="Fortalezas / Oportunidades"
-                        name="fortalezasOportunidades"
-                        value={form?.fortalezasOportunidades}
-                        onChange={handleChange}
-                        rows={4}
-                    />
-                    <InputTextArea
-                        label="Amenazas / Debilidades"
-                        name="amenazasDebilidades"
-                        value={form?.amenazasDebilidades}
-                        onChange={handleChange}
-                        rows={4}
-                    />
-                </div>
+            <SectionFieldset legend="Asignación de Médico">
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Especialista"
+                    form={form}
+                    onChange={handleChangeSimple}
+                />
             </SectionFieldset>
 
             {/* Acciones */}

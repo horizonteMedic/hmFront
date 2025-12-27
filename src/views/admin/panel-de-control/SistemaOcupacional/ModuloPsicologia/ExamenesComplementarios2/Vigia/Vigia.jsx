@@ -1,4 +1,3 @@
-
 import {
   InputTextOneLine,
   InputTextArea,
@@ -10,12 +9,13 @@ import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerVigia";
 import { BotonesAccion, DatosPersonalesLaborales } from "../../../../../../components/templates/Templates";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
-const tabla = "";
+const tabla = "cuadradorvigia";
 
 export default function Vigia() {
   const today = getToday();
-  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+  const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
   const initialFormState = {
     // Header - Información del examen
@@ -52,6 +52,10 @@ export default function Vigia() {
     // Observaciones y Recomendaciones
     observaciones: "",
     recomendaciones: "",
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
   const {
@@ -64,7 +68,7 @@ export default function Vigia() {
     handleClear,
     handleClearnotO,
     handlePrintDefault,
-  } = useForm(initialFormState, { storageKey: "informeConductores" });
+  } = useForm(initialFormState, { storageKey: "vigiaPsicologia" });
 
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
@@ -115,6 +119,7 @@ export default function Vigia() {
           value={form.esApto}
           trueLabel="APTO"
           falseLabel="NO APTO"
+          labelWidth="120px"
           onChange={handleRadioButtonBoolean}
         />
       </SectionFieldset>
@@ -191,6 +196,15 @@ export default function Vigia() {
             rows={4}
           />
         </div>
+      </SectionFieldset>
+
+      <SectionFieldset legend="Asignación de Médico">
+        <EmpleadoComboBox
+          value={form.nombre_medico}
+          label="Especialista"
+          form={form}
+          onChange={handleChangeSimple}
+        />
       </SectionFieldset>
 
       <BotonesAccion

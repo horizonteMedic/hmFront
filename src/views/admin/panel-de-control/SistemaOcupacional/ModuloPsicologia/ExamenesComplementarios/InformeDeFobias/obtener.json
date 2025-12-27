@@ -1,0 +1,42 @@
+{
+  "dniPaciente": 0,
+  "nombresPaciente": "string",
+  "apellidosPaciente": "string",
+  "direccionPaciente": "string",
+  "sexoPaciente": "string",
+  "fechaNacimientoPaciente": "2025-12-27",
+  "ocupacionPaciente": "string",
+  "lugarNacimientoPaciente": "string",
+  "nivelEstudioPaciente": "string",
+  "estadoCivilPaciente": "string",
+  "edadPaciente": "string",
+  "cargoPaciente": "string",
+  "areaPaciente": "string",
+  "contrata": "string",
+  "empresa": "string",
+  "codigoClinica": "string",
+  "tipoExamen": "string",
+  "criterioInteligencia": "string",
+  "criterioFobias": "string",
+  "analisisFodaFortalezasOportunidades": "string",
+  "analisisFodaAmenazasDebilidades": "string",
+  "observaciones": "string",
+  "recomendaciones": "string",
+  "perfilApto": true,
+  "perfilNoApto": true,
+  "usuarioFirma": "string",
+  "fechaRegistro": "2025-12-27",
+  "nombreSede": "string",
+  "sede": "string",
+  "color": 0,
+  "nameJasper": "string",
+  "textoColor": "string",
+  "codigoColor": "string",
+  "digitalizacion": [
+    {
+      "nombreDigitalizacion": "string",
+      "url": "string"
+    }
+  ],
+  "norden": 0
+}
