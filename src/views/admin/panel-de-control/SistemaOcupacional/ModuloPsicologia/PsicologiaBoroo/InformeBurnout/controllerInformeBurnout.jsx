@@ -91,7 +91,7 @@ export const SubmitDataService = async (
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     const jasperModules = import.meta.glob(
-        "../../../../../jaspers/ModuloPsicologia/InformeBurnout/*.jsx"
+        "../../../../../../jaspers/ModuloPsicologia/InformeBurnout/*.jsx"
     );
     PrintHojaRDefault(
         nro,
@@ -100,7 +100,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../jaspers/ModuloPsicologia/InformeBurnout"
+        "../../../../../../jaspers/ModuloPsicologia/InformeBurnout"
     );
 };
 

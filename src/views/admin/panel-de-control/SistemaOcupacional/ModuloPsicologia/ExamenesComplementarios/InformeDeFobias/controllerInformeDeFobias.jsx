@@ -105,7 +105,7 @@ export const SubmitDataService = async (
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     const jasperModules = import.meta.glob(
-        "../../../../../jaspers/ModuloPsicologia/InformeDeFobias/*.jsx"
+        "../../../../../../jaspers/ModuloPsicologia/InformeDeFobias/*.jsx"
     );
     PrintHojaRDefault(
         nro,
@@ -114,7 +114,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../jaspers/ModuloPsicologia/InformeDeFobias"
+        "../../../../../../jaspers/ModuloPsicologia/InformeDeFobias"
     );
 };
 
