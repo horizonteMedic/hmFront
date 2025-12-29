@@ -1,6 +1,4 @@
 import { useMemo } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faBroom, faPrint } from "@fortawesome/free-solid-svg-icons";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { useForm } from "../../../../../../hooks/useForm";
 import { getToday } from "../../../../../../utils/helpers";
@@ -15,6 +13,7 @@ import {
 } from "../../../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
+import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
 
 const tabla = "ac_coproparasitologico";
 const colorOptions = ["MARRON", "MOSTAZA", "VERDOSO"];
@@ -247,7 +246,7 @@ export default function Coproparasitologia() {
   };
 
   return (
-    <form className="space-y-3 p-4 text-[10px]">
+    <div className="/space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
       {/* Información del Examen */}
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <InputTextOneLine
@@ -421,45 +420,13 @@ export default function Coproparasitologia() {
         />
       </SectionFieldset>
 
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-6">
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={handleSave}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-          </button>
-          <button
-            type="button"
-            onClick={handleClear}
-            className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faBroom} /> Limpiar
-          </button>
-        </div>
-        <div className="flex flex-col items-end">
-          <span className="font-bold italic mb-2">Imprimir</span>
-          <div className="flex items-center gap-2">
-            <InputTextOneLine
-              label=""
-              name="norden"
-              value={form.norden}
-              onChange={handleChangeNumberDecimals}
-              inputClassName="w-24"
-              labelWidth="0px"
-              className="w-28"
-            />
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faPrint} />
-            </button>
-          </div>
-        </div>
-      </div>
-    </form>
+      <BotonesAccion
+        form={form}
+        handleSave={handleSave}
+        handleClear={handleClear}
+        handlePrint={handlePrint}
+        handleChangeNumberDecimals={handleChangeNumberDecimals}
+      />
+    </div>
   );
 }

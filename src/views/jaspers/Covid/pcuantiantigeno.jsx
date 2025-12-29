@@ -54,13 +54,18 @@ const toDDMMYYYY = (fecha) => {
 };
 
 // --- Componente Principal ---
-export default function pcuantiantigeno(datos = {}) {
+export default async function pcuantiantigeno(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
+<<<<<<< HEAD
   const drawHeader = () => {
     CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+=======
+  const drawHeader = async () => {
+    await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
     // Número de Ficha
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -202,7 +207,7 @@ export default function pcuantiantigeno(datos = {}) {
     return yPos;
   };
 
-  drawHeader();
+  await drawHeader();
 
   // === TÍTULO ===
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);

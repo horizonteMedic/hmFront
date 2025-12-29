@@ -1,32 +1,43 @@
-import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
 import { useForm } from "../../../../../../hooks/useForm"
 import { getToday } from "../../../../../../utils/helpers";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     InputTextOneLine,
-    InputsRadioGroup,
     RadioTable,
     InputTextArea,
+    InputsBooleanRadioGroup,
 } from "../../../../../../components/reusableComponents/ResusableComponents";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAversionRiesgo";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
+import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
+import { useSessionData } from "../../../../../../hooks/useSessionData";
 
-const tabla = ""
-const today = getToday();
+const tabla = "aversionalriesgo"
 
 export default function AversionRiesgo() {
+    const today = getToday();
+    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+
     const initialFormState = {
         norden: "",
         fechaExam: today,
+        nombreExamen: "",
 
-        nombres: "",
         dni: "",
+        nombres: "",
+        apellidos: "",
+        fechaNacimiento: "",
+        lugarNacimiento: "",
         edad: "",
         sexo: "",
+        estadoCivil: "",
+        nivelEstudios: "",
 
+        // Datos Laborales
         empresa: "",
         contrata: "",
-        areaTrabajo: "",
-        puestoActual: "",
+        ocupacion: "",
+        cargoDesempenar: "",
 
         practicaFuncional: "",
         recursividad: "",
@@ -48,14 +59,15 @@ export default function AversionRiesgo() {
         analisisResultados: "",
         recomendaciones: "",
 
-        conclusion: "",
+        conclusion: undefined,
     }
     const {
         form,
         setForm,
         handleChange,
-        handleChangeNumber,
+        handleChangeNumberDecimals,
         handleRadioButton,
+        handleRadioButtonBoolean,
         handleChangeSimple,
         handleClear,
         handleClearnotO,
@@ -80,81 +92,34 @@ export default function AversionRiesgo() {
     };
 
     return (
-        <div className="px-4 space-y-3">
-            <SectionFieldset legend="Información del Examen">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <InputTextOneLine
-                        label="N° Orden"
-                        name="norden"
-                        value={form?.norden}
-                        onChange={handleChangeNumber}
-                        onKeyUp={handleSearch}
-                    />
-                    <InputTextOneLine
-                        label="Fecha"
-                        name="fechaExam"
-                        type="date"
-                        value={form?.fechaExam}
-                        onChange={handleChangeSimple}
-                    />
-                </div>
+        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-3">
+                <InputTextOneLine
+                    label="N° Orden"
+                    name="norden"
+                    value={form?.norden}
+                    onChange={handleChangeNumberDecimals}
+                    onKeyUp={handleSearch}
+                    labelWidth="120px"
+                />
+                <InputTextOneLine
+                    label="Fecha"
+                    name="fechaExam"
+                    type="date"
+                    value={form?.fechaExam}
+                    onChange={handleChangeSimple}
+                    labelWidth="120px"
+                />
+                <InputTextOneLine
+                    label="Tipo de Examen"
+                    name="nombreExamen"
+                    value={form.nombreExamen}
+                    disabled
+                    labelWidth="120px"
+                />
             </SectionFieldset>
 
-            <SectionFieldset legend="Datos del Paciente" >
-                {/* Fila 1: Nombres, DNI, Edad, Género */}
-                <div className="grid grid-cols-1 md:grid-cols-2  gap-3 mb-3">
-                    <InputTextOneLine
-                        label="Nombres y Apellidos"
-                        name="nombres"
-                        value={form?.nombres}
-                        disabled
-                    />
-                    <div className="grid grid-cols-3 gap-4">
-                        <InputTextOneLine
-                            label="DNI"
-                            name="dni"
-                            value={form?.dni}
-                            disabled
-                        />
-                        <InputTextOneLine
-                            label="Edad"
-                            name="edad"
-                            value={form?.edad}
-                            disabled
-                        />
-                        <InputTextOneLine
-                            label="Sexo"
-                            name="sexo"
-                            value={form?.sexo}
-                            disabled
-                        />
-                    </div>
-                    <InputTextOneLine
-                        label="Empresa"
-                        name="empresa"
-                        value={form?.empresa}
-                        disabled
-                    />
-                    <InputTextOneLine
-                        label="Contrata"
-                        name="contrata"
-                        value={form?.contrata}
-                        disabled
-                    />
-                    <InputTextOneLine
-                        label="Area de Trabajo"
-                        name="areaTrabajo"
-                        value={form?.areaTrabajo}
-                        disabled
-                    />
-                    <InputTextOneLine
-                        label="Puesto de Trabajo"
-                        name="puestoActual"
-                        value={form?.puestoActual}
-                        disabled
-                    />
-                </div>
-            </SectionFieldset>
+            <DatosPersonalesLaborales form={form} />
 
             {/* Contenido*/}
             <div className="space-y-3 grid grid-cols-1 xl:grid-cols-3 gap-4">
@@ -234,57 +199,25 @@ export default function AversionRiesgo() {
                         />
                     </SectionFieldset>
                     <SectionFieldset legend="Conclusión">
-                        <InputsRadioGroup
+                        <InputsBooleanRadioGroup
                             name="conclusion"
                             value={form?.conclusion}
                             vertical
-                            onChange={handleRadioButton}
-                            options={[
-                                { label: "CUMPLE CON EL PERFIL", value: "CUMPLE" },
-                                { label: "NO CUMPLE CON EL PERFIL", value: "NO_CUMPLE" },
-                            ]}
+                            onChange={handleRadioButtonBoolean}
+                            trueLabel="CUMPLE CON EL PERFIL"
+                            falseLabel="NO CUMPLE CON EL PERFIL"
                         />
                     </SectionFieldset>
                 </section>
             </div>
 
-            <section className="flex flex-col md:flex-row justify-between items-center gap-4  px-4 pt-4">
-                <div className=" flex gap-4">
-                    <button
-                        type="button"
-                        onClick={handleSave}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                    >
-                        <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                    </button>
-                    <button
-                        type="button"
-                        onClick={handleClear}
-                        className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                    >
-                        <FontAwesomeIcon icon={faBroom} /> Limpiar
-                    </button>
-                </div>
-                <div className="flex flex-col items-end">
-                    <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
-                    <div className="flex items-center gap-2">
-                        <input
-                            name="norden"
-                            value={form.norden}
-                            onChange={handleChange}
-                            className="border rounded px-2 py-1 text-base w-24"
-                        />
-
-                        <button
-                            type="button"
-                            onClick={handlePrint}
-                            className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                        >
-                            <FontAwesomeIcon icon={faPrint} />
-                        </button>
-                    </div>
-                </div>
-            </section>
+            <BotonesAccion
+                form={form}
+                handleSave={handleSave}
+                handleClear={handleClear}
+                handlePrint={handlePrint}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+            />
         </div>
     )
 }

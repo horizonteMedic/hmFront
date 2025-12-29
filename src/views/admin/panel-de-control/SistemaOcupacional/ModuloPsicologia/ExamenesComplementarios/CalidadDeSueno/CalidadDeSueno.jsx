@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faListCheck, faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
+import { faListCheck } from "@fortawesome/free-solid-svg-icons";
 import { InputTextOneLine } from "../../../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 import { useForm } from "../../../../../../hooks/useForm";
@@ -10,11 +10,13 @@ import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerCalidadDeSu
 import ParteI from "./TabsCalidadDeSueno/ParteI";
 import ParteII from "./TabsCalidadDeSueno/ParteII";
 import ParteIII from "./TabsCalidadDeSueno/ParteIII";
+import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
 
-const today = getToday();
-const tabla = "";
+const tabla = "calidad_sueño";
 
 export default function CalidadDeSueno() {
+    const today = getToday();
     const [activeTab, setActiveTab] = useState(0);
     const { token, userlogued, selectedSede, datosFooter, userDNI } = useSessionData();
 
@@ -23,16 +25,24 @@ export default function CalidadDeSueno() {
         norden: "",
         fechaExam: today,
         nombreExamen: "",
+
         // Datos personales
-        nombres: "",
         dni: "",
+        nombres: "",
+        apellidos: "",
+        fechaNacimiento: "",
+        lugarNacimiento: "",
         edad: "",
         sexo: "",
+        estadoCivil: "",
+        nivelEstudios: "",
+
+        // Datos Laborales
         empresa: "",
         contrata: "",
-        puestoPostula: "",
-        puestoActual: "",
-        gradoInstruccion: "",
+        ocupacion: "",
+        cargoDesempenar: "",
+
         dniUsuario: userDNI,
 
         // ====================== PARTE I ======================
@@ -51,6 +61,7 @@ export default function CalidadDeSueno() {
         probSentiaCalor: "",
         probPesadillas: "",
         probDolores: "",
+        probOtrasRazones: "",
 
         // ====================== PARTE III ======================
         medicinasDormirFrecuencia: "",
@@ -66,6 +77,7 @@ export default function CalidadDeSueno() {
         setForm,
         handleChange,
         handleChangeNumber,
+        handleChangeNumberDecimals,
         handleRadioButton,
         handleChangeSimple,
         handleClear,
@@ -99,47 +111,34 @@ export default function CalidadDeSueno() {
     const ActiveComponent = tabs[activeTab]?.component || (() => null);
 
     return (
-        <div className="px-4 space-y-3">
-            <SectionFieldset legend="Información del Examen" className="m-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <InputTextOneLine
-                        label="N° Orden"
-                        name="norden"
-                        value={form?.norden}
-                        onChange={handleChangeNumber}
-                        onKeyUp={handleSearch}
-                    />
-                    <InputTextOneLine
-                        label="Fecha"
-                        name="fechaExam"
-                        type="date"
-                        value={form?.fechaExam}
-                        onChange={handleChange}
-                    />
-                    <InputTextOneLine
-                        label="Tipo de Examen"
-                        name="nombreExamen"
-                        value={form?.nombreExamen}
-                        disabled
-                    />
-                </div>
+        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-3">
+                <InputTextOneLine
+                    label="N° Orden"
+                    name="norden"
+                    value={form?.norden}
+                    onChange={handleChangeNumberDecimals}
+                    onKeyUp={handleSearch}
+                    labelWidth="120px"
+                />
+                <InputTextOneLine
+                    label="Fecha"
+                    name="fechaExam"
+                    type="date"
+                    value={form?.fechaExam}
+                    onChange={handleChange}
+                    labelWidth="120px"
+                />
+                <InputTextOneLine
+                    label="Tipo de Examen"
+                    name="nombreExamen"
+                    value={form?.nombreExamen}
+                    disabled
+                    labelWidth="120px"
+                />
             </SectionFieldset>
 
-            <SectionFieldset legend="Datos del Paciente" className="m-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                    <InputTextOneLine label="Nombres y Apellidos" name="nombres" value={form?.nombres} disabled />
-                    <div className="grid grid-cols-3 gap-4">
-                        <InputTextOneLine label="DNI" name="dni" value={form?.dni} disabled />
-                        <InputTextOneLine label="Edad" name="edad" value={form?.edad} disabled />
-                        <InputTextOneLine label="Sexo" name="sexo" value={form?.sexo} disabled />
-                    </div>
-                    <InputTextOneLine label="Empresa" name="empresa" value={form?.empresa} disabled />
-                    <InputTextOneLine label="Contrata" name="contrata" value={form?.contrata} disabled />
-                    <InputTextOneLine label="Area de Trabajo" name="puestoPostula" value={form?.puestoPostula} disabled />
-                    <InputTextOneLine label="Puesto de Trabajo" name="puestoActual" value={form?.puestoActual} disabled />
-                    <InputTextOneLine label="Grado de Instruccion" name="gradoInstruccion" value={form?.gradoInstruccion} disabled />
-                </div>
-            </SectionFieldset>
+            <DatosPersonalesLaborales form={form} />
 
             {/* Navegación de pestañas */}
             <nav className="flex bg-white border-b border-gray-200 sticky top-0 z-20">
@@ -173,43 +172,13 @@ export default function CalidadDeSueno() {
                 />
             </div>
 
-            {/* Acciones */}
-            <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-4 pt-4">
-                <div className="flex gap-4">
-                    <button
-                        type="button"
-                        onClick={handleSave}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                    >
-                        <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                    </button>
-                    <button
-                        type="button"
-                        onClick={handleClear}
-                        className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                    >
-                        <FontAwesomeIcon icon={faBroom} /> Limpiar
-                    </button>
-                </div>
-                <div className="flex flex-col items-end">
-                    <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
-                    <div className="flex items-center gap-2">
-                        <input
-                            name="norden"
-                            value={form.norden}
-                            onChange={handleChange}
-                            className="border rounded px-2 py-1 text-base w-24"
-                        />
-                        <button
-                            type="button"
-                            onClick={handlePrint}
-                            className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                        >
-                            <FontAwesomeIcon icon={faPrint} />
-                        </button>
-                    </div>
-                </div>
-            </section>
+            <BotonesAccion
+                form={form}
+                handleSave={handleSave}
+                handleClear={handleClear}
+                handlePrint={handlePrint}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+            />
         </div>
     );
 }

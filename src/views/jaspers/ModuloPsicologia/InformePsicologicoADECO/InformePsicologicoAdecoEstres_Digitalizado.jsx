@@ -5,7 +5,7 @@ import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import { getSign, convertirGenero } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
 
-export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
+export default async function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   // Contador de páginas dinámico
@@ -17,7 +17,7 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
       apellidosNombres: String((((raw?.apellidosPaciente ?? '') + ' ' + (raw?.nombresPaciente ?? '')).trim())),
       nombreExamen: String(raw?.nombreExamen ?? ''),
       tipoExamen: String(raw?.tipoExamen ?? ''),
-      fechaExamen: formatearFechaCorta(raw?.fechaExamen ?? ''), 
+      fechaExamen: formatearFechaCorta(raw?.fechaExamen ?? ''),
       sexo: convertirGenero(raw?.sexoPaciente ?? ''),
       documentoIdentidad: String(raw?.dniPaciente ?? ''),
       edad: String(raw?.edadPaciente ?? ''),
@@ -53,9 +53,9 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   const datosFinales = buildDatosFinales(data);
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
 
     // Títulos
     doc.setFont("helvetica", "bold").setFontSize(13);
@@ -95,10 +95,10 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   // Función para texto con salto de línea
   const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
     if (!texto) return y;
-    
+
     const lineas = doc.splitTextToSize(texto, anchoMaximo);
     const interlineado = 3.5;
-    
+
     lineas.forEach((linea, index) => {
       doc.text(linea, x, y + (index * interlineado));
     });
@@ -132,7 +132,7 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   };
 
   // === PÁGINA 1 ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === SECCIÓN 1: DATOS DE FILIACIÓN ===
   const { tablaInicioX, tablaAncho } = getTablaDimensiones();
@@ -202,7 +202,7 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
   dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 40, yTexto + 1.5, 90); // Ajustar ancho para la división
-  
+
   // Columna derecha: T. Examen
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("T. Examen:", tablaInicioX + 137, yTexto + 1.5);
@@ -271,21 +271,21 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
 
   // Fila con división media: INTELIGENCIA | RESULTADO
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho/2, yPos, tablaInicioX + tablaAncho/2, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho / 2, yPos, tablaInicioX + tablaAncho / 2, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
   // Contenido de la fila de headers
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("INTELIGENCIA", tablaInicioX + tablaAncho/4, yPos + 3.5, { align: "center" });
-  doc.text("RESULTADO", tablaInicioX + (tablaAncho/2) + (tablaAncho/4), yPos + 3.5, { align: "center" });
+  doc.text("INTELIGENCIA", tablaInicioX + tablaAncho / 4, yPos + 3.5, { align: "center" });
+  doc.text("RESULTADO", tablaInicioX + (tablaAncho / 2) + (tablaAncho / 4), yPos + 3.5, { align: "center" });
   yPos += filaAltura;
 
   // Fila con 3 divisiones: | 1 | Escala Sintomática de Estrés | BAJO |
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + 20, yPos, tablaInicioX + 20, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho/2, yPos, tablaInicioX + tablaAncho/2, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho / 2, yPos, tablaInicioX + tablaAncho / 2, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -296,7 +296,7 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
       // Dibujar líneas de la fila
       doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
       doc.line(tablaInicioX + 20, yPos, tablaInicioX + 20, yPos + filaAltura);
-      doc.line(tablaInicioX + tablaAncho/2, yPos, tablaInicioX + tablaAncho/2, yPos + filaAltura);
+      doc.line(tablaInicioX + tablaAncho / 2, yPos, tablaInicioX + tablaAncho / 2, yPos + filaAltura);
       doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
       doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
       doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -307,7 +307,7 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
     doc.text(resultado.numero, tablaInicioX + 10, yPos + 3.5, { align: "center" });
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(resultado.prueba, tablaInicioX + 22, yPos + 3.5);
-    doc.text(resultado.resultado, tablaInicioX + tablaAncho/2 + 2, yPos + 3.5);
+    doc.text(resultado.resultado, tablaInicioX + tablaAncho / 2 + 2, yPos + 3.5);
     yPos += filaAltura;
   });
 
@@ -318,11 +318,11 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   // Función para calcular altura dinámica de texto
   const calcularAlturaTexto = (texto, anchoMaximo, alturaMinima = 30) => {
     if (!texto) return alturaMinima;
-    
+
     doc.setFont("helvetica", "normal").setFontSize(8);
     const lineas = doc.splitTextToSize(texto, anchoMaximo);
     const interlineado = 3.5;
-    
+
     // Altura calculada + padding superior
     const alturaCalculada = lineas.length * interlineado + 2;
     return Math.max(alturaCalculada, alturaMinima);
@@ -330,7 +330,7 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
 
   // Fila 1: Fortalezas / Oportunidades
   const alturaFila1 = calcularAlturaTexto(datosFinales.fortalezasOportunidades, tablaAncho - 4);
-  
+
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila1);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFila1);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
@@ -339,14 +339,14 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   // Contenido de Fortalezas / Oportunidades
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Fortalezas / Oportunidades:", tablaInicioX + 2, yPos + 3.5);
-  
+
   doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(datosFinales.fortalezasOportunidades, tablaInicioX + 2, yPos + 7, tablaAncho - 4);
   yPos += alturaFila1;
 
   // Fila 2: Debilidades / Amenazas
   const alturaFila2 = calcularAlturaTexto(datosFinales.debilidadesAmenazas, tablaAncho - 4);
-  
+
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila2);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFila2);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
@@ -355,7 +355,7 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   // Contenido de Debilidades / Amenazas
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Debilidades / Amenazas:", tablaInicioX + 2, yPos + 3.5);
-  
+
   doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(datosFinales.debilidadesAmenazas, tablaInicioX + 2, yPos + 7, tablaAncho - 4);
   yPos += alturaFila2;
@@ -366,7 +366,7 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
 
   // Fila de Observaciones (creciente)
   const alturaObservaciones = calcularAlturaTexto(datosFinales.observaciones, tablaAncho - 5);
-  
+
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaObservaciones);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaObservaciones);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
@@ -382,7 +382,7 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
 
   // Fila de Recomendaciones (creciente)
   const alturaRecomendaciones = calcularAlturaTexto(datosFinales.recomendaciones, tablaAncho - 5);
-  
+
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRecomendaciones);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRecomendaciones);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
@@ -391,6 +391,22 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(datosFinales.recomendaciones, tablaInicioX + 2, yPos + 3.6, tablaAncho - 5);
   yPos += alturaRecomendaciones;
+
+  // === SECCIÓN 6: CONCLUSIONES ===
+  // Header de conclusiones
+  yPos = dibujarHeaderSeccion("VI.- CONCLUSIONES", yPos, filaAltura);
+
+  // Fila de Conclusiones (creciente)
+  const alturaConclusiones = calcularAlturaTexto(datosFinales.conclusiones, tablaAncho - 5);
+
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaConclusiones);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaConclusiones);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaConclusiones, tablaInicioX + tablaAncho, yPos + alturaConclusiones);
+
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.conclusiones, tablaInicioX + 2, yPos + 3.6, tablaAncho - 5);
+  yPos += alturaConclusiones;
 
   // === SECCIÓN DE FIRMAS ===
   const yFirmas = yPos; // Sin separación después de la última sección
@@ -405,7 +421,7 @@ export default function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   // === FIRMA DEL MÉDICO ===
   const centroColumna = tablaInicioX + (tablaAncho / 2);
   const firmaMedicoY = yFirmas + 3;
-  
+
   // Agregar firma y sello médico
   let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
   if (firmaMedicoUrl) {

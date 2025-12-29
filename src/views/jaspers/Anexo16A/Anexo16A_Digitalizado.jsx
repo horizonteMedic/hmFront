@@ -1,11 +1,11 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils";
-import { getSign, convertirGenero } from "../../utils/helpers";
+import { getSign, convertirGenero, getSignCompressed } from "../../utils/helpers";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 
-export default function Anexo16A_Digitalizado(data = {}, docExistente = null) {
+export default async function Anexo16A_Digitalizado(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -134,7 +134,7 @@ export default function Anexo16A_Digitalizado(data = {}, docExistente = null) {
   };
 
   // === HEADER ===
-  CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+  await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
   doc.setFont("helvetica", "bold").setFontSize(12);
   doc.setTextColor(0, 0, 0);
@@ -753,7 +753,7 @@ export default function Anexo16A_Digitalizado(data = {}, docExistente = null) {
   const centroColumna3 = tablaInicioX + 120 + (80 / 2); // Centro de la columna 3 (160mm desde tablaInicioX)
 
   // Agregar firma y sello médico
-  const firmaMedicoUrl = getSign(data, "SELLOFIRMA");
+  const firmaMedicoUrl = await getSignCompressed(data, "SELLOFIRMA");
   if (firmaMedicoUrl) {
     try {
       const imgWidth = 50;

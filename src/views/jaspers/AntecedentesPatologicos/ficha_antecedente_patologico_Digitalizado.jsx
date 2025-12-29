@@ -3,8 +3,9 @@ import drawColorBox from '../components/ColorBox.jsx';
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
+import { getSignCompressed } from "../../utils/helpers.js";
 
-export default function ficha_antecedente_patologico_Digitalizado(data = {}, docExistente = null) {
+export default async function ficha_antecedente_patologico_Digitalizado(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -201,9 +202,9 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}, doc
   const datosFinales = datosReales;
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
     // Título principal (en todas las páginas)
     doc.setFont("helvetica", "bold").setFontSize(12);
@@ -237,7 +238,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}, doc
   };
 
   // === HEADER PÁGINA 1 ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === DATOS PERSONALES ===
   // Función para convertir texto a formato gramaticalmente correcto (primera letra mayúscula, resto minúsculas)
@@ -1250,7 +1251,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}, doc
   numeroPagina++; // Incrementar contador de página
 
   // === HEADER PÁGINA 2 ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // Resetear posición para la nueva página
   yPos = 40;
@@ -1582,15 +1583,8 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}, doc
   const centroColumna2X = tablaInicioX + tablaAncho / 2 + (tablaAncho / 2) / 2;
 
   // Agregar firma y sello médico
-  let firmaMedicoUrl = null;
+  let firmaMedicoUrl = await getSignCompressed(data, "SELLOFIRMA");
 
-  if (data.digitalizacion && data.digitalizacion.length > 0) {
-    const firmaMedicoData = data.digitalizacion.find(item => item.nombreDigitalizacion === "SELLOFIRMA");
-
-    if (firmaMedicoData && firmaMedicoData.url) {
-      firmaMedicoUrl = firmaMedicoData.url;
-    }
-  }
 
   if (firmaMedicoUrl) {
     try {
@@ -1615,6 +1609,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}, doc
   if (docExistente) {
     return doc;
   } else {
+    doc.save(`FichaAntecedentesPatologicos.pdf`);
     imprimir(doc);
   }
 }

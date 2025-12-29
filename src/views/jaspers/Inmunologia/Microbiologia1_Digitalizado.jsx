@@ -52,10 +52,14 @@ const formatDateToLong = (dateString) => {
 };
 
 // Header con datos de ficha, sede y fecha
-const drawHeader = (doc, datos = {}) => {
+const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
 
+<<<<<<< HEAD
   CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+=======
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -125,12 +129,20 @@ const drawPatientData = (doc, datos = {}) => {
   return y + lineHeight;
 };
 
-export default function Microbiologia1_Digitalizado(datos = {}) {
+export default async function Microbiologia1_Digitalizado(datos = {}) {
   const doc = new jsPDF({ unit: "mm", format: "letter" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
+<<<<<<< HEAD
   drawHeader(doc, datos);
+=======
+  await drawHeader(doc, datos);
+
+  // === TÍTULO ===
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
+  doc.text("MICROBIOLOGÍA", pageW / 2, 38, { align: "center" });
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   // === DATOS DEL PACIENTE ===
   drawPatientData(doc, datos);
@@ -150,6 +162,7 @@ export default function Microbiologia1_Digitalizado(datos = {}) {
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
+<<<<<<< HEAD
     let y = 80;
     // TÍTULO
     drawUnderlinedTitle(doc, "MICROBIOLOGÍA", y, config.fontSize.title);
@@ -158,6 +171,11 @@ export default function Microbiologia1_Digitalizado(datos = {}) {
     doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
     doc.text("EXAMEN DIRECTO", config.margin, y);
     y += config.lineHeight;
+=======
+    let y = finalYPos + 10; // Posición inicial después de la tabla de datos con espacio adicional
+    const colData = 55;
+
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
     // MUESTRA
     doc.setFontSize(config.fontSize.header).setFont(config.font, "bold");
     doc.text("MUESTRA :", config.margin, y);

@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import header_EvaluacionOftalmologica2021_Digitalizado_ohla from "./headers/header_EvaluacionOftalmologica2021_Digitalizado_ohla.jsx";
 
-export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
+export default async function EvaluacionOftalmologica2021_Digitalizado_ohla(
   data = {}
 ) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -584,7 +584,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
   doc.text(
     String(datosFinales.estereopsiaSegundos ?? ""),
     xEstereopsiaSegundos,
-    yEstereopsia-1
+    yEstereopsia - 1
   );
 
   // === REFRACCIÓN ===

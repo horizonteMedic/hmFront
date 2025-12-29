@@ -27,25 +27,25 @@ const toDDMMYYYY = (fecha) => {
 };
 
 // Header con datos de ficha, sede y fecha
-const drawHeader = (doc, datos = {}) => {
+const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
-  
-  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-  
+
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Nro de ficha: ", pageW - 80, 15);
   doc.setFont("helvetica", "normal").setFontSize(18);
   doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
-  
+
   // Sede
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
-  
+
   // Fecha de examen
   const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
   doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
-  
+
   // Página
   doc.text("Pag. 01", pageW - 30, 10);
 
@@ -160,13 +160,22 @@ const drawPatientData = (doc, datos = {}) => {
 
 // --- Componente Principal ---
 
-export default function LGonadotropina_Digitalizado(datos) {
+export default async function LGonadotropina_Digitalizado(datos) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
+<<<<<<< HEAD
   drawHeader(doc, datos);
   
+=======
+  await drawHeader(doc, datos);
+
+  // === TÍTULO ===
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
+  doc.text("INMUNOLOGÍA", pageW / 2, 38, { align: "center" });
+
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
   // === DATOS DEL PACIENTE ===
   drawPatientData(doc, datos);
 
@@ -187,12 +196,18 @@ export default function LGonadotropina_Digitalizado(datos) {
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
+<<<<<<< HEAD
     // === TÍTULO ===
     doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
     doc.text("INMUNOLOGÍA", pageW / 2, 43, { align: "center" }); // +5mm
 
     let y = 100; // Posición inicial después de la tabla de datos (+5mm)
     
+=======
+    // === CUERPO ===
+    let y = finalYPos + 10;
+
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
     // === MUESTRA Y MÉTODO ===
     doc.setFontSize(config.fontSize.header).setFont(config.font, "bold");
     doc.text("MUESTRA:", config.margin, y);
@@ -219,7 +234,7 @@ export default function LGonadotropina_Digitalizado(datos) {
     const imgPath = './img/textogonabeta.png';
     const imgWTest = 100, imgHTest = 15;
     doc.addImage(imgPath, 'PNG', config.margin, y - 2, imgWTest, imgHTest);
-    
+
     // Resultado
     doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
     doc.text(datos.txtResultado || '', config.col2X, y + 6, { align: "center" });
@@ -229,11 +244,11 @@ export default function LGonadotropina_Digitalizado(datos) {
     const sigH = 23;
     const sigY = 210;
     const gap = 16;
-    
+
     if (s1 && s2) {
       const totalWidth = sigW * 2 + gap;
       const startX = (pageW - totalWidth) / 2;
-      
+
       const addSello = (img, xPos) => {
         const canvas = document.createElement('canvas');
         canvas.width = img.width;

@@ -5,7 +5,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 
-export default function Hoja_Consulta_Externa(data = {}) {
+export default async function Hoja_Consulta_Externa(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -46,9 +46,9 @@ export default function Hoja_Consulta_Externa(data = {}) {
   const datosFinales = datosReales;
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
     // Título principal (solo en página 1)
     if (pageNumber === 1) {
@@ -84,7 +84,7 @@ export default function Hoja_Consulta_Externa(data = {}) {
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === FUNCIONES AUXILIARES ===
   // Función para texto con salto de línea
@@ -93,16 +93,16 @@ export default function Hoja_Consulta_Externa(data = {}) {
     if (!texto || texto === null || texto === undefined) {
       return y;
     }
-    
+
     const fontSize = doc.internal.getFontSize();
     const palabras = String(texto).split(' ');
     let lineaActual = '';
     let yPos = y;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -116,22 +116,22 @@ export default function Hoja_Consulta_Externa(data = {}) {
         }
       }
     });
-    
+
     if (lineaActual) {
       doc.text(lineaActual, x, yPos);
       yPos += fontSize * 0.5;
     }
-    
+
     return yPos; // Devuelve la nueva posición final
   };
 
   // Función para procesar texto con saltos de línea numerados
   const procesarTextoConSaltosLinea = (texto) => {
     if (!texto) return [];
-    
+
     // Dividir por saltos de línea reales (\n, \r\n) y otros separadores
     const partes = texto.split(/\r\n|\r|\n|\\n|\/n/g);
-    
+
     // Procesar cada parte y mantener el formato original
     return partes
       .map(parte => parte.trim())
@@ -142,23 +142,23 @@ export default function Hoja_Consulta_Externa(data = {}) {
   const dibujarTextoConSaltosLinea = (texto, x, y, anchoMaximo) => {
     const fontSize = doc.internal.getFontSize();
     let yPos = y;
-    
+
     // Procesar el texto manteniendo el formato original
     const lineasProcesadas = procesarTextoConSaltosLinea(texto);
-    
+
     lineasProcesadas.forEach((linea, index) => {
       // Verificar si es una línea numerada (empieza con número seguido de punto)
       const esLineaNumerada = /^\d+\./.test(linea);
-      
+
       // Si la línea es muy larga, usar la función de salto de línea por palabras
       if (doc.getTextWidth(linea) > anchoMaximo) {
         yPos = dibujarTextoConSaltoLinea(linea, x, yPos, anchoMaximo);
-        
+
         // Espacio mejorado después de una línea numerada que hizo salto
         if (esLineaNumerada) {
           yPos += fontSize * 0.4; // Espacio mejorado después de línea numerada con salto
         }
-        
+
         // Si hay una siguiente línea numerada, agregar espacio adicional
         if (index < lineasProcesadas.length - 1) {
           const siguienteLinea = lineasProcesadas[index + 1];
@@ -169,7 +169,7 @@ export default function Hoja_Consulta_Externa(data = {}) {
       } else {
         // Si la línea cabe, dibujarla directamente
         doc.text(linea, x, yPos);
-        
+
         // Espaciado mejorado para líneas numeradas
         if (esLineaNumerada) {
           yPos += fontSize * 0.6; // Espacio mejorado para líneas numeradas
@@ -177,7 +177,7 @@ export default function Hoja_Consulta_Externa(data = {}) {
           yPos += fontSize * 0.5; // Espacio mejorado para líneas normales
         }
       }
-      
+
       // Espacio adicional entre líneas numeradas consecutivas (solo si no hizo salto)
       if (index < lineasProcesadas.length - 1 && doc.getTextWidth(linea) <= anchoMaximo) {
         const siguienteLinea = lineasProcesadas[index + 1];
@@ -186,7 +186,7 @@ export default function Hoja_Consulta_Externa(data = {}) {
         }
       }
     });
-    
+
     return yPos;
   };
 
@@ -194,25 +194,25 @@ export default function Hoja_Consulta_Externa(data = {}) {
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
     const tablaInicioX = 10;
     const tablaAncho = 190;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo gris más oscuro
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
+
     // Dibujar líneas del header
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(9);
     doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
-    
+
     return yPos + alturaHeader;
   };
 
@@ -289,13 +289,13 @@ export default function Hoja_Consulta_Externa(data = {}) {
     const lineasProcesadasOtros = procesarTextoConSaltosLinea(textoOtros);
     let alturaSimuladaOtros = 0;
     const fontSizeOtros = 8;
-    
+
     lineasProcesadasOtros.forEach((linea) => {
       if (doc.getTextWidth(linea) > (tablaAncho - 4)) {
         const palabras = linea.split(' ');
         let lineasNecesarias = 1;
         let lineaActual = '';
-        
+
         palabras.forEach(palabra => {
           const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
           if (doc.getTextWidth(textoPrueba) > (tablaAncho - 4)) {
@@ -305,15 +305,15 @@ export default function Hoja_Consulta_Externa(data = {}) {
             lineaActual = textoPrueba;
           }
         });
-        
+
         alturaSimuladaOtros += lineasNecesarias * fontSizeOtros * 0.5; // Interlineado mejorado
       } else {
         alturaSimuladaOtros += fontSizeOtros * 0.5; // Interlineado mejorado
       }
     });
-    
+
     const alturaFilaOtros = Math.max(filaAltura, alturaSimuladaOtros + 4);
-    
+
     // Dibujar la fila para descripción de Otros
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaOtros);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaOtros);
@@ -329,16 +329,16 @@ export default function Hoja_Consulta_Externa(data = {}) {
   // Primero calcular la altura necesaria para el texto SIN dibujarlo
   doc.setFont("helvetica", "normal").setFontSize(7.5);
   const textoObservaciones = datosFinales.observaciones;
-  
+
   // Calcular altura necesaria simulando el texto
   const alturaMinima = 150; // Altura mínima de la fila (100mm)
   const paddingSuperior = 4; // Padding superior 
-  
+
   // Simular el texto para calcular altura sin dibujarlo
   const lineasProcesadas = procesarTextoConSaltosLinea(textoObservaciones);
   let alturaSimulada = 0;
   const fontSize = 8;
-  
+
   lineasProcesadas.forEach((linea) => {
     const esLineaNumerada = /^\d+\./.test(linea);
     if (doc.getTextWidth(linea) > 160) {
@@ -346,7 +346,7 @@ export default function Hoja_Consulta_Externa(data = {}) {
       const palabras = linea.split(' ');
       let lineasNecesarias = 1;
       let lineaActual = '';
-      
+
       palabras.forEach(palabra => {
         const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
         if (doc.getTextWidth(textoPrueba) > 160) {
@@ -356,7 +356,7 @@ export default function Hoja_Consulta_Externa(data = {}) {
           lineaActual = textoPrueba;
         }
       });
-      
+
       alturaSimulada += lineasNecesarias * fontSize * 0.5; // Interlineado mejorado
       if (esLineaNumerada) alturaSimulada += fontSize * 0.1; // Espacio adicional para líneas numeradas
     } else {
@@ -364,7 +364,7 @@ export default function Hoja_Consulta_Externa(data = {}) {
       if (esLineaNumerada) alturaSimulada += fontSize * 0.1; // Espacio adicional para líneas numeradas
     }
   });
-  
+
   const alturaFilaFinal = Math.max(alturaMinima, alturaSimulada + paddingSuperior + 5); // Incluir margen de 3mm
 
   // Dibujar la fila con la altura calculada
@@ -372,12 +372,12 @@ export default function Hoja_Consulta_Externa(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaFinal);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaFilaFinal, tablaInicioX + tablaAncho, yPos + alturaFilaFinal);
-  
+
   // DIBUJAR EL TEXTO DE OBSERVACIONES INMEDIATAMENTE DESPUÉS DE DIBUJAR LA FILA
   const yObservaciones = yPos + 2.5; // Después del header de observaciones + margen
   doc.setFont("helvetica", "normal").setFontSize(6.5);
   dibujarTextoConSaltosLinea(datosFinales.observaciones, tablaInicioX + 2, yObservaciones + 1, 160);
-  
+
   yPos += alturaFilaFinal;
 
   // === CONTENIDO DE LA TABLA ===
@@ -454,11 +454,11 @@ export default function Hoja_Consulta_Externa(data = {}) {
 
   // Ubicación - POSTA | CEDRO | PARAIS | OTROS
   let yTexto2 = yTexto;
-  
+
   // POSTA
   doc.setFont("helvetica", "bold").setFontSize(7.5);
   doc.text("POSTA", tablaInicioX + 2, yTexto2 + 1);
-  
+
   // Marcar X en POSTA si es la ubicación seleccionada
   if (datosFinales.ubicacion === "POSTA") {
     doc.setFont("helvetica", "bold").setFontSize(10);
@@ -468,7 +468,7 @@ export default function Hoja_Consulta_Externa(data = {}) {
   // CEDRO
   doc.setFont("helvetica", "bold").setFontSize(7.5);
   doc.text("CEDRO", tablaInicioX + 42, yTexto2 + 1);
-  
+
   // Marcar X en CEDRO si es la ubicación seleccionada
   if (datosFinales.ubicacion === "CEDRO") {
     doc.setFont("helvetica", "bold").setFontSize(10);
@@ -478,7 +478,7 @@ export default function Hoja_Consulta_Externa(data = {}) {
   // PARAIS
   doc.setFont("helvetica", "bold").setFontSize(7.5);
   doc.text("PARAIS", tablaInicioX + 82, yTexto2 + 1);
-  
+
   // Marcar X en PARAIS si es la ubicación seleccionada
   if (datosFinales.ubicacion === "PARAIS") {
     doc.setFont("helvetica", "bold").setFontSize(10);
@@ -488,7 +488,7 @@ export default function Hoja_Consulta_Externa(data = {}) {
   // OTROS
   doc.setFont("helvetica", "bold").setFontSize(7.5);
   doc.text("OTROS", tablaInicioX + 122, yTexto2 + 1);
-  
+
   // Marcar X en OTROS si es la ubicación seleccionada
   if (datosFinales.ubicacion === "OTROS") {
     doc.setFont("helvetica", "bold").setFontSize(10);
@@ -505,7 +505,7 @@ export default function Hoja_Consulta_Externa(data = {}) {
 
   // === Calcular la posición base del cuadro de firmas ===
   const alturaSeccionFirmas = 30; // Altura fija de la sección de firmas
-  const yFirmas = yPos - 30 ; // +5mm de espacio visual debajo de "Observaciones"
+  const yFirmas = yPos - 30; // +5mm de espacio visual debajo de "Observaciones"
   console.log(yFirmas)
   // === Dibujar cuadro de firmas (dos columnas) ===
   doc.line(tablaInicioX, yFirmas, tablaInicioX, yFirmas + alturaSeccionFirmas); // Línea izquierda
@@ -516,7 +516,7 @@ export default function Hoja_Consulta_Externa(data = {}) {
 
   // === COLUMNA 1: FIRMA Y HUELLA DEL TRABAJADOR ===
   const firmaTrabajadorY = yFirmas + 3;
-  
+
   // Calcular centro de la columna 1 para centrar las imágenes
   const centroColumna1X = tablaInicioX + (95 / 2); // Centro de la columna 1
 
@@ -570,9 +570,9 @@ export default function Hoja_Consulta_Externa(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("Sello y Firma del Médico", centroColumnaDerechaX, yFirmas + 26, { align: "center" });
   doc.text("Responsable de la Evaluación", centroColumnaDerechaX, yFirmas + 28.5, { align: "center" });
-  
+
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 8});
+  footerTR(doc, { footerOffsetY: 8 });
 
   // === Imprimir ===
   imprimir(doc);

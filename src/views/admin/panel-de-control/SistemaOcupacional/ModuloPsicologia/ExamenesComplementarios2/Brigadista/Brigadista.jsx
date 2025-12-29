@@ -9,12 +9,13 @@ import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerBrigadista";
 import { BotonesAccion, DatosPersonalesLaborales } from "../../../../../../components/templates/Templates";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
-const tabla = "";
-const today = getToday();
+const tabla = "psi_brigadistas";
 
 export default function Brigadista() {
-  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+  const today = getToday();
+  const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
   const initialFormState = {
     // Header - Información del examen
@@ -51,6 +52,10 @@ export default function Brigadista() {
     // Observaciones y Recomendaciones
     observaciones: "",
     recomendaciones: "",
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
   const {
@@ -63,7 +68,7 @@ export default function Brigadista() {
     handleClear,
     handleClearnotO,
     handlePrintDefault,
-  } = useForm(initialFormState, { storageKey: "informeConductores" });
+  } = useForm(initialFormState, { storageKey: "psi_brigadistas" });
 
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
@@ -81,48 +86,47 @@ export default function Brigadista() {
       PrintHojaR(form.norden, token, tabla, datosFooter);
     });
   };
+
   return (
-    <div className="space-y-3 px-4">
-      <SectionFieldset legend="Información del Examen">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-          <InputTextOneLine
-            label="N° Orden"
-            name="norden"
-            value={form.norden}
-            onChange={handleChangeNumberDecimals}
-            onKeyUp={handleSearch}
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Fecha"
-            name="fecha"
-            type="date"
-            value={form.fecha}
-            onChange={handleChangeSimple}
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Nombre del Examen"
-            name="nombreExamen"
-            value={form.nombreExamen}
-            disabled
-            labelWidth="120px"
-          />
-          <InputsBooleanRadioGroup
-            label="Aptitud"
-            name="esApto"
-            value={form.esApto}
-            trueLabel="APTO"
-            falseLabel="NO APTO"
-            onChange={handleRadioButtonBoolean}
-          />
-        </div>
+    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-4 gap-3">
+        <InputTextOneLine
+          label="N° Orden"
+          name="norden"
+          value={form.norden}
+          onChange={handleChangeNumberDecimals}
+          onKeyUp={handleSearch}
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Fecha"
+          name="fecha"
+          type="date"
+          value={form.fecha}
+          onChange={handleChangeSimple}
+          labelWidth="120px"
+        />
+        <InputTextOneLine
+          label="Nombre del Examen"
+          name="nombreExamen"
+          value={form.nombreExamen}
+          disabled
+          labelWidth="120px"
+        />
+        <InputsBooleanRadioGroup
+          label="Aptitud"
+          name="esApto"
+          value={form.esApto}
+          trueLabel="APTO"
+          falseLabel="NO APTO"
+          onChange={handleRadioButtonBoolean}
+        />
       </SectionFieldset>
 
       <DatosPersonalesLaborales form={form} />
 
       <SectionFieldset legend="Criterios Psicológicos">
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div className="grid grid-cols-1 gap-4">
             <InputTextOneLine
               label="1.- Afrontamiento para la Toma de Decisiones"
@@ -191,6 +195,15 @@ export default function Brigadista() {
             rows={4}
           />
         </div>
+      </SectionFieldset>
+
+      <SectionFieldset legend="Asignación de Médico">
+        <EmpleadoComboBox
+          value={form.nombre_medico}
+          label="Especialista"
+          form={form}
+          onChange={handleChangeSimple}
+        />
       </SectionFieldset>
 
       <BotonesAccion

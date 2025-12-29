@@ -7,7 +7,7 @@ import {
     SubmitDataServiceDefault,
     VerifyTRDefault,
 } from "../../../../../utils/functionUtils";
-import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
+import { getHoraActual } from "../../../../../utils/helpers";
 
 const obtenerReporteUrl = "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoInformado";
 const registrarUrl = "/api/v01/ct/anexos/anexo16/registrarActualizarConsentimientoInformado";
@@ -40,7 +40,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla, datos
     const body = {
         norden: form.norden,
         fecha: form.fecha,
-        hora: form.horaActual.replace(/[^0-9:]/g, ""),
+        hora: getHoraActual(),
         userRegistro: user,
     };
 
@@ -92,7 +92,6 @@ const GetInfoPac = async (nro, set, token, sede) => {
         set((prev) => ({
             ...prev,
             ...res,
-            fechaNac: formatearFechaCorta(res.fechaNac ?? ""),
             nombres: res.nombresApellidos ?? prev.nombres ?? "",
             ocupacion: res.cargo ?? prev.ocupacion ?? "",
             dni: res.dni ?? prev.dni ?? "",

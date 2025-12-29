@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import header_EvaluacionOftalmologica2021_Digitalizado_boro from "./headers/header_EvaluacionOftalmologica2021_Digitalizado_boro.jsx";
 
-export default function EvaluacionOftalmologica2021_Digitalizado_boro(
+export default async function EvaluacionOftalmologica2021_Digitalizado_boro(
   data = {}
 ) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -487,9 +487,9 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(
 
   // Chalazion
   const xChalazionOD = margin + 96; // AJUSTAR POSICIÓN X DE CHALAZION OD AQUÍ
-  const yChalazionOD = margin +  73.5; // AJUSTAR ALTURA DE CHALAZION OD AQUÍ
+  const yChalazionOD = margin + 73.5; // AJUSTAR ALTURA DE CHALAZION OD AQUÍ
   const xChalazionOI = margin + 104; // AJUSTAR POSICIÓN X DE CHALAZION OI AQUÍ
-  const yChalazionOI = margin +  73.5; // AJUSTAR ALTURA DE CHALAZION OI AQUÍ
+  const yChalazionOI = margin + 73.5; // AJUSTAR ALTURA DE CHALAZION OI AQUÍ
 
   // Otros
   const xOtrosOD = margin + 96; // AJUSTAR POSICIÓN X DE OTROS OD AQUÍ

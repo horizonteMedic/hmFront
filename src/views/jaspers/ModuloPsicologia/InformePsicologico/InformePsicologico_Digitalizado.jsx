@@ -3,10 +3,10 @@ import drawColorBox from '../../components/ColorBox.jsx';
 import { formatearFechaCorta } from "../../../utils/formatDateUtils.js";
 import { normalizeList } from "../../../utils/listUtils.js";
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
-import { getSign, convertirGenero } from "../../../utils/helpers.js";
+import { getSign, convertirGenero, getSignCompressed } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
 
-export default function InformePsicologico_Digitalizado(data = {}, docExistente = null) {
+export default async function InformePsicologico_Digitalizado(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   // Contador de páginas dinámico
@@ -58,9 +58,9 @@ export default function InformePsicologico_Digitalizado(data = {}, docExistente 
   const datosFinales = buildDatosFinales(data);
 
   // Header reutilizable (igual que otros formatos)
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
 
     // Títulos
     doc.setFont("helvetica", "bold").setFontSize(12);
@@ -165,7 +165,7 @@ export default function InformePsicologico_Digitalizado(data = {}, docExistente 
   };
 
   // === PÁGINA 1 ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === SECCIÓN 1: DATOS DE FILIACIÓN ===
   const tablaInicioX = 5;
@@ -492,7 +492,7 @@ export default function InformePsicologico_Digitalizado(data = {}, docExistente 
   });
 
   // Firma dentro de la fila de recomendaciones
-  const placeSignaturesInRecomendaciones = () => {
+  const placeSignaturesInRecomendaciones = async () => {
     // Calcular posición dentro de la fila de recomendaciones
     const firmaX = tablaInicioX + tablaAncho - 50; // Posición a la derecha
     const firmaY = yPos + (alturaFilaRecomendaciones / 2) - 10; // Centrada verticalmente
@@ -501,9 +501,9 @@ export default function InformePsicologico_Digitalizado(data = {}, docExistente 
 
     let imagenPintada = false;
     try {
-      const firma = getSign(data, "SELLOFIRMA") || getSign(data, "FIRMAP");
+      const firma = await getSignCompressed(data, "SELLOFIRMA")
       if (firma) {
-        doc.addImage(firma, 'PNG', firmaX, firmaY, firmaW, firmaH);
+        doc.addImage(firma, 'JPEG', firmaX, firmaY, firmaW, firmaH);
         imagenPintada = true;
       }
     } catch (e) {
@@ -516,7 +516,7 @@ export default function InformePsicologico_Digitalizado(data = {}, docExistente 
   };
 
   // Llamar a la función después de dibujar la fila de recomendaciones
-  placeSignaturesInRecomendaciones();
+  await placeSignaturesInRecomendaciones();
 
   yPos += alturaFilaRecomendaciones;
 

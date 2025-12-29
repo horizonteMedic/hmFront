@@ -5,7 +5,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 
-export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
+export default async function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -63,9 +63,9 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
   const datosFinales = datosReales;
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
     // Título principal (solo en página 1)
     if (pageNumber === 1) {
@@ -100,7 +100,7 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === FUNCIONES AUXILIARES ===
   // Función para texto con salto de línea
@@ -109,16 +109,16 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
     if (!texto || texto === null || texto === undefined) {
       return y;
     }
-    
+
     const fontSize = doc.internal.getFontSize();
     const palabras = String(texto).split(' ');
     let lineaActual = '';
     let yPos = y;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -132,12 +132,12 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
         }
       }
     });
-    
+
     if (lineaActual) {
       doc.text(lineaActual, x, yPos);
       yPos += fontSize * 0.35;
     }
-    
+
     return yPos; // Devuelve la nueva posición final
   };
 
@@ -145,25 +145,25 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
     const tablaInicioX = 10;
     const tablaAncho = 190;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo gris más oscuro
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
+
     // Dibujar líneas del header
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(9);
     doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
-    
+
     return yPos + alturaHeader;
   };
 
@@ -314,7 +314,7 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
   // Superficie
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("SUPERFICIE", tablaInicioX + 2, yTexto2 + 1);
-  
+
   // Marcar X en Superficie si es el tipo seleccionado
   if (datosFinales.tipoTrabajo === "SUPERFICIE") {
     doc.setFont("helvetica", "bold").setFontSize(10);
@@ -324,7 +324,7 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
   // PLANTA (centrado en la tercera columna)
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("PLANTA", tablaInicioX + 63, yTexto2 + 1);
-  
+
   // Marcar X en Planta si es el tipo seleccionado
   if (datosFinales.tipoTrabajo === "PLANTA") {
     doc.setFont("helvetica", "bold").setFontSize(10);
@@ -334,7 +334,7 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
   // SUBSUELO (centrado en la cuarta columna)
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("SUBSUELO", tablaInicioX + 130, yTexto2 + 1);
-  
+
   // Marcar X en Subsuelo si es el tipo seleccionado
   if (datosFinales.tipoTrabajo === "SUBSUELO") {
     doc.setFont("helvetica", "bold").setFontSize(10);
@@ -378,7 +378,7 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
   // APTO
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("APTO", tablaInicioX + 2, yTexto3 + 1);
-  
+
   // Marcar X en APTO si es la condición seleccionada
   if (datosFinales.resultadoEvaluacion === "apto") {
     doc.setFont("helvetica", "bold").setFontSize(10);
@@ -388,7 +388,7 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
   // APTO CON RESTRICCIÓN
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("APTO CON RESTRICCIÓN", tablaInicioX + 37, yTexto3 + 1);
-  
+
   // Marcar X en APTO CON RESTRICCIÓN si es la condición seleccionada
   if (datosFinales.resultadoEvaluacion === "aptoConRestriccion") {
     doc.setFont("helvetica", "bold").setFontSize(10);
@@ -398,7 +398,7 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
   // NO APTO TEMPORAL
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("NO APTO TEMPORAL", tablaInicioX + 98, yTexto3 + 1);
-  
+
   // Marcar X en NO APTO TEMPORAL si es la condición seleccionada
   if (datosFinales.resultadoEvaluacion === "noAptoTemporal") {
     doc.setFont("helvetica", "bold").setFontSize(10);
@@ -408,7 +408,7 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
   // NO APTO
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("NO APTO", tablaInicioX + 152, yTexto3 + 1);
-  
+
   // Marcar X en NO APTO si es la condición seleccionada
   if (datosFinales.resultadoEvaluacion === "noApto") {
     doc.setFont("helvetica", "bold").setFontSize(10);
@@ -421,19 +421,19 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
   // Fila de observaciones con altura dinámica
   const observacionesTexto = datosFinales.observaciones || "";
   const anchoMaximoObservaciones = tablaAncho - 4;
-  
+
   // Función para calcular altura dinámica de observaciones
   const calcularAlturaObservaciones = (texto, anchoMaximo) => {
     if (!texto || texto.trim() === "") return 20; // Altura fija mínima si no hay texto
-    
+
     const palabras = texto.split(' ');
     let lineaActual = '';
     let lineas = 1;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -445,7 +445,7 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
         }
       }
     });
-    
+
     // Altura fija mínima de 20mm, altura por línea de 3mm
     const alturaCalculada = lineas * 3 + 2;
     return Math.max(alturaCalculada, 100); // Altura fija mínima de 20mm
@@ -461,11 +461,11 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
 
   // Contenido de la fila de observaciones
   doc.setFont("helvetica", "normal").setFontSize(8);
-  
+
   // Dividir el texto en líneas y agregar guión a cada una
   const lineasObservaciones = observacionesTexto.split('\n').filter(linea => linea.trim() !== '');
   let yTextoObservaciones = yPos + 5;
-  
+
   if (lineasObservaciones.length > 0) {
     lineasObservaciones.forEach(linea => {
       const textoConGuion = `${linea.trim()}`;
@@ -476,7 +476,7 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
     // Si no hay observaciones, mostrar texto por defecto
     doc.text("- Sin observaciones registradas", tablaInicioX + 2, yTextoObservaciones);
   }
-  
+
   yPos += alturaFilaObservaciones;
 
   // === FILA DE FECHAS ===
@@ -515,7 +515,7 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
 
   // === FIRMA DEL MÉDICO CENTRADA ===
   const firmaMedicoY = yFirmas + 3;
-  
+
   // Función para obtener URL de digitalización por nombre
   const getDigitalizacionUrl = (digitalizaciones, nombre) => {
     if (!digitalizaciones || !Array.isArray(digitalizaciones)) return null;
@@ -525,7 +525,7 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
 
   // Calcular centro de la fila para centrar la firma
   const centroFilaX = tablaInicioX + (tablaAncho / 2);
-  
+
   // Agregar firma y sello médico centrada
   let firmaMedicoUrl = getDigitalizacionUrl(data.digitalizacion, "SELLOFIRMA");
   if (firmaMedicoUrl) {
@@ -547,7 +547,7 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
   yPos += alturaSeccionFirmas;
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 8});
+  footerTR(doc, { footerOffsetY: 8 });
 
   // === Imprimir ===
   imprimir(doc);

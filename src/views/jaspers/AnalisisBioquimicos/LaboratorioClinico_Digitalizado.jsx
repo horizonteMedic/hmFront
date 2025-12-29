@@ -3,9 +3,8 @@ import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
-import { convertirGenero } from "../../utils/helpers.js";
-import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
-export default function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExistente = null) {
+import { convertirGenero, getSignCompressed } from "../../utils/helpers.js";
+export default async function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExistente = null) {
 
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
@@ -47,8 +46,8 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExis
   const filaAltura = 5;
 
   // Header reutilizable
-  const drawHeader = () => {
-    CabeceraLogo(doc, { ...datosReales, tieneMembrete: false, yOffset: 7 });
+  const drawHeader = async () => {
+    await CabeceraLogo(doc, { ...datosReales, tieneMembrete: false, yOffset: 7 });
 
     // Título principal
     doc.setFont("helvetica", "bold").setFontSize(12);
@@ -95,7 +94,7 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExis
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader();
+  await drawHeader();
 
   // === SECCIÓN 1: DATOS PERSONALES ===
   let yPos = 30;
@@ -548,27 +547,90 @@ export default function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExis
   doc.setLineWidth(0.2);
   doc.rect(tablaInicioX, baseY, tablaAncho, alturaSeccionFirmas);
 
-  // Usar helper para dibujar firmas (ajustar Y para que queden dentro de la fila, más cerca)
-  dibujarFirmas({ doc, datos: data, y: baseY + 2, pageW }).then(() => {
-    // === FOOTER ===
-    footerTR(doc, { footerOffsetY: 12 });
+  // LOGICA LINEAL DE FIRMAS
+  try {
+    // 1. Obtener firmas comprimidas
+    const sello1 = await getSignCompressed(data, "SELLOFIRMA");
+    const sello2 = await getSignCompressed(data, "SELLOFIRMADOCASIG");
 
-    // === IMPRIMIR ===
-    if (!docExistente) {
-      imprimir(doc);
-    }
-  }).catch(err => {
-    console.error(err);
-    if (!docExistente) {
-      alert('Error generando PDF: ' + err);
-    }
-  });
+    // 2. Lógica de dibujo (idéntica a la original pero lineal)
+    const tieneSelloProfesional = sello1 || sello2;
 
-  // Si hay docExistente, agregar footer y retornar el doc inmediatamente
-  // (las firmas se agregarán asíncronamente)
+    if (tieneSelloProfesional) {
+      const sigW = 48;
+      const sigH = 20;
+      const sigY = baseY + 2;
+      const gap = 16;
+      let lineY = sigY + sigH + 3;
+
+      // Función auxiliar para dibujar línea y texto
+      const dibujarLineaYTexto = (centroX, lineY, tipoSello) => {
+        doc.setLineWidth(0.2);
+        let texto1, texto2;
+        if (tipoSello === 'SELLOFIRMA') {
+          texto1 = "Firma y Sello del Profesional";
+          texto2 = "Responsable de la Evaluación";
+        } else if (tipoSello === 'SELLOFIRMADOCASIG') {
+          texto1 = "Firma y Sello Médico Asignado";
+          texto2 = null;
+        } else {
+          texto1 = "Firma y Sello";
+          texto2 = null;
+        }
+
+        const textoWidth = doc.getTextWidth(texto1);
+        const anchoLinea = Math.max(textoWidth, texto2 ? doc.getTextWidth(texto2) : 0);
+
+        doc.line(centroX - anchoLinea / 2, lineY, centroX + anchoLinea / 2, lineY);
+        doc.setFont('helvetica', 'normal').setFontSize(9);
+        doc.text(texto1, centroX, lineY + 3, { align: "center" });
+        if (texto2) {
+          doc.text(texto2, centroX, lineY + 6, { align: "center" });
+        }
+      };
+
+      const centroProfesionalX = pageW / 2;
+
+      // Dibujar Sello 1
+      if (sello1 && sello2) {
+        // Dos sellos
+        const totalWidth = sigW * 2 + gap;
+        const startX = centroProfesionalX - totalWidth / 2;
+
+        doc.addImage(sello1, 'JPEG', startX, sigY, sigW, sigH);
+        doc.addImage(sello2, 'JPEG', startX + sigW + gap, sigY, sigW, sigH);
+
+        const centroSello1X = startX + sigW / 2;
+        const centroSello2X = startX + sigW + gap + sigW / 2;
+        dibujarLineaYTexto(centroSello1X, lineY, 'SELLOFIRMA');
+        dibujarLineaYTexto(centroSello2X, lineY, 'SELLOFIRMADOCASIG');
+
+      } else if (sello1) {
+        // Solo sello 1
+        const imgX = centroProfesionalX - sigW / 2;
+        doc.addImage(sello1, 'JPEG', imgX, sigY, sigW, sigH);
+        dibujarLineaYTexto(centroProfesionalX, lineY, 'SELLOFIRMA');
+
+      } else if (sello2) {
+        // Solo sello 2
+        const imgX = centroProfesionalX - sigW / 2;
+        doc.addImage(sello2, 'JPEG', imgX, sigY, sigW, sigH);
+        dibujarLineaYTexto(centroProfesionalX, lineY, 'SELLOFIRMADOCASIG');
+      }
+    }
+
+  } catch (err) {
+    console.error("Error dibujando firmas:", err);
+  }
+
+  // === FINALIZACIÓN ===
+  // Footer se agrega al final
+  footerTR(doc, { footerOffsetY: 12 });
+
   if (docExistente) {
-    footerTR(doc, { footerOffsetY: 12 });
     return doc;
+  } else {
+    imprimir(doc);
   }
 }
 

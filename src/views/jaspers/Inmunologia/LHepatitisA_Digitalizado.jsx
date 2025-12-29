@@ -53,10 +53,14 @@ const formatDateToLong = (dateString) => {
 };
 
 // Header con datos de ficha, sede y fecha
-const drawHeader = (doc, datos = {}) => {
+const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
 
+<<<<<<< HEAD
   CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+=======
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -129,12 +133,20 @@ const drawPatientData = (doc, datos = {}) => {
 
 // --- Componente Principal ---
 
-export default function LHepatitisA_Digitalizado(datos = {}) {
+export default async function LHepatitisA_Digitalizado(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
+<<<<<<< HEAD
   drawHeader(doc, datos);
+=======
+  await drawHeader(doc, datos);
+
+  // === TÍTULO ===
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
+  doc.text("INMUNOLOGÍA", pageW / 2, 38, { align: "center" });
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   // === DATOS DEL PACIENTE ===
   drawPatientData(doc, datos);
@@ -158,10 +170,14 @@ export default function LHepatitisA_Digitalizado(datos = {}) {
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
+<<<<<<< HEAD
 
     // === TÍTULO ===
     drawUnderlinedTitle(doc, 'INMUNOLOGÍA', y);
     y += config.lineHeight * 2;
+=======
+    let y = finalYPos + 10; // Posición inicial después de la tabla de datos con espacio adicional
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
     // === MUESTRA Y MÉTODO ===
     doc.setFontSize(config.fontSize.header);

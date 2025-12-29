@@ -1,7 +1,5 @@
 import Swal from "sweetalert2";
 import { getFetch, SubmitData } from "./apiHelpers";
-import jsPDF from "jspdf";
-const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
 export const LoadingDefault = (text) => {
     Swal.fire({
         title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,
@@ -59,6 +57,18 @@ export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporte
         token
     )
         .then(async (res) => {
+            // Manejar errores de la respuesta
+            if (res.error) {
+                console.error("Error en la respuesta del servidor:", res);
+                Swal.fire(
+                    "Error",
+                    `No se pudo obtener el reporte. ${res.status === 404 ? 'El endpoint no existe o no hay datos.' : `Error ${res.status}: ${res.statusText || res.message || 'Error desconocido'}`}`,
+                    "error"
+                );
+                Swal.close();
+                return;
+            }
+            
             if (res.norden || res.norden_n_orden || res.n_orden) {
                 if (!(res.dataPrincipal ?? true)) {
                     Swal.fire(
@@ -69,15 +79,86 @@ export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporte
                     return;
                 }
                 const nombre = res.nameJasper || res.namejasper;
-                console.log(nombre)
-                console.log(res)
-                const modulo = await jasperModules[
-                    `${nombreCarpeta}/${nombre}.jsx`
-                ]();
-                console.log(modulo)
+                console.log("Nombre Jasper recibido:", nombre);
+                console.log("Nombre Carpeta:", nombreCarpeta);
+                
+                if (!nombre || !nombreCarpeta) {
+                    console.error("Faltan datos necesarios:", { nombre, nombreCarpeta });
+                    Swal.fire("Error", "Error al obtener el formato de impresión", "error");
+                    Swal.close();
+                    return;
+                }
+                
+                // Construir la ruta completa
+                const rutaCompleta = `${nombreCarpeta}/${nombre}.jsx`;
+                console.log("Ruta completa construida:", rutaCompleta);
+                
+                // Verificar las claves disponibles
+                const clavesDisponibles = Object.keys(jasperModules);
+                console.log("Claves disponibles en jasperModules:", clavesDisponibles);
+                
+                // Intentar encontrar el módulo
+                let moduloFunc = jasperModules[rutaCompleta];
+                
+                // Si no se encuentra la ruta exacta, buscar por nombre del archivo
+                if (!moduloFunc) {
+                    console.warn(`No se encontró la ruta exacta: ${rutaCompleta}`);
+                    // Buscar cualquier clave que contenga el nombre (sin extensión)
+                    const nombreSinExtension = nombre.replace(/\.jsx?$/, '');
+                    // Extraer palabras clave del nombre (ej: "Informe_Lab_panel4D" -> ["panel", "4d"])
+                    const palabrasClave = nombreSinExtension.toLowerCase()
+                        .replace(/informe|lab|_/g, ' ')
+                        .split(/\s+/)
+                        .filter(p => p.length > 0);
+                    
+                    const claveEncontrada = clavesDisponibles.find(key => {
+                        const nombreArchivo = key.split('/').pop().replace(/\.jsx?$/, '').toLowerCase();
+                        // Buscar coincidencia exacta
+                        if (nombreArchivo === nombreSinExtension.toLowerCase()) {
+                            return true;
+                        }
+                        // Buscar si contiene todas las palabras clave
+                        if (palabrasClave.length > 0) {
+                            return palabrasClave.every(palabra => nombreArchivo.includes(palabra));
+                        }
+                        // Buscar si el nombre del archivo contiene el nombre buscado o viceversa
+                        return nombreArchivo.includes(nombreSinExtension.toLowerCase()) ||
+                               nombreSinExtension.toLowerCase().includes(nombreArchivo);
+                    });
+                    
+                    if (claveEncontrada) {
+                        console.log(`Se encontró una clave similar: ${claveEncontrada}`);
+                        moduloFunc = jasperModules[claveEncontrada];
+                    } else {
+                        // Si hay solo un archivo en la carpeta, usarlo
+                        if (clavesDisponibles.length === 1) {
+                            console.log(`Usando el único archivo disponible: ${clavesDisponibles[0]}`);
+                            moduloFunc = jasperModules[clavesDisponibles[0]];
+                        } else {
+                            console.error("No se pudo encontrar el módulo jasper");
+                            Swal.fire("Error", `No se encontró el formato de impresión: ${nombre}.jsx`, "error");
+                            Swal.close();
+                            return;
+                        }
+                    }
+                }
+                
+                if (!moduloFunc || typeof moduloFunc !== 'function') {
+                    console.error("El módulo encontrado no es una función:", moduloFunc);
+                    Swal.fire("Error", `Error al cargar el formato de impresión: ${nombre}.jsx`, "error");
+                    Swal.close();
+                    return;
+                }
+                
+                const modulo = await moduloFunc();
+                console.log("Módulo cargado:", modulo);
+                
                 // Ejecuta la función exportada por default con los datos
                 if (typeof modulo.default === "function") {
                     modulo.default({ ...res, ...datosFooter }, null);
+                } else {
+                    console.error(`El módulo no exporta una función por defecto`);
+                    Swal.fire("Error", `El formato de impresión ${nombre}.jsx no es válido`, "error");
                 }
             }
             Swal.close();

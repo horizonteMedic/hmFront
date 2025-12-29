@@ -4,9 +4,9 @@ import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import PropTypes from 'prop-types';
-import { getSign } from '../../utils/helpers';
+import { getSign, getSignCompressed } from '../../utils/helpers';
 
-export default function UsoRespiradores(data = {}, docExistente = null) {
+export default async function UsoRespiradores(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -387,9 +387,9 @@ export default function UsoRespiradores(data = {}, docExistente = null) {
   const datosFinales = data && Object.keys(data).length > 0 ? datosReales : datosPrueba;
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete - Subido 3.5 puntos
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 6.5 }); // 10 - 3.5 = 6.5
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 6.5 }); // 10 - 3.5 = 6.5
 
     // Título principal (en todas las páginas)
     doc.setFont("helvetica", "bold").setFontSize(12);
@@ -457,7 +457,7 @@ export default function UsoRespiradores(data = {}, docExistente = null) {
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === TABLA DE DATOS PERSONALES ===
   const tablaInicioX = 10;
@@ -1603,7 +1603,7 @@ export default function UsoRespiradores(data = {}, docExistente = null) {
   yPos = 35; // Posición inicial de la nueva página
 
   // Dibujar header en la nueva página
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === CONTENIDO DE LA SEGUNDA PÁGINA ===
   // === PREGUNTA 4 ===
@@ -1748,7 +1748,7 @@ export default function UsoRespiradores(data = {}, docExistente = null) {
   yPos = 35; // Posición inicial de la nueva página
 
   // Dibujar header en la nueva página
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === SECCIÓN 3 CON FONDO NARANJA ===
   const textoInstruccionesSeccion3 = "Sección 3: (Confidencial) El profesional de la salud que va a revisar este cuestionario determinara si esta parte debe ser completada por el empleado. Por favor, marque \"SI\" o \"NO\"";
@@ -2132,7 +2132,7 @@ export default function UsoRespiradores(data = {}, docExistente = null) {
   const firmaMedicoY = yPos + 3;
 
   // Agregar firma y sello médico con fallback
-  let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
+  let firmaMedicoUrl = await getSignCompressed(data, "SELLOFIRMA");
   if (firmaMedicoUrl) {
     try {
       const imgWidth = 45;

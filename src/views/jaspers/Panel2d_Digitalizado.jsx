@@ -3,7 +3,7 @@ import autoTable from "jspdf-autotable";
 import header from "./components/header";
 import footer from "./components/footer";
 
-export default function Panel2d_Digitalizado(datos) {
+export default async function Panel2d_Digitalizado(datos) {
   const doc = new jsPDF();
   header(doc, datos);
 
@@ -39,19 +39,19 @@ export default function Panel2d_Digitalizado(datos) {
         { content: 'PANEL DROGAS 3D', colSpan: 3, styles: { fontStyle: 'bold', halign: 'left' } }
       ],
       [
-        { content: 'Cocaína (COC)', styles: { textColor: [0,0,0] } },
+        { content: 'Cocaína (COC)', styles: { textColor: [0, 0, 0] } },
         `${datos.re_cocaina || 'S/U'}`,
         'S/U'
       ],
       [
-        { content: 'Marihuana(THC)', styles: { textColor: [0,0,255] } },
+        { content: 'Marihuana(THC)', styles: { textColor: [0, 0, 255] } },
         `${datos.re_marihuana || 'S/U'}`,
         'S/U'
       ]
     ],
     theme: 'plain',
     styles: { fontSize: 11, cellPadding: 2 },
-    headStyles: { fillColor: [255,255,255], textColor: [0,0,0], fontStyle: 'bold', lineWidth: 0, lineColor: 255 },
+    headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], fontStyle: 'bold', lineWidth: 0, lineColor: 255 },
     columnStyles: {
       0: { cellWidth: 60 },
       1: { cellWidth: 40 },
@@ -72,10 +72,10 @@ export default function Panel2d_Digitalizado(datos) {
   doc.rect(marginX + 10, imgY, imgW, imgH);
   doc.setFontSize(10);
   doc.setTextColor(180);
-  doc.text('Detail 1', marginX + 10 + imgW/2, imgY + imgH/2, { align: 'center' });
+  doc.text('Detail 1', marginX + 10 + imgW / 2, imgY + imgH / 2, { align: 'center' });
   // Imagen 2
   doc.rect(marginX + 90, imgY, imgW, imgH);
-  doc.text('Detail 2', marginX + 90 + imgW/2, imgY + imgH/2, { align: 'center' });
+  doc.text('Detail 2', marginX + 90 + imgW / 2, imgY + imgH / 2, { align: 'center' });
 
   // Footer
   footer(doc, datos);

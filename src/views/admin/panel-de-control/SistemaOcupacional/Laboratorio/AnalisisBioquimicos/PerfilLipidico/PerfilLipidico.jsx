@@ -1,5 +1,3 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faBroom } from '@fortawesome/free-solid-svg-icons';
 import { GetInfoPacAnalisisBio, GetTableAnalBio, Loading, PrintHojaR, SubmitDataService, VerifyTR } from './controllerPerfilLipidico';
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { useForm } from '../../../../../../hooks/useForm';
@@ -11,6 +9,7 @@ import {
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import { useEffect, useState } from 'react';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
+import BotonesAccion from '../../../../../../components/templates/BotonesAccion';
 
 const tabla = 'analisis_bioquimicos';
 
@@ -319,20 +318,14 @@ export default function PerfilLipidico() {
           />
         </SectionFieldset>
 
-        <div className="flex gap-4 pt-4 border-t border-gray-200">
-          <button
-            onClick={handleSave}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded flex items-center gap-2 text-lg"
-          >
-            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-          </button>
-          <button
-            onClick={handleClear}
-            className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded flex items-center gap-2 text-lg"
-          >
-            <FontAwesomeIcon icon={faBroom} /> Limpiar
-          </button>
-        </div>
+        <BotonesAccion
+          form={form}
+          handleSave={handleSave}
+          handleClear={handleClear}
+          handlePrint={() => { }}
+          handleChangeNumberDecimals={handleChangeNumberDecimals}
+          hidePrint
+        />
       </div>
       <SectionFieldset legend="Búsqueda de Examenes" className="grid xl:grid-cols-2 gap-3">
         <InputTextOneLine

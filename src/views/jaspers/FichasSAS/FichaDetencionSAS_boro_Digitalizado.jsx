@@ -5,7 +5,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import { getSign } from '../../utils/helpers';
 
-export default function B_FichaDetencionSAS2(data = {}) {
+export default async function B_FichaDetencionSAS2(data = {}) {
 
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
@@ -109,8 +109,8 @@ export default function B_FichaDetencionSAS2(data = {}) {
     circunferenciaMujerNormal: Boolean(data.examenFisicoMujerSi_chkmujersi ?? false),
     presionSistolica: String(data.sistolicaTriaje ?? ""),
     presionDiastolica: String(data.diastolicaTriaje ?? ""),
-    htaNueva: (data.examenFisicoHtaNuevaSi_chkhtanuevasi === true) ? true : 
-              (data.examenFisicoHtaNuevaNo_chkhtanuevano === true) ? false : false,
+    htaNueva: (data.examenFisicoHtaNuevaSi_chkhtanuevasi === true) ? true :
+      (data.examenFisicoHtaNuevaNo_chkhtanuevano === true) ? false : false,
     // Grados de Mallampati
     mallampatiGradoI: Boolean(data.examenFisicoGradoI_chkgradoi ?? false),
     mallampatiGradoII: Boolean(data.examenFisicoGradoII_chkgradoii ?? false),
@@ -163,9 +163,9 @@ export default function B_FichaDetencionSAS2(data = {}) {
 
 
   // Header reutilizable (igual que Aptitud_Agroindustrial.jsx)
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
     // Título principal (solo en página 1)
     if (pageNumber === 1) {
@@ -355,7 +355,7 @@ export default function B_FichaDetencionSAS2(data = {}) {
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === TABLA DE DATOS PERSONALES ===
   const tablaInicioX = 15;
@@ -464,7 +464,7 @@ export default function B_FichaDetencionSAS2(data = {}) {
   const htaDiv1 = tablaInicioX + 15;  // 40 - 15 = 25
   const htaDiv2 = tablaInicioX + 40;  // 90 - 15 = 75
   const htaDiv3 = tablaInicioX + 80; // 132 - 15 = 117
-  
+
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
   doc.line(htaDiv1, yPos, htaDiv1, yPos + filaAltura); // Primera división
   doc.line(htaDiv2, yPos, htaDiv2, yPos + filaAltura); // Segunda división
@@ -912,8 +912,8 @@ export default function B_FichaDetencionSAS2(data = {}) {
 
   // Cuarta columna: Mostrar fecha real si polisomnografia.si es true, sino mostrar "NO APLICA"
   doc.setFont("helvetica", "normal").setFontSize(8);
-  const fechaPolisomnografia = datosFinales.polisomnografia.si 
-    ? datosFinales.polisomnografia.fecha 
+  const fechaPolisomnografia = datosFinales.polisomnografia.si
+    ? datosFinales.polisomnografia.fecha
     : "NO APLICA";
   doc.text(fechaPolisomnografia, tablaInicioX + 142.5, yTexto + 1);
   yTexto += filaAltura;
@@ -1259,7 +1259,7 @@ export default function B_FichaDetencionSAS2(data = {}) {
   numeroPagina++; // Incrementar contador de página
 
   // Header para página 2 (sin título)
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // Resetear posición Y para nueva página
   yPos = 30;

@@ -91,6 +91,10 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
     
     for (const folder of uparchFile) {
       try {
+<<<<<<< HEAD
+=======
+
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
           const fileBase64 = await toBase64(folder);
           const base64WithoutHeader = fileBase64.split(',')[1];
           const datos = {

@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import header_OftalmologiaLO from "./headers/header_OftalmologiaLO.jsx";
 
-export default function OftalmologiaLO(datos = {}) {
+export default async function OftalmologiaLO(datos = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   header_OftalmologiaLO(doc, datos);
   const margin = 10;
@@ -88,12 +88,12 @@ export default function OftalmologiaLO(datos = {}) {
   const edadCompleta = `${edadLabel}${datos.edad || ""} años`;
   doc.text(edadCompleta, margin, y + 6.5);
   y += 8;
-  
+
   // Calcular altura dinámica del cuadro basada en el contenido
   const calcularAlturaCuadro = () => {
     let alturaBase = 65; // altura mínima hasta "Enfermedades Oculares"
     const lineHeight = 8;
-    
+
     // Verificar si hay texto en enfermedades oculares y calcular líneas adicionales
     if (datos.eoculares) {
       const texto = datos.eoculares.toString();
@@ -106,7 +106,7 @@ export default function OftalmologiaLO(datos = {}) {
     } else {
       alturaBase += 8; // espacio mínimo si no hay texto
     }
-    
+
     // Verificar si hay texto adicional en eoculares1
     if (datos.eoculares1) {
       const texto = datos.eoculares1.toString();
@@ -117,10 +117,10 @@ export default function OftalmologiaLO(datos = {}) {
       }
       alturaBase += 8; // espacio para texto adicional
     }
-    
+
     return Math.max(alturaBase, 80); // altura mínima de 80mm
   };
-  
+
   // Caja principal con altura dinámica
   const boxH = calcularAlturaCuadro();
   doc.setLineWidth(0.3); // Línea más delgada (cambiado de 0.7 a 0.3)

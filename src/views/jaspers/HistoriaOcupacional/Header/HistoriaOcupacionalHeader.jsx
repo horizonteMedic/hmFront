@@ -1,3 +1,4 @@
+import { compressImage } from "../../../utils/helpers";
 import footerEnHeader from "../footerEnHeader";
 
 /**
@@ -34,15 +35,16 @@ const formatDateToShort = (dateString) => {
  * @param {jsPDF} doc - La instancia del documento jsPDF.
  * @param {object} datos - Los datos a imprimir.
  */
-const header_HistoriaOcupacional = (doc, datos = {}) => {
+const header_HistoriaOcupacional = async (doc, datos = {}) => {
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 5;
 
   // Logo a la izquierda
-  const img = "./img/logo-color.png";
+  const img = "/img/logo-color.webp";
+  const imgCompressed = await compressImage(img);
   try {
-    doc.addImage(img, "PNG", margin, y, 60, 20);
+    doc.addImage(imgCompressed, "WEBP", margin, y, 60, 20);
   } catch (error) {
     console.error("No se pudo cargar el logo.", error);
     doc.text("Policlinico Horizonte Medic", margin, y + 8);
@@ -67,7 +69,7 @@ const header_HistoriaOcupacional = (doc, datos = {}) => {
     doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(color);
-    doc.text(boxText, boxX + boxSize/2, boxY + (boxSize/2), { 
+    doc.text(boxText, boxX + boxSize / 2, boxY + (boxSize / 2), {
       align: "center",
       baseline: "middle",
       maxWidth: boxSize - 1
@@ -93,7 +95,7 @@ const header_HistoriaOcupacional = (doc, datos = {}) => {
   doc.text(nroOrdenValue, rightMargin - nroOrdenValueWidth - 10, nroOrdenY, { align: 'left' });
   doc.setLineWidth(0.5);
   doc.line(rightMargin - nroOrdenValueWidth - 10, nroOrdenY + 1.5, rightMargin, nroOrdenY + 1.5);
-  
+
   // Segunda línea: sede alineada con el número
   doc.setFontSize(8).setFont('helvetica', 'bold');
   //DATOS DEBAJO DE NORDEN

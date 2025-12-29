@@ -29,15 +29,23 @@ const formatDateToLong = (dateString) => {
 };
 
 // Header con datos de ficha, sede y fecha
+<<<<<<< HEAD
 const drawHeader = (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
 
   CabeceraLogo(doc, { ...datos, tieneMembrete: false, yOffset: 3 });
+=======
+const drawHeader = async (doc, datos = {}, pageNum = 1) => {
+  const pageW = doc.internal.pageSize.getWidth();
+
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("Nro de ficha: ", pageW - 80, 8);
   doc.setFont("helvetica", "normal").setFontSize(18);
+<<<<<<< HEAD
   doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 9);
 
   // Sede
@@ -47,6 +55,17 @@ const drawHeader = (doc, datos = {}) => {
   // Fecha de examen
   const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || datos.fechaLab || "");
   doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 18);
+=======
+  doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
+
+  // Sede
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
+
+  // Fecha de examen
+  const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || datos.fechaLab || "");
+  doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   // Página
   doc.text("Pag. 01", pageW - 30, 3);
@@ -174,7 +193,7 @@ const drawPatientData = (doc, datos = {}) => {
   return yPos;
 };
 
-export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
+export default async function ParasitologiaSeriado_Digitalizado(datos = {}) {
   // === MAPEO DE DATOS ===
   const datosReales = {
     // Datos del paciente
@@ -206,9 +225,8 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
     nombreSede: datos.sede || datos.nombreSede || "",
 
     // Datos de color
-    codigocolor: datos.codigoColor,
-    codigoColor: datos.codigoColor,
-    textoColor: datos.textoColor,
+    codigocolor: datos.codigoColor || "",
+    textoColor: datos.textoColor || "F",
     color: datos.color || 1,
 
     // Muestra I - Examen Macroscópico
@@ -309,7 +327,7 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
   Promise.all([
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-  ]).then(([s1, s2]) => {
+  ]).then(async ([s1, s2]) => {
     // Función auxiliar para agregar sello al PDF
     const agregarSello = (img, xPos, yPos, width, height) => {
       if (!img) return;
@@ -368,7 +386,11 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
     };
 
     // === PRIMERA PÁGINA (con header) ===
+<<<<<<< HEAD
     drawHeader(doc, datosFinales);
+=======
+    await drawHeader(doc, datosFinales, 1);
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
     // === TÍTULO ===
     let y = 28;
@@ -376,7 +398,11 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
     doc.text("COPROPARASITOLÓGICO SERIADO", pageW / 2, 31.8, { align: "center" });
 
     // === DATOS DEL PACIENTE ===
+<<<<<<< HEAD
     y = drawPatientData(doc, datosFinales, xLeft, y);
+=======
+    const finalYPos = drawPatientData(doc, datosFinales);
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
     // === RESULTADOS ===
     doc.setFont("helvetica", "bold").setFontSize(9);
@@ -390,7 +416,11 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
     // EXAMEN MACROSCÓPICO I
     doc.setFont("helvetica", "bold");
     doc.text("EXAMEN MACROSCÓPICO I", xLeft, y);
+<<<<<<< HEAD
     y += 7;
+=======
+    y += 5;
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
     doc.setFont("helvetica", "normal");
     [
       ["COLOR", datosFinales.muestra1.color],
@@ -403,6 +433,7 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
       doc.text(lbl, xLeft, y);
       doc.text(":", xDato, y);
       doc.text(value != null && value !== "" ? String(value) : "", xDato + 4, y);
+<<<<<<< HEAD
       y += 7;
     });
 
@@ -411,6 +442,16 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
     doc.setFont("helvetica", "bold");
     doc.text("EXAMEN MICROSCÓPICO I", xLeft, y);
     y += 7;
+=======
+      y += 5;
+    });
+
+    // EXAMEN MICROSCÓPICO I
+    y += 4;
+    doc.setFont("helvetica", "bold");
+    doc.text("EXAMEN MICROSCÓPICO I", xLeft, y);
+    y += 5;
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
     doc.setFont("helvetica", "normal");
     [
       ["LEUCOCITOS", datosFinales.microscopico1.leucocitos],
@@ -420,18 +461,30 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
       doc.text(lbl, xLeft, y);
       doc.text(":", xDato, y);
       doc.text(value != null && value !== "" ? String(value) : "", xDato + 4, y);
+<<<<<<< HEAD
       y += 7;
     });
 
     // MUESTRA: HECES II
     y += 10;
+=======
+      y += 5;
+    });
+
+    // MUESTRA: HECES II
+    y += 6;
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
     doc.setFont("helvetica", "bold");
     doc.text("MUESTRA: HECES II", pageW / 2, y, { align: "center" });
     y += 5;
     // EXAMEN MACROSCÓPICO II
     doc.setFont("helvetica", "bold");
     doc.text("EXAMEN MACROSCÓPICO II", xLeft, y);
+<<<<<<< HEAD
     y += 7;
+=======
+    y += 5;
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
     doc.setFont("helvetica", "normal");
     [
       ["COLOR", datosFinales.muestra2.color],
@@ -457,6 +510,7 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
     // === FOOTER PRIMERA PÁGINA ===
     footerTR(doc, { ...datosFinales, footerOffsetY: 16 });
 
+<<<<<<< HEAD
     // === SEGUNDA PÁGINA (SIN header) ===
     doc.addPage();
     // Header en la página 2
@@ -464,10 +518,19 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
 
     // === TÍTULO ===
     y = 28;
+=======
+    // === SEGUNDA PÁGINA ===
+    doc.addPage();
+    // Header en la página 2
+    await drawHeader(doc, datosFinales, 2);
+
+    // === TÍTULO ===
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
     doc.setFont("helvetica", "bold").setFontSize(14);
     doc.text("COPROPARASITOLÓGICO SERIADO", pageW / 2, 31.8, { align: "center" });
 
     // === DATOS DEL PACIENTE ===
+<<<<<<< HEAD
     y = drawPatientData(doc, datosFinales, xLeft, y);
 
     // === RESULTADOS ===
@@ -478,6 +541,19 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
     doc.setFont("helvetica", "bold").setFontSize(9);
     doc.text("EXAMEN MICROSCÓPICO II", xLeft, y);
     y += 7;
+=======
+    const finalYPos2 = drawPatientData(doc, datosFinales);
+
+    // === RESULTADOS ===
+    y = finalYPos2 + 10;
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.text("RESULTADOS:", xLeft, y);
+    y += 5;
+    // EXAMEN MICROSCÓPICO II (igual que en la página 1)
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.text("EXAMEN MICROSCÓPICO II", xLeft, y);
+    y += 5;
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
     doc.setFont("helvetica", "normal").setFontSize(9);
     [
       ["LEUCOCITOS", datosFinales.microscopico2.leucocitos],
@@ -487,9 +563,15 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
       doc.text(lbl, xLeft, y);
       doc.text(":", xDato, y);
       doc.text(value != null && value !== "" ? String(value) : "", xDato + 4, y);
+<<<<<<< HEAD
       y += 7;
     });
     y += 10;
+=======
+      y += 5;
+    });
+    y += 6;
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
     // MUESTRA: HECES III
     doc.setFont("helvetica", "bold");
     doc.text("MUESTRA: HECES III", pageW / 2, y, { align: "center" });
@@ -497,7 +579,11 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
     // EXAMEN MACROSCÓPICO III
     doc.setFont("helvetica", "bold");
     doc.text("EXAMEN MACROSCÓPICO III", xLeft, y);
+<<<<<<< HEAD
     y += 7;
+=======
+    y += 5;
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
     doc.setFont("helvetica", "normal");
     [
       ["COLOR", datosFinales.muestra3.color],
@@ -510,12 +596,21 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
       doc.text(lbl, xLeft, y);
       doc.text(":", xDato, y);
       doc.text(value != null && value !== "" ? String(value) : "", xDato + 4, y);
+<<<<<<< HEAD
       y += 7;
     });
     y += 6;
     doc.setFont("helvetica", "bold");
     doc.text("EXAMEN MICROSCÓPICO III", xLeft, y);
     y += 7;
+=======
+      y += 5;
+    });
+    y += 4;
+    doc.setFont("helvetica", "bold");
+    doc.text("EXAMEN MICROSCÓPICO III", xLeft, y);
+    y += 5;
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
     doc.setFont("helvetica", "normal");
     [
       ["LEUCOCITOS", datosFinales.microscopico3.leucocitos],
@@ -525,7 +620,11 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
       doc.text(lbl, xLeft, y);
       doc.text(":", xDato, y);
       doc.text(value != null && value !== "" ? String(value) : "", xDato + 4, y);
+<<<<<<< HEAD
       y += 7;
+=======
+      y += 5;
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
     });
 
     // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
@@ -537,7 +636,11 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
     dibujarSellos(s1, s2, sigW2, sigH2, sigY2, lineY2);
 
     // Footer de segunda página
+<<<<<<< HEAD
     footerTR(doc, { ...datosFinales, footerOffsetY: 16 });
+=======
+    footerTR(doc, { ...datosFinales, footerOffsetY: 8 });
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
     // Imprimir
     const pdfBlob = doc.output("blob");

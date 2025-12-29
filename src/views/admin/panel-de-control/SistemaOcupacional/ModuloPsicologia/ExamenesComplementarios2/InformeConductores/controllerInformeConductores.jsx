@@ -10,9 +10,9 @@ import {
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
-    "";
+    "/api/v01/ct/informeConductores/obtenerReporteInformeConductores";
 const registrarUrl =
-    "";
+    "/api/v01/ct/informeConductores/registrarActualizarInformeConductores";
 
 export const GetInfoServicio = async (
     nro,
@@ -34,13 +34,15 @@ export const GetInfoServicio = async (
             norden: res.norden ?? "",
             fecha: res.fecha,
 
-            nombreExamen: res.nombreExamen ?? "",
-            dni: res.dni ?? "",
+            esApto: res.perfilCumple ?? false,
 
-            nombres: res.nombres ?? "",
+            nombreExamen: res.tipoExamen ?? "",
+            dni: res.dniPaciente ?? "",
+
+            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
             lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-            edad: res.edad ?? "",
+            edad: res.edadPaciente ?? "",
             sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
             estadoCivil: res.estadoCivilPaciente,
             nivelEstudios: res.nivelEstudioPaciente,
@@ -50,7 +52,20 @@ export const GetInfoServicio = async (
             ocupacion: res.ocupacionPaciente,
             cargoDesempenar: res.cargoPaciente,
 
-            //agregar
+            // Criterios Psicológicos
+            atencion: res.critAtencion ?? "",
+            concentracion: res.critConcentracion ?? "",
+            seguridadYControl: res.critSeguridadControlConduc ?? "",
+
+            // Análisis FODA
+            fortalezasOportunidades: res.analisisFodaFortalezasOportunidades ?? "",
+            amenazasDebilidades: res.analisisFodaAmenazasDebilidades ?? "",
+
+            // Observaciones y Recomendaciones
+            observaciones: res.observacion ?? "",
+            recomendaciones: res.recomendacion ?? "",
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -63,20 +78,34 @@ export const SubmitDataService = async (
     tabla,
     datosFooter
 ) => {
+    let mensajeError = ""
     if (!form.norden) {
-        await Swal.fire("Error", "Datos Incompletos", "error");
+        mensajeError = "Datos Incompletos"
+    }
+    else if (form.esApto === undefined || form.esApto === null) {
+        mensajeError = "Debe marcar aptitud"
+    }
+    if (mensajeError != "") {
+        await Swal.fire("Error", mensajeError, "error");
         return;
     }
-    if (form.esApto === undefined || form.esApto === null) {
-        await Swal.fire("Error", "Debe marcar aptitud", "error");
-        return;
-    }
+
     const body = {
         norden: form.norden,
         fecha: form.fecha,
+        critAtencion: form.atencion,
+        critConcentracion: form.concentracion,
+        critSeguridadControlConduc: form.seguridadYControl,
+        analisisFodaFortalezasOportunidades: form.fortalezasOportunidades,
+        analisisFodaAmenazasDebilidades: form.amenazasDebilidades,
+        observacion: form.observaciones,
+        recomendacion: form.recomendaciones,
+        perfilCumple: form.esApto,
+        perfilNoCumple: !form.esApto,
 
-        //agregar
         usuarioRegistro: user,
+
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -85,7 +114,7 @@ export const SubmitDataService = async (
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformePsicologicoADECO/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformePsicoConductores/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -93,7 +122,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../../jaspers/ModuloPsicologia/InformePsicologicoADECO"
+        "../../../../../../jaspers/ModuloPsicologia/InformePsicoConductores"
     );
 };
 

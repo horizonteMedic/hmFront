@@ -1,11 +1,12 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
-import { getSign } from "../../utils/helpers.js";
+
+import { getSign, getSignCompressed } from "../../utils/helpers.js";
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 
-export default function Aptitud_Agroindustrial(data = {}, docExistente = null) {
+export default async function Aptitud_Agroindustrial(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -59,9 +60,9 @@ export default function Aptitud_Agroindustrial(data = {}, docExistente = null) {
 
 
   // Header reutilizable (mejorado basado en formatPsicologia)
-  const drawHeader = () => {
+  const drawHeader = async () => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
     // Título principal
     doc.setFont("helvetica", "bold").setFontSize(14);
@@ -92,10 +93,12 @@ export default function Aptitud_Agroindustrial(data = {}, docExistente = null) {
       fontSize: 30,
       textPosition: 0.9
     });
+    console.log("Header dibujado");
+    return
   };
 
   // === HEADER ===
-  drawHeader();
+  await drawHeader();
 
   // === TABLA PRINCIPAL ===
   const tablaInicioX = 15;
@@ -736,10 +739,13 @@ export default function Aptitud_Agroindustrial(data = {}, docExistente = null) {
   doc.text("SELLO Y FIRMA DE MEDICO QUE CERTIFICA", tablaAptitudInicioX + 105, yFechaTexto + 4);
 
   try {
-    const firmaMedicoImg = getSign(data, "SELLOFIRMA");
-    doc.addImage(firmaMedicoImg, 'PNG', firmaX, firmaY, 50 * 0.7, 30 * 0.7);
+    const firmaMedicoImg = await getSignCompressed(data, "SELLOFIRMA");
+    if (firmaMedicoImg) {
+      doc.addImage(firmaMedicoImg, 'JPEG', firmaX, firmaY, 50 * 0.7, 30 * 0.7);
+    }
   } catch (e) {
     // Error al agregar la firma
+    console.error("Error al agregar firma medico:", e);
   }
 
 
@@ -753,6 +759,7 @@ export default function Aptitud_Agroindustrial(data = {}, docExistente = null) {
   if (docExistente) {
     return doc;
   } else {
+    console.log("Imprimiendo");
     imprimir(doc);
   }
 

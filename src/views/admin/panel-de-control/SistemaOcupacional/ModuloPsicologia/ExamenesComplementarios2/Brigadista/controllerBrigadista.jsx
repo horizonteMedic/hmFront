@@ -10,9 +10,9 @@ import {
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
-    "";
+    "/api/v01/ct/psiBrigadista/obtenerReporteBrigadista";
 const registrarUrl =
-    "";
+    "/api/v01/ct/psiBrigadista/registrarActualizarBrigadista";
 
 export const GetInfoServicio = async (
     nro,
@@ -32,25 +32,40 @@ export const GetInfoServicio = async (
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
-            fecha: res.fecha,
+            fecha: res.fechaRegistro,
 
-            nombreExamen: res.nombreExamen ?? "",
-            dni: res.dni ?? "",
+            esApto: res.cumplePerfil,
 
-            nombres: res.nombres ?? "",
+            nombreExamen: res.tipoExamen ?? "",
+            dni: res.dniPaciente ?? "",
+
+            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
             lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-            edad: res.edad ?? "",
+            edad: res.edadPaciente ?? "",
             sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
-            estadoCivil: res.estadoCivilPaciente,
-            nivelEstudios: res.nivelEstudioPaciente,
+            estadoCivil: res.estadoCivilPaciente ?? "",
+            nivelEstudios: res.nivelEstudioPaciente ?? "",
             // Datos Laborales
-            empresa: res.empresa,
-            contrata: res.contrata,
-            ocupacion: res.ocupacionPaciente,
-            cargoDesempenar: res.cargoPaciente,
+            empresa: res.empresa ?? "",
+            contrata: res.contrata ?? "",
+            ocupacion: res.ocupacionPaciente ?? "",
+            cargoDesempenar: res.cargoPaciente ?? "",
 
-            //agregar
+            afrontamientoTomaDecisiones: res.afronTdd ?? "",
+            estiloDeConflicto: res.estiloConflicto ?? "",
+            afrontamientoSituacionesRiesgo: res.afronSitRiesgo ?? "",
+            nivelAnsiedad: res.levelAnsiedad ?? "",
+
+            // Análisis FODA
+            fortalezasOportunidades: res.fodaForOpor ?? "",
+            amenazasDebilidades: res.fodaAmenDebi ?? "",
+
+            // Observaciones y Recomendaciones
+            observaciones: res.observacion ?? "",
+            recomendaciones: res.recomenda ?? "",
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -73,10 +88,19 @@ export const SubmitDataService = async (
     }
     const body = {
         norden: form.norden,
-        fecha: form.fecha,
-
+        fechaRegistro: form.fecha,
+        afronTdd: form.afrontamientoTomaDecisiones,
+        estiloConflicto: form.estiloDeConflicto,
+        afronSitRiesgo: form.afrontamientoSituacionesRiesgo,
+        levelAnsiedad: form.nivelAnsiedad,
+        fodaForOpor: form.fortalezasOportunidades,
+        fodaAmenDebi: form.amenazasDebilidades,
+        observacion: form.observaciones,
+        recomenda: form.recomendaciones,
+        cumplePerfil: true,
         //agregar
-        usuarioRegistro: user,
+        userRegistro: user,
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -85,7 +109,7 @@ export const SubmitDataService = async (
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformePsicologicoADECO/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformePsicoBrigadista/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -93,7 +117,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../../jaspers/ModuloPsicologia/InformePsicologicoADECO"
+        "../../../../../../jaspers/ModuloPsicologia/InformePsicoBrigadista"
     );
 };
 

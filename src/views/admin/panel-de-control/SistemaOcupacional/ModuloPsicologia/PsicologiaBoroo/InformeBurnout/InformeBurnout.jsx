@@ -1,5 +1,3 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faPrint, faBroom } from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
     InputTextArea,
@@ -9,35 +7,36 @@ import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformeBurnout";
+import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
 
 const tabla = "informe_burnout";
-const today = getToday();
 
 export default function InformeBurnout() {
+    const today = getToday();
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
 
     const initialFormState = {
-        // Header - Información del examen
-        norden: "",
-        fechaExamen: today,
+        norden: '',
+        fecha: today,
+
         nombreExamen: "",
 
-        // Datos personales
+        dni: "",
         nombres: "",
         apellidos: "",
-        dni: "",
         fechaNacimiento: "",
         lugarNacimiento: "",
-        domicilioActual: "",
         edad: "",
+        sexo: "",
         estadoCivil: "",
         nivelEstudios: "",
 
-        // Datos laborales
-        ocupacion: "",
-        cargoDesempenar: "",
+        // Datos Laborales
         empresa: "",
         contrata: "",
+        ocupacion: "",
+        cargoDesempenar: "",
 
         // Síndrome de Burnout
         sindromeBurnout: "",
@@ -57,7 +56,7 @@ export default function InformeBurnout() {
         handleChange,
         handleChangeNumber,
         handleChangeSimple,
-        handleRadioButtonBoolean,
+        handleChangeNumberDecimals,
         handleClear,
         handleClearnotO,
         handlePrintDefault,
@@ -81,7 +80,7 @@ export default function InformeBurnout() {
     };
 
     return (
-        <div className="px-4 space-y-3">
+        <div className="space-y-3 px-4 max-w-[90%]  xl:max-w-[80%] mx-auto">
             {/* Header con información del examen */}
             <div className="w-full space-y-3">
                 <SectionFieldset legend="Información del Examen">
@@ -95,10 +94,10 @@ export default function InformeBurnout() {
                             labelWidth="120px"
                         />
                         <InputTextOneLine
-                            label="Fecha Examen"
-                            name="fechaExamen"
+                            label="Fecha"
+                            name="fecha"
                             type="date"
-                            value={form.fechaExamen}
+                            value={form.fecha}
                             onChange={handleChangeSimple}
                             labelWidth="120px"
                         />
@@ -112,36 +111,7 @@ export default function InformeBurnout() {
                     </div>
                 </SectionFieldset>
 
-                <SectionFieldset legend="Datos Personales">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <div className="space-y-3">
-                            <InputTextOneLine label="Nombres" name="nombres" value={form.nombres} disabled labelWidth="160px" />
-                            <InputTextOneLine label="Apellidos" name="apellidos" value={form.apellidos} disabled labelWidth="160px" />
-                            <InputTextOneLine label="Domicilio Actual" name="domicilioActual" value={form.domicilioActual} disabled labelWidth="160px" />
-                            <InputTextOneLine label="Fecha Nacimiento" name="fechaNacimiento" value={form.fechaNacimiento} disabled labelWidth="160px" />
-                            <InputTextOneLine label="Nivel de Estudios" name="nivelEstudios" value={form.nivelEstudios} disabled labelWidth="160px" />
-                        </div>
-                        <div className="space-y-3">
-                            <InputTextOneLine label="DNI" name="dni" value={form.dni} disabled labelWidth="160px" />
-                            <InputTextOneLine label="Edad (años)" name="edad" value={form.edad} disabled labelWidth="160px" />
-                            <InputTextOneLine label="Estado Civil" name="estadoCivil" value={form.estadoCivil} disabled labelWidth="160px" />
-                            <InputTextOneLine label="Lugar Nacimiento" name="lugarNacimiento" value={form.lugarNacimiento} disabled labelWidth="160px" />
-                        </div>
-                    </div>
-                </SectionFieldset>
-
-                <SectionFieldset legend="Datos Laborales">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <div className="space-y-3">
-                            <InputTextOneLine label="Ocupación" name="ocupacion" value={form.ocupacion} disabled labelWidth="160px" />
-                            <InputTextOneLine label="Cargo a desempeñar" name="cargoDesempenar" value={form.cargoDesempenar} disabled labelWidth="160px" />
-                        </div>
-                        <div className="space-y-3">
-                            <InputTextOneLine label="Empresa" name="empresa" value={form.empresa} disabled labelWidth="160px" />
-                            <InputTextOneLine label="Contrata" name="contrata" value={form.contrata} disabled labelWidth="160px" />
-                        </div>
-                    </div>
-                </SectionFieldset>
+                <DatosPersonalesLaborales form={form} />
             </div>
 
             <SectionFieldset legend="Criterios Psicológicos">
@@ -208,44 +178,13 @@ export default function InformeBurnout() {
                 </div>
             </SectionFieldset>
 
-            {/* Acciones */}
-            <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-4">
-                <div className="flex gap-4">
-                    <button
-                        type="button"
-                        onClick={handleSave}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                    >
-                        <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                    </button>
-                    <button
-                        type="button"
-                        onClick={handleClear}
-                        className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                    >
-                        <FontAwesomeIcon icon={faBroom} /> Limpiar
-                    </button>
-                </div>
-                <div className="flex flex-col items-end">
-                    <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
-                    <div className="flex items-center gap-2">
-                        <input
-                            name="norden"
-                            value={form.norden}
-                            onChange={handleChangeNumber}
-                            className="border rounded px-2 py-1 text-base w-24"
-                        />
-
-                        <button
-                            type="button"
-                            onClick={handlePrint}
-                            className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                        >
-                            <FontAwesomeIcon icon={faPrint} />
-                        </button>
-                    </div>
-                </div>
-            </section>
+            <BotonesAccion
+                form={form}
+                handleSave={handleSave}
+                handleClear={handleClear}
+                handlePrint={handlePrint}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+            />
         </div>
     );
 }

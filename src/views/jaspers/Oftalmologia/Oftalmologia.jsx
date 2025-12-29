@@ -5,7 +5,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 
-export default function Oftalmologia(datos = {}, docExistente = null) {
+export default async function Oftalmologia(datos = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -43,9 +43,9 @@ export default function Oftalmologia(datos = {}, docExistente = null) {
   };
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosReales, tieneMembrete: false });
+    await CabeceraLogo(doc, { ...datosReales, tieneMembrete: false });
 
     // Título principal (en todas las páginas)
     doc.setFont("helvetica", "bold").setFontSize(12);
@@ -78,7 +78,7 @@ export default function Oftalmologia(datos = {}, docExistente = null) {
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === FUNCIONES AUXILIARES ===
   // Función para texto con salto de línea

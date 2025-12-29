@@ -5,7 +5,7 @@ import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import { getSign, convertirGenero } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
 
-export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
+export default async function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   // Contador de páginas dinámico
@@ -15,8 +15,8 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   function buildDatosFinales(raw) {
     const datosReales = {
       apellidosNombres: String((((raw?.apellidosPaciente ?? '') + ' ' + (raw?.nombresPaciente ?? '')).trim())),
-      fechaExamen: formatearFechaCorta(raw?.fechaEntrevista ?? ''), 
-      tipoExamen: String(raw?.nombreExamen ?? ''),
+      fechaExamen: formatearFechaCorta(raw?.fechaExamen ?? raw?.fechaEntrevista ?? raw?.fecha ?? ''),
+      tipoExamen: String(raw?.nombreExamen ?? raw?.tipoExamen ?? ''),
       sexo: convertirGenero(raw?.sexoPaciente ?? ''),
       documentoIdentidad: String(raw?.dniPaciente ?? ''),
       edad: String(raw?.edadPaciente ?? ''),
@@ -71,9 +71,9 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   const datosFinales = buildDatosFinales(data);
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
 
     // Títulos
     doc.setFont("helvetica", "bold").setFontSize(12);
@@ -141,11 +141,11 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
     const palabras = texto.split(' ');
     let lineaActual = '';
     let lineas = 1;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -157,7 +157,7 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
         }
       }
     });
-    
+
     // Altura mínima de 15mm, altura por línea de 3mm
     const alturaCalculada = lineas * 3 + 2;
     return Math.max(alturaCalculada, 20);
@@ -190,7 +190,7 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   };
 
   // === PÁGINA 1 ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === SECCIÓN 1: DATOS DE FILIACIÓN ===
   const tablaInicioX = 5;
@@ -333,7 +333,7 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   // Fila con 5 divisiones: Aspecto Intelectual (más ancho) | I | NPI | NP | NPS | S
   const anchoAspectoIntelectual = 80; // Columna más ancha para el aspecto
   const anchoColumnaEvaluacion = (tablaAncho - anchoAspectoIntelectual) / 5; // Las 5 columnas de evaluación
-  
+
   const posicionesColumnas = [
     tablaInicioX, // Aspecto Intelectual
     tablaInicioX + anchoAspectoIntelectual, // I
@@ -357,11 +357,11 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   // Contenido de los headers
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Aspecto Intelectual", tablaInicioX + 2, yTexto + 3.5);
-  doc.text("I", posicionesColumnas[1] + anchoColumnaEvaluacion/2, yTexto + 3.5, { align: "center" });
-  doc.text("NPI", posicionesColumnas[2] + anchoColumnaEvaluacion/2, yTexto + 3.5, { align: "center" });
-  doc.text("NP", posicionesColumnas[3] + anchoColumnaEvaluacion/2, yTexto + 3.5, { align: "center" });
-  doc.text("NPS", posicionesColumnas[4] + anchoColumnaEvaluacion/2, yTexto + 3.5, { align: "center" });
-  doc.text("S", posicionesColumnas[5] + anchoColumnaEvaluacion/2, yTexto + 3.5, { align: "center" });
+  doc.text("I", posicionesColumnas[1] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
+  doc.text("NPI", posicionesColumnas[2] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
+  doc.text("NP", posicionesColumnas[3] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
+  doc.text("NPS", posicionesColumnas[4] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
+  doc.text("S", posicionesColumnas[5] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
   yTexto += filaAltura;
 
   // Función para obtener evaluación desde data
@@ -376,11 +376,12 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
 
   // Datos de aspectos psicológicos desde data
   const aspectosPsicologicos = [
-    { numero: 1, aspecto: "Razonamiento", evaluacion: getEvaluacion("razonamiento") },
+    { numero: 1, aspecto: "Razonamiento y Resolucion de problemas", evaluacion: getEvaluacion("razonamiento") },
     { numero: 2, aspecto: "Memoria", evaluacion: getEvaluacion("memoria") },
-    { numero: 3, aspecto: "Atención", evaluacion: getEvaluacion("atencion") },
-    { numero: 4, aspecto: "Orientación Espacial", evaluacion: getEvaluacion("orientacionEspacial") },
-    { numero: 5, aspecto: "Viso Motora", evaluacion: getEvaluacion("visoMotora") }
+    { numero: 3, aspecto: "Atencion y Concentración", evaluacion: getEvaluacion("atencion") },
+    { numero: 4, aspecto: "Coordinación viso-motora", evaluacion: getEvaluacion("visoMotora") },
+    { numero: 5, aspecto: "Orientación Espacial", evaluacion: getEvaluacion("orientacionEspacial") },
+    { numero: 6, aspecto: "Comprensión verbal", evaluacion: getEvaluacion("comprensionVerbal") }
   ];
 
   // Dibujar filas de datos
@@ -397,30 +398,30 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
 
     // Contenido de la fila
     doc.setFont("helvetica", "normal").setFontSize(8);
-    
+
     // Número
     doc.text(aspecto.numero.toString(), tablaInicioX + 2, yTexto + 3.5);
-    
+
     // Aspecto psicológico
     doc.text(aspecto.aspecto, tablaInicioX + 12, yTexto + 3.5);
-    
+
     // Marcar la evaluación correspondiente con X
     const evaluaciones = ["I", "NPI", "NP", "NPS", "S"];
     evaluaciones.forEach((evaluacion, evalIndex) => {
       if (aspecto.evaluacion === evaluacion) {
         doc.setFont("helvetica", "bold").setFontSize(10);
-        doc.text("X", posicionesColumnas[evalIndex + 1] + anchoColumnaEvaluacion/2, yTexto + 3.5, { align: "center" });
+        doc.text("X", posicionesColumnas[evalIndex + 1] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
         doc.setFont("helvetica", "normal").setFontSize(8);
       }
     });
-    
+
     yTexto += filaAltura;
   });
 
   // === SECCIÓN 3: ASPECTOS PERSONALIDAD ===
   // Espacio antes de la nueva sección
   yTexto += 3;
-  
+
   // Título de la sección
   doc.setFont("helvetica", "bold").setFontSize(10);
   doc.setTextColor(0, 0, 0);
@@ -468,12 +469,12 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
 
   // Ancho fijo para todas las columnas de X (igual para todas las filas)
   const anchoColumnaX_Fijo = 5; // Ancho fijo y consistente para todas las celdas de X
-  
+
   // Dibujar cada fila de aspecto de personalidad
   aspectosPersonalidad.forEach((aspecto, index) => {
     const anchoColumnaAspecto = 50; // Ancho para el nombre del aspecto
     const numOpciones = aspecto.opciones.length;
-    
+
     // Anchos personalizados para la tercera fila (Ansiedad a espacios confinados)
     const anchosPersonalizadosFila3 = [
       { texto: 20 },  // "Nada"
@@ -481,13 +482,13 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
       { texto: 40 },  // "Moderadamente ansioso"
       { texto: 40 }   // "Elevadamente ansioso"
     ];
-    
+
     // Calcular posiciones de las columnas
     const posicionesCols = [tablaInicioX]; // Inicio (columna del aspecto)
     posicionesCols.push(tablaInicioX + anchoColumnaAspecto); // División después del aspecto
-    
+
     let posicionActual = tablaInicioX + anchoColumnaAspecto;
-    
+
     if (index === 2) {
       // Tercera fila: usar anchos personalizados para texto, pero X fijo
       anchosPersonalizadosFila3.forEach((ancho) => {
@@ -500,7 +501,7 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
       // Otras filas: usar cálculo uniforme
       const anchoRestante = tablaAncho - anchoColumnaAspecto - (numOpciones * anchoColumnaX_Fijo);
       const anchoColumnaOpcion = anchoRestante / numOpciones; // Ancho para cada opción (distribución uniforme)
-      
+
       for (let i = 0; i < numOpciones; i++) {
         posicionActual += anchoColumnaOpcion;
         posicionesCols.push(posicionActual); // Fin de columna de texto
@@ -522,16 +523,16 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
 
     // Contenido de la fila
     doc.setFont("helvetica", "normal").setFontSize(8);
-    
+
     // Nombre del aspecto (alineado a la izquierda como en CRITERIOS PSICOLÓGICOS)
     doc.text(aspecto.aspecto, tablaInicioX + 2, yTexto + 3.5);
-    
+
     // Opciones: texto en una columna, X en la siguiente si está seleccionada
     let posicionOpcion = tablaInicioX + anchoColumnaAspecto;
-    
+
     aspecto.opciones.forEach((opcion, opcIndex) => {
       let anchoTextoOpcion;
-      
+
       if (index === 2) {
         // Tercera fila: usar anchos personalizados para texto
         anchoTextoOpcion = anchosPersonalizadosFila3[opcIndex].texto;
@@ -540,25 +541,25 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
         const anchoRestante = tablaAncho - anchoColumnaAspecto - (numOpciones * anchoColumnaX_Fijo);
         anchoTextoOpcion = anchoRestante / numOpciones;
       }
-      
+
       const inicioOpcion = posicionOpcion;
       const centroColumnaX = inicioOpcion + anchoTextoOpcion + (anchoColumnaX_Fijo / 2);
-      
+
       // Mostrar el texto de la opción alineado a la izquierda (como en CRITERIOS PSICOLÓGICOS)
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text(opcion, inicioOpcion + 2, yTexto + 3.5);
-      
+
       // Marcar con X si está seleccionada (centrada en su columna)
       if (aspecto.seleccionado === opcion) {
         doc.setFont("helvetica", "bold").setFontSize(10);
         doc.text("X", centroColumnaX, yTexto + 3.5, { align: "center" });
         doc.setFont("helvetica", "normal").setFontSize(8);
       }
-      
+
       // Actualizar posición para la siguiente opción
       posicionOpcion += anchoTextoOpcion + anchoColumnaX_Fijo;
     });
-    
+
     yTexto += filaAltura;
   });
 
@@ -567,7 +568,7 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
 
   // Fila de Análisis y Resultados (creciente)
   const alturaAnalisis = calcularAlturaTexto(datosFinales.analisisResultados, tablaAncho - 4);
-  
+
   doc.line(tablaInicioX, yTexto, tablaInicioX, yTexto + alturaAnalisis);
   doc.line(tablaInicioX + tablaAncho, yTexto, tablaInicioX + tablaAncho, yTexto + alturaAnalisis);
   doc.line(tablaInicioX, yTexto, tablaInicioX + tablaAncho, yTexto);
@@ -582,7 +583,7 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
 
   // Fila de Recomendaciones (creciente)
   const alturaRecomendaciones = calcularAlturaTexto(datosFinales.recomendaciones, tablaAncho - 4);
-  
+
   doc.line(tablaInicioX, yTexto, tablaInicioX, yTexto + alturaRecomendaciones);
   doc.line(tablaInicioX + tablaAncho, yTexto, tablaInicioX + tablaAncho, yTexto + alturaRecomendaciones);
   doc.line(tablaInicioX, yTexto, tablaInicioX + tablaAncho, yTexto);
@@ -623,22 +624,22 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
 
   // Contenido de la fila
   doc.setFont("helvetica", "normal").setFontSize(8);
-  
+
   // APTO
   const centroApto = tablaInicioX + (anchoColumnaApto / 2);
   doc.text("APTO", centroApto, yTexto + 3.5, { align: "center" });
-  
+
   // X para APTO
   const centroColumnaXApto = tablaInicioX + anchoColumnaApto + (anchoColumnaX / 2);
-  
+
   // NO APTO
   const inicioNoApto = tablaInicioX + anchoColumnaApto + anchoColumnaX;
   const centroNoApto = inicioNoApto + (anchoColumnaApto / 2);
   doc.text("NO APTO", centroNoApto, yTexto + 3.5, { align: "center" });
-  
+
   // X para NO APTO
   const centroColumnaXNoApto = inicioNoApto + anchoColumnaApto + (anchoColumnaX / 2);
-  
+
   // Marcar X según si está apto o no apto
   if (datosFinales.apto) {
     doc.setFont("helvetica", "bold").setFontSize(10);
@@ -647,7 +648,7 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text("X", centroColumnaXNoApto, yTexto + 3.5, { align: "center" });
   }
-  
+
   yTexto += filaAltura;
 
   // === SECCIÓN DE FIRMAS ===
@@ -663,7 +664,7 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   // === FIRMA DEL MÉDICO ===
   const centroColumna = tablaInicioX + (tablaAncho / 2);
   const firmaMedicoY = yFirmas + 3;
-  
+
   // Agregar firma y sello médico
   let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
   if (firmaMedicoUrl) {
@@ -680,9 +681,17 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
     }
   }
 
+  // Dibujar línea debajo de la firma
+  const textoFirma = "FIRMA Y SELLO DEL PROFESIONAL RESPONSABLE DE LA EVALUACION";
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Sello y Firma del Médico", centroColumna, yFirmas + 26, { align: "center" });
-  doc.text("Responsable de la Evaluación", centroColumna, yFirmas + 28.5, { align: "center" });
+  const anchoTextoFirma = doc.getTextWidth(textoFirma);
+  const lineaY = yFirmas + 25;
+  doc.setLineWidth(0.2);
+  doc.line(centroColumna - anchoTextoFirma / 2, lineaY, centroColumna + anchoTextoFirma / 2, lineaY);
+  
+  // Texto del pie de firma
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(textoFirma, centroColumna, lineaY + 4, { align: "center" });
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 5 });

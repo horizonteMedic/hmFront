@@ -5,7 +5,20 @@ import footerTR from '../components/footerTR.jsx';
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 import { convertirGenero } from "../../utils/helpers.js";
 
+<<<<<<< HEAD
 export default function Hematologia_Digitalizado_nuevo(data = {}) {
+=======
+// Función para formatear fecha a DD/MM/YYYY
+const toDDMMYYYY = (fecha) => {
+  if (!fecha) return '';
+  if (fecha.includes('/')) return fecha;
+  const [anio, mes, dia] = fecha.split('-');
+  if (!anio || !mes || !dia) return fecha;
+  return `${dia}/${mes}/${anio}`;
+};
+
+export default async function Hematologia_Digitalizado_nuevo(data = {}) {
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -44,6 +57,7 @@ export default function Hematologia_Digitalizado_nuevo(data = {}) {
   const filaAltura = 6;
 
   // Header reutilizable
+<<<<<<< HEAD
   const drawHeader = (pageNumber) => {
     CabeceraLogo(doc, { ...datosReales, tieneMembrete: false, yOffset: 13 });
 
@@ -51,6 +65,10 @@ export default function Hematologia_Digitalizado_nuevo(data = {}) {
     doc.setFont("helvetica", "bold").setFontSize(12);
     doc.setTextColor(0, 0, 0);
     doc.text("HEMOGRAMA AUTOMATIZADO", pageW / 2, 42, { align: "center" });
+=======
+  const drawHeader = async () => {
+    await CabeceraLogo(doc, { ...datosReales, tieneMembrete: false });
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
     // Número de Ficha y Página
     doc.setFont("helvetica", "normal").setFontSize(9);
@@ -94,7 +112,7 @@ export default function Hematologia_Digitalizado_nuevo(data = {}) {
   const drawTextWithSuperscript = (text, x, y) => {
     const parts = text.split(/(\^[0-9]+)/);
     let currentX = x;
-    
+
     parts.forEach((part) => {
       if (part.startsWith('^')) {
         // Superíndice
@@ -112,7 +130,11 @@ export default function Hematologia_Digitalizado_nuevo(data = {}) {
   };
 
   // === DIBUJAR HEADER ===
+<<<<<<< HEAD
   drawHeader(1);
+=======
+  await drawHeader();
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   // === SECCIÓN 1: DATOS PERSONALES ===
   let yPos = 46;
@@ -370,11 +392,67 @@ export default function Hematologia_Digitalizado_nuevo(data = {}) {
   // Firma centrada en toda la fila
   const centroFirma = tablaInicioX + tablaAncho / 2;
   const sello1 = data.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
+<<<<<<< HEAD
   if (sello1 && sello1.url && sello1.url !== "Sin registro") {
     try {
       doc.addImage(sello1.url, 'PNG', centroFirma - 22, yPos + 5, 45, 20);
     } catch (error) {
       console.log("Error cargando firma:", error);
+=======
+  const sello2 = data.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
+  const isValidUrl = url => url && url !== "Sin registro";
+  const loadImg = src =>
+    new Promise((res, rej) => {
+      const img = new Image();
+      img.src = src;
+      img.crossOrigin = 'anonymous';
+      img.onload = () => res(img);
+      img.onerror = () => rej(`No se pudo cargar ${src}`);
+    });
+
+  Promise.all([
+    isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
+    isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
+  ]).then(([s1, s2]) => {
+    const sigW = 53;
+    const sigH = 23;
+    const sigY = yPos + 20;
+    const gap = 16;
+
+    if (s1 && s2) {
+      const totalWidth = sigW * 2 + gap;
+      const startX = (pageW - totalWidth) / 2;
+
+      const addSello = (img, xPos) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const selloBase64 = canvas.toDataURL('image/png');
+        doc.addImage(selloBase64, 'PNG', xPos, sigY, sigW, sigH);
+      };
+      addSello(s1, startX);
+      addSello(s2, startX + sigW + gap);
+    } else if (s1) {
+      const canvas = document.createElement('canvas');
+      canvas.width = s1.width;
+      canvas.height = s1.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(s1, 0, 0);
+      const selloBase64 = canvas.toDataURL('image/png');
+      const imgX = (pageW - sigW) / 2;
+      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
+    } else if (s2) {
+      const canvas = document.createElement('canvas');
+      canvas.width = s2.width;
+      canvas.height = s2.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(s2, 0, 0);
+      const selloBase64 = canvas.toDataURL('image/png');
+      const imgX = (pageW - sigW) / 2;
+      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
     }
   }
 

@@ -5,7 +5,7 @@ import footerTR from "../components/footerTR.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
 import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
 
-export default function Consentimiento_Panel10D_Digitalizado(datos) {
+export default async function Consentimiento_Panel10D_Digitalizado(datos) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -19,8 +19,13 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
   };
 
   // Header con datos de ficha, sede y fecha
+<<<<<<< HEAD
   const drawHeader = () => {
     CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+=======
+  const drawHeader = async () => {
+    await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
     // Número de Ficha
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -41,8 +46,13 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
 
     // Bloque de color
     drawColorBox(doc, {
+<<<<<<< HEAD
       color: datos.codigoColor || "#008f39",
       text: datos.textoColor || "F",
+=======
+      color: datos.codigoColor,
+      text: datos.textoColor,
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
       x: pageW - 30,
       y: 10,
       size: 22,
@@ -52,7 +62,7 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
     });
   };
 
-  drawHeader();
+  await drawHeader();
 
   // Contenido del documento
   let y = 44;
@@ -157,7 +167,11 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
 
   // Antecedentes (tabla) igual que Panel2D
   doc.setFont(undefined, 'bold');
+<<<<<<< HEAD
   doc.setFontSize(12);
+=======
+  doc.setFontSize(9);
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
   doc.text('ANTECEDENTES:', margin, y);
   doc.setFont(undefined, 'normal');
   y += 6;
@@ -241,7 +255,11 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
       ],
     ],
     theme: 'plain',
+<<<<<<< HEAD
     styles: { fontSize: 11, cellPadding: 1 },
+=======
+    styles: { fontSize: 9, cellPadding: 1 },
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
     columnStyles: { 0: { cellWidth: 100 }, 1: { cellWidth: 20 }, 2: { cellWidth: 20 }, 3: { cellWidth: 50 } },
     margin: { left: 18 },
     didDrawPage: () => { }
@@ -250,7 +268,11 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
   // Fecha del examen alineada a la derecha y formato dd/mm/yyyy
   y = doc.lastAutoTable.finalY + 10;
   doc.setFont('helvetica', 'normal');
+<<<<<<< HEAD
   doc.setFontSize(10);
+=======
+  doc.setFontSize(9);
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
   if (datos.fecha) {
     const rightMargin = 20;
     doc.text(`${datos.fecha}`, pageW - rightMargin, y, { align: 'right' });

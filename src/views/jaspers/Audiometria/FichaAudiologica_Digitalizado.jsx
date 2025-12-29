@@ -1,8 +1,8 @@
 import jsPDF from "jspdf";
 import headerFicha from "./headers/header_FichaAudiologica_Digitalizado.jsx";
-import { getSign } from "../../utils/helpers.js";
+import { compressImage, getSign } from "../../utils/helpers.js";
 
-export default function FichaAudiologica_Digitalizado(
+export default async function FichaAudiologica_Digitalizado(
   data = {},
   docExistente = null,
   mostrarGrafico = true,
@@ -16,7 +16,7 @@ export default function FichaAudiologica_Digitalizado(
 
   // DEBUG: Ver en qué página estamos
   // 1) Header
-  headerFicha(doc, data);
+  await headerFicha(doc, data);
 
   // const datos = {
   //   norden: "95899",
@@ -233,10 +233,11 @@ export default function FichaAudiologica_Digitalizado(
 
   // === NUEVO: Usar imagen de fondo para la cabecera ===
   const fondoImg = "/img/frame_ficha.png";
+  const fondoImgCompressed = await compressImage(fondoImg);
   const fondoH = 95; // altura aproximada de la cabecera en mm (ajusta si es necesario)
   let yHeader = 40;
   try {
-    doc.addImage(fondoImg, "PNG", margin, yHeader, usableW, fondoH);
+    doc.addImage(fondoImgCompressed, "PNG", margin, yHeader, usableW, fondoH);
   } catch (e) {
     doc.text("Imagen de cabecera no disponible", margin, yHeader + 10);
   }

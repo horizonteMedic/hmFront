@@ -128,7 +128,7 @@ export default function EvaluacionPsicologicaPoderosa() {
     };
 
     return (
-        <div className="w-full space-y-4 px-4">
+        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
             {/* Header */}
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <InputTextOneLine

@@ -60,10 +60,10 @@ const formatDateToLong = (dateString) => {
 };
 
 // Header con datos de ficha, sede y fecha
-const drawHeader = (doc, datos = {}) => {
+const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
 
-  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
 
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -193,15 +193,16 @@ const drawPatientData = (doc, datos = {}) => {
 
 // --- Componente Principal ---
 
-export default function ResultadosPanel5d_ohla_Digitalizado(datos = {}) {
+export default async function ResultadosPanel5d_ohla_Digitalizado(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
-  drawHeader(doc, datos);
+  await drawHeader(doc, datos);
 
   // === TÍTULO ===
-  drawUnderlinedTitle(doc, "TOXICOLÓGICO", 38);
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
+  doc.text("TOXICOLÓGICO", pageW / 2, 38, { align: "center" });
 
   // === DATOS DEL PACIENTE ===
   drawPatientData(doc, datos);

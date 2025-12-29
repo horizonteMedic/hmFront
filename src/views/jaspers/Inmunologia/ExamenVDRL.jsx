@@ -32,10 +32,14 @@ const toDDMMYYYY = (fecha) => {
   return `${dia}/${mes}/${anio}`;
 };
 
-const drawHeader = (doc, datos = {}) => {
+const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
 
+<<<<<<< HEAD
   CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+=======
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Nro de ficha: ", pageW - 80, 15);
@@ -159,11 +163,11 @@ const drawPatientData = (doc, datos = {}) => {
 
 // --- Componente Principal ---
 
-export default function ExamenVDRL(datos = {}) {
+export default async function ExamenVDRL(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
-  drawHeader(doc, datos);
+  await drawHeader(doc, datos);
   drawUnderlinedTitle(doc, "BIOQUIMICA", 38);
   drawPatientData(doc, datos);
 

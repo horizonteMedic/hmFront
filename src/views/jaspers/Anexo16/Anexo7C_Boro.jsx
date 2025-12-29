@@ -1,11 +1,11 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
-import { getSign } from "../../utils/helpers.js";
+import { getSign, compressImage, getSignCompressed } from "../../utils/helpers.js";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 
-export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
+export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
   // Normalizar estructura de datos: si viene con anexo16Reporte, aplanar la estructura
   if (data.anexo16Reporte && typeof data.anexo16Reporte === 'object') {
     // Combinar anexo16Reporte con las propiedades de nivel superior
@@ -27,6 +27,11 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
 
   // Contador de páginas dinámico
   let numeroPagina = 1;
+
+  // Función helper para obtener el offset del footer según la página
+  const getFooterOffset = () => {
+    return numeroPagina === 1 ? 13 : 8; // Footer primera página 3mm más cerca del contenido (offset reducido)
+  };
 
   // Función helper para convertir valores vacíos/null a "N/A"
   const formatNA = (value) => {
@@ -208,14 +213,14 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
       visionCerca: {
         sinCorregirOD: data.visionCercaSinCorregirOd_v_cerca_s_od ?? "",
         sinCorregirOI: data.visionCercaSinCorregirOi_v_cerca_s_oi ?? "",
-        corregidaOD: data.odcc_odcc ?? "",
-        corregidaOI: data.oicc_oicc ?? "",
+        corregidaOD: data.visionCercaCorregidaOd_v_cerca_c_od ? data.visionCercaCorregidaOd_v_cerca_c_od : data.odcc_odcc,
+        corregidaOI: data.visionCercaCorregidaOi_v_cerca_c_oi ? data.visionCercaCorregidaOi_v_cerca_c_oi : data.oicc_oicc,
       },
       visionLejos: {
         sinCorregirOD: data.visionLejosSinCorregirOd_v_lejos_s_od ?? "",
         sinCorregirOI: data.visionLejosSinCorregirOi_v_lejos_s_oi ?? "",
-        corregidaOD: data.odlc_odlc ?? "",
-        corregidaOI: data.oilc_oilc ?? "",
+        corregidaOD: data.visionLejosCorregidaOd_v_lejos_c_od ? data.visionLejosCorregidaOd_v_lejos_c_od : data.odlc_odlc,
+        corregidaOI: data.visionLejosCorregidaOi_v_lejos_c_oi ? data.visionLejosCorregidaOi_v_lejos_c_oi : data.oilc_oilc,
       },
       enfermedadesOculares: data.enfermedadesOcularesAnexo7c_txtenfermedadesoculares ?? "",
       enfermedadesOcularesOtros: data.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "",
@@ -233,7 +238,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
           frecuencia2000: data.oidoDerecho2000Audiometria_o_d_2000 ?? "",
           frecuencia3000: data.oidoDerecho3000Audiometria_o_d_3000 ?? "",
           frecuencia4000: data.oidoDerecho4000Audiometria_o_d_4000 ?? "",
-          frecuencia5000: data.oidoDerecho6000Audiometria_o_d_6000 ?? "",
+          frecuencia6000: data.oidoDerecho6000Audiometria_o_d_6000 ?? "",
           frecuencia8000: data.oidoDerecho8000Audiometria_o_d_8000 ?? ""
         },
         oidoIzquierdo: {
@@ -242,7 +247,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
           frecuencia2000: data.oidoIzquierdo2000Audiometria_o_i_2000 ?? "",
           frecuencia3000: data.oidoIzquierdo3000Audiometria_o_i_3000 ?? "",
           frecuencia4000: data.oidoIzquierdo4000Audiometria_o_i_4000 ?? "",
-          frecuencia5000: data.oidoIzquierdo6000Audiometria_o_i_6000 ?? "",
+          frecuencia6000: data.oidoIzquierdo6000Audiometria_o_i_6000 ?? "",
           frecuencia8000: data.oidoIzquierdo8000Audiometria_o_i_8000 ?? ""
         }
       },
@@ -414,11 +419,12 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     // Recomendaciones / Restricciones
     recomendacionesRestricciones: data.conclusionMedicoAnexo7c_txtconclusionmed ?? "",
   };
-
+  console.log('data anexo16', data)
+  console.log(datosFinales.examenOjos)
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
     // Título principal (solo en página 1)
     // Título en todas las páginas
@@ -452,7 +458,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === FUNCIONES AUXILIARES ===
   // Función para texto con salto de línea
@@ -1083,10 +1089,10 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
   const pageHeight = doc.internal.pageSize.getHeight();
   const espacioNecesario = 20; // Espacio aproximado necesario
   if (yPos + espacioNecesario > pageHeight - 20) {
-    footerTR(doc, { footerOffsetY: 8 });
+    footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -1183,10 +1189,10 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
 
   // Verificar si necesitamos nueva página
   if (yPos + alturaFilaSeccion > pageHeight - 20) {
-    footerTR(doc, { footerOffsetY: 8 });
+    footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -1314,10 +1320,10 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
   // Verificar si necesitamos nueva página
   const espacioNecesarioHabitos = 30;
   if (yPos + espacioNecesarioHabitos > pageHeight - 20) {
-    footerTR(doc, { footerOffsetY: 8 });
+    footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -1581,10 +1587,10 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
   // Verificar si necesitamos nueva página
   const espacioNecesarioExamen = 25;
   if (yPos + espacioNecesarioExamen > pageHeight - 20) {
-    footerTR(doc, { footerOffsetY: 8 });
+    footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -1705,10 +1711,10 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
   // Verificar si necesitamos nueva página
   const espacioNecesarioOjos = 35;
   if (yPos + espacioNecesarioOjos > pageHeight - 20) {
-    footerTR(doc, { footerOffsetY: 8 });
+    footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -1867,10 +1873,10 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
 
   // Verificar si necesitamos nueva página
   if (yPos + alturaSeccionColores > pageHeight - 20) {
-    footerTR(doc, { footerOffsetY: 8 });
+    footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -1919,17 +1925,17 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
   // === SECCIÓN: OÍDOS ===
 
   // Definir frecuencias
-  const frecuencias = [500, 1000, 2000, 3000, 4000, 5000, 8000];
+  const frecuencias = [500, 1000, 2000, 3000, 4000, 6000, 8000];
 
   // Verificar si necesitamos nueva página
   const alturaFilaOidos = 5;
   const alturaTotalOidos = alturaFilaOidos * 3; // 1 fila header + 2 filas (Hz y dB(A))
   const espacioNecesarioOidos = alturaTotalOidos;
   if (yPos + espacioNecesarioOidos > pageHeight - 20) {
-    footerTR(doc, { footerOffsetY: 8 });
+    footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -1959,7 +1965,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
 
   let currentY = yPos + alturaFilaOidos;
 
-  // FILA 2: Hz | 500 | 1000 | 2000 | 3000 | 4000 | 5000 | 8000
+  // FILA 2: Hz | 500 | 1000 | 2000 | 3000 | 4000 | 6000 | 8000
   // Dibujar líneas verticales para subdividir cada columna
   // Línea vertical para separar label de frecuencias (columna izquierda)
   doc.line(tablaInicioX + anchoLabelCol, currentY, tablaInicioX + anchoLabelCol, currentY + alturaFilaOidos);
@@ -2025,7 +2031,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     datosFinales.evaluacionOidos?.audiometria?.oidoDerecho?.frecuencia2000 || "",
     datosFinales.evaluacionOidos?.audiometria?.oidoDerecho?.frecuencia3000 || "",
     datosFinales.evaluacionOidos?.audiometria?.oidoDerecho?.frecuencia4000 || "",
-    datosFinales.evaluacionOidos?.audiometria?.oidoDerecho?.frecuencia5000 || "",
+    datosFinales.evaluacionOidos?.audiometria?.oidoDerecho?.frecuencia6000 || "",
     datosFinales.evaluacionOidos?.audiometria?.oidoDerecho?.frecuencia8000 || ""
   ];
 
@@ -2045,7 +2051,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     datosFinales.evaluacionOidos?.audiometria?.oidoIzquierdo?.frecuencia2000 || "",
     datosFinales.evaluacionOidos?.audiometria?.oidoIzquierdo?.frecuencia3000 || "",
     datosFinales.evaluacionOidos?.audiometria?.oidoIzquierdo?.frecuencia4000 || "",
-    datosFinales.evaluacionOidos?.audiometria?.oidoIzquierdo?.frecuencia5000 || "",
+    datosFinales.evaluacionOidos?.audiometria?.oidoIzquierdo?.frecuencia6000 || "",
     datosFinales.evaluacionOidos?.audiometria?.oidoIzquierdo?.frecuencia8000 || ""
   ];
 
@@ -2064,10 +2070,10 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
   // Verificar si necesitamos nueva página
   const alturaSeccionVitales = 18; // Altura reducida para toda la sección
   if (yPos + alturaSeccionVitales > pageHeight - 20) {
-    footerTR(doc, { footerOffsetY: 8 });
+    footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -2084,22 +2090,40 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
   // Las líneas verticales y horizontales se dibujarán después de calcular la altura ajustada
 
   // === COLUMNA 1: OTOSCOPÍA y CARDIOVASCULAR ===
-  // La altura de OTOSCOPÍA será fija, y CARDIOVASCULAR será creciente
-  const alturaOtoscopia = 8; // Altura fija para OTOSCOPÍA
+  // La altura de OTOSCOPÍA será dinámica, y CARDIOVASCULAR será creciente
 
-  // Línea horizontal divisoria entre OTOSCOPÍA y CARDIOVASCULAR (se redibujará después)
-
-  // OTOSCOPÍA - Formato horizontal: "O.D.: NORMAL | O.I.: NORMAL"
+  // OTOSCOPÍA - Header
+  const alturaFilaHeaderOtoscopia = 5;
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("OTOSCOPÍA", tablaInicioX + 2, yPos + 3.5);
 
-  // Separar data del label
-  const yOtoscopiaData = yPos + 7; // Separación del label (de 6 a 7)
+  // OTOSCOPÍA - Data con altura dinámica
+  const yOtoscopiaData = yPos + alturaFilaHeaderOtoscopia;
   doc.setFont("helvetica", "normal").setFontSize(7);
   const odValue = (datosFinales.evaluacionOidos?.otoscopia?.oidoDerecho || "").toUpperCase();
   const oiValue = (datosFinales.evaluacionOidos?.otoscopia?.oidoIzquierdo || "").toUpperCase();
   const textoOtoscopia = `O.D.: ${odValue}  |  O.I.: ${oiValue}`;
-  doc.text(textoOtoscopia, tablaInicioX + 2, yOtoscopiaData);
+
+  // Calcular altura dinámica para otoscopía
+  const alturaFilaCrecienteOtoscopia = 8; // Altura mínima
+  const anchoDisponibleOtoscopia = anchoColVitales1 - 4;
+  const lineasOtoscopia = doc.splitTextToSize(textoOtoscopia, anchoDisponibleOtoscopia);
+  const interlineadoOtoscopia = 2.5;
+  const alturaDinamicaOtoscopia = Math.max(alturaFilaCrecienteOtoscopia, lineasOtoscopia.length * interlineadoOtoscopia + 4);
+
+  // Dibujar líneas de la fila de otoscopía (solo columna izquierda)
+  doc.line(tablaInicioX, yOtoscopiaData, tablaInicioX, yOtoscopiaData + alturaDinamicaOtoscopia);
+  doc.line(divColVitales1, yOtoscopiaData, divColVitales1, yOtoscopiaData + alturaDinamicaOtoscopia);
+  doc.line(tablaInicioX, yOtoscopiaData, divColVitales1, yOtoscopiaData);
+  doc.line(tablaInicioX, yOtoscopiaData + alturaDinamicaOtoscopia, divColVitales1, yOtoscopiaData + alturaDinamicaOtoscopia);
+
+  // Contenido de la fila de otoscopía con saltos de línea
+  lineasOtoscopia.forEach((linea, index) => {
+    doc.text(linea, tablaInicioX + 2, yOtoscopiaData + 3.5 + (index * interlineadoOtoscopia));
+  });
+
+  // Calcular altura total de otoscopía
+  const alturaOtoscopia = alturaFilaHeaderOtoscopia + alturaDinamicaOtoscopia;
 
   // CARDIOVASCULAR - Fila creciente separada
   const yCardioHeader = yPos + alturaOtoscopia;
@@ -2231,10 +2255,10 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
   // Verificar si necesitamos nueva página
   const alturaSeccionPulmonesPiel = 12; // Altura para la sección
   if (yPos + alturaSeccionPulmonesPiel > pageHeight - 20) {
-    footerTR(doc, { footerOffsetY: 8 });
+    footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -2433,10 +2457,10 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
   // Verificar si necesitamos nueva página (usando alturas dinámicas)
   const alturaTotalMiembros = alturaDinamicaMiembrosSuperiores + alturaDinamicaMiembrosInferiores;
   if (yPos + alturaTotalMiembros > pageHeight - 20) {
-    footerTR(doc, { footerOffsetY: 8 });
+    footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -2476,10 +2500,10 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
   const alturaFilaEvaluacion = 5;
   const alturaTotalEvaluacion = alturaFilaEvaluacion * 4; // 4 filas (ABDOMEN y TACTO RECTAL separados)
   if (yPos + alturaTotalEvaluacion > pageHeight - 20) {
-    footerTR(doc, { footerOffsetY: 8 });
+    footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -2587,10 +2611,10 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
   const alturaFilaInguinales = 5;
   const alturaTotalInguinales = alturaFilaInguinales * 2; // 2 filas
   if (yPos + alturaTotalInguinales > pageHeight - 20) {
-    footerTR(doc, { footerOffsetY: 8 });
+    footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -2635,10 +2659,10 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
   const alturaFilaOrganos = 5;
   const alturaTotalOrganos = alturaFilaOrganos * 2; // 2 filas
   if (yPos + alturaTotalOrganos > pageHeight - 20) {
-    footerTR(doc, { footerOffsetY: 8 });
+    footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -2679,10 +2703,10 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
   const alturaFilaMental = 5;
   const alturaTotalMental = alturaFilaMental * 3; // 3 filas (agregada fila de data de lenguaje)
   if (yPos + alturaTotalMental > pageHeight - 20) {
-    footerTR(doc, { footerOffsetY: 8 });
+    footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -2727,10 +2751,10 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
   const alturaFilaRX = 5;
   const alturaTotalRX = alturaFilaRX * 5; // 5 filas (agregamos una fila más para Silueta cardiovascular)
   if (yPos + alturaTotalRX > pageHeight - 20) {
-    footerTR(doc, { footerOffsetY: 8 });
+    footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
     numeroPagina++;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     yPos = 35.5;
   }
 
@@ -2774,9 +2798,12 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
   // Ruta de la imagen
   const imgPath = "/img/Anexo16/pulmonesFrame.png";
 
+  // Comprimir la imagen para reducir el tamaño del PDF
+  const imgPathCompressed = await compressImage(imgPath);
+
   // Cargar imagen de forma asíncrona pero asegurarse de que se añada
-  loadImg(imgPath)
-    .then((img) => {
+  await loadImg(imgPathCompressed)
+    .then(async (img) => {
       try {
         // Calcular altura manteniendo el aspect ratio original de la imagen
         const aspectRatio = img.height / img.width;
@@ -2789,11 +2816,11 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
           // Ajustar ancho proporcionalmente si la altura se limita
           const anchoFinal = alturaFinal / aspectRatio;
           const xImagenCentrada = divColRX1 + (anchoColRX2 - anchoFinal) / 2;
-          doc.addImage(img, "PNG", xImagenCentrada, yImagen, anchoFinal, alturaFinal);
+          doc.addImage(img, "JPEG", xImagenCentrada, yImagen, anchoFinal, alturaFinal);
         } else {
           // Centrar verticalmente si la imagen es más pequeña que la altura disponible
           const yImagenCentrada = yPos + (alturaTotalRX - alturaFinal) / 2;
-          doc.addImage(img, "PNG", xImagen, yImagenCentrada, anchoImagen, alturaFinal);
+          doc.addImage(img, "JPEG", xImagen, yImagenCentrada, anchoImagen, alturaFinal);
         }
       } catch (imgError) {
         console.warn("Error al añadir imagen al PDF:", imgError);
@@ -2803,14 +2830,14 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
           const alturaMaxima = alturaTotalRX - 1;
           const alturaFinal = alturaImagenEstimada > alturaMaxima ? alturaMaxima : alturaImagenEstimada;
           const yImagenCentrada = yPos + (alturaTotalRX - alturaFinal) / 2;
-          doc.addImage(imgPath, "PNG", xImagen, yImagenCentrada, anchoImagen, alturaFinal);
+          doc.addImage(imgPath, "JPEG", xImagen, yImagenCentrada, anchoImagen, alturaFinal);
         } catch (directError) {
           console.warn("No se pudo añadir imagen directamente:", directError);
         }
       }
 
       // Continuar con el resto del código después de añadir la imagen
-      continuarConRadiografia();
+      await continuarConRadiografia();
     })
     .catch((error) => {
       // Si la imagen no se puede cargar, intentar añadirla directamente con la ruta
@@ -2828,7 +2855,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     });
 
   // Función para continuar con el código después de cargar la imagen
-  function continuarConRadiografia() {
+  async function continuarConRadiografia() {
 
     // Línea horizontal superior (completa)
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
@@ -2945,10 +2972,10 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     const alturaFilaVacia = 8;
     const alturaTotalNeumo = alturaFilaNeumo * 2 + alturaFilaCategoria + alturaFilaDescripcion + alturaFilaVacia; // Checkboxes + Códigos + Categorías + Descripciones + Vacía
     if (yPos + alturaTotalNeumo > pageHeight - 20) {
-      footerTR(doc, { footerOffsetY: 8 });
+      footerTR(doc, { footerOffsetY: getFooterOffset() });
       doc.addPage();
       numeroPagina++;
-      drawHeader(numeroPagina);
+      await drawHeader(numeroPagina);
       yPos = 35.5;
     }
 
@@ -3244,10 +3271,10 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     // Verificar si necesitamos nueva página
     const alturaFilaLues = 6;
     if (yPos + alturaFilaLues > pageHeight - 20) {
-      footerTR(doc, { footerOffsetY: 8 });
+      footerTR(doc, { footerOffsetY: getFooterOffset() });
       doc.addPage();
       numeroPagina++;
-      drawHeader(numeroPagina);
+      await drawHeader(numeroPagina);
       yPos = 35.5;
     }
 
@@ -3307,10 +3334,10 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     const alturaFilaLab = 5;
     const alturaTotalLab = alturaFilaLabHeader + (alturaFilaLab * 9); // Header + 9 filas (3 títulos celestes + 6 filas de datos: 4 hemograma + 1 lipidico + 1 orina)
     if (yPos + alturaTotalLab > pageHeight - 20) {
-      footerTR(doc, { footerOffsetY: 8 });
+      footerTR(doc, { footerOffsetY: getFooterOffset() });
       doc.addPage();
       numeroPagina++;
-      drawHeader(numeroPagina);
+      await drawHeader(numeroPagina);
       yPos = 35.5;
     }
 
@@ -3658,10 +3685,10 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     // Verificar si necesitamos nueva página
     const alturaFilaGrupoSang = 6;
     if (yPos + alturaFilaGrupoSang > pageHeight - 20) {
-      footerTR(doc, { footerOffsetY: 8 });
+      footerTR(doc, { footerOffsetY: getFooterOffset() });
       doc.addPage();
       numeroPagina++;
-      drawHeader(numeroPagina);
+      await drawHeader(numeroPagina);
       yPos = 35.5;
     }
 
@@ -3812,10 +3839,10 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     // Verificar si necesitamos nueva página
     const alturaFilaApto = 6;
     if (yPos + alturaFilaApto > pageHeight - 20) {
-      footerTR(doc, { footerOffsetY: 8 });
+      footerTR(doc, { footerOffsetY: getFooterOffset() });
       doc.addPage();
       numeroPagina++;
-      drawHeader(numeroPagina);
+      await drawHeader(numeroPagina);
       yPos = 35.5;
     }
 
@@ -3879,7 +3906,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     yPos += alturaFilaApto;
 
     // === FOOTER PÁGINA 2 ===
-    footerTR(doc, { footerOffsetY: 8 });
+    footerTR(doc, { footerOffsetY: getFooterOffset() });
 
     // === CREAR PÁGINA 3 ===
     doc.addPage();
@@ -3887,7 +3914,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     yPos = 35.5; // Posición inicial de la nueva página
 
     // Dibujar header en la nueva página
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
 
     // === SECCIÓN: OTROS EXAMENES (PÁGINA 3) ===
 
@@ -4092,10 +4119,10 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
 
     // Verificar si necesitamos nueva página
     if (yPos + alturaSeccionDeclaracion > pageHeight - 20) {
-      footerTR(doc, { footerOffsetY: 8 });
+      footerTR(doc, { footerOffsetY: getFooterOffset() });
       doc.addPage();
       numeroPagina++;
-      drawHeader(numeroPagina);
+      await drawHeader(numeroPagina);
       yPos = 35.5;
     }
 
@@ -4186,7 +4213,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     const firmaMedicoY = yPos + 3;
 
     // Agregar firma y sello médico
-    let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
+    let firmaMedicoUrl = await getSignCompressed(data, "SELLOFIRMA");
     if (firmaMedicoUrl) {
       try {
         const imgWidth = 45;
@@ -4205,7 +4232,7 @@ export default function Anexo7C_Antiguo(data = {}, docExistente = null) {
     doc.text("Responsable de la Evaluación", centroColumna3, yPos + 28.5, { align: "center" });
 
     // === FOOTER ===
-    footerTR(doc, { footerOffsetY: 8 });
+    footerTR(doc, { footerOffsetY: getFooterOffset() });
 
     // === Imprimir ===
     // === Imprimir ===

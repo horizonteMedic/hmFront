@@ -45,7 +45,7 @@ import Anexo16A from "./views/admin/panel-de-control/SistemaOcupacional/Anexo16A
 
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/ModuloPsicologia/InformeDeTestPersonalidad/InformeDeTestPersonalidad.jsx";
+import Ficha from "./views/jaspers/AnalisisBioquimicos/LaboratorioClinico_Digitalizado.jsx";
 
 
 

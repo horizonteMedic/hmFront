@@ -44,10 +44,14 @@ const formatDateToLong = (dateString) => {
 };
 
 // Header con datos de ficha, sede y fecha
-const drawHeader = (doc, datos = {}) => {
+const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
 
+<<<<<<< HEAD
   CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+=======
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -198,12 +202,20 @@ const drawRow = (doc, y, test, datos) => {
   return y + config.lineHeight;
 };
 
-export default function PerfilHepatico_Digitalizado(datos = {}) {
+export default async function PerfilHepatico_Digitalizado(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
+<<<<<<< HEAD
   drawHeader(doc, datos);
+=======
+  await drawHeader(doc, datos);
+
+  // === TÍTULO ===
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
+  doc.text("BIOQUÍMICA", pageW / 2, 38, { align: "center" });
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   // === DATOS DEL PACIENTE ===
   drawPatientData(doc, datos);

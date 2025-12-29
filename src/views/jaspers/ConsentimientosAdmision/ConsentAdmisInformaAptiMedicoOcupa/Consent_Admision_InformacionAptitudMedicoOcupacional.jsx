@@ -1,0 +1,334 @@
+import jsPDF from "jspdf";
+import drawColorBox from '../../components/ColorBox.jsx';
+import { formatearFechaCorta, formatearFechaLarga } from "../../../utils/formatDateUtils.js";
+import CabeceraLogo from '../../components/CabeceraLogo.jsx';
+import footerTR from '../../components/footerTR.jsx';
+import { dibujarFirmas } from "../../../utils/dibujarFirmas.js";
+
+export default async function ConsentAdmisionInformacionAptitudMedicoOcupacional(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+  const pageW = doc.internal.pageSize.getWidth();
+
+  // Datos de prueba por defecto
+  const datosPrueba = {
+    apellidosPaciente: "CASTILLO PLASENCIA",
+    nombresPaciente: "HADY KATHERINE",
+    dniPaciente: "72384273",
+    edadPaciente: "31",
+    cargoPaciente: "OPERADOR DE MAQUINARIA",
+    empresa: "MINERA PODEROSA S.A.",
+    sede: "TRUJILLO",
+    norden: "96639",
+    fechaRegistro: "2025-01-28",
+    codigoColor: "#00FF00",
+    textoColor: "AB",
+    nombreExamen: "PRE-OCUPACIONAL",
+  };
+
+  // Normalizador de datos de entrada
+  function buildDatosFinales(raw) {
+    const datosFinales = {
+      apellidosNombres: String(((raw?.apellidosPaciente ?? datosPrueba.apellidosPaciente) + ' ' + (raw?.nombresPaciente ?? datosPrueba.nombresPaciente)).trim()),
+      fechaExamen: formatearFechaCorta(raw?.fechaRegistro ?? raw?.fecha ?? datosPrueba.fechaRegistro),
+      documentoIdentidad: String(raw?.dniPaciente ?? raw?.dni ?? datosPrueba.dniPaciente),
+      edad: String(raw?.edadPaciente ?? raw?.edad ?? datosPrueba.edadPaciente),
+      puestoTrabajo: String(raw?.cargoPaciente ?? raw?.ocupacion ?? datosPrueba.cargoPaciente),
+      empresa: String(raw?.empresa ?? datosPrueba.empresa),
+      sede: String(raw?.sede ?? raw?.nombreSede ?? datosPrueba.sede),
+      numeroFicha: String(raw?.norden ?? datosPrueba.norden),
+      codigoColor: String(raw?.codigoColor ?? datosPrueba.codigoColor),
+      textoColor: String(raw?.textoColor ?? datosPrueba.textoColor),
+      tipoExamen: String(raw?.nombreExamen ?? raw?.tipoExamen ?? datosPrueba.nombreExamen),
+    };
+    return datosFinales;
+  }
+
+  const datosFinales = buildDatosFinales(data);
+
+  // Función para obtener día y mes de la fecha
+  const obtenerDiaYMes = (fechaStr) => {
+    if (!fechaStr) return { dia: '', mes: '' };
+    try {
+      const fechaLarga = formatearFechaLarga(fechaStr);
+      // formatearFechaLarga devuelve: "28 de enero de 2025"
+      const partes = fechaLarga.split(' de ');
+      if (partes.length >= 2) {
+        return { dia: partes[0], mes: partes[1] };
+      }
+      return { dia: '', mes: '' };
+    } catch (error) {
+      return { dia: '', mes: '' };
+    }
+  };
+
+  const fechaPrueba = datosPrueba.fechaRegistro;
+  const { dia, mes } = obtenerDiaYMes(data?.fechaRegistro ?? data?.fecha ?? fechaPrueba);
+  const anio = new Date(data?.fechaRegistro ?? data?.fecha ?? fechaPrueba).getFullYear() || '2025';
+
+  // Header
+  const drawHeader = () => {
+    // Logo y membrete
+    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
+
+    // Título
+    doc.setFont("helvetica", "bold").setFontSize(14);
+    doc.setTextColor(0, 0, 0);
+    doc.text("DECLARACIÓN JURADA DE INFORMACIÓN DE APTITUD MÉDICO OCUPACIONAL", pageW / 2, 35, { align: "center" });
+
+    // Número de Ficha, Sede, Fecha y Página
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Nro de ficha: ", pageW - 70, 15);
+    doc.setFont("helvetica", "normal").setFontSize(18);
+    doc.text(datosFinales.numeroFicha, pageW - 50, 16);
+
+    // Calcular ancho disponible para la sede (evitar que se pise con el ColorBox)
+    const xInicioSede = pageW - 70;
+    const xFinColorBox = pageW - 5;
+    const anchoDisponibleSede = xFinColorBox - xInicioSede - 5;
+
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const textoSede = "Sede: " + datosFinales.sede;
+    const lineasSede = doc.splitTextToSize(textoSede, anchoDisponibleSede);
+    lineasSede.forEach((linea, idx) => {
+      doc.text(linea, xInicioSede, 20 + (idx * 3.5));
+    });
+    
+    const yFechaExamen = lineasSede.length === 1 ? 25 : 20 + (lineasSede.length * 3.5) + 2;
+    doc.text("Fecha de examen: " + (datosFinales.fechaExamen || ""), pageW - 70, yFechaExamen);
+    doc.text("Pag. 01", pageW - 25, 8);
+
+    // Bloque de color
+    drawColorBox(doc, {
+      color: datosFinales.codigoColor,
+      text: datosFinales.textoColor,
+      x: pageW - 30,
+      y: 10,
+      size: 22,
+      showLine: true,
+      fontSize: 30,
+      textPosition: 0.9
+    });
+  };
+
+  drawHeader();
+
+  // === CONTENIDO DEL DOCUMENTO ===
+  let yPos = 50;
+  const margin = 15;
+  const anchoTexto = pageW - (2 * margin);
+  const lineHeight = 5;
+
+  // Texto de la declaración
+  doc.setFontSize(11);
+  doc.setTextColor(0, 0, 0);
+
+  // Primera línea: "Yo, [nombre], de [edad] años de edad..."
+  let xActual = margin;
+  let yActual = yPos;
+
+  // "Yo, "
+  doc.setFont("helvetica", "normal");
+  doc.text("Yo, ", xActual, yActual);
+  xActual += doc.getTextWidth("Yo, ");
+
+  // Nombre en negrita
+  doc.setFont("helvetica", "bold");
+  const nombreWidth = doc.getTextWidth(datosFinales.apellidosNombres);
+  if (xActual + nombreWidth > pageW - margin) {
+    yActual += lineHeight;
+    xActual = margin;
+  }
+  doc.text(datosFinales.apellidosNombres, xActual, yActual);
+  xActual += nombreWidth;
+
+  // ", de "
+  doc.setFont("helvetica", "normal");
+  const textoDe = ", de ";
+  const textoDeWidth = doc.getTextWidth(textoDe);
+  if (xActual + textoDeWidth > pageW - margin) {
+    yActual += lineHeight;
+    xActual = margin;
+  }
+  doc.text(textoDe, xActual, yActual);
+  xActual += textoDeWidth;
+
+  // Edad en negrita
+  doc.setFont("helvetica", "bold");
+  const edadWidth = doc.getTextWidth(datosFinales.edad);
+  if (xActual + edadWidth > pageW - margin) {
+    yActual += lineHeight;
+    xActual = margin;
+  }
+  doc.text(datosFinales.edad, xActual, yActual);
+  xActual += edadWidth;
+
+  // " años de edad, identificado(a) con DNI N°: "
+  doc.setFont("helvetica", "normal");
+  const textoDni = " años de edad, identificado(a) con DNI N°: ";
+  const textoDniWidth = doc.getTextWidth(textoDni);
+  if (xActual + textoDniWidth > pageW - margin) {
+    yActual += lineHeight;
+    xActual = margin;
+  }
+  doc.text(textoDni, xActual, yActual);
+  xActual += textoDniWidth;
+
+  // DNI en negrita
+  doc.setFont("helvetica", "bold");
+  const dniWidth = doc.getTextWidth(datosFinales.documentoIdentidad);
+  if (xActual + dniWidth > pageW - margin) {
+    yActual += lineHeight;
+    xActual = margin;
+  }
+  doc.text(datosFinales.documentoIdentidad, xActual, yActual);
+  xActual += dniWidth;
+
+  // ", postulante al cargo de "
+  doc.setFont("helvetica", "normal");
+  const textoCargo = ", postulante al cargo de ";
+  const textoCargoWidth = doc.getTextWidth(textoCargo);
+  if (xActual + textoCargoWidth > pageW - margin) {
+    yActual += lineHeight;
+    xActual = margin;
+  }
+  doc.text(textoCargo, xActual, yActual);
+  xActual += textoCargoWidth;
+
+  // Cargo en negrita
+  doc.setFont("helvetica", "bold");
+  const cargoWidth = doc.getTextWidth(datosFinales.puestoTrabajo);
+  if (xActual + cargoWidth > pageW - margin) {
+    yActual += lineHeight;
+    xActual = margin;
+  }
+  doc.text(datosFinales.puestoTrabajo, xActual, yActual);
+  xActual += cargoWidth;
+
+  // ", para la empresa "
+  doc.setFont("helvetica", "normal");
+  const textoEmpresa = ", para la empresa ";
+  const textoEmpresaWidth = doc.getTextWidth(textoEmpresa);
+  if (xActual + textoEmpresaWidth > pageW - margin) {
+    yActual += lineHeight;
+    xActual = margin;
+  }
+  doc.text(textoEmpresa, xActual, yActual);
+  xActual += textoEmpresaWidth;
+
+  // Empresa en negrita
+  doc.setFont("helvetica", "bold");
+  const empresaWidth = doc.getTextWidth(datosFinales.empresa);
+  if (xActual + empresaWidth > pageW - margin) {
+    yActual += lineHeight;
+    xActual = margin;
+  }
+  doc.text(datosFinales.empresa, xActual, yActual);
+  
+  yPos = yActual + lineHeight + 8;
+
+  // Segunda línea: "declaro haber sido informado sobre la APTITUD y RECOMENDACIONES..."
+  doc.setFont("helvetica", "normal");
+  let xActual2 = margin;
+  let yActual2 = yPos;
+
+  // "declaro haber sido informado sobre la "
+  doc.setFont("helvetica", "normal");
+  const textoDeclaro = "declaro haber sido informado sobre la ";
+  const textoDeclaroWidth = doc.getTextWidth(textoDeclaro);
+  if (xActual2 + textoDeclaroWidth > pageW - margin) {
+    yActual2 += lineHeight;
+    xActual2 = margin;
+  }
+  doc.text(textoDeclaro, xActual2, yActual2);
+  xActual2 += textoDeclaroWidth;
+
+  // "APTITUD y RECOMENDACIONES" en negrita
+  doc.setFont("helvetica", "bold");
+  const textoAptitud = "APTITUD y RECOMENDACIONES";
+  const textoAptitudWidth = doc.getTextWidth(textoAptitud);
+  if (xActual2 + textoAptitudWidth > pageW - margin) {
+    yActual2 += lineHeight;
+    xActual2 = margin;
+  }
+  doc.text(textoAptitud, xActual2, yActual2);
+  xActual2 += textoAptitudWidth;
+
+  // " de mi examen médico "
+  doc.setFont("helvetica", "normal");
+  const textoExamen = " de mi examen médico ";
+  const textoExamenWidth = doc.getTextWidth(textoExamen);
+  if (xActual2 + textoExamenWidth > pageW - margin) {
+    yActual2 += lineHeight;
+    xActual2 = margin;
+  }
+  doc.text(textoExamen, xActual2, yActual2);
+  xActual2 += textoExamenWidth;
+
+  // Tipo de examen en negrita
+  doc.setFont("helvetica", "bold");
+  const tipoExamenWidth = doc.getTextWidth(datosFinales.tipoExamen);
+  if (xActual2 + tipoExamenWidth > pageW - margin) {
+    yActual2 += lineHeight;
+    xActual2 = margin;
+  }
+  doc.text(datosFinales.tipoExamen, xActual2, yActual2);
+  xActual2 += tipoExamenWidth;
+
+  // " Realizado en el Policlínico Horizonte Medic de la ciudad de Trujillo."
+  doc.setFont("helvetica", "normal");
+  const textoRealizado = " Realizado en el Policlínico Horizonte Medic de la ciudad de Trujillo.";
+  const textoRealizadoWidth = doc.getTextWidth(textoRealizado);
+  if (xActual2 + textoRealizadoWidth > pageW - margin) {
+    yActual2 += lineHeight;
+    xActual2 = margin;
+  }
+  doc.text(textoRealizado, xActual2, yActual2);
+  
+  yPos = yActual2 + lineHeight + 10;
+
+  // Tercera línea: "Firmo la presente declaración en conformidad a lo expuesto líneas arriba."
+  doc.setFont("helvetica", "normal");
+  const textoFirmo = "Firmo la presente declaración en conformidad a lo expuesto líneas arriba.";
+  const lineasFirmo = doc.splitTextToSize(textoFirmo, anchoTexto);
+  lineasFirmo.forEach((linea, idx) => {
+    doc.text(linea, margin, yPos + (idx * lineHeight));
+  });
+  yPos += lineasFirmo.length * lineHeight + 10;
+
+  // Cuarta línea: "Trujillo, [día] de [mes] 2025."
+  doc.setFont("helvetica", "normal");
+  const textoFecha = `Trujillo, ${dia} de ${mes} ${anio}.`;
+  doc.text(textoFecha, margin, yPos);
+  yPos += 20;
+
+  // === FIRMA Y HUELLA DEL PACIENTE (usando dibujarFirmas, bajada 15mm) ===
+  yPos += 15;
+  
+  // Usar la función dibujarFirmas del utils
+  await dibujarFirmas({
+    doc,
+    datos: data,
+    y: yPos,
+    pageW: pageW
+  });
+
+  // === FOOTER ===
+  footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
+
+  // === Imprimir ===
+  if (!docExistente) {
+    imprimir(doc);
+  }
+
+  return doc;
+}
+
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
+}

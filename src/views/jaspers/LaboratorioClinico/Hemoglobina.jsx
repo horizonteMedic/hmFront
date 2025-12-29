@@ -32,10 +32,14 @@ const toDDMMYYYY = (fecha) => {
   return `${dia}/${mes}/${anio}`;
 };
 
-const drawHeader = (doc, datos = {}) => {
+const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
 
+<<<<<<< HEAD
   CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+=======
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Nro de ficha: ", pageW - 80, 15);
@@ -159,11 +163,11 @@ const drawPatientData = (doc, datos = {}) => {
 
 // --- Componente Principal ---
 
-export default function Hemoglobina(datos = {}) {
+export default async function Hemoglobina(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
-  drawHeader(doc, datos);
+  await drawHeader(doc, datos);
   drawUnderlinedTitle(doc, "LABORATORIO CLINICO", 35);
   doc.setFont(config.font, "bold").setFontSize(12);
   doc.text("HEMOGLOBINA", pageW / 2, 42, { align: "center" });

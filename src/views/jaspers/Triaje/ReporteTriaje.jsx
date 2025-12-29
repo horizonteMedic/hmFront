@@ -4,7 +4,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 import footerTR from "../components/footerTR.jsx";
 
-export default function ReporteTriaje(datos) {
+export default async function ReporteTriaje(datos) {
     const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
     const pageW = doc.internal.pageSize.getWidth();
 
@@ -13,8 +13,8 @@ export default function ReporteTriaje(datos) {
     const tablaAncho = 190;                // ← ¡AQUÍ EL NUEVO ANCHO!
 
     // === HEADER ===
-    const drawHeader = () => {
-        CabeceraLogo(doc, { tieneMembrete: false, yOffset: 12 });
+    const drawHeader = async () => {
+        await CabeceraLogo(doc, { tieneMembrete: false, yOffset: 12 });
 
         doc.setFont("helvetica", "normal").setFontSize(8);
         doc.text("Nro de ficha: ", pageW - 80, 15);
@@ -26,8 +26,8 @@ export default function ReporteTriaje(datos) {
         doc.text("Fecha de examen: " + formatearFechaCorta(datos.fecha_triaje || ""), pageW - 80, 25);
 
         drawColorBox(doc, {
-            color: datos.codigoColor || "#008f39",
-            text: datos.textoColor || "F",
+            color: datos.codigoColor,
+            text: datos.textoColor,
             x: pageW - 30,
             y: 10,
             size: 22,
@@ -41,7 +41,7 @@ export default function ReporteTriaje(datos) {
         doc.text("INFORME TRIAJE", pageW / 2, 45, { align: "center" });
     };
 
-    drawHeader();
+    await drawHeader();
 
     // === FUNCIONES AUXILIARES ===
     const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 5) => {

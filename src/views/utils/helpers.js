@@ -44,6 +44,11 @@ export async function compressImage(imageUrl, quality = 0.6, maxWidth = 800) {
             canvas.height = height;
 
             const ctx = canvas.getContext('2d');
+
+            // Rellenar fondo blanco (para evitar que transparencia se vuelva negra en JPEG)
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, width, height);
+
             ctx.drawImage(img, 0, 0, width, height);
 
             // Convertir a JPEG comprimido
@@ -58,6 +63,19 @@ export async function compressImage(imageUrl, quality = 0.6, maxWidth = 800) {
 
         img.src = imageUrl;
     });
+}
+
+/**
+ * Obtiene y comprime automáticamente una firma/sello
+ * @param {object} data - Objeto con datos de digitalización
+ * @param {string} name - Nombre de la digitalización (HUELLA, FIRMAP, SELLOFIRMA, etc)
+ * @param {boolean} compress - Si debe comprimir la imagen, default true
+ * @returns {Promise<string>|string} - URL o Data URL comprimida
+ */
+export async function getSignCompressed(data, name, compress = true) {
+    const url = getSign(data, name);
+    if (!url || !compress) return url;
+    return await compressImage(url);
 }
 
 export function getSign(data, name) { //HUELLA // FIRMAP // SELLOFIRMA

@@ -60,10 +60,14 @@ const formatDateToLong = (dateString) => {
 };
 
 // Header con datos de ficha, sede y fecha
-const drawHeader = (doc, datos = {}) => {
+const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
 
+<<<<<<< HEAD
   CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+=======
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -193,11 +197,12 @@ const drawPatientData = (doc, datos = {}) => {
 
 // --- Componente Principal ---
 
-export default function ResultadosPanel5d_Digitalizado(datos = {}) {
+export default async function ResultadosPanel5d_Digitalizado(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
+<<<<<<< HEAD
   drawHeader(doc, datos);
 
   // === TÍTULO ===
@@ -205,6 +210,16 @@ export default function ResultadosPanel5d_Digitalizado(datos = {}) {
 
   // === DATOS DEL PACIENTE ===
   drawPatientData(doc, datos);
+=======
+  await drawHeader(doc, datos);
+
+  // === TÍTULO ===
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
+  doc.text("TOXICOLÓGICO", pageW / 2, 38, { align: "center" });
+
+  // === DATOS DEL PACIENTE ===
+  const finalYPos = drawPatientData(doc, datos);
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
   const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");

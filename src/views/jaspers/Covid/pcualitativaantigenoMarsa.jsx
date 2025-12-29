@@ -28,13 +28,18 @@ const toDDMMYYYY = (fecha) => {
   return `${dia}/${mes}/${anio}`;
 };
 
-export default function pcualitativaantigenoMarsa(datos = {}) {
+export default async function pcualitativaantigenoMarsa(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
+<<<<<<< HEAD
   const drawHeader = () => {
     CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+=======
+  const drawHeader = async () => {
+    await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
     // Número de Ficha
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -90,7 +95,7 @@ export default function pcualitativaantigenoMarsa(datos = {}) {
     doc.text(fechaExamen, valueX, dataY);
   };
 
-  drawHeader();
+  await drawHeader();
 
   // === CUERPO ===
   let y = 75;

@@ -22,7 +22,7 @@ const ExamenesList = [
         nombre: "ANEXO 16 ",
         resultado: false,
         tabla: "anexo7c",
-        url: "/api/v01/ct/anexos/anexo16/obtenerReporte2Anexo16"
+        url: "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16"
     },
     {
         nombre: "ENFERMEDADES EN ALTURA ",

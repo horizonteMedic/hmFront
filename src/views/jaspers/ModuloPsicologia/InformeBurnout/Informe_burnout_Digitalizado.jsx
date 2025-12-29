@@ -1,78 +1,62 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../../utils/formatDateUtils.js";
-import { convertirGenero, getSign } from "../../../utils/helpers.js";
+import { convertirGenero } from "../../../utils/helpers.js";
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import footerTR from '../../components/footerTR.jsx';
 import drawColorBox from '../../components/ColorBox.jsx';
+import { dibujarFirmas } from '../../../utils/dibujarFirmas.js';
 
-export default function Informe_burnout_Digitalizado(data = {}) {
+export default async function Informe_burnout_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
-  // DATOS DE PRUEBA (remover en producción)
-  const datosPrueba = {
-    apellidosPaciente: "GARCÍA MENDOZA",
-    nombresPaciente: "JUAN CARLOS",
-    fechaFichaAnexo16_fecha: "2024-01-15",
-    sexoPaciente: "M",
-    dniPaciente: "12345678",
-    edadPaciente: "35",
-    areaPaciente: "OPERACIONES MINA",
-    cargoPaciente: "OPERADOR DE EQUIPO PESADO",
-    empresa: "COMPAÑÍA MINERA PODEROSA S.A.",
-    contrata: "CONTRATISTA EJEMPLO S.A.C.",
-    norden: "00123456",
-    sede: "TRUJILLO",
-    fechaNacimientoPaciente: "1989-05-20",
-    color: 1,
-    codigoColor: "#00FF00",
-    textoColor: "AT",
-    sindromeBurnout: "NO PRESENTA SÍNDROME DE BURNOUT. Evaluación mediante el Inventario de Burnout de Maslach (MBI) sin hallazgos significativos.",
-    agotamientoEmocional: "BAJO - Puntuación: 12/54. El evaluado no presenta signos de agotamiento emocional significativo.",
-    despersonalizacion: "BAJO - Puntuación: 5/30. No se evidencia despersonalización en el trato con compañeros o usuarios.",
-    realizacionPersonal: "ALTO - Puntuación: 42/48. El evaluado muestra alta satisfacción con sus logros profesionales.",
-    resultados: "El evaluado presenta un perfil psicológico estable sin indicadores de síndrome de burnout. Los resultados del MBI indican niveles bajos de agotamiento emocional y despersonalización, junto con una alta realización personal. Esto sugiere una adecuada adaptación al entorno laboral y recursos personales para el manejo del estrés.",
-    conclusiones: "El trabajador evaluado NO PRESENTA SÍNDROME DE BURNOUT. Se encuentra en condiciones psicológicas óptimas para continuar desempeñando sus funciones laborales. Se recomienda mantener el equilibrio actual entre vida laboral y personal.",
-    recomendaciones: "1. Continuar con evaluaciones periódicas cada 12 meses.\n2. Participar en programas de bienestar laboral.\n3. Mantener actividades recreativas para equilibrio emocional.\n4. Fortalecer redes de apoyo social en el trabajo.",
-  };
-
-  // Usar datos de prueba si no hay data real
-  const dataFinal = Object.keys(data).length > 0 ? data : datosPrueba;
-
-  const datosReales = {
-    apellidosNombres: String(`${dataFinal.apellidosPaciente ?? ""} ${dataFinal.nombresPaciente ?? ""}`).trim(),
-    fechaExamen: formatearFechaCorta(dataFinal.fechaFichaAnexo16_fecha ?? ""),
-    tipoExamen: String(dataFinal.nombreExamen ?? ""),
-    sexo: convertirGenero(dataFinal.sexoPaciente) || "",
-    documentoIdentidad: String(dataFinal.dniPaciente ?? ""),
-    edad: String(dataFinal.edadPaciente ?? ""),
-    areaTrabajo: String(dataFinal.areaPaciente ?? ""),
-    puestoTrabajo: String(dataFinal.cargoPaciente ?? ""),
-    empresa: String(dataFinal.empresa ?? ""),
-    contrata: String(dataFinal.contrata ?? ""),
-    numeroFicha: String(dataFinal.norden ?? ""),
-    sede: String(dataFinal.sede ?? dataFinal.nombreSede ?? ""),
-    fechaNacimiento: formatearFechaCorta(dataFinal.fechaNacimientoPaciente ?? ""),
-    codigoColor: String(dataFinal.codigoColor ?? ""),
-    textoColor: String(dataFinal.textoColor ?? ""),
+  // Mapear y transformar todos los datos del JSON en un solo objeto
+  const datos = {
+    // Datos personales
+    apellidosNombres: String(`${data.apellidosPaciente ?? ""} ${data.nombresPaciente ?? ""}`).trim(),
+    fechaExamen: formatearFechaCorta(data.fecha ?? ""),
+    tipoExamen: String(data.nombreExamen ?? ""),
+    sexo: convertirGenero(data.sexoPaciente) || "",
+    documentoIdentidad: String(data.dniPaciente ?? ""),
+    edad: String(data.edadPaciente ?? ""),
+    areaTrabajo: String(data.areaPaciente ?? ""),
+    puestoTrabajo: String(data.cargoPaciente ?? ""),
+    empresa: String(data.empresa ?? ""),
+    contrata: String(data.contrata ?? ""),
+    numeroFicha: String(data.norden ?? ""),
+    sede: String(data.sede ?? data.nombreSede ?? ""),
+    fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente ?? ""),
+    codigoColor: String(data.codigoColor ?? ""),
+    textoColor: String(data.textoColor ?? ""),
+    // Datos del informe
+    sindromeBurnout: String(data.sindromeBurnout ?? ""),
+    agotamientoEmocional: String(data.agotamientoEmocional ?? ""),
+    despersonalizacion: String(data.despersonalizacion ?? ""),
+    realizacionPersonal: String(data.realizacionPersonal ?? ""),
+    resultados: String(data.resultados ?? ""),
+    conclusiones: String(data.conclusiones ?? ""),
+    recomendaciones: String(data.recomendaciones ?? ""),
+    // Datos originales para firma
+    digitalizacion: data.digitalizacion ?? [],
+    usuarioFirma: data.usuarioFirma ?? "",
   };
 
   // === HEADER / CABECERA ===
-  CabeceraLogo(doc, { ...datosReales, tieneMembrete: false });
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
 
   // Número de Ficha y Página
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Nro de ficha: ", pageW - 80, 15);
   doc.setFont("helvetica", "normal").setFontSize(18);
-  doc.text(datosReales.numeroFicha, pageW - 60, 16);
+  doc.text(datos.numeroFicha, pageW - 60, 16);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Sede: " + datosReales.sede, pageW - 80, 20);
-  doc.text("Fecha de examen: " + datosReales.fechaExamen, pageW - 80, 25);
+  doc.text("Sede: " + datos.sede, pageW - 80, 20);
+  doc.text("Fecha de examen: " + datos.fechaExamen, pageW - 80, 25);
 
   // === COLOR BOX ===
   drawColorBox(doc, {
-    color: datosReales.codigoColor,
-    text: datosReales.textoColor,
+    color: datos.codigoColor,
+    text: datos.textoColor,
     x: pageW - 30,
     y: 10,
     size: 22,
@@ -107,7 +91,7 @@ export default function Informe_burnout_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Apellidos y Nombres:", tablaInicioX + 2, yPos + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosReales.apellidosNombres || "", tablaInicioX + 40, yPos + 4);
+  doc.text(datos.apellidosNombres || "", tablaInicioX + 40, yPos + 4);
   yPos += filaAltura;
 
   // Fila 2: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
@@ -124,22 +108,22 @@ export default function Informe_burnout_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("DNI:", tablaInicioX + 2, yPos + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosReales.documentoIdentidad || "", tablaInicioX + 12, yPos + 4);
+  doc.text(datos.documentoIdentidad || "", tablaInicioX + 12, yPos + 4);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Edad:", tablaInicioX + col1W + 2, yPos + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((datosReales.edad || "") + " años", tablaInicioX + col1W + 14, yPos + 4);
+  doc.text((datos.edad || "") + " años", tablaInicioX + col1W + 14, yPos + 4);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Sexo:", tablaInicioX + col1W + col2W + 2, yPos + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosReales.sexo || "", tablaInicioX + col1W + col2W + 14, yPos + 4);
+  doc.text(datos.sexo || "", tablaInicioX + col1W + col2W + 14, yPos + 4);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Fecha Nac.:", tablaInicioX + col1W + col2W + col3W + 2, yPos + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosReales.fechaNacimiento || "", tablaInicioX + col1W + col2W + col3W + 22, yPos + 4);
+  doc.text(datos.fechaNacimiento || "", tablaInicioX + col1W + col2W + col3W + 22, yPos + 4);
   yPos += filaAltura;
 
   // Fila 3: Puesto de Trabajo y Área de Trabajo (2 columnas)
@@ -150,12 +134,12 @@ export default function Informe_burnout_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Puesto de Trabajo:", tablaInicioX + 2, yPos + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosReales.puestoTrabajo || "", tablaInicioX + 32, yPos + 4);
+  doc.text(datos.puestoTrabajo || "", tablaInicioX + 32, yPos + 4);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Área de Trabajo:", tablaInicioX + col2MitadW + 2, yPos + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosReales.areaTrabajo || "", tablaInicioX + col2MitadW + 30, yPos + 4);
+  doc.text(datos.areaTrabajo || "", tablaInicioX + col2MitadW + 30, yPos + 4);
   yPos += filaAltura;
 
   // Fila 4: Empresa
@@ -163,7 +147,7 @@ export default function Informe_burnout_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Empresa:", tablaInicioX + 2, yPos + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosReales.empresa || "", tablaInicioX + 20, yPos + 4);
+  doc.text(datos.empresa || "", tablaInicioX + 20, yPos + 4);
   yPos += filaAltura;
 
   // Fila 5: Contrata
@@ -171,19 +155,8 @@ export default function Informe_burnout_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Contratista:", tablaInicioX + 2, yPos + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosReales.contrata || "", tablaInicioX + 22, yPos + 4);
+  doc.text(datos.contrata || "", tablaInicioX + 22, yPos + 4);
   yPos += filaAltura;
-
-  // Datos adicionales para las secciones
-  const datosAdicionales = {
-    sindromeBurnout: String(dataFinal.sindromeBurnout ?? ""),
-    agotamientoEmocional: String(dataFinal.agotamientoEmocional ?? ""),
-    despersonalizacion: String(dataFinal.despersonalizacion ?? ""),
-    realizacionPersonal: String(dataFinal.realizacionPersonal ?? ""),
-    resultados: String(dataFinal.resultados ?? ""),
-    conclusiones: String(dataFinal.conclusiones ?? ""),
-    recomendaciones: String(dataFinal.recomendaciones ?? ""),
-  };
 
   // Función para dibujar header gris
   const dibujarHeaderGris = (titulo, y) => {
@@ -201,36 +174,35 @@ export default function Informe_burnout_Digitalizado(data = {}) {
     const dataW = tablaAncho - labelW;
     const padding = 2;
     doc.setFont("helvetica", "normal").setFontSize(8);
-    
-    // Calcular altura necesaria para el valor
+
+    // Calcular altura necesaria para el valor (siempre usar splitTextToSize para calcular correctamente)
     let alturaFila = filaAltura;
-    if (valor && doc.getTextWidth(valor) > dataW - 4) {
+    if (valor) {
       const lineas = doc.splitTextToSize(valor, dataW - 4);
       const alturaTexto = lineas.length * 3.5 + padding * 2;
       alturaFila = Math.max(filaAltura, alturaTexto);
     }
-    
+
     // Dibujar celdas
     doc.rect(tablaInicioX, y, labelW, alturaFila, 'S');
     doc.rect(tablaInicioX + labelW, y, dataW, alturaFila, 'S');
-    
-    // Dibujar label
+
+    // Dibujar label (centrado verticalmente en la fila)
     doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text(label, tablaInicioX + 2, y + 4);
-    
+    // Centrar verticalmente: el punto Y en jsPDF es la línea base del texto
+    // Para centrar, usamos: centro de la fila + ajuste para línea base
+    const labelY = y + (alturaFila / 2) + 1;
+    doc.text(label, tablaInicioX + 2, labelY);
+
     // Dibujar valor (con salto de línea si es necesario)
     doc.setFont("helvetica", "normal").setFontSize(8);
     if (valor) {
-      if (doc.getTextWidth(valor) > dataW - 4) {
-        const lineas = doc.splitTextToSize(valor, dataW - 4);
-        lineas.forEach((linea, idx) => {
-          doc.text(linea, tablaInicioX + labelW + 2, y + padding + 2 + (idx * 3.5));
-        });
-      } else {
-        doc.text(valor, tablaInicioX + labelW + 2, y + 4);
-      }
+      const lineas = doc.splitTextToSize(valor, dataW - 4);
+      lineas.forEach((linea, idx) => {
+        doc.text(linea, tablaInicioX + labelW + 2, y + padding + 2 + (idx * 3.5));
+      });
     }
-    
+
     return y + alturaFila;
   };
 
@@ -239,16 +211,16 @@ export default function Informe_burnout_Digitalizado(data = {}) {
     const alturaMinima = 30;
     const padding = 3;
     doc.setFont("helvetica", "normal").setFontSize(8);
-    
+
     let alturaFila = alturaMinima;
     if (texto && doc.getTextWidth(texto) > tablaAncho - 4) {
       const lineas = doc.splitTextToSize(texto, tablaAncho - 4);
       const alturaTexto = lineas.length * 3.5 + padding * 2;
       alturaFila = Math.max(alturaMinima, alturaTexto);
     }
-    
+
     doc.rect(tablaInicioX, y, tablaAncho, alturaFila, 'S');
-    
+
     if (texto) {
       if (doc.getTextWidth(texto) > tablaAncho - 4) {
         const lineas = doc.splitTextToSize(texto, tablaAncho - 4);
@@ -259,49 +231,38 @@ export default function Informe_burnout_Digitalizado(data = {}) {
         doc.text(texto, tablaInicioX + 2, y + padding + 2);
       }
     }
-    
+
     return y + alturaFila;
   };
 
   // === SECCIÓN II: CRITERIOS PSICOLÓGICOS ===
   yPos = dibujarHeaderGris("II. CRITERIOS PSICOLÓGICOS", yPos);
-  yPos = dibujarFilaLabelData("- SÍNDROME DE BURNOUT", datosAdicionales.sindromeBurnout, yPos);
+  yPos = dibujarFilaLabelData("- SÍNDROME DE BURNOUT", datos.sindromeBurnout, yPos);
 
   // === SECCIÓN III: SUB ESCALAS ===
   yPos = dibujarHeaderGris("III. SUB ESCALAS", yPos);
-  yPos = dibujarFilaLabelData("- AGOTAMIENTO EMOCIONAL", datosAdicionales.agotamientoEmocional, yPos);
-  yPos = dibujarFilaLabelData("- DESPERSONALIZACIÓN", datosAdicionales.despersonalizacion, yPos);
-  yPos = dibujarFilaLabelData("- REALIZACIÓN PERSONAL", datosAdicionales.realizacionPersonal, yPos);
+  yPos = dibujarFilaLabelData("- AGOTAMIENTO EMOCIONAL", datos.agotamientoEmocional, yPos);
+  yPos = dibujarFilaLabelData("- DESPERSONALIZACIÓN", datos.despersonalizacion, yPos);
+  yPos = dibujarFilaLabelData("- REALIZACIÓN PERSONAL", datos.realizacionPersonal, yPos);
 
   // === SECCIÓN IV: RESULTADOS ===
   yPos = dibujarHeaderGris("IV. RESULTADOS", yPos);
-  yPos = dibujarFilaCreciente(datosAdicionales.resultados, yPos);
+  yPos = dibujarFilaCreciente(datos.resultados, yPos);
 
   // === SECCIÓN V: CONCLUSIONES ===
   yPos = dibujarHeaderGris("V. CONCLUSIONES", yPos);
-  yPos = dibujarFilaCreciente(datosAdicionales.conclusiones, yPos);
+  yPos = dibujarFilaCreciente(datos.conclusiones, yPos);
 
   // === SECCIÓN VI: RECOMENDACIONES ===
   yPos = dibujarHeaderGris("VI. RECOMENDACIONES", yPos);
-  yPos = dibujarFilaCreciente(datosAdicionales.recomendaciones, yPos);
+  yPos = dibujarFilaCreciente(datos.recomendaciones, yPos);
 
-  // === FILA DE FIRMA DEL MÉDICO ===
-  const alturaFirma = 25;
+  // === FILA DE FIRMA ===
+  const alturaFirma = 32;
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaFirma, 'S');
-  
-  // Agregar firma del médico (imagen)
-  let firmaMedicoUrl = getSign(dataFinal, "SELLOFIRMA");
-  if (firmaMedicoUrl) {
-    try {
-      const imgWidth = 45;
-      const imgHeight = 20;
-      const x = tablaInicioX + (tablaAncho / 2) - (imgWidth / 2);
-      const y = yPos + 2;
-      doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
-    } catch (error) {
-      console.log("Error cargando firma del médico:", error);
-    }
-  }
+
+  // Usar helper para dibujar firmas
+  await dibujarFirmas({ doc, datos, y: yPos + 2, pageW });
   yPos += alturaFirma;
 
   // === FOOTER ===

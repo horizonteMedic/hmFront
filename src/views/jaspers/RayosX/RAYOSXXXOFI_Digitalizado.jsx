@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import HeaderRAYOSXXXOFI from "./Headers/header_RAYOSXXXOFI_Digitalizado.jsx";
 
-export default function RAYOSXXXOFI_Digitalizado(data = {}) {
+export default async function RAYOSXXXOFI_Digitalizado(data = {}) {
   const doc = new jsPDF();
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
@@ -30,27 +30,27 @@ export default function RAYOSXXXOFI_Digitalizado(data = {}) {
     return datosFinales[name] || "";
   };
   function formatearFecha(fechaStr) {
-  if (!fechaStr) return ""; // Si está vacío
-  
-  const [anio, mes, dia] = fechaStr.split("-").map(Number);
-  const fecha = new Date(anio, mes - 1, dia); // Fecha local
-  
-  const diasSemana = [
-    "DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", 
-    "JUEVES", "VIERNES", "SÁBADO"
-  ];
-  
-  const meses = [
-    "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", 
-    "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"
-  ];
-  
-  const diaSemana = diasSemana[fecha.getDay()];
-  const diaMes = fecha.getDate();
-  const nombreMes = meses[fecha.getMonth()];
-  
-  return `${diaSemana} ${diaMes} DE ${nombreMes} DEL ${anio}`;
-}
+    if (!fechaStr) return ""; // Si está vacío
+
+    const [anio, mes, dia] = fechaStr.split("-").map(Number);
+    const fecha = new Date(anio, mes - 1, dia); // Fecha local
+
+    const diasSemana = [
+      "DOMINGO", "LUNES", "MARTES", "MIÉRCOLES",
+      "JUEVES", "VIERNES", "SÁBADO"
+    ];
+
+    const meses = [
+      "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO",
+      "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"
+    ];
+
+    const diaSemana = diasSemana[fecha.getDay()];
+    const diaMes = fecha.getDate();
+    const nombreMes = meses[fecha.getMonth()];
+
+    return `${diaSemana} ${diaMes} DE ${nombreMes} DEL ${anio}`;
+  }
 
 
   // Datos del reporte
@@ -58,7 +58,7 @@ export default function RAYOSXXXOFI_Digitalizado(data = {}) {
     apellidosNombres: obtener("nombres").toUpperCase(),
     empresa: obtener("empresa").toUpperCase(),
     cargo: obtener("cargo").toUpperCase(),
-    edad: obtener("edad")+ " AÑOS",
+    edad: obtener("edad") + " AÑOS",
     examen: "RADIOAGRAFIA DE COLUMNA " + obtener("tipoRadio").toUpperCase(),
     fechaEvaluacion: formatearFecha(obtener("fechaExamen")),
     hallazgos: obtener("informacionGeneral").toUpperCase(),
@@ -108,7 +108,7 @@ export default function RAYOSXXXOFI_Digitalizado(data = {}) {
     // Valor a la derecha, con manejo de texto largo
     const maxValueWidth = pageW - valueX - margin - 10; // Ancho máximo disponible para el valor
     const valueLines = doc.splitTextToSize(item.value, maxValueWidth);
-    
+
     valueLines.forEach((line, index) => {
       doc.text(line, valueX, y + (index * 5));
     });
@@ -147,7 +147,7 @@ export default function RAYOSXXXOFI_Digitalizado(data = {}) {
       // Verificar si el texto es muy largo y necesita múltiples líneas
       const maxWidth = pageW - 2 * (margin + 20);
       const textLines = doc.splitTextToSize(trimmedItem, maxWidth);
-      
+
       textLines.forEach((line) => {
         // Todas las líneas con sangría, sin viñeta
         doc.text(line, margin + 20, y);

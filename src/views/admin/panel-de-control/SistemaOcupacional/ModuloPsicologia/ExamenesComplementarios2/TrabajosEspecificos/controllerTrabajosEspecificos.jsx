@@ -10,9 +10,9 @@ import {
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
-    "";
+    "/api/v01/ct/trabajoEspecifico/obtenerReporteTrabajosEspecificos";
 const registrarUrl =
-    "";
+    "/api/v01/ct/trabajoEspecifico/registrarActualizar";
 
 export const GetInfoServicio = async (
     nro,
@@ -34,13 +34,15 @@ export const GetInfoServicio = async (
             norden: res.norden ?? "",
             fecha: res.fecha,
 
-            nombreExamen: res.nombreExamen ?? "",
-            dni: res.dni ?? "",
+            esApto: res.perfilCumple ?? false,
 
-            nombres: res.nombres ?? "",
+            nombreExamen: res.tipoExamen ?? "",
+            dni: res.dniPaciente ?? "",
+
+            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
             lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-            edad: res.edad ?? "",
+            edad: res.edadPaciente ?? "",
             sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
             estadoCivil: res.estadoCivilPaciente,
             nivelEstudios: res.nivelEstudioPaciente,
@@ -50,7 +52,18 @@ export const GetInfoServicio = async (
             ocupacion: res.ocupacionPaciente,
             cargoDesempenar: res.cargoPaciente,
 
-            //agregar
+            nivelAlertaRiesgo: res.criterioNivelAlertRiesgo ?? "",
+            nivelPsicomotricidad: res.criterioNivelPsicomotrocidad ?? "",
+
+            // Análisis FODA
+            fortalezasOportunidades: res.analisisFodaFortalezasOportunidades ?? "",
+            amenazasDebilidades: res.analisisFodaAmenazasDebilidades ?? "",
+
+            // Observaciones y Recomendaciones
+            observaciones: res.observaciones ?? "",
+            recomendaciones: res.recomendaciones ?? "",
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -75,8 +88,18 @@ export const SubmitDataService = async (
         norden: form.norden,
         fecha: form.fecha,
 
+        criterioNivelAlertRiesgo: form.nivelAlertaRiesgo ?? "",
+        criterioNivelPsicomotrocidad: form.nivelPsicomotricidad ?? "",
+        analisisFodaFortaOport: form.fortalezasOportunidades ?? "",
+        analisisFodaAmenazDebili: form.amenazasDebilidades ?? "",
+        observaciones: form.observaciones ?? "",
+        recomendaciones: form.recomendaciones ?? "",
+        perfCumple: form.esApto,
+        perfNoCumple: !form.esApto,
+
         //agregar
         usuarioRegistro: user,
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -85,7 +108,7 @@ export const SubmitDataService = async (
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformePsicologicoADECO/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformePsicoEspecificos/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -93,7 +116,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../../jaspers/ModuloPsicologia/InformePsicologicoADECO"
+        "../../../../../../jaspers/ModuloPsicologia/InformePsicoEspecificos"
     );
 };
 

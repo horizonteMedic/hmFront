@@ -4,7 +4,7 @@ import footerTR from "../components/footerTR.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
 import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
 
-export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
+export default async function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -18,8 +18,13 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
   };
 
   // Header con datos de ficha, sede y fecha
+<<<<<<< HEAD
   const drawHeader = () => {
     CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+=======
+  const drawHeader = async () => {
+    await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
     // Número de Ficha
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -40,8 +45,13 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
 
     // Bloque de color
     drawColorBox(doc, {
+<<<<<<< HEAD
       color: datos.codigoColor || "#008f39",
       text: datos.textoColor || "F",
+=======
+      color: datos.codigoColor,
+      text: datos.textoColor,
+>>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
       x: pageW - 30,
       y: 10,
       size: 22,
@@ -51,7 +61,7 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
     });
   };
 
-  drawHeader();
+  await drawHeader();
 
   // Contenido del documento
 

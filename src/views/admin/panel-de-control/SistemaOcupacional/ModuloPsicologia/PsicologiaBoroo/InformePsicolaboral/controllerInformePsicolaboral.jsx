@@ -10,7 +10,7 @@ import {
 import { getToday } from "../../../../../../utils/helpers";
 
 const obtenerReporteUrl =
-    "/api/v01/ct/informePsicolaboral/obtenerReporteInformePsicolaboral";
+    "/api/v01/ct/informePsicolaboral/obtenerReporteInformePsicolaboral"; 
 const registrarUrl =
     "/api/v01/ct/informePsicolaboral/registrarActualizarInformePsicolaboral";
 const today = getToday();
@@ -209,7 +209,7 @@ export const SubmitDataService = async (
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../jaspers/ModuloPsicologia/InformePsicolaboral/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformePsicolaboral/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -217,7 +217,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../jaspers/ModuloPsicologia/InformePsicolaboral"
+        "../../../../../../jaspers/ModuloPsicologia/InformePsicolaboral"
     );
 };
 
