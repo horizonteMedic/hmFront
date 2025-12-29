@@ -43,7 +43,6 @@ import Permisos from "./views/admin/Permisos/Permisos.jsx";
 import SistemaOcupacional from "./views/admin/panel-de-control/SistemaOcupacional/SistemaOcupacional.jsx";
 import Anexo16A from "./views/admin/panel-de-control/SistemaOcupacional/Anexo16A/Anexo16A.jsx";
 
-
 //SIMULADOR DE jaspers
 import Ficha from "./views/jaspers/AnalisisBioquimicos/LaboratorioClinico_Digitalizado.jsx";
 
