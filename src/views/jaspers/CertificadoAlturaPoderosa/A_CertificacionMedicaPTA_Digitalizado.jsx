@@ -327,7 +327,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
       }
     }
     
-    const textoCol3 = datosFinales.otraRestriccion ? `Para: ${datosFinales.otraRestriccion}` : "";
+    const textoCol3 = datosFinales.puestoTrabajo ? `Para: ${datosFinales.puestoTrabajo}` : "";
     
     // Calcular altura necesaria para cada columna
     doc.setFont("helvetica", "normal").setFontSize(7);
