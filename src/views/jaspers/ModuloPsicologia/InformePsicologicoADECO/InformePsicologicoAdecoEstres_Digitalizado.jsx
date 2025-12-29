@@ -2,8 +2,9 @@ import jsPDF from "jspdf";
 import drawColorBox from '../../components/ColorBox.jsx';
 import { formatearFechaCorta } from "../../../utils/formatDateUtils.js";
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
-import { getSign, convertirGenero } from "../../../utils/helpers.js";
+import { convertirGenero } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
+import { dibujarFirmas } from '../../../utils/dibujarFirmas.js';
 
 export default async function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -33,6 +34,7 @@ export default async function InformePsicologicoAdecoEstres_Digitalizado(data = 
       codigoColor: String(raw?.codigoColor ?? ''),
       textoColor: String(raw?.textoColor ?? ''),
       apto: (typeof raw?.apto === 'boolean') ? raw.apto : false,
+      noApto: (typeof raw?.noApto === 'boolean') ? raw.noApto : false,
       // Resultados de pruebas
       resultados: [
         { numero: '1', prueba: 'Escala Sintomática de Estrés', resultado: String(raw?.escalaSintomatica ?? '') },
@@ -171,22 +173,28 @@ export default async function InformePsicologicoAdecoEstres_Digitalizado(data = 
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Cuarta fila: Área de Trabajo, Puesto de Trabajo (2 columnas)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Quinta fila: Empresa (fila completa)
+  // Cuarta fila: Área de Trabajo (completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Sexta fila: Contratista (fila completa)
+  // Quinta fila: Puesto de Trabajo (completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Sexta fila: Empresa (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Séptima fila: Contratista (fila completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
@@ -239,26 +247,28 @@ export default async function InformePsicologicoAdecoEstres_Digitalizado(data = 
   dibujarTextoConSaltoLinea(datosFinales.domicilio, tablaInicioX + 25, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
-  // Cuarta fila: Área de Trabajo, Puesto de Trabajo
+  // Cuarta fila: Área de Trabajo
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Área de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo, tablaInicioX + 30, yTexto + 1.5, 50);
-
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Puesto de Trabajo:", tablaInicioX + 92, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo, tablaInicioX + 122, yTexto + 1.5, 65);
+  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo, tablaInicioX + 30, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
-  // Quinta fila: Empresa
+  // Quinta fila: Puesto de Trabajo
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo, tablaInicioX + 35, yTexto + 1.5, tablaAncho - 35);
+  yTexto += filaAltura;
+
+  // Sexta fila: Empresa
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
   dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 25, yTexto + 1.5, tablaAncho - 25);
   yTexto += filaAltura;
 
-  // Sexta fila: Contratista
+  // Séptima fila: Contratista
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Contratista:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
@@ -316,7 +326,7 @@ export default async function InformePsicologicoAdecoEstres_Digitalizado(data = 
   yPos = dibujarHeaderSeccion("III.- ANÁLISIS FODA", yPos, filaAltura);
 
   // Función para calcular altura dinámica de texto
-  const calcularAlturaTexto = (texto, anchoMaximo, alturaMinima = 30) => {
+  const calcularAlturaTexto = (texto, anchoMaximo, alturaMinima = 10) => {
     if (!texto) return alturaMinima;
 
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -396,51 +406,60 @@ export default async function InformePsicologicoAdecoEstres_Digitalizado(data = 
   // Header de conclusiones
   yPos = dibujarHeaderSeccion("VI.- CONCLUSIONES", yPos, filaAltura);
 
-  // Fila de Conclusiones (creciente)
-  const alturaConclusiones = calcularAlturaTexto(datosFinales.conclusiones, tablaAncho - 5);
+  // Fila con APTO | X | NO APTO
+  const anchoColumna = tablaAncho / 4; // Dividir en 4 columnas
+  const alturaFilaApto = filaAltura;
 
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaConclusiones);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaConclusiones);
+  // Dibujar líneas de la fila
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaApto);
+  doc.line(tablaInicioX + anchoColumna, yPos, tablaInicioX + anchoColumna, yPos + alturaFilaApto);
+  doc.line(tablaInicioX + anchoColumna * 2, yPos, tablaInicioX + anchoColumna * 2, yPos + alturaFilaApto);
+  doc.line(tablaInicioX + anchoColumna * 3, yPos, tablaInicioX + anchoColumna * 3, yPos + alturaFilaApto);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaApto);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaConclusiones, tablaInicioX + tablaAncho, yPos + alturaConclusiones);
+  doc.line(tablaInicioX, yPos + alturaFilaApto, tablaInicioX + tablaAncho, yPos + alturaFilaApto);
 
+  // Contenido de la fila
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.conclusiones, tablaInicioX + 2, yPos + 3.6, tablaAncho - 5);
-  yPos += alturaConclusiones;
-
-  // === SECCIÓN DE FIRMAS ===
-  const yFirmas = yPos; // Sin separación después de la última sección
-  const alturaSeccionFirmas = 30; // Altura para la sección de firmas
-
-  // Dibujar las líneas de la sección de firmas (1 columna completa)
-  doc.line(tablaInicioX, yFirmas, tablaInicioX, yFirmas + alturaSeccionFirmas); // Línea izquierda
-  doc.line(tablaInicioX + tablaAncho, yFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea derecha
-  doc.line(tablaInicioX, yFirmas, tablaInicioX + tablaAncho, yFirmas); // Línea superior
-  doc.line(tablaInicioX, yFirmas + alturaSeccionFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea inferior
-
-  // === FIRMA DEL MÉDICO ===
-  const centroColumna = tablaInicioX + (tablaAncho / 2);
-  const firmaMedicoY = yFirmas + 3;
-
-  // Agregar firma y sello médico
-  let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
-  if (firmaMedicoUrl) {
-    try {
-      const imgWidth = 45;
-      const imgHeight = 20;
-      // Centrar la imagen: centro de la columna menos la mitad del ancho de la imagen
-      const firmaMedicoX = centroColumna - (imgWidth / 2);
-      const x = firmaMedicoX;
-      const y = firmaMedicoY;
-      doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
-    } catch (error) {
-      console.log("Error cargando firma del médico:", error);
-    }
+  doc.text("APTO", tablaInicioX + anchoColumna / 2, yPos + 3.5, { align: "center" });
+  
+  // Dibujar X en APTO si es true
+  if (datosFinales.apto === true) {
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.setTextColor(0, 51, 204); // #0033cc
+    doc.text("X", tablaInicioX + anchoColumna + anchoColumna / 2, yPos + 3.5, { align: "center" });
+    doc.setTextColor(0, 0, 0); // Volver a negro
+  }
+  
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("NO APTO", tablaInicioX + anchoColumna * 2 + anchoColumna / 2, yPos + 3.5, { align: "center" });
+  
+  // Dibujar X en NO APTO si es true
+  if (datosFinales.noApto === true) {
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.setTextColor(0, 51, 204); // #0033cc
+    doc.text("X", tablaInicioX + anchoColumna * 3 + anchoColumna / 2, yPos + 3.5, { align: "center" });
+    doc.setTextColor(0, 0, 0); // Volver a negro
   }
 
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Sello y Firma del Médico", centroColumna, yFirmas + 26, { align: "center" });
-  doc.text("Responsable de la Evaluación", centroColumna, yFirmas + 28.5, { align: "center" });
+  yPos += alturaFilaApto;
+
+  // === SECCIÓN DE FIRMAS ===
+  const yFirmas = yPos;
+  const alturaSeccionFirmas = 30; // Altura aumentada para la sección de firmas
+
+  // Dibujar borde de la fila de firmas
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.line(tablaInicioX, yFirmas, tablaInicioX, yFirmas + alturaSeccionFirmas);
+  doc.line(tablaInicioX + tablaAncho, yFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas);
+  doc.line(tablaInicioX, yFirmas, tablaInicioX + tablaAncho, yFirmas);
+  doc.line(tablaInicioX, yFirmas + alturaSeccionFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas);
+
+  // Usar helper para dibujar firmas dentro de la fila
+  await dibujarFirmas({ doc, datos: data, y: yFirmas + 2, pageW });
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 5 });
