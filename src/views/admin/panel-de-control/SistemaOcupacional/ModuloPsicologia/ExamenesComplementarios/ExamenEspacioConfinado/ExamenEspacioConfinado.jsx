@@ -1,5 +1,3 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faPrint, faBroom } from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
     InputTextArea,
@@ -66,7 +64,6 @@ export default function ExamenEspacioConfinado() {
         form,
         setForm,
         handleChange,
-        handleChangeNumber,
         handleChangeNumberDecimals,
         handleRadioButton,
         handleChangeSimple,
