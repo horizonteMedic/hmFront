@@ -174,7 +174,7 @@ export default function Coproparasitologico_Digitalizado(datos = {}) {
     sede: datos.sede || datos.nombreSede || "",
     
     // Datos de color
-    codigocolor: datos.codigoColor || ""
+    codigocolor: datos.codigoColor || "",
     textoColor: datos.textoColor || "F",
     color: datos.color || 1,
     
