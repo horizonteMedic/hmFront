@@ -125,10 +125,10 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         },
         () => {
             //Tiene registro
-            GetInfoServicioEditar(nro, tabla, set, token, () => {
+            GetInfoServicio(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de Altura 1.8",
+                    "Este paciente ya cuenta con registros de Espirometria",
                     "warning"
                 );
             });

@@ -1,6 +1,7 @@
 import {
     InputTextOneLine,
     InputCheckbox,
+    InputTextArea,
 } from "../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
 import { useSessionData } from "../../../../hooks/useSessionData";
@@ -58,6 +59,7 @@ export default function Espirometria() {
         setForm,
         handleChange,
         handleChangeNumberDecimals,
+        handleFocusNext,
         handleChangeSimple,
         handleCheckBoxChange,
         handleClear,
@@ -125,31 +127,35 @@ export default function Espirometria() {
 
             <DatosPersonalesLaborales form={form} />
 
-            <SectionFieldset legend="Criterios Psicológicos" className="grid xl:grid-cols-3 gap-x-4 gap-y-3">
+            <SectionFieldset legend="Criterios" className="grid xl:grid-cols-3 gap-x-4 gap-y-3">
                 <div className="space-y-3">
                     <InputTextOneLine
                         label="FVC %"
                         name="fvc"
                         value={form?.fvc}
                         onChange={handleChange}
+                        onKeyUp={handleFocusNext}
                     />
                     <InputTextOneLine
                         label="FEV1 %"
                         name="fev1"
                         value={form?.fev1}
                         onChange={handleChange}
+                        onKeyUp={handleFocusNext}
                     />
                     <InputTextOneLine
                         label="FEV1/FVC %"
                         name="fev1_fvc"
                         value={form?.fev1_fvc}
                         onChange={handleChange}
+                        onKeyUp={handleFocusNext}
                     />
                     <InputTextOneLine
                         label="FEF 25-75 %"
                         name="fef"
                         value={form?.fef}
                         onChange={handleChange}
+                        onKeyUp={handleFocusNext}
                     />
                 </div>
                 <div className="space-y-3">
@@ -172,14 +178,24 @@ export default function Espirometria() {
                         name="fvcTeorico"
                         value={form?.fvcTeorico}
                         onChange={handleChange}
+                        onKeyUp={handleFocusNext}
                     />
                     <InputTextOneLine
                         label="FEV1 Teórico"
                         name="fev1Teorico"
                         value={form?.fev1Teorico}
                         onChange={handleChange}
+                        onKeyUp={handleFocusNext}
                     />
                 </div>
+                <InputTextArea
+                    label="Interpretación"
+                    rows={4}
+                    name="interpretacion"
+                    value={form?.interpretacion}
+                    className="xl:col-span-3"
+                    onChange={handleChange}
+                />
             </SectionFieldset>
 
             <SectionFieldset legend="Asignación de Médico">
