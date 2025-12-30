@@ -1,7 +1,5 @@
 import Swal from "sweetalert2";
 import { getFetch, SubmitData } from "../../../../../utils/apiHelpers";
-import jsPDF from "jspdf";
-const doc = new jsPDF();
 //===============Zona Modificación===============
 const obtenerReporteUrl = "/api/v01/ct/rayosX/obtenerReporteRadiografiaTorax";
 const registrarUrl = "/api/v01/ct/rayosX/registrarActualizarRadiografiaTorax";

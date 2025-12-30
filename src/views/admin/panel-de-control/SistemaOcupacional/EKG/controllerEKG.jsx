@@ -34,16 +34,26 @@ export const GetInfoServicio = async (
   if (res) {
     set((prev) => ({
       ...prev,
-      ...res,
       norden: res.norden,
       codigoElectroCardiograma: res.codigoElectroCardiograma,
-      nombre: res.nombres,
-      edad: res.edad,
-      fechaNac: formatearFechaCorta(res.fechaNac),
 
       fechaExam: res.fechaInforme,
-      contrata: res.contrata,
-      empresa: res.empresa,
+
+      nombreExamen: res.tipoExamen ?? "",
+      dni: res.dni ?? "",
+
+      nombres: res.nombres ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+      lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+      edad: res.edad ?? "",
+      sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+      estadoCivil: res.estadoCivilPaciente ?? "",
+      nivelEstudios: res.nivelEstudioPaciente ?? "",
+      // Datos Laborales
+      empresa: res.empresa ?? "",
+      contrata: res.contrata ?? "",
+      ocupacion: res.ocupacionPaciente ?? "",
+      cargoDesempenar: res.cargoPaciente ?? "",
 
       ritmo: res.mensajeRitmo ?? "",
       fc: res.mensajeFC ?? "",
@@ -154,7 +164,7 @@ const GetInfoPac = async (nro, set, token, sede) => {
     set((prev) => ({
       ...prev,
       ...res,
-      fechaNac: formatearFechaCorta(res.fechaNac ?? ""),
+      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
       edad: res.edad,
       nombres: res.nombresApellidos,
     }));
