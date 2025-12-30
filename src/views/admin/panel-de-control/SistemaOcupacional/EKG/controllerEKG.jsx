@@ -38,8 +38,8 @@ export const GetInfoServicio = async (
       norden: res.norden,
       codigoElectroCardiograma: res.codigoElectroCardiograma,
       nombre: res.nombres,
-      edad: res.edad + " años",
-      fechaNac: formatearFechaCorta(res.fechaNac), //necesito
+      edad: res.edad,
+      fechaNac: formatearFechaCorta(res.fechaNac),
 
       fechaExam: res.fechaInforme,
       contrata: res.contrata,
@@ -55,7 +55,7 @@ export const GetInfoServicio = async (
       ondaT: res.mensajeOndaT ?? "",
       qtc: res.mensajeQtC ?? "",
 
-      informeCompleto: res.informeCompleto ?? "", //necesito
+      informeCompleto: res.informeCompleto ?? "",
       conclusiones: res.conclusion ?? "",
       hallazgos: res.hallazgo ?? "",
       recomendaciones: res.recomendaciones ?? "",
@@ -94,7 +94,7 @@ export const SubmitDataService = async (
     hallazgo: form.hallazgos,
     conclusion: form.conclusiones,
     recomendaciones: form.recomendaciones,
-    edadPaciente: form.edad?.replace(" años", ""),
+    edadPaciente: form.edad,
 
     usuarioFirma: form.user_medicoFirma,
     userRegistro: user,
@@ -155,7 +155,7 @@ const GetInfoPac = async (nro, set, token, sede) => {
       ...prev,
       ...res,
       fechaNac: formatearFechaCorta(res.fechaNac ?? ""),
-      edad: res.edad + " años",
+      edad: res.edad,
       nombres: res.nombresApellidos,
     }));
   }
