@@ -22,6 +22,7 @@ import InputTextArea from "../../../../../components/reusableComponents/InputTex
 import BotonesAccion from "../../../../../components/templates/BotonesAccion";
 import TablaTemplate from "../../../../../components/templates/TablaTemplate";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "radiografia_torax";
 
@@ -304,6 +305,14 @@ export default function RayosXToraxPA() {
             </div>
           </div>
         </SectionFieldset>
+        <SectionFieldset legend="Asignación de Médico">
+          <EmpleadoComboBox
+            value={form.nombre_medico}
+            label="Especialista"
+            form={form}
+            onChange={handleChangeSimple}
+          />
+        </SectionFieldset>
 
         <BotonesAccion
           form={form}
@@ -432,7 +441,7 @@ function Table({ data, tabla, set, token, clean, datosFooter }) {
     <TablaTemplate
       columns={columns}
       data={data}
-      height={675}
+      height={780}
       onRowClick={(row) => clicktable(row.norden)}
       onRowRightClick={(row) => handlePrintConfirm(row.norden)}
     />

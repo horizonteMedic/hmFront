@@ -1,5 +1,6 @@
 import Swal from "sweetalert2";
 import { getFetch, SubmitData } from "../../../../../utils/apiHelpers";
+import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 //===============Zona Modificación===============
 const obtenerReporteUrl = "/api/v01/ct/rayosX/obtenerReporteRadiografiaTorax";
 const registrarUrl = "/api/v01/ct/rayosX/registrarActualizarRadiografiaTorax";
@@ -19,12 +20,23 @@ export const GetInfoServicio = (
         console.log(res);
         set((prev) => ({
           ...prev,
-          ...res,
           norden: res.norden,
           codRat: res.codRat,
           fechaExam: res.fechaExamen,
-          edad: res.edad + " años",
-          nombres: res.nombres,
+          dni: res.dni ?? "",
+
+          nombres: `${res.nombres ?? ""} ${res.apellidosPaciente ?? ""}`,
+          fechaNacimiento: formatearFechaCorta(res.apellidos ?? ""),
+          lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+          edad: res.edad ?? "",
+          sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+          estadoCivil: res.estadoCivilPaciente ?? "",
+          nivelEstudios: res.nivelEstudioPaciente ?? "",
+          // Datos Laborales
+          empresa: res.empresa ?? "",
+          contrata: res.contrata ?? "",
+          ocupacion: res.ocupacionPaciente ?? "",
+          cargoDesempenar: res.cargoPaciente ?? "",
 
           vertices: res.vertices,
           hilios: res.hilios,
@@ -35,6 +47,8 @@ export const GetInfoServicio = (
           osteomuscular: res.osteomuscular,
           conclusiones: res.conclusionesRadiograficas,
           observaciones: res.observacionesRadiografiaTorax,
+
+          user_medicoFirma: res.usuarioFirma,
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -78,6 +92,8 @@ export const SubmitDataService = async (
     observacionesRadiografiaTorax: form.observaciones,
     camposPulmonares: form.camposPulmonares,
     userRegistro: user,
+
+    usuarioFirma: form.user_medicoFirma,
   };
   SubmitData(body, registrarUrl, token).then((res) => {
     console.log(res);
@@ -178,9 +194,14 @@ export const GetInfoPac = (nro, set, token, sede) => {
       set((prev) => ({
         ...prev,
         ...res,
-        // fechaNac: convertirFecha(res.fechaNac),
-        edad: res.edad + " años",
-        nombres: res.nombresApellidos,
+        nombres: res.nombresApellidos ?? "",
+        fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+        edad: res.edad,
+        ocupacion: res.areaO ?? "",
+        nombreExamen: res.nomExam ?? "",
+        cargoDesempenar: res.cargo ?? "",
+        lugarNacimiento: res.lugarNacimiento ?? "",
+        sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
       }));
     })
     .finally(() => {
