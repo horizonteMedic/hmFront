@@ -184,17 +184,9 @@ export default async function AnalisisBioquimicos_Digitalizado(datos = {}, docEx
 
   let y = finalYPos + 10; // Posición inicial después de la tabla de datos
 
-<<<<<<< HEAD
-    // === TÍTULO ===
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
-    doc.text("LABORATORIO CLÍNICO", pageW / 2, 43, { align: "center" }); // +5mm
-
-    let y = 100; // Posición inicial después de la tabla de datos (+5mm)
-=======
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
   doc.text("ANÁLISIS BIOQUÍMICOS", config.margin, y);
   y += config.lineHeight * 1.5;
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   // === ENCABEZADO DE TABLA ===
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);

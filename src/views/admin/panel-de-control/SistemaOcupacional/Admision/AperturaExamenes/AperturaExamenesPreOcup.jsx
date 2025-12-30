@@ -14,8 +14,11 @@ import ModalEmpresa from './modals/modalEmpresa/ModalEmpresa';
 import ModalContrata from './modals/modalContrata/ModalContrata';
 import { format } from 'date-fns';
 import { useSessionData } from '../../../../../hooks/useSessionData.js';
-import { fixEncodingModern } from '../../../../../utils/helpers.js';
+import { fixEncodingModern, getToday } from '../../../../../utils/helpers.js';
 import ModalExamenes from './modals/modalExamenes+/ModalExamenes'
+import ModalPagos from './modals/modalPagos/ModalPagos'
+
+const todayyy = getToday();
 
 const AperturaExamenesPreOcup = (props) => {
   const today = new Date();
@@ -86,6 +89,14 @@ const AperturaExamenesPreOcup = (props) => {
     espaciosConfinados: false,
     tmarihuana: false,
     tcocaina: false,
+    //Pagos
+    fechaPago: todayyy,
+    formaPago: "",
+    montoProtocolo: 0,
+    montoAdicionales: 0,
+    montoDescuento: 0,
+    montoTotal: 0,
+
 
     //Examenes Adicionales
     examenesAdicionales: [],
@@ -112,6 +123,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [FechaCanP, setFechaCanP] = useState(format(today, 'dd/MM/yyyy'))
   //Examenes Adicionales
   const [modalExam, setModalexam] = useState(false)
+  const [modalPagos, setModalPagos] = useState(false)
   //lista de Protocolos
   const [protocoloOptions, setProtocoloOptions] = useState([])
   const [searchProtocolo, setSearchProtocolo] = useState(datos.protocolo || '');
@@ -386,7 +398,7 @@ const AperturaExamenesPreOcup = (props) => {
   const handleSelectProtocolo = p => {
     console.log(p)
     setSearchProtocolo(p.nombre);
-    setDatos(d => ({ ...d, protocolo: p.nombre, idProtocolo: p.idProtocolo }));
+    setDatos(d => ({ ...d, protocolo: p.nombre, idProtocolo: p.idProtocolo, montoProtocolo: p.precio }));
     setFilteredProtocolos([]);
   };
 
@@ -1473,66 +1485,6 @@ const AperturaExamenesPreOcup = (props) => {
                 ))}
 
               </div>}
-              {/*<div className="flex items-center mr-8 mb-2">
-                  <input type="checkbox"  title="FIST-TEST" disabled={habilitar} checked={datos.n_fisttest} onChange={handleCheack}  id="examenAdicional4" name="n_fisttest" className="mr-2" />
-                  <label htmlFor="examenAdicional4" title="FIST-TEST">FIST-TEST</label>
-                </div>
-                <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" title='PSICOSENSOMETRIA' disabled={habilitar} checked={datos.n_psicosen} onChange={handleCheack} id="examenAdicional5" name="n_psicosen" className="mr-2" />
-                  <label htmlFor="examenAdicional5" title='PSICOSENSOMETRIA'>PSICOSEN</label>
-                </div>
-                <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" title="TEST DE ALTURA" disabled={habilitar} checked={datos.n_testaltura} onChange={handleCheack} id="examenAdicional6" name="n_testaltura" className="mr-2" />
-                  <label htmlFor="examenAdicional6" title="TEST DE ALTURA">T.ALTURA</label>
-                </div>
-                <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" title='TRABAJOS EN CALIENTE' disabled={habilitar} checked={datos.trabCalientes} onChange={handleCheack} id="examenAdicional7" name="trabCalientes" className="mr-2" />
-                  <label htmlFor="examenAdicional7" title='TRABAJOS EN CALIENTE'>T.CAL</label>
-                </div>
-                <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" title='RX COLUMNA LUMBOSACRA FyL' disabled={habilitar} checked={datos.rxcLumbosacra} onChange={handleCheack} id="examenAdicional8" name="rxcLumbosacra" className="mr-2" />
-                  <label htmlFor="examenAdicional8" title='RX COLUMNA LUMBOSACRA FyL' >RX.C.LUMBO</label>
-                </div>
-                <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" title='VISUAL COMPLEMENTARIO' disabled={habilitar} checked={datos.visualCompl} onChange={handleCheack} id="examenAdicional9" name="visualCompl" className="mr-2" />
-                  <label htmlFor="examenAdicional9" title='VISUAL COMPLEMENTARIO' >VIS.COMPL</label>
-                </div>
-                <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" title='MANIPULADOR DE ALIMENTOS' disabled={habilitar} checked={datos.manipAlimentos} onChange={handleCheack} id="examenAdicional10" name="manipAlimentos" className="mr-2" />
-                  <label htmlFor="examenAdicional10" title='MANIPULADOR DE ALIMENTOS' >M.ALIM.</label>
-                </div>
-                <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" title='HERRAMIENTAS MANUALES' disabled={habilitar} checked={datos.herraManuales} onChange={handleCheack} id="examenAdicional11" name="herraManuales" className="mr-2" />
-                  <label htmlFor="examenAdicional11" title='HERRAMIENTAS MANUALES'>H.MAN</label>
-                </div>
-                <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" title='RX COLUMNA DORSOLUMBAR FyL' disabled={habilitar} checked={datos.rxcDorsoLumbar} onChange={handleCheack} id="examenAdicional12" name="rxcDorsoLumbar" className="mr-2" />
-                  <label htmlFor="examenAdicional12" title='RX COLUMNA DORSOLUMBAR FyL'>RX.C.DORSE</label>
-                </div>
-                <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" title='RX COLUMNA LUMBA FyL' disabled={habilitar} checked={datos.rxcKLumbar} onChange={handleCheack} id="examenAdicional13" name="rxcKLumbar" className="mr-2" />
-                  <label htmlFor="examenAdicional13" title='RX COLUMNA LUMBA FyL'>RX.LUMBA</label>
-                </div>
-                <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" title='PLOMO EN SaNGRA' disabled={habilitar} checked={datos.rxcPlomos} onChange={handleCheack} id="examenAdicional14" name="rxcPlomos" className="mr-2" />
-                  <label htmlFor="examenAdicional14" title='PLOMO EN SaNGRA'>PLOMO S.</label>
-                </div>
-                <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" title='MERCURIO EN ORINA' disabled={habilitar} checked={datos.mercurioo} onChange={handleCheack} id="examenAdicional15" name="mercurioo" className="mr-2" />
-                  <label htmlFor="examenAdicional15" title='MERCURIO EN ORINA'>MER.O</label>
-                </div>
-                <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" title='ESPACIOS CONFINADOS' disabled={habilitar} checked={datos.espaciosConfinados} onChange={handleCheack} id="examenAdicional16" name="espaciosConfinados" className="mr-2" />
-                  <label htmlFor="examenAdicional16" title='ESPACIOS CONFINADOS'>ESP.CONF</label>
-                </div>
-                <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" title='MARIHUANA' disabled={habilitar} checked={datos.tmarihuana} onChange={handleCheack} id="examenAdicional17" name="tmarihuana" className="mr-2" />
-                  <label htmlFor="examenAdicional17" title='MARIHUANA'>MARIHUANA</label>
-                </div>
-                <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" title='COCAINA' disabled={habilitar} checked={datos.tcocaina} onChange={handleCheack} id="examenAdicional18" name="tcocaina" className="mr-2" />
-                  <label htmlFor="examenAdicional18" title='COCAINA'>COCAINA</label>
-                </div>*/}
 
             </div>
           </div>
@@ -1580,12 +1532,12 @@ const AperturaExamenesPreOcup = (props) => {
             </div>
           </div>
 
-          <div className="flex items-center space-x-2 mb-1">
-            <label htmlFor="Precio" className="block w-1/2">Precio del Examen</label>
+          <div className="flex items-center space-x-2 py-4 w-1/2 justify-between">
+            <label htmlFor="Precio" className="block ">Precio del Examen</label>
             <input type="text"
               id="precioPo"
               name="precioPo"
-              className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${!editPri ? "bg-slate-300" : "bg-slate-100"}`}
+              className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow  ${!editPri ? "bg-slate-300" : "bg-slate-100"}`}
               value={datos.precioPo}
               onChange={(e) => {
                 const value = e.target.value;
@@ -1597,29 +1549,10 @@ const AperturaExamenesPreOcup = (props) => {
                 }
               }}
               disabled={!editPri} />
-            <input type="checkbox" onChange={() => { setEditPri(!editPri) }} />
-            <InputsSelect2 nombre="tipoPago" disabled={habilitar} value={datos.tipoPago} title="Forma de Pago" Selects={FormaPago} handleChange={handleChange} />
-          </div>
-          <div className="flex items-center space-x-2 mb-1">
-            <label htmlFor="precioExamenAdicional" className="block w-1/2">Precio Examen Adicional:</label>
-            <input autoComplete="off"
-              type="text"
-              disabled={habilitar}
-              value={datos.precioAdic}
-              onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, ''); // Remover caracteres no numéricos
-                if (value.length <= 8) {
-                  setDatos({
-                    ...datos,
-                    precioAdic: value
-                  });
-                }
-              }}
-              id="precioAdic"
-              name="precioAdic"
-              className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
-            />
-            <InputsSelect2 nombre="autoriza" disabled={habilitar} value={datos.autoriza} title="Autorizado Por" Selects={ListAuth} handleChange={handleChange} />
+            <button onClick={() => { setModalPagos(true) }} disabled={datos.detallePago === null} className={`flex items-center border-1 border-blue-500 text-white px-3 py-1 bg-blue-800  mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none ${datos.detallePago === null ? 'opacity-60' : ""}`}>
+              Info. Pagos
+            </button>
+            {/*<InputsSelect2 nombre="tipoPago" disabled={habilitar} value={datos.tipoPago} title="Forma de Pago" Selects={FormaPago} handleChange={handleChange}*/}
           </div>
           <div className="mb-4">
             <div className="flex items-center space-x-2 mb-1">
@@ -1902,6 +1835,7 @@ const AperturaExamenesPreOcup = (props) => {
         }}
       />
       {modalExam && <ModalExamenes close={() => setModalexam(false)} idProtocolo={datos.idProtocolo} fetch={getFetch} token={props.token} set={setDatos} datos={datos} listaExamenes={listaExamenes} />}
+      {modalPagos && <ModalPagos close={() => setModalPagos(false)} set={setDatos} datos={datos} ListFormaPago={FormaPago} />}
     </div>
   );
 };

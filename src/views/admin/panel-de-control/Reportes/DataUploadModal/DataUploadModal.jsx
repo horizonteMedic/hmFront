@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faFolder, faCheck, faTimesCircle, faDownload } from '@fortawesome/free-solid-svg-icons'; 
+import { faTimes, faFolder, faCheck, faTimesCircle, faDownload } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import ArchivosMasivos from '../model/postArchivosMasivos';
 import { Loading } from '../../../../components/Loading';
@@ -26,7 +26,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   const [fileOrder, setFileOrder] = useState({});
   const [indice, setIndice] = useState(0);
   const [uploadProgress, setUploadProgress] = useState(0);
-  
+
   const sedes = Sedes;
   const defaultSede = sedes.find(sede => sede.cod_sede === 'T-NP');
   const initialSelectedSede = defaultSede || sedes[0];
@@ -38,17 +38,17 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   const [downloadProgressPDF, setDownloadProgressPDF] = useState(0);
   const isImageOrPDFOrExcel = (fileName) => {
     const ext = fileName.split('.').pop().toLowerCase();
-    return ext === 'jpg' || ext === 'jpeg' || ext === 'png' ||  ext === 'pdf' ;
+    return ext === 'jpg' || ext === 'jpeg' || ext === 'png' || ext === 'pdf';
   };
 
   const handleFolderUpload = (e) => {
     setUploadedFiles([]);
     setUploadStatus({});
     setFileOrder({});
-  
+
     // Filtrar el archivo desktop.ini
     let folders = Array.from(e.target.files).filter(file => file.name.toLowerCase() !== "desktop.ini");
-    
+
     setUparchFile(folders);
     const folderNames = folders.map((folder, index) => {
       const order = index + 1;
@@ -62,7 +62,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
       };
     });
     setUploadedFiles((prevFiles) => [...prevFiles, ...folderNames]);
-  
+
     folders.forEach((folder) => {
       if (!isImageOrPDFOrExcel(folder.name)) {
         setUploadStatus((prevStatus) => ({
@@ -75,11 +75,11 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
             ...prevStatus,
             [folder.name]: 'success',
           }));
-        }, Math.random() * 2000); 
+        }, Math.random() * 2000);
       }
     });
   };
-  
+
 
 
   const SubidaArchivos = async () => {
@@ -88,33 +88,22 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
     const index = await NewIndex(user, uploadedFiles.length, token);
     let uploadedCount = 0; // Contador de archivos procesados
-    
+
     for (const folder of uparchFile) {
       try {
-<<<<<<< HEAD
-=======
+        const fileBase64 = await toBase64(folder);
+        const base64WithoutHeader = fileBase64.split(',')[1];
+        const datos = {
+          nombre: folder.name,
+          sede: selectedSede.cod_sede,
+          base64: base64WithoutHeader,
+          nomenclatura: null,
+          indice: index.id
+        };
 
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
-          const fileBase64 = await toBase64(folder);
-          const base64WithoutHeader = fileBase64.split(',')[1];
-          const datos = {
-              nombre: folder.name,
-              sede: selectedSede.cod_sede,
-              base64: base64WithoutHeader,
-              nomenclatura: null,
-              indice: index.id
-          };
-
-          const response = await ArchivosMasivos(datos, user, token);
-          if (response.id) {
-            if (response.id === 1) {
-            } else {
-              setUploadStatus((prevStatus) => ({
-                ...prevStatus,
-                [folder.name]: 'error',
-              }));
-              failedUploads.push(folder.name);
-            }
+        const response = await ArchivosMasivos(datos, user, token);
+        if (response.id) {
+          if (response.id === 1) {
           } else {
             setUploadStatus((prevStatus) => ({
               ...prevStatus,
@@ -122,10 +111,17 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
             }));
             failedUploads.push(folder.name);
           }
-          
-      } catch (error) {
-          console.error(`Error uploading ${folder.name}:`, error);
+        } else {
+          setUploadStatus((prevStatus) => ({
+            ...prevStatus,
+            [folder.name]: 'error',
+          }));
           failedUploads.push(folder.name);
+        }
+
+      } catch (error) {
+        console.error(`Error uploading ${folder.name}:`, error);
+        failedUploads.push(folder.name);
       }
 
       // Actualizar el progreso
@@ -150,15 +146,15 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
           <div style="display: flex; flex-wrap: wrap; max-height: 300px; overflow-y: auto; text-align: left; padding: 10px;">
             <ul style="flex: 1 1 50%; padding-left: 20px; margin: 0;">
               ${failedUploads
-                .slice(0, Math.ceil(failedUploads.length / 2))
-                .map((file) => `<li style="font-size: 0.9em;">${file}</li>`)
-                .join('')}
+            .slice(0, Math.ceil(failedUploads.length / 2))
+            .map((file) => `<li style="font-size: 0.9em;">${file}</li>`)
+            .join('')}
             </ul>
             <ul style="flex: 1 1 50%; padding-left: 20px; margin: 0;">
               ${failedUploads
-                .slice(Math.ceil(failedUploads.length / 2))
-                .map((file) => `<li style="font-size: 0.9em;">${file}</li>`)
-                .join('')}
+            .slice(Math.ceil(failedUploads.length / 2))
+            .map((file) => `<li style="font-size: 0.9em;">${file}</li>`)
+            .join('')}
             </ul>
           </div>
         `,
@@ -210,7 +206,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
     // Iniciar simulación de descarga
     setIsDownloadingPDF(true);
     setDownloadProgressPDF(0);
-  
+
     // Simular descarga con un intervalo
     const interval = setInterval(() => {
       setDownloadProgressPDF((prev) => {
@@ -225,11 +221,11 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
       });
     }, 200); // cada 200ms aumenta un 10%
   };
-  
+
   const descargarPDF = (indice) => {
     const doc = new jsPDF();
     const imgUrl = "/img/logo-color.png";
-  
+
     const loadImageAsBase64 = (url) => {
       return new Promise((resolve, reject) => {
         const img = new Image();
@@ -247,92 +243,92 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
         img.onerror = (error) => reject(error);
       });
     };
-  
+
     loadImageAsBase64(imgUrl)
       .then((logoData) => {
         GetlistPDF(token, indice)
           .then((res) => {
-              const errores = res.filter((item) => item.id === 0); // Archivos con error
-              const subidos = res.filter((item) => item.id === 1); // Archivos correctos
-              console.log(res)
-              console.log("Subidos =",subidos)
-              console.log("Errores =",errores)
-    
-              doc.addImage(logoData, "PNG", 10, 10, 50, 15);
-    
-              let yPos = 30;
-              const fechaActual = new Date();
-              const fecha = fechaActual.toLocaleDateString();
-              const hora = fechaActual.toLocaleTimeString();
-    
-              // Título en negrita
-              doc.setFontSize(14);
-              doc.setFont("helvetica", "bold");
-              doc.text("Reporte de Datos Cargados", 10, yPos);
-              yPos += 10;
-    
-              doc.setFontSize(10);
-              const leftColX = 10;
-              const rightColX = 100;
-    
-              // ÍNDICE en negrita
-              doc.setFont("helvetica", "bold");
-              doc.text("Índice:", leftColX, yPos);
-              doc.setFont("helvetica", "normal");
-              doc.text(`${indice}`, leftColX + 20, yPos);
-    
-              // FECHA en negrita
-              doc.setFont("helvetica", "bold");
-              doc.text("Fecha:", rightColX, yPos);
-              doc.setFont("helvetica", "normal");
-              doc.text(`${fecha}`, rightColX + 15, yPos);
-              yPos += 10;
-    
-              // USUARIO en negrita
-              doc.setFont("helvetica", "bold");
-              doc.text("Usuario:", leftColX, yPos);
-              doc.setFont("helvetica", "normal");
-              doc.text(`${user}`, leftColX + 25, yPos);
-    
-              // HORA en negrita
-              doc.setFont("helvetica", "bold");
-              doc.text("Hora:", rightColX, yPos);
-              doc.setFont("helvetica", "normal");
-              doc.text(`${hora}`, rightColX + 12, yPos);
-              yPos += 10;
-    
-              // Cantidad Total de Archivos en negrita y color rojo
-              doc.setFont("helvetica", "bold");
-              doc.setTextColor(255,0,0);
-              doc.text(`Cantidad Total de Archivos: ${uparchFile.length}`, leftColX, yPos);
-              doc.setFont("helvetica", "normal");
-              doc.setTextColor(0,0,0);
-              yPos += 10;
-    
-              // Título de la tabla de errores en negrita
-              doc.setFontSize(12);
-              doc.setFont("helvetica", "bold");
-              doc.text("Archivos subidos con error:", leftColX, yPos);
-              doc.setFont("helvetica", "normal");
-              yPos += 5;
-    
-              const errorTable = errores.map((file, index) => [
-                index + 1,
-                file.mensaje || "Nombre no disponible",
-                "Error",
-              ]);
-              console.log(errorTable)
-              autoTable(doc, {
-                startY: yPos + 5,
-                head: [["#", "Nombre del Archivo", "Estado"]],
-                body: errorTable,
-                theme: "grid",
-                styles: { fontSize: 10, cellPadding: 2 },
-                headStyles: { fillColor: [255, 99, 132], textColor: 255 },
-              });
-  
+            const errores = res.filter((item) => item.id === 0); // Archivos con error
+            const subidos = res.filter((item) => item.id === 1); // Archivos correctos
+            console.log(res)
+            console.log("Subidos =", subidos)
+            console.log("Errores =", errores)
+
+            doc.addImage(logoData, "PNG", 10, 10, 50, 15);
+
+            let yPos = 30;
+            const fechaActual = new Date();
+            const fecha = fechaActual.toLocaleDateString();
+            const hora = fechaActual.toLocaleTimeString();
+
+            // Título en negrita
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.text("Reporte de Datos Cargados", 10, yPos);
+            yPos += 10;
+
+            doc.setFontSize(10);
+            const leftColX = 10;
+            const rightColX = 100;
+
+            // ÍNDICE en negrita
+            doc.setFont("helvetica", "bold");
+            doc.text("Índice:", leftColX, yPos);
+            doc.setFont("helvetica", "normal");
+            doc.text(`${indice}`, leftColX + 20, yPos);
+
+            // FECHA en negrita
+            doc.setFont("helvetica", "bold");
+            doc.text("Fecha:", rightColX, yPos);
+            doc.setFont("helvetica", "normal");
+            doc.text(`${fecha}`, rightColX + 15, yPos);
+            yPos += 10;
+
+            // USUARIO en negrita
+            doc.setFont("helvetica", "bold");
+            doc.text("Usuario:", leftColX, yPos);
+            doc.setFont("helvetica", "normal");
+            doc.text(`${user}`, leftColX + 25, yPos);
+
+            // HORA en negrita
+            doc.setFont("helvetica", "bold");
+            doc.text("Hora:", rightColX, yPos);
+            doc.setFont("helvetica", "normal");
+            doc.text(`${hora}`, rightColX + 12, yPos);
+            yPos += 10;
+
+            // Cantidad Total de Archivos en negrita y color rojo
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(255, 0, 0);
+            doc.text(`Cantidad Total de Archivos: ${uparchFile.length}`, leftColX, yPos);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(0, 0, 0);
+            yPos += 10;
+
+            // Título de la tabla de errores en negrita
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            doc.text("Archivos subidos con error:", leftColX, yPos);
+            doc.setFont("helvetica", "normal");
+            yPos += 5;
+
+            const errorTable = errores.map((file, index) => [
+              index + 1,
+              file.mensaje || "Nombre no disponible",
+              "Error",
+            ]);
+            console.log(errorTable)
+            autoTable(doc, {
+              startY: yPos + 5,
+              head: [["#", "Nombre del Archivo", "Estado"]],
+              body: errorTable,
+              theme: "grid",
+              styles: { fontSize: 10, cellPadding: 2 },
+              headStyles: { fillColor: [255, 99, 132], textColor: 255 },
+            });
+
             yPos = doc.lastAutoTable.finalY + 10;
-  
+
             // Texto debajo de tabla de errores
             doc.setFontSize(10);
             doc.setTextColor(100);
@@ -342,9 +338,9 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
               leftColX,
               yPos
             );
-  
+
             yPos += 15;
-  
+
             // Título de la tabla de archivos correctos en negrita
             doc.setFontSize(12);
             doc.setTextColor(0);
@@ -352,13 +348,13 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
             doc.text("Archivos Subidos Correctamente:", leftColX, yPos);
             doc.setFont("helvetica", "normal");
             yPos += 5;
-  
+
             const successTable = subidos.map((file, index) => [
               index + 1,
               file.mensaje || "Nombre no disponible",
               "Subido Correctamente",
             ]);
-  
+
             autoTable(doc, {
               startY: yPos + 5,
               head: [["#", "Nombre del Archivo", "Estado"]],
@@ -367,14 +363,14 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
               styles: { fontSize: 10, cellPadding: 2 },
               headStyles: { fillColor: [75, 192, 192], textColor: 255 },
             });
-  
+
             // Numeración de páginas
             const totalPages = doc.internal.getNumberOfPages();
             for (let i = 1; i <= totalPages; i++) {
               doc.setPage(i);
               doc.text(`Página ${i} de ${totalPages}`, 105, 290, { align: "center" });
             }
-  
+
             doc.save(`Reporte_${today}.pdf`);
             setIsDownloadingPDF(false); // Finalizar la simulación
           })
@@ -398,14 +394,14 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
         });
       });
   };
-  
-  
+
+
   console.log(indice)
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[800px] relative">
-        <FontAwesomeIcon icon={faTimes} className="absolute top-0 right-0 m-2.5  cursor-pointer text-white"  style={{fontSize:'14px'}} onClick={closeModal} />
+        <FontAwesomeIcon icon={faTimes} className="absolute top-0 right-0 m-2.5  cursor-pointer text-white" style={{ fontSize: '14px' }} onClick={closeModal} />
         <div className="p azuloscurobackground flex justify-between p-3.5">
           <h1 className="text-start font-bold color-azul text-white">Subir Carga Masiva de Datos</h1>
         </div>
@@ -432,7 +428,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
                 <h3 className="text-lg font-bold mb-2">
                   Archivos Cargados: {uploadedFiles.length}
                 </h3>
-                
+
                 <table className="table-auto w-full">
                   <thead>
                     <tr>
@@ -458,9 +454,9 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
                             </>
                           ) : (
                             <>
-                            <FontAwesomeIcon icon={faTimesCircle} className="text-red-500 mr-4" />
-                            <span>Archivo con error</span>
-                          </>
+                              <FontAwesomeIcon icon={faTimesCircle} className="text-red-500 mr-4" />
+                              <span>Archivo con error</span>
+                            </>
                           )}
                         </td>}
                       </tr>
@@ -483,8 +479,8 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
               >
                 Subir Archivos
               </button>
-              <p style={{padding:'10px'}}>*Cada archivo se subira cada 4 segundos al sistema</p>
-              
+              <p style={{ padding: '10px' }}>*Cada archivo se subira cada 4 segundos al sistema</p>
+
               {isUploading && (
                 <div className="flex items-center">
                   <Loading />
@@ -502,13 +498,13 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
 
               {/* Mostrar el GIF si la carga está completa */}
               {!isUploading && uploadProgress === 100 && (
-  <div className="flex flex-col items-center mt-4">
-    <img src="/gifs/party-popper-confetti.gif" alt="Carga Completa" style={{width: '100px', height: '100px'}}/>
-    <span className="mt-2 font-bold text-green-600">
-      ¡Archivos subidos, ya puedes descargar!
-    </span>
-  </div>
-)}
+                <div className="flex flex-col items-center mt-4">
+                  <img src="/gifs/party-popper-confetti.gif" alt="Carga Completa" style={{ width: '100px', height: '100px' }} />
+                  <span className="mt-2 font-bold text-green-600">
+                    ¡Archivos subidos, ya puedes descargar!
+                  </span>
+                </div>
+              )}
 
 
 
@@ -516,7 +512,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
                 <div className="flex flex-col items-center mt-4">
                   <button
                     className="px-4 py-2 rounded bg-red-500 text-white"
-                    onClick={() =>{generateErrorTablePDF(indice)}}
+                    onClick={() => { generateErrorTablePDF(indice) }}
                     disabled={isDownloadingPDF}
                   >
                     <FontAwesomeIcon icon={faDownload} className="mr-2" />

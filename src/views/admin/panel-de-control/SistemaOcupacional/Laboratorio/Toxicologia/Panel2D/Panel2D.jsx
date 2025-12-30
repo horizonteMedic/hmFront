@@ -61,11 +61,7 @@ export default function Panel2D() {
   } = useForm(initialFormState);
 
   const handleSave = () => {
-<<<<<<< HEAD
-    SubmitDataService(form, token, userlogued, handleClear);
-=======
     SubmitDataService(form, token, userlogued, handleClear, tabla);
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
   };
 
   const handleSearch = (e) => {

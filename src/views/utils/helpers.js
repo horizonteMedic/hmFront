@@ -91,11 +91,7 @@ export function getSign(data, name) { //HUELLA // FIRMAP // SELLOFIRMA
  * @param {boolean} compress - Si debe comprimir la imagen, default true
  * @returns {Promise<string>|string} - URL o Data URL comprimida
  */
-export async function getSignCompressed(data, name, compress = true) {
-    const url = getSign(data, name);
-    if (!url || !compress) return url;
-    return await compressImage(url);
-}
+
 export function getHoraActual() { //devuelve la hora con el formato correcto para guardar 09:05:08
     return new Date().toLocaleTimeString('es-PE', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }

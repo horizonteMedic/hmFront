@@ -32,27 +32,12 @@ const formatDateToLong = (dateString) => {
 const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
 
-<<<<<<< HEAD
-  CabeceraLogo(doc, { ...datos, tieneMembrete: false, yOffset: 3 });
-=======
   await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("Nro de ficha: ", pageW - 80, 8);
   doc.setFont("helvetica", "normal").setFontSize(18);
-<<<<<<< HEAD
-  doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 9);
-
-  // Sede
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 13);
-
-  // Fecha de examen
-  const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || datos.fechaLab || "");
-  doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 18);
-=======
   doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
 
   // Sede
@@ -62,20 +47,14 @@ const drawHeader = async (doc, datos = {}) => {
   // Fecha de examen
   const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || datos.fechaLab || "");
   doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   // Página
   doc.text("Pag. 01", pageW - 30, 3);
 
   // Bloque de color
   drawColorBox(doc, {
-<<<<<<< HEAD
-    color: datos.codigoColor || "#008f39",
-    text: datos.textoColor || "F",
-=======
     color: datos.codigoColor,
     text: datos.textoColor,
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
     x: pageW - 30,
     y: 3,
     size: 22,
@@ -223,21 +202,6 @@ export default async function Coproparasitologico_Digitalizado(datos = {}) {
   Promise.all([
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-<<<<<<< HEAD
-  ]).then(([s1, s2]) => {
-    // HEADER
-    drawHeader(doc, datosFinales);
-
-    // === TÍTULO ===
-    let y = 28;
-    doc.setFont("helvetica", "bold").setFontSize(14);
-    doc.text("COPROPARASITOLÓGICO", pageW / 2, y, { align: "center" });
-    y += 12; // Aumentado de 10 a 12 para más separación
-
-    // === DATOS DEL PACIENTE ===
-    const xLeft = margin * 2;
-    y = drawPatientData(doc, datosFinales, xLeft, y);
-=======
   ]).then(async ([s1, s2]) => {
     // HEADER
     await drawHeader(doc, datosFinales);
@@ -251,7 +215,6 @@ export default async function Coproparasitologico_Digitalizado(datos = {}) {
 
     let y = finalYPos + 10;
     const xLeft = margin * 2;
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
     // === RESULTADOS ===
     doc.setFont("helvetica", "bold").setFontSize(9);
@@ -357,11 +320,7 @@ export default async function Coproparasitologico_Digitalizado(datos = {}) {
     }
 
     // FOOTER
-<<<<<<< HEAD
-    footerTR(doc, { ...datosFinales, footerOffsetY: 16 });
-=======
     footerTR(doc, { ...datosFinales, footerOffsetY: 8 });
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
     // PRINT
     const blob = doc.output("blob");
