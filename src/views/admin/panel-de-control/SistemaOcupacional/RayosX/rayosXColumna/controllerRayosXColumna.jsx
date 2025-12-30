@@ -1,35 +1,67 @@
 import Swal from "sweetalert2";
-import { getFetch, SubmitData } from "../../../../../utils/apiHelpers";
+import {
+  GetInfoPacDefault,
+  GetInfoServicioDefault,
+  LoadingDefault,
+  PrintHojaRDefault,
+  SubmitDataServiceDefault,
+  VerifyTRDefault,
+} from "../../../../../utils/functionUtils";
+import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
   "/api/v01/ct/rayosX/obtenerReporteInformeRadiografico";
 const registrarUrl =
   "/api/v01/ct/rayosX/registrarActualizarInformeRadiografico";
 
-export const GetInfoServicio = (nro, tabla, set, token) => {
-  getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
-    .then((res) => {
-      if (res.norden) {
-        console.log(res);
-        set((prev) => ({
-          ...prev,
-          ...res,
-          norden: res.norden || "",
-          fechaExam: res.fechaExamen,
-          nombres: res.nombres || "",
-          dni: res.dni || "",
-          edad: res.edad || "",
-          tipoRadiografia: res.tipoRadio,
-          informe: res.informacionGeneral || "",
-          conclusion: res.conclusiones || "",
-        }));
-      } else {
-        Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
-      }
-    })
-    .finally(() => {
-      Swal.close();
-    });
+export const GetInfoServicio = async (
+  nro,
+  tabla,
+  set,
+  token,
+  onFinish = () => { }
+) => {
+  const res = await GetInfoServicioDefault(
+    nro,
+    tabla,
+    token,
+    obtenerReporteUrl,
+    onFinish
+  );
+
+  if (res) {
+    set((prev) => ({
+      ...prev,
+      norden: res.norden ?? "",
+      fechaExam: res.fechaExamen ?? "",
+
+      nombreExamen: res.tipoExamen ?? "",
+      dni: res.dni ?? "",
+
+      nombres: res.nombres ?? "",
+      fechaNacimiento: formatearFechaCorta(
+        res.fechaNacimientoPaciente ?? ""
+      ),
+      lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+      edad: res.edad ?? "",
+      sexo: res.sexo === "M" ? "MASCULINO" : "FEMENINO",
+      estadoCivil: res.estadoCivilPaciente ?? "",
+      nivelEstudios: res.gradoAcademico ?? "",
+
+      // Datos laborales
+      empresa: res.empresa ?? "",
+      contrata: res.contrata ?? "",
+      ocupacion: res.ocupacionPaciente ?? "",
+      cargoDesempenar: res.cargo ?? "",
+
+      // Rayos X
+      tipoRadiografia: res.tipoRadio ?? "",
+      informe: res.informacionGeneral ?? "",
+      conclusion: res.conclusiones ?? "",
+
+      user_medicoFirma: res.usuarioFirma,
+    }));
+  }
 };
 
 export const SubmitDataService = async (
@@ -41,144 +73,85 @@ export const SubmitDataService = async (
   datosFooter
 ) => {
   if (!form.norden) {
-    await Swal.fire("Error", "Datos Incompletos", "error");
+    await Swal.fire("Error", "Datos incompletos", "error");
     return;
   }
-  Loading("Registrando Datos");
+
   const body = {
     norden: form.norden,
+    fechaExamen: form.fechaExam,
     tipoRadio: form.tipoRadiografia,
     informacionGeneral: form.informe,
     conclusiones: form.conclusion,
-    fechaExamen: form.fechaExam,
     userRegistro: user,
+
+    usuarioFirma: form.user_medicoFirma,
   };
-  SubmitData(body, registrarUrl, token).then((res) => {
-    console.log(res);
-    if (res.id === 1 || res.id === 0) {
-      Swal.fire({
-        title: "Exito",
-        text: `${res.mensaje},\n¿Desea imprimir?`,
-        icon: "success",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-      }).then((result) => {
-        limpiar();
-        if (result.isConfirmed) {
-          PrintHojaR(form.norden, token, tabla, datosFooter);
-        }
-      });
-    } else {
-      Swal.fire("Error", "Ocurrio un error al Registrar", "error");
-    }
+
+  await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
+    PrintHojaR(form.norden, token, tabla, datosFooter);
   });
 };
-function convertirFecha(fecha) {
-  if (fecha === "") return "";
-  const [dia, mes, anio] = fecha.split("-");
-  return `${anio}/${mes.padStart(2, "0")}/${dia.padStart(2, "0")}`;
-}
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-  Loading("Cargando Formato a Imprimir");
+  const jasperModules = import.meta.glob(
+    "../../../../../jaspers/RayosX/*.jsx"
+  );
 
-  getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
-    .then(async (res) => {
-      if (res.norden) {
-        console.log(res);
-        const nombre = res.nameJasper;
-        console.log(nombre);
-        const jasperModules = import.meta.glob(
-          "../../../../../jaspers/RayosX/*.jsx"
-        );
-        const modulo = await jasperModules[
-          `../../../../../jaspers/RayosX/${nombre}.jsx`
-        ]();
-        // Ejecuta la función exportada por default con los datos
-        if (typeof modulo.default === "function") {
-          modulo.default({ ...res, ...datosFooter });
-        } else {
-          console.error(
-            `El archivo ${nombre}.jsx no exporta una función por defecto`
-          );
-        }
-      }
-    })
-    .finally(() => {
-      Swal.close();
-    });
-};
-
-//===============Fin Zona Modificación===============
-export const Loading = (text) => {
-  Swal.fire({
-    title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,
-    html: `<div style=\"font-size:1.1em;\"><span style='color:#0d9488;font-weight:bold;'></span></div><div class='mt-2'>Espere por favor...</div>`,
-    icon: "info",
-    background: "#f0f6ff",
-    color: "#22223b",
-    showConfirmButton: false,
-    allowOutsideClick: false,
-    allowEscapeKey: false,
-    showCancelButton: true,
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Yes, delete it!",
-    customClass: {
-      popup: "swal2-border-radius",
-      title: "swal2-title-custom",
-      htmlContainer: "swal2-html-custom",
-    },
-    showClass: {
-      popup: "animate__animated animate__fadeInDown",
-    },
-    hideClass: {
-      popup: "animate__animated animate__fadeOutUp",
-    },
-    didOpen: () => {
-      Swal.showLoading();
-    },
-  });
+  PrintHojaRDefault(
+    nro,
+    token,
+    tabla,
+    datosFooter,
+    obtenerReporteUrl,
+    jasperModules,
+    "../../../../../jaspers/RayosX"
+  );
 };
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
-  if (!nro) {
-    await Swal.fire(
-      "Error",
-      "Debe Introducir un Nro de Historia Clinica válido",
-      "error"
-    );
-    return;
-  }
-  Loading("Validando datos");
-  getFetch(
-    `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
-    token
-  ).then((res) => {
-    console.log(res);
-    if (res.id === 0) {
-      //No tiene registro previo
+  VerifyTRDefault(
+    nro,
+    tabla,
+    token,
+    set,
+    sede,
+    () => {
+      // NO tiene registro
       GetInfoPac(nro, set, token, sede);
-    } else {
-      GetInfoServicio(nro, tabla, set, token);
+    },
+    () => {
+      // SÍ tiene registro
+      GetInfoServicio(nro, tabla, set, token, () => {
+        Swal.fire(
+          "Alerta",
+          "Este paciente ya cuenta con un informe radiográfico.",
+          "warning"
+        );
+      });
     }
-  });
+  );
 };
 
-export const GetInfoPac = (nro, set, token, sede) => {
-  getFetch(
-    `/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`,
-    token
-  )
-    .then((res) => {
-      console.log("pros", res);
-      set((prev) => ({
-        ...prev,
-        ...res,
-        nombres: res.nombresApellidos,
-      }));
-    })
-    .finally(() => {
-      Swal.close();
-    });
+const GetInfoPac = async (nro, set, token, sede) => {
+  const res = await GetInfoPacDefault(nro, token, sede);
+
+  if (res) {
+    set((prev) => ({
+      ...prev,
+      ...res,
+      nombres: res.nombresApellidos ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+      edad: res.edad ?? "",
+      ocupacion: res.areaO ?? "",
+      nombreExamen: res.nomExam ?? "",
+      cargoDesempenar: res.cargo ?? "",
+      lugarNacimiento: res.lugarNacimiento ?? "",
+      sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
+    }));
+  }
+};
+
+export const Loading = (mensaje) => {
+  LoadingDefault(mensaje);
 };
