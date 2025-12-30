@@ -29,12 +29,25 @@ export default function EKG() {
   const initialFormState = {
     norden: "",
     codigoElectroCardiograma: null,
-    nombre: "",
-    edad: "",
-    fechaNac: "",
     fechaExam: today,
-    contrata: "",
+
+    nombreExamen: "",
+
+    dni: "",
+    nombres: "",
+    apellidos: "",
+    fechaNacimiento: "",
+    lugarNacimiento: "",
+    edad: "",
+    sexo: "",
+    estadoCivil: "",
+    nivelEstudios: "",
+
+    // Datos Laborales
     empresa: "",
+    contrata: "",
+    ocupacion: "",
+    cargoDesempenar: "",
 
     informeCompleto: false,
     ritmo: "SINUSAL",
@@ -270,7 +283,7 @@ export default function EKG() {
             labelWidth="120px"
           />
         </SectionFieldset>
-        
+
         <SectionFieldset
           legend="Parámetros Electrocardiográficos"
           className="grid grid-cols-1 xl:grid-cols-3 gap-x-4 gap-y-3"
