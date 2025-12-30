@@ -135,14 +135,35 @@ export default function HematologiaBioquimicaECO() {
     });
   };
 
+  // const GetTable = (nro) => {
+  //   getFetch(
+  //     `/api/v01/ct/laboratorio/listadoGrupoFactorSanguineo?nOrden=${nro}`,
+  //     token
+  //   ).then((res) => {
+  //     setForm(prev => ({ ...prev, dataTabla: res || [] }));
+  //   });
+  // };
   const GetTable = (nro) => {
     getFetch(
       `/api/v01/ct/laboratorio/listadoGrupoFactorSanguineo?nOrden=${nro}`,
       token
-    ).then((res) => {
-      setForm(prev => ({ ...prev, dataTabla: res || [] }));
-    });
+    )
+      .then((res) => {
+        setForm(prev => ({
+          ...prev,
+          dataTabla: Array.isArray(res) ? res : []
+        }));
+      })
+      .catch((err) => {
+        // Si es 404, tabla vacía
+        if (err?.status === 404) {
+          setForm(prev => ({ ...prev, dataTabla: [] }));
+        } else {
+          console.error(err);
+        }
+      });
   };
+
 
   useEffect(() => {
     if (!form.nombres || !form.norden) return;
