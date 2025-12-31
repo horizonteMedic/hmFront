@@ -128,7 +128,7 @@ export default function RayosXToraxPA() {
   }, []);
 
   return (
-    <div className="px-4 max-w-[90%] mx-auto grid xl:grid-cols-2 gap-6">
+    <div className="px-4 max-w-[95%] mx-auto grid xl:grid-cols-2 gap-6">
       {/* Columna izquierda: Formulario */}
       <div className="space-y-3">
         <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-3 gap-x-4 gap-y-3">
@@ -147,7 +147,7 @@ export default function RayosXToraxPA() {
             onChange={handleChangeSimple}
           />
           <InputTextOneLine
-            label="Nombre del Examen"
+            label="Tipo Examen"
             name="nombreExamen"
             value={form.nombreExamen}
             disabled
