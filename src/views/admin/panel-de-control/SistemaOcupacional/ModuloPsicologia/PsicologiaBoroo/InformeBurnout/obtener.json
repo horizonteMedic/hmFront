@@ -1,0 +1,40 @@
+{
+  "dniPaciente": 0,
+  "nombresPaciente": "string",
+  "apellidosPaciente": "string",
+  "direccionPaciente": "string",
+  "sexoPaciente": "string",
+  "fechaNacimientoPaciente": "2025-12-24",
+  "ocupacionPaciente": "string",
+  "lugarNacimientoPaciente": "string",
+  "nivelEstudioPaciente": "string",
+  "estadoCivilPaciente": "string",
+  "cargoPaciente": "string",
+  "areaPaciente": "string",
+  "contrata": "string",
+  "norden": 0,
+  "empresa": "string",
+  "nombreExamen": "string",
+  "codigoClinica": "string",
+  "edadPaciente": "string",
+  "fecha": "2025-12-24",
+  "sindromeBurnout": "string",
+  "agotamientoEmocional": "string",
+  "despersonalizacion": "string",
+  "realizacionPersonal": "string",
+  "resultados": "string",
+  "conclusiones": "string",
+  "recomendaciones": "string",
+  "nombreSede": "string",
+  "sede": "string",
+  "color": 0,
+  "nameJasper": "string",
+  "textoColor": "string",
+  "codigoColor": "string",
+  "digitalizacion": [
+    {
+      "nombreDigitalizacion": "string",
+      "url": "string"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
-import {URLAzure} from '../../../../config/config'
+import { URLAzure } from '../../../../config/config'
 //Esto es para ver los archivos ya subidos del paciente
-export function GetMatrizAdmin(datos,token) {
+export function GetMatrizAdmin(datos, token) {
 
     const data = {
         rucContrata: datos.rucContrata,
@@ -11,7 +11,7 @@ export function GetMatrizAdmin(datos,token) {
     }
 
     const options = {
-        method: 'POST', 
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
@@ -19,12 +19,12 @@ export function GetMatrizAdmin(datos,token) {
         body: JSON.stringify(data)
     }
 
-    return fetch(`${URLAzure}/api/v01/st/registros/matrizAdministrativa`,options)
-    .then(res => res.json()).then(response => response)
+    return fetch(`${URLAzure}/api/v01/st/registros/matrizAdministrativa`, options)
+        .then(res => res.json()).then(response => response)
 }
 
-export function GetMatrizDoctor(datos,token) {
- 
+export function GetMatrizDoctor(datos, token) {
+
     const data = {
         rucContrata: datos.rucContrata,
         rucEmpresa: datos.rucEmpresa,
@@ -33,7 +33,7 @@ export function GetMatrizDoctor(datos,token) {
         sede: datos.sede
     }
     const options = {
-        method: 'POST', 
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
@@ -41,25 +41,25 @@ export function GetMatrizDoctor(datos,token) {
         body: JSON.stringify(data)
     }
 
-    return fetch(`${URLAzure}/api/v01/st/registros/matrizSalud`,options)
-    .then(res => res.json()).then(response => response)
+    return fetch(`${URLAzure}/api/v01/st/registros/matrizSalud`, options)
+        .then(res => res.json()).then(response => response)
 }
 
 export function GetMatrizArchivos(token) {
 
     const options = {
-        method: 'GET', 
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
     }
 
-    return fetch(`${URLAzure}/api/v01/ct/archivos`,options)
-    .then(res => res.json()).then(response => response)
+    return fetch(`${URLAzure}/api/v01/ct/archivos`, options)
+        .then(res => res.json()).then(response => response)
 }
 
-export function GetMatrizADMOHLA(datos,token) {
+export function GetMatrizADMOHLA(datos, token) {
 
     const data = {
         rucContrata: datos.rucContrata,
@@ -69,7 +69,7 @@ export function GetMatrizADMOHLA(datos,token) {
         sede: datos.sede
     }
     const options = {
-        method: 'POST', 
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
@@ -77,15 +77,15 @@ export function GetMatrizADMOHLA(datos,token) {
         body: JSON.stringify(data)
     }
 
-    return fetch(`${URLAzure}/api/v01/st/registros/matrizAdministrativaOhla`,options)
-    .then(res => res.json()).then(response => response)
+    return fetch(`${URLAzure}/api/v01/st/registros/matrizAdministrativaOhla`, options)
+        .then(res => res.json()).then(response => response)
 
-    
+
 }
 
-export function GetMatrizSALUDOHLA(datos,token) {
+export function GetMatrizSALUDOHLA(datos, token) {
 
-   
+
     const data = {
         rucContrata: datos.rucContrata,
         rucEmpresa: datos.rucEmpresa,
@@ -94,7 +94,7 @@ export function GetMatrizSALUDOHLA(datos,token) {
         sede: datos.sede
     }
     const options = {
-        method: 'POST', 
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
@@ -102,13 +102,13 @@ export function GetMatrizSALUDOHLA(datos,token) {
         body: JSON.stringify(data)
     }
 
-    return fetch(`${URLAzure}/api/v01/st/registros/matrizSaludOhla`,options)
-    .then(res => res.json()).then(response => response)
+    return fetch(`${URLAzure}/api/v01/st/registros/matrizSaludOhla`, options)
+        .then(res => res.json()).then(response => response)
 }
 
-export function GetMatrizGeneral(datos,token) {
+export function GetMatrizGeneral(datos, token) {
 
-   
+
     const data = {
         rucContrata: datos.rucContrata,
         rucEmpresa: datos.rucEmpresa,
@@ -117,7 +117,7 @@ export function GetMatrizGeneral(datos,token) {
         sede: datos.sede
     }
     const options = {
-        method: 'POST', 
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
@@ -125,6 +125,31 @@ export function GetMatrizGeneral(datos,token) {
         body: JSON.stringify(data)
     }
 
-    return fetch(`${URLAzure}/api/v01/st/registros/matrizGeneral`,options)
-    .then(res => res.json()).then(response => response)
+    return fetch(`${URLAzure}/api/v01/st/registros/matrizGeneral`, options)
+        .then(res => res.json()).then(response => response)
+}
+
+export function GetMatrizUniversal(datos, config, token) {
+    const { url, method } = config;
+
+    const options = {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
+    }
+
+    if (method === "POST") {
+        options.body = JSON.stringify({
+            rucContrata: datos.rucContrata,
+            rucEmpresa: datos.rucEmpresa,
+            fechaInicio: datos.fechaInicio,
+            fechaFinal: datos.fechaFinal,
+            sede: datos.sede
+        });
+    }
+
+    return fetch(`${URLAzure}/api/v01/${url}`, options)
+        .then(res => res.json()).then(response => response)
 }

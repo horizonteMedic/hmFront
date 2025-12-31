@@ -1,7 +1,8 @@
 import Swal from "sweetalert2";
 import { getFetch } from "../../../getFetch/getFetch";
 import { SubmitData } from "../model";
-
+import jsPDF from "jspdf";
+const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
 //===============Zona Modificación===============
 const obtenerReporteUrl =
   "/api/v01/ct/agudezaVisual/obtenerReporteOftalmologia";

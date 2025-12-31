@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 import CabeceraLogo from "../components/CabeceraLogo.jsx";
 import footerTR from "../components/footerTR.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
-import { getSign } from "../../utils/helpers.js";
+import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
 
 // --- Configuración Centralizada ---
 const config = {
@@ -11,7 +11,7 @@ const config = {
   col2X: 85,
   col3X: 140,
   fontSize: {
-    title: 14,
+    title: 13,
     subtitle: 12,
     header: 9,
     body: 9,
@@ -30,28 +30,28 @@ const toDDMMYYYY = (fecha) => {
 };
 
 // --- Componente Principal ---
-export default function pcualitativaantigeno(datos = {}) {
+export default async function pcualitativaantigeno(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
-  const drawHeader = () => {
-    CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-    
+  const drawHeader = async () => {
+    await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+
     // Número de Ficha
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Nro de ficha: ", pageW - 80, 15);
     doc.setFont("helvetica", "bold").setFontSize(18);
     doc.text(String(datos.norden || datos.numeroFicha || datos.numero || ""), pageW - 50, 16);
-    
+
     // Sede
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
-    
+
     // Fecha de examen
     const fechaExamen = toDDMMYYYY(datos.fecha_examen || datos.fechaExamen || datos.fecha || "");
     doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
-    
+
     // Página
     doc.text("Pag. 01", pageW - 30, 10);
 
@@ -178,21 +178,21 @@ export default function pcualitativaantigeno(datos = {}) {
     return yPos;
   };
 
-  drawHeader();
+  await drawHeader();
 
   // === TÍTULO ===
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
-  doc.text("COVID-19", pageW / 2, 38, { align: "center" });
+  doc.text("COVID-19", pageW / 2, 34, { align: "center" });
+
+  // Título principal debajo de COVID-19
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
+  doc.text("PRUEBA CUALITATIVA DE ANTIGENOS", pageW / 2, 38, { align: "center" });
 
   // === DATOS DEL PACIENTE ===
   const finalYPos = drawPatientData(doc, datos);
 
   // === CUERPO ===
   let y = finalYPos + 10;
-  // TÍTULO alineado a la izquierda
-  doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
-  doc.text("PRUEBA CUALITATIVA DE ANTIGENOS", config.margin, y);
-  y += config.lineHeight + 2;
 
   // MARCA debajo del título
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
@@ -201,28 +201,28 @@ export default function pcualitativaantigeno(datos = {}) {
 
   // 3) ENCABEZADOS DE TABLA
   doc.setFont(config.font, "bold")
-     .setFontSize(config.fontSize.header);
+    .setFontSize(config.fontSize.header);
   doc.text("PRUEBA", config.col1X, y);
   doc.text("RESULTADOS", config.col2X, y);
   doc.text("VALORES DE REFERENCIA", config.col3X, y);
   y += 3;
   doc.setLineWidth(0.4)
-     .line(config.margin, y, pageW - config.margin, y);
+    .line(config.margin, y, pageW - config.margin, y);
   y += config.lineHeight;
 
   // 4) FILA DE RESULTADO
   doc.setFont(config.font, "normal")
-     .setFontSize(config.fontSize.body)
-     .text("Antígenos virales SARS-CoV-2", config.col1X, y);
+    .setFontSize(config.fontSize.body)
+    .text("Antígenos virales SARS-CoV-2", config.col1X, y);
 
   const reactivo = datos.chkIgmReactivo === true;
   const textoResultado = reactivo ? "Reactivo" : "No reactivo";
   doc.text(textoResultado, config.col2X, y);
 
   const refLines = doc.splitTextToSize(
-      "Método: Inmunocromatografia \n" +
-      "Sensibilidad: 94.55% \n" +
-      "Especificidad: 100%",
+    "Método: Inmunocromatografia \n" +
+    "Sensibilidad: 94.55% \n" +
+    "Especificidad: 100%",
     pageW - config.col3X - config.margin
   );
   doc.text(refLines, config.col3X, y);
@@ -231,8 +231,8 @@ export default function pcualitativaantigeno(datos = {}) {
 
   // 5) COMENTARIOS
   doc.setFont(config.font, "bold")
-     .setFontSize(config.fontSize.body)
-     .text("COMENTARIOS:", config.margin, y);
+    .setFontSize(config.fontSize.body)
+    .text("COMENTARIOS:", config.margin, y);
   y += config.lineHeight;
 
   const textoCom = reactivo
@@ -243,13 +243,13 @@ export default function pcualitativaantigeno(datos = {}) {
     pageW - 2 * config.margin
   );
   doc.setFont(config.font, "normal")
-     .text(comLines, config.margin, y);
+    .text(comLines, config.margin, y);
   y += comLines.length * config.lineHeight + config.lineHeight;
 
   // 6) SINTOMATOLOGÍA
   doc.setFont(config.font, "bold")
-     .setFontSize(config.fontSize.body)
-     .text("SINTOMATOLOGIA", config.margin, y);
+    .setFontSize(config.fontSize.body)
+    .text("SINTOMATOLOGIA", config.margin, y);
   y += config.lineHeight;
 
   const obs = datos.txtObservaciones;
@@ -261,69 +261,29 @@ export default function pcualitativaantigeno(datos = {}) {
     pageW - 2 * config.margin
   );
   doc.setFont(config.font, "normal")
-     .text(sintLines, config.margin, y);
+    .text(sintLines, config.margin, y);
   y += sintLines.length * config.lineHeight + config.lineHeight * 2;
 
-  // Firma y huella digital (centrado, sin cuadros, solo imágenes y textos)
-  // Posicionar la firma más abajo, cerca del footer
+  // Firma y huella digital usando dibujarFirmas
   const firmaY = 210;
-  const centroX = pageW / 2;
-  
-  // Obtener URLs de firma y huella
-  const firmaUrl = getSign(datos, "FIRMAP");
-  const huellaUrl = getSign(datos, "HUELLA");
-  
-  // Agregar firma del paciente (izquierda del centro)
-  if (firmaUrl) {
-    try {
-      const imgWidth = 30;
-      const imgHeight = 20;
-      const x = centroX - 25; // A la izquierda del centro
-      doc.addImage(firmaUrl, 'PNG', x, firmaY, imgWidth, imgHeight);
-    } catch (error) {
-      console.log("Error cargando firma del paciente:", error);
-    }
-  }
-  
-  // Agregar huella del paciente (derecha de la firma)
-  if (huellaUrl) {
-    try {
-      const imgWidth = 12;
-      const imgHeight = 20;
-      const x = centroX + 5; // A la derecha de la firma
-      doc.addImage(huellaUrl, 'PNG', x, firmaY, imgWidth, imgHeight);
-    } catch (error) {
-      console.log("Error cargando huella del paciente:", error);
-    }
-  }
-  
-  // Línea de firma debajo de las imágenes
-  const lineY = firmaY + 22;
-  doc.setLineWidth(0.2);
-  doc.line(centroX - 30, lineY, centroX + 30, lineY);
-  
-  // Texto "Firma y Huella del Paciente" centrado
-  doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
-  doc.text("Firma y Huella del Paciente", centroX, lineY + 6, { align: "center" });
-  
-  // DNI debajo del texto
-  if (datos.dni) {
-    doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
-    doc.text("DNI:", centroX - 15, lineY + 12);
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
-    doc.text(String(datos.dni || ""), centroX - 8, lineY + 12);
-  }
 
-  // === FOOTER ===
-  footerTR(doc, datos);
+  // Usar helper para dibujar firmas
+  dibujarFirmas({ doc, datos, y: firmaY, pageW }).then(() => {
+    // === FOOTER ===
+    footerTR(doc, datos);
 
-  const blob = doc.output("blob");
-  const url = URL.createObjectURL(blob);
-  const iframe = document.createElement("iframe");
-  iframe.style.display = "none";
-  iframe.src = url;
-  document.body.appendChild(iframe);
-  iframe.onload = () => iframe.contentWindow.print();
+    // Mostrar PDF
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.src = url;
+    document.body.appendChild(iframe);
+    iframe.onload = () => iframe.contentWindow.print();
+  }).catch(err => {
+    console.error(err);
+    alert('Error generando PDF: ' + err);
+  });
 
-  
+
 }

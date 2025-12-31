@@ -2,21 +2,22 @@ import jsPDF from "jspdf";
 import drawColorBox from '../../components/ColorBox.jsx';
 import { formatearFechaCorta } from "../../../utils/formatDateUtils.js";
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
-import { getSign, convertirGenero } from "../../../utils/helpers.js";
+import { convertirGenero } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
+import { dibujarFirmas } from '../../../utils/dibujarFirmas.js';
 
-export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
+export default async function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   // Contador de páginas dinámico
   let numeroPagina = 1;
 
-  // Normalizador único de datos de entrada
   function buildDatosFinales(raw) {
-    const datosReales = {
+    return {
+      // Datos personales
       apellidosNombres: String((((raw?.apellidosPaciente ?? '') + ' ' + (raw?.nombresPaciente ?? '')).trim())),
-      fechaExamen: formatearFechaCorta(raw?.fechaEntrevista ?? ''), 
-      tipoExamen: String(raw?.nombreExamen ?? ''),
+      fechaExamen: formatearFechaCorta(raw?.fecha ?? raw?.fechaExamen ?? raw?.fechaEntrevista ?? ''),
+      tipoExamen: String(raw?.nombreExamen ?? raw?.tipoExamen ?? ''),
       sexo: convertirGenero(raw?.sexoPaciente ?? ''),
       documentoIdentidad: String(raw?.dniPaciente ?? ''),
       edad: String(raw?.edadPaciente ?? ''),
@@ -31,49 +32,21 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
       color: Number(raw?.color ?? 0),
       codigoColor: String(raw?.codigoColor ?? ''),
       textoColor: String(raw?.textoColor ?? ''),
-      apto: (typeof raw?.aprobo === 'boolean') ? raw.aprobo : false,
-      // Análisis y resultados
-      analisisResultados: String(raw?.analisisResultados ?? raw?.analisis ?? ''),
-      // Recomendaciones
-      recomendaciones: String(raw?.recomendaciones ?? raw?.recomendacion ?? ''),
-      // Conclusiones
+      
+      // Resultados y conclusiones
+      apto: (typeof raw?.apto === 'boolean') ? raw.apto : false,
+      analisisResultados: String(raw?.analisis ?? raw?.analisisResultados ?? ''),
+      recomendaciones: String(raw?.recomendacion ?? raw?.recomendaciones ?? ''),
       conclusiones: String(raw?.conclusiones ?? '')
     };
-
-    const datosPrueba = {
-      apellidosNombres: 'GARCÍA LÓPEZ, MARÍA ELENA',
-      fechaExamen: '25/11/2025',
-      tipoExamen: 'PRE-OCUPACIONAL',
-      sexo: 'Femenino',
-      documentoIdentidad: '87654321',
-      edad: '32',
-      fechaNacimiento: '15/06/1993',
-      domicilio: 'Av. Industrial 456 - Lima',
-      areaTrabajo: 'Operaciones Mineras',
-      puestoTrabajo: 'Supervisora de Espacios Confinados',
-      empresa: 'MINERA CONFINADA S.A.C.',
-      contrata: 'SERVICIOS ESPECIALIZADOS E.I.R.L.',
-      sede: 'Lima - San Isidro',
-      numeroFicha: '000123',
-      color: 1,
-      codigoColor: '#4CAF50',
-      textoColor: 'A',
-      apto: true,
-      analisisResultados: 'Análisis de resultados de prueba',
-      recomendaciones: 'Recomendaciones de prueba',
-      conclusiones: ''
-    };
-
-    const selected = (raw && (raw.norden)) ? datosReales : datosPrueba;
-    return selected;
   }
 
   const datosFinales = buildDatosFinales(data);
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
 
     // Títulos
     doc.setFont("helvetica", "bold").setFontSize(12);
@@ -141,11 +114,11 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
     const palabras = texto.split(' ');
     let lineaActual = '';
     let lineas = 1;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -157,7 +130,7 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
         }
       }
     });
-    
+
     // Altura mínima de 15mm, altura por línea de 3mm
     const alturaCalculada = lineas * 3 + 2;
     return Math.max(alturaCalculada, 20);
@@ -190,7 +163,7 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   };
 
   // === PÁGINA 1 ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === SECCIÓN 1: DATOS DE FILIACIÓN ===
   const tablaInicioX = 5;
@@ -230,22 +203,28 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Cuarta fila: Área de Trabajo, Puesto de Trabajo (2 columnas)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Quinta fila: Empresa (fila completa)
+  // Cuarta fila: Área de Trabajo (fila completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Sexta fila: Contratista (fila completa)
+  // Quinta fila: Puesto de Trabajo (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Sexta fila: Empresa (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Séptima fila: Contratista (fila completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
@@ -297,26 +276,28 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   dibujarTextoConSaltoLinea(datosFinales.domicilio, tablaInicioX + 25, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
-  // Cuarta fila: Área de Trabajo, Puesto de Trabajo
+  // Cuarta fila: Área de Trabajo
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Área de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo, tablaInicioX + 30, yTexto + 1.5, 50);
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Puesto de Trabajo:", tablaInicioX + 92, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo, tablaInicioX + 122, yTexto + 1.5, 65);
+  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo, tablaInicioX + 30, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
-  // Quinta fila: Empresa
+  // Quinta fila: Puesto de Trabajo
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo, tablaInicioX + 35, yTexto + 1.5, tablaAncho - 35);
+  yTexto += filaAltura;
+
+  // Sexta fila: Empresa
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 25, yTexto + 1.5, tablaAncho - 25);
   yTexto += filaAltura;
 
-  // Sexta fila: Contratista
+  // Séptima fila: Contratista
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Contratista:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
@@ -333,7 +314,7 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   // Fila con 5 divisiones: Aspecto Intelectual (más ancho) | I | NPI | NP | NPS | S
   const anchoAspectoIntelectual = 80; // Columna más ancha para el aspecto
   const anchoColumnaEvaluacion = (tablaAncho - anchoAspectoIntelectual) / 5; // Las 5 columnas de evaluación
-  
+
   const posicionesColumnas = [
     tablaInicioX, // Aspecto Intelectual
     tablaInicioX + anchoAspectoIntelectual, // I
@@ -357,15 +338,25 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   // Contenido de los headers
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Aspecto Intelectual", tablaInicioX + 2, yTexto + 3.5);
-  doc.text("I", posicionesColumnas[1] + anchoColumnaEvaluacion/2, yTexto + 3.5, { align: "center" });
-  doc.text("NPI", posicionesColumnas[2] + anchoColumnaEvaluacion/2, yTexto + 3.5, { align: "center" });
-  doc.text("NP", posicionesColumnas[3] + anchoColumnaEvaluacion/2, yTexto + 3.5, { align: "center" });
-  doc.text("NPS", posicionesColumnas[4] + anchoColumnaEvaluacion/2, yTexto + 3.5, { align: "center" });
-  doc.text("S", posicionesColumnas[5] + anchoColumnaEvaluacion/2, yTexto + 3.5, { align: "center" });
+  doc.text("I", posicionesColumnas[1] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
+  doc.text("NPI", posicionesColumnas[2] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
+  doc.text("NP", posicionesColumnas[3] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
+  doc.text("NPS", posicionesColumnas[4] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
+  doc.text("S", posicionesColumnas[5] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
   yTexto += filaAltura;
 
   // Función para obtener evaluación desde data
   const getEvaluacion = (prefix) => {
+    // Manejar caso especial de "atencion" que puede venir como "atencio" (sin 'n')
+    if (prefix === "atencion") {
+      if (data[`atencionI`]) return "I";
+      if (data[`atencioNPI`] || data[`atencionNPI`]) return "NPI"; // Manejar ambos casos
+      if (data[`atencionNP`]) return "NP";
+      if (data[`atencionNPS`]) return "NPS";
+      if (data[`atencionS`]) return "S";
+      return "";
+    }
+    // Para otros prefijos
     if (data[`${prefix}I`]) return "I";
     if (data[`${prefix}NPI`]) return "NPI";
     if (data[`${prefix}NP`]) return "NP";
@@ -374,13 +365,13 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
     return "";
   };
 
-  // Datos de aspectos psicológicos desde data
+  // Datos de aspectos psicológicos desde data (solo 5)
   const aspectosPsicologicos = [
-    { numero: 1, aspecto: "Razonamiento", evaluacion: getEvaluacion("razonamiento") },
+    { numero: 1, aspecto: "Razonamiento y Resolucion de problemas", evaluacion: getEvaluacion("razonamiento") },
     { numero: 2, aspecto: "Memoria", evaluacion: getEvaluacion("memoria") },
-    { numero: 3, aspecto: "Atención", evaluacion: getEvaluacion("atencion") },
-    { numero: 4, aspecto: "Orientación Espacial", evaluacion: getEvaluacion("orientacionEspacial") },
-    { numero: 5, aspecto: "Viso Motora", evaluacion: getEvaluacion("visoMotora") }
+    { numero: 3, aspecto: "Atencion y Concentración", evaluacion: getEvaluacion("atencion") },
+    { numero: 4, aspecto: "Coordinación viso-motora", evaluacion: getEvaluacion("visoMotora") },
+    { numero: 5, aspecto: "Orientación Espacial", evaluacion: getEvaluacion("orientacionEspacial") }
   ];
 
   // Dibujar filas de datos
@@ -397,30 +388,30 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
 
     // Contenido de la fila
     doc.setFont("helvetica", "normal").setFontSize(8);
-    
+
     // Número
     doc.text(aspecto.numero.toString(), tablaInicioX + 2, yTexto + 3.5);
-    
+
     // Aspecto psicológico
     doc.text(aspecto.aspecto, tablaInicioX + 12, yTexto + 3.5);
-    
+
     // Marcar la evaluación correspondiente con X
     const evaluaciones = ["I", "NPI", "NP", "NPS", "S"];
     evaluaciones.forEach((evaluacion, evalIndex) => {
       if (aspecto.evaluacion === evaluacion) {
         doc.setFont("helvetica", "bold").setFontSize(10);
-        doc.text("X", posicionesColumnas[evalIndex + 1] + anchoColumnaEvaluacion/2, yTexto + 3.5, { align: "center" });
+        doc.text("X", posicionesColumnas[evalIndex + 1] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
         doc.setFont("helvetica", "normal").setFontSize(8);
       }
     });
-    
+
     yTexto += filaAltura;
   });
 
   // === SECCIÓN 3: ASPECTOS PERSONALIDAD ===
   // Espacio antes de la nueva sección
   yTexto += 3;
-  
+
   // Título de la sección
   doc.setFont("helvetica", "bold").setFontSize(10);
   doc.setTextColor(0, 0, 0);
@@ -468,12 +459,12 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
 
   // Ancho fijo para todas las columnas de X (igual para todas las filas)
   const anchoColumnaX_Fijo = 5; // Ancho fijo y consistente para todas las celdas de X
-  
+
   // Dibujar cada fila de aspecto de personalidad
   aspectosPersonalidad.forEach((aspecto, index) => {
     const anchoColumnaAspecto = 50; // Ancho para el nombre del aspecto
     const numOpciones = aspecto.opciones.length;
-    
+
     // Anchos personalizados para la tercera fila (Ansiedad a espacios confinados)
     const anchosPersonalizadosFila3 = [
       { texto: 20 },  // "Nada"
@@ -481,13 +472,13 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
       { texto: 40 },  // "Moderadamente ansioso"
       { texto: 40 }   // "Elevadamente ansioso"
     ];
-    
+
     // Calcular posiciones de las columnas
     const posicionesCols = [tablaInicioX]; // Inicio (columna del aspecto)
     posicionesCols.push(tablaInicioX + anchoColumnaAspecto); // División después del aspecto
-    
+
     let posicionActual = tablaInicioX + anchoColumnaAspecto;
-    
+
     if (index === 2) {
       // Tercera fila: usar anchos personalizados para texto, pero X fijo
       anchosPersonalizadosFila3.forEach((ancho) => {
@@ -500,7 +491,7 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
       // Otras filas: usar cálculo uniforme
       const anchoRestante = tablaAncho - anchoColumnaAspecto - (numOpciones * anchoColumnaX_Fijo);
       const anchoColumnaOpcion = anchoRestante / numOpciones; // Ancho para cada opción (distribución uniforme)
-      
+
       for (let i = 0; i < numOpciones; i++) {
         posicionActual += anchoColumnaOpcion;
         posicionesCols.push(posicionActual); // Fin de columna de texto
@@ -522,16 +513,16 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
 
     // Contenido de la fila
     doc.setFont("helvetica", "normal").setFontSize(8);
-    
+
     // Nombre del aspecto (alineado a la izquierda como en CRITERIOS PSICOLÓGICOS)
     doc.text(aspecto.aspecto, tablaInicioX + 2, yTexto + 3.5);
-    
+
     // Opciones: texto en una columna, X en la siguiente si está seleccionada
     let posicionOpcion = tablaInicioX + anchoColumnaAspecto;
-    
+
     aspecto.opciones.forEach((opcion, opcIndex) => {
       let anchoTextoOpcion;
-      
+
       if (index === 2) {
         // Tercera fila: usar anchos personalizados para texto
         anchoTextoOpcion = anchosPersonalizadosFila3[opcIndex].texto;
@@ -540,25 +531,25 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
         const anchoRestante = tablaAncho - anchoColumnaAspecto - (numOpciones * anchoColumnaX_Fijo);
         anchoTextoOpcion = anchoRestante / numOpciones;
       }
-      
+
       const inicioOpcion = posicionOpcion;
       const centroColumnaX = inicioOpcion + anchoTextoOpcion + (anchoColumnaX_Fijo / 2);
-      
+
       // Mostrar el texto de la opción alineado a la izquierda (como en CRITERIOS PSICOLÓGICOS)
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text(opcion, inicioOpcion + 2, yTexto + 3.5);
-      
+
       // Marcar con X si está seleccionada (centrada en su columna)
       if (aspecto.seleccionado === opcion) {
         doc.setFont("helvetica", "bold").setFontSize(10);
         doc.text("X", centroColumnaX, yTexto + 3.5, { align: "center" });
         doc.setFont("helvetica", "normal").setFontSize(8);
       }
-      
+
       // Actualizar posición para la siguiente opción
       posicionOpcion += anchoTextoOpcion + anchoColumnaX_Fijo;
     });
-    
+
     yTexto += filaAltura;
   });
 
@@ -567,7 +558,7 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
 
   // Fila de Análisis y Resultados (creciente)
   const alturaAnalisis = calcularAlturaTexto(datosFinales.analisisResultados, tablaAncho - 4);
-  
+
   doc.line(tablaInicioX, yTexto, tablaInicioX, yTexto + alturaAnalisis);
   doc.line(tablaInicioX + tablaAncho, yTexto, tablaInicioX + tablaAncho, yTexto + alturaAnalisis);
   doc.line(tablaInicioX, yTexto, tablaInicioX + tablaAncho, yTexto);
@@ -582,7 +573,7 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
 
   // Fila de Recomendaciones (creciente)
   const alturaRecomendaciones = calcularAlturaTexto(datosFinales.recomendaciones, tablaAncho - 4);
-  
+
   doc.line(tablaInicioX, yTexto, tablaInicioX, yTexto + alturaRecomendaciones);
   doc.line(tablaInicioX + tablaAncho, yTexto, tablaInicioX + tablaAncho, yTexto + alturaRecomendaciones);
   doc.line(tablaInicioX, yTexto, tablaInicioX + tablaAncho, yTexto);
@@ -623,22 +614,22 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
 
   // Contenido de la fila
   doc.setFont("helvetica", "normal").setFontSize(8);
-  
+
   // APTO
   const centroApto = tablaInicioX + (anchoColumnaApto / 2);
   doc.text("APTO", centroApto, yTexto + 3.5, { align: "center" });
-  
+
   // X para APTO
   const centroColumnaXApto = tablaInicioX + anchoColumnaApto + (anchoColumnaX / 2);
-  
+
   // NO APTO
   const inicioNoApto = tablaInicioX + anchoColumnaApto + anchoColumnaX;
   const centroNoApto = inicioNoApto + (anchoColumnaApto / 2);
   doc.text("NO APTO", centroNoApto, yTexto + 3.5, { align: "center" });
-  
+
   // X para NO APTO
   const centroColumnaXNoApto = inicioNoApto + anchoColumnaApto + (anchoColumnaX / 2);
-  
+
   // Marcar X según si está apto o no apto
   if (datosFinales.apto) {
     doc.setFont("helvetica", "bold").setFontSize(10);
@@ -647,11 +638,11 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text("X", centroColumnaXNoApto, yTexto + 3.5, { align: "center" });
   }
-  
+
   yTexto += filaAltura;
 
   // === SECCIÓN DE FIRMAS ===
-  const yFirmas = yTexto; // Sin separación después de la última sección
+  const yFirmas = yTexto;
   const alturaSeccionFirmas = 30; // Altura para la sección de firmas
 
   // Dibujar las líneas de la sección de firmas (1 columna completa)
@@ -660,29 +651,8 @@ export default function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   doc.line(tablaInicioX, yFirmas, tablaInicioX + tablaAncho, yFirmas); // Línea superior
   doc.line(tablaInicioX, yFirmas + alturaSeccionFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea inferior
 
-  // === FIRMA DEL MÉDICO ===
-  const centroColumna = tablaInicioX + (tablaAncho / 2);
-  const firmaMedicoY = yFirmas + 3;
-  
-  // Agregar firma y sello médico
-  let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
-  if (firmaMedicoUrl) {
-    try {
-      const imgWidth = 45;
-      const imgHeight = 20;
-      // Centrar la imagen: centro de la columna menos la mitad del ancho de la imagen
-      const firmaMedicoX = centroColumna - (imgWidth / 2);
-      const x = firmaMedicoX;
-      const y = firmaMedicoY;
-      doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
-    } catch (error) {
-      console.log("Error cargando firma del médico:", error);
-    }
-  }
-
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Sello y Firma del Médico", centroColumna, yFirmas + 26, { align: "center" });
-  doc.text("Responsable de la Evaluación", centroColumna, yFirmas + 28.5, { align: "center" });
+  // Usar helper para dibujar firmas dentro de la fila
+  await dibujarFirmas({ doc, datos: data, y: yFirmas + 2, pageW });
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 5 });

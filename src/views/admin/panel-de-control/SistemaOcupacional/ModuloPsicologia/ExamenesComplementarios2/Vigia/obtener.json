@@ -1,0 +1,35 @@
+{
+  "codPa": 0,
+  "nombreCompleto": "string",
+  "fechaNacimiento": "2025-12-27",
+  "nivelEstudio": "string",
+  "edad": "string",
+  "empresa": "string",
+  "cargo": "string",
+  "fechaApertura": "2025-12-27",
+  "temorRiesgoElectrico": "string",
+  "temorTareasAltura": "string",
+  "temorEspaciosConfinados": "string",
+  "manejoHerramientas": "string",
+  "fodaForOpor": "string",
+  "fodaAmenDebi": "string",
+  "observacion": "string",
+  "recomenda": "string",
+  "cumplePerfil": true,
+  "usuarioFirma": "string",
+  "fechaRegistro": "2025-12-27",
+  "userRegistro": "string",
+  "nombreSede": "string",
+  "sede": "string",
+  "color": 0,
+  "textoColor": "string",
+  "codigoColor": "string",
+  "nameJasper": "string",
+  "digitalizacion": [
+    {
+      "nombreDigitalizacion": "string",
+      "url": "string"
+    }
+  ],
+  "norden": 0
+}

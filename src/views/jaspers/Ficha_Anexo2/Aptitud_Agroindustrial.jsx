@@ -5,7 +5,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 
-export default function Aptitud_AgroindustrialH(data = {}) {
+export default async function Aptitud_AgroindustrialH(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -29,16 +29,16 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     numeroFicha: String(data.norden ?? ""), //revisar - usando norden como numeroFicha
     sede: data.sede || data.nombreSede || "",
     // Datos de conclusiones - eliminar duplicados
-    conclusiones: data.conclusiones ? 
+    conclusiones: data.conclusiones ?
       [...new Set(data.conclusiones.split('\n').filter(rec => rec.trim() !== ''))] : [],
     // Datos de aptitud
     apto: data.apto ? "APTO" : data?.noApto ? "NO APTO" : data.aptoConRestriccion ? "APTO CON RESTRICCIÓN" : "", //revisar - el JSON tiene boolean, necesita conversión
-    restricciones: data.restriccionesDescripcion ? 
+    restricciones: data.restriccionesDescripcion ?
       [...new Set(data.restriccionesDescripcion.split('\n').filter(rec => rec.trim() !== ''))].join('\n') : "",
-    recomendaciones: data.recomendaciones ? 
-      (Array.isArray(data.recomendaciones) ? 
-        [...new Set(data.recomendaciones.filter(rec => rec && rec.trim() !== ''))] : 
-        [...new Set(data.recomendaciones.split('\n').filter(rec => rec.trim() !== ''))]) : 
+    recomendaciones: data.recomendaciones ?
+      (Array.isArray(data.recomendaciones) ?
+        [...new Set(data.recomendaciones.filter(rec => rec && rec.trim() !== ''))] :
+        [...new Set(data.recomendaciones.split('\n').filter(rec => rec.trim() !== ''))]) :
       [],
     fechaDesde: formatearFechaCorta(data.fechaDesde ?? ""),
     fechaHasta: formatearFechaCorta(data.fechaHasta ?? ""),
@@ -63,9 +63,9 @@ export default function Aptitud_AgroindustrialH(data = {}) {
 
 
   // Header reutilizable (mejorado basado en formatPsicologia)
-  const drawHeader = () => {
+  const drawHeader = async () => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
     // Título principal
     doc.setFont("helvetica", "bold").setFontSize(14);
@@ -80,7 +80,7 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     doc.text(datosFinales.numeroFicha, pageW - 50, 16);
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Sede: " + datosFinales.sede, pageW - 80, 20);
-    
+
     doc.text("Pag. 01", pageW - 30, 10);
 
     // Bloque de color (posición mejorada)
@@ -97,7 +97,7 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   };
 
   // === HEADER ===
-  drawHeader();
+  await drawHeader();
 
   // === TABLA PRINCIPAL ===
   const tablaInicioX = 15;
@@ -436,16 +436,16 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("CONCLUSIONES:", marcoInicioX + 2, yTexto + 5);
     let yPosConclusiones = yTexto + 10;
-    
+
     // Dibujar cada conclusión y calcular la posición final real
     datosFinales.conclusiones.forEach((conclusion) => {
       doc.setFont("helvetica", "normal").setFontSize(7);
       yPosConclusiones = dibujarTextoPegado(conclusion, marcoInicioX + 2, yPosConclusiones, 170);
     });
-    
+
     // Calcular altura total basada en la posición real del texto + 1mm de padding
     const alturaContenido = (yPosConclusiones - yTexto) + 1;
-    
+
     // Usar la altura mayor entre la mínima definida y el contenido real
     const alturaTotalConclusiones = Math.max(alturaMinimaConclusiones, alturaContenido);
 
@@ -472,7 +472,7 @@ export default function Aptitud_AgroindustrialH(data = {}) {
       ? datosFinales.recomendaciones
       : [datosFinales.recomendaciones];
     recomendacionesArray = recomendacionesArray.slice(0, 10);
-    
+
     // Simular el dibujo para calcular la posición real final
     let yPosicionSimulada = 0; // Posición simulada
     const anchoMaximoRecomendaciones = 85;
@@ -498,12 +498,12 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   const anchoRestriccionesDyn = (tablaAptitudInicioX + tablaAptitudAncho) - xRestriccionesDyn - 5;
   const alturaMinimaRestricciones = 40; // Altura mínima para restricciones
   let alturaRestricciones = 4; // incluye el título "RESTRICCIONES:" - reducido
-  
+
   // Procesar restricciones una sola vez
-  const restriccionesProcesadas = datosFinales.restricciones && datosFinales.restricciones !== "NINGUNO." 
+  const restriccionesProcesadas = datosFinales.restricciones && datosFinales.restricciones !== "NINGUNO."
     ? datosFinales.restricciones.split('\n').filter(r => r.trim())
     : [];
-  
+
   if (datosFinales.apto === "APTO") {
     alturaRestricciones += calcularAlturaTexto("SIN RESTRICCIONES", anchoRestriccionesDyn, 6);
   } else if (restriccionesProcesadas.length > 0) {
@@ -516,7 +516,7 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   } else {
     alturaRestricciones += calcularAlturaTexto("NINGUNO", anchoRestriccionesDyn, 6);
   }
-  
+
   // Aplicar altura mínima a restricciones
   alturaRestricciones = Math.max(alturaMinimaRestricciones, alturaRestricciones);
 
@@ -549,18 +549,18 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     // Primeras 2 líneas horizontales solo hasta la mitad (división vertical principal)
     doc.line(tablaAptitudInicioX, y, tablaAptitudInicioX + 95, y);
   }
-  
+
   // Tercera línea horizontal (debajo de NO APTO) que llega hasta la división vertical
   const yTerceraFila = tablaAptitudInicioY + (3 * filaAptitudAltura);
   doc.line(tablaAptitudInicioX, yTerceraFila, tablaAptitudInicioX + 95, yTerceraFila);
-  
+
   // Línea horizontal "mitad" - base para restricciones (se mueve dinámicamente según altura de restricciones)
   const yMitad = tablaAptitudInicioY + alturaRestricciones;
   doc.line(tablaAptitudInicioX + tablaAptitudAncho - 85, yMitad, tablaAptitudInicioX + tablaAptitudAncho, yMitad);
 
   // === FIRMA SIN RECUADRO (DESPUÉS de la línea mitad) ===
   const firmaX = tablaAptitudInicioX + tablaAptitudAncho - firmaAncho - 15; // Posición X (derecha - 5 puntos más a la izquierda)
-  
+
   // Calcular altura de conclusiones para ajustar posición de firma
   let alturaConclusiones = 0;
   if (datosFinales.conclusiones && datosFinales.conclusiones.length > 0) {
@@ -571,12 +571,12 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     });
     alturaConclusiones = yPosConclusionesSimulada + 1; // +1mm de padding
   }
-  
+
   // Ajustar posición Y de la firma: base + 5mm si las conclusiones crecen
   const firmaY = yMitad + (alturaConclusiones > 20 ? 15 : 2); // +5mm si las conclusiones son altas, +2mm si son normales
-  
+
   // Sin recuadro para la firma
-  
+
   // Sin línea horizontal debajo de recomendaciones
 
   // Línea horizontal de separación para FECHA DE EXAMEN (después de la firma)
@@ -638,9 +638,9 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("RECOMENDACIONES:", tablaAptitudInicioX + 2, yAptitud + 4);
 
-    // Mostrar recomendaciones dinámicamente si existen
-    if (datosFinales.recomendaciones && datosFinales.recomendaciones.length > 0) {
-      doc.setFont("helvetica", "normal").setFontSize(7);
+  // Mostrar recomendaciones dinámicamente si existen
+  if (datosFinales.recomendaciones && datosFinales.recomendaciones.length > 0) {
+    doc.setFont("helvetica", "normal").setFontSize(7);
 
     // Ya está procesado como array en datosReales
     let recomendacionesArray = datosFinales.recomendaciones;

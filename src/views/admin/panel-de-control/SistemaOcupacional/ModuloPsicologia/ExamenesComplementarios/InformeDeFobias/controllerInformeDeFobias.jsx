@@ -7,17 +7,18 @@ import {
     SubmitDataServiceDefault,
     VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
+import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 const obtenerReporteUrl =
-    "";
+    "/api/v01/ct/fobias/obtenerReporte";
 const registrarUrl =
-    "";
+    "/api/v01/ct/fobias/registrarActualizar";
 
 export const GetInfoServicio = async (
     nro,
     tabla,
     set,
     token,
-    onFinish = () => {}
+    onFinish = () => { }
 ) => {
     const res = await GetInfoServicioDefault(
         nro,
@@ -29,9 +30,39 @@ export const GetInfoServicio = async (
     if (res) {
         set((prev) => ({
             ...prev,
-           
             norden: res.norden,
-           
+            fecha: res.fechaRegistro,
+            nombreExamen: res.tipoExamen ?? "",
+            esApto: res.perfilApto,
+
+            dni: res.dniPaciente ?? "",
+
+            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+            edad: res.edadPaciente ?? "",
+            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+            estadoCivil: res.estadoCivilPaciente ?? "",
+            nivelEstudios: res.nivelEstudioPaciente ?? "",
+            // Datos Laborales
+            empresa: res.empresa ?? "",
+            contrata: res.contrata ?? "",
+            ocupacion: res.ocupacionPaciente ?? "",
+            cargoDesempenar: res.cargoPaciente ?? "",
+
+            // Criterios psicológicos
+            inteligencia: res.criterioInteligencia ?? "",
+            fobias: res.criterioFobias ?? "",
+
+            // Análisis FODA
+            fortalezasOportunidades: res.analisisFodaFortalezasOportunidades ?? "",
+            amenazasDebilidades: res.analisisFodaAmenazasDebilidades ?? "",
+
+            // Observaciones y recomendaciones
+            observaciones: res.observaciones ?? "",
+            recomendaciones: res.recomendaciones ?? "",
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -54,7 +85,17 @@ export const SubmitDataService = async (
     }
     const body = {
         norden: form.norden,
-        usuarioRegistro: user,
+        criterioInteligencia: form.inteligencia,
+        criterioFobias: form.fobias,
+        analisisFodaFortaOport: form.fortalezasOportunidades,
+        analisisFodaAmenazDebili: form.amenazasDebilidades,
+        observaciones: form.observaciones,
+        recomendaciones: form.recomendaciones,
+        conclusionesApto: form.esApto,
+        conclusionesNoApto: !form.esApto,
+        fechaRegistro: form.fecha,
+        userRegistro: user,
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -64,7 +105,7 @@ export const SubmitDataService = async (
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     const jasperModules = import.meta.glob(
-        "../../../../../jaspers/ModuloPsicologia/InformeDeFobias/*.jsx"
+        "../../../../../../jaspers/ModuloPsicologia/InformeDeFobias/*.jsx"
     );
     PrintHojaRDefault(
         nro,
@@ -73,7 +114,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../jaspers/ModuloPsicologia/InformeDeFobias"
+        "../../../../../../jaspers/ModuloPsicologia/InformeDeFobias"
     );
 };
 
@@ -107,12 +148,14 @@ const GetInfoPac = async (nro, set, token, sede) => {
         set((prev) => ({
             ...prev,
             ...res,
-            nombres: res.nombres ?? prev.nombres,
-            apellidos: res.apellidos ?? prev.apellidos,
-            edad: (res.edad ? `${res.edad} AÑOS` : prev.edad),
-            gradoEstudios: res.nivelEstudioPaciente ?? prev.gradoEstudios,
-            empresa: res.empresa ?? prev.empresa,
-            cargo: res.cargo ?? prev.cargo,
+            nombres: res.nombresApellidos ?? "",
+            fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+            edad: res.edad,
+            ocupacion: res.areaO ?? "",
+            nombreExamen: res.nomExam ?? "",
+            cargoDesempenar: res.cargo ?? "",
+            lugarNacimiento: res.lugarNacimiento ?? "",
+            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
         }));
     }
 };

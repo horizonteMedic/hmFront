@@ -6,6 +6,8 @@
  * @param {object} datos - { norden: string|number, sede: string }
  */
 
+import { compressImage } from "../../utils/helpers";
+
 function footerOIT(doc, opts = {}, datos = {}) {
   const margin = 15;
   const logoW = 38;
@@ -88,17 +90,19 @@ function footerOIT(doc, opts = {}, datos = {}) {
 }
 
 
-const header_Cuestionario = (doc, datos = {}) => {
-   const margin = 8;
+const header_Cuestionario = async (doc, datos = {}) => {
+  const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 12;
 
   // 1) Logo a la izquierda
   const logoW = 43,
     logoH = 16;
-  const logoY = y ;
+  const logoY = y;
+  const img = "/img/logo-color.webp";
+  const imgCompressed = await compressImage(img);
   try {
-    doc.addImage("./img/logo-color.png", "PNG", margin, logoY - 5, logoW, logoH);
+    doc.addImage(imgCompressed, "WEBP", margin, logoY - 5, logoW, logoH);
   } catch {
     doc
       .setFont("helvetica", "normal")
@@ -111,28 +115,28 @@ const header_Cuestionario = (doc, datos = {}) => {
   // 3) Sección de datos del paciente
   const datosPacienteY = y + 45; // Bajado de 35 a 45
   const datosPacienteX = margin + 25;
-  
-  
+
+
   // Datos del paciente - todos en mayúsculas y labels en negrita
-  
+
 
   // 4) Información de sede y número de ficha a la derecha (al costado del bloque de color)
   const sedeValue = `${datos.sede || 'Trujillo-Pierola'}`;
   const sedeX = pageW - margin - 20;
   const sedeY = y + 5;
-  
+
   // Número de ficha primero
   const fichaNum = `${datos.norden || "96639"}`;
   const fichaY = sedeY;
-  
+
   // Texto "N° Ficha :" delante del número
   const fichaLabelX = sedeX - 40;
-  doc.setFont("helvetica", "normal").setFontSize(9);  
+  doc.setFont("helvetica", "normal").setFontSize(9);
   // Número de ficha grande y subrayado
   const fichaNumX = fichaLabelX + doc.getTextWidth("N° Ficha :") + 5;
   doc.setFont("helvetica", "bold").setFontSize(16);
-  doc.text(fichaNum, fichaNumX+2, fichaY);
-  
+  doc.text(fichaNum, fichaNumX + 2, fichaY);
+
   // Subrayar el número de ficha
   const fichaWidth = doc.getTextWidth(fichaNum);
   const fichaCenterX = fichaNumX + 2 + (fichaWidth / 2); // centro de la línea
@@ -149,35 +153,35 @@ const header_Cuestionario = (doc, datos = {}) => {
   const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
   if (colorValido) {
     // === BLOQUE CÓDIGO DE COLOR ===
-  const color = datos.codigoColor || "#008f39";
-  const boxText = (datos.textoColor || "F").toUpperCase();
-  let boxSize = 15;
-  let boxX = pageW - margin - boxSize;
-  let boxY = y - 9;
-  
-  // Draw box outline in black
-  doc.setDrawColor(0);
-  doc.setLineWidth(0.5);
-  doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
-  // Solo renderiza si color es válido o para prueba
-  doc.setDrawColor(color);
-  doc.setLineWidth(2);
-  doc.setLineCap("round");
-  doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
-  doc.setLineCap("butt");
-  doc.setFontSize(18);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(color);
-  doc.text(boxText, boxX + boxSize / 2, boxY + boxSize / 2, {
-    align: "center",
-    baseline: "middle",
-    maxWidth: boxSize - 1,
-  });
-  doc.setDrawColor(0);
-  doc.setTextColor(0);
-  doc.setLineWidth(0.2);
+    const color = datos.codigoColor || "#008f39";
+    const boxText = (datos.textoColor || "F").toUpperCase();
+    let boxSize = 15;
+    let boxX = pageW - margin - boxSize;
+    let boxY = y - 9;
+
+    // Draw box outline in black
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
+    // Solo renderiza si color es válido o para prueba
+    doc.setDrawColor(color);
+    doc.setLineWidth(2);
+    doc.setLineCap("round");
+    doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
+    doc.setLineCap("butt");
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(color);
+    doc.text(boxText, boxX + boxSize / 2, boxY + boxSize / 2, {
+      align: "center",
+      baseline: "middle",
+      maxWidth: boxSize - 1,
+    });
+    doc.setDrawColor(0);
+    doc.setTextColor(0);
+    doc.setLineWidth(0.2);
   }
-  
+
 
   // Restaurar fuente normal
   doc.setFont("helvetica", "normal").setFontSize(10);

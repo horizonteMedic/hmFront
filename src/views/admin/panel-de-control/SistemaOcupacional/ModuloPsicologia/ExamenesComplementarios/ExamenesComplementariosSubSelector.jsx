@@ -1,17 +1,19 @@
 import SubTabSelector from "../../../../../components/reusableComponents/SubTabSelector";
 import CalidadDeSueno from "./CalidadDeSueno/CalidadDeSueno";
 import ExamenEspacioConfinado from "./ExamenEspacioConfinado/ExamenEspacioConfinado";
-import InformePsicologicoADECO from "./InformePsicologicoADECO/InformePsicologicoADECO";
 import AlturaPsicologica from "./AlturaPsicologica/AlturaPsicologica";
 import InformeDeFobias from "./InformeDeFobias/InformeDeFobias";
 import AversionRiesgo from "./AversionRiesgo/AversionRiesgo";
+import TrastornoDePersonalidad from "./TrastornoDePersonalidad/TrastornoDePersonalidad";
+import EstresFatigaSomnolencia from "./EstresFatigaSomnolencia/EstresFatigaSomnolencia";
+
 export default function ExamenesComplementariosSubSelector({ tieneVista }) {
     const tabsConfig = [
         {
             id: 0,
-            permission: "Informe Psicologico ADECO",
-            label: "Informe Psicológico ADECO",
-            component: InformePsicologicoADECO
+            permission: "Estrés / Fatiga / Somnolencia",
+            label: "Estrés / Fatiga / Somnolencia",
+            component: EstresFatigaSomnolencia
         },
         {
             id: 1,
@@ -42,6 +44,12 @@ export default function ExamenesComplementariosSubSelector({ tieneVista }) {
             permission: "Altura Psicologica",
             label: "Formato Altura Psicologica",
             component: AlturaPsicologica
+        },
+        {
+            id: 6,
+            permission: "Trastorno de Personalidad",
+            label: "Trastorno de Personalidad",
+            component: TrastornoDePersonalidad
         },
     ];
     return (

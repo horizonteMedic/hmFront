@@ -1,7 +1,8 @@
-import { faDroplet, faVial } from "@fortawesome/free-solid-svg-icons";
+import { faDroplet, faHeartbeat, faVial } from "@fortawesome/free-solid-svg-icons";
 import SubTabSelector from "../../../../../components/reusableComponents/SubTabSelector";
 import Hematologia from "./Hematologia/Hematologia";
 import HematologiaBioquimicaECO from "./HematologiaBioquimicaECO/HematologiaBioquimicaECO";
+import Hemoglobina from "./Hemoglobina/Hemoglobina";
 
 export default function LaboratorioClinicoSubTabSelector({ tieneVista }) {
   const tabsConfig = [
@@ -18,6 +19,13 @@ export default function LaboratorioClinicoSubTabSelector({ tieneVista }) {
       label: "Hemograma",
       icon: faVial,
       component: Hematologia
+    },
+    {
+      id: 2,
+      permission: "Hemoglobina",
+      label: "Hemoglobina",
+      icon: faHeartbeat,
+      component: Hemoglobina
     },
 
   ];

@@ -19,6 +19,7 @@ export default function ParteII({ form, handleRadioButton }) {
     { name: "probSentiaCalor", label: "g) Sentía demasiado calor" },
     { name: "probPesadillas", label: "h) Tenía pesadilla o malos sueños" },
     { name: "probDolores", label: "i) Tenía dolores" },
+    { name: "probOtrasRazones", label: "j) Otras razones" },
   ];
 
   return (

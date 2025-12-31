@@ -45,7 +45,8 @@ const Especialidades = [
   "Área Medica",
   "Laboratorio",
   "Imagenologia",
-  "Audiometria"
+  "Audiometria",
+  "Dermatología"
 ]
 
 
@@ -95,8 +96,7 @@ export default function FichaInterconsulta() {
     }
 
     const { form, setForm, handleChangeSimple, handleChange, handleClear, handleClearnotO, handleChangeNumber, handleRadioButtonBoolean, handleRadioButton, handlePrintDefault } = useForm(Initialform, { storageKey: "ficha_interconsultas_form" })
-                   
-    console.log(form)
+     
     const handleClearnotOandEspecialidad = () => {
         setForm((prev) => ({ ...Initialform, norden: prev.norden }));
         if (typeof window !== "undefined" && "ficha_interconsultas_form") {

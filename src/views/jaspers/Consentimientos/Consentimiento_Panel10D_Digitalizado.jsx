@@ -3,8 +3,9 @@ import autoTable from "jspdf-autotable";
 import CabeceraLogo from "../components/CabeceraLogo.jsx";
 import footerTR from "../components/footerTR.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
+import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
 
-export default function Consentimiento_Panel10D_Digitalizado(datos) {
+export default async function Consentimiento_Panel10D_Digitalizado(datos) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -18,28 +19,28 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
   };
 
   // Header con datos de ficha, sede y fecha
-  const drawHeader = () => {
-    CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-    
+  const drawHeader = async () => {
+    await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+
     // Número de Ficha
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Nro de ficha: ", pageW - 80, 15);
     doc.setFont("helvetica", "normal").setFontSize(18);
     doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
-    
+
     // Sede
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
-    
+
     // Fecha de examen
     const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
     doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
-    
+
     // Página
     doc.text("Pag. 01", pageW - 30, 10);
 
     // Bloque de color
-     drawColorBox(doc, {
+    drawColorBox(doc, {
       color: datos.codigoColor,
       text: datos.textoColor,
       x: pageW - 30,
@@ -51,393 +52,216 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
     });
   };
 
-  drawHeader();
+  await drawHeader();
 
-  const digitalizacion = datos.digitalizacion || [];
-  const huella = digitalizacion.find(d => d.nombreDigitalizacion === "HUELLA");
-  const firma = digitalizacion.find(d => d.nombreDigitalizacion === "FIRMAP");
-  const sello = digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  const isValidUrl = url => url && url !== "Sin registro";
-  const loadImg = src =>
-    new Promise((res, rej) => {
-      const img = new Image();
-      img.src = src;
-      img.crossOrigin = 'anonymous';
-      img.onload = () => res(img);
-      img.onerror = () => rej(`No se pudo cargar ${src}`);
-    });
-  Promise.all([
-     isValidUrl(huella?.url) ? loadImg(huella.url) : Promise.resolve(null),
-    isValidUrl(firma?.url) ? loadImg(firma.url) : Promise.resolve(null),
-    isValidUrl(sello?.url) ? loadImg(sello.url) : Promise.resolve(null)
-  ])
-   .then(([huellap, firmap, sellop]) => {
-    let y = 44;
-    const margin = 18;
+  // Contenido del documento
+  let y = 44;
+  const margin = 18;
 
-    // Título principal en dos líneas, con subrayado y tamaño 14
-    doc.setFont(undefined, 'bold');
-    doc.setFontSize(12);
-    // Primera línea del título
-    doc.text('CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DROGAS PANEL 10D', pageW / 2, y, { align: 'center' });
-    let wT1 = doc.getTextWidth('CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DROGAS PANEL 10D');
-    let xT1 = (pageW - wT1) / 2;
-    doc.setLineWidth(0.7);
-    doc.line(xT1, y + 2, xT1 + wT1, y + 2);
-    doc.setLineWidth(0.2);
-    y += 10;
-    // Segunda línea del título
-    doc.text('(AMP-BAR-BZO-COC-MET-MTD-PCP-THC-OPI-TCA)', pageW / 2, y, { align: 'center' });
-    let wT2 = doc.getTextWidth('(AMP-BAR-BZO-COC-MET-MTD-PCP-THC-OPI-TCA)');
-    let xT2 = (pageW - wT2) / 2;
-    doc.setLineWidth(0.7);
-    doc.line(xT2, y + 2, xT2 + wT2, y + 2);
-    doc.setLineWidth(0.2);
-    y += 12;
-    doc.setFontSize(11);
+  // Título principal en dos líneas, con subrayado y tamaño 14
+  doc.setFont(undefined, 'bold');
+  doc.setFontSize(12);
+  // Primera línea del título
+  doc.text('CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DROGAS PANEL 10D', pageW / 2, y, { align: 'center' });
+  let wT1 = doc.getTextWidth('CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DROGAS PANEL 10D');
+  let xT1 = (pageW - wT1) / 2;
+  doc.setLineWidth(0.7);
+  doc.line(xT1, y + 2, xT1 + wT1, y + 2);
+  doc.setLineWidth(0.2);
+  y += 10;
+  // Segunda línea del título
+  doc.text('(AMP-BAR-BZO-COC-MET-MTD-PCP-THC-OPI-TCA)', pageW / 2, y, { align: 'center' });
+  let wT2 = doc.getTextWidth('(AMP-BAR-BZO-COC-MET-MTD-PCP-THC-OPI-TCA)');
+  let xT2 = (pageW - wT2) / 2;
+  doc.setLineWidth(0.7);
+  doc.line(xT2, y + 2, xT2 + wT2, y + 2);
+  doc.setLineWidth(0.2);
+  y += 12;
+  doc.setFontSize(11);
 
-    // Bloque de datos personales y consentimiento con interlineado y justificado
-    const nombre = String(datos.nombres || '_________________________');
-    const edad = String(datos.edad || '___');
-    const dni = String(datos.dni || '__________');
-    const bloques = [
-      { text: 'Yo  ', bold: false },
-      { text: nombre, bold: true },
-      { text: ', de ', bold: false },
-      { text: edad, bold: true },
-      { text: ' años de edad, identificado con DNI N° ', bold: false },
-      { text: dni, bold: true },
-      { text: '; habiendo recibido consejería e información acerca de la prueba para el panel de 10D drogas en orina; y en pleno uso de mis facultades mentales ', bold: false },
-      { text: 'AUTORIZO', bold: true },
-      { text: ' se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.', bold: false },
-    ];
-    const maxWidth = pageW - 2 * margin - 4;
-    const interlineado = 7;
-    function armarLineas(bloques, maxWidth) {
-      let lineas = [];
-      let lineaActual = [];
-      let anchoActual = 0;
-      let espacio = doc.getTextWidth(' ');
-      let i = 0;
-      while (i < bloques.length) {
-        let bloque = bloques[i];
-        if (!bloque.bold && bloque.text.includes(' ')) {
-          let palabras = bloque.text.split(/(\s+)/);
-          for (let j = 0; j < palabras.length; j++) {
-            let palabra = palabras[j];
-            if (palabra === '') continue;
-            let anchoPalabra = doc.getTextWidth(palabra);
-            if (anchoActual + anchoPalabra > maxWidth && lineaActual.length > 0) {
-              lineas.push(lineaActual);
-              lineaActual = [];
-              anchoActual = 0;
-            }
-            lineaActual.push({ text: palabra, bold: false });
-            anchoActual += anchoPalabra;
-          }
-        } else {
-          let anchoBloque = doc.getTextWidth(bloque.text);
-          if (anchoActual + anchoBloque > maxWidth && lineaActual.length > 0) {
+  // Bloque de datos personales y consentimiento con interlineado y justificado
+  const nombre = String(datos.nombres || '_________________________');
+  const edad = String(datos.edad || '___');
+  const dni = String(datos.dni || '__________');
+  const bloques = [
+    { text: 'Yo  ', bold: false },
+    { text: nombre, bold: true },
+    { text: ', de ', bold: false },
+    { text: edad, bold: true },
+    { text: ' años de edad, identificado con DNI N° ', bold: false },
+    { text: dni, bold: true },
+    { text: '; habiendo recibido consejería e información acerca de la prueba para el panel de 10D drogas en orina; y en pleno uso de mis facultades mentales ', bold: false },
+    { text: 'AUTORIZO', bold: true },
+    { text: ' se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.', bold: false },
+  ];
+  const maxWidth = pageW - 2 * margin - 4;
+  const interlineado = 7;
+  function armarLineas(bloques, maxWidth) {
+    let lineas = [];
+    let lineaActual = [];
+    let anchoActual = 0;
+    let i = 0;
+    while (i < bloques.length) {
+      let bloque = bloques[i];
+      if (!bloque.bold && bloque.text.includes(' ')) {
+        let palabras = bloque.text.split(/(\s+)/);
+        for (let j = 0; j < palabras.length; j++) {
+          let palabra = palabras[j];
+          if (palabra === '') continue;
+          let anchoPalabra = doc.getTextWidth(palabra);
+          if (anchoActual + anchoPalabra > maxWidth && lineaActual.length > 0) {
             lineas.push(lineaActual);
             lineaActual = [];
             anchoActual = 0;
           }
-          lineaActual.push(bloque);
-          anchoActual += anchoBloque;
+          lineaActual.push({ text: palabra, bold: false });
+          anchoActual += anchoPalabra;
         }
-        i++;
+      } else {
+        let anchoBloque = doc.getTextWidth(bloque.text);
+        if (anchoActual + anchoBloque > maxWidth && lineaActual.length > 0) {
+          lineas.push(lineaActual);
+          lineaActual = [];
+          anchoActual = 0;
+        }
+        lineaActual.push(bloque);
+        anchoActual += anchoBloque;
       }
-      if (lineaActual.length > 0) lineas.push(lineaActual);
-      return lineas;
+      i++;
     }
-    let yBloque = y;
-    const lineas = armarLineas(bloques, maxWidth);
-    lineas.forEach((linea, idx) => {
-      const totalW = linea.reduce((sum, b) => sum + doc.getTextWidth(b.text), 0);
-      const espacios = linea.filter(b => !b.bold && /^\s+$/.test(b.text)).length;
-      const extraSpace = (idx < lineas.length - 1 && espacios > 0)
-        ? (maxWidth - totalW) / espacios
-        : 0;
-      let x = margin;
-      linea.forEach(b => {
-        doc.setFont('helvetica', b.bold ? 'bold' : 'normal');
-        doc.text(b.text, x, yBloque);
-        let w = doc.getTextWidth(b.text);
-        if (!b.bold && /^\s+$/.test(b.text) && extraSpace) {
-          x += w + extraSpace;
-        } else {
-          x += w;
-        }
-      });
-      yBloque += interlineado;
+    if (lineaActual.length > 0) lineas.push(lineaActual);
+    return lineas;
+  }
+  let yBloque = y;
+  const lineas = armarLineas(bloques, maxWidth);
+  lineas.forEach((linea, idx) => {
+    const totalW = linea.reduce((sum, b) => sum + doc.getTextWidth(b.text), 0);
+    const espacios = linea.filter(b => !b.bold && /^\s+$/.test(b.text)).length;
+    const extraSpace = (idx < lineas.length - 1 && espacios > 0)
+      ? (maxWidth - totalW) / espacios
+      : 0;
+    let x = margin;
+    linea.forEach(b => {
+      doc.setFont('helvetica', b.bold ? 'bold' : 'normal');
+      doc.text(b.text, x, yBloque);
+      let w = doc.getTextWidth(b.text);
+      if (!b.bold && /^\s+$/.test(b.text) && extraSpace) {
+        x += w + extraSpace;
+      } else {
+        x += w;
+      }
     });
-    y = yBloque + 10;
+    yBloque += interlineado;
+  });
+  y = yBloque + 10;
 
-    // Antecedentes (tabla) igual que Panel2D
-    doc.setFont(undefined, 'bold');
-    doc.setFontSize(9);
-    doc.text('ANTECEDENTES:', margin, y);
-    doc.setFont(undefined, 'normal');
-    y += 6;
-    function formatearFecha(fecha) {
-      if (!fecha) return '';
-      const [anio, mes, dia] = fecha.split('-');
-      return `${dia}/${mes}/${anio}`;
-    }
-    function checkBox(checked) {
-      const filler = '\u00A0';
-      return `(  ${checked ? 'X' : filler + filler}  )`;
-    }
-    autoTable(doc, {
-      startY: y,
-      body: [
-        [
-          'CONSUME MARIHUANA (THC)',
-          `NO ${checkBox(!datos.antConsumeMarih)}`,
-          `SI ${checkBox(datos.antConsumeMarih)}`,
-          datos.antConsumeMarih && datos.fechaConsumeMarih ? `Cuando: ${formatearFecha(datos.fechaConsumeMarih)}` : ''
-        ],
-        [
-          'CONSUME COCAÍNA (COC)',
-          `NO ${checkBox(!datos.antConsumeCocacina)}`,
-          `SI ${checkBox(datos.antConsumeCocacina)}`,
-          datos.antConsumeCocacina && datos.fechaConsumeCocacina ? `Cuando: ${formatearFecha(datos.fechaConsumeCocacina)}` : ''
-        ],
-        [
-          'CONSUME HOJA DE COCA EN LOS 14 DÍAS PREVIOS',
-          `NO ${checkBox(!datos.antConsumeHojaCoca)}`,
-          `SI ${checkBox(datos.antConsumeHojaCoca)}`,
-          datos.antConsumeHojaCoca && datos.fechaConsumoHojaCoca ? `Cuando: ${formatearFecha(datos.fechaConsumoHojaCoca)}` : ''
-        ],
-        [
-          'CONSUME ANFETAMINAS (AMP)',
-          `NO ${checkBox(!datos.antConsumeAnfetaminaOExtasis)}`,
-          `SI ${checkBox(datos.antConsumeAnfetaminaOExtasis)}`,
-          datos.antConsumeAnfetaminaOExtasis && datos.fechaConsumeAnfetamina ? `Cuando: ${formatearFecha(datos.fechaConsumeAnfetamina)}` : ''
-        ],
-        [
-          'CONSUME METANFETAMINAS (MET)',
-          `NO ${checkBox(!datos.antConsumeMethanfetaminaOOpiaceos)}`,
-          `SI ${checkBox(datos.antConsumeMethanfetaminaOOpiaceos)}`,
-          datos.antConsumeMethanfetaminaOOpiaceos && datos.fechaConsumeMethanfetamina ? `Cuando: ${formatearFecha(datos.fechaConsumeMethanfetamina)}` : ''
-        ],
-        [
-          'CONSUME BENZODIAZEPINAS (BZO)',
-          `NO ${checkBox(!datos.antConsumeBenzodiacepinas)}`,
-          `SI ${checkBox(datos.antConsumeBenzodiacepinas)}`,
-          datos.antConsumeBenzodiacepinas && datos.fechaConsumeBenzodiacepinas ? `Cuando: ${formatearFecha(datos.fechaConsumeBenzodiacepinas)}` : ''
-        ],
-        [
-          'CONSUME OPIÁCEOS (OPI)',
-          `NO ${checkBox(!datos.antConsumeOpiacesos)}`,
-          `SI ${checkBox(datos.antConsumeOpiacesos)}`,
-          datos.antConsumeOpiacesos && datos.fechaConsumeOpiacesos ? `Cuando: ${formatearFecha(datos.fechaConsumeOpiacesos)}` : ''
-        ],
-        [
-          'CONSUME BARBITÚRICOS (BAR)',
-          `NO ${checkBox(!datos.antConsumeBarbituricos)}`,
-          `SI ${checkBox(datos.antConsumeBarbituricos)}`,
-          datos.antConsumeBarbituricos && datos.fechaConsumeBarbituricos ? `Cuando: ${formatearFecha(datos.fechaConsumeBarbituricos)}` : ''
-        ],
-        [
-          'CONSUME METADONA (MTD)',
-          `NO ${checkBox(!datos.antConsumeMetadona)}`,
-          `SI ${checkBox(datos.antConsumeMetadona)}`,
-          datos.antConsumeMetadona && datos.fechaConsumeMetadona ? `Cuando: ${formatearFecha(datos.fechaConsumeMetadona)}` : ''
-        ],
-        [
-          'CONSUME FENCICLIDINA (PCP)',
-          `NO ${checkBox(!datos.antConsumeFenciclidina)}`,
-          `SI ${checkBox(datos.antConsumeFenciclidina)}`,
-          datos.antConsumeFenciclidina && datos.fechaConsumeFenciclidina ? `Cuando: ${formatearFecha(datos.fechaConsumeFenciclidina)}` : ''
-        ],
-        [
-          'CONSUME ANTIDEPRESIVOS TRICÍCLICOS (TCA)',
-          `NO ${checkBox(!datos.antConsumeAntidepreTricicli)}`,
-          `SI ${checkBox(datos.antConsumeAntidepreTricicli)}`,
-          datos.antConsumeAntidepreTricicli && datos.fechaConsumeAntidepreTricicli ? `Cuando: ${formatearFecha(datos.fechaConsumeAntidepreTricicli)}` : ''
-        ],
+  // Antecedentes (tabla) igual que Panel2D
+  doc.setFont(undefined, 'bold');
+  doc.setFontSize(9);
+  doc.text('ANTECEDENTES:', margin, y);
+  doc.setFont(undefined, 'normal');
+  y += 6;
+  function formatearFecha(fecha) {
+    if (!fecha) return '';
+    const [anio, mes, dia] = fecha.split('-');
+    return `${dia}/${mes}/${anio}`;
+  }
+  function checkBox(checked) {
+    const filler = '\u00A0';
+    return `(  ${checked ? 'X' : filler + filler}  )`;
+  }
+  autoTable(doc, {
+    startY: y,
+    body: [
+      [
+        'CONSUME MARIHUANA (THC)',
+        `NO ${checkBox(!datos.antConsumeMarih)}`,
+        `SI ${checkBox(datos.antConsumeMarih)}`,
+        datos.antConsumeMarih && datos.fechaConsumeMarih ? `Cuando: ${formatearFecha(datos.fechaConsumeMarih)}` : ''
       ],
-      theme: 'plain',
-      styles: { fontSize: 9, cellPadding: 1 },
-      columnStyles: { 0: { cellWidth: 100 }, 1: { cellWidth: 20 }, 2: { cellWidth: 20 }, 3: { cellWidth: 50 } },
-      margin: { left: 18 },
-      didDrawPage: () => {}
-    });
+      [
+        'CONSUME COCAÍNA (COC)',
+        `NO ${checkBox(!datos.antConsumeCocacina)}`,
+        `SI ${checkBox(datos.antConsumeCocacina)}`,
+        datos.antConsumeCocacina && datos.fechaConsumeCocacina ? `Cuando: ${formatearFecha(datos.fechaConsumeCocacina)}` : ''
+      ],
+      [
+        'CONSUME HOJA DE COCA EN LOS 14 DÍAS PREVIOS',
+        `NO ${checkBox(!datos.antConsumeHojaCoca)}`,
+        `SI ${checkBox(datos.antConsumeHojaCoca)}`,
+        datos.antConsumeHojaCoca && datos.fechaConsumoHojaCoca ? `Cuando: ${formatearFecha(datos.fechaConsumoHojaCoca)}` : ''
+      ],
+      [
+        'CONSUME ANFETAMINAS (AMP)',
+        `NO ${checkBox(!datos.antConsumeAnfetaminaOExtasis)}`,
+        `SI ${checkBox(datos.antConsumeAnfetaminaOExtasis)}`,
+        datos.antConsumeAnfetaminaOExtasis && datos.fechaConsumeAnfetamina ? `Cuando: ${formatearFecha(datos.fechaConsumeAnfetamina)}` : ''
+      ],
+      [
+        'CONSUME METANFETAMINAS (MET)',
+        `NO ${checkBox(!datos.antConsumeMethanfetaminaOOpiaceos)}`,
+        `SI ${checkBox(datos.antConsumeMethanfetaminaOOpiaceos)}`,
+        datos.antConsumeMethanfetaminaOOpiaceos && datos.fechaConsumeMethanfetamina ? `Cuando: ${formatearFecha(datos.fechaConsumeMethanfetamina)}` : ''
+      ],
+      [
+        'CONSUME BENZODIAZEPINAS (BZO)',
+        `NO ${checkBox(!datos.antConsumeBenzodiacepinas)}`,
+        `SI ${checkBox(datos.antConsumeBenzodiacepinas)}`,
+        datos.antConsumeBenzodiacepinas && datos.fechaConsumeBenzodiacepinas ? `Cuando: ${formatearFecha(datos.fechaConsumeBenzodiacepinas)}` : ''
+      ],
+      [
+        'CONSUME OPIÁCEOS (OPI)',
+        `NO ${checkBox(!datos.antConsumeOpiacesos)}`,
+        `SI ${checkBox(datos.antConsumeOpiacesos)}`,
+        datos.antConsumeOpiacesos && datos.fechaConsumeOpiacesos ? `Cuando: ${formatearFecha(datos.fechaConsumeOpiacesos)}` : ''
+      ],
+      [
+        'CONSUME BARBITÚRICOS (BAR)',
+        `NO ${checkBox(!datos.antConsumeBarbituricos)}`,
+        `SI ${checkBox(datos.antConsumeBarbituricos)}`,
+        datos.antConsumeBarbituricos && datos.fechaConsumeBarbituricos ? `Cuando: ${formatearFecha(datos.fechaConsumeBarbituricos)}` : ''
+      ],
+      [
+        'CONSUME METADONA (MTD)',
+        `NO ${checkBox(!datos.antConsumeMetadona)}`,
+        `SI ${checkBox(datos.antConsumeMetadona)}`,
+        datos.antConsumeMetadona && datos.fechaConsumeMetadona ? `Cuando: ${formatearFecha(datos.fechaConsumeMetadona)}` : ''
+      ],
+      [
+        'CONSUME FENCICLIDINA (PCP)',
+        `NO ${checkBox(!datos.antConsumeFenciclidina)}`,
+        `SI ${checkBox(datos.antConsumeFenciclidina)}`,
+        datos.antConsumeFenciclidina && datos.fechaConsumeFenciclidina ? `Cuando: ${formatearFecha(datos.fechaConsumeFenciclidina)}` : ''
+      ],
+      [
+        'CONSUME ANTIDEPRESIVOS TRICÍCLICOS (TCA)',
+        `NO ${checkBox(!datos.antConsumeAntidepreTricicli)}`,
+        `SI ${checkBox(datos.antConsumeAntidepreTricicli)}`,
+        datos.antConsumeAntidepreTricicli && datos.fechaConsumeAntidepreTricicli ? `Cuando: ${formatearFecha(datos.fechaConsumeAntidepreTricicli)}` : ''
+      ],
+    ],
+    theme: 'plain',
+    styles: { fontSize: 9, cellPadding: 1 },
+    columnStyles: { 0: { cellWidth: 100 }, 1: { cellWidth: 20 }, 2: { cellWidth: 20 }, 3: { cellWidth: 50 } },
+    margin: { left: 18 },
+    didDrawPage: () => { }
+  });
 
-    // Fecha del examen alineada a la derecha y formato dd/mm/yyyy
-    y = doc.lastAutoTable.finalY + 10;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    if (datos.fecha) {
-      const f = new Date(datos.fecha);
-      const dia = f.getDate();
-      const mes = f.getMonth();
-      const anio = f.getFullYear();
-      const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-      const rightMargin = 20;
-      doc.text(`${datos.fecha}`, pageW - rightMargin, y, { align: 'right' });
-    }
-    y += 12;
+  // Fecha del examen alineada a la derecha y formato dd/mm/yyyy
+  y = doc.lastAutoTable.finalY + 10;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  if (datos.fecha) {
+    const rightMargin = 20;
+    doc.text(`${datos.fecha}`, pageW - rightMargin, y, { align: 'right' });
+  }
+  y += 12;
 
-    // ─── 5) FIRMA Y HUELLA DEL PACIENTE, FIRMA Y SELLO DEL PROFESIONAL ────────────────────
-    const baseY = doc.lastAutoTable.finalY + 30; // Subido 20mm (de 50 a 30)
-    const firmaY = baseY + 3;
+  // ─── 5) FIRMA Y HUELLA DEL PACIENTE, FIRMA Y SELLO DEL PROFESIONAL ────────────────────
+  y += 10;
 
-    // Verificar si hay sello del médico para decidir el layout
-    const tieneSelloMedico = sellop !== null;
-
-    if (tieneSelloMedico) {
-      // === LAYOUT CON DOS COLUMNAS (Paciente y Médico) ===
-      const anchoColumna = 60;
-      const espacioEntreColumnas = 20;
-      const totalAncho = (anchoColumna * 2) + espacioEntreColumnas;
-      const inicioX = (pageW - totalAncho) / 2;
-      
-      // === COLUMNA 1: FIRMA Y HUELLA DEL PACIENTE ===
-      const centroColumna1X = inicioX + (anchoColumna / 2);
-      
-      // Altura máxima para alinear ambas secciones (usar la del sello del médico)
-      const alturaMaxima = 28;
-      
-      // Agregar firma del paciente (izquierda)
-      if (firmap) {
-        try {
-          const imgWidth = 30;
-          const imgHeight = 20;
-          const x = centroColumna1X - 20;
-          const canvas = document.createElement('canvas');
-          canvas.width = firmap.width;
-          canvas.height = firmap.height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(firmap, 0, 0);
-          const firmaBase64 = canvas.toDataURL('image/png');
-          doc.addImage(firmaBase64, 'PNG', x, firmaY, imgWidth, imgHeight);
-        } catch (error) {
-          console.log("Error cargando firma del paciente:", error);
-        }
-      }
-      
-      // Agregar huella del paciente (derecha de la firma)
-      if (huellap) {
-        try {
-          const imgWidth = 12;
-          const imgHeight = 20;
-          const x = centroColumna1X + 10;
-          const canvas = document.createElement('canvas');
-          canvas.width = huellap.width;
-          canvas.height = huellap.height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(huellap, 0, 0);
-          const huellaBase64 = canvas.toDataURL('image/png');
-          doc.addImage(huellaBase64, 'PNG', x, firmaY, imgWidth, imgHeight);
-        } catch (error) {
-          console.log("Error cargando huella del paciente:", error);
-        }
-      }
-      
-      // Línea de firma debajo de las imágenes (alineada con la del médico)
-      const lineY = firmaY + alturaMaxima + 3; // Misma altura que la del médico
-      doc.setLineWidth(0.2);
-      doc.line(centroColumna1X - 30, lineY, centroColumna1X + 30, lineY);
-      
-      // Texto "Firma y Huella del Paciente" centrado
-      doc.setFont('helvetica', 'normal').setFontSize(9);
-      doc.text("Firma y Huella del Paciente", centroColumna1X, lineY + 6, { align: "center" });
-
-      // === COLUMNA 2: FIRMA Y SELLO DEL PROFESIONAL ===
-      const centroColumna2X = inicioX + anchoColumna + espacioEntreColumnas + (anchoColumna / 2);
-      
-      // Agregar sello y firma del profesional
-      if (sellop) {
-        try {
-          const sigW = 55;
-          const sigH = alturaMaxima;
-          const sigX = centroColumna2X - sigW / 2;
-          const sigY = firmaY;
-
-          const maxImgW = sigW - 5;
-          const maxImgH = sigH - 5;
-          let imgW = sellop.width;
-          let imgH = sellop.height;
-          const scaleW = maxImgW / imgW;
-          const scaleH = maxImgH / imgH;
-          const scale = Math.min(scaleW, scaleH, 1);
-          imgW *= scale;
-          imgH *= scale;
-          const imgX = sigX + (sigW - imgW) / 2;
-          const imgY = sigY + (sigH - imgH) / 2;
-
-          const canvas = document.createElement('canvas');
-          canvas.width = sellop.width;
-          canvas.height = sellop.height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(sellop, 0, 0);
-          const selloBase64 = canvas.toDataURL('image/png');
-          doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-        } catch (error) {
-          console.log("Error cargando sello del profesional:", error);
-        }
-      }
-      
-      // Línea de firma debajo de la imagen (alineada con la del paciente)
-      doc.setLineWidth(0.2);
-      doc.line(centroColumna2X - 30, lineY, centroColumna2X + 30, lineY);
-      
-      // Texto "Sello y Firma del Médico" y "Responsable de la Evaluación"
-      doc.setFont('helvetica', 'normal').setFontSize(9);
-      doc.text("Sello y Firma del Médico", centroColumna2X, lineY + 6, { align: "center" });
-      doc.text("Responsable de la Evaluación", centroColumna2X, lineY + 10, { align: "center" });
-    } else {
-      // === LAYOUT CON UNA SOLA COLUMNA CENTRADA (Solo Paciente) ===
-      const centroColumnaX = pageW / 2;
-      
-      // Agregar firma del paciente (izquierda)
-      if (firmap) {
-        try {
-          const imgWidth = 30;
-          const imgHeight = 20;
-          const x = centroColumnaX - 20;
-          const canvas = document.createElement('canvas');
-          canvas.width = firmap.width;
-          canvas.height = firmap.height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(firmap, 0, 0);
-          const firmaBase64 = canvas.toDataURL('image/png');
-          doc.addImage(firmaBase64, 'PNG', x, firmaY, imgWidth, imgHeight);
-        } catch (error) {
-          console.log("Error cargando firma del paciente:", error);
-        }
-      }
-      
-      // Agregar huella del paciente (derecha de la firma)
-      if (huellap) {
-        try {
-          const imgWidth = 12;
-          const imgHeight = 20;
-          const x = centroColumnaX + 10;
-          const canvas = document.createElement('canvas');
-          canvas.width = huellap.width;
-          canvas.height = huellap.height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(huellap, 0, 0);
-          const huellaBase64 = canvas.toDataURL('image/png');
-          doc.addImage(huellaBase64, 'PNG', x, firmaY, imgWidth, imgHeight);
-        } catch (error) {
-          console.log("Error cargando huella del paciente:", error);
-        }
-      }
-      
-      // Línea de firma debajo de las imágenes
-      const lineYP = firmaY + 22;
-      doc.setLineWidth(0.2);
-      doc.line(centroColumnaX - 30, lineYP, centroColumnaX + 30, lineYP);
-      
-      // Texto "Firma y Huella del Paciente" centrado
-      doc.setFont('helvetica', 'normal').setFontSize(9);
-      doc.text("Firma y Huella del Paciente", centroColumnaX, lineYP + 6, { align: "center" });
-    }
-
+  // Usar helper para dibujar firmas
+  dibujarFirmas({ doc, datos, y, pageW }).then(() => {
     footerTR(doc, datos);
 
     // Mostrar PDF
@@ -451,10 +275,9 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
       iframe.contentWindow.focus();
       iframe.contentWindow.print();
     };
-  })
-  .catch(err => {
+  }).catch(err => {
     console.error(err);
     alert('Error generando PDF: ' + err);
   });
-  
+
 } 

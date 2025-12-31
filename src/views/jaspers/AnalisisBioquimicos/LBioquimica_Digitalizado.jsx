@@ -29,30 +29,30 @@ const toDDMMYYYY = (fecha) => {
 
 
 // Header con datos de ficha, sede y fecha
-const drawHeader = (doc, datos = {}) => {
+const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
-  
-  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-  
+
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Nro de ficha: ", pageW - 80, 15);
   doc.setFont("helvetica", "normal").setFontSize(18);
   doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
-  
+
   // Sede
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
-  
+
   // Fecha de examen
   const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
   doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
-  
+
   // Página
   doc.text("Pag. 01", pageW - 30, 10);
 
   // Bloque de color
-   drawColorBox(doc, {
+  drawColorBox(doc, {
     color: datos.codigoColor,
     text: datos.textoColor,
     x: pageW - 30,
@@ -183,13 +183,13 @@ const drawPatientData = (doc, datos = {}) => {
   return yPos;
 };
 
-export default function LBioquimica_Digitalizado(datos) {
+export default async function LBioquimica_Digitalizado(datos) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
-  drawHeader(doc, datos);
-  
+  await drawHeader(doc, datos);
+
   // === TÍTULO BIOQUÍMICA ===
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
   doc.text('BIOQUÍMICA', pageW / 2, 38, { align: 'center' });
@@ -238,7 +238,7 @@ export default function LBioquimica_Digitalizado(datos) {
     const dataRows = [
       {
         prueba: 'CREATININA SÉRICA',
-        resultado: datos.txtCreatinina  || '',
+        resultado: datos.txtCreatinina || '',
         normales: 'Adulto: 0.8 - 1.4 mg/dl\nNiño: 0.24 - 0.84 mg/dl'
       },
       {
@@ -248,7 +248,7 @@ export default function LBioquimica_Digitalizado(datos) {
       },
       {
         prueba: 'ÁCIDO ÚRICO SÉRICO',
-        resultado: datos.txtAcidoUrico  || '',
+        resultado: datos.txtAcidoUrico || '',
         normales: 'Mujeres: 2.5 - 6.8 mg/dl\nHombres 3.6 - 7.7 mg/dl'
       }
     ];
@@ -269,52 +269,60 @@ export default function LBioquimica_Digitalizado(datos) {
     });
 
     // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
-    const sigW = 53; // Tamaño fijo width
-    const sigH = 23; // Tamaño fijo height
-    const sigY = y + 45;
-    const gap = 16; // Espacio entre sellos
-    
+    const sigW = 48;
+    const sigH = 20;
+    const sigY = y + 12;
+    const gap = 16;
+    const lineY = sigY + sigH + 3;
+
+    // Función auxiliar para agregar sello al PDF
+    const agregarSello = (img, xPos, yPos, width, height) => {
+      if (!img) return;
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const selloBase64 = canvas.toDataURL('image/png');
+      doc.addImage(selloBase64, 'PNG', xPos, yPos, width, height);
+    };
+
+    // Función auxiliar para dibujar línea y texto debajo del sello
+    const dibujarLineaYTexto = (centroX, lineY, tipoSello) => {
+      doc.setLineWidth(0.2);
+      doc.line(centroX - 25, lineY, centroX + 25, lineY);
+      doc.setFont('helvetica', 'normal').setFontSize(9);
+      if (tipoSello === 'SELLOFIRMA') {
+        // SELLOFIRMA: Firma y Sello del Profesional / Responsable de la Evaluación
+        doc.text("Firma y Sello del Profesional", centroX, lineY + 5, { align: "center" });
+        doc.text("Responsable de la Evaluación", centroX, lineY + 8, { align: "center" });
+      } else if (tipoSello === 'SELLOFIRMADOCASIG') {
+        // SELLOFIRMADOCASIG: Firma y Sello Médico Asignado
+        doc.text("Firma y Sello Médico Asignado", centroX, lineY + 5, { align: "center" });
+      } else {
+        doc.text("Firma y Sello", centroX, lineY + 5, { align: "center" });
+      }
+    };
+
     if (s1 && s2) {
-      // Si hay dos sellos, centrarlos juntos
       const totalWidth = sigW * 2 + gap;
       const startX = (pageW - totalWidth) / 2;
-      
-      // Sello 1 (izquierda) - Tamaño fijo
-      const canvas1 = document.createElement('canvas');
-      canvas1.width = s1.width;
-      canvas1.height = s1.height;
-      const ctx1 = canvas1.getContext('2d');
-      ctx1.drawImage(s1, 0, 0);
-      const selloBase64_1 = canvas1.toDataURL('image/png');
-      doc.addImage(selloBase64_1, 'PNG', startX, sigY, sigW, sigH);
-      
-      // Sello 2 (derecha) - Mismo tamaño fijo
-      const canvas2 = document.createElement('canvas');
-      canvas2.width = s2.width;
-      canvas2.height = s2.height;
-      const ctx2 = canvas2.getContext('2d');
-      ctx2.drawImage(s2, 0, 0);
-      const selloBase64_2 = canvas2.toDataURL('image/png');
-      doc.addImage(selloBase64_2, 'PNG', startX + sigW + gap, sigY, sigW, sigH);
+
+      agregarSello(s1, startX, sigY, sigW, sigH);
+      agregarSello(s2, startX + sigW + gap, sigY, sigW, sigH);
+
+      const centroSello1X = startX + sigW / 2;
+      const centroSello2X = startX + sigW + gap + sigW / 2;
+      dibujarLineaYTexto(centroSello1X, lineY, 'SELLOFIRMA');
+      dibujarLineaYTexto(centroSello2X, lineY, 'SELLOFIRMADOCASIG');
     } else if (s1) {
-      // Si solo hay un sello, centrarlo con tamaño fijo
-      const canvas = document.createElement('canvas');
-      canvas.width = s1.width;
-      canvas.height = s1.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(s1, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
       const imgX = (pageW - sigW) / 2;
-      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
+      agregarSello(s1, imgX, sigY, sigW, sigH);
+      dibujarLineaYTexto(pageW / 2, lineY, 'SELLOFIRMA');
     } else if (s2) {
-      // Si solo hay el segundo sello, colocarlo a la izquierda
-      const canvas = document.createElement('canvas');
-      canvas.width = s2.width;
-      canvas.height = s2.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(s2, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-      doc.addImage(selloBase64, 'PNG', tablaInicioX, sigY, sigW, sigH);
+      const imgX = (pageW - sigW) / 2;
+      agregarSello(s2, imgX, sigY, sigW, sigH);
+      dibujarLineaYTexto(pageW / 2, lineY, 'SELLOFIRMADOCASIG');
     }
 
     // === FOOTER ===

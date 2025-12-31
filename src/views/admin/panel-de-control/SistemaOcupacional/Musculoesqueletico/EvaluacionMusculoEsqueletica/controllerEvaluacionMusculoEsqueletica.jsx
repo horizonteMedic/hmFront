@@ -1,13 +1,14 @@
 import Swal from "sweetalert2";
 import { getFetch } from "../../../getFetch/getFetch";
 import { SubmitData } from "../model";
+import jsPDF from "jspdf";
 
 //===============Zona Modificación===============
 const obtenerReporteUrl =
   "/api/v01/ct/evaluacionMusculoEsqueletica/obtenerReporteEvaluacionMusculoEsqueletica";
 const registrarUrl =
   "/api/v01/ct/evaluacionMusculoEsqueletica/registrarActualizarEvaluacionMusculoEsqueletica";
-
+const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
 const leerBoolSI = (bool) => {
   return bool ? "SI" : "NO";
 };

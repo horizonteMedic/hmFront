@@ -1,12 +1,4 @@
 import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-    faUser,
-    faHeartbeat,
-    faPrint,
-    faBroom,
-    faSave,
-} from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
     InputTextArea,
@@ -18,12 +10,14 @@ import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformePsicologico";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
+import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
 
 const tabla = "informe_psicologico";
-const today = getToday();
 
 export default function InformePsicologico() {
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+
+    const today = getToday();
 
     const initialFormState = {
         norden: "",
@@ -48,7 +42,7 @@ export default function InformePsicologico() {
 
         // Área Intelectual
         areaIntelectual: "EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO.",
-        promedio: false,
+        promedio: true,
         superior: false,
         nInferior: false,
         alto: false,
@@ -105,6 +99,7 @@ export default function InformePsicologico() {
         setForm,
         handleChange,
         handleChangeNumber,
+        handleChangeNumberDecimals,
         handleClear,
         handleRadioButtonBoolean,
         handleClearnotO,
@@ -300,7 +295,7 @@ export default function InformePsicologico() {
         });
     };
     return (
-        <div className="w-full space-y-3 px-4">
+        <div className="space-y-3 px-4 max-w-[90%]  xl:max-w-[80%] mx-auto">
             {/* ===== SECCIÓN: DATOS NECESARIOS ===== */}
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
                 <InputTextOneLine
@@ -585,7 +580,7 @@ export default function InformePsicologico() {
                                 onChange={handleChange}
                             />
                             <fieldset className="grid grid-cols-2 gap-2">
-                                <SectionFieldset >
+                                <SectionFieldset className="flex gap-3 flex-col" >
                                     <InputCheckbox
                                         label="ALTO MANEJO DE FACULTADES MENTALES"
                                         name="poseeAltoManejo"
@@ -727,44 +722,13 @@ export default function InformePsicologico() {
                 </div>
             </div>
 
-            {/* BOTONES DE ACCIÓN */}
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4 px-12">
-                <div className="flex gap-4">
-                    <button
-                        type="button"
-                        onClick={handleSave}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                    >
-                        <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                    </button>
-                    <button
-                        type="button"
-                        onClick={handleClear}
-                        className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                    >
-                        <FontAwesomeIcon icon={faBroom} /> Limpiar
-                    </button>
-                </div>
-                <div className="flex flex-col items-end">
-                    <span className="font-bold italic text-base mb-1">Imprimir</span>
-                    <div className="flex items-center gap-2">
-                        <input
-                            name="norden"
-                            value={form.norden}
-                            onChange={handleChange}
-                            className="border rounded px-2 py-1 text-base w-24"
-                        />
-
-                        <button
-                            type="button"
-                            onClick={handlePrint}
-                            className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                        >
-                            <FontAwesomeIcon icon={faPrint} />
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <BotonesAccion
+                form={form}
+                handleSave={handleSave}
+                handleClear={handleClear}
+                handlePrint={handlePrint}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+            />
         </div>
     );
 }

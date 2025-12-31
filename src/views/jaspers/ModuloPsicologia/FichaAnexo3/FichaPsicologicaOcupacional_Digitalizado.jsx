@@ -6,13 +6,13 @@ import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import { convertirGenero, getSign } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
 
-export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
+export default async function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   // Contador de páginas dinámico
   let numeroPagina = 1;
-  
+
   // Configuración global de la tabla
   const TABLA_INICIO_X = 5;
   const TABLA_ANCHO = 200;
@@ -35,7 +35,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
       areaTrabajoEmpresa: String(payload?.areaPaciente ?? ''),
       superficie: String((String(payload?.explotacionEn ?? '').toUpperCase() === 'SUPERFICIE') ? 'X' : ''),
       subsuelo: String((String(payload?.explotacionEn ?? '').toUpperCase() === 'SUBSUELO') ? 'X' : ''),
-      tiempoLaborando: String(payload?.tiempoTrabajo_timpo_trab ?? ''),
+      tiempoLaborando: String(payload?.tiempoExperiencia ?? ''),
       puestoEmpresa: String(payload?.cargoPaciente ?? ''),
       principalesRiesgos: String(payload?.principalRiesgo_princ_riesgo ?? ''),
       medidasSeguridad: String(payload?.medidasSeguridad_med_seguridad ?? ''),
@@ -173,9 +173,9 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   const datosFinales = buildDatosFinales(data);
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
 
     // Títulos
     doc.setFont("helvetica", "bold").setFontSize(12);
@@ -214,27 +214,27 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     if (!texto || texto === null || texto === undefined) {
       return y;
     }
-    
+
     const fontSize = doc.internal.getFontSize();
     let yPos = y;
-    
+
     // Primero dividir por saltos de línea explícitos (\n)
     const lineasConSaltos = String(texto).split('\n');
-    
+
     lineasConSaltos.forEach((lineaConSalto, indiceLinea) => {
       // Si no es la primera línea y hay un salto de línea antes, hacer salto
       if (indiceLinea > 0) {
         yPos += fontSize * 0.35; // Salto de línea explícito
       }
-      
+
       // Dividir cada línea por espacios para manejar el ancho máximo
       const palabras = lineaConSalto.split(' ');
       let lineaActual = '';
-      
+
       palabras.forEach(palabra => {
         const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
         const anchoTexto = doc.getTextWidth(textoPrueba);
-        
+
         if (anchoTexto <= anchoMaximo) {
           lineaActual = textoPrueba;
         } else {
@@ -249,24 +249,24 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
           }
         }
       });
-      
+
       // Dibujar la línea actual si quedó algo
       if (lineaActual) {
         doc.text(lineaActual, x, yPos);
         // NO sumar una línea extra aquí, solo cuando hay salto explícito o nueva palabra
       }
     });
-    
+
     return yPos; // Devuelve la posición final donde terminó el texto
   };
 
   // Función para calcular altura dinámica del texto
   const calcularAlturaTexto = (texto, anchoMaximo, alturaMinima = 10) => {
     if (!texto || texto.trim() === '') return alturaMinima;
-    
+
     const fontSize = doc.internal.getFontSize();
     let lineas = 0;
-    
+
     // Si el texto contiene saltos de línea (listas), procesar cada línea por separado
     if (texto.includes('\n')) {
       const lineasTexto = texto.split('\n');
@@ -274,11 +274,11 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
         if (linea.trim()) {
           const palabras = linea.split(' ');
           let lineaActual = '';
-          
+
           palabras.forEach(palabra => {
             const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
             const anchoTexto = doc.getTextWidth(textoPrueba);
-            
+
             if (anchoTexto <= anchoMaximo) {
               lineaActual = textoPrueba;
             } else {
@@ -290,7 +290,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
               }
             }
           });
-          
+
           if (lineaActual) {
             lineas++;
           }
@@ -300,11 +300,11 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
       // Texto normal sin saltos de línea
       const palabras = texto.split(' ');
       let lineaActual = '';
-      
+
       palabras.forEach(palabra => {
         const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
         const anchoTexto = doc.getTextWidth(textoPrueba);
-        
+
         if (anchoTexto <= anchoMaximo) {
           lineaActual = textoPrueba;
         } else {
@@ -316,12 +316,12 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
           }
         }
       });
-      
+
       if (lineaActual) {
         lineas++;
       }
     }
-    
+
     // Calcular altura: padding superior + (líneas * altura por línea) + padding inferior
     const alturaCalculada = 3 + (lineas * fontSize * 0.35) + 3;
     return Math.max(alturaCalculada, alturaMinima);
@@ -331,25 +331,25 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
     const tablaInicioX = TABLA_INICIO_X;
     const tablaAncho = TABLA_ANCHO;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo gris más oscuro
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
+
     // Dibujar líneas del header
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
+
     // Dibujar texto del título con posición más baja
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
-    
+
     return yPos + alturaHeader;
   };
 
@@ -357,30 +357,30 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   const dibujarSubHeaderCeleste = (titulo, yPos, alturaHeader = 5) => {
     const tablaInicioX = TABLA_INICIO_X;
     const tablaAncho = TABLA_ANCHO;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo celeste
     doc.setFillColor(199, 241, 255); // Color celeste claro
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
+
     // Dibujar líneas del subheader
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
+
     // Dibujar texto del subtítulo
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
-    
+
     return yPos + alturaHeader;
   };
 
   // === PÁGINA 1 ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === SECCIÓN 1: DATOS DE FILIACIÓN ===
   const tablaInicioX = TABLA_INICIO_X;
@@ -537,25 +537,25 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
 
   // === SECCIÓN 2: MOTIVO DE EVALUACIÓN ===
   // Header de motivo de evaluación con texto más abajo
-  
+
   // Configurar líneas con grosor consistente
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
-  
+
   // Dibujar fondo gris más oscuro
   doc.setFillColor(196, 196, 196);
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
-  
+
   // Dibujar líneas del header
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   // Dibujar texto del título con posición más baja
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("II. MOTIVO DE EVALUACIÓN", tablaInicioX + 2, yPos + 3.5);
-  
+
   yPos += filaAltura;
 
   // Calcular altura dinámica para el texto del motivo
@@ -583,13 +583,13 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   yPos = dibujarSubHeaderCeleste("3.1. EMPRESA ACTUAL(postula, trabaja o trabajó)", yPos, filaAltura);
 
   // === CONTENIDO DE DATOS OCUPACIONALES ===
-  
+
   // Primera fila: Nombre de la Empresa
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Nombre de la Empresa:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -601,7 +601,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Actividad Empresa:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -613,7 +613,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Área de Trabajo:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -627,7 +627,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Superficie:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -641,7 +641,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Tiempo Total Laborando:", tablaInicioX + 122, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.tiempoLaborando , tablaInicioX + 170, yPos + 3.5);
+  doc.text(datosFinales.tiempoLaborando, tablaInicioX + 170, yPos + 3.5);
   yPos += filaAltura;
 
   // Quinta fila: Puesto
@@ -649,7 +649,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Puesto:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -715,7 +715,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   // Dibujar header principal de la tabla (altura aumentada)
   const headerAltura = filaAltura + 2;
   let xPos = tablaInicioX;
-  
+
   // Dibujar columnas principales
   columnasAnterioresEmpresas.forEach((columna, index) => {
     doc.line(xPos, yPos, xPos, yPos + headerAltura);
@@ -723,35 +723,35 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     if (index < columnasAnterioresEmpresas.length - 1) {
       doc.line(xPos + columna.ancho, yPos, xPos + columna.ancho, yPos + headerAltura);
     }
-    
+
     // Dibujar texto del header
     doc.setFont("helvetica", "bold").setFontSize(7);
-    
+
     if (index === 4) { // Columna TIEMPO
       // Centrar "TIEMPO" horizontalmente en la celda
       const tiempoTextoAncho = doc.getTextWidth("TIEMPO");
       const tiempoXCentrado = xPos + (columna.ancho - tiempoTextoAncho) / 2;
       doc.text("TIEMPO", tiempoXCentrado, yPos + 2.5);
-      
+
       // Dibujar línea horizontal que toque completamente los bordes de la celda
       doc.setLineWidth(0.2);
       doc.line(xPos, yPos + 3.5, xPos + columna.ancho, yPos + 3.5);
-      
+
       // Dibujar líneas verticales para dividir SUP/SUB
-      doc.line(xPos + columna.ancho/2, yPos + 3.5, xPos + columna.ancho/2, yPos + headerAltura);
-      
+      doc.line(xPos + columna.ancho / 2, yPos + 3.5, xPos + columna.ancho / 2, yPos + headerAltura);
+
       // Dibujar SUP y SUB centrados en sus sub-columnas
       doc.setFont("helvetica", "bold").setFontSize(7);
       const subColumnaAncho = columna.ancho / 2;
-      
+
       // Centrar SUP
       const supTextoAncho = doc.getTextWidth("SUP");
       const supXCentrado = xPos + (subColumnaAncho - supTextoAncho) / 2;
       doc.text("SUP", supXCentrado, yPos + 6);
-      
+
       // Centrar SUB
       const subTextoAncho = doc.getTextWidth("SUB");
-      const subXCentrado = xPos + columna.ancho/2 + (subColumnaAncho - subTextoAncho) / 2;
+      const subXCentrado = xPos + columna.ancho / 2 + (subColumnaAncho - subTextoAncho) / 2;
       doc.text("SUB", subXCentrado, yPos + 6);
     } else {
       // Para las demás columnas, centrar texto horizontalmente
@@ -759,22 +759,22 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
       const textoXCentrado = xPos + (columna.ancho - textoAncho) / 2;
       doc.text(columna.titulo, textoXCentrado, yPos + 4);
     }
-    
+
     xPos += columna.ancho;
   });
-  
+
   // Dibujar línea derecha final de la tabla
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + headerAltura);
-  
+
   // Dibujar líneas horizontales del header principal
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + headerAltura, tablaInicioX + tablaAncho, yPos + headerAltura);
-  
+
   // Dibujar línea doble en la parte inferior del header
   doc.setLineWidth(0.3);
   doc.line(tablaInicioX, yPos + headerAltura, tablaInicioX + tablaAncho, yPos + headerAltura);
   doc.setLineWidth(0.2);
-  
+
   yPos += headerAltura;
 
   // === FILAS DE DATOS ===
@@ -783,7 +783,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
 
   // Dibujar todas las filas de datos
   const filaDatosAltura = 8; // Altura suficiente para texto con salto de línea
-  
+
   datosEjemplo.forEach((fila) => {
     // Dibujar líneas verticales de la fila
     let xPosDatos = tablaInicioX;
@@ -794,77 +794,77 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
       }
       xPosDatos += columna.ancho;
     });
-    
+
     // Dibujar línea derecha final
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaDatosAltura);
-    
+
     // Dibujar líneas horizontales
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + filaDatosAltura, tablaInicioX + tablaAncho, yPos + filaDatosAltura);
-    
+
     // Dibujar líneas de la columna TIEMPO para dividir SUP/SUB
     const tiempoX = tablaInicioX + columnasAnterioresEmpresas[0].ancho + columnasAnterioresEmpresas[1].ancho + columnasAnterioresEmpresas[2].ancho + columnasAnterioresEmpresas[3].ancho;
     doc.line(tiempoX, yPos, tiempoX, yPos + filaDatosAltura);
     doc.line(tiempoX + columnasAnterioresEmpresas[4].ancho, yPos, tiempoX + columnasAnterioresEmpresas[4].ancho, yPos + filaDatosAltura);
-    
+
     // Dibujar línea vertical del medio para dividir SUP/SUB
-    doc.line(tiempoX + columnasAnterioresEmpresas[4].ancho/2, yPos, tiempoX + columnasAnterioresEmpresas[4].ancho/2, yPos + filaDatosAltura);
-    
+    doc.line(tiempoX + columnasAnterioresEmpresas[4].ancho / 2, yPos, tiempoX + columnasAnterioresEmpresas[4].ancho / 2, yPos + filaDatosAltura);
+
     // Dibujar contenido de la fila
     doc.setFont("helvetica", "normal").setFontSize(6.5);
-    
+
     // Calcular posiciones X dinámicamente
     let xPosTexto = tablaInicioX;
-    
+
     // FECHA (centrada)
     const fechaTextoAncho = doc.getTextWidth(fila.fecha || '');
     const fechaXCentrado = xPosTexto + (columnasAnterioresEmpresas[0].ancho - fechaTextoAncho) / 2;
     doc.text(fila.fecha || '', fechaXCentrado, yPos + 3);
     xPosTexto += columnasAnterioresEmpresas[0].ancho;
-    
+
     // NOMBRE DE LA EMPRESA (con salto de línea)
     dibujarTextoConSaltoLinea(fila.empresa || '', xPosTexto + 1, yPos + 3, columnasAnterioresEmpresas[1].ancho - 2);
     xPosTexto += columnasAnterioresEmpresas[1].ancho;
-    
+
     // ACT. EMPRESA (con salto de línea)
     dibujarTextoConSaltoLinea(fila.actividad || '', xPosTexto + 1, yPos + 3, columnasAnterioresEmpresas[2].ancho - 2);
     xPosTexto += columnasAnterioresEmpresas[2].ancho;
-    
+
     // PUESTO (mostrar ocupación del detalle)
     dibujarTextoConSaltoLinea((fila.ocupacion || fila.puesto || ''), xPosTexto + 1, yPos + 3, columnasAnterioresEmpresas[3].ancho - 2);
     xPosTexto += columnasAnterioresEmpresas[3].ancho;
-    
+
     // TIEMPO - SUP y SUB (mapear desde superficie y socavon)
     // Mostrar exactamente lo que viene en la data, en mayúsculas
     const tiempoSupTexto = (fila.superficie || '').toUpperCase();
     const tiempoSubTexto = (fila.socavon || '').toUpperCase();
-    
+
     const tiempoColAncho = columnasAnterioresEmpresas[4].ancho;
     const subColumnaAncho = tiempoColAncho / 2; // Ancho de cada sub-columna (SUP o SUB)
-    
+
     // Reducir tamaño de fuente para TIEMPO para que quepa mejor
     doc.setFont("helvetica", "normal").setFontSize(6);
-    
+
     // SUP (centrado en su sub-celda)
     const supTextoAncho = doc.getTextWidth(tiempoSupTexto);
     const supXInicio = xPosTexto; // Inicio de la sub-columna SUP
     const supXCentrado = supXInicio + (subColumnaAncho - supTextoAncho) / 2;
     doc.text(tiempoSupTexto, supXCentrado, yPos + 3);
-    
+
     // SUB (centrado en su sub-celda)
     const subTextoAncho = doc.getTextWidth(tiempoSubTexto);
     const subXInicio = xPosTexto + subColumnaAncho; // Inicio de la sub-columna SUB
     const subXCentrado = subXInicio + (subColumnaAncho - subTextoAncho) / 2;
     doc.text(tiempoSubTexto, subXCentrado, yPos + 3);
-    
+
     // Restaurar tamaño de fuente para el resto
     doc.setFont("helvetica", "normal").setFontSize(6.5);
-    
+
     xPosTexto += columnasAnterioresEmpresas[4].ancho;
-    
+
     // CAUSA DEL RETIRO (mapear desde causaRetiro)
     dibujarTextoConSaltoLinea(fila.causaRetiro || '', xPosTexto + 1, yPos + 3, columnasAnterioresEmpresas[5].ancho - 2);
-    
+
     yPos += filaDatosAltura;
   });
 
@@ -916,7 +916,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
 
   // Contenido de otras observaciones (puede ser texto o lista)
   const otrasObservacionesRaw = datosFinales.otrasObservaciones || 'El paciente presenta un perfil psicológico adecuado para el puesto solicitado / Se observa buena capacidad de concentración y atención durante la evaluación / Muestra actitud colaborativa y disposición para el trabajo en equipo / No se evidencian signos de ansiedad o estrés significativo / Se recomienda seguimiento psicológico periódico según protocolo de la empresa';
-  
+
   // Procesar si viene como lista separada por "/"
   let otrasObservacionesTexto;
   if (typeof otrasObservacionesRaw === 'string' && otrasObservacionesRaw.includes('/')) {
@@ -926,7 +926,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   } else {
     otrasObservacionesTexto = otrasObservacionesRaw;
   }
-  
+
   const anchoMaximoObservaciones = tablaAncho - 4;
   const alturaObservaciones = calcularAlturaTexto(otrasObservacionesTexto, anchoMaximoObservaciones, 10);
 
@@ -938,12 +938,12 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
 
   // Dibujar texto de otras observaciones (manejar listas con viñetas)
   doc.setFont("helvetica", "normal").setFontSize(8);
-  
+
   if (otrasObservacionesTexto.includes('\n')) {
     // Es una lista con viñetas, dibujar línea por línea
     const lineas = otrasObservacionesTexto.split('\n');
     let yPosTexto = yPos + 3.5;
-    
+
     lineas.forEach(linea => {
       if (linea.trim()) {
         dibujarTextoConSaltoLinea(linea, tablaInicioX + 2, yPosTexto, anchoMaximoObservaciones);
@@ -963,7 +963,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   // === PÁGINA 2 ===
   doc.addPage();
   numeroPagina = 2;
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // Resetear posición Y para la nueva página
   yPos = 35;
@@ -976,11 +976,11 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   // Fila celeste dividida más hacia la derecha
   const filaCelesteAltura = 5;
   const mitadAncho = tablaAncho * 0.60; // 60% para la izquierda, 40% para la derecha
-  
+
   // Dibujar fondo celeste
   doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, tablaAncho, filaCelesteAltura, 'F');
-  
+
   // Dibujar líneas de la fila
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
@@ -989,20 +989,20 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaCelesteAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaCelesteAltura, tablaInicioX + tablaAncho, yPos + filaCelesteAltura);
-  
+
   // Dibujar texto "7.1. OBSERVACIÓN DE CONDUCTAS" en la mitad izquierda
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("7.1. OBSERVACIÓN DE CONDUCTAS", tablaInicioX + 2, yPos + 3.5);
-  
+
   // Dibujar header "Nombre | ptje" en la mitad derecha
   const anchoTablaInventarios = tablaAncho - mitadAncho; // Usar el 40% restante
   const columnaNombreAncho = anchoTablaInventarios - 10; // Dejar 8mm para ptje (reducido de 15mm)
   doc.line(tablaInicioX + mitadAncho + columnaNombreAncho, yPos, tablaInicioX + mitadAncho + columnaNombreAncho, yPos + filaCelesteAltura);
-  
+
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("NOMBRE", tablaInicioX + mitadAncho + 1, yPos + 3.5);
   doc.text("PTJE", tablaInicioX + mitadAncho + columnaNombreAncho + 1.5, yPos + 3.5);
-  
+
   yPos += filaCelesteAltura;
 
   // Guardar la posición para la tabla de inventarios (debe empezar inmediatamente después del header)
@@ -1010,7 +1010,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
 
   // === TABLA DE OBSERVACIÓN DE CONDUCTAS EN LA MITAD IZQUIERDA ===
   const examenMental = datosFinales.examenMental || {};
-  
+
   const observacionesConductas = [
     {
       titulo: "Presentación:",
@@ -1026,14 +1026,14 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
 
   // Subcategorías de Postura (Ritmo y Tono)
   const posturas = [
-    { 
-      subtitulo: "Ritmo:", 
-      opciones: ["lento", "rapido", "fluido"], 
+    {
+      subtitulo: "Ritmo:",
+      opciones: ["lento", "rapido", "fluido"],
       valores: [examenMental.ritmo?.lento || false, examenMental.ritmo?.rapido || false, examenMental.ritmo?.fluido || false]
     },
-    { 
-      subtitulo: "Tono:", 
-      opciones: ["Bajo", "Moderado", "Alto"], 
+    {
+      subtitulo: "Tono:",
+      opciones: ["Bajo", "Moderado", "Alto"],
       valores: [examenMental.tono?.bajo || false, examenMental.tono?.moderado || false, examenMental.tono?.alto || false]
     }
   ];
@@ -1047,43 +1047,43 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
 
   const filaObservacionAltura = 5;
   const anchoMitadIzquierda = mitadAncho; // Usar solo la mitad izquierda
-  
+
   observacionesConductas.forEach((observacion) => {
     // Dibujar líneas de la fila
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaObservacionAltura);
     doc.line(tablaInicioX + anchoMitadIzquierda, yPos, tablaInicioX + anchoMitadIzquierda, yPos + filaObservacionAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + anchoMitadIzquierda, yPos);
     doc.line(tablaInicioX, yPos + filaObservacionAltura, tablaInicioX + anchoMitadIzquierda, yPos + filaObservacionAltura);
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(observacion.titulo, tablaInicioX + 1, yPos + 3.5);
-    
+
     // Dibujar opciones con X marcada (usar el mismo espacio que las demás filas)
     const espacioTitulo = 25; // Mismo espacio que orientación y articulación
     const anchoOpcion = (anchoMitadIzquierda - espacioTitulo) / observacion.opciones.length;
-    
+
     observacion.opciones.forEach((opcion, opcionIndex) => {
       const xOpcion = tablaInicioX + espacioTitulo + (opcionIndex * anchoOpcion);
-      
+
       // Dibujar línea vertical para separar opciones (incluyendo la primera)
       doc.line(xOpcion, yPos, xOpcion, yPos + filaObservacionAltura);
-      
+
       // Dibujar texto de la opción
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text(opcion, xOpcion + 1, yPos + 3.5);
-      
+
       // Dibujar X si está seleccionado (usar valores booleanos)
       if (observacion.valores[opcionIndex]) {
         doc.setFont("helvetica", "bold").setFontSize(10);
         doc.text("X", xOpcion + anchoOpcion - 5, yPos + 3.5);
       }
     });
-    
+
     // Dibujar línea vertical final para cerrar la última columna
     const xFinal = tablaInicioX + espacioTitulo + (observacion.opciones.length * anchoOpcion);
     doc.line(xFinal, yPos, xFinal, yPos + filaObservacionAltura);
-    
+
     yPos += filaObservacionAltura;
   });
 
@@ -1096,38 +1096,38 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     doc.line(tablaInicioX + anchoMitadIzquierda, yPos, tablaInicioX + anchoMitadIzquierda, yPos + filaObservacionAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + anchoMitadIzquierda, yPos);
     doc.line(tablaInicioX, yPos + filaObservacionAltura, tablaInicioX + anchoMitadIzquierda, yPos + filaObservacionAltura);
-    
+
     // Dibujar subtítulo (Ritmo:, Tono:)
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(postura.subtitulo, tablaInicioX + 1, yPos + 3.5);
-    
+
     // Dibujar línea vertical después del subtítulo
     doc.line(tablaInicioX + espacioTituloPostura, yPos, tablaInicioX + espacioTituloPostura, yPos + filaObservacionAltura);
-    
+
     // Dibujar opciones
     const anchoOpcionPostura = (anchoMitadIzquierda - espacioTituloPostura) / postura.opciones.length;
-    
+
     postura.opciones.forEach((opcion, opcionIndex) => {
       const xOpcion = tablaInicioX + espacioTituloPostura + (opcionIndex * anchoOpcionPostura);
-      
+
       // Dibujar línea vertical para separar opciones
       doc.line(xOpcion, yPos, xOpcion, yPos + filaObservacionAltura);
-      
+
       // Dibujar texto de la opción
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text(opcion, xOpcion + 1, yPos + 3.5);
-      
+
       // Dibujar X si está seleccionado (usar valores booleanos)
       if (postura.valores[opcionIndex]) {
         doc.setFont("helvetica", "bold").setFontSize(10);
         doc.text("X", xOpcion + anchoOpcionPostura - 5, yPos + 3.5);
       }
     });
-    
+
     // Dibujar línea vertical final para cerrar la última columna
     const xFinalPostura = tablaInicioX + espacioTituloPostura + (postura.opciones.length * anchoOpcionPostura);
     doc.line(xFinalPostura, yPos, xFinalPostura, yPos + filaObservacionAltura);
-    
+
     yPos += filaObservacionAltura;
   });
 
@@ -1137,53 +1137,53 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   doc.line(tablaInicioX + anchoMitadIzquierda, yPos, tablaInicioX + anchoMitadIzquierda, yPos + filaObservacionAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + anchoMitadIzquierda, yPos);
   doc.line(tablaInicioX, yPos + filaObservacionAltura, tablaInicioX + anchoMitadIzquierda, yPos + filaObservacionAltura);
-  
+
   // Dibujar título "Articulación:"
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text(articulacion.titulo, tablaInicioX + 1, yPos + 3.5);
-  
+
   // Dibujar opciones (usar el mismo espacio que las subcategorías de orientación)
   const espacioTituloArticulacion = 25; // Mismo espacio que orientación
   const anchoOpcionArticulacion = (anchoMitadIzquierda - espacioTituloArticulacion) / articulacion.opciones.length;
-  
+
   articulacion.opciones.forEach((opcion, opcionIndex) => {
     const xOpcion = tablaInicioX + espacioTituloArticulacion + (opcionIndex * anchoOpcionArticulacion);
-    
+
     // Dibujar línea vertical para separar opciones
     doc.line(xOpcion, yPos, xOpcion, yPos + filaObservacionAltura);
-    
+
     // Dibujar texto de la opción
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(opcion, xOpcion + 1, yPos + 3.5);
-    
+
     // Dibujar X si está seleccionado (usar valores booleanos)
     if (articulacion.valores[opcionIndex]) {
       doc.setFont("helvetica", "bold").setFontSize(10);
       doc.text("X", xOpcion + anchoOpcionArticulacion - 5, yPos + 3.5);
     }
   });
-  
+
   // Dibujar línea vertical final para cerrar la última columna
   const xFinalArticulacion = tablaInicioX + espacioTituloArticulacion + (articulacion.opciones.length * anchoOpcionArticulacion);
   doc.line(xFinalArticulacion, yPos, xFinalArticulacion, yPos + filaObservacionAltura);
-  
+
   yPos += filaObservacionAltura;
 
   // === SECCIÓN ESPECIAL: ORIENTACIÓN ===
   const orientaciones = [
-    { 
-      subtitulo: "Tiempo:", 
-      opciones: ["Orientado", "Desorientado"], 
+    {
+      subtitulo: "Tiempo:",
+      opciones: ["Orientado", "Desorientado"],
       valores: [examenMental.orientacion?.tiempo?.orientado || false, examenMental.orientacion?.tiempo?.desorientado || false]
     },
-    { 
-      subtitulo: "Espacio:", 
-      opciones: ["Orientado", "Desorientado"], 
+    {
+      subtitulo: "Espacio:",
+      opciones: ["Orientado", "Desorientado"],
       valores: [examenMental.orientacion?.espacio?.orientado || false, examenMental.orientacion?.espacio?.desorientado || false]
     },
-    { 
-      subtitulo: "Persona:", 
-      opciones: ["Orientado", "Desorientado"], 
+    {
+      subtitulo: "Persona:",
+      opciones: ["Orientado", "Desorientado"],
       valores: [examenMental.orientacion?.persona?.orientado || false, examenMental.orientacion?.persona?.desorientado || false]
     }
   ];
@@ -1192,7 +1192,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   // Dibujar fondo celeste
   doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, anchoMitadIzquierda, filaObservacionAltura, 'F');
-  
+
   // Dibujar líneas de la fila (sin división vertical interna)
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
@@ -1200,11 +1200,11 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   doc.line(tablaInicioX + anchoMitadIzquierda, yPos, tablaInicioX + anchoMitadIzquierda, yPos + filaObservacionAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + anchoMitadIzquierda, yPos);
   doc.line(tablaInicioX, yPos + filaObservacionAltura, tablaInicioX + anchoMitadIzquierda, yPos + filaObservacionAltura);
-  
+
   // Dibujar título "Orientación:"
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Orientación:", tablaInicioX + 1, yPos + 3.5);
-  
+
   yPos += filaObservacionAltura;
 
   // Dibujar subcategorías de orientación
@@ -1215,48 +1215,48 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     doc.line(tablaInicioX + anchoMitadIzquierda, yPos, tablaInicioX + anchoMitadIzquierda, yPos + filaObservacionAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + anchoMitadIzquierda, yPos);
     doc.line(tablaInicioX, yPos + filaObservacionAltura, tablaInicioX + anchoMitadIzquierda, yPos + filaObservacionAltura);
-    
+
     // Dibujar subtítulo (Tiempo:, Espacio:, Persona:)
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(orientacion.subtitulo, tablaInicioX + 1, yPos + 3.5);
-    
+
     // Dibujar línea vertical después del subtítulo
     doc.line(tablaInicioX + espacioTituloOrientacion, yPos, tablaInicioX + espacioTituloOrientacion, yPos + filaObservacionAltura);
-    
+
     // Dibujar opciones
     const anchoOpcionOrientacion = (anchoMitadIzquierda - espacioTituloOrientacion) / orientacion.opciones.length;
-    
+
     orientacion.opciones.forEach((opcion, opcionIndex) => {
       const xOpcion = tablaInicioX + espacioTituloOrientacion + (opcionIndex * anchoOpcionOrientacion);
-      
+
       // Dibujar línea vertical para separar opciones
       doc.line(xOpcion, yPos, xOpcion, yPos + filaObservacionAltura);
-      
+
       // Dibujar texto de la opción
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text(opcion, xOpcion + 1, yPos + 3.5);
-      
+
       // Dibujar X si está seleccionado (usar valores booleanos)
       if (orientacion.valores[opcionIndex]) {
         doc.setFont("helvetica", "bold").setFontSize(10);
         doc.text("X", xOpcion + anchoOpcionOrientacion - 5, yPos + 3.5);
       }
     });
-    
+
     // Dibujar línea vertical final para cerrar la última columna
     const xFinalOrientacion = tablaInicioX + espacioTituloOrientacion + (orientacion.opciones.length * anchoOpcionOrientacion);
     doc.line(xFinalOrientacion, yPos, xFinalOrientacion, yPos + filaObservacionAltura);
-    
+
     yPos += filaObservacionAltura;
   });
 
   // === SECCIÓN 7.2: PROCESOS COGNITIVOS ===
   // Header de procesos cognitivos (solo hasta la mitad)
-  
+
   // Dibujar fondo celeste solo en la mitad izquierda
   doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, anchoMitadIzquierda, filaAltura, 'F');
-  
+
   // Dibujar líneas del header solo en la mitad izquierda
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
@@ -1264,11 +1264,11 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   doc.line(tablaInicioX + anchoMitadIzquierda, yPos, tablaInicioX + anchoMitadIzquierda, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + anchoMitadIzquierda, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + anchoMitadIzquierda, yPos + filaAltura);
-  
+
   // Dibujar texto del título
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("7.2. PROCESOS COGNITIVOS", tablaInicioX + 2, yPos + 3.5);
-  
+
   yPos += filaAltura;
 
   // === FILAS DE PROCESOS COGNITIVOS ===
@@ -1340,36 +1340,36 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     doc.line(tablaInicioX + anchoMitadIzquierda, yPos, tablaInicioX + anchoMitadIzquierda, yPos + filaObservacionAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + anchoMitadIzquierda, yPos);
     doc.line(tablaInicioX, yPos + filaObservacionAltura, tablaInicioX + anchoMitadIzquierda, yPos + filaObservacionAltura);
-    
+
     // Dibujar título
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(proceso.titulo, tablaInicioX + 1, yPos + 3.5);
-    
+
     // Dibujar línea vertical después del título (para todas las filas)
     const espacioTituloProceso = 25;
     doc.line(tablaInicioX + espacioTituloProceso, yPos, tablaInicioX + espacioTituloProceso, yPos + filaObservacionAltura);
-    
+
     if (proceso.tipo === "opciones" && proceso.opciones.length > 0) {
       // Dibujar opciones
       const anchoOpcionProceso = (anchoMitadIzquierda - espacioTituloProceso) / proceso.opciones.length;
-      
+
       proceso.opciones.forEach((opcion, opcionIndex) => {
         const xOpcion = tablaInicioX + espacioTituloProceso + (opcionIndex * anchoOpcionProceso);
-        
+
         // Dibujar línea vertical para separar opciones
         doc.line(xOpcion, yPos, xOpcion, yPos + filaObservacionAltura);
-        
+
         // Dibujar texto de la opción
         doc.setFont("helvetica", "normal").setFontSize(8);
         doc.text(opcion, xOpcion + 1, yPos + 3.5);
-        
+
         // Dibujar X si está seleccionado (usar valores booleanos)
         if (proceso.valores[opcionIndex]) {
           doc.setFont("helvetica", "bold").setFontSize(10);
           doc.text("X", xOpcion + anchoOpcionProceso - 5, yPos + 3.5);
         }
       });
-      
+
       // Dibujar línea vertical final para cerrar la última columna
       const xFinalProceso = tablaInicioX + espacioTituloProceso + (proceso.opciones.length * anchoOpcionProceso);
       doc.line(xFinalProceso, yPos, xFinalProceso, yPos + filaObservacionAltura);
@@ -1378,17 +1378,17 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text(proceso.valor, tablaInicioX + espacioTituloProceso + 1, yPos + 3.5);
     }
-    
+
     yPos += filaObservacionAltura;
   });
 
   // === SECCIÓN 7.3: EVALUACIÓN ADICIONAL ===
   // Header de evaluación adicional (ocupa todo el ancho)
-  
+
   // Dibujar fondo celeste ocupando todo el ancho
   doc.setFillColor(199, 241, 255); // Color celeste claro
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
-  
+
   // Dibujar líneas del header ocupando todo el ancho
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
@@ -1396,11 +1396,11 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   // Dibujar texto del título
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("7.3. EVALUACIÓN ADICIONAL", tablaInicioX + 2, yPos + 3.5);
-  
+
   yPos += filaAltura;
 
   // === FILAS DE EVALUACIÓN ADICIONAL ===
@@ -1443,19 +1443,19 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaObservacionAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + filaObservacionAltura, tablaInicioX + tablaAncho, yPos + filaObservacionAltura);
-    
+
     // Dibujar título
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(evaluacion.titulo, tablaInicioX + 1, yPos + 3.5);
-    
+
     // Dibujar línea vertical después del título
     const espacioTituloEvaluacion = 25;
     doc.line(tablaInicioX + espacioTituloEvaluacion, yPos, tablaInicioX + espacioTituloEvaluacion, yPos + filaObservacionAltura);
-    
+
     // Dibujar valor (con más espacio disponible)
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(evaluacion.valor, tablaInicioX + espacioTituloEvaluacion + 1, yPos + 3.5);
-    
+
     yPos += filaObservacionAltura;
   });
 
@@ -1482,14 +1482,14 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     "Escala de Memoria de Wechsler",
     "Otras Pruebas"
   ];
-  
+
   // Obtener datos de inventarios del examen mental
   const inventariosData = examenMental.inventarios || {};
 
   const filaInventarioAltura = 5;
   const inicioXTabla = tablaInicioX + mitadAncho; // Empezar desde la nueva división
   // anchoTablaInventarios ya está definido arriba
-  
+
   // Dibujar todas las filas de inventarios (incluyendo "Otras Pruebas" como fila normal)
   inventarios.forEach((inventario) => {
     // Dibujar líneas de la fila
@@ -1497,20 +1497,20 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     doc.line(inicioXTabla + anchoTablaInventarios, yPos, inicioXTabla + anchoTablaInventarios, yPos + filaInventarioAltura);
     doc.line(inicioXTabla, yPos, inicioXTabla + anchoTablaInventarios, yPos);
     doc.line(inicioXTabla, yPos + filaInventarioAltura, inicioXTabla + anchoTablaInventarios, yPos + filaInventarioAltura);
-    
+
     // Dibujar línea vertical para separar "Nombre" y "ptje"
     doc.line(inicioXTabla + columnaNombreAncho, yPos, inicioXTabla + columnaNombreAncho, yPos + filaInventarioAltura);
-    
+
     // Dibujar texto del inventario (centrado verticalmente)
     doc.setFont("helvetica", "normal").setFontSize(8);
     dibujarTextoConSaltoLinea(inventario, inicioXTabla + 1, yPos + 3.5, columnaNombreAncho - 2);
-    
+
     // Dibujar "X" en la columna ptje solo si está marcado en los datos
     if (inventariosData[inventario]) {
       doc.setFont("helvetica", "bold").setFontSize(10);
       doc.text("X", inicioXTabla + columnaNombreAncho + 3, yPos + 3.5);
-    } 
-    
+    }
+
     yPos += filaInventarioAltura;
   });
 
@@ -1520,10 +1520,10 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   // === SECCIÓN IX: DIAGNÓSTICO FINAL ===
   // Usar la posición más baja entre evaluación adicional e inventarios para alinear correctamente
   yPos = Math.max(yPosFinalEvaluacionAdicional, yPosFinalInventarios);
-  
+
   // Header gris "IX. DIAGNOSTICO FINAL"
   yPos = dibujarHeaderSeccion("IX. DIAGNOSTICO FINAL", yPos, filaAltura);
-  
+
   // === SUBSECCIÓN: ÁREA COGNITIVA ===
   // Verificar si necesitamos nueva página antes de Área Cognitiva
   const espacioMinimoCognitiva = 15;
@@ -1531,29 +1531,29 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     doc.addPage();
     numeroPagina++;
     yPos = 35;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
   }
-  
+
   // Header celeste "Área Cognitiva"
   yPos = dibujarSubHeaderCeleste("Área Cognitiva:", yPos, filaAltura);
-  
+
   // Contenido del área cognitiva usando datos mapeados
   const diagnosticoFinal = examenMental.diagnosticoFinal || {};
   const areaCognitivaTexto = diagnosticoFinal.areaCognitiva || "El paciente presenta capacidades cognitivas preservadas con atención y concentración adecuadas. Se observa memoria inmediata y diferida dentro de parámetros normales, funciones ejecutivas eficientes y procesamiento de información adecuado para las demandas del puesto.";
-  
+
   // Dibujar borde superior y laterales de la fila
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  
+
   // Dibujar texto del área cognitiva primero para obtener altura real (FILA DINÁMICA/CRECIENTE)
   doc.setFont("helvetica", "normal").setFontSize(8);
   const yInicialCognitiva = yPos;
   const yTextoInicioCognitiva = yPos + 3.5;
   let yFinalCognitiva = dibujarTextoConSaltoLinea(areaCognitivaTexto, tablaInicioX + 2, yTextoInicioCognitiva, tablaAncho - 4);
-  
+
   // Verificar si necesitamos nueva página durante el dibujado (si el texto es muy largo)
   const alturaMaximaCognitiva = pageHeight - yInicialCognitiva - 25; // 25mm para footer y margen
   if (yFinalCognitiva - yInicialCognitiva > alturaMaximaCognitiva) {
@@ -1561,7 +1561,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     doc.addPage();
     numeroPagina++;
     yPos = 35;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     // Redibujar header celeste en nueva página
     yPos = dibujarSubHeaderCeleste("Área Cognitiva:", yPos, filaAltura);
     // Redibujar texto en nueva página desde el inicio
@@ -1573,20 +1573,20 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     yFinalCognitiva = dibujarTextoConSaltoLinea(areaCognitivaTexto, tablaInicioX + 2, yPos + 3.5, tablaAncho - 4);
     yPos = yInicialCognitivaNueva;
   }
-  
+
   // Calcular altura real de la fila (desde el inicio hasta el final del texto + margen inferior)
   // La fila CRECE DINÁMICAMENTE según la cantidad de texto
   const alturaNecesariaCognitiva = (yFinalCognitiva - yInicialCognitiva) + 3.5; // +3.5 para margen inferior
   const alturaMinimaFilaCognitiva = filaAltura;
   const alturaRealCognitiva = Math.max(alturaMinimaFilaCognitiva, alturaNecesariaCognitiva);
-  
+
   // Redibujar los bordes con la altura correcta (ajusta automáticamente al contenido)
   doc.line(tablaInicioX, yInicialCognitiva, tablaInicioX, yInicialCognitiva + alturaRealCognitiva);
   doc.line(tablaInicioX + tablaAncho, yInicialCognitiva, tablaInicioX + tablaAncho, yInicialCognitiva + alturaRealCognitiva);
   doc.line(tablaInicioX, yInicialCognitiva + alturaRealCognitiva, tablaInicioX + tablaAncho, yInicialCognitiva + alturaRealCognitiva);
-  
+
   yPos += alturaRealCognitiva;
-  
+
   // === SUBSECCIÓN: ÁREA EMOCIONAL ===
   // Verificar si necesitamos nueva página antes de Área Emocional
   const espacioMinimoEmocional = 15;
@@ -1594,28 +1594,28 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     doc.addPage();
     numeroPagina++;
     yPos = 35;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
   }
-  
+
   // Header celeste "Área Emocional"
   yPos = dibujarSubHeaderCeleste("Área Emocional:", yPos, filaAltura);
-  
+
   // Contenido del área emocional usando datos mapeados
   const areaEmocionalTexto = diagnosticoFinal.areaEmocional || "El paciente presenta un estado emocional estable con capacidad de regulación emocional adecuada. Se observa un nivel de ansiedad dentro de parámetros normales y habilidades sociales preservadas que le permiten mantener relaciones interpersonales satisfactorias.";
-  
+
   // Dibujar borde superior y laterales de la fila
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  
+
   // Dibujar texto del área emocional primero para obtener altura real (FILA DINÁMICA/CRECIENTE)
   doc.setFont("helvetica", "normal").setFontSize(8);
   const yInicialEmocional = yPos;
   const yTextoInicioEmocional = yPos + 3.5;
   let yFinalEmocional = dibujarTextoConSaltoLinea(areaEmocionalTexto, tablaInicioX + 2, yTextoInicioEmocional, tablaAncho - 4);
-  
+
   // Verificar si necesitamos nueva página durante el dibujado (si el texto es muy largo)
   const alturaMaximaEmocional = pageHeight - yInicialEmocional - 25; // 25mm para footer y margen
   if (yFinalEmocional - yInicialEmocional > alturaMaximaEmocional) {
@@ -1623,7 +1623,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     doc.addPage();
     numeroPagina++;
     yPos = 35;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     // Redibujar header celeste en nueva página
     yPos = dibujarSubHeaderCeleste("Área Emocional:", yPos, filaAltura);
     // Redibujar texto en nueva página desde el inicio
@@ -1635,18 +1635,18 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     yFinalEmocional = dibujarTextoConSaltoLinea(areaEmocionalTexto, tablaInicioX + 2, yPos + 3.5, tablaAncho - 4);
     yPos = yInicialEmocionalNueva;
   }
-  
+
   // Calcular altura real de la fila (desde el inicio hasta el final del texto + margen inferior)
   // La fila CRECE DINÁMICAMENTE según la cantidad de texto
   const alturaNecesariaEmocional = (yFinalEmocional - yInicialEmocional) + 3.5; // +3.5 para margen inferior
   const alturaMinimaFilaEmocional = filaAltura;
   const alturaRealEmocional = Math.max(alturaMinimaFilaEmocional, alturaNecesariaEmocional);
-  
+
   // Redibujar los bordes con la altura correcta (ajusta automáticamente al contenido)
   doc.line(tablaInicioX, yInicialEmocional, tablaInicioX, yInicialEmocional + alturaRealEmocional);
   doc.line(tablaInicioX + tablaAncho, yInicialEmocional, tablaInicioX + tablaAncho, yInicialEmocional + alturaRealEmocional);
   doc.line(tablaInicioX, yInicialEmocional + alturaRealEmocional, tablaInicioX + tablaAncho, yInicialEmocional + alturaRealEmocional);
-  
+
   yPos += alturaRealEmocional;
 
   // === SECCIÓN DE FIRMA DEL MÉDICO ===
@@ -1656,11 +1656,11 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     doc.addPage();
     numeroPagina++;
     yPos = 35;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
   }
-  
+
   const alturaSeccionFirma = 30; // Altura para la sección de firma
-  
+
   // Dibujar las líneas de la sección de firma (1 columna centrada)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaSeccionFirma); // Línea izquierda
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaSeccionFirma); // Línea derecha
@@ -1671,7 +1671,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   // Firma arriba, texto abajo
   const firmaMedicoY = yPos + 3; // Posición inicial de la firma (arriba)
   const imgHeight = 20; // Altura de la imagen
-  
+
   // Agregar firma y sello médico
   const firmaMedicoUrl = getSign(data, "SELLOFIRMA");
   if (firmaMedicoUrl) {
@@ -1684,7 +1684,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
       console.log("Error cargando firma del médico:", error);
     }
   }
-  
+
   // Texto debajo de la firma (después de la imagen + espacio)
   doc.setFont("helvetica", "normal").setFontSize(7);
   const centroX = tablaInicioX + tablaAncho / 2;

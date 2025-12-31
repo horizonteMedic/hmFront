@@ -1,8 +1,8 @@
-// src/views/jaspers/AnalisisBioquimicos/AnalisisBioquimicos_Digitalizado.jsx
 import jsPDF from "jspdf";
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
+import { getSignCompressed } from "../../utils/helpers";
 
 // --- Configuración Centralizada ---
 const config = {
@@ -29,28 +29,28 @@ const toDDMMYYYY = (fecha) => {
 };
 
 // Header con datos de ficha, sede y fecha
-const drawHeader = (doc, datos = {}) => {
+const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
-  
-  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-  
+
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Nro de ficha: ", pageW - 80, 15);
   doc.setFont("helvetica", "normal").setFontSize(18);
   doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
-  
+
   // Código AB (codAb)
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Cod. AB: " + (datos.codAb || ""), pageW - 80, 20);
-  
+
   // Sede
   doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 25);
-  
+
   // Fecha de examen
   const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
   doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 30);
-  
+
   // Página
   doc.text("Pag. 01", pageW - 30, 10);
 
@@ -177,116 +177,111 @@ const drawPatientData = (doc, datos = {}) => {
   return yPos;
 };
 
-export default function AnalisisBioquimicos_Digitalizado(datos = {}) {
-  const doc = new jsPDF();
+export default async function AnalisisBioquimicos_Digitalizado(datos = {}, docExistente = null) {
+
+  const doc = docExistente || new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
-  drawHeader(doc, datos);
-  
+  await drawHeader(doc, datos);
+
   // === TÍTULO ===
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
   doc.text("BIOQUÍMICA", pageW / 2, 38, { align: "center" });
-  
+
   // === DATOS DEL PACIENTE ===
   const finalYPos = drawPatientData(doc, datos);
 
-  const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
-  const isValidUrl = url => url && url !== "Sin registro";
-  const loadImg = src =>
-    new Promise((res, rej) => {
-      const img = new Image();
-      img.src = src;
-      img.crossOrigin = 'anonymous';
-      img.onload = () => res(img);
-      img.onerror = () => rej(`No se pudo cargar ${src}`);
-    });
+  // Obtener firmas comprimidas
+  const s1 = await getSignCompressed(datos, "SELLOFIRMA");
+  const s2 = await getSignCompressed(datos, "SELLOFIRMADOCASIG");
 
-  Promise.all([
-    isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
-    isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-  ]).then(([s1, s2]) => {
+  let y = finalYPos + 10; // Posición inicial después de la tabla de datos
 
-    let y = finalYPos + 10; // Posición inicial después de la tabla de datos
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+  doc.text("ANÁLISIS BIOQUÍMICOS", config.margin, y);
+  y += config.lineHeight * 1.5;
 
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
-    doc.text("ANÁLISIS BIOQUÍMICOS", config.margin, y);
-    y += config.lineHeight * 1.5;
+  // === ENCABEZADO DE TABLA ===
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+  doc.text("PRUEBA", config.col1X, y);
+  doc.text("RESULTADO", config.col2X, y, { align: "center" });
+  doc.text("RANGO REFERENCIAL", config.col3X, y, { align: "left" });
+  y += 3;
+  doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
+  y += config.lineHeight;
 
-    // === ENCABEZADO DE TABLA ===
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
-    doc.text("PRUEBA", config.col1X, y);
-    doc.text("RESULTADO", config.col2X, y, { align: "center" });
-    doc.text("RANGO REFERENCIAL", config.col3X, y, { align: "left" });
-    y += 3;
-    doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
+  // === PRUEBAS ===
+  const tests = [
+    // { label: "CREATININA", key: "txtCreatinina", ref: "0.8 - 1.4 mg/dL" }, // Comentado por el momento
+    { label: "COLESTEROL TOTAL", key: "txtColesterol", ref: "< 200 mg/dL" },
+    { label: "TRIGLICÉRIDOS", key: "txtTrigliseridos", ref: "< 150 mg/dL" },
+    { label: "H.D.L. COLESTEROL", key: "txtHdlColesterol", ref: "40 - 60 mg/dL" },
+    { label: "L.D.L. COLESTEROL", key: "txtLdlColesterol", ref: "< 129 mg/dL" },
+    { label: "V.L.D.L. COLESTEROL", key: "txtVldlColesterol", ref: "< 30 mg/dL" },
+  ];
+
+  doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
+  tests.forEach(({ label, key, ref }) => {
+    const val = datos[key] != null ? String(datos[key]) : "-";
+    doc.text(label, config.col1X, y);
+    doc.text(val, config.col2X, y, { align: "center" });
+    doc.text(ref, config.col3X, y, { align: "left" });
     y += config.lineHeight;
+  });
 
-    // === PRUEBAS ===
-    const tests = [
-      { label: "CREATININA", key: "txtCreatinina", ref: "0.8 - 1.4 mg/dL" },
-      { label: "COLESTEROL TOTAL", key: "txtColesterol", ref: "< 200 mg/dL" },
-      { label: "TRIGLICÉRIDOS", key: "txtTrigliseridos", ref: "< 150 mg/dL" },
-      { label: "H.D.L. COLESTEROL", key: "txtHdlColesterol", ref: "40 - 60 mg/dL" },
-      { label: "L.D.L. COLESTEROL", key: "txtLdlColesterol", ref: "< 129 mg/dL" },
-      { label: "V.L.D.L. COLESTEROL", key: "txtVldlColesterol", ref: "< 30 mg/dL" },
-    ];
+  // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
+  const sigW = 48;
+  const sigH = 20;
+  const sigY = y + 12;
+  const gap = 16;
+  const lineY = sigY + sigH + 3;
 
-    doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
-    tests.forEach(({ label, key, ref }) => {
-      const val = datos[key] != null ? String(datos[key]) : "-";
-      doc.text(label, config.col1X, y);
-      doc.text(val, config.col2X, y, { align: "center" });
-      doc.text(ref, config.col3X, y, { align: "left" });
-      y += config.lineHeight;
-    });
-
-    // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
-    const sigW = 53;
-    const sigH = 23;
-    const sigY = 210;
-    const gap = 16;
-    
-    if (s1 && s2) {
-      const totalWidth = sigW * 2 + gap;
-      const startX = (pageW - totalWidth) / 2;
-      
-      const addSello = (img, xPos) => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        const selloBase64 = canvas.toDataURL('image/png');
-        doc.addImage(selloBase64, 'PNG', xPos, sigY, sigW, sigH);
-      };
-      addSello(s1, startX);
-      addSello(s2, startX + sigW + gap);
-    } else if (s1) {
-      const canvas = document.createElement('canvas');
-      canvas.width = s1.width;
-      canvas.height = s1.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(s1, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = (pageW - sigW) / 2;
-      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
-    } else if (s2) {
-      const canvas = document.createElement('canvas');
-      canvas.width = s2.width;
-      canvas.height = s2.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(s2, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = (pageW - sigW) / 2;
-      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
+  // Función auxiliar para dibujar línea y texto debajo del sello
+  const dibujarLineaYTexto = (centroX, lineY, tipoSello) => {
+    doc.setLineWidth(0.2);
+    doc.line(centroX - 25, lineY, centroX + 25, lineY);
+    doc.setFont('helvetica', 'normal').setFontSize(9);
+    if (tipoSello === 'SELLOFIRMA') {
+      // SELLOFIRMA: Firma y Sello del Profesional / Responsable de la Evaluación
+      doc.text("Firma y Sello del Profesional", centroX, lineY + 5, { align: "center" });
+      doc.text("Responsable de la Evaluación", centroX, lineY + 8, { align: "center" });
+    } else if (tipoSello === 'SELLOFIRMADOCASIG') {
+      // SELLOFIRMADOCASIG: Firma y Sello Médico Asignado
+      doc.text("Firma y Sello Médico Asignado", centroX, lineY + 5, { align: "center" });
+    } else {
+      doc.text("Firma y Sello", centroX, lineY + 5, { align: "center" });
     }
+  };
 
-    // === FOOTER ===
-    footerTR(doc, datos);
+  if (s1 && s2) {
+    const totalWidth = sigW * 2 + gap;
+    const startX = (pageW - totalWidth) / 2;
 
-    // ==== Imprimir ====
+    doc.addImage(s1, 'JPEG', startX, sigY, sigW, sigH);
+    doc.addImage(s2, 'JPEG', startX + sigW + gap, sigY, sigW, sigH);
+
+    const centroSello1X = startX + sigW / 2;
+    const centroSello2X = startX + sigW + gap + sigW / 2;
+    dibujarLineaYTexto(centroSello1X, lineY, 'SELLOFIRMA');
+    dibujarLineaYTexto(centroSello2X, lineY, 'SELLOFIRMADOCASIG');
+  } else if (s1) {
+    const imgX = (pageW - sigW) / 2;
+    doc.addImage(s1, 'JPEG', imgX, sigY, sigW, sigH);
+    dibujarLineaYTexto(pageW / 2, lineY, 'SELLOFIRMA');
+  } else if (s2) {
+    const imgX = (pageW - sigW) / 2;
+    doc.addImage(s2, 'JPEG', imgX, sigY, sigW, sigH);
+    dibujarLineaYTexto(pageW / 2, lineY, 'SELLOFIRMADOCASIG');
+  }
+
+  // === FOOTER ===
+  footerTR(doc, datos);
+
+  // === Imprimir ===
+  if (docExistente) {
+    return doc;
+  } else {
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
     const iframe = document.createElement("iframe");
@@ -297,5 +292,5 @@ export default function AnalisisBioquimicos_Digitalizado(datos = {}) {
       iframe.contentWindow.focus();
       iframe.contentWindow.print();
     };
-  });
+  }
 }

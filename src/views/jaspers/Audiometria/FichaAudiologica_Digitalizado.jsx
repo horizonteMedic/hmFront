@@ -1,19 +1,22 @@
 import jsPDF from "jspdf";
 import headerFicha from "./headers/header_FichaAudiologica_Digitalizado.jsx";
+import { compressImage, getSign } from "../../utils/helpers.js";
 
-export default function FichaAudiologica_Digitalizado(
+export default async function FichaAudiologica_Digitalizado(
   data = {},
+  docExistente = null,
   mostrarGrafico = true,
-  firmaExtra = true
+  firmaExtra = true,
 ) {
-  const doc = new jsPDF();
+  const doc = docExistente || new jsPDF();
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
   const usableW = pageW - 2 * margin;
   let y = 32;
 
+  // DEBUG: Ver en qué página estamos
   // 1) Header
-  headerFicha(doc, data);
+  await headerFicha(doc, data);
 
   // const datos = {
   //   norden: "95899",
@@ -230,10 +233,11 @@ export default function FichaAudiologica_Digitalizado(
 
   // === NUEVO: Usar imagen de fondo para la cabecera ===
   const fondoImg = "/img/frame_ficha.png";
+  const fondoImgCompressed = await compressImage(fondoImg);
   const fondoH = 95; // altura aproximada de la cabecera en mm (ajusta si es necesario)
   let yHeader = 40;
   try {
-    doc.addImage(fondoImg, "PNG", margin, yHeader, usableW, fondoH);
+    doc.addImage(fondoImgCompressed, "PNG", margin, yHeader, usableW, fondoH);
   } catch (e) {
     doc.text("Imagen de cabecera no disponible", margin, yHeader + 10);
   }
@@ -365,7 +369,7 @@ export default function FichaAudiologica_Digitalizado(
     `${datos.aniosTrabajo ?? "0"} Años, ${datos.txtMesesTrabajo ?? "0"} Meses`,
     xAniosTrabajo,
     yAniosTrabajo,
-    {maxWidth:12}
+    { maxWidth: 12 }
   );
   doc.setFont("helvetica", "normal").setFontSize(7);
   // Empresa Contrata
@@ -483,7 +487,7 @@ export default function FichaAudiologica_Digitalizado(
   ySint += 4.5;
   if (datos.otros) doc.text("X", xSintSI, ySint);
   else doc.text("X", xSintNO, ySint);
-  
+
   // Mostrar texto descriptivo de "Otros" si está marcado
   if (datos.otros && datos.OtrosTexto) {
     const xOtrosTexto = margin + 108;
@@ -966,7 +970,7 @@ export default function FichaAudiologica_Digitalizado(
     }
   );
 
-  // Función para agregar la firma y esperar a que cargue o falle
+
   const addSello = (imagenUrl, x, y, maxw = 100) => {
     return new Promise((resolve) => {
       const img = new Image();
@@ -1021,21 +1025,26 @@ export default function FichaAudiologica_Digitalizado(
     .filter((f) => firmas[f.nombre])
     .map((f) => addSello(firmas[f.nombre], f.x, f.y, f.maxw));
 
-  Promise.all(promesasFirmas).then(() => {
+  return Promise.all(promesasFirmas).then(() => {
+
     // 4) Imprimir automáticamente
     // Dibujar el footer
     if (typeof footerFichaAudiologica === "function") {
       footerFichaAudiologica(doc);
     }
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    iframe.onload = () => {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
+    if (!docExistente) {
+      const blob = doc.output("blob");
+      const url = URL.createObjectURL(blob);
+      const iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      iframe.src = url;
+      document.body.appendChild(iframe);
+      iframe.onload = () => {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      };
+    }
+
+    return doc;
   });
 }

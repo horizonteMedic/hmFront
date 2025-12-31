@@ -5,7 +5,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 
-export default function Audiometria2021_Digitalizado_Nuevo(data = {}) {
+export default async function Audiometria2021_Digitalizado_Nuevo(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -61,9 +61,9 @@ export default function Audiometria2021_Digitalizado_Nuevo(data = {}) {
   const datosFinales = datosReales;
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
     // Título principal (solo en página 1)
     if (pageNumber === 1) {
@@ -98,7 +98,7 @@ export default function Audiometria2021_Digitalizado_Nuevo(data = {}) {
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === FUNCIONES AUXILIARES ===
   // Función para texto con salto de línea
@@ -107,16 +107,16 @@ export default function Audiometria2021_Digitalizado_Nuevo(data = {}) {
     if (!texto || texto === null || texto === undefined) {
       return y;
     }
-    
+
     const fontSize = doc.internal.getFontSize();
     const palabras = String(texto).split(' ');
     let lineaActual = '';
     let yPos = y;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -130,12 +130,12 @@ export default function Audiometria2021_Digitalizado_Nuevo(data = {}) {
         }
       }
     });
-    
+
     if (lineaActual) {
       doc.text(lineaActual, x, yPos);
       yPos += fontSize * 0.35;
     }
-    
+
     return yPos; // Devuelve la nueva posición final
   };
 
@@ -143,25 +143,25 @@ export default function Audiometria2021_Digitalizado_Nuevo(data = {}) {
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
     const tablaInicioX = 5;
     const tablaAncho = 200;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo gris más oscuro
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
+
     // Dibujar líneas del header
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(9);
     doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
-    
+
     return yPos + alturaHeader;
   };
 
@@ -453,14 +453,14 @@ export default function Audiometria2021_Digitalizado_Nuevo(data = {}) {
   const colRangoAnchoIndividual = colRangoAnchoTotal / 7; // ~14.14 cada uno
   const colEventualAncho = 11; // eventual
   // Verificación: 40 + 8 + 8 + 34 + 99 + 11 = 200 ✓
-  
+
   // Calcular posiciones
   let xExposicion = tablaInicioX;
   let xSi = xExposicion + colExposicionRuidoAncho;
   let xNo = xSi + colSiNoAncho;
   let xTiempoExp = xNo + colSiNoAncho;
   let xRangos = xTiempoExp + colTiempoExpAncho;
-  
+
   // Posiciones de rangos
   const rangos = ["0 a 2", "2 a 4", "4 a 6", "6 a 8", "8 a 10", "10 a 12", ">12", "eventual"];
   const posicionesRangos = [];
@@ -471,7 +471,7 @@ export default function Audiometria2021_Digitalizado_Nuevo(data = {}) {
   }
   // Último rango (eventual) con ancho diferente
   posicionesRangos.push(xActual);
-  
+
   // === FILA 1: ENCABEZADOS ===
   // Dibujar todas las líneas verticales
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + (filaAltura * 2)); // Línea izquierda (2 filas)
@@ -479,37 +479,37 @@ export default function Audiometria2021_Digitalizado_Nuevo(data = {}) {
   doc.line(xSi, yPos, xSi, yPos + filaAltura);
   doc.line(xNo, yPos, xNo, yPos + filaAltura);
   doc.line(xTiempoExp, yPos, xTiempoExp, yPos + (filaAltura * 2)); // Tiempo de exposición (2 filas)
-  
+
   // Líneas de rangos (solo primera fila para rangos normales, eventual se dibuja más abajo)
   for (let i = 0; i < 7; i++) {
     doc.line(posicionesRangos[i], yPos, posicionesRangos[i], yPos + filaAltura);
   }
   // Línea antes de eventual
   doc.line(posicionesRangos[7], yPos, posicionesRangos[7], yPos + filaAltura);
-  
+
   // Líneas horizontales y externas
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Superior
   // Línea horizontal media: iniciar DESPUÉS de "No" para no cruzar Si/No
   doc.line(xTiempoExp, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos + (filaAltura * 2), tablaInicioX + tablaAncho, yPos + (filaAltura * 2)); // Inferior
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + (filaAltura * 2)); // Derecha
-  
+
   // Contenido de la fila 1 (encabezados)
   doc.setFont("helvetica", "bold").setFontSize(7);
-  
+
   // Exposición a ruido (centrada horizontal y mejor centrada verticalmente en la primera fila)
   const textoExposicion = "Exposición a ruido";
   const anchoExposicion = doc.getTextWidth(textoExposicion);
   doc.text(textoExposicion, xExposicion + (colExposicionRuidoAncho - anchoExposicion) / 2, yPos + 5.5);
-  
+
   // Si (centrado)
   const anchoSi = doc.getTextWidth("Si");
   doc.text("Si", xSi + (colSiNoAncho - anchoSi) / 2, yPos + 5.5);
-  
+
   // No (centrado)
   const anchoNo = doc.getTextWidth("No");
   doc.text("No", xNo + (colSiNoAncho - anchoNo) / 2, yPos + 5.5);
-  
+
   // Tiempo de exposición (centrado horizontalmente; mantener por encima de la línea media)
   doc.setFont("helvetica", "bold").setFontSize(7);
   const textoTiempoExp = "Tiempo de exposición";
@@ -519,7 +519,7 @@ export default function Audiometria2021_Digitalizado_Nuevo(data = {}) {
   // Colocar arriba (no cruzado por la línea media)
   const yTiempoExpCentrado = yPos + 3.5;
   doc.text(textoTiempoExp, xTiempoExpCentrado, yTiempoExpCentrado);
-  
+
   // Rangos (centrados horizontalmente en sus celdas)
   doc.setFont("helvetica", "bold").setFontSize(7);
   rangos.forEach((rango, index) => {
@@ -532,7 +532,7 @@ export default function Audiometria2021_Digitalizado_Nuevo(data = {}) {
     const xCentrado = xRango + (colAncho - anchoRango) / 2;
     doc.text(rango, xCentrado, yPos + 3.5);
   });
-  
+
   // === FILA 2: DATOS ===
   // Dibujar líneas verticales adicionales para segunda fila
   // Mantener divisiones de Si/No; quitar divisiones internas de los rangos para esta fila
@@ -544,24 +544,24 @@ export default function Audiometria2021_Digitalizado_Nuevo(data = {}) {
   // Agregar SOLO la línea de división entre "Tiempo de exposición" y el bloque de rangos
   doc.line(xRangos, yPos + filaAltura, xRangos, yPos + (filaAltura * 2));
   // Nota: NO dibujar las demás líneas de posicionesRangos[] en la segunda fila (pedido del usuario)
-  
+
   // Contenido de la fila 2 (datos)
   doc.setFont("helvetica", "bold").setFontSize(7);
-  
+
   // Años de experiencia (debajo de Tiempo de exposición)
   const textoAnosExp = "Años de experiencia";
   const anchoAnosExp = doc.getTextWidth(textoAnosExp);
   doc.text(textoAnosExp, xTiempoExp + (colTiempoExpAncho - anchoAnosExp) / 2, yPos + filaAltura + 3.5);
-  
+
   // Datos de exposición a ruido (asumir campos genéricos - ajustar según estructura real)
   const exposicionRuidoSi = data.exposicionRuidoSi ?? data.exposicionRuido_si ?? false;
   const exposicionRuidoNo = data.exposicionRuidoNo ?? data.exposicionRuido_no ?? (!exposicionRuidoSi);
   const anosExperiencia = data.anosExperiencia ?? data.tiempoExposicionAnos ?? "";
   const mesesExperiencia = data.mesesExperiencia ?? data.tiempoExposicionMeses ?? "";
-  
+
   // Marcar Si/No (ubicación en la PRIMERA fila, centrado verticalmente)
   doc.setFont("helvetica", "normal").setFontSize(12);
-  
+
   const yMarcaPrimeraFila = yPos + 6; // misma altura visual que los rótulos Si/No
   if (exposicionRuidoSi) {
     const anchoX = doc.getTextWidth("X");
@@ -571,7 +571,7 @@ export default function Audiometria2021_Digitalizado_Nuevo(data = {}) {
     const anchoX = doc.getTextWidth("X");
     doc.text("X", xNo + (colSiNoAncho - anchoX) / 2, yMarcaPrimeraFila);
   }
-  
+
   // Datos de años y meses
   doc.setFont("helvetica", "normal").setFontSize(8);
   if (anosExperiencia) {
@@ -585,7 +585,7 @@ export default function Audiometria2021_Digitalizado_Nuevo(data = {}) {
     else if (anos > 8 && anos <= 10) rangoIndex = 4;
     else if (anos > 10 && anos <= 12) rangoIndex = 5;
     else if (anos > 12) rangoIndex = 6;
-    
+
     if (rangoIndex >= 0) {
       // Marcar X en la cabecera del rango correspondiente (primera fila)
       const yMarcaRangos = yPos + 5.5; // mismo centrado que Si/No
@@ -604,7 +604,7 @@ export default function Audiometria2021_Digitalizado_Nuevo(data = {}) {
       doc.text(textoAnos, xRango + (colRangoAnchoIndividual - anchoTexto) / 2, yPos + filaAltura + 3.5);
     }
   }
-  
+
   // Meses (va en eventual si hay meses pero años están en rango o viceversa)
   if (mesesExperiencia) {
     // Marcar X en "eventual" en cabecera
@@ -621,7 +621,7 @@ export default function Audiometria2021_Digitalizado_Nuevo(data = {}) {
     const anchoTexto = doc.getTextWidth(textoMeses);
     doc.text(textoMeses, xEventualInicio + (colEventualAncho - anchoTexto) / 2, yPos + filaAltura + 3.5);
   }
-  
+
   yPos += filaAltura * 2;
 
   // === FILA: USO DE PROTECTORES AUDITIVOS ===
@@ -1051,7 +1051,7 @@ export default function Audiometria2021_Digitalizado_Nuevo(data = {}) {
   yPos = Math.max(yPos, graphY + graphH + 8);
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 8});
+  footerTR(doc, { footerOffsetY: 8 });
 
   // === Imprimir ===
   imprimir(doc);

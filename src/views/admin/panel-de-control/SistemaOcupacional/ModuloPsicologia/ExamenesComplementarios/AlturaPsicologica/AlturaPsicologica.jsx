@@ -1,5 +1,3 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faPrint, faBroom } from "@fortawesome/free-solid-svg-icons";
 import {
   InputTextOneLine,
   InputTextArea,
@@ -13,11 +11,13 @@ import { useForm } from "../../../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAlturaPsicologica";
 import { useTailwindBreakpoints } from "../../../../../../hooks/useTailwindBreakpoints";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
+import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
 
-const tabla = "";
-const today = getToday();
+const tabla = "psicologiafobias";
 
 export default function AlturaPsicologica() {
+  const today = getToday();
   const { token, userlogued, selectedSede, datosFooter } = useSessionData();
   const { isLgUp } = useTailwindBreakpoints();
 
@@ -28,15 +28,13 @@ export default function AlturaPsicologica() {
     nombreExamen: "INFORME PSICOLÓGICO - TRABAJO EN ALTURA",
     esApto: undefined,
 
-    // Datos Personales
+    dni: "",
     nombres: "",
     apellidos: "",
     fechaNacimiento: "",
-    edad: "",
-    dni: "",
-    sexo: "",
     lugarNacimiento: "",
-    domicilioActual: "",
+    edad: "",
+    sexo: "",
     estadoCivil: "",
     nivelEstudios: "",
 
@@ -54,10 +52,10 @@ export default function AlturaPsicologica() {
     orientacionEspacial: "",
 
     // Aspectos de Personalidad
-    estabilidad: "",
-    ansiedadTendencias: "",
-    consumoAlcohol: "",
-    fobiaAltura: "",
+    estabilidad: "ESTABLE",
+    ansiedadTendencias: "NO CASO",
+    consumoAlcohol: "NO CASO",
+    fobiaAltura: "NADA",
 
     // Analisis y recomendaciones
     analisisResultados: "",
@@ -68,7 +66,7 @@ export default function AlturaPsicologica() {
     form,
     setForm,
     handleChange,
-    handleChangeNumber,
+    handleChangeNumberDecimals,
     handleChangeSimple,
     handleRadioButton,
     handleRadioButtonBoolean,
@@ -111,26 +109,26 @@ export default function AlturaPsicologica() {
   ];
 
   return (
-    <div className="space-y-3 px-4">
+    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
       {/* Header con información del examen */}
-      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+      <SectionFieldset legend="Información del Examen" className="grid 2xl:grid-cols-4 gap-3">
         <InputTextOneLine
           label="N° Orden"
           name="norden"
           value={form.norden}
           onKeyUp={handleSearch}
-          onChange={handleChangeNumber}
+          onChange={handleChangeNumberDecimals}
           labelWidth="120px"
         />
         <InputTextOneLine
-          label="Fecha Entrevista"
+          label="Fecha"
           name="fechaExamen"
           type="date"
           value={form.fechaExamen}
           onChange={handleChangeSimple}
           labelWidth="120px"
         />
-        <div className="flex gap-4 items-center col-span-2">
+        <div className="flex gap-4 items-center 2xl:col-span-2">
           <h4 className="font-semibold min-w-[120px] max-w-[120px]">Nombre del Examen:</h4>
           <select
             name="nombreExamen"
@@ -157,114 +155,7 @@ export default function AlturaPsicologica() {
         />
       </SectionFieldset>
 
-      {/* Datos necesarios */}
-      <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        <InputTextOneLine
-          label="Nombres"
-          name="nombres"
-          value={form.nombres}
-          disabled
-          labelWidth="120px"
-        />
-        <div className="grid lg:grid-cols-2 gap-3">
-          <InputTextOneLine
-            label="Edad"
-            name="edad"
-            value={form.edad}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Sexo"
-            name="sexo"
-            value={form.sexo}
-            disabled
-            labelWidth="120px" />
-        </div>
-        <InputTextOneLine
-          label="Apellidos"
-          name="apellidos"
-          value={form.apellidos}
-          disabled
-          labelWidth="120px"
-        />
-        <div className="grid lg:grid-cols-2 gap-3">
-          <InputTextOneLine
-            label="DNI"
-            name="dni"
-            value={form.dni}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Estado Civil"
-            name="estadoCivil"
-            value={form.estadoCivil}
-            disabled
-            labelWidth="120px"
-          />
-        </div>
-        <InputTextOneLine
-          label="Fecha Nacimiento"
-          name="fechaNacimiento"
-          value={form.fechaNacimiento}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Lugar Nacimiento"
-          name="lugarNacimiento"
-          value={form.lugarNacimiento}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Domicilio Actual"
-          name="domicilioActual"
-          value={form.domicilioActual}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Nivel Estudios"
-          name="nivelEstudios"
-          value={form.nivelEstudios}
-          disabled
-          labelWidth="120px"
-        />
-      </SectionFieldset>
-
-      {/* Datos Laborales */}
-      <SectionFieldset legend="Datos Laborales" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        <InputTextOneLine
-          label="Empresa"
-          name="empresa"
-          value={form.empresa}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Contrata"
-          name="contrata"
-          value={form.contrata}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Ocupación"
-          name="ocupacion"
-          value={form.ocupacion}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Cargo Desempeñar"
-          name="cargoDesempenar"
-          value={form.cargoDesempenar}
-          disabled
-          labelWidth="120px"
-        />
-      </SectionFieldset>
+      <DatosPersonalesLaborales form={form} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <SectionFieldset legend="Aspecto Intelectual">
@@ -348,43 +239,13 @@ export default function AlturaPsicologica() {
       </SectionFieldset>
 
       {/* Acciones */}
-      <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-4">
-        <div className="flex gap-4">
-          <button
-            type="button"
-            onClick={handleSave}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-          </button>
-          <button
-            type="button"
-            onClick={handleClear}
-            className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faBroom} /> Limpiar
-          </button>
-        </div>
-        <div className="flex flex-col items-end">
-          <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
-          <div className="flex items-center gap-2">
-            <input
-              name="norden"
-              value={form.norden}
-              onChange={handleChangeNumber}
-              className="border rounded px-2 py-1 text-base w-24"
-            />
-
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faPrint} />
-            </button>
-          </div>
-        </div>
-      </section>
+      <BotonesAccion
+        form={form}
+        handleSave={handleSave}
+        handleClear={handleClear}
+        handlePrint={handlePrint}
+        handleChangeNumberDecimals={handleChangeNumberDecimals}
+      />
     </div>
   );
 }

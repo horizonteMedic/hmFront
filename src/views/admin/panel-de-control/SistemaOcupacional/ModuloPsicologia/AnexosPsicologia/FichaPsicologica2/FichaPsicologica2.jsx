@@ -110,7 +110,7 @@ export default function FichaPsicologica2() {
         });
     };
     return (
-        <div className="px-4 space-y-3">
+        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
             {/* Header con información del examen */}
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
                 <InputTextOneLine

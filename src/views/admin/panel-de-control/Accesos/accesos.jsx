@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faUsers, faSortAlphaDown, faSortAlphaUp } from '@fortawesome/free-solid-svg-icons';
 import Modal from './ModalRegistroEmpleado/Modal';
 import EditModal from './ModalEditEmpleado/EditModal';
-import RegistroUsuarioModal from './ModalRegistroUsuario/ModalRegistroUsuario'; 
+import RegistroUsuarioModal from './ModalRegistroUsuario/ModalRegistroUsuario';
 import UsersModal from './ModalViewUser/ModalViewUser';
 import { getFetch } from '../getFetch/getFetch';
 import { Loading } from '../../../components/Loading';
@@ -18,7 +18,7 @@ const Accesos = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isConfigurarAccesosModalOpen, setIsConfigurarAccesosModalOpen] = useState(false);
-  const [isRegistroUsuarioModalOpen, setIsRegistroUsuarioModalOpen] = useState(false); 
+  const [isRegistroUsuarioModalOpen, setIsRegistroUsuarioModalOpen] = useState(false);
   const [isViewUsersModalOpen, SetIsViewUsersModalOpen] = useState(false);
   const [idEmpleado, SetIdEmpleado] = useState('');
 
@@ -104,7 +104,7 @@ const Accesos = () => {
     setIsModalOpen(false);
   };
 
-  const openEditModal = (id, tipoDocumento, nroDocumento, nombres, apellidos, cargo, ubigeo, cip, correoElectronico, celular, direccion, estado, 
+  const openEditModal = (id, tipoDocumento, nroDocumento, nombres, apellidos, cargo, ubigeo, cip, correoElectronico, celular, direccion, estado,
     fechaNacimiento, fechaRegistro, sexo, usuarioRegistro) => {
     SetIdEmpleado(id);
     setTipoDocumento(tipoDocumento);
@@ -129,18 +129,18 @@ const Accesos = () => {
     setIsEditModalOpen(false);
   };
 
-  const openConfigurarAccesosModal = () => { 
+  const openConfigurarAccesosModal = () => {
     setIsConfigurarAccesosModalOpen(true);
   };
 
-  const closeConfigurarAccesosModal = () => { 
+  const closeConfigurarAccesosModal = () => {
     setIsConfigurarAccesosModalOpen(false);
   };
 
   const openRegistroUsuarioModal = () => {
     setIsRegistroUsuarioModalOpen(true);
   };
-  
+
   const closeRegistroUsuarioModal = () => {
     setIsRegistroUsuarioModalOpen(false);
   };
@@ -152,16 +152,16 @@ const Accesos = () => {
 
   // Filtrar los datos según el término de búsqueda
   // Filtrar los datos según el término de búsqueda
-const filteredData = data.filter((item) => {
-  const searchLower = searchTerm.toLowerCase();
-  return (
-    item.nombres.toLowerCase().includes(searchLower) ||
-    item.apellidos.toLowerCase().includes(searchLower) ||
-    String(item.numDocumento).toLowerCase().includes(searchLower) || // Convertir numDocumento a string
-    item.cargo.toLowerCase().includes(searchLower) ||
-    (item.razonSocial && item.razonSocial.toLowerCase().includes(searchLower))
-  );
-});
+  const filteredData = data.filter((item) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      item.nombres.toLowerCase().includes(searchLower) ||
+      item.apellidos.toLowerCase().includes(searchLower) ||
+      String(item.numDocumento).toLowerCase().includes(searchLower) || // Convertir numDocumento a string
+      item.cargo.toLowerCase().includes(searchLower) ||
+      (item.empresas && item.empresas.toLowerCase().includes(searchLower))
+    );
+  });
 
 
   if (loading) {
@@ -175,21 +175,21 @@ const filteredData = data.filter((item) => {
           <h1 className="text-start font-bold color-azul text-white">Usuarios con Accesos</h1>
         </div>
         <div className="px-6 pt-4 pb-2 flex justify-between items-center">
-        {/* Input para búsqueda */}
-        <input
-          type="text"
-          placeholder="Buscar por nombre, apellido, DNI, cargo o razón social"
-          className="p-2 border border-gray-300 rounded-md w-[300px]  mr-4"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+          {/* Input para búsqueda */}
+          <input
+            type="text"
+            placeholder="Buscar por nombre, apellido, DNI, cargo o razón social"
+            className="p-2 border border-gray-300 rounded-md w-[300px]  mr-4"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
 
-        {/* Botones para registrar */}
-        <div className="flex space-x-2">
-          <button className="naranja-btn px-4 py-2 w-[150px]  rounded-md" onClick={openModal}>+ Registrar Empleado</button>
-          <button className="azul-btn px-4 py-2  w-[150px]   rounded-md" onClick={openRegistroUsuarioModal}>+ Registrar Usuario</button>
+          {/* Botones para registrar */}
+          <div className="flex space-x-2">
+            <button className="naranja-btn px-4 py-2 w-[150px]  rounded-md" onClick={openModal}>+ Registrar Empleado</button>
+            <button className="azul-btn px-4 py-2  w-[150px]   rounded-md" onClick={openRegistroUsuarioModal}>+ Registrar Usuario</button>
+          </div>
         </div>
-      </div>
 
 
         <div className="overflow-x-auto mb-1 p-3" style={{ maxHeight: '460px', overflowY: 'auto' }}>
@@ -234,7 +234,14 @@ const filteredData = data.filter((item) => {
                   <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.apellidos)}</td>
                   <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.nombres)}</td>
                   <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.cargo)}</td>
-                  <td className="border border-gray-300 px-2 py-1">{item.razonSocial || 'N/A'}</td>
+                  <td className="border border-gray-300 px-2 py-1 whitespace-pre-line">
+                    {item.empresas ? item.empresas
+                      .split(" - ")
+                      .map((empresa, index) => (
+                        <div key={index}>- {empresa}</div>
+                      ))
+                      : "N/A"}
+                  </td>
                 </tr>
               ))}
             </tbody>

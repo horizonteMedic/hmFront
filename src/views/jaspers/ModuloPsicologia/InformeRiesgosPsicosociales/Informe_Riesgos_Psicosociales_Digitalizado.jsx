@@ -5,7 +5,7 @@ import drawColorBox from '../../components/ColorBox.jsx';
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import footerTR from '../../components/footerTR.jsx';
 
-export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
+export default async function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -60,9 +60,9 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
   const datosFinales = datosReales;
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
     // Título principal (solo en página 1)
     if (pageNumber === 1) {
@@ -97,7 +97,7 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === FUNCIONES AUXILIARES ===
   // Función para texto con salto de línea
@@ -106,16 +106,16 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
     if (!texto || texto === null || texto === undefined) {
       return y;
     }
-    
+
     const fontSize = doc.internal.getFontSize();
     const palabras = String(texto).split(' ');
     let lineaActual = '';
     let yPos = y;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -129,12 +129,12 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
         }
       }
     });
-    
+
     if (lineaActual) {
       doc.text(lineaActual, x, yPos);
       yPos += fontSize * 0.35;
     }
-    
+
     return yPos; // Devuelve la nueva posición final
   };
 
@@ -142,25 +142,25 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
     const tablaInicioX = 5;
     const tablaAncho = 200;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo gris más oscuro
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
+
     // Dibujar líneas del header
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(9);
     doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
-    
+
     return yPos + alturaHeader;
   };
 
@@ -332,7 +332,7 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
   // Fila celeste: Header de columnas
   doc.setFillColor(199, 241, 255);
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
-  
+
   // Dibujar líneas del header
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
@@ -343,7 +343,7 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   // Texto de las columnas del header (centrados)
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("INDICADORES", tablaInicioX + colIndicadores / 2, yPos + 3.5, { align: "center" });
@@ -389,7 +389,7 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
   // Dibujar filas de indicadores
   indicadores.forEach((indicador, index) => {
     const numero = index + 1;
-    
+
     // Dibujar líneas de la fila
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
@@ -401,14 +401,14 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-    
+
     // Contenido de la fila
     doc.setFont("helvetica", "normal").setFontSize(8);
     // Número
     doc.text(String(numero), tablaInicioX + 2, yPos + 3.5);
     // Descripción del indicador
     doc.text(indicador.nombre, tablaInicioX + 10, yPos + 3.5);
-    
+
     // Marcar X en la columna correspondiente (centrada en X e Y)
     if (indicador.favorable) {
       dibujarX(posFavorable + anchoColumnaEvaluacion / 2, yPos, filaAltura);
@@ -417,7 +417,7 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
     } else if (indicador.desfavorable) {
       dibujarX(posDesfavorable + anchoColumnaEvaluacion / 2, yPos, filaAltura);
     }
-    
+
     yPos += filaAltura;
   });
 
@@ -428,7 +428,7 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
     doc.addPage();
     numeroPagina++;
     yPos = 45;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
   }
 
   // Fila gris: ANÁLISIS Y RESULTADOS
@@ -436,39 +436,39 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
 
   // Fila dinámica para contenido de análisis
   const textoAnalisis = (datosFinales.analisisResultados || "-").toUpperCase();
-  
+
   // Dibujar borde superior y laterales de la fila (se redibujará con altura final)
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + 35); // Altura mínima 35mm
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + 35); // Altura mínima 35mm
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  
+
   // Dibujar texto con salto de línea
   doc.setFont("helvetica", "normal").setFontSize(7);
   let yFinalAnalisis = dibujarTextoConSaltoLinea(textoAnalisis, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
-  
+
   // Verificar si necesitamos nueva página durante el dibujado
   const alturaMaximaAnalisis = pageHeight - yPos - 25;
   if (yFinalAnalisis - yPos > alturaMaximaAnalisis) {
     doc.addPage();
     numeroPagina++;
     yPos = 45;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     doc.setFont("helvetica", "normal").setFontSize(7);
     yFinalAnalisis = dibujarTextoConSaltoLinea(textoAnalisis, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
   }
-  
+
   // Calcular altura real de la fila
   const alturaNecesariaAnalisis = yFinalAnalisis - yPos;
   const alturaMinimaFilaAnalisis = 35; // Altura mínima de 35mm
   const alturaRealAnalisis = Math.max(alturaMinimaFilaAnalisis, alturaNecesariaAnalisis + 2);
-  
+
   // Redibujar los bordes con la altura correcta
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRealAnalisis);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRealAnalisis);
   doc.line(tablaInicioX, yPos + alturaRealAnalisis, tablaInicioX + tablaAncho, yPos + alturaRealAnalisis);
-  
+
   yPos += alturaRealAnalisis;
 
   // === SECCIÓN 4: RECOMENDACIONES ===
@@ -477,7 +477,7 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
     doc.addPage();
     numeroPagina++;
     yPos = 45;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
   }
 
   // Fila gris: RECOMENDACIONES
@@ -485,39 +485,39 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
 
   // Fila dinámica para contenido de recomendaciones
   const textoRecomendaciones = (datosFinales.recomendaciones || "-").toUpperCase();
-  
+
   // Dibujar borde superior y laterales de la fila (se redibujará con altura final)
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + 35); // Altura mínima 35mm
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + 35); // Altura mínima 35mm
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  
+
   // Dibujar texto con salto de línea
   doc.setFont("helvetica", "normal").setFontSize(7);
   let yFinalRecomendaciones = dibujarTextoConSaltoLinea(textoRecomendaciones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
-  
+
   // Verificar si necesitamos nueva página durante el dibujado
   const alturaMaximaRec = pageHeight - yPos - 25;
   if (yFinalRecomendaciones - yPos > alturaMaximaRec) {
     doc.addPage();
     numeroPagina++;
     yPos = 45;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
     doc.setFont("helvetica", "normal").setFontSize(7);
     yFinalRecomendaciones = dibujarTextoConSaltoLinea(textoRecomendaciones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
   }
-  
+
   // Calcular altura real de la fila
   const alturaNecesariaRecomendaciones = yFinalRecomendaciones - yPos;
   const alturaMinimaFilaRec = 35; // Altura mínima de 35mm
   const alturaRealRecomendaciones = Math.max(alturaMinimaFilaRec, alturaNecesariaRecomendaciones + 2);
-  
+
   // Redibujar los bordes con la altura correcta
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRealRecomendaciones);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRealRecomendaciones);
   doc.line(tablaInicioX, yPos + alturaRealRecomendaciones, tablaInicioX + tablaAncho, yPos + alturaRealRecomendaciones);
-  
+
   yPos += alturaRealRecomendaciones;
 
   // === SECCIÓN 5: CONCLUSIÓN (CUMPLE/NO CUMPLE CON EL PERFIL) ===
@@ -526,16 +526,16 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
     doc.addPage();
     numeroPagina++;
     yPos = 45;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
   }
-  
+
   // Fila con dos columnas iguales
   const anchoColumna = tablaAncho / 2;
-  
+
   // Dibujar bordes de la sección
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
-  
+
   // Línea vertical central
   doc.line(tablaInicioX + anchoColumna, yPos, tablaInicioX + anchoColumna, yPos + filaAltura);
   // Bordes externos
@@ -543,21 +543,21 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   // === COLUMNA IZQUIERDA: CUMPLE CON EL PERFIL ===
   // División vertical dentro de la columna izquierda (separando texto de mini celda)
   const miniCeldaSize = 6;
   const divisionCumpleX = tablaInicioX + anchoColumna - miniCeldaSize;
   doc.line(divisionCumpleX, yPos, divisionCumpleX, yPos + filaAltura);
-  
+
   // Texto "CUMPLE CON EL PERFIL"
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("CUMPLE CON EL PERFIL", tablaInicioX + 2, yPos + 3.5);
-  
+
   // Mini celda integrada en la fila (a la derecha, antes de la línea central)
   const miniCeldaXCumple = divisionCumpleX;
   const miniCeldaYCumple = yPos;
-  
+
   // Marcar con X si cumplePerfil es true (centrada en X e Y)
   if (datosFinales.cumplePerfil === true) {
     doc.setFont("helvetica", "bold").setFontSize(12);
@@ -566,21 +566,21 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
     const centroYCumple = miniCeldaYCumple + filaAltura / 2 + 1.2;
     doc.text("X", centroXCumple, centroYCumple, { align: "center" });
   }
-  
+
   // === COLUMNA DERECHA: NO CUMPLE CON EL PERFIL ===
   // División vertical dentro de la columna derecha (separando texto de mini celda)
   const divisionNoCumpleX = tablaInicioX + tablaAncho - miniCeldaSize;
   doc.line(divisionNoCumpleX, yPos, divisionNoCumpleX, yPos + filaAltura);
-  
+
   // Texto "NO CUMPLE CON EL PERFIL"
   const xTextoNoCumple = tablaInicioX + anchoColumna + 2;
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("NO CUMPLE CON EL PERFIL", xTextoNoCumple, yPos + 3.5);
-  
+
   // Mini celda integrada en la fila (a la derecha)
   const miniCeldaXNoCumple = divisionNoCumpleX;
   const miniCeldaYNoCumple = yPos;
-  
+
   // Marcar con X si cumplePerfil es false (centrada en X e Y)
   if (datosFinales.cumplePerfil === false) {
     doc.setFont("helvetica", "bold").setFontSize(12);
@@ -589,7 +589,7 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
     const centroYNoCumple = miniCeldaYNoCumple + filaAltura / 2 + 1.2;
     doc.text("X", centroXNoCumple, centroYNoCumple, { align: "center" });
   }
-  
+
   yPos += filaAltura;
 
   // === SECCIÓN DE FIRMA Y SELLO DEL MÉDICO ===
@@ -598,12 +598,12 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
     doc.addPage();
     numeroPagina++;
     yPos = 45;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
   }
-  
+
   const alturaSeccionFirma = 30; // Altura para la sección de firma
   const yFirmas = yPos;
-  
+
   // Dibujar líneas de la sección de firma (bordes)
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
@@ -611,11 +611,11 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirma); // Línea derecha
   doc.line(tablaInicioX, yFirmas, tablaInicioX + tablaAncho, yFirmas); // Línea superior
   doc.line(tablaInicioX, yFirmas + alturaSeccionFirma, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirma); // Línea inferior
-  
+
   // === SELLO Y FIRMA DEL MÉDICO (CENTRADO) ===
   const firmaMedicoY = yFirmas + 3;
   const centroX = tablaInicioX + tablaAncho / 2; // Centro de la página
-  
+
   // Agregar firma y sello médico
   let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
   if (firmaMedicoUrl) {
@@ -629,11 +629,11 @@ export default function Informe_Riesgos_Psicosociales_Digitalizado(data = {}) {
       console.log("Error cargando firma del médico:", error);
     }
   }
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("Sello y Firma del Médico", centroX, yFirmas + 26, { align: "center" });
   doc.text("Responsable de la Evaluación", centroX, yFirmas + 28.5, { align: "center" });
-  
+
   yPos += alturaSeccionFirma;
 
   // === FOOTER ===

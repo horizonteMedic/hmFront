@@ -6,7 +6,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 
-export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
+export default async function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -40,9 +40,9 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   };
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
     // Título principal (en todas las páginas)
     doc.setFont("helvetica", "bold").setFontSize(13);
@@ -76,7 +76,7 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader(1);
+  await drawHeader(1);
 
   // === FUNCIONES AUXILIARES ===
   // Función para texto con salto de línea y datos en negrita
@@ -85,13 +85,13 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
     doc.setFontSize(fontSize);
     const interlineado = fontSize * 0.4;
     let yPos = y;
-    
+
     // Dividir el texto en partes: texto normal y datos (que van en negrita)
     const partes = [];
     const regex = /\{([^}]+)\}/g;
     let lastIndex = 0;
     let match;
-    
+
     while ((match = regex.exec(textoBase)) !== null) {
       if (match.index > lastIndex) {
         partes.push({ tipo: 'texto', contenido: textoBase.substring(lastIndex, match.index) });
@@ -99,31 +99,31 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
       partes.push({ tipo: 'dato', contenido: datos[match[1]] || '' });
       lastIndex = regex.lastIndex;
     }
-    
+
     if (lastIndex < textoBase.length) {
       partes.push({ tipo: 'texto', contenido: textoBase.substring(lastIndex) });
     }
-    
+
     // Si no hay marcadores, usar el texto completo como texto normal
     if (partes.length === 0) {
       partes.push({ tipo: 'texto', contenido: textoBase });
     }
-    
+
     // Construir líneas con datos en negrita
     let lineaActual = [];
     let anchoLineaActual = 0;
     const espacioAncho = doc.getTextWidth(' ');
-    
+
     partes.forEach(parte => {
       const esDato = parte.tipo === 'dato';
       const palabras = parte.contenido.split(' ');
-      
+
       palabras.forEach(palabra => {
         doc.setFont("helvetica", esDato ? "bold" : "normal");
         const anchoPalabra = doc.getTextWidth(palabra);
         const espacioNecesario = lineaActual.length > 0 ? espacioAncho : 0;
         const anchoTotal = anchoLineaActual + espacioNecesario + anchoPalabra;
-        
+
         // Si la palabra sola es más larga que el ancho máximo, dividirla
         if (anchoPalabra > anchoMaximo) {
           // Dibujar línea actual si hay contenido
@@ -178,7 +178,7 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
         }
       });
     });
-    
+
     // Dibujar última línea
     if (lineaActual.length > 0) {
       let xActual = x;
@@ -188,7 +188,7 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
         xActual += doc.getTextWidth(item.texto) + espacioAncho;
       });
     }
-    
+
     return yPos;
   };
 
@@ -201,10 +201,10 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
     let lineaActual = '';
     let yPos = y;
     const interlineado = fontSize * 0.4;
-    
+
     palabras.forEach(palabra => {
       const anchoPalabra = doc.getTextWidth(palabra);
-      
+
       // Si la palabra sola es más larga que el ancho máximo, dividirla
       if (anchoPalabra > anchoMaximo) {
         // Dibujar línea actual si hay contenido
@@ -235,7 +235,7 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
       } else {
         const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
         const anchoTexto = doc.getTextWidth(textoPrueba);
-        
+
         if (anchoTexto <= anchoMaximo) {
           lineaActual = textoPrueba;
         } else {
@@ -250,11 +250,11 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
         }
       }
     });
-    
+
     if (lineaActual) {
       doc.text(lineaActual, x, yPos);
     }
-    
+
     return yPos;
   };
 
@@ -266,11 +266,11 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
     const palabras = texto.split(' ');
     let lineas = [];
     let lineaActual = '';
-    
+
     // Dividir en líneas
     palabras.forEach(palabra => {
       const anchoPalabra = doc.getTextWidth(palabra);
-      
+
       // Si la palabra sola es más larga que el ancho máximo, dividirla
       if (anchoPalabra > anchoMaximo) {
         // Guardar línea actual si hay contenido
@@ -299,7 +299,7 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
       } else {
         const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
         const anchoTexto = doc.getTextWidth(textoPrueba);
-        
+
         if (anchoTexto <= anchoMaximo) {
           lineaActual = textoPrueba;
         } else {
@@ -313,11 +313,11 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
         }
       }
     });
-    
+
     if (lineaActual) {
       lineas.push(lineaActual);
     }
-    
+
     // Dibujar líneas justificadas
     let yPos = y;
     lineas.forEach((linea, index) => {
@@ -331,7 +331,7 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
           const anchoLinea = doc.getTextWidth(linea);
           const espacioExtra = anchoMaximo - anchoLinea;
           const espaciosEntrePalabras = espacioExtra / (palabrasLinea.length - 1);
-          
+
           let xPos = x;
           palabrasLinea.forEach((palabra, i) => {
             doc.text(palabra, xPos, yPos);
@@ -345,7 +345,7 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
       }
       yPos += interlineado;
     });
-    
+
     return yPos;
   };
 
@@ -384,17 +384,17 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(10);
   doc.text("OBSERVACIONES:", tablaInicioX, yPos);
   yPos += 1;
-  
+
   if (datosFinales.observaciones) {
     // Establecer fontSize 10 antes de calcular altura
     doc.setFontSize(9);
     const alturaObservaciones = calcularAlturaTextoCreciente(doc, datosFinales.observaciones, tablaAncho - 4, 9);
     const alturaMinimaObs = Math.max(15, alturaObservaciones + 4);
-    
+
     // Dibujar texto de observaciones en normal y justificado
     doc.setFont("helvetica", "normal").setFontSize(9);
     // Usar función de texto justificado
-    dibujarTextoJustificado(datosFinales.observaciones, tablaInicioX, yPos + 4, tablaAncho - 4, 9); 
+    dibujarTextoJustificado(datosFinales.observaciones, tablaInicioX, yPos + 4, tablaAncho - 4, 9);
     // Restaurar tamaño de fuente después de dibujar
     doc.setFontSize(9);
     yPos += alturaMinimaObs;
@@ -408,13 +408,13 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(10);
   doc.text("RECOMENDACIONES:", tablaInicioX, yPos);
   yPos += 1;
-  
+
   if (datosFinales.recomendaciones) {
     // Establecer fontSize 10 antes de calcular altura
     doc.setFontSize(9);
     const alturaRecomendaciones = calcularAlturaTextoCreciente(doc, datosFinales.recomendaciones, tablaAncho - 4, 9);
     const alturaMinimaRec = Math.max(15, alturaRecomendaciones + 4);
-    
+
     // Dibujar texto de recomendaciones en normal y justificado
     doc.setFont("helvetica", "normal").setFontSize(9);
     // Usar función de texto justificado
@@ -422,7 +422,7 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
     // Restaurar tamaño de fuente después de dibujar
     doc.setFontSize(9);
     yPos += alturaMinimaRec;
-        } else {
+  } else {
     const alturaMinimaRec = 15;
     yPos += alturaMinimaRec;
   }
@@ -438,7 +438,7 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
 
   // Firma y sello del médico (bajado 30mm más desde donde estaba)
   yPos += 15; // Bajar el bloque 30mm más (ya estaba 15mm abajo, ahora 30mm más = 45mm total)
-  
+
   // Dibujar la firma primero (subida 1.5mm)
   const firmaMedicoY = yPos - 1.5; // Subir la firma 1.5mm
   let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
@@ -453,24 +453,24 @@ export default function ficha_antecedente_patologico_boro_nuevo(data = {}) {
       console.log("Error cargando firma del médico:", error);
     }
   }
-  
+
   // Posición para la línea y el texto
   const lineaY = yPos + 22;
   const textoY = lineaY + 4; // Bajado 1mm más (de 3 a 4)
-  
+
   // Dibujar línea horizontal arriba del texto (ancho reducido)
   const lineaInicioX = tablaInicioX + (tablaAncho / 2) - 30; // Reducido de 40 a 30
   const lineaFinX = tablaInicioX + (tablaAncho / 2) + 30; // Reducido de 40 a 30
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
   doc.line(lineaInicioX, lineaY, lineaFinX, lineaY);
-  
+
   // Dibujar texto debajo de la línea
   doc.setFont("helvetica", "normal").setFontSize(10);
   doc.text("Firma y sello del médico", tablaInicioX + (tablaAncho / 2), textoY, { align: "center" });
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 8});
+  footerTR(doc, { footerOffsetY: 8 });
 
   // === Imprimir ===
   imprimir(doc);

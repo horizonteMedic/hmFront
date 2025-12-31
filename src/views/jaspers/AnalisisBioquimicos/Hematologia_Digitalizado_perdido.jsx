@@ -15,32 +15,32 @@ const toDDMMYYYY = (fecha) => {
 
 
 // Header con datos de ficha, sede y fecha
-const drawHeader = (doc, datos = {}) => {
+const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
-  
-  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-  
+
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Nro de ficha: ", pageW - 80, 15);
   doc.setFont("helvetica", "normal").setFontSize(18);
   doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
-  
+
   // Sede
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
-  
+
   // Fecha de examen
   const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
   doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
-  
+
   // Página
   doc.text("Pag. 01", pageW - 30, 10);
 
   // Bloque de color
-   drawColorBox(doc, {
+  drawColorBox(doc, {
     color: datos.codigoColor,
-    text: datos.textoColor ,
+    text: datos.textoColor,
     x: pageW - 30,
     y: 10,
     size: 22,
@@ -160,17 +160,17 @@ const drawPatientData = (doc, datos = {}) => {
   return yPos;
 };
 
-export default function Hematologia_Digitalizado(datos) {
+export default async function Hematologia_Digitalizado(datos) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
-  drawHeader(doc, datos);
-  
+  await drawHeader(doc, datos);
+
   // === TÍTULO ===
   doc.setFont("helvetica", "bold").setFontSize(14);
   doc.text("BIOQUÍMICA", pageW / 2, 38, { align: "center" });
-  
+
   // === DATOS DEL PACIENTE ===
   const finalYPos = drawPatientData(doc, datos);
 
@@ -190,113 +190,113 @@ export default function Hematologia_Digitalizado(datos) {
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
-  // Título principal
-  doc.setFont("helvetica", 'bold');
-  doc.setFontSize(14);
-  const titleY = finalYPos + 10;
-  doc.text('HEMOGRAMA AUTOMATIZADO', pageW / 2, titleY, { align: 'center' });
+    // Título principal
+    doc.setFont("helvetica", 'bold');
+    doc.setFontSize(14);
+    const titleY = finalYPos + 10;
+    doc.text('HEMOGRAMA AUTOMATIZADO', pageW / 2, titleY, { align: 'center' });
 
-  let y = titleY + 6;
-  autoTable(doc, {
-    startY: y,
-    head: [[
-      { content: 'PRUEBA', styles: { halign: 'center', fontStyle: 'bold' } },
-      { content: 'RESULTADO', styles: { halign: 'center', fontStyle: 'bold' } },
-      { content: 'VALORES NORMALES', styles: { halign: 'center', fontStyle: 'bold' } }
-    ]],
-    body: [
-      [
-        { content: 'HEMOGLOBINA', styles: { fontStyle: 'bold' } },
-        datos.txtHemoglobina || '',
-        'Mujeres 12 - 16 g/dL\nHombres 14 - 18 g/dL'
+    let y = titleY + 6;
+    autoTable(doc, {
+      startY: y,
+      head: [[
+        { content: 'PRUEBA', styles: { halign: 'center', fontStyle: 'bold' } },
+        { content: 'RESULTADO', styles: { halign: 'center', fontStyle: 'bold' } },
+        { content: 'VALORES NORMALES', styles: { halign: 'center', fontStyle: 'bold' } }
+      ]],
+      body: [
+        [
+          { content: 'HEMOGLOBINA', styles: { fontStyle: 'bold' } },
+          datos.txtHemoglobina || '',
+          'Mujeres 12 - 16 g/dL\nHombres 14 - 18 g/dL'
+        ],
+        [
+          { content: 'HEMATOCRITO', styles: { fontStyle: 'bold' } },
+          datos.txtHematocrito || '',
+          'Mujeres 38 - 50 %\nHombres 40 - 54 %'
+        ],
+        [
+          { content: 'HEMATÍES', styles: { fontStyle: 'bold' } },
+          datos.txtHematies || '',
+          '4.0 - 5.5 x 10^6/mm³'
+        ],
+        ['Volumen Corpuscular Medio', datos.txtVolumen || '', '80 - 100 fL'],
+        ['Hemoglobina Corpuscular Media', datos.txtHemocorpuscular || '', '26 - 34 pg'],
+        ['Concentración de la Hemoglobina Corpuscular Media', datos.txtConcentracion || '', '31 - 37  g/dl'],
+        [
+          { content: 'LEUCOCITOS', styles: { fontStyle: 'bold' } },
+          datos.txtLeucocitos || '',
+          '4 - 10 x 10^3/mm³'
+        ],
+        [
+          { content: 'RECUENTO DIFERENCIAL', styles: { fontStyle: 'bold' } },
+          '',
+          ''
+        ],
+        [
+          { content: 'NEUTRÓFILOS (%)', styles: { fontStyle: 'bold' } },
+          datos.txtNeutrofilos || '',
+          '55-65 %'
+        ],
+        [
+          { content: 'ABASTONADOS (%)', styles: { fontStyle: 'bold' } },
+          datos.txtAbastonados || '',
+          '0 - 5 %'
+        ],
+        [
+          { content: 'SEGMENTADOS (%)', styles: { fontStyle: 'bold' } },
+          datos.txtSegmentados || '',
+          '55 - 65 %'
+        ],
+        [
+          { content: 'MONOCITOS (%)', styles: { fontStyle: 'bold' } },
+          datos.txtMonocitos || '',
+          '4 - 8 %'
+        ],
+        [
+          { content: 'EOSINÓFILOS (%)', styles: { fontStyle: 'bold' } },
+          datos.txtEosinofios || '',
+          '0 - 4 %'
+        ],
+        [
+          { content: 'BASÓFILOS (%)', styles: { fontStyle: 'bold' } },
+          datos.txtBasofilos || '',
+          '0 - 1 %'
+        ],
+        [
+          { content: 'LINFOCITOS (%)', styles: { fontStyle: 'bold' } },
+          datos.txtLinfocitos || '',
+          '20 - 40 %'
+        ],
+        [
+          { content: 'PLAQUETAS', styles: { fontStyle: 'bold' } },
+          datos.txtPlaquetas || '',
+          '1.5 - 4.5 x 10^5/mm³'
+        ],
       ],
-      [
-        { content: 'HEMATOCRITO', styles: { fontStyle: 'bold' } },
-        datos.txtHematocrito || '',
-        'Mujeres 38 - 50 %\nHombres 40 - 54 %'
-      ],
-      [
-        { content: 'HEMATÍES', styles: { fontStyle: 'bold' } },
-        datos.txtHematies || '',
-        '4.0 - 5.5 x 10^6/mm³'
-      ],
-      ['Volumen Corpuscular Medio', datos.txtVolumen || '', '80 - 100 fL'],
-      ['Hemoglobina Corpuscular Media', datos.txtHemocorpuscular || '', '26 - 34 pg'],
-      ['Concentración de la Hemoglobina Corpuscular Media', datos.txtConcentracion || '', '31 - 37  g/dl'],
-      [
-        { content: 'LEUCOCITOS', styles: { fontStyle: 'bold' } },
-        datos.txtLeucocitos || '',
-        '4 - 10 x 10^3/mm³'
-      ],
-      [
-        { content: 'RECUENTO DIFERENCIAL', styles: { fontStyle: 'bold' } },
-        '',
-        ''
-      ],
-      [
-        { content: 'NEUTRÓFILOS (%)', styles: { fontStyle: 'bold' } },
-        datos.txtNeutrofilos || '',
-        '55-65 %'
-      ],
-      [
-        { content: 'ABASTONADOS (%)', styles: { fontStyle: 'bold' } },
-        datos.txtAbastonados || '',
-        '0 - 5 %'
-      ],
-      [
-        { content: 'SEGMENTADOS (%)', styles: { fontStyle: 'bold' } },
-        datos.txtSegmentados || '',
-        '55 - 65 %'
-      ],
-      [
-        { content: 'MONOCITOS (%)', styles: { fontStyle: 'bold' } },
-        datos.txtMonocitos || '',
-        '4 - 8 %'
-      ],
-      [
-        { content: 'EOSINÓFILOS (%)', styles: { fontStyle: 'bold' } },
-        datos.txtEosinofios || '',
-        '0 - 4 %'
-      ],
-      [
-        { content: 'BASÓFILOS (%)', styles: { fontStyle: 'bold' } },
-        datos.txtBasofilos || '',
-        '0 - 1 %'
-      ],
-      [
-        { content: 'LINFOCITOS (%)', styles: { fontStyle: 'bold' } },
-        datos.txtLinfocitos || '',
-        '20 - 40 %'
-      ],
-      [
-        { content: 'PLAQUETAS', styles: { fontStyle: 'bold' } },
-        datos.txtPlaquetas || '',
-        '1.5 - 4.5 x 10^5/mm³'
-      ],
-    ],
-    theme: 'grid',
-    styles: { fontSize: 10, cellPadding: 2 },
-    headStyles: { fillColor: [230, 230, 230], textColor: [0, 0, 0] },
-    columnStyles: {
-      0: { cellWidth: 65 },
-      1: { cellWidth: 35 },
-      2: { cellWidth: 60 }
-    },
-    margin: { left: 15, right: 15 },
-    tableWidth: 180,
-    didDrawPage: () => {}
-  });
+      theme: 'grid',
+      styles: { fontSize: 10, cellPadding: 2 },
+      headStyles: { fillColor: [230, 230, 230], textColor: [0, 0, 0] },
+      columnStyles: {
+        0: { cellWidth: 65 },
+        1: { cellWidth: 35 },
+        2: { cellWidth: 60 }
+      },
+      margin: { left: 15, right: 15 },
+      tableWidth: 180,
+      didDrawPage: () => { }
+    });
     // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
     const sigW = 53; // Tamaño fijo width
     const sigH = 23; // Tamaño fijo height
     const sigY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 20 : 210;
     const gap = 16; // Espacio entre sellos (reducido 4mm: 20 - 4 = 16)
-    
+
     if (s1 && s2) {
       // Si hay dos sellos, centrarlos juntos
       const totalWidth = sigW * 2 + gap;
       const startX = (pageW - totalWidth) / 2;
-      
+
       const addSello = (img, xPos) => {
         const canvas = document.createElement('canvas');
         canvas.width = img.width;
@@ -333,17 +333,17 @@ export default function Hematologia_Digitalizado(datos) {
     // === FOOTER ===
     footerTR(doc, datos);
 
-  // Mostrar PDF
-  const pdfBlob = doc.output("blob");
-  const pdfUrl = URL.createObjectURL(pdfBlob);
-  const iframe = document.createElement('iframe');
-  iframe.style.display = 'none';
-  iframe.src = pdfUrl;
-  document.body.appendChild(iframe);
-  iframe.onload = function () {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-  };
+    // Mostrar PDF
+    const pdfBlob = doc.output("blob");
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = pdfUrl;
+    document.body.appendChild(iframe);
+    iframe.onload = function () {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    };
   })
-  
+
 } 

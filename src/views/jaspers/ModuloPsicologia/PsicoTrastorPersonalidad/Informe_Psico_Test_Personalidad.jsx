@@ -1,0 +1,603 @@
+import jsPDF from "jspdf";
+import drawColorBox from '../../components/ColorBox.jsx';
+import { formatearFechaCorta } from "../../../utils/formatDateUtils.js";
+import CabeceraLogo from '../../components/CabeceraLogo.jsx';
+import { convertirGenero } from "../../../utils/helpers.js";
+import footerTR from '../../components/footerTR.jsx';
+import { dibujarFirmas } from "../../../utils/dibujarFirmas.js";
+
+export default function InformeDeTestPersonalidad(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+  const pageW = doc.internal.pageSize.getWidth();
+  // Contador de páginas dinámico
+  let numeroPagina = 1;
+
+  // Normalizador único de datos de entrada
+  // SOLO usar los campos que vienen en la data proporcionada
+  function buildDatosFinales(raw) {
+    const datosFinales = {
+      apellidosNombres: String((((raw?.apellidosPaciente ?? '') + ' ' + (raw?.nombresPaciente ?? '')).trim())),
+      fechaExamen: formatearFechaCorta(raw?.fechaRegistro ?? ''),
+      sexo: convertirGenero(raw?.sexoPaciente ?? ''),
+      documentoIdentidad: String(raw?.dniPaciente ?? ''),
+      edad: String(raw?.edadPaciente ?? ''),
+      fechaNacimiento: formatearFechaCorta(raw?.fechaNacimientoPaciente ?? ''),
+      domicilio: String(raw?.direccionPaciente ?? ''),
+      areaTrabajo: String(raw?.areaPaciente ?? ''),
+      puestoTrabajo: String(raw?.cargoPaciente ?? ''),
+      empresa: String(raw?.empresa ?? ''),
+      contrata: String(raw?.contrata ?? ''),
+      sede: String(raw?.sede ?? ''),
+      numeroFicha: String(raw?.norden ?? ""),
+      tipoExamen: String(raw?.tipoExamen ?? ''),
+      color: Number(raw?.color ?? 0),
+      codigoColor: String(raw?.codigoColor ?? ''),
+      textoColor: String(raw?.textoColor ?? ''),
+      analisisResultados: String(raw?.analisisResultado ?? ''),
+      recomendaciones: String(raw?.recomendaciones ?? ''),
+      interpretacionParanoide: String(raw?.interpretacionParainoide ?? ''),
+      cumplePerfil: (typeof raw?.perfilCumple === 'boolean') ? raw.perfilCumple : (raw?.perfilCumple === true || raw?.perfilCumple === 'true' || raw?.perfilCumple === 1),
+      digitalizacion: raw?.digitalizacion ?? [],
+    };
+    return datosFinales;
+  }
+
+  const datosFinales = buildDatosFinales(data);
+
+  // Header reutilizable
+  const drawHeader = (pageNumber) => {
+    // Logo y membrete (ajustado para evitar sobreposición)
+    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 2 });
+
+    // Títulos (movido más abajo para evitar sobreposición con logo)
+    doc.setFont("helvetica", "bold").setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text("INFORME DE TEST DE PERSONALIDAD", pageW / 2, 35, { align: "center" });
+
+    // Número de Ficha, Sede, Fecha y Página
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Nro de ficha: ", pageW - 70, 15);
+    doc.setFont("helvetica", "normal").setFontSize(18);
+    doc.text(datosFinales.numeroFicha, pageW - 50, 16);
+
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Sede: " + datosFinales.sede, pageW - 70, 20);
+    doc.text("Fecha de examen: " + (datosFinales.fechaExamen || ""), pageW - 70, 25);
+    doc.text("Pag. " + pageNumber.toString().padStart(2, '0'), pageW - 25, 8);
+
+    // Bloque de color
+    drawColorBox(doc, {
+      color: datosFinales.codigoColor,
+      text: datosFinales.textoColor,
+      x: pageW - 30,
+      y: 10,
+      size: 22,
+      showLine: true,
+      fontSize: 30,
+      textPosition: 0.9
+    });
+  };
+
+  // === FUNCIONES AUXILIARES ===
+  // Función para texto con salto de línea
+  const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
+    if (!texto || texto === null || texto === undefined) {
+      return y;
+    }
+    
+    const fontSize = doc.internal.getFontSize();
+    const palabras = String(texto).split(' ');
+    let lineaActual = '';
+    let yPos = y;
+
+    palabras.forEach(palabra => {
+      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+      const anchoTexto = doc.getTextWidth(textoPrueba);
+
+      if (anchoTexto <= anchoMaximo) {
+        lineaActual = textoPrueba;
+      } else {
+        if (lineaActual) {
+          doc.text(lineaActual, x, yPos);
+          yPos += fontSize * 0.35;
+          lineaActual = palabra;
+        } else {
+          doc.text(palabra, x, yPos);
+          yPos += fontSize * 0.35;
+        }
+      }
+    });
+
+    if (lineaActual) {
+      doc.text(lineaActual, x, yPos);
+    }
+
+    return yPos;
+  };
+
+  // Función general para dibujar header de sección con fondo gris
+  const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4, infoAdicional = null) => {
+    const tablaInicioX = 5;
+    const tablaAncho = 200;
+
+    // Configurar líneas con grosor consistente
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
+
+    // Dibujar fondo gris más oscuro
+    doc.setFillColor(196, 196, 196);
+    doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
+
+    // Si hay información adicional, dibujar división
+    if (infoAdicional) {
+      doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + alturaHeader);
+    }
+
+    // Dibujar líneas del header
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
+
+    // Dibujar texto del título (centrado verticalmente)
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text(titulo, tablaInicioX + 2, yPos + alturaHeader / 2 + 1.2);
+
+    // Dibujar información adicional a la derecha si existe
+    if (infoAdicional) {
+      doc.setFont("helvetica", "bold").setFontSize(8);
+      doc.text(infoAdicional.label + ":", tablaInicioX + 137, yPos + alturaHeader / 2 + 1.2);
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      doc.text(infoAdicional.valor || "", tablaInicioX + 175, yPos + alturaHeader / 2 + 1.2);
+    }
+
+    return yPos + alturaHeader;
+  };
+
+  // === PÁGINA 1 ===
+  drawHeader(numeroPagina);
+
+  // === SECCIÓN 1: DATOS DE FILIACIÓN ===
+  const tablaInicioX = 5;
+  const tablaAncho = 200;
+  let yPos = 40; // Ajustado para coincidir con el título movido
+  const filaAltura = 5;
+
+  // Header de datos de filiación
+  yPos = dibujarHeaderSeccion("I. DATOS DE FILIACIÓN", yPos, filaAltura);
+
+  // Configurar líneas para filas de datos
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+
+  // Primera fila: Apellidos y Nombres con división para Tipo de examen
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + filaAltura); // División para Tipo de examen
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Segunda fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 45, yPos, tablaInicioX + 45, yPos + filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Tercera fila: Domicilio (completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Cuarta fila: Área de Trabajo (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Quinta fila: Puesto de Trabajo (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Sexta fila: Empresa (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Séptima fila: Contratista (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // === CONTENIDO DE LA TABLA ===
+  let yTexto = 40 + 2; // Ajustar para el header
+
+  // Primera fila: Apellidos y Nombres
+  yTexto += filaAltura;
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  // Ajustar ancho para la nueva división (hasta x = tablaInicioX + 135)
+  dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 40, yTexto + 1.5, 95);
+
+  // Columna derecha: Tipo de examen
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("T. Examen:", tablaInicioX + 137, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.tipoExamen || "", tablaInicioX + 155, yTexto + 1.5);
+  yTexto += filaAltura;
+
+  // Segunda fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("DNI:", tablaInicioX + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.documentoIdentidad, tablaInicioX + 12, yTexto + 1.5);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Edad:", tablaInicioX + 47, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.edad + " Años", tablaInicioX + 58, yTexto + 1.5);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Sexo:", tablaInicioX + 92, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.sexo, tablaInicioX + 105, yTexto + 1.5);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Fecha Nac.:", tablaInicioX + 137, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.fechaNacimiento, tablaInicioX + 165, yTexto + 1.5);
+  yTexto += filaAltura;
+
+  // Tercera fila: Domicilio
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Domicilio:", tablaInicioX + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.domicilio, tablaInicioX + 25, yTexto + 1.5, tablaAncho - 30);
+  yTexto += filaAltura;
+
+  // Cuarta fila: Área de Trabajo
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Área de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo, tablaInicioX + 30, yTexto + 1.5, tablaAncho - 35);
+  yTexto += filaAltura;
+
+  // Quinta fila: Puesto de Trabajo
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo, tablaInicioX + 35, yTexto + 1.5, tablaAncho - 40);
+  yTexto += filaAltura;
+
+  // Sexta fila: Empresa
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Empresa:", tablaInicioX + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 25, yTexto + 1.5, tablaAncho - 25);
+  yTexto += filaAltura;
+
+  // Séptima fila: Contratista
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Contratista:", tablaInicioX + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.contrata, tablaInicioX + 25, yTexto + 1.5, tablaAncho - 30);
+  yTexto += filaAltura;
+
+  // === SECCIÓN 2: ASPECTOS EVALUADOS ===
+
+  // Configuración de columnas de la tabla
+  const colGrupo = 30; // Columna para GRUPO A, B, C
+  const colAspecto = 90; // Columna para los aspectos evaluados
+  const colBajo = 28;
+  const colMedio = 28;
+  const colAlto = 24;
+
+  // Header de la tabla con colores
+  // Columna "ASPECTOS EVALUADOS" (abarca grupo + aspecto)
+  doc.setFillColor(196, 196, 196);
+  doc.rect(tablaInicioX, yPos, colGrupo + colAspecto, filaAltura, 'F');
+  doc.rect(tablaInicioX, yPos, colGrupo + colAspecto, filaAltura, 'S');
+  
+  // Columna Bajo (Rojo)
+  doc.setFillColor(255, 0, 0);
+  doc.rect(tablaInicioX + colGrupo + colAspecto, yPos, colBajo, filaAltura, 'F');
+  doc.rect(tablaInicioX + colGrupo + colAspecto, yPos, colBajo, filaAltura, 'S');
+  
+  // Columna Medio (Amarillo)
+  doc.setFillColor(255, 255, 0);
+  doc.rect(tablaInicioX + colGrupo + colAspecto + colBajo, yPos, colMedio, filaAltura, 'F');
+  doc.rect(tablaInicioX + colGrupo + colAspecto + colBajo, yPos, colMedio, filaAltura, 'S');
+  
+  // Columna Alto (Verde)
+  doc.setFillColor(0, 255, 0);
+  doc.rect(tablaInicioX + colGrupo + colAspecto + colBajo + colMedio, yPos, colAlto, filaAltura, 'F');
+  doc.rect(tablaInicioX + colGrupo + colAspecto + colBajo + colMedio, yPos, colAlto, filaAltura, 'S');
+
+  // Textos del header
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setTextColor(0, 0, 0);
+  doc.text("ASPECTOS EVALUADOS", tablaInicioX + (colGrupo + colAspecto) / 2, yPos + 4, { align: "center" });
+  doc.text("Bajo", tablaInicioX + colGrupo + colAspecto + colBajo / 2, yPos + 4, { align: "center" });
+  doc.text("Medio", tablaInicioX + colGrupo + colAspecto + colBajo + colMedio / 2, yPos + 4, { align: "center" });
+  doc.text("Alto", tablaInicioX + colGrupo + colAspecto + colBajo + colMedio + colAlto / 2, yPos + 4, { align: "center" });
+  yPos += filaAltura;
+
+  // Función para dibujar grupo con título que se extiende verticalmente
+  const dibujarGrupo = (tituloGrupo, aspectos, y) => {
+    const numFilas = aspectos.length;
+    const alturaGrupo = filaAltura * numFilas;
+    
+    // Celda del grupo que se extiende verticalmente
+    doc.rect(tablaInicioX, y, colGrupo, alturaGrupo, 'S');
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    // Centrar verticalmente el texto del grupo
+    const lineas = doc.splitTextToSize(tituloGrupo, colGrupo - 2);
+    const yTexto = y + alturaGrupo / 2 - (lineas.length * 2.5) / 2 + 2;
+    lineas.forEach((linea, idx) => {
+      doc.text(linea, tablaInicioX + colGrupo / 2, yTexto + idx * 3, { align: "center" });
+    });
+    
+      // Dibujar cada aspecto del grupo
+      let currentY = y;
+      aspectos.forEach((aspecto) => {
+      // Celda aspecto
+      doc.rect(tablaInicioX + colGrupo, currentY, colAspecto, filaAltura, 'S');
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      // Manejar texto largo que puede necesitar múltiples líneas
+      const textoAspecto = aspecto.nombre;
+      const lineasAspecto = doc.splitTextToSize(textoAspecto, colAspecto - 4);
+      if (lineasAspecto.length === 1) {
+        doc.text(textoAspecto, tablaInicioX + colGrupo + 2, currentY + 4);
+      } else {
+        lineasAspecto.forEach((linea, idx) => {
+          doc.text(linea, tablaInicioX + colGrupo + 2, currentY + 2 + (idx * 3));
+        });
+      }
+      
+      // Celdas Bajo, Medio, Alto
+      doc.rect(tablaInicioX + colGrupo + colAspecto, currentY, colBajo, filaAltura, 'S');
+      doc.rect(tablaInicioX + colGrupo + colAspecto + colBajo, currentY, colMedio, filaAltura, 'S');
+      doc.rect(tablaInicioX + colGrupo + colAspecto + colBajo + colMedio, currentY, colAlto, filaAltura, 'S');
+      
+      // Marcar X según valor - mapear desde los campos del backend
+      let valor = '';
+      if (aspecto.campo === 'paranoide') {
+        valor = data.paranoideBajo ? 'BAJO' : data.paranoideMedio ? 'MEDIO' : data.paranoideAlto ? 'ALTO' : '';
+      } else if (aspecto.campo === 'esquizoide') {
+        valor = data.esquizoideBajo ? 'BAJO' : data.esquizoideMedio ? 'MEDIO' : data.esquizoideAlto ? 'ALTO' : '';
+      } else if (aspecto.campo === 'esquizotipico') {
+        valor = data.esquizoTipicoBajo ? 'BAJO' : data.esquizoTipicoMedio ? 'MEDIO' : data.esquizoTipicoAlto ? 'ALTO' : '';
+      } else if (aspecto.campo === 'inestabilidadEmocionalImpulsivo') {
+        valor = data.subtipoImpulsivoBajo ? 'BAJO' : data.subtipoImpulsivoMedio ? 'MEDIO' : data.subtipoImpulsivoAlto ? 'ALTO' : '';
+      } else if (aspecto.campo === 'inestabilidadEmocionalLimite') {
+        valor = data.subtipoLimiteBajo ? 'BAJO' : data.subtipoLimiteMedio ? 'MEDIO' : data.subtipoLimiteAto ? 'ALTO' : '';
+      } else if (aspecto.campo === 'histrionico') {
+        valor = data.histrionicoBajo ? 'BAJO' : data.histrionicoMedio ? 'MEDIO' : data.histrionicoAlto ? 'ALTO' : '';
+      } else if (aspecto.campo === 'antisocial') {
+        valor = data.antisocialBajo ? 'BAJO' : data.antisocialMedio ? 'MEDIO' : data.antisocialAlto ? 'ALTO' : '';
+      } else if (aspecto.campo === 'narcicista') {
+        valor = data.narcicistaBajo ? 'BAJO' : data.narcicistaMedio ? 'MEDIO' : data.narcicistaAlto ? 'ALTO' : '';
+      } else if (aspecto.campo === 'anancastico') {
+        valor = data.anancasticoBajo ? 'BAJO' : data.anancasticoMedio ? 'MEDIO' : data.anancasticoAlto ? 'ALTO' : '';
+      } else if (aspecto.campo === 'dependiente') {
+        valor = data.dependienteBajo ? 'BAJO' : data.dependienteMedio ? 'MEDIO' : data.dependienteAlto ? 'ALTO' : '';
+      } else if (aspecto.campo === 'ansioso') {
+        valor = data.ansiosoBajo ? 'BAJO' : data.ansiosoMedio ? 'MEDIO' : data.ansiosoAlto ? 'ALTO' : '';
+      }
+      
+      const valorLower = String(valor).toLowerCase();
+      doc.setFont("helvetica", "bold").setFontSize(10);
+      doc.setTextColor(0, 51, 204); // #0033cc
+      if (valorLower === "bajo") {
+        doc.text("X", tablaInicioX + colGrupo + colAspecto + colBajo / 2, currentY + 4, { align: "center" });
+      } else if (valorLower === "medio") {
+        doc.text("X", tablaInicioX + colGrupo + colAspecto + colBajo + colMedio / 2, currentY + 4, { align: "center" });
+      } else if (valorLower === "alto") {
+        doc.text("X", tablaInicioX + colGrupo + colAspecto + colBajo + colMedio + colAlto / 2, currentY + 4, { align: "center" });
+      }
+      doc.setTextColor(0, 0, 0); // Volver a negro
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      
+      currentY += filaAltura;
+    });
+    
+    return currentY;
+  };
+
+  // GRUPO A
+  yPos = dibujarGrupo("GRUPO A", [
+    { nombre: "PARANOIDE", campo: "paranoide" },
+    { nombre: "ESQUIZOIDE", campo: "esquizoide" },
+    { nombre: "ESQUIZOTÍPICO", campo: "esquizotipico" }
+  ], yPos);
+
+  // GRUPO B
+  yPos = dibujarGrupo("GRUPO B", [
+    { nombre: "HISTRIÓNICO", campo: "histrionico" },
+    { nombre: "ANTISOCIAL", campo: "antisocial" },
+    { nombre: "NARCICISTA", campo: "narcicista" },
+    { nombre: "T. INESTABILIDAD EMOCIONAL SUBTIPO IMPULSIVO", campo: "inestabilidadEmocionalImpulsivo" },
+    { nombre: "T. INTESTABILIDAD EMOCIONAL SUBTIPO LÍMITE", campo: "inestabilidadEmocionalLimite" }
+  ], yPos);
+
+  // GRUPO C
+  yPos = dibujarGrupo("GRUPO C", [
+    { nombre: "ANANCÁSTICO", campo: "anancastico" },
+    { nombre: "DEPENDIENTE", campo: "dependiente" },
+    { nombre: "ANSIOSO", campo: "ansioso" }
+  ], yPos);
+
+  
+  doc.setFillColor(196, 196, 196);
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("ANÁLISIS Y RESULTADOS", tablaInicioX + 2, yPos + 4);
+  yPos += filaAltura;
+
+  // Función para dibujar texto justificado
+  const dibujarTextoJustificado = (texto, x, y, anchoMaximo, alturaMinima = 10) => {
+    if (!texto || texto.trim() === '') {
+      const alturaVacia = 4; // Altura reducida cuando no hay texto
+      doc.rect(tablaInicioX, y, tablaAncho, alturaVacia, 'S');
+      return y + alturaVacia;
+    }
+
+    const padding = 2;
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    
+    // Dividir texto en líneas
+    const lineas = doc.splitTextToSize(String(texto), anchoMaximo - 4);
+    const alturaTexto = lineas.length * 3.2 + padding * 2;
+    const alturaFinal = Math.max(alturaMinima, alturaTexto);
+    
+    // Dibujar borde
+    doc.rect(tablaInicioX, y, tablaAncho, alturaFinal, 'S');
+    
+    // Dibujar texto
+    lineas.forEach((linea, idx) => {
+      doc.text(linea, x + 2, y + padding + 1.5 + (idx * 3.2));
+    });
+    
+    return y + alturaFinal;
+  };
+
+  // Fila creciente para análisis
+  yPos = dibujarTextoJustificado(datosFinales.analisisResultados, tablaInicioX, yPos, tablaAncho - 4, 10);
+
+  // === SECCIÓN 4: INTERPRETACION PARANOIDE ===
+  doc.setFillColor(196, 196, 196);
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("INTERPRETACION PARANOIDE:", tablaInicioX + 2, yPos + 4);
+  yPos += filaAltura;
+
+  // Fila creciente para interpretación paranoide
+  yPos = dibujarTextoJustificado(datosFinales.interpretacionParanoide, tablaInicioX, yPos, tablaAncho - 4, 10);
+
+  // === SECCIÓN 5: RECOMENDACIONES ===
+  doc.setFillColor(196, 196, 196);
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("RECOMENDACIONES:", tablaInicioX + 2, yPos + 4);
+  yPos += filaAltura;
+
+  // Procesar recomendaciones y usar dibujarTextoJustificado como en paranoide
+  // Mantener el formato original con guiones y saltos de línea
+  const textoRecomendaciones = datosFinales.recomendaciones || '';
+  yPos = dibujarTextoJustificado(textoRecomendaciones, tablaInicioX, yPos, tablaAncho - 4, 10);
+
+  // === SECCIÓN 6: CONCLUSIONES ===
+  doc.setFillColor(196, 196, 196);
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("CONCLUSIONES", tablaInicioX + 2, yPos + 4);
+  yPos += filaAltura;
+
+  // Fila de CUMPLE / NO CUMPLE CON EL PERFIL (4 columnas)
+  // Estructura: CUMPLE CON EL PERFIL | X | NO CUMPLE CON EL PERFIL | (vacía)
+  const colXW = 15; // Ancho para columna de X
+  const colVaciaW = 15; // Ancho para columna vacía
+  const colTextoW = (tablaAncho - colXW - colVaciaW) / 2; // Ancho para columnas de texto
+  
+  // Dibujar las 4 columnas
+  doc.rect(tablaInicioX, yPos, colTextoW, filaAltura, 'S'); // Columna 1: CUMPLE CON EL PERFIL
+  doc.rect(tablaInicioX + colTextoW, yPos, colXW, filaAltura, 'S'); // Columna 2: X
+  doc.rect(tablaInicioX + colTextoW + colXW, yPos, colTextoW, filaAltura, 'S'); // Columna 3: NO CUMPLE CON EL PERFIL
+  doc.rect(tablaInicioX + colTextoW * 2 + colXW, yPos, colVaciaW, filaAltura, 'S'); // Columna 4: Vacía
+
+  const cumplePerfil = datosFinales.cumplePerfil ?? true;
+  
+  // Columna 1: CUMPLE CON EL PERFIL
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("CUMPLE CON EL PERFIL", tablaInicioX + colTextoW / 2, yPos + 4, { align: "center" });
+  
+  // Columna 2: X (si cumple)
+  if (cumplePerfil) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.setTextColor(0, 51, 204); // #0033cc
+    doc.text("X", tablaInicioX + colTextoW + colXW / 2, yPos + 4, { align: "center" });
+    doc.setTextColor(0, 0, 0);
+  }
+  
+  // Columna 3: NO CUMPLE CON EL PERFIL
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("NO CUMPLE CON EL PERFIL", tablaInicioX + colTextoW + colXW + colTextoW / 2, yPos + 4, { align: "center" });
+  
+  // Columna 4: Vacía
+  
+  yPos += filaAltura;
+
+  // === SECCIÓN 7: FIRMAS ===
+  // Verificar si necesitamos nueva página antes de las firmas
+  const espacioMinimoFirmas = 32;
+  if (yPos + espacioMinimoFirmas > doc.internal.pageSize.getHeight() - 20) {
+    doc.addPage();
+    numeroPagina++;
+    yPos = 40;
+    drawHeader(numeroPagina);
+  }
+  
+  const alturaSeccionFirmas = 32; // Altura ajustada para que quepa el texto completo dentro
+  const baseY = yPos;
+
+  // Dibujar los bordes de la fila de firmas
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.rect(tablaInicioX, baseY, tablaAncho, alturaSeccionFirmas);
+
+  // Usar helper para dibujar firmas (solo las que vengan en la data)
+  dibujarFirmas({ doc, datos: datosFinales, y: baseY + 2, pageW }).then(() => {
+    // === FOOTER ===
+    footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
+
+    // === Imprimir ===
+    if (!docExistente) {
+      imprimir(doc);
+    }
+  }).catch(err => {
+    console.error("Error al dibujar firmas:", err);
+    // === FOOTER ===
+    footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
+    
+    // === Imprimir ===
+    if (!docExistente) {
+      imprimir(doc);
+    }
+  });
+
+  // Si hay docExistente, retornar el doc (las firmas se agregarán asíncronamente)
+  if (docExistente) {
+    footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
+    return doc;
+  }
+}
+
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
+}
+

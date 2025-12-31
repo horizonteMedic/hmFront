@@ -3,7 +3,7 @@ import autoTable from "jspdf-autotable";
 import header from "./components/header";
 import footer from "./components/footer";
 
-export default function parasitologia(datos) {
+export default async function parasitologia(datos) {
   const doc = new jsPDF();
   header(doc, datos);
 

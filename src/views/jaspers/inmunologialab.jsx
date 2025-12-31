@@ -3,7 +3,7 @@ import autoTable from "jspdf-autotable";
 import header from "./components/header";
 import footer from "./components/footer";
 
-export default function inmunologialab(datos) {
+export default async function inmunologialab(datos) {
   const doc = new jsPDF();
   header(doc, datos);
 
@@ -54,7 +54,7 @@ export default function inmunologialab(datos) {
       ]
     ],
     theme: 'grid',
-    styles: { fontSize: 11, cellPadding: 4, valign: 'middle', halign: 'center', lineColor: [180,180,180], lineWidth: 0.5 },
+    styles: { fontSize: 11, cellPadding: 4, valign: 'middle', halign: 'center', lineColor: [180, 180, 180], lineWidth: 0.5 },
     headStyles: { fillColor: [220, 220, 220], textColor: [0, 0, 0], fontSize: 12, fontStyle: 'bold' },
     bodyStyles: { textColor: [60, 60, 60] },
     columnStyles: {

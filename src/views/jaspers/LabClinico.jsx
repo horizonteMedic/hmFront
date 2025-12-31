@@ -5,9 +5,9 @@ import drawBox from "./components/drawBox";
 import drawC from "./components/drawC";
 import footer from "./components/footer";
 
-export default function LabClinico(datos) {
+export default async function LabClinico(datos) {
   const doc = new jsPDF();
-  
+
   // componente header
   const finalY = headerHR(doc, datos);
 
@@ -33,9 +33,9 @@ export default function LabClinico(datos) {
   const indX = 130;
   const indY = headspace + 5;  // Align with first box
   const indW = doc.internal.pageSize.getWidth() - indX - 10;
-  doc.setFont("helvetica","bold").setFontSize(9).setTextColor(200, 0, 0);
+  doc.setFont("helvetica", "bold").setFontSize(9).setTextColor(200, 0, 0);
   doc.text("INDICACIONES:", indX, indY);
-  doc.setFont("helvetica","normal").setFontSize(9).setTextColor(0, 0, 0);
+  doc.setFont("helvetica", "normal").setFontSize(9).setTextColor(0, 0, 0);
   let cursor = indY + 4;
   [
     "• Si ud. es conductor y/o operador dejar copia a color de DNI y licencia de conducir.",
@@ -50,10 +50,10 @@ export default function LabClinico(datos) {
   // footer e impresión
   footer(doc, datos);
   const pdfBlob = doc.output("blob");
-  const pdfUrl  = URL.createObjectURL(pdfBlob);
-  const iframe  = document.createElement("iframe");
+  const pdfUrl = URL.createObjectURL(pdfBlob);
+  const iframe = document.createElement("iframe");
   iframe.style.display = "none";
-  iframe.src     = pdfUrl;
+  iframe.src = pdfUrl;
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
 }

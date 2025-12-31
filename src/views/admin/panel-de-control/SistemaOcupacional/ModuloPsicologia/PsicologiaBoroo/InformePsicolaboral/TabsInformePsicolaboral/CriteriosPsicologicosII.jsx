@@ -19,44 +19,33 @@ export default function CriteriosPsicologicosII({
   return (
     <div className="bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <SectionFieldset legend="ASPECTOS CONDUCTUALES">
+        <SectionFieldset legend="Apecto Conductuales">
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                1. Nivel de Alerta ante el riesgo
-              </label>
-              <InputTextOneLine
-                name="nivelAlerta"
-                value={form?.nivelAlerta}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                2. Tipo de hostigamiento sexual
-              </label>
-              <InputTextOneLine
-                name="hostigamientoSexual"
-                value={form?.hostigamientoSexual}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                3. Tipo de consecuencia encontrada
-              </label>
-              <InputTextOneLine
-                name="consecuencia"
-                value={form?.consecuencia}
-                onChange={handleChange}
-              />
-            </div>
+            <InputTextOneLine
+              label="1. Nivel de Alerta ante el riesgo"
+              labelOnTop
+              name="nivelAlerta"
+              value={form?.nivelAlerta}
+              onChange={handleChange}
+            />
+            <InputTextOneLine
+              label="2. Tipo de hostigamiento sexual"
+              labelOnTop
+              name="hostigamientoSexual"
+              value={form?.hostigamientoSexual}
+              onChange={handleChange}
+            />
+            <InputTextOneLine
+              label="3. Tipo de consecuencia encontrada"
+              labelOnTop
+              name="consecuencia"
+              value={form?.consecuencia}
+              onChange={handleChange}
+            />
           </div>
         </SectionFieldset>
 
-        <SectionFieldset legend="ASPECTOS PSICOLABORALES">
+        <SectionFieldset legend="Aspectos Psicolaborales">
           <RadioTable
             items={[
               { name: "capacidadInfluencia", label: "1. Capacidad de influencia" },

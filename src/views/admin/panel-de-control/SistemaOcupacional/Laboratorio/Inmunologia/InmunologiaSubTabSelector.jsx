@@ -4,7 +4,9 @@ import Hepatitis from "./Hepatitis/Hepatitis";
 import BKKOH from "./BKKOH/BKKOH";
 import VDRL from "./VDRL/VDRL";
 import Aglutinaciones from "./Aglutinaciones/Aglutinaciones";
-import { faDisease, faFlask, faMicroscope, faVenus, faVirus, faViruses } from "@fortawesome/free-solid-svg-icons";
+import { faDisease, faMarsAndVenusBurst, faMicroscope, faSpider, faVenus, faVirus, faViruses } from "@fortawesome/free-solid-svg-icons";
+import VIH from "./VIH/VIH";
+import Thevenon from "./Thevenon/Thevenon";
 
 export default function InmunologiaSubTabSelector({ tieneVista }) {
   const tabsConfig = [
@@ -42,6 +44,20 @@ export default function InmunologiaSubTabSelector({ tieneVista }) {
       label: "VDRL",
       icon: faViruses,
       component: VDRL
+    },
+    {
+      id: 5,
+      permission: "VIH",
+      label: "VIH",
+      icon: faMarsAndVenusBurst,
+      component: VIH
+    },
+    {
+      id: 6,
+      permission: "Thevenon",
+      label: "Thevenon",
+      icon: faSpider,
+      component: Thevenon
     },
   ];
   return (

@@ -1,12 +1,12 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils";
-import { getSign, convertirGenero } from "../../utils/helpers";
+import { getSign, convertirGenero, getSignCompressed } from "../../utils/helpers";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 
-export default function GenerarDatosPaciente(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function GenerarDatosPaciente(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   const datosReales = {
@@ -30,84 +30,136 @@ export default function GenerarDatosPaciente(data = {}) {
     sede: data.sede || data.codigoSede || "",
     // Datos de antecedentes
     antecedentes: [
-      { texto: "Accidente cerebrovascular", 
+      {
+        texto: "Accidente cerebrovascular",
         si: Boolean(data?.antecedentes?.accidenteCerebroVascularSi ?? false),
-        no: Boolean(data?.antecedentes?.accidenteCerebroVascularNo ?? false) },
-      { texto: "Angina inestable", 
+        no: Boolean(data?.antecedentes?.accidenteCerebroVascularNo ?? false)
+      },
+      {
+        texto: "Angina inestable",
         si: Boolean(data?.antecedentes?.anginaInestableSi ?? false),
-        no: Boolean(data?.antecedentes?.anginaInestableNo ?? false) },
-      { texto: "Antecedente de Bypass arterial coronario/AngioplastÍa/Stent", 
+        no: Boolean(data?.antecedentes?.anginaInestableNo ?? false)
+      },
+      {
+        texto: "Antecedente de Bypass arterial coronario/AngioplastÍa/Stent",
         si: Boolean(data?.antecedentes?.antecedenteBypassArterialSi ?? false),
-        no: Boolean(data?.antecedentes?.antecedenteBypassArterialNo ?? false) },
-      { texto: "Antecedente de edema cerebral de altura", 
+        no: Boolean(data?.antecedentes?.antecedenteBypassArterialNo ?? false)
+      },
+      {
+        texto: "Antecedente de edema cerebral de altura",
         si: Boolean(data?.antecedentes?.antecedenteEdemaCerebralSi ?? false),
-        no: Boolean(data?.antecedentes?.antecedenteEdemaCerebralNo ?? false) },
-      { texto: "Antecendente de edema pulmonar de altura", 
+        no: Boolean(data?.antecedentes?.antecedenteEdemaCerebralNo ?? false)
+      },
+      {
+        texto: "Antecendente de edema pulmonar de altura",
         si: Boolean(data?.antecedentes?.antecedenteEdemaPulmonarSi ?? false),
-        no: Boolean(data?.antecedentes?.antecedenteEdemaPulmonarNo ?? false) },
-      { texto: "Antecedente de Neumotórax en los ultimos 6 meses", 
+        no: Boolean(data?.antecedentes?.antecedenteEdemaPulmonarNo ?? false)
+      },
+      {
+        texto: "Antecedente de Neumotórax en los ultimos 6 meses",
         si: Boolean(data?.antecedentes?.antecedenteNeumotoraxSi ?? false),
-        no: Boolean(data?.antecedentes?.antecedenteNeumotoraxNo ?? false) },
-      { texto: "Arritmia cardiaca no controlada", 
+        no: Boolean(data?.antecedentes?.antecedenteNeumotoraxNo ?? false)
+      },
+      {
+        texto: "Arritmia cardiaca no controlada",
         si: Boolean(data?.antecedentes?.arritmiaCardiacaSi ?? false),
-        no: Boolean(data?.antecedentes?.arritmiaCardiacaNo ?? false) },
-      { texto: "Cardiomiopatía hipertrófica idiopática", 
+        no: Boolean(data?.antecedentes?.arritmiaCardiacaNo ?? false)
+      },
+      {
+        texto: "Cardiomiopatía hipertrófica idiopática",
         si: Boolean(data?.antecedentes?.cardiomiopatiaSi ?? false),
-        no: Boolean(data?.antecedentes?.cardiomiopatiaNo ?? false) },
-      { texto: "Cirugía mayor en los últimos 30 días", 
+        no: Boolean(data?.antecedentes?.cardiomiopatiaNo ?? false)
+      },
+      {
+        texto: "Cirugía mayor en los últimos 30 días",
         si: Boolean(data?.antecedentes?.cirujiaMayorSi ?? false),
-        no: Boolean(data?.antecedentes?.cirujiaMayorNo ?? false) },
-      { texto: "Cualquier insuficiencia en la válvula aórtica", 
+        no: Boolean(data?.antecedentes?.cirujiaMayorNo ?? false)
+      },
+      {
+        texto: "Cualquier insuficiencia en la válvula aórtica",
         si: Boolean(data?.antecedentes?.cualquierInsuficienciaSi ?? false),
-        no: Boolean(data?.antecedentes?.cualquierInsuficienciaNo ?? false) },
-      { texto: "Diabetes Mellitus", 
+        no: Boolean(data?.antecedentes?.cualquierInsuficienciaNo ?? false)
+      },
+      {
+        texto: "Diabetes Mellitus",
         si: Boolean(data?.antecedentes?.diabetesMellitusSi ?? false),
-        no: Boolean(data?.antecedentes?.diabetesMellitusNo ?? false) },
-      { texto: "Embarazo", 
+        no: Boolean(data?.antecedentes?.diabetesMellitusNo ?? false)
+      },
+      {
+        texto: "Embarazo",
         si: Boolean(data?.antecedentes?.embarazoSi ?? false),
-        no: Boolean(data?.antecedentes?.embarazoNo ?? false) },
-      { texto: "Epilepsia", 
+        no: Boolean(data?.antecedentes?.embarazoNo ?? false)
+      },
+      {
+        texto: "Epilepsia",
         si: Boolean(data?.antecedentes?.epilepsiaSi ?? false),
-        no: Boolean(data?.antecedentes?.epilepsiaNo ?? false) },
-      { texto: "EPOC - Enfermedad pulmonar obstructiva crónica confirmada", 
+        no: Boolean(data?.antecedentes?.epilepsiaNo ?? false)
+      },
+      {
+        texto: "EPOC - Enfermedad pulmonar obstructiva crónica confirmada",
         si: Boolean(data?.antecedentes?.epocSi ?? false),
-        no: Boolean(data?.antecedentes?.epocNo ?? false) },
-      { texto: "Eritrocitosis excesiva (mal de montaña crónico)", 
+        no: Boolean(data?.antecedentes?.epocNo ?? false)
+      },
+      {
+        texto: "Eritrocitosis excesiva (mal de montaña crónico)",
         si: Boolean(data?.antecedentes?.eritrocitosisSi ?? false),
-        no: Boolean(data?.antecedentes?.eritrocitosisNo ?? false) },
-      { texto: "Hipertensión arterial", 
+        no: Boolean(data?.antecedentes?.eritrocitosisNo ?? false)
+      },
+      {
+        texto: "Hipertensión arterial",
         si: Boolean(data?.antecedentes?.hipertensionArterialSi ?? false),
-        no: Boolean(data?.antecedentes?.hipertensionArterialNo ?? false) },
-      { texto: "Hipertensión pulmonar", 
+        no: Boolean(data?.antecedentes?.hipertensionArterialNo ?? false)
+      },
+      {
+        texto: "Hipertensión pulmonar",
         si: Boolean(data?.antecedentes?.hipertensionPulmonarSi ?? false),
-        no: Boolean(data?.antecedentes?.hipertensionPulmonarNo ?? false) },
-      { texto: "Infarto al miocardio en los últimos 6 meses", 
+        no: Boolean(data?.antecedentes?.hipertensionPulmonarNo ?? false)
+      },
+      {
+        texto: "Infarto al miocardio en los últimos 6 meses",
         si: Boolean(data?.antecedentes?.infartoMiocardioSi ?? false),
-        no: Boolean(data?.antecedentes?.infartoMiocardioNo ?? false) },
-      { texto: "Insuficiencia cardíaca congestiva", 
+        no: Boolean(data?.antecedentes?.infartoMiocardioNo ?? false)
+      },
+      {
+        texto: "Insuficiencia cardíaca congestiva",
         si: Boolean(data?.antecedentes?.insuficienciaCardiacaSi ?? false),
-        no: Boolean(data?.antecedentes?.insuficienciaCardiacaNo ?? false) },
-      { texto: "Patología hemorrágica de retina", 
+        no: Boolean(data?.antecedentes?.insuficienciaCardiacaNo ?? false)
+      },
+      {
+        texto: "Patología hemorrágica de retina",
         si: Boolean(data?.antecedentes?.patologiaHemorragicaSi ?? false),
-        no: Boolean(data?.antecedentes?.patologiaHemorragicaNo ?? false) },
-      { texto: "Patología Valvular Cardiáca en tratamiento", 
+        no: Boolean(data?.antecedentes?.patologiaHemorragicaNo ?? false)
+      },
+      {
+        texto: "Patología Valvular Cardiáca en tratamiento",
         si: Boolean(data?.antecedentes?.patologiaValvularSi ?? false),
-        no: Boolean(data?.antecedentes?.patologiaValvularNo ?? false) },
-      { texto: "Presencia de marcapasos", 
+        no: Boolean(data?.antecedentes?.patologiaValvularNo ?? false)
+      },
+      {
+        texto: "Presencia de marcapasos",
         si: Boolean(data?.antecedentes?.presenciaMarcaPasosSi ?? false),
-        no: Boolean(data?.antecedentes?.presenciaMarcaPasosNo ?? false) },
-      { texto: "Presencia de riesgo cardiovascular alto", 
+        no: Boolean(data?.antecedentes?.presenciaMarcaPasosNo ?? false)
+      },
+      {
+        texto: "Presencia de riesgo cardiovascular alto",
         si: Boolean(data?.antecedentes?.presenciaRiesgoCardioSi ?? false),
-        no: Boolean(data?.antecedentes?.presenciaRiesgoCardioNo ?? false) },
-      { texto: "Trastornos de la coagulación", 
+        no: Boolean(data?.antecedentes?.presenciaRiesgoCardioNo ?? false)
+      },
+      {
+        texto: "Trastornos de la coagulación",
         si: Boolean(data?.antecedentes?.transtornoCoagulacionSi ?? false),
-        no: Boolean(data?.antecedentes?.transtornoCoagulacionNo ?? false) },
-      { texto: "Trombosis venosa cerebral", 
+        no: Boolean(data?.antecedentes?.transtornoCoagulacionNo ?? false)
+      },
+      {
+        texto: "Trombosis venosa cerebral",
         si: Boolean(data?.antecedentes?.trombosisSi ?? false),
-        no: Boolean(data?.antecedentes?.trombosisNo ?? false) },
-      { texto: "Otros", 
+        no: Boolean(data?.antecedentes?.trombosisNo ?? false)
+      },
+      {
+        texto: "Otros",
         si: Boolean(data?.antecedentes?.otrosSi ?? false),
-        no: Boolean(data?.antecedentes?.otrosNo ?? false) },
+        no: Boolean(data?.antecedentes?.otrosNo ?? false)
+      },
     ],
     observaciones: String(data?.antecedentes?.observaciones ?? ""),
     esApto: Boolean(data?.antecedentes?.esApto ?? false),
@@ -132,11 +184,11 @@ export default function GenerarDatosPaciente(data = {}) {
     const palabras = texto.split(' ');
     let lineaActual = '';
     let yPos = y;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -150,11 +202,11 @@ export default function GenerarDatosPaciente(data = {}) {
         }
       }
     });
-    
+
     if (lineaActual) {
       doc.text(lineaActual, x, yPos);
     }
-    
+
     return yPos;
   };
 
@@ -162,30 +214,30 @@ export default function GenerarDatosPaciente(data = {}) {
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
     const tablaInicioX = 5;
     const tablaAncho = 200;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo gris más oscuro
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
+
     // Dibujar líneas del header
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
-    
+
     return yPos + alturaHeader;
   };
 
   // === HEADER ===
-  CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+  await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
   doc.setFont("helvetica", "normal").setFontSize(13);
   doc.setTextColor(0, 0, 0);
@@ -351,11 +403,11 @@ export default function GenerarDatosPaciente(data = {}) {
   // Usar el mismo estilo de líneas que el resto del documento
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
-  
+
   // Dibujar fondo naranja personalizado para el cuadro de texto
   doc.setFillColor(245, 174, 103); // #f5ae67 - Naranja personalizado
   doc.rect(cuadroX, cuadroY, cuadroWidth, cuadroHeight, 'F');
-  
+
   // Dibujar líneas individuales
   doc.line(cuadroX, cuadroY, cuadroX + cuadroWidth, cuadroY); // Superior
   doc.line(cuadroX, cuadroY + cuadroHeight, cuadroX + cuadroWidth, cuadroY + cuadroHeight); // Inferior
@@ -365,9 +417,9 @@ export default function GenerarDatosPaciente(data = {}) {
   // Texto dentro del cuadro
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.setTextColor(0, 0, 0);
-  
+
   const textoCuadro = "El presente listado de patologías deberá ser precisado por la persona que accederá a una operación minera en altitud geográfica. El Médico evaluador deberá evaluar los antecedentes y condición actual del paciente para determinar si es procedente o no el acceso del paciente a altitud geográfica. De ser necesario, el médico evaluador deberá solicitar las pruebas e interconsultas complementarias para evaluar el caso antes de emitir su conclusión.";
-  
+
   doc.text(textoCuadro, cuadroX + 2, cuadroY + 3, {
     align: "justify",
     maxWidth: cuadroWidth - 4
@@ -380,17 +432,17 @@ export default function GenerarDatosPaciente(data = {}) {
   const colTexto = 180;
   const colNo = 10;
   const colSi = 10;
-   
+
   // Función para dibujar header de antecedentes con columnas NO/SI
   const dibujarHeaderAntecedentes = (titulo, yPos, alturaHeader = 5) => {
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo gris más oscuro
     doc.setFillColor(196, 196, 196);
     doc.rect(leftMargin, yPos, colTexto + colNo + colSi, alturaHeader, 'F');
-    
+
     // Dibujar líneas del header
     doc.line(leftMargin, yPos, leftMargin + colTexto + colNo + colSi, yPos); // Superior
     doc.line(leftMargin, yPos + alturaHeader, leftMargin + colTexto + colNo + colSi, yPos + alturaHeader); // Inferior
@@ -398,14 +450,14 @@ export default function GenerarDatosPaciente(data = {}) {
     doc.line(leftMargin + colTexto, yPos, leftMargin + colTexto, yPos + alturaHeader); // División texto/opciones
     doc.line(leftMargin + colTexto + colNo, yPos, leftMargin + colTexto + colNo, yPos + alturaHeader); // División NO/SI
     doc.line(leftMargin + colTexto + colNo + colSi, yPos, leftMargin + colTexto + colNo + colSi, yPos + alturaHeader); // Derecha
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.setTextColor(0, 0, 0);
     doc.text(titulo, leftMargin + 2, yPos + 3.5);
-    doc.text("NO", leftMargin + colTexto + colNo/2, yPos + 3.5, { align: "center" });
-    doc.text("SI", leftMargin + colTexto + colNo + colSi/2, yPos + 3.5, { align: "center" });
-    
+    doc.text("NO", leftMargin + colTexto + colNo / 2, yPos + 3.5, { align: "center" });
+    doc.text("SI", leftMargin + colTexto + colNo + colSi / 2, yPos + 3.5, { align: "center" });
+
     return yPos + alturaHeader;
   };
 
@@ -414,7 +466,7 @@ export default function GenerarDatosPaciente(data = {}) {
 
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.setLineWidth(0.2);
-  
+
   datosFinales.antecedentes.forEach((item) => {
     let textoDividido = doc.splitTextToSize(item.texto, colTexto - 4);
     let altura = textoDividido.length * 3 + 2;
@@ -434,14 +486,14 @@ export default function GenerarDatosPaciente(data = {}) {
     // NO
     if (item.no === true) {
       doc.setFont("helvetica", "bold").setFontSize(10);
-      doc.text("X", leftMargin + colTexto + colNo/2, yPos + altura/2 + 1, { align: "center" });
+      doc.text("X", leftMargin + colTexto + colNo / 2, yPos + altura / 2 + 1, { align: "center" });
       doc.setFont("helvetica", "normal").setFontSize(8);
     }
 
     // SI
     if (item.si === true) {
       doc.setFont("helvetica", "bold").setFontSize(10);
-      doc.text("X", leftMargin + colTexto + colNo + colSi/2, yPos + altura/2 + 1, { align: "center" });
+      doc.text("X", leftMargin + colTexto + colNo + colSi / 2, yPos + altura / 2 + 1, { align: "center" });
       doc.setFont("helvetica", "normal").setFontSize(8);
     }
 
@@ -455,21 +507,21 @@ export default function GenerarDatosPaciente(data = {}) {
   // === Fila de comentarios del médico (sin divisiones internas) ===
   const textoComentarios = `Comentarios: ${datosFinales.otrosDescripcion || ""}`;
   const textoObservaciones = `Observaciones: ${datosFinales.observaciones || ""}`;
-  
+
   // Combinar ambos textos en un solo párrafo
   const textoCompleto = `${textoComentarios} ${textoObservaciones}`.trim();
-  
+
   // Calcular altura dinámica para el texto
   const calcularAlturaComentarios = (texto, anchoMaximo, fontSize) => {
     if (!texto) return filaAltura;
     const palabras = texto.split(' ');
     let lineaActual = '';
     let lineas = 1;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -481,7 +533,7 @@ export default function GenerarDatosPaciente(data = {}) {
         }
       }
     });
-    
+
     return Math.max(lineas * fontSize * 0.35 + 1.5, filaAltura);
   };
 
@@ -511,20 +563,20 @@ export default function GenerarDatosPaciente(data = {}) {
   const textoApto = `APTO (${datosFinales.esApto ? "X" : " "})`;
   const textoNoApto = `NO APTO (${!datosFinales.esApto ? "X" : " "})`;
   const textoFinal = " para ascender a emplazamientos ubicados en Gran Altitud Geográfica (Gran Altitud)";
-  
+
   // Combinar todo el texto en un solo párrafo
   const textoCompletoConclusiones = `${textoCertificacion} ${textoApto}, ${textoNoApto}${textoFinal}`;
-  
+
   // Calcular altura dinámica para el texto de conclusiones
   const calcularAlturaConclusiones = (texto, anchoMaximo, fontSize) => {
     const palabras = texto.split(' ');
     let lineaActual = '';
     let lineas = 1;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -536,7 +588,7 @@ export default function GenerarDatosPaciente(data = {}) {
         }
       }
     });
-    
+
     return Math.max(lineas * fontSize * 0.35 + 1.5, 8);
   };
 
@@ -557,7 +609,7 @@ export default function GenerarDatosPaciente(data = {}) {
 
   // ===== SECCIÓN DE LUGAR/FECHA, FIRMA TRABAJADOR Y FIRMA MÉDICO =====
   const alturaSeccionFirmas = 30;
-  
+
   // Dibujar las líneas de la sección (3 columnas)
   // Columna 1: 60mm, Columna 2: 60mm, Columna 3: 80mm (total 200mm)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaSeccionFirmas);
@@ -571,11 +623,11 @@ export default function GenerarDatosPaciente(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Lugar:", tablaInicioX + 2, yPos + 5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  
+
   // Usar dibujarTextoConSaltoLinea para el lugar
   const anchoColumnaLugar = 60 - 15 - 2;
   dibujarTextoConSaltoLinea(datosFinales.sede || "", tablaInicioX + 12, yPos + 5, anchoColumnaLugar);
-  
+
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Fecha:", tablaInicioX + 2, yPos + 15);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -625,12 +677,13 @@ export default function GenerarDatosPaciente(data = {}) {
 
   // === COLUMNA 3: SELLO Y FIRMA DEL MÉDICO ===
   const firmaMedicoY = yPos + 3;
-  
+
   // Calcular centro de la columna 3 para centrar la imagen
   const centroColumna3 = tablaInicioX + 120 + (80 / 2); // Centro de la columna 3 (160mm desde tablaInicioX)
-  
+
   // Agregar firma y sello médico
-  const firmaMedicoUrl = getSign(data, "SELLOFIRMA");
+  const firmaMedicoUrl = await getSignCompressed(data, "SELLOFIRMA");
+  console.log(firmaMedicoUrl)
   if (firmaMedicoUrl) {
     try {
       const imgWidth = 50;
@@ -638,12 +691,12 @@ export default function GenerarDatosPaciente(data = {}) {
       // Centrar la imagen: centro de la columna menos la mitad del ancho de la imagen
       const x = centroColumna3 - (imgWidth / 2);
       const y = firmaMedicoY;
-      doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
+      doc.addImage(firmaMedicoUrl, 'JPEG', x, y, imgWidth, imgHeight);
     } catch (error) {
       console.log("Error cargando firma del médico:", error);
     }
   }
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("Sello y Firma del Médico", centroColumna3, yPos + 26, { align: "center" });
   doc.text("Responsable de la Evaluación", centroColumna3, yPos + 28.5, { align: "center" });
@@ -651,10 +704,14 @@ export default function GenerarDatosPaciente(data = {}) {
   yPos += alturaSeccionFirmas;
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 8});
+  footerTR(doc, { footerOffsetY: 8 });
 
   // === Imprimir ===
-  imprimir(doc);
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {

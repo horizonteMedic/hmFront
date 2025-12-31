@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import header_TestFAtiga from "./Header_TestFatiga";
 import footer_TestFatiga from "./Footer_TestFatiga";
-export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
+export default async function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
 
   function drawXInBox(doc, x, y, width, height, color = [0, 0, 255], scale = 3) {
     const centerX = x + width / 2;
@@ -68,13 +68,13 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
     isValidUrl(sello3?.url) ? loadImg(sello3.url) : Promise.resolve(null),
-  ]).then(([s1,s2,s3]) => {
+  ]).then(([s1, s2, s3]) => {
     // 2) Encabezado (logo, campos, título)
     header_TestFAtiga(doc, datos);
     doc.setFont("helvetica", "bold").setFontSize(12);
-    doc.text("TEST DE FATIGA Y SOMNOLENCIA",pageW / 2, y, { align: "center" })
+    doc.text("TEST DE FATIGA Y SOMNOLENCIA", pageW / 2, y, { align: "center" })
 
-    doc.setFont("helvetica", "bold").setFontSize(9);  
+    doc.setFont("helvetica", "bold").setFontSize(9);
     doc.text("Apellidos y Nombres:", 10, y + 10)
     doc.text("Edad:", 135, y + 10)
     doc.text("Sexo:", 170, y + 10)
@@ -83,7 +83,7 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
     doc.text("Fecha:", 170, y + 15)
 
     doc.text("Empresa:", 10, y + 20)
-    
+
     doc.setFont("helvetica", "normal")
     doc.rect(45, y + 6, 88, 5);
     doc.text(`${datos.nombres ? datos.nombres : "asd"}`, 47, y + 10)
@@ -99,15 +99,15 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
 
     doc.rect(28, y + 17, 179, 5); // Empresa
     doc.text(`${datos.razonEmpresa ? datos.razonEmpresa : "asd"}`, 30, y + 21)
-    
+
     y += 24
-    
+
     autoTable(doc, {
       startY: y,
       theme: "grid",
       margin: { left: margin, right: margin },
-       styles: { 
-        fontSize: 9, 
+      styles: {
+        fontSize: 9,
         textColor: [0, 0, 0],
         lineColor: [0, 0, 0],   // color de las líneas internas
         lineWidth: 0.5          // grosor de las líneas internas
@@ -116,26 +116,27 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
       tableLineWidth: 0.5,       // grosor del borde externo
       body: [
         [
-          { content: `                              es que usted                                                    en las siguientes situaciones?. Considere los últimos meses de sus actividades habituales. No se refiere a sentirse cansado debido a actividad física. Aunque no haya realizado últimamente las situaciones descritas, considere como le habrian afectado. Use la siguiente escala y marque con una "X" la opción mas apropiada para cada situación.`
+          {
+            content: `                              es que usted                                                    en las siguientes situaciones?. Considere los últimos meses de sus actividades habituales. No se refiere a sentirse cansado debido a actividad física. Aunque no haya realizado últimamente las situaciones descritas, considere como le habrian afectado. Use la siguiente escala y marque con una "X" la opción mas apropiada para cada situación.`
             , styles: { cellPadding: 3, }
           }
         ],
         [
-          { content: "", styles: {minCellHeight: 37}}
+          { content: "", styles: { minCellHeight: 37 } }
         ],
       ],
       didDrawCell: (data) => {
         // Detectar la segunda fila (index 1) y la primera columna (index 0)
         if (data.row.index === 0 && data.column.index === 0) {
-            const cell = data.cell;
-            const startX = cell.x ; // margen interno
-            const startY = cell.y ;
-            doc.setFont("helvetica", "bold")
-            doc.text("Que tan probable", startX + 2.8, startY + 5.8)
-            doc.text("cabecee o se quede dormido", startX + 49, startY + 5.7)
-            doc.setFont("helvetica", "normal")
+          const cell = data.cell;
+          const startX = cell.x; // margen interno
+          const startY = cell.y;
+          doc.setFont("helvetica", "bold")
+          doc.text("Que tan probable", startX + 2.8, startY + 5.8)
+          doc.text("cabecee o se quede dormido", startX + 49, startY + 5.7)
+          doc.setFont("helvetica", "normal")
         }
-        
+
         if (data.row.index === 1 && data.column.index === 0) {
           const cell = data.cell;
           const startX = cell.x + 40; // margen interno
@@ -145,23 +146,23 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
             startY: startY,
             margin: { left: startX, right: startX },
             theme: "grid",
-            styles: { 
-              fontSize: 7, 
+            styles: {
+              fontSize: 7,
               textColor: [0, 0, 0],
               lineColor: [0, 0, 0],
-              lineWidth: 0.5 
+              lineWidth: 0.5
             },
             tableLineColor: [0, 0, 0],
             tableLineWidth: 0.5,
             body: [
               [
-                { content: "Descripción", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-                { content: "Puntaje", styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+                { content: "Descripción", styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+                { content: "Puntaje", styles: { valign: "middle", halign: "center", fontStyle: "bold" } }
               ],
-              ["Nunca me quedaría dormido", { content: "0", styles: {valign: "middle", halign: "center" }}],
-              ["Poca probabilidad de quedarme dormido", { content: "1", styles: {valign: "middle", halign: "center" }}],
-              ["Moderada probabilidad de quedarme dormido", { content:"2", styles: {valign: "middle", halign: "center" }}],
-              ["Alta probabilidad de quedarme dormido", { content:"3", styles: {valign: "middle", halign: "center" }}],
+              ["Nunca me quedaría dormido", { content: "0", styles: { valign: "middle", halign: "center" } }],
+              ["Poca probabilidad de quedarme dormido", { content: "1", styles: { valign: "middle", halign: "center" } }],
+              ["Moderada probabilidad de quedarme dormido", { content: "2", styles: { valign: "middle", halign: "center" } }],
+              ["Alta probabilidad de quedarme dormido", { content: "3", styles: { valign: "middle", halign: "center" } }],
             ],
           });
         }
@@ -172,8 +173,8 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
       startY: doc.lastAutoTable.finalY,
       theme: "grid",
       margin: { left: margin, right: margin },
-       styles: { 
-        fontSize: 9, 
+      styles: {
+        fontSize: 9,
         textColor: [0, 0, 0],
         lineColor: [0, 0, 0],   // color de las líneas internas
         lineWidth: 0.5          // grosor de las líneas internas
@@ -182,90 +183,90 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
       tableLineWidth: 0.5,       // grosor del borde externo
       body: [
         [
-          { content: `Situación`, colSpan: 2, rowSpan: 2, styles: { cellPadding: 3, valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `Probabilidad de cabecear`, colSpan: 4, rowSpan: 1, styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+          { content: `Situación`, colSpan: 2, rowSpan: 2, styles: { cellPadding: 3, valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `Probabilidad de cabecear`, colSpan: 4, rowSpan: 1, styles: { valign: "middle", halign: "center", fontStyle: "bold" } }
         ],
         [
-          { content: "Nunca", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "Poca", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "Moderada", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "Alta", styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+          { content: "Nunca", styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: "Poca", styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: "Moderada", styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: "Alta", styles: { valign: "middle", halign: "center", fontStyle: "bold" } }
         ],
         [
-          { content: "1", styles: { valign: "middle", halign: "center"}},
-          { content: "Sentado Leyendo"},
-          { content: `${datos.rbs1Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs1Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs1Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs1Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+          { content: "1", styles: { valign: "middle", halign: "center" } },
+          { content: "Sentado Leyendo" },
+          { content: `${datos.rbs1Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs1Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs1Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs1Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } }
         ],
         [
-          { content: "2", styles: { valign: "middle", halign: "center"}},
-          { content: "Viendo televisión"},
-          { content: `${datos.rbs2Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs2Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs2Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs2Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+          { content: "2", styles: { valign: "middle", halign: "center" } },
+          { content: "Viendo televisión" },
+          { content: `${datos.rbs2Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs2Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs2Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs2Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } }
         ],
         [
-          { content: "3", styles: { valign: "middle", halign: "center"}},
-          { content: "Sentado (por ejemplo en el teatro, en una reunión, en el cine, en una conferencia, escuchando misa o en el culto)"},
-          { content: `${datos.rbs3Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs3Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs3Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs3Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+          { content: "3", styles: { valign: "middle", halign: "center" } },
+          { content: "Sentado (por ejemplo en el teatro, en una reunión, en el cine, en una conferencia, escuchando misa o en el culto)" },
+          { content: `${datos.rbs3Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs3Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs3Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs3Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } }
         ],
         [
-          { content: "4", styles: { valign: "middle", halign: "center"}},
-          { content: "Como pasajero en un automóvil, ómnibus, micro o combi durante una hora o menos de recorrido"},
-          { content: `${datos.rbs4Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs4Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs4Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs4Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+          { content: "4", styles: { valign: "middle", halign: "center" } },
+          { content: "Como pasajero en un automóvil, ómnibus, micro o combi durante una hora o menos de recorrido" },
+          { content: `${datos.rbs4Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs4Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs4Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs4Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } }
         ],
         [
-          { content: "5", styles: { valign: "middle", halign: "center"}},
-          { content: "Recostado en la tarde si las circunstancias lo permiten"},
-          { content: `${datos.rbs5Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs5Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs5Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs5Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+          { content: "5", styles: { valign: "middle", halign: "center" } },
+          { content: "Recostado en la tarde si las circunstancias lo permiten" },
+          { content: `${datos.rbs5Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs5Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs5Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs5Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } }
         ],
         [
-          { content: "6", styles: { valign: "middle", halign: "center"}},
-          { content: "Sentado conversando con alguien"},
-          { content: `${datos.rbs6Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs6Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs6Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs6Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+          { content: "6", styles: { valign: "middle", halign: "center" } },
+          { content: "Sentado conversando con alguien" },
+          { content: `${datos.rbs6Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs6Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs6Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs6Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } }
         ],
         [
-          { content: "7", styles: { valign: "middle", halign: "center"}},
-          { content: "Sentado luego del almuerzo y sin haber bebido"},
-          { content: `${datos.rbs7Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs7Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs7Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs7Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+          { content: "7", styles: { valign: "middle", halign: "center" } },
+          { content: "Sentado luego del almuerzo y sin haber bebido" },
+          { content: `${datos.rbs7Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs7Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs7Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs7Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } }
         ],
         [
-          { content: "8", styles: { valign: "middle", halign: "center"}},
-          { content: "Conduciendo el automóvil cuando se detiene algunos minutos por razones de tráfico"},
-          { content: `${datos.rbs8Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs8Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs8Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs8Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+          { content: "8", styles: { valign: "middle", halign: "center" } },
+          { content: "Conduciendo el automóvil cuando se detiene algunos minutos por razones de tráfico" },
+          { content: `${datos.rbs8Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs8Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs8Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs8Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } }
         ],
         [
-          { content: "9", styles: { valign: "middle", halign: "center"}},
-          { content: "Parado y apoyándose o no en una pared o mueble",},
-          { content: `${datos.rbs9Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs9Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs9Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: `${datos.rbs9Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+          { content: "9", styles: { valign: "middle", halign: "center" } },
+          { content: "Parado y apoyándose o no en una pared o mueble", },
+          { content: `${datos.rbs9Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs9Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs9Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } },
+          { content: `${datos.rbs9Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" } }
         ],
         [
-          { content: "Puntaje", styles: { valign: "middle", halign: "right", fontStyle: "bold"}, colSpan: 2 },
-          { content: `${datos.txtPuntaje ? datos.txtPuntaje : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold"}, colSpan: 4}
+          { content: "Puntaje", styles: { valign: "middle", halign: "right", fontStyle: "bold" }, colSpan: 2 },
+          { content: `${datos.txtPuntaje ? datos.txtPuntaje : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }, colSpan: 4 }
         ]
       ],
       columnStyles: {
@@ -278,8 +279,8 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
       startY: doc.lastAutoTable.finalY,
       theme: "grid",
       margin: { left: margin, right: margin },
-       styles: { 
-        fontSize: 10, 
+      styles: {
+        fontSize: 10,
         textColor: [0, 0, 0],
         lineColor: [0, 0, 0],   // color de las líneas internas
         lineWidth: 0.5          // grosor de las líneas internas
@@ -288,7 +289,7 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
       tableLineWidth: 0.5,       // grosor del borde externo
       body: [
         [
-          { content: "", styles: {minCellHeight: 47}}
+          { content: "", styles: { minCellHeight: 47 } }
         ],
       ],
       didDrawCell: (data) => {
@@ -302,20 +303,20 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
             startY: startY,
             margin: { left: startX, right: startX },
             theme: "grid",
-            styles: { 
-              fontSize: 9, 
+            styles: {
+              fontSize: 9,
               textColor: [0, 0, 0],
               lineColor: [0, 0, 0],
-              lineWidth: 0.5 
+              lineWidth: 0.5
             },
             tableLineColor: [0, 0, 0],
             tableLineWidth: 0.5,
             body: [
               [
-                { content: "", styles: { minCellHeight: 26 }},
+                { content: "", styles: { minCellHeight: 26 } },
               ]
             ],
-            
+
           });
           doc.setFont("helvetica", "bold")
           doc.text("Pregunta Obligatoria", startX + 28, startY + 4)
@@ -329,20 +330,20 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
           doc.text(`NO`, startX + 63, startY + 22)
           doc.rect(startX + 74, startY + 17, 6, 6); // Cuadro pequeño
           if (datos.rbSi === true) {
-            drawXInBox(doc, startX + 24, startY + 17,  6, 5); // Cuadro Masculino
+            drawXInBox(doc, startX + 24, startY + 17, 6, 5); // Cuadro Masculino
           } else if (datos.rbNo === true) {
-            drawXInBox(doc, startX + 74, startY + 17,  6, 5); // Cuadro Femenino
+            drawXInBox(doc, startX + 74, startY + 17, 6, 5); // Cuadro Femenino
           }
 
           autoTable(doc, {
             startY: startY + 28,
             margin: { left: startX - 44, right: startX - 44 },
             theme: "grid",
-            styles: { 
-              fontSize: 9, 
+            styles: {
+              fontSize: 9,
               textColor: [0, 0, 0],
               lineColor: [0, 0, 0],
-              lineWidth: 0.5 
+              lineWidth: 0.5
             },
             tableLineColor: [0, 0, 0],
             tableLineWidth: 0.5,
@@ -351,7 +352,7 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
                 { content: `Calificación: El puntaje total se obtiene sumando el puntaje de cada situación. Para personas que manejan vehículos motorizados, se suman los primeros ocho ítems. Para personas que no manejan vehículos motorizados, se suma los primeros siete ítems y el ítem nueve.`, },
               ]
             ],
-            
+
           });
           doc.setFont("helvetica", "bold").setFontSize(9);
           const texto = "Puntaje mayor a 10, será considerado POSITIVO";
@@ -364,7 +365,7 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
 
           // Dibujar la línea debajo del texto (subrayado)
           doc.setLineWidth(0.3); // grosor de la línea
-          doc.line(x, y + 1, x + anchoTexto, y + 1); 
+          doc.line(x, y + 1, x + anchoTexto, y + 1);
         }
       }
     });
@@ -431,7 +432,7 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
     }
 
 
-    
+
     const lineStart = 20;
     const lineEnd = 80;
     const lineMid = (lineStart + lineEnd) / 2; // punto medio en X
@@ -447,29 +448,29 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
 
     if (s2) {
       const centerX = (lineStart + lineMid) / 2; // punto medio de la izquierda
-      addScaledImage(doc, s2, maxImgW+10, maxImgH+10, centerX+10, FirmaY);
+      addScaledImage(doc, s2, maxImgW + 10, maxImgH + 10, centerX + 10, FirmaY);
 
     }
 
     // ===== Agregar s3 (derecha del medio) =====
     if (s3) {
       const centerX = (lineMid + lineEnd) / 2; // punto medio de la derecha
-      addScaledImage(doc, s3, maxImgW, maxImgH, centerX+20, FirmaY);
+      addScaledImage(doc, s3, maxImgW, maxImgH, centerX + 20, FirmaY);
     }
     footer_TestFatiga(doc, datos)
 
 
 
 
-      const blob = doc.output("blob");
-      const url = URL.createObjectURL(blob);
-      const iframe = document.createElement("iframe");
-      iframe.style.display = "none";
-      iframe.src = url;
-      document.body.appendChild(iframe);
-      iframe.onload = () => iframe.contentWindow.print();
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.src = url;
+    document.body.appendChild(iframe);
+    iframe.onload = () => iframe.contentWindow.print();
 
-    })
+  })
 
-    
+
 }

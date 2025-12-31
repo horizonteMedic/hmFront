@@ -14,7 +14,7 @@ const toDDMMYYYY = (fecha) => {
   return `${dia}/${mes}/${anio}`;
 };
 
-export default function Hematologia_Digitalizado_nuevo(data = {}) {
+export default async function Hematologia_Digitalizado_nuevo(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -50,8 +50,8 @@ export default function Hematologia_Digitalizado_nuevo(data = {}) {
   };
 
   // Header reutilizable
-  const drawHeader = () => {
-    CabeceraLogo(doc, { ...datosReales, tieneMembrete: false });
+  const drawHeader = async () => {
+    await CabeceraLogo(doc, { ...datosReales, tieneMembrete: false });
 
     // Número de Ficha y Página
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -191,7 +191,7 @@ export default function Hematologia_Digitalizado_nuevo(data = {}) {
   const drawTextWithSuperscript = (text, x, y) => {
     const parts = text.split(/(\^[0-9]+)/);
     let currentX = x;
-    
+
     parts.forEach((part) => {
       if (part.startsWith('^')) {
         // Superíndice
@@ -209,7 +209,7 @@ export default function Hematologia_Digitalizado_nuevo(data = {}) {
   };
 
   // === DIBUJAR HEADER ===
-  drawHeader();
+  await drawHeader();
 
   // === TÍTULO ===
   doc.setFont("helvetica", "bold").setFontSize(14);
@@ -332,11 +332,11 @@ export default function Hematologia_Digitalizado_nuevo(data = {}) {
     const sigH = 23;
     const sigY = yPos + 20;
     const gap = 16;
-    
+
     if (s1 && s2) {
       const totalWidth = sigW * 2 + gap;
       const startX = (pageW - totalWidth) / 2;
-      
+
       const addSello = (img, xPos) => {
         const canvas = document.createElement('canvas');
         canvas.width = img.width;

@@ -1,6 +1,4 @@
 import { useEffect } from "react";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPrint, faSave, faBroom } from '@fortawesome/free-solid-svg-icons';
 import { getFetch } from "../../../../getFetch/getFetch";
 import {
   InputTextOneLine,
@@ -14,6 +12,7 @@ import { useForm } from "../../../../../../hooks/useForm";
 import { useSessionData } from '../../../../../../hooks/useSessionData';
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerHematologiaBioquimicaECO";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
+import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
 
 const tabla = "lab_clinico";
 
@@ -112,7 +111,7 @@ export default function HematologiaBioquimicaECO() {
     handleChange,
     handleClearnotO,
     handlePrintDefault,
-    handleChangeNumber,
+    handleChangeNumberDecimals,
     handleChangeSimple,
     handleClear,
     handleFocusNext,
@@ -136,14 +135,35 @@ export default function HematologiaBioquimicaECO() {
     });
   };
 
+  // const GetTable = (nro) => {
+  //   getFetch(
+  //     `/api/v01/ct/laboratorio/listadoGrupoFactorSanguineo?nOrden=${nro}`,
+  //     token
+  //   ).then((res) => {
+  //     setForm(prev => ({ ...prev, dataTabla: res || [] }));
+  //   });
+  // };
   const GetTable = (nro) => {
     getFetch(
       `/api/v01/ct/laboratorio/listadoGrupoFactorSanguineo?nOrden=${nro}`,
       token
-    ).then((res) => {
-      setForm(prev => ({ ...prev, dataTabla: res || [] }));
-    });
+    )
+      .then((res) => {
+        setForm(prev => ({
+          ...prev,
+          dataTabla: Array.isArray(res) ? res : []
+        }));
+      })
+      .catch((err) => {
+        // Si es 404, tabla vacía
+        if (err?.status === 404) {
+          setForm(prev => ({ ...prev, dataTabla: [] }));
+        } else {
+          console.error(err);
+        }
+      });
   };
+
 
   useEffect(() => {
     if (!form.nombres || !form.norden) return;
@@ -157,13 +177,13 @@ export default function HematologiaBioquimicaECO() {
   }, [form.grupoSanguineo, form.factorRh]);
 
   return (
-    <div className="p-4 space-y-3">
+    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 xl:grid-cols-3 gap-3 lg:gap-4">
         <InputTextOneLine
           label="N° Orden"
           name="norden"
           value={form.norden}
-          onChange={handleChangeNumber}
+          onChange={handleChangeNumberDecimals}
           onKeyUp={handleSearch}
           labelWidth="120px"
         />
@@ -347,7 +367,7 @@ export default function HematologiaBioquimicaECO() {
                 />
               ))}
             </div>
-            <div className="space-y-3">
+            <div className="space-y-3 mt-20">
               {[
                 ["Neutrofilos", "%"],
                 ["Abastonados", "%"],
@@ -364,7 +384,7 @@ export default function HematologiaBioquimicaECO() {
                   value={form[key.toLowerCase()]}
                   labelWidth="120px"
                   onChange={handleChange}
-                  onKeyUp={handleFocusNext}
+                  onKeyUp={(e) => { handleFocusNext(e, key == "Linfocitos" ? "glucosa" : "") }}
                 />
               ))}
             </div>
@@ -372,7 +392,7 @@ export default function HematologiaBioquimicaECO() {
         </SectionFieldset>
         <div className="space-y-3">
           {/* Reacciones Serológicas */}
-          <SectionFieldset legend="Reacciones Serológicas" className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <SectionFieldset legend="Reacciones Serológicas" className="grid grid-cols-1 xl:grid-cols-2 gap-6">
             {["rpr", "vih"].map(item => (
               <div className="space-y-3" key={item}>
                 <InputTextOneLine
@@ -405,6 +425,7 @@ export default function HematologiaBioquimicaECO() {
                 value={form.glucosa}
                 labelWidth="120px"
                 onChange={handleChange}
+                onKeyUp={(e) => { handleFocusNext(e, "creatinina") }}
               />
               <div className="flex gap-4 items-center">
                 <InputCheckbox
@@ -516,7 +537,7 @@ export default function HematologiaBioquimicaECO() {
                   No Aplica
                 </button>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid xl:grid-cols-2 gap-4">
                 <div className="flex items-center gap-4">
                   <label className="font-semibold min-w-[100px] max-w-[100px]">Color :</label>
                   <select name="color" value={form.color} className="border rounded p-1 w-full" onChange={handleChange}>
@@ -556,7 +577,7 @@ export default function HematologiaBioquimicaECO() {
               </div>
             </SectionFieldset>
 
-            <SectionFieldset legend="Sedimento Unitario" className="space-y-2 grid xl:grid-cols-2 gap-x-4">
+            <SectionFieldset legend="Sedimento Urinario" className="space-y-2 grid xl:grid-cols-2 gap-x-4">
               <div className="grid gap-y-2">
                 {[
                   { label: 'Leucocitos (x campos)', key: 'leucocitosSedimentoUnitario' },
@@ -633,7 +654,7 @@ export default function HematologiaBioquimicaECO() {
               </div>
             </SectionFieldset>
 
-            <SectionFieldset legend="Drogas" className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <SectionFieldset legend="Drogas" className="grid grid-cols-1 xl:grid-cols-2 gap-6">
               {[
                 { label: 'Cocaína', key: 'cocaina' },
                 { label: 'Marihuana', key: 'marihuana' }
@@ -678,39 +699,15 @@ export default function HematologiaBioquimicaECO() {
             onChange={handleChangeSimple}
           />
         </SectionFieldset>
-
-
       </SectionFieldset>
-      <div className="flex items-center justify-between gap-4 pt-4">
-        <div className="flex gap-2">
-          <button
-            className="bg-emerald-600 text-white px-4 py-2 rounded flex items-center gap-2"
-            onClick={handleSave}
-          >
-            <FontAwesomeIcon icon={faSave} /> Grabar
-          </button>
-          <button
-            className="bg-yellow-400 text-white px-4 py-2 rounded flex items-center gap-2"
-            onClick={handleClear}
-          >
-            <FontAwesomeIcon icon={faBroom} /> Limpiar
-          </button>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="font-semibold text-blue-900 italic">Imprimir</span>
-          <InputTextOneLine
-            name="norden"
-            value={form.norden}
-            onChange={handleChangeNumber}
-          />
-          <button
-            className="bg-blue-600 text-white px-4 py-2 rounded flex items-center gap-2"
-            onClick={handlePrint}
-          >
-            <FontAwesomeIcon icon={faPrint} />
-          </button>
-        </div>
-      </div>
+
+      <BotonesAccion //space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto
+        form={form}
+        handleSave={handleSave}
+        handleClear={handleClear}
+        handlePrint={handlePrint}
+        handleChangeNumberDecimals={handleChangeNumberDecimals}
+      />
     </div>
   );
 };

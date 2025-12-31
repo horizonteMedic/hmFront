@@ -12,7 +12,7 @@ import headerFicha from "./headers/header_CuestionarioAudiometria_Digitalizado.j
  *   ];
  *   datos.nroficha? – para el pie de página
  */
-export default function CuestionarioAudiometria_Digitalizado(datos) {
+export default async function CuestionarioAudiometria_Digitalizado(datos) {
   const doc = new jsPDF();
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
@@ -76,7 +76,7 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
     preguntas.forEach(p => {
       const lines = doc.splitTextToSize(p.texto, colPreguntaW - 4);
       const contentH = lines.length * lineHTable;
-      const extraSpace = [1,9,10,11,12,13,14,15].includes(p.numero) ? lineHTable : 0;
+      const extraSpace = [1, 9, 10, 11, 12, 13, 14, 15].includes(p.numero) ? lineHTable : 0;
       const rowH = contentH + paddingTop + paddingBottom + extraSpace;
       totalTableH += rowH;
     });
@@ -119,17 +119,17 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
       const lines = doc.splitTextToSize(p.texto, colPreguntaW - 4);
       const contentH = lines.length * lineHTable;
       // Si la pregunta es 1, 9, 10, 11, 12, 13, 14 o 15, agrego espacio extra
-      const extraSpace = [1,9,10,11,12,13,14,15].includes(p.numero) ? lineHTable : 0;
+      const extraSpace = [1, 9, 10, 11, 12, 13, 14, 15].includes(p.numero) ? lineHTable : 0;
       const rowH = contentH + paddingTop + paddingBottom + extraSpace;
 
       // texto con padding superior
       lines.forEach((ln, i) => {
         doc.text(ln, tableX + 2, tableY + paddingTop + lineHTable - 1.2 + i * lineHTable);
       });
-      let nuevoYParaTexto=tableY + paddingTop + lineHTable - 1.2;
+      let nuevoYParaTexto = tableY + paddingTop + lineHTable - 1.2;
       // Cambiar a fuente tamaño 8 para los campos adicionales
       doc.setFontSize(8);
-      switch(p.numero){
+      switch (p.numero) {
         case 1: {
           nuevoYParaTexto += 25; // Ajuste para la pregunta 1
           if (datos?.txtrcual1 || datos?.txtrcuando1 || datos?.txtrque1) {
@@ -198,7 +198,7 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
       doc.setFontSize(9);
 
 
-      
+
 
       // casillas
       const siX = tableX + colPreguntaW + (colSiW - boxSize) / 2;
@@ -218,8 +218,8 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     const lbl16 = "16.- ¿Ha realizado actividades de?";
     doc.text(lbl16, tableX + 2, tableY + lineHTable - 1.2);
-    doc.text("¿Cuánto tiempo?", tableX + colPreguntaW / 2-12, tableY + lineHTable - 1.2, { align: "center" });
-    doc.text("¿Cuánto tiempo?", tableX + colPreguntaW + colSiW + colNoW - 2-20, tableY + lineHTable - 1.2, { align: "right" });
+    doc.text("¿Cuánto tiempo?", tableX + colPreguntaW / 2 - 12, tableY + lineHTable - 1.2, { align: "center" });
+    doc.text("¿Cuánto tiempo?", tableX + colPreguntaW + colSiW + colNoW - 2 - 20, tableY + lineHTable - 1.2, { align: "right" });
     tableY += lineHTable;
     // Quitar la línea horizontal debajo del encabezado de la 16
     // doc.line(tableX, tableY, tableX + colPreguntaW + colSiW + colNoW, tableY);
@@ -257,13 +257,13 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
       } else {
         doc.text(left16[i].label, tableX + 2 + boxSize + 4, rowY + 2 + 3.5);
       }
-      doc.text(datos[left16[i].tiempo] || "", tableX + colPreguntaW / 2-40, rowY + 2 + 3.5, { align: "left" });
+      doc.text(datos[left16[i].tiempo] || "", tableX + colPreguntaW / 2 - 40, rowY + 2 + 3.5, { align: "left" });
       // derecha alineada verticalmente con la izquierda
       const rightY = (i === 2) ? rowY + 2 + lineHTable / 2 : rowY + 2;
       doc.rect(tableX + colPreguntaW / 2 + colSiW + 10, rightY, boxSize, boxSize);
       doc.text(datos[right16[i].key] ? "X" : "", tableX + colPreguntaW / 2 + colSiW + 11.5, rightY + 3.5);
       doc.text(right16[i].label, tableX + colPreguntaW / 2 + colSiW + 10 + boxSize + 4, rightY + 3.5, { maxWidth: colPreguntaW / 2 - boxSize - 10 });
-      doc.text(datos[right16[i].tiempo] || "", tableX + colPreguntaW + colSiW + colNoW / 2-40, rightY + 3.5, { align: "left" });
+      doc.text(datos[right16[i].tiempo] || "", tableX + colPreguntaW + colSiW + colNoW / 2 - 40, rightY + 3.5, { align: "left" });
       rowY += rowH16sContent[i];
     }
     tableY = rowY;
@@ -278,17 +278,17 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
 
     const colW = blockW / 3;
     // Línea horizontal debajo de la declaración SOLO hasta la división de la última columna
-    doc.line(blockX, blockY + blockH1-5, blockX + 2 * colW, blockY + blockH1-5);
+    doc.line(blockX, blockY + blockH1 - 5, blockX + 2 * colW, blockY + blockH1 - 5);
     // Línea horizontal bajo firmas (toda la tabla)
     doc.line(blockX, blockY + blockH1 + blockH2, blockX + blockW, blockY + blockH1 + blockH2);
     // Línea vertical de la última columna (desde el borde superior del recuadro exterior)
-    doc.line(blockX + 2 * colW, blockY-2, blockX + 2 * colW, blockY + blockH1 + blockH2 + blockH3); 
+    doc.line(blockX + 2 * colW, blockY - 2, blockX + 2 * colW, blockY + blockH1 + blockH2 + blockH3);
     //linea vertical parte firmas
-    doc.line(blockX + 2 * colW-60, blockY+5, blockX + 2 * colW-60, blockY + blockH1 + blockH2 + blockH3);  
+    doc.line(blockX + 2 * colW - 60, blockY + 5, blockX + 2 * colW - 60, blockY + blockH1 + blockH2 + blockH3);
 
     // Declaración: columna 1, alineado a la izquierda
     doc.setFontSize(8).setFont('helvetica', 'normal');
-    doc.text('Declaro que las respuestas son ciertas según mi leal saber y entender', blockX + 5, blockY + blockH1 / 2 -2.7);
+    doc.text('Declaro que las respuestas son ciertas según mi leal saber y entender', blockX + 5, blockY + blockH1 / 2 - 2.7);
 
     // Fila 2: Firma trabajador (columna 1), columna 2 vacía
     doc.text('Firma del trabajador o postulante', blockX + 14, blockY + blockH1 + blockH2 / 2 + 4);
@@ -296,7 +296,7 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
     // Fila 3: tres columnas, alineaciones distintas
     const dni = datos.dni || '70101010';
     doc.setFont('helvetica', 'bold');
-    doc.text(`DNI ${dni}`, blockX + 25, blockY + blockH1 + blockH2 + blockH3 / 2 +1, { align: 'left' });
+    doc.text(`DNI ${dni}`, blockX + 25, blockY + blockH1 + blockH2 + blockH3 / 2 + 1, { align: 'left' });
     doc.setFont('helvetica', 'normal');
     doc.text('Índice Derecho', blockX + colW + colW / 2, blockY + blockH1 + blockH2 + blockH3 / 2 + 1, { align: 'center' });
     doc.text('Firma Responsable', blockX + 2 * colW + colW / 2, blockY + blockH1 + blockH2 + blockH3 / 2 + 1, { align: 'center' });
@@ -331,7 +331,7 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
     if (s3) placeImage(s3, 98, 158);
 
     // 6) Footer e impresión
-   
+
     const blob = doc.output("blob");
     const url = URL.createObjectURL(blob);
     const iframe = document.createElement("iframe");

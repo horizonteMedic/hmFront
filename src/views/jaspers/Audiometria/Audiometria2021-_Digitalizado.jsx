@@ -511,11 +511,11 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
     { tipo: "x", color: "blue" },
   ];
   const prevLineWidth = doc.getLineWidth();
-  
+
   // Función para dibujar líneas con separación solo cuando hay puntos superpuestos
   const dibujarLineasConSeparacion = (pts, tipo, color) => {
     if (pts.length < 2) return;
-    
+
     // Línea roja más gruesa (0.95 puntos)
     if (color === "red") {
       doc.setLineWidth(0.95);
@@ -528,24 +528,24 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
       doc.setDrawColor(0, 0, 0);
     }
     doc.setLineCap(1);
-    
+
     let prev = null;
     for (let i = 0; i < pts.length; i++) {
       const freqIdx = freqs.indexOf(pts[i].freq);
       if (freqIdx === -1) continue;
-      
+
       let x = graphX + freqIdx * (graphW / (freqs.length - 1));
       let y = graphY + ((pts[i].db + 10) / 130) * graphH;
-      
+
       // Verificar si hay otro punto en la misma frecuencia y dB (superpuesto)
-      const haySuperposicion = puntos.some(p => 
-        p.freq === pts[i].freq && 
-        p.db === pts[i].db && 
-        p.tipo !== pts[i].tipo && 
-        p.db !== null && 
+      const haySuperposicion = puntos.some(p =>
+        p.freq === pts[i].freq &&
+        p.db === pts[i].db &&
+        p.tipo !== pts[i].tipo &&
+        p.db !== null &&
         p.db !== undefined
       );
-      
+
       // Solo aplicar separación si hay superposición
       if (haySuperposicion) {
         if (tipo === "x") {
@@ -554,14 +554,14 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
           x -= 1; // 1mm a la izquierda para líneas rojas (círculo)
         }
       }
-      
+
       if (prev) {
         doc.line(prev.x, prev.y, x, y);
       }
       prev = { x, y };
     }
   };
-  
+
   tipos.forEach(({ tipo, color }) => {
     // Filtrar puntos de este tipo y color, y ordenarlos por frecuencia
     const pts = puntos
@@ -573,7 +573,7 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
           p.db !== undefined
       )
       .sort((a, b) => a.freq - b.freq);
-    
+
     dibujarLineasConSeparacion(pts, tipo, color);
   });
   // Dibujar los puntos (círculo, X, [, ])
@@ -766,7 +766,7 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   );
 };
 
-export default function Audiometria2021_Digitalizado(data = {}) {
+export default async function Audiometria2021_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   body_Audiometria2021_Digitalizado(doc, data);
 

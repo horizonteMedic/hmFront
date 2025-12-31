@@ -37,32 +37,32 @@ const toDDMMYYYY = (fecha) => {
 };
 
 // Header con datos de ficha, sede y fecha
-const drawHeader = (doc, datos = {}) => {
+const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
-  
-  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-  
+
+  await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
+
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Nro de ficha: ", pageW - 80, 15);
   doc.setFont("helvetica", "normal").setFontSize(18);
   doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
-  
+
   // Sede
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
-  
+
   // Fecha de examen
   const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaExamen || "");
   doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
-  
+
   // Página
   doc.text("Pag. 01", pageW - 30, 10);
 
   // Bloque de color
-   drawColorBox(doc, {
+  drawColorBox(doc, {
     color: datos.codigoColor,
-    text: datos.textoColor ,
+    text: datos.textoColor,
     x: pageW - 30,
     y: 10,
     size: 22,
@@ -179,16 +179,16 @@ const drawPatientData = (doc, datos = {}) => {
 
 // --- Componente Principal ---
 
-export default function RiesgoCoronario(datos = {}) {
+export default async function RiesgoCoronario(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
-  drawHeader(doc, datos);
-  
+  await drawHeader(doc, datos);
+
   // === TÍTULO ===
   drawUnderlinedTitle(doc, "BIOQUIMICA", 38);
-  
+
   // === DATOS DEL PACIENTE ===
   drawPatientData(doc, datos);
 
@@ -203,7 +203,7 @@ export default function RiesgoCoronario(datos = {}) {
       img.onload = () => res(img);
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
-  
+
   Promise.all([
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
@@ -252,7 +252,7 @@ export default function RiesgoCoronario(datos = {}) {
     const resultadoX = colResultado + 10;
     const resultado = String(datos.txtRiesgoCoronario || "");
     doc.text(resultado, resultadoX, y + 2);
-    
+
     if (resultado) {
       const resultadoWidth = doc.getTextWidth(resultado);
       doc.setDrawColor(0, 0, 0);
@@ -275,27 +275,27 @@ export default function RiesgoCoronario(datos = {}) {
     const sigH = 23;
     const sigY = 210;
     const gap = 16;
-    
+
     if (s1 && s2) {
       const totalWidth = sigW * 2 + gap;
       const startX = (pageW - totalWidth) / 2;
-      
+
       const canvas1 = document.createElement('canvas');
       canvas1.width = s1.width;
       canvas1.height = s1.height;
       const ctx1 = canvas1.getContext('2d');
       ctx1.drawImage(s1, 0, 0);
       const selloBase64_1 = canvas1.toDataURL('image/png');
-      
+
       doc.addImage(selloBase64_1, 'PNG', startX, sigY, sigW, sigH);
-      
+
       const canvas2 = document.createElement('canvas');
       canvas2.width = s2.width;
       canvas2.height = s2.height;
       const ctx2 = canvas2.getContext('2d');
       ctx2.drawImage(s2, 0, 0);
       const selloBase64_2 = canvas2.toDataURL('image/png');
-      
+
       doc.addImage(selloBase64_2, 'PNG', startX + sigW + gap, sigY, sigW, sigH);
     } else if (s1) {
       const canvas = document.createElement('canvas');
@@ -304,7 +304,7 @@ export default function RiesgoCoronario(datos = {}) {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-      
+
       doc.addImage(selloBase64, 'PNG', (pageW - sigW) / 2, sigY, sigW, sigH);
     } else if (s2) {
       const canvas = document.createElement('canvas');
@@ -313,7 +313,7 @@ export default function RiesgoCoronario(datos = {}) {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s2, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-      
+
       doc.addImage(selloBase64, 'PNG', (pageW - sigW) / 2, sigY, sigW, sigH);
     }
 

@@ -34,16 +34,26 @@ export const GetInfoServicio = async (
   if (res) {
     set((prev) => ({
       ...prev,
-      ...res,
       norden: res.norden,
       codigoElectroCardiograma: res.codigoElectroCardiograma,
-      nombre: res.nombres,
-      edad: res.edad + " años",
-      fechaNac: formatearFechaCorta(res.fechaNac), //necesito
 
       fechaExam: res.fechaInforme,
-      contrata: res.contrata,
-      empresa: res.empresa,
+
+      nombreExamen: res.tipoExamen ?? "",
+      dni: res.dni ?? "",
+
+      nombres: res.nombres ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+      lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+      edad: res.edad ?? "",
+      sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+      estadoCivil: res.estadoCivilPaciente ?? "",
+      nivelEstudios: res.nivelEstudioPaciente ?? "",
+      // Datos Laborales
+      empresa: res.empresa ?? "",
+      contrata: res.contrata ?? "",
+      ocupacion: res.ocupacionPaciente ?? "",
+      cargoDesempenar: res.cargoPaciente ?? "",
 
       ritmo: res.mensajeRitmo ?? "",
       fc: res.mensajeFC ?? "",
@@ -55,7 +65,7 @@ export const GetInfoServicio = async (
       ondaT: res.mensajeOndaT ?? "",
       qtc: res.mensajeQtC ?? "",
 
-      informeCompleto: res.informeCompleto ?? "", //necesito
+      informeCompleto: res.informeCompleto ?? "",
       conclusiones: res.conclusion ?? "",
       hallazgos: res.hallazgo ?? "",
       recomendaciones: res.recomendaciones ?? "",
@@ -94,7 +104,7 @@ export const SubmitDataService = async (
     hallazgo: form.hallazgos,
     conclusion: form.conclusiones,
     recomendaciones: form.recomendaciones,
-    edadPaciente: form.edad?.replace(" años", ""),
+    edadPaciente: form.edad,
 
     usuarioFirma: form.user_medicoFirma,
     userRegistro: user,
@@ -154,8 +164,8 @@ const GetInfoPac = async (nro, set, token, sede) => {
     set((prev) => ({
       ...prev,
       ...res,
-      fechaNac: formatearFechaCorta(res.fechaNac ?? ""),
-      edad: res.edad + " años",
+      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+      edad: res.edad,
       nombres: res.nombresApellidos,
     }));
   }
