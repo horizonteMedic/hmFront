@@ -4,13 +4,16 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  plugins: [],
   theme: {
     extend: {
       fontFamily: {
         sans: ['Poppins', 'sans-serif'],
       },
+      colors: {
+        primario: "#233245",
+        primarioClaro: "#e9ebec",
+      },
     },
   },
+  plugins: [],
 }
-

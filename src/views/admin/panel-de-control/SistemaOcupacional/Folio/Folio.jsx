@@ -88,6 +88,13 @@ const ExamenesList = [
         url: "/api/v01/ct/rayosX/obtenerReporteRadiografiaTorax"
     },
     {
+        nombre: "ELECTROCARDIOGRAMA",
+        resultado: false,
+        tabla: "informe_electrocardiograma",
+        url: "/api/v01/ct/electroCardiograma/obtenerReporteInformeElectroCardiograma",
+        esJasper: true
+    },
+    {
         nombre: "FICHA AUDIOLOGICA",
         resultado: false,
         tabla: "audiometria_po",

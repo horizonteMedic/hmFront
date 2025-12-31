@@ -5,7 +5,13 @@ export default function RadioTable({
   handleRadioButton,
   labelColumns = 2,
 }) {
-
+  const styleButton = ` w-5 h-5
+                        rounded-md
+                        accent-primario
+                        border border-primario
+                        cursor-pointer
+                        disabled:cursor-not-allowed
+                        disabled:opacity-50 `
   // Calcular el número de columnas dinámicamente (labelColumns para texto + número de opciones)
   const totalColumns = labelColumns + options.length;
   const gridColsClass = `grid-cols-${totalColumns}`;
@@ -44,6 +50,7 @@ export default function RadioTable({
                 value={option.value}
                 checked={form?.[item.name] === option.value}
                 onChange={(e) => handleRadioButton(e, option.value)}
+                className={styleButton}
               />
             </div>
           ))}

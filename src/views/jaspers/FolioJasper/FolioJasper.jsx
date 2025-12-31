@@ -46,9 +46,18 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
                 }
             }
 
-            const generarReporte = reportesMap[examen.tabla];
-            if (generarReporte) {
-                await generarReporte(data, pdfFinal);
+            //const generarReporte = reportesMap[examen.tabla];
+            const generador = reportesMap[examen.tabla];
+            const generadorFinal = typeof generador === "function" && generador.length === 1
+                ? generador(data)
+                : generador;
+
+            if (!generador) {
+                console.warn("No existe generador para:", examen.tabla);
+                continue;
+            }
+            if (generadorFinal) {
+                await generadorFinal(data, pdfFinal);
             } else {
                 console.warn("No existe generador para:", examen.tabla);
             }

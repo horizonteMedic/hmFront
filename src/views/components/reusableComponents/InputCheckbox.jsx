@@ -7,6 +7,13 @@ export default function InputCheckbox({
   disabled = false,
   className = "",
 }) {
+  const styleButton = ` w-5 h-5
+                        rounded-md
+                        accent-primario
+                        border border-primario
+                        cursor-pointer
+                        disabled:cursor-not-allowed
+                        disabled:opacity-50 `
   return (
     <label className={`flex items-center gap-2 ${className}`}>
       {!labelRight && <span>{label} :</span>}
@@ -20,6 +27,7 @@ export default function InputCheckbox({
             onChange(e);
           }
         }}
+        className={styleButton}
       />
       {labelRight && <span>{label}</span>}
     </label>

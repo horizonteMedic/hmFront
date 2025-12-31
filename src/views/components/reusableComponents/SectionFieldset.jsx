@@ -41,12 +41,12 @@ export default function SectionFieldset({
 
     const contentSpacing = legend ? (open ? "mb-4" : "mb-0") : (open ? "my-4" : "my-0");
     return (
-        <fieldset className={`bg-[#e9ebec] border  rounded ${fieldsetClassName}`}>
+        <fieldset className={`bg-primarioClaro border  rounded ${fieldsetClassName}`}>
             {legend ? (
                 <legend
                     aria-expanded={open}
                     onClick={collapsible ? () => setIsOpen(!open) : undefined}
-                    className={`font-semibold ${open ? "mb-4" : ""} text-[10px] bg-[#233245] py-2 px-4 text-white rounded-t flex items-center justify-between ${collapsible ? "cursor-pointer select-none" : ""}`}
+                    className={`font-semibold ${open ? "mb-4" : ""} text-[10px] bg-primario py-2 px-4 text-white rounded-t flex items-center justify-between ${collapsible ? "cursor-pointer select-none" : ""}`}
                 >
                     <span>{legend}</span>
                     {collapsible ? (

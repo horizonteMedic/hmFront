@@ -17,6 +17,14 @@ export default function InputsBooleanRadioGroup({
   const trueId = `${name}-true`;
   const falseId = `${name}-false`;
 
+  const styleButton = ` w-5 h-5
+                        rounded-md
+                        accent-primario
+                        border border-primario
+                        cursor-pointer
+                        disabled:cursor-not-allowed
+                        disabled:opacity-50 `
+
   return (
     <div className={`${labelOnTop ? "flex flex-col gap-2" : "flex items-center gap-4"} ${className}`}>
       {label && (
@@ -38,6 +46,7 @@ export default function InputsBooleanRadioGroup({
             value="true"
             checked={value === true}
             onChange={(e) => (disabled ? null : onChange(e, true))}
+            className={styleButton}
           // disabled={disabled}
           />
           <span>{trueLabel}</span>
@@ -51,7 +60,8 @@ export default function InputsBooleanRadioGroup({
             value="false"
             checked={value === false}
             onChange={(e) => (disabled ? null : onChange(e, false))}
-          // disabled={disabled}
+            // disabled={disabled}
+            className={styleButton}
           />
           <span>{falseLabel}</span>
         </label>
