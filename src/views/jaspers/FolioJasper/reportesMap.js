@@ -15,7 +15,13 @@ import InformePsicologico_Digitalizado from "../ModuloPsicologia/InformePsicolog
 import Oftalmologia from "../Oftalmologia/Oftalmologia";
 import conInformadoOcupacional_Digitalizado from "../ConsentimientoInformado/conInformadoOcupacional_Digitalizado";
 import InformeElectrocardiograma2023 from "../EKG/InformeElectrocardiograma2023";
+import InformeElectrocardiograma_Digitalizado from "../EKG/InformeElectrocardiograma_Digitalizado";
 // Agrega aquí todos tus reportes
+export const ekgMap = {
+    InformeElectrocardiograma2023,
+    InformeElectrocardiograma_Digitalizado
+};
+
 
 export const reportesMap = {
     certificado_aptitud_medico_ocupacional: Aptitud_Agroindustrial,
@@ -30,7 +36,19 @@ export const reportesMap = {
     lab_clinico: LaboratorioClinico_Digitalizado_nuevo,
     analisis_bioquimicos: AnalisisBioquimicos_Digitalizado,
     radiografia_torax: RagiografiaToraxPA_Digitalizado,
-    informe_electrocardiograma: InformeElectrocardiograma2023,
+    informe_electrocardiograma: (data) => {
+        switch (data?.nameJasper) {
+            case "InformeElectrocardiograma2023":
+                return InformeElectrocardiograma2023;
+
+            case "InformeElectrocardiograma_Digitalizado":
+                return InformeElectrocardiograma_Digitalizado;
+
+            default:
+                console.warn("⚠️ nameJasper no reconocido:", data?.nameJasper);
+                return null;
+        }
+    },
     audiometria_po: FichaAudiologica_Digitalizado,
     informe_psicologico: InformePsicologico_Digitalizado,
     oftalmologia: Oftalmologia,

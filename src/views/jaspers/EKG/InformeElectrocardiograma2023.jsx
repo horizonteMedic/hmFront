@@ -8,7 +8,7 @@ import footerTR from "../components/footerTR.jsx";
 export default async function InformeElectrocardiograma2023(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
-
+  console.log("jaseper 2023");
   // Datos reales mapeados
   const datosFinales = {
     ritmo: String(data.mensajeRitmo ?? ""),
