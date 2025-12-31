@@ -14,6 +14,7 @@ import FichaAudiologica_Digitalizado from "../Audiometria/FichaAudiologica_Digit
 import InformePsicologico_Digitalizado from "../ModuloPsicologia/InformePsicologico/InformePsicologico_Digitalizado";
 import Oftalmologia from "../Oftalmologia/Oftalmologia";
 import conInformadoOcupacional_Digitalizado from "../ConsentimientoInformado/conInformadoOcupacional_Digitalizado";
+import InformeElectrocardiograma2023 from "../EKG/InformeElectrocardiograma2023";
 // Agrega aquí todos tus reportes
 
 export const reportesMap = {
@@ -29,6 +30,7 @@ export const reportesMap = {
     lab_clinico: LaboratorioClinico_Digitalizado_nuevo,
     analisis_bioquimicos: AnalisisBioquimicos_Digitalizado,
     radiografia_torax: RagiografiaToraxPA_Digitalizado,
+    informe_electrocardiograma: InformeElectrocardiograma2023,
     audiometria_po: FichaAudiologica_Digitalizado,
     informe_psicologico: InformePsicologico_Digitalizado,
     oftalmologia: Oftalmologia,
