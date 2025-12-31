@@ -404,6 +404,7 @@ export default async function InformeElectrocardiograma2023(data = {}, docExiste
   }
 }
 
+
 // -------------------------------
 // Helpers
 function procesarRecomendaciones(texto) {
