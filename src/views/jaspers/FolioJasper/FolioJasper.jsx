@@ -46,6 +46,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
                 }
             }
 
+
             //const generarReporte = reportesMap[examen.tabla];
             const generador = reportesMap[examen.tabla];
             const generadorFinal = typeof generador === "function" && generador.length === 1
