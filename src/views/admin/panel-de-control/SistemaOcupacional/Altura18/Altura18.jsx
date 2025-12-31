@@ -10,7 +10,7 @@ import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import { useForm } from "../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAltura18";
-import { BotonesAccion, DatosPersonalesLaborales} from "../../../../components/templates/Templates";
+import { BotonesAccion, DatosPersonalesLaborales } from "../../../../components/templates/Templates";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "certificacion_medica_altura";
@@ -387,102 +387,102 @@ export default function Altura18() {
                         />
                     </SectionFieldset>
                 </div>
-                <div className="flex  flex-col gap-y-3">
-                    <SectionFieldset legend="Oftalmología" collapsible>
-                        <h4 className="font-semibold text-gray-800 mb-3 text-center">Sin Corregir</h4>
+                <div className="flex flex-col gap-y-3">
+                    <SectionFieldset legend="Oftalmología" collapsible className="grid gap-y-6">
+                        <h4 className="font-extrabold text-gray-800 mb-2 text-center">Sin Corregir</h4>
                         {/* Sin Corregir */}
-                        <div className="mb-4">
+                        <div>
                             <div className="grid md:grid-cols-2 gap-3">
-                                <div className="">
-                                    <div className="font-semibold mb-2 text-center">O.D</div>
+                                <div>
+                                    <div className="font-semibold mb-2 text-center ml-[80px]">Ojo Derecho</div>
                                     <div className="space-y-3">
-                                        <InputTextOneLine label="V.C." name="vcOD" value={form?.vcOD} disabled labelWidth="35px" />
-                                        <InputTextOneLine label="V.L." name="vlOD" value={form?.vlOD} disabled labelWidth="35px" />
+                                        <InputTextOneLine label="Visión Cerca" name="vcOD" value={form?.vcOD} disabled labelWidth="70px" />
+                                        <InputTextOneLine label="Visión Lejos" name="vlOD" value={form?.vlOD} disabled labelWidth="70px" />
                                     </div>
                                 </div>
-                                <div className="">
-                                    <div className="font-semibold mb-2 text-center">O.I</div>
+                                <div>
+                                    <div className="font-semibold mb-2 text-center ml-[80px]">Ojo Izquierdo</div>
                                     <div className="space-y-3">
-                                        <InputTextOneLine label="V.C." name="vcOI" value={form?.vcOI} disabled labelWidth="35px" />
-                                        <InputTextOneLine label="V.L." name="vlOI" value={form?.vlOI} disabled labelWidth="35px" />
+                                        <InputTextOneLine label="Visión Cerca" name="vcOI" value={form?.vcOI} disabled labelWidth="70px" />
+                                        <InputTextOneLine label="Visión Lejos" name="vlOI" value={form?.vlOI} disabled labelWidth="70px" />
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         {/* Corregida */}
-                        <div className="mb-4">
-                            <h5 className="font-semibold text-gray-700 mb-2 text-center">Corregida</h5>
+                        <div>
+                            <h5 className="font-extrabold text-gray-700 mb-2 text-center">Corregida</h5>
                             {/* Fila OD y OI */}
                             <div className="grid md:grid-cols-2 gap-6">
                                 <div className="space-y-3">
-                                    <div className="font-semibold mb-2 text-center">O.D</div>
+                                    <div className="font-semibold mb-2 text-center ml-[80px]">Ojo Derecho</div>
                                     <InputTextOneLine
-                                        label="V.C."
+                                        label="Visión Cerca"
                                         name="vcCorregidaOD"
                                         value={form?.vcCorregidaOD}
                                         disabled
-                                        labelWidth="35px"
+                                        labelWidth="70px"
                                     />
                                     <InputTextOneLine
-                                        label="V.L."
+                                        label="Visión Lejos"
                                         name="vlCorregidaOD"
                                         value={form?.vlCorregidaOD}
                                         disabled
-                                        labelWidth="35px"
+                                        labelWidth="70px"
                                     />
                                 </div>
                                 <div className="space-y-3">
-                                    <div className="font-semibold mb-2 text-center">O.I</div>
+                                    <div className="font-semibold mb-2 text-center ml-[80px]">Ojo Izquierdo</div>
                                     <InputTextOneLine
-                                        label="V.C."
+                                        label="Visión Cerca"
                                         name="vcCorregidaOI"
                                         value={form?.vcCorregidaOI}
                                         disabled
-                                        labelWidth="35px"
+                                        labelWidth="70px"
                                     />
                                     <InputTextOneLine
-                                        label="V.L."
+                                        label="Visión Lejos"
                                         name="vlCorregidaOI"
                                         value={form?.vlCorregidaOI}
                                         disabled
-                                        labelWidth="35px"
+                                        labelWidth="70px"
                                     />
                                 </div>
                             </div>
-                            {/* Fila extra (ancho completo) */}
-                            <div className="mt-4 space-y-3">
-                                <InputTextOneLine
-                                    label="V.Clrs"
-                                    name="vclrs"
-                                    value={form?.vclrs}
-                                    disabled
-                                    labelWidth="35px"
-                                />
-                                <InputTextOneLine
-                                    name="vb"
-                                    label="V.B."
-                                    value={form?.vb}
-                                    disabled
-                                    labelWidth="35px"
-                                />
-                                <InputTextOneLine
-                                    label="R.P."
-                                    name="rp"
-                                    value={form?.rp}
-                                    disabled
-                                    labelWidth="35px"
-                                />
-                                <InputTextArea
-                                    label="Enfermedades Oculares"
-                                    rows={7}
-                                    name="enfermedadesOculares"
-                                    value={form?.enfermedadesOculares}
-                                    onChange={handleChange}
-                                    disabled
-                                />
-                            </div>
                         </div>
+                        {/* Fila extra (ancho completo) */}
+                        <div className="space-y-3 ">
+                            <InputTextOneLine
+                                label="Visión Colores"
+                                name="vclrs"
+                                value={form?.vclrs}
+                                disabled
+                                labelWidth="100px"
+                            />
+                            <InputTextOneLine
+                                label="Visión Binocular"
+                                name="vb"
+                                value={form?.vb}
+                                disabled
+                                labelWidth="100px"
+                            />
+                            <InputTextOneLine
+                                label="Reflejos Pupilares"
+                                name="rp"
+                                value={form?.rp}
+                                disabled
+                                labelWidth="100px"
+                            />
+                        </div>
+                        <InputTextArea
+                            label="Enfermedades Oculares"
+                            rows={7}
+                            name="enfermedadesOculares"
+                            value={form?.enfermedadesOculares}
+                            onChange={handleChange}
+                            disabled
+                        />
                     </SectionFieldset>
                     <SectionFieldset legend="Altura" className="space-y-3" collapsible>
                         <InputTextOneLine
