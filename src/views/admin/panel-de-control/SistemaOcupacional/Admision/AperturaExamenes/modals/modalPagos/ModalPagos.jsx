@@ -8,33 +8,46 @@ const ModalPagos = ({ close, datos, set, ListFormaPago }) => {
 
     const [currentTime, setCurrentTime] = useState(new Date())
 
+    // Store the initial price (precioPo) when modal opens to use as base if no protocol
+    const [initialBasePrice] = useState(() => {
+        if (!datos.idProtocolo) return parseFloat(datos.precioPo) || 0;
+        return 0;
+    });
+
     const handleChange = (e) => {
         const { name, value } = e.target;
-
         set((f) => {
             const upper = value.toUpperCase();
             return { ...f, [name]: upper };
         });
     };
 
-    const handleChangeNumberDecimals = (e, maxDecimals = 0) => {
+    const handleCurrencyChange = (e) => {
         const { name, value } = e.target;
-        const md = Number.isInteger(maxDecimals) && maxDecimals >= 0 ? maxDecimals : 1;
-        // Solo permite punto como separador decimal
-        const decimalPart = md === 0 ? '' : `(?:\\.\\d{0,${md}})?`;
-        // Regex que acepta solo números + punto opcional
-        const regex = new RegExp(`^\\d*${decimalPart}$`);
-        if (regex.test(value)) {
-            set((f) => ({ ...f, [name]: value }));
+        // Remove "S/." and any non-numeric/dot characters to get raw number
+        // We only allow one dot. 
+        // Logic: Keep only numbers and dots, then ensure max one dot.
+        let cleanVal = value.replace(/S\/\./g, '').replace(/[^0-9.]/g, '');
+
+        // Prevent multiple dots
+        const parts = cleanVal.split('.');
+        if (parts.length > 2) {
+            cleanVal = parts[0] + '.' + parts.slice(1).join('');
+        }
+
+        const finalized = `S/.${cleanVal}`;
+        set((f) => ({ ...f, [name]: cleanVal }));
+    };
+
+    const handleBlurCurrency = (e) => {
+        const { name, value } = e.target;
+        let clean = value.replace(/S\/\./g, '').replace(/[^0-9.]/g, '');
+        let num = parseFloat(clean);
+        if (!isNaN(num)) {
+            set((f) => ({ ...f, [name]: num.toFixed(2) }));
         }
     };
 
-    const handleChangeNumber = (e) => {
-        const { name, value } = e.target;
-        if (/^[\d/]*$/.test(value)) {
-            set((f) => ({ ...f, [name]: value }));
-        }
-    };
     // Timer for current time display
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000)
@@ -45,10 +58,21 @@ const ModalPagos = ({ close, datos, set, ListFormaPago }) => {
     useEffect(() => {
         const protocolo = parseFloat(datos.montoProtocolo) || 0
         const adicionales = parseFloat(datos.montoAdicionales) || 0
-        const total = protocolo + adicionales
 
-        set(prev => ({ ...prev, montoTotal: total }))
-    }, [datos.montoProtocolo, datos.montoAdicionales])
+        let total = 0;
+
+        if (datos.idProtocolo) {
+            total = protocolo + adicionales;
+        } else {
+            total = initialBasePrice + adicionales;
+        }
+
+        const formattedTotal = total.toFixed(2);
+
+        if (parseFloat(datos.precioPo || 0).toFixed(2) !== formattedTotal) {
+            set(prev => ({ ...prev, precioPo: formattedTotal }))
+        }
+    }, [datos.montoProtocolo, datos.montoAdicionales, datos.idProtocolo, initialBasePrice])
 
     return (
         <>
@@ -95,9 +119,9 @@ const ModalPagos = ({ close, datos, set, ListFormaPago }) => {
                                     Forma de Pago:
                                 </label>
                                 <select
-                                    id="formaPago"
-                                    name="formaPago"
-                                    value={datos.formaPago}
+                                    id="tipoPago"
+                                    name="tipoPago"
+                                    value={datos.tipoPago}
                                     onChange={handleChange}
                                     className="border border-gray-300 px-3 py-2 text-base rounded-md focus:outline-none w-full"
                                 >
@@ -122,16 +146,15 @@ const ModalPagos = ({ close, datos, set, ListFormaPago }) => {
                                     Monto Adicionales:
                                 </label>
                                 <div className="relative">
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">S/</span>
                                     <input
                                         autoComplete="off"
-                                        type="number"
+                                        type="text"
                                         id="montoAdicionales"
                                         name="montoAdicionales"
-                                        value={datos.montoAdicionales}
-                                        onChange={handleChangeNumber}
-                                        step="0.01"
-                                        className="border border-gray-300 pl-10 pr-3 py-2 text-base rounded-md focus:outline-none w-full"
+                                        value={`S/.${datos.montoAdicionales || ''}`}
+                                        onChange={handleCurrencyChange}
+                                        onBlur={handleBlurCurrency}
+                                        className="border border-gray-300 px-3 py-2 text-base rounded-md focus:outline-none w-full"
                                     />
                                 </div>
                             </div>
@@ -142,16 +165,15 @@ const ModalPagos = ({ close, datos, set, ListFormaPago }) => {
                                     Monto Protocolo:
                                 </label>
                                 <div className="relative">
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">S/</span>
                                     <input
                                         autoComplete="off"
-                                        type="number"
+                                        type="text"
                                         id="montoProtocolo"
-                                        value={datos.montoProtocolo}
-                                        onChange={handleChangeNumberDecimals}
+                                        value={`S/.${parseFloat(datos.montoProtocolo || 0).toFixed(2)}`}
+                                        onChange={handleCurrencyChange}
                                         name="montoProtocolo"
-                                        step="0.01"
-                                        className="border border-gray-300 pl-10 pr-3 py-2 text-base rounded-md focus:outline-none w-full"
+                                        disabled
+                                        className={`border border-gray-300 px-3 py-2 text-base rounded-md focus:outline-none w-full ${!datos.idProtocolo ? "bg-gray-200" : ""}`}
                                     />
                                 </div>
                             </div>
@@ -165,16 +187,14 @@ const ModalPagos = ({ close, datos, set, ListFormaPago }) => {
                                 Monto Total a Pagar:
                             </label>
                             <div className="relative">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-600 font-bold text-xl">S/</span>
                                 <input
                                     autoComplete="off"
-                                    type="number"
-                                    id="montoTotal"
-                                    name="montoTotal"
-                                    value={datos.montoTotal}
-                                    onChange={handleChangeNumberDecimals}
-                                    step="0.01"
-                                    className="border-2 border-blue-400 pl-14 pr-4 py-3 text-xl font-bold rounded-lg focus:outline-none w-full bg-blue-50 text-blue-700"
+                                    type="text"
+                                    id="precioPo"
+                                    name="precioPo"
+                                    value={`S/.${parseFloat(datos.precioPo || 0).toFixed(2)}`}
+                                    onChange={handleCurrencyChange}
+                                    className="border-2 border-blue-400 px-4 py-3 text-xl font-bold rounded-lg focus:outline-none w-full bg-blue-50 text-blue-700"
                                 />
                             </div>
                         </div>

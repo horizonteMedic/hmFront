@@ -63,10 +63,9 @@ const AperturaExamenesPreOcup = (props) => {
     nomEx: "",
     mineralPo: "",
     alturaPo: "",
-    precioPo: "",
     protocolo: "",
     idProtocolo: "",
-    tipoPago: "",
+
     precioAdic: "",
     autoriza: "",
     fechaAperturaPo: format(today, 'dd/MM/yyyy'),
@@ -90,12 +89,13 @@ const AperturaExamenesPreOcup = (props) => {
     tmarihuana: false,
     tcocaina: false,
     //Pagos
+    tipoPago: "",
     fechaPago: todayyy,
     formaPago: "",
     montoProtocolo: 0,
     montoAdicionales: 0,
     montoDescuento: 0,
-    montoTotal: 0,
+    precioPo: "",
 
 
     //Examenes Adicionales
@@ -107,7 +107,7 @@ const AperturaExamenesPreOcup = (props) => {
   //Examenes Adicionales
   const [listaExamenes, setListaExamenes] = useState([])
   const [originalExams, setOriginalExams] = useState([]); // Nuevo estado para exámenes originales
-
+  const [originalPago, setOriginalPago] = useState([]); // Nuevo estado para exámenes originales
   const [searchHC, setSearchHC] = useState([])
   const [showEdit, setShowEdit] = useState(false)
   const [habilitar, setHabilitar] = useState(false)
@@ -363,16 +363,20 @@ const AperturaExamenesPreOcup = (props) => {
     }));
 
     setFilteredExamMed([]);
-    getFetch(`/api/v01/ct/ocupacional/PrecioExamenMutisucursal/${props.selectedSede}/${x.mensaje}`, props.token)
-      .then((res) => {
-        setDatos(d => ({
-          ...d,
-          precioPo: res.mensaje
-        }));
-      })
-      .catch(() => {
-        console.log('Telible Error')
-      })
+    if (datos.idProtocolo) {
+      return
+    } else {
+      getFetch(`/api/v01/ct/ocupacional/PrecioExamenMutisucursal/${props.selectedSede}/${x.mensaje}`, props.token)
+        .then((res) => {
+          setDatos(d => ({
+            ...d,
+            precioPo: res.mensaje
+          }));
+        })
+        .catch(() => {
+          console.log('Telible Error')
+        })
+    }
     document.getElementById('nomEx')?.focus();
   };
 
@@ -398,9 +402,11 @@ const AperturaExamenesPreOcup = (props) => {
   const handleSelectProtocolo = p => {
     console.log(p)
     setSearchProtocolo(p.nombre);
-    setDatos(d => ({ ...d, protocolo: p.nombre, idProtocolo: p.idProtocolo, montoProtocolo: p.precio }));
+    setDatos(d => ({ ...d, protocolo: p.nombre, idProtocolo: p.idProtocolo, montoProtocolo: p.precio ?? 100, precioPo: p.precio ?? 100 }));
     setFilteredProtocolos([]);
   };
+
+
 
   const SearchExamenesAdicionales = async (id) => {
     const Toast = Swal.mixin({
@@ -473,17 +479,21 @@ const AperturaExamenesPreOcup = (props) => {
 
 
   const newPrice = (value) => {
-    props.PrecioC(props.selectedSede, value, props.token)
-      .then((res) => {
-        setDatos({
-          ...datos,
-          precioPo: res.mensaje
+    if (datos.idProtocolo) {
+      return
+    } else {
+      console.log('ingrese')
+      props.PrecioC(props.selectedSede, value, props.token)
+        .then((res) => {
+          setDatos({
+            ...datos,
+            precioPo: res.mensaje
+          })
         })
-      })
-      .catch(() => {
-        console.log('Telible Error')
-      })
-
+        .catch(() => {
+          console.log('Telible Error')
+        })
+    }
   }
 
   const handleChange = (e) => {
@@ -520,7 +530,8 @@ const AperturaExamenesPreOcup = (props) => {
           fechaAperturaPo: formatDate(res.fechaAperturaPo),
           userRegistroDatos: res.usuarioRegistro ?? "",
           idProtocolo: res.protocolo,
-          versionRegistro: res.examenesAdicionales.length > 0 ? res.examenesAdicionales[0].versionRegistro : 0
+          versionRegistroExamenes: res.examenesAdicionales.length > 0 ? res.examenesAdicionales[0].versionRegistro : 0,
+          versionRegistroPago: res.detallePago.length > 0 ? res.detallePago[0].versionRegistro : 0
         });
         setSearchEmpresa(res.razonEmpresa || "");
         setSearchContrata(res.razonContrata || "")
@@ -917,7 +928,7 @@ const AperturaExamenesPreOcup = (props) => {
         Swal.showLoading();
       }
     });
-    SubmitHistoriaC({ ...datos, user_registro: userlogued }, props.selectedSede, props.token, 2, originalExams)
+    SubmitHistoriaC({ ...datos, user_registro: userlogued }, props.selectedSede, props.token, 2, originalExams, originalPago)
       .then((res) => {
         if (!res.id) {
           Swal.fire('Error', 'No se ha podido editar la Historia Clinica', 'error');
@@ -1060,7 +1071,7 @@ const AperturaExamenesPreOcup = (props) => {
       examenesAdicionales: prev.examenesAdicionales.filter(ex => ex.id ? ex.id : ex.idExamen !== id)
     }));
   };
-
+  console.log(datos)
   return (
     <div >
       <div className="grid md:grid-cols-2 sm:flex-col gap-5 px-4">
@@ -1552,7 +1563,12 @@ const AperturaExamenesPreOcup = (props) => {
             <button onClick={() => { setModalPagos(true) }} disabled={datos.detallePago === null} className={`flex items-center border-1 border-blue-500 text-white px-3 py-1 bg-blue-800  mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none ${datos.detallePago === null ? 'opacity-60' : ""}`}>
               Info. Pagos
             </button>
-            {/*<InputsSelect2 nombre="tipoPago" disabled={habilitar} value={datos.tipoPago} title="Forma de Pago" Selects={FormaPago} handleChange={handleChange}*/}
+          </div>
+          <div className="mb-4">
+            <div className="flex items-center space-x-2 mb-1">
+              <InputsSelect2 nombre="tipoPago" disabled={habilitar} value={datos.tipoPago} title="Forma de Pago" Selects={FormaPago} handleChange={handleChange} />
+              <InputsSelect2 nombre="autoriza" disabled={habilitar} value={datos.autoriza} title="Autorizado Por" Selects={ListAuth} handleChange={handleChange} />
+            </div>
           </div>
           <div className="mb-4">
             <div className="flex items-center space-x-2 mb-1">

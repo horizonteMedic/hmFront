@@ -1,6 +1,7 @@
 import { URLAzure } from "../../../../../config/config";
+import { getHoraActual } from "../../../../../utils/helpers";
 
-export function SubmitHistoriaC(data, sede, token, operacion, originalExams = []) {
+export function SubmitHistoriaC(data, sede, token, operacion, originalExams = [], originalPago = {}) {
 
   const removePrefix = (str, prefix) => {
     if (typeof str !== "string") return ""; // o puedes lanzar un error si prefieres
@@ -20,14 +21,22 @@ export function SubmitHistoriaC(data, sede, token, operacion, originalExams = []
   const fechaFormateada = `${yyyy}/${mm}/${dd}`;
 
   // ---- CALCULAR versionRegistro ----
-  let version = 1;
-  if (data.versionRegistro && Number(data.versionRegistro) > 0) {
-    version = Number(data.versionRegistro) + 1;
+  let versionExamenes = 1;
+  if (data.versionRegistroExamenes && Number(data.versionRegistroExamenes) > 0) {
+    versionExamenes = Number(data.versionRegistroExamenes) + 1;
   }
+
+  let versionPago = 1;
+  if (data.versionRegistroPago && Number(data.versionRegistroPago) > 0) {
+    versionPago = Number(data.versionRegistroPago) + 1;
+  }
+
+
 
   // -------- VALIDACIÓN DE CAMBIOS EN EXÁMENES (SOLO PARA EDICIÓN) --------
   let examenesBody = [];
-
+  let pagoBody = {};
+  //EXAMENES
   if (operacion === 2 && originalExams) {
     // Función auxiliar para obtener IDs de exámenes
     const getExamIds = (list) => {
@@ -56,7 +65,7 @@ export function SubmitHistoriaC(data, sede, token, operacion, originalExams = []
       examenesBody = data.examenesAdicionales.map(ex => ({
         id: null,
         idExamenAdicionalProtocolo: ex.idExamenAdicionalProtocolo,
-        versionRegistro: version,
+        versionRegistro: versionExamenes,
         usuarioRegistro: data.user_registro,
         norden: null
       }));
@@ -71,10 +80,46 @@ export function SubmitHistoriaC(data, sede, token, operacion, originalExams = []
     examenesBody = data.examenesAdicionales.map(ex => ({
       id: null,
       idExamenAdicionalProtocolo: ex.idExamenAdicionalProtocolo,
-      versionRegistro: version,
+      versionRegistro: versionExamenes,
       usuarioRegistro: data.user_registro,
       norden: null
     }));
+  }
+
+  //PAGO
+  if (operacion === 2 && originalPago) {
+
+  } else {
+    pagoBody = {
+      versionRegistro: versionPago,
+      montoAdicionales: data.montoAdicionales ?? 0,
+      montoProtocolo: data.montoProtocolo ?? 0,
+      montoTotal: data.precioPo ?? 0,
+      fechaPago: fechaFormateada,
+      horaPago: getHoraActual(),
+      formaPago: data.tipoPago,
+      usuarioRegistro: data.user_registro,
+      estado: true,
+    }
+  }
+
+  function formatPrecioPo(value) {
+    if (value == null) return "";
+
+    const str = value.toString().trim();
+
+    // Si ya viene con formato S/.
+    if (/^S\/\.\s*\d+(\.\d+)?$/.test(str)) {
+      return str;
+    }
+
+    // Si es solo número (entero o decimal)
+    if (/^\d+(\.\d+)?$/.test(str)) {
+      return `S/.${str}`;
+    }
+
+    // Cualquier otro caso, devolver tal cual (por seguridad)
+    return str;
   }
 
 
@@ -89,7 +134,7 @@ export function SubmitHistoriaC(data, sede, token, operacion, originalExams = []
     alturaPo: data.alturaPo,
     mineralPo: data.mineralPo,
     fechaAperturaPo: fechaFormateada,
-    precioPo: data.precioPo,
+    precioPo: formatPrecioPo(data.precioPo),
     estadoEx: "EN PROCESO",
     nomExamen: data.nomExamen,
     cargoDe: data.cargoDe,
@@ -129,7 +174,26 @@ export function SubmitHistoriaC(data, sede, token, operacion, originalExams = []
     tcocaina: false,
     espaciosConfinados: false,
     user_registro: data.user_registro,
-    examenesAdicionales: examenesBody
+    examenesAdicionales: examenesBody,
+    detallePago: pagoBody
+    //ID NO MANDO
+    /*versionRegistro: versionPago, //EL ME ENVIA UNA VERSION Y SI ACTUALIZO ES LA VERSION + 1, SI NO ACTUALIZO NO ENVIO TODO DETALLE PAGO
+    montoAdicionales: data.montoAdicionales,
+    montoProtocolo: data.montoProtocolo,
+    montoTotal: data.precioPo,
+    //idConfiguracionDeposito NO ENVIAR
+    fechaPago: fechaFormateada,
+    horaPago: { //ENVIAR HORA PAGO; SOLO PASO PARA CUANDO SE REGISTRE NO PARA CUANDO SE ACTUALIZA
+      hour: hours,
+      minute: minutes,
+      second: seconds,
+      nano: 0
+    },
+    formaPago: data.tipoPago,
+    usuarioRegistro: data.user_registro,
+    //CRISTIAN WEBON
+    estado: true, //seimpre true
+    //norden: null //NO ENVIAR*/
   };
 
   console.log(body)
