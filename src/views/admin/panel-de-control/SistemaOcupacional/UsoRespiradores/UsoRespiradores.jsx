@@ -13,6 +13,7 @@ import {
 import {
   InputTextOneLine,
   InputTextArea,
+  SectionFieldset,
 } from "../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../hooks/useForm";
 import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
@@ -24,15 +25,14 @@ import PersonalEmpleadoIII from "./TabsUsoRespiradores/PersonalEmpleadoIII";
 import PersonalEmpleadoIV from "./TabsUsoRespiradores/PersonalEmpleadoIV";
 import FinalAutorizacion from "./TabsUsoRespiradores/FinalAutorizacion";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerUsoRespiradores";
+import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
 
 const tabla = "b_uso_respiradores";
-const today = getToday();
 
 export default function UsoRespiradores() {
   const [activeTab, setActiveTab] = useState(0);
-
-  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
-    useSessionData();
+  const today = getToday();
+  const { token, userlogued, selectedSede, datosFooter, userDNI } = useSessionData();
 
   const initialFormState = {
     // Header
@@ -41,17 +41,22 @@ export default function UsoRespiradores() {
     fechaExam: today,
     tipoExamen: "",
     // Datos personales
-    nombres: "",
     dni: "",
+    nombres: "",
+    fechaNacimiento: "",
+    lugarNacimiento: "",
     edad: "",
     sexo: "",
+    estadoCivil: "",
+    nivelEstudios: "",
+
+    // Datos Laborales
     empresa: "",
     contrata: "",
-    // Campos usados por la interfaz principal
-    puestoPostula: "",
-    puestoActual: "",
+    ocupacion: "",
+    cargoDesempenar: "",
 
-    dniUsuario: userCompleto?.datos?.dni_user ?? "",
+    dniUsuario: userDNI,
 
     // ====================== TAB LATERAL: AGUDEZA VISUAL ======================
     vcOD: "",
@@ -256,6 +261,7 @@ export default function UsoRespiradores() {
     handleCheckBoxChange,
     handleClear,
     handleClearnotO,
+    handleChangeNumberDecimals,
     handlePrintDefault,
   } = useForm(initialFormState);
 
@@ -269,10 +275,6 @@ export default function UsoRespiradores() {
   ];
 
   const handleSave = () => {
-    // if (form.aptitudUsoRespirador == null) {
-    //   Swal.fire({ icon: "error", title: "Error", text: "Por favor, seleccione la aptitud." });
-    //   return;
-    // }
     SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
 
@@ -292,265 +294,204 @@ export default function UsoRespiradores() {
   const ActiveComponent = tabs[activeTab]?.component || (() => null);
 
   return (
-    <div className="mx-auto bg-white ">
-      <div className="flex h-full">
-        {/* Contenido principal - 80% */}
-        <div className="w-4/5">
-          <div className="w-full">
-            {/* Datos del trabajador */}
-            <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-              <InputTextOneLine
-                label="N° Orden"
-                name="norden"
-                value={form?.norden}
-                onChange={handleChangeNumber}
-                onKeyUp={handleSearch}
-              />
-              <InputTextOneLine
-                label="Fecha"
-                name="fechaExam"
-                type="date"
-                value={form?.fechaExam}
-                onChange={handleChange}
-              />
-              <InputTextOneLine
-                label="Nombre Examen"
-                name="tipoExamen"
-                value={form?.tipoExamen}
-                disabled
-              />
-
-            </section>
-
-            {/* Información del trabajador */}
-            <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 gap-4">
-              <h3 className="text-lg font-semibold mb-3">Datos del Paciente</h3>
-              {/* Fila 1: Nombres, DNI, Edad, Género */}
-              <div className="grid grid-cols-1 md:grid-cols-2  gap-3 mb-3">
-                <InputTextOneLine
-                  label="Nombres y Apellidos"
-                  name="nombres"
-                  value={form?.nombres}
-                  disabled
-                />
-                <div className="grid grid-cols-3 gap-4">
-                  <InputTextOneLine
-                    label="DNI"
-                    name="dni"
-                    value={form?.dni}
-                    disabled
-                  />
-                  <InputTextOneLine
-                    label="Edad"
-                    name="edad"
-                    value={form?.edad}
-                    disabled
-                  />
-                  <InputTextOneLine
-                    label="Sexo"
-                    name="sexo"
-                    value={form?.sexo}
-                    disabled
-                  />
-                </div>
-                <InputTextOneLine
-                  label="Empresa"
-                  name="empresa"
-                  value={form?.empresa}
-                  disabled
-                />
-                <InputTextOneLine
-                  label="Contrata"
-                  name="contrata"
-                  value={form?.contrata}
-                  disabled
-                />
-                <InputTextOneLine
-                  label="Area de Trabajo"
-                  name="puestoPostula"
-                  value={form?.puestoPostula}
-                  disabled
-                />
-                <InputTextOneLine
-                  label="Puesto de Trabajo"
-                  name="puestoActual"
-                  value={form?.puestoActual}
-                  disabled
-                />
-              </div>
-            </section>
-
-            {/* Navegación de pestañas */}
-            <nav className="flex bg-white border-b border-gray-200 sticky top-0 z-20">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  className={`flex-1 px-4 py-3 uppercase tracking-wider text=[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${activeTab === tab.id
-                    ? "border-[#233245] text-[#233245] font-semibold"
-                    : "border-transparent"
-                    }`}
-                  onClick={() => setActiveTab(tab.id)}
-                >
-                  <FontAwesomeIcon icon={tab.icon} className="mr-2" />
-                  {tab.name}
-                </button>
-              ))}
-            </nav>
-
-            {/* Contenido de la pestaña activa */}
-            <div className="px-4 pt-4">
-              <ActiveComponent
-                form={form}
-                setForm={setForm}
-                handleChange={handleChange}
-                handleChangeNumber={handleChangeNumber}
-                handleCheckBoxChange={handleCheckBoxChange}
-                handleRadioButtonBoolean={handleRadioButtonBoolean}
-                handleClear={handleClear}
-                handleSave={handleSave}
-                handlePrint={handlePrint}
-                handleRadioButton={handleRadioButton}
-                handleChangeSimple={handleChangeSimple}
-              />
-            </div>
-
-            <section className="flex flex-col md:flex-row justify-between items-center gap-4  px-4 pt-4">
-              <div className=" flex gap-4">
-                <button
-                  type="button"
-                  onClick={handleSave}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                >
-                  <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                </button>
-                <button
-                  type="button"
-                  onClick={handleClear}
-                  className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                >
-                  <FontAwesomeIcon icon={faBroom} /> Limpiar
-                </button>
-              </div>
-              <div className="flex flex-col items-end">
-                <span className="font-bold italic text-base mb-1">Imprimir</span>
-                <div className="flex items-center gap-2">
-                  <input
-                    name="norden"
-                    value={form.norden}
-                    onChange={handleChange}
-                    className="border rounded px-2 py-1 text-base w-24"
-                  />
-
-                  <button
-                    type="button"
-                    onClick={handlePrint}
-                    className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                  >
-                    <FontAwesomeIcon icon={faPrint} />
-                  </button>
-                </div>
-              </div>
-            </section>
+    <div className="grid 2xl:grid-cols-8 mx-auto gap-x-4 px-2">
+      {/* Contenido principal - 80% */}
+      <div className="2xl:col-span-6">
+        {/* Datos del trabajador */}
+        <SectionFieldset legend="Información del Examen">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
+            <InputTextOneLine
+              label="N° Orden"
+              name="norden"
+              value={form.norden}
+              onChange={handleChangeNumberDecimals}
+              onKeyUp={handleSearch}
+              labelWidth="120px"
+            />
+            <InputTextOneLine
+              label="Fecha"
+              name="fechaExam"
+              type="date"
+              value={form.fechaExam}
+              onChange={handleChangeSimple}
+              labelWidth="120px"
+            />
+            <InputTextOneLine
+              label="Nombre del Examen"
+              name="tipoExamen"
+              value={form.tipoExamen}
+              disabled
+              labelWidth="120px"
+            />
           </div>
+        </SectionFieldset>
+
+        <DatosPersonalesLaborales form={form} />
+
+        {/* Navegación de pestañas */}
+        <nav className="flex bg-white border-b border-gray-200 sticky top-0 z-20">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              className={`flex-1 px-4 py-3 uppercase tracking-wider text=[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${activeTab === tab.id
+                ? "border-[#233245] text-[#233245] font-semibold"
+                : "border-transparent"
+                }`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              <FontAwesomeIcon icon={tab.icon} className="mr-2" />
+              {tab.name}
+            </button>
+          ))}
+        </nav>
+
+        {/* Contenido de la pestaña activa */}
+        <div className="px-4 pt-4">
+          <ActiveComponent
+            form={form}
+            setForm={setForm}
+            handleChange={handleChange}
+            handleChangeNumber={handleChangeNumber}
+            handleCheckBoxChange={handleCheckBoxChange}
+            handleRadioButtonBoolean={handleRadioButtonBoolean}
+            handleClear={handleClear}
+            handleSave={handleSave}
+            handlePrint={handlePrint}
+            handleRadioButton={handleRadioButton}
+            handleChangeSimple={handleChangeSimple}
+          />
         </div>
 
-        {/* Panel lateral - 20% */}
-        <div className="w-1/5">
-          <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 flex-1 flex flex-col space-y-3">
-            <h4 className="font-semibold text-gray-800 mb-3">Agudeza Visual</h4>
-            {/* Sin Corregir */}
-            <div className="mb-4">
-              <h5 className="font-semibold text-gray-700 mb-2 text-center">Sin Corregir</h5>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="">
-                  <div className="font-semibold mb-2 text-center">O.D</div>
-                  <div className="space-y-3">
-                    <InputTextOneLine label="V.C." name="vcOD" value={form?.vcOD} disabled labelWidth="35px" />
-                    <InputTextOneLine label="V.L." name="vlOD" value={form?.vlOD} disabled labelWidth="35px" />
-                  </div>
-                </div>
-                <div className="">
-                  <div className="font-semibold mb-2 text-center">O.I</div>
-                  <div className="space-y-3">
-                    <InputTextOneLine label="V.C." name="vcOI" value={form?.vcOI} disabled labelWidth="35px" />
-                    <InputTextOneLine label="V.L." name="vlOI" value={form?.vlOI} disabled labelWidth="35px" />
-                  </div>
-                </div>
-              </div>
-            </div>
+        <section className="flex flex-col md:flex-row justify-between items-center gap-4  px-4 pt-4">
+          <div className=" flex gap-4">
+            <button
+              type="button"
+              onClick={handleSave}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+            </button>
+            <button
+              type="button"
+              onClick={handleClear}
+              className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faBroom} /> Limpiar
+            </button>
+          </div>
+          <div className="flex flex-col items-end">
+            <span className="font-bold italic text-base mb-1">Imprimir</span>
+            <div className="flex items-center gap-2">
+              <input
+                name="norden"
+                value={form.norden}
+                onChange={handleChange}
+                className="border rounded px-2 py-1 text-base w-24"
+              />
 
-            {/* Corregida */}
-            <div className="mb-4">
-              <h5 className="font-semibold text-gray-700 mb-2 text-center">Corregida</h5>
-              {/* Fila OD y OI */}
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <div className="font-semibold mb-2 text-center">O.D</div>
-                  <InputTextOneLine
-                    label="V.C."
-                    name="vcCorregidaOD"
-                    value={form?.vcCorregidaOD}
-                    disabled
-                    labelWidth="35px"
-                  />
-                  <InputTextOneLine
-                    label="V.L."
-                    name="vlCorregidaOD"
-                    value={form?.vlCorregidaOD}
-                    disabled
-                    labelWidth="35px"
-                  />
-                </div>
-                <div className="space-y-3">
-                  <div className="font-semibold mb-2 text-center">O.I</div>
-                  <InputTextOneLine
-                    label="V.C."
-                    name="vcCorregidaOI"
-                    value={form?.vcCorregidaOI}
-                    disabled
-                    labelWidth="35px"
-                  />
-                  <InputTextOneLine
-                    label="V.L."
-                    name="vlCorregidaOI"
-                    value={form?.vlCorregidaOI}
-                    disabled
-                    labelWidth="35px"
-                  />
-                </div>
-              </div>
-              {/* Fila extra (ancho completo) */}
-              <div className="mt-4 space-y-3">
-                <InputTextOneLine
-                  label="V.Clrs"
-                  name="vclrs"
-                  value={form?.vclrs}
-                  disabled
-                  className="flex-1 w-full"
-                  labelWidth="35px"
-                />
-                <InputTextOneLine
-                  name="vb"
-                  label="V.B."
-                  value={form?.vb}
-                  disabled
-                  className="flex-1 w-full"
-                  labelWidth="35px"
-                />
-                <InputTextOneLine
-                  label="R.P."
-                  name="rp"
-                  value={form?.rp}
-                  disabled
-                  className="flex-1 w-full"
-                  labelWidth="35px"
-                />
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faPrint} />
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {/* Panel lateral - 20% */}
+      <div className="2xl:col-span-2">
+        <SectionFieldset legend="Oftalmología" className="grid gap-y-3">
+          <SectionFieldset legend="Sin Corregir" className="grid md:grid-cols-2 gap-x-4 gap-y-3">
+            <div>
+              <div className="font-semibold mb-2 text-center ml-[80px]">Ojo Derecho</div>
+              <div className="space-y-3">
+                <InputTextOneLine label="Visión Cerca" name="vcOD" value={form?.vcOD} disabled labelWidth="70px" />
+                <InputTextOneLine label="Visión Lejos" name="vlOD" value={form?.vlOD} disabled labelWidth="70px" />
               </div>
             </div>
-            {/* Enfermedades Oculares */}
-            <InputTextArea label="Enfermedades Oculares" rows={5} name="enfermedadesOculares" value={form?.enfermedadesOculares} onChange={handleChange} disabled />
-          </section>
-        </div>
+            <div>
+              <div className="font-semibold mb-2 text-center ml-[80px]">Ojo Izquierdo</div>
+              <div className="space-y-3">
+                <InputTextOneLine label="Visión Cerca" name="vcOI" value={form?.vcOI} disabled labelWidth="70px" />
+                <InputTextOneLine label="Visión Lejos" name="vlOI" value={form?.vlOI} disabled labelWidth="70px" />
+              </div>
+            </div>
+          </SectionFieldset>
+
+          {/* Corregida */}
+          <SectionFieldset legend="Corregida" className="grid md:grid-cols-2 gap-x-4 gap-y-3">
+            <div className="space-y-3">
+              <div className="font-semibold mb-2 text-center ml-[80px]">Ojo Derecho</div>
+              <InputTextOneLine
+                label="Visión Cerca"
+                name="vcCorregidaOD"
+                value={form?.vcCorregidaOD}
+                disabled
+                labelWidth="70px"
+              />
+              <InputTextOneLine
+                label="Visión Lejos"
+                name="vlCorregidaOD"
+                value={form?.vlCorregidaOD}
+                disabled
+                labelWidth="70px"
+              />
+            </div>
+            <div className="space-y-3">
+              <div className="font-semibold mb-2 text-center ml-[80px]">Ojo Izquierdo</div>
+              <InputTextOneLine
+                label="Visión Cerca"
+                name="vcCorregidaOI"
+                value={form?.vcCorregidaOI}
+                disabled
+                labelWidth="70px"
+              />
+              <InputTextOneLine
+                label="Visión Lejos"
+                name="vlCorregidaOI"
+                value={form?.vlCorregidaOI}
+                disabled
+                labelWidth="70px"
+              />
+            </div>
+          </SectionFieldset>
+          {/* Fila extra (ancho completo) */}
+          <SectionFieldset legend="Valoración Oftalmológica" className="grid gap-y-3">
+            <InputTextOneLine
+              label="Visión Colores"
+              name="vclrs"
+              value={form?.vclrs}
+              disabled
+              labelWidth="100px"
+            />
+            <InputTextOneLine
+              label="Visión Binocular"
+              name="vb"
+              value={form?.vb}
+              disabled
+              labelWidth="100px"
+            />
+            <InputTextOneLine
+              label="Reflejos Pupilares"
+              name="rp"
+              value={form?.rp}
+              disabled
+              labelWidth="100px"
+            />
+            <InputTextArea
+              label="Enfermedades Oculares"
+              rows={7}
+              name="enfermedadesOculares"
+              value={form?.enfermedadesOculares}
+              onChange={handleChange}
+              disabled
+            />
+          </SectionFieldset>
+
+        </SectionFieldset>
       </div>
     </div>
   );

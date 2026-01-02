@@ -6,6 +6,7 @@ import {
     SubmitDataServiceDefault,
 } from "../../../../utils/functionUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
+import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl = "/api/v01/ct/respiradores/obtenerReporteRespiradores";
 const registrarUrl = "/api/v01/ct/respiradores/registrarActualizarRespiradores";
@@ -31,14 +32,16 @@ export const GetInfoServicio = async (
             tipoExamen: res.nombreExamen ?? "",
             // Datos personales
             nombres: res.nombresPaciente ?? "",
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
             dni: res.dniPaciente ?? "",
-            edad: String((res.edadPaciente ?? "") + " AÑOS"),
+            edad: res.edadPaciente ?? "",
             sexo: res.sexoPaciente ?? "",
             empresa: res.empresa ?? "",
             contrata: res.contrata ?? "",
             // Campos usados por la interfaz principal
-            puestoPostula: res.cargoPaciente ?? "",
-            puestoActual: res.ocupacionPaciente ?? "",
+            cargoDesempenar: res.cargoPaciente ?? "",
+            ocupacion: res.ocupacionPaciente ?? "",
 
             // ====================== TAB LATERAL: AGUDEZA VISUAL ======================
             vcOD: res.visioncercasincorregirodVCercaSOd ?? "",
@@ -87,13 +90,15 @@ export const GetInfoServicioEditar = async (
             // Datos personales
             nombres: res.nombresPaciente ?? "",
             dni: res.dniPaciente ?? "",
-            edad: String((res.edadPaciente ?? "") + " AÑOS"),
-            sexo: res.sexoPaciente ?? "",
+            edad: res.edadPaciente ?? "",
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
             empresa: res.empresa ?? "",
             contrata: res.contrata ?? "",
             // Campos usados por la interfaz principal
-            puestoPostula: res.cargoPaciente ?? "",
-            puestoActual: res.ocupacionPaciente ?? "",
+            cargoDesempenar: res.cargoPaciente ?? "",
+            ocupacion: res.ocupacionPaciente ?? "",
 
             // ====================== TAB LATERAL: AGUDEZA VISUAL ======================
             vcOD: res.visioncercasincorregirodVCercaSOd ?? "",
@@ -337,7 +342,7 @@ export const SubmitDataService = async (
         norden: form.norden,
         codigoRespiradores: form.codigoRespiradores,
         dniPaciente: form.dni,
-        edad: form.edad.replace(" AÑOS", ""),
+        edad: form.edad,
         fechaExamen: form.fechaExam,
         tiempoPromedioHoras: form.promedioHorasDia,
         mascaraPolvo: form.respiradorMascaraPolvo,
@@ -569,7 +574,7 @@ export const SubmitDataService = async (
         personalEmpleado4Otros2Descripcion: form.probPulmonIndustrialesOtrosDescripcion,
         trabajoPrevio: form.trabajosExpuestosPeligrosRespiratorios,
         idEmpleado: form.norden,
-        cargo: form.puestoActual, //revisar
+        cargo: form.ocupacion, //revisar
         mineraBarrick: form.empresa, //revisar
         supervisor: form.supervisor,
         autorizacionClase1: form.claseAutorizacion === "CLASE_I",
