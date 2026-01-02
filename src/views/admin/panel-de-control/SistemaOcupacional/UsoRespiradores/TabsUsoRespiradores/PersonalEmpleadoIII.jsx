@@ -1,85 +1,166 @@
-import { InputsBooleanRadioGroup, InputTextOneLine } from "../../../../../components/reusableComponents/ResusableComponents";
+import { InputTextOneLine, RadioTable, SectionFieldset } from "../../../../../components/reusableComponents/ResusableComponents";
 
 export default function PersonalEmpleadoIII({ form, setForm, handleChange, handleRadioButtonBoolean }) {
   return (
-    <div className="text-[11px]  space-y-6">
-      <div className="bg-white border border-gray-200 rounded-lg p-4">
-        <div className="bg-orange-100 border border-orange-300 text-orange-900 rounded-md p-3 mb-4">
-          Sección 2: (Discrecional). Deben ser contestadas por empleados que han sido seleccionados para usar un respirador de cara completa o un aparato de respiración autónomo. (SCBA)
-          <br />Para los empleados que han sido seleccionados para utilizar otros tipos de respiradores contestar a estas preguntas de manera voluntaria. Responda SI o NO.
-        </div>
-
+    <div className="space-y-3">
+      <div className="bg-orange-100 border border-orange-300 text-orange-900 rounded-md p-3">
+        Sección 2: (Discrecional). Deben ser contestadas por empleados que han sido seleccionados para usar un respirador
+        de cara completa o un aparato de respiración autónomo (SCBA).
+        <br />
+        Para otros respiradores, responder de manera voluntaria. Responda SI o NO.
+      </div>
+      <div className="grid xl:grid-cols-2 gap-x-4 gap-y-3">
         {/* 9. Visión */}
-        <div className="mt-2">
-          <div className="flex items-start justify-between">
-            <p className="font-semibold mb-2">9. ¿Ha perdido la visión en cualquier ojo (temporal o permanente)?</p>
-            <InputsBooleanRadioGroup name="visionPerdidaOjo" value={form?.visionPerdidaOjo} onChange={handleRadioButtonBoolean} />
-          </div>
-        </div>
+        <SectionFieldset legend="9. ¿Ha perdido la visión en cualquier ojo (temporal o permanente)?">
+          <RadioTable
+            items={[
+              { name: "visionPerdidaOjo", label: "Respuesta" },
+            ]}
+            options={[
+              { label: "SI", value: true },
+              { label: "NO", value: false },
+            ]}
+            form={form}
+            handleRadioButton={handleRadioButtonBoolean}
+          />
+        </SectionFieldset>
 
         {/* 10. Condiciones relacionadas con la visión */}
-        <div className="mt-4">
-          <p className="font-semibold mb-2">10. En relación a su visión, indique si presenta alguna de las siguientes condiciones:</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div className="flex items-start justify-between"><span className="pr-4">a. Usa lentes de contacto.</span><InputsBooleanRadioGroup name="visionUsaLentesContacto" value={form?.visionUsaLentesContacto} onChange={handleRadioButtonBoolean} /></div>
-            <div className="flex items-start justify-between"><span className="pr-4">b. Usa lentes.</span><InputsBooleanRadioGroup name="visionUsaLentes" value={form?.visionUsaLentes} onChange={handleRadioButtonBoolean} /></div>
-            <div className="flex items-start justify-between"><span className="pr-4">c. Daltonismo.</span><InputsBooleanRadioGroup name="visionDaltonismo" value={form?.visionDaltonismo} onChange={handleRadioButtonBoolean} /></div>
-            <div className="flex items-start justify-between"><span className="pr-4">d. Otros.</span><InputsBooleanRadioGroup name="visionOtros" value={form?.visionOtros} onChange={(e, v) => { setForm(p => ({ ...p, visionOtrosDescripcion: "" })); handleRadioButtonBoolean(e, v); }} /></div>
-          </div>
-          <div className="mt-3">
-            <InputTextOneLine label="Especifique" name="visionOtrosDescripcion" value={form?.visionOtrosDescripcion} disabled={!form?.visionOtros} onChange={handleChange} />
-          </div>
-        </div>
+        <SectionFieldset
+          legend="10. En relación a su visión, indique si presenta alguna de las siguientes condiciones:"
+          className="space-y-3"
+        >
+          <RadioTable
+            items={[
+              { name: "visionUsaLentesContacto", label: "a. Usa lentes de contacto." },
+              { name: "visionUsaLentes", label: "b. Usa lentes." },
+              { name: "visionDaltonismo", label: "c. Daltonismo." },
+              { name: "visionOtros", label: "d. Otros." },
+            ]}
+            options={[
+              { label: "SI", value: true },
+              { label: "NO", value: false },
+            ]}
+            form={form}
+            handleRadioButton={(e, value) => {
+              if (e.target.name === "visionOtros" && !value) {
+                setForm(p => ({ ...p, visionOtrosDescripcion: "" }));
+              }
+              handleRadioButtonBoolean(e, value);
+            }}
+          />
+
+          <InputTextOneLine
+            label="Especifique"
+            name="visionOtrosDescripcion"
+            value={form?.visionOtrosDescripcion}
+            disabled={!form?.visionOtros}
+            onChange={handleChange}
+          />
+        </SectionFieldset>
 
         {/* 11. Lesiones de oído */}
-        <div className="mt-4">
-          <div className="flex items-start justify-between">
-            <p className="font-semibold mb-2">11. ¿Ha tenido alguna lesión en sus oídos, incluyendo un tímpano roto?</p>
-            <InputsBooleanRadioGroup name="oidoLesionTimpanoRoto" value={form?.oidoLesionTimpanoRoto} onChange={handleRadioButtonBoolean} />
-          </div>
-        </div>
+        <SectionFieldset legend="11. ¿Ha tenido alguna lesión en sus oídos, incluyendo un tímpano roto?">
+          <RadioTable
+            items={[
+              { name: "oidoLesionTimpanoRoto", label: "Respuesta" },
+            ]}
+            options={[
+              { label: "SI", value: true },
+              { label: "NO", value: false },
+            ]}
+            form={form}
+            handleRadioButton={handleRadioButtonBoolean}
+          />
+        </SectionFieldset>
 
         {/* 12. Problemas de audición actuales */}
-        <div className="mt-4">
-          <p className="font-semibold mb-2">12. ¿Tiene actualmente algunos de los siguientes problemas de audición?</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div className="flex items-start justify-between"><span className="pr-4">a. Dificultad para escuchar.</span><InputsBooleanRadioGroup name="audicionDificultadEscuchar" value={form?.audicionDificultadEscuchar} onChange={handleRadioButtonBoolean} /></div>
-            <div className="flex items-start justify-between"><span className="pr-4">b. Usa un audífono.</span><InputsBooleanRadioGroup name="audicionUsaAudifono" value={form?.audicionUsaAudifono} onChange={handleRadioButtonBoolean} /></div>
-            <div className="flex items-start justify-between"><span className="pr-4">d. Otros.</span><InputsBooleanRadioGroup name="audicionOtros" value={form?.audicionOtros} onChange={(e, v) => { setForm(p => ({ ...p, audicionOtrosDescripcion: "" })); handleRadioButtonBoolean(e, v); }} /></div>
-          </div>
-          <div className="mt-3">
-            <InputTextOneLine label="Especifique" name="audicionOtrosDescripcion" value={form?.audicionOtrosDescripcion} disabled={!form?.audicionOtros} onChange={handleChange} />
-          </div>
-        </div>
+        <SectionFieldset
+          legend="12. ¿Tiene actualmente algunos de los siguientes problemas de audición?"
+          className="space-y-3"
+        >
+          <RadioTable
+            items={[
+              { name: "audicionDificultadEscuchar", label: "a. Dificultad para escuchar." },
+              { name: "audicionUsaAudifono", label: "b. Usa un audífono." },
+              { name: "audicionOtros", label: "d. Otros." },
+            ]}
+            options={[
+              { label: "SI", value: true },
+              { label: "NO", value: false },
+            ]}
+            form={form}
+            handleRadioButton={(e, value) => {
+              if (e.target.name === "audicionOtros" && !value) {
+                setForm(p => ({ ...p, audicionOtrosDescripcion: "" }));
+              }
+              handleRadioButtonBoolean(e, value);
+            }}
+          />
+
+          <InputTextOneLine
+            label="Especifique"
+            name="audicionOtrosDescripcion"
+            value={form?.audicionOtrosDescripcion}
+            disabled={!form?.audicionOtros}
+            onChange={handleChange}
+          />
+        </SectionFieldset>
 
         {/* 13. Lesiones a la espalda */}
-        <div className="mt-4">
-          <p className="font-semibold mb-2">13. ¿Ha tenido alguna lesión a la espalda?</p>
-          <div className="flex items-start justify-between">
-            <span className="pr-4">Respuesta:</span>
-            <InputsBooleanRadioGroup name="espaldaLesion" value={form?.espaldaLesion} onChange={handleRadioButtonBoolean} />
-          </div>
-        </div>
+        <SectionFieldset legend="13. ¿Ha tenido alguna lesión a la espalda?">
+          <RadioTable
+            items={[
+              { name: "espaldaLesion", label: "Respuesta" },
+            ]}
+            options={[
+              { label: "SI", value: true },
+              { label: "NO", value: false },
+            ]}
+            form={form}
+            handleRadioButton={handleRadioButtonBoolean}
+          />
+        </SectionFieldset>
 
         {/* 14. Problemas musculoesqueléticos y de movilidad */}
-        <div className="mt-4">
-          <p className="font-semibold mb-2">14. ¿Ha tenido alguna vez algunos de los siguientes problemas?</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div className="flex items-start justify-between"><span className="pr-4">a. Debilidad en los brazos, manos, piernas o pies.</span><InputsBooleanRadioGroup name="probGenDebilidadExtremidades" value={form?.probGenDebilidadExtremidades} onChange={handleRadioButtonBoolean} /></div>
-            <div className="flex items-start justify-between"><span className="pr-4">b. Dolor de espalda.</span><InputsBooleanRadioGroup name="probGenDolorEspalda" value={form?.probGenDolorEspalda} onChange={handleRadioButtonBoolean} /></div>
-            <div className="flex items-start justify-between"><span className="pr-4">c. Dificultad para mover sus brazos y piernas.</span><InputsBooleanRadioGroup name="probGenDificultadMoverBrazosPiernas" value={form?.probGenDificultadMoverBrazosPiernas} onChange={handleRadioButtonBoolean} /></div>
-            <div className="flex items-start justify-between"><span className="pr-4">d. Dolor o rigidez cuando se inclina hacia adelante o atrás en la cintura.</span><InputsBooleanRadioGroup name="probGenDolorRigidezCintura" value={form?.probGenDolorRigidezCintura} onChange={handleRadioButtonBoolean} /></div>
-            <div className="flex items-start justify-between"><span className="pr-4">e. Dificultad para mover su cabeza de arriba o abajo.</span><InputsBooleanRadioGroup name="probGenDificultadMoverCabezaArribaAbajo" value={form?.probGenDificultadMoverCabezaArribaAbajo} onChange={handleRadioButtonBoolean} /></div>
-            <div className="flex items-start justify-between"><span className="pr-4">f. Dificultad para mover su cabeza de lado a lado.</span><InputsBooleanRadioGroup name="probGenDificultadMoverCabezaLadoALado" value={form?.probGenDificultadMoverCabezaLadoALado} onChange={handleRadioButtonBoolean} /></div>
-            <div className="flex items-start justify-between"><span className="pr-4">g. Dificultad al doblar las rodillas.</span><InputsBooleanRadioGroup name="probGenDificultadDoblarRodillas" value={form?.probGenDificultadDoblarRodillas} onChange={handleRadioButtonBoolean} /></div>
-            <div className="flex items-start justify-between"><span className="pr-4">h. Dificultad en ponerse en cuclillas.</span><InputsBooleanRadioGroup name="probGenDificultadCuclillas" value={form?.probGenDificultadCuclillas} onChange={handleRadioButtonBoolean} /></div>
-            <div className="flex items-start justify-between"><span className="pr-4">i. Subir las escaleras o una escalera.</span><InputsBooleanRadioGroup name="probGenSubirEscaleras" value={form?.probGenSubirEscaleras} onChange={handleRadioButtonBoolean} /></div>
-            <div className="flex items-start justify-between"><span className="pr-4">j. Otros.</span><InputsBooleanRadioGroup name="probGenOtros" value={form?.probGenOtros} onChange={(e, v) => { setForm(p => ({ ...p, probGenOtrosDescripcion: "" })); handleRadioButtonBoolean(e, v); }} /></div>
-          </div>
-          <div className="mt-3">
-            <InputTextOneLine label="Especifique" name="probGenOtrosDescripcion" value={form?.probGenOtrosDescripcion} disabled={!form?.probGenOtros} onChange={handleChange} />
-          </div>
-        </div>
+        <SectionFieldset
+          legend="14. ¿Ha tenido alguna vez algunos de los siguientes problemas?"
+          className="space-y-3"
+        >
+          <RadioTable
+            items={[
+              { name: "probGenDebilidadExtremidades", label: "a. Debilidad en los brazos, manos, piernas o pies." },
+              { name: "probGenDolorEspalda", label: "b. Dolor de espalda." },
+              { name: "probGenDificultadMoverBrazosPiernas", label: "c. Dificultad para mover sus brazos y piernas." },
+              { name: "probGenDolorRigidezCintura", label: "d. Dolor o rigidez al inclinarse en la cintura." },
+              { name: "probGenDificultadMoverCabezaArribaAbajo", label: "e. Dificultad para mover la cabeza arriba/abajo." },
+              { name: "probGenDificultadMoverCabezaLadoALado", label: "f. Dificultad para mover la cabeza de lado a lado." },
+              { name: "probGenDificultadDoblarRodillas", label: "g. Dificultad al doblar las rodillas." },
+              { name: "probGenDificultadCuclillas", label: "h. Dificultad para ponerse en cuclillas." },
+              { name: "probGenSubirEscaleras", label: "i. Subir escaleras o una escalera." },
+              { name: "probGenOtros", label: "j. Otros." },
+            ]}
+            options={[
+              { label: "SI", value: true },
+              { label: "NO", value: false },
+            ]}
+            form={form}
+            handleRadioButton={(e, value) => {
+              if (e.target.name === "probGenOtros" && !value) {
+                setForm(p => ({ ...p, probGenOtrosDescripcion: "" }));
+              }
+              handleRadioButtonBoolean(e, value);
+            }}
+          />
+
+          <InputTextOneLine
+            label="Especifique"
+            name="probGenOtrosDescripcion"
+            value={form?.probGenOtrosDescripcion}
+            disabled={!form?.probGenOtros}
+            onChange={handleChange}
+          />
+        </SectionFieldset>
       </div>
     </div>
   );

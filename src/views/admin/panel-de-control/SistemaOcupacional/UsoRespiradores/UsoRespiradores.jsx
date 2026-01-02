@@ -26,6 +26,7 @@ import PersonalEmpleadoIV from "./TabsUsoRespiradores/PersonalEmpleadoIV";
 import FinalAutorizacion from "./TabsUsoRespiradores/FinalAutorizacion";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerUsoRespiradores";
 import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
+import BotonesAccion from "../../../../components/templates/BotonesAccion";
 
 const tabla = "b_uso_respiradores";
 
@@ -294,9 +295,9 @@ export default function UsoRespiradores() {
   const ActiveComponent = tabs[activeTab]?.component || (() => null);
 
   return (
-    <div className="grid 2xl:grid-cols-8 mx-auto gap-x-4 px-2">
+    <div className="grid 2xl:grid-cols-8 mx-auto gap-x-4 px-2 gap-y-3">
       {/* Contenido principal - 80% */}
-      <div className="2xl:col-span-6">
+      <div className="2xl:col-span-6 space-y-3">
         {/* Datos del trabajador */}
         <SectionFieldset legend="Información del Examen">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
@@ -346,7 +347,7 @@ export default function UsoRespiradores() {
         </nav>
 
         {/* Contenido de la pestaña activa */}
-        <div className="px-4 pt-4">
+        <div className="px-4 pt-4 ">
           <ActiveComponent
             form={form}
             setForm={setForm}
@@ -362,43 +363,13 @@ export default function UsoRespiradores() {
           />
         </div>
 
-        <section className="flex flex-col md:flex-row justify-between items-center gap-4  px-4 pt-4">
-          <div className=" flex gap-4">
-            <button
-              type="button"
-              onClick={handleSave}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-            </button>
-            <button
-              type="button"
-              onClick={handleClear}
-              className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faBroom} /> Limpiar
-            </button>
-          </div>
-          <div className="flex flex-col items-end">
-            <span className="font-bold italic text-base mb-1">Imprimir</span>
-            <div className="flex items-center gap-2">
-              <input
-                name="norden"
-                value={form.norden}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 text-base w-24"
-              />
-
-              <button
-                type="button"
-                onClick={handlePrint}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faPrint} />
-              </button>
-            </div>
-          </div>
-        </section>
+        <BotonesAccion
+          form={form}
+          handleSave={handleSave}
+          handleClear={handleClear}
+          handlePrint={handlePrint}
+          handleChangeNumberDecimals={handleChangeNumberDecimals}
+        />
       </div>
 
       {/* Panel lateral - 20% */}
