@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import DatosPersonalesLaborales from '../../../../../../components/templates/DatosPersonalesLaborales';
 import BotonesAccion from '../../../../../../components/templates/BotonesAccion';
 
-const tabla = '';
+const tabla = 'analisis_bioquimicos';
 
 export default function GlucosaBasal() {
     const { token, userlogued, selectedSede, userName } = useSessionData();
@@ -19,6 +19,7 @@ export default function GlucosaBasal() {
 
     const initialFormState = {
         norden: '',
+        codAb:null,
         fecha: today,
 
         nombreExamen: "",

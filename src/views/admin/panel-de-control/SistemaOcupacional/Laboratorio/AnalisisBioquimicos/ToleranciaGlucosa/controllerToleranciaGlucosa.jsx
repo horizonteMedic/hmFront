@@ -9,8 +9,8 @@ import {
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
-const obtenerReporteUrl = "";
-const registrarUrl = "";
+const obtenerReporteUrl = "/api/v01/ct/glucosaTolerancia/obtenerReporteGlucosa";
+const registrarUrl = "/api/v01/ct/glucosaTolerancia/registrarActualizar";
 
 export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
     const res = await GetInfoServicioDefault(
@@ -24,15 +24,15 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
-            fecha: res.fecha,
+            fecha: res.fechaExamen,
 
-            nombreExamen: res.nombreExamen ?? "",
-            dni: res.dni ?? "",
+            nombreExamen: res.tipoExamen ?? "",
+            dni: res.dniPaciente ?? "",
 
-            nombres: res.nombres ?? "",
+            nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
             lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-            edad: res.edad ?? "",
+            edad: res.edadPaciente ?? "",
             sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
             estadoCivil: res.estadoCivilPaciente,
             nivelEstudios: res.nivelEstudioPaciente,
@@ -43,6 +43,10 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             cargoDesempenar: res.cargoPaciente,
 
             //AGREGAR
+            muestra: res.muestra ?? "",
+            glucosa: res.serica ?? "",
+            glucosa60: res.tolera60 ?? "",
+            glucosa120: res.tolera120 ?? "",
 
             user_medicoFirma: res.usuarioFirma,
         }));
@@ -57,10 +61,16 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
 
     const body = {
         norden: form.norden,
-        fecha: form.fecha,
-
+        fechaExamen: form.fecha,
+        fechaRegistro: form.fecha,
         //AGREGAR
-        
+        muestra: form.muestra ,
+        serica: form.glucosa ,
+        tolera60: form.glucosa60 ,
+        tolera120: form.glucosa120 ,
+
+        userRegistro: user,
+
         usuarioFirma: form.user_medicoFirma,
     };
 
