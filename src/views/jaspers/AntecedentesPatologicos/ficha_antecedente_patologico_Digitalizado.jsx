@@ -1609,7 +1609,6 @@ export default async function ficha_antecedente_patologico_Digitalizado(data = {
   if (docExistente) {
     return doc;
   } else {
-    doc.save(`FichaAntecedentesPatologicos.pdf`);
     imprimir(doc);
   }
 }

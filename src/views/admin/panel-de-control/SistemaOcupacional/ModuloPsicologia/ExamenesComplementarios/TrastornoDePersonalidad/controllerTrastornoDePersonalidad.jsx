@@ -48,7 +48,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             esquizoide: res.esquizoideBajo ? "BAJO" : res.esquizoideMedio ? "MEDIO" : res.esquizoideAlto ? "ALTO" : "",
             esquizotipico: res.esquizoTipicoBajo ? "BAJO" : res.esquizoTipicoMedio ? "MEDIO" : res.esquizoTipicoAlto ? "ALTO" : "",
             inestabilidadImpulsivo: res.subtipoImpulsivoBajo ? "BAJO" : res.subtipoImpulsivoMedio ? "MEDIO" : res.subtipoImpulsivoAlto ? "ALTO" : "",
-            inestabilidadLimite: res.subtipoLimiteBajo ? "BAJO" : res.subtipoLimiteMedio ? "MEDIO" : res.subtipoLimiteAlto ? "ALTO" : "",
+            inestabilidadLimite: res.subtipoLimiteBajo ? "BAJO" : res.subtipoLimiteMedio ? "MEDIO" : res.subtipoLimiteAto ? "ALTO" : "",
 
             histrionico: res.histrionicoBajo ? "BAJO" : res.histrionicoMedio ? "MEDIO" : res.histrionicoAlto ? "ALTO" : "",
             antisocial: res.antisocialBajo ? "BAJO" : res.antisocialMedio ? "MEDIO" : res.antisocialAlto ? "ALTO" : "",

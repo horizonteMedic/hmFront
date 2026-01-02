@@ -28,11 +28,10 @@ import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerUsoRespirad
 import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
 
 const tabla = "b_uso_respiradores";
-const today = getToday();
 
 export default function UsoRespiradores() {
   const [activeTab, setActiveTab] = useState(0);
-
+  const today = getToday();
   const { token, userlogued, selectedSede, datosFooter, userDNI } = useSessionData();
 
   const initialFormState = {
