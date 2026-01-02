@@ -9,8 +9,8 @@ import {
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
-const obtenerReporteUrl = "";
-const registrarUrl = "";
+const obtenerReporteUrl = "/api/v01/ct/laboratorio/obtenerReporteHemoglobina";
+const registrarUrl = "/api/v01/ct/laboratorio/registrarActualizarLaboratorioClinicp";
 
 export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
     const res = await GetInfoServicioDefault(
@@ -57,7 +57,63 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
 
     const body = {
         norden: form.norden,
-        fechaExamen: form.fecha,
+        fechaRegistro: form.fecha,
+        codLabclinico: form.codLabclinico,
+        tipoServicio: "",
+        numTicket: 0,
+        fechaLab: form.fecha,
+        chko: true,
+        chka: true,
+        chkb: true,
+        chkab: true,
+        rbrhpositivo: true,
+        rbrhnegativo: true,
+        txtHemoglobina: "",
+        txtHematocrito: "",
+
+        // "txtVsg": "",
+        // "txtLeucocitosHematologia": "",
+        // "txtHematiesHematologia": "",
+        // "txtNeutrofilos": "",
+        // "txtAbastonados": "",
+        // "txtSegmentadosHematologia": "",
+        // "txtMonocitosHematologia": "",
+        // "txtEosinofilosHematologia": "",
+        // "txtBasofilosHematologia": "",
+        // "txtLinfocitosHematologia": "",
+        // "txtGlucosaBio": "",
+        // "txtCreatininaBio": "",
+        // "chkPositivo": false,
+        // "chkNegativo": false,
+        // "txtVih": "",
+        // "txtColorEf": "",
+        // "txtDensidadEf": "",
+        // "txtAspectoEf": "",
+        // "txtPhEf": "",
+        // "txtNitritosEq": "",
+        // "txtProteinasEq": "",
+        // "txtCetonasEq": "",
+        // "txtLeucocitosEq": "",
+        // "txtUrobilinogenoEq": "",
+        // "txtBilirrubinaEq": "",
+        // "txtGlucosaEq": "",
+        // "txtSangreEq": "",
+        // "txtLeucocitosSu": "",
+        // "txtCelEpitelialesSu": "",
+        // "txtCilindrosSu": "",
+        // "txtBacteriasSu": "",
+        // "txtHematiesSu": "",
+        // "txtCristalesSu": "",
+        // "txtPusSu": "",
+        // "txtOtrosSu": "",
+        // "txtCocaina": "",
+        // "txtMarihuana": "",
+        // "txtObservacionesLb": "",
+        // "resLab": "",
+        // "txtPlaquetas": "",
+        // "txtAcAscorbico": "",
+
+        userMedicoOcup: "",
         userRegistro: user,
 
         usuarioFirma: form.user_medicoFirma,

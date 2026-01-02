@@ -1,0 +1,42 @@
+{
+  "nombres": "string",
+  "fecha": "2026-01-02",
+  "sede": "string",
+  "codAb": 0,
+  "txtCreatinina": "string",
+  "txtColesterol": "string",
+  "txtLdlColesterol": "string",
+  "txtHdlColesterol": "string",
+  "txtVldlColesterol": "string",
+  "txtTrigliseridos": "string",
+  "txtReponsable": "string",
+  "dniPaciente": 0,
+  "sexoPaciente": "string",
+  "fechaNacimientoPaciente": "2026-01-02",
+  "ocupacionPaciente": "string",
+  "lugarNacimientoPaciente": "string",
+  "nivelEstudioPaciente": "string",
+  "estadoCivilPaciente": "string",
+  "cargoPaciente": "string",
+  "areaPaciente": "string",
+  "nombreExamen": "string",
+  "codigoClinica": "string",
+  "edadPaciente": "string",
+  "empresa": "string",
+  "contrata": "string",
+  "glucBasal": "string",
+  "usuarioFirma": "string",
+  "fechaRegistro": "2026-01-02",
+  "userMedicoOcup": "string",
+  "color": 0,
+  "textoColor": "string",
+  "codigoColor": "string",
+  "nameJasper": "string",
+  "digitalizacion": [
+    {
+      "nombreDigitalizacion": "string",
+      "url": "string"
+    }
+  ],
+  "norden": 0
+}

@@ -9,9 +9,8 @@ import {
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
-const obtenerReporteUrl = "/api/v01/ct/laboratorio/reporteAnalisisBioquimico";
-const registrarUrl = "/api/v01/ct/laboratorio/registrarActualizarAnalisisBioquimico";
-
+const obtenerReporteUrl = "/api/v01/ct/analisisBioquimico/obtenerReporteGlucosaBasal";
+const registrarUrl = "/api/v01/ct/analisisBioquimico/registrarActualizarGlucosaBasal";
 
 export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
     const res = await GetInfoServicioDefault(
@@ -51,7 +50,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             vldl: res.txtVldlColesterol !== undefined && res.txtVldlColesterol !== null && res.txtVldlColesterol !== '' ? (parseFloat(res.txtVldlColesterol).toFixed(2)) : '',
             trigliceridos: res.txtTrigliseridos ?? "",
 
-            examenDirecto: res.colesterolTotal != "",
+            examenDirecto: res.glucBasal == "",
 
             user_medicoFirma: res.usuarioFirma,
         }));
@@ -65,7 +64,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     }
 
     const body = {
-        codAb: form.codAb ? form.codAb : null,
+        codAb: form.codAb,
         fechaAb: form.fecha,
         txtColesterol: form.colesterolTotal,
         txtLdlColesterol: form.ldl,
@@ -76,6 +75,11 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
         userRegistro: user,
         userMedicoOcup: "",
         nOrden: form.norden,
+
+        numTicket: 0,
+        txtReponsable: user,
+        txtCreatinina: "",
+        fechaRegistro: form.fecha,
 
         usuarioFirma: form.user_medicoFirma,
     };

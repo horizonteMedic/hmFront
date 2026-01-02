@@ -1,0 +1,41 @@
+{
+  "dniPaciente": 0,
+  "nombresPaciente": "string",
+  "apellidosPaciente": "string",
+  "nombreCompleto": "string",
+  "edadPaciente": "string",
+  "sexoPaciente": "string",
+  "fechaNacimientoPaciente": "2026-01-02",
+  "lugarNacimiento": "string",
+  "estadoCivil": "string",
+  "nivelEstudio": "string",
+  "ocupacion": "string",
+  "direccionPaciente": "string",
+  "empresa": "string",
+  "contrata": "string",
+  "cargoPaciente": "string",
+  "areaPaciente": "string",
+  "tipoExamen": "string",
+  "fechaApertura": "2026-01-02",
+  "codigoClinica": "string",
+  "fechaExamen": "2026-01-02",
+  "muestra": "string",
+  "examen": "string",
+  "metodo": "string",
+  "vdrl": "string",
+  "usuarioFirma": "string",
+  "fechaRegistro": "2026-01-02",
+  "nombreSede": "string",
+  "sede": "string",
+  "color": 0,
+  "nameJasper": "string",
+  "textoColor": "string",
+  "codigoColor": "string",
+  "digitalizacion": [
+    {
+      "nombreDigitalizacion": "string",
+      "url": "string"
+    }
+  ],
+  "norden": 0
+}
