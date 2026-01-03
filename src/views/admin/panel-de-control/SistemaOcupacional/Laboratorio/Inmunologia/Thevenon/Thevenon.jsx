@@ -6,7 +6,8 @@ import { PrintHojaR, VerifyTR, SubmitDataService } from "./controllerThevenon";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
 
-const tabla = "";
+const tabla = "thevenon";
+
 const colorOptions = ["Marrón", "Mostaza", "Verdoso"];
 const consistenciaOptions = ["Sólido", "Semisólido", "Diarreico"];
 const presenceOptions = ["Ausente", "Presente"];

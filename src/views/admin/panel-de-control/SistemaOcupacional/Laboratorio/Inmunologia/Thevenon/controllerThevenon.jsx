@@ -9,10 +9,8 @@ import {
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
-const obtenerReporteUrl =
-    "";
-const registrarUrl =
-    "";
+const obtenerReporteUrl = "/api/v01/ct/inmunologia/obtenerReporteThevenon";
+const registrarUrl = "/api/v01/ct/inmunologia/registrarActualizarThevenon";
 
 export const GetInfoServicio = async (
     nro,
@@ -32,25 +30,29 @@ export const GetInfoServicio = async (
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
-            fecha: res.fecha,
+            fecha: res.fechaExamen,
 
-            nombreExamen: res.nombreExamen ?? "",
-            dni: res.dni ?? "",
+            nombreExamen: res.tipoExamen ?? "",
+            dni: res.dniPaciente ?? "",
 
-            nombres: res.nombres ?? "",
+            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-            edad: res.edad ?? "",
+            lugarNacimiento: res.lugarNacimiento ?? "",
+            edad: res.edadPaciente ?? "",
             sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
-            estadoCivil: res.estadoCivilPaciente,
-            nivelEstudios: res.nivelEstudioPaciente,
+            estadoCivil: res.estadoCivil,
+            nivelEstudios: res.nivelEstudio,
             // Datos Laborales
             empresa: res.empresa,
             contrata: res.contrata,
-            ocupacion: res.ocupacionPaciente,
+            ocupacion: res.ocupacion,
             cargoDesempenar: res.cargoPaciente,
 
-
+            muestra: res.muestra ?? "",
+            color: res.colorExamen ?? "",
+            consistencia: res.consistencia ?? "",
+            sangrev: res.sangreVisible ?? "",
+            resultado: res.resultadoThevenon ?? "",
 
             user_medicoFirma: res.usuarioFirma,
         }));
@@ -71,10 +73,17 @@ export const SubmitDataService = async (
 
     const body = {
         norden: form.norden,
-        fecha: form.fecha,
+        fechaExamen: form.fecha,
+        fechaRegistro: form.fecha,
 
-        user_registro: user,
+        muestra: form.muestra,
+        color: form.color,
+        aspecto: form.consistencia,
+        sangreVisible: form.sangrev,
+        resultadoThevenon: form.resultado,
 
+        userRegistro: user,
+        userActualizacion: user,
         usuarioFirma: form.user_medicoFirma,
     };
 
