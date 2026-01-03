@@ -4,6 +4,7 @@ import { convertirGenero } from "../../../utils/helpers.js";
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import footerTR from '../../components/footerTR.jsx';
 import drawColorBox from '../../components/ColorBox.jsx';
+import { dibujarFirmas } from '../../../utils/dibujarFirmas.js';
 
 export default async function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -112,23 +113,23 @@ export default async function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}
   doc.text(datosReales.fechaNacimiento || "", tablaInicioX + col1W + col2W + col3W + 22, yPos + 4);
   yPos += filaAltura;
 
-  // Fila 3: Puesto de Trabajo y Área de Trabajo (2 columnas)
-  const col2MitadW = 95;
-  doc.rect(tablaInicioX, yPos, col2MitadW, filaAltura, 'S');
-  doc.rect(tablaInicioX + col2MitadW, yPos, col2MitadW, filaAltura, 'S');
-
+  // Fila 3: Puesto de Trabajo
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Puesto de Trabajo:", tablaInicioX + 2, yPos + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosReales.puestoTrabajo || "", tablaInicioX + 32, yPos + 4);
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Área de Trabajo:", tablaInicioX + col2MitadW + 2, yPos + 4);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosReales.areaTrabajo || "", tablaInicioX + col2MitadW + 30, yPos + 4);
   yPos += filaAltura;
 
-  // Fila 4: Empresa
+  // Fila 4: Área de Trabajo
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Área de Trabajo:", tablaInicioX + 2, yPos + 4);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosReales.areaTrabajo || "", tablaInicioX + 30, yPos + 4);
+  yPos += filaAltura;
+
+  // Fila 5: Empresa
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Empresa:", tablaInicioX + 2, yPos + 4);
@@ -136,7 +137,7 @@ export default async function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}
   doc.text(datosReales.empresa || "", tablaInicioX + 20, yPos + 4);
   yPos += filaAltura;
 
-  // Fila 5: Contrata
+  // Fila 6: Contrata
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Contratista:", tablaInicioX + 2, yPos + 4);
@@ -244,31 +245,52 @@ export default async function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}
   // === SECCIÓN III: ANÁLISIS FODA ===
   yPos = dibujarHeaderSeccion("III. ANÁLISIS FODA", yPos, filaAltura);
 
-  // Fila 1: Fortalezas / Oportunidades
-  const alturaFila1 = calcularAlturaTexto(datosAdicionales.fortalezasOportunidades, tablaAncho - 4);
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila1);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFila1);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaFila1, tablaInicioX + tablaAncho, yPos + alturaFila1);
-
+  // Fila: FORTALEZAS / OPORTUNIDADES (con altura dinámica)
+  const paddingVertical = 2; // Padding arriba y abajo
+  const anchoLabel = 58;
+  const anchoValor = tablaAncho - anchoLabel - 4;
+  const textoFortalezas = datosAdicionales.fortalezasOportunidades || "-";
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  const lineasFortalezas = doc.splitTextToSize(textoFortalezas, anchoValor);
+  const alturaFortalezas = Math.max(filaAltura, lineasFortalezas.length * 3.5 + paddingVertical * 2);
+  
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaFortalezas, 'S');
+  doc.line(tablaInicioX + anchoLabel, yPos, tablaInicioX + anchoLabel, yPos + alturaFortalezas);
+  
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Fortalezas / Oportunidades:", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosAdicionales.fortalezasOportunidades, tablaInicioX + 2, yPos + 7, tablaAncho - 4);
-  yPos += alturaFila1;
+  doc.text("FORTALEZAS / OPORTUNIDADES:", tablaInicioX + 2, yPos + paddingVertical + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  if (lineasFortalezas.length === 1) {
+    doc.text(lineasFortalezas[0], tablaInicioX + anchoLabel + 2, yPos + paddingVertical + 3.5);
+  } else {
+    const yInicioTexto = yPos + paddingVertical + 3.5;
+    lineasFortalezas.forEach((linea, lineIdx) => {
+      doc.text(linea, tablaInicioX + anchoLabel + 2, yInicioTexto + (lineIdx * 3.5));
+    });
+  }
+  yPos += alturaFortalezas;
 
-  // Fila 2: Amenazas / Debilidades
-  const alturaFila2 = calcularAlturaTexto(datosAdicionales.amenazasDebilidades, tablaAncho - 4);
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila2);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFila2);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaFila2, tablaInicioX + tablaAncho, yPos + alturaFila2);
-
+  // Fila: AMENAZAS / DEBILIDADES (con altura dinámica)
+  const textoAmenazas = datosAdicionales.amenazasDebilidades || "-";
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  const lineasAmenazas = doc.splitTextToSize(textoAmenazas, anchoValor);
+  const alturaAmenazas = Math.max(filaAltura, lineasAmenazas.length * 3.5 + paddingVertical * 2);
+  
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaAmenazas, 'S');
+  doc.line(tablaInicioX + anchoLabel, yPos, tablaInicioX + anchoLabel, yPos + alturaAmenazas);
+  
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Amenazas / Debilidades:", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosAdicionales.amenazasDebilidades, tablaInicioX + 2, yPos + 7, tablaAncho - 4);
-  yPos += alturaFila2;
+  doc.text("AMENAZAS / DEBILIDADES:", tablaInicioX + 2, yPos + paddingVertical + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  if (lineasAmenazas.length === 1) {
+    doc.text(lineasAmenazas[0], tablaInicioX + anchoLabel + 2, yPos + paddingVertical + 3.5);
+  } else {
+    const yInicioTexto = yPos + paddingVertical + 3.5;
+    lineasAmenazas.forEach((linea, lineIdx) => {
+      doc.text(linea, tablaInicioX + anchoLabel + 2, yInicioTexto + (lineIdx * 3.5));
+    });
+  }
+  yPos += alturaAmenazas;
 
   // === SECCIÓN IV: OBSERVACIONES ===
   yPos = dibujarHeaderSeccion("IV. OBSERVACIONES", yPos, filaAltura);
@@ -287,23 +309,15 @@ export default async function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}
   // === SECCIÓN V: RECOMENDACIONES ===
   yPos = dibujarHeaderSeccion("V. RECOMENDACIONES", yPos, filaAltura);
 
-  // Ancho para la firma a la derecha
-  const anchoFirma = 60;
-  const anchoRecomendaciones = tablaAncho - anchoFirma - 2; // Ancho disponible para recomendaciones
-  
   // Calcular altura necesaria (con padding igual que OBSERVACIONES)
   const padding = 3;
   let alturaRecomendaciones = 20;
   if (datosAdicionales.recomendaciones && datosAdicionales.recomendaciones.trim().length > 0) {
     doc.setFont("helvetica", "normal").setFontSize(8);
-    const lineas = doc.splitTextToSize(datosAdicionales.recomendaciones, anchoRecomendaciones - 4);
+    const lineas = doc.splitTextToSize(datosAdicionales.recomendaciones, tablaAncho - 4);
     const alturaTexto = lineas.length * 3.5;
     alturaRecomendaciones = Math.max(20, alturaTexto + padding * 2); // padding arriba y abajo
   }
-  
-  // Asegurar altura mínima para la firma
-  const alturaMinimaFirma = 25;
-  alturaRecomendaciones = Math.max(alturaRecomendaciones, alturaMinimaFirma);
   
   // Dibujar borde
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRecomendaciones);
@@ -311,83 +325,11 @@ export default async function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaRecomendaciones, tablaInicioX + tablaAncho, yPos + alturaRecomendaciones);
   
-  // Línea divisoria entre recomendaciones y firma
-  doc.line(tablaInicioX + anchoRecomendaciones, yPos, tablaInicioX + anchoRecomendaciones, yPos + alturaRecomendaciones);
-  
   // Dibujar recomendaciones (con padding arriba igual que OBSERVACIONES)
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosAdicionales.recomendaciones, tablaInicioX + 2, yPos + padding + 2, anchoRecomendaciones - 4);
+  dibujarTextoConSaltoLinea(datosAdicionales.recomendaciones, tablaInicioX + 2, yPos + padding + 2, tablaAncho - 4);
 
-  // Guardar yPos para después de las recomendaciones
-  const yPosDespuesRecomendaciones = yPos + alturaRecomendaciones;
-
-  // Firma del médico - dentro de la misma fila, al lado derecho
-  const digitalizacion = data.digitalizacion || [];
-  const sello1 = digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  const sello2 = digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
-  const isValidUrl = url => url && url !== "Sin registro";
-
-  const loadImg = src =>
-    new Promise((res, rej) => {
-      const img = new Image();
-      img.src = src;
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const maxWidth = 800;
-        let width = img.width;
-        let height = img.height;
-
-        if (width > maxWidth) {
-          height = (height * maxWidth) / width;
-          width = maxWidth;
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, width, height);
-        ctx.drawImage(img, 0, 0, width, height);
-        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
-        res(compressedDataUrl);
-      };
-      img.onerror = () => rej(`No se pudo cargar ${src}`);
-    });
-
-  try {
-    const [s1, s2] = await Promise.all([
-      isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
-      isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-    ]);
-
-    const sigW = 48;
-    const sigH = 20;
-    const sigY = yPos + (alturaRecomendaciones / 2) - (sigH / 2); // Centrar verticalmente
-    const gap = 16;
-    const xInicioFirma = tablaInicioX + anchoRecomendaciones + 2; // Posición X de la firma
-    const centroXFirma = xInicioFirma + (anchoFirma / 2); // Centro de la columna de firma
-
-    if (s1 && s2) {
-      // Dos sellos lado a lado
-      const totalWidth = sigW * 2 + gap;
-      const startX = centroXFirma - totalWidth / 2;
-      doc.addImage(s1, 'JPEG', startX, sigY, sigW, sigH);
-      doc.addImage(s2, 'JPEG', startX + sigW + gap, sigY, sigW, sigH);
-    } else if (s1) {
-      // Un solo sello centrado
-      const imgX = centroXFirma - sigW / 2;
-      doc.addImage(s1, 'JPEG', imgX, sigY, sigW, sigH);
-    } else if (s2) {
-      // Un solo sello centrado
-      const imgX = centroXFirma - sigW / 2;
-      doc.addImage(s2, 'JPEG', imgX, sigY, sigW, sigH);
-    }
-  } catch (err) {
-    console.error("Error al cargar firma del médico:", err);
-  }
-
-  yPos = yPosDespuesRecomendaciones;
+  yPos += alturaRecomendaciones;
 
   // === SECCIÓN VI: CONCLUSIONES ===
   yPos = dibujarHeaderSeccion("VI. CONCLUSIONES", yPos, filaAltura);
@@ -411,6 +353,22 @@ export default async function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(!datosAdicionales.apto ? "X" : "", tablaInicioX + colAptoW * 3 + colAptoW / 2, yPos + 4, { align: "center" });
   yPos += filaAltura;
+
+  // === SECCIÓN VII: FIRMA ===
+  const pageHeight = doc.internal.pageSize.getHeight();
+  if (yPos + 30 > pageHeight - 20) {
+    doc.addPage();
+    yPos = 35;
+  }
+
+  // Dibujar sección de firma con borde
+  const alturaSeccionFirma = 30;
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaSeccionFirma, 'S');
+
+  // Usar la función dibujarFirmas para dibujar las firmas
+  await dibujarFirmas({ doc, datos: data, y: yPos + 2, pageW });
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 5 });

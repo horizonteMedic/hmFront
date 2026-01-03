@@ -37,6 +37,7 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
       recomendaciones: String(raw?.recomendaciones ?? ''),
       interpretacionParanoide: String(raw?.interpretacionParainoide ?? ''),
       cumplePerfil: (typeof raw?.perfilCumple === 'boolean') ? raw.perfilCumple : (raw?.perfilCumple === true || raw?.perfilCumple === 'true' || raw?.perfilCumple === 1),
+      noCumplePerfil: (typeof raw?.perfilNoCumple === 'boolean') ? raw.perfilNoCumple : (raw?.perfilNoCumple === true || raw?.perfilNoCumple === 'true' || raw?.perfilNoCumple === 1),
       digitalizacion: raw?.digitalizacion ?? [],
     };
     return datosFinales;
@@ -513,36 +514,33 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
   yPos += filaAltura;
 
   // Fila de CUMPLE / NO CUMPLE CON EL PERFIL (4 columnas)
-  // Estructura: CUMPLE CON EL PERFIL | X | NO CUMPLE CON EL PERFIL | (vacía)
-  const colXW = 15; // Ancho para columna de X
-  const colVaciaW = 15; // Ancho para columna vacía
-  const colTextoW = (tablaAncho - colXW - colVaciaW) / 2; // Ancho para columnas de texto
+  // Estructura: CUMPLE CON EL PERFIL | (vacía) | NO CUMPLE CON EL PERFIL | (vacía)
+  const colTextoW = (tablaAncho - 30) / 2; // Ancho para columnas de texto
+  const colVaciaW = 15; // Ancho para columnas vacías
   
   // Dibujar las 4 columnas
   doc.rect(tablaInicioX, yPos, colTextoW, filaAltura, 'S'); // Columna 1: CUMPLE CON EL PERFIL
-  doc.rect(tablaInicioX + colTextoW, yPos, colXW, filaAltura, 'S'); // Columna 2: X
-  doc.rect(tablaInicioX + colTextoW + colXW, yPos, colTextoW, filaAltura, 'S'); // Columna 3: NO CUMPLE CON EL PERFIL
-  doc.rect(tablaInicioX + colTextoW * 2 + colXW, yPos, colVaciaW, filaAltura, 'S'); // Columna 4: Vacía
+  doc.rect(tablaInicioX + colTextoW, yPos, colVaciaW, filaAltura, 'S'); // Columna 2: Vacía
+  doc.rect(tablaInicioX + colTextoW + colVaciaW, yPos, colTextoW, filaAltura, 'S'); // Columna 3: NO CUMPLE CON EL PERFIL
+  doc.rect(tablaInicioX + colTextoW * 2 + colVaciaW, yPos, colVaciaW, filaAltura, 'S'); // Columna 4: Vacía
 
-  const cumplePerfil = datosFinales.cumplePerfil ?? true;
-  
-  // Columna 1: CUMPLE CON EL PERFIL
+  // Texto en las columnas
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("CUMPLE CON EL PERFIL", tablaInicioX + colTextoW / 2, yPos + 4, { align: "center" });
-  
-  // Columna 2: X (si cumple)
+  const centroVertical = yPos + filaAltura / 2 + 1; // Centro vertical de la celda
+  doc.text("CUMPLE CON EL PERFIL", tablaInicioX + colTextoW / 2, centroVertical, { align: "center" });
+  doc.text("NO CUMPLE CON EL PERFIL", tablaInicioX + colTextoW + colVaciaW + colTextoW / 2, centroVertical, { align: "center" });
+
+  // Marcar X según cumplePerfil o noCumplePerfil (en las columnas vacías)
+  const cumplePerfil = datosFinales.cumplePerfil ?? false;
+  const noCumplePerfil = datosFinales.noCumplePerfil ?? false;
+  doc.setFont("helvetica", "bold").setFontSize(12);
   if (cumplePerfil) {
-    doc.setFont("helvetica", "bold").setFontSize(10);
-    doc.setTextColor(0, 51, 204); // #0033cc
-    doc.text("X", tablaInicioX + colTextoW + colXW / 2, yPos + 4, { align: "center" });
-    doc.setTextColor(0, 0, 0);
+    // Marcar X en la columna vacía después de CUMPLE (columna 2)
+    doc.text("X", tablaInicioX + colTextoW + colVaciaW / 2, centroVertical, { align: "center" });
+  } else if (noCumplePerfil) {
+    // Marcar X en la columna vacía después de NO CUMPLE (columna 4)
+    doc.text("X", tablaInicioX + colTextoW * 2 + colVaciaW + colVaciaW / 2, centroVertical, { align: "center" });
   }
-  
-  // Columna 3: NO CUMPLE CON EL PERFIL
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("NO CUMPLE CON EL PERFIL", tablaInicioX + colTextoW + colXW + colTextoW / 2, yPos + 4, { align: "center" });
-  
-  // Columna 4: Vacía
   
   yPos += filaAltura;
 

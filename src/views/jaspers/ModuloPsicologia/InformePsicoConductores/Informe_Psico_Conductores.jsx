@@ -4,6 +4,7 @@ import { formatearFechaCorta } from "../../../utils/formatDateUtils.js";
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import { convertirGenero } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
+import { dibujarFirmas } from '../../../utils/dibujarFirmas.js';
 
 export default function InformePsicoConductores(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -177,9 +178,9 @@ export default function InformePsicoConductores(data = {}, docExistente = null) 
     // Dibujar borde
     doc.rect(tablaInicioX, y, tablaAncho, alturaFinal, 'S');
     
-    // Dibujar texto
+    // Dibujar texto justificado
     lineas.forEach((linea, idx) => {
-      doc.text(linea, x + 2, y + padding + 2 + (idx * 3.5));
+      doc.text(linea, x + 2, y + padding + 2 + (idx * 3.5), { align: "justify", maxWidth: anchoMaximo - 4 });
     });
     
     return y + alturaFinal;
@@ -193,6 +194,7 @@ export default function InformePsicoConductores(data = {}, docExistente = null) 
   const tablaAncho = 200;
   let yPos = 35;
   const filaAltura = 5;
+  const paddingVertical = 2; // Padding vertical para secciones con texto dinámico
 
   // Header de datos de filiación
   yPos = dibujarHeaderSeccion("I. DATOS DE FILIACIÓN", yPos, filaAltura);
@@ -405,21 +407,51 @@ export default function InformePsicoConductores(data = {}, docExistente = null) 
 
   yPos = dibujarHeaderSeccion("III. ANÁLISIS FODA", yPos, filaAltura);
 
-  // Fila: FORTALEZAS / OPORTUNIDADES
-  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("FORTALEZAS / OPORTUNIDADES:", tablaInicioX + 2, yPos + 3.5);
+  // Fila: FORTALEZAS / OPORTUNIDADES (con altura dinámica)
+  const anchoLabel = 58;
+  const anchoValor = tablaAncho - anchoLabel - 4;
+  const textoFortalezas = datosFinales.fortalezasOportunidades || "-";
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.fortalezasOportunidades || "-", tablaInicioX + 60, yPos + 3.5);
-  yPos += filaAltura;
+  const lineasFortalezas = doc.splitTextToSize(textoFortalezas, anchoValor);
+  const alturaFortalezas = Math.max(filaAltura, lineasFortalezas.length * 3.5 + paddingVertical * 2);
+  
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaFortalezas, 'S');
+  doc.line(tablaInicioX + anchoLabel, yPos, tablaInicioX + anchoLabel, yPos + alturaFortalezas);
+  
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("FORTALEZAS / OPORTUNIDADES:", tablaInicioX + 2, yPos + paddingVertical + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  if (lineasFortalezas.length === 1) {
+    doc.text(lineasFortalezas[0], tablaInicioX + anchoLabel + 2, yPos + paddingVertical + 3.5);
+  } else {
+    const yInicioTexto = yPos + paddingVertical + 3.5;
+    lineasFortalezas.forEach((linea, lineIdx) => {
+      doc.text(linea, tablaInicioX + anchoLabel + 2, yInicioTexto + (lineIdx * 3.5));
+    });
+  }
+  yPos += alturaFortalezas;
 
-  // Fila: AMENAZAS / DEBILIDADES
-  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("AMENAZAS / DEBILIDADES:", tablaInicioX + 2, yPos + 3.5);
+  // Fila: AMENAZAS / DEBILIDADES (con altura dinámica)
+  const textoAmenazas = datosFinales.amenazasDebilidades || "-";
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.amenazasDebilidades || "-", tablaInicioX + 60, yPos + 3.5);
-  yPos += filaAltura;
+  const lineasAmenazas = doc.splitTextToSize(textoAmenazas, anchoValor);
+  const alturaAmenazas = Math.max(filaAltura, lineasAmenazas.length * 3.5 + paddingVertical * 2);
+  
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaAmenazas, 'S');
+  doc.line(tablaInicioX + anchoLabel, yPos, tablaInicioX + anchoLabel, yPos + alturaAmenazas);
+  
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("AMENAZAS / DEBILIDADES:", tablaInicioX + 2, yPos + paddingVertical + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  if (lineasAmenazas.length === 1) {
+    doc.text(lineasAmenazas[0], tablaInicioX + anchoLabel + 2, yPos + paddingVertical + 3.5);
+  } else {
+    const yInicioTexto = yPos + paddingVertical + 3.5;
+    lineasAmenazas.forEach((linea, lineIdx) => {
+      doc.text(linea, tablaInicioX + anchoLabel + 2, yInicioTexto + (lineIdx * 3.5));
+    });
+  }
+  yPos += alturaAmenazas;
 
   // === SECCIÓN 4: OBSERVACIONES ===
   // Verificar si necesitamos nueva página
@@ -468,39 +500,28 @@ export default function InformePsicoConductores(data = {}, docExistente = null) 
   // Procesar recomendaciones
   const itemsRecomendaciones = procesarRecomendaciones(datosFinales.recomendaciones);
   
-  // Ancho para la firma a la derecha
-  const anchoFirma = 60; // Ancho reservado para la firma
-  const anchoRecomendaciones = tablaAncho - anchoFirma - 2; // Ancho disponible para recomendaciones
-  
-  // Calcular altura necesaria
+  // Calcular altura necesaria con padding vertical
   let alturaRecomendaciones = 20;
   if (itemsRecomendaciones.length > 0) {
     let alturaTotal = 0;
     itemsRecomendaciones.forEach(item => {
-      const lineas = doc.splitTextToSize(item, anchoRecomendaciones - 4);
+      const lineas = doc.splitTextToSize(item, tablaAncho - 8);
       alturaTotal += lineas.length * 3.5 + 2;
     });
-    alturaRecomendaciones = Math.max(20, alturaTotal + 4);
+    alturaRecomendaciones = Math.max(20, alturaTotal + paddingVertical * 2 + 2);
   }
-  
-  // Asegurar altura mínima para la firma
-  const alturaMinimaFirma = 25;
-  alturaRecomendaciones = Math.max(alturaRecomendaciones, alturaMinimaFirma);
   
   // Dibujar borde
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaRecomendaciones, 'S');
   
-  // Línea divisoria entre recomendaciones y firma
-  doc.line(tablaInicioX + anchoRecomendaciones, yPos, tablaInicioX + anchoRecomendaciones, yPos + alturaRecomendaciones);
-  
-  // Dibujar recomendaciones
+  // Dibujar recomendaciones con texto justificado
   doc.setFont("helvetica", "normal").setFontSize(9);
-  let yRecomendaciones = yPos + 3;
+  let yRecomendaciones = yPos + paddingVertical + 3;
   itemsRecomendaciones.forEach(item => {
     const textoItem = item.trim().startsWith('-') ? item.trim() : '- ' + item.trim();
-    const lineas = doc.splitTextToSize(textoItem, anchoRecomendaciones - 4);
+    const lineas = doc.splitTextToSize(textoItem, tablaAncho - 8);
     lineas.forEach(linea => {
-      doc.text(linea, tablaInicioX + 2, yRecomendaciones);
+      doc.text(linea, tablaInicioX + 2, yRecomendaciones, { align: "justify", maxWidth: tablaAncho - 8 });
       yRecomendaciones += 3.5;
     });
   });
@@ -508,109 +529,65 @@ export default function InformePsicoConductores(data = {}, docExistente = null) 
   // Guardar yPos para después de las recomendaciones
   const yPosDespuesRecomendaciones = yPos + alturaRecomendaciones;
 
-  // Firma del médico (sin pie de firma) - dentro de la misma fila, al lado derecho
-  // Cargar sello del médico
-  const digitalizacion = data.digitalizacion || [];
-  const sello1 = digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  const sello2 = digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
-  const isValidUrl = url => url && url !== "Sin registro";
+  // === SECCIÓN 6: CUMPLE CON EL PERFIL ===
+  // Verificar si necesitamos nueva página
+  if (yPosDespuesRecomendaciones + 20 > pageHeight - 20) {
+    doc.addPage();
+    numeroPagina++;
+    yPos = 35;
+    drawHeader(numeroPagina);
+  } else {
+    yPos = yPosDespuesRecomendaciones;
+  }
 
-  const loadImg = src =>
-    new Promise((res, rej) => {
-      const img = new Image();
-      img.src = src;
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const maxWidth = 800;
-        let width = img.width;
-        let height = img.height;
+  yPos = dibujarHeaderSeccion("VI. CUMPLE CON EL PERFIL PARA EL PUESTO QUE POSTULA", yPos, filaAltura);
 
-        if (width > maxWidth) {
-          height = (height * maxWidth) / width;
-          width = maxWidth;
-        }
+  // Fila con 4 columnas: SI | (vacía) | NO | (vacía)
+  const colTextoW = (tablaAncho - 30) / 2; // Ancho para columnas de texto
+  const colVaciaW = 15; // Ancho para columnas vacías
 
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, width, height);
-        ctx.drawImage(img, 0, 0, width, height);
-        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
-        res(compressedDataUrl);
-      };
-      img.onerror = () => rej(`No se pudo cargar ${src}`);
-    });
+  // Dibujar las 4 columnas
+  doc.rect(tablaInicioX, yPos, colTextoW, filaAltura, 'S'); // Columna 1: SI
+  doc.rect(tablaInicioX + colTextoW, yPos, colVaciaW, filaAltura, 'S'); // Columna 2: Vacía
+  doc.rect(tablaInicioX + colTextoW + colVaciaW, yPos, colTextoW, filaAltura, 'S'); // Columna 3: NO
+  doc.rect(tablaInicioX + colTextoW * 2 + colVaciaW, yPos, colVaciaW, filaAltura, 'S'); // Columna 4: Vacía
 
-  Promise.all([
-    isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
-    isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-  ]).then(([s1, s2]) => {
-    const sigW = 48;
-    const sigH = 20;
-    const sigY = yPos + (alturaRecomendaciones / 2) - (sigH / 2); // Centrar verticalmente
-    const gap = 16;
-    const xInicioFirma = tablaInicioX + anchoRecomendaciones + 2; // Posición X de la firma
-    const centroXFirma = xInicioFirma + (anchoFirma / 2); // Centro de la columna de firma
+  // Texto en las columnas
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  const centroVertical = yPos + filaAltura / 2 + 1; // Centro vertical de la celda
+  doc.text("SI", tablaInicioX + colTextoW / 2, centroVertical, { align: "center" });
+  doc.text("NO", tablaInicioX + colTextoW + colVaciaW + colTextoW / 2, centroVertical, { align: "center" });
 
-    if (s1 && s2) {
-      // Dos sellos lado a lado
-      const totalWidth = sigW * 2 + gap;
-      const startX = centroXFirma - totalWidth / 2;
-      doc.addImage(s1, 'JPEG', startX, sigY, sigW, sigH);
-      doc.addImage(s2, 'JPEG', startX + sigW + gap, sigY, sigW, sigH);
-    } else if (s1) {
-      // Un solo sello centrado
-      const imgX = centroXFirma - sigW / 2;
-      doc.addImage(s1, 'JPEG', imgX, sigY, sigW, sigH);
-    } else if (s2) {
-      // Un solo sello centrado
-      const imgX = centroXFirma - sigW / 2;
-      doc.addImage(s2, 'JPEG', imgX, sigY, sigW, sigH);
-    }
+  // Marcar X según cumplePerfil (en las columnas vacías)
+  const cumplePerfil = datosFinales.cumplePerfil ?? true;
+  doc.setFont("helvetica", "bold").setFontSize(12);
+  if (cumplePerfil) {
+    // Marcar X en la columna vacía después de SI (columna 2) - centrada vertical y horizontalmente
+    doc.text("X", tablaInicioX + colTextoW + colVaciaW / 2, centroVertical, { align: "center" });
+  } else {
+    // Marcar X en la columna vacía después de NO (columna 4) - centrada vertical y horizontalmente
+    doc.text("X", tablaInicioX + colTextoW * 2 + colVaciaW + colVaciaW / 2, centroVertical, { align: "center" });
+  }
 
-    // === SECCIÓN 6: CUMPLE CON EL PERFIL ===
-    // Verificar si necesitamos nueva página
-    if (yPosDespuesRecomendaciones + 20 > pageHeight - 20) {
-      doc.addPage();
-      numeroPagina++;
-      yPos = 35;
-      drawHeader(numeroPagina);
-    } else {
-      yPos = yPosDespuesRecomendaciones;
-    }
+  yPos += filaAltura;
 
-    yPos = dibujarHeaderSeccion("VI. CUMPLE CON EL PERFIL PARA EL PUESTO QUE POSTULA", yPos, filaAltura);
+  // === SECCIÓN 7: FIRMA ===
+  // Verificar si necesitamos nueva página
+  if (yPos + 30 > pageHeight - 20) {
+    doc.addPage();
+    numeroPagina++;
+    yPos = 35;
+    drawHeader(numeroPagina);
+  }
 
-    // Fila con 4 columnas: SI | (vacía) | NO | (vacía)
-    const colTextoW = (tablaAncho - 30) / 2; // Ancho para columnas de texto
-    const colVaciaW = 15; // Ancho para columnas vacías
+  // Dibujar sección de firma con borde
+  const alturaSeccionFirma = 30;
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaSeccionFirma, 'S');
 
-    // Dibujar las 4 columnas
-    doc.rect(tablaInicioX, yPos, colTextoW, filaAltura, 'S'); // Columna 1: SI
-    doc.rect(tablaInicioX + colTextoW, yPos, colVaciaW, filaAltura, 'S'); // Columna 2: Vacía
-    doc.rect(tablaInicioX + colTextoW + colVaciaW, yPos, colTextoW, filaAltura, 'S'); // Columna 3: NO
-    doc.rect(tablaInicioX + colTextoW * 2 + colVaciaW, yPos, colVaciaW, filaAltura, 'S'); // Columna 4: Vacía
-
-    // Texto en las columnas
-    doc.setFont("helvetica", "bold").setFontSize(9);
-    doc.text("SI", tablaInicioX + colTextoW / 2, yPos + 3.5, { align: "center" });
-    doc.text("NO", tablaInicioX + colTextoW + colVaciaW + colTextoW / 2, yPos + 3.5, { align: "center" });
-
-    // Marcar X según cumplePerfil (en las columnas vacías)
-    const cumplePerfil = datosFinales.cumplePerfil ?? true;
-    doc.setFont("helvetica", "bold").setFontSize(12);
-    if (cumplePerfil) {
-      // Marcar X en la columna vacía después de SI (columna 2)
-      doc.text("X", tablaInicioX + colTextoW + colVaciaW / 2, yPos + 3.5, { align: "center" });
-    } else {
-      // Marcar X en la columna vacía después de NO (columna 4)
-      doc.text("X", tablaInicioX + colTextoW * 2 + colVaciaW + colVaciaW / 2, yPos + 3.5, { align: "center" });
-    }
-
-    yPos += filaAltura;
-
+  // Usar la función dibujarFirmas para dibujar las firmas
+  dibujarFirmas({ doc, datos: data, y: yPos + 2, pageW }).then(() => {
     // === FOOTER ===
     footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
 
@@ -619,42 +596,8 @@ export default function InformePsicoConductores(data = {}, docExistente = null) 
       imprimir(doc);
     }
   }).catch(err => {
-    console.error("Error al cargar firma del médico:", err);
+    console.error("Error al cargar firmas:", err);
     
-    // Continuar con la sección VI aunque falle la carga de la firma
-    // === SECCIÓN 6: CUMPLE CON EL PERFIL ===
-    if (yPosDespuesRecomendaciones + 20 > pageHeight - 20) {
-      doc.addPage();
-      numeroPagina++;
-      yPos = 35;
-      drawHeader(numeroPagina);
-    } else {
-      yPos = yPosDespuesRecomendaciones;
-    }
-
-    yPos = dibujarHeaderSeccion("VI. CUMPLE CON EL PERFIL PARA EL PUESTO QUE POSTULA", yPos, filaAltura);
-
-    const colTextoW = (tablaAncho - 30) / 2;
-    const colVaciaW = 15;
-
-    doc.rect(tablaInicioX, yPos, colTextoW, filaAltura, 'S');
-    doc.rect(tablaInicioX + colTextoW, yPos, colVaciaW, filaAltura, 'S');
-    doc.rect(tablaInicioX + colTextoW + colVaciaW, yPos, colTextoW, filaAltura, 'S');
-    doc.rect(tablaInicioX + colTextoW * 2 + colVaciaW, yPos, colVaciaW, filaAltura, 'S');
-
-    doc.setFont("helvetica", "bold").setFontSize(9);
-    doc.text("SI", tablaInicioX + colTextoW / 2, yPos + 3.5, { align: "center" });
-    doc.text("NO", tablaInicioX + colTextoW + colVaciaW + colTextoW / 2, yPos + 3.5, { align: "center" });
-
-    // Marcar X según cumplePerfil (en las columnas vacías)
-    const cumplePerfil = datosFinales.cumplePerfil ?? true;
-    doc.setFont("helvetica", "bold").setFontSize(12);
-    if (cumplePerfil) {
-      doc.text("X", tablaInicioX + colTextoW + colVaciaW / 2, yPos + 3.5, { align: "center" });
-    } else {
-      doc.text("X", tablaInicioX + colTextoW * 2 + colVaciaW + colVaciaW / 2, yPos + 3.5, { align: "center" });
-    }
-
     // === FOOTER ===
     footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
     
