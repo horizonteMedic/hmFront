@@ -91,7 +91,6 @@ const AperturaExamenesPreOcup = (props) => {
     //Pagos
     tipoPago: "",
     fechaPago: todayyy,
-    formaPago: "",
     montoProtocolo: 0,
     montoAdicionales: 0,
     montoDescuento: 0,
@@ -523,6 +522,7 @@ const AperturaExamenesPreOcup = (props) => {
   const handleEdit = (value) => {
     getFetch(`/api/v01/ct/consentDigit/busquedaHistoriaOcupNOrden/${value.n_orden}`, props.token)
       .then((res) => {
+        console.log(res.detallePago.fechaPago)
         setDatos({
           ...res,
           nombresPa: res.nombres,
@@ -531,7 +531,12 @@ const AperturaExamenesPreOcup = (props) => {
           userRegistroDatos: res.usuarioRegistro ?? "",
           idProtocolo: res.protocolo,
           versionRegistroExamenes: res.examenesAdicionales.length > 0 ? res.examenesAdicionales[0].versionRegistro : 0,
-          versionRegistroPago: res.detallePago.length > 0 ? res.detallePago[0].versionRegistro : 0
+          //Pagos
+          fechaPago: res.detallePago.fechaPago,
+          montoProtocolo: res.detallePago.montoProtocolo,
+          montoAdicionales: res.detallePago.montoAdicionales,
+          montoTotal: res.detallePago.montoTotal,
+          versionRegistroPago: res.detallePago.versionRegistro
         });
         setSearchEmpresa(res.razonEmpresa || "");
         setSearchContrata(res.razonContrata || "")
@@ -543,6 +548,7 @@ const AperturaExamenesPreOcup = (props) => {
         setSearchProtocolo(res.nombreProtocolo || "")
         // Guardar exámenes originales para comparación posterior
         setOriginalExams(res.examenesAdicionales || []);
+        setOriginalPago(res.detallePago || {});
       })
 
     setRegister(false)
@@ -680,8 +686,6 @@ const AperturaExamenesPreOcup = (props) => {
       nomEx: "",
       mineralPo: "",
       alturaPo: "",
-      precioPo: "",
-      tipoPago: "",
       precioAdic: "",
       autoriza: "",
       fechaAperturaPo: format(today, 'dd/MM/yyyy'),
@@ -707,6 +711,13 @@ const AperturaExamenesPreOcup = (props) => {
       examenesAdicionales: [],
       protocolo: "",
       idProtocolo: "",
+      //Pagos
+      tipoPago: "",
+      fechaPago: todayyy,
+      montoProtocolo: 0,
+      montoAdicionales: 0,
+      montoDescuento: 0,
+      precioPo: "",
       nombres: "",
       apellidos: "",
       userRegistroDatos: "",
@@ -1071,7 +1082,6 @@ const AperturaExamenesPreOcup = (props) => {
       examenesAdicionales: prev.examenesAdicionales.filter(ex => ex.id ? ex.id : ex.idExamen !== id)
     }));
   };
-  console.log(datos)
   return (
     <div >
       <div className="grid md:grid-cols-2 sm:flex-col gap-5 px-4">

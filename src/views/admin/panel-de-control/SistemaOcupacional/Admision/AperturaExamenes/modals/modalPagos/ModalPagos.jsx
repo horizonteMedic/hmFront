@@ -53,7 +53,6 @@ const ModalPagos = ({ close, datos, set, ListFormaPago }) => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000)
         return () => clearInterval(timer)
     }, [])
-
     // Auto-calculate total when montoProtocolo or montoAdicionales change
     useEffect(() => {
         const protocolo = parseFloat(datos.montoProtocolo) || 0

@@ -1,5 +1,13 @@
 import { URLAzure } from "../../../../../config/config";
 import { getHoraActual } from "../../../../../utils/helpers";
+import { parseMoney } from "../../../../../utils/listUtils";
+const FIELDS_TO_COMPARE = [
+  'montoAdicionales',
+  'montoProtocolo',
+  'montoTotal',
+  'fechaPago',
+  'formaPago',
+];
 
 export function SubmitHistoriaC(data, sede, token, operacion, originalExams = [], originalPago = {}) {
 
@@ -30,6 +38,21 @@ export function SubmitHistoriaC(data, sede, token, operacion, originalExams = []
   if (data.versionRegistroPago && Number(data.versionRegistroPago) > 0) {
     versionPago = Number(data.versionRegistroPago) + 1;
   }
+
+  const hasPagoChanges = (current, original) => {
+    if (!original) return true;
+
+    for (const field of FIELDS_TO_COMPARE) {
+      if (
+        (current[field] ?? null) !==
+        (original[field] ?? null)
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  };
 
 
 
@@ -88,14 +111,40 @@ export function SubmitHistoriaC(data, sede, token, operacion, originalExams = []
 
   //PAGO
   if (operacion === 2 && originalPago) {
+    const precioPo = parseMoney(data.precioPo)
+    const currentPago = {
+      montoAdicionales: Number(data.montoAdicionales) ?? 0,
+      montoProtocolo: Number(data.montoProtocolo) ?? 0,
+      montoTotal: Number(precioPo) ?? 0,
+      fechaPago: data.fechaPago,
+      formaPago: data.tipoPago,
+    };
+    const pagoChanged = hasPagoChanges(currentPago, originalPago);
+    if (pagoChanged) {
+      // HAY cambios → nueva versión
+      pagoBody = {
+        versionRegistro: versionPago,
+        montoAdicionales: currentPago.montoAdicionales,
+        montoProtocolo: currentPago.montoProtocolo,
+        montoTotal: currentPago.montoTotal,
+        fechaPago: currentPago.fechaPago,
+        horaPago: getHoraActual(),
+        formaPago: currentPago.formaPago,
+        usuarioRegistro: data.user_registro,
+        estado: true,
+      };
 
+    } else {
+      // NO hay cambios → reenviar original
+      pagoBody = null
+    }
   } else {
     pagoBody = {
       versionRegistro: versionPago,
-      montoAdicionales: data.montoAdicionales ?? 0,
-      montoProtocolo: data.montoProtocolo ?? 0,
-      montoTotal: data.precioPo ?? 0,
-      fechaPago: fechaFormateada,
+      montoAdicionales: Number(data.montoAdicionales) ?? 0,
+      montoProtocolo: Number(data.montoProtocolo) ?? 0,
+      montoTotal: Number(data.precioPo) ?? 0,
+      fechaPago: data.fechaPago,
       horaPago: getHoraActual(),
       formaPago: data.tipoPago,
       usuarioRegistro: data.user_registro,
@@ -212,7 +261,6 @@ export function SubmitHistoriaC(data, sede, token, operacion, originalExams = []
       return res
     } return res.json()
   }).then(response => response)
-
 }
 
 export function GetHistoriaC(data, sede, token) {

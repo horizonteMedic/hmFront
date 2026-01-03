@@ -58,6 +58,8 @@ export const usePagination = (data = [], initialRecordsPerPage = 10) => {
     setCurrentPage(1); // Reiniciar a la primera página
   };
 
+
+
   return {
     currentPage,
     setCurrentPage,
@@ -70,4 +72,19 @@ export const usePagination = (data = [], initialRecordsPerPage = 10) => {
   };
 };
 
+export const parseMoney = (value) => {
+  if (value === null || value === undefined) return 0;
 
+  let cleaned = String(value).replace(/[^0-9.]/g, '');
+
+  const parts = cleaned.split('.');
+  if (parts.length > 1) {
+    cleaned =
+      parts.slice(0, -1).join('') + '.' + parts[parts.length - 1];
+  }
+
+  const number = Number(cleaned);
+  return Number.isFinite(number)
+    ? Number(number.toFixed(2))
+    : 0;
+};
