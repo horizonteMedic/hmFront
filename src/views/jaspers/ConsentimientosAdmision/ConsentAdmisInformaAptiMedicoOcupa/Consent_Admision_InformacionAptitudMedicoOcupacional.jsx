@@ -29,16 +29,16 @@ export default async function ConsentAdmisionInformacionAptitudMedicoOcupacional
   function buildDatosFinales(raw) {
     const datosFinales = {
       apellidosNombres: String(((raw?.apellidosPaciente ?? datosPrueba.apellidosPaciente) + ' ' + (raw?.nombresPaciente ?? datosPrueba.nombresPaciente)).trim()),
-      fechaExamen: formatearFechaCorta(raw?.fechaRegistro ?? raw?.fecha ?? datosPrueba.fechaRegistro),
-      documentoIdentidad: String(raw?.dniPaciente ?? raw?.dni ?? datosPrueba.dniPaciente),
-      edad: String(raw?.edadPaciente ?? raw?.edad ?? datosPrueba.edadPaciente),
-      puestoTrabajo: String(raw?.cargoPaciente ?? raw?.ocupacion ?? datosPrueba.cargoPaciente),
+      fechaExamen: formatearFechaCorta(raw?.fechaRegistro ?? datosPrueba.fechaRegistro),
+      documentoIdentidad: String(raw?.dniPaciente ?? datosPrueba.dniPaciente),
+      edad: String(raw?.edadPaciente ?? datosPrueba.edadPaciente),
+      puestoTrabajo: String(raw?.cargoPaciente ?? datosPrueba.cargoPaciente),
       empresa: String(raw?.empresa ?? datosPrueba.empresa),
       sede: String(raw?.sede ?? raw?.nombreSede ?? datosPrueba.sede),
       numeroFicha: String(raw?.norden ?? datosPrueba.norden),
       codigoColor: String(raw?.codigoColor ?? datosPrueba.codigoColor),
       textoColor: String(raw?.textoColor ?? datosPrueba.textoColor),
-      tipoExamen: String(raw?.nombreExamen ?? raw?.tipoExamen ?? datosPrueba.nombreExamen),
+      tipoExamen: String(raw?.tipoExamen ?? datosPrueba.nombreExamen),
     };
     return datosFinales;
   }
@@ -62,8 +62,8 @@ export default async function ConsentAdmisionInformacionAptitudMedicoOcupacional
   };
 
   const fechaPrueba = datosPrueba.fechaRegistro;
-  const { dia, mes } = obtenerDiaYMes(data?.fechaRegistro ?? data?.fecha ?? fechaPrueba);
-  const anio = new Date(data?.fechaRegistro ?? data?.fecha ?? fechaPrueba).getFullYear() || '2025';
+  const { dia, mes } = obtenerDiaYMes(data?.fechaRegistro ?? fechaPrueba);
+  const anio = new Date(data?.fechaRegistro ?? fechaPrueba).getFullYear() || '2025';
 
   // Header
   const drawHeader = () => {

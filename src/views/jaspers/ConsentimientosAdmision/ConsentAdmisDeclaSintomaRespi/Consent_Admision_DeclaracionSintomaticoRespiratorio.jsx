@@ -28,10 +28,10 @@ export default async function ConsentAdmisionDeclaracionSintomaticoRespiratorio(
   function buildDatosFinales(raw) {
     const datosFinales = {
       apellidosNombres: String(((raw?.apellidosPaciente ?? datosPrueba.apellidosPaciente) + ' ' + (raw?.nombresPaciente ?? datosPrueba.nombresPaciente)).trim()),
-      fechaExamen: formatearFechaCorta(raw?.fechaRegistro ?? raw?.fecha ?? datosPrueba.fechaRegistro),
-      documentoIdentidad: String(raw?.dniPaciente ?? raw?.dni ?? datosPrueba.dniPaciente),
-      edad: String(raw?.edadPaciente ?? raw?.edad ?? datosPrueba.edadPaciente),
-      puestoTrabajo: String(raw?.cargoPaciente ?? raw?.ocupacion ?? datosPrueba.cargoPaciente),
+      fechaExamen: formatearFechaCorta(raw?.fechaRegistro ?? datosPrueba.fechaRegistro),
+      documentoIdentidad: String(raw?.dniPaciente ?? datosPrueba.dniPaciente),
+      edad: String(raw?.edadPaciente ?? datosPrueba.edadPaciente),
+      puestoTrabajo: String(raw?.cargoPaciente ?? datosPrueba.cargoPaciente),
       empresa: String(raw?.empresa ?? datosPrueba.empresa),
       sede: String(raw?.sede ?? raw?.nombreSede ?? datosPrueba.sede),
       numeroFicha: String(raw?.norden ?? datosPrueba.norden),
@@ -60,7 +60,7 @@ export default async function ConsentAdmisionDeclaracionSintomaticoRespiratorio(
   };
 
   const fechaPrueba = datosPrueba.fechaRegistro;
-  const { dia, mes } = obtenerDiaYMes(data?.fechaRegistro ?? data?.fecha ?? fechaPrueba);
+  const { dia, mes } = obtenerDiaYMes(data?.fechaRegistro ?? fechaPrueba);
 
   // Header
   const drawHeader = () => {

@@ -126,7 +126,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
 
 export const PrintHojaR = (nro, token, tabla) => {
     const jasperModules = import.meta.glob(
-        "../../../../../../jaspers/Inmunologia/*.jsx"
+        "../../../../../../jaspers/LaboratorioClinico/*.jsx"
     );
     PrintHojaRDefault(
         nro,
@@ -135,7 +135,7 @@ export const PrintHojaR = (nro, token, tabla) => {
         null,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../../jaspers/Inmunologia"
+        "../../../../../../jaspers/LaboratorioClinico"
     );
 };
 

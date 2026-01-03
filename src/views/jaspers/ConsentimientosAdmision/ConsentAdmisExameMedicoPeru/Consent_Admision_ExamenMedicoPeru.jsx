@@ -25,13 +25,19 @@ export default async function ConsentAdmisionExamenMedicoPeru(data = {}, docExis
 
   // Normalizador de datos de entrada
   function buildDatosFinales(raw) {
+    // Extraer distrito y provincia de direccionPaciente si están disponibles
+    // Si no, usar valores por defecto
+    const direccionCompleta = raw?.direccionPaciente || datosPrueba.domicilio;
+    const distrito = raw?.distrito || datosPrueba.distrito;
+    const provincia = raw?.provincia || datosPrueba.provincia;
+    
     const datosFinales = {
       apellidosNombres: String(((raw?.apellidosPaciente ?? datosPrueba.apellidosPaciente) + ' ' + (raw?.nombresPaciente ?? datosPrueba.nombresPaciente)).trim()),
-      fechaExamen: formatearFechaCorta(raw?.fechaRegistro ?? raw?.fecha ?? datosPrueba.fechaRegistro),
-      documentoIdentidad: String(raw?.dniPaciente ?? raw?.dni ?? datosPrueba.dniPaciente),
-      domicilio: String(raw?.direccionPaciente ?? raw?.domicilio ?? datosPrueba.domicilio),
-      distrito: String(raw?.distritoPaciente ?? raw?.distrito ?? datosPrueba.distrito),
-      provincia: String(raw?.provinciaPaciente ?? raw?.provincia ?? datosPrueba.provincia),
+      fechaExamen: formatearFechaCorta(raw?.fechaRegistro ?? datosPrueba.fechaRegistro),
+      documentoIdentidad: String(raw?.dniPaciente ?? datosPrueba.dniPaciente),
+      domicilio: String(direccionCompleta),
+      distrito: String(distrito),
+      provincia: String(provincia),
       sede: String(raw?.sede ?? raw?.nombreSede ?? datosPrueba.sede),
       numeroFicha: String(raw?.norden ?? datosPrueba.norden),
       codigoColor: String(raw?.codigoColor ?? datosPrueba.codigoColor),
@@ -59,8 +65,8 @@ export default async function ConsentAdmisionExamenMedicoPeru(data = {}, docExis
   };
 
   const fechaPrueba = datosPrueba.fechaRegistro;
-  const { dia, mes } = obtenerDiaYMes(data?.fechaRegistro ?? data?.fecha ?? fechaPrueba);
-  const anio = new Date(data?.fechaRegistro ?? data?.fecha ?? fechaPrueba).getFullYear() || '2025';
+  const { dia, mes } = obtenerDiaYMes(data?.fechaRegistro ?? fechaPrueba);
+  const anio = new Date(data?.fechaRegistro ?? fechaPrueba).getFullYear() || '2025';
 
   // Header específico de Confipetrol
   const drawHeader = async () => {
