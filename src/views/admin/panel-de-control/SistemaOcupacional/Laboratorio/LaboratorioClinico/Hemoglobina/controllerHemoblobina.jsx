@@ -33,7 +33,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
             lugarNacimiento: res.lugarNacimientoPaciente ?? "",
             edad: res.edad ?? "",
-            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+            sexo: res.sexo === "M" ? "MASCULINO" : "FEMENINO",
             estadoCivil: res.estadoCivilPaciente,
             nivelEstudios: res.nivelEstudioPaciente,
             // Datos Laborales
@@ -43,6 +43,13 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             cargoDesempenar: res.cargoPaciente,
 
             //AGREGAR
+            grupoSanguineo: res.chko ? "O" :
+                res.chka ? "A" :
+                    res.chkb ? "B" :
+                        res.chkab ? "AB" : "",
+            factorRh: res.rbrhpositivo ? "RH(+)" : "RH(-)",
+            hematocrito: res.hematocrito ?? "",
+            hemoglobina: res.hemoglobina ?? "",
 
             user_medicoFirma: res.usuarioFirma,
         }));

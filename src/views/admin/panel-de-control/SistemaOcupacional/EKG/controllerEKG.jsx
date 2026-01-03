@@ -46,7 +46,7 @@ export const GetInfoServicio = async (
       fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
       lugarNacimiento: res.lugarNacimientoPaciente ?? "",
       edad: res.edad ?? "",
-      sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+      sexo: res.sexo === "M" ? "MASCULINO" : "FEMENINO",
       estadoCivil: res.estadoCivilPaciente ?? "",
       nivelEstudios: res.nivelEstudioPaciente ?? "",
       // Datos Laborales
