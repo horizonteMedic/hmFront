@@ -16,6 +16,7 @@ import Oftalmologia from "../Oftalmologia/Oftalmologia";
 import conInformadoOcupacional_Digitalizado from "../ConsentimientoInformado/conInformadoOcupacional_Digitalizado";
 import InformeElectrocardiograma2023 from "../EKG/InformeElectrocardiograma2023";
 import InformeElectrocardiograma_Digitalizado from "../EKG/InformeElectrocardiograma_Digitalizado";
+import OIT_Digitalizado from "../OIT/OIT_Digitalizado";
 // Agrega aquí todos tus reportes
 export const ekgMap = {
     InformeElectrocardiograma2023,
@@ -35,6 +36,7 @@ export const reportesMap = {
     evaluacion_musculo_esqueletica: EvaluacionMuscoloEsqueletica,
     lab_clinico: LaboratorioClinico_Digitalizado_nuevo,
     analisis_bioquimicos: AnalisisBioquimicos_Digitalizado,
+    oit: OIT_Digitalizado,
     radiografia_torax: RagiografiaToraxPA_Digitalizado,
     informe_electrocardiograma: (data) => {
         switch (data?.nameJasper) {

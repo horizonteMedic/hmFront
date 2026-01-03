@@ -82,6 +82,12 @@ const ExamenesList = [
         url: "/api/v01/ct/laboratorio/reporteAnalisisBioquimico"
     },
     {
+        nombre: "OIT",
+        resultado: false,
+        tabla: "oit",
+        url: "/api/v01/ct/oit/obtenerReporteOit"
+    },
+    {
         nombre: "RADIOGRAFIA TORAX",
         resultado: false,
         tabla: "radiografia_torax",
