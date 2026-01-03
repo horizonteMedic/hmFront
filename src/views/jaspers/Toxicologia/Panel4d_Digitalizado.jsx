@@ -95,25 +95,30 @@ const drawPatientData = (doc, datos = {}) => {
   const sexo = datos.sexoPaciente === 'F' ? 'FEMENINO' : datos.sexoPaciente === 'M' ? 'MASCULINO' : '';
 
   // Fila 1: Nombres y Apellidos (fila completa)
+  const nombresCompletos = (datos.nombresPaciente && datos.apellidosPaciente)
+    ? `${datos.nombresPaciente} ${datos.apellidosPaciente}`
+    : datos.nombres || datos.nombreCompleto || '';
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Nombres y Apellidos:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.nombres || datos.nombresPaciente || '', tablaInicioX + 40, yPos + 3.5);
+  doc.text(nombresCompletos, tablaInicioX + 40, yPos + 3.5);
   yPos += filaAltura;
 
   // Fila 2: DNI | Edad | Sexo
+  const dni = datos.dniPaciente || datos.dni || datos.codPa || '';
+  const edad = datos.edadPaciente || datos.edad || '';
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.line(tablaInicioX + 45, yPos, tablaInicioX + 45, yPos + filaAltura);
   doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
   doc.setFont("helvetica", "bold");
   doc.text("DNI:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(String(datos.dni || ''), tablaInicioX + 12, yPos + 3.5);
+  doc.text(String(dni), tablaInicioX + 12, yPos + 3.5);
   doc.setFont("helvetica", "bold");
   doc.text("Edad:", tablaInicioX + 47, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text((datos.edad || '') + " AÑOS", tablaInicioX + 58, yPos + 3.5);
+  doc.text(edad ? edad + " AÑOS" : '', tablaInicioX + 58, yPos + 3.5);
   doc.setFont("helvetica", "bold");
   doc.text("Sexo:", tablaInicioX + 92, yPos + 3.5);
   doc.setFont("helvetica", "normal");
@@ -121,77 +126,87 @@ const drawPatientData = (doc, datos = {}) => {
   yPos += filaAltura;
 
   // Fila 3: Lugar Nacimiento | Estado Civil
+  const lugarNacimiento = datos.lugarNacimientoPaciente || datos.lugarNacimiento || '';
+  const estadoCivil = datos.estadoCivilPaciente || datos.estadoCivil || '';
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
   doc.setFont("helvetica", "bold");
   doc.text("Lugar de Nacimiento:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.lugarNacimientoPaciente || '', tablaInicioX + 38, yPos + 3.5);
+  doc.text(lugarNacimiento, tablaInicioX + 38, yPos + 3.5);
   doc.setFont("helvetica", "bold");
   doc.text("Estado Civil:", tablaInicioX + 92, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.estadoCivilPaciente || '', tablaInicioX + 115, yPos + 3.5);
+  doc.text(estadoCivil, tablaInicioX + 115, yPos + 3.5);
   yPos += filaAltura;
 
   // Fila 4: Tipo Examen | Fecha Nac.
+  const tipoExamen = datos.tipoExamen || datos.nombreExamen || '';
+  const fechaNacimiento = datos.fechaNacimientoPaciente || datos.fechaNacimiento || datos.fechaNac || '';
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
   doc.setFont("helvetica", "bold");
   doc.text("Tipo Examen:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.nombreExamen || '', tablaInicioX + 28, yPos + 3.5);
+  doc.text(tipoExamen, tablaInicioX + 28, yPos + 3.5);
   doc.setFont("helvetica", "bold");
   doc.text("Fecha Nac.:", tablaInicioX + 92, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(toDDMMYYYY(datos.fechaNacimientoPaciente || ''), tablaInicioX + 115, yPos + 3.5);
+  doc.text(toDDMMYYYY(fechaNacimiento), tablaInicioX + 115, yPos + 3.5);
   yPos += filaAltura;
 
   // Fila 5: Nivel de Estudio (fila completa)
+  const nivelEstudio = datos.nivelEstudioPaciente || datos.nivelEstudio || '';
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.setFont("helvetica", "bold");
   doc.text("Nivel de Estudio:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.nivelEstudioPaciente || '', tablaInicioX + 32, yPos + 3.5);
+  doc.text(nivelEstudio, tablaInicioX + 32, yPos + 3.5);
   yPos += filaAltura;
 
   // Fila 6: Ocupación (fila completa)
+  const ocupacion = datos.ocupacionPaciente || datos.ocupacion || datos.areaO || '';
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.setFont("helvetica", "bold");
   doc.text("Ocupación:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.ocupacionPaciente || '', tablaInicioX + 25, yPos + 3.5);
+  doc.text(ocupacion, tablaInicioX + 25, yPos + 3.5);
   yPos += filaAltura;
 
   // Fila 7: Cargo (fila completa)
+  const cargo = datos.cargoPaciente || datos.cargo || datos.cargoDesempenar || '';
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.setFont("helvetica", "bold");
   doc.text("Cargo:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.cargoPaciente || '', tablaInicioX + 18, yPos + 3.5);
+  doc.text(cargo, tablaInicioX + 18, yPos + 3.5);
   yPos += filaAltura;
 
   // Fila 8: Área (fila completa)
+  const area = datos.areaPaciente || datos.area || '';
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.setFont("helvetica", "bold");
   doc.text("Área:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.areaPaciente || '', tablaInicioX + 15, yPos + 3.5);
+  doc.text(area, tablaInicioX + 15, yPos + 3.5);
   yPos += filaAltura;
 
   // Fila 9: Empresa (fila completa)
+  const empresa = datos.empresa || '';
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.setFont("helvetica", "bold");
   doc.text("Empresa:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.empresa || '', tablaInicioX + 20, yPos + 3.5);
+  doc.text(empresa, tablaInicioX + 20, yPos + 3.5);
   yPos += filaAltura;
 
   // Fila 10: Contrata (fila completa)
+  const contrata = datos.contrata || '';
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.setFont("helvetica", "bold");
   doc.text("Contrata:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.contrata || '', tablaInicioX + 22, yPos + 3.5);
+  doc.text(contrata, tablaInicioX + 22, yPos + 3.5);
   yPos += filaAltura;
 
   return yPos;
@@ -220,13 +235,13 @@ export default async function Panel4d_Digitalizado(datos = {}) {
     doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
     doc.text("MUESTRA :", config.margin, y);
     doc.setFont(config.font, "normal");
-    doc.text(datos.muestra || "ORINA", config.margin + 30, y);
+    doc.text("ORINA", config.margin + 30, y);
     y += config.lineHeight;
 
     doc.setFont(config.font, "bold");
     doc.text("MÉTODO :", config.margin, y);
     doc.setFont(config.font, "normal");
-    doc.text(datos.txtMetodo || "", config.margin + 30, y);
+    doc.text("INMUNOCROMATOGRAFICO", config.margin + 30, y);
     y += config.lineHeight * 2;
 
     // Encabezado de tabla

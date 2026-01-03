@@ -1,4 +1,4 @@
-// src/views/jaspers/AnalisisBioquimicos/GlucosaTolerancia.jsx
+// src/views/jaspers/Inmunologia/Informe_Lab_VRDL.jsx
 import jsPDF from "jspdf";
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
@@ -178,7 +178,7 @@ const drawPatientData = (doc, datos = {}) => {
 
 // --- Componente Principal ---
 
-export default async function GlucosaTolerancia(data = {}) {
+export default async function Informe_Lab_VRDL(data = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -187,15 +187,15 @@ export default async function GlucosaTolerancia(data = {}) {
     // Datos del paciente
     apellidosNombres: (data.nombresPaciente && data.apellidosPaciente)
       ? `${data.nombresPaciente} ${data.apellidosPaciente}`
-      : '',
+      : data.nombreCompleto || '',
     dni: String(data.dniPaciente || ''),
     edad: String(data.edadPaciente || ''),
     sexo: data.sexoPaciente === 'F' ? 'FEMENINO' : data.sexoPaciente === 'M' ? 'MASCULINO' : '',
-    lugarNacimiento: data.lugarNacimientoPaciente || '',
-    estadoCivil: data.estadoCivilPaciente || '',
+    lugarNacimiento: data.lugarNacimiento || data.lugarNacimientoPaciente || '',
+    estadoCivil: data.estadoCivil || data.estadoCivilPaciente || '',
     fechaNacimiento: data.fechaNacimientoPaciente || '',
-    nivelEstudio: data.nivelEstudioPaciente || '',
-    ocupacion: data.ocupacionPaciente || '',
+    nivelEstudio: data.nivelEstudio || data.nivelEstudioPaciente || '',
+    ocupacion: data.ocupacion || data.ocupacionPaciente || '',
     cargo: data.cargoPaciente || '',
     area: data.areaPaciente || '',
     tipoExamen: data.tipoExamen || '',
@@ -208,9 +208,9 @@ export default async function GlucosaTolerancia(data = {}) {
     color: data.color,
     // Datos del examen
     muestra: data.muestra || "SUERO",
-    glucosaBasica: data.serica !== undefined && data.serica !== null ? String(data.serica) : '',
-    glucosa60: data.tolera60 !== undefined && data.tolera60 !== null ? String(data.tolera60) : '',
-    glucosa120: data.tolera120 !== undefined && data.tolera120 !== null ? String(data.tolera120) : '',
+    examen: data.examen || '',
+    metodo: data.metodo || '',
+    resultado: data.vdrl || '',
     // Digitalización
     digitalizacion: data.digitalizacion || []
   };
@@ -222,7 +222,7 @@ export default async function GlucosaTolerancia(data = {}) {
   await drawHeader(doc, datosFinales);
 
   // === TÍTULO ===
-  drawUnderlinedTitle(doc, "BIOQUIMICA", 38);
+  drawUnderlinedTitle(doc, "INMUNOLOGÍA", 38);
 
   // === DATOS DEL PACIENTE ===
   drawPatientData(doc, datosFinales);
@@ -232,51 +232,44 @@ export default async function GlucosaTolerancia(data = {}) {
 
   // Muestra
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
-  doc.text("MUESTRA :", config.margin, y);
+  doc.text("MUESTRA:", config.margin, y);
   doc.setFont(config.font, "normal");
   doc.text(datosFinales.muestra, config.margin + 30, y);
-  y += config.lineHeight * 2;
-
-  // === SECCIÓN: GLUCOSA TOLERANCIA 120 MINUTOS ===
-  doc.setFont(config.font, "bold").setFontSize(10);
-  doc.text("GLUCOSA TOLERANCIA 120 MINUTOS", config.margin, y);
   y += config.lineHeight;
+
+  // Examen solicitado
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
+  doc.text("Examen solicitado:", config.margin, y);
+  doc.setFont(config.font, "normal");
+  const examenSolicitado = datosFinales.examen ? datosFinales.examen.replace(/\(.*?\)/g, '').trim() : "VDRL";
+  doc.text(examenSolicitado, config.margin + 45, y);
+  y += config.lineHeight * 2;
 
   // === TABLA DE RESULTADOS ===
   const colPrueba = config.margin;
-  const colResultado = config.margin + 80;
-  const colValores = config.margin + 140;
+  const colResultado = config.margin + 120;
 
   // Header de la tabla
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
-  doc.text("PRUEBA", colPrueba, y);
-  doc.text("RESULTADO", colResultado, y, { align: "center" });
-  doc.text("VALORES NORMALES", colValores, y);
+  doc.text("EXAMEN", colPrueba, y);
+  doc.text("RESULTADO", colResultado, y);
   y += 2;
 
   // Línea debajo del header
   doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
   y += config.lineHeight;
 
-  // Filas de datos
-  const tests = [
-    { label: "GLUCOSA (Básica)", valor: datosFinales.glucosaBasica, valores: "70 - 110 mg/dl" },
-    { label: "GLUCOSA (Tolerancia 60 minutos)", valor: datosFinales.glucosa60, valores: "120 - 170 mg/dl" },
-    { label: "GLUCOSA (Tolerancia 120 minutos)", valor: datosFinales.glucosa120, valores: "70 - 120 mg/dl" },
-  ];
-
-  tests.forEach(({ label, valor, valores }) => {
-    doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
-    doc.text(label, colPrueba, y);
-
-    doc.text(valor, colResultado, y, { align: "center" });
-    doc.text(valores, colValores, y);
-
-    y += config.lineHeight;
-  });
+  // Fila de datos VDRL
+  doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
+  // Mostrar "VDRL (Método: [método])" incluyendo el método en el texto del examen
+  const examenTexto = datosFinales.metodo 
+    ? `VDRL (Método: ${datosFinales.metodo.toLowerCase()})`
+    : "VDRL";
+  doc.text(examenTexto, colPrueba, y);
+  doc.text(datosFinales.resultado, colResultado, y);
 
   // === FIRMAS ===
-  const yFirmas = 210; // Mantener la posición original donde estaban las firmas
+  const yFirmas = y + 55; // Posición para las firmas (más abajo como en los anteriores)
   await dibujarFirmas({ doc, datos: data, y: yFirmas, pageW });
 
   // === FOOTER ===

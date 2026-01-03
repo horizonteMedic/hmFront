@@ -24,25 +24,34 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
-            fecha: res.fechaExamen,
+            fecha: res.fechaLab,
+
+            codLabclinico: res.codLabclinico ?? "",
 
             nombreExamen: res.nombreExamen ?? "",
             dni: res.dni ?? "",
 
             nombres: res.nombres ?? "",
-            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimiento ?? ""),
+            lugarNacimiento: res.lugarNacimiento ?? "",
             edad: res.edad ?? "",
-            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
-            estadoCivil: res.estadoCivilPaciente,
-            nivelEstudios: res.nivelEstudioPaciente,
+            sexo: res.sexo === "M" ? "MASCULINO" : "FEMENINO",
+            estadoCivil: res.estadoCivil,
+            nivelEstudios: res.nivelEstudios,
             // Datos Laborales
             empresa: res.empresa,
             contrata: res.contrata,
-            ocupacion: res.ocupacionPaciente,
-            cargoDesempenar: res.cargoPaciente,
+            ocupacion: res.ocupacion,
+            cargoDesempenar: res.cargo,
 
             //AGREGAR
+            grupoSanguineo: res.chko ? "O" :
+                res.chka ? "A" :
+                    res.chkb ? "B" :
+                        res.chkab ? "AB" : "",
+            factorRh: res.rbrhpositivo ? "RH(+)" : "RH(-)",
+            hematocrito: res.hematocrito ?? "",
+            hemoglobina: res.hemoglobina ?? "",
 
             user_medicoFirma: res.usuarioFirma,
         }));
@@ -62,14 +71,14 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
         tipoServicio: "",
         numTicket: 0,
         fechaLab: form.fecha,
-        chko: true,
-        chka: true,
-        chkb: true,
-        chkab: true,
-        rbrhpositivo: true,
-        rbrhnegativo: true,
-        txtHemoglobina: "",
-        txtHematocrito: "",
+        chko: form.grupoSanguineo == "O",
+        chka: form.grupoSanguineo == "A",
+        chkb: form.grupoSanguineo == "B",
+        chkab: form.grupoSanguineo == "AB",
+        rbrhpositivo: form.factorRh == "RH(+)",
+        rbrhnegativo: form.factorRh == "RH(-)",
+        txtHemoglobina: form.hematocrito,
+        txtHematocrito: form.hemoglobina,
 
         // "txtVsg": "",
         // "txtLeucocitosHematologia": "",
@@ -126,7 +135,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
 
 export const PrintHojaR = (nro, token, tabla) => {
     const jasperModules = import.meta.glob(
-        "../../../../../../jaspers/Inmunologia/*.jsx"
+        "../../../../../../jaspers/LaboratorioClinico/*.jsx"
     );
     PrintHojaRDefault(
         nro,
@@ -135,7 +144,7 @@ export const PrintHojaR = (nro, token, tabla) => {
         null,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../../jaspers/Inmunologia"
+        "../../../../../../jaspers/LaboratorioClinico"
     );
 };
 
