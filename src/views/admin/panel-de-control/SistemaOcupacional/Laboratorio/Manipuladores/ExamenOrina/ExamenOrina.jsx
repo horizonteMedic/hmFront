@@ -10,7 +10,7 @@ import DatosPersonalesLaborales from '../../../../../../components/templates/Dat
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 import BotonesAccion from '../../../../../../components/templates/BotonesAccion';
 
-const tabla = '';
+const tabla = 'lab_clinico';
 
 export default function ExamenOrina() {
     const { token, userlogued, selectedSede, userName } = useSessionData();

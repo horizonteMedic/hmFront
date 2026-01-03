@@ -9,8 +9,8 @@ import {
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
-const obtenerReporteUrl = "";
-const registrarUrl = "";
+const obtenerReporteUrl = "/api/v01/ct/laboratorio/obtenerReporteOrina";
+const registrarUrl = "/api/v01/ct/laboratorio/registrarActualizarLaboratorioClinicp";
 
 export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
     const res = await GetInfoServicioDefault(
@@ -24,23 +24,25 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
-            fecha: res.fechaExamen,
+            fecha: res.fechaLab,
+
+            codLabclinico: res.codLabclinico ?? "",
 
             nombreExamen: res.nombreExamen ?? "",
             dni: res.dni ?? "",
 
             nombres: res.nombres ?? "",
-            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimiento ?? ""),
+            lugarNacimiento: res.lugarNacimiento ?? "",
             edad: res.edad ?? "",
-            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
-            estadoCivil: res.estadoCivilPaciente,
-            nivelEstudios: res.nivelEstudioPaciente,
+            sexo: res.sexo === "M" ? "MASCULINO" : "FEMENINO",
+            estadoCivil: res.estadoCivil,
+            nivelEstudios: res.nivelEstudios,
             // Datos Laborales
             empresa: res.empresa,
             contrata: res.contrata,
-            ocupacion: res.ocupacionPaciente,
-            cargoDesempenar: res.cargoPaciente,
+            ocupacion: res.ocupacion,
+            cargoDesempenar: res.cargo,
 
             //AGREGAR
 
