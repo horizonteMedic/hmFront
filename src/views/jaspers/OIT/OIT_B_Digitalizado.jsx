@@ -2,9 +2,9 @@ import jsPDF from "jspdf";
 import header_OIT from "./HeaderOIT";
 import autoTable from "jspdf-autotable";
 
-export default async function OIT_B_Digitalizado(datos = {}) {
+export default async function OIT_B_Digitalizado(datos = {}, docExistente) {
 
-  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4" });
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 26;
@@ -515,8 +515,6 @@ export default async function OIT_B_Digitalizado(datos = {}) {
 
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
     }
-
-
     const blob = doc.output("blob");
     const url = URL.createObjectURL(blob);
     const iframe = document.createElement("iframe");

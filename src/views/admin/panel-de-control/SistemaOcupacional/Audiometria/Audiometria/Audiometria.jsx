@@ -1,18 +1,18 @@
-import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faSave,
-  faBroom,
-  faPrint,
-  faStethoscope,
-} from "@fortawesome/free-solid-svg-icons";
-
+import { faStethoscope } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import {
   SubmitDataService,
   VerifyTR,
   PrintHojaR,
 } from "./controllerAudiometria";
+import { getToday } from "../../../../../utils/helpers";
+import { useSessionData } from "../../../../../hooks/useSessionData";
+import { useForm } from "../../../../../hooks/useForm";
+import BotonesAccion from "../../../../../components/templates/BotonesAccion";
+import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
+import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
+import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
 
 const tabla = "audiometria_2023";
 
@@ -26,56 +26,137 @@ const chemicals = [
 ];
 const frecuencias = ["500", "1000", "2000", "3000", "4000", "6000", "8000"];
 
-export default function Audiometria({
-  token,
-  selectedSede,
-  userlogued,
-  initialFormState,
-  form,
-  setForm,
-}) {
-  const [status, setStatus] = useState("");
+export default function Audiometria() {
+  const today = getToday();
+  const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
+  const initialFormState = {
+    codAu: "",
+    norden: "",
+    fecha: today,
+    dni: "",
+    fechaNacimiento: "",
+    nombres: "",
+    edad: "",
+    nomExam: "",
 
-  const handleCheckRadio = (name, value) => {
-    setForm((f) => ({
-      ...f,
-      [name]: f[name] === value.toUpperCase() ? "" : value.toUpperCase(),
-    }));
-  };
-  const toggleCheckBox = (name) => {
-    setForm((f) => ({
-      ...f,
-      [name]: !f[name],
-    }));
+    sordera: "NO",
+    acufenos: "NO",
+    vertigo: "NO",
+    otalgia: "NO",
+    secrecion_otica: "NO",
+    otros_sintomas_orl: "",
+
+    rinitis: "NO",
+    sinusitis: "NO",
+    otitis_media_cronica: "NO",
+    medicamentos_ototoxicos: "NO",
+    meningitis: "NO",
+    tec: "NO",
+    sordera_am: "NO",
+    parotiditis: "NO",
+    sarampion: "NO",
+    tbc: "NO",
+    cuales_antecedentes: "",
+
+    exposicion_ruido: "NO",
+    protectores_auditivos: "NO",
+    exposicion_quimicos: "NO",
+
+    promedio_horas: "",
+    anios_exposicion: "",
+    meses_exposicion: "",
+
+    // tipo_protectores: [],
+    tapones: false,
+    orejeras: false,
+
+    plomo_hrs: "", // New fields
+    mercurio_hrs: "",
+    tolueno_hrs: "",
+    xileno_hrs: "",
+    plaguicidas_hrs: "",
+    organofosforados_hrs: "",
+
+    plomo_anios: "",
+    mercurio_anios: "",
+    tolueno_anios: "",
+    xileno_anios: "",
+    plaguicidas_anios: "",
+    organofosforados_anios: "",
+    otros_quimicos: "",
+
+    practica_tiro: "NO",
+    uso_walkman: "NO",
+    otros_antecedentes: "NO",
+    cuales_antecedentes_extralaborales: "",
+    otoscopia_odiocho: "Normal",
+    otoscopia_odilzquierdo: "Normal",
+
+    od_500: "",
+    od_1000: "",
+    od_2000: "",
+    od_3000: "",
+    od_4000: "",
+    od_6000: "",
+    od_8000: "",
+
+    oi_500: "",
+    oi_1000: "",
+    oi_2000: "",
+    oi_3000: "",
+    oi_4000: "",
+    oi_6000: "",
+    oi_8000: "",
+
+    diagnostico_od: "",
+    diagnostico_oi: "",
+    comentarios_audiometria: "",
+
+    proteccion_simpleODoble: "",
+    control_semestralOAnual: "",
+    recomendaciones_otras: "",
+
+    od_o_500: "",
+    od_o_1000: "",
+    od_o_2000: "",
+    od_o_3000: "",
+    od_o_4000: "",
+    od_o_6000: "",
+    od_o_8000: "",
+    oi_o_500: "",
+    oi_o_1000: "",
+    oi_o_2000: "",
+    oi_o_3000: "",
+    oi_o_4000: "",
+    oi_o_6000: "",
+    oi_o_8000: "",
+
+    empresa: "",
+    contrata: "",
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
-  };
-  const handleChangeNumber = (e) => {
-    const { name, value } = e.target;
+  const {
+    form,
+    setForm,
+    handleChange,
+    handleChangeNumberDecimals,
+    handleChangeSimple,
+    handleRadioButtonBoolean,
+    handleClear,
+    handleClearnotO,
+    handlePrintDefault,
+  } = useForm(initialFormState, { storageKey: "audiometriaNormal" });
 
-    // Solo permitir números (opcionalmente incluyendo vacío para poder borrar)
-    if (/^\d*$/.test(value)) {
-      setForm((f) => ({ ...f, [name]: value }));
+  const handleSave = () => {
+    SubmitDataService(form, token, userlogued, handleClear, tabla);
+    // SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+  };
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      handleClearnotO();
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
-  };
-
-  const handleClear = () => {
-    setForm(initialFormState);
-    setStatus("Formulario limpiado");
-  };
-
-  const handleClearnotO = () => {
-    setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
-  };
-  const getNextArrayItem = (pre = "", current, post = "", array, next = "") => {
-    const index = array.indexOf(current);
-    if (index === -1 || index === array.length - 1) {
-      return next; // No existe o ya es el último
-    }
-    return `${pre}${array[index + 1]}${post}`;
   };
 
   const handlePrint = () => {
@@ -98,7 +179,42 @@ export default function Audiometria({
         PrintHojaR(form.norden, token, tabla);
       }
     });
+    // handlePrintDefault(() => {
+    //   PrintHojaR(form.norden, token, tabla, datosFooter);
+    // });
   };
+
+
+  const handleCheckRadio = (name, value) => {
+    setForm((f) => ({
+      ...f,
+      [name]: f[name] === value.toUpperCase() ? "" : value.toUpperCase(),
+    }));
+  };
+  const toggleCheckBox = (name) => {
+    setForm((f) => ({
+      ...f,
+      [name]: !f[name],
+    }));
+  };
+
+  const handleChangeNumber = (e) => {
+    const { name, value } = e.target;
+
+    // Solo permitir números (opcionalmente incluyendo vacío para poder borrar)
+    if (/^\d*$/.test(value)) {
+      setForm((f) => ({ ...f, [name]: value }));
+    }
+  };
+
+  const getNextArrayItem = (pre = "", current, post = "", array, next = "") => {
+    const index = array.indexOf(current);
+    if (index === -1 || index === array.length - 1) {
+      return next; // No existe o ya es el último
+    }
+    return `${pre}${array[index + 1]}${post}`;
+  };
+
   const tipoHipoacusia = (promedio) => {
     let textoPromedio = "";
     if (promedio >= -10 && promedio <= 25) textoPromedio = "NORMAL";
@@ -170,128 +286,36 @@ export default function Audiometria({
   };
 
   return (
-    <div className="w-full max-w-[90vw] lg:max-w-[70vw] mx-auto bg-white rounded shadow p-6">
+    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
       <h2 className="text-2xl font-bold text-center mb-6">AUDIOMETRIA</h2>
       <div className="space-y-6">
-        {/* Encabezado */}
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
-              Nro Ficha:
-            </label>
-            <input
-              name="norden"
-              value={form.norden}
-              onKeyUp={(e) => {
-                if (e.key === "Enter") {
-                  handleClearnotO();
-                  VerifyTR(form.norden, tabla, token, setForm, selectedSede);
-                }
-              }}
-              onChange={handleChange}
-              className="border rounded px-2 py-1 text-base flex-1"
-            />
-          </div>
-          <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold text-base min-w-[50px] md:min-w-[90px]">
-              Fecha:
-            </label>
-            <input
-              type="date"
-              name="fecha"
-              value={form.fecha}
-              onChange={handleChange}
-              className="border rounded px-2 py-1 text-base flex-1"
-            />
-          </div>
-        </div>
+        <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-3 gap-3">
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            value={form.norden}
+            onChange={handleChangeNumberDecimals}
+            onKeyUp={handleSearch}
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Fecha"
+            name="fecha"
+            type="date"
+            value={form.fecha}
+            onChange={handleChangeSimple}
+            labelWidth="120px"
+          />
+          <InputTextOneLine
+            label="Nombre del Examen"
+            name="nomExam"
+            value={form.nomExam}
+            disabled
+            labelWidth="120px"
+          />
+        </SectionFieldset>
         {/* Paciente */}
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
-              Nombres:
-            </label>
-            <input
-              name="nombres"
-              value={form.nombres}
-              disabled
-              className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
-            />
-          </div>
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className=" flex items-center gap-2">
-              <label className="font-semibold text-base min-w-[50px]  md:min-w-[90px]">
-                Edad:
-              </label>
-              <input
-                name="edad"
-                value={form.edad}
-                disabled
-                className="border rounded px-2 py-1 text-base w-24 bg-gray-100"
-              />
-            </div>
-
-            <div className=" flex xl:justify-end items-center gap-4">
-              <label className="font-semibold text-base min-w-[50px] ">
-                Fecha de Nacimiento:
-              </label>
-              <input
-                name="fechaNac"
-                value={form.fechaNac}
-                disabled
-                className="border rounded px-2 py-1 text-base w-24 bg-gray-100 min-w-36"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
-              DNI:
-            </label>
-            <input
-              name="dni"
-              value={form.dni}
-              disabled
-              className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
-            />
-          </div>
-          <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
-              Ex. Médico:
-            </label>
-            <input
-              name="nomExam"
-              value={form.nomExam}
-              disabled
-              className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
-            />
-          </div>
-        </div>
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
-              Empresa:
-            </label>
-            <input
-              name="empresa"
-              value={form.empresa}
-              disabled
-              className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
-            />
-          </div>
-          <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
-              Contrata:
-            </label>
-            <input
-              name="contrata"
-              value={form.contrata}
-              disabled
-              className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
-            />
-          </div>
-        </div>
+        <DatosPersonalesLaborales form={form} />
 
         {/* Primera fila*/}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -481,11 +505,10 @@ export default function Audiometria({
                     </label>
                   </div>
                   <div
-                    className={`border rounded p-4 mt-6 ${
-                      form.exposicion_ruido === "NO"
-                        ? "opacity-50 pointer-events-none"
-                        : ""
-                    }`}
+                    className={`border rounded p-4 mt-6 ${form.exposicion_ruido === "NO"
+                      ? "opacity-50 pointer-events-none"
+                      : ""
+                      }`}
                   >
                     <h3 className="font-semibold text-lg mb-4">
                       Exposición a Ruido (Promedio de horas por día)
@@ -602,11 +625,10 @@ export default function Audiometria({
                   </div>
 
                   <div
-                    className={`border rounded p-4 mt-6 ${
-                      form.protectores_auditivos === "NO"
-                        ? "opacity-50 pointer-events-none"
-                        : ""
-                    }`}
+                    className={`border rounded p-4 mt-6 ${form.protectores_auditivos === "NO"
+                      ? "opacity-50 pointer-events-none"
+                      : ""
+                      }`}
                   >
                     <h3 className="font-semibold text-lg mb-4">
                       Tipo de Protectores:
@@ -683,11 +705,10 @@ export default function Audiometria({
                   </div>
                   {/* Químicos a los que está expuesto: */}
                   <div
-                    className={`border rounded p-4 mt-6 ${
-                      form.exposicion_quimicos === "NO"
-                        ? "opacity-50 pointer-events-none"
-                        : ""
-                    }`}
+                    className={`border rounded p-4 mt-6 ${form.exposicion_quimicos === "NO"
+                      ? "opacity-50 pointer-events-none"
+                      : ""
+                      }`}
                   >
                     <h3 className="font-semibold text-lg mb-4">
                       Químicos a los que está expuesto:
@@ -706,8 +727,8 @@ export default function Audiometria({
                           <label className="capitalize">
                             {chem.length > 5
                               ? chem.slice(0, 1).toUpperCase() +
-                                chem.slice(1, 5) +
-                                "."
+                              chem.slice(1, 5) +
+                              "."
                               : chem.slice(0, 1).toUpperCase() + chem.slice(1)}
                           </label>
                           <input
@@ -1257,49 +1278,13 @@ export default function Audiometria({
         </div>
 
         {/* Acciones */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                SubmitDataService(form, token, userlogued, handleClear, tabla);
-              }}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-            </button>
-            <button
-              type="button"
-              onClick={handleClear}
-              className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faBroom} /> Limpiar
-            </button>
-          </div>
-          <div className="flex flex-col items-end">
-            <span className="font-bold italic text-base mb-1">Imprimir</span>
-            <div className="flex items-center gap-2">
-              <input
-                name="norden"
-                value={form.norden}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 text-base w-24"
-              />
-
-              <button
-                type="button"
-                onClick={handlePrint}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faPrint} />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {status && (
-          <p className="mt-4 text-center text-green-600 text-base">{status}</p>
-        )}
+        <BotonesAccion
+          form={form}
+          handleSave={handleSave}
+          handleClear={handleClear}
+          handlePrint={handlePrint}
+          handleChangeNumberDecimals={handleChangeNumberDecimals}
+        />
       </div>
     </div>
   );

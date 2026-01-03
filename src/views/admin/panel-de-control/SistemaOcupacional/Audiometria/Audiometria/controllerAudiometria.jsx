@@ -18,7 +18,7 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
 
           codAu: res.codAu,
           fecha: res.fechaAu,
-          fechaNac: res.fechaNac ? convertirFecha(res.fechaNac) : "",
+          fechaNacimiento: res.fechaNac ? convertirFecha(res.fechaNac) : "",
           sordera: res.rbsasorderaSi ? "SI" : "NO",
           acufenos: res.rbsaacufenosSi ? "SI" : "NO",
           vertigo: res.rbsavertigoSi ? "SI" : "NO",
@@ -400,7 +400,7 @@ export const GetInfoPac = (nro, set, token, sede) => {
       set((prev) => ({
         ...prev,
         ...res,
-        fechaNac: convertirFecha(res.fechaNac),
+        fechaNacimiento: convertirFecha(res.fechaNac),
         nombres: res.nombresApellidos,
       }));
     })
