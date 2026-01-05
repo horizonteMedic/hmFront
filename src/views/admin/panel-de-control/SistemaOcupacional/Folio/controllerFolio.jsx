@@ -11,7 +11,8 @@ import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
 
 const GetExamenURL = `/api/v01/st/registros/obtenerExistenciasExamenes`
-
+const GetEspiro = `/api/v01/st/registros/detalleUrlArchivos`
+const NomenclaturaEspiro = `ESPIROMETRIA`
 export const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
     LoadingDefault("Validando datos");
     const res = await GetInfoPacDefault(nro, token, sede);
@@ -35,22 +36,54 @@ export const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
 
 const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
     LoadingDefault("Cargando examenes");
-    const res = await getFetch(`${GetExamenURL}?nOrden=${nro}`, token);
-    if (res) {
-        console.log(res);
-        const resArray = Object.values(res);
-        const listaActualizada = ExamenesList.map(examen => {
-            const match = resArray.find(item => item.nameService === examen.tabla);
-            return {
-                ...examen,
-                resultado: match ? match.existe : false
-            };
-        });
-        console.log(listaActualizada);
-        set(prev => ({
+    try {
+        const res = await getFetch(`${GetExamenURL}?nOrden=${nro}`, token);
+        const resEspirometria = await getFetch(
+            `${GetEspiro}/${nro}/${NomenclaturaEspiro}`,
+            token
+        );
+
+        let listaActualizada = [...ExamenesList];
+
+        // 🔹 Procesar exámenes generales
+        if (res) {
+            const resArray = Object.values(res);
+
+            listaActualizada = listaActualizada.map((examen) => {
+                const match = resArray.find(
+                    (item) => item.nameService === examen.tabla
+                );
+
+                return {
+                    ...examen,
+                    resultado: match ? match.existe : false,
+                };
+            });
+        }
+
+        // 🔹 Procesar ESPIROMETRÍA (regla especial)
+        if (resEspirometria?.id === 1) {
+            listaActualizada = listaActualizada.map((examen) =>
+                examen.tabla === "ESPIROMETRIA"
+                    ? {
+                        ...examen,
+                        resultado: true,
+                        url: resEspirometria.mensaje,
+                    }
+                    : examen
+            );
+        }
+
+        // 🔹 Set final (un solo render)
+        set((prev) => ({
             ...prev,
-            listaExamenes: listaActualizada
+            listaExamenes: listaActualizada,
         }));
+
+    } catch (error) {
+        console.error("Error al cargar exámenes:", error);
+    } finally {
         Swal.close();
     }
+
 };
