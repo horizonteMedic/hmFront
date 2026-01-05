@@ -21,9 +21,9 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             norden: res.norden ?? "",
             idConsentimiento: res.idConsentimiento ?? null,
             fecha: res.fechaRegistro ?? "",
-            nombres: res.nombres ?? "",
-            dniPaciente: res.dni ?? "",
-            ocupacion: res.ocupacion ?? "",
+            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
+            dni: res.dniPaciente ?? "",
+            ocupacion: res.ocupacionPaciente ?? "",
             empresa: res.empresa ?? "",
         }));
     }
@@ -42,7 +42,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla, datos
         nombreReporte: "DECLARACION DE SINTOMATICO RESPIRATORIO",
 
         antecedentesPatologicos: false,
-        detalleAntecedentes: "",
+        detalleAntecedentes: null,
 
         fechaFirma: form.fecha,
         horaReporte: getHoraActual(),

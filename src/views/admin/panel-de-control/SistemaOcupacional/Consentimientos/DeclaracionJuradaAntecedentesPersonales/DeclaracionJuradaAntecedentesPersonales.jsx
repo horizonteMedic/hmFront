@@ -1,4 +1,4 @@
-import { InputsBooleanRadioGroup, InputsRadioGroup, InputTextArea, InputTextOneLine } from "../../../../../components/reusableComponents/ResusableComponents";
+import { InputsBooleanRadioGroup, InputTextArea, InputTextOneLine } from "../../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
@@ -10,7 +10,7 @@ import {
 } from "./controllerDeclaracionJuradaAntecedentesPersonales";
 import BotonesAccion from "../../../../../components/templates/BotonesAccion";
 
-const tabla = "";
+const tabla = "DECLA_JURA_ANTECE_PERSON_FAM";
 
 const textoFinalConsentimiento = "(De marcar SI, detallar que antecedentes existen, considerar los antecedentes de la madre, padre, abuelo y abuela)";
 const textoFinalConsentimiento2 = "Se suscribe la presente declaración jurada en conformidad de lo antes expuesto.";
@@ -22,6 +22,7 @@ export default function DeclaracionJuradaAntecedentesPersonales() {
   const initialFormState = {
     norden: "",
     fecha: today,
+    idConsentimiento: null,
     nombres: "",
     dni: "",
     empresa: "",

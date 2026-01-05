@@ -10,7 +10,7 @@ import {
 } from "./controllerRecepcionExamenMedico";
 import BotonesAccion from "../../../../../components/templates/BotonesAccion";
 
-const tabla = "";
+const tabla = "CONSENT_RECOM_MEDIC";
 
 const textoFinalConsentimiento = `En mi calidad de trabajador de Confipetrol Andina, declaro bajo juramento que he sido informado de las razones para los exámenes de salud ocupacional así como de los riesgos para la seguridad y salud en mi puesto de trabajo, además declaro haber recibido oportunamente los resultados de mi examen médico, de manera confidencial, conforme a lo establecido en el artículo 71° literal b) de la Ley N° 29783, Ley de Seguridad y Salud en el Trabajo¹. Teniendo conocimiento de mis resultados, me comprometo a cumplir con las recomendaciones de carácter médico, indicadas por el médico tratante y/o médico ocupacional, así como ingresar al programa de vigilancia médica según lo establecido en el RM 312-2011-MINSA².`;
 const textoFinalConsentimiento2 = `En ese sentido, manifiesto que tengo conocimiento que al no cumplir con las recomendaciones médicas indicadas cualquier dolencia o malestar que presente queda bajo mi responsabilidad.`;
@@ -22,6 +22,7 @@ export default function RecepcionExamenMedico() {
   const initialFormState = {
     norden: "",
     fecha: today,
+    idConsentimiento: null,
     nombres: "",
     dni: "",
     domicilio: "",

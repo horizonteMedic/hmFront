@@ -10,7 +10,7 @@ import {
 } from "./controllerDeclaracionInformacionAptitudMedico";
 import BotonesAccion from "../../../../../components/templates/BotonesAccion";
 
-const tabla = "";
+const tabla = "DECLA_INFO_APTITUD_MO";
 
 const textoFinalConsentimiento = `Declaro haber sido informado sobre la APTITUD y RECOMENDACIONES de mi examen médico. Realizado en el Policlínico Horizonte Medic`;
 const textoFinalConsentimiento2 = `Firmo la presente declaración en conformidad a lo expuesto líneas arriba.`;
