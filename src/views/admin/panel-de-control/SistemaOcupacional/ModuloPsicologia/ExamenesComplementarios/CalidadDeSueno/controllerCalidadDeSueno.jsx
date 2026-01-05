@@ -32,7 +32,7 @@ export const GetInfoServicio = async (
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
-            // fechaExam: today,
+            fechaExam: res.fecha,
             nombreExamen: res.nombreExamen ?? "",
 
             // Datos personales
@@ -252,6 +252,8 @@ export const SubmitDataService = async (
         pregunta11MismoCuarto: form.comparteHabitacion == "MISMO_CUARTO",
         pregunta11DosMasPersonasMismoCuarto: form.comparteHabitacion == "DOS_O_MAS",
 
+
+        fecha: form.fechaExam,
         usuarioRegistro: user,
     };
 

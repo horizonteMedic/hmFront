@@ -20,6 +20,8 @@ export default function ExamenOrina() {
         norden: '',
         fecha: today,
 
+        codLabclinico: null,
+
         nombreExamen: "",
 
         dni: "",

@@ -45,6 +45,29 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             cargoDesempenar: res.cargo,
 
             //AGREGAR
+            color: res.colorUrina ?? '',
+            aspecto: res.aspecto ?? '',
+            densidad: res.densidad ?? "",
+            ph: res.ph ?? "",
+            // Examen Químico
+            nitritos: res.nitritos ?? '',
+            proteinas: res.proteinas ?? '',
+            cetonas: res.cetonas ?? '',
+            leucocitosExamenQuimico: res.leucocitosEq ?? '',
+            acAscorbico: res.acAscorbico ?? '',
+            urobilinogeno: res.urobilinogeno ?? '',
+            bilirrubina: res.bilirrubina ?? '',
+            glucosaExamenQuimico: res.glucosa ?? '',
+            sangre: res.sangre ?? '',
+            // Sedimento
+            leucocitosSedimentoUnitario: res.leucocitosSu ?? '',
+            hematiesSedimentoUnitario: res.hematiesSu ?? '',
+            celEpiteliales: res.celulasEpiteliales ?? '',
+            cristales: res.cristales ?? '',
+            cilindros: res.cilindros ?? '',
+            bacterias: res.bacterias ?? '',
+            gramSc: res.gramSC ?? '',
+            otros: res.otros ?? '',
 
             user_medicoFirma: res.usuarioFirma,
         }));
@@ -59,7 +82,38 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
 
     const body = {
         norden: form.norden,
-        fechaExamen: form.fecha,
+        fechaRegistro: form.fecha,
+        codLabclinico: form.codLabclinico,
+        tipoServicio: "",
+        numTicket: 0,
+        fechaLab: form.fecha,
+
+        //ORINA
+        txtColorEf: form.color,
+        txtDensidadEf: form.densidad,
+        txtAspectoEf: form.aspecto,
+        txtPhEf: form.ph,
+        //EXAMEN QUIMICO
+        txtNitritosEq: form.nitritos,
+        txtProteinasEq: form.proteinas,
+        txtCetonasEq: form.cetonas,
+        txtLeucocitosEq: form.leucocitosExamenQuimico,
+        txtAcAscorbico: form.acAscorbico,
+        txtUrobilinogenoEq: form.urobilinogeno,
+        txtBilirrubinaEq: form.bilirrubina,
+        txtGlucosaEq: form.glucosaExamenQuimico,
+        txtSangreEq: form.sangre,
+        //SEDIMIETNO
+        txtLeucocitosSu: form.leucocitosSedimentoUnitario,
+        txtCelEpitelialesSu: form.celEpiteliales,
+        txtCilindrosSu: form.cilindros,
+        txtBacteriasSu: form.bacterias,
+        txtHematiesSu: form.hematiesSedimentoUnitario,
+        txtCristalesSu: form.cristales,
+        txtPusSu: form.gramSc,
+        txtOtrosSu: form.otros,
+
+        userMedicoOcup: "",
         userRegistro: user,
 
         usuarioFirma: form.user_medicoFirma,
@@ -72,7 +126,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
 
 export const PrintHojaR = (nro, token, tabla) => {
     const jasperModules = import.meta.glob(
-        "../../../../../../jaspers/Inmunologia/*.jsx"
+        "../../../../../../jaspers/AnalisisBioquimicos/*.jsx"
     );
     PrintHojaRDefault(
         nro,
@@ -81,7 +135,7 @@ export const PrintHojaR = (nro, token, tabla) => {
         null,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../../jaspers/Inmunologia"
+        "../../../../../../jaspers/AnalisisBioquimicos"
     );
 };
 

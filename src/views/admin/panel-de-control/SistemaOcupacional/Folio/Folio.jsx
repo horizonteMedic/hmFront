@@ -101,6 +101,12 @@ const ExamenesList = [
         esJasper: true
     },
     {
+        nombre: "ESPIROMETRIA",
+        resultado: false,
+        tabla: "ESPIROMETRIA",
+        url: ""
+    },
+    {
         nombre: "FICHA AUDIOLOGICA",
         resultado: false,
         tabla: "audiometria_po",
@@ -237,7 +243,7 @@ const Folio = () => {
             });
         }
     };
-
+    console.log(form)
     return (
         <div className="w-full space-y-3 px-4">
             {/* ===== SECCIÓN: DATOS NECESARIOS ===== */}

@@ -19,7 +19,7 @@ export default function GlucosaBasal() {
 
     const initialFormState = {
         norden: '',
-        codAb:null,
+        codAb: null,
         fecha: today,
 
         nombreExamen: "",
@@ -154,16 +154,14 @@ export default function GlucosaBasal() {
                     onChange={handleChange}
                 />
                 <InputCheckbox
-                    label="Examen Directo"
+                    label="Examen Completo"
                     checked={form.examenDirecto}
                     name="examenDirecto"
                     onChange={(e) => {
                         const checked = e.target.checked;
                         setForm(prev => {
                             const newState = { ...prev, examenDirecto: checked };
-                            if (checked) {
-                                newState.glucosaBasal = '';
-                            } else {
+                            if (!checked) {
                                 newState.colesterolTotal = '';
                                 newState.ldl = '';
                                 newState.hdl = '';
@@ -185,7 +183,6 @@ export default function GlucosaBasal() {
                         labelWidth="120px"
                         onChange={(e) => handleChangeNumberDecimals(e, 1)}
                         onKeyUp={handleFocusNext}
-                        disabled={form.examenDirecto}
                         className='w-[85%]'
                     />
                     <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal 70 - 110 mg/dl)"}</span>

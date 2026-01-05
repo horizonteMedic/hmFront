@@ -33,7 +33,7 @@ export const GetInfoServicio = async (
       ...prev,
       norden: res.norden ?? "",
       panel4dId: res.panel4dId,
-      fecha: res.fechaExamen,
+      fecha: res.fecha,
 
       nombreExamen: res.tipoExamen ?? "",
       dni: res.dniPaciente ?? "",
@@ -76,7 +76,7 @@ export const SubmitDataService = async (
   const body = {
     id: form.panel4dId,
     norden: form.norden,
-    fechaExamen: form.fecha,
+    fecha: form.fecha,
     cocaina: form.valueC=="POSITIVO",
     marihuana: form.valueM=="POSITIVO",
     opiaceos: form.valueO=="POSITIVO",

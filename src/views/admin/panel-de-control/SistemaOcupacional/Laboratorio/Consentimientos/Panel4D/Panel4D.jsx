@@ -22,8 +22,8 @@ const Panel4D = () => {
       { label: 'CONSUME MARIHUANA', key: 'MARIHUANA', fecha: today, value: false },
       { label: 'CONSUMIO HOJA DE COCA EN LOS 7 DIAS PREVIOS', key: 'COCA', fecha: today, value: false },
       { label: 'CONSUME COCAÍNA', key: 'COCAINA', fecha: today, value: false },
-      { label: 'CONSUME OPIÁCEOS', key: 'OPIACEOS', fecha: today, value: false },
-      { label: 'CONSUME METHANFETAMINAS', key: 'METHANFETAMINAS', fecha: today, value: false },
+      { label: 'CONSUME OPIÁCEOS', key: 'OPIA', fecha: today, value: false },
+      { label: 'CONSUME METHANFETAMINAS', key: 'METAN', fecha: today, value: false },
     ]
   };
 
@@ -147,7 +147,7 @@ const Panel4D = () => {
         <SectionFieldset legend="ANTECEDENTES" className="space-y-4">
           {form.antecedentes.map(({ label, key, fecha, value }) => (
             <div key={key} className="flex flex-col md:flex-row items-start md:items-center gap-4">
-              <label className="text-base font-medium flex-1 whitespace-nowrap min-w-[300px]">{label}</label>
+              <label className="text-base font-medium flex-1 whitespace-nowrap min-w-[5px]">{label}</label>
               <div className="flex items-center gap-4">
                 <InputsBooleanRadioGroup
                   name={`antecedente_${key}`}
@@ -166,7 +166,6 @@ const Panel4D = () => {
                     value={fecha}
                     onChange={e => handleFechaChange(key, e.target.value)}
                     labelWidth="80px"
-                    className="w-48"
                   />
                 )}
               </div>

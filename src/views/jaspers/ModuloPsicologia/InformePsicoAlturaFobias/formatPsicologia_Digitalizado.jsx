@@ -6,7 +6,7 @@ import footerTR from '../../components/footerTR.jsx';
 import drawColorBox from '../../components/ColorBox.jsx';
 import { dibujarFirmas } from '../../../utils/dibujarFirmas.js';
 
-export default async function Informe_Psico_AlturaFobias(data = {}) {
+export default async function formatPsicologia_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -24,7 +24,7 @@ export default async function Informe_Psico_AlturaFobias(data = {}) {
   const datos = {
     // Datos personales
     apellidosNombres: String(`${data.apellidosPaciente ?? ""} ${data.nombresPaciente ?? ""}`).trim(),
-    fechaExamen: formatearFechaCorta(data.fecha ?? data.fechaRegistro ?? ""),
+    fechaExamen: formatearFechaCorta(data.fecha ?? ""),
     tipoExamen: String(data.nombreExamen ?? ""),
     nombreExamenPsicologico: String(data.nombreExamenPsicologico ?? ""),
     sexo: convertirGenero(data.sexoPaciente) || "",
@@ -55,8 +55,8 @@ export default async function Informe_Psico_AlturaFobias(data = {}) {
           data.fobiaAlturaMarcadamente ? "Marcadamente" :
             data.fobiaAlturaMiedoExtremo ? "Miedo Extremo" : "",
     // Análisis y Resultados
-    analisisResultados: String(data.analisis ?? data.analisisResultados ?? ""),
-    recomendaciones: String(data.recomendacion ?? data.recomendaciones ?? ""),
+    analisisResultados: String(data.analisis ?? ""),
+    recomendaciones: String(data.recomendacion ?? ""),
     // Conclusiones
     apto: data.apto ?? false,
     noApto: data.noApto ?? false,
@@ -328,8 +328,8 @@ export default async function Informe_Psico_AlturaFobias(data = {}) {
         doc.text(linea, xCentro, yTextoInicio + idx * 3, { align: "center" });
       });
 
-      // Dibujar X encima del texto si está seleccionada
-      if (valor && opcion.toLowerCase().includes(valor.toLowerCase())) {
+      // Dibujar X encima del texto si está seleccionada (comparación exacta)
+      if (valor && opcion.toLowerCase() === valor.toLowerCase()) {
         // La X va encima del texto, centrada en la misma columna
         dibujarCheckbox(xCentro, yPos, true, filaAltura);
       }

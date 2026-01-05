@@ -9,8 +9,8 @@ import {
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
-const obtenerReporteUrl = "";
-const registrarUrl = "";
+const obtenerReporteUrl = "/api/v01/ct/inmunologia/obtenerReporteVih";
+const registrarUrl = "/api/v01/ct/inmunologia/registrarActualizarVih";
 
 export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
     const res = await GetInfoServicioDefault(
@@ -26,23 +26,24 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             norden: res.norden ?? "",
             fecha: res.fechaExamen,
 
-            nombreExamen: res.nombreExamen ?? "",
-            dni: res.dni ?? "",
+            nombreExamen: res.tipoExamen ?? "",
+            dni: res.dniPaciente ?? "",
 
-            nombres: res.nombres ?? "",
+            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-            edad: res.edad ?? "",
+            lugarNacimiento: res.lugarNacimiento ?? "",
+            edad: res.edadPaciente ?? "",
             sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
-            estadoCivil: res.estadoCivilPaciente,
-            nivelEstudios: res.nivelEstudioPaciente,
+            estadoCivil: res.estadoCivil,
+            nivelEstudios: res.nivelEstudio,
             // Datos Laborales
             empresa: res.empresa,
             contrata: res.contrata,
-            ocupacion: res.ocupacionPaciente,
+            ocupacion: res.ocupacion,
             cargoDesempenar: res.cargoPaciente,
 
-            //AGREGAR
+            muestra: res.muestra ?? "",
+            resultado: res.vih ?? "",
 
             user_medicoFirma: res.usuarioFirma,
         }));
@@ -59,7 +60,10 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
         norden: form.norden,
         fechaExamen: form.fecha,
         userRegistro: user,
-
+        muestra: form.muestra,
+        vih: form.resultado,
+        fechaRegistro: form.fecha,
+        userActualizacion: user,
         usuarioFirma: form.user_medicoFirma,
     };
 

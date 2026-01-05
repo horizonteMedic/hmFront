@@ -7,9 +7,12 @@ import SectionFieldset from "../../../../components/reusableComponents/SectionFi
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import { useForm } from "../../../../hooks/useForm";
-import { SubmitDataService, VerifyTR } from "./controllerEspirometria";
+import { handleSubirArchivoEspirometria, ReadArchivosFormEspirometria, SubmitDataService, VerifyTR } from "./controllerEspirometria";
 import { BotonesAccion, DatosPersonalesLaborales } from "../../../../components/templates/Templates";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
+import { faDownload, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState } from "react";
 
 const tabla = "funcion_abs";
 
@@ -52,6 +55,8 @@ export default function Espirometria() {
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
+        SubirDoc: false,
+        nomenclatura: "ESPIROMETRIA"
     };
 
     const {
@@ -65,7 +70,7 @@ export default function Espirometria() {
         handleClear,
         handleClearnotO,
     } = useForm(initialFormState, { storageKey: "espirometria" });
-
+    const [visualerOpen, setVisualerOpen] = useState(null)
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
@@ -123,6 +128,16 @@ export default function Espirometria() {
                         handleCheckBoxChange(e);
                     }}
                 />
+                {form.SubirDoc && <div className="flex justify-center items-center gap-3">
+                    <button onClick={() => { handleSubirArchivoEspirometria(form, selectedSede, userlogued, token) }} className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2">
+                        <FontAwesomeIcon icon={faUpload} />
+                        Subir Archivo
+                    </button>
+                    <button onClick={() => { ReadArchivosFormEspirometria(form, setVisualerOpen, token) }} className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2">
+                        <FontAwesomeIcon icon={faDownload} />
+                        Ver Archivo
+                    </button>
+                </div>}
             </SectionFieldset>
 
             <DatosPersonalesLaborales form={form} />
@@ -215,6 +230,24 @@ export default function Espirometria() {
                 handleChangeNumberDecimals={handleChangeNumberDecimals}
                 hidePrint
             />
-        </div>
+            {visualerOpen && (
+                <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+                    <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
+                        <div className="px-4 py-2 naranjabackgroud flex justify-between">
+                            <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
+                            <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+                        </div>
+                        <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
+                            <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
+                        </div>
+                        <div className="flex justify-center">
+                            <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                                <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div >
     );
 }

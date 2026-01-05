@@ -142,23 +142,6 @@ export default function InformeDeFobias() {
                 />
             </SectionFieldset>
 
-            <SectionFieldset legend="Observaciones y Recomendaciones" className="grid md:grid-cols-2 gap-x-4 gap-y-3">
-                <InputTextArea
-                    label="Observaciones"
-                    name="observaciones"
-                    value={form?.observaciones}
-                    onChange={handleChange}
-                    rows={4}
-                />
-                <InputTextArea
-                    label="Recomendaciones"
-                    name="recomendaciones"
-                    value={form?.recomendaciones}
-                    onChange={handleChange}
-                    rows={4}
-                />
-            </SectionFieldset>
-
             <SectionFieldset legend="Análisis FODA" className="grid md:grid-cols-2 gap-x-4 gap-y-3">
                 <InputTextArea
                     label="Fortalezas / Oportunidades"
@@ -171,6 +154,23 @@ export default function InformeDeFobias() {
                     label="Amenazas / Debilidades"
                     name="amenazasDebilidades"
                     value={form?.amenazasDebilidades}
+                    onChange={handleChange}
+                    rows={4}
+                />
+            </SectionFieldset>
+
+            <SectionFieldset legend="Observaciones y Recomendaciones" className="grid md:grid-cols-2 gap-x-4 gap-y-3">
+                <InputTextArea
+                    label="Observaciones"
+                    name="observaciones"
+                    value={form?.observaciones}
+                    onChange={handleChange}
+                    rows={4}
+                />
+                <InputTextArea
+                    label="Recomendaciones"
+                    name="recomendaciones"
+                    value={form?.recomendaciones}
                     onChange={handleChange}
                     rows={4}
                 />

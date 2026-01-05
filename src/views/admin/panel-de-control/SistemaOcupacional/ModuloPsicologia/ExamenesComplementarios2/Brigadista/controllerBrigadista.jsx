@@ -41,15 +41,15 @@ export const GetInfoServicio = async (
 
             nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+            lugarNacimiento: res.lugarNacimiento ?? "",
             edad: res.edadPaciente ?? "",
             sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
-            estadoCivil: res.estadoCivilPaciente ?? "",
-            nivelEstudios: res.nivelEstudioPaciente ?? "",
+            estadoCivil: res.estadoCivil ?? "",
+            nivelEstudios: res.nivelEstudio ?? "",
             // Datos Laborales
             empresa: res.empresa ?? "",
             contrata: res.contrata ?? "",
-            ocupacion: res.ocupacionPaciente ?? "",
+            ocupacion: res.areaPaciente ?? "",
             cargoDesempenar: res.cargoPaciente ?? "",
 
             afrontamientoTomaDecisiones: res.afronTdd ?? "",
@@ -97,7 +97,7 @@ export const SubmitDataService = async (
         fodaAmenDebi: form.amenazasDebilidades,
         observacion: form.observaciones,
         recomenda: form.recomendaciones,
-        cumplePerfil: true,
+        cumplePerfil: form.esApto,
         //agregar
         userRegistro: user,
         usuarioFirma: form.user_medicoFirma,

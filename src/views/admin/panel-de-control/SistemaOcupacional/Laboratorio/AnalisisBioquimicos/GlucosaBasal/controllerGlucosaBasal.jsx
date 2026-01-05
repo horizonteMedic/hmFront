@@ -50,7 +50,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             vldl: res.txtVldlColesterol !== undefined && res.txtVldlColesterol !== null && res.txtVldlColesterol !== '' ? (parseFloat(res.txtVldlColesterol).toFixed(2)) : '',
             trigliceridos: res.txtTrigliseridos ?? "",
 
-            examenDirecto: res.glucBasal == "",
+            examenDirecto: res.txtColesterol != "",
 
             user_medicoFirma: res.usuarioFirma,
         }));
