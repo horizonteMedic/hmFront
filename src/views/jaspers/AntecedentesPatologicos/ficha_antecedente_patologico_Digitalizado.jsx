@@ -378,6 +378,33 @@ export default async function ficha_antecedente_patologico_Digitalizado(data = {
   };
 
   // Función para texto con salto de línea
+  // Función para calcular altura necesaria para un texto sin dibujarlo
+  const calcularAlturaTexto = (texto, anchoMaximo, fontSize = 8) => {
+    if (!texto) return filaAltura;
+    doc.setFontSize(fontSize);
+    const palabras = texto.split(' ');
+    let lineaActual = '';
+    let lineas = 1;
+
+    palabras.forEach(palabra => {
+      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+      const anchoTexto = doc.getTextWidth(textoPrueba);
+
+      if (anchoTexto <= anchoMaximo) {
+        lineaActual = textoPrueba;
+      } else {
+        if (lineaActual) {
+          lineas++;
+          lineaActual = palabra;
+        } else {
+          lineas++;
+        }
+      }
+    });
+
+    return Math.max(lineas * fontSize * 0.35 + 1.5, filaAltura);
+  };
+
   const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
     if (!texto) return y;
     const fontSize = doc.internal.getFontSize();
@@ -447,22 +474,30 @@ export default async function ficha_antecedente_patologico_Digitalizado(data = {
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Cuarta fila: Puesto de Trabajo, Área de Trabajo (2 columnas)
+  // Cuarta fila: Puesto de Trabajo (fila completa con altura dinámica)
+  const alturaPuestoTrabajo = calcularAlturaTexto(datosFinales.puestoTrabajo || "", tablaAncho - 35, 8);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaPuestoTrabajo);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaPuestoTrabajo);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaPuestoTrabajo, tablaInicioX + tablaAncho, yPos + alturaPuestoTrabajo);
+  yPos += alturaPuestoTrabajo;
+
+  // Quinta fila: Área de Trabajo (fila completa con altura dinámica)
+  const alturaAreaTrabajo = calcularAlturaTexto(datosFinales.areaTrabajo || "", tablaAncho - 35, 8);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaAreaTrabajo);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaAreaTrabajo);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaAreaTrabajo, tablaInicioX + tablaAncho, yPos + alturaAreaTrabajo);
+  yPos += alturaAreaTrabajo;
+
+  // Sexta fila: Empresa (fila completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Quinta fila: Empresa (fila completa)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Sexta fila: Contrata (fila completa)
+  // Séptima fila: Contrata (fila completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
@@ -509,26 +544,28 @@ export default async function ficha_antecedente_patologico_Digitalizado(data = {
   dibujarTextoConSaltoLinea(datosFinales.domicilio, tablaInicioX + 25, yTexto + 1.5, 160);
   yTexto += filaAltura;
 
-  // Cuarta fila: Puesto de Trabajo, Área de Trabajo
+  // Cuarta fila: Puesto de Trabajo (fila completa)
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.puestoTrabajo, tablaInicioX + 30, yTexto + 1.5);
+  dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo, tablaInicioX + 35, yTexto + 1.5, tablaAncho - 40);
+  yTexto += alturaPuestoTrabajo;
 
+  // Quinta fila: Área de Trabajo (fila completa)
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Área de Trabajo:", tablaInicioX + 92, yTexto + 1.5);
+  doc.text("Área de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.areaTrabajo, tablaInicioX + 118, yTexto + 1.5);
-  yTexto += filaAltura;
+  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo, tablaInicioX + 35, yTexto + 1.5, tablaAncho - 40);
+  yTexto += alturaAreaTrabajo;
 
-  // Quinta fila: Empresa
+  // Sexta fila: Empresa
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 24, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
-  // Sexta fila: Contratista
+  // Séptima fila: Contratista
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Contratista:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);

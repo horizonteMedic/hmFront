@@ -25,9 +25,9 @@ export default async function Informe_Lab_Thevenon(datos = {}) {
 
   await drawHeader(doc, datos);
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
-  doc.text("PRUEBA DE THEVENON", pageW / 2, 38, { align: "center" });
+  doc.text("PRUEBA DE THEVENON", pageW / 2, 32, { align: "center" });
   doc.setFont(config.font, "bold").setFontSize(12);
-  doc.text("SANGRE OCULTA EN HECES", pageW / 2, 44, { align: "center" });
+  doc.text("SANGRE OCULTA EN HECES", pageW / 2, 38, { align: "center" });
   const finalYPos = drawPatientData(doc, datos);
 
   let y = finalYPos + 10;
@@ -146,7 +146,8 @@ const drawPatientData = (doc, datos = {}) => {
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Apellidos y Nombres:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.nombres || datos.nombresPaciente || datos.nombreCompleto || '', tablaInicioX + 40, yPos + 3.5);
+  const nombreCompleto = datos.nombreCompleto || (datos.nombresPaciente && datos.apellidosPaciente ? `${datos.nombresPaciente} ${datos.apellidosPaciente}`.trim() : datos.nombresPaciente || datos.nombres || '');
+  doc.text(nombreCompleto, tablaInicioX + 40, yPos + 3.5);
   yPos += filaAltura;
 
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
