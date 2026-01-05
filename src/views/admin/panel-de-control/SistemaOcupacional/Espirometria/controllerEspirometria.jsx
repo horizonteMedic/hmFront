@@ -7,11 +7,14 @@ import {
     VerifyTRPerzonalizadoDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
+import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/espirometria/obtenerReporteEspirometria";
 const registrarUrl =
     "/api/v01/ct/espirometria/registrarActualizarEspirometria";
+const registrarPDF =
+    "/api/v01/ct/archivos/archivoInterconsulta"
 
 export const GetInfoServicio = async (
     nro,
@@ -68,6 +71,7 @@ export const GetInfoServicio = async (
             interpretacion: res.interpretacion,
 
             user_medicoFirma: res.usuarioFirma,
+            SubirDoc: true
         }));
     }
 };
@@ -165,3 +169,82 @@ const GetInfoPac = async (nro, set, token, sede) => {
 export const Loading = (mensaje) => {
     LoadingDefault(mensaje);
 };
+
+export const handleSubirArchivoEspirometria = async (form, selectedSede, userlogued, token) => {
+    const { value: file } = await Swal.fire({
+        title: "Selecciona un archivo PDF",
+        input: "file",
+        inputAttributes: {
+            accept: "application/pdf", // solo PDF
+            "aria-label": "Sube tu archivo en formato PDF"
+        },
+        showCancelButton: true,
+        confirmButtonText: "Subir",
+        cancelButtonText: "Cancelar",
+        inputValidator: (file) => {
+            if (!file) return "Debes seleccionar un archivo.";
+            if (file.type !== "application/pdf") return "Solo se permiten archivos PDF.";
+        },
+    });
+    const currentDate = new Date(); // Obtiene la fecha y hora actual
+    const year = currentDate.getFullYear(); // Obtiene el año actual
+    const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Obtiene el mes actual y le agrega un 0 al principio si es menor a 10
+    const day = ('0' + currentDate.getDate()).slice(-2);
+
+    if (file) {
+        // Puedes convertirlo a Base64 si lo necesitas
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            LoadingDefault("Subiendo documento")
+            const base64WithoutHeader = e.target.result.split(',')[1];
+            const datos = {
+                rutaArchivo: null,
+                dni: null,
+                historiaClinica: null,
+                servidor: "azure",
+                estado: true,
+                fechaRegistro: `${year}-${month}-${day}`,
+                userRegistro: userlogued,
+                fechaActualizacion: null,
+                userActualizacion: null,
+                id_tipo_archivo: null,
+
+                nombreArchivo: file.name,
+                codigoSede: selectedSede,
+                fileBase64: base64WithoutHeader,
+                nomenclatura_tipo_archivo: form.nomenclatura,
+                orden: form.norden,
+                indice_carga_masiva: undefined,
+            };
+
+            const response = await SubmitData(datos, registrarPDF, token);
+            console.log(response)
+            if (response.id === 1) {
+
+                Swal.fire("Exito", "Archivo Subido con exto", "success")
+            } else {
+                Swal.fire("Error", "No se pudo subir", "error")
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+export const ReadArchivosFormEspirometria = async (form, setVisualerOpen, token) => {
+    LoadingDefault("Cargando Interconsulta")
+    getFetch(`/api/v01/st/registros/detalleUrlArchivos/${form.norden}/${form.nomenclatura}`, token)
+        .then(response => {
+            console.log(response)
+            if (response.id === 1) {
+                setVisualerOpen(response)
+
+                Swal.close()
+            } else {
+                Swal.fire("Error", "No Existe reporte para este Numero de Orden", "error")
+            }
+        })
+        .catch(error => {
+            Swal.fire("Error", "Ocurrio un Error al visualizar la interconsulta", "error")
+            throw new Error('Network response was not ok.', error);
+        })
+}
