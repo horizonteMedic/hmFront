@@ -49,7 +49,7 @@ export const GetInfoServicio = async (
             // Datos Laborales
             empresa: res.empresa ?? "",
             contrata: res.contrata ?? "",
-            ocupacion: res.ocupacionPaciente ?? "",
+            ocupacion: res.areaPaciente ?? "",
             cargoDesempenar: res.cargoPaciente ?? "",
 
             temorRiesgoElectrico: res.triesgoElectrico ?? "",
