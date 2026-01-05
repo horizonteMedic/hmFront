@@ -2,16 +2,16 @@ import Swal from "sweetalert2";
 import { getFetch } from '../../../../getFetch/getFetch';
 import { GetInfoLaboratioEx } from '../Controller/model';
 import { GetInfoPacDefault, LoadingDefault, VerifyTRDefault } from '../../../../../../utils/functionUtils';
+import { getToday } from "../../../../../../utils/helpers";
 
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+const today = getToday();
 
 const camposAPI = {
   MARIHUANA: { valor: 'antConsumeMarih', fecha: 'fechaConsumeMarih' },
   COCAINA: { valor: 'antConsumeCocacina', fecha: 'fechaConsumeCocacina' },
   COCA: { valor: 'antConsumeHojaCoca', fecha: 'fechaConsumoHojaCoca' },
-  OPIACEOS: { valor: 'antConsumeOpiacesos', fecha: 'fechaConsumeOpiacesos' },
-  METHANFETAMINAS: { valor: 'antConsumeMethanfetaminaOOpiaceos', fecha: 'fechaConsumeMethanfetamina' },
+  OPIA: { valor: 'antConsumeOpiacesos', fecha: 'fechaConsumeOpiacesos' },
+  METAN: { valor: 'antConsumeMethanfetaminaOOpiaceos', fecha: 'fechaConsumeMethanfetamina' },
 };
 
 const tabla = 'con_panel4D';
