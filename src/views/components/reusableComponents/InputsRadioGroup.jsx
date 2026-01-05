@@ -13,6 +13,13 @@ export default function InputsRadioGroup({
   labelClassName = "",
   groupClassName = "",
 }) {
+  const styleButton = ` w-5 h-5
+                        rounded-md
+                        accent-primario
+                        border border-primario
+                        cursor-pointer
+                        disabled:cursor-not-allowed
+                        disabled:opacity-50 `
   const firstOptionId = options.length > 0 ? `${name}-${options[0].value}` : `${name}-first`;
 
   return (
@@ -43,6 +50,7 @@ export default function InputsRadioGroup({
                 value={option.value}
                 checked={value === option.value}
                 onChange={(e) => disabled ? null : onChange(e, option.value)}
+                className={styleButton}
               />
               <span>{option.label}</span>
             </label>

@@ -4,7 +4,7 @@ import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import PropTypes from 'prop-types';
-import { getSign } from '../../utils/helpers';
+import { getSign, getSignCompressed } from '../../utils/helpers';
 
 export default async function UsoRespiradores(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -2132,7 +2132,7 @@ export default async function UsoRespiradores(data = {}, docExistente = null) {
   const firmaMedicoY = yPos + 3;
 
   // Agregar firma y sello médico con fallback
-  let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
+  let firmaMedicoUrl = await getSignCompressed(data, "SELLOFIRMA");
   if (firmaMedicoUrl) {
     try {
       const imgWidth = 45;

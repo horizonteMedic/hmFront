@@ -60,6 +60,7 @@ export const GetInfoServicio = async (
         }
 
         //Validación Oftalmo uso lentes correctores y agudeza visual
+        let usoPermanenteLentesCorrectores = "NO";
         const vlejoscod = res.odlcOftalmologia_odlc || "";
         const vlejoscoi = res.oilcOftalmologia_oilc || "";
 
@@ -75,6 +76,10 @@ export const GetInfoServicio = async (
                 concatenacionObservacion += visionLejosNormal && visionCercaNormal
                     ? "CORREGIR AGUDEZA VISUAL.\n"
                     : "USO DE LENTES CORRECTORES.\n";
+
+                if (!visionLejosNormal ||!visionCercaNormal) {
+                    usoPermanenteLentesCorrectores = "SI";
+                }
             }
         }
 
@@ -129,6 +134,8 @@ export const GetInfoServicio = async (
             peso: res.peso ?? "",
             imc: res.imc ?? "",
             presionArterial: `${res.sistolica ?? ""}/${res.diastolica ?? ""}`,
+
+            usoPermanenteLentesCorrectores: usoPermanenteLentesCorrectores,
 
             observacionesYRecomendaciones: concatenacionObservacion,
         }));

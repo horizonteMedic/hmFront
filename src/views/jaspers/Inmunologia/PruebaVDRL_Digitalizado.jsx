@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import headerVDRLDigitalizado from "./Header/header_VDRL_Digitalizado";
+// import headerVDRLDigitalizado from "./Header/header_VDRL_Digitalizado";
 import footer from "../components/footer";
 
 // --- Configuración Centralizada (Estándar Inmunología) ---
@@ -34,7 +34,7 @@ export default async function PruebaVDRL_Digitalizado(datos) {
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
-  headerVDRLDigitalizado(doc, datos);
+  // headerVDRLDigitalizado(doc, datos);
 
   const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
   const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");

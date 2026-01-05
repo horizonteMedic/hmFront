@@ -3,6 +3,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
+import { getSignCompressed } from "../../utils/helpers.js";
 
 export default async function ficha_antecedente_patologico_Digitalizado(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -1582,15 +1583,8 @@ export default async function ficha_antecedente_patologico_Digitalizado(data = {
   const centroColumna2X = tablaInicioX + tablaAncho / 2 + (tablaAncho / 2) / 2;
 
   // Agregar firma y sello médico
-  let firmaMedicoUrl = null;
+  let firmaMedicoUrl = await getSignCompressed(data, "SELLOFIRMA");
 
-  if (data.digitalizacion && data.digitalizacion.length > 0) {
-    const firmaMedicoData = data.digitalizacion.find(item => item.nombreDigitalizacion === "SELLOFIRMA");
-
-    if (firmaMedicoData && firmaMedicoData.url) {
-      firmaMedicoUrl = firmaMedicoData.url;
-    }
-  }
 
   if (firmaMedicoUrl) {
     try {

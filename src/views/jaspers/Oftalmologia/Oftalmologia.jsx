@@ -430,7 +430,7 @@ export default async function Oftalmologia(datos = {}, docExistente = null) {
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });
 
-  agregarFirmas(doc, datos.digitalizacion, firmasAPintar).then(() => {
+  await agregarFirmas(doc, datos.digitalizacion, firmasAPintar).then(() => {
     if (docExistente) {
       return doc;
     } else {

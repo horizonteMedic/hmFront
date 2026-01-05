@@ -1,11 +1,11 @@
 import InputTextOneLine from "../reusableComponents/InputTextOneLine";
 import SectionFieldset from "../reusableComponents/SectionFieldset";
 
-export default function DatosPersonalesLaborales({form, personales = true, laborales = true}) {
+export default function DatosPersonalesLaborales({ form, personales = true, laborales = true, minSizePrincipal = "lg", minSizeSecundario = "lg" }) {
     return (
         <>
             {personales &&
-                (<SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
+                (<SectionFieldset legend="Datos Personales" collapsible className={`grid grid-cols-1 ${minSizePrincipal}:grid-cols-2 gap-x-4 gap-y-3`}>
                     <InputTextOneLine
                         label="Nombres"
                         name="nombres"
@@ -13,7 +13,7 @@ export default function DatosPersonalesLaborales({form, personales = true, labor
                         disabled
                         labelWidth="120px"
                     />
-                    <div className="grid lg:grid-cols-2 gap-3">
+                    <div className={`grid ${minSizeSecundario}:grid-cols-2 gap-x-4 gap-y-3`}>
                         <InputTextOneLine
                             label="Edad (Años)"
                             name="edad"
@@ -29,7 +29,7 @@ export default function DatosPersonalesLaborales({form, personales = true, labor
                             labelWidth="120px"
                         />
                     </div>
-                    <div className="grid lg:grid-cols-2 gap-3">
+                    <div className={`grid ${minSizeSecundario}:grid-cols-2 gap-x-4 gap-y-3`}>
                         <InputTextOneLine
                             label="DNI"
                             name="dni"
@@ -69,7 +69,7 @@ export default function DatosPersonalesLaborales({form, personales = true, labor
                 </SectionFieldset>)
             }
             {laborales &&
-                (<SectionFieldset legend="Datos Laborales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
+                (<SectionFieldset legend="Datos Laborales" collapsible className={`grid grid-cols-1 ${minSizePrincipal}:grid-cols-2 gap-x-4 gap-y-3`}>
                     <InputTextOneLine
                         label="Empresa"
                         name="empresa"

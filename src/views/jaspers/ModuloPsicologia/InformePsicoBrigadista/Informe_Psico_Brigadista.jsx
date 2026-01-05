@@ -4,8 +4,9 @@ import { formatearFechaCorta } from "../../../utils/formatDateUtils.js";
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import { convertirGenero } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
+import { dibujarFirmas } from '../../../utils/dibujarFirmas.js';
 
-export default function InformePsicoBrigadista(data = {}, docExistente = null) {
+export default async function InformePsicoBrigadista(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -16,7 +17,7 @@ export default function InformePsicoBrigadista(data = {}, docExistente = null) {
   function buildDatosFinales(raw) {
     const datosFinales = {
       apellidosNombres: String((((raw?.apellidosPaciente ?? '') + ' ' + (raw?.nombresPaciente ?? '')).trim())),
-      fechaExamen: formatearFechaCorta(raw?.fechaRegistro ?? raw?.fecha ?? ''),
+      fechaExamen: formatearFechaCorta(raw?.fechaRegistro ?? raw?.fecha ?? raw?.fechaExamen ?? ''),
       sexo: convertirGenero(raw?.sexoPaciente ?? ''),
       documentoIdentidad: String(raw?.dniPaciente ?? ''),
       edad: String(raw?.edadPaciente ?? ''),
@@ -33,15 +34,15 @@ export default function InformePsicoBrigadista(data = {}, docExistente = null) {
       codigoColor: String(raw?.codigoColor ?? ''),
       textoColor: String(raw?.textoColor ?? ''),
       // Datos específicos para brigadistas - usando solo las variables de la data
-      afrontamientoTomaDecisiones: String(raw?.afrontamientoTomaDecisiones ?? raw?.criterioAfrontamientoTomaDecisiones ?? ''),
-      estiloConflicto: String(raw?.estiloDeConflicto ?? raw?.criterioEstiloConflicto ?? ''),
-      afrontamientoSituacionesRiesgo: String(raw?.afrontamientoSituacionesRiesgo ?? raw?.criterioAfrontamientoSituacionesRiesgo ?? ''),
-      nivelAnsiedad: String(raw?.nivelAnsiedad ?? raw?.criterioNivelAnsiedad ?? ''),
-      fortalezasOportunidades: String(raw?.analisisFodaFortalezasOportunidades ?? raw?.analisisFodaFortaOport ?? ''),
-      amenazasDebilidades: String(raw?.analisisFodaAmenazasDebilidades ?? raw?.analisisFodaAmenazDebili ?? ''),
-      observaciones: String(raw?.observacion ?? raw?.observaciones ?? ''),
-      recomendaciones: String(raw?.recomendacion ?? raw?.recomendaciones ?? ''),
-      cumplePerfil: (typeof raw?.perfilCumple === 'boolean') ? raw.perfilCumple : (raw?.perfilCumple === true || raw?.perfilCumple === 'true' || raw?.perfilCumple === 1),
+      afrontamientoTomaDecisiones: String(raw?.afronTdd ?? ''),
+      estiloConflicto: String(raw?.estiloConflicto ?? ''),
+      afrontamientoSituacionesRiesgo: String(raw?.afronSitRiesgo ?? ''),
+      nivelAnsiedad: String(raw?.levelAnsiedad ?? ''),
+      fortalezasOportunidades: String(raw?.fodaForOpor ?? ''),
+      amenazasDebilidades: String(raw?.fodaAmenDebi ?? ''),
+      observaciones: String(raw?.observacion ?? ''),
+      recomendaciones: String(raw?.recomenda ?? ''),
+      cumplePerfil: (typeof raw?.cumplePerfil === 'boolean') ? raw.cumplePerfil : (raw?.cumplePerfil === true || raw?.cumplePerfil === 'true' || raw?.cumplePerfil === 1 || raw?.perfilCumple === true || raw?.perfilCumple === 'true' || raw?.perfilCumple === 1),
     };
     return datosFinales;
   }
@@ -49,9 +50,9 @@ export default function InformePsicoBrigadista(data = {}, docExistente = null) {
   const datosFinales = buildDatosFinales(data);
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
 
     // Títulos
     doc.setFont("helvetica", "bold").setFontSize(14);
@@ -187,13 +188,14 @@ export default function InformePsicoBrigadista(data = {}, docExistente = null) {
   };
 
   // === PÁGINA 1 ===
-  drawHeader(numeroPagina);
+  await drawHeader(numeroPagina);
 
   // === SECCIÓN 1: DATOS DE FILIACIÓN ===
   const tablaInicioX = 5;
   const tablaAncho = 200;
   let yPos = 38;
   const filaAltura = 5;
+  const paddingVertical = 2; // Padding vertical para secciones con texto dinámico
 
   // Header de datos de filiación
   yPos = dibujarHeaderSeccion("I. DATOS DE FILIACIÓN", yPos, filaAltura);
@@ -336,7 +338,7 @@ export default function InformePsicoBrigadista(data = {}, docExistente = null) {
     doc.addPage();
     numeroPagina++;
     yPos = 35;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
   }
 
   yPos = dibujarHeaderSeccion("II. CRITERIOS PSICOLÓGICOS", yPos, filaAltura);
@@ -402,26 +404,53 @@ export default function InformePsicoBrigadista(data = {}, docExistente = null) {
     doc.addPage();
     numeroPagina++;
     yPos = 35;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
   }
 
   yPos = dibujarHeaderSeccion("III. ANÁLISIS FODA", yPos, filaAltura);
 
-  // Fila: FORTALEZAS / OPORTUNIDADES
-  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("FORTALEZAS / OPORTUNIDADES:", tablaInicioX + 2, yPos + 3.5);
+  // Fila: FORTALEZAS / OPORTUNIDADES (con padding vertical)
+  const anchoLabel = 58;
+  const anchoValor = tablaAncho - anchoLabel - 4;
+  const textoFortalezas = datosFinales.fortalezasOportunidades || "-";
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.fortalezasOportunidades || "-", tablaInicioX + 60, yPos + 3.5);
-  yPos += filaAltura;
+  const lineasFortalezas = doc.splitTextToSize(textoFortalezas, anchoValor);
+  const alturaFortalezas = Math.max(filaAltura, lineasFortalezas.length * 3.5 + paddingVertical * 2);
+  
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaFortalezas, 'S');
+  doc.line(tablaInicioX + anchoLabel, yPos, tablaInicioX + anchoLabel, yPos + alturaFortalezas);
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("FORTALEZAS / OPORTUNIDADES:", tablaInicioX + 2, yPos + paddingVertical + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  if (lineasFortalezas.length === 1) {
+    doc.text(lineasFortalezas[0], tablaInicioX + anchoLabel + 2, yPos + paddingVertical + 3.5);
+  } else {
+    const yInicioTexto = yPos + paddingVertical + 3.5;
+    lineasFortalezas.forEach((linea, lineIdx) => {
+      doc.text(linea, tablaInicioX + anchoLabel + 2, yInicioTexto + (lineIdx * 3.5));
+    });
+  }
+  yPos += alturaFortalezas;
 
-  // Fila: AMENAZAS / DEBILIDADES
-  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
+  // Fila: AMENAZAS / DEBILIDADES (con padding vertical)
+  const textoAmenazas = datosFinales.amenazasDebilidades || "-";
+  const lineasAmenazas = doc.splitTextToSize(textoAmenazas, anchoValor);
+  const alturaAmenazas = Math.max(filaAltura, lineasAmenazas.length * 3.5 + paddingVertical * 2);
+  
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaAmenazas, 'S');
+  doc.line(tablaInicioX + anchoLabel, yPos, tablaInicioX + anchoLabel, yPos + alturaAmenazas);
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("AMENAZAS / DEBILIDADES:", tablaInicioX + 2, yPos + 3.5);
+  doc.text("AMENAZAS / DEBILIDADES:", tablaInicioX + 2, yPos + paddingVertical + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.amenazasDebilidades || "-", tablaInicioX + 60, yPos + 3.5);
-  yPos += filaAltura;
+  if (lineasAmenazas.length === 1) {
+    doc.text(lineasAmenazas[0], tablaInicioX + anchoLabel + 2, yPos + paddingVertical + 3.5);
+  } else {
+    const yInicioTexto = yPos + paddingVertical + 3.5;
+    lineasAmenazas.forEach((linea, lineIdx) => {
+      doc.text(linea, tablaInicioX + anchoLabel + 2, yInicioTexto + (lineIdx * 3.5));
+    });
+  }
+  yPos += alturaAmenazas;
 
   // === SECCIÓN 4: OBSERVACIONES ===
   // Verificar si necesitamos nueva página
@@ -429,7 +458,7 @@ export default function InformePsicoBrigadista(data = {}, docExistente = null) {
     doc.addPage();
     numeroPagina++;
     yPos = 35;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
   }
 
   yPos = dibujarHeaderSeccion("IV. OBSERVACIONES", yPos, filaAltura);
@@ -443,7 +472,7 @@ export default function InformePsicoBrigadista(data = {}, docExistente = null) {
     doc.addPage();
     numeroPagina++;
     yPos = 35;
-    drawHeader(numeroPagina);
+    await drawHeader(numeroPagina);
   }
 
   yPos = dibujarHeaderSeccion("V. RECOMENDACIONES:", yPos, filaAltura);
@@ -470,34 +499,28 @@ export default function InformePsicoBrigadista(data = {}, docExistente = null) {
   // Procesar recomendaciones
   const itemsRecomendaciones = procesarRecomendaciones(datosFinales.recomendaciones);
   
-  // Ancho para la firma a la derecha
-  const anchoFirma = 60; // Ancho reservado para la firma
-  const anchoRecomendaciones = tablaAncho - anchoFirma - 2; // Ancho disponible para recomendaciones
+  // Ancho disponible para recomendaciones (sin reservar espacio para firma)
+  const anchoRecomendaciones = tablaAncho - 4;
   
-  // Calcular altura necesaria
+  // Calcular altura necesaria (con padding igual que OBSERVACIONES)
+  const padding = 3;
   let alturaRecomendaciones = 20;
   if (itemsRecomendaciones.length > 0) {
     let alturaTotal = 0;
     itemsRecomendaciones.forEach(item => {
-      const lineas = doc.splitTextToSize(item, anchoRecomendaciones - 4);
-      alturaTotal += lineas.length * 3.5 + 2;
+      const textoItem = item.trim().startsWith('-') ? item.trim() : '- ' + item.trim();
+      const lineas = doc.splitTextToSize(textoItem, anchoRecomendaciones - 4);
+      alturaTotal += lineas.length * 3.5;
     });
-    alturaRecomendaciones = Math.max(20, alturaTotal + 4);
+    alturaRecomendaciones = Math.max(20, alturaTotal + padding * 2); // padding arriba y abajo
   }
-  
-  // Asegurar altura mínima para la firma
-  const alturaMinimaFirma = 25;
-  alturaRecomendaciones = Math.max(alturaRecomendaciones, alturaMinimaFirma);
   
   // Dibujar borde
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaRecomendaciones, 'S');
   
-  // Línea divisoria entre recomendaciones y firma
-  doc.line(tablaInicioX + anchoRecomendaciones, yPos, tablaInicioX + anchoRecomendaciones, yPos + alturaRecomendaciones);
-  
-  // Dibujar recomendaciones
+  // Dibujar recomendaciones (con padding arriba igual que OBSERVACIONES)
   doc.setFont("helvetica", "normal").setFontSize(9);
-  let yRecomendaciones = yPos + 3;
+  let yRecomendaciones = yPos + padding + 2; // Mismo padding que OBSERVACIONES (3 + 2 = 5)
   itemsRecomendaciones.forEach(item => {
     const textoItem = item.trim().startsWith('-') ? item.trim() : '- ' + item.trim();
     const lineas = doc.splitTextToSize(textoItem, anchoRecomendaciones - 4);
@@ -507,164 +530,75 @@ export default function InformePsicoBrigadista(data = {}, docExistente = null) {
     });
   });
 
-  // Guardar yPos para después de las recomendaciones
-  const yPosDespuesRecomendaciones = yPos + alturaRecomendaciones;
+  yPos += alturaRecomendaciones;
 
-  // Firma del médico (sin pie de firma) - dentro de la misma fila, al lado derecho
-  // Cargar sello del médico
-  const digitalizacion = data.digitalizacion || [];
-  const sello1 = digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  const sello2 = digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
-  const isValidUrl = url => url && url !== "Sin registro";
+  // === SECCIÓN 6: CUMPLE CON EL PERFIL ===
+  // Verificar si necesitamos nueva página
+  if (yPos + 20 > pageHeight - 20) {
+    doc.addPage();
+    numeroPagina++;
+    yPos = 35;
+    await drawHeader(numeroPagina);
+  }
 
-  const loadImg = src =>
-    new Promise((res, rej) => {
-      const img = new Image();
-      img.src = src;
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const maxWidth = 800;
-        let width = img.width;
-        let height = img.height;
+  yPos = dibujarHeaderSeccion("VI. CUMPLE CON EL PERFIL PARA EL PUESTO QUE POSTULA", yPos, filaAltura);
 
-        if (width > maxWidth) {
-          height = (height * maxWidth) / width;
-          width = maxWidth;
-        }
+  // Fila con 4 columnas: SI | (vacía) | NO | (vacía)
+  const colTextoW = (tablaAncho - 30) / 2; // Ancho para columnas de texto
+  const colVaciaW = 15; // Ancho para columnas vacías
 
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, width, height);
-        ctx.drawImage(img, 0, 0, width, height);
-        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
-        res(compressedDataUrl);
-      };
-      img.onerror = () => rej(`No se pudo cargar ${src}`);
-    });
+  // Dibujar las 4 columnas
+  doc.rect(tablaInicioX, yPos, colTextoW, filaAltura, 'S'); // Columna 1: SI
+  doc.rect(tablaInicioX + colTextoW, yPos, colVaciaW, filaAltura, 'S'); // Columna 2: Vacía
+  doc.rect(tablaInicioX + colTextoW + colVaciaW, yPos, colTextoW, filaAltura, 'S'); // Columna 3: NO
+  doc.rect(tablaInicioX + colTextoW * 2 + colVaciaW, yPos, colVaciaW, filaAltura, 'S'); // Columna 4: Vacía
 
-  Promise.all([
-    isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
-    isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-  ]).then(([s1, s2]) => {
-    const sigW = 48;
-    const sigH = 20;
-    const sigY = yPos + (alturaRecomendaciones / 2) - (sigH / 2); // Centrar verticalmente
-    const gap = 16;
-    const xInicioFirma = tablaInicioX + anchoRecomendaciones + 2; // Posición X de la firma
-    const centroXFirma = xInicioFirma + (anchoFirma / 2); // Centro de la columna de firma
+  // Texto en las columnas
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  const centroVertical = yPos + filaAltura / 2 + 1;
+  doc.text("SI", tablaInicioX + colTextoW / 2, centroVertical, { align: "center" });
+  doc.text("NO", tablaInicioX + colTextoW + colVaciaW + colTextoW / 2, centroVertical, { align: "center" });
 
-    if (s1 && s2) {
-      // Dos sellos lado a lado
-      const totalWidth = sigW * 2 + gap;
-      const startX = centroXFirma - totalWidth / 2;
-      doc.addImage(s1, 'JPEG', startX, sigY, sigW, sigH);
-      doc.addImage(s2, 'JPEG', startX + sigW + gap, sigY, sigW, sigH);
-    } else if (s1) {
-      // Un solo sello centrado
-      const imgX = centroXFirma - sigW / 2;
-      doc.addImage(s1, 'JPEG', imgX, sigY, sigW, sigH);
-    } else if (s2) {
-      // Un solo sello centrado
-      const imgX = centroXFirma - sigW / 2;
-      doc.addImage(s2, 'JPEG', imgX, sigY, sigW, sigH);
-    }
+  // Marcar X según cumplePerfil (en las columnas vacías)
+  // Ajustar centro vertical para la X (fontSize 12) para que quede mejor centrada
+  const cumplePerfil = datosFinales.cumplePerfil ?? true;
+  doc.setFont("helvetica", "bold").setFontSize(12);
+  const centroVerticalX = yPos + filaAltura / 2 + 1.5; // Ajustado para centrar mejor la X más grande
+  if (cumplePerfil) {
+    // Marcar X en la columna vacía después de SI (columna 2)
+    doc.text("X", tablaInicioX + colTextoW + colVaciaW / 2, centroVerticalX, { align: "center" });
+  } else {
+    // Marcar X en la columna vacía después de NO (columna 4)
+    doc.text("X", tablaInicioX + colTextoW * 2 + colVaciaW + colVaciaW / 2, centroVerticalX, { align: "center" });
+  }
 
-    // === SECCIÓN 6: CUMPLE CON EL PERFIL ===
-    // Verificar si necesitamos nueva página
-    if (yPosDespuesRecomendaciones + 20 > pageHeight - 20) {
-      doc.addPage();
-      numeroPagina++;
-      yPos = 35;
-      drawHeader(numeroPagina);
-    } else {
-      yPos = yPosDespuesRecomendaciones;
-    }
+  yPos += filaAltura;
 
-    yPos = dibujarHeaderSeccion("VI. CUMPLE CON EL PERFIL PARA EL PUESTO QUE POSTULA", yPos, filaAltura);
+  // === SECCIÓN 7: FIRMA ===
+  // Verificar si necesitamos nueva página
+  if (yPos + 30 > pageHeight - 20) {
+    doc.addPage();
+    numeroPagina++;
+    yPos = 35;
+    await drawHeader(numeroPagina);
+  }
 
-    // Fila con 4 columnas: SI | (vacía) | NO | (vacía)
-    const colTextoW = (tablaAncho - 30) / 2; // Ancho para columnas de texto
-    const colVaciaW = 15; // Ancho para columnas vacías
+  // Dibujar sección de firma con borde
+  const alturaSeccionFirma = 30;
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaSeccionFirma, 'S');
 
-    // Dibujar las 4 columnas
-    doc.rect(tablaInicioX, yPos, colTextoW, filaAltura, 'S'); // Columna 1: SI
-    doc.rect(tablaInicioX + colTextoW, yPos, colVaciaW, filaAltura, 'S'); // Columna 2: Vacía
-    doc.rect(tablaInicioX + colTextoW + colVaciaW, yPos, colTextoW, filaAltura, 'S'); // Columna 3: NO
-    doc.rect(tablaInicioX + colTextoW * 2 + colVaciaW, yPos, colVaciaW, filaAltura, 'S'); // Columna 4: Vacía
+  // Usar la función dibujarFirmas para dibujar las firmas
+  await dibujarFirmas({ doc, datos: data, y: yPos + 2, pageW });
 
-    // Texto en las columnas
-    doc.setFont("helvetica", "bold").setFontSize(9);
-    doc.text("SI", tablaInicioX + colTextoW / 2, yPos + 3.5, { align: "center" });
-    doc.text("NO", tablaInicioX + colTextoW + colVaciaW + colTextoW / 2, yPos + 3.5, { align: "center" });
+  // === FOOTER ===
+  footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
 
-    // Marcar X según cumplePerfil (en las columnas vacías)
-    const cumplePerfil = datosFinales.cumplePerfil ?? true;
-    doc.setFont("helvetica", "bold").setFontSize(12);
-    if (cumplePerfil) {
-      // Marcar X en la columna vacía después de SI (columna 2)
-      doc.text("X", tablaInicioX + colTextoW + colVaciaW / 2, yPos + 3.5, { align: "center" });
-    } else {
-      // Marcar X en la columna vacía después de NO (columna 4)
-      doc.text("X", tablaInicioX + colTextoW * 2 + colVaciaW + colVaciaW / 2, yPos + 3.5, { align: "center" });
-    }
-
-    yPos += filaAltura;
-
-    // === FOOTER ===
-    footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
-
-    // === Imprimir ===
-    if (!docExistente) {
-      imprimir(doc);
-    }
-  }).catch(err => {
-    console.error("Error al cargar firma del médico:", err);
-    
-    // Continuar con la sección VI aunque falle la carga de la firma
-    // === SECCIÓN 6: CUMPLE CON EL PERFIL ===
-    if (yPosDespuesRecomendaciones + 20 > pageHeight - 20) {
-      doc.addPage();
-      numeroPagina++;
-      yPos = 35;
-      drawHeader(numeroPagina);
-    } else {
-      yPos = yPosDespuesRecomendaciones;
-    }
-
-    yPos = dibujarHeaderSeccion("VI. CUMPLE CON EL PERFIL PARA EL PUESTO QUE POSTULA", yPos, filaAltura);
-
-    const colTextoW = (tablaAncho - 30) / 2;
-    const colVaciaW = 15;
-
-    doc.rect(tablaInicioX, yPos, colTextoW, filaAltura, 'S');
-    doc.rect(tablaInicioX + colTextoW, yPos, colVaciaW, filaAltura, 'S');
-    doc.rect(tablaInicioX + colTextoW + colVaciaW, yPos, colTextoW, filaAltura, 'S');
-    doc.rect(tablaInicioX + colTextoW * 2 + colVaciaW, yPos, colVaciaW, filaAltura, 'S');
-
-    doc.setFont("helvetica", "bold").setFontSize(9);
-    doc.text("SI", tablaInicioX + colTextoW / 2, yPos + 3.5, { align: "center" });
-    doc.text("NO", tablaInicioX + colTextoW + colVaciaW + colTextoW / 2, yPos + 3.5, { align: "center" });
-
-    // Marcar X según cumplePerfil (en las columnas vacías)
-    const cumplePerfil = datosFinales.cumplePerfil ?? true;
-    doc.setFont("helvetica", "bold").setFontSize(12);
-    if (cumplePerfil) {
-      doc.text("X", tablaInicioX + colTextoW + colVaciaW / 2, yPos + 3.5, { align: "center" });
-    } else {
-      doc.text("X", tablaInicioX + colTextoW * 2 + colVaciaW + colVaciaW / 2, yPos + 3.5, { align: "center" });
-    }
-
-    // === FOOTER ===
-    footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
-    
-    // === Imprimir ===
-    if (!docExistente) {
-      imprimir(doc);
-    }
-  });
+  // === Imprimir ===
+  if (!docExistente) {
+    imprimir(doc);
+  }
 
   // Si hay docExistente, retornar el doc (las firmas se agregarán asíncronamente)
   if (docExistente) {

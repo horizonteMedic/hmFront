@@ -1,11 +1,11 @@
 import jsPDF from "jspdf";
 import drawColorBox from '../../components/ColorBox.jsx';
-import { formatearFechaCorta } from "../../../utils/formatDateUtils.js";
+import { formatearFechaCorta, formatearFechaLarga } from "../../../utils/formatDateUtils.js";
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import footerTR from '../../components/footerTR.jsx';
 import { dibujarFirmas } from "../../../utils/dibujarFirmas.js";
 
-export default async function ConsentAdmisionDeclaracionAntecePatologicos(data = {}, docExistente = null) {
+export default async function ConsentAdmisionDeclacionAntecePatologicos(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -14,6 +14,7 @@ export default async function ConsentAdmisionDeclaracionAntecePatologicos(data =
     apellidosPaciente: "CASTILLO PLASENCIA",
     nombresPaciente: "HADY KATHERINE",
     dniPaciente: "72384273",
+    edadPaciente: "31",
     cargoPaciente: "OPERADOR DE MAQUINARIA",
     empresa: "MINERA PODEROSA S.A.",
     sede: "TRUJILLO",
@@ -27,9 +28,10 @@ export default async function ConsentAdmisionDeclaracionAntecePatologicos(data =
   function buildDatosFinales(raw) {
     const datosFinales = {
       apellidosNombres: String(((raw?.apellidosPaciente ?? datosPrueba.apellidosPaciente) + ' ' + (raw?.nombresPaciente ?? datosPrueba.nombresPaciente)).trim()),
-      fechaExamen: formatearFechaCorta(raw?.fechaRegistro ?? raw?.fecha ?? datosPrueba.fechaRegistro),
-      documentoIdentidad: String(raw?.dniPaciente ?? raw?.dni ?? datosPrueba.dniPaciente),
-      puestoTrabajo: String(raw?.cargoPaciente ?? raw?.ocupacion ?? datosPrueba.cargoPaciente),
+      fechaExamen: formatearFechaCorta(raw?.fechaRegistro ?? datosPrueba.fechaRegistro),
+      documentoIdentidad: String(raw?.dniPaciente ?? datosPrueba.dniPaciente),
+      edad: String(raw?.edadPaciente ?? datosPrueba.edadPaciente),
+      puestoTrabajo: String(raw?.cargoPaciente ?? datosPrueba.cargoPaciente),
       empresa: String(raw?.empresa ?? datosPrueba.empresa),
       sede: String(raw?.sede ?? raw?.nombreSede ?? datosPrueba.sede),
       numeroFicha: String(raw?.norden ?? datosPrueba.norden),
@@ -41,16 +43,34 @@ export default async function ConsentAdmisionDeclaracionAntecePatologicos(data =
 
   const datosFinales = buildDatosFinales(data);
 
+  // Función para obtener día y mes de la fecha
+  const obtenerDiaYMes = (fechaStr) => {
+    if (!fechaStr) return { dia: '', mes: '' };
+    try {
+      const fechaLarga = formatearFechaLarga(fechaStr);
+      // formatearFechaLarga devuelve: "28 de enero de 2025"
+      const partes = fechaLarga.split(' de ');
+      if (partes.length >= 2) {
+        return { dia: partes[0], mes: partes[1] };
+      }
+      return { dia: '', mes: '' };
+    } catch (error) {
+      return { dia: '', mes: '' };
+    }
+  };
+
+  const fechaPrueba = datosPrueba.fechaRegistro;
+  const { dia, mes } = obtenerDiaYMes(data?.fechaRegistro ?? fechaPrueba);
+
   // Header
   const drawHeader = () => {
     // Logo y membrete
     CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
 
     // Título
-    doc.setFont("helvetica", "bold").setFontSize(12);
+    doc.setFont("helvetica", "bold").setFontSize(14);
     doc.setTextColor(0, 0, 0);
-    doc.text("DECLARACIÓN JURADA DE ANTECEDENTES PERSONALES Y", pageW / 2, 40, { align: "center" });
-    doc.text("FAMILIARES", pageW / 2, 46, { align: "center" });
+    doc.text("DECLARACIÓN DE ANTECEDENTES PATOLÓGICOS", pageW / 2, 35, { align: "center" });
 
     // Número de Ficha, Sede, Fecha y Página
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -90,7 +110,7 @@ export default async function ConsentAdmisionDeclaracionAntecePatologicos(data =
   drawHeader();
 
   // === CONTENIDO DEL DOCUMENTO ===
-  let yPos = 60;
+  let yPos = 50;
   const margin = 15;
   const anchoTexto = pageW - (2 * margin);
   const lineHeight = 5;
@@ -99,27 +119,14 @@ export default async function ConsentAdmisionDeclaracionAntecePatologicos(data =
   doc.setFontSize(11);
   doc.setTextColor(0, 0, 0);
 
-  // "Señores: Corporación Peruana de Centros Médicos SAC – HORIZONTE MEDIC"
-  doc.setFont("helvetica", "normal");
-  doc.text("Señores: Corporación Peruana de Centros Médicos SAC – HORIZONTE MEDIC", margin, yPos);
-  yPos += lineHeight + 2;
-
-  // "Presente. -"
-  doc.text("Presente. -", margin, yPos);
-  yPos += lineHeight + 3;
-
-  // "Estimados Señores:"
-  doc.text("Estimados Señores:", margin, yPos);
-  yPos += lineHeight + 5;
-
-  // Unificar todos los datos personales en una línea continua
+  // Primera línea: "Yo: [nombre]"
   let xActual = margin;
   let yActual = yPos;
 
-  // "Yo, "
+  // "Yo: "
   doc.setFont("helvetica", "normal");
-  doc.text("Yo,", xActual, yActual);
-  xActual += doc.getTextWidth("Yo, ") + 2;
+  doc.text("Yo: ", xActual, yActual);
+  xActual += doc.getTextWidth("Yo: ");
 
   // Nombre en negrita
   doc.setFont("helvetica", "bold");
@@ -129,18 +136,17 @@ export default async function ConsentAdmisionDeclaracionAntecePatologicos(data =
     xActual = margin;
   }
   doc.text(datosFinales.apellidosNombres, xActual, yActual);
-  xActual += nombreWidth + 2;
+  
+  yPos = yActual + lineHeight + 8;
 
-  // " Con DNI "
+  // Segunda línea: "Identificado con DNI: [dni]"
+  xActual = margin;
+  yActual = yPos;
+
+  // "Identificado con DNI: "
   doc.setFont("helvetica", "normal");
-  const textoDni = " Con DNI ";
-  const textoDniWidth = doc.getTextWidth(textoDni);
-  if (xActual + textoDniWidth > pageW - margin) {
-    yActual += lineHeight;
-    xActual = margin;
-  }
-  doc.text(textoDni, xActual, yActual);
-  xActual += textoDniWidth;
+  doc.text("Identificado con DNI: ", xActual, yActual);
+  xActual += doc.getTextWidth("Identificado con DNI: ");
 
   // DNI en negrita
   doc.setFont("helvetica", "bold");
@@ -150,18 +156,17 @@ export default async function ConsentAdmisionDeclaracionAntecePatologicos(data =
     xActual = margin;
   }
   doc.text(datosFinales.documentoIdentidad, xActual, yActual);
-  xActual += dniWidth + 2;
+  
+  yPos = yActual + lineHeight + 8;
 
-  // " Postulante al cargo de "
+  // Tercera línea: "Con ocupación laboral de: [cargo]"
+  xActual = margin;
+  yActual = yPos;
+
+  // "Con ocupación laboral de: "
   doc.setFont("helvetica", "normal");
-  const textoCargo = " Postulante al cargo de ";
-  const textoCargoWidth = doc.getTextWidth(textoCargo);
-  if (xActual + textoCargoWidth > pageW - margin) {
-    yActual += lineHeight;
-    xActual = margin;
-  }
-  doc.text(textoCargo, xActual, yActual);
-  xActual += textoCargoWidth;
+  doc.text("Con ocupación laboral de: ", xActual, yActual);
+  xActual += doc.getTextWidth("Con ocupación laboral de: ");
 
   // Cargo en negrita
   doc.setFont("helvetica", "bold");
@@ -171,18 +176,17 @@ export default async function ConsentAdmisionDeclaracionAntecePatologicos(data =
     xActual = margin;
   }
   doc.text(datosFinales.puestoTrabajo, xActual, yActual);
-  xActual += cargoWidth + 2;
+  
+  yPos = yActual + lineHeight + 8;
 
-  // " De la empresa "
+  // Cuarta línea: "Para la Empresa: [empresa]"
+  xActual = margin;
+  yActual = yPos;
+
+  // "Para la Empresa: "
   doc.setFont("helvetica", "normal");
-  const textoEmpresa = " De la empresa ";
-  const textoEmpresaWidth = doc.getTextWidth(textoEmpresa);
-  if (xActual + textoEmpresaWidth > pageW - margin) {
-    yActual += lineHeight;
-    xActual = margin;
-  }
-  doc.text(textoEmpresa, xActual, yActual);
-  xActual += textoEmpresaWidth;
+  doc.text("Para la Empresa: ", xActual, yActual);
+  xActual += doc.getTextWidth("Para la Empresa: ");
 
   // Empresa en negrita
   doc.setFont("helvetica", "bold");
@@ -193,83 +197,37 @@ export default async function ConsentAdmisionDeclaracionAntecePatologicos(data =
   }
   doc.text(datosFinales.empresa, xActual, yActual);
   
-  yPos = yActual + lineHeight + 5;
+  yPos = yActual + lineHeight + 10;
 
-  // "Declaro bajo juramento: Existen antecedentes personales y familiares:"
+  // Quinta línea: "Por lo tanto..."
   doc.setFont("helvetica", "normal");
-  const textoDeclaracion = "Declaro bajo juramento: Existen antecedentes personales y familiares:";
-  doc.text(textoDeclaracion, margin, yPos);
-  yPos += lineHeight + 3;
+  const textoDeclaracion = "Por lo tanto, en forma consciente y voluntaria, declaro que no presento cefalea, dolor de garganta, tos, fiebre, malestar general ni dificultad para respirar.";
+  const lineasDeclaracion = doc.splitTextToSize(textoDeclaracion, anchoTexto);
+  lineasDeclaracion.forEach((linea, idx) => {
+    doc.text(linea, margin, yPos + (idx * lineHeight));
+  });
+  yPos += lineasDeclaracion.length * lineHeight + 10;
 
-  // Casillas SI/NO
+  // Tercera línea: "Trujillo, [día] de [mes] de 2025." (bajada 15mm)
+  yPos += 15;
   doc.setFont("helvetica", "normal");
-  doc.setDrawColor(0, 0, 0);
-  doc.setLineWidth(0.5);
+  const texto3 = `Trujillo, ${dia} de ${mes} 2025.`;
+  doc.text(texto3, margin, yPos);
+  yPos += 20;
+
+  // === FIRMA Y HUELLA DEL PACIENTE (usando dibujarFirmas, bajada 15mm) ===
+  yPos += 15;
   
-  // "SI" con casilla
-  doc.text("SI", margin, yPos);
-  const casillaSize = 4;
-  const xCasillaSI = margin + doc.getTextWidth("SI ") + 2;
-  doc.rect(xCasillaSI, yPos - 3, casillaSize, casillaSize);
-  
-  // "NO" con casilla
-  const xNO = xCasillaSI + casillaSize + 8;
-  doc.text("NO", xNO, yPos);
-  const xCasillaNO = xNO + doc.getTextWidth("NO ") + 2;
-  doc.rect(xCasillaNO, yPos - 3, casillaSize, casillaSize);
-  
-  yPos += lineHeight + 2;
-
-  // Texto entre paréntesis
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("(De marcar SI, detallar que antecedentes existen, considerar los antecedentes de la madre, padre, abuelo y abuela)", margin, yPos);
-  yPos += lineHeight + 5;
-
-  // "Detalle:" con líneas para escribir
-  doc.setFont("helvetica", "normal").setFontSize(11);
-  doc.text("Detalle:", margin, yPos);
-  yPos += lineHeight + 2;
-
-  // Dibujar líneas para el detalle (7 líneas)
-  const anchoLinea = anchoTexto;
-  const alturaLinea = 4;
-  const numLineas = 7;
-  
-  for (let i = 0; i < numLineas; i++) {
-    doc.setDrawColor(0, 0, 0);
-    doc.setLineWidth(0.1);
-    doc.line(margin, yPos, margin + anchoLinea, yPos);
-    yPos += alturaLinea;
-  }
-
-  yPos += lineHeight + 5;
-
-  // "Se suscribe la presente declaración jurada en conformidad de lo antes expuesto."
-  doc.setFont("helvetica", "normal").setFontSize(11);
-  const textoFinal = "Se suscribe la presente declaración jurada en conformidad de lo antes expuesto.";
-  doc.text(textoFinal, margin, yPos);
-  yPos += lineHeight + 5;
-
-  // "Fecha:"
-  doc.text("Fecha:", margin, yPos);
-  yPos += lineHeight + 10;
-
-  // === FIRMA Y HUELLA DEL PACIENTE (usando dibujarFirmas) ===
   // Usar la función dibujarFirmas del utils
-  const yPosFinalFirmas = await dibujarFirmas({
+  await dibujarFirmas({
     doc,
     datos: data,
     y: yPos,
     pageW: pageW
   });
 
-  // Agregar DNI debajo de la firma y huella
-  const centroX = pageW / 2;
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(`DNI: ${datosFinales.documentoIdentidad}`, centroX, yPosFinalFirmas + 3, { align: "center" });
-
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 7, fontSize: 7 });
+  footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
 
   // === Imprimir ===
   if (!docExistente) {
@@ -288,4 +246,3 @@ function imprimir(doc) {
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
 }
-

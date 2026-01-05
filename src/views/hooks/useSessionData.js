@@ -4,24 +4,15 @@ import { fixEncodingModern } from "../utils/helpers";
 import useRealTime from "./useRealTime";
 
 export const useSessionData = () => {
-    const { token, userlogued, datosFooter, listaEmpleados } = useAuthStore((state) => ({
+    const { token, userlogued, datosFooter, listaEmpleados, selectedSede } = useAuthStore((state) => ({
         token: state.token,
         userlogued: state.userlogued,
         datosFooter: state.datosFooter,
-        listaEmpleados: state.listaEmpleados
+        listaEmpleados: state.listaEmpleados,
+        selectedSede: state.selectedSede
     }));
 
-    const [selectedSede, setSelectedSede] = useState("");
     const hora = useRealTime();
-
-    useEffect(() => {
-        if (userlogued?.sedes?.length) {
-            const sedeTNP = userlogued.sedes.find(
-                (sede) => sede.cod_sede === "T-NP"
-            );
-            setSelectedSede(sedeTNP?.cod_sede ?? userlogued.sedes[0].cod_sede);
-        }
-    }, [userlogued]);
 
     return {
         token,

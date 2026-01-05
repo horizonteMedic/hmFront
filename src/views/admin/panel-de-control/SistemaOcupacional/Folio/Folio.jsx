@@ -22,7 +22,7 @@ const ExamenesList = [
         nombre: "ANEXO 16 ",
         resultado: false,
         tabla: "anexo7c",
-        url: "/api/v01/ct/anexos/anexo16/obtenerReporte2Anexo16"
+        url: "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16"
     },
     {
         nombre: "ENFERMEDADES EN ALTURA ",
@@ -82,10 +82,23 @@ const ExamenesList = [
         url: "/api/v01/ct/laboratorio/reporteAnalisisBioquimico"
     },
     {
+        nombre: "OIT",
+        resultado: false,
+        tabla: "oit",
+        url: "/api/v01/ct/oit/obtenerReporteOit"
+    },
+    {
         nombre: "RADIOGRAFIA TORAX",
         resultado: false,
         tabla: "radiografia_torax",
         url: "/api/v01/ct/rayosX/obtenerReporteRadiografiaTorax"
+    },
+    {
+        nombre: "ELECTROCARDIOGRAMA",
+        resultado: false,
+        tabla: "informe_electrocardiograma",
+        url: "/api/v01/ct/electroCardiograma/obtenerReporteInformeElectroCardiograma",
+        esJasper: true
     },
     {
         nombre: "FICHA AUDIOLOGICA",

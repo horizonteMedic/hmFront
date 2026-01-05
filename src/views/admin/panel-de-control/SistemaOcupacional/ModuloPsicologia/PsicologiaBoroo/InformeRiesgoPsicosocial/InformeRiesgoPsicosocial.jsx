@@ -1,8 +1,8 @@
 import {
     InputTextOneLine,
     InputTextArea,
-    InputsRadioGroup,
     RadioTable,
+    InputsBooleanRadioGroup,
 } from "../../../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 import { useForm } from "../../../../../../hooks/useForm";
@@ -10,6 +10,7 @@ import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformeRiesgoPsicosocial";
 import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
 
 const tabla = "informe_riesgos_psicosociales";
 
@@ -30,10 +31,6 @@ const riesgoOptions = [
     { value: "DESFAVORABLE", label: "DESFAVORABLE" },
 ];
 
-const conclusionOptions = [
-    { label: "CUMPLE CON EL PERFIL", value: "CUMPLE" },
-    { label: "NO CUMPLE CON EL PERFIL", value: "NO_CUMPLE" },
-];
 
 export default function InformeRiesgoPsicosocial() {
     const today = getToday();
@@ -42,26 +39,24 @@ export default function InformeRiesgoPsicosocial() {
     const initialFormState = {
         // Header
         norden: "",
-        codigoInformeRiesgoPsicosocial: null,
-        fechaExam: today,
+        fecha: today,
         nombreExamen: "",
 
-        // Datos personales
+        dni: "",
         nombres: "",
         apellidos: "",
-        dni: "",
         fechaNacimiento: "",
         lugarNacimiento: "",
-        domicilioActual: "",
         edad: "",
+        sexo: "",
         estadoCivil: "",
         nivelEstudios: "",
 
-        // Datos laborales
-        ocupacion: "",
-        cargoDesempenar: "",
+        // Datos Laborales
         empresa: "",
         contrata: "",
+        ocupacion: "",
+        cargoDesempenar: "",
 
         // Riesgos Psicosociales
         exigenciasPsicologicas: "",
@@ -73,7 +68,7 @@ export default function InformeRiesgoPsicosocial() {
         // Texto libre
         recomendaciones: "",
         analisisResultados: "",
-        conclusionPerfil: "",
+        conclusionPerfil: undefined,
     };
 
     const {
@@ -87,6 +82,7 @@ export default function InformeRiesgoPsicosocial() {
         handleChangeSimple,
         handleClear,
         handleRadioButton,
+        handleRadioButtonBoolean
     } = useForm(initialFormState, { storageKey: "InformeRiesgoPsicosocial" });
 
     const handleSave = () => {
@@ -119,9 +115,9 @@ export default function InformeRiesgoPsicosocial() {
                 />
                 <InputTextOneLine
                     label="Fecha Examen"
-                    name="fechaExam"
+                    name="fecha"
                     type="date"
-                    value={form.fechaExam}
+                    value={form.fecha}
                     onChange={handleChangeSimple}
                     labelWidth="120px"
                 />
@@ -134,34 +130,7 @@ export default function InformeRiesgoPsicosocial() {
                 />
             </SectionFieldset>
 
-            <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="space-y-3">
-                    <InputTextOneLine label="Nombres" name="nombres" value={form.nombres} disabled labelWidth="160px" />
-                    <InputTextOneLine label="Apellidos" name="apellidos" value={form.apellidos} disabled labelWidth="160px" />
-                    <InputTextOneLine label="Domicilio Actual" name="domicilioActual" value={form.domicilioActual} disabled labelWidth="160px" />
-                    <InputTextOneLine label="Fecha Nacimiento" name="fechaNacimiento" value={form.fechaNacimiento} disabled labelWidth="160px" />
-                    <InputTextOneLine label="Nivel de Estudios" name="nivelEstudios" value={form.nivelEstudios} disabled labelWidth="160px" />
-                </div>
-                <div className="space-y-3">
-                    <InputTextOneLine label="DNI" name="dni" value={form.dni} disabled labelWidth="160px" />
-                    <InputTextOneLine label="Edad (años)" name="edad" value={form.edad} disabled labelWidth="160px" />
-                    <InputTextOneLine label="Estado Civil" name="estadoCivil" value={form.estadoCivil} disabled labelWidth="160px" />
-                    <InputTextOneLine label="Lugar Nacimiento" name="lugarNacimiento" value={form.lugarNacimiento} disabled labelWidth="160px" />
-                </div>
-            </SectionFieldset>
-
-            <SectionFieldset legend="Datos Laborales">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div className="space-y-3">
-                        <InputTextOneLine label="Ocupación" name="ocupacion" value={form.ocupacion} disabled labelWidth="160px" />
-                        <InputTextOneLine label="Cargo a desempeñar" name="cargoDesempenar" value={form.cargoDesempenar} disabled labelWidth="160px" />
-                    </div>
-                    <div className="space-y-3">
-                        <InputTextOneLine label="Empresa" name="empresa" value={form.empresa} disabled labelWidth="160px" />
-                        <InputTextOneLine label="Contrata" name="contrata" value={form.contrata} disabled labelWidth="160px" />
-                    </div>
-                </div>
-            </SectionFieldset>
+            <DatosPersonalesLaborales form={form} />
 
             <div className="grid md:grid-cols-2 gap-4">
                 <SectionFieldset legend="Riesgos Psicosociales">
@@ -181,14 +150,16 @@ export default function InformeRiesgoPsicosocial() {
                             onChange={handleChange}
                             rows={10}
                         />
-                        <InputsRadioGroup
-                            label="Conclusión"
+                        <InputsBooleanRadioGroup
+                            label="Conclusión del Perfil"
                             name="conclusionPerfil"
                             value={form.conclusionPerfil}
-                            options={conclusionOptions}
                             labelWidth="120px"
-                            onChange={handleRadioButton}
+                            onChange={handleRadioButtonBoolean}
+                            trueLabel="Cumple"
+                            falseLabel="No Cumple"
                         />
+
                     </div>
                 </SectionFieldset>
             </div>

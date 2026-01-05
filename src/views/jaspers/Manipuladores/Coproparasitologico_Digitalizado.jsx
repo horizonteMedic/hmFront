@@ -193,7 +193,6 @@ export default async function Coproparasitologico_Digitalizado(datos = {}) {
 
     // Datos de color
     codigocolor: datos.codigoColor,
-    codigoColor: datos.codigoColor,
     textoColor: datos.textoColor,
     color: datos.color || 1,
 

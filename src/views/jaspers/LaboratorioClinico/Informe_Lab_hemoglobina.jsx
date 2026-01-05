@@ -1,8 +1,9 @@
-// src/views/jaspers/LaboratorioClinico/Hemoglobina.jsx
+// src/views/jaspers/LaboratorioClinico/Informe_Lab_hemoglobina.jsx
 import jsPDF from "jspdf";
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
+import { dibujarFirmas } from '../../utils/dibujarFirmas.js';
 
 // --- Configuración Centralizada ---
 const config = {
@@ -15,6 +16,92 @@ const config = {
   font: 'helvetica',
   lineHeight: 7,
 };
+
+// --- Componente Principal ---
+
+export default async function Hemoglobina(datos = {}) {
+  const doc = new jsPDF();
+  const pageW = doc.internal.pageSize.getWidth();
+
+  await drawHeader(doc, datos);
+  drawUnderlinedTitle(doc, "LABORATORIO CLINICO", 35);
+  doc.setFont(config.font, "bold").setFontSize(12);
+  doc.text("HEMOGLOBINA", pageW / 2, 42, { align: "center" });
+  drawPatientData(doc, datos);
+
+  let y = 98;
+
+  // === TABLA DE RESULTADOS ===
+  const colPrueba = config.margin;
+  const colResultado = config.margin + 60;
+  const colValores = config.margin + 120;
+
+  // Header de la tabla
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+  doc.text("PRUEBA", colPrueba, y);
+  doc.text("RESULTADO", colResultado, y);
+  doc.text("VALORES NORMALES / ANOTACIONES", colValores, y);
+  y += 2;
+
+  // Línea debajo del header
+  doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
+  y += config.lineHeight;
+
+  // GRUPO SANGUÍNEO
+  doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
+  doc.text("GRUPO SANGUÍNEO", colPrueba, y);
+  // Mapear los datos del formulario
+  const grupoSanguineo = datos.chko ? "O" : datos.chka ? "A" : datos.chkb ? "B" : datos.chkab ? "AB" : datos.txtGrupoSanguineo || "";
+  doc.text(grupoSanguineo, colResultado, y);
+  // Marcar el grupo correspondiente
+  const grupo = grupoSanguineo.toUpperCase();
+  const grupoTexto = `(${grupo === "O" ? "O" : "O"} / ${grupo === "A" ? "A" : "A"} / ${grupo === "B" ? "B" : "B"} / ${grupo === "AB" ? "AB" : "AB"})`;
+  doc.text(grupoTexto, colValores, y);
+  y += config.lineHeight;
+
+  // FACTOR (RH)
+  doc.text("FACTOR (RH)", colPrueba, y);
+  const factorRh = datos.rbrhpositivo ? "POSITIVO" : datos.rbrhnegativo ? "NEGATIVO" : datos.txtFactorRh || "";
+  doc.text(factorRh, colResultado, y);
+  // Marcar + o - según el resultado
+  const esPositivo = factorRh.toUpperCase().includes("POSITIVO") || factorRh === "+";
+  doc.text(esPositivo ? "(+)" : "(-)", colValores, y);
+  y += config.lineHeight;
+
+  // HEMATOCRITO
+  doc.text("HEMATOCRITO", colPrueba, y);
+  doc.text(datos.txtHematocrito || datos.hematocrito || "", colResultado, y);
+  doc.text("Mujeres 36 – 50 %", colValores, y);
+  y += 4;
+  doc.text("Hombres 40 – 55 %", colValores, y);
+  y += config.lineHeight;
+
+  // HEMOGLOBINA
+  doc.text("HEMOGLOBINA", colPrueba, y);
+  doc.text(datos.txtHemoglobina || datos.hemoglobina || "", colResultado, y);
+  doc.text("Mujeres 12 – 16 g/dl", colValores, y);
+  y += 4;
+  doc.text("Hombres 13 – 18 g/dl", colValores, y);
+
+  // === FIRMAS ===
+  const yFirmas = 210; // Posición para las firmas (abajo como estaba antes)
+  await dibujarFirmas({ doc, datos: datos, y: yFirmas, pageW });
+
+  // === FOOTER ===
+  footerTR(doc, { footerOffsetY: 8 });
+
+  // === IMPRIMIR ===
+  const pdfBlob = doc.output("blob");
+  const pdfUrl = URL.createObjectURL(pdfBlob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = pdfUrl;
+  document.body.appendChild(iframe);
+  iframe.onload = () => {
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+  };
+}
 
 // --- Funciones de Ayuda ---
 
@@ -156,155 +243,3 @@ const drawPatientData = (doc, datos = {}) => {
 
   return yPos;
 };
-
-// --- Componente Principal ---
-
-export default async function Hemoglobina(datos = {}) {
-  const doc = new jsPDF();
-  const pageW = doc.internal.pageSize.getWidth();
-
-  await drawHeader(doc, datos);
-  drawUnderlinedTitle(doc, "LABORATORIO CLINICO", 35);
-  doc.setFont(config.font, "bold").setFontSize(12);
-  doc.text("HEMOGLOBINA", pageW / 2, 42, { align: "center" });
-  drawPatientData(doc, datos);
-
-  const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
-  const isValidUrl = url => url && url !== "Sin registro" && url;
-  const loadImg = src =>
-    new Promise((res, rej) => {
-      const img = new Image();
-      img.src = src;
-      img.crossOrigin = 'anonymous';
-      img.onload = () => res(img);
-      img.onerror = () => rej(`No se pudo cargar ${src}`);
-    });
-
-  Promise.all([
-    isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
-    isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-  ]).then(([s1, s2]) => {
-
-    let y = 98;
-
-    // === TABLA DE RESULTADOS ===
-    const colPrueba = config.margin;
-    const colResultado = config.margin + 60;
-    const colValores = config.margin + 120;
-
-    // Header de la tabla
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
-    doc.text("PRUEBA", colPrueba, y);
-    doc.text("RESULTADO", colResultado, y);
-    doc.text("VALORES NORMALES / ANOTACIONES", colValores, y);
-    y += 2;
-
-    // Línea debajo del header
-    doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
-    y += config.lineHeight;
-
-    // GRUPO SANGUÍNEO
-    doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
-    doc.text("GRUPO SANGUÍNEO", colPrueba, y);
-    doc.text(datos.txtGrupoSanguineo || "", colResultado, y);
-    // Marcar el grupo correspondiente
-    const grupo = (datos.txtGrupoSanguineo || "").toUpperCase();
-    const grupoTexto = `(${grupo === "O" ? "O" : "O"} / ${grupo === "A" ? "A" : "A"} / ${grupo === "B" ? "B" : "B"} / ${grupo === "AB" ? "AB" : "AB"})`;
-    doc.text(grupoTexto, colValores, y);
-    y += config.lineHeight;
-
-    // FACTOR (RH)
-    doc.text("FACTOR (RH)", colPrueba, y);
-    doc.text(datos.txtFactorRh || "", colResultado, y);
-    // Marcar + o - según el resultado
-    const esPositivo = (datos.txtFactorRh || "").toUpperCase().includes("POSITIVO") || datos.txtFactorRh === "+";
-    doc.text(esPositivo ? "(+)" : "(-)", colValores, y);
-    y += config.lineHeight;
-
-    // HEMATOCRITO
-    doc.text("HEMATOCRITO", colPrueba, y);
-    doc.text(datos.txtHematocrito || "", colResultado, y);
-    doc.text("Mujeres 36 – 50 %", colValores, y);
-    y += 4;
-    doc.text("Hombres 40 – 55 %", colValores, y);
-    y += config.lineHeight;
-
-    // HEMOGLOBINA
-    doc.text("HEMOGLOBINA", colPrueba, y);
-    doc.text(datos.txtHemoglobina || "", colResultado, y);
-    doc.text("Mujeres 12 – 16 g/dl", colValores, y);
-    y += 4;
-    doc.text("Hombres 13 – 18 g/dl", colValores, y);
-
-    // Sellos
-    const sigW = 53;
-    const sigH = 23;
-    const sigY = 210;
-    const gap = 16;
-
-    if (s1 && s2) {
-      const totalWidth = sigW * 2 + gap;
-      const startX = (pageW - totalWidth) / 2;
-
-      const canvas1 = document.createElement('canvas');
-      canvas1.width = s1.width;
-      canvas1.height = s1.height;
-      const ctx1 = canvas1.getContext('2d');
-      ctx1.drawImage(s1, 0, 0);
-      const selloBase64_1 = canvas1.toDataURL('image/png');
-      doc.addImage(selloBase64_1, 'PNG', startX, sigY, sigW, sigH);
-
-      const canvas2 = document.createElement('canvas');
-      canvas2.width = s2.width;
-      canvas2.height = s2.height;
-      const ctx2 = canvas2.getContext('2d');
-      ctx2.drawImage(s2, 0, 0);
-      const selloBase64_2 = canvas2.toDataURL('image/png');
-      doc.addImage(selloBase64_2, 'PNG', startX + sigW + gap, sigY, sigW, sigH);
-    } else if (s1) {
-      const canvas = document.createElement('canvas');
-      canvas.width = s1.width;
-      canvas.height = s1.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(s1, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-      doc.addImage(selloBase64, 'PNG', (pageW - sigW) / 2, sigY, sigW, sigH);
-    } else if (s2) {
-      const canvas = document.createElement('canvas');
-      canvas.width = s2.width;
-      canvas.height = s2.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(s2, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-      doc.addImage(selloBase64, 'PNG', (pageW - sigW) / 2, sigY, sigW, sigH);
-    }
-
-    footerTR(doc, { footerOffsetY: 8 });
-
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = pdfUrl;
-    document.body.appendChild(iframe);
-    iframe.onload = () => {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
-  }).catch(error => {
-    console.error("Error al cargar imágenes:", error);
-    footerTR(doc, { footerOffsetY: 8 });
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = pdfUrl;
-    document.body.appendChild(iframe);
-    iframe.onload = () => {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
-  });
-}
-

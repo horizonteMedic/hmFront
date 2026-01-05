@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils";
-import { getSign, convertirGenero } from "../../utils/helpers";
+import { getSign, convertirGenero, getSignCompressed } from "../../utils/helpers";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
@@ -753,7 +753,7 @@ export default async function Anexo16A_Digitalizado(data = {}, docExistente = nu
   const centroColumna3 = tablaInicioX + 120 + (80 / 2); // Centro de la columna 3 (160mm desde tablaInicioX)
 
   // Agregar firma y sello médico
-  const firmaMedicoUrl = getSign(data, "SELLOFIRMA");
+  const firmaMedicoUrl = await getSignCompressed(data, "SELLOFIRMA");
   if (firmaMedicoUrl) {
     try {
       const imgWidth = 50;

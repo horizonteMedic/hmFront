@@ -46,6 +46,15 @@ export const GetInfoServicio = async (nro, token, setForm, form) => {
       `/api/v01/ct/laboratorio/consentimiento-laboratorio?nOrden=${nro}&nameConset=${tabla}`,
       token
     );
+    
+    // Manejar errores de la respuesta
+    if (res.error) {
+      console.error("Error en la respuesta del servidor:", res);
+      Swal.fire('Error', `Error al obtener datos: ${res.status === 404 ? 'No se encontró el registro' : `Error ${res.status}`}`, 'error');
+      Swal.close();
+      return;
+    }
+    
     if (res.norden) {
       Swal.fire(
         "Alerta",
@@ -69,7 +78,8 @@ export const GetInfoServicio = async (nro, token, setForm, form) => {
       Swal.fire('Error', 'Ocurrio un error al traer los datos', 'error');
     }
   } catch (error) {
-    Swal.fire('Error', 'Ocurrio un error al traer los datos', 'error');
+    console.error("Error al obtener servicio:", error);
+    Swal.fire('Error', error.message || 'Ocurrio un error al traer los datos', 'error');
   } finally {
     Swal.close();
   }
@@ -112,6 +122,21 @@ export const PrintHojaR = async (form, token) => {
       `/api/v01/ct/laboratorio/consentimiento-laboratorio?nOrden=${form.norden}&nameConset=${tabla}`,
       token
     );
+    
+    // Manejar errores de la respuesta
+    if (res.error) {
+      console.error("Error en la respuesta del servidor:", res);
+      Swal.fire({
+        icon: "error",
+        title: "Error al obtener datos",
+        text: res.status === 404 
+          ? "No se encontró el registro o el endpoint no existe." 
+          : `Error ${res.status}: ${res.statusText || res.message || 'Error desconocido'}`,
+      });
+      Swal.close();
+      return;
+    }
+    
     if (res.norden) {
       const nombre = res.nameJasper;
       const jasperModules = import.meta.glob('../../../../../../jaspers/Consentimientos/*.jsx');
@@ -121,13 +146,19 @@ export const PrintHojaR = async (form, token) => {
       } else {
         console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
       }
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "N° Orden no existente",
+        text: "Por favor, ingrese un N° Orden válido.",
+      });
     }
   } catch (error) {
     console.error("Error al obtener el consentimiento:", error);
     Swal.fire({
       icon: "error",
-      title: "N° Orden no existente",
-      text: "Por favor, ingrese un N° Orden válido.",
+      title: "Error",
+      text: error.message || "Ocurrió un error al obtener el consentimiento.",
     });
   } finally {
     Swal.close();

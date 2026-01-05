@@ -549,10 +549,19 @@ export default async function Informe_PsicolaboralBoroo_Digitalizado(data = {}) 
     }
   ];
 
-  aspectosConductuales.forEach((aspecto, index) => {
+  for (let index = 0; index < aspectosConductuales.length; index++) {
+    const aspecto = aspectosConductuales[index];
     const numero = index + 1;
 
-    // Dibujar líneas de la fila
+    // Verificar si necesitamos nueva página antes de esta fila
+    if (yPos + filaAltura > pageHeight - 20) {
+      doc.addPage();
+      numeroPagina++;
+      yPos = 45;
+      await drawHeader(numeroPagina);
+    }
+
+    // Dibujar borde superior y laterales de la fila (inicialmente con altura mínima)
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
@@ -560,7 +569,6 @@ export default async function Informe_PsicolaboralBoroo_Digitalizado(data = {}) 
     doc.line(tablaInicioX + colNumeroConductual + colDescripcionConductual, yPos, tablaInicioX + colNumeroConductual + colDescripcionConductual, yPos + filaAltura); // División descripción/valor
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
-    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
 
     // Contenido de la fila
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -568,11 +576,57 @@ export default async function Informe_PsicolaboralBoroo_Digitalizado(data = {}) 
     doc.text(String(numero), tablaInicioX + 2, yPos + 3.5);
     // Descripción del aspecto a la izquierda
     doc.text(aspecto.descripcion, tablaInicioX + colNumeroConductual + 2, yPos + 3.5);
-    // Valor (o "-" si no existe) alineado a la izquierda
-    doc.text(String(aspecto.valor), tablaInicioX + colNumeroConductual + colDescripcionConductual + 2, yPos + 3.5);
+    
+    // Valor con salto de línea (usar función para texto largo)
+    const anchoColumnaValor = tablaAncho - (colNumeroConductual + colDescripcionConductual) - 4; // Ancho disponible menos márgenes
+    const xValor = tablaInicioX + colNumeroConductual + colDescripcionConductual + 2;
+    const yInicioValor = yPos + 3;
+    
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    let yFinalValor = dibujarTextoConSaltoLinea(String(aspecto.valor), xValor, yInicioValor, anchoColumnaValor);
 
-    yPos += filaAltura;
-  });
+    // Verificar si necesitamos nueva página durante el dibujado del valor
+    const alturaMaximaValor = pageHeight - yPos - 25; // 25mm para footer y margen
+    if (yFinalValor - yPos > alturaMaximaValor) {
+      // Texto muy largo, necesitamos nueva página
+      doc.addPage();
+      numeroPagina++;
+      yPos = 45;
+      await drawHeader(numeroPagina);
+      
+      // Redibujar bordes en nueva página
+      doc.setDrawColor(0, 0, 0);
+      doc.setLineWidth(0.2);
+      doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+      doc.line(tablaInicioX + colNumeroConductual, yPos, tablaInicioX + colNumeroConductual, yPos + filaAltura);
+      doc.line(tablaInicioX + colNumeroConductual + colDescripcionConductual, yPos, tablaInicioX + colNumeroConductual + colDescripcionConductual, yPos + filaAltura);
+      doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+      doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+      
+      // Redibujar número y descripción
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      doc.text(String(numero), tablaInicioX + 2, yPos + 3.5);
+      doc.text(aspecto.descripcion, tablaInicioX + colNumeroConductual + 2, yPos + 3.5);
+      
+      // Redibujar valor en nueva página
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      yFinalValor = dibujarTextoConSaltoLinea(String(aspecto.valor), xValor, yPos + 3, anchoColumnaValor);
+    }
+
+    // Calcular altura real de la fila basándose en el contenido
+    const alturaNecesaria = yFinalValor - yPos;
+    const alturaMinimaFila = filaAltura;
+    const alturaRealFila = Math.max(alturaMinimaFila, alturaNecesaria + 2);
+
+    // Redibujar los bordes con la altura correcta
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRealFila);
+    doc.line(tablaInicioX + colNumeroConductual, yPos, tablaInicioX + colNumeroConductual, yPos + alturaRealFila);
+    doc.line(tablaInicioX + colNumeroConductual + colDescripcionConductual, yPos, tablaInicioX + colNumeroConductual + colDescripcionConductual, yPos + alturaRealFila);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRealFila);
+    doc.line(tablaInicioX, yPos + alturaRealFila, tablaInicioX + tablaAncho, yPos + alturaRealFila); // Línea inferior
+
+    yPos += alturaRealFila;
+  }
 
   // === SECCIÓN: ASPECTOS PSICOLABORALES ===
   // Fila celeste: Aspectos Psicolaborales | Poco desarrollado | Necesita mejorar | Adecuado | Destacado | Excepcional

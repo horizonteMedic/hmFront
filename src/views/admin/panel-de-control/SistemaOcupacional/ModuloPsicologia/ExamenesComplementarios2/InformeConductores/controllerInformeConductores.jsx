@@ -32,7 +32,7 @@ export const GetInfoServicio = async (
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
-            fecha: res.fecha,
+            fecha: res.fechaRegistro,
 
             esApto: res.perfilCumple ?? false,
 
@@ -92,7 +92,7 @@ export const SubmitDataService = async (
 
     const body = {
         norden: form.norden,
-        fecha: form.fecha,
+        fechaRegistro: form.fecha,
         critAtencion: form.atencion,
         critConcentracion: form.concentracion,
         critSeguridadControlConduc: form.seguridadYControl,

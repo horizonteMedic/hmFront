@@ -12,8 +12,9 @@ import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAlturaPsico
 import { useTailwindBreakpoints } from "../../../../../../hooks/useTailwindBreakpoints";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
 
-const tabla = "";
+const tabla = "psicologiafobias";
 
 export default function AlturaPsicologica() {
   const today = getToday();
@@ -27,15 +28,13 @@ export default function AlturaPsicologica() {
     nombreExamen: "INFORME PSICOLÓGICO - TRABAJO EN ALTURA",
     esApto: undefined,
 
-    // Datos Personales
+    dni: "",
     nombres: "",
     apellidos: "",
     fechaNacimiento: "",
-    edad: "",
-    dni: "",
-    sexo: "",
     lugarNacimiento: "",
-    domicilioActual: "",
+    edad: "",
+    sexo: "",
     estadoCivil: "",
     nivelEstudios: "",
 
@@ -112,7 +111,7 @@ export default function AlturaPsicologica() {
   return (
     <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
       {/* Header con información del examen */}
-      <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+      <SectionFieldset legend="Información del Examen" className="grid 2xl:grid-cols-4 gap-3">
         <InputTextOneLine
           label="N° Orden"
           name="norden"
@@ -122,14 +121,14 @@ export default function AlturaPsicologica() {
           labelWidth="120px"
         />
         <InputTextOneLine
-          label="Fecha Entrevista"
+          label="Fecha"
           name="fechaExamen"
           type="date"
           value={form.fechaExamen}
           onChange={handleChangeSimple}
           labelWidth="120px"
         />
-        <div className="flex gap-4 items-center col-span-2">
+        <div className="flex gap-4 items-center 2xl:col-span-2">
           <h4 className="font-semibold min-w-[120px] max-w-[120px]">Nombre del Examen:</h4>
           <select
             name="nombreExamen"
@@ -156,114 +155,7 @@ export default function AlturaPsicologica() {
         />
       </SectionFieldset>
 
-      {/* Datos necesarios */}
-      <SectionFieldset legend="Datos Personales" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        <InputTextOneLine
-          label="Nombres"
-          name="nombres"
-          value={form.nombres}
-          disabled
-          labelWidth="120px"
-        />
-        <div className="grid lg:grid-cols-2 gap-3">
-          <InputTextOneLine
-            label="Edad"
-            name="edad"
-            value={form.edad}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Sexo"
-            name="sexo"
-            value={form.sexo}
-            disabled
-            labelWidth="120px" />
-        </div>
-        <InputTextOneLine
-          label="Apellidos"
-          name="apellidos"
-          value={form.apellidos}
-          disabled
-          labelWidth="120px"
-        />
-        <div className="grid lg:grid-cols-2 gap-3">
-          <InputTextOneLine
-            label="DNI"
-            name="dni"
-            value={form.dni}
-            disabled
-            labelWidth="120px"
-          />
-          <InputTextOneLine
-            label="Estado Civil"
-            name="estadoCivil"
-            value={form.estadoCivil}
-            disabled
-            labelWidth="120px"
-          />
-        </div>
-        <InputTextOneLine
-          label="Fecha Nacimiento"
-          name="fechaNacimiento"
-          value={form.fechaNacimiento}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Lugar Nacimiento"
-          name="lugarNacimiento"
-          value={form.lugarNacimiento}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Domicilio Actual"
-          name="domicilioActual"
-          value={form.domicilioActual}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Nivel Estudios"
-          name="nivelEstudios"
-          value={form.nivelEstudios}
-          disabled
-          labelWidth="120px"
-        />
-      </SectionFieldset>
-
-      {/* Datos Laborales */}
-      <SectionFieldset legend="Datos Laborales" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        <InputTextOneLine
-          label="Empresa"
-          name="empresa"
-          value={form.empresa}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Contrata"
-          name="contrata"
-          value={form.contrata}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Ocupación"
-          name="ocupacion"
-          value={form.ocupacion}
-          disabled
-          labelWidth="120px"
-        />
-        <InputTextOneLine
-          label="Cargo Desempeñar"
-          name="cargoDesempenar"
-          value={form.cargoDesempenar}
-          disabled
-          labelWidth="120px"
-        />
-      </SectionFieldset>
+      <DatosPersonalesLaborales form={form} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <SectionFieldset legend="Aspecto Intelectual">

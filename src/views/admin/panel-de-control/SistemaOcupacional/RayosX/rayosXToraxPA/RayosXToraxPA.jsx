@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faBroom, faComments } from "@fortawesome/free-solid-svg-icons";
+import { faComments } from "@fortawesome/free-solid-svg-icons";
 import {
   GetInfoServicio,
   getInfoTabla,
@@ -13,53 +13,76 @@ import {
 import Swal from "sweetalert2";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { useForm } from "../../../../../hooks/useForm";
+import { getToday } from "../../../../../utils/helpers";
+import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
+import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
+import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
+import InputCheckbox from "../../../../../components/reusableComponents/InputCheckbox";
+import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
+import BotonesAccion from "../../../../../components/templates/BotonesAccion";
+import TablaTemplate from "../../../../../components/templates/TablaTemplate";
+import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "radiografia_torax";
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
-
-const initialFormState = {
-  norden: "",
-  codRat: null,
-  fechaExam: today,
-  edad: "",
-  nombres: "",
-
-  vertices: "LIBRES",
-  hilios: "NORMALES",
-  senosCostofrenicos: "LIBRES",
-  camposPulmonares: "NORMALES",
-  tramaBroncovascular: false,
-  mediastinos: "NORMALES",
-  siluetaCardiovascular: "NORMAL",
-  osteomuscular: "NORMAL",
-  conclusiones: "NORMAL",
-  observaciones: "NORMAL",
-
-  nombres_search: "",
-  codigo_search: "",
-  fechaDesde: today,
-  fechaHasta: today,
-};
 
 export default function RayosXToraxPA() {
   const [dataTabla, setDataTabla] = useState([]);
+  const today = getToday();
+
+  const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
+
+  const initialFormState = {
+    norden: "",
+    codRat: null,
+    fechaExam: today,
+    nombreExamen: "",
+
+    dni: "",
+    nombres: "",
+    apellidos: "",
+    fechaNacimiento: "",
+    lugarNacimiento: "",
+    edad: "",
+    sexo: "",
+    estadoCivil: "",
+    nivelEstudios: "",
+
+    // Datos Laborales
+    empresa: "",
+    contrata: "",
+    ocupacion: "",
+    cargoDesempenar: "",
+
+    vertices: "LIBRES",
+    hilios: "NORMALES",
+    senosCostofrenicos: "LIBRES",
+    camposPulmonares: "NORMALES",
+    mediastinos: "NORMALES",
+    siluetaCardiovascular: "NORMAL",
+    osteomuscular: "NORMAL",
+    conclusiones: "NORMAL",
+    observaciones: "NORMAL",
+
+    nombres_search: "",
+    codigo_search: "",
+    fechaDesde: today,
+    fechaHasta: today,
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
+  };
+
   const {
     form,
     setForm,
     handleChange,
-    handleChangeNumber,
-    handleRadioButton,
-    handleCheckBoxChange,
+    handleChangeNumberDecimals,
+    handleChangeSimple,
     handleClear,
     handleClearnotO,
-    handlePrintDefault,
-  } = useForm(initialFormState);
-  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
-    useSessionData();
+  } = useForm(initialFormState, { storageKey: "rayosX_torax_PA" });
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
@@ -105,225 +128,207 @@ export default function RayosXToraxPA() {
   }, []);
 
   return (
-    <div className="flex flex-col md:flex-row gap-6">
+    <div className="px-4 max-w-[95%] mx-auto grid xl:grid-cols-2 gap-6">
       {/* Columna izquierda: Formulario */}
-      <div className=" w-full xl:w-1/2 text-black flex-1">
-        <form className="space-y-6">
-          <div className="border p-4 rounded space-y-3">
-            <div className="flex items-center gap-4">
-              <label className="font-semibold max-w-[150px] min-w-[150px] ">
-                N° Orden :
-              </label>
-              <input
-                className="border rounded px-2 py-1 w-full"
-                name="norden"
-                value={form.norden || ""}
-                onKeyUp={handleSearch}
-                onChange={handleChangeNumber}
-              />
-            </div>
-            <div className="flex gap-3 xl:gap-8 w-full flex-col xl:flex-row">
-              <div className="flex items-center gap-4">
-                <label className="font-semibold max-w-[150px] min-w-[150px]">
-                  Fecha Examen :
-                </label>
-                <input
-                  type="date"
-                  className="border rounded px-2 py-1 w-full"
-                  name="fechaExam"
-                  value={form.fechaExam || ""}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="flex items-center gap-4 w-full">
-                <label className="font-semibold max-w-[150px] min-w-[150px] xl:max-w-[50px] xl:min-w-[50px]">
-                  Edad :
-                </label>
-                <input
-                  className="border rounded px-2 py-1 w-full"
-                  name="edad"
-                  value={form.edad || ""}
-                  disabled
-                />
-              </div>
-            </div>
+      <div className="space-y-3">
+        <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-3 gap-x-4 gap-y-3">
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            value={form.norden}
+            onChange={handleChangeNumberDecimals}
+            onKeyUp={handleSearch}
+          />
+          <InputTextOneLine
+            label="Fecha"
+            name="fechaExam"
+            type="date"
+            value={form.fechaExam}
+            onChange={handleChangeSimple}
+          />
+          <InputTextOneLine
+            label="Tipo Examen"
+            name="nombreExamen"
+            value={form.nombreExamen}
+            disabled
+          />
+        </SectionFieldset>
 
-            <div className="flex items-center gap-4">
-              <label className="font-semibold max-w-[150px] min-w-[150px]">
-                Nombres :
-              </label>
-              <input
-                className="border rounded px-2 py-1 w-full"
-                name="nombres"
-                value={form.nombres || ""}
-                disabled
-              />
-            </div>
+        <DatosPersonalesLaborales form={form} minSizePrincipal="none" />
+
+        <SectionFieldset
+          legend="Evaluación Radiográfica"
+          className="space-y-3"
+        >
+          <InputTextOneLine
+            label="Vértices"
+            name="vertices"
+            value={form.vertices ?? ""}
+            onChange={handleChange}
+            labelWidth="150px"
+          />
+
+          <InputTextOneLine
+            label="Hilios"
+            name="hilios"
+            value={form.hilios ?? ""}
+            onChange={handleChange}
+            labelWidth="150px"
+          />
+
+          <InputTextOneLine
+            label="Senos Costofrénicos"
+            name="senosCostofrenicos"
+            value={form.senosCostofrenicos ?? ""}
+            onChange={handleChange}
+            labelWidth="150px"
+          />
+
+          <div className="space-y-2">
+            <InputTextOneLine
+              label="Campos Pulmonares"
+              name="camposPulmonares"
+              value={form.camposPulmonares ?? ""}
+              onChange={handleChange}
+              labelWidth="150px"
+            />
+
+            <InputCheckbox
+              label="Trama Broncovascular Acentuada en ACP"
+              name="tramaBroncovascular"
+              checked={
+                form.camposPulmonares ===
+                "TRAMA BRONCOVASCULAR ACENTUADA EN ACP"
+              }
+              onChange={(e) => {
+                setForm((prev) => ({
+                  ...prev,
+                  camposPulmonares: e.target.checked
+                    ? "TRAMA BRONCOVASCULAR ACENTUADA EN ACP"
+                    : "",
+                }));
+              }}
+              className="ml-[170px]"
+            />
           </div>
-          <div className="border p-4 rounded space-y-3">
-            <div className="flex items-center gap-4">
-              <label className="font-semibold max-w-[150px] min-w-[150px]">
-                Vértices :
-              </label>
-              <input
-                className="border rounded px-2 py-1 w-full"
-                name="vertices"
-                value={form.vertices || ""}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="font-semibold max-w-[150px] min-w-[150px]">
-                Hilios :
-              </label>
-              <input
-                className="border rounded px-2 py-1 w-full"
-                name="hilios"
-                value={form.hilios || ""}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="font-semibold max-w-[150px] min-w-[150px]">
-                Senos Costofrénicos :
-              </label>
-              <input
-                className="border rounded px-2 py-1 w-full"
-                name="senosCostofrenicos"
-                value={form.senosCostofrenicos || ""}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="font-semibold max-w-[150px] min-w-[150px]">
-                Campos Pulmonares :
-              </label>
-              <input
-                className="border rounded px-2 py-1 w-full"
-                name="camposPulmonares"
-                value={form.camposPulmonares || ""}
-                onChange={handleChange}
-              />
-            </div>
-            <label className="flex gap-2 font-semibold ml-[168px]">
-              <input
-                type="checkbox"
-                name="tramaBroncovascular"
-                checked={
-                  form.camposPulmonares ==
-                  "Trama Broncovascular Acentuada en ACP".toUpperCase()
-                }
+
+          <InputTextOneLine
+            label="Campos Mediastinos"
+            name="mediastinos"
+            value={form.mediastinos ?? ""}
+            onChange={handleChange}
+            labelWidth="150px"
+          />
+
+          <InputTextOneLine
+            label="Silueta Cardiovascular"
+            name="siluetaCardiovascular"
+            value={form.siluetaCardiovascular ?? ""}
+            onChange={handleChange}
+            labelWidth="150px"
+          />
+
+          <InputTextOneLine
+            label="Osteomuscular"
+            name="osteomuscular"
+            value={form.osteomuscular ?? ""}
+            onChange={handleChange}
+            labelWidth="150px"
+          />
+
+          <InputTextOneLine
+            label="Conclusiones Radiográficas"
+            name="conclusiones"
+            value={form.conclusiones ?? ""}
+            onChange={handleChange}
+            labelWidth="150px"
+          />
+
+          <div className="md:col-span-2 flex gap-x-4">
+            <InputTextArea
+              label="Observaciones"
+              name="observaciones"
+              value={form.observaciones ?? ""}
+              rows={3}
+              onChange={handleChange}
+            />
+            <div className="flex flex-col gap-y-2 mt-4 min-w-[190px]">
+              <InputCheckbox
+                label="Evaluación Anual"
+                name="evaluacionAnual"
+                checked={form.observaciones === "EVALUACIÓN ANUAL"}
                 onChange={(e) => {
-                  handleCheckBoxChange(e);
                   setForm((prev) => ({
                     ...prev,
-                    camposPulmonares: e.target.checked
-                      ? "Trama Broncovascular Acentuada en ACP".toUpperCase()
+                    observaciones: e.target.checked
+                      ? "EVALUACIÓN ANUAL"
                       : "",
                   }));
                 }}
               />
-              Trama Broncovascular Acentuada en ACP
-            </label>
-            <div className="flex items-center gap-4">
-              <label className="font-semibold max-w-[150px] min-w-[150px]">
-                Campos Mediastinos :
-              </label>
-              <input
-                className="border rounded px-2 py-1 w-full"
-                name="mediastinos"
-                value={form.mediastinos || ""}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="font-semibold max-w-[150px] min-w-[150px]">
-                Silueta Cardiovascular :
-              </label>
-              <input
-                className="border rounded px-2 py-1 w-full"
-                name="siluetaCardiovascular"
-                value={form.siluetaCardiovascular || ""}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="font-semibold max-w-[150px] min-w-[150px]">
-                Osteomuscular :
-              </label>
-              <input
-                className="border rounded px-2 py-1 w-full"
-                name="osteomuscular"
-                value={form.osteomuscular || ""}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="font-semibold max-w-[150px] min-w-[150px]">
-                Conclusiones Radiográficas :
-              </label>
-              <input
-                className="border rounded px-2 py-1 w-full"
-                name="conclusiones"
-                value={form.conclusiones || ""}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="font-semibold max-w-[150px] min-w-[150px]">
-                Observaciones :
-              </label>
-              <textarea
-                className="border rounded px-2 py-1 w-full resize-none"
-                name="observaciones"
-                rows={3}
-                value={form.observaciones || ""}
-                onChange={handleChange}
-              />
-            </div>
-            <label className="flex gap-2 font-semibold ml-[168px]">
-              <input
-                type="checkbox"
-                checked={form.observaciones == "EVALUACIÓN ANUAL"}
+              <InputCheckbox
+                label="No se Tomó Radiografía de Tórax"
+                name="noRadiografiaTorax"
+                checked={form.observaciones === "NO SE TOMÓ RADIOGRAFIA DE TÓRAX"}
                 onChange={(e) => {
+                  const texto = e.target.checked
+                    ? "NO SE TOMÓ RADIOGRAFIA DE TÓRAX"
+                    : "";
                   setForm((prev) => ({
                     ...prev,
-                    observaciones: e.target.checked ? "EVALUACIÓN ANUAL" : "",
+                    vertices: texto,
+                    hilios: texto,
+                    senosCostofrenicos: texto,
+                    camposPulmonares: texto,
+                    mediastinos: texto,
+                    siluetaCardiovascular: texto,
+                    osteomuscular: texto,
+                    conclusiones: texto,
+                    observaciones: texto,
                   }));
                 }}
               />
-              EVALUACIÓN ANUAL
-            </label>
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4  pt-2">
-              <div className=" flex gap-4">
-                <button
-                  type="button"
-                  onClick={handleSave}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                >
-                  <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                </button>
-                <button
-                  type="button"
-                  onClick={handleClear}
-                  className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                >
-                  <FontAwesomeIcon icon={faBroom} /> Limpiar
-                </button>
-              </div>
+
+              <InputCheckbox
+                label="Evaluación por Neumología"
+                name="evaluacionNeumologia"
+                checked={form.observaciones === "EVALUACIÓN POR NEUMOLOGÍA"}
+                onChange={(e) => {
+                  setForm((prev) => ({
+                    ...prev,
+                    observaciones: e.target.checked
+                      ? "EVALUACIÓN POR NEUMOLOGÍA"
+                      : "",
+                  }));
+                }}
+              />
             </div>
           </div>
-        </form>
+        </SectionFieldset>
+        <SectionFieldset legend="Asignación de Médico">
+          <EmpleadoComboBox
+            value={form.nombre_medico}
+            label="Especialista"
+            form={form}
+            onChange={handleChangeSimple}
+          />
+        </SectionFieldset>
+
+        <BotonesAccion
+          form={form}
+          handleSave={handleSave}
+          handleClear={handleClear}
+          handleChangeNumberDecimals={handleChangeNumberDecimals}
+          hidePrint
+        />
       </div>
       {/* Columna derecha: Panel de historial/búsqueda */}
-
-      <div className="border rounded p-4 flex flex-col flex-1">
-        <p className="mb-2 font-semibold">Informe de Examen</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3 items-center justify-center w-full">
-          <div>
-            <label className="font-semibold">Nombre :</label>
-            <input
-              className="border rounded px-2 py-1 w-full"
+      <div className="space-y-3">
+        <SectionFieldset legend="Búsqueda de Registros" className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
+            <InputTextOneLine
+              label="Nombre"
+              labelOnTop
               name="nombres_search"
               value={form.nombres_search}
               onKeyUp={(e) => {
@@ -331,16 +336,11 @@ export default function RayosXToraxPA() {
                   obtenerInfoTabla();
                 }
               }}
-              onChange={(e) => {
-                const { name, value } = e.target;
-                setForm((f) => ({ ...f, [name]: value, codigo_search: "" }));
-              }}
+              onChange={(e) => { handleChange(e); setForm(prev => ({ ...prev, codigo_search: "" })) }}
             />
-          </div>
-          <div>
-            <label className="font-semibold ml-2">Codigo:</label>
-            <input
-              className="border rounded px-2 py-1  w-full"
+            <InputTextOneLine
+              label="Código"
+              labelOnTop
               name="codigo_search"
               value={form.codigo_search}
               onKeyUp={(e) => {
@@ -348,20 +348,9 @@ export default function RayosXToraxPA() {
                   obtenerInfoTabla();
                 }
               }}
-              onChange={(e) => {
-                const { name, value } = e.target;
-                if (/^[\d/]*$/.test(value)) {
-                  setForm((f) => ({
-                    ...f,
-                    [name]: value,
-                    nombres_search: "",
-                  }));
-                }
-              }}
+              onChange={(e) => { handleChangeNumberDecimals(e); setForm(prev => ({ ...prev, nombres_search: "" })) }}
             />
           </div>
-        </div>
-        <div className="flex-1">
           <Table
             data={dataTabla}
             tabla={tabla}
@@ -370,36 +359,28 @@ export default function RayosXToraxPA() {
             clean={handleClear}
             datosFooter={datosFooter}
           />
-        </div>
+        </SectionFieldset>
 
-        <div className="rounded-md  space-y-4">
-          <div>
-            <p className="mb-2 font-semibold">Reportes por Fechas</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              <div>
-                <label className="font-semibold">Fecha desde :</label>
-                <input
-                  name="fechaDesde"
-                  type="date"
-                  value={form.fechaDesde}
-                  onChange={handleChange}
-                  className="border rounded px-2 py-1 w-full"
-                />
-              </div>
-              <div>
-                <label className="font-semibold">Fecha hasta :</label>
-                <input
-                  name="fechaHasta"
-                  type="date"
-                  value={form.fechaHasta}
-                  onChange={handleChange}
-                  className="border rounded px-2 py-1 w-full"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-end pt-2">
+        <SectionFieldset legend="Reportes por Fechas" className="grid grid-cols-1 md:grid-cols-10 gap-x-4 gap-y-3">
+          <InputTextOneLine
+            label="Fecha Desde"
+            labelOnTop
+            name="fechaDesde"
+            type="date"
+            value={form.fechaDesde}
+            onChange={handleChangeSimple}
+            className="md:col-span-4"
+          />
+          <InputTextOneLine
+            label="Fecha Hasta"
+            labelOnTop
+            name="fechaHasta"
+            type="date"
+            value={form.fechaHasta}
+            onChange={handleChangeSimple}
+            className="md:col-span-4"
+          />
+          <div className="flex justify-end pt-4 md:col-span-2">
             <button
               type="button"
               onClick={handleEjecutarConsulta}
@@ -408,51 +389,7 @@ export default function RayosXToraxPA() {
               <FontAwesomeIcon icon={faComments} /> Ejecutar Consulta
             </button>
           </div>
-        </div>
-        <div className="space-y-3">
-          <label className="flex gap-2 font-semibold ">
-            <input
-              type="checkbox"
-              checked={form.observaciones == "NO SE TOMÓ RADIOGRAFIA DE TÓRAX"}
-              onChange={(e) => {
-                // handleCheckBoxChange(e);
-                const texto = e.target.checked
-                  ? "NO SE TOMÓ RADIOGRAFIA DE TÓRAX"
-                  : "";
-
-                setForm((prev) => ({
-                  ...prev,
-                  vertices: texto,
-                  hilios: texto,
-                  senosCostofrenicos: texto,
-                  camposPulmonares: texto,
-                  mediastinos: texto,
-                  siluetaCardiovascular: texto,
-                  osteomuscular: texto,
-                  conclusiones: texto,
-                  observaciones: texto,
-                }));
-              }}
-            />
-            NO SE TOMO RADIOGRAFIA DE TORAX
-          </label>
-          <label className="flex gap-2 font-semibold ">
-            <input
-              type="checkbox"
-              checked={form.observaciones == "EVALUACIÓN POR NEUMOLOGÍA"}
-              onChange={(e) => {
-                // handleCheckBoxChange(e);
-                setForm((prev) => ({
-                  ...prev,
-                  observaciones: e.target.checked
-                    ? "EVALUACIÓN POR NEUMOLOGÍA"
-                    : "",
-                }));
-              }}
-            />
-            EVALUACIÓN POR NEUMOLOGÍA
-          </label>
-        </div>
+        </SectionFieldset>
       </div>
     </div>
   );
@@ -481,55 +418,32 @@ function Table({ data, tabla, set, token, clean, datosFooter }) {
       Swal.close();
     });
   }
-  function convertirFecha(fecha) {
-    if (fecha == null || fecha === "") return "";
-    const [dia, mes, anio] = fecha.split("-");
-    return `${anio}/${mes.padStart(2, "0")}/${dia.padStart(2, "0")}`;
-  }
+
+  const columns = [
+    {
+      label: "N° Orden",
+      accessor: "norden",
+      width: "120px",
+      render: (row) => <span className="font-bold">{row.norden}</span>,
+    },
+    {
+      label: "Nombres",
+      accessor: "nombres",
+    },
+    {
+      label: "Fecha",
+      accessor: "fechaInforme",
+      render: (row) => formatearFechaCorta(row.fecha),
+    },
+  ];
 
   return (
-    <div className="overflow-y-auto mb-4 h-[280px]">
-      <table className="w-full table-auto border-collapse ">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="border px-2 py-1 text-left text-lg">N° Orden</th>
-            <th className="border px-2 py-1 text-left text-lg">Nombres</th>
-            <th className="border px-2 py-1 text-left text-lg">Fecha</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.length > 0 ? (
-            data.map((row, i) => (
-              <tr
-                key={i}
-                className={`hover:bg-[#233245] hover:text-white cursor-pointer text-lg `}
-                onClick={() => clicktable(row.norden)}
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  handlePrintConfirm(row.norden);
-                }}
-              >
-                <td className="border px-2 py-1 font-bold">
-                  {row.norden || ""}
-                </td>
-                <td className="border px-2 py-1">{row.nombres || ""}</td>
-                <td className="border px-2 py-1">
-                  {convertirFecha(row.fechaOd)}
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td
-                colSpan={5}
-                className="text-center py-4 text-gray-500 text-lg"
-              >
-                No hay datos
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
+    <TablaTemplate
+      columns={columns}
+      data={data}
+      height={780}
+      onRowClick={(row) => clicktable(row.norden)}
+      onRowRightClick={(row) => handlePrintConfirm(row.norden)}
+    />
   );
 }

@@ -1,0 +1,37 @@
+{
+  "dniPaciente": 0,
+  "nombresPaciente": "string",
+  "apellidosPaciente": "string",
+  "direccionPaciente": "string",
+  "sexoPaciente": "string",
+  "fechaNacimientoPaciente": "2025-12-26",
+  "edadPaciente": "string",
+  "norden": 0,
+  "empresa": "string",
+  "cargoPaciente": "string",
+  "areaPaciente": "string",
+  "manejoHerramientas": "string",
+  "fodaForOpor": "string",
+  "fodaAmenDebi": "string",
+  "observacion": "string",
+  "recomenda": "string",
+  "cumplePerfil": true,
+  "userRegistro": "string",
+  "usuarioFirma": "string",
+  "fechaRegistro": "2025-12-26",
+  "nombreSede": "string",
+  "sede": "string",
+  "color": 0,
+  "textoColor": "string",
+  "codigoColor": "string",
+  "nameJasper": "string",
+  "digitalizacion": [
+    {
+      "nombreDigitalizacion": "string",
+      "url": "string"
+    }
+  ],
+  "triesgoElectrico": "string",
+  "ttareasAltura": "string",
+  "tespaciosConfinados": "string"
+}

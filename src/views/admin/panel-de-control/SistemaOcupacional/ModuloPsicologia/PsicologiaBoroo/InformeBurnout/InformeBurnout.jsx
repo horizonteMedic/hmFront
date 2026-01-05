@@ -1,5 +1,3 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faPrint, faBroom } from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
     InputTextArea,
@@ -10,6 +8,7 @@ import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformeBurnout";
 import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
 
 const tabla = "informe_burnout";
 
@@ -18,27 +17,26 @@ export default function InformeBurnout() {
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
 
     const initialFormState = {
-        // Header - Información del examen
-        norden: "",
-        fechaExamen: today,
+        norden: '',
+        fecha: today,
+
         nombreExamen: "",
 
-        // Datos personales
+        dni: "",
         nombres: "",
         apellidos: "",
-        dni: "",
         fechaNacimiento: "",
         lugarNacimiento: "",
-        domicilioActual: "",
         edad: "",
+        sexo: "",
         estadoCivil: "",
         nivelEstudios: "",
 
-        // Datos laborales
-        ocupacion: "",
-        cargoDesempenar: "",
+        // Datos Laborales
         empresa: "",
         contrata: "",
+        ocupacion: "",
+        cargoDesempenar: "",
 
         // Síndrome de Burnout
         sindromeBurnout: "",
@@ -96,10 +94,10 @@ export default function InformeBurnout() {
                             labelWidth="120px"
                         />
                         <InputTextOneLine
-                            label="Fecha Examen"
-                            name="fechaExamen"
+                            label="Fecha"
+                            name="fecha"
                             type="date"
-                            value={form.fechaExamen}
+                            value={form.fecha}
                             onChange={handleChangeSimple}
                             labelWidth="120px"
                         />
@@ -113,36 +111,7 @@ export default function InformeBurnout() {
                     </div>
                 </SectionFieldset>
 
-                <SectionFieldset legend="Datos Personales">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <div className="space-y-3">
-                            <InputTextOneLine label="Nombres" name="nombres" value={form.nombres} disabled labelWidth="160px" />
-                            <InputTextOneLine label="Apellidos" name="apellidos" value={form.apellidos} disabled labelWidth="160px" />
-                            <InputTextOneLine label="Domicilio Actual" name="domicilioActual" value={form.domicilioActual} disabled labelWidth="160px" />
-                            <InputTextOneLine label="Fecha Nacimiento" name="fechaNacimiento" value={form.fechaNacimiento} disabled labelWidth="160px" />
-                            <InputTextOneLine label="Nivel de Estudios" name="nivelEstudios" value={form.nivelEstudios} disabled labelWidth="160px" />
-                        </div>
-                        <div className="space-y-3">
-                            <InputTextOneLine label="DNI" name="dni" value={form.dni} disabled labelWidth="160px" />
-                            <InputTextOneLine label="Edad (años)" name="edad" value={form.edad} disabled labelWidth="160px" />
-                            <InputTextOneLine label="Estado Civil" name="estadoCivil" value={form.estadoCivil} disabled labelWidth="160px" />
-                            <InputTextOneLine label="Lugar Nacimiento" name="lugarNacimiento" value={form.lugarNacimiento} disabled labelWidth="160px" />
-                        </div>
-                    </div>
-                </SectionFieldset>
-
-                <SectionFieldset legend="Datos Laborales">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <div className="space-y-3">
-                            <InputTextOneLine label="Ocupación" name="ocupacion" value={form.ocupacion} disabled labelWidth="160px" />
-                            <InputTextOneLine label="Cargo a desempeñar" name="cargoDesempenar" value={form.cargoDesempenar} disabled labelWidth="160px" />
-                        </div>
-                        <div className="space-y-3">
-                            <InputTextOneLine label="Empresa" name="empresa" value={form.empresa} disabled labelWidth="160px" />
-                            <InputTextOneLine label="Contrata" name="contrata" value={form.contrata} disabled labelWidth="160px" />
-                        </div>
-                    </div>
-                </SectionFieldset>
+                <DatosPersonalesLaborales form={form} />
             </div>
 
             <SectionFieldset legend="Criterios Psicológicos">
