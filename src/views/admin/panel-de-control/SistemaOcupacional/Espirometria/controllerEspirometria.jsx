@@ -7,12 +7,14 @@ import {
     VerifyTRPerzonalizadoDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
+import { SubmitData } from "../../../../utils/apiHelpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/espirometria/obtenerReporteEspirometria";
 const registrarUrl =
     "/api/v01/ct/espirometria/registrarActualizarEspirometria";
-
+const registrarPDF =
+    "/api/v01/ct/archivos/archivoInterconsulta"
 export const GetInfoServicio = async (
     nro,
     tabla,
@@ -164,4 +166,60 @@ const GetInfoPac = async (nro, set, token, sede) => {
 
 export const Loading = (mensaje) => {
     LoadingDefault(mensaje);
+};
+
+export const handleSubirArchivoEspirometria = async (form, selectedSede, userlogued, token) => {
+    const { value: file } = await Swal.fire({
+        title: "Selecciona un archivo PDF",
+        input: "file",
+        inputAttributes: {
+            accept: "application/pdf", // solo PDF
+            "aria-label": "Sube tu archivo en formato PDF"
+        },
+        showCancelButton: true,
+        confirmButtonText: "Subir",
+        cancelButtonText: "Cancelar",
+        inputValidator: (file) => {
+            if (!file) return "Debes seleccionar un archivo.";
+            if (file.type !== "application/pdf") return "Solo se permiten archivos PDF.";
+        },
+    });
+
+    if (file) {
+        // Puedes convertirlo a Base64 si lo necesitas
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            LoadingDefault("Subiendo documento")
+            const base64WithoutHeader = e.target.result.split(',')[1];
+            const datos = {
+                rutaArchivo: null,
+                dni: null,
+                historiaClinica: null,
+                servidor: "azure",
+                estado: true,
+                fechaRegistro: `${year}-${month}-${day}`,
+                userRegistro: userlogued,
+                fechaActualizacion: null,
+                userActualizacion: null,
+                id_tipo_archivo: null,
+
+                nombreArchivo: file.name,
+                codigoSede: selectedSede,
+                fileBase64: base64WithoutHeader,
+                nomenclatura_tipo_archivo: form.nomenclatura,
+                orden: form.norden,
+                indice_carga_masiva: undefined,
+            };
+
+            const response = await SubmitData(datos, registrarPDF, token);
+            console.log(response)
+            if (response.id === 1) {
+
+                Swal.fire("Exito", "Archivo Subido con exto", "success")
+            } else {
+                Swal.fire("Error", "No se pudo subir", "error")
+            }
+        };
+        reader.readAsDataURL(file);
+    }
 };
