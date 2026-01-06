@@ -4,6 +4,7 @@ import { convertirGenero } from "../../utils/helpers.js";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
+import { dibujarFirmas } from '../../utils/dibujarFirmas.js';
 
 export default async function Oftalmologia(datos = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -177,22 +178,28 @@ export default async function Oftalmologia(datos = {}, docExistente = null) {
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Cuarta fila: Puesto de Trabajo, Área de Trabajo (2 columnas)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Quinta fila: Empresa (fila completa)
+  // Cuarta fila: Puesto de Trabajo (fila completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Sexta fila: Contrata (fila completa)
+  // Quinta fila: Área de Trabajo (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Sexta fila: Empresa (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Séptima fila: Contrata (fila completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
@@ -245,30 +252,32 @@ export default async function Oftalmologia(datos = {}, docExistente = null) {
   dibujarTextoConSaltoLinea(datosReales.direccionPaciente, tablaInicioX + 25, yTexto + 1.5, 160);
   yTexto += filaAltura;
 
-  // Cuarta fila: Puesto de Trabajo, Área de Trabajo
+  // Cuarta fila: Puesto de Trabajo
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(datosReales.puestoTrabajo), tablaInicioX + 30, yTexto + 1.5);
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Área de Trabajo:", tablaInicioX + 92, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(datosReales.areaTrabajo), tablaInicioX + 118, yTexto + 1.5);
+  dibujarTextoConSaltoLinea(formatearTextoGramatical(datosReales.puestoTrabajo), tablaInicioX + 30, yTexto + 1.5, tablaAncho - 35);
   yTexto += filaAltura;
 
-  // Quinta fila: Empresa
+  // Quinta fila: Área de Trabajo
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Área de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(formatearTextoGramatical(datosReales.areaTrabajo), tablaInicioX + 30, yTexto + 1.5, tablaAncho - 35);
+  yTexto += filaAltura;
+
+  // Sexta fila: Empresa
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(formatearTextoGramatical(datosReales.empresa), tablaInicioX + 24, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
-  // Sexta fila: Contratista
+  // Séptima fila: Contratista
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Contratista:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(datosReales.contrata), tablaInicioX + 24, yTexto + 1.5);
+  dibujarTextoConSaltoLinea(formatearTextoGramatical(datosReales.contrata), tablaInicioX + 24, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
   // === SECCIÓN 2: EXAMEN OFTALMOLÓGICO ===
@@ -421,23 +430,34 @@ export default async function Oftalmologia(datos = {}, docExistente = null) {
     );
   }
 
-  // Arreglo de firmas que quieres cargar
-  const firmasAPintar = [
-    { nombre: "SELLOFIRMADOCASIG", x: 50, y: y + boxH + 20, maxw: 50 },
-    { nombre: "SELLOFIRMA", x: 120, y: y + boxH + 20, maxw: 50 },
-  ];
+  // === FIRMAS ===
+  const yFirmas = y + boxH + 20;
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });
 
-  await agregarFirmas(doc, datos.digitalizacion, firmasAPintar).then(() => {
+  // Usar dibujarFirmas para dibujar las firmas
+  await dibujarFirmas({ doc, datos: datos, y: yFirmas, pageW }).then(() => {
+    if (docExistente) {
+      return doc;
+    } else {
+      imprimir(doc);
+    }
+  }).catch(err => {
+    console.error("Error al cargar firmas:", err);
     if (docExistente) {
       return doc;
     } else {
       imprimir(doc);
     }
   });
+
+  // Si hay docExistente, retornar el doc (las firmas se agregarán asíncronamente)
+  if (docExistente) {
+    return doc;
+  }
 }
+
 function imprimir(doc) {
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
@@ -446,71 +466,4 @@ function imprimir(doc) {
   iframe.src = url;
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
-}
-
-function agregarFirmas(doc, digitalizacion = [], firmasAPintar = []) {
-  const addSello = (imagenUrl, x, y, maxw = 100) => {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = imagenUrl;
-
-      // img.onload = () => {
-      //   let sigW = maxw;
-      //   const sigH = 35;
-      //   const baseX = x;
-      //   const baseY = y;
-      //   const maxW = sigW - 10;
-      //   const maxH = sigH - 10;
-      //   let imgW = img.width;
-      //   let imgH = img.height;
-      //   const scale = Math.min(maxW / imgW, maxH / imgH, 1);
-      //   imgW *= scale;
-      //   imgH *= scale;
-      //   const imgX = baseX + (sigW - imgW) / 2;
-      //   const imgY = baseY + (sigH - imgH) / 2;
-      //   doc.addImage(imagenUrl, "PNG", imgX, imgY, imgW, imgH);
-      //   resolve();
-      // };
-      img.onload = () => {
-        const sigH = 35; // alto máximo
-        const maxW = maxw; // ancho máximo como parámetro
-        const baseX = x;
-        const baseY = y;
-
-        let imgW = img.width;
-        let imgH = img.height;
-
-        // Escala proporcional en base a ancho y alto máximos
-        const scale = Math.min(maxW / imgW, sigH / imgH, 1);
-        imgW *= scale;
-        imgH *= scale;
-
-        // Ahora el ancho se adapta
-        const sigW = imgW;
-
-        // Centrar la imagen
-        const imgX = baseX + (sigW - imgW) / 2;
-        const imgY = baseY + (sigH - imgH) / 2;
-
-        doc.addImage(imagenUrl, "PNG", imgX, imgY, imgW, imgH);
-        resolve();
-      };
-      img.onerror = (e) => {
-        console.error("Error al cargar la imagen:", e);
-        resolve();
-      };
-    });
-  };
-
-  const firmas = digitalizacion.reduce(
-    (acc, d) => ({ ...acc, [d.nombreDigitalizacion]: d.url }),
-    {}
-  );
-
-  const promesasFirmas = firmasAPintar
-    .filter((f) => firmas[f.nombre])
-    .map((f) => addSello(firmas[f.nombre], f.x, f.y, f.maxw));
-
-  return Promise.all(promesasFirmas);
 }
