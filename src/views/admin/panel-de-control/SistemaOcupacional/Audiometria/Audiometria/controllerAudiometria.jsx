@@ -19,46 +19,46 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
           codAu: res.codAu,
           fecha: res.fechaAu,
           fechaNacimiento: res.fechaNac ? convertirFecha(res.fechaNac) : "",
-          sordera: res.rbsasorderaSi ? "SI" : "NO",
-          acufenos: res.rbsaacufenosSi ? "SI" : "NO",
-          vertigo: res.rbsavertigoSi ? "SI" : "NO",
-          otalgia: res.rbsaotalgiaSi ? "SI" : "NO",
-          secrecion_otica: res.rbsasecrecionSi ? "SI" : "NO",
+          sordera: res.rbsasorderaSi,
+          acufenos: res.rbsaacufenosSi,
+          vertigo: res.rbsavertigoSi,
+          otalgia: res.rbsaotalgiaSi,
+          secrecion_otica: res.rbsasecrecionSi,
           otros_sintomas_orl: res.txtsaotrossintomas,
 
-          rinitis: res.rbamrenitisSi ? "SI" : "NO",
-          sinusitis: res.rbamsinusitisSi ? "SI" : "NO",
-          otitis_media_cronica: res.rbamotitisSi ? "SI" : "NO",
-          medicamentos_ototoxicos: res.rbamototoxicosSi ? "SI" : "NO",
-          meningitis: res.rbammeningitisSi ? "SI" : "NO",
-          tec: res.rbamtecSi ? "SI" : "NO",
-          sordera_am: res.rbamsorderaSi ? "SI" : "NO",
-          parotiditis: res.rbamparotiditisSi ? "SI" : "NO",
-          sarampion: res.rbamsarampionSi ? "SI" : "NO",
-          tbc: res.rbamtbcSi ? "SI" : "NO",
+          rinitis: res.rbamrenitisSi,
+          sinusitis: res.rbamsinusitisSi,
+          otitis_media_cronica: res.rbamotitisSi,
+          medicamentos_ototoxicos: res.rbamototoxicosSi,
+          meningitis: res.rbammeningitisSi,
+          tec: res.rbamtecSi,
+          sordera_am: res.rbamsorderaSi,
+          parotiditis: res.rbamparotiditisSi,
+          sarampion: res.rbamsarampionSi,
+          tbc: res.rbamtbcSi,
           cuales_antecedentes: res.txtamcuales,
 
-          exposicion_ruido: res.rbeoexposicionSi ? "SI" : "NO",
-          protectores_auditivos: res.rbeoprotectoresSi ? "SI" : "NO",
-          exposicion_quimicos: res.rbeosustanciasSi ? "SI" : "NO",
+          exposicion_ruido: res.rbeoexposicionSi,
+          protectores_auditivos: res.rbeoprotectoresSi,
+          exposicion_quimicos: res.rbeosustanciasSi,
 
           promedio_horas: res.rbte0a2
             ? "0-2"
             : res.rbte2a4
-            ? "2-4"
-            : res.rbte4a6
-            ? "4-6"
-            : res.rbte6a8
-            ? "6-8"
-            : res.rbte8a10
-            ? "8-10"
-            : res.rbte10a12
-            ? "10-12"
-            : res.rbtem12
-            ? ">12"
-            : res.rbteeventual
-            ? "eventual"
-            : "",
+              ? "2-4"
+              : res.rbte4a6
+                ? "4-6"
+                : res.rbte6a8
+                  ? "6-8"
+                  : res.rbte8a10
+                    ? "8-10"
+                    : res.rbte10a12
+                      ? "10-12"
+                      : res.rbtem12
+                        ? ">12"
+                        : res.rbteeventual
+                          ? "EVENTUAL"
+                          : "",
           anios_exposicion: res.txtanios,
           meses_exposicion: res.txtmeses,
 
@@ -80,11 +80,11 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
           organofosforados_anios: res.txttorganofos,
           otros_quimicos: res.txteootros,
 
-          practica_tiro: res.rbaepraticaSi ? "SI" : "NO",
-          uso_walkman: res.rbaeusoSi ? "SI" : "NO",
-          otros_antecedentes: res.rbaeotrosSi ? "SI" : "NO",
+          practica_tiro: res.rbaepraticaSi,
+          uso_walkman: res.rbaeusoSi,
+          otros_antecedentes: res.rbaeotrosSi,
           cuales_antecedentes_extralaborales: res.txtaecuales,
-          otoscopia_odiocho: res.txtood, 
+          otoscopia_odiocho: res.txtood,
           otoscopia_odilzquierdo: res.txtooi,
 
           od_500: res.od500,
@@ -107,15 +107,15 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
           diagnostico_oi: res.txtdiagOi,
           comentarios_audiometria: res.txtcomentarios,
           proteccion_simpleODoble: res.chkrpasimple
-            ? "simple"
+            ? "SIMPLE"
             : res.chkrpadoble
-            ? "doble"
-            : "",
+              ? "DOBLE"
+              : "",
           control_semestralOAnual: res.chkcasemestral
-            ? "semestral"
+            ? "SEMESTRAL"
             : res.chkcaanual
-            ? "anual"
-            : "",
+              ? "ANUAL"
+              : "",
           recomendaciones_otras: res.txtotrasrecomendaciones,
 
           od_o_500: res.od1500,
@@ -154,46 +154,46 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     norden: form.norden,
     fechaAu: form.fecha,
 
-    rbsasorderaSi: form.sordera == "SI",
-    rbsasorderaNo: form.sordera == "NO",
-    rbsaacufenosSi: form.acufenos == "SI",
-    rbsaacufenosNo: form.acufenos == "NO",
-    rbsavertigoSi: form.vertigo == "SI",
-    rbsavertigoNo: form.vertigo == "NO",
-    rbsaotalgiaSi: form.otalgia == "SI",
-    rbsaotalgiaNo: form.otalgia == "NO",
-    rbsasecrecionSi: form.secrecion_otica == "SI",
-    rbsasecrecionNo: form.secrecion_otica == "NO",
+    rbsasorderaSi: form.sordera ,
+    rbsasorderaNo: !form.sordera,
+    rbsaacufenosSi: form.acufenos ,
+    rbsaacufenosNo: !form.acufenos,
+    rbsavertigoSi: form.vertigo ,
+    rbsavertigoNo: !form.vertigo,
+    rbsaotalgiaSi: form.otalgia ,
+    rbsaotalgiaNo: !form.otalgia,
+    rbsasecrecionSi: form.secrecion_otica ,
+    rbsasecrecionNo: !form.secrecion_otica,
     txtsaotrossintomas: form.otros_sintomas_orl || "",
 
-    rbamrenitisSi: form.rinitis == "SI",
-    rbamrenitisNo: form.rinitis == "NO",
-    rbamsinusitisSi: form.sinusitis == "SI",
-    rbamsinusitisNo: form.sinusitis == "NO",
-    rbamotitisSi: form.otitis_media_cronica == "SI",
-    rbamotitisNo: form.otitis_media_cronica == "NO",
-    rbamototoxicosSi: form.medicamentos_ototoxicos == "SI",
-    rbamototoxicosNo: form.medicamentos_ototoxicos == "NO",
-    rbammeningitisSi: form.meningitis == "SI",
-    rbammeningitisNo: form.meningitis == "NO",
-    rbamtecSi: form.tec == "SI",
-    rbamtecNo: form.tec == "NO",
-    rbamsorderaSi: form.sordera_am == "SI",
-    rbamsorderaNo: form.sordera_am == "NO",
-    rbamparotiditisSi: form.parotiditis == "SI",
-    rbamparotiditisNo: form.parotiditis == "NO",
-    rbamsarampionSi: form.sarampion == "SI",
-    rbamsarampionNo: form.sarampion == "NO",
-    rbamtbcSi: form.tbc == "SI",
-    rbamtbcNo: form.tbc == "NO",
+    rbamrenitisSi: form.rinitis ,
+    rbamrenitisNo: !form.rinitis,
+    rbamsinusitisSi: form.sinusitis ,
+    rbamsinusitisNo: !form.sinusitis,
+    rbamotitisSi: form.otitis_media_cronica ,
+    rbamotitisNo: !form.otitis_media_cronica,
+    rbamototoxicosSi: form.medicamentos_ototoxicos ,
+    rbamototoxicosNo: !form.medicamentos_ototoxicos,
+    rbammeningitisSi: form.meningitis ,
+    rbammeningitisNo: !form.meningitis,
+    rbamtecSi: form.tec ,
+    rbamtecNo: !form.tec,
+    rbamsorderaSi: form.sordera_am ,
+    rbamsorderaNo: !form.sordera_am,
+    rbamparotiditisSi: form.parotiditis ,
+    rbamparotiditisNo: !form.parotiditis,
+    rbamsarampionSi: form.sarampion ,
+    rbamsarampionNo: !form.sarampion,
+    rbamtbcSi: form.tbc ,
+    rbamtbcNo: !form.tbc,
     txtamcuales: form.cuales_antecedentes || "",
 
-    rbeoexposicionSi: form.exposicion_ruido == "SI",
-    rbeoexposicionNo: form.exposicion_ruido == "NO",
-    rbeoprotectoresSi: form.protectores_auditivos == "SI",
-    rbeoprotectoresNo: form.protectores_auditivos == "NO",
-    rbeosustanciasSi: form.exposicion_quimicos == "SI",
-    rbeosustanciasNo: form.exposicion_quimicos == "NO",
+    rbeoexposicionSi: form.exposicion_ruido ,
+    rbeoexposicionNo: !form.exposicion_ruido,
+    rbeoprotectoresSi: form.protectores_auditivos ,
+    rbeoprotectoresNo: !form.protectores_auditivos,
+    rbeosustanciasSi: form.exposicion_quimicos ,
+    rbeosustanciasNo: !form.exposicion_quimicos,
 
     rbte0a2: form.promedio_horas == "0-2",
     rbte2a4: form.promedio_horas == "2-4",
@@ -202,7 +202,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     rbte8a10: form.promedio_horas == "8-10",
     rbte10a12: form.promedio_horas == "10-12",
     rbtem12: form.promedio_horas == ">12",
-    rbteeventual: form.promedio_horas == "eventual",
+    rbteeventual: form.promedio_horas == "EVENTUAL",
     txtanios: form.anios_exposicion || "",
     txtmeses: form.meses_exposicion || "",
 
@@ -223,12 +223,12 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     txttorganofos: form.organofosforados_anios || "",
     txteootros: form.otros_quimicos || "",
 
-    rbaepraticaSi: form.practica_tiro == "SI",
-    rbaepraticaNo: form.practica_tiro == "NO",
-    rbaeusoSi: form.uso_walkman == "SI",
-    rbaeusoNo: form.uso_walkman == "NO",
-    rbaeotrosSi: form.otros_antecedentes == "SI",
-    rbaeotrosNo: form.otros_antecedentes == "NO",
+    rbaepraticaSi: form.practica_tiro ,
+    rbaepraticaNo: !form.practica_tiro,
+    rbaeusoSi: form.uso_walkman ,
+    rbaeusoNo: !form.uso_walkman,
+    rbaeotrosSi: form.otros_antecedentes ,
+    rbaeotrosNo: !form.otros_antecedentes,
     txtaecuales: form.cuales_antecedentes_extralaborales || "",
     txtood: form.otoscopia_odiocho || "",
     txtooi: form.otoscopia_odilzquierdo || "",
@@ -252,10 +252,10 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     txtdiagOd: form.diagnostico_od || "",
     txtdiagOi: form.diagnostico_oi || "",
     txtcomentarios: form.comentarios_audiometria || "",
-    chkrpasimple: form.proteccion_simpleODoble == "simple",
-    chkrpadoble: form.proteccion_simpleODoble == "doble",
-    chkcasemestral: form.control_semestralOAnual == "semestral",
-    chkcaanual: form.control_semestralOAnual == "anual",
+    chkrpasimple: form.proteccion_simpleODoble == "SIMPLE",
+    chkrpadoble: form.proteccion_simpleODoble == "DOBLE",
+    chkcasemestral: form.control_semestralOAnual == "SEMESTRAL",
+    chkcaanual: form.control_semestralOAnual == "ANUAL",
     txtotrasrecomendaciones: form.recomendaciones_otras || "",
 
     od1500: form.od_o_500 || "",
