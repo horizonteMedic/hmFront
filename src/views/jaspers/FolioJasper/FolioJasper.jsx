@@ -192,7 +192,11 @@ async function insertarPdfEnPosicion(jsPdfDoc, pdfExternoUrl, paginaInsercion) {
     const basePdf = await PDFDocument.load(baseBytes);
 
     // Cargar el PDF externo
-    const externoBytes = await fetch(pdfExternoUrl).then(r => r.arrayBuffer());
+    let externoBytes = await fetch(pdfExternoUrl).then(r => r.arrayBuffer());
+
+    // 🫁 SOLO ESPEROMETRÍA → aplicar sello
+    externoBytes = await sellarEspirometria(externoBytes);
+
     const externoPdf = await PDFDocument.load(externoBytes);
 
     // Copiar todas las páginas del PDF externo
@@ -229,4 +233,38 @@ async function agregarPdfAlFinal(jsPdfDoc, pdfExternoUrl) {
     paginasExternas.forEach(p => basePdf.addPage(p));
 
     return await basePdf.save();
+}
+
+async function sellarEspirometria(pdfBytes) {
+    // Cargar PDF externo
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+
+    // Cargar imagen del sello (desde public)
+    const selloBytes = await fetch("/img/sello/sello.jpeg").then(r => r.arrayBuffer());
+    const selloImage = await pdfDoc.embedJpg(selloBytes);
+
+    // Obtener última página
+    const pages = pdfDoc.getPages();
+    const lastPage = pages[pages.length - 1];
+
+    const { width, height } = lastPage.getSize();
+
+    // Tamaño del sello
+    const selloWidth = 120;
+    const selloHeight = 120;
+
+    // Posición (abajo a la derecha)
+    const x = width - selloWidth - 27;
+    const y = 37;
+
+    // Dibujar sello
+    lastPage.drawImage(selloImage, {
+        x,
+        y,
+        width: selloWidth,
+        height: selloHeight,
+        opacity: 0.9
+    });
+
+    return await pdfDoc.save();
 }
