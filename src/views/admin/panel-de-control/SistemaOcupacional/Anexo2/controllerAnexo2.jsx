@@ -1,8 +1,5 @@
 import Swal from "sweetalert2";
-import {
-  LoadingDefault,
-  VerifyTRDefault,
-} from "../../../../utils/functionUtils";
+import { LoadingDefault, VerifyTRDefault } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
 import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
@@ -343,6 +340,23 @@ export const GetInfoServicio = (
             otrosExamenes: "", //txtOtrosEx
             conclusionRespiratoria: "", //txtconclusion
           };
+
+          if (res.interpretacion_interpretacion != null) {
+            data.observacionesGenerales += "ESPIROMETRIA: " + res.interpretacion_interpretacion + "\n";
+          }
+
+          if (res.conclusionRadiografia_conclu != null) {
+            data.observacionesGenerales += "RAYOS X: " + res.conclusionRadiografia_conclu + "\n";
+          }
+
+          if (res.conclusionMusculoesqueletica != null) {
+            data.observacionesGenerales += "MUSCULOESQUELETICA: " + res.conclusionMusculoesqueletica + "\n";
+          }
+
+          if (res.observacionesConduccionCertificado_conduccion != null) {
+            data.observacionesGenerales += "FICHA CONDUCCION: " + res.observacionesConduccionCertificado_conduccion + "\n";
+          }
+
           if (res.informacionesGeneralRadiografia_info_general != null) {
             data.observacionesGenerales += `INFORME RADIOGRAFICO : ${res.informacionesGeneralRadiografia_info_general}\n`;
           }
@@ -940,6 +954,10 @@ export const GetInfoServicioEditar = (
             user_medicoFirma: res.usuarioFirma,
             dataEnfermedades: res.accidentes ?? [],
           };
+
+          if (res.interpretacion_interpretacion != null) {
+            data.observacionesGenerales += "ESPIROMETRIA: " + res.interpretacion_interpretacion + "\n";
+          }
 
           if (res.observacionesOdonto_txtobservaciones != null)
             data.observacionesGenerales += `ODONTOGRAMA : ${res.observacionesOdonto_txtobservaciones}\n`;

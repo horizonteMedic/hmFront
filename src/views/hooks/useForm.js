@@ -23,7 +23,7 @@ export const useForm = (initialFormState, options = {}) => {
       const timeoutId = setTimeout(() => {
         try {
           localStorage.setItem(storageKey, JSON.stringify(form));
-          console.log("guardado en localStorage");
+          // console.log("guardado en localStorage");
         } catch (err) {
           console.warn("useForm: error guardando en localStorage", err);
         }
