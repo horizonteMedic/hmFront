@@ -646,7 +646,7 @@ export const GetInfoServicio = (
             else if (imc >= 40) {
               data.imcRed = true;
               data.observacionesGenerales +=
-                "OBESIDAD II.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
+                "OBESIDAD III.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
             }
           }
 

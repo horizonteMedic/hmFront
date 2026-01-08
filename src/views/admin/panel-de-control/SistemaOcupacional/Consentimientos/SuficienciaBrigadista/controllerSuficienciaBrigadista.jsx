@@ -8,10 +8,9 @@ import {
     VerifyTRDefault,
 } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
-import { getHoraActual } from "../../../../../utils/helpers";
 
-const obtenerReporteUrl = "";
-const registrarUrl = "";
+const obtenerReporteUrl = "/api/v01/ct/constaBrigadista/reporteConstaBrigadista";
+const registrarUrl = "/api/v01/ct/constaBrigadista/registrarActualizarConstaBrigadista";
 
 export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
     const res = await GetInfoServicioDefault(nro, tabla, token, obtenerReporteUrl, onFinish);
@@ -19,13 +18,16 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
-            idConsentimiento: res.idConsentimiento ?? null,
-            fecha: res.fechaRegistro ?? "",
+            fecha: res.fecha ?? "",
             edad: res.edadPaciente ?? "",
             nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
             dni: res.dniPaciente ?? "",
             ocupacion: res.ocupacionPaciente ?? "",
             empresa: res.empresa ?? "",
+
+            aptitud: res.esActivo ?? false,
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -42,19 +44,10 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla, datos
 
     const body = {
         norden: form.norden,
-        idConsentimiento: form.idConsentimiento,
-
-        tipoReporte: tabla,
-        nombreReporte: "Constancia_Suficiencia_Brigadista",
-
-        antecedentesPatologicos: false,
-        detalleAntecedentes: null,
-
-        fechaFirma: form.fecha,
-        horaReporte: getHoraActual(),
-        usuarioRegistro: user,
-        fechaRegistro: form.fecha,
-        usuarioActualiza: user,
+        fecha: form.fecha,
+        esActivo: form.aptitud,
+        userRegistro: user,
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

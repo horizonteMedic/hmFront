@@ -8,7 +8,6 @@ import {
 } from "../../../../../utils/functionUtils";
 import { getFetch } from "../../../../../utils/apiHelpers";
 import { getHoraActual, getToday } from "../../../../../utils/helpers";
-import Hoja_Consulta_Externa from "../../../../../jaspers/HojaConsultaExterna/Hoja_Consulta_Externa";
 
 const obtenerReporteUrl =
     "/api/v01/ct/aptitudAltura/obtenerReporteAptitudAlturaPoderosa";
