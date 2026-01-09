@@ -36,7 +36,7 @@ export const GetInfoServicio = async (
             hipertension = true;
         }
 
-        const medicamentosAnexo16A = res.medicamentesAnexo16A ?? "";
+        const medicamentosAnexo16A = res.medicamentosAnexo16A ?? "";
 
         set((prev) => ({
             ...prev,
