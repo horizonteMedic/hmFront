@@ -54,7 +54,7 @@ export const GetCintura = async (event,triaje,set,s) => {
             set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: OBESIDAD I.'+"\n" }))
         } else if (imc >= 35 && imc < 40) {
             set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: OBESIDAD II.'+"\n" }))
-        } else {
+        } else if (imc >= 40) {
             set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: OBESIDAD III.'+"\n" }))
         }
         document.getElementById('cadera')?.focus();

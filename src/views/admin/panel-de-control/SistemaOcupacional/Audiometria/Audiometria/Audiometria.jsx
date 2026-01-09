@@ -33,7 +33,7 @@ const frecuencias = ["500", "1000", "2000", "3000", "4000", "6000", "8000"];
 
 export default function Audiometria() {
   const today = getToday();
-  const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
+  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
   const initialFormState = {
     codAu: "",
     norden: "",
@@ -168,8 +168,7 @@ export default function Audiometria() {
   } = useForm(initialFormState, { storageKey: "audiometriaNormal" });
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla);
-    // SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
 
   const handleSearch = (e) => {
@@ -180,28 +179,9 @@ export default function Audiometria() {
   };
 
   const handlePrint = () => {
-    if (!form.norden)
-      return Swal.fire("Error", "Debe colocar un N° Orden", "error");
-    Swal.fire({
-      title: "¿Desea Imprimir Audiometría?",
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Sí, Imprimir",
-      cancelButtonText: "Cancelar",
-      customClass: {
-        title: "swal2-title",
-        confirmButton: "swal2-confirm",
-        cancelButton: "swal2-cancel",
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        PrintHojaR(form.norden, token, tabla);
-      }
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla, datosFooter);
     });
-    // handlePrintDefault(() => {
-    //   PrintHojaR(form.norden, token, tabla, datosFooter);
-    // });
   };
 
   const tipoHipoacusia = (promedio) => {
@@ -238,8 +218,6 @@ export default function Audiometria() {
       ).toFixed(2);
 
       odPromedio = isNaN(odPromedio) ? 0 : odPromedio;
-
-      // console.log("Oído Derecho - Promedio:", odPromedio);
 
       setForm((f) => ({
         ...f,

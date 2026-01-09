@@ -327,21 +327,12 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
     // Segundo diálogo: preguntar si quiere agregar sellos
     const { value: agregarSellos, isConfirmed } = await Swal.fire({
         title: "¿Agregar Sellos y Firmas?",
-        html: `
-            <div style="text-align: left; margin: 20px 0;">
-                <label style="display: flex; align-items: center; cursor: pointer; font-size: 16px;">
-                    <input type="checkbox" id="swal-checkbox-sellos" checked style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;">
-                    <span>Agregar Sellos y Firmas al PDF</span>
-                </label>
-            </div>
-        `,
-        icon: "question",
+        input: "checkbox",
+        inputValue: 1,
+        inputPlaceholder: "Agregar Sellos y Firmas al PDF",
         showCancelButton: true,
         confirmButtonText: "Subir",
-        cancelButtonText: "Cancelar",
-        preConfirm: () => {
-            return document.getElementById('swal-checkbox-sellos').checked;
-        }
+        cancelButtonText: "Cancelar"
     });
     if (!isConfirmed) return; // Usuario canceló
 
@@ -365,6 +356,8 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
                 SELLOFIRMA: sSello,
             };
             pdfBytes = await colocarSellosEnPdf(pdfBytes, sellos, coordenadas);
+        } else {
+            console.log("SIN SELLOS");
         }
 
         const pdfBase64Final = uint8ToBase64(new Uint8Array(pdfBytes));
