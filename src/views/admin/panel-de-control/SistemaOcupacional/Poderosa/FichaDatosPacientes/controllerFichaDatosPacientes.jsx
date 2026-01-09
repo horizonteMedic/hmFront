@@ -31,10 +31,188 @@ export const GetInfoServicio = async (
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
+            id: res.id,
+            fechaIngreso: res.fechaIngreso,
 
+            tipoTrabajador: res.empleado
+                ? "EMPLEADO"
+                : res.obrero
+                    ? "OBRERO"
+                    : "",
+
+            // ===== DATOS LABORALES =====
+            empresa: res.empresa ?? "",
+            cargo: res.cargoPaciente ?? "",
+
+            // ===== DATOS PERSONALES =====
+            nombres: res.nombresPaciente ?? "",
+            apellidos: res.apellidosPaciente ?? "",
+            apellidoPaterno: res.apellidoPaterno ?? "",
+            apellidoMaterno: res.apellidoMaterno ?? "",
+
+            dni: res.dniPaciente ?? "",
+            lmNo: res.lm ?? "",
+            autogenerado: res.autogenerado ?? "",
+            estadoCivil: res.estadoCivilPaciente ?? "",
+            afpSnp: res.afp ?? "",
+            estatura: res.talla ?? "",
+            licConducirNo: res.lincenciaConducir ?? "",
+            cusspNo: res.cussp ?? "",
+            peso: res.peso ?? "",
+
+            // ===== NACIMIENTO =====
+            distritoNacimiento: res.lugarNacimientoPaciente ?? "",
+            provinciaNacimiento: "",
+            departamentoNacimiento: "",
+
+            // ===== DOMICILIO =====
+            direccionDomicilio: res.direccionPaciente ?? "",
+            distritoDomicilio: res.distrito ?? "",
+            provinciaDomicilio: res.provincia ?? "",
+            departamentoDomicilio: res.departamento ?? "",
+            referenciaDomiciliaria: res.referenciaDomicilio ?? "",
+
+            // ===== CONTACTO =====
+            telefono1: res.telefonoEmergencia ?? "",
+            telefono2: "",
+            tipoVivienda: res.viviendaPropia
+                ? "PROPIA"
+                : res.viviendaAlquilada
+                    ? "ALQUILADA"
+                    : "OTROS",
+            email: "",
+            radioFrec: res.radioFrecuencia ?? "",
+            celular: "",
+            numeroCuentaAhorro: res.numeroCuenta ?? "",
+            banco: res.banco ?? "",
+
+            // Composición Familiar
+            ...mapFamilia(res.composicionFamiliar ?? []),
+
+            // Emergencia
+            emergenciaNombres: res.nombreEmergencia ?? "",
+            emergenciaParentesco: res.parentescoEmergencia ?? "",
+            emergenciaTelefono: res.telefonoEmergencia ?? "",
+            emergenciaDomicilio: res.domicilioEmergencia ?? "",
+            emergenciaOtraReferencia: res.otraReferenciaEmergencia ?? "",
+
+            // Instrucción Adquirida
+            ...mapInstruccion(res.instruccionAdquirida ?? []),
+
+            // Condiciones Laborales
+            sueldoJornal: res.sueldo ?? "",
+            sistemaTrabajo: res.sistemaTrabajo ?? "",
+            transporteTerrestre: res.transporteTerrestreSi ? "SI" : "NO",
+            transporteAereo: res.transporteAereoSi ? "SI" : "NO",
+            viaticos: res.viaticosSi ? "SI" : "NO",
+            viaticosValor: res.viaticosDescripcion ?? "",
+            alimentacionContrata: res.alimentacionContrata ?? "",
+
+            //Pre-Evaluación
+            grupoSanguineo: res.grupoSanguineo ?? "",
+            aptitudAltura18: res.aptitudAltura18,
+            aptitud: res.aptitud,
+
+            // capacitaciones: [],
+            experiencias: res.experienciaLaboral ?? [],
+            referencias: res.referenciasPersonales ?? [],
         }));
     }
 };
+
+const mapFamilia = (familia) => {
+    const base = {
+        idfamiliarPadre: null, familiarPadreNombre: "-", familiarPadreVive: "-", familiarPadreFechaNac: "", familiarPadreEdad: "-", familiarPadreDni: "-", familiarPadreGrado: "-", familiarPadreAutogenerado: "-",
+        idfamiliarMadre: null, familiarMadreNombre: "-", familiarMadreVive: "-", familiarMadreFechaNac: "", familiarMadreEdad: "-", familiarMadreDni: "-", familiarMadreGrado: "-", familiarMadreAutogenerado: "-",
+        idfamiliarEsposa: null, familiarEsposaNombre: "-", familiarEsposaVive: "-", familiarEsposaFechaNac: "", familiarEsposaEdad: "-", familiarEsposaDni: "-", familiarEsposaGrado: "-", familiarEsposaAutogenerado: "-",
+    };
+
+    familia.forEach((f) => {
+        switch (f.parentesco) {
+            case "PADRE":
+                base.idfamiliarPadre = f.id;
+                base.familiarPadreNombre = f.nombres ?? "-";
+                base.familiarPadreVive = f.vive ?? "-";
+                base.familiarPadreFechaNac = f.fechaNacimiento ?? "";
+                base.familiarPadreEdad = f.edad ?? "-";
+                base.familiarPadreDni = f.dni ?? "-";
+                base.familiarPadreGrado = f.gradoInstruccion ?? "-";
+                base.familiarPadreAutogenerado = f.autogenerado ?? "-";
+                break;
+
+            case "MADRE":
+                base.idfamiliarMadre = f.id;
+                base.familiarMadreNombre = f.nombres ?? "-";
+                base.familiarMadreVive = f.vive ?? "-";
+                base.familiarMadreFechaNac = f.fechaNacimiento ?? "";
+                base.familiarMadreEdad = f.edad ?? "-";
+                base.familiarMadreDni = f.dni ?? "-";
+                base.familiarMadreGrado = f.gradoInstruccion ?? "-";
+                base.familiarMadreAutogenerado = f.autogenerado ?? "-";
+                break;
+
+            case "ESPOSA":
+                base.idfamiliarEsposa = f.id;
+                base.familiarEsposaNombre = f.nombres ?? "-";
+                base.familiarEsposaVive = f.vive ?? "-";
+                base.familiarEsposaFechaNac = f.fechaNacimiento ?? "";
+                base.familiarEsposaEdad = f.edad ?? "-";
+                base.familiarEsposaDni = f.dni ?? "-";
+                base.familiarEsposaGrado = f.gradoInstruccion ?? "-";
+                base.familiarEsposaAutogenerado = f.autogenerado ?? "-";
+                break;
+        }
+    });
+
+    return base;
+};
+const mapInstruccion = (lista) => {
+    const base = {
+        instruccionPrimariaCentro: "-",
+        instruccionPrimariaInicio: "",
+        instruccionPrimariaTermino: "",
+        instruccionPrimariaGrado: "-",
+
+        instruccionSecundariaCentro: "-",
+        instruccionSecundariaInicio: "",
+        instruccionSecundariaTermino: "",
+        instruccionSecundariaGrado: "-",
+
+        instruccionTecnicaCentro: "-",
+        instruccionTecnicaInicio: "",
+        instruccionTecnicaTermino: "",
+        instruccionTecnicaGrado: "-",
+
+        instruccionSuperiorCentro: "-",
+        instruccionSuperiorInicio: "",
+        instruccionSuperiorTermino: "",
+        instruccionSuperiorGrado: "-",
+
+        instruccionOtrosCentro: "-",
+        instruccionOtrosInicio: "",
+        instruccionOtrosTermino: "",
+        instruccionOtrosGrado: "-",
+    };
+
+    lista.forEach((i) => {
+        const key = i.instruccion?.toLowerCase();
+        if (key === "primaria") {
+            base.instruccionPrimariaCentro = i.centroEstudio ?? "-";
+            base.instruccionPrimariaInicio = i.fechaInicio ?? "";
+            base.instruccionPrimariaTermino = i.fechaTermino ?? "";
+            base.instruccionPrimariaGrado = i.gradoObtenido ?? "-";
+        }
+        if (key === "secundaria") {
+            base.instruccionSecundariaCentro = i.centroEstudio ?? "-";
+            base.instruccionSecundariaInicio = i.fechaInicio ?? "";
+            base.instruccionSecundariaTermino = i.fechaTermino ?? "";
+            base.instruccionSecundariaGrado = i.gradoObtenido ?? "-";
+        }
+    });
+
+    return base;
+};
+
 
 export const GetInfoServicioEditar = async (
     nro,
@@ -54,7 +232,91 @@ export const GetInfoServicioEditar = async (
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
+            id: res.id,
+            fechaIngreso: res.fechaIngreso,
 
+            tipoTrabajador: res.empleado
+                ? "EMPLEADO"
+                : res.obrero
+                    ? "OBRERO"
+                    : "",
+
+            // ===== DATOS LABORALES =====
+            empresa: res.empresa ?? "",
+            cargo: res.cargoPaciente ?? "",
+
+            // ===== DATOS PERSONALES =====
+            nombres: res.nombresPaciente ?? "",
+            apellidos: res.apellidosPaciente ?? "",
+            apellidoPaterno: res.apellidoPaterno ?? "",
+            apellidoMaterno: res.apellidoMaterno ?? "",
+
+            dni: res.dniPaciente ?? "",
+            lmNo: res.lm ?? "",
+            autogenerado: res.autogenerado ?? "",
+            estadoCivil: res.estadoCivilPaciente ?? "",
+            afpSnp: res.afp ?? "",
+            estatura: res.talla ?? "",
+            licConducirNo: res.lincenciaConducir ?? "",
+            cusspNo: res.cussp ?? "",
+            peso: res.peso ?? "",
+
+            // ===== NACIMIENTO =====
+            distritoNacimiento: res.lugarNacimientoPaciente ?? "",
+            provinciaNacimiento: "",
+            departamentoNacimiento: "",
+
+            // ===== DOMICILIO =====
+            direccionDomicilio: res.direccionPaciente ?? "",
+            distritoDomicilio: res.distrito ?? "",
+            provinciaDomicilio: res.provincia ?? "",
+            departamentoDomicilio: res.departamento ?? "",
+            referenciaDomiciliaria: res.referenciaDomicilio ?? "",
+
+            // ===== CONTACTO =====
+            telefono1: res.telefonoEmergencia ?? "",
+            telefono2: "",
+            tipoVivienda: res.viviendaPropia
+                ? "PROPIA"
+                : res.viviendaAlquilada
+                    ? "ALQUILADA"
+                    : "OTROS",
+            email: "",
+            radioFrec: res.radioFrecuencia ?? "",
+            celular: "",
+            numeroCuentaAhorro: res.numeroCuenta ?? "",
+            banco: res.banco ?? "",
+
+            // Composición Familiar
+            ...mapFamilia(res.composicionFamiliar ?? []),
+
+            // Emergencia
+            emergenciaNombres: res.nombreEmergencia ?? "",
+            emergenciaParentesco: res.parentescoEmergencia ?? "",
+            emergenciaTelefono: res.telefonoEmergencia ?? "",
+            emergenciaDomicilio: res.domicilioEmergencia ?? "",
+            emergenciaOtraReferencia: res.otraReferenciaEmergencia ?? "",
+
+            // Instrucción Adquirida
+            ...mapInstruccion(res.instruccionAdquirida ?? []),
+
+            // Condiciones Laborales
+            sueldoJornal: res.sueldo ?? "",
+            sistemaTrabajo: res.sistemaTrabajo ?? "",
+            transporteTerrestre: res.transporteTerrestreSi ? "SI" : "NO",
+            transporteAereo: res.transporteAereoSi ? "SI" : "NO",
+            viaticos: res.viaticosSi ? "SI" : "NO",
+            viaticosValor: res.viaticosDescripcion ?? "",
+            alimentacionContrata: res.alimentacionContrata ?? "",
+
+            //Pre-Evaluación
+            grupoSanguineo: res.grupoSanguineo ?? "",
+            aptitudAltura18: res.aptitudAltura18,
+            aptitud: res.aptitud,
+
+            // capacitaciones: [],
+            experiencias: res.experienciaLaboral ?? [],
+            referencias: res.referenciasPersonales ?? [],
         }));
     }
 };
@@ -96,6 +358,28 @@ export const SubmitDataService = async (
         gradoInstruccion: form[`familiar${f.key}Grado`],
         autogenerado: form[`familiar${f.key}Autogenerado`]
     }));
+
+    const instruccionConfig = [
+        { key: "Primaria", label: "PRIMARIA" },
+        { key: "Secundaria", label: "SECUNDARIA" },
+        { key: "Tecnica", label: "TECNICA" },
+        { key: "Superior", label: "SUPERIOR" },
+        { key: "Otros", label: "OTROS" },
+    ];
+
+    const buildInstruccionAdquirida =
+        instruccionConfig
+            .map(i => ({
+                id: form[`idInstruccion${i.key}`],
+                idFichaDatosPersonales: form.norden,
+                instruccion: i.label,
+                centroEstudio: form[`instruccion${i.key}Centro`],
+                fechaInicio: form[`instruccion${i.key}Inicio`],
+                fechaTermino: form[`instruccion${i.key}Termino`],
+                gradoObtenido: form[`instruccion${i.key}Grado`],
+                cap: null,
+            }));
+
 
     const body = {
         norden: form.norden,
@@ -144,43 +428,12 @@ export const SubmitDataService = async (
 
         usuarioRegistro: user,
 
-        composicionFamiliar: composicionFamiliar ,
+        composicionFamiliar: composicionFamiliar,
 
-        "experienciaLaboral": [
-            {
-                "id": 0,
-                "idFichaDatosPersonales": 0,
-                "empresa": "string",
-                "telefono": "string",
-                "cargoDesemp": "string",
-                "fechaInicio": "string",
-                "fechaTermino": "string",
-                "motivoSalida": "string"
-            }
-        ],
-        "instruccionAdquirida": [
-            {
-                "id": 0,
-                "idFichaDatosPersonales": 0,
-                "instruccion": "string",
-                "centroEstudio": "string",
-                "fechaInicio": "string",
-                "fechaTermino": "string",
-                "gradoObtenido": "string",
-                "cap": 0
-            }
-        ],
-        "referenciasPersonales": [
-            {
-                "id": 0,
-                "idFichaDatosPersonales": 0,
-                "nombres": "string",
-                "centroTrab": "string",
-                "cargoDesemp": "string",
-                "telefono": "string",
-                "direccion": "string"
-            }
-        ]
+        experienciaLaboral: form.experiencias.map(item => ({ ...item, idFichaDatosPersonales: form.norden })),
+        // capacitaciones: form.capacitaciones.map(item => ({ ...item, idFichaDatosPersonales: form.norden, cap: null })),
+        instruccionAdquirida: buildInstruccionAdquirida,
+        referenciasPersonales: form.referencias.map(item => ({ ...item, idFichaDatosPersonales: form.norden })),
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

@@ -66,6 +66,8 @@ export const GetInfoServicio = async (
             fef: res.fef2575,
             peso: res.peso,
             talla: res.talla,
+            sistolica: res.sistolica,
+            diastolica: res.diastolica,
             fvcTeorico: res.fvcTeorico,
             fev1Teorico: res.fev1Teorico,
             interpretacion: res.interpretacion,
@@ -161,6 +163,8 @@ const GetInfoPac = async (nro, set, token, sede) => {
             nombreExamen: res.nomExam ?? "",
             cargoDesempenar: res.cargo ?? "",
             lugarNacimiento: res.lugarNacimiento ?? "",
+            sistolica: res.sistolica,
+            diastolica: res.diastolica,
             sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
         }));
     }

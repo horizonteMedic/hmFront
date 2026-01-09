@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle, faTrash } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -81,18 +80,18 @@ export default function FichaDatosPacientes() {
         emergenciaOtraReferencia: "",
 
         // Instrucción Adquirida
-        instruccionPrimariaCentro: "-", instruccionPrimariaInicio: "", instruccionPrimariaTermino: "", instruccionPrimariaGrado: "-",
-        instruccionSecundariaCentro: "-", instruccionSecundariaInicio: "", instruccionSecundariaTermino: "", instruccionSecundariaGrado: "-",
-        instruccionTecnicaCentro: "-", instruccionTecnicaInicio: "", instruccionTecnicaTermino: "", instruccionTecnicaGrado: "-",
-        instruccionSuperiorCentro: "-", instruccionSuperiorInicio: "", instruccionSuperiorTermino: "", instruccionSuperiorGrado: "-",
-        instruccionOtrosCentro: "-", instruccionOtrosInicio: "", instruccionOtrosTermino: "", instruccionOtrosGrado: "-",
+        idInstruccionPrimaria: null, instruccionPrimariaCentro: "-", instruccionPrimariaInicio: "", instruccionPrimariaTermino: "", instruccionPrimariaGrado: "-",
+        idInstruccionSecundaria: null, instruccionSecundariaCentro: "-", instruccionSecundariaInicio: "", instruccionSecundariaTermino: "", instruccionSecundariaGrado: "-",
+        idInstruccionTecnica: null, instruccionTecnicaCentro: "-", instruccionTecnicaInicio: "", instruccionTecnicaTermino: "", instruccionTecnicaGrado: "-",
+        idInstruccionSuperior: null, instruccionSuperiorCentro: "-", instruccionSuperiorInicio: "", instruccionSuperiorTermino: "", instruccionSuperiorGrado: "-",
+        idInstruccionOtros: null, instruccionOtrosCentro: "-", instruccionOtrosInicio: "", instruccionOtrosTermino: "", instruccionOtrosGrado: "-",
 
         // Capacitación (input temporal)
-        capacitacionTitulo: "",
-        capacitacionCentro: "",
-        capacitacionFechaInicio: "",
-        capacitacionFechaTermino: "",
-        capacitacionGrado: "",
+        // capacitacionTitulo: "",
+        // capacitacionCentro: "",
+        // capacitacionFechaInicio: "",
+        // capacitacionFechaTermino: "",
+        // capacitacionGrado: "",
         // Experiencia Laboral (input temporal)
         experienciaNombre: "",
         experienciaTelefono: "",
@@ -120,12 +119,11 @@ export default function FichaDatosPacientes() {
         grupoSanguineo: "",
         aptitudAltura18: undefined,
         aptitud: undefined,
-    };
 
-    // Estado para listas dinámicas
-    const [capacitaciones, setCapacitaciones] = useState([]);
-    const [experiencias, setExperiencias] = useState([]);
-    const [referencias, setReferencias] = useState([]);
+        // capacitaciones: [],
+        experiencias: [],
+        referencias: [],
+    };
 
     const {
         form,
@@ -133,6 +131,7 @@ export default function FichaDatosPacientes() {
         handleChange,
         handleChangeNumber,
         handleRadioButton,
+        handleRadioButtonBoolean,
         handleClear,
         handleChangeSimple,
         handleClearnotO,
@@ -171,15 +170,19 @@ export default function FichaDatosPacientes() {
     // Funciones para Capacitación
     const agregarCapacitacion = () => {
         if (form.capacitacionTitulo) {
-            setCapacitaciones([...capacitaciones, {
-                titulo: form.capacitacionTitulo,
-                centro: form.capacitacionCentro,
-                fechaInicio: form.capacitacionFechaInicio,
-                fechaTermino: form.capacitacionFechaTermino,
-                grado: form.capacitacionGrado,
-            }]);
             setForm({
                 ...form,
+                capacitaciones: [
+                    ...form.capacitaciones,
+                    {
+                        id: null,
+                        instruccion: form.capacitacionTitulo,
+                        centroEstudio: form.capacitacionCentro,
+                        fechaInicio: form.capacitacionFechaInicio,
+                        fechaTermino: form.capacitacionFechaTermino,
+                        gradoObtenido: form.capacitacionGrado,
+                    }
+                ],
                 capacitacionTitulo: "",
                 capacitacionCentro: "",
                 capacitacionFechaInicio: "",
@@ -189,23 +192,31 @@ export default function FichaDatosPacientes() {
         }
     };
 
+
     const eliminarCapacitacion = (index) => {
-        setCapacitaciones(capacitaciones.filter((_, i) => i !== index));
+        setForm({
+            ...form,
+            capacitaciones: form.capacitaciones.filter((_, i) => i !== index)
+        });
     };
 
     // Funciones para Experiencia Laboral
     const agregarExperiencia = () => {
         if (form.experienciaNombre) {
-            setExperiencias([...experiencias, {
-                nombre: form.experienciaNombre,
-                telefono: form.experienciaTelefono,
-                cargo: form.experienciaCargo,
-                fechaInicio: form.experienciaFechaInicio,
-                fechaTermino: form.experienciaFechaTermino,
-                motivo: form.experienciaMotivo,
-            }]);
             setForm({
                 ...form,
+                experiencias: [
+                    ...form.experiencias,
+                    {
+                        id: null,
+                        empresa: form.experienciaNombre,
+                        telefono: form.experienciaTelefono,
+                        cargoDesemp: form.experienciaCargo,
+                        fechaInicio: form.experienciaFechaInicio,
+                        fechaTermino: form.experienciaFechaTermino,
+                        motivoSalida: form.experienciaMotivo,
+                    }
+                ],
                 experienciaNombre: "",
                 experienciaTelefono: "",
                 experienciaCargo: "",
@@ -217,21 +228,29 @@ export default function FichaDatosPacientes() {
     };
 
     const eliminarExperiencia = (index) => {
-        setExperiencias(experiencias.filter((_, i) => i !== index));
+        setForm({
+            ...form,
+            experiencias: form.experiencias.filter((_, i) => i !== index)
+        });
     };
+
 
     // Funciones para Referencias Personales
     const agregarReferencia = () => {
         if (form.referenciaNombres) {
-            setReferencias([...referencias, {
-                nombres: form.referenciaNombres,
-                centro: form.referenciaCentro,
-                cargo: form.referenciaCargo,
-                telefono: form.referenciaTelefono,
-                direccion: form.referenciaDireccion,
-            }]);
             setForm({
                 ...form,
+                referencias: [
+                    ...form.referencias,
+                    {
+                        id: null,
+                        nombres: form.referenciaNombres,
+                        centroTrab: form.referenciaCentro,
+                        cargoDesemp: form.referenciaCargo,
+                        telefono: form.referenciaTelefono,
+                        direccion: form.referenciaDireccion,
+                    }
+                ],
                 referenciaNombres: "",
                 referenciaCentro: "",
                 referenciaCargo: "",
@@ -242,8 +261,12 @@ export default function FichaDatosPacientes() {
     };
 
     const eliminarReferencia = (index) => {
-        setReferencias(referencias.filter((_, i) => i !== index));
+        setForm({
+            ...form,
+            referencias: form.referencias.filter((_, i) => i !== index)
+        });
     };
+
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
@@ -695,7 +718,7 @@ export default function FichaDatosPacientes() {
             </SectionFieldset>
 
             {/* ===== SECCIÓN: CAPACITACIÓN ===== */}
-            <SectionFieldset legend="Capacitación">
+            {/* <SectionFieldset legend="Capacitación">
                 <div className="grid grid-cols-5 gap-2 mb-3 items-end">
                     <InputTextOneLine
                         label="Titulo Capacitación"
@@ -716,7 +739,7 @@ export default function FichaDatosPacientes() {
                         name="capacitacionFechaInicio"
                         type="date"
                         value={form.capacitacionFechaInicio}
-                        onChange={handleChange}
+                        onChange={handleChangeSimple}
                         labelOnTop
                     />
                     <InputTextOneLine
@@ -724,7 +747,7 @@ export default function FichaDatosPacientes() {
                         name="capacitacionFechaTermino"
                         type="date"
                         value={form.capacitacionFechaTermino}
-                        onChange={handleChange}
+                        onChange={handleChangeSimple}
                         labelOnTop
                     />
                     <div className="flex flex-col gap-2">
@@ -747,8 +770,7 @@ export default function FichaDatosPacientes() {
                         </div>
                     </div>
                 </div>
-                {/* Tabla de capacitaciones agregadas */}
-                {capacitaciones.length > 0 && (
+                {form.capacitaciones.length > 0 && (
                     <div className="overflow-x-auto">
                         <table className="w-full border-collapse border border-gray-300 ">
                             <thead className="bg-gray-100">
@@ -762,13 +784,13 @@ export default function FichaDatosPacientes() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {capacitaciones.map((cap, index) => (
+                                {form.capacitaciones.map((cap, index) => (
                                     <tr key={index}>
-                                        <td className="border border-gray-300 px-2 py-1">{cap.titulo}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{cap.centro}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{cap.instruccion}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{cap.centroEstudio}</td>
                                         <td className="border border-gray-300 px-2 py-1">{cap.fechaInicio}</td>
                                         <td className="border border-gray-300 px-2 py-1">{cap.fechaTermino}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{cap.grado}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{cap.gradoObtenido}</td>
                                         <td className="border border-gray-300 px-2 py-1 text-center">
                                             <button
                                                 type="button"
@@ -784,7 +806,7 @@ export default function FichaDatosPacientes() {
                         </table>
                     </div>
                 )}
-            </SectionFieldset>
+            </SectionFieldset> */}
 
             {/* ===== SECCIÓN: EXPERIENCIA LABORAL ===== */}
             <SectionFieldset legend="Experiencia Laboral (Comenzar por último empleo)">
@@ -815,7 +837,7 @@ export default function FichaDatosPacientes() {
                         name="experienciaFechaInicio"
                         type="date"
                         value={form.experienciaFechaInicio}
-                        onChange={handleChange}
+                        onChange={handleChangeSimple}
                         labelOnTop
                     />
                     <InputTextOneLine
@@ -823,7 +845,7 @@ export default function FichaDatosPacientes() {
                         name="experienciaFechaTermino"
                         type="date"
                         value={form.experienciaFechaTermino}
-                        onChange={handleChange}
+                        onChange={handleChangeSimple}
                         labelOnTop
                     />
                     <div className="flex flex-col gap-2">
@@ -847,7 +869,7 @@ export default function FichaDatosPacientes() {
                     </div>
                 </div>
                 {/* Tabla de experiencias agregadas */}
-                {experiencias.length > 0 && (
+                {form.experiencias.length > 0 && (
                     <div className="overflow-x-auto">
                         <table className="w-full border-collapse border border-gray-300 ">
                             <thead className="bg-gray-100">
@@ -862,14 +884,14 @@ export default function FichaDatosPacientes() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {experiencias.map((exp, index) => (
+                                {form.experiencias.map((exp, index) => (
                                     <tr key={index}>
-                                        <td className="border border-gray-300 px-2 py-1">{exp.nombre}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{exp.empresa}</td>
                                         <td className="border border-gray-300 px-2 py-1">{exp.telefono}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{exp.cargo}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{exp.cargoDesemp}</td>
                                         <td className="border border-gray-300 px-2 py-1">{exp.fechaInicio}</td>
                                         <td className="border border-gray-300 px-2 py-1">{exp.fechaTermino}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{exp.motivo}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{exp.motivoSalida}</td>
                                         <td className="border border-gray-300 px-2 py-1 text-center">
                                             <button
                                                 type="button"
@@ -939,7 +961,7 @@ export default function FichaDatosPacientes() {
                     </div>
                 </div>
                 {/* Tabla de referencias agregadas */}
-                {referencias.length > 0 && (
+                {form.referencias.length > 0 && (
                     <div className="overflow-x-auto">
                         <table className="w-full border-collapse border border-gray-300 ">
                             <thead className="bg-gray-100">
@@ -956,8 +978,8 @@ export default function FichaDatosPacientes() {
                                 {referencias.map((ref, index) => (
                                     <tr key={index}>
                                         <td className="border border-gray-300 px-2 py-1">{ref.nombres}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{ref.centro}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{ref.cargo}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{ref.centroTrab}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{ref.cargoDesemp}</td>
                                         <td className="border border-gray-300 px-2 py-1">{ref.telefono}</td>
                                         <td className="border border-gray-300 px-2 py-1">{ref.direccion}</td>
                                         <td className="border border-gray-300 px-2 py-1 text-center">
@@ -1063,6 +1085,7 @@ export default function FichaDatosPacientes() {
                     label="Aptitud"
                     name="aptitud"
                     value={form.aptitud}
+                    onChange={handleRadioButtonBoolean}
                     trueLabel="Apto"
                     falseLabel="No Apto"
                     labelWidth="120px"

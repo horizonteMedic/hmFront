@@ -46,6 +46,8 @@ export default function Espirometria() {
 
         peso: "",
         talla: "",
+        sistolica: "",
+        diastolica: "",
 
         fvcTeorico: "",
         fev1Teorico: "",
@@ -184,6 +186,18 @@ export default function Espirometria() {
                         label="Talla"
                         name="talla"
                         value={form?.talla}
+                        disabled
+                    />
+                    <InputTextOneLine
+                        label="Sistólica"
+                        name="sistolica"
+                        value={form?.sistolica}
+                        disabled
+                    />
+                    <InputTextOneLine
+                        label="Diastólica"
+                        name="diastolica"
+                        value={form?.diastolica}
                         disabled
                     />
                 </div>
