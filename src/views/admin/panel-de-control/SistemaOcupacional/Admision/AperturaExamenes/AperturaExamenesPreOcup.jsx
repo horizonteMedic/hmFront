@@ -94,7 +94,7 @@ const AperturaExamenesPreOcup = (props) => {
     montoProtocolo: 0,
     montoAdicionales: 0,
     montoDescuento: 0,
-    precioPo: "",
+    precioPo: 0,
 
 
     //Examenes Adicionales
@@ -362,20 +362,6 @@ const AperturaExamenesPreOcup = (props) => {
     }));
 
     setFilteredExamMed([]);
-    if (datos.idProtocolo) {
-      return
-    } else {
-      getFetch(`/api/v01/ct/ocupacional/PrecioExamenMutisucursal/${props.selectedSede}/${x.mensaje}`, props.token)
-        .then((res) => {
-          setDatos(d => ({
-            ...d,
-            precioPo: res.mensaje
-          }));
-        })
-        .catch(() => {
-          console.log('Telible Error')
-        })
-    }
     document.getElementById('nomEx')?.focus();
   };
 

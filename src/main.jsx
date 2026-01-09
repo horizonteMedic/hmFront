@@ -44,7 +44,7 @@ import SistemaOcupacional from "./views/admin/panel-de-control/SistemaOcupaciona
 import Anexo16A from "./views/admin/panel-de-control/SistemaOcupacional/Anexo16A/Anexo16A.jsx";
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/AnalisisBioquimicos/LaboratorioClinico_Digitalizado.jsx";
+import Ficha from "./views/jaspers/HojadeRutaDinamico/HojadeRutaDinamico.jsx";
 
 
 

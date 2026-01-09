@@ -8,11 +8,7 @@ const ModalPagos = ({ close, datos, set, ListFormaPago }) => {
 
     const [currentTime, setCurrentTime] = useState(new Date())
 
-    // Store the initial price (precioPo) when modal opens to use as base if no protocol
-    const [initialBasePrice] = useState(() => {
-        if (!datos.idProtocolo) return parseFloat(datos.precioPo) || 0;
-        return 0;
-    });
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -58,20 +54,13 @@ const ModalPagos = ({ close, datos, set, ListFormaPago }) => {
         const protocolo = parseFloat(datos.montoProtocolo) || 0
         const adicionales = parseFloat(datos.montoAdicionales) || 0
 
-        let total = 0;
-
-        if (datos.idProtocolo) {
-            total = protocolo + adicionales;
-        } else {
-            total = initialBasePrice + adicionales;
-        }
-
+        const total = protocolo + adicionales;
         const formattedTotal = total.toFixed(2);
 
         if (parseFloat(datos.precioPo || 0).toFixed(2) !== formattedTotal) {
             set(prev => ({ ...prev, precioPo: formattedTotal }))
         }
-    }, [datos.montoProtocolo, datos.montoAdicionales, datos.idProtocolo, initialBasePrice])
+    }, [datos.montoProtocolo, datos.montoAdicionales])
 
     return (
         <>
@@ -147,13 +136,14 @@ const ModalPagos = ({ close, datos, set, ListFormaPago }) => {
                                 <div className="relative">
                                     <input
                                         autoComplete="off"
+                                        disabled
                                         type="text"
                                         id="montoAdicionales"
                                         name="montoAdicionales"
                                         value={`S/.${datos.montoAdicionales || ''}`}
                                         onChange={handleCurrencyChange}
                                         onBlur={handleBlurCurrency}
-                                        className="border border-gray-300 px-3 py-2 text-base rounded-md focus:outline-none w-full"
+                                        className="border border-gray-300 px-3 py-2 text-base rounded-md focus:outline-none w-full bg-gray-200"
                                     />
                                 </div>
                             </div>
@@ -172,7 +162,7 @@ const ModalPagos = ({ close, datos, set, ListFormaPago }) => {
                                         onChange={handleCurrencyChange}
                                         name="montoProtocolo"
                                         disabled
-                                        className={`border border-gray-300 px-3 py-2 text-base rounded-md focus:outline-none w-full ${!datos.idProtocolo ? "bg-gray-200" : ""}`}
+                                        className="border border-gray-300 px-3 py-2 text-base rounded-md focus:outline-none w-full bg-gray-200"
                                     />
                                 </div>
                             </div>
@@ -192,7 +182,7 @@ const ModalPagos = ({ close, datos, set, ListFormaPago }) => {
                                     id="precioPo"
                                     name="precioPo"
                                     value={`S/.${parseFloat(datos.precioPo || 0).toFixed(2)}`}
-                                    onChange={handleCurrencyChange}
+                                    disabled
                                     className="border-2 border-blue-400 px-4 py-3 text-xl font-bold rounded-lg focus:outline-none w-full bg-blue-50 text-blue-700"
                                 />
                             </div>
