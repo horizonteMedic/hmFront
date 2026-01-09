@@ -158,6 +158,8 @@ export const GetInfoServicio = async (
             observacionesRecomendaciones: nuevasObservaciones,
             imcRed: imcRed,
 
+            medicinasTomando: res.medicamentosAnexo16A ?? "",
+
             obesidadIMC30: parseFloat(res.imcTriaje) >= 30,
 
         }));

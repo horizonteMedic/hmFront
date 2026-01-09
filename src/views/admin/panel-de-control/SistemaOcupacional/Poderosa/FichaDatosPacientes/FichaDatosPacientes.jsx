@@ -22,19 +22,14 @@ export default function FichaDatosPacientes() {
         norden: "",
         codigoFicha: null,
         fechaIngreso: today,
-        nombreExamen: "",
+        tipoTrabajador: "",
+
         empresa: "",
         cargo: "",
-        codigoActividad: "",
-        zona: "",
-        codigoDpto: "",
-        tipoTrabajador: "",
+
         nombres: "",
         apellidos: "",
-        // Nacimiento
-        diaNacimiento: "",
-        mesNacimiento: "",
-        anioNacimiento: "",
+
         distritoNacimiento: "",
         provinciaNacimiento: "",
         departamentoNacimiento: "",
@@ -54,20 +49,16 @@ export default function FichaDatosPacientes() {
         provinciaDomicilio: "",
         departamentoDomicilio: "",
         referenciaDomiciliaria: "",
+
         telefono1: "",
-        tipoVivienda: "",
         telefono2: "",
+        tipoVivienda: "",
         email: "",
         radioFrec: "",
         celular: "",
         numeroCuentaAhorro: "",
         banco: "",
-        // Emergencia
-        emergenciaNombres: "",
-        emergenciaParentesco: "",
-        emergenciaTelefono: "",
-        emergenciaDomicilio: "",
-        emergenciaOtraReferencia: "",
+
         // Composición Familiar
         familiarPadreNombre: "-", familiarPadreVive: "-", familiarPadreFechaNac: "", familiarPadreEdad: "-", familiarPadreDni: "-", familiarPadreGrado: "-", familiarPadreAutogenerado: "-",
         familiarMadreNombre: "-", familiarMadreVive: "-", familiarMadreFechaNac: "", familiarMadreEdad: "-", familiarMadreDni: "-", familiarMadreGrado: "-", familiarMadreAutogenerado: "-",
@@ -78,27 +69,21 @@ export default function FichaDatosPacientes() {
         familiarHijo3Nombre: "-", familiarHijo3Vive: "-", familiarHijo3FechaNac: "", familiarHijo3Edad: "-", familiarHijo3Dni: "-", familiarHijo3Grado: "-", familiarHijo3Autogenerado: "-",
         familiarHijo4Nombre: "-", familiarHijo4Vive: "-", familiarHijo4FechaNac: "", familiarHijo4Edad: "-", familiarHijo4Dni: "-", familiarHijo4Grado: "-", familiarHijo4Autogenerado: "-",
         familiarHijo5Nombre: "-", familiarHijo5Vive: "-", familiarHijo5FechaNac: "", familiarHijo5Edad: "-", familiarHijo5Dni: "-", familiarHijo5Grado: "-", familiarHijo5Autogenerado: "-",
+
+        // Emergencia
+        emergenciaNombres: "",
+        emergenciaParentesco: "",
+        emergenciaTelefono: "",
+        emergenciaDomicilio: "",
+        emergenciaOtraReferencia: "",
+
         // Instrucción Adquirida
-        instruccionPrimariaCentro: "-",
-        instruccionPrimariaInicio: "",
-        instruccionPrimariaTermino: "",
-        instruccionPrimariaGrado: "-",
-        instruccionSecundariaCentro: "-",
-        instruccionSecundariaInicio: "",
-        instruccionSecundariaTermino: "",
-        instruccionSecundariaGrado: "-",
-        instruccionTecnicaCentro: "-",
-        instruccionTecnicaInicio: "",
-        instruccionTecnicaTermino: "",
-        instruccionTecnicaGrado: "-",
-        instruccionSuperiorCentro: "-",
-        instruccionSuperiorInicio: "",
-        instruccionSuperiorTermino: "",
-        instruccionSuperiorGrado: "-",
-        instruccionOtrosCentro: "-",
-        instruccionOtrosInicio: "",
-        instruccionOtrosTermino: "",
-        instruccionOtrosGrado: "-",
+        instruccionPrimariaCentro: "-", instruccionPrimariaInicio: "", instruccionPrimariaTermino: "", instruccionPrimariaGrado: "-",
+        instruccionSecundariaCentro: "-", instruccionSecundariaInicio: "", instruccionSecundariaTermino: "", instruccionSecundariaGrado: "-",
+        instruccionTecnicaCentro: "-", instruccionTecnicaInicio: "", instruccionTecnicaTermino: "", instruccionTecnicaGrado: "-",
+        instruccionSuperiorCentro: "-", instruccionSuperiorInicio: "", instruccionSuperiorTermino: "", instruccionSuperiorGrado: "-",
+        instruccionOtrosCentro: "-", instruccionOtrosInicio: "", instruccionOtrosTermino: "", instruccionOtrosGrado: "-",
+
         // Capacitación (input temporal)
         capacitacionTitulo: "",
         capacitacionCentro: "",
@@ -118,6 +103,7 @@ export default function FichaDatosPacientes() {
         referenciaCargo: "",
         referenciaTelefono: "",
         referenciaDireccion: "",
+
         // Condiciones Laborales
         sueldoJornal: "",
         sistemaTrabajo: "",
@@ -127,6 +113,7 @@ export default function FichaDatosPacientes() {
         viaticosValor: "",
         alimentacionContrata: "",
 
+        //Pre-Evaluación
         grupoSanguineo: "",
         aptitudAltura18: undefined,
         aptitud: undefined,
@@ -543,7 +530,7 @@ export default function FichaDatosPacientes() {
                         </thead>
                         <tbody>
                             <tr>
-                                <td className="border border-gray-300 px-2 py-1 font-semibold">Padre:</td>
+                                <td className="border border-gray-300 px-2 py-1 font-semibold">Padre</td>
                                 <td><InputTextOneLine name="familiarPadreNombre" value={form.familiarPadreNombre ?? "-"} onChange={handleChange} /></td>
                                 <td><InputTextOneLine name="familiarPadreVive" value={form.familiarPadreVive ?? "-"} onChange={handleChange} /></td>
                                 <td><InputTextOneLine type="date" name="familiarPadreFechaNac" value={form.familiarPadreFechaNac ?? "-"} onChange={handleChangeSimple} /></td>
@@ -553,7 +540,7 @@ export default function FichaDatosPacientes() {
                                 <td><InputTextOneLine name="familiarPadreAutogenerado" value={form.familiarPadreAutogenerado ?? "-"} onChange={handleChange} /></td>
                             </tr>
                             <tr>
-                                <td className="border border-gray-300 px-2 py-1 font-semibold">Madre:</td>
+                                <td className="border border-gray-300 px-2 py-1 font-semibold">Madre</td>
                                 <td><InputTextOneLine name="familiarMadreNombre" value={form.familiarMadreNombre ?? "-"} onChange={handleChange} /></td>
                                 <td><InputTextOneLine name="familiarMadreVive" value={form.familiarMadreVive ?? "-"} onChange={handleChange} /></td>
                                 <td><InputTextOneLine type="date" name="familiarMadreFechaNac" value={form.familiarMadreFechaNac ?? ""} onChange={handleChangeSimple} /></td>
@@ -564,7 +551,7 @@ export default function FichaDatosPacientes() {
                             </tr>
 
                             <tr>
-                                <td className="border border-gray-300 px-2 py-1 font-semibold">Conviviente:</td>
+                                <td className="border border-gray-300 px-2 py-1 font-semibold">Conviviente</td>
                                 <td><InputTextOneLine name="familiarConvivienteNombre" value={form.familiarConvivienteNombre ?? "-"} onChange={handleChange} /></td>
                                 <td><InputTextOneLine name="familiarConvivienteVive" value={form.familiarConvivienteVive ?? "-"} onChange={handleChange} /></td>
                                 <td><InputTextOneLine type="date" name="familiarConvivienteFechaNac" value={form.familiarConvivienteFechaNac ?? ""} onChange={handleChangeSimple} /></td>
@@ -575,7 +562,7 @@ export default function FichaDatosPacientes() {
                             </tr>
 
                             <tr>
-                                <td className="border border-gray-300 px-2 py-1 font-semibold">Esposa:</td>
+                                <td className="border border-gray-300 px-2 py-1 font-semibold">Esposa</td>
                                 <td><InputTextOneLine name="familiarEsposaNombre" value={form.familiarEsposaNombre ?? "-"} onChange={handleChange} /></td>
                                 <td><InputTextOneLine name="familiarEsposaVive" value={form.familiarEsposaVive ?? "-"} onChange={handleChange} /></td>
                                 <td><InputTextOneLine type="date" name="familiarEsposaFechaNac" value={form.familiarEsposaFechaNac ?? ""} onChange={handleChangeSimple} /></td>
@@ -587,7 +574,7 @@ export default function FichaDatosPacientes() {
 
                             {[1, 2, 3, 4, 5].map((num) => (
                                 <tr key={num}>
-                                    <td className="border border-gray-300 px-2 py-1 font-semibold">Hijo:</td>
+                                    <td className="border border-gray-300 px-2 py-1 font-semibold">Hijo</td>
                                     <td><InputTextOneLine name={`familiarHijo${num}Nombre`} value={form[`familiarHijo${num}Nombre`] ?? "-"} onChange={handleChange} /></td>
                                     <td><InputTextOneLine name={`familiarHijo${num}Vive`} value={form[`familiarHijo${num}Vive`] ?? "-"} onChange={handleChange} /></td>
                                     <td><InputTextOneLine type="date" name={`familiarHijo${num}FechaNac`} value={form[`familiarHijo${num}FechaNac`] ?? ""} onChange={handleChangeSimple} /></td>
@@ -602,7 +589,7 @@ export default function FichaDatosPacientes() {
                 </div>
             </SectionFieldset>
 
-            {/* ===== SECCIÓN: EMERGENCIA ===== */}
+            {/* ===== SECCIÓN EMERGENCIA ===== */}
             <SectionFieldset legend="En Caso de Emergencia Notificar A" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div className="space-y-3">
                     <InputTextOneLine
@@ -661,79 +648,44 @@ export default function FichaDatosPacientes() {
                         <tbody>
                             <tr>
                                 <td className="border border-gray-300 px-2 py-1">Primaria</td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <input name="instruccionPrimariaCentro" value={form.instruccionPrimariaCentro ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" />
-                                </td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <input type="date" name="instruccionPrimariaInicio" value={form.instruccionPrimariaInicio ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" />
-                                </td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <input type="date" name="instruccionPrimariaTermino" value={form.instruccionPrimariaTermino ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" />
-                                </td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <input name="instruccionPrimariaGrado" value={form.instruccionPrimariaGrado ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" />
-                                </td>
+                                <td><InputTextOneLine name="instruccionPrimariaCentro" value={form.instruccionPrimariaCentro ?? ""} onChange={handleChange} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionPrimariaInicio" value={form.instruccionPrimariaInicio ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionPrimariaTermino" value={form.instruccionPrimariaTermino ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine name="instruccionPrimariaGrado" value={form.instruccionPrimariaGrado ?? ""} onChange={handleChange} /></td>
                             </tr>
+
                             <tr>
                                 <td className="border border-gray-300 px-2 py-1">Secundaria</td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <input name="instruccionSecundariaCentro" value={form.instruccionSecundariaCentro ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" />
-                                </td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <input type="date" name="instruccionSecundariaInicio" value={form.instruccionSecundariaInicio ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" />
-                                </td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <input type="date" name="instruccionSecundariaTermino" value={form.instruccionSecundariaTermino ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" />
-                                </td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <input name="instruccionSecundariaGrado" value={form.instruccionSecundariaGrado ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" />
-                                </td>
+                                <td><InputTextOneLine name="instruccionSecundariaCentro" value={form.instruccionSecundariaCentro ?? ""} onChange={handleChange} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionSecundariaInicio" value={form.instruccionSecundariaInicio ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionSecundariaTermino" value={form.instruccionSecundariaTermino ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine name="instruccionSecundariaGrado" value={form.instruccionSecundariaGrado ?? ""} onChange={handleChange} /></td>
                             </tr>
+
                             <tr>
                                 <td className="border border-gray-300 px-2 py-1">Técnica</td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <input name="instruccionTecnicaCentro" value={form.instruccionTecnicaCentro ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" />
-                                </td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <input type="date" name="instruccionTecnicaInicio" value={form.instruccionTecnicaInicio ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" />
-                                </td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <input type="date" name="instruccionTecnicaTermino" value={form.instruccionTecnicaTermino ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" />
-                                </td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <input name="instruccionTecnicaGrado" value={form.instruccionTecnicaGrado ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" />
-                                </td>
+                                <td><InputTextOneLine name="instruccionTecnicaCentro" value={form.instruccionTecnicaCentro ?? ""} onChange={handleChange} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionTecnicaInicio" value={form.instruccionTecnicaInicio ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionTecnicaTermino" value={form.instruccionTecnicaTermino ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine name="instruccionTecnicaGrado" value={form.instruccionTecnicaGrado ?? ""} onChange={handleChange} /></td>
                             </tr>
+
                             <tr>
                                 <td className="border border-gray-300 px-2 py-1">Superior</td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <input name="instruccionSuperiorCentro" value={form.instruccionSuperiorCentro ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" />
-                                </td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <input type="date" name="instruccionSuperiorInicio" value={form.instruccionSuperiorInicio ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" />
-                                </td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <input type="date" name="instruccionSuperiorTermino" value={form.instruccionSuperiorTermino ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" />
-                                </td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <input name="instruccionSuperiorGrado" value={form.instruccionSuperiorGrado ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" />
-                                </td>
+                                <td><InputTextOneLine name="instruccionSuperiorCentro" value={form.instruccionSuperiorCentro ?? ""} onChange={handleChange} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionSuperiorInicio" value={form.instruccionSuperiorInicio ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionSuperiorTermino" value={form.instruccionSuperiorTermino ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine name="instruccionSuperiorGrado" value={form.instruccionSuperiorGrado ?? ""} onChange={handleChange} /></td>
                             </tr>
+
                             <tr>
                                 <td className="border border-gray-300 px-2 py-1">Otros</td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <input name="instruccionOtrosCentro" value={form.instruccionOtrosCentro ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" />
-                                </td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <input type="date" name="instruccionOtrosInicio" value={form.instruccionOtrosInicio ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" />
-                                </td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <input type="date" name="instruccionOtrosTermino" value={form.instruccionOtrosTermino ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" />
-                                </td>
-                                <td className="border border-gray-300 px-2 py-1">
-                                    <input name="instruccionOtrosGrado" value={form.instruccionOtrosGrado ?? ""} onChange={handleChange} className="w-full border-0 bg-transparent" />
-                                </td>
+                                <td><InputTextOneLine name="instruccionOtrosCentro" value={form.instruccionOtrosCentro ?? ""} onChange={handleChange} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionOtrosInicio" value={form.instruccionOtrosInicio ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionOtrosTermino" value={form.instruccionOtrosTermino ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine name="instruccionOtrosGrado" value={form.instruccionOtrosGrado ?? ""} onChange={handleChange} /></td>
                             </tr>
+
                         </tbody>
                     </table>
                 </div>
