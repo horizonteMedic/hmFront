@@ -1,14 +1,19 @@
 import {
     InputTextOneLine,
     InputCheckbox,
+    InputTextArea,
 } from "../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import { useForm } from "../../../../hooks/useForm";
-import { SubmitDataService, VerifyTR } from "./controllerEspirometria";
+import { handleSubirArchivoEspirometria, ReadArchivosFormEspirometria, SubmitDataService, VerifyTR } from "./controllerEspirometria";
 import { BotonesAccion, DatosPersonalesLaborales } from "../../../../components/templates/Templates";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
+import { faDownload, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState } from "react";
+import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
 
 const tabla = "funcion_abs";
 
@@ -52,6 +57,7 @@ export default function Espirometria() {
         nombre_medico: userName,
         user_medicoFirma: userlogued,
         SubirDoc: false,
+        nomenclatura: "ESPIROMETRIA"
     };
 
     const {
@@ -59,12 +65,13 @@ export default function Espirometria() {
         setForm,
         handleChange,
         handleChangeNumberDecimals,
+        handleFocusNext,
         handleChangeSimple,
         handleCheckBoxChange,
         handleClear,
         handleClearnotO,
     } = useForm(initialFormState, { storageKey: "espirometria" });
-
+    const [visualerOpen, setVisualerOpen] = useState(null)
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
@@ -75,7 +82,6 @@ export default function Espirometria() {
             VerifyTR(form.norden, tabla, token, setForm, selectedSede);
         }
     };
-
 
 
     return (
@@ -122,45 +128,45 @@ export default function Espirometria() {
                         handleCheckBoxChange(e);
                     }}
                 />
+                {form.SubirDoc &&
+                    <ButtonsPDF
+                        handleSave={() => { handleSubirArchivoEspirometria(form, selectedSede, userlogued, token) }}
+                        handleRead={() => { ReadArchivosFormEspirometria(form, setVisualerOpen, token) }}
+                    />
+                }
             </SectionFieldset>
 
             <DatosPersonalesLaborales form={form} />
-            {form.SubirDoc && <div className="flex justify-center items-center gap-3">
-                <button onClick={handleSubirArchivo} className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2">
-                    <FontAwesomeIcon icon={faUpload} />
-                    Subir Archivo
-                </button>
-                <button onClick={ReadArchivosForm} className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2">
-                    <FontAwesomeIcon icon={faDownload} />
-                    Ver Archivo
-                </button>
-            </div>}
 
-            <SectionFieldset legend="Criterios Psicológicos" className="grid xl:grid-cols-3 gap-x-4 gap-y-3">
+            <SectionFieldset legend="Criterios" className="grid xl:grid-cols-3 gap-x-4 gap-y-3">
                 <div className="space-y-3">
                     <InputTextOneLine
                         label="FVC %"
                         name="fvc"
                         value={form?.fvc}
                         onChange={handleChange}
+                        onKeyUp={handleFocusNext}
                     />
                     <InputTextOneLine
                         label="FEV1 %"
                         name="fev1"
                         value={form?.fev1}
                         onChange={handleChange}
+                        onKeyUp={handleFocusNext}
                     />
                     <InputTextOneLine
                         label="FEV1/FVC %"
                         name="fev1_fvc"
                         value={form?.fev1_fvc}
                         onChange={handleChange}
+                        onKeyUp={handleFocusNext}
                     />
                     <InputTextOneLine
                         label="FEF 25-75 %"
                         name="fef"
                         value={form?.fef}
                         onChange={handleChange}
+                        onKeyUp={handleFocusNext}
                     />
                 </div>
                 <div className="space-y-3">
@@ -183,14 +189,24 @@ export default function Espirometria() {
                         name="fvcTeorico"
                         value={form?.fvcTeorico}
                         onChange={handleChange}
+                        onKeyUp={handleFocusNext}
                     />
                     <InputTextOneLine
                         label="FEV1 Teórico"
                         name="fev1Teorico"
                         value={form?.fev1Teorico}
                         onChange={handleChange}
+                        onKeyUp={handleFocusNext}
                     />
                 </div>
+                <InputTextArea
+                    label="Interpretación"
+                    rows={4}
+                    name="interpretacion"
+                    value={form?.interpretacion}
+                    className="xl:col-span-3"
+                    onChange={handleChange}
+                />
             </SectionFieldset>
 
             <SectionFieldset legend="Asignación de Médico">
@@ -210,6 +226,24 @@ export default function Espirometria() {
                 handleChangeNumberDecimals={handleChangeNumberDecimals}
                 hidePrint
             />
-        </div>
+            {visualerOpen && (
+                <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+                    <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
+                        <div className="px-4 py-2 naranjabackgroud flex justify-between">
+                            <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
+                            <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+                        </div>
+                        <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
+                            <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
+                        </div>
+                        <div className="flex justify-center">
+                            <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                                <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div >
     );
 }

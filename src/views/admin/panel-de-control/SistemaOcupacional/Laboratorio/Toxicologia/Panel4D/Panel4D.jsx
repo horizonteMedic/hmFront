@@ -18,6 +18,7 @@ export default function Panel4D() {
 
   const initialFormState = {
     norden: '',
+    panel4dId: null,
     fecha: today,
 
     nombreExamen: "",

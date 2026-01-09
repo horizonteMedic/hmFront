@@ -6,6 +6,8 @@ import DeclaracionInformacionAptitudMedico from "./DeclaracionInformacionAptitud
 import EvaluacionMedica from "./EvaluacionMedica/EvaluacionMedica";
 import RecepcionExamenMedico from "./RecepcionExamenMedico/RecepcionExamenMedico";
 import SintomaticoRespiratorio from "./SintomaticoRespiratorio/SintomaticoRespiratorio";
+import SuficienciaBrigadista from "./SuficienciaBrigadista/SuficienciaBrigadista";
+import ConformidadEMO from "./ConformidadEMO/ConformidadEMO";
 
 export default function ConsentimientosTabSelector({ tieneVista }) {
     const tabsConfig = [
@@ -50,6 +52,18 @@ export default function ConsentimientosTabSelector({ tieneVista }) {
             permission: "Declaracion Informacion Aptitud Medico",
             label: "Declaracion Informacion Aptitud Medico Ocupacional",
             component: DeclaracionInformacionAptitudMedico
+        },
+        {
+            id: 7,
+            permission: "Suficiencia Brigadista",
+            label: "Suficiencia Brigadista",
+            component: SuficienciaBrigadista
+        },
+        {
+            id: 8,
+            permission: "Conformidad EMO",
+            label: "Conformidad EMO",
+            component: ConformidadEMO
         },
     ];
     return (

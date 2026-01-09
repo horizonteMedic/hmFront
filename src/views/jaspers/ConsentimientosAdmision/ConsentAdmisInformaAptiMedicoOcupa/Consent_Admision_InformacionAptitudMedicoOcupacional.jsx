@@ -9,41 +9,20 @@ export default async function ConsentAdmisionInformacionAptitudMedicoOcupacional
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
-  // Datos de prueba por defecto
-  const datosPrueba = {
-    apellidosPaciente: "CASTILLO PLASENCIA",
-    nombresPaciente: "HADY KATHERINE",
-    dniPaciente: "72384273",
-    edadPaciente: "31",
-    cargoPaciente: "OPERADOR DE MAQUINARIA",
-    empresa: "MINERA PODEROSA S.A.",
-    sede: "TRUJILLO",
-    norden: "96639",
-    fechaRegistro: "2025-01-28",
-    codigoColor: "#00FF00",
-    textoColor: "AB",
-    nombreExamen: "PRE-OCUPACIONAL",
+  // Preparar datos
+  const datosFinales = {
+    apellidosNombres: String(((data?.apellidosPaciente ?? '') + ' ' + (data?.nombresPaciente ?? '')).trim()),
+    fechaExamen: formatearFechaCorta(data?.fechaRegistro ?? ''),
+    documentoIdentidad: String(data?.dniPaciente ?? ''),
+    edad: String(data?.edadPaciente ?? ''),
+    puestoTrabajo: String(data?.cargoPaciente ?? ''),
+    empresa: String(data?.empresa ?? ''),
+    sede: String(data?.sede ?? data?.nombreSede ?? ''),
+    numeroFicha: String(data?.norden ?? ''),
+    codigoColor: String(data?.codigoColor ?? ''),
+    textoColor: String(data?.textoColor ?? ''),
+    tipoExamen: String(data?.tipoExamen ?? ''),
   };
-
-  // Normalizador de datos de entrada
-  function buildDatosFinales(raw) {
-    const datosFinales = {
-      apellidosNombres: String(((raw?.apellidosPaciente ?? datosPrueba.apellidosPaciente) + ' ' + (raw?.nombresPaciente ?? datosPrueba.nombresPaciente)).trim()),
-      fechaExamen: formatearFechaCorta(raw?.fechaRegistro ?? raw?.fecha ?? datosPrueba.fechaRegistro),
-      documentoIdentidad: String(raw?.dniPaciente ?? raw?.dni ?? datosPrueba.dniPaciente),
-      edad: String(raw?.edadPaciente ?? raw?.edad ?? datosPrueba.edadPaciente),
-      puestoTrabajo: String(raw?.cargoPaciente ?? raw?.ocupacion ?? datosPrueba.cargoPaciente),
-      empresa: String(raw?.empresa ?? datosPrueba.empresa),
-      sede: String(raw?.sede ?? raw?.nombreSede ?? datosPrueba.sede),
-      numeroFicha: String(raw?.norden ?? datosPrueba.norden),
-      codigoColor: String(raw?.codigoColor ?? datosPrueba.codigoColor),
-      textoColor: String(raw?.textoColor ?? datosPrueba.textoColor),
-      tipoExamen: String(raw?.nombreExamen ?? raw?.tipoExamen ?? datosPrueba.nombreExamen),
-    };
-    return datosFinales;
-  }
-
-  const datosFinales = buildDatosFinales(data);
 
   // Función para obtener día y mes de la fecha
   const obtenerDiaYMes = (fechaStr) => {
@@ -61,19 +40,19 @@ export default async function ConsentAdmisionInformacionAptitudMedicoOcupacional
     }
   };
 
-  const fechaPrueba = datosPrueba.fechaRegistro;
-  const { dia, mes } = obtenerDiaYMes(data?.fechaRegistro ?? data?.fecha ?? fechaPrueba);
-  const anio = new Date(data?.fechaRegistro ?? data?.fecha ?? fechaPrueba).getFullYear() || '2025';
+  const { dia, mes } = obtenerDiaYMes(data?.fechaRegistro);
+  const anio = new Date(data?.fechaRegistro).getFullYear() || '';
 
   // Header
   const drawHeader = () => {
     // Logo y membrete
     CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
 
-    // Título
+    // Título (dividido en dos líneas, bajado más)
     doc.setFont("helvetica", "bold").setFontSize(14);
     doc.setTextColor(0, 0, 0);
-    doc.text("DECLARACIÓN JURADA DE INFORMACIÓN DE APTITUD MÉDICO OCUPACIONAL", pageW / 2, 35, { align: "center" });
+    doc.text("DECLARACIÓN JURADA DE INFORMACIÓN DE", pageW / 2, 50, { align: "center" });
+    doc.text("APTITUD MÉDICO OCUPACIONAL", pageW / 2, 57, { align: "center" });
 
     // Número de Ficha, Sede, Fecha y Página
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -113,187 +92,174 @@ export default async function ConsentAdmisionInformacionAptitudMedicoOcupacional
   drawHeader();
 
   // === CONTENIDO DEL DOCUMENTO ===
-  let yPos = 50;
+  let yPos = 70; // Bajado más
   const margin = 15;
   const anchoTexto = pageW - (2 * margin);
   const lineHeight = 5;
+
+  // Función para justificar texto con partes en negrita (igual que en Consent_Admision_ExamenMedicoPeru)
+  const justificarTextoConNegritas = (partesTexto, x, y, anchoMaximo, interlineado) => {
+    // Construir lista de palabras con su formato (negrita o no)
+    const palabrasConFormato = [];
+    
+    partesTexto.forEach(parte => {
+      const palabras = parte.texto.split(' ').filter(p => p.length > 0);
+      palabras.forEach(palabra => {
+        palabrasConFormato.push({ texto: palabra, negrita: parte.negrita });
+      });
+    });
+
+    // Construir líneas manualmente palabra por palabra
+    const lineas = [];
+    let lineaActual = [];
+    let anchoLineaActual = 0;
+
+    palabrasConFormato.forEach((palabraObj, idx) => {
+      const palabra = palabraObj.texto;
+      doc.setFont("helvetica", palabraObj.negrita ? "bold" : "normal");
+      const anchoPalabra = doc.getTextWidth(palabra);
+      const espacio = idx > 0 ? doc.getTextWidth(' ') : 0;
+      const anchoTotal = anchoLineaActual + espacio + anchoPalabra;
+
+      if (anchoTotal <= anchoMaximo || lineaActual.length === 0) {
+        // Agregar palabra a la línea actual
+        lineaActual.push(palabraObj);
+        anchoLineaActual = anchoTotal;
+      } else {
+        // Nueva línea
+        lineas.push(lineaActual);
+        lineaActual = [palabraObj];
+        anchoLineaActual = anchoPalabra;
+      }
+    });
+
+    // Agregar última línea
+    if (lineaActual.length > 0) {
+      lineas.push(lineaActual);
+    }
+
+    // Dibujar líneas justificadas
+    let yActual = y;
+
+    lineas.forEach((linea, index) => {
+      const esUltimaLinea = index === lineas.length - 1;
+      const numPalabras = linea.length;
+
+      if (!esUltimaLinea && numPalabras > 1) {
+        // Justificar línea
+        // Calcular ancho total de la línea
+        let anchoTotalLinea = 0;
+        linea.forEach((palabraObj, i) => {
+          doc.setFont("helvetica", palabraObj.negrita ? "bold" : "normal");
+          anchoTotalLinea += doc.getTextWidth(palabraObj.texto);
+          if (i < numPalabras - 1) {
+            anchoTotalLinea += doc.getTextWidth(' ');
+          }
+        });
+
+        const espacioExtra = (anchoMaximo - anchoTotalLinea) / (numPalabras - 1);
+        let xActual = x;
+
+        linea.forEach((palabraObj, i) => {
+          doc.setFont("helvetica", palabraObj.negrita ? "bold" : "normal");
+          doc.text(palabraObj.texto, xActual, yActual);
+
+          if (i < numPalabras - 1) {
+            const anchoPalabra = doc.getTextWidth(palabraObj.texto);
+            xActual += anchoPalabra + doc.getTextWidth(' ') + espacioExtra;
+          }
+        });
+      } else {
+        // Última línea, no justificar
+        let xActual = x;
+
+        linea.forEach((palabraObj, i) => {
+          doc.setFont("helvetica", palabraObj.negrita ? "bold" : "normal");
+          doc.text(palabraObj.texto, xActual, yActual);
+
+          if (i < numPalabras - 1) {
+            xActual += doc.getTextWidth(palabraObj.texto + ' ');
+          }
+        });
+      }
+      yActual += interlineado;
+    });
+
+    return yActual;
+  };
+
+  // Función simple para justificar texto normal
+  const justificarTexto = (texto, x, y, anchoMaximo, interlineado) => {
+    const lineas = doc.splitTextToSize(texto, anchoMaximo);
+    let yActual = y;
+
+    lineas.forEach((linea, index) => {
+      if (index < lineas.length - 1 && linea.includes(' ')) {
+        const palabras = linea.split(' ');
+        if (palabras.length > 1) {
+          doc.setFont("helvetica", "normal");
+          const anchoTexto = doc.getTextWidth(linea);
+          const espacioDisponible = anchoMaximo - anchoTexto;
+          const espaciosEntrePalabras = palabras.length - 1;
+          const espacioExtra = espacioDisponible / espaciosEntrePalabras;
+
+          let xActual = x;
+          palabras.forEach((palabra, i) => {
+            doc.text(palabra, xActual, yActual);
+            if (i < palabras.length - 1) {
+              const anchoPalabra = doc.getTextWidth(palabra);
+              xActual += anchoPalabra + (doc.getTextWidth(' ') + espacioExtra);
+            }
+          });
+        } else {
+          doc.text(linea, x, yActual);
+        }
+      } else {
+        doc.text(linea, x, yActual);
+      }
+      yActual += interlineado;
+    });
+
+    return yActual;
+  };
 
   // Texto de la declaración
   doc.setFontSize(11);
   doc.setTextColor(0, 0, 0);
 
-  // Primera línea: "Yo, [nombre], de [edad] años de edad..."
-  let xActual = margin;
-  let yActual = yPos;
-
-  // "Yo, "
-  doc.setFont("helvetica", "normal");
-  doc.text("Yo, ", xActual, yActual);
-  xActual += doc.getTextWidth("Yo, ");
-
-  // Nombre en negrita
-  doc.setFont("helvetica", "bold");
-  const nombreWidth = doc.getTextWidth(datosFinales.apellidosNombres);
-  if (xActual + nombreWidth > pageW - margin) {
-    yActual += lineHeight;
-    xActual = margin;
-  }
-  doc.text(datosFinales.apellidosNombres, xActual, yActual);
-  xActual += nombreWidth;
-
-  // ", de "
-  doc.setFont("helvetica", "normal");
-  const textoDe = ", de ";
-  const textoDeWidth = doc.getTextWidth(textoDe);
-  if (xActual + textoDeWidth > pageW - margin) {
-    yActual += lineHeight;
-    xActual = margin;
-  }
-  doc.text(textoDe, xActual, yActual);
-  xActual += textoDeWidth;
-
-  // Edad en negrita
-  doc.setFont("helvetica", "bold");
-  const edadWidth = doc.getTextWidth(datosFinales.edad);
-  if (xActual + edadWidth > pageW - margin) {
-    yActual += lineHeight;
-    xActual = margin;
-  }
-  doc.text(datosFinales.edad, xActual, yActual);
-  xActual += edadWidth;
-
-  // " años de edad, identificado(a) con DNI N°: "
-  doc.setFont("helvetica", "normal");
-  const textoDni = " años de edad, identificado(a) con DNI N°: ";
-  const textoDniWidth = doc.getTextWidth(textoDni);
-  if (xActual + textoDniWidth > pageW - margin) {
-    yActual += lineHeight;
-    xActual = margin;
-  }
-  doc.text(textoDni, xActual, yActual);
-  xActual += textoDniWidth;
-
-  // DNI en negrita
-  doc.setFont("helvetica", "bold");
-  const dniWidth = doc.getTextWidth(datosFinales.documentoIdentidad);
-  if (xActual + dniWidth > pageW - margin) {
-    yActual += lineHeight;
-    xActual = margin;
-  }
-  doc.text(datosFinales.documentoIdentidad, xActual, yActual);
-  xActual += dniWidth;
-
-  // ", postulante al cargo de "
-  doc.setFont("helvetica", "normal");
-  const textoCargo = ", postulante al cargo de ";
-  const textoCargoWidth = doc.getTextWidth(textoCargo);
-  if (xActual + textoCargoWidth > pageW - margin) {
-    yActual += lineHeight;
-    xActual = margin;
-  }
-  doc.text(textoCargo, xActual, yActual);
-  xActual += textoCargoWidth;
-
-  // Cargo en negrita
-  doc.setFont("helvetica", "bold");
-  const cargoWidth = doc.getTextWidth(datosFinales.puestoTrabajo);
-  if (xActual + cargoWidth > pageW - margin) {
-    yActual += lineHeight;
-    xActual = margin;
-  }
-  doc.text(datosFinales.puestoTrabajo, xActual, yActual);
-  xActual += cargoWidth;
-
-  // ", para la empresa "
-  doc.setFont("helvetica", "normal");
-  const textoEmpresa = ", para la empresa ";
-  const textoEmpresaWidth = doc.getTextWidth(textoEmpresa);
-  if (xActual + textoEmpresaWidth > pageW - margin) {
-    yActual += lineHeight;
-    xActual = margin;
-  }
-  doc.text(textoEmpresa, xActual, yActual);
-  xActual += textoEmpresaWidth;
-
-  // Empresa en negrita
-  doc.setFont("helvetica", "bold");
-  const empresaWidth = doc.getTextWidth(datosFinales.empresa);
-  if (xActual + empresaWidth > pageW - margin) {
-    yActual += lineHeight;
-    xActual = margin;
-  }
-  doc.text(datosFinales.empresa, xActual, yActual);
+  // Primera línea: "Yo, [nombre], de [edad] años de edad..." - JUSTIFICADO
+  const partesTexto1 = [
+    { texto: "Yo, ", negrita: false },
+    { texto: datosFinales.apellidosNombres, negrita: true },
+    { texto: ", de ", negrita: false },
+    { texto: datosFinales.edad, negrita: true },
+    { texto: " años de edad, identificado(a) con DNI N°: ", negrita: false },
+    { texto: datosFinales.documentoIdentidad, negrita: true },
+    { texto: ", postulante al cargo de ", negrita: false },
+    { texto: datosFinales.puestoTrabajo, negrita: true },
+    { texto: ", para la empresa ", negrita: false },
+    { texto: datosFinales.empresa, negrita: true }
+  ];
   
-  yPos = yActual + lineHeight + 8;
+  yPos = justificarTextoConNegritas(partesTexto1, margin, yPos, anchoTexto, lineHeight);
+  yPos += 5;
 
-  // Segunda línea: "declaro haber sido informado sobre la APTITUD y RECOMENDACIONES..."
-  doc.setFont("helvetica", "normal");
-  let xActual2 = margin;
-  let yActual2 = yPos;
-
-  // "declaro haber sido informado sobre la "
-  doc.setFont("helvetica", "normal");
-  const textoDeclaro = "declaro haber sido informado sobre la ";
-  const textoDeclaroWidth = doc.getTextWidth(textoDeclaro);
-  if (xActual2 + textoDeclaroWidth > pageW - margin) {
-    yActual2 += lineHeight;
-    xActual2 = margin;
-  }
-  doc.text(textoDeclaro, xActual2, yActual2);
-  xActual2 += textoDeclaroWidth;
-
-  // "APTITUD y RECOMENDACIONES" en negrita
-  doc.setFont("helvetica", "bold");
-  const textoAptitud = "APTITUD y RECOMENDACIONES";
-  const textoAptitudWidth = doc.getTextWidth(textoAptitud);
-  if (xActual2 + textoAptitudWidth > pageW - margin) {
-    yActual2 += lineHeight;
-    xActual2 = margin;
-  }
-  doc.text(textoAptitud, xActual2, yActual2);
-  xActual2 += textoAptitudWidth;
-
-  // " de mi examen médico "
-  doc.setFont("helvetica", "normal");
-  const textoExamen = " de mi examen médico ";
-  const textoExamenWidth = doc.getTextWidth(textoExamen);
-  if (xActual2 + textoExamenWidth > pageW - margin) {
-    yActual2 += lineHeight;
-    xActual2 = margin;
-  }
-  doc.text(textoExamen, xActual2, yActual2);
-  xActual2 += textoExamenWidth;
-
-  // Tipo de examen en negrita
-  doc.setFont("helvetica", "bold");
-  const tipoExamenWidth = doc.getTextWidth(datosFinales.tipoExamen);
-  if (xActual2 + tipoExamenWidth > pageW - margin) {
-    yActual2 += lineHeight;
-    xActual2 = margin;
-  }
-  doc.text(datosFinales.tipoExamen, xActual2, yActual2);
-  xActual2 += tipoExamenWidth;
-
-  // " Realizado en el Policlínico Horizonte Medic de la ciudad de Trujillo."
-  doc.setFont("helvetica", "normal");
-  const textoRealizado = " Realizado en el Policlínico Horizonte Medic de la ciudad de Trujillo.";
-  const textoRealizadoWidth = doc.getTextWidth(textoRealizado);
-  if (xActual2 + textoRealizadoWidth > pageW - margin) {
-    yActual2 += lineHeight;
-    xActual2 = margin;
-  }
-  doc.text(textoRealizado, xActual2, yActual2);
+  // Segunda línea: "declaro haber sido informado sobre la APTITUD y RECOMENDACIONES..." - JUSTIFICADO
+  const partesTexto2 = [
+    { texto: "Declaro haber sido informado sobre la ", negrita: false },
+    { texto: "APTITUD y RECOMENDACIONES", negrita: true },
+    { texto: " de mi examen médico ", negrita: false },
+    { texto: datosFinales.tipoExamen, negrita: true },
+    { texto: " Realizado en el Policlínico Horizonte Medic de la ciudad de Trujillo.", negrita: false }
+  ];
   
-  yPos = yActual2 + lineHeight + 10;
+  yPos = justificarTextoConNegritas(partesTexto2, margin, yPos, anchoTexto, lineHeight);
+  yPos += 5;
 
-  // Tercera línea: "Firmo la presente declaración en conformidad a lo expuesto líneas arriba."
-  doc.setFont("helvetica", "normal");
+  // Tercera línea: "Firmo la presente declaración en conformidad a lo expuesto líneas arriba." - JUSTIFICADO
   const textoFirmo = "Firmo la presente declaración en conformidad a lo expuesto líneas arriba.";
-  const lineasFirmo = doc.splitTextToSize(textoFirmo, anchoTexto);
-  lineasFirmo.forEach((linea, idx) => {
-    doc.text(linea, margin, yPos + (idx * lineHeight));
-  });
-  yPos += lineasFirmo.length * lineHeight + 10;
+  yPos = justificarTexto(textoFirmo, margin, yPos, anchoTexto, lineHeight);
+  yPos += 10;
 
   // Cuarta línea: "Trujillo, [día] de [mes] 2025."
   doc.setFont("helvetica", "normal");
@@ -301,19 +267,24 @@ export default async function ConsentAdmisionInformacionAptitudMedicoOcupacional
   doc.text(textoFecha, margin, yPos);
   yPos += 20;
 
-  // === FIRMA Y HUELLA DEL PACIENTE (usando dibujarFirmas, bajada 15mm) ===
-  yPos += 15;
+  // === FIRMA Y HUELLA DEL PACIENTE (usando dibujarFirmas, bajada 55mm) ===
+  yPos += 55;
   
   // Usar la función dibujarFirmas del utils
-  await dibujarFirmas({
+  const yPosFinalFirmas = await dibujarFirmas({
     doc,
     datos: data,
     y: yPos,
     pageW: pageW
   });
 
+  // Agregar DNI debajo de la firma y huella
+  const centroX = pageW / 2;
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text(`DNI: ${datosFinales.documentoIdentidad}`, centroX, yPosFinalFirmas + 1.5, { align: "center" });
+
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
+  footerTR(doc, { footerOffsetY: 8, fontSize: 8 });
 
   // === Imprimir ===
   if (!docExistente) {

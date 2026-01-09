@@ -11,7 +11,7 @@ import DatosPersonalesLaborales from '../../../../../../components/templates/Dat
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 import BotonesAccion from '../../../../../../components/templates/BotonesAccion';
 
-const tabla = '';
+const tabla = 'inmunologia_vdrl';
 
 export default function VDRL() {
   const { token, userlogued, selectedSede, userName } = useSessionData();

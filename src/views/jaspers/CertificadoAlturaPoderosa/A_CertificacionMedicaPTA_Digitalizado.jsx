@@ -140,7 +140,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     doc.setFont("helvetica", "normal").setFontSize(18);
     doc.text(datosFinales.numeroFicha, pageW - 50, 11);
 
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text("Sede: " + datosFinales.sede, pageW - 70, 15);
     doc.text("Fecha de examen: " + (datosFinales.fechaExamen || ""), pageW - 70, 20);
     doc.text("Pag. " + pageNumber.toString().padStart(2, '0'), pageW - 25, 3);
@@ -307,27 +307,83 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     yPos = dibujarHeaderSeccion("5.- CONCLUSIÓN DE LA PRESENTE EVALUACIÓN", yPos, filaAltura);
 
     // 2. Fila normal con tres columnas: APTO | DEBAJO | Para
-    const anchoCol1 = tablaAncho * 0.5; // 50% para "APTO PARA TRABAJAR..."
-    const anchoCol2 = tablaAncho * 0.25; // 25% para "DEBAJO"
-    // 25% restante para "Para"
+    const anchoCol1 = tablaAncho * 0.35; // 35% para "APTO PARA TRABAJAR..."
+    const anchoCol2 = tablaAncho * 0.22; // 22% para "DEBAJO"
+    const anchoCol3 = tablaAncho * 0.30; // 30% restante para "Para"
+    
+    // Textos para cada columna
+    const textoCol1 = "APTO PARA TRABAJAR ENCIMA DE LOS 1,8 METROS";
+    
+    // Construir textoCol2: verificar si ya contiene "DEBAJO"
+    let textoCol2 = "";
+    if (datosFinales.altura) {
+      const alturaUpper = String(datosFinales.altura).toUpperCase().trim();
+      if (alturaUpper.startsWith("DEBAJO")) {
+        // Si ya contiene "DEBAJO", solo agregar "m.s.n.m"
+        textoCol2 = `${datosFinales.altura} m.s.n.m`;
+      } else {
+        // Si no contiene "DEBAJO", agregar el prefijo
+        textoCol2 = `DEBAJO : ${datosFinales.altura} m.s.n.m`;
+      }
+    }
+    
+    const textoCol3 = datosFinales.puestoTrabajo ? `Para: ${datosFinales.puestoTrabajo}` : "";
+    
+    // Calcular altura necesaria para cada columna
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    const anchoDisponibleCol1 = anchoCol1 - 4;
+    const anchoDisponibleCol2 = anchoCol2 - 4;
+    const anchoDisponibleCol3 = anchoCol3 - 4;
+    
+    const lineasCol1 = doc.splitTextToSize(textoCol1, anchoDisponibleCol1);
+    const lineasCol2 = textoCol2 ? doc.splitTextToSize(textoCol2, anchoDisponibleCol2) : [];
+    const lineasCol3 = textoCol3 ? doc.splitTextToSize(textoCol3, anchoDisponibleCol3) : [];
+    
+    const maxLineas = Math.max(lineasCol1.length, lineasCol2.length, lineasCol3.length);
+    const alturaNecesaria = Math.max(alturaFila, maxLineas * 3.5 + 1);
     
     // Dibujar líneas de la fila
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila);
-    doc.line(tablaInicioX + anchoCol1, yPos, tablaInicioX + anchoCol1, yPos + alturaFila);
-    doc.line(tablaInicioX + anchoCol1 + anchoCol2, yPos, tablaInicioX + anchoCol1 + anchoCol2, yPos + alturaFila);
-    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFila);
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesaria);
+    doc.line(tablaInicioX + anchoCol1, yPos, tablaInicioX + anchoCol1, yPos + alturaNecesaria);
+    doc.line(tablaInicioX + anchoCol1 + anchoCol2, yPos, tablaInicioX + anchoCol1 + anchoCol2, yPos + alturaNecesaria);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesaria);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-    doc.line(tablaInicioX, yPos + alturaFila, tablaInicioX + tablaAncho, yPos + alturaFila);
+    doc.line(tablaInicioX, yPos + alturaNecesaria, tablaInicioX + tablaAncho, yPos + alturaNecesaria);
     
-    // Texto en cada columna
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text("APTO PARA TRABAJAR ENCIMA DE LOS 1,8 METROS", tablaInicioX + 2, yPos + 3.5);
-    doc.text("DEBAJO : " + (datosFinales.altura || ""), tablaInicioX + anchoCol1 + 2, yPos + 3.5);
-    doc.text("Para: " + (datosFinales.otraRestriccion || ""), tablaInicioX + anchoCol1 + anchoCol2 + 2, yPos + 3.5);
+    // Calcular centro vertical
+    const yCentro = yPos + alturaNecesaria / 2;
     
-    yPos += alturaFila;
+    // Dibujar texto en cada columna (centrado verticalmente)
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    
+    // Columna 1
+    const alturaBloqueCol1 = (lineasCol1.length - 1) * 3.5;
+    const yInicioCol1 = yCentro - alturaBloqueCol1 / 2 + 1;
+    lineasCol1.forEach((linea, idx) => {
+      doc.text(linea, tablaInicioX + 2, yInicioCol1 + (idx * 3.5));
+    });
+    
+    // Columna 2
+    if (lineasCol2.length > 0) {
+      const alturaBloqueCol2 = (lineasCol2.length - 1) * 3.5;
+      const yInicioCol2 = yCentro - alturaBloqueCol2 / 2 + 1;
+      lineasCol2.forEach((linea, idx) => {
+        doc.text(linea, tablaInicioX + anchoCol1 + 2, yInicioCol2 + (idx * 3.5));
+      });
+    }
+    
+    // Columna 3
+    if (lineasCol3.length > 0) {
+      const alturaBloqueCol3 = (lineasCol3.length - 1) * 3.5;
+      const yInicioCol3 = yCentro - alturaBloqueCol3 / 2 + 1;
+      lineasCol3.forEach((linea, idx) => {
+        doc.text(linea, tablaInicioX + anchoCol1 + anchoCol2 + 2, yInicioCol3 + (idx * 3.5));
+      });
+    }
+    
+    yPos += alturaNecesaria;
 
     // 3. Fila celeste solo con "RESTRICCIONES" (sin ":")
     const alturaFilaRestricciones = 4.5;
@@ -344,103 +400,63 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     doc.line(tablaInicioX, yPos + alturaFilaRestricciones, tablaInicioX + tablaAncho, yPos + alturaFilaRestricciones);
     
     // Texto "RESTRICCIONES" (sin ":")
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text("RESTRICCIONES", tablaInicioX + 2, yPos + 3.5);
     
     yPos += alturaFilaRestricciones;
 
-    // 4. Una sola fila con tres columnas, cada una con texto y una celda SI/NO
+    // 4. Tres filas separadas, cada una con texto y una celda SI/NO
     const alturaFilaRestriccion = 4.5;
     const anchoCeldaSiNo = 12; // Ancho para la celda única que muestra SI o NO
-    const anchoColumnaRestriccion = tablaAncho / 3;
-    const colTextoRestriccion = anchoColumnaRestriccion - anchoCeldaSiNo;
+    const colTextoRestriccion = tablaAncho - anchoCeldaSiNo; // Ancho para el texto (todo menos la celda SI/NO)
     
-    const texto1 = "Apto para trabajar encima de los 1,8 metros";
-    const texto2 = "Uso permanente de lentes correctores";
-    const texto3 = "Uso permanente de audífonos";
+    const restricciones = [
+      { texto: "Apto para trabajar encima de los 1,8 metros", valor: datosFinales.apto18 },
+      { texto: "Uso permanente de lentes correctores", valor: datosFinales.usoLentesCorrectores },
+      { texto: "Uso permanente de audífonos", valor: datosFinales.usoAudifonos }
+    ];
     
-    // Calcular altura necesaria
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    const lineas1 = doc.splitTextToSize(texto1, colTextoRestriccion - 4);
-    const lineas2 = doc.splitTextToSize(texto2, colTextoRestriccion - 4);
-    const lineas3 = doc.splitTextToSize(texto3, colTextoRestriccion - 4);
-    const maxLineas = Math.max(lineas1.length, lineas2.length, lineas3.length);
-    const alturaNecesaria = Math.max(alturaFilaRestriccion, maxLineas * 3 + 1);
-    
-    // Dibujar líneas de la fila completa
-    doc.setDrawColor(0, 0, 0);
-    doc.setLineWidth(0.2);
-    
-    // Líneas verticales principales
-    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesaria);
-    doc.line(tablaInicioX + anchoColumnaRestriccion, yPos, tablaInicioX + anchoColumnaRestriccion, yPos + alturaNecesaria);
-    doc.line(tablaInicioX + anchoColumnaRestriccion * 2, yPos, tablaInicioX + anchoColumnaRestriccion * 2, yPos + alturaNecesaria);
-    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesaria);
-    
-    // Líneas horizontales
-    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-    doc.line(tablaInicioX, yPos + alturaNecesaria, tablaInicioX + tablaAncho, yPos + alturaNecesaria);
-    
-    // Calcular centro vertical de la celda
-    // RESTRICCIONES usa yPos + 3.5 para altura 4.5 (centrado vertical)
-    // Aplicamos el mismo método: usar un offset proporcional
-    const yCentro = yPos + alturaNecesaria / 2;
-    
-    // Columna 1
-    const xCol1 = tablaInicioX;
-    doc.line(xCol1 + colTextoRestriccion, yPos, xCol1 + colTextoRestriccion, yPos + alturaNecesaria);
-    // Centrar texto verticalmente igual que RESTRICCIONES
-    // Si tengo n líneas, el centro del bloque está en yInicio + (n-1)*3/2
-    // Para centrar: yInicio + (n-1)*3/2 = yCentro, entonces yInicio = yCentro - (n-1)*3/2
-    // Ajustamos hacia abajo un poco para que quede mejor centrado
-    const alturaBloqueTexto1 = (lineas1.length - 1) * 3;
-    const yInicioTexto1 = yCentro - alturaBloqueTexto1 / 2 + 0.5;
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    lineas1.forEach((linea, idx) => {
-      doc.text(linea, xCol1 + 2, yInicioTexto1 + (idx * 3));
+    // Dibujar cada restricción en su propia fila
+    restricciones.forEach((restriccion) => {
+      // Calcular altura necesaria para esta fila
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      const lineas = doc.splitTextToSize(restriccion.texto, colTextoRestriccion - 4);
+      const alturaNecesaria = Math.max(alturaFilaRestriccion, lineas.length * 3 + 1);
+      
+      // Dibujar líneas de la fila
+      doc.setDrawColor(0, 0, 0);
+      doc.setLineWidth(0.2);
+      
+      // Líneas verticales
+      doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesaria);
+      doc.line(tablaInicioX + colTextoRestriccion, yPos, tablaInicioX + colTextoRestriccion, yPos + alturaNecesaria);
+      doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesaria);
+      
+      // Líneas horizontales
+      doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+      doc.line(tablaInicioX, yPos + alturaNecesaria, tablaInicioX + tablaAncho, yPos + alturaNecesaria);
+      
+      // Calcular centro vertical de la celda
+      const yCentro = yPos + alturaNecesaria / 2;
+      
+      // Dibujar texto (centrado verticalmente)
+      const alturaBloqueTexto = (lineas.length - 1) * 3;
+      const yInicioTexto = yCentro - alturaBloqueTexto / 2 + 0.5;
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      lineas.forEach((linea, idx) => {
+        doc.text(linea, tablaInicioX + 2, yInicioTexto + (idx * 3));
+      });
+      
+      // Dibujar SI/NO
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      if (restriccion.valor === true) {
+        doc.text("SI", tablaInicioX + colTextoRestriccion + anchoCeldaSiNo / 2, yCentro + 0.5, { align: "center" });
+      } else if (restriccion.valor === false) {
+        doc.text("NO", tablaInicioX + colTextoRestriccion + anchoCeldaSiNo / 2, yCentro + 0.5, { align: "center" });
+      }
+      
+      yPos += alturaNecesaria;
     });
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    if (datosFinales.apto18 === true) {
-      doc.text("SI", xCol1 + colTextoRestriccion + anchoCeldaSiNo / 2, yCentro + 0.5, { align: "center" });
-    } else if (datosFinales.apto18 === false) {
-      doc.text("NO", xCol1 + colTextoRestriccion + anchoCeldaSiNo / 2, yCentro + 0.5, { align: "center" });
-    }
-    
-    // Columna 2
-    const xCol2 = tablaInicioX + anchoColumnaRestriccion;
-    doc.line(xCol2 + colTextoRestriccion, yPos, xCol2 + colTextoRestriccion, yPos + alturaNecesaria);
-    // Centrar texto verticalmente
-    const alturaBloqueTexto2 = (lineas2.length - 1) * 3;
-    const yInicioTexto2 = yCentro - alturaBloqueTexto2 / 2 + 0.5;
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    lineas2.forEach((linea, idx) => {
-      doc.text(linea, xCol2 + 2, yInicioTexto2 + (idx * 3));
-    });
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    if (datosFinales.usoLentesCorrectores === true) {
-      doc.text("SI", xCol2 + colTextoRestriccion + anchoCeldaSiNo / 2, yCentro + 0.5, { align: "center" });
-    } else if (datosFinales.usoLentesCorrectores === false) {
-      doc.text("NO", xCol2 + colTextoRestriccion + anchoCeldaSiNo / 2, yCentro + 0.5, { align: "center" });
-    }
-    
-    // Columna 3
-    const xCol3 = tablaInicioX + anchoColumnaRestriccion * 2;
-    doc.line(xCol3 + colTextoRestriccion, yPos, xCol3 + colTextoRestriccion, yPos + alturaNecesaria);
-    // Centrar texto verticalmente
-    const alturaBloqueTexto3 = (lineas3.length - 1) * 3;
-    const yInicioTexto3 = yCentro - alturaBloqueTexto3 / 2 + 0.5;
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    lineas3.forEach((linea, idx) => {
-      doc.text(linea, xCol3 + 2, yInicioTexto3 + (idx * 3));
-    });
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    if (datosFinales.usoAudifonos === true) {
-      doc.text("SI", xCol3 + colTextoRestriccion + anchoCeldaSiNo / 2, yCentro + 0.5, { align: "center" });
-    } else if (datosFinales.usoAudifonos === false) {
-      doc.text("NO", xCol3 + colTextoRestriccion + anchoCeldaSiNo / 2, yCentro + 0.5, { align: "center" });
-    }
-    
-    yPos += alturaNecesaria;
 
     // 5. Fila para "Otra Restricción : {data}"
     doc.setDrawColor(0, 0, 0);
@@ -450,7 +466,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaFila, tablaInicioX + tablaAncho, yPos + alturaFila);
     
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text("Otra Restricción : " + (datosFinales.otraRestriccion || ""), tablaInicioX + 2, yPos + 3.5);
     
     yPos += alturaFila;
@@ -465,18 +481,12 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
 
     // Fila con texto (usando dibujarTextoCreciente con altura mínima de 15mm)
     // Si hay pocos datos, la altura será 15mm, si hay mucho texto crecerá automáticamente
-    yPos = dibujarTextoCreciente(datosFinales.observacionesRecomendaciones, "", yPos, 15);
+    yPos = dibujarTextoCreciente(datosFinales.observacionesRecomendaciones, "", yPos, 6);
 
     // Sección de firmas
-    const alturaSeccionFirmas = 32;
     const baseY = yPos;
 
-    // Dibujar los bordes de la fila de firmas
-    doc.setDrawColor(0, 0, 0);
-    doc.setLineWidth(0.2);
-    doc.rect(tablaInicioX, baseY, tablaAncho, alturaSeccionFirmas);
-
-    // Usar helper para dibujar firmas
+    // Usar helper para dibujar firmas (sin borde)
     dibujarFirmas({ doc, datos: data, y: baseY + 2, pageW }).then(() => {
       // === FOOTER ===
       footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
@@ -497,8 +507,8 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     });
 
     // Si hay docExistente, retornar el doc (las firmas se agregarán asíncronamente)
+    // El footer se dibujará en el .then() o .catch() de dibujarFirmas
     if (docExistente) {
-      footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
       return doc;
     }
   };
@@ -507,65 +517,51 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   const dibujarTextoCreciente = (texto, titulo, yPos, alturaMinima = 10) => {
     // Determinar si hay título para agregar ":"
     const tieneTitulo = titulo && titulo.trim() !== '';
-    const textoTitulo = tieneTitulo ? titulo + ":" : "";
+    const textoTitulo = tieneTitulo ? titulo + ": " : "";
     
-    if (!texto || texto.trim() === '') {
-      // Si no hay texto, dibujar solo el borde con altura mínima
-      doc.rect(tablaInicioX, yPos, tablaAncho, alturaMinima, 'S');
-      if (tieneTitulo) {
-        doc.setFont("helvetica", "bold").setFontSize(8);
-        doc.text(textoTitulo, tablaInicioX + 2, yPos + 3.5);
-      }
-      return yPos + alturaMinima;
-    }
-
     const padding = 2;
-    doc.setFont("helvetica", "normal").setFontSize(7);
+    const anchoDisponibleTexto = tablaAncho - 4;
     
-    // Si no hay título, usar todo el ancho disponible
-    let anchoDisponibleTexto;
-    if (tieneTitulo) {
-      // Calcular ancho disponible para el texto (después del título)
-      doc.setFont("helvetica", "bold").setFontSize(8);
-      const anchoTitulo = doc.getTextWidth(titulo + ": ");
-      anchoDisponibleTexto = tablaAncho - anchoTitulo - 4;
-    } else {
-      anchoDisponibleTexto = tablaAncho - 4;
-    }
-    
-    // Dividir texto en líneas
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    const lineas = doc.splitTextToSize(String(texto), anchoDisponibleTexto);
-    
-    // Si hay título y solo hay una línea y cabe, poner título y texto en la misma línea
-    if (tieneTitulo && lineas.length === 1 && doc.getTextWidth(titulo + ": " + lineas[0]) <= tablaAncho - 4) {
+    // Si no hay texto, dibujar solo el título
+    if (!texto || texto.trim() === '') {
       const alturaFinal = Math.max(alturaMinima, 4.5);
       doc.rect(tablaInicioX, yPos, tablaAncho, alturaFinal, 'S');
-      doc.setFont("helvetica", "bold").setFontSize(8);
-      doc.text(titulo + ": ", tablaInicioX + 2, yPos + 3.5);
-      doc.setFont("helvetica", "normal").setFontSize(7);
-      const anchoTitulo = doc.getTextWidth(titulo + ": ");
-      doc.text(lineas[0], tablaInicioX + 2 + anchoTitulo, yPos + 3.5);
+      if (tieneTitulo) {
+        doc.setFont("helvetica", "bold").setFontSize(7);
+        doc.text(textoTitulo, tablaInicioX + 2, yPos + 3.5);
+      }
       return yPos + alturaFinal;
     }
     
-    // Si hay múltiples líneas o no cabe en una, dibujar título arriba (si existe) y texto abajo
-    const alturaTexto = lineas.length * 3 + padding;
+    // Combinar título y texto para dividir juntos
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    const textoCompleto = tieneTitulo ? textoTitulo + String(texto) : String(texto);
+    const lineasCompletas = doc.splitTextToSize(textoCompleto, anchoDisponibleTexto);
+    
+    // Calcular altura necesaria
+    const alturaTexto = lineasCompletas.length * 3 + padding;
     const alturaFinal = Math.max(alturaMinima, alturaTexto + 2);
     
     // Dibujar borde
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaFinal, 'S');
     
-    // Dibujar título solo si existe
-    if (tieneTitulo) {
-      doc.setFont("helvetica", "bold").setFontSize(8);
-      doc.text(textoTitulo, tablaInicioX + 2, yPos + 3.5);
-    }
-    
-    // Dibujar texto
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    lineas.forEach((linea, idx) => {
-      doc.text(linea, tablaInicioX + 2, yPos + (tieneTitulo ? 6 : 3.5) + (idx * 3));
+    // Dibujar líneas: título en negrita solo en la primera línea si aplica
+    lineasCompletas.forEach((linea, idx) => {
+      if (idx === 0 && tieneTitulo && linea.startsWith(textoTitulo)) {
+        // Primera línea: título en negrita, resto en normal
+        doc.setFont("helvetica", "bold").setFontSize(7);
+        const anchoTitulo = doc.getTextWidth(textoTitulo);
+        doc.text(textoTitulo, tablaInicioX + 2, yPos + 3.5);
+        doc.setFont("helvetica", "normal").setFontSize(7);
+        const textoRestante = linea.substring(textoTitulo.length);
+        if (textoRestante.trim()) {
+          doc.text(textoRestante, tablaInicioX + 2 + anchoTitulo, yPos + 3.5);
+        }
+      } else {
+        // Resto de líneas en normal
+        doc.setFont("helvetica", "normal").setFontSize(7);
+        doc.text(linea, tablaInicioX + 2, yPos + 3.5 + (idx * 3));
+      }
     });
     
     return yPos + alturaFinal;
@@ -654,95 +650,95 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   yPos += filaAltura;
 
   // Apellidos y Nombres
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   dibujarTextoConSaltoLinea(datosFinales.apellidosNombres || "", tablaInicioX + 35, yTexto + 1, 95);
 
   // Columna derecha: Tipo de examen
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("T. Examen:", tablaInicioX + 137, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text(datosFinales.tipoExamen || "", tablaInicioX + 155, yTexto + 1);
   yTexto += filaAltura;
 
   // DNI, Edad, Sexo, Fecha Nac.
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("DNI:", tablaInicioX + 2, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text(datosFinales.documentoIdentidad || "", tablaInicioX + 12, yTexto + 1);
 
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Edad:", tablaInicioX + 47, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text((datosFinales.edad ? (datosFinales.edad + " AÑOS") : ""), tablaInicioX + 58, yTexto + 1);
 
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Sexo:", tablaInicioX + 92, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text(datosFinales.sexo || "", tablaInicioX + 105, yTexto + 1);
 
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Fecha Nac.:", tablaInicioX + 137, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text(datosFinales.fechaNacimiento || "", tablaInicioX + 155, yTexto + 1);
   yTexto += filaAltura;
 
   // Domicilio
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Domicilio:", tablaInicioX + 2, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   dibujarTextoConSaltoLinea(datosFinales.domicilio || "", tablaInicioX + 25, yTexto + 1, 160);
   yTexto += filaAltura;
 
   // Puesto de Trabajo, Área de Trabajo
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text(datosFinales.puestoTrabajo || "", tablaInicioX + 30, yTexto + 1);
 
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Área de Trabajo:", tablaInicioX + 92, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text(datosFinales.areaTrabajo || "", tablaInicioX + 118, yTexto + 1);
   yTexto += filaAltura;
 
   // Empresa y T. experiencia
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   dibujarTextoConSaltoLinea(datosFinales.empresa || "", tablaInicioX + 24, yTexto + 1, 70);
 
   // Columna derecha: T. experiencia
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("T. experiencia:", tablaInicioX + 102, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text(datosFinales.tiempoExperiencia || "", tablaInicioX + 125, yTexto + 1);
   yTexto += filaAltura;
 
   // Contratista
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Contratista:", tablaInicioX + 2, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text(datosFinales.contrata || "", tablaInicioX + 24, yTexto + 1);
   yTexto += filaAltura;
 
   // Labor
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Labor:", tablaInicioX + 2, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text(datosFinales.labor || "", tablaInicioX + 24, yTexto + 1);
   yTexto += filaAltura;
 
   // Primera Actitud y Revalidación
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Primera Actitud:", tablaInicioX + 2, yTexto + 1);
   // Checkbox Primera Actitud (centrado en celda de 6mm, desde 94 hasta 100)
   if (datosFinales.primeraActitud === true) {
     dibujarX(tablaInicioX + 94 + 3, yTexto + 1.2);
   }
   
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Revalidación:", tablaInicioX + 102, yTexto + 1);
   // Checkbox Revalidación (centrado en celda de 6mm, desde 194 hasta 200)
   if (datosFinales.revalidacion === true) {
@@ -791,7 +787,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   
   // Texto SI y NO en celdas del header
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   // Columna izquierda
   doc.text("SI", tablaInicioX + colPregunta + colSi / 2, yPos + 3.5, { align: "center" });
   doc.text("NO", tablaInicioX + colPregunta + colSi + colNo / 2, yPos + 3.5, { align: "center" });
@@ -881,7 +877,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   
   // Texto SI y NO en celdas del header
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   // Columna izquierda
   doc.text("SI", tablaInicioX + colPregunta + colSi / 2, yPos + 3.5, { align: "center" });
   doc.text("NO", tablaInicioX + colPregunta + colSi + colNo / 2, yPos + 3.5, { align: "center" });
@@ -957,7 +953,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   doc.line(tablaInicioX, yPos + alturaFilaSignos, tablaInicioX + anchoTotalSignos, yPos + alturaFilaSignos);
   
   // Texto en cada celda
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7);
   let xActual = tablaInicioX;
   doc.text("FC: " + (datosFinales.frecuenciaCardiaca || "") + " x min", xActual + 2, yPos + 3.5);
   xActual += anchoColumnaSignos;

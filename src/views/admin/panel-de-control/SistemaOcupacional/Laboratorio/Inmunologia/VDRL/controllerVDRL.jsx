@@ -9,8 +9,8 @@ import {
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
-const obtenerReporteUrl = "";
-const registrarUrl = "";
+const obtenerReporteUrl = "/api/v01/ct/inmunologia/obtenerReporteVdrl";
+const registrarUrl = "/api/v01/ct/inmunologia/registrarActualizarVdrl";
 
 export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
   const res = await GetInfoServicioDefault(
@@ -26,23 +26,27 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
       norden: res.norden ?? "",
       fecha: res.fechaExamen,
 
-      nombreExamen: res.nombreExamen ?? "",
-      dni: res.dni ?? "",
+      nombreExamen: res.tipoExamen ?? "",
+      dni: res.dniPaciente ?? "",
 
-      nombres: res.nombres ?? "",
+      nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
       fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-      lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-      edad: res.edad ?? "",
+      lugarNacimiento: res.lugarNacimiento ?? "",
+      edad: res.edadPaciente ?? "",
       sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
-      estadoCivil: res.estadoCivilPaciente,
-      nivelEstudios: res.nivelEstudioPaciente,
+      estadoCivil: res.estadoCivil ?? "",
+      nivelEstudios: res.nivelEstudio ?? "",
       // Datos Laborales
-      empresa: res.empresa,
-      contrata: res.contrata,
-      ocupacion: res.ocupacionPaciente,
-      cargoDesempenar: res.cargoPaciente,
+      empresa: res.empresa ?? "",
+      contrata: res.contrata ?? "",
+      ocupacion: res.ocupacion ?? "",
+      cargoDesempenar: res.cargoPaciente ?? "",
 
       //AGREGAR
+      muestra: res.muestra ?? "",
+      examen: res.examen ?? "",
+      metodo: res.metodo ?? "",
+      resultado: res.vdrl ?? "",
 
       user_medicoFirma: res.usuarioFirma,
     }));
@@ -58,8 +62,13 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
   const body = {
     norden: form.norden,
     fechaExamen: form.fecha,
-    userRegistro: user,
+    fechaRegistro: form.fecha,
 
+    muestra: form.muestra,
+    examen: form.examen,
+    metodo: form.metodo,
+    vdrl: form.resultado,
+    userRegistro: user,
     usuarioFirma: form.user_medicoFirma,
   };
 

@@ -113,23 +113,34 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
   doc.text(datosReales.fechaNacimiento || "", tablaInicioX + col1W + col2W + col3W + 22, yPos + 4);
   yPos += filaAltura;
 
-  // Fila 3: Puesto de Trabajo y Área de Trabajo (2 columnas)
-  const col2MitadW = tablaAncho / 2; // 100
-  doc.rect(tablaInicioX, yPos, col2MitadW, filaAltura, 'S');
-  doc.rect(tablaInicioX + col2MitadW, yPos, col2MitadW, filaAltura, 'S');
-
+  // Fila 3: Puesto de Trabajo (con altura dinámica)
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const textoPuestoTrabajo = datosReales.puestoTrabajo || "";
+  const lineasPuestoTrabajo = doc.splitTextToSize(textoPuestoTrabajo, tablaAncho - 35);
+  const alturaPuestoTrabajo = Math.max(filaAltura, lineasPuestoTrabajo.length * 3.5 + 1);
+  
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaPuestoTrabajo, 'S');
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Puesto de Trabajo:", tablaInicioX + 2, yPos + 4);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(datosReales.puestoTrabajo || "", tablaInicioX + 32, yPos + 4);
+  if (lineasPuestoTrabajo.length === 1) {
+    doc.text(lineasPuestoTrabajo[0], tablaInicioX + 32, yPos + 4);
+  } else {
+    lineasPuestoTrabajo.forEach((linea, lineIdx) => {
+      doc.text(linea, tablaInicioX + 32, yPos + 3.5 + (lineIdx * 3.5));
+    });
+  }
+  yPos += alturaPuestoTrabajo;
 
+  // Fila 4: Área de Trabajo
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
   doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("Área de Trabajo:", tablaInicioX + col2MitadW + 2, yPos + 4);
+  doc.text("Área de Trabajo:", tablaInicioX + 2, yPos + 4);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(datosReales.areaTrabajo || "", tablaInicioX + col2MitadW + 30, yPos + 4);
+  doc.text(datosReales.areaTrabajo || "", tablaInicioX + 30, yPos + 4);
   yPos += filaAltura;
 
-  // Fila 4: Empresa
+  // Fila 5: Empresa
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Empresa:", tablaInicioX + 2, yPos + 4);
@@ -137,7 +148,7 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
   doc.text(datosReales.empresa || "", tablaInicioX + 20, yPos + 4);
   yPos += filaAltura;
 
-  // Fila 5: Contrata
+  // Fila 6: Contrata
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Contratista:", tablaInicioX + 2, yPos + 4);
@@ -778,15 +789,20 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
   yPos += alturaFila11;
 
   // === SECCIÓN DE FIRMAS ===
-  yPos += 3;
+  const pageHeight = doc.internal.pageSize.getHeight();
+  if (yPos + 30 > pageHeight - 20) {
+    doc.addPage();
+    yPos = 35;
+  }
 
-  // Dibujar las firmas usando la utilidad centralizada (sin rectángulo)
-  yPos = await dibujarFirmas({
-    doc,
-    datos: data,
-    y: yPos,
-    pageW: pageW
-  });
+  // Dibujar sección de firma con borde
+  const alturaSeccionFirma = 30;
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaSeccionFirma, 'S');
+
+  // Usar la función dibujarFirmas para dibujar las firmas
+  await dibujarFirmas({ doc, datos: data, y: yPos + 2, pageW });
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 5 });

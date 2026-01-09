@@ -2,12 +2,13 @@ import Swal from "sweetalert2";
 import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
+    handleSubirArchivoDefault,
     LoadingDefault,
     SubmitDataServiceDefault,
     VerifyTRPerzonalizadoDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
-import { SubmitData } from "../../../../utils/apiHelpers";
+import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/espirometria/obtenerReporteEspirometria";
@@ -15,6 +16,7 @@ const registrarUrl =
     "/api/v01/ct/espirometria/registrarActualizarEspirometria";
 const registrarPDF =
     "/api/v01/ct/archivos/archivoInterconsulta"
+
 export const GetInfoServicio = async (
     nro,
     tabla,
@@ -70,6 +72,8 @@ export const GetInfoServicio = async (
             interpretacion: res.interpretacion,
 
             user_medicoFirma: res.usuarioFirma,
+            SubirDoc: true,
+            digitalizacion: res.digitalizacion
         }));
     }
 };
@@ -100,10 +104,11 @@ export const SubmitDataService = async (
         fvcTeorico: form.fvcTeorico,
         fev1Teorico: form.fev1Teorico,
 
-        userRegistro: user,
+        usuarioRegistro: user,
         usuarioFirma: form.user_medicoFirma,
-    };
 
+    };
+    console.log(body)
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
         Swal.fire({
             title: "Éxito",
@@ -127,10 +132,10 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         },
         () => {
             //Tiene registro
-            GetInfoServicioEditar(nro, tabla, set, token, () => {
+            GetInfoServicio(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de Altura 1.8",
+                    "Este paciente ya cuenta con registros de Espirometria",
                     "warning"
                 );
             });
@@ -169,57 +174,29 @@ export const Loading = (mensaje) => {
 };
 
 export const handleSubirArchivoEspirometria = async (form, selectedSede, userlogued, token) => {
-    const { value: file } = await Swal.fire({
-        title: "Selecciona un archivo PDF",
-        input: "file",
-        inputAttributes: {
-            accept: "application/pdf", // solo PDF
-            "aria-label": "Sube tu archivo en formato PDF"
-        },
-        showCancelButton: true,
-        confirmButtonText: "Subir",
-        cancelButtonText: "Cancelar",
-        inputValidator: (file) => {
-            if (!file) return "Debes seleccionar un archivo.";
-            if (file.type !== "application/pdf") return "Solo se permiten archivos PDF.";
-        },
-    });
+    const coordenadas = {
+        FIRMA: { x: 40, y: 720, width: 120, height: 60 },
+        HUELLA: { x: 220, y: 720, width: 60, height: 60 },
+        SELLOFIRMA: { x: 360, y: 680, width: 120, height: 80 },
+    };
+    handleSubirArchivoDefault(form, selectedSede, registrarPDF, userlogued, token, coordenadas)
+};
 
-    if (file) {
-        // Puedes convertirlo a Base64 si lo necesitas
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            LoadingDefault("Subiendo documento")
-            const base64WithoutHeader = e.target.result.split(',')[1];
-            const datos = {
-                rutaArchivo: null,
-                dni: null,
-                historiaClinica: null,
-                servidor: "azure",
-                estado: true,
-                fechaRegistro: `${year}-${month}-${day}`,
-                userRegistro: userlogued,
-                fechaActualizacion: null,
-                userActualizacion: null,
-                id_tipo_archivo: null,
-
-                nombreArchivo: file.name,
-                codigoSede: selectedSede,
-                fileBase64: base64WithoutHeader,
-                nomenclatura_tipo_archivo: form.nomenclatura,
-                orden: form.norden,
-                indice_carga_masiva: undefined,
-            };
-
-            const response = await SubmitData(datos, registrarPDF, token);
+export const ReadArchivosFormEspirometria = async (form, setVisualerOpen, token) => {
+    LoadingDefault("Cargando Interconsulta")
+    getFetch(`/api/v01/st/registros/detalleUrlArchivos/${form.norden}/${form.nomenclatura}`, token)
+        .then(response => {
             console.log(response)
             if (response.id === 1) {
+                setVisualerOpen(response)
 
-                Swal.fire("Exito", "Archivo Subido con exto", "success")
+                Swal.close()
             } else {
-                Swal.fire("Error", "No se pudo subir", "error")
+                Swal.fire("Error", "No Existe reporte para este Numero de Orden", "error")
             }
-        };
-        reader.readAsDataURL(file);
-    }
-};
+        })
+        .catch(error => {
+            Swal.fire("Error", "Ocurrio un Error al visualizar la interconsulta", "error")
+            throw new Error('Network response was not ok.', error);
+        })
+}

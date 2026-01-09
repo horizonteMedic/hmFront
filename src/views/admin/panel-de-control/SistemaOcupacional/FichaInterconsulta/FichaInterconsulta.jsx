@@ -45,7 +45,8 @@ const Especialidades = [
     "Área Medica",
     "Laboratorio",
     "Imagenologia",
-    "Audiometria"
+    "Audiometria",
+    "Dermatología"
 ]
 
 

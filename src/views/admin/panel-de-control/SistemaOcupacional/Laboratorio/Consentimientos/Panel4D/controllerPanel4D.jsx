@@ -2,16 +2,16 @@ import Swal from "sweetalert2";
 import { getFetch } from '../../../../getFetch/getFetch';
 import { GetInfoLaboratioEx } from '../Controller/model';
 import { GetInfoPacDefault, LoadingDefault, VerifyTRDefault } from '../../../../../../utils/functionUtils';
+import { getToday } from "../../../../../../utils/helpers";
 
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+const today = getToday();
 
 const camposAPI = {
   MARIHUANA: { valor: 'antConsumeMarih', fecha: 'fechaConsumeMarih' },
   COCAINA: { valor: 'antConsumeCocacina', fecha: 'fechaConsumeCocacina' },
   COCA: { valor: 'antConsumeHojaCoca', fecha: 'fechaConsumoHojaCoca' },
-  OPIACEOS: { valor: 'antConsumeOpiacesos', fecha: 'fechaConsumeOpiacesos' },
-  METHANFETAMINAS: { valor: 'antConsumeMethanfetaminaOOpiaceos', fecha: 'fechaConsumeMethanfetamina' },
+  OPIA: { valor: 'antConsumeOpiacesos', fecha: 'fechaConsumeOpiacesos' },
+  METAN: { valor: 'antConsumeMethanfetaminaOOpiaceos', fecha: 'fechaConsumeMethanfetamina' },
 };
 
 const tabla = 'con_panel4D';
@@ -139,12 +139,17 @@ export const PrintHojaR = async (form, token) => {
     
     if (res.norden) {
       const nombre = res.nameJasper;
+      console.log('📄 Jasper a llamar:', nombre);
+      console.log('📋 Datos recibidos:', res);
       const jasperModules = import.meta.glob('../../../../../../jaspers/Consentimientos/*.jsx');
-      const modulo = await jasperModules[`../../../../../../jaspers/Consentimientos/${nombre}.jsx`]();
+      const rutaCompleta = `../../../../../../jaspers/Consentimientos/${nombre}.jsx`;
+      console.log('🔍 Buscando módulo en:', rutaCompleta);
+      const modulo = await jasperModules[rutaCompleta]();
       if (typeof modulo.default === 'function') {
+        console.log('✅ Módulo encontrado y función válida, ejecutando...');
         modulo.default(res);
       } else {
-        console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+        console.error(`❌ El archivo ${nombre}.jsx no exporta una función por defecto`);
       }
     } else {
       Swal.fire({

@@ -7,12 +7,12 @@ import SectionFieldset from "../../../../../../components/reusableComponents/Sec
 import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformePsicologicoADECO";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerEstresFatigaSomnolencia";
 import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
 
 const tabla = "informe_psicologico_estres";
 
-export default function InformePsicologicoADECO() {
+export default function EstresFatigaSomnolencia() {
     const today = getToday();
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
 

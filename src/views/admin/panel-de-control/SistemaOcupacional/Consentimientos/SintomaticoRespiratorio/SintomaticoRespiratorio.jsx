@@ -10,7 +10,7 @@ import {
 } from "./controllerSintomaticoRespiratorio";
 import BotonesAccion from "../../../../../components/templates/BotonesAccion";
 
-const tabla = "";
+const tabla = "CONSENT_SINTOMATICO";
 
 const textoFinalConsentimiento = `Por lo tanto, en forma consciente y voluntaria, declaro que no presento cefalea, dolor de garganta, tos, fiebre, malestar general ni dificultad para respirar.`;
 
@@ -20,6 +20,7 @@ export default function SintomaticoRespiratorio() {
 
     const initialFormState = {
         norden: "",
+        idConsentimiento: null,
         fecha: today,
         nombres: "",
         dni: "",

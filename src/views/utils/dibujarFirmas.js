@@ -114,7 +114,7 @@ export function dibujarFirmas({ doc, datos, y, pageW }) {
       const sigH = 20;
       const sigY = y;
       const gap = 16;
-      lineY = sigY + sigH + 3;
+      lineY = sigY + sigH + 1; // Línea más cerca de la firma
 
       // Función auxiliar para agregar sello al PDF (ya viene comprimido como data URL)
       const agregarSello = (dataUrl, xPos, yPos, width, height) => {
@@ -146,11 +146,11 @@ export function dibujarFirmas({ doc, datos, y, pageW }) {
         // Dibujar línea
         doc.line(centroX - anchoLinea / 2, lineY, centroX + anchoLinea / 2, lineY);
 
-        // Dibujar texto (más cerca de la firma)
+        // Dibujar texto (con más espacio después de la línea)
         doc.setFont('helvetica', 'normal').setFontSize(7);
-        doc.text(texto1, centroX, lineY + 3, { align: "center" });
+        doc.text(texto1, centroX, lineY + 2.5, { align: "center" });
         if (texto2) {
-          doc.text(texto2, centroX, lineY + 6, { align: "center" });
+          doc.text(texto2, centroX, lineY + 4.5, { align: "center" });
         }
       };
 

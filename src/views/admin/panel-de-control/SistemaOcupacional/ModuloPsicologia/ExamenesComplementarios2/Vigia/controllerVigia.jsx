@@ -37,20 +37,20 @@ export const GetInfoServicio = async (
             esApto: res.cumplePerfil,
 
             nombreExamen: res.tipoExamen ?? "",
-            dni: res.dniPaciente ?? "",
+            dni: res.dni ?? "",
 
-            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
-            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-            edad: res.edadPaciente ?? "",
-            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
-            estadoCivil: res.estadoCivilPaciente ?? "",
-            nivelEstudios: res.nivelEstudioPaciente ?? "",
+            nombres: res.nombreCompleto ?? "",
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimiento ?? ""),
+            lugarNacimiento: res.lugarNacimiento ?? "",
+            edad: res.edad ?? "",
+            sexo: res.sexo === "M" ? "MASCULINO" : "FEMENINO",
+            estadoCivil: res.estadoCivil ?? "",
+            nivelEstudios: res.nivelEstudio ?? "",
             // Datos Laborales
             empresa: res.empresa ?? "",
             contrata: res.contrata ?? "",
-            ocupacion: res.ocupacionPaciente ?? "",
-            cargoDesempenar: res.cargoPaciente ?? "",
+            ocupacion: res.ocupacion ?? "",
+            cargoDesempenar: res.cargo ?? "",
 
             temorRiesgoElectrico: res.temorRiesgoElectrico ?? "",
             temorTareaAltura: res.temorTareasAltura ?? "",
@@ -109,7 +109,7 @@ export const SubmitDataService = async (
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformePsicologicoADECO/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformePsicoCuadradorVigia/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -117,7 +117,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../../jaspers/ModuloPsicologia/InformePsicologicoADECO"
+        "../../../../../../jaspers/ModuloPsicologia/InformePsicoCuadradorVigia"
     );
 };
 

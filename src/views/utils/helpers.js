@@ -1,4 +1,5 @@
 import { addYears, format, parse } from "date-fns";
+import { PDFDocument } from "pdf-lib";
 
 export function fixEncodingModern(str) {
     if (!str) return "";
@@ -133,4 +134,52 @@ export function formatearTextoATitulo(texto) {
         .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1))
         .join(' ');
 }
+//con la imagen en url
+export async function colocarSellosEnPdf(pdfBytes, sellos, coordenadas) {
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+    const pages = pdfDoc.getPages();
+    const page = pages[pages.length - 1]; // 👈 última página
 
+    const { height } = page.getSize();
+
+    for (const key of Object.keys(sellos)) {
+        const url = sellos[key];
+        const coord = coordenadas[key];
+
+        if (!url || !coord) continue;
+
+        const imgBytes = await fetchImageBytes(url);
+
+        const image =
+            url.toLowerCase().endsWith(".jpg") || url.toLowerCase().endsWith(".jpeg")
+                ? await pdfDoc.embedJpg(imgBytes)
+                : await pdfDoc.embedPng(imgBytes);
+
+        page.drawImage(image, {
+            x: coord.x,
+            y: height - coord.y - coord.height, // 👈 conversión PDF
+            width: coord.width,
+            height: coord.height,
+        });
+    }
+
+    return await pdfDoc.save();
+}
+
+export function uint8ToBase64(uint8Array) {
+    let binary = '';
+    const chunkSize = 0x8000; // 32 KB
+
+    for (let i = 0; i < uint8Array.length; i += chunkSize) {
+        const subarray = uint8Array.subarray(i, i + chunkSize);
+        binary += String.fromCharCode.apply(null, subarray);
+    }
+
+    return btoa(binary);
+}
+
+export async function fetchImageBytes(url) {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("No se pudo descargar imagen");
+    return new Uint8Array(await response.arrayBuffer());
+}

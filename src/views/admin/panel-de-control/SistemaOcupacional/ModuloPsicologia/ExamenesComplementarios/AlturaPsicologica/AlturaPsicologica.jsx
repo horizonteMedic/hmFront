@@ -139,8 +139,8 @@ export default function AlturaPsicologica() {
             <option value="INFORME PSICOLÓGICO - TRABAJO EN ALTURA">
               INFORME PSICOLÓGICO - TRABAJO EN ALTURA
             </option>
-            <option value="INFORME PSICOLÓGICO - TRABAJO EN ALTURA/OBRAS">
-              INFORME PSICOLÓGICO - TRABAJO EN ALTURA/OBRAS
+            <option value="INFORME PSICOLÓGICO - TRABAJO EN ALTURA/FOBIAS">
+              INFORME PSICOLÓGICO - TRABAJO EN ALTURA/FOBIAS
             </option>
           </select>
         </div>

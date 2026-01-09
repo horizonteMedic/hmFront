@@ -509,7 +509,7 @@ const TabComponent = () => {
               },
               10: { title: "Modulo Psicología", child: <PsicologiaTabSelector listas={listasCombos} tieneVista={tieneVista} /> },
               12: { title: "Rayos X", child: <RayosXTabSelector tieneVista={tieneVista} /> },
-              13: { title: undefined, child: <EKG /> },
+              13: { title: "Electrocardiograma", child: <EKG /> },
               14: { title: "Espirometría", child: <Espirometria /> },
               16: {
                 title: undefined, child: (

@@ -10,20 +10,23 @@ import {
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import { getHoraActual } from "../../../../../utils/helpers";
 
-const obtenerReporteUrl = "";
-const registrarUrl = "";
+const obtenerReporteUrl = "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision";
+const registrarUrl = "/api/v01/ct/consentimientos/registrarActualizarConsentimientosAdmision";
 
-export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {}) => {
+export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
     const res = await GetInfoServicioDefault(nro, tabla, token, obtenerReporteUrl, onFinish);
     if (res) {
         set((prev) => ({
             ...prev,
-            norden: res.norden ?? prev.norden ?? "",
-            fecha: res.fecha ?? prev.fecha ?? "",
-            nombres: res.nombres ?? prev.nombres ?? "",
-            dni: res.dni ?? prev.dni ?? "",
-            ocupacion: res.ocupacion ?? prev.ocupacion ?? "",
-            empresa: res.empresa ?? prev.empresa ?? "",
+            norden: res.norden ?? "",
+            idConsentimiento: res.idConsentimiento ?? null,
+            fecha: res.fechaRegistro ?? "",
+            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
+            dni: res.dniPaciente ?? "",
+            ocupacion: res.ocupacionPaciente ?? "",
+            empresa: res.empresa ?? "",
+            existenAntecedentes: res.antecedentesPatologicos,
+            detalleAntecedentes: res.detalleAntecedentes ?? "",
         }));
     }
 };
@@ -36,9 +39,19 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla, datos
 
     const body = {
         norden: form.norden,
-        fecha: form.fecha,
-        hora: getHoraActual(),
-        userRegistro: user,
+        idConsentimiento: form.idConsentimiento,
+
+        tipoReporte: tabla,
+        nombreReporte: "DECLARACION JURADA DE ANTECEDENTES PERSONALES Y FAMILIARES",
+
+        antecedentesPatologicos: form.existenAntecedentes,
+        detalleAntecedentes: form.existenAntecedentes == false ? null : form.detalleAntecedentes,
+
+        fechaFirma: form.fecha,
+        horaReporte: getHoraActual(),
+        usuarioRegistro: user,
+        fechaRegistro: form.fecha,
+        usuarioActualiza: user,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -47,7 +60,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla, datos
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../jaspers/ConsentimientoInformado/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../jaspers/ConsentimientosAdmision/ConsentAdmisDeclaAntecePatolo/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -55,7 +68,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../jaspers/ConsentimientoInformado"
+        "../../../../../jaspers/ConsentimientosAdmision/ConsentAdmisDeclaAntecePatolo"
     );
 };
 

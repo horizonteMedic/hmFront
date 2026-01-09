@@ -82,10 +82,29 @@ const ExamenesList = [
         url: "/api/v01/ct/laboratorio/reporteAnalisisBioquimico"
     },
     {
+        nombre: "OIT",
+        resultado: false,
+        tabla: "oit",
+        url: "/api/v01/ct/oit/obtenerReporteOit"
+    },
+    {
         nombre: "RADIOGRAFIA TORAX",
         resultado: false,
         tabla: "radiografia_torax",
         url: "/api/v01/ct/rayosX/obtenerReporteRadiografiaTorax"
+    },
+    {
+        nombre: "ELECTROCARDIOGRAMA",
+        resultado: false,
+        tabla: "informe_electrocardiograma",
+        url: "/api/v01/ct/electroCardiograma/obtenerReporteInformeElectroCardiograma",
+        esJasper: true
+    },
+    {
+        nombre: "ESPIROMETRIA",
+        resultado: false,
+        tabla: "ESPIROMETRIA",
+        url: ""
     },
     {
         nombre: "FICHA AUDIOLOGICA",
@@ -224,7 +243,7 @@ const Folio = () => {
             });
         }
     };
-
+    console.log(form)
     return (
         <div className="w-full space-y-3 px-4">
             {/* ===== SECCIÓN: DATOS NECESARIOS ===== */}

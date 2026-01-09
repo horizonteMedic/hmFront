@@ -10,7 +10,7 @@ import {
 import { getToday } from "../../../../../../utils/helpers";
 
 const obtenerReporteUrl =
-    "/api/v01/ct/informePsicolaboral/obtenerReporteInformePsicolaboral"; 
+    "/api/v01/ct/informePsicolaboral/obtenerReporteInformePsicolaboral";
 const registrarUrl =
     "/api/v01/ct/informePsicolaboral/registrarActualizarInformePsicolaboral";
 const today = getToday();
@@ -35,6 +35,7 @@ export const GetInfoServicio = async (
             ...res,
             norden: res.norden,
             tipoExamen: res.nombreExamen,
+            anual: res.anual,
             fechaExam: res.fecha,
             nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
             dni: res.dniPaciente,
@@ -47,12 +48,12 @@ export const GetInfoServicio = async (
             puestoActual: res.ocupacionPaciente,
             esApto: res.apto ? true : false,
             // ASPECTO INTELECTUAL
-            razonamientoProblemas: res.aspectoIntelectual1I ? "I" : res.aspectoIntelectual1NP ? "NP" : res.aspectoIntelectual1NPI ? "NPI" : res.aspectoIntelectual1NPS ? "NPS" : res.aspectoIntelectual1S ? "S" : undefined , // I, NP1, NP, NPS, S
-            memoria: res.aspectoIntelectual2I ? "I" : res.aspectoIntelectual2NP ? "NP" : res.aspectoIntelectual2NPI ? "NPI" : res.aspectoIntelectual2NPS ? "NPS" : res.aspectoIntelectual2S ? "S" : undefined ,
-            atencionConcentracion: res.aspectoIntelectual3I ? "I" : res.aspectoIntelectual3NP ? "NP" : res.aspectoIntelectual3NPI ? "NPI" : res.aspectoIntelectual3NPS ? "NPS" : res.aspectoIntelectual3S ? "S" : undefined ,
-            coordinacionVisoMotora: res.aspectoIntelectual4I ? "I" : res.aspectoIntelectual4NP ? "NP" : res.aspectoIntelectual4NPI ? "NPI" : res.aspectoIntelectual4NPS ? "NPS" : res.aspectoIntelectual4S ? "S" : undefined ,
-            orientacionEspacial: res.aspectoIntelectual5I ? "I" : res.aspectoIntelectual5NP ? "NP" : res.aspectoIntelectual5NPI ? "NPI" : res.aspectoIntelectual5NPS ? "NPS" : res.aspectoIntelectual5S ? "S" : undefined ,
-            comprensionVerbal: res.aspectoIntelectual6I ? "I" : res.aspectoIntelectual6NP ? "NP" : res.aspectoIntelectual6NPI ? "NPI" : res.aspectoIntelectual6NPS ? "NPS" : res.aspectoIntelectual6S ? "S" : undefined ,
+            razonamientoProblemas: res.aspectoIntelectual1I ? "I" : res.aspectoIntelectual1NP ? "NP" : res.aspectoIntelectual1NPI ? "NPI" : res.aspectoIntelectual1NPS ? "NPS" : res.aspectoIntelectual1S ? "S" : undefined, // I, NP1, NP, NPS, S
+            memoria: res.aspectoIntelectual2I ? "I" : res.aspectoIntelectual2NP ? "NP" : res.aspectoIntelectual2NPI ? "NPI" : res.aspectoIntelectual2NPS ? "NPS" : res.aspectoIntelectual2S ? "S" : undefined,
+            atencionConcentracion: res.aspectoIntelectual3I ? "I" : res.aspectoIntelectual3NP ? "NP" : res.aspectoIntelectual3NPI ? "NPI" : res.aspectoIntelectual3NPS ? "NPS" : res.aspectoIntelectual3S ? "S" : undefined,
+            coordinacionVisoMotora: res.aspectoIntelectual4I ? "I" : res.aspectoIntelectual4NP ? "NP" : res.aspectoIntelectual4NPI ? "NPI" : res.aspectoIntelectual4NPS ? "NPS" : res.aspectoIntelectual4S ? "S" : undefined,
+            orientacionEspacial: res.aspectoIntelectual5I ? "I" : res.aspectoIntelectual5NP ? "NP" : res.aspectoIntelectual5NPI ? "NPI" : res.aspectoIntelectual5NPS ? "NPS" : res.aspectoIntelectual5S ? "S" : undefined,
+            comprensionVerbal: res.aspectoIntelectual6I ? "I" : res.aspectoIntelectual6NP ? "NP" : res.aspectoIntelectual6NPI ? "NPI" : res.aspectoIntelectual6NPS ? "NPS" : res.aspectoIntelectual6S ? "S" : undefined,
 
             // ASPECTOS PERSONALIDAD
             estabilidadEmocional: res.aspectoPersonalidad1A ? "A" : res.aspectoPersonalidad1B ? "B" : res.aspectoPersonalidad1NP ? "NP" : res.aspectoPersonalidad1NPA ? "NPA" : res.aspectoPersonalidad1NPB ? "NPB" : undefined, // B, NPB, NP, NPA, A
@@ -90,6 +91,7 @@ export const SubmitDataService = async (
     const body = {
         "norden": form.norden,
         "fecha": form.fechaExam,
+        anual: form.anual ?? false,
         "aspectoIntelectual1I": form.razonamientoProblemas === "I" ? true : false,
         "aspectoIntelectual1NPI": form.razonamientoProblemas === "NPI" ? true : false,
         "aspectoIntelectual1NP": form.razonamientoProblemas === "NP" ? true : false,
@@ -198,8 +200,8 @@ export const SubmitDataService = async (
         "consecuencia": form.consecuencia,
         "observaciones": form.observaciones,
         "recomendaciones": form.recomendaciones,
-        "apto": form.esApto  ? true : false,
-        "noApto": form.esApto  ? true : false,
+        "apto": form.esApto ? true : false,
+        "noApto": form.esApto ? true : false,
         "usuarioRegistro": user
     };
 

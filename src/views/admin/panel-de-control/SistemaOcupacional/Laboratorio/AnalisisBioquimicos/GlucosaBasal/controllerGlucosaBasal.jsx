@@ -9,8 +9,8 @@ import {
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
-const obtenerReporteUrl = "";
-const registrarUrl = "";
+const obtenerReporteUrl = "/api/v01/ct/analisisBioquimico/obtenerReporteGlucosaBasal";
+const registrarUrl = "/api/v01/ct/analisisBioquimico/registrarActualizarGlucosaBasal";
 
 export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
     const res = await GetInfoServicioDefault(
@@ -24,15 +24,16 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
-            fecha: res.fecha,
+            fecha: res.fecha ?? "",
+            codAb: res.codAb,
 
             nombreExamen: res.nombreExamen ?? "",
-            dni: res.dni ?? "",
+            dni: res.dniPaciente ?? "",
 
             nombres: res.nombres ?? "",
             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
             lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-            edad: res.edad ?? "",
+            edad: res.edadPaciente ?? "",
             sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
             estadoCivil: res.estadoCivilPaciente,
             nivelEstudios: res.nivelEstudioPaciente,
@@ -42,7 +43,14 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             ocupacion: res.ocupacionPaciente,
             cargoDesempenar: res.cargoPaciente,
 
-            //AGREGAR
+            glucosaBasal: res.glucBasal ?? "",
+            colesterolTotal: res.txtColesterol ?? "",
+            ldl: res.txtLdlColesterol !== undefined && res.txtLdlColesterol !== null && res.txtLdlColesterol !== '' ? (parseFloat(res.txtLdlColesterol).toFixed(2)) : '',
+            hdl: res.txtHdlColesterol !== undefined && res.txtHdlColesterol !== null && res.txtHdlColesterol !== '' ? (parseFloat(res.txtHdlColesterol).toFixed(2)) : '',
+            vldl: res.txtVldlColesterol !== undefined && res.txtVldlColesterol !== null && res.txtVldlColesterol !== '' ? (parseFloat(res.txtVldlColesterol).toFixed(2)) : '',
+            trigliceridos: res.txtTrigliseridos ?? "",
+
+            examenDirecto: res.txtColesterol != "",
 
             user_medicoFirma: res.usuarioFirma,
         }));
@@ -56,10 +64,22 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     }
 
     const body = {
-        norden: form.norden,
-        fecha: form.fecha,
+        codAb: form.codAb,
+        fechaAb: form.fecha,
+        txtColesterol: form.colesterolTotal,
+        txtLdlColesterol: form.ldl,
+        txtHdlColesterol: form.hdl,
+        txtVldlColesterol: form.vldl,
+        txtTrigliseridos: form.trigliceridos,
+        glucBasal: form.glucosaBasal,
         userRegistro: user,
-        //AGREGAR
+        userMedicoOcup: "",
+        nOrden: form.norden,
+
+        numTicket: 0,
+        txtReponsable: user,
+        txtCreatinina: "",
+        fechaRegistro: form.fecha,
 
         usuarioFirma: form.user_medicoFirma,
     };

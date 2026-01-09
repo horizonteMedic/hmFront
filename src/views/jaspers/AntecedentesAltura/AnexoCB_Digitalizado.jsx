@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
-import { formatearFechaCorta } from "../../utils/formatDateUtils";
-import { getSign, convertirGenero, getSignCompressed } from "../../utils/helpers";
+import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
+import { getSign, convertirGenero, getSignCompressed } from "../../utils/helpers.js";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
@@ -177,6 +177,33 @@ export default async function GenerarDatosPaciente(data = {}, docExistente = nul
   const datosFinales = datosReales;
 
   // === FUNCIONES AUXILIARES ===
+  // Función para calcular altura necesaria para un texto sin dibujarlo
+  const calcularAlturaTexto = (texto, anchoMaximo, fontSize = 8) => {
+    if (!texto) return filaAltura;
+    doc.setFontSize(fontSize);
+    const palabras = texto.split(' ');
+    let lineaActual = '';
+    let lineas = 1;
+
+    palabras.forEach(palabra => {
+      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+      const anchoTexto = doc.getTextWidth(textoPrueba);
+
+      if (anchoTexto <= anchoMaximo) {
+        lineaActual = textoPrueba;
+      } else {
+        if (lineaActual) {
+          lineas++;
+          lineaActual = palabra;
+        } else {
+          lineas++;
+        }
+      }
+    });
+
+    return Math.max(lineas * fontSize * 0.35 + 1.5, filaAltura);
+  };
+
   // Función para texto con salto de línea
   const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
     if (!texto) return y;
@@ -304,22 +331,32 @@ export default async function GenerarDatosPaciente(data = {}, docExistente = nul
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Quinta fila: Puesto de Trabajo, Área de Trabajo (2 columnas)
+  // Calcular alturas dinámicas para Puesto de Trabajo y Área de Trabajo
+  const alturaPuestoTrabajo = calcularAlturaTexto(datosFinales.puestoTrabajo || "", tablaAncho - 35, 8);
+  const alturaAreaTrabajo = calcularAlturaTexto(datosFinales.areaTrabajo || "", tablaAncho - 30, 8);
+
+  // Quinta fila: Puesto de Trabajo (fila completa con altura dinámica)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaPuestoTrabajo);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaPuestoTrabajo);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaPuestoTrabajo, tablaInicioX + tablaAncho, yPos + alturaPuestoTrabajo);
+  yPos += alturaPuestoTrabajo;
+
+  // Sexta fila: Área de Trabajo (fila completa con altura dinámica)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaAreaTrabajo);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaAreaTrabajo);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaAreaTrabajo, tablaInicioX + tablaAncho, yPos + alturaAreaTrabajo);
+  yPos += alturaAreaTrabajo;
+
+  // Séptima fila: Empresa (fila completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + 100, yPos, tablaInicioX + 100, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Sexta fila: Empresa (fila completa)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Séptima fila: Contrata (fila completa)
+  // Octava fila: Contrata (fila completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
@@ -368,26 +405,28 @@ export default async function GenerarDatosPaciente(data = {}, docExistente = nul
   dibujarTextoConSaltoLinea(datosFinales.direccionPaciente || "", tablaInicioX + 25, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
-  // Quinta fila: Puesto de Trabajo, Área de Trabajo (2 columnas)
+  // Quinta fila: Puesto de Trabajo (fila completa)
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo || "", tablaInicioX + 35, yTexto + 1.5, 60);
+  const alturaPuestoTrabajoTexto = dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo || "", tablaInicioX + 35, yTexto + 1.5, tablaAncho - 40);
+  yTexto = Math.max(alturaPuestoTrabajoTexto, yTexto + alturaPuestoTrabajo);
 
+  // Sexta fila: Área de Trabajo (fila completa)
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Área de Trabajo:", tablaInicioX + 102, yTexto + 1.5);
+  doc.text("Área de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo || "", tablaInicioX + 135, yTexto + 1.5, 60);
-  yTexto += filaAltura;
+  const alturaAreaTrabajoTexto = dibujarTextoConSaltoLinea(datosFinales.areaTrabajo || "", tablaInicioX + 30, yTexto + 1.5, tablaAncho - 35);
+  yTexto = Math.max(alturaAreaTrabajoTexto, yTexto + alturaAreaTrabajo);
 
-  // Sexta fila: Empresa
+  // Séptima fila: Empresa
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 24, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
-  // Séptima fila: Contrata
+  // Octava fila: Contrata
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Contrata:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -704,7 +743,7 @@ export default async function GenerarDatosPaciente(data = {}, docExistente = nul
   yPos += alturaSeccionFirmas;
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 8 });
+  footerTR(doc, { footerOffsetY: 12 });
 
   // === Imprimir ===
   if (docExistente) {

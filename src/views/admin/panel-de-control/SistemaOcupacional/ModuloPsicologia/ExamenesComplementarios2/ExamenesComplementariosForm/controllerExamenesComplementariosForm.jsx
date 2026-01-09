@@ -101,7 +101,7 @@ export const SubmitDataService = async (
         fodaAmenDebi: form.amenazasDebilidades,
         observacion: form.observaciones,
         recomenda: form.recomendaciones,
-        cumplePerfil: form.esApto ?? false,
+        cumplePerfil: form.esApto,
 
         usuarioRegistro: user,
         usuarioFirma: form.user_medicoFirma,

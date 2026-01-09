@@ -3,9 +3,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function BotonesAccion({
     form,
-    handleSave,
-    handleClear,
-    handlePrint,
+    handleSave = () => { },
+    handleClear = () => { },
+    handlePrint = () => { },
     handleChangeNumberDecimals,
     hideSave = false,
     hideClear = false,
@@ -18,7 +18,13 @@ export default function BotonesAccion({
                     <button
                         type="button"
                         onClick={handleSave}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                        className="
+                            bg-emerald-600 hover:bg-emerald-700
+                            text-white text-base px-6 py-2 rounded
+                            flex items-center gap-2
+                            transition-all duration-150 ease-out
+                            hover:shadow-lg
+                            active:scale-95 active:shadow-inner"
                     >
                         <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
                     </button>
@@ -28,7 +34,13 @@ export default function BotonesAccion({
                     <button
                         type="button"
                         onClick={handleClear}
-                        className="bg-amber-500 hover:bg-amber-600 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                        className="
+                        bg-amber-500 hover:bg-amber-600  
+                        text-white text-base px-6 py-2 rounded
+                        flex items-center gap-2
+                        transition-all duration-150 ease-out
+                        hover:shadow-lg
+                        active:scale-95 active:shadow-inner"
                     >
                         <FontAwesomeIcon icon={faBroom} /> Limpiar
                     </button>
@@ -50,7 +62,13 @@ export default function BotonesAccion({
                         <button
                             type="button"
                             onClick={handlePrint}
-                            className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                            className="
+                            bg-blue-600 hover:bg-blue-700
+                            text-white text-base px-6 py-2 rounded
+                            flex items-center gap-2
+                            transition-all duration-150 ease-out
+                            hover:shadow-lg
+                            active:scale-95 active:shadow-inner"
                         >
                             <FontAwesomeIcon icon={faPrint} />
                         </button>

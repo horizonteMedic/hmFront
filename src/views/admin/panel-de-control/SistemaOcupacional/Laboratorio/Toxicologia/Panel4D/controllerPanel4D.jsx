@@ -32,15 +32,16 @@ export const GetInfoServicio = async (
     set((prev) => ({
       ...prev,
       norden: res.norden ?? "",
-      fecha: res.fechaExamen,
+      panel4dId: res.panel4dId,
+      fecha: res.fecha,
 
-      nombreExamen: res.nombreExamen ?? "",
-      dni: res.dni ?? "",
+      nombreExamen: res.tipoExamen ?? "",
+      dni: res.dniPaciente ?? "",
 
-      nombres: res.nombres ?? "",
+      nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
       fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
       lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-      edad: res.edad ?? "",
+      edad: res.edadPaciente ?? "",
       sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
       estadoCivil: res.estadoCivilPaciente,
       nivelEstudios: res.nivelEstudioPaciente,
@@ -50,10 +51,10 @@ export const GetInfoServicio = async (
       ocupacion: res.ocupacionPaciente,
       cargoDesempenar: res.cargoPaciente,
 
-      valueC: res.txtrCocaina ?? "NEGATIVO",
-      valueM: res.txtrMarihuana ?? "NEGATIVO",
-      valueO: res.txtrOpiaceos ?? "NEGATIVO",
-      valueMet: res.txtrMethanfetamina ?? "NEGATIVO",
+      valueC: res.cocaina ? "POSITIVO" : "NEGATIVO",
+      valueM: res.marihuana ? "POSITIVO" : "NEGATIVO",
+      valueO: res.opiaceos ? "POSITIVO" : "NEGATIVO",
+      valueMet: res.metanfetamina ? "POSITIVO" : "NEGATIVO",
 
       user_medicoFirma: res.usuarioFirma,
     }));
@@ -73,14 +74,14 @@ export const SubmitDataService = async (
   }
 
   const body = {
+    id: form.panel4dId,
     norden: form.norden,
-    fechaExamen: form.fecha,
-    txtrCocaina: form.valueC,
-    txtrMarihuana: form.valueM,
-    txtrOpiaceos: form.valueO,
-    txtrMethanfetamina: form.valueMet,
-    userMedicoOcup: "",
-    userRegistro: user,
+    fecha: form.fecha,
+    cocaina: form.valueC=="POSITIVO",
+    marihuana: form.valueM=="POSITIVO",
+    opiaceos: form.valueO=="POSITIVO",
+    metanfetamina: form.valueMet=="POSITIVO",
+    usuarioRegistro: user,
 
     usuarioFirma: form.user_medicoFirma,
   };

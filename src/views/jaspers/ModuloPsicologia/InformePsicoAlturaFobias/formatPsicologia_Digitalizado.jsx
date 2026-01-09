@@ -4,8 +4,9 @@ import { convertirGenero } from "../../../utils/helpers.js";
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import footerTR from '../../components/footerTR.jsx';
 import drawColorBox from '../../components/ColorBox.jsx';
+import { dibujarFirmas } from '../../../utils/dibujarFirmas.js';
 
-export default async function Informe_Psico_AlturaFobias(data = {}) {
+export default async function formatPsicologia_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -23,7 +24,7 @@ export default async function Informe_Psico_AlturaFobias(data = {}) {
   const datos = {
     // Datos personales
     apellidosNombres: String(`${data.apellidosPaciente ?? ""} ${data.nombresPaciente ?? ""}`).trim(),
-    fechaExamen: formatearFechaCorta(data.fecha ?? data.fechaRegistro ?? ""),
+    fechaExamen: formatearFechaCorta(data.fecha ?? ""),
     tipoExamen: String(data.nombreExamen ?? ""),
     nombreExamenPsicologico: String(data.nombreExamenPsicologico ?? ""),
     sexo: convertirGenero(data.sexoPaciente) || "",
@@ -54,8 +55,8 @@ export default async function Informe_Psico_AlturaFobias(data = {}) {
           data.fobiaAlturaMarcadamente ? "Marcadamente" :
             data.fobiaAlturaMiedoExtremo ? "Miedo Extremo" : "",
     // Análisis y Resultados
-    analisisResultados: String(data.analisis ?? data.analisisResultados ?? ""),
-    recomendaciones: String(data.recomendacion ?? data.recomendaciones ?? ""),
+    analisisResultados: String(data.analisis ?? ""),
+    recomendaciones: String(data.recomendacion ?? ""),
     // Conclusiones
     apto: data.apto ?? false,
     noApto: data.noApto ?? false,
@@ -149,23 +150,34 @@ export default async function Informe_Psico_AlturaFobias(data = {}) {
   doc.text(datos.fechaNacimiento || "", tablaInicioX + col1W + col2W + col3W + 22, yPos + 4);
   yPos += filaAltura;
 
-  // Fila 3: Puesto de Trabajo y Área de Trabajo (2 columnas)
-  const col2MitadW = 95;
-  doc.rect(tablaInicioX, yPos, col2MitadW, filaAltura, 'S');
-  doc.rect(tablaInicioX + col2MitadW, yPos, col2MitadW, filaAltura, 'S');
-
+  // Fila 3: Puesto de Trabajo (con altura dinámica)
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  const textoPuestoTrabajo = datos.puestoTrabajo || "";
+  const lineasPuestoTrabajo = doc.splitTextToSize(textoPuestoTrabajo, tablaAncho - 35);
+  const alturaPuestoTrabajo = Math.max(filaAltura, lineasPuestoTrabajo.length * 3.5 + 1);
+  
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaPuestoTrabajo, 'S');
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Puesto de Trabajo:", tablaInicioX + 2, yPos + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datos.puestoTrabajo || "", tablaInicioX + 32, yPos + 4);
+  if (lineasPuestoTrabajo.length === 1) {
+    doc.text(lineasPuestoTrabajo[0], tablaInicioX + 32, yPos + 4);
+  } else {
+    lineasPuestoTrabajo.forEach((linea, lineIdx) => {
+      doc.text(linea, tablaInicioX + 32, yPos + 3.5 + (lineIdx * 3.5));
+    });
+  }
+  yPos += alturaPuestoTrabajo;
 
+  // Fila 4: Área de Trabajo
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Área de Trabajo:", tablaInicioX + col2MitadW + 2, yPos + 4);
+  doc.text("Área de Trabajo:", tablaInicioX + 2, yPos + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datos.areaTrabajo || "", tablaInicioX + col2MitadW + 30, yPos + 4);
+  doc.text(datos.areaTrabajo || "", tablaInicioX + 30, yPos + 4);
   yPos += filaAltura;
 
-  // Fila 4: Empresa
+  // Fila 5: Empresa
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Empresa:", tablaInicioX + 2, yPos + 4);
@@ -173,7 +185,7 @@ export default async function Informe_Psico_AlturaFobias(data = {}) {
   doc.text(datos.empresa || "", tablaInicioX + 20, yPos + 4);
   yPos += filaAltura;
 
-  // Fila 5: Contrata
+  // Fila 6: Contrata
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Contratista:", tablaInicioX + 2, yPos + 4);
@@ -316,8 +328,8 @@ export default async function Informe_Psico_AlturaFobias(data = {}) {
         doc.text(linea, xCentro, yTextoInicio + idx * 3, { align: "center" });
       });
 
-      // Dibujar X encima del texto si está seleccionada
-      if (valor && opcion.toLowerCase().includes(valor.toLowerCase())) {
+      // Dibujar X encima del texto si está seleccionada (comparación exacta)
+      if (valor && opcion.toLowerCase() === valor.toLowerCase()) {
         // La X va encima del texto, centrada en la misma columna
         dibujarCheckbox(xCentro, yPos, true, filaAltura);
       }
@@ -374,99 +386,21 @@ export default async function Informe_Psico_AlturaFobias(data = {}) {
   doc.text("RECOMENDACIONES:", tablaInicioX + 2, yPos + 4);
   yPos += filaAltura;
 
-  const anchoFirma = 60;
-  const anchoRecomendaciones = tablaAncho - anchoFirma - 2;
-
   let alturaRecomendaciones = alturaMinima;
   if (datos.recomendaciones) {
-    const lineas = doc.splitTextToSize(datos.recomendaciones, anchoRecomendaciones - 4);
+    const lineas = doc.splitTextToSize(datos.recomendaciones, tablaAncho - 4);
     const alturaTexto = lineas.length * 3.5 + padding * 2;
     alturaRecomendaciones = Math.max(alturaMinima, alturaTexto);
   }
 
-  const alturaMinimaFirma = 25;
-  alturaRecomendaciones = Math.max(alturaRecomendaciones, alturaMinimaFirma);
-
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaRecomendaciones, 'S');
-  doc.line(tablaInicioX + anchoRecomendaciones, yPos, tablaInicioX + anchoRecomendaciones, yPos + alturaRecomendaciones);
 
   doc.setFont("helvetica", "normal").setFontSize(8);
   if (datos.recomendaciones) {
-    const lineas = doc.splitTextToSize(datos.recomendaciones, anchoRecomendaciones - 4);
+    const lineas = doc.splitTextToSize(datos.recomendaciones, tablaAncho - 4);
     lineas.forEach((linea, idx) => {
       doc.text(linea, tablaInicioX + 2, yPos + padding + 2 + (idx * 3.5));
     });
-  }
-
-  // Firma
-  const digitalizacion = data.digitalizacion || [];
-  const sello1 = digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  const sello2 = digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
-  const isValidUrl = url => url && url !== "Sin registro";
-
-  const loadImg = src =>
-    new Promise((res, rej) => {
-      const img = new Image();
-      img.src = src;
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const maxWidth = 800;
-        let width = img.width;
-        let height = img.height;
-
-        if (width > maxWidth) {
-          height = (height * maxWidth) / width;
-          width = maxWidth;
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, width, height);
-        ctx.drawImage(img, 0, 0, width, height);
-        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
-        res(compressedDataUrl);
-      };
-      img.onerror = () => rej(`No se pudo cargar ${src}`);
-    });
-
-  try {
-    const [s1, s2] = await Promise.all([
-      isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
-      isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-    ]);
-
-    const sigW = 48;
-    const sigH = 20;
-    const sigY = yPos + (alturaRecomendaciones / 2) - (sigH / 2);
-    const gap = 16;
-    const xInicioFirma = tablaInicioX + anchoRecomendaciones + 2;
-    const centroXFirma = xInicioFirma + (anchoFirma / 2);
-
-    if (s1 && s2) {
-      const totalWidth = sigW * 2 + gap;
-      const startX = centroXFirma - totalWidth / 2;
-      doc.addImage(s1, 'JPEG', startX, sigY, sigW, sigH);
-      doc.addImage(s2, 'JPEG', startX + sigW + gap, sigY, sigW, sigH);
-    } else if (s1) {
-      doc.addImage(s1, 'JPEG', centroXFirma - sigW / 2, sigY, sigW, sigH);
-    } else if (s2) {
-      doc.addImage(s2, 'JPEG', centroXFirma - sigW / 2, sigY, sigW, sigH);
-    }
-
-    if (s1 || s2) {
-      doc.setFont("helvetica", "normal").setFontSize(7);
-      const nombreProfesional = data.usuarioFirma || "";
-      const lineasNombre = doc.splitTextToSize(nombreProfesional, anchoFirma - 4);
-      const yNombre = yPos + alturaRecomendaciones - (lineasNombre.length * 3) - 2;
-      lineasNombre.forEach((linea, idx) => {
-        doc.text(linea, centroXFirma, yNombre + (idx * 3), { align: "center" });
-      });
-    }
-  } catch (error) {
-    console.log("Error cargando firma:", error);
   }
 
   yPos += alturaRecomendaciones;
@@ -479,21 +413,50 @@ export default async function Informe_Psico_AlturaFobias(data = {}) {
   doc.text("CONCLUSIONES", tablaInicioX + 2, yPos + 4);
   yPos += filaAltura;
 
-  const colCumpleW = 95;
-  doc.rect(tablaInicioX, yPos, colCumpleW, filaAltura, 'S');
-  doc.rect(tablaInicioX + colCumpleW, yPos, colCumpleW, filaAltura, 'S');
+  // Fila con 4 columnas: APTO | (vacía) | NO APTO | (vacía)
+  const colTextoW = (tablaAncho - 30) / 2; // Ancho para columnas de texto
+  const colVaciaW = 15; // Ancho para columnas vacías
 
+  // Dibujar las 4 columnas
+  doc.rect(tablaInicioX, yPos, colTextoW, filaAltura, 'S'); // Columna 1: APTO
+  doc.rect(tablaInicioX + colTextoW, yPos, colVaciaW, filaAltura, 'S'); // Columna 2: Vacía
+  doc.rect(tablaInicioX + colTextoW + colVaciaW, yPos, colTextoW, filaAltura, 'S'); // Columna 3: NO APTO
+  doc.rect(tablaInicioX + colTextoW * 2 + colVaciaW, yPos, colVaciaW, filaAltura, 'S'); // Columna 4: Vacía
+
+  // Texto en las columnas
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  const centroVertical = yPos + filaAltura / 2 + 1; // Centro vertical de la celda
+  doc.text("APTO", tablaInicioX + colTextoW / 2, centroVertical, { align: "center" });
+  doc.text("NO APTO", tablaInicioX + colTextoW + colVaciaW + colTextoW / 2, centroVertical, { align: "center" });
+
+  // Marcar X según apto/noApto (en las columnas vacías)
   const esApto = datos.apto ?? false;
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("APTO", tablaInicioX + colCumpleW / 2, yPos + 4, { align: "center" });
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(esApto ? "X" : "", tablaInicioX + colCumpleW + colCumpleW / 2, yPos + 4, { align: "center" });
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("NO APTO", tablaInicioX + colCumpleW * 2 + colCumpleW / 2, yPos + 4, { align: "center" });
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(!esApto ? "X" : "", tablaInicioX + colCumpleW * 3 + colCumpleW / 2, yPos + 4, { align: "center" });
+  const esNoApto = datos.noApto ?? false;
+  doc.setFont("helvetica", "bold").setFontSize(12);
+  if (esApto) {
+    // Marcar X en la columna vacía después de APTO (columna 2)
+    doc.text("X", tablaInicioX + colTextoW + colVaciaW / 2, centroVertical, { align: "center" });
+  } else if (esNoApto) {
+    // Marcar X en la columna vacía después de NO APTO (columna 4)
+    doc.text("X", tablaInicioX + colTextoW * 2 + colVaciaW + colVaciaW / 2, centroVertical, { align: "center" });
+  }
   yPos += filaAltura;
+
+  // === SECCIÓN DE FIRMA ===
+  const pageHeight = doc.internal.pageSize.getHeight();
+  if (yPos + 30 > pageHeight - 20) {
+    doc.addPage();
+    yPos = 35;
+  }
+
+  // Dibujar sección de firma con borde
+  const alturaSeccionFirma = 30;
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaSeccionFirma, 'S');
+
+  // Usar la función dibujarFirmas para dibujar las firmas
+  await dibujarFirmas({ doc, datos: data, y: yPos + 2, pageW });
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });

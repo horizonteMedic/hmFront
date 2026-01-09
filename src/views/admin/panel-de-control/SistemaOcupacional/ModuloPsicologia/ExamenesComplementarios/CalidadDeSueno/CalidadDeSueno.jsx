@@ -112,7 +112,7 @@ export default function CalidadDeSueno() {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-3">
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 xl:grid-cols-3 gap-x-4 gap-y-3">
                 <InputTextOneLine
                     label="N° Orden"
                     name="norden"
@@ -126,7 +126,7 @@ export default function CalidadDeSueno() {
                     name="fechaExam"
                     type="date"
                     value={form?.fechaExam}
-                    onChange={handleChange}
+                    onChange={handleChangeSimple}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
