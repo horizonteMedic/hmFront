@@ -1,5 +1,7 @@
 import Swal from "sweetalert2";
 import { getFetch, SubmitData } from "./apiHelpers";
+import { colocarSellosEnPdf, getSign, uint8ToBase64 } from "./helpers";
+import { PDFDocument } from "pdf-lib";
 export const LoadingDefault = (text) => {
     Swal.fire({
         title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,
@@ -68,7 +70,7 @@ export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporte
                 Swal.close();
                 return;
             }
-            
+
             if (res.norden || res.norden_n_orden || res.n_orden) {
                 if (!(res.dataPrincipal ?? true)) {
                     Swal.fire(
@@ -81,25 +83,25 @@ export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporte
                 const nombre = res.nameJasper || res.namejasper;
                 console.log("Nombre Jasper recibido:", nombre);
                 console.log("Nombre Carpeta:", nombreCarpeta);
-                
+
                 if (!nombre || !nombreCarpeta) {
                     console.error("Faltan datos necesarios:", { nombre, nombreCarpeta });
                     Swal.fire("Error", "Error al obtener el formato de impresión", "error");
                     Swal.close();
                     return;
                 }
-                
+
                 // Construir la ruta completa
                 const rutaCompleta = `${nombreCarpeta}/${nombre}.jsx`;
                 console.log("Ruta completa construida:", rutaCompleta);
-                
+
                 // Verificar las claves disponibles
                 const clavesDisponibles = Object.keys(jasperModules);
                 console.log("Claves disponibles en jasperModules:", clavesDisponibles);
-                
+
                 // Intentar encontrar el módulo
                 let moduloFunc = jasperModules[rutaCompleta];
-                
+
                 // Si no se encuentra la ruta exacta, buscar por nombre del archivo
                 if (!moduloFunc) {
                     console.warn(`No se encontró la ruta exacta: ${rutaCompleta}`);
@@ -110,7 +112,7 @@ export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporte
                         .replace(/informe|lab|_/g, ' ')
                         .split(/\s+/)
                         .filter(p => p.length > 0);
-                    
+
                     const claveEncontrada = clavesDisponibles.find(key => {
                         const nombreArchivo = key.split('/').pop().replace(/\.jsx?$/, '').toLowerCase();
                         // Buscar coincidencia exacta
@@ -123,9 +125,9 @@ export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporte
                         }
                         // Buscar si el nombre del archivo contiene el nombre buscado o viceversa
                         return nombreArchivo.includes(nombreSinExtension.toLowerCase()) ||
-                               nombreSinExtension.toLowerCase().includes(nombreArchivo);
+                            nombreSinExtension.toLowerCase().includes(nombreArchivo);
                     });
-                    
+
                     if (claveEncontrada) {
                         console.log(`Se encontró una clave similar: ${claveEncontrada}`);
                         moduloFunc = jasperModules[claveEncontrada];
@@ -142,17 +144,17 @@ export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporte
                         }
                     }
                 }
-                
+
                 if (!moduloFunc || typeof moduloFunc !== 'function') {
                     console.error("El módulo encontrado no es una función:", moduloFunc);
                     Swal.fire("Error", `Error al cargar el formato de impresión: ${nombre}.jsx`, "error");
                     Swal.close();
                     return;
                 }
-                
+
                 const modulo = await moduloFunc();
                 console.log("Módulo cargado:", modulo);
-                
+
                 // Ejecuta la función exportada por default con los datos
                 if (typeof modulo.default === "function") {
                     modulo.default({ ...res, ...datosFooter }, null);
@@ -298,3 +300,109 @@ export const SubmitDataServiceDefault = async (
         }
     });
 };
+
+export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, userlogued, token, coordenadas) => {
+    const sFirma = await getSign(form, "FIRMAP")
+    const sHuella = await getSign(form, "HUELLA")
+    const sSello = await getSign(form, "SELLOFIRMA")
+
+    const { value: file } = await Swal.fire({
+        title: "Selecciona un archivo PDF",
+        input: "file",
+        inputAttributes: {
+            accept: "application/pdf", // solo PDF
+            "aria-label": "Sube tu archivo en formato PDF"
+        },
+        showCancelButton: true,
+        confirmButtonText: "Continuar",
+        cancelButtonText: "Cancelar",
+        inputValidator: (file) => {
+            if (!file) return "Debes seleccionar un archivo.";
+            if (file.type !== "application/pdf") return "Solo se permiten archivos PDF.";
+        },
+    });
+
+    if (!file) return; // Usuario canceló la selección de archivo
+
+    // Segundo diálogo: preguntar si quiere agregar sellos
+    const { value: agregarSellos, isConfirmed } = await Swal.fire({
+        title: "¿Agregar Sellos y Firmas?",
+        input: "checkbox",
+        inputValue: 1,
+        inputPlaceholder: "Agregar Sellos y Firmas al PDF",
+        showCancelButton: true,
+        confirmButtonText: "Subir",
+        cancelButtonText: "Cancelar"
+    });
+    if (!isConfirmed) return; // Usuario canceló
+
+    const currentDate = new Date(); // Obtiene la fecha y hora actual
+    const year = currentDate.getFullYear(); // Obtiene el año actual
+    const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Obtiene el mes actual y le agrega un 0 al principio si es menor a 10
+    const day = ('0' + currentDate.getDate()).slice(-2);
+
+    // Procesar el archivo
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        LoadingDefault("Subiendo documento")
+        const base64WithoutHeader = e.target.result.split(',')[1];
+        let pdfBytes = Uint8Array.from(atob(base64WithoutHeader), c => c.charCodeAt(0));
+        console.log(agregarSellos)
+        // Solo aplicar sellos si el usuario lo solicitó
+        if (agregarSellos) {
+            const sellos = {
+                FIRMA: sFirma,
+                HUELLA: sHuella,
+                SELLOFIRMA: sSello,
+            };
+            pdfBytes = await colocarSellosEnPdf(pdfBytes, sellos, coordenadas);
+        } else {
+            console.log("SIN SELLOS");
+        }
+
+        const pdfBase64Final = uint8ToBase64(new Uint8Array(pdfBytes));
+
+
+        const datos = {
+            rutaArchivo: null,
+            dni: null,
+            historiaClinica: null,
+            servidor: "azure",
+            estado: true,
+            fechaRegistro: `${year}-${month}-${day}`,
+            userRegistro: userlogued,
+            fechaActualizacion: null,
+            userActualizacion: null,
+            id_tipo_archivo: null,
+
+            nombreArchivo: file.name,
+            codigoSede: selectedSede,
+            fileBase64: pdfBase64Final,
+            nomenclatura_tipo_archivo: form.nomenclatura,
+            orden: form.norden,
+            indice_carga_masiva: undefined,
+        };
+
+        const response = await SubmitData(datos, urlPDf, token);
+        if (response.id === 1) {
+
+            Swal.fire("Exito", "Archivo Subido con exto", "success")
+        } else {
+            Swal.fire("Error", "No se pudo subir", "error")
+        }
+    };
+    reader.readAsDataURL(file);
+};
+
+
+/*abrir PDF para previsualizador
+ const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
+            const pdfUrl = URL.createObjectURL(pdfBlob);
+            const link = document.createElement("a");
+            link.href = pdfUrl;
+            link.download = file.name; // o el nombre que tú quieras
+            document.body.appendChild(link);
+            link.click();
+
+            document.body.removeChild(link);
+            URL.revokeObjectURL(pdfUrl);*/

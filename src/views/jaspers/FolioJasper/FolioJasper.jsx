@@ -195,7 +195,7 @@ async function insertarPdfEnPosicion(jsPdfDoc, pdfExternoUrl, paginaInsercion) {
     let externoBytes = await fetch(pdfExternoUrl).then(r => r.arrayBuffer());
 
     // 🫁 SOLO ESPEROMETRÍA → aplicar sello
-    externoBytes = await sellarEspirometria(externoBytes);
+    //externoBytes = await sellarEspirometria(externoBytes);
 
     const externoPdf = await PDFDocument.load(externoBytes);
 

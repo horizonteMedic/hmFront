@@ -1,12 +1,12 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils";
-import { getSign } from "../../utils/helpers";
+import { getSign, getSignCompressed } from "../../utils/helpers";
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 
-export default async function Aptitud_AgroindustrialH(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function Aptitud_AgroindustrialH(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   const datosFinales = {
@@ -712,7 +712,7 @@ export default async function Aptitud_AgroindustrialH(data = {}) {
   doc.text("SELLO Y FIRMA DE MEDICO QUE CERTIFICA", tablaAptitudInicioX + 105, yFechaTexto + 4);
 
   try {
-    const firmaMedicoImg = getSign(data, "SELLOFIRMA");
+    const firmaMedicoImg = await getSignCompressed(data, "SELLOFIRMA");
     doc.addImage(firmaMedicoImg, 'PNG', firmaX, firmaY, 50 * 0.7, 30 * 0.7);
   } catch (e) {
     // Error al agregar la firma
@@ -725,7 +725,11 @@ export default async function Aptitud_AgroindustrialH(data = {}) {
   footerTR(doc);
 
   // === Imprimir ===
-  imprimir(doc);
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {
