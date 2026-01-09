@@ -13,6 +13,7 @@ import {
 } from "./controllerOftalmologia";
 import Swal from "sweetalert2";
 import { getToday } from "../../../../../utils/helpers";
+import ButtonsPDF from "../../../../../components/reusableComponents/ButtonsPDF";
 
 const tabla = "oftalmologia2021";
 const today = getToday();
@@ -134,6 +135,9 @@ const initialFormState = {
   otrosOd: false,
   otrosOi: false,
   examenClinicoHallazgos: "",
+
+  SubirDoc: true,
+  nomenclatura: "ESPIROMETRIA"
 };
 export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
   const [form, setForm] = useState(initialFormState);
@@ -288,37 +292,40 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
               disabled
             />
           </div>
+          {/*form.SubirDoc &&
+            <ButtonsPDF
+              handleSave={() => { handleSubirArchivoEspirometria(form, selectedSede, userlogued, token) }}
+              handleRead={() => { ReadArchivosFormEspirometria(form, setVisualerOpen, token) }}
+            />
+          */}
         </div>
       </form>
       {/* Tabs */}
       <div className="flex gap-1">
         <button
           onClick={() => setTab(0)}
-          className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none flex items-center whitespace-nowrap ${
-            tab === 0
-              ? "bg-[#233245] text-white font-bold"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-          } ${tab === 0 ? "border-b-0" : "border-b"}`}
+          className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none flex items-center whitespace-nowrap ${tab === 0
+            ? "bg-[#233245] text-white font-bold"
+            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            } ${tab === 0 ? "border-b-0" : "border-b"}`}
         >
           PARTE I
         </button>
         <button
           onClick={() => setTab(1)}
-          className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none flex items-center whitespace-nowrap ${
-            tab === 1
-              ? "bg-[#233245] text-white font-bold"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-          } ${tab === 1 ? "border-b-0" : "border-b"}`}
+          className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none flex items-center whitespace-nowrap ${tab === 1
+            ? "bg-[#233245] text-white font-bold"
+            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            } ${tab === 1 ? "border-b-0" : "border-b"}`}
         >
           PARTE II
         </button>
         <button
           onClick={() => setTab(2)}
-          className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none flex items-center whitespace-nowrap ${
-            tab === 2
-              ? "bg-[#233245] text-white font-bold"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-          } ${tab === 2 ? "border-b-0" : "border-b"}`}
+          className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none flex items-center whitespace-nowrap ${tab === 2
+            ? "bg-[#233245] text-white font-bold"
+            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            } ${tab === 2 ? "border-b-0" : "border-b"}`}
         >
           PARTE III
         </button>
@@ -507,11 +514,10 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                     </label>
                   </div>
                   <div
-                    className={`flex gap-16 border rounded p-3 ${
-                      form.correctorOcular === "NO"
-                        ? "opacity-50 pointer-events-none"
-                        : ""
-                    }`}
+                    className={`flex gap-16 border rounded p-3 ${form.correctorOcular === "NO"
+                      ? "opacity-50 pointer-events-none"
+                      : ""
+                      }`}
                   >
                     <div className="flex items-start gap-2 flex-col justify-start">
                       <label className="flex justify-center items-center gap-2">
@@ -812,11 +818,10 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                   </div>
                 </div>
                 <div
-                  className={`grid md:grid-cols-2 gap-4 ${
-                    form.aplicaRefraccion === "NO"
-                      ? "opacity-50 pointer-events-none"
-                      : ""
-                  } `}
+                  className={`grid md:grid-cols-2 gap-4 ${form.aplicaRefraccion === "NO"
+                    ? "opacity-50 pointer-events-none"
+                    : ""
+                    } `}
                 >
                   {/* De Lejos */}
                   <div className="border rounded p-4">
