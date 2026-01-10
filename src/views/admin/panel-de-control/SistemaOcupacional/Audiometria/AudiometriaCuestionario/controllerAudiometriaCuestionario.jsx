@@ -192,17 +192,17 @@ export const PrintHojaR = (nro, token, tabla) => {
         const nombre = res.nameJasper;
         console.log(nombre);
         const jasperModules = import.meta.glob(
-          `../../../../../jaspers/Audiometria/*.jsx`
+          `../../../../../jaspers/Audiometria/**/*.jsx`
         );
         const modulo = await jasperModules[
-          `../../../../../jaspers/Audiometria/${nombre}.jsx`
+          `../../../../../jaspers/Audiometria/CuestionarioAudiometria/CuestionarioAudiometria_Digitalizado.jsx`
         ]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
           modulo.default(res);
         } else {
           console.error(
-            `El archivo ${nombre}.jsx no exporta una función por defecto`
+            `El archivo CuestionarioAudiometria_Digitalizado.jsx no exporta una función por defecto`
           );
         }
       }
