@@ -153,9 +153,15 @@ const createBase = () => {
 
 export const mapFamilia = (familia = []) => {
     const base = createBase();
-
+    let hijo = 0;
     familia.forEach((f) => {
-        const key = parentescoConfig[f.parentesco.toUpperCase()];
+        if (f.parentesco.toUpperCase() === "HIJO") {
+            hijo++;
+        }
+        const concatenacion =
+            f.parentesco.toUpperCase() != "HIJO" ?
+                f.parentesco.toUpperCase() : `HIJO${hijo}`;
+        const key = parentescoConfig[concatenacion];
         if (!key) return;
 
         base[`idfamiliar${key}`] = f.id ?? null;
@@ -480,9 +486,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         },
         () => {
             //Tiene registro
-            GetInfoServicioEditar(nro, tabla, set, token, () => {
-
-            });
+            GetInfoServicioEditar(nro, tabla, set, token, () => { });
         },
         () => {
             //Necesita

@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-import { getFetch, getFetchManejo, SubmitData } from "./apiHelpers";
+import { getFetch, getFetchManejo, SubmitData, SubmitDataManejo } from "./apiHelpers";
 import { colocarSellosEnPdf, getSign, uint8ToBase64 } from "./helpers";
 
 export const LoadingDefault = (text) => {
@@ -344,7 +344,7 @@ export const SubmitDataServiceDefaultManejo = async (
         if (tienePrint) {
             Swal.fire({
                 title: "Exito",
-                text: `${res.mensaje ?? ""},\n¿Desea imprimir?`,
+                text: `${res.resultado ?? ""},\n¿Desea imprimir?`,
                 icon: "success",
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",
@@ -357,7 +357,7 @@ export const SubmitDataServiceDefaultManejo = async (
         } else {
             Swal.fire({
                 title: "Exito",
-                text: `${res.mensaje ?? ""}`,
+                text: `${res.resultado ?? ""}`,
                 icon: "success",
             })
         }
