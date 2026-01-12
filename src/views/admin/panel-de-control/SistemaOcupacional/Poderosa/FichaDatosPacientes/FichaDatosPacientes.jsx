@@ -28,6 +28,7 @@ export default function FichaDatosPacientes() {
 
         nombres: "",
         apellidos: "",
+        fechaNacimiento: "",
 
         apellidoPaterno: "",
         apellidoMaterno: "",
@@ -975,7 +976,7 @@ export default function FichaDatosPacientes() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {referencias.map((ref, index) => (
+                                {form.referencias.map((ref, index) => (
                                     <tr key={index}>
                                         <td className="border border-gray-300 px-2 py-1">{ref.nombres}</td>
                                         <td className="border border-gray-300 px-2 py-1">{ref.centroTrab}</td>

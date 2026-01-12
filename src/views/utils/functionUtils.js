@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
-import { getFetch, SubmitData } from "./apiHelpers";
+import { getFetch, getFetchManejo, SubmitData } from "./apiHelpers";
 import { colocarSellosEnPdf, getSign, uint8ToBase64 } from "./helpers";
-import { PDFDocument } from "pdf-lib";
+
 export const LoadingDefault = (text) => {
     Swal.fire({
         title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,
@@ -262,6 +262,79 @@ export const GetInfoServicioDefault = async (
         onFinish();
     }
 };
+
+export const GetInfoServicioDefaultManejo = async (
+    nro,
+    tabla,
+    token,
+    obtenerReporteUrl,
+    onFinish = () => { }
+) => {
+    try {
+        const res = await getFetchManejo(
+            `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=false`,
+            token
+        );
+        if (!res) return null;
+
+        const tieneOrden =
+            res.norden ||
+            res.norden_n_orden ||
+            res.n_orden;
+
+        return tieneOrden ? res : null;
+
+    } catch (error) {
+        console.error(error);
+        Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
+        return null;
+    } finally {
+        onFinish();
+    }
+};
+// export const GetInfoServicioDefaultManejo = async (
+//     nro,
+//     tabla,
+//     token,
+//     obtenerReporteUrl,
+//     onFinish = () => { }
+// ) => {
+//     try {
+//         const respuesta = await getFetch(
+//             `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=false`,
+//             token
+//         );
+//         if (respuesta?.codigo && respuesta?.codigo != null) {
+//             if (respuesta.codigo == 200) {
+//                 return respuesta.resultado;
+//             }
+//             else {
+//                 const { id, mensaje, detalle, codigo } = respuesta.resultado;
+//                 Swal.fire({
+//                     icon: "error",
+//                     title: (mensaje && `${mensaje} ${id && `(${id})`}`) || "Error",
+//                     html: `
+//                         <div style="text-align:left">
+//                         <p><strong>Código:</strong> ${codigo}</p>
+//                         <p><strong>Detalle:</strong> ${detalle}</p>
+//                         </div>
+//                     `,
+//                     confirmButtonText: "Entendido"
+//                 });
+//                 return null;
+//             }
+
+//         } else {
+//             Swal.fire("Error", "Ocurrió un error al traer los datos", "error");
+//             return null;
+//         }
+//     } catch (error) {
+//         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
+//         return null;
+//     } finally {
+//         onFinish();
+//     }
+// };
 
 export const SubmitDataServiceDefault = async (
     token,

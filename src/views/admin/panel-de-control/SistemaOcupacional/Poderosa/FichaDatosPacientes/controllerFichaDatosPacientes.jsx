@@ -1,6 +1,7 @@
 import Swal from "sweetalert2";
 import {
     GetInfoServicioDefault,
+    GetInfoServicioDefaultManejo,
     LoadingDefault,
     PrintHojaRDefault,
     SubmitDataServiceDefault,
@@ -20,7 +21,7 @@ export const GetInfoServicio = async (
     token,
     onFinish = () => { }
 ) => {
-    const res = await GetInfoServicioDefault(
+    const res = await GetInfoServicioDefaultManejo(
         nro,
         tabla,
         token,
@@ -117,55 +118,58 @@ export const GetInfoServicio = async (
             experiencias: res.experienciaLaboral ?? [],
             referencias: res.referenciasPersonales ?? [],
         }));
+        Swal.close();
     }
 };
+const parentescoConfig = {
+    PADRE: "Padre",
+    MADRE: "Madre",
+    CONVIVIENTE: "Conviviente",
+    ESPOSA: "Esposa",
+    HIJO1: "Hijo1",
+    HIJO2: "Hijo2",
+    HIJO3: "Hijo3",
+    HIJO4: "Hijo4",
+    HIJO5: "Hijo5",
+};
 
-const mapFamilia = (familia) => {
-    const base = {
-        idfamiliarPadre: null, familiarPadreNombre: "-", familiarPadreVive: "-", familiarPadreFechaNac: "", familiarPadreEdad: "-", familiarPadreDni: "-", familiarPadreGrado: "-", familiarPadreAutogenerado: "-",
-        idfamiliarMadre: null, familiarMadreNombre: "-", familiarMadreVive: "-", familiarMadreFechaNac: "", familiarMadreEdad: "-", familiarMadreDni: "-", familiarMadreGrado: "-", familiarMadreAutogenerado: "-",
-        idfamiliarEsposa: null, familiarEsposaNombre: "-", familiarEsposaVive: "-", familiarEsposaFechaNac: "", familiarEsposaEdad: "-", familiarEsposaDni: "-", familiarEsposaGrado: "-", familiarEsposaAutogenerado: "-",
-    };
+const createBase = () => {
+    const base = {};
 
-    familia.forEach((f) => {
-        switch (f.parentesco) {
-            case "PADRE":
-                base.idfamiliarPadre = f.id;
-                base.familiarPadreNombre = f.nombres ?? "-";
-                base.familiarPadreVive = f.vive ?? "-";
-                base.familiarPadreFechaNac = f.fechaNacimiento ?? "";
-                base.familiarPadreEdad = f.edad ?? "-";
-                base.familiarPadreDni = f.dni ?? "-";
-                base.familiarPadreGrado = f.gradoInstruccion ?? "-";
-                base.familiarPadreAutogenerado = f.autogenerado ?? "-";
-                break;
-
-            case "MADRE":
-                base.idfamiliarMadre = f.id;
-                base.familiarMadreNombre = f.nombres ?? "-";
-                base.familiarMadreVive = f.vive ?? "-";
-                base.familiarMadreFechaNac = f.fechaNacimiento ?? "";
-                base.familiarMadreEdad = f.edad ?? "-";
-                base.familiarMadreDni = f.dni ?? "-";
-                base.familiarMadreGrado = f.gradoInstruccion ?? "-";
-                base.familiarMadreAutogenerado = f.autogenerado ?? "-";
-                break;
-
-            case "ESPOSA":
-                base.idfamiliarEsposa = f.id;
-                base.familiarEsposaNombre = f.nombres ?? "-";
-                base.familiarEsposaVive = f.vive ?? "-";
-                base.familiarEsposaFechaNac = f.fechaNacimiento ?? "";
-                base.familiarEsposaEdad = f.edad ?? "-";
-                base.familiarEsposaDni = f.dni ?? "-";
-                base.familiarEsposaGrado = f.gradoInstruccion ?? "-";
-                base.familiarEsposaAutogenerado = f.autogenerado ?? "-";
-                break;
-        }
+    Object.values(parentescoConfig).forEach((key) => {
+        base[`idfamiliar${key}`] = null;
+        base[`familiar${key}Nombre`] = "-";
+        base[`familiar${key}Vive`] = "-";
+        base[`familiar${key}FechaNac`] = "";
+        base[`familiar${key}Edad`] = "-";
+        base[`familiar${key}Dni`] = "-";
+        base[`familiar${key}Grado`] = "-";
+        base[`familiar${key}Autogenerado`] = "-";
     });
 
     return base;
 };
+
+export const mapFamilia = (familia = []) => {
+    const base = createBase();
+
+    familia.forEach((f) => {
+        const key = parentescoConfig[f.parentesco.toUpperCase()];
+        if (!key) return;
+
+        base[`idfamiliar${key}`] = f.id ?? null;
+        base[`familiar${key}Nombre`] = f.nombres ?? "-";
+        base[`familiar${key}Vive`] = f.vive ?? "-";
+        base[`familiar${key}FechaNac`] = f.fechaNacimiento ?? "";
+        base[`familiar${key}Edad`] = f.edad ?? "-";
+        base[`familiar${key}Dni`] = f.dni ?? "-";
+        base[`familiar${key}Grado`] = f.gradoInstruccion ?? "-";
+        base[`familiar${key}Autogenerado`] = f.autogenerado ?? "-";
+    });
+
+    return base;
+};
+
 const mapInstruccion = (lista) => {
     const base = {
         instruccionPrimariaCentro: "-",
@@ -221,7 +225,7 @@ export const GetInfoServicioEditar = async (
     token,
     onFinish = () => { }
 ) => {
-    const res = await GetInfoServicioDefault(
+    const res = await GetInfoServicioDefaultManejo(
         nro,
         tabla,
         token,
@@ -248,6 +252,8 @@ export const GetInfoServicioEditar = async (
             // ===== DATOS PERSONALES =====
             nombres: res.nombresPaciente ?? "",
             apellidos: res.apellidosPaciente ?? "",
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+
             apellidoPaterno: res.apellidoPaterno ?? "",
             apellidoMaterno: res.apellidoMaterno ?? "",
 
@@ -274,7 +280,7 @@ export const GetInfoServicioEditar = async (
             referenciaDomiciliaria: res.referenciaDomicilio ?? "",
 
             // ===== CONTACTO =====
-            telefono1: res.telefonoEmergencia ?? "",
+            telefono1: "",
             telefono2: "",
             tipoVivienda: res.viviendaPropia
                 ? "PROPIA"
@@ -318,6 +324,11 @@ export const GetInfoServicioEditar = async (
             experiencias: res.experienciaLaboral ?? [],
             referencias: res.referenciasPersonales ?? [],
         }));
+        Swal.fire(
+            "Alerta",
+            "Este paciente ya cuenta con registros de Ficha Datos Personales.",
+            "warning"
+        );
     }
 };
 
@@ -441,11 +452,6 @@ export const SubmitDataService = async (
     });
 };
 
-export const GetInfoServicioTabla = (nro, tabla, set, token) => {
-    GetInfoServicio(nro, tabla, set, token, () => {
-        Swal.close();
-    });
-};
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     const jasperModules = import.meta.glob("../../../../../jaspers/FichaDatosPersonales/*.jsx");
@@ -469,16 +475,12 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         sede,
         () => {
             //NO Tiene registro
-            GetInfoServicio(nro, tabla, set, token, () => { Swal.close(); });
+            GetInfoServicio(nro, tabla, set, token, () => { });
         },
         () => {
             //Tiene registro
             GetInfoServicioEditar(nro, tabla, set, token, () => {
-                Swal.fire(
-                    "Alerta",
-                    "Este paciente ya cuenta con registros de Ficha Datos Personales.",
-                    "warning"
-                );
+
             });
         },
         () => {
