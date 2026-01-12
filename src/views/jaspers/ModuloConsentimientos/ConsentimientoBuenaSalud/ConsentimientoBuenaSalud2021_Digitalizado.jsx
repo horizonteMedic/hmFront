@@ -1,14 +1,14 @@
 import jsPDF from "jspdf";
-import CabeceraLogo from "../../components/CabeceraLogo.jsx";
-import footerTR from "../../components/footerTR.jsx";
-import drawColorBox from "../../components/ColorBox.jsx";
 import { formatearFechaLargaConDia } from "../../../utils/formatDateUtils.js";
+import CabeceraLogo from '../../components/CabeceraLogo.jsx';
+import drawColorBox from '../../components/ColorBox.jsx';
+import footerTR from '../../components/footerTR.jsx';
+import { dibujarFirmas } from "../../../utils/dibujarFirmas.js";
 
 export default async function ConsentimientoBuenaSalud2021_Digitalizado(data = {}) {
     const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
     const margin = 20;
     const pageW = doc.internal.pageSize.getWidth();
-    const pageH = doc.internal.pageSize.getHeight();
 
     // Función para formatear fecha a DD/MM/YYYY
     const toDDMMYYYY = (fecha) => {
@@ -41,26 +41,49 @@ export default async function ConsentimientoBuenaSalud2021_Digitalizado(data = {
 
     // Header con datos de ficha, sede y fecha
     const drawHeader = async () => {
-        await CabeceraLogo(doc, { ...data, tieneMembrete: false });
+        const margin = 8;
+        let y = 12;
 
-        // Número de Ficha
-        doc.setFont("helvetica", "normal").setFontSize(8);
-        doc.text("Nro de ficha: ", pageW - 80, 15);
-        doc.setFont("helvetica", "normal").setFontSize(18);
-        doc.text(String(data.norden || data.numeroFicha || ""), pageW - 50, 16);
+        // === 1) LOGO A LA IZQUIERDA ===
+        await CabeceraLogo(doc, { ...data, tieneMembrete: false, yOffset: 12 });
 
-        // Sede
-        doc.setFont("helvetica", "normal").setFontSize(8);
-        doc.text("Sede: " + (data.sedeDescripcion || data.nombreSede || data.codigoSede || ""), pageW - 80, 20);
+        // === 2) NÚMERO DE FICHA Y SEDE AL COSTADO DEL BLOQUE DE COLOR ===
+        const sedeValue = `${data.sedeDescripcion || data.nombreSede || data.codigoSede || ''}`;
+        const sedeX = pageW - margin - 20;
+        const sedeY = y + 6;
+        
+        // Número de ficha primero
+        const fichaNum = String(data.norden || data.numeroFicha || "");
+        const fichaY = sedeY;
+        
+        // Texto "N° Ficha :" delante del número
+        const fichaLabelX = sedeX - 40;
+        doc.setFont("helvetica", "normal").setFontSize(9);
+        doc.text("N° Ficha :", fichaLabelX - 4, fichaY);
+        
+        // Número de ficha grande y subrayado
+        const fichaNumX = fichaLabelX + doc.getTextWidth("N° Ficha :") + 5;
+        doc.setFont("helvetica", "bold").setFontSize(22);
+        doc.text(fichaNum, fichaNumX - 4, fichaY);
+        
+        // Subrayar el número de ficha
+        const fichaWidth = doc.getTextWidth(fichaNum);
+        doc.setLineWidth(0.3);
+        doc.line(fichaNumX - 4, fichaY + 1, fichaNumX - 4 + fichaWidth, fichaY + 1);
+        
+        // Sede debajo del número de ficha
+        const sedeY2 = sedeY + 8;
+        doc.setFont("helvetica", "normal").setFontSize(9);
+        doc.text(`Sede : ${sedeValue}`, sedeX, sedeY2, { align: "right" });
 
         // Fecha de examen
         const fechaExamen = toDDMMYYYY(data.fecha || data.fechaExamen || "");
-        doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
+        doc.text(`Fecha de examen: ${fechaExamen}`, sedeX, sedeY2 + 6, { align: "right" });
 
         // Página
         doc.text("Pag. 01", pageW - 30, 10);
 
-        // Bloque de color
+        // === 3) BLOQUE CÓDIGO DE COLOR ===
         drawColorBox(doc, {
             color: data.codigoColor,
             text: data.textoColor,
@@ -69,31 +92,15 @@ export default async function ConsentimientoBuenaSalud2021_Digitalizado(data = {
             size: 22,
             showLine: true,
             fontSize: 30,
-            textPosition: 0.9,
+            textPosition: 0.9
         });
     };
 
-    const sello1 = data.digitalizacion?.find((d) => d.nombreDigitalizacion === "FIRMAP");
-    const sello2 = data.digitalizacion?.find((d) => d.nombreDigitalizacion === "HUELLA");
-    const isValidUrl = (url) => url && url !== "Sin registro";
-    const loadImg = (src) =>
-        new Promise((res, rej) => {
-            const img = new Image();
-            img.src = src;
-            img.crossOrigin = "anonymous";
-            img.onload = () => res(img);
-            img.onerror = () => rej(`No se pudo cargar ${src}`);
-        });
+    // Usar datos reales
+    const datosFinales = datosReales;
 
-    Promise.all([
-        isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
-        isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-    ]).then(async ([s1, s2]) => {
-        // Usar datos reales
-        const datosFinales = datosReales;
-
-        // === 0) HEADER CON LOGO, N° FICHA, SEDE Y BLOQUE DE COLOR ===
-        await drawHeader();
+    // === 0) HEADER CON LOGO, N° FICHA, SEDE Y BLOQUE DE COLOR ===
+    await drawHeader();
 
         // === 1) TÍTULO PRINCIPAL ===
         const titulo = "Consentimiento de Buena Salud".toUpperCase();
@@ -120,7 +127,7 @@ export default async function ConsentimientoBuenaSalud2021_Digitalizado(data = {
             { text: `años de edad`, bold: false },
             { text: ", identificado con DNI: ", bold: false },
             { text: datosFinales.dni, bold: true },
-            { text: ", declaro que ", bold: false },
+            { text: ", declaro que :", bold: false },
         ];
 
         // Configuración de formato
@@ -182,99 +189,24 @@ export default async function ConsentimientoBuenaSalud2021_Digitalizado(data = {
         doc.setFont("helvetica", "normal").setFontSize(11);
         doc.text(`${formatearFechaLargaConDia(datosFinales.fecha)}`, pageW - margin, fechaHoraY, { align: "right" });
 
-        // === 5) FOOTER CON FIRMAS ===
-        const footerY = pageH - 80;
-
-        // Calcular el ancho total del bloque (huella + espacio + firma)
-        const huellaSize = 35;
-        const espacioEntre = 40;
-        const firmaWidth = 60;
-        const anchoTotal = huellaSize + espacioEntre + firmaWidth;
-
-        // Calcular la posición X para centrar el bloque completo
-        const bloqueX = (pageW - anchoTotal) / 2;
-
-        // Línea para firma (ahora a la izquierda)
-        const firmaX = bloqueX;
-        const firmaY = footerY + 7;
-        doc.setLineWidth(0.5);
-        doc.line(firmaX, firmaY + 12, firmaX + firmaWidth, firmaY + 12);
-        doc.setFont("helvetica", "normal").setFontSize(10);
-        doc.text("Firma", firmaX + firmaWidth / 2, firmaY + 20, {
-            align: "center",
-        });
-        doc.text(`DNI: ${datosFinales.dni}`, firmaX + firmaWidth / 2, firmaY + 25, {
-            align: "center",
+        // === 5) FIRMA Y HUELLA DEL PACIENTE (usando dibujarFirmas) ===
+        let yPos = fechaHoraY + 45;
+        
+        // Usar la función dibujarFirmas del utils
+        const yPosFinalFirmas = await dibujarFirmas({
+            doc,
+            datos: data,
+            y: yPos,
+            pageW: pageW
         });
 
-        // Cuadro para huella (ahora a la derecha)
-        const huellaX = firmaX + firmaWidth + espacioEntre;
-        const huellaY = footerY - 15;
-        doc.setDrawColor(0, 0, 0);
-        doc.setLineWidth(0.5);
-        doc.rect(huellaX, huellaY, huellaSize, huellaSize);
-        doc.setFont("helvetica", "normal").setFontSize(10);
-        doc.text("Huella Digital", huellaX + huellaSize / 2, huellaY + huellaSize + 5, {
-            align: "center",
-        });
+        // Agregar DNI debajo de la firma y huella
+        const centroX = pageW / 2;
+        doc.setFont("helvetica", "normal").setFontSize(9);
+        doc.text(`DNI: ${datosFinales.dni}`, centroX, yPosFinalFirmas + 1.5, { align: "center" });
 
-        // --- Imagen de huella ---
-        if (s2) {
-            const canvas = document.createElement("canvas");
-            canvas.width = s2.width;
-            canvas.height = s2.height;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(s2, 0, 0);
-            const selloBase64 = canvas.toDataURL("image/png");
-
-            // Dimensiones máximas dentro del cuadro de huella
-            const maxImgW = huellaSize - 4; // margen interno de 2px por lado
-            const maxImgH = huellaSize - 4;
-
-            // Escalar proporcionalmente
-            let imgW = s2.width;
-            let imgH = s2.height;
-            const scale = Math.min(maxImgW / imgW, maxImgH / imgH, 1);
-            imgW *= scale;
-            imgH *= scale;
-
-            // Centrar dentro del cuadro
-            const imgX = huellaX + (huellaSize - imgW) / 2;
-            const imgY = huellaY + (huellaSize - imgH) / 2;
-
-            doc.addImage(selloBase64, "PNG", imgX, imgY, imgW, imgH);
-        }
-
-        // --- Imagen de firma ---
-        if (s1) {
-            const canvas = document.createElement("canvas");
-            canvas.width = s1.width;
-            canvas.height = s1.height;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(s1, 0, 0);
-            const firmaBase64 = canvas.toDataURL("image/png");
-
-            // Tamaño máximo permitido para la firma
-            const maxImgW = firmaWidth - 4; // pequeño margen
-            const maxImgH = 35; // altura máxima recomendada
-
-            let imgW = s1.width;
-            let imgH = s1.height;
-            const scale = Math.min(maxImgW / imgW, maxImgH / imgH, 1);
-            imgW *= scale;
-            imgH *= scale;
-
-            // Centrar horizontalmente en el área de firma
-            const imgX = firmaX + (firmaWidth - imgW) / 2;
-
-            // Colocar justo encima de la línea de firma
-            const imgY = firmaY + 12 - imgH - 2;
-
-            doc.addImage(firmaBase64, "PNG", imgX, imgY, imgW, imgH);
-        }
-
-        // === 6) FOOTER CON LÍNEA PÚRPURA Y DATOS DE CONTACTO ===
-        footerTR(doc, data);
+        // === 6) FOOTER ===
+        footerTR(doc, { footerOffsetY: 8, fontSize: 8 });
 
         // === 7) Generar blob y abrir en iframe para imprimir automáticamente ===
         const blob = doc.output("blob");
@@ -287,5 +219,4 @@ export default async function ConsentimientoBuenaSalud2021_Digitalizado(data = {
             iframe.contentWindow.focus();
             iframe.contentWindow.print();
         };
-    });
 }

@@ -40,11 +40,43 @@ export const GetInfoServicio = async (
         if (diagnosticoAudio != "NORMAL" && diagnosticoAudio != "") {
             nuevoConclusiones += `HIPOACUSIA\n`
         }
+
+        const imc = res.imctriaje_imc ?? "";
+        let obesidadIMC30 = false;
+        let imcRed = false;
+        if (imc) {
+            const imcValue = parseFloat(imc);
+            if (!isNaN(imcValue) && imcValue > 25) {
+                imcRed = true;
+                if (imcValue >= 25 && imcValue < 30) {
+                    nuevoConclusiones += "SOBREPESO: DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+                } else if (imcValue >= 30 && imcValue < 35) {
+                    obesidadIMC30 = true;
+                    nuevoConclusiones += "OBESIDAD I: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+                } else if (imcValue >= 35 && imcValue < 40) {
+                    obesidadIMC30 = true;
+                    nuevoConclusiones += "OBESIDAD II: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+                } else if (imcValue >= 40) {
+                    obesidadIMC30 = true;
+                    nuevoConclusiones += "OBESIDAD III: NO HACER TRABAJOS EN ESPACIOS CONFINADOS. NO HACER TRABAJOS SOBRE 1.8 M.S.N PISO. DIETA HIPOCALORICA, HIPOGRASA Y EJERCICIOS.\n";
+                }
+            }
+        }
+
+
+        let presion_sistolica = parseFloat(res.sistolicatriaje_sistolica);
+        let presion_diastolica = parseFloat(res.diastolicatriaje_diastolica);
+        if (!isNaN(presion_sistolica) && !isNaN(presion_diastolica) &&
+            (presion_sistolica >= 140 || presion_diastolica >= 90)) {
+            nuevoConclusiones += "HTA NO CONTROLADA.\n";
+        }
+
         set((prev) => ({
             ...prev,
             // Header
             norden: res.norden ?? "",
             nombreExamen: res.nombreExamen ?? "",
+            esApto: obesidadIMC30 ? false : prev.esApto,
 
             // Datos personales
             nombres: res.nombresPaciente ?? "",
@@ -89,7 +121,7 @@ export const GetInfoServicio = async (
             pToracicoInspiracion: res.maximaInspiracionPtoracico_p_max_inspiracion ?? "",
             pToracicoEspiracion: res.forazadaPtoracico_p_ex_forzada ?? "",
 
-            conclusionesRecomendaciones: nuevoConclusiones,
+            diagnostico: nuevoConclusiones,
         }));
     }
 };
@@ -109,7 +141,7 @@ export const GetInfoServicioEditar = async (
         onFinish
     );
     if (res) {
-
+        
         set((prev) => ({
             ...prev,
             // Header

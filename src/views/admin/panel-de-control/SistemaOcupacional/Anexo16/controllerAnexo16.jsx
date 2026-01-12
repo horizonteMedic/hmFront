@@ -1,21 +1,16 @@
 import Swal from "sweetalert2";
-import {
-  LoadingDefault,
-  PrintHojaRDefault,
-  VerifyTRDefault,
-} from "../../../../utils/functionUtils";
+import { LoadingDefault, VerifyTRDefault } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
 import { getToday } from "../../../../utils/helpers";
-import jsPDF from "jspdf";
+
 const registrarUrl = "/api/v01/ct/anexos/anexo16/registrarActualizarAnexo7c";
 const obtenerSimpleUrl = "/api/v01/ct/anexos/anexo16/obtenerAnexo16";
 const obtenerParaEditarUrl = "/api/v01/ct/anexos/anexo16/reporteEditarAnexo16";
 const obtenerParaJasperUrl = "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16";
 
-const obtenerExamenesRealizadosUrl =
-  "/api/v01/ct/anexos/anexo2/obtenerExamenesRealizados";
-const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+const obtenerExamenesRealizadosUrl = "/api/v01/ct/anexos/anexo2/obtenerExamenesRealizados";
+
 export const SubmitDataService = async (
   form,
   setForm,
@@ -292,6 +287,22 @@ export const GetInfoServicio = (
           data.electricos = res.electricosAnexo7c_electricos ?? false;
           data.otros = res.otrosAnexo7c_chkotros ?? false;
 
+          if (res.interpretacionFuncionRespiratoria_interpretacion != null) {
+            data.observacionesGenerales += "ESPIROMETRIA: " + res.interpretacionFuncionRespiratoria_interpretacion + "\n";
+          }
+
+          // if (res.conclusionradiografia_conclu != null) {
+          //   data.observacionesGenerales += "RAYOS X: " + res.conclusionradiografia_conclu + "\n";
+          // }
+
+          if (res.conclusionMusculoesqueletica != null) {
+            data.observacionesGenerales += "MUSCULOESQUELETICA: " + res.conclusionMusculoesqueletica + "\n";
+          }
+
+          // if (res.observacionFichaConduccion != null) {
+          //   data.observacionesGenerales += "FICHA CONDUCCION: " + res.observacionFichaConduccion + "\n";
+          // }
+
           // Información radiográfica
           if (res.infoGeneralRadiografia_info_general != null) {
             data.observacionesGenerales +=
@@ -440,18 +451,13 @@ export const GetInfoServicio = (
               "\n";
             data.contador++;
           }
-          if (
-            res.ordenAlturaCertificado_ordenaltura == null &&
-            res.numeroAlturaCertificacion_numalt == null
-          ) {
-            if (res.observacionesConduccionCertificado_conduccion != null) {
-              data.observacionesGenerales +=
-                data.contador +
-                "-" +
-                res.observacionesConduccionCertificado_conduccion +
-                "\n";
-              data.contador++;
-            }
+          if (res.observacionesConduccionCertificado_conduccion != null) {
+            data.observacionesGenerales +=
+              data.contador +
+              "-" +
+              res.observacionesConduccionCertificado_conduccion +
+              "\n";
+            data.contador++;
           }
 
           // Laboratorio - Drogas
@@ -1408,6 +1414,13 @@ export const GetInfoServicioEditar = (
             pielObservaciones: res.pielDescripcionAnexo7c_piel_descripcion,
           };
 
+          console.log("interpretacionFuncionRespiratoria_interpretacion", res.interpretacionFuncionRespiratoria_interpretacion)
+          if (res.interpretacionFuncionRespiratoria_interpretacion != null) {
+            console.log("interpretacionFuncionRespiratoria_interpretacion2", res.interpretacionFuncionRespiratoria_interpretacion)
+
+            data.observacionesGenerales += "ESPIROMETRIA: " + res.interpretacionFuncionRespiratoria_interpretacion + "\n";
+          }
+
           // Build observacionesGenerales from different medical areas
           if (res.observacionesOdontograma_txtobservaciones != null) {
             data.observacionesGenerales +=
@@ -1738,7 +1751,7 @@ export const GetInfoServicioEditar = (
           data.evaluacionCognitiva = res.lenguageAnexo7c_txtlenguage ?? "";
 
           // Medical conclusions and observations
-          data.observacionesGenerales =
+          data.observacionesGenerales +=
             res.observacionesFichaMedicaAnexo7c_txtobservacionesfm ?? "";
           data.conclusionRespiratoria =
             res.interpretacionFuncionRespiratoria_interpretacion ?? "";

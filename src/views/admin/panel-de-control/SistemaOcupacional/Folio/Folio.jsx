@@ -7,10 +7,23 @@ import { getToday } from "../../../../utils/helpers";
 import { GetInfoPac } from "./controllerFolio";
 import Swal from "sweetalert2";
 
-const tabla = "informe_psicologico";
 const today = getToday();
 
 const ExamenesList = [
+    /*{
+        nombre: "RESUMEN MEDICO PODEROSA",
+        resultado: false,
+        tabla: "resumen_medico_poderosa",
+        url: "/api/v01/ct/anexos/obtenerReporteResumenMedico",
+        esJasper: true
+    },*/
+    {
+        nombre: "CONSTANCIA DE EXAMEN MEDICO OCUPACIONAL",
+        resultado: false,
+        tabla: "certificado_aptitud_medico_resumen",
+        url: "/api/v01/ct/certificadoAptitudMedicoOcupacional/obtenerReporteCertificadoMedicoOcupacional",
+        esJasper: true
+    },
     {
         nombre: "CERTIFICADO DE APTITUD ANEXO 16",
         resultado: false,
@@ -23,6 +36,14 @@ const ExamenesList = [
         resultado: false,
         tabla: "anexo7c",
         url: "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16"
+    },
+    //FICHA APTITUD ANEXO 2
+    {
+        nombre: "CERTIFICADO MEDICO OCUPACIONAL ANEXO 02",
+        resultado: false,
+        tabla: "aptitud_medico_ocupacional_agro",
+        url: "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2",
+        esJasper: true
     },
     {
         nombre: "ENFERMEDADES EN ALTURA ",
@@ -243,7 +264,7 @@ const Folio = () => {
             });
         }
     };
-    console.log(form)
+
     return (
         <div className="w-full space-y-3 px-4">
             {/* ===== SECCIÓN: DATOS NECESARIOS ===== */}

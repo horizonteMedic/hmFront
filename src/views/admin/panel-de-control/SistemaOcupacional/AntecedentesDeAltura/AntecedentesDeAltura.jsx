@@ -7,19 +7,14 @@ import {
   SubmitDataService,
   VerifyTR,
 } from "./controllerAntecedentesDeAltura";
-import { fixEncodingModern } from "../../../../utils/helpers";
+import { getToday } from "../../../../utils/helpers";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "antece_enfermedades_altura";
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
 
 export default function AntecedentesDeAltura() {
-  const { token, userlogued, selectedSede, datosFooter, userCompleto, userName } =
-    useSessionData();
+  const today = getToday();
+  const { token, userlogued, selectedSede, datosFooter, userName, userDNI, userCMP, userEmail, userDireccion } = useSessionData();
   const initialFormState = {
     norden: "",
     codigoAntecedentesAltura: null,
@@ -35,11 +30,11 @@ export default function AntecedentesDeAltura() {
     apto: true,
 
     // Información del médico
-    dniMedico: userCompleto?.datos?.dni_user ?? "",
-    nombreMedico: fixEncodingModern(userCompleto?.datos?.nombres_user ?? ""),
-    cmp: userCompleto?.datos?.cmp ?? "",
-    email: fixEncodingModern(userCompleto?.datos?.email ?? ""),
-    direccionMedico: fixEncodingModern(userCompleto?.datos?.direccion ?? ""),
+    dniMedico: userDNI,
+    nombreMedico: userName,
+    cmp: userCMP,
+    email: userEmail,
+    direccionMedico: userDireccion,
 
     // Antecedentes patológicos - todos en false por defecto
     accidenteCerebrovascular: false,
@@ -87,7 +82,6 @@ export default function AntecedentesDeAltura() {
     handleChangeSimple,
     handleClearnotO,
     handlePrintDefault,
-    handleRadioButton,
     handleRadioButtonBoolean,
   } = useForm(initialFormState, { storageKey: "antecedentes_altura" });
 

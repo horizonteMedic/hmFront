@@ -1,50 +1,42 @@
-import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-    faCheckCircle,
-    faTrash,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCheckCircle, faTrash } from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
     InputsBooleanRadioGroup,
-    InputsRadioGroup,
+    InputsRadioGroup, SectionFieldset
 } from "../../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaDatosPacientes";
-import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 import BotonesAccion from "../../../../../components/templates/BotonesAccion";
 
-const tabla = "";
+const tabla = "ficha_datos_pacientes";
 const today = getToday();
 
 export default function FichaDatosPacientes() {
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
 
     const initialFormState = {
-        // ===== Información general =====
         norden: "",
-        codigoFicha: null,
+        id: null,
         fechaIngreso: today,
-        nombreExamen: "",
+        tipoTrabajador: "",
+
         empresa: "",
         cargo: "",
-        codigoActividad: "",
-        zona: "",
-        codigoDpto: "",
-        tipoTrabajador: "",
+
         nombres: "",
         apellidos: "",
-        // ===== Nacimiento =====
         fechaNacimiento: "",
-        diaNacimiento: "",
-        mesNacimiento: "",
-        anioNacimiento: "",
+
+        apellidoPaterno: "",
+        apellidoMaterno: "",
+
         distritoNacimiento: "",
         provinciaNacimiento: "",
         departamentoNacimiento: "",
-        // ===== Datos personales =====
+        // Datos personales
         dni: "",
         lmNo: "",
         autogenerado: "",
@@ -54,62 +46,98 @@ export default function FichaDatosPacientes() {
         licConducirNo: "",
         cusspNo: "",
         peso: "",
-        // ===== Domicilio =====
+        // Domicilio
         direccionDomicilio: "",
         distritoDomicilio: "",
         provinciaDomicilio: "",
         departamentoDomicilio: "",
         referenciaDomiciliaria: "",
+
         telefono1: "",
-        tipoVivienda: "",
         telefono2: "",
+        tipoVivienda: "",
         email: "",
         radioFrec: "",
         celular: "",
         numeroCuentaAhorro: "",
         banco: "",
-        // ===== Emergencia =====
+
+        // Composición Familiar
+        idfamiliarPadre: null, familiarPadreNombre: "-", familiarPadreVive: "-", familiarPadreFechaNac: "", familiarPadreEdad: "-", familiarPadreDni: "-", familiarPadreGrado: "-", familiarPadreAutogenerado: "-",
+        idfamiliarMadre: null, familiarMadreNombre: "-", familiarMadreVive: "-", familiarMadreFechaNac: "", familiarMadreEdad: "-", familiarMadreDni: "-", familiarMadreGrado: "-", familiarMadreAutogenerado: "-",
+        idfamiliarMadre: null, familiarConvivienteNombre: "-", familiarConvivienteVive: "-", familiarConvivienteFechaNac: "", familiarConvivienteEdad: "-", familiarConvivienteDni: "-", familiarConvivienteGrado: "-", familiarConvivienteAutogenerado: "-",
+        idfamiliarEsposa: null, familiarEsposaNombre: "-", familiarEsposaVive: "-", familiarEsposaFechaNac: "", familiarEsposaEdad: "-", familiarEsposaDni: "-", familiarEsposaGrado: "-", familiarEsposaAutogenerado: "-",
+        idfamiliarHijo1: null, familiarHijo1Nombre: "-", familiarHijo1Vive: "-", familiarHijo1FechaNac: "", familiarHijo1Edad: "-", familiarHijo1Dni: "-", familiarHijo1Grado: "-", familiarHijo1Autogenerado: "-",
+        idfamiliarHijo2: null, familiarHijo2Nombre: "-", familiarHijo2Vive: "-", familiarHijo2FechaNac: "", familiarHijo2Edad: "-", familiarHijo2Dni: "-", familiarHijo2Grado: "-", familiarHijo2Autogenerado: "-",
+        idfamiliarHijo3: null, familiarHijo3Nombre: "-", familiarHijo3Vive: "-", familiarHijo3FechaNac: "", familiarHijo3Edad: "-", familiarHijo3Dni: "-", familiarHijo3Grado: "-", familiarHijo3Autogenerado: "-",
+        idfamiliarHijo4: null, familiarHijo4Nombre: "-", familiarHijo4Vive: "-", familiarHijo4FechaNac: "", familiarHijo4Edad: "-", familiarHijo4Dni: "-", familiarHijo4Grado: "-", familiarHijo4Autogenerado: "-",
+        idfamiliarHijo5: null, familiarHijo5Nombre: "-", familiarHijo5Vive: "-", familiarHijo5FechaNac: "", familiarHijo5Edad: "-", familiarHijo5Dni: "-", familiarHijo5Grado: "-", familiarHijo5Autogenerado: "-",
+
+        // Emergencia
         emergenciaNombres: "",
         emergenciaParentesco: "",
         emergenciaTelefono: "",
         emergenciaDomicilio: "",
         emergenciaOtraReferencia: "",
-        // ===== Composición Familiar (inputs temporales) =====
-        familiarParentesco: "",
-        familiarNombres: "",
-        familiarVive: "",
-        familiarFechaNac: "",
-        familiarEdad: "",
-        familiarDni: "",
-        familiarGrado: "",
-        familiarAutogenerado: "",
-        // ===== Condiciones Laborales =====
+
+        // Instrucción Adquirida
+        idInstruccionPrimaria: null, instruccionPrimariaCentro: "-", instruccionPrimariaInicio: "", instruccionPrimariaTermino: "", instruccionPrimariaGrado: "-",
+        idInstruccionSecundaria: null, instruccionSecundariaCentro: "-", instruccionSecundariaInicio: "", instruccionSecundariaTermino: "", instruccionSecundariaGrado: "-",
+        idInstruccionTecnica: null, instruccionTecnicaCentro: "-", instruccionTecnicaInicio: "", instruccionTecnicaTermino: "", instruccionTecnicaGrado: "-",
+        idInstruccionSuperior: null, instruccionSuperiorCentro: "-", instruccionSuperiorInicio: "", instruccionSuperiorTermino: "", instruccionSuperiorGrado: "-",
+        idInstruccionOtros: null, instruccionOtrosCentro: "-", instruccionOtrosInicio: "", instruccionOtrosTermino: "", instruccionOtrosGrado: "-",
+
+        // Capacitación (input temporal)
+        // capacitacionTitulo: "",
+        // capacitacionCentro: "",
+        // capacitacionFechaInicio: "",
+        // capacitacionFechaTermino: "",
+        // capacitacionGrado: "",
+        // Experiencia Laboral (input temporal)
+        experienciaNombre: "",
+        experienciaTelefono: "",
+        experienciaCargo: "",
+        experienciaFechaInicio: "",
+        experienciaFechaTermino: "",
+        experienciaMotivo: "",
+        // Referencias Personales (input temporal)
+        referenciaNombres: "",
+        referenciaCentro: "",
+        referenciaCargo: "",
+        referenciaTelefono: "",
+        referenciaDireccion: "",
+
+        // Condiciones Laborales
         sueldoJornal: "",
         sistemaTrabajo: "",
-        grupoSanguineo: "",
         transporteTerrestre: "",
         transporteAereo: "",
         viaticos: "",
         viaticosValor: "",
         alimentacionContrata: "",
 
-        apto18: "",
-        aptitud: "",
-    };
+        //Pre-Evaluación
+        grupoSanguineo: "",
+        aptitudAltura18: undefined,
+        aptitud: undefined,
 
-    // Estado para listas dinámicas
-    const [familiares, setFamiliares] = useState([]);
+        // capacitaciones: [],
+        experiencias: [],
+        referencias: [],
+    };
 
     const {
         form,
         setForm,
         handleChange,
         handleChangeNumber,
-        handleChangeNumberDecimals,
         handleRadioButton,
+        handleRadioButtonBoolean,
         handleClear,
+        handleChangeSimple,
         handleClearnotO,
         handlePrintDefault,
+        handleChangeNumberDecimals,
     } = useForm(initialFormState, { storageKey: "fichaDatosPacientesPoderosa" });
 
     const handleSave = () => {
@@ -140,43 +168,109 @@ export default function FichaDatosPacientes() {
         { value: "OBRERO", label: "Obrero" },
     ];
 
-
-    // Funciones para Composición Familiar
-    const agregarFamiliar = () => {
-        if (form.familiarParentesco && form.familiarNombres) {
-            setFamiliares([
-                ...familiares,
-                {
-                    parentesco: form.familiarParentesco,
-                    nombres: form.familiarNombres,
-                    vive: form.familiarVive,
-                    fechaNac: form.familiarFechaNac,
-                    edad: form.familiarEdad,
-                    dni: form.familiarDni,
-                    grado: form.familiarGrado,
-                    autogenerado: form.familiarAutogenerado,
-                },
-            ]);
+    // Funciones para Capacitación
+    const agregarCapacitacion = () => {
+        if (form.capacitacionTitulo) {
             setForm({
                 ...form,
-                familiarParentesco: "",
-                familiarNombres: "",
-                familiarVive: "",
-                familiarFechaNac: "",
-                familiarEdad: "",
-                familiarDni: "",
-                familiarGrado: "",
-                familiarAutogenerado: "",
+                capacitaciones: [
+                    ...form.capacitaciones,
+                    {
+                        id: null,
+                        instruccion: form.capacitacionTitulo,
+                        centroEstudio: form.capacitacionCentro,
+                        fechaInicio: form.capacitacionFechaInicio,
+                        fechaTermino: form.capacitacionFechaTermino,
+                        gradoObtenido: form.capacitacionGrado,
+                    }
+                ],
+                capacitacionTitulo: "",
+                capacitacionCentro: "",
+                capacitacionFechaInicio: "",
+                capacitacionFechaTermino: "",
+                capacitacionGrado: "",
             });
         }
     };
 
-    const eliminarFamiliar = (index) => {
-        setFamiliares(familiares.filter((_, i) => i !== index));
+
+    const eliminarCapacitacion = (index) => {
+        setForm({
+            ...form,
+            capacitaciones: form.capacitaciones.filter((_, i) => i !== index)
+        });
     };
 
+    // Funciones para Experiencia Laboral
+    const agregarExperiencia = () => {
+        if (form.experienciaNombre) {
+            setForm({
+                ...form,
+                experiencias: [
+                    ...form.experiencias,
+                    {
+                        id: null,
+                        empresa: form.experienciaNombre,
+                        telefono: form.experienciaTelefono,
+                        cargoDesemp: form.experienciaCargo,
+                        fechaInicio: form.experienciaFechaInicio,
+                        fechaTermino: form.experienciaFechaTermino,
+                        motivoSalida: form.experienciaMotivo,
+                    }
+                ],
+                experienciaNombre: "",
+                experienciaTelefono: "",
+                experienciaCargo: "",
+                experienciaFechaInicio: "",
+                experienciaFechaTermino: "",
+                experienciaMotivo: "",
+            });
+        }
+    };
+
+    const eliminarExperiencia = (index) => {
+        setForm({
+            ...form,
+            experiencias: form.experiencias.filter((_, i) => i !== index)
+        });
+    };
+
+
+    // Funciones para Referencias Personales
+    const agregarReferencia = () => {
+        if (form.referenciaNombres) {
+            setForm({
+                ...form,
+                referencias: [
+                    ...form.referencias,
+                    {
+                        id: null,
+                        nombres: form.referenciaNombres,
+                        centroTrab: form.referenciaCentro,
+                        cargoDesemp: form.referenciaCargo,
+                        telefono: form.referenciaTelefono,
+                        direccion: form.referenciaDireccion,
+                    }
+                ],
+                referenciaNombres: "",
+                referenciaCentro: "",
+                referenciaCargo: "",
+                referenciaTelefono: "",
+                referenciaDireccion: "",
+            });
+        }
+    };
+
+    const eliminarReferencia = (index) => {
+        setForm({
+            ...form,
+            referencias: form.referencias.filter((_, i) => i !== index)
+        });
+    };
+
+
     return (
-        <div className=" space-y-3 p-4">
+        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
             {/* ===== SECCIÓN: N° ORDEN Y FECHA ===== */}
             <SectionFieldset legend="Información General" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
                 <InputTextOneLine
@@ -192,7 +286,7 @@ export default function FichaDatosPacientes() {
                     name="fechaIngreso"
                     type="date"
                     value={form.fechaIngreso}
-                    onChange={handleChange}
+                    onChange={handleChangeSimple}
                     labelWidth="120px"
                 />
                 <InputsRadioGroup
@@ -447,123 +541,82 @@ export default function FichaDatosPacientes() {
 
             {/* ===== SECCIÓN: COMPOSICIÓN FAMILIAR ===== */}
             <SectionFieldset legend="Composición Familiar">
-                <div className="grid grid-cols-8 gap-2 mb-3 items-end">
-                    <InputTextOneLine
-                        label="Parentesco"
-                        name="familiarParentesco"
-                        value={form.familiarParentesco}
-                        onChange={handleChange}
-                        labelOnTop
-                    />
-                    <InputTextOneLine
-                        label="Apellidos y Nombres"
-                        name="familiarNombres"
-                        value={form.familiarNombres}
-                        onChange={handleChange}
-                        labelOnTop
-                    />
-                    <InputTextOneLine
-                        label="Vive? Si o No"
-                        name="familiarVive"
-                        value={form.familiarVive}
-                        onChange={handleChange}
-                        labelOnTop
-                    />
-                    <InputTextOneLine
-                        label="Fecha Nacimiento"
-                        name="familiarFechaNac"
-                        type="date"
-                        value={form.familiarFechaNac}
-                        onChange={handleChange}
-                        labelOnTop
-                    />
-                    <InputTextOneLine
-                        label="Edad"
-                        name="familiarEdad"
-                        value={form.familiarEdad}
-                        onChange={handleChange}
-                        labelOnTop
-                    />
-                    <InputTextOneLine
-                        label="DNI Part. Nac."
-                        name="familiarDni"
-                        value={form.familiarDni}
-                        onChange={handleChange}
-                        labelOnTop
-                    />
-                    <InputTextOneLine
-                        label="Grado Instruc."
-                        name="familiarGrado"
-                        value={form.familiarGrado}
-                        onChange={handleChange}
-                        labelOnTop
-                    />
-                    <div className="flex flex-col gap-2">
-                        <label className="font-semibold">Autogenerado :</label>
-                        <div className="flex gap-2">
-                            <input
-                                name="familiarAutogenerado"
-                                value={form.familiarAutogenerado ?? ""}
-                                onChange={handleChange}
-                                className="border rounded px-2 py-1 w-full"
-                            />
-                            <button
-                                type="button"
-                                onClick={agregarFamiliar}
-                                className="bg-green-500 hover:bg-green-600 text-white w-8 h-8 rounded flex-shrink-0 flex items-center justify-center"
-                                title="Agregar familiar"
-                            >
-                                <FontAwesomeIcon icon={faCheckCircle} />
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border border-gray-300">
+                        <thead className="bg-gray-100">
+                            <tr>
+                                <th className="border border-gray-300 px-2 py-1"></th>
+                                <th className="border border-gray-300 px-2 py-1">Apellidos y Nombres</th>
+                                <th className="border border-gray-300 px-2 py-1">Vive? Si o No</th>
+                                <th className="border border-gray-300 px-2 py-1">Fecha Nacimiento</th>
+                                <th className="border border-gray-300 px-2 py-1">Edad</th>
+                                <th className="border border-gray-300 px-2 py-1">DNI</th>
+                                <th className="border border-gray-300 px-2 py-1">Grado Instruc.</th>
+                                <th className="border border-gray-300 px-2 py-1">Autogenerado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td className="border border-gray-300 px-2 py-1 font-semibold">Padre</td>
+                                <td><InputTextOneLine name="familiarPadreNombre" value={form.familiarPadreNombre ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="familiarPadreVive" value={form.familiarPadreVive ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine type="date" name="familiarPadreFechaNac" value={form.familiarPadreFechaNac ?? "-"} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine name="familiarPadreEdad" value={form.familiarPadreEdad ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="familiarPadreDni" value={form.familiarPadreDni ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="familiarPadreGrado" value={form.familiarPadreGrado ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="familiarPadreAutogenerado" value={form.familiarPadreAutogenerado ?? "-"} onChange={handleChange} /></td>
+                            </tr>
+                            <tr>
+                                <td className="border border-gray-300 px-2 py-1 font-semibold">Madre</td>
+                                <td><InputTextOneLine name="familiarMadreNombre" value={form.familiarMadreNombre ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="familiarMadreVive" value={form.familiarMadreVive ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine type="date" name="familiarMadreFechaNac" value={form.familiarMadreFechaNac ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine name="familiarMadreEdad" value={form.familiarMadreEdad ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="familiarMadreDni" value={form.familiarMadreDni ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="familiarMadreGrado" value={form.familiarMadreGrado ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="familiarMadreAutogenerado" value={form.familiarMadreAutogenerado ?? "-"} onChange={handleChange} /></td>
+                            </tr>
 
-                {familiares.length > 0 && (
-                    <div className="overflow-x-auto">
-                        <table className="w-full border-collapse border border-gray-300 ">
-                            <thead className="bg-gray-100">
-                                <tr>
-                                    <th className="border border-gray-300 px-2 py-1">Parentesco</th>
-                                    <th className="border border-gray-300 px-2 py-1">Apellidos y Nombres</th>
-                                    <th className="border border-gray-300 px-2 py-1">Vive? Si o No</th>
-                                    <th className="border border-gray-300 px-2 py-1">Fecha Nacimiento</th>
-                                    <th className="border border-gray-300 px-2 py-1">Edad</th>
-                                    <th className="border border-gray-300 px-2 py-1">DNI Part. Nac.</th>
-                                    <th className="border border-gray-300 px-2 py-1">Grado Instruc.</th>
-                                    <th className="border border-gray-300 px-2 py-1">Autogenerado</th>
-                                    <th className="border border-gray-300 px-2 py-1">Acción</th>
+                            <tr>
+                                <td className="border border-gray-300 px-2 py-1 font-semibold">Conviviente</td>
+                                <td><InputTextOneLine name="familiarConvivienteNombre" value={form.familiarConvivienteNombre ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="familiarConvivienteVive" value={form.familiarConvivienteVive ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine type="date" name="familiarConvivienteFechaNac" value={form.familiarConvivienteFechaNac ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine name="familiarConvivienteEdad" value={form.familiarConvivienteEdad ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="familiarConvivienteDni" value={form.familiarConvivienteDni ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="familiarConvivienteGrado" value={form.familiarConvivienteGrado ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="familiarConvivienteAutogenerado" value={form.familiarConvivienteAutogenerado ?? "-"} onChange={handleChange} /></td>
+                            </tr>
+
+                            <tr>
+                                <td className="border border-gray-300 px-2 py-1 font-semibold">Esposa</td>
+                                <td><InputTextOneLine name="familiarEsposaNombre" value={form.familiarEsposaNombre ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="familiarEsposaVive" value={form.familiarEsposaVive ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine type="date" name="familiarEsposaFechaNac" value={form.familiarEsposaFechaNac ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine name="familiarEsposaEdad" value={form.familiarEsposaEdad ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="familiarEsposaDni" value={form.familiarEsposaDni ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="familiarEsposaGrado" value={form.familiarEsposaGrado ?? "-"} onChange={handleChange} /></td>
+                                <td><InputTextOneLine name="familiarEsposaAutogenerado" value={form.familiarEsposaAutogenerado ?? "-"} onChange={handleChange} /></td>
+                            </tr>
+
+                            {[1, 2, 3, 4, 5].map((num) => (
+                                <tr key={num}>
+                                    <td className="border border-gray-300 px-2 py-1 font-semibold">Hijo</td>
+                                    <td><InputTextOneLine name={`familiarHijo${num}Nombre`} value={form[`familiarHijo${num}Nombre`] ?? "-"} onChange={handleChange} /></td>
+                                    <td><InputTextOneLine name={`familiarHijo${num}Vive`} value={form[`familiarHijo${num}Vive`] ?? "-"} onChange={handleChange} /></td>
+                                    <td><InputTextOneLine type="date" name={`familiarHijo${num}FechaNac`} value={form[`familiarHijo${num}FechaNac`] ?? ""} onChange={handleChangeSimple} /></td>
+                                    <td><InputTextOneLine name={`familiarHijo${num}Edad`} value={form[`familiarHijo${num}Edad`] ?? "-"} onChange={handleChange} /></td>
+                                    <td><InputTextOneLine name={`familiarHijo${num}Dni`} value={form[`familiarHijo${num}Dni`] ?? "-"} onChange={handleChange} /></td>
+                                    <td><InputTextOneLine name={`familiarHijo${num}Grado`} value={form[`familiarHijo${num}Grado`] ?? "-"} onChange={handleChange} /></td>
+                                    <td><InputTextOneLine name={`familiarHijo${num}Autogenerado`} value={form[`familiarHijo${num}Autogenerado`] ?? "-"} onChange={handleChange} /></td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {familiares.map((fam, index) => (
-                                    <tr key={index}>
-                                        <td className="border border-gray-300 px-2 py-1">{fam.parentesco}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{fam.nombres}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{fam.vive}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{fam.fechaNac}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{fam.edad}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{fam.dni}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{fam.grado}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{fam.autogenerado}</td>
-                                        <td className="border border-gray-300 px-2 py-1 text-center">
-                                            <button
-                                                type="button"
-                                                onClick={() => eliminarFamiliar(index)}
-                                                className="text-red-500 hover:text-red-700"
-                                            >
-                                                <FontAwesomeIcon icon={faTrash} />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </SectionFieldset>
 
-            {/* ===== SECCIÓN: EMERGENCIA ===== */}
+            {/* ===== SECCIÓN EMERGENCIA ===== */}
             <SectionFieldset legend="En Caso de Emergencia Notificar A" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div className="space-y-3">
                     <InputTextOneLine
@@ -606,10 +659,350 @@ export default function FichaDatosPacientes() {
                 </div>
             </SectionFieldset>
 
+            {/* ===== SECCIÓN: INSTRUCCIÓN ADQUIRIDA ===== */}
+            <SectionFieldset legend="Instrucción Adquirida">
+                <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border border-gray-300 ">
+                        <thead className="bg-gray-100">
+                            <tr>
+                                <th className="border border-gray-300 px-2 py-1">Instrucción</th>
+                                <th className="border border-gray-300 px-2 py-1">Centro de Estudios</th>
+                                <th className="border border-gray-300 px-2 py-1">Fecha Inicio</th>
+                                <th className="border border-gray-300 px-2 py-1">Fecha Termino</th>
+                                <th className="border border-gray-300 px-2 py-1">Grado Obtenido</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td className="border border-gray-300 px-2 py-1">Primaria</td>
+                                <td><InputTextOneLine name="instruccionPrimariaCentro" value={form.instruccionPrimariaCentro ?? ""} onChange={handleChange} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionPrimariaInicio" value={form.instruccionPrimariaInicio ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionPrimariaTermino" value={form.instruccionPrimariaTermino ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine name="instruccionPrimariaGrado" value={form.instruccionPrimariaGrado ?? ""} onChange={handleChange} /></td>
+                            </tr>
+
+                            <tr>
+                                <td className="border border-gray-300 px-2 py-1">Secundaria</td>
+                                <td><InputTextOneLine name="instruccionSecundariaCentro" value={form.instruccionSecundariaCentro ?? ""} onChange={handleChange} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionSecundariaInicio" value={form.instruccionSecundariaInicio ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionSecundariaTermino" value={form.instruccionSecundariaTermino ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine name="instruccionSecundariaGrado" value={form.instruccionSecundariaGrado ?? ""} onChange={handleChange} /></td>
+                            </tr>
+
+                            <tr>
+                                <td className="border border-gray-300 px-2 py-1">Técnica</td>
+                                <td><InputTextOneLine name="instruccionTecnicaCentro" value={form.instruccionTecnicaCentro ?? ""} onChange={handleChange} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionTecnicaInicio" value={form.instruccionTecnicaInicio ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionTecnicaTermino" value={form.instruccionTecnicaTermino ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine name="instruccionTecnicaGrado" value={form.instruccionTecnicaGrado ?? ""} onChange={handleChange} /></td>
+                            </tr>
+
+                            <tr>
+                                <td className="border border-gray-300 px-2 py-1">Superior</td>
+                                <td><InputTextOneLine name="instruccionSuperiorCentro" value={form.instruccionSuperiorCentro ?? ""} onChange={handleChange} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionSuperiorInicio" value={form.instruccionSuperiorInicio ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionSuperiorTermino" value={form.instruccionSuperiorTermino ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine name="instruccionSuperiorGrado" value={form.instruccionSuperiorGrado ?? ""} onChange={handleChange} /></td>
+                            </tr>
+
+                            <tr>
+                                <td className="border border-gray-300 px-2 py-1">Otros</td>
+                                <td><InputTextOneLine name="instruccionOtrosCentro" value={form.instruccionOtrosCentro ?? ""} onChange={handleChange} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionOtrosInicio" value={form.instruccionOtrosInicio ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine type="date" name="instruccionOtrosTermino" value={form.instruccionOtrosTermino ?? ""} onChange={handleChangeSimple} /></td>
+                                <td><InputTextOneLine name="instruccionOtrosGrado" value={form.instruccionOtrosGrado ?? ""} onChange={handleChange} /></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </SectionFieldset>
+
+            {/* ===== SECCIÓN: CAPACITACIÓN ===== */}
+            {/* <SectionFieldset legend="Capacitación">
+                <div className="grid grid-cols-5 gap-2 mb-3 items-end">
+                    <InputTextOneLine
+                        label="Titulo Capacitación"
+                        name="capacitacionTitulo"
+                        value={form.capacitacionTitulo}
+                        onChange={handleChange}
+                        labelOnTop
+                    />
+                    <InputTextOneLine
+                        label="Centro de Estudios"
+                        name="capacitacionCentro"
+                        value={form.capacitacionCentro}
+                        onChange={handleChange}
+                        labelOnTop
+                    />
+                    <InputTextOneLine
+                        label="Fecha Inicio"
+                        name="capacitacionFechaInicio"
+                        type="date"
+                        value={form.capacitacionFechaInicio}
+                        onChange={handleChangeSimple}
+                        labelOnTop
+                    />
+                    <InputTextOneLine
+                        label="Fecha Término"
+                        name="capacitacionFechaTermino"
+                        type="date"
+                        value={form.capacitacionFechaTermino}
+                        onChange={handleChangeSimple}
+                        labelOnTop
+                    />
+                    <div className="flex flex-col gap-2">
+                        <label className="font-semibold">Grado Obtenido :</label>
+                        <div className="flex gap-2">
+                            <input
+                                name="capacitacionGrado"
+                                value={form.capacitacionGrado ?? ""}
+                                onChange={handleChange}
+                                className="border rounded px-2 py-1 w-full"
+                            />
+                            <button
+                                type="button"
+                                onClick={agregarCapacitacion}
+                                className="bg-green-500 hover:bg-green-600 text-white w-8 h-8 rounded flex-shrink-0 flex items-center justify-center"
+                                title="Agregar capacitación"
+                            >
+                                <FontAwesomeIcon icon={faCheckCircle} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {form.capacitaciones.length > 0 && (
+                    <div className="overflow-x-auto">
+                        <table className="w-full border-collapse border border-gray-300 ">
+                            <thead className="bg-gray-100">
+                                <tr>
+                                    <th className="border border-gray-300 px-2 py-1">Titulo</th>
+                                    <th className="border border-gray-300 px-2 py-1">Centro de Estudios</th>
+                                    <th className="border border-gray-300 px-2 py-1">Fecha Inicio</th>
+                                    <th className="border border-gray-300 px-2 py-1">Fecha Término</th>
+                                    <th className="border border-gray-300 px-2 py-1">Grado Obtenido</th>
+                                    <th className="border border-gray-300 px-2 py-1">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {form.capacitaciones.map((cap, index) => (
+                                    <tr key={index}>
+                                        <td className="border border-gray-300 px-2 py-1">{cap.instruccion}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{cap.centroEstudio}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{cap.fechaInicio}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{cap.fechaTermino}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{cap.gradoObtenido}</td>
+                                        <td className="border border-gray-300 px-2 py-1 text-center">
+                                            <button
+                                                type="button"
+                                                onClick={() => eliminarCapacitacion(index)}
+                                                className="text-red-500 hover:text-red-700"
+                                            >
+                                                <FontAwesomeIcon icon={faTrash} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </SectionFieldset> */}
+
+            {/* ===== SECCIÓN: EXPERIENCIA LABORAL ===== */}
+            <SectionFieldset legend="Experiencia Laboral (Comenzar por último empleo)">
+                <div className="grid grid-cols-6 gap-2 mb-3 items-end">
+                    <InputTextOneLine
+                        label="Nombre de la Empresa"
+                        name="experienciaNombre"
+                        value={form.experienciaNombre}
+                        onChange={handleChange}
+                        labelOnTop
+                    />
+                    <InputTextOneLine
+                        label="Teléfono"
+                        name="experienciaTelefono"
+                        value={form.experienciaTelefono}
+                        onChange={handleChange}
+                        labelOnTop
+                    />
+                    <InputTextOneLine
+                        label="Cargo Desempeñado"
+                        name="experienciaCargo"
+                        value={form.experienciaCargo}
+                        onChange={handleChange}
+                        labelOnTop
+                    />
+                    <InputTextOneLine
+                        label="Fecha Inicio"
+                        name="experienciaFechaInicio"
+                        type="date"
+                        value={form.experienciaFechaInicio}
+                        onChange={handleChangeSimple}
+                        labelOnTop
+                    />
+                    <InputTextOneLine
+                        label="Fecha Término"
+                        name="experienciaFechaTermino"
+                        type="date"
+                        value={form.experienciaFechaTermino}
+                        onChange={handleChangeSimple}
+                        labelOnTop
+                    />
+                    <div className="flex flex-col gap-2">
+                        <label className="font-semibold">Motivo de Salida :</label>
+                        <div className="flex gap-2">
+                            <input
+                                name="experienciaMotivo"
+                                value={form.experienciaMotivo ?? ""}
+                                onChange={handleChange}
+                                className="border rounded px-2 py-1 w-full"
+                            />
+                            <button
+                                type="button"
+                                onClick={agregarExperiencia}
+                                className="bg-green-500 hover:bg-green-600 text-white w-8 h-8 rounded flex-shrink-0 flex items-center justify-center"
+                                title="Agregar experiencia"
+                            >
+                                <FontAwesomeIcon icon={faCheckCircle} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {/* Tabla de experiencias agregadas */}
+                {form.experiencias.length > 0 && (
+                    <div className="overflow-x-auto">
+                        <table className="w-full border-collapse border border-gray-300 ">
+                            <thead className="bg-gray-100">
+                                <tr>
+                                    <th className="border border-gray-300 px-2 py-1">Nombre de la Empresa</th>
+                                    <th className="border border-gray-300 px-2 py-1">Teléfono</th>
+                                    <th className="border border-gray-300 px-2 py-1">Cargo Desempeñado</th>
+                                    <th className="border border-gray-300 px-2 py-1">Fecha Inicio</th>
+                                    <th className="border border-gray-300 px-2 py-1">Fecha Término</th>
+                                    <th className="border border-gray-300 px-2 py-1">Motivo de Salida</th>
+                                    <th className="border border-gray-300 px-2 py-1">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {form.experiencias.map((exp, index) => (
+                                    <tr key={index}>
+                                        <td className="border border-gray-300 px-2 py-1">{exp.empresa}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{exp.telefono}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{exp.cargoDesemp}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{exp.fechaInicio}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{exp.fechaTermino}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{exp.motivoSalida}</td>
+                                        <td className="border border-gray-300 px-2 py-1 text-center">
+                                            <button
+                                                type="button"
+                                                onClick={() => eliminarExperiencia(index)}
+                                                className="text-red-500 hover:text-red-700"
+                                            >
+                                                <FontAwesomeIcon icon={faTrash} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </SectionFieldset>
+
+            {/* ===== SECCIÓN: REFERENCIAS PERSONALES ===== */}
+            <SectionFieldset legend="Referencias Personales">
+                <div className="grid grid-cols-5 gap-2 mb-3 items-end">
+                    <InputTextOneLine
+                        label="Apellidos y Nombres"
+                        name="referenciaNombres"
+                        value={form.referenciaNombres}
+                        onChange={handleChange}
+                        labelOnTop
+                    />
+                    <InputTextOneLine
+                        label="Centro de Trabajo"
+                        name="referenciaCentro"
+                        value={form.referenciaCentro}
+                        onChange={handleChange}
+                        labelOnTop
+                    />
+                    <InputTextOneLine
+                        label="Cargo"
+                        name="referenciaCargo"
+                        value={form.referenciaCargo}
+                        onChange={handleChange}
+                        labelOnTop
+                    />
+                    <InputTextOneLine
+                        label="Telefono"
+                        name="referenciaTelefono"
+                        value={form.referenciaTelefono}
+                        onChange={handleChange}
+                        labelOnTop
+                    />
+                    <div className="flex flex-col gap-2">
+                        <label className="font-semibold">Dirección :</label>
+                        <div className="flex gap-2">
+                            <input
+                                name="referenciaDireccion"
+                                value={form.referenciaDireccion ?? ""}
+                                onChange={handleChange}
+                                className="border rounded px-2 py-1 w-full"
+                            />
+                            <button
+                                type="button"
+                                onClick={agregarReferencia}
+                                className="bg-green-500 hover:bg-green-600 text-white w-8 h-8 rounded flex-shrink-0 flex items-center justify-center"
+                                title="Agregar referencia"
+                            >
+                                <FontAwesomeIcon icon={faCheckCircle} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {/* Tabla de referencias agregadas */}
+                {form.referencias.length > 0 && (
+                    <div className="overflow-x-auto">
+                        <table className="w-full border-collapse border border-gray-300 ">
+                            <thead className="bg-gray-100">
+                                <tr>
+                                    <th className="border border-gray-300 px-2 py-1">Apellidos y Nombres</th>
+                                    <th className="border border-gray-300 px-2 py-1">Centro de Trabajo</th>
+                                    <th className="border border-gray-300 px-2 py-1">Cargo</th>
+                                    <th className="border border-gray-300 px-2 py-1">Telefono</th>
+                                    <th className="border border-gray-300 px-2 py-1">Dirección</th>
+                                    <th className="border border-gray-300 px-2 py-1">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {form.referencias.map((ref, index) => (
+                                    <tr key={index}>
+                                        <td className="border border-gray-300 px-2 py-1">{ref.nombres}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{ref.centroTrab}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{ref.cargoDesemp}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{ref.telefono}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{ref.direccion}</td>
+                                        <td className="border border-gray-300 px-2 py-1 text-center">
+                                            <button
+                                                type="button"
+                                                onClick={() => eliminarReferencia(index)}
+                                                className="text-red-500 hover:text-red-700"
+                                            >
+                                                <FontAwesomeIcon icon={faTrash} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </SectionFieldset>
 
             {/* ===== SECCIÓN: CONDICIONES LABORALES ===== */}
             <SectionFieldset legend="Condiciones Laborales, a cuenta de la Ctta.">
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid xl:grid-cols-3 gap-x-4 gap-y-3">
                     <div className="space-y-3">
                         <InputTextOneLine
                             label="Sueldo/Jornal"
@@ -625,67 +1018,41 @@ export default function FichaDatosPacientes() {
                             disabled
                             labelWidth="100px"
                         />
-                        <InputTextOneLine
-                            label="G.Sang."
-                            name="grupoSanguineo"
-                            value={form.grupoSanguineo}
+
+                    </div>
+                    <div className="space-y-3">
+                        <InputsRadioGroup
+                            label="Transporte Terrestre"
+                            name="transporteTerrestre"
+                            value={form.transporteTerrestre}
+                            labelWidth="100px"
                             disabled
+                            options={[{ value: "SI", label: "SI" }, { value: "NO", label: "NO" }]}
+                        />
+                        <InputsRadioGroup
+                            label="Transporte Aéreo"
+                            name="transporteAereo"
+                            value={form.transporteAereo}
+                            disabled
+                            options={[{ value: "SI", label: "SI" }, { value: "NO", label: "NO" }]}
                             labelWidth="100px"
                         />
                     </div>
                     <div className="space-y-3">
-                        <InputsBooleanRadioGroup
-                            label="Transporte Terrestre"
-                            name="transporteTerrestre"
-                            value={form.transporteTerrestre}
-                            labelWidth="140px"
-                            disabled
-                        />
-                        <InputsBooleanRadioGroup
-                            label="Transporte Aéreo"
-                            name="transporteAereo"
-                            labelWidth="140px"
-                            value={form.transporteAereo}
-                            disabled
-                        />
-                        <InputsRadioGroup
-                            label="Apto Altura 1.8"
-                            name="apto18"
-                            value={form.apto18}
-                            labelWidth="140px"
-                            disabled
-                            options={[
-                                { label: "SI", value: "SI" },
-                                { label: "NO", value: "NO" },
-                            ]}
-                        />
-                        <InputsRadioGroup
-                            label="Aptitud"
-                            name="aptitud"
-                            value={form.aptitud}
-                            labelWidth="140px"
-                            disabled
-                            options={[
-                                { label: "APTO", value: "APTO" },
-                                { label: "NO APTO", value: "NO APTO" },
-                                { label: "APTO CON RESTRICCIÓN", value: "APTO CON RESTRICCIÓN" },
-                            ]}
-                        />
-                    </div>
-                    <div className="space-y-3">
-                        <div className="flex items-center gap-4">
-                            <InputsBooleanRadioGroup
-                                name="viaticos"
+                        <div className="flex items-center gap-x-4">
+                            <InputsRadioGroup
                                 label="Viáticos"
+                                name="viaticos"
                                 value={form.viaticos}
-                                labelWidth="140px"
                                 disabled
+                                labelWidth="100px"
+                                options={[{ value: "SI", label: "SI" }, { value: "NO", label: "NO" }]}
                             />
                             <InputTextOneLine
                                 name="viaticosValor"
-                                value={form.viaticosValor}
-                                disabled
+                                value={form.viaticosValor ?? ""}
                                 className="w-full"
+                                disabled
                             />
                         </div>
                         <InputTextOneLine
@@ -693,12 +1060,40 @@ export default function FichaDatosPacientes() {
                             name="alimentacionContrata"
                             value={form.alimentacionContrata}
                             disabled
-                            labelWidth="140px"
+                            labelWidth="100px"
                         />
                     </div>
                 </div>
             </SectionFieldset>
+            <SectionFieldset legend="Pre-Evaluación" className="grid xl:grid-cols-3 gap-x-4 gap-y-3">
+                <InputTextOneLine
+                    label="Grupo Sanguíneo"
+                    name="grupoSanguineo"
+                    value={form.grupoSanguineo}
+                    disabled
+                    labelWidth="100px"
+                />
+                <InputsBooleanRadioGroup
+                    label="Aptitud Altura 1.8"
+                    name="aptitudAltura18"
+                    value={form.aptitudAltura18}
+                    trueLabel="Apto"
+                    falseLabel="No Apto"
+                    disabled
+                    labelWidth="120px"
+                />
+                <InputsBooleanRadioGroup
+                    label="Aptitud"
+                    name="aptitud"
+                    value={form.aptitud}
+                    onChange={handleRadioButtonBoolean}
+                    trueLabel="Apto"
+                    falseLabel="No Apto"
+                    labelWidth="120px"
+                />
+            </SectionFieldset>
 
+            {/* BOTONES DE ACCIÓN */}
             <BotonesAccion
                 form={form}
                 handleSave={handleSave}

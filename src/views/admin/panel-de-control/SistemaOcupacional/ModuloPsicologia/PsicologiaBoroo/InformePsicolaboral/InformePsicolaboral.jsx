@@ -179,14 +179,14 @@ export default function InformePsicolaboral() {
 
       <SectionFieldset legend="Datos del Paciente" className="m-4">
         {/* Fila 1: Nombres, DNI, Edad, Género */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
+        <div className="grid grid-cols-1 2xl:grid-cols-2 gap-x-4 gap-y-3">
           <InputTextOneLine
             label="Nombres y Apellidos"
             name="nombres"
             value={form?.nombres}
             disabled
           />
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid 2xl:grid-cols-3 gap-4">
             <InputTextOneLine
               label="DNI"
               name="dni"

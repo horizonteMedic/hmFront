@@ -139,12 +139,17 @@ export const PrintHojaR = async (form, token) => {
     
     if (res.norden) {
       const nombre = res.nameJasper;
+      console.log('📄 Jasper a llamar:', nombre);
+      console.log('📋 Datos recibidos:', res);
       const jasperModules = import.meta.glob('../../../../../../jaspers/Consentimientos/*.jsx');
-      const modulo = await jasperModules[`../../../../../../jaspers/Consentimientos/${nombre}.jsx`]();
+      const rutaCompleta = `../../../../../../jaspers/Consentimientos/${nombre}.jsx`;
+      console.log('🔍 Buscando módulo en:', rutaCompleta);
+      const modulo = await jasperModules[rutaCompleta]();
       if (typeof modulo.default === 'function') {
+        console.log('✅ Módulo encontrado y función válida, ejecutando...');
         modulo.default(res);
       } else {
-        console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+        console.error(`❌ El archivo ${nombre}.jsx no exporta una función por defecto`);
       }
     } else {
       Swal.fire({

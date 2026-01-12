@@ -6,9 +6,6 @@ import {
   faUsers,
   faListCheck,
   faCheck,
-  faBroom,
-  faPrint,
-  faSave,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   InputTextOneLine,

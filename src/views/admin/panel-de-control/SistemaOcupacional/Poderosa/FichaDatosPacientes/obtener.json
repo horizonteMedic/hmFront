@@ -1,0 +1,123 @@
+{
+  "dniPaciente": 0,
+  "nombresPaciente": "string",
+  "apellidosPaciente": "string",
+  "direccionPaciente": "string",
+  "sexoPaciente": "string",
+  "fechaNacimientoPaciente": "2026-01-09",
+  "ocupacionPaciente": "string",
+  "lugarNacimientoPaciente": "string",
+  "nivelEstudioPaciente": "string",
+  "estadoCivilPaciente": "string",
+  "cargoPaciente": "string",
+  "areaPaciente": "string",
+  "contrata": "string",
+  "norden": 0,
+  "empresa": "string",
+  "codigoClinica": "string",
+  "tipoExamen": "string",
+  "edadPaciente": "string",
+  "talla": "string",
+  "peso": "string",
+  "grupoSanguineo": "string",
+  "id": 0,
+  "fechaIngreso": "2026-01-09",
+  "empleado": true,
+  "obrero": true,
+  "codigoActividad": "string",
+  "codigoDepartamento": "string",
+  "zona": "string",
+  "distrito": "string",
+  "provincia": "string",
+  "departamento": "string",
+  "lincenciaConducir": "string",
+  "lm": "string",
+  "afp": "string",
+  "cussp": "string",
+  "autogenerado": "string",
+  "referenciaDomicilio": "string",
+  "viviendaPropia": true,
+  "viviendaAlquilada": true,
+  "radioFrecuencia": "string",
+  "numeroCuenta": "string",
+  "banco": "string",
+  "nombreEmergencia": "string",
+  "parentescoEmergencia": "string",
+  "telefonoEmergencia": "string",
+  "domicilioEmergencia": "string",
+  "otraReferenciaEmergencia": "string",
+  "sueldo": "string",
+  "sistemaTrabajo": "string",
+  "transporteTerrestreSi": true,
+  "transporteTerrestreNo": true,
+  "transporteAereoSi": true,
+  "transporteAereoNo": true,
+  "viaticosSi": true,
+  "viaticosNo": true,
+  "viaticosDescripcion": "string",
+  "alimentacionContrata": "string",
+  "apellidoPaterno": "string",
+  "apellidoMaterno": "string",
+  "usuarioRegistro": "string",
+  "composicionFamiliar": [
+    {
+      "id": 0,
+      "idFichaDatosPersonales": 0,
+      "parentesco": "string",
+      "nombres": "string",
+      "vive": "string",
+      "fechaNacimiento": "string",
+      "edad": "string",
+      "dni": "string",
+      "gradoInstruccion": "string",
+      "autogenerado": "string"
+    }
+  ],
+  "experienciaLaboral": [
+    {
+      "id": 0,
+      "idFichaDatosPersonales": 0,
+      "empresa": "string",
+      "telefono": "string",
+      "cargoDesemp": "string",
+      "fechaInicio": "string",
+      "fechaTermino": "string",
+      "motivoSalida": "string"
+    }
+  ],
+  "instruccionAdquirida": [
+    {
+      "id": 0,
+      "idFichaDatosPersonales": 0,
+      "instruccion": "string",
+      "centroEstudio": "string",
+      "fechaInicio": "string",
+      "fechaTermino": "string",
+      "gradoObtenido": "string",
+      "cap": 0
+    }
+  ],
+  "referenciasPersonales": [
+    {
+      "id": 0,
+      "idFichaDatosPersonales": 0,
+      "nombres": "string",
+      "centroTrab": "string",
+      "cargoDesemp": "string",
+      "telefono": "string",
+      "direccion": "string"
+    }
+  ],
+  "nombreSede": "string",
+  "sede": "string",
+  "color": 0,
+  "nameJasper": "string",
+  "textoColor": "string",
+  "codigoColor": "string",
+  "digitalizacion": [
+    {
+      "nombreDigitalizacion": "string",
+      "url": "string"
+    }
+  ]
+}

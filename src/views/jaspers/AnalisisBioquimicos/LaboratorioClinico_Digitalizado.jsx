@@ -78,6 +78,66 @@ export default async function LaboratorioClinico_Digitalizado_nuevo(data = {}, d
     });
   };
 
+  // Función para calcular altura necesaria para un texto sin dibujarlo
+  const calcularAlturaTexto = (texto, anchoMaximo, fontSize = 8) => {
+    if (!texto) return filaAltura;
+    doc.setFontSize(fontSize);
+    const palabras = texto.split(' ');
+    let lineaActual = '';
+    let lineas = 1;
+
+    palabras.forEach(palabra => {
+      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+      const anchoTexto = doc.getTextWidth(textoPrueba);
+
+      if (anchoTexto <= anchoMaximo) {
+        lineaActual = textoPrueba;
+      } else {
+        if (lineaActual) {
+          lineas++;
+          lineaActual = palabra;
+        } else {
+          lineas++;
+        }
+      }
+    });
+
+    return Math.max(lineas * fontSize * 0.35 + 1.5, filaAltura);
+  };
+
+  // Función para texto con salto de línea
+  const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
+    if (!texto) return y;
+    const fontSize = doc.internal.getFontSize();
+    const palabras = texto.split(' ');
+    let lineaActual = '';
+    let yPos = y;
+
+    palabras.forEach(palabra => {
+      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+      const anchoTexto = doc.getTextWidth(textoPrueba);
+
+      if (anchoTexto <= anchoMaximo) {
+        lineaActual = textoPrueba;
+      } else {
+        if (lineaActual) {
+          doc.text(lineaActual, x, yPos);
+          yPos += fontSize * 0.35;
+          lineaActual = palabra;
+        } else {
+          doc.text(palabra, x, yPos);
+          yPos += fontSize * 0.35;
+        }
+      }
+    });
+
+    if (lineaActual) {
+      doc.text(lineaActual, x, yPos);
+    }
+
+    return yPos;
+  };
+
   // Función para dibujar header de sección con fondo gris
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
     doc.setDrawColor(0, 0, 0);
@@ -213,23 +273,31 @@ export default async function LaboratorioClinico_Digitalizado_nuevo(data = {}, d
   doc.text(datosReales.contrata, tablaInicioX + 22, yPos + 3.5);
   yPos += filaAltura;
 
-  // Cargo, Área (2 columnas)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + 100, yPos, tablaInicioX + 100, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  // Cargo (fila completa con altura dinámica)
+  const alturaCargo = calcularAlturaTexto(datosReales.cargo || "", tablaAncho - 20, 8);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaCargo);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaCargo);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos + alturaCargo, tablaInicioX + tablaAncho, yPos + alturaCargo);
 
   doc.setFont("helvetica", "bold");
   doc.text("Cargo:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datosReales.cargo, tablaInicioX + 18, yPos + 3.5);
+  dibujarTextoConSaltoLinea(datosReales.cargo, tablaInicioX + 18, yPos + 3.5, tablaAncho - 25);
+  yPos += alturaCargo;
+
+  // Área (fila completa con altura dinámica)
+  const alturaArea = calcularAlturaTexto(datosReales.areaTrabajo || "", tablaAncho - 20, 8);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaArea);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaArea);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaArea, tablaInicioX + tablaAncho, yPos + alturaArea);
 
   doc.setFont("helvetica", "bold");
-  doc.text("Área:", tablaInicioX + 102, yPos + 3.5);
+  doc.text("Área:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datosReales.areaTrabajo, tablaInicioX + 115, yPos + 3.5);
-  yPos += filaAltura;
+  dibujarTextoConSaltoLinea(datosReales.areaTrabajo, tablaInicioX + 18, yPos + 3.5, tablaAncho - 25);
+  yPos += alturaArea;
 
   // === SECCIÓN 3: HEMATOLOGÍA ===
   yPos = dibujarHeaderSeccion("HEMATOLOGÍA", yPos, filaAltura);
