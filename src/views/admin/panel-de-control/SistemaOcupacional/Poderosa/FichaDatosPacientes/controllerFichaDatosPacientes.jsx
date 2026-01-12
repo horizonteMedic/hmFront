@@ -5,6 +5,7 @@ import {
     LoadingDefault,
     PrintHojaRDefault,
     SubmitDataServiceDefault,
+    SubmitDataServiceDefaultManejo,
     VerifyTRPerzonalizadoDefault,
 } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
@@ -447,7 +448,7 @@ export const SubmitDataService = async (
         referenciasPersonales: form.referencias.map(item => ({ ...item, idFichaDatosPersonales: form.norden })),
     };
 
-    await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
+    await SubmitDataServiceDefaultManejo(token, limpiar, body, registrarUrl, () => {
         PrintHojaR(form.norden, token, tabla, datosFooter);
     });
 };

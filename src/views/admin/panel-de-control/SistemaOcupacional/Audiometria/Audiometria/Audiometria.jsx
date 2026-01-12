@@ -621,8 +621,8 @@ export default function Audiometria() {
                   <div key={hz}>
                     <p>{hz}</p>
                     <InputTextOneLine
-                      name={`od_${hz}`}
-                      value={form[`od_${hz}`]}
+                      name={`oi_${hz}`}
+                      value={form[`oi_${hz}`]}
                       onChange={handleChangeNumber}
                       onKeyUp={handleFocusNext}
                     />

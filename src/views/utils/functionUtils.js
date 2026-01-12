@@ -292,49 +292,6 @@ export const GetInfoServicioDefaultManejo = async (
         onFinish();
     }
 };
-// export const GetInfoServicioDefaultManejo = async (
-//     nro,
-//     tabla,
-//     token,
-//     obtenerReporteUrl,
-//     onFinish = () => { }
-// ) => {
-//     try {
-//         const respuesta = await getFetch(
-//             `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=false`,
-//             token
-//         );
-//         if (respuesta?.codigo && respuesta?.codigo != null) {
-//             if (respuesta.codigo == 200) {
-//                 return respuesta.resultado;
-//             }
-//             else {
-//                 const { id, mensaje, detalle, codigo } = respuesta.resultado;
-//                 Swal.fire({
-//                     icon: "error",
-//                     title: (mensaje && `${mensaje} ${id && `(${id})`}`) || "Error",
-//                     html: `
-//                         <div style="text-align:left">
-//                         <p><strong>Código:</strong> ${codigo}</p>
-//                         <p><strong>Detalle:</strong> ${detalle}</p>
-//                         </div>
-//                     `,
-//                     confirmButtonText: "Entendido"
-//                 });
-//                 return null;
-//             }
-
-//         } else {
-//             Swal.fire("Error", "Ocurrió un error al traer los datos", "error");
-//             return null;
-//         }
-//     } catch (error) {
-//         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
-//         return null;
-//     } finally {
-//         onFinish();
-//     }
-// };
 
 export const SubmitDataServiceDefault = async (
     token,
@@ -372,6 +329,44 @@ export const SubmitDataServiceDefault = async (
             Swal.fire("Error", "Ocurrio un error al Registrar", "error");
         }
     });
+};
+export const SubmitDataServiceDefaultManejo = async (
+    token,
+    limpiar,
+    body,
+    registrarUrl,
+    onPrint = () => { },
+    tienePrint = true,
+) => {
+    try {
+        LoadingDefault("Registrando Datos");
+        const res = await SubmitDataManejo(body, registrarUrl, token)
+        if (tienePrint) {
+            Swal.fire({
+                title: "Exito",
+                text: `${res.mensaje ?? ""},\n¿Desea imprimir?`,
+                icon: "success",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    onPrint();
+                }
+            });
+        } else {
+            Swal.fire({
+                title: "Exito",
+                text: `${res.mensaje ?? ""}`,
+                icon: "success",
+            })
+        }
+        limpiar();
+    } catch (error) {
+        console.error(error);
+        Swal.fire("Error", "Ocurrio un error al registrar los datos", "error");
+        return null;
+    }
 };
 
 export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, userlogued, token, coordenadas) => {
