@@ -45,6 +45,22 @@ const ExamenesList = [
         url: "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2",
         esJasper: true
     },
+    //ANEXO 02
+    {
+        nombre: "ANEXO 02",
+        resultado: false,
+        tabla: "anexo_agroindustrial",
+        url: "/api/v01/ct/anexos/anexo2/obtenerReporteAnexo2Completo",
+        esJasper: true
+    },
+    //Certificado en Altura
+    {
+        nombre: "CERTIFICADO ALTURA",
+        resultado: false,
+        tabla: "b_certificado_altura",
+        url: "/api/v01/ct/certificadoTrabajoAltura/obtenerReporteCertificadoTrabajoAltura",
+        esJasper: true
+    },
     {
         nombre: "ENFERMEDADES EN ALTURA ",
         resultado: false,
