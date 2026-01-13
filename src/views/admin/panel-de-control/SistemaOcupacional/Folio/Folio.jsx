@@ -7,15 +7,13 @@ import { getToday } from "../../../../utils/helpers";
 import { GetInfoPac } from "./controllerFolio";
 import Swal from "sweetalert2";
 
-const today = getToday();
-
 const ExamenesList = [
-    {
-        nombre: "RESUMEN MEDICO PODEROSA", //NUEVO
-        resultado: false,
-        tabla: "resumen_medico_poderosa",
-        url: "/api/v01/ct/anexos/obtenerReporteResumenMedico",
-    },
+    // {
+    //     nombre: "RESUMEN MEDICO PODEROSA", //NUEVO
+    //     resultado: false,
+    //     tabla: "resumen_medico_poderosa",
+    //     url: "/api/v01/ct/anexos/obtenerReporteResumenMedico",
+    // },
     {
         nombre: "CONSTANCIA DE EXAMEN MEDICO OCUPACIONAL",
         resultado: false,
@@ -76,12 +74,12 @@ const ExamenesList = [
         esJasper: true
     },
     //PSICOSENSOMETRICO
-    {
-        nombre: "PSICOSENSOMETRICO ",//NUEVO ARCHIVO EXTERNO
-        resultado: false,
-        tabla: "PSICOSENSOMETRICO",
-        url: ""
-    },
+    // {
+    //     nombre: "PSICOSENSOMETRICO ",//NUEVO ARCHIVO EXTERNO
+    //     resultado: false,
+    //     tabla: "PSICOSENSOMETRICO",
+    //     url: ""
+    // },
     //Certificado en Altura PODEROSA
     {
         nombre: "CERTIFICADO APTITUD ALTURA PODEROSA",
@@ -107,20 +105,20 @@ const ExamenesList = [
         esJasper: true
     },
     //LICENCIA PARA CONDUCIR INTERNA PODEROSA
-    {
-        nombre: "LICENCIA PARA CONDUCIR INTERNA PODEROSA",//NUEVO
-        resultado: false,
-        tabla: "aptitud_licencia_conduciri",
-        url: "/api/v01/ct/aptitudLicenciaConducir/obtenerReporteAptitudLicenciaConducir",
-        esJasper: true
-    },
+    // {
+    //     nombre: "LICENCIA PARA CONDUCIR INTERNA PODEROSA",//NUEVO
+    //     resultado: false,
+    //     tabla: "aptitud_licencia_conduciri",
+    //     url: "/api/v01/ct/aptitudLicenciaConducir/obtenerReporteAptitudLicenciaConducir",
+    //     esJasper: true
+    // },
     //HOJA DE CONSULTA EXTERNA
-    {
-        nombre: "HOJA DE CONSULTA EXTERNA",//NUEVO
-        resultado: false,
-        tabla: "hoja_consulta_externa",
-        url: "/api/v01/ct/hojaConsultaExterna/obtenerReporteHojaConsultaExterna",
-    },
+    // {
+    //     nombre: "HOJA DE CONSULTA EXTERNA",//NUEVO
+    //     resultado: false,
+    //     tabla: "hoja_consulta_externa",
+    //     url: "/api/v01/ct/hojaConsultaExterna/obtenerReporteHojaConsultaExterna",
+    // },
     {
         nombre: "USO DE RESPIRADORES",
         resultado: false,
@@ -142,13 +140,13 @@ const ExamenesList = [
         esJasper: true
     },
     //DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS Y FAMILIARES
-    {
-        nombre: "DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS Y FAMILIARES",
-        resultado: false,
-        tabla: "DECLA_JURA_ANTECE_PERSON_FAM",
-        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
-        esJasper: true
-    },
+    // {
+    //     nombre: "DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS Y FAMILIARES",//NUEVO
+    //     resultado: false,
+    //     tabla: "DECLA_JURA_ANTECE_PERSON_FAM",
+    //     url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
+    //     esJasper: true
+    // },
     {
         nombre: "CUESTIONARIO NORDICO",
         resultado: false,
@@ -156,13 +154,21 @@ const ExamenesList = [
         url: "/api/v01/ct/cuestionarioNordico/obtenerReporteCuestionarioNordico"
     },
     {
-        nombre: "EVALUACION MUSCULO ESQUELETICA ",
+        nombre: "EVALUACION MUSCULO ESQUELETICA",
         resultado: false,
         tabla: "evaluacion_musculo_esqueletica",
         url: "/api/v01/ct/evaluacionMusculoEsqueletica/obtenerReporteEvaluacionMusculoEsqueletica"
     },
+    //CONSENTIMIENTO DE MUESTRA DE SANGRE
+    // {
+    //     nombre: "CONSENTIMIENTO DE MUESTRA DE SANGRE",//NUEVO
+    //     resultado: false,
+    //     tabla: "consent_Muestra_Sangre",
+    //     url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
+    //     nameConset: true
+    // },
     {
-        nombre: "LABORATORIO CLINICO ",
+        nombre: "LABORATORIO CLINICO",
         resultado: false,
         tabla: "lab_clinico",
         url: "/api/v01/ct/laboratorio/obtenerReporteLaboratorioClinico"
@@ -173,6 +179,37 @@ const ExamenesList = [
         tabla: "analisis_bioquimicos",
         url: "/api/v01/ct/laboratorio/reporteAnalisisBioquimico"
     },
+    //INMUNOLOGIA - GENODOTROPINA
+    // {
+    //     nombre: "INMUNOLOGIA - GENODOTROPINA",//NUEVO
+    //     resultado: false,
+    //     tabla: "lgonadotropina",
+    //     url: "/api/v01/ct/inmunologia/obtenerReporteLgonadotropina",
+    // },
+    //CONSENTIMIENTO DE MARIHUANA 
+    // {
+    //     nombre: "CONSENTIMIENTO DE MARIHUANA",//NUEVO
+    //     resultado: false,
+    //     tabla: "consent_marihuana",
+    //     url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
+    //     nameConset: true,
+    // },
+    //CONSENTIMIENTO PANEL 2D
+    // {
+    //     nombre: "CONSENTIMIENTO PANEL 2D",//NUEVO
+    //     resultado: false,
+    //     tabla: "con_panel2D",
+    //     url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
+    //     nameConset: true,
+    // },
+    //CONSENTIMIENTO DROGAS BOROO
+    // {
+    //     nombre: "CONSENTIMIENTO DROGAS BOROO",//NUEVO
+    //     resultado: false,
+    //     tabla: "consent_Boro",
+    //     url: "/api/v01/ct/laboratorio/consentimientoLaboratorioBoro",
+    //     nameConset: true,
+    // },
     {
         nombre: "OIT",
         resultado: false,
@@ -185,6 +222,27 @@ const ExamenesList = [
         tabla: "radiografia_torax",
         url: "/api/v01/ct/rayosX/obtenerReporteRadiografiaTorax"
     },
+    //RAYOS X TORAX ARCHIVO
+    // {
+    //     nombre: "RAYOS X TORAX ARCHIVO", //NUEVO ARCHIVO
+    //     resultado: false,
+    //     tabla: "RAYOSXTORAXARCHIVO",
+    //     url: ""
+    // },
+    //INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA)
+    // {
+    //     nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA)", //NUEVO
+    //     resultado: false,
+    //     tabla: "radiografia",
+    //     url: "/api/v01/ct/rayosX/obtenerReporteInformeRadiografico"
+    // },
+    //INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA) ARCHIVO
+    // {
+    //     nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA) ARCHIVO", //NUEVO ARCHIVO
+    //     resultado: false,
+    //     tabla: "INFORME RADIOGRAFICOARCHIVO",
+    //     url: ""
+    // },
     {
         nombre: "ELECTROCARDIOGRAMA",
         resultado: false,
@@ -192,6 +250,13 @@ const ExamenesList = [
         url: "/api/v01/ct/electroCardiograma/obtenerReporteInformeElectroCardiograma",
         esJasper: true
     },
+    //ELECTROCARDIOGRAMA ARCHIVO
+    // {
+    //     nombre: "ELECTROCARDIOGRAMA ARCHIVO", //NUEVO ARCHIVO
+    //     resultado: false,
+    //     tabla: "ELECTROCARDIOGRAMARCHIVO",
+    //     url: ""
+    // },
     {
         nombre: "ESPIROMETRIA",
         resultado: false,
@@ -199,11 +264,64 @@ const ExamenesList = [
         url: ""
     },
     {
-        nombre: "FICHA AUDIOLOGICA",
+        nombre: "FICHA AUDIOLOGICA OHLA",
         resultado: false,
         tabla: "audiometria_po",
         url: "/api/v01/ct/audiometria/obtenerReporteAudiometriaM"
     },
+    //FICHA AUDIOMETRIA
+    // {
+    //     nombre: "FICHA AUDIOMETRIA", //NUEVO
+    //     resultado: false,
+    //     tabla: "audiometria_2023",
+    //     url: "/api/v01/ct/manipuladores/obtenerReporteAudiometria"
+    // },
+    //FICHA INTERCONSULTA 
+    // {
+    //     nombre: "FICHA INTERCONSULTA", //NUEVO REVISAR  SERAN VARIOS CONSUMOS
+    //     resultado: false,
+    //     tabla: "ficha_interconsulta",
+    //     url: "/api/v01/ct/fichaInterconsulta/obtenerFichaInterconsultaReporte"
+    // },
+    //ODONTROGRAMA
+    // {
+    //     nombre: "ODONTROGRAMA", //NUEVO
+    //     resultado: false,
+    //     tabla: "odontograma",
+    //     url: "/api/v01/ct/odontograma/obtenerReporteOdontograma"
+    // },
+    //PSICOLOGIA ANEXO 03
+    // {
+    //     nombre: "PSICOLOGIA ANEXO 03", //NUEVO
+    //     resultado: false,
+    //     tabla: "ficha_psicologica_anexo03",
+    //     url: "/api/v01/ct/psicologia/obtenerFichaPsicologiaAnexo03",
+    //     esJaper: true,
+    // },
+    //TEST DE FATIGA Y SOMNOLENCIA
+    // {
+    //     nombre: "TEST DE FATIGA Y SOMNOLENCIA", //NUEVO
+    //     resultado: false,
+    //     tabla: "informe_psicologico_estres",
+    //     url: "/api/v01/ct/informePsicologicoAdeco/obtenerReporteInformePsicologicoAdeco",
+    //     esJaper: true,
+    // },
+    //INFORME PSICOLOGICO DE PODEROSA LICENCIA PARA OPERAR
+    // {
+    //     nombre: "INFORME PSICOLOGICO DE PODEROSA LICENCIA PARA OPERAR", //NUEVO
+    //     resultado: false,
+    //     tabla: "evaluacion_psicologica_poderosa",
+    //     url: "/api/v01/ct/evaluacionPsicologicaPoderosa/obtenerReporteEvaluacionPsicologicaPoderosa",
+    //     esJaper: true,
+    // },
+    //PSICOLOGIA ANEXO 02
+    // {
+    //     nombre: "PSICOLOGIA ANEXO 02", //NUEVO
+    //     resultado: false,
+    //     tabla: "ficha_psicologica_anexo02",
+    //     url: "/api/v01/ct/psicologia/obtenerFichaPsicologiaAnexo02",
+    //     esJaper: true,
+    // },
     {
         nombre: "INFORME PSICOLOGICO",
         resultado: false,
@@ -211,21 +329,106 @@ const ExamenesList = [
         url: "/api/v01/ct/informePsicologico/obtenerReporteInformePsicologico",
         esJasper: true
     },
+    //INFORME PSICOLOGIA FOBIAS
+    // {
+    //     nombre: "INFORME PSICOLOGIA FOBIAS", //NUEVO
+    //     resultado: false,
+    //     tabla: "fobias",
+    //     url: "/api/v01/ct/fobias/obtenerReporte",
+    //     esJasper: true
+    // },
+    //INFORME PSICOLABORAL
+    // {
+    //     nombre: "INFORME PSICOLABORAL", //NUEVO
+    //     resultado: false,
+    //     tabla: "informe_psicolaboral",
+    //     url: "/api/v01/ct/informePsicolaboral/obtenerReporteInformePsicolaboral",
+    //     esJasper: true
+    // },
+    //TRABAJOS EN ESPECIFICOS
+    // {
+    //     nombre: "TRABAJOS EN ESPECIFICOS", //NUEVO
+    //     resultado: false,
+    //     tabla: "especificos",
+    //     url: "/api/v01/ct/trabajoEspecifico/obtenerReporteTrabajosEspecificos",
+    //     esJasper: true
+    // },
+    //TRABAJO EN ALTURA
+    // {
+    //     nombre: "TRABAJO EN ALTURA", //NUEVO
+    //     resultado: false,
+    //     tabla: "psicologiafobias",
+    //     url: "/api/v01/ct/informePsicologicoFobias/obtenerReporteInformePsicologicoFobias",
+    //     esJasper: true
+    // },
+    //OFTALMOLOGIA
+    // {
+    //     nombre: "OFTALMOLOGIA", //NUEVO
+    //     resultado: false,
+    //     tabla: "oftalmologia2021",
+    //     url: "/api/v01/ct/agudezaVisual/obtenerReporteEvaluacionOftalmologica",
+    // },
+    //OFTALMOLOGIA VISION TESTER
+    // {
+    //     nombre: "OFTALMOLOGIA VISION TESTER", //NUEVO ARCHIVO
+    //     resultado: false,
+    //     tabla: "OFTALMOLOGIAVISIONTESTER",
+    //     url: ""
+    // },
     {
         nombre: "FICHA OFTALMOLOGICA",
         resultado: false,
         tabla: "oftalmologia",
         url: "/api/v01/ct/agudezaVisual/obtenerReporteOftalmologia"
     },
+    //DECLARACION DE SINTOMATICO RESPIRATORIO
+    // {
+    //     nombre: "DECLARACION DE SINTOMATICO RESPIRATORIO", //NUEVO
+    //     resultado: false,
+    //     tabla: "CONSENT_SINTOMATICO",
+    //     url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
+    //     esJasper: true
+    // },
+    //CONSENTIMIENTO INFORMADO DE EVALUACION MEDICA
+    // {
+    //     nombre: "CONSENTIMIENTO INFORMADO DE EVALUACION MEDICA", //NUEVO
+    //     resultado: false,
+    //     tabla: "CONSENT_INFORMADO_MEDICA",
+    //     url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
+    //     esJasper: true
+    // },
+    //CONSENTIMIENTO BUENA SALUD
+    // {
+    //     nombre: "CONSENTIMIENTO BUENA SALUD", //NUEVO
+    //     resultado: false,
+    //     tabla: "consentimientobuenasalud",
+    //     url: "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoBuenaSalud",
+    //     esJasper: true
+    // },
     {
         nombre: "CONSENTIMIENTO INFORMADO",
         resultado: false,
         tabla: "consentimientoInformado",
         url: "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoInformado"
     },
+    //DECLARACION JURADA PARA EL USO DE FIRMA ELECTRONICA
+    // {
+    //     nombre: "DECLARACION JURADA PARA EL USO DE FIRMA ELECTRONICA", //NUEVO ARCHIVO
+    //     resultado: false,
+    //     tabla: "DECLARACIONUSOFIRMA",
+    //     url: "",
+    // },
+    //DNI Y OTROS DOCUMENTOS
+    // {
+    //     nombre: "DNI Y OTROS DOCUMENTOS", //NUEVO ARCHIVO
+    //     resultado: false,
+    //     tabla: "DNI Y OTROS DOCUMENTOS",
+    //     url: "",
+    // },
 ];
 
 const Folio = () => {
+    const today = getToday();
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
     const initialFormState = {
         norden: "",
