@@ -1,8 +1,8 @@
 import jsPDF from "jspdf";
 import HeaderRAYOSXXXOFI from "./Headers/header_RAYOSXXXOFI_Digitalizado.jsx";
 
-export default async function RAYOSXXXOFI_Digitalizado(data = {}) {
-  const doc = new jsPDF();
+export default async function RAYOSXXXOFI_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF();
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 60;

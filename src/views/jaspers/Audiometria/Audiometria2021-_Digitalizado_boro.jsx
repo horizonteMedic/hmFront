@@ -772,9 +772,9 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   );
 };
 
-export default async function Audiometria2021_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-  body_Audiometria2021_Digitalizado(doc, data);
+export default async function Audiometria2021_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+  await body_Audiometria2021_Digitalizado(doc, data);
 
   // Función para agregar la firma y esperar a que cargue o falle
   const addSello = (imagenUrl, x, y, maxw = 100) => {

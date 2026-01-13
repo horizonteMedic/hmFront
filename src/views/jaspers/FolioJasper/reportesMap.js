@@ -24,7 +24,15 @@ import Certificacion_suficiencia_trabajos_en_altura_boro_Digitalizado from "../C
 import Aptitud_Poderosa_Digitalizado from "../AptitupAlturaPoderosa/Aptitud_Poderosa_Digitalizado";
 import Certificaciondeconduccion_Digitalizado from "../FichaConduccion/certificaciondeconduccion_Digitalizado_boro";
 import B_FichaDetencionSAS2 from "../FichasSAS/FichaDetencionSAS_boro_Digitalizado";
-
+import Aptitud_Licencia_Conducir_Interna_Digitalizado from "../AptitudLicenciaInterna/Aptitud_Licencia_Conducir_Interna_Digitalizado";
+import Hoja_Consulta_Externa from "../HojaConsultaExterna/Hoja_Consulta_Externa";
+import ConsentAdmisionDeclacionAntecePatologicos from "../ModuloConsentimientos/ConsentAdmisDeclaAntecePatolo/Consent_Admision_DeclacionAntecePatologicos";
+import Consentimiento_Muestra_Sangre_Digitalizado from "../Consentimientos/Consentimiento_Muestra_Sangre_Digitalizado";
+import LGonadotropina_Digitalizado from "../Inmunologia/LGonadotropina_Digitalizado";
+import RAYOSXXXOFI_Digitalizado from "../RayosX/RAYOSXXXOFI_Digitalizado";
+import Audiometria2021_Digitalizado from "../Audiometria/Audiometria2021-_Digitalizado_boro";
+import CuestionarioAudiometria_Digitalizado from "../Audiometria/CuestionarioAudiometria/CuestionarioAudiometria_Digitalizado";
+import Odontograma_Digitalizado from "../Odontologia/Odontograma_Digitalizado";
 // Agrega aquí todos tus reportes
 export const ekgMap = {
     InformeElectrocardiograma2023,
@@ -51,6 +59,26 @@ export const reportesMap = {
     b_certificado_conduccion: Certificaciondeconduccion_Digitalizado,
     //FICHA SAS 
     ficha_sas: B_FichaDetencionSAS2,
+    //AptitudLicenciaConducir
+    aptitud_licencia_conduciri: Aptitud_Licencia_Conducir_Interna_Digitalizado,
+    //Hoja Consulta Externa
+    hoja_consulta_externa: Hoja_Consulta_Externa,
+    //DECLARACION ANTECEDENTES PATOLOGICOS
+    DECLA_JURA_ANTECE_PERSON_FAM: ConsentAdmisionDeclacionAntecePatologicos,
+    //CONSENTIMIENTO MUESTRA DE SANGER
+    consent_Muestra_Sangre: Consentimiento_Muestra_Sangre_Digitalizado,
+    //INMUNOLOGIA GENODOTROPINA
+    lgonadotropina: LGonadotropina_Digitalizado,
+    //CONST LABORATORIOS
+    //RADIOGRAFIA
+    radiografia: RAYOSXXXOFI_Digitalizado,
+    //audiometria
+    audiometria_2023: Audiometria2021_Digitalizado,
+    //Cuestionario audiometria
+    cuestionario_audiometria: CuestionarioAudiometria_Digitalizado,
+    //INTERCONSULTA
+    //ODONTOGRAMA
+    odontograma: Odontograma_Digitalizado,
 
 
     b_uso_respiradores: UsoRespiradores,

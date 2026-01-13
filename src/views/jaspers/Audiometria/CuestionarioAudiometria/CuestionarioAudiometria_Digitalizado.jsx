@@ -155,8 +155,8 @@ const drawPatientData = (doc, datos = {}) => {
   return yPos;
 };
 
-export default async function CuestionarioAudiometria_Digitalizado(datos = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function CuestionarioAudiometria_Digitalizado(datos = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const lineHTable = 3.5;
   const paddingTop = 1.5;
   const paddingBottom = 1.5;
@@ -187,78 +187,78 @@ export default async function CuestionarioAudiometria_Digitalizado(datos = {}) {
     let tableY = y;
 
     const preguntas = [
-      { 
-        numero: 1, 
+      {
+        numero: 1,
         texto: "¿Tiene conocimiento de algún problema del oído y/o audición que haya tenido o haya sido diagnosticado y/o en estudio, así como: pérdida de audición, hipoacusia, otitis media agudo, crónico, supurativo externo, presencia de secreción purulenta y/o sanguinolenta con o sin mal olor, escucha sonidos como pititos, soplidos del viento, sonido del mar, acúfenos, tinnitus, mareos, vértigo, náuseas, rinitis alérgica, parálisis facial, adormecimiento de hemicorpo, tumores del sistema nervioso central.",
         tieneNota: true
       },
-      { 
-        numero: 2, 
+      {
+        numero: 2,
         texto: "Ha realizado viaje o ha llegado de viaje en las 16 horas anteriores a esta entrevista y examen.",
         tieneNota: false
       },
-      { 
-        numero: 3, 
+      {
+        numero: 3,
         texto: "Ha estado escuchando música con audífonos en las 16 horas anteriores a esta entrevista o examen.",
         tieneNota: false
       },
-      { 
-        numero: 4, 
+      {
+        numero: 4,
         texto: "Se ha desplazado y/o movilizado en moto lineal y/o en vehículo con las ventanas abiertas.",
         tieneNota: false
       },
-      { 
-        numero: 5, 
+      {
+        numero: 5,
         texto: "Ha trabajado expuesto a ruido y/o vibraciones en las 16 horas anteriores a esta entrevista y examen.",
         tieneNota: false
       },
-      { 
-        numero: 6, 
+      {
+        numero: 6,
         texto: "Ha bebido bebidas alcohólicas y/o fumó cigarrillos en las 16 horas anteriores a esta entrevista y examen.",
         tieneNota: false
       },
-      { 
-        numero: 7, 
+      {
+        numero: 7,
         texto: "Ha estado despierto o trabajando en turno de noche 16 horas anteriores a esta entrevista y examen.",
         tieneNota: false
       },
-      { 
-        numero: 8, 
+      {
+        numero: 8,
         texto: "¿Está resfriado con tos, con dolor auricular, fiebre y/u otra enfermedad respiratoria aguda?",
         tieneNota: false
       },
-      { 
-        numero: 9, 
+      {
+        numero: 9,
         texto: "¿Le han practicado cirugía de oído (timpanoplastía, mastoidectomía, estapediectomía)?",
         tieneNota: true
       },
-      { 
-        numero: 10, 
+      {
+        numero: 10,
         texto: "¿Ha tenido traumatismo craneoencefálico, traumatismo en el oído?",
         tieneNota: true
       },
-      { 
-        numero: 11, 
+      {
+        numero: 11,
         texto: "¿Ha consumido o consume medicamentos como: Cisplatino, aminoglucósidos (vancomicina y amikacina), aspirina, furosemida y/o antituberculosos?",
         tieneNota: true
       },
-      { 
-        numero: 12, 
+      {
+        numero: 12,
         texto: "¿Ha estado expuesto a solventes orgánicos (tolueno, xileno, disulfuro de carbono, plomo, mercurio, monóxido de carbono), plaguicidas, organofosforados y piretroides?",
         tieneNota: true
       },
-      { 
-        numero: 13, 
+      {
+        numero: 13,
         texto: "¿Ha estado expuesto a vibraciones continuas?",
         tieneNota: true
       },
-      { 
-        numero: 14, 
+      {
+        numero: 14,
         texto: "¿Sufre de: hipertensión arterial, diabetes mellitus, hipotiroidismo, insuficiencia renal crónica, enfermedades autoinmunes?",
         tieneNota: true
       },
-      { 
-        numero: 15, 
+      {
+        numero: 15,
         texto: "¿Consume cigarrillos?",
         tieneNota: true
       }
@@ -335,11 +335,11 @@ export default async function CuestionarioAudiometria_Digitalizado(datos = {}) {
           }
         }
       }
-      
+
       const textoConNumero = `${p.numero}.- ${p.texto}`;
       const lines = doc.splitTextToSize(textoConNumero, colPreguntaW - 4);
       const contentH = lines.length * lineHTable;
-      
+
       let notaH = 0;
       if (notaText) {
         doc.setFontSize(8);
@@ -347,7 +347,7 @@ export default async function CuestionarioAudiometria_Digitalizado(datos = {}) {
         notaH = notaLines.length * lineHTable;
         doc.setFontSize(9);
       }
-      
+
       const rowH = contentH + paddingTop + paddingBottom + notaH;
       totalTableH += rowH;
     });
@@ -357,7 +357,7 @@ export default async function CuestionarioAudiometria_Digitalizado(datos = {}) {
     doc.setLineWidth(0.2);
     doc.setFillColor(196, 196, 196);
     doc.rect(tableX, tableY, tablaAncho, headerHeight, 'FD');
-    
+
     // Líneas verticales del header (izquierda, división pregunta/SI, división SI/NO, derecha)
     doc.line(tableX, tableY, tableX, tableY + totalTableH);
     doc.line(tableX + colPreguntaW, tableY, tableX + colPreguntaW, tableY + totalTableH);
@@ -365,7 +365,7 @@ export default async function CuestionarioAudiometria_Digitalizado(datos = {}) {
     doc.line(tableX + tablaAncho, tableY, tableX + tablaAncho, tableY + totalTableH);
     // Línea inferior del header
     doc.line(tableX, tableY + headerHeight, tableX + tablaAncho, tableY + headerHeight);
-    
+
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("II. PREGUNTAS", tableX + 2, tableY + 3.5);
     doc.text("SI", tableX + colPreguntaW + colSiW / 2, tableY + 3.5, { align: "center" });
@@ -447,7 +447,7 @@ export default async function CuestionarioAudiometria_Digitalizado(datos = {}) {
       const textoConNumero = `${p.numero}.- ${p.texto}`;
       const lines = doc.splitTextToSize(textoConNumero, colPreguntaW - 4);
       const contentH = lines.length * lineHTable;
-      
+
       // Calcular altura de nota si existe
       let notaH = 0;
       if (notaText) {
@@ -455,7 +455,7 @@ export default async function CuestionarioAudiometria_Digitalizado(datos = {}) {
         const notaLines = doc.splitTextToSize(notaText, colPreguntaW - 4);
         notaH = notaLines.length * lineHTable;
       }
-      
+
       // Altura total de la fila: contenido + padding + nota
       const rowH = contentH + paddingTop + paddingBottom + notaH;
 
@@ -486,7 +486,7 @@ export default async function CuestionarioAudiometria_Digitalizado(datos = {}) {
       const noX = tableX + colPreguntaW + colSiW;
       const celdaY = tableY;
       const celdaH = rowH;
-      
+
       // Marcar X en la celda correspondiente, centrada verticalmente
       const respuestaSi = datos[`chksi${p.numero}`];
       const celdaCenterY = celdaY + celdaH / 2;
@@ -505,23 +505,23 @@ export default async function CuestionarioAudiometria_Digitalizado(datos = {}) {
     // Fila con el número y texto de la pregunta 16 (sin columnas SI/NO)
     const filaPregunta16H = lineHTable + paddingTop + paddingBottom;
     const pregunta16Y = tableY;
-    
+
     // Línea horizontal superior
     doc.line(tableX, pregunta16Y, tableX + tablaAncho, pregunta16Y);
-    
+
     // Líneas verticales para la fila de pregunta 16 (solo bordes izquierdo y derecho)
     doc.line(tableX, pregunta16Y, tableX, pregunta16Y + filaPregunta16H);
     doc.line(tableX + tablaAncho, pregunta16Y, tableX + tablaAncho, pregunta16Y + filaPregunta16H);
-    
+
     doc.setFont("helvetica", "bold").setFontSize(9);
     const textoPregunta16 = `16.- ¿Ha realizado actividades de? ${datos?.txtrcual16 || ""} `;
     doc.text(textoPregunta16, tableX + 2, pregunta16Y + paddingTop + lineHTable - 1.2);
-    
+
     // Línea horizontal inferior de la fila de pregunta
     doc.line(tableX, pregunta16Y + filaPregunta16H, tableX + tablaAncho, pregunta16Y + filaPregunta16H);
-    
+
     tableY = pregunta16Y + filaPregunta16H;
-    
+
     // Actividades para la pregunta 16 (agrupadas en pares para dos columnas)
     const actividades = [
       { nombre: "Caza", campo: "chkcaza16", tiempo: "txtcaza16" },
@@ -531,19 +531,19 @@ export default async function CuestionarioAudiometria_Digitalizado(datos = {}) {
       { nombre: "Concurrencia frecuente a discotecas y/o bares", campo: "chkdiscoteca16", tiempo: "txtdiscoteca16" },
       { nombre: "Boxeo", campo: "chkboxeo16", tiempo: "txtboxeo16" }
     ];
-    
+
     // Anchos de columnas: solo 2 columnas principales
     // Cada columna tiene: checkbox | texto + tiempo
     const colCheckboxW = 10;
     const colActividadTiempoW = (tablaAncho - colCheckboxW * 2) / 2; // Dos columnas iguales (menos 2 checkboxes)
     const filaActividadHMin = 5; // Altura mínima de fila
     const paddingActividad = 1; // Padding vertical para el texto
-    
+
     // Calcular altura total primero
     let alturaTotal = 0;
     let alturasFilas = [];
     doc.setFont("helvetica", "normal").setFontSize(8);
-    
+
     for (let i = 0; i < actividades.length; i += 2) {
       // Calcular altura de texto izquierdo
       const actividadIzq = actividades[i].nombre;
@@ -551,7 +551,7 @@ export default async function CuestionarioAudiometria_Digitalizado(datos = {}) {
       const textoIzq = tiempoIzq ? `${actividadIzq} - Tiempo: ${tiempoIzq}` : actividadIzq;
       const linesIzq = doc.splitTextToSize(textoIzq, colActividadTiempoW - 4);
       const alturaIzq = linesIzq.length * lineHTable + paddingActividad * 2;
-      
+
       // Calcular altura de texto derecho (si existe)
       let alturaDer = 0;
       if (i + 1 < actividades.length) {
@@ -561,26 +561,26 @@ export default async function CuestionarioAudiometria_Digitalizado(datos = {}) {
         const linesDer = doc.splitTextToSize(textoDer, colActividadTiempoW - 4);
         alturaDer = linesDer.length * lineHTable + paddingActividad * 2;
       }
-      
+
       // La altura de la fila es la máxima entre izquierda y derecha, con mínimo
       const alturaFila = Math.max(filaActividadHMin, Math.max(alturaIzq, alturaDer));
       alturasFilas.push(alturaFila);
       alturaTotal += alturaFila;
     }
-    
+
     // Dibujar líneas verticales principales: solo 3 líneas (izquierda, división central, derecha)
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
     doc.line(tableX, tableY, tableX, tableY + alturaTotal);
     doc.line(tableX + colCheckboxW + colActividadTiempoW, tableY, tableX + colCheckboxW + colActividadTiempoW, tableY + alturaTotal);
     doc.line(tableX + tablaAncho, tableY, tableX + tablaAncho, tableY + alturaTotal);
-    
+
     // Dibujar filas de actividades (2 por fila)
     let yPosActual = tableY;
     for (let i = 0; i < actividades.length; i += 2) {
       const alturaFila = alturasFilas[i / 2];
       const filaY = yPosActual;
-      
+
       // COLUMNA IZQUIERDA: | checkbox | texto - Tiempo: {data} |
       const colIzqX = tableX;
       // Línea vertical entre checkbox y texto
@@ -597,7 +597,7 @@ export default async function CuestionarioAudiometria_Digitalizado(datos = {}) {
       linesIzq.forEach((line, idx) => {
         doc.text(line, colIzqX + colCheckboxW + 2, filaY + paddingActividad + lineHTable - 1.2 + idx * lineHTable);
       });
-      
+
       // COLUMNA DERECHA: | checkbox | texto - Tiempo: {data} | (si existe)
       if (i + 1 < actividades.length) {
         const colDerX = tableX + colCheckboxW + colActividadTiempoW;
@@ -616,26 +616,26 @@ export default async function CuestionarioAudiometria_Digitalizado(datos = {}) {
           doc.text(line, colDerX + colCheckboxW + 2, filaY + paddingActividad + lineHTable - 1.2 + idx * lineHTable);
         });
       }
-      
+
       // Línea horizontal inferior de la fila
       doc.line(tableX, filaY + alturaFila, tableX + tablaAncho, filaY + alturaFila);
-      
+
       yPosActual += alturaFila;
     }
-    
+
     tableY += alturaTotal;
-    
+
     // Fila de advertencia con color de advertencia (#fc9c0a)
     const filaAdvertenciaH = 5;
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
     doc.setFillColor(252, 156, 10); // #fc9c0a en RGB
     doc.rect(tableX, tableY, tablaAncho, filaAdvertenciaH, 'FD');
-    
+
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Declaro que las respuestas son ciertas según mi leal saber y entender", tableX + 2, tableY + 3.5);
     tableY += filaAdvertenciaH;
-    
+
     // Fila de firmas (sin marco/borde)
     // 5) Dibujar firmas usando dibujarFirmas
     dibujarFirmas({ doc, datos, y: tableY + 2, pageW }).then(() => {

@@ -269,8 +269,8 @@ const headerOdontograma = (doc, datos) => {
   doc.setFont("helvetica", "normal").setFontSize(10);
 };
 
-export default async function Odontograma_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "landscape" });
+export default async function Odontograma_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "landscape" });
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
 

@@ -4,8 +4,8 @@ import footerTR from "../components/footerTR.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
 import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
 
-export default async function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
-  const doc = new jsPDF();
+export default async function Consentimiento_Muestra_Sangre_Digitalizado(datos, docExistente = null) {
+  const doc = docExistente || new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // Función para formatear fecha a DD/MM/YYYY

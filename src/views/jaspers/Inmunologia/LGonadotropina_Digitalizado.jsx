@@ -174,8 +174,8 @@ const drawPatientData = (doc, datos = {}) => {
 
 // --- Componente Principal ---
 
-export default async function LGonadotropina_Digitalizado(datos) {
-  const doc = new jsPDF();
+export default async function LGonadotropina_Digitalizado(datos, docExistente = null) {
+  const doc = docExistente || new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
