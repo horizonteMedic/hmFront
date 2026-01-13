@@ -10,13 +10,12 @@ import Swal from "sweetalert2";
 const today = getToday();
 
 const ExamenesList = [
-    /*{
-        nombre: "RESUMEN MEDICO PODEROSA",
+    {
+        nombre: "RESUMEN MEDICO PODEROSA", //NUEVO
         resultado: false,
         tabla: "resumen_medico_poderosa",
         url: "/api/v01/ct/anexos/obtenerReporteResumenMedico",
-        esJasper: true
-    },*/
+    },
     {
         nombre: "CONSTANCIA DE EXAMEN MEDICO OCUPACIONAL",
         resultado: false,
@@ -32,7 +31,7 @@ const ExamenesList = [
         esJasper: true
     },
     {
-        nombre: "ANEXO 16 ",
+        nombre: "ANEXO 16",
         resultado: false,
         tabla: "anexo7c",
         url: "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16"
@@ -53,6 +52,21 @@ const ExamenesList = [
         url: "/api/v01/ct/anexos/anexo2/obtenerReporteAnexo2Completo",
         esJasper: true
     },
+    //ENFERMEDADES ALTURA GEOGRAFICA
+    {
+        nombre: "ENFERMEDADES EN ALTURA",
+        resultado: false,
+        tabla: "antece_enfermedades_altura",
+        url: "/api/v01/ct/antecedentesEnfermedadesAltura/obtenerReporteAntecedentesEnfermedadesAltura"
+    },
+    //ANEXO 16A
+    {
+        nombre: "ANEXO 16A",
+        resultado: false,
+        tabla: "anexo16a",
+        url: "/api/v01/ct/anexos/anexo16a/obtenerReporteAnexo16a",
+        esJasper: true
+    },
     //Certificado en Altura
     {
         nombre: "CERTIFICADO ALTURA",
@@ -61,7 +75,14 @@ const ExamenesList = [
         url: "/api/v01/ct/certificadoTrabajoAltura/obtenerReporteCertificadoTrabajoAltura",
         esJasper: true
     },
-    //Certificado en Altura
+    //PSICOSENSOMETRICO
+    {
+        nombre: "PSICOSENSOMETRICO ",//NUEVO ARCHIVO EXTERNO
+        resultado: false,
+        tabla: "PSICOSENSOMETRICO",
+        url: ""
+    },
+    //Certificado en Altura PODEROSA
     {
         nombre: "CERTIFICADO APTITUD ALTURA PODEROSA",
         resultado: false,
@@ -85,18 +106,20 @@ const ExamenesList = [
         url: "/api/v01/ct/fichaApneaSueno/obtenerReporteFichaSas",
         esJasper: true
     },
+    //LICENCIA PARA CONDUCIR INTERNA PODEROSA
     {
-        nombre: "ENFERMEDADES EN ALTURA ",
+        nombre: "LICENCIA PARA CONDUCIR INTERNA PODEROSA",//NUEVO
         resultado: false,
-        tabla: "antece_enfermedades_altura",
-        url: "/api/v01/ct/antecedentesEnfermedadesAltura/obtenerReporteAntecedentesEnfermedadesAltura"
-    },
-    {
-        nombre: "ANEXO 16A",
-        resultado: false,
-        tabla: "anexo16a",
-        url: "/api/v01/ct/anexos/anexo16a/obtenerReporteAnexo16a",
+        tabla: "aptitud_licencia_conduciri",
+        url: "/api/v01/ct/aptitudLicenciaConducir/obtenerReporteAptitudLicenciaConducir",
         esJasper: true
+    },
+    //HOJA DE CONSULTA EXTERNA
+    {
+        nombre: "HOJA DE CONSULTA EXTERNA",//NUEVO
+        resultado: false,
+        tabla: "hoja_consulta_externa",
+        url: "/api/v01/ct/hojaConsultaExterna/obtenerReporteHojaConsultaExterna",
     },
     {
         nombre: "USO DE RESPIRADORES",
@@ -106,7 +129,7 @@ const ExamenesList = [
         esJasper: true
     },
     {
-        nombre: "HISTORIA OCUPACIONAL ",
+        nombre: "HISTORIA OCUPACIONAL",
         resultado: false,
         tabla: "historia_oc_info",
         url: "/api/v01/ct/historiaOcupacional/obtenerReporteHistoriaOcupacional"
@@ -116,6 +139,14 @@ const ExamenesList = [
         resultado: false,
         tabla: "antecedentes_patologicos",
         url: "/api/v01/ct/antecedentesPatologicos/obtenerReporteAntecedentesPatologicos",
+        esJasper: true
+    },
+    //DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS Y FAMILIARES
+    {
+        nombre: "DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS Y FAMILIARES",
+        resultado: false,
+        tabla: "DECLA_JURA_ANTECE_PERSON_FAM",
+        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
         esJasper: true
     },
     {
@@ -187,7 +218,7 @@ const ExamenesList = [
         url: "/api/v01/ct/agudezaVisual/obtenerReporteOftalmologia"
     },
     {
-        nombre: "CONSENTIMIENTO INFORMADO ",
+        nombre: "CONSENTIMIENTO INFORMADO",
         resultado: false,
         tabla: "consentimientoInformado",
         url: "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoInformado"
