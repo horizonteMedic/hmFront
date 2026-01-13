@@ -61,6 +61,30 @@ const ExamenesList = [
         url: "/api/v01/ct/certificadoTrabajoAltura/obtenerReporteCertificadoTrabajoAltura",
         esJasper: true
     },
+    //Certificado en Altura
+    {
+        nombre: "CERTIFICADO APTITUD ALTURA PODEROSA",
+        resultado: false,
+        tabla: "aptitud_altura_poderosa",
+        url: "/api/v01/ct/aptitudAltura/obtenerReporteAptitudAlturaPoderosa",
+        esJasper: true
+    },
+    //Certificado Vehiculos
+    {
+        nombre: "CERTIFICADO VEHICULOS",
+        resultado: false,
+        tabla: "b_certificado_conduccion",
+        url: "/api/v01/ct/certificadoConduccion/obtenerReporteCertificadoConduccion",
+        esJasper: true
+    },
+    //Ficha sas
+    {
+        nombre: "FICHA SAS",
+        resultado: false,
+        tabla: "ficha_sas",
+        url: "/api/v01/ct/fichaApneaSueno/obtenerReporteFichaSas",
+        esJasper: true
+    },
     {
         nombre: "ENFERMEDADES EN ALTURA ",
         resultado: false,

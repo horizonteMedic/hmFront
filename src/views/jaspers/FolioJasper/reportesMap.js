@@ -21,6 +21,10 @@ import Aptitud_medico_resumen_Digitalizado from "../CertificadoMedicoOcupacional
 import Aptitud_AgroindustrialH from "../Ficha_Anexo2/Aptitud_Agroindustrial";
 import InformePsicologico_Anexo02_Nuevo from "../Anexo2/Anexo2";
 import Certificacion_suficiencia_trabajos_en_altura_boro_Digitalizado from "../CertificadoAltura/Certificacion_suficiencia_trabajos_en_altura_boro_Digitalizado";
+import Aptitud_Poderosa_Digitalizado from "../AptitupAlturaPoderosa/Aptitud_Poderosa_Digitalizado";
+import Certificaciondeconduccion_Digitalizado from "../FichaConduccion/certificaciondeconduccion_Digitalizado_boro";
+import B_FichaDetencionSAS2 from "../FichasSAS/FichaDetencionSAS_boro_Digitalizado";
+
 // Agrega aquí todos tus reportes
 export const ekgMap = {
     InformeElectrocardiograma2023,
@@ -41,6 +45,14 @@ export const reportesMap = {
     anexo16a: Anexo16A_Digitalizado,
     //Certificado en Alutra
     b_certificado_altura: Certificacion_suficiencia_trabajos_en_altura_boro_Digitalizado,
+    //Cetificado de aptitud altura poderosa
+    aptitud_altura_poderosa: Aptitud_Poderosa_Digitalizado,
+    //Certificado vehiculos
+    b_certificado_conduccion: Certificaciondeconduccion_Digitalizado,
+    //FICHA SAS 
+    ficha_sas: B_FichaDetencionSAS2,
+
+
     b_uso_respiradores: UsoRespiradores,
     historia_oc_info: HistoriaOcupacional_Digitalizado,
     antecedentes_patologicos: ficha_antecedente_patologico_Digitalizado,
