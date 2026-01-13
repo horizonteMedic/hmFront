@@ -64,7 +64,14 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             }
 
             //const generarReporte = reportesMap[examen.tabla];
-            const generador = reportesMap[examen.tabla];
+            let generador = null;
+
+            if (examen.tabla === "resumen_medico_poderosa") {
+                generador = reportesMap[examen.tabla][data.nameJasper];
+            } else {
+                generador = reportesMap[examen.tabla];
+            }
+
             const generadorFinal = typeof generador === "function" && generador.length === 1
                 ? generador(data)
                 : generador;

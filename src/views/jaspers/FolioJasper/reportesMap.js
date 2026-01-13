@@ -33,14 +33,20 @@ import RAYOSXXXOFI_Digitalizado from "../RayosX/RAYOSXXXOFI_Digitalizado";
 import Audiometria2021_Digitalizado from "../Audiometria/Audiometria2021-_Digitalizado_boro";
 import CuestionarioAudiometria_Digitalizado from "../Audiometria/CuestionarioAudiometria/CuestionarioAudiometria_Digitalizado";
 import Odontograma_Digitalizado from "../Odontologia/Odontograma_Digitalizado";
+import ResumenAnexo7C_OHLA_Digitalizado from "../Ficha_Anexo16/ResumenMedico/ResumenAnexo7C_OHLA_Digitalizado";
+import ResumenAnexo7CP_Digitalizado from "../Ficha_Anexo16/ResumenMedico/ResumenAnexo7CP_Digitalizado";
+
 // Agrega aquí todos tus reportes
 export const ekgMap = {
     InformeElectrocardiograma2023,
     InformeElectrocardiograma_Digitalizado
 };
 
-
 export const reportesMap = {
+    resumen_medico_poderosa: {
+        ResumenAnexo7C_OHLA_Digitalizado,
+        ResumenAnexo7CP_Digitalizado
+    },
     certificado_aptitud_medico_resumen: Aptitud_medico_resumen_Digitalizado,
     certificado_aptitud_medico_ocupacional: Aptitud_Agroindustrial,
     anexo7c: Anexo7C_Antiguo,

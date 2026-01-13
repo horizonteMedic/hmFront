@@ -8,12 +8,12 @@ import { GetInfoPac } from "./controllerFolio";
 import Swal from "sweetalert2";
 
 const ExamenesList = [
-    // {
-    //     nombre: "RESUMEN MEDICO PODEROSA", //NUEVO
-    //     resultado: false,
-    //     tabla: "resumen_medico_poderosa",
-    //     url: "/api/v01/ct/anexos/obtenerReporteResumenMedico",
-    // },
+    {
+        nombre: "RESUMEN MEDICO PODEROSA", //NUEVO LISTO
+        resultado: false,
+        tabla: "resumen_medico_poderosa",
+        url: "/api/v01/ct/anexos/obtenerReporteResumenMedico",
+    },
     {
         nombre: "CONSTANCIA DE EXAMEN MEDICO OCUPACIONAL",
         resultado: false,
