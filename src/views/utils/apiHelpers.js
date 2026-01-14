@@ -30,8 +30,8 @@ export async function SubmitDataManejo(body, url, token) {
 
     const data = await res.json();
 
-    if (data.codigo === 200) {
-        return data.resultado;
+    if (data.codigo === 201) {
+        return data;
     }
     validacionError(data.resultado);
     return null;

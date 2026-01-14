@@ -6,8 +6,8 @@ import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import { getSign } from '../../utils/helpers.js';
 
-export default async function Certificacion_suficiencia_trabajos_en_altura_boro_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function Certificacion_suficiencia_trabajos_en_altura_boro_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // Contador de páginas dinámico
@@ -1260,7 +1260,12 @@ export default async function Certificacion_suficiencia_trabajos_en_altura_boro_
   footerTR(doc, { footerOffsetY: 8 });
 
   // === Imprimir ===
-  imprimir(doc);
+  if (docExistente) {
+    return doc
+  } else {
+    imprimir(doc);
+
+  }
 }
 
 function imprimir(doc) {

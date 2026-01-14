@@ -68,7 +68,7 @@ export default async function ConsentAdmisionDeclaracionSintomaticoRespiratorio(
     lineasSede.forEach((linea, idx) => {
       doc.text(linea, xInicioSede, 20 + (idx * 3.5));
     });
-    
+
     const yFechaExamen = lineasSede.length === 1 ? 25 : 20 + (lineasSede.length * 3.5) + 2;
     doc.text("Fecha de examen: " + (datosFinales.fechaExamen || ""), pageW - 70, yFechaExamen);
     doc.text("Pag. 01", pageW - 25, 8);
@@ -98,7 +98,7 @@ export default async function ConsentAdmisionDeclaracionSintomaticoRespiratorio(
   const justificarTextoConNegritas = (partesTexto, x, y, anchoMaximo, interlineado) => {
     // Construir lista de palabras con su formato (negrita o no)
     const palabrasConFormato = [];
-    
+
     partesTexto.forEach(parte => {
       const palabras = parte.texto.split(' ').filter(p => p.length > 0);
       palabras.forEach(palabra => {
@@ -237,7 +237,7 @@ export default async function ConsentAdmisionDeclaracionSintomaticoRespiratorio(
     { texto: ", para la empresa ", negrita: false },
     { texto: datosFinales.empresa, negrita: true }
   ];
-  
+
   yPos = justificarTextoConNegritas(partesTexto1, margin, yPos, anchoTexto, lineHeight);
   yPos += 5;
 
@@ -255,7 +255,7 @@ export default async function ConsentAdmisionDeclaracionSintomaticoRespiratorio(
 
   // === FIRMA Y HUELLA DEL PACIENTE (usando dibujarFirmas, bajada 40mm) ===
   yPos += 55;
-  
+
   // Usar la función dibujarFirmas del utils
   const yPosFinalFirmas = await dibujarFirmas({
     doc,
@@ -273,11 +273,11 @@ export default async function ConsentAdmisionDeclaracionSintomaticoRespiratorio(
   footerTR(doc, { footerOffsetY: 8, fontSize: 8 });
 
   // === Imprimir ===
-  if (!docExistente) {
+  if (docExistente) {
+    return doc;
+  } else {
     imprimir(doc);
   }
-
-  return doc;
 }
 
 function imprimir(doc) {

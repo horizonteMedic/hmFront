@@ -7,16 +7,22 @@ import { getToday } from "../../../../utils/helpers";
 import { GetInfoPac } from "./controllerFolio";
 import Swal from "sweetalert2";
 
-const today = getToday();
-
 const ExamenesList = [
-    /*{
-        nombre: "RESUMEN MEDICO PODEROSA",
+    {
+        nombre: "RAYOS X TORAX ARCHIVO", //NUEVO ARCHIVO
+        resultado: false,
+        tabla: "RAYOS X TORAX",
+        url: ""
+    },
+]
+
+const ExamenesList2 = [
+    {
+        nombre: "RESUMEN MEDICO PODEROSA", //NUEVO OPTIMIZAR
         resultado: false,
         tabla: "resumen_medico_poderosa",
         url: "/api/v01/ct/anexos/obtenerReporteResumenMedico",
-        esJasper: true
-    },*/
+    },
     {
         nombre: "CONSTANCIA DE EXAMEN MEDICO OCUPACIONAL",
         resultado: false,
@@ -32,7 +38,7 @@ const ExamenesList = [
         esJasper: true
     },
     {
-        nombre: "ANEXO 16 ",
+        nombre: "ANEXO 16",
         resultado: false,
         tabla: "anexo7c",
         url: "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16"
@@ -45,18 +51,82 @@ const ExamenesList = [
         url: "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2",
         esJasper: true
     },
+    //ANEXO 02
     {
-        nombre: "ENFERMEDADES EN ALTURA ",
+        nombre: "ANEXO 02",
+        resultado: false,
+        tabla: "anexo_agroindustrial",
+        url: "/api/v01/ct/anexos/anexo2/obtenerReporteAnexo2Completo",
+        esJasper: true
+    },
+    //ENFERMEDADES ALTURA GEOGRAFICA
+    {
+        nombre: "ENFERMEDADES EN ALTURA",
         resultado: false,
         tabla: "antece_enfermedades_altura",
         url: "/api/v01/ct/antecedentesEnfermedadesAltura/obtenerReporteAntecedentesEnfermedadesAltura"
     },
+    //ANEXO 16A
     {
         nombre: "ANEXO 16A",
         resultado: false,
         tabla: "anexo16a",
         url: "/api/v01/ct/anexos/anexo16a/obtenerReporteAnexo16a",
         esJasper: true
+    },
+    //Certificado en Altura
+    {
+        nombre: "CERTIFICADO ALTURA",
+        resultado: false,
+        tabla: "b_certificado_altura",
+        url: "/api/v01/ct/certificadoTrabajoAltura/obtenerReporteCertificadoTrabajoAltura",
+        esJasper: true
+    },
+    //PSICOSENSOMETRICO
+    // {
+    //     nombre: "PSICOSENSOMETRICO ",//NUEVO ARCHIVO EXTERNO
+    //     resultado: false,
+    //     tabla: "PSICOSENSOMETRICO",
+    //     url: ""
+    // },
+    //Certificado en Altura PODEROSA
+    {
+        nombre: "CERTIFICADO APTITUD ALTURA PODEROSA",
+        resultado: false,
+        tabla: "aptitud_altura_poderosa",
+        url: "/api/v01/ct/aptitudAltura/obtenerReporteAptitudAlturaPoderosa",
+        esJasper: true
+    },
+    //Certificado Vehiculos
+    {
+        nombre: "CERTIFICADO VEHICULOS",
+        resultado: false,
+        tabla: "b_certificado_conduccion",
+        url: "/api/v01/ct/certificadoConduccion/obtenerReporteCertificadoConduccion",
+        esJasper: true
+    },
+    //Ficha sas
+    {
+        nombre: "FICHA SAS",
+        resultado: false,
+        tabla: "ficha_sas",
+        url: "/api/v01/ct/fichaApneaSueno/obtenerReporteFichaSas",
+        esJasper: true
+    },
+    //LICENCIA PARA CONDUCIR INTERNA PODEROSA
+    {
+        nombre: "LICENCIA PARA CONDUCIR INTERNA PODEROSA",//NUEVO  OPTIMIZAR
+        resultado: false,
+        tabla: "aptitud_licencia_conduciri",
+        url: "/api/v01/ct/aptitudLicenciaConducir/obtenerReporteAptitudLicenciaConducir",
+        esJasper: true
+    },
+    //HOJA DE CONSULTA EXTERNA
+    {
+        nombre: "HOJA DE CONSULTA EXTERNA",//NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "hoja_consulta_externa",
+        url: "/api/v01/ct/hojaConsultaExterna/obtenerReporteHojaConsultaExterna",
     },
     {
         nombre: "USO DE RESPIRADORES",
@@ -66,7 +136,7 @@ const ExamenesList = [
         esJasper: true
     },
     {
-        nombre: "HISTORIA OCUPACIONAL ",
+        nombre: "HISTORIA OCUPACIONAL",
         resultado: false,
         tabla: "historia_oc_info",
         url: "/api/v01/ct/historiaOcupacional/obtenerReporteHistoriaOcupacional"
@@ -78,6 +148,14 @@ const ExamenesList = [
         url: "/api/v01/ct/antecedentesPatologicos/obtenerReporteAntecedentesPatologicos",
         esJasper: true
     },
+    //DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS Y FAMILIARES
+    {
+        nombre: "DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS Y FAMILIARES",//NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "DECLA_JURA_ANTECE_PERSON_FAM",
+        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
+        esJasper: true
+    },
     {
         nombre: "CUESTIONARIO NORDICO",
         resultado: false,
@@ -85,13 +163,21 @@ const ExamenesList = [
         url: "/api/v01/ct/cuestionarioNordico/obtenerReporteCuestionarioNordico"
     },
     {
-        nombre: "EVALUACION MUSCULO ESQUELETICA ",
+        nombre: "EVALUACION MUSCULO ESQUELETICA",
         resultado: false,
         tabla: "evaluacion_musculo_esqueletica",
         url: "/api/v01/ct/evaluacionMusculoEsqueletica/obtenerReporteEvaluacionMusculoEsqueletica"
     },
+    //CONSENTIMIENTO DE MUESTRA DE SANGRE
     {
-        nombre: "LABORATORIO CLINICO ",
+        nombre: "CONSENTIMIENTO DE MUESTRA DE SANGRE",//NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "consent_Muestra_Sangre",
+        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
+        nameConset: true
+    },
+    {
+        nombre: "LABORATORIO CLINICO",
         resultado: false,
         tabla: "lab_clinico",
         url: "/api/v01/ct/laboratorio/obtenerReporteLaboratorioClinico"
@@ -101,6 +187,37 @@ const ExamenesList = [
         resultado: false,
         tabla: "analisis_bioquimicos",
         url: "/api/v01/ct/laboratorio/reporteAnalisisBioquimico"
+    },
+    //INMUNOLOGIA - GENODOTROPINA
+    {
+        nombre: "INMUNOLOGIA - GENODOTROPINA",//NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "lgonadotropina",
+        url: "/api/v01/ct/inmunologia/obtenerReporteLgonadotropina",
+    },
+    //CONSENTIMIENTO DE MARIHUANA 
+    {
+        nombre: "CONSENTIMIENTO DE MARIHUANA",//NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "consent_marihuana",
+        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
+        nameConset: true,
+    },
+    //CONSENTIMIENTO PANEL 2D
+    {
+        nombre: "CONSENTIMIENTO PANEL 2D",//NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "con_panel2D",
+        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
+        nameConset: true,
+    },
+    //CONSENTIMIENTO DROGAS BOROO
+    {
+        nombre: "CONSENTIMIENTO DROGAS BOROO",//NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "consent_Boro",
+        url: "/api/v01/ct/laboratorio/consentimientoLaboratorioBoro",
+        nameConset: true,
     },
     {
         nombre: "OIT",
@@ -114,6 +231,27 @@ const ExamenesList = [
         tabla: "radiografia_torax",
         url: "/api/v01/ct/rayosX/obtenerReporteRadiografiaTorax"
     },
+    //RAYOS X TORAX ARCHIVO
+    // {
+    //     nombre: "RAYOS X TORAX ARCHIVO", //NUEVO ARCHIVO FALTA IMPRIMIR
+    //     resultado: false,
+    //     tabla: "RAYOS X TORAX",
+    //     url: ""
+    // },
+    //INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA)
+    {
+        nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA)", //NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "radiografia",
+        url: "/api/v01/ct/rayosX/obtenerReporteInformeRadiografico"
+    },
+    //INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA) ARCHIVO
+    // {
+    //     nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA) ARCHIVO", //NUEVO ARCHIVO FALTA IMPRIMIR
+    //     resultado: false,
+    //     tabla: "INFORME RADIOGRAFICO",
+    //     url: ""
+    // },
     {
         nombre: "ELECTROCARDIOGRAMA",
         resultado: false,
@@ -121,6 +259,13 @@ const ExamenesList = [
         url: "/api/v01/ct/electroCardiograma/obtenerReporteInformeElectroCardiograma",
         esJasper: true
     },
+    //ELECTROCARDIOGRAMA ARCHIVO
+    // {
+    //     nombre: "ELECTROCARDIOGRAMA ARCHIVO", //NUEVO ARCHIVO FALTA IMPRIMIR
+    //     resultado: false,
+    //     tabla: "ELECTROCARDIOGRAMA",
+    //     url: ""
+    // },
     {
         nombre: "ESPIROMETRIA",
         resultado: false,
@@ -128,10 +273,70 @@ const ExamenesList = [
         url: ""
     },
     {
-        nombre: "FICHA AUDIOLOGICA",
+        nombre: "FICHA AUDIOLOGICA OHLA",
         resultado: false,
         tabla: "audiometria_po",
         url: "/api/v01/ct/audiometria/obtenerReporteAudiometriaM"
+    },
+    //FICHA AUDIOMETRIA
+    {
+        nombre: "FICHA AUDIOMETRIA", //NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "audiometria_2023",
+        url: "/api/v01/ct/manipuladores/obtenerReporteAudiometria"
+    },
+    //CUESTIONARIO AUDIOMETRIA 
+    {
+        nombre: "CUESTIONARIO AUDIOMETRIA ", //NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "cuestionario_audiometria",
+        url: "/api/v01/ct/audiometria/obtenerReporteCuestionarioAudiometria"
+    },
+    //FICHA INTERCONSULTA 
+    // {
+    //     nombre: "FICHA INTERCONSULTA", //NUEVO REVISAR SERAN VARIOS CONSUMOS
+    //     resultado: false,
+    //     tabla: "ficha_interconsulta",
+    //     url: "/api/v01/ct/fichaInterconsulta/obtenerFichaInterconsultaReporte"
+    // },
+    //ODONTROGRAMA
+    {
+        nombre: "ODONTROGRAMA", //NUEVO OPTIMIZAR Y REENCUADRE JEAN
+        resultado: false,
+        tabla: "odontograma",
+        url: "/api/v01/ct/odontograma/obtenerReporteOdontograma"
+    },
+    //PSICOLOGIA ANEXO 03
+    {
+        nombre: "PSICOLOGIA ANEXO 03", //NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "ficha_psicologica_anexo03",
+        url: "/api/v01/ct/psicologia/obtenerFichaPsicologiaAnexo03",
+        esJasper: true,
+    },
+    //TEST DE FATIGA Y SOMNOLENCIA
+    {
+        nombre: "TEST DE FATIGA Y SOMNOLENCIA", //NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "informe_psicologico_estres",
+        url: "/api/v01/ct/informePsicologicoAdeco/obtenerReporteInformePsicologicoAdeco",
+        esJasper: true,
+    },
+    //INFORME PSICOLOGICO DE PODEROSA LICENCIA PARA OPERAR
+    {
+        nombre: "INFORME PSICOLOGICO DE PODEROSA LICENCIA PARA OPERAR", //NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "evaluacion_psicologica_poderosa",
+        url: "/api/v01/ct/evaluacionPsicologicaPoderosa/obtenerReporteEvaluacionPsicologicaPoderosa",
+        esJasper: true,
+    },
+    //PSICOLOGIA ANEXO 02
+    {
+        nombre: "PSICOLOGIA ANEXO 02", //NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "ficha_psicologica_anexo02",
+        url: "/api/v01/ct/psicologia/obtenerFichaPsicologiaAnexo02",
+        esJasper: true,
     },
     {
         nombre: "INFORME PSICOLOGICO",
@@ -140,21 +345,106 @@ const ExamenesList = [
         url: "/api/v01/ct/informePsicologico/obtenerReporteInformePsicologico",
         esJasper: true
     },
+    //INFORME PSICOLOGIA FOBIAS
+    {
+        nombre: "INFORME PSICOLOGIA FOBIAS", //NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "fobias",
+        url: "/api/v01/ct/fobias/obtenerReporte",
+        esJasper: true
+    },
+    //INFORME PSICOLABORAL
+    {
+        nombre: "INFORME PSICOLABORAL", //NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "informe_psicolaboral",
+        url: "/api/v01/ct/informePsicolaboral/obtenerReporteInformePsicolaboral",
+        esJasper: true
+    },
+    //TRABAJOS EN ESPECIFICOS
+    {
+        nombre: "TRABAJOS EN ESPECIFICOS", //NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "especificos",
+        url: "/api/v01/ct/trabajoEspecifico/obtenerReporteTrabajosEspecificos",
+        esJasper: true
+    },
+    //TRABAJO EN ALTURA
+    {
+        nombre: "TRABAJO EN ALTURA", //NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "psicologiafobias",
+        url: "/api/v01/ct/informePsicologicoFobias/obtenerReporteInformePsicologicoFobias",
+        esJasper: true
+    },
+    //OFTALMOLOGIA
+    {
+        nombre: "OFTALMOLOGIA", //NUEVO OPTIMIZAR JEAN URGENTE
+        resultado: false,
+        tabla: "oftalmologia2021",
+        url: "/api/v01/ct/agudezaVisual/obtenerReporteEvaluacionOftalmologica",
+    },
+    //OFTALMOLOGIA VISION TESTER
+    // {
+    //     nombre: "OFTALMOLOGIA VISION TESTER", //NUEVO ARCHIVO
+    //     resultado: false,
+    //     tabla: "OFTALMOLOGIA VISION TESTER",
+    //     url: ""
+    // },
     {
         nombre: "FICHA OFTALMOLOGICA",
         resultado: false,
         tabla: "oftalmologia",
         url: "/api/v01/ct/agudezaVisual/obtenerReporteOftalmologia"
     },
+    //DECLARACION DE SINTOMATICO RESPIRATORIO
     {
-        nombre: "CONSENTIMIENTO INFORMADO ",
+        nombre: "DECLARACION DE SINTOMATICO RESPIRATORIO", //NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "CONSENT_SINTOMATICO",
+        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
+        esJasper: true
+    },
+    //CONSENTIMIENTO INFORMADO DE EVALUACION MEDICA
+    {
+        nombre: "CONSENTIMIENTO INFORMADO DE EVALUACION MEDICA", //NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "CONSENT_INFORMADO_MEDICA",
+        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
+        esJasper: true
+    },
+    //CONSENTIMIENTO BUENA SALUD
+    {
+        nombre: "CONSENTIMIENTO BUENA SALUD", //NUEVO
+        resultado: false,
+        tabla: "consentimientobuenasalud",
+        url: "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoBuenaSalud",
+        esJasper: true
+    },
+    {
+        nombre: "CONSENTIMIENTO INFORMADO",
         resultado: false,
         tabla: "consentimientoInformado",
         url: "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoInformado"
     },
+    //DECLARACION JURADA PARA EL USO DE FIRMA ELECTRONICA
+    // {
+    //     nombre: "DECLARACION JURADA PARA EL USO DE FIRMA ELECTRONICA", //NUEVO ARCHIVO
+    //     resultado: false,
+    //     tabla: "DECLARACIONUSOFIRMA",
+    //     url: "",
+    // },
+    //DNI Y OTROS DOCUMENTOS
+    // {
+    //     nombre: "DNI Y OTROS DOCUMENTOS", //NUEVO ARCHIVO
+    //     resultado: false,
+    //     tabla: "DNI Y OTROS DOCUMENTOS",
+    //     url: "",
+    // },
 ];
 
 const Folio = () => {
+    const today = getToday();
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
     const initialFormState = {
         norden: "",

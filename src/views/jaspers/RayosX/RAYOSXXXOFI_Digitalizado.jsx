@@ -1,8 +1,8 @@
 import jsPDF from "jspdf";
 import HeaderRAYOSXXXOFI from "./Headers/header_RAYOSXXXOFI_Digitalizado.jsx";
 
-export default async function RAYOSXXXOFI_Digitalizado(data = {}) {
-  const doc = new jsPDF();
+export default async function RAYOSXXXOFI_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 60;
@@ -177,9 +177,13 @@ export default async function RAYOSXXXOFI_Digitalizado(data = {}) {
   // Posición de la firma justo 4 puntos debajo de las conclusiones
   const firmaY = y + 4; // Solo 4 puntos debajo del texto de conclusiones
   const firmasAPintar = [{ nombre: "SELLOFIRMA", x: 95, y: firmaY, maxw: 120 }];
-  agregarFirmas(doc, data.digitalizacion, firmasAPintar).then(() => {
+  await agregarFirmas(doc, data.digitalizacion, firmasAPintar);
+
+  if (docExistente) {
+    return doc;
+  } else {
     imprimir(doc);
-  });
+  }
 }
 
 function imprimir(doc) {

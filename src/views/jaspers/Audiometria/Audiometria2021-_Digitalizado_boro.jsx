@@ -772,9 +772,9 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   );
 };
 
-export default async function Audiometria2021_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-  body_Audiometria2021_Digitalizado(doc, data);
+export default async function Audiometria2021_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+  await body_Audiometria2021_Digitalizado(doc, data);
 
   // Función para agregar la firma y esperar a que cargue o falle
   const addSello = (imagenUrl, x, y, maxw = 100) => {
@@ -825,20 +825,23 @@ export default async function Audiometria2021_Digitalizado(data = {}) {
   ];
 
   // Crear promesas para todas las firmas existentes
-  const promesasFirmas = firmasAPintar
+  await firmasAPintar
     .filter((f) => firmas[f.nombre])
     .map((f) => addSello(firmas[f.nombre], f.x, f.y, f.maxw));
 
-  Promise.all(promesasFirmas).then(() => {
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    iframe.onload = () => {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
-  });
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
+
+}
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
 }

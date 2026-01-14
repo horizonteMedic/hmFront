@@ -4,8 +4,8 @@ import footerTR from "../components/footerTR.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
 import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
 
-export default async function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
-  const doc = new jsPDF();
+export default async function Consentimiento_Muestra_Sangre_Digitalizado(datos = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // Función para formatear fecha a DD/MM/YYYY
@@ -247,22 +247,28 @@ export default async function Consentimiento_Muestra_Sangre_Digitalizado(datos) 
   const baseY = y + 70;
 
   // Usar helper para dibujar firmas
-  dibujarFirmas({ doc, datos, y: baseY, pageW }).then(() => {
+  try {
+    await dibujarFirmas({ doc, datos, y: baseY, pageW });
     footerTR(doc, datos);
-
-    // ─── 6) Imprimir ───────────────────────────────────
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    iframe.onload = () => {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
-  }).catch(err => {
+    
+    if (docExistente) {
+      return doc;
+    } else {
+      imprimir(doc);
+    }
+  } catch (err) {
     console.error(err);
     alert('Error generando PDF: ' + err);
-  });
+  }
+
+
+}
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
 }

@@ -7,7 +7,15 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
     const pdfFinal = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
 
     const reportesConHorizontal = [
-        "historia_oc_info"
+        "historia_oc_info",
+        "odontograma"
+    ];
+
+    const archivos = [
+        "ESPIROMETRIA",
+        "RAYOS X TORAX",
+        "INFORME RADIOGRAFICO",
+        "ELECTROCARDIOGRAMA"
     ];
 
     const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true);
@@ -18,7 +26,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
 
     // Encontrar el examen de Espirometría
     const espirometria = ListaExamenes.find(
-        e => e.tabla === "ESPIROMETRIA" && e.resultado === true && e.url
+        e => e.tabla === "ESPIROMETRIA" && e.resultado === true
     );
 
     // Variable para rastrear en qué página insertar Espirometría
@@ -36,7 +44,9 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
 
         const apiUrl = examen.esJasper
             ? `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}&esJasper=true`
-            : `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}`;
+            : examen.nameConset ?
+                `${examen.url}?nOrden=${nro}&nameConset=${examen.tabla}`
+                : `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}`;
 
         try {
             const data = await getFetch(apiUrl, token);
@@ -65,7 +75,17 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
 
 
             //const generarReporte = reportesMap[examen.tabla];
-            const generador = reportesMap[examen.tabla];
+            let generador = null;
+
+            if (examen.tabla === "resumen_medico_poderosa") {
+                generador = reportesMap[examen.tabla][data.nameJasper];
+            } else {
+                generador = reportesMap[examen.tabla];
+            }
+            console.log("data:", data);
+            console.log("Generador:", generador);
+
+
             const generadorFinal = typeof generador === "function" && generador.length === 1
                 ? generador(data)
                 : generador;

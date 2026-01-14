@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-import { getFetch, getFetchManejo, SubmitData } from "./apiHelpers";
+import { getFetch, getFetchManejo, SubmitData, SubmitDataManejo } from "./apiHelpers";
 import { colocarSellosEnPdf, getSign, uint8ToBase64 } from "./helpers";
 
 export const LoadingDefault = (text) => {
@@ -242,11 +242,12 @@ export const GetInfoServicioDefault = async (
     tabla,
     token,
     obtenerReporteUrl,
-    onFinish = () => { }
+    onFinish = () => { },
+    esJasper = false
 ) => {
     try {
         const res = await getFetch(
-            `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=false`,
+            `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=${esJasper}`,
             token
         );
         if (res?.norden || res?.norden_n_orden || res?.n_orden) {
@@ -344,7 +345,7 @@ export const SubmitDataServiceDefaultManejo = async (
         if (tienePrint) {
             Swal.fire({
                 title: "Exito",
-                text: `${res.mensaje ?? ""},\n¿Desea imprimir?`,
+                text: `${res.resultado ?? ""},\n¿Desea imprimir?`,
                 icon: "success",
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",
@@ -357,7 +358,7 @@ export const SubmitDataServiceDefaultManejo = async (
         } else {
             Swal.fire({
                 title: "Exito",
-                text: `${res.mensaje ?? ""}`,
+                text: `${res.resultado ?? ""}`,
                 icon: "success",
             })
         }
@@ -463,6 +464,82 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
 };
 
 
+export const handleSubirArchivoDefaultSinSellos = async (
+    form,
+    selectedSede,
+    urlPDf,
+    userlogued,
+    token
+) => {
+    const { value: file } = await Swal.fire({
+        title: "Selecciona un archivo PDF",
+        input: "file",
+        inputAttributes: {
+            accept: "application/pdf",
+            "aria-label": "Sube tu archivo en formato PDF",
+        },
+        showCancelButton: true,
+        confirmButtonText: "Subir",
+        cancelButtonText: "Cancelar",
+        inputValidator: (file) => {
+            if (!file) return "Debes seleccionar un archivo.";
+            if (file.type !== "application/pdf")
+                return "Solo se permiten archivos PDF.";
+        },
+    });
+
+    if (!file) return;
+
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = ("0" + (currentDate.getMonth() + 1)).slice(-2);
+    const day = ("0" + currentDate.getDate()).slice(-2);
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        LoadingDefault("Subiendo documento");
+
+        const base64WithoutHeader = e.target.result.split(",")[1];
+        const pdfBytes = Uint8Array.from(
+            atob(base64WithoutHeader),
+            (c) => c.charCodeAt(0)
+        );
+
+        const pdfBase64Final = uint8ToBase64(pdfBytes);
+
+        const datos = {
+            rutaArchivo: null,
+            dni: null,
+            historiaClinica: null,
+            servidor: "azure",
+            estado: true,
+            fechaRegistro: `${year}-${month}-${day}`,
+            userRegistro: userlogued,
+            fechaActualizacion: null,
+            userActualizacion: null,
+            id_tipo_archivo: null,
+
+            nombreArchivo: file.name,
+            codigoSede: selectedSede,
+            fileBase64: pdfBase64Final,
+            nomenclatura_tipo_archivo: form.nomenclatura,
+            orden: form.norden,
+            indice_carga_masiva: undefined,
+        };
+
+        const response = await SubmitData(datos, urlPDf, token);
+
+        if (response?.id === 1) {
+            Swal.fire("Éxito", "Archivo subido con éxito", "success");
+        } else {
+            Swal.fire("Error", "No se pudo subir el archivo", "error");
+        }
+    };
+
+    reader.readAsDataURL(file);
+};
+
+
 /*abrir PDF para previsualizador
  const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
             const pdfUrl = URL.createObjectURL(pdfBlob);
@@ -474,3 +551,22 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
 
             document.body.removeChild(link);
             URL.revokeObjectURL(pdfUrl);*/
+
+export const ReadArchivosFormDefault = async (form, setVisualerOpen, token) => {
+    LoadingDefault("Cargando Archivo")
+    getFetch(`/api/v01/st/registros/detalleUrlArchivos/${form.norden}/${form.nomenclatura}`, token)
+        .then(response => {
+            console.log(response)
+            if (response.id === 1) {
+                setVisualerOpen(response)
+
+                Swal.close()
+            } else {
+                Swal.fire("Error", "No Existe reporte para este Numero de Orden", "error")
+            }
+        })
+        .catch(error => {
+            Swal.fire("Error", "Ocurrio un Error al visualizar el archivo", "error")
+            throw new Error('Network response was not ok.', error);
+        })
+}

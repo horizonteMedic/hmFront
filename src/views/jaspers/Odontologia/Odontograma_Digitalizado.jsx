@@ -269,8 +269,8 @@ const headerOdontograma = (doc, datos) => {
   doc.setFont("helvetica", "normal").setFontSize(10);
 };
 
-export default async function Odontograma_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "landscape" });
+export default async function Odontograma_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "landscape" });
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -644,9 +644,14 @@ export default async function Odontograma_Digitalizado(data = {}) {
     { nombre: "HUELLA", x: 120, y: 160, maxw: 130 },
     { nombre: "SELLOFIRMA", x: 180, y: 160, maxw: 120 },
   ];
-  agregarFirmas(doc, data.digitalizacion, firmasAPintar).then(() => {
+  await agregarFirmas(doc, data.digitalizacion, firmasAPintar);
+
+
+  if (docExistente) {
+    return doc;
+  } else {
     imprimir(doc);
-  });
+  }
 }
 function imprimir(doc) {
   const blob = doc.output("blob");
