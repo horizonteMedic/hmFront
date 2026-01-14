@@ -25,20 +25,28 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
     // Array para almacenar estadísticas de peso
     const estadisticasPeso = [];
 
-    // Encontrar el examen de Espirometría
-    const espirometria = ListaExamenes.find(
-        e => e.tabla === "ESPIROMETRIA" && e.resultado === true
-    );
+    // Array para rastrear exámenes con PDFs externos y sus posiciones
+    const pdfsExternos = [];
 
-    // Variable para rastrear en qué página insertar Espirometría
-    // Prioridad: EKG > Radiografía de Torax > OIT
-    let paginaParaEspirometria = null;
-    let examenReferencia = null;
+    // Contador de exámenes GENERADOS (no externos)
+    let examenesGenerados = 0;
+
+    // Variable para rastrear la última página generada
+    let ultimaPaginaGenerada = 0;
 
     for (let i = 0; i < examenesFiltrados.length; i++) {
         const examen = examenesFiltrados[i];
-        // ⚠️ ESPIROMETRIA NO SE CONSULTA
-        if (examen.tabla === "ESPIROMETRIA") {
+
+        // ⚠️ Si el examen está en el array "archivos", NO se consulta - se insertará el PDF externo
+        if (archivos.includes(examen.tabla)) {
+            // Guardar referencia para insertar PDF externo después
+            pdfsExternos.push({
+                examen: examen,
+                // La posición es después del último examen generado
+                posicionInsercion: ultimaPaginaGenerada,
+                indiceEnLista: i
+            });
+            console.log(`📎 PDF Externo detectado: ${examen.nombre} - Se insertará después de página ${ultimaPaginaGenerada}`);
             continue;
         }
 
@@ -58,8 +66,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
 
             const isHorizontal = reportesConHorizontal.includes(examen.tabla);
 
-            // Solo agregar página si NO es el primer examen
-            if (i > 0) {
+            // Solo agregar página si NO es el primer examen GENERADO
+            if (examenesGenerados > 0) {
                 if (isHorizontal) {
                     pdfFinal.addPage("letter", "landscape");
                 } else {
@@ -97,21 +105,11 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
                 console.warn("No existe generador para:", examen.tabla);
             }
 
-            // 🫁 Marcar la posición para insertar Espirometría (con prioridad)
-            // Prioridad: EKG > Radiografía > OIT
-            if (examen.tabla === "informe_electrocardiograma") {
-                paginaParaEspirometria = pdfFinal.internal.getNumberOfPages();
-                examenReferencia = "Electrocardiograma";
-                console.log(`📍 EKG termina en página ${paginaParaEspirometria} - PRIORIDAD ALTA para Espirometría`);
-            } else if (examen.tabla === "radiografia_torax" && !examenReferencia) {
-                paginaParaEspirometria = pdfFinal.internal.getNumberOfPages();
-                examenReferencia = "Radiografía de Tórax";
-                console.log(`📍 Radiografía termina en página ${paginaParaEspirometria} - Fallback para Espirometría`);
-            } else if (examen.tabla === "oit" && !examenReferencia) {
-                paginaParaEspirometria = pdfFinal.internal.getNumberOfPages();
-                examenReferencia = "OIT";
-                console.log(`📍 OIT termina en página ${paginaParaEspirometria} - Fallback secundario para Espirometría`);
-            }
+            // 📍 Actualizar la última página generada
+            ultimaPaginaGenerada = pdfFinal.internal.getNumberOfPages();
+            examenesGenerados++;
+
+            console.log(`✅ Examen generado: ${examen.nombre} - Termina en página ${ultimaPaginaGenerada}`);
 
             // Medir tamaño DESPUÉS de agregar el reporte
             const pesoDespues = pdfFinal.output('arraybuffer').byteLength;
@@ -159,16 +157,52 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
     console.log("═".repeat(80) + "\n");
 
 
-    // Generar PDF final con Espirometría en la posición correcta
+    // 📄 Generar PDF final con todos los PDFs externos en sus posiciones correctas
     let pdfFinalBytes;
 
-    if (espirometria && paginaParaEspirometria !== null) {
-        console.log(`🫁 Insertando PDF de Espirometría después de página ${paginaParaEspirometria} (después de ${examenReferencia})`);
-        pdfFinalBytes = await insertarPdfEnPosicion(pdfFinal, espirometria.url, paginaParaEspirometria);
-    } else if (espirometria) {
-        // Si no se encontró ningún examen de referencia, agregar Espirometría al final
-        console.log("🫁 Agregando PDF de Espirometría al final (no se encontró EKG, Radiografía ni OIT)");
-        pdfFinalBytes = await agregarPdfAlFinal(pdfFinal, espirometria.url);
+    if (pdfsExternos.length > 0) {
+        console.log(`📎 Insertando ${pdfsExternos.length} PDF(s) externo(s) en el orden correcto...`);
+
+        // Convertir jsPDF a PDFDocument
+        const baseBytes = pdfFinal.output("arraybuffer");
+        let basePdf = await PDFDocument.load(baseBytes);
+
+        // Contador de páginas insertadas para ajustar posiciones
+        let paginasInsertadasAcumuladas = 0;
+
+        // Insertar PDFs externos en ORDEN NORMAL (del primero al último)
+        // Ajustamos las posiciones considerando las inserciones previas
+        for (let i = 0; i < pdfsExternos.length; i++) {
+            const pdfExt = pdfsExternos[i];
+            const { examen, posicionInsercion } = pdfExt;
+
+            // Ajustar la posición según las páginas insertadas previamente
+            const posicionAjustada = posicionInsercion + paginasInsertadasAcumuladas;
+
+            console.log(`📌 Insertando ${examen.nombre} (${examen.tabla}) en posición ${posicionAjustada} (original: ${posicionInsercion}, ajuste: +${paginasInsertadasAcumuladas})`);
+
+            // Cargar el PDF externo
+            const externoBytes = await fetch(examen.url).then(r => r.arrayBuffer());
+            const externoPdf = await PDFDocument.load(externoBytes);
+
+            // Copiar todas las páginas del PDF externo
+            const paginasExternas = await basePdf.copyPages(
+                externoPdf,
+                externoPdf.getPageIndices()
+            );
+
+            // Insertar las páginas en la posición correcta
+            paginasExternas.forEach((pagina, index) => {
+                basePdf.insertPage(posicionAjustada + index, pagina);
+            });
+
+            // Actualizar el contador de páginas insertadas
+            paginasInsertadasAcumuladas += paginasExternas.length;
+            console.log(`   ✓ ${paginasExternas.length} página(s) insertada(s). Total acumulado: ${paginasInsertadasAcumuladas}`);
+        }
+
+        pdfFinalBytes = await basePdf.save();
+        console.log("✅ Todos los PDFs externos insertados correctamente");
     } else {
         pdfFinalBytes = pdfFinal.output("arraybuffer");
     }
