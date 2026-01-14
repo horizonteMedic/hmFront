@@ -11,6 +11,13 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "odontograma"
     ];
 
+    const archivos = [
+        "ESPIROMETRIA",
+        "RAYOS X TORAX",
+        "INFORME RADIOGRAFICO",
+        "ELECTROCARDIOGRAMA"
+    ];
+
     const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true);
     const totalReportes = examenesFiltrados.length;
 
@@ -19,7 +26,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
 
     // Encontrar el examen de Espirometría
     const espirometria = ListaExamenes.find(
-        e => e.tabla === "ESPIROMETRIA" && e.resultado === true && e.url
+        e => e.tabla === "ESPIROMETRIA" && e.resultado === true
     );
 
     // Variable para rastrear en qué página insertar Espirometría

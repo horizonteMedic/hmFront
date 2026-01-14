@@ -213,7 +213,7 @@ const ExamenesList2 = [
     },
     //CONSENTIMIENTO DROGAS BOROO
     {
-        nombre: "CONSENTIMIENTO DROGAS BOROO",//NUEVO REVISAR PORQUE CRISTIAN NO MANDA
+        nombre: "CONSENTIMIENTO DROGAS BOROO",//NUEVO OPTIMIZAR
         resultado: false,
         tabla: "consent_Boro",
         url: "/api/v01/ct/laboratorio/consentimientoLaboratorioBoro",
@@ -233,9 +233,9 @@ const ExamenesList2 = [
     },
     //RAYOS X TORAX ARCHIVO
     // {
-    //     nombre: "RAYOS X TORAX ARCHIVO", //NUEVO ARCHIVO
+    //     nombre: "RAYOS X TORAX ARCHIVO", //NUEVO ARCHIVO FALTA IMPRIMIR
     //     resultado: false,
-    //     tabla: "RAYOSXTORAXARCHIVO",
+    //     tabla: "RAYOS X TORAX",
     //     url: ""
     // },
     //INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA)
@@ -247,9 +247,9 @@ const ExamenesList2 = [
     },
     //INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA) ARCHIVO
     // {
-    //     nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA) ARCHIVO", //NUEVO ARCHIVO
+    //     nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA) ARCHIVO", //NUEVO ARCHIVO FALTA IMPRIMIR
     //     resultado: false,
-    //     tabla: "INFORME RADIOGRAFICOARCHIVO",
+    //     tabla: "INFORME RADIOGRAFICO",
     //     url: ""
     // },
     {
@@ -261,9 +261,9 @@ const ExamenesList2 = [
     },
     //ELECTROCARDIOGRAMA ARCHIVO
     // {
-    //     nombre: "ELECTROCARDIOGRAMA ARCHIVO", //NUEVO ARCHIVO
+    //     nombre: "ELECTROCARDIOGRAMA ARCHIVO", //NUEVO ARCHIVO FALTA IMPRIMIR
     //     resultado: false,
-    //     tabla: "ELECTROCARDIOGRAMARCHIVO",
+    //     tabla: "ELECTROCARDIOGRAMA",
     //     url: ""
     // },
     {
@@ -294,7 +294,7 @@ const ExamenesList2 = [
     },
     //FICHA INTERCONSULTA 
     // {
-    //     nombre: "FICHA INTERCONSULTA", //NUEVO REVISAR  SERAN VARIOS CONSUMOS
+    //     nombre: "FICHA INTERCONSULTA", //NUEVO REVISAR SERAN VARIOS CONSUMOS
     //     resultado: false,
     //     tabla: "ficha_interconsulta",
     //     url: "/api/v01/ct/fichaInterconsulta/obtenerFichaInterconsultaReporte"
@@ -363,7 +363,7 @@ const ExamenesList2 = [
     },
     //TRABAJOS EN ESPECIFICOS
     {
-        nombre: "TRABAJOS EN ESPECIFICOS", //NUEVO REVISAR MAPEAO CRISTIAN
+        nombre: "TRABAJOS EN ESPECIFICOS", //NUEVO OPTIMIZAR
         resultado: false,
         tabla: "especificos",
         url: "/api/v01/ct/trabajoEspecifico/obtenerReporteTrabajosEspecificos",
@@ -388,7 +388,7 @@ const ExamenesList2 = [
     // {
     //     nombre: "OFTALMOLOGIA VISION TESTER", //NUEVO ARCHIVO
     //     resultado: false,
-    //     tabla: "OFTALMOLOGIAVISIONTESTER",
+    //     tabla: "OFTALMOLOGIA VISION TESTER",
     //     url: ""
     // },
     {
