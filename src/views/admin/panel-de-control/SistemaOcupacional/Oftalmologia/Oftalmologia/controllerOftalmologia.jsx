@@ -1,6 +1,7 @@
 import Swal from "sweetalert2";
 import { getFetch } from "../../../getFetch/getFetch";
 import { SubmitData } from "../model";
+import { handleSubirArchivoDefaultSinSellos, ReadArchivosFormDefault } from "../../../../../utils/functionUtils";
 
 //===============Zona Modificación===============
 const obtenerReporteUrl =
@@ -9,6 +10,8 @@ const registrarUrl =
   "/api/v01/ct/agudezaVisual/registrarActualizarEvaluacionOftalmologica";
 const obtenerDataRegistrada =
   "/api/v01/ct/agudezaVisual/obtenerInformacionOftalmologiaConSusObservaciones";
+const registrarPDF =
+  "/api/v01/ct/archivos/archivoInterconsulta"
 
 export const GetInfoServicio = (nro, tabla, set, token) => {
   getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
@@ -55,24 +58,24 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
           ishihara: res.rbtEcIshiharaNormal
             ? "NORMAL"
             : res.rbtEcIshiharaAnormal
-            ? "ANORMAL"
-            : res.rbtEcIshiharaNc
-            ? "N.C."
-            : "",
+              ? "ANORMAL"
+              : res.rbtEcIshiharaNc
+                ? "N.C."
+                : "",
           coloresPuros: res.rbtEcColeresNormal
             ? "NORMAL"
             : res.rbtEcColeresAnormal
-            ? "ANORMAL"
-            : res.rbtEcColeresNc
-            ? "N.C."
-            : "",
+              ? "ANORMAL"
+              : res.rbtEcColeresNc
+                ? "N.C."
+                : "",
           estereopsia: res.rbtEcEstereopsiaNormal
             ? "NORMAL"
             : res.rbtEcEstereopsiaAnormal
-            ? "ANORMAL"
-            : res.rbtEcEstereopsiaNc
-            ? "N.C."
-            : "",
+              ? "ANORMAL"
+              : res.rbtEcEstereopsiaNc
+                ? "N.C."
+                : "",
           estereopsiaText: res.txtTecEstereopsia ?? "",
 
           aplicaRefraccion: res.chkRefraccionAplica ? "SI" : "NO",
@@ -151,6 +154,9 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
           otrosOd: res.rbecOtrosOd,
           otrosOi: res.rbecOtrosOi,
           examenClinicoHallazgos: res.txtecHallazgos ?? "",
+
+          SubirDoc: true,
+          digitalizacion: res.digitalizacion
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -426,3 +432,11 @@ export const GetInfoPac = (nro, set, token, sede) => {
       Swal.close();
     });
 };
+
+export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
+  handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
+};
+
+export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
+  ReadArchivosFormDefault(form, setVisualerOpen, token)
+}

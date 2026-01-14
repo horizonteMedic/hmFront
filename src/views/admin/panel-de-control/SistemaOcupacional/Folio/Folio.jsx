@@ -386,7 +386,7 @@ const ExamenesList2 = [
     },
     //OFTALMOLOGIA VISION TESTER
     // {
-    //     nombre: "OFTALMOLOGIA VISION TESTER", //NUEVO ARCHIVO
+    //     nombre: "OFTALMOLOGIA VISION TESTER", //NUEVO ARCHIVO FALTA IMPRIMIR
     //     resultado: false,
     //     tabla: "OFTALMOLOGIA VISION TESTER",
     //     url: ""
