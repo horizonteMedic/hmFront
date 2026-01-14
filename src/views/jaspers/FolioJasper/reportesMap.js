@@ -33,6 +33,8 @@ import RAYOSXXXOFI_Digitalizado from "../RayosX/RAYOSXXXOFI_Digitalizado";
 import Audiometria2021_Digitalizado from "../Audiometria/Audiometria2021-_Digitalizado_boro";
 import CuestionarioAudiometria_Digitalizado from "../Audiometria/CuestionarioAudiometria/CuestionarioAudiometria_Digitalizado";
 import Odontograma_Digitalizado from "../Odontologia/Odontograma_Digitalizado";
+import FichaPsicologicaOcupacional_Digitalizado from "../ModuloPsicologia/FichaAnexo3/FichaPsicologicaOcupacional_Digitalizado";
+import InformePsicologicoAdecoEstres_Digitalizado from "../ModuloPsicologia/InformePsicologicoADECO/InformePsicologicoAdecoEstres_Digitalizado";
 // Agrega aquí todos tus reportes
 export const ekgMap = {
     InformeElectrocardiograma2023,
@@ -79,6 +81,11 @@ export const reportesMap = {
     //INTERCONSULTA
     //ODONTOGRAMA
     odontograma: Odontograma_Digitalizado,
+    //PSICOLOGIA ANEXO 3
+    ficha_psicologica_anexo03: FichaPsicologicaOcupacional_Digitalizado,
+    //TEST DE FATIGA
+    informe_psicologico_estres: InformePsicologicoAdecoEstres_Digitalizado,
+
 
 
     b_uso_respiradores: UsoRespiradores,

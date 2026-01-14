@@ -6,8 +6,8 @@ import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import { convertirGenero, getSign } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
 
-export default async function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function FichaPsicologicaOcupacional_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   // Contador de páginas dinámico
@@ -1698,7 +1698,12 @@ export default async function FichaPsicologicaOcupacional_Digitalizado(data = {}
   footerTR(doc, { footerOffsetY: 5 });
 
   // Imprimir
-  imprimir(doc);
+  if (docExistente) {
+    return doc;
+  } else {
+
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {
