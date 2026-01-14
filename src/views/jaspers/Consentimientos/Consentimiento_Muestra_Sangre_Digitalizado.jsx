@@ -4,7 +4,7 @@ import footerTR from "../components/footerTR.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
 import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
 
-export default async function Consentimiento_Muestra_Sangre_Digitalizado( datos = {}, docExistente = null ) {
+export default async function Consentimiento_Muestra_Sangre_Digitalizado(datos = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -247,18 +247,21 @@ export default async function Consentimiento_Muestra_Sangre_Digitalizado( datos 
   const baseY = y + 70;
 
   // Usar helper para dibujar firmas
-  dibujarFirmas({ doc, datos, y: baseY, pageW }).then(() => {
+  try {
+    await dibujarFirmas({ doc, datos, y: baseY, pageW });
     footerTR(doc, datos);
-  }).catch(err => {
+    
+    if (docExistente) {
+      return doc;
+    } else {
+      imprimir(doc);
+    }
+  } catch (err) {
     console.error(err);
     alert('Error generando PDF: ' + err);
-  });
-
-  if (docExistente) {
-    return doc;
-  } else {
-    imprimir(doc);
   }
+
+
 }
 function imprimir(doc) {
   const blob = doc.output("blob");

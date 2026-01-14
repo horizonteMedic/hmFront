@@ -7,7 +7,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
     const pdfFinal = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
 
     const reportesConHorizontal = [
-        "historia_oc_info"
+        "historia_oc_info",
+        "odontograma"
     ];
 
     const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true);

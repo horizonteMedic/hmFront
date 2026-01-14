@@ -6,8 +6,8 @@ import { convertirGenero } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
 import { dibujarFirmas } from '../../../utils/dibujarFirmas.js';
 
-export default async function InformePsicologicoAdecoEstres_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function InformePsicologicoAdecoEstres_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   // Contador de páginas dinámico
   let numeroPagina = 1;
@@ -424,7 +424,7 @@ export default async function InformePsicologicoAdecoEstres_Digitalizado(data = 
   // Contenido de la fila
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("APTO", tablaInicioX + anchoColumna / 2, yPos + 3.5, { align: "center" });
-  
+
   // Dibujar X en APTO si es true
   if (datosFinales.apto === true) {
     doc.setFont("helvetica", "bold").setFontSize(9);
@@ -432,10 +432,10 @@ export default async function InformePsicologicoAdecoEstres_Digitalizado(data = 
     doc.text("X", tablaInicioX + anchoColumna + anchoColumna / 2, yPos + 3.5, { align: "center" });
     doc.setTextColor(0, 0, 0); // Volver a negro
   }
-  
+
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("NO APTO", tablaInicioX + anchoColumna * 2 + anchoColumna / 2, yPos + 3.5, { align: "center" });
-  
+
   // Dibujar X en NO APTO si es true
   if (datosFinales.noApto === true) {
     doc.setFont("helvetica", "bold").setFontSize(9);
@@ -465,7 +465,11 @@ export default async function InformePsicologicoAdecoEstres_Digitalizado(data = 
   footerTR(doc, { footerOffsetY: 5 });
 
   // Imprimir
-  imprimir(doc);
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {

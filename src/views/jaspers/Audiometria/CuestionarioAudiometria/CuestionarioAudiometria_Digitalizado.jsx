@@ -638,37 +638,28 @@ export default async function CuestionarioAudiometria_Digitalizado(datos = {}, d
 
     // Fila de firmas (sin marco/borde)
     // 5) Dibujar firmas usando dibujarFirmas
-    dibujarFirmas({ doc, datos, y: tableY + 2, pageW }).then(() => {
+    await dibujarFirmas({ doc, datos, y: tableY + 2, pageW }).then(() => {
       // 6) Footer
       footerTR(doc, { footerOffsetY: 8, fontSize: 8 });
 
-      // 7) Generar blob y abrir en iframe para imprimir automáticamente
-      const blob = doc.output("blob");
-      const url = URL.createObjectURL(blob);
-      const iframe = document.createElement("iframe");
-      iframe.style.display = "none";
-      iframe.src = url;
-      document.body.appendChild(iframe);
-      iframe.onload = () => {
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print();
-      };
     }).catch(err => {
       console.error("Error al dibujar firmas:", err);
-      // 6) Footer
-      footerTR(doc, { footerOffsetY: 8, fontSize: 8 });
-
-      // 7) Generar blob y abrir en iframe para imprimir automáticamente
-      const blob = doc.output("blob");
-      const url = URL.createObjectURL(blob);
-      const iframe = document.createElement("iframe");
-      iframe.style.display = "none";
-      iframe.src = url;
-      document.body.appendChild(iframe);
-      iframe.onload = () => {
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print();
-      };
     });
+
+    if (docExistente) {
+      return doc;
+    } else {
+      imprimir(doc);
+    }
+
   })();
+}
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
 }

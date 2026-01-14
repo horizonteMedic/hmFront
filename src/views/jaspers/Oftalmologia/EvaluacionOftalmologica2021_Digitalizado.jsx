@@ -1,8 +1,8 @@
 import jsPDF from "jspdf";
 import header_EvaluacionOftalmologica2021_Digitalizado from "./headers/header_EvaluacionOftalmologica2021_Digitalizado.jsx";
 
-export default async function EvaluacionOftalmologica2021_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function EvaluacionOftalmologica2021_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -982,9 +982,12 @@ export default async function EvaluacionOftalmologica2021_Digitalizado(data = {}
     { nombre: "SELLOFIRMA", x: 40, y: 238, maxw: 120 },
     { nombre: "SELLOFIRMADOCASIG", x: 110, y: 238, maxw: 120 },
   ];
-  agregarFirmas(doc, data.digitalizacion, firmasAPintar).then(() => {
+  await agregarFirmas(doc, data.digitalizacion, firmasAPintar);
+  if (docExistente) {
+    return doc;
+  } else {
     imprimir(doc);
-  });
+  }
 }
 
 function imprimir(doc) {

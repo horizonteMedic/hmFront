@@ -6,8 +6,8 @@ import footerTR from '../../components/footerTR.jsx';
 import drawColorBox from '../../components/ColorBox.jsx';
 import { dibujarFirmas } from '../../../utils/dibujarFirmas.js';
 
-export default async function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   const datosReales = {
@@ -253,10 +253,10 @@ export default async function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}
   doc.setFont("helvetica", "normal").setFontSize(9);
   const lineasFortalezas = doc.splitTextToSize(textoFortalezas, anchoValor);
   const alturaFortalezas = Math.max(filaAltura, lineasFortalezas.length * 3.5 + paddingVertical * 2);
-  
+
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaFortalezas, 'S');
   doc.line(tablaInicioX + anchoLabel, yPos, tablaInicioX + anchoLabel, yPos + alturaFortalezas);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("FORTALEZAS / OPORTUNIDADES:", tablaInicioX + 2, yPos + paddingVertical + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
@@ -275,10 +275,10 @@ export default async function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}
   doc.setFont("helvetica", "normal").setFontSize(9);
   const lineasAmenazas = doc.splitTextToSize(textoAmenazas, anchoValor);
   const alturaAmenazas = Math.max(filaAltura, lineasAmenazas.length * 3.5 + paddingVertical * 2);
-  
+
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaAmenazas, 'S');
   doc.line(tablaInicioX + anchoLabel, yPos, tablaInicioX + anchoLabel, yPos + alturaAmenazas);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("AMENAZAS / DEBILIDADES:", tablaInicioX + 2, yPos + paddingVertical + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
@@ -318,13 +318,13 @@ export default async function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}
     const alturaTexto = lineas.length * 3.5;
     alturaRecomendaciones = Math.max(20, alturaTexto + padding * 2); // padding arriba y abajo
   }
-  
+
   // Dibujar borde
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRecomendaciones);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRecomendaciones);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaRecomendaciones, tablaInicioX + tablaAncho, yPos + alturaRecomendaciones);
-  
+
   // Dibujar recomendaciones (con padding arriba igual que OBSERVACIONES)
   doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(datosAdicionales.recomendaciones, tablaInicioX + 2, yPos + padding + 2, tablaAncho - 4);
@@ -374,7 +374,11 @@ export default async function INFORME_ADICIONAL_DE_FOBIAS_Digitalizado(data = {}
   footerTR(doc, { footerOffsetY: 5 });
 
   // === IMPRIMIR ===
-  imprimir(doc);
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {

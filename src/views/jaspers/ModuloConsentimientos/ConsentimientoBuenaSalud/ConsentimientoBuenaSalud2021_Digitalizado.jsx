@@ -5,8 +5,8 @@ import drawColorBox from '../../components/ColorBox.jsx';
 import footerTR from '../../components/footerTR.jsx';
 import { dibujarFirmas } from "../../../utils/dibujarFirmas.js";
 
-export default async function ConsentimientoBuenaSalud2021_Digitalizado(data = {}) {
-    const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function ConsentimientoBuenaSalud2021_Digitalizado(data = {}, docExistente = null) {
+    const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
     const margin = 20;
     const pageW = doc.internal.pageSize.getWidth();
 
@@ -51,26 +51,26 @@ export default async function ConsentimientoBuenaSalud2021_Digitalizado(data = {
         const sedeValue = `${data.sedeDescripcion || data.nombreSede || data.codigoSede || ''}`;
         const sedeX = pageW - margin - 20;
         const sedeY = y + 6;
-        
+
         // Número de ficha primero
         const fichaNum = String(data.norden || data.numeroFicha || "");
         const fichaY = sedeY;
-        
+
         // Texto "N° Ficha :" delante del número
         const fichaLabelX = sedeX - 40;
         doc.setFont("helvetica", "normal").setFontSize(9);
         doc.text("N° Ficha :", fichaLabelX - 4, fichaY);
-        
+
         // Número de ficha grande y subrayado
         const fichaNumX = fichaLabelX + doc.getTextWidth("N° Ficha :") + 5;
         doc.setFont("helvetica", "bold").setFontSize(22);
         doc.text(fichaNum, fichaNumX - 4, fichaY);
-        
+
         // Subrayar el número de ficha
         const fichaWidth = doc.getTextWidth(fichaNum);
         doc.setLineWidth(0.3);
         doc.line(fichaNumX - 4, fichaY + 1, fichaNumX - 4 + fichaWidth, fichaY + 1);
-        
+
         // Sede debajo del número de ficha
         const sedeY2 = sedeY + 8;
         doc.setFont("helvetica", "normal").setFontSize(9);
@@ -102,121 +102,124 @@ export default async function ConsentimientoBuenaSalud2021_Digitalizado(data = {
     // === 0) HEADER CON LOGO, N° FICHA, SEDE Y BLOQUE DE COLOR ===
     await drawHeader();
 
-        // === 1) TÍTULO PRINCIPAL ===
-        const titulo = "Consentimiento de Buena Salud".toUpperCase();
+    // === 1) TÍTULO PRINCIPAL ===
+    const titulo = "Consentimiento de Buena Salud".toUpperCase();
 
-        doc.setFont("helvetica", "bold").setFontSize(16);
-        doc.text(titulo, pageW / 2, margin + 25, { align: "center" });
+    doc.setFont("helvetica", "bold").setFontSize(16);
+    doc.text(titulo, pageW / 2, margin + 25, { align: "center" });
 
-        // Subrayado para el título
-        doc.setDrawColor(0, 0, 0);
-        doc.setLineWidth(0.5);
-        const tituloWidth = doc.getTextWidth(titulo);
-        doc.line((pageW - tituloWidth) / 2, margin + 27, (pageW + tituloWidth) / 2, margin + 27);
+    // Subrayado para el título
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.5);
+    const tituloWidth = doc.getTextWidth(titulo);
+    doc.line((pageW - tituloWidth) / 2, margin + 27, (pageW + tituloWidth) / 2, margin + 27);
 
-        // === 2) PÁRRAFO CON TEXTO EN NEGRITA PARA NOMBRE, DNI Y EDAD ===
-        let currentY = margin + 55;
-        doc.setFont("helvetica", "normal").setFontSize(11);
+    // === 2) PÁRRAFO CON TEXTO EN NEGRITA PARA NOMBRE, DNI Y EDAD ===
+    let currentY = margin + 55;
+    doc.setFont("helvetica", "normal").setFontSize(11);
 
-        // Texto completo dividido en partes para buena salud
-        const textoPartes = [
-            { text: "Mediante el presente pongo en conocimiento que Yo, ", bold: false },
-            { text: datosFinales.nombre, bold: true },
-            { text: " de ", bold: false },
-            { text: `${datosFinales.edad} `, bold: true },
-            { text: `años de edad`, bold: false },
-            { text: ", identificado con DNI: ", bold: false },
-            { text: datosFinales.dni, bold: true },
-            { text: ", declaro que :", bold: false },
-        ];
+    // Texto completo dividido en partes para buena salud
+    const textoPartes = [
+        { text: "Mediante el presente pongo en conocimiento que Yo, ", bold: false },
+        { text: datosFinales.nombre, bold: true },
+        { text: " de ", bold: false },
+        { text: `${datosFinales.edad} `, bold: true },
+        { text: `años de edad`, bold: false },
+        { text: ", identificado con DNI: ", bold: false },
+        { text: datosFinales.dni, bold: true },
+        { text: ", declaro que :", bold: false },
+    ];
 
-        // Configuración de formato
-        const lineHeight = 5;
-        const maxWidth = pageW - 2 * margin;
-        let currentX = margin;
+    // Configuración de formato
+    const lineHeight = 5;
+    const maxWidth = pageW - 2 * margin;
+    let currentX = margin;
 
-        // Función para agregar una línea completa
-        const agregarLinea = (texto, esNegrita) => {
-            doc.setFont("helvetica", esNegrita ? "bold" : "normal");
-            doc.text(texto, currentX, currentY);
-            currentX += doc.getTextWidth(texto);
-        };
+    // Función para agregar una línea completa
+    const agregarLinea = (texto, esNegrita) => {
+        doc.setFont("helvetica", esNegrita ? "bold" : "normal");
+        doc.text(texto, currentX, currentY);
+        currentX += doc.getTextWidth(texto);
+    };
 
-        // Procesar cada parte del texto
-        textoPartes.forEach((parte) => {
-            const palabras = parte.text.split(" ");
-            palabras.forEach((palabra, i) => {
-                const palabraConEspacio = i > 0 ? " " + palabra : palabra;
-                const anchoPalabra = doc.getTextWidth(palabraConEspacio);
+    // Procesar cada parte del texto
+    textoPartes.forEach((parte) => {
+        const palabras = parte.text.split(" ");
+        palabras.forEach((palabra, i) => {
+            const palabraConEspacio = i > 0 ? " " + palabra : palabra;
+            const anchoPalabra = doc.getTextWidth(palabraConEspacio);
 
-                if (currentX + anchoPalabra <= maxWidth + margin) {
-                    // Agregar a la línea actual
-                    agregarLinea(palabraConEspacio, parte.bold);
-                } else {
-                    // Nueva línea
-                    currentY += lineHeight;
-                    currentX = margin;
-                    agregarLinea(palabra, parte.bold);
-                }
-            });
+            if (currentX + anchoPalabra <= maxWidth + margin) {
+                // Agregar a la línea actual
+                agregarLinea(palabraConEspacio, parte.bold);
+            } else {
+                // Nueva línea
+                currentY += lineHeight;
+                currentX = margin;
+                agregarLinea(palabra, parte.bold);
+            }
         });
+    });
 
-        // Ajustar posición Y para siguiente sección
-        currentY += lineHeight + 5;
+    // Ajustar posición Y para siguiente sección
+    currentY += lineHeight + 5;
 
-        // === 3) CUERPO DEL CONSENTIMIENTO ===
-        doc.setFont("helvetica", "normal").setFontSize(11);
-        const consentimiento =
-            "NO PADEZCO DE ENFERMEDAD ALGUNA, NI PRESENTO SÍNTOMAS DE NINGÚN TIPO, por lo cual me considero una persona completamente SANA.";
+    // === 3) CUERPO DEL CONSENTIMIENTO ===
+    doc.setFont("helvetica", "normal").setFontSize(11);
+    const consentimiento =
+        "NO PADEZCO DE ENFERMEDAD ALGUNA, NI PRESENTO SÍNTOMAS DE NINGÚN TIPO, por lo cual me considero una persona completamente SANA.";
 
-        // Usar la posición final del párrafo + espaciado para el cuerpo del consentimiento
-        const cuerpoY = currentY + 5;
+    // Usar la posición final del párrafo + espaciado para el cuerpo del consentimiento
+    const cuerpoY = currentY + 5;
 
-        // Usar el mismo método simple que en conInformadoOcupacional_Digitalizado.jsx
-        doc.text(consentimiento, margin, cuerpoY, {
-            maxWidth: pageW - 2 * margin,
-            align: "justify",
-        });
+    // Usar el mismo método simple que en conInformadoOcupacional_Digitalizado.jsx
+    doc.text(consentimiento, margin, cuerpoY, {
+        maxWidth: pageW - 2 * margin,
+        align: "justify",
+    });
 
-        // Calcular la posición final del cuerpo del consentimiento (aproximada)
-        const cuerpoEndY = cuerpoY + 25; // Espacio aproximado para el texto del consentimiento
+    // Calcular la posición final del cuerpo del consentimiento (aproximada)
+    const cuerpoEndY = cuerpoY + 25; // Espacio aproximado para el texto del consentimiento
 
-        doc.setFont("helvetica", "normal").setFontSize(11);
-        doc.text("Por lo que soy responsable de lo anteriormente declarado.", margin, cuerpoEndY + 5);
+    doc.setFont("helvetica", "normal").setFontSize(11);
+    doc.text("Por lo que soy responsable de lo anteriormente declarado.", margin, cuerpoEndY + 5);
 
-        // === 4) FECHA Y HORA ===
-        const fechaHoraY = cuerpoEndY + 15;
-        doc.setFont("helvetica", "normal").setFontSize(11);
-        doc.text(`${formatearFechaLargaConDia(datosFinales.fecha)}`, pageW - margin, fechaHoraY, { align: "right" });
+    // === 4) FECHA Y HORA ===
+    const fechaHoraY = cuerpoEndY + 15;
+    doc.setFont("helvetica", "normal").setFontSize(11);
+    doc.text(`${formatearFechaLargaConDia(datosFinales.fecha)}`, pageW - margin, fechaHoraY, { align: "right" });
 
-        // === 5) FIRMA Y HUELLA DEL PACIENTE (usando dibujarFirmas) ===
-        let yPos = fechaHoraY + 45;
-        
-        // Usar la función dibujarFirmas del utils
-        const yPosFinalFirmas = await dibujarFirmas({
-            doc,
-            datos: data,
-            y: yPos,
-            pageW: pageW
-        });
+    // === 5) FIRMA Y HUELLA DEL PACIENTE (usando dibujarFirmas) ===
+    let yPos = fechaHoraY + 45;
 
-        // Agregar DNI debajo de la firma y huella
-        const centroX = pageW / 2;
-        doc.setFont("helvetica", "normal").setFontSize(9);
-        doc.text(`DNI: ${datosFinales.dni}`, centroX, yPosFinalFirmas + 1.5, { align: "center" });
+    // Usar la función dibujarFirmas del utils
+    const yPosFinalFirmas = await dibujarFirmas({
+        doc,
+        datos: data,
+        y: yPos,
+        pageW: pageW
+    });
 
-        // === 6) FOOTER ===
-        footerTR(doc, { footerOffsetY: 8, fontSize: 8 });
+    // Agregar DNI debajo de la firma y huella
+    const centroX = pageW / 2;
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text(`DNI: ${datosFinales.dni}`, centroX, yPosFinalFirmas + 1.5, { align: "center" });
 
-        // === 7) Generar blob y abrir en iframe para imprimir automáticamente ===
-        const blob = doc.output("blob");
-        const url = URL.createObjectURL(blob);
-        const iframe = document.createElement("iframe");
-        iframe.style.display = "none";
-        iframe.src = url;
-        document.body.appendChild(iframe);
-        iframe.onload = () => {
-            iframe.contentWindow.focus();
-            iframe.contentWindow.print();
-        };
+    // === 6) FOOTER ===
+    footerTR(doc, { footerOffsetY: 8, fontSize: 8 });
+
+    if (docExistente) {
+        return doc;
+    } else {
+        imprimir(doc);
+    }
+}
+function imprimir(doc) {
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.src = url;
+    document.body.appendChild(iframe);
+    iframe.onload = () => iframe.contentWindow.print();
 }

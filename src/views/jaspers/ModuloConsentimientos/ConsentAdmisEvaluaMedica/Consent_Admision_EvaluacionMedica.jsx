@@ -69,7 +69,7 @@ export default async function ConsentAdmisionEvaluacionMedica(data = {}, docExis
     lineasSede.forEach((linea, idx) => {
       doc.text(linea, xInicioSede, 20 + (idx * 3.5));
     });
-    
+
     const yFechaExamen = lineasSede.length === 1 ? 25 : 20 + (lineasSede.length * 3.5) + 2;
     doc.text("Fecha de examen: " + (datosFinales.fechaExamen || ""), pageW - 70, yFechaExamen);
     doc.text("Pag. 01", pageW - 25, 8);
@@ -99,7 +99,7 @@ export default async function ConsentAdmisionEvaluacionMedica(data = {}, docExis
   const justificarTextoConNegritas = (partesTexto, x, y, anchoMaximo, interlineado) => {
     // Construir lista de palabras con su formato (negrita o no)
     const palabrasConFormato = [];
-    
+
     partesTexto.forEach(parte => {
       const palabras = parte.texto.split(' ').filter(p => p.length > 0);
       palabras.forEach(palabra => {
@@ -232,7 +232,7 @@ export default async function ConsentAdmisionEvaluacionMedica(data = {}, docExis
     { texto: ", identificado con el DNI ", negrita: false },
     { texto: datosFinales.documentoIdentidad, negrita: true }
   ];
-  
+
   yPos = justificarTextoConNegritas(partesTexto1, margin, yPos, anchoTexto, lineHeight);
   yPos += 10;
 
@@ -243,7 +243,7 @@ export default async function ConsentAdmisionEvaluacionMedica(data = {}, docExis
 
   // Texto del consentimiento (entre comillas) - JUSTIFICADO
   const textoConsentimiento = `"De acuerdo con lo dispuesto en la Ley 29733 (Ley de Protección de Datos Personales), declaro haber tomado conocimiento que los exámenes médicos efectuados por el Centro Médico Evaluador y la información contenida en los mismos, a fin de evaluar mi condición médica para postular a un puesto de trabajo en el campamento minero es registrada por la Compañía Minera y/o la Compañía Aseguradora que tenga a su cargo la cobertura del Seguro Complementario de Trabajo de Riesgo o la que esta designe para los efectos de control de dicho seguro. En ese sentido, mediante la suscripción del presente documento, otorgo consentimiento expreso e inequívoco para que la Compañía Minera efectúe el tratamiento de los datos personales facilitados y los transfiera a la Compañía Aseguradora a fin de la evaluación y otorgamiento de la Cobertura del Seguro Complementario de Trabajo de Riesgo, pudiendo esta última informar a la Compañía Minera, Contratistas o Corredor de Seguros de ambos el estado de la cobertura del Seguro Complementario de Trabajo de Riesgo. Esta declaración autoriza al Centro Médico Evaluador la transferencia al empleador y/o Compañía Aseguradora de la información de la historia clínica y exámenes médicos confidenciales de conformidad con la Ley 26842 (Ley General de Salud), y de la Ley 29783 (Ley de Seguridad y Salud en el Trabajo) y su Reglamento aprobado por Decreto Supremo 005-2012-TR."`;
-  
+
   yPos = justificarTexto(textoConsentimiento, margin, yPos, anchoTexto, lineHeight);
   yPos += 15;
 
@@ -255,7 +255,7 @@ export default async function ConsentAdmisionEvaluacionMedica(data = {}, docExis
 
   // === FIRMA Y HUELLA DEL PACIENTE (usando dibujarFirmas, bajada 15mm) ===
   yPos += 15;
-  
+
   // Usar la función dibujarFirmas del utils
   const yPosFinalFirmas = await dibujarFirmas({
     doc,
@@ -273,11 +273,11 @@ export default async function ConsentAdmisionEvaluacionMedica(data = {}, docExis
   footerTR(doc, { footerOffsetY: 7, fontSize: 7 });
 
   // === Imprimir ===
-  if (!docExistente) {
+  if (docExistente) {
+    return doc;
+  } else {
     imprimir(doc);
   }
-
-  return doc;
 }
 
 function imprimir(doc) {
