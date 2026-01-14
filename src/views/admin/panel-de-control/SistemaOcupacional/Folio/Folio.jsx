@@ -7,7 +7,7 @@ import { getToday } from "../../../../utils/helpers";
 import { GetInfoPac } from "./controllerFolio";
 import Swal from "sweetalert2";
 
-const ExamenesList = [
+const ExamenesList2 = [
     {
         nombre: "RAYOS X TORAX ARCHIVO", //NUEVO ARCHIVO
         resultado: false,
@@ -16,7 +16,7 @@ const ExamenesList = [
     },
 ]
 
-const ExamenesList2 = [
+const ExamenesList = [
     {
         nombre: "RESUMEN MEDICO PODEROSA", //NUEVO OPTIMIZAR
         resultado: false,
