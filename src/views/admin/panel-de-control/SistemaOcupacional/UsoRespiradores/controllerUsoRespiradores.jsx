@@ -26,6 +26,15 @@ export const GetInfoServicio = async (
         onFinish
     );
     if (res) {
+        let presion_sistolica = parseFloat(res.sistolica);
+        let presion_diastolica = parseFloat(res.diastolica);
+        let hipertension = false;
+        if (!isNaN(presion_sistolica) && !isNaN(presion_diastolica) &&
+            (presion_sistolica >= 140 || presion_diastolica >= 90)) {
+            // concatenacionObservacion += "HTA NO CONTROLADA.\n";
+            hipertension = true;
+        }
+
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
@@ -52,6 +61,9 @@ export const GetInfoServicio = async (
             vlCorregidaOD: res.odlcoftalmologiaOdlc ?? "",
             vcCorregidaOI: res.oiccoftalmologiaOicc ?? "",
             vlCorregidaOI: res.oilcoftalmologiaOilc ?? "",
+
+            cardioOtros: hipertension,
+            cardioOtrosDescripcion: hipertension ? "HIPERTENSIÓN" : "",
 
             visionUsaLentes: ((res.oftalodccmologiaOdcc ?? "") != "" && (res.oftalodccmologiaOdcc ?? "") != "00") ||
                 ((res.odlcoftalmologiaOdlc ?? "") != "" && (res.odlcoftalmologiaOdlc ?? "") != "00") ||

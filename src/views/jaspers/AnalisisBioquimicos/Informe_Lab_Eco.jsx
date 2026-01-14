@@ -128,7 +128,7 @@ export default async function Informe_Lab_Eco(datos = {}) {
   }
 
   // === FIRMAS ===
-  const yFirmas = 210; // Posición para las firmas (abajo)
+  const yFirmas = 230; // Posición para las firmas (abajo)
   await dibujarFirmas({ doc, datos: datos, y: yFirmas, pageW });
 
   // === FOOTER ===
@@ -181,7 +181,7 @@ const drawHeader = async (doc, datos = {}) => {
     color: datos.codigoColor,
     text: datos.textoColor,
     x: pageW - 30,
-    y: 10,
+    y: 15,
     size: 22,
     showLine: true,
     fontSize: 30,
@@ -210,7 +210,8 @@ const drawPatientData = (doc, datos = {}) => {
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Apellidos y Nombres:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.nombres || datos.nombreCompleto || '', tablaInicioX + 40, yPos + 3.5);
+  const nombreCompleto = datos.nombreCompleto || (datos.nombres && datos.apellidos ? `${datos.nombres} ${datos.apellidos}`.trim() : datos.nombres || '');
+  doc.text(nombreCompleto, tablaInicioX + 40, yPos + 3.5);
   yPos += filaAltura;
 
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);

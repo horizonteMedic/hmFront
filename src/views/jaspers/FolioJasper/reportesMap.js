@@ -17,6 +17,8 @@ import conInformadoOcupacional_Digitalizado from "../ConsentimientoInformado/con
 import InformeElectrocardiograma2023 from "../EKG/InformeElectrocardiograma2023";
 import InformeElectrocardiograma_Digitalizado from "../EKG/InformeElectrocardiograma_Digitalizado";
 import OIT_Digitalizado from "../OIT/OIT_Digitalizado";
+import Aptitud_medico_resumen_Digitalizado from "../CertificadoMedicoOcupacional/Aptitud_medico_resumen_Digitalizado";
+import Aptitud_AgroindustrialH from "../Ficha_Anexo2/Aptitud_Agroindustrial";
 // Agrega aquí todos tus reportes
 export const ekgMap = {
     InformeElectrocardiograma2023,
@@ -25,8 +27,11 @@ export const ekgMap = {
 
 
 export const reportesMap = {
+    certificado_aptitud_medico_resumen: Aptitud_medico_resumen_Digitalizado,
     certificado_aptitud_medico_ocupacional: Aptitud_Agroindustrial,
     anexo7c: Anexo7C_Antiguo,
+    //ficha aptitud anexo 2
+    aptitud_medico_ocupacional_agro: Aptitud_AgroindustrialH,
     antece_enfermedades_altura: GenerarDatosPaciente,
     anexo16a: Anexo16A_Digitalizado,
     b_uso_respiradores: UsoRespiradores,

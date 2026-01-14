@@ -1,3 +1,4 @@
+import Swal from 'sweetalert2';
 import { URLAzure } from '../config/config';
 
 export function SubmitData(body, url, token) {
@@ -15,6 +16,41 @@ export function SubmitData(body, url, token) {
             return res
         } return res.json()
     }).then(response => response)
+}
+
+export async function SubmitDataManejo(body, url, token) {
+    const res = await fetch(`${URLAzure}${url}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(body)
+    })
+
+    const data = await res.json();
+
+    if (data.codigo === 200) {
+        return data.resultado;
+    }
+    validacionError(data.resultado);
+    return null;
+}
+
+function validacionError(resultado) {
+    const { id, mensaje, detalle, codigo } = resultado || {};
+
+    Swal.fire({
+        icon: "error",
+        title: mensaje ? `${mensaje}${id ? ` (${id})` : ""}` : "Error",
+        html: `
+                <div style="text-align:left">
+                    ${codigo ? `<p><strong>Código:</strong> ${codigo}</p>` : ""}
+                    ${detalle ? `<p><strong>Detalle:</strong> ${detalle}</p>` : ""}
+                </div>
+            `,
+        confirmButtonText: "Entendido",
+    });
 }
 
 export function getFetch(url, token) {
@@ -43,6 +79,33 @@ export function getFetch(url, token) {
             }
         });
     }).then(response => response)
+}
+
+export async function getFetchManejo(url, token) {
+    const res = await fetch(URLAzure + url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    // if (!res.ok && res.status !== 404) {
+    //     throw new Error(`HTTP ${res.status}`);
+    // }
+
+    if (res.status >= 500) {
+        throw new Error(`HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+
+    if (data.codigo === 200) {
+        return data.resultado;
+    }
+
+    validacionError(data.resultado);
+    return null;
 }
 
 export function updateData(body, url, token) {

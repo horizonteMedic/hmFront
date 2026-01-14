@@ -8,45 +8,19 @@ export default async function ConsentAdmisionExamenMedicoPeru(data = {}, docExis
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
-  // Datos de prueba por defecto
-  const datosPrueba = {
-    apellidosPaciente: "CASTILLO PLASENCIA",
-    nombresPaciente: "HADY KATHERINE",
-    dniPaciente: "72384273",
-    domicilio: "SAC1 URB PARQUE INDUSTRIAL MZ D LT 3",
-    distrito: "LA ESPERANZA",
-    provincia: "TRUJILLO, LA LIBERTAD",
-    sede: "TRUJILLO",
-    norden: "96639",
-    fechaRegistro: "2025-01-28",
-    codigoColor: "#00FF00",
-    textoColor: "AB",
+  // Preparar datos
+  const datosFinales = {
+    apellidosNombres: String(((data?.apellidosPaciente ?? '') + ' ' + (data?.nombresPaciente ?? '')).trim()),
+    fechaExamen: formatearFechaCorta(data?.fechaRegistro ?? ''),
+    documentoIdentidad: String(data?.dniPaciente ?? ''),
+    domicilio: String(data?.direccionPaciente || ''),
+    distrito: String(data?.distrito || ''),
+    provincia: String(data?.provincia || ''),
+    sede: String(data?.sede ?? data?.nombreSede ?? ''),
+    numeroFicha: String(data?.norden ?? ''),
+    codigoColor: String(data?.codigoColor ?? ''),
+    textoColor: String(data?.textoColor ?? ''),
   };
-
-  // Normalizador de datos de entrada
-  function buildDatosFinales(raw) {
-    // Extraer distrito y provincia de direccionPaciente si están disponibles
-    // Si no, usar valores por defecto
-    const direccionCompleta = raw?.direccionPaciente || datosPrueba.domicilio;
-    const distrito = raw?.distrito || datosPrueba.distrito;
-    const provincia = raw?.provincia || datosPrueba.provincia;
-    
-    const datosFinales = {
-      apellidosNombres: String(((raw?.apellidosPaciente ?? datosPrueba.apellidosPaciente) + ' ' + (raw?.nombresPaciente ?? datosPrueba.nombresPaciente)).trim()),
-      fechaExamen: formatearFechaCorta(raw?.fechaRegistro ?? datosPrueba.fechaRegistro),
-      documentoIdentidad: String(raw?.dniPaciente ?? datosPrueba.dniPaciente),
-      domicilio: String(direccionCompleta),
-      distrito: String(distrito),
-      provincia: String(provincia),
-      sede: String(raw?.sede ?? raw?.nombreSede ?? datosPrueba.sede),
-      numeroFicha: String(raw?.norden ?? datosPrueba.norden),
-      codigoColor: String(raw?.codigoColor ?? datosPrueba.codigoColor),
-      textoColor: String(raw?.textoColor ?? datosPrueba.textoColor),
-    };
-    return datosFinales;
-  }
-
-  const datosFinales = buildDatosFinales(data);
 
   // Función para obtener día y mes de la fecha
   const obtenerDiaYMes = (fechaStr) => {
@@ -64,9 +38,8 @@ export default async function ConsentAdmisionExamenMedicoPeru(data = {}, docExis
     }
   };
 
-  const fechaPrueba = datosPrueba.fechaRegistro;
-  const { dia, mes } = obtenerDiaYMes(data?.fechaRegistro ?? fechaPrueba);
-  const anio = new Date(data?.fechaRegistro ?? fechaPrueba).getFullYear() || '2025';
+  const { dia, mes } = obtenerDiaYMes(data?.fechaRegistro);
+  const anio = new Date(data?.fechaRegistro).getFullYear() || '';
 
   // Header específico de Confipetrol
   const drawHeader = async () => {
@@ -354,7 +327,7 @@ export default async function ConsentAdmisionExamenMedicoPeru(data = {}, docExis
   // Agregar DNI debajo de la firma y huella
   const centroX = pageW / 2;
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(`DNI: ${datosFinales.documentoIdentidad}`, centroX, yPosFinalFirmas + 3, { align: "center" });
+  doc.text(`DNI: ${datosFinales.documentoIdentidad}`, centroX, yPosFinalFirmas + 1.5, { align: "center" });
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 7, fontSize: 7 });

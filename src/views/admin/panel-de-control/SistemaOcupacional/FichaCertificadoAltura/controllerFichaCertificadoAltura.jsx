@@ -50,7 +50,7 @@ export const GetInfoServicio = async (
         let imcRed = false;
         let nuevasObservaciones = (res.diagnosticoAudiometria ?? "").toUpperCase();
         if (nuevasObservaciones != "") {
-            nuevasObservaciones += "\n";
+            nuevasObservaciones = "Dx Audiometría: " + nuevasObservaciones + "\n";
         }
         if (imc) {
             const imcValue = parseFloat(imc);
@@ -71,7 +71,8 @@ export const GetInfoServicio = async (
             }
         }
 
-        
+        let debeCorregirAgudezaVisual = false;
+        let debeUsarLentesCorrectores = false;
         const vlejoscod = res.odlcoftalmologia_odlc || "";
         const vlejoscoi = res.oilcoftalmologia_oilc || "";
 
@@ -84,12 +85,15 @@ export const GetInfoServicio = async (
             if (enfermedadesRefractarias.some(e => textoEnfermedadOftalmo.includes(e))) {
                 const visionLejosNormal = vlejoscod === "00" && vlejoscoi === "00";
                 const visionCercaNormal = vcercacod === "00" && vcercacoi === "00";
-                nuevasObservaciones += visionLejosNormal && visionCercaNormal
+
+                debeCorregirAgudezaVisual = visionLejosNormal && visionCercaNormal;
+                debeUsarLentesCorrectores = !debeCorregirAgudezaVisual;
+
+                nuevasObservaciones += debeCorregirAgudezaVisual
                     ? "CORREGIR AGUDEZA VISUAL.\n"
                     : "USO DE LENTES CORRECTORES.\n";
             }
         }
-
 
         const promedioOidoDerecho = res.promedioOidoDerecho ?? 0;
         const promedioOidoIzquierdo = res.promedioOidoIzquierdo ?? 0;
@@ -105,7 +109,6 @@ export const GetInfoServicio = async (
             const umbral = res.sexoPaciente === "M" ? 13 : 12;
             anemia = hemoglobina < umbral;
         }
-
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
@@ -134,7 +137,8 @@ export const GetInfoServicio = async (
             enfermedadesOculares: res.enfermedadesocularesoftalmo_e_oculares ?? "",
 
             hipoacusiaFrecuenciasConversacionales: oidoMayor40,
-            conclusion: oidoMayor40 ? "NO APTO" : null,
+            conclusion: oidoMayor40 || obesidadIMC30 ? "NO APTO" :
+                debeUsarLentesCorrectores ? "APTO CON RESTRICCION" : null,
             anemiaCriteriosOMS2011: anemia,
             //==========================TAB EXAMEN FISICO===========================
             // Examen Médico - Medidas Antropométricas y Signos Vitales
@@ -153,6 +157,8 @@ export const GetInfoServicio = async (
             icc: res.iccTriaje ?? "",
             perimetroToracicoInspiracion: res.maximaInspiracionPtoracico_p_max_inspiracion ?? "",
             perimetroToracicoEspiracion: res.forazadaPtoracico_p_ex_forzada ?? "",
+
+            medicinasTomando: res.medicamentosAnexo16A ?? "",
         }));
     }
 };
@@ -172,6 +178,63 @@ export const GetInfoServicioEditar = async (
         onFinish
     );
     if (res) {
+        const imc = res.imcTriaje ?? "";
+        let obesidadIMC30 = false;
+        let imcRed = false;
+        let nuevasObservaciones = (res.diagnosticoAudiometria ?? "").toUpperCase();
+        if (nuevasObservaciones != "") {
+            nuevasObservaciones += "\n";
+        }
+        if (imc) {
+            const imcValue = parseFloat(imc);
+            if (!isNaN(imcValue) && imcValue > 25) {
+                imcRed = true;
+                if (imcValue >= 25 && imcValue < 30) {
+                    // nuevasObservaciones += "SOBREPESO: DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+                } else if (imcValue >= 30 && imcValue < 35) {
+                    obesidadIMC30 = true;
+                    // nuevasObservaciones += "OBESIDAD I: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+                } else if (imcValue >= 35 && imcValue < 40) {
+                    obesidadIMC30 = true;
+                    // nuevasObservaciones += "OBESIDAD II: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+                } else if (imcValue >= 40) {
+                    obesidadIMC30 = true;
+                    // nuevasObservaciones += "OBESIDAD III: NO HACER TRABAJOS EN ESPACIOS CONFINADOS. NO HACER TRABAJOS SOBRE 1.8 M.S.N PISO. DIETA HIPOCALORICA, HIPOGRASA Y EJERCICIOS.\n";
+                }
+            }
+        }
+
+        let debeCorregirAgudezaVisual = false;
+        let debeUsarLentesCorrectores = false;
+        const vlejoscod = res.odlcoftalmologia_odlc || "";
+        const vlejoscoi = res.oilcoftalmologia_oilc || "";
+
+        const vcercacod = res.oftalodccmologia_odcc || "";
+        const vcercacoi = res.oiccoftalmologia_oicc || "";
+        const textoEnfermedadOftalmo = (res.enfermedadesocularesoftalmo_e_oculares ?? "").trim().toUpperCase();
+
+        if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
+            const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
+            if (enfermedadesRefractarias.some(e => textoEnfermedadOftalmo.includes(e))) {
+                const visionLejosNormal = vlejoscod === "00" && vlejoscoi === "00";
+                const visionCercaNormal = vcercacod === "00" && vcercacoi === "00";
+
+                debeCorregirAgudezaVisual = visionLejosNormal && visionCercaNormal;
+                debeUsarLentesCorrectores = !debeCorregirAgudezaVisual;
+
+                // nuevasObservaciones += debeCorregirAgudezaVisual
+                //     ? "CORREGIR AGUDEZA VISUAL.\n"
+                //     : "USO DE LENTES CORRECTORES.\n";
+            }
+        }
+
+        const promedioOidoDerecho = res.promedioOidoDerecho ?? 0;
+        const promedioOidoIzquierdo = res.promedioOidoIzquierdo ?? 0;
+        let oidoMayor40 = false;
+        if (promedioOidoDerecho > 40 || promedioOidoIzquierdo > 40) {
+            oidoMayor40 = true;
+        }
+
         set((prev) => ({
             ...prev,
             // Header
@@ -270,10 +333,14 @@ export const GetInfoServicioEditar = async (
             // Conclusión y Comentarios
             aptoDesde: res.fechaDesde_f_desde ?? today,
             aptoHasta: res.fechaHasta_f_hasta ?? getTodayPlusOneYear(),
-            conclusion: res.apto_chk_si ? "APTO" :
-                (res.noApto_chk_no_apto ? "NO APTO" :
-                    (res.aptoConRestriccion_chk_apto_r ? "APTO CON RESTRICCION" :
-                        res.observado_chk_observado ? "OBSERVADO" : null)),
+
+            conclusion: oidoMayor40 || obesidadIMC30 ? "NO APTO" :
+                debeUsarLentesCorrectores ? "APTO CON RESTRICCION" :
+                    res.apto_chk_si ? "APTO" :
+                        (res.noApto_chk_no_apto ? "NO APTO" :
+                            (res.aptoConRestriccion_chk_apto_r ? "APTO CON RESTRICCION" :
+                                res.observado_chk_observado ? "OBSERVADO" : null)),
+
             observacionesRecomendaciones: res.observacionesRecomendaciones_b_c_observaciones ?? "",
             // nombreMedicoColegiatura: userCompleto?.datos?.nombres_user?.toUpperCase(),
             // dniUsuario: userCompleto?.datos?.dni_user,

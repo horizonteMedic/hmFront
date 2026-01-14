@@ -214,6 +214,16 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
 const GetInfoPac = async (nro, set, token, sede) => {
   const res = await GetInfoPacDefault(nro, token, sede);
   if (res) {
+    //Validacion HTA
+    let presion_sistolica = parseFloat(res.sistolica);
+    let presion_diastolica = parseFloat(res.diastolica);
+    let hipertension = false;
+    if (!isNaN(presion_sistolica) && !isNaN(presion_diastolica) &&
+      (presion_sistolica >= 140 || presion_diastolica >= 90)) {
+      // concatenacionObservacion += "HTA NO CONTROLADA.\n";
+      hipertension = true;
+    }
+
     set((prev) => ({
       ...prev,
       ...res,
@@ -223,6 +233,8 @@ const GetInfoPac = async (nro, set, token, sede) => {
       dni: res.dni,
       sexo: res.genero,
       cargo: res.cargo,
+
+      hipertensionArterial: hipertension,
     }));
   }
 };
