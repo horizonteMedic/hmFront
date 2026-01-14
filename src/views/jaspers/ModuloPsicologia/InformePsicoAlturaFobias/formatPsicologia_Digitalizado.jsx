@@ -6,8 +6,8 @@ import footerTR from '../../components/footerTR.jsx';
 import drawColorBox from '../../components/ColorBox.jsx';
 import { dibujarFirmas } from '../../../utils/dibujarFirmas.js';
 
-export default async function formatPsicologia_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function formatPsicologia_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // Función auxiliar para obtener el valor seleccionado de los criterios intelectuales
@@ -155,7 +155,7 @@ export default async function formatPsicologia_Digitalizado(data = {}) {
   const textoPuestoTrabajo = datos.puestoTrabajo || "";
   const lineasPuestoTrabajo = doc.splitTextToSize(textoPuestoTrabajo, tablaAncho - 35);
   const alturaPuestoTrabajo = Math.max(filaAltura, lineasPuestoTrabajo.length * 3.5 + 1);
-  
+
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaPuestoTrabajo, 'S');
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Puesto de Trabajo:", tablaInicioX + 2, yPos + 4);
@@ -209,7 +209,7 @@ export default async function formatPsicologia_Digitalizado(data = {}) {
   doc.setFillColor(220, 220, 220);
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
-  
+
   // Dibujar líneas verticales
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + colCriterio, yPos, tablaInicioX + colCriterio, yPos + filaAltura);
@@ -218,7 +218,7 @@ export default async function formatPsicologia_Digitalizado(data = {}) {
   doc.line(tablaInicioX + colCriterio + colOpciones * 3, yPos, tablaInicioX + colCriterio + colOpciones * 3, yPos + filaAltura);
   doc.line(tablaInicioX + colCriterio + colOpciones * 4, yPos, tablaInicioX + colCriterio + colOpciones * 4, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Aspecto Intelectual", tablaInicioX + 2, yPos + 4);
   doc.setFont("helvetica", "bold").setFontSize(7);
@@ -249,10 +249,10 @@ export default async function formatPsicologia_Digitalizado(data = {}) {
     doc.line(tablaInicioX + colCriterio + colOpciones * 3, yPos, tablaInicioX + colCriterio + colOpciones * 3, yPos + filaAltura);
     doc.line(tablaInicioX + colCriterio + colOpciones * 4, yPos, tablaInicioX + colCriterio + colOpciones * 4, yPos + filaAltura);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-    
+
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(texto, tablaInicioX + 2, yPos + filaAltura / 2 + 1);
-    
+
     if (valor === "I") {
       dibujarCheckbox(tablaInicioX + colCriterio + colOpciones / 2, yPos, true, filaAltura);
     } else if (valor === "NPI") {
@@ -264,7 +264,7 @@ export default async function formatPsicologia_Digitalizado(data = {}) {
     } else if (valor === "S") {
       dibujarCheckbox(tablaInicioX + colCriterio + colOpciones * 4 + colOpciones / 2, yPos, true, filaAltura);
     }
-    
+
     yPos += filaAltura;
   };
 
@@ -462,7 +462,11 @@ export default async function formatPsicologia_Digitalizado(data = {}) {
   footerTR(doc, { footerOffsetY: 8 });
 
   // === IMPRIMIR ===
-  imprimir(doc);
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {
