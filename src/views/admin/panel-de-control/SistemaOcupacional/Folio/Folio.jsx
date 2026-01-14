@@ -7,17 +7,16 @@ import { getToday } from "../../../../utils/helpers";
 import { GetInfoPac } from "./controllerFolio";
 import Swal from "sweetalert2";
 
-const ExamenesList2 = [
+const ExamenesList = [
     {
-        nombre: "CONSENTIMIENTO BUENA SALUD", //NUEVO
+        nombre: "RAYOS X TORAX ARCHIVO", //NUEVO ARCHIVO
         resultado: false,
-        tabla: "consentimientobuenasalud",
-        url: "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoBuenaSalud",
-        esJasper: true
+        tabla: "RAYOS X TORAX",
+        url: ""
     },
 ]
 
-const ExamenesList = [
+const ExamenesList2 = [
     {
         nombre: "RESUMEN MEDICO PODEROSA", //NUEVO OPTIMIZAR
         resultado: false,

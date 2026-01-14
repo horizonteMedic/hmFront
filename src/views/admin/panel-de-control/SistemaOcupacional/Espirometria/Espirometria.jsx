@@ -58,6 +58,7 @@ export default function Espirometria() {
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
+        
         SubirDoc: false,
         nomenclatura: "ESPIROMETRIA"
     };
@@ -73,7 +74,9 @@ export default function Espirometria() {
         handleClear,
         handleClearnotO,
     } = useForm(initialFormState, { storageKey: "espirometria" });
+
     const [visualerOpen, setVisualerOpen] = useState(null)
+
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
