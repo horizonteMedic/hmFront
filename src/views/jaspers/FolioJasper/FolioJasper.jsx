@@ -36,7 +36,9 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
 
         const apiUrl = examen.esJasper
             ? `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}&esJasper=true`
-            : `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}`;
+            : examen.nameConset ?
+                `${examen.url}?nOrden=${nro}&nameConset=${examen.tabla}`
+                : `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}`;
 
         try {
             const data = await getFetch(apiUrl, token);
@@ -71,6 +73,9 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             } else {
                 generador = reportesMap[examen.tabla];
             }
+            console.log("data:", data);
+            console.log("Generador:", generador);
+
 
             const generadorFinal = typeof generador === "function" && generador.length === 1
                 ? generador(data)

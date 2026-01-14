@@ -9,7 +9,17 @@ import Swal from "sweetalert2";
 
 const ExamenesList = [
     {
-        nombre: "RESUMEN MEDICO PODEROSA", //NUEVO LISTO
+        nombre: "CONSENTIMIENTO DE MUESTRA DE SANGRE",//NUEVO
+        resultado: false,
+        tabla: "consent_Muestra_Sangre",
+        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
+        nameConset: true
+    },
+]
+
+const ExamenesList2 = [
+    {
+        nombre: "RESUMEN MEDICO PODEROSA", //NUEVO OPTIMIZAR
         resultado: false,
         tabla: "resumen_medico_poderosa",
         url: "/api/v01/ct/anexos/obtenerReporteResumenMedico",
@@ -105,20 +115,20 @@ const ExamenesList = [
         esJasper: true
     },
     //LICENCIA PARA CONDUCIR INTERNA PODEROSA
-    // {
-    //     nombre: "LICENCIA PARA CONDUCIR INTERNA PODEROSA",//NUEVO
-    //     resultado: false,
-    //     tabla: "aptitud_licencia_conduciri",
-    //     url: "/api/v01/ct/aptitudLicenciaConducir/obtenerReporteAptitudLicenciaConducir",
-    //     esJasper: true
-    // },
+    {
+        nombre: "LICENCIA PARA CONDUCIR INTERNA PODEROSA",//NUEVO  OPTIMIZAR
+        resultado: false,
+        tabla: "aptitud_licencia_conduciri",
+        url: "/api/v01/ct/aptitudLicenciaConducir/obtenerReporteAptitudLicenciaConducir",
+        esJasper: true
+    },
     //HOJA DE CONSULTA EXTERNA
-    // {
-    //     nombre: "HOJA DE CONSULTA EXTERNA",//NUEVO
-    //     resultado: false,
-    //     tabla: "hoja_consulta_externa",
-    //     url: "/api/v01/ct/hojaConsultaExterna/obtenerReporteHojaConsultaExterna",
-    // },
+    {
+        nombre: "HOJA DE CONSULTA EXTERNA",//NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "hoja_consulta_externa",
+        url: "/api/v01/ct/hojaConsultaExterna/obtenerReporteHojaConsultaExterna",
+    },
     {
         nombre: "USO DE RESPIRADORES",
         resultado: false,
@@ -140,13 +150,13 @@ const ExamenesList = [
         esJasper: true
     },
     //DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS Y FAMILIARES
-    // {
-    //     nombre: "DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS Y FAMILIARES",//NUEVO
-    //     resultado: false,
-    //     tabla: "DECLA_JURA_ANTECE_PERSON_FAM",
-    //     url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
-    //     esJasper: true
-    // },
+    {
+        nombre: "DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS Y FAMILIARES",//NUEVO OPTIMIZAR
+        resultado: false,
+        tabla: "DECLA_JURA_ANTECE_PERSON_FAM",
+        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
+        esJasper: true
+    },
     {
         nombre: "CUESTIONARIO NORDICO",
         resultado: false,
@@ -160,13 +170,13 @@ const ExamenesList = [
         url: "/api/v01/ct/evaluacionMusculoEsqueletica/obtenerReporteEvaluacionMusculoEsqueletica"
     },
     //CONSENTIMIENTO DE MUESTRA DE SANGRE
-    // {
-    //     nombre: "CONSENTIMIENTO DE MUESTRA DE SANGRE",//NUEVO
-    //     resultado: false,
-    //     tabla: "consent_Muestra_Sangre",
-    //     url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
-    //     nameConset: true
-    // },
+    {
+        nombre: "CONSENTIMIENTO DE MUESTRA DE SANGRE",//NUEVO
+        resultado: false,
+        tabla: "consent_Muestra_Sangre",
+        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
+        nameConset: true
+    },
     {
         nombre: "LABORATORIO CLINICO",
         resultado: false,
