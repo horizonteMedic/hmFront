@@ -431,7 +431,7 @@ const ExamenesList = [
     // {
     //     nombre: "DECLARACION JURADA PARA EL USO DE FIRMA ELECTRONICA", //NUEVO ARCHIVO
     //     resultado: false,
-    //     tabla: "DECLARACIONUSOFIRMA",
+    //     tabla: "DECLARACION USO FIRMA",
     //     url: "",
     // },
     //DNI Y OTROS DOCUMENTOS
