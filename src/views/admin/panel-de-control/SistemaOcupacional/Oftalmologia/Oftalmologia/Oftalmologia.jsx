@@ -3,11 +3,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBroom,
   faChevronDown,
+  faDownload,
   faPrint,
   faSave,
 } from "@fortawesome/free-solid-svg-icons";
 import {
+  handleSubirArchivo,
   PrintHojaR,
+  ReadArchivosForm,
   SubmitDataService,
   VerifyTR,
 } from "./controllerOftalmologia";
@@ -136,12 +139,14 @@ const initialFormState = {
   otrosOi: false,
   examenClinicoHallazgos: "",
 
-  SubirDoc: true,
-  nomenclatura: "ESPIROMETRIA"
+  SubirDoc: false,
+  nomenclatura: "OFTALMOLOGIA VISION TESTER"
 };
 export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
   const [form, setForm] = useState(initialFormState);
   const [tab, setTab] = useState(0);
+
+  const [visualerOpen, setVisualerOpen] = useState(null)
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -213,7 +218,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
 
   return (
     <div className="w-full text-[11px]">
-      <form className=" p-4 rounded w-full border mb-4">
+      <div className=" p-4 rounded w-full border mb-4">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 items-center gap-3 w-full">
           {/* Primera fila: solo los 4 campos principales */}
           <div className="flex items-center gap-4">
@@ -292,14 +297,14 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
               disabled
             />
           </div>
-          {/*form.SubirDoc &&
+          {form.SubirDoc &&
             <ButtonsPDF
-              handleSave={() => { handleSubirArchivoEspirometria(form, selectedSede, userlogued, token) }}
-              handleRead={() => { ReadArchivosFormEspirometria(form, setVisualerOpen, token) }}
+              handleSave={() => { handleSubirArchivo(form, selectedSede, userlogued, token) }}
+              handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token) }}
             />
-          */}
+          }
         </div>
-      </form>
+      </div>
       {/* Tabs */}
       <div className="flex gap-1">
         <button
@@ -1540,6 +1545,24 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
               </button>
             </div>
           </div>
+          {visualerOpen && (
+            <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+              <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
+                <div className="px-4 py-2 naranjabackgroud flex justify-between">
+                  <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
+                  <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+                </div>
+                <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
+                  <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
+                </div>
+                <div className="flex justify-center">
+                  <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                    <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
