@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import header_EvaluacionOftalmologica2021_Digitalizado from "./headers/header_EvaluacionOftalmologica2021_Digitalizado.jsx";
+import { compressImage, getSignCompressed } from "../../utils/helpers.js";
 
 export default async function EvaluacionOftalmologica2021_Digitalizado(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -273,10 +274,12 @@ export default async function EvaluacionOftalmologica2021_Digitalizado(data = {}
 
   // === NUEVO: Usar imagen de fondo para la evaluación oftalmológica ===
   const fondoImg = "/img/Oftamo_digitalizado.png";
+
   const fondoH = 210; // altura aproximada del frame en mm (ajusta si es necesario)
   let yHeader = 60;
   try {
-    doc.addImage(fondoImg, "PNG", 0, yHeader, pageW, fondoH);
+    const img = await compressImage(fondoImg);
+    doc.addImage(img, "jpeg", 0, yHeader, pageW, fondoH);
   } catch (e) {
     doc.text(
       "Imagen de evaluación oftalmológica no disponible",

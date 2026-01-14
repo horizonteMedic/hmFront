@@ -11,8 +11,8 @@ import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
 
 const GetExamenURL = `/api/v01/st/registros/obtenerExistenciasExamenes`
-const GetEspiro = `/api/v01/st/registros/detalleUrlArchivos`
-const NomenclaturaEspiro = `ESPIROMETRIA`
+const GetExamenExterno = `/api/v01/st/registros/detalleUrlArchivos`
+
 export const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
     LoadingDefault("Validando datos");
     const res = await GetInfoPacDefault(nro, token, sede);
@@ -38,10 +38,6 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
     LoadingDefault("Cargando examenes");
     try {
         const res = await getFetch(`${GetExamenURL}?nOrden=${nro}`, token);
-        const resEspirometria = await getFetch(
-            `${GetEspiro}/${nro}/${NomenclaturaEspiro}`,
-            token
-        );
 
         let listaActualizada = [...ExamenesList];
 
@@ -61,18 +57,42 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
             });
         }
 
-        // 🔹 Procesar ESPIROMETRÍA (regla especial)
-        if (resEspirometria?.id === 1) {
-            listaActualizada = listaActualizada.map((examen) =>
-                examen.tabla === "ESPIROMETRIA"
-                    ? {
-                        ...examen,
-                        resultado: true,
-                        url: resEspirometria.mensaje,
-                    }
-                    : examen
-            );
-        }
+        // 🔹 Procesar ARCHIVOS EXTERNOS (dinámico por nomenclatura)
+        // Filtrar exámenes que tienen nomenclatura
+        const examenesConNomenclatura = ExamenesList.filter(
+            (examen) => examen.nomenclatura
+        );
+
+        // Hacer todas las llamadas en paralelo
+        const promesasArchivosExternos = examenesConNomenclatura.map((examen) =>
+            getFetch(`${GetExamenExterno}/${nro}/${examen.nomenclatura}`, token)
+                .then((response) => ({
+                    nomenclatura: examen.nomenclatura,
+                    tabla: examen.tabla,
+                    response,
+                }))
+                .catch((error) => {
+                    console.error(`Error al cargar ${examen.nomenclatura}:`, error);
+                    return { nomenclatura: examen.nomenclatura, tabla: examen.tabla, response: null };
+                })
+        );
+
+        const resultadosArchivosExternos = await Promise.all(promesasArchivosExternos);
+
+        // Actualizar lista con los resultados de archivos externos
+        resultadosArchivosExternos.forEach(({ tabla, response }) => {
+            if (response?.id === 1) {
+                listaActualizada = listaActualizada.map((examen) =>
+                    examen.tabla === tabla
+                        ? {
+                            ...examen,
+                            resultado: true,
+                            url: response.mensaje,
+                        }
+                        : examen
+                );
+            }
+        });
 
         // 🔹 Set final (un solo render)
         set((prev) => ({

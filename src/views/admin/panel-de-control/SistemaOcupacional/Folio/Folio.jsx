@@ -232,12 +232,12 @@ const ExamenesList = [
         url: "/api/v01/ct/rayosX/obtenerReporteRadiografiaTorax"
     },
     //RAYOS X TORAX ARCHIVO
-    // {
-    //     nombre: "RAYOS X TORAX ARCHIVO", //NUEVO ARCHIVO FALTA IMPRIMIR
-    //     resultado: false,
-    //     tabla: "RAYOS X TORAX",
-    //     url: ""
-    // },
+    {
+        nombre: "RAYOS X TORAX ARCHIVO", //NUEVO ARCHIVO FALTA IMPRIMIR
+        resultado: false,
+        tabla: "RAYOS X TORAX",
+        nomenclatura: "RAYOS X TORAX"
+    },
     //INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA)
     {
         nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA)", //NUEVO OPTIMIZAR
@@ -246,12 +246,12 @@ const ExamenesList = [
         url: "/api/v01/ct/rayosX/obtenerReporteInformeRadiografico"
     },
     //INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA) ARCHIVO
-    // {
-    //     nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA) ARCHIVO", //NUEVO ARCHIVO FALTA IMPRIMIR
-    //     resultado: false,
-    //     tabla: "INFORME RADIOGRAFICO",
-    //     url: ""
-    // },
+    {
+        nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA) ARCHIVO", //NUEVO ARCHIVO FALTA IMPRIMIR
+        resultado: false,
+        tabla: "INFORME RADIOGRAFICO",
+        nomenclatura: "INFORME RADIOGRAFICO"
+    },
     {
         nombre: "ELECTROCARDIOGRAMA",
         resultado: false,
@@ -260,17 +260,17 @@ const ExamenesList = [
         esJasper: true
     },
     //ELECTROCARDIOGRAMA ARCHIVO
-    // {
-    //     nombre: "ELECTROCARDIOGRAMA ARCHIVO", //NUEVO ARCHIVO FALTA IMPRIMIR
-    //     resultado: false,
-    //     tabla: "ELECTROCARDIOGRAMA",
-    //     url: ""
-    // },
+    {
+        nombre: "ELECTROCARDIOGRAMA ARCHIVO", //NUEVO ARCHIVO FALTA IMPRIMIR
+        resultado: false,
+        tabla: "ELECTROCARDIOGRAMA",
+        nomenclatura: "ELECTROCARDIOGRAMA"
+    },
     {
         nombre: "ESPIROMETRIA",
         resultado: false,
         tabla: "ESPIROMETRIA",
-        url: ""
+        nomenclatura: "ESPIROMETRIA"
     },
     {
         nombre: "FICHA AUDIOLOGICA OHLA",
@@ -385,12 +385,12 @@ const ExamenesList = [
         url: "/api/v01/ct/agudezaVisual/obtenerReporteEvaluacionOftalmologica",
     },
     //OFTALMOLOGIA VISION TESTER
-    // {
-    //     nombre: "OFTALMOLOGIA VISION TESTER", //NUEVO ARCHIVO FALTA IMPRIMIR
-    //     resultado: false,
-    //     tabla: "OFTALMOLOGIA VISION TESTER",
-    //     url: ""
-    // },
+    {
+        nombre: "OFTALMOLOGIA VISION TESTER", //NUEVO ARCHIVO FALTA IMPRIMIR
+        resultado: false,
+        tabla: "OFTALMOLOGIA VISION TESTER",
+        nomenclatura: "OFTALMOLOGIA VISION TESTER"
+    },
     {
         nombre: "FICHA OFTALMOLOGICA",
         resultado: false,

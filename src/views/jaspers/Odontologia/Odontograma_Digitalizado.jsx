@@ -1,4 +1,5 @@
 import jsPDF from "jspdf";
+import { compressImage } from "../../utils/helpers";
 
 const labelsToImgs = {
   Ausente: "imgAusente",
@@ -365,8 +366,9 @@ export default async function Odontograma_Digitalizado(data = {}, docExistente =
   const xOffset = 0;
   const yOffset = 0;
 
+  const img = await compressImage(fondoImg);
   try {
-    doc.addImage(fondoImg, "PNG", xOffset, yOffset, imgWidth, imgHeight);
+    doc.addImage(img, "jpeg", xOffset, yOffset, imgWidth, imgHeight);
   } catch (e) {
     doc.text("Imagen de odontograma no disponible", margin, yOffset + 10);
   }
