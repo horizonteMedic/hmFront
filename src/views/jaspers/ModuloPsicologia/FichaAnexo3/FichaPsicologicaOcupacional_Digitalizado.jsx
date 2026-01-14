@@ -1701,6 +1701,10 @@ export default async function FichaPsicologicaOcupacional_Digitalizado(data = {}
   if (docExistente) {
     return doc;
   } else {
+<<<<<<< HEAD
+
+=======
+>>>>>>> 97bff524dee9134252132f16bde5983814f8f5f1
     imprimir(doc);
   }
 }

@@ -10,7 +10,7 @@ import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaInterc
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import Swal from "sweetalert2";
-import {SubirInterconsulta, ReadArchivos} from "./model";
+import { SubirInterconsulta, ReadArchivos } from "./model";
 import { LoadingDefault } from "../../../../utils/functionUtils";
 import { useState } from "react";
 import { SubmitData } from "../../../../utils/apiHelpers";
@@ -19,34 +19,35 @@ const tabla = "ficha_interconsulta"
 const today = getToday();
 
 const Especialidades = [
-  "Neurología del Sueño",
-  "Neurocirugia",
-  "Alergología",
-  "Neurología",
-  "Cirugía General",
-  "Cirugía Cardiologo",
-  "Cirugía Cabeza y Cuello",
-  "Gastroenterología",
-  "Fisiatria",
-  "Medicina Fisica",
-  "Oncologia",
-  "Cirugía Oncológica",
-  "Hematología",
-  "Ginecologia",
-  "Oftalmología",
-  "Cardiología",
-  "Neumología",
-  "Medicina Interna",
-  "Endocrinología",
-  "Traumatología",
-  "Reumatología",
-  "Nutrición",
-  "Otorrinolaringologia",
-  "Área Medica",
-  "Laboratorio",
-  "Imagenologia",
-  "Audiometria",
-  "Dermatología"
+    "Neurología del Sueño",
+    "Neurocirugia",
+    "Alergología",
+    "Neurología",
+    "Cirugía General",
+    "Cirugía Cardiologo",
+    "Cirugía Cabeza y Cuello",
+    "Gastroenterología",
+    "Fisiatria",
+    "Medicina Fisica",
+    "Oncologia",
+    "Cirugía Oncológica",
+    "Hematología",
+    "Ginecologia",
+    "Oftalmología",
+    "Cardiología",
+    "Neumología",
+    "Medicina Interna",
+    "Endocrinología",
+    "Traumatología",
+    "Reumatología",
+    "Nutrición",
+    "Otorrinolaringologia",
+    "Área Medica",
+    "Laboratorio",
+    "Imagenologia",
+    "Audiometria",
+    "Dermatología",
+    "Agudeza Visual"
 ]
 
 
@@ -96,15 +97,15 @@ export default function FichaInterconsulta() {
     }
 
     const { form, setForm, handleChangeSimple, handleChange, handleClear, handleClearnotO, handleChangeNumber, handleRadioButtonBoolean, handleRadioButton, handlePrintDefault } = useForm(Initialform, { storageKey: "ficha_interconsultas_form" })
-     
+
     const handleClearnotOandEspecialidad = () => {
         setForm((prev) => ({ ...Initialform, norden: prev.norden }));
         if (typeof window !== "undefined" && "ficha_interconsultas_form") {
-        try {
-            localStorage.setItem("ficha_interconsultas_form", JSON.stringify({ ...Initialform, norden: form.norden }));
-        } catch (err) {
-            console.warn("useForm: error guardando localStorage en clearnotO", err);
-        }
+            try {
+                localStorage.setItem("ficha_interconsultas_form", JSON.stringify({ ...Initialform, norden: form.norden }));
+            } catch (err) {
+                console.warn("useForm: error guardando localStorage en clearnotO", err);
+            }
         }
     };
 
@@ -117,7 +118,7 @@ export default function FichaInterconsulta() {
 
     const handlePrint = () => {
         if (!form.norden) {
-            Swal.fire("Error","Debe colocar un Numero de Orden",'error')
+            Swal.fire("Error", "Debe colocar un Numero de Orden", 'error')
             return
         }
         handlePrintDefault(() => {
@@ -126,74 +127,74 @@ export default function FichaInterconsulta() {
     };
 
     const handleSave = () => {
-        if (!form.especialidad) return Swal.fire("Error","Debe solucionar al menos una especialidad","error")
+        if (!form.especialidad) return Swal.fire("Error", "Debe solucionar al menos una especialidad", "error")
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
         console.log("Guardando datos:", form);
     };
 
     const handleSubirArchivo = async () => {
         const { value: file } = await Swal.fire({
-        title: "Selecciona un archivo PDF",
-        input: "file",
-        inputAttributes: {
-            accept: "application/pdf", // solo PDF
-            "aria-label": "Sube tu archivo en formato PDF"
-        },
-        showCancelButton: true,
-        confirmButtonText: "Subir",
-        cancelButtonText: "Cancelar",
-        inputValidator: (file) => {
-            if (!file) return "Debes seleccionar un archivo.";
-            if (file.type !== "application/pdf") return "Solo se permiten archivos PDF.";
-        },
+            title: "Selecciona un archivo PDF",
+            input: "file",
+            inputAttributes: {
+                accept: "application/pdf", // solo PDF
+                "aria-label": "Sube tu archivo en formato PDF"
+            },
+            showCancelButton: true,
+            confirmButtonText: "Subir",
+            cancelButtonText: "Cancelar",
+            inputValidator: (file) => {
+                if (!file) return "Debes seleccionar un archivo.";
+                if (file.type !== "application/pdf") return "Solo se permiten archivos PDF.";
+            },
         });
 
         if (file) {
-        // Puedes convertirlo a Base64 si lo necesitas
-        const reader = new FileReader();
-        reader.onload = async (e)  => {
-            LoadingDefault("Subiendo documento")
-            const base64WithoutHeader = e.target.result.split(',')[1];
-            const datos = {
-                nombre: file.name,
-                sede: selectedSede,
-                base64:  base64WithoutHeader,
-                nomenclatura: form.nomenclatura,
-                norden: form.norden
-            };
-            const response = await SubirInterconsulta(datos, userlogued, token);
-            if (response.id === 1) {
-                const body = {
-                    "codigoFichaInterconsulta": form.codigoFichaInterconsulta,
-                    "nomenclatura": form.nomenclatura
+            // Puedes convertirlo a Base64 si lo necesitas
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                LoadingDefault("Subiendo documento")
+                const base64WithoutHeader = e.target.result.split(',')[1];
+                const datos = {
+                    nombre: file.name,
+                    sede: selectedSede,
+                    base64: base64WithoutHeader,
+                    nomenclatura: form.nomenclatura,
+                    norden: form.norden
+                };
+                const response = await SubirInterconsulta(datos, userlogued, token);
+                if (response.id === 1) {
+                    const body = {
+                        "codigoFichaInterconsulta": form.codigoFichaInterconsulta,
+                        "nomenclatura": form.nomenclatura
+                    }
+                    const response = await SubmitData(body, '/api/v01/ct/fichaInterconsulta/actualizarNomenclaturaFichaInterconsulta', token)
+                    console.log(response)
+                    Swal.fire("Exito", "Archivo Subido con exto", "success")
+                } else {
+                    Swal.fire("Error", "No se pudo subir", "error")
                 }
-                const response = await SubmitData(body,'/api/v01/ct/fichaInterconsulta/actualizarNomenclaturaFichaInterconsulta',token)
                 console.log(response)
-                Swal.fire("Exito", "Archivo Subido con exto","success")
-            } else {
-                Swal.fire("Error", "No se pudo subir","error")
-            }
-            console.log(response)
-        };
-        reader.readAsDataURL(file);
+            };
+            reader.readAsDataURL(file);
         }
     };
-    
+
     const ReadArchivosForm = async () => {
         LoadingDefault("Cargando Interconsulta")
         ReadArchivos(form.norden, form.nomenclatura)
-        .then(response => {
-            if (response.id === 1) {
-                setVisualerOpen(response)
-            }
-            Swal.close()
-        })
-        .catch(error => {
-            Swal.fire("Error","Ocurrio un Error al visualizar la interconsulta","error")
-            throw new Error('Network response was not ok.', error);
-        })
+            .then(response => {
+                if (response.id === 1) {
+                    setVisualerOpen(response)
+                }
+                Swal.close()
+            })
+            .catch(error => {
+                Swal.fire("Error", "Ocurrio un Error al visualizar la interconsulta", "error")
+                throw new Error('Network response was not ok.', error);
+            })
     }
-   
+
     return (
         <>
             <div className="space-y-6 max-w-[95%] mx-auto">
@@ -201,7 +202,7 @@ export default function FichaInterconsulta() {
                 <section className="bg-white border border-gray-200 rounded-lg p-4 w-full">
                     {/* Fila de inputs */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-                        <InputTextOneLine label="N° Orden" value={form.norden} name="norden" onKeyUp={handleSearch} onChange={handleChangeNumber}  />
+                        <InputTextOneLine label="N° Orden" value={form.norden} name="norden" onKeyUp={handleSearch} onChange={handleChangeNumber} />
                         <InputTextOneLine label="Fecha de Examen" value={form.fechaExamen} onChange={handleChangeSimple} type="date" name="fechaExamen" />
                         <div className="flex items-center gap-4 w-full">
                             <label htmlFor="">Especialidades</label>
@@ -209,10 +210,10 @@ export default function FichaInterconsulta() {
                                 <option value="">Selecione una Especialidad...</option>
                                 {Especialidades?.sort((a, b) => a.localeCompare(b)) // ordena alfabéticamente respetando tildes
                                     .map((option, index) => (
-                                    <option key={index} value={option.toUpperCase()}>
-                                        {option}
-                                    </option>
-                                ))}
+                                        <option key={index} value={option.toUpperCase()}>
+                                            {option}
+                                        </option>
+                                    ))}
                             </select>
                         </div>
                         {/*<InputTextOneLine label="Especialidad" value={form.especialidad} onChange={handleChange} name="especialidad" />*/}
@@ -229,13 +230,13 @@ export default function FichaInterconsulta() {
                             <FontAwesomeIcon icon={faUpload} />
                             Subir Archivo
                         </button>
-                         <button onClick={ReadArchivosForm} className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2">
+                        <button onClick={ReadArchivosForm} className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2">
                             <FontAwesomeIcon icon={faDownload} />
                             Ver Archivo
                         </button>
-                    </div>}   
-  
-                    
+                    </div>}
+
+
 
                     <div className="grid gap-4 mt-4 pt-4 border-t-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(150px,1fr))] items-center">
                         {/* DNI */}
@@ -286,13 +287,13 @@ export default function FichaInterconsulta() {
                             className="max-w-[100px]"
                             inputClassName="!w-[70px] text-center"
                         />
-                        
+
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
                         <InputTextOneLine label="Emp. Contratista" value={form.contrata} disabled name="contrata" />
                         <InputTextOneLine label="Empresa" value={form.empresa} disabled name="empresa" />
                     </div>
-                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
                         <InputTextOneLine label="Area de Trabajo" value={form.areaPaciente} disabled name="contrata" />
                         <InputTextOneLine label="Puesto de Trabajo" value={form.cargoPaciente} disabled name="empresa" />
                     </div>
@@ -305,12 +306,12 @@ export default function FichaInterconsulta() {
                         {/* F.C */}
                         <div className="flex items-center gap-1">
                             <InputTextOneLine
-                            label="F.C"
-                            labelWidth="30px"
-                            disabled
-                            value={form.frecuenciaCardiaca}
-                            className="min-w-[90px] w-full !gap-1"
-                            name="fc"
+                                label="F.C"
+                                labelWidth="30px"
+                                disabled
+                                value={form.frecuenciaCardiaca}
+                                className="min-w-[90px] w-full !gap-1"
+                                name="fc"
                             />
                             <span className="text-sm text-gray-600">x min</span>
                         </div>
@@ -318,12 +319,12 @@ export default function FichaInterconsulta() {
                         {/* P.A */}
                         <div className="flex items-center gap-1">
                             <InputTextOneLine
-                            label="P.A"
-                            labelWidth="30px"
-                            value={form.PA}
-                            disabled
-                            className="min-w-[90px] w-full !gap-1"
-                            name="pa"
+                                label="P.A"
+                                labelWidth="30px"
+                                value={form.PA}
+                                disabled
+                                className="min-w-[90px] w-full !gap-1"
+                                name="pa"
                             />
                             <span className="text-sm text-gray-600">mmHg</span>
                         </div>
@@ -331,12 +332,12 @@ export default function FichaInterconsulta() {
                         {/* F.R */}
                         <div className="flex items-center gap-1">
                             <InputTextOneLine
-                            label="F.R"
-                            labelWidth="30px"
-                            disabled
-                            value={form.frecuenciaRespiratoriaTriaje}
-                            className="min-w-[90px] w-full !gap-1"
-                            name="fr"
+                                label="F.R"
+                                labelWidth="30px"
+                                disabled
+                                value={form.frecuenciaRespiratoriaTriaje}
+                                className="min-w-[90px] w-full !gap-1"
+                                name="fr"
                             />
                             <span className="text-sm text-gray-600">x min</span>
                         </div>
@@ -374,12 +375,12 @@ export default function FichaInterconsulta() {
                         {/* Peso */}
                         <div className="flex items-center gap-1">
                             <InputTextOneLine
-                            label="Peso"
-                            value={form.peso}
-                            disabled
-                            labelWidth="40px"
-                            className="min-w-[90px] w-full !gap-1"
-                            name="peso"
+                                label="Peso"
+                                value={form.peso}
+                                disabled
+                                labelWidth="40px"
+                                className="min-w-[90px] w-full !gap-1"
+                                name="peso"
                             />
                             <span className="text-sm text-gray-600">Kg</span>
                         </div>
@@ -387,12 +388,12 @@ export default function FichaInterconsulta() {
                         {/* Talla */}
                         <div className="flex items-center gap-1">
                             <InputTextOneLine
-                            label="Talla"
-                            value={form.tallaTriaje}
-                            disabled
-                            labelWidth="45px"
-                            className="min-w-[90px] w-full !gap-1"
-                            name="talla"
+                                label="Talla"
+                                value={form.tallaTriaje}
+                                disabled
+                                labelWidth="45px"
+                                className="min-w-[90px] w-full !gap-1"
+                                name="talla"
                             />
                             <span className="text-sm text-gray-600">m</span>
                         </div>
@@ -416,7 +417,7 @@ export default function FichaInterconsulta() {
                     </div>
                 </section>
 
-                
+
                 <section className="bg-white rounded-lg  my-4 w-full">
                     <div className="w-full flex justify-around items-center gap-4">
                         <InputTextArea
@@ -434,7 +435,7 @@ export default function FichaInterconsulta() {
                             onChange={handleChange}
                             classNameLabel="text-blue-600"
                             rows={6}
-                             classNameArea="bg-[#99FFFF]"
+                            classNameArea="bg-[#99FFFF]"
                             name="hallazgo"
                         />
                     </div>
@@ -452,7 +453,7 @@ export default function FichaInterconsulta() {
                                 classNameArea="bg-[#99FFFF]"
                             />
                         </div>
-                        
+
                         <div className="flex flex-col w-full">
                             <InputTextArea
                                 label="Tratamiento"
@@ -463,7 +464,7 @@ export default function FichaInterconsulta() {
                                 name="tratamiento"
                                 classNameArea="bg-[#99FFFF]"
                             />
-                            
+
                             <div className="flex  p-3 mt-4 text-lg items-center font-bold rounded-lg justify-between">
                                 <div className="flex justify-between gap-1 p-2 border">
                                     <button
@@ -502,27 +503,27 @@ export default function FichaInterconsulta() {
                                 </div>
                             </div>
                         </div>
-                        
+
                     </div>
                 </section>
                 {visualerOpen && (
                     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
                         <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
-                        <div className="px-4 py-2 naranjabackgroud flex justify-between">
-                            <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
-                            <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
-                        </div>
-                        <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
-                            <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`}  type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
-                        </div>
-                        <div className="flex justify-center">
-                            <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
-                            <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
-                            </a>
-                        </div>
+                            <div className="px-4 py-2 naranjabackgroud flex justify-between">
+                                <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
+                                <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+                            </div>
+                            <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
+                                <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
+                            </div>
+                            <div className="flex justify-center">
+                                <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                                    <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+                                </a>
+                            </div>
                         </div>
                     </div>
-                    )}
+                )}
             </div>
         </>
     )
