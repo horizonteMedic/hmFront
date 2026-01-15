@@ -16,11 +16,14 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "RAYOS X TORAX",
         "INFORME RADIOGRAFICO",
         "ELECTROCARDIOGRAMA",
-        "OFTALMOLOGIA VISION TESTER"
+        "OFTALMOLOGIA VISION TESTER",
+        "DECLARACION USO FIRMA",
+        "PSICOSENSOMETRICO",
+        "PSICOSENSOMETRICO VEHI-FOLIO"
     ];
 
     const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true);
-    // const examenesFiltrados = ListaExamenes; //SOLO ACTIVAR PARA PRUEBAS 
+    //const examenesFiltrados = ListaExamenes; //SOLO ACTIVAR PARA PRUEBAS 
     const totalReportes = examenesFiltrados.length;
 
     // Array para almacenar estadísticas de peso

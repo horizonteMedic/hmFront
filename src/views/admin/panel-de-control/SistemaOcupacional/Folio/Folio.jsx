@@ -7,16 +7,22 @@ import { getToday } from "../../../../utils/helpers";
 import { GetInfoPac } from "./controllerFolio";
 import Swal from "sweetalert2";
 
-const ExamenesList = [
+const ExamenesList2 = [
     {
-        nombre: "CONSENTIMIENTO PANEL 5D",//NUEVO OPTIMIZAR //20 CORRECTO Consentimiento Panel 5D
+        nombre: "CONSENTIMIENTO DECLARACIÓN DE INFORMACION APTITUD MEDICO OCUPACIONAL", //25 CORRECTO EKG
         resultado: false,
-        tabla: "con_panel5D",
-        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
-        nameConset: true,
+        tabla: "DECLA_INFO_APTITUD_MO",
+        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
+        esJasper: true
+    },
+    {  //Solo si tiene ficha de conducción de vehículos
+        nombre: "PSICOSENSOMETRICO VEHI-FOLIO",//NUEVO ARCHIVO //8 REVISAR  Psicosensométrico
+        resultado: false,
+        tabla: "PSICOSENSOMETRICO VEHI-FOLIO",
+        nomenclatura: "PSICOSENSOMETRICO VEHI-FOLIO",
     },
 ]
-const ExamenesList2 = [
+const ExamenesList = [
     {
         nombre: "RESUMEN MEDICO PODEROSA", //NUEVO OPTIMIZAR   //1 CORRECTO Resumen Médico
         resultado: false,
@@ -66,12 +72,12 @@ const ExamenesList2 = [
         url: "/api/v01/ct/fichaApneaSueno/obtenerReporteFichaSas",
         esJasper: true
     },
-    // {  //Solo si tiene ficha de conducción de vehículos
-    //     nombre: "PSICOSENSOMETRICO ",//NUEVO ARCHIVO //8 REVISAR  Psicosensométrico
-    //     resultado: false,
-    //     tabla: "PSICOSENSOMETRICO",
-    //     url: ""
-    // },
+    {  //Solo si tiene ficha de conducción de vehículos
+        nombre: "PSICOSENSOMETRICO VEHI-FOLIO",//NUEVO ARCHIVO //8 REVISAR  Psicosensométrico
+        resultado: false,
+        tabla: "PSICOSENSOMETRICO VEHI-FOLIO",
+        nomenclatura: "PSICOSENSOMETRICO VEHI-FOLIO",
+    },
     {
         nombre: "HISTORIA OCUPACIONAL", //9 CORRECTO  Historia Ocupacional
         resultado: false,
@@ -92,12 +98,6 @@ const ExamenesList2 = [
         url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
         esJasper: true
     },
-    // {    //validar si existira PREGUNTAR DOC Y VIVIANA
-    //     nombre: "DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS Y FAMILIARES ARCHIVO", //NUEVO ARCHIVO   //11.1 REVISAR  Declaración Jurada de Antecedentes Personales
-    //     resultado: false,
-    //     tabla: "DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS",
-    //     nomenclatura: "DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS"
-    // },
     {
         nombre: "CUESTIONARIO NORDICO", //12 CORRECTO Cuestionario Nórdico
         resultado: false,
@@ -154,18 +154,12 @@ const ExamenesList2 = [
         url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
         nameConset: true,
     },
-    { //REVISAR SI SOLO QUDA CON REPORTE O HABRA ARCHIVO
+    {
         nombre: "OIT",//21 CORRECTO REVISAR Consentimiento Panel 5D
         resultado: false,
         tabla: "oit",
         url: "/api/v01/ct/oit/obtenerReporteOit"
     },
-    // { //REVISAR CON DOCTORA SI TENDRA REPORTE TAMBIEN 
-    //     nombre: "RADIOGRAFIA TORAX",
-    //     resultado: false,
-    //     tabla: "radiografia_torax",
-    //     url: "/api/v01/ct/rayosX/obtenerReporteRadiografiaTorax"
-    // },
     {
         nombre: "RAYOS X TORAX ARCHIVO", //NUEVO ARCHIVO FALTA IMPRIMIR  //22 CORRECTO Radiografía de Tórax – Archivo
         resultado: false,
@@ -223,20 +217,40 @@ const ExamenesList2 = [
         url: "/api/v01/ct/informePsicologicoAdeco/obtenerReporteInformePsicologicoAdeco",
         esJasper: true,
     },
-    //31. **Informe Psicológico / Exámenes Complementarios**
-    //32. **Informe Psicológico – Trabajo en Altura**
+    {
+        nombre: "INFORME PSICOLOGICO", //31 CORRECTO  Informe Psicológico / Exámenes Complementarios
+        resultado: false,
+        tabla: "informe_psicologico",
+        url: "/api/v01/ct/informePsicologico/obtenerReporteInformePsicologico",
+        esJasper: true
+    },
+    {
+        nombre: "TRABAJO EN ALTURA", //NUEVO OPTIMIZAR //32 CORRECTO  Informe Psicológico – Trabajo en Altura
+        resultado: false,
+        tabla: "psicologiafobias",
+        url: "/api/v01/ct/informePsicologicoFobias/obtenerReporteInformePsicologicoFobias",
+        esJasper: true
+    },
     {
         nombre: "OFTALMOLOGIA", //NUEVO OPTIMIZAR JEAN URGENTE //33 CORRECTO Oftalmología
         resultado: false,
         tabla: "oftalmologia2021",
         url: "/api/v01/ct/agudezaVisual/obtenerReporteEvaluacionOftalmologica",
     },
-
-    //34. ** Declaración de Información de Aptitud Médico Ocupacional **
-
-    //35. ** Declaración Jurada para el Uso de Firma Electrónica **
-
-    //36. ** DNI y Licencia de Conducir **
+    {
+        nombre: "CONSENTIMIENTO DECLARACIÓN DE INFORMACION APTITUD MEDICO OCUPACIONAL", //NUEVO OPTIMIZAR//25 CORRECTO Declaración de Información de Aptitud Médico Ocupacional 
+        resultado: false,
+        tabla: "DECLA_INFO_APTITUD_MO",
+        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
+        esJasper: true
+    },
+    {
+        nombre: "DECLARACION USO FIRMA", //NUEVO ARCHIVO //35 CORRECTO Declaración Jurada para el Uso de Firma Electrónica archivo solo archivo
+        resultado: false,
+        tabla: "DECLARACION USO FIRMA",
+        nomenclatura: "DECLARACION USO FIRMA",
+    },
+    //37. ** Interconsultas **
 
 ];
 

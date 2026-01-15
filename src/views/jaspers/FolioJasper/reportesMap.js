@@ -53,6 +53,7 @@ import ConsentimientoBuenaSalud2021_Digitalizado from "../ModuloConsentimientos/
 import LBioquimica_Digitalizado from "../AnalisisBioquimicos/LBioquimica_Digitalizado";
 import PerfilHepatico_Digitalizado from "../AnalisisBioquimicos/PerfilHepatico_Digitalizado";
 import Consentimiento_Panel5D_ohla_Digitalizado from "../Consentimientos/Consentimiento_Panel5D_Digitalizado";
+import ConsentAdmisionInformacionAptitudMedicoOcupacional from "../ModuloConsentimientos/ConsentAdmisInformaAptiMedicoOcupa/Consent_Admision_InformacionAptitudMedicoOcupacional";
 
 
 // Agrega aquí todos tus reportes
@@ -132,6 +133,7 @@ export const reportesMap = {
     CONSENT_INFORMADO_MEDICA: Consent_Admision_EvaluacionMedica,
 
     consentimientobuenasalud: ConsentimientoBuenaSalud2021_Digitalizado,
+    DECLA_INFO_APTITUD_MO:ConsentAdmisionInformacionAptitudMedicoOcupacional,
 
     b_uso_respiradores: UsoRespiradores,
     historia_oc_info: HistoriaOcupacional_Digitalizado,
