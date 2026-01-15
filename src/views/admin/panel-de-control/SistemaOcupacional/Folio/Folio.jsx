@@ -7,16 +7,241 @@ import { getToday } from "../../../../utils/helpers";
 import { GetInfoPac } from "./controllerFolio";
 import Swal from "sweetalert2";
 
-const ExamenesList2 = [
+const ExamenesList = [
     {
-        nombre: "RAYOS X TORAX ARCHIVO", //NUEVO ARCHIVO
+        nombre: "CONSENTIMIENTO PANEL 5D",//NUEVO OPTIMIZAR //20 CORRECTO Consentimiento Panel 5D
         resultado: false,
-        tabla: "RAYOS X TORAX",
-        url: ""
+        tabla: "con_panel5D",
+        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
+        nameConset: true,
     },
 ]
+const ExamenesList2 = [
+    {
+        nombre: "RESUMEN MEDICO PODEROSA", //NUEVO OPTIMIZAR   //1 CORRECTO Resumen Médico
+        resultado: false,
+        tabla: "resumen_medico_poderosa",
+        url: "/api/v01/ct/anexos/obtenerReporteResumenMedico",
+    },
+    {
+        nombre: "CONSTANCIA DE EXAMEN MEDICO OCUPACIONAL",  //2 CORRECTO Constancia de Examen Médico Ocupacional
+        resultado: false,
+        tabla: "certificado_aptitud_medico_resumen",
+        url: "/api/v01/ct/certificadoAptitudMedicoOcupacional/obtenerReporteCertificadoMedicoOcupacional",
+        esJasper: true
+    },
+    {
+        nombre: "ANEXO 16", //3 CORRECTO Anexo 16 
+        resultado: false,
+        tabla: "anexo7c",
+        url: "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16"
+    },
+    {
+        nombre: "CERTIFICADO ALTURA",  //4 CORRECTO Ficha Certificado de Trabajos de Altura
+        resultado: false,
+        tabla: "b_certificado_altura",
+        url: "/api/v01/ct/certificadoTrabajoAltura/obtenerReporteCertificadoTrabajoAltura",
+        esJasper: true
+    },
+    {
+        // Solo si tiene ficha certificado de trabajos de altura
+        //(Si hay psicosensométrico y test de altura, se colocará el psicosensométrico donde va el test de altura)
+        nombre: "OFTALMOLOGIA VISION TESTER", //NUEVO ARCHIVO   //5 REVISAR  Test de Altura (Visual)
+        resultado: false,
+        tabla: "OFTALMOLOGIA VISION TESTER",
+        nomenclatura: "OFTALMOLOGIA VISION TESTER"
+    },
+    {
+        nombre: "CERTIFICADO VEHICULOS", //6 CORRECTO Ficha Conducción de Vehículos
+        resultado: false,
+        tabla: "b_certificado_conduccion",
+        url: "/api/v01/ct/certificadoConduccion/obtenerReporteCertificadoConduccion",
+        esJasper: true
+    },
+    {
+        //Solo si tiene ficha de conducción de vehículos
+        nombre: "FICHA SAS", //7 CORRECTO Ficha SAS
+        resultado: false,
+        tabla: "ficha_sas",
+        url: "/api/v01/ct/fichaApneaSueno/obtenerReporteFichaSas",
+        esJasper: true
+    },
+    // {  //Solo si tiene ficha de conducción de vehículos
+    //     nombre: "PSICOSENSOMETRICO ",//NUEVO ARCHIVO //8 REVISAR  Psicosensométrico
+    //     resultado: false,
+    //     tabla: "PSICOSENSOMETRICO",
+    //     url: ""
+    // },
+    {
+        nombre: "HISTORIA OCUPACIONAL", //9 CORRECTO  Historia Ocupacional
+        resultado: false,
+        tabla: "historia_oc_info",
+        url: "/api/v01/ct/historiaOcupacional/obtenerReporteHistoriaOcupacional"
+    },
+    {
+        nombre: "ANTECEDENTES PATOLOGICOS", //10 CORRECTO  Antecedentes Patológicos
+        resultado: false,
+        tabla: "antecedentes_patologicos",
+        url: "/api/v01/ct/antecedentesPatologicos/obtenerReporteAntecedentesPatologicos",
+        esJasper: true
+    },
+    {
+        nombre: "DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS Y FAMILIARES",//NUEVO OPTIMIZAR //11 REVISAR Declaración Jurada de Antecedentes Personales
+        resultado: false,
+        tabla: "DECLA_JURA_ANTECE_PERSON_FAM",
+        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
+        esJasper: true
+    },
+    // {    //validar si existira PREGUNTAR DOC Y VIVIANA
+    //     nombre: "DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS Y FAMILIARES ARCHIVO", //NUEVO ARCHIVO   //11.1 REVISAR  Declaración Jurada de Antecedentes Personales
+    //     resultado: false,
+    //     tabla: "DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS",
+    //     nomenclatura: "DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS"
+    // },
+    {
+        nombre: "CUESTIONARIO NORDICO", //12 CORRECTO Cuestionario Nórdico
+        resultado: false,
+        tabla: "cuestionario_nordico",
+        url: "/api/v01/ct/cuestionarioNordico/obtenerReporteCuestionarioNordico"
+    },
+    {
+        nombre: "EVALUACION MUSCULO ESQUELETICA",//13 CORRECTO Cuestionario Nórdico
+        resultado: false,
+        tabla: "evaluacion_musculo_esqueletica",
+        url: "/api/v01/ct/evaluacionMusculoEsqueletica/obtenerReporteEvaluacionMusculoEsqueletica"
+    },
+    {
+        nombre: "CONSENTIMIENTO DE MUESTRA DE SANGRE",//NUEVO OPTIMIZAR   //14 CORRECTO Consentimientos – Muestra de Sangre
+        resultado: false,
+        tabla: "consent_Muestra_Sangre",
+        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
+        nameConset: true
+    },
+    {
+        nombre: "LABORATORIO CLINICO", //15 CORRECTO Laboratorio Clínico – Hematología Bioquímica
+        resultado: false,
+        tabla: "lab_clinico",
+        url: "/api/v01/ct/laboratorio/obtenerReporteLaboratorioClinico"
+    },
+    {
+        nombre: "ANALISIS BIOQUIMICOS - PERFIL LIPIDICO", //16 CORRECTO Análisis Bioquímico – Perfil Lipídico
+        resultado: false,
+        tabla: "analisis_bioquimicos",
+        url: "/api/v01/ct/laboratorio/reporteAnalisisBioquimico"
+    },
+    {
+        nombre: "INMUNOLOGIA - GENODOTROPINA",//NUEVO OPTIMIZAR //17 CORRECTO Gonadotropina
+        resultado: false,
+        tabla: "lgonadotropina",
+        url: "/api/v01/ct/inmunologia/obtenerReporteLgonadotropina",
+    },
+    {
+        nombre: "ANALISIS BIOQUIMICOS - PERFIL RENAL",//NUEVO OPTIMIZAR  //18 CORRECTO Análisis Bioquímico – Perfil Renal
+        resultado: false,
+        tabla: "l_bioquimica",
+        url: "/api/v01/ct/analisisBioquimico/obtenerReportePerfilRenal"
+    },
+    {
+        nombre: "ANALISIS BIOQUIMICOS - PERFIL HEPÁTICO",//NUEVO OPTIMIZAR  //19 CORRECTO Análisis Bioquímico – Perfil Hepático
+        resultado: false,
+        tabla: "perfil_hepatico",
+        url: "/api/v01/ct/analisisBioquimico/obtenerReportePerfilHepatico"
+    },
+    {
+        nombre: "CONSENTIMIENTO PANEL 5D",//NUEVO OPTIMIZAR //20 CORRECTO Consentimiento Panel 5D
+        resultado: false,
+        tabla: "con_panel5D",
+        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
+        nameConset: true,
+    },
+    { //REVISAR SI SOLO QUDA CON REPORTE O HABRA ARCHIVO
+        nombre: "OIT",//21 CORRECTO REVISAR Consentimiento Panel 5D
+        resultado: false,
+        tabla: "oit",
+        url: "/api/v01/ct/oit/obtenerReporteOit"
+    },
+    // { //REVISAR CON DOCTORA SI TENDRA REPORTE TAMBIEN 
+    //     nombre: "RADIOGRAFIA TORAX",
+    //     resultado: false,
+    //     tabla: "radiografia_torax",
+    //     url: "/api/v01/ct/rayosX/obtenerReporteRadiografiaTorax"
+    // },
+    {
+        nombre: "RAYOS X TORAX ARCHIVO", //NUEVO ARCHIVO FALTA IMPRIMIR  //22 CORRECTO Radiografía de Tórax – Archivo
+        resultado: false,
+        tabla: "RAYOS X TORAX",
+        nomenclatura: "RAYOS X TORAX"
+    },
+    {
+        nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA)", //NUEVO OPTIMIZAR //23 CORRECTO Radiografía de Columna
+        resultado: false,
+        tabla: "radiografia",
+        url: "/api/v01/ct/rayosX/obtenerReporteInformeRadiografico"
+    },
+    {
+        nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA) ARCHIVO", //NUEVO ARCHIVO FALTA IMPRIMIR //24 CORRECTO Radiografía de Columna – Archivo
+        resultado: false,
+        tabla: "INFORME RADIOGRAFICO",
+        nomenclatura: "INFORME RADIOGRAFICO"
+    },
+    {
+        nombre: "ELECTROCARDIOGRAMA", //25 CORRECTO EKG
+        resultado: false,
+        tabla: "informe_electrocardiograma",
+        url: "/api/v01/ct/electroCardiograma/obtenerReporteInformeElectroCardiograma",
+        esJasper: true
+    },
+    {
+        nombre: "ESPIROMETRIA",  //26 CORRECTO Espirometría – Archivo
+        resultado: false,
+        tabla: "ESPIROMETRIA",
+        nomenclatura: "ESPIROMETRIA"
+    },
+    {
+        nombre: "FICHA AUDIOLOGICA OHLA", //27 CORRECTO  Audiometría OHLA
+        resultado: false,
+        tabla: "audiometria_po",
+        url: "/api/v01/ct/audiometria/obtenerReporteAudiometriaM"
+    },
+    { //REENCUADRE JEAN
+        nombre: "ODONTROGRAMA", //NUEVO OPTIMIZAR //28 CORRECTO Odontología
+        resultado: false,
+        tabla: "odontograma",
+        url: "/api/v01/ct/odontograma/obtenerReporteOdontograma"
+    },
+    {
+        nombre: "PSICOLOGIA ANEXO 02", //NUEVO OPTIMIZAR //29 CORRECTO Informe Psicológico Ocupacional – Anexo 2
+        resultado: false,
+        tabla: "ficha_psicologica_anexo02",
+        url: "/api/v01/ct/psicologia/obtenerFichaPsicologiaAnexo02",
+        esJasper: true,
+    },
+    { //revisar con viviana si es este
+        nombre: "TEST DE FATIGA Y SOMNOLENCIA", //NUEVO OPTIMIZAR //30 CORRECTO Informe Psicológico de Estrés
+        resultado: false,
+        tabla: "informe_psicologico_estres",
+        url: "/api/v01/ct/informePsicologicoAdeco/obtenerReporteInformePsicologicoAdeco",
+        esJasper: true,
+    },
+    //31. **Informe Psicológico / Exámenes Complementarios**
+    //32. **Informe Psicológico – Trabajo en Altura**
+    {
+        nombre: "OFTALMOLOGIA", //NUEVO OPTIMIZAR JEAN URGENTE //33 CORRECTO Oftalmología
+        resultado: false,
+        tabla: "oftalmologia2021",
+        url: "/api/v01/ct/agudezaVisual/obtenerReporteEvaluacionOftalmologica",
+    },
 
-const ExamenesList = [
+    //34. ** Declaración de Información de Aptitud Médico Ocupacional **
+
+    //35. ** Declaración Jurada para el Uso de Firma Electrónica **
+
+    //36. ** DNI y Licencia de Conducir **
+
+];
+
+{/* 
+const ExamenesListPODEROSA = [
     {
         nombre: "RESUMEN MEDICO PODEROSA", //NUEVO OPTIMIZAR
         resultado: false,
@@ -442,7 +667,7 @@ const ExamenesList = [
     //     url: "",
     // },
 ];
-
+*/}
 const Folio = () => {
     const today = getToday();
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();

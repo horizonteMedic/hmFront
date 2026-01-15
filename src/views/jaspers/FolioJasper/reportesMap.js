@@ -50,6 +50,9 @@ import EvaluacionOftalmologica2021_Digitalizado from "../Oftalmologia/Evaluacion
 import Consent_Admision_DeclaracionSintomaticoRespiratorio from "../ModuloConsentimientos/ConsentAdmisDeclaSintomaRespi/Consent_Admision_DeclaracionSintomaticoRespiratorio"
 import Consent_Admision_EvaluacionMedica from "../ModuloConsentimientos/ConsentAdmisEvaluaMedica/Consent_Admision_EvaluacionMedica"
 import ConsentimientoBuenaSalud2021_Digitalizado from "../ModuloConsentimientos/ConsentimientoBuenaSalud/ConsentimientoBuenaSalud2021_Digitalizado";
+import LBioquimica_Digitalizado from "../AnalisisBioquimicos/LBioquimica_Digitalizado";
+import PerfilHepatico_Digitalizado from "../AnalisisBioquimicos/PerfilHepatico_Digitalizado";
+import Consentimiento_Panel5D_ohla_Digitalizado from "../Consentimientos/Consentimiento_Panel5D_Digitalizado";
 
 
 // Agrega aquí todos tus reportes
@@ -94,6 +97,7 @@ export const reportesMap = {
     //CONST LABORATORIOS
     consent_marihuana: Consentimiento_Marihuana_Digitalizado,
     con_panel2D: Consentimiento_Panel2D_Digitalizado,
+    con_panel5D: Consentimiento_Panel5D_ohla_Digitalizado,
     consent_Boro: Consentimiento_Boro_Digitalizado,
     //RADIOGRAFIA
     radiografia: RAYOSXXXOFI_Digitalizado,
@@ -136,6 +140,10 @@ export const reportesMap = {
     evaluacion_musculo_esqueletica: EvaluacionMuscoloEsqueletica,
     lab_clinico: LaboratorioClinico_Digitalizado_nuevo,
     analisis_bioquimicos: AnalisisBioquimicos_Digitalizado,
+    perfil_hepatico: PerfilHepatico_Digitalizado,
+
+    l_bioquimica: LBioquimica_Digitalizado,
+
     oit: OIT_Digitalizado,
     radiografia_torax: RagiografiaToraxPA_Digitalizado,
     informe_electrocardiograma: (data) => {
