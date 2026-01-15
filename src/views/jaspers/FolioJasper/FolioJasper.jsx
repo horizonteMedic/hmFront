@@ -22,8 +22,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "PSICOSENSOMETRICO VEHI-FOLIO"
     ];
 
-    //const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true);
-    const examenesFiltrados = ListaExamenes; //SOLO ACTIVAR PARA PRUEBAS 
+    const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true);
+    //const examenesFiltrados = ListaExamenes; //SOLO ACTIVAR PARA PRUEBAS 
     const totalReportes = examenesFiltrados.length;
 
     // Array para almacenar estadísticas de peso
