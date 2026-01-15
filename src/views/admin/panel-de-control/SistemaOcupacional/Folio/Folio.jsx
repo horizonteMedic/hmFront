@@ -9,17 +9,11 @@ import Swal from "sweetalert2";
 
 const ExamenesList2 = [
     {
-        nombre: "CONSENTIMIENTO DECLARACIÓN DE INFORMACION APTITUD MEDICO OCUPACIONAL", //25 CORRECTO EKG
+        nombre: "CONSENTIMIENTO DECLARACIÓN DE INFORMACION APTITUD MEDICO OCUPACIONAL", //NUEVO OPTIMIZAR//35 CORRECTO Declaración de Información de Aptitud Médico Ocupacional 
         resultado: false,
         tabla: "DECLA_INFO_APTITUD_MO",
         url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
         esJasper: true
-    },
-    {  //Solo si tiene ficha de conducción de vehículos
-        nombre: "PSICOSENSOMETRICO VEHI-FOLIO",//NUEVO ARCHIVO //8 REVISAR  Psicosensométrico
-        resultado: false,
-        tabla: "PSICOSENSOMETRICO VEHI-FOLIO",
-        nomenclatura: "PSICOSENSOMETRICO VEHI-FOLIO",
     },
 ]
 const ExamenesList = [
@@ -218,34 +212,41 @@ const ExamenesList = [
         esJasper: true,
     },
     {
-        nombre: "INFORME PSICOLOGICO", //31 CORRECTO  Informe Psicológico / Exámenes Complementarios
+        nombre: "CUESTIONARIO BERLIN", //31 CORRECTO  Informe Cuestionario Berlin
+        resultado: false,
+        tabla: "cuestionario_berlin",
+        url: "/api/v01/ct/cuestionarioBerlin/obtenerReporte",
+        esJasper: true
+    },
+    {
+        nombre: "INFORME PSICOLOGICO", //32 CORRECTO  Informe Psicológico / Exámenes Complementarios
         resultado: false,
         tabla: "informe_psicologico",
         url: "/api/v01/ct/informePsicologico/obtenerReporteInformePsicologico",
         esJasper: true
     },
     {
-        nombre: "TRABAJO EN ALTURA", //NUEVO OPTIMIZAR //32 CORRECTO  Informe Psicológico – Trabajo en Altura
+        nombre: "TRABAJO EN ALTURA", //NUEVO OPTIMIZAR //33 CORRECTO  Informe Psicológico – Trabajo en Altura
         resultado: false,
         tabla: "psicologiafobias",
         url: "/api/v01/ct/informePsicologicoFobias/obtenerReporteInformePsicologicoFobias",
         esJasper: true
     },
     {
-        nombre: "OFTALMOLOGIA", //NUEVO OPTIMIZAR JEAN URGENTE //33 CORRECTO Oftalmología
+        nombre: "OFTALMOLOGIA", //NUEVO OPTIMIZAR JEAN URGENTE //34 CORRECTO Oftalmología
         resultado: false,
         tabla: "oftalmologia2021",
         url: "/api/v01/ct/agudezaVisual/obtenerReporteEvaluacionOftalmologica",
     },
     {
-        nombre: "CONSENTIMIENTO DECLARACIÓN DE INFORMACION APTITUD MEDICO OCUPACIONAL", //NUEVO OPTIMIZAR//25 CORRECTO Declaración de Información de Aptitud Médico Ocupacional 
+        nombre: "CONSENTIMIENTO DECLARACIÓN DE INFORMACION APTITUD MEDICO OCUPACIONAL", //NUEVO OPTIMIZAR//35 CORRECTO Declaración de Información de Aptitud Médico Ocupacional 
         resultado: false,
         tabla: "DECLA_INFO_APTITUD_MO",
         url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
         esJasper: true
     },
     {
-        nombre: "DECLARACION USO FIRMA", //NUEVO ARCHIVO //35 CORRECTO Declaración Jurada para el Uso de Firma Electrónica archivo solo archivo
+        nombre: "DECLARACION USO FIRMA", //NUEVO ARCHIVO //36 CORRECTO Declaración Jurada para el Uso de Firma Electrónica archivo solo archivo
         resultado: false,
         tabla: "DECLARACION USO FIRMA",
         nomenclatura: "DECLARACION USO FIRMA",

@@ -54,7 +54,7 @@ import LBioquimica_Digitalizado from "../AnalisisBioquimicos/LBioquimica_Digital
 import PerfilHepatico_Digitalizado from "../AnalisisBioquimicos/PerfilHepatico_Digitalizado";
 import Consentimiento_Panel5D_ohla_Digitalizado from "../Consentimientos/Consentimiento_Panel5D_Digitalizado";
 import ConsentAdmisionInformacionAptitudMedicoOcupacional from "../ModuloConsentimientos/ConsentAdmisInformaAptiMedicoOcupa/Consent_Admision_InformacionAptitudMedicoOcupacional";
-
+import Informe_Psico_Cuestionario_Berlin from "../ModuloPsicologia/InformePsicoCuestionarioBerlin/Informe_Psico_Cuestionario_Berlin"
 
 // Agrega aquí todos tus reportes
 export const ekgMap = {
@@ -120,6 +120,8 @@ export const reportesMap = {
 
     fobias: INFORME_ADICIONAL_DE_FOBIAS_Digitalizado,
 
+    cuestionario_berlin: Informe_Psico_Cuestionario_Berlin,
+
     informe_psicolaboral: Informe_PsicolaboralBoroo_Digitalizado,
 
     especificos: TRABAJOS_EN_ESPECIFICO_Digitalizado,
@@ -133,7 +135,7 @@ export const reportesMap = {
     CONSENT_INFORMADO_MEDICA: Consent_Admision_EvaluacionMedica,
 
     consentimientobuenasalud: ConsentimientoBuenaSalud2021_Digitalizado,
-    DECLA_INFO_APTITUD_MO:ConsentAdmisionInformacionAptitudMedicoOcupacional,
+    DECLA_INFO_APTITUD_MO: ConsentAdmisionInformacionAptitudMedicoOcupacional,
 
     b_uso_respiradores: UsoRespiradores,
     historia_oc_info: HistoriaOcupacional_Digitalizado,
