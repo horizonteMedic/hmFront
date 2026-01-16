@@ -254,6 +254,122 @@ const ExamenesList = [
 
 ];
 
+const ExamenesListCampana = [
+    {
+        nombre: "CERTIFICADO DE APTITUD ANEXO 16",
+        resultado: false,
+        tabla: "certificado_aptitud_medico_ocupacional",
+        url: "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16",
+        esJasper: true
+    },
+    {
+        nombre: "ANEXO 16",
+        resultado: false,
+        tabla: "anexo7c",
+        url: "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16"
+    },
+    {
+        nombre: "ENFERMEDADES EN ALTURA",
+        resultado: false,
+        tabla: "antece_enfermedades_altura",
+        url: "/api/v01/ct/antecedentesEnfermedadesAltura/obtenerReporteAntecedentesEnfermedadesAltura"
+    },
+    {
+        nombre: "USO DE RESPIRADORES",
+        resultado: false,
+        tabla: "b_uso_respiradores",
+        url: "/api/v01/ct/respiradores/obtenerReporteRespiradores",
+        esJasper: true
+    },
+    {
+        nombre: "HISTORIA OCUPACIONAL",
+        resultado: false,
+        tabla: "historia_oc_info",
+        url: "/api/v01/ct/historiaOcupacional/obtenerReporteHistoriaOcupacional"
+    },
+    {
+        nombre: "ANTECEDENTES PATOLOGICOS",
+        resultado: false,
+        tabla: "antecedentes_patologicos",
+        url: "/api/v01/ct/antecedentesPatologicos/obtenerReporteAntecedentesPatologicos",
+        esJasper: true
+    },
+    {
+        nombre: "CUESTIONARIO NORDICO",
+        resultado: false,
+        tabla: "cuestionario_nordico",
+        url: "/api/v01/ct/cuestionarioNordico/obtenerReporteCuestionarioNordico"
+    },
+    {
+        nombre: "EVALUACION MUSCULO ESQUELETICA ",
+        resultado: false,
+        tabla: "evaluacion_musculo_esqueletica",
+        url: "/api/v01/ct/evaluacionMusculoEsqueletica/obtenerReporteEvaluacionMusculoEsqueletica"
+    },
+    {
+        nombre: "LABORATORIO CLINICO ",
+        resultado: false,
+        tabla: "lab_clinico",
+        url: "/api/v01/ct/laboratorio/obtenerReporteLaboratorioClinico"
+    },
+    {
+        nombre: "ANALISIS BIOQUIMICOS (PERFIL LIPIDICO) OPCIONAL EN ALGUNOS EXAMANES ",
+        resultado: false,
+        tabla: "analisis_bioquimicos",
+        url: "/api/v01/ct/laboratorio/reporteAnalisisBioquimico"
+    },
+    {
+        nombre: "OIT",
+        resultado: false,
+        tabla: "oit",
+        url: "/api/v01/ct/oit/obtenerReporteOit"
+    },
+    {
+        nombre: "RADIOGRAFIA TORAX",
+        resultado: false,
+        tabla: "radiografia_torax",
+        url: "/api/v01/ct/rayosX/obtenerReporteRadiografiaTorax"
+    },
+    {
+        nombre: "ELECTROCARDIOGRAMA",
+        resultado: false,
+        tabla: "informe_electrocardiograma",
+        url: "/api/v01/ct/electroCardiograma/obtenerReporteInformeElectroCardiograma",
+        esJasper: true
+    },
+    {
+        nombre: "ESPIROMETRIA",
+        resultado: false,
+        tabla: "ESPIROMETRIA",
+        nomenclatura: "ESPIROMETRIA"
+    },
+    {
+        nombre: "FICHA AUDIOLOGICA",
+        resultado: false,
+        tabla: "audiometria_po",
+        url: "/api/v01/ct/audiometria/obtenerReporteAudiometriaM"
+    },
+    {
+        nombre: "INFORME PSICOLOGICO",
+        resultado: false,
+        tabla: "informe_psicologico",
+        url: "/api/v01/ct/informePsicologico/obtenerReporteInformePsicologico",
+        esJasper: true
+    },
+    {
+        nombre: "FICHA OFTALMOLOGICA",
+        resultado: false,
+        tabla: "oftalmologia",
+        url: "/api/v01/ct/agudezaVisual/obtenerReporteOftalmologia"
+    },
+    {
+        nombre: "CONSENTIMIENTO INFORMADO ",
+        resultado: false,
+        tabla: "consentimientoInformado",
+        url: "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoInformado"
+    },
+];
+
 {/* 
 const ExamenesListPODEROSA = [
     {
