@@ -9,7 +9,7 @@ import { dibujarFirmas } from '../../utils/dibujarFirmas.js';
 export default async function Oftalmologia(datos = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
-
+  console.log("sies");
   // Contador de páginas dinámico
   let numeroPagina = 1;
 
@@ -448,6 +448,7 @@ export default async function Oftalmologia(datos = {}, docExistente = null) {
     if (docExistente) {
       return doc;
     } else {
+      doc.save("Oftalmologia.pdf");
       imprimir(doc);
     }
   });

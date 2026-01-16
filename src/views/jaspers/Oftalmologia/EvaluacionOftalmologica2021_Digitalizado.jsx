@@ -8,7 +8,7 @@ export default async function EvaluacionOftalmologica2021_Digitalizado(data = {}
   const pageW = doc.internal.pageSize.getWidth();
 
   // 1) Header específico para Boro
-  header_EvaluacionOftalmologica2021_Digitalizado(doc, data);
+  await header_EvaluacionOftalmologica2021_Digitalizado(doc, data);
 
   // Datos de prueba (solo para desarrollo)
   const datosPrueba = {
