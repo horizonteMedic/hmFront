@@ -3,7 +3,7 @@ import { getFetch } from "../../utils/apiHelpers";
 import { reportesMap } from "./reportesMap";
 import { PDFDocument } from "pdf-lib";
 
-export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null) {
+export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType) {
     const pdfFinal = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
 
     const reportesConHorizontal = [
@@ -18,7 +18,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "ELECTROCARDIOGRAMA",
         "OFTALMOLOGIA VISION TESTER",
         "DECLARACION USO FIRMA",
-        "PSICOSENSOMETRICO",
+        // "PSICOSENSOMETRICO",
         "PSICOSENSOMETRICO VEHI-FOLIO",
         "INTERCONSULTA",
         "INTERCONSULTA 2",
@@ -169,6 +169,22 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
 
     // 📄 Generar PDF final con todos los PDFs externos en sus posiciones correctas
     let pdfFinalBytes;
+
+    //VALIDACION OHLA
+    console.log("pdfsExternos.length", pdfsExternos.length)
+    if (selectedListType === "OHLA") {
+        const existeOftalmo = pdfsExternos.some(pd => pd.examen.tabla === "OFTALMOLOGIA VISION TESTER");
+        console.log("existeOftalmoexisteOftalmo:", existeOftalmo);
+        const existePsico = pdfsExternos.some(pd => pd.examen.tabla === "PSICOSENSOMETRICO VEHI-FOLIO");
+        console.log("existePsicoexistePsico:", existePsico)
+        if (existeOftalmo && existePsico) {
+            const indexOftalmo = pdfsExternos.findIndex(pd => pd.examen.tabla === "OFTALMOLOGIA VISION TESTER");
+            if (indexOftalmo !== -1) {
+                pdfsExternos.splice(indexOftalmo, 1);
+            }
+        }
+    }
+    console.log("pdfsExternos.length2", pdfsExternos.length)
 
     if (pdfsExternos.length > 0) {
         console.log(`📎 Insertando ${pdfsExternos.length} PDF(s) externo(s) en el orden correcto...`);

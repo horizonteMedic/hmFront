@@ -409,6 +409,12 @@ export const EXAMENES_CATALOGO = {
         esJasper: true
     },
 
+    INTERCONSULTAS: {
+        nombre: "INTERCONSULTAS",
+        tabla: "",
+        url: "",
+    },
+
 };
 
 const buildExamenesList = (orden) =>
@@ -421,11 +427,12 @@ const buildExamenesList = (orden) =>
         return buildExamen(config);
     }).filter(Boolean);
 
-const ExamenesList2 = buildExamenesList([
-     "RADIOGRAFIA_COLUMNA_ARCHIVO",  
+const ExamenesList = buildExamenesList([
+    "OFTALMOLOGIA_VISION_TESTER",
+    "PSICOSENSOMETRICO",
 ]);
 
-const ExamenesList = buildExamenesList([      //OHLA
+const ExamenesList2 = buildExamenesList([      //OHLA
     "RESUMEN_MEDICO_PODEROSA",                 // 1
     "CONSTANCIA_EMO",                          // 2
     "ANEXO_16",                                // 3
@@ -462,6 +469,7 @@ const ExamenesList = buildExamenesList([      //OHLA
     "OFTALMOLOGIA",                            // 34
     "CONSENT_DECLARACION_APTITUD",             // 35
     "DECLARACION_USO_FIRMA_ARCHIVO",           // 36
+    "INTERCONSULTAS"                           // 37
 ]);
 
 const ExamenesList3 = buildExamenesList([ // Campaña
@@ -1386,7 +1394,7 @@ const Folio = () => {
             };
 
             // Llamar a FolioJasper con el callback de progreso
-            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress);
+            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress, selectedListType);
 
             // Cerrar la alerta de carga y mostrar éxito
             Swal.fire({
@@ -1545,7 +1553,7 @@ const Folio = () => {
             {/* ===== SECCIÓN: CONFIGURACIÓN ===== */}
             <SectionFieldset legend="Configuración" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div className="flex items-center gap-4">
-                    <label className="font-semibold" style={{ minWidth: "120px" }}>Tipo de Lista :</label>
+                    <label className="font-semibold" style={{ minWidth: "120px" }}>Plantilla Protoco:</label>
                     <select
                         className="border rounded px-2 py-1 w-full"
                         value={selectedListType}
@@ -1556,7 +1564,7 @@ const Folio = () => {
                     </select>
                 </div>
             </SectionFieldset>
-            
+
             {/* ===== SECCIÓN: EXAMENES ===== */}
             <SectionFieldset legend="Examenes" className="flex flex-col justify-center items-center w-full">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
