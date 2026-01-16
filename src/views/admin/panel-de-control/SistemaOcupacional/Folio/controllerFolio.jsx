@@ -73,7 +73,7 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
                     const interconsultasFormateadas = interconsultasConNomenclatura.map((item) => ({
                         nombre: `INTERCONSULTA - ${item.especialidad}`,
                         resultado: true,
-                        tabla: "INTERCONSULTA",
+                        tabla: item.nomenclatura,
                         nomenclatura: item.nomenclatura,
                     }));
 
