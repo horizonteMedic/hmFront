@@ -180,6 +180,9 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         // Contador de páginas insertadas para ajustar posiciones
         let paginasInsertadasAcumuladas = 0;
 
+        // Array para rastrear estadísticas de PDFs externos
+        const estadisticasPdfsExternos = [];
+
         // Insertar PDFs externos en ORDEN NORMAL (del primero al último)
         // Ajustamos las posiciones considerando las inserciones previas
         for (let i = 0; i < pdfsExternos.length; i++) {
@@ -193,6 +196,21 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
 
             // Cargar el PDF externo
             const externoBytes = await fetch(examen.url).then(r => r.arrayBuffer());
+
+            // 📊 Mostrar tamaño del PDF externo
+            const tamañoExternoKB = (externoBytes.byteLength / 1024).toFixed(2);
+            const tamañoExternoMB = (externoBytes.byteLength / (1024 * 1024)).toFixed(3);
+            console.log(`   📄 Tamaño del PDF externo: ${tamañoExternoKB} KB (${tamañoExternoMB} MB)`);
+
+            // Guardar estadísticas del PDF externo
+            estadisticasPdfsExternos.push({
+                nombre: examen.nombre,
+                tabla: examen.tabla,
+                pesoKB: tamañoExternoKB,
+                pesoMB: tamañoExternoMB,
+                pesoBytes: externoBytes.byteLength
+            });
+
             const externoPdf = await PDFDocument.load(externoBytes);
 
             // Copiar todas las páginas del PDF externo
@@ -213,6 +231,24 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
 
         pdfFinalBytes = await basePdf.save();
         console.log("✅ Todos los PDFs externos insertados correctamente");
+
+        // Mostrar resumen de PDFs externos
+        if (estadisticasPdfsExternos.length > 0) {
+            console.log("\n📎 RESUMEN DE PDFs EXTERNOS:");
+            console.log("═".repeat(80));
+
+            estadisticasPdfsExternos.forEach((pdf, index) => {
+                console.log(`📄 ${pdf.nombre} (${pdf.tabla})`);
+                console.log(`   Tamaño: ${pdf.pesoKB} KB (${pdf.pesoMB} MB)`);
+                console.log("─".repeat(80));
+            });
+
+            // Calcular peso total de PDFs externos
+            const pesoTotalExterno = estadisticasPdfsExternos.reduce((sum, pdf) => sum + pdf.pesoBytes, 0);
+            console.log(`\n📦 PESO TOTAL DE PDFs EXTERNOS: ${(pesoTotalExterno / 1024).toFixed(2)} KB (${(pesoTotalExterno / (1024 * 1024)).toFixed(2)} MB)`);
+            console.log(`📄 Total de PDFs externos: ${estadisticasPdfsExternos.length}`);
+            console.log("═".repeat(80) + "\n");
+        }
     } else {
         pdfFinalBytes = pdfFinal.output("arraybuffer");
     }

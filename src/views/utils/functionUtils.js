@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 import { getFetch, getFetchManejo, SubmitData, SubmitDataManejo } from "./apiHelpers";
-import { colocarSellosEnPdf, getSign, uint8ToBase64 } from "./helpers";
+import { colocarSellosEnPdf, getSign, uint8ToBase64, optimizePdf } from "./helpers";
 
 export const LoadingDefault = (text) => {
     Swal.fire({
@@ -390,7 +390,9 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
             if (file.type !== "application/pdf") return "Solo se permiten archivos PDF.";
         },
     });
-
+    console.log(sFirma)
+    console.log(sHuella)
+    console.log(sSello)
     if (!file) return; // Usuario canceló la selección de archivo
 
     // Segundo diálogo: preguntar si quiere agregar sellos
@@ -429,7 +431,22 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
             console.log("SIN SELLOS");
         }
 
-        const pdfBase64Final = uint8ToBase64(new Uint8Array(pdfBytes));
+        // Calcular tamaño antes de optimizar
+        const tamañoAntesKB = (pdfBytes.length / 1024).toFixed(2);
+        console.log(`📄 Tamaño del PDF ANTES de optimizar: ${tamañoAntesKB} KB (${pdfBytes.length} bytes)`);
+
+        // Optimizar el PDF
+        const pdfBytesOptimizado = await optimizePdf(pdfBytes);
+
+        // Calcular tamaño después de optimizar
+        const tamañoDespuesKB = (pdfBytesOptimizado.length / 1024).toFixed(2);
+        const reduccionKB = (tamañoAntesKB - tamañoDespuesKB).toFixed(2);
+        const porcentajeReduccion = ((reduccionKB / tamañoAntesKB) * 100).toFixed(1);
+
+        console.log(`📄 Tamaño del PDF DESPUÉS de optimizar: ${tamañoDespuesKB} KB (${pdfBytesOptimizado.length} bytes)`);
+        console.log(`✅ Reducción: ${reduccionKB} KB (${porcentajeReduccion}%)`);
+
+        const pdfBase64Final = uint8ToBase64(new Uint8Array(pdfBytesOptimizado));
 
 
         const datos = {
