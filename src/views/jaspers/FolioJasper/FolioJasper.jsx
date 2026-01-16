@@ -19,7 +19,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "OFTALMOLOGIA VISION TESTER",
         "DECLARACION USO FIRMA",
         "PSICOSENSOMETRICO",
-        "PSICOSENSOMETRICO VEHI-FOLIO"
+        "PSICOSENSOMETRICO VEHI-FOLIO",
+        "INTERCONSULTA"
     ];
 
     const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true);

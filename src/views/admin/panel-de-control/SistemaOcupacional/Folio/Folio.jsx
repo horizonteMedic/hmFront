@@ -9,11 +9,10 @@ import Swal from "sweetalert2";
 
 const ExamenesList2 = [
     {
-        nombre: "CONSENTIMIENTO DECLARACIÓN DE INFORMACION APTITUD MEDICO OCUPACIONAL", //NUEVO OPTIMIZAR//35 CORRECTO Declaración de Información de Aptitud Médico Ocupacional 
-        resultado: false,
-        tabla: "DECLA_INFO_APTITUD_MO",
-        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
-        esJasper: true
+        nombre: "OIT",//21 CORRECTO REVISAR Consentimiento Panel 5D
+        resultado: true,
+        tabla: "oit",
+        url: "/api/v01/ct/oit/obtenerReporteOit"
     },
 ]
 const ExamenesList = [

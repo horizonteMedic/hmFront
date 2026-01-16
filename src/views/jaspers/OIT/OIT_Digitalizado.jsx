@@ -865,6 +865,7 @@ export default async function OIT_Digitalizado(datos = {}, docExistente = null) 
   if (docExistente) {
     return doc;
   } else {
+    doc.save("OIT_Digitalizado.pdf");
     imprimir(doc);
   }
 }
