@@ -1551,7 +1551,7 @@ const Folio = () => {
                         value={selectedListType}
                         onChange={handleListChange}
                     >
-                        <option value="OHLA">OHLA (Default)</option>
+                        <option value="OHLA">OHLA</option>
                         <option value="CAMPANA">Campaña</option>
                     </select>
                 </div>
