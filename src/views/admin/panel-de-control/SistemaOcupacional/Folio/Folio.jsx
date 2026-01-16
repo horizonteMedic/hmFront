@@ -1,5 +1,6 @@
 import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
+import { useState } from "react";
 import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import FolioJasper from "../../../../jaspers/FolioJasper/FolioJasper";
@@ -174,7 +175,7 @@ export const EXAMENES_CATALOGO = {
         nomenclatura: "ELECTROCARDIOGRAMA",
     },
 
-    DECLARACION_USO_FIRMA: {
+    DECLARACION_USO_FIRMA_ARCHIVO: {
         nombre: "DECLARACION USO FIRMA",
         tabla: "DECLARACION USO FIRMA",
         nomenclatura: "DECLARACION USO FIRMA",
@@ -264,13 +265,26 @@ export const EXAMENES_CATALOGO = {
         esJasper: true
     },
 
+    CONSENT_DECLARACION_APTITUD: {
+        nombre: "CONSENTIMIENTO DECLARACIÓN DE INFORMACION APTITUD MEDICO OCUPACIONAL",
+        tabla: "DECLA_INFO_APTITUD_MO",
+        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
+        esJasper: true
+    },
+
     /* =========================
-       IMÁGENES / MÉDICOS
+       EXÁMENES MÉDICOS
     ========================= */
     OIT: {
         nombre: "OIT",
         tabla: "oit",
         url: "/api/v01/ct/oit/obtenerReporteOit",
+    },
+
+    OFTALMOLOGIA: {
+        nombre: "OFTALMOLOGIA",
+        tabla: "oftalmologia2021",
+        url: "/api/v01/ct/agudezaVisual/obtenerReporteEvaluacionOftalmologica",
     },
 
     RADIOGRAFIA_TORAX: {
@@ -375,17 +389,26 @@ export const EXAMENES_CATALOGO = {
     },
 
     TRABAJO_ALTURA_PSICO: {
-        nombre: "TRABAJO EN ALTURA",
+        nombre: "TRABAJO EN ALTURA PSICOLOGIA",
         tabla: "psicologiafobias",
         url: "/api/v01/ct/informePsicologicoFobias/obtenerReporteInformePsicologicoFobias",
         esJasper: true,
     },
 
-    OFTALMOLOGIA: {
-        nombre: "OFTALMOLOGIA",
-        tabla: "oftalmologia2021",
-        url: "/api/v01/ct/agudezaVisual/obtenerReporteEvaluacionOftalmologica",
+    TEST_FATIGA_SOMNOLENCIA: {
+        nombre: "TEST DE FATIGA Y SOMNOLENCIA",
+        tabla: "informe_psicologico_estres",
+        url: "/api/v01/ct/informePsicologicoAdeco/obtenerReporteInformePsicologicoAdeco",
+        esJasper: true,
     },
+
+    CUESTIONARIO_BERLIN: {
+        nombre: "CUESTIONARIO BERLIN",
+        tabla: "cuestionario_berlin",
+        url: "/api/v01/ct/cuestionarioBerlin/obtenerReporte",
+        esJasper: true
+    },
+
 };
 
 const buildExamenesList = (orden) =>
@@ -398,9 +421,9 @@ const buildExamenesList = (orden) =>
         return buildExamen(config);
     }).filter(Boolean);
 
-const ExamenesList2 = buildExamenesList(
-    ["OIT"],
-);
+const ExamenesList2 = buildExamenesList([
+     "RADIOGRAFIA_COLUMNA_ARCHIVO",  
+]);
 
 const ExamenesList = buildExamenesList([      //OHLA
     "RESUMEN_MEDICO_PODEROSA",                 // 1
@@ -438,7 +461,7 @@ const ExamenesList = buildExamenesList([      //OHLA
     "TRABAJO_ALTURA_PSICO",                    // 33
     "OFTALMOLOGIA",                            // 34
     "CONSENT_DECLARACION_APTITUD",             // 35
-    "DECLARACION_USO_FIRMA",                   // 36
+    "DECLARACION_USO_FIRMA_ARCHIVO",           // 36
 ]);
 
 const ExamenesList3 = buildExamenesList([ // Campaña
@@ -1257,6 +1280,7 @@ const ExamenesListPODEROSA = [
 const Folio = () => {
     const today = getToday();
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+    const [selectedListType, setSelectedListType] = useState("OHLA");
     const initialFormState = {
         norden: "",
         codigoInforme: null,
@@ -1294,8 +1318,25 @@ const Folio = () => {
     const handleSearch = (e) => {
         if (e.key === "Enter") {
             handleClearnotO();
-            GetInfoPac(form.norden, setForm, token, selectedSede, ExamenesList);
+            const currentList = selectedListType === "OHLA" ? ExamenesList : ExamenesList3;
+            GetInfoPac(form.norden, setForm, token, selectedSede, currentList);
             //VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        }
+    };
+
+    const handleListChange = (e) => {
+        const newValue = e.target.value;
+        setSelectedListType(newValue);
+        const newList = newValue === "OHLA" ? ExamenesList : ExamenesList3;
+
+        if (form.norden) {
+            handleClearnotO();
+            GetInfoPac(form.norden, setForm, token, selectedSede, newList);
+        } else {
+            setForm((prev) => ({
+                ...prev,
+                listaExamenes: newList,
+            }));
         }
     };
 
@@ -1500,6 +1541,22 @@ const Folio = () => {
                     labelWidth="120px"
                 />
             </SectionFieldset>
+
+            {/* ===== SECCIÓN: CONFIGURACIÓN ===== */}
+            <SectionFieldset legend="Configuración" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="flex items-center gap-4">
+                    <label className="font-semibold" style={{ minWidth: "120px" }}>Tipo de Lista :</label>
+                    <select
+                        className="border rounded px-2 py-1 w-full"
+                        value={selectedListType}
+                        onChange={handleListChange}
+                    >
+                        <option value="OHLA">OHLA (Default)</option>
+                        <option value="CAMPANA">Campaña</option>
+                    </select>
+                </div>
+            </SectionFieldset>
+            
             {/* ===== SECCIÓN: EXAMENES ===== */}
             <SectionFieldset legend="Examenes" className="flex flex-col justify-center items-center w-full">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
