@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import HeaderRAYOSXXXOFI from "./Headers/header_RAYOSXXXOFI_Digitalizado.jsx";
+import { getSignCompressed } from "../../utils/helpers.js";
 
 export default async function RAYOSXXXOFI_Digitalizado(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -8,7 +9,7 @@ export default async function RAYOSXXXOFI_Digitalizado(data = {}, docExistente =
   let y = 60;
 
   // 1) Header
-  HeaderRAYOSXXXOFI(doc, data);
+  await HeaderRAYOSXXXOFI(doc, data);
 
   // Datos de prueba para demostrar el manejo de texto largo
   const datosPrueba = {
@@ -176,8 +177,23 @@ export default async function RAYOSXXXOFI_Digitalizado(data = {}, docExistente =
 
   // Posición de la firma justo 4 puntos debajo de las conclusiones
   const firmaY = y + 4; // Solo 4 puntos debajo del texto de conclusiones
-  const firmasAPintar = [{ nombre: "SELLOFIRMA", x: 95, y: firmaY, maxw: 120 }];
-  await agregarFirmas(doc, data.digitalizacion, firmasAPintar);
+  //const firmasAPintar = [{ nombre: "SELLOFIRMA", x: 95, y: firmaY, maxw: 120 }];
+  const s1 = await getSignCompressed(data, "SELLOFIRMA");
+  if (s1) {
+    try {
+      const imgWidth = 50;
+      const imgHeight = 25;
+      // Centrar la imagen: centro de la columna menos la mitad del ancho de la imagen
+      const x = 95;
+      const y = firmaY;
+      doc.addImage(s1, 'JPEG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando firma del médico:", error);
+    }
+  }
+
+
+  //await agregarFirmas(doc, data.digitalizacion, firmasAPintar);
 
   if (docExistente) {
     return doc;

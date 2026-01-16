@@ -3,7 +3,7 @@ import { formatearFechaCorta } from "../../utils/formatDateUtils";
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
-import { getSign } from '../../utils/helpers';
+import { compressImage, getSign } from '../../utils/helpers';
 
 export default async function B_FichaDetencionSAS2(data = {}, docExistente = null) {
 
@@ -1406,8 +1406,8 @@ export default async function B_FichaDetencionSAS2(data = {}, docExistente = nul
   // Primero dibujar la imagen
   try {
     // Usar ruta absoluta para producción
-    const imageUrl = window.location.origin + '/img/FichasSAS/grado_epiglotis.png';
-    doc.addImage(imageUrl, 'PNG', x, y, imgWidth, imgHeight);
+    const imgCompressed = await compressImage("/img/FichasSAS/grado_epiglotis.png");
+    doc.addImage(imgCompressed, 'jpeg', x, y, imgWidth, imgHeight);
   } catch (error) {
     console.log("Error cargando imagen de grados de epiglotis:", error);
     // Texto alternativo si no se puede cargar la imagen
@@ -1860,6 +1860,7 @@ export default async function B_FichaDetencionSAS2(data = {}, docExistente = nul
   if (docExistente) {
     return doc;
   } else {
+    doc.save("FichaDetencionSAS_boro_Digitalizado.pdf");
     imprimir(doc);
   }
 }

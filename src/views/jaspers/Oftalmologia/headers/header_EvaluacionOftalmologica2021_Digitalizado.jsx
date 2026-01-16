@@ -1,3 +1,5 @@
+import { compressImage } from "../../../utils/helpers";
+
 /**
  * Header para Evaluación Oftalmológica 2021 Digitalizado
  * @param {jsPDF} doc - Instancia de jsPDF
@@ -60,7 +62,7 @@ function footerFichaOftalmoCabecera(doc, datos = {}) {
   });
 }
 
-const header_EvaluacionOftalmologica2021_Digitalizado = (doc, datos = {}) => {
+const header_EvaluacionOftalmologica2021_Digitalizado = async (doc, datos = {}) => {
   footerFichaOftalmoCabecera(doc, datos);
   const margin = 18;
   const pageW = doc.internal.pageSize.getWidth();
@@ -70,8 +72,9 @@ const header_EvaluacionOftalmologica2021_Digitalizado = (doc, datos = {}) => {
   // 1) Logo a la izquierda
   const logoW = 35,
     logoH = 15;
+  const imgCompressed = await compressImage("./img/logo-color.png");
   try {
-    doc.addImage("./img/logo-color.png", "PNG", margin, y - 4, logoW, logoH);
+    doc.addImage(imgCompressed, "jpeg", margin, y - 4, logoW, logoH);
   } catch {
     doc
       .setFont("helvetica", "normal")
