@@ -193,6 +193,14 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         const baseBytes = pdfFinal.output("arraybuffer");
         let basePdf = await PDFDocument.load(baseBytes);
 
+        //si es una pagina en blanco la elimina
+        if (estadisticasPeso.length === 0) {
+            const totalPages = basePdf.getPages().length;
+            if (totalPages === 1) {
+                basePdf.removePage(0);
+            }
+        }
+
         // Contador de páginas insertadas para ajustar posiciones
         let paginasInsertadasAcumuladas = 0;
 

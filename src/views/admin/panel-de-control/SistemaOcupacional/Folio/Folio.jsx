@@ -435,6 +435,7 @@ const ExamenesList4 = buildExamenesList([
 const ExamenesList2 = buildExamenesList([
     "OFTALMOLOGIA_VISION_TESTER",
     "PSICOSENSOMETRICO",
+    "INTERCONSULTAS"
 ]);
 
 
