@@ -15,13 +15,12 @@ const ExamenesListPRUEBAS2 = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "ELECTROCARDIOGRAMA",
-    "ANEXO_16",
+    "EXAMENES_COMPLEMENTARIOS",
 ]);
 
 const ExamenesListOHLA = buildExamenesList([       //OHLA
     "RESUMEN_MEDICO_PODEROSA",                 // 1
-    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",                          // 2
+    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",    // 2
     "ANEXO_16",                                // 3
     "CERTIFICADO_ALTURA",                      // 4
     "OFTALMOLOGIA_VISION_TESTER",              // 5
@@ -63,6 +62,7 @@ const ExamenesListOHLA2 = buildExamenesList([       //OHLA 2
     "RESUMEN_MEDICO_PODEROSA",
     "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
     "ANEXO_16",
+    "CERTIFICADO_VEHICULOS",
     "PSICOSENSOMETRICO",
     "FICHA_SAS",
     "HISTORIA_OCUPACIONAL",
@@ -94,6 +94,36 @@ const ExamenesListOHLA2 = buildExamenesList([       //OHLA 2
     "INTERCONSULTAS"
 ]);
 
+const ExamenesListOHLA3 = buildExamenesList([       //OHLA 3
+    "RESUMEN_MEDICO_PODEROSA",
+    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
+    "ANEXO_16",
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+    "PERFIL_HEPATICO",
+    "PERFIL_RENAL",
+    "PANEL_5D",
+    "CONSENT_PANEL_5D",
+    "OIT",
+    "ELECTROCARDIOGRAMA",
+    "ELECTROCARDIOGRAMA_ARCHIVO",
+    "ESPIROMETRIA_ARCHIVO",
+    "AUDIOMETRIA_OHLA",
+    "ODONTOGRAMA",
+    "PSICOLOGIA_ANEXO_02",
+    "EXAMENES_COMPLEMENTARIOS",
+    "OFTALMOLOGIA",
+    "CONSENT_DECLARACION_APTITUD",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
     "CERTIFICADO_APTITUD_ANEXO_16",  // 1
     "ANEXO_16",                      // 2
@@ -119,6 +149,7 @@ const ExamenesListCAMPANA = buildExamenesList([ // Campaña
 const ListaPorPlantilla = {
     OHLA: ExamenesListOHLA,
     OHLA2: ExamenesListOHLA2,
+    OHLA3: ExamenesListOHLA3,
     CAMPANA: ExamenesListCAMPANA,
     PRUEBAS: ExamenesListPRUEBAS,
 };

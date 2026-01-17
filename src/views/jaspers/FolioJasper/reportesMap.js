@@ -56,6 +56,7 @@ import Consentimiento_Panel5D_ohla_Digitalizado from "../Consentimientos/Consent
 import ConsentAdmisionInformacionAptitudMedicoOcupacional from "../ModuloConsentimientos/ConsentAdmisInformaAptiMedicoOcupa/Consent_Admision_InformacionAptitudMedicoOcupacional";
 import Informe_Psico_Cuestionario_Berlin from "../ModuloPsicologia/InformePsicoCuestionarioBerlin/Informe_Psico_Cuestionario_Berlin"
 import ResultadosPanel5d_Digitalizado from "../Toxicologia/ResultadosPanel5d_Digitalizado";
+import InformePsicoExamComplementario from "../ModuloPsicologia/InformePsicoExamComplementario/Informe_Psico_Exam_Complementario";
 
 // Agrega aquí todos tus reportes
 export const ekgMap = {
@@ -157,6 +158,7 @@ export const reportesMap = {
         InformeElectrocardiograma2023,
         InformeElectrocardiograma_Digitalizado
     },
+    exam_complementarios:InformePsicoExamComplementario,
     audiometria_po: FichaAudiologica_Digitalizado,
     informe_psicologico: InformePsicologico_Digitalizado,
     oftalmologia: Oftalmologia,

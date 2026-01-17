@@ -407,13 +407,20 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/cuestionarioBerlin/obtenerReporte",
         esJasper: true
     },
+
     ESPACIOS_CONFINADOS_PSICOLOGIA: {
         nombre: "ESPACIOS CONFINADOS PSICOLOGIA",
         tabla: "psicologia_espacios_confinados",
         url: "/api/v01/ct/psicologiaEspaciosConfinados/obtenerReportePsicologiaEspaciosConfinados",
         esJasper: true
-    }
+    },
 
+    EXAMENES_COMPLEMENTARIOS: {
+        nombre: "EXAMENES COMPLEMENTARIOS",
+        tabla: "exam_complementarios",
+        url: "/api/v01/ct/examenComplementario/obtenerReporte",
+        esJasper: true
+    }
 
 
 
