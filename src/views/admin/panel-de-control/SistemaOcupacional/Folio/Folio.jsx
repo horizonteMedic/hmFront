@@ -11,11 +11,11 @@ import { buildExamenesList } from "./folioCatalogo";
 
 const ExamenesListPRUEBAS2 = buildExamenesList([
     "OFTALMOLOGIA_VISION_TESTER",
-    "PSICOSENSOMETRICO",
+    "PSICOSENSOMETRICO_VEHI_FOLIO",
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "INTERCONSULTAS",
+    "PSICOSENSOMETRICO_CERT_ALTURA",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -48,7 +48,7 @@ const ExamenesListOHLA = buildExamenesList([       //OHLA
     "OFTALMOLOGIA_VISION_TESTER",              // 5
     "CERTIFICADO_VEHICULOS",                   // 6
     "FICHA_SAS",                               // 7
-    "PSICOSENSOMETRICO",                       // 8
+    "PSICOSENSOMETRICO_VEHI_FOLIO",            // 8
     "HISTORIA_OCUPACIONAL",                    // 9
     "ANTECEDENTES_PATOLOGICOS",                // 10
     "DECLARACION_JURADA_ANTECEDENTES",         // 11
@@ -85,7 +85,7 @@ const ExamenesListOHLA1 = buildExamenesList([       //OHLA 1
     "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
     "ANEXO_16",
     "CERTIFICADO_ALTURA",
-    "OFTALMOLOGIA_VISION_TESTER",
+    "PSICOSENSOMETRICO_CERT_ALTURA",
     "CERTIFICADO_VEHICULOS",
     "FICHA_SAS",
     "HISTORIA_OCUPACIONAL",
@@ -121,7 +121,7 @@ const ExamenesListOHLA2 = buildExamenesList([       //OHLA 2
     "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
     "ANEXO_16",
     "CERTIFICADO_VEHICULOS",
-    "PSICOSENSOMETRICO",
+    "PSICOSENSOMETRICO_VEHI_FOLIO",
     "FICHA_SAS",
     "HISTORIA_OCUPACIONAL",
     "ANTECEDENTES_PATOLOGICOS",

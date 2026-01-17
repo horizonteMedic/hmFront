@@ -146,7 +146,7 @@ export default function FichaCertificadoAltura() {
         nombre_medico: userName,
         user_medicoFirma: userlogued,
         SubirDoc: false,
-        nomenclatura: "PSICOSENSOMETRICO"
+        nomenclatura: "PSICOSENSOMETRICO CERT-ALTURA"
     };
 
     const {
