@@ -10,7 +10,7 @@ import EvaluacionMuscoloEsqueletica from "../MusculoEsqueletica/EvaluacionMuscol
 import LaboratorioClinico_Digitalizado_nuevo from "../AnalisisBioquimicos/LaboratorioClinico_Digitalizado";
 import AnalisisBioquimicos_Digitalizado from "../AnalisisBioquimicos/AnalisisBioquimicos_Digitalizado";
 import RagiografiaToraxPA_Digitalizado from "../RayosX/RagiografiaToraxPA_Digitalizado";
-import FichaAudiologica_Digitalizado from "../Audiometria/FichaAudiologica_Digitalizado";
+import FichaAudiologica_Digitalizado from "../Audiometria/FichaAudiologica/FichaAudiologica_Digitalizado";
 import InformePsicologico_Digitalizado from "../ModuloPsicologia/InformePsicologico/InformePsicologico_Digitalizado";
 import EvaluacionPsicologica_p_Digitalizado from "../ModuloPsicologia/EvaluacionPsicologicaPoderosa/InformePsicologico_Digitalizado";
 import Oftalmologia from "../Oftalmologia/Oftalmologia";
@@ -33,7 +33,7 @@ import LGonadotropina_Digitalizado from "../Inmunologia/LGonadotropina_Digitaliz
 import RAYOSXXXOFI_Digitalizado from "../RayosX/RAYOSXXXOFI_Digitalizado";
 import Audiometria2021_Digitalizado from "../Audiometria/Audiometria2021-_Digitalizado_boro";
 import CuestionarioAudiometria_Digitalizado from "../Audiometria/CuestionarioAudiometria/CuestionarioAudiometria_Digitalizado";
-import Odontograma_Digitalizado from "../Odontologia/Odontograma_Digitalizado";
+import Odontograma_Digitalizado from "../Odontologia/OdontogramaDigitalizado/Odontograma_Digitalizado";
 import ResumenAnexo7C_OHLA_Digitalizado from "../Ficha_Anexo16/ResumenMedico/ResumenAnexo7C_OHLA_Digitalizado";
 import ResumenAnexo7CP_Digitalizado from "../Ficha_Anexo16/ResumenMedico/ResumenAnexo7CP_Digitalizado";
 import Consentimiento_Marihuana_Digitalizado from "../Consentimientos/Consentimiento_Marihuana_Digitalizado";

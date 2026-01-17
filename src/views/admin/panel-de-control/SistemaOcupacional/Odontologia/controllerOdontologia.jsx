@@ -503,12 +503,15 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         console.log(res);
         const nombre = res.nameJasper;
         console.log(nombre);
+        // Buscar en subcarpetas también
         const jasperModules = import.meta.glob(
-          "../../../../jaspers/Odontologia/*.jsx"
+          "../../../../jaspers/Odontologia/**/*.jsx"
         );
-        const modulo = await jasperModules[
-          `../../../../jaspers/Odontologia/${nombre}.jsx`
-        ]();
+        // Si es Odontograma_Digitalizado, buscar en la subcarpeta OdontogramaDigitalizado
+        const rutaArchivo = nombre === "Odontograma_Digitalizado"
+          ? `../../../../jaspers/Odontologia/OdontogramaDigitalizado/${nombre}.jsx`
+          : `../../../../jaspers/Odontologia/${nombre}.jsx`;
+        const modulo = await jasperModules[rutaArchivo]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
           modulo.default({ ...res, ...datosFooter });
@@ -536,12 +539,15 @@ export const PrintHojaRLO = (nro, token, tabla, datosFooter) => {
         console.log(res);
         const nombre = res.nameJasper;
         console.log(nombre);
+        // Buscar en subcarpetas también
         const jasperModules = import.meta.glob(
-          "../../../../jaspers/Odontologia/*.jsx"
+          "../../../../jaspers/Odontologia/**/*.jsx"
         );
-        const modulo = await jasperModules[
-          `../../../../jaspers/Odontologia/${nombre}.jsx`
-        ]();
+        // Si es Odontograma_Digitalizado, buscar en la subcarpeta OdontogramaDigitalizado
+        const rutaArchivo = nombre === "Odontograma_Digitalizado"
+          ? `../../../../jaspers/Odontologia/OdontogramaDigitalizado/${nombre}.jsx`
+          : `../../../../jaspers/Odontologia/${nombre}.jsx`;
+        const modulo = await jasperModules[rutaArchivo]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
           modulo.default({ ...res, ...datosFooter });
@@ -568,12 +574,15 @@ export const PrintConsultaEjecutada = (inicio, fin, token, datosFooter) => {
         console.log(res);
         const nombre = res.nameJasper;
         console.log(nombre);
+        // Buscar en subcarpetas también
         const jasperModules = import.meta.glob(
-          "../../../../jaspers/Odontologia/*.jsx"
+          "../../../../jaspers/Odontologia/**/*.jsx"
         );
-        const modulo = await jasperModules[
-          `../../../../jaspers/Odontologia/${nombre}.jsx`
-        ]();
+        // Si es Odontograma_Digitalizado, buscar en la subcarpeta OdontogramaDigitalizado
+        const rutaArchivo = nombre === "Odontograma_Digitalizado"
+          ? `../../../../jaspers/Odontologia/OdontogramaDigitalizado/${nombre}.jsx`
+          : `../../../../jaspers/Odontologia/${nombre}.jsx`;
+        const modulo = await jasperModules[rutaArchivo]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
           modulo.default({ ...res, ...datosFooter });

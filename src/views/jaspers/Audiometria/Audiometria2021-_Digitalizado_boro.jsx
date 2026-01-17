@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import header_Audiometria2021_Digitalizado_boro from "./headers/header_Audiometria2021-_Digitalizado_boro";
+import header_Audiometria2021_Digitalizado_boro from "./headers/header_Audiometria2021-_Digitalizado_boro.jsx";
 
 /**
  * Genera el cuerpo completo del PDF:
