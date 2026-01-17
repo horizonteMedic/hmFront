@@ -1,3 +1,5 @@
+import { getSignCompressed } from "./helpers";
+
 /**
  * Helper para dibujar firmas y sellos en documentos PDF
  * Maneja la carga de imágenes y el dibujo de firmas del paciente y profesional
@@ -9,8 +11,13 @@
  * @param {number} params.pageW - Ancho de la página en mm
  * @returns {Promise<number>} - Retorna la posición Y final después de dibujar las firmas
  */
-export function dibujarFirmas({ doc, datos, y, pageW }) {
+export async function dibujarFirmas({ doc, datos, y, pageW }) {
   // Cargar imágenes de digitalizaciones
+  const firmap = await getSignCompressed(datos, "FIRMAP");
+  const huellap = await getSignCompressed(datos, "HUELLA");
+  const s1 = await getSignCompressed(datos, "SELLOFIRMA");
+  const s2 = await getSignCompressed(datos, "SELLOFIRMADOCASIG");
+
   const digitalizacion = datos.digitalizacion || [];
   const firmaPaciente = digitalizacion.find(d => d.nombreDigitalizacion === "FIRMAP");
   const huellaPaciente = digitalizacion.find(d => d.nombreDigitalizacion === "HUELLA");
@@ -54,144 +61,138 @@ export function dibujarFirmas({ doc, datos, y, pageW }) {
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
 
-  return Promise.all([
-    isValidUrl(firmaPaciente?.url) ? loadImg(firmaPaciente.url) : Promise.resolve(null),
-    isValidUrl(huellaPaciente?.url) ? loadImg(huellaPaciente.url) : Promise.resolve(null),
-    isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
-    isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-  ]).then(([firmap, huellap, s1, s2]) => {
-    // Verificar qué firmas tenemos
-    const tieneFirmaPaciente = firmap !== null || huellap !== null;
-    const tieneSelloProfesional = s1 !== null || s2 !== null;
+  // Verificar qué firmas tenemos
+  const tieneFirmaPaciente = firmap !== null || huellap !== null;
+  const tieneSelloProfesional = s1 !== null || s2 !== null;
 
-    // Firma y Huella del Paciente
-    const firmaPacienteY = y;
-    // Si hay sello profesional Y paciente, paciente a la izquierda (1/3), si no, centrado
-    const centroPacienteX = (tieneSelloProfesional && tieneFirmaPaciente) ? pageW / 3 : pageW / 2;
+  // Firma y Huella del Paciente
+  const firmaPacienteY = y;
+  // Si hay sello profesional Y paciente, paciente a la izquierda (1/3), si no, centrado
+  const centroPacienteX = (tieneSelloProfesional && tieneFirmaPaciente) ? pageW / 3 : pageW / 2;
 
-    // Agregar firma del paciente (ya viene comprimida como data URL)
-    if (firmap) {
-      try {
-        const imgWidth = 30;
-        const imgHeight = 20;
-        const x = centroPacienteX - 22;
-        const yPos = firmaPacienteY;
-        doc.addImage(firmap, 'JPEG', x, yPos, imgWidth, imgHeight);
-      } catch (error) {
-        console.log("Error cargando firma del paciente:", error);
-      }
+  // Agregar firma del paciente (ya viene comprimida como data URL)
+  if (firmap) {
+    try {
+      const imgWidth = 30;
+      const imgHeight = 20;
+      const x = centroPacienteX - 22;
+      const yPos = firmaPacienteY;
+      doc.addImage(firmap, 'JPEG', x, yPos, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando firma del paciente:", error);
     }
+  }
 
-    // Agregar huella del paciente (ya viene comprimida como data URL)
-    if (huellap) {
-      try {
-        const imgWidth = 12;
-        const imgHeight = 20;
-        const x = centroPacienteX + 10;
-        const yPos = firmaPacienteY;
-        doc.addImage(huellap, 'JPEG', x, yPos, imgWidth, imgHeight);
-      } catch (error) {
-        console.log("Error cargando huella del paciente:", error);
-      }
+  // Agregar huella del paciente (ya viene comprimida como data URL)
+  if (huellap) {
+    try {
+      const imgWidth = 12;
+      const imgHeight = 20;
+      const x = centroPacienteX + 10;
+      const yPos = firmaPacienteY;
+      doc.addImage(huellap, 'JPEG', x, yPos, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando huella del paciente:", error);
     }
+  }
 
-    // Línea y texto debajo de firma y huella del paciente (solo si hay firma o huella)
-    if (tieneFirmaPaciente) {
-      const lineYPaciente = firmaPacienteY + 23;
-      const textoPaciente = "Firma y Huella del Paciente";
-      const textoPacienteWidth = doc.getTextWidth(textoPaciente);
+  // Línea y texto debajo de firma y huella del paciente (solo si hay firma o huella)
+  if (tieneFirmaPaciente) {
+    const lineYPaciente = firmaPacienteY + 23;
+    const textoPaciente = "Firma y Huella del Paciente";
+    const textoPacienteWidth = doc.getTextWidth(textoPaciente);
+    doc.setLineWidth(0.2);
+    doc.line(centroPacienteX - textoPacienteWidth / 2, lineYPaciente, centroPacienteX + textoPacienteWidth / 2, lineYPaciente);
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.text(textoPaciente, centroPacienteX, lineYPaciente + 5, { align: "center" });
+  }
+
+  // Firma y Sello del Profesional (solo si existe)
+  let lineY = 0;
+
+  if (tieneSelloProfesional) {
+    const sigW = 48;
+    const sigH = 20;
+    const sigY = y;
+    const gap = 16;
+    lineY = sigY + sigH + 1; // Línea más cerca de la firma
+
+    // Función auxiliar para agregar sello al PDF (ya viene comprimido como data URL)
+    const agregarSello = (dataUrl, xPos, yPos, width, height) => {
+      if (!dataUrl) return;
+      doc.addImage(dataUrl, 'JPEG', xPos, yPos, width, height);
+    };
+
+    // Función auxiliar para dibujar línea y texto debajo del sello
+    const dibujarLineaYTexto = (centroX, lineY, tipoSello) => {
       doc.setLineWidth(0.2);
-      doc.line(centroPacienteX - textoPacienteWidth / 2, lineYPaciente, centroPacienteX + textoPacienteWidth / 2, lineYPaciente);
-      doc.setFont("helvetica", "normal").setFontSize(7);
-      doc.text(textoPaciente, centroPacienteX, lineYPaciente + 5, { align: "center" });
-    }
-
-    // Firma y Sello del Profesional (solo si existe)
-    let lineY = 0;
-
-    if (tieneSelloProfesional) {
-      const sigW = 48;
-      const sigH = 20;
-      const sigY = y;
-      const gap = 16;
-      lineY = sigY + sigH + 1; // Línea más cerca de la firma
-
-      // Función auxiliar para agregar sello al PDF (ya viene comprimido como data URL)
-      const agregarSello = (dataUrl, xPos, yPos, width, height) => {
-        if (!dataUrl) return;
-        doc.addImage(dataUrl, 'JPEG', xPos, yPos, width, height);
-      };
-
-      // Función auxiliar para dibujar línea y texto debajo del sello
-      const dibujarLineaYTexto = (centroX, lineY, tipoSello) => {
-        doc.setLineWidth(0.2);
-        let texto1, texto2;
-        if (tipoSello === 'SELLOFIRMA') {
-          // SELLOFIRMA: Firma y Sello del Profesional / Responsable de la Evaluación
-          texto1 = "Firma y Sello del Profesional";
-          texto2 = "Responsable de la Evaluación";
-        } else if (tipoSello === 'SELLOFIRMADOCASIG') {
-          // SELLOFIRMADOCASIG: Firma y Sello Médico Asignado
-          texto1 = "Firma y Sello Médico Asignado";
-          texto2 = null;
-        } else {
-          texto1 = "Firma y Sello";
-          texto2 = null;
-        }
-
-        // Calcular ancho del texto más largo para la línea
-        const textoWidth = doc.getTextWidth(texto1);
-        const anchoLinea = Math.max(textoWidth, texto2 ? doc.getTextWidth(texto2) : 0);
-
-        // Dibujar línea
-        doc.line(centroX - anchoLinea / 2, lineY, centroX + anchoLinea / 2, lineY);
-
-        // Dibujar texto (con más espacio después de la línea)
-        doc.setFont('helvetica', 'normal').setFontSize(7);
-        doc.text(texto1, centroX, lineY + 2.5, { align: "center" });
-        if (texto2) {
-          doc.text(texto2, centroX, lineY + 4.5, { align: "center" });
-        }
-      };
-
-      // Posición para los sellos del profesional
-      // Si hay paciente, profesional a la derecha (2/3), si no, centrado
-      const centroProfesionalX = tieneFirmaPaciente ? (pageW / 3) * 2 : pageW / 2;
-
-      if (s1 && s2) {
-        // Dos sellos lado a lado
-        const totalWidth = sigW * 2 + gap;
-        const startX = centroProfesionalX - totalWidth / 2;
-
-        agregarSello(s1, startX, sigY, sigW, sigH);
-        agregarSello(s2, startX + sigW + gap, sigY, sigW, sigH);
-
-        const centroSello1X = startX + sigW / 2;
-        const centroSello2X = startX + sigW + gap + sigW / 2;
-        dibujarLineaYTexto(centroSello1X, lineY, 'SELLOFIRMA');
-        dibujarLineaYTexto(centroSello2X, lineY, 'SELLOFIRMADOCASIG');
-      } else if (s1) {
-        // Un solo sello centrado
-        const imgX = centroProfesionalX - sigW / 2;
-        agregarSello(s1, imgX, sigY, sigW, sigH);
-        dibujarLineaYTexto(centroProfesionalX, lineY, 'SELLOFIRMA');
-      } else if (s2) {
-        // Un solo sello centrado
-        const imgX = centroProfesionalX - sigW / 2;
-        agregarSello(s2, imgX, sigY, sigW, sigH);
-        dibujarLineaYTexto(centroProfesionalX, lineY, 'SELLOFIRMADOCASIG');
+      let texto1, texto2;
+      if (tipoSello === 'SELLOFIRMA') {
+        // SELLOFIRMA: Firma y Sello del Profesional / Responsable de la Evaluación
+        texto1 = "Firma y Sello del Profesional";
+        texto2 = "Responsable de la Evaluación";
+      } else if (tipoSello === 'SELLOFIRMADOCASIG') {
+        // SELLOFIRMADOCASIG: Firma y Sello Médico Asignado
+        texto1 = "Firma y Sello Médico Asignado";
+        texto2 = null;
+      } else {
+        texto1 = "Firma y Sello";
+        texto2 = null;
       }
-    }
 
-    // Retornar posición Y final (ajustado para texto más junto)
-    const lineYPaciente = tieneFirmaPaciente ? firmaPacienteY + 23 : 0;
-    if (tieneSelloProfesional) {
-      return tieneFirmaPaciente 
-        ? Math.max(lineYPaciente + 10, lineY + 9)
-        : lineY + 9;
-    } else {
-      return tieneFirmaPaciente ? lineYPaciente + 10 : y + 10;
+      // Calcular ancho del texto más largo para la línea
+      const textoWidth = doc.getTextWidth(texto1);
+      const anchoLinea = Math.max(textoWidth, texto2 ? doc.getTextWidth(texto2) : 0);
+
+      // Dibujar línea
+      doc.line(centroX - anchoLinea / 2, lineY, centroX + anchoLinea / 2, lineY);
+
+      // Dibujar texto (con más espacio después de la línea)
+      doc.setFont('helvetica', 'normal').setFontSize(7);
+      doc.text(texto1, centroX, lineY + 2.5, { align: "center" });
+      if (texto2) {
+        doc.text(texto2, centroX, lineY + 4.5, { align: "center" });
+      }
+    };
+
+    // Posición para los sellos del profesional
+    // Si hay paciente, profesional a la derecha (2/3), si no, centrado
+    const centroProfesionalX = tieneFirmaPaciente ? (pageW / 3) * 2 : pageW / 2;
+
+    if (s1 && s2) {
+      // Dos sellos lado a lado
+      const totalWidth = sigW * 2 + gap;
+      const startX = centroProfesionalX - totalWidth / 2;
+
+      agregarSello(s1, startX, sigY, sigW, sigH);
+      agregarSello(s2, startX + sigW + gap, sigY, sigW, sigH);
+
+      const centroSello1X = startX + sigW / 2;
+      const centroSello2X = startX + sigW + gap + sigW / 2;
+      dibujarLineaYTexto(centroSello1X, lineY, 'SELLOFIRMA');
+      dibujarLineaYTexto(centroSello2X, lineY, 'SELLOFIRMADOCASIG');
+    } else if (s1) {
+      // Un solo sello centrado
+      const imgX = centroProfesionalX - sigW / 2;
+      agregarSello(s1, imgX, sigY, sigW, sigH);
+      dibujarLineaYTexto(centroProfesionalX, lineY, 'SELLOFIRMA');
+    } else if (s2) {
+      // Un solo sello centrado
+      const imgX = centroProfesionalX - sigW / 2;
+      agregarSello(s2, imgX, sigY, sigW, sigH);
+      dibujarLineaYTexto(centroProfesionalX, lineY, 'SELLOFIRMADOCASIG');
     }
-  });
+  }
+
+  // Retornar posición Y final (ajustado para texto más junto)
+  const lineYPaciente = tieneFirmaPaciente ? firmaPacienteY + 23 : 0;
+  if (tieneSelloProfesional) {
+    return tieneFirmaPaciente
+      ? Math.max(lineYPaciente + 10, lineY + 9)
+      : lineY + 9;
+  } else {
+    return tieneFirmaPaciente ? lineYPaciente + 10 : y + 10;
+  }
+
 }
 

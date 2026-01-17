@@ -131,7 +131,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
                 : generador;
 
             if (generadorFinal) {
-                // pdfFinal.save("folio.pdf");
+                pdfFinal.save("folio.pdf");
                 await generadorFinal(data, pdfFinal);
             } else {
                 console.warn("No existe generador para:", examen.tabla);

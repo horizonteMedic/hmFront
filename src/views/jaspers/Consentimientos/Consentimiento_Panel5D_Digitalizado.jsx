@@ -4,6 +4,7 @@ import CabeceraLogo from "../components/CabeceraLogo.jsx";
 import footerTR from "../components/footerTR.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
 import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
+import { getSignCompressed } from "../../utils/helpers.js";
 
 export default async function Consentimiento_Panel5D_ohla_Digitalizado(datos = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -215,6 +216,9 @@ export default async function Consentimiento_Panel5D_ohla_Digitalizado(datos = {
   const baseY = doc.lastAutoTable.finalY + 40; // Subido 10mm (de 50 a 40)
 
   // Usar helper para dibujar firmas
+  const s1 = await getSignCompressed(datos, "FIRMAP");
+  const s2 = await getSignCompressed(datos, "HUELLAP");
+  const s3 = await getSignCompressed(datos, "SELLOFIRMA");
   await dibujarFirmas({ doc, datos, y: baseY, pageW })
 
   if (docExistente) {
