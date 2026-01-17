@@ -2,9 +2,13 @@ import jsPDF from "jspdf";
 import { getFetch } from "../../utils/apiHelpers";
 import { reportesMap } from "./reportesMap";
 import { PDFDocument } from "pdf-lib";
+import * as pdfjsLib from "pdfjs-dist";
+import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType) {
-    const pdfFinal = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
+    const pdfFinal = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true, precision: 1 });
 
     const reportesConHorizontal = [
         "historia_oc_info",
@@ -274,7 +278,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             console.log(`   ✓ ${paginasExternas.length} página(s) insertada(s). Total acumulado: ${paginasInsertadasAcumuladas}`);
         }
 
-        pdfFinalBytes = await basePdf.save();
+        pdfFinalBytes = await basePdf.save({ useObjectStreams: true });
         console.log("✅ Todos los PDFs externos insertados correctamente");
 
         // Mostrar resumen de PDFs externos
@@ -298,9 +302,11 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         pdfFinalBytes = pdfFinal.output("arraybuffer");
     }
 
-    // Descargar e imprimir el PDF
-    descargarPdf(pdfFinalBytes, `Folio_${nro}.pdf`);
-    imprimirBytes(pdfFinalBytes);
+    const baseBytes = pdfFinalBytes instanceof Uint8Array ? pdfFinalBytes : new Uint8Array(pdfFinalBytes);
+    const rasterizedBytes = await rasterizeAndCompressPdf(baseBytes);
+
+    descargarPdf(rasterizedBytes, `Folio_${nro}.pdf`);
+    imprimirBytes(rasterizedBytes);
 }
 
 function descargarPdf(pdfBytes, nombreArchivo) {
@@ -413,4 +419,33 @@ async function sellarEspirometria(pdfBytes) {
     });
 
     return await pdfDoc.save();
+}
+
+async function rasterizeAndCompressPdf(pdfBytes) {
+    const loadingTask = pdfjsLib.getDocument({ data: pdfBytes });
+    const pdf = await loadingTask.promise;
+    const mmPerPt = 25.4 / 72;
+
+    let doc = null;
+    const numPages = pdf.numPages;
+    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const vp = page.getViewport({ scale: 1.5 });
+        const pageWidthMm = vp.width * mmPerPt;
+        const pageHeightMm = vp.height * mmPerPt;
+        const orientation = pageWidthMm >= pageHeightMm ? "landscape" : "portrait";
+        if (!doc) {
+            doc = new jsPDF({ unit: "mm", format: [pageWidthMm, pageHeightMm], orientation, compress: true, precision: 1 });
+        } else {
+            doc.addPage([pageWidthMm, pageHeightMm], orientation);
+        }
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = vp.width;
+        canvas.height = vp.height;
+        await page.render({ canvasContext: ctx, viewport: vp }).promise;
+        const imgData = canvas.toDataURL("image/jpeg", 0.90);
+        doc.addImage(imgData, "JPEG", 0, 0, pageWidthMm, pageHeightMm, undefined, "FAST");
+    }
+    return doc.output("arraybuffer");
 }
