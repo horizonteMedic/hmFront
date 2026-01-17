@@ -27,8 +27,13 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "INTERCONSULTA 5"
     ];
 
-    const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true && ex.imprimir === true);
-    //const examenesFiltrados = ListaExamenes; //SOLO ACTIVAR PARA PRUEBAS 
+    const jaspersConOpcionMultiple = [
+        "informe_electrocardiograma",
+        "resumen_medico_poderosa"
+    ]
+
+    //const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true && ex.imprimir === true);
+    const examenesFiltrados = ListaExamenes; //SOLO ACTIVAR PARA PRUEBAS 
     const totalReportes = examenesFiltrados.length;
 
     // Array para almacenar estadísticas de peso
@@ -94,7 +99,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             //const generarReporte = reportesMap[examen.tabla];
             let generador = null;
 
-            if (examen.tabla === "resumen_medico_poderosa") {
+            if (jaspersConOpcionMultiple.some(item => item == examen.tabla)) {
                 generador = reportesMap[examen.tabla][data.nameJasper];
             } else {
                 generador = reportesMap[examen.tabla];

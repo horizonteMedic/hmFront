@@ -55,6 +55,7 @@ import PerfilHepatico_Digitalizado from "../AnalisisBioquimicos/PerfilHepatico_D
 import Consentimiento_Panel5D_ohla_Digitalizado from "../Consentimientos/Consentimiento_Panel5D_Digitalizado";
 import ConsentAdmisionInformacionAptitudMedicoOcupacional from "../ModuloConsentimientos/ConsentAdmisInformaAptiMedicoOcupa/Consent_Admision_InformacionAptitudMedicoOcupacional";
 import Informe_Psico_Cuestionario_Berlin from "../ModuloPsicologia/InformePsicoCuestionarioBerlin/Informe_Psico_Cuestionario_Berlin"
+import ResultadosPanel5d_Digitalizado from "../Toxicologia/ResultadosPanel5d_Digitalizado";
 
 // Agrega aquí todos tus reportes
 export const ekgMap = {
@@ -148,20 +149,13 @@ export const reportesMap = {
 
     l_bioquimica: LBioquimica_Digitalizado,
 
+    toxicologia: ResultadosPanel5d_Digitalizado,
+
     oit: OIT_Digitalizado,
     radiografia_torax: RagiografiaToraxPA_Digitalizado,
-    informe_electrocardiograma: (data) => {
-        switch (data?.nameJasper) {
-            case "InformeElectrocardiograma2023":
-                return InformeElectrocardiograma2023;
-
-            case "InformeElectrocardiograma_Digitalizado":
-                return InformeElectrocardiograma_Digitalizado;
-
-            default:
-                console.warn("⚠️ nameJasper no reconocido:", data?.nameJasper);
-                return null;
-        }
+    informe_electrocardiograma: {
+        InformeElectrocardiograma2023,
+        InformeElectrocardiograma_Digitalizado
     },
     audiometria_po: FichaAudiologica_Digitalizado,
     informe_psicologico: InformePsicologico_Digitalizado,
