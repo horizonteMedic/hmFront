@@ -96,6 +96,7 @@ export async function dibujarFirmas({ doc, datos, y, pageW }) {
     }
   }
 
+
   // Línea y texto debajo de firma y huella del paciente (solo si hay firma o huella)
   if (tieneFirmaPaciente) {
     const lineYPaciente = firmaPacienteY + 23;
