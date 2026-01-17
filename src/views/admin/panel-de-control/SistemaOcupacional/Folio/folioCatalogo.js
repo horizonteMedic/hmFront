@@ -304,6 +304,13 @@ export const EXAMENES_CATALOGO = {
         esJasper: true
     },
 
+    CONSENT_BUENA_SALUD: {
+        nombre: "CONSENTIMIENTO BUENA SALUD",
+        tabla: "consentimientobuenasalud",
+        url: "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoBuenaSalud",
+        esJasper: true
+    },
+
     /* =========================
        EXÁMENES MÉDICOS
     ========================= */
@@ -349,7 +356,7 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/audiometria/obtenerReporteAudiometriaM",
     },
 
-    AUDIOMETRIA_2023: {
+    FICHA_AUDIOMETRIA: {
         nombre: "FICHA AUDIOMETRIA",
         tabla: "audiometria_2023",
         url: "/api/v01/ct/manipuladores/obtenerReporteAudiometria",
