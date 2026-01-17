@@ -432,13 +432,13 @@ const ExamenesList4 = buildExamenesList([
     "OFTALMOLOGIA_VISION_TESTER",
     "PSICOSENSOMETRICO",
 ]);
-const ExamenesList = buildExamenesList([
+const ExamenesList2 = buildExamenesList([
     "OFTALMOLOGIA_VISION_TESTER",
     "PSICOSENSOMETRICO",
 ]);
 
 
-const ExamenesList2 = buildExamenesList([       //OHLA
+const ExamenesList = buildExamenesList([       //OHLA
     "RESUMEN_MEDICO_PODEROSA",                 // 1
     "CONSTANCIA_EMO",                          // 2
     "ANEXO_16",                                // 3
