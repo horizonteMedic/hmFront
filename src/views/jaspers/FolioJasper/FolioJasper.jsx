@@ -18,7 +18,6 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "ELECTROCARDIOGRAMA",
         "OFTALMOLOGIA VISION TESTER",
         "DECLARACION USO FIRMA",
-        // "PSICOSENSOMETRICO",
         "PSICOSENSOMETRICO VEHI-FOLIO",
         "INTERCONSULTA",
         "INTERCONSULTA 2",
@@ -32,8 +31,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "resumen_medico_poderosa"
     ]
 
-    //const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true && ex.imprimir === true);
-    const examenesFiltrados = ListaExamenes; //SOLO ACTIVAR PARA PRUEBAS 
+    const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true && ex.imprimir === true);
+    //const examenesFiltrados = ListaExamenes; //SOLO ACTIVAR PARA PRUEBAS 
     const totalReportes = examenesFiltrados.length;
 
     // Array para almacenar estadísticas de peso
@@ -47,6 +46,29 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
 
     // Variable para rastrear la última página generada
     let ultimaPaginaGenerada = 0;
+
+    // Ejecutar todas las consultas a los endpoints en paralelo
+    const resultadosFetch = await Promise.all(
+        examenesFiltrados.map(async (examen) => {
+            if (archivos.includes(examen.tabla)) {
+                return null;
+            }
+
+            const apiUrl = examen.esJasper
+                ? `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}&esJasper=true`
+                : examen.nameConset ?
+                    `${examen.url}?nOrden=${nro}&nameConset=${examen.tabla}`
+                    : `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}`;
+
+            try {
+                const data = await getFetch(apiUrl, token);
+                return data || null;
+            } catch (err) {
+                console.error("Error cargando:", examen.nombre, err);
+                return null;
+            }
+        })
+    );
 
     for (let i = 0; i < examenesFiltrados.length; i++) {
         const examen = examenesFiltrados[i];
@@ -64,17 +86,13 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             continue;
         }
 
-
-        const apiUrl = examen.esJasper
-            ? `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}&esJasper=true`
-            : examen.nameConset ?
-                `${examen.url}?nOrden=${nro}&nameConset=${examen.tabla}`
-                : `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}`;
+        const data = resultadosFetch[i];
+        if (!data) {
+            console.warn("No se recibieron datos para:", examen.nombre);
+            continue;
+        }
 
         try {
-            const data = await getFetch(apiUrl, token);
-            if (!data) continue;
-
             // Medir tamaño ANTES de agregar el reporte
             const pesoAntes = pdfFinal.output('arraybuffer').byteLength;
 
@@ -96,7 +114,6 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
                 }
             }
 
-            //const generarReporte = reportesMap[examen.tabla];
             let generador = null;
 
             if (jaspersConOpcionMultiple.some(item => item == examen.tabla)) {
@@ -115,7 +132,6 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             if (generadorFinal) {
                 // pdfFinal.save("folio.pdf");
                 await generadorFinal(data, pdfFinal);
-
             } else {
                 console.warn("No existe generador para:", examen.tabla);
             }
@@ -143,9 +159,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             if (onProgress) {
                 onProgress(i + 1, totalReportes, porcentaje, examen.nombre);
             }
-
         } catch (err) {
-            console.error("Error cargando:", examen.nombre, err);
+            console.error("Error generando reporte para:", examen.nombre, err);
         }
     }
 

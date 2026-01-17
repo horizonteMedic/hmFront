@@ -15,7 +15,29 @@ const ExamenesListPRUEBAS2 = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "EXAMENES_COMPLEMENTARIOS",
+    "INTERCONSULTAS",
+]);
+
+const ExamenesListCAMPANA = buildExamenesList([ // Campaña
+    "CERTIFICADO_APTITUD_ANEXO_16",  // 1
+    "ANEXO_16",                      // 2
+    "ENFERMEDADES_ALTURA",           // 3
+    "ANEXO_16A",                     // 4
+    "USO_RESPIRADORES",              // 5
+    "HISTORIA_OCUPACIONAL",          // 6
+    "ANTECEDENTES_PATOLOGICOS",      // 7
+    "CUESTIONARIO_NORDICO",          // 8
+    "EVALUACION_MUSCULO_ESQUELETICA",// 9
+    "LABORATORIO_CLINICO",           // 10
+    "PERFIL_LIPIDICO",               // 11
+    "OIT",                           // 12
+    "RADIOGRAFIA_TORAX",             // 13
+    "ELECTROCARDIOGRAMA",            // 14
+    "ESPIROMETRIA_ARCHIVO",          // 15
+    "AUDIOMETRIA_OHLA",              // 16
+    "INFORME_PSICOLOGICO",           // 17
+    "OFTALMOLOGIA",                  // 18
+    "CONSENTIMIENTO_INFORMADO",      // 19
 ]);
 
 const ExamenesListOHLA = buildExamenesList([       //OHLA
@@ -56,6 +78,42 @@ const ExamenesListOHLA = buildExamenesList([       //OHLA
     "CONSENT_DECLARACION_APTITUD",             // 35
     "DECLARACION_USO_FIRMA_ARCHIVO",           // 36
     "INTERCONSULTAS"                           // 37
+]);
+
+const ExamenesListOHLA1 = buildExamenesList([       //OHLA 1
+    "RESUMEN_MEDICO_PODEROSA",
+    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
+    "ANEXO_16",
+    "CERTIFICADO_ALTURA",
+    "OFTALMOLOGIA_VISION_TESTER",
+    "CERTIFICADO_VEHICULOS",
+    "FICHA_SAS",
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+    "PERFIL_HEPATICO",
+    "PERFIL_RENAL",
+    "PANEL_5D",
+    "CONSENT_PANEL_5D",
+    "OIT",
+    "ELECTROCARDIOGRAMA",
+    "ELECTROCARDIOGRAMA_ARCHIVO",
+    "ESPIROMETRIA_ARCHIVO",
+    "AUDIOMETRIA_OHLA",
+    "ODONTOGRAMA",
+    "PSICOLOGIA_ANEXO_02",
+    "TEST_FATIGA_SOMNOLENCIA",
+    "EXAMENES_COMPLEMENTARIOS",
+    "TRABAJO_ALTURA_PSICO",
+    "OFTALMOLOGIA",
+    "CONSENT_DECLARACION_APTITUD",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
 ]);
 
 const ExamenesListOHLA2 = buildExamenesList([       //OHLA 2
@@ -124,30 +182,11 @@ const ExamenesListOHLA3 = buildExamenesList([       //OHLA 3
     "INTERCONSULTAS"
 ]);
 
-const ExamenesListCAMPANA = buildExamenesList([ // Campaña
-    "CERTIFICADO_APTITUD_ANEXO_16",  // 1
-    "ANEXO_16",                      // 2
-    "ENFERMEDADES_ALTURA",           // 3
-    "ANEXO_16A",                     // 4
-    "USO_RESPIRADORES",              // 5
-    "HISTORIA_OCUPACIONAL",          // 6
-    "ANTECEDENTES_PATOLOGICOS",      // 7
-    "CUESTIONARIO_NORDICO",          // 8
-    "EVALUACION_MUSCULO_ESQUELETICA",// 9
-    "LABORATORIO_CLINICO",           // 10
-    "PERFIL_LIPIDICO",               // 11
-    "OIT",                           // 12
-    "RADIOGRAFIA_TORAX",             // 13
-    "ELECTROCARDIOGRAMA",            // 14
-    "ESPIROMETRIA_ARCHIVO",          // 15
-    "AUDIOMETRIA_OHLA",              // 16
-    "INFORME_PSICOLOGICO",           // 17
-    "OFTALMOLOGIA",                  // 18
-    "CONSENTIMIENTO_INFORMADO",      // 19
-]);
+
 
 const ListaPorPlantilla = {
     OHLA: ExamenesListOHLA,
+    OHLA1: ExamenesListOHLA1,
     OHLA2: ExamenesListOHLA2,
     OHLA3: ExamenesListOHLA3,
     CAMPANA: ExamenesListCAMPANA,
