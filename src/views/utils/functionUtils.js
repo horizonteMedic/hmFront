@@ -246,6 +246,7 @@ export const GetInfoServicioDefault = async (
     esJasper = false
 ) => {
     try {
+        console.log(esJasper)
         const res = await getFetch(
             `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=${esJasper}`,
             token
@@ -371,10 +372,10 @@ export const SubmitDataServiceDefaultManejo = async (
 };
 
 export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, userlogued, token, coordenadas) => {
+
     const sFirma = await getSign(form, "FIRMAP")
     const sHuella = await getSign(form, "HUELLA")
     const sSello = await getSign(form, "SELLOFIRMA")
-
     const { value: file } = await Swal.fire({
         title: "Selecciona un archivo PDF",
         input: "file",
@@ -390,9 +391,6 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
             if (file.type !== "application/pdf") return "Solo se permiten archivos PDF.";
         },
     });
-    console.log(sFirma)
-    console.log(sHuella)
-    console.log(sSello)
     if (!file) return; // Usuario canceló la selección de archivo
 
     // Segundo diálogo: preguntar si quiere agregar sellos
@@ -448,6 +446,16 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
 
         const pdfBase64Final = uint8ToBase64(new Uint8Array(pdfBytesOptimizado));
 
+        const pdfBlob = new Blob([pdfBytesOptimizado], { type: "application/pdf" });
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        const link = document.createElement("a");
+        link.href = pdfUrl;
+        link.download = file.name; // o el nombre que tú quieras
+        document.body.appendChild(link);
+        link.click();
+
+        document.body.removeChild(link);
+        URL.revokeObjectURL(pdfUrl);
 
         const datos = {
             rutaArchivo: null,

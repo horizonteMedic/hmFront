@@ -2,8 +2,10 @@ import Swal from "sweetalert2";
 import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
+    handleSubirArchivoDefault,
     LoadingDefault,
     PrintHojaRDefault,
+    ReadArchivosFormDefault,
     SubmitDataServiceDefault,
 } from "../../../../../utils/functionUtils";
 import { getFetch } from "../../../../../utils/apiHelpers";
@@ -13,6 +15,8 @@ const obtenerReporteUrl =
     "/api/v01/ct/aptitudAltura/obtenerReporteAptitudAlturaPoderosa";
 const registrarUrl =
     "/api/v01/ct/aptitudAltura/registrarActualizarAptitudAlturaPoderosa";
+const registrarPDF =
+    "/api/v01/ct/archivos/archivoInterconsulta"
 const today = getToday();
 
 export const GetInfoServicio = async (
@@ -59,7 +63,8 @@ export const GetInfoServicioEditar = async (
         tabla,
         token,
         obtenerReporteUrl,
-        onFinish
+        onFinish,
+        true
     );
     if (res) {
         console.log(res)
@@ -72,7 +77,9 @@ export const GetInfoServicioEditar = async (
             edadPaciente: `${res.edadPaciente} AÑOS`,
             dniUser: res.dniUsuario,
             apto: res.apto ? "APTO" : res.aptoRestriccion ? "APTOCONRESTRICCION" : res.aptoTemporal ? "NOAPTOTEMPORAL" : res.noApto ? "NOAPTO" : "",
-            nombre_medico: res.nombreMedico
+            nombre_medico: res.nombreMedico,
+            SubirDoc: true,
+            digitalizacion: res.digitalizacion,
         }));
     }
 };
@@ -190,3 +197,16 @@ export const VerifyTRPerzonalizado = async (nro, tabla, token, set, sede, noTien
 export const Loading = (mensaje) => {
     LoadingDefault(mensaje);
 };
+
+export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
+    const coordenadas = {
+        HUELLA: { x: 40, y: 680, width: 60, height: 60 },
+        FIRMA: { x: 106, y: 680, width: 120, height: 60 },
+        SELLOFIRMA: { x: 400, y: 680, width: 120, height: 80 },
+    };
+    handleSubirArchivoDefault(form, selectedSede, registrarPDF, userlogued, token, coordenadas)
+};
+
+export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
+    ReadArchivosFormDefault(form, setVisualerOpen, token)
+}
