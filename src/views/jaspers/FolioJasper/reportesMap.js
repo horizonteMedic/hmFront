@@ -57,6 +57,8 @@ import ConsentAdmisionInformacionAptitudMedicoOcupacional from "../ModuloConsent
 import Informe_Psico_Cuestionario_Berlin from "../ModuloPsicologia/InformePsicoCuestionarioBerlin/Informe_Psico_Cuestionario_Berlin"
 import ResultadosPanel5d_Digitalizado from "../Toxicologia/ResultadosPanel5d_Digitalizado";
 import InformePsicoExamComplementario from "../ModuloPsicologia/InformePsicoExamComplementario/Informe_Psico_Exam_Complementario";
+import CertificadoAlturaPoderosa_Digitalizado from "../CertificadoAlturaPoderosa/CertificadoAlturaPoderosa_Digitalizado";
+import TestFatigaSomnolenia_Digitalizado_boro from "../Test_Fatiga/TestFatigaSomnolenia_Digitalizado_boro";
 
 // Agrega aquí todos tus reportes
 export const ekgMap = {
@@ -83,6 +85,7 @@ export const reportesMap = {
     b_certificado_altura: Certificacion_suficiencia_trabajos_en_altura_boro_Digitalizado,
     //Cetificado de aptitud altura poderosa
     aptitud_altura_poderosa: Aptitud_Poderosa_Digitalizado,
+    certificado_altura_poderosa: CertificadoAlturaPoderosa_Digitalizado,
     //Certificado vehiculos
     b_certificado_conduccion: Certificaciondeconduccion_Digitalizado,
     //FICHA SAS 
@@ -91,6 +94,7 @@ export const reportesMap = {
     aptitud_licencia_conduciri: Aptitud_Licencia_Conducir_Interna_Digitalizado,
     //Hoja Consulta Externa
     hoja_consulta_externa: Hoja_Consulta_Externa,
+    test_fatiga_somnolencia: TestFatigaSomnolenia_Digitalizado_boro,
     //DECLARACION ANTECEDENTES PATOLOGICOS
     DECLA_JURA_ANTECE_PERSON_FAM: ConsentAdmisionDeclacionAntecePatologicos,
     //CONSENTIMIENTO MUESTRA DE SANGER
@@ -158,7 +162,7 @@ export const reportesMap = {
         InformeElectrocardiograma2023,
         InformeElectrocardiograma_Digitalizado
     },
-    exam_complementarios:InformePsicoExamComplementario,
+    exam_complementarios: InformePsicoExamComplementario,
     audiometria_po: FichaAudiologica_Digitalizado,
     informe_psicologico: InformePsicologico_Digitalizado,
     oftalmologia: Oftalmologia,

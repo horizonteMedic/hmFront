@@ -3,7 +3,7 @@ export const EXAMENES_CATALOGO = {
        GENERALES / BASE
     ========================= */
     RESUMEN_MEDICO_PODEROSA: {
-        nombre: "RESUMEN MEDICO PODEROSA",
+        nombre: "RESUMEN MEDICO",
         tabla: "resumen_medico_poderosa",
         url: "/api/v01/ct/anexos/obtenerReporteResumenMedico",
     },
@@ -78,21 +78,35 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
     CERTIFICADO_ALTURA_PODEROSA: {
+        nombre: "CERTIFICADO ALTURA PODEROSA",
+        tabla: "certificado_altura_poderosa",
+        url: "/api/v01/ct/certificadoTrabajoAltura/obtenerReporteCertificadoTrabajoAlturaPoderosa",
+        esJasper: true,
+    },
+    CERTIFICADO_APTITUD_ALTURA_PODEROSA: {
         nombre: "CERTIFICADO APTITUD ALTURA PODEROSA",
         tabla: "aptitud_altura_poderosa",
         url: "/api/v01/ct/aptitudAltura/obtenerReporteAptitudAlturaPoderosa",
         esJasper: true,
     },
+
     ENFERMEDADES_ALTURA: {
         nombre: "ENFERMEDADES EN ALTURA",
         tabla: "antece_enfermedades_altura",
         url: "/api/v01/ct/antecedentesEnfermedadesAltura/obtenerReporteAntecedentesEnfermedadesAltura"
     },
+
     CERTIFICADO_VEHICULOS: {
         nombre: "CERTIFICADO VEHICULOS",
         tabla: "b_certificado_conduccion",
         url: "/api/v01/ct/certificadoConduccion/obtenerReporteCertificadoConduccion",
         esJasper: true,
+    },
+
+    HOJA_DE_CONSULTA_EXTERNA: {
+        nombre: "HOJA DE CONSULTA EXTERNA",
+        tabla: "hoja_consulta_externa",
+        url: "/api/v01/ct/hojaConsultaExterna/obtenerReporteHojaConsultaExterna",
     },
 
     LICENCIA_CONDUCIR_PODEROSA: {
@@ -249,7 +263,7 @@ export const EXAMENES_CATALOGO = {
         nameConset: true,
     },
 
-    CONSENT_BORO: {
+    CONSENT_DROGAS_BORO: {
         nombre: "CONSENTIMIENTO DROGAS BOROO",
         tabla: "consent_Boro",
         url: "/api/v01/ct/laboratorio/consentimientoLaboratorioBoro",
@@ -276,6 +290,20 @@ export const EXAMENES_CATALOGO = {
         esJasper: true
     },
 
+    CONSENT_SINTOMATICO_RESPIRATORIO: {
+        nombre: "DECLARACION DE SINTOMATICO RESPIRATORIO",
+        tabla: "CONSENT_SINTOMATICO",
+        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
+        esJasper: true
+    },
+
+    CONSENT_INFORMADO: {
+        nombre: "CONSENTIMIENTO INFORMADO DE EVALUACION MEDICA",
+        tabla: "CONSENT_INFORMADO_MEDICA",
+        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
+        esJasper: true
+    },
+
     /* =========================
        EXÁMENES MÉDICOS
     ========================= */
@@ -289,6 +317,11 @@ export const EXAMENES_CATALOGO = {
         nombre: "OFTALMOLOGIA",
         tabla: "oftalmologia2021",
         url: "/api/v01/ct/agudezaVisual/obtenerReporteEvaluacionOftalmologica",
+    },
+    FICHA_OFTALMOLOGICA: {
+        nombre: "FICHA OFTALMOLOGICA",
+        tabla: "oftalmologia",
+        url: "/api/v01/ct/agudezaVisual/obtenerReporteOftalmologia"
     },
 
     RADIOGRAFIA_TORAX: {
@@ -332,6 +365,12 @@ export const EXAMENES_CATALOGO = {
         nombre: "ODONTROGRAMA",
         tabla: "odontograma",
         url: "/api/v01/ct/odontograma/obtenerReporteOdontograma",
+    },
+
+    TEST_FATIGA_SOMNOLENCIA: {
+        nombre: "TEST FATIGA Y SOMNOLENCIA",
+        tabla: "test_fatiga_somnolencia",
+        url: "/api/v01/ct/testFatigaSomnolencia/obtenerReporteTestFatigaSomnolencia",
     },
 
     /* =========================
@@ -393,8 +432,8 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
-    TEST_FATIGA_SOMNOLENCIA: {
-        nombre: "TEST DE FATIGA Y SOMNOLENCIA",
+    ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA: {
+        nombre: "TEST DE ESTRES FATIGA Y SOMNOLENCIA PSICOLOGIA",
         tabla: "informe_psicologico_estres",
         url: "/api/v01/ct/informePsicologicoAdeco/obtenerReporteInformePsicologicoAdeco",
         esJasper: true,
@@ -427,9 +466,6 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/examenComplementario/obtenerReporte",
         esJasper: true
     }
-
-
-
 };
 
 const EXAMEN_DEFAULT = {
