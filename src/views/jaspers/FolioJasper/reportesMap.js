@@ -55,6 +55,10 @@ import PerfilHepatico_Digitalizado from "../AnalisisBioquimicos/PerfilHepatico_D
 import Consentimiento_Panel5D_ohla_Digitalizado from "../Consentimientos/Consentimiento_Panel5D_Digitalizado";
 import ConsentAdmisionInformacionAptitudMedicoOcupacional from "../ModuloConsentimientos/ConsentAdmisInformaAptiMedicoOcupa/Consent_Admision_InformacionAptitudMedicoOcupacional";
 import Informe_Psico_Cuestionario_Berlin from "../ModuloPsicologia/InformePsicoCuestionarioBerlin/Informe_Psico_Cuestionario_Berlin"
+import ResultadosPanel5d_Digitalizado from "../Toxicologia/ResultadosPanel5d_Digitalizado";
+import InformePsicoExamComplementario from "../ModuloPsicologia/InformePsicoExamComplementario/Informe_Psico_Exam_Complementario";
+import CertificadoAlturaPoderosa_Digitalizado from "../CertificadoAlturaPoderosa/CertificadoAlturaPoderosa_Digitalizado";
+import TestFatigaSomnolenia_Digitalizado_boro from "../Test_Fatiga/TestFatigaSomnolenia_Digitalizado_boro";
 
 // Agrega aquí todos tus reportes
 export const ekgMap = {
@@ -81,6 +85,7 @@ export const reportesMap = {
     b_certificado_altura: Certificacion_suficiencia_trabajos_en_altura_boro_Digitalizado,
     //Cetificado de aptitud altura poderosa
     aptitud_altura_poderosa: Aptitud_Poderosa_Digitalizado,
+    certificado_altura_poderosa: CertificadoAlturaPoderosa_Digitalizado,
     //Certificado vehiculos
     b_certificado_conduccion: Certificaciondeconduccion_Digitalizado,
     //FICHA SAS 
@@ -89,6 +94,7 @@ export const reportesMap = {
     aptitud_licencia_conduciri: Aptitud_Licencia_Conducir_Interna_Digitalizado,
     //Hoja Consulta Externa
     hoja_consulta_externa: Hoja_Consulta_Externa,
+    test_fatiga_somnolencia: TestFatigaSomnolenia_Digitalizado_boro,
     //DECLARACION ANTECEDENTES PATOLOGICOS
     DECLA_JURA_ANTECE_PERSON_FAM: ConsentAdmisionDeclacionAntecePatologicos,
     //CONSENTIMIENTO MUESTRA DE SANGER
@@ -148,21 +154,15 @@ export const reportesMap = {
 
     l_bioquimica: LBioquimica_Digitalizado,
 
+    toxicologia: ResultadosPanel5d_Digitalizado,
+
     oit: OIT_Digitalizado,
     radiografia_torax: RagiografiaToraxPA_Digitalizado,
-    informe_electrocardiograma: (data) => {
-        switch (data?.nameJasper) {
-            case "InformeElectrocardiograma2023":
-                return InformeElectrocardiograma2023;
-
-            case "InformeElectrocardiograma_Digitalizado":
-                return InformeElectrocardiograma_Digitalizado;
-
-            default:
-                console.warn("⚠️ nameJasper no reconocido:", data?.nameJasper);
-                return null;
-        }
+    informe_electrocardiograma: {
+        InformeElectrocardiograma2023,
+        InformeElectrocardiograma_Digitalizado
     },
+    exam_complementarios: InformePsicoExamComplementario,
     audiometria_po: FichaAudiologica_Digitalizado,
     informe_psicologico: InformePsicologico_Digitalizado,
     oftalmologia: Oftalmologia,

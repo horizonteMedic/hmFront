@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
 import { getFetch } from "../../../getFetch/getFetch";
 import { SubmitData } from "../model";
-import { handleSubirArchivoDefaultSinSellos, ReadArchivosFormDefault } from "../../../../../utils/functionUtils";
+import { handleSubirArchivoDefault, handleSubirArchivoDefaultSinSellos, ReadArchivosFormDefault } from "../../../../../utils/functionUtils";
 
 //===============Zona Modificación===============
 const obtenerReporteUrl =
@@ -439,7 +439,12 @@ export const GetInfoPac = (nro, set, token, sede) => {
 };
 
 export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
-  handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
+  const coordenadas = {
+    HUELLA: { x: 40, y: 680, width: 60, height: 60 },
+    FIRMA: { x: 106, y: 680, width: 120, height: 60 },
+    SELLOFIRMA: { x: 400, y: 680, width: 120, height: 80 },
+  };
+  handleSubirArchivoDefault(form, selectedSede, registrarPDF, userlogued, token, coordenadas)
 };
 
 export const ReadArchivosForm = async (form, setVisualerOpen, token) => {

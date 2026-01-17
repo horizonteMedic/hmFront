@@ -8,7 +8,7 @@ import useRealTime from "../../../../hooks/useRealTime";
 import { useForm } from "../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaInterconsulta";
 import { useSessionData } from "../../../../hooks/useSessionData";
-import { getToday } from "../../../../utils/helpers";
+import { getToday, optimizePdf, uint8ToBase64 } from "../../../../utils/helpers";
 import Swal from "sweetalert2";
 import { SubirInterconsulta, ReadArchivos } from "./model";
 import { LoadingDefault } from "../../../../utils/functionUtils";
@@ -155,10 +155,29 @@ export default function FichaInterconsulta() {
             reader.onload = async (e) => {
                 LoadingDefault("Subiendo documento")
                 const base64WithoutHeader = e.target.result.split(',')[1];
+                let pdfBytes = Uint8Array.from(atob(base64WithoutHeader), c => c.charCodeAt(0));
+
+                // Calcular tamaño antes de optimizar
+                const tamañoAntesKB = (pdfBytes.length / 1024).toFixed(2);
+                console.log(`📄 Tamaño del PDF ANTES de optimizar: ${tamañoAntesKB} KB (${pdfBytes.length} bytes)`);
+
+                // Optimizar el PDF
+                const pdfBytesOptimizado = await optimizePdf(pdfBytes);
+
+                // Calcular tamaño después de optimizar
+                const tamañoDespuesKB = (pdfBytesOptimizado.length / 1024).toFixed(2);
+                const reduccionKB = (tamañoAntesKB - tamañoDespuesKB).toFixed(2);
+                const porcentajeReduccion = ((reduccionKB / tamañoAntesKB) * 100).toFixed(1);
+
+                console.log(`📄 Tamaño del PDF DESPUÉS de optimizar: ${tamañoDespuesKB} KB (${pdfBytesOptimizado.length} bytes)`);
+                console.log(`✅ Reducción: ${reduccionKB} KB (${porcentajeReduccion}%)`);
+
+                const base64Optimizado = uint8ToBase64(new Uint8Array(pdfBytesOptimizado));
+
                 const datos = {
                     nombre: file.name,
                     sede: selectedSede,
-                    base64: base64WithoutHeader,
+                    base64: base64Optimizado,
                     nomenclatura: form.nomenclatura,
                     norden: form.norden
                 };

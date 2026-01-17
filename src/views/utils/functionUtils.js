@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 import { getFetch, getFetchManejo, SubmitData, SubmitDataManejo } from "./apiHelpers";
-import { colocarSellosEnPdf, getSign, uint8ToBase64 } from "./helpers";
+import { colocarSellosEnPdf, getSign, uint8ToBase64, optimizePdf } from "./helpers";
 
 export const LoadingDefault = (text) => {
     Swal.fire({
@@ -246,6 +246,7 @@ export const GetInfoServicioDefault = async (
     esJasper = false
 ) => {
     try {
+        console.log(esJasper)
         const res = await getFetch(
             `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=${esJasper}`,
             token
@@ -371,10 +372,10 @@ export const SubmitDataServiceDefaultManejo = async (
 };
 
 export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, userlogued, token, coordenadas) => {
+
     const sFirma = await getSign(form, "FIRMAP")
     const sHuella = await getSign(form, "HUELLA")
     const sSello = await getSign(form, "SELLOFIRMA")
-
     const { value: file } = await Swal.fire({
         title: "Selecciona un archivo PDF",
         input: "file",
@@ -390,7 +391,6 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
             if (file.type !== "application/pdf") return "Solo se permiten archivos PDF.";
         },
     });
-
     if (!file) return; // Usuario canceló la selección de archivo
 
     // Segundo diálogo: preguntar si quiere agregar sellos
@@ -429,8 +429,33 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
             console.log("SIN SELLOS");
         }
 
-        const pdfBase64Final = uint8ToBase64(new Uint8Array(pdfBytes));
+        // Calcular tamaño antes de optimizar
+        const tamañoAntesKB = (pdfBytes.length / 1024).toFixed(2);
+        console.log(`📄 Tamaño del PDF ANTES de optimizar: ${tamañoAntesKB} KB (${pdfBytes.length} bytes)`);
 
+        // Optimizar el PDF
+        const pdfBytesOptimizado = await optimizePdf(pdfBytes);
+
+        // Calcular tamaño después de optimizar
+        const tamañoDespuesKB = (pdfBytesOptimizado.length / 1024).toFixed(2);
+        const reduccionKB = (tamañoAntesKB - tamañoDespuesKB).toFixed(2);
+        const porcentajeReduccion = ((reduccionKB / tamañoAntesKB) * 100).toFixed(1);
+
+        console.log(`📄 Tamaño del PDF DESPUÉS de optimizar: ${tamañoDespuesKB} KB (${pdfBytesOptimizado.length} bytes)`);
+        console.log(`✅ Reducción: ${reduccionKB} KB (${porcentajeReduccion}%)`);
+
+        const pdfBase64Final = uint8ToBase64(new Uint8Array(pdfBytesOptimizado));
+
+        const pdfBlob = new Blob([pdfBytesOptimizado], { type: "application/pdf" });
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        const link = document.createElement("a");
+        link.href = pdfUrl;
+        link.download = file.name; // o el nombre que tú quieras
+        document.body.appendChild(link);
+        link.click();
+
+        document.body.removeChild(link);
+        URL.revokeObjectURL(pdfUrl);
 
         const datos = {
             rutaArchivo: null,

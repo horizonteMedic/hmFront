@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import header_TestFAtiga from "./Header_TestFatiga";
 import footer_TestFatiga from "./Footer_TestFatiga";
-export default async function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
+export default async function TestFatigaSomnolenia_Digitalizado_boro(datos = {}, docExistente = null) {
 
   function drawXInBox(doc, x, y, width, height, color = [0, 0, 255], scale = 3) {
     const centerX = x + width / 2;
@@ -44,7 +44,7 @@ export default async function TestFatigaSomnolenia_Digitalizado_boro(datos = {})
     doc.setDrawColor(0, 0, 0);
   }
 
-  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const margin = 10;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 20;
@@ -64,7 +64,7 @@ export default async function TestFatigaSomnolenia_Digitalizado_boro(datos = {})
       img.onload = () => res(img);
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
-  Promise.all([
+  await Promise.all([
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
     isValidUrl(sello3?.url) ? loadImg(sello3.url) : Promise.resolve(null),
@@ -461,16 +461,21 @@ export default async function TestFatigaSomnolenia_Digitalizado_boro(datos = {})
 
 
 
-
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    iframe.onload = () => iframe.contentWindow.print();
-
   })
 
 
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
+}
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
 }

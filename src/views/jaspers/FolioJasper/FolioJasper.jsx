@@ -2,9 +2,13 @@ import jsPDF from "jspdf";
 import { getFetch } from "../../utils/apiHelpers";
 import { reportesMap } from "./reportesMap";
 import { PDFDocument } from "pdf-lib";
+import * as pdfjsLib from "pdfjs-dist";
+import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType) {
-    const pdfFinal = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
+    const pdfFinal = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true, precision: 1 });
 
     const reportesConHorizontal = [
         "historia_oc_info",
@@ -18,7 +22,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "ELECTROCARDIOGRAMA",
         "OFTALMOLOGIA VISION TESTER",
         "DECLARACION USO FIRMA",
-        // "PSICOSENSOMETRICO",
+        "PSICOSENSOMETRICO CERT-ALTURA",
         "PSICOSENSOMETRICO VEHI-FOLIO",
         "INTERCONSULTA",
         "INTERCONSULTA 2",
@@ -27,7 +31,12 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "INTERCONSULTA 5"
     ];
 
-    const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true);
+    const jaspersConOpcionMultiple = [
+        "informe_electrocardiograma",
+        "resumen_medico_poderosa"
+    ]
+
+    const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true && ex.imprimir === true);
     //const examenesFiltrados = ListaExamenes; //SOLO ACTIVAR PARA PRUEBAS 
     const totalReportes = examenesFiltrados.length;
 
@@ -42,6 +51,29 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
 
     // Variable para rastrear la última página generada
     let ultimaPaginaGenerada = 0;
+
+    // Ejecutar todas las consultas a los endpoints en paralelo
+    const resultadosFetch = await Promise.all(
+        examenesFiltrados.map(async (examen) => {
+            if (archivos.includes(examen.tabla)) {
+                return null;
+            }
+
+            const apiUrl = examen.esJasper
+                ? `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}&esJasper=true`
+                : examen.nameConset ?
+                    `${examen.url}?nOrden=${nro}&nameConset=${examen.tabla}`
+                    : `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}`;
+
+            try {
+                const data = await getFetch(apiUrl, token);
+                return data || null;
+            } catch (err) {
+                console.error("Error cargando:", examen.nombre, err);
+                return null;
+            }
+        })
+    );
 
     for (let i = 0; i < examenesFiltrados.length; i++) {
         const examen = examenesFiltrados[i];
@@ -59,17 +91,13 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             continue;
         }
 
-
-        const apiUrl = examen.esJasper
-            ? `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}&esJasper=true`
-            : examen.nameConset ?
-                `${examen.url}?nOrden=${nro}&nameConset=${examen.tabla}`
-                : `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}`;
+        const data = resultadosFetch[i];
+        if (!data) {
+            console.warn("No se recibieron datos para:", examen.nombre);
+            continue;
+        }
 
         try {
-            const data = await getFetch(apiUrl, token);
-            if (!data) continue;
-
             // Medir tamaño ANTES de agregar el reporte
             const pesoAntes = pdfFinal.output('arraybuffer').byteLength;
 
@@ -91,10 +119,9 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
                 }
             }
 
-            //const generarReporte = reportesMap[examen.tabla];
             let generador = null;
 
-            if (examen.tabla === "resumen_medico_poderosa") {
+            if (jaspersConOpcionMultiple.some(item => item == examen.tabla)) {
                 generador = reportesMap[examen.tabla][data.nameJasper];
             } else {
                 generador = reportesMap[examen.tabla];
@@ -110,7 +137,6 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             if (generadorFinal) {
                 // pdfFinal.save("folio.pdf");
                 await generadorFinal(data, pdfFinal);
-
             } else {
                 console.warn("No existe generador para:", examen.tabla);
             }
@@ -138,9 +164,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             if (onProgress) {
                 onProgress(i + 1, totalReportes, porcentaje, examen.nombre);
             }
-
         } catch (err) {
-            console.error("Error cargando:", examen.nombre, err);
+            console.error("Error generando reporte para:", examen.nombre, err);
         }
     }
 
@@ -193,8 +218,19 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         const baseBytes = pdfFinal.output("arraybuffer");
         let basePdf = await PDFDocument.load(baseBytes);
 
+        //si es una pagina en blanco la elimina
+        if (estadisticasPeso.length === 0) {
+            const totalPages = basePdf.getPages().length;
+            if (totalPages === 1) {
+                basePdf.removePage(0);
+            }
+        }
+
         // Contador de páginas insertadas para ajustar posiciones
         let paginasInsertadasAcumuladas = 0;
+
+        // Array para rastrear estadísticas de PDFs externos
+        const estadisticasPdfsExternos = [];
 
         // Insertar PDFs externos en ORDEN NORMAL (del primero al último)
         // Ajustamos las posiciones considerando las inserciones previas
@@ -209,6 +245,21 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
 
             // Cargar el PDF externo
             const externoBytes = await fetch(examen.url).then(r => r.arrayBuffer());
+
+            // 📊 Mostrar tamaño del PDF externo
+            const tamañoExternoKB = (externoBytes.byteLength / 1024).toFixed(2);
+            const tamañoExternoMB = (externoBytes.byteLength / (1024 * 1024)).toFixed(3);
+            console.log(`   📄 Tamaño del PDF externo: ${tamañoExternoKB} KB (${tamañoExternoMB} MB)`);
+
+            // Guardar estadísticas del PDF externo
+            estadisticasPdfsExternos.push({
+                nombre: examen.nombre,
+                tabla: examen.tabla,
+                pesoKB: tamañoExternoKB,
+                pesoMB: tamañoExternoMB,
+                pesoBytes: externoBytes.byteLength
+            });
+
             const externoPdf = await PDFDocument.load(externoBytes);
 
             // Copiar todas las páginas del PDF externo
@@ -227,15 +278,35 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             console.log(`   ✓ ${paginasExternas.length} página(s) insertada(s). Total acumulado: ${paginasInsertadasAcumuladas}`);
         }
 
-        pdfFinalBytes = await basePdf.save();
+        pdfFinalBytes = await basePdf.save({ useObjectStreams: true });
         console.log("✅ Todos los PDFs externos insertados correctamente");
+
+        // Mostrar resumen de PDFs externos
+        if (estadisticasPdfsExternos.length > 0) {
+            console.log("\n📎 RESUMEN DE PDFs EXTERNOS:");
+            console.log("═".repeat(80));
+
+            estadisticasPdfsExternos.forEach((pdf, index) => {
+                console.log(`📄 ${pdf.nombre} (${pdf.tabla})`);
+                console.log(`   Tamaño: ${pdf.pesoKB} KB (${pdf.pesoMB} MB)`);
+                console.log("─".repeat(80));
+            });
+
+            // Calcular peso total de PDFs externos
+            const pesoTotalExterno = estadisticasPdfsExternos.reduce((sum, pdf) => sum + pdf.pesoBytes, 0);
+            console.log(`\n📦 PESO TOTAL DE PDFs EXTERNOS: ${(pesoTotalExterno / 1024).toFixed(2)} KB (${(pesoTotalExterno / (1024 * 1024)).toFixed(2)} MB)`);
+            console.log(`📄 Total de PDFs externos: ${estadisticasPdfsExternos.length}`);
+            console.log("═".repeat(80) + "\n");
+        }
     } else {
         pdfFinalBytes = pdfFinal.output("arraybuffer");
     }
 
-    // Descargar e imprimir el PDF
-    descargarPdf(pdfFinalBytes, `Folio_${nro}.pdf`);
-    imprimirBytes(pdfFinalBytes);
+    const baseBytes = pdfFinalBytes instanceof Uint8Array ? pdfFinalBytes : new Uint8Array(pdfFinalBytes);
+    const rasterizedBytes = await rasterizeAndCompressPdf(baseBytes);
+
+    descargarPdf(rasterizedBytes, `Folio_${nro}.pdf`);
+    imprimirBytes(rasterizedBytes);
 }
 
 function descargarPdf(pdfBytes, nombreArchivo) {
@@ -348,4 +419,33 @@ async function sellarEspirometria(pdfBytes) {
     });
 
     return await pdfDoc.save();
+}
+
+async function rasterizeAndCompressPdf(pdfBytes) {
+    const loadingTask = pdfjsLib.getDocument({ data: pdfBytes });
+    const pdf = await loadingTask.promise;
+    const mmPerPt = 25.4 / 72;
+
+    let doc = null;
+    const numPages = pdf.numPages;
+    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const vp = page.getViewport({ scale: 1.5 });
+        const pageWidthMm = vp.width * mmPerPt;
+        const pageHeightMm = vp.height * mmPerPt;
+        const orientation = pageWidthMm >= pageHeightMm ? "landscape" : "portrait";
+        if (!doc) {
+            doc = new jsPDF({ unit: "mm", format: [pageWidthMm, pageHeightMm], orientation, compress: true, precision: 1 });
+        } else {
+            doc.addPage([pageWidthMm, pageHeightMm], orientation);
+        }
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = vp.width;
+        canvas.height = vp.height;
+        await page.render({ canvasContext: ctx, viewport: vp }).promise;
+        const imgData = canvas.toDataURL("image/jpeg", 0.90);
+        doc.addImage(imgData, "JPEG", 0, 0, pageWidthMm, pageHeightMm, undefined, "FAST");
+    }
+    return doc.output("arraybuffer");
 }

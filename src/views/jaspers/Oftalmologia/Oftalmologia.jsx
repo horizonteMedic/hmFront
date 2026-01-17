@@ -448,7 +448,6 @@ export default async function Oftalmologia(datos = {}, docExistente = null) {
     if (docExistente) {
       return doc;
     } else {
-      doc.save("Oftalmologia.pdf");
       imprimir(doc);
     }
   });
@@ -458,6 +457,7 @@ export default async function Oftalmologia(datos = {}, docExistente = null) {
     return doc;
   }
 }
+
 
 function imprimir(doc) {
   const blob = doc.output("blob");

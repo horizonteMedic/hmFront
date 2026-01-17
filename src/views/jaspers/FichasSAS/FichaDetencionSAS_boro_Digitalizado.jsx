@@ -1860,7 +1860,6 @@ export default async function B_FichaDetencionSAS2(data = {}, docExistente = nul
   if (docExistente) {
     return doc;
   } else {
-    doc.save("FichaDetencionSAS_boro_Digitalizado.pdf");
     imprimir(doc);
   }
 }

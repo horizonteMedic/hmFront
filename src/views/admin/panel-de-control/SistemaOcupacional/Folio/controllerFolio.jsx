@@ -56,6 +56,7 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
                 return {
                     ...examen,
                     resultado: match ? match.existe : false,
+                    imprimir: match ? match.existe : false,
                 };
             });
         }
@@ -77,6 +78,7 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
                         const interconsultasFormateadas = interconsultasConNomenclatura.map((item) => ({
                             nombre: `INTERCONSULTA - ${item.especialidad}`,
                             resultado: true,
+                            imprimir: true,
                             tabla: item.nomenclatura,
                             nomenclatura: item.nomenclatura,
                         }));
@@ -121,6 +123,7 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
                         ? {
                             ...examen,
                             resultado: true,
+                            imprimir: true,
                             url: response.mensaje,
                         }
                         : examen

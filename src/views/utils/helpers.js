@@ -174,3 +174,29 @@ export async function fetchImageBytes(url) {
     if (!response.ok) throw new Error("No se pudo descargar imagen");
     return new Uint8Array(await response.arrayBuffer());
 }
+
+/**
+ * Optimiza un PDF reduciendo su tamaño mediante compresión
+ * @param {Uint8Array} pdfBytes - Array de bytes del PDF original
+ * @returns {Promise<Uint8Array>} - Array de bytes del PDF optimizado
+ */
+export async function optimizePdf(pdfBytes) {
+    try {
+        const pdfDoc = await PDFDocument.load(pdfBytes, {
+            ignoreEncryption: true,
+            updateMetadata: false
+        });
+
+        // Guardar el PDF con opciones de optimización
+        const optimizedPdfBytes = await pdfDoc.save({
+            useObjectStreams: true,  // Comprime estructuras internas
+            addDefaultPage: false,
+            objectsPerTick: 50
+        });
+
+        return optimizedPdfBytes;
+    } catch (error) {
+        console.error("Error optimizando PDF:", error);
+        return pdfBytes; // Retornar original si falla la optimización
+    }
+}

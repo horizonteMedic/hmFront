@@ -1,6 +1,7 @@
 import Swal from "sweetalert2";
 import {
     GetInfoServicioDefault,
+    handleSubirArchivoDefault,
     handleSubirArchivoDefaultSinSellos,
     LoadingDefault,
     PrintHojaRDefault,
@@ -185,7 +186,8 @@ export const GetInfoServicioEditar = async (
         tabla,
         token,
         obtenerReporteUrl,
-        onFinish
+        onFinish,
+        true
     );
     if (res) {
         let debeCorregirAgudezaVisual = false;
@@ -528,7 +530,12 @@ export const Loading = (mensaje) => {
 };
 
 export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
-    handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
+    const coordenadas = {
+        HUELLA: { x: 40, y: 680, width: 60, height: 60 },
+        FIRMA: { x: 106, y: 680, width: 120, height: 60 },
+        SELLOFIRMA: { x: 400, y: 680, width: 120, height: 80 },
+    };
+    handleSubirArchivoDefault(form, selectedSede, registrarPDF, userlogued, token, coordenadas)
 };
 
 export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
