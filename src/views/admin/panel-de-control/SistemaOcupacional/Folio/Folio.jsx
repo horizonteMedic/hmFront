@@ -10,6 +10,7 @@ import Swal from "sweetalert2";
 
 const EXAMEN_DEFAULT = {
     resultado: false,
+    imprimir: false,
     esJasper: false,
     nameConset: false,
 };
@@ -431,13 +432,13 @@ const ExamenesList4 = buildExamenesList([
     "OFTALMOLOGIA_VISION_TESTER",
     "PSICOSENSOMETRICO",
 ]);
-const ExamenesList1 = buildExamenesList([
+const ExamenesList = buildExamenesList([
     "OFTALMOLOGIA_VISION_TESTER",
     "PSICOSENSOMETRICO",
 ]);
 
 
-const ExamenesList = buildExamenesList([       //OHLA
+const ExamenesList2 = buildExamenesList([       //OHLA
     "RESUMEN_MEDICO_PODEROSA",                 // 1
     "CONSTANCIA_EMO",                          // 2
     "ANEXO_16",                                // 3
@@ -1353,6 +1354,18 @@ const Folio = () => {
         }
     };
 
+    const toggleExamen = (index) => {
+        const newList = [...form.listaExamenes];
+        // Solo permitir cambiar si el examen existe (resultado es true)
+        if (newList[index].resultado) {
+            newList[index].imprimir = !newList[index].imprimir;
+            setForm((prev) => ({
+                ...prev,
+                listaExamenes: newList,
+            }));
+        }
+    };
+
     const handleGenerarFolio = async () => {
         // Mostrar alerta de carga con barra de progreso
         Swal.fire({
@@ -1574,8 +1587,19 @@ const Folio = () => {
             <SectionFieldset legend="Examenes" className="flex flex-col justify-center items-center w-full">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
                     {form.listaExamenes?.map((examen, index) => (
-                        <div key={index} className="flex justify-between items-center border p-3 rounded-md shadow-sm bg-white">
-                            <span className="font-medium text-gray-700 text-sm whitespace-normal break-words max-w-[150px]">{index + 1}.- {examen.nombre}</span>
+                        <div key={index} className="flex justify-between items-center border p-3 rounded-md shadow-sm bg-white gap-2">
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    checked={examen.imprimir || false}
+                                    onChange={() => toggleExamen(index)}
+                                    disabled={!examen.resultado}
+                                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                                />
+                                <span className="font-medium text-gray-700 text-sm whitespace-normal break-words max-w-[150px] cursor-pointer" onClick={() => toggleExamen(index)}>
+                                    {index + 1}.- {examen.nombre}
+                                </span>
+                            </div>
                             <span className={`font-bold text-sm ${examen.resultado ? 'text-green-600' : 'text-red-600'}`}>
                                 {examen.resultado ? 'PASO' : 'NO PASO'}
                             </span>
@@ -1585,7 +1609,7 @@ const Folio = () => {
                 <div className="flex justify-center items-center w-full gap-4">
                     <button
                         className="bg-yellow-400 hover:bg-yellow-500 text-white py-2 px-4 rounded-md mt-4 text-semibold"
-                        onClick={handleClear}
+                        onClick={() => { handleClear(); setSelectedListType("OHLA") }}
                     >
                         Limpiar
                     </button>
