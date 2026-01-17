@@ -458,6 +458,7 @@ export default async function Oftalmologia(datos = {}, docExistente = null) {
   }
 }
 
+
 function imprimir(doc) {
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
