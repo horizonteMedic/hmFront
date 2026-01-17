@@ -37,10 +37,12 @@ export const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
 
 const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
     LoadingDefault("Cargando examenes");
+    const existeInterconsultas = ExamenesList.some(exa => exa.nombre == "INTERCONSULTAS");
+    const listaFiltrada = ExamenesList.filter(exa => exa.nombre != "INTERCONSULTAS");//limpiar interconsulta
     try {
         const res = await getFetch(`${GetExamenURL}?nOrden=${nro}`, token);
 
-        let listaActualizada = [...ExamenesList];
+        let listaActualizada = [...listaFiltrada];
 
         // 🔹 Procesar exámenes generales
         if (res) {
@@ -54,31 +56,36 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
                 return {
                     ...examen,
                     resultado: match ? match.existe : false,
+                    imprimir: match ? match.existe : false,
                 };
             });
         }
 
         // 🔹 Procesar INTERCONSULTAS
         try {
-            const interconsultasResponse = await getFetch(`${GetNomenclatura}?nOrden=${nro}`, token);
 
-            // Validar si la respuesta tiene contenido y si al menos uno tiene nomenclatura
-            if (interconsultasResponse?.resultado && Array.isArray(interconsultasResponse.resultado)) {
-                const interconsultasConNomenclatura = interconsultasResponse.resultado.filter(
-                    (item) => item.nomenclatura && item.nomenclatura.trim() !== ""
-                );
+            if (existeInterconsultas) { //SI EXISTE
+                const interconsultasResponse = await getFetch(`${GetNomenclatura}?nOrden=${nro}`, token);
 
-                // Si hay interconsultas con nomenclatura, agregarlas al final de la lista
-                if (interconsultasConNomenclatura.length > 0) {
-                    const interconsultasFormateadas = interconsultasConNomenclatura.map((item) => ({
-                        nombre: `INTERCONSULTA - ${item.especialidad}`,
-                        resultado: true,
-                        tabla: item.nomenclatura,
-                        nomenclatura: item.nomenclatura,
-                    }));
+                // Validar si la respuesta tiene contenido y si al menos uno tiene nomenclatura
+                if (interconsultasResponse?.resultado && Array.isArray(interconsultasResponse.resultado)) {
+                    const interconsultasConNomenclatura = interconsultasResponse.resultado.filter(
+                        (item) => item.nomenclatura && item.nomenclatura.trim() !== ""
+                    );
 
-                    // Agregar interconsultas al final de la lista
-                    listaActualizada = [...listaActualizada, ...interconsultasFormateadas];
+                    // Si hay interconsultas con nomenclatura, agregarlas al final de la lista
+                    if (interconsultasConNomenclatura.length > 0) {
+                        const interconsultasFormateadas = interconsultasConNomenclatura.map((item) => ({
+                            nombre: `INTERCONSULTA - ${item.especialidad}`,
+                            resultado: true,
+                            imprimir: true,
+                            tabla: item.nomenclatura,
+                            nomenclatura: item.nomenclatura,
+                        }));
+
+                        // Agregar interconsultas al final de la lista
+                        listaActualizada = [...listaActualizada, ...interconsultasFormateadas];
+                    }
                 }
             }
         } catch (error) {
@@ -116,6 +123,7 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
                         ? {
                             ...examen,
                             resultado: true,
+                            imprimir: true,
                             url: response.mensaje,
                         }
                         : examen

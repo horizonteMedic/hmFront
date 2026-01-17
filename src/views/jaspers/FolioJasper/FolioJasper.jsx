@@ -3,7 +3,7 @@ import { getFetch } from "../../utils/apiHelpers";
 import { reportesMap } from "./reportesMap";
 import { PDFDocument } from "pdf-lib";
 
-export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null) {
+export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType) {
     const pdfFinal = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
 
     const reportesConHorizontal = [
@@ -18,7 +18,6 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "ELECTROCARDIOGRAMA",
         "OFTALMOLOGIA VISION TESTER",
         "DECLARACION USO FIRMA",
-        "PSICOSENSOMETRICO",
         "PSICOSENSOMETRICO VEHI-FOLIO",
         "INTERCONSULTA",
         "INTERCONSULTA 2",
@@ -27,7 +26,12 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "INTERCONSULTA 5"
     ];
 
-    const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true);
+    const jaspersConOpcionMultiple = [
+        "informe_electrocardiograma",
+        "resumen_medico_poderosa"
+    ]
+
+    const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true && ex.imprimir === true);
     //const examenesFiltrados = ListaExamenes; //SOLO ACTIVAR PARA PRUEBAS 
     const totalReportes = examenesFiltrados.length;
 
@@ -42,6 +46,29 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
 
     // Variable para rastrear la última página generada
     let ultimaPaginaGenerada = 0;
+
+    // Ejecutar todas las consultas a los endpoints en paralelo
+    const resultadosFetch = await Promise.all(
+        examenesFiltrados.map(async (examen) => {
+            if (archivos.includes(examen.tabla)) {
+                return null;
+            }
+
+            const apiUrl = examen.esJasper
+                ? `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}&esJasper=true`
+                : examen.nameConset ?
+                    `${examen.url}?nOrden=${nro}&nameConset=${examen.tabla}`
+                    : `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}`;
+
+            try {
+                const data = await getFetch(apiUrl, token);
+                return data || null;
+            } catch (err) {
+                console.error("Error cargando:", examen.nombre, err);
+                return null;
+            }
+        })
+    );
 
     for (let i = 0; i < examenesFiltrados.length; i++) {
         const examen = examenesFiltrados[i];
@@ -59,17 +86,13 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             continue;
         }
 
-
-        const apiUrl = examen.esJasper
-            ? `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}&esJasper=true`
-            : examen.nameConset ?
-                `${examen.url}?nOrden=${nro}&nameConset=${examen.tabla}`
-                : `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}`;
+        const data = resultadosFetch[i];
+        if (!data) {
+            console.warn("No se recibieron datos para:", examen.nombre);
+            continue;
+        }
 
         try {
-            const data = await getFetch(apiUrl, token);
-            if (!data) continue;
-
             // Medir tamaño ANTES de agregar el reporte
             const pesoAntes = pdfFinal.output('arraybuffer').byteLength;
 
@@ -91,10 +114,9 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
                 }
             }
 
-            //const generarReporte = reportesMap[examen.tabla];
             let generador = null;
 
-            if (examen.tabla === "resumen_medico_poderosa") {
+            if (jaspersConOpcionMultiple.some(item => item == examen.tabla)) {
                 generador = reportesMap[examen.tabla][data.nameJasper];
             } else {
                 generador = reportesMap[examen.tabla];
@@ -110,7 +132,6 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             if (generadorFinal) {
                 // pdfFinal.save("folio.pdf");
                 await generadorFinal(data, pdfFinal);
-
             } else {
                 console.warn("No existe generador para:", examen.tabla);
             }
@@ -138,9 +159,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             if (onProgress) {
                 onProgress(i + 1, totalReportes, porcentaje, examen.nombre);
             }
-
         } catch (err) {
-            console.error("Error cargando:", examen.nombre, err);
+            console.error("Error generando reporte para:", examen.nombre, err);
         }
     }
 
@@ -170,12 +190,36 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
     // 📄 Generar PDF final con todos los PDFs externos en sus posiciones correctas
     let pdfFinalBytes;
 
+    //VALIDACION OHLA
+    console.log("pdfsExternos.length", pdfsExternos.length)
+    if (selectedListType === "OHLA") {
+        const existeOftalmo = pdfsExternos.some(pd => pd.examen.tabla === "OFTALMOLOGIA VISION TESTER");
+        console.log("existeOftalmoexisteOftalmo:", existeOftalmo);
+        const existePsico = pdfsExternos.some(pd => pd.examen.tabla === "PSICOSENSOMETRICO VEHI-FOLIO");
+        console.log("existePsicoexistePsico:", existePsico)
+        if (existeOftalmo && existePsico) {
+            const indexOftalmo = pdfsExternos.findIndex(pd => pd.examen.tabla === "OFTALMOLOGIA VISION TESTER");
+            if (indexOftalmo !== -1) {
+                pdfsExternos.splice(indexOftalmo, 1);
+            }
+        }
+    }
+    console.log("pdfsExternos.length2", pdfsExternos.length)
+
     if (pdfsExternos.length > 0) {
         console.log(`📎 Insertando ${pdfsExternos.length} PDF(s) externo(s) en el orden correcto...`);
 
         // Convertir jsPDF a PDFDocument
         const baseBytes = pdfFinal.output("arraybuffer");
         let basePdf = await PDFDocument.load(baseBytes);
+
+        //si es una pagina en blanco la elimina
+        if (estadisticasPeso.length === 0) {
+            const totalPages = basePdf.getPages().length;
+            if (totalPages === 1) {
+                basePdf.removePage(0);
+            }
+        }
 
         // Contador de páginas insertadas para ajustar posiciones
         let paginasInsertadasAcumuladas = 0;
