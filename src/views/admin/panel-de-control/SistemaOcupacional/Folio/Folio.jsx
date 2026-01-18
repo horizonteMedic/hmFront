@@ -1,6 +1,6 @@
 import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import FolioJasper from "../../../../jaspers/FolioJasper/FolioJasper";
@@ -981,7 +981,7 @@ const ExamenesListAlturaSolo = buildExamenesList([ // ALTURA SOLO
     "DECLARACION_USO_FIRMA_ARCHIVO",
     "INTERCONSULTAS"
 ]);
-{/**/}
+{/**/ }
 
 
 const ListaPorPlantilla = {
@@ -991,32 +991,33 @@ const ListaPorPlantilla = {
     OHLA3: ExamenesListOHLA3,
     CAMPANA: ExamenesListCAMPANA,
     PRUEBAS: ExamenesListPRUEBAS,
-    // SUMMAGOLD: ExamenesListSummaGold,
-    // SMMOT: ExamenesListSmmot,
-    // RETIRO_LA_ARENA: ExamenesListRetiroLaArena,
-    // RETIRO_SUMMAGOLD: ExamenesListRetiroSummaGold,
-    // PSICOSENSOMETRICO_SOLO: ExamenesListPsicosensometricoSolo,
-    // PROSEGURIDAD_BASICO: ExamenesListProseguridadBasico,
-    // PODEROSA_SOLO_CONDUCCION: ExamenesListPoderosaSoloConduccion,
-    // PODEROSA_SOLO_ALTURA: ExamenesListPoderosaSoloAltura,
-    // PODEROSA_RETIRO: ExamenesListPoderosaRetiro,
-    // PODEROSA_BASICO: ExamenesListPoderosaBasico,
-    // MINEROS_DEL_NORTE: ExamenesListMinerosDelNorte,
-    // MARSA_CONDUCCION: ExamenesListMarsaSoloConduccion,
-    // MARSA_ALTURA: ExamenesListMarsaSoloAltura,
-    // MARSA_BASICO: ExamenesListMarsaBasico,
-    // LA_ARENA_ALTURA: ExamenesListLaArenaSoloAltura,
-    // LA_ARENA_ALTURA_CONDUCCION: ExamenesListLaArenaAlturaConduccion,
-    // K2: ExamenesListK2,
-    // BORO_Altura_EKG: ExamenesListBorooAlturaEKG,
-    // BORO_Altura_NO_EKG: ExamenesListBorooAlturaSinEKG,
-    // BORO_Altura_CONDUCCION: ExamenesListBorooAlturaConduccion,
-    // BESALCO_SOLO: ExamenesListBesalcoSolo,
-    // ALTURA_SOLO: ExamenesListAlturaSolo,
+    SUMMAGOLD: ExamenesListSummaGold,
+    SMMOT: ExamenesListSmmot,
+    RETIRO_LA_ARENA: ExamenesListRetiroLaArena,
+    RETIRO_SUMMAGOLD: ExamenesListRetiroSummaGold,
+    PSICOSENSOMETRICO_SOLO: ExamenesListPsicosensometricoSolo,
+    PROSEGURIDAD_BASICO: ExamenesListProseguridadBasico,
+    PODEROSA_SOLO_CONDUCCION: ExamenesListPoderosaSoloConduccion,
+    PODEROSA_SOLO_ALTURA: ExamenesListPoderosaSoloAltura,
+    PODEROSA_RETIRO: ExamenesListPoderosaRetiro,
+    PODEROSA_BASICO: ExamenesListPoderosaBasico,
+    MINEROS_DEL_NORTE: ExamenesListMinerosDelNorte,
+    MARSA_CONDUCCION: ExamenesListMarsaSoloConduccion,
+    MARSA_ALTURA: ExamenesListMarsaSoloAltura,
+    MARSA_BASICO: ExamenesListMarsaBasico,
+    LA_ARENA_ALTURA: ExamenesListLaArenaSoloAltura,
+    LA_ARENA_ALTURA_CONDUCCION: ExamenesListLaArenaAlturaConduccion,
+    K2: ExamenesListK2,
+    BORO_Altura_EKG: ExamenesListBorooAlturaEKG,
+    BORO_Altura_NO_EKG: ExamenesListBorooAlturaSinEKG,
+    BORO_Altura_CONDUCCION: ExamenesListBorooAlturaConduccion,
+    BESALCO_SOLO: ExamenesListBesalcoSolo,
+    ALTURA_SOLO: ExamenesListAlturaSolo,
 
 };
 
 const Folio = () => {
+    const abortControllerRef = useRef(null);
     const today = getToday();
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
     const [selectedListType, setSelectedListType] = useState("OHLA");
@@ -1092,6 +1093,14 @@ const Folio = () => {
     };
 
     const handleGenerarFolio = async () => {
+        // Cancelar petición anterior si existe
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+        }
+        
+        const controller = new AbortController();
+        abortControllerRef.current = controller;
+
         // Mostrar alerta de carga con barra de progreso
         Swal.fire({
             title: 'Generando Folio',
@@ -1110,8 +1119,15 @@ const Folio = () => {
             allowOutsideClick: false,
             allowEscapeKey: false,
             showConfirmButton: false,
+            showCancelButton: true,
+            cancelButtonText: 'Cancelar',
+            cancelButtonColor: '#d33',
             didOpen: () => {
                 Swal.showLoading();
+            }
+        }).then((result) => {
+            if (result.dismiss === Swal.DismissReason.cancel) {
+                controller.abort();
             }
         });
 
@@ -1137,7 +1153,7 @@ const Folio = () => {
             };
 
             // Llamar a FolioJasper con el callback de progreso
-            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress, selectedListType);
+            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress, selectedListType, controller.signal);
 
             // Cerrar la alerta de carga y mostrar éxito
             Swal.fire({
@@ -1148,6 +1164,10 @@ const Folio = () => {
                 showConfirmButton: false
             });
         } catch (error) {
+            if (error.name === 'AbortError' || error.message === 'Aborted') {
+                Swal.fire('Cancelado', 'La generación del folio ha sido cancelada.', 'info');
+                return;
+            }
             console.error('Error generando folio:', error);
             Swal.fire({
                 icon: 'error',

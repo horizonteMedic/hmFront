@@ -7,7 +7,9 @@ import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
-export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType) {
+export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType, signal) {
+    if (signal?.aborted) throw new DOMException("Aborted", "AbortError");//para poder cancelar la gereracion
+
     const pdfFinal = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true, precision: 1 });
 
     const reportesConHorizontal = [
@@ -66,7 +68,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
                     : `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}`;
 
             try {
-                const data = await getFetch(apiUrl, token);
+                const data = await getFetch(apiUrl, token, signal);
                 return data || null;
             } catch (err) {
                 console.error("Error cargando:", examen.nombre, err);
@@ -76,6 +78,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
     );
 
     for (let i = 0; i < examenesFiltrados.length; i++) {
+        if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
         const examen = examenesFiltrados[i];
 
         // ⚠️ Si el examen está en el array "archivos", NO se consulta - se insertará el PDF externo
@@ -235,6 +238,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         // Insertar PDFs externos en ORDEN NORMAL (del primero al último)
         // Ajustamos las posiciones considerando las inserciones previas
         for (let i = 0; i < pdfsExternos.length; i++) {
+            if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
             const pdfExt = pdfsExternos[i];
             const { examen, posicionInsercion } = pdfExt;
 
@@ -244,7 +248,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             console.log(`📌 Insertando ${examen.nombre} (${examen.tabla}) en posición ${posicionAjustada} (original: ${posicionInsercion}, ajuste: +${paginasInsertadasAcumuladas})`);
 
             // Cargar el PDF externo
-            const externoBytes = await fetch(examen.url).then(r => r.arrayBuffer());
+            const externoBytes = await fetch(examen.url, { signal }).then(r => r.arrayBuffer());
 
             // 📊 Mostrar tamaño del PDF externo
             const tamañoExternoKB = (externoBytes.byteLength / 1024).toFixed(2);
