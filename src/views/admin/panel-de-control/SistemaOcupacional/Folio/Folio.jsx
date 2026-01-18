@@ -15,7 +15,7 @@ const ExamenesListPRUEBAS2 = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "INTERCONSULTAS",
+    "PSICOSENSOMETRICO_CERT_ALTURA",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -38,6 +38,7 @@ const ExamenesListCAMPANA = buildExamenesList([ // Campaña
     "INFORME_PSICOLOGICO",           // 17
     "OFTALMOLOGIA",                  // 18
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",      // 19
+    "DECLARACION_USO_FIRMA_ARCHIVO"                            // 20 nuevo
 ]);
 
 const ExamenesListOHLA = buildExamenesList([       //OHLA
@@ -45,7 +46,7 @@ const ExamenesListOHLA = buildExamenesList([       //OHLA
     "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",    // 2
     "ANEXO_16",                                // 3
     "CERTIFICADO_ALTURA",                      // 4
-    "OFTALMOLOGIA_VISION_TESTER",              // 5
+    "OFTALMOLOGIA_VISION_TESTER",              // 5 no se mostrara si existe  PSICOSENSOMETRICO_VEHI_FOLIO 
     "CERTIFICADO_VEHICULOS",                   // 6
     "FICHA_SAS",                               // 7
     "PSICOSENSOMETRICO_VEHI_FOLIO",            // 8
@@ -424,7 +425,7 @@ const ExamenesListPoderosaSoloAltura = buildExamenesList([ // PODEROSA SOLO ALTU
     "DECLARACION_USO_FIRMA_ARCHIVO",
     "INTERCONSULTAS"
 ]);
-{/*
+
 const ExamenesListPoderosaRetiro = buildExamenesList([ // PODEROSA RETIRO
     "RESUMEN_MEDICO_PODEROSA",
     "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
@@ -477,8 +478,8 @@ const ExamenesListPoderosaBasico = buildExamenesList([ // PODEROSA BASICO
 
     "OIT",
 
-    "RADIOGRAFIA_COLUMNA",
-    "RADIOGRAFIA_COLUMNA_ARCHIVO",
+    "ELECTROCARDIOGRAMA",
+    "ELECTROCARDIOGRAMA_ARCHIVO",
     "ESPIROMETRIA_ARCHIVO",
     "AUDIOMETRIA_OHLA",
     "CUESTIONARIO_AUDIOMETRIA",
@@ -760,7 +761,7 @@ const ExamenesListK2 = buildExamenesList([ // K2
 
     "FICHA_AUDIOMETRIA",
 
-    "TEST_FATIGA_SOMNOLENCIA",
+    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
 
     "INFORME_PSICOLOGICO",
     // "INFORME_MAPEO",
@@ -810,7 +811,7 @@ const ExamenesListBorooAlturaEKG = buildExamenesList([ // BOROO ALTURA + EKG
 
     "ODONTOGRAMA",
 
-    "TEST_FATIGA_SOMNOLENCIA",
+    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
 
     "INFORME_PSICOLOGICO",
     "INFORME_PSICOLABORAL",
@@ -856,7 +857,7 @@ const ExamenesListBorooAlturaSinEKG = buildExamenesList([ // BOROO ALTURA SIN EK
 
     "ODONTOGRAMA",
 
-    "TEST_FATIGA_SOMNOLENCIA",
+    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
 
     "INFORME_PSICOLOGICO",
     "INFORME_PSICOLABORAL",
@@ -906,7 +907,7 @@ const ExamenesListBorooAlturaConduccion = buildExamenesList([ // BOROO ALTURA + 
 
     "ODONTOGRAMA",
 
-    "TEST_FATIGA_SOMNOLENCIA",
+    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
 
     "INFORME_PSICOLOGICO",
     "INFORME_PSICOLABORAL",
@@ -916,7 +917,8 @@ const ExamenesListBorooAlturaConduccion = buildExamenesList([ // BOROO ALTURA + 
     "FICHA_OFTALMOLOGICA",
 
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
-    "DECLARACION_USO_FIRMA_ARCHIVO"
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
 ]);
 
 const ExamenesListBesalcoSolo = buildExamenesList([ // BESALCO SOLO
@@ -957,13 +959,13 @@ const ExamenesListBesalcoSolo = buildExamenesList([ // BESALCO SOLO
     "OFTALMOLOGIA_VISION_TESTER",
 
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
-    "DECLARACION_USO_FIRMA_ARCHIVO"
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
 ]);
 
 const ExamenesListAlturaSolo = buildExamenesList([ // ALTURA SOLO
     "CERTIFICADO_ALTURA",
     "PSICOSENSOMETRICO_CERT_ALTURA",
-
 
     "LABORATORIO_CLINICO",
     "PERFIL_LIPIDICO",
@@ -976,9 +978,10 @@ const ExamenesListAlturaSolo = buildExamenesList([ // ALTURA SOLO
     "OFTALMOLOGIA",
     "OFTALMOLOGIA_VISION_TESTER",
 
-    "DECLARACION_USO_FIRMA_ARCHIVO"
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
 ]);
-*/}
+{/**/}
 
 
 const ListaPorPlantilla = {

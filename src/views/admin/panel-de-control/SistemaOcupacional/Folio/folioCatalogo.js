@@ -2,23 +2,10 @@ export const EXAMENES_CATALOGO = {
     /* =========================
        GENERALES / BASE
     ========================= */
-    RESUMEN_MEDICO_PODEROSA: {
-        nombre: "RESUMEN MEDICO",
-        tabla: "resumen_medico_poderosa",
-        url: "/api/v01/ct/anexos/obtenerReporteResumenMedico",
-    },
-
-    CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL: {
-        nombre: "CONSTANCIA DE EXAMEN MEDICO OCUPACIONAL",
-        tabla: "certificado_aptitud_medico_resumen",
-        url: "/api/v01/ct/certificadoAptitudMedicoOcupacional/obtenerReporteCertificadoMedicoOcupacional",
-        esJasper: true,
-    },
-
-    CERTIFICADO_APTITUD_ANEXO_16: {
-        nombre: "CERTIFICADO DE APTITUD ANEXO 16",
-        tabla: "certificado_aptitud_medico_ocupacional",
-        url: "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16",
+    ANEXO_02: {
+        nombre: "ANEXO 02",
+        tabla: "anexo_agroindustrial",
+        url: "/api/v01/ct/anexos/anexo2/obtenerReporteAnexo2Completo",
         esJasper: true,
     },
 
@@ -35,11 +22,11 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
-    ANEXO_02: {
-        nombre: "ANEXO 02",
-        tabla: "anexo_agroindustrial",
-        url: "/api/v01/ct/anexos/anexo2/obtenerReporteAnexo2Completo",
-        esJasper: true,
+    ANTECEDENTES_PATOLOGICOS: {
+        nombre: "ANTECEDENTES PATOLOGICOS",
+        tabla: "antecedentes_patologicos",
+        url: "/api/v01/ct/antecedentesPatologicos/obtenerReporteAntecedentesPatologicos",
+        esJasper: true
     },
 
     CERTIFICADO_ANEXO_02: {
@@ -49,11 +36,18 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
-    ANTECEDENTES_PATOLOGICOS: {
-        nombre: "ANTECEDENTES PATOLOGICOS",
-        tabla: "antecedentes_patologicos",
-        url: "/api/v01/ct/antecedentesPatologicos/obtenerReporteAntecedentesPatologicos",
-        esJasper: true
+    CERTIFICADO_APTITUD_ANEXO_16: {
+        nombre: "CERTIFICADO DE APTITUD ANEXO 16",
+        tabla: "certificado_aptitud_medico_ocupacional",
+        url: "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16",
+        esJasper: true,
+    },
+
+    CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL: {
+        nombre: "CONSTANCIA DE EXAMEN MEDICO OCUPACIONAL",
+        tabla: "certificado_aptitud_medico_resumen",
+        url: "/api/v01/ct/certificadoAptitudMedicoOcupacional/obtenerReporteCertificadoMedicoOcupacional",
+        esJasper: true,
     },
 
     CUESTIONARIO_NORDICO: {
@@ -68,6 +62,12 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/evaluacionMusculoEsqueletica/obtenerReporteEvaluacionMusculoEsqueletica"
     },
 
+    RESUMEN_MEDICO_PODEROSA: {
+        nombre: "RESUMEN MEDICO",
+        tabla: "resumen_medico_poderosa",
+        url: "/api/v01/ct/anexos/obtenerReporteResumenMedico",
+    },
+
     /* =========================
        ALTURA / VEHÍCULOS
     ========================= */
@@ -77,16 +77,25 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/certificadoTrabajoAltura/obtenerReporteCertificadoTrabajoAltura",
         esJasper: true,
     },
+
     CERTIFICADO_ALTURA_PODEROSA: {
         nombre: "CERTIFICADO ALTURA PODEROSA",
         tabla: "certificado_altura_poderosa",
         url: "/api/v01/ct/certificadoTrabajoAltura/obtenerReporteCertificadoTrabajoAlturaPoderosa",
         esJasper: true,
     },
+
     CERTIFICADO_APTITUD_ALTURA_PODEROSA: {
         nombre: "CERTIFICADO APTITUD ALTURA PODEROSA",
         tabla: "aptitud_altura_poderosa",
         url: "/api/v01/ct/aptitudAltura/obtenerReporteAptitudAlturaPoderosa",
+        esJasper: true,
+    },
+
+    CERTIFICADO_VEHICULOS: {
+        nombre: "CERTIFICADO VEHICULOS",
+        tabla: "b_certificado_conduccion",
+        url: "/api/v01/ct/certificadoConduccion/obtenerReporteCertificadoConduccion",
         esJasper: true,
     },
 
@@ -96,11 +105,17 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/antecedentesEnfermedadesAltura/obtenerReporteAntecedentesEnfermedadesAltura"
     },
 
-    CERTIFICADO_VEHICULOS: {
-        nombre: "CERTIFICADO VEHICULOS",
-        tabla: "b_certificado_conduccion",
-        url: "/api/v01/ct/certificadoConduccion/obtenerReporteCertificadoConduccion",
-        esJasper: true,
+    FICHA_SAS: {
+        nombre: "FICHA SAS",
+        tabla: "ficha_sas",
+        url: "/api/v01/ct/fichaApneaSueno/obtenerReporteFichaSas",
+        esJasper: true
+    },
+
+    HISTORIA_OCUPACIONAL: {
+        nombre: "HISTORIA OCUPACIONAL",
+        tabla: "historia_oc_info",
+        url: "/api/v01/ct/historiaOcupacional/obtenerReporteHistoriaOcupacional"
     },
 
     HOJA_DE_CONSULTA_EXTERNA: {
@@ -123,21 +138,33 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
-    HISTORIA_OCUPACIONAL: {
-        nombre: "HISTORIA OCUPACIONAL",
-        tabla: "historia_oc_info",
-        url: "/api/v01/ct/historiaOcupacional/obtenerReporteHistoriaOcupacional"
-    },
-
-    FICHA_SAS: {
-        nombre: "FICHA SAS",
-        tabla: "ficha_sas",
-        url: "/api/v01/ct/fichaApneaSueno/obtenerReporteFichaSas",
-        esJasper: true
-    },
     /* =========================
        ARCHIVOS EXTERNOS
     ========================= */
+    DECLARACION_USO_FIRMA_ARCHIVO: {
+        nombre: "DECLARACION USO FIRMA",
+        tabla: "DECLARACION USO FIRMA",
+        nomenclatura: "DECLARACION USO FIRMA",
+    },
+
+    ELECTROCARDIOGRAMA_ARCHIVO: {
+        nombre: "ELECTROCARDIOGRAMA ARCHIVO",
+        tabla: "ELECTROCARDIOGRAMA",
+        nomenclatura: "ELECTROCARDIOGRAMA",
+    },
+
+    ESPIROMETRIA_ARCHIVO: {
+        nombre: "ESPIROMETRIA",
+        tabla: "ESPIROMETRIA",
+        nomenclatura: "ESPIROMETRIA",
+    },
+
+    INTERCONSULTAS: {
+        nombre: "INTERCONSULTAS",
+        tabla: "",
+        url: "",
+    },
+
     OFTALMOLOGIA_VISION_TESTER: {
         nombre: "OFTALMOLOGIA VISION TESTER",
         tabla: "OFTALMOLOGIA VISION TESTER",
@@ -156,49 +183,44 @@ export const EXAMENES_CATALOGO = {
         nomenclatura: "PSICOSENSOMETRICO VEHI-FOLIO",
     },
 
-    RAYOS_X_TORAX_ARCHIVO: {
-        nombre: "RAYOS X TORAX ARCHIVO",
-        tabla: "RAYOS X TORAX",
-        nomenclatura: "RAYOS X TORAX",
-    },
-
     RADIOGRAFIA_COLUMNA_ARCHIVO: {
         nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA) ARCHIVO",
         tabla: "INFORME RADIOGRAFICO",
         nomenclatura: "INFORME RADIOGRAFICO",
     },
 
-    ELECTROCARDIOGRAMA_ARCHIVO: {
-        nombre: "ELECTROCARDIOGRAMA ARCHIVO",
-        tabla: "ELECTROCARDIOGRAMA",
-        nomenclatura: "ELECTROCARDIOGRAMA",
-    },
-
-    DECLARACION_USO_FIRMA_ARCHIVO: {
-        nombre: "DECLARACION USO FIRMA",
-        tabla: "DECLARACION USO FIRMA",
-        nomenclatura: "DECLARACION USO FIRMA",
-    },
-
-    ESPIROMETRIA_ARCHIVO: {
-        nombre: "ESPIROMETRIA",
-        tabla: "ESPIROMETRIA",
-        nomenclatura: "ESPIROMETRIA",
-    },
-
-    INTERCONSULTAS: {
-        nombre: "INTERCONSULTAS",
-        tabla: "",
-        url: "",
+    RAYOS_X_TORAX_ARCHIVO: {
+        nombre: "RAYOS X TORAX ARCHIVO",
+        tabla: "RAYOS X TORAX",
+        nomenclatura: "RAYOS X TORAX",
     },
 
     /* =========================
        LABORATORIO
     ========================= */
+    GONADOTROPINA: {
+        nombre: "INMUNOLOGIA - GENODOTROPINA",
+        tabla: "lgonadotropina",
+        url: "/api/v01/ct/inmunologia/obtenerReporteLgonadotropina",
+    },
+
     LABORATORIO_CLINICO: {
         nombre: "LABORATORIO CLINICO",
         tabla: "lab_clinico",
         url: "/api/v01/ct/laboratorio/obtenerReporteLaboratorioClinico",
+    },
+
+    PANEL_5D: {
+        nombre: "PANEL 5D",
+        tabla: "toxicologia",
+        url: "/api/v01/ct/toxicologia/obtenerReportePanel5D",
+        esJasper: true,
+    },
+
+    PERFIL_HEPATICO: {
+        nombre: "ANALISIS BIOQUIMICOS - PERFIL HEPÁTICO",
+        tabla: "perfil_hepatico",
+        url: "/api/v01/ct/analisisBioquimico/obtenerReportePerfilHepatico",
     },
 
     PERFIL_LIPIDICO: {
@@ -213,54 +235,21 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/analisisBioquimico/obtenerReportePerfilRenal",
     },
 
-    PERFIL_HEPATICO: {
-        nombre: "ANALISIS BIOQUIMICOS - PERFIL HEPÁTICO",
-        tabla: "perfil_hepatico",
-        url: "/api/v01/ct/analisisBioquimico/obtenerReportePerfilHepatico",
-    },
-
-    GONADOTROPINA: {
-        nombre: "INMUNOLOGIA - GENODOTROPINA",
-        tabla: "lgonadotropina",
-        url: "/api/v01/ct/inmunologia/obtenerReporteLgonadotropina",
-    },
-
-    PANEL_5D: {
-        nombre: "PANEL 5D",
-        tabla: "toxicologia",
-        url: "/api/v01/ct/toxicologia/obtenerReportePanel5D",
-        esJasper: true,
-    },
-
     /* =========================
        CONSENTIMIENTOS
     ========================= */
-    CONSENT_MUESTRA_SANGRE: {
-        nombre: "CONSENTIMIENTO DE MUESTRA DE SANGRE",
-        tabla: "consent_Muestra_Sangre",
-        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
-        nameConset: true,
+    CONSENT_BUENA_SALUD: {
+        nombre: "CONSENTIMIENTO BUENA SALUD",
+        tabla: "consentimientobuenasalud",
+        url: "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoBuenaSalud",
+        esJasper: true
     },
 
-    CONSENT_PANEL_5D: {
-        nombre: "CONSENTIMIENTO PANEL 5D",
-        tabla: "con_panel5D",
-        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
-        nameConset: true,
-    },
-
-    CONSENT_MARIHUANA: {
-        nombre: "CONSENTIMIENTO DE MARIHUANA",
-        tabla: "consent_marihuana",
-        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
-        nameConset: true,
-    },
-
-    CONSENT_PANEL_2D: {
-        nombre: "CONSENTIMIENTO PANEL 2D",
-        tabla: "con_panel2D",
-        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
-        nameConset: true,
+    CONSENT_DECLARACION_APTITUD: {
+        nombre: "CONSENTIMIENTO DECLARACIÓN DE INFORMACION APTITUD MEDICO OCUPACIONAL",
+        tabla: "DECLA_INFO_APTITUD_MO",
+        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
+        esJasper: true
     },
 
     CONSENT_DROGAS_BOROO: {
@@ -277,24 +266,32 @@ export const EXAMENES_CATALOGO = {
         esJasper: true
     },
 
-    CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL: {
-        nombre: "CONSENTIMIENTO INFORMADO EXAMEN MEDICO OCUPACIONAL",
-        tabla: "consentimientoInformado",
-        url: "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoInformado"
+    CONSENT_MARIHUANA: {
+        nombre: "CONSENTIMIENTO DE MARIHUANA",
+        tabla: "consent_marihuana",
+        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
+        nameConset: true,
     },
 
-    DECLARACION_JURADA_ANTECEDENTES: {
-        nombre: "DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS Y FAMILIARES",//NUEVO OPTIMIZAR //11 REVISAR Declaración Jurada de Antecedentes Personales
-        tabla: "DECLA_JURA_ANTECE_PERSON_FAM",
-        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
-        esJasper: true
+    CONSENT_MUESTRA_SANGRE: {
+        nombre: "CONSENTIMIENTO DE MUESTRA DE SANGRE",
+        tabla: "consent_Muestra_Sangre",
+        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
+        nameConset: true,
     },
 
-    CONSENT_DECLARACION_APTITUD: {
-        nombre: "CONSENTIMIENTO DECLARACIÓN DE INFORMACION APTITUD MEDICO OCUPACIONAL",
-        tabla: "DECLA_INFO_APTITUD_MO",
-        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
-        esJasper: true
+    CONSENT_PANEL_2D: {
+        nombre: "CONSENTIMIENTO PANEL 2D",
+        tabla: "con_panel2D",
+        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
+        nameConset: true,
+    },
+
+    CONSENT_PANEL_5D: {
+        nombre: "CONSENTIMIENTO PANEL 5D",
+        tabla: "con_panel5D",
+        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
+        nameConset: true,
     },
 
     CONSENT_SINTOMATICO_RESPIRATORIO: {
@@ -304,44 +301,32 @@ export const EXAMENES_CATALOGO = {
         esJasper: true
     },
 
+    CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL: {
+        nombre: "CONSENTIMIENTO INFORMADO EXAMEN MEDICO OCUPACIONAL",
+        tabla: "consentimientoInformado",
+        url: "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoInformado"
+    },
 
-    CONSENT_BUENA_SALUD: {
-        nombre: "CONSENTIMIENTO BUENA SALUD",
-        tabla: "consentimientobuenasalud",
-        url: "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoBuenaSalud",
+    DECLARACION_JURADA_ANTECEDENTES: {
+        nombre: "DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS Y FAMILIARES",
+        tabla: "DECLA_JURA_ANTECE_PERSON_FAM",
+        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
         esJasper: true
     },
 
     /* =========================
        EXÁMENES MÉDICOS
     ========================= */
-    OIT: {
-        nombre: "OIT",
-        tabla: "oit",
-        url: "/api/v01/ct/oit/obtenerReporteOit",
+    AUDIOMETRIA_OHLA: {
+        nombre: "FICHA AUDIOLOGICA OHLA",
+        tabla: "audiometria_po",
+        url: "/api/v01/ct/audiometria/obtenerReporteAudiometriaM",
     },
 
-    OFTALMOLOGIA: {
-        nombre: "OFTALMOLOGIA",
-        tabla: "oftalmologia2021",
-        url: "/api/v01/ct/agudezaVisual/obtenerReporteEvaluacionOftalmologica",
-    },
-    FICHA_OFTALMOLOGICA: {
-        nombre: "FICHA OFTALMOLOGICA",
-        tabla: "oftalmologia",
-        url: "/api/v01/ct/agudezaVisual/obtenerReporteOftalmologia"
-    },
-
-    RADIOGRAFIA_TORAX: {
-        nombre: "RADIOGRAFIA TORAX",
-        tabla: "radiografia_torax",
-        url: "/api/v01/ct/rayosX/obtenerReporteRadiografiaTorax",
-    },
-
-    RADIOGRAFIA_COLUMNA: {
-        nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA)",
-        tabla: "radiografia",
-        url: "/api/v01/ct/rayosX/obtenerReporteInformeRadiografico",
+    CUESTIONARIO_AUDIOMETRIA: {
+        nombre: "CUESTIONARIO AUDIOMETRIA",
+        tabla: "cuestionario_audiometria",
+        url: "/api/v01/ct/audiometria/obtenerReporteCuestionarioAudiometria",
     },
 
     ELECTROCARDIOGRAMA: {
@@ -351,28 +336,46 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
-    AUDIOMETRIA_OHLA: {
-        nombre: "FICHA AUDIOLOGICA OHLA",
-        tabla: "audiometria_po",
-        url: "/api/v01/ct/audiometria/obtenerReporteAudiometriaM",
-    },
-
     FICHA_AUDIOMETRIA: {
         nombre: "FICHA AUDIOMETRIA",
         tabla: "audiometria_2023",
         url: "/api/v01/ct/manipuladores/obtenerReporteAudiometria",
     },
 
-    CUESTIONARIO_AUDIOMETRIA: {
-        nombre: "CUESTIONARIO AUDIOMETRIA",
-        tabla: "cuestionario_audiometria",
-        url: "/api/v01/ct/audiometria/obtenerReporteCuestionarioAudiometria",
+    FICHA_OFTALMOLOGICA: {
+        nombre: "FICHA OFTALMOLOGICA",
+        tabla: "oftalmologia",
+        url: "/api/v01/ct/agudezaVisual/obtenerReporteOftalmologia"
     },
 
     ODONTOGRAMA: {
         nombre: "ODONTROGRAMA",
         tabla: "odontograma",
         url: "/api/v01/ct/odontograma/obtenerReporteOdontograma",
+    },
+
+    OFTALMOLOGIA: {
+        nombre: "OFTALMOLOGIA",
+        tabla: "oftalmologia2021",
+        url: "/api/v01/ct/agudezaVisual/obtenerReporteEvaluacionOftalmologica",
+    },
+
+    OIT: {
+        nombre: "OIT",
+        tabla: "oit",
+        url: "/api/v01/ct/oit/obtenerReporteOit",
+    },
+
+    RADIOGRAFIA_COLUMNA: {
+        nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA)",
+        tabla: "radiografia",
+        url: "/api/v01/ct/rayosX/obtenerReporteInformeRadiografico",
+    },
+
+    RADIOGRAFIA_TORAX: {
+        nombre: "RADIOGRAFIA TORAX",
+        tabla: "radiografia_torax",
+        url: "/api/v01/ct/rayosX/obtenerReporteRadiografiaTorax",
     },
 
     TEST_FATIGA_SOMNOLENCIA: {
@@ -384,69 +387,6 @@ export const EXAMENES_CATALOGO = {
     /* =========================
        PSICOLOGÍA
     ========================= */
-    PSICOLOGIA_ANEXO_02: {
-        nombre: "PSICOLOGIA ANEXO 02",
-        tabla: "ficha_psicologica_anexo02",
-        url: "/api/v01/ct/psicologia/obtenerFichaPsicologiaAnexo02",
-        esJasper: true,
-    },
-
-    PSICOLOGIA_ANEXO_03: {
-        nombre: "PSICOLOGIA ANEXO 03",
-        tabla: "ficha_psicologica_anexo03",
-        url: "/api/v01/ct/psicologia/obtenerFichaPsicologiaAnexo03",
-        esJasper: true,
-    },
-
-    INFORME_PSICOLOGICO: {
-        nombre: "INFORME PSICOLOGICO",
-        tabla: "informe_psicologico",
-        url: "/api/v01/ct/informePsicologico/obtenerReporteInformePsicologico",
-        esJasper: true,
-    },
-
-    INFORME_PSICOLOGIA_FOBIAS: {
-        nombre: "INFORME PSICOLOGIA FOBIAS",
-        tabla: "fobias",
-        url: "/api/v01/ct/fobias/obtenerReporte",
-        esJasper: true,
-    },
-
-    INFORME_PSICOLABORAL: {
-        nombre: "INFORME PSICOLABORAL",
-        tabla: "informe_psicolaboral",
-        url: "/api/v01/ct/informePsicolaboral/obtenerReporteInformePsicolaboral",
-        esJasper: true,
-    },
-
-    INFORME_PODEROSA_OPERAR: {
-        nombre: "INFORME PSICOLOGICO DE PODEROSA LICENCIA PARA OPERAR",
-        tabla: "evaluacion_psicologica_poderosa",
-        url: "/api/v01/ct/evaluacionPsicologicaPoderosa/obtenerReporteEvaluacionPsicologicaPoderosa",
-        esJasper: true,
-    },
-
-    TRABAJO_ESPECIFICOS: {
-        nombre: "TRABAJOS EN ESPECIFICOS",
-        tabla: "especificos",
-        url: "/api/v01/ct/trabajoEspecifico/obtenerReporteTrabajosEspecificos",
-        esJasper: true,
-    },
-
-    TRABAJO_ALTURA_PSICO: {
-        nombre: "TRABAJO EN ALTURA PSICOLOGIA",
-        tabla: "psicologiafobias",
-        url: "/api/v01/ct/informePsicologicoFobias/obtenerReporteInformePsicologicoFobias",
-        esJasper: true,
-    },
-
-    ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA: {
-        nombre: "TEST DE ESTRES FATIGA Y SOMNOLENCIA PSICOLOGIA",
-        tabla: "informe_psicologico_estres",
-        url: "/api/v01/ct/informePsicologicoAdeco/obtenerReporteInformePsicologicoAdeco",
-        esJasper: true,
-    },
-
     CUESTIONARIO_BERLIN: {
         nombre: "CUESTIONARIO BERLIN",
         tabla: "cuestionario_berlin",
@@ -468,13 +408,77 @@ export const EXAMENES_CATALOGO = {
         esJasper: true
     },
 
+    ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA: {
+        nombre: "TEST DE ESTRES FATIGA Y SOMNOLENCIA PSICOLOGIA",
+        tabla: "informe_psicologico_estres",
+        url: "/api/v01/ct/informePsicologicoAdeco/obtenerReporteInformePsicologicoAdeco",
+        esJasper: true
+    },
+
     EXAMENES_COMPLEMENTARIOS: {
         nombre: "EXAMENES COMPLEMENTARIOS",
         tabla: "exam_complementarios",
         url: "/api/v01/ct/examenComplementario/obtenerReporte",
         esJasper: true
-    }
+    },
+
+    INFORME_PODEROSA_OPERAR: {
+        nombre: "INFORME PSICOLOGICO DE PODEROSA LICENCIA PARA OPERAR",
+        tabla: "evaluacion_psicologica_poderosa",
+        url: "/api/v01/ct/evaluacionPsicologicaPoderosa/obtenerReporteEvaluacionPsicologicaPoderosa",
+        esJasper: true,
+    },
+
+    INFORME_PSICOLOGIA_FOBIAS: {
+        nombre: "INFORME PSICOLOGIA FOBIAS",
+        tabla: "fobias",
+        url: "/api/v01/ct/fobias/obtenerReporte",
+        esJasper: true,
+    },
+
+    INFORME_PSICOLABORAL: {
+        nombre: "INFORME PSICOLABORAL",
+        tabla: "informe_psicolaboral",
+        url: "/api/v01/ct/informePsicolaboral/obtenerReporteInformePsicolaboral",
+        esJasper: true,
+    },
+
+    INFORME_PSICOLOGICO: {
+        nombre: "INFORME PSICOLOGICO",
+        tabla: "informe_psicologico",
+        url: "/api/v01/ct/informePsicologico/obtenerReporteInformePsicologico",
+        esJasper: true,
+    },
+
+    PSICOLOGIA_ANEXO_02: {
+        nombre: "PSICOLOGIA ANEXO 02",
+        tabla: "ficha_psicologica_anexo02",
+        url: "/api/v01/ct/psicologia/obtenerFichaPsicologiaAnexo02",
+        esJasper: true,
+    },
+
+    PSICOLOGIA_ANEXO_03: {
+        nombre: "PSICOLOGIA ANEXO 03",
+        tabla: "ficha_psicologica_anexo03",
+        url: "/api/v01/ct/psicologia/obtenerFichaPsicologiaAnexo03",
+        esJasper: true,
+    },
+
+    TRABAJO_ALTURA_PSICO: {
+        nombre: "TRABAJO EN ALTURA PSICOLOGIA",
+        tabla: "psicologiafobias",
+        url: "/api/v01/ct/informePsicologicoFobias/obtenerReporteInformePsicologicoFobias",
+        esJasper: true,
+    },
+
+    TRABAJO_ESPECIFICOS: {
+        nombre: "TRABAJOS EN ESPECIFICOS",
+        tabla: "especificos",
+        url: "/api/v01/ct/trabajoEspecifico/obtenerReporteTrabajosEspecificos",
+        esJasper: true,
+    },
 };
+
 
 const EXAMEN_DEFAULT = {
     resultado: false,

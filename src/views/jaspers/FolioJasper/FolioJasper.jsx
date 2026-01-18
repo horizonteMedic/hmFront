@@ -421,40 +421,13 @@ async function sellarEspirometria(pdfBytes) {
     return await pdfDoc.save();
 }
 
-// async function rasterizeAndCompressPdf(pdfBytes) {
-//     const loadingTask = pdfjsLib.getDocument({ data: pdfBytes });
-//     const pdf = await loadingTask.promise;
-//     const mmPerPt = 25.4 / 72;
-
-//     let doc = null;
-//     const numPages = pdf.numPages;
-//     for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-//         const page = await pdf.getPage(pageNum);
-//         const vp = page.getViewport({ scale: 1.7});
-//         const pageWidthMm = vp.width * mmPerPt;
-//         const pageHeightMm = vp.height * mmPerPt;
-//         const orientation = pageWidthMm >= pageHeightMm ? "landscape" : "portrait";
-//         if (!doc) {
-//             doc = new jsPDF({ unit: "mm", format: [pageWidthMm, pageHeightMm], orientation, compress: true, precision: 1 });
-//         } else {
-//             doc.addPage([pageWidthMm, pageHeightMm], orientation);
-//         }
-//         const canvas = document.createElement("canvas");
-//         const ctx = canvas.getContext("2d");
-//         canvas.width = vp.width;
-//         canvas.height = vp.height;
-//         await page.render({ canvasContext: ctx, viewport: vp }).promise;
-//         const imgData = canvas.toDataURL("image/jpeg", 0.92);
-//         doc.addImage(imgData, "JPEG", 0, 0, pageWidthMm, pageHeightMm, undefined, "FAST");
-//     }
-//     return doc.output("arraybuffer");
-// }
-
 async function rasterizeAndCompressPdf(pdfBytes) {
     const loadingTask = pdfjsLib.getDocument({ data: pdfBytes });
     const pdf = await loadingTask.promise;
 
     const mmPerPt = 25.4 / 72;
+    const A4_WIDTH_MM = 210;
+    const A4_HEIGHT_MM = 297;
     const SCALE = 2.3;           // 🔥 DPI alto para texto nítido
     const JPEG_QUALITY = 0.65;   // 🔥 Compresión fuerte sin borrosidad
 
@@ -468,16 +441,30 @@ async function rasterizeAndCompressPdf(pdfBytes) {
         const pageHeightMm = viewport.height * mmPerPt;
         const orientation = pageWidthMm >= pageHeightMm ? "landscape" : "portrait";
 
+        const targetWidthMm = orientation === "landscape" ? A4_HEIGHT_MM : A4_WIDTH_MM;
+        const targetHeightMm = orientation === "landscape" ? A4_WIDTH_MM : A4_HEIGHT_MM;
+
+        const scaleFactor = Math.min(
+            targetWidthMm / pageWidthMm,
+            targetHeightMm / pageHeightMm
+        );
+
+        const drawWidthMm = pageWidthMm * scaleFactor;
+        const drawHeightMm = pageHeightMm * scaleFactor;
+
+        const offsetX = (targetWidthMm - drawWidthMm) / 2;
+        const offsetY = (targetHeightMm - drawHeightMm) / 2;
+
         if (!doc) {
             doc = new jsPDF({
                 unit: "mm",
-                format: [pageWidthMm, pageHeightMm],
+                format: "a4",
                 orientation,
                 compress: true,
                 precision: 2
             });
         } else {
-            doc.addPage([pageWidthMm, pageHeightMm], orientation);
+            doc.addPage("a4", orientation);
         }
 
         const canvas = document.createElement("canvas");
@@ -500,10 +487,10 @@ async function rasterizeAndCompressPdf(pdfBytes) {
         doc.addImage(
             imgData,
             "JPEG",
-            0,
-            0,
-            pageWidthMm,
-            pageHeightMm
+            offsetX,
+            offsetY,
+            drawWidthMm,
+            drawHeightMm
         );
     }
 

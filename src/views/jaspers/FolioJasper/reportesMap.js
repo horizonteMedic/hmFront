@@ -60,61 +60,128 @@ import InformePsicoExamComplementario from "../ModuloPsicologia/InformePsicoExam
 import CertificadoAlturaPoderosa_Digitalizado from "../CertificadoAlturaPoderosa/CertificadoAlturaPoderosa_Digitalizado";
 import TestFatigaSomnolenia_Digitalizado_boro from "../Test_Fatiga/TestFatigaSomnolenia_Digitalizado_boro";
 
-// Agrega aquí todos tus reportes
-export const ekgMap = {
-    InformeElectrocardiograma2023,
-    InformeElectrocardiograma_Digitalizado
-};
-
 export const reportesMap = {
+    /* =========================
+       GENERALES / BASE
+    ========================= */
+    anexo_agroindustrial: InformePsicologico_Anexo02_Nuevo,
+
+    anexo7c: Anexo7C_Antiguo,
+
+    anexo16a: Anexo16A_Digitalizado,
+
+    antecedentes_patologicos: ficha_antecedente_patologico_Digitalizado,
+
+    aptitud_medico_ocupacional_agro: Aptitud_AgroindustrialH,
+
+    certificado_aptitud_medico_ocupacional: Aptitud_Agroindustrial,
+
+    certificado_aptitud_medico_resumen: Aptitud_medico_resumen_Digitalizado,
+
+    cuestionario_nordico: CuestionarioNordico,
+
+    evaluacion_musculo_esqueletica: EvaluacionMuscoloEsqueletica,
+
     resumen_medico_poderosa: {
         ResumenAnexo7C_OHLA_Digitalizado,
         ResumenAnexo7CP_Digitalizado
     },
-    certificado_aptitud_medico_resumen: Aptitud_medico_resumen_Digitalizado,
-    certificado_aptitud_medico_ocupacional: Aptitud_Agroindustrial,
-    anexo7c: Anexo7C_Antiguo,
-    //ficha aptitud anexo 2
-    aptitud_medico_ocupacional_agro: Aptitud_AgroindustrialH,
-    //ANEXO 02 
-    anexo_agroindustrial: InformePsicologico_Anexo02_Nuevo,
-    //
-    antece_enfermedades_altura: GenerarDatosPaciente,
-    anexo16a: Anexo16A_Digitalizado,
-    //Certificado en Alutra
+
+    /* =========================
+       ALTURA / VEHÍCULOS
+    ========================= */
     b_certificado_altura: Certificacion_suficiencia_trabajos_en_altura_boro_Digitalizado,
-    //Cetificado de aptitud altura poderosa
-    aptitud_altura_poderosa: Aptitud_Poderosa_Digitalizado,
+
     certificado_altura_poderosa: CertificadoAlturaPoderosa_Digitalizado,
-    //Certificado vehiculos
+
+    aptitud_altura_poderosa: Aptitud_Poderosa_Digitalizado,
+
+    antece_enfermedades_altura: GenerarDatosPaciente,
+
     b_certificado_conduccion: Certificaciondeconduccion_Digitalizado,
-    //FICHA SAS 
+
     ficha_sas: B_FichaDetencionSAS2,
-    //AptitudLicenciaConducir
+
     aptitud_licencia_conduciri: Aptitud_Licencia_Conducir_Interna_Digitalizado,
-    //Hoja Consulta Externa
+
     hoja_consulta_externa: Hoja_Consulta_Externa,
-    test_fatiga_somnolencia: TestFatigaSomnolenia_Digitalizado_boro,
-    //DECLARACION ANTECEDENTES PATOLOGICOS
-    DECLA_JURA_ANTECE_PERSON_FAM: ConsentAdmisionDeclacionAntecePatologicos,
-    //CONSENTIMIENTO MUESTRA DE SANGER
-    consent_Muestra_Sangre: Consentimiento_Muestra_Sangre_Digitalizado,
-    //INMUNOLOGIA GENODOTROPINA
+
+    b_uso_respiradores: UsoRespiradores,
+
+    historia_oc_info: HistoriaOcupacional_Digitalizado,
+
+    /* =========================
+       LABORATORIO
+    ========================= */
     lgonadotropina: LGonadotropina_Digitalizado,
-    //CONST LABORATORIOS
-    consent_marihuana: Consentimiento_Marihuana_Digitalizado,
-    con_panel2D: Consentimiento_Panel2D_Digitalizado,
-    con_panel5D: Consentimiento_Panel5D_ohla_Digitalizado,
+
+    lab_clinico: LaboratorioClinico_Digitalizado_nuevo,
+
+    toxicologia: ResultadosPanel5d_Digitalizado,
+
+    perfil_hepatico: PerfilHepatico_Digitalizado,
+
+    analisis_bioquimicos: AnalisisBioquimicos_Digitalizado,
+
+    l_bioquimica: LBioquimica_Digitalizado,
+
+    /* =========================
+       CONSENTIMIENTOS
+    ========================= */
+    consentimientobuenasalud: ConsentimientoBuenaSalud2021_Digitalizado,
+
+    DECLA_INFO_APTITUD_MO: ConsentAdmisionInformacionAptitudMedicoOcupacional,
+
     consent_Boro: Consentimiento_Boro_Digitalizado,
-    //RADIOGRAFIA
-    radiografia: RAYOSXXXOFI_Digitalizado,
-    //audiometria
-    audiometria_2023: Audiometria2021_Digitalizado,
-    //Cuestionario audiometria
+
+    CONSENT_INFORMADO_MEDICA: Consent_Admision_EvaluacionMedica,
+
+    consent_marihuana: Consentimiento_Marihuana_Digitalizado,
+
+    consent_Muestra_Sangre: Consentimiento_Muestra_Sangre_Digitalizado,
+
+    con_panel2D: Consentimiento_Panel2D_Digitalizado,
+
+    con_panel5D: Consentimiento_Panel5D_ohla_Digitalizado,
+
+    CONSENT_SINTOMATICO: Consent_Admision_DeclaracionSintomaticoRespiratorio,
+
+    DECLA_JURA_ANTECE_PERSON_FAM: ConsentAdmisionDeclacionAntecePatologicos,
+
+    consentimientoInformado: conInformadoOcupacional_Digitalizado,
+
+    /* =========================
+       EXÁMENES MÉDICOS
+    ========================= */
+    audiometria_po: FichaAudiologica_Digitalizado,
+
     cuestionario_audiometria: CuestionarioAudiometria_Digitalizado,
-    //INTERCONSULTA
-    //ODONTOGRAMA
+
+    informe_electrocardiograma: {
+        InformeElectrocardiograma2023,
+        InformeElectrocardiograma_Digitalizado
+    },
+
+    audiometria_2023: Audiometria2021_Digitalizado,
+
+    oftalmologia: Oftalmologia,
+
     odontograma: Odontograma_Digitalizado,
+
+    oftalmologia2021: EvaluacionOftalmologica2021_Digitalizado,
+
+    oit: OIT_Digitalizado,
+
+    radiografia: RAYOSXXXOFI_Digitalizado,
+
+    radiografia_torax: RagiografiaToraxPA_Digitalizado,
+
+    test_fatiga_somnolencia: TestFatigaSomnolenia_Digitalizado_boro,
+
+    /* =========================
+       PSICOLOGÍA
+    ========================= */
+    cuestionario_berlin: Informe_Psico_Cuestionario_Berlin,
 
     ficha_psicologica_anexo03: FichaPsicologicaOcupacional_Digitalizado,
 
@@ -126,46 +193,14 @@ export const reportesMap = {
 
     fobias: INFORME_ADICIONAL_DE_FOBIAS_Digitalizado,
 
-    cuestionario_berlin: Informe_Psico_Cuestionario_Berlin,
-
     informe_psicolaboral: Informe_PsicolaboralBoroo_Digitalizado,
 
     especificos: TRABAJOS_EN_ESPECIFICO_Digitalizado,
 
     psicologiafobias: formatPsicologia_Digitalizado,
 
-    oftalmologia2021: EvaluacionOftalmologica2021_Digitalizado,
-
-    CONSENT_SINTOMATICO: Consent_Admision_DeclaracionSintomaticoRespiratorio,
-
-    CONSENT_INFORMADO_MEDICA: Consent_Admision_EvaluacionMedica,
-
-    consentimientobuenasalud: ConsentimientoBuenaSalud2021_Digitalizado,
-    DECLA_INFO_APTITUD_MO: ConsentAdmisionInformacionAptitudMedicoOcupacional,
-
-    b_uso_respiradores: UsoRespiradores,
-    historia_oc_info: HistoriaOcupacional_Digitalizado,
-    antecedentes_patologicos: ficha_antecedente_patologico_Digitalizado,
-    cuestionario_nordico: CuestionarioNordico,
-    evaluacion_musculo_esqueletica: EvaluacionMuscoloEsqueletica,
-    lab_clinico: LaboratorioClinico_Digitalizado_nuevo,
-    analisis_bioquimicos: AnalisisBioquimicos_Digitalizado,
-    perfil_hepatico: PerfilHepatico_Digitalizado,
-
-    l_bioquimica: LBioquimica_Digitalizado,
-
-    toxicologia: ResultadosPanel5d_Digitalizado,
-
-    oit: OIT_Digitalizado,
-    radiografia_torax: RagiografiaToraxPA_Digitalizado,
-    informe_electrocardiograma: {
-        InformeElectrocardiograma2023,
-        InformeElectrocardiograma_Digitalizado
-    },
-    exam_complementarios: InformePsicoExamComplementario,
-    audiometria_po: FichaAudiologica_Digitalizado,
     informe_psicologico: InformePsicologico_Digitalizado,
-    oftalmologia: Oftalmologia,
-    consentimientoInformado: conInformadoOcupacional_Digitalizado
-    // ...
+
+    exam_complementarios: InformePsicoExamComplementario,
+
 };

@@ -1,11 +1,7 @@
 import Swal from "sweetalert2";
 import {
     GetInfoPacDefault,
-    GetInfoServicioDefault,
     LoadingDefault,
-    PrintHojaRDefault,
-    SubmitDataServiceDefault,
-    VerifyTRDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
