@@ -421,31 +421,91 @@ async function sellarEspirometria(pdfBytes) {
     return await pdfDoc.save();
 }
 
+// async function rasterizeAndCompressPdf(pdfBytes) {
+//     const loadingTask = pdfjsLib.getDocument({ data: pdfBytes });
+//     const pdf = await loadingTask.promise;
+//     const mmPerPt = 25.4 / 72;
+
+//     let doc = null;
+//     const numPages = pdf.numPages;
+//     for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+//         const page = await pdf.getPage(pageNum);
+//         const vp = page.getViewport({ scale: 1.7});
+//         const pageWidthMm = vp.width * mmPerPt;
+//         const pageHeightMm = vp.height * mmPerPt;
+//         const orientation = pageWidthMm >= pageHeightMm ? "landscape" : "portrait";
+//         if (!doc) {
+//             doc = new jsPDF({ unit: "mm", format: [pageWidthMm, pageHeightMm], orientation, compress: true, precision: 1 });
+//         } else {
+//             doc.addPage([pageWidthMm, pageHeightMm], orientation);
+//         }
+//         const canvas = document.createElement("canvas");
+//         const ctx = canvas.getContext("2d");
+//         canvas.width = vp.width;
+//         canvas.height = vp.height;
+//         await page.render({ canvasContext: ctx, viewport: vp }).promise;
+//         const imgData = canvas.toDataURL("image/jpeg", 0.92);
+//         doc.addImage(imgData, "JPEG", 0, 0, pageWidthMm, pageHeightMm, undefined, "FAST");
+//     }
+//     return doc.output("arraybuffer");
+// }
+
 async function rasterizeAndCompressPdf(pdfBytes) {
     const loadingTask = pdfjsLib.getDocument({ data: pdfBytes });
     const pdf = await loadingTask.promise;
+
     const mmPerPt = 25.4 / 72;
+    const SCALE = 2.3;           // 🔥 DPI alto para texto nítido
+    const JPEG_QUALITY = 0.65;   // 🔥 Compresión fuerte sin borrosidad
 
     let doc = null;
-    const numPages = pdf.numPages;
-    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
         const page = await pdf.getPage(pageNum);
-        const vp = page.getViewport({ scale: 1.5 });
-        const pageWidthMm = vp.width * mmPerPt;
-        const pageHeightMm = vp.height * mmPerPt;
+        const viewport = page.getViewport({ scale: SCALE });
+
+        const pageWidthMm = viewport.width * mmPerPt;
+        const pageHeightMm = viewport.height * mmPerPt;
         const orientation = pageWidthMm >= pageHeightMm ? "landscape" : "portrait";
+
         if (!doc) {
-            doc = new jsPDF({ unit: "mm", format: [pageWidthMm, pageHeightMm], orientation, compress: true, precision: 1 });
+            doc = new jsPDF({
+                unit: "mm",
+                format: [pageWidthMm, pageHeightMm],
+                orientation,
+                compress: true,
+                precision: 2
+            });
         } else {
             doc.addPage([pageWidthMm, pageHeightMm], orientation);
         }
+
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-        canvas.width = vp.width;
-        canvas.height = vp.height;
-        await page.render({ canvasContext: ctx, viewport: vp }).promise;
-        const imgData = canvas.toDataURL("image/jpeg", 0.90);
-        doc.addImage(imgData, "JPEG", 0, 0, pageWidthMm, pageHeightMm, undefined, "FAST");
+
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+
+        await page.render({
+            canvasContext: ctx,
+            viewport
+        }).promise;
+
+        const imgData = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
+
+        // ❌ NO usar FAST → destruye texto
+        doc.addImage(
+            imgData,
+            "JPEG",
+            0,
+            0,
+            pageWidthMm,
+            pageHeightMm
+        );
     }
+
     return doc.output("arraybuffer");
 }

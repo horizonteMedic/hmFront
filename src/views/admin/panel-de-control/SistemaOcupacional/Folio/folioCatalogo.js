@@ -263,15 +263,22 @@ export const EXAMENES_CATALOGO = {
         nameConset: true,
     },
 
-    CONSENT_DROGAS_BORO: {
+    CONSENT_DROGAS_BOROO: {
         nombre: "CONSENTIMIENTO DROGAS BOROO",
         tabla: "consent_Boro",
         url: "/api/v01/ct/laboratorio/consentimientoLaboratorioBoro",
         nameConset: true,
     },
 
-    CONSENTIMIENTO_INFORMADO: {
-        nombre: "CONSENTIMIENTO INFORMADO ",
+    CONSENT_INFORMADO_EVALUACION_MEDICA: {
+        nombre: "CONSENTIMIENTO INFORMADO DE EVALUACION MEDICA",
+        tabla: "CONSENT_INFORMADO_MEDICA",
+        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
+        esJasper: true
+    },
+
+    CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL: {
+        nombre: "CONSENTIMIENTO INFORMADO EXAMEN MEDICO OCUPACIONAL",
         tabla: "consentimientoInformado",
         url: "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoInformado"
     },
@@ -297,12 +304,6 @@ export const EXAMENES_CATALOGO = {
         esJasper: true
     },
 
-    CONSENT_INFORMADO: {
-        nombre: "CONSENTIMIENTO INFORMADO DE EVALUACION MEDICA",
-        tabla: "CONSENT_INFORMADO_MEDICA",
-        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
-        esJasper: true
-    },
 
     CONSENT_BUENA_SALUD: {
         nombre: "CONSENTIMIENTO BUENA SALUD",

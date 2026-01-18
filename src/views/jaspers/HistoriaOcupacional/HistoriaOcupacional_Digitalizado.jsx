@@ -3,7 +3,7 @@ import jsPDF from "jspdf";
 import header_HistoriaOcupacional from "./Header/HistoriaOcupacionalHeader";
 import footerEnHeader from "./footerEnHeader";
 import autoTable from "jspdf-autotable";
-import { getSignCompressed } from "../../utils/helpers.js";
+import { getSignCompressed, compressImage } from "../../utils/helpers.js";
 // --- Configuración Centralizada (Estándar) ---
 const config = {
   margin: 15,
@@ -30,6 +30,8 @@ export default async function HistoriaOcupacional_Digitalizado(
     orientation: "landscape",
   });
   const pageW = doc.internal.pageSize.getWidth();
+  const logoHistoriaOcup = await compressImage("/img/logo-color.webp");
+  const datosHeader = { ...datos, logoHistoriaOcup };
   const getAñoInicial = (fecha) => {
     const match = fecha?.match(/\d{4}/);
     return match ? parseInt(match[0], 10) : Infinity;
@@ -114,7 +116,7 @@ export default async function HistoriaOcupacional_Digitalizado(
     ],
   };
   // === HEADER ===
-  await header_HistoriaOcupacional(doc, datos);
+  await header_HistoriaOcupacional(doc, datosHeader);
   console.log(tabla)
   // Obtener firmas comprimidas (JPEG por defecto)
   // getSignCompressed toma el objeto de datos completo, ya que internamente accede a data.digitalizacion
@@ -272,10 +274,7 @@ export default async function HistoriaOcupacional_Digitalizado(
       lineColor: [0, 0, 0],
     },
     didDrawPage: (data) => {
-      // Agrega el header personalizado en cada página
-      header_HistoriaOcupacional(doc, datos);
-
-      // Modifica el startY si estás en una nueva página
+      header_HistoriaOcupacional(doc, datosHeader);
       if (data.pageNumber > 1) {
         data.settings.margin.top = 53;
       }
@@ -304,14 +303,11 @@ export default async function HistoriaOcupacional_Digitalizado(
 
   const pageHeight = doc.internal.pageSize.getHeight();
 
-  // Si no cabe el bloque de firmas, agrega página antes de imprimirlas
   if (pageHeight - finalY < totalRequired) {
-    doc.addPage(); // 🟡 CREA LA NUEVA HOJA
-
-    await header_HistoriaOcupacional(doc, datos); // 🔵 REDIBUJA EL HEADER EN LA NUEVA HOJA
-
-    const newY = 53; // 👈 Usa 53 para mantener consistencia con el resto del documento
-    finalY = newY; // ✅ Ajusta para que la firma comience debajo del header
+    doc.addPage();
+    await header_HistoriaOcupacional(doc, datosHeader);
+    const newY = 53;
+    finalY = newY;
   }
 
   const signatureTop = finalY + spacingAfterTable;
