@@ -6,6 +6,7 @@ import {
   faSave,
   faBroom,
   faPrint,
+  faDownload,
 } from "@fortawesome/free-solid-svg-icons";
 import { getFetch } from "../../getFetch/getFetch";
 import Parenquimatosas from "./Parenquimatosas/Parenquimatosas";
@@ -13,12 +14,15 @@ import Pleurales from "./Pleurales/Pleurales";
 import Engrosamiento from "./Engrosamiento/Engrosamiento";
 import { useState } from "react";
 import {
+  handleSubirArchivo,
   PrintHojaR,
   PrintHojaSinDatos,
+  ReadArchivosForm,
   SubmitOIT,
   VerifyTR,
 } from "./controller/OIT_controller";
 import Swal from "sweetalert2";
+import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
 const tabla = "oit";
 const date = new Date();
 const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
@@ -207,9 +211,12 @@ const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
     chk_28: false,
     chk_29: false,
     txtSComentarios: "",
-    opcionSComentario:"",
+    opcionSComentario: "",
     //
     SinDatos: false,
+
+    SubirDoc: false,
+    nomenclatura: "OIT FOLIO"
   });
 
   const handleClean = () => {
@@ -390,7 +397,10 @@ const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
       chk_28: false,
       chk_29: false,
       txtSComentarios: "",
-      opcionSComentario:""
+      opcionSComentario: "",
+
+      SubirDoc: false,
+      nomenclatura: "OIT FOLIO"
     });
   };
   console.log(form);
@@ -617,7 +627,9 @@ const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
       chk_28: false,
       chk_29: false,
       txtSComentarios: "",
-      opcionSComentario:""
+      opcionSComentario: "",
+      SubirDoc: false,
+      nomenclatura: "OIT FOLIO"
     }));
   };
 
@@ -662,6 +674,8 @@ const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
       });
     }
   };
+
+  const [visualerOpen, setVisualerOpen] = useState(null)
 
   return (
     <div className="">
@@ -803,6 +817,12 @@ const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
               {/* <span className="text-sm text-gray-500 mt-1 mr-4">
                 Día - Mes - Año
               </span> */}
+              {form.SubirDoc &&
+                <ButtonsPDF
+                  handleSave={() => { handleSubirArchivo(form, selectedSede, userlogued, token) }}
+                  handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token) }}
+                />
+              }
             </div>
           </div>
         </div>
@@ -813,17 +833,34 @@ const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
             <button
               key={idx}
               onClick={() => setActiveTab(idx)}
-              className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none flex items-center whitespace-nowrap ${
-                activeTab === idx
-                  ? "bg-[#233245] text-white font-bold"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
+              className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none flex items-center whitespace-nowrap ${activeTab === idx
+                ? "bg-[#233245] text-white font-bold"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
             >
               <FontAwesomeIcon icon={tab.icon} className="mr-2" />
               {tab.label}
             </button>
           ))}
         </div>
+        {visualerOpen && (
+          <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+            <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
+              <div className="px-4 py-2 naranjabackgroud flex justify-between">
+                <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
+                <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+              </div>
+              <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
+                <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
+              </div>
+              <div className="flex justify-center">
+                <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                  <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Active Content */}
         <div className="border border-gray-200 border-t-0 p-4 bg-white rounded-b-lg text-lg">

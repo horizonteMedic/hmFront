@@ -30,12 +30,11 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "INTERCONSULTA 2",
         "INTERCONSULTA 3",
         "INTERCONSULTA 4",
-        "INTERCONSULTA 5"
     ];
 
     const jaspersConOpcionMultiple = [
         "informe_electrocardiograma",
-        "resumen_medico_poderosa"
+        "resumen_medico_poderosa",
     ]
 
     const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true && ex.imprimir === true);

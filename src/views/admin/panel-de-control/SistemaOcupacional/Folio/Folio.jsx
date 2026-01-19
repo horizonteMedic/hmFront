@@ -13,9 +13,28 @@ const ExamenesListPRUEBAS2 = buildExamenesList([
     "OFTALMOLOGIA_VISION_TESTER",
     "PSICOSENSOMETRICO_VEHI_FOLIO",
 ]);
+const ExamenesListPRUEBASArchivos = buildExamenesList([
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "ELECTROCARDIOGRAMA_ARCHIVO",
+    "ESPIROMETRIA_ARCHIVO",   //Tiene firma
+    "OFTALMOLOGIA_VISION_TESTER",//Tiene firma
+    "PSICOSENSOMETRICO_CERT_ALTURA", //Tiene firma
+    "PSICOSENSOMETRICO_VEHI_FOLIO", //Tiene firma
+    "RADIOGRAFIA_COLUMNA_ARCHIVO",
+    "RAYOS_X_TORAX_ARCHIVO",
+    "INTERCONSULTAS"
+]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "PSICOSENSOMETRICO_CERT_ALTURA",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "ELECTROCARDIOGRAMA_ARCHIVO",
+    "ESPIROMETRIA_ARCHIVO",   //Tiene firma
+    "OFTALMOLOGIA_VISION_TESTER",//Tiene firma
+    "PSICOSENSOMETRICO_CERT_ALTURA", //Tiene firma
+    "PSICOSENSOMETRICO_VEHI_FOLIO", //Tiene firma
+    "RADIOGRAFIA_COLUMNA_ARCHIVO",
+    "RAYOS_X_TORAX_ARCHIVO",
+    "INTERCONSULTAS"
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -709,7 +728,7 @@ const ExamenesListLaArenaAlturaConduccion = buildExamenesList([ // LA ARENA ALTU
     "ANTECEDENTES_PATOLOGICOS",
     "DECLARACION_JURADA_ANTECEDENTES",
     "CUESTIONARIO_NORDICO",
-    "EVALUACION_MUSCULO_ESQUELETICA",
+    "EVALUACION_MUSCULO_ESQUELETICA_BOROO",
 
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
@@ -744,7 +763,7 @@ const ExamenesListK2 = buildExamenesList([ // K2
     "HISTORIA_OCUPACIONAL",
     "ANTECEDENTES_PATOLOGICOS",
     "CUESTIONARIO_NORDICO",
-    "EVALUACION_MUSCULO_ESQUELETICA",
+    "EVALUACION_MUSCULO_ESQUELETICA_BOROO",
 
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
@@ -791,7 +810,7 @@ const ExamenesListBorooAlturaEKG = buildExamenesList([ // BOROO ALTURA + EKG
     "DECLARACION_JURADA_ANTECEDENTES",
 
     "CUESTIONARIO_NORDICO",
-    "EVALUACION_MUSCULO_ESQUELETICA",
+    "EVALUACION_MUSCULO_ESQUELETICA_BOROO",
 
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
@@ -840,7 +859,7 @@ const ExamenesListBorooAlturaSinEKG = buildExamenesList([ // BOROO ALTURA SIN EK
     "DECLARACION_JURADA_ANTECEDENTES",
 
     "CUESTIONARIO_NORDICO",
-    "EVALUACION_MUSCULO_ESQUELETICA",
+    "EVALUACION_MUSCULO_ESQUELETICA_BOROO",
 
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
@@ -890,7 +909,7 @@ const ExamenesListBorooAlturaConduccion = buildExamenesList([ // BOROO ALTURA + 
     "DECLARACION_JURADA_ANTECEDENTES",
 
     "CUESTIONARIO_NORDICO",
-    "EVALUACION_MUSCULO_ESQUELETICA",
+    "EVALUACION_MUSCULO_ESQUELETICA_BOROO",
 
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
@@ -985,34 +1004,34 @@ const ExamenesListAlturaSolo = buildExamenesList([ // ALTURA SOLO
 
 
 const ListaPorPlantilla = {
+    PRUEBAS: ExamenesListPRUEBAS,
+    CAMPANA: ExamenesListCAMPANA,
     OHLA: ExamenesListOHLA,
     OHLA1: ExamenesListOHLA1,
     OHLA2: ExamenesListOHLA2,
     OHLA3: ExamenesListOHLA3,
-    CAMPANA: ExamenesListCAMPANA,
-    PRUEBAS: ExamenesListPRUEBAS,
     SUMMAGOLD: ExamenesListSummaGold,
     SMMOT: ExamenesListSmmot,
-    RETIRO_LA_ARENA: ExamenesListRetiroLaArena,
-    RETIRO_SUMMAGOLD: ExamenesListRetiroSummaGold,
-    PSICOSENSOMETRICO_SOLO: ExamenesListPsicosensometricoSolo,
-    PROSEGURIDAD_BASICO: ExamenesListProseguridadBasico,
-    PODEROSA_SOLO_CONDUCCION: ExamenesListPoderosaSoloConduccion,
-    PODEROSA_SOLO_ALTURA: ExamenesListPoderosaSoloAltura,
-    PODEROSA_RETIRO: ExamenesListPoderosaRetiro,
-    PODEROSA_BASICO: ExamenesListPoderosaBasico,
-    MINEROS_DEL_NORTE: ExamenesListMinerosDelNorte,
-    MARSA_CONDUCCION: ExamenesListMarsaSoloConduccion,
-    MARSA_ALTURA: ExamenesListMarsaSoloAltura,
-    MARSA_BASICO: ExamenesListMarsaBasico,
-    LA_ARENA_ALTURA: ExamenesListLaArenaSoloAltura,
-    LA_ARENA_ALTURA_CONDUCCION: ExamenesListLaArenaAlturaConduccion,
-    K2: ExamenesListK2,
-    BORO_Altura_EKG: ExamenesListBorooAlturaEKG,
-    BORO_Altura_NO_EKG: ExamenesListBorooAlturaSinEKG,
-    BORO_Altura_CONDUCCION: ExamenesListBorooAlturaConduccion,
-    BESALCO_SOLO: ExamenesListBesalcoSolo,
-    ALTURA_SOLO: ExamenesListAlturaSolo,
+    "LA ARENA - RETIRO": ExamenesListRetiroLaArena,
+    "SUMMAGOLD - RETIRO ": ExamenesListRetiroSummaGold,
+    "PSICOSENSOMETRICO SOLO": ExamenesListPsicosensometricoSolo,
+    "PROSEGURIDAD - BASICO": ExamenesListProseguridadBasico,
+    "PODEROSA - CONDUCCION": ExamenesListPoderosaSoloConduccion,
+    "PODEROSA - ALTURA": ExamenesListPoderosaSoloAltura,
+    "PODEROSA - RETIRO": ExamenesListPoderosaRetiro,
+    "PODEROSA - BASICO": ExamenesListPoderosaBasico,
+    "MINEROS DEL NORTE": ExamenesListMinerosDelNorte,
+    "MARSA - CONDUCCION": ExamenesListMarsaSoloConduccion,
+    "MARSA - ALTURA": ExamenesListMarsaSoloAltura,
+    "MARSA - BASICO": ExamenesListMarsaBasico,
+    "LA ARENA - ALTURA": ExamenesListLaArenaSoloAltura,
+    "LA ARENA - ALTURA CONDUCCION": ExamenesListLaArenaAlturaConduccion,
+    "K2": ExamenesListK2,
+    "BOROO - ALTURA EKG": ExamenesListBorooAlturaEKG,
+    "BOROO -ALTURA NO EKG": ExamenesListBorooAlturaSinEKG,
+    "BOROO - ALTURA CONDUCCION": ExamenesListBorooAlturaConduccion,
+    "BESALCO - SOLO": ExamenesListBesalcoSolo,
+    "ALTURA - SOLO": ExamenesListAlturaSolo,
 
 };
 
@@ -1024,7 +1043,6 @@ const Folio = () => {
     const initialFormState = {
         norden: "",
         codigoInforme: null,
-        fechaEntrevista: today,
         nombreExamen: "",
         nombres: "",
         apellidos: "",
@@ -1047,12 +1065,9 @@ const Folio = () => {
     const {
         form,
         setForm,
-        handleChange,
         handleChangeNumber,
         handleClear,
-        handleRadioButtonBoolean,
         handleClearnotO,
-        handlePrintDefault,
     } = useForm(initialFormState, { storageKey: "Folio_KEY" });
 
     const handleSearch = (e) => {
@@ -1097,7 +1112,7 @@ const Folio = () => {
         if (abortControllerRef.current) {
             abortControllerRef.current.abort();
         }
-        
+
         const controller = new AbortController();
         abortControllerRef.current = controller;
 
@@ -1181,21 +1196,13 @@ const Folio = () => {
     return (
         <div className="w-full space-y-3 px-4">
             {/* ===== SECCIÓN: DATOS NECESARIOS ===== */}
-            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 <InputTextOneLine
                     label="N° Orden"
                     name="norden"
                     value={form.norden}
                     onKeyUp={handleSearch}
                     onChange={handleChangeNumber}
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Fecha Entrevista"
-                    name="fechaEntrevista"
-                    type="date"
-                    value={form.fechaEntrevista}
-                    onChange={handleChange}
                     labelWidth="120px"
                 />
                 <InputTextOneLine

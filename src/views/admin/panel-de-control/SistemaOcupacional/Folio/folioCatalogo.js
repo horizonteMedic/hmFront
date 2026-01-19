@@ -62,6 +62,12 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/evaluacionMusculoEsqueletica/obtenerReporteEvaluacionMusculoEsqueletica"
     },
 
+    EVALUACION_MUSCULO_ESQUELETICA_BOROO: {
+        nombre: "EVALUACION MUSCULO ESQUELETICA BOROO",
+        tabla: "evaluacion_musculo_esqueletica2021",
+        url: "/api/v01/ct/evaluacionMusculoEsqueletica/obtenerReporteEvaluacionMusculoEsqueletica2021"
+    },
+
     RESUMEN_MEDICO_PODEROSA: {
         nombre: "RESUMEN MEDICO",
         tabla: "resumen_medico_poderosa",

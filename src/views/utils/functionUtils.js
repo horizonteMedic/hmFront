@@ -446,16 +446,17 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
 
         const pdfBase64Final = uint8ToBase64(new Uint8Array(pdfBytesOptimizado));
 
-        const pdfBlob = new Blob([pdfBytesOptimizado], { type: "application/pdf" });
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        const link = document.createElement("a");
-        link.href = pdfUrl;
-        link.download = file.name; // o el nombre que tú quieras
-        document.body.appendChild(link);
-        link.click();
+        //DESCARGA INNECESARIA
+        // const pdfBlob = new Blob([pdfBytesOptimizado], { type: "application/pdf" });
+        // const pdfUrl = URL.createObjectURL(pdfBlob);
+        // const link = document.createElement("a");
+        // link.href = pdfUrl;
+        // link.download = file.name; // o el nombre que tú quieras
+        // document.body.appendChild(link);
+        // link.click();
 
-        document.body.removeChild(link);
-        URL.revokeObjectURL(pdfUrl);
+        // document.body.removeChild(link);
+        // URL.revokeObjectURL(pdfUrl);
 
         const datos = {
             rutaArchivo: null,

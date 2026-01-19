@@ -1,8 +1,8 @@
 import jsPDF from "jspdf";
 import headerEvaluacionMuscoloEsqueletica from "./Headers/Header_EvaluacionMuscoloEsqueletica2021_Digitalizado_boro.jsx";
 
-export default async function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
@@ -1370,18 +1370,7 @@ export default async function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro
 
   // === 4) FOOTER EN PÁGINA 2 ===
   footerTR(doc, data);
-
-  // === 2) Generar blob y abrir en iframe para imprimir automáticamente ===
-  // const blob = doc.output("blob");
-  // const url = URL.createObjectURL(blob);
-  // const iframe = document.createElement("iframe");
-  // iframe.style.display = "none";
-  // iframe.src = url;
-  // document.body.appendChild(iframe);
-  // iframe.onload = () => {
-  //   iframe.contentWindow.focus();
-  //   iframe.contentWindow.print();
-  // };
+  
   const firmasAPintar = [
     {
       nombre: "FIRMAP", x: margin + 25, y: margin + 215, maxw: 50
@@ -1396,9 +1385,12 @@ export default async function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro
 
   // Validar que data.informacionSede exista antes de acceder a sus propiedades
   const digitalizacion = data?.digitalizacion || [];
-  agregarFirmas(doc, digitalizacion, firmasAPintar).then(() => {
+  await agregarFirmas(doc, digitalizacion, firmasAPintar)
+  if (docExistente) {
+    return doc;
+  } else {
     imprimir(doc);
-  });
+  }
 }
 function footerTR(doc, datos) {
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -1516,3 +1508,4 @@ function agregarFirmas(doc, digitalizacion = [], firmasAPintar = []) {
 
   return Promise.all(promesasFirmas);
 }
+
