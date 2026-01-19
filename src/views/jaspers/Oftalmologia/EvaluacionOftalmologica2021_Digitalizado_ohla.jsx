@@ -2,14 +2,15 @@ import jsPDF from "jspdf";
 import header_EvaluacionOftalmologica2021_Digitalizado_ohla from "./headers/header_EvaluacionOftalmologica2021_Digitalizado_ohla.jsx";
 
 export default async function EvaluacionOftalmologica2021_Digitalizado_ohla(
-  data = {}
+  data = {},
+  docExistente = null
 ) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
 
   // 1) Header
-  header_EvaluacionOftalmologica2021_Digitalizado_ohla(doc, data);
+  await header_EvaluacionOftalmologica2021_Digitalizado_ohla(doc, data);
 
   // const datos = {
   //   // Evaluación Oftalmológica
@@ -888,9 +889,12 @@ export default async function EvaluacionOftalmologica2021_Digitalizado_ohla(
     { nombre: "SELLOFIRMA", x: 40, y: 238, maxw: 120 },
     { nombre: "SELLOFIRMADOCASIG", x: 90, y: 238, maxw: 150 },
   ];
-  agregarFirmas(doc, data.digitalizacion, firmasAPintar).then(() => {
+  await agregarFirmas(doc, data.digitalizacion, firmasAPintar);
+  if (docExistente) {
+    return doc;
+  } else {
     imprimir(doc);
-  });
+  }
 }
 
 function imprimir(doc) {
