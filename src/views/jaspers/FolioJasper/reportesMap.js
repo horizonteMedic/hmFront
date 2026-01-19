@@ -60,6 +60,7 @@ import InformePsicoExamComplementario from "../ModuloPsicologia/InformePsicoExam
 import CertificadoAlturaPoderosa_Digitalizado from "../CertificadoAlturaPoderosa/CertificadoAlturaPoderosa_Digitalizado";
 import TestFatigaSomnolenia_Digitalizado_boro from "../Test_Fatiga/TestFatigaSomnolenia_Digitalizado_boro";
 import EvaluacionMuscoloEsqueletica2021_Digitalizado_boro from "../MusculoEsqueletica/EvaluacionMuscoloEsqueletica2021_Digitalizado_boro";
+import EvaluacionOftalmologica2021_Digitalizado_ohla from "../Oftalmologia/EvaluacionOftalmologica2021_Digitalizado_ohla";
 
 export const reportesMap = {
    /* =========================
@@ -171,7 +172,10 @@ export const reportesMap = {
 
    odontograma: Odontograma_Digitalizado,
 
-   oftalmologia2021: EvaluacionOftalmologica2021_Digitalizado,
+   oftalmologia2021: {
+      EvaluacionOftalmologica2021_Digitalizado,
+      EvaluacionOftalmologica2021_Digitalizado_ohla
+   },
 
    oit: OIT_Digitalizado,
 
