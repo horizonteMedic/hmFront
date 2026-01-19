@@ -7,6 +7,8 @@ export default function EmpleadoComboBox({
     form,
     className = "",
     label = "Médico que Certifica",
+    nameField = "nombre_medico",
+    idField = "user_medicoFirma"
 }) {
     const { listaEmpleados: empleados } = useSessionData();
     const [filteredEmpleados, setFilteredEmpleados] = useState([]);
@@ -21,36 +23,36 @@ export default function EmpleadoComboBox({
         setFilteredEmpleados(filtered);
         onChange({
             target: {
-                name: "nombre_medico",
+                name: nameField,
                 value: v
             }
         });
     };
 
     useEffect(() => {
-        if (!form.user_medicoFirma) return
-        const empleadoEncontrado = empleados.find((emp) => emp.username === form.user_medicoFirma);
+        if (!form[idField]) return
+        const empleadoEncontrado = empleados.find((emp) => emp.username === form[idField]);
         if (empleadoEncontrado && empleadoEncontrado.nombres) {
             onChange({
                 target: {
-                    name: "nombre_medico",
+                    name: nameField,
                     value: empleadoEncontrado.nombres
                 }
             });
         }
-    }, [form.user_medicoFirma])
+    }, [form[idField], idField, nameField])
 
     const handleSelect = (emp) => {
         setFilteredEmpleados([]);
         onChange({
             target: {
-                name: "nombre_medico",
+                name: nameField,
                 value: emp.nombres
             }
         });
         onChange({
             target: {
-                name: "user_medicoFirma",
+                name: idField,
                 value: emp.username
             }
         });
@@ -61,8 +63,8 @@ export default function EmpleadoComboBox({
             <label className="block font-semibold mb-1">{label} :</label>
             <div className="relative flex-grow flex items-center">
                 <input
-                    id="nombre_medico"
-                    name="nombre_medico"
+                    id={nameField}
+                    name={nameField}
                     type="text"
                     autoComplete="off"
                     value={value || ""}
