@@ -252,7 +252,7 @@ export const EXAMENES_CATALOGO = {
     },
 
     CONSENT_DECLARACION_APTITUD: {
-        nombre: "CONSENTIMIENTO DECLARACIÓN DE INFORMACION APTITUD MEDICO OCUPACIONAL",
+        nombre: "DECLARACIÓN JURADA DE INFORMACION APTITUD MEDICO OCUPACIONAL",
         tabla: "DECLA_INFO_APTITUD_MO",
         url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
         esJasper: true
