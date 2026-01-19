@@ -53,6 +53,9 @@ export default function GlucosaBasal() {
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
+
+        // nombre_medico_extra: userName,
+        // user_medicoFirmaExtra: userlogued,
     };
 
     const {
@@ -260,6 +263,14 @@ export default function GlucosaBasal() {
                     form={form}
                     onChange={handleChangeSimple}
                 />
+                {/* <EmpleadoComboBox
+                    value={form.nombre_medico_extra}
+                    label="Especialista Extra"
+                    form={form}
+                    onChange={handleChangeSimple}
+                    nameField="nombre_medico_extra"
+                    idField="user_medicoFirmaExtra"
+                /> */}
             </SectionFieldset>
 
             <BotonesAccion
