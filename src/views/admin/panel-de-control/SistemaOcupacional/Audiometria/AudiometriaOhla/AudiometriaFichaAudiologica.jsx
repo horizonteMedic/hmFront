@@ -7,6 +7,9 @@ import {
   SubmitDataServiceFicha,
   VerifyTRFicha,
 } from "./controllerAudiometriaOhla";
+import { useSessionData } from "../../../../../hooks/useSessionData";
+import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "ficha_audiologica";
 
@@ -34,7 +37,7 @@ const AudiometriaFichaAudiologica = ({
 }) => {
   console.log(listas);
   const { MedicosMulti } = listas;
-
+  const { userName } = useSessionData();
   const handleNombreMedicoSearch = (e) => {
     const v = e.target.value.toUpperCase();
     if (v === "") {
@@ -45,8 +48,8 @@ const AudiometriaFichaAudiologica = ({
     setFilteredNombresMedicos(
       v
         ? MedicosMulti.filter((medico) =>
-            medico.mensaje.toLowerCase().includes(v.toLowerCase())
-          )
+          medico.mensaje.toLowerCase().includes(v.toLowerCase())
+        )
         : []
     );
   };
@@ -96,8 +99,8 @@ const AudiometriaFichaAudiologica = ({
       [name]: f[name].toUpperCase().includes(objetivo)
         ? ""
         : /\d/.test(f[name])
-        ? f[name] + " " + objetivo
-        : " " + objetivo,
+          ? f[name] + " " + objetivo
+          : " " + objetivo,
     }));
   };
 
@@ -712,6 +715,14 @@ const AudiometriaFichaAudiologica = ({
                   )}
                 </div>
               </div>
+              {/*<SectionFieldset legend="Sellos" className="space-y-4">
+                <EmpleadoComboBox
+                  value={form.nombre_medico}
+                  label="Especialista"
+                  form={form}
+                  onChange={handleChangeSimple}
+                />
+              </SectionFieldset>*/}
             </div>
           </div>
           <div className="flex gap-2 mt-4 text-[12px] border p-4 rounded-lg">

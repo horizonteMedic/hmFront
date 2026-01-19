@@ -3,6 +3,7 @@ import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
     handleSubirArchivoDefault,
+    handleSubirArchivoDefaultSinSellos,
     LoadingDefault,
     SubmitDataServiceDefault,
     VerifyTRPerzonalizadoDefault,
@@ -178,12 +179,12 @@ export const Loading = (mensaje) => {
 };
 
 export const handleSubirArchivoEspirometria = async (form, selectedSede, userlogued, token) => {
-    const coordenadas = {
+    /*const coordenadas = {
         FIRMA: { x: 40, y: 720, width: 120, height: 60 },
         HUELLA: { x: 220, y: 720, width: 60, height: 60 },
         SELLOFIRMA: { x: 360, y: 680, width: 120, height: 80 },
-    };
-    handleSubirArchivoDefault(form, selectedSede, registrarPDF, userlogued, token, coordenadas)
+    };*/
+    handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
 };
 
 export const ReadArchivosFormEspirometria = async (form, setVisualerOpen, token) => {

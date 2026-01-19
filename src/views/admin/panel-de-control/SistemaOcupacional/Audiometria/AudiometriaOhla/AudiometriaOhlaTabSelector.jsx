@@ -3,15 +3,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeadphones, faFileAlt } from "@fortawesome/free-solid-svg-icons";
 import AudiometriaOhla from "./AudiometriaOhla";
 import AudiometriaFichaAudiologica from "./AudiometriaFichaAudiologica";
+import { useSessionData } from "../../../../../hooks/useSessionData";
 
 const AudiometriaOhlaTabSelector = ({
-  token,
-  selectedSede,
-  userlogued,
   listas,
 }) => {
   const [activeTab, setActiveTab] = useState(0);
-
+  const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
   const date = new Date();
   const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
     2,
@@ -72,6 +70,10 @@ const AudiometriaOhlaTabSelector = ({
     nombres_search: "",
     codigo_search: "",
     diagnostico: "",
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
   const [formOhla, setFormOhla] = useState(initialFormStateOhla);
 
@@ -129,7 +131,7 @@ const AudiometriaOhlaTabSelector = ({
     mareos: "NO",
     infeccion_oido_actual: "NO",
     otro: "NO",
-    otroDescripcion:"",
+    otroDescripcion: "",
 
     nombre_profecional: fixEncodingModern(
       userlogued?.datos?.nombres_user || ""
@@ -195,7 +197,7 @@ const AudiometriaOhlaTabSelector = ({
           handleClearnotOFicha={handleClearnotOFicha}
           tablaFicha={"ficha_audiologica"}
           setFormFicha={setFormFicha}
-          setSearchNombreMedico={setSearchNombreMedico}          
+          setSearchNombreMedico={setSearchNombreMedico}
           handleClearFicha={handleClearFicha}
         />
       ),
@@ -231,11 +233,10 @@ const AudiometriaOhlaTabSelector = ({
           <button
             key={tab.label}
             onClick={() => setActiveTab(idx)}
-            className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none ${
-              activeTab === idx
-                ? "bg-[#233245] text-white font-bold"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none ${activeTab === idx
+              ? "bg-[#233245] text-white font-bold"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
           >
             <FontAwesomeIcon icon={tab.icon} className="mr-2" />
             {tab.label}
