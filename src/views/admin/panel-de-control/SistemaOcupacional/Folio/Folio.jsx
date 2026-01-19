@@ -26,15 +26,7 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "DECLARACION_USO_FIRMA_ARCHIVO",
-    "ELECTROCARDIOGRAMA_ARCHIVO",
-    "ESPIROMETRIA_ARCHIVO",   //Tiene firma
-    "OFTALMOLOGIA_VISION_TESTER",//Tiene firma
-    "PSICOSENSOMETRICO_CERT_ALTURA", //Tiene firma
-    "PSICOSENSOMETRICO_VEHI_FOLIO", //Tiene firma
-    "RADIOGRAFIA_COLUMNA_ARCHIVO",
-    "RAYOS_X_TORAX_ARCHIVO",
-    "INTERCONSULTAS"
+    "AUDIOMETRIA_OHLA",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña

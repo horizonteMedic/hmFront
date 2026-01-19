@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import headerFicha from "./headers/header_FichaAudiologica_Digitalizado.jsx";
+import headerFicha from "./headers/header_Audiometria2021-_Digitalizado.jsx";
 
 export default async function FichaAudiologica_Digitalizado(data = {}) {
   const doc = new jsPDF();
