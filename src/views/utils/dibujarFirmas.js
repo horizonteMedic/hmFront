@@ -18,48 +18,6 @@ export async function dibujarFirmas({ doc, datos, y, pageW }) {
   const s1 = await getSignCompressed(datos, "SELLOFIRMA");
   const s2 = await getSignCompressed(datos, "SELLOFIRMADOCASIG");
 
-  const digitalizacion = datos.digitalizacion || [];
-  const firmaPaciente = digitalizacion.find(d => d.nombreDigitalizacion === "FIRMAP");
-  const huellaPaciente = digitalizacion.find(d => d.nombreDigitalizacion === "HUELLA");
-  const sello1 = digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  const sello2 = digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
-  const isValidUrl = url => url && url !== "Sin registro";
-
-  // Función mejorada para cargar y comprimir imágenes
-  const loadImg = src =>
-    new Promise((res, rej) => {
-      const img = new Image();
-      img.src = src;
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        // Comprimir imagen antes de retornarla
-        const canvas = document.createElement('canvas');
-        const maxWidth = 800;
-        let width = img.width;
-        let height = img.height;
-
-        // Redimensionar si es muy grande
-        if (width > maxWidth) {
-          height = (height * maxWidth) / width;
-          width = maxWidth;
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-
-        // Rellenar fondo blanco
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, width, height);
-
-        ctx.drawImage(img, 0, 0, width, height);
-
-        // Convertir a data URL comprimido (JPEG 60% calidad)
-        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
-        res(compressedDataUrl);
-      };
-      img.onerror = () => rej(`No se pudo cargar ${src}`);
-    });
 
   // Verificar qué firmas tenemos
   const tieneFirmaPaciente = firmap !== null || huellap !== null;
@@ -112,11 +70,8 @@ export async function dibujarFirmas({ doc, datos, y, pageW }) {
   let lineY = 0;
 
   if (tieneSelloProfesional) {
-    const sigW = 48;
-    const sigH = 20;
     const sigY = y;
-    const gap = 16;
-    lineY = sigY + sigH + 1; // Línea más cerca de la firma
+    lineY = sigY + 20 + 1; // Línea más cerca de la firma
 
     // Función auxiliar para agregar sello al PDF (ya viene comprimido como data URL)
     const agregarSello = (dataUrl, xPos, yPos, width, height) => {
@@ -156,32 +111,100 @@ export async function dibujarFirmas({ doc, datos, y, pageW }) {
       }
     };
 
-    // Posición para los sellos del profesional
-    // Si hay paciente, profesional a la derecha (2/3), si no, centrado
-    const centroProfesionalX = tieneFirmaPaciente ? (pageW / 3) * 2 : pageW / 2;
+    // Contar sellos disponibles
+    const sellos = [];
+    if (s1) sellos.push({ data: s1, tipo: 'SELLOFIRMA' });
+    if (s2) sellos.push({ data: s2, tipo: 'SELLOFIRMADOCASIG' });
+    const numSellos = sellos.length;
 
-    if (s1 && s2) {
-      // Dos sellos lado a lado
-      const totalWidth = sigW * 2 + gap;
-      const startX = centroProfesionalX - totalWidth / 2;
+    if (numSellos === 0) {
+      // No hay sellos, no hacer nada
+    } else {
+      // Calcular espacio disponible
+      const margin = 10; // Margen lateral
+      let espacioDisponible;
+      let startX;
 
-      agregarSello(s1, startX, sigY, sigW, sigH);
-      agregarSello(s2, startX + sigW + gap, sigY, sigW, sigH);
+      if (tieneFirmaPaciente) {
+        // Paciente a la izquierda, sellos a la derecha
+        // Paciente ocupa aproximadamente hasta pageW/3 + 20mm
+        const finPaciente = pageW / 3 + 20;
+        startX = finPaciente + 5; // 5mm de separación
+        espacioDisponible = pageW - startX - margin;
+      } else {
+        // Sin paciente, centrar sellos
+        espacioDisponible = pageW - 2 * margin;
+        startX = margin;
+      }
 
-      const centroSello1X = startX + sigW / 2;
-      const centroSello2X = startX + sigW + gap + sigW / 2;
-      dibujarLineaYTexto(centroSello1X, lineY, 'SELLOFIRMA');
-      dibujarLineaYTexto(centroSello2X, lineY, 'SELLOFIRMADOCASIG');
-    } else if (s1) {
-      // Un solo sello centrado
-      const imgX = centroProfesionalX - sigW / 2;
-      agregarSello(s1, imgX, sigY, sigW, sigH);
-      dibujarLineaYTexto(centroProfesionalX, lineY, 'SELLOFIRMA');
-    } else if (s2) {
-      // Un solo sello centrado
-      const imgX = centroProfesionalX - sigW / 2;
-      agregarSello(s2, imgX, sigY, sigW, sigH);
-      dibujarLineaYTexto(centroProfesionalX, lineY, 'SELLOFIRMADOCASIG');
+      // Calcular tamaño y gap dinámicamente
+      let sigW, sigH, gap;
+      if (numSellos === 1) {
+        // Un solo sello: usar tamaño estándar pero asegurar que quepa
+        sigW = Math.min(48, espacioDisponible - 10);
+        sigH = 20;
+        gap = 0;
+      } else if (numSellos === 2) {
+        // Dos sellos: gap fijo de 15mm, tamaño estándar, centrados
+        sigW = 48;
+        sigH = 20;
+        gap = 15;
+      } else {
+        // Múltiples sellos (3+): ajustar tamaño y gap para que quepan
+        const gapMin = 8; // Gap mínimo
+        const sigWMax = 45; // Ancho máximo por sello
+        const sigWMin = 35; // Ancho mínimo por sello
+        
+        // Calcular ancho total necesario
+        const anchoTotalNecesario = numSellos * sigWMax + (numSellos - 1) * gapMin;
+        
+        if (anchoTotalNecesario <= espacioDisponible) {
+          // Cabe con tamaño máximo
+          sigW = sigWMax;
+          gap = gapMin;
+        } else {
+          // Reducir tamaño y/o gap
+          const espacioParaSellos = espacioDisponible - (numSellos - 1) * gapMin;
+          sigW = Math.max(sigWMin, Math.floor(espacioParaSellos / numSellos));
+          gap = gapMin;
+          
+          // Si aún no cabe, reducir gap también
+          if (sigW * numSellos + gap * (numSellos - 1) > espacioDisponible) {
+            const espacioRestante = espacioDisponible - sigW * numSellos;
+            gap = Math.max(4, Math.floor(espacioRestante / (numSellos - 1)));
+          }
+        }
+        sigH = 20;
+      }
+
+      // Centrar los sellos
+      if (numSellos === 1) {
+        // Un solo sello centrado
+        if (tieneFirmaPaciente) {
+          const centroProfesionalX = startX + espacioDisponible / 2;
+          startX = centroProfesionalX - sigW / 2;
+        } else {
+          startX = (pageW - sigW) / 2;
+        }
+      } else {
+        // Múltiples sellos: centrar el grupo
+        const totalWidth = sigW * numSellos + gap * (numSellos - 1);
+        if (tieneFirmaPaciente) {
+          const centroProfesionalX = startX + espacioDisponible / 2;
+          startX = centroProfesionalX - totalWidth / 2;
+        } else {
+          startX = (pageW - totalWidth) / 2;
+        }
+      }
+
+      // Dibujar sellos
+      sellos.forEach((sello, index) => {
+        const xPos = startX + index * (sigW + gap);
+        agregarSello(sello.data, xPos, sigY, sigW, sigH);
+        
+        const centroSelloX = xPos + sigW / 2;
+        dibujarLineaYTexto(centroSelloX, lineY, sello.tipo);
+      });
     }
   }
 
