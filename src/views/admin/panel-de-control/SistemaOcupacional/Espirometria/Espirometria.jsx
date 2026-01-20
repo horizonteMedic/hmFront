@@ -58,7 +58,10 @@ export default function Espirometria() {
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
-        
+
+        nombre_medico_extra: "",
+        user_medicoFirmaExtra: "",
+
         SubirDoc: false,
         nomenclatura: "ESPIROMETRIA"
     };
@@ -232,6 +235,14 @@ export default function Espirometria() {
                     label="Especialista"
                     form={form}
                     onChange={handleChangeSimple}
+                />
+                <EmpleadoComboBox
+                    value={form.nombre_medico_extra}
+                    label="Especialista Extra"
+                    form={form}
+                    onChange={handleChangeSimple}
+                    nameField="nombre_medico_extra"
+                    idField="user_medicoFirmaExtra"
                 />
             </SectionFieldset>
 

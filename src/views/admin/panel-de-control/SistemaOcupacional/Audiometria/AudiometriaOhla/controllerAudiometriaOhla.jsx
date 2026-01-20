@@ -369,6 +369,7 @@ export const GetInfoServicioFicha = (
           i_porcentaje: res.txtLIPorcentajeDiscriminacion,
           i_umbral_confort: res.txtLIConfort,
           i_umbral_disconfort: res.txtLIDisconfort,
+          user_medicoFirma: res.usuarioFirma,
         }));
         setSearchNombreMedico(res.txtMedico);
       } else {
@@ -462,6 +463,8 @@ export const SubmitDataServiceFicha = async (
     txtMesesTrabajo: form.mesesTrabajo,
     userRegistro: user,
     userMedicoOcup: form.nombre_profecional,
+
+    usuarioFirma: form.user_medicoFirma,
   };
   SubmitData(body, registrarUrlFicha, token).then((res) => {
     console.log(res);
