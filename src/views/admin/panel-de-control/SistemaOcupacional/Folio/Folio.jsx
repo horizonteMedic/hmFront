@@ -809,6 +809,7 @@ const ExamenesListK2 = buildExamenesList([ // K2
 
 const ExamenesListBorooAlturaEKG = buildExamenesList([ // BOROO ALTURA + EKG
     "RESUMEN_MEDICO_PODEROSA",
+    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
     "CERTIFICADO_APTITUD_ANEXO_16",
     "ANEXO_16",
 
