@@ -53,10 +53,10 @@ export const GetInfoServicio = async (
 
             // Área Intelectual
             areaIntelectual: res.areaIntelectual ?? "",
-            promedio: (res.areaIntelectual ?? "").includes("EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO."),
-            superior: (res.areaIntelectual ?? "").includes("EL EVALUADO POSEE UN NIVEL INTELECTUAL SUPERIOR."),
-            nInferior: (res.areaIntelectual ?? "").includes("EL EVALUADO POSEE UN NIVEL INTELECTUAL NORMAL INFERIOR."),
-            alto: (res.areaIntelectual ?? "").includes("EL EVALUADO POSEE UN NIVEL INTELECTUAL ALTO."),
+            intelectualSuperior: (res.areaIntelectual ?? "").includes("- EL EVALUADO POSEE UN NIVEL INTELECTUAL SUPERIOR."),
+            intelectualPromedio: (res.areaIntelectual ?? "").includes("- EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO."),
+            intelectualPromedioSuperior: (res.areaIntelectual ?? "").includes("- EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO SUPERIOR."),
+            intelectualPromedioBajo: (res.areaIntelectual ?? "").includes("- EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO BAJO."),
 
             pSuperior: (res.areaIntelectual ?? "").includes("POSEE UN NIVEL PSICOMOTOR SUPERIOR."),
             pMedio: (res.areaIntelectual ?? "").includes("POSEE UN NIVEL PSICOMOTOR MEDIO."),

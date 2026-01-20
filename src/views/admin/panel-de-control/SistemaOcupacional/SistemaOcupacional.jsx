@@ -66,6 +66,7 @@ import {
   faBrain,
   faArrowUp,
   faFileContract,
+  faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -140,6 +141,7 @@ const TabComponent = () => {
 
   //Sede
   const [selectSede, setSelectSede] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
     if (userlogued?.sedes?.length > 0) {
       const sedeTNP = userlogued.sedes.find((sede) => sede.cod_sede === "T-NP");
@@ -238,7 +240,7 @@ const TabComponent = () => {
       <div className={styles.mainContent}>
         {activeTab === null && (
           <>
-            <div className={styles.sedeSelector}>
+            <div className={styles.sedeSelector} style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
               <select
                 className={styles.sedeSelect}
                 onChange={(e) => { setSelectSede(e.target.value), setSelectedSede(e.target.value) }}
@@ -250,6 +252,34 @@ const TabComponent = () => {
                   </option>
                 ))}
               </select>
+              <div style={{ position: 'relative', width: '250px' }}>
+                <input
+                  type="text"
+                  placeholder="Buscar módulo..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 35px 8px 15px',
+                    borderRadius: '8px',
+                    border: '1px solid #e2e8f0',
+                    outline: 'none',
+                    fontSize: '14px',
+                    backgroundColor: '#fff',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                  }}
+                />
+                <FontAwesomeIcon
+                  icon={faSearch}
+                  style={{
+                    position: 'absolute',
+                    right: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: '#94a3b8'
+                  }}
+                />
+              </div>
             </div>
             <div className={styles.gridContainer}>
               {(() => {
@@ -292,6 +322,7 @@ const TabComponent = () => {
                 ];
                 return items
                   .filter((item) => tieneVista(item.vista))
+                  .filter((item) => item.label.toLowerCase().includes(searchTerm.toLowerCase()))
                   .map((item) => (
                     <div
                       key={item.vista}

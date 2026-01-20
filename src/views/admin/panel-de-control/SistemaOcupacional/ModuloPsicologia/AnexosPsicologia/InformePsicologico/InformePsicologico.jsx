@@ -42,10 +42,10 @@ export default function InformePsicologico() {
 
         // Área Intelectual
         areaIntelectual: "EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO.",
-        promedio: true,
-        superior: false,
-        nInferior: false,
-        alto: false,
+        intelectualSuperior: false,
+        intelectualPromedio: false,
+        intelectualPromedioSuperior: false,
+        intelectualPromedioBajo: false,
 
         pSuperior: false,
         pMedio: false,
@@ -143,7 +143,7 @@ export default function InformePsicologico() {
 
     // Definición de grupos de checkboxes del área intelectual
     const intellectualGroups = {
-        nivelIntelectual: ['promedio', 'superior', 'nInferior', 'alto'],
+        nivelIntelectual: ['intelectualSuperior', 'intelectualPromedio', 'intelectualPromedioSuperior', 'intelectualPromedioBajo'],
         facilidadDificultad: ['facilidad', 'dificultad'],
         capacidadNumerica: ['yNumerica', 'yCalculo'],
         nivelPsicomotor: ['pSuperior', 'pMedio', 'pBajo', 'bajo'],
@@ -153,21 +153,26 @@ export default function InformePsicologico() {
 
     // Textos específicos para cada checkbox
     const intellectualTexts = {
-        promedio: "EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO.",
-        superior: "EL EVALUADO POSEE UN NIVEL INTELECTUAL SUPERIOR.",
-        nInferior: "EL EVALUADO POSEE UN NIVEL INTELECTUAL NORMAL INFERIOR.",
-        alto: "EL EVALUADO POSEE UN NIVEL INTELECTUAL ALTO.",
+        intelectualSuperior: "- EL EVALUADO POSEE UN NIVEL INTELECTUAL SUPERIOR.",
+        intelectualPromedio: "- EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO.",
+        intelectualPromedioSuperior: "- EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO SUPERIOR.",
+        intelectualPromedioBajo: "- EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO BAJO.",
+
         facilidad: "PRESENTA FACILIDAD EN EL PROCESAMIENTO DE LA INFORMACIÓN.",
         dificultad: "PRESENTA DIFICULTAD EN EL PROCESAMIENTO DE LA INFORMACIÓN.",
+
         yNumerica: "Y EN CAPACIDAD NUMÉRICA.",
         yCalculo: "Y EN CAPACIDAD DE CÁLCULO.",
+
         pSuperior: "POSEE UN NIVEL PSICOMOTOR SUPERIOR.",
         pMedio: "POSEE UN NIVEL PSICOMOTOR MEDIO.",
         pBajo: "POSEE UN NIVEL PSICOMOTOR BAJO.",
         bajo: "POSEE UN NIVEL PSICOMOTOR BAJO.",
+
         pnAdecuado: "PRESENTA UN NIVEL DE ATENCIÓN ADECUADO.",
         nAlto: "PRESENTA UN NIVEL DE ATENCIÓN ALTO.",
         nBajo: "PRESENTA UN NIVEL DE ATENCIÓN BAJO.",
+
         adecuadaR: "PRESENTA ADECUADA RETENCIÓN DE DÍGITOS.",
         inadecuada: "PRESENTA INADECUADA RETENCIÓN DE DÍGITOS."
     };
@@ -450,30 +455,30 @@ export default function InformePsicologico() {
                                 value={form.areaIntelectual}
                                 onChange={handleChange}
                             />
-                            <div className="grid grid-cols-4 gap-2 ">
-                                <SectionFieldset>
-                                    <InputCheckbox
-                                        label="PROMEDIO"
-                                        name="promedio"
-                                        checked={form.promedio}
-                                        onChange={handleIntellectualCheckboxChange}
-                                    />
+                            <div className="grid grid-cols-5 gap-2 ">
+                                <SectionFieldset fieldsetClassName="col-span-2">
                                     <InputCheckbox
                                         label="SUPERIOR"
-                                        name="superior"
-                                        checked={form.superior}
+                                        name="intelectualSuperior"
+                                        checked={form.intelectualSuperior}
                                         onChange={handleIntellectualCheckboxChange}
                                     />
                                     <InputCheckbox
-                                        label="N. INFERIOR"
-                                        name="nInferior"
-                                        checked={form.nInferior}
+                                        label="PROMEDIO"
+                                        name="intelectualPromedio"
+                                        checked={form.intelectualPromedio}
                                         onChange={handleIntellectualCheckboxChange}
                                     />
                                     <InputCheckbox
-                                        label="ALTO"
-                                        name="alto"
-                                        checked={form.alto}
+                                        label="PROMEDIO SUPERIOR"
+                                        name="intelectualPromedioSuperior"
+                                        checked={form.intelectualPromedioSuperior}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="PROMEDIO BAJO"
+                                        name="intelectualPromedioBajo"
+                                        checked={form.intelectualPromedioBajo}
                                         onChange={handleIntellectualCheckboxChange}
                                     />
                                 </SectionFieldset>
