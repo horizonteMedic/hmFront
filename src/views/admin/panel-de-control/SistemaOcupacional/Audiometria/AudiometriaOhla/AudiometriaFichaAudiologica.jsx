@@ -35,9 +35,8 @@ const AudiometriaFichaAudiologica = ({
   handleClearOhla,
   formOhla,
 }) => {
-  console.log(listas);
+
   const { MedicosMulti } = listas;
-  const { userName } = useSessionData();
   const handleNombreMedicoSearch = (e) => {
     const v = e.target.value.toUpperCase();
     if (v === "") {
@@ -131,7 +130,7 @@ const AudiometriaFichaAudiologica = ({
       }
     });
   };
-
+  console.log(form)
   return (
     <div className="w-full bg-white rounded shadow p-4 border border-gray-200 mb-4">
       <div className="w-full flex flex-row flex-nowrap gap-4 text-[12px] pb-4">
@@ -662,67 +661,21 @@ const AudiometriaFichaAudiologica = ({
                   className="border border-gray-400 rounded-lg px-3 py-1 bg-white flex-1 text-[12px]"
                 />
               </div>
-              <div className="flex items-center gap-2">
-                <label htmlFor="nombre_medico" className="block w-[200px]">
-                  Nombre del Médico :
-                </label>
-                <div className="relative flex-grow flex items-center">
-                  <input
-                    autoComplete="off"
-                    id="nombre_medico"
-                    name="nombre_medico"
-                    type="text"
-                    value={searchNombreMedico || ""}
-                    placeholder="Escribe para buscar médico..."
-                    onChange={handleNombreMedicoSearch}
-                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full `}
-                    onKeyDown={(e) => {
-                      if (
-                        e.key === "Enter" &&
-                        filteredNombresMedicos.length > 0
-                      ) {
-                        e.preventDefault();
-                        handleSelectNombreMedico(filteredNombresMedicos[0]);
-                      }
-                    }}
-                    onFocus={() => {
-                      if (searchNombreMedico) {
-                        setFilteredNombresMedicos(
-                          MedicosMulti.filter((emp) =>
-                            emp.mensaje
-                              .toLowerCase()
-                              .includes(searchNombreMedico.toLowerCase())
-                          )
-                        );
-                      }
-                    }}
-                    onBlur={() =>
-                      setTimeout(() => setFilteredNombresMedicos([]), 100)
-                    }
-                  />
-                  {searchNombreMedico && filteredNombresMedicos.length > 0 && (
-                    <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
-                      {filteredNombresMedicos.map((medico) => (
-                        <li
-                          key={medico.id}
-                          className="cursor-pointer px-3 py-2 hover:bg-gray-100"
-                          onMouseDown={() => handleSelectNombreMedico(medico)}
-                        >
-                          {medico.mensaje}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </div>
-              {/*<SectionFieldset legend="Sellos" className="space-y-4">
-                <EmpleadoComboBox
-                  value={form.nombre_medico}
-                  label="Especialista"
-                  form={form}
-                  onChange={handleChangeSimple}
-                />
-              </SectionFieldset>*/}
+              <EmpleadoComboBox
+                value={form.nombre_medico}
+                label="Especialista"
+                form={form}
+                onChange={handleChange}
+              />
+              <EmpleadoComboBox
+                value={form.nombre_medico_extra}
+                label="Especialista Extra"
+                form={form}
+                onChange={handleChange}
+                nameField="nombre_medico_extra"
+                idField="user_medicoFirmaExtra"
+              />
+
             </div>
           </div>
           <div className="flex gap-2 mt-4 text-[12px] border p-4 rounded-lg">

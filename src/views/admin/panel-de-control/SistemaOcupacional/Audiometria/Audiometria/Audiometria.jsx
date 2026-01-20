@@ -152,8 +152,12 @@ export default function Audiometria() {
     oi_o_8000: "",
 
     // Médico que Certifica //BUSCADOR
-    //nombre_medico: userName,
-    //user_medicoFirma: userlogued,
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
+
+    //extra
+    nombre_medico_extra: "",
+    user_medicoFirmaExtra: "",
   };
 
   const {
@@ -790,6 +794,14 @@ export default function Audiometria() {
               label="Especialista"
               form={form}
               onChange={handleChangeSimple}
+            />
+            <EmpleadoComboBox
+              value={form.nombre_medico_extra}
+              label="Especialista Extra"
+              form={form}
+              onChange={handleChangeSimple}
+              nameField="nombre_medico_extra"
+              idField="user_medicoFirmaExtra"
             />
           </SectionFieldset>
         </div>

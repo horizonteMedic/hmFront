@@ -57,7 +57,8 @@ export default function GlucosaBasal() {
         // nombre_medico_extra: userName,
         // user_medicoFirmaExtra: userlogued,
     };
-
+    console.log(userName)
+    console.log(userlogued)
     const {
         form,
         setForm,

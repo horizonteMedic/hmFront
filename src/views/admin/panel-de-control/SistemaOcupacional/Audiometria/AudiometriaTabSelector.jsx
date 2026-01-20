@@ -2,6 +2,7 @@ import { useState } from "react";
 import Audiometria from "./Audiometria/Audiometria";
 import AudiometriaCuestionario from "./AudiometriaCuestionario/AudiometriaCuestionario";
 import AudiometriaOhlaTabSelector from "./AudiometriaOhla/AudiometriaOhlaTabSelector";
+import { useSessionData } from "../../../../hooks/useSessionData";
 
 const date = new Date();
 const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
@@ -9,6 +10,7 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   "0"
 )}-${String(date.getDate()).padStart(2, "0")}`;
 
+const { userlogued, userName } = useSessionData();
 
 const initialFormStateCuestionarioAudio = {
   norden: "",
@@ -69,6 +71,9 @@ const initialFormStateCuestionarioAudio = {
   p16_servicio_tiempo: "",
   p16_boxeo: false,
   p16_boxeo_tiempo: "",
+  // Médico que Certifica //BUSCADOR
+  nombre_medico: userName,
+  user_medicoFirma: userlogued,
 };
 
 export default function AudiometriaTabSelector({

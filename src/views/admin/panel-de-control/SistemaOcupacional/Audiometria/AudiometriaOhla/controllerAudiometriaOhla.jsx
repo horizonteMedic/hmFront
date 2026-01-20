@@ -116,6 +116,8 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
 
     diagnostico: form.diagnostico,
     userRegistro: user,
+    usuarioFirma: form.user_medicoFirma,
+
   };
   SubmitData(body, registrarUrl, token).then((res) => {
     console.log(res);
@@ -506,12 +508,12 @@ export const PrintHojaR = (nro, token, tabla, mostrarGrafico, firmaExtra) => {
         );
         // Determinar la ruta según el nombre del Jasper
         let rutaCompleta = `../../../../../jaspers/Audiometria/${nombre}.jsx`;
-        
+
         // Si el nombre contiene "FichaAudiologica", buscar en la subcarpeta
         if (nombre && nombre.includes("FichaAudiologica")) {
           rutaCompleta = `../../../../../jaspers/Audiometria/FichaAudiologica/${nombre}.jsx`;
         }
-        
+
         const modulo = await jasperModules[rutaCompleta]();
         // Ejecuta la función exportada por default con los datos
         if (modulo && typeof modulo.default === "function") {
