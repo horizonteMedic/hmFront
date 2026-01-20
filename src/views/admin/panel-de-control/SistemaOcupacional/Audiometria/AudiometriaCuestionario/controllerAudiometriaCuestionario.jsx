@@ -16,7 +16,7 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
         set((prev) => ({
           ...prev,
           ...res,
-          
+
           nombres: res.nombres,
           edad: res.edad,
           norden: res.norden,
@@ -75,6 +75,7 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
           p16_servicio_tiempo: res.txtmilitar16,
           p16_boxeo: res.chkboxeo16,
           p16_boxeo_tiempo: res.txtboxeo16,
+          user_medicoFirma: res.usuarioFirma,
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -159,6 +160,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     chkboxeo16: form.p16_boxeo,
     txtboxeo16: form.p16_boxeo_tiempo,
     userRegistro: user,
+    usuarioFirma: form.user_medicoFirma,
   };
   SubmitData(body, registrarUrl, token).then((res) => {
     console.log(res);
