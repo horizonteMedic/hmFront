@@ -155,8 +155,6 @@ export default function OftalmologiaOhla() {
     nombre_doctorAsignado: "",
     user_doctorAsignado: "",
 
-    nombre_doctorExtra: "",
-    user_doctorExtra: "",
   };
   const [form, setForm] = useState(initialFormState);
   const [tab, setTab] = useState(0);
@@ -1538,14 +1536,6 @@ export default function OftalmologiaOhla() {
             onChange={handleChange}
             nameField="nombre_doctorAsignado"
             idField="user_doctorAsignado"
-          />
-          <EmpleadoComboBox
-            value={form.nombre_doctorExtra}
-            label="Doctor Extra"
-            form={form}
-            onChange={handleChange}
-            nameField="nombre_doctorExtra"
-            idField="user_doctorExtra"
           />
         </SectionFieldset>
         <div className="flex flex-col md:flex-row justify-between items-center gap-4  px-4 pt-2">

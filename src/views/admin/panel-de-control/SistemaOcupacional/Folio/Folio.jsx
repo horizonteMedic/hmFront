@@ -113,6 +113,7 @@ const ExamenesListOHLA1 = buildExamenesList([       //OHLA 1
     "PANEL_5D",
     "CONSENT_PANEL_5D",
     "OIT",
+    "RADIOGRAFIA_COLUMNA",
     "RAYOS_X_TORAX_ARCHIVO",
     "ELECTROCARDIOGRAMA",
     "ELECTROCARDIOGRAMA_ARCHIVO",
