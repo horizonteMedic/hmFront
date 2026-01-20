@@ -61,6 +61,7 @@ import CertificadoAlturaPoderosa_Digitalizado from "../CertificadoAlturaPoderosa
 import TestFatigaSomnolenia_Digitalizado_boro from "../Test_Fatiga/TestFatigaSomnolenia_Digitalizado_boro";
 import EvaluacionMuscoloEsqueletica2021_Digitalizado_boro from "../MusculoEsqueletica/EvaluacionMuscoloEsqueletica2021_Digitalizado_boro";
 import EvaluacionOftalmologica2021_Digitalizado_ohla from "../Oftalmologia/EvaluacionOftalmologica2021_Digitalizado_ohla";
+import ficha_antecedente_patologico_boro from "../AntecedentesPatologicos/ficha_antecedente_patologico_boro";
 
 export const reportesMap = {
    /* =========================
@@ -72,7 +73,10 @@ export const reportesMap = {
 
    anexo16a: Anexo16A_Digitalizado,
 
-   antecedentes_patologicos: ficha_antecedente_patologico_Digitalizado,
+   antecedentes_patologicos: {
+      ficha_antecedente_patologico_Digitalizado,
+      ficha_antecedente_patologico_boro
+   },
 
    aptitud_medico_ocupacional_agro: Aptitud_AgroindustrialH,
 

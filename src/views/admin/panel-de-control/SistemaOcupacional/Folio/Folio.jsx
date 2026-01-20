@@ -26,7 +26,7 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
