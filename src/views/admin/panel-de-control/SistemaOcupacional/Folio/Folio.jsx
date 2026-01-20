@@ -26,7 +26,7 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "AUDIOMETRIA_OHLA",
+    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -206,6 +206,7 @@ const ExamenesListOHLA3 = buildExamenesList([       //OHLA 3
 ]);
 
 const ExamenesListSummaGold = buildExamenesList([   //SUMMAGOLD
+    "RESUMEN_MEDICO_PODEROSA",
     "CERTIFICADO_APTITUD_ANEXO_16",
     "ANEXO_16",
     "ANEXO_16A",
@@ -233,6 +234,7 @@ const ExamenesListSummaGold = buildExamenesList([   //SUMMAGOLD
 ]);
 
 const ExamenesListSmmot = buildExamenesList([       //SMMOT
+    "RESUMEN_MEDICO_PODEROSA",
     "CERTIFICADO_APTITUD_ANEXO_16",
     "ANEXO_16",
     "ANEXO_02",
@@ -258,6 +260,7 @@ const ExamenesListSmmot = buildExamenesList([       //SMMOT
 ]);
 
 const ExamenesListRetiroLaArena = buildExamenesList([   // Retiro La Arena
+    "RESUMEN_MEDICO_PODEROSA",
     "CERTIFICADO_APTITUD_ANEXO_16",
     "ANEXO_16",
 
@@ -284,6 +287,7 @@ const ExamenesListRetiroLaArena = buildExamenesList([   // Retiro La Arena
 ]);
 
 const ExamenesListRetiroSummaGold = buildExamenesList([   //  Retiro SummaGold
+    "RESUMEN_MEDICO_PODEROSA",
     "CERTIFICADO_APTITUD_ANEXO_16",
     "ANEXO_16",
 
@@ -310,6 +314,7 @@ const ExamenesListRetiroSummaGold = buildExamenesList([   //  Retiro SummaGold
 ]);
 
 const ExamenesListPsicosensometricoSolo = buildExamenesList([   // Psicosensometrico Solo
+    "RESUMEN_MEDICO_PODEROSA",
     "CERTIFICADO_VEHICULOS",
     "FICHA_SAS",
 
@@ -327,6 +332,7 @@ const ExamenesListPsicosensometricoSolo = buildExamenesList([   // Psicosensomet
 ]);
 
 const ExamenesListProseguridadBasico = buildExamenesList([   // PROSEGURIDAD BASICO
+    "RESUMEN_MEDICO_PODEROSA",
     "CERTIFICADO_ANEXO_02",
     "ANEXO_02",
 
@@ -516,6 +522,7 @@ const ExamenesListPoderosaBasico = buildExamenesList([ // PODEROSA BASICO
 ]);
 
 const ExamenesListMinerosDelNorte = buildExamenesList([ // MINEROS DEL NORTE
+    "RESUMEN_MEDICO_PODEROSA",
     "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
     "CERTIFICADO_APTITUD_ANEXO_16",
     "ANEXO_16",
@@ -559,6 +566,7 @@ const ExamenesListMinerosDelNorte = buildExamenesList([ // MINEROS DEL NORTE
 ]);
 
 const ExamenesListMarsaSoloConduccion = buildExamenesList([ // MARSA SOLO CONDUCCION
+    "RESUMEN_MEDICO_PODEROSA",
     "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
     "CERTIFICADO_APTITUD_ANEXO_16",
     "ANEXO_16",
@@ -597,6 +605,7 @@ const ExamenesListMarsaSoloConduccion = buildExamenesList([ // MARSA SOLO CONDUC
 ]);
 
 const ExamenesListMarsaSoloAltura = buildExamenesList([ // MARSA SOLO ALTURA
+    "RESUMEN_MEDICO_PODEROSA",
     "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
     "CERTIFICADO_APTITUD_ANEXO_16",
     "ANEXO_16",
@@ -634,6 +643,7 @@ const ExamenesListMarsaSoloAltura = buildExamenesList([ // MARSA SOLO ALTURA
 ]);
 
 const ExamenesListMarsaBasico = buildExamenesList([ // MARSA BASICO
+    "RESUMEN_MEDICO_PODEROSA",
     "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
     "CERTIFICADO_APTITUD_ANEXO_16",
     "ANEXO_16",
@@ -669,6 +679,7 @@ const ExamenesListMarsaBasico = buildExamenesList([ // MARSA BASICO
 ]);
 
 const ExamenesListLaArenaSoloAltura = buildExamenesList([ // LA ARENA SOLO ALTURA
+    "RESUMEN_MEDICO_PODEROSA",
     "CERTIFICADO_APTITUD_ANEXO_16",
     "ANEXO_16",
 
@@ -711,6 +722,7 @@ const ExamenesListLaArenaSoloAltura = buildExamenesList([ // LA ARENA SOLO ALTUR
 ]);
 
 const ExamenesListLaArenaAlturaConduccion = buildExamenesList([ // LA ARENA ALTURA + CONDUCCION
+    "RESUMEN_MEDICO_PODEROSA",
     "CERTIFICADO_APTITUD_ANEXO_16",
     "ANEXO_16",
 
@@ -757,6 +769,7 @@ const ExamenesListLaArenaAlturaConduccion = buildExamenesList([ // LA ARENA ALTU
 ]);
 
 const ExamenesListK2 = buildExamenesList([ // K2
+    "RESUMEN_MEDICO_PODEROSA",
     "CERTIFICADO_ANEXO_02",
     "ANEXO_02",
 
@@ -795,6 +808,7 @@ const ExamenesListK2 = buildExamenesList([ // K2
 ]);
 
 const ExamenesListBorooAlturaEKG = buildExamenesList([ // BOROO ALTURA + EKG
+    "RESUMEN_MEDICO_PODEROSA",
     "CERTIFICADO_APTITUD_ANEXO_16",
     "ANEXO_16",
 
@@ -843,6 +857,7 @@ const ExamenesListBorooAlturaEKG = buildExamenesList([ // BOROO ALTURA + EKG
 ]);
 
 const ExamenesListBorooAlturaSinEKG = buildExamenesList([ // BOROO ALTURA SIN EKG
+    "RESUMEN_MEDICO_PODEROSA",
     "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
     "CERTIFICADO_APTITUD_ANEXO_16",
     "ANEXO_16",
@@ -889,6 +904,7 @@ const ExamenesListBorooAlturaSinEKG = buildExamenesList([ // BOROO ALTURA SIN EK
 ]);
 
 const ExamenesListBorooAlturaConduccion = buildExamenesList([ // BOROO ALTURA + CONDUCCIÓN
+    "RESUMEN_MEDICO_PODEROSA",
     "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
     "CERTIFICADO_APTITUD_ANEXO_16",
     "ANEXO_16",
@@ -941,6 +957,7 @@ const ExamenesListBorooAlturaConduccion = buildExamenesList([ // BOROO ALTURA + 
 ]);
 
 const ExamenesListBesalcoSolo = buildExamenesList([ // BESALCO SOLO
+    "RESUMEN_MEDICO_PODEROSA",
     "CERTIFICADO_ANEXO_02",
     "ANEXO_02",
 
@@ -983,6 +1000,7 @@ const ExamenesListBesalcoSolo = buildExamenesList([ // BESALCO SOLO
 ]);
 
 const ExamenesListAlturaSolo = buildExamenesList([ // ALTURA SOLO
+    "RESUMEN_MEDICO_PODEROSA",
     "CERTIFICADO_ALTURA",
     "PSICOSENSOMETRICO_CERT_ALTURA",
 
@@ -1000,8 +1018,6 @@ const ExamenesListAlturaSolo = buildExamenesList([ // ALTURA SOLO
     "DECLARACION_USO_FIRMA_ARCHIVO",
     "INTERCONSULTAS"
 ]);
-{/**/ }
-
 
 const ListaPorPlantilla = {
     PRUEBAS: ExamenesListPRUEBAS,
