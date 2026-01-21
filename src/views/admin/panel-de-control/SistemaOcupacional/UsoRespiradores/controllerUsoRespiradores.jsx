@@ -334,6 +334,7 @@ export const GetInfoServicioEditar = async (
                             res.datosRespiradores?.autorizacionOtros_chk_f_6 ? "OTROS" : "",
 
             fechaExpiraAutorizacion: res.datosRespiradores?.fechaExpira_fecha_expira ?? getTodayPlusOneYear(),
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -601,6 +602,8 @@ export const SubmitDataService = async (
         fechaExpira: form.fechaExpiraAutorizacion,
         dniUsuario: form.dniUsuario,
         usuarioRegistro: user,
+        usuarioFirma: data.user_medicoFirma,
+
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

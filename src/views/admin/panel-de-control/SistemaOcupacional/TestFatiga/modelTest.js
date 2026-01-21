@@ -1,8 +1,8 @@
 import { URLAzure } from "../../../../config/config";
 
-export function SubmitTestFatigaJs(data,user,token) {
+export function SubmitTestFatigaJs(data, user, token) {
     const body = {
-         "codEval": data.codEval ? data.codEval : null,
+        "codEval": data.codEval ? data.codEval : null,
         "nOrden": data.norden,
         "codPa": data.dni,
         "edad": data.edad,
@@ -48,20 +48,22 @@ export function SubmitTestFatigaJs(data,user,token) {
         "txtPuntaje": data.txtPuntaje,
         "txtMedico": data.txtMedico,
         "dniUser": data.dniUser,
-        "userRegistro": user
-    };    
+        "userRegistro": user,
+        "usuarioFirma": data.user_medicoFirma,
+    };
 
     const url = `${URLAzure}/api/v01/ct/testFatigaSomnolencia/registrarActualizarTestFatigaSomnolencia`
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(body)
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(body)
     }
-    return fetch(url,options).then(res =>  {
+    return fetch(url, options).then(res => {
         if (!res.ok) {
             return res
-        } return res.json()}).then(response => response) 
+        } return res.json()
+    }).then(response => response)
 }
