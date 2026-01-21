@@ -10,6 +10,8 @@ import {
 import { getFetch } from "../../getFetch/getFetch";
 import Swal from "sweetalert2";
 import AutoResizeInput from "./Inputs";
+import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
+import { useSessionData } from "../../../../hooks/useSessionData";
 
 const date = new Date();
 const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
@@ -127,6 +129,8 @@ const HistoriaOcupacional = ({
     const bytes = new Uint8Array([...str].map(c => c.charCodeAt(0)));
     return new TextDecoder('utf-8').decode(bytes);
   }
+  const { userName } =
+    useSessionData();
 
   const [form, setForm] = useState({
     norden: "",
@@ -139,6 +143,9 @@ const HistoriaOcupacional = ({
     dni: "",
     dniUser: userDatos.datos.dni_user,
     nombreUser: fixEncodingModern(userDatos.datos.nombres_user),
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   });
   const [rowData, setRowData] = useState({
     fecha: "",
@@ -174,7 +181,6 @@ const HistoriaOcupacional = ({
   const { EmpresasMulti, AlturaMulti, AreaMulti, CargosMulti } = listas;
   // Opciones random de ejemplo para los selects
   //ALGUNOS YA TREEN DATOS DE VERITAS
-  console.log('Empresas en Historia Ocupacional',EmpresasMulti)
   const handleRowChange = (field, value) => {
     const numero = Number(value); // solo para lógica de control
 
@@ -255,6 +261,9 @@ const HistoriaOcupacional = ({
       dniUser: userDatos.datos.dni_user,
       areaO: "",
       dni: "",
+      // Médico que Certifica //BUSCADOR
+      nombre_medico: userName,
+      user_medicoFirma: userlogued,
     });
     setRowData({
       fecha: "",
@@ -284,12 +293,20 @@ const HistoriaOcupacional = ({
       nombres: "",
       areaO: "",
       fecha: today,
+      // Médico que Certifica //BUSCADOR
+      nombre_medico: userName,
+      user_medicoFirma: userlogued,
     }));
     setRegistros([]);
     setSearchEmpresa("");
     setSearchCargoOcupacion("");
     setSearchAltitud("");
     setSearchArea("");
+  };
+
+  const handleChangeSimple = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
   };
 
   const handleInputChange = (e) => {
@@ -1447,6 +1464,14 @@ const HistoriaOcupacional = ({
                 border: "1px solid #ccc",
                 borderRadius: "5px",
               }}
+            />
+          </div>
+          <div className="flex items-center w-full">
+            <EmpleadoComboBox
+              className="flex w-full"
+              value={form.nombre_medico}
+              form={form}
+              onChange={handleChangeSimple}
             />
           </div>
         </div>

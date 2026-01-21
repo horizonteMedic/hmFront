@@ -376,6 +376,8 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
     const sFirma = await getSign(form, "FIRMAP")
     const sHuella = await getSign(form, "HUELLA")
     const sSello = await getSign(form, "SELLOFIRMA")
+    const sSello2 = await getSign(form, "SELLOFIRMADOCASIG")
+    const sSello3 = await getSign(form, "SELLOFIRMADOCASIG-EXTRA")
     const { value: file } = await Swal.fire({
         title: "Selecciona un archivo PDF",
         input: "file",
@@ -423,6 +425,8 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
                 FIRMA: sFirma,
                 HUELLA: sHuella,
                 SELLOFIRMA: sSello,
+                SELLOFIRMADOCASIG: sSello2,
+                "SELLOFIRMADOCASIG-EXTRA": sSello3,
             };
             pdfBytes = await colocarSellosEnPdf(pdfBytes, sellos, coordenadas);
         } else {
@@ -446,17 +450,16 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
 
         const pdfBase64Final = uint8ToBase64(new Uint8Array(pdfBytesOptimizado));
 
-        //DESCARGA INNECESARIA
-        // const pdfBlob = new Blob([pdfBytesOptimizado], { type: "application/pdf" });
-        // const pdfUrl = URL.createObjectURL(pdfBlob);
-        // const link = document.createElement("a");
-        // link.href = pdfUrl;
-        // link.download = file.name; // o el nombre que tú quieras
-        // document.body.appendChild(link);
-        // link.click();
 
-        // document.body.removeChild(link);
-        // URL.revokeObjectURL(pdfUrl);
+        const pdfBlob = new Blob([pdfBytesOptimizado], { type: "application/pdf" });
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        // Abre el PDF en una nueva pestaña
+        window.open(pdfUrl, "_blank");
+
+        // Limpia luego (no inmediato)
+        setTimeout(() => {
+            URL.revokeObjectURL(pdfUrl);
+        }, 1000);
 
         const datos = {
             rutaArchivo: null,
@@ -478,13 +481,13 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
             indice_carga_masiva: undefined,
         };
 
-        const response = await SubmitData(datos, urlPDf, token);
+        /*const response = await SubmitData(datos, urlPDf, token);
         if (response.id === 1) {
 
             Swal.fire("Exito", "Archivo Subido con exto", "success")
         } else {
             Swal.fire("Error", "No se pudo subir", "error")
-        }
+        }*/
     };
     reader.readAsDataURL(file);
 };

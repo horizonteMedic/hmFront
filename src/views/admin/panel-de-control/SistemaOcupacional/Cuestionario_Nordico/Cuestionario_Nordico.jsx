@@ -24,7 +24,7 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
 const tabla = "cuestionario_nordico"
 
 const Cuestionario_Nordico = () => {
-  const { token, selectedSede, datosFooter, userlogued, userCompleto ,userName} =
+  const { token, selectedSede, datosFooter, userlogued, userCompleto, userName } =
     useSessionData();
   const initialFormState = {
     norden: "",
@@ -46,7 +46,7 @@ const Cuestionario_Nordico = () => {
     pregunta1CuelloSi: false,
     pregunta2CuelloNo: false,
     pregunta2CuelloSi: false,
-      //Hombros
+    //Hombros
     hombrosNo: true,
     hombroDerechoSi: false,
     hombroIzquierdoSi: false,
@@ -55,7 +55,7 @@ const Cuestionario_Nordico = () => {
     pregunta1HombrosSi: false,
     pregunta2HombrosNo: false,
     pregunta2HombrosSi: false,
-      //Codos
+    //Codos
     codosNo: true,
     codoDerechoSi: false,
     codoIzquierdoNo: false,
@@ -64,7 +64,7 @@ const Cuestionario_Nordico = () => {
     pregunta1CodosSi: false,
     pregunta2CodosNo: false,
     pregunta2CodosSi: false,
-      //Muñeca
+    //Muñeca
     munecaNo: true,
     munecaDerechaSi: false,
     munecaIzquierdaSi: false,
@@ -73,36 +73,36 @@ const Cuestionario_Nordico = () => {
     pregunta1MunecasSi: false,
     pregunta2MunecasNo: false,
     pregunta2MunecasSi: false,
-      //Otros
-      //Espalda Alta
+    //Otros
+    //Espalda Alta
     espaldaAltaToraxNo: true,
     espaldaAltaToraxSi: false,
     pregunta1EspaldaAltaToraxNo: false,
     pregunta1EspaldaAltaToraxSi: false,
     pregunta2EspaldaAltaToraxNo: false,
     pregunta2EspaldaAltaToraxSi: false,
-      //Espalda Baja
+    //Espalda Baja
     espaldaBajaLumbarNo: true,
     espaldaBajaLumbarSi: false,
     pregunta1EspaldaBajaLumbarNo: false,
     pregunta1EspaldaBajaLumbarSi: false,
     pregunta2EspaldaBajaLumbarNo: false,
     pregunta2EspaldaBajaLumbarSi: false,
-      //Caderas
+    //Caderas
     caderasOMuslosNo: true,
     caderasOMuslosSi: false,
     pregunta1CaderasOMuslosNo: false,
     pregunta1CaderasOMuslosSi: false,
     pregunta2CaderasOMuslosNo: false,
     pregunta2CaderasOMuslosSi: false,
-      //Rodillas
+    //Rodillas
     rodillasNo: true,
     rodillasSi: false,
     pregunta1RodillasNo: false,
     pregunta1RodillasSi: false,
     pregunta2RodillasNo: false,
     pregunta2RodillasSi: false,
-      //Tobillos
+    //Tobillos
     tobillosOPiesNo: true,
     tobillosOPiesSi: false,
     pregunta1TobillosOPiesNo: false,
@@ -116,26 +116,26 @@ const Cuestionario_Nordico = () => {
     pregunta2EspaldaBajaSi: false,
     pregunta3EspaldaBajaNo: false,
     pregunta3EspaldaBajaSi: false,
-      //Dias 1
+    //Dias 1
     pregunta4AEspaldaBaja: false,
     pregunta4BEspaldaBaja: false,
     pregunta4CEspaldaBaja: false,
     pregunta4DEspaldaBaja: false,
     pregunta4EEspaldaBaja: false,
-      //5
+    //5
     pregunta5AEspaldaBajaNo: false,
     pregunta5AEspaldaBajaSi: false,
     pregunta5BEspaldaBajaNo: false,
     pregunta5BEspaldaBajaSi: false,
-      //6 Dias 2
+    //6 Dias 2
     pregunta6AEspaldaBaja: false,
     pregunta6BEspaldaBaja: false,
     pregunta6CEspaldaBaja: false,
     pregunta6DEspaldaBaja: false,
-      //7
+    //7
     pregunta7EspaldaBajaNo: false,
     pregunta7EspaldaBajaSi: false,
-      //8
+    //8
     pregunta8EspaldaBajaNo: false,
     pregunta8EspaldaBajaSi: false,
     //Hombros
@@ -162,7 +162,7 @@ const Cuestionario_Nordico = () => {
     //14
     pregunta6AProblemasHombrosNo: false,
     pregunta6AProblemasHombrosSi: false,
-    
+
     pregunta6BProblemasHombrosNo: false,
     pregunta6BProblemasHombrosSi: false,
     //15
@@ -196,7 +196,7 @@ const Cuestionario_Nordico = () => {
     //5
     pregunta5AProblemasCuelloNo: false,
     pregunta5AProblemasCuelloSi: false,
-    
+
     pregunta5BProblemasCuelloNo: false,
     pregunta5BProblemasCuelloSi: false,
     //6
@@ -211,14 +211,14 @@ const Cuestionario_Nordico = () => {
     pregunta8ProblemasCuelloNo: false,
     pregunta8ProblemasCuelloSi: false,
 
-     // Médico que Certifica //BUSCADOR
+    // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
   };
 
-  
-  const { form, setForm, handleChange, handleChangeNumber, handleClear,handleChangeSimple, handleClearnotO, handleInputChangeChecked } = useForm(initialFormState)
-  
+
+  const { form, setForm, handleChange, handleChangeNumber, handleClear, handleChangeSimple, handleClearnotO, handleInputChangeChecked } = useForm(initialFormState)
+
   const handlePrint = () => {
     if (!form.norden) return Swal.fire("Error", "Debe colocar un N° Orden", "error");
     Swal.fire({
@@ -246,65 +246,65 @@ const Cuestionario_Nordico = () => {
         <h1 className="text-3xl font-bold mb-4 text-center">Cuestionario Nórdico de Signos y Síntomas Osteomusculares</h1>
         {/* Tabs */}
         <div className="flex flex-col space-x-1 mt-4 border shadow p-8 mx-auto">
-           <Cuestionario
-              token={token}
-              selectedSede={selectedSede}
-              userlogued={userlogued}
-              form={form}
-              setForm={setForm}
-              handleChange={handleChange}
-              handleChangeNumber={handleChangeNumber}
-              handleClearnotO={handleClearnotO}
-              handleInputChangeChecked={handleInputChangeChecked}
-              tabla={tabla}
-              VerifyTR={VerifyTR}
-            />
-            <Responder
-              token={token}
-              selectedSede={selectedSede}
-              userlogued={userlogued}
-              form={form}
-              setForm={setForm}
-              handleChange={handleChange}
-              handleChangeNumber={handleChangeNumber}
-              handleClearnotO={handleClearnotO}
-              handleInputChangeChecked={handleInputChangeChecked}
-            />
-            <Espalda_Baja
-              token={token}
-              selectedSede={selectedSede}
-              userlogued={userlogued}
-              form={form}
-              setForm={setForm}
-              handleChange={handleChange}
-              handleChangeNumber={handleChangeNumber}
-              handleClearnotO={handleClearnotO}
-              handleInputChangeChecked={handleInputChangeChecked}
-            />
-            <Hombros
-              token={token}
-              selectedSede={selectedSede}
-              userlogued={userlogued}
-              form={form}
-              setForm={setForm}
-              handleChange={handleChange}
-              handleChangeNumber={handleChangeNumber}
-              handleClearnotO={handleClearnotO}
-              handleInputChangeChecked={handleInputChangeChecked}
-            />
-            <Cuello
-              token={token}
-              userlogued={userlogued}
-              form={form}
-              setForm={setForm}
-              handleInputChangeChecked={handleInputChangeChecked}
-              SubmitCuestionarioNordic={SubmitCuestionarioNordic}
-              tabla={tabla}
-              handleClear={handleClear}
-              handleChange={handleChange}
-              handlePrint={handlePrint}
-              handleChangeSimple={handleChangeSimple}
-            />
+          <Cuestionario
+            token={token}
+            selectedSede={selectedSede}
+            userlogued={userlogued}
+            form={form}
+            setForm={setForm}
+            handleChange={handleChange}
+            handleChangeNumber={handleChangeNumber}
+            handleClearnotO={handleClearnotO}
+            handleInputChangeChecked={handleInputChangeChecked}
+            tabla={tabla}
+            VerifyTR={VerifyTR}
+          />
+          <Responder
+            token={token}
+            selectedSede={selectedSede}
+            userlogued={userlogued}
+            form={form}
+            setForm={setForm}
+            handleChange={handleChange}
+            handleChangeNumber={handleChangeNumber}
+            handleClearnotO={handleClearnotO}
+            handleInputChangeChecked={handleInputChangeChecked}
+          />
+          <Espalda_Baja
+            token={token}
+            selectedSede={selectedSede}
+            userlogued={userlogued}
+            form={form}
+            setForm={setForm}
+            handleChange={handleChange}
+            handleChangeNumber={handleChangeNumber}
+            handleClearnotO={handleClearnotO}
+            handleInputChangeChecked={handleInputChangeChecked}
+          />
+          <Hombros
+            token={token}
+            selectedSede={selectedSede}
+            userlogued={userlogued}
+            form={form}
+            setForm={setForm}
+            handleChange={handleChange}
+            handleChangeNumber={handleChangeNumber}
+            handleClearnotO={handleClearnotO}
+            handleInputChangeChecked={handleInputChangeChecked}
+          />
+          <Cuello
+            token={token}
+            userlogued={userlogued}
+            form={form}
+            setForm={setForm}
+            handleInputChangeChecked={handleInputChangeChecked}
+            SubmitCuestionarioNordic={SubmitCuestionarioNordic}
+            tabla={tabla}
+            handleClear={handleClear}
+            handleChange={handleChange}
+            handlePrint={handlePrint}
+            handleChangeSimple={handleChangeSimple}
+          />
 
         </div>
 

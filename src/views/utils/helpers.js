@@ -137,12 +137,15 @@ export async function colocarSellosEnPdf(pdfBytes, sellos, coordenadas) {
         const url = sellos[key];
         const coord = coordenadas[key];
 
-        if (!url || !coord) continue;
+        if (!coord || !esUrlImagenValida(url)) {
+            console.warn(`Sello omitido: ${key}`, url);
+            continue;
+        }
 
         const imgBytes = await fetchImageBytes(url);
 
         const image =
-            url.toLowerCase().endsWith(".jpg") || url.toLowerCase().endsWith(".jpeg")
+            url.toLowerCase().endsWith(".png") || url.toLowerCase().endsWith(".jpeg")
                 ? await pdfDoc.embedJpg(imgBytes)
                 : await pdfDoc.embedPng(imgBytes);
 
@@ -155,6 +158,13 @@ export async function colocarSellosEnPdf(pdfBytes, sellos, coordenadas) {
     }
 
     return await pdfDoc.save();
+}
+
+function esUrlImagenValida(url) {
+    if (!url || typeof url !== "string") return false;
+    if (url === "Sin registro") return false;
+
+    return /\.(png|jpg|jpeg)$/i.test(url.split("?")[0]);
 }
 
 export function uint8ToBase64(uint8Array) {
