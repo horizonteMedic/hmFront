@@ -1151,30 +1151,6 @@ export default function AudiometriaOhla({
               Asignar Especialista
             </label>
           </div>
-          <SectionFieldset legend="Asignación de Médico">
-            <EmpleadoComboBox
-              value={form.nombre_medico}
-              label="Especialista"
-              form={form}
-              onChange={handleChange}
-            />
-            <EmpleadoComboBox
-              value={form.nombre_doctorAsignado}
-              label="Doctor Asignado"
-              form={form}
-              onChange={handleChange}
-              nameField="nombre_doctorAsignado"
-              idField="user_doctorAsignado"
-            />
-            <EmpleadoComboBox
-              value={form.nombre_doctorExtra}
-              label="Doctor Extra"
-              form={form}
-              onChange={handleChange}
-              nameField="nombre_doctorExtra"
-              idField="user_doctorExtra"
-            />
-          </SectionFieldset>
         </div>
         {/* Lado derecho */}
         <div className="border rounded p-4 mt-6 flex flex-col gap-4">

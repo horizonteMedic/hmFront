@@ -61,9 +61,9 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
           oi_o_8000: res.oi1_8000,
           diagnostico: res.diagnostico,
 
-          user_medicoFirma: res.usuarioFirma,
-          user_doctorAsignado: res.doctorAsignado,
-          user_doctorExtra: res.doctorExtra,
+          // user_medicoFirma: res.usuarioFirma,
+          // user_doctorAsignado: res.doctorAsignado,
+          // user_doctorExtra: res.doctorExtra,
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -121,9 +121,9 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     diagnostico: form.diagnostico,
     userRegistro: user,
 
-    usuarioFirma: form.user_medicoFirma,
-    doctorAsignado: form.user_doctorAsignado,
-    doctorExtra: form.user_doctorExtra,
+    // usuarioFirma: form.user_medicoFirma,
+    // doctorAsignado: form.user_doctorAsignado,
+    // doctorExtra: form.user_doctorExtra,
 
   };
   SubmitData(body, registrarUrl, token).then((res) => {

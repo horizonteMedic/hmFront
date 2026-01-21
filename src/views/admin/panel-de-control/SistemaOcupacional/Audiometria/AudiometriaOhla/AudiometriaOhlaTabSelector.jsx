@@ -70,16 +70,6 @@ const AudiometriaOhlaTabSelector = ({
     nombres_search: "",
     codigo_search: "",
     diagnostico: "",
-
-    // Médico que Certifica //BUSCADOR
-    nombre_medico: userName,
-    user_medicoFirma: userlogued,
-
-    nombre_doctorAsignado: "",
-    user_doctorAsignado: "",
-
-    nombre_doctorExtra: "",
-    user_doctorExtra: "",
   };
   const [formOhla, setFormOhla] = useState(initialFormStateOhla);
 
