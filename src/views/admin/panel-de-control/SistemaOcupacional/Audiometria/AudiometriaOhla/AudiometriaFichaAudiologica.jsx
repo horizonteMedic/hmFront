@@ -10,14 +10,11 @@ import {
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import { getToday } from "../../../../../utils/helpers";
 
 const tabla = "ficha_audiologica";
 
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
+const today = getToday();
 
 const AudiometriaFichaAudiologica = ({
   token,
@@ -661,20 +658,30 @@ const AudiometriaFichaAudiologica = ({
                   className="border border-gray-400 rounded-lg px-3 py-1 bg-white flex-1 text-[12px]"
                 />
               </div>
-              <EmpleadoComboBox
-                value={form.nombre_medico}
-                label="Especialista"
-                form={form}
-                onChange={handleChange}
-              />
-              <EmpleadoComboBox
-                value={form.nombre_medico_extra}
-                label="Especialista Extra"
-                form={form}
-                onChange={handleChange}
-                nameField="nombre_medico_extra"
-                idField="user_medicoFirmaExtra"
-              />
+              <SectionFieldset legend="Asignación de Médico">
+                <EmpleadoComboBox
+                  value={form.nombre_medico}
+                  label="Especialista"
+                  form={form}
+                  onChange={handleChange}
+                />
+                <EmpleadoComboBox
+                  value={form.nombre_doctorAsignado}
+                  label="Doctor Asignado"
+                  form={form}
+                  onChange={handleChange}
+                  nameField="nombre_doctorAsignado"
+                  idField="user_doctorAsignado"
+                />
+                <EmpleadoComboBox
+                  value={form.nombre_doctorExtra}
+                  label="Doctor Extra"
+                  form={form}
+                  onChange={handleChange}
+                  nameField="nombre_doctorExtra"
+                  idField="user_doctorExtra"
+                />
+              </SectionFieldset>
 
             </div>
           </div>

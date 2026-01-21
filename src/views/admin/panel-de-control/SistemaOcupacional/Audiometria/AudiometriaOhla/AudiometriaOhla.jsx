@@ -19,6 +19,8 @@ import {
   GetInfoServicioFicha,
   PrintHojaR,
 } from "./controllerAudiometriaOhla";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 
 const tabla = "audiometria_po";
 const frecuencias = ["500", "1000", "2000", "3000", "4000", "6000", "8000"];
@@ -1149,6 +1151,30 @@ export default function AudiometriaOhla({
               Asignar Especialista
             </label>
           </div>
+          <SectionFieldset legend="Asignación de Médico">
+            <EmpleadoComboBox
+              value={form.nombre_medico}
+              label="Especialista"
+              form={form}
+              onChange={handleChange}
+            />
+            <EmpleadoComboBox
+              value={form.nombre_doctorAsignado}
+              label="Doctor Asignado"
+              form={form}
+              onChange={handleChange}
+              nameField="nombre_doctorAsignado"
+              idField="user_doctorAsignado"
+            />
+            <EmpleadoComboBox
+              value={form.nombre_doctorExtra}
+              label="Doctor Extra"
+              form={form}
+              onChange={handleChange}
+              nameField="nombre_doctorExtra"
+              idField="user_doctorExtra"
+            />
+          </SectionFieldset>
         </div>
         {/* Lado derecho */}
         <div className="border rounded p-4 mt-6 flex flex-col gap-4">

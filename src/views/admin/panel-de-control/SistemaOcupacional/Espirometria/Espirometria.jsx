@@ -59,8 +59,11 @@ export default function Espirometria() {
         nombre_medico: userName,
         user_medicoFirma: userlogued,
 
-        nombre_medico_extra: "",
-        user_medicoFirmaExtra: "",
+        nombre_doctorAsignado: "",
+        user_doctorAsignado: "",
+
+        nombre_doctorExtra: "",
+        user_doctorExtra: "",
 
         SubirDoc: false,
         nomenclatura: "ESPIROMETRIA"
@@ -237,12 +240,20 @@ export default function Espirometria() {
                     onChange={handleChangeSimple}
                 />
                 <EmpleadoComboBox
-                    value={form.nombre_medico_extra}
-                    label="Especialista Extra"
+                    value={form.nombre_doctorAsignado}
+                    label="Doctor Asignado"
                     form={form}
                     onChange={handleChangeSimple}
-                    nameField="nombre_medico_extra"
-                    idField="user_medicoFirmaExtra"
+                    nameField="nombre_doctorAsignado"
+                    idField="user_doctorAsignado"
+                />
+                <EmpleadoComboBox
+                    value={form.nombre_doctorExtra}
+                    label="Doctor Extra"
+                    form={form}
+                    onChange={handleChangeSimple}
+                    nameField="nombre_doctorExtra"
+                    idField="user_doctorExtra"
                 />
             </SectionFieldset>
 

@@ -75,6 +75,8 @@ export const GetInfoServicio = async (
             interpretacion: res.interpretacion,
 
             user_medicoFirma: res.usuarioFirma,
+            user_doctorAsignado: res.doctorAsignado,
+            user_doctorExtra: res.doctorExtra,
             SubirDoc: true,
             digitalizacion: res.digitalizacion
         }));
@@ -109,6 +111,8 @@ export const SubmitDataService = async (
 
         usuarioRegistro: user,
         usuarioFirma: form.user_medicoFirma,
+        doctorAsignado: form.user_doctorAsignado,
+        doctorExtra:form.user_doctorExtra,
 
     };
     console.log(body)
