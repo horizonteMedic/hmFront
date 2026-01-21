@@ -57,6 +57,7 @@ export const GetInfoServicio = async (
       valueMet: res.metanfetamina ? "POSITIVO" : "NEGATIVO",
 
       user_medicoFirma: res.usuarioFirma,
+      user_doctorAsignado: res.doctorAsignado,
     }));
   }
 };
@@ -77,13 +78,14 @@ export const SubmitDataService = async (
     id: form.panel4dId,
     norden: form.norden,
     fecha: form.fecha,
-    cocaina: form.valueC=="POSITIVO",
-    marihuana: form.valueM=="POSITIVO",
-    opiaceos: form.valueO=="POSITIVO",
-    metanfetamina: form.valueMet=="POSITIVO",
+    cocaina: form.valueC == "POSITIVO",
+    marihuana: form.valueM == "POSITIVO",
+    opiaceos: form.valueO == "POSITIVO",
+    metanfetamina: form.valueMet == "POSITIVO",
     usuarioRegistro: user,
 
     usuarioFirma: form.user_medicoFirma,
+    doctorAsignado: form.user_doctorAsignado,
   };
 
   await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

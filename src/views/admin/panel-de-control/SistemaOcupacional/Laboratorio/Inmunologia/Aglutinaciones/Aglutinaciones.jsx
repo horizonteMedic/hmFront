@@ -46,6 +46,9 @@ export default function Aglutinaciones() {
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
+
+    nombre_doctorAsignado: "",
+    user_doctorAsignado: "",
   };
 
   const {
@@ -241,6 +244,14 @@ export default function Aglutinaciones() {
           label="Especialista"
           form={form}
           onChange={handleChangeSimple}
+        />
+        <EmpleadoComboBox
+          value={form.nombre_doctorAsignado}
+          label="Doctor Asignado"
+          form={form}
+          onChange={handleChangeSimple}
+          nameField="nombre_doctorAsignado"
+          idField="user_doctorAsignado"
         />
       </SectionFieldset>
 

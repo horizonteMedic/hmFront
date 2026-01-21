@@ -57,6 +57,7 @@ export const GetInfoServicio = async (
       valueBen: res.txtrBenzodiacepina ?? "NEGATIVO",
 
       user_medicoFirma: res.usuarioFirma,
+      user_doctorAsignado: res.doctorAsignado,
     }));
   }
 };
@@ -85,6 +86,7 @@ export const SubmitDataService = async (
     userRegistro: user,
 
     usuarioFirma: form.user_medicoFirma,
+    doctorAsignado: form.user_doctorAsignado,
   };
 
   await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
