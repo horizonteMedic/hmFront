@@ -88,6 +88,7 @@ const ExamenesListOHLA = buildExamenesList([       //OHLA
     "TRABAJO_ALTURA_PSICO",                    // 33
     "OFTALMOLOGIA",                            // 34
     "CONSENT_DECLARACION_APTITUD",             // 35
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL", //EXTRA VIVIANA
     "DECLARACION_USO_FIRMA_ARCHIVO",           // 36
     "INTERCONSULTAS"                           // 37
 ]);
@@ -328,6 +329,7 @@ const ExamenesListPsicosensometricoSolo = buildExamenesList([   // Psicosensomet
     "TRABAJO_ESPECIFICOS",
     "FICHA_OFTALMOLOGICA",
 
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
     "DECLARACION_USO_FIRMA_ARCHIVO",
     "INTERCONSULTAS"
 ]);
@@ -803,8 +805,7 @@ const ExamenesListK2 = buildExamenesList([ // K2
 
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
     "DECLARACION_USO_FIRMA_ARCHIVO",
-
-    "INTERCONSULTAS",
+    "INTERCONSULTAS"
 ]);
 
 const ExamenesListBorooAlturaEKG = buildExamenesList([ // BOROO ALTURA + EKG
@@ -853,7 +854,7 @@ const ExamenesListBorooAlturaEKG = buildExamenesList([ // BOROO ALTURA + EKG
 
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
     "DECLARACION_USO_FIRMA_ARCHIVO",
-    "INTERCONSULTAS",
+    "INTERCONSULTAS"
 ]);
 
 const ExamenesListBorooAlturaSinEKG = buildExamenesList([ // BOROO ALTURA SIN EKG
@@ -1013,6 +1014,7 @@ const ExamenesListAlturaSolo = buildExamenesList([ // ALTURA SOLO
     "OFTALMOLOGIA",
     "OFTALMOLOGIA_VISION_TESTER",
 
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
     "DECLARACION_USO_FIRMA_ARCHIVO",
     "INTERCONSULTAS"
 ]);
