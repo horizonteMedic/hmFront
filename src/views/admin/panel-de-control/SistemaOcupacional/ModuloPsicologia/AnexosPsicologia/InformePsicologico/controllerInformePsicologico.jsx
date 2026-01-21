@@ -58,45 +58,42 @@ export const GetInfoServicio = async (
             intelectualPromedioSuperior: (res.areaIntelectual ?? "").includes("- EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO SUPERIOR."),
             intelectualPromedioBajo: (res.areaIntelectual ?? "").includes("- EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO BAJO."),
 
-            pSuperior: (res.areaIntelectual ?? "").includes("POSEE UN NIVEL PSICOMOTOR SUPERIOR."),
-            pMedio: (res.areaIntelectual ?? "").includes("POSEE UN NIVEL PSICOMOTOR MEDIO."),
-            pBajo: (res.areaIntelectual ?? "").includes("POSEE UN NIVEL PSICOMOTOR BAJO."),
-            bajo: (res.areaIntelectual ?? "").includes("POSEE UN NIVEL PSICOMOTOR BAJO."),
+            promSuperior: (res.areaIntelectual ?? "").includes("- POSEE UN NIVEL PROMEDIO SUPERIOR EN COMPRENSION VERBAL Y EN CAPACIDAD DE CÁLCULO."),
+            promedio: (res.areaIntelectual ?? "").includes("- POSEE UN NIVEL PROMEDIO EN COMPRENSION VERBAL Y EN CAPACIDAD DE CÁLCULO."),
+            superior: (res.areaIntelectual ?? "").includes("- POSEE UN NIVEL SUPERIOR EN COMPRENSION VERBAL Y EN CAPACIDAD DE CÁLCULO."),
+            promBajo: (res.areaIntelectual ?? "").includes("- POSEE UN NIVEL PROMEDIO BAJO EN COMPRENSION VERBAL Y EN CAPACIDAD DE CÁLCULO."),
 
-            facilidad: (res.areaIntelectual ?? "").includes("PRESENTA FACILIDAD EN EL PROCESAMIENTO DE LA INFORMACIÓN."),
-            dificultad: (res.areaIntelectual ?? "").includes("PRESENTA DIFICULTAD EN EL PROCESAMIENTO DE LA INFORMACIÓN."),
+            infosencilla: (res.areaIntelectual ?? "").includes("- COMPRENDE Y PROCESA LA INFORMACION SENCILLA CON FACILIDAD."),
+            infogeneral: (res.areaIntelectual ?? "").includes("- COMPRENDE Y PROCESA LA INFORMACION CON FACILIDAD."),
 
-            pnAdecuado: (res.areaIntelectual ?? "").includes("PRESENTA UN NIVEL DE ATENCIÓN ADECUADO."),
-            nAlto: (res.areaIntelectual ?? "").includes("PRESENTA UN NIVEL DE ATENCIÓN ALTO."),
-            nBajo: (res.areaIntelectual ?? "").includes("PRESENTA UN NIVEL DE ATENCIÓN BAJO."),
+            compInfo: (res.areaIntelectual ?? "").includes("- COMPRENDE Y PROCESA LA INFORMACION SENCILLA CON FACILIDAD."),
+            compBajo: (res.areaIntelectual ?? "").includes("- POSEE UN NIVEL PROMEDIO BAJO EN EL MANEJO DE FACULTADES MENTALES."),
 
-            yNumerica: (res.areaIntelectual ?? "").includes("Y EN CAPACIDAD NUMÉRICA."),
-            yCalculo: (res.areaIntelectual ?? "").includes("Y EN CAPACIDAD DE CÁLCULO."),
+            supVerbalNum: (res.areaIntelectual ?? "").includes("- POSEE UN NIVEL SUPERIOR EN COMPRENSION VERBAL Y EN CAPACIDAD NUMÉRICA."),
+            promVerbalNum: (res.areaIntelectual ?? "").includes("- POSEE UN NIVEL PROMEDIO EN COMPRENSION VERBAL Y EN CAPACIDAD NUMÉRICA."),
+            promSupVerbalNum: (res.areaIntelectual ?? "").includes("- POSEE UN NIVEL PROMEDIO SUPERIOR EN COMPRENSION VERBAL Y EN CAPACIDAD NUMÉRICA."),
+            promBajoVerbalNum: (res.areaIntelectual ?? "").includes("- POSEE UN NIVEL PROMEDIO BAJO EN COMPRENSION VERBAL Y EN CAPACIDAD NUMÉRICA."),
 
-            adecuadaR: (res.areaIntelectual ?? "").includes("PRESENTA ADECUADA RETENCIÓN DE DÍGITOS."),
-            inadecuada: (res.areaIntelectual ?? "").includes("PRESENTA INADECUADA RETENCIÓN DE DÍGITOS."),
+            adecuado: (res.areaIntelectual ?? "").includes("- ADECUADA RETENCION DE DIGITOS."),
+            prmBajo: (res.areaIntelectual ?? "").includes("- PRESENTA UN NIVEL PROMEDIO BAJO RETENCION DE DIGITOS."),
 
             // Área de Personalidad
             areaPersonalidad: res.areaPersonalidad ?? "",
 
             // Área de Psicomotricidad
             areaPsicomotricidad: res.areaPsicomotricidad ?? "",
-            nivelAltoPs: (res.areaPsicomotricidad ?? "").includes("POSEE UN NIVEL PSICOMOTOR ALTO."),
-            nivelAdecuadoPs: (res.areaPsicomotricidad ?? "").includes("POSEE UN NIVEL PSICOMOTOR ADECUADO."),
-            nivelBajoPs: (res.areaPsicomotricidad ?? "").includes("POSEE UN NIVEL PSICOMOTOR BAJO."),
-
-            facilidadPs: (res.areaPsicomotricidad ?? "").includes("PRESENTA FACILIDAD EN PSICOMOTRICIDAD."),
-            dificultadPs: (res.areaPsicomotricidad ?? "").includes("PRESENTA DIFICULTAD EN PSICOMOTRICIDAD."),
+            nivAdecuado: (res.areaPsicomotricidad ?? "").includes("- NIVEL ADECUADO EN DESARROLLO PSICOMOTOR."),
+            facilidad: (res.areaPsicomotricidad ?? "").includes("- REALIZA LAS INSTRUCCIONES BRINDADAS CON FACILIDAD."),
+            dificultad: (res.areaPsicomotricidad ?? "").includes("- REALIZA LAS INSTRUCCIONES BRINDADAS CON DIFICULTAD."),
 
             // Área de Organicidad
             areaOrganicidad: res.areaOrganicidad ?? "",
-            orientadoEnTiempo: (res.areaOrganicidad ?? "").includes("ORIENTADO EN TIEMPO, ESPACIO Y PERSONA."),
+            orientadoTiempo: (res.areaOrganicidad ?? "").includes("- ORIENTADO EN TIEMPO, ESPACIO, Y PERSONA."),
 
-            poseeAltoManejo: (res.areaOrganicidad ?? "").includes("POSEE ALTO MANEJO DE FACULTADES MENTALES."),
-            pAdecuadoManejo: (res.areaOrganicidad ?? "").includes("POSEE ADECUADO MANEJO DE FACULTADES MENTALES."),
-            pBajoManejo: (res.areaOrganicidad ?? "").includes("POSEE BAJO MANEJO DE FACULTADES MENTALES."),
+            adecuadoManejo: (res.areaOrganicidad ?? "").includes("- POSEE UN ADECUADO MANEJO DE FACULTADES MENTALES"),
+            bajoManejo: (res.areaOrganicidad ?? "").includes("- POSEE UN NIVEL PROMEDIO BAJO EN EL MANEJO DE FACULTADES MENTALES."),
 
-            noSeEnvidencia: (res.areaOrganicidad ?? "").includes("NO SE EVIDENCIA DAÑO ORGÁNICO."),
+            noEnvidencia: (res.areaOrganicidad ?? "").includes("- NO SE EVIDENCIA DAÑO ORGÁNICO."),
 
             // Recomendaciones
             recomendaciones: res.recomendaciones,
