@@ -55,6 +55,7 @@ export const GetInfoServicio = async (
             resultado: res.resultadoThevenon ?? "",
 
             user_medicoFirma: res.usuarioFirma,
+            user_doctorAsignado: res.doctorAsignado,
         }));
     }
 };
@@ -85,6 +86,7 @@ export const SubmitDataService = async (
         userRegistro: user,
         userActualizacion: user,
         usuarioFirma: form.user_medicoFirma,
+        doctorAsignado: form.user_doctorAsignado,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

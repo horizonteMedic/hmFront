@@ -67,6 +67,7 @@ export const GetInfoServicio = async (
       observaciones: res.txtobservaciones ?? prev.observaciones,
 
       user_medicoFirma: res.usuarioFirma,
+      user_doctorAsignado: res.doctorAsignado,
     }));
   }
 };
@@ -105,6 +106,7 @@ export const SubmitDataService = async (
     user_medico_ocup: "",
 
     usuarioFirma: form.user_medicoFirma,
+    doctorAsignado: form.user_doctorAsignado,
   };
 
   await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

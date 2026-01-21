@@ -639,17 +639,6 @@ const AudiometriaFichaAudiologica = ({
             {/* Datos de profesional y botones */}
             <div className="flex flex-col gap-3 ml-4">
               <div className="flex items-center gap-2 mb-1">
-                <label className="w-[200px] text-[12px]">
-                  Nombre del profesional que realiza la audiometría :
-                </label>
-                <input
-                  name="nombre_profecional"
-                  value={form.nombre_profecional || ""}
-                  disabled
-                  className="border border-gray-400 rounded-lg px-3 py-1 bg-white flex-1 text-[12px]"
-                />
-              </div>
-              <div className="flex items-center gap-2 mb-1">
                 <label className="w-[200px] text-[12px]">Conclusiones :</label>
                 <input
                   name="conclusiones"
@@ -661,7 +650,7 @@ const AudiometriaFichaAudiologica = ({
               <SectionFieldset legend="Asignación de Médico">
                 <EmpleadoComboBox
                   value={form.nombre_medico}
-                  label="Especialista"
+                  label="Nombre del profesional que realiza la audiometría"
                   form={form}
                   onChange={handleChange}
                 />

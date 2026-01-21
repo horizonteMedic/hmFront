@@ -47,6 +47,9 @@ export default function VDRL() {
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
+
+    nombre_doctorAsignado: "",
+    user_doctorAsignado: "",
   };
 
   const {
@@ -159,6 +162,14 @@ export default function VDRL() {
           form={form}
           label='Especialista que Certifica'
           onChange={handleChangeSimple}
+        />
+        <EmpleadoComboBox
+          value={form.nombre_doctorAsignado}
+          label="Doctor Asignado"
+          form={form}
+          onChange={handleChangeSimple}
+          nameField="nombre_doctorAsignado"
+          idField="user_doctorAsignado"
         />
       </SectionFieldset>
 
