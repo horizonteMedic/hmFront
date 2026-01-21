@@ -14,14 +14,13 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
 
 export default function AudiometriaTabSelector({
   token,
-  userlogued,
+  userlogued2,
   selectedSede,
   listas,
   subTab,
 }) {
 
-  const { userName } = useSessionData();
-  console.log(userlogued)
+  const { userName, userlogued } = useSessionData();
   const initialFormStateCuestionarioAudio = {
     norden: "",
     codCuestionario: null,
@@ -83,7 +82,7 @@ export default function AudiometriaTabSelector({
     p16_boxeo_tiempo: "",
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
-    user_medicoFirma: userlogued.sub,
+    user_medicoFirma: userlogued,
   };
 
 

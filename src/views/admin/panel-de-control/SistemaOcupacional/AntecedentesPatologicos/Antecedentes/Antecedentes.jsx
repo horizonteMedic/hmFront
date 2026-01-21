@@ -7,6 +7,7 @@ import InputTextOneLine from "../../../../../components/reusableComponents/Input
 import MedicoSearch from "../../../../../components/reusableComponents/MedicoSearch";
 import { useState } from "react";
 import Swal from "sweetalert2";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
 export default function Antecedentes({
   form,
@@ -72,12 +73,12 @@ export default function Antecedentes({
     }));
   };
   const handleLimpiar = () => {
-    console.log( "antecedentesEliminados", [
-        ...form.antecedentesEliminados,
-        ...form.antecedentes
-          .filter(reg => reg.quirurjicosId != null)
-          .map(reg => reg.quirurjicosId)
-      ])
+    console.log("antecedentesEliminados", [
+      ...form.antecedentesEliminados,
+      ...form.antecedentes
+        .filter(reg => reg.quirurjicosId != null)
+        .map(reg => reg.quirurjicosId)
+    ])
     setForm(prev => ({
       ...prev,
       antecedentesEliminados: [
@@ -313,10 +314,11 @@ export default function Antecedentes({
       <div className="bg-white border border-gray-200 rounded-lg p-3 ">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Columna 1 - Campo Médico */}
-          <MedicoSearch
+          <EmpleadoComboBox
             value={form.nombre_medico}
+            label="Especialista"
+            form={form}
             onChange={handleChangeSimple}
-            MedicosMulti={MedicosMulti}
           />
           {/* Columna 2 - Sección de impresión */}
           <div className="flex items-center gap-2">

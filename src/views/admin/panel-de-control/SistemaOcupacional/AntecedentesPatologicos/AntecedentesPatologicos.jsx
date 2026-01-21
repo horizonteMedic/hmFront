@@ -16,7 +16,7 @@ const today = getToday();
 // Tab Normal de Antecedentes Patológicos
 export default function AntecedentesPatologicos({ listas }) {
   const { MedicosMulti } = listas;
-  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+  const { token, userlogued, selectedSede, datosFooter, userCompleto, userName } =
     useSessionData();
 
   const initialFormState = {
@@ -282,7 +282,8 @@ export default function AntecedentesPatologicos({ listas }) {
 
     dniUsuario: userCompleto?.datos?.dni_user ?? "",
     // Médico que Certifica //BUSCADOR
-    nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
   const {
     form,

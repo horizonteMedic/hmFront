@@ -361,6 +361,8 @@ export const GetInfoServicioEditar = async (
             hijos: res.hijosEspecifiqueBoro_hijos_detall,
             esposaConyuge: res.esposConyEspecifiqueBoro_espos_cony_detall,
             carnetConadis: res.conadisEspecifiqueBoro_conadisdetalle,
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -598,6 +600,8 @@ export const SubmitDataService = async (
         eliminarPatologicosQuirurjicos:
             form.codigoAntecedentesPatologicos_cod_ap ? form.antecedentesEliminados : null,
         userRegistro: user,
+
+        usuarioFirma: form.user_medicoFirma,
     };
     console.log(body)
 

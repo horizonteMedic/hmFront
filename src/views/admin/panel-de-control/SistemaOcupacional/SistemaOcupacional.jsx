@@ -292,7 +292,7 @@ const TabComponent = () => {
                   { vista: "Antecedentes Patologicos", tab: 29, icons: [{ icon: faBacterium }], label: "Antecedentes Patológicos" },
                   { vista: "Audiometria", tab: 15, icons: [{ icon: faDeaf }], label: "Audiometría" },
                   { vista: "Constancia Certificado Medico Ocupacional", tab: 34, icons: [{ icon: faSuitcaseMedical }], label: "Certificado Medico Ocupacional" },
-                  { vista: "Coproparasitologico", tab: 3, icons: [{ icon: faClipboardList }], label: "Coproparasitológico" },
+                  // { vista: "Coproparasitologico", tab: 3, icons: [{ icon: faClipboardList }], label: "Coproparasitológico" },
                   { vista: "Cuestionario Nordico", tab: 21, icons: [{ icon: faSkiingNordic }], label: "Cuestionario Nordico" },
                   { vista: "EKG", tab: 13, icons: [{ icon: faHeartbeat }], label: "EKG" },
                   { vista: "Espirometria", tab: 14, icons: [{ icon: faLungs }], label: "Espirometría" },
@@ -304,7 +304,7 @@ const TabComponent = () => {
                   { vista: "Fichas Aptitud", tab: 30, icons: [{ icon: faFileMedical }], label: "Fichas Aptitud" },
                   { vista: "Historia Ocupacional", tab: 16, icons: [{ icon: faFileWaveform }], label: "Historia Ocupacional" },
                   { vista: "Laboratorio Clinico", tab: 2, icons: [{ icon: faVial }], label: "Laboratorio" },
-                  { vista: "Medicina General", tab: 11, icons: [{ icon: faUserMd }], label: "Medicina General" },
+                  // { vista: "Medicina General", tab: 11, icons: [{ icon: faUserMd }], label: "Medicina General" },
                   { vista: "Modulo de Consentimientos", tab: 20, icons: [{ icon: faCheckToSlot }], label: "Modulo de Consentimientos" },
                   { vista: "Odontologia", tab: 18, icons: [{ icon: faTooth }], label: "Odontología" },
                   { vista: "Oftalmologia", tab: 17, icons: [{ icon: faEye }], label: "Oftalmología" },
@@ -523,7 +523,7 @@ const TabComponent = () => {
             const displayedInterfaces = {
               1: { title: "Triaje", child: <Triaje token={token} selectedSede={selectSede} /> },
               2: { title: "Laboratorio", child: <LaboratorioTabSelector tieneVista={tieneVista} /> },
-              3: { title: "Coproparasitológico", child: <ParasitologiaCoprologico /> },
+              // 3: { title: "Coproparasitológico", child: <ParasitologiaCoprologico /> },
               6: {
                 title: "Consentimientos", child: (
                   <ConsentimientosSubTabSelector
