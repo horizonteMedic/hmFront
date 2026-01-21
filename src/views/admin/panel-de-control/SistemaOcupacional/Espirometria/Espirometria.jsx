@@ -93,7 +93,7 @@ export default function Espirometria() {
             VerifyTR(form.norden, tabla, token, setForm, selectedSede);
         }
     };
-
+    console.log(form)
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">

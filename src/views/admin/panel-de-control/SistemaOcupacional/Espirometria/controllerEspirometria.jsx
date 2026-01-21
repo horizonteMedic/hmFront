@@ -112,7 +112,7 @@ export const SubmitDataService = async (
         usuarioRegistro: user,
         usuarioFirma: form.user_medicoFirma,
         doctorAsignado: form.user_doctorAsignado,
-        doctorExtra:form.user_doctorExtra,
+        doctorExtra: form.user_doctorExtra,
 
     };
     console.log(body)
@@ -183,12 +183,14 @@ export const Loading = (mensaje) => {
 };
 
 export const handleSubirArchivoEspirometria = async (form, selectedSede, userlogued, token) => {
-    /*const coordenadas = {
-        FIRMA: { x: 40, y: 720, width: 120, height: 60 },
-        HUELLA: { x: 220, y: 720, width: 60, height: 60 },
-        SELLOFIRMA: { x: 360, y: 680, width: 120, height: 80 },
-    };*/
-    handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
+    const coordenadas = {
+        FIRMA: { x: 40, y: 750, width: 120, height: 60 },
+        HUELLA: { x: 180, y: 750, width: 60, height: 60 },
+        SELLOFIRMA: { x: 220, y: 700, width: 100, height: 60 },
+        SELLOFIRMADOCASIG: { x: 340, y: 700, width: 100, height: 60 },
+        "SELLOFIRMADOCASIG-EXTRA": { x: 460, y: 700, width: 100, height: 60 },
+    };
+    handleSubirArchivoDefault(form, selectedSede, registrarPDF, userlogued, token, coordenadas)
 };
 
 export const ReadArchivosFormEspirometria = async (form, setVisualerOpen, token) => {
