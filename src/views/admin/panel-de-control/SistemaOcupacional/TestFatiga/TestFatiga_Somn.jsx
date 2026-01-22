@@ -7,7 +7,6 @@ import {
   faBroom,
   faPrint,
 } from "@fortawesome/free-solid-svg-icons";
-import PropTypes from "prop-types";
 
 import Swal from "sweetalert2";
 
@@ -15,16 +14,12 @@ import { useSessionData } from "../../../../hooks/useSessionData";
 import { useForm } from "../../../../hooks/useForm";
 import { PrintHojaR, SubmitTestFatiga, VerifyTR } from "./ControllerTestF";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
+import { getToday } from "../../../../utils/helpers";
 
-
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
 const tabla = "test_fatiga_somnolencia"
 
 const Test_fatiga = () => {
+  const today = getToday();
   const { token, selectedSede, datosFooter, userlogued, userCompleto, userName } =
     useSessionData();
   const initialFormState = {
@@ -312,14 +307,18 @@ const Test_fatiga = () => {
                 <input type="checkbox" checked={form.rbNo} name="rbNo" onChange={(e) => handleInputChangeCheckedGroup(e, ["rbSi", "rbNo"])} id="" className=" mx-3" />
               </div>
             </div>
+            <div className="mb-4">
+              <EmpleadoComboBox
+                value={form.nombre_medico}
+                form={form}
+                onChange={handleChangeSimple}
+              />
+            </div>
+
             <div className="border border-gray-200 border-t-0 p-4 bg-white rounded-b-lg text-lg">
               <h1 className="text-blue-800 font-bold">GRABAR / ACTUALIZAR</h1>
               <div className="flex gap-2 justify-around">
-                <EmpleadoComboBox
-                  value={form.nombre_medico}
-                  form={form}
-                  onChange={handleChangeSimple}
-                />
+
                 <div className="flex flex-col p-2 ">
                   <button
                     type="button"

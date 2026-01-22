@@ -45,8 +45,9 @@ export const GetInfoServicio = async (
             contrata: res.contrata,
             cargoPaciente: res.cargo,
             ocupacionPaciente: res.areaO,
-            fechaExamen: prev.fechaExamen
+            fechaExamen: prev.fechaExamen,
 
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -109,7 +110,9 @@ export const SubmitDataService = async (
         "noApto": form.apto === "NOAPTO" ? true : false,
         "observaciones": form.observaciones,
         "horaSalida": getHoraActual(),
-        "usuarioRegistro": form.userlogued
+        "usuarioRegistro": form.userlogued,
+        
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

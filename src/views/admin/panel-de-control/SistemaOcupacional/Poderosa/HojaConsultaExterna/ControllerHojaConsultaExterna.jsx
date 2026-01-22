@@ -17,8 +17,8 @@ const registrarUrl =
 const today = getToday();
 
 const generarObservaciones = (res) => {
-  return [
-`A- ANAMNESIS: COLABORADOR REFIERE SENTIRSE BIEN, SIN PROBLEMAS DE SALUD, NO practica deporte o deporte de alto rendimiento.
+    return [
+        `A- ANAMNESIS: COLABORADOR REFIERE SENTIRSE BIEN, SIN PROBLEMAS DE SALUD, NO practica deporte o deporte de alto rendimiento.
 B- ANTECEDENTES PERSONALES: ${res.anexo16AntecedentesPersonales2 || "SIN DATOS."}
 C- ANTECEDENTES FAMILIARES: ${res.anexo16AntecedentesFamiliares || "JALARLO DEL ANEXO 16."},
 D- EXAMEN FISICO:
@@ -37,7 +37,7 @@ D- EXAMEN FISICO:
 - SISTEMA NERVIOSO: SENSIBILIDAD, MOTRICIDAD CONSERVADA, ROTS CONSERVADOS, BIPEDESTACIÓN CONSERVADA, EQUILIBRIO CONSERVADO, ROMBERG NEGATIVO. NO SIGNOS MENÍNGEOS. NO SIGNOS DE FOCALIZACION, NERVIOS CRANEALES CONSERVADOS, GLASGLOW 15 PTOS.
 E- EXÁMENES AUXILIARES: \n${res.anexo16OtrosExamenes || "JALARLO DE LOS EXÁMENES DE LABORATORIO."}
 F- DIAGNÓSTICOS: \n${res.anexo16ObservacionesGenerales || "JALARLO DE LOS DIAGNÓSTICOS DEL ANEXO 16."}`
-  ].join("\n\n");
+    ].join("\n\n");
 };
 
 export const GetInfoServicio = async (
@@ -63,7 +63,7 @@ export const GetInfoServicio = async (
             ...res,
             nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
             sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
-            dniUser: res.dniUsuario,            
+            dniUser: res.dniUsuario,
             edadPaciente: res.edadPaciente,
             nombreExamen: res.nombreExamen,
             empresa: res.empresa,
@@ -72,7 +72,7 @@ export const GetInfoServicio = async (
             ocupacionPaciente: res.ocupacionPaciente,
             fechaExamen: prev.fechaExamen,
             observaciones: generarObservaciones(res),
-            
+
         }));
     }
 };
@@ -102,7 +102,9 @@ export const GetInfoServicioEditar = async (
             edadPaciente: `${res.edadPaciente} AÑOS`,
             dniUser: res.dniUsuario,
             cajon: res.paraiso ? "PARAISO" : res.postaVijus ? "POSTA VIJUS" : res.cedro ? "CEDRO" : res.otros ? "OTROS" : "",
-            nombre_medico: res.nombreMedico
+            nombre_medico: res.nombreMedico,
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -132,7 +134,9 @@ export const SubmitDataService = async (
         "otros": form.cajon === "OTROS" ? true : false,
         "otrosDescripcion": form.otrosDescripcion,
         "observaciones": form.observaciones,
-        "usuarioRegistro": user
+        "usuarioRegistro": user,
+
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

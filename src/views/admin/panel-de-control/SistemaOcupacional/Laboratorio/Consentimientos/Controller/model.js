@@ -80,7 +80,8 @@ export function SubmitInfoLaboratioExBoro(data, token, user) {
         fechaex: data.fecha,
         masticahCoca: data.chaccha.key,
         notas: data.notas,
-        norden: data.norden
+        norden: data.norden,
+        usuarioFirma: data.user_medicoFirma,
     };
 
     const url = `${URLAzure}/api/v01/ct/laboratorio/registrarActualizarConsentimientoBORO`

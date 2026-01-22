@@ -18,9 +18,9 @@ import Swal from "sweetalert2";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "anexo16a";
-const today = getToday();
 
 export default function Anexo16A() {
+  const today = getToday();
   const { token, userlogued, selectedSede, datosFooter, userName, userDireccion } = useSessionData();
 
   const initialFormState = {

@@ -46,7 +46,7 @@ export const GetInfoServicio = async (nro, token, setForm, form) => {
       `/api/v01/ct/laboratorio/consentimiento-laboratorio?nOrden=${nro}&nameConset=${tabla}`,
       token
     );
-    
+
     // Manejar errores de la respuesta
     if (res.error) {
       console.error("Error en la respuesta del servidor:", res);
@@ -54,7 +54,7 @@ export const GetInfoServicio = async (nro, token, setForm, form) => {
       Swal.close();
       return;
     }
-    
+
     if (res.norden) {
       Swal.fire(
         "Alerta",
@@ -73,6 +73,7 @@ export const GetInfoServicio = async (nro, token, setForm, form) => {
         ...prev,
         ...res,
         antecedentes: antecedentesActualizados,
+        user_medicoFirma: res.usuarioFirma,
       }));
     } else {
       Swal.fire('Error', 'Ocurrio un error al traer los datos', 'error');
@@ -122,21 +123,21 @@ export const PrintHojaR = async (form, token) => {
       `/api/v01/ct/laboratorio/consentimiento-laboratorio?nOrden=${form.norden}&nameConset=${tabla}`,
       token
     );
-    
+
     // Manejar errores de la respuesta
     if (res.error) {
       console.error("Error en la respuesta del servidor:", res);
       Swal.fire({
         icon: "error",
         title: "Error al obtener datos",
-        text: res.status === 404 
-          ? "No se encontró el registro o el endpoint no existe." 
+        text: res.status === 404
+          ? "No se encontró el registro o el endpoint no existe."
           : `Error ${res.status}: ${res.statusText || res.message || 'Error desconocido'}`,
       });
       Swal.close();
       return;
     }
-    
+
     if (res.norden) {
       const nombre = res.nameJasper;
       console.log('📄 Jasper a llamar:', nombre);

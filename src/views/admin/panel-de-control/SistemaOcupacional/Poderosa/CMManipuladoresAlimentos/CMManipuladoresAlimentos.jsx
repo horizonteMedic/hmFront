@@ -8,11 +8,13 @@ import {
   InputTextOneLine,
   InputTextArea,
   InputsBooleanRadioGroup,
+  SectionFieldset,
 } from "../../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../../hooks/useForm";
 import { getToday } from "../../../../../utils/helpers";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerCMManipuladoresAlimentos";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "certificado_manipuladores_barrick";
 const today = getToday();
@@ -39,12 +41,13 @@ export default function CMManipuladoresAlimentos() {
     cargo: "",
     areaTrabajo: "",
 
-    // Médico
-    nombre_medico: userName,
-
     // Recomendaciones
     recomendaciones: "",
-    observaciones: ""
+    observaciones: "",
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
   const {
@@ -199,13 +202,14 @@ export default function CMManipuladoresAlimentos() {
             />
           </div>
           {/* Médico */}
-          <InputTextOneLine
-            label="Médico que Certifica"
-            name="nombre_medico"
-            value={form?.nombre_medico}
-            labelOnTop
-            disabled
-          />
+          <SectionFieldset legend="Asignación de Médico">
+            <EmpleadoComboBox
+              value={form.nombre_medico}
+              label="Especialista"
+              form={form}
+              onChange={handleChangeSimple}
+            />
+          </SectionFieldset>
         </fieldset>
 
         <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-4 pt-4">

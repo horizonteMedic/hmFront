@@ -602,7 +602,7 @@ export const SubmitDataService = async (
         fechaExpira: form.fechaExpiraAutorizacion,
         dniUsuario: form.dniUsuario,
         usuarioRegistro: user,
-        usuarioFirma: data.user_medicoFirma,
+        usuarioFirma: form.user_medicoFirma,
 
     };
 

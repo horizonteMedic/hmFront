@@ -10,6 +10,8 @@ import { getToday } from "../../../../../utils/helpers";
 import { handleSubirArchivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./ControllerAptitudPoderosa";
 import ButtonsPDF from "../../../../../components/reusableComponents/ButtonsPDF";
 import { useState } from "react";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 
 const tabla = "aptitud_altura_poderosa"
 const today = getToday();
@@ -37,7 +39,7 @@ const opcionesConclusiones = [
 ];
 
 const CertificadoAptitudPoderosa = () => {
-    const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+    const { token, userlogued, selectedSede, datosFooter, userCompleto, userName } =
         useSessionData();
     const [visualerOpen, setVisualerOpen] = useState(null)
 
@@ -56,7 +58,11 @@ const CertificadoAptitudPoderosa = () => {
         nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
         userlogued: userlogued,
         SubirDoc: false,
-        nomenclatura: "PSICOSENSOMETRICO"
+        nomenclatura: "PSICOSENSOMETRICO",
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
     }
 
     const { form, setForm, handleChangeNumber, handleChangeSimple, handleClearnotO, handleClear, handleChange, handlePrintDefault, handleRadioButton } = useForm(InitialForm, { storageKey: "Certificado_Aptitud_Poderosa_form" })
@@ -256,14 +262,15 @@ const CertificadoAptitudPoderosa = () => {
                                     </section>
                                     <section className="bg-white rounded-lg p-4 pb-1 pt-1 gap-4 mt-0 m-4">
 
-                                        <InputTextOneLine
-                                            label="Medico que Certifica"
-                                            name="nombre_medico"
-                                            disabled
-                                            className="mt-2"
-                                            value={form?.nombre_medico}
-                                            onChange={handleChange}
-                                        />
+                                        <SectionFieldset legend="Asignación de Médico">
+                                            <EmpleadoComboBox
+                                                value={form.nombre_medico}
+                                                label="Especialista"
+                                                form={form}
+                                                onChange={handleChangeSimple}
+                                            />
+                                        </SectionFieldset>
+
                                         <div className="w-full flex justify-between items-center gap-1 mt-4">
                                             <div className="flex gap-1">
                                                 <button
