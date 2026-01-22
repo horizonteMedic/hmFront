@@ -50,7 +50,7 @@ export const GetInfoServicio = (
   tabla,
   set,
   token,
-  onFinish = () => {}
+  onFinish = () => { }
 ) => {
   getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
     .then((res) => {
@@ -104,6 +104,7 @@ export const GetInfoServicio = (
           noPasoExamen: res?.txtObservaciones?.includes(
             "NO PASO EXAMEN ODONTOLOGICO"
           ),
+          user_medicoFirma: res.usuarioFirma,
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -187,6 +188,8 @@ export const SubmitDataService = async (
     txtCoronas: form.corona,
     txtObservaciones: form.observaciones,
     userRegistro: user,
+
+    usuarioFirma: form.user_medicoFirma,
   };
   SubmitData(body, registrarUrl, token).then((res) => {
     console.log(res);
@@ -404,7 +407,7 @@ export const GetInfoServicioLO = (
   tabla,
   set,
   token,
-  onFinish = () => {}
+  onFinish = () => { }
 ) => {
   getFetch(`${obtenerReporteUrlLo}?nOrden=${nro}&nameService=${tabla}`, token)
     .then((res) => {
@@ -610,8 +613,7 @@ export const PrintConsultaEjecutada = (inicio, fin, token, datosFooter) => {
 export const getInfoTabla = (nombreSearch, codigoSearch, setData, token) => {
   try {
     getFetch(
-      `/api/v01/ct/odontograma/obtenerOdontogramaPorFiltros?${
-        codigoSearch == "" ? "" : `nOrden=${codigoSearch}`
+      `/api/v01/ct/odontograma/obtenerOdontogramaPorFiltros?${codigoSearch == "" ? "" : `nOrden=${codigoSearch}`
       }
     ${nombreSearch == "" ? "" : `&nombres=${nombreSearch}`}`,
       token
