@@ -454,7 +454,7 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
         const pdfBlob = new Blob([pdfBytesOptimizado], { type: "application/pdf" });
         const pdfUrl = URL.createObjectURL(pdfBlob);
         // Abre el PDF en una nueva pestaña
-        window.open(pdfUrl, "_blank");
+        //window.open(pdfUrl, "_blank");
 
         // Limpia luego (no inmediato)
         setTimeout(() => {
@@ -481,13 +481,13 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
             indice_carga_masiva: undefined,
         };
 
-        /*const response = await SubmitData(datos, urlPDf, token);
+        const response = await SubmitData(datos, urlPDf, token);
         if (response.id === 1) {
 
             Swal.fire("Exito", "Archivo Subido con exto", "success")
         } else {
             Swal.fire("Error", "No se pudo subir", "error")
-        }*/
+        }
     };
     reader.readAsDataURL(file);
 };

@@ -79,7 +79,8 @@ export const GetInfoPacLaboratorioFil = (nro, tabla, set, token) => {
         ...prev,
         ...res,
         SubirDoc: true,
-        digitalizacion: res.digitalizacion
+        digitalizacion: res.digitalizacion,
+        user_medicoFirma: res.usuarioFirma,
       }))
     })
     .finally(() => {

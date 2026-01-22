@@ -23,6 +23,9 @@ import {
 } from "./controller/OIT_controller";
 import Swal from "sweetalert2";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
+import { useSessionData } from "../../../../hooks/useSessionData";
+import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
+import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
 const tabla = "oit";
 const date = new Date();
 const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
@@ -30,7 +33,10 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   "0"
 )}-${String(date.getDate()).padStart(2, "0")}`;
 
-const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
+const OIT = () => {
+
+  const { token, userlogued, selectedSede, userName, userDNI } = useSessionData();
+
   const [activeTab, setActiveTab] = useState(0);
   //const tabsConPermiso = tabs.filter(tab => permiso(tab.vista, tab.permiso));
   const [form, setForm] = useState({
@@ -40,7 +46,7 @@ const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
     nombres: "",
     doctor: "",
     dni: "",
-    dniUser: userDatos.datos.dni_user,
+    dniUser: userDNI,
     edad: "",
     fradiografia: today,
     flectura: today,
@@ -216,7 +222,10 @@ const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
     SinDatos: false,
 
     SubirDoc: false,
-    nomenclatura: "OIT FOLIO"
+    nomenclatura: "OIT FOLIO",
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   });
 
   const handleClean = () => {
@@ -227,7 +236,7 @@ const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
       nombres: "",
       doctor: "",
       dni: "",
-      dniUser: userDatos.datos.dni_user,
+      dniUser: userDNI,
       edad: "",
       fradiografia: today,
       flectura: today,
@@ -400,7 +409,11 @@ const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
       opcionSComentario: "",
 
       SubirDoc: false,
-      nomenclatura: "OIT FOLIO"
+      nomenclatura: "OIT FOLIO",
+
+      // Médico que Certifica //BUSCADOR
+      nombre_medico: userName,
+      user_medicoFirma: userlogued,
     });
   };
   console.log(form);
@@ -450,6 +463,12 @@ const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
     setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
   };
 
+  const handleChangeSimple = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+  };
+
+
   const handleset = () => {
     setForm((prev) => ({
       ...prev,
@@ -457,7 +476,7 @@ const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
       nombres: "",
       doctor: "",
       dni: "",
-      dniUser: userDatos.datos.dni_user,
+      dniUser: userDNI,
       edad: "",
       fradiografia: today,
       flectura: today,
@@ -862,10 +881,22 @@ const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
           </div>
         )}
 
+
+
         {/* Active Content */}
         <div className="border border-gray-200 border-t-0 p-4 bg-white rounded-b-lg text-lg">
           {tabs[activeTab].component}
         </div>
+
+        <SectionFieldset legend="Asignación de Médico">
+          <EmpleadoComboBox
+            value={form.nombre_medico}
+            label="Especialista"
+            form={form}
+            onChange={handleChangeSimple}
+          />
+        </SectionFieldset>
+        
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4 px-4">
           <div className="flex gap-4">
             <button
@@ -901,6 +932,7 @@ const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
               <FontAwesomeIcon icon={faPrint} />
             </button>
           </div> */}
+
           <div className="flex flex-col items-end">
             <span className="font-bold italic text-base mb-1">Imprimir</span>
             <div className="flex items-center gap-2">
