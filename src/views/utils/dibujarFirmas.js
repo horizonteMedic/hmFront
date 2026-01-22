@@ -20,8 +20,8 @@ export async function dibujarFirmas({ doc, datos, y, pageW }) {
 
 
   // Verificar qué firmas tenemos
-  const tieneFirmaPaciente = firmap !== null || huellap !== null;
-  const tieneSelloProfesional = s1 !== null || s2 !== null;
+  const tieneFirmaPaciente = (firmap !== null && firmap !== "") || (huellap !== null & huellap !== "");
+  const tieneSelloProfesional = (s1 !== null && s1 !== "") || (s2 !== null & s2 !== "");
 
   // Firma y Huella del Paciente
   const firmaPacienteY = y;
@@ -154,10 +154,10 @@ export async function dibujarFirmas({ doc, datos, y, pageW }) {
         const gapMin = 8; // Gap mínimo
         const sigWMax = 45; // Ancho máximo por sello
         const sigWMin = 35; // Ancho mínimo por sello
-        
+
         // Calcular ancho total necesario
         const anchoTotalNecesario = numSellos * sigWMax + (numSellos - 1) * gapMin;
-        
+
         if (anchoTotalNecesario <= espacioDisponible) {
           // Cabe con tamaño máximo
           sigW = sigWMax;
@@ -167,7 +167,7 @@ export async function dibujarFirmas({ doc, datos, y, pageW }) {
           const espacioParaSellos = espacioDisponible - (numSellos - 1) * gapMin;
           sigW = Math.max(sigWMin, Math.floor(espacioParaSellos / numSellos));
           gap = gapMin;
-          
+
           // Si aún no cabe, reducir gap también
           if (sigW * numSellos + gap * (numSellos - 1) > espacioDisponible) {
             const espacioRestante = espacioDisponible - sigW * numSellos;
@@ -201,7 +201,7 @@ export async function dibujarFirmas({ doc, datos, y, pageW }) {
       sellos.forEach((sello, index) => {
         const xPos = startX + index * (sigW + gap);
         agregarSello(sello.data, xPos, sigY, sigW, sigH);
-        
+
         const centroSelloX = xPos + sigW / 2;
         dibujarLineaYTexto(centroSelloX, lineY, sello.tipo);
       });
