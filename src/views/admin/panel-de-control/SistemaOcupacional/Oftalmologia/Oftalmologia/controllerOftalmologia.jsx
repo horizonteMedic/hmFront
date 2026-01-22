@@ -350,6 +350,8 @@ export const PrintHojaR = (nro, token, tabla) => {
         let rutaJasper;
         if (nombre === "EvaluacionOftalmologica2021_Digitalizado") {
           rutaJasper = `../../../../../jaspers/Oftalmologia/EvaluacionOftalmologica/${nombre}.jsx`;
+        } else if (nombre === "EvaluacionOftalmologica2021_Digitalizado_ohla") {
+          rutaJasper = `../../../../../jaspers/Oftalmologia/EvaluacionOftalmologica/${nombre}.jsx`;
         } else {
           rutaJasper = `../../../../../jaspers/Oftalmologia/${nombre}.jsx`;
         }

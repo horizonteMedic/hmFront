@@ -46,7 +46,7 @@ import INFORME_ADICIONAL_DE_FOBIAS_Digitalizado from "../ModuloPsicologia/Inform
 import Informe_PsicolaboralBoroo_Digitalizado from "../ModuloPsicologia/InformePsicolaboral/Informe_PsicolaboralBoroo_Digitalizado";
 import TRABAJOS_EN_ESPECIFICO_Digitalizado from "../ModuloPsicologia/InformePsicoEspecificos/Informe_Psico_Especificos";
 import formatPsicologia_Digitalizado from "../ModuloPsicologia/InformePsicoAlturaFobias/formatPsicologia_Digitalizado";
-import EvaluacionOftalmologica2021_Digitalizado from "../Oftalmologia/EvaluacionOftalmologica2021_Digitalizado";
+import EvaluacionOftalmologica2021_Digitalizado from "../Oftalmologia/EvaluacionOftalmologica/EvaluacionOftalmologica2021_Digitalizado";
 import Consent_Admision_DeclaracionSintomaticoRespiratorio from "../ModuloConsentimientos/ConsentAdmisDeclaSintomaRespi/Consent_Admision_DeclaracionSintomaticoRespiratorio"
 import Consent_Admision_EvaluacionMedica from "../ModuloConsentimientos/ConsentAdmisEvaluaMedica/Consent_Admision_EvaluacionMedica"
 import ConsentimientoBuenaSalud2021_Digitalizado from "../ModuloConsentimientos/ConsentimientoBuenaSalud/ConsentimientoBuenaSalud2021_Digitalizado";
@@ -60,7 +60,7 @@ import InformePsicoExamComplementario from "../ModuloPsicologia/InformePsicoExam
 import CertificadoAlturaPoderosa_Digitalizado from "../CertificadoAlturaPoderosa/CertificadoAlturaPoderosa_Digitalizado";
 import TestFatigaSomnolenia_Digitalizado_boro from "../Test_Fatiga/TestFatigaSomnolenia_Digitalizado_boro";
 import EvaluacionMuscoloEsqueletica2021_Digitalizado_boro from "../MusculoEsqueletica/EvaluacionMuscoloEsqueletica2021_Digitalizado_boro";
-import EvaluacionOftalmologica2021_Digitalizado_ohla from "../Oftalmologia/EvaluacionOftalmologica2021_Digitalizado_ohla";
+import EvaluacionOftalmologica2021_Digitalizado_ohla from "../Oftalmologia/EvaluacionOftalmologica/EvaluacionOftalmologica2021_Digitalizado_ohla";
 import ficha_antecedente_patologico_boro from "../AntecedentesPatologicos/ficha_antecedente_patologico_boro";
 
 export const reportesMap = {
