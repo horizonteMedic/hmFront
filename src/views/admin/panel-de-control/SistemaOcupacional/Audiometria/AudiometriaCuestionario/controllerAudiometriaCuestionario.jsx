@@ -91,7 +91,6 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     await Swal.fire("Error", "Datos Incompletos", "error");
     return;
   }
-  console.log(user)
   Loading("Registrando Datos");
   const body = {
     codCuestionario: form.codCuestionario,
