@@ -9,9 +9,10 @@ import { getSignCompressed } from "./helpers";
  * @param {Object} params.datos - Objeto con datos del paciente, debe incluir digitalizacion[]
  * @param {number} params.y - Posición Y inicial donde comenzar a dibujar las firmas
  * @param {number} params.pageW - Ancho de la página en mm
+ * @param {boolean} params.mostrarFirmaPaciente - Si es true, muestra firma y huella del paciente (default: true)
  * @returns {Promise<number>} - Retorna la posición Y final después de dibujar las firmas
  */
-export async function dibujarFirmas({ doc, datos, y, pageW }) {
+export async function dibujarFirmas({ doc, datos, y, pageW, mostrarFirmaPaciente = true }) {
   // Cargar imágenes de digitalizaciones
   const firmap = await getSignCompressed(datos, "FIRMAP");
   const huellap = await getSignCompressed(datos, "HUELLA");
@@ -21,16 +22,16 @@ export async function dibujarFirmas({ doc, datos, y, pageW }) {
 
 
   // Verificar qué firmas tenemos
-  const tieneFirmaPaciente = (firmap !== null && firmap !== "") || (huellap !== null & huellap !== "");
+  const tieneFirmaPaciente = mostrarFirmaPaciente && ((firmap !== null && firmap !== "") || (huellap !== null & huellap !== ""));
   const tieneSelloProfesional = (s1 !== null && s1 !== "") || (s2 !== null & s2 !== "") || (s3 !== null & s3 !== "");
 
-  // Firma y Huella del Paciente
+  // Firma y Huella del Paciente (solo si mostrarFirmaPaciente es true)
   const firmaPacienteY = y;
   // Si hay sello profesional Y paciente, paciente a la izquierda (1/3), si no, centrado
   const centroPacienteX = (tieneSelloProfesional && tieneFirmaPaciente) ? pageW / 3 : pageW / 2;
 
   // Agregar firma del paciente (ya viene comprimida como data URL)
-  if (firmap) {
+  if (mostrarFirmaPaciente && firmap) {
     try {
       const imgWidth = 30;
       const imgHeight = 20;
@@ -43,7 +44,7 @@ export async function dibujarFirmas({ doc, datos, y, pageW }) {
   }
 
   // Agregar huella del paciente (ya viene comprimida como data URL)
-  if (huellap) {
+  if (mostrarFirmaPaciente && huellap) {
     try {
       const imgWidth = 12;
       const imgHeight = 20;

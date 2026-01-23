@@ -436,8 +436,8 @@ export default async function Oftalmologia(datos = {}, docExistente = null) {
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });
 
-  // Usar dibujarFirmas para dibujar las firmas
-  await dibujarFirmas({ doc, datos: datos, y: yFirmas, pageW }).then(() => {
+  // Usar dibujarFirmas para dibujar las firmas (sin firma del paciente)
+  await dibujarFirmas({ doc, datos: datos, y: yFirmas, pageW, mostrarFirmaPaciente: false }).then(() => {
     if (docExistente) {
       return doc;
     } else {
