@@ -133,7 +133,6 @@ const AudiometriaOhlaTabSelector = ({
       userlogued?.datos?.nombres_user || ""
     ),
     conclusiones: "",
-    nombre_medico: "",
 
     od_250: "",
     od_500: "",

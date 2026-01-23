@@ -357,7 +357,6 @@ export const GetInfoServicioFicha = (
           otroDescripcion: res.otros ?? "",
 
           conclusiones: res.txtConclusiones,
-          nombre_medico: res.txtMedico,
 
           od_250: res.txtDod250,
           od_500: res.txtDod500,
@@ -381,7 +380,7 @@ export const GetInfoServicioFicha = (
           user_doctorAsignado: res.doctorAsignado,
           user_doctorExtra: res.doctorExtra,
         }));
-        setSearchNombreMedico(res.txtMedico);
+        // setSearchNombreMedico(res.txtMedico);
       } else {
         Swal.fire(
           "Error",
@@ -468,7 +467,7 @@ export const SubmitDataServiceFicha = async (
     txtLIDisconfort: form.i_umbral_disconfort,
     txtResponsable: form.nombre_profecional,
     txtConclusiones: form.conclusiones,
-    txtMedico: form.nombre_medico,
+    // txtMedico: form.nombre_medico,
     txtOtoscopia: form.otoscopia,
     txtMesesTrabajo: form.mesesTrabajo,
     userRegistro: user,

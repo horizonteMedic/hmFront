@@ -17,11 +17,12 @@ export async function dibujarFirmas({ doc, datos, y, pageW }) {
   const huellap = await getSignCompressed(datos, "HUELLA");
   const s1 = await getSignCompressed(datos, "SELLOFIRMA");
   const s2 = await getSignCompressed(datos, "SELLOFIRMADOCASIG");
+  const s3 = await getSignCompressed(datos, "SELLOFIRMADOCASIG-EXTRA");
 
 
   // Verificar qué firmas tenemos
   const tieneFirmaPaciente = (firmap !== null && firmap !== "") || (huellap !== null & huellap !== "");
-  const tieneSelloProfesional = (s1 !== null && s1 !== "") || (s2 !== null & s2 !== "");
+  const tieneSelloProfesional = (s1 !== null && s1 !== "") || (s2 !== null & s2 !== "") || (s3 !== null & s3 !== "");
 
   // Firma y Huella del Paciente
   const firmaPacienteY = y;
@@ -115,6 +116,7 @@ export async function dibujarFirmas({ doc, datos, y, pageW }) {
     const sellos = [];
     if (s1) sellos.push({ data: s1, tipo: 'SELLOFIRMA' });
     if (s2) sellos.push({ data: s2, tipo: 'SELLOFIRMADOCASIG' });
+    if (s3) sellos.push({ data: s3, tipo: 'SELLOFIRMADOCASIG-EXTRA' });
     const numSellos = sellos.length;
 
     if (numSellos === 0) {
