@@ -26,8 +26,7 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "OFTALMOLOGIA",
-    "FICHA_OFTALMOLOGICA",
+    "FICHA_AUDIOMETRIA",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -807,8 +806,9 @@ const ExamenesListK2 = buildExamenesList([ // K2
 
     "HISTORIA_OCUPACIONAL",
     "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
     "CUESTIONARIO_NORDICO",
-    "EVALUACION_MUSCULO_ESQUELETICA_BOROO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
 
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
@@ -825,12 +825,11 @@ const ExamenesListK2 = buildExamenesList([ // K2
 
     "ESPIROMETRIA_ARCHIVO",
 
-    "FICHA_AUDIOMETRIA",
-
-    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
+    "c",
 
     "INFORME_PSICOLOGICO",
-    // "INFORME_MAPEO",
+    "INFORME_PSICOLOGIA_FOBIAS",
+    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
 
     "OFTALMOLOGIA",
     "OFTALMOLOGIA_VISION_TESTER",
@@ -1060,7 +1059,7 @@ const ExamenesListAlturaSolo = buildExamenesList([ // ALTURA SOLO
 ]);
 
 const ListaPorPlantilla = {
-    PRUEBAS: ExamenesListPRUEBAS,
+    // PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     OHLA: ExamenesListOHLA,
     OHLA1: ExamenesListOHLA1,
