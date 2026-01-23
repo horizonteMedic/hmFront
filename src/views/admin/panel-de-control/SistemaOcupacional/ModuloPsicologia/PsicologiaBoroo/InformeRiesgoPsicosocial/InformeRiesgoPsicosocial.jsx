@@ -11,6 +11,7 @@ import { getToday } from "../../../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformeRiesgoPsicosocial";
 import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
 import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "informe_riesgos_psicosociales";
 
@@ -34,7 +35,7 @@ const riesgoOptions = [
 
 export default function InformeRiesgoPsicosocial() {
     const today = getToday();
-    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+    const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
     const initialFormState = {
         // Header
@@ -69,6 +70,10 @@ export default function InformeRiesgoPsicosocial() {
         recomendaciones: "",
         analisisResultados: "",
         conclusionPerfil: undefined,
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
     };
 
     const {
@@ -171,6 +176,15 @@ export default function InformeRiesgoPsicosocial() {
                     value={form.analisisResultados}
                     onChange={handleChange}
                     rows={6}
+                />
+            </SectionFieldset>
+
+            <SectionFieldset legend="Asignación de Médico">
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Especialista"
+                    form={form}
+                    onChange={handleChangeSimple}
                 />
             </SectionFieldset>
 

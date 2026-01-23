@@ -53,8 +53,14 @@ export default function GlucosaBasal() {
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
-    };
 
+        nombre_doctorAsignado: "",
+        user_doctorAsignado: "",
+        // nombre_medico_extra: userName,
+        // user_medicoFirmaExtra: userlogued,
+    };
+    console.log(userName)
+    console.log(userlogued)
     const {
         form,
         setForm,
@@ -260,6 +266,22 @@ export default function GlucosaBasal() {
                     form={form}
                     onChange={handleChangeSimple}
                 />
+                <EmpleadoComboBox
+                    value={form.nombre_doctorAsignado}
+                    label="Doctor Asignado"
+                    form={form}
+                    onChange={handleChangeSimple}
+                    nameField="nombre_doctorAsignado"
+                    idField="user_doctorAsignado"
+                />
+                {/* <EmpleadoComboBox
+                    value={form.nombre_medico_extra}
+                    label="Especialista Extra"
+                    form={form}
+                    onChange={handleChangeSimple}
+                    nameField="nombre_medico_extra"
+                    idField="user_medicoFirmaExtra"
+                /> */}
             </SectionFieldset>
 
             <BotonesAccion

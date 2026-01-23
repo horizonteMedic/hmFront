@@ -143,6 +143,9 @@ export const GetInfoServicio = async (
 
             // Pruebas Psicológicas - Área Emocional
             areaEmocional: res.areaEmocional_area_emocional,
+
+            user_medicoFirma: res.usuarioFirma,
+
         }));
     }
 };
@@ -229,6 +232,8 @@ export const SubmitDataService = async (
         areaCognitiva: form.areaCognitiva,
         areaEmocional: form.areaEmocional,
         usuarioRegistro: user,
+
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -286,7 +291,7 @@ const GetInfoPac = async (nro, set, token, sede) => {
             nombreExamen: res.nomExam ?? "",
             cargoDesempenar: res.cargo ?? "",
             explotacionEn: res.explotacion ?? "",
-            mineral:res.mineralExp ?? "",
+            mineral: res.mineralExp ?? "",
             alturaLabor: res.alturaLabor ?? "",
             lugarNacimiento: res.lugarNacimiento ?? "",
             domicilioActual: res.direccion ?? "",

@@ -141,7 +141,7 @@ export const GetInfoServicioEditar = async (
         onFinish
     );
     if (res) {
-        
+
         set((prev) => ({
             ...prev,
             // Header
@@ -301,6 +301,8 @@ export const GetInfoServicioEditar = async (
             babinskiWeil: res.babinskiPositivo_chkneuro_pos8 ?? false,
             dixHallpike: res.dixPositivo_chkneuro_pos9 ?? false,
             marcha: res.marchaPositivo_chkneuro_pos10 ?? false,
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -433,6 +435,8 @@ export const SubmitDataService = async (
         otrosExamenesLaboratorio: form.otrosExaLaboratorio,
         altura: form.altura,
         usuarioRegistro: user,
+
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

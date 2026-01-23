@@ -24,13 +24,14 @@ import FinalAutorizacion from "./TabsUsoRespiradores/FinalAutorizacion";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerUsoRespiradores";
 import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
 import BotonesAccion from "../../../../components/templates/BotonesAccion";
+import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "b_uso_respiradores";
 
 export default function UsoRespiradores() {
   const [activeTab, setActiveTab] = useState(0);
   const today = getToday();
-  const { token, userlogued, selectedSede, datosFooter, userDNI } = useSessionData();
+  const { token, userlogued, selectedSede, datosFooter, userDNI, userName } = useSessionData();
 
   const initialFormState = {
     // Header
@@ -246,6 +247,10 @@ export default function UsoRespiradores() {
     claseAutorizacion: "CLASE_I",
     claseIIOpcion: "",
     fechaExpiraAutorizacion: getTodayPlusOneYear(),
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
   const {
@@ -359,6 +364,13 @@ export default function UsoRespiradores() {
             handleChangeSimple={handleChangeSimple}
           />
         </div>
+        <SectionFieldset legend="Autorización Final" fieldsetClassName="mx-4 mt-4">
+          <EmpleadoComboBox
+            value={form.nombre_medico}
+            form={form}
+            onChange={handleChangeSimple}
+          />
+        </SectionFieldset>
 
         <BotonesAccion
           form={form}

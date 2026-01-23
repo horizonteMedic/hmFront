@@ -53,12 +53,15 @@ function validacionError(resultado) {
     });
 }
 
-export function getFetch(url, token) {
+export function getFetch(url, token, signal) {
     const options = {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`
         }
+    }
+    if (signal) {
+        options.signal = signal;
     }
     return fetch(URLAzure + url, options).then(res => {
         if (!res.ok) {

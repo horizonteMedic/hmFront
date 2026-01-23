@@ -171,6 +171,15 @@ const MatrizPostulante = () => {
 
       const response = await GetMatrizUniversal(datosapi, config, token);
       console.log(response)
+      if (!Array.isArray(response)) {
+        setData([]);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Ocurrió un error al traer la Matriz',
+        });
+        return;
+      }
       setData(response);
       const headers = Object.keys(response[0] || {});
       setHeaders(headers);
@@ -430,7 +439,7 @@ const MatrizPostulante = () => {
 
   const startIdx = (currentPage - 1) * recordsPerPage;
   const endIdx = startIdx + recordsPerPage;
-  const currentData = data?.slice(startIdx, endIdx);
+  const currentData = Array.isArray(data) ? data.slice(startIdx, endIdx) : [];
 
   return (
     <div className="container mx-auto mt-12 mb-12">

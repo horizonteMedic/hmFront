@@ -103,6 +103,9 @@ export default function HematologiaBioquimicaECO() {
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
+
+    nombre_doctorAsignado: "",
+    user_doctorAsignado: "",
   };
 
   const {
@@ -445,6 +448,7 @@ export default function HematologiaBioquimicaECO() {
                 value={form.creatinina}
                 labelWidth="120px"
                 onChange={handleChange}
+                onKeyUp={(e) => { handleFocusNext(e, "densidad") }}
               />
               <div className="flex gap-4 items-center">
                 <InputCheckbox
@@ -566,6 +570,7 @@ export default function HematologiaBioquimicaECO() {
                   value={form.densidad}
                   labelWidth="100px"
                   onChange={handleChange}
+                  onKeyUp={(e) => { handleFocusNext(e, "ph") }}
                 />
                 <InputTextOneLine
                   label="PH"
@@ -573,6 +578,7 @@ export default function HematologiaBioquimicaECO() {
                   value={form.ph}
                   labelWidth="100px"
                   onChange={handleChange}
+                  onKeyUp={(e) => { handleFocusNext(e, "cocaina") }}
                 />
               </div>
             </SectionFieldset>
@@ -665,6 +671,7 @@ export default function HematologiaBioquimicaECO() {
                     name={item.key}
                     value={form[item.key]}
                     onChange={handleChange}
+                    onKeyUp={(e) => { handleFocusNext(e, item.key == "cocaina" ? "marihuana" : "") }}
                   />
                   <div className="flex justify-center">
                     <InputsRadioGroup
@@ -697,6 +704,14 @@ export default function HematologiaBioquimicaECO() {
             label="Especialista"
             form={form}
             onChange={handleChangeSimple}
+          />
+          <EmpleadoComboBox
+            value={form.nombre_doctorAsignado}
+            label="Doctor Asignado"
+            form={form}
+            onChange={handleChangeSimple}
+            nameField="nombre_doctorAsignado"
+            idField="user_doctorAsignado"
           />
         </SectionFieldset>
       </SectionFieldset>

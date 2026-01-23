@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
 import { getFetch } from "../../../getFetch/getFetch";
 import { SubmitData } from "../model";
-import { handleSubirArchivoDefaultSinSellos, ReadArchivosFormDefault } from "../../../../../utils/functionUtils";
+import { handleSubirArchivoDefault, handleSubirArchivoDefaultSinSellos, ReadArchivosFormDefault } from "../../../../../utils/functionUtils";
 
 //===============Zona Modificación===============
 const obtenerReporteUrl =
@@ -156,7 +156,10 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
           examenClinicoHallazgos: res.txtecHallazgos ?? "",
 
           SubirDoc: true,
-          digitalizacion: res.digitalizacion
+          digitalizacion: res.digitalizacion,
+
+          user_medicoFirma: res.usuarioFirma,
+          user_doctorAsignado: res.doctorAsignado,
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -300,6 +303,9 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     txtCristalino: form.cristalino,
     txtAntPersImp: form.antecedentesPersonales,
     txtFamImp: form.antecedentesFamiliares,
+
+    usuarioFirma: form.user_medicoFirma,
+    doctorAsignado: form.user_doctorAsignado,
   };
   SubmitData(body, registrarUrl, token).then((res) => {
     console.log(res);
@@ -338,11 +344,18 @@ export const PrintHojaR = (nro, token, tabla) => {
         const nombre = res.nameJasper;
         console.log(nombre);
         const jasperModules = import.meta.glob(
-          "../../../../../jaspers/Oftalmologia/*.jsx"
+          "../../../../../jaspers/Oftalmologia/**/*.jsx"
         );
-        const modulo = await jasperModules[
-          `../../../../../jaspers/Oftalmologia/${nombre}.jsx`
-        ]();
+        // Determinar la ruta según el nombre del jasper
+        let rutaJasper;
+        if (nombre === "EvaluacionOftalmologica2021_Digitalizado") {
+          rutaJasper = `../../../../../jaspers/Oftalmologia/EvaluacionOftalmologica/${nombre}.jsx`;
+        } else if (nombre === "EvaluacionOftalmologica2021_Digitalizado_ohla") {
+          rutaJasper = `../../../../../jaspers/Oftalmologia/EvaluacionOftalmologica/${nombre}.jsx`;
+        } else {
+          rutaJasper = `../../../../../jaspers/Oftalmologia/${nombre}.jsx`;
+        }
+        const modulo = await jasperModules[rutaJasper]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
           modulo.default(res);
@@ -434,7 +447,12 @@ export const GetInfoPac = (nro, set, token, sede) => {
 };
 
 export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
-  handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
+  const coordenadas = {
+    HUELLA: { x: 400, y: 680, width: 60, height: 60 },
+    FIRMA: { x: 466, y: 680, width: 120, height: 60 },
+    SELLOFIRMADOCASIG: { x: 40, y: 680, width: 120, height: 80 },
+  };
+  handleSubirArchivoDefault(form, selectedSede, registrarPDF, userlogued, token, coordenadas)
 };
 
 export const ReadArchivosForm = async (form, setVisualerOpen, token) => {

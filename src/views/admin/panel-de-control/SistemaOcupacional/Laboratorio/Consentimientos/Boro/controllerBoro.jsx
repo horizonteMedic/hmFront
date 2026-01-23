@@ -48,8 +48,11 @@ export const GetInfoServicio = async (nro, token, setForm) => {
         medicamento: { key: res.antBoroAlgunMedicamento, cual: res.critCualAlgunMedicamento ? res.critCualAlgunMedicamento : '' },
         matecoca: { key: res.antBoroConsumenMateCoca, fecha: res.critFechaConsumoMateCoca },
         chaccha: { key: res.masticaHojaCoca, fecha: res.fechaConsumoHojaCoca },
-        tratamiento: { key: res.antBoroTratQuirugODental, cual: res.critCualTratQuirugODental ? res.critCualTratQuirugODental : '', 
-          cuando: res.critCuandoTratQuirugODental ? res.critCuandoTratQuirugODental : '', donde: res.critDondeTratQuirugODental ? res.critDondeTratQuirugODental : '' },
+        tratamiento: {
+          key: res.antBoroTratQuirugODental, cual: res.critCualTratQuirugODental ? res.critCualTratQuirugODental : '',
+          cuando: res.critCuandoTratQuirugODental ? res.critCuandoTratQuirugODental : '', donde: res.critDondeTratQuirugODental ? res.critDondeTratQuirugODental : ''
+        },
+        user_medicoFirma: res.usuarioFirma,
       }));
     } else {
       Swal.fire('Error', 'Ocurrio un error al traer los datos', 'error');

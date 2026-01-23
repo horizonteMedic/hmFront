@@ -1,8 +1,11 @@
 import Swal from "sweetalert2";
 import {
     GetInfoServicioDefault,
+    handleSubirArchivoDefault,
+    handleSubirArchivoDefaultSinSellos,
     LoadingDefault,
     PrintHojaRDefault,
+    ReadArchivosFormDefault,
     SubmitDataServiceDefault,
 } from "../../../../utils/functionUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
@@ -11,6 +14,9 @@ const obtenerReporteUrl =
     "/api/v01/ct/certificadoConduccion/obtenerReporteCertificadoConduccion";
 const registrarUrl =
     "/api/v01/ct/certificadoConduccion/registrarActualizarCertificadoConduccion";
+const registrarPDF =
+    "/api/v01/ct/archivos/archivoInterconsulta"
+
 
 export const GetInfoServicio = async (
     nro,
@@ -162,6 +168,8 @@ export const GetInfoServicio = async (
 
             obesidadIMC30: parseFloat(res.imcTriaje) >= 30,
 
+            SubirDoc: true,
+            digitalizacion: res.digitalizacion
         }));
     }
 };
@@ -178,7 +186,8 @@ export const GetInfoServicioEditar = async (
         tabla,
         token,
         obtenerReporteUrl,
-        onFinish
+        onFinish,
+        true
     );
     if (res) {
         let debeCorregirAgudezaVisual = false;
@@ -334,6 +343,9 @@ export const GetInfoServicioEditar = async (
             usoLentesCorrectoresLectura: (res.observacionesRecomendaciones_b_c_observaciones ?? "").includes("USO DE LENTES CORRECTORES PARA LECTURA DE CERCA."),
             corregirAgudezaLectura: (res.observacionesRecomendaciones_b_c_observaciones ?? "").includes("CORREGIR AGUDEZA VISUAL PARA LECTURA DE CERCA."),
             user_medicoFirma: res.usuarioFirma,
+
+            SubirDoc: true,
+            digitalizacion: res.digitalizacion
         }));
     }
 };
@@ -516,3 +528,16 @@ export const VerifyTRPerzonalizado = async (nro, tabla, token, set, sede, noTien
 export const Loading = (mensaje) => {
     LoadingDefault(mensaje);
 };
+
+export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
+    const coordenadas = {
+        HUELLA: { x: 400, y: 680, width: 60, height: 60 },
+        FIRMA: { x: 466, y: 680, width: 120, height: 60 },
+        SELLOFIRMA: { x: 40, y: 680, width: 120, height: 80 },
+    };
+    handleSubirArchivoDefault(form, selectedSede, registrarPDF, userlogued, token, coordenadas)
+};
+
+export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
+    ReadArchivosFormDefault(form, setVisualerOpen, token)
+}

@@ -46,6 +46,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             resultado: res.vih ?? "",
 
             user_medicoFirma: res.usuarioFirma,
+            user_doctorAsignado: res.doctorAsignado,
         }));
     }
 };
@@ -65,6 +66,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
         fechaRegistro: form.fecha,
         userActualizacion: user,
         usuarioFirma: form.user_medicoFirma,
+        doctorAsignado: form.user_doctorAsignado,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

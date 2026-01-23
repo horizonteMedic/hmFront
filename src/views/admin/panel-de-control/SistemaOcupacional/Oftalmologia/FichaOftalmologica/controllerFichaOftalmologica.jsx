@@ -46,6 +46,9 @@ export const GetInfoServicio = (
           fechaExamen: res.fechaOf,
           presenciaPterigion: res.eoculares1 ?? "",
           agudezaLejos: res.agudezaVisualLejor,
+
+          user_medicoFirma: res.usuarioFirma,
+          user_doctorAsignado: res.doctorAsignado,
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -92,6 +95,9 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     agudezaVisualLejor: form.agudezaLejos,
     userRegistro: user,
     userMedicoOcup: "",
+
+    usuarioFirma: form.user_medicoFirma,
+    doctorAsignado: form.user_doctorAsignado,
   };
   SubmitData(body, registrarUrl, token).then((res) => {
     console.log(res);

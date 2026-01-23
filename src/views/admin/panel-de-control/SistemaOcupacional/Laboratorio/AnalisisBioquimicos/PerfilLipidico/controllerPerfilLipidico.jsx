@@ -51,6 +51,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
       trigliceridos: res.txtTrigliseridos ?? "",
 
       user_medicoFirma: res.usuarioFirma,
+      user_doctorAsignado: res.doctorAsignado,
     }));
 
   }
@@ -77,6 +78,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla, Refre
     nOrden: form.norden,
 
     usuarioFirma: form.user_medicoFirma,
+    doctorAsignado: form.user_doctorAsignado,
   };
 
   await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

@@ -42,7 +42,7 @@ const header_HistoriaOcupacional = async (doc, datos = {}) => {
 
   // Logo a la izquierda
   const img = "/img/logo-color.webp";
-  const imgCompressed = await compressImage(img);
+  const imgCompressed = datos.logoHistoriaOcup || await compressImage(img);
   try {
     doc.addImage(imgCompressed, "WEBP", margin, y, 60, 20);
   } catch (error) {

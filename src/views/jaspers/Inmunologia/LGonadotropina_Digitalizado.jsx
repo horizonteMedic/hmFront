@@ -2,6 +2,7 @@ import jsPDF from "jspdf";
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
+import { getSignCompressed } from "../../utils/helpers.js";
 
 // --- Configuración Centralizada ---
 const config = {
@@ -187,102 +188,96 @@ export default async function LGonadotropina_Digitalizado(datos = {}, docExisten
 
   // === DATOS DEL PACIENTE ===
   const finalYPos = drawPatientData(doc, datos);
+  const s1 = await getSignCompressed(datos, "SELLOFIRMA");
+  const s2 = await getSignCompressed(datos, "SELLOFIRMADOCASIG");
 
-  const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
-  const isValidUrl = url => url && url !== "Sin registro";
-  const loadImg = src =>
-    new Promise((res, rej) => {
-      const img = new Image();
-      img.src = src;
-      img.crossOrigin = 'anonymous';
-      img.onload = () => res(img);
-      img.onerror = () => rej(`No se pudo cargar ${src}`);
-    });
 
-  await Promise.all([
-    isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
-    isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-  ]).then(([s1, s2]) => {
+  // === CUERPO ===
+  let y = finalYPos + 10;
 
-    // === CUERPO ===
-    let y = finalYPos + 10;
+  // === MUESTRA Y MÉTODO ===
+  doc.setFontSize(config.fontSize.header).setFont(config.font, "bold");
+  doc.text("MUESTRA:", config.margin, y);
+  doc.setFont(config.font, "normal");
+  doc.text("SUERO", config.margin + 20, y);
+  y += config.lineHeight;
 
-    // === MUESTRA Y MÉTODO ===
-    doc.setFontSize(config.fontSize.header).setFont(config.font, "bold");
-    doc.text("MUESTRA:", config.margin, y);
-    doc.setFont(config.font, "normal");
-    doc.text("SUERO", config.margin + 20, y);
-    y += config.lineHeight;
+  doc.setFont(config.font, "bold");
+  doc.text("MÉTODO:", config.margin, y);
+  doc.setFont(config.font, "normal");
+  doc.text("INMUNOCROMATOGRÁFICO", config.margin + 18, y);
+  y += config.lineHeight * 1.5;
 
-    doc.setFont(config.font, "bold");
-    doc.text("MÉTODO:", config.margin, y);
-    doc.setFont(config.font, "normal");
-    doc.text("INMUNOCROMATOGRÁFICO", config.margin + 18, y);
-    y += config.lineHeight * 1.5;
+  // === ENCABEZADO DE TABLA ===
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+  doc.text("PRUEBA CUALITATIVO", config.col1X, y);
+  doc.text("RESULTADO", config.col2X, y, { align: "center" });
+  y += 3;
+  doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
+  y += config.lineHeight;
 
-    // === ENCABEZADO DE TABLA ===
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
-    doc.text("PRUEBA CUALITATIVO", config.col1X, y);
-    doc.text("RESULTADO", config.col2X, y, { align: "center" });
-    y += 3;
-    doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
-    y += config.lineHeight;
+  // === CUERPO DE TABLA ===
+  // Inserta la imagen en vez del texto
+  const imgPath = './img/textogonabeta.png';
+  const imgWTest = 100, imgHTest = 15;
+  doc.addImage(imgPath, 'PNG', config.margin, y - 2, imgWTest, imgHTest);
 
-    // === CUERPO DE TABLA ===
-    // Inserta la imagen en vez del texto
-    const imgPath = './img/textogonabeta.png';
-    const imgWTest = 100, imgHTest = 15;
-    doc.addImage(imgPath, 'PNG', config.margin, y - 2, imgWTest, imgHTest);
+  // Resultado
+  doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
+  doc.text(datos.txtResultado || '', config.col2X, y + 6, { align: "center" });
 
-    // Resultado
-    doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
-    doc.text(datos.txtResultado || '', config.col2X, y + 6, { align: "center" });
+  // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
+  const sigW = 53;
+  const sigH = 23;
+  const sigY = 210;
+  const gap = 16;
 
-    // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
-    const sigW = 53;
-    const sigH = 23;
-    const sigY = 210;
-    const gap = 16;
+  if (s1 && s2) {
+    const totalWidth = sigW * 2 + gap;
+    const startX = (pageW - totalWidth) / 2;
 
-    if (s1 && s2) {
-      const totalWidth = sigW * 2 + gap;
-      const startX = (pageW - totalWidth) / 2;
+    const addSelloFromUrl = (url, xPos) => {
+      return new Promise((resolve, reject) => {
+        if (!url) return resolve();
 
-      const addSello = (img, xPos) => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        const selloBase64 = canvas.toDataURL('image/png');
-        doc.addImage(selloBase64, 'PNG', xPos, sigY, sigW, sigH);
-      };
-      addSello(s1, startX);
-      addSello(s2, startX + sigW + gap);
-    } else if (s1) {
-      const canvas = document.createElement('canvas');
-      canvas.width = s1.width;
-      canvas.height = s1.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(s1, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = (pageW - sigW) / 2;
-      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
-    } else if (s2) {
-      const canvas = document.createElement('canvas');
-      canvas.width = s2.width;
-      canvas.height = s2.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(s2, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = (pageW - sigW) / 2;
-      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
-    }
+        const img = new Image();
+        img.crossOrigin = "anonymous";
 
-    // === FOOTER ===
-    footerTR(doc, datos);
-  });
+        img.onload = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+
+            const selloBase64 = canvas.toDataURL('image/jpeg');
+            doc.addImage(selloBase64, 'jpeg', xPos, sigY, sigW, sigH);
+
+            resolve();
+          } catch (err) {
+            reject(err);
+          }
+        };
+
+        img.onerror = (e) => reject(e);
+        img.src = url;
+      });
+    };
+    await addSelloFromUrl(s1, startX);
+    await addSelloFromUrl(s2, startX + sigW + gap);
+  } else if (s1) {
+    const imgX = (pageW - sigW) / 2;
+    await addSelloFromUrl(s1, imgX);
+  } else if (s2) {
+    const imgX = (pageW - sigW) / 2;
+    await addSelloFromUrl(s2, imgX);
+  }
+
+  // === FOOTER ===
+  footerTR(doc, datos);
+
   if (docExistente) {
     return doc;
   } else {

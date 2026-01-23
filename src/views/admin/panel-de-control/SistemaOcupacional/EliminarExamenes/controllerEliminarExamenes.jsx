@@ -16,47 +16,48 @@ const urlsEliminar = {
     espirometria: "espirometria",
     odontograma: "odontograma",
     psicologia: "informePsicologico",
-    fichaOIT: "",
-    exRxSanguineos: "",
+    fichaOIT: "oit",
+    exRxSanguineos: "", //pendiente
     fichaAntPatologicos: "antecedentesPatologicos",
     histOcupacional: "historiaOcupacional",
     cuestionarioNordico: "cuestionarioNordico",
-    evMusculoEsqueletica: "",
-    oftalmologia: "",
-    actitudMedOcupacional: "",
-    usoRespiradores: "",
-    anexo16A: "",
-    consentimientoDosaje: "",
-    anexo16: "",
-    electrocardiograma: "",
+    evMusculoEsqueletica: "evaluacionMusculoEsqueletica",
+    oftalmologia: "", //pendiente
+    actitudMedOcupacional: "", //pendiente
+    usoRespiradores: "respiradores",
+    anexo16A: "anexos/anexo16a",
+    consentimientoDosaje: "", //pendiente
+    anexo16: "anexos/anexo16",
+    electrocardiograma: "electroCardiograma",
     // Trabajos en Altura
-    certTrabAlturaBarrik: "",
-    certTrabajoAltura: "",
+    certTrabAlturaBarrik: "", //pendiente
+    certTrabajoAltura: "certificadoTrabajoAltura",
     // Otros Formatos
-    evMuscEsqueletico: "",
-    cuestCalidadSueno: "",
-    testFatSomnolencia: "",
-    evalOftalmologica: "",
-    certManipuladores: "",
-    cuestAudiometria: "",
-    informeAudiometria: "",
+    evMuscEsqueletico: "evaluacionMusculoEsqueletica",
+    cuestCalidadSueno: "", //pendiente
+    testFatSomnolencia: "testFatigaSomnolencia",
+    evalOftalmologica: "", //pendiente
+    certManipuladores: "certificadoManipuladoresAlimentos",
+    cuestAudiometria: "cuestionarioNordico",
+    informeAudiometria: "audiometriaPo",
     perimetroToraxico: "",
     // Conducción de Vehículos
-    fichaSAS: "",
-    certConduccVehiculos: "",
-    // Fichas Sin Restricción
-    fMedica: "",
-    fAptitudMedOcup: "",
-    fMedicaAnexo2: "",
-    fAptitudAnexo2: "",
-    fMedAgro: "",
-    fAptitudAgro: "",
+    fichaSAS: "fichaApneaSueno", //pendiente
+    certConduccVehiculos: "certificadoConduccion",
+    // Fichas Sin Restricción 
+    fMedica: "", //pendiente
+    fAptitudMedOcup: "", //pendiente
+    fMedicaAnexo2: "", //pendiente
+    fAptitudAnexo2: "anexos/anexo2",
+    fMedAgro: "", //pendiente
+    fAptitudAgro: "", //pendiente   
 }
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
     GetInfoPac(nro, set, token, sede);
     GetInfoServicio(nro, tabla, set, token, () => { Swal.close(); });
 };
+
 export const GetInfoServicio = async (
     nro,
     tabla,

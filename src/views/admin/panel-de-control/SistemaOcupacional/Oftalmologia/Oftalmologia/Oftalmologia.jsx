@@ -17,132 +17,145 @@ import {
 import Swal from "sweetalert2";
 import { getToday } from "../../../../../utils/helpers";
 import ButtonsPDF from "../../../../../components/reusableComponents/ButtonsPDF";
+import { useSessionData } from "../../../../../hooks/useSessionData";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 
 const tabla = "oftalmologia2021";
-const today = getToday();
 
-const initialFormState = {
-  norden: "",
-  codOf: null,
-  fechaExam: today,
-  nomExam: "",
-  fechaNac: "",
-  nombres: "",
-  dni: "",
-  empresa: "",
-  contrata: "",
+export default function OftalmologiaOhla() {
+  const { token, userlogued, selectedSede, userName } = useSessionData();
+  const today = getToday();
 
-  parpadosYAnexos: "NORMAL",
-  corneas: "NORMAL",
-  otrosHallazgos: "NINGUNO",
-  conjuntivas: "NORMAL",
-  cristalino: "TRANSPARENTE",
+  const initialFormState = {
+    norden: "",
+    codOf: null,
+    fechaExam: today,
+    nomExam: "",
+    fechaNac: "",
+    nombres: "",
+    dni: "",
+    empresa: "",
+    contrata: "",
 
-  fondoNormalOD: false,
-  fondoNormalOI: false,
-  fondoAnormalOD: false,
-  fondoAnormalOI: false,
-  fondoHallazgos: "N/A",
+    parpadosYAnexos: "NORMAL",
+    corneas: "NORMAL",
+    otrosHallazgos: "NINGUNO",
+    conjuntivas: "NORMAL",
+    cristalino: "TRANSPARENTE",
 
-  pioOd: "-",
-  pioOi: "-",
-  noAplica: "X",
+    fondoNormalOD: false,
+    fondoNormalOI: false,
+    fondoAnormalOD: false,
+    fondoAnormalOI: false,
+    fondoHallazgos: "N/A",
 
-  correctorOcular: "NO",
-  correctorCerca: false,
-  correctorLejos: false,
-  noTrajocorrectorCerca: false,
-  noTrajocorrectorLejos: false,
+    pioOd: "-",
+    pioOi: "-",
+    noAplica: "X",
 
-  antecedentesPersonales: "NO REFIERE",
-  antecedentesFamiliares: "NO REFIERE",
+    correctorOcular: "NO",
+    correctorCerca: false,
+    correctorLejos: false,
+    noTrajocorrectorCerca: false,
+    noTrajocorrectorLejos: false,
 
-  ishihara: "",
-  coloresPuros: "",
-  estereopsia: "",
-  estereopsiaText: "",
+    antecedentesPersonales: "NO REFIERE",
+    antecedentesFamiliares: "NO REFIERE",
 
-  aplicaRefraccion: "NO",
-  odsfL: "-",
-  odcilL: "-",
-  odejeL: "-",
+    ishihara: "",
+    coloresPuros: "",
+    estereopsia: "",
+    estereopsiaText: "",
 
-  oisfL: "-",
-  oicilL: "-",
-  oiejeL: "-",
-  dipL: "-",
+    aplicaRefraccion: "NO",
+    odsfL: "-",
+    odcilL: "-",
+    odejeL: "-",
 
-  odsfC: "-",
-  odcilC: "-",
-  odejeC: "-",
+    oisfL: "-",
+    oicilL: "-",
+    oiejeL: "-",
+    dipL: "-",
 
-  oisfC: "-",
-  oicilC: "-",
-  oiejeC: "-",
-  dipC: "-",
+    odsfC: "-",
+    odcilC: "-",
+    odejeC: "-",
 
-  agudezaOdLejos: "00",
-  agudezaOiLejos: "00",
-  agudezaOdCerca: "00",
-  agudezaOiCerca: "00",
-  diagnostico: "",
+    oisfC: "-",
+    oicilC: "-",
+    oiejeC: "-",
+    dipC: "-",
 
-  ninguna: false,
-  usoCorrectoresCerca: false,
-  usoCorrectoresLejos: false,
-  lentesCorrectoresCerca: false,
-  lentesCorrectoresLejos: false,
-  lentesCambioLunas: false,
-  indicacionPterigion: false,
-  indicacionOtras: false,
+    agudezaOdLejos: "00",
+    agudezaOiLejos: "00",
+    agudezaOdCerca: "00",
+    agudezaOiCerca: "00",
+    diagnostico: "",
 
-  noRestringeActividades: false,
-  restriccionCorrectorLejos: false,
-  restriccionCorrectorCerca: false,
-  noTrabajosCableElectrico: false,
-  noConduccion: false,
+    ninguna: false,
+    usoCorrectoresCerca: false,
+    usoCorrectoresLejos: false,
+    lentesCorrectoresCerca: false,
+    lentesCorrectoresLejos: false,
+    lentesCambioLunas: false,
+    indicacionPterigion: false,
+    indicacionOtras: false,
 
-  vc_sinc_od: "00",
-  vc_sinc_oi: "00",
-  vc_conc_od: "00",
-  vc_conc_oi: "00",
-  vc_agujero_od: "00",
-  vc_agujero_oi: "00",
-  vl_sinc_od: "00",
-  vl_sinc_oi: "00",
-  vl_conc_od: "00",
-  vl_conc_oi: "00",
-  vl_agujero_od: "00",
-  vl_agujero_oi: "00",
-  bino_sinc: "00",
-  bino_conc: "00",
-  reflejos_pupilares: "",
+    noRestringeActividades: false,
+    restriccionCorrectorLejos: false,
+    restriccionCorrectorCerca: false,
+    noTrabajosCableElectrico: false,
+    noConduccion: false,
 
-  ptosisPalpebralOd: false,
-  ptosisPalpebralOi: false,
-  pterigionGradoOd: false,
-  pterigionGradoOi: false,
+    vc_sinc_od: "00",
+    vc_sinc_oi: "00",
+    vc_conc_od: "00",
+    vc_conc_oi: "00",
+    vc_agujero_od: "00",
+    vc_agujero_oi: "00",
+    vl_sinc_od: "00",
+    vl_sinc_oi: "00",
+    vl_conc_od: "00",
+    vl_conc_oi: "00",
+    vl_agujero_od: "00",
+    vl_agujero_oi: "00",
+    bino_sinc: "00",
+    bino_conc: "00",
+    reflejos_pupilares: "",
 
-  estrabismoOd: false,
-  estrabismoOi: false,
-  pingueculaOd: false,
-  pingueculaOi: false,
+    ptosisPalpebralOd: false,
+    ptosisPalpebralOi: false,
+    pterigionGradoOd: false,
+    pterigionGradoOi: false,
 
-  conjuntivitisOd: false,
-  conjuntivitisOi: false,
-  chalazionOd: false,
-  chalazionOi: false,
+    estrabismoOd: false,
+    estrabismoOi: false,
+    pingueculaOd: false,
+    pingueculaOi: false,
 
-  cataratasOd: false,
-  cataratasOi: false,
-  otrosOd: false,
-  otrosOi: false,
-  examenClinicoHallazgos: "",
+    conjuntivitisOd: false,
+    conjuntivitisOi: false,
+    chalazionOd: false,
+    chalazionOi: false,
 
-  SubirDoc: false,
-  nomenclatura: "OFTALMOLOGIA VISION TESTER"
-};
-export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
+    cataratasOd: false,
+    cataratasOi: false,
+    otrosOd: false,
+    otrosOi: false,
+    examenClinicoHallazgos: "",
+
+    SubirDoc: false,
+    nomenclatura: "OFTALMOLOGIA VISION TESTER",
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
+
+    nombre_doctorAsignado: "",
+    user_doctorAsignado: "",
+
+  };
   const [form, setForm] = useState(initialFormState);
   const [tab, setTab] = useState(0);
 
@@ -1509,6 +1522,22 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
             </div>
           </div>
         )}
+        <SectionFieldset legend="Asignación de Médico">
+          <EmpleadoComboBox
+            value={form.nombre_medico}
+            label="Especialista"
+            form={form}
+            onChange={handleChange}
+          />
+          <EmpleadoComboBox
+            value={form.nombre_doctorAsignado}
+            label="Doctor Asignado"
+            form={form}
+            onChange={handleChange}
+            nameField="nombre_doctorAsignado"
+            idField="user_doctorAsignado"
+          />
+        </SectionFieldset>
         <div className="flex flex-col md:flex-row justify-between items-center gap-4  px-4 pt-2">
           <div className=" flex gap-4">
             <button

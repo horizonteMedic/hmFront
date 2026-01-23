@@ -3,77 +3,84 @@ import Swal from "sweetalert2";
 import { SubmitOITModel, SubmitOITModelSinDatos } from "./model";
 import OIT_B_Digitalizado from "../../../../../jaspers/OIT/OIT_B_Digitalizado";
 import OIT_B_Digitalizado_boro from "../../../../../jaspers/OIT/OIT_B_Digitalizado_boro";
+import { handleSubirArchivoDefaultSinSellos, ReadArchivosFormDefault } from "../../../../../utils/functionUtils";
+
+const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta"
+
 const Loading = (text) => {
-    Swal.fire({
-      title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,
-      html: `<div style=\"font-size:1.1em;\"><span style='color:#0d9488;font-weight:bold;'></span></div><div class='mt-2'>Espere por favor...</div>` ,
-      icon: 'info',
-      background: '#f0f6ff',
-      color: '#22223b',
-      showConfirmButton: false,
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      showCancelButton: true,
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-      customClass: {
-        popup: 'swal2-border-radius',
-        title: 'swal2-title-custom',
-        htmlContainer: 'swal2-html-custom',
-      },
-      showClass: {
-        popup: 'animate__animated animate__fadeInDown'
-      },
-      hideClass: {
-        popup: 'animate__animated animate__fadeOutUp'
-      },
-      didOpen: () => {
-        Swal.showLoading();
-      }
-    });
-    
+  Swal.fire({
+    title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,
+    html: `<div style=\"font-size:1.1em;\"><span style='color:#0d9488;font-weight:bold;'></span></div><div class='mt-2'>Espere por favor...</div>`,
+    icon: 'info',
+    background: '#f0f6ff',
+    color: '#22223b',
+    showConfirmButton: false,
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    showCancelButton: true,
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Yes, delete it!",
+    customClass: {
+      popup: 'swal2-border-radius',
+      title: 'swal2-title-custom',
+      htmlContainer: 'swal2-html-custom',
+    },
+    showClass: {
+      popup: 'animate__animated animate__fadeInDown'
+    },
+    hideClass: {
+      popup: 'animate__animated animate__fadeOutUp'
+    },
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+
 
 }
 
-export const VerifyTR = async (nro,tabla,token,set,sede) => {
-    if (!nro) { 
-      await Swal.fire('Error', 'Debe Introducir un Nro de Historia Clinica valido', 'error') 
-      return
-    }
-    Loading('Validando datos')
-    getFetch(`/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,token)
+export const VerifyTR = async (nro, tabla, token, set, sede) => {
+  if (!nro) {
+    await Swal.fire('Error', 'Debe Introducir un Nro de Historia Clinica valido', 'error')
+    return
+  }
+  Loading('Validando datos')
+  getFetch(`/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`, token)
     .then((res) => {
-        console.log(res)
-        if (res.id === 0) {
-            GetInfoPac(nro,set,token,sede)
-        } else {
-            GetInfoPacLaboratorioFil(nro,tabla,set,token)
-        }
+      console.log(res)
+      if (res.id === 0) {
+        GetInfoPac(nro, set, token, sede)
+      } else {
+        GetInfoPacLaboratorioFil(nro, tabla, set, token)
+      }
     })
 }
 
-export const GetInfoPac = (nro,set,token,sede) => {
-    getFetch(`/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`,token)
+export const GetInfoPac = (nro, set, token, sede) => {
+  getFetch(`/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`, token)
     .then((res) => {
-        console.log('pros',res)
-        set(prev => ({
+      console.log('pros', res)
+      set(prev => ({
         ...prev,
         ...res,
         nombres: res.nombresApellidos,
-        }));
+      }));
     })
     .finally(() => {
       Swal.close()
     })
 }
 
-export const GetInfoPacLaboratorioFil = (nro,tabla,set,token) => {
-    getFetch(`/api/v01/ct/oit/obtenerReporteOit?nOrden=${nro}&nameService=${tabla}`,token)
+export const GetInfoPacLaboratorioFil = (nro, tabla, set, token) => {
+  getFetch(`/api/v01/ct/oit/obtenerReporteOit?nOrden=${nro}&nameService=${tabla}`, token)
     .then((res) => {
       console.log(res)
       set(prev => ({
         ...prev,
         ...res,
+        SubirDoc: true,
+        digitalizacion: res.digitalizacion,
+        user_medicoFirma: res.usuarioFirma,
       }))
     })
     .finally(() => {
@@ -81,94 +88,104 @@ export const GetInfoPacLaboratorioFil = (nro,tabla,set,token) => {
     })
 }
 
-export const SubmitOIT = async (form,token,user,limpiar,tabla) => {
-    if (!form.norden) {
-        await Swal.fire('Error', 'Datos Incompletos','error')
-        return
-    }
-    Loading('Registrando Datos')
-    if (form.SinDatos) {
-      SubmitOITModelSinDatos(form,user,token)
+export const SubmitOIT = async (form, token, user, limpiar, tabla) => {
+  if (!form.norden) {
+    await Swal.fire('Error', 'Datos Incompletos', 'error')
+    return
+  }
+  Loading('Registrando Datos')
+  if (form.SinDatos) {
+    SubmitOITModelSinDatos(form, user, token)
       .then((res) => {
         console.log(res)
         if (res.id === 1 || res.id === 0) {
-          Swal.fire({title: 'Exito', text:`${res.mensaje},\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
-              confirmButtonColor: "#3085d6",
-              cancelButtonColor: "#d33",
+          Swal.fire({
+            title: 'Exito', text: `${res.mensaje},\n¿Desea imprimir?`, icon: 'success', showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
           }).then((result) => {
-              limpiar()
-              if (result.isConfirmed) {
-                  PrintHojaSinDatos(form.norden,token,tabla)
-              }
+            limpiar()
+            if (result.isConfirmed) {
+              PrintHojaSinDatos(form.norden, token, tabla)
+            }
           })
-          } else {
-              Swal.fire('Error','Ocurrio un error al Registrar','error')
+        } else {
+          Swal.fire('Error', 'Ocurrio un error al Registrar', 'error')
         }
       })
-        
-    } else {
-      console.log('formulario',form)
-    SubmitOITModel(form,user,token)
+
+  } else {
+    console.log('formulario', form)
+    SubmitOITModel(form, user, token)
       .then((res) => {
-          console.log(res)
-          if (res.id === 1 || res.id === 0) {
-          Swal.fire({title: 'Exito', text:`${res.mensaje},\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
-              confirmButtonColor: "#3085d6",
-              cancelButtonColor: "#d33",
+        console.log(res)
+        if (res.id === 1 || res.id === 0) {
+          Swal.fire({
+            title: 'Exito', text: `${res.mensaje},\n¿Desea imprimir?`, icon: 'success', showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
           }).then((result) => {
-              limpiar()
-              if (result.isConfirmed) {
+            limpiar()
+            if (result.isConfirmed) {
 
-                  PrintHojaR(form.norden,token,tabla)
-              }
+              PrintHojaR(form.norden, token, tabla)
+            }
           })
-          } else {
-              Swal.fire('Error','Ocurrio un error al Registrar','error')
-          }
-        })
-    }
+        } else {
+          Swal.fire('Error', 'Ocurrio un error al Registrar', 'error')
+        }
+      })
+  }
 }
 
-export const PrintHojaR = (nro,token,tabla) => {
+export const PrintHojaR = (nro, token, tabla) => {
   Loading('Cargando Formato a Imprimir')
-  getFetch(`/api/v01/ct/oit/obtenerReporteOit?nOrden=${nro}&nameService=${tabla}`,token)
-  .then(async (res) => {
-    if (res.norden) {
-      console.log(res)
-      const nombre = res.nameJasper;
-      console.log(nombre)
-      const jasperModules = import.meta.glob('../../../../../jaspers/OIT/*.jsx');
-      const modulo = await jasperModules[`../../../../../jaspers/OIT/${nombre}.jsx`]();
-      // Ejecuta la función exportada por default con los datos
-      if (typeof modulo.default === 'function') {
-        modulo.default(res);
+  getFetch(`/api/v01/ct/oit/obtenerReporteOit?nOrden=${nro}&nameService=${tabla}`, token)
+    .then(async (res) => {
+      if (res.norden) {
+        console.log(res)
+        const nombre = res.nameJasper;
+        console.log(nombre)
+        const jasperModules = import.meta.glob('../../../../../jaspers/OIT/*.jsx');
+        const modulo = await jasperModules[`../../../../../jaspers/OIT/${nombre}.jsx`]();
+        // Ejecuta la función exportada por default con los datos
+        if (typeof modulo.default === 'function') {
+          modulo.default(res);
+        } else {
+          console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+        }
+        Swal.close()
       } else {
-        console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+        Swal.close()
       }
-      Swal.close()
-    } else {
-      Swal.close()
-    }
-  })
+    })
 }
 
-export const PrintHojaSinDatos = (nro,token,tabla) => {
+export const PrintHojaSinDatos = (nro, token, tabla) => {
   Loading('Cargando Formato a Imprimir')
-  getFetch(`/api/v01/ct/oit/obtenerReporteOit?nOrden=${nro}&nameService=${tabla}`,token)
-  .then(async (res) => {
-    if (res.norden) {
-      console.log(res)
-      const nombre = res.nameJasper;
-      console.log(nombre)
-      if (nombre === 'OIT_Digitalizado_boro') {
-        OIT_B_Digitalizado_boro(res)
-        Swal.close()
+  getFetch(`/api/v01/ct/oit/obtenerReporteOit?nOrden=${nro}&nameService=${tabla}`, token)
+    .then(async (res) => {
+      if (res.norden) {
+        console.log(res)
+        const nombre = res.nameJasper;
+        console.log(nombre)
+        if (nombre === 'OIT_Digitalizado_boro') {
+          OIT_B_Digitalizado_boro(res)
+          Swal.close()
+        } else {
+          OIT_B_Digitalizado(res)
+          Swal.close()
+        }
       } else {
-        OIT_B_Digitalizado(res)
         Swal.close()
       }
-    } else {
-      Swal.close()
-    }
-  })
+    })
+}
+
+export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
+  handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
+};
+
+export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
+  ReadArchivosFormDefault(form, setVisualerOpen, token)
 }

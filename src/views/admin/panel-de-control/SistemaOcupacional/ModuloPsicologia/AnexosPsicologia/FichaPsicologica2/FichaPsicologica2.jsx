@@ -12,6 +12,7 @@ import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaPsicologica2";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "ficha_psicologica_anexo02"
 const today = getToday()
@@ -29,7 +30,7 @@ const orientacionOptions = [
 ];
 
 export default function FichaPsicologica2() {
-    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+    const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
     const initialFormState = {
         // Datos personales
@@ -78,6 +79,10 @@ export default function FichaPsicologica2() {
         recomendaciones: "",
         areaCognitiva: "",
         areaEmocional: "",
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
     };
 
     const {
@@ -338,6 +343,15 @@ export default function FichaPsicologica2() {
                     </div>
                 </SectionFieldset>
             </div>
+
+            <SectionFieldset legend="Asignación de Médico">
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Especialista"
+                    form={form}
+                    onChange={handleChangeSimple}
+                />
+            </SectionFieldset>
             <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
                 <div className="flex gap-4">
                     <button

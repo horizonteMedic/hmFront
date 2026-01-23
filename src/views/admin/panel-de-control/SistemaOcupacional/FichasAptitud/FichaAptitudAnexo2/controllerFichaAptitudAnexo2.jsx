@@ -98,8 +98,7 @@ export const GetInfoServicioEditar = async (
             noConducirVehiculos: res.restriccionesDescripcion?.includes("NO CONDUCIR VEHÍCULOS") || false,
 
             // Médico que Certifica
-            nombre_medico: res.nombreMedico,
-
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -131,6 +130,8 @@ export const SubmitDataService = async (
         recomendaciones: form.recomendaciones,
         conclusiones: form.conclusiones,
         usuarioRegistro: user,
+
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

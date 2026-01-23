@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import header_Audiometria2021_Digitalizado_boro from "./headers/header_Audiometria2021-_Digitalizado_boro";
+import header_Audiometria2021_Digitalizado_boro from "./headers/header_Audiometria2021-_Digitalizado_boro.jsx";
 
 /**
  * Genera el cuerpo completo del PDF:
@@ -8,9 +8,9 @@ import header_Audiometria2021_Digitalizado_boro from "./headers/header_Audiometr
  * 4.- Exposición Ocupacional
  * @param {jsPDF} doc
  */
-const body_Audiometria2021_Digitalizado = (doc, data) => {
+const body_Audiometria2021_Digitalizado = async (doc, data) => {
   // Header
-  header_Audiometria2021_Digitalizado_boro(doc, data);
+  await header_Audiometria2021_Digitalizado_boro(doc, data);
 
   function drawCenteredText(text, centerX, y, options = {}) {
     const textWidth = doc.getTextWidth(text);
@@ -777,8 +777,8 @@ export default async function Audiometria2021_Digitalizado(data = {}, docExisten
   await body_Audiometria2021_Digitalizado(doc, data);
 
   // Función para agregar la firma y esperar a que cargue o falle
-  const addSello = (imagenUrl, x, y, maxw = 100) => {
-    return new Promise((resolve) => {
+  const addSello = async (imagenUrl, x, y, maxw = 100) => {
+    await new Promise((resolve) => {
       const img = new Image();
       img.crossOrigin = "anonymous"; // importante si es una URL externa
       img.src = imagenUrl;
@@ -825,9 +825,11 @@ export default async function Audiometria2021_Digitalizado(data = {}, docExisten
   ];
 
   // Crear promesas para todas las firmas existentes
-  await firmasAPintar
+  const tareas = firmasAPintar
     .filter((f) => firmas[f.nombre])
     .map((f) => addSello(firmas[f.nombre], f.x, f.y, f.maxw));
+
+  await Promise.all(tareas);
 
   if (docExistente) {
     return doc;

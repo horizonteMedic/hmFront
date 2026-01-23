@@ -58,7 +58,13 @@ export default function Espirometria() {
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
-        
+
+        nombre_doctorAsignado: "",
+        user_doctorAsignado: "",
+
+        nombre_doctorExtra: "",
+        user_doctorExtra: "",
+
         SubirDoc: false,
         nomenclatura: "ESPIROMETRIA"
     };
@@ -87,7 +93,7 @@ export default function Espirometria() {
             VerifyTR(form.norden, tabla, token, setForm, selectedSede);
         }
     };
-
+    console.log(form)
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
@@ -232,6 +238,22 @@ export default function Espirometria() {
                     label="Especialista"
                     form={form}
                     onChange={handleChangeSimple}
+                />
+                <EmpleadoComboBox
+                    value={form.nombre_doctorAsignado}
+                    label="Doctor Asignado"
+                    form={form}
+                    onChange={handleChangeSimple}
+                    nameField="nombre_doctorAsignado"
+                    idField="user_doctorAsignado"
+                />
+                <EmpleadoComboBox
+                    value={form.nombre_doctorExtra}
+                    label="Doctor Extra"
+                    form={form}
+                    onChange={handleChangeSimple}
+                    nameField="nombre_doctorExtra"
+                    idField="user_doctorExtra"
                 />
             </SectionFieldset>
 

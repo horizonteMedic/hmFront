@@ -18,6 +18,7 @@ import InputsBooleanRadioGroup from "../../../../../components/reusableComponent
 import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
 import InputCheckbox from "../../../../../components/reusableComponents/InputCheckbox";
 import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "audiometria_2023";
 
@@ -33,7 +34,7 @@ const frecuencias = ["500", "1000", "2000", "3000", "4000", "6000", "8000"];
 
 export default function Audiometria() {
   const today = getToday();
-  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+  const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
   const initialFormState = {
     codAu: "",
     norden: "",
@@ -149,6 +150,14 @@ export default function Audiometria() {
     oi_o_4000: "",
     oi_o_6000: "",
     oi_o_8000: "",
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
+
+    //extra
+    nombre_medico_extra: "",
+    user_medicoFirmaExtra: "",
   };
 
   const {
@@ -779,6 +788,22 @@ export default function Audiometria() {
               />
             </SectionFieldset>
           </div>
+          <SectionFieldset legend="Sellos" className="space-y-4">
+            <EmpleadoComboBox
+              value={form.nombre_medico}
+              label="Especialista"
+              form={form}
+              onChange={handleChangeSimple}
+            />
+            <EmpleadoComboBox
+              value={form.nombre_medico_extra}
+              label="Especialista Extra"
+              form={form}
+              onChange={handleChangeSimple}
+              nameField="nombre_medico_extra"
+              idField="user_medicoFirmaExtra"
+            />
+          </SectionFieldset>
         </div>
 
         {/* Acciones */}

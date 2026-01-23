@@ -1,6 +1,6 @@
 import { URLAzure } from "../../../../../config/config";
 
-export function SubmitOITModel(data,user,token) {
+export function SubmitOITModel(data, user, token) {
     const body = {
         "norden": data.norden,
         "nplaca": data.nplaca,
@@ -12,7 +12,7 @@ export function SubmitOITModel(data,user,token) {
         "rbAceptable": data.rbAceptable,
         "rbBajacalidad": data.rbBajacalidad,
         "rbInaceptable": data.rbInaceptable,
-            //causas
+        //causas
         "rbSobreexposicion": data.rbSobreexposicion,
         "rbSubexposicion": data.rbSubexposicion,
         "rbPosicioncentrado": data.rbPosicioncentrado,
@@ -66,7 +66,7 @@ export function SubmitOITModel(data,user,token) {
         "chkE4": data.chkE4,
         "chkE5": data.chkE5,
         "chkE6": data.chkE6,
-            //a
+        //a
         chk2_1: data.chk2_1,
         chk2_2: data.chk2_2,
         chk2_3: data.chk2_3,
@@ -174,25 +174,27 @@ export function SubmitOITModel(data,user,token) {
         chk_28: data.chk_28,
         chk_29: data.chk_29,
         "txtSComentarios": data.txtSComentarios,
-        "userRegistro": user
-    };    
+        "userRegistro": user,
+        usuarioFirma: data.user_medicoFirma,
+    };
 
     const url = `${URLAzure}/api/v01/ct/oit/registrarActualizarOit`
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(body)
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(body)
     }
-    return fetch(url,options).then(res =>  {
+    return fetch(url, options).then(res => {
         if (!res.ok) {
             return res
-        } return res.json()}).then(response => response) 
+        } return res.json()
+    }).then(response => response)
 }
 
-export function SubmitOITModelSinDatos(data,user,token) {
+export function SubmitOITModelSinDatos(data, user, token) {
     const body = {
         "norden": data.norden,
         "edad": data.edad,
@@ -200,19 +202,21 @@ export function SubmitOITModelSinDatos(data,user,token) {
         "userRegistro": user,
         "flectura": data.flectura,
         "fradiografia": data.fradiografia,
-    };    
+        usuarioFirma: data.user_medicoFirma,
+    };
 
     const url = `${URLAzure}/api/v01/ct/oit/registrarActualizarOit`
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(body)
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(body)
     }
-    return fetch(url,options).then(res =>  {
+    return fetch(url, options).then(res => {
         if (!res.ok) {
             return res
-        } return res.json()}).then(response => response) 
+        } return res.json()
+    }).then(response => response)
 }

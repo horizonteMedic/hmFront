@@ -42,50 +42,48 @@ export default function InformePsicologico() {
 
         // Área Intelectual
         areaIntelectual: "EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO.",
-        promedio: true,
-        superior: false,
-        nInferior: false,
-        alto: false,
+        intelectualSuperior: false,
+        intelectualPromedio: false,
+        intelectualPromedioSuperior: false,
+        intelectualPromedioBajo: false,
 
         pSuperior: false,
         pMedio: false,
         pBajo: false,
         bajo: false,
 
-        facilidad: false,
-        dificultad: false,
+        infosencilla: false,
+        infogeneral: false,
 
-        pnAdecuado: false,
-        nAlto: false,
-        nBajo: false,
+        compInfo: false,
+        compBajo: false,
 
-        yNumerica: false,
-        yCalculo: false,
+        supVerbalNum: false,
+        promVerbalNum: false,
+        promSupVerbalNum: false,
+        promBajoVerbalNum: false,
 
-        adecuadaR: false,
-        inadecuada: false,
+        adecuado: false,
+        prmBajo: false,
 
         // Área de Personalidad
         areaPersonalidad: "",
 
         // Área de Psicomotricidad
         areaPsicomotricidad: "",
-        nivelAltoPs: false,
-        nivelAdecuadoPs: false,
-        nivelBajoPs: false,
+        nivAdecuadoPs: false,
 
-        facilidadPs: false,
-        dificultadPs: false,
+        facilidad: false,
+        dificultad: false,
 
         // Área de Organicidad
         areaOrganicidad: "",
-        orientadoEnTiempo: false,
+        orientadoTiempo: false,
 
-        poseeAltoManejo: false,
-        pAdecuadoManejo: false,
-        pBajoManejo: false,
+        adecuadoManejo: false,
+        bajoManejo: false,
 
-        noSeEnvidencia: false,
+        noEnvidencia: false,
 
         // Recomendaciones
         recomendaciones: "",
@@ -143,33 +141,39 @@ export default function InformePsicologico() {
 
     // Definición de grupos de checkboxes del área intelectual
     const intellectualGroups = {
-        nivelIntelectual: ['promedio', 'superior', 'nInferior', 'alto'],
-        facilidadDificultad: ['facilidad', 'dificultad'],
-        capacidadNumerica: ['yNumerica', 'yCalculo'],
-        nivelPsicomotor: ['pSuperior', 'pMedio', 'pBajo', 'bajo'],
-        nivelAtencion: ['pnAdecuado', 'nAlto', 'nBajo'],
-        retencionDigitos: ['adecuadaR', 'inadecuada']
+        nivelIntelectual: ['intelectualSuperior', 'intelectualPromedio', 'intelectualPromedioSuperior', 'intelectualPromedioBajo'],
+        facilidadDificultad: ['infosencilla', 'infogeneral'],
+        capacidadNumerica: ['supVerbalNum', 'promVerbalNum', 'promSupVerbalNum', 'promBajoVerbalNum'],
+        nivelPsicomotor: ['promSuperior', 'promedio', 'superior', 'promBajo'],
+        nivelAtencion: ['compInfo', 'compBajo'],
+        retencionDigitos: ['adecuado', 'prmBajo']
     };
 
     // Textos específicos para cada checkbox
     const intellectualTexts = {
-        promedio: "EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO.",
-        superior: "EL EVALUADO POSEE UN NIVEL INTELECTUAL SUPERIOR.",
-        nInferior: "EL EVALUADO POSEE UN NIVEL INTELECTUAL NORMAL INFERIOR.",
-        alto: "EL EVALUADO POSEE UN NIVEL INTELECTUAL ALTO.",
-        facilidad: "PRESENTA FACILIDAD EN EL PROCESAMIENTO DE LA INFORMACIÓN.",
-        dificultad: "PRESENTA DIFICULTAD EN EL PROCESAMIENTO DE LA INFORMACIÓN.",
-        yNumerica: "Y EN CAPACIDAD NUMÉRICA.",
-        yCalculo: "Y EN CAPACIDAD DE CÁLCULO.",
-        pSuperior: "POSEE UN NIVEL PSICOMOTOR SUPERIOR.",
-        pMedio: "POSEE UN NIVEL PSICOMOTOR MEDIO.",
-        pBajo: "POSEE UN NIVEL PSICOMOTOR BAJO.",
-        bajo: "POSEE UN NIVEL PSICOMOTOR BAJO.",
-        pnAdecuado: "PRESENTA UN NIVEL DE ATENCIÓN ADECUADO.",
-        nAlto: "PRESENTA UN NIVEL DE ATENCIÓN ALTO.",
-        nBajo: "PRESENTA UN NIVEL DE ATENCIÓN BAJO.",
-        adecuadaR: "PRESENTA ADECUADA RETENCIÓN DE DÍGITOS.",
-        inadecuada: "PRESENTA INADECUADA RETENCIÓN DE DÍGITOS."
+        intelectualSuperior: "- EL EVALUADO POSEE UN NIVEL INTELECTUAL SUPERIOR.",
+        intelectualPromedio: "- EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO.",
+        intelectualPromedioSuperior: "- EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO SUPERIOR.",
+        intelectualPromedioBajo: "- EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO BAJO.",
+
+        infosencilla: "- COMPRENDE Y PROCESA LA INFORMACION SENCILLA CON FACILIDAD.",
+        infogeneral: "- COMPRENDE Y PROCESA LA INFORMACION CON FACILIDAD.",
+
+        supVerbalNum: "- POSEE UN NIVEL SUPERIOR EN COMPRENSION VERBAL Y EN CAPACIDAD NUMÉRICA.",
+        promVerbalNum: "- POSEE UN NIVEL PROMEDIO EN COMPRENSION VERBAL Y EN CAPACIDAD NUMÉRICA.",
+        promSupVerbalNum: "- POSEE UN NIVEL PROMEDIO SUPERIOR EN COMPRENSION VERBAL Y EN CAPACIDAD NUMÉRICA.",
+        promBajoVerbalNum: "- POSEE UN NIVEL PROMEDIO BAJO EN COMPRENSION VERBAL Y EN CAPACIDAD NUMÉRICA.",
+        
+        promSuperior: "- POSEE UN NIVEL PROMEDIO SUPERIOR EN COMPRENSION VERBAL Y EN CAPACIDAD DE CÁLCULO.",
+        promedio: "- POSEE UN NIVEL PROMEDIO EN COMPRENSION VERBAL Y EN CAPACIDAD DE CÁLCULO.",
+        superior: "- POSEE UN NIVEL SUPERIOR EN COMPRENSION VERBAL Y EN CAPACIDAD DE CÁLCULO.",
+        promBajo: "- POSEE UN NIVEL PROMEDIO BAJO EN COMPRENSION VERBAL Y EN CAPACIDAD DE CÁLCULO.",
+
+        compInfo: "- COMPRENDE Y PROCESA LA INFORMACION SENCILLA CON FACILIDAD.",
+        compBajo: "- POSEE UN NIVEL PROMEDIO BAJO EN EL MANEJO DE FACULTADES MENTALES.",
+ 
+        adecuado: "- ADECUADA RETENCION DE DIGITOS.",
+        prmBajo: "- PRESENTA UN NIVEL PROMEDIO BAJO RETENCION DE DIGITOS."
     };
 
     // Configuración de grupos y textos para todas las áreas
@@ -181,30 +185,27 @@ export default function InformePsicologico() {
         },
         organicidad: {
             groups: {
-                manejoFacultades: ['poseeAltoManejo', 'pAdecuadoManejo', 'pBajoManejo'],
-                orientacion: ['orientadoEnTiempo'],
-                danoOrganico: ['noSeEnvidencia']
+                manejoFacultades: ['adecuadoManejo', 'bajoManejo'],
+                orientacion: ['orientadoTiempo'],
+                danoOrganico: ['noEnvidencia']
             },
             texts: {
-                poseeAltoManejo: 'POSEE ALTO MANEJO DE FACULTADES MENTALES.',
-                pAdecuadoManejo: 'POSEE ADECUADO MANEJO DE FACULTADES MENTALES.',
-                pBajoManejo: 'POSEE BAJO MANEJO DE FACULTADES MENTALES.',
-                orientadoEnTiempo: 'ORIENTADO EN TIEMPO, ESPACIO Y PERSONA.',
-                noSeEnvidencia: 'NO SE EVIDENCIA DAÑO ORGÁNICO.'
+                adecuadoManejo: '- POSEE UN ADECUADO MANEJO DE FACULTADES MENTALES.',
+                bajoManejo: '- POSEE UN NIVEL PROMEDIO BAJO EN EL MANEJO DE FACULTADES MENTALES.',
+                orientadoTiempo: '- ORIENTADO EN TIEMPO, ESPACIO, Y PERSONA.',
+                noEnvidencia: '- NO SE EVIDENCIA DAÑO ORGÁNICO.'
             },
             fieldName: 'areaOrganicidad'
         },
         psicomotricidad: {
             groups: {
-                nivel: ['nivelAltoPs', 'nivelAdecuadoPs', 'nivelBajoPs'],
-                facilidad: ['facilidadPs', 'dificultadPs']
+                nivel: ['nivAdecuado'],
+                facilidad: ['facilidad', 'dificultad']
             },
             texts: {
-                nivelAltoPs: 'POSEE UN NIVEL PSICOMOTOR ALTO.',
-                nivelAdecuadoPs: 'POSEE UN NIVEL PSICOMOTOR ADECUADO.',
-                nivelBajoPs: 'POSEE UN NIVEL PSICOMOTOR BAJO.',
-                facilidadPs: 'PRESENTA FACILIDAD EN PSICOMOTRICIDAD.',
-                dificultadPs: 'PRESENTA DIFICULTAD EN PSICOMOTRICIDAD.'
+                nivAdecuado: '- NIVEL ADECUADO EN DESARROLLO PSICOMOTOR.',
+                facilidad: '- REALIZA LAS INSTRUCCIONES BRINDADAS CON FACILIDAD',
+                dificultad: '- REALIZA LAS INSTRUCCIONES BRINDADAS CON DIFICULTAD.'
             },
             fieldName: 'areaPsicomotricidad'
         }
@@ -450,118 +451,124 @@ export default function InformePsicologico() {
                                 value={form.areaIntelectual}
                                 onChange={handleChange}
                             />
-                            <div className="grid grid-cols-4 gap-2 ">
+                            <div className="grid grid-cols-2 gap-2">
                                 <SectionFieldset>
                                     <InputCheckbox
+                                        label="SUPERIOR"
+                                        name="intelectualSuperior"
+                                        checked={form.intelectualSuperior}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                    <InputCheckbox
                                         label="PROMEDIO"
+                                        name="intelectualPromedio"
+                                        checked={form.intelectualPromedio}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="PROMEDIO SUPERIOR"
+                                        name="intelectualPromedioSuperior"
+                                        checked={form.intelectualPromedioSuperior}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="PROMEDIO BAJO"
+                                        name="intelectualPromedioBajo"
+                                        checked={form.intelectualPromedioBajo}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                </SectionFieldset>
+                                <SectionFieldset >
+                                    <InputCheckbox
+                                        label="INFORMACION SENCILLA"
+                                        name="infosencilla"
+                                        checked={form.infosencilla}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="INFORMACION GENERAL"
+                                        name="infogeneral"
+                                        checked={form.infogeneral}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                </SectionFieldset>
+                                <SectionFieldset>
+                                    <InputCheckbox
+                                        label="N.S.VERBAL Y NUMÉRICA"
+                                        name="supVerbalNum"
+                                        checked={form.supVerbalNum}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="N.P.VERBAL Y NUMÉRICA"
+                                        name="promVerbalNum"
+                                        checked={form.promVerbalNum}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="N.P.S.VERBAL Y NUMÉRICA"
+                                        name="promSupVerbalNum"
+                                        checked={form.promSupVerbalNum}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />       
+                                    <InputCheckbox
+                                        label="N.P.B.VERBAL Y NUMÉRICA"
+                                        name="promBajoVerbalNum"
+                                        checked={form.promBajoVerbalNum}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />                             
+                                </SectionFieldset>
+                                <SectionFieldset>
+                                    <InputCheckbox
+                                        label="N.P.S. VERBAL Y CÁLCULO"
+                                        name="promSuperior"
+                                        checked={form.promSuperior}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="N.P.VERBAL Y CÁLCULO"
                                         name="promedio"
                                         checked={form.promedio}
                                         onChange={handleIntellectualCheckboxChange}
                                     />
                                     <InputCheckbox
-                                        label="SUPERIOR"
+                                        label="N.S.VERBAL Y CÁLCULO"
                                         name="superior"
                                         checked={form.superior}
                                         onChange={handleIntellectualCheckboxChange}
                                     />
                                     <InputCheckbox
-                                        label="N. INFERIOR"
-                                        name="nInferior"
-                                        checked={form.nInferior}
-                                        onChange={handleIntellectualCheckboxChange}
-                                    />
-                                    <InputCheckbox
-                                        label="ALTO"
-                                        name="alto"
-                                        checked={form.alto}
+                                        label="N.P.B.VERBAL Y CÁLCULO"
+                                        name="promBajo"
+                                        checked={form.promBajo}
                                         onChange={handleIntellectualCheckboxChange}
                                     />
                                 </SectionFieldset>
                                 <SectionFieldset>
                                     <InputCheckbox
-                                        label="FACILIDAD"
-                                        name="facilidad"
-                                        checked={form.facilidad}
+                                        label="COMPRENSIÓN"
+                                        name="compInfo"
+                                        checked={form.compInfo}
                                         onChange={handleIntellectualCheckboxChange}
                                     />
                                     <InputCheckbox
-                                        label="DIFICULTAD"
-                                        name="dificultad"
-                                        checked={form.dificultad}
-                                        onChange={handleIntellectualCheckboxChange}
-                                    />
-                                </SectionFieldset>
-                                <SectionFieldset fieldsetClassName="col-span-2">
-                                    <InputCheckbox
-                                        label="Y EN CAPACIDAD NUMÉRICA"
-                                        name="yNumerica"
-                                        checked={form.yNumerica}
-                                        onChange={handleIntellectualCheckboxChange}
-                                    />
-                                    <InputCheckbox
-                                        label="Y EN CAPACIDAD DE CÁLCULO"
-                                        name="yCalculo"
-                                        checked={form.yCalculo}
+                                        label="PROMEDIO BAJO"
+                                        name="compBajo"
+                                        checked={form.compBajo}
                                         onChange={handleIntellectualCheckboxChange}
                                     />
                                 </SectionFieldset>
                                 <SectionFieldset>
-                                    <InputCheckbox
-                                        label="P. SUPERIOR"
-                                        name="pSuperior"
-                                        checked={form.pSuperior}
-                                        onChange={handleIntellectualCheckboxChange}
-                                    />
-                                    <InputCheckbox
-                                        label="P. MEDIO"
-                                        name="pMedio"
-                                        checked={form.pMedio}
-                                        onChange={handleIntellectualCheckboxChange}
-                                    />
-                                    <InputCheckbox
-                                        label="P. BAJO"
-                                        name="pBajo"
-                                        checked={form.pBajo}
-                                        onChange={handleIntellectualCheckboxChange}
-                                    />
-                                    <InputCheckbox
-                                        label="BAJO"
-                                        name="bajo"
-                                        checked={form.bajo}
-                                        onChange={handleIntellectualCheckboxChange}
-                                    />
-                                </SectionFieldset>
-                                <SectionFieldset>
-                                    <InputCheckbox
-                                        label="P.N. ADECUADO"
-                                        name="pnAdecuado"
-                                        checked={form.pnAdecuado}
-                                        onChange={handleIntellectualCheckboxChange}
-                                    />
-                                    <InputCheckbox
-                                        label="N. ALTO"
-                                        name="nAlto"
-                                        checked={form.nAlto}
-                                        onChange={handleIntellectualCheckboxChange}
-                                    />
-                                    <InputCheckbox
-                                        label="N. BAJO"
-                                        name="nBajo"
-                                        checked={form.nBajo}
-                                        onChange={handleIntellectualCheckboxChange}
-                                    />
-                                </SectionFieldset>
-                                <SectionFieldset fieldsetClassName="col-span-2">
                                     <InputCheckbox
                                         label="ADECUADA RETENCIÓN DE DÍGITOS"
-                                        name="adecuadaR"
-                                        checked={form.adecuadaR}
+                                        name="adecuado"
+                                        checked={form.adecuado}
                                         onChange={handleIntellectualCheckboxChange}
                                     />
                                     <InputCheckbox
-                                        label="INADECUADA"
-                                        name="inadecuada"
-                                        checked={form.inadecuada}
+                                        label="PROMEDIO BAJO DE RETENCIÓN"
+                                        name="prmBajo"
+                                        checked={form.prmBajo}
                                         onChange={handleIntellectualCheckboxChange}
                                     />
                                 </SectionFieldset>
@@ -582,21 +589,15 @@ export default function InformePsicologico() {
                             <fieldset className="grid grid-cols-2 gap-2">
                                 <SectionFieldset className="flex gap-3 flex-col" >
                                     <InputCheckbox
-                                        label="ALTO MANEJO DE FACULTADES MENTALES"
-                                        name="poseeAltoManejo"
-                                        checked={form.poseeAltoManejo}
-                                        onChange={handleOrganicidadCheckboxChange}
-                                    />
-                                    <InputCheckbox
                                         label="ADECUADO MANEJO DE FACULTADES MENTALES"
-                                        name="pAdecuadoManejo"
-                                        checked={form.pAdecuadoManejo}
+                                        name="adecuadoManejo"
+                                        checked={form.adecuadoManejo}
                                         onChange={handleOrganicidadCheckboxChange}
                                     />
                                     <InputCheckbox
                                         label="BAJO MANEJO DE FACULTADES MENTALES"
-                                        name="pBajoManejo"
-                                        checked={form.pBajoManejo}
+                                        name="bajoManejo"
+                                        checked={form.bajoManejo}
                                         onChange={handleOrganicidadCheckboxChange}
                                     />
                                 </SectionFieldset>
@@ -604,16 +605,16 @@ export default function InformePsicologico() {
                                     <SectionFieldset>
                                         <InputCheckbox
                                             label="ORIENTADO EN TIEMPO, ESPACIO, Y PERSONA"
-                                            name="orientadoEnTiempo"
-                                            checked={form.orientadoEnTiempo}
+                                            name="orientadoTiempo"
+                                            checked={form.orientadoTiempo}
                                             onChange={handleOrganicidadCheckboxChange}
                                         />
                                     </SectionFieldset>
                                     <SectionFieldset>
                                         <InputCheckbox
                                             label="NO SE EVIDENCIA DAÑO ORGÁNICO"
-                                            name="noSeEnvidencia"
-                                            checked={form.noSeEnvidencia}
+                                            name="noEnvidencia"
+                                            checked={form.noEnvidencia}
                                             onChange={handleOrganicidadCheckboxChange}
                                         />
                                     </SectionFieldset>
@@ -649,36 +650,25 @@ export default function InformePsicologico() {
                             />
                             <div className="grid grid-cols-2 gap-2">
                                 <SectionFieldset>
-                                    <InputCheckbox
-                                        label="NIVEL ALTO"
-                                        name="nivelAltoPs"
-                                        checked={form.nivelAltoPs}
-                                        onChange={handlePsicomotricidadCheckboxChange}
-                                    />
+
                                     <InputCheckbox
                                         label="NIVEL ADECUADO"
-                                        name="nivelAdecuadoPs"
-                                        checked={form.nivelAdecuadoPs}
-                                        onChange={handlePsicomotricidadCheckboxChange}
-                                    />
-                                    <InputCheckbox
-                                        label="NIVEL BAJO"
-                                        name="nivelBajoPs"
-                                        checked={form.nivelBajoPs}
+                                        name="nivAdecuado"
+                                        checked={form.nivAdecuado}
                                         onChange={handlePsicomotricidadCheckboxChange}
                                     />
                                 </SectionFieldset>
                                 <SectionFieldset>
                                     <InputCheckbox
                                         label="FACILIDAD"
-                                        name="facilidadPs"
-                                        checked={form.facilidadPs}
+                                        name="facilidad"
+                                        checked={form.facilidad}
                                         onChange={handlePsicomotricidadCheckboxChange}
                                     />
                                     <InputCheckbox
                                         label="DIFICULTAD"
-                                        name="dificultadPs"
-                                        checked={form.dificultadPs}
+                                        name="dificultad"
+                                        checked={form.dificultad}
                                         onChange={handlePsicomotricidadCheckboxChange}
                                     />
                                 </SectionFieldset>

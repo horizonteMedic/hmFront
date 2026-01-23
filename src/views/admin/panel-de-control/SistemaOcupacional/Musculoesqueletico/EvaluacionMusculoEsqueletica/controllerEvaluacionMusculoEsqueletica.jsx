@@ -555,11 +555,16 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         const nombre = res.informacionSede.nameJasper;
         console.log(nombre);
         const jasperModules = import.meta.glob(
-          "../../../../../jaspers/MusculoEsqueletica/*.jsx"
+          "../../../../../jaspers/MusculoEsqueletica/**/*.jsx"
         );
-        const modulo = await jasperModules[
-          `../../../../../jaspers/MusculoEsqueletica/${nombre}.jsx`
-        ]();
+        // Determinar la ruta según el nombre del jasper
+        let rutaArchivo;
+        if (nombre === "EvaluacionMuscoloEsqueletica") {
+          rutaArchivo = `../../../../../jaspers/MusculoEsqueletica/Digitalizado/${nombre}.jsx`;
+        } else {
+          rutaArchivo = `../../../../../jaspers/MusculoEsqueletica/${nombre}.jsx`;
+        }
+        const modulo = await jasperModules[rutaArchivo]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
           modulo.default({ ...res, ...datosFooter });

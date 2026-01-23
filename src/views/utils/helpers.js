@@ -137,12 +137,15 @@ export async function colocarSellosEnPdf(pdfBytes, sellos, coordenadas) {
         const url = sellos[key];
         const coord = coordenadas[key];
 
-        if (!url || !coord) continue;
+        if (!coord || !esUrlImagenValida(url)) {
+            console.warn(`Sello omitido: ${key}`, url);
+            continue;
+        }
 
         const imgBytes = await fetchImageBytes(url);
 
         const image =
-            url.toLowerCase().endsWith(".jpg") || url.toLowerCase().endsWith(".jpeg")
+            url.toLowerCase().endsWith(".png") || url.toLowerCase().endsWith(".jpeg")
                 ? await pdfDoc.embedJpg(imgBytes)
                 : await pdfDoc.embedPng(imgBytes);
 
@@ -155,6 +158,13 @@ export async function colocarSellosEnPdf(pdfBytes, sellos, coordenadas) {
     }
 
     return await pdfDoc.save();
+}
+
+function esUrlImagenValida(url) {
+    if (!url || typeof url !== "string") return false;
+    if (url === "Sin registro") return false;
+
+    return /\.(png|jpg|jpeg)$/i.test(url.split("?")[0]);
 }
 
 export function uint8ToBase64(uint8Array) {
@@ -173,4 +183,30 @@ export async function fetchImageBytes(url) {
     const response = await fetch(url);
     if (!response.ok) throw new Error("No se pudo descargar imagen");
     return new Uint8Array(await response.arrayBuffer());
+}
+
+/**
+ * Optimiza un PDF reduciendo su tamaño mediante compresión
+ * @param {Uint8Array} pdfBytes - Array de bytes del PDF original
+ * @returns {Promise<Uint8Array>} - Array de bytes del PDF optimizado
+ */
+export async function optimizePdf(pdfBytes) {
+    try {
+        const pdfDoc = await PDFDocument.load(pdfBytes, {
+            ignoreEncryption: true,
+            updateMetadata: false
+        });
+
+        // Guardar el PDF con opciones de optimización
+        const optimizedPdfBytes = await pdfDoc.save({
+            useObjectStreams: true,  // Comprime estructuras internas
+            addDefaultPage: false,
+            objectsPerTick: 50
+        });
+
+        return optimizedPdfBytes;
+    } catch (error) {
+        console.error("Error optimizando PDF:", error);
+        return pdfBytes; // Retornar original si falla la optimización
+    }
 }

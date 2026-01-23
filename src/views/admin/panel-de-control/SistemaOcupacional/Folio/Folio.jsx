@@ -1,455 +1,1104 @@
 import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
+import { useState, useRef } from "react";
 import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import FolioJasper from "../../../../jaspers/FolioJasper/FolioJasper";
 import { getToday } from "../../../../utils/helpers";
 import { GetInfoPac } from "./controllerFolio";
 import Swal from "sweetalert2";
+import { buildExamenesList } from "./folioCatalogo";
 
-const ExamenesList2 = [
-    {
-        nombre: "RAYOS X TORAX ARCHIVO", //NUEVO ARCHIVO
-        resultado: false,
-        tabla: "RAYOS X TORAX",
-        url: ""
-    },
-]
+const ExamenesListPRUEBAS2 = buildExamenesList([
+    "OFTALMOLOGIA_VISION_TESTER",
+    "PSICOSENSOMETRICO_VEHI_FOLIO",
+]);
+const ExamenesListPRUEBASArchivos = buildExamenesList([
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "ELECTROCARDIOGRAMA_ARCHIVO",
+    "ESPIROMETRIA_ARCHIVO",   //Tiene firma
+    "OFTALMOLOGIA_VISION_TESTER",//Tiene firma
+    "PSICOSENSOMETRICO_CERT_ALTURA", //Tiene firma
+    "PSICOSENSOMETRICO_VEHI_FOLIO", //Tiene firma
+    "RADIOGRAFIA_COLUMNA_ARCHIVO",
+    "RAYOS_X_TORAX_ARCHIVO",
+    "INTERCONSULTAS"
+]);
 
-const ExamenesList = [
-    {
-        nombre: "RESUMEN MEDICO PODEROSA", //NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "resumen_medico_poderosa",
-        url: "/api/v01/ct/anexos/obtenerReporteResumenMedico",
-    },
-    {
-        nombre: "CONSTANCIA DE EXAMEN MEDICO OCUPACIONAL",
-        resultado: false,
-        tabla: "certificado_aptitud_medico_resumen",
-        url: "/api/v01/ct/certificadoAptitudMedicoOcupacional/obtenerReporteCertificadoMedicoOcupacional",
-        esJasper: true
-    },
-    {
-        nombre: "CERTIFICADO DE APTITUD ANEXO 16",
-        resultado: false,
-        tabla: "certificado_aptitud_medico_ocupacional",
-        url: "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16",
-        esJasper: true
-    },
-    {
-        nombre: "ANEXO 16",
-        resultado: false,
-        tabla: "anexo7c",
-        url: "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16"
-    },
-    //FICHA APTITUD ANEXO 2
-    {
-        nombre: "CERTIFICADO MEDICO OCUPACIONAL ANEXO 02",
-        resultado: false,
-        tabla: "aptitud_medico_ocupacional_agro",
-        url: "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2",
-        esJasper: true
-    },
-    //ANEXO 02
-    {
-        nombre: "ANEXO 02",
-        resultado: false,
-        tabla: "anexo_agroindustrial",
-        url: "/api/v01/ct/anexos/anexo2/obtenerReporteAnexo2Completo",
-        esJasper: true
-    },
-    //ENFERMEDADES ALTURA GEOGRAFICA
-    {
-        nombre: "ENFERMEDADES EN ALTURA",
-        resultado: false,
-        tabla: "antece_enfermedades_altura",
-        url: "/api/v01/ct/antecedentesEnfermedadesAltura/obtenerReporteAntecedentesEnfermedadesAltura"
-    },
-    //ANEXO 16A
-    {
-        nombre: "ANEXO 16A",
-        resultado: false,
-        tabla: "anexo16a",
-        url: "/api/v01/ct/anexos/anexo16a/obtenerReporteAnexo16a",
-        esJasper: true
-    },
-    //Certificado en Altura
-    {
-        nombre: "CERTIFICADO ALTURA",
-        resultado: false,
-        tabla: "b_certificado_altura",
-        url: "/api/v01/ct/certificadoTrabajoAltura/obtenerReporteCertificadoTrabajoAltura",
-        esJasper: true
-    },
-    //PSICOSENSOMETRICO
-    // {
-    //     nombre: "PSICOSENSOMETRICO ",//NUEVO ARCHIVO EXTERNO
-    //     resultado: false,
-    //     tabla: "PSICOSENSOMETRICO",
-    //     url: ""
-    // },
-    //Certificado en Altura PODEROSA
-    {
-        nombre: "CERTIFICADO APTITUD ALTURA PODEROSA",
-        resultado: false,
-        tabla: "aptitud_altura_poderosa",
-        url: "/api/v01/ct/aptitudAltura/obtenerReporteAptitudAlturaPoderosa",
-        esJasper: true
-    },
-    //Certificado Vehiculos
-    {
-        nombre: "CERTIFICADO VEHICULOS",
-        resultado: false,
-        tabla: "b_certificado_conduccion",
-        url: "/api/v01/ct/certificadoConduccion/obtenerReporteCertificadoConduccion",
-        esJasper: true
-    },
-    //Ficha sas
-    {
-        nombre: "FICHA SAS",
-        resultado: false,
-        tabla: "ficha_sas",
-        url: "/api/v01/ct/fichaApneaSueno/obtenerReporteFichaSas",
-        esJasper: true
-    },
-    //LICENCIA PARA CONDUCIR INTERNA PODEROSA
-    {
-        nombre: "LICENCIA PARA CONDUCIR INTERNA PODEROSA",//NUEVO  OPTIMIZAR
-        resultado: false,
-        tabla: "aptitud_licencia_conduciri",
-        url: "/api/v01/ct/aptitudLicenciaConducir/obtenerReporteAptitudLicenciaConducir",
-        esJasper: true
-    },
-    //HOJA DE CONSULTA EXTERNA
-    {
-        nombre: "HOJA DE CONSULTA EXTERNA",//NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "hoja_consulta_externa",
-        url: "/api/v01/ct/hojaConsultaExterna/obtenerReporteHojaConsultaExterna",
-    },
-    {
-        nombre: "USO DE RESPIRADORES",
-        resultado: false,
-        tabla: "b_uso_respiradores",
-        url: "/api/v01/ct/respiradores/obtenerReporteRespiradores",
-        esJasper: true
-    },
-    {
-        nombre: "HISTORIA OCUPACIONAL",
-        resultado: false,
-        tabla: "historia_oc_info",
-        url: "/api/v01/ct/historiaOcupacional/obtenerReporteHistoriaOcupacional"
-    },
-    {
-        nombre: "ANTECEDENTES PATOLOGICOS",
-        resultado: false,
-        tabla: "antecedentes_patologicos",
-        url: "/api/v01/ct/antecedentesPatologicos/obtenerReporteAntecedentesPatologicos",
-        esJasper: true
-    },
-    //DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS Y FAMILIARES
-    {
-        nombre: "DECLARACION JURADA DE ANTECEDENTES PATOLOGICOS Y FAMILIARES",//NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "DECLA_JURA_ANTECE_PERSON_FAM",
-        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
-        esJasper: true
-    },
-    {
-        nombre: "CUESTIONARIO NORDICO",
-        resultado: false,
-        tabla: "cuestionario_nordico",
-        url: "/api/v01/ct/cuestionarioNordico/obtenerReporteCuestionarioNordico"
-    },
-    {
-        nombre: "EVALUACION MUSCULO ESQUELETICA",
-        resultado: false,
-        tabla: "evaluacion_musculo_esqueletica",
-        url: "/api/v01/ct/evaluacionMusculoEsqueletica/obtenerReporteEvaluacionMusculoEsqueletica"
-    },
-    //CONSENTIMIENTO DE MUESTRA DE SANGRE
-    {
-        nombre: "CONSENTIMIENTO DE MUESTRA DE SANGRE",//NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "consent_Muestra_Sangre",
-        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
-        nameConset: true
-    },
-    {
-        nombre: "LABORATORIO CLINICO",
-        resultado: false,
-        tabla: "lab_clinico",
-        url: "/api/v01/ct/laboratorio/obtenerReporteLaboratorioClinico"
-    },
-    {
-        nombre: "ANALISIS BIOQUIMICOS (PERFIL LIPIDICO) OPCIONAL EN ALGUNOS EXAMANES ",
-        resultado: false,
-        tabla: "analisis_bioquimicos",
-        url: "/api/v01/ct/laboratorio/reporteAnalisisBioquimico"
-    },
-    //INMUNOLOGIA - GENODOTROPINA
-    {
-        nombre: "INMUNOLOGIA - GENODOTROPINA",//NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "lgonadotropina",
-        url: "/api/v01/ct/inmunologia/obtenerReporteLgonadotropina",
-    },
-    //CONSENTIMIENTO DE MARIHUANA 
-    {
-        nombre: "CONSENTIMIENTO DE MARIHUANA",//NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "consent_marihuana",
-        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
-        nameConset: true,
-    },
-    //CONSENTIMIENTO PANEL 2D
-    {
-        nombre: "CONSENTIMIENTO PANEL 2D",//NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "con_panel2D",
-        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
-        nameConset: true,
-    },
-    //CONSENTIMIENTO DROGAS BOROO
-    {
-        nombre: "CONSENTIMIENTO DROGAS BOROO",//NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "consent_Boro",
-        url: "/api/v01/ct/laboratorio/consentimientoLaboratorioBoro",
-        nameConset: true,
-    },
-    {
-        nombre: "OIT",
-        resultado: false,
-        tabla: "oit",
-        url: "/api/v01/ct/oit/obtenerReporteOit"
-    },
-    {
-        nombre: "RADIOGRAFIA TORAX",
-        resultado: false,
-        tabla: "radiografia_torax",
-        url: "/api/v01/ct/rayosX/obtenerReporteRadiografiaTorax"
-    },
-    //RAYOS X TORAX ARCHIVO
-    // {
-    //     nombre: "RAYOS X TORAX ARCHIVO", //NUEVO ARCHIVO FALTA IMPRIMIR
-    //     resultado: false,
-    //     tabla: "RAYOS X TORAX",
-    //     url: ""
-    // },
-    //INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA)
-    {
-        nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA)", //NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "radiografia",
-        url: "/api/v01/ct/rayosX/obtenerReporteInformeRadiografico"
-    },
-    //INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA) ARCHIVO
-    // {
-    //     nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA) ARCHIVO", //NUEVO ARCHIVO FALTA IMPRIMIR
-    //     resultado: false,
-    //     tabla: "INFORME RADIOGRAFICO",
-    //     url: ""
-    // },
-    {
-        nombre: "ELECTROCARDIOGRAMA",
-        resultado: false,
-        tabla: "informe_electrocardiograma",
-        url: "/api/v01/ct/electroCardiograma/obtenerReporteInformeElectroCardiograma",
-        esJasper: true
-    },
-    //ELECTROCARDIOGRAMA ARCHIVO
-    // {
-    //     nombre: "ELECTROCARDIOGRAMA ARCHIVO", //NUEVO ARCHIVO FALTA IMPRIMIR
-    //     resultado: false,
-    //     tabla: "ELECTROCARDIOGRAMA",
-    //     url: ""
-    // },
-    {
-        nombre: "ESPIROMETRIA",
-        resultado: false,
-        tabla: "ESPIROMETRIA",
-        url: ""
-    },
-    {
-        nombre: "FICHA AUDIOLOGICA OHLA",
-        resultado: false,
-        tabla: "audiometria_po",
-        url: "/api/v01/ct/audiometria/obtenerReporteAudiometriaM"
-    },
-    //FICHA AUDIOMETRIA
-    {
-        nombre: "FICHA AUDIOMETRIA", //NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "audiometria_2023",
-        url: "/api/v01/ct/manipuladores/obtenerReporteAudiometria"
-    },
-    //CUESTIONARIO AUDIOMETRIA 
-    {
-        nombre: "CUESTIONARIO AUDIOMETRIA ", //NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "cuestionario_audiometria",
-        url: "/api/v01/ct/audiometria/obtenerReporteCuestionarioAudiometria"
-    },
-    //FICHA INTERCONSULTA 
-    // {
-    //     nombre: "FICHA INTERCONSULTA", //NUEVO REVISAR SERAN VARIOS CONSUMOS
-    //     resultado: false,
-    //     tabla: "ficha_interconsulta",
-    //     url: "/api/v01/ct/fichaInterconsulta/obtenerFichaInterconsultaReporte"
-    // },
-    //ODONTROGRAMA
-    {
-        nombre: "ODONTROGRAMA", //NUEVO OPTIMIZAR Y REENCUADRE JEAN
-        resultado: false,
-        tabla: "odontograma",
-        url: "/api/v01/ct/odontograma/obtenerReporteOdontograma"
-    },
-    //PSICOLOGIA ANEXO 03
-    {
-        nombre: "PSICOLOGIA ANEXO 03", //NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "ficha_psicologica_anexo03",
-        url: "/api/v01/ct/psicologia/obtenerFichaPsicologiaAnexo03",
-        esJasper: true,
-    },
-    //TEST DE FATIGA Y SOMNOLENCIA
-    {
-        nombre: "TEST DE FATIGA Y SOMNOLENCIA", //NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "informe_psicologico_estres",
-        url: "/api/v01/ct/informePsicologicoAdeco/obtenerReporteInformePsicologicoAdeco",
-        esJasper: true,
-    },
-    //INFORME PSICOLOGICO DE PODEROSA LICENCIA PARA OPERAR
-    {
-        nombre: "INFORME PSICOLOGICO DE PODEROSA LICENCIA PARA OPERAR", //NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "evaluacion_psicologica_poderosa",
-        url: "/api/v01/ct/evaluacionPsicologicaPoderosa/obtenerReporteEvaluacionPsicologicaPoderosa",
-        esJasper: true,
-    },
-    //PSICOLOGIA ANEXO 02
-    {
-        nombre: "PSICOLOGIA ANEXO 02", //NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "ficha_psicologica_anexo02",
-        url: "/api/v01/ct/psicologia/obtenerFichaPsicologiaAnexo02",
-        esJasper: true,
-    },
-    {
-        nombre: "INFORME PSICOLOGICO",
-        resultado: false,
-        tabla: "informe_psicologico",
-        url: "/api/v01/ct/informePsicologico/obtenerReporteInformePsicologico",
-        esJasper: true
-    },
-    //INFORME PSICOLOGIA FOBIAS
-    {
-        nombre: "INFORME PSICOLOGIA FOBIAS", //NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "fobias",
-        url: "/api/v01/ct/fobias/obtenerReporte",
-        esJasper: true
-    },
-    //INFORME PSICOLABORAL
-    {
-        nombre: "INFORME PSICOLABORAL", //NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "informe_psicolaboral",
-        url: "/api/v01/ct/informePsicolaboral/obtenerReporteInformePsicolaboral",
-        esJasper: true
-    },
-    //TRABAJOS EN ESPECIFICOS
-    {
-        nombre: "TRABAJOS EN ESPECIFICOS", //NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "especificos",
-        url: "/api/v01/ct/trabajoEspecifico/obtenerReporteTrabajosEspecificos",
-        esJasper: true
-    },
-    //TRABAJO EN ALTURA
-    {
-        nombre: "TRABAJO EN ALTURA", //NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "psicologiafobias",
-        url: "/api/v01/ct/informePsicologicoFobias/obtenerReporteInformePsicologicoFobias",
-        esJasper: true
-    },
-    //OFTALMOLOGIA
-    {
-        nombre: "OFTALMOLOGIA", //NUEVO OPTIMIZAR JEAN URGENTE
-        resultado: false,
-        tabla: "oftalmologia2021",
-        url: "/api/v01/ct/agudezaVisual/obtenerReporteEvaluacionOftalmologica",
-    },
-    //OFTALMOLOGIA VISION TESTER
-    // {
-    //     nombre: "OFTALMOLOGIA VISION TESTER", //NUEVO ARCHIVO FALTA IMPRIMIR
-    //     resultado: false,
-    //     tabla: "OFTALMOLOGIA VISION TESTER",
-    //     url: ""
-    // },
-    {
-        nombre: "FICHA OFTALMOLOGICA",
-        resultado: false,
-        tabla: "oftalmologia",
-        url: "/api/v01/ct/agudezaVisual/obtenerReporteOftalmologia"
-    },
-    //DECLARACION DE SINTOMATICO RESPIRATORIO
-    {
-        nombre: "DECLARACION DE SINTOMATICO RESPIRATORIO", //NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "CONSENT_SINTOMATICO",
-        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
-        esJasper: true
-    },
-    //CONSENTIMIENTO INFORMADO DE EVALUACION MEDICA
-    {
-        nombre: "CONSENTIMIENTO INFORMADO DE EVALUACION MEDICA", //NUEVO OPTIMIZAR
-        resultado: false,
-        tabla: "CONSENT_INFORMADO_MEDICA",
-        url: "/api/v01/ct/consentimientos/obtenerReporteConsentimientosAdmision",
-        esJasper: true
-    },
-    //CONSENTIMIENTO BUENA SALUD
-    {
-        nombre: "CONSENTIMIENTO BUENA SALUD", //NUEVO
-        resultado: false,
-        tabla: "consentimientobuenasalud",
-        url: "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoBuenaSalud",
-        esJasper: true
-    },
-    {
-        nombre: "CONSENTIMIENTO INFORMADO",
-        resultado: false,
-        tabla: "consentimientoInformado",
-        url: "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoInformado"
-    },
-    //DECLARACION JURADA PARA EL USO DE FIRMA ELECTRONICA
-    // {
-    //     nombre: "DECLARACION JURADA PARA EL USO DE FIRMA ELECTRONICA", //NUEVO ARCHIVO
-    //     resultado: false,
-    //     tabla: "DECLARACIONUSOFIRMA",
-    //     url: "",
-    // },
-    //DNI Y OTROS DOCUMENTOS
-    // {
-    //     nombre: "DNI Y OTROS DOCUMENTOS", //NUEVO ARCHIVO
-    //     resultado: false,
-    //     tabla: "DNI Y OTROS DOCUMENTOS",
-    //     url: "",
-    // },
-];
+const ExamenesListPRUEBAS = buildExamenesList([
+    "OFTALMOLOGIA_VISION_TESTER",
+    "PSICOSENSOMETRICO_VEHI_FOLIO",
+]);
+
+const ExamenesListCAMPANA = buildExamenesList([ // Campaña
+    "CERTIFICADO_APTITUD_ANEXO_16",  // 1
+    "ANEXO_16",                      // 2
+    "ENFERMEDADES_ALTURA",           // 3
+    "ANEXO_16A",                     // 4
+    "USO_RESPIRADORES",              // 5
+    "HISTORIA_OCUPACIONAL",          // 6
+    "ANTECEDENTES_PATOLOGICOS",      // 7
+    "CUESTIONARIO_NORDICO",          // 8
+    "EVALUACION_MUSCULO_ESQUELETICA",// 9
+    "LABORATORIO_CLINICO",           // 10
+    "PERFIL_LIPIDICO",               // 11
+    "OIT",                           // 12
+    "RADIOGRAFIA_TORAX",             // 13
+    "ELECTROCARDIOGRAMA",            // 14
+    "ESPIROMETRIA_ARCHIVO",          // 15
+    "AUDIOMETRIA_OHLA",              // 16
+    "INFORME_PSICOLOGICO",           // 17
+    "OFTALMOLOGIA",                  // 18
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",      // 19
+    "DECLARACION_USO_FIRMA_ARCHIVO"                            // 20 nuevo
+]);
+
+const ExamenesListOHLA = buildExamenesList([       //OHLA
+    "RESUMEN_MEDICO_PODEROSA",                 // 1
+    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",    // 2
+    "ANEXO_16",                                // 3
+    "CERTIFICADO_ALTURA",                      // 4
+    "OFTALMOLOGIA_VISION_TESTER",              // 5 no se mostrara si existe  PSICOSENSOMETRICO_VEHI_FOLIO 
+    "CERTIFICADO_VEHICULOS",                   // 6
+    "FICHA_SAS",                               // 7
+    "PSICOSENSOMETRICO_VEHI_FOLIO",            // 8
+    "HISTORIA_OCUPACIONAL",                    // 9
+    "ANTECEDENTES_PATOLOGICOS",                // 10
+    "DECLARACION_JURADA_ANTECEDENTES",         // 11
+    "CUESTIONARIO_NORDICO",                    // 12
+    "EVALUACION_MUSCULO_ESQUELETICA",          // 13
+    "CONSENT_MUESTRA_SANGRE",                  // 14
+    "LABORATORIO_CLINICO",                     // 15
+    "PERFIL_LIPIDICO",                         // 16
+    "GONADOTROPINA",                           // 17
+    "PERFIL_RENAL",                            // 18
+    "PERFIL_HEPATICO",                         // 19
+    "CONSENT_PANEL_5D",                        // 20
+    "OIT",                                     // 21
+    "RAYOS_X_TORAX_ARCHIVO",                   // 22
+    "RADIOGRAFIA_COLUMNA",                     // 23
+    "RADIOGRAFIA_COLUMNA_ARCHIVO",             // 24
+    "ELECTROCARDIOGRAMA",                      // 25
+    "ESPIROMETRIA_ARCHIVO",                    // 26
+    "AUDIOMETRIA_OHLA",                        // 27
+    "ODONTOGRAMA",                             // 28
+    "PSICOLOGIA_ANEXO_02",                     // 29
+    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",    // 30
+    "CUESTIONARIO_BERLIN",                     // 31
+    "INFORME_PSICOLOGICO",                     // 32
+    "TRABAJO_ALTURA_PSICO",                    // 33
+    "OFTALMOLOGIA",                            // 34
+    "CONSENT_DECLARACION_APTITUD",             // 35
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL", //EXTRA VIVIANA
+    "DECLARACION_USO_FIRMA_ARCHIVO",           // 36
+    "INTERCONSULTAS"                           // 37
+]);
+
+const ExamenesListOHLA1 = buildExamenesList([       //OHLA 1
+    "RESUMEN_MEDICO_PODEROSA",
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16",
+    "CERTIFICADO_ALTURA",
+    "PSICOSENSOMETRICO_CERT_ALTURA",
+    "CERTIFICADO_VEHICULOS",
+    "FICHA_SAS",
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+    "PERFIL_HEPATICO",
+    "PERFIL_RENAL",
+    "PANEL_5D",
+    "GONADOTROPINA",
+    "CONSENT_PANEL_5D",
+    "OIT",
+    "RADIOGRAFIA_COLUMNA",
+    "RAYOS_X_TORAX_ARCHIVO",
+    "ELECTROCARDIOGRAMA",
+    "ELECTROCARDIOGRAMA_ARCHIVO",
+    "ESPIROMETRIA_ARCHIVO",
+    "AUDIOMETRIA_OHLA",
+    "ODONTOGRAMA",
+    "PSICOLOGIA_ANEXO_02",
+    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
+    "EXAMENES_COMPLEMENTARIOS",
+    "TRABAJO_ALTURA_PSICO",
+    "OFTALMOLOGIA",
+    "OFTALMOLOGIA_VISION_TESTER",
+    "CONSENT_DECLARACION_APTITUD",
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListOHLA2 = buildExamenesList([       //OHLA 2
+    "RESUMEN_MEDICO_PODEROSA",
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16",
+    "CERTIFICADO_VEHICULOS",
+    "PSICOSENSOMETRICO_VEHI_FOLIO",
+    "FICHA_SAS",
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+    "PERFIL_HEPATICO",
+    "PERFIL_RENAL",
+    "PANEL_5D",
+    "GONADOTROPINA",
+    "CONSENT_PANEL_5D",
+    "OIT",
+    "RAYOS_X_TORAX_ARCHIVO",
+    "RADIOGRAFIA_COLUMNA",
+    "RADIOGRAFIA_COLUMNA_ARCHIVO",
+    "ELECTROCARDIOGRAMA",
+    "ELECTROCARDIOGRAMA_ARCHIVO",
+    "ESPIROMETRIA_ARCHIVO",
+    "AUDIOMETRIA_OHLA",
+    "ODONTOGRAMA",
+    "PSICOLOGIA_ANEXO_02",
+    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
+    "CUESTIONARIO_BERLIN",
+    "EXAMENES_COMPLEMENTARIOS",
+    "ESPACIOS_CONFINADOS_PSICOLOGIA",
+    "OFTALMOLOGIA",
+    "OFTALMOLOGIA_VISION_TESTER",
+    "CONSENT_DECLARACION_APTITUD",
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListOHLA3 = buildExamenesList([       //OHLA 3
+    "RESUMEN_MEDICO_PODEROSA",
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16",
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+    "PERFIL_HEPATICO",
+    "PERFIL_RENAL",
+    "PANEL_5D",
+    "GONADOTROPINA",
+    "CONSENT_PANEL_5D",
+    "OIT",
+    "RAYOS_X_TORAX_ARCHIVO",
+    "ELECTROCARDIOGRAMA",
+    "ELECTROCARDIOGRAMA_ARCHIVO",
+    "ESPIROMETRIA_ARCHIVO",
+    "AUDIOMETRIA_OHLA",
+    "ODONTOGRAMA",
+    "PSICOLOGIA_ANEXO_02",
+    "EXAMENES_COMPLEMENTARIOS",
+    "OFTALMOLOGIA",
+    "OFTALMOLOGIA_VISION_TESTER",
+    "CONSENT_DECLARACION_APTITUD",
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListSummaGold = buildExamenesList([   //SUMMAGOLD
+    "RESUMEN_MEDICO_PODEROSA",
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16",
+    "ANEXO_16A",
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+    "GONADOTROPINA",
+    "CONSENT_MARIHUANA",
+    "OIT",
+    "ELECTROCARDIOGRAMA",
+    "ELECTROCARDIOGRAMA_ARCHIVO",
+    "ESPIROMETRIA_ARCHIVO",
+    "AUDIOMETRIA_OHLA",
+    "ODONTOGRAMA",
+    "INFORME_PSICOLOGICO",
+    "OFTALMOLOGIA",
+    "OFTALMOLOGIA_VISION_TESTER",
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListSmmot = buildExamenesList([       //SMMOT
+    "RESUMEN_MEDICO_PODEROSA",
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16",
+    "ANEXO_02",
+    "CERTIFICADO_ALTURA",
+    "PSICOSENSOMETRICO_CERT_ALTURA",
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+    "GONADOTROPINA",
+    "OIT",
+    "RADIOGRAFIA_TORAX",
+    "RAYOS_X_TORAX_ARCHIVO",
+    "AUDIOMETRIA_OHLA",
+    "PSICOLOGIA_ANEXO_02",
+    "FICHA_OFTALMOLOGICA",
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListRetiroLaArena = buildExamenesList([   // Retiro La Arena
+    "RESUMEN_MEDICO_PODEROSA",
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16",
+
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "GONADOTROPINA",
+
+    "OIT",
+
+    "ESPIROMETRIA_ARCHIVO",
+    "AUDIOMETRIA_OHLA",
+    "CUESTIONARIO_AUDIOMETRIA",
+
+    "FICHA_OFTALMOLOGICA",
+
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListRetiroSummaGold = buildExamenesList([   //  Retiro SummaGold
+    "RESUMEN_MEDICO_PODEROSA",
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16",
+
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "GONADOTROPINA",
+
+    "OIT",
+
+    "ESPIROMETRIA_ARCHIVO",
+    "AUDIOMETRIA_OHLA",
+    "ODONTOGRAMA",
+
+    "FICHA_OFTALMOLOGICA",
+
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListPsicosensometricoSolo = buildExamenesList([   // Psicosensometrico Solo
+    "RESUMEN_MEDICO_PODEROSA",
+    "CERTIFICADO_VEHICULOS",
+    "FICHA_SAS",
+
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+    "GONADOTROPINA",
+
+    "AUDIOMETRIA_OHLA",
+    "CUESTIONARIO_AUDIOMETRIA",
+
+    "TRABAJO_ESPECIFICOS",
+    "FICHA_OFTALMOLOGICA",
+
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListProseguridadBasico = buildExamenesList([   // PROSEGURIDAD BASICO
+    "RESUMEN_MEDICO_PODEROSA",
+    "CERTIFICADO_ANEXO_02",
+    "ANEXO_02",
+
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
+    "CONSENT_PANEL_2D",
+
+    "AUDIOMETRIA_OHLA",
+
+    "PSICOLOGIA_ANEXO_03",
+
+    "CONSENT_SINTOMATICO_RESPIRATORIO",
+
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListPoderosaSoloConduccion = buildExamenesList([ // PODEROSA SOLO CONDUCCION DE VEHICULOS
+    "RESUMEN_MEDICO_PODEROSA",
+    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16",
+
+    "ENFERMEDADES_ALTURA",
+    "ANEXO_16A",
+
+    "CERTIFICADO_VEHICULOS",
+    "FICHA_SAS",
+    "LICENCIA_CONDUCIR_PODEROSA",
+    "HOJA_DE_CONSULTA_EXTERNA",
+    "USO_RESPIRADORES",
+
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
+
+    "OIT",
+
+    "ELECTROCARDIOGRAMA",
+    "ELECTROCARDIOGRAMA_ARCHIVO",
+    "ESPIROMETRIA_ARCHIVO",
+    "AUDIOMETRIA_OHLA",
+    "CUESTIONARIO_AUDIOMETRIA",
+
+    "ODONTOGRAMA",
+
+    "INFORME_PODEROSA_OPERAR",
+
+    "FICHA_OFTALMOLOGICA",
+
+    "CONSENT_INFORMADO_EVALUACION_MEDICA",
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListPoderosaSoloAltura = buildExamenesList([ // PODEROSA SOLO ALTURA
+    "RESUMEN_MEDICO_PODEROSA",
+    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16",
+
+    "ENFERMEDADES_ALTURA",
+    "ANEXO_16A",
+
+    "CERTIFICADO_ALTURA_PODEROSA",
+    "PSICOSENSOMETRICO_CERT_ALTURA",
+    "CERTIFICADO_APTITUD_ALTURA_PODEROSA",
+
+    "USO_RESPIRADORES",
+
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
+
+    "OIT",
+
+    "ELECTROCARDIOGRAMA",
+    "ELECTROCARDIOGRAMA_ARCHIVO",
+    "ESPIROMETRIA_ARCHIVO",
+    "AUDIOMETRIA_OHLA",
+    "CUESTIONARIO_AUDIOMETRIA",
+
+    "ODONTOGRAMA",
+
+    "INFORME_PODEROSA_OPERAR",
+
+    "TRABAJO_ALTURA_PSICO",
+
+    "FICHA_OFTALMOLOGICA",
+
+    "CONSENT_INFORMADO_EVALUACION_MEDICA",
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListPoderosaRetiro = buildExamenesList([ // PODEROSA RETIRO
+    "RESUMEN_MEDICO_PODEROSA",
+    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16",
+
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+
+    "GONADOTROPINA",
+
+    "OIT",
+
+    "ESPIROMETRIA_ARCHIVO",
+    "AUDIOMETRIA_OHLA",
+    "CUESTIONARIO_AUDIOMETRIA",
+
+    "ODONTOGRAMA",
+
+    "FICHA_OFTALMOLOGICA",
+
+    "CONSENT_INFORMADO_EVALUACION_MEDICA",
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListPoderosaBasico = buildExamenesList([ // PODEROSA BASICO
+    "RESUMEN_MEDICO_PODEROSA",
+    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16",
+
+    "ENFERMEDADES_ALTURA",
+    "ANEXO_16A",
+
+    "USO_RESPIRADORES",
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
+
+    "OIT",
+
+    "ELECTROCARDIOGRAMA",
+    "ELECTROCARDIOGRAMA_ARCHIVO",
+    "ESPIROMETRIA_ARCHIVO",
+    "AUDIOMETRIA_OHLA",
+    "CUESTIONARIO_AUDIOMETRIA",
+
+    "ODONTOGRAMA",
+
+    "INFORME_PODEROSA_OPERAR",
+
+    "FICHA_OFTALMOLOGICA",
+
+    "CONSENT_INFORMADO_EVALUACION_MEDICA",
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListMinerosDelNorte = buildExamenesList([ // MINEROS DEL NORTE
+    "RESUMEN_MEDICO_PODEROSA",
+    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16",
+
+    "ENFERMEDADES_ALTURA",
+    "ANEXO_16A",
+
+    "CERTIFICADO_ALTURA",
+    "PSICOSENSOMETRICO_CERT_ALTURA",
+
+    "USO_RESPIRADORES",
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
+
+    "OIT",
+
+    "RADIOGRAFIA_COLUMNA",
+    "RADIOGRAFIA_COLUMNA_ARCHIVO",
+
+    "ELECTROCARDIOGRAMA",
+    "ELECTROCARDIOGRAMA_ARCHIVO",
+
+    "ESPIROMETRIA_ARCHIVO",
+    "AUDIOMETRIA_OHLA",
+
+    "INFORME_PSICOLOGICO",
+
+    "TRABAJO_ALTURA_PSICO",
+
+    "FICHA_OFTALMOLOGICA",
+
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListMarsaSoloConduccion = buildExamenesList([ // MARSA SOLO CONDUCCION
+    "RESUMEN_MEDICO_PODEROSA",
+    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16",
+
+    "ENFERMEDADES_ALTURA",
+    "ANEXO_16A",
+
+    "CERTIFICADO_VEHICULOS",
+    "FICHA_SAS",
+
+    "USO_RESPIRADORES",
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+
+    "GONADOTROPINA",
+
+    "OIT",
+
+    "ESPIROMETRIA_ARCHIVO",
+    "AUDIOMETRIA_OHLA",
+
+    "ODONTOGRAMA",
+
+    "INFORME_PSICOLOGICO",
+
+    "FICHA_OFTALMOLOGICA",
+
+    "CONSENT_BUENA_SALUD",
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListMarsaSoloAltura = buildExamenesList([ // MARSA SOLO ALTURA
+    "RESUMEN_MEDICO_PODEROSA",
+    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16",
+
+    "ENFERMEDADES_ALTURA",
+    "ANEXO_16A",
+
+    "CERTIFICADO_ALTURA",
+    "PSICOSENSOMETRICO_CERT_ALTURA",
+
+    "USO_RESPIRADORES",
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+
+    "GONADOTROPINA",
+
+    "OIT",
+
+    "ODONTOGRAMA",
+
+    "INFORME_PSICOLOGICO",
+
+    "TRABAJO_ALTURA_PSICO",
+
+    "FICHA_OFTALMOLOGICA",
+
+    "CONSENT_BUENA_SALUD",
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListMarsaBasico = buildExamenesList([ // MARSA BASICO
+    "RESUMEN_MEDICO_PODEROSA",
+    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16",
+
+    "ENFERMEDADES_ALTURA",
+    "ANEXO_16A",
+
+    "USO_RESPIRADORES",
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+
+    "GONADOTROPINA",
+
+    "OIT",
+
+    "ESPIROMETRIA_ARCHIVO",
+    "AUDIOMETRIA_OHLA",
+
+    "ODONTOGRAMA",
+
+    "INFORME_PSICOLOGICO",
+
+    "FICHA_OFTALMOLOGICA",
+
+    "CONSENT_BUENA_SALUD",
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListLaArenaSoloAltura = buildExamenesList([ // LA ARENA SOLO ALTURA
+    "RESUMEN_MEDICO_PODEROSA",
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16",
+
+    "ENFERMEDADES_ALTURA",
+    "ANEXO_16A",
+
+    "CERTIFICADO_ALTURA",
+    "PSICOSENSOMETRICO_CERT_ALTURA",
+
+    "USO_RESPIRADORES",
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
+
+    "CONSENT_PANEL_2D",
+
+    "OIT",
+
+    "ESPIROMETRIA_ARCHIVO",
+    "AUDIOMETRIA_OHLA",
+    "CUESTIONARIO_AUDIOMETRIA",
+
+    "ODONTOGRAMA",
+
+    "INFORME_PSICOLOGICO",
+
+    "TRABAJO_ALTURA_PSICO",
+
+    "FICHA_OFTALMOLOGICA",
+
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListLaArenaAlturaConduccion = buildExamenesList([ // LA ARENA ALTURA + CONDUCCION
+    "RESUMEN_MEDICO_PODEROSA",
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16",
+
+    "ENFERMEDADES_ALTURA",
+    "ANEXO_16A",
+
+    "CERTIFICADO_ALTURA",
+    "PSICOSENSOMETRICO_CERT_ALTURA",
+
+    "CERTIFICADO_VEHICULOS",
+    "FICHA_SAS",
+
+    "USO_RESPIRADORES",
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA_BOROO",
+
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
+
+    "CONSENT_PANEL_2D",
+
+    "OIT",
+
+    "ESPIROMETRIA_ARCHIVO",
+    "AUDIOMETRIA_OHLA",
+    "CUESTIONARIO_AUDIOMETRIA",
+
+    "ODONTOGRAMA",
+
+    "INFORME_PSICOLOGICO",
+
+    "TRABAJO_ESPECIFICOS",
+    "TRABAJO_ALTURA_PSICO",
+
+    "FICHA_OFTALMOLOGICA",
+
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListK2 = buildExamenesList([ // K2
+    "RESUMEN_MEDICO_PODEROSA",
+    "CERTIFICADO_ANEXO_02",
+    "ANEXO_02",
+
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA_BOROO",
+
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
+
+    "OIT",
+
+    "RADIOGRAFIA_TORAX",
+    "RAYOS_X_TORAX_ARCHIVO",
+    "RADIOGRAFIA_COLUMNA",
+    "RADIOGRAFIA_COLUMNA_ARCHIVO",
+
+    "ESPIROMETRIA_ARCHIVO",
+
+    "FICHA_AUDIOMETRIA",
+
+    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
+
+    "INFORME_PSICOLOGICO",
+    // "INFORME_MAPEO",
+
+    "OFTALMOLOGIA",
+    "OFTALMOLOGIA_VISION_TESTER",
+
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListBorooAlturaEKG = buildExamenesList([ // BOROO ALTURA + EKG
+    "RESUMEN_MEDICO_PODEROSA",
+    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16",
+
+    "ENFERMEDADES_ALTURA",
+    "ANEXO_16A",
+
+    "CERTIFICADO_ALTURA",
+    "PSICOSENSOMETRICO_CERT_ALTURA",
+
+    "USO_RESPIRADORES",
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA_BOROO",
+
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
+
+    "CONSENT_DROGAS_BOROO",
+
+    "OIT",
+
+    "ELECTROCARDIOGRAMA",
+    "ELECTROCARDIOGRAMA_ARCHIVO",
+
+    "ESPIROMETRIA_ARCHIVO",
+
+    "FICHA_AUDIOMETRIA",
+    "CUESTIONARIO_AUDIOMETRIA",
+
+    "ODONTOGRAMA",
+
+    "TEST_FATIGA_SOMNOLENCIA",
+
+    "INFORME_PSICOLOGICO",
+    "INFORME_PSICOLABORAL",
+
+    "FICHA_OFTALMOLOGICA",
+
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListBorooAlturaSinEKG = buildExamenesList([ // BOROO ALTURA SIN EKG
+    "RESUMEN_MEDICO_PODEROSA",
+    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16",
+
+    "ENFERMEDADES_ALTURA",
+    "ANEXO_16A",
+
+    "CERTIFICADO_ALTURA",
+    "PSICOSENSOMETRICO_CERT_ALTURA",
+
+    "USO_RESPIRADORES",
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA_BOROO",
+
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
+
+    "CONSENT_DROGAS_BOROO",
+
+    "OIT",
+
+    "ESPIROMETRIA_ARCHIVO",
+
+    "FICHA_AUDIOMETRIA",
+    "CUESTIONARIO_AUDIOMETRIA",
+
+    "ODONTOGRAMA",
+
+    "TEST_FATIGA_SOMNOLENCIA",
+
+    "INFORME_PSICOLOGICO",
+    "INFORME_PSICOLABORAL",
+
+    "FICHA_OFTALMOLOGICA",
+
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListBorooAlturaConduccion = buildExamenesList([ // BOROO ALTURA + CONDUCCIÓN
+    "RESUMEN_MEDICO_PODEROSA",
+    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16",
+
+    "ENFERMEDADES_ALTURA",
+    "ANEXO_16A",
+
+    "CERTIFICADO_ALTURA",
+    "PSICOSENSOMETRICO_CERT_ALTURA",
+
+    "CERTIFICADO_VEHICULOS",
+
+    "FICHA_SAS",
+
+    "USO_RESPIRADORES",
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA_BOROO",
+
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
+
+    "CONSENT_DROGAS_BOROO",
+
+    "OIT",
+
+    "ESPIROMETRIA_ARCHIVO",
+
+    "FICHA_AUDIOMETRIA",
+    "CUESTIONARIO_AUDIOMETRIA",
+
+    "ODONTOGRAMA",
+
+    "TEST_FATIGA_SOMNOLENCIA",
+
+    "INFORME_PSICOLOGICO",
+    "INFORME_PSICOLABORAL",
+
+    "TRABAJO_ESPECIFICOS",
+
+    "FICHA_OFTALMOLOGICA",
+
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListBesalcoSolo = buildExamenesList([ // BESALCO SOLO
+    "RESUMEN_MEDICO_PODEROSA",
+    "CERTIFICADO_ANEXO_02",
+    "ANEXO_02",
+
+    "HISTORIA_OCUPACIONAL",
+    "ANTECEDENTES_PATOLOGICOS",
+    "DECLARACION_JURADA_ANTECEDENTES",
+
+    "CUESTIONARIO_NORDICO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
+
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
+
+    "CONSENT_PANEL_2D",
+
+    "OIT",
+    "RADIOGRAFIA_TORAX",
+
+    "ELECTROCARDIOGRAMA",
+    "ELECTROCARDIOGRAMA_ARCHIVO",
+    "ESPIROMETRIA_ARCHIVO",
+
+    "AUDIOMETRIA_OHLA",
+
+    "ODONTOGRAMA",
+
+    "PSICOLOGIA_ANEXO_03",
+
+    "TRABAJO_ESPECIFICOS",
+
+    "OFTALMOLOGIA",
+    "OFTALMOLOGIA_VISION_TESTER",
+
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ExamenesListAlturaSolo = buildExamenesList([ // ALTURA SOLO
+    "RESUMEN_MEDICO_PODEROSA",
+    "CERTIFICADO_ALTURA",
+    "PSICOSENSOMETRICO_CERT_ALTURA",
+
+    "LABORATORIO_CLINICO",
+    "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
+
+    "AUDIOMETRIA_OHLA",
+    "CUESTIONARIO_AUDIOMETRIA",
+
+    "TRABAJO_ALTURA_PSICO",
+
+    "OFTALMOLOGIA",
+    "OFTALMOLOGIA_VISION_TESTER",
+
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "INTERCONSULTAS"
+]);
+
+const ListaPorPlantilla = {
+    PRUEBAS: ExamenesListPRUEBAS,
+    CAMPANA: ExamenesListCAMPANA,
+    OHLA: ExamenesListOHLA,
+    OHLA1: ExamenesListOHLA1,
+    OHLA2: ExamenesListOHLA2,
+    OHLA3: ExamenesListOHLA3,
+    SUMMAGOLD: ExamenesListSummaGold,
+    SMMOT: ExamenesListSmmot,
+    "LA ARENA - RETIRO": ExamenesListRetiroLaArena,
+    "SUMMAGOLD - RETIRO ": ExamenesListRetiroSummaGold,
+    "PSICOSENSOMETRICO SOLO": ExamenesListPsicosensometricoSolo,
+    "PROSEGURIDAD - BASICO": ExamenesListProseguridadBasico,
+    "PODEROSA - CONDUCCION": ExamenesListPoderosaSoloConduccion,
+    "PODEROSA - ALTURA": ExamenesListPoderosaSoloAltura,
+    "PODEROSA - RETIRO": ExamenesListPoderosaRetiro,
+    "PODEROSA - BASICO": ExamenesListPoderosaBasico,
+    "MINEROS DEL NORTE": ExamenesListMinerosDelNorte,
+    "MARSA - CONDUCCION": ExamenesListMarsaSoloConduccion,
+    "MARSA - ALTURA": ExamenesListMarsaSoloAltura,
+    "MARSA - BASICO": ExamenesListMarsaBasico,
+    "LA ARENA - ALTURA": ExamenesListLaArenaSoloAltura,
+    "LA ARENA - ALTURA CONDUCCION": ExamenesListLaArenaAlturaConduccion,
+    "K2": ExamenesListK2,
+    "BOROO - ALTURA EKG": ExamenesListBorooAlturaEKG,
+    "BOROO -ALTURA NO EKG": ExamenesListBorooAlturaSinEKG,
+    "BOROO - ALTURA CONDUCCION": ExamenesListBorooAlturaConduccion,
+    "BESALCO - SOLO": ExamenesListBesalcoSolo,
+    "ALTURA - SOLO": ExamenesListAlturaSolo,
+
+};
 
 const Folio = () => {
+    const abortControllerRef = useRef(null);
     const today = getToday();
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+    const [selectedListType, setSelectedListType] = useState("OHLA");
     const initialFormState = {
         norden: "",
         codigoInforme: null,
-        fechaEntrevista: today,
         nombreExamen: "",
         nombres: "",
         apellidos: "",
@@ -466,29 +1115,63 @@ const Folio = () => {
         contrata: "",
         ocupacion: "",
         cargoDesempenar: "",
-        listaExamenes: ExamenesList,
+        listaExamenes: ListaPorPlantilla["OHLA"],
     };
 
     const {
         form,
         setForm,
-        handleChange,
         handleChangeNumber,
         handleClear,
-        handleRadioButtonBoolean,
         handleClearnotO,
-        handlePrintDefault,
     } = useForm(initialFormState, { storageKey: "Folio_KEY" });
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
             handleClearnotO();
-            GetInfoPac(form.norden, setForm, token, selectedSede, ExamenesList);
+            const currentList = ListaPorPlantilla[selectedListType] || ListaPorPlantilla["OHLA"];
+            GetInfoPac(form.norden, setForm, token, selectedSede, currentList);
             //VerifyTR(form.norden, tabla, token, setForm, selectedSede);
         }
     };
 
+    const handleListChange = (e) => {
+        const newValue = e.target.value;
+        setSelectedListType(newValue);
+        const newList = ListaPorPlantilla[newValue] || ListaPorPlantilla["OHLA"];
+
+        if (form.norden) {
+            handleClearnotO();
+            GetInfoPac(form.norden, setForm, token, selectedSede, newList);
+        } else {
+            setForm((prev) => ({
+                ...prev,
+                listaExamenes: newList,
+            }));
+        }
+    };
+
+    const toggleExamen = (index) => {
+        const newList = [...form.listaExamenes];
+        // Solo permitir cambiar si el examen existe (resultado es true)
+        if (newList[index].resultado) {
+            newList[index].imprimir = !newList[index].imprimir;
+            setForm((prev) => ({
+                ...prev,
+                listaExamenes: newList,
+            }));
+        }
+    };
+
     const handleGenerarFolio = async () => {
+        // Cancelar petición anterior si existe
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+        }
+
+        const controller = new AbortController();
+        abortControllerRef.current = controller;
+
         // Mostrar alerta de carga con barra de progreso
         Swal.fire({
             title: 'Generando Folio',
@@ -507,8 +1190,15 @@ const Folio = () => {
             allowOutsideClick: false,
             allowEscapeKey: false,
             showConfirmButton: false,
+            showCancelButton: true,
+            cancelButtonText: 'Cancelar',
+            cancelButtonColor: '#d33',
             didOpen: () => {
                 Swal.showLoading();
+            }
+        }).then((result) => {
+            if (result.dismiss === Swal.DismissReason.cancel) {
+                controller.abort();
             }
         });
 
@@ -534,7 +1224,7 @@ const Folio = () => {
             };
 
             // Llamar a FolioJasper con el callback de progreso
-            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress);
+            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress, selectedListType, controller.signal);
 
             // Cerrar la alerta de carga y mostrar éxito
             Swal.fire({
@@ -545,6 +1235,10 @@ const Folio = () => {
                 showConfirmButton: false
             });
         } catch (error) {
+            if (error.name === 'AbortError' || error.message === 'Aborted') {
+                Swal.fire('Cancelado', 'La generación del folio ha sido cancelada.', 'info');
+                return;
+            }
             console.error('Error generando folio:', error);
             Swal.fire({
                 icon: 'error',
@@ -558,21 +1252,13 @@ const Folio = () => {
     return (
         <div className="w-full space-y-3 px-4">
             {/* ===== SECCIÓN: DATOS NECESARIOS ===== */}
-            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 <InputTextOneLine
                     label="N° Orden"
                     name="norden"
                     value={form.norden}
                     onKeyUp={handleSearch}
                     onChange={handleChangeNumber}
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Fecha Entrevista"
-                    name="fechaEntrevista"
-                    type="date"
-                    value={form.fechaEntrevista}
-                    onChange={handleChange}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
@@ -689,12 +1375,40 @@ const Folio = () => {
                     labelWidth="120px"
                 />
             </SectionFieldset>
+
+            {/* ===== SECCIÓN: CONFIGURACIÓN ===== */}
+            <SectionFieldset legend="Configuración" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="flex items-center gap-4">
+                    <label className="font-semibold" style={{ minWidth: "120px" }}>Plantilla Protoco:</label>
+                    <select
+                        className="border rounded px-2 py-1 w-full"
+                        value={selectedListType}
+                        onChange={handleListChange}
+                    >
+                        {Object.keys(ListaPorPlantilla).map(elemento => (
+                            <option value={elemento} key={elemento}>{elemento}</option>
+                        ))}
+                    </select>
+                </div>
+            </SectionFieldset>
+
             {/* ===== SECCIÓN: EXAMENES ===== */}
             <SectionFieldset legend="Examenes" className="flex flex-col justify-center items-center w-full">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
                     {form.listaExamenes?.map((examen, index) => (
-                        <div key={index} className="flex justify-between items-center border p-3 rounded-md shadow-sm bg-white">
-                            <span className="font-medium text-gray-700 text-sm whitespace-normal break-words max-w-[150px]">{examen.nombre}</span>
+                        <div key={index} className="flex justify-between items-center border p-3 rounded-md shadow-sm bg-white gap-2">
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    checked={examen.imprimir || false}
+                                    onChange={() => toggleExamen(index)}
+                                    disabled={!examen.resultado}
+                                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                                />
+                                <span className="font-medium text-gray-700 text-sm whitespace-normal break-words max-w-[150px] cursor-pointer" onClick={() => toggleExamen(index)}>
+                                    {index + 1}.- {examen.nombre}
+                                </span>
+                            </div>
                             <span className={`font-bold text-sm ${examen.resultado ? 'text-green-600' : 'text-red-600'}`}>
                                 {examen.resultado ? 'PASO' : 'NO PASO'}
                             </span>
@@ -704,7 +1418,7 @@ const Folio = () => {
                 <div className="flex justify-center items-center w-full gap-4">
                     <button
                         className="bg-yellow-400 hover:bg-yellow-500 text-white py-2 px-4 rounded-md mt-4 text-semibold"
-                        onClick={handleClear}
+                        onClick={() => { handleClear(); setSelectedListType("OHLA") }}
                     >
                         Limpiar
                     </button>

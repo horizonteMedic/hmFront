@@ -19,152 +19,158 @@ import OdontogramaLevantarObservacion from "./OdontogramaLevantarObservacion";
 import Swal from "sweetalert2";
 import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
+import { getToday } from "../../../../utils/helpers";
+import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
+import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
 
 const tabla = "odontograma";
 const tablaLO = "odontograma_lo";
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
 
-const initialFormState = {
-  norden: "",
-  codOd: null,
-  fechaExam: today,
-  nombres: "",
-  sexo: "",
-  edad: "",
-  empresa: "",
-  contrata: "",
-
-  d1: "Normal",
-  d2: "Normal",
-  d3: "Normal",
-  d4: "Normal",
-  d5: "Normal",
-  d6: "Normal",
-  d7: "Normal",
-  d8: "Normal",
-  d9: "Normal",
-  d10: "Normal",
-  d11: "Normal",
-  d12: "Normal",
-  d13: "Normal",
-  d14: "Normal",
-  d15: "Normal",
-  d16: "Normal",
-  d17: "Normal",
-  d18: "Normal",
-  d19: "Normal",
-  d20: "Normal",
-  d21: "Normal",
-  d22: "Normal",
-  d23: "Normal",
-  d24: "Normal",
-  d25: "Normal",
-  d26: "Normal",
-  d27: "Normal",
-  d28: "Normal",
-  d29: "Normal",
-  d30: "Normal",
-  d31: "Normal",
-  d32: "Normal",
-
-  ausente: 0,
-  cariada: 0,
-  porExtraer: 0,
-  fracturada: 0,
-  corona: 0,
-  obturacion: 0,
-  puente: 0,
-  pprMetalica: 0,
-  pprAcrilica: 0,
-  pTotal: 0,
-  normal: 32,
-  malEstado: 0,
-
-  observaciones: "",
-  noPasoExamen: false,
-
-  nombres_search: "",
-  codigo_search: "",
-  fechaDesde: today,
-  fechaHasta: today,
-  filtroOcupacional: true,
-  filtroClientesConsulta: false,
-};
-
-const initialFormStateLO = {
-  norden: "",
-  fechaExam: today,
-  nombres: "",
-  sexo: "",
-  edad: "",
-  empresa: "",
-  contrata: "",
-
-  d1: "Normal",
-  d2: "Normal",
-  d3: "Normal",
-  d4: "Normal",
-  d5: "Normal",
-  d6: "Normal",
-  d7: "Normal",
-  d8: "Normal",
-  d9: "Normal",
-  d10: "Normal",
-  d11: "Normal",
-  d12: "Normal",
-  d13: "Normal",
-  d14: "Normal",
-  d15: "Normal",
-  d16: "Normal",
-  d17: "Normal",
-  d18: "Normal",
-  d19: "Normal",
-  d20: "Normal",
-  d21: "Normal",
-  d22: "Normal",
-  d23: "Normal",
-  d24: "Normal",
-  d25: "Normal",
-  d26: "Normal",
-  d27: "Normal",
-  d28: "Normal",
-  d29: "Normal",
-  d30: "Normal",
-  d31: "Normal",
-  d32: "Normal",
-
-  ausente: 0,
-  cariada: 0,
-  porExtraer: 0,
-  fracturada: 0,
-  corona: 0,
-  obturacion: 0,
-  puente: 0,
-  pprMetalica: 0,
-  pprAcrilica: 0,
-  pTotal: 0,
-  normal: 32,
-  malEstado: 0,
-
-  observaciones: "",
-};
 
 export default function Odontologia() {
+  const today = getToday();
+  const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
+
+  const initialFormState = {
+    norden: "",
+    codOd: null,
+    fechaExam: today,
+    nombres: "",
+    sexo: "",
+    edad: "",
+    empresa: "",
+    contrata: "",
+
+    d1: "Normal",
+    d2: "Normal",
+    d3: "Normal",
+    d4: "Normal",
+    d5: "Normal",
+    d6: "Normal",
+    d7: "Normal",
+    d8: "Normal",
+    d9: "Normal",
+    d10: "Normal",
+    d11: "Normal",
+    d12: "Normal",
+    d13: "Normal",
+    d14: "Normal",
+    d15: "Normal",
+    d16: "Normal",
+    d17: "Normal",
+    d18: "Normal",
+    d19: "Normal",
+    d20: "Normal",
+    d21: "Normal",
+    d22: "Normal",
+    d23: "Normal",
+    d24: "Normal",
+    d25: "Normal",
+    d26: "Normal",
+    d27: "Normal",
+    d28: "Normal",
+    d29: "Normal",
+    d30: "Normal",
+    d31: "Normal",
+    d32: "Normal",
+
+    ausente: 0,
+    cariada: 0,
+    porExtraer: 0,
+    fracturada: 0,
+    corona: 0,
+    obturacion: 0,
+    puente: 0,
+    pprMetalica: 0,
+    pprAcrilica: 0,
+    pTotal: 0,
+    normal: 32,
+    malEstado: 0,
+
+    observaciones: "",
+    noPasoExamen: false,
+
+    nombres_search: "",
+    codigo_search: "",
+    fechaDesde: today,
+    fechaHasta: today,
+    filtroOcupacional: true,
+    filtroClientesConsulta: false,
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
+  };
+
+
+  const initialFormStateLO = {
+    norden: "",
+    fechaExam: today,
+    nombres: "",
+    sexo: "",
+    edad: "",
+    empresa: "",
+    contrata: "",
+
+    d1: "Normal",
+    d2: "Normal",
+    d3: "Normal",
+    d4: "Normal",
+    d5: "Normal",
+    d6: "Normal",
+    d7: "Normal",
+    d8: "Normal",
+    d9: "Normal",
+    d10: "Normal",
+    d11: "Normal",
+    d12: "Normal",
+    d13: "Normal",
+    d14: "Normal",
+    d15: "Normal",
+    d16: "Normal",
+    d17: "Normal",
+    d18: "Normal",
+    d19: "Normal",
+    d20: "Normal",
+    d21: "Normal",
+    d22: "Normal",
+    d23: "Normal",
+    d24: "Normal",
+    d25: "Normal",
+    d26: "Normal",
+    d27: "Normal",
+    d28: "Normal",
+    d29: "Normal",
+    d30: "Normal",
+    d31: "Normal",
+    d32: "Normal",
+
+    ausente: 0,
+    cariada: 0,
+    porExtraer: 0,
+    fracturada: 0,
+    corona: 0,
+    obturacion: 0,
+    puente: 0,
+    pprMetalica: 0,
+    pprAcrilica: 0,
+    pTotal: 0,
+    normal: 32,
+    malEstado: 0,
+
+    observaciones: "",
+  };
+
   const {
     form,
     setForm,
     handleChange,
+    handleChangeSimple,
     handleCheckBoxChange,
     handleClear,
     handleClearnotO,
     handlePrintDefault,
   } = useForm(initialFormState);
-
-  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
 
   const {
     form: formLO,
@@ -294,19 +300,17 @@ export default function Odontologia() {
                         setFormLO((prev) => ({ ...prev, norden: form.norden }));
                       }}
                       className={`px-3 h-[22px] rounded flex items-center w-full justify-center transition-colors duration-200 my-auto
-                                ${
-                                  form.codOd == null
-                                    ? "bg-gray-300 text-gray-500 "
-                                    : "bg-green-200 hover:bg-green-300 text-green-800 cursor-pointer"
-                                }`}
+                                ${form.codOd == null
+                          ? "bg-gray-300 text-gray-500 "
+                          : "bg-green-200 hover:bg-green-300 text-green-800 cursor-pointer"
+                        }`}
                     >
                       <FontAwesomeIcon
                         icon={faCheckCircle}
-                        className={`mr-2 ${
-                          form.codOd == null
-                            ? "text-gray-500"
-                            : "text-green-800"
-                        }`}
+                        className={`mr-2 ${form.codOd == null
+                          ? "text-gray-500"
+                          : "text-green-800"
+                          }`}
                       />
                       <p className="">LEVANTAR OBSERVACION</p>
                     </button>
@@ -369,22 +373,20 @@ export default function Odontologia() {
             {/* Tabs */}
             <div className="flex gap-1">
               <div
-                className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold  cursor-pointer   focus:outline-none flex items-center whitespace-nowrap ${
-                  activeTab === 1
-                    ? "bg-[#233245] text-white font-bold"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                } ${activeTab === 1 ? "border-b-0" : "border-b"}`}
+                className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold  cursor-pointer   focus:outline-none flex items-center whitespace-nowrap ${activeTab === 1
+                  ? "bg-[#233245] text-white font-bold"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  } ${activeTab === 1 ? "border-b-0" : "border-b"}`}
                 onClick={() => changeTab(1)}
               >
                 <FontAwesomeIcon icon={faUsers} className="mr-2" />
                 Odontograma Adultos
               </div>
               <div
-                className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold cursor-pointer  focus:outline-none flex items-center whitespace-nowrap ${
-                  activeTab === 2
-                    ? "bg-[#233245] text-white font-bold"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                } ${activeTab === 2 ? "border-b-0" : "border-b"}`}
+                className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold cursor-pointer  focus:outline-none flex items-center whitespace-nowrap ${activeTab === 2
+                  ? "bg-[#233245] text-white font-bold"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  } ${activeTab === 2 ? "border-b-0" : "border-b"}`}
                 onClick={() => changeTab(2)}
               >
                 <FontAwesomeIcon icon={faClipboardList} className="mr-2" />
@@ -398,6 +400,7 @@ export default function Odontologia() {
                 form={form}
                 setForm={setForm}
                 handleChange={handleChange}
+                handleChangeSimple={handleChangeSimple}
                 handleCheckBoxChange={handleCheckBoxChange}
                 handleClear={handleClear}
                 handleSave={handleSave}
@@ -420,6 +423,7 @@ export default function Odontologia() {
                 datosFooter={datosFooter}
               />
             )}
+           
           </div>
         </div>
 

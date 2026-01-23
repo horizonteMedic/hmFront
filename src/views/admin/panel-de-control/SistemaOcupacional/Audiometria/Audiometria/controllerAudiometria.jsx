@@ -168,6 +168,8 @@ export const GetInfoServicio = async (
       oi_o_4000: res.oi14000,
       oi_o_6000: res.oi16000,
       oi_o_8000: res.oi18000,
+
+      user_medicoFirma: res.usuarioFirma,
     }));
   }
 };
@@ -314,6 +316,7 @@ export const SubmitDataService = async (
     userRegistro: user,
     userMedicoOcup: "",
     formato: "",
+    usuarioFirma: form.user_medicoFirma,
   };
 
   await SubmitDataServiceDefault(

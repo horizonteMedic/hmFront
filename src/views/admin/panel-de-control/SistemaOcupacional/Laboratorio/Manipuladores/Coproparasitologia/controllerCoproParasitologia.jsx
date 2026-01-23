@@ -80,6 +80,7 @@ export const GetInfoServicio = async (
       micro3_parasitos: res.txtlugol2 ?? "",
 
       user_medicoFirma: res.usuarioFirma,
+      user_doctorAsignado: res.doctorAsignado,
     }));
   }
 };
@@ -131,6 +132,7 @@ export const SubmitDataService = async (
     userMedicoOcup: "",
 
     usuarioFirma: form.user_medicoFirma,
+    doctorAsignado: form.user_doctorAsignado,
   };
 
   await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

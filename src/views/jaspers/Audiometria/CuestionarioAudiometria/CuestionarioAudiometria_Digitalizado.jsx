@@ -175,7 +175,7 @@ export default async function CuestionarioAudiometria_Digitalizado(datos = {}, d
   // Sin espacio entre tablas
 
   // Continuar con el dibujado del cuestionario
-  (async () => {
+  await (async () => {
     // 4) Sección de preguntas 1–15
     const pageW = doc.internal.pageSize.getWidth();
     const tablaAncho = 200;
@@ -638,13 +638,9 @@ export default async function CuestionarioAudiometria_Digitalizado(datos = {}, d
 
     // Fila de firmas (sin marco/borde)
     // 5) Dibujar firmas usando dibujarFirmas
-    await dibujarFirmas({ doc, datos, y: tableY + 2, pageW }).then(() => {
-      // 6) Footer
-      footerTR(doc, { footerOffsetY: 8, fontSize: 8 });
 
-    }).catch(err => {
-      console.error("Error al dibujar firmas:", err);
-    });
+    await dibujarFirmas({ doc, datos, y: tableY + 2, pageW })
+    footerTR(doc, { footerOffsetY: 8, fontSize: 8 });
 
     if (docExistente) {
       return doc;
