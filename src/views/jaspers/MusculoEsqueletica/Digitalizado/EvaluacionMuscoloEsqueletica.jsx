@@ -10,11 +10,11 @@ const drawHeader = async (doc, datos = {}, numeroPagina = 1) => {
   const pageW = doc.internal.pageSize.getWidth();
   const informacionSede = datos.informacionSede || {};
 
-  await CabeceraLogo(doc, { 
-    ...datos, 
+  await CabeceraLogo(doc, {
+    ...datos,
     sede: informacionSede.sede || datos.sede || "",
-    tieneMembrete: false, 
-    yOffset: 10 
+    tieneMembrete: false,
+    yOffset: 10
   });
 
   // Número de Ficha
@@ -207,14 +207,14 @@ const drawSintomasYPreguntas = (doc, datos = {}, yInicio) => {
     const anchoLabel = 100;
     const anchoTextoSINO = 10; // Ancho para "SI" o "NO"
     const anchoCeldaX = 8; // Ancho de celda para X
-    
+
     const xLabel = tablaInicioX;
     const xSI = xLabel + anchoLabel;
     const xCeldaSI = xSI + anchoTextoSINO;
     const xNO = xCeldaSI + anchoCeldaX;
     const xCeldaNO = xNO + anchoTextoSINO;
     const xTexto = xCeldaNO + anchoCeldaX;
-    
+
     // Líneas verticales: Label | SI | [X] | NO | [X] | Texto(opcional)
     doc.line(xLabel, yPos, xLabel, yPos + filaAltura);
     doc.line(xSI, yPos, xSI, yPos + filaAltura);
@@ -230,11 +230,11 @@ const drawSintomasYPreguntas = (doc, datos = {}, yInicio) => {
     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
     const yCentro = yPos + filaAltura / 2 + 1.2;
-    
+
     // Label
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(label, xLabel + 2, yCentro);
-    
+
     // SI (sin negrita)
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text("SI", xSI + 2, yCentro);
@@ -242,7 +242,7 @@ const drawSintomasYPreguntas = (doc, datos = {}, yInicio) => {
     if (siMarcado) {
       dibujarX(doc, xCeldaSI + anchoCeldaX / 2, yCentro);
     }
-    
+
     // NO (sin negrita)
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text("NO", xNO + 2, yCentro);
@@ -250,7 +250,7 @@ const drawSintomasYPreguntas = (doc, datos = {}, yInicio) => {
     if (noMarcado) {
       dibujarX(doc, xCeldaNO + anchoCeldaX / 2, yCentro);
     }
-    
+
     // Texto opcional (Cuales)
     if (textoOpcional !== null) {
       doc.setFont("helvetica", "normal").setFontSize(7);
@@ -260,7 +260,7 @@ const drawSintomasYPreguntas = (doc, datos = {}, yInicio) => {
         doc.text(texto, xTexto + 15, yCentro);
       }
     }
-    
+
     yPos += filaAltura;
   };
 
@@ -377,12 +377,12 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
     const yCentro = yPos + filaAltura / 2 + 1.2;
-    
+
     // Movimiento
     doc.setFont("helvetica", "normal").setFontSize(7);
     const textoCompleto = valor ? `${label}: ${valor}` : label;
     doc.text(textoCompleto, xMovimientoCol + anchoMovimientoCol / 2, yCentro, { align: "center" });
-    
+
     // Grado - Solo X si está marcado (N, R, M están en el header)
     if (nMarcado) {
       dibujarX(doc, xGradoCol + anchoN / 2, yCentro);
@@ -393,12 +393,12 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
     if (mMarcado) {
       dibujarX(doc, xGradoCol + anchoN + anchoR + anchoM / 2, yCentro);
     }
-    
+
     yPos += filaAltura;
   };
 
   // Función para dibujar fila de movimiento con dos columnas de Grado (izquierda y derecha)
-  const dibujarFilaMovimientoDoble = async (label, valor, 
+  const dibujarFilaMovimientoDoble = async (label, valor,
     nIzq, rIzq, mIzq, // Grado izquierdo
     nDer, rDer, mDer  // Grado derecho
   ) => {
@@ -416,12 +416,12 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
     const yCentro = yPos + filaAltura / 2 + 1.2;
-    
+
     // Movimiento (centro)
     doc.setFont("helvetica", "normal").setFontSize(7);
     const textoCompleto = valor ? `${label}: ${valor}` : label;
     doc.text(textoCompleto, xMovimiento + anchoMovimiento / 2, yCentro, { align: "center" });
-    
+
     // Grado Izquierdo - Solo X si está marcado (N, R, M están en el header)
     if (nIzq) {
       dibujarX(doc, xGradoIzq + anchoN / 2, yCentro);
@@ -432,7 +432,7 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
     if (mIzq) {
       dibujarX(doc, xGradoIzq + anchoN + anchoR + anchoM / 2, yCentro);
     }
-    
+
     // Grado Derecho - Solo X si está marcado (N, R, M están en el header)
     if (nDer) {
       dibujarX(doc, xGradoDer + anchoN / 2, yCentro);
@@ -443,18 +443,18 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
     if (mDer) {
       dibujarX(doc, xGradoDer + anchoN + anchoR + anchoM / 2, yCentro);
     }
-    
+
     yPos += filaAltura;
   };
 
   // === 1. CABEZA Y CUELLO ===
   await dibujarHeaderSeccion("1. CABEZA Y CUELLO", filaAltura);
-  
+
   // Layout para Cabeza y Cuello: Movimiento (todo el ancho menos Grado) | N R M
   const xMovimientoCabeza = tablaInicioX;
   const xGradoCabeza = tablaInicioX + tablaAncho - anchoGradoColumna;
   const anchoMovimientoCabeza = xGradoCabeza - xMovimientoCabeza;
-  
+
   // Header única fila: Movimiento | N R M
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(xGradoCabeza, yPos, xGradoCabeza, yPos + filaAltura);
@@ -501,10 +501,10 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
 
   // === 2. MIEMBROS SUPERIORES ===
   await dibujarHeaderSeccion("2. MIEMBROS SUPERIORES", filaAltura);
-  
+
   // === a) HOMBRO ===
   await dibujarHeaderSeccion("a) HOMBRO", filaAltura);
-  
+
   // Header única fila: N R M | Movimiento | N R M
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(xGradoIzq + anchoN, yPos, xGradoIzq + anchoN, yPos + filaAltura);
@@ -565,7 +565,7 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
 
   // === b) BRAZO ===
   await dibujarHeaderSeccion("b) BRAZO", filaAltura);
-  
+
   // Header única fila: N R M | Movimiento | N R M
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(xGradoIzq + anchoN, yPos, xGradoIzq + anchoN, yPos + filaAltura);
@@ -603,7 +603,7 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
 
   // === c) ANTEBRAZO ===
   await dibujarHeaderSeccion("c) ANTEBRAZO", filaAltura);
-  
+
   // Header única fila: N R M | Movimiento | N R M
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(xGradoIzq + anchoN, yPos, xGradoIzq + anchoN, yPos + filaAltura);
@@ -641,7 +641,7 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
 
   // === d) MUÑECA ===
   await dibujarHeaderSeccion("d) MUÑECA", filaAltura);
-  
+
   // Header única fila: N R M | Movimiento | N R M
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(xGradoIzq + anchoN, yPos, xGradoIzq + anchoN, yPos + filaAltura);
@@ -693,12 +693,12 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
     // Layout con celdas: Grado Izq (SI/NO) | Movimiento | Grado Der (vacío)
     const anchoTextoSINO = 10;
     const anchoCeldaX = 8;
-    
+
     const xSI = xGradoIzq;
     const xCeldaSI = xSI + anchoTextoSINO;
     const xNO = xCeldaSI + anchoCeldaX;
     const xCeldaNO = xNO + anchoTextoSINO;
-    
+
     // Líneas verticales
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
     doc.line(xSI, yPos, xSI, yPos + filaAltura);
@@ -714,7 +714,7 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
     const yCentro = yPos + filaAltura / 2 + 1.2;
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(label, xMovimiento + anchoMovimiento / 2, yCentro, { align: "center" });
-    
+
     // Izquierdo: SI | [X] | NO | [X]
     doc.text("SI", xSI + 2, yCentro);
     if (siMarcado) {
@@ -724,9 +724,9 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
     if (noMarcado) {
       dibujarX(doc, xCeldaNO + anchoCeldaX / 2, yCentro);
     }
-    
+
     // Derecho: vacío (sin SI/NO)
-    
+
     yPos += filaAltura;
   };
 
@@ -743,7 +743,7 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
 
   // === 3. TÓRAX ===
   await dibujarHeaderSeccion("3. TÓRAX", filaAltura);
-  
+
   // Header única fila: N R M | Movimiento | N R M
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(xGradoIzq + anchoN, yPos, xGradoIzq + anchoN, yPos + filaAltura);
@@ -786,10 +786,10 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
 
   // === 4. MIEMBROS INFERIORES ===
   await dibujarHeaderSeccion("4. MIEMBROS INFERIORES", filaAltura);
-  
+
   // === a) CADERAS ===
   await dibujarHeaderSeccion("a) CADERAS", filaAltura);
-  
+
   // Header única fila: N R M | Movimiento | N R M
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(xGradoIzq + anchoN, yPos, xGradoIzq + anchoN, yPos + filaAltura);
@@ -847,7 +847,7 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
 
   // === b) PIERNA ===
   await dibujarHeaderSeccion("b) PIERNA", filaAltura);
-  
+
   // Header única fila: N R M | Movimiento | N R M
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(xGradoIzq + anchoN, yPos, xGradoIzq + anchoN, yPos + filaAltura);
@@ -885,7 +885,7 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
 
   // === c) RODILLA ===
   await dibujarHeaderSeccion("c) RODILLA", filaAltura);
-  
+
   // Header única fila: N R M | Movimiento | N R M
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(xGradoIzq + anchoN, yPos, xGradoIzq + anchoN, yPos + filaAltura);
@@ -933,7 +933,7 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
 
   // === d) TOBILLO ===
   await dibujarHeaderSeccion("d) TOBILLO", filaAltura);
-  
+
   // Header única fila: N R M | Movimiento | N R M
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(xGradoIzq + anchoN, yPos, xGradoIzq + anchoN, yPos + filaAltura);
@@ -1037,7 +1037,7 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
   const desvLabelW = 52;
   const xDesvLabelEnd = xRight + desvLabelW;
   const desvOptW = (halfW - desvLabelW) / 2;
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("Normal", xLeft + ejeLabelW + ejeOptW / 2, yPos + rowH + 3.3, { align: "center" });
   doc.text("Derecha", xLeft + ejeLabelW + ejeOptW * 1.5, yPos + rowH + 3.3, { align: "center" });
@@ -1256,7 +1256,8 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaSeccionFirma);
 
   const yFirmas = yPos + 3;
-  await dibujarFirmas({ doc, datos, y: yFirmas, pageW, mostrarFirmaPaciente: true });
+  await dibujarFirmas({ doc, datos: { ...datos, ...datos.informacionSede }, y: yFirmas, pageW, mostrarFirmaPaciente: true });
+
   yPos += alturaSeccionFirma;
 
   return yPos;
