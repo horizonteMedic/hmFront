@@ -9,12 +9,13 @@ import { useForm } from "../../../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformeBurnout";
 import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
 import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "informe_burnout";
 
 export default function InformeBurnout() {
     const today = getToday();
-    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+    const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
     const initialFormState = {
         norden: '',
@@ -48,6 +49,10 @@ export default function InformeBurnout() {
         resultados: "",
         conclusiones: "",
         recomendaciones: "",
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
     };
 
     const {
@@ -176,6 +181,15 @@ export default function InformeBurnout() {
                         rows={4}
                     />
                 </div>
+            </SectionFieldset>
+
+            <SectionFieldset legend="Asignación de Médico">
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Especialista"
+                    form={form}
+                    onChange={handleChangeSimple}
+                />
             </SectionFieldset>
 
             <BotonesAccion

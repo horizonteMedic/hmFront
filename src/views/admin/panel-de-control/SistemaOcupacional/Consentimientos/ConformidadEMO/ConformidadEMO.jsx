@@ -5,6 +5,7 @@ import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerConformidadEMO";
 import BotonesAccion from "../../../../../components/templates/BotonesAccion";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "registro_conformidad_emo";
 
@@ -141,6 +142,16 @@ export default function ConformidadEMO() {
                     </div>
                 </div>
             </SectionFieldset>
+
+            <SectionFieldset legend="Asignación de Médico">
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Especialista"
+                    form={form}
+                    onChange={handleChangeSimple}
+                />
+            </SectionFieldset>
+
 
             <BotonesAccion
                 form={form}

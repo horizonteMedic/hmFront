@@ -88,6 +88,8 @@ export const GetInfoServicio = async (
             recomendaciones: res.recomendaciones_recomendaciones,
             areaCognitiva: res.areaCognitiva_areacognitiva,
             areaEmocional: res.areaEmocional_areaemocional,
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -144,6 +146,8 @@ export const SubmitDataService = async (
         recomendaciones: form.recomendaciones,
         apto: form.esApto,
         usuarioRegistro: user,
+
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

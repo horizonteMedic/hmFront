@@ -12,13 +12,14 @@ import ParteII from "./TabsCalidadDeSueno/ParteII";
 import ParteIII from "./TabsCalidadDeSueno/ParteIII";
 import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
 import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "calidad_sueño";
 
 export default function CalidadDeSueno() {
     const today = getToday();
     const [activeTab, setActiveTab] = useState(0);
-    const { token, userlogued, selectedSede, datosFooter, userDNI } = useSessionData();
+    const { token, userlogued, selectedSede, datosFooter, userDNI, userName } = useSessionData();
 
     const initialFormState = {
         // Header
@@ -70,6 +71,10 @@ export default function CalidadDeSueno() {
         calidadSuenoGeneral: "",
         animoDificultaActividad: "",
         comparteHabitacion: "",
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
     };
 
     const {
@@ -171,6 +176,15 @@ export default function CalidadDeSueno() {
                     handleChangeSimple={handleChangeSimple}
                 />
             </div>
+
+            <SectionFieldset legend="Asignación de Médico">
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Especialista"
+                    form={form}
+                    onChange={handleChangeSimple}
+                />
+            </SectionFieldset>
 
             <BotonesAccion
                 form={form}

@@ -11,12 +11,13 @@ import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerExamenEspacioConfinado";
 import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "psicologia_espacios_confinados";
 
 export default function ExamenEspacioConfinado() {
     const today = getToday();
-    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+    const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
     const initialFormState = {
         // Header - Información del examen
@@ -58,6 +59,11 @@ export default function ExamenEspacioConfinado() {
         // Análisis y Resultados
         analisisResultados: "",
         recomendaciones: "",
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
+
     };
 
     const {
@@ -321,6 +327,15 @@ export default function ExamenEspacioConfinado() {
                     </div>
                 </SectionFieldset>
             </div>
+
+            <SectionFieldset legend="Asignación de Médico">
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Especialista"
+                    form={form}
+                    onChange={handleChangeSimple}
+                />
+            </SectionFieldset>
 
             {/* Botones de acción */}
             <BotonesAccion

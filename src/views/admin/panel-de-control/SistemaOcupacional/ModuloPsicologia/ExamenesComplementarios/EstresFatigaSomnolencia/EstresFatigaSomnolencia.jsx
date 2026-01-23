@@ -9,12 +9,13 @@ import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerEstresFatigaSomnolencia";
 import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "informe_psicologico_estres";
 
 export default function EstresFatigaSomnolencia() {
     const today = getToday();
-    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+    const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
     const initialFormState = {
         // Header - Información del examen
@@ -51,6 +52,11 @@ export default function EstresFatigaSomnolencia() {
         // Observaciones y Recomendaciones
         observaciones: "",
         recomendaciones: "",
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
+
     };
 
     const {
@@ -82,7 +88,7 @@ export default function EstresFatigaSomnolencia() {
             PrintHojaR(form.norden, token, tabla, datosFooter);
         });
     };
-    
+
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-4 gap-3">
@@ -282,7 +288,16 @@ export default function EstresFatigaSomnolencia() {
                     />
                 </div>
             </SectionFieldset>
-            
+
+            <SectionFieldset legend="Asignación de Médico">
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Especialista"
+                    form={form}
+                    onChange={handleChangeSimple}
+                />
+            </SectionFieldset>
+
             <BotonesAccion
                 form={form}
                 handleSave={handleSave}
