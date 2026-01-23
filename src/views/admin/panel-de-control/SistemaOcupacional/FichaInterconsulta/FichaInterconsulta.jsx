@@ -24,7 +24,7 @@ const Especialidades = [
     "Alergología",
     "Neurología",
     "Cirugía General",
-    "Cirugía Cardiologo",
+    "Cirugía Cardiovascular",
     "Cirugía Cabeza y Cuello",
     "Gastroenterología",
     "Fisiatria",
