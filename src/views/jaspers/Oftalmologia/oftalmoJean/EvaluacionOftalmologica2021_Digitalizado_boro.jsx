@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import header_EvaluacionOftalmologica2021_Digitalizado_boro from "./headers/header_EvaluacionOftalmologica2021_Digitalizado_boro.jsx";
+import header_EvaluacionOftalmologica2021_Digitalizado_boro from "../headers/header_EvaluacionOftalmologica2021_Digitalizado_boro.jsx";
 
 export default async function EvaluacionOftalmologica2021_Digitalizado_boro(
   data = {}, docExistente = null
