@@ -13,12 +13,13 @@ import { useTailwindBreakpoints } from "../../../../../../hooks/useTailwindBreak
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
 import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "psicologiafobias";
 
 export default function AlturaPsicologica() {
   const today = getToday();
-  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+  const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
   const { isLgUp } = useTailwindBreakpoints();
 
   const initialFormState = {
@@ -60,6 +61,11 @@ export default function AlturaPsicologica() {
     // Analisis y recomendaciones
     analisisResultados: "",
     recomendaciones: "",
+
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
   const {
@@ -235,6 +241,15 @@ export default function AlturaPsicologica() {
           value={form.recomendaciones}
           onChange={handleChange}
           rows={4}
+        />
+      </SectionFieldset>
+
+      <SectionFieldset legend="Asignación de Médico">
+        <EmpleadoComboBox
+          value={form.nombre_medico}
+          label="Especialista"
+          form={form}
+          onChange={handleChangeSimple}
         />
       </SectionFieldset>
 

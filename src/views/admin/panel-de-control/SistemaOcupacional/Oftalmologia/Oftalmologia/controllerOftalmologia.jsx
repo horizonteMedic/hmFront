@@ -450,7 +450,7 @@ export const handleSubirArchivo = async (form, selectedSede, userlogued, token) 
   const coordenadas = {
     HUELLA: { x: 400, y: 680, width: 60, height: 60 },
     FIRMA: { x: 466, y: 680, width: 120, height: 60 },
-    SELLOFIRMA: { x: 40, y: 680, width: 120, height: 80 },
+    SELLOFIRMADOCASIG: { x: 40, y: 680, width: 120, height: 80 },
   };
   handleSubirArchivoDefault(form, selectedSede, registrarPDF, userlogued, token, coordenadas)
 };

@@ -89,7 +89,7 @@ export async function dibujarFirmas({ doc, datos, y, pageW, mostrarFirmaPaciente
         // SELLOFIRMA: Firma y Sello del Profesional / Responsable de la Evaluación
         texto1 = "Firma y Sello del Profesional";
         texto2 = "Responsable de la Evaluación";
-      } else if (tipoSello === 'SELLOFIRMADOCASIG') {
+      } else if (tipoSello === 'SELLOFIRMADOCASIG' || tipoSello == "SELLOFIRMADOCASIG-EXTRA") {
         // SELLOFIRMADOCASIG: Firma y Sello Médico Asignado
         texto1 = "Firma y Sello Médico Asignado";
         texto2 = null;

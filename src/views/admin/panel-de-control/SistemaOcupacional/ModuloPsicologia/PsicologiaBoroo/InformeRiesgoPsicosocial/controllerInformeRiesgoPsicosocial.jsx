@@ -75,6 +75,8 @@ export const GetInfoServicio = async (
             recomendaciones: res.recomendaciones ?? "",
             analisisResultados: res.analisis ?? "",
             conclusionPerfil: res.apto ?? false,
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -124,6 +126,8 @@ export const SubmitDataService = async (
         apto: form.conclusionPerfil,
         noApto: !form.conclusionPerfil,
         usuarioRegistro: user,
+
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

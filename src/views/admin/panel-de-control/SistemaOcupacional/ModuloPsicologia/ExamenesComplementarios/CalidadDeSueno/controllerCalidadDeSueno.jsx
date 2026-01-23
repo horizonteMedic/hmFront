@@ -141,6 +141,8 @@ export const GetInfoServicio = async (
                 res.pregunta11SoloAlado ? "SOLO_LADO" :
                     res.pregunta11MismoCuarto ? "MISMO_CUARTO" :
                         res.pregunta11DosMasPersonasMismoCuarto ? "DOS_O_MAS" : "",
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -255,6 +257,8 @@ export const SubmitDataService = async (
 
         fecha: form.fechaExam,
         usuarioRegistro: user,
+
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

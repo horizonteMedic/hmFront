@@ -26,7 +26,8 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "ANTECEDENTES_PATOLOGICOS",
+    "OFTALMOLOGIA",
+    "FICHA_OFTALMOLOGICA",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -112,6 +113,7 @@ const ExamenesListOHLA1 = buildExamenesList([       //OHLA 1
     "PERFIL_HEPATICO",
     "PERFIL_RENAL",
     "PANEL_5D",
+    "GONADOTROPINA",
     "CONSENT_PANEL_5D",
     "OIT",
     "RADIOGRAFIA_COLUMNA",
@@ -151,6 +153,7 @@ const ExamenesListOHLA2 = buildExamenesList([       //OHLA 2
     "PERFIL_HEPATICO",
     "PERFIL_RENAL",
     "PANEL_5D",
+    "GONADOTROPINA",
     "CONSENT_PANEL_5D",
     "OIT",
     "RAYOS_X_TORAX_ARCHIVO",
@@ -189,6 +192,7 @@ const ExamenesListOHLA3 = buildExamenesList([       //OHLA 3
     "PERFIL_HEPATICO",
     "PERFIL_RENAL",
     "PANEL_5D",
+    "GONADOTROPINA",
     "CONSENT_PANEL_5D",
     "OIT",
     "RAYOS_X_TORAX_ARCHIVO",
@@ -220,6 +224,7 @@ const ExamenesListSummaGold = buildExamenesList([   //SUMMAGOLD
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
     "PERFIL_LIPIDICO",
+    "GONADOTROPINA",
     "CONSENT_MARIHUANA",
     "OIT",
     "ELECTROCARDIOGRAMA",
@@ -250,6 +255,7 @@ const ExamenesListSmmot = buildExamenesList([       //SMMOT
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
     "PERFIL_LIPIDICO",
+    "GONADOTROPINA",
     "OIT",
     "RADIOGRAFIA_TORAX",
     "RAYOS_X_TORAX_ARCHIVO",
@@ -274,6 +280,7 @@ const ExamenesListRetiroLaArena = buildExamenesList([   // Retiro La Arena
 
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
+    "GONADOTROPINA",
 
     "OIT",
 
@@ -301,6 +308,7 @@ const ExamenesListRetiroSummaGold = buildExamenesList([   //  Retiro SummaGold
 
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
+    "GONADOTROPINA",
 
     "OIT",
 
@@ -322,6 +330,7 @@ const ExamenesListPsicosensometricoSolo = buildExamenesList([   // Psicosensomet
 
     "LABORATORIO_CLINICO",
     "PERFIL_LIPIDICO",
+    "GONADOTROPINA",
 
     "AUDIOMETRIA_OHLA",
     "CUESTIONARIO_AUDIOMETRIA",
@@ -349,6 +358,7 @@ const ExamenesListProseguridadBasico = buildExamenesList([   // PROSEGURIDAD BAS
     "LABORATORIO_CLINICO",
     "PERFIL_LIPIDICO",
 
+    "GONADOTROPINA",
     "CONSENT_PANEL_2D",
 
     "AUDIOMETRIA_OHLA",
@@ -386,6 +396,8 @@ const ExamenesListPoderosaSoloConduccion = buildExamenesList([ // PODEROSA SOLO 
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
     "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
 
     "OIT",
 
@@ -432,6 +444,8 @@ const ExamenesListPoderosaSoloAltura = buildExamenesList([ // PODEROSA SOLO ALTU
     "LABORATORIO_CLINICO",
     "PERFIL_LIPIDICO",
 
+    "GONADOTROPINA",
+
     "OIT",
 
     "ELECTROCARDIOGRAMA",
@@ -469,6 +483,8 @@ const ExamenesListPoderosaRetiro = buildExamenesList([ // PODEROSA RETIRO
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
 
+    "GONADOTROPINA",
+
     "OIT",
 
     "ESPIROMETRIA_ARCHIVO",
@@ -503,6 +519,8 @@ const ExamenesListPoderosaBasico = buildExamenesList([ // PODEROSA BASICO
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
     "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
 
     "OIT",
 
@@ -544,6 +562,8 @@ const ExamenesListMinerosDelNorte = buildExamenesList([ // MINEROS DEL NORTE
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
     "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
 
     "OIT",
 
@@ -589,6 +609,8 @@ const ExamenesListMarsaSoloConduccion = buildExamenesList([ // MARSA SOLO CONDUC
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
 
+    "GONADOTROPINA",
+
     "OIT",
 
     "ESPIROMETRIA_ARCHIVO",
@@ -628,6 +650,8 @@ const ExamenesListMarsaSoloAltura = buildExamenesList([ // MARSA SOLO ALTURA
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
 
+    "GONADOTROPINA",
+
     "OIT",
 
     "ODONTOGRAMA",
@@ -662,6 +686,8 @@ const ExamenesListMarsaBasico = buildExamenesList([ // MARSA BASICO
 
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
+
+    "GONADOTROPINA",
 
     "OIT",
 
@@ -701,6 +727,8 @@ const ExamenesListLaArenaSoloAltura = buildExamenesList([ // LA ARENA SOLO ALTUR
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
     "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
 
     "CONSENT_PANEL_2D",
 
@@ -748,6 +776,8 @@ const ExamenesListLaArenaAlturaConduccion = buildExamenesList([ // LA ARENA ALTU
     "LABORATORIO_CLINICO",
     "PERFIL_LIPIDICO",
 
+    "GONADOTROPINA",
+
     "CONSENT_PANEL_2D",
 
     "OIT",
@@ -783,6 +813,8 @@ const ExamenesListK2 = buildExamenesList([ // K2
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
     "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
 
     "OIT",
 
@@ -830,6 +862,8 @@ const ExamenesListBorooAlturaEKG = buildExamenesList([ // BOROO ALTURA + EKG
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
     "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
 
     "CONSENT_DROGAS_BOROO",
 
@@ -880,6 +914,8 @@ const ExamenesListBorooAlturaSinEKG = buildExamenesList([ // BOROO ALTURA SIN EK
     "LABORATORIO_CLINICO",
     "PERFIL_LIPIDICO",
 
+    "GONADOTROPINA",
+
     "CONSENT_DROGAS_BOROO",
 
     "OIT",
@@ -929,6 +965,8 @@ const ExamenesListBorooAlturaConduccion = buildExamenesList([ // BOROO ALTURA + 
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
     "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
 
     "CONSENT_DROGAS_BOROO",
 
@@ -1005,6 +1043,8 @@ const ExamenesListAlturaSolo = buildExamenesList([ // ALTURA SOLO
 
     "LABORATORIO_CLINICO",
     "PERFIL_LIPIDICO",
+
+    "GONADOTROPINA",
 
     "AUDIOMETRIA_OHLA",
     "CUESTIONARIO_AUDIOMETRIA",
