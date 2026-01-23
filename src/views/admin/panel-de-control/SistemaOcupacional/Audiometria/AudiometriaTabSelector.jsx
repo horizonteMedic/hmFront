@@ -85,7 +85,6 @@ export default function AudiometriaTabSelector({
     user_medicoFirma: userlogued,
   };
 
-
   const [formCuestionarioAudio, setFormCuestionarioAudio] = useState(
     initialFormStateCuestionarioAudio
   );
@@ -105,7 +104,7 @@ export default function AudiometriaTabSelector({
       {subTab === 2 && (
         <AudiometriaCuestionario
           token={token}
-          userlogued={userlogued.sub}
+          userlogued={userlogued}
           selectedSede={selectedSede}
           initialFormState={initialFormStateCuestionarioAudio}
           form={formCuestionarioAudio}

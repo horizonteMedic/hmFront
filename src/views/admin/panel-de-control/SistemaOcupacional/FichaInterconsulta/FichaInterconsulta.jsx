@@ -47,7 +47,8 @@ const Especialidades = [
     "Imagenologia",
     "Audiometria",
     "Dermatología",
-    "Agudeza Visual"
+    "Agudeza Visual",
+    "Odontologia"
 ]
 
 

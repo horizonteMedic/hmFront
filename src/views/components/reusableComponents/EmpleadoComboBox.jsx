@@ -68,12 +68,18 @@ export default function EmpleadoComboBox({
     const handleSearch = (e) => {
         const v = e.target.value.toUpperCase();
         setInputValue(v);
-        
+        console.log(v)
         // Actualizamos el padre inmediatamente con el valor en mayúsculas (requisito existente)
         onChange({
             target: {
                 name: nameField,
                 value: v
+            }
+        });
+        onChange({
+            target: {
+                name: idField,
+                value: ""
             }
         });
     };
@@ -98,6 +104,8 @@ export default function EmpleadoComboBox({
     const handleSelect = (emp) => {
         setFilteredEmpleados([]);
         setInputValue(emp.nombres);
+        console.log(emp.nombres)
+        console.log(emp.username)
         onChange({
             target: {
                 name: nameField,
@@ -113,7 +121,6 @@ export default function EmpleadoComboBox({
         // Mantener el foco o permitir blur? Normalmente selección cierra la lista.
         // isFocused se manejará con onBlur.
     };
-
     return (
         <div className={className}>
             <label className="block font-semibold mb-1">{label} :</label>
@@ -148,8 +155,8 @@ export default function EmpleadoComboBox({
                 )}
                 {isFocused && filteredEmpleados.length > 0 && !isLoading && (
                     <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded max-h-40 overflow-y-auto z-10 shadow-lg">
-                        {filteredEmpleados.map((emp,index) => (
-                            <li 
+                        {filteredEmpleados.map((emp, index) => (
+                            <li
                                 key={index}
                                 className="cursor-pointer px-3 py-2 hover:bg-gray-100"
                                 onMouseDown={() => handleSelect(emp)}

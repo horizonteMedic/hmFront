@@ -191,6 +191,7 @@ export default async function LGonadotropina_Digitalizado(datos = {}, docExisten
   const s1 = await getSignCompressed(datos, "SELLOFIRMA");
   const s2 = await getSignCompressed(datos, "SELLOFIRMADOCASIG");
 
+  console.log({ s1, s2 })
 
   // === CUERPO ===
   let y = finalYPos + 10;
@@ -232,45 +233,46 @@ export default async function LGonadotropina_Digitalizado(datos = {}, docExisten
   const sigY = 210;
   const gap = 16;
 
-  if (s1 && s2) {
-    const totalWidth = sigW * 2 + gap;
-    const startX = (pageW - totalWidth) / 2;
 
-    const addSelloFromUrl = (url, xPos) => {
-      return new Promise((resolve, reject) => {
-        if (!url) return resolve();
+  const totalWidth = sigW * 2 + gap;
+  const startX = (pageW - totalWidth) / 2;
+  const addSelloFromUrl = (url, xPos) => {
+    return new Promise((resolve, reject) => {
+      if (!url) return resolve();
 
-        const img = new Image();
-        img.crossOrigin = "anonymous";
+      const img = new Image();
+      img.crossOrigin = "anonymous";
 
-        img.onload = () => {
-          try {
-            const canvas = document.createElement('canvas');
-            canvas.width = img.naturalWidth;
-            canvas.height = img.naturalHeight;
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
 
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
 
-            const selloBase64 = canvas.toDataURL('image/jpeg');
-            doc.addImage(selloBase64, 'jpeg', xPos, sigY, sigW, sigH);
+          const selloBase64 = canvas.toDataURL('image/jpeg');
+          doc.addImage(selloBase64, 'jpeg', xPos, sigY, sigW, sigH);
 
-            resolve();
-          } catch (err) {
-            reject(err);
-          }
-        };
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      };
 
-        img.onerror = (e) => reject(e);
-        img.src = url;
-      });
-    };
+      img.onerror = (e) => reject(e);
+      img.src = url;
+    });
+  };
+
+  if (s1 != "" && s1 != null && s2 != "" && s2 != null) {
     await addSelloFromUrl(s1, startX);
     await addSelloFromUrl(s2, startX + sigW + gap);
-  } else if (s1) {
+  } else if (s1 != "" && s1 != null) {
     const imgX = (pageW - sigW) / 2;
     await addSelloFromUrl(s1, imgX);
-  } else if (s2) {
+  } else if (s2 != "" && s2 != null) {
     const imgX = (pageW - sigW) / 2;
     await addSelloFromUrl(s2, imgX);
   }
