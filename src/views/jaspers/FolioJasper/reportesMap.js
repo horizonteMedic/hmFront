@@ -62,6 +62,7 @@ import TestFatigaSomnolenia_Digitalizado_boro from "../Test_Fatiga/TestFatigaSom
 import EvaluacionMuscoloEsqueletica2021_Digitalizado_boro from "../MusculoEsqueletica/EvaluacionMuscoloEsqueletica2021_Digitalizado_boro";
 import EvaluacionOftalmologica2021_Digitalizado_ohla from "../Oftalmologia/EvaluacionOftalmologica/EvaluacionOftalmologica2021_Digitalizado_ohla";
 import ficha_antecedente_patologico_boro from "../AntecedentesPatologicos/ficha_antecedente_patologico_boro";
+import EvaluacionOftalmologica2021_Digitalizado_boro from "../Oftalmologia/EvaluacionOftalmologica2021_Digitalizado_boro";
 
 export const reportesMap = {
    /* =========================
@@ -178,7 +179,8 @@ export const reportesMap = {
 
    oftalmologia2021: {
       EvaluacionOftalmologica2021_Digitalizado,
-      EvaluacionOftalmologica2021_Digitalizado_ohla
+      EvaluacionOftalmologica2021_Digitalizado_ohla,
+      EvaluacionOftalmologica2021_Digitalizado_boro
    },
 
    oit: OIT_Digitalizado,

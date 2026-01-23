@@ -26,8 +26,8 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "OFTALMOLOGIA_VISION_TESTER",
-    "PSICOSENSOMETRICO_VEHI_FOLIO",
+    "OFTALMOLOGIA",
+    "FICHA_OFTALMOLOGICA",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
