@@ -404,7 +404,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         // Determinar la ruta según el nombre del jasper
         let rutaArchivo;
         if (nombre === "EvaluacionMuscoloEsqueletica2021_Digitalizado_boro") {
-          rutaArchivo = `../../../../../jaspers/MusculoEsqueletica/DigitalizadoBoro/${nombre}.jsx`;
+          rutaArchivo = `../../../../../jaspers/MusculoEsqueletica/${nombre}.jsx`;
         } else {
           rutaArchivo = `../../../../../jaspers/MusculoEsqueletica/${nombre}.jsx`;
         }

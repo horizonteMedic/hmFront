@@ -455,8 +455,8 @@ export default async function formatPsicologia_Digitalizado(data = {}, docExiste
   doc.setLineWidth(0.2);
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaSeccionFirma, 'S');
 
-  // Usar la función dibujarFirmas para dibujar las firmas
-  await dibujarFirmas({ doc, datos: data, y: yPos + 2, pageW });
+  // Usar la función dibujarFirmas para dibujar las firmas (sin firma del paciente)
+  await dibujarFirmas({ doc, datos: data, y: yPos + 2, pageW, mostrarFirmaPaciente: false });
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });

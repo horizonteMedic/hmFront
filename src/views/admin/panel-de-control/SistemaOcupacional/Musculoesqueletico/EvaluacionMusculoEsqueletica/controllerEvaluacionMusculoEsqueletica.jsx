@@ -558,20 +558,39 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
           "../../../../../jaspers/MusculoEsqueletica/**/*.jsx"
         );
         // Determinar la ruta según el nombre del jasper
-        let rutaArchivo;
         if (nombre === "EvaluacionMuscoloEsqueletica") {
-          rutaArchivo = `../../../../../jaspers/MusculoEsqueletica/Digitalizado/${nombre}.jsx`;
+          // Primera llamada: Digitalizado/EvaluacionMuscoloEsqueletica.jsx
+          const rutaArchivo1 = `../../../../../jaspers/MusculoEsqueletica/Digitalizado/${nombre}.jsx`;
+          const modulo1 = await jasperModules[rutaArchivo1]();
+          if (typeof modulo1.default === "function") {
+            await modulo1.default({ ...res, ...datosFooter });
+          } else {
+            console.error(
+              `El archivo ${nombre}.jsx no exporta una función por defecto`
+            );
+          }
+          
+          // Segunda llamada: EvaluacionMusculoEsqueletica2021_Digitalizado_boro.jsx
+          const rutaArchivo2 = `../../../../../jaspers/MusculoEsqueletica/EvaluacionMusculoEsqueletica2021_Digitalizado_boro.jsx`;
+          const modulo2 = await jasperModules[rutaArchivo2]();
+          if (typeof modulo2.default === "function") {
+            await modulo2.default({ ...res, ...datosFooter });
+          } else {
+            console.error(
+              `El archivo EvaluacionMusculoEsqueletica2021_Digitalizado_boro.jsx no exporta una función por defecto`
+            );
+          }
         } else {
-          rutaArchivo = `../../../../../jaspers/MusculoEsqueletica/${nombre}.jsx`;
-        }
-        const modulo = await jasperModules[rutaArchivo]();
-        // Ejecuta la función exportada por default con los datos
-        if (typeof modulo.default === "function") {
-          modulo.default({ ...res, ...datosFooter });
-        } else {
-          console.error(
-            `El archivo ${nombre}.jsx no exporta una función por defecto`
-          );
+          const rutaArchivo = `../../../../../jaspers/MusculoEsqueletica/${nombre}.jsx`;
+          const modulo = await jasperModules[rutaArchivo]();
+          // Ejecuta la función exportada por default con los datos
+          if (typeof modulo.default === "function") {
+            modulo.default({ ...res, ...datosFooter });
+          } else {
+            console.error(
+              `El archivo ${nombre}.jsx no exporta una función por defecto`
+            );
+          }
         }
       }
     })
