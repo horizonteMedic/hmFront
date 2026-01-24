@@ -26,7 +26,10 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "FICHA_AUDIOMETRIA",
+    "OFTALMOLOGIA",
+    "CERTIFICADO_APTITUD_ANEXO_16",  // 1
+    "ANEXO_16",                      // 2
+
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -825,7 +828,7 @@ const ExamenesListK2 = buildExamenesList([ // K2
 
     "ESPIROMETRIA_ARCHIVO",
 
-    "c",
+    "FICHA_AUDIOMETRIA",
 
     "INFORME_PSICOLOGICO",
     "INFORME_PSICOLOGIA_FOBIAS",
@@ -1059,7 +1062,7 @@ const ExamenesListAlturaSolo = buildExamenesList([ // ALTURA SOLO
 ]);
 
 const ListaPorPlantilla = {
-    // PRUEBAS: ExamenesListPRUEBAS,
+    PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     OHLA: ExamenesListOHLA,
     "OHLA ALTURA - CONDUCCION": ExamenesListOHLA1,
@@ -1223,7 +1226,7 @@ const Folio = () => {
             };
 
             // Llamar a FolioJasper con el callback de progreso
-            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress, selectedListType, controller.signal);
+            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress, selectedListType, controller.signal, form.nombres, form.apellidos);
 
             // Cerrar la alerta de carga y mostrar éxito
             Swal.fire({

@@ -63,6 +63,7 @@ import EvaluacionMuscoloEsqueletica2021_Digitalizado_boro from "../MusculoEsquel
 import EvaluacionOftalmologica2021_Digitalizado_ohla from "../Oftalmologia/EvaluacionOftalmologica2021_Digitalizado_ohla";
 import ficha_antecedente_patologico_boro from "../AntecedentesPatologicos/ficha_antecedente_patologico_boro";
 import EvaluacionOftalmologica2021_Digitalizado_boro from "../Oftalmologia/EvaluacionOftalmologica2021_Digitalizado_boro";
+import formatPsicologia_SuficienciaEspaciosC from "../ModuloPsicologia/InformeEspaciosConfinados/formatPsicologia_SuficienciaEspaciosC";
 
 export const reportesMap = {
    /* =========================
@@ -195,6 +196,8 @@ export const reportesMap = {
       PSICOLOGÍA
    ========================= */
    cuestionario_berlin: Informe_Psico_Cuestionario_Berlin,
+
+   psicologia_espacios_confinados:formatPsicologia_SuficienciaEspaciosC,
 
    ficha_psicologica_anexo03: FichaPsicologicaOcupacional_Digitalizado,
 

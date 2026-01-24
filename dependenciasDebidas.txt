@@ -1,0 +1,1 @@
+"pdfjs-dist": "^5.4.530", //se usa la version antigua debido a que no es compatible con el servidor compatido de RICHARD
