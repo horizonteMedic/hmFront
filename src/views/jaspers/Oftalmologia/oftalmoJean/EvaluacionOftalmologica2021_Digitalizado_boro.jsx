@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import header_EvaluacionOftalmologica2021_Digitalizado_boro from "./headers/header_EvaluacionOftalmologica2021_Digitalizado_boro";
+import header_EvaluacionOftalmologica2021_Digitalizado_boro from "../headers/header_EvaluacionOftalmologica2021_Digitalizado_boro.jsx";
 
 export default async function EvaluacionOftalmologica2021_Digitalizado_boro(
   data = {}, docExistente = null
@@ -983,7 +983,7 @@ export default async function EvaluacionOftalmologica2021_Digitalizado_boro(
     { nombre: "SELLOFIRMADOCASIG", x: 100, y: 235, maxw: 150 },
   ];
   await agregarFirmas(doc, data.digitalizacion, firmasAPintar)
-  
+
   if (docExistente) {
     return doc;
   } else {

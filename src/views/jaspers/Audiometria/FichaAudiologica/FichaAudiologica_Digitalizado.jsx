@@ -529,26 +529,37 @@ const drawGraficoYTablas = (doc, datos = {}, yPosInicial) => {
     { freq: 8000, db: toNumberOrNull(datos.oi8000), color: "blue", tipo: "x" },
   ];
 
+  // Vía ósea (corchetes) — mapeo correcto con guión bajo
+  const puntosOseos = [
+    // OD: [
+    { freq: 500, db: toNumberOrNull(datos.od1_500), color: "red", tipo: "bracketLeft" },
+    { freq: 1000, db: toNumberOrNull(datos.od1_1000), color: "red", tipo: "bracketLeft" },
+    { freq: 2000, db: toNumberOrNull(datos.od1_2000), color: "red", tipo: "bracketLeft" },
+    { freq: 3000, db: toNumberOrNull(datos.od1_3000), color: "red", tipo: "bracketLeft" },
+    { freq: 4000, db: toNumberOrNull(datos.od1_4000), color: "red", tipo: "bracketLeft" },
+    { freq: 6000, db: toNumberOrNull(datos.od1_6000), color: "red", tipo: "bracketLeft" },
+    { freq: 8000, db: toNumberOrNull(datos.od1_8000), color: "red", tipo: "bracketLeft" },
+
+    // OI: ]
+    { freq: 500, db: toNumberOrNull(datos.oi1_500), color: "blue", tipo: "bracketRight" },
+    { freq: 1000, db: toNumberOrNull(datos.oi1_1000), color: "blue", tipo: "bracketRight" },
+    { freq: 2000, db: toNumberOrNull(datos.oi1_2000), color: "blue", tipo: "bracketRight" },
+    { freq: 3000, db: toNumberOrNull(datos.oi1_3000), color: "blue", tipo: "bracketRight" },
+    { freq: 4000, db: toNumberOrNull(datos.oi1_4000), color: "blue", tipo: "bracketRight" },
+    { freq: 6000, db: toNumberOrNull(datos.oi1_6000), color: "blue", tipo: "bracketRight" },
+    { freq: 8000, db: toNumberOrNull(datos.oi1_8000), color: "blue", tipo: "bracketRight" },
+  ].filter((p) => p.db !== null);
+
+  puntos.push(...puntosOseos);
+
   // Conectar puntos por tipo/color
-  const tipos = [
-    { tipo: "circle", color: "red" },
-    { tipo: "x", color: "blue" },
-  ];
-  const prevLineWidth = doc.getLineWidth();
-  tipos.forEach(({ tipo, color }) => {
+  const drawSeries = (tipo, rgb) => {
     const pts = puntos
-      .filter((p) => p.tipo === tipo && p.color === color && p.db !== null)
+      .filter((p) => p.tipo === tipo && p.db !== null)
       .sort((a, b) => a.freq - b.freq);
     if (pts.length < 2) return;
-
-    if (color === "red") {
-      doc.setLineWidth(0.95);
-      doc.setDrawColor(255, 0, 0);
-    } else {
-      doc.setLineWidth(0.4);
-      doc.setDrawColor(0, 0, 255);
-    }
-
+    doc.setDrawColor(...rgb);
+    doc.setLineWidth(tipo === "circle" ? 0.95 : 0.4);
     let prev = null;
     pts.forEach((p) => {
       const freqIdx = freqs.indexOf(p.freq);
@@ -558,9 +569,13 @@ const drawGraficoYTablas = (doc, datos = {}, yPosInicial) => {
       if (prev) doc.line(prev.x, prev.y, x, y);
       prev = { x, y };
     });
-  });
-  doc.setLineWidth(prevLineWidth);
-  doc.setDrawColor(0, 0, 0);
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
+  };
+  
+  // Dibujar líneas de conexión solo para círculos y X (NO para corchetes)
+  drawSeries("circle", [255, 0, 0]);
+  drawSeries("x", [0, 0, 255]);
 
   // Dibujar símbolos
   puntos.forEach((p) => {
@@ -572,14 +587,31 @@ const drawGraficoYTablas = (doc, datos = {}, yPosInicial) => {
 
     if (p.color === "red") doc.setDrawColor(255, 0, 0);
     if (p.color === "blue") doc.setDrawColor(0, 0, 255);
-    doc.setLineWidth(0.4);
-
+    
     if (p.tipo === "circle") {
+      doc.setLineWidth(0.4);
       doc.circle(x, y, 1.0);
-    } else {
+    } else if (p.tipo === "x") {
+      doc.setLineWidth(0.4);
       const size = 2;
       doc.line(x - size / 2, y - size / 2, x + size / 2, y + size / 2);
       doc.line(x - size / 2, y + size / 2, x + size / 2, y - size / 2);
+    } else if (p.tipo === "bracketLeft") {
+      // [
+      doc.setLineWidth(0.5);
+      const w = 2.4;
+      const h = 3.6;
+      doc.line(x - w / 2, y - h / 2, x - w / 2, y + h / 2);
+      doc.line(x - w / 2, y - h / 2, x + w / 2, y - h / 2);
+      doc.line(x - w / 2, y + h / 2, x + w / 2, y + h / 2);
+    } else if (p.tipo === "bracketRight") {
+      // ]
+      doc.setLineWidth(0.5);
+      const w = 2.4;
+      const h = 3.6;
+      doc.line(x + w / 2, y - h / 2, x + w / 2, y + h / 2);
+      doc.line(x - w / 2, y - h / 2, x + w / 2, y - h / 2);
+      doc.line(x - w / 2, y + h / 2, x + w / 2, y + h / 2);
     }
     doc.setDrawColor(0, 0, 0);
   });

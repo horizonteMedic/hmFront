@@ -2,12 +2,14 @@ import jsPDF from "jspdf";
 import { getFetch } from "../../utils/apiHelpers";
 import { reportesMap } from "./reportesMap";
 import { PDFDocument } from "pdf-lib";
-import * as pdfjsLib from "pdfjs-dist";
-import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
+// import * as pdfjsLib from "pdfjs-dist";
+// import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+// pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
-export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType, signal) {
+import pdfjsLib from "../../config/pdjfConfig";
+
+export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType, signal, nombres = "", apellidos = "") {
     if (signal?.aborted) throw new DOMException("Aborted", "AbortError");//para poder cancelar la gereracion
 
     const pdfFinal = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true, precision: 1 });
@@ -312,7 +314,11 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
     const baseBytes = pdfFinalBytes instanceof Uint8Array ? pdfFinalBytes : new Uint8Array(pdfFinalBytes);
     const rasterizedBytes = await rasterizeAndCompressPdf(baseBytes);
 
-    descargarPdf(rasterizedBytes, `Folio_${nro}.pdf`);
+    const nombreArchivo = (nombres && apellidos)
+        ? `${nro} - ${apellidos.toUpperCase()} ${nombres.toUpperCase()}.pdf`
+        : `Folio_${nro}.pdf`;
+
+    descargarPdf(rasterizedBytes, nombreArchivo);
     imprimirBytes(rasterizedBytes);
 }
 
@@ -435,7 +441,7 @@ async function rasterizeAndCompressPdf(pdfBytes) {
     const mmPerPt = 25.4 / 72;
     const A4_WIDTH_MM = 210;
     const A4_HEIGHT_MM = 297;
-    const SCALE = 2.3;           // 🔥 DPI alto para texto nítido
+    const SCALE = 2.2;           // 🔥 DPI alto para texto nítido
     const JPEG_QUALITY = 0.65;   // 🔥 Compresión fuerte sin borrosidad
 
     let doc = null;

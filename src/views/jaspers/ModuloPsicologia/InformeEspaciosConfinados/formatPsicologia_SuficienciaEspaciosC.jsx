@@ -6,8 +6,8 @@ import { convertirGenero } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
 import { dibujarFirmas } from '../../../utils/dibujarFirmas.js';
 
-export default async function formatPsicologia_SuficienciaEspaciosC(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function formatPsicologia_SuficienciaEspaciosC(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   // Contador de páginas dinámico
   let numeroPagina = 1;
@@ -32,7 +32,7 @@ export default async function formatPsicologia_SuficienciaEspaciosC(data = {}) {
       color: Number(raw?.color ?? 0),
       codigoColor: String(raw?.codigoColor ?? ''),
       textoColor: String(raw?.textoColor ?? ''),
-      
+
       // Resultados y conclusiones
       apto: (typeof raw?.apto === 'boolean') ? raw.apto : false,
       analisisResultados: String(raw?.analisis ?? raw?.analisisResultados ?? ''),
@@ -657,8 +657,11 @@ export default async function formatPsicologia_SuficienciaEspaciosC(data = {}) {
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 5 });
 
-  // Imprimir
-  imprimir(doc);
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {

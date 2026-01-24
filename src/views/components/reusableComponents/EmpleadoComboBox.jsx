@@ -21,13 +21,13 @@ export default function EmpleadoComboBox({
 
     // Sincronizar el estado local con el prop value si cambia externamente
     useEffect(() => {
-        if (value !== undefined) {
+        if (value !== undefined && !isFocused) {
             const valStr = value || "";
             if (valStr !== inputValue) {
                 setInputValue(valStr);
             }
         }
-    }, [value]);
+    }, [value, isFocused]);
 
     const filterEmpleados = (query) => {
         if (!query) return safeEmpleados;
@@ -68,14 +68,39 @@ export default function EmpleadoComboBox({
     const handleSearch = (e) => {
         const v = e.target.value.toUpperCase();
         setInputValue(v);
-        
-        // Actualizamos el padre inmediatamente con el valor en mayúsculas (requisito existente)
-        onChange({
-            target: {
-                name: nameField,
-                value: v
-            }
-        });
+
+        // Buscar coincidencia exacta
+        const exactMatch = safeEmpleados.find(
+            (emp) => (emp.nombres || "").toUpperCase() === v
+        );
+
+        if (exactMatch) {
+            onChange({
+                target: {
+                    name: nameField,
+                    value: exactMatch.nombres
+                }
+            });
+            onChange({
+                target: {
+                    name: idField,
+                    value: exactMatch.username
+                }
+            });
+        } else {
+            onChange({
+                target: {
+                    name: nameField,
+                    value: ""
+                }
+            });
+            onChange({
+                target: {
+                    name: idField,
+                    value: ""
+                }
+            });
+        }
     };
 
     useEffect(() => {
@@ -148,8 +173,8 @@ export default function EmpleadoComboBox({
                 )}
                 {isFocused && filteredEmpleados.length > 0 && !isLoading && (
                     <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded max-h-40 overflow-y-auto z-10 shadow-lg">
-                        {filteredEmpleados.map((emp,index) => (
-                            <li 
+                        {filteredEmpleados.map((emp, index) => (
+                            <li
                                 key={index}
                                 className="cursor-pointer px-3 py-2 hover:bg-gray-100"
                                 onMouseDown={() => handleSelect(emp)}
