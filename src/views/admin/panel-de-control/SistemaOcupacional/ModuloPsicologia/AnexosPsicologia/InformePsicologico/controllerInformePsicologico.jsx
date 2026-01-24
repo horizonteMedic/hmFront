@@ -67,7 +67,7 @@ export const GetInfoServicio = async (
             infogeneral: (res.areaIntelectual ?? "").includes("- COMPRENDE Y PROCESA LA INFORMACION CON FACILIDAD."),
 
             compInfo: (res.areaIntelectual ?? "").includes("- COMPRENDE Y PROCESA LA INFORMACION SENCILLA CON FACILIDAD."),
-            compBajo: (res.areaIntelectual ?? "").includes("- POSEE UN NIVEL PROMEDIO BAJO EN EL MANEJO DE FACULTADES MENTALES."),
+            // compBajo: (res.areaIntelectual ?? "").includes("- POSEE UN NIVEL PROMEDIO BAJO EN EL MANEJO DE FACULTADES MENTALES."),
 
             supVerbalNum: (res.areaIntelectual ?? "").includes("- POSEE UN NIVEL SUPERIOR EN COMPRENSION VERBAL Y EN CAPACIDAD NUMÉRICA."),
             promVerbalNum: (res.areaIntelectual ?? "").includes("- POSEE UN NIVEL PROMEDIO EN COMPRENSION VERBAL Y EN CAPACIDAD NUMÉRICA."),

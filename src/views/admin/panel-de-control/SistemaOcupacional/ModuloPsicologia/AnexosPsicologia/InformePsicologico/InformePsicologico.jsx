@@ -41,9 +41,9 @@ export default function InformePsicologico() {
         cargoDesempenar: "",
 
         // Área Intelectual
-        areaIntelectual: "EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO.",
+        areaIntelectual: "- EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO.",
         intelectualSuperior: false,
-        intelectualPromedio: false,
+        intelectualPromedio: true,
         intelectualPromedioSuperior: false,
         intelectualPromedioBajo: false,
 
@@ -56,7 +56,7 @@ export default function InformePsicologico() {
         infogeneral: false,
 
         compInfo: false,
-        compBajo: false,
+        // compBajo: false,
 
         supVerbalNum: false,
         promVerbalNum: false,
@@ -145,7 +145,7 @@ export default function InformePsicologico() {
         facilidadDificultad: ['infosencilla', 'infogeneral'],
         capacidadNumerica: ['supVerbalNum', 'promVerbalNum', 'promSupVerbalNum', 'promBajoVerbalNum'],
         nivelPsicomotor: ['promSuperior', 'promedio', 'superior', 'promBajo'],
-        nivelAtencion: ['compInfo', 'compBajo'],
+        nivelAtencion: ['compInfo'], //, 'compBajo'
         retencionDigitos: ['adecuado', 'prmBajo']
     };
 
@@ -170,7 +170,7 @@ export default function InformePsicologico() {
         promBajo: "- POSEE UN NIVEL PROMEDIO BAJO EN COMPRENSION VERBAL Y EN CAPACIDAD DE CÁLCULO.",
 
         compInfo: "- COMPRENDE Y PROCESA LA INFORMACION SENCILLA CON FACILIDAD.",
-        compBajo: "- POSEE UN NIVEL PROMEDIO BAJO EN EL MANEJO DE FACULTADES MENTALES.",
+        // compBajo: "- POSEE UN NIVEL PROMEDIO BAJO EN EL MANEJO DE FACULTADES MENTALES.",
  
         adecuado: "- ADECUADA RETENCION DE DIGITOS.",
         prmBajo: "- PRESENTA UN NIVEL PROMEDIO BAJO RETENCION DE DIGITOS."
@@ -551,12 +551,12 @@ export default function InformePsicologico() {
                                         checked={form.compInfo}
                                         onChange={handleIntellectualCheckboxChange}
                                     />
-                                    <InputCheckbox
+                                    {/* <InputCheckbox
                                         label="PROMEDIO BAJO"
                                         name="compBajo"
                                         checked={form.compBajo}
                                         onChange={handleIntellectualCheckboxChange}
-                                    />
+                                    /> */}
                                 </SectionFieldset>
                                 <SectionFieldset>
                                     <InputCheckbox

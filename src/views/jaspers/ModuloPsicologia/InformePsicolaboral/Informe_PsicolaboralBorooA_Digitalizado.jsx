@@ -6,8 +6,8 @@ import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import footerTR from '../../components/footerTR.jsx';
 import { dibujarFirmas } from '../../../utils/dibujarFirmas.js';
 
-export default async function Informe_PsicolaboralBorooA_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function Informe_PsicolaboralBorooA_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
@@ -543,11 +543,11 @@ export default async function Informe_PsicolaboralBorooA_Digitalizado(data = {})
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(String(numero), tablaInicioX + 2, yPos + 3.5);
     doc.text(aspecto.descripcion, tablaInicioX + colNumeroConductual + 2, yPos + 3.5);
-    
+
     const anchoColumnaValor = tablaAncho - (colNumeroConductual + colDescripcionConductual) - 4;
     const xValor = tablaInicioX + colNumeroConductual + colDescripcionConductual + 2;
     const yInicioValor = yPos + 3;
-    
+
     doc.setFont("helvetica", "normal").setFontSize(8);
     let yFinalValor = dibujarTextoConSaltoLinea(String(aspecto.valor), xValor, yInicioValor, anchoColumnaValor);
 
@@ -557,7 +557,7 @@ export default async function Informe_PsicolaboralBorooA_Digitalizado(data = {})
       numeroPagina++;
       yPos = 45;
       await drawHeader(numeroPagina);
-      
+
       doc.setDrawColor(0, 0, 0);
       doc.setLineWidth(0.2);
       doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
@@ -565,11 +565,11 @@ export default async function Informe_PsicolaboralBorooA_Digitalizado(data = {})
       doc.line(tablaInicioX + colNumeroConductual + colDescripcionConductual, yPos, tablaInicioX + colNumeroConductual + colDescripcionConductual, yPos + filaAltura);
       doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
       doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-      
+
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text(String(numero), tablaInicioX + 2, yPos + 3.5);
       doc.text(aspecto.descripcion, tablaInicioX + colNumeroConductual + 2, yPos + 3.5);
-      
+
       doc.setFont("helvetica", "normal").setFontSize(8);
       yFinalValor = dibujarTextoConSaltoLinea(String(aspecto.valor), xValor, yPos + 3, anchoColumnaValor);
     }
@@ -890,7 +890,11 @@ export default async function Informe_PsicolaboralBorooA_Digitalizado(data = {})
   footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
 
   // === Imprimir ===
-  imprimir(doc);
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {
