@@ -400,13 +400,6 @@ export const EXAMENES_CATALOGO = {
         esJasper: true
     },
 
-    CUESTIONARIO_BERLIN: {
-        nombre: "CUESTIONARIO BERLIN",
-        tabla: "cuestionario_berlin",
-        url: "/api/v01/ct/cuestionarioBerlin/obtenerReporte",
-        esJasper: true
-    },
-
     ESPACIOS_CONFINADOS_PSICOLOGIA: {
         nombre: "ESPACIOS CONFINADOS PSICOLOGIA",
         tabla: "psicologia_espacios_confinados",

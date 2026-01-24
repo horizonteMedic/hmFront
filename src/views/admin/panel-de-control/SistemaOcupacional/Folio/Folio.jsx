@@ -1062,7 +1062,7 @@ const ExamenesListAlturaSolo = buildExamenesList([ // ALTURA SOLO
 ]);
 
 const ListaPorPlantilla = {
-    PRUEBAS: ExamenesListPRUEBAS,
+    // PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     OHLA: ExamenesListOHLA,
     "OHLA ALTURA - CONDUCCION": ExamenesListOHLA1,
@@ -1396,9 +1396,9 @@ const Folio = () => {
 
             {/* ===== SECCIÓN: EXAMENES ===== */}
             <SectionFieldset legend="Examenes" className="flex flex-col justify-center items-center w-full">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+                <div className="columns-1 sm:columns-2 lg:columns-4 gap-4 w-full">
                     {form.listaExamenes?.map((examen, index) => (
-                        <div key={index} className="flex justify-between items-center border p-3 rounded-md shadow-sm bg-white gap-2">
+                        <div key={index} className="break-inside-avoid mb-4 flex justify-between items-center border p-3 rounded-md shadow-sm bg-white gap-2 h-24">
                             <div className="flex items-center gap-2">
                                 <input
                                     type="checkbox"
@@ -1407,7 +1407,7 @@ const Folio = () => {
                                     disabled={!examen.resultado}
                                     className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
                                 />
-                                <span className="font-medium text-gray-700 text-sm whitespace-normal break-words max-w-[150px] cursor-pointer" onClick={() => toggleExamen(index)}>
+                                <span className="font-medium text-gray-700 text-sm whitespace-normal break-words max-w-[150px] cursor-pointer line-clamp-3" onClick={() => toggleExamen(index)}>
                                     {index + 1}.- {examen.nombre}
                                 </span>
                             </div>
