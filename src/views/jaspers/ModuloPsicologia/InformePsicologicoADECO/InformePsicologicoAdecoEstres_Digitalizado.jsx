@@ -62,7 +62,7 @@ export default async function InformePsicologicoAdecoEstres_Digitalizado(data = 
     // Títulos
     doc.setFont("helvetica", "bold").setFontSize(13);
     doc.setTextColor(0, 0, 0);
-    doc.text("INF. PSIC. – ESTRÉS/ FATIGA Y SOMNOLENCIA", pageW / 2, 35, { align: "center" });
+    doc.text(`${datosFinales.nombreExamen}`, pageW / 2, 35, { align: "center" });
 
     // Número de Ficha, Sede, Fecha y Página
     doc.setFont("helvetica", "normal").setFontSize(9);

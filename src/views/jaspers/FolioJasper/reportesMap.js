@@ -64,6 +64,9 @@ import EvaluacionOftalmologica2021_Digitalizado_ohla from "../Oftalmologia/Evalu
 import ficha_antecedente_patologico_boro from "../AntecedentesPatologicos/ficha_antecedente_patologico_boro";
 import EvaluacionOftalmologica2021_Digitalizado_boro from "../Oftalmologia/EvaluacionOftalmologica2021_Digitalizado_boro";
 import formatPsicologia_SuficienciaEspaciosC from "../ModuloPsicologia/InformeEspaciosConfinados/formatPsicologia_SuficienciaEspaciosC";
+import Informe_PsicolaboralBorooA_Digitalizado from "../ModuloPsicologia/InformePsicolaboral/Informe_PsicolaboralBorooA_Digitalizado";
+import Aptitud_medico_ocupacional_11 from "../Ficha_Anexo16/Aptitud_medico_ocupacional_11"
+
 
 export const reportesMap = {
    /* =========================
@@ -82,7 +85,10 @@ export const reportesMap = {
 
    aptitud_medico_ocupacional_agro: Aptitud_AgroindustrialH,
 
-   certificado_aptitud_medico_ocupacional: Aptitud_Agroindustrial,
+   certificado_aptitud_medico_ocupacional: {
+      Aptitud_medico_ocupacional_11,
+      Aptitud_Agroindustrial
+   }, //son 2 jaspers
 
    certificado_aptitud_medico_resumen: Aptitud_medico_resumen_Digitalizado,
 
@@ -197,7 +203,7 @@ export const reportesMap = {
    ========================= */
    cuestionario_berlin: Informe_Psico_Cuestionario_Berlin,
 
-   psicologia_espacios_confinados:formatPsicologia_SuficienciaEspaciosC,
+   psicologia_espacios_confinados: formatPsicologia_SuficienciaEspaciosC,
 
    ficha_psicologica_anexo03: FichaPsicologicaOcupacional_Digitalizado,
 
@@ -209,7 +215,10 @@ export const reportesMap = {
 
    fobias: INFORME_ADICIONAL_DE_FOBIAS_Digitalizado,
 
-   informe_psicolaboral: Informe_PsicolaboralBoroo_Digitalizado,
+   informe_psicolaboral: {
+      Informe_PsicolaboralBoroo_Digitalizado,
+      Informe_PsicolaboralBorooA_Digitalizado
+   }, // pedir que backend envie correctamente namejasper
 
    especificos: TRABAJOS_EN_ESPECIFICO_Digitalizado,
 

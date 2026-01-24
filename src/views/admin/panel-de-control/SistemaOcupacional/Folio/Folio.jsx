@@ -26,10 +26,8 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "OFTALMOLOGIA",
-    "CERTIFICADO_APTITUD_ANEXO_16",  // 1
-    "ANEXO_16",                      // 2
-
+    "CERTIFICADO_APTITUD_ANEXO_16",
+    "INFORME_PSICOLABORAL"
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -1062,7 +1060,7 @@ const ExamenesListAlturaSolo = buildExamenesList([ // ALTURA SOLO
 ]);
 
 const ListaPorPlantilla = {
-    // PRUEBAS: ExamenesListPRUEBAS,
+    PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     OHLA: ExamenesListOHLA,
     "OHLA ALTURA - CONDUCCION": ExamenesListOHLA1,
