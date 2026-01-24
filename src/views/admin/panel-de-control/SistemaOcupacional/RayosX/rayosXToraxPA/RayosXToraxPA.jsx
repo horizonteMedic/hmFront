@@ -26,6 +26,7 @@ import TablaTemplate from "../../../../../components/templates/TablaTemplate";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import ButtonsPDF from "../../../../../components/reusableComponents/ButtonsPDF";
+import { handleSubirArchivo2 } from "../rayosXColumna/controllerRayosXColumna";
 
 const tabla = "radiografia_torax";
 
@@ -162,7 +163,7 @@ export default function RayosXToraxPA() {
           />
           {form.SubirDoc &&
             <ButtonsPDF
-              handleSave={() => { handleSubirArchivo(form, selectedSede, userlogued, token) }}
+              handleSave={() => { handleSubirArchivo2(form, selectedSede, userlogued, token, form.nomenclatura) }}
               handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token) }}
             />
           }
