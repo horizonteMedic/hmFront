@@ -21,13 +21,19 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
     "PSICOSENSOMETRICO_CERT_ALTURA", //Tiene firma
     "PSICOSENSOMETRICO_VEHI_FOLIO", //Tiene firma
     "RADIOGRAFIA_COLUMNA_ARCHIVO",
+    "RADIOGRAFIA_COLUMNA_ARCHIVO2",
     "RAYOS_X_TORAX_ARCHIVO",
     "INTERCONSULTAS"
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "CERTIFICADO_APTITUD_ANEXO_16",
-    "INFORME_PSICOLABORAL"
+    "RESUMEN_MEDICO_PODEROSA",
+    "CERTIFICADO_ALTURA",
+    "RAYOS_X_TORAX_ARCHIVO",
+    "ANEXO_16",
+    "RADIOGRAFIA_COLUMNA_ARCHIVO",
+    "RADIOGRAFIA_COLUMNA_ARCHIVO2",
+
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -78,6 +84,7 @@ const ExamenesListOHLA = buildExamenesList([       //OHLA
     "RAYOS_X_TORAX_ARCHIVO",                   // 22
     "RADIOGRAFIA_COLUMNA",                     // 23
     "RADIOGRAFIA_COLUMNA_ARCHIVO",             // 24
+    "RADIOGRAFIA_COLUMNA_ARCHIVO2",             // 24
     "ELECTROCARDIOGRAMA",                      // 25
     "ESPIROMETRIA_ARCHIVO",                    // 26
     "AUDIOMETRIA_OHLA",                        // 27
@@ -119,6 +126,7 @@ const ExamenesListOHLA1 = buildExamenesList([       //OHLA 1
     "RAYOS_X_TORAX_ARCHIVO",
     "RADIOGRAFIA_COLUMNA",
     "RADIOGRAFIA_COLUMNA_ARCHIVO",
+    "RADIOGRAFIA_COLUMNA_ARCHIVO2",
     "ELECTROCARDIOGRAMA",
     "ELECTROCARDIOGRAMA_ARCHIVO",
     "ESPIROMETRIA_ARCHIVO",
@@ -569,6 +577,7 @@ const ExamenesListMinerosDelNorte = buildExamenesList([ // MINEROS DEL NORTE
 
     "RADIOGRAFIA_COLUMNA",
     "RADIOGRAFIA_COLUMNA_ARCHIVO",
+    "RADIOGRAFIA_COLUMNA_ARCHIVO2",
 
     "ELECTROCARDIOGRAMA",
     "ELECTROCARDIOGRAMA_ARCHIVO",
@@ -823,6 +832,7 @@ const ExamenesListK2 = buildExamenesList([ // K2
     "RAYOS_X_TORAX_ARCHIVO",
     "RADIOGRAFIA_COLUMNA",
     "RADIOGRAFIA_COLUMNA_ARCHIVO",
+    "RADIOGRAFIA_COLUMNA_ARCHIVO2",
 
     "ESPIROMETRIA_ARCHIVO",
 
@@ -1060,7 +1070,7 @@ const ExamenesListAlturaSolo = buildExamenesList([ // ALTURA SOLO
 ]);
 
 const ListaPorPlantilla = {
-    // PRUEBAS: ExamenesListPRUEBAS,
+    //PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     OHLA: ExamenesListOHLA,
     "OHLA ALTURA - CONDUCCION": ExamenesListOHLA1,
