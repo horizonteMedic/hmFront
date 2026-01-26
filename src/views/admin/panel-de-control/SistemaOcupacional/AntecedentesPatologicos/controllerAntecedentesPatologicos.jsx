@@ -27,6 +27,17 @@ export const GetInfoServicio = async (
         onFinish
     );
     if (res) {
+        let presion_sistolica = parseFloat(res.sistolica);
+        let presion_diastolica = parseFloat(res.diastolica);
+        let hipertension = false;
+        if (!isNaN(presion_sistolica) && !isNaN(presion_diastolica) &&
+            (presion_sistolica >= 140 || presion_diastolica >= 90)) {
+            // concatenacionObservacion += "HTA NO CONTROLADA.\n";
+            hipertension = true;
+        }
+
+        const medicamentosAnexo16A = res.medicamentosAnexo16A ?? "";
+
         set((prev) => ({
             ...prev,
             norden: res.n_orden,
@@ -35,6 +46,8 @@ export const GetInfoServicio = async (
             sexo: res.sexo_sexo_pa == "M" ? "MASCULINO" : "FEMENINO",
             edad: res.edad_edad + " AÑOS",
             boroo: res.esBoro ?? false,
+
+            hipertensionArterial: hipertension,
 
             enfermedadesOculares: res.enfermedadesocularesoftalmo_e_oculares,
             enfOculares: (res.enfermedadesocularesoftalmo_e_oculares || "") != "" && !(res.enfermedadesocularesoftalmo_e_oculares || "").includes("NINGUNA"),
@@ -53,6 +66,9 @@ export const GetInfoServicio = async (
             cocainaRed: (res.cocainaLaboratorioClinico_txtcocaina ?? "") == "POSITIVO",
             marihuana: res.marihuanaLaboratorioClinico_txtmarihuana,
             marihuanaRed: (res.marihuanaLaboratorioClinico_txtmarihuana ?? "") == "POSITIVO",
+
+            medicamentos: medicamentosAnexo16A != "",
+            especifiqueMedicamentos: medicamentosAnexo16A,
 
             antecedentes: res.antecedentesPatologicosQuirurjicos.map((item) => ({
                 codAntecedentesPatologicosQuirurgicos: item.codAntecedentesPatologicosQuirurgicos,
@@ -345,6 +361,8 @@ export const GetInfoServicioEditar = async (
             hijos: res.hijosEspecifiqueBoro_hijos_detall,
             esposaConyuge: res.esposConyEspecifiqueBoro_espos_cony_detall,
             carnetConadis: res.conadisEspecifiqueBoro_conadisdetalle,
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -582,6 +600,8 @@ export const SubmitDataService = async (
         eliminarPatologicosQuirurjicos:
             form.codigoAntecedentesPatologicos_cod_ap ? form.antecedentesEliminados : null,
         userRegistro: user,
+
+        usuarioFirma: form.user_medicoFirma,
     };
     console.log(body)
 

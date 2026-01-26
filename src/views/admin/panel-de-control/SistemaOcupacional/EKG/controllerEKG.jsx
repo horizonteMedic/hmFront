@@ -2,8 +2,10 @@ import Swal from "sweetalert2";
 import {
   GetInfoPacDefault,
   GetInfoServicioDefault,
+  handleSubirArchivoDefaultSinSellos,
   LoadingDefault,
   PrintHojaRDefault,
+  ReadArchivosFormDefault,
   SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../utils/functionUtils";
@@ -16,6 +18,9 @@ const registrarUrl =
   "/api/v01/ct/electroCardiograma/registrarActualizarInformeElectroCardiograma";
 const obtenerReporteInfoTablaUrl =
   "/api/v01/ct/electroCardiograma/obtenerElectroCardiogramaPorFiltros";
+const registrarPDF =
+  "/api/v01/ct/archivos/archivoInterconsulta"
+
 
 export const GetInfoServicio = async (
   nro,
@@ -71,6 +76,8 @@ export const GetInfoServicio = async (
       recomendaciones: res.recomendaciones ?? "",
 
       user_medicoFirma: res.usuarioFirma,
+      SubirDoc: true,
+      digitalizacion: res.digitalizacion
     }));
   }
 };
@@ -201,3 +208,10 @@ export const getInfoTabla = (
 export const Loading = (mensaje) => {
   LoadingDefault(mensaje);
 };
+export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
+  handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
+};
+
+export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
+  ReadArchivosFormDefault(form, setVisualerOpen, token)
+}

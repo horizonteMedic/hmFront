@@ -5,8 +5,8 @@ import drawColorBox from '../../components/ColorBox.jsx';
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import footerTR from '../../components/footerTR.jsx';
 
-export default async function Informe_PsicolaboralBoroo_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function Informe_PsicolaboralBoroo_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
@@ -576,54 +576,72 @@ export default async function Informe_PsicolaboralBoroo_Digitalizado(data = {}) 
     doc.text(String(numero), tablaInicioX + 2, yPos + 3.5);
     // Descripción del aspecto a la izquierda
     doc.text(aspecto.descripcion, tablaInicioX + colNumeroConductual + 2, yPos + 3.5);
-    
-    // Valor con salto de línea (usar función para texto largo)
-    const anchoColumnaValor = tablaAncho - (colNumeroConductual + colDescripcionConductual) - 4; // Ancho disponible menos márgenes
+
+    // Valor - verificar si necesita múltiples líneas
+    const valorTexto = String(aspecto.valor || "-");
+    const anchoColumnaValor = tablaAncho - (colNumeroConductual + colDescripcionConductual) - 4;
     const xValor = tablaInicioX + colNumeroConductual + colDescripcionConductual + 2;
-    const yInicioValor = yPos + 3;
     
+    // Calcular si el texto cabe en una línea
     doc.setFont("helvetica", "normal").setFontSize(8);
-    let yFinalValor = dibujarTextoConSaltoLinea(String(aspecto.valor), xValor, yInicioValor, anchoColumnaValor);
-
-    // Verificar si necesitamos nueva página durante el dibujado del valor
-    const alturaMaximaValor = pageHeight - yPos - 25; // 25mm para footer y margen
-    if (yFinalValor - yPos > alturaMaximaValor) {
-      // Texto muy largo, necesitamos nueva página
-      doc.addPage();
-      numeroPagina++;
-      yPos = 45;
-      await drawHeader(numeroPagina);
+    const anchoTexto = doc.getTextWidth(valorTexto);
+    const necesitaMultiplesLineas = anchoTexto > anchoColumnaValor;
+    
+    let alturaRealFila = filaAltura; // Por defecto 4.5mm
+    
+    if (necesitaMultiplesLineas) {
+      // Calcular altura necesaria ANTES de dibujar
+      const lineasValor = doc.splitTextToSize(valorTexto, anchoColumnaValor);
+      const interlineado = 8 * 0.35; // ~2.8mm por línea
+      const alturaTexto = (lineasValor.length * interlineado) + 1; // +1mm padding
+      alturaRealFila = Math.max(filaAltura, alturaTexto);
       
-      // Redibujar bordes en nueva página
-      doc.setDrawColor(0, 0, 0);
-      doc.setLineWidth(0.2);
-      doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-      doc.line(tablaInicioX + colNumeroConductual, yPos, tablaInicioX + colNumeroConductual, yPos + filaAltura);
-      doc.line(tablaInicioX + colNumeroConductual + colDescripcionConductual, yPos, tablaInicioX + colNumeroConductual + colDescripcionConductual, yPos + filaAltura);
-      doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-      doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-      
-      // Redibujar número y descripción
-      doc.setFont("helvetica", "normal").setFontSize(8);
-      doc.text(String(numero), tablaInicioX + 2, yPos + 3.5);
-      doc.text(aspecto.descripcion, tablaInicioX + colNumeroConductual + 2, yPos + 3.5);
-      
-      // Redibujar valor en nueva página
-      doc.setFont("helvetica", "normal").setFontSize(8);
-      yFinalValor = dibujarTextoConSaltoLinea(String(aspecto.valor), xValor, yPos + 3, anchoColumnaValor);
+      // Verificar si necesitamos nueva página
+      if (yPos + alturaRealFila > pageHeight - 25) {
+        doc.addPage();
+        numeroPagina++;
+        yPos = 45;
+        await drawHeader(numeroPagina);
+        
+        // Redibujar bordes en nueva página
+        doc.setDrawColor(0, 0, 0);
+        doc.setLineWidth(0.2);
+        doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRealFila);
+        doc.line(tablaInicioX + colNumeroConductual, yPos, tablaInicioX + colNumeroConductual, yPos + alturaRealFila);
+        doc.line(tablaInicioX + colNumeroConductual + colDescripcionConductual, yPos, tablaInicioX + colNumeroConductual + colDescripcionConductual, yPos + alturaRealFila);
+        doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRealFila);
+        doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+        doc.line(tablaInicioX, yPos + alturaRealFila, tablaInicioX + tablaAncho, yPos + alturaRealFila);
+        
+        // Redibujar número y descripción
+        doc.setFont("helvetica", "normal").setFontSize(8);
+        doc.text(String(numero), tablaInicioX + 2, yPos + 3.5);
+        doc.text(aspecto.descripcion, tablaInicioX + colNumeroConductual + 2, yPos + 3.5);
+        
+        // Dibujar valor en múltiples líneas
+        doc.setFont("helvetica", "normal").setFontSize(8);
+        lineasValor.forEach((linea, idx) => {
+          doc.text(linea, xValor, yPos + 2.5 + (idx * interlineado));
+        });
+      } else {
+        // Redibujar bordes con altura correcta
+        doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRealFila);
+        doc.line(tablaInicioX + colNumeroConductual, yPos, tablaInicioX + colNumeroConductual, yPos + alturaRealFila);
+        doc.line(tablaInicioX + colNumeroConductual + colDescripcionConductual, yPos, tablaInicioX + colNumeroConductual + colDescripcionConductual, yPos + alturaRealFila);
+        doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRealFila);
+        doc.line(tablaInicioX, yPos + alturaRealFila, tablaInicioX + tablaAncho, yPos + alturaRealFila);
+        
+        // Dibujar valor en múltiples líneas
+        doc.setFont("helvetica", "normal").setFontSize(8);
+        lineasValor.forEach((linea, idx) => {
+          doc.text(linea, xValor, yPos + 2.5 + (idx * interlineado));
+        });
+      }
+    } else {
+      // Texto cabe en una línea - usar altura fija de 4.5mm
+      doc.text(valorTexto, xValor, yPos + 3.5);
+      doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
     }
-
-    // Calcular altura real de la fila basándose en el contenido
-    const alturaNecesaria = yFinalValor - yPos;
-    const alturaMinimaFila = filaAltura;
-    const alturaRealFila = Math.max(alturaMinimaFila, alturaNecesaria + 2);
-
-    // Redibujar los bordes con la altura correcta
-    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRealFila);
-    doc.line(tablaInicioX + colNumeroConductual, yPos, tablaInicioX + colNumeroConductual, yPos + alturaRealFila);
-    doc.line(tablaInicioX + colNumeroConductual + colDescripcionConductual, yPos, tablaInicioX + colNumeroConductual + colDescripcionConductual, yPos + alturaRealFila);
-    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRealFila);
-    doc.line(tablaInicioX, yPos + alturaRealFila, tablaInicioX + tablaAncho, yPos + alturaRealFila); // Línea inferior
 
     yPos += alturaRealFila;
   }
@@ -760,43 +778,70 @@ export default async function Informe_PsicolaboralBoroo_Digitalizado(data = {}) 
   yPos += filaAltura;
 
   // Fila dinámica para contenido de observaciones
-  const textoObservaciones = (datosFinales.observaciones || "-").toUpperCase();
-
-  // Dibujar borde superior y laterales de la fila
-  doc.setDrawColor(0, 0, 0);
-  doc.setLineWidth(0.2);
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-
-  // Dibujar texto con salto de línea (fuente 7px)
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  let yFinalObservaciones = dibujarTextoConSaltoLinea(textoObservaciones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
-
-  // Verificar si necesitamos nueva página durante el dibujado
-  const alturaMaximaObs = pageHeight - yPos - 25; // 25mm para footer y margen
-  if (yFinalObservaciones - yPos > alturaMaximaObs) {
-    // Texto muy largo, necesitamos nueva página
-    doc.addPage();
-    numeroPagina++;
-    yPos = 45;
-    await drawHeader(numeroPagina);
-    // Redibujar texto en nueva página desde el inicio
+  const textoObservaciones = (datosFinales.observaciones || "").trim();
+  
+  // Si no hay texto, usar altura mínima
+  if (!textoObservaciones || textoObservaciones === "-") {
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
     doc.setFont("helvetica", "normal").setFontSize(7);
-    yFinalObservaciones = dibujarTextoConSaltoLinea(textoObservaciones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
+    doc.text("-", tablaInicioX + 2, yPos + 3.5);
+    yPos += filaAltura;
+  } else {
+    // Calcular altura necesaria ANTES de dibujar
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    const textoUpper = textoObservaciones.toUpperCase();
+    const lineasObservaciones = doc.splitTextToSize(textoUpper, tablaAncho - 4);
+    
+    // Si solo hay una línea, usar altura fija de 4.5mm + padding
+    const paddingVertical = 0.6 * 2; // 0.6mm arriba + 0.6mm abajo
+    let alturaRealObservaciones = filaAltura + paddingVertical; // Por defecto 4.5mm + 1.2mm
+    
+    if (lineasObservaciones.length > 1) {
+      // Solo si necesita múltiples líneas, calcular altura necesaria
+      const interlineado = 7 * 0.35; // ~2.45mm por línea
+      const alturaTextoObservaciones = (lineasObservaciones.length * interlineado) + paddingVertical;
+      alturaRealObservaciones = Math.max(filaAltura + paddingVertical, alturaTextoObservaciones);
+    }
+
+    // Verificar si necesitamos nueva página ANTES de dibujar
+    const alturaMaximaObs = pageHeight - yPos - 25; // 25mm para footer y margen
+    if (alturaRealObservaciones > alturaMaximaObs) {
+      // Texto muy largo, necesitamos nueva página
+      doc.addPage();
+      numeroPagina++;
+      yPos = 45;
+      await drawHeader(numeroPagina);
+    }
+
+    // Dibujar borde superior y laterales de la fila
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRealObservaciones);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRealObservaciones);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + alturaRealObservaciones, tablaInicioX + tablaAncho, yPos + alturaRealObservaciones);
+
+    // Dibujar texto con salto de línea (fuente 7px) - con padding de 0.6mm arriba y abajo
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    const paddingTop = 0.6; // Espacio superior
+    if (lineasObservaciones.length === 1) {
+      // Una sola línea - centrar verticalmente con padding
+      doc.text(lineasObservaciones[0], tablaInicioX + 2, yPos + paddingTop + 3.5);
+    } else {
+      // Múltiples líneas - usar interlineado preciso con padding superior
+      const interlineadoObs = 7 * 0.35; // ~2.45mm
+      lineasObservaciones.forEach((linea, idx) => {
+        doc.text(linea, tablaInicioX + 2, yPos + paddingTop + 2 + (idx * interlineadoObs));
+      });
+    }
+
+    yPos += alturaRealObservaciones;
   }
-
-  // Calcular altura real de la fila y redibujar si es necesario
-  const alturaNecesariaObservaciones = yFinalObservaciones - yPos;
-  const alturaMinimaFilaObs = filaAltura;
-  const alturaRealObservaciones = Math.max(alturaMinimaFilaObs, alturaNecesariaObservaciones + 2);
-
-  // Redibujar los bordes con la altura correcta
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRealObservaciones);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRealObservaciones);
-  doc.line(tablaInicioX, yPos + alturaRealObservaciones, tablaInicioX + tablaAncho, yPos + alturaRealObservaciones);
-
-  yPos += alturaRealObservaciones;
 
   // === SECCIÓN: RECOMENDACIONES ===
   // Verificar si necesitamos nueva página antes de RECOMENDACIONES
@@ -825,43 +870,70 @@ export default async function Informe_PsicolaboralBoroo_Digitalizado(data = {}) 
   yPos += filaAltura;
 
   // Fila dinámica para contenido de recomendaciones
-  const textoRecomendaciones = (datosFinales.recomendaciones || "-").toUpperCase();
-
-  // Dibujar borde superior y laterales de la fila
-  doc.setDrawColor(0, 0, 0);
-  doc.setLineWidth(0.2);
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-
-  // Dibujar texto con salto de línea (fuente 7px)
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  let yFinalRecomendaciones = dibujarTextoConSaltoLinea(textoRecomendaciones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
-
-  // Verificar si necesitamos nueva página durante el dibujado
-  const alturaMaximaRec = pageHeight - yPos - 25; // 25mm para footer y margen
-  if (yFinalRecomendaciones - yPos > alturaMaximaRec) {
-    // Texto muy largo, necesitamos nueva página
-    doc.addPage();
-    numeroPagina++;
-    yPos = 45;
-    await drawHeader(numeroPagina);
-    // Redibujar texto en nueva página desde el inicio
+  const textoRecomendaciones = (datosFinales.recomendaciones || "").trim();
+  
+  // Si no hay texto, usar altura mínima
+  if (!textoRecomendaciones || textoRecomendaciones === "-") {
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
     doc.setFont("helvetica", "normal").setFontSize(7);
-    yFinalRecomendaciones = dibujarTextoConSaltoLinea(textoRecomendaciones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
+    doc.text("-", tablaInicioX + 2, yPos + 3.5);
+    yPos += filaAltura;
+  } else {
+    // Calcular altura necesaria ANTES de dibujar
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    const textoUpper = textoRecomendaciones.toUpperCase();
+    const lineasRecomendaciones = doc.splitTextToSize(textoUpper, tablaAncho - 4);
+    
+    // Si solo hay una línea, usar altura fija de 4.5mm + padding
+    const paddingVertical = 0.6 * 2; // 0.6mm arriba + 0.6mm abajo
+    let alturaRealRecomendaciones = filaAltura + paddingVertical; // Por defecto 4.5mm + 1.2mm
+    
+    if (lineasRecomendaciones.length > 1) {
+      // Solo si necesita múltiples líneas, calcular altura necesaria
+      const interlineado = 7 * 0.35; // ~2.45mm por línea
+      const alturaTextoRecomendaciones = (lineasRecomendaciones.length * interlineado) + paddingVertical;
+      alturaRealRecomendaciones = Math.max(filaAltura + paddingVertical, alturaTextoRecomendaciones);
+    }
+
+    // Verificar si necesitamos nueva página ANTES de dibujar
+    const alturaMaximaRec = pageHeight - yPos - 25; // 25mm para footer y margen
+    if (alturaRealRecomendaciones > alturaMaximaRec) {
+      // Texto muy largo, necesitamos nueva página
+      doc.addPage();
+      numeroPagina++;
+      yPos = 45;
+      await drawHeader(numeroPagina);
+    }
+
+    // Dibujar borde superior y laterales de la fila
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRealRecomendaciones);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRealRecomendaciones);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + alturaRealRecomendaciones, tablaInicioX + tablaAncho, yPos + alturaRealRecomendaciones);
+
+    // Dibujar texto con salto de línea (fuente 7px) - con padding de 0.6mm arriba y abajo
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    const paddingTop = 0.6; // Espacio superior
+    if (lineasRecomendaciones.length === 1) {
+      // Una sola línea - centrar verticalmente con padding
+      doc.text(lineasRecomendaciones[0], tablaInicioX + 2, yPos + paddingTop + 3.5);
+    } else {
+      // Múltiples líneas - usar interlineado preciso con padding superior
+      const interlineadoRec = 7 * 0.35; // ~2.45mm
+      lineasRecomendaciones.forEach((linea, idx) => {
+        doc.text(linea, tablaInicioX + 2, yPos + paddingTop + 2 + (idx * interlineadoRec));
+      });
+    }
+
+    yPos += alturaRealRecomendaciones;
   }
-
-  // Calcular altura real de la fila y redibujar si es necesario
-  const alturaNecesariaRecomendaciones = yFinalRecomendaciones - yPos;
-  const alturaMinimaFilaRec = filaAltura;
-  const alturaRealRecomendaciones = Math.max(alturaMinimaFilaRec, alturaNecesariaRecomendaciones + 2);
-
-  // Redibujar los bordes con la altura correcta
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRealRecomendaciones);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRealRecomendaciones);
-  doc.line(tablaInicioX, yPos + alturaRealRecomendaciones, tablaInicioX + tablaAncho, yPos + alturaRealRecomendaciones);
-
-  yPos += alturaRealRecomendaciones;
 
   // === SECCIÓN: CONCLUSIÓN (CUMPLE/NO CUMPLE CON EL PERFIL) ===
   // Verificar si necesitamos nueva página antes de la conclusión
@@ -939,15 +1011,18 @@ export default async function Informe_PsicolaboralBoroo_Digitalizado(data = {}) 
   yPos += filaAltura;
 
   // === SECCIÓN DE FIRMA Y SELLO DEL MÉDICO ===
+  const alturaSeccionFirma = 30; // Altura para la sección de firma
+  const espacioFooter = 12; // Espacio para el footer
+  
   // Verificar si necesitamos nueva página antes de la firma
-  if (yPos + 30 > pageHeight - 20) {
+  // Debe haber espacio suficiente: altura de firma + footer + margen
+  if (yPos + alturaSeccionFirma + espacioFooter > pageHeight - 10) {
     doc.addPage();
     numeroPagina++;
     yPos = 45;
     await drawHeader(numeroPagina);
   }
 
-  const alturaSeccionFirma = 30; // Altura para la sección de firma
   const yFirmas = yPos;
 
   // Dibujar líneas de la sección de firma (bordes)
@@ -986,7 +1061,11 @@ export default async function Informe_PsicolaboralBoroo_Digitalizado(data = {}) 
   footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
 
   // === Imprimir ===
-  imprimir(doc);
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {

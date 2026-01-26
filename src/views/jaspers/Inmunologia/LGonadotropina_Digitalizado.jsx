@@ -2,6 +2,7 @@ import jsPDF from "jspdf";
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
+import { getSignCompressed } from "../../utils/helpers.js";
 
 // --- Configuración Centralizada ---
 const config = {
@@ -160,139 +161,124 @@ const drawPatientData = (doc, datos = {}) => {
 
 // --- Componente Principal ---
 
-export default async function LGonadotropina_Digitalizado(datos) {
-  const doc = new jsPDF();
+export default async function LGonadotropina_Digitalizado(datos = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
-<<<<<<< HEAD
-  drawHeader(doc, datos);
-  
-=======
   await drawHeader(doc, datos);
 
   // === TÍTULO ===
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
   doc.text("INMUNOLOGÍA", pageW / 2, 38, { align: "center" });
 
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
   // === DATOS DEL PACIENTE ===
-  drawPatientData(doc, datos);
+  const finalYPos = drawPatientData(doc, datos);
+  const s1 = await getSignCompressed(datos, "SELLOFIRMA");
+  const s2 = await getSignCompressed(datos, "SELLOFIRMADOCASIG");
 
-  const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
-  const isValidUrl = url => url && url !== "Sin registro";
-  const loadImg = src =>
-    new Promise((res, rej) => {
+  console.log({ s1, s2 })
+
+  // === CUERPO ===
+  let y = finalYPos + 10;
+
+  // === MUESTRA Y MÉTODO ===
+  doc.setFontSize(config.fontSize.header).setFont(config.font, "bold");
+  doc.text("MUESTRA:", config.margin, y);
+  doc.setFont(config.font, "normal");
+  doc.text("SUERO", config.margin + 20, y);
+  y += config.lineHeight;
+
+  doc.setFont(config.font, "bold");
+  doc.text("MÉTODO:", config.margin, y);
+  doc.setFont(config.font, "normal");
+  doc.text("INMUNOCROMATOGRÁFICO", config.margin + 18, y);
+  y += config.lineHeight * 1.5;
+
+  // === ENCABEZADO DE TABLA ===
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+  doc.text("PRUEBA CUALITATIVO", config.col1X, y);
+  doc.text("RESULTADO", config.col2X, y, { align: "center" });
+  y += 3;
+  doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
+  y += config.lineHeight;
+
+  // === CUERPO DE TABLA ===
+  // Inserta la imagen en vez del texto
+  const imgPath = './img/textogonabeta.png';
+  const imgWTest = 100, imgHTest = 15;
+  doc.addImage(imgPath, 'PNG', config.margin, y - 2, imgWTest, imgHTest);
+
+  // Resultado
+  doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
+  doc.text(datos.txtResultado || '', config.col2X, y + 6, { align: "center" });
+
+  // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
+  const sigW = 53;
+  const sigH = 23;
+  const sigY = 210;
+  const gap = 16;
+
+
+  const totalWidth = sigW * 2 + gap;
+  const startX = (pageW - totalWidth) / 2;
+  const addSelloFromUrl = (url, xPos) => {
+    return new Promise((resolve, reject) => {
+      if (!url) return resolve();
+
       const img = new Image();
-      img.src = src;
-      img.crossOrigin = 'anonymous';
-      img.onload = () => res(img);
-      img.onerror = () => rej(`No se pudo cargar ${src}`);
-    });
+      img.crossOrigin = "anonymous";
 
-  Promise.all([
-    isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
-    isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-  ]).then(([s1, s2]) => {
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
 
-<<<<<<< HEAD
-    // === TÍTULO ===
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
-    doc.text("INMUNOLOGÍA", pageW / 2, 43, { align: "center" }); // +5mm
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
 
-    let y = 100; // Posición inicial después de la tabla de datos (+5mm)
-    
-=======
-    // === CUERPO ===
-    let y = finalYPos + 10;
+          const selloBase64 = canvas.toDataURL('image/jpeg');
+          doc.addImage(selloBase64, 'jpeg', xPos, sigY, sigW, sigH);
 
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
-    // === MUESTRA Y MÉTODO ===
-    doc.setFontSize(config.fontSize.header).setFont(config.font, "bold");
-    doc.text("MUESTRA:", config.margin, y);
-    doc.setFont(config.font, "normal");
-    doc.text("SUERO", config.margin + 20, y);
-    y += config.lineHeight;
-
-    doc.setFont(config.font, "bold");
-    doc.text("MÉTODO:", config.margin, y);
-    doc.setFont(config.font, "normal");
-    doc.text("INMUNOCROMATOGRÁFICO", config.margin + 18, y);
-    y += config.lineHeight * 1.5;
-
-    // === ENCABEZADO DE TABLA ===
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
-    doc.text("PRUEBA CUALITATIVO", config.col1X, y);
-    doc.text("RESULTADO", config.col2X, y, { align: "center" });
-    y += 3;
-    doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
-    y += config.lineHeight;
-
-    // === CUERPO DE TABLA ===
-    // Inserta la imagen en vez del texto
-    const imgPath = './img/textogonabeta.png';
-    const imgWTest = 100, imgHTest = 15;
-    doc.addImage(imgPath, 'PNG', config.margin, y - 2, imgWTest, imgHTest);
-
-    // Resultado
-    doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
-    doc.text(datos.txtResultado || '', config.col2X, y + 6, { align: "center" });
-
-    // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
-    const sigW = 53;
-    const sigH = 23;
-    const sigY = 210;
-    const gap = 16;
-
-    if (s1 && s2) {
-      const totalWidth = sigW * 2 + gap;
-      const startX = (pageW - totalWidth) / 2;
-
-      const addSello = (img, xPos) => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        const selloBase64 = canvas.toDataURL('image/png');
-        doc.addImage(selloBase64, 'PNG', xPos, sigY, sigW, sigH);
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
       };
-      addSello(s1, startX);
-      addSello(s2, startX + sigW + gap);
-    } else if (s1) {
-      const canvas = document.createElement('canvas');
-      canvas.width = s1.width;
-      canvas.height = s1.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(s1, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = (pageW - sigW) / 2;
-      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
-    } else if (s2) {
-      const canvas = document.createElement('canvas');
-      canvas.width = s2.width;
-      canvas.height = s2.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(s2, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = (pageW - sigW) / 2;
-      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
-    }
 
-    // === FOOTER ===
-    footerTR(doc, datos);
+      img.onerror = (e) => reject(e);
+      img.src = url;
+    });
+  };
 
-    // === Imprimir ===
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = pdfUrl;
-    document.body.appendChild(iframe);
-    iframe.onload = function () {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
-  });
+  if (s1 != "" && s1 != null && s2 != "" && s2 != null) {
+    await addSelloFromUrl(s1, startX);
+    await addSelloFromUrl(s2, startX + sigW + gap);
+  } else if (s1 != "" && s1 != null) {
+    const imgX = (pageW - sigW) / 2;
+    await addSelloFromUrl(s1, imgX);
+  } else if (s2 != "" && s2 != null) {
+    const imgX = (pageW - sigW) / 2;
+    await addSelloFromUrl(s2, imgX);
+  }
+
+  // === FOOTER ===
+  footerTR(doc, datos);
+
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
+}
+
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
 }

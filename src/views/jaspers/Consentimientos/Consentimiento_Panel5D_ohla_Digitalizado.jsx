@@ -5,8 +5,8 @@ import footerTR from "../components/footerTR.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
 import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
 
-export default async function Consentimiento_Panel5D_Digitalizado(datos) {
-  const doc = new jsPDF();
+export default async function Consentimiento_Panel5D_Digitalizado(datos, docExistente = null) {
+  const doc = docExistente || new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // Función para formatear fecha a DD/MM/YYYY
@@ -19,13 +19,8 @@ export default async function Consentimiento_Panel5D_Digitalizado(datos) {
   };
 
   // Header con datos de ficha, sede y fecha
-<<<<<<< HEAD
-  const drawHeader = () => {
-    CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-=======
   const drawHeader = async () => {
     await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
     // Número de Ficha
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -46,13 +41,8 @@ export default async function Consentimiento_Panel5D_Digitalizado(datos) {
 
     // Bloque de color
     drawColorBox(doc, {
-<<<<<<< HEAD
-      color: datos.codigoColor || "#008f39",
-      text: datos.textoColor || "F",
-=======
       color: datos.codigoColor,
       text: datos.textoColor,
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
       x: pageW - 30,
       y: 10,
       size: 22,
@@ -213,25 +203,25 @@ export default async function Consentimiento_Panel5D_Digitalizado(datos) {
 
   // ─── 5) FIRMA Y HUELLA DEL PACIENTE, FIRMA Y SELLO DEL PROFESIONAL ────────────────────
   const baseY = doc.lastAutoTable.finalY + 40; // Subido 10mm (de 50 a 40)
-
+  footerTR(doc, datos);
   // Usar helper para dibujar firmas
-  dibujarFirmas({ doc, datos, y: baseY, pageW }).then(() => {
-    footerTR(doc, datos);
+  await dibujarFirmas({ doc, datos, y: baseY, pageW })
+  if (docExistente) {
+    return doc;
+  } else {
 
-    // Mostrar PDF
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = pdfUrl;
-    document.body.appendChild(iframe);
-    iframe.onload = function () {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
-  }).catch(err => {
-    console.error(err);
-    alert('Error generando PDF: ' + err);
-  });
+
+    imprimir(doc);
+  }
+
 }
 
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
+}

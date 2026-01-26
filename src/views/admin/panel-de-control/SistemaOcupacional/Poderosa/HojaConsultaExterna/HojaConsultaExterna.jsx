@@ -8,13 +8,15 @@ import { PrintHojaR, SubmitDataService, VerifyTR } from "./ControllerHojaConsult
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useSessionData } from "../../../../../hooks/useSessionData"
 import { getToday } from "../../../../../utils/helpers"
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox"
+import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset"
 
 const tabla = "hoja_consulta_externa"
 const today = getToday();
 
 
 const HojaConsultaExterna = () => {
-    const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+    const { token, userlogued, selectedSede, datosFooter, userCompleto, userName } =
         useSessionData();
 
     const InitialForm = {
@@ -35,6 +37,10 @@ const HojaConsultaExterna = () => {
         otrosDescripcion: "",
         observaciones: "",
         nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
     }
 
     const { form, setForm, handleChangeNumber, handleChangeSimple, handleClearnotO, handleClear, handleChange, handlePrintDefault, handleRadioButton } = useForm(InitialForm, { storageKey: "Hoja_Consulta_Externa_form" })
@@ -194,21 +200,26 @@ const HojaConsultaExterna = () => {
                                     label="Observaciones"
                                     value={form?.observaciones}
                                     onChange={handleChangeSimple}
-                                    onBlur={()=>{setForm(prev=>({...prev, observaciones: form.observaciones.toUpperCase()}))}}
+                                    onBlur={() => { setForm(prev => ({ ...prev, observaciones: form.observaciones.toUpperCase() })) }}
                                     classNameLabel="text-blue-600"
                                     rows={15}
                                     name="observaciones"
                                 />
                             </section>
+                            <div className="max-w-[80%] mx-auto mb-4">
+                                <SectionFieldset legend="Asignación de Médico">
+                                    <EmpleadoComboBox
+                                        value={form.nombre_medico}
+                                        label="Especialista"
+                                        form={form}
+                                        onChange={handleChangeSimple}
+                                    />
+                                </SectionFieldset>
+                            </div>
+
+
                             <div className="w-auto flex flex-col justify-center items-center gap-1 p-4 pt-0 m-4 mt-0">
-                                <InputTextOneLine
-                                    label="Medico que Certifica"
-                                    name="nombre_medico"
-                                    disabled
-                                    className=" w-[400px]"
-                                    value={form?.nombre_medico}
-                                    onChange={handleChange}
-                                />
+
                                 <div className="flex gap-1 items-center">
                                     <button
                                         type="button"

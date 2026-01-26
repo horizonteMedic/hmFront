@@ -5,7 +5,7 @@ import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import footerTR from '../../components/footerTR.jsx';
 import { dibujarFirmas } from "../../../utils/dibujarFirmas.js";
 
-export default async function ConsentAdmisionEvaluacionMedica(data = {}, docExistente = null) {
+export default async function ConsentAdmisionDeclaracionSintomaticoRespiratorio(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -40,17 +40,16 @@ export default async function ConsentAdmisionEvaluacionMedica(data = {}, docExis
   };
 
   const { dia, mes } = obtenerDiaYMes(data?.fechaRegistro);
-  const anio = new Date(data?.fechaRegistro).getFullYear() || '';
 
   // Header
   const drawHeader = () => {
     // Logo y membrete
     CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
 
-    // Título (bajado 4mm más)
+    // Título (bajado más)
     doc.setFont("helvetica", "bold").setFontSize(14);
     doc.setTextColor(0, 0, 0);
-    doc.text("CONSENTIMIENTO INFORMADO DE EVALUACIÓN MÉDICA", pageW / 2, 47, { align: "center" });
+    doc.text("DECLARACIÓN DE SINTOMÁTICO RESPIRATORIO", pageW / 2, 55, { align: "center" });
 
     // Número de Ficha, Sede, Fecha y Página
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -69,7 +68,7 @@ export default async function ConsentAdmisionEvaluacionMedica(data = {}, docExis
     lineasSede.forEach((linea, idx) => {
       doc.text(linea, xInicioSede, 20 + (idx * 3.5));
     });
-    
+
     const yFechaExamen = lineasSede.length === 1 ? 25 : 20 + (lineasSede.length * 3.5) + 2;
     doc.text("Fecha de examen: " + (datosFinales.fechaExamen || ""), pageW - 70, yFechaExamen);
     doc.text("Pag. 01", pageW - 25, 8);
@@ -90,7 +89,7 @@ export default async function ConsentAdmisionEvaluacionMedica(data = {}, docExis
   drawHeader();
 
   // === CONTENIDO DEL DOCUMENTO ===
-  let yPos = 60; // Bajado 10mm
+  let yPos = 70; // Bajado más
   const margin = 15;
   const anchoTexto = pageW - (2 * margin);
   const lineHeight = 5;
@@ -99,7 +98,7 @@ export default async function ConsentAdmisionEvaluacionMedica(data = {}, docExis
   const justificarTextoConNegritas = (partesTexto, x, y, anchoMaximo, interlineado) => {
     // Construir lista de palabras con su formato (negrita o no)
     const palabrasConFormato = [];
-    
+
     partesTexto.forEach(parte => {
       const palabras = parte.texto.split(' ').filter(p => p.length > 0);
       palabras.forEach(palabra => {
@@ -225,37 +224,38 @@ export default async function ConsentAdmisionEvaluacionMedica(data = {}, docExis
   doc.setFontSize(11);
   doc.setTextColor(0, 0, 0);
 
-  // Primera línea: "Yo, [nombre], identificado con el DNI [dni]" - JUSTIFICADO
+  // Primera línea: "Yo, [nombre], de [edad] años de edad..." - JUSTIFICADO
   const partesTexto1 = [
     { texto: "Yo, ", negrita: false },
     { texto: datosFinales.apellidosNombres, negrita: true },
-    { texto: ", identificado con el DNI ", negrita: false },
-    { texto: datosFinales.documentoIdentidad, negrita: true }
+    { texto: ", de ", negrita: false },
+    { texto: datosFinales.edad, negrita: true },
+    { texto: " años de edad, identificado con DNI: ", negrita: false },
+    { texto: datosFinales.documentoIdentidad, negrita: true },
+    { texto: ", postulante al cargo de ", negrita: false },
+    { texto: datosFinales.puestoTrabajo, negrita: true },
+    { texto: ", para la empresa ", negrita: false },
+    { texto: datosFinales.empresa, negrita: true }
   ];
-  
+
   yPos = justificarTextoConNegritas(partesTexto1, margin, yPos, anchoTexto, lineHeight);
+  yPos += 5;
+
+  // Segunda línea: "Por lo tanto..." - JUSTIFICADO
+  const texto2 = "Por lo tanto, en forma consciente y voluntaria, declaro que no presento cefalea, dolor de garganta, tos, fiebre, malestar general, ni dificultad para respirar.";
+  yPos = justificarTexto(texto2, margin, yPos, anchoTexto, lineHeight);
   yPos += 10;
 
-  // "Certifico haber sido informado que:"
-  doc.setFont("helvetica", "bold");
-  doc.text("Certifico haber sido informado que:", margin, yPos);
-  yPos += lineHeight + 5;
-
-  // Texto del consentimiento (entre comillas) - JUSTIFICADO
-  const textoConsentimiento = `"De acuerdo con lo dispuesto en la Ley 29733 (Ley de Protección de Datos Personales), declaro haber tomado conocimiento que los exámenes médicos efectuados por el Centro Médico Evaluador y la información contenida en los mismos, a fin de evaluar mi condición médica para postular a un puesto de trabajo en el campamento minero es registrada por la Compañía Minera y/o la Compañía Aseguradora que tenga a su cargo la cobertura del Seguro Complementario de Trabajo de Riesgo o la que esta designe para los efectos de control de dicho seguro. En ese sentido, mediante la suscripción del presente documento, otorgo consentimiento expreso e inequívoco para que la Compañía Minera efectúe el tratamiento de los datos personales facilitados y los transfiera a la Compañía Aseguradora a fin de la evaluación y otorgamiento de la Cobertura del Seguro Complementario de Trabajo de Riesgo, pudiendo esta última informar a la Compañía Minera, Contratistas o Corredor de Seguros de ambos el estado de la cobertura del Seguro Complementario de Trabajo de Riesgo. Esta declaración autoriza al Centro Médico Evaluador la transferencia al empleador y/o Compañía Aseguradora de la información de la historia clínica y exámenes médicos confidenciales de conformidad con la Ley 26842 (Ley General de Salud), y de la Ley 29783 (Ley de Seguridad y Salud en el Trabajo) y su Reglamento aprobado por Decreto Supremo 005-2012-TR."`;
-  
-  yPos = justificarTexto(textoConsentimiento, margin, yPos, anchoTexto, lineHeight);
+  // Tercera línea: "Trujillo, [día] de [mes] de 2025." (bajada 15mm)
   yPos += 15;
-
-  // Fecha al final (alineada a la derecha): "de [día] de [mes] del [año]"
   doc.setFont("helvetica", "normal");
-  const textoFecha = `de ${dia} de ${mes} del ${anio}`;
-  doc.text(textoFecha, pageW - margin, yPos, { align: "right" });
+  const texto3 = `Trujillo, ${dia} de ${mes} 2025.`;
+  doc.text(texto3, margin, yPos);
   yPos += 20;
 
-  // === FIRMA Y HUELLA DEL PACIENTE (usando dibujarFirmas, bajada 15mm) ===
-  yPos += 15;
-  
+  // === FIRMA Y HUELLA DEL PACIENTE (usando dibujarFirmas, bajada 40mm) ===
+  yPos += 55;
+
   // Usar la función dibujarFirmas del utils
   const yPosFinalFirmas = await dibujarFirmas({
     doc,
@@ -270,14 +270,14 @@ export default async function ConsentAdmisionEvaluacionMedica(data = {}, docExis
   doc.text(`DNI: ${datosFinales.documentoIdentidad}`, centroX, yPosFinalFirmas + 1.5, { align: "center" });
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 7, fontSize: 7 });
+  footerTR(doc, { footerOffsetY: 8, fontSize: 8 });
 
   // === Imprimir ===
-  if (!docExistente) {
+  if (docExistente) {
+    return doc;
+  } else {
     imprimir(doc);
   }
-
-  return doc;
 }
 
 function imprimir(doc) {

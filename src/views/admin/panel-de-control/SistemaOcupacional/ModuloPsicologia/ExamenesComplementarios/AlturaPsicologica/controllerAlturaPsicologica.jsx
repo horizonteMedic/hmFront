@@ -102,6 +102,8 @@ export const GetInfoServicio = async (
       // Analisis y recomendaciones
       analisisResultados: res.analisis ?? "",
       recomendaciones: res.recomendacion ?? "",
+
+      user_medicoFirma: res.usuarioFirma,
     }));
   }
 };
@@ -181,6 +183,8 @@ export const SubmitDataService = async (
     recomendacion: form.recomendaciones,
 
     usuarioRegistro: user,
+
+    usuarioFirma: form.user_medicoFirma,
   };
 
   await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

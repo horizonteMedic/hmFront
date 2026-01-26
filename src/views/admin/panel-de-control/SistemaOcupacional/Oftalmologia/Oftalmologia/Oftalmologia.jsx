@@ -3,145 +3,163 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBroom,
   faChevronDown,
+  faDownload,
   faPrint,
   faSave,
 } from "@fortawesome/free-solid-svg-icons";
 import {
+  handleSubirArchivo,
   PrintHojaR,
+  ReadArchivosForm,
   SubmitDataService,
   VerifyTR,
 } from "./controllerOftalmologia";
 import Swal from "sweetalert2";
 import { getToday } from "../../../../../utils/helpers";
 import ButtonsPDF from "../../../../../components/reusableComponents/ButtonsPDF";
+import { useSessionData } from "../../../../../hooks/useSessionData";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 
 const tabla = "oftalmologia2021";
-const today = getToday();
 
-const initialFormState = {
-  norden: "",
-  codOf: null,
-  fechaExam: today,
-  nomExam: "",
-  fechaNac: "",
-  nombres: "",
-  dni: "",
-  empresa: "",
-  contrata: "",
+export default function OftalmologiaOhla() {
+  const { token, userlogued, selectedSede, userName } = useSessionData();
+  const today = getToday();
 
-  parpadosYAnexos: "NORMAL",
-  corneas: "NORMAL",
-  otrosHallazgos: "NINGUNO",
-  conjuntivas: "NORMAL",
-  cristalino: "TRANSPARENTE",
+  const initialFormState = {
+    norden: "",
+    codOf: null,
+    fechaExam: today,
+    nomExam: "",
+    fechaNac: "",
+    nombres: "",
+    dni: "",
+    empresa: "",
+    contrata: "",
 
-  fondoNormalOD: false,
-  fondoNormalOI: false,
-  fondoAnormalOD: false,
-  fondoAnormalOI: false,
-  fondoHallazgos: "N/A",
+    parpadosYAnexos: "NORMAL",
+    corneas: "NORMAL",
+    otrosHallazgos: "NINGUNO",
+    conjuntivas: "NORMAL",
+    cristalino: "TRANSPARENTE",
 
-  pioOd: "-",
-  pioOi: "-",
-  noAplica: "X",
+    fondoNormalOD: false,
+    fondoNormalOI: false,
+    fondoAnormalOD: false,
+    fondoAnormalOI: false,
+    fondoHallazgos: "N/A",
 
-  correctorOcular: "NO",
-  correctorCerca: false,
-  correctorLejos: false,
-  noTrajocorrectorCerca: false,
-  noTrajocorrectorLejos: false,
+    pioOd: "-",
+    pioOi: "-",
+    noAplica: "X",
 
-  antecedentesPersonales: "NO REFIERE",
-  antecedentesFamiliares: "NO REFIERE",
+    correctorOcular: "NO",
+    correctorCerca: false,
+    correctorLejos: false,
+    noTrajocorrectorCerca: false,
+    noTrajocorrectorLejos: false,
 
-  ishihara: "",
-  coloresPuros: "",
-  estereopsia: "",
-  estereopsiaText: "",
+    antecedentesPersonales: "NO REFIERE",
+    antecedentesFamiliares: "NO REFIERE",
 
-  aplicaRefraccion: "NO",
-  odsfL: "-",
-  odcilL: "-",
-  odejeL: "-",
+    ishihara: "",
+    coloresPuros: "",
+    estereopsia: "",
+    estereopsiaText: "",
 
-  oisfL: "-",
-  oicilL: "-",
-  oiejeL: "-",
-  dipL: "-",
+    aplicaRefraccion: "NO",
+    odsfL: "-",
+    odcilL: "-",
+    odejeL: "-",
 
-  odsfC: "-",
-  odcilC: "-",
-  odejeC: "-",
+    oisfL: "-",
+    oicilL: "-",
+    oiejeL: "-",
+    dipL: "-",
 
-  oisfC: "-",
-  oicilC: "-",
-  oiejeC: "-",
-  dipC: "-",
+    odsfC: "-",
+    odcilC: "-",
+    odejeC: "-",
 
-  agudezaOdLejos: "00",
-  agudezaOiLejos: "00",
-  agudezaOdCerca: "00",
-  agudezaOiCerca: "00",
-  diagnostico: "",
+    oisfC: "-",
+    oicilC: "-",
+    oiejeC: "-",
+    dipC: "-",
 
-  ninguna: false,
-  usoCorrectoresCerca: false,
-  usoCorrectoresLejos: false,
-  lentesCorrectoresCerca: false,
-  lentesCorrectoresLejos: false,
-  lentesCambioLunas: false,
-  indicacionPterigion: false,
-  indicacionOtras: false,
+    agudezaOdLejos: "00",
+    agudezaOiLejos: "00",
+    agudezaOdCerca: "00",
+    agudezaOiCerca: "00",
+    diagnostico: "",
 
-  noRestringeActividades: false,
-  restriccionCorrectorLejos: false,
-  restriccionCorrectorCerca: false,
-  noTrabajosCableElectrico: false,
-  noConduccion: false,
+    ninguna: false,
+    usoCorrectoresCerca: false,
+    usoCorrectoresLejos: false,
+    lentesCorrectoresCerca: false,
+    lentesCorrectoresLejos: false,
+    lentesCambioLunas: false,
+    indicacionPterigion: false,
+    indicacionOtras: false,
 
-  vc_sinc_od: "00",
-  vc_sinc_oi: "00",
-  vc_conc_od: "00",
-  vc_conc_oi: "00",
-  vc_agujero_od: "00",
-  vc_agujero_oi: "00",
-  vl_sinc_od: "00",
-  vl_sinc_oi: "00",
-  vl_conc_od: "00",
-  vl_conc_oi: "00",
-  vl_agujero_od: "00",
-  vl_agujero_oi: "00",
-  bino_sinc: "00",
-  bino_conc: "00",
-  reflejos_pupilares: "",
+    noRestringeActividades: false,
+    restriccionCorrectorLejos: false,
+    restriccionCorrectorCerca: false,
+    noTrabajosCableElectrico: false,
+    noConduccion: false,
 
-  ptosisPalpebralOd: false,
-  ptosisPalpebralOi: false,
-  pterigionGradoOd: false,
-  pterigionGradoOi: false,
+    vc_sinc_od: "00",
+    vc_sinc_oi: "00",
+    vc_conc_od: "00",
+    vc_conc_oi: "00",
+    vc_agujero_od: "00",
+    vc_agujero_oi: "00",
+    vl_sinc_od: "00",
+    vl_sinc_oi: "00",
+    vl_conc_od: "00",
+    vl_conc_oi: "00",
+    vl_agujero_od: "00",
+    vl_agujero_oi: "00",
+    bino_sinc: "00",
+    bino_conc: "00",
+    reflejos_pupilares: "",
 
-  estrabismoOd: false,
-  estrabismoOi: false,
-  pingueculaOd: false,
-  pingueculaOi: false,
+    ptosisPalpebralOd: false,
+    ptosisPalpebralOi: false,
+    pterigionGradoOd: false,
+    pterigionGradoOi: false,
 
-  conjuntivitisOd: false,
-  conjuntivitisOi: false,
-  chalazionOd: false,
-  chalazionOi: false,
+    estrabismoOd: false,
+    estrabismoOi: false,
+    pingueculaOd: false,
+    pingueculaOi: false,
 
-  cataratasOd: false,
-  cataratasOi: false,
-  otrosOd: false,
-  otrosOi: false,
-  examenClinicoHallazgos: "",
+    conjuntivitisOd: false,
+    conjuntivitisOi: false,
+    chalazionOd: false,
+    chalazionOi: false,
 
-  SubirDoc: true,
-  nomenclatura: "ESPIROMETRIA"
-};
-export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
+    cataratasOd: false,
+    cataratasOi: false,
+    otrosOd: false,
+    otrosOi: false,
+    examenClinicoHallazgos: "",
+
+    SubirDoc: false,
+    nomenclatura: "OFTALMOLOGIA VISION TESTER",
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
+
+    nombre_doctorAsignado: "",
+    user_doctorAsignado: "",
+
+  };
   const [form, setForm] = useState(initialFormState);
   const [tab, setTab] = useState(0);
+
+  const [visualerOpen, setVisualerOpen] = useState(null)
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -213,7 +231,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
 
   return (
     <div className="w-full text-[11px]">
-      <form className=" p-4 rounded w-full border mb-4">
+      <div className=" p-4 rounded w-full border mb-4">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 items-center gap-3 w-full">
           {/* Primera fila: solo los 4 campos principales */}
           <div className="flex items-center gap-4">
@@ -292,14 +310,14 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
               disabled
             />
           </div>
-          {/*form.SubirDoc &&
+          {form.SubirDoc &&
             <ButtonsPDF
-              handleSave={() => { handleSubirArchivoEspirometria(form, selectedSede, userlogued, token) }}
-              handleRead={() => { ReadArchivosFormEspirometria(form, setVisualerOpen, token) }}
+              handleSave={() => { handleSubirArchivo(form, selectedSede, userlogued, token) }}
+              handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token) }}
             />
-          */}
+          }
         </div>
-      </form>
+      </div>
       {/* Tabs */}
       <div className="flex gap-1">
         <button
@@ -1504,6 +1522,22 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
             </div>
           </div>
         )}
+        <SectionFieldset legend="Asignación de Médico">
+          <EmpleadoComboBox
+            value={form.nombre_medico}
+            label="Especialista"
+            form={form}
+            onChange={handleChange}
+          />
+          <EmpleadoComboBox
+            value={form.nombre_doctorAsignado}
+            label="Doctor Asignado"
+            form={form}
+            onChange={handleChange}
+            nameField="nombre_doctorAsignado"
+            idField="user_doctorAsignado"
+          />
+        </SectionFieldset>
         <div className="flex flex-col md:flex-row justify-between items-center gap-4  px-4 pt-2">
           <div className=" flex gap-4">
             <button
@@ -1540,6 +1574,24 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
               </button>
             </div>
           </div>
+          {visualerOpen && (
+            <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+              <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
+                <div className="px-4 py-2 naranjabackgroud flex justify-between">
+                  <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
+                  <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+                </div>
+                <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
+                  <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
+                </div>
+                <div className="flex justify-center">
+                  <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                    <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

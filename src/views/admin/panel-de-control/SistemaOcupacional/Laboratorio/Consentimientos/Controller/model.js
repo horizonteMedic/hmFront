@@ -14,16 +14,17 @@ export function GetInfoLaboratioEx(data, tabla, token, user) {
         METADONA: { valor: 'antConsumeMetadona', fecha: 'fechaConsumeMetadona' },
         FENCI: { valor: 'antConsumeFenciclidina', fecha: 'fechaConsumeFenciclidina' },
         ANTI: { valor: 'antConsumeAntidepreTricicli', fecha: 'fechaConsumeAntidepreTricicli' }
-        };
+    };
 
     const body = {
         nameConset: tabla,
         userRegistro: user,
         userMedicoOcup: "",
         fechaex: data.fecha,
-        nOrden: data.norden
+        nOrden: data.norden,
+        usuarioFirma: data?.user_medicoFirma ?? "",
     };
-    
+
     if (data.antecedentes) {
         const antecedentes = Array.isArray(data.antecedentes)
             ? data.antecedentes
@@ -31,34 +32,35 @@ export function GetInfoLaboratioEx(data, tabla, token, user) {
                 key,
                 value: typeof value === 'object' && value !== null ? value.value : value,
                 fecha: typeof value === 'object' && value !== null ? value.fecha : null,
-                }));
+            }));
         antecedentes.forEach(({ key, value, fecha }) => {
             const campos = camposAPI[key];
             if (campos) {
-            body[campos.valor] = value ?? false;
-            body[campos.fecha] = fecha ?? null;
+                body[campos.valor] = value ?? false;
+                body[campos.fecha] = fecha ?? null;
             }
         });
     }
 
-   
+
     const url = `${URLAzure}/api/v01/ct/laboratorio/registrarActualizarConsentimientos`
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(body)
-        }
-        return fetch(url,options).then(res =>  {
-            if (!res.ok) {
-                return res
-            } return res.json()}).then(response => response) 
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(body)
+    }
+    return fetch(url, options).then(res => {
+        if (!res.ok) {
+            return res
+        } return res.json()
+    }).then(response => response)
 }
 
 export function SubmitInfoLaboratioExBoro(data, token, user) {
-   
+
     const body = {
         antBoroAlgunaEnfermedad: data.enfermedad.key,
         antBoroAlgunMedicamento: data.medicamento.key,
@@ -78,20 +80,22 @@ export function SubmitInfoLaboratioExBoro(data, token, user) {
         fechaex: data.fecha,
         masticahCoca: data.chaccha.key,
         notas: data.notas,
-        norden: data.norden
-    };    
+        norden: data.norden,
+        usuarioFirma: data.user_medicoFirma,
+    };
 
     const url = `${URLAzure}/api/v01/ct/laboratorio/registrarActualizarConsentimientoBORO`
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(body)
-        }
-        return fetch(url,options).then(res =>  {
-            if (!res.ok) {
-                return res
-            } return res.json()}).then(response => response) 
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(body)
+    }
+    return fetch(url, options).then(res => {
+        if (!res.ok) {
+            return res
+        } return res.json()
+    }).then(response => response)
 }

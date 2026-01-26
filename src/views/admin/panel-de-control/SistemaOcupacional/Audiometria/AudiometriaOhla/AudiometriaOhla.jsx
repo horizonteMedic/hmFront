@@ -19,6 +19,8 @@ import {
   GetInfoServicioFicha,
   PrintHojaR,
 } from "./controllerAudiometriaOhla";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 
 const tabla = "audiometria_po";
 const frecuencias = ["500", "1000", "2000", "3000", "4000", "6000", "8000"];

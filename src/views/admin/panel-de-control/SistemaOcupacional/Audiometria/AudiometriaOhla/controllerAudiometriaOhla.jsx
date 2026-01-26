@@ -60,6 +60,10 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
           oi_o_6000: res.oi1_6000,
           oi_o_8000: res.oi1_8000,
           diagnostico: res.diagnostico,
+
+          // user_medicoFirma: res.usuarioFirma,
+          // user_doctorAsignado: res.doctorAsignado,
+          // user_doctorExtra: res.doctorExtra,
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -116,6 +120,11 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
 
     diagnostico: form.diagnostico,
     userRegistro: user,
+
+    // usuarioFirma: form.user_medicoFirma,
+    // doctorAsignado: form.user_doctorAsignado,
+    // doctorExtra: form.user_doctorExtra,
+
   };
   SubmitData(body, registrarUrl, token).then((res) => {
     console.log(res);
@@ -348,7 +357,6 @@ export const GetInfoServicioFicha = (
           otroDescripcion: res.otros ?? "",
 
           conclusiones: res.txtConclusiones,
-          nombre_medico: res.txtMedico,
 
           od_250: res.txtDod250,
           od_500: res.txtDod500,
@@ -367,8 +375,12 @@ export const GetInfoServicioFicha = (
           i_porcentaje: res.txtLIPorcentajeDiscriminacion,
           i_umbral_confort: res.txtLIConfort,
           i_umbral_disconfort: res.txtLIDisconfort,
+
+          user_medicoFirma: res.usuarioFirma,
+          user_doctorAsignado: res.doctorAsignado,
+          user_doctorExtra: res.doctorExtra,
         }));
-        setSearchNombreMedico(res.txtMedico);
+        // setSearchNombreMedico(res.txtMedico);
       } else {
         Swal.fire(
           "Error",
@@ -455,11 +467,15 @@ export const SubmitDataServiceFicha = async (
     txtLIDisconfort: form.i_umbral_disconfort,
     txtResponsable: form.nombre_profecional,
     txtConclusiones: form.conclusiones,
-    txtMedico: form.nombre_medico,
+    // txtMedico: form.nombre_medico,
     txtOtoscopia: form.otoscopia,
     txtMesesTrabajo: form.mesesTrabajo,
     userRegistro: user,
     userMedicoOcup: form.nombre_profecional,
+
+    usuarioFirma: form.user_medicoFirma,
+    doctorAsignado: form.user_doctorAsignado,
+    doctorExtra: form.user_doctorExtra,
   };
   SubmitData(body, registrarUrlFicha, token).then((res) => {
     console.log(res);
@@ -502,17 +518,23 @@ export const PrintHojaR = (nro, token, tabla, mostrarGrafico, firmaExtra) => {
         const nombre = res.nameJasper;
         console.log(nombre);
         const jasperModules = import.meta.glob(
-          `../../../../../jaspers/Audiometria/*.jsx`
+          `../../../../../jaspers/Audiometria/**/*.jsx`
         );
-        const modulo = await jasperModules[
-          `../../../../../jaspers/Audiometria/${nombre}.jsx`
-        ]();
+        // Determinar la ruta según el nombre del Jasper
+        let rutaCompleta = `../../../../../jaspers/Audiometria/${nombre}.jsx`;
+
+        // Si el nombre contiene "FichaAudiologica", buscar en la subcarpeta
+        if (nombre && nombre.includes("FichaAudiologica")) {
+          rutaCompleta = `../../../../../jaspers/Audiometria/FichaAudiologica/${nombre}.jsx`;
+        }
+
+        const modulo = await jasperModules[rutaCompleta]();
         // Ejecuta la función exportada por default con los datos
-        if (typeof modulo.default === "function") {
+        if (modulo && typeof modulo.default === "function") {
           modulo.default(res, null, mostrarGrafico, firmaExtra);
         } else {
           console.error(
-            `El archivo ${nombre}.jsx no exporta una función por defecto`
+            `El archivo ${nombre}.jsx no se encontró o no exporta una función por defecto`
           );
         }
       }

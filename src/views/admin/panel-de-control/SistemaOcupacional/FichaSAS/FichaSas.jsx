@@ -14,9 +14,9 @@ import Swal from "sweetalert2";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "ficha_sas"
-const today = getToday();
 
 export default function FichaSas() {
+    const today = getToday();
     const { token, userlogued, selectedSede, datosFooter, userName, userDNI } =
         useSessionData();
 

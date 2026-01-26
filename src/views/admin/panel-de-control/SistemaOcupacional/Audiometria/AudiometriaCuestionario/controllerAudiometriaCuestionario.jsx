@@ -12,11 +12,11 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
   getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
     .then((res) => {
       if (res.norden) {
-        console.log(res);
+        console.log(res.usuarioFirma);
         set((prev) => ({
           ...prev,
           ...res,
-          
+
           nombres: res.nombres,
           edad: res.edad,
           norden: res.norden,
@@ -75,6 +75,7 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
           p16_servicio_tiempo: res.txtmilitar16,
           p16_boxeo: res.chkboxeo16,
           p16_boxeo_tiempo: res.txtboxeo16,
+          user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -159,6 +160,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     chkboxeo16: form.p16_boxeo,
     txtboxeo16: form.p16_boxeo_tiempo,
     userRegistro: user,
+    usuarioFirma: form.user_medicoFirma,
   };
   SubmitData(body, registrarUrl, token).then((res) => {
     console.log(res);
@@ -192,17 +194,17 @@ export const PrintHojaR = (nro, token, tabla) => {
         const nombre = res.nameJasper;
         console.log(nombre);
         const jasperModules = import.meta.glob(
-          `../../../../../jaspers/Audiometria/*.jsx`
+          `../../../../../jaspers/Audiometria/**/*.jsx`
         );
         const modulo = await jasperModules[
-          `../../../../../jaspers/Audiometria/${nombre}.jsx`
+          `../../../../../jaspers/Audiometria/CuestionarioAudiometria/CuestionarioAudiometria_Digitalizado.jsx`
         ]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
           modulo.default(res);
         } else {
           console.error(
-            `El archivo ${nombre}.jsx no exporta una función por defecto`
+            `El archivo CuestionarioAudiometria_Digitalizado.jsx no exporta una función por defecto`
           );
         }
       }

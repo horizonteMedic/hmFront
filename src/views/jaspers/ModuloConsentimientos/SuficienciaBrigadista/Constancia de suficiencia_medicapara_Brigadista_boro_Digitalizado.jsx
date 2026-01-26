@@ -5,23 +5,23 @@ import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import footerTR from '../../components/footerTR.jsx';
 import { dibujarFirmas } from "../../../utils/dibujarFirmas.js";
 
-export default async function ConsentAdmisionInformacionAptitudMedicoOcupacional(data = {}, docExistente = null) {
+export default async function ConstanciaSuficienciaBrigadista(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
-  // Preparar datos
+  // Preparar datos según los campos del backend
   const datosFinales = {
     apellidosNombres: String(((data?.apellidosPaciente ?? '') + ' ' + (data?.nombresPaciente ?? '')).trim()),
-    fechaExamen: formatearFechaCorta(data?.fechaRegistro ?? ''),
+    fechaExamen: formatearFechaCorta(data?.fecha ?? data?.fechaRegistro ?? ''),
     documentoIdentidad: String(data?.dniPaciente ?? ''),
-    edad: String(data?.edadPaciente ?? ''),
-    puestoTrabajo: String(data?.cargoPaciente ?? ''),
     empresa: String(data?.empresa ?? ''),
+    puestoTrabajo: String(data?.cargo ?? data?.cargoPaciente ?? ''),
     sede: String(data?.sede ?? data?.nombreSede ?? ''),
     numeroFicha: String(data?.norden ?? ''),
     codigoColor: String(data?.codigoColor ?? ''),
     textoColor: String(data?.textoColor ?? ''),
-    tipoExamen: String(data?.tipoExamen ?? ''),
+    estadoApto: data?.esActivo === true ? 'apto' : (data?.esActivo === false ? 'no apto' : 'apto'),
+    vigencia: data?.vigencia ?? data?.fecha ?? data?.fechaRegistro ?? '',
   };
 
   // Función para obtener día y mes de la fecha
@@ -40,19 +40,23 @@ export default async function ConsentAdmisionInformacionAptitudMedicoOcupacional
     }
   };
 
-  const { dia, mes } = obtenerDiaYMes(data?.fechaRegistro);
-  const anio = new Date(data?.fechaRegistro).getFullYear() || '';
+  const fechaBase = data?.fecha ?? data?.fechaRegistro ?? '';
+  const { dia, mes } = obtenerDiaYMes(fechaBase);
+  const anio = new Date(fechaBase).getFullYear() || '';
+
+  // Función para obtener fecha de vigencia
+  const { dia: diaVigencia, mes: mesVigencia } = obtenerDiaYMes(datosFinales.vigencia);
+  const anioVigencia = new Date(datosFinales.vigencia).getFullYear() || '';
 
   // Header
   const drawHeader = () => {
     // Logo y membrete
     CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
 
-    // Título (dividido en dos líneas, bajado más)
+    // Título
     doc.setFont("helvetica", "bold").setFontSize(14);
     doc.setTextColor(0, 0, 0);
-    doc.text("DECLARACIÓN JURADA DE INFORMACIÓN DE", pageW / 2, 50, { align: "center" });
-    doc.text("APTITUD MÉDICO OCUPACIONAL", pageW / 2, 57, { align: "center" });
+    doc.text("CONSTANCIA DE SUFICIENCIA MÉDICA PARA BRIGADISTAS", pageW / 2, 50, { align: "center" });
 
     // Número de Ficha, Sede, Fecha y Página
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -92,7 +96,7 @@ export default async function ConsentAdmisionInformacionAptitudMedicoOcupacional
   drawHeader();
 
   // === CONTENIDO DEL DOCUMENTO ===
-  let yPos = 70; // Bajado más
+  let yPos = 65;
   const margin = 15;
   const anchoTexto = pageW - (2 * margin);
   const lineHeight = 5;
@@ -223,65 +227,61 @@ export default async function ConsentAdmisionInformacionAptitudMedicoOcupacional
     return yActual;
   };
 
-  // Texto de la declaración
+  // Texto de la constancia
   doc.setFontSize(11);
   doc.setTextColor(0, 0, 0);
 
-  // Primera línea: "Yo, [nombre], de [edad] años de edad..." - JUSTIFICADO
+  // Primer párrafo completo: "Se hace constar que el Señor(a): [nombre] identificado con DNI N° [dni] de la empresa [empresa], con el cargo de [cargo] ha sido evaluado de la normativa vigente, estando [apto/no apto] para efectuar trabajos o actividades como brigadistas." - JUSTIFICADO
   const partesTexto1 = [
-    { texto: "Yo, ", negrita: false },
+    { texto: "Se hace constar que el Señor(a): ", negrita: false },
     { texto: datosFinales.apellidosNombres, negrita: true },
-    { texto: ", de ", negrita: false },
-    { texto: datosFinales.edad, negrita: true },
-    { texto: " años de edad, identificado(a) con DNI N°: ", negrita: false },
+    { texto: " identificado con DNI N° ", negrita: false },
     { texto: datosFinales.documentoIdentidad, negrita: true },
-    { texto: ", postulante al cargo de ", negrita: false },
+    { texto: " de la empresa ", negrita: false },
+    { texto: datosFinales.empresa, negrita: true },
+    { texto: ", con el cargo de ", negrita: false },
     { texto: datosFinales.puestoTrabajo, negrita: true },
-    { texto: ", para la empresa ", negrita: false },
-    { texto: datosFinales.empresa, negrita: true }
+    { texto: " ha sido evaluado de la normativa vigente, estando ", negrita: false },
+    { texto: datosFinales.estadoApto.toUpperCase(), negrita: true },
+    { texto: " para efectuar trabajos o actividades como brigadistas.", negrita: false }
   ];
   
   yPos = justificarTextoConNegritas(partesTexto1, margin, yPos, anchoTexto, lineHeight);
-  yPos += 5;
+  yPos += 8;
 
-  // Segunda línea: "declaro haber sido informado sobre la APTITUD y RECOMENDACIONES..." - JUSTIFICADO
+  // Segundo párrafo: "La vigencia de esta constancia es del [fecha]" - JUSTIFICADO
+  const textoVigencia = diaVigencia && mesVigencia && anioVigencia 
+    ? `${diaVigencia} de ${mesVigencia} de ${anioVigencia}`
+    : '';
   const partesTexto2 = [
-    { texto: "Declaro haber sido informado sobre la ", negrita: false },
-    { texto: "APTITUD y RECOMENDACIONES", negrita: true },
-    { texto: " de mi examen médico ", negrita: false },
-    { texto: datosFinales.tipoExamen, negrita: true },
-    { texto: " Realizado en el Policlínico Horizonte Medic de la ciudad de Trujillo.", negrita: false }
+    { texto: "La vigencia de esta constancia es del ", negrita: false },
+    { texto: textoVigencia, negrita: true }
   ];
   
   yPos = justificarTextoConNegritas(partesTexto2, margin, yPos, anchoTexto, lineHeight);
-  yPos += 5;
+  yPos += 8;
 
-  // Tercera línea: "Firmo la presente declaración en conformidad a lo expuesto líneas arriba." - JUSTIFICADO
-  const textoFirmo = "Firmo la presente declaración en conformidad a lo expuesto líneas arriba.";
-  yPos = justificarTexto(textoFirmo, margin, yPos, anchoTexto, lineHeight);
-  yPos += 10;
+  // Texto sobre información de resultados médicos - JUSTIFICADO
+  const textoInformacion = "A su vez se hace constar que se le ha informado al colaborador sobre los resultados Médicos Ocupacionales que se le practicaron en la fecha.";
+  yPos = justificarTexto(textoInformacion, margin, yPos, anchoTexto, lineHeight);
+  yPos += 15;
 
-  // Cuarta línea: "Trujillo, [día] de [mes] 2025."
+  // Fecha al final: "Fecha: [día] de [mes] de [año]"
   doc.setFont("helvetica", "normal");
-  const textoFecha = `Trujillo, ${dia} de ${mes} ${anio}.`;
+  const textoFecha = `Fecha: ${dia} de ${mes} de ${anio}`;
   doc.text(textoFecha, margin, yPos);
   yPos += 20;
 
-  // === FIRMA Y HUELLA DEL PACIENTE (usando dibujarFirmas, bajada 55mm) ===
-  yPos += 55;
+  // === FIRMA Y HUELLA DEL PACIENTE (usando dibujarFirmas) ===
+  yPos += 10;
   
   // Usar la función dibujarFirmas del utils
-  const yPosFinalFirmas = await dibujarFirmas({
+  await dibujarFirmas({
     doc,
     datos: data,
     y: yPos,
     pageW: pageW
   });
-
-  // Agregar DNI debajo de la firma y huella
-  const centroX = pageW / 2;
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(`DNI: ${datosFinales.documentoIdentidad}`, centroX, yPosFinalFirmas + 1.5, { align: "center" });
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8, fontSize: 8 });

@@ -5,7 +5,7 @@ import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import footerTR from '../../components/footerTR.jsx';
 import { dibujarFirmas } from "../../../utils/dibujarFirmas.js";
 
-export default async function ConsentAdmisionDeclaracionSintomaticoRespiratorio(data = {}, docExistente = null) {
+export default async function ConsentAdmisionInformacionAptitudMedicoOcupacional(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -21,6 +21,7 @@ export default async function ConsentAdmisionDeclaracionSintomaticoRespiratorio(
     numeroFicha: String(data?.norden ?? ''),
     codigoColor: String(data?.codigoColor ?? ''),
     textoColor: String(data?.textoColor ?? ''),
+    tipoExamen: String(data?.tipoExamen ?? ''),
   };
 
   // Función para obtener día y mes de la fecha
@@ -40,16 +41,18 @@ export default async function ConsentAdmisionDeclaracionSintomaticoRespiratorio(
   };
 
   const { dia, mes } = obtenerDiaYMes(data?.fechaRegistro);
+  const anio = new Date(data?.fechaRegistro).getFullYear() || '';
 
   // Header
   const drawHeader = () => {
     // Logo y membrete
     CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
 
-    // Título (bajado más)
+    // Título (dividido en dos líneas, bajado más)
     doc.setFont("helvetica", "bold").setFontSize(14);
     doc.setTextColor(0, 0, 0);
-    doc.text("DECLARACIÓN DE SINTOMÁTICO RESPIRATORIO", pageW / 2, 55, { align: "center" });
+    doc.text("DECLARACIÓN JURADA DE INFORMACIÓN DE", pageW / 2, 50, { align: "center" });
+    doc.text("APTITUD MÉDICO OCUPACIONAL", pageW / 2, 57, { align: "center" });
 
     // Número de Ficha, Sede, Fecha y Página
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -68,7 +71,7 @@ export default async function ConsentAdmisionDeclaracionSintomaticoRespiratorio(
     lineasSede.forEach((linea, idx) => {
       doc.text(linea, xInicioSede, 20 + (idx * 3.5));
     });
-    
+
     const yFechaExamen = lineasSede.length === 1 ? 25 : 20 + (lineasSede.length * 3.5) + 2;
     doc.text("Fecha de examen: " + (datosFinales.fechaExamen || ""), pageW - 70, yFechaExamen);
     doc.text("Pag. 01", pageW - 25, 8);
@@ -98,7 +101,7 @@ export default async function ConsentAdmisionDeclaracionSintomaticoRespiratorio(
   const justificarTextoConNegritas = (partesTexto, x, y, anchoMaximo, interlineado) => {
     // Construir lista de palabras con su formato (negrita o no)
     const palabrasConFormato = [];
-    
+
     partesTexto.forEach(parte => {
       const palabras = parte.texto.split(' ').filter(p => p.length > 0);
       palabras.forEach(palabra => {
@@ -230,32 +233,43 @@ export default async function ConsentAdmisionDeclaracionSintomaticoRespiratorio(
     { texto: datosFinales.apellidosNombres, negrita: true },
     { texto: ", de ", negrita: false },
     { texto: datosFinales.edad, negrita: true },
-    { texto: " años de edad, identificado con DNI: ", negrita: false },
+    { texto: " años de edad, identificado(a) con DNI N°: ", negrita: false },
     { texto: datosFinales.documentoIdentidad, negrita: true },
     { texto: ", postulante al cargo de ", negrita: false },
     { texto: datosFinales.puestoTrabajo, negrita: true },
     { texto: ", para la empresa ", negrita: false },
     { texto: datosFinales.empresa, negrita: true }
   ];
-  
+
   yPos = justificarTextoConNegritas(partesTexto1, margin, yPos, anchoTexto, lineHeight);
   yPos += 5;
 
-  // Segunda línea: "Por lo tanto..." - JUSTIFICADO
-  const texto2 = "Por lo tanto, en forma consciente y voluntaria, declaro que no presento cefalea, dolor de garganta, tos, fiebre, malestar general, ni dificultad para respirar.";
-  yPos = justificarTexto(texto2, margin, yPos, anchoTexto, lineHeight);
+  // Segunda línea: "declaro haber sido informado sobre la APTITUD y RECOMENDACIONES..." - JUSTIFICADO
+  const partesTexto2 = [
+    { texto: "Declaro haber sido informado sobre la ", negrita: false },
+    { texto: "APTITUD y RECOMENDACIONES", negrita: true },
+    { texto: " de mi examen médico ", negrita: false },
+    { texto: datosFinales.tipoExamen, negrita: true },
+    { texto: " Realizado en el Policlínico Horizonte Medic de la ciudad de Trujillo.", negrita: false }
+  ];
+
+  yPos = justificarTextoConNegritas(partesTexto2, margin, yPos, anchoTexto, lineHeight);
+  yPos += 5;
+
+  // Tercera línea: "Firmo la presente declaración en conformidad a lo expuesto líneas arriba." - JUSTIFICADO
+  const textoFirmo = "Firmo la presente declaración en conformidad a lo expuesto líneas arriba.";
+  yPos = justificarTexto(textoFirmo, margin, yPos, anchoTexto, lineHeight);
   yPos += 10;
 
-  // Tercera línea: "Trujillo, [día] de [mes] de 2025." (bajada 15mm)
-  yPos += 15;
+  // Cuarta línea: "Trujillo, [día] de [mes] 2025."
   doc.setFont("helvetica", "normal");
-  const texto3 = `Trujillo, ${dia} de ${mes} 2025.`;
-  doc.text(texto3, margin, yPos);
+  const textoFecha = `Trujillo, ${dia} de ${mes} ${anio}.`;
+  doc.text(textoFecha, margin, yPos);
   yPos += 20;
 
-  // === FIRMA Y HUELLA DEL PACIENTE (usando dibujarFirmas, bajada 40mm) ===
+  // === FIRMA Y HUELLA DEL PACIENTE (usando dibujarFirmas, bajada 55mm) ===
   yPos += 55;
-  
+
   // Usar la función dibujarFirmas del utils
   const yPosFinalFirmas = await dibujarFirmas({
     doc,
@@ -272,12 +286,11 @@ export default async function ConsentAdmisionDeclaracionSintomaticoRespiratorio(
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8, fontSize: 8 });
 
-  // === Imprimir ===
-  if (!docExistente) {
+  if (docExistente) {
+    return doc;
+  } else {
     imprimir(doc);
   }
-
-  return doc;
 }
 
 function imprimir(doc) {
@@ -289,4 +302,3 @@ function imprimir(doc) {
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
 }
-

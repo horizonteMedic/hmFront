@@ -1,3 +1,5 @@
+import { compressImage } from "../../../utils/helpers";
+
 // === FOOTER FICHA RADIOGRAFÍA CABECERA ===
 function footerFichaRadiografiaCabecera(doc, opts = {}, datos = {}) {
   const margin = 15;
@@ -85,7 +87,7 @@ function footerFichaRadiografiaCabecera(doc, opts = {}, datos = {}) {
   doc.text("Web : www.horizontemedic.com", baseX, yFila + 2);
 }
 
-const HeaderRAYOSXXXOFI = (doc, datos) => {
+const HeaderRAYOSXXXOFI = async (doc, datos) => {
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 12;
@@ -94,8 +96,9 @@ const HeaderRAYOSXXXOFI = (doc, datos) => {
   const logoW = 60,
     logoH = 20;
   const logoY = y + 10;
+  const imgCompressed = await compressImage("./img/logo-color.png");
   try {
-    doc.addImage("./img/logo-color.png", "PNG", margin, logoY, logoW, logoH);
+    doc.addImage(imgCompressed, "jpeg", margin, logoY, logoW, logoH);
   } catch {
     doc
       .setFont("helvetica", "normal")

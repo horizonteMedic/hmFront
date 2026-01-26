@@ -49,6 +49,9 @@ import Ficha from "./views/jaspers/HojadeRutaDinamico/HojadeRutaDinamico.jsx";
 
 
 import useAppVersionChecker from "./views/hooks/useAppVersionChecker.jsx";
+// import * as pdfjsLib from "pdfjs-dist";
+
+// pdfjsLib.disableWorker = true;
 
 const App = () => {
   return (

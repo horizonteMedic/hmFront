@@ -49,6 +49,8 @@ export const GetInfoServicio = async (
             // Recomendaciones
             recomendaciones: res.recomendaciones ?? "",
             observaciones: res.observaciones ?? "",
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -77,6 +79,8 @@ export const SubmitDataService = async (
         observaciones: form.observaciones,
         recomendaciones: form.recomendaciones,
         usuarioRegistro: user,
+
+        usuarioFirma: form.user_medicoFirma,
     };
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
         PrintHojaR(form.norden, token, tabla, datosFooter);

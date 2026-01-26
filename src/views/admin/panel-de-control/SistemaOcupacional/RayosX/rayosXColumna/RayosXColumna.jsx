@@ -1,5 +1,8 @@
 import {
+  handleSubirArchivo,
+  handleSubirArchivo2,
   PrintHojaR,
+  ReadArchivosForm,
   SubmitDataService,
   VerifyTR,
 } from "./controllerRayosXColumna";
@@ -13,6 +16,10 @@ import { getToday } from "../../../../../utils/helpers";
 import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
 import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import ButtonsPDF from "../../../../../components/reusableComponents/ButtonsPDF";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
 
 const tabla = "radiografia";
 
@@ -53,6 +60,10 @@ export default function RayosXColumna() {
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
+
+    SubirDoc: false,
+    nomenclatura: "INFORME RADIOGRAFICO",
+    nomenclatura2: "INFORME RADIOGRAFICO 2",
   };
 
   const {
@@ -66,6 +77,8 @@ export default function RayosXColumna() {
     handleClearnotO,
     handlePrintDefault
   } = useForm(initialFormState, { storageKey: "rayosXColumna" });
+
+  const [visualerOpen, setVisualerOpen] = useState(null)
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
@@ -111,7 +124,22 @@ export default function RayosXColumna() {
           disabled
           labelWidth="120px"
         />
+
       </SectionFieldset>
+      {form.SubirDoc &&
+        <div className="flex gap-2 w-full flex-col justify-center">
+          <ButtonsPDF
+            handleSave={() => { handleSubirArchivo2(form, selectedSede, userlogued, token, form.nomenclatura) }}
+            handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token) }}
+          />
+          <ButtonsPDF
+            handleSave={() => { handleSubirArchivo2(form, selectedSede, userlogued, token, form.nomenclatura2) }}
+            handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token, form.nomenclatura2) }}
+            Nombre_1="Subir Archivo 2"
+            Nombre_2="Ver Archivo 2"
+          />
+        </div>
+      }
       <DatosPersonalesLaborales form={form} />
       {/* Sección Radiografía de Columna */}
       <SectionFieldset legend="Radiografía de Columna" className="space-y-3">
@@ -163,7 +191,7 @@ export default function RayosXColumna() {
           onChange={handleChangeSimple}
         />
       </SectionFieldset>
-      
+
       <BotonesAccion
         form={form}
         handleSave={handleSave}
@@ -171,6 +199,24 @@ export default function RayosXColumna() {
         handlePrint={handlePrint}
         handleChangeNumberDecimals={handleChangeNumberDecimals}
       />
+      {visualerOpen && (
+        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
+            <div className="px-4 py-2 naranjabackgroud flex justify-between">
+              <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
+              <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+            </div>
+            <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
+              <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
+            </div>
+            <div className="flex justify-center">
+              <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

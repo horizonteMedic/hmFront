@@ -3,10 +3,10 @@ import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
-import { getSign } from '../../utils/helpers.js';
+import { getSign, getSignCompressed } from '../../utils/helpers.js';
 
-export default async function Certificaciondeconduccion_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function Certificaciondeconduccion_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // Contador de páginas dinámico
@@ -1143,7 +1143,7 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}) 
   const centroColumna2X = tablaInicioX + 60 + (60 / 2); // Centro de la columna 2
 
   // Agregar firma del trabajador (lado izquierdo)
-  let firmaTrabajadorUrl = getSign(data, "FIRMAP");
+  let firmaTrabajadorUrl = await getSignCompressed(data, "FIRMAP");
   if (firmaTrabajadorUrl) {
     try {
       const imgWidth = 30;
@@ -1157,7 +1157,7 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}) 
   }
 
   // Agregar huella del trabajador (lado derecho, vertical)
-  let huellaTrabajadorUrl = getSign(data, "HUELLA");
+  let huellaTrabajadorUrl = await getSignCompressed(data, "HUELLA");
   if (huellaTrabajadorUrl) {
     try {
       const imgWidth = 12;
@@ -1179,7 +1179,7 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}) 
   const firmaMedicoY = yPos + 3;
 
   // Agregar firma y sello médico
-  let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
+  let firmaMedicoUrl = await getSignCompressed(data, "SELLOFIRMA");
   if (firmaMedicoUrl) {
     try {
       const imgWidth = 45;
@@ -1203,7 +1203,12 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}) 
   footerTR(doc, { footerOffsetY: 8 });
 
   // === Imprimir ===
-  imprimir(doc);
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+
+  }
 }
 
 function imprimir(doc) {

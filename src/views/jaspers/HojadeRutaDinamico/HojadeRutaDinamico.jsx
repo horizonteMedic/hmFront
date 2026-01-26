@@ -5,7 +5,7 @@ import drawBox from "../components/drawBox";
 import drawC from "../components/drawC";
 import footer from "../components/footer";
 
-export default function HojadeRutaDinamico(datos = {}) {
+export default async function HojadeRutaDinamico(datos = {}) {
 
     // ==========================================
     // 1. DEFINICIÓN DE EXÁMENES (AGRUPACIÓN DINÁMICA)
@@ -13,45 +13,28 @@ export default function HojadeRutaDinamico(datos = {}) {
 
     // Lista de prueba solicitada por el usuario
     const testExams = [
-        { nombreExamen: "Audiologia", nombreArea: "Audiometria" },
-        { nombreExamen: "Espirometria Basal", nombreArea: "Espirometria" },
-        { nombreExamen: "Oftalmologia", nombreArea: "Oftalmologia" },
-        { nombreExamen: "Rayos X Torax", nombreArea: "Imagenes" },
-        { nombreExamen: "Rayos X Columna", nombreArea: "Imagenes" },
-        { nombreExamen: "Hemograma", nombreArea: "Laboratorio" },
-        { nombreExamen: "Glucosa", nombreArea: "Laboratorio" },
-        { nombreExamen: "Examen Medico", nombreArea: "Medicina" },
-        { nombreExamen: "Psicologia", nombreArea: "Psicologia" }
+        { nombreExamen: "Sin Examenes", nombreArea: "Sin Area" },
     ];
 
     const getCategorizedExams = (d) => {
-        // Usar la lista de exámenes proporcionada en 'd.listaExamenes' o usar la de prueba
-        // Si d.listaExamenes existe pero está vacío, usamos testExams para demostración si no hay otros datos
+        if (!Array.isArray(d?.areas)) return [];
 
-        let lista = [];
-        if (d.listaExamenes && Array.isArray(d.listaExamenes) && d.listaExamenes.length > 0) {
-            lista = d.listaExamenes;
-        } else {
-            // Si no hay lista, usamos la de prueba para que el usuario vea algo
-            lista = testExams;
-        }
+        return d.areas.map((area) => {
+            const examenesNormales = (area.examenes || []).map(ex => ({
+                nombre: ex.nombre,
+                subExamenes: (ex.subExamenes || []).map(se => se.nombre)
+            }));
 
-        const groups = {};
+            const examenesAdicionales = (area.examenesAdicionales || []).map(ex => ({
+                nombre: ex.nombre,
+                subExamenes: (ex.subExamenes || []).map(se => se.nombre)
+            }));
 
-        lista.forEach(exam => {
-            const area = exam.nombreArea || "OTROS";
-            if (!groups[area]) {
-                groups[area] = {
-                    name: area.toUpperCase(),
-                    exams: []
-                };
-            }
-            // Asumimos que si están en la lista, son activos.
-            groups[area].exams.push({ name: exam.nombreExamen, active: true });
-        });
-
-        // Convertir el objeto de grupos a un array
-        return Object.values(groups);
+            return {
+                area: area.nombre.toUpperCase(),
+                examenes: [...examenesNormales, ...examenesAdicionales]
+            };
+        }).filter(g => g.examenes.length > 0); // 👈 elimina áreas vacías
     };
 
     const baseAdicionales = [
@@ -65,20 +48,20 @@ export default function HojadeRutaDinamico(datos = {}) {
     // ==========================================
     // 2. GENERACIÓN DE TABLA ÚNICA POR CATEGORÍAS
     // ==========================================
-    const drawTable = (doc, startY, categories, adicionales) => {
+    const drawTable = async (doc, startY, categories, adicionales) => {
         const tableBody = [];
-
+        console.log("categories", categories);
         // 1. ITERAR CATEGORÍAS Y CREAR FILAS
-        categories.forEach(cat => {
-            const activeExams = cat.exams.filter(e => e.active);
-
+        await categories.forEach(cat => {
+            const activeExams = cat.examenes
+            console.log("activeExams", activeExams);
             if (activeExams.length > 0) {
                 // Usar viñetas más estéticas (•) en lugar de asteriscos (*)
-                const examList = activeExams.map(e => `• ${e.name}`).join("\n");
-
+                const examList = activeExams.map(e => `• ${e.nombre}`).join("\n");
+                console.log("examList", examList);
                 tableBody.push([
                     // Agregar salto de línea simple para separar el título del área de los exámenes
-                    { content: cat.name + "\n" + examList, styles: { halign: 'left' } },
+                    { content: cat.area + "\n" + examList, styles: { halign: 'left' } },
                     { content: "", styles: { minCellHeight: 10 } }
                 ]);
             }
@@ -132,7 +115,7 @@ export default function HojadeRutaDinamico(datos = {}) {
     // ==========================================
     const doc = new jsPDF();
 
-    headerHR(doc, datos);
+    await headerHR(doc, datos);
 
     const startY = 70;
 
@@ -148,18 +131,15 @@ export default function HojadeRutaDinamico(datos = {}) {
     doc.setFont("helvetica", "normal");
     const indicacionesTexto =
         "- DEJAR UNA COPIA A COLOR DE SU DNI VIGENTE\n" +
-        "- DEJAR COPIA A COLOR DE SU LICENCIA DE CONDUCIR VIGENTE, SI VA A CONDUCIR VEHICULO Y/O SE REALIZARÁ EXAMEN\nPSICOSENSOMETRICO";
+        "- DEJAR COPIA A COLOR DE SU LICENCIA DE CONDUCIR VIGENTE, SI VA A CONDUCIR VEHICULO\nY/O SE REALIZARÁ EXAMEN PSICOSENSOMETRICO";
 
     doc.text(indicacionesTexto, 12, startY + 10);
 
     const categorizedExams = getCategorizedExams(datos);
 
-    drawTable(doc, startY + 25, categorizedExams, baseAdicionales);
+    await drawTable(doc, startY + 25, categorizedExams, baseAdicionales);
 
     const pageHeight = doc.internal.pageSize.getHeight();
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "bold");
-    doc.text(`Registrado por : ${obtenerPrimeraPalabra(datos.userRegistro || "")}`, 15, pageHeight - 15);
 
     footer(doc, datos);
 

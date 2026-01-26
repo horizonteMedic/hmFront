@@ -1,4 +1,4 @@
-import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
+import { faBroom, faDownload, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
 import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
 import { useForm } from "../../../../../hooks/useForm"
@@ -7,7 +7,11 @@ import InputTextArea from "../../../../../components/reusableComponents/InputTex
 import useRealTime from "../../../../../hooks/useRealTime";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./ControllerAptitudPoderosa";
+import { handleSubirArchivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./ControllerAptitudPoderosa";
+import ButtonsPDF from "../../../../../components/reusableComponents/ButtonsPDF";
+import { useState } from "react";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 
 const tabla = "aptitud_altura_poderosa"
 const today = getToday();
@@ -17,27 +21,28 @@ fecha.setFullYear(fecha.getFullYear() + 1);
 const nextYearDate = fecha.toISOString().split("T")[0];
 
 const opcionesConclusiones = [
-  { label: "CORREGIR AGUDEZA VISUAL TOTAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO", value: "Check1" },
-  { label: "CORREGIR AGUDEZA VISUAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO", value: "Check2" },
-  { label: "CORREGIR AGUDEZA VISUAL PARA LECTURA CERCA", value: "Check3" },
-  { label: "EVITAR MOVIMIENTOS Y POSICIONES DISERGONOMICAS", value: "Check4" },
-  { label: "NO HACER TRABAJO DE ALTO RIESGO", value: "Check5" },
-  { label: "NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO", value: "Check6" },
-  { label: "USO DE EPP AUDITIVO ANTE EXPOSICION A RUIDO >=80 DB", value: "Check7" },
-  { label: "USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHÍCULOS MOTORIZADOS", value: "Check8" },
-  { label: "USO DE LENTES CORRECTORES PARA TRABAJO", value: "Check9" },
-  { label: "USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO", value: "Check10" },
-  { label: "USO DE LENTES CORRECTORES LECTURA DE CERCA", value: "Check11" },
-  { label: "NO CONDUCIR VEHÍCULOS", value: "Check12" },
-  { label: "NO HACER TRABAJO CON CÓDIGO COLORES", value: "Check13" },
-  { label: "DIETA HIPOCALÓRICA Y EJERCICIOS", value: "Check14" },
-  { label: "NINGUNO", value: "Check15" },
+    { label: "CORREGIR AGUDEZA VISUAL TOTAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO", value: "Check1" },
+    { label: "CORREGIR AGUDEZA VISUAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO", value: "Check2" },
+    { label: "CORREGIR AGUDEZA VISUAL PARA LECTURA CERCA", value: "Check3" },
+    { label: "EVITAR MOVIMIENTOS Y POSICIONES DISERGONOMICAS", value: "Check4" },
+    { label: "NO HACER TRABAJO DE ALTO RIESGO", value: "Check5" },
+    { label: "NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO", value: "Check6" },
+    { label: "USO DE EPP AUDITIVO ANTE EXPOSICION A RUIDO >=80 DB", value: "Check7" },
+    { label: "USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHÍCULOS MOTORIZADOS", value: "Check8" },
+    { label: "USO DE LENTES CORRECTORES PARA TRABAJO", value: "Check9" },
+    { label: "USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO", value: "Check10" },
+    { label: "USO DE LENTES CORRECTORES LECTURA DE CERCA", value: "Check11" },
+    { label: "NO CONDUCIR VEHÍCULOS", value: "Check12" },
+    { label: "NO HACER TRABAJO CON CÓDIGO COLORES", value: "Check13" },
+    { label: "DIETA HIPOCALÓRICA Y EJERCICIOS", value: "Check14" },
+    { label: "NINGUNO", value: "Check15" },
 ];
 
 const CertificadoAptitudPoderosa = () => {
-    const { token, userlogued, selectedSede, datosFooter, userCompleto } =
-            useSessionData();
-    
+    const { token, userlogued, selectedSede, datosFooter, userCompleto, userName } =
+        useSessionData();
+    const [visualerOpen, setVisualerOpen] = useState(null)
+
     const InitialForm = {
         norden: "",
         nombreExamen: "",
@@ -51,10 +56,16 @@ const CertificadoAptitudPoderosa = () => {
         fechaHasta: nextYearDate,
         observaciones: "",
         nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
-        userlogued: userlogued
+        userlogued: userlogued,
+        SubirDoc: false,
+        nomenclatura: "PSICOSENSOMETRICO",
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
     }
 
-    const { form, setForm, handleChangeNumber, handleChangeSimple, handleClearnotO, handleClear, handleChange, handlePrintDefault, handleRadioButton} = useForm(InitialForm, { storageKey: "Certificado_Aptitud_Poderosa_form" })
+    const { form, setForm, handleChangeNumber, handleChangeSimple, handleClearnotO, handleClear, handleChange, handlePrintDefault, handleRadioButton } = useForm(InitialForm, { storageKey: "Certificado_Aptitud_Poderosa_form" })
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
@@ -76,14 +87,14 @@ const CertificadoAptitudPoderosa = () => {
 
     const handleRadioButtonConclusiones = (e) => {
         const { name, value } = e.target;
-        
+
         // Busca el label correspondiente al valor seleccionado
         const selectedOption = opcionesConclusiones.find(opt => opt.value === value);
         if (value === "Check15") {
             setForm({
                 ...form,
-            [name]: value, // actualiza la selección del radio
-            observaciones: "- NINGUNO" // agrega el texto con salto
+                [name]: value, // actualiza la selección del radio
+                observaciones: "- NINGUNO" // agrega el texto con salto
             });
             return
         }
@@ -95,24 +106,24 @@ const CertificadoAptitudPoderosa = () => {
             }
             // Si ya existe texto previo en observaciones, agregamos un salto de línea
             nuevasObservaciones = nuevasObservaciones
-            ? `${nuevasObservaciones}\n${textoAgregar}`
-            : textoAgregar;
+                ? `${nuevasObservaciones}\n${textoAgregar}`
+                : textoAgregar;
 
             setForm({
-            ...form,
-            [name]: value, // actualiza la selección del radio
-            observaciones: nuevasObservaciones // agrega el texto con salto
+                ...form,
+                [name]: value, // actualiza la selección del radio
+                observaciones: nuevasObservaciones // agrega el texto con salto
             });
         }
     };
 
-    return(
+    return (
         <>
             <div className="mx-auto bg-white overflow-hidden">
                 {/* Header */}
                 <h1 className="text-blue-600 font-semibold p-4 pb-0 mb-0 m-4">Aptitud</h1>
                 <div className="flex h-full">
-                {/* Contenido principal - 80% */}
+                    {/* Contenido principal - 80% */}
                     <div className="w-4/5">
                         <div className="w-full">
                             {/* Datos del trabajador */}
@@ -136,95 +147,100 @@ const CertificadoAptitudPoderosa = () => {
                                 <div className="flex justify-end mt-3">
                                     <h1 className="text-lg font-bold">{useRealTime()}</h1>
                                 </div>
-                                
+                                {form.SubirDoc &&
+                                    <ButtonsPDF
+                                        handleSave={() => { handleSubirArchivo(form, selectedSede, userlogued, token) }}
+                                        handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token) }}
+                                    />
+                                }
                             </section>
-    
+
                             <h1 className="text-blue-600 font-semibold p-4 pb-0 mb-0 m-4">Certifica que el Sr.</h1>
                             <section className="bg-white border border-gray-200 rounded-lg p-4 mt-0 m-4">
                                 {/* Fila 1: Datos personales */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                                     <InputTextOneLine
-                                    label="Nombres y Apellidos"
-                                    name="nombres"
-                                    disabled
-                                    value={form?.nombres}
-                                    onChange={handleChange}
+                                        label="Nombres y Apellidos"
+                                        name="nombres"
+                                        disabled
+                                        value={form?.nombres}
+                                        onChange={handleChange}
                                     />
                                     <InputTextOneLine
-                                    label="DNI"
-                                    disabled
-                                    labelWidth="50px"
-                                    name="dniPaciente"
-                                    value={form?.dniPaciente}
-                                    onChange={handleChange}
+                                        label="DNI"
+                                        disabled
+                                        labelWidth="50px"
+                                        name="dniPaciente"
+                                        value={form?.dniPaciente}
+                                        onChange={handleChange}
                                     />
                                     <InputTextOneLine
-                                    label="Edad"
-                                    disabled
-                                    labelWidth="50px"
-                                    name="edadPaciente"
-                                    value={form?.edadPaciente}
-                                    onChange={handleChange}
+                                        label="Edad"
+                                        disabled
+                                        labelWidth="50px"
+                                        name="edadPaciente"
+                                        value={form?.edadPaciente}
+                                        onChange={handleChange}
                                     />
                                     <InputTextOneLine
-                                    label="Género"
-                                    disabled
-                                    labelWidth="60px"
-                                    name="sexo"
-                                    value={form?.sexo}
-                                    onChange={handleChange}
+                                        label="Género"
+                                        disabled
+                                        labelWidth="60px"
+                                        name="sexo"
+                                        value={form?.sexo}
+                                        onChange={handleChange}
                                     />
                                 </div>
-    
+
                                 {/* Fila 2: Empresa y Contratista */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                                     <InputTextOneLine
-                                    label="Empresa"
-                                    name="empresa"
-                                    disabled
-                                    value={form?.empresa}
-                                    onChange={handleChange}
+                                        label="Empresa"
+                                        name="empresa"
+                                        disabled
+                                        value={form?.empresa}
+                                        onChange={handleChange}
                                     />
                                     <InputTextOneLine
-                                    label="Contratista"
-                                    disabled
-                                    name="contratista"
-                                    value={form?.contrata}
-                                    onChange={handleChange}
+                                        label="Contratista"
+                                        disabled
+                                        name="contratista"
+                                        value={form?.contrata}
+                                        onChange={handleChange}
                                     />
                                 </div>
-    
+
                                 {/* Fila 3: Puesto y Ocupación */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                                     <InputTextOneLine
-                                    label="Puesto al que Postula"
-                                    name="cargoPaciente"
-                                    disabled
-                                    value={form?.cargoPaciente}
-                                    onChange={handleChange}
+                                        label="Puesto al que Postula"
+                                        name="cargoPaciente"
+                                        disabled
+                                        value={form?.cargoPaciente}
+                                        onChange={handleChange}
                                     />
                                     <InputTextOneLine
-                                    label="Ocupación Actual o Última Ocupación"
-                                    name="ocupacionPaciente"
-                                    disabled
-                                    value={form?.ocupacionPaciente}
-                                    onChange={handleChange}
+                                        label="Ocupación Actual o Última Ocupación"
+                                        name="ocupacionPaciente"
+                                        disabled
+                                        value={form?.ocupacionPaciente}
+                                        onChange={handleChange}
                                     />
                                 </div>
                             </section>
-                            
+
                             <div className="flex w-full">
                                 <div className="w-1/2">
                                     <section className="bg-white border border-gray-200 rounded-lg p-4 gap-4 mt-0 m-4">
-                                            <InputsRadioGroup
+                                        <InputsRadioGroup
                                             vertical
                                             name="apto" value={form?.apto} className="py-2"
                                             onChange={handleRadioButton} options={[
                                                 { label: "APTO (para el puesto en el que trabaja o postula)", value: "APTO" },
                                                 { label: "No APTO (para el puesto en el que trabaja o postula)", value: "NOAPTO" }
                                             ]}
-                                            />
-                                        
+                                        />
+
                                         <div className="w-full flex justify-between items-center pt-4 pb-2 px-2">
                                             <InputTextOneLine
                                                 label="Fecha"
@@ -245,15 +261,16 @@ const CertificadoAptitudPoderosa = () => {
                                         </div>
                                     </section>
                                     <section className="bg-white rounded-lg p-4 pb-1 pt-1 gap-4 mt-0 m-4">
-                                        
-                                        <InputTextOneLine
-                                        label="Medico que Certifica"
-                                        name="nombre_medico"
-                                        disabled
-                                        className="mt-2"
-                                        value={form?.nombre_medico}
-                                        onChange={handleChange}
-                                        />
+
+                                        <SectionFieldset legend="Asignación de Médico">
+                                            <EmpleadoComboBox
+                                                value={form.nombre_medico}
+                                                label="Especialista"
+                                                form={form}
+                                                onChange={handleChangeSimple}
+                                            />
+                                        </SectionFieldset>
+
                                         <div className="w-full flex justify-between items-center gap-1 mt-4">
                                             <div className="flex gap-1">
                                                 <button
@@ -279,7 +296,7 @@ const CertificadoAptitudPoderosa = () => {
                                                     onChange={handleChangeNumber}
                                                     className="border rounded px-2 py-1 text-base w-24"
                                                 />
-    
+
                                                 <button
                                                     type="button"
                                                     onClick={handlePrint}
@@ -298,29 +315,29 @@ const CertificadoAptitudPoderosa = () => {
                                             classNameLabel="text-blue-600"
                                             rows={5}
                                             name="observaciones"
-                                        />               
+                                        />
                                     </div>
                                 </div>
                                 <div className="w-1/2 h-auto">
                                     <InputsRadioGroup
-                                    name="conclusiones"
-                                    vertical
-                                    value={form?.conclusiones}
-                                    className="py-2"
-                                    onChange={handleRadioButtonConclusiones}
-                                    options={opcionesConclusiones}
+                                        name="conclusiones"
+                                        vertical
+                                        value={form?.conclusiones}
+                                        className="py-2"
+                                        onChange={handleRadioButtonConclusiones}
+                                        options={opcionesConclusiones}
                                     />
                                 </div>
                             </div>
-                            
+
                         </div>
                     </div>
-    
-                {/* Panel lateral de Agudeza Visual - 20% */}
-                <div className="w-1/5">
-                    <div className="bg-white border border-gray-200 rounded-lg p-4 m-4 flex-1 flex flex-col space-y-3">
-                        <h4 className="font-bold text-lg text-gray-800 mb-3 text-center">Sin Corregir</h4>
-                        {/* Sin Corregir */}
+
+                    {/* Panel lateral de Agudeza Visual - 20% */}
+                    <div className="w-1/5">
+                        <div className="bg-white border border-gray-200 rounded-lg p-4 m-4 flex-1 flex flex-col space-y-3">
+                            <h4 className="font-bold text-lg text-gray-800 mb-3 text-center">Sin Corregir</h4>
+                            {/* Sin Corregir */}
                             <div className="mb-4">
                                 <h5 className="font-semibold text-gray-700 mb-2 text-center">Sin Corregir</h5>
                                 <div className="grid grid-cols-2 gap-3">
@@ -340,7 +357,7 @@ const CertificadoAptitudPoderosa = () => {
                                     </div>
                                 </div>
                             </div>
-    
+
                             {/* Corregida */}
                             <div className="mb-4">
                                 <h5 className="font-semibold text-gray-700 mb-2 text-center">Corregida</h5>
@@ -410,41 +427,58 @@ const CertificadoAptitudPoderosa = () => {
                                 </div>
                             </div>
                             {/* Enfermedades Oculares */}
-                            <InputTextArea label="Enfermedades Oculares" rows={2    } name="enfermedadesOcularesOftalmo_e_oculares" value={form?.enfermedadesOcularesOftalmo_e_oculares} onChange={handleChange} disabled />
-                    </div>
-                    <div className="bg-white  rounded-lg p-4 m-4 flex-1 flex flex-col space-y-3">
-                        <InputTextOneLine
-                            label="Hemoglobina"
-                            name="hemoglobina_txthemoglobina"
-                            value={form?.hemoglobina_txthemoglobina}
-                            disabled
-                            labelWidth="80px"
-                        />
-                        <InputTextOneLine
-                            label="V.S.G"
-                            name="vsgLabClinico_txtvsg"
-                            value={form?.vsgLabClinico_txtvsg}
-                            disabled
-                            labelWidth="80px"
-                        />
-                        <InputTextOneLine
-                            label="Glucosa"
-                            name="glucosaLabClinico_txtglucosabio"
-                            value={form?.glucosaLabClinico_txtglucosabio}
-                            disabled
-                            labelWidth="80px"
-                        />
-                        <InputTextOneLine
-                            label="Creatinina"
-                            name="creatininaLabClinico_txtcreatininabio"
-                            value={form?.creatininaLabClinico_txtcreatininabio}
-                            disabled
-                            labelWidth="80px"
-                        />
+                            <InputTextArea label="Enfermedades Oculares" rows={2} name="enfermedadesOcularesOftalmo_e_oculares" value={form?.enfermedadesOcularesOftalmo_e_oculares} onChange={handleChange} disabled />
+                        </div>
+                        <div className="bg-white  rounded-lg p-4 m-4 flex-1 flex flex-col space-y-3">
+                            <InputTextOneLine
+                                label="Hemoglobina"
+                                name="hemoglobina_txthemoglobina"
+                                value={form?.hemoglobina_txthemoglobina}
+                                disabled
+                                labelWidth="80px"
+                            />
+                            <InputTextOneLine
+                                label="V.S.G"
+                                name="vsgLabClinico_txtvsg"
+                                value={form?.vsgLabClinico_txtvsg}
+                                disabled
+                                labelWidth="80px"
+                            />
+                            <InputTextOneLine
+                                label="Glucosa"
+                                name="glucosaLabClinico_txtglucosabio"
+                                value={form?.glucosaLabClinico_txtglucosabio}
+                                disabled
+                                labelWidth="80px"
+                            />
+                            <InputTextOneLine
+                                label="Creatinina"
+                                name="creatininaLabClinico_txtcreatininabio"
+                                value={form?.creatininaLabClinico_txtcreatininabio}
+                                disabled
+                                labelWidth="80px"
+                            />
+                        </div>
                     </div>
                 </div>
-            </div>
-                
+                {visualerOpen && (
+                    <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+                        <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
+                            <div className="px-4 py-2 naranjabackgroud flex justify-between">
+                                <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
+                                <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+                            </div>
+                            <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
+                                <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
+                            </div>
+                            <div className="flex justify-center">
+                                <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                                    <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </>
     )

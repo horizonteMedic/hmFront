@@ -35,7 +35,7 @@ export const GetInfoServicio = async (
             ...res,
             norden: res.norden,
             tipoExamen: res.nombreExamen,
-            anual: res.anual,
+            anual: res.nombreExamen == "ANUAL",
             fechaExam: res.fecha,
             nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
             dni: res.dniPaciente,
@@ -72,6 +72,9 @@ export const GetInfoServicio = async (
             tomaDecisiones: res.aspectosPsicolaborales6A ? "A" : res.aspectosPsicolaborales6D ? "D" : res.aspectosPsicolaborales6NA ? "NA" : res.aspectosPsicolaborales6NM ? "NM" : res.aspectosPsicolaborales6PD ? "PD" : undefined,
             crecimientoPersonal: res.aspectosPsicolaborales7A ? "A" : res.aspectosPsicolaborales7D ? "D" : res.aspectosPsicolaborales7NA ? "NA" : res.aspectosPsicolaborales7NM ? "NM" : res.aspectosPsicolaborales7PD ? "PD" : undefined,
             motivacion: res.aspectosPsicolaborales8A ? "A" : res.aspectosPsicolaborales8D ? "D" : res.aspectosPsicolaborales8NA ? "NA" : res.aspectosPsicolaborales8NM ? "NM" : res.aspectosPsicolaborales8PD ? "PD" : undefined,
+
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -202,7 +205,9 @@ export const SubmitDataService = async (
         "recomendaciones": form.recomendaciones,
         "apto": form.esApto ? true : false,
         "noApto": form.esApto ? true : false,
-        "usuarioRegistro": user
+        "usuarioRegistro": user,
+
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -255,6 +260,7 @@ const GetInfoPac = async (nro, set, token, sede) => {
             ...res,
             nombres: res.nombresApellidos,
             sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
+            anual: res.nombreExamen == "ANUAL",
             dni: res.dni,
             edad: res.edad,
             tipoExamen: res.nomExam,

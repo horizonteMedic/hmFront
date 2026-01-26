@@ -4,7 +4,8 @@ import {
   InputTextOneLine,
   InputTextArea,
   InputCheckbox,
-  InputsRadioGroup
+  InputsRadioGroup,
+  SectionFieldset
 } from "../../../../../components/reusableComponents/ResusableComponents";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getDatePlusOneYear, getToday } from "../../../../../utils/helpers";
@@ -12,15 +13,17 @@ import { useForm } from "../../../../../hooks/useForm";
 import MedicoSearch from "../../../../../components/reusableComponents/MedicoSearch";
 import useRealTime from "../../../../../hooks/useRealTime";
 import { PrintHojaR, PrintHojaR2, SubmitDataService, VerifyTR } from "./controllerFichaAptitudAnexo16";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "certificado_aptitud_medico_ocupacional"
 const tabla2 = "resumen_medico_poderosa"
-const today = getToday();
+
 
 export default function FichaAptitudAnexo16({ MedicosMulti }) {
+  const today = getToday();
   const hora = useRealTime();
 
-  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+  const { token, userlogued, selectedSede, datosFooter, userCompleto, userName } =
     useSessionData();
 
   const initialFormState = {
@@ -79,8 +82,9 @@ export default function FichaAptitudAnexo16({ MedicosMulti }) {
     glucosa: "",
     creatinina: "",
 
-    // Médico que Certifica
-    nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
   const {
@@ -362,11 +366,14 @@ export default function FichaAptitudAnexo16({ MedicosMulti }) {
                   rows={6}
                   className="mb-3"
                 />
-                <MedicoSearch
-                  value={form.nombre_medico}
-                  onChange={handleChangeSimple}
-                  MedicosMulti={MedicosMulti}
-                />
+                <SectionFieldset legend="Asignación de Médico">
+                  <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Especialista"
+                    form={form}
+                    onChange={handleChangeSimple}
+                  />
+                </SectionFieldset>
               </div>
             </div>
 

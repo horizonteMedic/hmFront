@@ -6,7 +6,7 @@ import { convertirGenero } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
 import { dibujarFirmas } from '../../../utils/dibujarFirmas.js';
 
-export default function InformePsicoEspecificos(data = {}, docExistente = null) {
+export default async function InformePsicoEspecificos(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -77,7 +77,7 @@ export default function InformePsicoEspecificos(data = {}, docExistente = null) 
     lineasSede.forEach((linea, idx) => {
       doc.text(linea, xInicioSede, 20 + (idx * 3.5));
     });
-    
+
     // Ajustar posición de "Fecha de examen" según la cantidad de líneas de la sede
     const yFechaExamen = lineasSede.length === 1 ? 25 : 20 + (lineasSede.length * 3.5) + 2;
     doc.text("Fecha de examen: " + (datosFinales.fechaExamen || ""), pageW - 70, yFechaExamen);
@@ -102,7 +102,7 @@ export default function InformePsicoEspecificos(data = {}, docExistente = null) 
     if (!texto || texto === null || texto === undefined) {
       return y;
     }
-    
+
     const fontSize = doc.internal.getFontSize();
     const palabras = String(texto).split(' ');
     let lineaActual = '';
@@ -168,20 +168,20 @@ export default function InformePsicoEspecificos(data = {}, docExistente = null) 
 
     const padding = 3;
     doc.setFont("helvetica", "normal").setFontSize(9);
-    
+
     // Dividir texto en líneas
     const lineas = doc.splitTextToSize(String(texto), anchoMaximo - 4);
     const alturaTexto = lineas.length * 3.5 + padding * 2;
     const alturaFinal = Math.max(alturaMinima, alturaTexto);
-    
+
     // Dibujar borde
     doc.rect(tablaInicioX, y, tablaAncho, alturaFinal, 'S');
-    
+
     // Dibujar texto
     lineas.forEach((linea, idx) => {
       doc.text(linea, x + 2, y + padding + 2 + (idx * 3.5));
     });
-    
+
     return y + alturaFinal;
   };
 
@@ -329,7 +329,7 @@ export default function InformePsicoEspecificos(data = {}, docExistente = null) 
   dibujarTextoConSaltoLinea(datosFinales.contrata, tablaInicioX + 25, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
- 
+
 
   // Verificar si necesitamos nueva página
   if (yPos + 30 > pageHeight - 20) {
@@ -354,16 +354,16 @@ export default function InformePsicoEspecificos(data = {}, docExistente = null) 
   // Dibujar filas de criterios
   criterios.forEach((criterio, idx) => {
     const yFila = yPos + (idx * filaAltura);
-    
+
     // Calcular altura necesaria para el valor (si es largo)
     doc.setFont("helvetica", "normal").setFontSize(9);
     const anchoDisponibleValor = tablaAncho - colCriterio - 4;
     const lineasValor = doc.splitTextToSize(criterio.valor, anchoDisponibleValor);
     const alturaFila = Math.max(filaAltura, lineasValor.length * 3.5 + 1);
-    
+
     // Dibujar rectángulo completo de la fila
     doc.rect(tablaInicioX, yFila, tablaAncho, alturaFila, 'S');
-    
+
     // Línea divisoria entre criterio y resultado
     doc.line(tablaInicioX + colCriterio, yFila, tablaInicioX + colCriterio, yFila + alturaFila);
 
@@ -412,7 +412,7 @@ export default function InformePsicoEspecificos(data = {}, docExistente = null) 
   doc.setFont("helvetica", "normal").setFontSize(9);
   const lineasFortalezas = doc.splitTextToSize(textoFortalezas, anchoValor);
   const alturaFortalezas = Math.max(filaAltura, lineasFortalezas.length * 3.5 + paddingVertical * 2);
-  
+
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaFortalezas, 'S');
   doc.line(tablaInicioX + anchoLabel, yPos, tablaInicioX + anchoLabel, yPos + alturaFortalezas);
   doc.setFont("helvetica", "bold").setFontSize(9);
@@ -432,7 +432,7 @@ export default function InformePsicoEspecificos(data = {}, docExistente = null) 
   const textoAmenazas = datosFinales.amenazasDebilidades || "-";
   const lineasAmenazas = doc.splitTextToSize(textoAmenazas, anchoValor);
   const alturaAmenazas = Math.max(filaAltura, lineasAmenazas.length * 3.5 + paddingVertical * 2);
-  
+
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaAmenazas, 'S');
   doc.line(tablaInicioX + anchoLabel, yPos, tablaInicioX + anchoLabel, yPos + alturaAmenazas);
   doc.setFont("helvetica", "bold").setFontSize(9);
@@ -476,28 +476,28 @@ export default function InformePsicoEspecificos(data = {}, docExistente = null) 
   // Función para procesar recomendaciones (separar por líneas o guiones)
   const procesarRecomendaciones = (texto) => {
     if (!texto || texto.trim() === '') return [];
-    
+
     // Si tiene saltos de línea, dividir por ellos
     if (texto.includes('\n')) {
       return texto.split('\n').filter(item => item.trim() !== '');
     }
-    
+
     // Si tiene guiones al inicio, dividir por ellos
     if (texto.includes('-')) {
       const items = texto.split(/-/).filter(item => item.trim() !== '');
       return items.map(item => item.trim());
     }
-    
+
     // Si no, devolver como un solo item
     return [texto];
   };
 
   // Procesar recomendaciones
   const itemsRecomendaciones = procesarRecomendaciones(datosFinales.recomendaciones);
-  
+
   // Ancho disponible para recomendaciones (sin reservar espacio para firma)
   const anchoRecomendaciones = tablaAncho - 4;
-  
+
   // Calcular altura necesaria (con padding igual que OBSERVACIONES)
   const padding = 3;
   let alturaRecomendaciones = 20;
@@ -510,10 +510,10 @@ export default function InformePsicoEspecificos(data = {}, docExistente = null) 
     });
     alturaRecomendaciones = Math.max(20, alturaTotal + padding * 2); // padding arriba y abajo
   }
-  
+
   // Dibujar borde
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaRecomendaciones, 'S');
-  
+
   // Dibujar recomendaciones (con padding arriba igual que OBSERVACIONES)
   doc.setFont("helvetica", "normal").setFontSize(9);
   let yRecomendaciones = yPos + padding + 2; // Mismo padding que OBSERVACIONES (3 + 2 = 5)
@@ -586,30 +586,17 @@ export default function InformePsicoEspecificos(data = {}, docExistente = null) 
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaSeccionFirma, 'S');
 
   // Usar la función dibujarFirmas para dibujar las firmas
-  dibujarFirmas({ doc, datos: data, y: yPos + 2, pageW }).then(() => {
+  await dibujarFirmas({ doc, datos: data, y: yPos + 2, pageW }).then(() => {
     // === FOOTER ===
     footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
-
-    // === Imprimir ===
-    if (!docExistente) {
-      imprimir(doc);
-    }
   }).catch(err => {
     console.error("Error al cargar firmas:", err);
-    
-    // === FOOTER ===
-    footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
-    
-    // === Imprimir ===
-    if (!docExistente) {
-      imprimir(doc);
-    }
   });
 
-  // Si hay docExistente, retornar el doc (las firmas se agregarán asíncronamente)
   if (docExistente) {
-    footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
     return doc;
+  } else {
+    imprimir(doc);
   }
 }
 

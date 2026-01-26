@@ -8,10 +8,9 @@ import {
     VerifyTRDefault,
 } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
-import { getHoraActual } from "../../../../../utils/helpers";
 
-const obtenerReporteUrl = "";
-const registrarUrl = "";
+const obtenerReporteUrl = "/api/v01/ct/registroConformidadEmo/reporteRegistroConformidadEmo";
+const registrarUrl = "/api/v01/ct/registroConformidadEmo/registrarActualizarRegistroConformidadEmo";
 
 export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
     const res = await GetInfoServicioDefault(nro, tabla, token, obtenerReporteUrl, onFinish);
@@ -19,13 +18,15 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
-            idConsentimiento: res.idConsentimiento ?? null,
-            fecha: res.fechaRegistro ?? "",
+            fecha: res.fechaEmo ?? "",
+            nombreExamen: res.nombreExamen ?? "",
             edad: res.edadPaciente ?? "",
             nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
             dni: res.dniPaciente ?? "",
             ocupacion: res.ocupacionPaciente ?? "",
             empresa: res.empresa ?? "",
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -38,19 +39,16 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla, datos
 
     const body = {
         norden: form.norden,
-        idConsentimiento: form.idConsentimiento,
+        fechaEmo: form.fecha,
+        fechaEntrega: form.fecha,
 
-        tipoReporte: tabla,
-        nombreReporte: "Constancia_Suficiencia_Brigadista",
+        tipoEmo: form.nombreExamen,
+        apellidosNombres: form.nombres,
+        dni: form.dni,
+        puestoTrabajo: form.ocupacion,
 
-        antecedentesPatologicos: false,
-        detalleAntecedentes: null,
-
-        fechaFirma: form.fecha,
-        horaReporte: getHoraActual(),
-        usuarioRegistro: user,
-        fechaRegistro: form.fecha,
-        usuarioActualiza: user,
+        userRegistro: user,
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -59,7 +57,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla, datos
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../jaspers/ConsentimientosAdmision/ConsentAdmisInformaAptiMedicoOcupa/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../jaspers/ModuloConsentimientos/ConstanciaLecturaYEntregaResultadosEMO_boro/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -67,7 +65,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../jaspers/ConsentimientosAdmision/ConsentAdmisInformaAptiMedicoOcupa"
+        "../../../../../jaspers/ModuloConsentimientos/ConstanciaLecturaYEntregaResultadosEMO_boro"
     );
 };
 

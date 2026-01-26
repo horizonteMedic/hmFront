@@ -2,8 +2,11 @@ import Swal from "sweetalert2";
 import {
   GetInfoPacDefault,
   GetInfoServicioDefault,
+  handleImgtoPdfDefault,
+  handleSubirArchivoDefaultSinSellos,
   LoadingDefault,
   PrintHojaRDefault,
+  ReadArchivosFormDefault,
   SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../../utils/functionUtils";
@@ -13,6 +16,10 @@ const obtenerReporteUrl =
   "/api/v01/ct/rayosX/obtenerReporteInformeRadiografico";
 const registrarUrl =
   "/api/v01/ct/rayosX/registrarActualizarInformeRadiografico";
+const registrarPDF =
+  "/api/v01/ct/archivos/archivoInterconsulta"
+
+
 
 export const GetInfoServicio = async (
   nro,
@@ -60,6 +67,9 @@ export const GetInfoServicio = async (
       conclusion: res.conclusiones ?? "",
 
       user_medicoFirma: res.usuarioFirma,
+
+      SubirDoc: true,
+      digitalizacion: res.digitalizacion
     }));
   }
 };
@@ -155,3 +165,15 @@ const GetInfoPac = async (nro, set, token, sede) => {
 export const Loading = (mensaje) => {
   LoadingDefault(mensaje);
 };
+
+export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
+  handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
+};
+
+export const handleSubirArchivo2 = async (form, selectedSede, userlogued, token, nomenclatura) => {
+  handleImgtoPdfDefault(form, selectedSede, registrarPDF, userlogued, token, nomenclatura)
+};
+
+export const ReadArchivosForm = async (form, setVisualerOpen, token, nomenclatura) => {
+  ReadArchivosFormDefault(form, setVisualerOpen, token, nomenclatura)
+}

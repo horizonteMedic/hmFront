@@ -146,6 +146,8 @@ export const GetInfoServicioEditar = async (
             vsg: res.vsglabclinicoTxtvsg,
             glucosa: res.glucosalabclinicoTxtglucosabio,
             creatinina: res.creatininalabclinicoTxtcreatininabio,
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -179,6 +181,8 @@ export const SubmitDataService = async (
         recomendaciones: form.recomendaciones,
         conclusiones: form.conclusiones,
         usuarioRegistro: user,
+
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

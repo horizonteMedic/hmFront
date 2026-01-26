@@ -73,6 +73,7 @@ import {
   faBrain,
   faArrowUp,
   faFileContract,
+  faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -147,6 +148,7 @@ const TabComponent = () => {
 
   //Sede
   const [selectSede, setSelectSede] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
     if (userlogued?.sedes?.length > 0) {
       const sedeTNP = userlogued.sedes.find((sede) => sede.cod_sede === "T-NP");
@@ -245,7 +247,7 @@ const TabComponent = () => {
       <div className={styles.mainContent}>
         {activeTab === null && (
           <>
-            <div className={styles.sedeSelector}>
+            <div className={styles.sedeSelector} style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
               <select
                 className={styles.sedeSelect}
                 onChange={(e) => { setSelectSede(e.target.value), setSelectedSede(e.target.value) }}
@@ -257,6 +259,34 @@ const TabComponent = () => {
                   </option>
                 ))}
               </select>
+              <div style={{ position: 'relative', width: '250px' }}>
+                <input
+                  type="text"
+                  placeholder="Buscar módulo..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 35px 8px 15px',
+                    borderRadius: '8px',
+                    border: '1px solid #e2e8f0',
+                    outline: 'none',
+                    fontSize: '14px',
+                    backgroundColor: '#fff',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                  }}
+                />
+                <FontAwesomeIcon
+                  icon={faSearch}
+                  style={{
+                    position: 'absolute',
+                    right: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: '#94a3b8'
+                  }}
+                />
+              </div>
             </div>
             <div className={styles.gridContainer}>
               {(() => {
@@ -269,7 +299,7 @@ const TabComponent = () => {
                   { vista: "Antecedentes Patologicos", tab: 29, icons: [{ icon: faBacterium }], label: "Antecedentes Patológicos" },
                   { vista: "Audiometria", tab: 15, icons: [{ icon: faDeaf }], label: "Audiometría" },
                   { vista: "Constancia Certificado Medico Ocupacional", tab: 34, icons: [{ icon: faSuitcaseMedical }], label: "Certificado Medico Ocupacional" },
-                  { vista: "Coproparasitologico", tab: 3, icons: [{ icon: faClipboardList }], label: "Coproparasitológico" },
+                  // { vista: "Coproparasitologico", tab: 3, icons: [{ icon: faClipboardList }], label: "Coproparasitológico" },
                   { vista: "Cuestionario Nordico", tab: 21, icons: [{ icon: faSkiingNordic }], label: "Cuestionario Nordico" },
                   { vista: "EKG", tab: 13, icons: [{ icon: faHeartbeat }], label: "EKG" },
                   { vista: "Espirometria", tab: 14, icons: [{ icon: faLungs }], label: "Espirometría" },
@@ -281,7 +311,7 @@ const TabComponent = () => {
                   { vista: "Fichas Aptitud", tab: 30, icons: [{ icon: faFileMedical }], label: "Fichas Aptitud" },
                   { vista: "Historia Ocupacional", tab: 16, icons: [{ icon: faFileWaveform }], label: "Historia Ocupacional" },
                   { vista: "Laboratorio Clinico", tab: 2, icons: [{ icon: faVial }], label: "Laboratorio" },
-                  { vista: "Medicina General", tab: 11, icons: [{ icon: faUserMd }], label: "Medicina General" },
+                  // { vista: "Medicina General", tab: 11, icons: [{ icon: faUserMd }], label: "Medicina General" },
                   { vista: "Modulo de Consentimientos", tab: 20, icons: [{ icon: faCheckToSlot }], label: "Modulo de Consentimientos" },
                   { vista: "Odontologia", tab: 18, icons: [{ icon: faTooth }], label: "Odontología" },
                   { vista: "Oftalmologia", tab: 17, icons: [{ icon: faEye }], label: "Oftalmología" },
@@ -299,6 +329,7 @@ const TabComponent = () => {
                 ];
                 return items
                   .filter((item) => tieneVista(item.vista))
+                  .filter((item) => item.label.toLowerCase().includes(searchTerm.toLowerCase()))
                   .map((item) => (
                     <div
                       key={item.vista}
@@ -499,7 +530,7 @@ const TabComponent = () => {
             const displayedInterfaces = {
               1: { title: "Triaje", child: <Triaje token={token} selectedSede={selectSede} /> },
               2: { title: "Laboratorio", child: <LaboratorioTabSelector tieneVista={tieneVista} /> },
-              3: { title: "Coproparasitológico", child: <ParasitologiaCoprologico /> },
+              // 3: { title: "Coproparasitológico", child: <ParasitologiaCoprologico /> },
               6: {
                 title: "Consentimientos", child: (
                   <ConsentimientosSubTabSelector

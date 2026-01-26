@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import header_Audiometria2021_Digitalizado_boro from "./headers/header_Audiometria2021-_Digitalizado_boro";
+import header_Audiometria2021_Digitalizado_boro from "./headers/header_Audiometria2021-_Digitalizado_boro.jsx";
 
 /**
  * Genera el cuerpo completo del PDF:
@@ -8,9 +8,9 @@ import header_Audiometria2021_Digitalizado_boro from "./headers/header_Audiometr
  * 4.- Exposición Ocupacional
  * @param {jsPDF} doc
  */
-const body_Audiometria2021_Digitalizado = (doc, data) => {
+const body_Audiometria2021_Digitalizado = async (doc, data) => {
   // Header
-  header_Audiometria2021_Digitalizado_boro(doc, data);
+  await header_Audiometria2021_Digitalizado_boro(doc, data);
 
   function drawCenteredText(text, centerX, y, options = {}) {
     const textWidth = doc.getTextWidth(text);
@@ -772,13 +772,13 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   );
 };
 
-export default async function Audiometria2021_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-  body_Audiometria2021_Digitalizado(doc, data);
+export default async function Audiometria2021_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+  await body_Audiometria2021_Digitalizado(doc, data);
 
   // Función para agregar la firma y esperar a que cargue o falle
-  const addSello = (imagenUrl, x, y, maxw = 100) => {
-    return new Promise((resolve) => {
+  const addSello = async (imagenUrl, x, y, maxw = 100) => {
+    await new Promise((resolve) => {
       const img = new Image();
       img.crossOrigin = "anonymous"; // importante si es una URL externa
       img.src = imagenUrl;
@@ -825,20 +825,25 @@ export default async function Audiometria2021_Digitalizado(data = {}) {
   ];
 
   // Crear promesas para todas las firmas existentes
-  const promesasFirmas = firmasAPintar
+  const tareas = firmasAPintar
     .filter((f) => firmas[f.nombre])
     .map((f) => addSello(firmas[f.nombre], f.x, f.y, f.maxw));
 
-  Promise.all(promesasFirmas).then(() => {
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    iframe.onload = () => {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
-  });
+  await Promise.all(tareas);
+
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
+
+}
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
 }

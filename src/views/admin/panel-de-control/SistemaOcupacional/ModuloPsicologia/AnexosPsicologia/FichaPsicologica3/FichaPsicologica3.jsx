@@ -12,6 +12,7 @@ import {
   RadioTable,
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
+import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 
 const tabla = "ficha_psicologica_anexo03";
 const today = getToday();
@@ -301,6 +302,7 @@ function ExamenMental({
   form,
   handleChange,
   handleRadioButton,
+  handleChangeSimple,
   handleCheckBoxChange,
   handleSave,
   handlePrint,
@@ -601,6 +603,15 @@ function ExamenMental({
           </SectionFieldset>
         </div>
       </div>
+
+      <SectionFieldset legend="Asignación de Médico">
+        <EmpleadoComboBox
+          value={form.nombre_medico}
+          label="Especialista"
+          form={form}
+          onChange={handleChangeSimple}
+        />
+      </SectionFieldset>
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex gap-4">
           <button
@@ -643,7 +654,7 @@ function ExamenMental({
 
 export default function FichaPsicologica3() {
 
-  const { token, userlogued, selectedSede, datosFooter } =
+  const { token, userlogued, selectedSede, datosFooter, userName } =
     useSessionData();
 
   const initialFormState = {
@@ -716,7 +727,7 @@ export default function FichaPsicologica3() {
     inteligencia: null,
     apetito: "ADECUADO",
     sueno: "SIN DIFICULTAD",
-    personalidad: "CUENTA CON RECUERDOS PERSONALES",
+    personalidad: "CUENTA CON RECURSOS PERSONALES",
     afectividad: "EUTIMICO",
     conductaSexual: "NORMAL",
 
@@ -738,6 +749,11 @@ export default function FichaPsicologica3() {
 
     // Pruebas Psicológicas - Área Emocional
     areaEmocional: "",
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
+
   };
 
   const {
@@ -783,6 +799,7 @@ export default function FichaPsicologica3() {
         form={form}
         handleChange={handleChange}
         handleRadioButton={handleRadioButton}
+        handleChangeSimple={handleChangeSimple}
         handleCheckBoxChange={handleCheckBoxChange}
         handleSave={handleSave}
         handlePrint={handlePrint}

@@ -51,6 +51,10 @@ export default function PerfilLipidico() {
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
+
+    // Doctor Asignado //BUSCADOR
+    nombre_doctorAsignado: "",
+    user_doctorAsignado: "",
   };
   const [dataTabla, setDataTabla] = useState([]);
 
@@ -315,6 +319,14 @@ export default function PerfilLipidico() {
             form={form}
             label='Especialista que Certifica'
             onChange={handleChangeSimple}
+          />
+          <EmpleadoComboBox
+            value={form.nombre_doctorAsignado}
+            form={form}
+            label="Doctor Asignado"
+            onChange={handleChangeSimple}
+            nameField="nombre_doctorAsignado"
+            idField="user_doctorAsignado"
           />
         </SectionFieldset>
 

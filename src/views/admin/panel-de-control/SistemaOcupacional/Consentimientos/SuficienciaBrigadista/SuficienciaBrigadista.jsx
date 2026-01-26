@@ -9,6 +9,7 @@ import {
     VerifyTR,
 } from "./controllerSuficienciaBrigadista";
 import BotonesAccion from "../../../../../components/templates/BotonesAccion";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "consta_brigadista";
 
@@ -17,7 +18,7 @@ const textoFinalConsentimiento2 = `A su vez se hace constar que se le ha informa
 
 export default function SuficienciaBrigadista() {
     const today = getToday();
-    const { token, selectedSede, userlogued, datosFooter, hora } = useSessionData();
+    const { token, selectedSede, userlogued, datosFooter, userName, hora } = useSessionData();
 
     const initialFormState = {
         norden: "",
@@ -28,6 +29,10 @@ export default function SuficienciaBrigadista() {
         empresa: "",
         ocupacion: "",
         aptitud: undefined,
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
     };
 
     const {
@@ -149,6 +154,15 @@ export default function SuficienciaBrigadista() {
                         />
                     </div>
                 </div>
+            </SectionFieldset>
+
+            <SectionFieldset legend="Asignación de Médico">
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Especialista"
+                    form={form}
+                    onChange={handleChangeSimple}
+                />
             </SectionFieldset>
 
             <BotonesAccion

@@ -4,7 +4,8 @@ import {
   InputTextOneLine,
   InputTextArea,
   InputCheckbox,
-  InputsRadioGroup
+  InputsRadioGroup,
+  SectionFieldset
 } from "../../../../../components/reusableComponents/ResusableComponents";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getDatePlusOneYear, getToday } from "../../../../../utils/helpers";
@@ -12,6 +13,7 @@ import { useForm } from "../../../../../hooks/useForm";
 import MedicoSearch from "../../../../../components/reusableComponents/MedicoSearch";
 import useRealTime from "../../../../../hooks/useRealTime";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaAptitudAnexo2";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "aptitud_medico_ocupacional_agro"
 const today = getToday();
@@ -19,7 +21,7 @@ const today = getToday();
 export default function FichaAptitudAnexo2({ MedicosMulti }) {
   const hora = useRealTime();
 
-  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+  const { token, userlogued, selectedSede, datosFooter, userCompleto, userName } =
     useSessionData();
 
   const initialFormState = {
@@ -58,7 +60,9 @@ export default function FichaAptitudAnexo2({ MedicosMulti }) {
     noConducirVehiculos: false,
 
     // Médico que Certifica
-    nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
   const {
@@ -324,11 +328,14 @@ export default function FichaAptitudAnexo2({ MedicosMulti }) {
               rows={6}
               className="mb-3"
             />
-            <MedicoSearch
-              value={form.nombre_medico}
-              onChange={handleChangeSimple}
-              MedicosMulti={MedicosMulti}
-            />
+            <SectionFieldset legend="Asignación de Médico">
+              <EmpleadoComboBox
+                value={form.nombre_medico}
+                label="Especialista"
+                form={form}
+                onChange={handleChangeSimple}
+              />
+            </SectionFieldset>
 
           </div>
         </div>

@@ -7,14 +7,14 @@ import {
   SubmitDataServiceFicha,
   VerifyTRFicha,
 } from "./controllerAudiometriaOhla";
+import { useSessionData } from "../../../../../hooks/useSessionData";
+import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import { getToday } from "../../../../../utils/helpers";
 
 const tabla = "ficha_audiologica";
 
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
+const today = getToday();
 
 const AudiometriaFichaAudiologica = ({
   token,
@@ -32,9 +32,8 @@ const AudiometriaFichaAudiologica = ({
   handleClearOhla,
   formOhla,
 }) => {
-  console.log(listas);
-  const { MedicosMulti } = listas;
 
+  const { MedicosMulti } = listas;
   const handleNombreMedicoSearch = (e) => {
     const v = e.target.value.toUpperCase();
     if (v === "") {
@@ -45,8 +44,8 @@ const AudiometriaFichaAudiologica = ({
     setFilteredNombresMedicos(
       v
         ? MedicosMulti.filter((medico) =>
-            medico.mensaje.toLowerCase().includes(v.toLowerCase())
-          )
+          medico.mensaje.toLowerCase().includes(v.toLowerCase())
+        )
         : []
     );
   };
@@ -96,8 +95,8 @@ const AudiometriaFichaAudiologica = ({
       [name]: f[name].toUpperCase().includes(objetivo)
         ? ""
         : /\d/.test(f[name])
-        ? f[name] + " " + objetivo
-        : " " + objetivo,
+          ? f[name] + " " + objetivo
+          : " " + objetivo,
     }));
   };
 
@@ -128,7 +127,7 @@ const AudiometriaFichaAudiologica = ({
       }
     });
   };
-
+  console.log(form)
   return (
     <div className="w-full bg-white rounded shadow p-4 border border-gray-200 mb-4">
       <div className="w-full flex flex-row flex-nowrap gap-4 text-[12px] pb-4">
@@ -640,17 +639,6 @@ const AudiometriaFichaAudiologica = ({
             {/* Datos de profesional y botones */}
             <div className="flex flex-col gap-3 ml-4">
               <div className="flex items-center gap-2 mb-1">
-                <label className="w-[200px] text-[12px]">
-                  Nombre del profesional que realiza la audiometría :
-                </label>
-                <input
-                  name="nombre_profecional"
-                  value={form.nombre_profecional || ""}
-                  disabled
-                  className="border border-gray-400 rounded-lg px-3 py-1 bg-white flex-1 text-[12px]"
-                />
-              </div>
-              <div className="flex items-center gap-2 mb-1">
                 <label className="w-[200px] text-[12px]">Conclusiones :</label>
                 <input
                   name="conclusiones"
@@ -659,59 +647,31 @@ const AudiometriaFichaAudiologica = ({
                   className="border border-gray-400 rounded-lg px-3 py-1 bg-white flex-1 text-[12px]"
                 />
               </div>
-              <div className="flex items-center gap-2">
-                <label htmlFor="nombre_medico" className="block w-[200px]">
-                  Nombre del Médico :
-                </label>
-                <div className="relative flex-grow flex items-center">
-                  <input
-                    autoComplete="off"
-                    id="nombre_medico"
-                    name="nombre_medico"
-                    type="text"
-                    value={searchNombreMedico || ""}
-                    placeholder="Escribe para buscar médico..."
-                    onChange={handleNombreMedicoSearch}
-                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full `}
-                    onKeyDown={(e) => {
-                      if (
-                        e.key === "Enter" &&
-                        filteredNombresMedicos.length > 0
-                      ) {
-                        e.preventDefault();
-                        handleSelectNombreMedico(filteredNombresMedicos[0]);
-                      }
-                    }}
-                    onFocus={() => {
-                      if (searchNombreMedico) {
-                        setFilteredNombresMedicos(
-                          MedicosMulti.filter((emp) =>
-                            emp.mensaje
-                              .toLowerCase()
-                              .includes(searchNombreMedico.toLowerCase())
-                          )
-                        );
-                      }
-                    }}
-                    onBlur={() =>
-                      setTimeout(() => setFilteredNombresMedicos([]), 100)
-                    }
-                  />
-                  {searchNombreMedico && filteredNombresMedicos.length > 0 && (
-                    <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
-                      {filteredNombresMedicos.map((medico) => (
-                        <li
-                          key={medico.id}
-                          className="cursor-pointer px-3 py-2 hover:bg-gray-100"
-                          onMouseDown={() => handleSelectNombreMedico(medico)}
-                        >
-                          {medico.mensaje}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </div>
+              <SectionFieldset legend="Asignación de Médico">
+                <EmpleadoComboBox
+                  value={form.nombre_medico}
+                  label="Nombre del profesional que realiza la audiometría"
+                  form={form}
+                  onChange={handleChange}
+                />
+                <EmpleadoComboBox
+                  value={form.nombre_doctorAsignado}
+                  label="Doctor Asignado"
+                  form={form}
+                  onChange={handleChange}
+                  nameField="nombre_doctorAsignado"
+                  idField="user_doctorAsignado"
+                />
+                <EmpleadoComboBox
+                  value={form.nombre_doctorExtra}
+                  label="Doctor Extra"
+                  form={form}
+                  onChange={handleChange}
+                  nameField="nombre_doctorExtra"
+                  idField="user_doctorExtra"
+                />
+              </SectionFieldset>
+
             </div>
           </div>
           <div className="flex gap-2 mt-4 text-[12px] border p-4 rounded-lg">

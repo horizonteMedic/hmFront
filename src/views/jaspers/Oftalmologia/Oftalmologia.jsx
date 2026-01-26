@@ -9,7 +9,7 @@ import { dibujarFirmas } from '../../utils/dibujarFirmas.js';
 export default async function Oftalmologia(datos = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
-
+  console.log("sies");
   // Contador de páginas dinámico
   let numeroPagina = 1;
 
@@ -436,8 +436,8 @@ export default async function Oftalmologia(datos = {}, docExistente = null) {
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });
 
-  // Usar dibujarFirmas para dibujar las firmas
-  await dibujarFirmas({ doc, datos: datos, y: yFirmas, pageW }).then(() => {
+  // Usar dibujarFirmas para dibujar las firmas (sin firma del paciente)
+  await dibujarFirmas({ doc, datos: datos, y: yFirmas, pageW, mostrarFirmaPaciente: false }).then(() => {
     if (docExistente) {
       return doc;
     } else {
@@ -457,6 +457,7 @@ export default async function Oftalmologia(datos = {}, docExistente = null) {
     return doc;
   }
 }
+
 
 function imprimir(doc) {
   const blob = doc.output("blob");

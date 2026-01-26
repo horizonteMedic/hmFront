@@ -7,6 +7,7 @@ import {
   SubmitDataService,
   VerifyTR,
 } from "./controllerAudiometriaCuestionario";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
 export default function AudiometriaCuestionario({
   token,
@@ -155,7 +156,7 @@ export default function AudiometriaCuestionario({
                     name="genero"
                     value="Masculino"
                     checked={form.genero === "Masculino"}
-                    onChange={() => {}}
+                    onChange={() => { }}
                   />
                   Masculino
                 </label>
@@ -168,7 +169,7 @@ export default function AudiometriaCuestionario({
                     name="genero"
                     value="Femenino"
                     checked={form.genero === "Femenino"}
-                    onChange={() => {}}
+                    onChange={() => { }}
                   />
                   Femenino
                 </label>
@@ -229,9 +230,8 @@ export default function AudiometriaCuestionario({
               </div>
             </div>
             <div
-              className={`flex-1 flex flex-col gap-2 ${
-                form.p1 === "SI" ? "opacity-100" : "opacity-50"
-              }`}
+              className={`flex-1 flex flex-col gap-2 ${form.p1 === "SI" ? "opacity-100" : "opacity-50"
+                }`}
             >
               <div className="flex items-center gap-2">
                 <span className="min-w-[70px]">¿Cuál?</span>
@@ -509,9 +509,8 @@ export default function AudiometriaCuestionario({
             </div>
 
             <div
-              className={`flex-1 flex flex-col gap-2 ${
-                form.p9 === "SI" ? "opacity-100" : "opacity-50"
-              }`}
+              className={`flex-1 flex flex-col gap-2 ${form.p9 === "SI" ? "opacity-100" : "opacity-50"
+                }`}
             >
               <div className="flex items-center gap-2">
                 <span className="min-w-[150px]">¿Cuál?</span>
@@ -594,9 +593,8 @@ export default function AudiometriaCuestionario({
             </div>
 
             <div
-              className={`flex-1 flex flex-col gap-2 ${
-                form.p10 === "SI" ? "opacity-100" : "opacity-50"
-              }`}
+              className={`flex-1 flex flex-col gap-2 ${form.p10 === "SI" ? "opacity-100" : "opacity-50"
+                }`}
             >
               <div className="flex items-center gap-2">
                 <span className="min-w-[70px]">¿Cuál?</span>
@@ -679,9 +677,8 @@ export default function AudiometriaCuestionario({
             </div>
 
             <div
-              className={`flex-1 flex flex-col gap-2 ${
-                form.p11 === "SI" ? "opacity-100" : "opacity-50"
-              }`}
+              className={`flex-1 flex flex-col gap-2 ${form.p11 === "SI" ? "opacity-100" : "opacity-50"
+                }`}
             >
               <div className="flex items-center gap-2">
                 <span className="min-w-[150px]">¿Cuál?</span>
@@ -752,9 +749,8 @@ export default function AudiometriaCuestionario({
             </div>
 
             <div
-              className={`flex-1 flex flex-col gap-2 ${
-                form.p12 === "SI" ? "opacity-100" : "opacity-50"
-              }`}
+              className={`flex-1 flex flex-col gap-2 ${form.p12 === "SI" ? "opacity-100" : "opacity-50"
+                }`}
             >
               <div className="flex items-center gap-2">
                 <span className="min-w-[70px]">¿Cuál?</span>
@@ -822,9 +818,8 @@ export default function AudiometriaCuestionario({
             </div>
 
             <div
-              className={`flex-1 flex flex-col gap-2 ${
-                form.p13 === "SI" ? "opacity-100" : "opacity-50"
-              }`}
+              className={`flex-1 flex flex-col gap-2 ${form.p13 === "SI" ? "opacity-100" : "opacity-50"
+                }`}
             >
               <div className="flex items-center gap-2">
                 <span className="min-w-[110px]">¿Cuánto tiempo?</span>
@@ -908,9 +903,8 @@ export default function AudiometriaCuestionario({
             </div>
 
             <div
-              className={`flex-1 flex flex-col gap-2 ${
-                form.p14 === "SI" ? "opacity-100" : "opacity-50"
-              }`}
+              className={`flex-1 flex flex-col gap-2 ${form.p14 === "SI" ? "opacity-100" : "opacity-50"
+                }`}
             >
               <div className="flex items-center gap-2">
                 <span className="min-w-[110px]">¿Cuál?</span>
@@ -989,9 +983,8 @@ export default function AudiometriaCuestionario({
             </div>
 
             <div
-              className={`flex-1 flex flex-col gap-2 ${
-                form.p15 === "SI" ? "opacity-100" : "opacity-50"
-              }`}
+              className={`flex-1 flex flex-col gap-2 ${form.p15 === "SI" ? "opacity-100" : "opacity-50"
+                }`}
             >
               <div className="flex items-center gap-2">
                 <span className="min-w-[110px]">¿Cuántos por mes?</span>
@@ -1056,9 +1049,8 @@ export default function AudiometriaCuestionario({
                 </div>
 
                 <div
-                  className={`flex items-center gap-2 sm:ml-4 ${
-                    form[item.name] ? "opacity-100" : "opacity-50"
-                  }`}
+                  className={`flex items-center gap-2 sm:ml-4 ${form[item.name] ? "opacity-100" : "opacity-50"
+                    }`}
                 >
                   <span>¿Cuánto tiempo?</span>
                   <input
@@ -1073,6 +1065,12 @@ export default function AudiometriaCuestionario({
               </div>
             ))}
           </div>
+          <EmpleadoComboBox
+            value={form.nombre_medico}
+            label="Especialista"
+            form={form}
+            onChange={handleChange}
+          />
         </div>
       </div>
       {/* Acciones al pie, dentro del mismo formulario */}

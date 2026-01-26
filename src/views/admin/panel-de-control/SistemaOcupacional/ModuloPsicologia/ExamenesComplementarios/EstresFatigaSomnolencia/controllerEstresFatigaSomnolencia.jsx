@@ -65,6 +65,8 @@ export const GetInfoServicio = async (
             // Observaciones y Recomendaciones
             observaciones: res.observaciones,
             recomendaciones: res.recomendacion,
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -99,6 +101,8 @@ export const SubmitDataService = async (
         apto: form.esApto,
         noApto: !form.esApto,
         usuarioRegistro: user,
+
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

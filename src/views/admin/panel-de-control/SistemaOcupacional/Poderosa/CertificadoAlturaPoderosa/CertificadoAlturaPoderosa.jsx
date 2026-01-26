@@ -14,6 +14,7 @@ import {
     InputTextArea,
     InputsBooleanRadioGroup,
     InputCheckbox,
+    SectionFieldset,
 } from "../../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../../hooks/useForm";
 import { getToday, getTodayPlusOneYear } from "../../../../../utils/helpers";
@@ -24,11 +25,12 @@ import ExamenFisico from "./TabsCertificadoAlturaPoderosa/ExamenFisico";
 import Neurologico from "./TabsCertificadoAlturaPoderosa/Neurologico";
 import Swal from "sweetalert2";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerCertificadoAlturaPoderosa";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "certificado_altura_poderosa";
-const today = getToday();
 
 export default function CertificadoAlturaPoderosa() {
+    const today = getToday();
     const [activeTab, setActiveTab] = useState(0);
 
     const { token, userlogued, selectedSede, datosFooter, userName, userDNI } =
@@ -197,6 +199,10 @@ export default function CertificadoAlturaPoderosa() {
         babinskiWeil: false,
         dixHallpike: false,
         marcha: false,
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
     };
 
     const {
@@ -494,13 +500,14 @@ export default function CertificadoAlturaPoderosa() {
                             </div>
 
                             {/* Médico */}
-                            <InputTextOneLine
-                                label="Médico que Certifica"
-                                name="nombre_medico"
-                                value={form?.nombre_medico}
-                                labelOnTop
-                                disabled
-                            />
+                            <SectionFieldset legend="Asignación de Médico">
+                                <EmpleadoComboBox
+                                    value={form.nombre_medico}
+                                    label="Especialista"
+                                    form={form}
+                                    onChange={handleChangeSimple}
+                                />
+                            </SectionFieldset>
                         </fieldset>
 
                         <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-4 pt-4">

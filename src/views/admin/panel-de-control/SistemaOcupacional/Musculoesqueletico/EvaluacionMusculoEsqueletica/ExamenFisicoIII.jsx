@@ -241,7 +241,7 @@ export default function ExamenFisicoIII({ form, handleRadioButton, handleChange 
             <RadioGroupNumerico
               label="Grado"
               name="fuerzaMuscular"
-              value={form.fuerzaMuscular || "1"}
+              value={form.fuerzaMuscular}
               onChange={handleRadioButton}
             />
           </div>

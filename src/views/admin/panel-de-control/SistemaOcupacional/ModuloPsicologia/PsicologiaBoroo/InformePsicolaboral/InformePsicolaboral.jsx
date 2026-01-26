@@ -17,6 +17,7 @@ import {
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformePsicolaboral";
 import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "informe_psicolaboral";
 
@@ -24,7 +25,7 @@ export default function InformePsicolaboral() {
   const today = getToday();
   const [activeTab, setActiveTab] = useState(0);
 
-  const { token, userlogued, selectedSede, datosFooter, userDNI } = useSessionData();
+  const { token, userlogued, selectedSede, datosFooter, userDNI, userName } = useSessionData();
 
   const initialFormState = {
     // Header
@@ -86,6 +87,11 @@ export default function InformePsicolaboral() {
     // Observaciones y Recomendaciones
     observaciones: "",
     recomendaciones: "",
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
+
   };
 
   const {
@@ -172,21 +178,21 @@ export default function InformePsicolaboral() {
             label={<p className="text-red-500 text-[10px]">Examen Anual</p>}
             name="anual"
             checked={form?.anual}
-            onChange={handleCheckBoxChange}
+          // onChange={handleCheckBoxChange}
           />
         </div>
       </SectionFieldset>
 
       <SectionFieldset legend="Datos del Paciente" className="m-4">
         {/* Fila 1: Nombres, DNI, Edad, Género */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
+        <div className="grid grid-cols-1 2xl:grid-cols-2 gap-x-4 gap-y-3">
           <InputTextOneLine
             label="Nombres y Apellidos"
             name="nombres"
             value={form?.nombres}
             disabled
           />
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid 2xl:grid-cols-3 gap-4">
             <InputTextOneLine
               label="DNI"
               name="dni"
@@ -273,6 +279,15 @@ export default function InformePsicolaboral() {
           value={form?.recomendaciones}
           onChange={handleChange}
           rows={4}
+        />
+      </SectionFieldset>
+
+      <SectionFieldset legend="Asignación de Médico">
+        <EmpleadoComboBox
+          value={form.nombre_medico}
+          label="Especialista"
+          form={form}
+          onChange={handleChangeSimple}
         />
       </SectionFieldset>
 

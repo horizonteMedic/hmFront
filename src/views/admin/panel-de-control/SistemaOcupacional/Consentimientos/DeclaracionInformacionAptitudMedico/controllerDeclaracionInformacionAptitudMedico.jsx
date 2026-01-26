@@ -59,7 +59,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla, datos
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../jaspers/ConsentimientosAdmision/ConsentAdmisInformaAptiMedicoOcupa/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../jaspers/ModuloConsentimientos/ConsentAdmisInformaAptiMedicoOcupa/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -67,7 +67,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../jaspers/ConsentimientosAdmision/ConsentAdmisInformaAptiMedicoOcupa"
+        "../../../../../jaspers/ModuloConsentimientos/ConsentAdmisInformaAptiMedicoOcupa"
     );
 };
 

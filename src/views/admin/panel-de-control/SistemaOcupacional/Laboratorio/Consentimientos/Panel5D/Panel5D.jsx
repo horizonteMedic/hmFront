@@ -6,9 +6,10 @@ import { InputTextOneLine, InputsBooleanRadioGroup } from '../../../../../../com
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerPanel5D';
 import { getToday } from '../../../../../../utils/helpers';
+import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 
 const Panel5D = () => {
-  const { token, userlogued, selectedSede } = useSessionData();
+  const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
   const initialFormState = {
@@ -25,10 +26,13 @@ const Panel5D = () => {
       { label: 'CONSUMO ANFETAMINAS/EXTASIS', key: 'ANFETAMINAS', fecha: today, value: false },
       { label: 'CONSUMO METHANFETAMINAS/OPIACEOS', key: 'METAN', fecha: today, value: false },
       { label: 'CONSUMO DE BENZODIACEPINAS', key: 'BENZO', fecha: today, value: false },
-    ]
+    ],
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
-  const { form, setForm, handleChange, handleClear, handlePrintDefault } = useForm(initialFormState);
+  const { form, setForm, handleChange, handleChangeSimple, handleClear, handlePrintDefault } = useForm(initialFormState);
 
   const handleAntecedenteChange = (key, newValue) => {
     setForm(prev => ({
@@ -68,6 +72,9 @@ const Panel5D = () => {
         { label: 'CONSUMO METHANFETAMINAS/OPIACEOS', key: 'METAN', fecha: today, value: false },
         { label: 'CONSUMO DE BENZODIACEPINAS', key: 'BENZO', fecha: today, value: false },
       ],
+      // Médico que Certifica //BUSCADOR
+      nombre_medico: userName,
+      user_medicoFirma: userlogued,
     }));
   };
 
@@ -84,7 +91,7 @@ const Panel5D = () => {
   return (
     <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
       <h2 className="text-2xl font-bold text-center mb-6">CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DROGAS PANEL 5D<br />(COCAINA, MARIHUANA, ANFETAMINA, METHANFETAMINA Y BENZODIAZEPINA)</h2>
-      
+
       <form className="space-y-6">
         <SectionFieldset legend="Datos del Paciente" className="space-y-4">
           <div className="flex flex-col md:flex-row gap-4">
@@ -175,6 +182,14 @@ const Panel5D = () => {
               </div>
             </div>
           ))}
+        </SectionFieldset>
+        <SectionFieldset legend="Asignación de Médico">
+          <EmpleadoComboBox
+            value={form.nombre_medico}
+            label="Especialista"
+            form={form}
+            onChange={handleChangeSimple}
+          />
         </SectionFieldset>
 
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">

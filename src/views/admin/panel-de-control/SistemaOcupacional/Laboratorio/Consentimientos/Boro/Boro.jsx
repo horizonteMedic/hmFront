@@ -6,9 +6,10 @@ import { InputTextOneLine, InputTextArea, InputCheckbox } from '../../../../../.
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerBoro';
 import { getToday } from '../../../../../../utils/helpers';
+import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 
 const Boro = () => {
-  const { token, userlogued, selectedSede } = useSessionData();
+  const { token, userlogued, selectedSede, userName } = useSessionData();
   const today = getToday();
 
   const initialFormState = {
@@ -27,9 +28,12 @@ const Boro = () => {
     tratamiento: { key: false, cual: '', cuando: '', donde: '' },
     notas: '',
     medico: '',
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
   };
 
-  const { form, setForm, handleChange, handleClear, handlePrintDefault } = useForm(initialFormState);
+  const { form, setForm, handleChange, handleChangeSimple, handleClear, handlePrintDefault } = useForm(initialFormState);
 
   const handlePreguntaChange = (field, key, value) => {
     setForm(prev => ({
@@ -55,6 +59,9 @@ const Boro = () => {
       tratamiento: { key: false, cual: '', cuando: '', donde: '' },
       notas: '',
       medico: '',
+      // Médico que Certifica //BUSCADOR
+      nombre_medico: userName,
+      user_medicoFirma: userlogued,
     }));
   };
 
@@ -71,7 +78,7 @@ const Boro = () => {
   return (
     <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
       <h2 className="text-2xl font-bold text-center mb-6">CONSENTIMIENTO PARA REALIZAR LA PRUEBA DE DOSAJE DE MARIHUANA Y COCAÍNA</h2>
-      
+
       <form className="space-y-6">
         <SectionFieldset legend="Datos del Paciente" className="space-y-4">
           <div className="flex flex-col md:flex-row gap-4">
@@ -293,6 +300,14 @@ const Boro = () => {
             value={form.notas}
             onChange={handleChange}
             rows={4}
+          />
+        </SectionFieldset>
+        <SectionFieldset legend="Asignación de Médico">
+          <EmpleadoComboBox
+            value={form.nombre_medico}
+            label="Especialista"
+            form={form}
+            onChange={handleChangeSimple}
           />
         </SectionFieldset>
 

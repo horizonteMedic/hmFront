@@ -155,7 +155,7 @@ export default function EvaluacionMusculoEsqueletica() {
     escoliosis: "NO",
     lordosis: "NO",
     mixta: "NO",
-    fuerzaMuscular: "1",
+    fuerzaMuscular: "5",
     dolorCervical: "NO",
     dolorDorsal: "NO",
     dolorLumbar: "NO",

@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBroom, faSave, faPrint } from "@fortawesome/free-solid-svg-icons";
 import "./OdontogramaAdultos.css";
+import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
+import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
 
 export default function OdontogramaAdultos({
   form,
   setForm,
   handleChange,
+  handleChangeSimple,
   handleCheckBoxChange,
   handleClear,
   handleSave,
@@ -19,11 +22,11 @@ export default function OdontogramaAdultos({
   const dientesInferioresArray = [
     17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
   ];
-  const mapeoDientes=[
-    18,17,16,15,14,13,12,11,
-    21,22,23,24,25,26,27,28,
-    48,47,46,45,44,43,42,41,
-    31,32,33,34,35,36,37,38,
+  const mapeoDientes = [
+    18, 17, 16, 15, 14, 13, 12, 11,
+    21, 22, 23, 24, 25, 26, 27, 28,
+    48, 47, 46, 45, 44, 43, 42, 41,
+    31, 32, 33, 34, 35, 36, 37, 38,
   ]
 
   const [contextMenu, setContextMenu] = useState(null);
@@ -207,7 +210,7 @@ export default function OdontogramaAdultos({
         alt={`Diente ${diente}`}
         className={`diente-imagen ${rotate ? "rotate-180" : ""}`}
       />
-      <span className="diente-numero ">{mapeoDientes[diente-1]}</span>
+      <span className="diente-numero ">{mapeoDientes[diente - 1]}</span>
       {form[`d${diente}`] && (
         <div className="indicador-diente">
           {renderIndicator(form[`d${diente}`])}
@@ -306,8 +309,8 @@ export default function OdontogramaAdultos({
               [6, 11].includes(diente)
                 ? imagenCanino
                 : [1, 2, 3, 14, 15, 16].includes(diente)
-                ? imagenMolar
-                : imagenInicivo,
+                  ? imagenMolar
+                  : imagenInicivo,
               true
             )}
           </div>
@@ -320,8 +323,8 @@ export default function OdontogramaAdultos({
               [6, 11].includes(diente)
                 ? imagenCanino
                 : [1, 2, 3, 14, 15, 16].includes(diente)
-                ? imagenMolar
-                : imagenInicivo,
+                  ? imagenMolar
+                  : imagenInicivo,
               true
             )}
           </div>
@@ -337,8 +340,8 @@ export default function OdontogramaAdultos({
               [22, 27].includes(diente)
                 ? imagenCanino
                 : [17, 18, 19, 30, 31, 32].includes(diente)
-                ? imagenMolar
-                : imagenInicivo,
+                  ? imagenMolar
+                  : imagenInicivo,
               false
             )}
           </div>
@@ -351,8 +354,8 @@ export default function OdontogramaAdultos({
               [22, 27].includes(diente)
                 ? imagenCanino
                 : [17, 18, 19, 30, 31, 32].includes(diente)
-                ? imagenMolar
-                : imagenInicivo,
+                  ? imagenMolar
+                  : imagenInicivo,
               false
             )}
           </div>
@@ -420,6 +423,14 @@ export default function OdontogramaAdultos({
             No pasó examen odontológico
           </label>
         </div>
+        <SectionFieldset legend="Asignación de Médico">
+          <EmpleadoComboBox
+            value={form.nombre_medico}
+            label="Especialista"
+            form={form}
+            onChange={handleChangeSimple}
+          />
+        </SectionFieldset>
         {/*BOTONES ACCIONES*/}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-2 ">
           <div className=" flex gap-4">

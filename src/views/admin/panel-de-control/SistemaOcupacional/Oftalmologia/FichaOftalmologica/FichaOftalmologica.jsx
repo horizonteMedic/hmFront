@@ -16,55 +16,58 @@ import {
   VerifyTR,
 } from "./controllerFichaOftalmologica";
 import Swal from "sweetalert2";
+import { getToday } from "../../../../../utils/helpers";
+import { useSessionData } from "../../../../../hooks/useSessionData";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 
 const tabla = "oftalmologia";
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
 
-const initialFormState = {
-  norden: "",
-  codOf: null,
-  fechaExamen: today,
-  nomExam: "",
-  fechaNac: "",
-  dni: "",
-  nombres: "",
-  empresa: "",
-  contrata: "",
-  edad: "",
-  visionCercaOD: "00",
-  visionCercaOI: "00",
-  visionCercaODC: "00",
-  visionCercaOIC: "00",
-  visionLejosOD: "00",
-  visionLejosOI: "00",
-  visionLejosODC: "00",
-  visionLejosOIC: "00",
-  visionColores: "",
-  visionBinocular: "",
-  reflejosPupilares: "",
-  presenciaPterigion: "",
-  opcionPterigion: "",
-  normal: false,
-  conservado: false,
-  ninguna: false,
-  enfOculares: "",
+export default function FichaOftalmologica() {
+  const { token, userlogued, selectedSede, userName } = useSessionData();
+  const today = getToday();
 
-  normalGeneral: false,
-  agudezaLejos: "",
+  const initialFormState = {
+    norden: "",
+    codOf: null,
+    fechaExamen: today,
+    nomExam: "",
+    fechaNac: "",
+    dni: "",
+    nombres: "",
+    empresa: "",
+    contrata: "",
+    edad: "",
+    visionCercaOD: "00",
+    visionCercaOI: "00",
+    visionCercaODC: "00",
+    visionCercaOIC: "00",
+    visionLejosOD: "00",
+    visionLejosOI: "00",
+    visionLejosODC: "00",
+    visionLejosOIC: "00",
+    visionColores: "",
+    visionBinocular: "",
+    reflejosPupilares: "",
+    presenciaPterigion: "",
+    opcionPterigion: "",
+    normal: false,
+    conservado: false,
+    ninguna: false,
+    enfOculares: "",
 
-  nombres_search: "",
-  codigo_search: "",
-};
+    normalGeneral: false,
+    agudezaLejos: "",
 
-export default function FichaOftalmologica({
-  token,
-  selectedSede,
-  userlogued,
-}) {
+    nombres_search: "",
+    codigo_search: "",
+
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
+
+    nombre_doctorAsignado: "",
+    user_doctorAsignado: "",
+  };
   const [form, setForm] = useState(initialFormState);
   const [form2, setForm2] = useState(initialFormState);
   const [showModal, setShowModal] = useState(false);
@@ -149,9 +152,8 @@ export default function FichaOftalmologica({
     }
 
     // Caso mixto
-    return `${od.tipo ? od.tipo + " " + od.nivel : od.nivel} OJO DERECHO Y ${
-      oi.tipo ? oi.tipo + " " + oi.nivel : oi.nivel
-    } OJO IZQUIERDO`;
+    return `${od.tipo ? od.tipo + " " + od.nivel : od.nivel} OJO DERECHO Y ${oi.tipo ? oi.tipo + " " + oi.nivel : oi.nivel
+      } OJO IZQUIERDO`;
   }
 
   function generarDiagnosticoCerca() {
@@ -232,17 +234,15 @@ export default function FichaOftalmologica({
                   setForm2((prev) => ({ ...prev, norden: form.norden }));
                 }}
                 className={`px-3 h-[22px] rounded flex items-center w-full justify-center transition-colors duration-200
-                  ${
-                    form.codOf == null
-                      ? "bg-gray-300 text-gray-500 "
-                      : "bg-green-200 hover:bg-green-300 text-green-800 cursor-pointer"
+                  ${form.codOf == null
+                    ? "bg-gray-300 text-gray-500 "
+                    : "bg-green-200 hover:bg-green-300 text-green-800 cursor-pointer"
                   }`}
               >
                 <FontAwesomeIcon
                   icon={faCheckCircle}
-                  className={`mr-2 ${
-                    form.codOf == null ? "text-gray-500" : "text-green-800"
-                  }`}
+                  className={`mr-2 ${form.codOf == null ? "text-gray-500" : "text-green-800"
+                    }`}
                 />
                 <p className="">LEVANTAR OBSERVACION</p>
               </button>
@@ -613,6 +613,22 @@ export default function FichaOftalmologica({
               Normal
             </div>
           </div>
+          <SectionFieldset legend="Asignación de Médico">
+            <EmpleadoComboBox
+              value={form.nombre_medico}
+              label="Especialista"
+              form={form}
+              onChange={handleChange}
+            />
+            <EmpleadoComboBox
+              value={form.nombre_doctorAsignado}
+              label="Doctor Asignado"
+              form={form}
+              onChange={handleChange}
+              nameField="nombre_doctorAsignado"
+              idField="user_doctorAsignado"
+            />
+          </SectionFieldset>
 
           {/* Botones */}
           <div className="flex gap-4 justify-center pt-4 mt-auto">
@@ -680,11 +696,10 @@ export default function FichaOftalmologica({
         </div>
         <div className="flex justify-center mt-auto pt-4">
           <button
-            className={`font-semibold px-4 py-2 rounded shadow border max-w-[450px] transition-colors duration-200 ${
-              form.norden == ""
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-blue-500 hover:bg-blue-600 text-white cursor-pointer"
-            }`}
+            className={`font-semibold px-4 py-2 rounded shadow border max-w-[450px] transition-colors duration-200 ${form.norden == ""
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-blue-500 hover:bg-blue-600 text-white cursor-pointer"
+              }`}
             disabled={form.norden == ""}
             onClick={handlePrint}
           >

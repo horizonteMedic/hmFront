@@ -18,6 +18,7 @@ import InputsBooleanRadioGroup from "../../../../../components/reusableComponent
 import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
 import InputCheckbox from "../../../../../components/reusableComponents/InputCheckbox";
 import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "audiometria_2023";
 
@@ -149,6 +150,15 @@ export default function Audiometria() {
     oi_o_4000: "",
     oi_o_6000: "",
     oi_o_8000: "",
+
+    //DOCTOR ASIGNADO
+    nombre_doctorAsignado: "",
+    user_doctorAsignado: "",
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userName,
+    user_medicoFirma: userlogued,
+
   };
 
   const {
@@ -168,8 +178,7 @@ export default function Audiometria() {
   } = useForm(initialFormState, { storageKey: "audiometriaNormal" });
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla);
-    // SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
 
   const handleSearch = (e) => {
@@ -180,28 +189,9 @@ export default function Audiometria() {
   };
 
   const handlePrint = () => {
-    if (!form.norden)
-      return Swal.fire("Error", "Debe colocar un N° Orden", "error");
-    Swal.fire({
-      title: "¿Desea Imprimir Audiometría?",
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Sí, Imprimir",
-      cancelButtonText: "Cancelar",
-      customClass: {
-        title: "swal2-title",
-        confirmButton: "swal2-confirm",
-        cancelButton: "swal2-cancel",
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        PrintHojaR(form.norden, token, tabla);
-      }
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla, datosFooter);
     });
-    // handlePrintDefault(() => {
-    //   PrintHojaR(form.norden, token, tabla, datosFooter);
-    // });
   };
 
   const tipoHipoacusia = (promedio) => {
@@ -238,8 +228,6 @@ export default function Audiometria() {
       ).toFixed(2);
 
       odPromedio = isNaN(odPromedio) ? 0 : odPromedio;
-
-      // console.log("Oído Derecho - Promedio:", odPromedio);
 
       setForm((f) => ({
         ...f,
@@ -643,8 +631,8 @@ export default function Audiometria() {
                   <div key={hz}>
                     <p>{hz}</p>
                     <InputTextOneLine
-                      name={`od_${hz}`}
-                      value={form[`od_${hz}`]}
+                      name={`oi_${hz}`}
+                      value={form[`oi_${hz}`]}
                       onChange={handleChangeNumber}
                       onKeyUp={handleFocusNext}
                     />
@@ -801,6 +789,22 @@ export default function Audiometria() {
               />
             </SectionFieldset>
           </div>
+          <SectionFieldset legend="Sellos" className="space-y-4">
+            <EmpleadoComboBox
+              value={form.nombre_medico}
+              label="Especialista"
+              form={form}
+              onChange={handleChangeSimple}
+            />
+            <EmpleadoComboBox
+              value={form.nombre_doctorAsignado}
+              label="Doctor Asignado"
+              form={form}
+              onChange={handleChangeSimple}
+              nameField="nombre_doctorAsignado"
+              idField="user_doctorAsignado"
+            />
+          </SectionFieldset>
         </div>
 
         {/* Acciones */}

@@ -2,6 +2,7 @@ import jsPDF from "jspdf";
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
+import { getSignCompressed } from "../../utils/helpers.js";
 
 const config = {
   margin: 15,
@@ -67,13 +68,8 @@ const drawHeader = async (doc, datos = {}) => {
 
   // Bloque de color
   drawColorBox(doc, {
-<<<<<<< HEAD
-    color: datos.codigoColor || "#008f39",
-    text: datos.textoColor || "F",
-=======
     color: datos.codigoColor,
     text: datos.textoColor,
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
     x: pageW - 30,
     y: 10,
     size: 22,
@@ -188,8 +184,8 @@ const drawPatientData = (doc, datos = {}) => {
   return yPos;
 };
 
-export default async function LBioquimica_Digitalizado(datos) {
-  const doc = new jsPDF();
+export default async function LBioquimica_Digitalizado(datos = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
@@ -200,147 +196,156 @@ export default async function LBioquimica_Digitalizado(datos) {
   doc.text('BIOQUÍMICA', pageW / 2, 38, { align: 'center' });
 
   // === DATOS DEL PACIENTE ===
-  drawPatientData(doc, datos);
+  const finalYPos = drawPatientData(doc, datos);
+  const s1 = await getSignCompressed(datos, "SELLOFIRMA");
+  const s2 = await getSignCompressed(datos, "SELLOFIRMADOCASIG");
 
-  const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
-  const isValidUrl = url => url && url !== "Sin registro";
-  const loadImg = src =>
-    new Promise((res, rej) => {
-      const img = new Image();
-      img.src = src;
-      img.crossOrigin = 'anonymous';
-      img.onload = () => res(img);
-      img.onerror = () => rej(`No se pudo cargar ${src}`);
-    });
-  Promise.all([
-    isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
-    isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-  ]).then(([s1, s2]) => {
 
-    let y = 95;
-    const tablaInicioX = 15;
-    const tablaAncho = 180;
+  let y = finalYPos + 10;
+  const tablaInicioX = 15;
+  const tablaAncho = 180;
 
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.subtitle);
-    doc.text('MUESTRA : SUERO', tablaInicioX, y);
-    y += config.lineHeight.normal * 1.5;
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.subtitle);
+  doc.text('MUESTRA : SUERO', tablaInicioX, y);
+  y += config.lineHeight.normal * 1.5;
 
-    const tableCols = {
-      col1: tablaInicioX,
-      col2: 100,
-      col3: 153,
-    };
+  const tableCols = {
+    col1: tablaInicioX,
+    col2: 100,
+    col3: 153,
+  };
 
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
-    doc.text('PRUEBA', tableCols.col1, y);
-    doc.text('RESULTADO', tableCols.col2, y, { align: 'center' });
-    doc.text('VALORES NORMALES', tableCols.col3, y, { align: 'left' });
-    y += 3;
-    doc.setLineWidth(0.4).line(tablaInicioX, y, tablaInicioX + tablaAncho, y);
-    y += config.lineHeight.normal;
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+  doc.text('PRUEBA', tableCols.col1, y);
+  doc.text('RESULTADO', tableCols.col2, y, { align: 'center' });
+  doc.text('VALORES NORMALES', tableCols.col3, y, { align: 'left' });
+  y += 3;
+  doc.setLineWidth(0.4).line(tablaInicioX, y, tablaInicioX + tablaAncho, y);
+  y += config.lineHeight.normal;
 
-    const dataRows = [
-      {
-        prueba: 'CREATININA SÉRICA',
-        resultado: datos.txtCreatinina || '',
-        normales: 'Adulto: 0.8 - 1.4 mg/dl\nNiño: 0.24 - 0.84 mg/dl'
-      },
-      {
-        prueba: 'UREA SÉRICA',
-        resultado: datos.txtUreaSerica || '',
-        normales: '10 - 50 mg/dl'
-      },
-      {
-        prueba: 'ÁCIDO ÚRICO SÉRICO',
-        resultado: datos.txtAcidoUrico || '',
-        normales: 'Mujeres: 2.5 - 6.8 mg/dl\nHombres 3.6 - 7.7 mg/dl'
-      }
-    ];
-
-    doc.setFont(config.font, "normal").setFontSize(9);
-    dataRows.forEach(row => {
-      // Prueba
-      doc.text(row.prueba, tableCols.col1, y);
-      // Resultado centrado
-      doc.text(String(row.resultado), tableCols.col2, y, { align: 'center' });
-      // Valores normales (puede ser multilinea)
-      const normalesLines = String(row.normales).split('\n');
-      normalesLines.forEach((line, idx) => {
-        doc.text(line, tableCols.col3, y + idx * config.lineHeight.small, { align: 'left' });
-      });
-      // Ajusta y para la siguiente fila
-      y += Math.max(config.lineHeight.normal, normalesLines.length * config.lineHeight.small + 2);
-    });
-
-    // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
-    const sigW = 48;
-    const sigH = 20;
-    const sigY = y + 12;
-    const gap = 16;
-    const lineY = sigY + sigH + 3;
-
-    // Función auxiliar para agregar sello al PDF
-    const agregarSello = (img, xPos, yPos, width, height) => {
-      if (!img) return;
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-      doc.addImage(selloBase64, 'PNG', xPos, yPos, width, height);
-    };
-
-    // Función auxiliar para dibujar línea y texto debajo del sello
-    const dibujarLineaYTexto = (centroX, lineY, tipoSello) => {
-      doc.setLineWidth(0.2);
-      doc.line(centroX - 25, lineY, centroX + 25, lineY);
-      doc.setFont('helvetica', 'normal').setFontSize(9);
-      if (tipoSello === 'SELLOFIRMA') {
-        // SELLOFIRMA: Firma y Sello del Profesional / Responsable de la Evaluación
-        doc.text("Firma y Sello del Profesional", centroX, lineY + 5, { align: "center" });
-        doc.text("Responsable de la Evaluación", centroX, lineY + 8, { align: "center" });
-      } else if (tipoSello === 'SELLOFIRMADOCASIG') {
-        // SELLOFIRMADOCASIG: Firma y Sello Médico Asignado
-        doc.text("Firma y Sello Médico Asignado", centroX, lineY + 5, { align: "center" });
-      } else {
-        doc.text("Firma y Sello", centroX, lineY + 5, { align: "center" });
-      }
-    };
-
-    if (s1 && s2) {
-      const totalWidth = sigW * 2 + gap;
-      const startX = (pageW - totalWidth) / 2;
-
-      agregarSello(s1, startX, sigY, sigW, sigH);
-      agregarSello(s2, startX + sigW + gap, sigY, sigW, sigH);
-
-      const centroSello1X = startX + sigW / 2;
-      const centroSello2X = startX + sigW + gap + sigW / 2;
-      dibujarLineaYTexto(centroSello1X, lineY, 'SELLOFIRMA');
-      dibujarLineaYTexto(centroSello2X, lineY, 'SELLOFIRMADOCASIG');
-    } else if (s1) {
-      const imgX = (pageW - sigW) / 2;
-      agregarSello(s1, imgX, sigY, sigW, sigH);
-      dibujarLineaYTexto(pageW / 2, lineY, 'SELLOFIRMA');
-    } else if (s2) {
-      const imgX = (pageW - sigW) / 2;
-      agregarSello(s2, imgX, sigY, sigW, sigH);
-      dibujarLineaYTexto(pageW / 2, lineY, 'SELLOFIRMADOCASIG');
+  const dataRows = [
+    {
+      prueba: 'CREATININA SÉRICA',
+      resultado: datos.txtCreatinina || '',
+      normales: 'Adulto: 0.8 - 1.4 mg/dl\nNiño: 0.24 - 0.84 mg/dl'
+    },
+    {
+      prueba: 'UREA SÉRICA',
+      resultado: datos.txtUreaSerica || '',
+      normales: '10 - 50 mg/dl'
+    },
+    {
+      prueba: 'ÁCIDO ÚRICO SÉRICO',
+      resultado: datos.txtAcidoUrico || '',
+      normales: 'Mujeres: 2.5 - 6.8 mg/dl\nHombres 3.6 - 7.7 mg/dl'
     }
+  ];
 
-    // === FOOTER ===
-    footerTR(doc, datos);
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = pdfUrl;
-    document.body.appendChild(iframe);
-    iframe.onload = function () {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
+  doc.setFont(config.font, "normal").setFontSize(9);
+  dataRows.forEach(row => {
+    // Prueba
+    doc.text(row.prueba, tableCols.col1, y);
+    // Resultado centrado
+    doc.text(String(row.resultado), tableCols.col2, y, { align: 'center' });
+    // Valores normales (puede ser multilinea)
+    const normalesLines = String(row.normales).split('\n');
+    normalesLines.forEach((line, idx) => {
+      doc.text(line, tableCols.col3, y + idx * config.lineHeight.small, { align: 'left' });
+    });
+    // Ajusta y para la siguiente fila
+    y += Math.max(config.lineHeight.normal, normalesLines.length * config.lineHeight.small + 2);
   });
-} 
+
+  // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
+  const sigW = 48;
+  const sigH = 20;
+  const sigY = y + 12;
+  const gap = 16;
+  const lineY = sigY + sigH + 3;
+
+  // Función auxiliar para agregar sello al PDF
+  const agregarSello = (url, xPos, yPos, width, height) => {
+    return new Promise((resolve, reject) => {
+      if (!url) return resolve();
+
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+
+          const selloBase64 = canvas.toDataURL('image/jpeg');
+          doc.addImage(selloBase64, 'jpeg', xPos, yPos, width, height);
+
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      };
+
+      img.onerror = (e) => reject(e);
+      img.src = url;
+    });
+  };
+
+  // Función auxiliar para dibujar línea y texto debajo del sello
+  const dibujarLineaYTexto = (centroX, lineY, tipoSello) => {
+    doc.setLineWidth(0.2);
+    doc.line(centroX - 25, lineY, centroX + 25, lineY);
+    doc.setFont('helvetica', 'normal').setFontSize(9);
+    if (tipoSello === 'SELLOFIRMA') {
+      // SELLOFIRMA: Firma y Sello del Profesional / Responsable de la Evaluación
+      doc.text("Firma y Sello del Profesional", centroX, lineY + 5, { align: "center" });
+      doc.text("Responsable de la Evaluación", centroX, lineY + 8, { align: "center" });
+    } else if (tipoSello === 'SELLOFIRMADOCASIG') {
+      // SELLOFIRMADOCASIG: Firma y Sello Médico Asignado
+      doc.text("Firma y Sello Médico Asignado", centroX, lineY + 5, { align: "center" });
+    } else {
+      doc.text("Firma y Sello", centroX, lineY + 5, { align: "center" });
+    }
+  };
+
+  if (s1 && s2) {
+    const totalWidth = sigW * 2 + gap;
+    const startX = (pageW - totalWidth) / 2;
+
+    await agregarSello(s1, startX, sigY, sigW, sigH);
+    await agregarSello(s2, startX + sigW + gap, sigY, sigW, sigH);
+
+    const centroSello1X = startX + sigW / 2;
+    const centroSello2X = startX + sigW + gap + sigW / 2;
+    dibujarLineaYTexto(centroSello1X, lineY, 'SELLOFIRMA');
+    dibujarLineaYTexto(centroSello2X, lineY, 'SELLOFIRMADOCASIG');
+  } else if (s1) {
+    const imgX = (pageW - sigW) / 2;
+    await agregarSello(s1, imgX, sigY, sigW, sigH);
+    dibujarLineaYTexto(pageW / 2, lineY, 'SELLOFIRMA');
+  } else if (s2) {
+    const imgX = (pageW - sigW) / 2;
+    await agregarSello(s2, imgX, sigY, sigW, sigH);
+    dibujarLineaYTexto(pageW / 2, lineY, 'SELLOFIRMADOCASIG');
+  }
+
+  // === FOOTER ===
+  footerTR(doc, datos);
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
+}
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
+}

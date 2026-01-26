@@ -52,6 +52,8 @@ export const GetInfoServicio = async (
 
             // observacion
             observacion: res.observacion ?? "",
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -82,6 +84,8 @@ export const SubmitDataService = async (
         fechaCertificado: form.fechaExam,
         fechaCaducidad: form.fechahasta,
         usuarioRegistro: user,
+
+        usuarioFirma: form.user_medicoFirma,
     };
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
         PrintHojaR(form.norden, token, tabla, datosFooter);

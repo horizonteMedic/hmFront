@@ -1,8 +1,11 @@
 import Swal from "sweetalert2";
 import {
     GetInfoServicioDefault,
+    handleSubirArchivoDefault,
+    handleSubirArchivoDefaultSinSellos,
     LoadingDefault,
     PrintHojaRDefault,
+    ReadArchivosFormDefault,
     SubmitDataServiceDefault,
 } from "../../../../utils/functionUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
@@ -11,6 +14,9 @@ const obtenerReporteUrl =
     "/api/v01/ct/certificadoConduccion/obtenerReporteCertificadoConduccion";
 const registrarUrl =
     "/api/v01/ct/certificadoConduccion/registrarActualizarCertificadoConduccion";
+const registrarPDF =
+    "/api/v01/ct/archivos/archivoInterconsulta"
+
 
 export const GetInfoServicio = async (
     nro,
@@ -31,7 +37,7 @@ export const GetInfoServicio = async (
         let imcRed = false;
         let nuevasObservaciones = (res.diagnosticoAudiometria ?? "").toUpperCase();
         if (nuevasObservaciones != "") {
-            nuevasObservaciones += "\n";
+            nuevasObservaciones = "Dx Audiometría: " + nuevasObservaciones + "\n";
         }
         if (imc) {
             const imcValue = parseFloat(imc);
@@ -48,6 +54,8 @@ export const GetInfoServicio = async (
                 }
             }
         }
+
+
         const promedioOidoDerecho = res.promedioOidoDerecho ?? 0;
         const promedioOidoIzquierdo = res.promedioOidoIzquierdo ?? 0;
         let oidoMayor40 = false;
@@ -55,6 +63,9 @@ export const GetInfoServicio = async (
             oidoMayor40 = true;
         }
 
+
+        let debeCorregirAgudezaVisual = false;
+        let debeUsarLentesCorrectores = false;
         const vlejoscod = res.odlcoftalmologia_odlc || "";
         const vlejoscoi = res.oilcoftalmologia_oilc || "";
 
@@ -67,11 +78,16 @@ export const GetInfoServicio = async (
             if (enfermedadesRefractarias.some(e => textoEnfermedadOftalmo.includes(e))) {
                 const visionLejosNormal = vlejoscod === "00" && vlejoscoi === "00";
                 const visionCercaNormal = vcercacod === "00" && vcercacoi === "00";
-                nuevasObservaciones += visionLejosNormal && visionCercaNormal
+
+                debeCorregirAgudezaVisual = visionLejosNormal && visionCercaNormal;
+                debeUsarLentesCorrectores = !debeCorregirAgudezaVisual;
+
+                nuevasObservaciones += debeCorregirAgudezaVisual
                     ? "CORREGIR AGUDEZA VISUAL.\n"
                     : "USO DE LENTES CORRECTORES.\n";
             }
         }
+
 
         let anemia = false;
         const hemoglobina = parseFloat(res.laboratorioClinicoHemoglobina);
@@ -124,7 +140,8 @@ export const GetInfoServicio = async (
             vlCorregidaOI: res.oilcoftalmologia_oilc ?? "",
 
             hipoacusiaFrecuenciasConversacionales: oidoMayor40,
-            conclusion: oidoMayor40 ? "NO APTO" : null,
+            conclusion: oidoMayor40 ? "NO APTO" :
+                debeUsarLentesCorrectores ? "APTO CON RESTRICCION" : null,
             anemiaCriteriosOMS2011: anemia,
 
             vclrs: res.vcoftalmologia_vc ?? "",
@@ -147,8 +164,12 @@ export const GetInfoServicio = async (
             observacionesRecomendaciones: nuevasObservaciones,
             imcRed: imcRed,
 
+            medicinasTomando: res.medicamentosAnexo16A ?? "",
+
             obesidadIMC30: parseFloat(res.imcTriaje) >= 30,
 
+            SubirDoc: true,
+            digitalizacion: res.digitalizacion
         }));
     }
 };
@@ -165,9 +186,43 @@ export const GetInfoServicioEditar = async (
         tabla,
         token,
         obtenerReporteUrl,
-        onFinish
+        onFinish,
+        true
     );
     if (res) {
+        let debeCorregirAgudezaVisual = false;
+        let debeUsarLentesCorrectores = false;
+        const vlejoscod = res.odlcoftalmologia_odlc || "";
+        const vlejoscoi = res.oilcoftalmologia_oilc || "";
+
+        const vcercacod = res.oftalodccmologia_odcc || "";
+        const vcercacoi = res.oiccoftalmologia_oicc || "";
+        const textoEnfermedadOftalmo = (res.enfermedadesocularesoftalmo_e_oculares ?? "").trim().toUpperCase();
+
+        if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
+            const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
+            if (enfermedadesRefractarias.some(e => textoEnfermedadOftalmo.includes(e))) {
+                const visionLejosNormal = vlejoscod === "00" && vlejoscoi === "00";
+                const visionCercaNormal = vcercacod === "00" && vcercacoi === "00";
+
+                debeCorregirAgudezaVisual = visionLejosNormal && visionCercaNormal;
+                debeUsarLentesCorrectores = !debeCorregirAgudezaVisual;
+
+                // nuevasObservaciones += debeCorregirAgudezaVisual
+                //     ? "CORREGIR AGUDEZA VISUAL.\n"
+                //     : "USO DE LENTES CORRECTORES.\n";
+            }
+        }
+
+
+        const promedioOidoDerecho = res.promedioOidoDerecho ?? 0;
+        const promedioOidoIzquierdo = res.promedioOidoIzquierdo ?? 0;
+        let oidoMayor40 = false;
+        if (promedioOidoDerecho > 40 || promedioOidoIzquierdo > 40) {
+            oidoMayor40 = true;
+        }
+
+
         const imc = res.imcTriaje ?? "";
         let imcRed = false;
         if (imc) {
@@ -272,10 +327,12 @@ export const GetInfoServicioEditar = async (
             // Conclusión y Comentarios
             aptoDesde: res.fechaDesde_f_desde ?? "",
             aptoHasta: res.fechaHasta_f_hasta ?? "",
-            conclusion: res.apto_chk_si ? "APTO" :
-                (res.noApto_chk_no ? "NO APTO" :
-                    (res.observado_chk_observado ? "OBSERVADO" :
-                        (res.aptoConRestriccion_chk_apto_r ? "APTO CON RESTRICCION" : null))),
+            conclusion: oidoMayor40 ? "NO APTO" :
+                debeUsarLentesCorrectores ? "APTO CON RESTRICCION" :
+                    res.apto_chk_si ? "APTO" :
+                        (res.noApto_chk_no ? "NO APTO" :
+                            (res.observado_chk_observado ? "OBSERVADO" :
+                                (res.aptoConRestriccion_chk_apto_r ? "APTO CON RESTRICCION" : null))),
             observacionesRecomendaciones: res.observacionesRecomendaciones_b_c_observaciones ?? "",
             // nombreMedicoColegiatura:"",
             // Recomendaciones - 
@@ -286,6 +343,9 @@ export const GetInfoServicioEditar = async (
             usoLentesCorrectoresLectura: (res.observacionesRecomendaciones_b_c_observaciones ?? "").includes("USO DE LENTES CORRECTORES PARA LECTURA DE CERCA."),
             corregirAgudezaLectura: (res.observacionesRecomendaciones_b_c_observaciones ?? "").includes("CORREGIR AGUDEZA VISUAL PARA LECTURA DE CERCA."),
             user_medicoFirma: res.usuarioFirma,
+
+            SubirDoc: true,
+            digitalizacion: res.digitalizacion
         }));
     }
 };
@@ -468,3 +528,16 @@ export const VerifyTRPerzonalizado = async (nro, tabla, token, set, sede, noTien
 export const Loading = (mensaje) => {
     LoadingDefault(mensaje);
 };
+
+export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
+    const coordenadas = {
+        HUELLA: { x: 400, y: 680, width: 60, height: 60 },
+        FIRMA: { x: 466, y: 680, width: 120, height: 60 },
+        SELLOFIRMA: { x: 40, y: 680, width: 120, height: 80 },
+    };
+    handleSubirArchivoDefault(form, selectedSede, registrarPDF, userlogued, token, coordenadas)
+};
+
+export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
+    ReadArchivosFormDefault(form, setVisualerOpen, token)
+}

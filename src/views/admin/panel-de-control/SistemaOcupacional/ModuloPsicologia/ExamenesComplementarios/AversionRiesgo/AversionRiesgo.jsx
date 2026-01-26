@@ -11,12 +11,13 @@ import SectionFieldset from "../../../../../../components/reusableComponents/Sec
 import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
 import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "aversionalriesgo"
 
 export default function AversionRiesgo() {
     const today = getToday();
-    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+    const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
     const initialFormState = {
         norden: "",
@@ -60,6 +61,10 @@ export default function AversionRiesgo() {
         recomendaciones: "",
 
         conclusion: undefined,
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
     }
     const {
         form,
@@ -210,6 +215,15 @@ export default function AversionRiesgo() {
                     </SectionFieldset>
                 </section>
             </div>
+
+            <SectionFieldset legend="Asignación de Médico">
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Especialista"
+                    form={form}
+                    onChange={handleChangeSimple}
+                />
+            </SectionFieldset>
 
             <BotonesAccion
                 form={form}

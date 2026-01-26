@@ -47,6 +47,8 @@ export default function Espirometria() {
 
         peso: "",
         talla: "",
+        sistolica: "",
+        diastolica: "",
 
         fvcTeorico: "",
         fev1Teorico: "",
@@ -56,6 +58,13 @@ export default function Espirometria() {
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
+
+        nombre_doctorAsignado: "",
+        user_doctorAsignado: "",
+
+        nombre_doctorExtra: "",
+        user_doctorExtra: "",
+
         SubirDoc: false,
         nomenclatura: "ESPIROMETRIA"
     };
@@ -71,7 +80,9 @@ export default function Espirometria() {
         handleClear,
         handleClearnotO,
     } = useForm(initialFormState, { storageKey: "espirometria" });
+
     const [visualerOpen, setVisualerOpen] = useState(null)
+
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
@@ -82,7 +93,7 @@ export default function Espirometria() {
             VerifyTR(form.norden, tabla, token, setForm, selectedSede);
         }
     };
-
+    console.log(form)
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
@@ -182,6 +193,18 @@ export default function Espirometria() {
                         value={form?.talla}
                         disabled
                     />
+                    <InputTextOneLine
+                        label="Sistólica"
+                        name="sistolica"
+                        value={form?.sistolica}
+                        disabled
+                    />
+                    <InputTextOneLine
+                        label="Diastólica"
+                        name="diastolica"
+                        value={form?.diastolica}
+                        disabled
+                    />
                 </div>
                 <div className="space-y-3">
                     <InputTextOneLine
@@ -215,6 +238,22 @@ export default function Espirometria() {
                     label="Especialista"
                     form={form}
                     onChange={handleChangeSimple}
+                />
+                <EmpleadoComboBox
+                    value={form.nombre_doctorAsignado}
+                    label="Doctor Asignado"
+                    form={form}
+                    onChange={handleChangeSimple}
+                    nameField="nombre_doctorAsignado"
+                    idField="user_doctorAsignado"
+                />
+                <EmpleadoComboBox
+                    value={form.nombre_doctorExtra}
+                    label="Doctor Extra"
+                    form={form}
+                    onChange={handleChangeSimple}
+                    nameField="nombre_doctorExtra"
+                    idField="user_doctorExtra"
                 />
             </SectionFieldset>
 

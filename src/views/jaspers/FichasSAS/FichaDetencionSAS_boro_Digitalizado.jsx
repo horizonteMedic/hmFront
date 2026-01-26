@@ -3,11 +3,11 @@ import { formatearFechaCorta } from "../../utils/formatDateUtils";
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
-import { getSign } from '../../utils/helpers';
+import { compressImage, getSign } from '../../utils/helpers';
 
-export default async function B_FichaDetencionSAS2(data = {}) {
+export default async function B_FichaDetencionSAS2(data = {}, docExistente = null) {
 
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // Contador de páginas dinámico
@@ -1406,8 +1406,8 @@ export default async function B_FichaDetencionSAS2(data = {}) {
   // Primero dibujar la imagen
   try {
     // Usar ruta absoluta para producción
-    const imageUrl = window.location.origin + '/img/FichasSAS/grado_epiglotis.png';
-    doc.addImage(imageUrl, 'PNG', x, y, imgWidth, imgHeight);
+    const imgCompressed = await compressImage("/img/FichasSAS/grado_epiglotis.png");
+    doc.addImage(imgCompressed, 'jpeg', x, y, imgWidth, imgHeight);
   } catch (error) {
     console.log("Error cargando imagen de grados de epiglotis:", error);
     // Texto alternativo si no se puede cargar la imagen
@@ -1817,7 +1817,7 @@ export default async function B_FichaDetencionSAS2(data = {}) {
   try {
     const x = tablaCriteriosInicioX + 65;
     const y = yDeclaracion + 2;
-    const firmaPaciente = getSign(data, "FIRMAP")
+    const firmaPaciente = await getSign(data, "FIRMAP")
     doc.addImage(
       firmaPaciente,
       'PNG',
@@ -1837,7 +1837,7 @@ export default async function B_FichaDetencionSAS2(data = {}) {
   try {
     const x = tablaCriteriosInicioX + 125;
     const y = yDeclaracion + 2;
-    const huellaDigital = getSign(data, "HUELLA")
+    const huellaDigital = await getSign(data, "HUELLA")
     doc.addImage(
       huellaDigital,
       'PNG',
@@ -1857,7 +1857,11 @@ export default async function B_FichaDetencionSAS2(data = {}) {
   footerTR(doc, { footerOffsetY: 5 });
 
   // === Imprimir ===
-  imprimir(doc);
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {

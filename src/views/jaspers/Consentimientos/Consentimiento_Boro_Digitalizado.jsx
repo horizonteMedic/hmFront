@@ -5,8 +5,8 @@ import footerTR from "../components/footerTR.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
 import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
 
-export default async function Consentimiento_Boro_Digitalizado(datos) {
-  const doc = new jsPDF();
+export default async function Consentimiento_Boro_Digitalizado(datos = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // Función para formatear fecha a DD/MM/YYYY
@@ -19,13 +19,8 @@ export default async function Consentimiento_Boro_Digitalizado(datos) {
   };
 
   // Header con datos de ficha, sede y fecha
-<<<<<<< HEAD
-  const drawHeader = () => {
-    CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-=======
   const drawHeader = async () => {
     await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
     // Número de Ficha
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -46,13 +41,8 @@ export default async function Consentimiento_Boro_Digitalizado(datos) {
 
     // Bloque de color
     drawColorBox(doc, {
-<<<<<<< HEAD
-      color: datos.codigoColor || "#008f39",
-      text: datos.textoColor || "F",
-=======
       color: datos.codigoColor,
       text: datos.textoColor,
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
       x: pageW - 30,
       y: 10,
       size: 22,
@@ -380,7 +370,7 @@ export default async function Consentimiento_Boro_Digitalizado(datos) {
   const notasFinalY = dibujarTextoPegado(notas, margin, notasInicioY, anchoMaximoNotas);
 
   // Usar helper para dibujar firmas
-  dibujarFirmas({ doc, datos, y: notasFinalY + 10, pageW }).then((yFinalFirmas) => {
+  await dibujarFirmas({ doc, datos, y: notasFinalY + 10, pageW }).then((yFinalFirmas) => {
     // Agregar campos de nombre completo y DNI debajo de la firma del responsable
     const tieneSelloProfesional = datos.digitalizacion?.some(d =>
       d.nombreDigitalizacion === "SELLOFIRMA" || d.nombreDigitalizacion === "SELLOFIRMADOCASIG"
@@ -402,19 +392,23 @@ export default async function Consentimiento_Boro_Digitalizado(datos) {
     }
 
     footerTR(doc, datos);
-    // Mostrar PDF
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = pdfUrl;
-    document.body.appendChild(iframe);
-    iframe.onload = function () {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
   }).catch(err => {
     console.error(err);
     alert('Error generando PDF: ' + err);
   });
-} 
+
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
+}
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
+}

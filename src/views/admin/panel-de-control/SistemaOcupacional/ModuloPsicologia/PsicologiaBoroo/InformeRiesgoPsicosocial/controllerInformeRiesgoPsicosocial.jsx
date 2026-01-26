@@ -75,6 +75,8 @@ export const GetInfoServicio = async (
             recomendaciones: res.recomendaciones ?? "",
             analisisResultados: res.analisis ?? "",
             conclusionPerfil: res.apto ?? false,
+
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -124,6 +126,8 @@ export const SubmitDataService = async (
         apto: form.conclusionPerfil,
         noApto: !form.conclusionPerfil,
         usuarioRegistro: user,
+
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -133,7 +137,7 @@ export const SubmitDataService = async (
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     const jasperModules = import.meta.glob(
-        "../../../../../jaspers/ModuloPsicologia/InformeRiesgosPsicosociales/*.jsx"
+        "../../../../../../jaspers/ModuloPsicologia/InformeRiesgosPsicosociales/*.jsx"
     );
     PrintHojaRDefault(
         nro,
@@ -142,7 +146,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../jaspers/ModuloPsicologia/InformeRiesgosPsicosociales"
+        "../../../../../../jaspers/ModuloPsicologia/InformeRiesgosPsicosociales"
     );
 };
 
