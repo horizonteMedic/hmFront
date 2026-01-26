@@ -107,6 +107,7 @@ export const GetInfoServicio = async (
             amenazasDebilidades: res.amenazasDebilidades,
             observaciones: res.observaciones,
             recomendaciones: res.recomendaciones,
+            user_medicoFirma: res.usuarioFirma,
         }));
     }
 };
@@ -239,6 +240,7 @@ export const SubmitDataService = async (
         licencia: form.tipoInforme === "LICENCIA",
         trabajosCaliente: form.tipoInforme === "T. EN CALIENTE",
         usuarioRegistro: user,
+        usuarioFirma: form.user_medicoFirma,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

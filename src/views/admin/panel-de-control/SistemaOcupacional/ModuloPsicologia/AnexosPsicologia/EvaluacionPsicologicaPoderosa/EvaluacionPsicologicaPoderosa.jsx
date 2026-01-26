@@ -11,7 +11,7 @@ import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerEvaluacionPsicologicaPoderosa";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
-
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 const tabla = "evaluacion_psicologica_poderosa"
 const today = getToday();
 
@@ -45,7 +45,7 @@ const evalOptions = [
 ];
 
 export default function EvaluacionPsicologicaPoderosa() {
-    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+    const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
     const initialFormState = {
         // Header
@@ -96,6 +96,10 @@ export default function EvaluacionPsicologicaPoderosa() {
         amenazasDebilidades: "",
         observaciones: "",
         recomendaciones: "",
+
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
+        
     };
 
     const {
@@ -266,6 +270,14 @@ export default function EvaluacionPsicologicaPoderosa() {
                 />
             </SectionFieldset>
 
+            <SectionFieldset legend="Asignación de Médico">
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Especialista"
+                    form={form}
+                    onChange={handleChangeSimple}
+                />
+            </SectionFieldset>
             <fieldset className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
                 <div className="flex gap-4">
                     <button
