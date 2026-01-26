@@ -104,7 +104,6 @@ import EliminarExamenes from "./EliminarExamenes/EliminarExamenes.jsx";
 import LaboratorioTabSelector from "./Laboratorio/LaboratorioTabSelector.jsx";
 import Folio from "./Folio/Folio.jsx";
 import Altura18 from "./Altura18/Altura18.jsx";
-import CuestionarioNordico from "./CuestionarioNordico2/CuestionarioNordico.jsx";
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
   { key: 7, label: "Test Altura" },
@@ -570,13 +569,12 @@ const TabComponent = () => {
               20: { title: "Módulo de Consentimientos", child: <ConsentimientosTabSelector tieneVista={tieneVista} /> },
               21: {
                 title: undefined, child: (
-                  // <Cuestionario_Nordico
-                  //   token={token}
-                  //   userlogued={userlogued.sub}
-                  //   selectedSede={selectSede}
-                  //   userDatos={userlogued}
-                  // />
-                  <CuestionarioNordico />
+                  <Cuestionario_Nordico
+                    token={token}
+                    userlogued={userlogued.sub}
+                    selectedSede={selectSede}
+                    userDatos={userlogued}
+                  />
                 )
               },
               22: { title: "Evaluación Musculoesquelética", child: <MusculoEsqueleticoTabSelector tieneVista={tieneVista} /> },
