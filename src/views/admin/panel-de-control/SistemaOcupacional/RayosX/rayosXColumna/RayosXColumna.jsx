@@ -1,5 +1,6 @@
 import {
   handleSubirArchivo,
+  handleSubirArchivo2,
   PrintHojaR,
   ReadArchivosForm,
   SubmitDataService,
@@ -61,7 +62,8 @@ export default function RayosXColumna() {
     user_medicoFirma: userlogued,
 
     SubirDoc: false,
-    nomenclatura: "INFORME RADIOGRAFICO"
+    nomenclatura: "INFORME RADIOGRAFICO",
+    nomenclatura2: "INFORME RADIOGRAFICO 2",
   };
 
   const {
@@ -122,13 +124,22 @@ export default function RayosXColumna() {
           disabled
           labelWidth="120px"
         />
-        {form.SubirDoc &&
+
+      </SectionFieldset>
+      {form.SubirDoc &&
+        <div className="flex gap-2 w-full flex-col justify-center">
           <ButtonsPDF
-            handleSave={() => { handleSubirArchivo(form, selectedSede, userlogued, token) }}
+            handleSave={() => { handleSubirArchivo2(form, selectedSede, userlogued, token, form.nomenclatura) }}
             handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token) }}
           />
-        }
-      </SectionFieldset>
+          <ButtonsPDF
+            handleSave={() => { handleSubirArchivo2(form, selectedSede, userlogued, token, form.nomenclatura2) }}
+            handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token, form.nomenclatura2) }}
+            Nombre_1="Subir Archivo 2"
+            Nombre_2="Ver Archivo 2"
+          />
+        </div>
+      }
       <DatosPersonalesLaborales form={form} />
       {/* Sección Radiografía de Columna */}
       <SectionFieldset legend="Radiografía de Columna" className="space-y-3">

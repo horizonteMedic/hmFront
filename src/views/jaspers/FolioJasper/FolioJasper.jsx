@@ -23,6 +23,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "ESPIROMETRIA",
         "RAYOS X TORAX",
         "INFORME RADIOGRAFICO",
+        "INFORME RADIOGRAFICO 2",
         "ELECTROCARDIOGRAMA",
         "OFTALMOLOGIA VISION TESTER",
         "DECLARACION USO FIRMA",

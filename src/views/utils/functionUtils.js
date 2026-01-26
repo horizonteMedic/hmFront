@@ -1,6 +1,7 @@
 import Swal from "sweetalert2";
 import { getFetch, getFetchManejo, SubmitData, SubmitDataManejo } from "./apiHelpers";
-import { colocarSellosEnPdf, getSign, uint8ToBase64, optimizePdf } from "./helpers";
+import { colocarSellosEnPdf, getSign, uint8ToBase64, optimizePdf, imagenToPdf, imagenToPdfA4 } from "./helpers";
+import { PDFDocument } from "pdf-lib";
 
 export const LoadingDefault = (text) => {
     Swal.fire({
@@ -569,21 +570,99 @@ export const handleSubirArchivoDefaultSinSellos = async (
 };
 
 
-/*abrir PDF para previsualizador
- const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
-            const pdfUrl = URL.createObjectURL(pdfBlob);
-            const link = document.createElement("a");
-            link.href = pdfUrl;
-            link.download = file.name; // o el nombre que tú quieras
-            document.body.appendChild(link);
-            link.click();
+export const handleImgtoPdfDefault = async (
+    form,
+    selectedSede,
+    urlPDf,
+    userlogued,
+    token,
+    nomenclatura
+) => {
+    const { value: file } = await Swal.fire({
+        title: "Selecciona una imagen o PDF",
+        input: "file",
+        inputAttributes: {
+            accept: "application/pdf,image/jpeg,image/png",
+            "aria-label": "Sube una imagen o PDF",
+        },
+        showCancelButton: true,
+        confirmButtonText: "Subir",
+        cancelButtonText: "Cancelar",
+        inputValidator: (file) => {
+            if (!file) return "Debes seleccionar un archivo.";
+            if (!file.type.startsWith("image/") &&
+                file.type !== "application/pdf"
+            ) {
+                return "Solo se permiten imágenes (JPG/PNG) o PDF.";
+            }
+        },
+    });
 
-            document.body.removeChild(link);
-            URL.revokeObjectURL(pdfUrl);*/
+    if (!file) return;
 
-export const ReadArchivosFormDefault = async (form, setVisualerOpen, token) => {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = ("0" + (currentDate.getMonth() + 1)).slice(-2);
+    const day = ("0" + currentDate.getDate()).slice(-2);
+
+    LoadingDefault("Procesando documento");
+
+    let pdfBytesFinal;
+
+    if (file.type.startsWith("image/")) {
+        // ✅ IMAGEN → PDF
+        pdfBytesFinal = await imagenToPdfA4(file);
+    } else {
+        // ✅ PDF NORMAL
+        const reader = new FileReader();
+        pdfBytesFinal = await new Promise((resolve) => {
+            reader.onload = (e) => {
+                const base64WithoutHeader = e.target.result.split(",")[1];
+                const bytes = Uint8Array.from(
+                    atob(base64WithoutHeader),
+                    (c) => c.charCodeAt(0)
+                );
+                resolve(bytes);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    const pdfBase64Final = uint8ToBase64(pdfBytesFinal);
+
+    const datos = {
+        rutaArchivo: null,
+        dni: null,
+        historiaClinica: null,
+        servidor: "azure",
+        estado: true,
+        fechaRegistro: `${year}-${month}-${day}`,
+        userRegistro: userlogued,
+        fechaActualizacion: null,
+        userActualizacion: null,
+        id_tipo_archivo: null,
+
+        nombreArchivo: file.name.replace(/\.(jpg|jpeg|png)$/i, ".pdf"),
+        codigoSede: selectedSede,
+        fileBase64: pdfBase64Final,
+        nomenclatura_tipo_archivo: nomenclatura,
+        orden: form.norden,
+        indice_carga_masiva: undefined,
+    };
+
+    const response = await SubmitData(datos, urlPDf, token);
+
+    if (response?.id === 1) {
+        Swal.fire("Éxito", "Archivo subido con éxito", "success");
+    } else {
+        Swal.fire("Error", "No se pudo subir el archivo", "error");
+    }
+};
+
+
+export const ReadArchivosFormDefault = async (form, setVisualerOpen, token, nomenclatura) => {
     LoadingDefault("Cargando Archivo")
-    getFetch(`/api/v01/st/registros/detalleUrlArchivos/${form.norden}/${form.nomenclatura}`, token)
+    getFetch(`/api/v01/st/registros/detalleUrlArchivos/${form.norden}/${nomenclatura ?? form.nomenclatura}`, token)
         .then(response => {
             console.log(response)
             if (response.id === 1) {
