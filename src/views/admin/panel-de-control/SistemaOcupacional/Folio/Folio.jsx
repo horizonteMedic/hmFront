@@ -1064,7 +1064,7 @@ const ExamenesListAlturaSolo = buildExamenesList([ // ALTURA SOLO
 ]);
 
 const ListaPorPlantilla = {
-    PRUEBAS: ExamenesListPRUEBAS,
+    //PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     OHLA: ExamenesListOHLA,
     "OHLA ALTURA - CONDUCCION": ExamenesListOHLA1,
