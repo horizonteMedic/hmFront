@@ -47,7 +47,7 @@ export const GetInfoServicio = async (
             ocupacionPaciente: res.areaO,
             fechaExamen: prev.fechaExamen,
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
     }
 };
@@ -111,7 +111,7 @@ export const SubmitDataService = async (
         "observaciones": form.observaciones,
         "horaSalida": getHoraActual(),
         "usuarioRegistro": form.userlogued,
-        
+
         usuarioFirma: form.user_medicoFirma,
     };
 

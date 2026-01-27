@@ -56,7 +56,7 @@ export const GetInfoServicio = async (
       valueO: res.opiaceos ? "POSITIVO" : "NEGATIVO",
       valueMet: res.metanfetamina ? "POSITIVO" : "NEGATIVO",
 
-      user_medicoFirma: res.usuarioFirma,
+      user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado,
     }));
   }

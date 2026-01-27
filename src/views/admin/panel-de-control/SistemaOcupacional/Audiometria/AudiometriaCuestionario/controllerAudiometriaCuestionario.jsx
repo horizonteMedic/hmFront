@@ -75,7 +75,7 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
           p16_servicio_tiempo: res.txtmilitar16,
           p16_boxeo: res.chkboxeo16,
           p16_boxeo_tiempo: res.txtboxeo16,
-          user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+          user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");

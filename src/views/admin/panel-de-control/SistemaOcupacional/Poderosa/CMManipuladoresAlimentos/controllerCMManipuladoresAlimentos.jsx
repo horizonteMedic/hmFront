@@ -50,7 +50,7 @@ export const GetInfoServicio = async (
             recomendaciones: res.recomendaciones ?? "",
             observaciones: res.observaciones ?? "",
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
     }
 };

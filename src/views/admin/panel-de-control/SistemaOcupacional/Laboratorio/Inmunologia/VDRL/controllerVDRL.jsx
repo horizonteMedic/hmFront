@@ -48,7 +48,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
       metodo: res.metodo ?? "",
       resultado: res.vdrl ?? "",
 
-      user_medicoFirma: res.usuarioFirma,
+      user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado,
     }));
   }

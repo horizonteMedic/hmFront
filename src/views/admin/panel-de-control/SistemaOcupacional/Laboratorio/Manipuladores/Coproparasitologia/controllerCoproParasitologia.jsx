@@ -79,7 +79,7 @@ export const GetInfoServicio = async (
       micro3_hematies: res.txthematies2 ?? "",
       micro3_parasitos: res.txtlugol2 ?? "",
 
-      user_medicoFirma: res.usuarioFirma,
+      user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado,
     }));
   }
