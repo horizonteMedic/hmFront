@@ -1,4 +1,4 @@
-import Aptitud_Agroindustrial from "../Ficha_Anexo16/Aptitud_medico_ocupacional_F";
+import Aptitud_medico_ocupacional_F from "../Ficha_Anexo16/Aptitud_medico_ocupacional_F";
 import Anexo7C_Antiguo from "../Anexo16/Anexo7C_Boro";
 import GenerarDatosPaciente from "../AntecedentesAltura/AnexoCB_Digitalizado";
 import Anexo16A_Digitalizado from "../Anexo16A/Anexo16A_Digitalizado";
@@ -31,7 +31,7 @@ import ConsentAdmisionDeclacionAntecePatologicos from "../ModuloConsentimientos/
 import Consentimiento_Muestra_Sangre_Digitalizado from "../Consentimientos/Consentimiento_Muestra_Sangre_Digitalizado";
 import LGonadotropina_Digitalizado from "../Inmunologia/LGonadotropina_Digitalizado";
 import RAYOSXXXOFI_Digitalizado from "../RayosX/RAYOSXXXOFI_Digitalizado";
-import Audiometria2021_Digitalizado from "../Audiometria/Audiometria2021-_Digitalizado_boro";
+// import Audiometria2021_Digitalizado from "../Audiometria/Audiometria/Audiometria2021-_Digitalizado";
 import CuestionarioAudiometria_Digitalizado from "../Audiometria/CuestionarioAudiometria/CuestionarioAudiometria_Digitalizado";
 import Odontograma_Digitalizado from "../Odontologia/OdontogramaDigitalizado/Odontograma_Digitalizado";
 import ResumenAnexo7C_OHLA_Digitalizado from "../Ficha_Anexo16/ResumenMedico/ResumenAnexo7C_OHLA_Digitalizado";
@@ -66,6 +66,9 @@ import EvaluacionOftalmologica2021_Digitalizado_boro from "../Oftalmologia/Evalu
 import formatPsicologia_SuficienciaEspaciosC from "../ModuloPsicologia/InformeEspaciosConfinados/formatPsicologia_SuficienciaEspaciosC";
 import Informe_PsicolaboralBorooA_Digitalizado from "../ModuloPsicologia/InformePsicolaboral/Informe_PsicolaboralBorooA_Digitalizado";
 import Aptitud_medico_ocupacional_11 from "../Ficha_Anexo16/Aptitud_medico_ocupacional_11"
+// import Audiometria2021_Digitalizado from "../Audiometria/LegacyAudiometria/Audiometria2021-_Digitalizado";
+import Audiometria2021BORO from "../Audiometria/LegacyAudiometria/Audiometria2021-_Digitalizado_boro";
+import Audiometria2021 from "../Audiometria/LegacyAudiometria/Audiometria2021-_Digitalizado";
 
 
 export const reportesMap = {
@@ -87,7 +90,7 @@ export const reportesMap = {
 
    certificado_aptitud_medico_ocupacional: {
       Aptitud_medico_ocupacional_11,
-      Aptitud_Agroindustrial
+      Aptitud_medico_ocupacional_F
    }, //son 2 jaspers
 
    certificado_aptitud_medico_resumen: Aptitud_medico_resumen_Digitalizado,
@@ -178,7 +181,10 @@ export const reportesMap = {
       InformeElectrocardiograma_Digitalizado
    },
 
-   audiometria_2023: Audiometria2021_Digitalizado,
+   audiometria_2023: {
+      "Audiometria2021-_Digitalizado_boro": Audiometria2021BORO,
+      "Audiometria2021-_Digitalizado": Audiometria2021
+   },
 
    oftalmologia: Oftalmologia,
 

@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import header_Audiometria2021_Digitalizado_boro from "./headers/header_Audiometria2021-_Digitalizado_boro.jsx";
+import header_Audiometria2021_Digitalizado_boro from "./header_Audiometria2021-_Digitalizado_boro";
 
 /**
  * Genera el cuerpo completo del PDF:
@@ -8,9 +8,9 @@ import header_Audiometria2021_Digitalizado_boro from "./headers/header_Audiometr
  * 4.- Exposición Ocupacional
  * @param {jsPDF} doc
  */
-const body_Audiometria2021_Digitalizado = async (doc, data) => {
-  // Header (devuelve la posición Y final de los datos personales)
-  const yPosFinalDatos = await header_Audiometria2021_Digitalizado_boro(doc, data);
+const body_Audiometria2021_Digitalizado = (doc, data) => {
+  // Header
+  header_Audiometria2021_Digitalizado_boro(doc, data);
 
   function drawCenteredText(text, centerX, y, options = {}) {
     const textWidth = doc.getTextWidth(text);
@@ -18,13 +18,13 @@ const body_Audiometria2021_Digitalizado = async (doc, data) => {
     doc.text(text, x, y, options);
   }
 
-  // Insertar imagen cuerpo2-8.png después de los datos personales
+  // Insertar imagen cuerpo2-8.png en la parte superior
   const pageW = doc.internal.pageSize.getWidth();
   const margin = 16;
   const usableW = pageW - margin * 2;
   const imgW = usableW; // Menos ancho, deja márgenes
   const imgH = 90; // Más alto
-  let y = yPosFinalDatos + 2; // Empezar justo después de los datos personales con un pequeño espacio
+  let y = 45;
   try {
     console.log(margin, y);
     doc.addImage(
@@ -772,13 +772,13 @@ const body_Audiometria2021_Digitalizado = async (doc, data) => {
   );
 };
 
-export default async function Audiometria2021_Digitalizado(data = {}, docExistente = null) {
+export default async function Audiometria2021_DigitalizadoBoro(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-  await body_Audiometria2021_Digitalizado(doc, data);
+  body_Audiometria2021_Digitalizado(doc, data);
 
   // Función para agregar la firma y esperar a que cargue o falle
-  const addSello = async (imagenUrl, x, y, maxw = 100) => {
-    await new Promise((resolve) => {
+  const addSello = (imagenUrl, x, y, maxw = 100) => {
+    return new Promise((resolve) => {
       const img = new Image();
       img.crossOrigin = "anonymous"; // importante si es una URL externa
       img.src = imagenUrl;
@@ -825,18 +825,16 @@ export default async function Audiometria2021_Digitalizado(data = {}, docExisten
   ];
 
   // Crear promesas para todas las firmas existentes
-  const tareas = firmasAPintar
+  const promesasFirmas = firmasAPintar
     .filter((f) => firmas[f.nombre])
     .map((f) => addSello(firmas[f.nombre], f.x, f.y, f.maxw));
 
-  await Promise.all(tareas);
-
+  await Promise.all(promesasFirmas)
   if (docExistente) {
     return doc;
   } else {
     imprimir(doc);
   }
-
 }
 function imprimir(doc) {
   const blob = doc.output("blob");
