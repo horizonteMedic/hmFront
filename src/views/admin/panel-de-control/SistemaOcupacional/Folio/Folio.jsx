@@ -27,7 +27,7 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "INFORME_PSICOLOGICO",
+    "CERTIFICADO_APTITUD_ANEXO_16",    
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -64,7 +64,8 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
 
     "ANEXO_16A",                     // 6
     "CERTIFICADO_ALTURA",
-    "CERTIFICADO_ALTURA_PODEROSA",
+    "PSICOSENSOMETRICO_CERT_ALTURA",        //revisar
+    "CERTIFICADO_ALTURA_PODEROSA",          //revisar
     "CERTIFICADO_APTITUD_ALTURA_PODEROSA",
     "CERTIFICADO_VEHICULOS",
     "FICHA_SAS",
@@ -81,7 +82,12 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "CONSENT_MUESTRA_SANGRE",                  // 12
     "LABORATORIO_CLINICO",           // 12
     "PERFIL_LIPIDICO",               // 13
+    "PERFIL_HEPATICO",
+    "PERFIL_RENAL",
+    "PANEL_5D",
     "GONADOTROPINA",
+    "CONSENT_PANEL_5D",
+
     "CONSENT_MARIHUANA",
     "CONSENT_PANEL_2D",
     "CONSENT_DROGAS_BOROO",
@@ -101,17 +107,21 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "TEST_FATIGA_SOMNOLENCIA",
     "PSICOLOGIA_ANEXO_03",
     "PSICOLOGIA_ANEXO_02",
-    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
+    "INFORME_PSICOLOGICO",
+
+    "CUESTIONARIO_BERLIN",
     "EXAMENES_COMPLEMENTARIOS",
     "ESPACIOS_CONFINADOS_PSICOLOGIA",
+
     "INFORME_PODEROSA_OPERAR",
     "INFORME_PSICOLOGIA_FOBIAS",
-    "informe_psicologico_estres",
+    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
     "INFORME_PSICOLABORAL",
     "TRABAJO_ESPECIFICOS",
     "TRABAJO_ALTURA_PSICO",
     "OFTALMOLOGIA",
     "OFTALMOLOGIA_VISION_TESTER",
+    "FICHA_OFTALMOLOGICA",
     "CONSENT_DECLARACION_APTITUD",
     "CONSENT_SINTOMATICO_RESPIRATORIO",
     "CONSENT_INFORMADO_EVALUACION_MEDICA",
@@ -123,7 +133,7 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
 
 const ExamenesListOHLA = buildExamenesList([       //OHLA
     "RESUMEN_MEDICO_PODEROSA",                 // 1
-    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",    // 2
+    "CERTIFICADO_APTITUD_ANEXO_16",    // 2
     "ANEXO_16",                                // 3
     "CERTIFICADO_ALTURA",                      // 4
     "OFTALMOLOGIA_VISION_TESTER",              // 5 no se mostrara si existe  PSICOSENSOMETRICO_VEHI_FOLIO 
@@ -852,6 +862,9 @@ const ExamenesListLaArenaAlturaConduccion = buildExamenesList([ // LA ARENA ALTU
     "CONSENT_PANEL_2D",
 
     "OIT",
+
+    "ELECTROCARDIOGRAMA",
+    "ELECTROCARDIOGRAMA_ARCHIVO",
 
     "ESPIROMETRIA_ARCHIVO",
     "AUDIOMETRIA_OHLA",
