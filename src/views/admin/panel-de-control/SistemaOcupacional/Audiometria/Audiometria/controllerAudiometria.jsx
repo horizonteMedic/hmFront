@@ -335,7 +335,7 @@ export const SubmitDataService = async (
 // ================= PRINT =================
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
   const jasperModules = import.meta.glob(
-    "../../../../../jaspers/Audiometria/*.jsx"
+    "../../../../../jaspers/Audiometria/LegacyAudiometria/*.jsx"
   );
 
   PrintHojaRDefault(
@@ -345,7 +345,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     datosFooter,
     obtenerReporteUrl,
     jasperModules,
-    "../../../../../jaspers/Audiometria"
+    "../../../../../jaspers/Audiometria/LegacyAudiometria"
   );
 };
 

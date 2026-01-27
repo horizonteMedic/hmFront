@@ -768,19 +768,19 @@ export default async function Certificacion_suficiencia_trabajos_en_altura_boro_
       siDerecho: datosFinales.pcomplementariaCampimetriaSi,
       noDerecho: datosFinales.pcomplementariaCampimetriaNo
     },
-    {
-      numero: 4,
-      textoIzquierdo: "Test de SAS : Anormal",
-      textoDerecho: "Campimetría Anormal (Test de confrontación alterada)",
-      alturaFila: 5,
-      posicionY: 2.5,
-      // Variables para checkbox izquierdo (SAS - no hay variable específica, usar false por defecto)
-      siIzquierdo: false,
-      noIzquierdo: true,
-      // Variables para checkbox derecho (campimetría)
-      siDerecho: datosFinales.pcomplementariaCampimetriaSi,
-      noDerecho: datosFinales.pcomplementariaCampimetriaNo
-    },
+    // {
+    //   numero: 4,
+    //   textoIzquierdo: "Test de SAS : Anormal",
+    //   textoDerecho: "Campimetría Anormal (Test de confrontación alterada)",
+    //   alturaFila: 5,
+    //   posicionY: 2.5,
+    //   // Variables para checkbox izquierdo (SAS - no hay variable específica, usar false por defecto)
+    //   siIzquierdo: false,
+    //   noIzquierdo: true,
+    //   // Variables para checkbox derecho (campimetría)
+    //   siDerecho: datosFinales.pcomplementariaCampimetriaSi,
+    //   noDerecho: datosFinales.pcomplementariaCampimetriaNo
+    // },
 
   ];
 
