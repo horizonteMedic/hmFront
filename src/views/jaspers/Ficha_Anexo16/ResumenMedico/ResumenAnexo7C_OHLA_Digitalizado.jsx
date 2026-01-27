@@ -318,22 +318,28 @@ export default async function ResumenAnexo7C_OHLA_Digitalizado(data = {}, docExi
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Cuarta fila: Área de Trabajo, Puesto de Trabajo (2 columnas)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Quinta fila: Empresa (fila completa)
+  // Cuarta fila: Área de Trabajo (fila completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Sexta fila: Contratista (fila completa)
+  // Quinta fila: Puesto de Trabajo (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Sexta fila: Empresa (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Séptima fila: Contratista (fila completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
@@ -385,26 +391,28 @@ export default async function ResumenAnexo7C_OHLA_Digitalizado(data = {}, docExi
   dibujarTextoConSaltoLinea(datosFinales.domicilio || "", tablaInicioX + 25, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
-  // Cuarta fila: Área de Trabajo, Puesto de Trabajo
+  // Cuarta fila: Área de Trabajo
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Área de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo || "", tablaInicioX + 30, yTexto + 1.5, 50);
-
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Puesto de Trabajo:", tablaInicioX + 92, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo || "", tablaInicioX + 122, yTexto + 1.5, 65);
+  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo || "", tablaInicioX + 30, yTexto + 1.5, tablaAncho - 35);
   yTexto += filaAltura;
 
-  // Quinta fila: Empresa
+  // Quinta fila: Puesto de Trabajo
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo || "", tablaInicioX + 35, yTexto + 1.5, tablaAncho - 40);
+  yTexto += filaAltura;
+
+  // Sexta fila: Empresa
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
   dibujarTextoConSaltoLinea(datosFinales.empresa || "", tablaInicioX + 25, yTexto + 1.5, tablaAncho - 25);
   yTexto += filaAltura;
 
-  // Sexta fila: Contratista
+  // Séptima fila: Contratista
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Contratista:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
