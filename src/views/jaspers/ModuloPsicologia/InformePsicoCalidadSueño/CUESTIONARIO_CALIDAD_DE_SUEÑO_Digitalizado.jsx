@@ -12,8 +12,7 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
 
   const datosReales = {
     apellidosNombres: String(`${data.apellidosPaciente ?? ""} ${data.nombresPaciente ?? ""}`).trim(),
-    fechaExamen: formatearFechaCorta(data.fechaRegistro ?? ""),
-    tipoExamen: String(data.tipoExamen ?? ""),
+    fechaExamen: formatearFechaCorta(data.fecha ?? ""),
     sexo: convertirGenero(data.sexoPaciente) || "",
     documentoIdentidad: String(data.dniPaciente ?? ""),
     edad: String(data.edadPaciente ?? ""),
@@ -22,7 +21,7 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
     empresa: String(data.empresa ?? ""),
     contrata: String(data.contrata ?? ""),
     numeroFicha: String(data.norden ?? ""),
-    sede: String(data.sede ?? data.nombreSede ?? ""),
+    sede: String(data.sede ?? ""),
     fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente ?? ""),
     codigoColor: String(data.codigoColor ?? ""),
     textoColor: String(data.textoColor ?? ""),
@@ -172,18 +171,30 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
   };
 
 
-  // Función para dibujar checkbox marcado
-  const dibujarCheckbox = (x, y, marcado, alturaFila = filaAltura) => {
+  // Función para dibujar checkbox marcado debajo del texto (para opciones con texto)
+  const dibujarCheckboxDebajoTexto = (x, yUltimaLineaTexto, marcado) => {
     if (marcado) {
-      doc.setFont("helvetica", "bold").setFontSize(11.3);
-      doc.setTextColor(0, 51, 204); // #0033cc
+      doc.setFont("helvetica", "normal").setFontSize(9);
+      doc.setTextColor(0, 51, 204); // #0033cc - solo las X son azules
+      // Posicionar la X debajo de la última línea del texto (con espacio de 3mm)
+      doc.text("X", x, yUltimaLineaTexto + 3.5, { align: "center" });
+      doc.setTextColor(0, 0, 0); // Volver a negro para el texto
+    }
+  };
+
+  // Función para dibujar checkbox centrado (para sub-preguntas sin texto)
+  const dibujarCheckboxCentrado = (x, y, marcado, alturaFila = filaAltura) => {
+    if (marcado) {
+      doc.setFont("helvetica", "normal").setFontSize(9);
+      doc.setTextColor(0, 51, 204); // #0033cc - solo las X son azules
+      // Posicionar la X centrada en la celda
       doc.text("X", x, y + alturaFila / 2 + 1, { align: "center" });
-      doc.setTextColor(0, 0, 0); // Volver a negro
+      doc.setTextColor(0, 0, 0); // Volver a negro para el texto
     }
   };
 
   // === TEXTO INTRODUCTORIO ===
-  yPos += 3;
+  yPos += 5; // Más espacio arriba
   doc.setFont("helvetica", "bold").setFontSize(7);
   const textoIntro = "Las siguientes preguntas hacen referencia a como ha dormido normalmente durante el último mes. Intente ajustarse en sus respuestas de la manera más exacta posible a lo ocurrido durante la mayor parte de los días y noches del último mes.";
   dibujarTextoConSaltoLinea(textoIntro, tablaInicioX, yPos, tablaAncho);
@@ -211,9 +222,9 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
     doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text(linea, tablaInicioX + colNumero + 2, yPos + 3.5 + (idx * 3));
   });
-  doc.setTextColor(0, 0, 255); // Azul para la respuesta
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setTextColor(0, 0, 0); // Texto siempre negro
   doc.text(String(data.pregunta1 ?? ""), tablaInicioX + colNumero + colPregunta + 2, yPos + alturaFila1 / 2 + 0.5);
-  doc.setTextColor(0, 0, 0); // Volver a negro
   yPos += alturaFila1;
 
   // === PREGUNTA 2: TIEMPO EN QUEDARSE DORMIDO ===
@@ -261,15 +272,21 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
 
   opcionesPregunta2.forEach((opcion, idx) => {
     const xColumna = tablaInicioX + colNumero + colPregunta + (idx * colOpciones2);
+    const centroX = xColumna + colOpciones2 / 2;
+    // Primero dibujar el texto (siempre negro) centrado
     doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.setTextColor(0, 0, 0); // Asegurar que el texto sea negro
     const lineas = doc.splitTextToSize(opcion.texto, colOpciones2 - 6);
     const alturaTexto = lineas.length * 3;
-    const yInicioTexto = yPos + 3.5 + (alturaFila2 - alturaTexto - 3.5) / 2;
+    const espacioParaX = 4; // Espacio para la X debajo
+    const yInicioTexto = yPos + 2 + (alturaFila2 - alturaTexto - espacioParaX) / 2; // Centrado considerando espacio para X
     
     lineas.forEach((linea, lineIdx) => {
-      doc.text(linea, xColumna + colOpciones2 / 2, yInicioTexto + (lineIdx * 3), { align: "center" });
+      doc.text(linea, centroX, yInicioTexto + (lineIdx * 3), { align: "center" });
     });
-    dibujarCheckbox(xColumna + colOpciones2 / 2, yPos, opcion.marcado, alturaFila2);
+    // Luego dibujar la X debajo de la última línea del texto
+    const yUltimaLineaTexto = yInicioTexto + (lineas.length - 1) * 3;
+    dibujarCheckboxDebajoTexto(centroX, yUltimaLineaTexto, opcion.marcado);
   });
   
   yPos += alturaFila2;
@@ -292,9 +309,9 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
     doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text(linea, tablaInicioX + colNumero + 2, yPos + 3.5 + (idx * 3));
   });
-  doc.setTextColor(0, 0, 255); // Azul para la respuesta
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setTextColor(0, 0, 0); // Texto siempre negro
   doc.text(String(data.pregunta3 ?? ""), tablaInicioX + colNumero + colPregunta + 2, yPos + alturaFila3 / 2 + 0.5);
-  doc.setTextColor(0, 0, 0); // Volver a negro
   yPos += alturaFila3;
 
   // === PREGUNTA 4: HORAS DORMIDAS ===
@@ -315,9 +332,9 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
     doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text(linea, tablaInicioX + colNumero + 2, yPos + 3.5 + (idx * 3));
   });
-  doc.setTextColor(0, 0, 255); // Azul para la respuesta
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setTextColor(0, 0, 0); // Texto siempre negro
   doc.text(String(data.pregunta4 ?? ""), tablaInicioX + colNumero + colPregunta + 2, yPos + alturaFila4 / 2 + 0.5);
-  doc.setTextColor(0, 0, 0); // Volver a negro
   yPos += alturaFila4;
 
   // === PREGUNTA 5: PROBLEMAS PARA DORMIR ===
@@ -486,10 +503,10 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
       doc.text(`${subPregunta.letra}. ${subPregunta.texto}`, tablaInicioX + colNumero + 2, yPos + 2.5);
     }
     
-    dibujarCheckbox(tablaInicioX + colPregunta5 + colOpciones / 2, yPos, subPregunta.nunca, filaAltura);
-    dibujarCheckbox(tablaInicioX + colPregunta5 + colOpciones + colOpciones / 2, yPos, subPregunta.menos, filaAltura);
-    dibujarCheckbox(tablaInicioX + colPregunta5 + colOpciones * 2 + colOpciones / 2, yPos, subPregunta.unaDos, filaAltura);
-    dibujarCheckbox(tablaInicioX + colPregunta5 + colOpciones * 3 + colOpciones / 2, yPos, subPregunta.tres, filaAltura);
+    dibujarCheckboxCentrado(tablaInicioX + colPregunta5 + colOpciones / 2, yPos, subPregunta.nunca, filaAltura);
+    dibujarCheckboxCentrado(tablaInicioX + colPregunta5 + colOpciones + colOpciones / 2, yPos, subPregunta.menos, filaAltura);
+    dibujarCheckboxCentrado(tablaInicioX + colPregunta5 + colOpciones * 2 + colOpciones / 2, yPos, subPregunta.unaDos, filaAltura);
+    dibujarCheckboxCentrado(tablaInicioX + colPregunta5 + colOpciones * 3 + colOpciones / 2, yPos, subPregunta.tres, filaAltura);
     
     // Dibujar línea inferior de cada fila (cruza TODO el ancho de la tabla)
     doc.line(tablaInicioX, yFilaActual + filaAltura, tablaInicioX + tablaAncho, yFilaActual + filaAltura);
@@ -518,7 +535,7 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
     maxAlturaOpciones6 = Math.max(maxAlturaOpciones6, lineas.length * 3);
   });
   
-  const alturaFila6 = Math.max(filaAltura, Math.max(lineasPregunta6.length * 3 + 3.5, maxAlturaOpciones6 + 3.5));
+  const alturaFila6 = Math.max(filaAltura, Math.max(lineasPregunta6.length * 3 + 3.5, maxAlturaOpciones6 + 3.5)) + 0.5;
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila6);
   doc.line(tablaInicioX + colNumero, yPos, tablaInicioX + colNumero, yPos + alturaFila6);
@@ -539,15 +556,21 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
 
   opcionesPregunta6.forEach((opcion, idx) => {
     const xColumna = tablaInicioX + colNumero + colPregunta + (idx * colOpciones6);
+    const centroX = xColumna + colOpciones6 / 2;
+    // Primero dibujar el texto (siempre negro) centrado
     doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.setTextColor(0, 0, 0); // Asegurar que el texto sea negro
     const lineas = doc.splitTextToSize(opcion.texto, colOpciones6 - 6);
     const alturaTexto = lineas.length * 3;
-    const yInicioTexto = yPos + 3.5 + (alturaFila6 - alturaTexto - 3.5) / 2;
+    const espacioParaX = 4; // Espacio para la X debajo
+    const yInicioTexto = yPos + 2 + (alturaFila6 - alturaTexto - espacioParaX) / 2; // Centrado considerando espacio para X
     
     lineas.forEach((linea, lineIdx) => {
-      doc.text(linea, xColumna + colOpciones6 / 2, yInicioTexto + (lineIdx * 3), { align: "center" });
+      doc.text(linea, centroX, yInicioTexto + (lineIdx * 3), { align: "center" });
     });
-    dibujarCheckbox(xColumna + colOpciones6 / 2, yPos, opcion.marcado, alturaFila6);
+    // Luego dibujar la X debajo de la última línea del texto
+    const yUltimaLineaTexto = yInicioTexto + (lineas.length - 1) * 3;
+    dibujarCheckboxDebajoTexto(centroX, yUltimaLineaTexto, opcion.marcado);
   });
   
   yPos += alturaFila6;
@@ -573,7 +596,7 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
     maxAlturaOpciones7 = Math.max(maxAlturaOpciones7, lineas.length * 3);
   });
   
-  const alturaFila7 = Math.max(filaAltura, Math.max(lineasPregunta7.length * 3 + 3.5, maxAlturaOpciones7 + 3.5));
+  const alturaFila7 = Math.max(filaAltura, Math.max(lineasPregunta7.length * 3 + 3.5, maxAlturaOpciones7 + 3.5)) + 0.5;
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila7);
   doc.line(tablaInicioX + colNumero, yPos, tablaInicioX + colNumero, yPos + alturaFila7);
@@ -594,15 +617,21 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
 
   opcionesPregunta7.forEach((opcion, idx) => {
     const xColumna = tablaInicioX + colNumero + colPregunta + (idx * colOpciones7);
+    const centroX = xColumna + colOpciones7 / 2;
+    // Primero dibujar el texto (siempre negro) centrado
     doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.setTextColor(0, 0, 0); // Asegurar que el texto sea negro
     const lineas = doc.splitTextToSize(opcion.texto, colOpciones7 - 6);
     const alturaTexto = lineas.length * 3;
-    const yInicioTexto = yPos + 3.5 + (alturaFila7 - alturaTexto - 3.5) / 2;
+    const espacioParaX = 4; // Espacio para la X debajo
+    const yInicioTexto = yPos + 2 + (alturaFila7 - alturaTexto - espacioParaX) / 2; // Centrado considerando espacio para X
     
     lineas.forEach((linea, lineIdx) => {
-      doc.text(linea, xColumna + colOpciones7 / 2, yInicioTexto + (lineIdx * 3), { align: "center" });
+      doc.text(linea, centroX, yInicioTexto + (lineIdx * 3), { align: "center" });
     });
-    dibujarCheckbox(xColumna + colOpciones7 / 2, yPos, opcion.marcado, alturaFila7);
+    // Luego dibujar la X debajo de la última línea del texto
+    const yUltimaLineaTexto = yInicioTexto + (lineas.length - 1) * 3;
+    dibujarCheckboxDebajoTexto(centroX, yUltimaLineaTexto, opcion.marcado);
   });
   
   yPos += alturaFila7;
@@ -621,7 +650,7 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
     { texto: "> 3 vez por", marcado: data.pregunta8CuatroVeces ?? false }
   ];
 
-  const alturaFila8 = Math.max(filaAltura, lineasPregunta8.length * 3 + 3.5);
+  const alturaFila8 = Math.max(filaAltura, lineasPregunta8.length * 3 + 3.5) + 0.5;
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila8);
   doc.line(tablaInicioX + colNumero, yPos, tablaInicioX + colNumero, yPos + alturaFila8);
@@ -642,9 +671,15 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
 
   opcionesPregunta8.forEach((opcion, idx) => {
     const xColumna = tablaInicioX + colNumero + colPregunta + (idx * colOpciones8);
+    const centroX = xColumna + colOpciones8 / 2;
+    // Primero dibujar el texto (siempre negro) centrado
     doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.text(opcion.texto, xColumna + colOpciones8 / 2, yPos + alturaFila8 / 2 + 0.5, { align: "center" });
-    dibujarCheckbox(xColumna + colOpciones8 / 2, yPos, opcion.marcado, alturaFila8);
+    doc.setTextColor(0, 0, 0); // Asegurar que el texto sea negro
+    const espacioParaX = 4; // Espacio para la X debajo
+    const yTexto = yPos + 2 + (alturaFila8 - 3 - espacioParaX) / 2; // Centrado considerando espacio para X
+    doc.text(opcion.texto, centroX, yTexto, { align: "center" });
+    // Luego dibujar la X debajo del texto
+    dibujarCheckboxDebajoTexto(centroX, yTexto, opcion.marcado);
   });
   
   yPos += alturaFila8;
@@ -684,9 +719,15 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
 
   opcionesPregunta9.forEach((opcion, idx) => {
     const xColumna = tablaInicioX + colNumero + colPregunta + (idx * colOpciones9);
+    const centroX = xColumna + colOpciones9 / 2;
+    // Primero dibujar el texto (siempre negro) centrado
     doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.text(opcion.texto, xColumna + colOpciones9 / 2, yPos + alturaFila9 / 2 + 0.5, { align: "center" });
-    dibujarCheckbox(xColumna + colOpciones9 / 2, yPos, opcion.marcado, alturaFila9);
+    doc.setTextColor(0, 0, 0); // Asegurar que el texto sea negro
+    const espacioParaX = 4; // Espacio para la X debajo
+    const yTexto = yPos + 2 + (alturaFila9 - 3 - espacioParaX) / 2; // Centrado considerando espacio para X
+    doc.text(opcion.texto, centroX, yTexto, { align: "center" });
+    // Luego dibujar la X debajo del texto
+    dibujarCheckboxDebajoTexto(centroX, yTexto, opcion.marcado);
   });
   
   yPos += alturaFila9;
@@ -726,9 +767,15 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
 
   opcionesPregunta10.forEach((opcion, idx) => {
     const xColumna = tablaInicioX + colNumero + colPregunta + (idx * colOpciones10);
+    const centroX = xColumna + colOpciones10 / 2;
+    // Primero dibujar el texto (siempre negro) centrado
     doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.text(opcion.texto, xColumna + colOpciones10 / 2, yPos + alturaFila10 / 2 + 0.5, { align: "center" });
-    dibujarCheckbox(xColumna + colOpciones10 / 2, yPos, opcion.marcado, alturaFila10);
+    doc.setTextColor(0, 0, 0); // Asegurar que el texto sea negro
+    const espacioParaX = 4; // Espacio para la X debajo
+    const yTexto = yPos + 2 + (alturaFila10 - 3 - espacioParaX) / 2; // Centrado considerando espacio para X
+    doc.text(opcion.texto, centroX, yTexto, { align: "center" });
+    // Luego dibujar la X debajo del texto
+    dibujarCheckboxDebajoTexto(centroX, yTexto, opcion.marcado);
   });
   
   yPos += alturaFila10;
@@ -754,7 +801,7 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
     maxAlturaOpciones11 = Math.max(maxAlturaOpciones11, lineas.length * 3);
   });
   
-  const alturaFila11 = Math.max(filaAltura, Math.max(lineasPregunta11.length * 3 + 3.5, maxAlturaOpciones11 + 3.5));
+  const alturaFila11 = Math.max(filaAltura, Math.max(lineasPregunta11.length * 3 + 3.5, maxAlturaOpciones11 + 3.5)) + 0.5;
   
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila11);
   doc.line(tablaInicioX + colNumero, yPos, tablaInicioX + colNumero, yPos + alturaFila11);
@@ -775,37 +822,41 @@ export default async function CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado(data =
 
   opcionesPregunta11.forEach((opcion, idx) => {
     const xColumna = tablaInicioX + colNumero + colPregunta + (idx * colOpciones11);
+    const centroX = xColumna + colOpciones11 / 2;
+    // Primero dibujar el texto (siempre negro) centrado
     doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.setTextColor(0, 0, 0); // Asegurar que el texto sea negro
     const lineas = doc.splitTextToSize(opcion.texto, colOpciones11 - 6);
     const alturaTexto = lineas.length * 3;
-    const yInicioTexto = yPos + 3.5 + (alturaFila11 - alturaTexto - 3.5) / 2;
+    const espacioParaX = 4; // Espacio para la X debajo
+    const yInicioTexto = yPos + 2 + (alturaFila11 - alturaTexto - espacioParaX) / 2; // Centrado considerando espacio para X
     
     lineas.forEach((linea, lineIdx) => {
-      doc.text(linea, xColumna + colOpciones11 / 2, yInicioTexto + (lineIdx * 3), { align: "center" });
+      doc.text(linea, centroX, yInicioTexto + (lineIdx * 3), { align: "center" });
     });
-    dibujarCheckbox(xColumna + colOpciones11 / 2, yPos, opcion.marcado, alturaFila11);
+    // Luego dibujar la X debajo de la última línea del texto
+    const yUltimaLineaTexto = yInicioTexto + (lineas.length - 1) * 3;
+    dibujarCheckboxDebajoTexto(centroX, yUltimaLineaTexto, opcion.marcado);
   });
   
   yPos += alturaFila11;
 
   // === SECCIÓN DE FIRMAS ===
   const pageHeight = doc.internal.pageSize.getHeight();
+  
+  // Agregar espacio arriba antes de las firmas
+  yPos += 5;
+  
   if (yPos + 30 > pageHeight - 20) {
     doc.addPage();
     yPos = 35;
   }
 
-  // Dibujar sección de firma con borde
-  const alturaSeccionFirma = 30;
-  doc.setDrawColor(0, 0, 0);
-  doc.setLineWidth(0.2);
-  doc.rect(tablaInicioX, yPos, tablaAncho, alturaSeccionFirma, 'S');
-
-  // Usar la función dibujarFirmas para dibujar las firmas
-  await dibujarFirmas({ doc, datos: data, y: yPos + 2, pageW });
+  // Usar la función dibujarFirmas para dibujar las firmas (sin borde)
+  await dibujarFirmas({ doc, datos: data, y: yPos, pageW });
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 5 });
+  footerTR(doc, { footerOffsetY:  12});
 
   // === IMPRIMIR ===
   imprimir(doc);

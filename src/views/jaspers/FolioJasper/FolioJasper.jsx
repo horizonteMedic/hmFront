@@ -256,23 +256,37 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             console.log(`📌 Insertando ${examen.nombre} (${examen.tabla}) en posición ${posicionAjustada} (original: ${posicionInsercion}, ajuste: +${paginasInsertadasAcumuladas})`);
 
             // Cargar el PDF externo
-            const externoBytes = await fetch(examen.url, { signal }).then(r => r.arrayBuffer());
+            let externoBytes;
+            let externoPdf;
+            try {
+                const response = await fetch(examen.url, { signal });
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                externoBytes = await response.arrayBuffer();
 
-            // 📊 Mostrar tamaño del PDF externo
-            const tamañoExternoKB = (externoBytes.byteLength / 1024).toFixed(2);
-            const tamañoExternoMB = (externoBytes.byteLength / (1024 * 1024)).toFixed(3);
-            console.log(`   📄 Tamaño del PDF externo: ${tamañoExternoKB} KB (${tamañoExternoMB} MB)`);
+                // 📊 Mostrar tamaño del PDF externo
+                const tamañoExternoKB = (externoBytes.byteLength / 1024).toFixed(2);
+                const tamañoExternoMB = (externoBytes.byteLength / (1024 * 1024)).toFixed(3);
+                console.log(`   📄 Tamaño del PDF externo: ${tamañoExternoKB} KB (${tamañoExternoMB} MB)`);
 
-            // Guardar estadísticas del PDF externo
-            estadisticasPdfsExternos.push({
-                nombre: examen.nombre,
-                tabla: examen.tabla,
-                pesoKB: tamañoExternoKB,
-                pesoMB: tamañoExternoMB,
-                pesoBytes: externoBytes.byteLength
-            });
+                // Guardar estadísticas del PDF externo
+                estadisticasPdfsExternos.push({
+                    nombre: examen.nombre,
+                    tabla: examen.tabla,
+                    pesoKB: tamañoExternoKB,
+                    pesoMB: tamañoExternoMB,
+                    pesoBytes: externoBytes.byteLength
+                });
 
-            const externoPdf = await PDFDocument.load(externoBytes);
+                externoPdf = await PDFDocument.load(externoBytes);
+            } catch (error) {
+                if (examen.tabla.includes("INTERCONSULTA")) {
+                    console.warn(`⚠️ Error al procesar interconsulta ${examen.nombre}: ${error.message}. Se omitirá.`);
+                    continue;
+                }
+                throw error;
+            }
 
             // Copiar todas las páginas del PDF externo
             const paginasExternas = await basePdf.copyPages(
