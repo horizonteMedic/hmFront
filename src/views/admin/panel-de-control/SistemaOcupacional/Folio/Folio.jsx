@@ -27,7 +27,7 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "CERTIFICADO_APTITUD_ANEXO_16",
+    "INFORME_PSICOLOGICO",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña

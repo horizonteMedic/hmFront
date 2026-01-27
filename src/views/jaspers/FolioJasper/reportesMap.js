@@ -12,6 +12,7 @@ import AnalisisBioquimicos_Digitalizado from "../AnalisisBioquimicos/AnalisisBio
 import RagiografiaToraxPA_Digitalizado from "../RayosX/RagiografiaToraxPA_Digitalizado";
 import FichaAudiologica_Digitalizado from "../Audiometria/FichaAudiologica/FichaAudiologica_Digitalizado";
 import InformePsicologico_Digitalizado from "../ModuloPsicologia/InformePsicologico/InformePsicologico_Digitalizado";
+import Informe_Psicologico_Boroo from "../ModuloPsicologia/InformePsicologico/Informe_Psicologico_Boroo";
 import EvaluacionPsicologica_p_Digitalizado from "../ModuloPsicologia/EvaluacionPsicologicaPoderosa/InformePsicologico_Digitalizado";
 import Oftalmologia from "../Oftalmologia/Oftalmologia";
 import conInformadoOcupacional_Digitalizado from "../ConsentimientoInformado/conInformadoOcupacional_Digitalizado";
@@ -230,7 +231,10 @@ export const reportesMap = {
 
    psicologiafobias: formatPsicologia_Digitalizado,
 
-   informe_psicologico: InformePsicologico_Digitalizado,
+   informe_psicologico: {
+      InformePsicologico_Digitalizado,
+      Informe_Psicologico_Boroo
+   },
 
    exam_complementarios: InformePsicoExamComplementario,
 
