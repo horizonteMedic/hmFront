@@ -1914,20 +1914,39 @@ export default async function UsoRespiradores(data = {}, docExistente = null) {
   yPos = dibujarHeaderSeccion("7.3 Ficha: Autorización para el uso de Respiradores", yPos, filaAltura);
 
   // === FILA 1: ID EMPLEADO Y MINERA BARRICK ===
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
-  doc.line(tablaInicioX + tablaAncho / 2, yPos, tablaInicioX + tablaAncho / 2, yPos + filaAltura); // División central
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
-  yPos += filaAltura;
+  // Calcular altura dinámica basada en el contenido
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const anchoDisponibleEmpresa = tablaAncho / 2 - 22; // Ancho disponible para el texto de empresa
+  const lineasEmpresa = doc.splitTextToSize(String(datosFinales.empresa || ""), anchoDisponibleEmpresa);
+  const espacioSuperior = 0.6; // Espacio superior de 0.6mm para que no choque con la línea
+  const espacioInferior = 1; // Espacio inferior
+  const alturaNecesaria = Math.max(filaAltura, lineasEmpresa.length * 3.5 + espacioSuperior + espacioInferior);
+  
+  const alturaFila1 = alturaNecesaria;
+  const yInicioFila1 = yPos;
+
+  // Dibujar líneas de la fila 1 con altura dinámica
+  doc.line(tablaInicioX, yInicioFila1, tablaInicioX, yInicioFila1 + alturaFila1); // Línea izquierda
+  doc.line(tablaInicioX + tablaAncho / 2, yInicioFila1, tablaInicioX + tablaAncho / 2, yInicioFila1 + alturaFila1); // División central
+  doc.line(tablaInicioX + tablaAncho, yInicioFila1, tablaInicioX + tablaAncho, yInicioFila1 + alturaFila1); // Línea derecha
+  doc.line(tablaInicioX, yInicioFila1, tablaInicioX + tablaAncho, yInicioFila1); // Línea superior
+  doc.line(tablaInicioX, yInicioFila1 + alturaFila1, tablaInicioX + tablaAncho, yInicioFila1 + alturaFila1); // Línea inferior
 
   // Contenido de la fila 1
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("ID Empleado:", tablaInicioX + 2, yPos - 1.5);
-  doc.text(datosFinales.numeroFicha, tablaInicioX + 20, yPos - 1.5);
+  const yCentroFila1 = yInicioFila1 + alturaFila1 / 2;
+  doc.text("ID Empleado:", tablaInicioX + 2, yCentroFila1);
+  doc.text(datosFinales.numeroFicha, tablaInicioX + 20, yCentroFila1);
 
-  doc.text("Minera Barrick:", tablaInicioX + tablaAncho / 2 + 2, yPos - 1.5);
-  doc.text(datosFinales.empresa, tablaInicioX + tablaAncho / 2 + 20, yPos - 1.5);
+  // Texto de Minera Barrick con espacio superior de 0.6mm desde la línea superior
+  // El texto se dibuja desde su baseline, así que necesitamos ajustar para que visualmente esté a 0.6mm de la línea
+  const yTextoInicio = yInicioFila1 + espacioSuperior + 2; // 0.6mm espacio + 2mm para el baseline del texto
+  doc.text("Minera Barrick:", tablaInicioX + tablaAncho / 2 + 2, yTextoInicio);
+  // Dibujar texto de empresa con múltiples líneas si es necesario
+  lineasEmpresa.forEach((linea, idx) => {
+    doc.text(linea, tablaInicioX + tablaAncho / 2 + 20, yTextoInicio + (idx * 3.5));
+  });
+  
+  yPos += alturaFila1;
 
   // === FILA 2: TRABAJADOR Y ÁREA ===
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda

@@ -25,17 +25,51 @@ export async function dibujarFirmas({ doc, datos, y, pageW, mostrarFirmaPaciente
   const tieneFirmaPaciente = mostrarFirmaPaciente && ((firmap !== null && firmap !== "") || (huellap !== null & huellap !== ""));
   const tieneSelloProfesional = (s1 !== null && s1 !== "") || (s2 !== null & s2 !== "") || (s3 !== null & s3 !== "");
 
+  // Contar sellos disponibles
+  const sellos = [];
+  if (s1) sellos.push({ data: s1, tipo: 'SELLOFIRMA' });
+  if (s2) sellos.push({ data: s2, tipo: 'SELLOFIRMADOCASIG' });
+  if (s3) sellos.push({ data: s3, tipo: 'SELLOFIRMADOCASIG-EXTRA' });
+  const numSellos = sellos.length;
+
+  // Verificar casos especiales de distribución en columnas iguales
+  const tiene4Firmas = tieneFirmaPaciente && numSellos === 3;
+  const tiene2Firmas = tieneFirmaPaciente && numSellos === 1;
+  const tiene3Firmas = tieneFirmaPaciente && numSellos === 2;
+  const tiene1Firma = (tieneFirmaPaciente && numSellos === 0) || (!tieneFirmaPaciente && numSellos === 1);
+
   // Firma y Huella del Paciente (solo si mostrarFirmaPaciente es true)
   const firmaPacienteY = y;
-  // Si hay sello profesional Y paciente, paciente a la izquierda (1/3), si no, centrado
-  const centroPacienteX = (tieneSelloProfesional && tieneFirmaPaciente) ? pageW / 3 : pageW / 2;
+  
+  // Calcular posición del paciente según el número de firmas
+  let centroPacienteX;
+  if (tiene4Firmas) {
+    // Columna 1 de 4 (centro de la primera columna)
+    centroPacienteX = pageW / 8; // pageW / 4 / 2 = pageW / 8
+  } else if (tiene3Firmas) {
+    // Columna 1 de 3 (centro de la primera columna)
+    centroPacienteX = pageW / 6; // pageW / 3 / 2 = pageW / 6
+  } else if (tiene2Firmas) {
+    // Columna 1 de 2 (centro de la primera columna)
+    centroPacienteX = pageW / 4; // pageW / 2 / 2 = pageW / 4
+  } else if (tiene1Firma) {
+    // Solo 1 firma, centrado
+    centroPacienteX = pageW / 2;
+  } else if (tieneSelloProfesional && tieneFirmaPaciente) {
+    // Distribución normal: paciente a la izquierda
+    centroPacienteX = pageW / 4;
+  } else {
+    // Sin sellos, centrado
+    centroPacienteX = pageW / 2;
+  }
 
   // Agregar firma del paciente (ya viene comprimida como data URL)
   if (mostrarFirmaPaciente && firmap) {
     try {
       const imgWidth = 30;
       const imgHeight = 20;
-      const x = centroPacienteX - 22;
+      // Si hay distribución en columnas, centrar mejor en la columna
+      const x = (tiene4Firmas || tiene3Firmas || tiene2Firmas) ? centroPacienteX - imgWidth / 2 : centroPacienteX - 22;
       const yPos = firmaPacienteY;
       doc.addImage(firmap, 'JPEG', x, yPos, imgWidth, imgHeight);
     } catch (error) {
@@ -48,7 +82,8 @@ export async function dibujarFirmas({ doc, datos, y, pageW, mostrarFirmaPaciente
     try {
       const imgWidth = 12;
       const imgHeight = 20;
-      const x = centroPacienteX + 10;
+      // Si hay distribución en columnas, posicionar la huella justo después de la firma, centrado en la columna
+      const x = (tiene4Firmas || tiene3Firmas || tiene2Firmas) ? centroPacienteX + 15 : centroPacienteX + 10;
       const yPos = firmaPacienteY;
       doc.addImage(huellap, 'JPEG', x, yPos, imgWidth, imgHeight);
     } catch (error) {
@@ -113,16 +148,68 @@ export async function dibujarFirmas({ doc, datos, y, pageW, mostrarFirmaPaciente
       }
     };
 
-    // Contar sellos disponibles
-    const sellos = [];
-    if (s1) sellos.push({ data: s1, tipo: 'SELLOFIRMA' });
-    if (s2) sellos.push({ data: s2, tipo: 'SELLOFIRMADOCASIG' });
-    if (s3) sellos.push({ data: s3, tipo: 'SELLOFIRMADOCASIG-EXTRA' });
-    const numSellos = sellos.length;
-
     if (numSellos === 0) {
       // No hay sellos, no hacer nada
+    } else if (tiene4Firmas) {
+      // CASO ESPECIAL: 4 firmas (paciente + 3 sellos) - Distribuir en 4 columnas iguales
+      const anchoColumna = pageW / 4;
+      const sigW = 40;
+      const sigH = 20;
+      
+      // Dibujar sellos en columnas 2, 3 y 4
+      sellos.forEach((sello, index) => {
+        // Columna 2, 3, 4 (index 0, 1, 2 de sellos)
+        const columnaIndex = index + 1; // Columna 2, 3, 4
+        const centroColumnaX = (columnaIndex + 0.5) * anchoColumna; // Centro de cada columna
+        const xPos = centroColumnaX - sigW / 2; // Centrar el sello en la columna
+        
+        agregarSello(sello.data, xPos, sigY, sigW, sigH);
+        dibujarLineaYTexto(centroColumnaX, lineY, sello.tipo);
+      });
+    } else if (tiene3Firmas) {
+      // CASO ESPECIAL: 3 firmas (paciente + 2 sellos) - Distribuir en 3 columnas iguales
+      const anchoColumna = pageW / 3;
+      const sigW = 42;
+      const sigH = 20;
+      
+      // Dibujar sellos en columnas 2 y 3
+      sellos.forEach((sello, index) => {
+        // Columna 2, 3 (index 0, 1 de sellos)
+        const columnaIndex = index + 1; // Columna 2, 3
+        const centroColumnaX = (columnaIndex + 0.5) * anchoColumna; // Centro de cada columna
+        const xPos = centroColumnaX - sigW / 2; // Centrar el sello en la columna
+        
+        agregarSello(sello.data, xPos, sigY, sigW, sigH);
+        dibujarLineaYTexto(centroColumnaX, lineY, sello.tipo);
+      });
+    } else if (tiene2Firmas) {
+      // CASO ESPECIAL: 2 firmas (paciente + 1 sello) - Distribuir en 2 columnas iguales
+      const anchoColumna = pageW / 2;
+      const sigW = 45;
+      const sigH = 20;
+      
+      // Dibujar sello en columna 2
+      sellos.forEach((sello) => {
+        // Columna 2 (centro de la segunda columna)
+        const centroColumnaX = 1.5 * anchoColumna; // Centro de la columna 2
+        const xPos = centroColumnaX - sigW / 2; // Centrar el sello en la columna
+        
+        agregarSello(sello.data, xPos, sigY, sigW, sigH);
+        dibujarLineaYTexto(centroColumnaX, lineY, sello.tipo);
+      });
+    } else if (tiene1Firma && !tieneFirmaPaciente) {
+      // CASO ESPECIAL: Solo 1 sello (sin paciente) - Centrado
+      const sigW = 48;
+      const sigH = 20;
+      const centroX = pageW / 2;
+      const xPos = centroX - sigW / 2;
+      
+      sellos.forEach((sello) => {
+        agregarSello(sello.data, xPos, sigY, sigW, sigH);
+        dibujarLineaYTexto(centroX, lineY, sello.tipo);
+      });
     } else {
+      // Distribución normal (no 4 firmas)
       // Calcular espacio disponible
       const margin = 10; // Margen lateral
       let espacioDisponible;
@@ -130,9 +217,10 @@ export async function dibujarFirmas({ doc, datos, y, pageW, mostrarFirmaPaciente
 
       if (tieneFirmaPaciente) {
         // Paciente a la izquierda, sellos a la derecha
-        // Paciente ocupa aproximadamente hasta pageW/3 + 20mm
-        const finPaciente = pageW / 3 + 20;
-        startX = finPaciente + 5; // 5mm de separación
+        // Calcular el espacio que ocupa el paciente (firma + huella + margen)
+        const anchoPaciente = 30 + 12 + 10; // firma + huella + espacio
+        const finPaciente = centroPacienteX + anchoPaciente / 2;
+        startX = finPaciente + 10; // 10mm de separación (aumentado para mejor espaciado)
         espacioDisponible = pageW - startX - margin;
       } else {
         // Sin paciente, centrar sellos
@@ -148,15 +236,36 @@ export async function dibujarFirmas({ doc, datos, y, pageW, mostrarFirmaPaciente
         sigH = 20;
         gap = 0;
       } else if (numSellos === 2) {
-        // Dos sellos: gap fijo de 15mm, tamaño estándar, centrados
-        sigW = 48;
+        // Dos sellos: gap fijo de 12mm, tamaño estándar, centrados
+        sigW = 45;
         sigH = 20;
-        gap = 15;
+        gap = 12;
+      } else if (numSellos === 3) {
+        // Tres sellos: ajustar para que quepan bien
+        const gapMin = 6; // Gap mínimo para 3 sellos
+        const sigWMax = 40; // Ancho máximo por sello
+        const sigWMin = 32; // Ancho mínimo por sello
+        
+        const anchoTotalNecesario = 3 * sigWMax + 2 * gapMin;
+        if (anchoTotalNecesario <= espacioDisponible) {
+          sigW = sigWMax;
+          gap = gapMin;
+        } else {
+          const espacioParaSellos = espacioDisponible - 2 * gapMin;
+          sigW = Math.max(sigWMin, Math.floor(espacioParaSellos / 3));
+          gap = gapMin;
+          
+          if (sigW * 3 + gap * 2 > espacioDisponible) {
+            const espacioRestante = espacioDisponible - sigW * 3;
+            gap = Math.max(4, Math.floor(espacioRestante / 2));
+          }
+        }
+        sigH = 20;
       } else {
-        // Múltiples sellos (3+): ajustar tamaño y gap para que quepan
-        const gapMin = 8; // Gap mínimo
-        const sigWMax = 45; // Ancho máximo por sello
-        const sigWMin = 35; // Ancho mínimo por sello
+        // Múltiples sellos (4+): ajustar tamaño y gap para que quepan
+        const gapMin = 5; // Gap mínimo para 4+ sellos
+        const sigWMax = 38; // Ancho máximo por sello
+        const sigWMin = 30; // Ancho mínimo por sello
 
         // Calcular ancho total necesario
         const anchoTotalNecesario = numSellos * sigWMax + (numSellos - 1) * gapMin;

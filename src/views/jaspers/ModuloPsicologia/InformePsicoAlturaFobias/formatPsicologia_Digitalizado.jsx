@@ -202,7 +202,7 @@ export default async function formatPsicologia_Digitalizado(data = {}, docExiste
   yPos += filaAltura;
 
   // === Aspecto Intelectual ===
-  const colCriterio = 70; // Reducido para dar más espacio a las opciones
+  const colCriterio = 65; // Reducido para dar más espacio a las opciones
   const colOpciones = (tablaAncho - colCriterio) / 5; // 5 columnas: I, NPI, NP, NPS, S
 
   // Header de Aspecto Intelectual con opciones
@@ -286,12 +286,23 @@ export default async function formatPsicologia_Digitalizado(data = {}, docExiste
   doc.text("Aspectos Personalidad", tablaInicioX + 2, yPos + 4);
   yPos += filaAltura;
 
-  // === FUNCIÓN MEJORADA PARA CENTRADO PERFECTO ===
+  // === FUNCIÓN PARA DIBUJAR FILA DE CRITERIO DE PERSONALIDAD ===
   const dibujarFilaCriterioPersonalidad = (texto, opciones, valor) => {
     const numOpciones = opciones.length;
     const anchoDisponible = tablaAncho - colCriterio;
-    // Cada opción tiene solo una columna (sin columna de X separada)
-    const colOpcion = anchoDisponible / numOpciones;
+    
+    // Anchos personalizados para "Fobia a la altura" (5 opciones)
+    let anchosColumnas;
+    if (numOpciones === 5 && texto === "Fobia a la altura") {
+      // Primera columna (Nada) más estrecha, resto más anchas
+      const anchoNada = 16; // Más estrecha para dar más espacio a las otras columnas
+      const anchoResto = (anchoDisponible - anchoNada) / 4; // Dividir el resto entre las 4 opciones
+      anchosColumnas = [anchoNada, anchoResto, anchoResto, anchoResto, anchoResto];
+    } else {
+      // Para otras opciones, dividir equitativamente
+      const colOpcion = anchoDisponible / numOpciones;
+      anchosColumnas = Array(numOpciones).fill(colOpcion);
+    }
 
     // Línea superior
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
@@ -301,37 +312,40 @@ export default async function formatPsicologia_Digitalizado(data = {}, docExiste
     doc.line(tablaInicioX + colCriterio, yPos, tablaInicioX + colCriterio, yPos + filaAltura);
 
     let xActual = tablaInicioX + colCriterio;
-    for (let i = 0; i < numOpciones; i++) {
-      xActual += colOpcion;
+    anchosColumnas.forEach((ancho) => {
+      xActual += ancho;
       doc.line(xActual, yPos, xActual, yPos + filaAltura);
-    }
+    });
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-    // Texto del criterio (izquierda) - centrado verticalmente
+    // Texto del criterio (izquierda)
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(texto, tablaInicioX + 2, yPos + filaAltura / 2 + 2);
 
-    // Dibujar opciones (con X encima del texto si está seleccionada)
+    // Dibujar opciones con X en la columna seleccionada
     xActual = tablaInicioX + colCriterio;
-    opciones.forEach((opcion) => {
-      const xCentro = xActual + colOpcion / 2;
+    opciones.forEach((opcion, index) => {
+      const colOpcion = anchosColumnas[index];
+      const esSeleccionada = valor && opcion.toLowerCase() === valor.toLowerCase();
 
+      // Dibujar texto de la opción (izquierda de la columna)
       doc.setFont("helvetica", "normal").setFontSize(7);
-      const lineas = doc.splitTextToSize(opcion, colOpcion - 4);
-      const alturaTotalTexto = lineas.length * 3; // ~3mm por línea
-
-      // Cálculo preciso del Y para centrar verticalmente el texto
+      const espacioParaX = 6; // Espacio reservado para la X
+      const lineas = doc.splitTextToSize(opcion, colOpcion - espacioParaX - 2); // Dejar espacio para la X y padding
+      const alturaTotalTexto = lineas.length * 3;
       const yTextoInicio = yPos + (filaAltura - alturaTotalTexto) / 2 + 2.5;
 
-      // Dibujar texto de la opción
       lineas.forEach((linea, idx) => {
-        doc.text(linea, xCentro, yTextoInicio + idx * 3, { align: "center" });
+        doc.text(linea, xActual + 2, yTextoInicio + idx * 3);
       });
 
-      // Dibujar X encima del texto si está seleccionada (comparación exacta)
-      if (valor && opcion.toLowerCase() === valor.toLowerCase()) {
-        // La X va encima del texto, centrada en la misma columna
-        dibujarCheckbox(xCentro, yPos, true, filaAltura);
+      // Dibujar X a la derecha de la columna si está seleccionada
+      if (esSeleccionada) {
+        doc.setFont("helvetica", "bold").setFontSize(11.3);
+        doc.setTextColor(0, 51, 204); // Azul
+        const xX = xActual + colOpcion - 3; // Posición X a la derecha con menos margen
+        doc.text("X", xX, yPos + filaAltura / 2 + 1, { align: "right" });
+        doc.setTextColor(0, 0, 0); // Volver a negro
       }
 
       xActual += colOpcion;
