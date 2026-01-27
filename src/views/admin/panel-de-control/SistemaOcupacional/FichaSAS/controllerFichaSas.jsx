@@ -218,7 +218,7 @@ export const GetInfoServicioEditar = async (
             apto_bajo_riesgo: res.conclusionAptoBajoRiesgoSi_chkaptobajosi ?? false,
             observaciones: res.conclusionObservaciones_txtobservaciones ?? "",
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
     }
 };

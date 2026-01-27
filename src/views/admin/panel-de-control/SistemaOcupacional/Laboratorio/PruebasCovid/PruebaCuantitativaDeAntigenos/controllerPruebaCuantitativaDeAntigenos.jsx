@@ -46,7 +46,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
       doctor: res.medico ?? "N/A",
       valor: res.valorIgm ?? "",
 
-      user_medicoFirma: res.usuarioFirma,
+      user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado,
     }));
   }

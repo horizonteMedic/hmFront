@@ -107,7 +107,7 @@ export const GetInfoServicio = async (
             amenazasDebilidades: res.amenazasDebilidades,
             observaciones: res.observaciones,
             recomendaciones: res.recomendaciones,
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
     }
 };

@@ -71,7 +71,7 @@ export const GetInfoServicio = async (
       conclusiones: res.conclusionesRadiograficas ?? "",
       observaciones: res.observacionesRadiografiaTorax ?? "",
 
-      user_medicoFirma: res.usuarioFirma,
+      user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
 
       SubirDoc: true,
       digitalizacion: res.digitalizacion

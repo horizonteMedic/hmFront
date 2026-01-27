@@ -169,7 +169,7 @@ export const GetInfoServicio = async (
       oi_o_6000: res.oi16000,
       oi_o_8000: res.oi18000,
 
-      user_medicoFirma: res.usuarioFirma,
+      user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado,
     }));
   }
@@ -335,7 +335,7 @@ export const SubmitDataService = async (
 // ================= PRINT =================
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
   const jasperModules = import.meta.glob(
-    "../../../../../jaspers/Audiometria/*.jsx"
+    "../../../../../jaspers/Audiometria/LegacyAudiometria/*.jsx"
   );
 
   PrintHojaRDefault(
@@ -345,7 +345,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     datosFooter,
     obtenerReporteUrl,
     jasperModules,
-    "../../../../../jaspers/Audiometria"
+    "../../../../../jaspers/Audiometria/LegacyAudiometria"
   );
 };
 

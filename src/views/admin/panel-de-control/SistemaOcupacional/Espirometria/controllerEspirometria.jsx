@@ -74,7 +74,7 @@ export const GetInfoServicio = async (
             fev1Teorico: res.fev1Teorico,
             interpretacion: res.interpretacion,
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
             user_doctorAsignado: res.doctorAsignado,
             user_doctorExtra: res.doctorExtra,
             SubirDoc: true,

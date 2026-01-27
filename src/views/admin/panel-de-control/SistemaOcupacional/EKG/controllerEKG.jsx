@@ -75,7 +75,7 @@ export const GetInfoServicio = async (
       hallazgos: res.hallazgo ?? "",
       recomendaciones: res.recomendaciones ?? "",
 
-      user_medicoFirma: res.usuarioFirma,
+      user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       SubirDoc: true,
       digitalizacion: res.digitalizacion
     }));

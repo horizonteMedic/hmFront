@@ -12,6 +12,7 @@ import AnalisisBioquimicos_Digitalizado from "../AnalisisBioquimicos/AnalisisBio
 import RagiografiaToraxPA_Digitalizado from "../RayosX/RagiografiaToraxPA_Digitalizado";
 import FichaAudiologica_Digitalizado from "../Audiometria/FichaAudiologica/FichaAudiologica_Digitalizado";
 import InformePsicologico_Digitalizado from "../ModuloPsicologia/InformePsicologico/InformePsicologico_Digitalizado";
+import Informe_Psicologico_Boroo from "../ModuloPsicologia/InformePsicologico/Informe_Psicologico_Boroo";
 import EvaluacionPsicologica_p_Digitalizado from "../ModuloPsicologia/EvaluacionPsicologicaPoderosa/InformePsicologico_Digitalizado";
 import Oftalmologia from "../Oftalmologia/Oftalmologia";
 import conInformadoOcupacional_Digitalizado from "../ConsentimientoInformado/conInformadoOcupacional_Digitalizado";
@@ -31,7 +32,7 @@ import ConsentAdmisionDeclacionAntecePatologicos from "../ModuloConsentimientos/
 import Consentimiento_Muestra_Sangre_Digitalizado from "../Consentimientos/Consentimiento_Muestra_Sangre_Digitalizado";
 import LGonadotropina_Digitalizado from "../Inmunologia/LGonadotropina_Digitalizado";
 import RAYOSXXXOFI_Digitalizado from "../RayosX/RAYOSXXXOFI_Digitalizado";
-import Audiometria2021_Digitalizado from "../Audiometria/Audiometria2021-_Digitalizado_boro";
+// import Audiometria2021_Digitalizado from "../Audiometria/Audiometria/Audiometria2021-_Digitalizado";
 import CuestionarioAudiometria_Digitalizado from "../Audiometria/CuestionarioAudiometria/CuestionarioAudiometria_Digitalizado";
 import Odontograma_Digitalizado from "../Odontologia/OdontogramaDigitalizado/Odontograma_Digitalizado";
 import ResumenAnexo7C_OHLA_Digitalizado from "../Ficha_Anexo16/ResumenMedico/ResumenAnexo7C_OHLA_Digitalizado";
@@ -66,6 +67,9 @@ import EvaluacionOftalmologica2021_Digitalizado_boro from "../Oftalmologia/Evalu
 import formatPsicologia_SuficienciaEspaciosC from "../ModuloPsicologia/InformeEspaciosConfinados/formatPsicologia_SuficienciaEspaciosC";
 import Informe_PsicolaboralBorooA_Digitalizado from "../ModuloPsicologia/InformePsicolaboral/Informe_PsicolaboralBorooA_Digitalizado";
 import Aptitud_medico_ocupacional_11 from "../Ficha_Anexo16/Aptitud_medico_ocupacional_11"
+// import Audiometria2021_Digitalizado from "../Audiometria/LegacyAudiometria/Audiometria2021-_Digitalizado";
+import Audiometria2021BORO from "../Audiometria/LegacyAudiometria/Audiometria2021-_Digitalizado_boro";
+import Audiometria2021 from "../Audiometria/LegacyAudiometria/Audiometria2021-_Digitalizado";
 
 
 export const reportesMap = {
@@ -178,7 +182,10 @@ export const reportesMap = {
       InformeElectrocardiograma_Digitalizado
    },
 
-   audiometria_2023: Audiometria2021_Digitalizado,
+   audiometria_2023: {
+      "Audiometria2021-_Digitalizado_boro": Audiometria2021BORO,
+      "Audiometria2021-_Digitalizado": Audiometria2021
+   },
 
    oftalmologia: Oftalmologia,
 
@@ -224,7 +231,10 @@ export const reportesMap = {
 
    psicologiafobias: formatPsicologia_Digitalizado,
 
-   informe_psicologico: InformePsicologico_Digitalizado,
+   informe_psicologico: {
+      InformePsicologico_Digitalizado,
+      Informe_Psicologico_Boroo
+   },
 
    exam_complementarios: InformePsicoExamComplementario,
 

@@ -62,13 +62,13 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
 
             if (existeInterconsultas) { //SI EXISTE
                 const interconsultasResponse = await getFetch(`${GetNomenclatura}?nOrden=${nro}`, token);
-
+                console.log("interconsultasResponse", interconsultasResponse);
                 // Validar si la respuesta tiene contenido y si al menos uno tiene nomenclatura
                 if (interconsultasResponse?.resultado && Array.isArray(interconsultasResponse.resultado)) {
                     const interconsultasConNomenclatura = interconsultasResponse.resultado.filter(
                         (item) => item.nomenclatura && item.nomenclatura.trim() !== ""
                     );
-
+                    console.log("interconsultasConNomenclatura", interconsultasConNomenclatura);
                     // Si hay interconsultas con nomenclatura, agregarlas al final de la lista
                     if (interconsultasConNomenclatura.length > 0) {
                         const interconsultasFormateadas = interconsultasConNomenclatura.map((item) => ({

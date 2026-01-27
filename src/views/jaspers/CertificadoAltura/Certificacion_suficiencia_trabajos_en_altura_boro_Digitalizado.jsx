@@ -4,7 +4,7 @@ import { normalizeList } from "../../utils/listUtils";
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
-import { getSign, getSignCompressed } from '../../utils/helpers.js';
+import { getSignCompressed } from '../../utils/helpers.js';
 
 export default async function Certificacion_suficiencia_trabajos_en_altura_boro_Digitalizado(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -522,42 +522,66 @@ export default async function Certificacion_suficiencia_trabajos_en_altura_boro_
       textoIzquierdo: "Todas las enfermedades que produzcan alteración de la consciencia sin importar su causa e independiente de su tratamiento",
       textoDerecho: "Personas que consumen sustancias estupefacientes o psicotrópicas en niveles que alteren su capacidad o trabajar como controlar un vehículo.",
       alturaFila: 6,    // Altura exacta en mm que quieres para esta fila
-      posicionY: 2.5        // Posición vertical del texto
+      posicionY: 2.5,        // Posición vertical del texto
+      siIzquierdo: datosFinales.antecedentesTodasEnfermedadesSi,
+      noIzquierdo: datosFinales.antecedentesTodasEnfermedadesNo,
+      siDerecho: datosFinales.antecedentesConsumeSustanciasSiAltereSi,
+      noDerecho: datosFinales.antecedentesConsumeSustanciasSiAltereNo
     },
     {
       numero: 2,
       textoIzquierdo: "Alcoholismo crónico y en general todas aquellas enfermedades que produzcan incapacidad de efectuar movimientos voluntarios y/o que limiten la capacidad de trabajo como conducción, manejo o control físico de un vehículo motorizado, subir y bajar escaleras, etc.",
       textoDerecho: "Personas que consumen sustancias estupefacientes o psicotrópicas en niveles que no alteren su capacidad de trabajar, pero que se encuentran sin tratamiento o en tratamiento sin prescripción médica.",
       alturaFila: 11,    // Altura exacta en mm
-      posicionY: 2.5
+      posicionY: 2.5,
+      siIzquierdo: datosFinales.antecedentesAlcoholismoCronicoSi,
+      noIzquierdo: datosFinales.antecedentesAlcoholismoCronicoNo,
+      siDerecho: datosFinales.antecedentesConsumeSustanciasNoAltereSi,
+      noDerecho: datosFinales.antecedentesConsumeSustanciasNoAltereNo
     },
     {
       numero: 3,
       textoIzquierdo: "Todas aquellas enfermedades que se caractericen por movimientos involuntarios y que interfieran seriamente su capacidad de trabajar, independiente de su tratamiento farmacológico.",
       textoDerecho: "Personas que como consecuencia de una enfermedad o su tratamiento, sufran uno o varios de los siguientes efectos: alteración del estado de consciencia, alteración del equilibrio, en la percepción, en la habilidad motriz, en la estabilidad emocional y en el juicio.",
       alturaFila: 11,    // Altura exacta en mm
-      posicionY: 2.5
+      posicionY: 2.5,
+      siIzquierdo: datosFinales.antecedentesEnfermedadesInvoluntariosSi,
+      noIzquierdo: datosFinales.antecedentesEnfermedadesInvoluntariosNo,
+      siDerecho: datosFinales.antecedentesVariosEfectosSi,
+      noDerecho: datosFinales.antecedentesVariosEfectosNo
     },
     {
       numero: 4,
       textoIzquierdo: "Perdida recurrente de la consciencia, independiente de su tratamiento, tales como narcolepsia, epilepsia, etc.",
       textoDerecho: "Síndrome Apnea Obstructiva del sueño.",
       alturaFila: 5.5,    // Altura exacta en mm
-      posicionY: 2.5
+      posicionY: 2.5,
+      siIzquierdo: datosFinales.antecedentesPerdidaConcienciaSi,
+      noIzquierdo: datosFinales.antecedentesPerdidaConcienciaNo,
+      siDerecho: datosFinales.antecedentesApneaSi,
+      noDerecho: datosFinales.antecedentesApneaNo
     },
     {
       numero: 5,
       textoIzquierdo: "Diabetes mellitus o hipoglicemia no controlada",
       textoDerecho: "Obesidad (IMC > o igual a 30)",
       alturaFila: 5,    // Altura exacta en mm (normal)
-      posicionY: 2.5
+      posicionY: 2.5,
+      siIzquierdo: datosFinales.antecedentesDiabetesMellitusSi,
+      noIzquierdo: datosFinales.antecedentesDiabetesMellitusNo,
+      siDerecho: datosFinales.antecedentesObesidadSi,
+      noDerecho: datosFinales.antecedentesObesidadNo
     },
     {
       numero: 6,
       textoIzquierdo: "Insuficiencia renal crónica grado IV",
       textoDerecho: "Anemia de cualquier grado, según criterios OMS 2011.",
       alturaFila: 5,    // Altura exacta en mm (normal)
-      posicionY: 2.5
+      posicionY: 2.5,
+      siIzquierdo: datosFinales.chk5Si,
+      noIzquierdo: datosFinales.chk5No,
+      siDerecho: datosFinales.chk30Si,
+      noDerecho: datosFinales.chk30No
     }
   ];
 
@@ -590,12 +614,16 @@ export default async function Certificacion_suficiencia_trabajos_en_altura_boro_
     doc.setFont("helvetica", "normal").setFontSize(7);
     dibujarTextoConSaltoLinea(config.textoIzquierdo, posicionTextoIzquierdo, yPos + config.posicionY, maxWidthIzquierdo);
 
-    // Marca X izquierda - usar variables si están disponibles
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    // Marca X izquierda - usar variables del config
+    doc.setFont("helvetica", "bold").setFontSize(8);
     const siIzquierdo = config.siIzquierdo !== undefined ? config.siIzquierdo : false;
-    const noIzquierdo = config.noIzquierdo !== undefined ? config.noIzquierdo : true;
-    doc.text(siIzquierdo ? "X" : "", tablaInicioX + 86.3, yPos + alturaFila / 2 + 1);
-    doc.text(noIzquierdo ? "X" : "", tablaInicioX + 91.5, yPos + alturaFila / 2 + 1);
+    const noIzquierdo = config.noIzquierdo !== undefined ? config.noIzquierdo : false;
+    if (siIzquierdo) {
+      doc.text("X", tablaInicioX + 86.3, yPos + alturaFila / 2 + 1);
+    }
+    if (noIzquierdo) {
+      doc.text("X", tablaInicioX + 91.5, yPos + alturaFila / 2 + 1);
+    }
 
     // Contenido texto derecho
     doc.setFont("helvetica", "normal").setFontSize(7);
@@ -604,12 +632,16 @@ export default async function Certificacion_suficiencia_trabajos_en_altura_boro_
     const posYTextoDerecho = esTextoDerechoCorto ? yPos + calcularPosicionYCentrada(alturaFila, 6) : yPos + config.posicionY;
     dibujarTextoConSaltoLinea(config.textoDerecho, posicionTextoDerecho, posYTextoDerecho, maxWidthDerecho);
 
-    // Marca X derecha - usar variables si están disponibles
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    // Marca X derecha - usar variables del config
+    doc.setFont("helvetica", "bold").setFontSize(8);
     const siDerecho = config.siDerecho !== undefined ? config.siDerecho : false;
-    const noDerecho = config.noDerecho !== undefined ? config.noDerecho : true;
-    doc.text(siDerecho ? "X" : "", tablaInicioX + 181.3, yPos + alturaFila / 2 + 1);
-    doc.text(noDerecho ? "X" : "", tablaInicioX + 186.5, yPos + alturaFila / 2 + 1);
+    const noDerecho = config.noDerecho !== undefined ? config.noDerecho : false;
+    if (siDerecho) {
+      doc.text("X", tablaInicioX + 181.3, yPos + alturaFila / 2 + 1);
+    }
+    if (noDerecho) {
+      doc.text("X", tablaInicioX + 186.5, yPos + alturaFila / 2 + 1);
+    }
 
     return alturaFila;
   };
@@ -736,19 +768,19 @@ export default async function Certificacion_suficiencia_trabajos_en_altura_boro_
       siDerecho: datosFinales.pcomplementariaCampimetriaSi,
       noDerecho: datosFinales.pcomplementariaCampimetriaNo
     },
-    {
-      numero: 4,
-      textoIzquierdo: "Test de SAS : Anormal",
-      textoDerecho: "Campimetría Anormal (Test de confrontación alterada)",
-      alturaFila: 5,
-      posicionY: 2.5,
-      // Variables para checkbox izquierdo (SAS - no hay variable específica, usar false por defecto)
-      siIzquierdo: false,
-      noIzquierdo: true,
-      // Variables para checkbox derecho (campimetría)
-      siDerecho: datosFinales.pcomplementariaCampimetriaSi,
-      noDerecho: datosFinales.pcomplementariaCampimetriaNo
-    },
+    // {
+    //   numero: 4,
+    //   textoIzquierdo: "Test de SAS : Anormal",
+    //   textoDerecho: "Campimetría Anormal (Test de confrontación alterada)",
+    //   alturaFila: 5,
+    //   posicionY: 2.5,
+    //   // Variables para checkbox izquierdo (SAS - no hay variable específica, usar false por defecto)
+    //   siIzquierdo: false,
+    //   noIzquierdo: true,
+    //   // Variables para checkbox derecho (campimetría)
+    //   siDerecho: datosFinales.pcomplementariaCampimetriaSi,
+    //   noDerecho: datosFinales.pcomplementariaCampimetriaNo
+    // },
 
   ];
 
@@ -909,35 +941,55 @@ export default async function Certificacion_suficiencia_trabajos_en_altura_boro_
       textoIzquierdo: "Limitación en fuerza y/o movilidad de extremidades (Mayor a 5Kg / fuerza cada mano )",
       textoDerecho: "Presencia de nistagmus",
       alturaFila: 5.5,
-      posicionY: 2.5
+      posicionY: 2.5,
+      siIzquierdo: datosFinales.examenFisicoLimitacionFuerzaSi,
+      noIzquierdo: datosFinales.examenFisicoLimitacionFuerzaNo,
+      siDerecho: datosFinales.exameFisicoNistagmusSi,
+      noDerecho: datosFinales.exameFisicoNistagmusNo
     },
     {
       numero: 2,
       textoIzquierdo: "Alteración presente del equilibrio. (Romberg).",
       textoDerecho: "Anormalidad en movimientos oculares",
       alturaFila: 4.0,
-      posicionY: 2.5
+      posicionY: 2.5,
+      siIzquierdo: datosFinales.examenFisicoAlteracionEquilibrioSi,
+      noIzquierdo: datosFinales.examenFisicoAlteracionEquilibrioNo,
+      siDerecho: datosFinales.examenFisicoAnormalidadMovimientoSi,
+      noDerecho: datosFinales.examenFisicoAnormalidadMovimientoNo
     },
     {
       numero: 3,
       textoIzquierdo: "Anormalidad en la marcha.",
       textoDerecho: "Pupilas no CIRLA",
       alturaFila: 4.0,
-      posicionY: 2.5
+      posicionY: 2.5,
+      siIzquierdo: datosFinales.examenFisicoAnormalidadMarchaSi,
+      noIzquierdo: datosFinales.examenFisicoAnormalidadMarchaNo,
+      siDerecho: datosFinales.examenFisicoCirlaSi,
+      noDerecho: datosFinales.examenFisicoCirlaNo
     },
     {
       numero: 4,
       textoIzquierdo: "Alteración de la coordinación (dedo índice nariz)",
       textoDerecho: "Anormalidad del lenguaje",
       alturaFila: 4.0,
-      posicionY: 2.5
+      posicionY: 2.5,
+      siIzquierdo: datosFinales.examenFisicoAlteracionCoordinacionSi,
+      noIzquierdo: datosFinales.examenFisicoAlteracionCoordinacionNo,
+      siDerecho: datosFinales.examenFisicoAnormalidadLenguajeSi,
+      noDerecho: datosFinales.examenFisicoAnormalidadLenguajeNo
     },
     {
       numero: 5,
       textoIzquierdo: "Sustentación en 1 pie > 15",
       textoDerecho: "Movimientos involuntarios y/o Asimetría facial.",
       alturaFila: 4.0,
-      posicionY: 2.5
+      posicionY: 2.5,
+      siIzquierdo: datosFinales.examenFisicoSustentacionPie,
+      noIzquierdo: !datosFinales.examenFisicoSustentacionPie,
+      siDerecho: datosFinales.examenFisicoMovimientoInvoluntarioSi || datosFinales.examenFisicoAsimetriaFacialSi,
+      noDerecho: datosFinales.examenFisicoMovimientoInvoluntarioNo && datosFinales.examenFisicoAsimetriaFacialNo
     }
   ];
 

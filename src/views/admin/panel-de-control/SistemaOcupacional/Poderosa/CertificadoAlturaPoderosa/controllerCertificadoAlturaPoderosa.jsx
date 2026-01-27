@@ -302,7 +302,7 @@ export const GetInfoServicioEditar = async (
             dixHallpike: res.dixPositivo_chkneuro_pos9 ?? false,
             marcha: res.marchaPositivo_chkneuro_pos10 ?? false,
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
     }
 };

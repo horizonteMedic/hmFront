@@ -27,7 +27,7 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "CERTIFICADO_APTITUD_ANEXO_16",
+    "CERTIFICADO_APTITUD_ANEXO_16",    
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -53,9 +53,87 @@ const ExamenesListCAMPANA = buildExamenesList([ // Campaña
     "DECLARACION_USO_FIRMA_ARCHIVO"                            // 20 nuevo
 ]);
 
-const ExamenesListOHLA = buildExamenesList([       //OHLA
+const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "RESUMEN_MEDICO_PODEROSA",                 // 1
     "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",    // 2
+    "CERTIFICADO_APTITUD_ANEXO_16",  // 3
+    "ANEXO_16",                      // 4
+    "CERTIFICADO_ANEXO_02",
+    "ANEXO_02",
+    "ENFERMEDADES_ALTURA",           // 5
+
+    "ANEXO_16A",                     // 6
+    "CERTIFICADO_ALTURA",
+    "PSICOSENSOMETRICO_CERT_ALTURA",        //revisar
+    "CERTIFICADO_ALTURA_PODEROSA",          //revisar
+    "CERTIFICADO_APTITUD_ALTURA_PODEROSA",
+    "CERTIFICADO_VEHICULOS",
+    "FICHA_SAS",
+    "LICENCIA_CONDUCIR_PODEROSA",
+    "HOJA_DE_CONSULTA_EXTERNA",
+    "USO_RESPIRADORES",             // 7
+    "HISTORIA_OCUPACIONAL",          // 8
+
+    "ANTECEDENTES_PATOLOGICOS",      // 9
+    "DECLARACION_JURADA_ANTECEDENTES", // 10
+    "CUESTIONARIO_NORDICO",          // 11
+    "EVALUACION_MUSCULO_ESQUELETICA_BOROO",
+    "EVALUACION_MUSCULO_ESQUELETICA",// 12
+    "CONSENT_MUESTRA_SANGRE",                  // 12
+    "LABORATORIO_CLINICO",           // 12
+    "PERFIL_LIPIDICO",               // 13
+    "PERFIL_HEPATICO",
+    "PERFIL_RENAL",
+    "PANEL_5D",
+    "GONADOTROPINA",
+    "CONSENT_PANEL_5D",
+
+    "CONSENT_MARIHUANA",
+    "CONSENT_PANEL_2D",
+    "CONSENT_DROGAS_BOROO",
+    "OIT",                           // 14
+    "RADIOGRAFIA_TORAX",             // 15
+    "RAYOS_X_TORAX_ARCHIVO",         // 16
+    "RADIOGRAFIA_COLUMNA",           // 17
+    "RADIOGRAFIA_COLUMNA_ARCHIVO",   // 18
+    "RADIOGRAFIA_COLUMNA_ARCHIVO2",  // 19
+    "ELECTROCARDIOGRAMA",            // 20
+    "ESPIROMETRIA_ARCHIVO",          // 21
+    "AUDIOMETRIA_OHLA",              // 22
+    "FICHA_AUDIOMETRIA",
+
+    "CUESTIONARIO_AUDIOMETRIA",
+    "ODONTOGRAMA",
+    "TEST_FATIGA_SOMNOLENCIA",
+    "PSICOLOGIA_ANEXO_03",
+    "PSICOLOGIA_ANEXO_02",
+    "INFORME_PSICOLOGICO",
+
+    "CUESTIONARIO_BERLIN",
+    "EXAMENES_COMPLEMENTARIOS",
+    "ESPACIOS_CONFINADOS_PSICOLOGIA",
+
+    "INFORME_PODEROSA_OPERAR",
+    "INFORME_PSICOLOGIA_FOBIAS",
+    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
+    "INFORME_PSICOLABORAL",
+    "TRABAJO_ESPECIFICOS",
+    "TRABAJO_ALTURA_PSICO",
+    "OFTALMOLOGIA",
+    "OFTALMOLOGIA_VISION_TESTER",
+    "FICHA_OFTALMOLOGICA",
+    "CONSENT_DECLARACION_APTITUD",
+    "CONSENT_SINTOMATICO_RESPIRATORIO",
+    "CONSENT_INFORMADO_EVALUACION_MEDICA",
+    "CONSENT_BUENA_SALUD",
+    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+    "DECLARACION_USO_FIRMA_ARCHIVO",           // 36
+    "INTERCONSULTAS"                         // 22 nuevo
+]);
+
+const ExamenesListOHLA = buildExamenesList([       //OHLA
+    "RESUMEN_MEDICO_PODEROSA",                 // 1
+    "CERTIFICADO_APTITUD_ANEXO_16",    // 2
     "ANEXO_16",                                // 3
     "CERTIFICADO_ALTURA",                      // 4
     "OFTALMOLOGIA_VISION_TESTER",              // 5 no se mostrara si existe  PSICOSENSOMETRICO_VEHI_FOLIO 
@@ -496,7 +574,7 @@ const ExamenesListPoderosaRetiro = buildExamenesList([ // PODEROSA RETIRO
     "ODONTOGRAMA",
 
     "OFTALMOLOGIA",
-
+    //
     "CONSENT_INFORMADO_EVALUACION_MEDICA",
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
     "DECLARACION_USO_FIRMA_ARCHIVO",
@@ -785,6 +863,9 @@ const ExamenesListLaArenaAlturaConduccion = buildExamenesList([ // LA ARENA ALTU
 
     "OIT",
 
+    "ELECTROCARDIOGRAMA",
+    "ELECTROCARDIOGRAMA_ARCHIVO",
+
     "ESPIROMETRIA_ARCHIVO",
     "AUDIOMETRIA_OHLA",
     "CUESTIONARIO_AUDIOMETRIA",
@@ -830,7 +911,7 @@ const ExamenesListK2 = buildExamenesList([ // K2
 
     "ESPIROMETRIA_ARCHIVO",
 
-    "FICHA_AUDIOMETRIA",
+    "AUDIOMETRIA_OHLA",
 
     "INFORME_PSICOLOGICO",
     "INFORME_PSICOLOGIA_FOBIAS",
@@ -1066,6 +1147,7 @@ const ExamenesListAlturaSolo = buildExamenesList([ // ALTURA SOLO
 const ListaPorPlantilla = {
     //PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
+    "COMPLETO": ExamenesListCOMPLETO,
     OHLA: ExamenesListOHLA,
     "OHLA ALTURA - CONDUCCION": ExamenesListOHLA1,
     "OHLA CONDUCCION": ExamenesListOHLA2,

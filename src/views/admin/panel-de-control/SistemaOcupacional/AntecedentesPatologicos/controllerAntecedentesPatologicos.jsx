@@ -362,7 +362,7 @@ export const GetInfoServicioEditar = async (
             esposaConyuge: res.esposConyEspecifiqueBoro_espos_cony_detall,
             carnetConadis: res.conadisEspecifiqueBoro_conadisdetalle,
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
     }
 };
