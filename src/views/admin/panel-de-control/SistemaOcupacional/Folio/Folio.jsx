@@ -898,7 +898,7 @@ const ExamenesListK2 = buildExamenesList([ // K2
 
     "ESPIROMETRIA_ARCHIVO",
 
-    "FICHA_AUDIOMETRIA",
+    "AUDIOMETRIA_OHLA",
 
     "INFORME_PSICOLOGICO",
     "INFORME_PSICOLOGIA_FOBIAS",
