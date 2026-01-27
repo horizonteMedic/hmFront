@@ -2,12 +2,14 @@ import jsPDF from "jspdf";
 import { getFetch } from "../../utils/apiHelpers";
 import { reportesMap } from "./reportesMap";
 import { PDFDocument } from "pdf-lib";
-import * as pdfjsLib from "pdfjs-dist";
-import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
+// import * as pdfjsLib from "pdfjs-dist";
+// import pdfjsWorker from "pdfjs-dist/build/pdf.worker.mjs?url";
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+// pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
-export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType, signal) {
+import pdfjsLib from "../../config/pdjfConfig";
+
+export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType, signal, nombres = "", apellidos = "") {
     if (signal?.aborted) throw new DOMException("Aborted", "AbortError");//para poder cancelar la gereracion
 
     const pdfFinal = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true, precision: 1 });
@@ -21,6 +23,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "ESPIROMETRIA",
         "RAYOS X TORAX",
         "INFORME RADIOGRAFICO",
+        "INFORME RADIOGRAFICO 2",
         "ELECTROCARDIOGRAMA",
         "OFTALMOLOGIA VISION TESTER",
         "DECLARACION USO FIRMA",
@@ -36,7 +39,9 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "informe_electrocardiograma",
         "resumen_medico_poderosa",
         "oftalmologia2021",
-        "antecedentes_patologicos"
+        "antecedentes_patologicos",
+        "informe_psicolaboral",
+        "certificado_aptitud_medico_ocupacional"
     ]
 
     const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true && ex.imprimir === true);
@@ -249,23 +254,37 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             console.log(`📌 Insertando ${examen.nombre} (${examen.tabla}) en posición ${posicionAjustada} (original: ${posicionInsercion}, ajuste: +${paginasInsertadasAcumuladas})`);
 
             // Cargar el PDF externo
-            const externoBytes = await fetch(examen.url, { signal }).then(r => r.arrayBuffer());
+            let externoBytes;
+            let externoPdf;
+            try {
+                const response = await fetch(examen.url, { signal });
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                externoBytes = await response.arrayBuffer();
 
-            // 📊 Mostrar tamaño del PDF externo
-            const tamañoExternoKB = (externoBytes.byteLength / 1024).toFixed(2);
-            const tamañoExternoMB = (externoBytes.byteLength / (1024 * 1024)).toFixed(3);
-            console.log(`   📄 Tamaño del PDF externo: ${tamañoExternoKB} KB (${tamañoExternoMB} MB)`);
+                // 📊 Mostrar tamaño del PDF externo
+                const tamañoExternoKB = (externoBytes.byteLength / 1024).toFixed(2);
+                const tamañoExternoMB = (externoBytes.byteLength / (1024 * 1024)).toFixed(3);
+                console.log(`   📄 Tamaño del PDF externo: ${tamañoExternoKB} KB (${tamañoExternoMB} MB)`);
 
-            // Guardar estadísticas del PDF externo
-            estadisticasPdfsExternos.push({
-                nombre: examen.nombre,
-                tabla: examen.tabla,
-                pesoKB: tamañoExternoKB,
-                pesoMB: tamañoExternoMB,
-                pesoBytes: externoBytes.byteLength
-            });
+                // Guardar estadísticas del PDF externo
+                estadisticasPdfsExternos.push({
+                    nombre: examen.nombre,
+                    tabla: examen.tabla,
+                    pesoKB: tamañoExternoKB,
+                    pesoMB: tamañoExternoMB,
+                    pesoBytes: externoBytes.byteLength
+                });
 
-            const externoPdf = await PDFDocument.load(externoBytes);
+                externoPdf = await PDFDocument.load(externoBytes);
+            } catch (error) {
+                if (examen.tabla.includes("INTERCONSULTA")) {
+                    console.warn(`⚠️ Error al procesar interconsulta ${examen.nombre}: ${error.message}. Se omitirá.`);
+                    continue;
+                }
+                throw error;
+            }
 
             // Copiar todas las páginas del PDF externo
             const paginasExternas = await basePdf.copyPages(
@@ -310,7 +329,11 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
     const baseBytes = pdfFinalBytes instanceof Uint8Array ? pdfFinalBytes : new Uint8Array(pdfFinalBytes);
     const rasterizedBytes = await rasterizeAndCompressPdf(baseBytes);
 
-    descargarPdf(rasterizedBytes, `Folio_${nro}.pdf`);
+    const nombreArchivo = (nombres && apellidos)
+        ? `${nro} - ${apellidos.toUpperCase()} ${nombres.toUpperCase()}.pdf`
+        : `Folio_${nro}.pdf`;
+
+    descargarPdf(rasterizedBytes, nombreArchivo);
     imprimirBytes(rasterizedBytes);
 }
 
@@ -433,7 +456,7 @@ async function rasterizeAndCompressPdf(pdfBytes) {
     const mmPerPt = 25.4 / 72;
     const A4_WIDTH_MM = 210;
     const A4_HEIGHT_MM = 297;
-    const SCALE = 2.3;           // 🔥 DPI alto para texto nítido
+    const SCALE = 2.2;           // 🔥 DPI alto para texto nítido
     const JPEG_QUALITY = 0.65;   // 🔥 Compresión fuerte sin borrosidad
 
     let doc = null;

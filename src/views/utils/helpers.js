@@ -210,3 +210,72 @@ export async function optimizePdf(pdfBytes) {
         return pdfBytes; // Retornar original si falla la optimización
     }
 }
+
+export async function imagenToPdf(file) {
+    const imgBytes = await file.arrayBuffer();
+    const pdfDoc = await PDFDocument.create();
+    let img;
+
+    if (file.type === "image/png") {
+        img = await pdfDoc.embedPng(imgBytes);
+    } else {
+        img = await pdfDoc.embedJpg(imgBytes);
+    }
+
+    const { width, height } = img.scale(1);
+    const page = pdfDoc.addPage([width, height]);
+
+    page.drawImage(img, {
+        x: 0,
+        y: 0,
+        width,
+        height,
+    });
+
+    return await pdfDoc.save();
+}
+
+export async function imagenToPdfA4(file) {
+    const A4_WIDTH = 595.28;
+    const A4_HEIGHT = 841.89;
+
+    const imgBytes = await file.arrayBuffer();
+    const pdfDoc = await PDFDocument.create();
+
+    let img;
+    if (file.type === "image/png") {
+        img = await pdfDoc.embedPng(imgBytes);
+    } else {
+        img = await pdfDoc.embedJpg(imgBytes);
+    }
+
+    const page = pdfDoc.addPage([A4_WIDTH, A4_HEIGHT]);
+
+    // Medidas originales de la imagen
+    const imgWidth = img.width;
+    const imgHeight = img.height;
+
+    // Margen de seguridad
+    const margin = 40;
+    const maxW = A4_WIDTH - margin * 2;
+    const maxH = A4_HEIGHT - margin * 2;
+
+    // Escala manteniendo proporción
+    const scale = Math.min(maxW / imgWidth, maxH / imgHeight, 1);
+
+    const drawWidth = imgWidth * scale;
+    const drawHeight = imgHeight * scale;
+
+    // Centrado
+    const x = (A4_WIDTH - drawWidth) / 2;
+    const y = (A4_HEIGHT - drawHeight) / 2;
+
+    page.drawImage(img, {
+        x,
+        y,
+        width: drawWidth,
+        height: drawHeight,
+    });
+
+    return await pdfDoc.save();
+}

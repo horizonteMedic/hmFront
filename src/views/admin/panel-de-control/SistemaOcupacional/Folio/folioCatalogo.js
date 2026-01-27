@@ -195,6 +195,12 @@ export const EXAMENES_CATALOGO = {
         nomenclatura: "INFORME RADIOGRAFICO",
     },
 
+    RADIOGRAFIA_COLUMNA_ARCHIVO2: {
+        nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA) ARCHIVO 2",
+        tabla: "INFORME RADIOGRAFICO 2",
+        nomenclatura: "INFORME RADIOGRAFICO 2",
+    },
+
     RAYOS_X_TORAX_ARCHIVO: {
         nombre: "RAYOS X TORAX ARCHIVO",
         tabla: "RAYOS X TORAX",
@@ -393,13 +399,6 @@ export const EXAMENES_CATALOGO = {
     /* =========================
        PSICOLOGÍA
     ========================= */
-    CUESTIONARIO_BERLIN: {
-        nombre: "CUESTIONARIO BERLIN",
-        tabla: "cuestionario_berlin",
-        url: "/api/v01/ct/cuestionarioBerlin/obtenerReporte",
-        esJasper: true
-    },
-
     CUESTIONARIO_BERLIN: {
         nombre: "CUESTIONARIO BERLIN",
         tabla: "cuestionario_berlin",

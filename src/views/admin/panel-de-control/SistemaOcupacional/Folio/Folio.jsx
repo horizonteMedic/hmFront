@@ -21,12 +21,13 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
     "PSICOSENSOMETRICO_CERT_ALTURA", //Tiene firma
     "PSICOSENSOMETRICO_VEHI_FOLIO", //Tiene firma
     "RADIOGRAFIA_COLUMNA_ARCHIVO",
+    "RADIOGRAFIA_COLUMNA_ARCHIVO2",
     "RAYOS_X_TORAX_ARCHIVO",
     "INTERCONSULTAS"
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "FICHA_AUDIOMETRIA",
+    "CERTIFICADO_APTITUD_ANEXO_16",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -77,6 +78,7 @@ const ExamenesListOHLA = buildExamenesList([       //OHLA
     "RAYOS_X_TORAX_ARCHIVO",                   // 22
     "RADIOGRAFIA_COLUMNA",                     // 23
     "RADIOGRAFIA_COLUMNA_ARCHIVO",             // 24
+    "RADIOGRAFIA_COLUMNA_ARCHIVO2",             // 24
     "ELECTROCARDIOGRAMA",                      // 25
     "ESPIROMETRIA_ARCHIVO",                    // 26
     "AUDIOMETRIA_OHLA",                        // 27
@@ -115,16 +117,18 @@ const ExamenesListOHLA1 = buildExamenesList([       //OHLA 1
     "GONADOTROPINA",
     "CONSENT_PANEL_5D",
     "OIT",
-    "RADIOGRAFIA_COLUMNA",
     "RAYOS_X_TORAX_ARCHIVO",
+    "RADIOGRAFIA_COLUMNA",
+    "RADIOGRAFIA_COLUMNA_ARCHIVO",
+    "RADIOGRAFIA_COLUMNA_ARCHIVO2",
     "ELECTROCARDIOGRAMA",
     "ELECTROCARDIOGRAMA_ARCHIVO",
     "ESPIROMETRIA_ARCHIVO",
     "AUDIOMETRIA_OHLA",
     "ODONTOGRAMA",
     "PSICOLOGIA_ANEXO_02",
-    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
     "EXAMENES_COMPLEMENTARIOS",
+    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
     "TRABAJO_ALTURA_PSICO",
     "OFTALMOLOGIA",
     "OFTALMOLOGIA_VISION_TESTER",
@@ -156,18 +160,17 @@ const ExamenesListOHLA2 = buildExamenesList([       //OHLA 2
     "CONSENT_PANEL_5D",
     "OIT",
     "RAYOS_X_TORAX_ARCHIVO",
-    "RADIOGRAFIA_COLUMNA",
-    "RADIOGRAFIA_COLUMNA_ARCHIVO",
     "ELECTROCARDIOGRAMA",
     "ELECTROCARDIOGRAMA_ARCHIVO",
     "ESPIROMETRIA_ARCHIVO",
     "AUDIOMETRIA_OHLA",
     "ODONTOGRAMA",
     "PSICOLOGIA_ANEXO_02",
-    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
     "CUESTIONARIO_BERLIN",
     "EXAMENES_COMPLEMENTARIOS",
     "ESPACIOS_CONFINADOS_PSICOLOGIA",
+    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
+
     "OFTALMOLOGIA",
     "OFTALMOLOGIA_VISION_TESTER",
     "CONSENT_DECLARACION_APTITUD",
@@ -260,7 +263,7 @@ const ExamenesListSmmot = buildExamenesList([       //SMMOT
     "RAYOS_X_TORAX_ARCHIVO",
     "AUDIOMETRIA_OHLA",
     "PSICOLOGIA_ANEXO_02",
-    "FICHA_OFTALMOLOGICA",
+    "OFTALMOLOGIA",
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
     "DECLARACION_USO_FIRMA_ARCHIVO",
     "INTERCONSULTAS"
@@ -287,7 +290,7 @@ const ExamenesListRetiroLaArena = buildExamenesList([   // Retiro La Arena
     "AUDIOMETRIA_OHLA",
     "CUESTIONARIO_AUDIOMETRIA",
 
-    "FICHA_OFTALMOLOGICA",
+    "OFTALMOLOGIA",
 
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
     "DECLARACION_USO_FIRMA_ARCHIVO",
@@ -335,7 +338,7 @@ const ExamenesListPsicosensometricoSolo = buildExamenesList([   // Psicosensomet
     "CUESTIONARIO_AUDIOMETRIA",
 
     "TRABAJO_ESPECIFICOS",
-    "FICHA_OFTALMOLOGICA",
+    "OFTALMOLOGIA",
 
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
     "DECLARACION_USO_FIRMA_ARCHIVO",
@@ -410,7 +413,7 @@ const ExamenesListPoderosaSoloConduccion = buildExamenesList([ // PODEROSA SOLO 
 
     "INFORME_PODEROSA_OPERAR",
 
-    "FICHA_OFTALMOLOGICA",
+    "OFTALMOLOGIA",
 
     "CONSENT_INFORMADO_EVALUACION_MEDICA",
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
@@ -459,7 +462,7 @@ const ExamenesListPoderosaSoloAltura = buildExamenesList([ // PODEROSA SOLO ALTU
 
     "TRABAJO_ALTURA_PSICO",
 
-    "FICHA_OFTALMOLOGICA",
+    "OFTALMOLOGIA",
 
     "CONSENT_INFORMADO_EVALUACION_MEDICA",
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
@@ -492,7 +495,7 @@ const ExamenesListPoderosaRetiro = buildExamenesList([ // PODEROSA RETIRO
 
     "ODONTOGRAMA",
 
-    "FICHA_OFTALMOLOGICA",
+    "OFTALMOLOGIA",
 
     "CONSENT_INFORMADO_EVALUACION_MEDICA",
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
@@ -533,7 +536,7 @@ const ExamenesListPoderosaBasico = buildExamenesList([ // PODEROSA BASICO
 
     "INFORME_PODEROSA_OPERAR",
 
-    "FICHA_OFTALMOLOGICA",
+    "OFTALMOLOGIA",
 
     "CONSENT_INFORMADO_EVALUACION_MEDICA",
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
@@ -568,6 +571,7 @@ const ExamenesListMinerosDelNorte = buildExamenesList([ // MINEROS DEL NORTE
 
     "RADIOGRAFIA_COLUMNA",
     "RADIOGRAFIA_COLUMNA_ARCHIVO",
+    "RADIOGRAFIA_COLUMNA_ARCHIVO2",
 
     "ELECTROCARDIOGRAMA",
     "ELECTROCARDIOGRAMA_ARCHIVO",
@@ -579,7 +583,7 @@ const ExamenesListMinerosDelNorte = buildExamenesList([ // MINEROS DEL NORTE
 
     "TRABAJO_ALTURA_PSICO",
 
-    "FICHA_OFTALMOLOGICA",
+    "OFTALMOLOGIA",
 
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
     "DECLARACION_USO_FIRMA_ARCHIVO",
@@ -619,7 +623,7 @@ const ExamenesListMarsaSoloConduccion = buildExamenesList([ // MARSA SOLO CONDUC
 
     "INFORME_PSICOLOGICO",
 
-    "FICHA_OFTALMOLOGICA",
+    "OFTALMOLOGIA",
 
     "CONSENT_BUENA_SALUD",
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
@@ -659,7 +663,7 @@ const ExamenesListMarsaSoloAltura = buildExamenesList([ // MARSA SOLO ALTURA
 
     "TRABAJO_ALTURA_PSICO",
 
-    "FICHA_OFTALMOLOGICA",
+    "OFTALMOLOGIA",
 
     "CONSENT_BUENA_SALUD",
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
@@ -697,7 +701,7 @@ const ExamenesListMarsaBasico = buildExamenesList([ // MARSA BASICO
 
     "INFORME_PSICOLOGICO",
 
-    "FICHA_OFTALMOLOGICA",
+    "OFTALMOLOGIA",
 
     "CONSENT_BUENA_SALUD",
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
@@ -743,7 +747,7 @@ const ExamenesListLaArenaSoloAltura = buildExamenesList([ // LA ARENA SOLO ALTUR
 
     "TRABAJO_ALTURA_PSICO",
 
-    "FICHA_OFTALMOLOGICA",
+    "OFTALMOLOGIA",
 
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
     "DECLARACION_USO_FIRMA_ARCHIVO",
@@ -769,7 +773,7 @@ const ExamenesListLaArenaAlturaConduccion = buildExamenesList([ // LA ARENA ALTU
     "ANTECEDENTES_PATOLOGICOS",
     "DECLARACION_JURADA_ANTECEDENTES",
     "CUESTIONARIO_NORDICO",
-    "EVALUACION_MUSCULO_ESQUELETICA_BOROO",
+    "EVALUACION_MUSCULO_ESQUELETICA",
 
     "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
@@ -792,7 +796,7 @@ const ExamenesListLaArenaAlturaConduccion = buildExamenesList([ // LA ARENA ALTU
     "TRABAJO_ESPECIFICOS",
     "TRABAJO_ALTURA_PSICO",
 
-    "FICHA_OFTALMOLOGICA",
+    "OFTALMOLOGIA",
 
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
     "DECLARACION_USO_FIRMA_ARCHIVO",
@@ -822,10 +826,11 @@ const ExamenesListK2 = buildExamenesList([ // K2
     "RAYOS_X_TORAX_ARCHIVO",
     "RADIOGRAFIA_COLUMNA",
     "RADIOGRAFIA_COLUMNA_ARCHIVO",
+    "RADIOGRAFIA_COLUMNA_ARCHIVO2",
 
     "ESPIROMETRIA_ARCHIVO",
 
-    "c",
+    "FICHA_AUDIOMETRIA",
 
     "INFORME_PSICOLOGICO",
     "INFORME_PSICOLOGIA_FOBIAS",
@@ -883,7 +888,7 @@ const ExamenesListBorooAlturaEKG = buildExamenesList([ // BOROO ALTURA + EKG
     "INFORME_PSICOLOGICO",
     "INFORME_PSICOLABORAL",
 
-    "FICHA_OFTALMOLOGICA",
+    "OFTALMOLOGIA",
 
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
     "DECLARACION_USO_FIRMA_ARCHIVO",
@@ -931,7 +936,7 @@ const ExamenesListBorooAlturaSinEKG = buildExamenesList([ // BOROO ALTURA SIN EK
     "INFORME_PSICOLOGICO",
     "INFORME_PSICOLABORAL",
 
-    "FICHA_OFTALMOLOGICA",
+    "OFTALMOLOGIA",
 
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
     "DECLARACION_USO_FIRMA_ARCHIVO",
@@ -985,7 +990,7 @@ const ExamenesListBorooAlturaConduccion = buildExamenesList([ // BOROO ALTURA + 
 
     "TRABAJO_ESPECIFICOS",
 
-    "FICHA_OFTALMOLOGICA",
+    "OFTALMOLOGIA",
 
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
     "DECLARACION_USO_FIRMA_ARCHIVO",
@@ -1059,12 +1064,12 @@ const ExamenesListAlturaSolo = buildExamenesList([ // ALTURA SOLO
 ]);
 
 const ListaPorPlantilla = {
-    // PRUEBAS: ExamenesListPRUEBAS,
+    PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     OHLA: ExamenesListOHLA,
-    OHLA1: ExamenesListOHLA1,
-    OHLA2: ExamenesListOHLA2,
-    OHLA3: ExamenesListOHLA3,
+    "OHLA ALTURA - CONDUCCION": ExamenesListOHLA1,
+    "OHLA CONDUCCION": ExamenesListOHLA2,
+    "OHLA SIMPLE": ExamenesListOHLA3,
     SUMMAGOLD: ExamenesListSummaGold,
     SMMOT: ExamenesListSmmot,
     "LA ARENA - RETIRO": ExamenesListRetiroLaArena,
@@ -1223,7 +1228,7 @@ const Folio = () => {
             };
 
             // Llamar a FolioJasper con el callback de progreso
-            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress, selectedListType, controller.signal);
+            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress, selectedListType, controller.signal, form.nombres, form.apellidos);
 
             // Cerrar la alerta de carga y mostrar éxito
             Swal.fire({
@@ -1393,9 +1398,9 @@ const Folio = () => {
 
             {/* ===== SECCIÓN: EXAMENES ===== */}
             <SectionFieldset legend="Examenes" className="flex flex-col justify-center items-center w-full">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+                <div className="columns-1 sm:columns-2 lg:columns-4 gap-4 w-full">
                     {form.listaExamenes?.map((examen, index) => (
-                        <div key={index} className="flex justify-between items-center border p-3 rounded-md shadow-sm bg-white gap-2">
+                        <div key={index} className="break-inside-avoid mb-4 flex justify-between items-center border p-3 rounded-md shadow-sm bg-white gap-2 h-24">
                             <div className="flex items-center gap-2">
                                 <input
                                     type="checkbox"
@@ -1404,7 +1409,7 @@ const Folio = () => {
                                     disabled={!examen.resultado}
                                     className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
                                 />
-                                <span className="font-medium text-gray-700 text-sm whitespace-normal break-words max-w-[150px] cursor-pointer" onClick={() => toggleExamen(index)}>
+                                <span className="font-medium text-gray-700 text-sm whitespace-normal break-words max-w-[150px] cursor-pointer line-clamp-3" onClick={() => toggleExamen(index)}>
                                     {index + 1}.- {examen.nombre}
                                 </span>
                             </div>

@@ -20,6 +20,7 @@ export async function dibujarFirmas({ doc, datos, y, pageW, mostrarFirmaPaciente
   const s2 = await getSignCompressed(datos, "SELLOFIRMADOCASIG");
   const s3 = await getSignCompressed(datos, "SELLOFIRMADOCASIG-EXTRA");
 
+  // console.log({ firmap, huellap, s1, s2, s3 })
 
   // Verificar qué firmas tenemos
   const tieneFirmaPaciente = mostrarFirmaPaciente && ((firmap !== null && firmap !== "") || (huellap !== null & huellap !== ""));

@@ -727,7 +727,7 @@ export default function FichaPsicologica3() {
     inteligencia: null,
     apetito: "ADECUADO",
     sueno: "SIN DIFICULTAD",
-    personalidad: "CUENTA CON RECUERDOS PERSONALES",
+    personalidad: "CUENTA CON RECURSOS PERSONALES",
     afectividad: "EUTIMICO",
     conductaSexual: "NORMAL",
 

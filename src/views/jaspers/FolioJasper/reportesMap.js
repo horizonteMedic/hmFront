@@ -1,4 +1,4 @@
-import Aptitud_Agroindustrial from "../Ficha_Anexo16/Aptitud_medico_ocupacional_F";
+import Aptitud_medico_ocupacional_F from "../Ficha_Anexo16/Aptitud_medico_ocupacional_F";
 import Anexo7C_Antiguo from "../Anexo16/Anexo7C_Boro";
 import GenerarDatosPaciente from "../AntecedentesAltura/AnexoCB_Digitalizado";
 import Anexo16A_Digitalizado from "../Anexo16A/Anexo16A_Digitalizado";
@@ -46,7 +46,7 @@ import INFORME_ADICIONAL_DE_FOBIAS_Digitalizado from "../ModuloPsicologia/Inform
 import Informe_PsicolaboralBoroo_Digitalizado from "../ModuloPsicologia/InformePsicolaboral/Informe_PsicolaboralBoroo_Digitalizado";
 import TRABAJOS_EN_ESPECIFICO_Digitalizado from "../ModuloPsicologia/InformePsicoEspecificos/Informe_Psico_Especificos";
 import formatPsicologia_Digitalizado from "../ModuloPsicologia/InformePsicoAlturaFobias/formatPsicologia_Digitalizado";
-import EvaluacionOftalmologica2021_Digitalizado from "../Oftalmologia/EvaluacionOftalmologica/EvaluacionOftalmologica2021_Digitalizado";
+import EvaluacionOftalmologica2021_Digitalizado from "../Oftalmologia/EvaluacionOftalmologica2021_Digitalizado";
 import Consent_Admision_DeclaracionSintomaticoRespiratorio from "../ModuloConsentimientos/ConsentAdmisDeclaSintomaRespi/Consent_Admision_DeclaracionSintomaticoRespiratorio"
 import Consent_Admision_EvaluacionMedica from "../ModuloConsentimientos/ConsentAdmisEvaluaMedica/Consent_Admision_EvaluacionMedica"
 import ConsentimientoBuenaSalud2021_Digitalizado from "../ModuloConsentimientos/ConsentimientoBuenaSalud/ConsentimientoBuenaSalud2021_Digitalizado";
@@ -60,9 +60,13 @@ import InformePsicoExamComplementario from "../ModuloPsicologia/InformePsicoExam
 import CertificadoAlturaPoderosa_Digitalizado from "../CertificadoAlturaPoderosa/CertificadoAlturaPoderosa_Digitalizado";
 import TestFatigaSomnolenia_Digitalizado_boro from "../Test_Fatiga/TestFatigaSomnolenia_Digitalizado_boro";
 import EvaluacionMuscoloEsqueletica2021_Digitalizado_boro from "../MusculoEsqueletica/EvaluacionMuscoloEsqueletica2021_Digitalizado_boro";
-import EvaluacionOftalmologica2021_Digitalizado_ohla from "../Oftalmologia/EvaluacionOftalmologica/EvaluacionOftalmologica2021_Digitalizado_ohla";
+import EvaluacionOftalmologica2021_Digitalizado_ohla from "../Oftalmologia/EvaluacionOftalmologica2021_Digitalizado_ohla";
 import ficha_antecedente_patologico_boro from "../AntecedentesPatologicos/ficha_antecedente_patologico_boro";
 import EvaluacionOftalmologica2021_Digitalizado_boro from "../Oftalmologia/EvaluacionOftalmologica2021_Digitalizado_boro";
+import formatPsicologia_SuficienciaEspaciosC from "../ModuloPsicologia/InformeEspaciosConfinados/formatPsicologia_SuficienciaEspaciosC";
+import Informe_PsicolaboralBorooA_Digitalizado from "../ModuloPsicologia/InformePsicolaboral/Informe_PsicolaboralBorooA_Digitalizado";
+import Aptitud_medico_ocupacional_11 from "../Ficha_Anexo16/Aptitud_medico_ocupacional_11"
+
 
 export const reportesMap = {
    /* =========================
@@ -81,7 +85,10 @@ export const reportesMap = {
 
    aptitud_medico_ocupacional_agro: Aptitud_AgroindustrialH,
 
-   certificado_aptitud_medico_ocupacional: Aptitud_Agroindustrial,
+   certificado_aptitud_medico_ocupacional: {
+      Aptitud_medico_ocupacional_11,
+      Aptitud_medico_ocupacional_F
+   }, //son 2 jaspers
 
    certificado_aptitud_medico_resumen: Aptitud_medico_resumen_Digitalizado,
 
@@ -196,6 +203,8 @@ export const reportesMap = {
    ========================= */
    cuestionario_berlin: Informe_Psico_Cuestionario_Berlin,
 
+   psicologia_espacios_confinados: formatPsicologia_SuficienciaEspaciosC,
+
    ficha_psicologica_anexo03: FichaPsicologicaOcupacional_Digitalizado,
 
    informe_psicologico_estres: InformePsicologicoAdecoEstres_Digitalizado,
@@ -206,7 +215,10 @@ export const reportesMap = {
 
    fobias: INFORME_ADICIONAL_DE_FOBIAS_Digitalizado,
 
-   informe_psicolaboral: Informe_PsicolaboralBoroo_Digitalizado,
+   informe_psicolaboral: {
+      Informe_PsicolaboralBoroo_Digitalizado,
+      Informe_PsicolaboralBorooA_Digitalizado
+   }, // pedir que backend envie correctamente namejasper
 
    especificos: TRABAJOS_EN_ESPECIFICO_Digitalizado,
 

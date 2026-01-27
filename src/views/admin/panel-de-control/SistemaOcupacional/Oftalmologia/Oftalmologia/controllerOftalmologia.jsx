@@ -348,13 +348,9 @@ export const PrintHojaR = (nro, token, tabla) => {
         );
         // Determinar la ruta según el nombre del jasper
         let rutaJasper;
-        if (nombre === "EvaluacionOftalmologica2021_Digitalizado") {
-          rutaJasper = `../../../../../jaspers/Oftalmologia/EvaluacionOftalmologica/${nombre}.jsx`;
-        } else if (nombre === "EvaluacionOftalmologica2021_Digitalizado_ohla") {
-          rutaJasper = `../../../../../jaspers/Oftalmologia/EvaluacionOftalmologica/${nombre}.jsx`;
-        } else {
-          rutaJasper = `../../../../../jaspers/Oftalmologia/${nombre}.jsx`;
-        }
+
+        rutaJasper = `../../../../../jaspers/Oftalmologia/${nombre}.jsx`;
+
         const modulo = await jasperModules[rutaJasper]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {

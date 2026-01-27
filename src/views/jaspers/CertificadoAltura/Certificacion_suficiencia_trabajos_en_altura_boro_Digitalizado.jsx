@@ -1263,7 +1263,6 @@ export default async function Certificacion_suficiencia_trabajos_en_altura_boro_
   if (docExistente) {
     return doc
   } else {
-    doc.save("certificado.pdf");
     imprimir(doc);
 
   }
