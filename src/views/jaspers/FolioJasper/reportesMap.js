@@ -1,4 +1,4 @@
-import Aptitud_Agroindustrial from "../Ficha_Anexo16/Aptitud_medico_ocupacional_F";
+import Aptitud_medico_ocupacional_F from "../Ficha_Anexo16/Aptitud_medico_ocupacional_F";
 import Anexo7C_Antiguo from "../Anexo16/Anexo7C_Boro";
 import GenerarDatosPaciente from "../AntecedentesAltura/AnexoCB_Digitalizado";
 import Anexo16A_Digitalizado from "../Anexo16A/Anexo16A_Digitalizado";
@@ -87,7 +87,7 @@ export const reportesMap = {
 
    certificado_aptitud_medico_ocupacional: {
       Aptitud_medico_ocupacional_11,
-      Aptitud_Agroindustrial
+      Aptitud_medico_ocupacional_F
    }, //son 2 jaspers
 
    certificado_aptitud_medico_resumen: Aptitud_medico_resumen_Digitalizado,
