@@ -951,7 +951,7 @@ export const GetInfoServicioEditar = (
             fechaAptitud: res.fechaDesde_fechadesde ?? "",
             fechaVencimiento: res.fechaHasta_fechahasta ?? "",
             // nombre_medico: res.medico_medico ?? "",
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
             dataEnfermedades: res.accidentes ?? [],
           };
 

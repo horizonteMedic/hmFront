@@ -106,7 +106,7 @@ export const GetInfoHistoriaOcupacinal = (nro, tabla, set, token, setTable) => {
           fecha: res.fechaHo,
 
           nombres: res.nombresApellidos,
-          user_medicoFirma: res.usuarioFirma,
+          user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
         setTable(detallesOrdenados)
       } else {

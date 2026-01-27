@@ -147,7 +147,7 @@ export const GetInfoServicioEditar = async (
             glucosa: res.glucosalabclinicoTxtglucosabio,
             creatinina: res.creatininalabclinicoTxtcreatininabio,
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
     }
 };

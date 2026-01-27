@@ -104,7 +104,7 @@ export const GetInfoServicio = (
           noPasoExamen: res?.txtObservaciones?.includes(
             "NO PASO EXAMEN ODONTOLOGICO"
           ),
-          user_medicoFirma: res.usuarioFirma,
+          user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");

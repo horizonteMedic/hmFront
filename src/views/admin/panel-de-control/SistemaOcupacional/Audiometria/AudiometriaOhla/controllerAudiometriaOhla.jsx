@@ -61,7 +61,7 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
           oi_o_8000: res.oi1_8000,
           diagnostico: res.diagnostico,
 
-          // user_medicoFirma: res.usuarioFirma,
+          // user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
           // user_doctorAsignado: res.doctorAsignado,
           // user_doctorExtra: res.doctorExtra,
         }));
@@ -376,7 +376,7 @@ export const GetInfoServicioFicha = (
           i_umbral_confort: res.txtLIConfort,
           i_umbral_disconfort: res.txtLIDisconfort,
 
-          user_medicoFirma: res.usuarioFirma,
+          user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
           user_doctorAsignado: res.doctorAsignado,
           user_doctorExtra: res.doctorExtra,
         }));

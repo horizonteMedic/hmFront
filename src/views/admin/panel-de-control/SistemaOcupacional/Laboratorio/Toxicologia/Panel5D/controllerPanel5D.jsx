@@ -56,7 +56,7 @@ export const GetInfoServicio = async (
       valueMet: res.txtrMethanfetamina ?? "NEGATIVO",
       valueBen: res.txtrBenzodiacepina ?? "NEGATIVO",
 
-      user_medicoFirma: res.usuarioFirma,
+      user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado,
     }));
   }

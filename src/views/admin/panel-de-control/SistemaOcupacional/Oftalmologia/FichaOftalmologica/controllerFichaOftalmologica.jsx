@@ -47,7 +47,7 @@ export const GetInfoServicio = (
           presenciaPterigion: res.eoculares1 ?? "",
           agudezaLejos: res.agudezaVisualLejor,
 
-          user_medicoFirma: res.usuarioFirma,
+          user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
           user_doctorAsignado: res.doctorAsignado,
         }));
       } else {

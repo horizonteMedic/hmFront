@@ -48,7 +48,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
       urea: res.txtUreaSerica ?? "",
       acidoUrico: res.txtAcidoUrico ?? "",
 
-      user_medicoFirma: res.usuarioFirma,
+      user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado,
     }));
   }

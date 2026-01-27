@@ -66,7 +66,7 @@ export const GetInfoServicio = async (
       resultado: res.txtresultado ?? "",
       observaciones: res.txtobservaciones ?? prev.observaciones,
 
-      user_medicoFirma: res.usuarioFirma,
+      user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado,
     }));
   }

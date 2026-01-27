@@ -144,7 +144,7 @@ export const GetInfoServicio = async (
             // Pruebas Psicológicas - Área Emocional
             areaEmocional: res.areaEmocional_area_emocional,
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
 
         }));
     }

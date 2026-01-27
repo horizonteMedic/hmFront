@@ -276,7 +276,7 @@ export const GetInfoServicioEditar = async (
             usoLentesCorrectoresLecturaCerca: (res.observaciones ?? "").includes("USO DE LENTES CORRECTORES PARA LECTURA DE CERCA."),
             corregirAgudezaLecturaCerca: (res.observaciones ?? "").includes("CORREGIR AGUDEZA VISUAL PARA LECTURA DE CERCA."),
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
             SubirDoc: true,
             digitalizacion: res.digitalizacion,
         }));

@@ -334,7 +334,7 @@ export const GetInfoServicioEditar = async (
                             res.datosRespiradores?.autorizacionOtros_chk_f_6 ? "OTROS" : "",
 
             fechaExpiraAutorizacion: res.datosRespiradores?.fechaExpira_fecha_expira ?? getTodayPlusOneYear(),
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
     }
 };

@@ -51,7 +51,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
       resultadoHBsAg: res.txtHepatitisb ?? "",
       resultadoVHC: res.hepatitisc ?? "",
 
-      user_medicoFirma: res.usuarioFirma,
+      user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado,
     }));
   }

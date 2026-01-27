@@ -89,7 +89,7 @@ export const GetInfoServicio = async (
             areaCognitiva: res.areaCognitiva_areacognitiva,
             areaEmocional: res.areaEmocional_areaemocional,
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
     }
 };

@@ -333,7 +333,7 @@ export const GetInfoServicioEditar = async (
             // Examen Físico - Información Adicional
             detalleInformacionExamenFisico: res.detalleInformacion_d_informacion ?? "",
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
             //===============PARTE INFERIOR=======================
             // Conclusión y Comentarios
             aptoDesde: res.fechaDesde_f_desde ?? today,

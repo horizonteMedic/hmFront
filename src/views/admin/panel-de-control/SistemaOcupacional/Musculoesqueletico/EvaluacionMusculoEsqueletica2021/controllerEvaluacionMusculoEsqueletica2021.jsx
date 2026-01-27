@@ -187,7 +187,7 @@ export const GetInfoServicio = (
           conclusiones: res.conclusiones,
           recomendaciones: res.recomendaciones,
 
-          user_medicoFirma: res.usuarioFirma,
+          user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");

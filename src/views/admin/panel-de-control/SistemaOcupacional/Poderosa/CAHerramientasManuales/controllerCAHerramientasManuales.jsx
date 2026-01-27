@@ -53,7 +53,7 @@ export const GetInfoServicio = async (
             // observacion
             observacion: res.observacion ?? "",
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
     }
 };

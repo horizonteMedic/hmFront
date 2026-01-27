@@ -66,7 +66,7 @@ export const GetInfoServicio = async (
       informe: res.informacionGeneral ?? "",
       conclusion: res.conclusiones ?? "",
 
-      user_medicoFirma: res.usuarioFirma,
+      user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
 
       SubirDoc: true,
       digitalizacion: res.digitalizacion
