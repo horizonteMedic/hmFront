@@ -6,10 +6,10 @@ import { convertirGenero } from "../../utils/helpers.js";
 import footerTR from '../components/footerTR.jsx';
 import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
 
-export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExistente = null) {
+export default async function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExistente = null) {
   // Si se está usando como componente React (sin docExistente y sin datos válidos), retornar JSX
   const tieneDatosValidos = data && (data.norden || data.dniPaciente || data.nombresPaciente);
-  
+
   if (!docExistente && !tieneDatosValidos) {
     return (
       <div style={{ padding: '20px', textAlign: 'center' }}>
@@ -19,14 +19,14 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
       </div>
     );
   }
-  
+
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   if (!doc || !doc.internal) {
     return null;
   }
   const pageW = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  
+
   // Contador de páginas dinámico
   let numeroPagina = 1;
 
@@ -121,9 +121,9 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   const datosFinales = buildDatosFinales(data);
 
   // Header reutilizable
-  const drawHeader = (pageNumber) => {
+  const drawHeader = async (pageNumber) => {
     // Logo y membrete (subido más arriba para que no pise el título, yOffset de 7 a 2)
-    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 2 });
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 2 });
 
     // Título principal (subido 5mm, de 30 a 25)
     doc.setFont("helvetica", "bold").setFontSize(13);
@@ -164,7 +164,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     if (!texto || texto === null || texto === undefined) {
       return y;
     }
-    
+
     const fontSize = doc.internal.getFontSize();
     const palabras = String(texto).split(' ');
     let lineaActual = '';
@@ -200,25 +200,25 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
     const tablaInicioX = 5;
     const tablaAncho = 200;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo gris más oscuro
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
+
     // Dibujar líneas del header
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(9);
     doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
-    
+
     return yPos + alturaHeader;
   };
 
@@ -247,16 +247,16 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     const colSi = 6; // Ancho para celda SI (más delgada)
     const colNo = 6; // Ancho para celda NO (más delgada)
     const colPregunta = anchoColumna - colSi - colNo; // Ancho para la pregunta
-    
+
     // Dibujar pregunta
     doc.setFont("helvetica", "normal").setFontSize(7);
     const lineasPregunta = doc.splitTextToSize(pregunta, colPregunta - 4);
     const alturaNecesaria = alturaFija !== null ? alturaFija : Math.max(alturaFila, lineasPregunta.length * 3 + 1);
-    
+
     // Dibujar líneas de la fila
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Línea izquierda (inicio de pregunta)
     doc.line(xInicio, yPos, xInicio, yPos + alturaNecesaria);
     // Línea divisoria entre pregunta y SI
@@ -269,25 +269,25 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     doc.line(xInicio, yPos, xInicio + anchoColumna, yPos);
     // Línea inferior
     doc.line(xInicio, yPos + alturaNecesaria, xInicio + anchoColumna, yPos + alturaNecesaria);
-    
+
     // Dibujar texto de la pregunta
     lineasPregunta.forEach((linea, idx) => {
       doc.text(linea, xInicio + 2, yPos + 2.5 + (idx * 3));
     });
-    
+
     // Dibujar celda SI
     const xSi = xInicio + colPregunta;
     const yCentro = yPos + alturaNecesaria / 2;
     if (valor === true) {
       dibujarX(xSi + colSi / 2, yCentro + 0.5);
     }
-    
+
     // Dibujar celda NO
     const xNo = xInicio + colPregunta + colSi;
     if (valor === false) {
       dibujarX(xNo + colNo / 2, yCentro + 0.5);
     }
-    
+
     return yPos + alturaNecesaria;
   };
 
@@ -302,7 +302,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     }
 
     const alturaFila = 4.5;
-    
+
     // 1. Fila gris con título
     yPos = dibujarHeaderSeccion("5.- CONCLUSIÓN DE LA PRESENTE EVALUACIÓN", yPos, filaAltura);
 
@@ -310,10 +310,10 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     const anchoCol1 = tablaAncho * 0.35; // 35% para "APTO PARA TRABAJAR..."
     const anchoCol2 = tablaAncho * 0.22; // 22% para "DEBAJO"
     const anchoCol3 = tablaAncho * 0.30; // 30% restante para "Para"
-    
+
     // Textos para cada columna
     const textoCol1 = "APTO PARA TRABAJAR ENCIMA DE LOS 1,8 METROS";
-    
+
     // Construir textoCol2: verificar si ya contiene "DEBAJO"
     let textoCol2 = "";
     if (datosFinales.altura) {
@@ -326,22 +326,22 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
         textoCol2 = `DEBAJO : ${datosFinales.altura} m.s.n.m`;
       }
     }
-    
+
     const textoCol3 = datosFinales.puestoTrabajo ? `Para: ${datosFinales.puestoTrabajo}` : "";
-    
+
     // Calcular altura necesaria para cada columna
     doc.setFont("helvetica", "normal").setFontSize(7);
     const anchoDisponibleCol1 = anchoCol1 - 4;
     const anchoDisponibleCol2 = anchoCol2 - 4;
     const anchoDisponibleCol3 = anchoCol3 - 4;
-    
+
     const lineasCol1 = doc.splitTextToSize(textoCol1, anchoDisponibleCol1);
     const lineasCol2 = textoCol2 ? doc.splitTextToSize(textoCol2, anchoDisponibleCol2) : [];
     const lineasCol3 = textoCol3 ? doc.splitTextToSize(textoCol3, anchoDisponibleCol3) : [];
-    
+
     const maxLineas = Math.max(lineasCol1.length, lineasCol2.length, lineasCol3.length);
     const alturaNecesaria = Math.max(alturaFila, maxLineas * 3.5 + 1);
-    
+
     // Dibujar líneas de la fila
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
@@ -351,20 +351,20 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesaria);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaNecesaria, tablaInicioX + tablaAncho, yPos + alturaNecesaria);
-    
+
     // Calcular centro vertical
     const yCentro = yPos + alturaNecesaria / 2;
-    
+
     // Dibujar texto en cada columna (centrado verticalmente)
     doc.setFont("helvetica", "normal").setFontSize(7);
-    
+
     // Columna 1
     const alturaBloqueCol1 = (lineasCol1.length - 1) * 3.5;
     const yInicioCol1 = yCentro - alturaBloqueCol1 / 2 + 1;
     lineasCol1.forEach((linea, idx) => {
       doc.text(linea, tablaInicioX + 2, yInicioCol1 + (idx * 3.5));
     });
-    
+
     // Columna 2
     if (lineasCol2.length > 0) {
       const alturaBloqueCol2 = (lineasCol2.length - 1) * 3.5;
@@ -373,7 +373,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
         doc.text(linea, tablaInicioX + anchoCol1 + 2, yInicioCol2 + (idx * 3.5));
       });
     }
-    
+
     // Columna 3
     if (lineasCol3.length > 0) {
       const alturaBloqueCol3 = (lineasCol3.length - 1) * 3.5;
@@ -382,15 +382,15 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
         doc.text(linea, tablaInicioX + anchoCol1 + anchoCol2 + 2, yInicioCol3 + (idx * 3.5));
       });
     }
-    
+
     yPos += alturaNecesaria;
 
     // 3. Fila celeste solo con "RESTRICCIONES" (sin ":")
     const alturaFilaRestricciones = 4.5;
-    
+
     doc.setFillColor(199, 241, 255); // Celeste
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaFilaRestricciones, 'F');
-    
+
     // Dibujar líneas
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
@@ -398,47 +398,47 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaRestricciones);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaFilaRestricciones, tablaInicioX + tablaAncho, yPos + alturaFilaRestricciones);
-    
+
     // Texto "RESTRICCIONES" (sin ":")
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text("RESTRICCIONES", tablaInicioX + 2, yPos + 3.5);
-    
+
     yPos += alturaFilaRestricciones;
 
     // 4. Tres filas separadas, cada una con texto y una celda SI/NO
     const alturaFilaRestriccion = 4.5;
     const anchoCeldaSiNo = 12; // Ancho para la celda única que muestra SI o NO
     const colTextoRestriccion = tablaAncho - anchoCeldaSiNo; // Ancho para el texto (todo menos la celda SI/NO)
-    
+
     const restricciones = [
       { texto: "Apto para trabajar encima de los 1,8 metros", valor: datosFinales.apto18 },
       { texto: "Uso permanente de lentes correctores", valor: datosFinales.usoLentesCorrectores },
       { texto: "Uso permanente de audífonos", valor: datosFinales.usoAudifonos }
     ];
-    
+
     // Dibujar cada restricción en su propia fila
     restricciones.forEach((restriccion) => {
       // Calcular altura necesaria para esta fila
       doc.setFont("helvetica", "normal").setFontSize(7);
       const lineas = doc.splitTextToSize(restriccion.texto, colTextoRestriccion - 4);
       const alturaNecesaria = Math.max(alturaFilaRestriccion, lineas.length * 3 + 1);
-      
+
       // Dibujar líneas de la fila
       doc.setDrawColor(0, 0, 0);
       doc.setLineWidth(0.2);
-      
+
       // Líneas verticales
       doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesaria);
       doc.line(tablaInicioX + colTextoRestriccion, yPos, tablaInicioX + colTextoRestriccion, yPos + alturaNecesaria);
       doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesaria);
-      
+
       // Líneas horizontales
       doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
       doc.line(tablaInicioX, yPos + alturaNecesaria, tablaInicioX + tablaAncho, yPos + alturaNecesaria);
-      
+
       // Calcular centro vertical de la celda
       const yCentro = yPos + alturaNecesaria / 2;
-      
+
       // Dibujar texto (centrado verticalmente)
       const alturaBloqueTexto = (lineas.length - 1) * 3;
       const yInicioTexto = yCentro - alturaBloqueTexto / 2 + 0.5;
@@ -446,7 +446,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
       lineas.forEach((linea, idx) => {
         doc.text(linea, tablaInicioX + 2, yInicioTexto + (idx * 3));
       });
-      
+
       // Dibujar SI/NO
       doc.setFont("helvetica", "normal").setFontSize(7);
       if (restriccion.valor === true) {
@@ -454,7 +454,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
       } else if (restriccion.valor === false) {
         doc.text("NO", tablaInicioX + colTextoRestriccion + anchoCeldaSiNo / 2, yCentro + 0.5, { align: "center" });
       }
-      
+
       yPos += alturaNecesaria;
     });
 
@@ -465,17 +465,17 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFila);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaFila, tablaInicioX + tablaAncho, yPos + alturaFila);
-    
+
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text("Otra Restricción : " + (datosFinales.otraRestriccion || ""), tablaInicioX + 2, yPos + 3.5);
-    
+
     yPos += alturaFila;
-    
+
     return yPos;
   };
 
   // Función para dibujar sección de observaciones/recomendaciones y firmas
-  const dibujarSeccionObservacionesYFirmas = (yPos) => {
+  const dibujarSeccionObservacionesYFirmas = async (yPos) => {
     // Fila gris: Observaciones / recomendaciones (sin dos puntos)
     yPos = dibujarHeaderSeccion("6.- Observaciones / recomendaciones", yPos, filaAltura);
 
@@ -487,24 +487,11 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     const baseY = yPos;
 
     // Usar helper para dibujar firmas (sin borde)
-    dibujarFirmas({ doc, datos: data, y: baseY + 2, pageW }).then(() => {
-      // === FOOTER ===
-      footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
-
-      // === Imprimir ===
-      if (!docExistente) {
-        imprimir(doc);
-      }
-    }).catch(err => {
-      console.error("Error al dibujar firmas:", err);
-      // === FOOTER ===
-      footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
-      
-      // === Imprimir ===
-      if (!docExistente) {
-        imprimir(doc);
-      }
-    });
+    await dibujarFirmas({ doc, datos: data, y: baseY + 2, pageW })
+    footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
+    if (!docExistente) {
+      imprimir(doc);
+    }
 
     // Si hay docExistente, retornar el doc (las firmas se agregarán asíncronamente)
     // El footer se dibujará en el .then() o .catch() de dibujarFirmas
@@ -518,10 +505,10 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     // Determinar si hay título para agregar ":"
     const tieneTitulo = titulo && titulo.trim() !== '';
     const textoTitulo = tieneTitulo ? titulo + ": " : "";
-    
+
     const padding = 2;
     const anchoDisponibleTexto = tablaAncho - 4;
-    
+
     // Si no hay texto, dibujar solo el título
     if (!texto || texto.trim() === '') {
       const alturaFinal = Math.max(alturaMinima, 4.5);
@@ -532,19 +519,19 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
       }
       return yPos + alturaFinal;
     }
-    
+
     // Combinar título y texto para dividir juntos
     doc.setFont("helvetica", "normal").setFontSize(7);
     const textoCompleto = tieneTitulo ? textoTitulo + String(texto) : String(texto);
     const lineasCompletas = doc.splitTextToSize(textoCompleto, anchoDisponibleTexto);
-    
+
     // Calcular altura necesaria
     const alturaTexto = lineasCompletas.length * 3 + padding;
     const alturaFinal = Math.max(alturaMinima, alturaTexto + 2);
-    
+
     // Dibujar borde
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaFinal, 'S');
-    
+
     // Dibujar líneas: título en negrita solo en la primera línea si aplica
     lineasCompletas.forEach((linea, idx) => {
       if (idx === 0 && tieneTitulo && linea.startsWith(textoTitulo)) {
@@ -563,7 +550,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
         doc.text(linea, tablaInicioX + 2, yPos + 3.5 + (idx * 3));
       }
     });
-    
+
     return yPos + alturaFinal;
   };
 
@@ -737,7 +724,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   if (datosFinales.primeraActitud === true) {
     dibujarX(tablaInicioX + 94 + 3, yTexto + 1.2);
   }
-  
+
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Revalidación:", tablaInicioX + 102, yTexto + 1);
   // Checkbox Revalidación (centrado en celda de 6mm, desde 194 hasta 200)
@@ -762,18 +749,18 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   const colPregunta = anchoColumna - colSi - colNo;
 
   // Header de columnas NO/SI con celdas
-  
+
   // Header columna izquierda
   doc.setFillColor(199, 241, 255); // Celeste
   doc.rect(tablaInicioX, yPos, colPregunta, filaAltura, 'F');
   doc.rect(tablaInicioX + colPregunta, yPos, colSi, filaAltura, 'F');
   doc.rect(tablaInicioX + colPregunta + colSi, yPos, colNo, filaAltura, 'F');
-  
+
   // Header columna derecha
   doc.rect(tablaInicioX + anchoColumna, yPos, colPregunta, filaAltura, 'F');
   doc.rect(tablaInicioX + anchoColumna + colPregunta, yPos, colSi, filaAltura, 'F');
   doc.rect(tablaInicioX + anchoColumna + colPregunta + colSi, yPos, colNo, filaAltura, 'F');
-  
+
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
@@ -785,7 +772,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   // Texto SI y NO en celdas del header
   doc.setFont("helvetica", "bold").setFontSize(7);
   // Columna izquierda
@@ -802,7 +789,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   let yColumnaIzq = yPos;
   let yColumnaDer = yPos;
   const yInicioColumnas = yPos;
-  
+
   // Definir pares de filas (izquierda, derecha)
   const paresFilas = [
     { izq: { pregunta: "Tiene fobia (miedo) a las alturas", valor: datosFinales.tieneFobiaAlturas }, der: { pregunta: "Insuficiencia cardiaca, enfermedad coronaria arritmias, porta marcapaso, prótesis valvular", valor: datosFinales.tieneInsuficienciaCardiaca } },
@@ -812,24 +799,24 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     { izq: { pregunta: "Diabetes mellitus o hipoglicemia no controlada", valor: datosFinales.tieneDiabetes }, der: { pregunta: "Alteración de la agudeza visual(de lejos)y/o estereopsia", valor: datosFinales.tieneAlteracionVisual } },
     { izq: { pregunta: "Migraña no controlada", valor: datosFinales.tieneMigrana }, der: { pregunta: "Declarado NO APTO para labor de altura en último examen ocupacional", valor: datosFinales.declaradoNoApto } }
   ];
-  
+
   // Dibujar cada par de filas con la misma altura
   paresFilas.forEach(par => {
     // Calcular altura máxima del par
     const alturaIzq = calcularAlturaFila(par.izq.pregunta, anchoColumna);
     const alturaDer = calcularAlturaFila(par.der.pregunta, anchoColumna);
     const alturaMaxima = Math.max(alturaIzq, alturaDer);
-    
+
     // Dibujar fila izquierda con altura fija
     yColumnaIzq = dibujarFilaAntecedente(par.izq.pregunta, par.izq.valor, yColumnaIzq, xColumnaIzq, anchoColumna, alturaMaxima);
-    
+
     // Dibujar fila derecha con altura fija
     yColumnaDer = dibujarFilaAntecedente(par.der.pregunta, par.der.valor, yColumnaDer, xColumnaDer, anchoColumna, alturaMaxima);
   });
 
   // Ajustar yPos al máximo de ambas columnas (deberían ser iguales ahora)
   yPos = Math.max(yColumnaIzq, yColumnaDer);
-  
+
   // Dibujar líneas verticales y horizontales que conectan ambas columnas
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
@@ -858,12 +845,12 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   doc.rect(tablaInicioX, yPos, colPregunta, filaAltura, 'F');
   doc.rect(tablaInicioX + colPregunta, yPos, colSi, filaAltura, 'F');
   doc.rect(tablaInicioX + colPregunta + colSi, yPos, colNo, filaAltura, 'F');
-  
+
   // Header columna derecha
   doc.rect(tablaInicioX + anchoColumna, yPos, colPregunta, filaAltura, 'F');
   doc.rect(tablaInicioX + anchoColumna + colPregunta, yPos, colSi, filaAltura, 'F');
   doc.rect(tablaInicioX + anchoColumna + colPregunta + colSi, yPos, colNo, filaAltura, 'F');
-  
+
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
@@ -875,7 +862,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
+
   // Texto SI y NO en celdas del header
   doc.setFont("helvetica", "bold").setFontSize(7);
   // Columna izquierda
@@ -890,30 +877,30 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   yColumnaIzq = yPos;
   yColumnaDer = yPos;
   const yInicioColumnas2 = yPos;
-  
+
   // Definir pares de filas (izquierda, derecha)
   const paresFilas2 = [
     { izq: { pregunta: "Se encuentra resfriado o con algún cuadro respiratorio", valor: datosFinales.tieneResfriado }, der: { pregunta: "Consumió licor en la últimas 24 horas", valor: datosFinales.consumioLicor } },
     { izq: { pregunta: "Sufre de vértigo o mareos diagnosticados recientemente", valor: datosFinales.tieneVertigo }, der: { pregunta: "Frecuencia de cefaleas", valor: datosFinales.frecuenciaCefaleas } }
   ];
-  
+
   // Dibujar cada par de filas con la misma altura
   paresFilas2.forEach(par => {
     // Calcular altura máxima del par
     const alturaIzq = calcularAlturaFila(par.izq.pregunta, anchoColumna);
     const alturaDer = calcularAlturaFila(par.der.pregunta, anchoColumna);
     const alturaMaxima = Math.max(alturaIzq, alturaDer);
-    
+
     // Dibujar fila izquierda con altura fija
     yColumnaIzq = dibujarFilaAntecedente(par.izq.pregunta, par.izq.valor, yColumnaIzq, xColumnaIzq, anchoColumna, alturaMaxima);
-    
+
     // Dibujar fila derecha con altura fija
     yColumnaDer = dibujarFilaAntecedente(par.der.pregunta, par.der.valor, yColumnaDer, xColumnaDer, anchoColumna, alturaMaxima);
   });
 
   // Ajustar yPos al máximo de ambas columnas (deberían ser iguales ahora)
   yPos = Math.max(yColumnaIzq, yColumnaDer);
-  
+
   // Dibujar líneas verticales y horizontales que conectan ambas columnas
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
@@ -941,7 +928,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   const anchoTotalSignos = tablaAncho;
   const numColumnas = 7; // FC, FR, PA, Sat O2, Talla, Peso, IMC
   const anchoColumnaSignos = anchoTotalSignos / numColumnas;
-  
+
   // Dibujar líneas de la fila
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
@@ -951,7 +938,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   }
   doc.line(tablaInicioX, yPos, tablaInicioX + anchoTotalSignos, yPos);
   doc.line(tablaInicioX, yPos + alturaFilaSignos, tablaInicioX + anchoTotalSignos, yPos + alturaFilaSignos);
-  
+
   // Texto en cada celda
   doc.setFont("helvetica", "normal").setFontSize(7);
   let xActual = tablaInicioX;
@@ -968,13 +955,13 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   doc.text("Peso: " + (datosFinales.peso || "") + " Kg.", xActual + 2, yPos + 3.5);
   xActual += anchoColumnaSignos;
   doc.text("IMC: " + (datosFinales.imc || "") + (datosFinales.imc ? " kg/m²" : ""), xActual + 2, yPos + 3.5);
-  
+
   yPos += alturaFilaSignos; // Reducir espacio superior
 
   // Layout: Imagen a la izquierda, 3 columnas a la derecha
   const anchoImagen = 25; // Imagen más reducida
   const espacioEntre = 1.5; // Reducir espacio entre imagen y columnas
-  
+
   const xImagen = tablaInicioX;
   const yImagen = yPos;
   const xCol1 = xImagen + anchoImagen + espacioEntre;
@@ -988,7 +975,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   // Calcular altura total de las columnas antes de cargar la imagen
   const calcularAlturaColumnas = () => {
     const alturaHeaderHallazgos = 4;
-    
+
     // Definir las filas de cada columna
     const filasCol1 = [
       { pregunta: "Hallazgos Anormales Hombro: Cirugías, Accidentes, Congénitos", valor: datosFinales.hallazgosHombro },
@@ -997,7 +984,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
       { pregunta: "Hallazgos Anormales Tobillo: Cirugías, Accidentes, Congénitos.", valor: datosFinales.hallazgosTobillo },
       { pregunta: "Otros Hallazgos Alteración Musculo- Esqueléticos.", valor: datosFinales.otrosHallazgosMusculoEsqueleticos }
     ];
-    
+
     const filasCol2 = [
       { pregunta: "Limitación en Fuerza y/o movilidad de extremidades", valor: datosFinales.limitacionFuerzaMovilidad },
       { pregunta: "Alteración del equilibrio", valor: datosFinales.alteracionEquilibrio },
@@ -1005,7 +992,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
       { pregunta: "Anormalidad en la fuerza de los miembros", valor: datosFinales.anormalidadFuerzaMiembros },
       { pregunta: "Lenguaje anormal", valor: datosFinales.lenguajeAnormal }
     ];
-    
+
     const filasCol3 = [
       { pregunta: "Alteración de la coordinación", valor: datosFinales.alteracionCoordinacion },
       { pregunta: "Presencia de nisfagmus", valor: datosFinales.presenciaNistagmus },
@@ -1013,11 +1000,11 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
       { pregunta: "Pupilas CIRLA", valor: datosFinales.pupilasCIRLA },
       { pregunta: "Asimetría facial", valor: datosFinales.asimetriaFacial }
     ];
-    
+
     // Calcular alturas para cada fila
     const numFilas = Math.max(filasCol1.length, filasCol2.length, filasCol3.length);
     const alturasFilas = [];
-    
+
     for (let i = 0; i < numFilas; i++) {
       let alturaMax = 0;
       if (i < filasCol1.length) {
@@ -1031,7 +1018,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
       }
       alturasFilas.push(alturaMax);
     }
-    
+
     // Sumar todas las alturas
     const alturaTotalFilas = alturasFilas.reduce((sum, altura) => sum + altura, 0);
     return alturaHeaderHallazgos + alturaTotalFilas;
@@ -1044,17 +1031,17 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
       img.crossOrigin = 'anonymous';
       // Ruta desde public
       img.src = '/img/Altura18/cuerpo_jasper_18.png';
-      
+
       img.onload = () => {
         const imgAncho = anchoImagen;
         // Calcular altura de las columnas y ajustar la imagen a esa altura
         const alturaColumnas = calcularAlturaColumnas();
         const imgAlto = alturaColumnas; // Usar la altura de las columnas en lugar de mantener proporción
-        
+
         doc.addImage(img, 'PNG', xImagen, yImagen, imgAncho, imgAlto);
         resolve({ yFinal: yImagen + imgAlto, imgAlto });
       };
-      
+
       img.onerror = () => {
         console.error("Error al cargar imagen del cuerpo");
         resolve({ yFinal: yPos, imgAlto: 0 }); // Continuar sin la imagen
@@ -1063,12 +1050,12 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
   };
 
   // Función para continuar con las tablas después de cargar la imagen
-  const continuarConTablas = (resultadoImagen) => {
-    
+  const continuarConTablas = async (resultadoImagen) => {
+
     // Header para cada columna
     const alturaHeaderHallazgos = 4;
     doc.setFillColor(199, 241, 255);
-    
+
     // Header Columna 1
     doc.rect(xCol1, yTablas, anchoColumnaHallazgos, alturaHeaderHallazgos, 'F');
     doc.rect(xCol1 + anchoColumnaHallazgos - colSi - colNo, yTablas, colSi, alturaHeaderHallazgos, 'F');
@@ -1084,7 +1071,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("SI", xCol1 + anchoColumnaHallazgos - colSi - colNo + colSi / 2, yTablas + 3, { align: "center" });
     doc.text("NO", xCol1 + anchoColumnaHallazgos - colNo + colNo / 2, yTablas + 3, { align: "center" });
-    
+
     // Header Columna 2
     doc.setFillColor(199, 241, 255);
     doc.rect(xCol2, yTablas, anchoColumnaHallazgos, alturaHeaderHallazgos, 'F');
@@ -1100,7 +1087,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("SI", xCol2 + anchoColumnaHallazgos - colSi - colNo + colSi / 2, yTablas + 3, { align: "center" });
     doc.text("NO", xCol2 + anchoColumnaHallazgos - colNo + colNo / 2, yTablas + 3, { align: "center" });
-    
+
     // Header Columna 3
     doc.setFillColor(199, 241, 255);
     doc.rect(xCol3, yTablas, anchoColumnaHallazgos, alturaHeaderHallazgos, 'F');
@@ -1116,9 +1103,9 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("SI", xCol3 + anchoColumnaHallazgos - colSi - colNo + colSi / 2, yTablas + 3, { align: "center" });
     doc.text("NO", xCol3 + anchoColumnaHallazgos - colNo + colNo / 2, yTablas + 3, { align: "center" });
-    
+
     yTablas += alturaHeaderHallazgos;
-    
+
     // Definir las filas de cada columna
     const filasCol1 = [
       { pregunta: "Hallazgos Anormales Hombro: Cirugías, Accidentes, Congénitos", valor: datosFinales.hallazgosHombro },
@@ -1127,7 +1114,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
       { pregunta: "Hallazgos Anormales Tobillo: Cirugías, Accidentes, Congénitos.", valor: datosFinales.hallazgosTobillo },
       { pregunta: "Otros Hallazgos Alteración Musculo- Esqueléticos.", valor: datosFinales.otrosHallazgosMusculoEsqueleticos }
     ];
-    
+
     const filasCol2 = [
       { pregunta: "Limitación en Fuerza y/o movilidad de extremidades", valor: datosFinales.limitacionFuerzaMovilidad },
       { pregunta: "Alteración del equilibrio", valor: datosFinales.alteracionEquilibrio },
@@ -1135,7 +1122,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
       { pregunta: "Anormalidad en la fuerza de los miembros", valor: datosFinales.anormalidadFuerzaMiembros },
       { pregunta: "Lenguaje anormal", valor: datosFinales.lenguajeAnormal }
     ];
-    
+
     const filasCol3 = [
       { pregunta: "Alteración de la coordinación", valor: datosFinales.alteracionCoordinacion },
       { pregunta: "Presencia de nisfagmus", valor: datosFinales.presenciaNistagmus },
@@ -1143,11 +1130,11 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
       { pregunta: "Pupilas CIRLA", valor: datosFinales.pupilasCIRLA },
       { pregunta: "Asimetría facial", valor: datosFinales.asimetriaFacial }
     ];
-    
+
     // Calcular alturas para cada fila lógica (tomando el máximo entre las 3 columnas)
     const numFilas = Math.max(filasCol1.length, filasCol2.length, filasCol3.length);
     const alturasFilas = [];
-    
+
     for (let i = 0; i < numFilas; i++) {
       let alturaMax = 0;
       if (i < filasCol1.length) {
@@ -1161,15 +1148,15 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
       }
       alturasFilas.push(alturaMax);
     }
-    
+
     // Dibujar todas las filas con la altura máxima calculada
     let yCol1 = yTablas;
     let yCol2 = yTablas;
     let yCol3 = yTablas;
-    
+
     for (let i = 0; i < numFilas; i++) {
       const alturaFila = alturasFilas[i];
-      
+
       // Dibujar fila en Columna 1
       if (i < filasCol1.length) {
         yCol1 = dibujarFilaAntecedente(filasCol1[i].pregunta, filasCol1[i].valor, yCol1, xCol1, anchoColumnaHallazgos, alturaFila);
@@ -1183,7 +1170,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
         doc.line(xCol1, yCol1 + alturaFila, xCol1 + anchoColumnaHallazgos, yCol1 + alturaFila);
         yCol1 += alturaFila;
       }
-      
+
       // Dibujar fila en Columna 2
       if (i < filasCol2.length) {
         yCol2 = dibujarFilaAntecedente(filasCol2[i].pregunta, filasCol2[i].valor, yCol2, xCol2, anchoColumnaHallazgos, alturaFila);
@@ -1196,7 +1183,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
         doc.line(xCol2, yCol2 + alturaFila, xCol2 + anchoColumnaHallazgos, yCol2 + alturaFila);
         yCol2 += alturaFila;
       }
-      
+
       // Dibujar fila en Columna 3
       if (i < filasCol3.length) {
         yCol3 = dibujarFilaAntecedente(filasCol3[i].pregunta, filasCol3[i].valor, yCol3, xCol3, anchoColumnaHallazgos, alturaFila);
@@ -1210,25 +1197,25 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
         yCol3 += alturaFila;
       }
     }
-    
+
     // Ajustar yPos al máximo entre la imagen y las tres columnas
     yPos = Math.max(resultadoImagen.yFinal, yCol1, yCol2, yCol3);
-    
+
     // === SECCIÓN 5: CONCLUSIÓN ===
     yPos = dibujarSeccionConclusion(yPos);
-    
+
     // === SECCIÓN 6: OBSERVACIONES/RECOMENDACIONES Y FIRMAS ===
-    dibujarSeccionObservacionesYFirmas(yPos);
+    await dibujarSeccionObservacionesYFirmas(yPos);
   };
-  
+
   // Cargar imagen y continuar
-  cargarImagenCuerpo().then(continuarConTablas).catch((error) => {
+  await cargarImagenCuerpo().then(continuarConTablas).catch((error) => {
     console.error("Error al cargar imagen:", error);
     // Continuar sin la imagen - dibujar tablas sin esperar imagen
     // Header para cada columna
     const alturaHeaderHallazgos = 4;
     doc.setFillColor(199, 241, 255);
-    
+
     // Header Columna 1
     doc.rect(xCol1, yTablas, anchoColumnaHallazgos, alturaHeaderHallazgos, 'F');
     doc.rect(xCol1 + anchoColumnaHallazgos - colSi - colNo, yTablas, colSi, alturaHeaderHallazgos, 'F');
@@ -1244,7 +1231,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("SI", xCol1 + anchoColumnaHallazgos - colSi - colNo + colSi / 2, yTablas + 3, { align: "center" });
     doc.text("NO", xCol1 + anchoColumnaHallazgos - colNo + colNo / 2, yTablas + 3, { align: "center" });
-    
+
     // Header Columna 2
     doc.setFillColor(199, 241, 255);
     doc.rect(xCol2, yTablas, anchoColumnaHallazgos, alturaHeaderHallazgos, 'F');
@@ -1260,7 +1247,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("SI", xCol2 + anchoColumnaHallazgos - colSi - colNo + colSi / 2, yTablas + 3, { align: "center" });
     doc.text("NO", xCol2 + anchoColumnaHallazgos - colNo + colNo / 2, yTablas + 3, { align: "center" });
-    
+
     // Header Columna 3
     doc.setFillColor(199, 241, 255);
     doc.rect(xCol3, yTablas, anchoColumnaHallazgos, alturaHeaderHallazgos, 'F');
@@ -1276,9 +1263,9 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
     doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text("SI", xCol3 + anchoColumnaHallazgos - colSi - colNo + colSi / 2, yTablas + 3, { align: "center" });
     doc.text("NO", xCol3 + anchoColumnaHallazgos - colNo + colNo / 2, yTablas + 3, { align: "center" });
-    
+
     yTablas += alturaHeaderHallazgos;
-    
+
     // Definir las filas de cada columna
     const filasCol1 = [
       { pregunta: "Hallazgos Anormales Hombro: Cirugías, Accidentes, Congénitos", valor: datosFinales.hallazgosHombro },
@@ -1287,7 +1274,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
       { pregunta: "Hallazgos Anormales Tobillo: Cirugías, Accidentes, Congénitos.", valor: datosFinales.hallazgosTobillo },
       { pregunta: "Otros Hallazgos Alteración Musculo- Esqueléticos.", valor: datosFinales.otrosHallazgosMusculoEsqueleticos }
     ];
-    
+
     const filasCol2 = [
       { pregunta: "Limitación en Fuerza y/o movilidad de extremidades", valor: datosFinales.limitacionFuerzaMovilidad },
       { pregunta: "Alteración del equilibrio", valor: datosFinales.alteracionEquilibrio },
@@ -1295,7 +1282,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
       { pregunta: "Anormalidad en la fuerza de los miembros", valor: datosFinales.anormalidadFuerzaMiembros },
       { pregunta: "Lenguaje anormal", valor: datosFinales.lenguajeAnormal }
     ];
-    
+
     const filasCol3 = [
       { pregunta: "Alteración de la coordinación", valor: datosFinales.alteracionCoordinacion },
       { pregunta: "Presencia de nisfagmus", valor: datosFinales.presenciaNistagmus },
@@ -1303,11 +1290,11 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
       { pregunta: "Pupilas CIRLA", valor: datosFinales.pupilasCIRLA },
       { pregunta: "Asimetría facial", valor: datosFinales.asimetriaFacial }
     ];
-    
+
     // Calcular alturas para cada fila lógica (tomando el máximo entre las 3 columnas)
     const numFilas = Math.max(filasCol1.length, filasCol2.length, filasCol3.length);
     const alturasFilas = [];
-    
+
     for (let i = 0; i < numFilas; i++) {
       let alturaMax = 0;
       if (i < filasCol1.length) {
@@ -1321,15 +1308,15 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
       }
       alturasFilas.push(alturaMax);
     }
-    
+
     // Dibujar todas las filas con la altura máxima calculada
     let yCol1 = yTablas;
     let yCol2 = yTablas;
     let yCol3 = yTablas;
-    
+
     for (let i = 0; i < numFilas; i++) {
       const alturaFila = alturasFilas[i];
-      
+
       // Dibujar fila en Columna 1
       if (i < filasCol1.length) {
         yCol1 = dibujarFilaAntecedente(filasCol1[i].pregunta, filasCol1[i].valor, yCol1, xCol1, anchoColumnaHallazgos, alturaFila);
@@ -1342,7 +1329,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
         doc.line(xCol1, yCol1 + alturaFila, xCol1 + anchoColumnaHallazgos, yCol1 + alturaFila);
         yCol1 += alturaFila;
       }
-      
+
       // Dibujar fila en Columna 2
       if (i < filasCol2.length) {
         yCol2 = dibujarFilaAntecedente(filasCol2[i].pregunta, filasCol2[i].valor, yCol2, xCol2, anchoColumnaHallazgos, alturaFila);
@@ -1355,7 +1342,7 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
         doc.line(xCol2, yCol2 + alturaFila, xCol2 + anchoColumnaHallazgos, yCol2 + alturaFila);
         yCol2 += alturaFila;
       }
-      
+
       // Dibujar fila en Columna 3
       if (i < filasCol3.length) {
         yCol3 = dibujarFilaAntecedente(filasCol3[i].pregunta, filasCol3[i].valor, yCol3, xCol3, anchoColumnaHallazgos, alturaFila);
@@ -1369,16 +1356,16 @@ export default function A_CertificacionMedicaPTA_Digitalizado(data = {}, docExis
         yCol3 += alturaFila;
       }
     }
-    
+
     yPos = Math.max(yCol1, yCol2, yCol3);
-    
+
     // === SECCIÓN 5: CONCLUSIÓN ===
     yPos = dibujarSeccionConclusion(yPos);
-    
+
     // === SECCIÓN 6: OBSERVACIONES/RECOMENDACIONES Y FIRMAS ===
     dibujarSeccionObservacionesYFirmas(yPos);
   });
-  
+  console.log("sisoy")
   // Si es docExistente, retornar el doc inmediatamente
   // Las tablas se agregarán de forma asíncrona, pero el doc se modifica por referencia
   if (docExistente) {

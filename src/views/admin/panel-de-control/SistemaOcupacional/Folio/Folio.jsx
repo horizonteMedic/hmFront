@@ -27,7 +27,7 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "ANEXO_16A",
+    "ALTURA1PUNTO8",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -68,15 +68,17 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "PSICOSENSOMETRICO_CERT_ALTURA",        //revisar
     "CERTIFICADO_APTITUD_ALTURA_PODEROSA",
     "CERTIFICADO_VEHICULOS",
+    "PSICOSENSOMETRICO_VEHI_FOLIO",
     "FICHA_SAS",
     "LICENCIA_CONDUCIR_PODEROSA",
     "HOJA_DE_CONSULTA_EXTERNA",
     "USO_RESPIRADORES",             // 7
-    "HISTORIA_OCUPACIONAL",          // 8
+    "ALTURA1PUNTO8",                 // 8
+    "HISTORIA_OCUPACIONAL",          // 9
 
-    "ANTECEDENTES_PATOLOGICOS",      // 9
-    "DECLARACION_JURADA_ANTECEDENTES", // 10
-    "CUESTIONARIO_NORDICO",          // 11
+    "ANTECEDENTES_PATOLOGICOS",      // 10
+    "DECLARACION_JURADA_ANTECEDENTES", // 11
+    "CUESTIONARIO_NORDICO",          // 12
     "EVALUACION_MUSCULO_ESQUELETICA_BOROO",
     "EVALUACION_MUSCULO_ESQUELETICA",// 12
     "CONSENT_MUESTRA_SANGRE",                  // 12

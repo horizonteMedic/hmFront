@@ -71,7 +71,7 @@ import Aptitud_medico_ocupacional_11 from "../Ficha_Anexo16/Aptitud_medico_ocupa
 import Audiometria2021BORO from "../Audiometria/LegacyAudiometria/Audiometria2021-_Digitalizado_boro";
 import Audiometria2021 from "../Audiometria/LegacyAudiometria/Audiometria2021-_Digitalizado";
 import Anexo16ABoro_Digitalizado from "../Anexo16A/Anexo16ABoro_Digitalizado";
-
+import A_CertificacionMedicaPTA_Digitalizado from "../CertificadoAlturaPoderosa/A_CertificacionMedicaPTA_Digitalizado";
 
 export const reportesMap = {
    /* =========================
@@ -241,5 +241,7 @@ export const reportesMap = {
    },
 
    exam_complementarios: InformePsicoExamComplementario,
+
+   certificacion_medica_altura: A_CertificacionMedicaPTA_Digitalizado,
 
 };
