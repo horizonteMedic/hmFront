@@ -27,7 +27,7 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "CERTIFICADO_APTITUD_ANEXO_16",
+    "ANEXO_16A",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -291,16 +291,14 @@ const ExamenesListOHLA3 = buildExamenesList([       //OHLA 3
     "INTERCONSULTAS"
 ]);
 
-
 const ListaPorPlantilla = {
-    //PRUEBAS: ExamenesListPRUEBAS,
+    PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     "COMPLETO": ExamenesListCOMPLETO,
     OHLA: ExamenesListOHLA,
     "OHLA ALTURA - CONDUCCION": ExamenesListOHLA1,
     "OHLA CONDUCCION": ExamenesListOHLA2,
     "OHLA SIMPLE": ExamenesListOHLA3,
-
 };
 
 const Folio = () => {
