@@ -172,19 +172,19 @@ export const EXAMENES_CATALOGO = {
     },
 
     OFTALMOLOGIA_VISION_TESTER: {
-        nombre: "OFTALMOLOGIA VISION TESTER",
+        nombre: "VISION TESTER ARCHIVO EXTERNO",
         tabla: "OFTALMOLOGIA VISION TESTER",
         nomenclatura: "OFTALMOLOGIA VISION TESTER",
     },
 
     PSICOSENSOMETRICO_CERT_ALTURA: {
-        nombre: "PSICOSENSOMETRICO CERT-ALTURA",
+        nombre: "ALTURA ARCHIVO EXTERNO",
         tabla: "PSICOSENSOMETRICO CERT-ALTURA",
         nomenclatura: "PSICOSENSOMETRICO CERT-ALTURA",
     },
 
     PSICOSENSOMETRICO_VEHI_FOLIO: {
-        nombre: "PSICOSENSOMETRICO VEHI-FOLIO",
+        nombre: "PSICOSENSOMETRICO CONDUCCION ARCHIVO EXTERNO",
         tabla: "PSICOSENSOMETRICO VEHI-FOLIO",
         nomenclatura: "PSICOSENSOMETRICO VEHI-FOLIO",
     },
@@ -480,6 +480,13 @@ export const EXAMENES_CATALOGO = {
         nombre: "TRABAJOS EN ESPECIFICOS",
         tabla: "especificos",
         url: "/api/v01/ct/trabajoEspecifico/obtenerReporteTrabajosEspecificos",
+        esJasper: true,
+    },
+
+    ALTURA1PUNTO8: {
+        nombre: "ALTURA 1.8",
+        tabla: "certificacion_medica_altura",
+        url: "/api/v01/ct/certificacionMedicinaAltura/obtenerReporteCertificacionMedicinaAltura",
         esJasper: true,
     },
 };
