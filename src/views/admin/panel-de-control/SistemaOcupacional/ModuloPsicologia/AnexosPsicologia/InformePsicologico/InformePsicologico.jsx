@@ -109,16 +109,14 @@ export default function InformePsicologico() {
 
     // Opciones predefinidas para recomendaciones
     const opcionesRecomendaciones = [
-        "Se recomienda seguimiento psicológico periódico",
-        "Mantener un ambiente laboral saludable y libre de estrés",
-        "Implementar técnicas de manejo del estrés",
-        "Fomentar la comunicación asertiva en el equipo de trabajo",
-        "Realizar pausas activas durante la jornada laboral",
-        "Promover el equilibrio entre vida laboral y personal",
-        "Capacitación en habilidades de liderazgo",
-        "Evaluación psicológica de seguimiento en 6 meses",
-        "Apoyo psicológico especializado si es necesario",
-        "Fortalecer la autoestima y confianza personal"
+        "Orientacion y consejeria psicologica",
+        "Asistir a terapia psicologica",
+        "Asistir a talleres de gestión emocional",
+        "Asistir a talleres de habilidades sociales",
+        "Asistir a talleres de autoestima y/o superacion personal",
+        "Asistir a talleres de relajacion",
+        "Realizar actividades ludicas para reforzar sus funciones cognitivas",
+        "Evaluacion psicologica anual/periodica"
     ];
 
     // Función para agregar recomendación seleccionada al campo
@@ -126,8 +124,8 @@ export default function InformePsicologico() {
         if (selectedRecomendacion) {
             const textoActual = form.recomendaciones;
             const nuevoTexto = textoActual
-                ? `${textoActual}\n• ${selectedRecomendacion}`
-                : `• ${selectedRecomendacion}`;
+                ? `${textoActual}\n- ${selectedRecomendacion.toUpperCase()}`
+                : `- ${selectedRecomendacion.toUpperCase()}`;
 
             setForm({
                 ...form,
@@ -163,7 +161,7 @@ export default function InformePsicologico() {
         promVerbalNum: "- POSEE UN NIVEL PROMEDIO EN COMPRENSION VERBAL Y EN CAPACIDAD NUMÉRICA.",
         promSupVerbalNum: "- POSEE UN NIVEL PROMEDIO SUPERIOR EN COMPRENSION VERBAL Y EN CAPACIDAD NUMÉRICA.",
         promBajoVerbalNum: "- POSEE UN NIVEL PROMEDIO BAJO EN COMPRENSION VERBAL Y EN CAPACIDAD NUMÉRICA.",
-        
+
         promSuperior: "- POSEE UN NIVEL PROMEDIO SUPERIOR EN COMPRENSION VERBAL Y EN CAPACIDAD DE CÁLCULO.",
         promedio: "- POSEE UN NIVEL PROMEDIO EN COMPRENSION VERBAL Y EN CAPACIDAD DE CÁLCULO.",
         superior: "- POSEE UN NIVEL SUPERIOR EN COMPRENSION VERBAL Y EN CAPACIDAD DE CÁLCULO.",
@@ -171,7 +169,7 @@ export default function InformePsicologico() {
 
         compInfo: "- COMPRENDE Y PROCESA LA INFORMACION SENCILLA CON FACILIDAD.",
         // compBajo: "- POSEE UN NIVEL PROMEDIO BAJO EN EL MANEJO DE FACULTADES MENTALES.",
- 
+
         adecuado: "- ADECUADA RETENCION DE DIGITOS.",
         prmBajo: "- PRESENTA UN NIVEL PROMEDIO BAJO RETENCION DE DIGITOS."
     };
@@ -510,13 +508,13 @@ export default function InformePsicologico() {
                                         name="promSupVerbalNum"
                                         checked={form.promSupVerbalNum}
                                         onChange={handleIntellectualCheckboxChange}
-                                    />       
+                                    />
                                     <InputCheckbox
                                         label="N.P.B.VERBAL Y NUMÉRICA"
                                         name="promBajoVerbalNum"
                                         checked={form.promBajoVerbalNum}
                                         onChange={handleIntellectualCheckboxChange}
-                                    />                             
+                                    />
                                 </SectionFieldset>
                                 <SectionFieldset>
                                     <InputCheckbox

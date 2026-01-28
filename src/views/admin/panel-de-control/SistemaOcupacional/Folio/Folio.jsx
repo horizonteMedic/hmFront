@@ -134,7 +134,7 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
 
 const ExamenesListOHLA = buildExamenesList([       //OHLA
     "RESUMEN_MEDICO_PODEROSA",                 // 1
-    "CERTIFICADO_APTITUD_ANEXO_16",    // 2
+    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",    // 2
     "ANEXO_16",                                // 3
     "CERTIFICADO_ALTURA",                      // 4
     "OFTALMOLOGIA_VISION_TESTER",              // 5 no se mostrara si existe  PSICOSENSOMETRICO_VEHI_FOLIO 
