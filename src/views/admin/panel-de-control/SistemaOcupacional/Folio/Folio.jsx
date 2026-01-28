@@ -27,7 +27,9 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "ANEXO_16A",
+    "PSICOSENSOMETRICO_CERT_ALTURA",
+    "PSICOSENSOMETRICO_VEHI_FOLIO",
+    "OFTALMOLOGIA_VISION_TESTER"
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -68,6 +70,7 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "PSICOSENSOMETRICO_CERT_ALTURA",        //revisar
     "CERTIFICADO_APTITUD_ALTURA_PODEROSA",
     "CERTIFICADO_VEHICULOS",
+    "PSICOSENSOMETRICO_VEHI_FOLIO",
     "FICHA_SAS",
     "LICENCIA_CONDUCIR_PODEROSA",
     "HOJA_DE_CONSULTA_EXTERNA",
@@ -303,7 +306,7 @@ const ExamenesListOHLA3 = buildExamenesList([       //OHLA 3
 ]);
 
 const ListaPorPlantilla = {
-    PRUEBAS: ExamenesListPRUEBAS,
+    //PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     "COMPLETO": ExamenesListCOMPLETO,
     OHLA: ExamenesListOHLA,
