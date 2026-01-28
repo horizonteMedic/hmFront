@@ -64,8 +64,8 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
 
     "ANEXO_16A",                     // 6
     "CERTIFICADO_ALTURA",
-    "PSICOSENSOMETRICO_CERT_ALTURA",        //revisar
     "CERTIFICADO_ALTURA_PODEROSA",          //revisar
+    "PSICOSENSOMETRICO_CERT_ALTURA",        //revisar
     "CERTIFICADO_APTITUD_ALTURA_PODEROSA",
     "CERTIFICADO_VEHICULOS",
     "FICHA_SAS",
@@ -98,6 +98,7 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "RADIOGRAFIA_COLUMNA_ARCHIVO",   // 18
     "RADIOGRAFIA_COLUMNA_ARCHIVO2",  // 19
     "ELECTROCARDIOGRAMA",            // 20
+    "ELECTROCARDIOGRAMA_ARCHIVO",
     "ESPIROMETRIA_ARCHIVO",          // 21
     "AUDIOMETRIA_OHLA",              // 22
     "FICHA_AUDIOMETRIA",
@@ -153,10 +154,11 @@ const ExamenesListOHLA = buildExamenesList([       //OHLA
     "PERFIL_HEPATICO",                         // 19
     "CONSENT_PANEL_5D",                        // 20
     "OIT",                                     // 21
-    "RAYOS_X_TORAX_ARCHIVO",                   // 22
-    "RADIOGRAFIA_COLUMNA",                     // 23
-    "RADIOGRAFIA_COLUMNA_ARCHIVO",             // 24
-    "RADIOGRAFIA_COLUMNA_ARCHIVO2",             // 24
+    "RADIOGRAFIA_TORAX",             // 15
+    "RAYOS_X_TORAX_ARCHIVO",         // 16
+    "RADIOGRAFIA_COLUMNA",           // 17
+    "RADIOGRAFIA_COLUMNA_ARCHIVO",   // 18
+    "RADIOGRAFIA_COLUMNA_ARCHIVO2",  // 19
     "ELECTROCARDIOGRAMA",                      // 25
     "ESPIROMETRIA_ARCHIVO",                    // 26
     "AUDIOMETRIA_OHLA",                        // 27
@@ -195,10 +197,11 @@ const ExamenesListOHLA1 = buildExamenesList([       //OHLA 1
     "GONADOTROPINA",
     "CONSENT_PANEL_5D",
     "OIT",
-    "RAYOS_X_TORAX_ARCHIVO",
-    "RADIOGRAFIA_COLUMNA",
-    "RADIOGRAFIA_COLUMNA_ARCHIVO",
-    "RADIOGRAFIA_COLUMNA_ARCHIVO2",
+    "RADIOGRAFIA_TORAX",             // 15
+    "RAYOS_X_TORAX_ARCHIVO",         // 16
+    "RADIOGRAFIA_COLUMNA",           // 17
+    "RADIOGRAFIA_COLUMNA_ARCHIVO",   // 18
+    "RADIOGRAFIA_COLUMNA_ARCHIVO2",  // 19
     "ELECTROCARDIOGRAMA",
     "ELECTROCARDIOGRAMA_ARCHIVO",
     "ESPIROMETRIA_ARCHIVO",
@@ -237,7 +240,11 @@ const ExamenesListOHLA2 = buildExamenesList([       //OHLA 2
     "GONADOTROPINA",
     "CONSENT_PANEL_5D",
     "OIT",
-    "RAYOS_X_TORAX_ARCHIVO",
+    "RADIOGRAFIA_TORAX",             // 15
+    "RAYOS_X_TORAX_ARCHIVO",         // 16
+    "RADIOGRAFIA_COLUMNA",           // 17
+    "RADIOGRAFIA_COLUMNA_ARCHIVO",   // 18
+    "RADIOGRAFIA_COLUMNA_ARCHIVO2",  // 19
     "ELECTROCARDIOGRAMA",
     "ELECTROCARDIOGRAMA_ARCHIVO",
     "ESPIROMETRIA_ARCHIVO",
@@ -275,7 +282,11 @@ const ExamenesListOHLA3 = buildExamenesList([       //OHLA 3
     "GONADOTROPINA",
     "CONSENT_PANEL_5D",
     "OIT",
-    "RAYOS_X_TORAX_ARCHIVO",
+    "RADIOGRAFIA_TORAX",             // 15
+    "RAYOS_X_TORAX_ARCHIVO",         // 16
+    "RADIOGRAFIA_COLUMNA",           // 17
+    "RADIOGRAFIA_COLUMNA_ARCHIVO",   // 18
+    "RADIOGRAFIA_COLUMNA_ARCHIVO2",  // 19
     "ELECTROCARDIOGRAMA",
     "ELECTROCARDIOGRAMA_ARCHIVO",
     "ESPIROMETRIA_ARCHIVO",
@@ -601,7 +612,7 @@ const Folio = () => {
                         ))}
                     </select>
                 </div>
-                <div className="w-full flex justify-between items-center px-2">
+                <div className="w-full flex  justify-between items-center px-2">
                     <div className="flex items-center gap-2">
                         <input
                             type="checkbox"
@@ -615,8 +626,16 @@ const Folio = () => {
                             Exámenes Pasados Por el Paciente
                         </label>
                     </div>
-                    <div className="text-sm font-bold text-gray-700 bg-gray-100 px-3 py-1 rounded-full">
-                        Exámenes a imprimir: <span className="text-blue-600 ml-1">{form.listaExamenes?.filter(e => e.imprimir).length || 0}</span>
+                    <div className="flex items-center gap-2">
+                        <div className="text-sm font-bold text-red-700 bg-red-100 px-3 py-1 rounded-full">
+                            No pasados: <span className="text-red-600 ml-1">{form.listaExamenes?.filter(e => !e.resultado).length || 0}</span>
+                        </div>
+                        <div className="text-sm font-bold text-green-700 bg-green-100 px-3 py-1 rounded-full">
+                            Pasados: <span className="text-green-600 ml-1">{form.listaExamenes?.filter(e => e.resultado).length || 0}</span>
+                        </div>
+                        <div className="text-sm font-bold text-gray-700 bg-gray-100 px-3 py-1 rounded-full">
+                            Exámenes a imprimir: <span className="text-blue-600 ml-1">{form.listaExamenes?.filter(e => e.imprimir).length || 0}</span>
+                        </div>
                     </div>
                 </div>
             </SectionFieldset>
