@@ -70,6 +70,7 @@ import Aptitud_medico_ocupacional_11 from "../Ficha_Anexo16/Aptitud_medico_ocupa
 // import Audiometria2021_Digitalizado from "../Audiometria/LegacyAudiometria/Audiometria2021-_Digitalizado";
 import Audiometria2021BORO from "../Audiometria/LegacyAudiometria/Audiometria2021-_Digitalizado_boro";
 import Audiometria2021 from "../Audiometria/LegacyAudiometria/Audiometria2021-_Digitalizado";
+import Anexo16ABoro_Digitalizado from "../Anexo16A/Anexo16ABoro_Digitalizado";
 
 
 export const reportesMap = {
@@ -80,7 +81,10 @@ export const reportesMap = {
 
    anexo7c: Anexo7C_Antiguo,
 
-   anexo16a: Anexo16A_Digitalizado,
+   anexo16a: {
+      Anexo16A_Digitalizado,
+      Anexo16ABoro_Digitalizado
+   },
 
    antecedentes_patologicos: {
       ficha_antecedente_patologico_Digitalizado,

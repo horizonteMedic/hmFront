@@ -106,12 +106,13 @@ export default async function FichaAudiologica_Digitalizado(data = {}) {
     oi1_8000: 95,
   };
 
-  const obtener = (name) => {
-    return data[name] || "";
-  };
-  const obtenerNumero = (name) => {
-    return data[name] || 0;
-  };
+  // Funciones auxiliares para obtener datos (actualmente no se usan, se usan datos de prueba)
+  // const obtener = (name) => {
+  //   return data[name] || "";
+  // };
+  // const obtenerNumero = (name) => {
+  //   return data[name] || 0;
+  // };
 
   // const datos = {
   //   norden: obtener("norden"),
@@ -456,22 +457,35 @@ export default async function FichaAudiologica_Digitalizado(data = {}) {
   if (datos.otros) doc.text("X", xSintSI, ySint);
   else doc.text("X", xSintNO, ySint);
 
-  // Mostrar texto descriptivo de "Otros" si está marcado
+  // Calcular altura dinámica para el texto de "Otros" si está marcado
+  let alturaOtrosTexto = 0;
+  let yOtrosTexto = margin + 117.2;
+  const xOtrosTexto = margin + 108;
+  const anchoMaximoOtros = 171;
+
   if (datos.otros && datos.OtrosTexto) {
-    const xOtrosTexto = margin + 108;
-    const yOtrosTexto = margin + 117.2;
     doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(
-      String(datos.OtrosTexto),
-      xOtrosTexto,
-      yOtrosTexto,
-      { maxWidth: 171 }
-    );
+    const textoOtros = String(datos.OtrosTexto);
+    
+    // Calcular cuántas líneas necesitará el texto
+    const lineasOtros = doc.splitTextToSize(textoOtros, anchoMaximoOtros);
+    const alturaPorLinea = 3.5; // Altura aproximada por línea en mm
+    
+    // Calcular altura adicional si hay más de una línea
+    if (lineasOtros.length > 1) {
+      alturaOtrosTexto = (lineasOtros.length - 1) * alturaPorLinea;
+    }
+    
+    // Dibujar el texto con múltiples líneas
+    lineasOtros.forEach((linea, index) => {
+      doc.text(linea, xOtrosTexto, yOtrosTexto + (index * alturaPorLinea));
+    });
   }
 
   // === OTOSCOPIA ===
+  // Ajustar posición de otoscopia según la altura del texto de "Otros"
   const xOtoscopia = margin + 23;
-  const yOtoscopia = margin + 122.5;
+  const yOtoscopia = margin + 122.5 + alturaOtrosTexto;
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(
     String(
@@ -888,10 +902,6 @@ export default async function FichaAudiologica_Digitalizado(data = {}) {
   });
 
   // 4) Imprimir automáticamente
-  // Dibujar el footer
-  if (typeof footerFichaAudiologica === 'function') {
-    footerFichaAudiologica(doc);
-  }
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
   const iframe = document.createElement("iframe");
