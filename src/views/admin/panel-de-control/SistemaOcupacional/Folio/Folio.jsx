@@ -305,7 +305,6 @@ const ExamenesListOHLA3 = buildExamenesList([       //OHLA 3
 ]);
 
 const ListaPorPlantilla = {
-    PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     "COMPLETO": ExamenesListCOMPLETO,
     OHLA: ExamenesListOHLA,
