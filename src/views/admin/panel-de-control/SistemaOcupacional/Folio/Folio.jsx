@@ -27,7 +27,7 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "ALTURA1PUNTO8",
+    "ACIDO_URICO",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -304,7 +304,48 @@ const ExamenesListOHLA3 = buildExamenesList([       //OHLA 3
     "INTERCONSULTAS"
 ]);
 
+const ExamenesListPsicologia = buildExamenesList([
+    "cuestionario_berlin",
+    "HEMOGRAMA_AUTO",
+    "psicologia_espacios_confinados",
+    "ficha_psicologica_anexo03",
+    "informe_psicologico_estres",
+    "evaluacion_psicologica_poderosa",
+    "ficha_psicologica_anexo02",
+    "fobias",
+
+    "informe_psicolaboral",
+
+    "especificos",
+
+    "psicologiafobias",
+
+    "informe_psicologico",
+
+    "exam_complementarios",
+
+    "certificacion_medica_altura",
+
+    "calidad_sueño"
+]);
+
+const ExamenesListLaboratorio = buildExamenesList([
+    "lgonadotropina",
+    "lab_clinico",
+    "toxicologia",
+    "perfil_hepatico",
+    "analisis_bioquimicos",
+    "l_bioquimica",
+    "consent_marihuana",
+    "consent_Muestra_Sangre",
+    "con_panel2D",
+    "con_panel5D",
+    "HEMOGRAMA_AUTO",
+    "ACIDO_URICO"
+]);
+
 const ListaPorPlantilla = {
+    PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     "COMPLETO": ExamenesListCOMPLETO,
     OHLA: ExamenesListOHLA,

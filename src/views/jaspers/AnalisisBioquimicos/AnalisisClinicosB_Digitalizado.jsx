@@ -173,8 +173,8 @@ const drawPatientData = (doc, datos = {}) => {
   return yPos;
 };
 
-export default async function AnalisisClinicosB_Digitalizado(datos = {}) {
-  const doc = new jsPDF();
+export default async function AnalisisClinicosB_Digitalizado(datos = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
@@ -199,7 +199,7 @@ export default async function AnalisisClinicosB_Digitalizado(datos = {}) {
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
 
-  Promise.all([
+  await Promise.all([
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
@@ -298,15 +298,24 @@ export default async function AnalisisClinicosB_Digitalizado(datos = {}) {
     footerTR(doc, datos);
 
     // === Imprimir ===
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = pdfUrl;
-    document.body.appendChild(iframe);
-    iframe.onload = () => {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
+    if (!docExistente) {
+      Imprimir(doc);
+    } else {
+      return doc
+    }
+
   });
+}
+
+function Imprimir(doc) {
+  const pdfBlob = doc.output("blob");
+  const pdfUrl = URL.createObjectURL(pdfBlob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = pdfUrl;
+  document.body.appendChild(iframe);
+  iframe.onload = () => {
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+  };
 }

@@ -210,6 +210,20 @@ export const EXAMENES_CATALOGO = {
     /* =========================
        LABORATORIO
     ========================= */
+    HEMOGRAMA_AUTO: {
+        nombre: "HEMOGRAMA",
+        tabla: "hemograma_autom",
+        url: "/api/v01/ct/laboratorio/obtenerReporteLabHematograma",
+        esJasper: true,
+    },
+
+    ACIDO_URICO: {
+        nombre: "ACIDO URICO",
+        tabla: "ac_bioquimicos2022",
+        url: "/api/v01/ct/analisisBioquimico/obtenerReporteAcidoUrico",
+        esJasper: true,
+    },
+
     GONADOTROPINA: {
         nombre: "INMUNOLOGIA - GENODOTROPINA",
         tabla: "lgonadotropina",
@@ -489,6 +503,15 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/certificacionMedicinaAltura/obtenerReporteCertificacionMedicinaAltura",
         esJasper: true,
     },
+
+    CALIDADSUEÑO: {
+        nombre: "CALIDAD DE SUEÑO",
+        tabla: "calidad_sueño",
+        url: "/api/v01/ct/cuestionarioCalidadSueno/obtenerReporteCalidadSueno",
+        esJasper: true,
+    },
+
+
 };
 
 
