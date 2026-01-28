@@ -306,6 +306,7 @@ const Folio = () => {
     const today = getToday();
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
     const [selectedListType, setSelectedListType] = useState("OHLA");
+    const [showOnlyPassed, setShowOnlyPassed] = useState(false);
     const initialFormState = {
         norden: "",
         codigoInforme: null,
@@ -600,30 +601,52 @@ const Folio = () => {
                         ))}
                     </select>
                 </div>
+                <div className="w-full flex justify-between items-center px-2">
+                    <div className="flex items-center gap-2">
+                        <input
+                            type="checkbox"
+                            id="showPassed"
+                            checked={showOnlyPassed}
+                            onChange={(e) => setShowOnlyPassed(e.target.checked)}
+                            disabled={!form.nombres}
+                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        />
+                        <label htmlFor="showPassed" className={`text-sm font-medium ${!form.nombres ? 'text-gray-400' : 'text-gray-700'} cursor-pointer select-none`}>
+                            Exámenes Pasados Por el Paciente
+                        </label>
+                    </div>
+                    <div className="text-sm font-bold text-gray-700 bg-gray-100 px-3 py-1 rounded-full">
+                        Exámenes a imprimir: <span className="text-blue-600 ml-1">{form.listaExamenes?.filter(e => e.imprimir).length || 0}</span>
+                    </div>
+                </div>
             </SectionFieldset>
 
             {/* ===== SECCIÓN: EXAMENES ===== */}
             <SectionFieldset legend="Examenes" className="flex flex-col justify-center items-center w-full">
+
                 <div className="columns-1 sm:columns-2 lg:columns-4 gap-4 w-full">
-                    {form.listaExamenes?.map((examen, index) => (
-                        <div key={index} className="break-inside-avoid mb-4 flex justify-between items-center border p-3 rounded-md shadow-sm bg-white gap-2 h-24">
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    checked={examen.imprimir || false}
-                                    onChange={() => toggleExamen(index)}
-                                    disabled={!examen.resultado}
-                                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-                                />
-                                <span className="font-medium text-gray-700 text-sm whitespace-normal break-words max-w-[150px] cursor-pointer line-clamp-3" onClick={() => toggleExamen(index)}>
-                                    {index + 1}.- {examen.nombre}
+                    {form.listaExamenes?.map((examen, index) => {
+                        if (showOnlyPassed && !examen.resultado) return null;
+                        return (
+                            <div key={index} className="break-inside-avoid mb-4 flex justify-between items-center border p-3 rounded-md shadow-sm bg-white gap-2 h-24">
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={examen.imprimir || false}
+                                        onChange={() => toggleExamen(index)}
+                                        disabled={!examen.resultado}
+                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                                    />
+                                    <span className="font-medium text-gray-700 text-sm whitespace-normal break-words max-w-[150px] cursor-pointer line-clamp-3" onClick={() => toggleExamen(index)}>
+                                        {index + 1}.- {examen.nombre}
+                                    </span>
+                                </div>
+                                <span className={`font-bold text-sm ${examen.resultado ? 'text-green-600' : 'text-red-600'}`}>
+                                    {examen.resultado ? 'PASO' : 'NO PASO'}
                                 </span>
                             </div>
-                            <span className={`font-bold text-sm ${examen.resultado ? 'text-green-600' : 'text-red-600'}`}>
-                                {examen.resultado ? 'PASO' : 'NO PASO'}
-                            </span>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
                 <div className="flex justify-center items-center w-full gap-4">
                     <button
