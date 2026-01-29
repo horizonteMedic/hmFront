@@ -918,6 +918,7 @@ export const GetInfoServicio = (
               data.contador++;
             }
           }
+          data.notasDoctor = res.notasDoctor ?? "";
           console.log("DATAAA", data);
           set((prev) => ({ ...prev, ...data }));
         }
@@ -1777,6 +1778,8 @@ export const GetInfoServicioEditar = (
           data.quimicos = res.quimicosAnexo7c_quimicos ?? false;
           data.electricos = res.electricosAnexo7c_electricos ?? false;
           data.vibraciones = res.vibracionesAnexo7c_vibraciones ?? false;
+
+          data.notasDoctor = res.notasDoctor ?? "";
 
           data = MapearDatosAdicionales(res, data, 1, true);
 

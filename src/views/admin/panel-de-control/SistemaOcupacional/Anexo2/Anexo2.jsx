@@ -298,7 +298,9 @@ export default function Anexo2() {
     perimetroToraxico: "",
     oftalmologia: "",
 
-  // Médico que Certifica //BUSCADOR
+    notasDoctor: "",
+
+    // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
   };

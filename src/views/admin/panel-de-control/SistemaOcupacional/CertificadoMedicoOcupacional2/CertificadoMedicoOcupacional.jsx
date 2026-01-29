@@ -1,12 +1,13 @@
-import { 
-    Valores, 
-    VerifyTR, 
-    SubmitDataService, 
+import {
+    PrintHojaR,
+    SubmitDataService,
+    Valores,
+    VerifyTR,
 } from "./controllerCertificadoMedicoOcupacional.jsx";
 
 import { InputTextOneLine, InputTextArea } from "../../../../../views/components/reusableComponents/ResusableComponents.jsx";
 import SectionFieldset from "../../../../../views/components/reusableComponents/SectionFieldset.jsx";
-import { useForm } from "../../../../hooks/useForm.js"; 
+import { useForm } from "../../../../hooks/useForm.js";
 import { useSessionData } from "../../../../hooks/useSessionData.js";
 import { getToday } from "../../../../utils/helpers.js";
 import { BotonesAccion, DatosPersonalesLaborales } from "../../../../components/templates/Templates";
@@ -39,8 +40,8 @@ export default function CertificadoMedicoOcupacional2() {
         ocupacion: "",
         cargoDesempenar: "",
         apto: "APTO",
+        conclusionesOpciones:"",
         conclusiones: "",
-        observaciones: "",
 
         nombre_medico: userName,
         user_medicoFirma: userlogued,
@@ -52,12 +53,12 @@ export default function CertificadoMedicoOcupacional2() {
         handleChange,
         handleChangeNumberDecimals,
         handleChangeSimple,
+        handleRadioButton,
         handleClear,
         handleClearnotO,
         handlePrintDefault
     } = useForm(initialFormState);
 
-    // Handlers adicionales
     const handleSearch = (e) => {
         if (e.key === "Enter") {
             handleClearnotO();
@@ -65,30 +66,22 @@ export default function CertificadoMedicoOcupacional2() {
         }
     };
 
+    const handleSave = () => {
+        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
 
-const handleSave = () => {
-    // Descomentado para que guarde en la BD
-    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
-};
-
-const handlePrint = () => {
+    const handlePrint = () => {
         handlePrintDefault(() => {
             PrintHojaR(form.norden, token, tabla, datosFooter);
         });
     };
 
-    const handleRadioButton = (e) => {
-        handleChangeSimple({ target: { name: "apto", value: e.target.value } });
-    };
-
     const handleRadioButton2 = (e, valor) => {
-
         const textoFinal = generarConclusiones(form, Valores, valor);
-
         setForm((prev) => ({
             ...prev,
             // conclusiones: valor,
-            observaciones: textoFinal,
+            conclusiones: textoFinal,
         }));
     };
 
@@ -163,7 +156,7 @@ const handlePrint = () => {
                             value={form?.nombreExamen}
                             labelWidth="120px"
                             onChange={handleChangeSimple}
-                        />                        
+                        />
                         <InputTextOneLine
                             label="Hora"
                             name="hora"
@@ -207,8 +200,8 @@ const handlePrint = () => {
                             </div>
 
                             <InputsRadioGroup
-                                name="conclusiones"
-                                value={form.conclusiones}
+                                name="conclusionesOpciones"
+                                value={form.conclusionesOpciones}
                                 onChange={(e, valor) => handleRadioButton2(e, valor)}
                                 vertical
                                 options={[
@@ -230,8 +223,8 @@ const handlePrint = () => {
 
                         <SectionFieldset legend="Exámenes / Observaciones">
                             <InputTextArea
-                                name="observaciones"
-                                value={form.observaciones}
+                                name="conclusiones"
+                                value={form.conclusiones}
                                 onChange={handleChangeSimple}
                                 rows={12}
                                 className="w-full h-full"
@@ -294,7 +287,7 @@ const handlePrint = () => {
                                 <InputTextOneLine label="V.Clrs" name="vcOftalmologia_vc" value={form?.vcOftalmologia_vc} disabled labelWidth="40px" />
                                 <InputTextOneLine label="V.B." name="vbOftalmologia_vb" value={form?.vbOftalmologia_vb} disabled labelWidth="40px" />
                                 <InputTextOneLine label="R.P." name="rpOftalmologia_rp" value={form?.rpOftalmologia_rp} disabled labelWidth="40px" />
-                                <InputTextArea label="Enfermedades Oculares" rows={2} name="enfermedadesOcularesOftalmologia_e_oculares" value={form?.enfermedadesOcularesOftalmologia_e_oculares} disabled className="text-[10px]" />
+                                <InputTextArea label="Enfermedades Oculares" rows={8} name="enfermedadesOcularesOftalmologia_e_oculares" value={form?.enfermedadesOcularesOftalmologia_e_oculares} disabled className="text-[10px]" />
                             </div>
                         </div>
                     </SectionFieldset>

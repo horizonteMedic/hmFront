@@ -17,10 +17,10 @@ import Swal from "sweetalert2";
 import Abdomen from "./Abdomen/Abdomen";
 
 const tabla = "anexo7c";
-const today = getToday();
 
 export default function Anexo16() {
-  const { token, userlogued, selectedSede, datosFooter, userName} =
+  const today = getToday();
+  const { token, userlogued, selectedSede, datosFooter, userName } =
     useSessionData();
 
   const initialFormState = {
@@ -315,6 +315,8 @@ export default function Anexo16() {
     hdlRed: "",
     vldlRed: "",
     trigliceridosRed: "",
+
+    notasDoctor: "",
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,

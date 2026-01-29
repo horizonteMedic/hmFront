@@ -1,11 +1,12 @@
-import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
-import { GetInfoServicioDefault
-        , PrintHojaRDefault 
-} from "../../../../utils/functionUtils";
-import { getHoraActual } from "../../../../utils/helpers";
+import Swal from "sweetalert2";
+import { GetInfoServicioDefault, PrintHojaRDefault, SubmitDataServiceDefault, VerifyTRPerzonalizadoDefault } from "../../../../utils/functionUtils";
+import { getHoraActual, getToday } from "../../../../utils/helpers";
 
-const obtenerReporteUrl = "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoInformado";
-const registrarUrl = "/api/v01/ct/anexos/anexo16/registrarActualizarConsentimientoInformado";
+const obtenerReporteUrl =
+    "/api/v01/ct/certificadoAptitudMedicoOcupacional/obtenerReporteCertificadoMedicoOcupacional";
+const registrarUrl =
+    "/api/v01/ct/certificadoAptitudMedicoOcupacional/registrarActualizarCertificadoAptitudMedicoOcupacional";
+const today = getToday();
 
 export const GetInfoServicio = async (
     nro,
@@ -21,39 +22,27 @@ export const GetInfoServicio = async (
         obtenerReporteUrl,
         onFinish
     );
-    console.log(res)
     if (res) {
-        console.log(res)
         set((prev) => ({
             ...prev,
             ...res,
-            norden: res.norden ?? "",
+            nombres: `${res.nombrePaciente} ${res.apellidoPaciente}`,
+            sexo: `${res.sexoPaciente === "F" ? "FEMENINO" : "MASCULINO"}`,
+            dniPaciente: res.dniPaciente ?? "",
+            edadPaciente: res.edadPaciente,
             nombreExamen: res.nombreExamen,
-
-             nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
-             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-             lugarNacimiento: res.lugarNacimiento ?? "",
-             dniPaciente: res.dniPaciente,
-
-             edad: res.edadPaciente ?? "",
-             sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
-             estadoCivil: res.estadoCivil ?? "",
-             nivelEstudios: res.nivelEstudio ?? "",
-             // Datos Laborales
-             empresa: res.empresa ?? "",
-             contrata: res.contrata ?? "",
-             ocupacion: res.areaPaciente ?? "",
-             cargoDesempenar: res.cargoPaciente ?? "",
+            empresa: res.empresa,
+            contrata: res.contrata,
+            cargoPaciente: res.cargoPaciente,
+            ocupacionPaciente: res.ocupacionPaciente,
             apto: "APTO",
             fechaExamen: `${res.fechaExamen ? res.fechaExamen : today}`,
             fechaDesde: `${res.fechaDesde ? res.fechaDesde : today}`,
-            fechahasta: `${res.fechahasta ? res.fechahasta : today}`,
-
-            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
-
+            fechahasta: `${res.fechahasta ? res.fechahasta : today}`
         }));
     }
 };
+
 export const GetInfoServicioEditar = async (
     nro,
     tabla,
@@ -86,6 +75,38 @@ export const GetInfoServicioEditar = async (
 };
 
 
+export const VerifyTR = async (nro, tabla, token, set, sede) => {
+    VerifyTRPerzonalizadoDefault(
+        nro,
+        tabla,
+        token,
+        set,
+        sede,
+        () => {
+            //NO Tiene registro
+            GetInfoServicio(nro, tabla, set, token, () => { Swal.close(); });
+        },
+        () => {
+            //Tiene registro
+            GetInfoServicioEditar(nro, tabla, set, token, () => {
+                Swal.fire(
+                    "Alerta",
+                    "Este paciente ya cuenta con registros de Altura 1.8",
+                    "warning"
+                );
+            });
+        },
+        () => {
+            //Necesita
+            Swal.fire(
+                "Alerta",
+                "El paciente necesita pasar por Triaje.",
+                "warning"
+            );
+        }
+    );
+};
+
 
 export const SubmitDataService = async (
     form,
@@ -110,16 +131,18 @@ export const SubmitDataService = async (
         "horaSalida": getHoraActual(),
         "fechaHasta": form.fechahasta,
         "conclusiones": form.conclusiones,
-        userRegistro: user,
         usuarioFirma: form.user_medicoFirma,
+        "usuarioRegistro": user
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
         PrintHojaR(form.norden, token, tabla, datosFooter);
     });
 };
+
+
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformePsicoBrigadista/*.jsx");
+    const jasperModules = import.meta.glob("../../../../jaspers/CertificadoMedicoOcupacional/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -127,9 +150,10 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../../jaspers/ModuloPsicologia/InformePsicoBrigadista"
+        "../../../../jaspers/CertificadoMedicoOcupacional"
     );
 };
+
 export const Valores = {
     CHECK1: `- LABORATORIO: Hb / Hto, Grupo Sanguíneo y Factor ({grupoFactor}), Glucosa, Ex. orina, 
 - APTITUD

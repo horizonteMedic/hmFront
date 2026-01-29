@@ -401,12 +401,6 @@ export const SubmitDataService = async (
     });
 };
 
-export const GetInfoServicioTabla = (nro, tabla, set, token) => {
-    GetInfoServicio(nro, tabla, set, token, () => {
-        Swal.close();
-    });
-};
-
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     const jasperModules = import.meta.glob("../../../../jaspers/CertificadoAlturaPoderosa/*.jsx");
     PrintHojaRDefault(
