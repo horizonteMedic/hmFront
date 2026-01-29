@@ -12,8 +12,8 @@ import { getToday } from "../../../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerEvaluacionPsicologicaPoderosa";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
-const tabla = "evaluacion_psicologica_poderosa"
-const today = getToday();
+import Swal from "sweetalert2";
+import { useEffect, useState } from "react";
 
 // Áreas de Evaluación: Inteligencia
 const inteligenciaItems = [
@@ -45,6 +45,10 @@ const evalOptions = [
 ];
 
 export default function EvaluacionPsicologicaPoderosa() {
+    const today = getToday();
+    const [tabla, setTabla] = useState("evaluacion_psicologica_poderosa_normal");
+    const [tipoInforme, setTipoInforme] = useState({ tipoInforme: "NORMAL" })
+
     const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
     const initialFormState = {
@@ -53,7 +57,7 @@ export default function EvaluacionPsicologicaPoderosa() {
         codigoEvaluacionPsicologicaPoderosa: null,
         fechaExam: today,
         nombreExamen: "",
-        tipoInforme: "NORMAL",
+        // tipoInforme: "NORMAL",
         aptitud: "",
 
         // Datos personales
@@ -99,7 +103,7 @@ export default function EvaluacionPsicologicaPoderosa() {
 
         nombre_medico: userName,
         user_medicoFirma: userlogued,
-        
+
     };
 
     const {
@@ -114,8 +118,25 @@ export default function EvaluacionPsicologicaPoderosa() {
         handleRadioButton,
     } = useForm(initialFormState, { storageKey: "EvaluacionPsicologicaPoderosa" });
 
+    const handleRadioButtonTipoInforme = (e, value) => {
+        const { name } = e.target;
+        setTipoInforme((f) => ({
+            ...f,
+            [name]: value.toUpperCase(),
+        }));
+    };
+
+    useEffect(() => {
+        const value = tipoInforme.tipoInforme;
+        setTabla(
+            value == "NORMAL" ? "evaluacion_psicologica_poderosa_normal" :
+                value == "LICENCIA" ? "evaluacion_psicologica_poderosa_licencia" :
+                    value == "T. EN CALIENTE" ? "evaluacion_psicologica_poderosa_caliente" : "evaluacion_psicologica_poderosa_normal")
+        handleClearnotO();
+    }, [tipoInforme.tipoInforme])
+
     const handleSave = () => {
-        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        SubmitDataService({ ...form, ...tipoInforme }, token, userlogued, handleClear, tabla, datosFooter);
     };
 
     const handleSearch = (e) => {
@@ -161,14 +182,14 @@ export default function EvaluacionPsicologicaPoderosa() {
                 <InputsRadioGroup
                     label="Tipo Informe"
                     name="tipoInforme"
-                    value={form.tipoInforme}
+                    value={tipoInforme.tipoInforme}
                     labelWidth="120px"
                     options={[
                         { label: "NORMAL", value: "NORMAL" },
                         { label: "LICENCIA", value: "LICENCIA" },
                         { label: "T. EN CALIENTE", value: "T. EN CALIENTE" },
                     ]}
-                    onChange={handleRadioButton}
+                    onChange={handleRadioButtonTipoInforme}
                 />
                 <InputsRadioGroup
                     label="Aptitud"
