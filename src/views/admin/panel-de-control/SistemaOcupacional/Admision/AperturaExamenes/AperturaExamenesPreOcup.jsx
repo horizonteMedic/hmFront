@@ -1718,6 +1718,7 @@ const AperturaExamenesPreOcup = (props) => {
                     <th className="border border-gray-300 px-2 py-1  mb-1">Empresa</th>
                     <th className="border border-gray-300 px-2 py-1  mb-1">Contrata</th>
                     <th className="border border-gray-300 px-2 py-1  mb-1">T. Examen</th>
+                    <th className="border border-gray-300 px-2 py-1  mb-1">Laboratorio</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1736,6 +1737,7 @@ const AperturaExamenesPreOcup = (props) => {
                       <td className="border border-gray-300 px-2 py-1  mb-1">{option.razon_empresa}</td>
                       <td className="border border-gray-300 px-2 py-1  mb-1">{option.razon_contrata}</td>
                       <td className="border border-gray-300 px-2 py-1  mb-1">{option.nom_examen}</td>
+                      <td className="border border-gray-300 px-2 py-1  mb-1">{option.laboratorio ?? ""}</td>
                     </tr>
                   ))}
                 </tbody>

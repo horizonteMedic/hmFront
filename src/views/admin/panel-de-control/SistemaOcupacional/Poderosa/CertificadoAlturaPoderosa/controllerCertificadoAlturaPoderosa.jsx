@@ -1,6 +1,8 @@
 import Swal from "sweetalert2";
 import {
     GetInfoServicioDefault,
+    handleSubirArchivoDefault,
+    ReadArchivosFormDefault,
     LoadingDefault,
     PrintHojaRDefault,
     SubmitDataServiceDefault,
@@ -11,6 +13,8 @@ const obtenerReporteUrl =
     "/api/v01/ct/certificadoTrabajoAltura/obtenerReporteCertificadoTrabajoAlturaPoderosa";
 const registrarUrl =
     "/api/v01/ct/certificadoTrabajoAltura/registrarActualizarCertificadoTrabajoAlturaPoderosa";
+const registrarPDF =
+    "/api/v01/ct/archivos/archivoInterconsulta"
 
 export const GetInfoServicio = async (
     nro,
@@ -138,7 +142,8 @@ export const GetInfoServicioEditar = async (
         tabla,
         token,
         obtenerReporteUrl,
-        onFinish
+        onFinish,
+        true
     );
     if (res) {
 
@@ -301,6 +306,9 @@ export const GetInfoServicioEditar = async (
             babinskiWeil: res.babinskiPositivo_chkneuro_pos8 ?? false,
             dixHallpike: res.dixPositivo_chkneuro_pos9 ?? false,
             marcha: res.marchaPositivo_chkneuro_pos10 ?? false,
+
+            SubirDoc: true,
+            digitalizacion: res.digitalizacion,
 
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
@@ -497,3 +505,16 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
 export const Loading = (mensaje) => {
     LoadingDefault(mensaje);
 };
+
+export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
+    const coordenadas = {
+        HUELLA: { x: 400, y: 680, width: 60, height: 60 },
+        FIRMA: { x: 466, y: 680, width: 120, height: 60 },
+        SELLOFIRMA: { x: 40, y: 680, width: 120, height: 80 },
+    };
+    handleSubirArchivoDefault(form, selectedSede, registrarPDF, userlogued, token, coordenadas)
+};
+
+export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
+    ReadArchivosFormDefault(form, setVisualerOpen, token)
+}

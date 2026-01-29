@@ -100,6 +100,8 @@ export default function HematologiaBioquimicaECO() {
 
     observaciones: '',
 
+    notasDoctor: "",
+
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
@@ -341,6 +343,7 @@ export default function HematologiaBioquimicaECO() {
                 options={[{ label: "O", value: "O" }, { label: "A", value: "A" }, { label: "B", value: "B" }, { label: "AB", value: "AB" }]}
                 labelWidth="120px"
                 onChange={handleRadioButton}
+                allowUncheck
               />
               <InputsRadioGroup
                 label="Factor Rh"
@@ -350,6 +353,7 @@ export default function HematologiaBioquimicaECO() {
                 labelWidth="120px"
                 className="mb-4"
                 onChange={handleRadioButton}
+                allowUncheck
               />
               {[
                 ["Hemoglobina", "g/dl"],
@@ -696,6 +700,13 @@ export default function HematologiaBioquimicaECO() {
             label="Observaciones"
             name="observaciones"
             value={form.observaciones}
+            rows={4}
+            onChange={handleChange}
+          />
+          <InputTextArea
+            label="Notas Para Doctor"
+            name="notasDoctor"
+            value={form.notasDoctor}
             rows={4}
             onChange={handleChange}
           />

@@ -3,7 +3,7 @@ import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
-import { convertirGenero } from "../../utils/helpers.js";
+import { convertirGenero, getSign } from "../../utils/helpers.js";
 
 // Función para formatear fecha a DD/MM/YYYY
 const toDDMMYYYY = (fecha) => {
@@ -14,10 +14,9 @@ const toDDMMYYYY = (fecha) => {
   return `${dia}/${mes}/${anio}`;
 };
 
-export default async function Hematologia_Digitalizado_nuevo(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function Hematologia_Digitalizado_nuevo(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
-
   // === MAPEO DE DATOS ===
   const datosReales = {
     // Datos Personales del Paciente
@@ -324,7 +323,7 @@ export default async function Hematologia_Digitalizado_nuevo(data = {}) {
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
 
-  Promise.all([
+  await Promise.all([
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
@@ -372,7 +371,11 @@ export default async function Hematologia_Digitalizado_nuevo(data = {}) {
     footerTR(doc, { ...data, footerOffsetY: 7 });
 
     // === IMPRIMIR ===
-    imprimir(doc);
+    if (docExistente) {
+      return doc;
+    } else {
+      imprimir(doc);
+    }
   });
 }
 

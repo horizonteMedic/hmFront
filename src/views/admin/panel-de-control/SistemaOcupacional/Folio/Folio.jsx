@@ -13,6 +13,7 @@ const ExamenesListPRUEBAS2 = buildExamenesList([
     "OFTALMOLOGIA_VISION_TESTER",
     "PSICOSENSOMETRICO_VEHI_FOLIO",
 ]);
+
 const ExamenesListPRUEBASArchivos = buildExamenesList([
     "DECLARACION_USO_FIRMA_ARCHIVO",
     "ELECTROCARDIOGRAMA_ARCHIVO",
@@ -27,7 +28,8 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "ALTURA1PUNTO8",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "ELECTROCARDIOGRAMA_ARCHIVO",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -122,6 +124,7 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "INFORME_PSICOLABORAL",
     "TRABAJO_ESPECIFICOS",
     "TRABAJO_ALTURA_PSICO",
+    "CALIDADSUEÑO",
     "OFTALMOLOGIA",
     "OFTALMOLOGIA_VISION_TESTER",
     "FICHA_OFTALMOLOGICA",
@@ -304,13 +307,47 @@ const ExamenesListOHLA3 = buildExamenesList([       //OHLA 3
     "INTERCONSULTAS"
 ]);
 
+const ExamenesListPsicologia = buildExamenesList([
+    "PSICOLOGIA_ANEXO_03",
+    "PSICOLOGIA_ANEXO_02",
+    "INFORME_PSICOLOGICO",
+    "CUESTIONARIO_BERLIN",
+    "EXAMENES_COMPLEMENTARIOS",
+    "ESPACIOS_CONFINADOS_PSICOLOGIA",
+    "INFORME_PODEROSA_OPERAR",
+    "INFORME_PSICOLOGIA_FOBIAS",
+    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
+    "INFORME_PSICOLABORAL",
+    "TRABAJO_ESPECIFICOS",
+    "TRABAJO_ALTURA_PSICO",
+    "CALIDADSUEÑO"
+]);
+
+const ExamenesListLaboratorio = buildExamenesList([
+    "LABORATORIO_CLINICO",
+    "HEMOGRAMA",
+    "PERFIL_LIPIDICO",
+    "PERFIL_HEPATICO",
+    "PERFIL_RENAL",
+    "PANEL_5D",
+    "CONSENT_MUESTRA_SANGRE",
+    "GONADOTROPINA",
+    "CONSENT_PANEL_5D",
+    "CONSENT_MARIHUANA",
+    "CONSENT_PANEL_2D",
+    "CONSENT_DROGAS_BOROO",
+]);
+
 const ListaPorPlantilla = {
+    //PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     "COMPLETO": ExamenesListCOMPLETO,
     OHLA: ExamenesListOHLA,
     "OHLA ALTURA - CONDUCCION": ExamenesListOHLA1,
     "OHLA CONDUCCION": ExamenesListOHLA2,
     "OHLA SIMPLE": ExamenesListOHLA3,
+    PSICOLOGIA: ExamenesListPsicologia,
+    LABORATORIO: ExamenesListLaboratorio,
 };
 
 const Folio = () => {

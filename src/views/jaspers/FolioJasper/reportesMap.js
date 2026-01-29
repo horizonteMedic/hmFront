@@ -72,6 +72,9 @@ import Audiometria2021BORO from "../Audiometria/LegacyAudiometria/Audiometria202
 import Audiometria2021 from "../Audiometria/LegacyAudiometria/Audiometria2021-_Digitalizado";
 import Anexo16ABoro_Digitalizado from "../Anexo16A/Anexo16ABoro_Digitalizado";
 import A_CertificacionMedicaPTA_Digitalizado from "../CertificadoAlturaPoderosa/A_CertificacionMedicaPTA_Digitalizado";
+import CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado from "../ModuloPsicologia/InformePsicoCalidadSueño/CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado";
+import Hematologia_Digitalizado_nuevo from "../LaboratorioClinico/Hematologia_Digitalizado";
+import AnalisisClinicosB_Digitalizado from "../AnalisisBioquimicos/AnalisisClinicosB_Digitalizado";
 
 export const reportesMap = {
    /* =========================
@@ -148,6 +151,10 @@ export const reportesMap = {
    analisis_bioquimicos: AnalisisBioquimicos_Digitalizado,
 
    l_bioquimica: LBioquimica_Digitalizado,
+
+   hemograma_autom: Hematologia_Digitalizado_nuevo,
+
+   ac_bioquimicos2022: AnalisisClinicosB_Digitalizado,
 
    /* =========================
       CONSENTIMIENTOS
@@ -243,5 +250,5 @@ export const reportesMap = {
    exam_complementarios: InformePsicoExamComplementario,
 
    certificacion_medica_altura: A_CertificacionMedicaPTA_Digitalizado,
-
+   calidad_sueño: CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado
 };

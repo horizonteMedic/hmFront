@@ -462,6 +462,10 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
             URL.revokeObjectURL(pdfUrl);
         }, 1000);
 
+        const nombreOriginal = file.name.replace(/\.pdf$/i, "");
+        const idCorto = generarIdCorto();
+        const nombreFinal = `${nombreOriginal}-${idCorto}.pdf`;
+
         const datos = {
             rutaArchivo: null,
             dni: null,
@@ -474,7 +478,7 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
             userActualizacion: null,
             id_tipo_archivo: null,
 
-            nombreArchivo: file.name,
+            nombreArchivo: nombreFinal,
             codigoSede: selectedSede,
             fileBase64: pdfBase64Final,
             nomenclatura_tipo_archivo: form.nomenclatura,
@@ -537,6 +541,10 @@ export const handleSubirArchivoDefaultSinSellos = async (
 
         const pdfBase64Final = uint8ToBase64(pdfBytes);
 
+        const nombreOriginal = file.name.replace(/\.pdf$/i, "");
+        const idCorto = generarIdCorto();
+        const nombreFinal = `${nombreOriginal}-${idCorto}.pdf`;
+
         const datos = {
             rutaArchivo: null,
             dni: null,
@@ -549,7 +557,7 @@ export const handleSubirArchivoDefaultSinSellos = async (
             userActualizacion: null,
             id_tipo_archivo: null,
 
-            nombreArchivo: file.name,
+            nombreArchivo: nombreFinal,
             codigoSede: selectedSede,
             fileBase64: pdfBase64Final,
             nomenclatura_tipo_archivo: form.nomenclatura,
@@ -678,3 +686,9 @@ export const ReadArchivosFormDefault = async (form, setVisualerOpen, token, nome
             throw new Error('Network response was not ok.', error);
         })
 }
+
+const generarIdCorto = () => {
+    const time = Date.now().toString(36);
+    const random = Math.random().toString(36).substring(2, 6);
+    return `${time}${random}`;
+};
