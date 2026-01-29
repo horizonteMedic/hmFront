@@ -13,6 +13,7 @@ const ExamenesListPRUEBAS2 = buildExamenesList([
     "OFTALMOLOGIA_VISION_TESTER",
     "PSICOSENSOMETRICO_VEHI_FOLIO",
 ]);
+
 const ExamenesListPRUEBASArchivos = buildExamenesList([
     "DECLARACION_USO_FIRMA_ARCHIVO",
     "ELECTROCARDIOGRAMA_ARCHIVO",
@@ -27,7 +28,8 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "ACIDO_URICO",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
+    "ELECTROCARDIOGRAMA_ARCHIVO",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -122,6 +124,7 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "INFORME_PSICOLABORAL",
     "TRABAJO_ESPECIFICOS",
     "TRABAJO_ALTURA_PSICO",
+    "CALIDADSUEÑO",
     "OFTALMOLOGIA",
     "OFTALMOLOGIA_VISION_TESTER",
     "FICHA_OFTALMOLOGICA",
@@ -321,13 +324,13 @@ const ExamenesListPsicologia = buildExamenesList([
 ]);
 
 const ExamenesListLaboratorio = buildExamenesList([
-    "CONSENT_MUESTRA_SANGRE",
     "LABORATORIO_CLINICO",
     "HEMOGRAMA",
     "PERFIL_LIPIDICO",
     "PERFIL_HEPATICO",
     "PERFIL_RENAL",
     "PANEL_5D",
+    "CONSENT_MUESTRA_SANGRE",
     "GONADOTROPINA",
     "CONSENT_PANEL_5D",
     "CONSENT_MARIHUANA",
