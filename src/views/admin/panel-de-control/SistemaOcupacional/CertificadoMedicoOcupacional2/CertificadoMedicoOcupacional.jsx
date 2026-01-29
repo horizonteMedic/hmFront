@@ -1,20 +1,27 @@
+import { 
+    Valores, 
+    VerifyTR, 
+    SubmitDataService, 
+} from "./controllerCertificadoMedicoOcupacional.jsx";
+
 import { InputTextOneLine, InputTextArea } from "../../../../../views/components/reusableComponents/ResusableComponents.jsx";
 import SectionFieldset from "../../../../../views/components/reusableComponents/SectionFieldset.jsx";
-import { useForm } from "../../../../hooks/useForm.js"; // <- ruta CORRECTA
+import { useForm } from "../../../../hooks/useForm.js"; 
 import { useSessionData } from "../../../../hooks/useSessionData.js";
 import { getToday } from "../../../../utils/helpers.js";
 import { BotonesAccion, DatosPersonalesLaborales } from "../../../../components/templates/Templates";
 import InputsRadioGroup from "../../../../../views/components/reusableComponents/InputsRadioGroup.jsx";
 import EmpleadoComboBox from "../../../../../views/components/reusableComponents/EmpleadoComboBox.jsx";
-import { Valores } from "./controllerCertificadoMedicoOcupacional.jsx";
+
+const tabla = "certificado_aptitud_medico_resumen";
 
 export default function CertificadoMedicoOcupacional2() {
+    // ... resto de tu componente
     const today = getToday();
     const { token, userlogued, selectedSede, datosFooter, userName, hora } = useSessionData();
 
     const initialFormState = {
         norden: "",
-        fecha: today,
         fechaDesde: today,
         fechahasta: today,
         nombreExamen: "",
@@ -59,15 +66,15 @@ export default function CertificadoMedicoOcupacional2() {
     };
 
 
-    const handlePrint = () => {
-        handlePrintDefault(() => {
-            // PrintHojaR(form.norden, token, tabla, datosFooter);
-        });
-    };
+const handleSave = () => {
+    // Descomentado para que guarde en la BD
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+};
 
-    const handleSave = () => {
-        // SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
-        console.log("Guardando datos:", form);
+const handlePrint = () => {
+        handlePrintDefault(() => {
+            PrintHojaR(form.norden, token, tabla, datosFooter);
+        });
     };
 
     const handleRadioButton = (e) => {
@@ -151,13 +158,12 @@ export default function CertificadoMedicoOcupacional2() {
                             labelWidth="120px"
                         />
                         <InputTextOneLine
-                            label="Fecha"
-                            name="fecha"
-                            type="date"
-                            value={form.fecha}
-                            onChange={handleChangeSimple}
+                            label="Tipo de Examen"
+                            name="nombreExamen"
+                            value={form?.nombreExamen}
                             labelWidth="120px"
-                        />
+                            onChange={handleChangeSimple}
+                        />                        
                         <InputTextOneLine
                             label="Hora"
                             name="hora"
