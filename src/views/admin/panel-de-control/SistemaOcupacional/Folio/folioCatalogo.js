@@ -210,7 +210,7 @@ export const EXAMENES_CATALOGO = {
     /* =========================
        LABORATORIO
     ========================= */
-    HEMOGRAMA_AUTO: {
+    HEMOGRAMA: {
         nombre: "HEMOGRAMA",
         tabla: "hemograma_autom",
         url: "/api/v01/ct/laboratorio/obtenerReporteLabHematograma",
@@ -410,6 +410,13 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/testFatigaSomnolencia/obtenerReporteTestFatigaSomnolencia",
     },
 
+    ALTURA1PUNTO8: {
+        nombre: "ALTURA 1.8",
+        tabla: "certificacion_medica_altura",
+        url: "/api/v01/ct/certificacionMedicinaAltura/obtenerReporteCertificacionMedicinaAltura",
+        esJasper: true,
+    },
+
     /* =========================
        PSICOLOGÍA
     ========================= */
@@ -497,21 +504,12 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
-    ALTURA1PUNTO8: {
-        nombre: "ALTURA 1.8",
-        tabla: "certificacion_medica_altura",
-        url: "/api/v01/ct/certificacionMedicinaAltura/obtenerReporteCertificacionMedicinaAltura",
-        esJasper: true,
-    },
-
     CALIDADSUEÑO: {
         nombre: "CALIDAD DE SUEÑO",
         tabla: "calidad_sueño",
         url: "/api/v01/ct/cuestionarioCalidadSueno/obtenerReporteCalidadSueno",
         esJasper: true,
     },
-
-
 };
 
 

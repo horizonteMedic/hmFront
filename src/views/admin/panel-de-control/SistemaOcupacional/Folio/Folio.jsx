@@ -305,43 +305,34 @@ const ExamenesListOHLA3 = buildExamenesList([       //OHLA 3
 ]);
 
 const ExamenesListPsicologia = buildExamenesList([
-    "cuestionario_berlin",
-    "HEMOGRAMA_AUTO",
-    "psicologia_espacios_confinados",
-    "ficha_psicologica_anexo03",
-    "informe_psicologico_estres",
-    "evaluacion_psicologica_poderosa",
-    "ficha_psicologica_anexo02",
-    "fobias",
-
-    "informe_psicolaboral",
-
-    "especificos",
-
-    "psicologiafobias",
-
-    "informe_psicologico",
-
-    "exam_complementarios",
-
-    "certificacion_medica_altura",
-
-    "calidad_sueño"
+    "PSICOLOGIA_ANEXO_03",
+    "PSICOLOGIA_ANEXO_02",
+    "INFORME_PSICOLOGICO",
+    "CUESTIONARIO_BERLIN",
+    "EXAMENES_COMPLEMENTARIOS",
+    "ESPACIOS_CONFINADOS_PSICOLOGIA",
+    "INFORME_PODEROSA_OPERAR",
+    "INFORME_PSICOLOGIA_FOBIAS",
+    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
+    "INFORME_PSICOLABORAL",
+    "TRABAJO_ESPECIFICOS",
+    "TRABAJO_ALTURA_PSICO",
+    "CALIDADSUEÑO"
 ]);
 
 const ExamenesListLaboratorio = buildExamenesList([
-    "lgonadotropina",
-    "lab_clinico",
-    "toxicologia",
-    "perfil_hepatico",
-    "analisis_bioquimicos",
-    "l_bioquimica",
-    "consent_marihuana",
-    "consent_Muestra_Sangre",
-    "con_panel2D",
-    "con_panel5D",
-    "HEMOGRAMA_AUTO",
-    "ACIDO_URICO"
+    "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_CLINICO",
+    "HEMOGRAMA",
+    "PERFIL_LIPIDICO",
+    "PERFIL_HEPATICO",
+    "PERFIL_RENAL",
+    "PANEL_5D",
+    "GONADOTROPINA",
+    "CONSENT_PANEL_5D",
+    "CONSENT_MARIHUANA",
+    "CONSENT_PANEL_2D",
+    "CONSENT_DROGAS_BOROO",
 ]);
 
 const ListaPorPlantilla = {
@@ -352,6 +343,8 @@ const ListaPorPlantilla = {
     "OHLA ALTURA - CONDUCCION": ExamenesListOHLA1,
     "OHLA CONDUCCION": ExamenesListOHLA2,
     "OHLA SIMPLE": ExamenesListOHLA3,
+    PSICOLOGIA: ExamenesListPsicologia,
+    LABORATORIO: ExamenesListLaboratorio,
 };
 
 const Folio = () => {
