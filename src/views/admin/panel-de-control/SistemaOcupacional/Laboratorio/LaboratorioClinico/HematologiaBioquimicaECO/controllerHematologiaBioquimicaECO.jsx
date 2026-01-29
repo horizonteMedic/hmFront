@@ -93,6 +93,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
       marihuana: res.txtMarihuana ?? "",
       // Observaciones
       observaciones: res.txtObservacionesLb ?? "",
+      notasDoctor: res.notasDoctor ?? "",
 
       user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado,
@@ -170,6 +171,8 @@ export const SubmitDataService = async (
     userRegistro: user,
     userMedicoOcup: "",
     norden: form.norden,
+
+    notasDoctor: form.notasDoctor,
 
     usuarioFirma: form.user_medicoFirma,
     doctorAsignado: form.user_doctorAsignado,

@@ -336,8 +336,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         ? `${nro} - ${apellidos.toUpperCase()} ${nombres.toUpperCase()}.pdf`
         : `Folio_${nro}.pdf`;
 
-    descargarPdf(rasterizedBytes, nombreArchivo);
-    imprimirBytes(rasterizedBytes);
+    // descargarPdf(rasterizedBytes, nombreArchivo);
+    imprimirBytes(rasterizedBytes, nombreArchivo);
 }
 
 function descargarPdf(pdfBytes, nombreArchivo) {
@@ -357,7 +357,7 @@ function descargarPdf(pdfBytes, nombreArchivo) {
     console.log(`📥 PDF descargado: ${nombreArchivo}`);
 }
 
-function imprimirBytes(pdfBytes) {
+function imprimirBytes(pdfBytes, nombreArchivo) {
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     const url = URL.createObjectURL(blob);
 
@@ -366,7 +366,21 @@ function imprimirBytes(pdfBytes) {
     iframe.src = url;
 
     document.body.appendChild(iframe);
-    iframe.onload = () => iframe.contentWindow.print();
+    iframe.onload = () => {
+        const tituloOriginal = document.title;
+        if (nombreArchivo) {
+            document.title = nombreArchivo.replace(".pdf", "");
+        }
+
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+
+        if (nombreArchivo) {
+            setTimeout(() => {
+                document.title = tituloOriginal;
+            }, 5000);
+        }
+    };
 }
 
 async function insertarPdfEnPosicion(jsPdfDoc, pdfExternoUrl, paginaInsercion) {
