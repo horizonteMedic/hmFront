@@ -9,70 +9,132 @@ const registrarUrl =
 const today = getToday();
 
 export const GetInfoServicio = async (
+  nro,
+  tabla,
+  set,
+  token,
+  onFinish = () => {}
+) => {
+  const res = await GetInfoServicioDefault(
     nro,
     tabla,
-    set,
     token,
-    onFinish = () => { }
-) => {
-    const res = await GetInfoServicioDefault(
-        nro,
-        tabla,
-        token,
-        obtenerReporteUrl,
-        onFinish
-    );
-    if (res) {
-        set((prev) => ({
-            ...prev,
-            ...res,
-            nombres: `${res.nombrePaciente} ${res.apellidoPaciente}`,
-            sexo: `${res.sexoPaciente === "F" ? "FEMENINO" : "MASCULINO"}`,
-            dniPaciente: res.dniPaciente ?? "",
-            edadPaciente: res.edadPaciente,
-            nombreExamen: res.nombreExamen,
-            empresa: res.empresa,
-            contrata: res.contrata,
-            cargoPaciente: res.cargoPaciente,
-            ocupacionPaciente: res.ocupacionPaciente,
-            apto: "APTO",
-            fechaExamen: `${res.fechaExamen ? res.fechaExamen : today}`,
-            fechaDesde: `${res.fechaDesde ? res.fechaDesde : today}`,
-            fechahasta: `${res.fechahasta ? res.fechahasta : today}`
-        }));
-    }
+    obtenerReporteUrl,
+    onFinish
+  );
+
+  if (res) {
+    set((prev) => ({
+      ...prev,
+
+      norden: res.norden,
+      dni: res.dniPaciente,
+      nombres: `${res.nombrePaciente} ${res.apellidoPaciente}`,
+      sexo: res.sexoPaciente === "F" ? "FEMENINO" : "MASCULINO",
+
+      fechaNacimiento: res.fechaNacimientoPaciente,
+      lugarNacimiento: res.lugarNacimientoPaciente,
+      estadoCivil: res.estadoCivilPaciente,
+      nivelEstudios: res.nivelEstudioPaciente,
+      edad: res.edadPaciente,
+
+      empresa: res.empresa,
+      contrata: res.contrata,
+      ocupacion: res.areaPaciente,
+      cargoDesempenar: res.cargoPaciente,
+      nombreExamen: res.nombreExamen,
+      fechaDesde: res.fechaDesde ? res.fechaDesde : today,
+      fechahasta: res.fechahasta ? res.fechahasta : today,
+      conclusiones: res.conclusiones,
+
+      user_medicoFirma: res.usuarioFirma || prev.user_medicoFirma,
+      apto: res.apto ? "APTO": res.aptoconrestriccion ? "APTOCONRESTRICCION": "NOAPTO",
+
+      //SIN CORREGIR 
+      visionCercaSincorregirOd_v_cerca_s_od: res.visionCercaSincorregirOd_v_cerca_s_od,
+      visionLejosSincorregirOd_v_lejos_s_od: res.visionLejosSincorregirOd_v_lejos_s_od,
+      visionCercaSincorregirOi_v_cerca_s_oi: res.visionCercaSincorregirOi_v_cerca_s_oi,
+      visionLejosSincorregirOi_v_lejos_s_oi: res.visionLejosSincorregirOi_v_lejos_s_oi,
+
+      // CORREGIDA 
+      oftalodccmologia_odcc: res.oftalodccmologia_odcc,
+      odlcOftalmologia_odlc: res.odlcOftalmologia_odlc,
+      oiccoftalmologia_oicc: res.oiccoftalmologia_oicc,
+      oilcOftalmologia_oilc: res.oilcOftalmologia_oilc,
+
+      vcOftalmologia_vc: res.vcOftalmologia_vc,
+      vbOftalmologia_vb: res.vbOftalmologia_vb,
+      rpOftalmologia_rp: res.rpOftalmologia_rp,
+      enfermedadesOcularesOftalmologia_e_oculares: res.enfermedadesOcularesOftalmologia_e_oculares,
+    }));
+  }
 };
 
+
 export const GetInfoServicioEditar = async (
+  nro,
+  tabla,
+  set,
+  token,
+  onFinish = () => {}
+) => {
+  const res = await GetInfoServicioDefault(
     nro,
     tabla,
-    set,
     token,
-    onFinish = () => { }
-) => {
-    const res = await GetInfoServicioDefault(
-        nro,
-        tabla,
-        token,
-        obtenerReporteUrl,
-        onFinish
-    );
-    if (res) {
-        console.log(res)
-        set((prev) => ({
-            ...prev,
-            ...res,
-            // Header
-            nombres: `${res.nombrePaciente} ${res.apellidoPaciente}`,
-            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
-            sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
-            PA: `${res.sistolica}/${res.diastolica}`,
-            edadPaciente: res.edadPaciente,
-            dniUser: res.dniUsuario,
-            apto: res.apto ? "APTO" : res.aptoconrestriccion ? "APTOCONRESTRICCION" : "NOAPTO"
-        }));
-    }
+    obtenerReporteUrl,
+    onFinish
+  );
+
+  if (res) {
+    set((prev) => ({
+      ...prev,
+
+      norden: res.norden,
+      dni: res.dniPaciente,
+      nombres: `${res.nombrePaciente} ${res.apellidoPaciente}`,
+      sexo: res.sexoPaciente === "F" ? "FEMENINO" : "MASCULINO",
+
+      fechaNacimiento: res.fechaNacimientoPaciente,
+      lugarNacimiento: res.lugarNacimientoPaciente,
+      estadoCivil: res.estadoCivilPaciente,
+      nivelEstudios: res.nivelEstudioPaciente,
+      edad: res.edadPaciente,
+
+      empresa: res.empresa,
+      contrata: res.contrata,
+      ocupacion: res.areaPaciente,
+      cargoDesempenar: res.cargoPaciente,
+      nombreExamen: res.nombreExamen,
+
+      fechaDesde: res.fechaDesde ? res.fechaDesde : today,
+      fechahasta: res.fechahasta ? res.fechahasta : today,
+      conclusiones: res.conclusiones,
+
+      user_medicoFirma: res.usuarioFirma,
+      apto: "APTO",
+
+      // ===== SIN CORREGIR =====
+      visionCercaSincorregirOd_v_cerca_s_od: res.visionCercaSincorregirOd_v_cerca_s_od,
+      visionLejosSincorregirOd_v_lejos_s_od: res.visionLejosSincorregirOd_v_lejos_s_od,
+      visionCercaSincorregirOi_v_cerca_s_oi: res.visionCercaSincorregirOi_v_cerca_s_oi,
+      visionLejosSincorregirOi_v_lejos_s_oi: res.visionLejosSincorregirOi_v_lejos_s_oi,
+
+      // ===== CORREGIDA =====
+      oftalodccmologia_odcc: res.oftalodccmologia_odcc,
+      odlcOftalmologia_odlc: res.odlcOftalmologia_odlc,
+      oiccoftalmologia_oicc: res.oiccoftalmologia_oicc,
+      oilcOftalmologia_oilc: res.oilcOftalmologia_oilc,
+
+      vcOftalmologia_vc: res.vcOftalmologia_vc,
+      vbOftalmologia_vb: res.vbOftalmologia_vb,
+      rpOftalmologia_rp: res.rpOftalmologia_rp,
+      enfermedadesOcularesOftalmologia_e_oculares:
+        res.enfermedadesOcularesOftalmologia_e_oculares,
+    }));
+  }
 };
+
 
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
@@ -121,19 +183,24 @@ export const SubmitDataService = async (
         return;
     }
     const body = {
-        "norden": form.norden,
-        "dniPaciente": form.dniPaciente,
-        "fecha": form.fechaDesde,
-        "nombreMedico": "",
-        "apto": form.apto === "APTO" ? true : false,
-        "aptoConRestriccion": form.apto === "APTOCONRESTRICCION" ? true : false,
-        "noApto": form.apto === "NOAPTO" ? true : false,
-        "horaSalida": getHoraActual(),
-        "fechaHasta": form.fechahasta,
-        "conclusiones": form.conclusiones,
-        usuarioFirma: form.user_medicoFirma,
-        "usuarioRegistro": user
+    norden: form.norden,
+    dni: form.dni,
+    fecha: form.fechaDesde,
+
+    nombreMedico: "",
+
+    apto: form.apto === "APTO",
+    aptoConRestriccion: form.apto === "APTOCONRESTRICCION",
+    noApto: form.apto === "NOAPTO",
+
+    horaSalida: getHoraActual(),
+    fechaHasta: form.fechahasta,
+    conclusiones: form.conclusiones,
+
+    usuarioFirma: form.user_medicoFirma,
+    usuarioRegistro: user,
     };
+
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
         PrintHojaR(form.norden, token, tabla, datosFooter);
