@@ -223,17 +223,24 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
-    ACIDO_URICO: {
+    ACIDO_URICO: {//NUEVO Gr
         nombre: "ACIDO URICO",
-        tabla: "ac_bioquimicos2022",
+        tabla: "ac_bioquimica2022",
         url: "/api/v01/ct/analisisBioquimico/obtenerReporteAcidoUrico",
         esJasper: true,
     },
 
     GONADOTROPINA: {
-        nombre: "INMUNOLOGIA - GENODOTROPINA",
+        nombre: "INMUNOLOGIA - GONADOTROPINA",
         tabla: "lgonadotropina",
         url: "/api/v01/ct/inmunologia/obtenerReporteLgonadotropina",
+    },
+
+    INMUNOLOGIA_BK_KOH: {
+        nombre: "INMUNOLOGIA BK-KOH",
+        tabla: "microbiologia",
+        url: "/api/v01/ct/inmunologia/obtenerReporteMicrobiologia",
+        esJasper: true,
     },
 
     LABORATORIO_CLINICO: {

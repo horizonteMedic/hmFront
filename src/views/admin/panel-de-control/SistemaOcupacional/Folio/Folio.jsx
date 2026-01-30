@@ -28,7 +28,7 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "LABORATORIO_ARCHIVO_EXTERNO",
+    "INMUNOLOGIA_BK_KOH",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -339,7 +339,7 @@ const ExamenesListLaboratorio = buildExamenesList([
 ]);
 
 const ListaPorPlantilla = {
-    //PRUEBAS: ExamenesListPRUEBAS,
+    PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     "COMPLETO": ExamenesListCOMPLETO,
     OHLA: ExamenesListOHLA,

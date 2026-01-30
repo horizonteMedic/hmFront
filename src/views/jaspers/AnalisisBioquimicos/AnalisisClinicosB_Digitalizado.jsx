@@ -174,7 +174,7 @@ const drawPatientData = (doc, datos = {}) => {
 };
 
 export default async function AnalisisClinicosB_Digitalizado(datos = {}, docExistente = null) {
-  const doc = docExistente || new jsPDF();
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
@@ -297,25 +297,22 @@ export default async function AnalisisClinicosB_Digitalizado(datos = {}, docExis
     // === FOOTER ===
     footerTR(doc, datos);
 
-    // === Imprimir ===
-    if (!docExistente) {
-      Imprimir(doc);
-    } else {
-      return doc
-    }
 
   });
+  
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
-function Imprimir(doc) {
-  const pdfBlob = doc.output("blob");
-  const pdfUrl = URL.createObjectURL(pdfBlob);
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
   const iframe = document.createElement("iframe");
   iframe.style.display = "none";
-  iframe.src = pdfUrl;
+  iframe.src = url;
   document.body.appendChild(iframe);
-  iframe.onload = () => {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-  };
+  iframe.onload = () => iframe.contentWindow.print();
 }
