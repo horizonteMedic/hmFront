@@ -1,12 +1,162 @@
+import Swal from "sweetalert2";
+import { GetInfoServicioDefault, PrintHojaRDefault, SubmitDataServiceDefault, VerifyTRPerzonalizadoDefault } from "../../../../utils/functionUtils";
+import { getHoraActual, getToday } from "../../../../utils/helpers";
 
-const obtenerReporteUrl = "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoInformado";
-const registrarUrl = "/api/v01/ct/anexos/anexo16/registrarActualizarConsentimientoInformado";
+const obtenerReporteUrl =
+    "/api/v01/ct/certificadoAptitudMedicoOcupacional/obtenerReporteCertificadoMedicoOcupacional";
+const registrarUrl =
+    "/api/v01/ct/certificadoAptitudMedicoOcupacional/registrarActualizarCertificadoAptitudMedicoOcupacional";
+const today = getToday();
+
+export const GetInfoServicio = async (
+    nro,
+    tabla,
+    set,
+    token,
+    onFinish = () => { }
+) => {
+    const res = await GetInfoServicioDefault(
+        nro,
+        tabla,
+        token,
+        obtenerReporteUrl,
+        onFinish
+    );
+    if (res) {
+        set((prev) => ({
+            ...prev,
+            ...res,
+            nombres: `${res.nombrePaciente} ${res.apellidoPaciente}`,
+            sexo: `${res.sexoPaciente === "F" ? "FEMENINO" : "MASCULINO"}`,
+            dniPaciente: res.dniPaciente ?? "",
+            edadPaciente: res.edadPaciente,
+            nombreExamen: res.nombreExamen,
+            empresa: res.empresa,
+            contrata: res.contrata,
+            cargoPaciente: res.cargoPaciente,
+            ocupacionPaciente: res.ocupacionPaciente,
+            apto: "APTO",
+            fechaExamen: `${res.fechaExamen ? res.fechaExamen : today}`,
+            fechaDesde: `${res.fechaDesde ? res.fechaDesde : today}`,
+            fechahasta: `${res.fechahasta ? res.fechahasta : today}`
+        }));
+    }
+};
+
+export const GetInfoServicioEditar = async (
+    nro,
+    tabla,
+    set,
+    token,
+    onFinish = () => { }
+) => {
+    const res = await GetInfoServicioDefault(
+        nro,
+        tabla,
+        token,
+        obtenerReporteUrl,
+        onFinish
+    );
+    if (res) {
+        console.log(res)
+        set((prev) => ({
+            ...prev,
+            ...res,
+            // Header
+            nombres: `${res.nombrePaciente} ${res.apellidoPaciente}`,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+            sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
+            PA: `${res.sistolica}/${res.diastolica}`,
+            edadPaciente: res.edadPaciente,
+            dniUser: res.dniUsuario,
+            apto: res.apto ? "APTO" : res.aptoconrestriccion ? "APTOCONRESTRICCION" : "NOAPTO"
+        }));
+    }
+};
 
 
+export const VerifyTR = async (nro, tabla, token, set, sede) => {
+    VerifyTRPerzonalizadoDefault(
+        nro,
+        tabla,
+        token,
+        set,
+        sede,
+        () => {
+            //NO Tiene registro
+            GetInfoServicio(nro, tabla, set, token, () => { Swal.close(); });
+        },
+        () => {
+            //Tiene registro
+            GetInfoServicioEditar(nro, tabla, set, token, () => {
+                Swal.fire(
+                    "Alerta",
+                    "Este paciente ya cuenta con registros de Altura 1.8",
+                    "warning"
+                );
+            });
+        },
+        () => {
+            //Necesita
+            Swal.fire(
+                "Alerta",
+                "El paciente necesita pasar por Triaje.",
+                "warning"
+            );
+        }
+    );
+};
+
+
+export const SubmitDataService = async (
+    form,
+    token,
+    user,
+    limpiar,
+    tabla,
+    datosFooter
+) => {
+    if (!form.norden) {
+        await Swal.fire("Error", "Datos Incompletos", "error");
+        return;
+    }
+    const body = {
+        "norden": form.norden,
+        "dniPaciente": form.dniPaciente,
+        "fecha": form.fechaDesde,
+        "nombreMedico": "",
+        "apto": form.apto === "APTO" ? true : false,
+        "aptoConRestriccion": form.apto === "APTOCONRESTRICCION" ? true : false,
+        "noApto": form.apto === "NOAPTO" ? true : false,
+        "horaSalida": getHoraActual(),
+        "fechaHasta": form.fechahasta,
+        "conclusiones": form.conclusiones,
+        usuarioFirma: form.user_medicoFirma,
+        "usuarioRegistro": user
+    };
+
+    await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
+        PrintHojaR(form.norden, token, tabla, datosFooter);
+    });
+};
+
+
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+    const jasperModules = import.meta.glob("../../../../jaspers/CertificadoMedicoOcupacional/*.jsx");
+    PrintHojaRDefault(
+        nro,
+        token,
+        tabla,
+        datosFooter,
+        obtenerReporteUrl,
+        jasperModules,
+        "../../../../jaspers/CertificadoMedicoOcupacional"
+    );
+};
 
 export const Valores = {
     CHECK1: `- LABORATORIO: Hb / Hto, Grupo Sanguíneo y Factor ({grupoFactor}), Glucosa, Ex. orina, 
-        - APTITUD
+- APTITUD
 - ANEXO 16
 - ANTECEDENTES ENFERMEDADES EN ALTURA
 - ANEXO 16-A

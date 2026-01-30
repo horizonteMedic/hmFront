@@ -812,6 +812,8 @@ export const GetInfoServicio = (
               data.observacionesGenerales += "HTA NO CONTROLADA.\n";
             }
           }
+
+          data.notasDoctor = res.notasDoctor ?? "";
           console.log("DATAAA", data);
           set((prev) => ({ ...prev, ...data }));
         }
@@ -951,7 +953,7 @@ export const GetInfoServicioEditar = (
             fechaAptitud: res.fechaDesde_fechadesde ?? "",
             fechaVencimiento: res.fechaHasta_fechahasta ?? "",
             // nombre_medico: res.medico_medico ?? "",
-            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : "",
             dataEnfermedades: res.accidentes ?? [],
           };
 
@@ -1251,7 +1253,7 @@ export const GetInfoServicioEditar = (
           });
           // Marcar "ninguno" si restricciones es "NINGUNO" o está vacío
           data.ninguno = restriccionesTexto === "NINGUNO" || restriccionesTexto === "";
-
+          data.notasDoctor = res.notasDoctor ?? "";
           console.log("DATA EDITAR", data);
           set((prev) => ({ ...prev, ...data }));
         }

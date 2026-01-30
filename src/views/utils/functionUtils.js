@@ -223,19 +223,25 @@ export const VerifyTRPerzonalizadoDefault = async (nro, tabla, token, set, sede,
         return;
     }
     LoadingDefault("Validando datos");
-    getFetch(
-        `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
-        token
-    ).then((res) => {
-        if (res.id === 0) {
-            //No tiene registro previo 
-            noTieneRegistro();//datos paciente
-        } else if (res.id === 2) {
-            necesitaExamen();
-        } else {
-            tieneRegistro();//obtener data servicio
-        }
-    });
+    try {
+        getFetch(
+            `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
+            token
+        ).then((res) => {
+            if (res.id === 0) {
+                //No tiene registro previo 
+                noTieneRegistro();//datos paciente
+            } else if (res.id === 2) {
+                necesitaExamen();
+            } else {
+                tieneRegistro();//obtener data servicio
+            }
+        });
+    } catch (error) {
+        console.log(error)
+        Swal.fire("Ocurrio un Error al Validar la Información");
+    }
+
 };
 
 export const GetInfoServicioDefault = async (

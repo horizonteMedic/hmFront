@@ -2,8 +2,10 @@ import Swal from "sweetalert2";
 import {
   GetInfoPacDefault,
   GetInfoServicioDefault,
+  handleSubirArchivoDefaultSinSellos,
   LoadingDefault,
   PrintHojaRDefault,
+  ReadArchivosFormDefault,
   SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../../../utils/functionUtils.js";
@@ -11,6 +13,7 @@ import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils.js"
 
 const obtenerReporteUrl = "/api/v01/ct/laboratorio/obtenerReporteLaboratorioClinico";
 const registrarUrl = "/api/v01/ct/laboratorio/registrarActualizarLaboratorioClinicp";
+const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta"
 
 export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
   const res = await GetInfoServicioDefault(
@@ -18,7 +21,8 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
     tabla,
     token,
     obtenerReporteUrl,
-    onFinish
+    onFinish,
+    true
   );
   if (res) {
     set((prev) => ({
@@ -94,6 +98,9 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
       // Observaciones
       observaciones: res.txtObservacionesLb ?? "",
       notasDoctor: res.notasDoctor ?? "",
+
+      SubirDoc: true,
+      digitalizacion: res.digitalizacion,
 
       user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado,
@@ -241,3 +248,11 @@ const GetInfoPac = async (nro, set, token, sede) => {
 export const Loading = (mensaje) => {
   LoadingDefault(mensaje);
 };
+
+export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
+  handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
+};
+
+export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
+  ReadArchivosFormDefault(form, setVisualerOpen, token)
+}

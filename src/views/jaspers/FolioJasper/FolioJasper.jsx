@@ -29,6 +29,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "DECLARACION USO FIRMA",
         "PSICOSENSOMETRICO CERT-ALTURA",
         "PSICOSENSOMETRICO VEHI-FOLIO",
+        "LABORATORIO MANIPULADORES",
         "INTERCONSULTA",
         "INTERCONSULTA 2",
         "INTERCONSULTA 3",

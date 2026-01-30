@@ -159,6 +159,12 @@ export const EXAMENES_CATALOGO = {
         nomenclatura: "ELECTROCARDIOGRAMA",
     },
 
+    LABORATORIO_ARCHIVO_EXTERNO: {
+        nombre: "LABORATORIO ARCHIVO EXTERNO",
+        tabla: "LABORATORIO MANIPULADORES",
+        nomenclatura: "LABORATORIO MANIPULADORES",
+    },
+
     ESPIROMETRIA_ARCHIVO: {
         nombre: "ESPIROMETRIA",
         tabla: "ESPIROMETRIA",

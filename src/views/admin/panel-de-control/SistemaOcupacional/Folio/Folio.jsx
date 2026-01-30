@@ -28,8 +28,7 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "DECLARACION_USO_FIRMA_ARCHIVO",
-    "ELECTROCARDIOGRAMA_ARCHIVO",
+    "LABORATORIO_ARCHIVO_EXTERNO",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -85,6 +84,7 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "EVALUACION_MUSCULO_ESQUELETICA",// 12
     "CONSENT_MUESTRA_SANGRE",                  // 12
     "LABORATORIO_CLINICO",           // 12
+    "LABORATORIO_ARCHIVO_EXTERNO",
     "PERFIL_LIPIDICO",               // 13
     "PERFIL_HEPATICO",
     "PERFIL_RENAL",

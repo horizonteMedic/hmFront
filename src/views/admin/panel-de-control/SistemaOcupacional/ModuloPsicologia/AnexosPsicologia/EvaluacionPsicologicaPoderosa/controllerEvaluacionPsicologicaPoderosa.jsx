@@ -40,11 +40,11 @@ export const GetInfoServicio = async (
         };
 
         // Derivar tipo de informe desde flags del JSON
-        const tipoInformeDerivado = res.trabajosCaliente
-            ? "T. EN CALIENTE"
-            : res.licencia
-                ? "LICENCIA"
-                : "NORMAL";
+        // const tipoInformeDerivado = res.trabajosCaliente
+        //     ? "T. EN CALIENTE"
+        //     : res.licencia
+        //         ? "LICENCIA"
+        //         : "NORMAL";
 
         // Derivar aptitud desde flags del JSON (prioridad: APTO > NO APTO > EX > AP O.)
         const aptitudDerivada = res.apto
@@ -64,7 +64,7 @@ export const GetInfoServicio = async (
             codigoEvaluacionPsicologicaPoderosa: res.codigoEvaluacionPsicologicaPoderosa,
             fechaExam: res.fecha,
             nombreExamen: res.nombreExamen,
-            tipoInforme: tipoInformeDerivado,
+            // tipoInforme: tipoInformeDerivado,
             aptitud: aptitudDerivada,
             sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
 
