@@ -43,6 +43,26 @@ export default function CertificadoMedicoOcupacional2() {
         conclusionesOpciones:"",
         conclusiones: "",
 
+        //cuadro a la derecha
+        visionCercaSincorregirOd_v_cerca_s_od: "",
+        visionLejosSincorregirOd_v_lejos_s_od: "",
+        visionCercaSincorregirOi_v_cerca_s_oi: "",
+        visionLejosSincorregirOi_v_lejos_s_oi: "",
+
+        oftalodccmologia_odcc: "",
+        oiccoftalmologia_oicc: "",
+        odlcOftalmologia_odlc: "",
+        oilcOftalmologia_oilc: "",
+        vcOftalmologia_vc: "",
+        vbOftalmologia_vb: "",
+        rpOftalmologia_rp: "",
+
+        enfermedadesOcularesOftalmologia_e_oculares: "",
+        hemoglobina_txthemoglobina: "",
+        vsgLabClinico_txtvsg: "",
+        glucosaLabClinico_txtglucosabio: "",
+        leucocitoSematologiaLabClinico: "",
+
         nombre_medico: userName,
         user_medicoFirma: userlogued,
     };
@@ -156,6 +176,7 @@ export default function CertificadoMedicoOcupacional2() {
                             value={form?.nombreExamen}
                             labelWidth="120px"
                             onChange={handleChangeSimple}
+                            disabled
                         />
                         <InputTextOneLine
                             label="Hora"
@@ -284,27 +305,75 @@ export default function CertificadoMedicoOcupacional2() {
 
                             {/* OTROS VALORES */}
                             <div className="space-y-2 pt-2 border-t">
-                                <InputTextOneLine label="V.Clrs" name="vcOftalmologia_vc" value={form?.vcOftalmologia_vc} disabled labelWidth="40px" />
-                                <InputTextOneLine label="V.B." name="vbOftalmologia_vb" value={form?.vbOftalmologia_vb} disabled labelWidth="40px" />
-                                <InputTextOneLine label="R.P." name="rpOftalmologia_rp" value={form?.rpOftalmologia_rp} disabled labelWidth="40px" />
-                                <InputTextArea label="Enfermedades Oculares" rows={8} name="enfermedadesOcularesOftalmologia_e_oculares" value={form?.enfermedadesOcularesOftalmologia_e_oculares} disabled className="text-[10px]" />
+                <InputTextOneLine
+                                    label="V.Clrs"
+                                    name="vcOftalmologia_vc"
+                                    value={form?.vcOftalmologia_vc}
+                                    disabled
+                                    className="flex-1 w-full"
+                                    labelWidth="35px"
+                                />
+                                <InputTextOneLine
+                                    name="vbOftalmologia_vb"
+                                    label="V.B."
+                                    value={form?.vbOftalmologia_vb}
+                                    disabled
+                                    className="flex-1 w-full"
+                                    labelWidth="35px"
+                                />
+                                <InputTextOneLine
+                                    label="R.P."
+                                    name="rpOftalmologia_rp"
+                                    value={form?.rpOftalmologia_rp}
+                                    disabled
+                                    className="flex-1 w-full"
+                                    labelWidth="35px"
+                                />
                             </div>
+                               <InputTextArea 
+                                    label="Enfermedades Oculares" 
+                                    rows={2} 
+                                    name="enfermedadesOcularesOftalmologia_e_oculares" 
+                                    value={form?.enfermedadesOcularesOftalmologia_e_oculares} 
+                                    onChange={handleChange} 
+                                    labelWidth="35px"
+                                />
                         </div>
                     </SectionFieldset>
-
-                    {/* SECCIÓN LABORATORIO */}
                     <SectionFieldset legend="Laboratorio">
                         <div className="p-2 space-y-2">
-                            <InputTextOneLine label="Hemoglobina" name="hemoglobina_txthemoglobina" value={form?.hemoglobina_txthemoglobina} disabled labelWidth="85px" />
-                            <InputTextOneLine label="V.S.G" name="vsgLabClinico_txtvsg" value={form?.vsgLabClinico_txtvsg} disabled labelWidth="85px" />
-                            <InputTextOneLine label="Glucosa" name="glucosaLabClinico_txtglucosabio" value={form?.glucosaLabClinico_txtglucosabio} disabled labelWidth="85px" />
-                            <InputTextOneLine label="Creatina" name="leucocitoSematologiaLabClinico" value={form?.leucocitoSematologiaLabClinico} disabled labelWidth="85px" />
+                     <InputTextOneLine
+                        label="Hemoglobina"
+                        name="hemoglobina_txthemoglobina"
+                        value={form?.hemoglobina_txthemoglobina}
+                        disabled
+                        labelWidth="80px"
+                                     />
+                                     <InputTextOneLine
+                                         label="V.S.G"
+                                         name="vsgLabClinico_txtvsg"
+                                         value={form?.vsgLabClinico_txtvsg}
+                                         disabled
+                                         labelWidth="80px"
+                                     />
+                                     <InputTextOneLine
+                                         label="Glucosa"
+                                         name="glucosaLabClinico_txtglucosabio"
+                                         value={form?.glucosaLabClinico_txtglucosabio}
+                                         disabled
+                                         labelWidth="80px"
+                                     />
+                                     <InputTextOneLine
+                                         label="Creatina"
+                                         name="leucocitoSematologiaLabClinico"
+                                         value={form?.leucocitoSematologiaLabClinico}
+                                         disabled
+                                         labelWidth="80px"
+                                     />
                         </div>
                     </SectionFieldset>
                 </div>
             </div>
-
-
         </div>
     );
 }
