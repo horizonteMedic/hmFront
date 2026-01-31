@@ -45,7 +45,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "certificado_aptitud_medico_ocupacional",
         "audiometria_2023",
         "informe_psicologico",
-        "anexo16a"
+        "anexo16a",
+        "microbiologia"//NUEVO 
     ]
 
     const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true && ex.imprimir === true);

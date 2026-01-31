@@ -74,7 +74,9 @@ import Anexo16ABoro_Digitalizado from "../Anexo16A/Anexo16ABoro_Digitalizado";
 import A_CertificacionMedicaPTA_Digitalizado from "../CertificadoAlturaPoderosa/A_CertificacionMedicaPTA_Digitalizado";
 import CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado from "../ModuloPsicologia/InformePsicoCalidadSueño/CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado";
 import Hematologia_Digitalizado_nuevo from "../LaboratorioClinico/Hematologia_Digitalizado";
-import AnalisisClinicosB_Digitalizado from "../AnalisisBioquimicos/AnalisisClinicosB_Digitalizado";
+import AnalisisClinicosB_Digitalizado from "../AnalisisBioquimicos/AnalisisClinicosB_Digitalizado"
+import Microbiologia1_Digitalizado from "../Inmunologia/Microbiologia1_Digitalizado";
+import Microbiologia_Digitalizado from "../Inmunologia/Microbiologia_Digitalizado";
 
 export const reportesMap = {
    /* =========================
@@ -154,7 +156,12 @@ export const reportesMap = {
 
    hemograma_autom: Hematologia_Digitalizado_nuevo,
 
-   ac_bioquimicos2022: AnalisisClinicosB_Digitalizado,
+   ac_bioquimica2022: AnalisisClinicosB_Digitalizado,
+
+   microbiologia: {//NUEVO
+      Microbiologia1_Digitalizado,
+      Microbiologia_Digitalizado
+   },
 
    /* =========================
       CONSENTIMIENTOS
@@ -227,7 +234,11 @@ export const reportesMap = {
 
    informe_psicologico_estres: InformePsicologicoAdecoEstres_Digitalizado,
 
-   evaluacion_psicologica_poderosa: EvaluacionPsicologica_p_Digitalizado,
+   evaluacion_psicologica_poderosa_normal: EvaluacionPsicologica_p_Digitalizado,
+
+   evaluacion_psicologica_poderosa_licencia: EvaluacionPsicologica_p_Digitalizado,
+
+   evaluacion_psicologica_poderosa_caliente: EvaluacionPsicologica_p_Digitalizado,
 
    ficha_psicologica_anexo02: InformePsicologico_Anexo02_Digitalizado,
 
