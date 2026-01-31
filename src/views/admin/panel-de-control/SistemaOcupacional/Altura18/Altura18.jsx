@@ -141,7 +141,7 @@ export default function Altura18() {
         dniusuario: userDNI,
 
         SubirDoc: false,
-        nomenclatura: "PSICOSENSOMETRICO CERT-ALTURA",
+        nomenclatura: "PSICOSENSOMETRICO ALTURA 1-8",
 
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,

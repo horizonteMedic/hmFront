@@ -5,8 +5,8 @@ import footerTR from "../components/footerTR.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
 import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
 
-export default async function Consentimiento_Panel10D_Digitalizado(datos) {
-  const doc = new jsPDF();
+export default async function Consentimiento_Panel10D_Digitalizado(datos = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // Función para formatear fecha a DD/MM/YYYY
@@ -261,23 +261,25 @@ export default async function Consentimiento_Panel10D_Digitalizado(datos) {
   y += 10;
 
   // Usar helper para dibujar firmas
-  dibujarFirmas({ doc, datos, y, pageW }).then(() => {
+  await dibujarFirmas({ doc, datos, y, pageW }).then(() => {
     footerTR(doc, datos);
+  })
 
-    // Mostrar PDF
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = pdfUrl;
-    document.body.appendChild(iframe);
-    iframe.onload = function () {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
-  }).catch(err => {
-    console.error(err);
-    alert('Error generando PDF: ' + err);
-  });
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
+}
+  
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
+}
 
-} 
+

@@ -74,8 +74,23 @@ import Anexo16ABoro_Digitalizado from "../Anexo16A/Anexo16ABoro_Digitalizado";
 import A_CertificacionMedicaPTA_Digitalizado from "../CertificadoAlturaPoderosa/A_CertificacionMedicaPTA_Digitalizado";
 import CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado from "../ModuloPsicologia/InformePsicoCalidadSueño/CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado";
 import Hematologia_Digitalizado_nuevo from "../LaboratorioClinico/Hematologia_Digitalizado";
-import AnalisisClinicosB_Digitalizado from "../AnalisisBioquimicos/AnalisisClinicosB_Digitalizado";
-
+import AnalisisClinicosB_Digitalizado from "../AnalisisBioquimicos/AnalisisClinicosB_Digitalizado"
+import Microbiologia1_Digitalizado from "../Inmunologia/Microbiologia1_Digitalizado";
+import Microbiologia_Digitalizado from "../Inmunologia/Microbiologia_Digitalizado";
+import InmunologiaLab_Digitalizado from "../Inmunologia/InmunologiaLab_Digitalizado";
+import LHepatitisA_Digitalizado from "../Inmunologia/LHepatitisA_Digitalizado";
+import LHepatitisB_Digitalizado from "../Inmunologia/LHepatitisB_Digitalizado";
+import LHepatitisC_Digitalizado from "../Inmunologia/LHepatitisC_Digitalizado";
+import Informe_Lab_VRDL from "../Inmunologia/Informe_Lab_VRDL";
+import Panel2d_Digitalizado from "../Toxicologia/Panel2d_Digitalizado";
+import Panel3d_Digitalizado from "../Toxicologia/Panel3d_Digitalizado";
+import Panel4d_Digitalizado from "../Toxicologia/Panel4d_Digitalizado";
+import Panel10d_Digitalizado from "../Toxicologia/Panel10d_Digitalizado";
+import Consentimiento_Panel3D_Digitalizado from "../Consentimientos/Consentimiento_Panel3D_Digitalizado";
+import Consent_Lab_panel4D from "../Consentimientos/Consent_Lab_panel4D";
+import Consentimiento_Panel10D_Digitalizado from "../Consentimientos/Consentimiento_Panel10D_Digitalizado";
+import coprocultivo_digitalizado from "../Manipuladores/coprocultivo_digitalizado";
+import Coproparasitologico_Digitalizado from "../Manipuladores/Coproparasitologico_Digitalizado";
 export const reportesMap = {
    /* =========================
       GENERALES / BASE
@@ -154,8 +169,36 @@ export const reportesMap = {
 
    hemograma_autom: Hematologia_Digitalizado_nuevo,
 
-   ac_bioquimicos2022: AnalisisClinicosB_Digitalizado,
+   ac_bioquimica2022: AnalisisClinicosB_Digitalizado,
 
+   microbiologia: {//NUEVO
+      Microbiologia1_Digitalizado,
+      Microbiologia_Digitalizado
+   },
+
+
+   inmunologia: InmunologiaLab_Digitalizado,
+
+   lhepatitis:{
+      LHepatitisA_Digitalizado,
+      LHepatitisB_Digitalizado,
+      LHepatitisC_Digitalizado
+   },
+
+   inmunologia_vdrl: Informe_Lab_VRDL,
+
+   panel2d: Panel2d_Digitalizado,
+
+   panel3d: Panel3d_Digitalizado,
+
+   panel4d: Panel4d_Digitalizado,
+
+   panel10d: Panel10d_Digitalizado,
+
+   ac_coprocultivo: coprocultivo_digitalizado,
+
+   ac_coproparasitologico:Coproparasitologico_Digitalizado,
+  
    /* =========================
       CONSENTIMIENTOS
    ========================= */
@@ -166,6 +209,12 @@ export const reportesMap = {
    consent_Boro: Consentimiento_Boro_Digitalizado,
 
    CONSENT_INFORMADO_MEDICA: Consent_Admision_EvaluacionMedica,
+
+   con_panel3D: Consentimiento_Panel3D_Digitalizado,
+
+   con_panel4D: Consent_Lab_panel4D,  
+
+   con_panel10D: Consentimiento_Panel10D_Digitalizado,
 
    consent_marihuana: Consentimiento_Marihuana_Digitalizado,
 
@@ -227,7 +276,11 @@ export const reportesMap = {
 
    informe_psicologico_estres: InformePsicologicoAdecoEstres_Digitalizado,
 
-   evaluacion_psicologica_poderosa: EvaluacionPsicologica_p_Digitalizado,
+   evaluacion_psicologica_poderosa_normal: EvaluacionPsicologica_p_Digitalizado,
+
+   evaluacion_psicologica_poderosa_licencia: EvaluacionPsicologica_p_Digitalizado,
+
+   evaluacion_psicologica_poderosa_caliente: EvaluacionPsicologica_p_Digitalizado,
 
    ficha_psicologica_anexo02: InformePsicologico_Anexo02_Digitalizado,
 

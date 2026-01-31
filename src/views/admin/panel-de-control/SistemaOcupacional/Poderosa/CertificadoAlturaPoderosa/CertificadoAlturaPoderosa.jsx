@@ -204,7 +204,7 @@ export default function CertificadoAlturaPoderosa() {
         marcha: false,
 
         SubirDoc: false,
-        nomenclatura: "PSICOSENSOMETRICO CERT-ALTURA",
+        nomenclatura: "PSICOSENSOMETRICO ALTU-POD",
 
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,

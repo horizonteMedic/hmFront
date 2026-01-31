@@ -363,7 +363,7 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
       hemograma: {
         vsg: formatNA(data.vsgLaboratorioClinico_txtvsg),
         glucosa: formatNA(data.glucosaLaboratorioClinico_txtglucosabio),
-        urea: formatNA(data.ureaAnexo7c_txturea), // Por defecto N/A
+        urea: formatNA(data.ureaAsericaPerfilRenal_txtureaserica), // Por defecto N/A
         creatinina: formatNA(data.creatininaLaboratorioClinico_txtcreatininabio),
         leucocitos: formatNA(data.leucocitos_txtleucocitosematologia),
         hematies: formatNA(data.hematies_txthematiesematologia),
