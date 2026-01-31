@@ -1,6 +1,7 @@
 import Swal from "sweetalert2";
 import {
     GetInfoServicioDefault,
+    handleSubidaMasiva,
     handleSubirArchivoDefault,
     handleSubirArchivoDefaultSinSellos,
     LoadingDefault,
@@ -540,4 +541,8 @@ export const handleSubirArchivo = async (form, selectedSede, userlogued, token) 
 
 export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
     ReadArchivosFormDefault(form, setVisualerOpen, token)
+}
+
+export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token) => {
+    handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token)
 }

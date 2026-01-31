@@ -22,7 +22,7 @@ import PruebasComplementarias from "./PruebasComplementarias/PruebasComplementar
 import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import Swal from "sweetalert2";
-import { handleSubirArchivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerFichaConduccionVehiculos";
+import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerFichaConduccionVehiculos";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
 
@@ -283,12 +283,11 @@ export default function FichaConduccionVehiculos() {
                                 { label: "Revalidación", value: "REVALIDACION" },
                             ]}
                         />
-                        {form.SubirDoc &&
-                            <ButtonsPDF
-                                handleSave={() => { handleSubirArchivo(form, selectedSede, userlogued, token) }}
-                                handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token) }}
-                            />
-                        }
+                        <ButtonsPDF
+                            {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
+                            {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+                            handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
+                        />
                     </section>
                     <section className="bg-white border border-gray-200 rounded-lg p-4 m-4">
                         <h3 className="text-lg font-semibold mb-3">Datos del Paciente</h3>

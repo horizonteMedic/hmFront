@@ -316,12 +316,11 @@ export default function CertificadoAlturaPoderosa() {
                                 falseLabel="NO APTO"
                                 onChange={handleRadioButtonBoolean}
                             />
-                            {form.SubirDoc &&
-                                <ButtonsPDF
-                                    handleSave={() => { handleSubirArchivo(form, selectedSede, userlogued, token) }}
-                                    handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token) }}
-                                />
-                            }
+                            <ButtonsPDF
+                                {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
+                                {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+                                handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
+                            />
                         </section>
 
                         {/* Información del trabajador */}
