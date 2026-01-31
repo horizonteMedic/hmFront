@@ -462,8 +462,22 @@ export const EXAMENES_CATALOGO = {
     },
 
     INFORME_PODEROSA_OPERAR: {
-        nombre: "INFORME PSICOLOGICO DE PODEROSA LICENCIA PARA OPERAR",
-        tabla: "evaluacion_psicologica_poderosa",
+        nombre: "INFORME PSICOLOGICO DE PODEROSA LICENCIA PARA OPERAR - NORMAL",
+        tabla: "evaluacion_psicologica_poderosa_normal",
+        url: "/api/v01/ct/evaluacionPsicologicaPoderosa/obtenerReporteEvaluacionPsicologicaPoderosa",
+        esJasper: true,
+    },
+
+    INFORME_PODEROSA_OPERAR_LICENCIA: {
+        nombre: "INFORME PSICOLOGICO DE PODEROSA LICENCIA PARA OPERAR - LICENCIA",
+        tabla: "evaluacion_psicologica_poderosa_licencia",
+        url: "/api/v01/ct/evaluacionPsicologicaPoderosa/obtenerReporteEvaluacionPsicologicaPoderosa",
+        esJasper: true,
+    },
+
+    INFORME_PODEROSA_OPERAR_CALIENTE: {
+        nombre: "INFORME PSICOLOGICO DE PODEROSA LICENCIA PARA OPERAR - CALIENTE",
+        tabla: "evaluacion_psicologica_poderosa_caliente",
         url: "/api/v01/ct/evaluacionPsicologicaPoderosa/obtenerReporteEvaluacionPsicologicaPoderosa",
         esJasper: true,
     },

@@ -28,7 +28,11 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "INMUNOLOGIA_BK_KOH",
+    // "INMUNOLOGIA_BK_KOH",
+    "INFORME_PODEROSA_OPERAR",
+    "INFORME_PODEROSA_OPERAR_LICENCIA",
+    "INFORME_PODEROSA_OPERAR_CALIENTE",
+
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -119,6 +123,8 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "ESPACIOS_CONFINADOS_PSICOLOGIA",
 
     "INFORME_PODEROSA_OPERAR",
+    "INFORME_PODEROSA_OPERAR_LICENCIA",
+    "INFORME_PODEROSA_OPERAR_CALIENTE",
     "INFORME_PSICOLOGIA_FOBIAS",
     "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
     "INFORME_PSICOLABORAL",
@@ -339,7 +345,7 @@ const ExamenesListLaboratorio = buildExamenesList([
 ]);
 
 const ListaPorPlantilla = {
-    PRUEBAS: ExamenesListPRUEBAS,
+    //PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     "COMPLETO": ExamenesListCOMPLETO,
     OHLA: ExamenesListOHLA,

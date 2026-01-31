@@ -234,7 +234,11 @@ export const reportesMap = {
 
    informe_psicologico_estres: InformePsicologicoAdecoEstres_Digitalizado,
 
-   evaluacion_psicologica_poderosa: EvaluacionPsicologica_p_Digitalizado,
+   evaluacion_psicologica_poderosa_normal: EvaluacionPsicologica_p_Digitalizado,
+
+   evaluacion_psicologica_poderosa_licencia: EvaluacionPsicologica_p_Digitalizado,
+
+   evaluacion_psicologica_poderosa_caliente: EvaluacionPsicologica_p_Digitalizado,
 
    ficha_psicologica_anexo02: InformePsicologico_Anexo02_Digitalizado,
 
