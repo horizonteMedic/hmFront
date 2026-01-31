@@ -673,6 +673,123 @@ export const handleImgtoPdfDefault = async (
     }
 };
 
+export const handleSubidaMasiva = async (form, selectedSede, urlPDf, userlogued, token) => {
+    let pdfFiles = [];
+    const { isConfirmed } = await Swal.fire({
+        title: "Selecciona la carpeta con PDFs",
+        input: "file",
+        inputAttributes: {
+            webkitdirectory: true,
+            directory: true,
+            multiple: true,
+            accept: "application/pdf",
+        },
+        showCancelButton: true,
+        confirmButtonText: "Subir archivos",
+        cancelButtonText: "Cancelar",
+        didOpen: () => {
+            const input = Swal.getInput();
+            input.addEventListener("change", () => {
+                const files = Array.from(input.files || []);
+                pdfFiles = files.filter(f => f.type === "application/pdf");
+
+                const htmlList = pdfFiles.length
+                    ? `
+                        <div style="max-height:250px;overflow:auto;text-align:left">
+                            <b>Archivos detectados (${pdfFiles.length}):</b>
+                            <ul>
+                                ${pdfFiles.map(f => `<li>${f.name}</li>`).join("")}
+                            </ul>
+                        </div>
+                      `
+                    : `<p style="color:red">No se encontraron archivos PDF</p>`;
+
+                Swal.update({ html: htmlList });
+            });
+        },
+
+        preConfirm: () => {
+            if (!pdfFiles.length) {
+                Swal.showValidationMessage(
+                    "No hay archivos PDF válidos para subir"
+                );
+                return false;
+            }
+            return true;
+        },
+    });
+
+    if (!isConfirmed) return;
+
+    LoadingDefault("Subiendo documentos...");
+
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = ("0" + (currentDate.getMonth() + 1)).slice(-2);
+    const day = ("0" + currentDate.getDate()).slice(-2);
+
+    const uploadPromises = pdfFiles.map(async (file) => {
+        const orden = obtenerOrdenDesdeNombre(file.name);
+        if (!orden) return null; // Se ignora
+
+        const base64 = await readFileAsBase64(file);
+        const base64WithoutHeader = base64.split(",")[1];
+
+        const pdfBytes = Uint8Array.from(
+            atob(base64WithoutHeader),
+            (c) => c.charCodeAt(0)
+        );
+
+        const pdfBase64Final = uint8ToBase64(pdfBytes);
+
+        const nombreOriginal = file.name.replace(/\.pdf$/i, "");
+        const nombreFinal = `${nombreOriginal}-${generarIdCorto()}.pdf`;
+
+        const datos = {
+            rutaArchivo: null,
+            dni: null,
+            historiaClinica: null,
+            servidor: "azure",
+            estado: true,
+            fechaRegistro: `${year}-${month}-${day}`,
+            userRegistro: userlogued,
+            fechaActualizacion: null,
+            userActualizacion: null,
+            id_tipo_archivo: null,
+
+            nombreArchivo: nombreFinal,
+            codigoSede: selectedSede,
+            fileBase64: pdfBase64Final,
+            nomenclatura_tipo_archivo: form.nomenclatura,
+            orden,
+            indice_carga_masiva: undefined,
+        };
+
+        return SubmitData(datos, urlPDf, token);
+    });
+
+    try {
+        const results = await Promise.all(
+            uploadPromises.filter(Boolean)
+        );
+
+        const exitosos = results.filter(r => r?.id === 1).length;
+
+        Swal.fire(
+            "Carga finalizada",
+            `${exitosos} archivos subidos correctamente`,
+            "success"
+        );
+    } catch (err) {
+        console.error(err);
+        Swal.fire(
+            "Error",
+            "Ocurrió un error durante la carga masiva",
+            "error"
+        );
+    }
+}
+
 
 export const ReadArchivosFormDefault = async (form, setVisualerOpen, token, nomenclatura) => {
     LoadingDefault("Cargando Archivo")
@@ -697,4 +814,18 @@ const generarIdCorto = () => {
     const time = Date.now().toString(36);
     const random = Math.random().toString(36).substring(2, 6);
     return `${time}${random}`;
+};
+
+
+const readFileAsBase64 = (file) =>
+    new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+
+const obtenerOrdenDesdeNombre = (filename) => {
+    const match = filename.match(/^(\d+)/);
+    return match ? match[1] : null;
 };

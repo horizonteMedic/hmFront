@@ -24,6 +24,7 @@ import TablaTemplate from "../../../../components/templates/TablaTemplate";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
+import { handleSubirArchivoMasivo } from "../Admision/ConsentimientoDigitalizacion/controllerConsentimientoDigitalizacion";
 
 const tabla = "informe_electrocardiograma";
 
@@ -198,12 +199,13 @@ export default function EKG() {
               }));
             }}
           />
-          {form.SubirDoc &&
-            <ButtonsPDF
-              handleSave={() => { handleSubirArchivo(form, selectedSede, userlogued, token) }}
-              handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token) }}
-            />
-          }
+
+          <ButtonsPDF
+            {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
+            {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+            handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
+          />
+
         </SectionFieldset>
 
         <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 3xl:grid-cols-2 gap-x-4 gap-y-3">
