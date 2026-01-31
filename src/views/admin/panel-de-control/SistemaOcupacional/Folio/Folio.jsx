@@ -28,17 +28,15 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "INFORME_PODEROSA_OPERAR",
-    "INFORME_PODEROSA_OPERAR_LICENCIA",
-    "INFORME_PODEROSA_OPERAR_CALIENTE",
-    // "ESPIROMETRIA_ARCHIVO",
-    // "LABORATORIO_ARCHIVO_EXTERNO",
-    // "CERTIFICADO_APTITUD_ANEXO_16",
-    // "OFTALMOLOGIA_VISION_TESTER",
-    // "PSICOSENSOMETRICO_VEHI_FOLIO",
-    // "PSICOSENSOMETRICO_CERT_ALTURA",
-    // "PSICOSENSOMETRICO_CERT_ALTURA_PODEROSA",
-    // "PSICOSENSOMETRICO_CERT_ALTURA_1_8",
+    // "INFORME_PODEROSA_OPERAR",
+    // "INFORME_PODEROSA_OPERAR_LICENCIA",
+    // "INFORME_PODEROSA_OPERAR_CALIENTE",
+    "ESPIROMETRIA_ARCHIVO",
+    "OFTALMOLOGIA_VISION_TESTER",
+    "PSICOSENSOMETRICO_VEHI_FOLIO",
+    "PSICOSENSOMETRICO_CERT_ALTURA",
+    "PSICOSENSOMETRICO_CERT_ALTURA_PODEROSA",
+    "PSICOSENSOMETRICO_CERT_ALTURA_1_8",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -698,23 +696,57 @@ const Folio = () => {
                 <div className="columns-1 sm:columns-2 lg:columns-4 gap-4 w-full">
                     {form.listaExamenes?.map((examen, index) => {
                         if (showOnlyPassed && !examen.resultado) return null;
+
+                        let cardClass = "break-inside-avoid mb-4 flex justify-between items-center border-2 p-3 rounded-md shadow-sm gap-2 h-24 transition-all duration-200";
+
+                        if (!examen.resultado) {
+                            // NO PASO -> ROJO FUERTE
+                            cardClass += " bg-red-200 border-red-400 cursor-not-allowed opacity-90";
+                        } else {
+                            // SI PASO -> POINTER
+                            cardClass += " cursor-pointer hover:shadow-md hover:scale-[1.01]";
+                            if (!examen.imprimir) {
+                                // PASO PERO DESACTIVADO -> GRIS VERDOSO
+                                cardClass += " bg-gray-300 border-green-600 border-dashed";
+                            } else {
+                                // PASO Y ACTIVADO -> VERDE FUERTE
+                                cardClass += " bg-green-200 border-green-500";
+                            }
+                        }
+
                         return (
-                            <div key={index} className="break-inside-avoid mb-4 flex justify-between items-center border p-3 rounded-md shadow-sm bg-white gap-2 h-24">
+                            <div
+                                key={index}
+                                className={cardClass}
+                                onClick={(e) => {
+                                    if (e.target.type !== 'checkbox') {
+                                        toggleExamen(index);
+                                    }
+                                }}
+                            >
                                 <div className="flex items-center gap-2">
                                     <input
                                         type="checkbox"
                                         checked={examen.imprimir || false}
                                         onChange={() => toggleExamen(index)}
                                         disabled={!examen.resultado}
-                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                                        className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 flex-shrink-0"
                                     />
-                                    <span className="font-medium text-gray-700 text-sm whitespace-normal break-words max-w-[150px] cursor-pointer line-clamp-3" onClick={() => toggleExamen(index)}>
+                                    <span className="font-bold text-gray-800 text-sm whitespace-normal break-words max-w-[150px] line-clamp-3 leading-tight select-none">
                                         {index + 1}.- {examen.nombre}
                                     </span>
                                 </div>
-                                <span className={`font-bold text-sm ${examen.resultado ? 'text-green-600' : 'text-red-600'}`}>
-                                    {examen.resultado ? 'PASO' : 'NO PASO'}
-                                </span>
+
+                                <div className="flex flex-col items-end justify-center min-w-fit gap-1">
+                                    <span className={`font-black text-sm whitespace-nowrap ${examen.resultado ? 'text-green-800' : 'text-red-800'} select-none`}>
+                                        {examen.resultado ? 'PASO' : 'NO PASO'}
+                                    </span>
+                                    {examen.esArchivo && (
+                                        <span className="bg-blue-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm select-none">
+                                            ARCHIVO
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                         );
                     })}
@@ -727,8 +759,9 @@ const Folio = () => {
                         Limpiar
                     </button>
                     <button
-                        className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-md mt-4 text-semibold"
+                        className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
                         onClick={handleGenerarFolio}
+                        disabled={(form.listaExamenes?.filter(e => e.imprimir).length || 0) == 0}
                     >
                         Generar Folio
                     </button>

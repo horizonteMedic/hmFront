@@ -151,18 +151,21 @@ export const EXAMENES_CATALOGO = {
         nombre: "DECLARACION USO FIRMA",
         tabla: "DECLARACION USO FIRMA",
         nomenclatura: "DECLARACION USO FIRMA",
+        esArchivo: true,
     },
 
     ELECTROCARDIOGRAMA_ARCHIVO: {
         nombre: "ELECTROCARDIOGRAMA ARCHIVO",
         tabla: "ELECTROCARDIOGRAMA",
         nomenclatura: "ELECTROCARDIOGRAMA",
+        esArchivo: true,
     },
 
     LABORATORIO_ARCHIVO_EXTERNO: {
         nombre: "LABORATORIO ARCHIVO EXTERNO",
         tabla: "LABORATORIO MANIPULADORES",
         nomenclatura: "LABORATORIO MANIPULADORES",
+        esArchivo: true,
     },
 
     ESPIROMETRIA_ARCHIVO: {
@@ -171,12 +174,14 @@ export const EXAMENES_CATALOGO = {
         nomenclatura: "ESPIROMETRIA",
         tablaArchivo: "funcion_abs",
         urlInfo: "/api/v01/ct/espirometria/obtenerReporteEspirometria",
+        esArchivo: true,
     },
 
     INTERCONSULTAS: {
         nombre: "INTERCONSULTAS",
         tabla: "",
         url: "",
+        esArchivo: true,
     },
 
     OFTALMOLOGIA_VISION_TESTER: {
@@ -185,24 +190,34 @@ export const EXAMENES_CATALOGO = {
         nomenclatura: "OFTALMOLOGIA VISION TESTER",
         tablaArchivo: "oftalmologia2021",
         urlInfo: "/api/v01/ct/agudezaVisual/obtenerReporteEvaluacionOftalmologica",
+        esArchivo: true,
     },
 
     PSICOSENSOMETRICO_CERT_ALTURA: {
         nombre: "CERT. ALTURA ARCHIVO EXTERNO",
         tabla: "PSICOSENSOMETRICO CERT-ALTURA",
         nomenclatura: "PSICOSENSOMETRICO CERT-ALTURA",
+        tablaArchivo: "b_certificado_altura",
+        urlInfo: "/api/v01/ct/certificadoTrabajoAltura/obtenerReporteCertificadoTrabajoAltura",
+        esArchivo: true,
     },
 
     PSICOSENSOMETRICO_CERT_ALTURA_PODEROSA: {
         nombre: "CERT. ALTURA PODEROSA ARCHIVO EXTERNO",
         tabla: "PSICOSENSOMETRICO ALTU-POD",
         nomenclatura: "PSICOSENSOMETRICO ALTU-POD",
+        tablaArchivo: "certificado_altura_poderosa",
+        urlInfo: "/api/v01/ct/certificadoTrabajoAltura/obtenerReporteCertificadoTrabajoAlturaPoderosa",
+        esArchivo: true,
     },
 
     PSICOSENSOMETRICO_CERT_ALTURA_1_8: {
         nombre: "ALTURA 1.8 ARCHIVO EXTERNO",
         tabla: "PSICOSENSOMETRICO ALTURA 1-8",
         nomenclatura: "PSICOSENSOMETRICO ALTURA 1-8",
+        tablaArchivo: "certificacion_medica_altura",
+        urlInfo: "/api/v01/ct/certificacionMedicinaAltura/obtenerReporteCertificacionMedicinaAltura",
+        esArchivo: true,
     },
 
     PSICOSENSOMETRICO_VEHI_FOLIO: {
@@ -211,24 +226,28 @@ export const EXAMENES_CATALOGO = {
         nomenclatura: "PSICOSENSOMETRICO VEHI-FOLIO",
         tablaArchivo: "b_certificado_conduccion",
         urlInfo: "/api/v01/ct/certificadoConduccion/obtenerReporteCertificadoConduccion",
+        esArchivo: true,
     },
 
     RADIOGRAFIA_COLUMNA_ARCHIVO: {
         nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA) ARCHIVO",
         tabla: "INFORME RADIOGRAFICO",
         nomenclatura: "INFORME RADIOGRAFICO",
+        esArchivo: true,
     },
 
     RADIOGRAFIA_COLUMNA_ARCHIVO2: {
         nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA) ARCHIVO 2",
         tabla: "INFORME RADIOGRAFICO 2",
         nomenclatura: "INFORME RADIOGRAFICO 2",
+        esArchivo: true,
     },
 
     RAYOS_X_TORAX_ARCHIVO: {
         nombre: "RAYOS X TORAX ARCHIVO",
         tabla: "RAYOS X TORAX",
         nomenclatura: "RAYOS X TORAX",
+        esArchivo: true,
     },
 
     /* =========================
