@@ -28,11 +28,17 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    // "INMUNOLOGIA_BK_KOH",
     "INFORME_PODEROSA_OPERAR",
     "INFORME_PODEROSA_OPERAR_LICENCIA",
     "INFORME_PODEROSA_OPERAR_CALIENTE",
-
+    // "ESPIROMETRIA_ARCHIVO",
+    // "LABORATORIO_ARCHIVO_EXTERNO",
+    // "CERTIFICADO_APTITUD_ANEXO_16",
+    // "OFTALMOLOGIA_VISION_TESTER",
+    // "PSICOSENSOMETRICO_VEHI_FOLIO",
+    // "PSICOSENSOMETRICO_CERT_ALTURA",
+    // "PSICOSENSOMETRICO_CERT_ALTURA_PODEROSA",
+    // "PSICOSENSOMETRICO_CERT_ALTURA_1_8",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -71,6 +77,8 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "CERTIFICADO_ALTURA",
     "CERTIFICADO_ALTURA_PODEROSA",          //revisar
     "PSICOSENSOMETRICO_CERT_ALTURA",        //revisar
+    "PSICOSENSOMETRICO_CERT_ALTURA_PODEROSA",
+    "PSICOSENSOMETRICO_CERT_ALTURA_1_8",
     "CERTIFICADO_APTITUD_ALTURA_PODEROSA",
     "CERTIFICADO_VEHICULOS",
     "PSICOSENSOMETRICO_VEHI_FOLIO",
@@ -345,7 +353,7 @@ const ExamenesListLaboratorio = buildExamenesList([
 ]);
 
 const ListaPorPlantilla = {
-    //PRUEBAS: ExamenesListPRUEBAS,
+    PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     "COMPLETO": ExamenesListCOMPLETO,
     OHLA: ExamenesListOHLA,

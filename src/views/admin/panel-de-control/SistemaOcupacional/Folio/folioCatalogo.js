@@ -169,6 +169,8 @@ export const EXAMENES_CATALOGO = {
         nombre: "ESPIROMETRIA",
         tabla: "ESPIROMETRIA",
         nomenclatura: "ESPIROMETRIA",
+        tablaArchivo: "funcion_abs",
+        urlInfo: "/api/v01/ct/espirometria/obtenerReporteEspirometria",
     },
 
     INTERCONSULTAS: {
@@ -181,18 +183,34 @@ export const EXAMENES_CATALOGO = {
         nombre: "VISION TESTER ARCHIVO EXTERNO",
         tabla: "OFTALMOLOGIA VISION TESTER",
         nomenclatura: "OFTALMOLOGIA VISION TESTER",
+        tablaArchivo: "oftalmologia2021",
+        urlInfo: "/api/v01/ct/agudezaVisual/obtenerReporteEvaluacionOftalmologica",
     },
 
     PSICOSENSOMETRICO_CERT_ALTURA: {
-        nombre: "ALTURA ARCHIVO EXTERNO",
+        nombre: "CERT. ALTURA ARCHIVO EXTERNO",
         tabla: "PSICOSENSOMETRICO CERT-ALTURA",
         nomenclatura: "PSICOSENSOMETRICO CERT-ALTURA",
+    },
+
+    PSICOSENSOMETRICO_CERT_ALTURA_PODEROSA: {
+        nombre: "CERT. ALTURA PODEROSA ARCHIVO EXTERNO",
+        tabla: "PSICOSENSOMETRICO ALTU-POD",
+        nomenclatura: "PSICOSENSOMETRICO ALTU-POD",
+    },
+
+    PSICOSENSOMETRICO_CERT_ALTURA_1_8: {
+        nombre: "ALTURA 1.8 ARCHIVO EXTERNO",
+        tabla: "PSICOSENSOMETRICO ALTURA 1-8",
+        nomenclatura: "PSICOSENSOMETRICO ALTURA 1-8",
     },
 
     PSICOSENSOMETRICO_VEHI_FOLIO: {
         nombre: "PSICOSENSOMETRICO CONDUCCION ARCHIVO EXTERNO",
         tabla: "PSICOSENSOMETRICO VEHI-FOLIO",
         nomenclatura: "PSICOSENSOMETRICO VEHI-FOLIO",
+        tablaArchivo: "b_certificado_conduccion",
+        urlInfo: "/api/v01/ct/certificadoConduccion/obtenerReporteCertificadoConduccion",
     },
 
     RADIOGRAFIA_COLUMNA_ARCHIVO: {

@@ -8,6 +8,7 @@ import { PDFDocument } from "pdf-lib";
 // pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 import pdfjsLib from "../../config/pdjfConfig";
+import { colocarSellosEnPdf, getSign } from "../../utils/helpers";
 
 export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType, signal, nombres = "", apellidos = "") {
     if (signal?.aborted) throw new DOMException("Aborted", "AbortError");//para poder cancelar la gereracion
@@ -20,21 +21,51 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
     ];
 
     const archivos = [
-        "ESPIROMETRIA",
+        "ESPIROMETRIA",//SI FIRMA
         "RAYOS X TORAX",
         "INFORME RADIOGRAFICO",
         "INFORME RADIOGRAFICO 2",
         "ELECTROCARDIOGRAMA",
-        "OFTALMOLOGIA VISION TESTER",
+        "OFTALMOLOGIA VISION TESTER",//SI FIRMA
         "DECLARACION USO FIRMA",
-        "PSICOSENSOMETRICO CERT-ALTURA",
-        "PSICOSENSOMETRICO VEHI-FOLIO",
+        "PSICOSENSOMETRICO CERT-ALTURA",//SI FIRMA
+        "PSICOSENSOMETRICO ALTU-POD",//SI FIRMA nuevo
+        "PSICOSENSOMETRICO ALTURA 1-8",//SI FIRMA nuevo
+        "PSICOSENSOMETRICO VEHI-FOLIO",//SI FIRMA
         "LABORATORIO MANIPULADORES",
         "INTERCONSULTA",
         "INTERCONSULTA 2",
         "INTERCONSULTA 3",
         "INTERCONSULTA 4",
     ];
+    const coordenadasPSICOSENSO = {
+        HUELLA: { x: 400, y: 680, width: 60, height: 60 },
+        FIRMA: { x: 466, y: 680, width: 120, height: 60 },
+        SELLOFIRMA: { x: 40, y: 680, width: 120, height: 80 },
+    }
+    const archivosConFirmas = {
+        "ESPIROMETRIA": {
+            FIRMA: { x: 40, y: 750, width: 120, height: 60 },
+            HUELLA: { x: 180, y: 750, width: 60, height: 60 },
+            SELLOFIRMA: { x: 220, y: 700, width: 100, height: 60 },
+            SELLOFIRMADOCASIG: { x: 340, y: 700, width: 100, height: 60 },
+            "SELLOFIRMADOCASIG-EXTRA": { x: 460, y: 700, width: 100, height: 60 },
+        },
+
+        "OFTALMOLOGIA VISION TESTER": {
+            HUELLA: { x: 400, y: 680, width: 60, height: 60 },
+            FIRMA: { x: 466, y: 680, width: 120, height: 60 },
+            SELLOFIRMADOCASIG: { x: 40, y: 680, width: 120, height: 80 },
+        },
+
+        "PSICOSENSOMETRICO CERT-ALTURA": coordenadasPSICOSENSO,
+
+        "PSICOSENSOMETRICO ALTU-POD": coordenadasPSICOSENSO,
+
+        "PSICOSENSOMETRICO ALTURA 1-8": coordenadasPSICOSENSO,
+
+        "PSICOSENSOMETRICO VEHI-FOLIO": coordenadasPSICOSENSO,
+    }
 
     const jaspersConOpcionMultiple = [
         "informe_electrocardiograma",
@@ -50,6 +81,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
     ]
 
     const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true && ex.imprimir === true);
+
     //const examenesFiltrados = ListaExamenes; //SOLO ACTIVAR PARA PRUEBAS 
     const totalReportes = examenesFiltrados.length;
 
@@ -68,16 +100,19 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
     // Ejecutar todas las consultas a los endpoints en paralelo
     const resultadosFetch = await Promise.all(
         examenesFiltrados.map(async (examen) => {
-            if (archivos.includes(examen.tabla)) {
+            if (archivos.includes(examen.tabla) && !Object.keys(archivosConFirmas).includes(examen.tabla)) {
                 return null;
             }
-
-            const apiUrl = examen.esJasper
-                ? `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}&esJasper=true`
-                : examen.nameConset ?
-                    `${examen.url}?nOrden=${nro}&nameConset=${examen.tabla}`
-                    : `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}`;
-
+            let apiUrl = ""
+            if (examen.urlInfo) {
+                apiUrl = `${examen.urlInfo}?nOrden=${nro}&nameService=${examen.tablaArchivo}&esJasper=true`
+            } else {
+                apiUrl = examen.esJasper
+                    ? `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}&esJasper=true`
+                    : examen.nameConset ?
+                        `${examen.url}?nOrden=${nro}&nameConset=${examen.tabla}`
+                        : `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}`;
+            }
             try {
                 const data = await getFetch(apiUrl, token, signal);
                 return data || null;
@@ -99,7 +134,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
                 examen: examen,
                 // La posición es después del último examen generado
                 posicionInsercion: ultimaPaginaGenerada,
-                indiceEnLista: i
+                indiceEnLista: i,
+                data: resultadosFetch[i]
             });
             console.log(`📎 PDF Externo detectado: ${examen.nombre} - Se insertará después de página ${ultimaPaginaGenerada}`);
             continue;
@@ -267,6 +303,38 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
                     throw new Error(`Error HTTP: ${response.status}`);
                 }
                 externoBytes = await response.arrayBuffer();
+
+
+
+                // 🆕 APLICAR FIRMAS SI ESTÁ CONFIGURADO
+                if (archivosConFirmas[examen.tabla] && pdfExt.data) {
+                    try {
+                        console.log(`🖋️ Aplicando firmas a ${examen.nombre}...`);
+                        const data = pdfExt.data;
+                        const coordenadas = archivosConFirmas[examen.tabla];
+
+                        const sFirma = getSign(data, "FIRMAP");
+                        const sHuella = getSign(data, "HUELLA");
+                        const sSello = getSign(data, "SELLOFIRMA");
+                        const sSello2 = getSign(data, "SELLOFIRMADOCASIG");
+                        const sSello3 = getSign(data, "SELLOFIRMADOCASIG-EXTRA");
+
+                        const sellos = {
+                            FIRMA: sFirma,
+                            HUELLA: sHuella,
+                            SELLOFIRMA: sSello,
+                            SELLOFIRMADOCASIG: sSello2,
+                            "SELLOFIRMADOCASIG-EXTRA": sSello3,
+                        };
+
+                        const pdfUint8 = new Uint8Array(externoBytes);
+                        externoBytes = await colocarSellosEnPdf(pdfUint8, sellos, coordenadas);
+                        console.log("✅ Firmas aplicadas correctamente.");
+                    } catch (err) {
+                        console.error("❌ Error aplicando firmas:", err);
+                        // No lanzamos error fatal, seguimos con el PDF original
+                    }
+                }
 
                 // 📊 Mostrar tamaño del PDF externo
                 const tamañoExternoKB = (externoBytes.byteLength / 1024).toFixed(2);
