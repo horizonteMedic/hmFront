@@ -730,61 +730,93 @@ export const handleSubidaMasiva = async (form, selectedSede, urlPDf, userlogued,
 
     const uploadPromises = pdfFiles.map(async (file) => {
         const orden = obtenerOrdenDesdeNombre(file.name);
-        if (!orden) return null; // Se ignora
+        if (!orden) {
+            return { name: file.name, status: "ignored", message: "Sin N° Orden detectado" };
+        }
 
-        const base64 = await readFileAsBase64(file);
-        const base64WithoutHeader = base64.split(",")[1];
+        try {
+            const base64 = await readFileAsBase64(file);
+            const base64WithoutHeader = base64.split(",")[1];
 
-        const pdfBytes = Uint8Array.from(
-            atob(base64WithoutHeader),
-            (c) => c.charCodeAt(0)
-        );
+            const pdfBytes = Uint8Array.from(
+                atob(base64WithoutHeader),
+                (c) => c.charCodeAt(0)
+            );
 
-        const pdfBase64Final = uint8ToBase64(pdfBytes);
+            const pdfBase64Final = uint8ToBase64(pdfBytes);
 
-        const nombreOriginal = file.name.replace(/\.pdf$/i, "");
-        const nombreFinal = `${nombreOriginal}-${generarIdCorto()}.pdf`;
+            const nombreOriginal = file.name.replace(/\.pdf$/i, "");
+            const nombreFinal = `${nombreOriginal}-${generarIdCorto()}.pdf`;
 
-        const datos = {
-            rutaArchivo: null,
-            dni: null,
-            historiaClinica: null,
-            servidor: "azure",
-            estado: true,
-            fechaRegistro: `${year}-${month}-${day}`,
-            userRegistro: userlogued,
-            fechaActualizacion: null,
-            userActualizacion: null,
-            id_tipo_archivo: null,
+            const datos = {
+                rutaArchivo: null,
+                dni: null,
+                historiaClinica: null,
+                servidor: "azure",
+                estado: true,
+                fechaRegistro: `${year}-${month}-${day}`,
+                userRegistro: userlogued,
+                fechaActualizacion: null,
+                userActualizacion: null,
+                id_tipo_archivo: null,
 
-            nombreArchivo: nombreFinal,
-            codigoSede: selectedSede,
-            fileBase64: pdfBase64Final,
-            nomenclatura_tipo_archivo: form.nomenclatura,
-            orden,
-            indice_carga_masiva: undefined,
-        };
+                nombreArchivo: nombreFinal,
+                codigoSede: selectedSede,
+                fileBase64: pdfBase64Final,
+                nomenclatura_tipo_archivo: form.nomenclatura,
+                orden,
+                indice_carga_masiva: undefined,
+            };
 
-        return SubmitData(datos, urlPDf, token);
+            const res = await SubmitData(datos, urlPDf, token);
+            return {
+                name: file.name,
+                status: res?.id === 1 ? "success" : "error",
+                message: res?.id === 1 ? "OK" : (res?.message || "Error al subir")
+            };
+        } catch (err) {
+            console.error(err);
+            return { name: file.name, status: "error", message: "Error interno" };
+        }
     });
 
     try {
-        const results = await Promise.all(
-            uploadPromises.filter(Boolean)
-        );
+        const results = await Promise.all(uploadPromises);
 
-        const exitosos = results.filter(r => r?.id === 1).length;
+        const exitosos = results.filter(r => r.status === "success");
+        const fallidos = results.filter(r => r.status !== "success");
 
-        Swal.fire(
-            "Carga finalizada",
-            `${exitosos} archivos subidos correctamente`,
-            "success"
-        );
+        const htmlList = `
+            <div style="text-align:left; max-height:300px; overflow:auto;">
+                <p><b>Resumen:</b> ${exitosos.length} subidos, ${fallidos.length} no subidos.</p>
+                
+                ${exitosos.length > 0 ? `
+                    <h5 style="color:green; margin-top:10px; font-size:16px;">Subidos correctamente:</h5>
+                    <ul style="font-size:14px; margin-bottom:10px;">
+                        ${exitosos.map(f => `<li>${f.name}</li>`).join("")}
+                    </ul>
+                ` : ""}
+
+                ${fallidos.length > 0 ? `
+                    <h5 style="color:red; margin-top:10px; font-size:16px;">No se pudieron subir:</h5>
+                    <ul style="font-size:14px;">
+                        ${fallidos.map(f => `<li>${f.name} <span style="color:gray">(${f.message})</span></li>`).join("")}
+                    </ul>
+                ` : ""}
+            </div>
+        `;
+
+        Swal.fire({
+            title: "Carga Finalizada",
+            html: htmlList,
+            icon: fallidos.length === 0 ? "success" : "warning",
+            width: "600px"
+        });
     } catch (err) {
         console.error(err);
         Swal.fire(
             "Error",
-            "Ocurrió un error durante la carga masiva",
+            "Ocurrió un error crítico durante el proceso",
             "error"
         );
     }

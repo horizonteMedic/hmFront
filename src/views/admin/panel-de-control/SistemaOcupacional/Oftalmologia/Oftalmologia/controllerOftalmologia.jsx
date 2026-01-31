@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
 import { getFetch } from "../../../getFetch/getFetch";
 import { SubmitData } from "../model";
-import { handleSubidaMasiva, handleSubirArchivoDefault, handleSubirArchivoDefaultSinSellos, ReadArchivosFormDefault } from "../../../../../utils/functionUtils";
+import { handleSubidaMasiva, handleSubirArchivoDefaultSinSellos, ReadArchivosFormDefault } from "../../../../../utils/functionUtils";
 
 //===============Zona Modificación===============
 const obtenerReporteUrl =
@@ -443,12 +443,12 @@ export const GetInfoPac = (nro, set, token, sede) => {
 };
 
 export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
-  const coordenadas = {
-    HUELLA: { x: 400, y: 680, width: 60, height: 60 },
-    FIRMA: { x: 466, y: 680, width: 120, height: 60 },
-    SELLOFIRMADOCASIG: { x: 40, y: 680, width: 120, height: 80 },
-  };
-  handleSubirArchivoDefault(form, selectedSede, registrarPDF, userlogued, token, coordenadas)
+  // const coordenadas = {
+  //   HUELLA: { x: 400, y: 680, width: 60, height: 60 },
+  //   FIRMA: { x: 466, y: 680, width: 120, height: 60 },
+  //   SELLOFIRMADOCASIG: { x: 40, y: 680, width: 120, height: 80 },
+  // };
+  handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
 };
 
 export const ReadArchivosForm = async (form, setVisualerOpen, token) => {

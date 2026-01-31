@@ -6,6 +6,7 @@ import {
   GetInfoServicio,
   getInfoTabla,
   handleSubirArchivo,
+  handleSubirArchivoMasivo,
   Loading,
   PrintHojaR,
   ReadArchivosForm,
@@ -24,7 +25,6 @@ import TablaTemplate from "../../../../components/templates/TablaTemplate";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
-import { handleSubirArchivoMasivo } from "../Admision/ConsentimientoDigitalizacion/controllerConsentimientoDigitalizacion";
 
 const tabla = "informe_electrocardiograma";
 

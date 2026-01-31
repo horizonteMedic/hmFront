@@ -9,6 +9,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {
   handleSubirArchivo,
+  handleSubirArchivoMasivo,
   PrintHojaR,
   ReadArchivosForm,
   SubmitDataService,

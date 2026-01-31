@@ -7,13 +7,14 @@ import SectionFieldset from "../../../../components/reusableComponents/SectionFi
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import { useForm } from "../../../../hooks/useForm";
-import { handleSubirArchivoEspirometria, ReadArchivosFormEspirometria, SubmitDataService, VerifyTR } from "./controllerEspirometria";
+import { handleSubirArchivoMasivo, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerEspirometria";
 import { BotonesAccion, DatosPersonalesLaborales } from "../../../../components/templates/Templates";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
-import { faDownload, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
+import { handleSubirArchivo } from "../Altura18/controllerAltura18";
 
 const tabla = "funcion_abs";
 
@@ -139,12 +140,11 @@ export default function Espirometria() {
                         handleCheckBoxChange(e);
                     }}
                 />
-                {form.SubirDoc &&
-                    <ButtonsPDF
-                        handleSave={() => { handleSubirArchivoEspirometria(form, selectedSede, userlogued, token) }}
-                        handleRead={() => { ReadArchivosFormEspirometria(form, setVisualerOpen, token) }}
-                    />
-                }
+                <ButtonsPDF
+                    {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
+                    {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+                    handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
+                />
             </SectionFieldset>
 
             <DatosPersonalesLaborales form={form} />

@@ -28,7 +28,14 @@ const ExamenesListPRUEBASArchivos = buildExamenesList([
 ]);
 
 const ExamenesListPRUEBAS = buildExamenesList([
-        "INMUNOLOGIA_HEPATITIS",
+    "OFTALMOLOGIA_VISION_TESTER",
+    "PSICOSENSOMETRICO_CERT_ALTURA",        //revisar
+    "PSICOSENSOMETRICO_CERT_ALTURA_PODEROSA",
+    "PSICOSENSOMETRICO_CERT_ALTURA_1_8",
+    "PSICOSENSOMETRICO_VEHI_FOLIO",
+    "ESPIROMETRIA_ARCHIVO",
+    "LABORATORIO_ARCHIVO_EXTERNO",
+    "DECLARACION_USO_FIRMA_ARCHIVO",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
