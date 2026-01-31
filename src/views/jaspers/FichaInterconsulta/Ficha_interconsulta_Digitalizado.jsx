@@ -46,6 +46,7 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
     // Datos específicos de interconsulta
     codigoFichaInterconsulta: String(data.codigoFichaInterconsulta ?? ""),
     especialidad: String(data.especialidad ?? ""),
+    esOftalmologia: Boolean(data.esOftalmologia ?? false),
     motivoInterconsulta: String(data.motivo ?? ""),
     fechaAtencion: formatearFechaCorta(data.fechaApertura ?? ""),
     hallazgosRelevantes: String(data.hallazgo ?? ""),
@@ -206,123 +207,108 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
   }
 
   doc.text(horaFormateada, tablaInicioX + 155, yPos - 1.5)
+  
   // Configurar líneas para filas de datos
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
 
-  // Primera fila: Apellidos y Nombres (fila completa) 
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); yPos += filaAltura;
-
-  // Segunda fila: DNI, Edad, Sexo (3 columnas)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + 60, yPos, tablaInicioX + 60, yPos + filaAltura);
-  doc.line(tablaInicioX + 120, yPos, tablaInicioX + 120, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  // === Fila 1: Apellidos y Nombres ===
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yPos + 4);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.apellidosNombres || "", tablaInicioX + 40, yPos + 4);
   yPos += filaAltura;
 
-  // Tercera fila: Área de Trabajo, Puesto de Trabajo (2 columnas)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  // === Fila 2: DNI, Edad, Sexo (3 columnas) ===
+  const col1W = 63.33;
+  const col2W = 63.33;
+  const col3W = 63.34;
+
+  doc.rect(tablaInicioX, yPos, col1W, filaAltura, 'S');
+  doc.rect(tablaInicioX + col1W, yPos, col2W, filaAltura, 'S');
+  doc.rect(tablaInicioX + col1W + col2W, yPos, col3W, filaAltura, 'S');
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("DNI / CE / NIE:", tablaInicioX + 2, yPos + 4);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.documentoIdentidad || "", tablaInicioX + 29, yPos + 4);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Edad:", tablaInicioX + col1W + 2, yPos + 4);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.edad || "") + " Años", tablaInicioX + col1W + 14, yPos + 4);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Género:", tablaInicioX + col1W + col2W + 2, yPos + 4);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.sexo || "", tablaInicioX + col1W + col2W + 14, yPos + 4);
   yPos += filaAltura;
 
-  // 🔹 Nueva cuarta fila: Centro de Trabajo (fila completa)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  // === Fila 3: Área de Trabajo, Puesto de Trabajo (2 columnas) ===
+  const anchoCol1 = 95;
+  const anchoCol2 = 95;
+
+  doc.rect(tablaInicioX, yPos, anchoCol1, filaAltura, 'S');
+  doc.rect(tablaInicioX + anchoCol1, yPos, anchoCol2, filaAltura, 'S');
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Área de Trabajo:", tablaInicioX + 2, yPos + 4);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.areaTrabajo || "", tablaInicioX + 30, yPos + 4);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Puesto de Trabajo:", tablaInicioX + anchoCol1 + 2, yPos + 4);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.puestoTrabajo || "", tablaInicioX + anchoCol1 + 30, yPos + 4);
   yPos += filaAltura;
 
-  // Quinta fila: Empresa (fila completa)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  // === Fila 4: Empresa (con altura dinámica) ===
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  const textoEmpresa = datosFinales.empresa || "";
+  const lineasEmpresa = doc.splitTextToSize(textoEmpresa, tablaAncho - 25);
+  const alturaEmpresa = Math.max(filaAltura, lineasEmpresa.length * 3.5 + 1);
+
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaEmpresa, 'S');
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Empresa:", tablaInicioX + 2, yPos + 4);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  if (lineasEmpresa.length === 1) {
+    doc.text(lineasEmpresa[0], tablaInicioX + 25, yPos + 4);
+  } else {
+    lineasEmpresa.forEach((linea, lineIdx) => {
+      doc.text(linea, tablaInicioX + 25, yPos + 3.5 + (lineIdx * 3.5));
+    });
+  }
+  yPos += alturaEmpresa;
+
+  // === Fila 5: Contratista ===
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Contratista:", tablaInicioX + 2, yPos + 4);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.contrata || "", tablaInicioX + 25, yPos + 4);
   yPos += filaAltura;
 
-  // Sexta fila: Contrata (2 columnas, la segunda más pequeña)
-  const anchoPrimeraCol = 140; // Ancho columna grande
+  // === Fila 6: Dirección y Tel (2 columnas) ===
+  const anchoDir = 140;
+  const anchoTel = 50;
 
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + anchoPrimeraCol, yPos, tablaInicioX + anchoPrimeraCol, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // === CONTENIDO DE LA TABLA ===
-  let yTexto = 38 + 2; // Ajustar para el header
-
-  // Primera fila: Apellidos y Nombres
-  yTexto += filaAltura;
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto + 2);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 40, yTexto + 2, tablaAncho - 40);
-  yTexto += filaAltura;
-
-  // Segunda fila: DNI, Edad, Sexo
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("DNI / CE / NIE:", tablaInicioX + 2, yTexto + 2);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.documentoIdentidad, tablaInicioX + 29, yTexto + 2);
+  doc.rect(tablaInicioX, yPos, anchoDir, filaAltura, 'S');
+  doc.rect(tablaInicioX + anchoDir, yPos, anchoTel, filaAltura, 'S');
 
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Edad:", tablaInicioX + 62, yTexto + 2);
+  doc.text("Dirección:", tablaInicioX + 2, yPos + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.edad + " Años", tablaInicioX + 75, yTexto + 2);
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Género:", tablaInicioX + 122, yTexto + 2);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.sexo, tablaInicioX + 135, yTexto + 2);
-  yTexto += filaAltura;
-
-  // Tercera fila: Área de Trabajo, Puesto de Trabajo
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Área de Trabajo:", tablaInicioX + 2, yTexto + 2);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo, tablaInicioX + 30, yTexto + 2, 50);
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Puesto de Trabajo:", tablaInicioX + 92, yTexto + 2);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo, tablaInicioX + 122, yTexto + 2, 65);
-  yTexto += filaAltura;
-
-  // Cuarta fila: Empresa
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Empresa:", tablaInicioX + 2, yTexto + 2);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 25, yTexto + 2, tablaAncho - 25);
-  yTexto += filaAltura;
-
-  // Quinta fila: Contrata
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Contratista:", tablaInicioX + 2, yTexto + 2);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.contrata, tablaInicioX + 25, yTexto + 2, tablaAncho - 30);
-  yTexto += filaAltura;
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Dirección:", tablaInicioX + 2, yTexto + 2);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.direccionPaciente, tablaInicioX + 25, yTexto + 2, tablaAncho - 60);
+  doc.text(datosFinales.direccionPaciente || "", tablaInicioX + 25, yPos + 4);
 
   if (datosFinales.telefonoPaciente) {
     doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text("Tel:", tablaInicioX + 140, yTexto + 2);
+    doc.text("Tel:", tablaInicioX + anchoDir + 2, yPos + 4);
     doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(datosFinales.telefonoPaciente, tablaInicioX + 150, yTexto + 2);
+    doc.text(datosFinales.telefonoPaciente, tablaInicioX + anchoDir + 12, yPos + 4);
   }
-  yTexto += filaAltura;
+  yPos += filaAltura;
 
   // === SECCIÓN 2: FUNCIONES VITALES ===
   // Header de funciones vitales (solo título)
@@ -405,158 +391,165 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
   yPos += filaAltura;
 
   // === SECCIÓN 3: EVALUACIÓN OFTALMOLÓGICA ===
-  // Header de evaluación oftalmológica
-  yPos = dibujarHeaderSeccion("3. EVALUACIÓN OFTALMOLÓGICA", yPos, filaAltura);
+  // Solo mostrar si es oftalmología o agudeza visual
+  const mostrarSeccionOftalmologia = datosFinales.esOftalmologia || 
+    datosFinales.especialidad.toUpperCase() === "OFTALMO" || 
+    datosFinales.especialidad.toUpperCase() === "AGUDEZA VISUAL";
 
-  // Línea divisoria después del título
-  doc.setDrawColor(0, 0, 0);
-  doc.setLineWidth(0.2);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  if (mostrarSeccionOftalmologia) {
+    // Header de evaluación oftalmológica
+    yPos = dibujarHeaderSeccion("3. EVALUACIÓN OFTALMOLÓGICA", yPos, filaAltura);
 
-  // Configuración de la tabla manual
-  const alturaFilaHeader = filaAltura; // Usar filaAltura (5mm)
-  const anchoCol1 = 30; // Agudeza Visual
-  const anchoCol2 = 35; // Sin correctores
-  const anchoCol3 = 35; // Con correctores
-  const anchoCol4 = 50; // V. Binocular
-  const anchoCol5 = 40; // E. Oculares
+    // Línea divisoria después del título
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
 
-  // Preparar textos para calcular altura dinámica
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  const textosBinocularCerca = `Test de Ishihara: ${datosFinales.testIshihara || ""}`;
-  const textosBinocularLejos = `Ref. Pupilares: ${datosFinales.refPupilares || ""}`;
+    // Configuración de la tabla manual
+    const alturaFilaHeader = filaAltura; // Usar filaAltura (5mm)
+    const anchoCol1 = 30; // Agudeza Visual
+    const anchoCol2 = 35; // Sin correctores
+    const anchoCol3 = 35; // Con correctores
+    const anchoCol4 = 50; // V. Binocular
+    const anchoCol5 = 40; // E. Oculares
 
-  // Calcular altura necesaria para cada fila basada en el contenido más largo
-  const calcularAlturaTexto = (texto, anchoMaximo) => {
-    if (!texto) return filaAltura;
-    const lineas = doc.splitTextToSize(texto, anchoMaximo);
-    return Math.max(filaAltura, lineas.length * 3 + 2);
-  };
+    // Preparar textos para calcular altura dinámica
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const textosBinocularCerca = `Test de Ishihara: ${datosFinales.testIshihara || ""}`;
+    const textosBinocularLejos = `Ref. Pupilares: ${datosFinales.refPupilares || ""}`;
 
-  const alturaBinocularCerca = calcularAlturaTexto(textosBinocularCerca, anchoCol4 - 4);
-  const alturaBinocularLejos = calcularAlturaTexto(textosBinocularLejos, anchoCol4 - 4);
-  // Todas las filas usan la misma altura (la máxima necesaria)
-  const alturaFilaComun = Math.max(filaAltura, alturaBinocularCerca, alturaBinocularLejos);
-  const alturaTotal = alturaFilaHeader + (alturaFilaComun * 2);
+    // Calcular altura necesaria para cada fila basada en el contenido más largo
+    const calcularAlturaTexto = (texto, anchoMaximo) => {
+      if (!texto) return filaAltura;
+      const lineas = doc.splitTextToSize(texto, anchoMaximo);
+      return Math.max(filaAltura, lineas.length * 3 + 2);
+    };
 
-  // Dibujar líneas del header
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
+    const alturaBinocularCerca = calcularAlturaTexto(textosBinocularCerca, anchoCol4 - 4);
+    const alturaBinocularLejos = calcularAlturaTexto(textosBinocularLejos, anchoCol4 - 4);
+    // Todas las filas usan la misma altura (la máxima necesaria)
+    const alturaFilaComun = Math.max(filaAltura, alturaBinocularCerca, alturaBinocularLejos);
+    const alturaTotal = alturaFilaHeader + (alturaFilaComun * 2);
 
-  // Dibujar columnas verticales
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaTotal); // Línea izquierda
-  doc.line(tablaInicioX + anchoCol1, yPos, tablaInicioX + anchoCol1, yPos + alturaTotal); // Col 1
-  doc.line(tablaInicioX + anchoCol1 + anchoCol2, yPos, tablaInicioX + anchoCol1 + anchoCol2, yPos + alturaTotal); // Col 2
-  doc.line(tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3, yPos, tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3, yPos + alturaTotal); // Col 3
-  doc.line(tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3 + anchoCol4, yPos, tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3 + anchoCol4, yPos + alturaTotal); // Col 4
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaTotal); // Línea derecha
+    // Dibujar líneas del header
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
 
-  // Posición de E. Oculares
-  const xEOculares = tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3 + anchoCol4;
+    // Dibujar columnas verticales
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaTotal); // Línea izquierda
+    doc.line(tablaInicioX + anchoCol1, yPos, tablaInicioX + anchoCol1, yPos + alturaTotal); // Col 1
+    doc.line(tablaInicioX + anchoCol1 + anchoCol2, yPos, tablaInicioX + anchoCol1 + anchoCol2, yPos + alturaTotal); // Col 2
+    doc.line(tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3, yPos, tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3, yPos + alturaTotal); // Col 3
+    doc.line(tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3 + anchoCol4, yPos, tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3 + anchoCol4, yPos + alturaTotal); // Col 4
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaTotal); // Línea derecha
 
-  // Dibujar líneas horizontales principales
-  doc.line(tablaInicioX, yPos + alturaFilaHeader, tablaInicioX + tablaAncho, yPos + alturaFilaHeader); // Después del header (incluyendo E. Oculares)
-  doc.line(tablaInicioX, yPos + alturaFilaHeader + alturaFilaComun, tablaInicioX + tablaAncho, yPos + alturaFilaHeader + alturaFilaComun); // Después de Cerca (incluyendo E. Oculares)
-  doc.line(tablaInicioX, yPos + alturaTotal, tablaInicioX + tablaAncho, yPos + alturaTotal); // Línea inferior completa
+    // Posición de E. Oculares
+    const xEOculares = tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3 + anchoCol4;
 
-  // HEADER - Textos de las columnas (títulos en bold, tamaño normal)
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Agudeza Visual", tablaInicioX + anchoCol1 / 2, yPos + alturaFilaHeader / 2 + 1.5, { align: "center" });
-  doc.text("Sin correctores", tablaInicioX + anchoCol1 + anchoCol2 / 2, yPos + alturaFilaHeader / 2 + 1.5, { align: "center" });
-  doc.text("Con correctores", tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3 / 2, yPos + alturaFilaHeader / 2 + 1.5, { align: "center" });
-  doc.text("V. Binocular", tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3 + anchoCol4 / 2, yPos + alturaFilaHeader / 2 + 1.5, { align: "center" });
-  doc.text("E. Oculares", tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3 + anchoCol4 + anchoCol5 / 2, yPos + alturaFilaHeader / 2 + 1.5, { align: "center" });
+    // Dibujar líneas horizontales principales
+    doc.line(tablaInicioX, yPos + alturaFilaHeader, tablaInicioX + tablaAncho, yPos + alturaFilaHeader); // Después del header (incluyendo E. Oculares)
+    doc.line(tablaInicioX, yPos + alturaFilaHeader + alturaFilaComun, tablaInicioX + tablaAncho, yPos + alturaFilaHeader + alturaFilaComun); // Después de Cerca (incluyendo E. Oculares)
+    doc.line(tablaInicioX, yPos + alturaTotal, tablaInicioX + tablaAncho, yPos + alturaTotal); // Línea inferior completa
 
-  // Línea divisoria debajo del título "V. Binocular" (dentro de la celda del header)
-  const xVBinocular = tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3;
-  doc.line(xVBinocular, yPos + alturaFilaHeader / 2 + 2.5, xVBinocular + anchoCol4, yPos + alturaFilaHeader / 2 + 2.5);
+    // HEADER - Textos de las columnas (títulos en bold, tamaño normal)
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Agudeza Visual", tablaInicioX + anchoCol1 / 2, yPos + alturaFilaHeader / 2 + 1.5, { align: "center" });
+    doc.text("Sin correctores", tablaInicioX + anchoCol1 + anchoCol2 / 2, yPos + alturaFilaHeader / 2 + 1.5, { align: "center" });
+    doc.text("Con correctores", tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3 / 2, yPos + alturaFilaHeader / 2 + 1.5, { align: "center" });
+    doc.text("V. Binocular", tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3 + anchoCol4 / 2, yPos + alturaFilaHeader / 2 + 1.5, { align: "center" });
+    doc.text("E. Oculares", tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3 + anchoCol4 + anchoCol5 / 2, yPos + alturaFilaHeader / 2 + 1.5, { align: "center" });
 
-  // Línea divisoria debajo del título "E. Oculares" (dentro de la celda del header)
-  doc.line(xEOculares, yPos + alturaFilaHeader / 2 + 2.5, xEOculares + anchoCol5, yPos + alturaFilaHeader / 2 + 2.5);
+    // Línea divisoria debajo del título "V. Binocular" (dentro de la celda del header)
+    const xVBinocular = tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3;
+    doc.line(xVBinocular, yPos + alturaFilaHeader / 2 + 2.5, xVBinocular + anchoCol4, yPos + alturaFilaHeader / 2 + 2.5);
 
-  // FILA 1: CERCA
-  let yFila1 = yPos + alturaFilaHeader;
-  const mitadFila1 = yFila1 + alturaFilaComun / 2;
+    // Línea divisoria debajo del título "E. Oculares" (dentro de la celda del header)
+    doc.line(xEOculares, yPos + alturaFilaHeader / 2 + 2.5, xEOculares + anchoCol5, yPos + alturaFilaHeader / 2 + 2.5);
 
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Cerca", tablaInicioX + anchoCol1 / 2, mitadFila1 + 1, { align: "center" });
+    // FILA 1: CERCA
+    let yFila1 = yPos + alturaFilaHeader;
+    const mitadFila1 = yFila1 + alturaFilaComun / 2;
 
-  doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Cerca", tablaInicioX + anchoCol1 / 2, mitadFila1 + 1, { align: "center" });
 
-  // Sin correctores - con línea divisoria
-  const xSinCorrectores = tablaInicioX + anchoCol1;
-  doc.line(xSinCorrectores, yFila1, xSinCorrectores + anchoCol2, yFila1); // Línea superior celda
-  doc.line(xSinCorrectores, mitadFila1, xSinCorrectores + anchoCol2, mitadFila1); // Línea divisoria OD/OI
-  doc.line(xSinCorrectores, yFila1 + alturaFilaComun, xSinCorrectores + anchoCol2, yFila1 + alturaFilaComun); // Línea inferior celda
-  doc.text(`OD: ${datosFinales.agudezaVisualCercaOD || ""}`, xSinCorrectores + 2, yFila1 + alturaFilaComun / 4 + 1);
-  doc.text(`OI: ${datosFinales.agudezaVisualCercaOI || ""}`, xSinCorrectores + 2, mitadFila1 + alturaFilaComun / 4 + 1);
+    doc.setFont("helvetica", "normal").setFontSize(8);
 
-  // Con correctores - con línea divisoria
-  const xConCorrectores = tablaInicioX + anchoCol1 + anchoCol2;
-  doc.line(xConCorrectores, yFila1, xConCorrectores + anchoCol3, yFila1); // Línea superior celda
-  doc.line(xConCorrectores, mitadFila1, xConCorrectores + anchoCol3, mitadFila1); // Línea divisoria OD/OI
-  doc.line(xConCorrectores, yFila1 + alturaFilaComun, xConCorrectores + anchoCol3, yFila1 + alturaFilaComun); // Línea inferior celda
-  doc.text(`OD: ${datosFinales.agudezaVisualCercaConOD || ""}`, xConCorrectores + 2, yFila1 + alturaFilaComun / 4 + 1);
-  doc.text(`OI: ${datosFinales.agudezaVisualCercaConOI || ""}`, xConCorrectores + 2, mitadFila1 + alturaFilaComun / 4 + 1);
+    // Sin correctores - con línea divisoria
+    const xSinCorrectores = tablaInicioX + anchoCol1;
+    doc.line(xSinCorrectores, yFila1, xSinCorrectores + anchoCol2, yFila1); // Línea superior celda
+    doc.line(xSinCorrectores, mitadFila1, xSinCorrectores + anchoCol2, mitadFila1); // Línea divisoria OD/OI
+    doc.line(xSinCorrectores, yFila1 + alturaFilaComun, xSinCorrectores + anchoCol2, yFila1 + alturaFilaComun); // Línea inferior celda
+    doc.text(`OD: ${datosFinales.agudezaVisualCercaOD || ""}`, xSinCorrectores + 2, yFila1 + alturaFilaComun / 4 + 1);
+    doc.text(`OI: ${datosFinales.agudezaVisualCercaOI || ""}`, xSinCorrectores + 2, mitadFila1 + alturaFilaComun / 4 + 1);
 
-  // V. Binocular - Cerca
-  doc.text(textosBinocularCerca, tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3 + 2, yFila1 + 3.5, { maxWidth: anchoCol4 - 4, align: "left" });
+    // Con correctores - con línea divisoria
+    const xConCorrectores = tablaInicioX + anchoCol1 + anchoCol2;
+    doc.line(xConCorrectores, yFila1, xConCorrectores + anchoCol3, yFila1); // Línea superior celda
+    doc.line(xConCorrectores, mitadFila1, xConCorrectores + anchoCol3, mitadFila1); // Línea divisoria OD/OI
+    doc.line(xConCorrectores, yFila1 + alturaFilaComun, xConCorrectores + anchoCol3, yFila1 + alturaFilaComun); // Línea inferior celda
+    doc.text(`OD: ${datosFinales.agudezaVisualCercaConOD || ""}`, xConCorrectores + 2, yFila1 + alturaFilaComun / 4 + 1);
+    doc.text(`OI: ${datosFinales.agudezaVisualCercaConOI || ""}`, xConCorrectores + 2, mitadFila1 + alturaFilaComun / 4 + 1);
 
-  // E. Oculares - Fila 1 (Cerca)
-  const enfermedadesOculares = datosFinales.enfermedadesOculares || "";
-  if (enfermedadesOculares && enfermedadesOculares.trim() !== "") {
-    const maxAnchoEOculares = anchoCol5 - 4;
-    const lineasEOculares1 = doc.splitTextToSize(enfermedadesOculares, maxAnchoEOculares);
-    let yEOculares1 = yFila1 + 3.5;
-    const limiteSuperiorY = yFila1 + alturaFilaComun - 1;
-    lineasEOculares1.forEach((linea) => {
-      if (yEOculares1 < limiteSuperiorY && xEOculares + 2 + maxAnchoEOculares <= tablaInicioX + tablaAncho) {
-        doc.text(linea, xEOculares + 2, yEOculares1, { maxWidth: maxAnchoEOculares, align: "left" });
-        yEOculares1 += 3; // Espaciado entre líneas
-      }
-    });
+    // V. Binocular - Cerca
+    doc.text(textosBinocularCerca, tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3 + 2, yFila1 + 3.5, { maxWidth: anchoCol4 - 4, align: "left" });
+
+    // E. Oculares - Fila 1 (Cerca)
+    const enfermedadesOculares = datosFinales.enfermedadesOculares || "";
+    if (enfermedadesOculares && enfermedadesOculares.trim() !== "") {
+      const maxAnchoEOculares = anchoCol5 - 4;
+      const lineasEOculares1 = doc.splitTextToSize(enfermedadesOculares, maxAnchoEOculares);
+      let yEOculares1 = yFila1 + 3.5;
+      const limiteSuperiorY = yFila1 + alturaFilaComun - 1;
+      lineasEOculares1.forEach((linea) => {
+        if (yEOculares1 < limiteSuperiorY && xEOculares + 2 + maxAnchoEOculares <= tablaInicioX + tablaAncho) {
+          doc.text(linea, xEOculares + 2, yEOculares1, { maxWidth: maxAnchoEOculares, align: "left" });
+          yEOculares1 += 3; // Espaciado entre líneas
+        }
+      });
+    }
+
+    // FILA 2: LEJOS
+    let yFila2 = yPos + alturaFilaHeader + alturaFilaComun;
+    const mitadFila2 = yFila2 + alturaFilaComun / 2;
+
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Lejos", tablaInicioX + anchoCol1 / 2, mitadFila2 + 1, { align: "center" });
+
+    doc.setFont("helvetica", "normal").setFontSize(8);
+
+    // Sin correctores - con línea divisoria
+    doc.line(xSinCorrectores, yFila2, xSinCorrectores + anchoCol2, yFila2); // Línea superior celda
+    doc.line(xSinCorrectores, mitadFila2, xSinCorrectores + anchoCol2, mitadFila2); // Línea divisoria OD/OI
+    doc.line(xSinCorrectores, yFila2 + alturaFilaComun, xSinCorrectores + anchoCol2, yFila2 + alturaFilaComun); // Línea inferior celda
+    doc.text(`OD: ${datosFinales.agudezaVisualLejosOD || ""}`, xSinCorrectores + 2, yFila2 + alturaFilaComun / 4 + 1);
+    doc.text(`OI: ${datosFinales.agudezaVisualLejosOI || ""}`, xSinCorrectores + 2, mitadFila2 + alturaFilaComun / 4 + 1);
+
+    // Con correctores - con línea divisoria
+    doc.line(xConCorrectores, yFila2, xConCorrectores + anchoCol3, yFila2); // Línea superior celda
+    doc.line(xConCorrectores, mitadFila2, xConCorrectores + anchoCol3, mitadFila2); // Línea divisoria OD/OI
+    doc.line(xConCorrectores, yFila2 + alturaFilaComun, xConCorrectores + anchoCol3, yFila2 + alturaFilaComun); // Línea inferior celda
+    doc.text(`OD: ${datosFinales.agudezaVisualLejosConOD || ""}`, xConCorrectores + 2, yFila2 + alturaFilaComun / 4 + 1);
+    doc.text(`OI: ${datosFinales.agudezaVisualLejosConOI || ""}`, xConCorrectores + 2, mitadFila2 + alturaFilaComun / 4 + 1);
+
+    // V. Binocular - Lejos
+    doc.text(textosBinocularLejos, tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3 + 2, yFila2 + 3.5, { maxWidth: anchoCol4 - 4, align: "left" });
+
+    // E. Oculares - Fila 2 (Lejos)
+    if (enfermedadesOculares && enfermedadesOculares.trim() !== "") {
+      const maxAnchoEOculares = anchoCol5 - 4;
+      const lineasEOculares2 = doc.splitTextToSize(enfermedadesOculares, maxAnchoEOculares);
+      let yEOculares2 = yFila2 + 3.5;
+      const limiteSuperiorY = yFila2 + alturaFilaComun - 1;
+      lineasEOculares2.forEach((linea) => {
+        if (yEOculares2 < limiteSuperiorY && xEOculares + 2 + maxAnchoEOculares <= tablaInicioX + tablaAncho) {
+          doc.text(linea, xEOculares + 2, yEOculares2, { maxWidth: maxAnchoEOculares, align: "left" });
+          yEOculares2 += 3; // Espaciado entre líneas
+        }
+      });
+    }
+
+    yPos = yPos + alturaTotal;
   }
-
-  // FILA 2: LEJOS
-  let yFila2 = yPos + alturaFilaHeader + alturaFilaComun;
-  const mitadFila2 = yFila2 + alturaFilaComun / 2;
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Lejos", tablaInicioX + anchoCol1 / 2, mitadFila2 + 1, { align: "center" });
-
-  doc.setFont("helvetica", "normal").setFontSize(8);
-
-  // Sin correctores - con línea divisoria
-  doc.line(xSinCorrectores, yFila2, xSinCorrectores + anchoCol2, yFila2); // Línea superior celda
-  doc.line(xSinCorrectores, mitadFila2, xSinCorrectores + anchoCol2, mitadFila2); // Línea divisoria OD/OI
-  doc.line(xSinCorrectores, yFila2 + alturaFilaComun, xSinCorrectores + anchoCol2, yFila2 + alturaFilaComun); // Línea inferior celda
-  doc.text(`OD: ${datosFinales.agudezaVisualLejosOD || ""}`, xSinCorrectores + 2, yFila2 + alturaFilaComun / 4 + 1);
-  doc.text(`OI: ${datosFinales.agudezaVisualLejosOI || ""}`, xSinCorrectores + 2, mitadFila2 + alturaFilaComun / 4 + 1);
-
-  // Con correctores - con línea divisoria
-  doc.line(xConCorrectores, yFila2, xConCorrectores + anchoCol3, yFila2); // Línea superior celda
-  doc.line(xConCorrectores, mitadFila2, xConCorrectores + anchoCol3, mitadFila2); // Línea divisoria OD/OI
-  doc.line(xConCorrectores, yFila2 + alturaFilaComun, xConCorrectores + anchoCol3, yFila2 + alturaFilaComun); // Línea inferior celda
-  doc.text(`OD: ${datosFinales.agudezaVisualLejosConOD || ""}`, xConCorrectores + 2, yFila2 + alturaFilaComun / 4 + 1);
-  doc.text(`OI: ${datosFinales.agudezaVisualLejosConOI || ""}`, xConCorrectores + 2, mitadFila2 + alturaFilaComun / 4 + 1);
-
-  // V. Binocular - Lejos
-  doc.text(textosBinocularLejos, tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3 + 2, yFila2 + 3.5, { maxWidth: anchoCol4 - 4, align: "left" });
-
-  // E. Oculares - Fila 2 (Lejos)
-  if (enfermedadesOculares && enfermedadesOculares.trim() !== "") {
-    const maxAnchoEOculares = anchoCol5 - 4;
-    const lineasEOculares2 = doc.splitTextToSize(enfermedadesOculares, maxAnchoEOculares);
-    let yEOculares2 = yFila2 + 3.5;
-    const limiteSuperiorY = yFila2 + alturaFilaComun - 1;
-    lineasEOculares2.forEach((linea) => {
-      if (yEOculares2 < limiteSuperiorY && xEOculares + 2 + maxAnchoEOculares <= tablaInicioX + tablaAncho) {
-        doc.text(linea, xEOculares + 2, yEOculares2, { maxWidth: maxAnchoEOculares, align: "left" });
-        yEOculares2 += 3; // Espaciado entre líneas
-      }
-    });
-  }
-
-  yPos = yPos + alturaTotal;
 
   // === FUNCIÓN PARA CALCULAR ALTURA DINÁMICA ===
   const calcularAlturaHallazgos = (texto, anchoMaximo) => {
@@ -846,28 +839,35 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("Firma y Huella del trabajador", 50, yFirmas + 20, { align: "center" }); // Reducido de 26 a 20
 
-  autoTable(doc, {
-    startY: yFirmas + alturaSeccionFirmas + 2, // Reducido espacio después de firmas
-    margin: { left: 80, right: 80 },
-    body: [
-      [
-        { content: "Apto:", styles: { valign: "middle", fontStyle: "bold", halign: "center" } },
-        { content: `${datosFinales.conclusionApto ? "" : ""}`, styles: { valign: "middle", fontStyle: "bold", halign: "center" } },
-        { content: "No Apto:", styles: { valign: "middle", fontStyle: "bold", halign: "center" } },
-        { content: `${datosFinales.conclusionNoApto ? "" : ""}`, styles: { valign: "middle", fontStyle: "bold", halign: "center" } }
-      ]
-    ],
-    theme: "grid",
-    styles: {
-      fontSize: 8,
-      cellPadding: 1,
-      textColor: [0, 0, 0],
-      lineColor: [0, 0, 0], // 🔹 líneas negras
-      lineWidth: 0.2,       // 🔹 grosor de línea
-    },
-    tableLineColor: [0, 0, 0], // 🔹 bordes externos negros
-    tableLineWidth: 0.2,
-  });
+  // Solo mostrar APTO/NO APTO si la empresa NO es CONSORCIO COPTOS ni HIDRANDINA
+  const empresaUpper = (datosFinales.empresa || "").toUpperCase().trim();
+  const ocultarAptoNoApto = empresaUpper === "CONSORCIO COPTOS" || 
+    empresaUpper === "EMPRESA REGIONAL DE SERVICIO PUBLICO DE ELECTRICIDAD ELECTRONORTEMEDIO SOCIEDAD ANONIMA - HIDRANDINA";
+
+  if (!ocultarAptoNoApto) {
+    autoTable(doc, {
+      startY: yFirmas + alturaSeccionFirmas + 2, // Reducido espacio después de firmas
+      margin: { left: 80, right: 80 },
+      body: [
+        [
+          { content: "Apto:", styles: { valign: "middle", fontStyle: "bold", halign: "center" } },
+          { content: `${datosFinales.conclusionApto ? "" : ""}`, styles: { valign: "middle", fontStyle: "bold", halign: "center" } },
+          { content: "No Apto:", styles: { valign: "middle", fontStyle: "bold", halign: "center" } },
+          { content: `${datosFinales.conclusionNoApto ? "" : ""}`, styles: { valign: "middle", fontStyle: "bold", halign: "center" } }
+        ]
+      ],
+      theme: "grid",
+      styles: {
+        fontSize: 8,
+        cellPadding: 1,
+        textColor: [0, 0, 0],
+        lineColor: [0, 0, 0], // 🔹 líneas negras
+        lineWidth: 0.2,       // 🔹 grosor de línea
+      },
+      tableLineColor: [0, 0, 0], // 🔹 bordes externos negros
+      tableLineWidth: 0.2,
+    });
+  }
 
 
   // === FOOTER ===

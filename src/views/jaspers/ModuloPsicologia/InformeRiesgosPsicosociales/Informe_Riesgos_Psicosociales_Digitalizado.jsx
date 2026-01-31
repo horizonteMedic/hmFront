@@ -100,7 +100,29 @@ export default async function Informe_Riesgos_Psicosociales_Digitalizado(data = 
   await drawHeader(numeroPagina);
 
   // === FUNCIONES AUXILIARES ===
-  // Función para texto con salto de línea
+  // Función auxiliar para dividir texto respetando \n y luego hacer wrap
+  const dividirTextoConSaltosLinea = (texto, anchoMaximo) => {
+    if (!texto) return [];
+    
+    const textoStr = String(texto);
+    const parrafos = textoStr.split('\n');
+    const todasLasLineas = [];
+    
+    parrafos.forEach((parrafo) => {
+      if (parrafo.trim() === '') {
+        // Si el párrafo está vacío, agregar una línea vacía
+        todasLasLineas.push('');
+      } else {
+        // Dividir cada párrafo por ancho máximo
+        const lineasParrafo = doc.splitTextToSize(parrafo, anchoMaximo);
+        todasLasLineas.push(...lineasParrafo);
+      }
+    });
+    
+    return todasLasLineas;
+  };
+
+  // Función para texto con salto de línea (respeta \n y hace wrap de palabras)
   const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
     // Validar que el texto no sea undefined, null o vacío
     if (!texto || texto === null || texto === undefined) {
@@ -108,32 +130,59 @@ export default async function Informe_Riesgos_Psicosociales_Digitalizado(data = 
     }
 
     const fontSize = doc.internal.getFontSize();
-    const palabras = String(texto).split(' ');
-    let lineaActual = '';
+    const textoStr = String(texto);
+    
+    // Primero dividir por saltos de línea explícitos (\n)
+    const parrafos = textoStr.split('\n');
     let yPos = y;
 
-    palabras.forEach(palabra => {
-      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
-      const anchoTexto = doc.getTextWidth(textoPrueba);
+    parrafos.forEach((parrafo, parrafoIndex) => {
+      // Si no es el primer párrafo, agregar espacio extra entre párrafos
+      if (parrafoIndex > 0 && parrafo.trim() !== '') {
+        yPos += fontSize * 0.35; // Espacio entre párrafos
+      }
 
-      if (anchoTexto <= anchoMaximo) {
-        lineaActual = textoPrueba;
-      } else {
-        if (lineaActual) {
-          doc.text(lineaActual, x, yPos);
-          yPos += fontSize * 0.35; // salto real entre líneas
-          lineaActual = palabra;
+      // Si el párrafo está vacío, solo agregar un pequeño espacio
+      if (parrafo.trim() === '') {
+        yPos += fontSize * 0.35;
+        return;
+      }
+
+      // Para cada párrafo, hacer wrap de palabras
+      const palabras = parrafo.split(' ');
+      let lineaActual = '';
+
+      palabras.forEach(palabra => {
+        const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+        const anchoTexto = doc.getTextWidth(textoPrueba);
+
+        if (anchoTexto <= anchoMaximo) {
+          lineaActual = textoPrueba;
         } else {
-          doc.text(palabra, x, yPos);
-          yPos += fontSize * 0.35;
+          if (lineaActual) {
+            doc.text(lineaActual, x, yPos);
+            yPos += fontSize * 0.35; // salto real entre líneas
+            lineaActual = palabra;
+          } else {
+            // Si la palabra sola es más larga que el ancho máximo, dividirla
+            const lineasPalabra = doc.splitTextToSize(palabra, anchoMaximo);
+            lineasPalabra.forEach((linea, idx) => {
+              if (idx > 0) {
+                yPos += fontSize * 0.35;
+              }
+              doc.text(linea, x, yPos);
+            });
+            yPos += fontSize * 0.35;
+            lineaActual = '';
+          }
         }
+      });
+
+      if (lineaActual) {
+        doc.text(lineaActual, x, yPos);
+        yPos += fontSize * 0.35;
       }
     });
-
-    if (lineaActual) {
-      doc.text(lineaActual, x, yPos);
-      yPos += fontSize * 0.35;
-    }
 
     return yPos; // Devuelve la nueva posición final
   };
@@ -450,26 +499,70 @@ export default async function Informe_Riesgos_Psicosociales_Digitalizado(data = 
 
   // Verificar si necesitamos nueva página durante el dibujado
   const alturaMaximaAnalisis = pageHeight - yPos - 25;
-  if (yFinalAnalisis - yPos > alturaMaximaAnalisis) {
+  let alturaNecesariaAnalisis = Math.max(35, yFinalAnalisis - yPos + 2);
+  
+  // Si el contenido no cabe, dividirlo en múltiples páginas
+  if (alturaNecesariaAnalisis > alturaMaximaAnalisis) {
+    // Dibujar líneas de la primera página con la altura máxima disponible
+    const alturaPrimeraPagina = alturaMaximaAnalisis;
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaPrimeraPagina);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaPrimeraPagina);
+    doc.line(tablaInicioX, yPos + alturaPrimeraPagina, tablaInicioX + tablaAncho, yPos + alturaPrimeraPagina);
+    
+    // Nueva página para el resto del contenido
     doc.addPage();
     numeroPagina++;
     yPos = 45;
     await drawHeader(numeroPagina);
+    
+    // Dibujar líneas de la nueva página
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    
+    // Dibujar el texto restante usando dividirTextoConSaltosLinea para respetar \n
+    const lineasTexto = dividirTextoConSaltosLinea(textoAnalisis, tablaAncho - 4);
     doc.setFont("helvetica", "normal").setFontSize(7);
-    yFinalAnalisis = dibujarTextoConSaltoLinea(textoAnalisis, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
+    let yTextoActual = yPos + 3;
+    
+    // Calcular cuántas líneas ya se dibujaron en la primera página
+    const lineasEnPrimeraPagina = Math.floor((alturaPrimeraPagina - 3) / 3.5);
+    const lineasRestantes = lineasTexto.slice(lineasEnPrimeraPagina);
+    
+    for (let idx = 0; idx < lineasRestantes.length; idx++) {
+      if (yTextoActual + 3.5 > pageHeight - 20) {
+        doc.addPage();
+        numeroPagina++;
+        yPos = 45;
+        await drawHeader(numeroPagina);
+        yTextoActual = yPos + 3;
+        // Redibujar líneas en la nueva página
+        doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+        doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+        doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+      }
+      // Si la línea está vacía (salto de párrafo), agregar espacio extra
+      if (lineasRestantes[idx].trim() === '') {
+        yTextoActual += 3.5; // Espacio extra para párrafo
+      } else {
+        doc.text(lineasRestantes[idx], tablaInicioX + 2, yTextoActual);
+        yTextoActual += 3.5;
+      }
+    }
+    
+    // Calcular altura final
+    alturaNecesariaAnalisis = Math.max(35, yTextoActual - yPos + 2);
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesariaAnalisis);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesariaAnalisis);
+    doc.line(tablaInicioX, yPos + alturaNecesariaAnalisis, tablaInicioX + tablaAncho, yPos + alturaNecesariaAnalisis);
+  } else {
+    // Si cabe en una página, dibujar las líneas finales
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesariaAnalisis);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesariaAnalisis);
+    doc.line(tablaInicioX, yPos + alturaNecesariaAnalisis, tablaInicioX + tablaAncho, yPos + alturaNecesariaAnalisis);
   }
 
-  // Calcular altura real de la fila
-  const alturaNecesariaAnalisis = yFinalAnalisis - yPos;
-  const alturaMinimaFilaAnalisis = 35; // Altura mínima de 35mm
-  const alturaRealAnalisis = Math.max(alturaMinimaFilaAnalisis, alturaNecesariaAnalisis + 2);
-
-  // Redibujar los bordes con la altura correcta
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRealAnalisis);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRealAnalisis);
-  doc.line(tablaInicioX, yPos + alturaRealAnalisis, tablaInicioX + tablaAncho, yPos + alturaRealAnalisis);
-
-  yPos += alturaRealAnalisis;
+  yPos += alturaNecesariaAnalisis;
 
   // === SECCIÓN 4: RECOMENDACIONES ===
   // Verificar si necesitamos nueva página
@@ -499,26 +592,70 @@ export default async function Informe_Riesgos_Psicosociales_Digitalizado(data = 
 
   // Verificar si necesitamos nueva página durante el dibujado
   const alturaMaximaRec = pageHeight - yPos - 25;
-  if (yFinalRecomendaciones - yPos > alturaMaximaRec) {
+  let alturaNecesariaRecomendaciones = Math.max(35, yFinalRecomendaciones - yPos + 2);
+  
+  // Si el contenido no cabe, dividirlo en múltiples páginas
+  if (alturaNecesariaRecomendaciones > alturaMaximaRec) {
+    // Dibujar líneas de la primera página con la altura máxima disponible
+    const alturaPrimeraPagina = alturaMaximaRec;
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaPrimeraPagina);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaPrimeraPagina);
+    doc.line(tablaInicioX, yPos + alturaPrimeraPagina, tablaInicioX + tablaAncho, yPos + alturaPrimeraPagina);
+    
+    // Nueva página para el resto del contenido
     doc.addPage();
     numeroPagina++;
     yPos = 45;
     await drawHeader(numeroPagina);
+    
+    // Dibujar líneas de la nueva página
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    
+    // Dibujar el texto restante usando dividirTextoConSaltosLinea para respetar \n
+    const lineasTexto = dividirTextoConSaltosLinea(textoRecomendaciones, tablaAncho - 4);
     doc.setFont("helvetica", "normal").setFontSize(7);
-    yFinalRecomendaciones = dibujarTextoConSaltoLinea(textoRecomendaciones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
+    let yTextoActual = yPos + 3;
+    
+    // Calcular cuántas líneas ya se dibujaron en la primera página
+    const lineasEnPrimeraPagina = Math.floor((alturaPrimeraPagina - 3) / 3.5);
+    const lineasRestantes = lineasTexto.slice(lineasEnPrimeraPagina);
+    
+    for (let idx = 0; idx < lineasRestantes.length; idx++) {
+      if (yTextoActual + 3.5 > pageHeight - 20) {
+        doc.addPage();
+        numeroPagina++;
+        yPos = 45;
+        await drawHeader(numeroPagina);
+        yTextoActual = yPos + 3;
+        // Redibujar líneas en la nueva página
+        doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+        doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+        doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+      }
+      // Si la línea está vacía (salto de párrafo), agregar espacio extra
+      if (lineasRestantes[idx].trim() === '') {
+        yTextoActual += 3.5; // Espacio extra para párrafo
+      } else {
+        doc.text(lineasRestantes[idx], tablaInicioX + 2, yTextoActual);
+        yTextoActual += 3.5;
+      }
+    }
+    
+    // Calcular altura final
+    alturaNecesariaRecomendaciones = Math.max(35, yTextoActual - yPos + 2);
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesariaRecomendaciones);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesariaRecomendaciones);
+    doc.line(tablaInicioX, yPos + alturaNecesariaRecomendaciones, tablaInicioX + tablaAncho, yPos + alturaNecesariaRecomendaciones);
+  } else {
+    // Si cabe en una página, dibujar las líneas finales
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesariaRecomendaciones);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesariaRecomendaciones);
+    doc.line(tablaInicioX, yPos + alturaNecesariaRecomendaciones, tablaInicioX + tablaAncho, yPos + alturaNecesariaRecomendaciones);
   }
 
-  // Calcular altura real de la fila
-  const alturaNecesariaRecomendaciones = yFinalRecomendaciones - yPos;
-  const alturaMinimaFilaRec = 35; // Altura mínima de 35mm
-  const alturaRealRecomendaciones = Math.max(alturaMinimaFilaRec, alturaNecesariaRecomendaciones + 2);
-
-  // Redibujar los bordes con la altura correcta
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRealRecomendaciones);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRealRecomendaciones);
-  doc.line(tablaInicioX, yPos + alturaRealRecomendaciones, tablaInicioX + tablaAncho, yPos + alturaRealRecomendaciones);
-
-  yPos += alturaRealRecomendaciones;
+  yPos += alturaNecesariaRecomendaciones;
 
   // === SECCIÓN 5: CONCLUSIÓN (CUMPLE/NO CUMPLE CON EL PERFIL) ===
   // Verificar si necesitamos nueva página antes de la conclusión

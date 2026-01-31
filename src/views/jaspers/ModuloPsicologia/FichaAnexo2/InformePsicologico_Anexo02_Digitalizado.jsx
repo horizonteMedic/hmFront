@@ -80,7 +80,9 @@ export default async function InformePsicologico_Anexo02_Digitalizado(data = {},
     areaEmocional: data.areaEmocional_areaemocional,
     recomendaciones: data.recomendaciones_recomendaciones,
     // Datos de evaluación final
-    cumplePerfil: data.apto_apto
+    cumplePerfil: data.apto_apto,
+    // Flag para OHLA
+    esOhla: Boolean(data.esOhla ?? false)
   };
 
   // Usar solo datos reales
@@ -702,7 +704,12 @@ export default async function InformePsicologico_Anexo02_Digitalizado(data = {},
     }
   ];
 
-  resultadosEvaluacion.forEach((resultado) => {
+  // Filtrar "Nivel Intelectual" si esOhla es true
+  const resultadosFiltrados = datosFinales.esOhla 
+    ? resultadosEvaluacion.filter(r => r.titulo !== "Nivel Intelectual:")
+    : resultadosEvaluacion;
+
+  resultadosFiltrados.forEach((resultado) => {
     // Calcular altura dinámica para el valor del resultado
     const valorFormateado = formatearTextoGramatical(resultado.valor);
     const espacioTitulo = 60; // Espacio para el título
@@ -735,18 +742,24 @@ export default async function InformePsicologico_Anexo02_Digitalizado(data = {},
   yPos = dibujarHeaderSeccion("5. CONCLUSIONES", yPos, filaAltura);
 
   // === SUBSECCIÓN: ÁREA COGNITIVA ===
-  // Header celeste "Área Cognitiva"
-  yPos = dibujarSubHeaderCeleste("Área Cognitiva:", yPos, filaAltura);
+  // Solo mostrar si NO es OHLA
+  if (!datosFinales.esOhla) {
+    // Header celeste "Área Cognitiva"
+    yPos = dibujarSubHeaderCeleste("Área Cognitiva:", yPos, filaAltura);
 
-  // Fila creciente para área cognitiva (altura inicial 10mm)
-  const areaCognitivaFormateada = formatearTextoGramatical(datosFinales.areaCognitiva || "");
-  yPos = dibujarTextoEnFilaCreciente(doc, areaCognitivaFormateada, tablaInicioX, tablaAncho, yPos, 7, 4, 8);
+    // Fila creciente para área cognitiva (altura inicial 10mm)
+    const areaCognitivaFormateada = formatearTextoGramatical(datosFinales.areaCognitiva || "");
+    yPos = dibujarTextoEnFilaCreciente(doc, areaCognitivaFormateada, tablaInicioX, tablaAncho, yPos, 7, 4, 8);
+  }
 
   // === SUBSECCIÓN: ÁREA EMOCIONAL ===
-  // Header celeste "Área Emocional"
-  yPos = dibujarSubHeaderCeleste("Área Emocional:", yPos, filaAltura);
+  // Si es OHLA, no mostrar el header pero sí el contenido
+  if (!datosFinales.esOhla) {
+    // Header celeste "Área Emocional"
+    yPos = dibujarSubHeaderCeleste("Área Emocional:", yPos, filaAltura);
+  }
 
-  // Fila creciente para área emocional (altura inicial 10mm)
+  // Fila creciente para área emocional (altura inicial 10mm) - siempre se muestra
   const areaEmocionalFormateada = formatearTextoGramatical(datosFinales.areaEmocional || "");
   yPos = dibujarTextoEnFilaCreciente(doc, areaEmocionalFormateada, tablaInicioX, tablaAncho, yPos, 7, 4, 8);
 
