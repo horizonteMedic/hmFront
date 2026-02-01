@@ -179,25 +179,25 @@ export const reportesMap = {
 
    inmunologia: InmunologiaLab_Digitalizado,
 
-   lhepatitis:{
+   lhepatitis:{ //nuevo
       LHepatitisA_Digitalizado,
       LHepatitisB_Digitalizado,
       LHepatitisC_Digitalizado
    },
 
-   inmunologia_vdrl: Informe_Lab_VRDL,
+   inmunologia_vdrl: Informe_Lab_VRDL,  //nuevo
 
-   panel2d: Panel2d_Digitalizado,
+   panel2d: Panel2d_Digitalizado, //nuevo
 
-   panel3d: Panel3d_Digitalizado,
+   panel3d: Panel3d_Digitalizado, //nuevo
 
-   panel4d: Panel4d_Digitalizado,
+   panel4d: Panel4d_Digitalizado,  //nuevo
 
-   panel10d: Panel10d_Digitalizado,
+   panel10d: Panel10d_Digitalizado,  //nuevo
 
-   ac_coprocultivo: coprocultivo_digitalizado,
+   ac_coprocultivo: coprocultivo_digitalizado,  //nuevo
 
-   ac_coproparasitologico:Coproparasitologico_Digitalizado,
+   ac_coproparasitologico:Coproparasitologico_Digitalizado,  //nuevo
   
    /* =========================
       CONSENTIMIENTOS
@@ -210,17 +210,17 @@ export const reportesMap = {
 
    CONSENT_INFORMADO_MEDICA: Consent_Admision_EvaluacionMedica,
 
-   con_panel3D: Consentimiento_Panel3D_Digitalizado,
+   con_panel3D: Consentimiento_Panel3D_Digitalizado,  //nuevo
 
-   con_panel4D: Consent_Lab_panel4D,  
+   con_panel4D: Consent_Lab_panel4D,   //nuevo
 
-   con_panel10D: Consentimiento_Panel10D_Digitalizado,
+   con_panel10D: Consentimiento_Panel10D_Digitalizado,  //nuevo
 
    consent_marihuana: Consentimiento_Marihuana_Digitalizado,
 
    consent_Muestra_Sangre: Consentimiento_Muestra_Sangre_Digitalizado,
 
-   con_panel2D: Consentimiento_Panel2D_Digitalizado,
+   con_panel2D: Consentimiento_Panel2D_Digitalizado, 
 
    con_panel5D: Consentimiento_Panel5D_ohla_Digitalizado,
 

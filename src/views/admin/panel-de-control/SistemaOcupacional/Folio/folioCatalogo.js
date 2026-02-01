@@ -281,21 +281,21 @@ export const EXAMENES_CATALOGO = {
     },
 
     
-    INMUNLOGIA_AGLUTINACIONES: {
+    INMUNLOGIA_AGLUTINACIONES: { //nuevo
         nombre: "INMUNOLOGIA - AGLUTINACIONES",
         tabla: "inmunologia",
         url: "/api/v01/ct/inmunologia/obtenerReporteInmunologia",
         esJasper: true,
     },
 
-    INMUNOLOGIA_HEPATITIS: {
+    INMUNOLOGIA_HEPATITIS: { //nuevo
         nombre: "INMUNOLOGIA - HEPATITIS",
         tabla: "lhepatitis",
         url: "/api/v01/ct/inmunologia/obtenerReporteHepatitis",
         esJasper: true,
     },
 
-    INMUNOLOGIA_VRL: {
+    INMUNOLOGIA_VRL: { //nuevo
         nombre: "INMUNOLOGIA - VRL",
         tabla: "inmunologia_vdrl",
         url: "/api/v01/ct/inmunologia/obtenerReporteVdrl",
@@ -303,28 +303,28 @@ export const EXAMENES_CATALOGO = {
     },
  
 
-    PANEL_2D: {
+    PANEL_2D: { //nuevo
         nombre: "PANEL 2D",
         tabla: "panel2d",
         url: "/api/v01/ct/toxicologia/obtenerReportePanel2D",
         esJasper: true,
     },	
 
-    PANEL_3D: {
+    PANEL_3D: { //nuevo
         nombre: "PANEL 3D",
         tabla: "panel3d",
         url: "/api/v01/ct/toxicologia/obtenerReportePanel3D",
         esJasper: true,
     },
 
-    PANEL_4D: {
+    PANEL_4D: { //nuevo
         nombre: "PANEL 4D",
         tabla: "panel4d",
         url: "/api/v01/ct/toxicologia/obtenerReportePanel4D",
         esJasper: true,
     },
 
-   PANEL_10D: {
+   PANEL_10D: { //nuevo
         nombre: "PANEL 10D",
         tabla: "panel10d",
         url: "/api/v01/ct/toxicologia/obtenerReportePanel10D",
@@ -332,42 +332,35 @@ export const EXAMENES_CATALOGO = {
     },
 
 
-    CONSENT_PANEL_3D: {
+    CONSENT_PANEL_3D: { //nuevo
         nombre: "CONSENTIMIENTO PANEL 3D",
         tabla: "con_panel3D",
         url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
         nameConset: true,
     },
 
-    CONSENT_PANEL_4D: {
+    CONSENT_PANEL_4D: { //nuevo
         nombre: "CONSENTIMIENTO PANEL 4D",
         tabla: "con_panel4D",
         url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
         nameConset: true,
     },
 
-    CONSENT_PANEL_10D: {
+    CONSENT_PANEL_10D: { //nuevo
         nombre: "CONSENTIMIENTO PANEL 10D",
         tabla: "con_panel10D",
         url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
         nameConset: true,
     },
 
-    CONSENT_MARIHUANA:{
-        nombre: "CONSENTIMIENTO DE MARIHUANA",
-        tabla: "consent_marihuana",
-        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
-        nameConset: true,
-    },
-
-    MANIPULADORES_COPROCULTIVO: {
+    MANIPULADORES_COPROCULTIVO: { //nuevo
         nombre: "MANIPULADORES COPROCULTIVO",
         tabla: "ac_coprocultivo",
         url: "/api/v01/ct/manipuladores/obtenerReporteCoprocultivo",
         esJasper: true,
     },
 
-    MANIPULADORES_PARASITOLOGIA:{
+    MANIPULADORES_PARASITOLOGIA:{ //nuevo
         nombre: "MANIPULADORES PARASITOLOGIA",
         tabla: "ac_coproparasitologico",
         url: "/api/v01/ct/manipuladores/obtenerReporteCoproparasitologico",
