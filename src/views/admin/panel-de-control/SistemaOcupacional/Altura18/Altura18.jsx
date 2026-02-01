@@ -9,7 +9,7 @@ import SectionFieldset from "../../../../components/reusableComponents/SectionFi
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import { useForm } from "../../../../hooks/useForm";
-import { handleSubirArchivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerAltura18";
+import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerAltura18";
 import { BotonesAccion, DatosPersonalesLaborales } from "../../../../components/templates/Templates";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import { useState } from "react";
@@ -237,12 +237,11 @@ export default function Altura18() {
                         onChange={handleChange}
                         labelWidth="120px"
                     />
-                    {form.SubirDoc &&
-                        <ButtonsPDF
-                            handleSave={() => { handleSubirArchivo(form, selectedSede, userlogued, token) }}
-                            handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token) }}
-                        />
-                    }
+                    <ButtonsPDF
+                        {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
+                        {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+                        handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
+                    />
                 </div>
             </SectionFieldset>
 

@@ -25,7 +25,7 @@ import TestDeCage from "./TabsCertificadoAlturaPoderosa/TestDeCage";
 import ExamenFisico from "./TabsCertificadoAlturaPoderosa/ExamenFisico";
 import Neurologico from "./TabsCertificadoAlturaPoderosa/Neurologico";
 import Swal from "sweetalert2";
-import { PrintHojaR, SubmitDataService, VerifyTR, handleSubirArchivo, ReadArchivosForm } from "./controllerCertificadoAlturaPoderosa";
+import { PrintHojaR, SubmitDataService, VerifyTR, handleSubirArchivo, ReadArchivosForm, handleSubirArchivoMasivo } from "./controllerCertificadoAlturaPoderosa";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import ButtonsPDF from "../../../../../components/reusableComponents/ButtonsPDF";
 
@@ -316,12 +316,11 @@ export default function CertificadoAlturaPoderosa() {
                                 falseLabel="NO APTO"
                                 onChange={handleRadioButtonBoolean}
                             />
-                            {form.SubirDoc &&
-                                <ButtonsPDF
-                                    handleSave={() => { handleSubirArchivo(form, selectedSede, userlogued, token) }}
-                                    handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token) }}
-                                />
-                            }
+                            <ButtonsPDF
+                                {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
+                                {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+                                handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
+                            />
                         </section>
 
                         {/* Información del trabajador */}

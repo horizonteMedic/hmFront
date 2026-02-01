@@ -673,6 +673,155 @@ export const handleImgtoPdfDefault = async (
     }
 };
 
+export const handleSubidaMasiva = async (form, selectedSede, urlPDf, userlogued, token) => {
+    let pdfFiles = [];
+    const { isConfirmed } = await Swal.fire({
+        title: "Selecciona la carpeta con PDFs",
+        input: "file",
+        inputAttributes: {
+            webkitdirectory: true,
+            directory: true,
+            multiple: true,
+            accept: "application/pdf",
+        },
+        showCancelButton: true,
+        confirmButtonText: "Subir archivos",
+        cancelButtonText: "Cancelar",
+        didOpen: () => {
+            const input = Swal.getInput();
+            input.addEventListener("change", () => {
+                const files = Array.from(input.files || []);
+                pdfFiles = files.filter(f => f.type === "application/pdf");
+
+                const htmlList = pdfFiles.length
+                    ? `
+                        <div style="max-height:250px;overflow:auto;text-align:left">
+                            <b>Archivos detectados (${pdfFiles.length}):</b>
+                            <ul>
+                                ${pdfFiles.map(f => `<li>${f.name}</li>`).join("")}
+                            </ul>
+                        </div>
+                      `
+                    : `<p style="color:red">No se encontraron archivos PDF</p>`;
+
+                Swal.update({ html: htmlList });
+            });
+        },
+
+        preConfirm: () => {
+            if (!pdfFiles.length) {
+                Swal.showValidationMessage(
+                    "No hay archivos PDF válidos para subir"
+                );
+                return false;
+            }
+            return true;
+        },
+    });
+
+    if (!isConfirmed) return;
+
+    LoadingDefault("Subiendo documentos...");
+
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = ("0" + (currentDate.getMonth() + 1)).slice(-2);
+    const day = ("0" + currentDate.getDate()).slice(-2);
+
+    const uploadPromises = pdfFiles.map(async (file) => {
+        const orden = obtenerOrdenDesdeNombre(file.name);
+        if (!orden) {
+            return { name: file.name, status: "ignored", message: "Sin N° Orden detectado" };
+        }
+
+        try {
+            const base64 = await readFileAsBase64(file);
+            const base64WithoutHeader = base64.split(",")[1];
+
+            const pdfBytes = Uint8Array.from(
+                atob(base64WithoutHeader),
+                (c) => c.charCodeAt(0)
+            );
+
+            const pdfBase64Final = uint8ToBase64(pdfBytes);
+
+            const nombreOriginal = file.name.replace(/\.pdf$/i, "");
+            const nombreFinal = `${nombreOriginal}-${generarIdCorto()}.pdf`;
+
+            const datos = {
+                rutaArchivo: null,
+                dni: null,
+                historiaClinica: null,
+                servidor: "azure",
+                estado: true,
+                fechaRegistro: `${year}-${month}-${day}`,
+                userRegistro: userlogued,
+                fechaActualizacion: null,
+                userActualizacion: null,
+                id_tipo_archivo: null,
+
+                nombreArchivo: nombreFinal,
+                codigoSede: selectedSede,
+                fileBase64: pdfBase64Final,
+                nomenclatura_tipo_archivo: form.nomenclatura,
+                orden,
+                indice_carga_masiva: undefined,
+            };
+
+            const res = await SubmitData(datos, urlPDf, token);
+            return {
+                name: file.name,
+                status: res?.id === 1 ? "success" : "error",
+                message: res?.id === 1 ? "OK" : (res?.message || "Error al subir")
+            };
+        } catch (err) {
+            console.error(err);
+            return { name: file.name, status: "error", message: "Error interno" };
+        }
+    });
+
+    try {
+        const results = await Promise.all(uploadPromises);
+
+        const exitosos = results.filter(r => r.status === "success");
+        const fallidos = results.filter(r => r.status !== "success");
+
+        const htmlList = `
+            <div style="text-align:left; max-height:300px; overflow:auto;">
+                <p><b>Resumen:</b> ${exitosos.length} subidos, ${fallidos.length} no subidos.</p>
+                
+                ${exitosos.length > 0 ? `
+                    <h5 style="color:green; margin-top:10px; font-size:16px;">Subidos correctamente:</h5>
+                    <ul style="font-size:14px; margin-bottom:10px;">
+                        ${exitosos.map(f => `<li>${f.name}</li>`).join("")}
+                    </ul>
+                ` : ""}
+
+                ${fallidos.length > 0 ? `
+                    <h5 style="color:red; margin-top:10px; font-size:16px;">No se pudieron subir:</h5>
+                    <ul style="font-size:14px;">
+                        ${fallidos.map(f => `<li>${f.name} <span style="color:gray">(${f.message})</span></li>`).join("")}
+                    </ul>
+                ` : ""}
+            </div>
+        `;
+
+        Swal.fire({
+            title: "Carga Finalizada",
+            html: htmlList,
+            icon: fallidos.length === 0 ? "success" : "warning",
+            width: "600px"
+        });
+    } catch (err) {
+        console.error(err);
+        Swal.fire(
+            "Error",
+            "Ocurrió un error crítico durante el proceso",
+            "error"
+        );
+    }
+}
+
 
 export const ReadArchivosFormDefault = async (form, setVisualerOpen, token, nomenclatura) => {
     LoadingDefault("Cargando Archivo")
@@ -697,4 +846,18 @@ const generarIdCorto = () => {
     const time = Date.now().toString(36);
     const random = Math.random().toString(36).substring(2, 6);
     return `${time}${random}`;
+};
+
+
+const readFileAsBase64 = (file) =>
+    new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+
+const obtenerOrdenDesdeNombre = (filename) => {
+    const match = filename.match(/^(\d+)/);
+    return match ? match[1] : null;
 };
