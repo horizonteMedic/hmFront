@@ -231,67 +231,65 @@ export default async function Panel4d_Digitalizado(datos = {}, docExistente = nu
   // === CUERPO ===
   let y = finalYPos + 10;
 
-    // Muestra y Método
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
-    doc.text("MUESTRA :", config.margin, y);
-    doc.setFont(config.font, "normal");
-    doc.text("ORINA", config.margin + 30, y);
-    y += config.lineHeight;
+  // Muestra y Método
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
+  doc.text("MUESTRA :", config.margin, y);
+  doc.setFont(config.font, "normal");
+  doc.text("ORINA", config.margin + 30, y);
+  y += config.lineHeight;
 
-    doc.setFont(config.font, "bold");
-    doc.text("MÉTODO :", config.margin, y);
-    doc.setFont(config.font, "normal");
-    doc.text("INMUNOCROMATOGRAFICO", config.margin + 30, y);
-    y += config.lineHeight * 2;
+  doc.setFont(config.font, "bold");
+  doc.text("MÉTODO :", config.margin, y);
+  doc.setFont(config.font, "normal");
+  doc.text("INMUNOCROMATOGRAFICO", config.margin + 30, y);
+  y += config.lineHeight * 2;
 
-    // Encabezado de tabla
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
-    doc.text("PRUEBA CUALITATIVO", config.col1X, y);
-    doc.text("RESULTADOS", config.col2X, y, { align: 'center' });
-    doc.text("UNIDADES", config.col3X, y, { align: 'center' });
-    y += 3;
+  // Encabezado de tabla
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+  doc.text("PRUEBA CUALITATIVO", config.col1X, y);
+  doc.text("RESULTADOS", config.col2X, y, { align: 'center' });
+  doc.text("UNIDADES", config.col3X, y, { align: 'center' });
+  y += 3;
 
-    // Línea
-    doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
-    y += config.lineHeight;
+  // Línea
+  doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
+  y += config.lineHeight;
 
-    // Título del Panel
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
-    doc.text("DROGAS PANEL 4D", config.col1X, y);
-    y += config.lineHeight;
+  // Título del Panel
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
+  doc.text("DROGAS PANEL 4D", config.col1X, y);
+  y += config.lineHeight;
 
-    // Datos - usando las claves exactas del JSON y convirtiendo booleanos a texto
-    const tests = [
-      { label: "COCAINA", key: "cocaina" },
-      { label: "MARIHUANA", key: "marihuana" },
-      { label: "OPIACEOS", key: "opiaceos" },
-      { label: "METHANFETAMINA", key: "metanfetamina" },
-    ];
+  // Datos - usando las claves exactas del JSON y convirtiendo booleanos a texto
+  const tests = [
+    { label: "COCAINA", key: "cocaina" },
+    { label: "MARIHUANA", key: "marihuana" },
+    { label: "OPIACEOS", key: "opiaceos" },
+    { label: "METHANFETAMINA", key: "metanfetamina" },
+  ];
 
-    tests.forEach(({ label, key }) => {
-      // Convertir booleano a texto: true = "POSITIVO", false = "NEGATIVO"
-      let value = "NEGATIVO";
-      if (datos[key] != null) {
-        if (typeof datos[key] === 'boolean') {
-          value = datos[key] ? "POSITIVO" : "NEGATIVO";
-        } else if (typeof datos[key] === 'string') {
-          value = datos[key].toUpperCase() === 'TRUE' || datos[key].toUpperCase() === 'POSITIVO' 
-            ? "POSITIVO" 
-            : "NEGATIVO";
-        } else {
-          value = String(datos[key] || "NEGATIVO");
-        }
+  tests.forEach(({ label, key }) => {
+    // Convertir booleano a texto: true = "POSITIVO", false = "NEGATIVO"
+    let value = "NEGATIVO";
+    if (datos[key] != null) {
+      if (typeof datos[key] === 'boolean') {
+        value = datos[key] ? "POSITIVO" : "NEGATIVO";
+      } else if (typeof datos[key] === 'string') {
+        value = datos[key].toUpperCase() === 'TRUE' || datos[key].toUpperCase() === 'POSITIVO'
+          ? "POSITIVO"
+          : "NEGATIVO";
+      } else {
+        value = String(datos[key] || "NEGATIVO");
       }
-      y = drawResultRow(doc, y, label, value, "S/U");
-    });
+    }
+    y = drawResultRow(doc, y, label, value, "S/U");
+  });
 
-    // === FIRMAS ===
-    const yFirmas = 210; // Posición Y para las firmas
-    await dibujarFirmas({ doc, datos, y: yFirmas, pageW })
-      .then(() => {
-        // === FOOTER ===
-        footerTR(doc, { footerOffsetY: 8 });
-     })
+  // === FIRMAS ===
+  const yFirmas = 210; // Posición Y para las firmas
+  await dibujarFirmas({ doc, datos, y: yFirmas, pageW })
+  footerTR(doc, { footerOffsetY: 8 });
+  
   if (docExistente) {
     return doc;
   } else {

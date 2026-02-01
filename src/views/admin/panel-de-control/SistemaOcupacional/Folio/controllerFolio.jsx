@@ -94,7 +94,6 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
         const examenesConNomenclatura = listaActualizada.filter(
             (examen) => examen.nomenclatura
         );
-        console.log("examenesConNomenclatura", examenesConNomenclatura);
         // Hacer todas las llamadas en paralelo
         const promesasArchivosExternos = examenesConNomenclatura.map((examen) =>
             getFetch(`${GetExamenExterno}/${nro}/${examen.nomenclatura}`, token)
