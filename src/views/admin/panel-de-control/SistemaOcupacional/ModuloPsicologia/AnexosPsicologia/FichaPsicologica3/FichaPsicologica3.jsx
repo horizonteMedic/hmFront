@@ -10,6 +10,7 @@ import {
   InputTextOneLine,
   InputCheckbox,
   RadioTable,
+  InputsBooleanRadioGroup,
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
@@ -62,6 +63,15 @@ function DatosPersonales({
             value={form.nombreExamen}
             disabled
             labelWidth="120px"
+          />
+          <InputsBooleanRadioGroup
+            label="Aptitud"
+            labelWidth="120px"
+            name="esApto"
+            value={form.esApto}
+            trueLabel="APTO"
+            falseLabel="NO APTO"
+            onChange={handleRadioButtonBoolean}
           />
         </div>
       </SectionFieldset>
@@ -663,6 +673,7 @@ export default function FichaPsicologica3() {
     norden: "",
     fechaExamen: today,
     nombreExamen: "",
+    esApto: undefined,
     codigoAnexo: null,
 
     // Datos Personales
@@ -760,6 +771,7 @@ export default function FichaPsicologica3() {
     form,
     handleChange,
     handleRadioButton,
+    handleRadioButtonBoolean,
     handleChangeSimple,
     handleCheckBoxChange,
     handleChangeNumber,
