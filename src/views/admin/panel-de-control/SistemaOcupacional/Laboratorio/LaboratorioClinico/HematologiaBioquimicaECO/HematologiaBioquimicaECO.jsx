@@ -10,7 +10,7 @@ import {
 import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
 import { useSessionData } from '../../../../../../hooks/useSessionData';
-import { handleSubirArchivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerHematologiaBioquimicaECO";
+import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerHematologiaBioquimicaECO";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
 import ButtonsPDF from "../../../../../../components/reusableComponents/ButtonsPDF";
@@ -215,12 +215,11 @@ export default function HematologiaBioquimicaECO() {
           disabled
           labelWidth="120px"
         />
-        {form.SubirDoc &&
-          <ButtonsPDF
-            handleSave={() => { handleSubirArchivo(form, selectedSede, userlogued, token) }}
-            handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token) }}
-          />
-        }
+        <ButtonsPDF
+          {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
+          {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+          handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
+        />
       </SectionFieldset>
       <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
         <InputTextOneLine

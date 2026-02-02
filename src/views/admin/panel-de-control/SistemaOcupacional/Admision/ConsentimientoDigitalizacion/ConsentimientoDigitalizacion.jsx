@@ -5,6 +5,7 @@ import { useSessionData } from '../../../../../hooks/useSessionData';
 import { getToday } from '../../../../../utils/helpers';
 import {
   handleSubirArchivo,
+  handleSubirArchivoMasivo,
   PrintHojaR,
   ReadArchivosForm,
   SubmitDataService,
@@ -92,12 +93,13 @@ const ConsentimientoDigitalizacion = () => {
             className="w-full border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </label>
-        {form.SubirDoc &&
-          <ButtonsPDF
-            handleSave={() => { handleSubirArchivo(form, selectedSede, userlogued, token) }}
-            handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token) }}
-          />
-        }
+
+        <ButtonsPDF
+          {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
+          {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+          handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
+        />
+
       </div>
 
       <h2 className="text-center text-2xl mb-8 tracking-wide" style={{ color: '#000', fontWeight: 'bold' }}>

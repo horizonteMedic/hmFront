@@ -214,8 +214,8 @@ const drawPatientData = (doc, datos = {}) => {
 
 // --- Componente Principal ---
 
-export default async function Panel4d_Digitalizado(datos = {}) {
-  const doc = new jsPDF();
+export default async function Panel4d_Digitalizado(datos = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
@@ -231,92 +231,78 @@ export default async function Panel4d_Digitalizado(datos = {}) {
   // === CUERPO ===
   let y = finalYPos + 10;
 
-    // Muestra y Método
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
-    doc.text("MUESTRA :", config.margin, y);
-    doc.setFont(config.font, "normal");
-    doc.text("ORINA", config.margin + 30, y);
-    y += config.lineHeight;
+  // Muestra y Método
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
+  doc.text("MUESTRA :", config.margin, y);
+  doc.setFont(config.font, "normal");
+  doc.text("ORINA", config.margin + 30, y);
+  y += config.lineHeight;
 
-    doc.setFont(config.font, "bold");
-    doc.text("MÉTODO :", config.margin, y);
-    doc.setFont(config.font, "normal");
-    doc.text("INMUNOCROMATOGRAFICO", config.margin + 30, y);
-    y += config.lineHeight * 2;
+  doc.setFont(config.font, "bold");
+  doc.text("MÉTODO :", config.margin, y);
+  doc.setFont(config.font, "normal");
+  doc.text("INMUNOCROMATOGRAFICO", config.margin + 30, y);
+  y += config.lineHeight * 2;
 
-    // Encabezado de tabla
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
-    doc.text("PRUEBA CUALITATIVO", config.col1X, y);
-    doc.text("RESULTADOS", config.col2X, y, { align: 'center' });
-    doc.text("UNIDADES", config.col3X, y, { align: 'center' });
-    y += 3;
+  // Encabezado de tabla
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+  doc.text("PRUEBA CUALITATIVO", config.col1X, y);
+  doc.text("RESULTADOS", config.col2X, y, { align: 'center' });
+  doc.text("UNIDADES", config.col3X, y, { align: 'center' });
+  y += 3;
 
-    // Línea
-    doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
-    y += config.lineHeight;
+  // Línea
+  doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
+  y += config.lineHeight;
 
-    // Título del Panel
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
-    doc.text("DROGAS PANEL 4D", config.col1X, y);
-    y += config.lineHeight;
+  // Título del Panel
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
+  doc.text("DROGAS PANEL 4D", config.col1X, y);
+  y += config.lineHeight;
 
-    // Datos - usando las claves exactas del JSON y convirtiendo booleanos a texto
-    const tests = [
-      { label: "COCAINA", key: "cocaina" },
-      { label: "MARIHUANA", key: "marihuana" },
-      { label: "OPIACEOS", key: "opiaceos" },
-      { label: "METHANFETAMINA", key: "metanfetamina" },
-    ];
+  // Datos - usando las claves exactas del JSON y convirtiendo booleanos a texto
+  const tests = [
+    { label: "COCAINA", key: "cocaina" },
+    { label: "MARIHUANA", key: "marihuana" },
+    { label: "OPIACEOS", key: "opiaceos" },
+    { label: "METHANFETAMINA", key: "metanfetamina" },
+  ];
 
-    tests.forEach(({ label, key }) => {
-      // Convertir booleano a texto: true = "POSITIVO", false = "NEGATIVO"
-      let value = "NEGATIVO";
-      if (datos[key] != null) {
-        if (typeof datos[key] === 'boolean') {
-          value = datos[key] ? "POSITIVO" : "NEGATIVO";
-        } else if (typeof datos[key] === 'string') {
-          value = datos[key].toUpperCase() === 'TRUE' || datos[key].toUpperCase() === 'POSITIVO' 
-            ? "POSITIVO" 
-            : "NEGATIVO";
-        } else {
-          value = String(datos[key] || "NEGATIVO");
-        }
+  tests.forEach(({ label, key }) => {
+    // Convertir booleano a texto: true = "POSITIVO", false = "NEGATIVO"
+    let value = "NEGATIVO";
+    if (datos[key] != null) {
+      if (typeof datos[key] === 'boolean') {
+        value = datos[key] ? "POSITIVO" : "NEGATIVO";
+      } else if (typeof datos[key] === 'string') {
+        value = datos[key].toUpperCase() === 'TRUE' || datos[key].toUpperCase() === 'POSITIVO'
+          ? "POSITIVO"
+          : "NEGATIVO";
+      } else {
+        value = String(datos[key] || "NEGATIVO");
       }
-      y = drawResultRow(doc, y, label, value, "S/U");
-    });
+    }
+    y = drawResultRow(doc, y, label, value, "S/U");
+  });
 
-    // === FIRMAS ===
-    const yFirmas = 210; // Posición Y para las firmas
-    dibujarFirmas({ doc, datos, y: yFirmas, pageW })
-      .then(() => {
-        // === FOOTER ===
-        footerTR(doc, { footerOffsetY: 8 });
+  // === FIRMAS ===
+  const yFirmas = 210; // Posición Y para las firmas
+  await dibujarFirmas({ doc, datos, y: yFirmas, pageW })
+  footerTR(doc, { footerOffsetY: 8 });
+  
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
+}
 
-        // === Imprimir ===
-        const pdfBlob = doc.output("blob");
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        const iframe = document.createElement("iframe");
-        iframe.style.display = "none";
-        iframe.src = pdfUrl;
-        document.body.appendChild(iframe);
-        iframe.onload = () => {
-          iframe.contentWindow.focus();
-          iframe.contentWindow.print();
-        };
-      })
-      .catch(error => {
-        console.error("Error al cargar firmas:", error);
-        // Continuar con la impresión aunque falle la carga de firmas
-        footerTR(doc, { footerOffsetY: 8 });
-        const pdfBlob = doc.output("blob");
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        const iframe = document.createElement("iframe");
-        iframe.style.display = "none";
-        iframe.src = pdfUrl;
-        document.body.appendChild(iframe);
-        iframe.onload = () => {
-          iframe.contentWindow.focus();
-          iframe.contentWindow.print();
-        };
-      });
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
 }

@@ -187,8 +187,8 @@ const drawPatientData = (doc, datos = {}) => {
 
 // --- Componente Principal ---
 
-export default async function Panel10d_Digitalizado(datos = {}) {
-  const doc = new jsPDF();
+export default async function Panel10d_Digitalizado(datos = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
@@ -213,22 +213,7 @@ export default async function Panel10d_Digitalizado(datos = {}) {
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
 
-  // Función helper para imprimir el PDF
-  const imprimirPDF = () => {
-    footerTR(doc, { footerOffsetY: 5 });
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = pdfUrl;
-    document.body.appendChild(iframe);
-    iframe.onload = () => {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
-  };
-
-  Promise.all([
+  await Promise.all([
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
@@ -349,10 +334,24 @@ export default async function Panel10d_Digitalizado(datos = {}) {
     }
 
     // === FOOTER E IMPRIMIR ===
-    imprimirPDF();
+    footerTR(doc, { footerOffsetY: 5 });
   }).catch(error => {
     console.error("Error al cargar imágenes:", error);
-    // Continuar con la impresión aunque falle la carga de imágenes
-    imprimirPDF();
   });
+
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
+}
+
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
 }

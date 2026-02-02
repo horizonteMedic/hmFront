@@ -2,14 +2,14 @@ import Swal from "sweetalert2";
 import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
-    handleSubirArchivoDefault,
+    handleSubidaMasiva,
     handleSubirArchivoDefaultSinSellos,
     LoadingDefault,
+    ReadArchivosFormDefault,
     SubmitDataServiceDefault,
     VerifyTRPerzonalizadoDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
-import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/espirometria/obtenerReporteEspirometria";
@@ -183,31 +183,39 @@ export const Loading = (mensaje) => {
 };
 
 export const handleSubirArchivoEspirometria = async (form, selectedSede, userlogued, token) => {
-    const coordenadas = {
-        FIRMA: { x: 40, y: 750, width: 120, height: 60 },
-        HUELLA: { x: 180, y: 750, width: 60, height: 60 },
-        SELLOFIRMA: { x: 220, y: 700, width: 100, height: 60 },
-        SELLOFIRMADOCASIG: { x: 340, y: 700, width: 100, height: 60 },
-        "SELLOFIRMADOCASIG-EXTRA": { x: 460, y: 700, width: 100, height: 60 },
-    };
-    handleSubirArchivoDefault(form, selectedSede, registrarPDF, userlogued, token, coordenadas)
+    // const coordenadas = {
+    //     FIRMA: { x: 40, y: 750, width: 120, height: 60 },
+    //     HUELLA: { x: 180, y: 750, width: 60, height: 60 },
+    //     SELLOFIRMA: { x: 220, y: 700, width: 100, height: 60 },
+    //     SELLOFIRMADOCASIG: { x: 340, y: 700, width: 100, height: 60 },
+    //     "SELLOFIRMADOCASIG-EXTRA": { x: 460, y: 700, width: 100, height: 60 },
+    // };
+    handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
 };
 
-export const ReadArchivosFormEspirometria = async (form, setVisualerOpen, token) => {
-    LoadingDefault("Cargando Interconsulta")
-    getFetch(`/api/v01/st/registros/detalleUrlArchivos/${form.norden}/${form.nomenclatura}`, token)
-        .then(response => {
-            console.log(response)
-            if (response.id === 1) {
-                setVisualerOpen(response)
+// export const ReadArchivosFormEspirometria = async (form, setVisualerOpen, token) => {
+//     LoadingDefault("Cargando Interconsulta")
+//     getFetch(`/api/v01/st/registros/detalleUrlArchivos/${form.norden}/${form.nomenclatura}`, token)
+//         .then(response => {
+//             console.log(response)
+//             if (response.id === 1) {
+//                 setVisualerOpen(response)
 
-                Swal.close()
-            } else {
-                Swal.fire("Error", "No Existe reporte para este Numero de Orden", "error")
-            }
-        })
-        .catch(error => {
-            Swal.fire("Error", "Ocurrio un Error al visualizar la interconsulta", "error")
-            throw new Error('Network response was not ok.', error);
-        })
+//                 Swal.close()
+//             } else {
+//                 Swal.fire("Error", "No Existe reporte para este Numero de Orden", "error")
+//             }
+//         })
+//         .catch(error => {
+//             Swal.fire("Error", "Ocurrio un Error al visualizar la interconsulta", "error")
+//             throw new Error('Network response was not ok.', error);
+//         })
+// }
+
+export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
+    ReadArchivosFormDefault(form, setVisualerOpen, token)
+}
+
+export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token) => {
+    handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token)
 }

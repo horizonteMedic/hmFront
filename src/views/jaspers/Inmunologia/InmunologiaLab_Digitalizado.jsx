@@ -173,8 +173,8 @@ const drawPatientData = (doc, datos = {}) => {
 
 // --- Componente Principal ---
 
-export default async function InmunologiaLab_Digitalizado(datos = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "letter" });
+export default async function InmunologiaLab_Digitalizado(datos = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
@@ -198,7 +198,7 @@ export default async function InmunologiaLab_Digitalizado(datos = {}) {
       img.onload = () => res(img);
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
-  Promise.all([
+  await Promise.all([
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
@@ -296,15 +296,23 @@ export default async function InmunologiaLab_Digitalizado(datos = {}) {
 
     // === FOOTER ===
     footerTR(doc, { ...datos, footerOffsetY: 8 });
-
-    // === Imprimir ===
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    iframe.onload = () => iframe.contentWindow.print();
   })
 
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
+  
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
+}
+
+
