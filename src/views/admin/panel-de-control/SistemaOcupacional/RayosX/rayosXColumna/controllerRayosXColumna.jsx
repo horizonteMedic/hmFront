@@ -3,6 +3,7 @@ import {
   GetInfoPacDefault,
   GetInfoServicioDefault,
   handleImgtoPdfDefault,
+  handleSubidaMasiva,
   handleSubirArchivoDefaultSinSellos,
   LoadingDefault,
   PrintHojaRDefault,
@@ -176,4 +177,8 @@ export const handleSubirArchivo2 = async (form, selectedSede, userlogued, token,
 
 export const ReadArchivosForm = async (form, setVisualerOpen, token, nomenclatura) => {
   ReadArchivosFormDefault(form, setVisualerOpen, token, nomenclatura)
+}
+
+export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token, nomenclatura) => {
+  handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token, nomenclatura)
 }

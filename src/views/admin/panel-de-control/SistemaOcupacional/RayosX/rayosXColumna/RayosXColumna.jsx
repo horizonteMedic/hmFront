@@ -1,6 +1,7 @@
 import {
   handleSubirArchivo,
   handleSubirArchivo2,
+  handleSubirArchivoMasivo,
   PrintHojaR,
   ReadArchivosForm,
   SubmitDataService,
@@ -135,6 +136,7 @@ export default function RayosXColumna() {
           <ButtonsPDF
             handleSave={() => { handleSubirArchivo2(form, selectedSede, userlogued, token, form.nomenclatura2) }}
             handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token, form.nomenclatura2) }}
+            handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token, form.nomenclatura2) }}
             Nombre_1="Subir Archivo 2"
             Nombre_2="Ver Archivo 2"
           />

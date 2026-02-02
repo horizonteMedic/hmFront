@@ -822,6 +822,163 @@ export const handleSubidaMasiva = async (form, selectedSede, urlPDf, userlogued,
     }
 }
 
+export const handleSubidaMasivaImagenes = async (
+    form,
+    selectedSede,
+    urlPDf,
+    userlogued,
+    token,
+    nomenclatura
+) => {
+    let imageFiles = [];
+
+    const { isConfirmed } = await Swal.fire({
+        title: "Selecciona la carpeta con imágenes",
+        input: "file",
+        width: 650,
+        inputAttributes: {
+            webkitdirectory: true,
+            directory: true,
+            multiple: true,
+            accept: "image/jpeg,image/png",
+        },
+        showCancelButton: true,
+        confirmButtonText: "Procesar imágenes",
+        cancelButtonText: "Cancelar",
+
+        didOpen: () => {
+            const input = Swal.getInput();
+
+            input.addEventListener("change", () => {
+                const files = Array.from(input.files || []);
+                imageFiles = files.filter(f => f.type.startsWith("image/"));
+
+                const htmlList = imageFiles.length
+                    ? `
+                        <div style="max-height:260px;overflow:auto;text-align:left">
+                            <b>Imágenes detectadas (${imageFiles.length}):</b>
+                            <ul>
+                                ${imageFiles.map(f =>
+                        `<li>${f.name} <span style="color:#888">(→ PDF)</span></li>`
+                    ).join("")}
+                            </ul>
+                        </div>
+                      `
+                    : `<p style="color:red">No se encontraron imágenes válidas</p>`;
+
+                Swal.update({ html: htmlList });
+            });
+        },
+
+        preConfirm: () => {
+            if (!imageFiles.length) {
+                Swal.showValidationMessage(
+                    "No hay imágenes válidas para subir"
+                );
+                return false;
+            }
+            return true;
+        }
+    });
+
+    if (!isConfirmed) return;
+
+    LoadingDefault("Convirtiendo imágenes a PDF...");
+
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = ("0" + (currentDate.getMonth() + 1)).slice(-2);
+    const day = ("0" + currentDate.getDate()).slice(-2);
+
+    const uploadPromises = imageFiles.map(async (file) => {
+        const orden = obtenerOrdenDesdeNombre(file.name);
+        if (!orden) {
+            return {
+                name: file.name,
+                status: "ignored",
+                message: "Sin N° Orden detectado"
+            };
+        }
+
+        try {
+            // 🔥 IMAGEN → PDF A4
+            const pdfBytes = await imagenToPdfA4(file);
+            const pdfBase64Final = uint8ToBase64(pdfBytes);
+
+            const nombreFinal =
+                file.name.replace(/\.(jpg|jpeg|png)$/i, "") +
+                `-${generarIdCorto()}.pdf`;
+
+            const datos = {
+                rutaArchivo: null,
+                dni: null,
+                historiaClinica: null,
+                servidor: "azure",
+                estado: true,
+                fechaRegistro: `${year}-${month}-${day}`,
+                userRegistro: userlogued,
+                fechaActualizacion: null,
+                userActualizacion: null,
+                id_tipo_archivo: null,
+
+                nombreArchivo: nombreFinal,
+                codigoSede: selectedSede,
+                fileBase64: pdfBase64Final,
+                nomenclatura_tipo_archivo: nomenclatura,
+                orden,
+                indice_carga_masiva: undefined,
+            };
+
+            const res = await SubmitData(datos, urlPDf, token);
+
+            return {
+                name: file.name,
+                status: res?.id === 1 ? "success" : "error",
+                message: res?.id === 1 ? "OK" : "Error al subir"
+            };
+        } catch (err) {
+            console.error(err);
+            return {
+                name: file.name,
+                status: "error",
+                message: "Error interno"
+            };
+        }
+    });
+
+    const results = await Promise.all(uploadPromises);
+
+    const exitosos = results.filter(r => r.status === "success");
+    const fallidos = results.filter(r => r.status !== "success");
+
+    const htmlResumen = `
+        <div style="text-align:left; max-height:300px; overflow:auto;">
+            <p><b>Resumen:</b> ${exitosos.length} subidas, ${fallidos.length} no subidas</p>
+
+            ${exitosos.length ? `
+                <h4 style="color:green">Convertidas y subidas:</h4>
+                <ul>${exitosos.map(r => `<li>${r.name}</li>`).join("")}</ul>
+            ` : ""}
+
+            ${fallidos.length ? `
+                <h4 style="color:red">Errores:</h4>
+                <ul>
+                    ${fallidos.map(r =>
+        `<li>${r.name} <span style="color:gray">(${r.message})</span></li>`
+    ).join("")}
+                </ul>
+            ` : ""}
+        </div>
+    `;
+
+    Swal.fire({
+        title: "Proceso finalizado",
+        html: htmlResumen,
+        icon: fallidos.length ? "warning" : "success",
+        width: 600
+    });
+};
+
 
 export const ReadArchivosFormDefault = async (form, setVisualerOpen, token, nomenclatura) => {
     LoadingDefault("Cargando Archivo")

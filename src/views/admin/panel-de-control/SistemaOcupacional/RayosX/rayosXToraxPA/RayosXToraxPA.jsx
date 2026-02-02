@@ -5,6 +5,7 @@ import {
   GetInfoServicio,
   getInfoTabla,
   handleSubirArchivo,
+  handleSubirArchivoMasivo,
   Loading,
   PrintConsultaEjecutada,
   PrintHojaR,
@@ -161,12 +162,11 @@ export default function RayosXToraxPA() {
             value={form.nombreExamen}
             disabled
           />
-          {form.SubirDoc &&
-            <ButtonsPDF
-              handleSave={() => { handleSubirArchivo2(form, selectedSede, userlogued, token, form.nomenclatura) }}
-              handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token) }}
-            />
-          }
+          <ButtonsPDF
+            {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token, form.nomenclatura) } } : {}}
+            {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+            handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token, form.nomenclatura) }}
+          />
         </SectionFieldset>
 
         <DatosPersonalesLaborales form={form} minSizePrincipal="none" />
