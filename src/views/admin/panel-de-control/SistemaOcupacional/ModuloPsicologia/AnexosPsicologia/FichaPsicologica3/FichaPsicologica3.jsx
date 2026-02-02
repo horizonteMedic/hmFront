@@ -8,9 +8,9 @@ import {
   InputsRadioGroup,
   InputTextArea,
   InputTextOneLine,
+  InputsBooleanRadioGroup,
   InputCheckbox,
   RadioTable,
-  InputsBooleanRadioGroup,
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
@@ -35,6 +35,7 @@ function DatosPersonales({
   handleChangeNumber,
   handleChangeSimple,
   handleSearch,
+  handleRadioButtonBoolean
 }) {
   return (
     <div className="space-y-3">
@@ -806,6 +807,7 @@ export default function FichaPsicologica3() {
         handleChangeNumber={handleChangeNumber}
         handleChangeSimple={handleChangeSimple}
         handleSearch={handleSearch}
+        handleRadioButtonBoolean={handleRadioButtonBoolean}
       />
       <ExamenMental
         form={form}
