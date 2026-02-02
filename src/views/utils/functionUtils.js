@@ -1116,9 +1116,7 @@ export const handleSubidaMasivaImagenesRXDinamico = async (
             };
         }
     });
-
     const results = await Promise.all(uploadPromises);
-
     const exitosos = results.filter(r => r.status === "success");
     const fallidos = results.filter(r => r.status !== "success");
 

@@ -91,6 +91,7 @@ import Consent_Lab_panel4D from "../Consentimientos/Consent_Lab_panel4D";
 import Consentimiento_Panel10D_Digitalizado from "../Consentimientos/Consentimiento_Panel10D_Digitalizado";
 import coprocultivo_digitalizado from "../Manipuladores/coprocultivo_digitalizado";
 import Coproparasitologico_Digitalizado from "../Manipuladores/Coproparasitologico_Digitalizado";
+import ParasitologiaSeriado_Digitalizado from "../Manipuladores/ParasitologiaSeriado_Digitalizado";
 export const reportesMap = {
    /* =========================
       GENERALES / BASE
@@ -197,7 +198,10 @@ export const reportesMap = {
 
    ac_coprocultivo: coprocultivo_digitalizado,  //nuevo
 
-   ac_coproparasitologico:Coproparasitologico_Digitalizado,  //nuevo
+   ac_coproparasitologico:{
+      Coproparasitologico_Digitalizado,  //nuevo
+      ParasitologiaSeriado_Digitalizado
+   },
   
    /* =========================
       CONSENTIMIENTOS

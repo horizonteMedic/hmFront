@@ -160,7 +160,7 @@ const drawPatientData = (doc, datos = {}) => {
   return yPos;
 };
 
-export default async function ParasitologiaSeriado_Digitalizado(datos = {}) {
+export default async function ParasitologiaSeriado_Digitalizado(datos = {}, docExistente = null) {
   // === MAPEO DE DATOS ===
   const datosReales = {
     // Datos del paciente
@@ -270,7 +270,8 @@ export default async function ParasitologiaSeriado_Digitalizado(datos = {}) {
   // Usar datos reales
   const datosFinales = datosReales;
 
-  const doc = new jsPDF({ unit: "mm", format: "letter" });
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+
   const pageW = doc.internal.pageSize.getWidth();
   const margin = 15;
   const xLeft = margin * 2;
@@ -291,7 +292,7 @@ export default async function ParasitologiaSeriado_Digitalizado(datos = {}) {
       img.onload = () => res(img);
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
-  Promise.all([
+  await Promise.all([
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(async ([s1, s2]) => {
@@ -523,15 +524,20 @@ export default async function ParasitologiaSeriado_Digitalizado(datos = {}) {
 
     // Footer de segunda página
     footerTR(doc, { ...datosFinales, footerOffsetY: 8 });
-
-    // Imprimir
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = pdfUrl;
-    document.body.appendChild(iframe);
-    iframe.onload = () => iframe.contentWindow.print();
   });
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
+}
 
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
 }
