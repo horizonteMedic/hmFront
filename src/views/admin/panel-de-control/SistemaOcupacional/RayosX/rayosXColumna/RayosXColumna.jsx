@@ -1,6 +1,7 @@
 import {
   handleSubirArchivo,
   handleSubirArchivo2,
+  handleSubirArchivoMasivo,
   PrintHojaR,
   ReadArchivosForm,
   SubmitDataService,
@@ -126,20 +127,21 @@ export default function RayosXColumna() {
         />
 
       </SectionFieldset>
-      {form.SubirDoc &&
-        <div className="flex gap-2 w-full flex-col justify-center">
-          <ButtonsPDF
-            handleSave={() => { handleSubirArchivo2(form, selectedSede, userlogued, token, form.nomenclatura) }}
-            handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token) }}
-          />
-          <ButtonsPDF
-            handleSave={() => { handleSubirArchivo2(form, selectedSede, userlogued, token, form.nomenclatura2) }}
-            handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token, form.nomenclatura2) }}
-            Nombre_1="Subir Archivo 2"
-            Nombre_2="Ver Archivo 2"
-          />
-        </div>
-      }
+
+      <div className="flex gap-2 w-full flex-col justify-center">
+        <ButtonsPDF
+          {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo2(form, selectedSede, userlogued, token, form.nomenclatura) } } : {}}
+          {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+        />
+        <ButtonsPDF
+          {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo2(form, selectedSede, userlogued, token, form.nomenclatura2) } } : {}}
+          {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token, form.nomenclatura2) } } : {}}
+          handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token, form.nomenclatura2) }}
+          Nombre_1="Subir Archivo 2"
+          Nombre_2="Ver Archivo 2"
+        />
+      </div>
+
       <DatosPersonalesLaborales form={form} />
       {/* Sección Radiografía de Columna */}
       <SectionFieldset legend="Radiografía de Columna" className="space-y-3">
