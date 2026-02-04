@@ -142,7 +142,7 @@ export const GetInfoServicio = async (
                     res.pregunta11MismoCuarto ? "MISMO_CUARTO" :
                         res.pregunta11DosMasPersonasMismoCuarto ? "DOS_O_MAS" : "",
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
     }
 };

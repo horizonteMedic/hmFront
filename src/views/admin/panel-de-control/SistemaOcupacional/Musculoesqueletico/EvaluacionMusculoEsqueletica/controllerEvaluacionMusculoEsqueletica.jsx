@@ -224,7 +224,7 @@ export const GetInfoServicio = (
           conclusion: leerBoolSI(res.conclusionAsintomaticoSi),
           diagnostico: res.diagnostico ?? "",
           recomendaciones: res.recomendaciones ?? "",
-          user_medicoFirma: res.usuarioFirma,
+          user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -569,7 +569,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
               `El archivo ${nombre}.jsx no exporta una función por defecto`
             );
           }
-          
+
           // Segunda llamada: EvaluacionMusculoEsqueletica2021_Digitalizado_boro.jsx
           const rutaArchivo2 = `../../../../../jaspers/MusculoEsqueletica/EvaluacionMusculoEsqueletica2021_Digitalizado_boro.jsx`;
           const modulo2 = await jasperModules[rutaArchivo2]();

@@ -37,6 +37,7 @@ export const GetInfoServicio = async (
             // Información General
             norden: res.norden,
             fechaExamen: res.fechaExamen_fecha,
+            esApto: res.apto_apto,
             nombreExamen: res.nombreExamen,
             codigoAnexo: res.codigoAnexo_cod_anexo03,
 
@@ -144,7 +145,7 @@ export const GetInfoServicio = async (
             // Pruebas Psicológicas - Área Emocional
             areaEmocional: res.areaEmocional_area_emocional,
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
 
         }));
     }
@@ -158,6 +159,14 @@ export const SubmitDataService = async (
     tabla,
     datosFooter
 ) => {
+    if (form.esApto === undefined || form.esApto === "") {
+        Swal.fire({
+            icon: "Error",
+            title: "Datos Incompletos",
+            text: "Por favor, marque la aptitud.",
+        });
+        return;
+    }
     if (!form.norden) {
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
@@ -231,6 +240,8 @@ export const SubmitDataService = async (
 
         areaCognitiva: form.areaCognitiva,
         areaEmocional: form.areaEmocional,
+
+        apto: form.esApto,
         usuarioRegistro: user,
 
         usuarioFirma: form.user_medicoFirma,

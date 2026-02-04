@@ -3,6 +3,8 @@ import {
   GetInfoPacDefault,
   GetInfoServicioDefault,
   handleImgtoPdfDefault,
+  handleSubidaMasiva,
+  handleSubidaMasivaImagenesRXDinamico,
   handleSubirArchivoDefaultSinSellos,
   LoadingDefault,
   PrintHojaRDefault,
@@ -66,7 +68,7 @@ export const GetInfoServicio = async (
       informe: res.informacionGeneral ?? "",
       conclusion: res.conclusiones ?? "",
 
-      user_medicoFirma: res.usuarioFirma,
+      user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
 
       SubirDoc: true,
       digitalizacion: res.digitalizacion
@@ -176,4 +178,8 @@ export const handleSubirArchivo2 = async (form, selectedSede, userlogued, token,
 
 export const ReadArchivosForm = async (form, setVisualerOpen, token, nomenclatura) => {
   ReadArchivosFormDefault(form, setVisualerOpen, token, nomenclatura)
+}
+
+export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token, nomenclatura) => {
+  handleSubidaMasivaImagenesRXDinamico(form, selectedSede, registrarPDF, userlogued, token, nomenclatura)
 }

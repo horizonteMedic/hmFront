@@ -32,11 +32,7 @@ const formatDateToLong = (dateString) => {
 const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
 
-<<<<<<< HEAD
-  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-=======
   await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -107,13 +103,8 @@ const drawPatientData = (doc, datos = {}) => {
   return y + lineHeight;
 };
 
-export default async function LHepatitisB_Digitalizado(datos) {
-  const doc = new jsPDF();
-<<<<<<< HEAD
-
-  // === HEADER ===
-  drawHeader(doc, datos);
-=======
+export default async function LHepatitisB_Digitalizado(datos = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
@@ -122,7 +113,6 @@ export default async function LHepatitisB_Digitalizado(datos) {
   // === TÍTULO ===
   doc.setFont("helvetica", "bold").setFontSize(14);
   doc.text("INMUNOLOGÍA", pageW / 2, 38, { align: "center" });
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   // === DATOS DEL PACIENTE ===
   drawPatientData(doc, datos);
@@ -138,63 +128,13 @@ export default async function LHepatitisB_Digitalizado(datos) {
       img.onload = () => res(img);
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
-  Promise.all([
+  await Promise.all([
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
     let y = 90;
 
-<<<<<<< HEAD
-    // Título principal
-    doc.setFont(undefined, 'bold');
-    doc.setFontSize(14);
-    doc.text('INMUNOLOGÍA', 105, y, { align: 'center' });
-    doc.setFontSize(11);
-
-    // Muestra y método
-    y += 8;
-    autoTable(doc, {
-      startY: y,
-      body: [
-        [{ content: 'MUESTRA : SUERO', styles: { fontStyle: 'bold' } }],
-        [{ content: 'MÉTODO : INMUNOENSAYO CROMATOGRÁFICO', styles: { fontStyle: 'bold' } }]
-      ],
-      theme: 'plain',
-      styles: { fontSize: 11, cellPadding: 1 },
-      margin: { left: 15, right: 15 },
-      tableWidth: 180
-    });
-
-    // Tabla de resultado
-    let yTable = doc.lastAutoTable.finalY + 8;
-    // Encabezados
-    doc.setFont('helvetica', 'bold');
-    doc.text('PRUEBA CUALITATIVO', 15, yTable);
-    doc.text('RESULTADO', 105 + 40, yTable, { align: 'left' });
-    yTable += 3;
-    doc.setLineWidth(0.3);
-    doc.line(15, yTable, doc.internal.pageSize.getWidth() - 15, yTable);
-    doc.setLineWidth(0.2);
-    yTable += 8;
-    // Fila de datos
-    doc.setFont('helvetica', 'normal');
-    doc.text(`HEPATITIS B (HBsAg) - ${datos.txtMarca || ''}`, 15, yTable);
-    doc.text(datos.txtHepatitisb || '', 105 + 40, yTable, { align: 'left' });
-
-    // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
-    const pageW = doc.internal.pageSize.getWidth();
-    const sigW = 53; // Tamaño fijo width
-    const sigH = 23; // Tamaño fijo height
-    const sigY = 210;
-    const gap = 16; // Espacio entre sellos (reducido 4mm: 20 - 4 = 16)
-
-    if (s1 && s2) {
-      // Si hay dos sellos, centrarlos juntos
-      const totalWidth = sigW * 2 + gap;
-      const startX = (pageW - totalWidth) / 2;
-
-=======
     // Muestra y método
     autoTable(doc, {
       startY: y,
@@ -236,7 +176,6 @@ export default async function LHepatitisB_Digitalizado(datos) {
       const totalWidth = sigW * 2 + gap;
       const startX = (pageW - totalWidth) / 2;
 
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
       // Sello 1 (izquierda) - Tamaño fijo
       const canvas1 = document.createElement('canvas');
       canvas1.width = s1.width;
@@ -290,23 +229,23 @@ export default async function LHepatitisB_Digitalizado(datos) {
       doc.addImage(selloBase64, 'PNG', imgX, imgY, sigW, sigH);
     }
 
-<<<<<<< HEAD
-    footerTR(doc, datos);
-=======
     footerTR(doc, { ...datos, footerOffsetY: 8 });
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
-    // Mostrar PDF
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = pdfUrl;
-    document.body.appendChild(iframe);
-    iframe.onload = function () {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
-  })
+  });
 
-} 
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
+}
+
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
+}

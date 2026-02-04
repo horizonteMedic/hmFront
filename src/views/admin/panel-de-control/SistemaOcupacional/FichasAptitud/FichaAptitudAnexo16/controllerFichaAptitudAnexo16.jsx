@@ -7,6 +7,7 @@ import {
 } from "../../../../../utils/functionUtils";
 import { getFetch } from "../../../../../utils/apiHelpers";
 import { getHoraActual } from "../../../../../utils/helpers";
+import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
     "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16";
@@ -34,15 +35,21 @@ export const GetInfoServicio = async (
             ...prev,
             norden: res.norden,
             tipoExamen: res.nombreExamen,
-            nombres: res.nombresPaciente + " " + res.apellidosPaciente,
             dni: res.dniPaciente,
+            nombres: res.nombresPaciente + " " + res.apellidosPaciente,
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente),
+            lugarNacimiento: res.lugarNacimientoPaciente,
             edad: res.edadPaciente,
-            sexo: res.sexoPaciente,
+            sexo: res.sexoPaciente == "F" ? "FEMENINO" : "MASCULINO",
+            estadoCivil: res.estadoCivilPaciente,
+            nivelEstudios: res.nivelEstudioPaciente,
+
             empresa: res.empresa,
             contrata: res.contrata,
             puestoPostula: res.ocupacionPaciente,
-            areaTrabajo: res.areaPaciente,
-            puestoActual: res.cargoPaciente,
+            ocupacion: res.areaPaciente,
+            cargoDesempenar: res.cargoPaciente,
+
             esOhla: res.esOhla ?? false,
 
             conclusiones: res.observacionesFichaMedica,
@@ -89,15 +96,22 @@ export const GetInfoServicioEditar = async (
             ...prev,
             norden: res.norden,
             tipoExamen: res.nombreExamen,
-            nombres: res.nombresPaciente + " " + res.apellidosPaciente,
+            
             dni: res.dniPaciente,
+            nombres: res.nombresPaciente + " " + res.apellidosPaciente,
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente),
+            lugarNacimiento: res.lugarNacimientoPaciente,
             edad: res.edadPaciente,
-            sexo: res.sexoPaciente,
+            sexo: res.sexoPaciente == "F" ? "FEMENINO" : "MASCULINO",
+            estadoCivil: res.estadoCivilPaciente,
+            nivelEstudios: res.nivelEstudioPaciente,
+
             empresa: res.empresa,
             contrata: res.contrata,
             puestoPostula: res.ocupacionPaciente,
-            areaTrabajo: res.areaPaciente,
-            puestoActual: res.cargoPaciente,
+            ocupacion: res.areaPaciente,
+            cargoDesempenar: res.cargoPaciente,
+
             esOhla: res.esOhla ?? false,
 
             conclusiones: res.conclusiones,
@@ -147,7 +161,7 @@ export const GetInfoServicioEditar = async (
             glucosa: res.glucosalabclinicoTxtglucosabio,
             creatinina: res.creatininalabclinicoTxtcreatininabio,
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
     }
 };

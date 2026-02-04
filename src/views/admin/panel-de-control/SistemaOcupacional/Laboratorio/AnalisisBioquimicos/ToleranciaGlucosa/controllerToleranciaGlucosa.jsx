@@ -48,7 +48,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             glucosa60: res.tolera60 ?? "",
             glucosa120: res.tolera120 ?? "",
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
             user_doctorAsignado: res.doctorAsignado,
         }));
     }
@@ -65,10 +65,10 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
         fechaExamen: form.fecha,
         fechaRegistro: form.fecha,
         //AGREGAR
-        muestra: form.muestra ,
-        serica: form.glucosa ,
-        tolera60: form.glucosa60 ,
-        tolera120: form.glucosa120 ,
+        muestra: form.muestra,
+        serica: form.glucosa,
+        tolera60: form.glucosa60,
+        tolera120: form.glucosa120,
 
         userRegistro: user,
 

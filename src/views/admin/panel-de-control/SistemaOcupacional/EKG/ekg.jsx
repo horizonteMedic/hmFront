@@ -6,6 +6,7 @@ import {
   GetInfoServicio,
   getInfoTabla,
   handleSubirArchivo,
+  handleSubirArchivoMasivo,
   Loading,
   PrintHojaR,
   ReadArchivosForm,
@@ -76,6 +77,10 @@ export default function EKG() {
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
+
+    //DOCTOR ASIGNADO
+    nombre_doctorAsignado: "",
+    user_doctorAsignado: "",
 
     SubirDoc: false,
     nomenclatura: "ELECTROCARDIOGRAMA"
@@ -198,12 +203,13 @@ export default function EKG() {
               }));
             }}
           />
-          {form.SubirDoc &&
-            <ButtonsPDF
-              handleSave={() => { handleSubirArchivo(form, selectedSede, userlogued, token) }}
-              handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token) }}
-            />
-          }
+
+          <ButtonsPDF
+            {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
+            {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+            handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
+          />
+
         </SectionFieldset>
 
         <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 3xl:grid-cols-2 gap-x-4 gap-y-3">
@@ -557,6 +563,14 @@ export default function EKG() {
             label="Especialista"
             form={form}
             onChange={handleChangeSimple}
+          />
+          <EmpleadoComboBox
+            value={form.nombre_doctorAsignado}
+            label="Doctor Asignado"
+            form={form}
+            onChange={handleChangeSimple}
+            nameField="nombre_doctorAsignado"
+            idField="user_doctorAsignado"
           />
         </SectionFieldset>
         {/* BOTONES DE ACCIÓN */}

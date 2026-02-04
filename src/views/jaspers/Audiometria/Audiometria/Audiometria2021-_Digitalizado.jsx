@@ -3,7 +3,7 @@ import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import drawColorBox from '../../components/ColorBox.jsx';
 import footerTR from '../../components/footerTR.jsx';
 import { formatearFechaCorta } from '../../../utils/formatDateUtils';
-// import { dibujarFirmas } from '../../../utils/dibujarFirmas.js'; // Se usará cuando se agreguen las firmas
+import { dibujarFirmas } from '../../../utils/dibujarFirmas.js';
 
 // Header con logo, color box y título
 const drawHeader = async (doc, datos = {}) => {
@@ -58,11 +58,11 @@ const dibujarTextoConSaltoLinea = (doc, texto, x, y, anchoMaximo) => {
     } else {
       if (lineaActual) {
         doc.text(lineaActual, x, yActual);
-        yActual += fontSize * 0.35;
+        yActual += fontSize * 0.3; // Reducido de 0.35 a 0.3
         lineaActual = palabra;
       } else {
         doc.text(palabra, x, yActual);
-        yActual += fontSize * 0.35;
+        yActual += fontSize * 0.3; // Reducido de 0.35 a 0.3
       }
     }
   });
@@ -74,21 +74,21 @@ const dibujarTextoConSaltoLinea = (doc, texto, x, y, anchoMaximo) => {
 const drawPatientData = (doc, datos = {}) => {
   // Parámetros de tabla
   const tablaInicioX = 5;
-  const tablaInicioY = 35;
+  const tablaInicioY = 33; // Reducido de 35 a 33
   const tablaAncho = 200;
-  const filaAltura = 4;
+  const filaAltura = 3.5; // Reducido de 4 a 3.5
   let yPos = tablaInicioY;
 
   // Header de sección filiación (datos personales)
-  const dibujarHeaderSeccion = (titulo, yPosLocal, alturaHeader = 4) => {
+  const dibujarHeaderSeccion = (titulo, yPosLocal, alturaHeader = 3.5) => { // Reducido de 4 a 3.5
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPosLocal, tablaAncho, alturaHeader, 'F');
     doc.line(tablaInicioX, yPosLocal, tablaInicioX + tablaAncho, yPosLocal);
     doc.line(tablaInicioX, yPosLocal + alturaHeader, tablaInicioX + tablaAncho, yPosLocal + alturaHeader);
     doc.line(tablaInicioX, yPosLocal, tablaInicioX, yPosLocal + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPosLocal, tablaInicioX + tablaAncho, yPosLocal + alturaHeader);
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text(titulo, tablaInicioX + 2, yPosLocal + 3);
+    doc.setFont("helvetica", "bold").setFontSize(7);
+    doc.text(titulo, tablaInicioX + 2, yPosLocal + alturaHeader / 2 + 1);
     return yPosLocal + alturaHeader;
   };
 
@@ -173,70 +173,71 @@ const drawPatientData = (doc, datos = {}) => {
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Contenido de la tabla (ubicar texto debajo del header gris)
-  let yTexto = tablaInicioY + filaAltura + 2.5;
+  // Contenido de la tabla (centrado verticalmente en cada fila)
+  let yTexto = tablaInicioY + filaAltura;
+  const yCentro = (y) => y + filaAltura / 2 + 1;
 
   // Apellidos y Nombres
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto + 1);
-  dibujarTextoConSaltoLinea(doc, nombresCompletos, tablaInicioX + 35, yTexto + 1, 150);
+  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yCentro(yTexto));
+  dibujarTextoConSaltoLinea(doc, nombresCompletos, tablaInicioX + 35, yCentro(yTexto), 150);
   yTexto += filaAltura;
 
   // DNI, Edad, Sexo, Fecha Nac.
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("DNI:", tablaInicioX + 2, yTexto + 1);
-  doc.text(dni, tablaInicioX + 12, yTexto + 1);
+  doc.text("DNI:", tablaInicioX + 2, yCentro(yTexto));
+  doc.text(dni, tablaInicioX + 12, yCentro(yTexto));
 
-  doc.text("Edad:", tablaInicioX + 47, yTexto + 1);
-  doc.text((edad ? edad + " Años" : ""), tablaInicioX + 58, yTexto + 1);
+  doc.text("Edad:", tablaInicioX + 47, yCentro(yTexto));
+  doc.text((edad ? edad + " Años" : ""), tablaInicioX + 58, yCentro(yTexto));
 
-  doc.text("Sexo:", tablaInicioX + 92, yTexto + 1);
-  doc.text(sexo, tablaInicioX + 105, yTexto + 1);
+  doc.text("Sexo:", tablaInicioX + 92, yCentro(yTexto));
+  doc.text(sexo, tablaInicioX + 105, yCentro(yTexto));
 
-  doc.text("Fecha Nac.:", tablaInicioX + 137, yTexto + 1);
-  doc.text(fechaNacimiento || "", tablaInicioX + 155, yTexto + 1);
+  doc.text("Fecha Nac.:", tablaInicioX + 137, yCentro(yTexto));
+  doc.text(fechaNacimiento || "", tablaInicioX + 155, yCentro(yTexto));
   yTexto += filaAltura;
 
   // Lugar de Nacimiento, Estado Civil, Nivel de Estudio
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Lugar de Nacimiento:", tablaInicioX + 2, yTexto + 1);
-  doc.text(lugarNacimiento, tablaInicioX + 35, yTexto + 1);
+  doc.text("Lugar de Nacimiento:", tablaInicioX + 2, yCentro(yTexto));
+  doc.text(lugarNacimiento, tablaInicioX + 35, yCentro(yTexto));
 
-  doc.text("Estado Civil:", tablaInicioX + 67, yTexto + 1);
-  doc.text(estadoCivil, tablaInicioX + 82, yTexto + 1);
+  doc.text("Estado Civil:", tablaInicioX + 67, yCentro(yTexto));
+  doc.text(estadoCivil, tablaInicioX + 82, yCentro(yTexto));
 
-  doc.text("Nivel de Estudio:", tablaInicioX + 132, yTexto + 1);
-  doc.text(nivelEstudio, tablaInicioX + 150, yTexto + 1);
+  doc.text("Nivel de Estudio:", tablaInicioX + 132, yCentro(yTexto));
+  doc.text(nivelEstudio, tablaInicioX + 150, yCentro(yTexto));
   yTexto += filaAltura;
 
   // Dirección
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Dirección:", tablaInicioX + 2, yTexto + 1);
-  dibujarTextoConSaltoLinea(doc, direccion, tablaInicioX + 20, yTexto + 1, 170);
+  doc.text("Dirección:", tablaInicioX + 2, yCentro(yTexto));
+  dibujarTextoConSaltoLinea(doc, direccion, tablaInicioX + 20, yCentro(yTexto), 170);
   yTexto += filaAltura;
 
   // Ocupación
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Ocupación:", tablaInicioX + 2, yTexto + 1);
-  dibujarTextoConSaltoLinea(doc, ocupacion, tablaInicioX + 25, yTexto + 1, 165);
+  doc.text("Ocupación:", tablaInicioX + 2, yCentro(yTexto));
+  dibujarTextoConSaltoLinea(doc, ocupacion, tablaInicioX + 25, yCentro(yTexto), 165);
   yTexto += filaAltura;
 
   // Área de Trabajo
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Área de Trabajo:", tablaInicioX + 2, yTexto + 1);
-  dibujarTextoConSaltoLinea(doc, areaTrabajo, tablaInicioX + 30, yTexto + 1, 160);
+  doc.text("Área de Trabajo:", tablaInicioX + 2, yCentro(yTexto));
+  dibujarTextoConSaltoLinea(doc, areaTrabajo, tablaInicioX + 30, yCentro(yTexto), 160);
   yTexto += filaAltura;
 
   // Empresa
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Empresa:", tablaInicioX + 2, yTexto + 1);
-  dibujarTextoConSaltoLinea(doc, empresa, tablaInicioX + 24, yTexto + 1, 160);
+  doc.text("Empresa:", tablaInicioX + 2, yCentro(yTexto));
+  dibujarTextoConSaltoLinea(doc, empresa, tablaInicioX + 24, yCentro(yTexto), 160);
   yTexto += filaAltura;
 
   // Contratista
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Contratista:", tablaInicioX + 2, yTexto + 1);
-  dibujarTextoConSaltoLinea(doc, contrata, tablaInicioX + 24, yTexto + 1, 160);
+  doc.text("Contratista:", tablaInicioX + 2, yCentro(yTexto));
+  dibujarTextoConSaltoLinea(doc, contrata, tablaInicioX + 24, yCentro(yTexto), 160);
   yTexto += filaAltura;
 
   return yPos;
@@ -252,61 +253,26 @@ const dibujarX = (doc, x, y) => {
 const drawSintomasActuales = (doc, datos = {}, yInicio) => {
   const tablaInicioX = 5;
   const tablaAncho = 200;
-  const filaAltura = 4;
+  const filaAltura = 3.5; // Reducido de 4 a 3.5
   let yPos = yInicio;
 
   // Header de sección
-  const dibujarHeaderSeccion = (titulo, yPosLocal, alturaHeader = 4) => {
+  const dibujarHeaderSeccion = (titulo, yPosLocal, alturaHeader = 3.5) => { // Reducido de 4 a 3.5
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPosLocal, tablaAncho, alturaHeader, 'F');
     doc.line(tablaInicioX, yPosLocal, tablaInicioX + tablaAncho, yPosLocal);
     doc.line(tablaInicioX, yPosLocal + alturaHeader, tablaInicioX + tablaAncho, yPosLocal + alturaHeader);
     doc.line(tablaInicioX, yPosLocal, tablaInicioX, yPosLocal + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPosLocal, tablaInicioX + tablaAncho, yPosLocal + alturaHeader);
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text(titulo, tablaInicioX + 2, yPosLocal + 3);
+    doc.setFont("helvetica", "bold").setFontSize(7);
+    doc.text(titulo, tablaInicioX + 2, yPosLocal + alturaHeader / 2 + 1);
     return yPosLocal + alturaHeader;
   };
 
   // Sección: 2. SÍNTOMAS ACTUALES
   yPos = dibujarHeaderSeccion("2. SÍNTOMAS ACTUALES", yPos, filaAltura);
 
-  // Fila header: Sí | No (repetido para cada síntoma)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
-  // Dividir en columnas: cada síntoma tiene su label + Si + No
-  const numSintomas = 5;
-  const anchoColumna = tablaAncho / numSintomas;
-  const anchoLabel = anchoColumna * 0.5;
-  const anchoSi = anchoColumna * 0.25;
-  const anchoNo = anchoColumna * 0.25;
-
-  for (let i = 0; i <= numSintomas; i++) {
-    const x = tablaInicioX + (i * anchoColumna);
-    doc.line(x, yPos, x, yPos + filaAltura);
-    if (i < numSintomas) {
-      const xSi = x + anchoLabel;
-      const xNo = xSi + anchoSi;
-      doc.line(xSi, yPos, xSi, yPos + filaAltura);
-      doc.line(xNo, yPos, xNo, yPos + filaAltura);
-    }
-  }
-
-  const yCentroHeader = yPos + filaAltura / 2 + 1;
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  for (let i = 0; i < numSintomas; i++) {
-    const xInicio = tablaInicioX + (i * anchoColumna);
-    const xSi = xInicio + anchoLabel;
-    const xNo = xSi + anchoSi;
-    doc.text("Si", xSi + anchoSi / 2, yCentroHeader, { align: "center" });
-    doc.text("No", xNo + anchoNo / 2, yCentroHeader, { align: "center" });
-  }
-  yPos += filaAltura;
-
-  // Fila de síntomas
+  // Fila de síntomas con formato: cada síntoma en su celda "Sordera: Si | Vértigo: No | ..."
   const sintomas = [
     { nombre: "Sordera", si: datos.rbsasorderaSi, no: datos.rbsasorderaNo },
     { nombre: "Vértigo", si: datos.rbsavertigoSi, no: datos.rbsavertigoNo },
@@ -315,46 +281,54 @@ const drawSintomasActuales = (doc, datos = {}, yInicio) => {
     { nombre: "Otalgia", si: datos.rbsaotalgiaSi, no: datos.rbsaotalgiaNo }
   ];
 
+  // Dividir en columnas (5 síntomas)
+  const numSintomas = sintomas.length;
+  const anchoColumna = tablaAncho / numSintomas;
+
+  // Dibujar líneas verticales
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  for (let i = 1; i < numSintomas; i++) {
+    const x = tablaInicioX + i * anchoColumna;
+    doc.line(x, yPos, x, yPos + filaAltura);
+  }
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
+  // Dibujar texto en cada celda
   const yCentroFila = yPos + filaAltura / 2 + 1;
   doc.setFont("helvetica", "normal").setFontSize(7);
-
   sintomas.forEach((sintoma, index) => {
-    const xInicio = tablaInicioX + (index * anchoColumna);
-    const xSi = xInicio + anchoLabel;
-    const xNo = xSi + anchoSi;
-
-    doc.line(xInicio, yPos, xInicio, yPos + filaAltura);
-    doc.line(xSi, yPos, xSi, yPos + filaAltura);
-    doc.line(xNo, yPos, xNo, yPos + filaAltura);
-
-    doc.text(sintoma.nombre, xInicio + 1, yCentroFila);
-    if (sintoma.si === true) {
-      dibujarX(doc, xSi + anchoSi / 2, yCentroFila);
-    }
-    if (sintoma.no === true) {
-      dibujarX(doc, xNo + anchoNo / 2, yCentroFila);
-    }
+    const xInicio = tablaInicioX + index * anchoColumna;
+    const valor = sintoma.si === true || sintoma.si === "true" || sintoma.si === 1 ? "Si" : 
+                  sintoma.no === true || sintoma.no === "true" || sintoma.no === 1 ? "No" : "";
+    const texto = valor ? `${sintoma.nombre}: ${valor}` : sintoma.nombre;
+    doc.text(texto, xInicio + 1, yCentroFila);
   });
   yPos += filaAltura;
 
-  // Fila: Otros síntomas ORL
-  const alturaOtros = filaAltura * 2;
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaOtros);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaOtros);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaOtros, tablaInicioX + tablaAncho, yPos + alturaOtros);
-
-  const yCentroOtros = yPos + alturaOtros / 2 + 1;
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Otros síntomas ORL:", tablaInicioX + 2, yCentroOtros);
-  const otrosSintomas = String(datos.txtsaotrossintomas || "");
-  dibujarTextoConSaltoLinea(doc, otrosSintomas, tablaInicioX + 35, yCentroOtros, 160);
-  yPos += alturaOtros;
+  // Fila: Otros síntomas ORL - solo crece si hay contenido
+  const otrosSintomas = String(datos.txtsaotrossintomas || "").trim();
+  if (otrosSintomas) {
+    const lineas = doc.splitTextToSize(otrosSintomas, tablaAncho - 4);
+    const alturaOtros = Math.max(filaAltura, lineas.length * 2.2 + 1.5); // Reducido de 2.5+2 a 2.2+1.5
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaOtros);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaOtros);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + alturaOtros, tablaInicioX + tablaAncho, yPos + alturaOtros);
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.text("Otros síntomas ORL:", tablaInicioX + 2, yPos + 2.0); // Reducido de 2.5 a 2.0
+    doc.text(lineas, tablaInicioX + 35, yPos + 2.0); // Reducido de 2.5 a 2.0
+    yPos += alturaOtros;
+  } else {
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.text("Otros síntomas ORL:", tablaInicioX + 2, yPos + filaAltura / 2 + 1);
+    yPos += filaAltura;
+  }
 
   return yPos;
 };
@@ -363,61 +337,26 @@ const drawSintomasActuales = (doc, datos = {}, yInicio) => {
 const drawAntecedentesMedicos = (doc, datos = {}, yInicio) => {
   const tablaInicioX = 5;
   const tablaAncho = 200;
-  const filaAltura = 4;
+  const filaAltura = 3.5; // Reducido de 4 a 3.5
   let yPos = yInicio;
 
   // Header de sección
-  const dibujarHeaderSeccion = (titulo, yPosLocal, alturaHeader = 4) => {
+  const dibujarHeaderSeccion = (titulo, yPosLocal, alturaHeader = 3.5) => { // Reducido de 4 a 3.5
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPosLocal, tablaAncho, alturaHeader, 'F');
     doc.line(tablaInicioX, yPosLocal, tablaInicioX + tablaAncho, yPosLocal);
     doc.line(tablaInicioX, yPosLocal + alturaHeader, tablaInicioX + tablaAncho, yPosLocal + alturaHeader);
     doc.line(tablaInicioX, yPosLocal, tablaInicioX, yPosLocal + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPosLocal, tablaInicioX + tablaAncho, yPosLocal + alturaHeader);
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text(titulo, tablaInicioX + 2, yPosLocal + 3);
+    doc.setFont("helvetica", "bold").setFontSize(7);
+    doc.text(titulo, tablaInicioX + 2, yPosLocal + alturaHeader / 2 + 1);
     return yPosLocal + alturaHeader;
   };
 
   // Sección: 3. ANTECEDENTES MÉDICOS DE IMPORTANCIA
   yPos = dibujarHeaderSeccion("3. ANTECEDENTES MÉDICOS DE IMPORTANCIA", yPos, filaAltura);
 
-  // Fila header: Sí | No (repetido para cada antecedente)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  
-  // Dividir en columnas: cada antecedente tiene su label + Si + No
-  const numAntecedentesPorFila = 3;
-  const anchoColumna = tablaAncho / numAntecedentesPorFila;
-  const anchoLabel = anchoColumna * 0.5;
-  const anchoSi = anchoColumna * 0.25;
-  const anchoNo = anchoColumna * 0.25;
-
-  for (let i = 0; i <= numAntecedentesPorFila; i++) {
-    const x = tablaInicioX + (i * anchoColumna);
-    doc.line(x, yPos, x, yPos + filaAltura);
-    if (i < numAntecedentesPorFila) {
-      const xSi = x + anchoLabel;
-      const xNo = xSi + anchoSi;
-      doc.line(xSi, yPos, xSi, yPos + filaAltura);
-      doc.line(xNo, yPos, xNo, yPos + filaAltura);
-    }
-  }
-
-  const yCentroHeader = yPos + filaAltura / 2 + 1;
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  for (let i = 0; i < numAntecedentesPorFila; i++) {
-    const xInicio = tablaInicioX + (i * anchoColumna);
-    const xSi = xInicio + anchoLabel;
-    const xNo = xSi + anchoSi;
-    doc.text("Si", xSi + anchoSi / 2, yCentroHeader, { align: "center" });
-    doc.text("No", xNo + anchoNo / 2, yCentroHeader, { align: "center" });
-  }
-  yPos += filaAltura;
-
-  // Filas de antecedentes
+  // Antecedentes en filas de 3 columnas
   const filasAntecedentes = [
     [
       { nombre: "Rinitis", si: datos.rbamrenitisSi, no: datos.rbamrenitisNo },
@@ -436,48 +375,55 @@ const drawAntecedentesMedicos = (doc, datos = {}, yInicio) => {
     ]
   ];
 
+  const numCols = 3;
+  const anchoColumna = tablaAncho / numCols;
+
   filasAntecedentes.forEach(fila => {
+    // Dibujar líneas verticales
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    for (let i = 1; i < numCols; i++) {
+      const x = tablaInicioX + i * anchoColumna;
+      doc.line(x, yPos, x, yPos + filaAltura);
+    }
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
+    // Dibujar texto en cada celda
     const yCentroFila = yPos + filaAltura / 2 + 1;
     doc.setFont("helvetica", "normal").setFontSize(7);
-
     fila.forEach((antecedente, index) => {
-      const xInicio = tablaInicioX + (index * anchoColumna);
-      const xSi = xInicio + anchoLabel;
-      const xNo = xSi + anchoSi;
-
-      doc.line(xInicio, yPos, xInicio, yPos + filaAltura);
-      doc.line(xSi, yPos, xSi, yPos + filaAltura);
-      doc.line(xNo, yPos, xNo, yPos + filaAltura);
-
-      doc.text(antecedente.nombre, xInicio + 1, yCentroFila);
-      if (antecedente.si === true) {
-        dibujarX(doc, xSi + anchoSi / 2, yCentroFila);
-      }
-      if (antecedente.no === true) {
-        dibujarX(doc, xNo + anchoNo / 2, yCentroFila);
-      }
+      const xInicio = tablaInicioX + index * anchoColumna;
+      const valor = antecedente.si === true || antecedente.si === "true" || antecedente.si === 1 ? "Si" : 
+                    antecedente.no === true || antecedente.no === "true" || antecedente.no === 1 ? "No" : "";
+      const texto = valor ? `${antecedente.nombre}: ${valor}` : antecedente.nombre;
+      doc.text(texto, xInicio + 1, yCentroFila);
     });
     yPos += filaAltura;
   });
 
-  // Fila: Medicamentos Ototóxicos
-  const alturaMedicamentos = filaAltura * 2;
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaMedicamentos);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaMedicamentos);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaMedicamentos, tablaInicioX + tablaAncho, yPos + alturaMedicamentos);
-
-  const yCentroMedicamentos = yPos + alturaMedicamentos / 2 + 1;
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Medicamentos Ototóxicos:", tablaInicioX + 2, yCentroMedicamentos);
-  const medicamentos = String(datos.txtamcuales || "");
-  dibujarTextoConSaltoLinea(doc, medicamentos, tablaInicioX + 45, yCentroMedicamentos, 150);
-  yPos += alturaMedicamentos;
+  // Fila: Medicamentos Ototóxicos - solo crece si hay contenido
+  const medicamentos = String(datos.txtamcuales || "").trim();
+  if (medicamentos) {
+    const lineas = doc.splitTextToSize(medicamentos, tablaAncho - 4);
+    const alturaMedicamentos = Math.max(filaAltura, lineas.length * 2.2 + 1.5); // Reducido de 2.5+2 a 2.2+1.5
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaMedicamentos);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaMedicamentos);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + alturaMedicamentos, tablaInicioX + tablaAncho, yPos + alturaMedicamentos);
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.text("Medicamentos Ototóxicos:", tablaInicioX + 2, yPos + 2.0); // Reducido de 2.5 a 2.0
+    doc.text(lineas, tablaInicioX + 45, yPos + 2.0); // Reducido de 2.5 a 2.0
+    yPos += alturaMedicamentos;
+  } else {
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.text("Medicamentos Ototóxicos:", tablaInicioX + 2, yPos + filaAltura / 2 + 1);
+    yPos += filaAltura;
+  }
 
   return yPos;
 };
@@ -486,18 +432,18 @@ const drawAntecedentesMedicos = (doc, datos = {}, yInicio) => {
 const drawExposicionOcupacional = (doc, datos = {}, yInicio) => {
   const tablaInicioX = 5;
   const tablaAncho = 200;
-  const filaAltura = 4;
+  const filaAltura = 3.5; // Reducido de 4 a 3.5
   let yPos = yInicio;
 
-  const dibujarHeaderSeccion = (titulo, yPosLocal, alturaHeader = 4) => {
+  const dibujarHeaderSeccion = (titulo, yPosLocal, alturaHeader = 3.5) => { // Reducido de 4 a 3.5
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPosLocal, tablaAncho, alturaHeader, "F");
     doc.line(tablaInicioX, yPosLocal, tablaInicioX + tablaAncho, yPosLocal);
     doc.line(tablaInicioX, yPosLocal + alturaHeader, tablaInicioX + tablaAncho, yPosLocal + alturaHeader);
     doc.line(tablaInicioX, yPosLocal, tablaInicioX, yPosLocal + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPosLocal, tablaInicioX + tablaAncho, yPosLocal + alturaHeader);
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text(titulo, tablaInicioX + 2, yPosLocal + 3);
+    doc.setFont("helvetica", "bold").setFontSize(7);
+    doc.text(titulo, tablaInicioX + 2, yPosLocal + alturaHeader / 2 + 1);
     return yPosLocal + alturaHeader;
   };
 
@@ -664,14 +610,28 @@ const drawExposicionOcupacional = (doc, datos = {}, yInicio) => {
 
   yPos += alturaQuim;
 
-  // Fila: Otros (Detallar)
-  const alturaOtros = filaAltura * 2;
-  doc.rect(tablaInicioX, yPos, tablaAncho, alturaOtros);
-  const yOtrosMid = yPos + alturaOtros / 2 + 1;
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Otros (Detallar):", tablaInicioX + 2, yOtrosMid);
-  dibujarTextoConSaltoLinea(doc, String(datos.txteootros || ""), tablaInicioX + 35, yOtrosMid, 160);
-  yPos += alturaOtros;
+  // Fila: Otros (Detallar) - solo crece si hay contenido
+  const otros = String(datos.txteootros || "").trim();
+  if (otros) {
+    const lineas = doc.splitTextToSize(otros, tablaAncho - 4);
+    const alturaOtros = Math.max(filaAltura, lineas.length * 2.2 + 1.5); // Reducido de 2.5+2 a 2.2+1.5
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaOtros);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaOtros);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + alturaOtros, tablaInicioX + tablaAncho, yPos + alturaOtros);
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.text("Otros (Detallar):", tablaInicioX + 2, yPos + 2.0); // Reducido de 2.5 a 2.0
+    doc.text(lineas, tablaInicioX + 35, yPos + 2.0); // Reducido de 2.5 a 2.0
+    yPos += alturaOtros;
+  } else {
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.text("Otros (Detallar):", tablaInicioX + 2, yPos + filaAltura / 2 + 1);
+    yPos += filaAltura;
+  }
 
   return yPos;
 };
@@ -680,84 +640,77 @@ const drawExposicionOcupacional = (doc, datos = {}, yInicio) => {
 const drawAntecedentesExtraLaborales = (doc, datos = {}, yInicio) => {
   const tablaInicioX = 5;
   const tablaAncho = 200;
-  const filaAltura = 4;
+  const filaAltura = 3.5; // Reducido de 4 a 3.5
   let yPos = yInicio;
 
-  const dibujarHeaderSeccion = (titulo, yPosLocal, alturaHeader = 4) => {
+  const dibujarHeaderSeccion = (titulo, yPosLocal, alturaHeader = 3.5) => { // Reducido de 4 a 3.5
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPosLocal, tablaAncho, alturaHeader, "F");
     doc.line(tablaInicioX, yPosLocal, tablaInicioX + tablaAncho, yPosLocal);
     doc.line(tablaInicioX, yPosLocal + alturaHeader, tablaInicioX + tablaAncho, yPosLocal + alturaHeader);
     doc.line(tablaInicioX, yPosLocal, tablaInicioX, yPosLocal + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPosLocal, tablaInicioX + tablaAncho, yPosLocal + alturaHeader);
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text(titulo, tablaInicioX + 2, yPosLocal + 3);
+    doc.setFont("helvetica", "bold").setFontSize(7);
+    doc.text(titulo, tablaInicioX + 2, yPosLocal + alturaHeader / 2 + 1);
     return yPosLocal + alturaHeader;
   };
 
   yPos = dibujarHeaderSeccion("5. ANTECEDENTES EXTRA-LABORALES", yPos, filaAltura);
 
-  // Header SI/NO por cada item (3 items)
-  const numItems = 3;
-  const anchoColumna = tablaAncho / numItems;
-  const anchoLabel = anchoColumna * 0.6;
-  const anchoSi = anchoColumna * 0.2;
-  const anchoNo = anchoColumna * 0.2;
-
-  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
-  for (let i = 0; i <= numItems; i++) {
-    const x = tablaInicioX + i * anchoColumna;
-    doc.line(x, yPos, x, yPos + filaAltura);
-    if (i < numItems) {
-      const xSi = x + anchoLabel;
-      const xNo = xSi + anchoSi;
-      doc.line(xSi, yPos, xSi, yPos + filaAltura);
-      doc.line(xNo, yPos, xNo, yPos + filaAltura);
-    }
-  }
-
-  const yH = yPos + filaAltura / 2 + 1;
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  for (let i = 0; i < numItems; i++) {
-    const xInicio = tablaInicioX + i * anchoColumna;
-    const xSi = xInicio + anchoLabel;
-    const xNo = xSi + anchoSi;
-    doc.text("Si", xSi + anchoSi / 2, yH, { align: "center" });
-    doc.text("No", xNo + anchoNo / 2, yH, { align: "center" });
-  }
-  yPos += filaAltura;
-
-  // Fila items con X (encima de SI o NO)
+  // Items en formato texto: cada item en su celda
   const items = [
     { nombre: "Practica tiro", si: datos.rbaepraticaSi, no: datos.rbaepraticaNo },
     { nombre: "Uso de walkman", si: datos.rbaeusoSi, no: datos.rbaeusoNo },
     { nombre: "Otros", si: datos.rbaeotrosSi, no: datos.rbaeotrosNo },
   ];
 
-  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  const numItems = items.length;
+  const anchoColumna = tablaAncho / numItems;
+
+  // Dibujar líneas verticales
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  for (let i = 1; i < numItems; i++) {
+    const x = tablaInicioX + i * anchoColumna;
+    doc.line(x, yPos, x, yPos + filaAltura);
+  }
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+
+  // Dibujar texto en cada celda
   const yRow = yPos + filaAltura / 2 + 1;
   doc.setFont("helvetica", "normal").setFontSize(7);
   items.forEach((it, idx) => {
     const xInicio = tablaInicioX + idx * anchoColumna;
-    const xSi = xInicio + anchoLabel;
-    const xNo = xSi + anchoSi;
-    doc.line(xInicio, yPos, xInicio, yPos + filaAltura);
-    doc.line(xSi, yPos, xSi, yPos + filaAltura);
-    doc.line(xNo, yPos, xNo, yPos + filaAltura);
-    doc.text(it.nombre, xInicio + 2, yRow);
-    if (it.si === true) dibujarX(doc, xSi + anchoSi / 2, yRow);
-    if (it.no === true) dibujarX(doc, xNo + anchoNo / 2, yRow);
+    const valor = it.si === true || it.si === "true" || it.si === 1 ? "Si" : 
+                  it.no === true || it.no === "true" || it.no === 1 ? "No" : "";
+    const texto = valor ? `${it.nombre}: ${valor}` : it.nombre;
+    doc.text(texto, xInicio + 1, yRow);
   });
   yPos += filaAltura;
 
-  // Fila: Detallar
-  const alturaDet = filaAltura * 2;
-  doc.rect(tablaInicioX, yPos, tablaAncho, alturaDet);
-  const yDetMid = yPos + alturaDet / 2 + 1;
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Detallar:", tablaInicioX + 2, yDetMid);
-  dibujarTextoConSaltoLinea(doc, String(datos.txtaecuales || ""), tablaInicioX + 20, yDetMid, 175);
-  yPos += alturaDet;
+  // Fila: Detallar - solo crece si hay contenido
+  const detallar = String(datos.txtaecuales || "").trim();
+  if (detallar) {
+    const lineas = doc.splitTextToSize(detallar, tablaAncho - 4);
+    const alturaDet = Math.max(filaAltura, lineas.length * 2.2 + 1.5); // Reducido de 2.5+2 a 2.2+1.5
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDet);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDet);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + alturaDet, tablaInicioX + tablaAncho, yPos + alturaDet);
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.text("Detallar:", tablaInicioX + 2, yPos + 2.0); // Reducido de 2.5 a 2.0
+    doc.text(lineas, tablaInicioX + 20, yPos + 2.0); // Reducido de 2.5 a 2.0
+    yPos += alturaDet;
+  } else {
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.text("Detallar:", tablaInicioX + 2, yPos + filaAltura / 2 + 1);
+    yPos += filaAltura;
+  }
 
   return yPos;
 };
@@ -766,7 +719,7 @@ const drawAntecedentesExtraLaborales = (doc, datos = {}, yInicio) => {
 const drawOtoscopia = (doc, datos = {}, yInicio) => {
   const tablaInicioX = 5;
   const tablaAncho = 200;
-  const filaAltura = 4;
+  const filaAltura = 3.5; // Reducido de 4 a 3.5
   let yPos = yInicio;
 
   doc.setFillColor(196, 196, 196);
@@ -782,7 +735,7 @@ const drawOtoscopia = (doc, datos = {}, yInicio) => {
   doc.line(xODEnd, yPos, xODEnd, yPos + filaAltura);
 
   const yMid = yPos + filaAltura / 2 + 1;
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("6. OTOSCOPIA", tablaInicioX + 2, yMid);
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text(`Oído derecho: ${String(datos.txtood || "")}`, xTituloEnd + 2, yMid);
@@ -793,99 +746,42 @@ const drawOtoscopia = (doc, datos = {}, yInicio) => {
 };
 
 // Función para dibujar Audiometría (gráfico simple estilo ficha)
-const drawAudiometriaGrafico = (doc, datos = {}, yInicio) => {
-  const tablaInicioX = 5;
+const drawAudiometriaGrafico = async (doc, datos = {}, yInicio) => {
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
   const tablaAncho = 200;
+  const tablaInicioX = (pageW - tablaAncho) / 2;
   const filaAltura = 4;
   let yPos = yInicio;
+
+  // Verificar si necesitamos nueva página
+  const colH = 55; // Aumentado de 50 a 55mm
+  if (yPos + colH + 20 > pageH) {
+    doc.addPage();
+    await drawHeader(doc, datos);
+    doc.setFont("helvetica", "bold").setFontSize(13); // Reducido de 14 a 13
+    doc.text("FICHA DE EVALUACIÓN AUDIOMETRÍA", pageW / 2, 31, { align: "center" }); // Reducido de 32 a 31
+    yPos = 50;
+    footerTR(doc, { footerOffsetY: 12, fontSize: 8 });
+  }
 
   // Header gris
   doc.setFillColor(196, 196, 196);
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, "F");
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("7. AUDIOMETRÍA (Oído Derecho: Rojo , Oído Izquierdo: Azul)", tablaInicioX + 2, yPos + 3.5);
-  yPos += filaAltura + 2;
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("7. AUDIOMETRÍA (Oído Derecho: Rojo , Oído Izquierdo: Azul)", tablaInicioX + 2, yPos + filaAltura / 2 + 1);
+  yPos += filaAltura + 1; // Reducido de +2 a +1
 
-  // Layout en 2 columnas: Leyenda (izq) + Gráfico (der)
-  const colGap = 6;
-  const legendW = 62;
-  const graphW = tablaAncho - legendW - colGap - 18; // 18mm para escala dB a la izquierda del gráfico
-  const graphH = 70;
-  const legendX = tablaInicioX;
-  const graphX = tablaInicioX + legendW + colGap + 18; // el gráfico empieza después de leyenda + gap + espacio para dB
-  const graphY = yPos + 6;
-
-  const drawLegend = (x, y) => {
-    const lineH = 4.2;
-    let yy = y;
-
-    const drawItem = (drawSymbol, text) => {
-      drawSymbol(x + 4, yy - 1);
-      doc.setFont("helvetica", "normal").setFontSize(7);
-      doc.text(text, x + 12, yy);
-      yy += lineH;
-    };
-
-    // Símbolos
-    const symCircleRed = (sx, sy) => {
-      doc.setDrawColor(255, 0, 0);
-      doc.setLineWidth(0.5);
-      doc.circle(sx, sy, 1.2);
-      doc.setDrawColor(0);
-      doc.setLineWidth(0.2);
-    };
-    const symXBlue = (sx, sy) => {
-      doc.setDrawColor(0, 0, 255);
-      doc.setLineWidth(0.5);
-      const size = 2.4;
-      doc.line(sx - size / 2, sy - size / 2, sx + size / 2, sy + size / 2);
-      doc.line(sx - size / 2, sy + size / 2, sx + size / 2, sy - size / 2);
-      doc.setDrawColor(0);
-      doc.setLineWidth(0.2);
-    };
-    const symBracketLeftRed = (sx, sy) => {
-      doc.setDrawColor(255, 0, 0);
-      doc.setLineWidth(0.5);
-      const w = 2.4;
-      const h = 3.6;
-      doc.line(sx - w / 2, sy - h / 2, sx - w / 2, sy + h / 2);
-      doc.line(sx - w / 2, sy - h / 2, sx + w / 2, sy - h / 2);
-      doc.line(sx - w / 2, sy + h / 2, sx + w / 2, sy + h / 2);
-      doc.setDrawColor(0);
-      doc.setLineWidth(0.2);
-    };
-    const symBracketRightBlue = (sx, sy) => {
-      doc.setDrawColor(0, 0, 255);
-      doc.setLineWidth(0.5);
-      const w = 2.4;
-      const h = 3.6;
-      doc.line(sx + w / 2, sy - h / 2, sx + w / 2, sy + h / 2);
-      doc.line(sx - w / 2, sy - h / 2, sx + w / 2, sy - h / 2);
-      doc.line(sx - w / 2, sy + h / 2, sx + w / 2, sy + h / 2);
-      doc.setDrawColor(0);
-      doc.setLineWidth(0.2);
-    };
-    const symArrowDownRed = (sx, sy) => {
-      doc.setDrawColor(255, 0, 0);
-      doc.setLineWidth(0.5);
-      doc.line(sx, sy - 2, sx, sy + 1.6);
-      doc.line(sx, sy + 1.6, sx - 1.2, sy + 0.4);
-      doc.line(sx, sy + 1.6, sx + 1.2, sy + 0.4);
-      doc.setDrawColor(0);
-      doc.setLineWidth(0.2);
-    };
-
-    // Lista (lo más parecido a tu imagen)
-    drawItem(symCircleRed, ": Vía aérea del OD.");
-    drawItem(symXBlue, ": Vía aérea del OI.");
-    drawItem(symBracketLeftRed, ": Vía ósea del OD (OI enmascarado).");
-    drawItem(symBracketRightBlue, ": Vía ósea del OI (OD enmascarado).");
-    // (Otros símbolos del estándar pueden agregarse luego si los necesitas)
-    drawItem(symArrowDownRed, ": Ausencia del umbral.");
-
-    return yy;
-  };
+  // Layout como FichaAudiologica: Gráfico (izq) + Imagen leyenda (der) - dos columnas ordenadas
+  const colGap = 6; // Reducido de 8 a 6
+  const dbLabelW = 10; // Reducido de 12 a 10
+  const graphW = (tablaAncho - dbLabelW - colGap) / 2; // Gráfico ocupa la mitad
+  const legendW = tablaAncho - dbLabelW - graphW - colGap; // Imagen ocupa el resto
+  const graphH = colH; // 50mm de altura
+  const graphX = tablaInicioX + dbLabelW; // Gráfico después de dB
+  const legendX = graphX + graphW + colGap; // Imagen después del gráfico
+  const graphY = yPos + 4; // Reducido de +8 a +4
 
   const freqs = [125, 250, 500, 1000, 2000, 3000, 4000, 6000, 8000];
 
@@ -897,8 +793,24 @@ const drawAudiometriaGrafico = (doc, datos = {}, yInicio) => {
     return Number.isFinite(n) ? n : null;
   };
 
-  // Leyenda (columna izquierda)
-  drawLegend(legendX, graphY + 6);
+  // Cargar y mostrar imagen de leyenda (columna derecha) - ajustada para no ser cuadrada
+  try {
+    // Reducir el tamaño de la imagen y mantener proporción correcta (no cuadrada)
+    const legendImgW = legendW * 0.85; // Reducido a 85% del ancho disponible
+    const legendImgH = graphH * 0.75; // Reducido a 75% de la altura del gráfico (proporción más vertical)
+    const legendImgY = graphY + (graphH - legendImgH) / 2; // Centrar verticalmente
+    const legendImgX = legendX + (legendW - legendImgW) / 2; // Centrar horizontalmente
+    doc.addImage(
+      "/img/frame_audiodigializado.png",
+      "PNG",
+      legendImgX,
+      legendImgY,
+      legendImgW,
+      legendImgH
+    );
+  } catch (error) {
+    console.log("Error cargando imagen de leyenda:", error);
+  }
 
   // Fondo azul 20-40 dB (gráfico)
   doc.setFillColor(180, 235, 255);
@@ -924,7 +836,7 @@ const drawAudiometriaGrafico = (doc, datos = {}, yInicio) => {
   // Etiquetas Hz
   doc.setFont("helvetica", "normal").setFontSize(7);
   for (let i = 0; i < freqs.length; i++) {
-    const xTick = graphX + i * (graphW / (freqs.length - 1));
+    const xTick = graphX + i * (graphW / 8);
     doc.text(String(freqs[i]), xTick, graphY - 2, { align: "center" });
   }
   doc.text("Hz", graphX + graphW + 4, graphY - 2, { align: "left" });
@@ -935,7 +847,7 @@ const drawAudiometriaGrafico = (doc, datos = {}, yInicio) => {
     const yTick = graphY + i * (graphH / 13) + 0.5;
     doc.text(String(dB), graphX - 2, yTick, { align: "right" });
   }
-  doc.text("dB", graphX - 10, graphY + graphH / 2 - 2, { align: "right" });
+  doc.text("dB", graphX - 7, graphY + graphH / 2 - 2, { align: "right" });
 
   // Puntos aérea OD/OI
   const puntos = [
@@ -956,7 +868,7 @@ const drawAudiometriaGrafico = (doc, datos = {}, yInicio) => {
     { freq: 8000, db: toNumberOrNull(datos.oi8000), color: "blue", tipo: "x" },
   ];
 
-  // Vía ósea (corchetes) — mismo mapeo que el jasper antiguo
+  // Vía ósea (corchetes) — mapeo correcto SIN guión bajo
   const puntosOseos = [
     // OD: [
     { freq: 500, db: toNumberOrNull(datos.od1500), color: "red", tipo: "bracketLeft" },
@@ -979,19 +891,19 @@ const drawAudiometriaGrafico = (doc, datos = {}, yInicio) => {
 
   puntos.push(...puntosOseos);
 
-  // Conectar puntos (aérea) + opcional vía ósea
+  // Conectar puntos (aérea) - solo círculos y X, NO corchetes
   const drawSeries = (tipo, rgb) => {
     const pts = puntos
       .filter((p) => p.tipo === tipo && p.db !== null)
       .sort((a, b) => a.freq - b.freq);
     if (pts.length < 2) return;
     doc.setDrawColor(...rgb);
-    doc.setLineWidth(tipo === "circle" ? 0.9 : 0.4);
+    doc.setLineWidth(tipo === "circle" ? 0.95 : 0.4);
     let prev = null;
     pts.forEach((p) => {
       const idx = freqs.indexOf(p.freq);
       if (idx === -1) return;
-      const x = graphX + idx * (graphW / (freqs.length - 1));
+      const x = graphX + idx * (graphW / 8);
       const y = graphY + ((p.db + 10) / 130) * graphH;
       if (prev) doc.line(prev.x, prev.y, x, y);
       prev = { x, y };
@@ -999,10 +911,9 @@ const drawAudiometriaGrafico = (doc, datos = {}, yInicio) => {
     doc.setDrawColor(0);
     doc.setLineWidth(0.2);
   };
+  // Solo conectar círculos y X, NO corchetes
   drawSeries("circle", [255, 0, 0]);
   drawSeries("x", [0, 0, 255]);
-  drawSeries("bracketLeft", [255, 0, 0]);
-  drawSeries("bracketRight", [0, 0, 255]);
 
   // Dibujar símbolos
   puntos.forEach((p) => {
@@ -1011,17 +922,21 @@ const drawAudiometriaGrafico = (doc, datos = {}, yInicio) => {
     if (idx === -1) return;
     const x = graphX + idx * (graphW / (freqs.length - 1));
     const y = graphY + ((p.db + 10) / 130) * graphH;
+
     if (p.color === "red") doc.setDrawColor(255, 0, 0);
     if (p.color === "blue") doc.setDrawColor(0, 0, 255);
-    doc.setLineWidth(0.4);
+
     if (p.tipo === "circle") {
+      doc.setLineWidth(0.4);
       doc.circle(x, y, 1.0);
     } else if (p.tipo === "x") {
+      doc.setLineWidth(0.4);
       const size = 2;
       doc.line(x - size / 2, y - size / 2, x + size / 2, y + size / 2);
       doc.line(x - size / 2, y + size / 2, x + size / 2, y - size / 2);
     } else if (p.tipo === "bracketLeft") {
       // [
+      doc.setLineWidth(0.5);
       const w = 2.4;
       const h = 3.6;
       doc.line(x - w / 2, y - h / 2, x - w / 2, y + h / 2);
@@ -1029,6 +944,7 @@ const drawAudiometriaGrafico = (doc, datos = {}, yInicio) => {
       doc.line(x - w / 2, y + h / 2, x + w / 2, y + h / 2);
     } else if (p.tipo === "bracketRight") {
       // ]
+      doc.setLineWidth(0.5);
       const w = 2.4;
       const h = 3.6;
       doc.line(x + w / 2, y - h / 2, x + w / 2, y + h / 2);
@@ -1039,45 +955,298 @@ const drawAudiometriaGrafico = (doc, datos = {}, yInicio) => {
     doc.setLineWidth(0.2);
   });
 
-  yPos = graphY + graphH + 2;
+  yPos = graphY + graphH + 1; // Reducido de +2 a +1
+  return yPos;
+};
+
+// Función para dibujar Interpretación - Conclusiones
+const drawInterpretacion = (doc, datos = {}, yInicio) => {
+  const pageW = doc.internal.pageSize.getWidth();
+  const tablaAncho = 200;
+  const tablaInicioX = (pageW - tablaAncho) / 2;
+  const filaAltura = 4;
+  let yPos = yInicio;
+
+  // Asegurar que el color de las líneas sea negro
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+
+  // Header gris
+  doc.setFillColor(196, 196, 196);
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, "F");
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("8.- Interpretación - Conclusiones:", tablaInicioX + 2, yPos + filaAltura / 2 + 1);
+  yPos += filaAltura;
+
+  // Interpretación Clínica - fila con líneas
+  const interpretacionClinica = String(datos?.diagnostico || datos?.interpretacionClinica || "");
+  const odResultado = String(datos?.txtdiagOd || "NORMAL");
+  const oiResultado = String(datos?.txtdiagOi || "NORMAL");
+
+  // Fila: Interpretación Clínica (solo líneas, sin fondo)
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("• Interpretación Clínica: Dx Auditivo + (Incluir detalle: Severidad (Promedio Frec. 500/1000/2000/4000) + (Unilateral/bilateral)):", tablaInicioX + 2, yPos + filaAltura / 2 + 1);
+  yPos += filaAltura;
+
+  // Texto de interpretación (si existe) - fila con líneas
+  if (interpretacionClinica) {
+    const lineas = doc.splitTextToSize(interpretacionClinica, tablaAncho - 4);
+    const alturaTexto = Math.max(filaAltura, lineas.length * 2.2 + 1.5); // Reducido de 2.5+2 a 2.2+1.5
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + alturaTexto, tablaInicioX + tablaAncho, yPos + alturaTexto);
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaTexto);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaTexto);
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.text(lineas, tablaInicioX + 2, yPos + 2.0); // Reducido de 2.5 a 2.0
+    yPos += alturaTexto;
+  }
+
+  // Resultados OD - fila con líneas
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text(`Oído Derecho: ${odResultado}`, tablaInicioX + 2, yPos + filaAltura / 2 + 1);
+  yPos += filaAltura;
+
+  // Resultados OI - fila con líneas
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.text(`Oído Izquierdo: ${oiResultado}`, tablaInicioX + 2, yPos + filaAltura / 2 + 1);
+  yPos += filaAltura;
+
+  return yPos;
+};
+
+// Función para dibujar Comentarios
+const drawComentarios = (doc, datos = {}, yInicio) => {
+  const pageW = doc.internal.pageSize.getWidth();
+  const tablaAncho = 200;
+  const tablaInicioX = (pageW - tablaAncho) / 2;
+  const filaAltura = 4;
+  let yPos = yInicio;
+
+  // Asegurar que el color de las líneas sea negro
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+
+  // Header gris
+  doc.setFillColor(196, 196, 196);
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, "F");
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("COMENTARIOS:", tablaInicioX + 2, yPos + filaAltura / 2 + 1);
+  yPos += filaAltura;
+
+  // Texto de comentarios - solo líneas
+  const comentarios = String(datos?.txtcomentarios || "");
+  const lineas = doc.splitTextToSize(comentarios || "-", tablaAncho - 4);
+  const alturaTexto = Math.max(filaAltura, lineas.length * 2.5 + 2);
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaTexto, tablaInicioX + tablaAncho, yPos + alturaTexto);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaTexto);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaTexto);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text(lineas, tablaInicioX + 2, yPos + 2.5);
+  yPos += alturaTexto;
+
+  return yPos;
+};
+
+// Función para dibujar Recomendaciones
+const drawRecomendaciones = (doc, datos = {}, yInicio) => {
+  const pageW = doc.internal.pageSize.getWidth();
+  const tablaAncho = 200;
+  const tablaInicioX = (pageW - tablaAncho) / 2;
+  const filaAltura = 4;
+  let yPos = yInicio;
+
+  // Asegurar que el color de las líneas sea negro
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+
+  // Header gris
+  doc.setFillColor(196, 196, 196);
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, "F");
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("9.- Recomendaciones:", tablaInicioX + 2, yPos + filaAltura / 2 + 1);
+  yPos += filaAltura;
+
+  // Uso adecuado de Protección Auditiva - ordenado: texto | Simple | X | Doble | X
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  
+  // Dividir en columnas ordenadas: texto | Simple | X | Doble | X
+  const colTextoW = 100;
+  const colOpcionW = 25;
+  const colXCeldaW = 15;
+  
+  const x1 = tablaInicioX + colTextoW;
+  const x2 = x1 + colOpcionW;
+  const x3 = x2 + colXCeldaW;
+  const x4 = x3 + colOpcionW;
+  
+  doc.line(x1, yPos, x1, yPos + filaAltura);
+  doc.line(x2, yPos, x2, yPos + filaAltura);
+  doc.line(x3, yPos, x3, yPos + filaAltura);
+  doc.line(x4, yPos, x4, yPos + filaAltura);
+  
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text("Uso adecuado de Protección Auditiva........", tablaInicioX + 2, yPos + filaAltura / 2 + 1);
+  doc.text("Simple", x1 + colOpcionW / 2, yPos + filaAltura / 2 + 1, { align: "center" });
+  doc.text("Doble", x3 + colOpcionW / 2, yPos + filaAltura / 2 + 1, { align: "center" });
+  
+  // Dibujar X en las celdas si están marcadas
+  if (datos?.chkrpasimple) {
+    doc.setFont("helvetica", "bold").setFontSize(7);
+    doc.text("X", x2 + colXCeldaW / 2, yPos + filaAltura / 2 + 1, { align: "center" });
+  }
+  if (datos?.chkrpadoble) {
+    doc.setFont("helvetica", "bold").setFontSize(7);
+    doc.text("X", x4 + colXCeldaW / 2, yPos + filaAltura / 2 + 1, { align: "center" });
+  }
+  yPos += filaAltura;
+
+  // Control - ordenado: texto | Semestral | X | Anual | X
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  
+  // Dividir en columnas ordenadas: texto | Semestral | X | Anual | X
+  const colControlTextoW = 30;
+  const colControlOpcionW = 30;
+  const colControlXCeldaW = 15;
+  
+  const cx1 = tablaInicioX + colControlTextoW;
+  const cx2 = cx1 + colControlOpcionW;
+  const cx3 = cx2 + colControlXCeldaW;
+  const cx4 = cx3 + colControlOpcionW;
+  
+  doc.line(cx1, yPos, cx1, yPos + filaAltura);
+  doc.line(cx2, yPos, cx2, yPos + filaAltura);
+  doc.line(cx3, yPos, cx3, yPos + filaAltura);
+  doc.line(cx4, yPos, cx4, yPos + filaAltura);
+  
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text("Control :", tablaInicioX + 2, yPos + filaAltura / 2 + 1);
+  doc.text("Semestral", cx1 + colControlOpcionW / 2, yPos + filaAltura / 2 + 1, { align: "center" });
+  doc.text("Anual", cx3 + colControlOpcionW / 2, yPos + filaAltura / 2 + 1, { align: "center" });
+  
+  // Dibujar X en las celdas si están marcadas
+  if (datos?.chkcasemestral) {
+    doc.setFont("helvetica", "bold").setFontSize(7);
+    doc.text("X", cx2 + colControlXCeldaW / 2, yPos + filaAltura / 2 + 1, { align: "center" });
+  }
+  if (datos?.chkcaanual) {
+    doc.setFont("helvetica", "bold").setFontSize(7);
+    doc.text("X", cx4 + colControlXCeldaW / 2, yPos + filaAltura / 2 + 1, { align: "center" });
+  }
+  yPos += filaAltura;
+
+  // Otras - solo texto, sin línea
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const otrasRecomendaciones = String(datos?.txtotrasrecomendaciones || "");
+  doc.text(`Otras: ${otrasRecomendaciones || "-"}`, tablaInicioX + 2, yPos + filaAltura / 2 + 1);
+  yPos += filaAltura;
+
   return yPos;
 };
 
 // Función principal del jasper
 export default async function Audiometria2021_Digitalizado(datos = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
 
   // 1) Header con logo, color box y datos
   await drawHeader(doc, datos);
 
   // 2) Título principal
-  const pageW = doc.internal.pageSize.getWidth();
-  doc.setFont("helvetica", "bold").setFontSize(14);
-  doc.text("FICHA DE EVALUACIÓN AUDIOMETRÍA", pageW / 2, 32, { align: "center" });
+  doc.setFont("helvetica", "bold").setFontSize(13); // Reducido de 14 a 13
+  doc.text("FICHA DE EVALUACIÓN AUDIOMETRÍA", pageW / 2, 31, { align: "center" }); // Reducido de 32 a 31
 
   // 3) Datos personales
-  const yDespuesDatos = drawPatientData(doc, datos);
+  let yPos = drawPatientData(doc, datos);
 
   // 4) Síntomas actuales
-  const yDespuesSintomas = drawSintomasActuales(doc, datos, yDespuesDatos);
+  yPos = drawSintomasActuales(doc, datos, yPos);
 
   // 5) Antecedentes médicos de importancia
-  const yDespuesAntecedentes = drawAntecedentesMedicos(doc, datos, yDespuesSintomas);
+  yPos = drawAntecedentesMedicos(doc, datos, yPos);
 
   // 6) Exposición ocupacional
-  const yDespuesExpo = drawExposicionOcupacional(doc, datos, yDespuesAntecedentes);
+  yPos = drawExposicionOcupacional(doc, datos, yPos);
 
   // 7) Antecedentes extra-laborales
-  const yDespuesExtra = drawAntecedentesExtraLaborales(doc, datos, yDespuesExpo);
+  yPos = drawAntecedentesExtraLaborales(doc, datos, yPos);
 
   // 8) Otoscopia
-  const yDespuesOtoscopia = drawOtoscopia(doc, datos, yDespuesExtra);
+  yPos = drawOtoscopia(doc, datos, yPos);
 
   // 9) Audiometría (gráfico)
-  drawAudiometriaGrafico(doc, datos, yDespuesOtoscopia);
+  yPos = await drawAudiometriaGrafico(doc, datos, yPos);
 
-  // Footer
-  footerTR(doc, { footerOffsetY: 12, fontSize: 8 });
+  // Verificar si necesitamos nueva página para las secciones finales
+  const espacioNecesario = 70; // Reducido de 80 a 70
+  if (yPos + espacioNecesario > pageH - 20) {
+    doc.addPage();
+    await drawHeader(doc, datos);
+    doc.setFont("helvetica", "bold").setFontSize(13); // Reducido de 14 a 13
+    doc.text("FICHA DE EVALUACIÓN AUDIOMETRÍA", pageW / 2, 31, { align: "center" }); // Reducido de 32 a 31
+    yPos = 50;
+    footerTR(doc, { footerOffsetY: 12, fontSize: 8 });
+  }
+
+  // 10) Interpretación - Conclusiones
+  yPos = drawInterpretacion(doc, datos, yPos);
+
+  // 11) Comentarios
+  yPos = drawComentarios(doc, datos, yPos);
+
+  // 12) Recomendaciones
+  yPos = drawRecomendaciones(doc, datos, yPos);
+
+  // 13) Firmas (sin fila)
+  await dibujarFirmas({ doc, datos, y: yPos + 3, pageW }); // Reducido de +5 a +3
+
+  // Footer en todas las páginas
+  const numPages = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= numPages; i++) {
+    doc.setPage(i);
+    footerTR(doc, { footerOffsetY: 12, fontSize: 8 });
+  }
 
   if (docExistente) {
     return doc;

@@ -3,11 +3,9 @@ import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
-import { convertirGenero } from "../../utils/helpers.js";
+import { convertirGenero, getSign } from "../../utils/helpers.js";
 
-<<<<<<< HEAD
-export default function Hematologia_Digitalizado_nuevo(data = {}) {
-=======
+
 // Función para formatear fecha a DD/MM/YYYY
 const toDDMMYYYY = (fecha) => {
   if (!fecha) return '';
@@ -17,11 +15,9 @@ const toDDMMYYYY = (fecha) => {
   return `${dia}/${mes}/${anio}`;
 };
 
-export default async function Hematologia_Digitalizado_nuevo(data = {}) {
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function Hematologia_Digitalizado_nuevo(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
-
   // === MAPEO DE DATOS ===
   const datosReales = {
     // Datos Personales del Paciente
@@ -57,18 +53,8 @@ export default async function Hematologia_Digitalizado_nuevo(data = {}) {
   const filaAltura = 6;
 
   // Header reutilizable
-<<<<<<< HEAD
-  const drawHeader = (pageNumber) => {
-    CabeceraLogo(doc, { ...datosReales, tieneMembrete: false, yOffset: 13 });
-
-    // Título principal
-    doc.setFont("helvetica", "bold").setFontSize(12);
-    doc.setTextColor(0, 0, 0);
-    doc.text("HEMOGRAMA AUTOMATIZADO", pageW / 2, 42, { align: "center" });
-=======
   const drawHeader = async () => {
     await CabeceraLogo(doc, { ...datosReales, tieneMembrete: false });
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
     // Número de Ficha y Página
     doc.setFont("helvetica", "normal").setFontSize(9);
@@ -130,11 +116,7 @@ export default async function Hematologia_Digitalizado_nuevo(data = {}) {
   };
 
   // === DIBUJAR HEADER ===
-<<<<<<< HEAD
-  drawHeader(1);
-=======
   await drawHeader();
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   // === SECCIÓN 1: DATOS PERSONALES ===
   let yPos = 46;
@@ -155,7 +137,7 @@ export default async function Hematologia_Digitalizado_nuevo(data = {}) {
   doc.text("Apellidos y Nombres:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(datosReales.apellidosNombres, tablaInicioX + 40, yPos + 3.5);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("T. Examen:", tablaInicioX + 132, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
@@ -280,7 +262,7 @@ export default async function Hematologia_Digitalizado_nuevo(data = {}) {
   doc.text("PRUEBA", tablaInicioX + 35, yPos + 3.5, { align: "center" });
   doc.text("RESULTADO", tablaInicioX + 95, yPos + 3.5, { align: "center" });
   doc.text("VALORES NORMALES", tablaInicioX + 155, yPos + 3.5, { align: "center" });
-  
+
   // Líneas verticales del header
   doc.line(tablaInicioX + 70, yPos, tablaInicioX + 70, yPos + filaAltura);
   doc.line(tablaInicioX + 120, yPos, tablaInicioX + 120, yPos + filaAltura);
@@ -315,7 +297,7 @@ export default async function Hematologia_Digitalizado_nuevo(data = {}) {
 
     // Dibujar celda
     doc.setLineWidth(0.2);
-    
+
     // Fondo gris para RECUENTO DIFERENCIAL
     if (item.grayBg) {
       doc.setFillColor(196, 196, 196);
@@ -323,27 +305,27 @@ export default async function Hematologia_Digitalizado_nuevo(data = {}) {
     } else {
       doc.rect(tablaInicioX, yPos, tablaAncho, rowHeight);
     }
-    
+
     doc.line(tablaInicioX + 70, yPos, tablaInicioX + 70, yPos + rowHeight);
     doc.line(tablaInicioX + 120, yPos, tablaInicioX + 120, yPos + rowHeight);
 
     // Contenido
     doc.setFontSize(9);
-    
+
     // Calcular centrado vertical
     const textHeight = maxLines * 3.5;
     const centroY = yPos + (rowHeight - textHeight) / 2 + 3;
-    
+
     // Prueba
     if (item.bold) {
       doc.setFont("helvetica", "bold");
     } else {
       doc.setFont("helvetica", "normal");
     }
-    
+
     // Los textos no bold o con indent van 4mm más a la derecha
     const pruebaX = (!item.bold || item.indent) ? tablaInicioX + 6 : tablaInicioX + 2;
-    
+
     if (item.prueba.includes('\n')) {
       const pruebaLines = item.prueba.split('\n');
       pruebaLines.forEach((line, idx) => {
@@ -384,7 +366,7 @@ export default async function Hematologia_Digitalizado_nuevo(data = {}) {
 
   // === SECCIÓN 4: FIRMA ===
   const alturaFilaFirmas = 30;
-  
+
   // Dibujar fila de firma (centrada)
   doc.setLineWidth(0.2);
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaFilaFirmas);
@@ -392,13 +374,6 @@ export default async function Hematologia_Digitalizado_nuevo(data = {}) {
   // Firma centrada en toda la fila
   const centroFirma = tablaInicioX + tablaAncho / 2;
   const sello1 = data.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-<<<<<<< HEAD
-  if (sello1 && sello1.url && sello1.url !== "Sin registro") {
-    try {
-      doc.addImage(sello1.url, 'PNG', centroFirma - 22, yPos + 5, 45, 20);
-    } catch (error) {
-      console.log("Error cargando firma:", error);
-=======
   const sello2 = data.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
   const isValidUrl = url => url && url !== "Sin registro";
   const loadImg = src =>
@@ -410,7 +385,7 @@ export default async function Hematologia_Digitalizado_nuevo(data = {}) {
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
 
-  Promise.all([
+  await Promise.all([
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
@@ -452,15 +427,18 @@ export default async function Hematologia_Digitalizado_nuevo(data = {}) {
       const selloBase64 = canvas.toDataURL('image/png');
       const imgX = (pageW - sigW) / 2;
       doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
     }
-  }
+  });
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 7 });
 
   // === IMPRIMIR ===
-  imprimir(doc);
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {

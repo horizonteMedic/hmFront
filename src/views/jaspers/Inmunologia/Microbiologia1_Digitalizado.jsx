@@ -55,11 +55,7 @@ const formatDateToLong = (dateString) => {
 const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
 
-<<<<<<< HEAD
-  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-=======
   await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -129,20 +125,16 @@ const drawPatientData = (doc, datos = {}) => {
   return y + lineHeight;
 };
 
-export default async function Microbiologia1_Digitalizado(datos = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "letter" });
+export default async function Microbiologia1_Digitalizado(datos = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
-<<<<<<< HEAD
-  drawHeader(doc, datos);
-=======
   await drawHeader(doc, datos);
 
   // === TÍTULO ===
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
   doc.text("MICROBIOLOGÍA", pageW / 2, 38, { align: "center" });
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   // === DATOS DEL PACIENTE ===
   drawPatientData(doc, datos);
@@ -158,24 +150,13 @@ export default async function Microbiologia1_Digitalizado(datos = {}) {
       img.onload = () => res(img);
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
-  Promise.all([
+  await Promise.all([
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
-<<<<<<< HEAD
-    let y = 80;
-    // TÍTULO
-    drawUnderlinedTitle(doc, "MICROBIOLOGÍA", y, config.fontSize.title);
-    y += config.lineHeight * 2;
-    // NUEVO: EXAMEN DIRECTO
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
-    doc.text("EXAMEN DIRECTO", config.margin, y);
-    y += config.lineHeight;
-=======
     let y = finalYPos + 10; // Posición inicial después de la tabla de datos con espacio adicional
     const colData = 55;
 
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
     // MUESTRA
     doc.setFontSize(config.fontSize.header).setFont(config.font, "bold");
     doc.text("MUESTRA :", config.margin, y);
@@ -245,19 +226,20 @@ export default async function Microbiologia1_Digitalizado(datos = {}) {
 
     // === FOOTER ===
     footerTR(doc, datos);
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = pdfUrl;
-    document.body.appendChild(iframe);
-    iframe.onload = () => {
-      try {
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print();
-      } catch (e) {
-        alert("Error al intentar imprimir: " + e.message);
-      }
-    };
   });
+
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
+}
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
 }

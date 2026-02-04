@@ -2,6 +2,8 @@ import Swal from "sweetalert2";
 import {
   GetInfoPacDefault,
   GetInfoServicioDefault,
+  handleImgtoPdfDefault,
+  handleSubidaMasivaImagenes,
   handleSubirArchivoDefaultSinSellos,
   LoadingDefault,
   PrintHojaRDefault,
@@ -71,7 +73,7 @@ export const GetInfoServicio = async (
       conclusiones: res.conclusionesRadiograficas ?? "",
       observaciones: res.observacionesRadiografiaTorax ?? "",
 
-      user_medicoFirma: res.usuarioFirma,
+      user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
 
       SubirDoc: true,
       digitalizacion: res.digitalizacion
@@ -216,10 +218,14 @@ export const Loading = (mensaje) => {
   LoadingDefault(mensaje);
 };
 
-export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
-  handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
+export const handleSubirArchivo = async (form, selectedSede, userlogued, token, nomenclatura) => {
+  handleImgtoPdfDefault(form, selectedSede, registrarPDF, userlogued, token, nomenclatura)
 };
 
 export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
   ReadArchivosFormDefault(form, setVisualerOpen, token)
+}
+
+export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token, nomenclatura) => {
+  handleSubidaMasivaImagenes(form, selectedSede, registrarPDF, userlogued, token, nomenclatura)
 }

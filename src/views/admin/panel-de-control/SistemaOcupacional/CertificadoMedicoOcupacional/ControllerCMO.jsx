@@ -73,7 +73,7 @@ export const GetInfoServicioEditar = async (
             ...res,
             // Header
             nombres: `${res.nombrePaciente} ${res.apellidoPaciente}`,
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
             sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
             PA: `${res.sistolica}/${res.diastolica}`,
             edadPaciente: res.edadPaciente,

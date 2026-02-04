@@ -63,11 +63,7 @@ const formatDateToLong = (dateString) => {
 const drawHeader = async (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
 
-<<<<<<< HEAD
-  CabeceraLogo(doc, { ...datos, tieneMembrete: false });
-=======
   await CabeceraLogo(doc, { ...datos, tieneMembrete: false });
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   // Número de Ficha
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -206,23 +202,16 @@ const drawPatientData = (doc, datos = {}) => {
 
 // --- Componente Principal ---
 
-export default async function Panel3d_Digitalizado(datos = {}) {
-  const doc = new jsPDF();
+export default async function Panel3d_Digitalizado(datos = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
-<<<<<<< HEAD
-  drawHeader(doc, datos);
-
-  // === TÍTULO ===
-  drawUnderlinedTitle(doc, "TOXICOLÓGICO", 38);
-=======
   await drawHeader(doc, datos);
 
   // === TÍTULO ===
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
   doc.text("TOXICOLÓGICO", pageW / 2, 38, { align: "center" });
->>>>>>> 26e624014566d7a1c94a7d61ccf7ba918c25e50a
 
   // === DATOS DEL PACIENTE ===
   drawPatientData(doc, datos);
@@ -239,7 +228,7 @@ export default async function Panel3d_Digitalizado(datos = {}) {
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
 
-  Promise.all([
+  await Promise.all([
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
@@ -354,31 +343,23 @@ export default async function Panel3d_Digitalizado(datos = {}) {
 
     // === FOOTER ===
     footerTR(doc, { footerOffsetY: 8 });
+  })
 
-    // === Imprimir ===
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = pdfUrl;
-    document.body.appendChild(iframe);
-    iframe.onload = () => {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
-  }).catch(error => {
-    console.error("Error al cargar imágenes:", error);
-    // Continuar con la impresión aunque falle la carga de imágenes
-    footerTR(doc, { footerOffsetY: 8 });
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = pdfUrl;
-    document.body.appendChild(iframe);
-    iframe.onload = () => {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    };
-  });
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
+
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
+}
+
+

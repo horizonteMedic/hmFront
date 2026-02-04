@@ -50,6 +50,48 @@ const drawHeader = async (doc, datos = {}, numeroPagina = 1) => {
   }
 };
 
+// Función para dibujar texto con X en azul
+const dibujarTextoConXAzul = (doc, texto, x, y, options = {}) => {
+  const colorNegro = [0, 0, 0];
+  const colorAzul = [0, 0, 255];
+  
+  // Si el texto contiene "X", dividirlo en partes
+  if (texto.includes("X")) {
+    const partes = texto.split("X");
+    const antesX = partes[0];
+    const despuesX = partes[1];
+    
+    // Calcular anchos
+    const anchoAntesX = doc.getTextWidth(antesX);
+    const anchoX = doc.getTextWidth("X");
+    const anchoDespuesX = doc.getTextWidth(despuesX);
+    const anchoTotal = anchoAntesX + anchoX + anchoDespuesX;
+    
+    let xActual = x;
+    
+    // Si hay alineación center, ajustar
+    if (options.align === "center") {
+      xActual = x - anchoTotal / 2;
+    }
+    
+    // Dibujar texto antes de X en negro
+    doc.setTextColor(...colorNegro);
+    doc.text(antesX, xActual, y);
+    
+    // Dibujar X en azul
+    doc.setTextColor(...colorAzul);
+    doc.text("X", xActual + anchoAntesX, y);
+    
+    // Dibujar texto después de X en negro
+    doc.setTextColor(...colorNegro);
+    doc.text(despuesX, xActual + anchoAntesX + anchoX, y);
+  } else {
+    // Si no hay X, dibujar normalmente en negro
+    doc.setTextColor(...colorNegro);
+    doc.text(texto, x, y, options);
+  }
+};
+
 // Función para dibujar texto con salto de línea
 /* eslint-disable-next-line no-unused-vars */
 const dibujarTextoConSaltoLinea = (doc, texto, x, y, anchoMaximo) => {
@@ -114,84 +156,73 @@ const drawPatientData = (doc, datos = {}) => {
   const mitadTabla = tablaInicioX + tablaAncho / 2;
   const tercioTabla = tablaAncho / 3;
 
-  // Fila 1: Apellidos y Nombres | Tiempo de Servicio
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  // Dibujar todas las filas como una tabla unificada
+  const alturaTotal = filaAltura * 3;
+  
+  // Rectángulo exterior de toda la tabla (sin espacio, directamente después del header)
+  doc.rect(tablaInicioX, yPos, tablaAncho, alturaTotal, 'S');
+  
+  // Líneas horizontales entre filas (solo las internas, no la superior ni inferior)
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos + filaAltura * 2, tablaInicioX + tablaAncho, yPos + filaAltura * 2);
+  
+  // Fila 1: Línea vertical divisoria
   doc.line(mitadTabla, yPos, mitadTabla, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
+  
+  // Fila 2: Líneas verticales divisorias (3 columnas)
+  doc.line(tablaInicioX + tercioTabla, yPos + filaAltura, tablaInicioX + tercioTabla, yPos + filaAltura * 2);
+  doc.line(tablaInicioX + tercioTabla * 2, yPos + filaAltura, tablaInicioX + tercioTabla * 2, yPos + filaAltura * 2);
+  
+  // Fila 3: Línea vertical divisoria
+  doc.line(mitadTabla, yPos + filaAltura * 2, mitadTabla, yPos + alturaTotal);
 
-  // Fila 2: DNI | Edad | Sexo (3 columnas)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tercioTabla, yPos, tablaInicioX + tercioTabla, yPos + filaAltura);
-  doc.line(tablaInicioX + tercioTabla * 2, yPos, tablaInicioX + tercioTabla * 2, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Fila 3: Empresa | Área de Trabajo
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(mitadTabla, yPos, mitadTabla, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Contenido de la tabla
-  let yTexto = tablaInicioY + filaAltura + 2.5;
+  // Contenido de la tabla - alineado directamente con las filas dibujadas
+  const yCentroFila = 3.2; // Offset vertical para centrar el texto en cada fila
 
   // Fila 1: Apellidos y Nombres | Tiempo de Servicio
+  let yTexto = yPos + yCentroFila;
   doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto + 1);
+  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(nombres, tablaInicioX + 36, yTexto + 1);
+  doc.text(nombres, tablaInicioX + 36, yTexto);
 
   doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("Tiempo de Servicio:", mitadTabla + 2, yTexto + 1);
+  doc.text("Tiempo de Servicio:", mitadTabla + 2, yTexto);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(tiempoServicio, mitadTabla + 36, yTexto + 1);
-  yTexto += filaAltura;
+  doc.text(tiempoServicio, mitadTabla + 36, yTexto);
 
   // Fila 2: DNI | Edad | Sexo
+  yTexto = yPos + filaAltura + yCentroFila;
   doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("DNI:", tablaInicioX + 2, yTexto + 1);
+  doc.text("DNI:", tablaInicioX + 2, yTexto);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(dni, tablaInicioX + 12, yTexto + 1);
+  doc.text(dni, tablaInicioX + 12, yTexto);
 
   doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("Edad:", tablaInicioX + tercioTabla + 2, yTexto + 1);
+  doc.text("Edad:", tablaInicioX + tercioTabla + 2, yTexto);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text((edad ? edad + " Años" : ""), tablaInicioX + tercioTabla + 12, yTexto + 1);
+  doc.text((edad ? edad + " Años" : ""), tablaInicioX + tercioTabla + 12, yTexto);
 
   doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("Sexo:", tablaInicioX + tercioTabla * 2 + 2, yTexto + 1);
+  doc.text("Sexo:", tablaInicioX + tercioTabla * 2 + 2, yTexto);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(sexo, tablaInicioX + tercioTabla * 2 + 12, yTexto + 1);
-  yTexto += filaAltura;
+  doc.text(sexo, tablaInicioX + tercioTabla * 2 + 12, yTexto);
 
   // Fila 3: Empresa | Área de Trabajo
+  yTexto = yPos + filaAltura * 2 + yCentroFila;
   doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("Empresa:", tablaInicioX + 2, yTexto + 1);
+  doc.text("Empresa:", tablaInicioX + 2, yTexto);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(empresa, tablaInicioX + 20, yTexto + 1);
+  doc.text(empresa, tablaInicioX + 20, yTexto);
 
   doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("Área de Trabajo:", mitadTabla + 2, yTexto + 1);
+  doc.text("Área de Trabajo:", mitadTabla + 2, yTexto);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(areaTrabajo, mitadTabla + 30, yTexto + 1);
-  yTexto += filaAltura;
+  doc.text(areaTrabajo, mitadTabla + 30, yTexto);
 
-  return yTexto;
-};
-
-// Función para dibujar X en las columnas (formato como psicolaboral)
-const dibujarX = (doc, x, y) => {
-  doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.setTextColor(0, 0, 255); // Azul para la X
-  doc.text("X", x, y, { align: "center" });
-  doc.setTextColor(0, 0, 0); // Resetear a negro
+  // Retornar la posición después de todas las filas
+  yPos += alturaTotal;
+  return yPos;
 };
 
 // Función para dibujar sección de Síntomas y preguntas SI/NO
@@ -201,98 +232,101 @@ const drawSintomasYPreguntas = (doc, datos = {}, yInicio) => {
   const filaAltura = 4.5;
   let yPos = yInicio;
 
-  // Función para dibujar fila con SI/NO y campo de texto opcional
-  const dibujarFilaSINO = (label, siMarcado, noMarcado, textoOpcional = null) => {
-    // Layout: Label | SI | [X] | NO | [X] | Cuales: texto
-    const anchoLabel = 100;
-    const anchoTextoSINO = 10; // Ancho para "SI" o "NO"
-    const anchoCeldaX = 8; // Ancho de celda para X
+  // Fila 1: Usa faja lumbar | SI/NO | Adecuada Técnica | SI/NO | Capacitación | SI/NO
+  // Anchos personalizados para cada columna
+  const anchoFaja = 35;
+  const anchoSINO1 = 15;
+  const anchoTecnica = 65;
+  const anchoSINO2 = 15;
+  const anchoCapacitacion = 50;
+  const anchoSINO3 = 20;
+  
+  // Dibujar rectángulo de la fila
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
+  
+  // Líneas verticales divisorias
+  let xActual = tablaInicioX;
+  xActual += anchoFaja;
+  doc.line(xActual, yPos, xActual, yPos + filaAltura);
+  xActual += anchoSINO1;
+  doc.line(xActual, yPos, xActual, yPos + filaAltura);
+  xActual += anchoTecnica;
+  doc.line(xActual, yPos, xActual, yPos + filaAltura);
+  xActual += anchoSINO2;
+  doc.line(xActual, yPos, xActual, yPos + filaAltura);
+  xActual += anchoCapacitacion;
+  doc.line(xActual, yPos, xActual, yPos + filaAltura);
+  
+  const yCentro = yPos + filaAltura / 2 + 1.2;
+  
+  // Columna 1: "Usa faja lumbar:"
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text("Usa faja lumbar:", tablaInicioX + 2, yCentro);
+  
+  // Columna 2: SI/NO (mostrar texto según booleano)
+  const fajaValor = datos.fajaSi === true ? "SI" : (datos.fajaNo === true ? "NO" : "");
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text(fajaValor, tablaInicioX + anchoFaja + anchoSINO1 / 2, yCentro, { align: "center" });
+  
+  // Columna 3: "Adecuada Técnica de Levantamiento de Carga:"
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text("Adecuada Técnica de Levantamiento de Carga:", tablaInicioX + anchoFaja + anchoSINO1 + 2, yCentro);
+  
+  // Columna 4: SI/NO
+  const tecnicaValor = datos.adecuadaTecnicacargaSi === true ? "SI" : (datos.adecuadaTecnicacargaNo === true ? "NO" : "");
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text(tecnicaValor, tablaInicioX + anchoFaja + anchoSINO1 + anchoTecnica + anchoSINO2 / 2, yCentro, { align: "center" });
+  
+  // Columna 5: "Capacitación en Levantamiento de Carga:"
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text("Capacitación en Levantamiento de Carga:", tablaInicioX + anchoFaja + anchoSINO1 + anchoTecnica + anchoSINO2 + 2, yCentro);
+  
+  // Columna 6: SI/NO
+  const capacitacionValor = datos.capacitacionLevantamientoCargaSi === true ? "SI" : (datos.capacitacionLevantamientoCargaNo === true ? "NO" : "");
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text(capacitacionValor, tablaInicioX + anchoFaja + anchoSINO1 + anchoTecnica + anchoSINO2 + anchoCapacitacion + anchoSINO3 / 2, yCentro, { align: "center" });
+  
+  yPos += filaAltura;
 
-    const xLabel = tablaInicioX;
-    const xSI = xLabel + anchoLabel;
-    const xCeldaSI = xSI + anchoTextoSINO;
-    const xNO = xCeldaSI + anchoCeldaX;
-    const xCeldaNO = xNO + anchoTextoSINO;
-    const xTexto = xCeldaNO + anchoCeldaX;
-
-    // Líneas verticales: Label | SI | [X] | NO | [X] | Texto(opcional)
-    doc.line(xLabel, yPos, xLabel, yPos + filaAltura);
-    doc.line(xSI, yPos, xSI, yPos + filaAltura);
-    doc.line(xCeldaSI, yPos, xCeldaSI, yPos + filaAltura);
-    doc.line(xNO, yPos, xNO, yPos + filaAltura);
-    doc.line(xCeldaNO, yPos, xCeldaNO, yPos + filaAltura);
-    if (textoOpcional !== null) {
-      doc.line(xTexto, yPos, xTexto, yPos + filaAltura);
-    }
-    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-    // Líneas horizontales
-    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-
-    const yCentro = yPos + filaAltura / 2 + 1.2;
-
-    // Label
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.text(label, xLabel + 2, yCentro);
-
-    // SI (sin negrita)
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.text("SI", xSI + 2, yCentro);
-    // X centrada en la celda entre xCeldaSI y xNO
-    if (siMarcado) {
-      dibujarX(doc, xCeldaSI + anchoCeldaX / 2, yCentro);
-    }
-
-    // NO (sin negrita)
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.text("NO", xNO + 2, yCentro);
-    // X centrada en la celda entre xCeldaNO y xTexto
-    if (noMarcado) {
-      dibujarX(doc, xCeldaNO + anchoCeldaX / 2, yCentro);
-    }
-
-    // Texto opcional (Cuales)
-    if (textoOpcional !== null) {
-      doc.setFont("helvetica", "normal").setFontSize(7);
-      doc.text("Cuales:", xTexto + 2, yCentro);
-      const texto = String(textoOpcional || "");
-      if (texto) {
-        doc.text(texto, xTexto + 15, yCentro);
-      }
-    }
-
-    yPos += filaAltura;
-  };
-
-  // Fila: Síntomas
-  dibujarFilaSINO(
-    "Síntomas:",
-    datos.sintomaSi === true,
-    datos.sintomaNo === true,
-    datos.sintomas || "",
-    30
-  );
-
-  // Fila: Usa faja lumbar
-  dibujarFilaSINO(
-    "Usa faja lumbar:",
-    datos.fajaSi === true,
-    datos.fajaNo === true
-  );
-
-  // Fila: Adecuada Técnica de Levantamiento de Carga
-  dibujarFilaSINO(
-    "Adecuada Técnica de Levantamiento de Carga:",
-    datos.adecuadaTecnicacargaSi === true,
-    datos.adecuadaTecnicacargaNo === true
-  );
-
-  // Fila: Capacitación en Levantamiento de Carga
-  dibujarFilaSINO(
-    "Capacitación en Levantamiento de Carga:",
-    datos.capacitacionLevantamientoCargaSi === true,
-    datos.capacitacionLevantamientoCargaNo === true
-  );
+  // Fila 2: Síntomas | SI/NO | Cuales: | texto
+  // Anchos personalizados para cada columna
+  const anchoSintomas = 25;
+  const anchoSINOSintomas = 15;
+  const anchoCuales = 20;
+  
+  // Dibujar rectángulo de la fila
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
+  
+  // Líneas verticales divisorias
+  let xActual2 = tablaInicioX;
+  xActual2 += anchoSintomas;
+  doc.line(xActual2, yPos, xActual2, yPos + filaAltura);
+  xActual2 += anchoSINOSintomas;
+  doc.line(xActual2, yPos, xActual2, yPos + filaAltura);
+  xActual2 += anchoCuales;
+  doc.line(xActual2, yPos, xActual2, yPos + filaAltura);
+  
+  const yCentro2 = yPos + filaAltura / 2 + 1.2;
+  
+  // Columna 1: "Síntomas:"
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text("Síntomas:", tablaInicioX + 2, yCentro2);
+  
+  // Columna 2: SI/NO
+  const sintomaValor = datos.sintomaSi === true ? "SI" : (datos.sintomaNo === true ? "NO" : "");
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text(sintomaValor, tablaInicioX + anchoSintomas + anchoSINOSintomas / 2, yCentro2, { align: "center" });
+  
+  // Columna 3: "Cuales:"
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text("Cuales:", tablaInicioX + anchoSintomas + anchoSINOSintomas + 2, yCentro2);
+  
+  // Columna 4: Texto de síntomas
+  const sintomasTexto = String(datos.sintomas || "");
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text(sintomasTexto, tablaInicioX + anchoSintomas + anchoSINOSintomas + anchoCuales + 2, yCentro2);
+  
+  yPos += filaAltura;
 
   return yPos;
 };
@@ -327,13 +361,13 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
   // Header de sección
   const dibujarHeaderSeccion = async (titulo, alturaHeader = 4) => {
     await verificarSaltoPagina(alturaHeader);
-    // Usar yPos después de verificar salto de página
+    // PRIMERO: Dibujar fondo gris
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-    doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
-    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
+    // DESPUÉS: Dibujar líneas encima del fondo gris
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
+    doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'S'); // Borde del rectángulo
     doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text(titulo, tablaInicioX + 2, yPos + 3);
     yPos += alturaHeader;
@@ -344,7 +378,13 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
     await verificarSaltoPagina(filaAltura);
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+    // Fondo gris para "5. COLUMNA VERTEBRAL"
+    if (titulo === "5. COLUMNA VERTEBRAL") {
+      doc.setFillColor(196, 196, 196);
+      doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'FD'); // 'FD' = Fill + Draw (borde)
+    } else {
+      doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
+    }
     doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text(titulo, tablaInicioX + tablaAncho / 2, yPos + 3.2, { align: "center" });
     yPos += filaAltura;
@@ -364,45 +404,14 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
   const anchoR = anchoGradoColumna / 3;
   const anchoM = anchoGradoColumna / 3;
 
-  // Función para dibujar fila de movimiento con una columna de Grado (para Cabeza y Cuello)
-  const dibujarFilaMovimiento = async (label, valor, nMarcado, rMarcado, mMarcado, xMovimientoCol, anchoMovimientoCol, xGradoCol) => {
-    await verificarSaltoPagina();
-    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-    doc.line(xGradoCol, yPos, xGradoCol, yPos + filaAltura);
-    // Divisiones dentro de la columna de Grado
-    doc.line(xGradoCol + anchoN, yPos, xGradoCol + anchoN, yPos + filaAltura);
-    doc.line(xGradoCol + anchoN + anchoR, yPos, xGradoCol + anchoN + anchoR, yPos + filaAltura);
-    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-
-    const yCentro = yPos + filaAltura / 2 + 1.2;
-
-    // Movimiento
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    const textoCompleto = valor ? `${label}: ${valor}` : label;
-    doc.text(textoCompleto, xMovimientoCol + anchoMovimientoCol / 2, yCentro, { align: "center" });
-
-    // Grado - Solo X si está marcado (N, R, M están en el header)
-    if (nMarcado) {
-      dibujarX(doc, xGradoCol + anchoN / 2, yCentro);
-    }
-    if (rMarcado) {
-      dibujarX(doc, xGradoCol + anchoN + anchoR / 2, yCentro);
-    }
-    if (mMarcado) {
-      dibujarX(doc, xGradoCol + anchoN + anchoR + anchoM / 2, yCentro);
-    }
-
-    yPos += filaAltura;
-  };
-
   // Función para dibujar fila de movimiento con dos columnas de Grado (izquierda y derecha)
   const dibujarFilaMovimientoDoble = async (label, valor,
     nIzq, rIzq, mIzq, // Grado izquierdo
     nDer, rDer, mDer  // Grado derecho
   ) => {
     await verificarSaltoPagina();
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
     doc.line(xMovimiento, yPos, xMovimiento, yPos + filaAltura);
     doc.line(xGradoDer, yPos, xGradoDer, yPos + filaAltura);
@@ -422,27 +431,22 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
     const textoCompleto = valor ? `${label}: ${valor}` : label;
     doc.text(textoCompleto, xMovimiento + anchoMovimiento / 2, yCentro, { align: "center" });
 
-    // Grado Izquierdo - Solo X si está marcado (N, R, M están en el header)
-    if (nIzq) {
-      dibujarX(doc, xGradoIzq + anchoN / 2, yCentro);
-    }
-    if (rIzq) {
-      dibujarX(doc, xGradoIzq + anchoN + anchoR / 2, yCentro);
-    }
-    if (mIzq) {
-      dibujarX(doc, xGradoIzq + anchoN + anchoR + anchoM / 2, yCentro);
-    }
+    // Grado Izquierdo - Mostrar "N ( X )" si está marcado, "N (  )" si no está marcado
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    const textoNIzq = nIzq ? "N ( X )" : "N (  )";
+    dibujarTextoConXAzul(doc, textoNIzq, xGradoIzq + anchoN / 2, yCentro, { align: "center" });
+    const textoRIzq = rIzq ? "R ( X )" : "R (  )";
+    dibujarTextoConXAzul(doc, textoRIzq, xGradoIzq + anchoN + anchoR / 2, yCentro, { align: "center" });
+    const textoMIzq = mIzq ? "M ( X )" : "M (  )";
+    dibujarTextoConXAzul(doc, textoMIzq, xGradoIzq + anchoN + anchoR + anchoM / 2, yCentro, { align: "center" });
 
-    // Grado Derecho - Solo X si está marcado (N, R, M están en el header)
-    if (nDer) {
-      dibujarX(doc, xGradoDer + anchoN / 2, yCentro);
-    }
-    if (rDer) {
-      dibujarX(doc, xGradoDer + anchoN + anchoR / 2, yCentro);
-    }
-    if (mDer) {
-      dibujarX(doc, xGradoDer + anchoN + anchoR + anchoM / 2, yCentro);
-    }
+    // Grado Derecho - Mostrar "N ( X )" si está marcado, "N (  )" si no está marcado
+    const textoNDer = nDer ? "N ( X )" : "N (  )";
+    dibujarTextoConXAzul(doc, textoNDer, xGradoDer + anchoN / 2, yCentro, { align: "center" });
+    const textoRDer = rDer ? "R ( X )" : "R (  )";
+    dibujarTextoConXAzul(doc, textoRDer, xGradoDer + anchoN + anchoR / 2, yCentro, { align: "center" });
+    const textoMDer = mDer ? "M ( X )" : "M (  )";
+    dibujarTextoConXAzul(doc, textoMDer, xGradoDer + anchoN + anchoR + anchoM / 2, yCentro, { align: "center" });
 
     yPos += filaAltura;
   };
@@ -450,54 +454,64 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
   // === 1. CABEZA Y CUELLO ===
   await dibujarHeaderSeccion("1. CABEZA Y CUELLO", filaAltura);
 
-  // Layout para Cabeza y Cuello: Movimiento (todo el ancho menos Grado) | N R M
-  const xMovimientoCabeza = tablaInicioX;
-  const xGradoCabeza = tablaInicioX + tablaAncho - anchoGradoColumna;
-  const anchoMovimientoCabeza = xGradoCabeza - xMovimientoCabeza;
+  // Layout para Cabeza y Cuello: Extensión | N R M | Flexión | N R M
+  // Dividir el ancho en 4 columnas principales (cada una de 50mm)
+  const anchoColumnaMovimiento = 50; // Ancho para "Extensión" y "Flexión"
+  const anchoColumnaGrado = 50; // Ancho para cada columna de grado (N R M)
+  
+  // Posiciones de las columnas
+  const xExtensión = tablaInicioX;
+  const xGradoExt = xExtensión + anchoColumnaMovimiento;
+  const xFlexion = xGradoExt + anchoColumnaGrado;
+  const xGradoFlex = xFlexion + anchoColumnaMovimiento;
+  
+  // Anchos para N, R, M dentro de cada columna de grado
+  const anchoNCabeza = anchoColumnaGrado / 3;
+  const anchoRCabeza = anchoColumnaGrado / 3;
+  const anchoMCabeza = anchoColumnaGrado / 3;
 
-  // Header única fila: Movimiento | N R M
+  // Fila única: Extensión | N ( ) R ( ) M ( ) | Flexión | N ( ) R ( ) M ( )
+  await verificarSaltoPagina();
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(xGradoCabeza, yPos, xGradoCabeza, yPos + filaAltura);
-  doc.line(xGradoCabeza + anchoN, yPos, xGradoCabeza + anchoN, yPos + filaAltura);
-  doc.line(xGradoCabeza + anchoN + anchoR, yPos, xGradoCabeza + anchoN + anchoR, yPos + filaAltura);
+  doc.line(xGradoExt, yPos, xGradoExt, yPos + filaAltura);
+  doc.line(xGradoExt + anchoNCabeza, yPos, xGradoExt + anchoNCabeza, yPos + filaAltura);
+  doc.line(xGradoExt + anchoNCabeza + anchoRCabeza, yPos, xGradoExt + anchoNCabeza + anchoRCabeza, yPos + filaAltura);
+  doc.line(xFlexion, yPos, xFlexion, yPos + filaAltura);
+  doc.line(xGradoFlex, yPos, xGradoFlex, yPos + filaAltura);
+  doc.line(xGradoFlex + anchoNCabeza, yPos, xGradoFlex + anchoNCabeza, yPos + filaAltura);
+  doc.line(xGradoFlex + anchoNCabeza + anchoRCabeza, yPos, xGradoFlex + anchoNCabeza + anchoRCabeza, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-  const yCentroHeaderCabeza = yPos + filaAltura / 2 + 1.2;
-  doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("Movimiento", xMovimientoCabeza + anchoMovimientoCabeza / 2, yCentroHeaderCabeza, { align: "center" });
+  const yCentro = yPos + filaAltura / 2 + 1.2;
+  
+  // Extensión (centro de su columna)
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("N", xGradoCabeza + anchoN / 2, yCentroHeaderCabeza, { align: "center" });
-  doc.text("R", xGradoCabeza + anchoN + anchoR / 2, yCentroHeaderCabeza, { align: "center" });
-  doc.text("M", xGradoCabeza + anchoN + anchoR + anchoM / 2, yCentroHeaderCabeza, { align: "center" });
+  doc.text("Extensión", xExtensión + anchoColumnaMovimiento / 2, yCentro, { align: "center" });
+  
+  // Grado para Extensión: N ( ) R ( ) M ( )
+  const textoNExt = datos.extensionCabezaN === true ? "N ( X )" : "N (  )";
+  dibujarTextoConXAzul(doc, textoNExt, xGradoExt + anchoNCabeza / 2, yCentro, { align: "center" });
+  const textoRExt = datos.extensionCabezaR === true ? "R ( X )" : "R (  )";
+  dibujarTextoConXAzul(doc, textoRExt, xGradoExt + anchoNCabeza + anchoRCabeza / 2, yCentro, { align: "center" });
+  const textoMExt = datos.extensionCabezaM === true ? "M ( X )" : "M (  )";
+  dibujarTextoConXAzul(doc, textoMExt, xGradoExt + anchoNCabeza + anchoRCabeza + anchoMCabeza / 2, yCentro, { align: "center" });
+  
+  // Flexión (centro de su columna)
+  doc.text("Flexión", xFlexion + anchoColumnaMovimiento / 2, yCentro, { align: "center" });
+  
+  // Grado para Flexión: N ( ) R ( ) M ( )
+  const textoNFlex = datos.flexionCabezaN === true ? "N ( X )" : "N (  )";
+  dibujarTextoConXAzul(doc, textoNFlex, xGradoFlex + anchoNCabeza / 2, yCentro, { align: "center" });
+  const textoRFlex = datos.flexionCabezaR === true ? "R ( X )" : "R (  )";
+  dibujarTextoConXAzul(doc, textoRFlex, xGradoFlex + anchoNCabeza + anchoRCabeza / 2, yCentro, { align: "center" });
+  const textoMFlex = datos.flexionCabezaM === true ? "M ( X )" : "M (  )";
+  dibujarTextoConXAzul(doc, textoMFlex, xGradoFlex + anchoNCabeza + anchoRCabeza + anchoMCabeza / 2, yCentro, { align: "center" });
+  
   yPos += filaAltura;
-
-  // Fila: Extensión
-  const extensionValor = datos.extencionCabeza || "";
-  await dibujarFilaMovimiento(
-    "Extensión",
-    extensionValor,
-    datos.extensionCabezaN === true,
-    datos.extensionCabezaR === true,
-    datos.extensionCabezaM === true,
-    xMovimientoCabeza,
-    anchoMovimientoCabeza,
-    xGradoCabeza
-  );
-
-  // Fila: Flexión
-  const flexionValor = datos.flexionCabeza || "";
-  await dibujarFilaMovimiento(
-    "Flexión",
-    flexionValor,
-    datos.flexionCabezaN === true,
-    datos.flexionCabezaR === true,
-    datos.flexionCabezaM === true,
-    xMovimientoCabeza,
-    anchoMovimientoCabeza,
-    xGradoCabeza
-  );
 
   // === 2. MIEMBROS SUPERIORES ===
   await dibujarHeaderSeccion("2. MIEMBROS SUPERIORES", filaAltura);
@@ -505,30 +519,23 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
   // === a) HOMBRO ===
   await dibujarHeaderSeccion("a) HOMBRO", filaAltura);
 
-  // Header única fila: N R M | Movimiento | N R M
+  // Header única fila: Grado (Izquierdo) | Movimiento | Grado (Derecho)
+  // Celdas limpias sin divisiones internas
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(xGradoIzq + anchoN, yPos, xGradoIzq + anchoN, yPos + filaAltura);
-  doc.line(xGradoIzq + anchoN + anchoR, yPos, xGradoIzq + anchoN + anchoR, yPos + filaAltura);
   doc.line(xMovimiento, yPos, xMovimiento, yPos + filaAltura);
   doc.line(xGradoDer, yPos, xGradoDer, yPos + filaAltura);
-  doc.line(xGradoDer + anchoN, yPos, xGradoDer + anchoN, yPos + filaAltura);
-  doc.line(xGradoDer + anchoN + anchoR, yPos, xGradoDer + anchoN + anchoR, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
   const yCentroHeaderHombro = yPos + filaAltura / 2 + 1.2;
   doc.setFont("helvetica", "bold").setFontSize(7);
+  // Grado (Izquierdo) - centrado sobre las columnas N R M
+  doc.text("Grado (Izquierdo)", xGradoIzq + anchoGradoColumna / 2, yCentroHeaderHombro, { align: "center" });
+  // Movimiento
   doc.text("Movimiento", xMovimiento + anchoMovimiento / 2, yCentroHeaderHombro, { align: "center" });
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  // Grado Izquierdo
-  doc.text("N", xGradoIzq + anchoN / 2, yCentroHeaderHombro, { align: "center" });
-  doc.text("R", xGradoIzq + anchoN + anchoR / 2, yCentroHeaderHombro, { align: "center" });
-  doc.text("M", xGradoIzq + anchoN + anchoR + anchoM / 2, yCentroHeaderHombro, { align: "center" });
-  // Grado Derecho
-  doc.text("N", xGradoDer + anchoN / 2, yCentroHeaderHombro, { align: "center" });
-  doc.text("R", xGradoDer + anchoN + anchoR / 2, yCentroHeaderHombro, { align: "center" });
-  doc.text("M", xGradoDer + anchoN + anchoR + anchoM / 2, yCentroHeaderHombro, { align: "center" });
+  // Grado (Derecho) - centrado sobre las columnas N R M
+  doc.text("Grado (Derecho)", xGradoDer + anchoGradoColumna / 2, yCentroHeaderHombro, { align: "center" });
   yPos += filaAltura;
 
   // Movimientos de Hombro
@@ -566,28 +573,20 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
   // === b) BRAZO ===
   await dibujarHeaderSeccion("b) BRAZO", filaAltura);
 
-  // Header única fila: N R M | Movimiento | N R M
+  // Header única fila: Grado (Izquierdo) | Movimiento | Grado (Derecho)
+  // Celdas limpias sin divisiones internas
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(xGradoIzq + anchoN, yPos, xGradoIzq + anchoN, yPos + filaAltura);
-  doc.line(xGradoIzq + anchoN + anchoR, yPos, xGradoIzq + anchoN + anchoR, yPos + filaAltura);
   doc.line(xMovimiento, yPos, xMovimiento, yPos + filaAltura);
   doc.line(xGradoDer, yPos, xGradoDer, yPos + filaAltura);
-  doc.line(xGradoDer + anchoN, yPos, xGradoDer + anchoN, yPos + filaAltura);
-  doc.line(xGradoDer + anchoN + anchoR, yPos, xGradoDer + anchoN + anchoR, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
   const yCentroHeaderBrazo = yPos + filaAltura / 2 + 1.2;
   doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("Grado (Izquierdo)", xGradoIzq + anchoGradoColumna / 2, yCentroHeaderBrazo, { align: "center" });
   doc.text("Movimiento", xMovimiento + anchoMovimiento / 2, yCentroHeaderBrazo, { align: "center" });
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("N", xGradoIzq + anchoN / 2, yCentroHeaderBrazo, { align: "center" });
-  doc.text("R", xGradoIzq + anchoN + anchoR / 2, yCentroHeaderBrazo, { align: "center" });
-  doc.text("M", xGradoIzq + anchoN + anchoR + anchoM / 2, yCentroHeaderBrazo, { align: "center" });
-  doc.text("N", xGradoDer + anchoN / 2, yCentroHeaderBrazo, { align: "center" });
-  doc.text("R", xGradoDer + anchoN + anchoR / 2, yCentroHeaderBrazo, { align: "center" });
-  doc.text("M", xGradoDer + anchoN + anchoR + anchoM / 2, yCentroHeaderBrazo, { align: "center" });
+  doc.text("Grado (Derecho)", xGradoDer + anchoGradoColumna / 2, yCentroHeaderBrazo, { align: "center" });
   yPos += filaAltura;
 
   await dibujarFilaMovimientoDoble(
@@ -604,28 +603,20 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
   // === c) ANTEBRAZO ===
   await dibujarHeaderSeccion("c) ANTEBRAZO", filaAltura);
 
-  // Header única fila: N R M | Movimiento | N R M
+  // Header única fila: Grado (Izquierdo) | Movimiento | Grado (Derecho)
+  // Celdas limpias sin divisiones internas
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(xGradoIzq + anchoN, yPos, xGradoIzq + anchoN, yPos + filaAltura);
-  doc.line(xGradoIzq + anchoN + anchoR, yPos, xGradoIzq + anchoN + anchoR, yPos + filaAltura);
   doc.line(xMovimiento, yPos, xMovimiento, yPos + filaAltura);
   doc.line(xGradoDer, yPos, xGradoDer, yPos + filaAltura);
-  doc.line(xGradoDer + anchoN, yPos, xGradoDer + anchoN, yPos + filaAltura);
-  doc.line(xGradoDer + anchoN + anchoR, yPos, xGradoDer + anchoN + anchoR, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
   const yCentroHeaderAntebrazo = yPos + filaAltura / 2 + 1.2;
   doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("Grado (Izquierdo)", xGradoIzq + anchoGradoColumna / 2, yCentroHeaderAntebrazo, { align: "center" });
   doc.text("Movimiento", xMovimiento + anchoMovimiento / 2, yCentroHeaderAntebrazo, { align: "center" });
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("N", xGradoIzq + anchoN / 2, yCentroHeaderAntebrazo, { align: "center" });
-  doc.text("R", xGradoIzq + anchoN + anchoR / 2, yCentroHeaderAntebrazo, { align: "center" });
-  doc.text("M", xGradoIzq + anchoN + anchoR + anchoM / 2, yCentroHeaderAntebrazo, { align: "center" });
-  doc.text("N", xGradoDer + anchoN / 2, yCentroHeaderAntebrazo, { align: "center" });
-  doc.text("R", xGradoDer + anchoN + anchoR / 2, yCentroHeaderAntebrazo, { align: "center" });
-  doc.text("M", xGradoDer + anchoN + anchoR + anchoM / 2, yCentroHeaderAntebrazo, { align: "center" });
+  doc.text("Grado (Derecho)", xGradoDer + anchoGradoColumna / 2, yCentroHeaderAntebrazo, { align: "center" });
   yPos += filaAltura;
 
   await dibujarFilaMovimientoDoble(
@@ -642,28 +633,20 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
   // === d) MUÑECA ===
   await dibujarHeaderSeccion("d) MUÑECA", filaAltura);
 
-  // Header única fila: N R M | Movimiento | N R M
+  // Header única fila: Grado (Izquierdo) | Movimiento | Grado (Derecho)
+  // Celdas limpias sin divisiones internas
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(xGradoIzq + anchoN, yPos, xGradoIzq + anchoN, yPos + filaAltura);
-  doc.line(xGradoIzq + anchoN + anchoR, yPos, xGradoIzq + anchoN + anchoR, yPos + filaAltura);
   doc.line(xMovimiento, yPos, xMovimiento, yPos + filaAltura);
   doc.line(xGradoDer, yPos, xGradoDer, yPos + filaAltura);
-  doc.line(xGradoDer + anchoN, yPos, xGradoDer + anchoN, yPos + filaAltura);
-  doc.line(xGradoDer + anchoN + anchoR, yPos, xGradoDer + anchoN + anchoR, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
   const yCentroHeaderMuneca = yPos + filaAltura / 2 + 1.2;
   doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("Grado (Izquierdo)", xGradoIzq + anchoGradoColumna / 2, yCentroHeaderMuneca, { align: "center" });
   doc.text("Movimiento", xMovimiento + anchoMovimiento / 2, yCentroHeaderMuneca, { align: "center" });
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("N", xGradoIzq + anchoN / 2, yCentroHeaderMuneca, { align: "center" });
-  doc.text("R", xGradoIzq + anchoN + anchoR / 2, yCentroHeaderMuneca, { align: "center" });
-  doc.text("M", xGradoIzq + anchoN + anchoR + anchoM / 2, yCentroHeaderMuneca, { align: "center" });
-  doc.text("N", xGradoDer + anchoN / 2, yCentroHeaderMuneca, { align: "center" });
-  doc.text("R", xGradoDer + anchoN + anchoR / 2, yCentroHeaderMuneca, { align: "center" });
-  doc.text("M", xGradoDer + anchoN + anchoR + anchoM / 2, yCentroHeaderMuneca, { align: "center" });
+  doc.text("Grado (Derecho)", xGradoDer + anchoGradoColumna / 2, yCentroHeaderMuneca, { align: "center" });
   yPos += filaAltura;
 
   await dibujarFilaMovimientoDoble(
@@ -687,26 +670,25 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
     datos.desiacionRadialMuniecaN === true, datos.desiacionRadialMuniecaR === true, datos.desiacionRadialMuniecaM === true
   );
 
-  // S. de Phallen y S. Tinel (con SI/NO solo en columna izquierda)
+  // S. de Phallen y S. Tinel (con SI/NO en columna derecha)
   const dibujarFilaSINO = async (label, siMarcado, noMarcado) => {
     await verificarSaltoPagina();
-    // Layout con celdas: Grado Izq (SI/NO) | Movimiento | Grado Der (vacío)
-    const anchoTextoSINO = 10;
-    const anchoCeldaX = 8;
+    // Layout con celdas: Grado Izq (vacío) | Movimiento | Grado Der (SI/NO a la derecha)
+    // Ancho para texto "SI ( X )" o "NO ( X )"
+    const anchoCeldaSINO = 18; // Ancho suficiente para "SI ( X )" o "NO ( X )"
 
-    const xSI = xGradoIzq;
-    const xCeldaSI = xSI + anchoTextoSINO;
-    const xNO = xCeldaSI + anchoCeldaX;
-    const xCeldaNO = xNO + anchoTextoSINO;
+    // Calcular posiciones desde la derecha (pegadas al final)
+    const xNO = tablaInicioX + tablaAncho - anchoCeldaSINO; // Última celda al final
+    const xSI = xNO - anchoCeldaSINO;
 
     // Líneas verticales
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-    doc.line(xSI, yPos, xSI, yPos + filaAltura);
-    doc.line(xCeldaSI, yPos, xCeldaSI, yPos + filaAltura);
-    doc.line(xNO, yPos, xNO, yPos + filaAltura);
-    doc.line(xCeldaNO, yPos, xCeldaNO, yPos + filaAltura);
+    doc.line(xGradoIzq, yPos, xGradoIzq, yPos + filaAltura);
     doc.line(xMovimiento, yPos, xMovimiento, yPos + filaAltura);
-    doc.line(xGradoDer, yPos, xGradoDer, yPos + filaAltura);
+    doc.line(xSI, yPos, xSI, yPos + filaAltura);
+    doc.line(xNO, yPos, xNO, yPos + filaAltura);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -715,17 +697,13 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(label, xMovimiento + anchoMovimiento / 2, yCentro, { align: "center" });
 
-    // Izquierdo: SI | [X] | NO | [X]
-    doc.text("SI", xSI + 2, yCentro);
-    if (siMarcado) {
-      dibujarX(doc, xCeldaSI + anchoCeldaX / 2, yCentro);
-    }
-    doc.text("NO", xNO + 2, yCentro);
-    if (noMarcado) {
-      dibujarX(doc, xCeldaNO + anchoCeldaX / 2, yCentro);
-    }
+    // Derecho: SI ( X ) | NO ( X ) (pegadas a la derecha)
+    const textoSI = siMarcado ? "SI ( X )" : "SI (  )";
+    const textoNO = noMarcado ? "NO ( X )" : "NO (  )";
+    doc.text(textoSI, xSI + anchoCeldaSINO / 2, yCentro, { align: "center" });
+    doc.text(textoNO, xNO + anchoCeldaSINO / 2, yCentro, { align: "center" });
 
-    // Derecho: vacío (sin SI/NO)
+    // Izquierdo: vacío (sin SI/NO)
 
     yPos += filaAltura;
   };
@@ -744,28 +722,20 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
   // === 3. TÓRAX ===
   await dibujarHeaderSeccion("3. TÓRAX", filaAltura);
 
-  // Header única fila: N R M | Movimiento | N R M
+  // Header única fila: Grado (Izquierdo) | Movimiento | Grado (Derecho)
+  // Celdas limpias sin divisiones internas
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(xGradoIzq + anchoN, yPos, xGradoIzq + anchoN, yPos + filaAltura);
-  doc.line(xGradoIzq + anchoN + anchoR, yPos, xGradoIzq + anchoN + anchoR, yPos + filaAltura);
   doc.line(xMovimiento, yPos, xMovimiento, yPos + filaAltura);
   doc.line(xGradoDer, yPos, xGradoDer, yPos + filaAltura);
-  doc.line(xGradoDer + anchoN, yPos, xGradoDer + anchoN, yPos + filaAltura);
-  doc.line(xGradoDer + anchoN + anchoR, yPos, xGradoDer + anchoN + anchoR, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
   const yCentroHeaderTorax = yPos + filaAltura / 2 + 1.2;
   doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("Grado (Izquierdo)", xGradoIzq + anchoGradoColumna / 2, yCentroHeaderTorax, { align: "center" });
   doc.text("Movimiento", xMovimiento + anchoMovimiento / 2, yCentroHeaderTorax, { align: "center" });
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("N", xGradoIzq + anchoN / 2, yCentroHeaderTorax, { align: "center" });
-  doc.text("R", xGradoIzq + anchoN + anchoR / 2, yCentroHeaderTorax, { align: "center" });
-  doc.text("M", xGradoIzq + anchoN + anchoR + anchoM / 2, yCentroHeaderTorax, { align: "center" });
-  doc.text("N", xGradoDer + anchoN / 2, yCentroHeaderTorax, { align: "center" });
-  doc.text("R", xGradoDer + anchoN + anchoR / 2, yCentroHeaderTorax, { align: "center" });
-  doc.text("M", xGradoDer + anchoN + anchoR + anchoM / 2, yCentroHeaderTorax, { align: "center" });
+  doc.text("Grado (Derecho)", xGradoDer + anchoGradoColumna / 2, yCentroHeaderTorax, { align: "center" });
   yPos += filaAltura;
 
   await dibujarFilaMovimientoDoble(
@@ -790,28 +760,20 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
   // === a) CADERAS ===
   await dibujarHeaderSeccion("a) CADERAS", filaAltura);
 
-  // Header única fila: N R M | Movimiento | N R M
+  // Header única fila: Grado (Izquierdo) | Movimiento | Grado (Derecho)
+  // Celdas limpias sin divisiones internas
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(xGradoIzq + anchoN, yPos, xGradoIzq + anchoN, yPos + filaAltura);
-  doc.line(xGradoIzq + anchoN + anchoR, yPos, xGradoIzq + anchoN + anchoR, yPos + filaAltura);
   doc.line(xMovimiento, yPos, xMovimiento, yPos + filaAltura);
   doc.line(xGradoDer, yPos, xGradoDer, yPos + filaAltura);
-  doc.line(xGradoDer + anchoN, yPos, xGradoDer + anchoN, yPos + filaAltura);
-  doc.line(xGradoDer + anchoN + anchoR, yPos, xGradoDer + anchoN + anchoR, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
   const yCentroHeaderCadera = yPos + filaAltura / 2 + 1.2;
   doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("Grado (Izquierdo)", xGradoIzq + anchoGradoColumna / 2, yCentroHeaderCadera, { align: "center" });
   doc.text("Movimiento", xMovimiento + anchoMovimiento / 2, yCentroHeaderCadera, { align: "center" });
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("N", xGradoIzq + anchoN / 2, yCentroHeaderCadera, { align: "center" });
-  doc.text("R", xGradoIzq + anchoN + anchoR / 2, yCentroHeaderCadera, { align: "center" });
-  doc.text("M", xGradoIzq + anchoN + anchoR + anchoM / 2, yCentroHeaderCadera, { align: "center" });
-  doc.text("N", xGradoDer + anchoN / 2, yCentroHeaderCadera, { align: "center" });
-  doc.text("R", xGradoDer + anchoN + anchoR / 2, yCentroHeaderCadera, { align: "center" });
-  doc.text("M", xGradoDer + anchoN + anchoR + anchoM / 2, yCentroHeaderCadera, { align: "center" });
+  doc.text("Grado (Derecho)", xGradoDer + anchoGradoColumna / 2, yCentroHeaderCadera, { align: "center" });
   yPos += filaAltura;
 
   await dibujarFilaMovimientoDoble(
@@ -848,28 +810,20 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
   // === b) PIERNA ===
   await dibujarHeaderSeccion("b) PIERNA", filaAltura);
 
-  // Header única fila: N R M | Movimiento | N R M
+  // Header única fila: Grado (Izquierdo) | Movimiento | Grado (Derecho)
+  // Celdas limpias sin divisiones internas
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(xGradoIzq + anchoN, yPos, xGradoIzq + anchoN, yPos + filaAltura);
-  doc.line(xGradoIzq + anchoN + anchoR, yPos, xGradoIzq + anchoN + anchoR, yPos + filaAltura);
   doc.line(xMovimiento, yPos, xMovimiento, yPos + filaAltura);
   doc.line(xGradoDer, yPos, xGradoDer, yPos + filaAltura);
-  doc.line(xGradoDer + anchoN, yPos, xGradoDer + anchoN, yPos + filaAltura);
-  doc.line(xGradoDer + anchoN + anchoR, yPos, xGradoDer + anchoN + anchoR, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
   const yCentroHeaderPierna = yPos + filaAltura / 2 + 1.2;
   doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("Grado (Izquierdo)", xGradoIzq + anchoGradoColumna / 2, yCentroHeaderPierna, { align: "center" });
   doc.text("Movimiento", xMovimiento + anchoMovimiento / 2, yCentroHeaderPierna, { align: "center" });
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("N", xGradoIzq + anchoN / 2, yCentroHeaderPierna, { align: "center" });
-  doc.text("R", xGradoIzq + anchoN + anchoR / 2, yCentroHeaderPierna, { align: "center" });
-  doc.text("M", xGradoIzq + anchoN + anchoR + anchoM / 2, yCentroHeaderPierna, { align: "center" });
-  doc.text("N", xGradoDer + anchoN / 2, yCentroHeaderPierna, { align: "center" });
-  doc.text("R", xGradoDer + anchoN + anchoR / 2, yCentroHeaderPierna, { align: "center" });
-  doc.text("M", xGradoDer + anchoN + anchoR + anchoM / 2, yCentroHeaderPierna, { align: "center" });
+  doc.text("Grado (Derecho)", xGradoDer + anchoGradoColumna / 2, yCentroHeaderPierna, { align: "center" });
   yPos += filaAltura;
 
   await dibujarFilaMovimientoDoble(
@@ -886,28 +840,22 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
   // === c) RODILLA ===
   await dibujarHeaderSeccion("c) RODILLA", filaAltura);
 
-  // Header única fila: N R M | Movimiento | N R M
+  // Header única fila: Grado (Izquierdo) | Movimiento | Grado (Derecho)
+  // Celdas limpias sin divisiones internas
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(xGradoIzq + anchoN, yPos, xGradoIzq + anchoN, yPos + filaAltura);
-  doc.line(xGradoIzq + anchoN + anchoR, yPos, xGradoIzq + anchoN + anchoR, yPos + filaAltura);
   doc.line(xMovimiento, yPos, xMovimiento, yPos + filaAltura);
   doc.line(xGradoDer, yPos, xGradoDer, yPos + filaAltura);
-  doc.line(xGradoDer + anchoN, yPos, xGradoDer + anchoN, yPos + filaAltura);
-  doc.line(xGradoDer + anchoN + anchoR, yPos, xGradoDer + anchoN + anchoR, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
   const yCentroHeaderRodilla = yPos + filaAltura / 2 + 1.2;
   doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("Grado (Izquierdo)", xGradoIzq + anchoGradoColumna / 2, yCentroHeaderRodilla, { align: "center" });
   doc.text("Movimiento", xMovimiento + anchoMovimiento / 2, yCentroHeaderRodilla, { align: "center" });
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("N", xGradoIzq + anchoN / 2, yCentroHeaderRodilla, { align: "center" });
-  doc.text("R", xGradoIzq + anchoN + anchoR / 2, yCentroHeaderRodilla, { align: "center" });
-  doc.text("M", xGradoIzq + anchoN + anchoR + anchoM / 2, yCentroHeaderRodilla, { align: "center" });
-  doc.text("N", xGradoDer + anchoN / 2, yCentroHeaderRodilla, { align: "center" });
-  doc.text("R", xGradoDer + anchoN + anchoR / 2, yCentroHeaderRodilla, { align: "center" });
-  doc.text("M", xGradoDer + anchoN + anchoR + anchoM / 2, yCentroHeaderRodilla, { align: "center" });
+  doc.text("Grado (Derecho)", xGradoDer + anchoGradoColumna / 2, yCentroHeaderRodilla, { align: "center" });
   yPos += filaAltura;
 
   await dibujarFilaMovimientoDoble(
@@ -934,28 +882,22 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
   // === d) TOBILLO ===
   await dibujarHeaderSeccion("d) TOBILLO", filaAltura);
 
-  // Header única fila: N R M | Movimiento | N R M
+  // Header única fila: Grado (Izquierdo) | Movimiento | Grado (Derecho)
+  // Celdas limpias sin divisiones internas
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(xGradoIzq + anchoN, yPos, xGradoIzq + anchoN, yPos + filaAltura);
-  doc.line(xGradoIzq + anchoN + anchoR, yPos, xGradoIzq + anchoN + anchoR, yPos + filaAltura);
   doc.line(xMovimiento, yPos, xMovimiento, yPos + filaAltura);
   doc.line(xGradoDer, yPos, xGradoDer, yPos + filaAltura);
-  doc.line(xGradoDer + anchoN, yPos, xGradoDer + anchoN, yPos + filaAltura);
-  doc.line(xGradoDer + anchoN + anchoR, yPos, xGradoDer + anchoN + anchoR, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
   const yCentroHeaderTobillo = yPos + filaAltura / 2 + 1.2;
   doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text("Grado (Izquierdo)", xGradoIzq + anchoGradoColumna / 2, yCentroHeaderTobillo, { align: "center" });
   doc.text("Movimiento", xMovimiento + anchoMovimiento / 2, yCentroHeaderTobillo, { align: "center" });
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("N", xGradoIzq + anchoN / 2, yCentroHeaderTobillo, { align: "center" });
-  doc.text("R", xGradoIzq + anchoN + anchoR / 2, yCentroHeaderTobillo, { align: "center" });
-  doc.text("M", xGradoIzq + anchoN + anchoR + anchoM / 2, yCentroHeaderTobillo, { align: "center" });
-  doc.text("N", xGradoDer + anchoN / 2, yCentroHeaderTobillo, { align: "center" });
-  doc.text("R", xGradoDer + anchoN + anchoR / 2, yCentroHeaderTobillo, { align: "center" });
-  doc.text("M", xGradoDer + anchoN + anchoR + anchoM / 2, yCentroHeaderTobillo, { align: "center" });
+  doc.text("Grado (Derecho)", xGradoDer + anchoGradoColumna / 2, yCentroHeaderTobillo, { align: "center" });
   yPos += filaAltura;
 
   await dibujarFilaMovimientoDoble(
@@ -971,32 +913,48 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
 
   // === FUERZA MUSCULAR (GRADO) ===
   await verificarSaltoPagina(filaAltura * 2);
-  const fmColLabelW = 70;
-  const fmColW = (tablaAncho - fmColLabelW) / 5;
-
-  // Fila 1: títulos
+  
+  // Estructura: Celda grande (abarca 2 filas) | Columna 1 | Columna 2 | Columna 3 | Columna 4 | Columna 5
+  const fmColW = tablaAncho / 6; // Ancho de cada columna (6 columnas: 1 celda grande + 5 números)
+  const fmCeldaGrandeW = fmColW; // Celda grande ocupa 1 columna
+  const xFinCeldaGrande = tablaInicioX + fmCeldaGrandeW;
+  
+  // PRIMERO: Dibujar fondo gris para las columnas de números (1-5) en la fila 1
+  doc.setFillColor(196, 196, 196);
+  doc.rect(xFinCeldaGrande, yPos, fmColW * 5, filaAltura, 'F');
+  
+  // DESPUÉS: Dibujar todas las líneas encima del fondo gris
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
-  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
-  doc.line(tablaInicioX + fmColLabelW, yPos, tablaInicioX + fmColLabelW, yPos + filaAltura);
-  for (let i = 1; i < 5; i++) {
-    doc.line(tablaInicioX + fmColLabelW + fmColW * i, yPos, tablaInicioX + fmColLabelW + fmColW * i, yPos + filaAltura);
-  }
+  // Rectángulo exterior (2 filas)
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura * 2, 'S');
+  // Líneas verticales: después de la celda grande, y entre las columnas 1, 2, 3, 4, 5
+  doc.line(xFinCeldaGrande, yPos, xFinCeldaGrande, yPos + filaAltura * 2); // Después de celda grande
+  doc.line(xFinCeldaGrande + fmColW, yPos, xFinCeldaGrande + fmColW, yPos + filaAltura * 2); // Entre 1 y 2
+  doc.line(xFinCeldaGrande + fmColW * 2, yPos, xFinCeldaGrande + fmColW * 2, yPos + filaAltura * 2); // Entre 2 y 3
+  doc.line(xFinCeldaGrande + fmColW * 3, yPos, xFinCeldaGrande + fmColW * 3, yPos + filaAltura * 2); // Entre 3 y 4
+  doc.line(xFinCeldaGrande + fmColW * 4, yPos, xFinCeldaGrande + fmColW * 4, yPos + filaAltura * 2); // Entre 4 y 5
+  // Línea horizontal entre fila 1 y fila 2 (solo en las columnas de números, no en la celda grande)
+  doc.line(xFinCeldaGrande, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  
+  // Texto en celda grande (centrado verticalmente en las 2 filas)
   doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("Fuerza Muscular ( Grado )", tablaInicioX + 2, yPos + 3.2);
-  doc.setFont("helvetica", "bold").setFontSize(7);
-  for (let i = 0; i < 5; i++) {
-    doc.text(String(i + 1), tablaInicioX + fmColLabelW + fmColW * i + fmColW / 2, yPos + 3.2, { align: "center" });
-  }
+  doc.text("Fuerza Muscular ( Grado )", tablaInicioX + fmCeldaGrandeW / 2, yPos + filaAltura + 1.2, { align: "center" });
+  
+  // Números 1, 2, 3, 4, 5 centrados en sus columnas (fila 1)
+  doc.text("1", xFinCeldaGrande + fmColW / 2, yPos + 3.2, { align: "center" });
+  doc.text("2", xFinCeldaGrande + fmColW + fmColW / 2, yPos + 3.2, { align: "center" });
+  doc.text("3", xFinCeldaGrande + fmColW * 2 + fmColW / 2, yPos + 3.2, { align: "center" });
+  doc.text("4", xFinCeldaGrande + fmColW * 3 + fmColW / 2, yPos + 3.2, { align: "center" });
+  doc.text("5", xFinCeldaGrande + fmColW * 4 + fmColW / 2, yPos + 3.2, { align: "center" });
+  
   yPos += filaAltura;
-
-  // Fila 2: marcas
-  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
-  doc.line(tablaInicioX + fmColLabelW, yPos, tablaInicioX + fmColLabelW, yPos + filaAltura);
-  for (let i = 1; i < 5; i++) {
-    doc.line(tablaInicioX + fmColLabelW + fmColW * i, yPos, tablaInicioX + fmColLabelW + fmColW * i, yPos + filaAltura);
-  }
+  
+  // Fila 2: Marcas X dentro de paréntesis
   const yCentroFM = yPos + filaAltura / 2 + 1.2;
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  
+  // Mapear los datos y dibujar "( X )" o "(  )" en cada columna
   const fmFlags = [
     datos.fuerzaMuscularGrado1 === true,
     datos.fuerzaMuscularGrado2 === true,
@@ -1004,11 +962,12 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
     datos.fuerzaMuscularGrado4 === true,
     datos.fuerzaMuscularGrado5 === true
   ];
+  
   fmFlags.forEach((flag, idx) => {
-    if (flag) {
-      dibujarX(doc, tablaInicioX + fmColLabelW + fmColW * idx + fmColW / 2, yCentroFM);
-    }
+    const textoFM = flag ? "( X )" : "(  )";
+    dibujarTextoConXAzul(doc, textoFM, xFinCeldaGrande + fmColW * idx + fmColW / 2, yCentroFM, { align: "center" });
   });
+  
   yPos += filaAltura;
 
   // === 5. COLUMNA VERTEBRAL ===
@@ -1018,19 +977,26 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
   const xRight = tablaInicioX + halfW;
   const rowH = 5;
 
-  // Bloque 5.1 / 5.2 (6 filas: titulo, cabecera, 4 filas de data)
-  await verificarSaltoPagina(rowH * 6);
-  doc.rect(tablaInicioX, yPos, tablaAncho, rowH * 6);
-  doc.line(xRight, yPos, xRight, yPos + rowH * 6);
-
-  // Row 1: títulos
+  // Bloque 5.1 / 5.2 (5 filas: titulo + 4 filas de data, sin headers)
+  await verificarSaltoPagina(rowH * 5);
+  
+  // PRIMERO: Dibujar fondo gris de la fila 1
+  doc.setFillColor(196, 196, 196);
+  doc.rect(tablaInicioX, yPos, tablaAncho, rowH, 'F');
+  
+  // DESPUÉS: Dibujar todas las líneas (horizontales y verticales)
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  // Rectángulo exterior
+  doc.rect(tablaInicioX, yPos, tablaAncho, rowH * 5, 'S'); // 'S' = Stroke only
+  // Línea horizontal después de la fila 1 (sin divisiones verticales en la fila 1 porque ahí va texto)
   doc.line(tablaInicioX, yPos + rowH, tablaInicioX + tablaAncho, yPos + rowH);
+  // Línea vertical divisoria (empieza después de la fila 1, no pasa por ella)
+  doc.line(xRight, yPos + rowH, xRight, yPos + rowH * 5);
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("5.1. Desviación de eje :", xLeft + 2, yPos + 3.3);
   doc.text("5.2. Desviación de Columna :", xRight + 2, yPos + 3.3);
 
-  // Row 2: headers
-  doc.line(tablaInicioX, yPos + rowH * 2, tablaInicioX + tablaAncho, yPos + rowH * 2);
   const ejeLabelW = 28;
   const ejeOptW = (halfW - ejeLabelW) / 3;
   // Calcular variables para 5.2 antes de usarlas
@@ -1038,31 +1004,28 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
   const xDesvLabelEnd = xRight + desvLabelW;
   const desvOptW = (halfW - desvLabelW) / 2;
 
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Normal", xLeft + ejeLabelW + ejeOptW / 2, yPos + rowH + 3.3, { align: "center" });
-  doc.text("Derecha", xLeft + ejeLabelW + ejeOptW * 1.5, yPos + rowH + 3.3, { align: "center" });
-  doc.text("Concavidad Izquierda", xLeft + ejeLabelW + ejeOptW * 2.5, yPos + rowH + 3.3, { align: "center" });
-  doc.text("SI", xDesvLabelEnd + desvOptW / 2, yPos + rowH + 3.3, { align: "center" });
-  doc.text("NO", xDesvLabelEnd + desvOptW * 1.5, yPos + rowH + 3.3, { align: "center" });
+  // Líneas verticales internas (5.1) - empiezan después de la fila 1
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.line(xLeft + ejeLabelW, yPos + rowH, xLeft + ejeLabelW, yPos + rowH * 5);
+  doc.line(xLeft + ejeLabelW + ejeOptW, yPos + rowH, xLeft + ejeLabelW + ejeOptW, yPos + rowH * 5);
+  doc.line(xLeft + ejeLabelW + ejeOptW * 2, yPos + rowH, xLeft + ejeLabelW + ejeOptW * 2, yPos + rowH * 5);
+  // Líneas verticales internas (5.2) - empiezan después de la fila 1
+  doc.line(xDesvLabelEnd, yPos + rowH, xDesvLabelEnd, yPos + rowH * 5);
+  doc.line(xDesvLabelEnd + desvOptW, yPos + rowH, xDesvLabelEnd + desvOptW, yPos + rowH * 5);
 
-  // Líneas verticales internas (5.1)
-  doc.line(xLeft + ejeLabelW, yPos + rowH, xLeft + ejeLabelW, yPos + rowH * 6);
-  doc.line(xLeft + ejeLabelW + ejeOptW, yPos + rowH, xLeft + ejeLabelW + ejeOptW, yPos + rowH * 6);
-  doc.line(xLeft + ejeLabelW + ejeOptW * 2, yPos + rowH, xLeft + ejeLabelW + ejeOptW * 2, yPos + rowH * 6);
-  // Líneas verticales internas (5.2)
-  doc.line(xDesvLabelEnd, yPos + rowH, xDesvLabelEnd, yPos + rowH * 6);
-  doc.line(xDesvLabelEnd + desvOptW, yPos + rowH, xDesvLabelEnd + desvOptW, yPos + rowH * 6);
-
-  // Filas de data (4 filas para alinear con 5.2)
-  for (let i = 0; i < 4; i++) {
-    doc.line(tablaInicioX, yPos + rowH * (3 + i), tablaInicioX + tablaAncho, yPos + rowH * (3 + i));
+  // Filas de data (4 filas: después de cada fila de datos)
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  for (let i = 0; i < 3; i++) {
+    doc.line(tablaInicioX, yPos + rowH * (2 + i), tablaInicioX + tablaAncho, yPos + rowH * (2 + i));
   }
+  // La línea inferior del rectángulo exterior (yPos + rowH * 5) ya está dibujada por el rectángulo
 
   const filasEje = [
     { label: "Cervical :", n: datos.columaVertebralEjeCervicalNormal, d: datos.columaVertebralEjeCervicalDerecha, i: datos.columaVertebralEjeCervicalIzquierda },
     { label: "Dorsal :", n: datos.columaVertebralEjeDorsalNormal, d: datos.columaVertebralEjeDorsalDerecha, i: datos.columaVertebralEjeDorsalIzquierda },
-    { label: "Lumbar :", n: datos.columaVertebralEjeLumbarNormal, d: datos.columaVertebralEjeLumbarDerecha, i: datos.columaVertebralEjeLumbarIzquierda },
-    { label: "", n: false, d: false, i: false }
+    { label: "Lumbar :", n: datos.columaVertebralEjeLumbarNormal, d: datos.columaVertebralEjeLumbarDerecha, i: datos.columaVertebralEjeLumbarIzquierda }
   ];
 
   const filasDesv = [
@@ -1073,69 +1036,70 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
   ];
 
   filasEje.forEach((fila, idx) => {
-    const yRowTop = yPos + rowH * (2 + idx);
+    const yRowTop = yPos + rowH * (1 + idx);
     const yTexto = yRowTop + rowH / 2 + 1.2;
     doc.setFont("helvetica", "normal").setFontSize(7);
-    if (fila.label) doc.text(fila.label, xLeft + 2, yTexto);
-    // Celdas con X centrada
-    if (fila.n === true) {
-      dibujarX(doc, xLeft + ejeLabelW + ejeOptW / 2, yTexto);
-    }
-    if (fila.d === true) {
-      dibujarX(doc, xLeft + ejeLabelW + ejeOptW * 1.5, yTexto);
-    }
-    if (fila.i === true) {
-      dibujarX(doc, xLeft + ejeLabelW + ejeOptW * 2.5, yTexto);
-    }
+    doc.text(fila.label, xLeft + 2, yTexto);
+    // Mostrar texto con paréntesis: "Normal ( X )" o "Normal (  )"
+    const textoNormal = fila.n === true ? "Normal ( X )" : "Normal (  )";
+    const textoDerecha = fila.d === true ? "Derecha ( X )" : "Derecha (  )";
+    const textoIzquierda = fila.i === true ? "Concavidad Izq. ( X )" : "Concavidad Izq. (  )";
+    dibujarTextoConXAzul(doc, textoNormal, xLeft + ejeLabelW + ejeOptW / 2, yTexto, { align: "center" });
+    dibujarTextoConXAzul(doc, textoDerecha, xLeft + ejeLabelW + ejeOptW * 1.5, yTexto, { align: "center" });
+    dibujarTextoConXAzul(doc, textoIzquierda, xLeft + ejeLabelW + ejeOptW * 2.5, yTexto, { align: "center" });
   });
 
   filasDesv.forEach((fila, idx) => {
-    const yRowTop = yPos + rowH * (2 + idx);
+    const yRowTop = yPos + rowH * (1 + idx);
     const yTexto = yRowTop + rowH / 2 + 1.2;
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(fila.label, xRight + 2, yTexto);
-    // Celdas con X centrada
-    if (fila.si === true) {
-      dibujarX(doc, xDesvLabelEnd + desvOptW / 2, yTexto);
-    }
-    if (fila.no === true) {
-      dibujarX(doc, xDesvLabelEnd + desvOptW * 1.5, yTexto);
-    }
+    // Mostrar texto con paréntesis: "SI ( X )" o "SI (  )"
+    const textoSI = fila.si === true ? "SI ( X )" : "SI (  )";
+    const textoNO = fila.no === true ? "NO ( X )" : "NO (  )";
+    dibujarTextoConXAzul(doc, textoSI, xDesvLabelEnd + desvOptW / 2, yTexto, { align: "center" });
+    dibujarTextoConXAzul(doc, textoNO, xDesvLabelEnd + desvOptW * 1.5, yTexto, { align: "center" });
   });
 
-  yPos += rowH * 6;
+  yPos += rowH * 5;
 
-  // Bloque 5.3 / 5.4 (5 filas: títulos, cabecera, 3 filas data)
-  await verificarSaltoPagina(rowH * 5);
-  doc.rect(tablaInicioX, yPos, tablaAncho, rowH * 5);
-  doc.line(xRight, yPos, xRight, yPos + rowH * 5);
+  // Bloque 5.3 / 5.4 (4 filas: títulos + 3 filas data, sin headers)
+  await verificarSaltoPagina(rowH * 4);
+  
+  // PRIMERO: Dibujar fondo gris de la fila 1
+  doc.setFillColor(196, 196, 196);
+  doc.rect(tablaInicioX, yPos, tablaAncho, rowH, 'F');
+  
+  // DESPUÉS: Dibujar todas las líneas (horizontales y verticales)
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  // Rectángulo exterior
+  doc.rect(tablaInicioX, yPos, tablaAncho, rowH * 4, 'S'); // 'S' = Stroke only
+  // Líneas horizontales
   doc.line(tablaInicioX, yPos + rowH, tablaInicioX + tablaAncho, yPos + rowH);
   doc.line(tablaInicioX, yPos + rowH * 2, tablaInicioX + tablaAncho, yPos + rowH * 2);
   doc.line(tablaInicioX, yPos + rowH * 3, tablaInicioX + tablaAncho, yPos + rowH * 3);
-  doc.line(tablaInicioX, yPos + rowH * 4, tablaInicioX + tablaAncho, yPos + rowH * 4);
+  // Línea vertical divisoria (empieza después de la fila 1, no pasa por ella porque ahí va texto)
+  doc.line(xRight, yPos + rowH, xRight, yPos + rowH * 4);
 
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("5.3. Palpación :      DOLOR", xLeft + 2, yPos + 3.3);
   doc.text("5.4. Exploración :      Signo de Lasague", xRight + 2, yPos + 3.3);
 
-  // Headers SI/NO
+  // Líneas verticales empiezan después de la fila 1 (sin divisiones en la fila de títulos)
   const palLabelW = 42;
   const palOptW = (halfW - palLabelW) / 2;
   const palXLabelEnd = xLeft + palLabelW;
-  doc.line(palXLabelEnd, yPos + rowH, palXLabelEnd, yPos + rowH * 5);
-  doc.line(palXLabelEnd + palOptW, yPos + rowH, palXLabelEnd + palOptW, yPos + rowH * 5);
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  doc.line(palXLabelEnd, yPos + rowH, palXLabelEnd, yPos + rowH * 4);
+  doc.line(palXLabelEnd + palOptW, yPos + rowH, palXLabelEnd + palOptW, yPos + rowH * 4);
 
   const lasLabelW = 52;
   const lasOptW = (halfW - lasLabelW) / 2;
   const lasXLabelEnd = xRight + lasLabelW;
-  doc.line(lasXLabelEnd, yPos + rowH, lasXLabelEnd, yPos + rowH * 5);
-  doc.line(lasXLabelEnd + lasOptW, yPos + rowH, lasXLabelEnd + lasOptW, yPos + rowH * 5);
-
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("SI", palXLabelEnd + palOptW / 2, yPos + rowH + 3.3, { align: "center" });
-  doc.text("NO", palXLabelEnd + palOptW * 1.5, yPos + rowH + 3.3, { align: "center" });
-  doc.text("SI", lasXLabelEnd + lasOptW / 2, yPos + rowH + 3.3, { align: "center" });
-  doc.text("NO", lasXLabelEnd + lasOptW * 1.5, yPos + rowH + 3.3, { align: "center" });
+  doc.line(lasXLabelEnd, yPos + rowH, lasXLabelEnd, yPos + rowH * 4);
+  doc.line(lasXLabelEnd + lasOptW, yPos + rowH, lasXLabelEnd + lasOptW, yPos + rowH * 4);
 
   // Palpación rows
   const palpRows = [
@@ -1144,39 +1108,35 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
     { label: "Lumbar :", si: datos.columaVertebralPalpacionLumbarSi, no: datos.columaVertebralPalpacionLumbarNo }
   ];
   palpRows.forEach((fila, idx) => {
-    const yRowTop = yPos + rowH * (2 + idx);
+    const yRowTop = yPos + rowH * (1 + idx);
     const yTexto = yRowTop + rowH / 2 + 1.2;
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(fila.label, xLeft + 2, yTexto);
-    // Celdas con X centrada
-    if (fila.si === true) {
-      dibujarX(doc, palXLabelEnd + palOptW / 2, yTexto);
-    }
-    if (fila.no === true) {
-      dibujarX(doc, palXLabelEnd + palOptW * 1.5, yTexto);
-    }
+    // Mostrar texto con paréntesis: "SI ( X )" o "SI (  )"
+    const textoSI = fila.si === true ? "SI ( X )" : "SI (  )";
+    const textoNO = fila.no === true ? "NO ( X )" : "NO (  )";
+    dibujarTextoConXAzul(doc, textoSI, palXLabelEnd + palOptW / 2, yTexto, { align: "center" });
+    dibujarTextoConXAzul(doc, textoNO, palXLabelEnd + palOptW * 1.5, yTexto, { align: "center" });
   });
 
-  // Lasague rows (2 filas) - empezar desde fila 3 para alinear con las últimas 2 filas de Palpación
+  // Lasague rows (2 filas) - alineadas con las últimas 2 filas de Palpación
   const lasRows = [
     { label: "Derecho :", si: datos.columaVertebralExploracionLesagueDerechoSi, no: datos.columaVertebralExploracionLesagueDerechoNo },
     { label: "Izquierdo :", si: datos.columaVertebralExploracionLesagueIzquierdoSi, no: datos.columaVertebralExploracionLesagueIzquierdoNo }
   ];
   lasRows.forEach((fila, idx) => {
-    const yRowTop = yPos + rowH * (3 + idx); // Empezar en fila 3 (después de header)
+    const yRowTop = yPos + rowH * (1 + idx); // Empezar después de la fila 1
     const yTexto = yRowTop + rowH / 2 + 1.2;
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(fila.label, xRight + 2, yTexto);
-    // Celdas con X centrada
-    if (fila.si === true) {
-      dibujarX(doc, lasXLabelEnd + lasOptW / 2, yTexto);
-    }
-    if (fila.no === true) {
-      dibujarX(doc, lasXLabelEnd + lasOptW * 1.5, yTexto);
-    }
+    // Mostrar texto con paréntesis: "SI ( X )" o "SI (  )"
+    const textoSI = fila.si === true ? "SI ( X )" : "SI (  )";
+    const textoNO = fila.no === true ? "NO ( X )" : "NO (  )";
+    dibujarTextoConXAzul(doc, textoSI, lasXLabelEnd + lasOptW / 2, yTexto, { align: "center" });
+    dibujarTextoConXAzul(doc, textoNO, lasXLabelEnd + lasOptW * 1.5, yTexto, { align: "center" });
   });
 
-  yPos += rowH * 5;
+  yPos += rowH * 4;
 
   // === VIII. DIAGNÓSTICO ===
   await verificarSaltoPagina(10);
@@ -1198,29 +1158,37 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
   doc.text(recTxt, tablaInicioX + tablaAncho / 2, yPos + 13, { align: "center", maxWidth: tablaAncho - 10 });
   yPos += 25;
 
+  // Anchos fijos para las celdas de SI/NO (con paréntesis)
+  const anchoCeldaSINO = 18; // Ancho suficiente para "SI ( X )" o "NO ( X )"
+  
+  // Calcular posiciones desde la derecha (pegadas al final)
+  const xNO = tablaInicioX + tablaAncho - anchoCeldaSINO; // Última celda al final
+  const xSI = xNO - anchoCeldaSINO;
+  
+  // Labels
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const labelTratamiento = "X. Tratamiento :";
+  const labelConclusiones = "XI. Conclusiones Asintomático :";
+  
+  const xLabel = tablaInicioX;
+  
   // === X. TRATAMIENTO ===
   await verificarSaltoPagina(filaAltura);
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
-  // Líneas verticales para celdas
-  const xTratLabel = tablaInicioX + 50;
-  const xTratSi = xTratLabel + 15;
-  const xTratNo = xTratSi + 20;
-  doc.line(xTratLabel, yPos, xTratLabel, yPos + filaAltura);
-  doc.line(xTratSi, yPos, xTratSi, yPos + filaAltura);
-  doc.line(xTratNo, yPos, xTratNo, yPos + filaAltura);
+  
+  // Líneas verticales para celdas (solo 2 celdas: SI y NO)
+  doc.line(xSI, yPos, xSI, yPos + filaAltura);
+  doc.line(xNO, yPos, xNO, yPos + filaAltura);
+  
   const yCentroTrat = yPos + filaAltura / 2 + 1.2;
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("X. Tratamiento :", tablaInicioX + 2, yCentroTrat);
-  doc.text("SI", xTratLabel + 2, yCentroTrat);
-  if (datos.tratamientoSi === true) {
-    dibujarX(doc, xTratSi + 10, yCentroTrat);
-  }
-  doc.text("NO", xTratNo + 2, yCentroTrat);
-  if (datos.tratamientoNo === true) {
-    dibujarX(doc, xTratNo + 10, yCentroTrat);
-  }
+  doc.text(labelTratamiento, xLabel + 2, yCentroTrat);
+  const textoSITrat = datos.tratamientoSi === true ? "SI ( X )" : "SI (  )";
+  const textoNOTrat = datos.tratamientoNo === true ? "NO ( X )" : "NO (  )";
+  dibujarTextoConXAzul(doc, textoSITrat, xSI + anchoCeldaSINO / 2, yCentroTrat, { align: "center" });
+  dibujarTextoConXAzul(doc, textoNOTrat, xNO + anchoCeldaSINO / 2, yCentroTrat, { align: "center" });
   yPos += filaAltura;
 
   // === XI. CONCLUSIONES ASINTOMÁTICO ===
@@ -1228,33 +1196,24 @@ const drawExamenFisico = async (doc, datos = {}, yInicio, numeroPaginaInicial = 
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
-  // Líneas verticales para celdas
-  const xConLabel = tablaInicioX + 68;
-  const xConSi = xConLabel + 15;
-  const xConNo = xConSi + 20;
-  doc.line(xConLabel, yPos, xConLabel, yPos + filaAltura);
-  doc.line(xConSi, yPos, xConSi, yPos + filaAltura);
-  doc.line(xConNo, yPos, xConNo, yPos + filaAltura);
+  
+  // Líneas verticales para celdas (mismas posiciones)
+  doc.line(xSI, yPos, xSI, yPos + filaAltura);
+  doc.line(xNO, yPos, xNO, yPos + filaAltura);
+  
   const yCentroCon = yPos + filaAltura / 2 + 1.2;
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("XI. Conclusiones Asintomático :", tablaInicioX + 2, yCentroCon);
-  doc.text("SI", xConLabel + 2, yCentroCon);
-  if (datos.conclusionAsintomaticoSi === true) {
-    dibujarX(doc, xConSi + 10, yCentroCon);
-  }
-  doc.text("NO", xConNo + 2, yCentroCon);
-  if (datos.conclusionAsintomaticoNo === true) {
-    dibujarX(doc, xConNo + 10, yCentroCon);
-  }
+  doc.text(labelConclusiones, xLabel + 2, yCentroCon);
+  const textoSICon = datos.conclusionAsintomaticoSi === true ? "SI ( X )" : "SI (  )";
+  const textoNOCon = datos.conclusionAsintomaticoNo === true ? "NO ( X )" : "NO (  )";
+  dibujarTextoConXAzul(doc, textoSICon, xSI + anchoCeldaSINO / 2, yCentroCon, { align: "center" });
+  dibujarTextoConXAzul(doc, textoNOCon, xNO + anchoCeldaSINO / 2, yCentroCon, { align: "center" });
   yPos += filaAltura;
 
   // === FIRMAS (Paciente + Médico) ===
   const alturaSeccionFirma = 30;
   await verificarSaltoPagina(alturaSeccionFirma + 8);
-  doc.setDrawColor(0, 0, 0);
-  doc.setLineWidth(0.2);
-  doc.rect(tablaInicioX, yPos, tablaAncho, alturaSeccionFirma);
-
+  // Sin celdas/rectángulo, solo dibujar las firmas
   const yFirmas = yPos + 3;
   await dibujarFirmas({ doc, datos: { ...datos, ...datos.informacionSede }, y: yFirmas, pageW, mostrarFirmaPaciente: true });
 

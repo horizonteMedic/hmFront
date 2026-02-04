@@ -1,7 +1,9 @@
 import Swal from "sweetalert2";
 import {
     GetInfoServicioDefault,
+    handleSubidaMasiva,
     handleSubirArchivoDefault,
+    handleSubirArchivoDefaultSinSellos,
     LoadingDefault,
     PrintHojaRDefault,
     ReadArchivosFormDefault,
@@ -333,7 +335,7 @@ export const GetInfoServicioEditar = async (
             // Examen Físico - Información Adicional
             detalleInformacionExamenFisico: res.detalleInformacion_d_informacion ?? "",
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
             //===============PARTE INFERIOR=======================
             // Conclusión y Comentarios
             aptoDesde: res.fechaDesde_f_desde ?? today,
@@ -545,14 +547,18 @@ export const Loading = (mensaje) => {
 };
 
 export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
-    const coordenadas = {
-        HUELLA: { x: 400, y: 680, width: 60, height: 60 },
-        FIRMA: { x: 466, y: 680, width: 120, height: 60 },
-        SELLOFIRMA: { x: 40, y: 680, width: 120, height: 80 },
-    };
-    handleSubirArchivoDefault(form, selectedSede, registrarPDF, userlogued, token, coordenadas)
+    // const coordenadas = {
+    //     HUELLA: { x: 400, y: 680, width: 60, height: 60 },
+    //     FIRMA: { x: 466, y: 680, width: 120, height: 60 },
+    //     SELLOFIRMA: { x: 40, y: 680, width: 120, height: 80 },
+    // };
+    handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
 };
 
 export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
     ReadArchivosFormDefault(form, setVisualerOpen, token)
+}
+
+export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token) => {
+    handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token)
 }

@@ -2,6 +2,7 @@ import Swal from "sweetalert2";
 import {
   GetInfoPacDefault,
   GetInfoServicioDefault,
+  handleSubidaMasiva,
   handleSubirArchivoDefaultSinSellos,
   LoadingDefault,
   PrintHojaRDefault,
@@ -75,7 +76,8 @@ export const GetInfoServicio = async (
       hallazgos: res.hallazgo ?? "",
       recomendaciones: res.recomendaciones ?? "",
 
-      user_medicoFirma: res.usuarioFirma,
+      user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+      user_doctorAsignado: res.doctorAsignado,
       SubirDoc: true,
       digitalizacion: res.digitalizacion
     }));
@@ -114,6 +116,7 @@ export const SubmitDataService = async (
     edadPaciente: form.edad,
 
     usuarioFirma: form.user_medicoFirma,
+    doctorAsignado: form.user_doctorAsignado,
     userRegistro: user,
   };
 
@@ -214,4 +217,7 @@ export const handleSubirArchivo = async (form, selectedSede, userlogued, token) 
 
 export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
   ReadArchivosFormDefault(form, setVisualerOpen, token)
+}
+export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token) => {
+  handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token)
 }

@@ -54,7 +54,7 @@ export const GetInfoServicio = async (
       valueC: res.reCocaina ?? "NEGATIVO",
       metodo: res.txtMetodo ?? "INMUNOCROMATOGRAFICO",
 
-      user_medicoFirma: res.usuarioFirma,
+      user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado,
     }));
   }

@@ -21,7 +21,7 @@ import Antecedentes from "./Antecedentes/Antecedentes";
 import PruebasComplementarias from "./PruebasComplementarias/PruebasComplementarias";
 import ExamenFisico from "./ExamenFisico/ExamenFisico";
 import { useSessionData } from "../../../../hooks/useSessionData";
-import { handleSubirArchivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerFichaCertificadoAltura";
+import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerFichaCertificadoAltura";
 import Swal from "sweetalert2";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
@@ -343,12 +343,11 @@ export default function FichaCertificadoAltura() {
                                     value={form?.puestoTrabajo}
                                     disabled
                                 />
-                                {form.SubirDoc &&
-                                    <ButtonsPDF
-                                        handleSave={() => { handleSubirArchivo(form, selectedSede, userlogued, token) }}
-                                        handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token) }}
-                                    />
-                                }
+                                <ButtonsPDF
+                                    {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
+                                    {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+                                    handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
+                                />
                             </div>
                         </section>
 

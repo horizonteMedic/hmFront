@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import { SubmitOITModel, SubmitOITModelSinDatos } from "./model";
 import OIT_B_Digitalizado from "../../../../../jaspers/OIT/OIT_B_Digitalizado";
 import OIT_B_Digitalizado_boro from "../../../../../jaspers/OIT/OIT_B_Digitalizado_boro";
-import { handleSubirArchivoDefaultSinSellos, ReadArchivosFormDefault } from "../../../../../utils/functionUtils";
+import { handleSubidaMasiva, handleSubirArchivoDefaultSinSellos, ReadArchivosFormDefault } from "../../../../../utils/functionUtils";
 
 const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta"
 
@@ -80,7 +80,7 @@ export const GetInfoPacLaboratorioFil = (nro, tabla, set, token) => {
         ...res,
         SubirDoc: true,
         digitalizacion: res.digitalizacion,
-        user_medicoFirma: res.usuarioFirma,
+        user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       }))
     })
     .finally(() => {
@@ -188,4 +188,8 @@ export const handleSubirArchivo = async (form, selectedSede, userlogued, token) 
 
 export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
   ReadArchivosFormDefault(form, setVisualerOpen, token)
+}
+
+export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token, nomenclatura) => {
+  handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token, nomenclatura)
 }

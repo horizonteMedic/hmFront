@@ -62,7 +62,7 @@ export const GetInfoServicio = async (
       valueAnti: res.txtAntidepresivos ?? "NEGATIVO",
       metodo: res.txtMetodo ?? "INMUNOCROMATOGRAFICO",
 
-      user_medicoFirma: res.usuarioFirma,
+      user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado,
     }));
   }

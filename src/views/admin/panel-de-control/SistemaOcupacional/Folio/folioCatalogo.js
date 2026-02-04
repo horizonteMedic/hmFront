@@ -151,71 +151,221 @@ export const EXAMENES_CATALOGO = {
         nombre: "DECLARACION USO FIRMA",
         tabla: "DECLARACION USO FIRMA",
         nomenclatura: "DECLARACION USO FIRMA",
+        esArchivo: true,
     },
 
     ELECTROCARDIOGRAMA_ARCHIVO: {
         nombre: "ELECTROCARDIOGRAMA ARCHIVO",
         tabla: "ELECTROCARDIOGRAMA",
         nomenclatura: "ELECTROCARDIOGRAMA",
+        esArchivo: true,
+    },
+
+    LABORATORIO_ARCHIVO_EXTERNO: {
+        nombre: "LABORATORIO ARCHIVO EXTERNO",
+        tabla: "LABORATORIO MANIPULADORES",
+        nomenclatura: "LABORATORIO MANIPULADORES",
+        esArchivo: true,
     },
 
     ESPIROMETRIA_ARCHIVO: {
         nombre: "ESPIROMETRIA",
         tabla: "ESPIROMETRIA",
         nomenclatura: "ESPIROMETRIA",
+        tablaArchivo: "funcion_abs",
+        urlInfo: "/api/v01/ct/espirometria/obtenerReporteEspirometria",
+        esArchivo: true,
     },
 
     INTERCONSULTAS: {
         nombre: "INTERCONSULTAS",
         tabla: "",
         url: "",
+        esArchivo: true,
     },
 
     OFTALMOLOGIA_VISION_TESTER: {
-        nombre: "OFTALMOLOGIA VISION TESTER",
+        nombre: "VISION TESTER ARCHIVO EXTERNO",
         tabla: "OFTALMOLOGIA VISION TESTER",
         nomenclatura: "OFTALMOLOGIA VISION TESTER",
+        tablaArchivo: "oftalmologia2021",
+        urlInfo: "/api/v01/ct/agudezaVisual/obtenerReporteEvaluacionOftalmologica",
+        esArchivo: true,
     },
 
     PSICOSENSOMETRICO_CERT_ALTURA: {
-        nombre: "PSICOSENSOMETRICO CERT-ALTURA",
+        nombre: "CERT. ALTURA ARCHIVO EXTERNO",
         tabla: "PSICOSENSOMETRICO CERT-ALTURA",
         nomenclatura: "PSICOSENSOMETRICO CERT-ALTURA",
+        tablaArchivo: "b_certificado_altura",
+        urlInfo: "/api/v01/ct/certificadoTrabajoAltura/obtenerReporteCertificadoTrabajoAltura",
+        esArchivo: true,
+    },
+
+    PSICOSENSOMETRICO_CERT_ALTURA_PODEROSA: {
+        nombre: "CERT. ALTURA PODEROSA ARCHIVO EXTERNO",
+        tabla: "PSICOSENSOMETRICO ALTU-POD",
+        nomenclatura: "PSICOSENSOMETRICO ALTU-POD",
+        tablaArchivo: "certificado_altura_poderosa",
+        urlInfo: "/api/v01/ct/certificadoTrabajoAltura/obtenerReporteCertificadoTrabajoAlturaPoderosa",
+        esArchivo: true,
+    },
+
+    PSICOSENSOMETRICO_CERT_ALTURA_1_8: {
+        nombre: "ALTURA 1.8 ARCHIVO EXTERNO",
+        tabla: "PSICOSENSOMETRICO ALTURA 1-8",
+        nomenclatura: "PSICOSENSOMETRICO ALTURA 1-8",
+        tablaArchivo: "certificacion_medica_altura",
+        urlInfo: "/api/v01/ct/certificacionMedicinaAltura/obtenerReporteCertificacionMedicinaAltura",
+        esArchivo: true,
     },
 
     PSICOSENSOMETRICO_VEHI_FOLIO: {
-        nombre: "PSICOSENSOMETRICO VEHI-FOLIO",
+        nombre: "PSICOSENSOMETRICO CONDUCCION ARCHIVO EXTERNO",
         tabla: "PSICOSENSOMETRICO VEHI-FOLIO",
         nomenclatura: "PSICOSENSOMETRICO VEHI-FOLIO",
+        tablaArchivo: "b_certificado_conduccion",
+        urlInfo: "/api/v01/ct/certificadoConduccion/obtenerReporteCertificadoConduccion",
+        esArchivo: true,
     },
 
     RADIOGRAFIA_COLUMNA_ARCHIVO: {
         nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA) ARCHIVO",
         tabla: "INFORME RADIOGRAFICO",
         nomenclatura: "INFORME RADIOGRAFICO",
+        esArchivo: true,
     },
 
     RADIOGRAFIA_COLUMNA_ARCHIVO2: {
         nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA) ARCHIVO 2",
         tabla: "INFORME RADIOGRAFICO 2",
         nomenclatura: "INFORME RADIOGRAFICO 2",
+        esArchivo: true,
     },
 
     RAYOS_X_TORAX_ARCHIVO: {
         nombre: "RAYOS X TORAX ARCHIVO",
         tabla: "RAYOS X TORAX",
         nomenclatura: "RAYOS X TORAX",
+        esArchivo: true,
     },
 
     /* =========================
        LABORATORIO
     ========================= */
+    HEMOGRAMA: {
+        nombre: "HEMOGRAMA",
+        tabla: "hemograma_autom",
+        url: "/api/v01/ct/laboratorio/obtenerReporteLabHematograma",
+        esJasper: true,
+    },
+
+    ACIDO_URICO: {//NUEVO Gr
+        nombre: "ACIDO URICO",
+        tabla: "ac_bioquimica2022",
+        url: "/api/v01/ct/analisisBioquimico/obtenerReporteAcidoUrico",
+        esJasper: true,
+    },
+
     GONADOTROPINA: {
-        nombre: "INMUNOLOGIA - GENODOTROPINA",
+        nombre: "INMUNOLOGIA - GONADOTROPINA",
         tabla: "lgonadotropina",
         url: "/api/v01/ct/inmunologia/obtenerReporteLgonadotropina",
     },
 
+    INMUNOLOGIA_BK_KOH: {
+        nombre: "INMUNOLOGIA BK-KOH",
+        tabla: "microbiologia",
+        url: "/api/v01/ct/inmunologia/obtenerReporteMicrobiologia",
+        esJasper: true,
+    },
+
+    
+    INMUNLOGIA_AGLUTINACIONES: { //nuevo
+        nombre: "INMUNOLOGIA - AGLUTINACIONES",
+        tabla: "inmunologia",
+        url: "/api/v01/ct/inmunologia/obtenerReporteInmunologia",
+        esJasper: true,
+    },
+
+    INMUNOLOGIA_HEPATITIS: { //nuevo
+        nombre: "INMUNOLOGIA - HEPATITIS",
+        tabla: "lhepatitis",
+        url: "/api/v01/ct/inmunologia/obtenerReporteHepatitis",
+        esJasper: true,
+    },
+
+    INMUNOLOGIA_VRL: { //nuevo
+        nombre: "INMUNOLOGIA - VRL",
+        tabla: "inmunologia_vdrl",
+        url: "/api/v01/ct/inmunologia/obtenerReporteVdrl",
+        esJasper: true,
+    },
+ 
+
+    PANEL_2D: { //nuevo
+        nombre: "PANEL 2D",
+        tabla: "panel2d",
+        url: "/api/v01/ct/toxicologia/obtenerReportePanel2D",
+        esJasper: true,
+    },	
+
+    PANEL_3D: { //nuevo
+        nombre: "PANEL 3D",
+        tabla: "panel3d",
+        url: "/api/v01/ct/toxicologia/obtenerReportePanel3D",
+        esJasper: true,
+    },
+
+    PANEL_4D: { //nuevo
+        nombre: "PANEL 4D",
+        tabla: "panel4d",
+        url: "/api/v01/ct/toxicologia/obtenerReportePanel4D",
+        esJasper: true,
+    },
+
+   PANEL_10D: { //nuevo
+        nombre: "PANEL 10D",
+        tabla: "panel10d",
+        url: "/api/v01/ct/toxicologia/obtenerReportePanel10D",
+        esJasper: true,
+    },
+
+
+    CONSENT_PANEL_3D: { //nuevo
+        nombre: "CONSENTIMIENTO PANEL 3D",
+        tabla: "con_panel3D",
+        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
+        nameConset: true,
+    },
+
+    CONSENT_PANEL_4D: { //nuevo
+        nombre: "CONSENTIMIENTO PANEL 4D",
+        tabla: "con_panel4D",
+        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
+        nameConset: true,
+    },
+
+    CONSENT_PANEL_10D: { //nuevo
+        nombre: "CONSENTIMIENTO PANEL 10D",
+        tabla: "con_panel10D",
+        url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
+        nameConset: true,
+    },
+
+    MANIPULADORES_COPROCULTIVO: { //nuevo
+        nombre: "MANIPULADORES COPROCULTIVO",
+        tabla: "ac_coprocultivo",
+        url: "/api/v01/ct/manipuladores/obtenerReporteCoprocultivo",
+        esJasper: true,
+    },
+
+    MANIPULADORES_PARASITOLOGIA:{ //nuevo
+        nombre: "MANIPULADORES PARASITOLOGIA",
+        tabla: "ac_coproparasitologico",
+        url: "/api/v01/ct/manipuladores/obtenerReporteCoproparasitologico",
+        esJasper: true,
+    },
     LABORATORIO_CLINICO: {
         nombre: "LABORATORIO CLINICO",
         tabla: "lab_clinico",
@@ -396,6 +546,13 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/testFatigaSomnolencia/obtenerReporteTestFatigaSomnolencia",
     },
 
+    ALTURA1PUNTO8: {
+        nombre: "ALTURA 1.8",
+        tabla: "certificacion_medica_altura",
+        url: "/api/v01/ct/certificacionMedicinaAltura/obtenerReporteCertificacionMedicinaAltura",
+        esJasper: true,
+    },
+
     /* =========================
        PSICOLOGÍA
     ========================= */
@@ -428,8 +585,22 @@ export const EXAMENES_CATALOGO = {
     },
 
     INFORME_PODEROSA_OPERAR: {
-        nombre: "INFORME PSICOLOGICO DE PODEROSA LICENCIA PARA OPERAR",
-        tabla: "evaluacion_psicologica_poderosa",
+        nombre: "INFORME PSICOLOGICO DE PODEROSA LICENCIA PARA OPERAR - NORMAL",
+        tabla: "evaluacion_psicologica_poderosa_normal",
+        url: "/api/v01/ct/evaluacionPsicologicaPoderosa/obtenerReporteEvaluacionPsicologicaPoderosa",
+        esJasper: true,
+    },
+
+    INFORME_PODEROSA_OPERAR_LICENCIA: {
+        nombre: "INFORME PSICOLOGICO DE PODEROSA LICENCIA PARA OPERAR - LICENCIA",
+        tabla: "evaluacion_psicologica_poderosa_licencia",
+        url: "/api/v01/ct/evaluacionPsicologicaPoderosa/obtenerReporteEvaluacionPsicologicaPoderosa",
+        esJasper: true,
+    },
+
+    INFORME_PODEROSA_OPERAR_CALIENTE: {
+        nombre: "INFORME PSICOLOGICO DE PODEROSA LICENCIA PARA OPERAR - CALIENTE",
+        tabla: "evaluacion_psicologica_poderosa_caliente",
         url: "/api/v01/ct/evaluacionPsicologicaPoderosa/obtenerReporteEvaluacionPsicologicaPoderosa",
         esJasper: true,
     },
@@ -480,6 +651,13 @@ export const EXAMENES_CATALOGO = {
         nombre: "TRABAJOS EN ESPECIFICOS",
         tabla: "especificos",
         url: "/api/v01/ct/trabajoEspecifico/obtenerReporteTrabajosEspecificos",
+        esJasper: true,
+    },
+
+    CALIDADSUEÑO: {
+        nombre: "CALIDAD DE SUEÑO",
+        tabla: "calidad_sueño",
+        url: "/api/v01/ct/cuestionarioCalidadSueno/obtenerReporteCalidadSueno",
         esJasper: true,
     },
 };

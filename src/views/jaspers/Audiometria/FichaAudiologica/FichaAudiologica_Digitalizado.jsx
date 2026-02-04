@@ -23,15 +23,15 @@ const drawHeader = async (doc, datos = {}) => {
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Nro de ficha: ", pageW - 80, 15);
   doc.setFont("helvetica", "bold").setFontSize(18);
-  doc.text(String(datos.norden || datos.numeroFicha || ""), pageW - 50, 16);
+  doc.text(String(datos.norden || ""), pageW - 50, 16);
 
   // Sede
   doc.setFont("helvetica", "normal").setFontSize(8);
-  const sedeValue = datos.sede || datos.nombreSede || "";
+  const sedeValue = datos.sede || "";
   doc.text("Sede: " + sedeValue, pageW - 80, 20);
 
   // Fecha de examen
-  const fechaExamen = toDDMMYYYY(datos.fechaExamen || datos.fechaRegistro || datos.fechaAu || "");
+  const fechaExamen = toDDMMYYYY(datos.fechaExamen || datos.fechaAu || "");
   doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
 
   // Página
@@ -60,14 +60,14 @@ const drawPatientData = (doc, datos = {}) => {
   const filaAltura = 5;
   let yPos = 35;
 
-  // Preparar datos - mapeo desde los datos del backend
+  // Preparar datos - mapeo desde los datos del backend (solo campos que envía el backend)
   const apellidosNombres = String(datos?.nombres ?? '');
   const dni = String(datos?.dni ?? '');
-  const edad = String(datos?.edad ?? datos?.edadFa ?? '');
-  const sexo = datos?.genero === 'F' || datos?.genero === 'Femenino' ? 'FEMENINO' : datos?.genero === 'M' || datos?.genero === 'Masculino' ? 'MASCULINO' : '';
-  const fechaNac = toDDMMYYYY(datos?.fechaNacimientoPaciente ?? datos?.fechaNac ?? "");
+  const edad = String(datos?.edad ?? '');
+  const sexo = datos?.genero === 'F' ? 'FEMENINO' : datos?.genero === 'M' ? 'MASCULINO' : '';
+  const fechaNac = toDDMMYYYY(datos?.fechaNacimientoPaciente ?? "");
   const ocupacion = String(datos?.ocupacion ?? '');
-  const cargo = String(datos?.cargoPaciente ?? datos?.cargo ?? '');
+  const area = String(datos?.area ?? '');
   const empresa = String(datos?.empresa ?? '');
   const contrata = String(datos?.contrata ?? 'N/A');
   
@@ -166,7 +166,7 @@ const drawPatientData = (doc, datos = {}) => {
   doc.text(ocupacion, tablaInicioX + 24, yPos + 3.5);
   yPos += filaAltura;
 
-  // Fila 4: Cargo | Empresa
+  // Fila 4: Área | Empresa
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
@@ -174,9 +174,9 @@ const drawPatientData = (doc, datos = {}) => {
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Cargo:", tablaInicioX + 2, yPos + 3.5);
+  doc.text("Área:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(cargo, tablaInicioX + 18, yPos + 3.5);
+  doc.text(area, tablaInicioX + 18, yPos + 3.5);
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Empresa:", tablaInicioX + 92, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getFetch } from "../../../../getFetch/getFetch";
 import {
   InputTextOneLine,
@@ -10,9 +10,12 @@ import {
 import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
 import { useSessionData } from '../../../../../../hooks/useSessionData';
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerHematologiaBioquimicaECO";
+import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerHematologiaBioquimicaECO";
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
 import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import ButtonsPDF from "../../../../../../components/reusableComponents/ButtonsPDF";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
 const tabla = "lab_clinico";
 
@@ -100,6 +103,11 @@ export default function HematologiaBioquimicaECO() {
 
     observaciones: '',
 
+    notasDoctor: "",
+
+    SubirDoc: false,
+    nomenclatura: "LABORATORIO MANIPULADORES",
+
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
@@ -107,6 +115,8 @@ export default function HematologiaBioquimicaECO() {
     nombre_doctorAsignado: "",
     user_doctorAsignado: "",
   };
+
+  const [visualerOpen, setVisualerOpen] = useState(null)
 
   const {
     form,
@@ -204,6 +214,11 @@ export default function HematologiaBioquimicaECO() {
           value={form.nombreExamen}
           disabled
           labelWidth="120px"
+        />
+        <ButtonsPDF
+          {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
+          {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+          handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
         />
       </SectionFieldset>
       <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
@@ -341,6 +356,7 @@ export default function HematologiaBioquimicaECO() {
                 options={[{ label: "O", value: "O" }, { label: "A", value: "A" }, { label: "B", value: "B" }, { label: "AB", value: "AB" }]}
                 labelWidth="120px"
                 onChange={handleRadioButton}
+                allowUncheck
               />
               <InputsRadioGroup
                 label="Factor Rh"
@@ -350,6 +366,7 @@ export default function HematologiaBioquimicaECO() {
                 labelWidth="120px"
                 className="mb-4"
                 onChange={handleRadioButton}
+                allowUncheck
               />
               {[
                 ["Hemoglobina", "g/dl"],
@@ -699,6 +716,13 @@ export default function HematologiaBioquimicaECO() {
             rows={4}
             onChange={handleChange}
           />
+          <InputTextArea
+            label="Notas Para Doctor"
+            name="notasDoctor"
+            value={form.notasDoctor}
+            rows={4}
+            onChange={handleChange}
+          />
           <EmpleadoComboBox
             value={form.nombre_medico}
             label="Especialista"
@@ -715,6 +739,24 @@ export default function HematologiaBioquimicaECO() {
           />
         </SectionFieldset>
       </SectionFieldset>
+      {visualerOpen && (
+        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
+            <div className="px-4 py-2 naranjabackgroud flex justify-between">
+              <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
+              <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+            </div>
+            <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
+              <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
+            </div>
+            <div className="flex justify-center">
+              <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
 
       <BotonesAccion //space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto
         form={form}

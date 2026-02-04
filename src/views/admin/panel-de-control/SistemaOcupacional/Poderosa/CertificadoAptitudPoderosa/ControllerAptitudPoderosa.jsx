@@ -15,9 +15,7 @@ const obtenerReporteUrl =
     "/api/v01/ct/aptitudAltura/obtenerReporteAptitudAlturaPoderosa";
 const registrarUrl =
     "/api/v01/ct/aptitudAltura/registrarActualizarAptitudAlturaPoderosa";
-const registrarPDF =
-    "/api/v01/ct/archivos/archivoInterconsulta"
-const today = getToday();
+
 
 export const GetInfoServicio = async (
     nro,
@@ -47,7 +45,7 @@ export const GetInfoServicio = async (
             ocupacionPaciente: res.areaO,
             fechaExamen: prev.fechaExamen,
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
     }
 };
@@ -79,7 +77,6 @@ export const GetInfoServicioEditar = async (
             dniUser: res.dniUsuario,
             apto: res.apto ? "APTO" : res.aptoRestriccion ? "APTOCONRESTRICCION" : res.aptoTemporal ? "NOAPTOTEMPORAL" : res.noApto ? "NOAPTO" : "",
             nombre_medico: res.nombreMedico,
-            SubirDoc: true,
             digitalizacion: res.digitalizacion,
         }));
     }
@@ -111,7 +108,7 @@ export const SubmitDataService = async (
         "observaciones": form.observaciones,
         "horaSalida": getHoraActual(),
         "usuarioRegistro": form.userlogued,
-        
+
         usuarioFirma: form.user_medicoFirma,
     };
 
@@ -200,16 +197,3 @@ export const VerifyTRPerzonalizado = async (nro, tabla, token, set, sede, noTien
 export const Loading = (mensaje) => {
     LoadingDefault(mensaje);
 };
-
-export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
-    const coordenadas = {
-        HUELLA: { x: 400, y: 680, width: 60, height: 60 },
-        FIRMA: { x: 466, y: 680, width: 120, height: 60 },
-        SELLOFIRMA: { x: 40, y: 680, width: 120, height: 80 },
-    };
-    handleSubirArchivoDefault(form, selectedSede, registrarPDF, userlogued, token, coordenadas)
-};
-
-export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
-    ReadArchivosFormDefault(form, setVisualerOpen, token)
-}

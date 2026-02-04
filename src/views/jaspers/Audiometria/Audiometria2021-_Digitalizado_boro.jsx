@@ -9,8 +9,8 @@ import header_Audiometria2021_Digitalizado_boro from "./headers/header_Audiometr
  * @param {jsPDF} doc
  */
 const body_Audiometria2021_Digitalizado = async (doc, data) => {
-  // Header
-  await header_Audiometria2021_Digitalizado_boro(doc, data);
+  // Header (devuelve la posición Y final de los datos personales)
+  const yPosFinalDatos = await header_Audiometria2021_Digitalizado_boro(doc, data);
 
   function drawCenteredText(text, centerX, y, options = {}) {
     const textWidth = doc.getTextWidth(text);
@@ -18,13 +18,13 @@ const body_Audiometria2021_Digitalizado = async (doc, data) => {
     doc.text(text, x, y, options);
   }
 
-  // Insertar imagen cuerpo2-8.png en la parte superior
+  // Insertar imagen cuerpo2-8.png después de los datos personales
   const pageW = doc.internal.pageSize.getWidth();
   const margin = 16;
   const usableW = pageW - margin * 2;
   const imgW = usableW; // Menos ancho, deja márgenes
   const imgH = 90; // Más alto
-  let y = 45;
+  let y = yPosFinalDatos + 2; // Empezar justo después de los datos personales con un pequeño espacio
   try {
     console.log(margin, y);
     doc.addImage(

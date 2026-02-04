@@ -9,6 +9,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {
   handleSubirArchivo,
+  handleSubirArchivoMasivo,
   PrintHojaR,
   ReadArchivosForm,
   SubmitDataService,
@@ -310,12 +311,11 @@ export default function OftalmologiaOhla() {
               disabled
             />
           </div>
-          {form.SubirDoc &&
-            <ButtonsPDF
-              handleSave={() => { handleSubirArchivo(form, selectedSede, userlogued, token) }}
-              handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token) }}
-            />
-          }
+          <ButtonsPDF
+            {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
+            {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+            handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
+          />
         </div>
       </div>
       {/* Tabs */}

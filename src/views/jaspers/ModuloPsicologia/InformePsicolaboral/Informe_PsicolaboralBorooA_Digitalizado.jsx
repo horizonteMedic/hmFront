@@ -90,7 +90,7 @@ export default async function Informe_PsicolaboralBorooA_Digitalizado(data = {},
   await drawHeader(numeroPagina);
 
   // === FUNCIONES AUXILIARES ===
-  // Función para texto con salto de línea
+  // Función para texto con salto de línea (respeta \n y hace wrap de palabras)
   const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
     // Validar que el texto no sea undefined, null o vacío
     if (!texto || texto === null || texto === undefined) {
@@ -98,34 +98,83 @@ export default async function Informe_PsicolaboralBorooA_Digitalizado(data = {},
     }
 
     const fontSize = doc.internal.getFontSize();
-    const palabras = String(texto).split(' ');
-    let lineaActual = '';
+    const textoStr = String(texto);
+    
+    // Primero dividir por saltos de línea explícitos (\n)
+    const parrafos = textoStr.split('\n');
     let yPos = y;
 
-    palabras.forEach(palabra => {
-      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
-      const anchoTexto = doc.getTextWidth(textoPrueba);
+    parrafos.forEach((parrafo, parrafoIndex) => {
+      // Si no es el primer párrafo, agregar espacio extra entre párrafos
+      if (parrafoIndex > 0 && parrafo.trim() !== '') {
+        yPos += fontSize * 0.35; // Espacio entre párrafos
+      }
 
-      if (anchoTexto <= anchoMaximo) {
-        lineaActual = textoPrueba;
-      } else {
-        if (lineaActual) {
-          doc.text(lineaActual, x, yPos);
-          yPos += fontSize * 0.35; // salto real entre líneas
-          lineaActual = palabra;
+      // Si el párrafo está vacío, solo agregar un pequeño espacio
+      if (parrafo.trim() === '') {
+        yPos += fontSize * 0.35;
+        return;
+      }
+
+      // Para cada párrafo, hacer wrap de palabras
+      const palabras = parrafo.split(' ');
+      let lineaActual = '';
+
+      palabras.forEach(palabra => {
+        const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+        const anchoTexto = doc.getTextWidth(textoPrueba);
+
+        if (anchoTexto <= anchoMaximo) {
+          lineaActual = textoPrueba;
         } else {
-          doc.text(palabra, x, yPos);
-          yPos += fontSize * 0.35;
+          if (lineaActual) {
+            doc.text(lineaActual, x, yPos);
+            yPos += fontSize * 0.35; // salto real entre líneas
+            lineaActual = palabra;
+          } else {
+            // Si la palabra sola es más larga que el ancho máximo, dividirla
+            const lineasPalabra = doc.splitTextToSize(palabra, anchoMaximo);
+            lineasPalabra.forEach((linea, idx) => {
+              if (idx > 0) {
+                yPos += fontSize * 0.35;
+              }
+              doc.text(linea, x, yPos);
+            });
+            yPos += fontSize * 0.35;
+            lineaActual = '';
+          }
         }
+      });
+
+      if (lineaActual) {
+        doc.text(lineaActual, x, yPos);
+        yPos += fontSize * 0.35;
       }
     });
 
-    if (lineaActual) {
-      doc.text(lineaActual, x, yPos);
-      yPos += fontSize * 0.35;
-    }
-
     return yPos; // Devuelve la nueva posición final
+  };
+
+  // Función auxiliar para dividir texto respetando \n y luego hacer wrap
+  const dividirTextoConSaltosLinea = (texto, anchoMaximo) => {
+    if (!texto) return [];
+    
+    const textoStr = String(texto);
+    const parrafos = textoStr.split('\n');
+    const todasLasLineas = [];
+    
+    parrafos.forEach((parrafo) => {
+      if (parrafo.trim() === '') {
+        // Si el párrafo está vacío, agregar una línea vacía
+        todasLasLineas.push('');
+      } else {
+        // Dividir cada párrafo por ancho máximo
+        const lineasParrafo = doc.splitTextToSize(parrafo, anchoMaximo);
+        todasLasLineas.push(...lineasParrafo);
+      }
+    });
+    
+    return todasLasLineas;
   };
 
   // Función para dibujar X en las columnas
@@ -166,7 +215,7 @@ export default async function Informe_PsicolaboralBorooA_Digitalizado(data = {},
   const tablaInicioX = 5;
   const tablaAncho = 200;
   let yPos = 35;
-  const filaAltura = 4.5;
+  const filaAltura = 5;
 
   // Header de datos personales
   yPos = dibujarHeaderSeccion("1. DATOS PERSONALES", yPos, filaAltura);
@@ -291,8 +340,6 @@ export default async function Informe_PsicolaboralBorooA_Digitalizado(data = {},
   yTexto += filaAltura;
 
   // === SECCIÓN: CRITERIOS PSICOLÓGICOS ===
-  // (Misma estructura que el archivo original)
-  // ... (copiar toda la sección de CRITERIOS PSICOLÓGICOS del archivo original)
   // Fila gris: Título CRITERIOS PSICOLÓGICOS
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
@@ -312,7 +359,7 @@ export default async function Informe_PsicolaboralBorooA_Digitalizado(data = {},
   doc.text("CRITERIOS PSICOLÓGICOS", tablaInicioX + tablaAncho / 2, yPos + 3.5, { align: "center" });
   yPos += filaAltura;
 
-  // Fila celeste: Aspecto Intelectual | Inferior | Promedio Inferior | Promedio | Promedio superior | Superior
+  // Constantes para las columnas
   const colNumero = 8;
   const colAspecto = 60;
   const col1Total = colNumero + colAspecto;
@@ -322,86 +369,7 @@ export default async function Informe_PsicolaboralBorooA_Digitalizado(data = {},
   const col4 = anchoColumnaEvaluacion;
   const col5 = anchoColumnaEvaluacion;
 
-  // Dibujar fondo celeste
-  doc.setFillColor(199, 241, 255);
-  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
-
-  // Dibujar líneas verticales para las columnas del header
-  doc.setDrawColor(0, 0, 0);
-  doc.setLineWidth(0.2);
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + col1Total, yPos, tablaInicioX + col1Total, yPos + filaAltura);
-  doc.line(tablaInicioX + col1Total + col2, yPos, tablaInicioX + col1Total + col2, yPos + filaAltura);
-  doc.line(tablaInicioX + col1Total + col2 + col3, yPos, tablaInicioX + col1Total + col2 + col3, yPos + filaAltura);
-  doc.line(tablaInicioX + col1Total + col2 + col3 + col4, yPos, tablaInicioX + col1Total + col2 + col3 + col4, yPos + filaAltura);
-  doc.line(tablaInicioX + col1Total + col2 + col3 + col4 + col5, yPos, tablaInicioX + col1Total + col2 + col3 + col4 + col5, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-
-  // Texto de las columnas del header
-  doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("Aspecto Intelectual", tablaInicioX + col1Total / 2, yPos + 3.5, { align: "center" });
-  doc.text("Inferior", tablaInicioX + col1Total + col2 / 2, yPos + 3.5, { align: "center" });
-  doc.text("Promedio Inferior", tablaInicioX + col1Total + col2 + col3 / 2, yPos + 3.5, { align: "center" });
-  doc.text("Promedio", tablaInicioX + col1Total + col2 + col3 + col4 / 2, yPos + 3.5, { align: "center" });
-  doc.text("Promedio superior", tablaInicioX + col1Total + col2 + col3 + col4 + col5 / 2, yPos + 3.5, { align: "center" });
-  doc.text("Superior", tablaInicioX + col1Total + col2 + col3 + col4 + col5 + anchoColumnaEvaluacion / 2, yPos + 3.5, { align: "center" });
-  yPos += filaAltura;
-
-  // === FILAS DE ASPECTOS INTELECTUALES ===
-  const aspectos = [
-    "Razonamiento y Resolucion de problemas",
-    "Memoria",
-    "Atencion y Concentración",
-    "Coordinación viso-motora",
-    "Orientación Espacial",
-    "Comprensión verbal"
-  ];
-
-  aspectos.forEach((aspecto, index) => {
-    const numero = index + 1;
-    const aspectoNum = numero;
-
-    const inferior = data[`aspectoIntelectual${aspectoNum}I`];
-    const promedioInferior = data[`aspectoIntelectual${aspectoNum}NPI`];
-    const promedio = data[`aspectoIntelectual${aspectoNum}NP`];
-    const promedioSuperior = data[`aspectoIntelectual${aspectoNum}NPS`];
-    const superior = data[`aspectoIntelectual${aspectoNum}S`];
-
-    doc.setDrawColor(0, 0, 0);
-    doc.setLineWidth(0.2);
-    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-    doc.line(tablaInicioX + colNumero, yPos, tablaInicioX + colNumero, yPos + filaAltura);
-    doc.line(tablaInicioX + col1Total, yPos, tablaInicioX + col1Total, yPos + filaAltura);
-    doc.line(tablaInicioX + col1Total + col2, yPos, tablaInicioX + col1Total + col2, yPos + filaAltura);
-    doc.line(tablaInicioX + col1Total + col2 + col3, yPos, tablaInicioX + col1Total + col2 + col3, yPos + filaAltura);
-    doc.line(tablaInicioX + col1Total + col2 + col3 + col4, yPos, tablaInicioX + col1Total + col2 + col3 + col4, yPos + filaAltura);
-    doc.line(tablaInicioX + col1Total + col2 + col3 + col4 + col5, yPos, tablaInicioX + col1Total + col2 + col3 + col4 + col5, yPos + filaAltura);
-    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(String(numero), tablaInicioX + 2, yPos + 3.5);
-    doc.text(aspecto, tablaInicioX + colNumero + 2, yPos + 3.5);
-
-    const centroY = yPos + filaAltura / 2 + 1.2;
-    if (inferior) {
-      dibujarX(tablaInicioX + col1Total + col2 / 2, centroY);
-    } else if (promedioInferior) {
-      dibujarX(tablaInicioX + col1Total + col2 + col3 / 2, centroY);
-    } else if (promedio) {
-      dibujarX(tablaInicioX + col1Total + col2 + col3 + col4 / 2, centroY);
-    } else if (promedioSuperior) {
-      dibujarX(tablaInicioX + col1Total + col2 + col3 + col4 + col5 / 2, centroY);
-    } else if (superior) {
-      dibujarX(tablaInicioX + col1Total + col2 + col3 + col4 + col5 + anchoColumnaEvaluacion / 2, centroY);
-    }
-
-    yPos += filaAltura;
-  });
-
+  // === SECCIÓN: ASPECTOS DE PERSONALIDAD ===
   // Fila celeste: Aspectos de Personalidad
   const colNumeroPersonalidad = colNumero;
   const col1TotalPersonalidad = col1Total;
@@ -440,9 +408,7 @@ export default async function Informe_PsicolaboralBorooA_Digitalizado(data = {},
     "Estabilidad emocional",
     "Tolerancia a la frustración",
     "Autoestima",
-    "Asertividad",
-    "Ansiedad ESTADO",
-    "Ansiedad RASGO"
+    "Asertividad"
   ];
 
   aspectosPersonalidad.forEach((aspecto, index) => {
@@ -574,17 +540,17 @@ export default async function Informe_PsicolaboralBorooA_Digitalizado(data = {},
       yFinalValor = dibujarTextoConSaltoLinea(String(aspecto.valor), xValor, yPos + 3, anchoColumnaValor);
     }
 
-    const alturaNecesaria = yFinalValor - yPos;
-    const alturaMinimaFila = filaAltura;
-    const alturaRealFila = Math.max(alturaMinimaFila, alturaNecesaria + 2);
+    // Calcular altura necesaria con mínimo de filaAltura (5)
+    const alturaNecesaria = Math.max(filaAltura, yFinalValor - yPos + 2);
+    
+    // Redibujar líneas verticales con la altura correcta
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesaria);
+    doc.line(tablaInicioX + colNumeroConductual, yPos, tablaInicioX + colNumeroConductual, yPos + alturaNecesaria);
+    doc.line(tablaInicioX + colNumeroConductual + colDescripcionConductual, yPos, tablaInicioX + colNumeroConductual + colDescripcionConductual, yPos + alturaNecesaria);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesaria);
+    doc.line(tablaInicioX, yPos + alturaNecesaria, tablaInicioX + tablaAncho, yPos + alturaNecesaria);
 
-    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRealFila);
-    doc.line(tablaInicioX + colNumeroConductual, yPos, tablaInicioX + colNumeroConductual, yPos + alturaRealFila);
-    doc.line(tablaInicioX + colNumeroConductual + colDescripcionConductual, yPos, tablaInicioX + colNumeroConductual + colDescripcionConductual, yPos + alturaRealFila);
-    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRealFila);
-    doc.line(tablaInicioX, yPos + alturaRealFila, tablaInicioX + tablaAncho, yPos + alturaRealFila);
-
-    yPos += alturaRealFila;
+    yPos += alturaNecesaria;
   }
 
   // === SECCIÓN: ASPECTOS PSICOLABORALES ===
@@ -687,7 +653,7 @@ export default async function Informe_PsicolaboralBorooA_Digitalizado(data = {},
   // Header gris: OBSERVACIONES
   yPos = dibujarHeaderSeccion("OBSERVACIONES:", yPos, filaAltura);
 
-  // Fila dinámica para contenido de observaciones
+  // Fila con altura dinámica (mínimo 5)
   const textoObservaciones = (datosFinales.observaciones || "-").toUpperCase();
 
   doc.setDrawColor(0, 0, 0);
@@ -700,24 +666,70 @@ export default async function Informe_PsicolaboralBorooA_Digitalizado(data = {},
   let yFinalObservaciones = dibujarTextoConSaltoLinea(textoObservaciones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
 
   const alturaMaximaObs = pageHeight - yPos - 25;
-  if (yFinalObservaciones - yPos > alturaMaximaObs) {
+  let alturaNecesariaObservaciones = Math.max(filaAltura, yFinalObservaciones - yPos + 2);
+  
+  // Si el contenido no cabe, dividirlo en múltiples páginas
+  if (alturaNecesariaObservaciones > alturaMaximaObs) {
+    // Dibujar líneas de la primera página con la altura máxima disponible
+    const alturaPrimeraPagina = alturaMaximaObs;
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaPrimeraPagina);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaPrimeraPagina);
+    doc.line(tablaInicioX, yPos + alturaPrimeraPagina, tablaInicioX + tablaAncho, yPos + alturaPrimeraPagina);
+    
+    // Nueva página para el resto del contenido
     doc.addPage();
     numeroPagina++;
     yPos = 45;
     await drawHeader(numeroPagina);
+    
+    // Dibujar líneas de la nueva página
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    
+    // Dibujar el texto restante usando dividirTextoConSaltosLinea para respetar \n
+    const lineasTexto = dividirTextoConSaltosLinea(textoObservaciones, tablaAncho - 4);
     doc.setFont("helvetica", "normal").setFontSize(7);
-    yFinalObservaciones = dibujarTextoConSaltoLinea(textoObservaciones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
+    let yTextoActual = yPos + 3;
+    
+    // Calcular cuántas líneas ya se dibujaron en la primera página
+    const lineasEnPrimeraPagina = Math.floor((alturaPrimeraPagina - 3) / 3.5);
+    const lineasRestantes = lineasTexto.slice(lineasEnPrimeraPagina);
+    
+    for (let idx = 0; idx < lineasRestantes.length; idx++) {
+      if (yTextoActual + 3.5 > pageHeight - 20) {
+        doc.addPage();
+        numeroPagina++;
+        yPos = 45;
+        await drawHeader(numeroPagina);
+        yTextoActual = yPos + 3;
+        // Redibujar líneas en la nueva página
+        doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+        doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+        doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+      }
+      // Si la línea está vacía (salto de párrafo), agregar espacio extra
+      if (lineasRestantes[idx].trim() === '') {
+        yTextoActual += 3.5; // Espacio extra para párrafo
+      } else {
+        doc.text(lineasRestantes[idx], tablaInicioX + 2, yTextoActual);
+        yTextoActual += 3.5;
+      }
+    }
+    
+    // Calcular altura final
+    alturaNecesariaObservaciones = Math.max(filaAltura, yTextoActual - yPos + 2);
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesariaObservaciones);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesariaObservaciones);
+    doc.line(tablaInicioX, yPos + alturaNecesariaObservaciones, tablaInicioX + tablaAncho, yPos + alturaNecesariaObservaciones);
+  } else {
+    // Si cabe en una página, dibujar las líneas finales
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesariaObservaciones);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesariaObservaciones);
+    doc.line(tablaInicioX, yPos + alturaNecesariaObservaciones, tablaInicioX + tablaAncho, yPos + alturaNecesariaObservaciones);
   }
 
-  const alturaNecesariaObservaciones = yFinalObservaciones - yPos;
-  const alturaMinimaFilaObs = filaAltura;
-  const alturaRealObservaciones = Math.max(alturaMinimaFilaObs, alturaNecesariaObservaciones + 2);
-
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRealObservaciones);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRealObservaciones);
-  doc.line(tablaInicioX, yPos + alturaRealObservaciones, tablaInicioX + tablaAncho, yPos + alturaRealObservaciones);
-
-  yPos += alturaRealObservaciones;
+  yPos += alturaNecesariaObservaciones;
 
   // === SECCIÓN: RECOMENDACIONES (CON HEADER GRIS) ===
   if (yPos + espacioMinimo > pageHeight - 20) {
@@ -730,7 +742,7 @@ export default async function Informe_PsicolaboralBorooA_Digitalizado(data = {},
   // Header gris: RECOMENDACIONES
   yPos = dibujarHeaderSeccion("RECOMENDACIONES:", yPos, filaAltura);
 
-  // Fila dinámica para contenido de recomendaciones
+  // Fila con altura dinámica (mínimo 5)
   const textoRecomendaciones = (datosFinales.recomendaciones || "-").toUpperCase();
 
   doc.setDrawColor(0, 0, 0);
@@ -743,24 +755,70 @@ export default async function Informe_PsicolaboralBorooA_Digitalizado(data = {},
   let yFinalRecomendaciones = dibujarTextoConSaltoLinea(textoRecomendaciones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
 
   const alturaMaximaRec = pageHeight - yPos - 25;
-  if (yFinalRecomendaciones - yPos > alturaMaximaRec) {
+  let alturaNecesariaRecomendaciones = Math.max(filaAltura, yFinalRecomendaciones - yPos + 2);
+  
+  // Si el contenido no cabe, dividirlo en múltiples páginas
+  if (alturaNecesariaRecomendaciones > alturaMaximaRec) {
+    // Dibujar líneas de la primera página con la altura máxima disponible
+    const alturaPrimeraPagina = alturaMaximaRec;
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaPrimeraPagina);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaPrimeraPagina);
+    doc.line(tablaInicioX, yPos + alturaPrimeraPagina, tablaInicioX + tablaAncho, yPos + alturaPrimeraPagina);
+    
+    // Nueva página para el resto del contenido
     doc.addPage();
     numeroPagina++;
     yPos = 45;
     await drawHeader(numeroPagina);
+    
+    // Dibujar líneas de la nueva página
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    
+    // Dibujar el texto restante usando dividirTextoConSaltosLinea para respetar \n
+    const lineasTexto = dividirTextoConSaltosLinea(textoRecomendaciones, tablaAncho - 4);
     doc.setFont("helvetica", "normal").setFontSize(7);
-    yFinalRecomendaciones = dibujarTextoConSaltoLinea(textoRecomendaciones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
+    let yTextoActual = yPos + 3;
+    
+    // Calcular cuántas líneas ya se dibujaron en la primera página
+    const lineasEnPrimeraPagina = Math.floor((alturaPrimeraPagina - 3) / 3.5);
+    const lineasRestantes = lineasTexto.slice(lineasEnPrimeraPagina);
+    
+    for (let idx = 0; idx < lineasRestantes.length; idx++) {
+      if (yTextoActual + 3.5 > pageHeight - 20) {
+        doc.addPage();
+        numeroPagina++;
+        yPos = 45;
+        await drawHeader(numeroPagina);
+        yTextoActual = yPos + 3;
+        // Redibujar líneas en la nueva página
+        doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+        doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+        doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+      }
+      // Si la línea está vacía (salto de párrafo), agregar espacio extra
+      if (lineasRestantes[idx].trim() === '') {
+        yTextoActual += 3.5; // Espacio extra para párrafo
+      } else {
+        doc.text(lineasRestantes[idx], tablaInicioX + 2, yTextoActual);
+        yTextoActual += 3.5;
+      }
+    }
+    
+    // Calcular altura final
+    alturaNecesariaRecomendaciones = Math.max(filaAltura, yTextoActual - yPos + 2);
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesariaRecomendaciones);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesariaRecomendaciones);
+    doc.line(tablaInicioX, yPos + alturaNecesariaRecomendaciones, tablaInicioX + tablaAncho, yPos + alturaNecesariaRecomendaciones);
+  } else {
+    // Si cabe en una página, dibujar las líneas finales
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaNecesariaRecomendaciones);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaNecesariaRecomendaciones);
+    doc.line(tablaInicioX, yPos + alturaNecesariaRecomendaciones, tablaInicioX + tablaAncho, yPos + alturaNecesariaRecomendaciones);
   }
 
-  const alturaNecesariaRecomendaciones = yFinalRecomendaciones - yPos;
-  const alturaMinimaFilaRec = filaAltura;
-  const alturaRealRecomendaciones = Math.max(alturaMinimaFilaRec, alturaNecesariaRecomendaciones + 2);
-
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRealRecomendaciones);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRealRecomendaciones);
-  doc.line(tablaInicioX, yPos + alturaRealRecomendaciones, tablaInicioX + tablaAncho, yPos + alturaRealRecomendaciones);
-
-  yPos += alturaRealRecomendaciones;
+  yPos += alturaNecesariaRecomendaciones;
 
   // === SECCIÓN: CONCLUSIONES (CON HEADER GRIS) ===
   if (yPos + espacioMinimo > pageHeight - 20) {
@@ -771,52 +829,9 @@ export default async function Informe_PsicolaboralBorooA_Digitalizado(data = {},
   }
 
   // Header gris: CONCLUSIONES
-  yPos = dibujarHeaderSeccion("CONCLUSIONES:", yPos, filaAltura);
+  yPos = dibujarHeaderSeccion("CONCLUSIONES", yPos, filaAltura);
 
-  // Fila dinámica para contenido de conclusiones
-  const textoConclusiones = (datosFinales.conclusiones || "-").toUpperCase();
-
-  doc.setDrawColor(0, 0, 0);
-  doc.setLineWidth(0.2);
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  let yFinalConclusiones = dibujarTextoConSaltoLinea(textoConclusiones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
-
-  const alturaMaximaConcl = pageHeight - yPos - 25;
-  if (yFinalConclusiones - yPos > alturaMaximaConcl) {
-    doc.addPage();
-    numeroPagina++;
-    yPos = 45;
-    await drawHeader(numeroPagina);
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    yFinalConclusiones = dibujarTextoConSaltoLinea(textoConclusiones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
-  }
-
-  const alturaNecesariaConclusiones = yFinalConclusiones - yPos;
-  const alturaMinimaFilaConcl = filaAltura;
-  const alturaRealConclusiones = Math.max(alturaMinimaFilaConcl, alturaNecesariaConclusiones + 2);
-
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaRealConclusiones);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaRealConclusiones);
-  doc.line(tablaInicioX, yPos + alturaRealConclusiones, tablaInicioX + tablaAncho, yPos + alturaRealConclusiones);
-
-  yPos += alturaRealConclusiones;
-
-  // === SECCIÓN: CUMPLE/NO CUMPLE CON EL PERFIL (CON HEADER GRIS) ===
-  if (yPos + filaAltura + 5 > pageHeight - 20) {
-    doc.addPage();
-    numeroPagina++;
-    yPos = 45;
-    await drawHeader(numeroPagina);
-  }
-
-  // Header gris: CUMPLE CON EL PERFIL / NO CUMPLE CON EL PERFIL
-  yPos = dibujarHeaderSeccion("CUMPLE CON EL PERFIL / NO CUMPLE CON EL PERFIL", yPos, filaAltura);
-
-  // Fila con dos columnas iguales
+  // Fila con dos columnas: CUMPLE CON EL PERFIL | NO CUMPLE CON EL PERFIL
   const anchoColumna = tablaAncho / 2;
 
   doc.setDrawColor(0, 0, 0);

@@ -223,19 +223,25 @@ export const VerifyTRPerzonalizadoDefault = async (nro, tabla, token, set, sede,
         return;
     }
     LoadingDefault("Validando datos");
-    getFetch(
-        `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
-        token
-    ).then((res) => {
-        if (res.id === 0) {
-            //No tiene registro previo 
-            noTieneRegistro();//datos paciente
-        } else if (res.id === 2) {
-            necesitaExamen();
-        } else {
-            tieneRegistro();//obtener data servicio
-        }
-    });
+    try {
+        getFetch(
+            `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
+            token
+        ).then((res) => {
+            if (res.id === 0) {
+                //No tiene registro previo 
+                noTieneRegistro();//datos paciente
+            } else if (res.id === 2) {
+                necesitaExamen();
+            } else {
+                tieneRegistro();//obtener data servicio
+            }
+        });
+    } catch (error) {
+        console.log(error)
+        Swal.fire("Ocurrio un Error al Validar la Información");
+    }
+
 };
 
 export const GetInfoServicioDefault = async (
@@ -462,6 +468,10 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
             URL.revokeObjectURL(pdfUrl);
         }, 1000);
 
+        const nombreOriginal = file.name.replace(/\.pdf$/i, "");
+        const idCorto = generarIdCorto();
+        const nombreFinal = `${nombreOriginal}-${idCorto}.pdf`;
+
         const datos = {
             rutaArchivo: null,
             dni: null,
@@ -474,7 +484,7 @@ export const handleSubirArchivoDefault = async (form, selectedSede, urlPDf, user
             userActualizacion: null,
             id_tipo_archivo: null,
 
-            nombreArchivo: file.name,
+            nombreArchivo: nombreFinal,
             codigoSede: selectedSede,
             fileBase64: pdfBase64Final,
             nomenclatura_tipo_archivo: form.nomenclatura,
@@ -537,6 +547,10 @@ export const handleSubirArchivoDefaultSinSellos = async (
 
         const pdfBase64Final = uint8ToBase64(pdfBytes);
 
+        const nombreOriginal = file.name.replace(/\.pdf$/i, "");
+        const idCorto = generarIdCorto();
+        const nombreFinal = `${nombreOriginal}-${idCorto}.pdf`;
+
         const datos = {
             rutaArchivo: null,
             dni: null,
@@ -549,7 +563,7 @@ export const handleSubirArchivoDefaultSinSellos = async (
             userActualizacion: null,
             id_tipo_archivo: null,
 
-            nombreArchivo: file.name,
+            nombreArchivo: nombreFinal,
             codigoSede: selectedSede,
             fileBase64: pdfBase64Final,
             nomenclatura_tipo_archivo: form.nomenclatura,
@@ -659,6 +673,481 @@ export const handleImgtoPdfDefault = async (
     }
 };
 
+export const handleSubidaMasiva = async (form, selectedSede, urlPDf, userlogued, token) => {
+    let pdfFiles = [];
+    const { isConfirmed } = await Swal.fire({
+        title: "Selecciona la carpeta con PDFs",
+        input: "file",
+        inputAttributes: {
+            webkitdirectory: true,
+            directory: true,
+            multiple: true,
+            accept: "application/pdf",
+        },
+        showCancelButton: true,
+        confirmButtonText: "Subir archivos",
+        cancelButtonText: "Cancelar",
+        didOpen: () => {
+            const input = Swal.getInput();
+            input.addEventListener("change", () => {
+                const files = Array.from(input.files || []);
+                pdfFiles = files.filter(f => f.type === "application/pdf");
+
+                const htmlList = pdfFiles.length
+                    ? `
+                        <div style="max-height:250px;overflow:auto;text-align:left">
+                            <b>Archivos detectados (${pdfFiles.length}):</b>
+                            <ul>
+                                ${pdfFiles.map(f => `<li>${f.name}</li>`).join("")}
+                            </ul>
+                        </div>
+                      `
+                    : `<p style="color:red">No se encontraron archivos PDF</p>`;
+
+                Swal.update({ html: htmlList });
+            });
+        },
+
+        preConfirm: () => {
+            if (!pdfFiles.length) {
+                Swal.showValidationMessage(
+                    "No hay archivos PDF válidos para subir"
+                );
+                return false;
+            }
+            return true;
+        },
+    });
+
+    if (!isConfirmed) return;
+
+    LoadingDefault("Subiendo documentos...");
+
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = ("0" + (currentDate.getMonth() + 1)).slice(-2);
+    const day = ("0" + currentDate.getDate()).slice(-2);
+
+    const uploadPromises = pdfFiles.map(async (file) => {
+        const orden = obtenerOrdenDesdeNombre(file.name);
+        if (!orden) {
+            return { name: file.name, status: "ignored", message: "Sin N° Orden detectado" };
+        }
+
+        try {
+            const base64 = await readFileAsBase64(file);
+            const base64WithoutHeader = base64.split(",")[1];
+
+            const pdfBytes = Uint8Array.from(
+                atob(base64WithoutHeader),
+                (c) => c.charCodeAt(0)
+            );
+
+            const pdfBase64Final = uint8ToBase64(pdfBytes);
+
+            const nombreOriginal = file.name.replace(/\.pdf$/i, "");
+            const nombreFinal = `${nombreOriginal}-${generarIdCorto()}.pdf`;
+
+            const datos = {
+                rutaArchivo: null,
+                dni: null,
+                historiaClinica: null,
+                servidor: "azure",
+                estado: true,
+                fechaRegistro: `${year}-${month}-${day}`,
+                userRegistro: userlogued,
+                fechaActualizacion: null,
+                userActualizacion: null,
+                id_tipo_archivo: null,
+
+                nombreArchivo: nombreFinal,
+                codigoSede: selectedSede,
+                fileBase64: pdfBase64Final,
+                nomenclatura_tipo_archivo: form.nomenclatura,
+                orden,
+                indice_carga_masiva: undefined,
+            };
+
+            const res = await SubmitData(datos, urlPDf, token);
+            return {
+                name: file.name,
+                status: res?.id === 1 ? "success" : "error",
+                message: res?.id === 1 ? "OK" : (res?.message || "Error al subir")
+            };
+        } catch (err) {
+            console.error(err);
+            return { name: file.name, status: "error", message: "Error interno" };
+        }
+    });
+
+    try {
+        const results = await Promise.all(uploadPromises);
+
+        const exitosos = results.filter(r => r.status === "success");
+        const fallidos = results.filter(r => r.status !== "success");
+
+        const htmlList = `
+            <div style="text-align:left; max-height:300px; overflow:auto;">
+                <p><b>Resumen:</b> ${exitosos.length} subidos, ${fallidos.length} no subidos.</p>
+                
+                ${exitosos.length > 0 ? `
+                    <h5 style="color:green; margin-top:10px; font-size:16px;">Subidos correctamente:</h5>
+                    <ul style="font-size:14px; margin-bottom:10px;">
+                        ${exitosos.map(f => `<li>${f.name}</li>`).join("")}
+                    </ul>
+                ` : ""}
+
+                ${fallidos.length > 0 ? `
+                    <h5 style="color:red; margin-top:10px; font-size:16px;">No se pudieron subir:</h5>
+                    <ul style="font-size:14px;">
+                        ${fallidos.map(f => `<li>${f.name} <span style="color:gray">(${f.message})</span></li>`).join("")}
+                    </ul>
+                ` : ""}
+            </div>
+        `;
+
+        Swal.fire({
+            title: "Carga Finalizada",
+            html: htmlList,
+            icon: fallidos.length === 0 ? "success" : "warning",
+            width: "600px"
+        });
+    } catch (err) {
+        console.error(err);
+        Swal.fire(
+            "Error",
+            "Ocurrió un error crítico durante el proceso",
+            "error"
+        );
+    }
+}
+
+export const handleSubidaMasivaImagenes = async (
+    form,
+    selectedSede,
+    urlPDf,
+    userlogued,
+    token,
+    nomenclatura
+) => {
+    let imageFiles = [];
+
+    const { isConfirmed } = await Swal.fire({
+        title: "Selecciona la carpeta con imágenes",
+        input: "file",
+        width: 650,
+        inputAttributes: {
+            webkitdirectory: true,
+            directory: true,
+            multiple: true,
+            accept: "image/jpeg,image/png",
+        },
+        showCancelButton: true,
+        confirmButtonText: "Procesar imágenes",
+        cancelButtonText: "Cancelar",
+
+        didOpen: () => {
+            const input = Swal.getInput();
+
+            input.addEventListener("change", () => {
+                const files = Array.from(input.files || []);
+                imageFiles = files.filter(f => f.type.startsWith("image/"));
+
+                const htmlList = imageFiles.length
+                    ? `
+                        <div style="max-height:260px;overflow:auto;text-align:left">
+                            <b>Imágenes detectadas (${imageFiles.length}):</b>
+                            <ul>
+                                ${imageFiles.map(f =>
+                        `<li>${f.name} <span style="color:#888">(→ PDF)</span></li>`
+                    ).join("")}
+                            </ul>
+                        </div>
+                      `
+                    : `<p style="color:red">No se encontraron imágenes válidas</p>`;
+
+                Swal.update({ html: htmlList });
+            });
+        },
+
+        preConfirm: () => {
+            if (!imageFiles.length) {
+                Swal.showValidationMessage(
+                    "No hay imágenes válidas para subir"
+                );
+                return false;
+            }
+            return true;
+        }
+    });
+
+    if (!isConfirmed) return;
+
+    LoadingDefault("Convirtiendo imágenes a PDF...");
+
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = ("0" + (currentDate.getMonth() + 1)).slice(-2);
+    const day = ("0" + currentDate.getDate()).slice(-2);
+
+    const uploadPromises = imageFiles.map(async (file) => {
+        const orden = obtenerOrdenDesdeNombre(file.name);
+        if (!orden) {
+            return {
+                name: file.name,
+                status: "ignored",
+                message: "Sin N° Orden detectado"
+            };
+        }
+
+        try {
+            // 🔥 IMAGEN → PDF A4
+            const pdfBytes = await imagenToPdfA4(file);
+            const pdfBase64Final = uint8ToBase64(pdfBytes);
+
+            const nombreFinal =
+                file.name.replace(/\.(jpg|jpeg|png)$/i, "") +
+                `-${generarIdCorto()}.pdf`;
+
+            const datos = {
+                rutaArchivo: null,
+                dni: null,
+                historiaClinica: null,
+                servidor: "azure",
+                estado: true,
+                fechaRegistro: `${year}-${month}-${day}`,
+                userRegistro: userlogued,
+                fechaActualizacion: null,
+                userActualizacion: null,
+                id_tipo_archivo: null,
+
+                nombreArchivo: nombreFinal,
+                codigoSede: selectedSede,
+                fileBase64: pdfBase64Final,
+                nomenclatura_tipo_archivo: nomenclatura,
+                orden,
+                indice_carga_masiva: undefined,
+            };
+
+            const res = await SubmitData(datos, urlPDf, token);
+
+            return {
+                name: file.name,
+                status: res?.id === 1 ? "success" : "error",
+                message: res?.id === 1 ? "OK" : "Error al subir"
+            };
+        } catch (err) {
+            console.error(err);
+            return {
+                name: file.name,
+                status: "error",
+                message: "Error interno"
+            };
+        }
+    });
+
+    const results = await Promise.all(uploadPromises);
+
+    const exitosos = results.filter(r => r.status === "success");
+    const fallidos = results.filter(r => r.status !== "success");
+
+    const htmlResumen = `
+        <div style="text-align:left; max-height:300px; overflow:auto;">
+            <p><b>Resumen:</b> ${exitosos.length} subidas, ${fallidos.length} no subidas</p>
+
+            ${exitosos.length ? `
+                <h4 style="color:green">Convertidas y subidas:</h4>
+                <ul>${exitosos.map(r => `<li>${r.name}</li>`).join("")}</ul>
+            ` : ""}
+
+            ${fallidos.length ? `
+                <h4 style="color:red">Errores:</h4>
+                <ul>
+                    ${fallidos.map(r =>
+        `<li>${r.name} <span style="color:gray">(${r.message})</span></li>`
+    ).join("")}
+                </ul>
+            ` : ""}
+        </div>
+    `;
+
+    Swal.fire({
+        title: "Proceso finalizado",
+        html: htmlResumen,
+        icon: fallidos.length ? "warning" : "success",
+        width: 600
+    });
+};
+
+export const handleSubidaMasivaImagenesRXDinamico = async (
+    form,
+    selectedSede,
+    urlPDf,
+    userlogued,
+    token,
+    nomenclatura
+) => {
+    let imageFiles = [];
+
+    const { isConfirmed } = await Swal.fire({
+        title: "Selecciona la carpeta con imágenes",
+        input: "file",
+        width: 650,
+        inputAttributes: {
+            webkitdirectory: true,
+            directory: true,
+            multiple: true,
+            accept: "image/jpeg,image/png",
+        },
+        showCancelButton: true,
+        confirmButtonText: "Procesar imágenes",
+        cancelButtonText: "Cancelar",
+
+        didOpen: () => {
+            const input = Swal.getInput();
+
+            input.addEventListener("change", () => {
+                const files = Array.from(input.files || []);
+                imageFiles = files.filter(f => f.type.startsWith("image/"));
+
+                const htmlList = imageFiles.length
+                    ? `
+                        <div style="max-height:260px;overflow:auto;text-align:left">
+                            <b>Imágenes detectadas (${imageFiles.length}):</b>
+                            <ul>
+                                ${imageFiles.map(f =>
+                        `<li>${f.name} <span style="color:#888">(→ PDF)</span></li>`
+                    ).join("")}
+                            </ul>
+                        </div>
+                      `
+                    : `<p style="color:red">No se encontraron imágenes válidas</p>`;
+
+                Swal.update({ html: htmlList });
+            });
+        },
+
+        preConfirm: () => {
+            if (!imageFiles.length) {
+                Swal.showValidationMessage(
+                    "No hay imágenes válidas para subir"
+                );
+                return false;
+            }
+            return true;
+        }
+    });
+
+    if (!isConfirmed) return;
+
+    LoadingDefault("Convirtiendo imágenes a PDF...");
+
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = ("0" + (currentDate.getMonth() + 1)).slice(-2);
+    const day = ("0" + currentDate.getDate()).slice(-2);
+
+    const uploadPromises = imageFiles.map(async (file) => {
+        const orden = obtenerOrdenDesdeNombre(file.name);
+        if (!orden) {
+            return {
+                name: file.name,
+                status: "ignored",
+                message: "Sin N° Orden detectado"
+            };
+        }
+
+        // 🔎 detectar nomenclatura
+        const nomenclaturaDetectada = obtenerNomenclaturaDesdeNombre(
+            file.name,
+            form
+        );
+
+        if (!nomenclaturaDetectada) {
+            return {
+                name: file.name,
+                status: "ignored",
+                message: "Nomenclatura no detectada (RXCL / RXCL2)"
+            };
+        }
+
+        try {
+            // 🔥 IMAGEN → PDF A4
+            const pdfBytes = await imagenToPdfA4(file);
+            const pdfBase64Final = uint8ToBase64(pdfBytes);
+
+            const nombreFinal =
+                file.name.replace(/\.(jpg|jpeg|png)$/i, "") +
+                `-${generarIdCorto()}.pdf`;
+
+            const datos = {
+                rutaArchivo: null,
+                dni: null,
+                historiaClinica: null,
+                servidor: "azure",
+                estado: true,
+                fechaRegistro: `${year}-${month}-${day}`,
+                userRegistro: userlogued,
+                fechaActualizacion: null,
+                userActualizacion: null,
+                id_tipo_archivo: null,
+
+                nombreArchivo: nombreFinal,
+                codigoSede: selectedSede,
+                fileBase64: pdfBase64Final,
+                nomenclatura_tipo_archivo: nomenclaturaDetectada,
+                orden,
+                indice_carga_masiva: undefined,
+            };
+
+            const res = await SubmitData(datos, urlPDf, token);
+
+            return {
+                name: file.name,
+                status: res?.id === 1 ? "success" : "error",
+                message: res?.id === 1 ? "OK" : "Error al subir"
+            };
+        } catch (err) {
+            console.error(err);
+            return {
+                name: file.name,
+                status: "error",
+                message: "Error interno"
+            };
+        }
+    });
+    const results = await Promise.all(uploadPromises);
+    const exitosos = results.filter(r => r.status === "success");
+    const fallidos = results.filter(r => r.status !== "success");
+
+    const htmlResumen = `
+        <div style="text-align:left; max-height:300px; overflow:auto;">
+            <p><b>Resumen:</b> ${exitosos.length} subidas, ${fallidos.length} no subidas</p>
+
+            ${exitosos.length ? `
+                <h4 style="color:green">Convertidas y subidas:</h4>
+                <ul>${exitosos.map(r => `<li>${r.name}</li>`).join("")}</ul>
+            ` : ""}
+
+            ${fallidos.length ? `
+                <h4 style="color:red">Errores:</h4>
+                <ul>
+                    ${fallidos.map(r =>
+        `<li>${r.name} <span style="color:gray">(${r.message})</span></li>`
+    ).join("")}
+                </ul>
+            ` : ""}
+        </div>
+    `;
+
+    Swal.fire({
+        title: "Proceso finalizado",
+        html: htmlResumen,
+        icon: fallidos.length ? "warning" : "success",
+        width: 600
+    });
+};
+
 
 export const ReadArchivosFormDefault = async (form, setVisualerOpen, token, nomenclatura) => {
     LoadingDefault("Cargando Archivo")
@@ -678,3 +1167,40 @@ export const ReadArchivosFormDefault = async (form, setVisualerOpen, token, nome
             throw new Error('Network response was not ok.', error);
         })
 }
+
+const generarIdCorto = () => {
+    const time = Date.now().toString(36);
+    const random = Math.random().toString(36).substring(2, 6);
+    return `${time}${random}`;
+};
+
+
+const readFileAsBase64 = (file) =>
+    new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+
+const obtenerOrdenDesdeNombre = (filename) => {
+    const match = filename.match(/^(\d+)/);
+    return match ? match[1] : null;
+};
+
+const obtenerNomenclaturaDesdeNombre = (filename, form) => {
+    const normalized = filename
+        .toUpperCase()
+        .replace(/\s+/g, "")   // elimina espacios
+        .replace(/[-_]/g, ""); // elimina guiones y underscores
+
+    if (normalized.includes("RXCL2")) {
+        return form.nomenclatura2; // INFORME RADIOGRAFICO 2
+    }
+
+    if (normalized.includes("RXCL")) {
+        return form.nomenclatura; // INFORME RADIOGRAFICO
+    }
+
+    return null;
+};

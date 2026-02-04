@@ -2,6 +2,7 @@ import Swal from "sweetalert2";
 import {
   InputCheckbox,
   InputsBooleanRadioGroup,
+  InputTextArea,
   InputTextOneLine,
 } from "../../../../../components/reusableComponents/ResusableComponents";
 
@@ -239,6 +240,13 @@ export default function DatosPersonales({
               />
             </div>
           </div>
+          <InputTextArea
+            label="Notas Para Doctor"
+            name="notasDoctor"
+            value={form.notasDoctor}
+            rows={4}
+            disabled
+          />
         </div>
 
         {/* Columna Derecha */}

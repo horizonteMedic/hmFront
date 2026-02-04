@@ -332,7 +332,7 @@ export const GetInfoServicioEditar = async (
             enfermedadesOculares: res.enfermedadesOcularesOftalmo_e_oculares,
             medicacionActual: res.medicacionActualAnexo16a_m_actual,
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
     }
 };

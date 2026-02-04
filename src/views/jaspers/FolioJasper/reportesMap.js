@@ -1,4 +1,4 @@
-import Aptitud_Agroindustrial from "../Ficha_Anexo16/Aptitud_medico_ocupacional_F";
+import Aptitud_medico_ocupacional_F from "../Ficha_Anexo16/Aptitud_medico_ocupacional_F";
 import Anexo7C_Antiguo from "../Anexo16/Anexo7C_Boro";
 import GenerarDatosPaciente from "../AntecedentesAltura/AnexoCB_Digitalizado";
 import Anexo16A_Digitalizado from "../Anexo16A/Anexo16A_Digitalizado";
@@ -12,6 +12,7 @@ import AnalisisBioquimicos_Digitalizado from "../AnalisisBioquimicos/AnalisisBio
 import RagiografiaToraxPA_Digitalizado from "../RayosX/RagiografiaToraxPA_Digitalizado";
 import FichaAudiologica_Digitalizado from "../Audiometria/FichaAudiologica/FichaAudiologica_Digitalizado";
 import InformePsicologico_Digitalizado from "../ModuloPsicologia/InformePsicologico/InformePsicologico_Digitalizado";
+import Informe_Psicologico_Boroo from "../ModuloPsicologia/InformePsicologico/Informe_Psicologico_Boroo";
 import EvaluacionPsicologica_p_Digitalizado from "../ModuloPsicologia/EvaluacionPsicologicaPoderosa/InformePsicologico_Digitalizado";
 import Oftalmologia from "../Oftalmologia/Oftalmologia";
 import conInformadoOcupacional_Digitalizado from "../ConsentimientoInformado/conInformadoOcupacional_Digitalizado";
@@ -31,7 +32,7 @@ import ConsentAdmisionDeclacionAntecePatologicos from "../ModuloConsentimientos/
 import Consentimiento_Muestra_Sangre_Digitalizado from "../Consentimientos/Consentimiento_Muestra_Sangre_Digitalizado";
 import LGonadotropina_Digitalizado from "../Inmunologia/LGonadotropina_Digitalizado";
 import RAYOSXXXOFI_Digitalizado from "../RayosX/RAYOSXXXOFI_Digitalizado";
-import Audiometria2021_Digitalizado from "../Audiometria/Audiometria2021-_Digitalizado_boro";
+// import Audiometria2021_Digitalizado from "../Audiometria/Audiometria/Audiometria2021-_Digitalizado";
 import CuestionarioAudiometria_Digitalizado from "../Audiometria/CuestionarioAudiometria/CuestionarioAudiometria_Digitalizado";
 import Odontograma_Digitalizado from "../Odontologia/OdontogramaDigitalizado/Odontograma_Digitalizado";
 import ResumenAnexo7C_OHLA_Digitalizado from "../Ficha_Anexo16/ResumenMedico/ResumenAnexo7C_OHLA_Digitalizado";
@@ -66,8 +67,31 @@ import EvaluacionOftalmologica2021_Digitalizado_boro from "../Oftalmologia/Evalu
 import formatPsicologia_SuficienciaEspaciosC from "../ModuloPsicologia/InformeEspaciosConfinados/formatPsicologia_SuficienciaEspaciosC";
 import Informe_PsicolaboralBorooA_Digitalizado from "../ModuloPsicologia/InformePsicolaboral/Informe_PsicolaboralBorooA_Digitalizado";
 import Aptitud_medico_ocupacional_11 from "../Ficha_Anexo16/Aptitud_medico_ocupacional_11"
-
-
+// import Audiometria2021_Digitalizado from "../Audiometria/LegacyAudiometria/Audiometria2021-_Digitalizado";
+import Audiometria2021BORO from "../Audiometria/LegacyAudiometria/Audiometria2021-_Digitalizado_boro";
+import Audiometria2021 from "../Audiometria/LegacyAudiometria/Audiometria2021-_Digitalizado";
+import Anexo16ABoro_Digitalizado from "../Anexo16A/Anexo16ABoro_Digitalizado";
+import A_CertificacionMedicaPTA_Digitalizado from "../CertificadoAlturaPoderosa/A_CertificacionMedicaPTA_Digitalizado";
+import CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado from "../ModuloPsicologia/InformePsicoCalidadSueño/CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado";
+import Hematologia_Digitalizado_nuevo from "../LaboratorioClinico/Hematologia_Digitalizado";
+import AnalisisClinicosB_Digitalizado from "../AnalisisBioquimicos/AnalisisClinicosB_Digitalizado"
+import Microbiologia1_Digitalizado from "../Inmunologia/Microbiologia1_Digitalizado";
+import Microbiologia_Digitalizado from "../Inmunologia/Microbiologia_Digitalizado";
+import InmunologiaLab_Digitalizado from "../Inmunologia/InmunologiaLab_Digitalizado";
+import LHepatitisA_Digitalizado from "../Inmunologia/LHepatitisA_Digitalizado";
+import LHepatitisB_Digitalizado from "../Inmunologia/LHepatitisB_Digitalizado";
+import LHepatitisC_Digitalizado from "../Inmunologia/LHepatitisC_Digitalizado";
+import Informe_Lab_VRDL from "../Inmunologia/Informe_Lab_VRDL";
+import Panel2d_Digitalizado from "../Toxicologia/Panel2d_Digitalizado";
+import Panel3d_Digitalizado from "../Toxicologia/Panel3d_Digitalizado";
+import Panel4d_Digitalizado from "../Toxicologia/Panel4d_Digitalizado";
+import Panel10d_Digitalizado from "../Toxicologia/Panel10d_Digitalizado";
+import Consentimiento_Panel3D_Digitalizado from "../Consentimientos/Consentimiento_Panel3D_Digitalizado";
+import Consent_Lab_panel4D from "../Consentimientos/Consent_Lab_panel4D";
+import Consentimiento_Panel10D_Digitalizado from "../Consentimientos/Consentimiento_Panel10D_Digitalizado";
+import coprocultivo_digitalizado from "../Manipuladores/coprocultivo_digitalizado";
+import Coproparasitologico_Digitalizado from "../Manipuladores/Coproparasitologico_Digitalizado";
+import ParasitologiaSeriado_Digitalizado from "../Manipuladores/ParasitologiaSeriado_Digitalizado";
 export const reportesMap = {
    /* =========================
       GENERALES / BASE
@@ -76,7 +100,10 @@ export const reportesMap = {
 
    anexo7c: Anexo7C_Antiguo,
 
-   anexo16a: Anexo16A_Digitalizado,
+   anexo16a: {
+      Anexo16A_Digitalizado,
+      Anexo16ABoro_Digitalizado
+   },
 
    antecedentes_patologicos: {
       ficha_antecedente_patologico_Digitalizado,
@@ -87,7 +114,7 @@ export const reportesMap = {
 
    certificado_aptitud_medico_ocupacional: {
       Aptitud_medico_ocupacional_11,
-      Aptitud_Agroindustrial
+      Aptitud_medico_ocupacional_F
    }, //son 2 jaspers
 
    certificado_aptitud_medico_resumen: Aptitud_medico_resumen_Digitalizado,
@@ -141,6 +168,41 @@ export const reportesMap = {
 
    l_bioquimica: LBioquimica_Digitalizado,
 
+   hemograma_autom: Hematologia_Digitalizado_nuevo,
+
+   ac_bioquimica2022: AnalisisClinicosB_Digitalizado,
+
+   microbiologia: {//NUEVO
+      Microbiologia1_Digitalizado,
+      Microbiologia_Digitalizado
+   },
+
+
+   inmunologia: InmunologiaLab_Digitalizado,
+
+   lhepatitis:{ //nuevo
+      LHepatitisA_Digitalizado,
+      LHepatitisB_Digitalizado,
+      LHepatitisC_Digitalizado
+   },
+
+   inmunologia_vdrl: Informe_Lab_VRDL,  //nuevo
+
+   panel2d: Panel2d_Digitalizado, //nuevo
+
+   panel3d: Panel3d_Digitalizado, //nuevo
+
+   panel4d: Panel4d_Digitalizado,  //nuevo
+
+   panel10d: Panel10d_Digitalizado,  //nuevo
+
+   ac_coprocultivo: coprocultivo_digitalizado,  //nuevo
+
+   ac_coproparasitologico:{
+      Coproparasitologico_Digitalizado,  //nuevo
+      ParasitologiaSeriado_Digitalizado
+   },
+  
    /* =========================
       CONSENTIMIENTOS
    ========================= */
@@ -152,11 +214,17 @@ export const reportesMap = {
 
    CONSENT_INFORMADO_MEDICA: Consent_Admision_EvaluacionMedica,
 
+   con_panel3D: Consentimiento_Panel3D_Digitalizado,  //nuevo
+
+   con_panel4D: Consent_Lab_panel4D,   //nuevo
+
+   con_panel10D: Consentimiento_Panel10D_Digitalizado,  //nuevo
+
    consent_marihuana: Consentimiento_Marihuana_Digitalizado,
 
    consent_Muestra_Sangre: Consentimiento_Muestra_Sangre_Digitalizado,
 
-   con_panel2D: Consentimiento_Panel2D_Digitalizado,
+   con_panel2D: Consentimiento_Panel2D_Digitalizado, 
 
    con_panel5D: Consentimiento_Panel5D_ohla_Digitalizado,
 
@@ -178,7 +246,10 @@ export const reportesMap = {
       InformeElectrocardiograma_Digitalizado
    },
 
-   audiometria_2023: Audiometria2021_Digitalizado,
+   audiometria_2023: {
+      "Audiometria2021-_Digitalizado_boro": Audiometria2021BORO,
+      "Audiometria2021-_Digitalizado": Audiometria2021
+   },
 
    oftalmologia: Oftalmologia,
 
@@ -209,7 +280,11 @@ export const reportesMap = {
 
    informe_psicologico_estres: InformePsicologicoAdecoEstres_Digitalizado,
 
-   evaluacion_psicologica_poderosa: EvaluacionPsicologica_p_Digitalizado,
+   evaluacion_psicologica_poderosa_normal: EvaluacionPsicologica_p_Digitalizado,
+
+   evaluacion_psicologica_poderosa_licencia: EvaluacionPsicologica_p_Digitalizado,
+
+   evaluacion_psicologica_poderosa_caliente: EvaluacionPsicologica_p_Digitalizado,
 
    ficha_psicologica_anexo02: InformePsicologico_Anexo02_Digitalizado,
 
@@ -224,8 +299,13 @@ export const reportesMap = {
 
    psicologiafobias: formatPsicologia_Digitalizado,
 
-   informe_psicologico: InformePsicologico_Digitalizado,
+   informe_psicologico: {
+      InformePsicologico_Digitalizado,
+      Informe_Psicologico_Boroo
+   },
 
    exam_complementarios: InformePsicoExamComplementario,
 
+   certificacion_medica_altura: A_CertificacionMedicaPTA_Digitalizado,
+   calidad_sueño: CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado
 };

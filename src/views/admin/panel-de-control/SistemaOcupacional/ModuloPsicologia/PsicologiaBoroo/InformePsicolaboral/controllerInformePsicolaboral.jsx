@@ -74,7 +74,7 @@ export const GetInfoServicio = async (
             motivacion: res.aspectosPsicolaborales8A ? "A" : res.aspectosPsicolaborales8D ? "D" : res.aspectosPsicolaborales8NA ? "NA" : res.aspectosPsicolaborales8NM ? "NM" : res.aspectosPsicolaborales8PD ? "PD" : undefined,
 
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
     }
 };

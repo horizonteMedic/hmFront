@@ -11,9 +11,9 @@ import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerEvaluacionPsicologicaPoderosa";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
-
-const tabla = "evaluacion_psicologica_poderosa"
-const today = getToday();
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
+import Swal from "sweetalert2";
+import { useEffect, useState } from "react";
 
 // Áreas de Evaluación: Inteligencia
 const inteligenciaItems = [
@@ -45,7 +45,11 @@ const evalOptions = [
 ];
 
 export default function EvaluacionPsicologicaPoderosa() {
-    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+    const today = getToday();
+    const [tabla, setTabla] = useState("evaluacion_psicologica_poderosa_normal");
+    const [tipoInforme, setTipoInforme] = useState({ tipoInforme: "NORMAL" })
+
+    const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
     const initialFormState = {
         // Header
@@ -53,7 +57,7 @@ export default function EvaluacionPsicologicaPoderosa() {
         codigoEvaluacionPsicologicaPoderosa: null,
         fechaExam: today,
         nombreExamen: "",
-        tipoInforme: "NORMAL",
+        // tipoInforme: "NORMAL",
         aptitud: "",
 
         // Datos personales
@@ -96,6 +100,10 @@ export default function EvaluacionPsicologicaPoderosa() {
         amenazasDebilidades: "",
         observaciones: "",
         recomendaciones: "",
+
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
+
     };
 
     const {
@@ -110,8 +118,25 @@ export default function EvaluacionPsicologicaPoderosa() {
         handleRadioButton,
     } = useForm(initialFormState, { storageKey: "EvaluacionPsicologicaPoderosa" });
 
+    const handleRadioButtonTipoInforme = (e, value) => {
+        const { name } = e.target;
+        setTipoInforme((f) => ({
+            ...f,
+            [name]: value.toUpperCase(),
+        }));
+    };
+
+    useEffect(() => {
+        const value = tipoInforme.tipoInforme;
+        setTabla(
+            value == "NORMAL" ? "evaluacion_psicologica_poderosa_normal" :
+                value == "LICENCIA" ? "evaluacion_psicologica_poderosa_licencia" :
+                    value == "T. EN CALIENTE" ? "evaluacion_psicologica_poderosa_caliente" : "evaluacion_psicologica_poderosa_normal")
+        handleClearnotO();
+    }, [tipoInforme.tipoInforme])
+
     const handleSave = () => {
-        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        SubmitDataService({ ...form, ...tipoInforme }, token, userlogued, handleClear, tabla, datosFooter);
     };
 
     const handleSearch = (e) => {
@@ -157,14 +182,14 @@ export default function EvaluacionPsicologicaPoderosa() {
                 <InputsRadioGroup
                     label="Tipo Informe"
                     name="tipoInforme"
-                    value={form.tipoInforme}
+                    value={tipoInforme.tipoInforme}
                     labelWidth="120px"
                     options={[
                         { label: "NORMAL", value: "NORMAL" },
                         { label: "LICENCIA", value: "LICENCIA" },
                         { label: "T. EN CALIENTE", value: "T. EN CALIENTE" },
                     ]}
-                    onChange={handleRadioButton}
+                    onChange={handleRadioButtonTipoInforme}
                 />
                 <InputsRadioGroup
                     label="Aptitud"
@@ -266,6 +291,14 @@ export default function EvaluacionPsicologicaPoderosa() {
                 />
             </SectionFieldset>
 
+            <SectionFieldset legend="Asignación de Médico">
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Especialista"
+                    form={form}
+                    onChange={handleChangeSimple}
+                />
+            </SectionFieldset>
             <fieldset className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
                 <div className="flex gap-4">
                     <button

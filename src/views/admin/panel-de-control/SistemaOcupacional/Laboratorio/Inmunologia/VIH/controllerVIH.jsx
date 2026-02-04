@@ -45,7 +45,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             muestra: res.muestra ?? "",
             resultado: res.vih ?? "",
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
             user_doctorAsignado: res.doctorAsignado,
         }));
     }
