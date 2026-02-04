@@ -15,6 +15,7 @@ import Engrosamiento from "./Engrosamiento/Engrosamiento";
 import { useState } from "react";
 import {
   handleSubirArchivo,
+  handleSubirArchivoMasivo,
   PrintHojaR,
   PrintHojaSinDatos,
   ReadArchivosForm,
@@ -836,12 +837,11 @@ const OIT = () => {
               {/* <span className="text-sm text-gray-500 mt-1 mr-4">
                 Día - Mes - Año
               </span> */}
-              {form.SubirDoc &&
-                <ButtonsPDF
-                  handleSave={() => { handleSubirArchivo(form, selectedSede, userlogued, token) }}
-                  handleRead={() => { ReadArchivosForm(form, setVisualerOpen, token) }}
-                />
-              }
+              <ButtonsPDF
+                {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token, form.nomenclatura) } } : {}}
+                {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+                handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token, form.nomenclatura) }}
+              />
             </div>
           </div>
         </div>
@@ -896,7 +896,7 @@ const OIT = () => {
             onChange={handleChangeSimple}
           />
         </SectionFieldset>
-        
+
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4 px-4">
           <div className="flex gap-4">
             <button
