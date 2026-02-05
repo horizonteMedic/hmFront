@@ -6,7 +6,7 @@ import { convertirGenero } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
 import { dibujarFirmas } from '../../../utils/dibujarFirmas.js';
 
-export default function InformePsicoAltoRiesgo(data = {}, docExistente = null) {
+export default async function InformePsicoAltoRiesgo(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -588,7 +588,7 @@ export default function InformePsicoAltoRiesgo(data = {}, docExistente = null) {
   doc.rect(tablaInicioX, yPos, tablaAncho, alturaSeccionFirma, 'S');
 
   // Usar la función dibujarFirmas para dibujar las firmas
-  dibujarFirmas({ doc, datos: data, y: yPos + 2, pageW }).then(() => {
+  await dibujarFirmas({ doc, datos: data, y: yPos + 2, pageW }).then(() => {
     // === FOOTER ===
     footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
 
@@ -601,20 +601,14 @@ export default function InformePsicoAltoRiesgo(data = {}, docExistente = null) {
     
     // === FOOTER ===
     footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
-    
-    // === Imprimir ===
-    if (!docExistente) {
-      imprimir(doc);
-    }
   });
-
-  // Si hay docExistente, retornar el doc (las firmas se agregarán asíncronamente)
+  
   if (docExistente) {
-    footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
     return doc;
+  } else {
+    imprimir(doc);
   }
 }
-
 function imprimir(doc) {
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
@@ -624,4 +618,3 @@ function imprimir(doc) {
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
 }
-

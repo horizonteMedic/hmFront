@@ -19,8 +19,8 @@ const config = {
 
 // --- Componente Principal ---
 
-export default async function Informe_Lab_Eco(datos = {}) {
-  const doc = new jsPDF();
+export default async function Informe_Lab_Eco(datos= {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
@@ -133,20 +133,23 @@ export default async function Informe_Lab_Eco(datos = {}) {
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });
-
-  // === IMPRIMIR ===
-  const pdfBlob = doc.output("blob");
-  const pdfUrl = URL.createObjectURL(pdfBlob);
-  const iframe = document.createElement("iframe");
-  iframe.style.display = "none";
-  iframe.src = pdfUrl;
-  document.body.appendChild(iframe);
-  iframe.onload = () => {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-  };
+ 
+    if (docExistente) {
+      return doc;
+    } else {
+      imprimir(doc);
+    }
+  }
+  
+  function imprimir(doc) {
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.src = url;
+    document.body.appendChild(iframe);
+    iframe.onload = () => iframe.contentWindow.print();
 }
-
 // --- Funciones de Ayuda ---
 
 // Función para formatear fecha a DD/MM/YYYY

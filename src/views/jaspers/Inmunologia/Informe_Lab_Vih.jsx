@@ -19,8 +19,8 @@ const config = {
 
 // --- Componente Principal ---
 
-export default async function Informe_Lab_Vih(datos = {}) {
-  const doc = new jsPDF();
+export default async function Informe_Lab_Vih(datos = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   await drawHeader(doc, datos);
@@ -76,19 +76,24 @@ export default async function Informe_Lab_Vih(datos = {}) {
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });
+  
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
+}
 
-  // === IMPRIMIR ===
-  const pdfBlob = doc.output("blob");
-  const pdfUrl = URL.createObjectURL(pdfBlob);
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
   const iframe = document.createElement("iframe");
   iframe.style.display = "none";
-  iframe.src = pdfUrl;
+  iframe.src = url;
   document.body.appendChild(iframe);
-  iframe.onload = () => {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-  };
+  iframe.onload = () => iframe.contentWindow.print();
 }
+
 
 // --- Funciones de Ayuda ---
 

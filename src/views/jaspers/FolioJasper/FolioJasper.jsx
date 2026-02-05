@@ -80,6 +80,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "microbiologia",//NUEVO 
         "lhepatitis", //NUEVO
         "ac_coproparasitologico",
+        "lab_clinico" //NUEVO
     ]
 
     const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true && ex.imprimir === true);

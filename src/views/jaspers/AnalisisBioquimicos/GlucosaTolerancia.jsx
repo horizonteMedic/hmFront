@@ -178,8 +178,8 @@ const drawPatientData = (doc, datos = {}) => {
 
 // --- Componente Principal ---
 
-export default async function GlucosaTolerancia(data = {}) {
-  const doc = new jsPDF();
+export default async function GlucosaTolerancia(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // === NORMALIZACIÓN DE DATOS ===
@@ -281,17 +281,20 @@ export default async function GlucosaTolerancia(data = {}) {
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });
-
-  // === Imprimir ===
-  const pdfBlob = doc.output("blob");
-  const pdfUrl = URL.createObjectURL(pdfBlob);
-  const iframe = document.createElement("iframe");
-  iframe.style.display = "none";
-  iframe.src = pdfUrl;
-  document.body.appendChild(iframe);
-  iframe.onload = () => {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-  };
+   
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
+  }

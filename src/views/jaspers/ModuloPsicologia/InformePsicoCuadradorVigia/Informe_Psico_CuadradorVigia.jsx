@@ -592,19 +592,13 @@ export default async function InformePsicoCuadradorVigia(data = {}, docExistente
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
-
-  // === Imprimir ===
-  if (!docExistente) {
+  
+  if (docExistente) {
+    return doc;   
+  } else {
     imprimir(doc);
   }
-
-  // Si hay docExistente, retornar el doc (las firmas se agregarán asíncronamente)
-  if (docExistente) {
-    footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
-    return doc;
-  }
-}
-
+} 
 function imprimir(doc) {
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
@@ -614,4 +608,5 @@ function imprimir(doc) {
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
 }
+
 

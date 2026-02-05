@@ -594,19 +594,13 @@ export default async function InformePsicoBrigadista(data = {}, docExistente = n
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
-
-  // === Imprimir ===
-  if (!docExistente) {
+  
+  if (docExistente) {
+    return doc;
+  } else {
     imprimir(doc);
   }
-
-  // Si hay docExistente, retornar el doc (las firmas se agregarán asíncronamente)
-  if (docExistente) {
-    footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
-    return doc;
-  }
 }
-
 function imprimir(doc) {
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);

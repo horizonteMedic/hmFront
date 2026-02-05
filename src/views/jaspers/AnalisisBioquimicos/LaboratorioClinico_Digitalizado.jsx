@@ -4,8 +4,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 import { convertirGenero, getSignCompressed } from "../../utils/helpers.js";
-export default async function LaboratorioClinico_Digitalizado_nuevo(data = {}, docExistente = null) {
-
+export default async function LaboratorioClinico_Digitalizado(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 

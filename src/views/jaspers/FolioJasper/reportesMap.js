@@ -7,7 +7,6 @@ import HistoriaOcupacional_Digitalizado from "../HistoriaOcupacional/HistoriaOcu
 import ficha_antecedente_patologico_Digitalizado from "../AntecedentesPatologicos/ficha_antecedente_patologico_Digitalizado";
 import CuestionarioNordico from "../Cuestionario_Nordico/CuestionarioNordico";
 import EvaluacionMuscoloEsqueletica from "../MusculoEsqueletica/EvaluacionMuscoloEsqueletica";
-import LaboratorioClinico_Digitalizado_nuevo from "../AnalisisBioquimicos/LaboratorioClinico_Digitalizado";
 import AnalisisBioquimicos_Digitalizado from "../AnalisisBioquimicos/AnalisisBioquimicos_Digitalizado";
 import RagiografiaToraxPA_Digitalizado from "../RayosX/RagiografiaToraxPA_Digitalizado";
 import FichaAudiologica_Digitalizado from "../Audiometria/FichaAudiologica/FichaAudiologica_Digitalizado";
@@ -92,6 +91,27 @@ import Consentimiento_Panel10D_Digitalizado from "../Consentimientos/Consentimie
 import coprocultivo_digitalizado from "../Manipuladores/coprocultivo_digitalizado";
 import Coproparasitologico_Digitalizado from "../Manipuladores/Coproparasitologico_Digitalizado";
 import ParasitologiaSeriado_Digitalizado from "../Manipuladores/ParasitologiaSeriado_Digitalizado";
+import pcuantiantigeno from "../Covid/pcuantiantigeno";
+import pcualitativaantigeno from "../Covid/pcualitativaantigeno";
+import RiesgoCoronario from "../AnalisisBioquimicos/RiesgoCoronario";
+import GlucosaTolerancia from "../AnalisisBioquimicos/GlucosaTolerancia";
+import ExamenGlucosaBasal from "../AnalisisBioquimicos/ExamenGlucosaBasal";
+import Informe_Lab_Vih from "../Inmunologia/Informe_Lab_Vih";
+import Informe_Lab_Thevenon from "../Inmunologia/Informe_Lab_Thevenon";
+import Informe_Riesgos_Psicosociales_Digitalizado from "../ModuloPsicologia/InformeRiesgosPsicosociales/Informe_Riesgos_Psicosociales_Digitalizado";
+import Informe_burnout_Digitalizado from "../ModuloPsicologia/InformeBurnout/Informe_burnout_Digitalizado";
+import Informe_Aversión_Riesgo_Digitalizado from "../ModuloPsicologia/PsicologiaAversionRiesgo/Informe_Aversión_Riesgo_Digitalizado";
+import Informe_Psico_Test_Personalidad from "../ModuloPsicologia/PsicoTrastorPersonalidad/Informe_Psico_Test_Personalidad";
+import Informe_Psico_Conductores from "../ModuloPsicologia/InformePsicoConductores/Informe_Psico_Conductores";
+import Informe_Psico_Alto_Riesgo from "../ModuloPsicologia/InformePsicoAltoRiesgo/Informe_Psico_Alto_Riesgo";
+import Informe_Psico_Brigadista from "../ModuloPsicologia/InformePsicoBrigadista/Informe_Psico_Brigadista";
+import Informe_Psico_BombaElectrica from "../ModuloPsicologia/InformePsicoBombaElectrica/Informe_Psico_BombaElectrica";
+import Informe_Psico_CuadradorVigia from "../ModuloPsicologia/InformePsicoCuadradorVigia/Informe_Psico_CuadradorVigia";
+import LaboratorioClinico_Digitalizado from "../AnalisisBioquimicos/LaboratorioClinico_Digitalizado";
+import Informe_Lab_hemoglobina from "../LaboratorioClinico/Informe_Lab_hemoglobina";
+import Informe_Lab_Eco from "../AnalisisBioquimicos/Informe_Lab_Eco";
+
+
 export const reportesMap = {
    /* =========================
       GENERALES / BASE
@@ -158,7 +178,11 @@ export const reportesMap = {
    ========================= */
    lgonadotropina: LGonadotropina_Digitalizado,
 
-   lab_clinico: LaboratorioClinico_Digitalizado_nuevo,
+   lab_clinico:{ //NUEVO 
+      LaboratorioClinico_Digitalizado,
+      Informe_Lab_hemoglobina,
+      Informe_Lab_Eco,
+   },
 
    toxicologia: ResultadosPanel5d_Digitalizado,
 
@@ -172,12 +196,17 @@ export const reportesMap = {
 
    ac_bioquimica2022: AnalisisClinicosB_Digitalizado,
 
-   microbiologia: {//NUEVO
+   microbiologia: {  //NUEVO
       Microbiologia1_Digitalizado,
       Microbiologia_Digitalizado
    },
 
+   riesgocoronario: RiesgoCoronario,
 
+   glucosatolerancia: GlucosaTolerancia,
+
+   analisis_bioquimicos: ExamenGlucosaBasal,
+  
    inmunologia: InmunologiaLab_Digitalizado,
 
    lhepatitis:{ //nuevo
@@ -187,6 +216,10 @@ export const reportesMap = {
    },
 
    inmunologia_vdrl: Informe_Lab_VRDL,  //nuevo
+
+   vih: Informe_Lab_Vih, //nuevo
+
+   thevenon: Informe_Lab_Thevenon, //nuevo
 
    panel2d: Panel2d_Digitalizado, //nuevo
 
@@ -203,6 +236,10 @@ export const reportesMap = {
       ParasitologiaSeriado_Digitalizado
    },
   
+   examen_inmunologico: pcualitativaantigeno, //nuevo
+   
+   examen_inmunologico: pcuantiantigeno, //nuevo
+
    /* =========================
       CONSENTIMIENTOS
    ========================= */
@@ -237,6 +274,7 @@ export const reportesMap = {
    /* =========================
       EXÁMENES MÉDICOS
    ========================= */
+
    audiometria_po: FichaAudiologica_Digitalizado,
 
    cuestionario_audiometria: CuestionarioAudiometria_Digitalizado,
@@ -272,12 +310,17 @@ export const reportesMap = {
    /* =========================
       PSICOLOGÍA
    ========================= */
+
    cuestionario_berlin: Informe_Psico_Cuestionario_Berlin,
 
+   informe_riesgos_psicosociales: Informe_Riesgos_Psicosociales_Digitalizado, //nuevo
+   
    psicologia_espacios_confinados: formatPsicologia_SuficienciaEspaciosC,
 
    ficha_psicologica_anexo03: FichaPsicologicaOcupacional_Digitalizado,
 
+   informe_burnout: Informe_burnout_Digitalizado,//nuevo
+   
    informe_psicologico_estres: InformePsicologicoAdecoEstres_Digitalizado,
 
    evaluacion_psicologica_poderosa_normal: EvaluacionPsicologica_p_Digitalizado,
@@ -290,10 +333,23 @@ export const reportesMap = {
 
    fobias: INFORME_ADICIONAL_DE_FOBIAS_Digitalizado,
 
-   informe_psicolaboral: {
+   aversionalriesgo: Informe_Aversión_Riesgo_Digitalizado, //nuevo
+   
+   infor_conductores: Informe_Psico_Conductores, //nuevo
+   
+   alto_riesgo: Informe_Psico_Alto_Riesgo, //nuevo
+
+   psi_brigadistas: Informe_Psico_Brigadista, //nuevo
+
+   bombaelectrica: Informe_Psico_BombaElectrica, //nuevo
+
+   cuadradorvigia: Informe_Psico_CuadradorVigia, //nuevo
+      informe_psicolaboral: {
       Informe_PsicolaboralBoroo_Digitalizado,
       Informe_PsicolaboralBorooA_Digitalizado
    }, // pedir que backend envie correctamente namejasper
+
+   trastornos_personalidad: Informe_Psico_Test_Personalidad, //nuevo
 
    especificos: TRABAJOS_EN_ESPECIFICO_Digitalizado,
 
@@ -307,5 +363,7 @@ export const reportesMap = {
    exam_complementarios: InformePsicoExamComplementario,
 
    certificacion_medica_altura: A_CertificacionMedicaPTA_Digitalizado,
+   
    calidad_sueño: CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado
+
 };

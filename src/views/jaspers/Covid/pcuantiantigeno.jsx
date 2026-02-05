@@ -54,8 +54,8 @@ const toDDMMYYYY = (fecha) => {
 };
 
 // --- Componente Principal ---
-export default async function pcuantiantigeno(datos = {}) {
-  const doc = new jsPDF();
+export default async function pcuantiantigeno(datos = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
@@ -265,20 +265,23 @@ export default async function pcuantiantigeno(datos = {}) {
   y += 13; // Subido 7mm para no chocar con el footer (original y += 20, ahora y += 13)
 
   // Usar helper para dibujar firmas
-  dibujarFirmas({ doc, datos, y, pageW }).then(() => {
+  await dibujarFirmas({ doc, datos, y, pageW }).then(() => {
     // === FOOTER ===
     footerTR(doc, datos);
-
-    // Mostrar PDF
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    iframe.onload = () => iframe.contentWindow.print();
-  }).catch(err => {
-    console.error(err);
-    alert('Error generando PDF: ' + err);
   });
+  
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
+}
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
 }

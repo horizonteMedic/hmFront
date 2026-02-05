@@ -260,6 +260,13 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
+    HEMOGLOBINA:{ //nuevo Gr
+        nombre: "HEMOGLOBINA",
+        tabla: "lab_clinico",
+        url: "/api/v01/ct/laboratorio/obtenerReporteHemoglobina",
+        esJasper: true,
+    },
+
     ACIDO_URICO: {//NUEVO Gr
         nombre: "ACIDO URICO",
         tabla: "ac_bioquimica2022",
@@ -281,50 +288,50 @@ export const EXAMENES_CATALOGO = {
     },
 
     
-    INMUNLOGIA_AGLUTINACIONES: { //nuevo
+    INMUNLOGIA_AGLUTINACIONES: { //nuevo Gr
         nombre: "INMUNOLOGIA - AGLUTINACIONES",
         tabla: "inmunologia",
         url: "/api/v01/ct/inmunologia/obtenerReporteInmunologia",
         esJasper: true,
     },
 
-    INMUNOLOGIA_HEPATITIS: { //nuevo
+    INMUNOLOGIA_HEPATITIS: { //nuevo Gr
         nombre: "INMUNOLOGIA - HEPATITIS",
         tabla: "lhepatitis",
         url: "/api/v01/ct/inmunologia/obtenerReporteHepatitis",
         esJasper: true,
     },
 
-    INMUNOLOGIA_VRL: { //nuevo
-        nombre: "INMUNOLOGIA - VRL",
+    INMUNOLOGIA_VDRL: { //nuevo Gr
+        nombre: "INMUNOLOGIA - VDRL",
         tabla: "inmunologia_vdrl",
         url: "/api/v01/ct/inmunologia/obtenerReporteVdrl",
         esJasper: true,
     },
  
 
-    PANEL_2D: { //nuevo
+    PANEL_2D: { //nuevo Gr
         nombre: "PANEL 2D",
         tabla: "panel2d",
         url: "/api/v01/ct/toxicologia/obtenerReportePanel2D",
         esJasper: true,
     },	
 
-    PANEL_3D: { //nuevo
+    PANEL_3D: { //nuevo Gr
         nombre: "PANEL 3D",
         tabla: "panel3d",
         url: "/api/v01/ct/toxicologia/obtenerReportePanel3D",
         esJasper: true,
     },
 
-    PANEL_4D: { //nuevo
+    PANEL_4D: { //nuevo Gr
         nombre: "PANEL 4D",
         tabla: "panel4d",
         url: "/api/v01/ct/toxicologia/obtenerReportePanel4D",
         esJasper: true,
     },
 
-   PANEL_10D: { //nuevo
+   PANEL_10D: { //nuevo Gr
         nombre: "PANEL 10D",
         tabla: "panel10d",
         url: "/api/v01/ct/toxicologia/obtenerReportePanel10D",
@@ -332,40 +339,55 @@ export const EXAMENES_CATALOGO = {
     },
 
 
-    CONSENT_PANEL_3D: { //nuevo
+    CONSENT_PANEL_3D: { //nuevo Gr
         nombre: "CONSENTIMIENTO PANEL 3D",
         tabla: "con_panel3D",
         url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
         nameConset: true,
     },
 
-    CONSENT_PANEL_4D: { //nuevo
+    CONSENT_PANEL_4D: { //nuevo Gr
         nombre: "CONSENTIMIENTO PANEL 4D",
         tabla: "con_panel4D",
         url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
         nameConset: true,
     },
 
-    CONSENT_PANEL_10D: { //nuevo
+    CONSENT_PANEL_10D: { //nuevo Gr
         nombre: "CONSENTIMIENTO PANEL 10D",
         tabla: "con_panel10D",
         url: "/api/v01/ct/laboratorio/consentimiento-laboratorio",
         nameConset: true,
     },
 
-    MANIPULADORES_COPROCULTIVO: { //nuevo
+    MANIPULADORES_COPROCULTIVO: { //nuevo Gr
         nombre: "MANIPULADORES COPROCULTIVO",
         tabla: "ac_coprocultivo",
         url: "/api/v01/ct/manipuladores/obtenerReporteCoprocultivo",
         esJasper: true,
     },
 
-    MANIPULADORES_PARASITOLOGIA:{ //nuevo
+    MANIPULADORES_PARASITOLOGIA:{ //nuevo Gr
         nombre: "MANIPULADORES PARASITOLOGIA",
         tabla: "ac_coproparasitologico",
         url: "/api/v01/ct/manipuladores/obtenerReporteCoproparasitologico",
         esJasper: true,
     },
+
+    PRUEBA_CUALITATIVA: { //nuevo Gr
+        nombre: "PRUEBA CUALITATIVA",
+        tabla: "examen_inmunologico",
+        url: "/api/v01/ct/pruebasCovid/obtenerReporteExamenInmunologico",
+        esJasper: true,
+    },
+
+    PRUEBA_CUANTITATIVA: { //nuevo Gr
+        nombre: "PRUEBA CUANTITATIVA",
+        tabla: "examen_inmunologico",
+        url: "/api/v01/ct/pruebasCovid/obtenerReporteExamenInmunologico",
+        esJasper: true,
+    },
+
     LABORATORIO_CLINICO: {
         nombre: "LABORATORIO CLINICO",
         tabla: "lab_clinico",
@@ -397,6 +419,27 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/analisisBioquimico/obtenerReportePerfilRenal",
     },
 
+    ANALISIS_RIESGO_CORONARIO:{ //nuevo Gr
+        nombre: "ANALISIS BIOQUIMICOS - RIESGO CORONARIO",
+        tabla: "riesgocoronario",
+        url: "/api/v01/ct/riesgoCoronario/obtenerReporte",
+        esJasper: true,
+    },
+
+        
+    ANALISIS_TOLERANCIA_GLUCOSA: { //nuevo Gr
+        nombre: "ANALISIS BIOQUIMICOS - TOLERANCIA GLUCOSA",
+        tabla: "glucosatolerancia",
+        url: "/api/v01/ct/glucosaTolerancia/obtenerReporteGlucosa",
+        esJasper: true,
+    },
+
+    ANALISIS_GLUCOSA_BASAL: { //nuevo Gr
+        nombre: "ANALISIS BIOQUIMICOS - GLUCOSA BASAL",
+        tabla: "analisis_bioquimicos",
+        url: "/api/v01/ct/analisisBioquimico/obtenerReporteGlucosaBasal",
+        esJasper: true,
+    },
     /* =========================
        CONSENTIMIENTOS
     ========================= */
@@ -405,6 +448,20 @@ export const EXAMENES_CATALOGO = {
         tabla: "consentimientobuenasalud",
         url: "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoBuenaSalud",
         esJasper: true
+    },
+
+    INMUNOLOGIA_VIH: { //nuevo Gr
+        nombre: "INMUNOLOGIA - VIH",
+        tabla: "vih",
+        url: "/api/v01/ct/inmunologia/obtenerReporteVih",
+        esJasper: true,
+    },
+
+    INMUNOLOGIA_THEVENON: { //nuevo Gr
+        nombre: "INMUNOLOGIA - THEVENON",
+        tabla: "thevenon",
+        url: "/api/v01/ct/inmunologia/obtenerReporteThevenon",
+        esJasper: true,
     },
 
     CONSENT_DECLARACION_APTITUD: {
@@ -419,6 +476,13 @@ export const EXAMENES_CATALOGO = {
         tabla: "consent_Boro",
         url: "/api/v01/ct/laboratorio/consentimientoLaboratorioBoro",
         nameConset: true,
+    },
+
+    EXAMEN_ORINA_LAB:{  //nuevo Gr
+        nombre: "EXAMEN ORINA LABORATORIO",
+        tabla: "lab_clinico",
+        url: "/api/v01/ct/laboratorio/obtenerReporteOrina",
+        esJasper: true,
     },
 
     CONSENT_INFORMADO_EVALUACION_MEDICA: {
@@ -584,6 +648,27 @@ export const EXAMENES_CATALOGO = {
         esJasper: true
     },
 
+    BRIGADISTAS_PSICOLOGIA:{ //nuevo Gr
+        nombre: "BRIGADISTAS PSICOLOGIA",
+        tabla: "psi_brigadistas",
+        url: "/api/v01/ct/psiBrigadista/obtenerReporteBrigadista",
+        esJasper: true
+    },
+
+    BOMBA_ELECTRICA:{ //nuevo Gr
+        nombre: "BOMBA ELECTRICA",
+        tabla: "bombaelectrica",
+        url: "/api/v01/ct/bombaElectrica/obtenerReporteBombaElectrica",
+        esJasper: true
+    },
+
+    PSICOLOGIA_VIGIA:{ //nuevo Gr
+        nombre: "PSICOLOGIA VIGIA",
+        tabla: "cuadradorvigia",
+        url: "/api/v01/ct/cuadradorVigia/obtenerReporte",
+        esJasper: true
+    },
+
     INFORME_PODEROSA_OPERAR: {
         nombre: "INFORME PSICOLOGICO DE PODEROSA LICENCIA PARA OPERAR - NORMAL",
         tabla: "evaluacion_psicologica_poderosa_normal",
@@ -609,6 +694,13 @@ export const EXAMENES_CATALOGO = {
         nombre: "INFORME PSICOLOGIA FOBIAS",
         tabla: "fobias",
         url: "/api/v01/ct/fobias/obtenerReporte",
+        esJasper: true,
+    },
+
+    AVERSION_RIESGO:{ //nuevo Gr
+        nombre: "AVERSION RIESGO",
+        tabla: "aversionalriesgo",
+        url: "/api/v01/ct/aversionRiesgo/obtenerReporteAversionRiesgo",
         esJasper: true,
     },
 
@@ -640,6 +732,20 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
+    INFORME_RIESGO_PSICOSOCIAL: { //nuevo Gr
+        nombre: "INFORME RIESGO PSICOSOCIAL",
+        tabla: "informe_riesgos_psicosociales",
+        url: "/api/v01/ct/informeRiesgoPsicosocial/obtenerReporteInformeRiesgoPsicosocial",
+        esJasper: true,
+    },
+
+    INFORME_BURNOUT:{ //nuevo Gr
+        nombre: "INFORME BURNOUT",
+        tabla: "informe_burnout",
+        url: "/api/v01/ct/informeBurnout/obtenerReporteInformeBurnout",
+        esJasper: true,
+    },
+
     TRABAJO_ALTURA_PSICO: {
         nombre: "TRABAJO EN ALTURA PSICOLOGIA",
         tabla: "psicologiafobias",
@@ -647,6 +753,26 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
+    TRANSTORNO_PERSONALIDAD_PSICO:{
+        nombre: "TRANSTORNO PERSONALIDAD PSICOLOGIA",
+        tabla: "trastornos_personalidad",
+        url: "/api/v01/ct/transtornoPersonalidad/obtenerReporteTranstornoPersonalidad",
+        esJasper: true,
+    },
+
+    INFORME_CONDUCTORES:{
+        nombre: "INFORME CONDUCTORES",
+        tabla: "infor_conductores",
+        url: "/api/v01/ct/informeConductores/obtenerReporteInformeConductores",
+        esJasper: true,
+    },
+
+    ALTO_RIESGO:{
+        nombre: "ALTO RIESGO",
+        tabla: "alto_riesgo",
+        url: "/api/v01/ct/altoRiesgo/obtenerReporteAltoRiesgo",
+        esJasper: true,
+    },
     TRABAJO_ESPECIFICOS: {
         nombre: "TRABAJOS EN ESPECIFICOS",
         tabla: "especificos",

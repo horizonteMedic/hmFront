@@ -594,16 +594,11 @@ export default async function InformePsicoBombaElectrica(data = {}, docExistente
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
-
-  // === Imprimir ===
-  if (!docExistente) {
-    imprimir(doc);
-  }
-
-  // Si hay docExistente, retornar el doc (las firmas se agregarán asíncronamente)
+  
   if (docExistente) {
-    footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
-    return doc;
+    return doc; 
+  } else {
+    imprimir(doc);
   }
 }
 
@@ -615,5 +610,4 @@ function imprimir(doc) {
   iframe.src = url;
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
-}
-
+} 

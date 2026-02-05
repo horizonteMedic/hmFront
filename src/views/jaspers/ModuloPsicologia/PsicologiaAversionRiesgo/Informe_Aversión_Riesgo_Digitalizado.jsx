@@ -5,8 +5,8 @@ import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import footerTR from '../../components/footerTR.jsx';
 import drawColorBox from '../../components/ColorBox.jsx';
 
-export default async function Informe_Aversion_Riesgo_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function Informe_Aversion_Riesgo_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // Función auxiliar para convertir booleanos a "Alto", "Medio", "Bajo"
@@ -440,11 +440,13 @@ export default async function Informe_Aversion_Riesgo_Digitalizado(data = {}) {
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });
-
-  // === IMPRIMIR ===
-  imprimir(doc);
+  
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
-
 function imprimir(doc) {
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
@@ -454,4 +456,5 @@ function imprimir(doc) {
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
 }
+
 

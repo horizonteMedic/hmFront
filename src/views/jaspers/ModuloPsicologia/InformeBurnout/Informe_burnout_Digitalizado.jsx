@@ -6,8 +6,8 @@ import footerTR from '../../components/footerTR.jsx';
 import drawColorBox from '../../components/ColorBox.jsx';
 import { dibujarFirmas } from '../../../utils/dibujarFirmas.js';
 
-export default async function Informe_burnout_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function Informe_burnout_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   // Mapear y transformar todos los datos del JSON en un solo objeto
@@ -268,10 +268,12 @@ export default async function Informe_burnout_Digitalizado(data = {}) {
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });
 
-  // === IMPRIMIR ===
-  imprimir(doc);
+    if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
-
 function imprimir(doc) {
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
@@ -281,4 +283,3 @@ function imprimir(doc) {
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
 }
-

@@ -6,7 +6,7 @@ import { convertirGenero } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
 import { dibujarFirmas } from "../../../utils/dibujarFirmas.js";
 
-export default function InformeDeTestPersonalidad(data = {}, docExistente = null) {
+export  default async function InformeDeTestPersonalidad(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   // Contador de páginas dinámico
@@ -563,32 +563,18 @@ export default function InformeDeTestPersonalidad(data = {}, docExistente = null
   doc.rect(tablaInicioX, baseY, tablaAncho, alturaSeccionFirmas);
 
   // Usar helper para dibujar firmas (solo las que vengan en la data)
-  dibujarFirmas({ doc, datos: datosFinales, y: baseY + 2, pageW }).then(() => {
+  await dibujarFirmas({ doc, datos: datosFinales, y: baseY + 2, pageW }).then(() => {
+   
     // === FOOTER ===
     footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
-
-    // === Imprimir ===
-    if (!docExistente) {
-      imprimir(doc);
-    }
-  }).catch(err => {
-    console.error("Error al dibujar firmas:", err);
-    // === FOOTER ===
-    footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
-    
-    // === Imprimir ===
-    if (!docExistente) {
-      imprimir(doc);
-    }
   });
-
-  // Si hay docExistente, retornar el doc (las firmas se agregarán asíncronamente)
-  if (docExistente) {
-    footerTR(doc, { footerOffsetY: 12, fontSize: 7 });
+  
+  if (docExistente) { 
     return doc;
+  } else {
+    imprimir(doc);
   }
-}
-
+} 
 function imprimir(doc) {
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
@@ -597,5 +583,4 @@ function imprimir(doc) {
   iframe.src = url;
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
-}
-
+} 
