@@ -16,7 +16,8 @@ const MATRICES_MAP = {
   "Matriz-5": { url: "st/registros/matrizSaludOhla", method: "POST" },
   "Matriz-6": { url: "st/registros/matrizGeneral", method: "POST" },
   "Matriz-7": { url: "st/registros/matrizOhlaGestor", method: "POST" },
-  "Matriz-8": { url: "st/registros/matrizOhlaConstruccion", method: "POST" }
+  "Matriz-8": { url: "st/registros/matrizOhlaConstruccion", method: "POST" },
+  "Matriz-9": { url: "st/registros/matrizArena2026", method: "POST" }
 };
 
 const MatrizPostulante = () => {
@@ -552,7 +553,8 @@ const MatrizPostulante = () => {
               {tienePermisoEnVista("Matriz Postulante", "Matriz de Salud OHLA") && <option value="Matriz-5">Matriz de Salud OHLA</option>}
               {tienePermisoEnVista("Matriz Postulante", "Matriz General") && <option value="Matriz-6">Matriz General</option>}
               {tienePermisoEnVista("Matriz Postulante", "Matriz Gestor OHLA") && <option value="Matriz-7">Matriz Gestor OHLA</option>},
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Construccion OHLA") && <option value="Matriz-8">Matriz Construccion OHLA</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Construccion OHLA") && <option value="Matriz-8">Matriz Construccion OHLA</option>},
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Arena") && <option value="Matriz-9">Matriz Arena 2026</option>}
             </select>
           </div>
           <div className="flex flex-col flex-grow justify-end">
