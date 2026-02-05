@@ -7,16 +7,16 @@ import Swal from 'sweetalert2';
 const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, sede }) => {
 
   const [datosarch, setDatosarch] = useState({
-      id: combinedParam.archivoItem.id,
-      nombre: combinedParam.archivoItem.nombre,
-      extension: combinedParam.archivoItem.extension,
-      color: combinedParam.archivoItem.color,
-      codigo: combinedParam.archivoItem.codigo,
-      nomenclatura: combinedParam.archivoItem.nomenclatura,
-      historiaClinica: combinedParam.historiaClinica,
-      orden: combinedParam.orden,
-      nombres: combinedParam.nombres,
-      apellidos: combinedParam.apellidos
+    id: combinedParam.archivoItem.id,
+    nombre: combinedParam.archivoItem.nombre,
+    extension: combinedParam.archivoItem.extension,
+    color: combinedParam.archivoItem.color,
+    codigo: combinedParam.archivoItem.codigo,
+    nomenclatura: combinedParam.archivoItem.nomenclatura,
+    historiaClinica: combinedParam.historiaClinica,
+    orden: combinedParam.orden,
+    nombres: combinedParam.nombres,
+    apellidos: combinedParam.apellidos
   });
 
   const [filePreview, setFilePreview] = useState(null);
@@ -26,7 +26,7 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
   const [uploadError, setUploadError] = useState(false);
 
   const [fileName, setFileName] = useState('')
-  
+
   function AleertSucces() {
     Swal.fire({
       title: "¡Exito!",
@@ -47,7 +47,7 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
     closeModal();
   };
 
-  
+
 
   const handleFileInputChange = (event) => {
     const file = event.target.files[0];
@@ -55,7 +55,7 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
       const fileName = file.name;
       const fileExtension = fileName.split('.').pop().toLowerCase();
       const fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
-      
+
       if (datosarch.extension === 'pdf' && fileExtension !== 'pdf') {
         Swal.fire({
           icon: 'error',
@@ -75,11 +75,11 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
       }
       let Ripconciv = combinedParam.contrata.split(' ')[0];
 
-      if (sede !== 'HMAC' ) {
+      if (sede !== 'HMAC') {
         if (Ripconciv !== 'RIPCONCIV') {
           const Nombres = `${datosarch.apellidos} ${datosarch.nombres}`
-          const CodOrden = fileNameWithoutExtension.split('-') 
-    
+          const CodOrden = fileNameWithoutExtension.split('-')
+
           if (CodOrden.length < 3) {
             Swal.fire({
               icon: 'error',
@@ -89,7 +89,7 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
             closeModal();
             return;
           }
-    
+
           //Nomenclatuura
           const Orden = fileNameWithoutExtension.split('-')[0]
           //Nombre
@@ -99,48 +99,48 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
 
           //Cod Orden
           const Nomenclatura = CodOrden[1].trim()
-          
-            if (datosarch.orden != Orden) {
-              Swal.fire({
-                icon: 'error',
-                title: 'Error al subir archivo',
-                text: `El número de Orden debe ser igual: ${datosarch.orden}. \n\nRecuerda que debe ser Orden-Nomenclatura-Nombres`,
-              });
-              closeCAMUModal()
-              return;
-            }
-    
-            if (datosarch.nomenclatura.toUpperCase() != Nomenclatura.toUpperCase()) {
-              Swal.fire({
-                icon: 'error',
-                title: 'Error al subir archivo',
-                text: `La Nomenlatura debe ser igual: ${datosarch.nomenclatura}. \n\nRecuerda que debe ser Orden-Nomenclatura-Nombres`,
-              });
-              closeCAMUModal()
-              return;
-            }
-      
-      
-            if (ApellName.toUpperCase() != cleanedNamePart.toUpperCase()) {
-              Swal.fire({
-                icon: 'error',
-                title: 'Error al subir archivo',
-                text: `Los Apellidos y Nombres son Incorrectos: ${ApellName}. \n\nRecuerda que debe ser Orden-Nomenclatura-Nombres`,
-              });
-              closeCAMUModal()
-              return;
-            }
-      
-            
-            const filesave = `${Orden}-${Nomenclatura}-${cleanedNamePart}.${fileExtension}`
-            setFileName(filesave); 
+
+          if (datosarch.orden != Orden) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error al subir archivo',
+              text: `El número de Orden debe ser igual: ${datosarch.orden}. \n\nRecuerda que debe ser Orden-Nomenclatura-Nombres`,
+            });
+            closeCAMUModal()
+            return;
+          }
+
+          if (datosarch.nomenclatura.toUpperCase() != Nomenclatura.toUpperCase()) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error al subir archivo',
+              text: `La Nomenlatura debe ser igual: ${datosarch.nomenclatura}. \n\nRecuerda que debe ser Orden-Nomenclatura-Nombres`,
+            });
+            closeCAMUModal()
+            return;
+          }
+
+
+          if (ApellName.toUpperCase() != cleanedNamePart.toUpperCase()) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error al subir archivo',
+              text: `Los Apellidos y Nombres son Incorrectos: ${ApellName}. \n\nRecuerda que debe ser Orden-Nomenclatura-Nombres`,
+            });
+            closeCAMUModal()
+            return;
+          }
+
+
+          const filesave = `${Orden}-${Nomenclatura}-${cleanedNamePart}.${fileExtension}`
+          setFileName(filesave);
         } else {
           setFileName(fileName)
         }
       } else {
         setFileName(fileName)
       }
-      
+
 
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -149,16 +149,16 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
         setFileUploaded(true);
       };
       reader.readAsDataURL(file);
-      
+
     }
   };
-  
+
   const handleFileInputClick = () => {
     document.getElementById('fileInput').click();
   };
 
   const handleUpload = () => {
-    
+
     Swal.fire({
       title: "¿Estas Seguro?",
       text: `Vas a subir este archivo a la Sede ${sede}`,
@@ -170,25 +170,25 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
     }).then((result) => {
       if (result.isConfirmed) {
         setUploading(true);
-        NewArchivo(fileName,dni,datosarch.historiaClinica,datosarch.orden,datosarch.id,user,token,filePreview)
-        .then(data => {
-          if (data.id) {
-            setUploadSuccess(true);
-            setUploading(false);
-            AleertSucces()
-          } else {
-            Swal.fire({title: 'Error', text: 'Ocurrio un error al subir el archivo', icon: 'error'})
-          }          
-        })
-        .catch(error => {
-          console.error('Error:', error)
-        }) 
+        NewArchivo(fileName, dni, datosarch.historiaClinica, datosarch.orden, datosarch.id, user, token, filePreview)
+          .then(data => {
+            if (data.id) {
+              setUploadSuccess(true);
+              setUploading(false);
+              AleertSucces()
+            } else {
+              Swal.fire({ title: 'Error', text: 'Ocurrio un error al subir el archivo', icon: 'error' })
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error)
+          })
       } else {
         closeCAMUModal()
       }
     })
 
-    
+
     // Simulando una solicitud de carga (aquí puedes agregar tu lógica real de carga)
   };
 
@@ -203,13 +203,13 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
         </div>
         <div className="mx-auto my-8 w-[90%] h-[200px] border-dashed border-4 border-gray-400 flex justify-center items-center cursor-pointer" onClick={handleFileInputClick}>
           {filePreview ? (
-              <img src={filePreview} alt="Vista previa del archivo" className="max-w-full max-h-full" />
-            ) : (
-              <div className="text-center">
-                <h2 style={{ fontSize: '24px', fontWeight:'bold' }}>{datosarch.nombre}.{datosarch.extension}</h2>
-                <span>Haga clic aquí para seleccionar un archivo</span>
-              </div>
-            )}
+            <img src={filePreview} alt="Vista previa del archivo" className="max-w-full max-h-full" />
+          ) : (
+            <div className="text-center">
+              <h2 style={{ fontSize: '24px', fontWeight: 'bold' }}>{datosarch.nombre}.{datosarch.extension}</h2>
+              <span>Haga clic aquí para seleccionar un archivo</span>
+            </div>
+          )}
 
           <input type="file" id="fileInput" className="hidden" onChange={handleFileInputChange} />
         </div>
@@ -234,9 +234,9 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
         <button
           onClick={handleUpload}
           disabled={!fileUploaded || uploading}
-          style={{background: datosarch.codigo}}
+          style={{ background: datosarch.codigo }}
           className={`block w-full py-2 text-white font-bold uppercase rounded hover:bg-red-600 focus:outline-none focus:bg-red-600 ${(!fileUploaded || uploading) && 'opacity-50 cursor-not-allowed'}`}
-          >
+        >
           Subir <FontAwesomeIcon icon={faCloudUploadAlt} className="ml-2" />
         </button>
       </div>
@@ -244,4 +244,4 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
   );
 };
 
-export default ModalUpload;
+export default ModalUpload;

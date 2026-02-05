@@ -88,7 +88,6 @@ export default async function ResumenAnexo7C_OHLA_Digitalizado(data = {}, docExi
       color: Number(raw?.color),
       codigoColor: String(raw?.codigoColor),
       textoColor: String(raw?.textoColor),
-      apto: (typeof raw?.aproboPsicologico_aprobo_inf === 'boolean') ? raw.aproboPsicologico_aprobo_inf : false,
       // Mapeo de antecedentes médicos - usando los campos correctos
       antecedentesPersonales: String(raw?.antecedentesPersonales2Anexo7c_txtantecedentespersonales2 || ''),
       antecedentesPatologicos: String(raw?.antecedentesPatologicos_ante_patologicos || ''),
@@ -106,7 +105,7 @@ export default async function ResumenAnexo7C_OHLA_Digitalizado(data = {}, docExi
       medicina: String(raw?.aptitud || ''),
       examenOftalmologico: String(raw?.enfermedadesocularesoftalmo_e_oculares || ''),
       examenOdontologico: String(raw?.observacionesOdontograma_txtobservaciones || ''),
-      evaluacionPsicologica: raw?.aproboPsicologico_aprobo_inf ? 'APTO' : 'NO APTO',
+      evaluacionPsicologica: String(raw?.aproboPsicologico_aprobo_inf || ''),
       audiometria: String(raw?.diagnosticoAudiometria_diagnostico || ''),
       radiografiaTorax: String(raw?.conclusionesRadiograficas || ''),
       electrocardiograma: String(raw?.hallazgosInformeElectroCardiograma_hallazgo || ''),

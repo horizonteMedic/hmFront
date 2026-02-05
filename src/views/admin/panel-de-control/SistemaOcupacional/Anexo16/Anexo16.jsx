@@ -4,6 +4,7 @@ import {
   faUser,
   faStethoscope,
   faChartLine,
+  faFlask,
 } from "@fortawesome/free-solid-svg-icons";
 import Resultados from "./Resultados/Resultados";
 import Examenes from "./Examenes/Examenes";
@@ -15,6 +16,7 @@ import { getToday } from "../../../../utils/helpers";
 import { GetExamenesRealizados, PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAnexo16";
 import Swal from "sweetalert2";
 import Abdomen from "./Abdomen/Abdomen";
+import Laboratorio from "./Laboratorio/Laboratorio";
 
 const tabla = "anexo7c";
 
@@ -346,8 +348,9 @@ export default function Anexo16() {
       component: DatosPersonales,
     },
     { id: 1, name: "Exámenes", icon: faStethoscope, component: Examenes },
-    { id: 2, name: "Abdomen", icon: faChartLine, component: Abdomen },
-    { id: 3, name: "Resultados", icon: faChartLine, component: Resultados },
+    { id: 2, name: "Laboratorio", icon: faFlask, component: Laboratorio },
+    { id: 3, name: "Abdomen", icon: faChartLine, component: Abdomen },
+    { id: 4, name: "Resultados", icon: faChartLine, component: Resultados },
 
   ];
 

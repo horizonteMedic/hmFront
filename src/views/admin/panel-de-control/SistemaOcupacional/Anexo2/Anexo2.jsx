@@ -5,6 +5,7 @@ import {
   faStethoscope,
   faHeartbeat,
   faChartLine,
+  faFlask,
 } from "@fortawesome/free-solid-svg-icons";
 import Resultados from "./Resultados/Resultados";
 import ExamenFisico from "./ExamenFisico/ExamenFisico";
@@ -16,6 +17,7 @@ import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import { GetExamenesRealizados, PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAnexo2";
 import Swal from "sweetalert2";
+import Laboratorio from "./Laboratorio/Laboratorio";
 
 const tabla = "anexo_agroindustrial";
 const today = getToday();
@@ -329,13 +331,14 @@ export default function Anexo2() {
       component: DatosPersonales,
     },
     { id: 1, name: "Exámenes", icon: faStethoscope, component: Examenes },
+    { id: 2, name: "Laboratorio", icon: faFlask, component: Laboratorio },
     {
-      id: 2,
+      id: 3,
       name: "Examen Físico",
       icon: faHeartbeat,
       component: ExamenFisico,
     },
-    { id: 3, name: "Resultados", icon: faChartLine, component: Resultados },
+    { id: 4, name: "Resultados", icon: faChartLine, component: Resultados },
   ];
 
   const handleSave = () => {

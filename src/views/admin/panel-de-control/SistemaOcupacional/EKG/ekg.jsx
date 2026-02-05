@@ -78,6 +78,10 @@ export default function EKG() {
     nombre_medico: userName,
     user_medicoFirma: userlogued,
 
+    //DOCTOR ASIGNADO
+    nombre_doctorAsignado: "",
+    user_doctorAsignado: "",
+
     SubirDoc: false,
     nomenclatura: "ELECTROCARDIOGRAMA"
   };
@@ -559,6 +563,14 @@ export default function EKG() {
             label="Especialista"
             form={form}
             onChange={handleChangeSimple}
+          />
+          <EmpleadoComboBox
+            value={form.nombre_doctorAsignado}
+            label="Doctor Asignado"
+            form={form}
+            onChange={handleChangeSimple}
+            nameField="nombre_doctorAsignado"
+            idField="user_doctorAsignado"
           />
         </SectionFieldset>
         {/* BOTONES DE ACCIÓN */}

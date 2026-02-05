@@ -77,6 +77,7 @@ export const GetInfoServicio = async (
       recomendaciones: res.recomendaciones ?? "",
 
       user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+      user_doctorAsignado: res.doctorAsignado,
       SubirDoc: true,
       digitalizacion: res.digitalizacion
     }));
@@ -115,6 +116,7 @@ export const SubmitDataService = async (
     edadPaciente: form.edad,
 
     usuarioFirma: form.user_medicoFirma,
+    doctorAsignado: form.user_doctorAsignado,
     userRegistro: user,
   };
 
@@ -217,5 +219,5 @@ export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
   ReadArchivosFormDefault(form, setVisualerOpen, token)
 }
 export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token) => {
-    handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token)
+  handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token)
 }
