@@ -348,7 +348,7 @@ export default function Anexo16() {
       component: DatosPersonales,
     },
     { id: 1, name: "Exámenes", icon: faStethoscope, component: Examenes },
-    { id: 2, name: "Laboratorio", icon: faFlask, component: Laboratorio },
+    // { id: 2, name: "Laboratorio", icon: faFlask, component: Laboratorio },
     { id: 3, name: "Abdomen", icon: faChartLine, component: Abdomen },
     { id: 4, name: "Resultados", icon: faChartLine, component: Resultados },
 
