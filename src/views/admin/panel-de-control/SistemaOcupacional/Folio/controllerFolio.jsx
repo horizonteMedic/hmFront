@@ -4,11 +4,14 @@ import {
     LoadingDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
-import { getFetch } from "../../../../utils/apiHelpers";
+import { getFetch, SubmitDataManejo } from "../../../../utils/apiHelpers";
 
 const GetExamenURL = `/api/v01/st/registros/obtenerExistenciasExamenes`
 const GetExamenExterno = `/api/v01/st/registros/detalleUrlArchivos`
 const GetNomenclatura = `/api/v01/ct/fichaInterconsulta/obtenerEspecialidadesNomenclaturaFichaInterconsulta`
+
+const registrarUrl = "/api/v01/ct/asignarFirma/registrarActualizarOrdenOcupacionalFirma";
+const obtenerUrl = "/api/v01/ct/asignarFirma/obtenerOrdenOcupacionalFirmaPorNOrden"
 
 export const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
     LoadingDefault("Validando datos");
@@ -140,4 +143,66 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
         Swal.close();
     }
 
+};
+
+export const GetFirmasAsignadasGeneral = async (nro, token) => {
+    try {
+        const res = await getFetch(
+            `${obtenerUrl}?nOrden=${nro}`,
+            token
+        );
+        return res;
+    } catch (error) {
+        console.log(error)
+        return null;
+    }
+};
+export const obtenerFirmas = async (nro, token, set) => {
+    try {
+        const res = await GetFirmasAsignadasGeneral(nro, token);
+        if (res && res.resultado) {
+            console.log("res", res.resultado);
+            set(prev => ({
+                ...prev,
+                user_medicoFirma: res.resultado.profesional,
+                idFirma: res.resultado.id,
+            }))
+        }
+    } catch (error) {
+        throw error;
+    } finally {
+        Swal.close();
+    }
+}
+
+export const SubmitDataService = async (
+    token,
+    finallyFun = () => { },
+    form,
+    userlogued
+) => {
+    try {
+        LoadingDefault("Registrando Datos");
+        const body = {
+            id: form.idFirma,
+            norden: form.norden,
+            profesional: form.user_medicoFirma,
+            doctorAsignado: "",
+            doctorExtra: "",
+            usuarioRegistro: form.idFirma == null ? userlogued : null,
+            usuarioActualizacion: form.idFirma == null ? null : userlogued
+        }
+
+        const res = await SubmitDataManejo(body, registrarUrl, token)
+        Swal.fire({
+            title: "Exito",
+            text: `${res.resultado ?? ""}`,
+            icon: "success",
+        })
+        finallyFun();
+    } catch (error) {
+        console.error(error);
+        Swal.fire("Error", "Ocurrio un error al registrar los datos", "error");
+        return null;
+    }
 };

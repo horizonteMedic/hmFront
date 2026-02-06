@@ -5,9 +5,10 @@ import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import FolioJasper from "../../../../jaspers/FolioJasper/FolioJasper";
 import { getToday } from "../../../../utils/helpers";
-import { GetInfoPac } from "./controllerFolio";
+import { GetInfoPac, obtenerFirmas, SubmitDataService } from "./controllerFolio";
 import Swal from "sweetalert2";
 import { buildExamenesList } from "./folioCatalogo";
+import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
 const ExamenesListPRUEBAS2 = buildExamenesList([
     "OFTALMOLOGIA_VISION_TESTER",
@@ -36,32 +37,34 @@ const ExamenesListPRUEBAS = buildExamenesList([
     // "ESPIROMETRIA_ARCHIVO",
     // "LABORATORIO_ARCHIVO_EXTERNO",
     // "DECLARACION_USO_FIRMA_ARCHIVO",
+    "PERFIL_LIPIDICO",
+    "ANALISIS_GLUCOSA_BASAL",
     //PRUEBA 1 = ANEXOS
-    "INFORME_PSICOLOGICO",
-    "INFORME_PODEROSA_OPERAR",
-    "PSICOLOGIA_ANEXO_02",
-    "PSICOLOGIA_ANEXO_03",
-    //PRUEBA 2 = BOROO
-    "INFORME_PSICOLABORAL",  
-    "INFORME_RIESGO_PSICOSOCIAL", //nuevo
-    "INFORME_BURNOUT", //nuevo
-    //Prueba 3
-    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
-    "ESPACIOS_CONFINADOS_PSICOLOGIA",
-    "CALIDADSUEÑO",
-    "INFORME_PSICOLOGIA_FOBIAS",
-    "AVERSION_RIESGO", //nuevo
-    "TRABAJO_ALTURA_PSICO",
-    "TRANSTORNO_PERSONALIDAD_PSICO", //nuevo
-    //Prueba 4
-    "INFORME_CONDUCTORES", //nuevo
-    "ALTO_RIESGO", //nuevo
-    "TRABAJO_ESPECIFICOS",
-    "CUESTIONARIO_BERLIN",
-    "EXAMENES_COMPLEMENTARIOS",
-    "BRIGADISTAS_PSICOLOGIA", //nuevo
-    "BOMBA_ELECTRICA", //nuevo
-    "PSICOLOGIA_VIGIA" //nuevo
+    // "INFORME_PSICOLOGICO",
+    // "INFORME_PODEROSA_OPERAR",
+    // "PSICOLOGIA_ANEXO_02",
+    // "PSICOLOGIA_ANEXO_03",
+    // //PRUEBA 2 = BOROO
+    // "INFORME_PSICOLABORAL",  
+    // "INFORME_RIESGO_PSICOSOCIAL", //nuevo
+    // "INFORME_BURNOUT", //nuevo
+    // //Prueba 3
+    // "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
+    // "ESPACIOS_CONFINADOS_PSICOLOGIA",
+    // "CALIDADSUEÑO",
+    // "INFORME_PSICOLOGIA_FOBIAS",
+    // "AVERSION_RIESGO", //nuevo
+    // "TRABAJO_ALTURA_PSICO",
+    // "TRANSTORNO_PERSONALIDAD_PSICO", //nuevo
+    // //Prueba 4
+    // "INFORME_CONDUCTORES", //nuevo
+    // "ALTO_RIESGO", //nuevo
+    // "TRABAJO_ESPECIFICOS",
+    // "CUESTIONARIO_BERLIN",
+    // "EXAMENES_COMPLEMENTARIOS",
+    // "BRIGADISTAS_PSICOLOGIA", //nuevo
+    // "BOMBA_ELECTRICA", //nuevo
+    // "PSICOLOGIA_VIGIA" //nuevo
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -448,12 +451,18 @@ const Folio = () => {
         ocupacion: "",
         cargoDesempenar: "",
         listaExamenes: ListaPorPlantilla["OHLA"],
+
+        // Médico que Certifica //BUSCADOR
+        idFirma: null,
+        nombre_medico: "",
+        user_medicoFirma: "",
     };
 
     const {
         form,
         setForm,
         handleChangeNumber,
+        handleChangeSimple,
         handleClear,
         handleClearnotO,
     } = useForm(initialFormState, { storageKey: "Folio_KEY" });
@@ -463,9 +472,13 @@ const Folio = () => {
             handleClearnotO();
             const currentList = ListaPorPlantilla[selectedListType] || ListaPorPlantilla["OHLA"];
             GetInfoPac(form.norden, setForm, token, selectedSede, currentList);
-            //VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+            obtenerFirmas(form.norden, token, setForm, userlogued);
         }
     };
+
+    const handleRegisterFirma = () => {
+        SubmitDataService(token, () => { handleSearch({ key: "Enter" }) }, form);
+    }
 
     const handleListChange = (e) => {
         const newValue = e.target.value;
@@ -749,7 +762,30 @@ const Folio = () => {
                     </div>
                 </div>
             </SectionFieldset>
+            {/* <SectionFieldset legend="Asignación de Profesional Firma" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Especialista"
+                    form={form}
+                    onChange={handleChangeSimple}
+                />
+                <div className="flex mt-auto">
+                    <button type="button"
+                        className={`
+                                text-white text-base px-6 py-2 rounded
+                                flex items-center gap-2
+                                transition-all duration-150 ease-out
+                                ${!form.norden
+                                ? "bg-gray-400 cursor-not-allowed pointer-events-none"
+                                : "bg-blue-600 hover:bg-blue-700 hover:shadow-lg active:scale-95 active:shadow-inner"
+                            }
+                        `}
+                        onClick={handleRegisterFirma}
+                        disabled={!form.norden}
+                    >Registrar Firma</button>
+                </div>
 
+            </SectionFieldset> */}
             {/* ===== SECCIÓN: EXAMENES ===== */}
             <SectionFieldset legend="Examenes" className="flex flex-col justify-center items-center w-full">
 
