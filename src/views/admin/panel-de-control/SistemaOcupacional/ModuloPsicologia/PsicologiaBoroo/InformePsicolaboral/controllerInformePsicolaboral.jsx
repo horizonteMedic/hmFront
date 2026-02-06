@@ -260,7 +260,7 @@ const GetInfoPac = async (nro, set, token, sede) => {
             ...res,
             nombres: res.nombresApellidos,
             sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
-            anual: res.nombreExamen == "ANUAL",
+            anual: res.nomExam == "ANUAL",
             dni: res.dni,
             edad: res.edad,
             tipoExamen: res.nomExam,
