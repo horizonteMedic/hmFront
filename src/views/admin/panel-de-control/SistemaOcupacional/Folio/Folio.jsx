@@ -346,6 +346,9 @@ const ExamenesListOHLA3 = buildExamenesList([       //OHLA 3
 
 const ExamenesListPsicologia = buildExamenesList([
     "INFORME_PSICOLOGICO",
+    "INFORME_PODEROSA_OPERAR",
+    "INFORME_PODEROSA_OPERAR_LICENCIA",
+    "INFORME_PODEROSA_OPERAR_CALIENTE",
     "PSICOLOGIA_ANEXO_02",
 
     "PSICOLOGIA_ANEXO_03",
