@@ -24,6 +24,9 @@ const ModalContrata = ({
   const [formData, setFormData] = useState({
     ruc: "",
     razonSocial: "",
+    distrito: "",
+    provincia: "",
+    departamento: "",
     direccion: "",
     telefonos: "",
     responsable: "",
@@ -53,8 +56,9 @@ const ModalContrata = ({
           setPuedeHabilitar(false);
           Swal.fire("Error", "El RUC ya existe", "error");
         } else {
-          setExisteRUC(false);
-          setPuedeHabilitar(true);
+          buscarEmpresaenLinea(ruc)
+          //setExisteRUC(false);
+          //setPuedeHabilitar(true);
         }
       })
       .catch((error) => {
@@ -62,6 +66,36 @@ const ModalContrata = ({
         setExisteRUC(false);
         setPuedeHabilitar(true);
         // Swal.fire("Error", "Error al verificar el RUC", "error");
+      });
+  };
+
+  const buscarEmpresaenLinea = (ruc) => {
+    Get(
+      `/api/v01/ct/infoAdmisionEmpresa/datosEmpresa/${ruc}`,
+      token
+    )
+      .then((res) => {
+        if (res.ruc == ruc) {
+          setFormData((prev) => ({
+            ...prev,
+            ruc: res.ruc || "",
+            razonSocial: res.razonSocial || "",
+            direccion: res.direccion || "",
+            distrito: res.distrito || "",
+            provincia: res.provincia || "",
+            departamento: res.departamento || "",
+            responsable: res.responsable || "",
+          }));
+          Swal.fire("Success", "Empresa no registrada. Datos encontrados en Línea", "success");
+        }
+      })
+      .catch((error) => {
+        console.error("Error checking RUC existence:", error);
+        // Swal.fire("Error", "Error al verificar el RUC", "error");
+      })
+      .finally(() => {
+        setExisteRUC(false);
+        setPuedeHabilitar(true);
       });
   };
 
@@ -141,6 +175,9 @@ const ModalContrata = ({
     setFormData({
       ruc: "",
       razonSocial: "",
+      distrito: "",
+      provincia: "",
+      departamento: "",
       direccion: "",
       telefonos: "",
       responsable: "",
@@ -155,6 +192,9 @@ const ModalContrata = ({
     setFormData({
       ruc: "",
       razonSocial: "",
+      distrito: "",
+      provincia: "",
+      departamento: "",
       direccion: "",
       telefonos: "",
       responsable: "",
@@ -167,10 +207,19 @@ const ModalContrata = ({
     setPuedeHabilitar(false);
   };
 
+  const handleRucPaste = (e) => {
+    e.preventDefault();
+    const pastedText = e.clipboardData.getData('text').trim();
+    setFormData((prev) => ({
+      ...prev,
+      ruc: pastedText.toUpperCase(),
+    }));
+  };
+
   // Add ESC key handler
   useEffect(() => {
     const handleEsc = (e) => {
-      if (e.key === "Escape") {
+      if (e.key === "Escape" || e.key === "Esc" || e.keyCode === 27) {
         handleClose();
       }
     };
@@ -178,7 +227,6 @@ const ModalContrata = ({
     return () => window.removeEventListener("keydown", handleEsc);
   }, [onClose]);
 
-  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -200,9 +248,9 @@ const ModalContrata = ({
               name="ruc"
               value={formData.ruc}
               onChange={handleChange}
-              className={`border rounded px-2 py-1 flex-1 ${
-                habilitar ? "bg-slate-300" : "bg-white"
-              }`}
+              onPaste={handleRucPaste}
+              className={`border rounded px-2 py-1 flex-1 ${habilitar ? "bg-slate-300" : "bg-white"
+                }`}
               maxLength={11}
               disabled={habilitar}
               required
@@ -234,9 +282,8 @@ const ModalContrata = ({
             name="razonSocial"
             value={formData.razonSocial}
             onChange={handleChange}
-            className={`border rounded px-2 py-1 ${
-              habilitar || existeRUC ? "bg-slate-300" : "bg-white"
-            }`}
+            className={`border rounded px-2 py-1 ${habilitar || existeRUC ? "bg-slate-300" : "bg-white"
+              }`}
             disabled={habilitar || existeRUC}
             required
           />
@@ -256,9 +303,8 @@ const ModalContrata = ({
             name="direccion"
             value={formData.direccion}
             onChange={handleChange}
-            className={`border rounded px-2 py-1 ${
-              habilitar || existeRUC ? "bg-slate-300" : "bg-white"
-            }`}
+            className={`border rounded px-2 py-1 ${habilitar || existeRUC ? "bg-slate-300" : "bg-white"
+              }`}
             disabled={habilitar || existeRUC}
           />
           <button
@@ -269,17 +315,17 @@ const ModalContrata = ({
             <FontAwesomeIcon icon={faBroom} /> Limpiar
           </button>
 
-          <label className="text-right">Teléfonos:</label>
+          <label className="text-right">Distrito:</label>
           <input
-            type="text"
-            name="telefonos"
-            value={formData.telefonos}
+            name="distrito"
+            value={formData.distrito}
             onChange={handleChange}
-            className={`border rounded px-2 py-1 ${
-              habilitar || existeRUC ? "bg-slate-300" : "bg-white"
-            }`}
             disabled={habilitar || existeRUC}
+            className={`border rounded px-2 py-1 ${habilitar || existeRUC ? "bg-slate-300" : "bg-white"
+              }`}
           />
+
+
           <button
             type="button"
             className="px-3 py-1 bg-green-600 text-white rounded flex items-center gap-2"
@@ -287,17 +333,16 @@ const ModalContrata = ({
             <FontAwesomeIcon icon={faFileExport} /> Exportar
           </button>
 
-          <label className="text-right">Responsable:</label>
+          <label className="text-right">Provincia:</label>
           <input
-            type="text"
-            name="responsable"
-            value={formData.responsable}
+            name="provincia"
+            value={formData.provincia}
             onChange={handleChange}
-            className={`border rounded px-2 py-1 ${
-              habilitar || existeRUC ? "bg-slate-300" : "bg-white"
-            }`}
             disabled={habilitar || existeRUC}
+            className={`border rounded px-2 py-1 ${habilitar || existeRUC ? "bg-slate-300" : "bg-white"
+              }`}
           />
+
           <button
             type="button"
             onClick={handleClose}
@@ -306,17 +351,16 @@ const ModalContrata = ({
             <FontAwesomeIcon icon={faTimes} /> Cerrar
           </button>
 
-          <label className="text-right">Email:</label>
+          <label className="text-right">Departamento:</label>
           <input
-            type="email"
-            name="email"
-            value={formData.email}
+            name="departamento"
+            value={formData.departamento}
             onChange={handleChange}
-            className={`border rounded px-2 py-1 ${
-              habilitar || existeRUC ? "bg-slate-300" : "bg-white"
-            }`}
             disabled={habilitar || existeRUC}
+            className={`border rounded px-2 py-1 ${habilitar || existeRUC ? "bg-slate-300" : "bg-white"
+              }`}
           />
+
           <button
             type="button"
             onClick={() => {
@@ -328,6 +372,42 @@ const ModalContrata = ({
           >
             <FontAwesomeIcon icon={faUnlock} /> Habilitar
           </button>
+
+          <label className="text-right">Teléfonos:</label>
+          <input
+            type="text"
+            disabled={habilitar || existeRUC}
+            name="telefonos"
+            value={formData.telefonos}
+            onChange={handleChange}
+            className={`border rounded px-2 py-1 ${habilitar || existeRUC ? "bg-slate-300" : "bg-white"
+              }`}
+          />
+          <div />
+
+          <label className="text-right">Responsable:</label>
+          <input
+            type="text"
+            disabled={habilitar || existeRUC}
+            name="responsable"
+            value={formData.responsable}
+            onChange={handleChange}
+            className={`border rounded px-2 py-1 ${habilitar || existeRUC ? "bg-slate-300" : "bg-white"
+              }`}
+          />
+          <div />
+
+          <label className="text-right">Email:</label>
+          <input
+            type="email"
+            disabled={habilitar || existeRUC}
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className={`border rounded px-2 py-1 ${habilitar || existeRUC ? "bg-slate-300" : "bg-white"
+              }`}
+          />
+          <div />
         </div>
 
         {/* Search Razón Social input */}

@@ -1255,7 +1255,7 @@ export const GetInfoServicioEditar = (
           data.ninguno = restriccionesTexto === "NINGUNO" || restriccionesTexto === "";
           data.notasDoctor = res.notasDoctor ?? "";
           console.log("DATA EDITAR", data);
-          set((prev) => ({ ...prev, ...data }));
+          set((prev) => ({ ...prev, ...data, ...res }));
         }
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");

@@ -20,7 +20,9 @@ const AsignarEmpresaContrataModal = ({ closeModal, id, user, userlogued, token }
         setLoading(true);
         ListEoCUsername(id, token)
             .then(response => {
-                setData(response);
+                if (Array.isArray(response)) {
+                    setData(response)
+                }
             })
             .catch(error => {
                 throw new Error('Network response was not ok.', error);
@@ -44,35 +46,35 @@ const AsignarEmpresaContrataModal = ({ closeModal, id, user, userlogued, token }
 
     const deleteEoCUser = (id) => {
         Swal.fire({
-          title: "¿Estas Seguro?",
-          text: "No puedes revertir esta accion!",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#3085d6",
-          cancelButtonColor: "#d33",
-          confirmButtonText: "Si, Eliminar!"
+            title: "¿Estas Seguro?",
+            text: "No puedes revertir esta accion!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Si, Eliminar!"
         }).then((result) => {
-          if (result.isConfirmed) {
-            DeleteEoCxUser(id,token)
-              .then(() => {
-                Swal.fire({
-                  title: "Eliminado!",
-                  text: "Esta Asignacion ha sido eliminada.",
-                  icon: "success"
-                }).then((result) => {
-                  if (result.isConfirmed) Refresgpag()
-                });
-              })
-              .catch(() => {
-                Swal.fire({
-                  title: "Error!",
-                  text: "La asignacion no se ha podido Eliminar!",
-                  icon: "error"
-                });
-              });
-          }
+            if (result.isConfirmed) {
+                DeleteEoCxUser(id, token)
+                    .then(() => {
+                        Swal.fire({
+                            title: "Eliminado!",
+                            text: "Esta Asignacion ha sido eliminada.",
+                            icon: "success"
+                        }).then((result) => {
+                            if (result.isConfirmed) Refresgpag()
+                        });
+                    })
+                    .catch(() => {
+                        Swal.fire({
+                            title: "Error!",
+                            text: "La asignacion no se ha podido Eliminar!",
+                            icon: "error"
+                        });
+                    });
+            }
         });
-      }
+    }
     return (
         <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
             <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[500px] h-auto relative">
@@ -108,7 +110,7 @@ const AsignarEmpresaContrataModal = ({ closeModal, id, user, userlogued, token }
                                         <td className="border border-gray-300 px-2 py-1">{item.ruc}</td>
                                         <td className="border border-gray-300 px-2 py-1">{item.estado ? 'Activo' : 'Inactivo'}</td>
                                         <td className="border border-gray-300 px-2 py-1 text-center">
-                                            <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 pointer" onClick={() =>{deleteEoCUser(item.id)}}/>
+                                            <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 pointer" onClick={() => { deleteEoCUser(item.id) }} />
                                         </td>
                                     </tr>
                                 ))}

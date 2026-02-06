@@ -19,72 +19,94 @@ export default function Laboratorio({
                 {/* Información Triaje */}
                 <div className="bg-white border border-gray-200 rounded-lg p-3 h-full flex flex-col">
                     <h4 className="font-semibold text-gray-800 mb-2">
-                        Información Triaje
+                        Hematologia-BQ-ECO
                     </h4>
                     <div className="space-y-2 grid grid-cols-2 gap-x-4 flex-1">
                         <InputTextOneLine
-                            label="Temp. (°C)"
-                            name="temperatura"
-                            value={form.temperatura}
+                            label="Leucocitos"
+                            name="temperaleucocitosHematologiatura"
+                            value={form.leucocitosHematologia}
                             disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
-                            label="Cintura (cm)"
-                            name="cintura"
-                            value={form.cintura}
+                            label="Hematies"
+                            name="hematiesHematologia"
+                            value={form.hematiesHematologia}
                             disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
-                            label="Cadera (cm)"
-                            name="cadera"
-                            value={form.cadera}
+                            label="Plaquetas"
+                            name="plaquetasHematologia"
+                            value={form.plaquetasHematologia}
                             disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
-                            label="ICC"
-                            name="icc"
-                            value={form.icc}
+                            label="Neutrofilos"
+                            name="neutrofilosHematologia"
+                            value={form.neutrofilosHematologia}
                             disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
-                            label="F. Respiratoria (min)"
-                            name="frecuenciaRespiratoria"
-                            value={form.frecuenciaRespiratoria}
+                            label="Abastonados"
+                            name="abastonadosHematologia"
+                            value={form.abastonadosHematologia}
                             disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
-                            label="F. Cardiaca (min)"
-                            name="frecuenciaCardiaca"
-                            value={form.frecuenciaCardiaca}
+                            label="Segmentados"
+                            name="segmentadosHematologia"
+                            value={form.segmentadosHematologia}
                             disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
-                            label="Sat. O2 (%)"
-                            name="saturacionO2"
-                            value={form.saturacionO2}
+                            label="Monocitos"
+                            name="monocitosHematologia"
+                            value={form.monocitosHematologia}
                             disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
-                            label="Sistólica (min)"
-                            name="presionSistolica"
-                            value={form.presionSistolica}
+                            label="Eosinofilos"
+                            name="eosinofilosHematologia"
+                            value={form.eosinofilosHematologia}
                             disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
-                            label="Diastólica (min)"
-                            name="presionDiastolica"
-                            value={form.presionDiastolica}
+                            label="Basofilos"
+                            name="basofilosHematologia"
+                            value={form.basofilosHematologia}
                             disabled
                             labelWidth="100px"
                         />
+                        <InputTextOneLine
+                            label="Linfocitos"
+                            name="linfocitosHematologia"
+                            value={form.linfocitosHematologia}
+                            disabled
+                            labelWidth="100px"
+                        />
+                        <InputTextOneLine
+                            label="VIH"
+                            name="vihHematologia"
+                            value={form.vihHematologia}
+                            disabled
+                            labelWidth="100px"
+                        />
+                        <InputTextOneLine
+                            label="RPR"
+                            name="rprHematologia"
+                            value={form.rprHematologia}
+                            disabled
+                            labelWidth="100px"
+                        />
+
                     </div>
                 </div>
 
@@ -97,43 +119,38 @@ export default function Laboratorio({
                         <div className="space-y-2">
                             <InputTextOneLine
                                 label="Colesterol Total"
-                                name="colesterolTotal"
-                                value={form.colesterolTotal}
+                                name="colesterolAnalisisBioquimico_txtcolesterol"
+                                value={form.colesterolAnalisisBioquimico_txtcolesterol}
                                 labelWidth="100px"
                                 disabled
-                                className={form.colesterolRed ? "text-red-600" : ""}
                             />
                             <InputTextOneLine
                                 label="L.D.L Colesterol"
-                                name="LDLColesterol"
-                                value={form.LDLColesterol}
+                                name="ldlcolesterolAnalisisBioquimico_txtldlcolesterol"
+                                value={form.ldlcolesterolAnalisisBioquimico_txtldlcolesterol}
                                 labelWidth="100px"
                                 disabled
-                                className={form.ldlRed ? "text-red-600" : ""}
                             />
                             <InputTextOneLine
                                 label="H.D.L Colesterol"
-                                name="HDLColesterol"
-                                value={form.HDLColesterol}
+                                name="hdlcolesterolAnalisisBioquimico_txthdlcolesterol"
+                                value={form.hdlcolesterolAnalisisBioquimico_txthdlcolesterol}
                                 labelWidth="100px"
                                 disabled
-                                className={form.hdlRed ? "text-red-600" : ""}
                             />
                             <InputTextOneLine
                                 label="V.L.D.L Colesterol"
-                                name="VLDLColesterol"
-                                value={form.VLDLColesterol}
+                                name="vldlcolesterolAnalisisBioquimico_txtvldlcolesterol"
+                                value={form.vldlcolesterolAnalisisBioquimico_txtvldlcolesterol}
                                 labelWidth="100px"
                                 disabled
-                                className={form.vldlRed ? "text-red-600" : ""}
                             />
                             <InputTextOneLine
                                 label="Triglicéridos"
-                                name="trigliceridos"
-                                value={form.trigliceridos}
+                                name="trigliseridosAnalisisBioquimico_txttrigliseridos"
+                                value={form.trigliseridosAnalisisBioquimico_txttrigliseridos}
                                 labelWidth="100px"
                                 disabled
-                                className={form.trigliceridosRed ? "text-red-600" : ""}
                             />
                         </div>
                     </div>
@@ -147,22 +164,22 @@ export default function Laboratorio({
                     <div className="space-y-3">
                         <InputTextOneLine
                             label="Creatinina Sérica"
-                            name="temperatura"
-                            value={form.temperatura}
+                            name="creatininaPerfilRenal"
+                            value={form.creatininaPerfilRenal}
                             disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
                             label="Urea Sérica"
-                            name="cintura"
-                            value={form.cintura}
+                            name="ureaSericaPerfilRenal"
+                            value={form.ureaSericaPerfilRenal}
                             disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
                             label="Acido Urico Sérico"
-                            name="cadera"
-                            value={form.cadera}
+                            name="acidoUricoSericoPerfilRenal"
+                            value={form.acidoUricoSericoPerfilRenal}
                             disabled
                             labelWidth="100px"
                         />
@@ -181,71 +198,71 @@ export default function Laboratorio({
                     <div className="space-y-2 grid grid-cols-2 gap-x-4 flex-1">
                         <InputTextOneLine
                             label="Fosfatasa Alcalina"
-                            name="temperatura"
-                            value={form.temperatura}
+                            name="fosfatasaAlcalinaPerfilHepatico"
+                            value={form.fosfatasaAlcalinaPerfilHepatico}
                             disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
                             label="Bilirrubina Directa"
-                            name="cintura"
-                            value={form.cintura}
+                            name="bilirrubinaDirectaPerfilHepatico"
+                            value={form.bilirrubinaDirectaPerfilHepatico}
                             disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
                             label="GGT"
-                            name="cadera"
-                            value={form.cadera}
+                            name="ggtPerfilHepatico"
+                            value={form.ggtPerfilHepatico}
                             disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
                             label="Bilirrubina Indirecta"
-                            name="icc"
-                            value={form.icc}
+                            name="bilirrubinaIndirectaPerfilHepatico"
+                            value={form.bilirrubinaIndirectaPerfilHepatico}
                             disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
                             label="TGP"
-                            name="frecuenciaRespiratoria"
-                            value={form.frecuenciaRespiratoria}
+                            name="tgpPerfilHepatico"
+                            value={form.tgpPerfilHepatico}
                             disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
                             label="Proteínas Totales"
-                            name="frecuenciaCardiaca"
-                            value={form.frecuenciaCardiaca}
+                            name="proteinaTotalesPerfilHepatico"
+                            value={form.proteinaTotalesPerfilHepatico}
                             disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
                             label="TGO"
-                            name="saturacionO2"
-                            value={form.saturacionO2}
+                            name="tgoPerfilHepatico"
+                            value={form.tgoPerfilHepatico}
                             disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
                             label="Albumina"
-                            name="presionSistolica"
-                            value={form.presionSistolica}
+                            name="albuminaPerfilHepatico"
+                            value={form.albuminaPerfilHepatico}
                             disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
                             label="Bilirrubina Total"
-                            name="presionDiastolica"
-                            value={form.presionDiastolica}
+                            name="bilirrubinaTotalPerfilHepatico"
+                            value={form.bilirrubinaTotalPerfilHepatico}
                             disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
                             label="Globulina Sérica"
-                            name="presionDiastolica"
-                            value={form.presionDiastolica}
+                            name="globulinaSericaPerfilHepatico"
+                            value={form.globulinaSericaPerfilHepatico}
                             disabled
                             labelWidth="100px"
                         />
@@ -261,8 +278,8 @@ export default function Laboratorio({
                         <div className="space-y-2">
                             <InputTextOneLine
                                 label="Resultado"
-                                name="colesterolTotal"
-                                value={form.colesterolTotal}
+                                name="resultadoGonadotropina"
+                                value={form.resultadoGonadotropina}
                                 labelWidth="100px"
                                 disabled
                                 className={form.colesterolRed ? "text-red-600" : ""}
@@ -279,8 +296,8 @@ export default function Laboratorio({
                     <div className="space-y-3">
                         <InputTextOneLine
                             label="RPR"
-                            name="temperatura"
-                            value={form.temperatura}
+                            name="rprHematologia"
+                            value={form.rprHematologia}
                             disabled
                             labelWidth="100px"
                         />

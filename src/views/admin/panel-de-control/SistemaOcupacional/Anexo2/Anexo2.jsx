@@ -331,7 +331,7 @@ export default function Anexo2() {
       component: DatosPersonales,
     },
     { id: 1, name: "Exámenes", icon: faStethoscope, component: Examenes },
-    // { id: 2, name: "Laboratorio", icon: faFlask, component: Laboratorio },
+    //{ id: 2, name: "Laboratorio", icon: faFlask, component: Laboratorio },
     {
       id: 3,
       name: "Examen Físico",

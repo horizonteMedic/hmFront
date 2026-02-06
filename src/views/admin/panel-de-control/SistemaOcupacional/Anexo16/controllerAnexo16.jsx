@@ -1413,6 +1413,7 @@ export const GetInfoServicioEditar = (
             imagenRadiograficaPolvo: res.examenRadiograficoIrep_txtirep ?? "",
             piel: res.pielAnexo7c_piel ? "NORMAL" : "ANORMAL",
             pielObservaciones: res.pielDescripcionAnexo7c_piel_descripcion,
+            colesterolAnalisisBioquimico_txtcolesterol: res.colesterolAnalisisBioquimico_txtcolesterol
           };
 
           console.log("interpretacionFuncionRespiratoria_interpretacion", res.interpretacionFuncionRespiratoria_interpretacion)
@@ -1784,7 +1785,7 @@ export const GetInfoServicioEditar = (
           data = MapearDatosAdicionales(res, data, 1, true);
 
           console.log("DATA EDITAR", data);
-          set((prev) => ({ ...prev, ...data }));
+          set((prev) => ({ ...prev, ...data, ...res }));
         }
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
