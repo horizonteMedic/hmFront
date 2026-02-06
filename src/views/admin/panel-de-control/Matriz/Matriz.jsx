@@ -23,7 +23,6 @@ const MATRICES_MAP = {
 const MatrizPostulante = () => {
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
-
   //ACCESOS
   const Acceso = useAuthStore(state => state.listAccesos);
   const tienePermisoEnVista = (nombreVista, permiso) => {
@@ -195,138 +194,6 @@ const MatrizPostulante = () => {
     } finally {
       setLoading(false);
     }
-
-    /*if (datos.matrizSeleccionada === 'Matriz-1') {
-      GetMatrizAdmin(datosapi, token)
-        .then(response => {
-          setData(response);
-          const headers = Object.keys(response[0]);
-          setHeaders(headers);
-          setTotalPages(Math.ceil(response.length / recordsPerPage));
-        })
-        .catch(error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Ocurrio un error al traer la Matriz',
-            text: 'No hay datos que mostrar',
-          });
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else if (datos.matrizSeleccionada === 'Matriz-2') {
-      GetMatrizDoctor(datosapi, token)
-        .then(response => {
-          setData(response);
-          const headers = Object.keys(response[0]);
-          setHeaders(headers);
-          setTotalPages(Math.ceil(response.length / recordsPerPage));
-        })
-        .catch(error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Ocurrio un error al traer la Matriz',
-            text: 'No hay datos que mostrar',
-          });
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else if (datos.matrizSeleccionada === 'Matriz-3') {
-      GetMatrizArchivos(token)
-        .then(response => {
-          setData(response);
-          const headers = Object.keys(response[0]);
-          setHeaders(headers);
-          setTotalPages(Math.ceil(response.length / recordsPerPage));
-        })
-        .catch(error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Ocurrio un error al traer la Matriz',
-            text: 'No hay datos que mostrar',
-          });
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else if (datos.matrizSeleccionada === 'Matriz-4') {
-      GetMatrizADMOHLA(datosapi, token)
-        .then(response => {
-          setData(response);
-          const headers = Object.keys(response[0]);
-          setHeaders(headers);
-          setTotalPages(Math.ceil(response.length / recordsPerPage));
-        })
-        .catch(error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Ocurrio un error al traer la Matriz',
-            text: 'No hay datos que mostrar',
-          });
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else if (datos.matrizSeleccionada === 'Matriz-5') {
-      GetMatrizSALUDOHLA(datosapi, token)
-        .then(response => {
-          setData(response);
-          const headers = Object.keys(response[0]);
-          setHeaders(headers);
-          setTotalPages(Math.ceil(response.length / recordsPerPage));
-        })
-        .catch(error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Ocurrio un error al traer la Matriz',
-            text: 'No hay datos que mostrar',
-          });
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else if (datos.matrizSeleccionada === 'Matriz-6') {
-      GetMatrizGeneral(datosapi, token)
-        .then(response => {
-          setData(response);
-          const headers = Object.keys(response[0]);
-          setHeaders(headers);
-          setTotalPages(Math.ceil(response.length / recordsPerPage));
-        })
-        .catch(error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Ocurrio un error al traer la Matriz',
-            text: 'No hay datos que mostrar',
-          });
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else if (datos.matrizSeleccionada === 'Matriz-7') {
-      GetMatrizGestorOHLA(datosapi, token)
-        .then(response => {
-          setData(response);
-          const headers = Object.keys(response[0]);
-          setHeaders(headers);
-          setTotalPages(Math.ceil(response.length / recordsPerPage));
-        })
-        .catch(error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Ocurrio un error al traer la Matriz',
-            text: 'No hay datos que mostrar',
-          });
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      setLoading(false)
-    }*/
-
-
   };
 
   const handleRUCEmpresa = (e) => {
@@ -389,8 +256,24 @@ const MatrizPostulante = () => {
       cell.style = headerStyle;
     });
 
+    const indexResponsable = head.findIndex(
+      h => h.toLowerCase() === 'responsabledigitalizacion'
+    );
+
     data.forEach(row => {
-      const dataRow = worksheet.addRow(Object.values(row));
+      // clonamos para no mutar el dataset original
+      const rowData = { ...row };
+
+      // 🔒 Lógica exclusiva Matriz-9
+      if (
+        datos.matrizSeleccionada === 'Matriz-9' &&
+        indexResponsable !== -1
+      ) {
+        rowData[head[indexResponsable]] =
+          userlogued.datos.nombres_user.toUpperCase();
+      }
+
+      const dataRow = worksheet.addRow(Object.values(rowData));
       dataRow.eachCell(cell => {
         cell.style = dataStyle;
       });
@@ -406,6 +289,7 @@ const MatrizPostulante = () => {
     });
 
     const buffer = await workbook.xlsx.writeBuffer();
+    console.log(datos.matrizSeleccionada)
     const dataFile = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     saveAs(dataFile, 'matriz_postulante.xlsx');
   };
