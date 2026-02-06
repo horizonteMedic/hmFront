@@ -188,7 +188,10 @@ export const reportesMap = {
 
    perfil_hepatico: PerfilHepatico_Digitalizado,
 
-   analisis_bioquimicos: AnalisisBioquimicos_Digitalizado,
+   analisis_bioquimicos:{
+      AnalisisBioquimicos_Digitalizado,
+      ExamenGlucosaBasal
+   },
 
    l_bioquimica: LBioquimica_Digitalizado,
 
@@ -204,9 +207,7 @@ export const reportesMap = {
    riesgocoronario: RiesgoCoronario,
 
    glucosatolerancia: GlucosaTolerancia,
-
-   analisis_bioquimicos: ExamenGlucosaBasal,
-  
+ 
    inmunologia: InmunologiaLab_Digitalizado,
 
    lhepatitis:{ //nuevo
@@ -236,9 +237,10 @@ export const reportesMap = {
       ParasitologiaSeriado_Digitalizado
    },
   
-   examen_inmunologico: pcualitativaantigeno, //nuevo
-   
-   examen_inmunologico: pcuantiantigeno, //nuevo
+   examen_inmunologico:{
+      pcualitativaantigeno, //nuevo
+      pcuantiantigeno //nuevo
+   },
 
    /* =========================
       CONSENTIMIENTOS
@@ -344,7 +346,8 @@ export const reportesMap = {
    bombaelectrica: Informe_Psico_BombaElectrica, //nuevo
 
    cuadradorvigia: Informe_Psico_CuadradorVigia, //nuevo
-      informe_psicolaboral: {
+     
+   informe_psicolaboral: {
       Informe_PsicolaboralBoroo_Digitalizado,
       Informe_PsicolaboralBorooA_Digitalizado
    }, // pedir que backend envie correctamente namejasper
