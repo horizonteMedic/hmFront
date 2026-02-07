@@ -207,7 +207,7 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
   }
 
   doc.text(horaFormateada, tablaInicioX + 155, yPos - 1.5)
-  
+
   // Configurar líneas para filas de datos
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
@@ -392,8 +392,8 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
 
   // === SECCIÓN 3: EVALUACIÓN OFTALMOLÓGICA ===
   // Solo mostrar si es oftalmología o agudeza visual
-  const mostrarSeccionOftalmologia = datosFinales.esOftalmologia || 
-    datosFinales.especialidad.toUpperCase() === "OFTALMO" || 
+  const mostrarSeccionOftalmologia = datosFinales.esOftalmologia ||
+    datosFinales.especialidad.toUpperCase() === "OFTALMO" ||
     datosFinales.especialidad.toUpperCase() === "AGUDEZA VISUAL";
 
   if (mostrarSeccionOftalmologia) {
@@ -553,7 +553,7 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
 
   // === FUNCIÓN PARA CALCULAR ALTURA DINÁMICA ===
   const calcularAlturaHallazgos = (texto, anchoMaximo) => {
-    if (!texto || texto.trim() === "") return 15; // Reducido de 20 a 15
+    if (!texto || texto.trim() === "") return 24; // Reducido de 20 a 15
 
     const palabras = texto.split(' ');
     let lineaActual = '';
@@ -577,7 +577,7 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
 
     // Altura por línea de 2.5mm (reducido de 3mm)
     const alturaCalculada = lineas * 2.5 + 2;
-    return Math.max(alturaCalculada, 15); // Altura mínima reducida de 20 a 15
+    return Math.max(alturaCalculada, 24); // Altura mínima reducida de 20 a 15
   };
 
   // === SECCIÓN 4: MOTIVO DE INTERCONSULTA ===
@@ -787,7 +787,7 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
 
   // === SECCIÓN DE FIRMAS ===
   const yFirmas = yPos; // Continuar directamente desde la sección anterior
-  const alturaSeccionFirmas = 22; // Reducido de 28 a 22 para más compacto
+  const alturaSeccionFirmas = 26; // Reducido de 28 a 22 para más compacto
 
   // Dibujar las líneas de la sección de firmas (solo columna del trabajador)
   doc.line(tablaInicioX, yFirmas, tablaInicioX, yFirmas + alturaSeccionFirmas); // Línea izquierda
@@ -839,9 +839,11 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("Firma y Huella del trabajador", 50, yFirmas + 20, { align: "center" }); // Reducido de 26 a 20
 
+  doc.text("Firma del Médico", 150, yFirmas + 20, { align: "center" }); // Reducido de 26 a 20
+
   // Solo mostrar APTO/NO APTO si la empresa NO es CONSORCIO COPTOS ni HIDRANDINA
   const empresaUpper = (datosFinales.empresa || "").toUpperCase().trim();
-  const ocultarAptoNoApto = empresaUpper === "CONSORCIO COPTOS" || 
+  const ocultarAptoNoApto = empresaUpper === "CONSORCIO COPTOS" ||
     empresaUpper === "EMPRESA REGIONAL DE SERVICIO PUBLICO DE ELECTRICIDAD ELECTRONORTEMEDIO SOCIEDAD ANONIMA - HIDRANDINA";
 
   if (!ocultarAptoNoApto) {
