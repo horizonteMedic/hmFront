@@ -389,8 +389,23 @@ const MatrizPostulante = () => {
       cell.style = headerStyle;
     });
 
+    const indexResponsable = head.findIndex(
+      h => h.toLowerCase() === 'responsabledigitalizacion'
+    );
+
     data.forEach(row => {
-      const dataRow = worksheet.addRow(Object.values(row));
+      const rowData = { ...row };
+
+      // 🔒 Lógica exclusiva Matriz-9
+      if (
+        datos.matrizSeleccionada === 'Matriz-9' &&
+        indexResponsable !== -1
+      ) {
+        rowData[head[indexResponsable]] =
+          userlogued.datos.nombres_user.toUpperCase();
+      }
+
+      const dataRow = worksheet.addRow(Object.values(rowData));
       dataRow.eachCell(cell => {
         cell.style = dataStyle;
       });
