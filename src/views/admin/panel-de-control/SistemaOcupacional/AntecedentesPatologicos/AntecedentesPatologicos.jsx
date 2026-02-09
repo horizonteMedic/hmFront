@@ -11,10 +11,10 @@ import { getToday } from "../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAntecedentesPatologicos";
 
 const tabla = "antecedentes_patologicos"
-const today = getToday();
 
 // Tab Normal de Antecedentes Patológicos
 export default function AntecedentesPatologicos({ listas }) {
+  const today = getToday();
   const { MedicosMulti } = listas;
   const { token, userlogued, selectedSede, datosFooter, userCompleto, userName } =
     useSessionData();
