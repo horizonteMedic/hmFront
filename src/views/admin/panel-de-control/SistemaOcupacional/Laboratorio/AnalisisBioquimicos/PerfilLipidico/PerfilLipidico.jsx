@@ -104,34 +104,39 @@ export default function PerfilLipidico() {
   }, [selectedSede]);
 
   useEffect(() => {
-    const ct = form.colesterolTotal;
-    const tg = form.trigliceridos;
-    const nCT = parseFloat(String(ct).replace(',', '.'));
-    const nTG = parseFloat(String(tg).replace(',', '.'));
-    const updates = {};
-    if (ct !== '' && Number.isFinite(nCT)) {
-      const h = nCT * 0.25;
-      updates.hdl = h.toFixed(1);
-    } else {
-      updates.hdl = '';
+    console.log("no")
+    if (!form.Editando) {
+      console.log("Ssi")
+      const ct = form.colesterolTotal;
+      const tg = form.trigliceridos;
+      const nCT = parseFloat(String(ct).replace(',', '.'));
+      const nTG = parseFloat(String(tg).replace(',', '.'));
+      const updates = {};
+      if (ct !== '' && Number.isFinite(nCT)) {
+        const h = nCT * 0.25;
+        updates.hdl = h.toFixed(1);
+      } else {
+        updates.hdl = '';
+      }
+      if (tg !== '' && Number.isFinite(nTG)) {
+        const v = nTG / 5;
+        updates.vldl = v.toFixed(1);
+      } else {
+        updates.vldl = '';
+      }
+      if (ct !== '' && tg !== '' && Number.isFinite(nCT) && Number.isFinite(nTG)) {
+        const h = nCT * 0.25;
+        const v = nTG / 5;
+        updates.ldl = (nCT - h - v).toFixed(1);
+      } else {
+        updates.ldl = '';
+      }
+      setForm((prev) => ({
+        ...prev,
+        ...updates
+      }));
     }
-    if (tg !== '' && Number.isFinite(nTG)) {
-      const v = nTG / 5;
-      updates.vldl = v.toFixed(1);
-    } else {
-      updates.vldl = '';
-    }
-    if (ct !== '' && tg !== '' && Number.isFinite(nCT) && Number.isFinite(nTG)) {
-      const h = nCT * 0.25;
-      const v = nTG / 5;
-      updates.ldl = (nCT - h - v).toFixed(1);
-    } else {
-      updates.ldl = '';
-    }
-    setForm((prev) => ({
-      ...prev,
-      ...updates
-    }));
+
   }, [form.colesterolTotal, form.trigliceridos]);
 
   return (
