@@ -94,7 +94,6 @@ export default function FichaInterconsulta() {
         SubirDoc: false,
         nomenclatura: "",
         orden: "",
-        NewNomenclatura: ""
     }
 
     const { form, setForm, handleChangeSimple, handleChange, handleClear, handleClearnotO, handleChangeNumber, handleRadioButtonBoolean, handleRadioButton, handlePrintDefault } = useForm(Initialform, { storageKey: "ficha_interconsultas_form" })

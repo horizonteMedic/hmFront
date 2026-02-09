@@ -1104,13 +1104,13 @@ export const MapearDatosAdicionales = (
             ? "B"
             : res.grupoSanguineoAB_chkab
               ? "AB"
-              : "O";
+              : "";
 
       data.factorRh = res.grupoSanguineoRhPositivo_rbrhpositivo
         ? "RH(+)"
         : res.grupoSanguineoRhNegativo_rbrhnegativo
           ? "RH(-)"
-          : "RH(+)";
+          : "";
 
       // Fechas y calidad
       data.fechaRx = res.fechaExamenRadiografico_fecha_exra ?? "";
@@ -1195,12 +1195,12 @@ export const MapearDatosAdicionales = (
             ? "B"
             : res.grupoSanguineoAB_chkab
               ? "AB"
-              : "O";
+              : "";
       data.factorRh = res.grupoSanguineoRhPositivo_rbrhpositivo
         ? "RH(+)"
         : res.grupoSanguineoRhNegativo_rbrhnegativo
           ? "RH(-)"
-          : "RH(+)";
+          : "";
 
       const vsg = res.vsgLaboratorioClinico_txtvsg;
       const gluc = res.glucosaLaboratorioClinico_txtglucosabio;

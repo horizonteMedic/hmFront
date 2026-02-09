@@ -4,6 +4,7 @@ import {
   InputsRadioGroup,
   InputTextOneLine,
   InputTextArea,
+  SectionFieldset,
 } from "../../../../../components/reusableComponents/ResusableComponents";
 
 export default function DatosPersonales({
@@ -463,13 +464,15 @@ export default function DatosPersonales({
               </div>
             </div>
           </div>
-          <InputTextArea
-            label="Notas Para Doctor"
-            name="notasDoctor"
-            value={form.notasDoctor}
-            rows={4}
-            disabled
-          />
+          <SectionFieldset legend="Notas Para Doctor">
+            <InputTextArea
+              label="Notas"
+              name="notasDoctor"
+              value={form.notasDoctor}
+              rows={4}
+              disabled
+            />
+          </SectionFieldset>
         </div>
 
         {/* Columna Derecha - Número de Hijos e Inmunizaciones */}

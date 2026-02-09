@@ -597,7 +597,7 @@ export const SubmitDataService = async (
             ...reg,
             quirurjicosId: form.codigoAntecedentesPatologicos_cod_ap ? reg.quirurjicosId : null,
         })),//form.antecedentes || null,
-        eliminarPatologicosQuirurjicos:
+        eliminarPatologicosQuirurgicos:
             form.codigoAntecedentesPatologicos_cod_ap ? form.antecedentesEliminados : null,
         userRegistro: user,
 
