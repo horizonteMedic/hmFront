@@ -2,9 +2,11 @@ import Swal from "sweetalert2";
 import { URLAzure } from "../../../../config/config";
 import { GetInfoServicioDefault, LoadingDefault, GetInfoPacDefault } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
+import { getFetch } from "../../../../utils/apiHelpers";
 
 const obtenerReporteUrl =
     "/api/v01/st/registros/obtenerExistenciasExamenes";
+const GetExamenURL = `/api/v01/st/registros/obtenerExistenciasExamenes`
 
 const urlsEliminar = {
     // Examen Ocupacional
@@ -22,11 +24,11 @@ const urlsEliminar = {
     histOcupacional: "historiaOcupacional",
     cuestionarioNordico: "cuestionarioNordico",
     evMusculoEsqueletica: "evaluacionMusculoEsqueletica",
-    oftalmologia: "", 
-    actitudMedOcupacional: "", 
+    oftalmologia: "",
+    actitudMedOcupacional: "",
     usoRespiradores: "respiradores",
     anexo16A: "anexos/anexo16a",
-    consentimientoDosaje: "", 
+    consentimientoDosaje: "",
     anexo16: "anexos/anexo16",
     electrocardiograma: "electroCardiograma",
     // Trabajos en Altura
@@ -35,50 +37,25 @@ const urlsEliminar = {
     // Otros Formatos
     evMuscEsqueletico: "evaluacionMusculoEsqueletica",
     cuestCalidadSueno: "cuestionarioCalidadSueno",
-    evalOftalmologica: "", 
+    evalOftalmologica: "",
     certManipuladores: "certificadoManipuladoresAlimentos",
     cuestAudiometria: "cuestionarioNordico",
     informeAudiometria: "audiometriaPo",
     perimetroToraxico: "",
     // Conducción de Vehículos
-    fichaSAS: "fichaApneaSueno", 
+    fichaSAS: "fichaApneaSueno",
     certConduccVehiculos: "certificadoConduccion",
     // Fichas Sin Restricción 
     fMedica: "anexos/fichaAnexo16",
-    fAptitudMedOcup: "", 
-    fMedicaAnexo2: "anexos/anexo2", 
+    fAptitudMedOcup: "",
+    fMedicaAnexo2: "anexos/anexo2",
     fAptitudAnexo2: "",
     fMedAgro: "", //pendiente
     fAptitudAgro: "", //pendiente   
 }
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
-    GetInfoPac(nro, set, token, sede);
-    GetInfoServicio(nro, tabla, set, token, () => { Swal.close(); });
-};
-
-export const GetInfoServicio = async (
-    nro,
-    tabla,
-    set,
-    token,
-    onFinish = () => { }
-) => {
-    LoadingDefault("Validando datos");
-    const res = await GetInfoServicioDefault(
-        nro,
-        tabla,
-        token,
-        obtenerReporteUrl,
-        onFinish
-    );
-    if (res) {
-        set((prev) => ({
-            ...prev,
-            norden: res.norden,
-            
-        }));
-    }
+export const VerifyTR = async (nro, tabla, token, set, sede, ExamenesList) => {
+    GetInfoPac(nro, set, token, sede, ExamenesList);
 };
 
 export const DeleteExamen = async (norden, campo, token, setForm) => {
@@ -123,7 +100,8 @@ export const DeleteExamen = async (norden, campo, token, setForm) => {
     }
 };
 
-const GetInfoPac = async (nro, set, token, sede) => {
+const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
+    LoadingDefault("Validando datos");
     const res = await GetInfoPacDefault(nro, token, sede);
     if (res) {
         set((prev) => ({
@@ -138,5 +116,48 @@ const GetInfoPac = async (nro, set, token, sede) => {
             lugarNacimiento: res.lugarNacimiento ?? "",
             sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
         }));
+        GetExamenesCheck(nro, set, token, ExamenesList);
     }
+};
+
+const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
+    LoadingDefault("Cargando examenes");
+
+    try {
+        const res = await getFetch(`${GetExamenURL}?nOrden=${nro}`, token);
+        console.log(res)
+
+        // 🔹 1. Normalizar respuesta a mapa por nameService
+        const serviciosMap = Object.values(res).reduce((acc, item) => {
+            acc[item.nameService] = item.existe;
+            return acc;
+        }, {});
+
+        // 🔹 2. Mapear lista base de exámenes
+        const configActualizada = ExamenesList.map(section => ({
+            ...section,
+            items: section.items.map(item => {
+                const existe = serviciosMap[item.name] === true;
+
+                return {
+                    ...item,
+                    resultado: existe,
+                };
+            }),
+        }));
+
+        console.log(configActualizada)
+        // 🔹 3. Set único (sin renders extras)
+        set(prev => ({
+            ...prev,
+            listaExamenes: configActualizada,
+        }));
+
+
+    } catch (error) {
+        console.error("Error al cargar exámenes:", error);
+    } finally {
+        Swal.close();
+    }
+
 };

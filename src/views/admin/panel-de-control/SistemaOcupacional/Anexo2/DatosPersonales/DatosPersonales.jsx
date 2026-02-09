@@ -4,6 +4,7 @@ import {
   InputsBooleanRadioGroup,
   InputTextArea,
   InputTextOneLine,
+  SectionFieldset,
 } from "../../../../../components/reusableComponents/ResusableComponents";
 
 export default function DatosPersonales({
@@ -240,13 +241,15 @@ export default function DatosPersonales({
               />
             </div>
           </div>
+        <SectionFieldset legend="Notas Para Doctor">
           <InputTextArea
-            label="Notas Para Doctor"
+            label="Nota"
             name="notasDoctor"
             value={form.notasDoctor}
             rows={4}
             disabled
           />
+          </SectionFieldset> 
         </div>
 
         {/* Columna Derecha */}

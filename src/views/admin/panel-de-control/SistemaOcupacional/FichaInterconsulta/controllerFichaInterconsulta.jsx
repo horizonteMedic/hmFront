@@ -117,7 +117,7 @@ export const GetInfoServicio = async (
             // Detecta el botón de "Nuevo registro"
             const isDenied = Swal.isVisible() && Swal.getDenyButton().classList.contains("swal2-deny");
             if (isDenied) {
-                GetInfoServicioNewEditar(nro, Object.values(inputOptions)[0], tabla, set, token, () => { Swal.close(); }, totalRadios + 1)
+                GetInfoServicioNewEditar(nro, Object.values(inputOptions)[0], tabla, set, token, () => { Swal.close(); })
             }
         }
 
@@ -204,7 +204,7 @@ export const GetInfoServicioNewEditar = async (
     set,
     token,
     onFinish = () => { },
-    NewNomenclatura = ""
+    // NewNomenclatura = ""
 ) => {
     const res = await GetInfoServicioInterconsulta(
         nro,
@@ -232,7 +232,7 @@ export const GetInfoServicioNewEditar = async (
             diagnostico: "",
             tratamiento: "",
             apto: false,
-            NewNomenclatura: NewNomenclatura
+            // NewNomenclatura: NewNomenclatura
         }));
     }
 };
@@ -264,7 +264,7 @@ export const SubmitDataService = async (
         "noApto": false,
         "horaSalida": getHoraActual(),
         "orden": null,
-        "nomenclatura": `INTERCONSULTA${form.NewNomenclatura ? ` ${form.NewNomenclatura}` : ""}`
+        // "nomenclatura": `INTERCONSULTA${form.NewNomenclatura ? ` ${form.NewNomenclatura}` : ""}`
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

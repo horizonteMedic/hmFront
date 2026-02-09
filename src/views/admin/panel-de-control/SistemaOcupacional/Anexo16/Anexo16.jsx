@@ -112,8 +112,8 @@ export default function Anexo16() {
     //Grupo Sanguineo
     grupoSanguineoPrevio: "",
     grupoSanguineoGrupo: "",
-    grupoSanguineo: "O",
-    factorRh: "RH(+)",
+    grupoSanguineo: "",
+    factorRh: "",
     //Resultados de Laboratorio
     colesterolTotal: "",
     LDLColesterol: "",
