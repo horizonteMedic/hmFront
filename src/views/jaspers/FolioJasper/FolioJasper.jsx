@@ -80,7 +80,6 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "microbiologia",//NUEVO 
         "lhepatitis", //NUEVO
         "ac_coproparasitologico",
-        "lab_clinico", //NUEVO
         "analisis_bioquimicos", //NUEVO
         "examen_inmunologico" //NUEVO
     ]

@@ -262,7 +262,7 @@ export const EXAMENES_CATALOGO = {
 
     HEMOGLOBINA:{ //nuevo Gr
         nombre: "HEMOGLOBINA",
-        tabla: "lab_clinico",
+        tabla: "lab_clinico_hemoglobina",
         url: "/api/v01/ct/laboratorio/obtenerReporteHemoglobina",
         esJasper: true,
     },
@@ -480,7 +480,7 @@ export const EXAMENES_CATALOGO = {
 
     EXAMEN_ORINA_LAB:{  //nuevo Gr
         nombre: "EXAMEN ORINA LABORATORIO",
-        tabla: "lab_clinico",
+        tabla: "lab_clinico_examen_orina",
         url: "/api/v01/ct/laboratorio/obtenerReporteOrina",
         esJasper: true,
     },

@@ -178,17 +178,18 @@ export const reportesMap = {
    ========================= */
    lgonadotropina: LGonadotropina_Digitalizado,
 
-   lab_clinico:{ //NUEVO 
-      LaboratorioClinico_Digitalizado,
-      Informe_Lab_hemoglobina,
-      Informe_Lab_Eco,
-   },
+   lab_clinico: LaboratorioClinico_Digitalizado,
+
+   lab_clinico_examen_orina: Informe_Lab_Eco,
+
+   lab_clinico_hemoglobina: Informe_Lab_hemoglobina,
+
 
    toxicologia: ResultadosPanel5d_Digitalizado,
 
    perfil_hepatico: PerfilHepatico_Digitalizado,
 
-   analisis_bioquimicos:{
+   analisis_bioquimicos: {
       AnalisisBioquimicos_Digitalizado,
       Informe_Lab_Glucosa_Basal
    },
@@ -207,10 +208,10 @@ export const reportesMap = {
    riesgocoronario: RiesgoCoronario,
 
    glucosatolerancia: GlucosaTolerancia,
- 
+
    inmunologia: InmunologiaLab_Digitalizado,
 
-   lhepatitis:{ //nuevo
+   lhepatitis: { //nuevo
       LHepatitisA_Digitalizado,
       LHepatitisB_Digitalizado,
       LHepatitisC_Digitalizado
@@ -232,12 +233,12 @@ export const reportesMap = {
 
    ac_coprocultivo: coprocultivo_digitalizado,  //nuevo
 
-   ac_coproparasitologico:{
+   ac_coproparasitologico: {
       Coproparasitologico_Digitalizado,  //nuevo
       ParasitologiaSeriado_Digitalizado
    },
-  
-   examen_inmunologico:{
+
+   examen_inmunologico: {
       pcualitativaantigeno, //nuevo
       pcuantiantigeno //nuevo
    },
@@ -263,7 +264,7 @@ export const reportesMap = {
 
    consent_Muestra_Sangre: Consentimiento_Muestra_Sangre_Digitalizado,
 
-   con_panel2D: Consentimiento_Panel2D_Digitalizado, 
+   con_panel2D: Consentimiento_Panel2D_Digitalizado,
 
    con_panel5D: Consentimiento_Panel5D_ohla_Digitalizado,
 
@@ -316,13 +317,13 @@ export const reportesMap = {
    cuestionario_berlin: Informe_Psico_Cuestionario_Berlin,
 
    informe_riesgos_psicosociales: Informe_Riesgos_Psicosociales_Digitalizado, //nuevo
-   
+
    psicologia_espacios_confinados: formatPsicologia_SuficienciaEspaciosC,
 
    ficha_psicologica_anexo03: FichaPsicologicaOcupacional_Digitalizado,
 
    informe_burnout: Informe_burnout_Digitalizado,//nuevo
-   
+
    informe_psicologico_estres: InformePsicologicoAdecoEstres_Digitalizado,
 
    evaluacion_psicologica_poderosa_normal: EvaluacionPsicologica_p_Digitalizado,
@@ -336,9 +337,9 @@ export const reportesMap = {
    fobias: INFORME_ADICIONAL_DE_FOBIAS_Digitalizado,
 
    aversionalriesgo: Informe_Aversión_Riesgo_Digitalizado, //nuevo
-   
+
    infor_conductores: Informe_Psico_Conductores, //nuevo
-   
+
    alto_riesgo: Informe_Psico_Alto_Riesgo, //nuevo
 
    psi_brigadistas: Informe_Psico_Brigadista, //nuevo
@@ -346,7 +347,7 @@ export const reportesMap = {
    bombaelectrica: Informe_Psico_BombaElectrica, //nuevo
 
    cuadradorvigia: Informe_Psico_CuadradorVigia, //nuevo
-     
+
    informe_psicolaboral: {
       Informe_PsicolaboralBoroo_Digitalizado,
       Informe_PsicolaboralBorooA_Digitalizado
@@ -366,7 +367,7 @@ export const reportesMap = {
    exam_complementarios: InformePsicoExamComplementario,
 
    certificacion_medica_altura: A_CertificacionMedicaPTA_Digitalizado,
-   
+
    calidad_sueño: CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado
 
 };
