@@ -436,7 +436,7 @@ export const EXAMENES_CATALOGO = {
 
     ANALISIS_GLUCOSA_BASAL: { //nuevo Gr
         nombre: "ANALISIS BIOQUIMICOS - GLUCOSA BASAL",
-        tabla: "analisis_bioquimicos",
+        tabla: "analisis_bioquimicos_glucosa_basal",
         url: "/api/v01/ct/analisisBioquimico/obtenerReporteGlucosaBasal",
         esJasper: true,
     },

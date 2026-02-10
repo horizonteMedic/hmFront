@@ -418,8 +418,6 @@ const ExamenesListLaboratorio = buildExamenesList([
     "MANIPULADORES_COPROCULTIVO",
     "MANIPULADORES_PARASITOLOGIA",
     "EXAMEN_ORINA_LAB",
-    "PRUEBA_CUALITATIVA",
-    "PRUEBA_CUANTITATIVA",
 ]);
 
 const ListaPorPlantilla = {
