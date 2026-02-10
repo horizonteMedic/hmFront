@@ -82,6 +82,8 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
         txtCreatinina: "",
         fechaRegistro: form.fecha,
 
+        esGlucosaBasal: true,
+
         usuarioFirma: form.user_medicoFirma,
         doctorAsignado: form.user_doctorAsignado,
     };

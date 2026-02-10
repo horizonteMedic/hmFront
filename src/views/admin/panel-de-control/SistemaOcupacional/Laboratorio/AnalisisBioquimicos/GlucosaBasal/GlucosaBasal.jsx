@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import DatosPersonalesLaborales from '../../../../../../components/templates/DatosPersonalesLaborales';
 import BotonesAccion from '../../../../../../components/templates/BotonesAccion';
 
-const tabla = 'analisis_bioquimicos';
+const tabla = 'analisis_bioquimicos_glucosa_basal';
 
 export default function GlucosaBasal() {
     const { token, userlogued, selectedSede, userName } = useSessionData();

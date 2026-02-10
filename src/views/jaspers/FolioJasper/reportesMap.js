@@ -189,10 +189,9 @@ export const reportesMap = {
 
    perfil_hepatico: PerfilHepatico_Digitalizado,
 
-   analisis_bioquimicos: {
-      AnalisisBioquimicos_Digitalizado,
-      Informe_Lab_Glucosa_Basal
-   },
+   analisis_bioquimicos: AnalisisBioquimicos_Digitalizado,
+
+   analisis_bioquimicos_glucosa_basal: Informe_Lab_Glucosa_Basal,
 
    l_bioquimica: LBioquimica_Digitalizado,
 
