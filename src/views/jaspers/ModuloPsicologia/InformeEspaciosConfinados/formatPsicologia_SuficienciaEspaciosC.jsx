@@ -42,6 +42,8 @@ export default async function formatPsicologia_SuficienciaEspaciosC(data = {}, d
   }
 
   const datosFinales = buildDatosFinales(data);
+  // Flag para identificar reportes de la empresa OHLA y ocultar secciones específicas
+  const esOhla = Boolean(data?.esOhla || (datosFinales.empresa || '').toUpperCase().includes('OHLA'));
 
   // Header reutilizable
   const drawHeader = async (pageNumber) => {
@@ -305,112 +307,119 @@ export default async function formatPsicologia_SuficienciaEspaciosC(data = {}, d
   yTexto += filaAltura;
 
   // === SECCIÓN 2: CRITERIOS PSICOLÓGICOS ===
-  // Fila de texto centrado sin color de fondo
-  doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.setTextColor(0, 0, 0);
-  doc.text("CRITERIOS PSICOLÓGICOS", pageW / 2, yTexto + 3, { align: "center" });
-  yTexto += 6; // Espacio después del título
+  if (!esOhla) {
+    // Fila de texto centrado sin color de fondo
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text("CRITERIOS PSICOLÓGICOS", pageW / 2, yTexto + 3, { align: "center" });
+    yTexto += 6; // Espacio después del título
 
-  // Fila con 5 divisiones: Aspecto Intelectual (más ancho) | I | NPI | NP | NPS | S
-  const anchoAspectoIntelectual = 80; // Columna más ancha para el aspecto
-  const anchoColumnaEvaluacion = (tablaAncho - anchoAspectoIntelectual) / 5; // Las 5 columnas de evaluación
+    // Fila con 5 divisiones: Aspecto Intelectual (más ancho) | I | NPI | NP | NPS | S
+    const anchoAspectoIntelectual = 80; // Columna más ancha para el aspecto
+    const anchoColumnaEvaluacion = (tablaAncho - anchoAspectoIntelectual) / 5; // Las 5 columnas de evaluación
 
-  const posicionesColumnas = [
-    tablaInicioX, // Aspecto Intelectual
-    tablaInicioX + anchoAspectoIntelectual, // I
-    tablaInicioX + anchoAspectoIntelectual + anchoColumnaEvaluacion, // NPI
-    tablaInicioX + anchoAspectoIntelectual + anchoColumnaEvaluacion * 2, // NP
-    tablaInicioX + anchoAspectoIntelectual + anchoColumnaEvaluacion * 3, // NPS
-    tablaInicioX + anchoAspectoIntelectual + anchoColumnaEvaluacion * 4, // S
-    tablaInicioX + tablaAncho // Final
-  ];
+    const posicionesColumnas = [
+      tablaInicioX, // Aspecto Intelectual
+      tablaInicioX + anchoAspectoIntelectual, // I
+      tablaInicioX + anchoAspectoIntelectual + anchoColumnaEvaluacion, // NPI
+      tablaInicioX + anchoAspectoIntelectual + anchoColumnaEvaluacion * 2, // NP
+      tablaInicioX + anchoAspectoIntelectual + anchoColumnaEvaluacion * 3, // NPS
+      tablaInicioX + anchoAspectoIntelectual + anchoColumnaEvaluacion * 4, // S
+      tablaInicioX + tablaAncho // Final
+    ];
 
-  // Dibujar líneas de la tabla de criterios
-  doc.line(tablaInicioX, yTexto, tablaInicioX, yTexto + filaAltura); // Línea izquierda
-  posicionesColumnas.forEach((pos, index) => {
-    if (index > 0) {
-      doc.line(pos, yTexto, pos, yTexto + filaAltura); // Líneas verticales
-    }
-  });
-  doc.line(tablaInicioX, yTexto, tablaInicioX + tablaAncho, yTexto); // Línea superior
-  doc.line(tablaInicioX, yTexto + filaAltura, tablaInicioX + tablaAncho, yTexto + filaAltura); // Línea inferior
-
-  // Contenido de los headers
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Aspecto Intelectual", tablaInicioX + 2, yTexto + 3.5);
-  doc.text("I", posicionesColumnas[1] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
-  doc.text("NPI", posicionesColumnas[2] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
-  doc.text("NP", posicionesColumnas[3] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
-  doc.text("NPS", posicionesColumnas[4] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
-  doc.text("S", posicionesColumnas[5] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
-  yTexto += filaAltura;
-
-  // Función para obtener evaluación desde data
-  const getEvaluacion = (prefix) => {
-    // Manejar caso especial de "atencion" que puede venir como "atencio" (sin 'n')
-    if (prefix === "atencion") {
-      if (data[`atencionI`]) return "I";
-      if (data[`atencioNPI`] || data[`atencionNPI`]) return "NPI"; // Manejar ambos casos
-      if (data[`atencionNP`]) return "NP";
-      if (data[`atencionNPS`]) return "NPS";
-      if (data[`atencionS`]) return "S";
-      return "";
-    }
-    // Para otros prefijos
-    if (data[`${prefix}I`]) return "I";
-    if (data[`${prefix}NPI`]) return "NPI";
-    if (data[`${prefix}NP`]) return "NP";
-    if (data[`${prefix}NPS`]) return "NPS";
-    if (data[`${prefix}S`]) return "S";
-    return "";
-  };
-
-  // Datos de aspectos psicológicos desde data (solo 5)
-  const aspectosPsicologicos = [
-    { numero: 1, aspecto: "Razonamiento y Resolucion de problemas", evaluacion: getEvaluacion("razonamiento") },
-    { numero: 2, aspecto: "Memoria", evaluacion: getEvaluacion("memoria") },
-    { numero: 3, aspecto: "Atencion y Concentración", evaluacion: getEvaluacion("atencion") },
-    { numero: 4, aspecto: "Coordinación viso-motora", evaluacion: getEvaluacion("visoMotora") },
-    { numero: 5, aspecto: "Orientación Espacial", evaluacion: getEvaluacion("orientacionEspacial") }
-  ];
-
-  // Dibujar filas de datos
-  aspectosPsicologicos.forEach((aspecto) => {
-    // Dibujar líneas de la fila
+    // Dibujar líneas de la tabla de criterios
     doc.line(tablaInicioX, yTexto, tablaInicioX, yTexto + filaAltura); // Línea izquierda
-    posicionesColumnas.forEach((pos, posIndex) => {
-      if (posIndex > 0) {
+    posicionesColumnas.forEach((pos, index) => {
+      if (index > 0) {
         doc.line(pos, yTexto, pos, yTexto + filaAltura); // Líneas verticales
       }
     });
     doc.line(tablaInicioX, yTexto, tablaInicioX + tablaAncho, yTexto); // Línea superior
     doc.line(tablaInicioX, yTexto + filaAltura, tablaInicioX + tablaAncho, yTexto + filaAltura); // Línea inferior
 
-    // Contenido de la fila
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    // Contenido de los headers
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Aspecto Intelectual", tablaInicioX + 2, yTexto + 3.5);
+    doc.text("I", posicionesColumnas[1] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
+    doc.text("NPI", posicionesColumnas[2] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
+    doc.text("NP", posicionesColumnas[3] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
+    doc.text("NPS", posicionesColumnas[4] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
+    doc.text("S", posicionesColumnas[5] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
+    yTexto += filaAltura;
 
-    // Número
-    doc.text(aspecto.numero.toString(), tablaInicioX + 2, yTexto + 3.5);
-
-    // Aspecto psicológico
-    doc.text(aspecto.aspecto, tablaInicioX + 12, yTexto + 3.5);
-
-    // Marcar la evaluación correspondiente con X
-    const evaluaciones = ["I", "NPI", "NP", "NPS", "S"];
-    evaluaciones.forEach((evaluacion, evalIndex) => {
-      if (aspecto.evaluacion === evaluacion) {
-        doc.setFont("helvetica", "bold").setFontSize(10);
-        doc.text("X", posicionesColumnas[evalIndex + 1] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
-        doc.setFont("helvetica", "normal").setFontSize(8);
+    // Función para obtener evaluación desde data
+    const getEvaluacion = (prefix) => {
+      // Manejar caso especial de "atencion" que puede venir como "atencio" (sin 'n')
+      if (prefix === "atencion") {
+        if (data[`atencionI`]) return "I";
+        if (data[`atencioNPI`] || data[`atencionNPI`]) return "NPI"; // Manejar ambos casos
+        if (data[`atencionNP`]) return "NP";
+        if (data[`atencionNPS`]) return "NPS";
+        if (data[`atencionS`]) return "S";
+        return "";
       }
+      // Para otros prefijos
+      if (data[`${prefix}I`]) return "I";
+      if (data[`${prefix}NPI`]) return "NPI";
+      if (data[`${prefix}NP`]) return "NP";
+      if (data[`${prefix}NPS`]) return "NPS";
+      if (data[`${prefix}S`]) return "S";
+      return "";
+    };
+
+    // Datos de aspectos psicológicos desde data (solo 5)
+    const aspectosPsicologicos = [
+      { numero: 1, aspecto: "Razonamiento y Resolucion de problemas", evaluacion: getEvaluacion("razonamiento") },
+      { numero: 2, aspecto: "Memoria", evaluacion: getEvaluacion("memoria") },
+      { numero: 3, aspecto: "Atencion y Concentración", evaluacion: getEvaluacion("atencion") },
+      { numero: 4, aspecto: "Coordinación viso-motora", evaluacion: getEvaluacion("visoMotora") },
+      { numero: 5, aspecto: "Orientación Espacial", evaluacion: getEvaluacion("orientacionEspacial") }
+    ];
+
+    // Dibujar filas de datos
+    aspectosPsicologicos.forEach((aspecto) => {
+      // Dibujar líneas de la fila
+      doc.line(tablaInicioX, yTexto, tablaInicioX, yTexto + filaAltura); // Línea izquierda
+      posicionesColumnas.forEach((pos, posIndex) => {
+        if (posIndex > 0) {
+          doc.line(pos, yTexto, pos, yTexto + filaAltura); // Líneas verticales
+        }
+      });
+      doc.line(tablaInicioX, yTexto, tablaInicioX + tablaAncho, yTexto); // Línea superior
+      doc.line(tablaInicioX, yTexto + filaAltura, tablaInicioX + tablaAncho, yTexto + filaAltura); // Línea inferior
+
+      // Contenido de la fila
+      doc.setFont("helvetica", "normal").setFontSize(8);
+
+      // Número
+      doc.text(aspecto.numero.toString(), tablaInicioX + 2, yTexto + 3.5);
+
+      // Aspecto psicológico
+      doc.text(aspecto.aspecto, tablaInicioX + 12, yTexto + 3.5);
+
+      // Marcar la evaluación correspondiente con X
+      const evaluaciones = ["I", "NPI", "NP", "NPS", "S"];
+      evaluaciones.forEach((evaluacion, evalIndex) => {
+        if (aspecto.evaluacion === evaluacion) {
+          doc.setFont("helvetica", "bold").setFontSize(10);
+          doc.text("X", posicionesColumnas[evalIndex + 1] + anchoColumnaEvaluacion / 2, yTexto + 3.5, { align: "center" });
+          doc.setFont("helvetica", "normal").setFontSize(8);
+        }
+      });
+
+      yTexto += filaAltura;
     });
 
-    yTexto += filaAltura;
-  });
+    // Espacio antes de la nueva sección
+    yTexto += 3;
+  } else {
+    // Si es OHLA, no se muestra la tabla de criterios psicológicos
+    // y solo se deja un pequeño espacio antes de la siguiente sección
+    yTexto += 3;
+  }
 
   // === SECCIÓN 3: ASPECTOS PERSONALIDAD ===
-  // Espacio antes de la nueva sección
-  yTexto += 3;
 
   // Título de la sección
   doc.setFont("helvetica", "bold").setFontSize(10);
