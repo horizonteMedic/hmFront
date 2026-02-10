@@ -125,19 +125,19 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
 
     try {
         const res = await getFetch(`${GetExamenURL}?nOrden=${nro}`, token);
-        console.log(res)
+        console.log('respuesta', res)
 
         // 🔹 1. Normalizar respuesta a mapa por nameService
         const serviciosMap = Object.values(res).reduce((acc, item) => {
             acc[item.nameService] = item.existe;
             return acc;
         }, {});
-
+        console.log("servicios normalizados", serviciosMap)
         // 🔹 2. Mapear lista base de exámenes
         const configActualizada = ExamenesList.map(section => ({
             ...section,
             items: section.items.map(item => {
-                const existe = serviciosMap[item.name] === true;
+                const existe = serviciosMap[item.tabla] === true;
 
                 return {
                     ...item,
@@ -146,7 +146,7 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
             }),
         }));
 
-        console.log(configActualizada)
+        console.log('configActualizada', configActualizada)
         // 🔹 3. Set único (sin renders extras)
         set(prev => ({
             ...prev,

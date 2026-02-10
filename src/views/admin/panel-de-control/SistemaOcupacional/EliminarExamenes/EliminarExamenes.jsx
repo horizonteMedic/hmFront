@@ -27,23 +27,7 @@ export default function EliminarExamenes() {
         puestoActual: "",
         listaExamenes: EXAMENES_CONFIG,
 
-        // Examen Ocupacional
-        triaje: "", labClinico: "", rxTorax: "", fichaAudiologica: "", audiometria: "",
-        espirometria: "", odontograma: "", psicologia: "", fichaOIT: "", exRxSanguineos: "",
-        fichaAntPatologicos: "", histOcupacional: "", cuestionarioNordico: "", evMusculoEsqueletica: "",
-        oftalmologia: "", actitudMedOcupacional: "", usoRespiradores: "", anexo16A: "",
-        consentimientoDosaje: "", anexo16: "", electrocardiograma: "",
-        // Trabajos en Altura
-        certTrabAlturaBarrik: "", certTrabajoAltura: "",
-        // Otros Formatos
-        evMuscEsqueletico: "", cuestCalidadSueno: "", testFatSomnolencia: "",
-        evalOftalmologica: "", certManipuladores: "", cuestAudiometria: "", informeAudiometria: "",
-        perimetroToraxico: "",
-        // Conducción de Vehículos
-        fichaSAS: "", certConduccVehiculos: "",
-        // Fichas Sin Restricción
-        fMedica: "", fAptitudMedOcup: "", fMedicaAnexo2: "", fAptitudAnexo2: "",
-        fMedAgro: "", fAptitudAgro: "",
+
     };
 
     const {
@@ -61,7 +45,7 @@ export default function EliminarExamenes() {
             VerifyTR(form.norden, tabla, token, setForm, selectedSede, form.listaExamenes);
         }
     };
-    console.log(form.listaExamenes)
+
     const handleDelete = (campo) => {
         DeleteExamen(form.norden, campo, token, setForm, form);
     };
@@ -72,7 +56,7 @@ export default function EliminarExamenes() {
                 label={label}
                 name={name}
                 value={value}
-                inputClassName="text-center"
+                inputClassName={`text-center font-bold ${value === "PASO" ? "text-green-600" : "text-red-700"}`}
                 onChange={handleChange}
                 disabled
                 labelWidth="160px"
