@@ -114,6 +114,8 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
         txtPusSu: form.gramSc,
         txtOtrosSu: form.otros,
 
+        esOrina: true,
+
         userMedicoOcup: "",
         userRegistro: user,
 

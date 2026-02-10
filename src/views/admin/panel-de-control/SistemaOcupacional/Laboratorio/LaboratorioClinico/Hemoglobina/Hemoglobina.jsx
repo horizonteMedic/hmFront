@@ -11,7 +11,7 @@ import DatosPersonalesLaborales from '../../../../../../components/templates/Dat
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 import BotonesAccion from '../../../../../../components/templates/BotonesAccion';
 
-const tabla = 'lab_clinico';
+const tabla = 'lab_clinico_hemoglobina';
 
 export default function Hemoglobina() {
     const { token, userlogued, selectedSede, userName } = useSessionData();

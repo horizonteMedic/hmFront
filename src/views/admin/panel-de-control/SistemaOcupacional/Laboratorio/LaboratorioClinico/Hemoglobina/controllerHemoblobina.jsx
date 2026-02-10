@@ -123,6 +123,8 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
         // "txtPlaquetas": "",
         // "txtAcAscorbico": "",
 
+        esHemoglobina: true,
+
         userMedicoOcup: "",
         userRegistro: user,
 

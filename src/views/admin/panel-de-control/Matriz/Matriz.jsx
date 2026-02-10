@@ -17,7 +17,13 @@ const MATRICES_MAP = {
   "Matriz-6": { url: "st/registros/matrizGeneral", method: "POST" },
   "Matriz-7": { url: "st/registros/matrizOhlaGestor", method: "POST" },
   "Matriz-8": { url: "st/registros/matrizOhlaConstruccion", method: "POST" },
-  "Matriz-9": { url: "st/registros/matrizArena2026", method: "POST" }
+  "Matriz-9": { url: "st/registros/matrizArena2026", method: "POST" },
+  "Matriz-10": { url: "st/registros/matrizPoderosa2026", method: "POST" },
+  "Matriz-11": { url: "st/registros/matrizCaraveli2026", method: "POST" },
+  "Matriz-12": { url: "st/registros/matrizProseguridadAsistencia2026", method: "POST" },
+  "Matriz-13": { url: "st/registros/matrizProseguridad2026", method: "POST" },
+
+
 };
 
 const MatrizPostulante = () => {
@@ -195,138 +201,6 @@ const MatrizPostulante = () => {
     } finally {
       setLoading(false);
     }
-
-    /*if (datos.matrizSeleccionada === 'Matriz-1') {
-      GetMatrizAdmin(datosapi, token)
-        .then(response => {
-          setData(response);
-          const headers = Object.keys(response[0]);
-          setHeaders(headers);
-          setTotalPages(Math.ceil(response.length / recordsPerPage));
-        })
-        .catch(error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Ocurrio un error al traer la Matriz',
-            text: 'No hay datos que mostrar',
-          });
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else if (datos.matrizSeleccionada === 'Matriz-2') {
-      GetMatrizDoctor(datosapi, token)
-        .then(response => {
-          setData(response);
-          const headers = Object.keys(response[0]);
-          setHeaders(headers);
-          setTotalPages(Math.ceil(response.length / recordsPerPage));
-        })
-        .catch(error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Ocurrio un error al traer la Matriz',
-            text: 'No hay datos que mostrar',
-          });
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else if (datos.matrizSeleccionada === 'Matriz-3') {
-      GetMatrizArchivos(token)
-        .then(response => {
-          setData(response);
-          const headers = Object.keys(response[0]);
-          setHeaders(headers);
-          setTotalPages(Math.ceil(response.length / recordsPerPage));
-        })
-        .catch(error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Ocurrio un error al traer la Matriz',
-            text: 'No hay datos que mostrar',
-          });
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else if (datos.matrizSeleccionada === 'Matriz-4') {
-      GetMatrizADMOHLA(datosapi, token)
-        .then(response => {
-          setData(response);
-          const headers = Object.keys(response[0]);
-          setHeaders(headers);
-          setTotalPages(Math.ceil(response.length / recordsPerPage));
-        })
-        .catch(error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Ocurrio un error al traer la Matriz',
-            text: 'No hay datos que mostrar',
-          });
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else if (datos.matrizSeleccionada === 'Matriz-5') {
-      GetMatrizSALUDOHLA(datosapi, token)
-        .then(response => {
-          setData(response);
-          const headers = Object.keys(response[0]);
-          setHeaders(headers);
-          setTotalPages(Math.ceil(response.length / recordsPerPage));
-        })
-        .catch(error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Ocurrio un error al traer la Matriz',
-            text: 'No hay datos que mostrar',
-          });
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else if (datos.matrizSeleccionada === 'Matriz-6') {
-      GetMatrizGeneral(datosapi, token)
-        .then(response => {
-          setData(response);
-          const headers = Object.keys(response[0]);
-          setHeaders(headers);
-          setTotalPages(Math.ceil(response.length / recordsPerPage));
-        })
-        .catch(error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Ocurrio un error al traer la Matriz',
-            text: 'No hay datos que mostrar',
-          });
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else if (datos.matrizSeleccionada === 'Matriz-7') {
-      GetMatrizGestorOHLA(datosapi, token)
-        .then(response => {
-          setData(response);
-          const headers = Object.keys(response[0]);
-          setHeaders(headers);
-          setTotalPages(Math.ceil(response.length / recordsPerPage));
-        })
-        .catch(error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Ocurrio un error al traer la Matriz',
-            text: 'No hay datos que mostrar',
-          });
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      setLoading(false)
-    }*/
-
-
   };
 
   const handleRUCEmpresa = (e) => {
@@ -570,6 +444,10 @@ const MatrizPostulante = () => {
               {tienePermisoEnVista("Matriz Postulante", "Matriz Gestor OHLA") && <option value="Matriz-7">Matriz Gestor OHLA</option>},
               {tienePermisoEnVista("Matriz Postulante", "Matriz Construccion OHLA") && <option value="Matriz-8">Matriz Construccion OHLA</option>},
               {tienePermisoEnVista("Matriz Postulante", "Matriz Arena") && <option value="Matriz-9">Matriz Arena 2026</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Poderosa 2026") && <option value="Matriz-10">Matriz Poderosa 2026</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Caraveli 2026") && <option value="Matriz-11">Matriz Caraveli 2026</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Pro-Seguridad Asistencia 2026") && <option value="Matriz-12">Matriz Pro-Seguridad Asistencia 2026</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Pro-Seguridad") && <option value="Matriz-13">Matriz Pro-Seguridad 2026</option>}
             </select>
           </div>
           <div className="flex flex-col flex-grow justify-end">

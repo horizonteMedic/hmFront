@@ -418,8 +418,6 @@ const ExamenesListLaboratorio = buildExamenesList([
     "MANIPULADORES_COPROCULTIVO",
     "MANIPULADORES_PARASITOLOGIA",
     "EXAMEN_ORINA_LAB",
-    "PRUEBA_CUALITATIVA",
-    "PRUEBA_CUANTITATIVA",
 ]);
 
 const ListaPorPlantilla = {
@@ -771,7 +769,7 @@ const Folio = () => {
                     </div>
                 </div>
             </SectionFieldset>
-            {/* <SectionFieldset legend="Asignación de Profesional Firma" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <SectionFieldset legend="Asignación de Profesional Firma" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <EmpleadoComboBox
                     value={form.nombre_medico}
                     label="Especialista"
@@ -794,7 +792,7 @@ const Folio = () => {
                     >Registrar Firma</button>
                 </div>
 
-            </SectionFieldset> */}
+            </SectionFieldset>
             {/* ===== SECCIÓN: EXAMENES ===== */}
             <SectionFieldset legend="Examenes" className="flex flex-col justify-center items-center w-full">
 
