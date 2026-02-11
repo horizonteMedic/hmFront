@@ -266,7 +266,7 @@ const MatrizPostulante = () => {
     });
 
     const indexResponsable = head.findIndex(
-      h => h.toLowerCase() === 'responsabledigitalizacion'
+      h => h.toLowerCase() === 'RESPONSABLE_DIGITALIZACION'
     );
 
     const indexCondicion = head.findIndex(
