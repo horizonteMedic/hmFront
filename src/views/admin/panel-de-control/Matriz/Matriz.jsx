@@ -24,7 +24,7 @@ const MATRICES_MAP = {
   "Matriz-13": { url: "st/registros/matrizProseguridad2026", method: "POST" },
   "Matriz-14": { url: "st/registros/matrizPacificoVida2026", method: "POST" },
   "Matriz-15": { url: "st/registros/matrizBoroo2026", method: "POST" },
-
+  "Matriz-16": { url: "st/registros/matrizPoderosaAltura2026", method: "POST" },
 
 };
 
@@ -490,6 +490,7 @@ const MatrizPostulante = () => {
               {tienePermisoEnVista("Matriz Postulante", "Matriz Pro-Seguridad") && <option value="Matriz-13">Matriz Pro-Seguridad 2026</option>}
               {tienePermisoEnVista("Matriz Postulante", "Matriz Pacifico Vida 2026") && <option value="Matriz-14">Matriz Pacifico Vida 2026</option>}
               {tienePermisoEnVista("Matriz Postulante", "Matriz Boroo 2026") && <option value="Matriz-15">Matriz Boroo 2026</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Poderosa Altura 2026") && <option value="Matriz-16">Matriz Poderosa Altura 2026</option>}
             </select>
           </div>
           <div className="flex flex-col flex-grow justify-end">
