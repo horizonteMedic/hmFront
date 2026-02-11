@@ -383,7 +383,6 @@ export default async function UsoRespiradores(data = {}, docExistente = null) {
     equipoMATPEL: Boolean(data.datosRespiradores?.equipoMatpelSi_chk_87_si ?? false)
   };
 
-  // Igual que en FichaDetencionSAS_boro_Digitalizado.jsx: usar reales si hay data, si no, pruebas
   const datosFinales = data && Object.keys(data).length > 0 ? datosReales : datosPrueba;
 
   // Header reutilizable
