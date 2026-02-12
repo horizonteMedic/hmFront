@@ -159,7 +159,6 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "INMUNOLOGIA_VIH",
     "INMUNOLOGIA_THEVENON",
 
-    "CONSENT_DROGAS_BOROO",
     "OIT",                           // 14
     "RADIOGRAFIA_TORAX",             // 15
     "RAYOS_X_TORAX_ARCHIVO",         // 16
