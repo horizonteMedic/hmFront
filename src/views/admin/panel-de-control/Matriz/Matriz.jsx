@@ -22,7 +22,9 @@ const MATRICES_MAP = {
   "Matriz-11": { url: "st/registros/matrizCaraveli2026", method: "POST" },
   "Matriz-12": { url: "st/registros/matrizProseguridadAsistencia2026", method: "POST" },
   "Matriz-13": { url: "st/registros/matrizProseguridad2026", method: "POST" },
-
+  "Matriz-14": { url: "st/registros/matrizPacificoVida2026", method: "POST" },
+  "Matriz-15": { url: "st/registros/matrizBoroo2026", method: "POST" },
+  "Matriz-16": { url: "st/registros/matrizPoderosaAltura2026", method: "POST" },
 
 };
 
@@ -264,7 +266,11 @@ const MatrizPostulante = () => {
     });
 
     const indexResponsable = head.findIndex(
-      h => h.toLowerCase() === 'responsabledigitalizacion'
+      h => h.toLowerCase() === 'RESPONSABLE_DIGITALIZACION'
+    );
+
+    const indexCondicion = head.findIndex(
+      h => h.toLowerCase() === 'condicion'
     );
 
     data.forEach(row => {
@@ -280,8 +286,42 @@ const MatrizPostulante = () => {
       }
 
       const dataRow = worksheet.addRow(Object.values(rowData));
-      dataRow.eachCell(cell => {
-        cell.style = dataStyle;
+      dataRow.eachCell((cell, colNumber) => {
+        cell.alignment = dataStyle.alignment;
+        cell.border = dataStyle.border;
+        if (
+          datos.matrizSeleccionada === 'Matriz-9' &&
+          indexCondicion !== -1 &&
+          colNumber - 1 === indexCondicion
+        ) {
+          const valor = String(cell.value || '').trim().toLowerCase();
+          if (valor === 'no apto') {
+            cell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'FFFF0000' } // Rojo
+            };
+            cell.font = {
+              bold: true,
+              color: { argb: 'FFFFFFFF' }
+            };
+          }
+
+          if (valor === 'apto') {
+            cell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'FF00B050' } // Verde profesional Excel
+            };
+            cell.font = {
+              bold: true,
+              color: { argb: 'FFFFFFFF' }
+            };
+          }
+        }
+
+
+
       });
     });
 
@@ -448,6 +488,9 @@ const MatrizPostulante = () => {
               {tienePermisoEnVista("Matriz Postulante", "Matriz Caraveli 2026") && <option value="Matriz-11">Matriz Caraveli 2026</option>}
               {tienePermisoEnVista("Matriz Postulante", "Matriz Pro-Seguridad Asistencia 2026") && <option value="Matriz-12">Matriz Pro-Seguridad Asistencia 2026</option>}
               {tienePermisoEnVista("Matriz Postulante", "Matriz Pro-Seguridad") && <option value="Matriz-13">Matriz Pro-Seguridad 2026</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Pacifico Vida 2026") && <option value="Matriz-14">Matriz Pacifico Vida 2026</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Boroo 2026") && <option value="Matriz-15">Matriz Boroo 2026</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Poderosa Altura 2026") && <option value="Matriz-16">Matriz Poderosa Altura 2026</option>}
             </select>
           </div>
           <div className="flex flex-col flex-grow justify-end">

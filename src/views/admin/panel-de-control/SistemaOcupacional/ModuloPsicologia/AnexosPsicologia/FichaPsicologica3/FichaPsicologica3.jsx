@@ -16,7 +16,6 @@ import SectionFieldset from '../../../../../../components/reusableComponents/Sec
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 
 const tabla = "ficha_psicologica_anexo03";
-const today = getToday();
 
 const orientacionItems = [
   { name: 'orientacionTiempo', label: 'Tiempo' },
@@ -664,7 +663,7 @@ function ExamenMental({
 }
 
 export default function FichaPsicologica3() {
-
+  const today = getToday();
   const { token, userlogued, selectedSede, datosFooter, userName } =
     useSessionData();
 

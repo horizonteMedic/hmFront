@@ -1026,14 +1026,14 @@ export default function FichaDatosPacientes() {
                             name="transporteTerrestre"
                             value={form.transporteTerrestre}
                             labelWidth="100px"
-                            disabled
+                            onChange={handleRadioButtonBoolean}
                             options={[{ value: "SI", label: "SI" }, { value: "NO", label: "NO" }]}
                         />
                         <InputsRadioGroup
                             label="Transporte Aéreo"
                             name="transporteAereo"
                             value={form.transporteAereo}
-                            disabled
+                            onChange={handleRadioButtonBoolean}
                             options={[{ value: "SI", label: "SI" }, { value: "NO", label: "NO" }]}
                             labelWidth="100px"
                         />
@@ -1044,7 +1044,7 @@ export default function FichaDatosPacientes() {
                                 label="Viáticos"
                                 name="viaticos"
                                 value={form.viaticos}
-                                disabled
+                                onChange={handleRadioButtonBoolean}
                                 labelWidth="100px"
                                 options={[{ value: "SI", label: "SI" }, { value: "NO", label: "NO" }]}
                             />

@@ -161,6 +161,9 @@ export default async function B_FichaDetencionSAS2(data = {}, docExistente = nul
   // Usar datos reales
   const datosFinales = datosReales;
 
+  // Detectar si la empresa es BOROO para aplicar lógica especial
+  const esBoroo = (datosFinales.empresa || '').toUpperCase().includes('BOROO');
+
 
   // Header reutilizable (igual que Aptitud_Agroindustrial.jsx)
   const drawHeader = async (pageNumber) => {
@@ -404,13 +407,15 @@ export default async function B_FichaDetencionSAS2(data = {}, docExistente = nul
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
   yPos += filaAltura;
 
-  // Quinta fila: Contratista (fila completa)
-  // Fondo blanco - no se aplica fondo
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
-  yPos += filaAltura;
+  // Quinta fila: Contratista (fila completa) - Solo si NO es BOROO
+  if (!esBoroo) {
+    // Fondo blanco - no se aplica fondo
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
+    yPos += filaAltura;
+  }
 
   // Sexta fila: Trabajo nocturno (4 columnas)
   // Fondo blanco para fila par (índice 5) - no se aplica fondo
@@ -794,15 +799,19 @@ export default async function B_FichaDetencionSAS2(data = {}, docExistente = nul
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Empresa :", tablaInicioX + 2, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 24, yTexto + 1, 160);
+  // Si es BOROO, mostrar el contratista como empresa; si no, mostrar la empresa normal
+  const textoEmpresa = esBoroo ? datosFinales.contratista : datosFinales.empresa;
+  dibujarTextoConSaltoLinea(textoEmpresa, tablaInicioX + 24, yTexto + 1, 160);
   yTexto += filaAltura;
 
-  // Quinta fila: Contratista (fila completa)
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Contratista :", tablaInicioX + 2, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.contratista, tablaInicioX + 24, yTexto + 1, 160);
-  yTexto += filaAltura;
+  // Quinta fila: Contratista (fila completa) - Solo si NO es BOROO
+  if (!esBoroo) {
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Contratista :", tablaInicioX + 2, yTexto + 1);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    dibujarTextoConSaltoLinea(datosFinales.contratista, tablaInicioX + 24, yTexto + 1, 160);
+    yTexto += filaAltura;
+  }
 
   // Sexta fila: Trabajo nocturno (4 columnas)
   // Primera columna: "Trabaja de noche"

@@ -34,7 +34,7 @@ export const GetInfoServicio = async (
             ...prev,
             norden: res.norden ?? "",
             id: res.id,
-            fechaIngreso: res.fechaIngreso,
+            fechaIngreso: res.fechaIngreso ?? prev.fechaIngreso,
 
             tipoTrabajador: res.empleado
                 ? "EMPLEADO"
@@ -63,9 +63,10 @@ export const GetInfoServicio = async (
             peso: res.peso ?? "",
 
             // ===== NACIMIENTO =====
-            distritoNacimiento: res.lugarNacimientoPaciente ?? "",
-            provinciaNacimiento: "",
-            departamentoNacimiento: "",
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+            distritoNacimiento: res.distrito ?? "",
+            provinciaNacimiento: res.provincia ?? "",
+            departamentoNacimiento: res.departamento ?? "",
 
             // ===== DOMICILIO =====
             direccionDomicilio: res.direccionPaciente ?? "",
@@ -275,9 +276,9 @@ export const GetInfoServicioEditar = async (
             peso: res.peso ?? "",
 
             // ===== NACIMIENTO =====
-            distritoNacimiento: res.lugarNacimientoPaciente ?? "",
-            provinciaNacimiento: "",
-            departamentoNacimiento: "",
+            distritoNacimiento: res.distrito ?? "",
+            provinciaNacimiento: res.provincia ?? "",
+            departamentoNacimiento: res.departamento ?? "",
 
             // ===== DOMICILIO =====
             direccionDomicilio: res.direccionPaciente ?? "",

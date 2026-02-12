@@ -5,7 +5,7 @@ import {
     LoadingDefault,
     PrintHojaRDefault,
     SubmitDataServiceDefault,
-    VerifyTRDefault,
+    VerifyTRPerzonalizadoDefault,
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
@@ -13,9 +13,7 @@ const obtenerReporteUrl =
     "/api/v01/ct/psicologia/obtenerFichaPsicologiaAnexo03";
 const registrarUrl =
     "/api/v01/ct/psicologia/registrarActualizarFichaPsicologiaAnexo03";
-const obtenerReporteInfoTablaUrl =
-    "/api/v01/ct/historiaOcupacional/obtenerHistoriaOcupacionalDetallesPorNorden";
-
+    
 export const GetInfoServicio = async (
     nro,
     tabla,
@@ -266,7 +264,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
 };
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
-    VerifyTRDefault(
+    VerifyTRPerzonalizadoDefault(
         nro,
         tabla,
         token,
@@ -285,6 +283,13 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
                     "warning"
                 );
             });
+        },
+        () => {
+            Swal.fire(
+                "Alerta",
+                "El paciente necesita pasar por Cuestionario Nórdico.",
+                "warning"
+            );
         }
     );
 };
