@@ -70,7 +70,11 @@ export default async function InformePsicologico_Anexo02_Digitalizado(data = {},
       },
       articulacion: {
         conDificultad: data.articulacionConDificultad_rb_condificultad || false,
+<<<<<<< HEAD
         sinDificultad: data.articulacionSinDificultad_rb_sindificultad || false
+=======
+        sinDificultad: data.articulacionSinDificultad_rb_sindificultad || false,
+>>>>>>> b70f80c803ab29945d53e48939a88ac7d3092af2
       }
     },
     // Datos de resultados de evaluación
@@ -717,7 +721,7 @@ export default async function InformePsicologico_Anexo02_Digitalizado(data = {},
   ];
 
   // Filtrar "Nivel Intelectual" si esOhla es true
-  const resultadosFiltrados = datosFinales.esOhla 
+  const resultadosFiltrados = datosFinales.esOhla
     ? resultadosEvaluacion.filter(r => r.titulo !== "Nivel Intelectual:")
     : resultadosEvaluacion;
 
@@ -869,10 +873,10 @@ export default async function InformePsicologico_Anexo02_Digitalizado(data = {},
 
   // === Imprimir ===
   if (docExistente) {
-      return doc;
-    } else {
-      imprimir(doc);
-    }
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {
