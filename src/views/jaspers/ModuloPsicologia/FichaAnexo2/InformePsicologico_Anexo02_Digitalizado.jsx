@@ -67,6 +67,10 @@ export default async function InformePsicologico_Anexo02_Digitalizado(data = {},
           orientado: data.personaOrientado_rb_persona_orientado || false,
           desorientado: data.personaDesorientado_rb_persona_desorientado || false
         }
+      },
+      articulacion: {
+        conDificultad: data.articulacionConDificultad_rb_condificultad || false,
+        sinDificultad: data.articulacionSinDificultad_rb_sindificultad || false
       }
     },
     // Datos de resultados de evaluación
@@ -287,9 +291,15 @@ export default async function InformePsicologico_Anexo02_Digitalizado(data = {},
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Fila: Puesto de Trabajo, Área de Trabajo (2 columnas)
+  // Fila: Puesto de Trabajo (completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Fila: Área de Trabajo (completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -355,16 +365,18 @@ export default async function InformePsicologico_Anexo02_Digitalizado(data = {},
   doc.text(datosFinales.direccionPaciente || "", tablaInicioX + 25, yTexto + 1);
   yTexto += filaAltura;
 
-  // Puesto de Trabajo, Área de Trabajo
+  // Puesto de Trabajo
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.puestoTrabajo || "", tablaInicioX + 30, yTexto + 1);
+  yTexto += filaAltura;
 
+  // Área de Trabajo
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Área de Trabajo:", tablaInicioX + 92, yTexto + 1);
+  doc.text("Área de Trabajo:", tablaInicioX + 2, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.areaTrabajo || "", tablaInicioX + 118, yTexto + 1);
+  doc.text(datosFinales.areaTrabajo || "", tablaInicioX + 30, yTexto + 1);
   yTexto += filaAltura;
 
   // Empresa
@@ -411,7 +423,7 @@ export default async function InformePsicologico_Anexo02_Digitalizado(data = {},
   const posturas = [
     {
       subtitulo: "Ritmo:",
-      opciones: ["lento", "rapido", "fluido"],
+      opciones: ["Lento", "Rapido", "Fluido"],
       valores: [examenMental.ritmo?.lento || false, examenMental.ritmo?.rapido || false, examenMental.ritmo?.fluido || false]
     },
     {
@@ -425,7 +437,7 @@ export default async function InformePsicologico_Anexo02_Digitalizado(data = {},
   // Articulación después de Discurso
   const articulacion = {
     titulo: "Articulación:",
-    opciones: ["con dificultad", "sin dificultad"],
+    opciones: ["Con dificultad", "Sin dificultad"],
     valores: [examenMental.articulacion?.conDificultad || false, examenMental.articulacion?.sinDificultad || false]
   };
 

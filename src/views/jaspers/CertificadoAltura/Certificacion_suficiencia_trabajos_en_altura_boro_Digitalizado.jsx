@@ -230,6 +230,9 @@ export default async function Certificacion_suficiencia_trabajos_en_altura_boro_
   // Usar datos reales si existen, sino usar datos de prueba
   const datosFinales = data && data.norden ? datosReales : datosPrueba;
 
+  // Detectar si la empresa es BOROO para aplicar lógica especial
+  const esBoroo = (datosFinales.empresa || '').toUpperCase().includes('BOROO');
+
   // Header reutilizable
   const drawHeader = async (pageNumber) => {
     // Logo y membrete - Subido 3.5 puntos
@@ -375,12 +378,14 @@ export default async function Certificacion_suficiencia_trabajos_en_altura_boro_
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
   yPos += filaAltura;
 
-  // Séptima fila: Contrata (fila completa)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
-  yPos += filaAltura;
+  // Séptima fila: Contrata (fila completa) - Solo si NO es BOROO
+  if (!esBoroo) {
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
+    yPos += filaAltura;
+  }
 
   // Octava fila: Años de experiencia, Primera aptitud, Revalidación (3 columnas)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
@@ -449,15 +454,19 @@ export default async function Certificacion_suficiencia_trabajos_en_altura_boro_
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 24, yTexto + 1, 160);
+  // Si es BOROO, mostrar el contratista como empresa; si no, mostrar la empresa normal
+  const textoEmpresa = esBoroo ? datosFinales.contratista : datosFinales.empresa;
+  dibujarTextoConSaltoLinea(textoEmpresa, tablaInicioX + 24, yTexto + 1, 160);
   yTexto += filaAltura;
 
-  // Séptima fila: Contrata
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Contratista:", tablaInicioX + 2, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.contratista, tablaInicioX + 24, yTexto + 1);
-  yTexto += filaAltura;
+  // Séptima fila: Contrata - Solo si NO es BOROO
+  if (!esBoroo) {
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Contratista:", tablaInicioX + 2, yTexto + 1);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(datosFinales.contratista, tablaInicioX + 24, yTexto + 1);
+    yTexto += filaAltura;
+  }
 
   // Octava fila: Años de experiencia, Primera aptitud, Revalidación (3 columnas)
   doc.setFont("helvetica", "bold").setFontSize(8);
