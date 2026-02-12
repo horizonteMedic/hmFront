@@ -70,15 +70,17 @@ const drawPatientData = (doc, datos = {}) => {
   const area = String(datos?.area ?? '');
   const empresa = String(datos?.empresa ?? '');
   const contrata = String(datos?.contrata ?? 'N/A');
-  
+
   // Nuevos campos
   const tipoExamen = String(datos?.nomExam ?? '');
   const marca = String(datos?.txtMarca ?? '');
   const modelo = String(datos?.txtModelo ?? '');
   const calibracion = toDDMMYYYY(datos?.fechaCalibracion ?? '');
   const aniosTrabajo = String(datos?.tiempoTrabajo ?? '');
+  const mesesTrabajo = String(datos?.txtMesesTrabajo ?? '');
+
   const tiempoExposicion = String(datos?.tiempoExposicionTotalPonderado ?? '');
-  
+
   // Uso de protectores auditivos
   let protectoresAuditivos = '';
   if (datos?.chkTapones && datos?.chkgrajeras) {
@@ -90,7 +92,7 @@ const drawPatientData = (doc, datos = {}) => {
   } else {
     protectoresAuditivos = 'No';
   }
-  
+
   // Apreciación del ruido
   let apreciacionRuido = '';
   if (datos?.chkIntenso) {
@@ -230,7 +232,8 @@ const drawPatientData = (doc, datos = {}) => {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Años de trabajo:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((aniosTrabajo ? aniosTrabajo + " años" : ''), tablaInicioX + 35, yPos + 3.5);
+  const textoaniosTrabajoYMeses = `${aniosTrabajo ? aniosTrabajo + " años" : ''} ${mesesTrabajo ? mesesTrabajo + " meses" : ''}`
+  doc.text(textoaniosTrabajoYMeses, tablaInicioX + 35, yPos + 3.5);
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Tiempo de exposición:", tablaInicioX + 102, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -270,13 +273,13 @@ const drawAntecedentesRelacionados = (doc, datos = {}, yPosInicial) => {
   const colSiW = 6;
   const colNoW = 6;
   const colTextoW = colPreguntaW - colSiW - colNoW;
-  
+
   // Header ANTECEDENTES RELACIONADOS con SI/NO en cada columna
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
   doc.setFillColor(196, 196, 196);
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'FD');
-  
+
   // Dibujar líneas verticales del header
   // Línea entre texto y SI de la primera columna
   doc.line(tablaInicioX + colTextoW, yPos, tablaInicioX + colTextoW, yPos + filaAltura);
@@ -288,21 +291,21 @@ const drawAntecedentesRelacionados = (doc, datos = {}, yPosInicial) => {
   doc.line(tablaInicioX + colPreguntaW + colTextoW, yPos, tablaInicioX + colPreguntaW + colTextoW, yPos + filaAltura);
   // Línea entre SI y NO de la segunda columna
   doc.line(tablaInicioX + colPreguntaW + colTextoW + colSiW, yPos, tablaInicioX + colPreguntaW + colTextoW + colSiW, yPos + filaAltura);
-  
+
   // Texto del header - alineado a la izquierda como DATOS DE FILIACIÓN
   doc.setFont("helvetica", "bold").setFontSize(8);
   const textoHeader = "2. ANTECEDENTES RELACIONADOS";
   doc.text(textoHeader, tablaInicioX + 2, yPos + 3.5);
-  
+
   // SI/NO de la columna izquierda - centrados en sus celdas
   doc.text("SI", tablaInicioX + colTextoW + colSiW / 2, yPos + 3.5, { align: "center" });
   doc.text("NO", tablaInicioX + colTextoW + colSiW + colNoW / 2, yPos + 3.5, { align: "center" });
-  
+
   // SI/NO de la columna derecha - centrados en sus celdas
   const colDerXHeader = tablaInicioX + colPreguntaW;
   doc.text("SI", colDerXHeader + colTextoW + colSiW / 2, yPos + 3.5, { align: "center" });
   doc.text("NO", colDerXHeader + colTextoW + colSiW + colNoW / 2, yPos + 3.5, { align: "center" });
-  
+
   yPos += filaAltura;
 
   // Preguntas - Columna izquierda
@@ -572,7 +575,7 @@ const drawGraficoYTablas = (doc, datos = {}, yPosInicial) => {
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
   };
-  
+
   // Dibujar líneas de conexión solo para círculos y X (NO para corchetes)
   drawSeries("circle", [255, 0, 0]);
   drawSeries("x", [0, 0, 255]);
@@ -587,7 +590,7 @@ const drawGraficoYTablas = (doc, datos = {}, yPosInicial) => {
 
     if (p.color === "red") doc.setDrawColor(255, 0, 0);
     if (p.color === "blue") doc.setDrawColor(0, 0, 255);
-    
+
     if (p.tipo === "circle") {
       doc.setLineWidth(0.4);
       doc.circle(x, y, 1.0);

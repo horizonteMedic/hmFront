@@ -249,7 +249,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
           ...d,
           tipoDocumento: "DNI",
           nombres: sanitized.nombresPa,
-          apellidos: sanitized.nombresPa,
+          apellidos: sanitized.apellidosPa,
           email: sanitized.emailPa,
           startDate: sanitized.fechaNaciminetoPa,
           sexo: sanitized.sexoPa === "M" ? "MASCULINO" : sanitized.sexoPa === "F" ? "FEMENINO" : sanitized.sexoPa,
