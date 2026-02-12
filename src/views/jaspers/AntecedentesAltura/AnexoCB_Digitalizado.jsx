@@ -176,6 +176,9 @@ export default async function GenerarDatosPaciente(data = {}, docExistente = nul
   // Usar datos reales
   const datosFinales = datosReales;
 
+  // Detectar si la empresa es BOROO para aplicar lógica especial
+  const esBoroo = (datosFinales.empresa || '').toUpperCase().includes('BOROO');
+
   // === FUNCIONES AUXILIARES ===
   // Función para calcular altura necesaria para un texto sin dibujarlo
   const calcularAlturaTexto = (texto, anchoMaximo, fontSize = 8) => {
@@ -356,12 +359,14 @@ export default async function GenerarDatosPaciente(data = {}, docExistente = nul
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Octava fila: Contrata (fila completa)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
+  // Octava fila: Contrata (fila completa) - Solo si NO es BOROO
+  if (!esBoroo) {
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+    yPos += filaAltura;
+  }
 
   // === CONTENIDO DE LA TABLA ===
   let yTexto = 37 + 2; // Ajustar para el header
@@ -423,15 +428,19 @@ export default async function GenerarDatosPaciente(data = {}, docExistente = nul
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 24, yTexto + 1.5, tablaAncho - 30);
+  // Si es BOROO, mostrar el contratista como empresa; si no, mostrar la empresa normal
+  const textoEmpresa = esBoroo ? (datosFinales.contratista || "") : datosFinales.empresa;
+  dibujarTextoConSaltoLinea(textoEmpresa, tablaInicioX + 24, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
-  // Octava fila: Contrata
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Contrata:", tablaInicioX + 2, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.contratista || "", tablaInicioX + 24, yTexto + 1.5);
-  yTexto += filaAltura;
+  // Octava fila: Contrata - Solo si NO es BOROO
+  if (!esBoroo) {
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Contrata:", tablaInicioX + 2, yTexto + 1.5);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(datosFinales.contratista || "", tablaInicioX + 24, yTexto + 1.5);
+    yTexto += filaAltura;
+  }
 
   // === CUADRO INFORMATIVO NARANJA ===
   const cuadroWidth = 200;

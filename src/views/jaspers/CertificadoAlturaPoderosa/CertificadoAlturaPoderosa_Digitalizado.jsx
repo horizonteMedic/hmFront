@@ -290,31 +290,50 @@ export default async function CertificadoAlturaPoderosa_Digitalizado(data = {}, 
     }
 
     const fontSize = doc.internal.getFontSize();
-    const palabras = texto.split(' ');
-    let lineaActual = '';
     let yPos = y;
 
-    palabras.forEach(palabra => {
-      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
-      const anchoTexto = doc.getTextWidth(textoPrueba);
+    // Primero dividir por saltos de línea explícitos (\n)
+    const lineas = texto.split('\n');
 
-      if (anchoTexto <= anchoMaximo) {
-        lineaActual = textoPrueba;
-      } else {
-        if (lineaActual) {
-          doc.text(lineaActual, x, yPos);
+    lineas.forEach((linea, indexLinea) => {
+      if (linea.trim() === '') {
+        // Si la línea está vacía, solo avanzar un poco
+        if (indexLinea < lineas.length - 1) {
           yPos += fontSize * 0.35;
-          lineaActual = palabra;
+        }
+        return;
+      }
+
+      // Procesar cada línea dividiendo por espacios
+      const palabras = linea.split(' ');
+      let lineaActual = '';
+
+      palabras.forEach(palabra => {
+        const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+        const anchoTexto = doc.getTextWidth(textoPrueba);
+
+        if (anchoTexto <= anchoMaximo) {
+          lineaActual = textoPrueba;
         } else {
-          doc.text(palabra, x, yPos);
+          if (lineaActual) {
+            doc.text(lineaActual, x, yPos);
+            yPos += fontSize * 0.35;
+            lineaActual = palabra;
+          } else {
+            doc.text(palabra, x, yPos);
+            yPos += fontSize * 0.35;
+          }
+        }
+      });
+
+      if (lineaActual) {
+        doc.text(lineaActual, x, yPos);
+        // Solo avanzar si no es la última línea o si hay más líneas después
+        if (indexLinea < lineas.length - 1 || palabras.length > 0) {
           yPos += fontSize * 0.35;
         }
       }
     });
-
-    if (lineaActual) {
-      doc.text(lineaActual, x, yPos);
-    }
 
     return yPos;
   };
@@ -383,29 +402,35 @@ export default async function CertificadoAlturaPoderosa_Digitalizado(data = {}, 
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Cuarta fila: Puesto de Trabajo, Área de Trabajo (2 columnas)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
-
-  // Quinta fila: Empresa (fila completa)
+  // Cuarta fila: Puesto de Trabajo (fila completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Sexta fila: Contrata (fila completa)
+  // Quinta fila: Área de Trabajo (fila completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Séptima fila: Lugar, Años de experiencia, Altura (3 columnas)
+  // Sexta fila: Empresa (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Séptima fila: Contrata (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Octava fila: Lugar, Años de experiencia, Altura (3 columnas)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + 66, yPos, tablaInicioX + 66, yPos + filaAltura); // División 1
   doc.line(tablaInicioX + 132, yPos, tablaInicioX + 132, yPos + filaAltura); // División 2
@@ -461,33 +486,35 @@ export default async function CertificadoAlturaPoderosa_Digitalizado(data = {}, 
   dibujarTextoConSaltoLinea(datosFinales.direccionPaciente, tablaInicioX + 25, yTexto + 1.5, 160);
   yTexto += filaAltura;
 
-  // Cuarta fila: Puesto de Trabajo, Área de Trabajo
+  // Cuarta fila: Puesto de Trabajo
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(formatearTextoGramatical(datosFinales.puestoTrabajo), tablaInicioX + 30, yTexto + 1.5);
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Área de Trabajo:", tablaInicioX + 92, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(datosFinales.areaTrabajo), tablaInicioX + 118, yTexto + 1.5);
   yTexto += filaAltura;
 
-  // Quinta fila: Empresa
+  // Quinta fila: Área de Trabajo
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Área de Trabajo:", tablaInicioX + 2, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(formatearTextoGramatical(datosFinales.areaTrabajo), tablaInicioX + 30, yTexto + 1.5);
+  yTexto += filaAltura;
+
+  // Sexta fila: Empresa
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(formatearTextoGramatical(datosFinales.empresa), tablaInicioX + 24, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
-  // Sexta fila: Contratista
+  // Séptima fila: Contratista
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Contratista:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(formatearTextoGramatical(datosFinales.contrata), tablaInicioX + 24, yTexto + 1.5);
   yTexto += filaAltura;
 
-  // Séptima fila: Lugar, Años de experiencia, Altura
+  // Octava fila: Lugar, Años de experiencia, Altura
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Lugar:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -954,18 +981,23 @@ export default async function CertificadoAlturaPoderosa_Digitalizado(data = {}, 
   doc.text(textoOI2, mitadCorregida + (colCorregidaAncho / 2 - anchoOI2) / 2, yPos + 3.5);
   yPos += filaAlturaAgudeza;
 
+  // Calcular altura dinámica para Visión de Cerca
+  const observacionesCerca = formatearTextoGramatical(data.enfermedadesocularesoftalmo_e_oculares1 || "");
+  const alturaObservacionesCerca = calcularAlturaTextoCreciente(doc, observacionesCerca, colObservacionesAncho - 4, 8);
+  const alturaFilaCerca = Math.max(filaAlturaAgudeza, alturaObservacionesCerca + 2);
+
   // Dibujar fila de datos para Visión de Cerca
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaAgudeza);
-  doc.line(xSinCorregir, yPos, xSinCorregir, yPos + filaAlturaAgudeza);
-  doc.line(xCorregida, yPos, xCorregida, yPos + filaAlturaAgudeza);
-  doc.line(xObservaciones, yPos, xObservaciones, yPos + filaAlturaAgudeza);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaCerca);
+  doc.line(xSinCorregir, yPos, xSinCorregir, yPos + alturaFilaCerca);
+  doc.line(xCorregida, yPos, xCorregida, yPos + alturaFilaCerca);
+  doc.line(xObservaciones, yPos, xObservaciones, yPos + alturaFilaCerca);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaCerca);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAlturaAgudeza, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX, yPos + alturaFilaCerca, tablaInicioX + tablaAncho, yPos + alturaFilaCerca);
 
   // Dibujar líneas verticales para dividir O.D y O.I en la fila de datos
-  doc.line(mitadSinCorregir, yPos, mitadSinCorregir, yPos + filaAlturaAgudeza);
-  doc.line(mitadCorregida, yPos, mitadCorregida, yPos + filaAlturaAgudeza);
+  doc.line(mitadSinCorregir, yPos, mitadSinCorregir, yPos + alturaFilaCerca);
+  doc.line(mitadCorregida, yPos, mitadCorregida, yPos + alturaFilaCerca);
 
   // Contenido de la fila Visión de Cerca
   doc.setFont("helvetica", "bold").setFontSize(8);
@@ -987,22 +1019,32 @@ export default async function CertificadoAlturaPoderosa_Digitalizado(data = {}, 
   doc.text(odCorregida, xCorregida + (colCorregidaAncho / 2 - anchoOdCorregida) / 2, yPos + 3.5);
   doc.text(oiCorregida, mitadCorregida + (colCorregidaAncho / 2 - anchoOiCorregida) / 2, yPos + 3.5);
 
-  dibujarTextoConSaltoLinea(formatearTextoGramatical(data.enfermedadesocularesoftalmo_e_oculares), xObservaciones + 2, yPos + 3.5, colObservacionesAncho - 4);
+  dibujarTextoConSaltoLinea(observacionesCerca, xObservaciones + 2, yPos + 3.5, colObservacionesAncho - 4);
+  yPos += alturaFilaCerca;
 
-  yPos += filaAlturaAgudeza;
+  // Calcular altura dinámica para Visión de Lejos
+  // Si tiene \n, solo tomar la primera parte (antes del salto de línea)
+  const observacionesLejosRaw = data.enfermedadesocularesoftalmo_e_oculares || "";
+  const observacionesLejos = formatearTextoGramatical(
+    observacionesLejosRaw.includes('\n') 
+      ? observacionesLejosRaw.split('\n')[0] 
+      : observacionesLejosRaw
+  );
+  const alturaObservacionesLejos = calcularAlturaTextoCreciente(doc, observacionesLejos, colObservacionesAncho - 4, 8);
+  const alturaFilaLejos = Math.max(filaAlturaAgudeza, alturaObservacionesLejos + 2);
 
   // Dibujar fila de datos para Visión de Lejos
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaAgudeza);
-  doc.line(xSinCorregir, yPos, xSinCorregir, yPos + filaAlturaAgudeza);
-  doc.line(xCorregida, yPos, xCorregida, yPos + filaAlturaAgudeza);
-  doc.line(xObservaciones, yPos, xObservaciones, yPos + filaAlturaAgudeza);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaLejos);
+  doc.line(xSinCorregir, yPos, xSinCorregir, yPos + alturaFilaLejos);
+  doc.line(xCorregida, yPos, xCorregida, yPos + alturaFilaLejos);
+  doc.line(xObservaciones, yPos, xObservaciones, yPos + alturaFilaLejos);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaLejos);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAlturaAgudeza, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX, yPos + alturaFilaLejos, tablaInicioX + tablaAncho, yPos + alturaFilaLejos);
 
   // Dibujar líneas verticales para dividir O.D y O.I en la fila de datos
-  doc.line(mitadSinCorregir, yPos, mitadSinCorregir, yPos + filaAlturaAgudeza);
-  doc.line(mitadCorregida, yPos, mitadCorregida, yPos + filaAlturaAgudeza);
+  doc.line(mitadSinCorregir, yPos, mitadSinCorregir, yPos + alturaFilaLejos);
+  doc.line(mitadCorregida, yPos, mitadCorregida, yPos + alturaFilaLejos);
 
   // Contenido de la fila Visión de Lejos
   doc.setFont("helvetica", "bold").setFontSize(8);
@@ -1024,9 +1066,8 @@ export default async function CertificadoAlturaPoderosa_Digitalizado(data = {}, 
   doc.text(odLejosCorregida, xCorregida + (colCorregidaAncho / 2 - anchoOdLejosCorregida) / 2, yPos + 3.5);
   doc.text(oiLejosCorregida, mitadCorregida + (colCorregidaAncho / 2 - anchoOiLejosCorregida) / 2, yPos + 3.5);
 
-  dibujarTextoConSaltoLinea(formatearTextoGramatical(data.enfermedadesocularesoftalmo_e_oculares1), xObservaciones + 2, yPos + 3.5, colObservacionesAncho - 4);
-
-  yPos += filaAlturaAgudeza;
+  dibujarTextoConSaltoLinea(observacionesLejos, xObservaciones + 2, yPos + 3.5, colObservacionesAncho - 4);
+  yPos += alturaFilaLejos;
 
   // Dibujar fila de datos para Visión Crómatica (una sola fila sin divisiones)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaAgudeza);

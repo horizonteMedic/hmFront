@@ -419,6 +419,10 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     // Recomendaciones / Restricciones
     recomendacionesRestricciones: data.conclusionMedicoAnexo7c_txtconclusionmed ?? "",
   };
+
+  // Detectar si la empresa es BOROO para aplicar lógica especial
+  const esBoroo = (datosFinales.empresa || '').toUpperCase().includes('BOROO');
+
   console.log('data anexo16', data)
   console.log(datosFinales.examenOjos)
   // Header reutilizable
@@ -534,21 +538,25 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("EMPRESA:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(datosFinales.empresa || "", tablaInicioX + 24, yPos + 3.5);
+  // Si es BOROO, mostrar el contratista como empresa; si no, mostrar la empresa normal
+  const textoEmpresa = esBoroo ? (datosFinales.contrata || "") : (datosFinales.empresa || "");
+  doc.text(textoEmpresa, tablaInicioX + 24, yPos + 3.5);
   yPos += filaAltura;
 
-  // Fila 3: Contrata (columna completa)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  // Fila 3: Contrata (columna completa) - Solo si NO es BOROO
+  if (!esBoroo) {
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-  // Contenido Fila 3
-  doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("CONTRATA:", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(datosFinales.contrata || "", tablaInicioX + 24, yPos + 3.5);
-  yPos += filaAltura;
+    // Contenido Fila 3
+    doc.setFont("helvetica", "bold").setFontSize(7);
+    doc.text("CONTRATA:", tablaInicioX + 2, yPos + 3.5);
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.text(datosFinales.contrata || "", tablaInicioX + 24, yPos + 3.5);
+    yPos += filaAltura;
+  }
 
   // === FILA: FECHA DEL EXAMEN | MINERALES EXPLOTADOS O PROCESADOS ===
   // Estructura: 40% izquierda | 60% derecha

@@ -73,6 +73,9 @@ export default async function Anexo16A_Digitalizado(data = {}, docExistente = nu
   // Usar datos reales
   const datosFinales = datosReales;
 
+  // Detectar si la empresa es BOROO para aplicar lógica especial
+  const esBoroo = (datosFinales.empresa || '').toUpperCase().includes('BOROO');
+
   // === FUNCIONES AUXILIARES ===
   // Función para calcular altura necesaria para un texto sin dibujarlo
   const calcularAlturaTexto = (texto, anchoMaximo, fontSize = 8) => {
@@ -247,12 +250,14 @@ export default async function Anexo16A_Digitalizado(data = {}, docExistente = nu
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Sexta fila: Contrata (fila completa)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
+  // Sexta fila: Contrata (fila completa) - Solo si NO es BOROO
+  if (!esBoroo) {
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+    yPos += filaAltura;
+  }
 
   // === CONTENIDO DE LA TABLA ===
   let yTexto = 48 + 2; // Ajustar para el header
@@ -300,15 +305,19 @@ export default async function Anexo16A_Digitalizado(data = {}, docExistente = nu
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 24, yTexto + 1.5, tablaAncho - 30);
+  // Si es BOROO, mostrar el contratista como empresa; si no, mostrar la empresa normal
+  const textoEmpresa = esBoroo ? (datosFinales.contrata || "N/A") : datosFinales.empresa;
+  dibujarTextoConSaltoLinea(textoEmpresa, tablaInicioX + 24, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
-  // Sexta fila: Contrata
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Contrata:", tablaInicioX + 2, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((datosFinales.contrata || "N/A"), tablaInicioX + 24, yTexto + 1.5);
-  yTexto += filaAltura;
+  // Sexta fila: Contrata - Solo si NO es BOROO
+  if (!esBoroo) {
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Contrata:", tablaInicioX + 2, yTexto + 1.5);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text((datosFinales.contrata || "N/A"), tablaInicioX + 24, yTexto + 1.5);
+    yTexto += filaAltura;
+  }
 
   // === SECCIÓN 2: FUNCIONES VITALES ===
   // Header de funciones vitales
