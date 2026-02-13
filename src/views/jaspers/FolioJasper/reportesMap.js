@@ -110,7 +110,7 @@ import Informe_Psico_CuadradorVigia from "../ModuloPsicologia/InformePsicoCuadra
 import LaboratorioClinico_Digitalizado from "../AnalisisBioquimicos/LaboratorioClinico_Digitalizado";
 import Informe_Lab_hemoglobina from "../LaboratorioClinico/Informe_Lab_hemoglobina";
 import Informe_Lab_Eco from "../AnalisisBioquimicos/Informe_Lab_Eco";
-
+import Certificado_Aptitud_Herramientas_Manuales_Digitalizado from "../Poderosa/Certificado_Aptitud_Herramientas_Manuales_Digitalizado"; //Gr nuevo
 
 export const reportesMap = {
    /* =========================
@@ -159,6 +159,7 @@ export const reportesMap = {
 
    aptitud_altura_poderosa: Aptitud_Poderosa_Digitalizado,
 
+   certificado_aptitud_herramientas_manuales: Certificado_Aptitud_Herramientas_Manuales_Digitalizado,
    antece_enfermedades_altura: GenerarDatosPaciente,
 
    b_certificado_conduccion: Certificaciondeconduccion_Digitalizado,

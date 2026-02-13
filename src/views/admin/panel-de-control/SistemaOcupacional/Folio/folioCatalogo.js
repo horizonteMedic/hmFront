@@ -137,6 +137,13 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
+    APTITUD_HERRAMIENTAS_MANUALES:{ //Gr nuevo
+        nombre: "APTITUD HERRAMIENTAS MANUALES",
+        tabla: "certificado_aptitud_herramientas_manuales",
+        url: "/api/v01/ct/certificadoAptitudHerramientasManuales/obtenerReporteCertificadoAptitudHerramientasManuales",
+        esJasper: true,
+    },
+
     USO_RESPIRADORES: {
         nombre: "USO DE RESPIRADORES",
         tabla: "b_uso_respiradores",
