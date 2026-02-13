@@ -32,62 +32,55 @@ export const GetInfoServicio = async (
   );
 
 if (res) {
-  set((prev) => ({
-    ...prev,
-
-    norden: res.norden ?? "",
-    fecha: res.fechaAntecedente ?? "",
-    nombreExamen: "ANTECEDENTES DE ALTURA",
-    esApto: res.esApto,
-
-    dni: res.dni ?? "",
-    nombres: res.nombres ?? "",
-    apellidos: res.apellidos ?? "",
-    fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-    lugarNacimiento: res.lugarNacimientoPaciente ?? "",   
-    edad: res.edad + " años",
-    sexo: res.sexo ?? "",
-    estadoCivil: res.estadoCivilPaciente ?? "",
-    nivelEstudios: res.nivelEstudioPaciente ?? "", 
-    
-    empresa: res.empresa ?? "",
-    contrata: res.contrata ?? "",
-    ocupacion: res.ocupacion ?? "",
-    cargoDesempenar: res.cargo ?? "",
-
-    // ===== ANTECEDENTES =====
-    accidenteCerebrovascular: res.accidenteCerebroVascularSi,
-    anginaInestable: res.anginaInestableSi,
-    antecedenteBypass: res.antecedenteBypassArterialSi,
-    antecedenteEdemaCerebral: res.antecedenteEdemaCerebralSi,
-    antecedenteEdemaPulmonar: res.antecedenteEdemaPulmonarSi,
-    antecedenteNeumotorax: res.antecedenteNeumotoraxSi,
-    arritmiaCardiaca: res.arritmiaCardiacaSi,
-    cardiomiopatiaHipertrofica: res.cardiomiopatiaSi,
-    cirugiaMayor: res.cirujiaMayorSi,
-    insuficienciaValvulaAortica: res.cualquierInsuficienciaSi,
-    diabetesMellitus: res.diabetesMellitusSi,
-    embarazo: res.embarazoSi,
-    epilepsia: res.epilepsiaSi,
-    epoc: res.epocSi,
-    eritrocitosisExcesiva: res.eritrocitosisSi,
-    hipertensionArterial: res.hipertensionArterialSi,
-    hipertensionPulmonar: res.hipertensionPulmonarSi,
-    infartoMiocardio: res.infartoMiocardioSi,
-    insuficienciaCardiaca: res.insuficienciaCardiacaSi,
-    patologiaHemorragicaRetina: res.patologiaHemorragicaSi,
-    patologiaValvularCardiaca: res.patologiaValvularSi,
-    presenciaMarcapasos: res.presenciaMarcaPasosSi,
-    riesgoCardiovascularAlto: res.presenciaRiesgoCardioSi,
-    trastornosCoagulacion: res.transtornoCoagulacionSi,
-    trombosisVenosaCerebral: res.trombosisSi,
-    otros: res.otrosSi,
-
-    otrosDescripcion: res.otrosDescripcion ?? "",
-    comentarios: res.observaciones ?? "",
-
-    user_medicoFirma: res.usuarioFirma,
-  }));
+set((prev) => ({
+  ...prev,
+  norden: res.antecedentes?.norden ?? "",
+  fecha: res.antecedentes?.fechaAntecedente ?? "",
+  nombreExamen: "ANTECEDENTES DE ALTURA",
+  esApto: res.antecedentes?.esApto ?? "",
+  dni: res.dni ?? "",
+  nombres: res.nombres ?? "",
+  apellidos: res.apellidos ?? "",
+  fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+  lugarNacimiento: res.lugarnacimiento ?? "",
+  edad: res.edad ?? "",
+  sexo: res.sexo === "M" ? "MASCULINO" : res.sexo === "F" ? "FEMENINO" : "",
+  estadoCivil: "",
+  nivelEstudios: "",
+  empresa: res.empresa ?? "",
+  contrata: res.contrata ?? "",
+  ocupacion: res.area ?? "",
+  cargoDesempenar: res.cargo ?? "",
+  accidenteCerebrovascular: res.antecedentes?.accidenteCerebroVascularSi ? "SI" : "NO",
+  anginaInestable: res.antecedentes?.anginaInestableSi ? "SI" : "NO",
+  antecedenteBypass: res.antecedentes?.antecedenteBypassArterialSi ? "SI" : "NO",
+  antecedenteEdemaCerebral: res.antecedentes?.antecedenteEdemaCerebralSi ? "SI" : "NO",
+  antecedenteEdemaPulmonar: res.antecedentes?.antecedenteEdemaPulmonarSi ? "SI" : "NO",
+  antecedenteNeumotorax: res.antecedentes?.antecedenteNeumotoraxSi ? "SI" : "NO",
+  arritmiaCardiaca: res.antecedentes?.arritmiaCardiacaSi ? "SI" : "NO",
+  cardiomiopatiaHipertrofica: res.antecedentes?.cardiomiopatiaSi ? "SI" : "NO",
+  cirugiaMayor: res.antecedentes?.cirujiaMayorSi ? "SI" : "NO",
+  insuficienciaValvulaAortica: res.antecedentes?.cualquierInsuficienciaSi ? "SI" : "NO",
+  diabetesMellitus: res.antecedentes?.diabetesMellitusSi ? "SI" : "NO",
+  embarazo: res.antecedentes?.embarazoSi ? "SI" : "NO",
+  epilepsia: res.antecedentes?.epilepsiaSi ? "SI" : "NO",
+  epoc: res.antecedentes?.epocSi ? "SI" : "NO",
+  eritrocitosisExcesiva: res.antecedentes?.eritrocitosisSi ? "SI" : "NO",
+  hipertensionArterial: res.antecedentes?.hipertensionArterialSi ? "SI" : "NO",
+  hipertensionPulmonar: res.antecedentes?.hipertensionPulmonarSi ? "SI" : "NO",
+  infartoMiocardio: res.antecedentes?.infartoMiocardioSi ? "SI" : "NO",
+  insuficienciaCardiaca: res.antecedentes?.insuficienciaCardiacaSi ? "SI" : "NO",
+  patologiaHemorragicaRetina: res.antecedentes?.patologiaHemorragicaSi ? "SI" : "NO",
+  patologiaValvularCardiaca: res.antecedentes?.patologiaValvularSi ? "SI" : "NO",
+  presenciaMarcapasos: res.antecedentes?.presenciaMarcaPasosSi ? "SI" : "NO",
+  riesgoCardiovascularAlto: res.antecedentes?.presenciaRiesgoCardioSi ? "SI" : "NO",
+  trastornosCoagulacion: res.antecedentes?.transtornoCoagulacionSi ? "SI" : "NO",
+  trombosisVenosaCerebral: res.antecedentes?.trombosisSi ? "SI" : "NO",
+  otros: res.antecedentes?.otrosSi ? "SI" : "NO",
+  otrosDescripcion: res.antecedentes?.otrosDescripcion ?? "",
+  comentarios: res.antecedentes?.observaciones ?? "",
+  user_medicoFirma: res.antecedentes?.usuarioFirma ?? ""
+}));
 }
 };
 
@@ -104,62 +97,101 @@ export const SubmitDataService = async (
     await Swal.fire("Error", "Datos incompletos", "error");
     return;
   }
-
 const body = {
+  codigoEnfermedadesAltura: form.codigoAntecedentesAltura,
+  fechaAntecedente: form.fecha,
+  edad: form.edad?.replace(" años", ""),
+  dniUsuario: form.dniMedico,
+  direccionUsuario: form.direccionMedico,
+  emailUsuario: form.email,
   norden: form.norden,
-  fecha: form.fecha,
-  nombreExamen: form.nombreExamen,
   esApto: form.esApto,
+  noEsApto: !form.esApto,
 
-  dni: form.dni,
-  nombres: form.nombres,
-  apellidos: form.apellidos,
-  fechaNacimiento: form.fechaNacimiento,
-  lugarNacimiento: form.lugarNacimiento,   
-  edad: form.edad,
-  sexo: form.sexo,
-  estadoCivil: form.estadoCivil,
-  nivelEstudios: form.nivelEstudios,
+  accidenteCerebroVascularNo: !form.accidenteCerebrovascular,
+  accidenteCerebroVascularSi: form.accidenteCerebrovascular,
 
-  empresa: form.empresa,
-  contrata: form.contrata,
-  ocupacion: form.ocupacion,
-  cargoDesempenar: form.cargoDesempenar,
+  anginaInestableNo: !form.anginaInestable,
+  anginaInestableSi: form.anginaInestable,
 
-  // ===== ANTECEDENTES =====
-  accidenteCerebrovascular: form.accidenteCerebrovascular,
-  anginaInestable: form.anginaInestable,
-  antecedenteBypass: form.antecedenteBypass,
-  antecedenteEdemaCerebral: form.antecedenteEdemaCerebral,
-  antecedenteEdemaPulmonar: form.antecedenteEdemaPulmonar,
-  antecedenteNeumotorax: form.antecedenteNeumotorax,
-  arritmiaCardiaca: form.arritmiaCardiaca,
-  cardiomiopatiaHipertrofica: form.cardiomiopatiaHipertrofica,
-  cirugiaMayor: form.cirugiaMayor,
-  insuficienciaValvulaAortica: form.insuficienciaValvulaAortica,
-  diabetesMellitus: form.diabetesMellitus,
-  embarazo: form.embarazo,
-  epilepsia: form.epilepsia,
-  epoc: form.epoc,
-  eritrocitosisExcesiva: form.eritrocitosisExcesiva,
-  hipertensionArterial: form.hipertensionArterial,
-  hipertensionPulmonar: form.hipertensionPulmonar,
-  infartoMiocardio: form.infartoMiocardio,
-  insuficienciaCardiaca: form.insuficienciaCardiaca,
-  patologiaHemorragicaRetina: form.patologiaHemorragicaRetina,
-  patologiaValvularCardiaca: form.patologiaValvularCardiaca,
-  presenciaMarcapasos: form.presenciaMarcapasos,
-  riesgoCardiovascularAlto: form.riesgoCardiovascularAlto,
-  trastornosCoagulacion: form.trastornosCoagulacion,
-  trombosisVenosaCerebral: form.trombosisVenosaCerebral,
-  otros: form.otros,
+  antecedenteBypassArterialNo: !form.antecedenteBypass,
+  antecedenteBypassArterialSi: form.antecedenteBypass,
+
+  antecedenteEdemaCerebralNo: !form.antecedenteEdemaCerebral,
+  antecedenteEdemaCerebralSi: form.antecedenteEdemaCerebral,
+
+  antecedenteEdemaPulmonarNo: !form.antecedenteEdemaPulmonar,
+  antecedenteEdemaPulmonarSi: form.antecedenteEdemaPulmonar,
+
+  antecedenteNeumotoraxNo: !form.antecedenteNeumotorax,
+  antecedenteNeumotoraxSi: form.antecedenteNeumotorax,
+
+  arritmiaCardiacaNo: !form.arritmiaCardiaca,
+  arritmiaCardiacaSi: form.arritmiaCardiaca,
+
+  cardiomiopatiaNo: !form.cardiomiopatiaHipertrofica,
+  cardiomiopatiaSi: form.cardiomiopatiaHipertrofica,
+
+  cirujiaMayorNo: !form.cirugiaMayor,
+  cirujiaMayorSi: form.cirugiaMayor,
+
+  cualquierInsuficienciaNo: !form.insuficienciaValvulaAortica,
+  cualquierInsuficienciaSi: form.insuficienciaValvulaAortica,
+
+  diabetesMellitusNo: !form.diabetesMellitus,
+  diabetesMellitusSi: form.diabetesMellitus,
+
+  embarazoNo: !form.embarazo,
+  embarazoSi: form.embarazo,
+
+  epilepsiaNo: !form.epilepsia,
+  epilepsiaSi: form.epilepsia,
+
+  epocNo: !form.epoc,
+  epocSi: form.epoc,
+
+  eritrocitosisNo: !form.eritrocitosisExcesiva,
+  eritrocitosisSi: form.eritrocitosisExcesiva,
+
+  hipertensionArterialNo: !form.hipertensionArterial,
+  hipertensionArterialSi: form.hipertensionArterial,
+
+  hipertensionPulmonarNo: !form.hipertensionPulmonar,
+  hipertensionPulmonarSi: form.hipertensionPulmonar,
+
+  infartoMiocardioNo: !form.infartoMiocardio,
+  infartoMiocardioSi: form.infartoMiocardio,
+
+  insuficienciaCardiacaNo: !form.insuficienciaCardiaca,
+  insuficienciaCardiacaSi: form.insuficienciaCardiaca,
+
+  patologiaHemorragicaNo: !form.patologiaHemorragicaRetina,
+  patologiaHemorragicaSi: form.patologiaHemorragicaRetina,
+
+  patologiaValvularNo: !form.patologiaValvularCardiaca,
+  patologiaValvularSi: form.patologiaValvularCardiaca,
+
+  presenciaMarcaPasosNo: !form.presenciaMarcapasos,
+  presenciaMarcaPasosSi: form.presenciaMarcapasos,
+
+  presenciaRiesgoCardioNo: !form.riesgoCardiovascularAlto,
+  presenciaRiesgoCardioSi: form.riesgoCardiovascularAlto,
+
+  transtornoCoagulacionNo: !form.trastornosCoagulacion,
+  transtornoCoagulacionSi: form.trastornosCoagulacion,
+
+  trombosisNo: !form.trombosisVenosaCerebral,
+  trombosisSi: form.trombosisVenosaCerebral,
+
+  otrosNo: !form.otros,
+  otrosSi: form.otros,
 
   otrosDescripcion: form.otrosDescripcion,
-  comentarios: form.comentarios,
+  observaciones: form.comentarios,
 
-  user_medicoFirma: form.user_medicoFirma,
+  usuarioFirma: form.user_medicoFirma,
+  usuarioRegistro: user,
 };
-
 
   await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
     PrintHojaR(form.norden, token, tabla, datosFooter);
@@ -187,7 +219,6 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
   );
 };
 
-// ✅ AQUÍ está bien definido VerifyTR
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
   VerifyTRDefault(
     nro,
