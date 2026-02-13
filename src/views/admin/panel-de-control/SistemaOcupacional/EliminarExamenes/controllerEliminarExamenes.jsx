@@ -58,11 +58,12 @@ export const VerifyTR = async (nro, tabla, token, set, sede, ExamenesList) => {
     GetInfoPac(nro, set, token, sede, ExamenesList);
 };
 
-export const DeleteExamen = async (norden, campo, token, setForm) => {
+export const DeleteExamen = async (norden, campo, token, setForm, form) => {
     if (!norden) {
         Swal.fire("Error", "Primero busque un paciente", "error");
         return;
     }
+    console.log(campo)
     const result = await Swal.fire({
         title: "¿Está seguro?",
         text: `¿Desea eliminar el registro de ${campo}?`,
@@ -85,10 +86,20 @@ export const DeleteExamen = async (norden, campo, token, setForm) => {
             });
 
             if (response.ok) {
+                const actualizarLista = (lista, campo) =>
+                    lista.map(section => ({
+                        ...section,
+                        items: section.items.map(item =>
+                            item.name === campo
+                                ? { ...item, resultado: false, imprimir: false }
+                                : item
+                        )
+                    }));
                 Swal.fire("Eliminado", "El registro ha sido eliminado", "success");
                 setForm((prev) => ({
                     ...prev,
                     [campo]: "",
+                    listaExamenes: actualizarLista(prev.listaExamenes, campo),
                 }));
             } else {
                 Swal.fire("Error", "No se pudo eliminar el registro", "error");
