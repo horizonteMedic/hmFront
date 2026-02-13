@@ -200,7 +200,7 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "BOMBA_ELECTRICA",
     "PSICOLOGIA_VIGIA",
     "TRANSTORNO_PERSONALIDAD_PSICO",
-    
+
     "OFTALMOLOGIA",
     "OFTALMOLOGIA_VISION_TESTER",
     "FICHA_OFTALMOLOGICA",
@@ -500,14 +500,14 @@ const Folio = () => {
         handleChangeSimple,
         handleClear,
         handleClearnotO,
-    } = useForm(initialFormState, { storageKey: "Folio_KEY" });
+    } = useForm(initialFormState);
 
-    const handleSearch = (e) => {
+    const handleSearch = async (e) => {
         if (e.key === "Enter") {
             handleClearnotO();
             const currentList = ListaPorPlantilla[selectedListType] || ListaPorPlantilla["OHLA"];
-            GetInfoPac(form.norden, setForm, token, selectedSede, currentList);
-            obtenerFirmas(form.norden, token, setForm, userlogued);
+            await GetInfoPac(form.norden, setForm, token, selectedSede, currentList);
+            obtenerFirmas(form.norden, token, setForm);
         }
     };
 
@@ -523,6 +523,7 @@ const Folio = () => {
         if (form.norden) {
             handleClearnotO();
             GetInfoPac(form.norden, setForm, token, selectedSede, newList);
+            obtenerFirmas(form.norden, token, setForm);
         } else {
             setForm((prev) => ({
                 ...prev,

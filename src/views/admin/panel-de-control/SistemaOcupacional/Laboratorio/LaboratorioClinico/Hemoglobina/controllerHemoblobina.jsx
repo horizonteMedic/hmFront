@@ -78,8 +78,8 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
         chkab: form.grupoSanguineo == "AB",
         rbrhpositivo: form.factorRh == "RH(+)",
         rbrhnegativo: form.factorRh == "RH(-)",
-        txtHemoglobina: form.hematocrito,
-        txtHematocrito: form.hemoglobina,
+        txtHemoglobina: form.hemoglobina,
+        txtHematocrito: form.hematocrito,
 
         // "txtVsg": "",
         // "txtLeucocitosHematologia": "",
