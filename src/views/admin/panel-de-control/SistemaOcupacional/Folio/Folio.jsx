@@ -416,6 +416,7 @@ const ExamenesListPsicologia = buildExamenesList([
 
 const ExamenesListLaboratorio = buildExamenesList([
     "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_ARCHIVO_EXTERNO",
     "LABORATORIO_CLINICO",
     "PERFIL_LIPIDICO",
     "PERFIL_RENAL",
