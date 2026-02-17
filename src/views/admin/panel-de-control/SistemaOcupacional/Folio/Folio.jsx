@@ -148,6 +148,7 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "CONSENT_DROGAS_BOROO",
 
     "INMUNOLOGIA_BK_KOH",
+    "INMUNOLOGIA_BK_KOH_DIRECTO",
     "MANIPULADORES_COPROCULTIVO",
     "MANIPULADORES_PARASITOLOGIA",
     "EXAMEN_ORINA_LAB",
@@ -437,6 +438,7 @@ const ExamenesListLaboratorio = buildExamenesList([
     "CONSENT_DROGAS_BOROO",
 
     "INMUNOLOGIA_BK_KOH",
+    "INMUNOLOGIA_BK_KOH_DIRECTO",
     "MANIPULADORES_COPROCULTIVO",
     "MANIPULADORES_PARASITOLOGIA",
     "EXAMEN_ORINA_LAB",
@@ -610,7 +612,7 @@ const Folio = () => {
             };
 
             // Llamar a FolioJasper con el callback de progreso
-            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress, selectedListType, controller.signal, form.nombres, form.apellidos);
+            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress, selectedListType, controller.signal, form.nombres, form.apellidos, datosFooter);
 
             // Cerrar la alerta de carga y mostrar éxito
             Swal.fire({

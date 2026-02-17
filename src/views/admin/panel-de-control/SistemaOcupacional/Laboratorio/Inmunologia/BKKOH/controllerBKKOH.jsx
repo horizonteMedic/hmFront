@@ -12,12 +12,15 @@ import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 const obtenerReporteUrl = "/api/v01/ct/inmunologia/obtenerReporteMicrobiologia";
 const registrarUrl = "/api/v01/ct/inmunologia/registrarActualizarMicrobiologia";
 
+const obtenerReporteUrlKoh = "/api/v01/ct/inmunologia/obtenerReporteKoh";
+const registrarUrlKoh = "/api/v01/ct/inmunologia/registrarActualizarKoh";
+
 export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
   const res = await GetInfoServicioDefault(
     nro,
     tabla,
     token,
-    obtenerReporteUrl,
+    tabla == "koh" ? obtenerReporteUrlKoh : obtenerReporteUrl,
     onFinish
   );
   if (res) {
@@ -25,6 +28,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
       ...prev,
       norden: res.norden ?? "",
       fecha: res.fecha,
+      id: res.id ?? null,
 
       nombreExamen: res.nombreExamen ?? "",
       dni: res.dniPaciente ?? "",
@@ -42,7 +46,6 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
       ocupacion: res.ocupacionPaciente,
       cargoDesempenar: res.cargoPaciente,
 
-      examenDirecto: res.txtKoh ? true : false,
       bk1: res.txtMuestra1 ?? "",
       bk2: res.txtMuestra2 ?? "",
       koh: res.txtKoh ?? "",
@@ -61,6 +64,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
 
   const body = {
     norden: form.norden,
+    id: form.id,
     fecha: form.fecha,
     txtMuestra1: form.bk1,
     txtMuestra2: form.bk2,
@@ -70,10 +74,9 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
 
     usuarioFirma: form.user_medicoFirma,
     doctorAsignado: form.user_doctorAsignado,
-
   };
 
-  await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
+  await SubmitDataServiceDefault(token, limpiar, body, tabla == "koh" ? registrarUrlKoh : registrarUrl, () => {
     PrintHojaR(form.norden, token, tabla);
   });
 };
@@ -87,7 +90,7 @@ export const PrintHojaR = (nro, token, tabla) => {
     token,
     tabla,
     null,
-    obtenerReporteUrl,
+    tabla == "koh" ? obtenerReporteUrlKoh : obtenerReporteUrl,
     jasperModules,
     "../../../../../../jaspers/Inmunologia"
   );

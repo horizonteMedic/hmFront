@@ -483,14 +483,14 @@ const MatrizPostulante = () => {
               {tienePermisoEnVista("Matriz Postulante", "Matriz General") && <option value="Matriz-6">Matriz General</option>}
               {tienePermisoEnVista("Matriz Postulante", "Matriz Gestor OHLA") && <option value="Matriz-7">Matriz Gestor OHLA</option>},
               {tienePermisoEnVista("Matriz Postulante", "Matriz Construccion OHLA") && <option value="Matriz-8">Matriz Construccion OHLA</option>},
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Arena") && <option value="Matriz-9">Matriz Arena 2026</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Poderosa 2026") && <option value="Matriz-10">Matriz Poderosa 2026</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Caraveli 2026") && <option value="Matriz-11">Matriz Caraveli 2026</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Pro-Seguridad Asistencia 2026") && <option value="Matriz-12">Matriz ProSeguridad Asistencia 2026</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Pro-Seguridad 2026") && <option value="Matriz-13">Matriz ProSeguridad 2026</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Pacifico Vida 2026") && <option value="Matriz-14">Matriz Pacifico Vida 2026</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Boroo 2026") && <option value="Matriz-15">Matriz Boroo 2026</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Poderosa Altura 2026") && <option value="Matriz-16">Matriz Poderosa Altura 2026</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Arena") && <option value="Matriz-9">MATRIZ LA ARENA</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Poderosa 2026") && <option value="Matriz-10">REPORTE CONSOLIDADO ATENCIONES DIARIAS - PODEROSA</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Caraveli 2026") && <option value="Matriz-11">MATRIZ COMPAÑIA MINERA CARAVELI</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Pro-Seguridad Asistencia 2026") && <option value="Matriz-12">PLANILLA ASISTENCIA PROSEGURIDAD</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Pro-Seguridad 2026") && <option value="Matriz-13">MATRIZ SALUD PROSEGURIDAD</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Pacifico Vida 2026") && <option value="Matriz-14">REPORTE CONSOLIDAD-PACIFICO VIDA - PODEROSA</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Boroo 2026") && <option value="Matriz-15">MATRIZ MINERA BOROO MISQUICHILCA</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Poderosa Altura 2026") && <option value="Matriz-16">REPORTE DE TRABAJOS EN ALTURA - PODEROSA</option>}
             </select>
           </div>
           <div className="flex flex-col flex-grow justify-end">

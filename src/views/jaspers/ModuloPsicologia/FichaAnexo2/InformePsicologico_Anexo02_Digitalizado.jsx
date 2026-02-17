@@ -70,11 +70,7 @@ export default async function InformePsicologico_Anexo02_Digitalizado(data = {},
       },
       articulacion: {
         conDificultad: data.articulacionConDificultad_rb_condificultad || false,
-<<<<<<< HEAD
         sinDificultad: data.articulacionSinDificultad_rb_sindificultad || false
-=======
-        sinDificultad: data.articulacionSinDificultad_rb_sindificultad || false,
->>>>>>> b70f80c803ab29945d53e48939a88ac7d3092af2
       }
     },
     // Datos de resultados de evaluación

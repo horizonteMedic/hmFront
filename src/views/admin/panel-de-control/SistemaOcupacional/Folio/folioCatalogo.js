@@ -137,7 +137,7 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
-    APTITUD_HERRAMIENTAS_MANUALES:{ //Gr nuevo
+    APTITUD_HERRAMIENTAS_MANUALES: { //Gr nuevo
         nombre: "APTITUD HERRAMIENTAS MANUALES",
         tabla: "certificado_aptitud_herramientas_manuales",
         url: "/api/v01/ct/certificadoAptitudHerramientasManuales/obtenerReporteCertificadoAptitudHerramientasManuales",
@@ -267,7 +267,7 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
-    HEMOGLOBINA:{ //nuevo Gr
+    HEMOGLOBINA: { //nuevo Gr
         nombre: "HEMOGLOBINA",
         tabla: "lab_clinico_hemoglobina",
         url: "/api/v01/ct/laboratorio/obtenerReporteHemoglobina",
@@ -294,7 +294,13 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
-    
+    INMUNOLOGIA_BK_KOH_DIRECTO: {
+        nombre: "INMUNOLOGIA BK-KOH DIRECTO",
+        tabla: "koh",
+        url: "/api/v01/ct/inmunologia/obtenerReporteKoh",
+        esJasper: true,
+    },
+
     INMUNLOGIA_AGLUTINACIONES: { //nuevo Gr
         nombre: "INMUNOLOGIA - AGLUTINACIONES",
         tabla: "inmunologia",
@@ -315,14 +321,14 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/inmunologia/obtenerReporteVdrl",
         esJasper: true,
     },
- 
+
 
     PANEL_2D: { //nuevo Gr
         nombre: "PANEL 2D",
         tabla: "panel2d",
         url: "/api/v01/ct/toxicologia/obtenerReportePanel2D",
         esJasper: true,
-    },	
+    },
 
     PANEL_3D: { //nuevo Gr
         nombre: "PANEL 3D",
@@ -338,7 +344,7 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
-   PANEL_10D: { //nuevo Gr
+    PANEL_10D: { //nuevo Gr
         nombre: "PANEL 10D",
         tabla: "panel10d",
         url: "/api/v01/ct/toxicologia/obtenerReportePanel10D",
@@ -374,7 +380,7 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
-    MANIPULADORES_PARASITOLOGIA:{ //nuevo Gr
+    MANIPULADORES_PARASITOLOGIA: { //nuevo Gr
         nombre: "MANIPULADORES PARASITOLOGIA",
         tabla: "ac_coproparasitologico",
         url: "/api/v01/ct/manipuladores/obtenerReporteCoproparasitologico",
@@ -426,14 +432,14 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/analisisBioquimico/obtenerReportePerfilRenal",
     },
 
-    ANALISIS_RIESGO_CORONARIO:{ //nuevo Gr
+    ANALISIS_RIESGO_CORONARIO: { //nuevo Gr
         nombre: "ANALISIS BIOQUIMICOS - RIESGO CORONARIO",
         tabla: "riesgocoronario",
         url: "/api/v01/ct/riesgoCoronario/obtenerReporte",
         esJasper: true,
     },
 
-        
+
     ANALISIS_TOLERANCIA_GLUCOSA: { //nuevo Gr
         nombre: "ANALISIS BIOQUIMICOS - TOLERANCIA GLUCOSA",
         tabla: "glucosatolerancia",
@@ -485,7 +491,7 @@ export const EXAMENES_CATALOGO = {
         nameConset: true,
     },
 
-    EXAMEN_ORINA_LAB:{  //nuevo Gr
+    EXAMEN_ORINA_LAB: {  //nuevo Gr
         nombre: "EXAMEN ORINA LABORATORIO",
         tabla: "lab_clinico_examen_orina",
         url: "/api/v01/ct/laboratorio/obtenerReporteOrina",
@@ -655,21 +661,21 @@ export const EXAMENES_CATALOGO = {
         esJasper: true
     },
 
-    BRIGADISTAS_PSICOLOGIA:{ //nuevo Gr
+    BRIGADISTAS_PSICOLOGIA: { //nuevo Gr
         nombre: "BRIGADISTAS PSICOLOGIA",
         tabla: "psi_brigadistas",
         url: "/api/v01/ct/psiBrigadista/obtenerReporteBrigadista",
         esJasper: true
     },
 
-    BOMBA_ELECTRICA:{ //nuevo Gr
+    BOMBA_ELECTRICA: { //nuevo Gr
         nombre: "BOMBA ELECTRICA",
         tabla: "bombaelectrica",
         url: "/api/v01/ct/bombaElectrica/obtenerReporteBombaElectrica",
         esJasper: true
     },
 
-    PSICOLOGIA_VIGIA:{ //nuevo Gr
+    PSICOLOGIA_VIGIA: { //nuevo Gr
         nombre: "PSICOLOGIA VIGIA",
         tabla: "cuadradorvigia",
         url: "/api/v01/ct/cuadradorVigia/obtenerReporte",
@@ -704,7 +710,7 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
-    AVERSION_RIESGO:{ //nuevo Gr
+    AVERSION_RIESGO: { //nuevo Gr
         nombre: "AVERSION RIESGO",
         tabla: "aversionalriesgo",
         url: "/api/v01/ct/aversionRiesgo/obtenerReporteAversionRiesgo",
@@ -746,7 +752,7 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
-    INFORME_BURNOUT:{ //nuevo Gr
+    INFORME_BURNOUT: { //nuevo Gr
         nombre: "INFORME BURNOUT",
         tabla: "informe_burnout",
         url: "/api/v01/ct/informeBurnout/obtenerReporteInformeBurnout",
@@ -760,21 +766,21 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
-    TRANSTORNO_PERSONALIDAD_PSICO:{
+    TRANSTORNO_PERSONALIDAD_PSICO: {
         nombre: "TRANSTORNO PERSONALIDAD PSICOLOGIA",
         tabla: "trastornos_personalidad",
         url: "/api/v01/ct/transtornoPersonalidad/obtenerReporteTranstornoPersonalidad",
         esJasper: true,
     },
 
-    INFORME_CONDUCTORES:{
+    INFORME_CONDUCTORES: {
         nombre: "INFORME CONDUCTORES",
         tabla: "infor_conductores",
         url: "/api/v01/ct/informeConductores/obtenerReporteInformeConductores",
         esJasper: true,
     },
 
-    ALTO_RIESGO:{
+    ALTO_RIESGO: {
         nombre: "ALTO RIESGO",
         tabla: "alto_riesgo",
         url: "/api/v01/ct/altoRiesgo/obtenerReporteAltoRiesgo",

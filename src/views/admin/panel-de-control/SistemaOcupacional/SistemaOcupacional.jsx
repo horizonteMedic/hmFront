@@ -291,7 +291,7 @@ const TabComponent = () => {
                   { vista: "Antecedentes de Altura", tab: 25, icons: [{ icon: faMountain }], label: "Antecedentes de Altura" },
                   { vista: "Antecedentes Patologicos", tab: 29, icons: [{ icon: faBacterium }], label: "Antecedentes Patológicos" },
                   { vista: "Audiometria", tab: 15, icons: [{ icon: faDeaf }], label: "Audiometría" },
-                  { vista: "Constancia Certificado Medico Ocupacional", tab: 34, icons: [{ icon: faSuitcaseMedical }], label: "Certificado Medico Ocupacional" },
+                  { vista: "Constancia Certificado Medico Ocupacional", tab: 34, icons: [{ icon: faSuitcaseMedical }], label: "Constancia Cert. Medico Ocupacional" },
                   // { vista: "Coproparasitologico", tab: 3, icons: [{ icon: faClipboardList }], label: "Coproparasitológico" },
                   { vista: "Cuestionario Nordico", tab: 21, icons: [{ icon: faSkiingNordic }], label: "Cuestionario Nordico" },
                   { vista: "EKG", tab: 13, icons: [{ icon: faHeartbeat }], label: "EKG" },
