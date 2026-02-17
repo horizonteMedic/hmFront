@@ -1204,3 +1204,39 @@ const obtenerNomenclaturaDesdeNombre = (filename, form) => {
 
     return null;
 };
+export const resolverEmpresaContratistaBoroo = (empresa, contratista) => {
+    const empresaTexto = (empresa ?? "").toString();
+    const contratistaTexto = (contratista ?? "").toString();
+    const normalizadoEmpresa = empresaTexto.toUpperCase().replace(/\s+/g, "");
+    const normalizadoContrata = contratistaTexto.toUpperCase().replace(/\s+/g, "");
+    const variantes = ["BOROO", "BORO", "BOORO"];
+    const empresaEsBoroo = variantes.some((v) => normalizadoEmpresa.includes(v));
+    const contrataEsBoroo = variantes.some((v) => normalizadoContrata.includes(v));
+    const esBoroo = empresaEsBoroo || contrataEsBoroo;
+
+    if (esBoroo) {
+        if (empresaEsBoroo && !contrataEsBoroo && contratistaTexto) {
+            return {
+                esBoroo: true,
+                empresaTexto: contratistaTexto,
+            };
+        }
+
+        if (contrataEsBoroo && !empresaEsBoroo && empresaTexto) {
+            return {
+                esBoroo: true,
+                empresaTexto: empresaTexto,
+            };
+        }
+
+        return {
+            esBoroo: true,
+            empresaTexto: contratistaTexto || empresaTexto,
+        };
+    }
+
+    return {
+        esBoroo: false,
+        empresaTexto: empresaTexto,
+    };
+};

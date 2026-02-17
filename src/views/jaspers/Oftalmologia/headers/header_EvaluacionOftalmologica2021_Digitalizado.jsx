@@ -1,4 +1,5 @@
 import { compressImage } from "../../../utils/helpers";
+import { resolverEmpresaContratistaBoroo } from "../../../utils/functionUtils";
 
 /**
  * Header para Evaluación Oftalmológica 2021 Digitalizado
@@ -68,6 +69,15 @@ const header_EvaluacionOftalmologica2021_Digitalizado = async (doc, datos = {}) 
     const pageW = doc.internal.pageSize.getWidth();
     const usableW = pageW - 2 * margin;
     let y = 12;
+
+    const empresaBase = String(datos.empresa || "");
+    const contrataBase = String(datos.contrata || datos.contratista || "");
+    const { esBoroo, empresaTexto: empresaTextoBase } = resolverEmpresaContratistaBoroo(empresaBase, contrataBase);
+    const empresaUpper = empresaTextoBase.toUpperCase();
+    const empresaTexto =
+        empresaUpper.includes("BOROO") || empresaUpper.includes("BORO")
+            ? contrataBase || empresaTextoBase
+            : empresaTextoBase;
 
     // 1) Logo a la izquierda
     const logoW = 35,
@@ -243,15 +253,17 @@ const header_EvaluacionOftalmologica2021_Digitalizado = async (doc, datos = {}) 
 
     // Empresa
     const xEmpresa = margin + 30;
-    doc.text(String(datos.empresa || ""), xEmpresa, ycuartaFila, {
+    doc.text(String(empresaTexto || ""), xEmpresa, ycuartaFila, {
         maxWidth: 70,
     });
 
     // Contrata
     const xContrata = margin + 119;
-    doc.text(String(datos.contrata || ""), xContrata, ycuartaFila, {
-        maxWidth: 50,
-    });
+    if (!esBoroo) {
+        doc.text(String(datos.contrata || ""), xContrata, ycuartaFila, {
+            maxWidth: 50,
+        });
+    }
 
     // restaurar fuente normal
     doc.setFont("helvetica", "normal").setFontSize(10);
