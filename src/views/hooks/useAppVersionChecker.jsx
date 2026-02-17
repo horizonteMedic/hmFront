@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import Swal from "sweetalert2";
 
-function useAppVersionChecker(intervalMs = 60000) {
+function useAppVersionChecker(intervalMs = 180000) {
     useEffect(() => {
         let currentVersion = localStorage.getItem("app_version") || null;
 

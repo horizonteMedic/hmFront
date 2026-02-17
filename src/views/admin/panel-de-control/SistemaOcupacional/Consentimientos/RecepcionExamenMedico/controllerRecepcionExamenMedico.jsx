@@ -106,7 +106,7 @@ const GetInfoPac = async (nro, set, token, sede) => {
             ...res,
             fechaNac: formatearFechaCorta(res.fechaNac ?? ""),
             nombres: res.nombresApellidos ?? prev.nombres ?? "",
-            direccion: res.direccion ?? "",
+            domicilio: res.direccion ?? "",
             ocupacion: res.cargo ?? prev.ocupacion ?? "",
             dni: res.dni ?? prev.dni ?? "",
             empresa: res.empresa ?? prev.empresa ?? "",
