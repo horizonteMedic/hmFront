@@ -70,8 +70,8 @@ export default async function InformePsicologico_Anexo02_Digitalizado(data = {},
       },
       articulacion: {
         conDificultad: data.articulacionConDificultad_rb_condificultad || false,
-        sinDificultad: data.articulacionSinDificultad_rb_sindificultad || false,
-      },
+        sinDificultad: data.articulacionSinDificultad_rb_sindificultad || false
+      }
     },
     // Datos de resultados de evaluación
     nivelIntelectual: data.nivelIntelectual_resul_nivel_intelectual,

@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils";
 import { getSign, convertirGenero } from "../../utils/helpers";
+import { resolverEmpresaContratistaBoroo } from "../../utils/functionUtils";
 import { normalizeList } from "../../utils/listUtils";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
@@ -89,6 +90,8 @@ export default async function Anexo16ABoro_Digitalizado(data = {}, docExistente 
 
   // Usar datos reales
   const datosFinales = datosReales;
+
+  const { esBoroo, empresaTexto } = resolverEmpresaContratistaBoroo(datosFinales.empresa, datosFinales.contrata);
 
   // Header reutilizable (similar a FichaDetencionSAS_boro_Digitalizado.jsx)
   const drawHeader = async (pageNumber) => {
@@ -327,15 +330,17 @@ export default async function Anexo16ABoro_Digitalizado(data = {}, docExistente 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 2);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 25, yTexto + 2, tablaAncho - 25);
+  dibujarTextoConSaltoLinea(empresaTexto, tablaInicioX + 25, yTexto + 2, tablaAncho - 25);
   yTexto += filaAltura;
 
-  // Quinta fila: Contrata
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Contratista:", tablaInicioX + 2, yTexto + 2);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.contrata, tablaInicioX + 25, yTexto + 2, tablaAncho - 30);
-  yTexto += filaAltura;
+  if (!esBoroo) {
+    // Quinta fila: Contrata (solo si NO es BOROO)
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Contratista:", tablaInicioX + 2, yTexto + 2);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    dibujarTextoConSaltoLinea(datosFinales.contrata, tablaInicioX + 25, yTexto + 2, tablaAncho - 30);
+    yTexto += filaAltura;
+  }
 
   // === SECCIÓN 2: FUNCIONES VITALES ===
   // Header de funciones vitales (solo título)

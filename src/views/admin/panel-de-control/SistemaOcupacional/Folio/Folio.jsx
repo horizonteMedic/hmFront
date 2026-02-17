@@ -99,18 +99,22 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "ANEXO_02",
     "ENFERMEDADES_ALTURA",           // 5
 
-    "ANEXO_16A",                     // 6
+    "ANEXO_16A",
+    "PSICOSENSOMETRICO_CERT_ALTURA_PODEROSA", //Gr nuevo
+    "CERTIFICADO_ALTURA_PODEROSA", //Gr nuevo
+    "HOJA_DE_CONSULTA_EXTERNA", //Gr nuevo
+    "LICENCIA_CONDUCIR_PODEROSA", //Gr nuevo
+    "APTITUD_HERRAMIENTAS_MANUALES", //Gr nuevo
+
     "CERTIFICADO_ALTURA",
-    "CERTIFICADO_ALTURA_PODEROSA",          //revisar
     "PSICOSENSOMETRICO_CERT_ALTURA",        //revisar
-    "PSICOSENSOMETRICO_CERT_ALTURA_PODEROSA",
     "PSICOSENSOMETRICO_CERT_ALTURA_1_8",
     "CERTIFICADO_APTITUD_ALTURA_PODEROSA",
     "CERTIFICADO_VEHICULOS",
     "PSICOSENSOMETRICO_VEHI_FOLIO",
     "FICHA_SAS",
-    "LICENCIA_CONDUCIR_PODEROSA",
-    "HOJA_DE_CONSULTA_EXTERNA",
+
+
     "USO_RESPIRADORES",             // 7
     "ALTURA1PUNTO8",                 // 8
     "HISTORIA_OCUPACIONAL",          // 9
@@ -144,6 +148,7 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "CONSENT_DROGAS_BOROO",
 
     "INMUNOLOGIA_BK_KOH",
+    "INMUNOLOGIA_BK_KOH_DIRECTO",
     "MANIPULADORES_COPROCULTIVO",
     "MANIPULADORES_PARASITOLOGIA",
     "EXAMEN_ORINA_LAB",
@@ -412,6 +417,7 @@ const ExamenesListPsicologia = buildExamenesList([
 
 const ExamenesListLaboratorio = buildExamenesList([
     "CONSENT_MUESTRA_SANGRE",
+    "LABORATORIO_ARCHIVO_EXTERNO",
     "LABORATORIO_CLINICO",
     "PERFIL_LIPIDICO",
     "PERFIL_RENAL",
@@ -432,6 +438,7 @@ const ExamenesListLaboratorio = buildExamenesList([
     "CONSENT_DROGAS_BOROO",
 
     "INMUNOLOGIA_BK_KOH",
+    "INMUNOLOGIA_BK_KOH_DIRECTO",
     "MANIPULADORES_COPROCULTIVO",
     "MANIPULADORES_PARASITOLOGIA",
     "EXAMEN_ORINA_LAB",
@@ -449,13 +456,13 @@ const ExamenesListLaboratorio = buildExamenesList([
 ]);
 
 const ListaPorPlantilla = {
-    PRUEBAS: ExamenesListPRUEBAS,
+    //PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     "COMPLETO": ExamenesListCOMPLETO,
-    OHLA: ExamenesListOHLA,
-    "OHLA ALTURA - CONDUCCION": ExamenesListOHLA1,
-    "OHLA CONDUCCION": ExamenesListOHLA2,
-    "OHLA SIMPLE": ExamenesListOHLA3,
+    //OHLA: ExamenesListOHLA,
+    //"OHLA ALTURA - CONDUCCION": ExamenesListOHLA1,
+    //"OHLA CONDUCCION": ExamenesListOHLA2,
+    //"OHLA SIMPLE": ExamenesListOHLA3,
     PSICOLOGIA: ExamenesListPsicologia,
     LABORATORIO: ExamenesListLaboratorio,
 };
@@ -464,7 +471,7 @@ const Folio = () => {
     const abortControllerRef = useRef(null);
     const today = getToday();
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
-    const [selectedListType, setSelectedListType] = useState("OHLA");
+    const [selectedListType, setSelectedListType] = useState("COMPLETO");
     const [showOnlyPassed, setShowOnlyPassed] = useState(false);
     const initialFormState = {
         norden: "",
@@ -485,7 +492,7 @@ const Folio = () => {
         contrata: "",
         ocupacion: "",
         cargoDesempenar: "",
-        listaExamenes: ListaPorPlantilla["OHLA"],
+        listaExamenes: ListaPorPlantilla["COMPLETO"],
 
         // Médico que Certifica //BUSCADOR
         idFirma: null,
@@ -505,7 +512,7 @@ const Folio = () => {
     const handleSearch = async (e) => {
         if (e.key === "Enter") {
             handleClearnotO();
-            const currentList = ListaPorPlantilla[selectedListType] || ListaPorPlantilla["OHLA"];
+            const currentList = ListaPorPlantilla[selectedListType] || ListaPorPlantilla["COMPLETO"];
             await GetInfoPac(form.norden, setForm, token, selectedSede, currentList);
             obtenerFirmas(form.norden, token, setForm);
         }
@@ -518,7 +525,7 @@ const Folio = () => {
     const handleListChange = (e) => {
         const newValue = e.target.value;
         setSelectedListType(newValue);
-        const newList = ListaPorPlantilla[newValue] || ListaPorPlantilla["OHLA"];
+        const newList = ListaPorPlantilla[newValue] || ListaPorPlantilla["COMPLETO"];
 
         if (form.norden) {
             handleClearnotO();
@@ -605,7 +612,7 @@ const Folio = () => {
             };
 
             // Llamar a FolioJasper con el callback de progreso
-            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress, selectedListType, controller.signal, form.nombres, form.apellidos);
+            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress, selectedListType, controller.signal, form.nombres, form.apellidos, datosFooter);
 
             // Cerrar la alerta de carga y mostrar éxito
             Swal.fire({
@@ -886,7 +893,7 @@ const Folio = () => {
                 <div className="flex justify-center items-center w-full gap-4">
                     <button
                         className="bg-yellow-400 hover:bg-yellow-500 text-white py-2 px-4 rounded-md mt-4 text-semibold"
-                        onClick={() => { handleClear(); setSelectedListType("OHLA") }}
+                        onClick={() => { handleClear(); setSelectedListType("COMPLETO") }}
                     >
                         Limpiar
                     </button>

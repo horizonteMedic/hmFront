@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 import { getSign, convertirGenero, getSignCompressed } from "../../utils/helpers.js";
+import { resolverEmpresaContratistaBoroo } from "../../utils/functionUtils";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
@@ -176,8 +177,7 @@ export default async function GenerarDatosPaciente(data = {}, docExistente = nul
   // Usar datos reales
   const datosFinales = datosReales;
 
-  // Detectar si la empresa es BOROO para aplicar lógica especial
-  const esBoroo = (datosFinales.empresa || '').toUpperCase().includes('BOROO');
+  const { esBoroo, empresaTexto } = resolverEmpresaContratistaBoroo(datosFinales.empresa, datosFinales.contratista);
 
   // === FUNCIONES AUXILIARES ===
   // Función para calcular altura necesaria para un texto sin dibujarlo
@@ -429,8 +429,7 @@ export default async function GenerarDatosPaciente(data = {}, docExistente = nul
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   // Si es BOROO, mostrar el contratista como empresa; si no, mostrar la empresa normal
-  const textoEmpresa = esBoroo ? (datosFinales.contratista || "") : datosFinales.empresa;
-  dibujarTextoConSaltoLinea(textoEmpresa, tablaInicioX + 24, yTexto + 1.5, tablaAncho - 30);
+  dibujarTextoConSaltoLinea(empresaTexto, tablaInicioX + 24, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
   // Octava fila: Contrata - Solo si NO es BOROO

@@ -1,10 +1,11 @@
 import jsPDF from "jspdf";
-import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
+import { formatearFechaCorta } from "../../utils/formatDateUtils";
 import { convertirGenero } from "../../utils/helpers.js";
 import { dibujarTextoEnFilaCreciente, calcularAlturaTextoCreciente } from "../../utils/formatoParaTextoCrecienteFila.js";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
+import { resolverEmpresaContratistaBoroo } from "../../utils/functionUtils";
 
 export default async function CertificadoAlturaPoderosa_Digitalizado(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -241,6 +242,11 @@ export default async function CertificadoAlturaPoderosa_Digitalizado(data = {}, 
 
   // Usar solo datos reales proporcionados
   const datosFinales = datosReales;
+
+  const { esBoroo, empresaTexto } = resolverEmpresaContratistaBoroo(
+    datosFinales.empresa,
+    datosFinales.contrata
+  );
 
   // Header reutilizable
   const drawHeader = async (pageNumber) => {
@@ -504,15 +510,17 @@ export default async function CertificadoAlturaPoderosa_Digitalizado(data = {}, 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(formatearTextoGramatical(datosFinales.empresa), tablaInicioX + 24, yTexto + 1.5, tablaAncho - 30);
+  dibujarTextoConSaltoLinea(formatearTextoGramatical(empresaTexto), tablaInicioX + 24, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
-  // Séptima fila: Contratista
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Contratista:", tablaInicioX + 2, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(formatearTextoGramatical(datosFinales.contrata), tablaInicioX + 24, yTexto + 1.5);
-  yTexto += filaAltura;
+  if (!esBoroo) {
+    // Séptima fila: Contratista (solo si NO es BOROO)
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Contratista:", tablaInicioX + 2, yTexto + 1.5);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(formatearTextoGramatical(datosFinales.contrata), tablaInicioX + 24, yTexto + 1.5);
+    yTexto += filaAltura;
+  }
 
   // Octava fila: Lugar, Años de experiencia, Altura
   doc.setFont("helvetica", "bold").setFontSize(8);

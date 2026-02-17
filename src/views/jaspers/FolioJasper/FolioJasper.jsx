@@ -10,7 +10,7 @@ import { PDFDocument } from "pdf-lib";
 import pdfjsLib from "../../config/pdjfConfig";
 import { colocarSellosEnPdf, getSign } from "../../utils/helpers";
 
-export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType, signal, nombres = "", apellidos = "") {
+export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType, signal, nombres = "", apellidos = "", datosFooter) {
     if (signal?.aborted) throw new DOMException("Aborted", "AbortError");//para poder cancelar la gereracion
 
     const pdfFinal = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true, precision: 1 });
@@ -77,7 +77,6 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "audiometria_2023",
         "informe_psicologico",
         "anexo16a",
-        "microbiologia",//NUEVO 
         "lhepatitis", //NUEVO
         "ac_coproparasitologico",
         "examen_inmunologico" //NUEVO
@@ -118,7 +117,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             }
             try {
                 const data = await getFetch(apiUrl, token, signal);
-                return data || null;
+                return data ? { ...data, ...datosFooter } : null;
             } catch (err) {
                 console.error("Error cargando:", examen.nombre, err);
                 return null;

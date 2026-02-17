@@ -10,15 +10,17 @@ import {
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 import BotonesAccion from '../../../../../../components/templates/BotonesAccion';
-
-const tabla = 'microbiologia';
+import { useEffect, useState } from 'react';
 
 export default function BKKOH() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
+  const [tabla, setTabla] = useState('microbiologia');
+  const [examenDirecto, setExamenDirecto] = useState(false);
   const today = getToday();
 
   const initialFormState = {
     norden: '',
+    id: null,
     fecha: today,
     nombreExamen: "",
 
@@ -38,13 +40,9 @@ export default function BKKOH() {
     ocupacion: "",
     cargoDesempenar: "",
 
-    examenDirecto: false,
     bk1: '',
-    bk1Radio: '',
     bk2: '',
-    bk2Radio: '',
     koh: '',
-    kohRadio: '',
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
@@ -66,6 +64,10 @@ export default function BKKOH() {
     handlePrintDefault,
   } = useForm(initialFormState);
 
+  useEffect(() => {
+    setTabla(examenDirecto ? 'koh' : "microbiologia");
+  }, [examenDirecto]);
+
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear, tabla);
   };
@@ -86,6 +88,7 @@ export default function BKKOH() {
   return (
     <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
       <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 xl:grid-cols-3 gap-3 lg:gap-4">
+        {/* {tabla && <h1>{tabla}</h1>} */}
         <InputTextOneLine
           label="N° Orden"
           name="norden"
@@ -206,20 +209,12 @@ export default function BKKOH() {
       <SectionFieldset legend="Configuración">
         <InputCheckbox
           label="Examen Directo"
-          checked={form.examenDirecto}
+          checked={examenDirecto}
           name="examenDirecto"
           onChange={(e) => {
             const checked = e.target.checked;
-            setForm(prev => {
-              const newState = { ...prev, examenDirecto: checked };
-              if (checked) {
-                newState.bk1 = '';
-                newState.bk2 = '';
-              } else {
-                newState.koh = '';
-              }
-              return newState;
-            });
+            setExamenDirecto(checked);
+            handleClearnotO();
           }}
         />
 
@@ -227,72 +222,76 @@ export default function BKKOH() {
 
       <div className="text-center font-semibold text-lg my-4">MUESTRA: ESPUTO</div>
       <SectionFieldset legend="Pruebas" className="grid grid-cols-12 gap-2 items-center">
-        <InputTextOneLine
-          label='Examen de BK - BACILOSCOPIA 1ª'
-          labelWidth='180px'
-          name="bk1"
-          value={form.bk1}
-          onChange={handleChange}
-          className="col-span-6"
-          disabled={form.examenDirecto}
-        />
-        <InputsRadioGroup
-          name="bk1"
-          value={form.bk1}
-          options={[
-            { label: 'BAAR - NEGATIVO', value: 'BAAR - NEGATIVO' },
-            { label: 'BAAR - POSITIVO', value: 'BAAR - POSITIVO' },
-            { label: 'N/A', value: 'N/A' }
-          ]}
-          onChange={handleRadioButton}
-          disabled={form.examenDirecto}
-          className='col-span-6'
-        />
-        {/* BK 2 */}
-        <InputTextOneLine
-          label='Examen de BK - BACILOSCOPIA 2ª'
-          labelWidth='180px'
-          name="bk2"
-          value={form.bk2}
-          className="col-span-6"
-          onChange={handleChange}
-          disabled={form.examenDirecto}
-        />
-        <InputsRadioGroup
-          name="bk2"
-          value={form.bk2}
-          options={[
-            { label: 'BAAR - NEGATIVO', value: 'BAAR - NEGATIVO' },
-            { label: 'BAAR - POSITIVO', value: 'BAAR - POSITIVO' },
-            { label: 'N/A', value: 'N/A' }
-          ]}
-          onChange={handleRadioButton}
-          disabled={form.examenDirecto}
-          className='col-span-6'
-        />
-
-        {/* KOH */}
-        <InputTextOneLine
-          label='KOH'
-          labelWidth='180px'
-          className="col-span-6"
-          name="koh"
-          value={form.koh}
-          onChange={handleChange}
-          disabled={!form.examenDirecto}
-        />
-        <InputsRadioGroup
-          name="koh"
-          value={form.koh}
-          options={[
-            { label: 'NEGATIVO', value: 'NEGATIVO' },
-            { label: 'POSITIVO', value: 'POSITIVO' },
-            { label: 'N/A', value: 'N/A' }
-          ]}
-          onChange={handleRadioButton}
-          disabled={!form.examenDirecto}
-          className='col-span-6'
-        />
+        {examenDirecto ? (
+          <>
+            < InputTextOneLine
+              label='KOH'
+              labelWidth='180px'
+              className="col-span-6"
+              name="koh"
+              value={form.koh}
+              onChange={handleChange}
+              disabled={!examenDirecto}
+            />
+            <InputsRadioGroup
+              name="koh"
+              value={form.koh}
+              options={[
+                { label: 'NEGATIVO', value: 'NEGATIVO' },
+                { label: 'POSITIVO', value: 'POSITIVO' },
+                { label: 'N/A', value: 'N/A' }
+              ]}
+              onChange={handleRadioButton}
+              disabled={!examenDirecto}
+              className='col-span-6'
+            />
+          </>)
+          : (
+            <>
+              <InputTextOneLine
+                label='Examen de BK - BACILOSCOPIA 1ª'
+                labelWidth='180px'
+                name="bk1"
+                value={form.bk1}
+                onChange={handleChange}
+                className="col-span-6"
+                disabled={examenDirecto}
+              />
+              <InputsRadioGroup
+                name="bk1"
+                value={form.bk1}
+                options={[
+                  { label: 'BAAR - NEGATIVO', value: 'BAAR - NEGATIVO' },
+                  { label: 'BAAR - POSITIVO', value: 'BAAR - POSITIVO' },
+                  { label: 'N/A', value: 'N/A' }
+                ]}
+                onChange={handleRadioButton}
+                disabled={examenDirecto}
+                className='col-span-6'
+              />
+              {/* BK 2 */}
+              <InputTextOneLine
+                label='Examen de BK - BACILOSCOPIA 2ª'
+                labelWidth='180px'
+                name="bk2"
+                value={form.bk2}
+                className="col-span-6"
+                onChange={handleChange}
+                disabled={examenDirecto}
+              />
+              <InputsRadioGroup
+                name="bk2"
+                value={form.bk2}
+                options={[
+                  { label: 'BAAR - NEGATIVO', value: 'BAAR - NEGATIVO' },
+                  { label: 'BAAR - POSITIVO', value: 'BAAR - POSITIVO' },
+                  { label: 'N/A', value: 'N/A' }
+                ]}
+                onChange={handleRadioButton}
+                disabled={examenDirecto}
+                className='col-span-6'
+              />
+            </>)}
       </SectionFieldset>
 
       <SectionFieldset legend="Especialista">
@@ -313,12 +312,12 @@ export default function BKKOH() {
       </SectionFieldset>
 
       <BotonesAccion
-             form={form}
-             handleSave={handleSave}
-             handleClear={handleClear}
-             handlePrint={handlePrint}
-             handleChangeNumberDecimals={handleChangeNumberDecimals}
-           />
+        form={form}
+        handleSave={handleSave}
+        handleClear={handleClear}
+        handlePrint={handlePrint}
+        handleChangeNumberDecimals={handleChangeNumberDecimals}
+      />
     </div>
   );
 }

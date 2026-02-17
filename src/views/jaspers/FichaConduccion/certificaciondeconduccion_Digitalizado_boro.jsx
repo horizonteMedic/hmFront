@@ -4,6 +4,7 @@ import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import { getSign, getSignCompressed } from '../../utils/helpers.js';
+import { resolverEmpresaContratistaBoroo } from "../../utils/functionUtils";
 
 export default async function Certificaciondeconduccion_Digitalizado(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -74,8 +75,7 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}, 
   // Usar datos reales
   const datosFinales = datosReales;
 
-  // Detectar si la empresa es BOROO para aplicar lógica especial
-  const esBoroo = (datosFinales.empresa || '').toUpperCase().includes('BOROO');
+  const { esBoroo, empresaTexto } = resolverEmpresaContratistaBoroo(datosFinales.empresa, datosFinales.contratista);
 
   // Header reutilizable
   const drawHeader = async (pageNumber) => {
@@ -304,8 +304,7 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}, 
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
   // Si es BOROO, mostrar el contratista como empresa; si no, mostrar la empresa normal
-  const textoEmpresa = esBoroo ? datosFinales.contratista : datosFinales.empresa;
-  dibujarTextoConSaltoLinea(textoEmpresa, tablaInicioX + 24, yTexto + 1, 160);
+  dibujarTextoConSaltoLinea(empresaTexto, tablaInicioX + 24, yTexto + 1, 160);
   yTexto += filaAltura;
 
   // Séptima fila: Contrata - Solo si NO es BOROO

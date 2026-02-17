@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBroom, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faBroom, faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { InputTextOneLine } from "../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
@@ -67,7 +67,7 @@ export default function EliminarExamenes() {
                 className="text-red-500 hover:text-red-700 border border-red-300 rounded px-2 py-1"
                 title="Eliminar"
             >
-                <FontAwesomeIcon icon={faTimes} />
+                <FontAwesomeIcon icon={faTrash} />
             </button>
         </div>
     );

@@ -918,9 +918,11 @@ export const GetInfoServicio = (
               data.contador++;
             }
           }
+          data.resultadoGonadotropina = res.sexo_sexo_pa === "M" ? "N/A" : res.resultadoGonadotropina
+
           data.notasDoctor = res.notasDoctor ?? "";
           console.log("DATAAA", data);
-          set((prev) => ({ ...prev, ...data }));
+          set((prev) => ({ ...prev, ...res, ...data }));
         }
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -1413,7 +1415,8 @@ export const GetInfoServicioEditar = (
             imagenRadiograficaPolvo: res.examenRadiograficoIrep_txtirep ?? "",
             piel: res.pielAnexo7c_piel ? "NORMAL" : "ANORMAL",
             pielObservaciones: res.pielDescripcionAnexo7c_piel_descripcion,
-            colesterolAnalisisBioquimico_txtcolesterol: res.colesterolAnalisisBioquimico_txtcolesterol
+            colesterolAnalisisBioquimico_txtcolesterol: res.colesterolAnalisisBioquimico_txtcolesterol,
+
           };
 
           console.log("interpretacionFuncionRespiratoria_interpretacion", res.interpretacionFuncionRespiratoria_interpretacion)
@@ -1781,11 +1784,10 @@ export const GetInfoServicioEditar = (
           data.vibraciones = res.vibracionesAnexo7c_vibraciones ?? false;
 
           data.notasDoctor = res.notasDoctor ?? "";
-
+          data.resultadoGonadotropina = res.sexo_sexo_pa === "M" ? "N/A" : res.resultadoGonadotropina
           data = MapearDatosAdicionales(res, data, 1, true);
-
           console.log("DATA EDITAR", data);
-          set((prev) => ({ ...prev, ...data, ...res }));
+          set((prev) => ({ ...prev, ...res, ...data }));
         }
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");

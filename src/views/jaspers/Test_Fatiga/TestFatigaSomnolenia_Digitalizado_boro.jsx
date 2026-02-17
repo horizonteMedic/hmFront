@@ -2,6 +2,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import header_TestFAtiga from "./Header_TestFatiga";
 import footer_TestFatiga from "./Footer_TestFatiga";
+import { resolverEmpresaContratistaBoroo } from "../../utils/functionUtils";
 export default async function TestFatigaSomnolenia_Digitalizado_boro(datos = {}, docExistente = null) {
 
   function drawXInBox(doc, x, y, width, height, color = [0, 0, 255], scale = 3) {
@@ -48,6 +49,10 @@ export default async function TestFatigaSomnolenia_Digitalizado_boro(datos = {},
   const margin = 10;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 20;
+
+  const empresaBase = String(datos.razonEmpresa || "");
+  const contrataBase = String(datos.contrata || datos.contratista || datos.razonContrata || datos.razonContratista || "");
+  const { empresaTexto } = resolverEmpresaContratistaBoroo(empresaBase, contrataBase);
 
   // 2) Encabezado (logo, campos, título)
 
@@ -98,7 +103,7 @@ export default async function TestFatigaSomnolenia_Digitalizado_boro(datos = {},
     doc.text(`${datos.fexamen ? datos.fexamen : "15/04/2002"}`, 184, y + 15)
 
     doc.rect(28, y + 17, 179, 5); // Empresa
-    doc.text(`${datos.razonEmpresa ? datos.razonEmpresa : "asd"}`, 30, y + 21)
+    doc.text(`${empresaTexto || "asd"}`, 30, y + 21)
 
     y += 24
 
