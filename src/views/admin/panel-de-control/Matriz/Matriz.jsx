@@ -9,22 +9,22 @@ import { faFileExcel, faMagnifyingGlass, faChevronLeft, faChevronRight, faSyncAl
 import ExcelJS from 'exceljs';
 
 const MATRICES_MAP = {
-  "Matriz-1": { url: "st/registros/matrizAdministrativa", method: "POST" },
-  "Matriz-2": { url: "st/registros/matrizSalud", method: "POST" },
-  "Matriz-3": { url: "ct/archivos", method: "GET" },
-  "Matriz-4": { url: "st/registros/matrizAdministrativaOhla", method: "POST" },
-  "Matriz-5": { url: "st/registros/matrizSaludOhla", method: "POST" },
-  "Matriz-6": { url: "st/registros/matrizGeneral", method: "POST" },
-  "Matriz-7": { url: "st/registros/matrizOhlaGestor", method: "POST" },
-  "Matriz-8": { url: "st/registros/matrizOhlaConstruccion", method: "POST" },
-  "Matriz-9": { url: "st/registros/matrizArena2026", method: "POST" },
-  "Matriz-10": { url: "st/registros/matrizPoderosa2026", method: "POST" },
-  "Matriz-11": { url: "st/registros/matrizCaraveli2026", method: "POST" },
-  "Matriz-12": { url: "st/registros/matrizProseguridadAsistencia2026", method: "POST" },
-  "Matriz-13": { url: "st/registros/matrizProseguridad2026", method: "POST" },
-  "Matriz-14": { url: "st/registros/matrizPacificoVida2026", method: "POST" },
-  "Matriz-15": { url: "st/registros/matrizBoroo2026", method: "POST" },
-  "Matriz-16": { url: "st/registros/matrizPoderosaAltura2026", method: "POST" },
+  "Matriz-1": { url: "api/v01/st/registros/matrizAdministrativa", method: "POST" },
+  "Matriz-2": { url: "api/v01/st/registros/matrizSalud", method: "POST" },
+  "Matriz-3": { url: "api/v01/ct/archivos", method: "GET" },
+  "Matriz-4": { url: "api/v01/st/registros/matrizAdministrativaOhla", method: "POST" },
+  "Matriz-5": { url: "api/v01/st/registros/matrizSaludOhla", method: "POST" },
+  "Matriz-6": { url: "api/v01/st/registros/matrizGeneral", method: "POST" },
+  "Matriz-7": { url: "api/v01/st/registros/matrizOhlaGestor", method: "POST" },
+  "Matriz-8": { url: "api/v01/st/registros/matrizOhlaConstruccion", method: "POST" },
+  "Matriz-9": { url: "api/v01/st/registros/matrizArena2026", method: "POST" },
+  "Matriz-10": { url: "api/v01/st/registros/matrizPoderosa2026", method: "POST" },
+  "Matriz-11": { urlH: "api/headers/caraveli-2026", methodH: "GET", urlB: "api/v01/st/registros/matrizCaraveli2026", methodB: "POST" },
+  "Matriz-12": { url: "api/v01/st/registros/matrizProseguridadAsistencia2026", method: "POST" },
+  "Matriz-13": { url: "api/v01/st/registros/matrizProseguridad2026", method: "POST" },
+  "Matriz-14": { url: "api/v01/st/registros/matrizPacificoVida2026", method: "POST" },
+  "Matriz-15": { urlH: "api/headers/boroo", methodH: "GET", urlB: "api/v01/st/registros/matrizBoroo2026", methodB: "POST" },
+  "Matriz-16": { url: "api/v01/st/registros/matrizPoderosaAltura2026", method: "POST" },
 
 };
 
@@ -172,34 +172,49 @@ const MatrizPostulante = () => {
 
     try {
       const config = MATRICES_MAP[datos.matrizSeleccionada];
-      console.log(config)
       if (!config) {
         setLoading(false);
         return;
       }
 
-      const response = await GetMatrizUniversal(datosapi, config, token);
-      console.log(response)
-      if (!Array.isArray(response)) {
-        setData([]);
+      const {
+        urlH,
+        methodH,
+        urlB,
+        methodB
+      } = config;
+
+      // 🔥 Ejecutar ambas en paralelo
+      const [headersResponse, bodyResponse] = await Promise.all([
+        GetMatrizUniversal(null, { url: urlH, method: methodH }, token),
+        GetMatrizUniversal(datosapi, { url: urlB, method: methodB }, token)
+      ]);
+
+      console.log("Headers:", headersResponse);
+      console.log("Body:", bodyResponse);
+
+      // Validaciones defensivas
+      if (!Array.isArray(headersResponse) || !Array.isArray(bodyResponse)) {
         Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Ocurrió un error al traer la Matriz',
+          icon: "error",
+          title: "Error",
+          text: "Ocurrió un error al traer la Matriz"
         });
         return;
       }
-      setData(response);
-      const headers = Object.keys(response[0] || {});
-      setHeaders(headers);
-      setTotalPages(Math.ceil(response.length / recordsPerPage));
+
+      //Guardamos estructura y registros separados
+      setHeaders(headersResponse);
+      setData(bodyResponse);
 
     } catch (error) {
+
       Swal.fire({
-        icon: 'error',
-        title: 'Ocurrió un error al traer la Matriz',
-        text: 'No hay datos que mostrar',
+        icon: "error",
+        title: "Ocurrió un error al traer la Matriz",
+        text: "No hay datos que mostrar",
       });
+
     } finally {
       setLoading(false);
     }
@@ -236,6 +251,10 @@ const MatrizPostulante = () => {
       setReload(0); // Reinicia el estado reload para evitar múltiples recargas
     }
   }, [reload]);
+
+  const handleExport = () => {
+
+  }
 
   const exportToExcel = async () => {
     const workbook = new ExcelJS.Workbook();
@@ -339,6 +358,247 @@ const MatrizPostulante = () => {
     saveAs(dataFile, 'matriz_postulante.xlsx');
   };
 
+  const exportToExcel2 = async () => {
+
+    const estructura = head;     // tu header jerárquico
+    const trabajadores = data;     // tu array plano real
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Reporte");
+
+    const borderStyle = {
+      top: { style: "thin" },
+      left: { style: "thin" },
+      bottom: { style: "thin" },
+      right: { style: "thin" }
+    };
+
+    // =============================
+    // 1️⃣ PROFUNDIDAD MÁXIMA
+    // =============================
+    const getMaxDepth = (nodes, level = 1) => {
+      return Math.max(
+        ...nodes.map(n =>
+          n.children && n.children.length > 0
+            ? getMaxDepth(n.children, level + 1)
+            : level
+        )
+      );
+    };
+
+    const maxDepth = getMaxDepth(estructura);
+    // =============================
+    // 2️⃣ CONTAR HOJAS
+    // =============================
+    const countLeaves = (node) => {
+      if (!node.children || node.children.length === 0)
+        return 1;
+
+      return node.children.reduce((sum, child) => sum + countLeaves(child), 0);
+    };
+
+    // =============================
+    // 3️⃣ GENERAR HEADER
+    // =============================
+    let currentCol = 1;
+
+    const generateHeader = (nodes, level, startCol) => {
+
+      let currentCol = startCol;
+
+      nodes.forEach(node => {
+
+        const span = countLeaves(node);
+        const colStart = currentCol;
+        const colEnd = currentCol + span - 1;
+
+        const cell = worksheet.getRow(level).getCell(colStart);
+        cell.value = node.label ?? "";
+        cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+        cell.font = { bold: true };
+        cell.border = borderStyle;
+
+        // 🔥 PINTAR SOLO ESTA CELDA DEL HEADER SI TIENE COLOR
+        if (node.color) {
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: {
+              argb: node.color.replace("#", "")
+            }
+          };
+        }
+
+        // Merge horizontal si tiene hijos
+        if (span > 1) {
+          worksheet.mergeCells(level, colStart, level, colEnd);
+
+          // Aplicar bordes y color a todas las celdas del merge
+          for (let col = colStart; col <= colEnd; col++) {
+            const mergedCell = worksheet.getRow(level).getCell(col);
+            mergedCell.border = borderStyle;
+
+            if (node.color) {
+              mergedCell.fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: {
+                  argb: node.color.replace("#", "")
+                }
+              };
+            }
+          }
+        }
+
+        // Merge vertical si es hoja
+        if (!node.children || node.children.length === 0) {
+          if (level < maxDepth) {
+            worksheet.mergeCells(level, colStart, maxDepth, colStart);
+
+            // Aplicar estilo al merge vertical
+            for (let row = level; row <= maxDepth; row++) {
+              const mergedCell = worksheet.getRow(row).getCell(colStart);
+              mergedCell.border = borderStyle;
+
+              if (node.color) {
+                mergedCell.fill = {
+                  type: "pattern",
+                  pattern: "solid",
+                  fgColor: {
+                    argb: node.color.replace("#", "")
+                  }
+                };
+              }
+            }
+          }
+        }
+
+        if (node.children && node.children.length > 0) {
+          generateHeader(node.children, level + 1, colStart);
+        }
+
+        currentCol += span;
+      });
+
+      return currentCol;
+    };
+
+    // Ejecutar desde columna 1
+    generateHeader(estructura, 1, 1);
+
+    // =============================
+    // 4️⃣ EXTRAER CAMPOS HOJA + COLOR
+    // =============================
+    const fields = [];
+
+    const extractFields = (nodes) => {
+      nodes.forEach(n => {
+
+        if (!n.children || n.children.length === 0) {
+
+          fields.push({
+            field: n.field,
+            color: n.color
+          });
+
+        } else {
+          extractFields(n.children);
+        }
+
+      });
+    };
+
+    extractFields(estructura);
+
+    // =============================
+    // 5️⃣ INSERTAR DATOS
+    // =============================
+    let dataStartRow = maxDepth + 1;
+
+    trabajadores.forEach(trabajador => {
+
+      const row = worksheet.getRow(dataStartRow);
+      let colIndex = 1;
+
+      fields.forEach(({ field, color }) => {
+
+        const cell = row.getCell(colIndex);
+
+        // 🔥 IMPORTANTE: body es plano, NO uses t.data[field]
+        cell.value = trabajador[field] ?? "";
+
+        cell.border = borderStyle;
+        cell.alignment = { horizontal: "center", vertical: "middle" };
+
+        colIndex++;
+
+      });
+
+      dataStartRow++;
+
+    });
+
+    // =============================
+    // 6️⃣ AUTO WIDTH
+    // =============================
+    worksheet.columns.forEach(column => {
+      column.width = 18;
+    });
+
+    // =============================
+    // 7️⃣ EXPORTAR
+    // =============================
+    const buffer = await workbook.xlsx.writeBuffer();
+    saveAs(new Blob([buffer]), "ReporteJerarquico.xlsx");
+
+  }
+
+  const flattenTree = (nodes, level = 0, parentLabel = null, result = []) => {
+    nodes.forEach(node => {
+      result.push({
+        label: node.label,
+        field: node.field,
+        color: node.color,
+        level,
+        parentLabel
+      });
+
+      if (node.children && node.children.length > 0) {
+        flattenTree(node.children, level + 1, node.label, result);
+      }
+    });
+
+    return result;
+  };
+
+  const flattenHeaders = (nodes) => {
+    const result = [];
+
+    const traverse = (items) => {
+      if (!Array.isArray(items)) return;
+
+      items.forEach(item => {
+        if (item.children && item.children.length > 0) {
+          traverse(item.children);
+        } else if (item.field) {
+          result.push({
+            label: item.label,
+            field: item.field,
+            color: item.color || null
+          });
+        }
+      });
+    };
+
+    traverse(nodes);
+    return result;
+  };
+
+
+
+
+
+
   const reloadTable = () => {
     if (datos.matrizSeleccionada === "") {
       setData([]);
@@ -378,7 +638,7 @@ const MatrizPostulante = () => {
           <h1 className="text-start font-bold color-azul text-white">Matriz Postulante</h1>
           <div className="flex items-center gap-4">
             <button
-              onClick={exportToExcel}
+              onClick={exportToExcel2}
               className={`verde-btn px-4 py-1 rounded-md ${exportButtonEnabled ? '' : 'cursor-not-allowed opacity-50'}`}
               disabled={!exportButtonEnabled}
             >
@@ -483,14 +743,14 @@ const MatrizPostulante = () => {
               {tienePermisoEnVista("Matriz Postulante", "Matriz General") && <option value="Matriz-6">Matriz General</option>}
               {tienePermisoEnVista("Matriz Postulante", "Matriz Gestor OHLA") && <option value="Matriz-7">Matriz Gestor OHLA</option>},
               {tienePermisoEnVista("Matriz Postulante", "Matriz Construccion OHLA") && <option value="Matriz-8">Matriz Construccion OHLA</option>},
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Arena") && <option value="Matriz-9">Matriz Arena 2026</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Poderosa 2026") && <option value="Matriz-10">Matriz Poderosa 2026</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Caraveli 2026") && <option value="Matriz-11">Matriz Caraveli 2026</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Pro-Seguridad Asistencia 2026") && <option value="Matriz-12">Matriz ProSeguridad Asistencia 2026</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Pro-Seguridad 2026") && <option value="Matriz-13">Matriz ProSeguridad 2026</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Pacifico Vida 2026") && <option value="Matriz-14">Matriz Pacifico Vida 2026</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Boroo 2026") && <option value="Matriz-15">Matriz Boroo 2026</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Poderosa Altura 2026") && <option value="Matriz-16">Matriz Poderosa Altura 2026</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Arena") && <option value="Matriz-9">MATRIZ LA ARENA</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Poderosa 2026") && <option value="Matriz-10">REPORTE CONSOLIDADO ATENCIONES DIARIAS - PODEROSA</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Caraveli 2026") && <option value="Matriz-11">MATRIZ COMPAÑIA MINERA CARAVELI</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Pro-Seguridad Asistencia 2026") && <option value="Matriz-12">PLANILLA ASISTENCIA PROSEGURIDAD</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Pro-Seguridad 2026") && <option value="Matriz-13">MATRIZ SALUD PROSEGURIDAD</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Pacifico Vida 2026") && <option value="Matriz-14">REPORTE CONSOLIDAD-PACIFICO VIDA - PODEROSA</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Boroo 2026") && <option value="Matriz-15">MATRIZ MINERA BOROO MISQUICHILCA</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Poderosa Altura 2026") && <option value="Matriz-16">REPORTE DE TRABAJOS EN ALTURA - PODEROSA</option>}
             </select>
           </div>
           <div className="flex flex-col flex-grow justify-end">
@@ -516,19 +776,19 @@ const MatrizPostulante = () => {
             <table className="w-full border border-gray-300">
               <thead>
                 <tr>
-                  {head.map((header) => (
+                  {/*head.map((header) => (
                     <th key={header} className="border border-gray-300 px-4 py-2">{header}</th>
-                  ))}
+                  ))*/}
                 </tr>
               </thead>
               <tbody>
-                {currentData.map((item, index) => (
+                {/*currentData.map((item, index) => (
                   <tr key={index}>
                     {head.map((header) => (
                       <td key={header} className="border border-gray-300 px-4 py-2">{item[header]}</td>
                     ))}
                   </tr>
-                ))}
+                ))*/}
               </tbody>
             </table>
           )}
