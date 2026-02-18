@@ -84,8 +84,8 @@ export const DeleteExamen = async (norden, campo, token, setForm, form) => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-
-            if (response.ok) {
+            console.log(response)
+            if (response.ok === true) {
                 const actualizarLista = (lista, campo) =>
                     lista.map(section => ({
                         ...section,

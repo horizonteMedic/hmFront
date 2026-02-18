@@ -17,7 +17,7 @@ const MATRICES_MAP = {
   "Matriz-6": { url: "api/v01/st/registros/matrizGeneral", method: "POST" },
   "Matriz-7": { url: "api/v01/st/registros/matrizOhlaGestor", method: "POST" },
   "Matriz-8": { url: "api/v01/st/registros/matrizOhlaConstruccion", method: "POST" },
-  "Matriz-9": { url: "api/v01/st/registros/matrizArena2026", method: "POST" },
+  "Matriz-9": { urlH: "/api/headers/arena", methodH: "GET", urlB: "api/v01/st/registros/matrizArena2026", methodB: "POST" },
   "Matriz-10": { url: "api/v01/st/registros/matrizPoderosa2026", method: "POST" },
   "Matriz-11": { urlH: "api/headers/caraveli-2026", methodH: "GET", urlB: "api/v01/st/registros/matrizCaraveli2026", methodB: "POST" },
   "Matriz-12": { url: "api/v01/st/registros/matrizProseguridadAsistencia2026", method: "POST" },
@@ -176,36 +176,69 @@ const MatrizPostulante = () => {
         setLoading(false);
         return;
       }
+      const isMatrizArena = datos.matrizSeleccionada === "Matriz-9";
+      const isMatrizCaraveli = datos.matrizSeleccionada === "Matriz-11";
 
-      const {
-        urlH,
-        methodH,
-        urlB,
-        methodB
-      } = config;
+      if (config.urlH) {
 
-      // 🔥 Ejecutar ambas en paralelo
-      const [headersResponse, bodyResponse] = await Promise.all([
-        GetMatrizUniversal(null, { url: urlH, method: methodH }, token),
-        GetMatrizUniversal(datosapi, { url: urlB, method: methodB }, token)
-      ]);
+        const { urlH, methodH, urlB, methodB } = config;
 
-      console.log("Headers:", headersResponse);
-      console.log("Body:", bodyResponse);
+        const [headersResponse, bodyResponse] = await Promise.all([
+          GetMatrizUniversal(null, { url: urlH, method: methodH }, token),
+          GetMatrizUniversal(datosapi, { url: urlB, method: methodB }, token)
+        ]);
 
-      // Validaciones defensivas
-      if (!Array.isArray(headersResponse) || !Array.isArray(bodyResponse)) {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Ocurrió un error al traer la Matriz"
-        });
-        return;
+        if (!Array.isArray(headersResponse) || !Array.isArray(bodyResponse)) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Ocurrió un error al traer la Matriz"
+          });
+          return;
+        }
+
+        let processedBody = bodyResponse;
+
+        // 🔥 SOLO MATRIZ 9
+        if (isMatrizArena || isMatrizCaraveli) {
+          processedBody = bodyResponse.map(item => ({
+            ...item,
+            responsable_digitalizacion: userlogued.datos.nombres_user.toUpperCase()
+          }));
+        }
+
+        setHeaders(headersResponse);
+        setData(processedBody);
+
+      } else {
+        const response = await GetMatrizUniversal(
+          datosapi,
+          { url: config.url, method: config.method },
+          token
+        );
+
+        if (!Array.isArray(response)) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Ocurrió un error al traer la Matriz"
+          });
+        }
+
+        setData(response);
+
+        // 🔥 Generar columnas automáticamente
+        if (response.length > 0) {
+          const autoHeaders = Object.keys(response[0]).map(key => ({
+            field: key,
+            headerName: key.toUpperCase()
+          }));
+
+          setHeaders(autoHeaders);
+        } else {
+          setHeaders([]);
+        }
       }
-
-      //Guardamos estructura y registros separados
-      setHeaders(headersResponse);
-      setData(bodyResponse);
 
     } catch (error) {
 
@@ -360,9 +393,7 @@ const MatrizPostulante = () => {
 
   const exportToExcel2 = async () => {
 
-    const estructura = head;     // tu header jerárquico
-    const trabajadores = data;     // tu array plano real
-
+    const trabajadores = data || [];
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Reporte");
 
@@ -373,34 +404,67 @@ const MatrizPostulante = () => {
       right: { style: "thin" }
     };
 
-    // =============================
-    // 1️⃣ PROFUNDIDAD MÁXIMA
-    // =============================
-    const getMaxDepth = (nodes, level = 1) => {
-      return Math.max(
-        ...nodes.map(n =>
-          n.children && n.children.length > 0
-            ? getMaxDepth(n.children, level + 1)
-            : level
-        )
-      );
-    };
+    // ============================================
+    // 🔍 SI NO HAY HEADERS DINÁMICOS (MODO PLANO)
+    // ============================================
+    if (!head || head.length === 0 || !head[0]?.children) {
+
+      if (trabajadores.length === 0) return;
+
+      const fields = Object.keys(trabajadores[0]);
+
+      // 1️⃣ HEADER SIMPLE
+      fields.forEach((field, index) => {
+        const cell = worksheet.getRow(1).getCell(index + 1);
+        cell.value = field;
+        cell.font = { bold: true };
+        cell.alignment = { horizontal: "center", vertical: "middle" };
+        cell.border = borderStyle;
+      });
+
+      // 2️⃣ DATA
+      let rowIndex = 2;
+
+      trabajadores.forEach(item => {
+
+        const row = worksheet.getRow(rowIndex);
+        fields.forEach((field, colIndex) => {
+          const cell = row.getCell(colIndex + 1);
+          cell.value = item[field] ?? "";
+          cell.border = borderStyle;
+          cell.alignment = { horizontal: "center", vertical: "middle" };
+        });
+
+        rowIndex++;
+      });
+
+      worksheet.columns.forEach(col => col.width = 18);
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      saveAs(new Blob([buffer]), "Reporte.xlsx");
+
+      return;
+    }
+
+    // ============================================
+    // 🔥 MODO JERÁRQUICO (CON ESTRUCTURA)
+    // ============================================
+
+    const estructura = head;
+
+    const getMaxDepth = (nodes, level = 1) =>
+      Math.max(...nodes.map(n =>
+        n.children?.length
+          ? getMaxDepth(n.children, level + 1)
+          : level
+      ));
 
     const maxDepth = getMaxDepth(estructura);
-    // =============================
-    // 2️⃣ CONTAR HOJAS
-    // =============================
-    const countLeaves = (node) => {
-      if (!node.children || node.children.length === 0)
-        return 1;
 
-      return node.children.reduce((sum, child) => sum + countLeaves(child), 0);
-    };
-
-    // =============================
-    // 3️⃣ GENERAR HEADER
-    // =============================
-    let currentCol = 1;
+    const countLeaves = (node) =>
+      !node.children?.length
+        ? 1
+        : node.children.reduce((sum, child) => sum + countLeaves(child), 0);
 
     const generateHeader = (nodes, level, startCol) => {
 
@@ -414,144 +478,105 @@ const MatrizPostulante = () => {
 
         const cell = worksheet.getRow(level).getCell(colStart);
         cell.value = node.label ?? "";
-        cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
         cell.font = { bold: true };
+        cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
         cell.border = borderStyle;
 
-        // 🔥 PINTAR SOLO ESTA CELDA DEL HEADER SI TIENE COLOR
+        // 🎨 Pintar SOLO si tiene color
         if (node.color) {
           cell.fill = {
             type: "pattern",
             pattern: "solid",
-            fgColor: {
-              argb: node.color.replace("#", "")
-            }
+            fgColor: { argb: node.color.replace("#", "") }
           };
         }
 
-        // Merge horizontal si tiene hijos
         if (span > 1) {
           worksheet.mergeCells(level, colStart, level, colEnd);
-
-          // Aplicar bordes y color a todas las celdas del merge
-          for (let col = colStart; col <= colEnd; col++) {
-            const mergedCell = worksheet.getRow(level).getCell(col);
-            mergedCell.border = borderStyle;
-
-            if (node.color) {
-              mergedCell.fill = {
-                type: "pattern",
-                pattern: "solid",
-                fgColor: {
-                  argb: node.color.replace("#", "")
-                }
-              };
-            }
-          }
         }
 
-        // Merge vertical si es hoja
-        if (!node.children || node.children.length === 0) {
-          if (level < maxDepth) {
-            worksheet.mergeCells(level, colStart, maxDepth, colStart);
-
-            // Aplicar estilo al merge vertical
-            for (let row = level; row <= maxDepth; row++) {
-              const mergedCell = worksheet.getRow(row).getCell(colStart);
-              mergedCell.border = borderStyle;
-
-              if (node.color) {
-                mergedCell.fill = {
-                  type: "pattern",
-                  pattern: "solid",
-                  fgColor: {
-                    argb: node.color.replace("#", "")
-                  }
-                };
-              }
-            }
-          }
+        if (!node.children?.length && level < maxDepth) {
+          worksheet.mergeCells(level, colStart, maxDepth, colStart);
         }
 
-        if (node.children && node.children.length > 0) {
+        if (node.children?.length) {
           generateHeader(node.children, level + 1, colStart);
         }
 
         currentCol += span;
       });
-
-      return currentCol;
     };
 
-    // Ejecutar desde columna 1
     generateHeader(estructura, 1, 1);
 
-    // =============================
-    // 4️⃣ EXTRAER CAMPOS HOJA + COLOR
-    // =============================
+    // Extraer hojas
     const fields = [];
 
     const extractFields = (nodes) => {
       nodes.forEach(n => {
-
-        if (!n.children || n.children.length === 0) {
-
-          fields.push({
-            field: n.field,
-            color: n.color
-          });
-
+        if (!n.children?.length) {
+          fields.push(n.field);
         } else {
           extractFields(n.children);
         }
-
       });
     };
 
     extractFields(estructura);
 
-    // =============================
-    // 5️⃣ INSERTAR DATOS
-    // =============================
     let dataStartRow = maxDepth + 1;
 
-    trabajadores.forEach(trabajador => {
+    trabajadores.forEach(item => {
 
       const row = worksheet.getRow(dataStartRow);
-      let colIndex = 1;
 
-      fields.forEach(({ field, color }) => {
+      fields.forEach((field, colIndex) => {
 
-        const cell = row.getCell(colIndex);
+        const cell = row.getCell(colIndex + 1);
+        const valor = item[field] ?? "";
+        cell.value = valor;
 
-        // 🔥 IMPORTANTE: body es plano, NO uses t.data[field]
-        cell.value = trabajador[field] ?? "";
+        if (datos.matrizSeleccionada === "Matriz-9" && field.toLowerCase() === "condicion") {
 
+          const normalized = String(valor).toLowerCase().trim();
+
+          if (normalized === "no apto") {
+            cell.fill = {
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: "FFFF0000" }
+            };
+            cell.font = {
+              bold: true,
+              color: { argb: "FFFFFFFF" }
+            };
+          }
+
+          if (normalized === "apto") {
+            cell.fill = {
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: "FF00B050" }
+            };
+            cell.font = {
+              bold: true,
+              color: { argb: "FFFFFFFF" }
+            };
+          }
+        }
         cell.border = borderStyle;
         cell.alignment = { horizontal: "center", vertical: "middle" };
-
-        colIndex++;
 
       });
 
       dataStartRow++;
-
     });
 
-    // =============================
-    // 6️⃣ AUTO WIDTH
-    // =============================
-    worksheet.columns.forEach(column => {
-      column.width = 18;
-    });
+    worksheet.columns.forEach(col => col.width = 18);
 
-    // =============================
-    // 7️⃣ EXPORTAR
-    // =============================
     const buffer = await workbook.xlsx.writeBuffer();
     saveAs(new Blob([buffer]), "ReporteJerarquico.xlsx");
-
-  }
+  };
 
   const flattenTree = (nodes, level = 0, parentLabel = null, result = []) => {
     nodes.forEach(node => {
@@ -570,33 +595,6 @@ const MatrizPostulante = () => {
 
     return result;
   };
-
-  const flattenHeaders = (nodes) => {
-    const result = [];
-
-    const traverse = (items) => {
-      if (!Array.isArray(items)) return;
-
-      items.forEach(item => {
-        if (item.children && item.children.length > 0) {
-          traverse(item.children);
-        } else if (item.field) {
-          result.push({
-            label: item.label,
-            field: item.field,
-            color: item.color || null
-          });
-        }
-      });
-    };
-
-    traverse(nodes);
-    return result;
-  };
-
-
-
-
 
 
   const reloadTable = () => {
@@ -630,6 +628,36 @@ const MatrizPostulante = () => {
   const startIdx = (currentPage - 1) * recordsPerPage;
   const endIdx = startIdx + recordsPerPage;
   const currentData = Array.isArray(data) ? data.slice(startIdx, endIdx) : [];
+  const isHierarchical =
+    head &&
+    head.length > 0 &&
+    head[0]?.children &&
+    head[0].children.length > 0;
+
+  const getMaxDepth = (nodes, level = 1) =>
+    Math.max(
+      ...nodes.map(n =>
+        n.children?.length
+          ? getMaxDepth(n.children, level + 1)
+          : level
+      )
+    );
+
+  const countLeaves = (node) =>
+    !node.children?.length
+      ? 1
+      : node.children.reduce((sum, child) => sum + countLeaves(child), 0);
+
+  const extractLeaves = (nodes, result = []) => {
+    nodes.forEach(n => {
+      if (!n.children?.length) {
+        result.push(n.field);
+      } else {
+        extractLeaves(n.children, result);
+      }
+    });
+    return result;
+  };
 
   return (
     <div className="container mx-auto mt-12 mb-12">
@@ -735,13 +763,13 @@ const MatrizPostulante = () => {
               className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
             >
               <option value="">Seleccionar...</option>
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Administrativa") && <option value="Matriz-1">Matriz Administrativa</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Salud") && <option value="Matriz-2">Matriz de Salud</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Archivos") && <option value="Matriz-3">Matriz de Archivos</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Administrativo OHLA") && <option value="Matriz-4">Matriz Administrativa OHLA</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz de Salud OHLA") && <option value="Matriz-5">Matriz de Salud OHLA</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz General") && <option value="Matriz-6">Matriz General</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Gestor OHLA") && <option value="Matriz-7">Matriz Gestor OHLA</option>},
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Administrativa") && <option value="Matriz-1">MATRIZ ADMINISTRATIVA</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Salud") && <option value="Matriz-2">MATRIZ DE SALUD</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Archivos") && <option value="Matriz-3">MATRIZ DE ARCHIVOS</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Administrativo OHLA") && <option value="Matriz-4">MATRIZ ADMINISTRATIVA OHLA</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz de Salud OHLA") && <option value="Matriz-5">MATRIZ DE SALUD OHLA</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz General") && <option value="Matriz-6">MATRIZ GENERAL</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Gestor OHLA") && <option value="Matriz-7">MATRIZ GESTOR OHLA</option>},
               {tienePermisoEnVista("Matriz Postulante", "Matriz Construccion OHLA") && <option value="Matriz-8">Matriz Construccion OHLA</option>},
               {tienePermisoEnVista("Matriz Postulante", "Matriz Arena") && <option value="Matriz-9">MATRIZ LA ARENA</option>}
               {tienePermisoEnVista("Matriz Postulante", "Matriz Poderosa 2026") && <option value="Matriz-10">REPORTE CONSOLIDADO ATENCIONES DIARIAS - PODEROSA</option>}
@@ -775,20 +803,117 @@ const MatrizPostulante = () => {
           {loading || (
             <table className="w-full border border-gray-300">
               <thead>
-                <tr>
-                  {/*head.map((header) => (
-                    <th key={header} className="border border-gray-300 px-4 py-2">{header}</th>
-                  ))*/}
-                </tr>
-              </thead>
-              <tbody>
-                {/*currentData.map((item, index) => (
-                  <tr key={index}>
-                    {head.map((header) => (
-                      <td key={header} className="border border-gray-300 px-4 py-2">{item[header]}</td>
+                {isHierarchical ? (
+                  (() => {
+                    const maxDepth = getMaxDepth(head);
+                    const rows = Array.from({ length: maxDepth }, () => []);
+
+                    const generate = (nodes, level) => {
+                      nodes.forEach(node => {
+                        const colSpan = countLeaves(node);
+                        const rowSpan = node.children?.length ? 1 : maxDepth - level + 1;
+
+                        rows[level - 1].push({
+                          label: node.label,
+                          colSpan,
+                          rowSpan,
+                          color: node.color
+                        });
+
+                        if (node.children?.length) {
+                          generate(node.children, level + 1);
+                        }
+                      });
+                    };
+
+                    generate(head, 1);
+
+                    return rows.map((row, rowIndex) => (
+                      <tr key={rowIndex}>
+                        {row.map((cell, i) => (
+                          <th
+                            key={i}
+                            colSpan={cell.colSpan}
+                            rowSpan={cell.rowSpan}
+                            className="border border-gray-300 px-4 py-2 text-center font-bold"
+                            style={{
+                              backgroundColor: cell.color || undefined
+                            }}
+                          >
+                            {cell.label}
+                          </th>
+                        ))}
+                      </tr>
+                    ));
+                  })()
+                ) : (
+                  <tr>
+                    {(head?.length > 0
+                      ? head.map(h => h.field)
+                      : Object.keys(currentData?.[0] || {})
+                    ).map((field, i) => (
+                      <th
+                        key={i}
+                        className="border border-gray-300 px-4 py-2 text-center font-bold"
+                      >
+                        {field}
+                      </th>
                     ))}
                   </tr>
-                ))*/}
+                )}
+              </thead>
+
+              <tbody>
+                {currentData.length === 0 ? (
+                  (() => {
+                    const totalColumns = isHierarchical
+                      ? extractLeaves(head).length
+                      : head?.length > 0
+                        ? head.map(h => h.field).length
+                        : Object.keys(currentData?.[0] || {}).length || 1;
+
+                    return (
+                      <tr>
+                        <td
+                          colSpan={totalColumns}
+                          className="border border-gray-300 px-4 py-6 text-center font-semibold text-gray-500"
+                        >
+                          SIN DATOS
+                        </td>
+                      </tr>
+                    );
+                  })()
+                ) : (
+                  currentData.map((item, rowIndex) => {
+                    const fields = isHierarchical
+                      ? extractLeaves(head)
+                      : head?.length > 0
+                        ? head.map(h => h.field)
+                        : Object.keys(item);
+
+                    return (
+                      <tr key={rowIndex}>
+                        {fields.map((field, colIndex) => (
+                          <td
+                            key={colIndex}
+                            className={`border border-gray-300 px-4 py-2 text-center ${datos.matrizSeleccionada === "Matriz-9" &&
+                              field.toLowerCase() === "condicion" &&
+                              String(item[field]).toLowerCase().trim() === "no apto"
+                              ? "bg-[#FF0000] text-white font-bold"
+                              : datos.matrizSeleccionada === "Matriz-9" &&
+                                field.toLowerCase() === "condicion" &&
+                                String(item[field]).toLowerCase().trim() === "apto"
+                                ? "bg-[#47D359] text-white font-bold"
+                                : ""
+                              }`}
+                          >
+                            {item[field] ?? ""}
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           )}

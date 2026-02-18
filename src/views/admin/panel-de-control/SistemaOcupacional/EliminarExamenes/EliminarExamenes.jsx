@@ -63,8 +63,9 @@ export default function EliminarExamenes() {
             />
             <button
                 type="button"
+                disabled={value === "NO PASO"}
                 onClick={() => handleDelete(name)}
-                className="text-red-500 hover:text-red-700 border border-red-300 rounded px-2 py-1"
+                className={`text-red-500 hover:text-red-700 border border-red-300 rounded px-2 py-1 ${value === "NO PASO" ? "opacity-50" : ""}`}
                 title="Eliminar"
             >
                 <FontAwesomeIcon icon={faTrash} />

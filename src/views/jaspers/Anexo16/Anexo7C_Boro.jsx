@@ -4,6 +4,7 @@ import { getSign, compressImage, getSignCompressed } from "../../utils/helpers.j
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
+import { resolverEmpresaContratistaBoroo } from "../../utils/functionUtils";
 
 export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
   // Normalizar estructura de datos: si viene con anexo16Reporte, aplanar la estructura
@@ -420,8 +421,7 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     recomendacionesRestricciones: data.conclusionMedicoAnexo7c_txtconclusionmed ?? "",
   };
 
-  // Detectar si la empresa es BOROO para aplicar lógica especial
-  const esBoroo = (datosFinales.empresa || '').toUpperCase().includes('BOROO');
+  const { esBoroo, empresaTexto } = resolverEmpresaContratistaBoroo(datosFinales.empresa, datosFinales.contrata);
 
   console.log('data anexo16', data)
   console.log(datosFinales.examenOjos)
@@ -539,8 +539,7 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
   doc.text("EMPRESA:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
   // Si es BOROO, mostrar el contratista como empresa; si no, mostrar la empresa normal
-  const textoEmpresa = esBoroo ? (datosFinales.contrata || "") : (datosFinales.empresa || "");
-  doc.text(textoEmpresa, tablaInicioX + 24, yPos + 3.5);
+  doc.text(empresaTexto || "", tablaInicioX + 24, yPos + 3.5);
   yPos += filaAltura;
 
   // Fila 3: Contrata (columna completa) - Solo si NO es BOROO
@@ -1605,40 +1604,66 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
   // Estructura: 2 columnas iguales
   const anchoColExamen = tablaAncho / 2;
   const divColExamen = tablaInicioX + anchoColExamen;
-  const alturaFilaExamen = 5;
+  const alturaFilaBaseExamen = 5;
+
+  const textoCabeza = datosFinales.examenFisicoCabezaCuello?.cabeza || "";
+  const textoCuello = datosFinales.examenFisicoCabezaCuello?.cuello || "";
+
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const interlineadoFila1 = 2.5;
+  const xTextoCabeza = tablaInicioX + 20;
+  const xTextoCuello = divColExamen + 20;
+  const anchoDisponibleCabeza = anchoColExamen - (xTextoCabeza - tablaInicioX) - 2;
+  const anchoDisponibleCuello = anchoColExamen - (xTextoCuello - divColExamen) - 2;
+
+  const lineasCabeza = textoCabeza
+    ? doc.splitTextToSize(String(textoCabeza), anchoDisponibleCabeza)
+    : [];
+  const lineasCuello = textoCuello
+    ? doc.splitTextToSize(String(textoCuello), anchoDisponibleCuello)
+    : [];
+
+  const maxLineasFila1 = Math.max(lineasCabeza.length, lineasCuello.length, 1);
+  const alturaFilaCabeza1 = Math.max(alturaFilaBaseExamen, 4 + (maxLineasFila1 - 1) * interlineadoFila1);
+  const alturaFila2 = alturaFilaBaseExamen;
 
   // Líneas horizontales para filas 1 y 2 (las verticales y la última horizontal se dibujarán después)
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaFilaExamen, tablaInicioX + tablaAncho, yPos + alturaFilaExamen);
-  doc.line(tablaInicioX, yPos + (alturaFilaExamen * 2), tablaInicioX + tablaAncho, yPos + (alturaFilaExamen * 2));
+  doc.line(tablaInicioX, yPos + alturaFilaCabeza1, tablaInicioX + tablaAncho, yPos + alturaFilaCabeza1);
+  doc.line(tablaInicioX, yPos + alturaFilaCabeza1 + alturaFila2, tablaInicioX + tablaAncho, yPos + alturaFilaCabeza1 + alturaFila2);
 
   // COLUMNA IZQUIERDA - Fila 1: CABEZA
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("CABEZA:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(datosFinales.examenFisicoCabezaCuello?.cabeza || "", tablaInicioX + 20, yPos + 3.5);
+  lineasCabeza.forEach((linea, index) => {
+    doc.text(linea, xTextoCabeza, yPos + 3.5 + (index * interlineadoFila1));
+  });
 
   // COLUMNA DERECHA - Fila 1: CUELLO
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("CUELLO:", divColExamen + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(datosFinales.examenFisicoCabezaCuello?.cuello || "", divColExamen + 20, yPos + 3.5);
+  lineasCuello.forEach((linea, index) => {
+    doc.text(linea, xTextoCuello, yPos + 3.5 + (index * interlineadoFila1));
+  });
 
   // COLUMNA IZQUIERDA - Fila 2: PERIMETRO CUELLO
+  const yFila2 = yPos + alturaFilaCabeza1;
   doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("PERIMETRO CUELLO:", tablaInicioX + 2, yPos + alturaFilaExamen + 3.5);
+  doc.text("PERIMETRO CUELLO:", tablaInicioX + 2, yFila2 + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
   const perimetroCuelloTexto = datosFinales.examenFisicoCabezaCuello?.perimetroCuello ? `${datosFinales.examenFisicoCabezaCuello.perimetroCuello} cm` : "";
-  doc.text(perimetroCuelloTexto, tablaInicioX + 40, yPos + alturaFilaExamen + 3.5);
+  doc.text(perimetroCuelloTexto, tablaInicioX + 40, yFila2 + 3.5);
 
   // COLUMNA DERECHA - Fila 2: NARÍZ
   doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("NARÍZ:", divColExamen + 2, yPos + alturaFilaExamen + 3.5);
+  doc.text("NARÍZ:", divColExamen + 2, yFila2 + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(datosFinales.examenFisicoCabezaCuello?.nariz || "", divColExamen + 20, yPos + alturaFilaExamen + 3.5);
+  doc.text(datosFinales.examenFisicoCabezaCuello?.nariz || "", divColExamen + 20, yFila2 + 3.5);
 
   // COLUMNA IZQUIERDA - Fila 3: BOCA, AMIGDALAS, FARINGE, LARINGE (fila creciente)
-  const yFila3 = yPos + (alturaFilaExamen * 2);
+  const yFila3 = yPos + alturaFilaCabeza1 + alturaFila2;
 
   // Fila header con label
   const alturaFilaHeaderBoca = 5;
@@ -1704,7 +1729,7 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
   doc.text(piezasQueFaltan, divColExamen + 45, yDentaduraData2);
 
   // Ajustar altura total de la sección
-  const alturaSeccionExamenAjustada = (alturaFilaExamen * 2) + alturaTotalFila3;
+  const alturaSeccionExamenAjustada = alturaFilaCabeza1 + alturaFila2 + alturaTotalFila3;
 
   // Redibujar líneas verticales de toda la sección con la altura correcta
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaSeccionExamenAjustada);
