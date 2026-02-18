@@ -9,22 +9,22 @@ import { faFileExcel, faMagnifyingGlass, faChevronLeft, faChevronRight, faSyncAl
 import ExcelJS from 'exceljs';
 
 const MATRICES_MAP = {
-  "Matriz-1": { url: "api/v01/st/registros/matrizAdministrativa", method: "POST" },
-  "Matriz-2": { url: "api/v01/st/registros/matrizSalud", method: "POST" },
-  "Matriz-3": { url: "api/v01/ct/archivos", method: "GET" },
-  "Matriz-4": { url: "api/v01/st/registros/matrizAdministrativaOhla", method: "POST" },
-  "Matriz-5": { url: "api/v01/st/registros/matrizSaludOhla", method: "POST" },
-  "Matriz-6": { url: "api/v01/st/registros/matrizGeneral", method: "POST" },
-  "Matriz-7": { url: "api/v01/st/registros/matrizOhlaGestor", method: "POST" },
-  "Matriz-8": { url: "api/v01/st/registros/matrizOhlaConstruccion", method: "POST" },
-  "Matriz-9": { urlH: "/api/headers/arena", methodH: "GET", urlB: "api/v01/st/registros/matrizArena2026", methodB: "POST" },
-  "Matriz-10": { url: "api/v01/st/registros/matrizPoderosa2026", method: "POST" },
-  "Matriz-11": { urlH: "api/headers/caraveli-2026", methodH: "GET", urlB: "api/v01/st/registros/matrizCaraveli2026", methodB: "POST" },
-  "Matriz-12": { url: "api/v01/st/registros/matrizProseguridadAsistencia2026", method: "POST" },
-  "Matriz-13": { url: "api/v01/st/registros/matrizProseguridad2026", method: "POST" },
-  "Matriz-14": { url: "api/v01/st/registros/matrizPacificoVida2026", method: "POST" },
-  "Matriz-15": { urlH: "api/headers/boroo", methodH: "GET", urlB: "api/v01/st/registros/matrizBoroo2026", methodB: "POST" },
-  "Matriz-16": { url: "api/v01/st/registros/matrizPoderosaAltura2026", method: "POST" },
+  "Matriz-1": { url: "api/v01/st/registros/matrizAdministrativa", method: "POST", name: "MATRIZ ADMINISTRATIVA" },
+  "Matriz-2": { url: "api/v01/st/registros/matrizSalud", method: "POST", name: "MATRIZ DE SALUD" },
+  "Matriz-3": { url: "api/v01/ct/archivos", method: "GET", name: "MATRIZ DE ARCHIVOS" },
+  "Matriz-4": { url: "api/v01/st/registros/matrizAdministrativaOhla", method: "POST", name: "MATRIZ ADMINISTRATIVA OHLA" },
+  "Matriz-5": { url: "api/v01/st/registros/matrizSaludOhla", method: "POST", name: "MATRIZ DE SALUD OHLA" },
+  "Matriz-6": { url: "api/v01/st/registros/matrizGeneral", method: "POST", name: "MATRIZ GENERAL" },
+  "Matriz-7": { url: "api/v01/st/registros/matrizOhlaGestor", method: "POST", name: "MATRIZ GESTOR OHLA" },
+  "Matriz-8": { url: "api/v01/st/registros/matrizOhlaConstruccion", method: "POST", name: "MATRIZ CONSTRUCCION OHLA" },
+  "Matriz-9": { urlH: "/api/headers/arena", methodH: "GET", urlB: "api/v01/st/registros/matrizArena2026", methodB: "POST", name: "MATRIZ LA ARENA" },
+  "Matriz-10": { url: "api/v01/st/registros/matrizPoderosa2026", method: "POST", name: "REPORTE CONSOLIDADO ATENCIONES DIARIAS - PODEROSA" },
+  "Matriz-11": { urlH: "api/headers/caraveli-2026", methodH: "GET", urlB: "api/v01/st/registros/matrizCaraveli2026", methodB: "POST", name: "MATRIZ COMPAÑIA MINERA CARAVELI" },
+  "Matriz-12": { url: "api/v01/st/registros/matrizProseguridadAsistencia2026", method: "POST", name: "PLANILLA ASISTENCIA PROSEGURIDAD" },
+  "Matriz-13": { url: "api/v01/st/registros/matrizProseguridad2026", method: "POST", name: "MATRIZ SALUD PROSEGURIDAD" },
+  "Matriz-14": { url: "api/v01/st/registros/matrizPacificoVida2026", method: "POST", name: "REPORTE CONSOLIDAD-PACIFICO VIDA - PODEROSA" },
+  "Matriz-15": { urlH: "api/headers/boroo", methodH: "GET", urlB: "api/v01/st/registros/matrizBoroo2026", methodB: "POST", name: "MATRIZ MINERA BOROO MISQUICHILCA" },
+  "Matriz-16": { url: "api/v01/st/registros/matrizPoderosaAltura2026", method: "POST", name: "REPORTE DE TRABAJOS EN ALTURA - PODEROSA" },
 
 };
 
@@ -392,7 +392,7 @@ const MatrizPostulante = () => {
   };
 
   const exportToExcel2 = async () => {
-
+    const config = MATRICES_MAP[datos.matrizSeleccionada];
     const trabajadores = data || [];
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Reporte");
@@ -441,7 +441,7 @@ const MatrizPostulante = () => {
       worksheet.columns.forEach(col => col.width = 18);
 
       const buffer = await workbook.xlsx.writeBuffer();
-      saveAs(new Blob([buffer]), "Reporte.xlsx");
+      saveAs(new Blob([buffer]), `${config.name}.xlsx`);
 
       return;
     }
@@ -575,7 +575,7 @@ const MatrizPostulante = () => {
     worksheet.columns.forEach(col => col.width = 18);
 
     const buffer = await workbook.xlsx.writeBuffer();
-    saveAs(new Blob([buffer]), "ReporteJerarquico.xlsx");
+    saveAs(new Blob([buffer]), `${config.name}.xlsx`);
   };
 
   const flattenTree = (nodes, level = 0, parentLabel = null, result = []) => {
@@ -658,7 +658,7 @@ const MatrizPostulante = () => {
     });
     return result;
   };
-
+  console.log(datos.matrizSeleccionada)
   return (
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
