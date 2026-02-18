@@ -200,10 +200,9 @@ export const reportesMap = {
 
    ac_bioquimica2022: AnalisisClinicosB_Digitalizado,
 
-   microbiologia: {  //NUEVO
-      Microbiologia1_Digitalizado,
-      Microbiologia_Digitalizado
-   },
+   microbiologia: Microbiologia_Digitalizado,
+
+   koh: Microbiologia1_Digitalizado,
 
    riesgocoronario: RiesgoCoronario,
 

@@ -226,6 +226,26 @@ export default async function ConsentAdmisionDeclacionAntecePatologicos(data = {
     return yActual;
   };
 
+  const dibujarDetalleLista = (texto, x, y, anchoMaximo, interlineado) => {
+    const items = String(texto)
+      .split(/\r\n|\r|\n|\\n/g)
+      .map(p => p.trim())
+      .filter(p => p.length > 0);
+
+    let yActual = y;
+    doc.setFont("helvetica", "normal").setFontSize(10);
+
+    items.forEach(item => {
+      const lineas = doc.splitTextToSize(`- ${item}`, anchoMaximo);
+      lineas.forEach(linea => {
+        doc.text(linea, x, yActual);
+        yActual += interlineado;
+      });
+    });
+
+    return yActual;
+  };
+
   // Texto de la declaración
   doc.setFontSize(11);
   doc.setTextColor(0, 0, 0);
@@ -295,8 +315,7 @@ export default async function ConsentAdmisionDeclacionAntecePatologicos(data = {
 
   // Texto del detalle si existe (sin borde, justificado)
   if (datosFinales.detalleAntecedentes) {
-    doc.setFont("helvetica", "normal").setFontSize(10);
-    yPos = justificarTexto(datosFinales.detalleAntecedentes, margin, yPos, anchoTexto, 5);
+    yPos = dibujarDetalleLista(datosFinales.detalleAntecedentes, margin, yPos, anchoTexto, 5);
   } else {
     // Si no hay detalle, dejar espacio
     yPos += 20;

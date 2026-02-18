@@ -290,28 +290,26 @@ export default async function Coprocultivo_Digitalizado(datos = {}, docExistente
       });
     }
 
-    // Sellos a la derecha - Mismo tamaño fijo para ambos
+    // Sellos
     const sigW = 53;
     const sigH = 23;
-    const sigY = 210;
-    const gap = 16;
-    const sigXOffset = 25; // 25mm más a la derecha
+    const sigY = 205;
+    const gap = 8;
+    const sigX = pageW / 2 + 20;
 
-    if (s1 && s2) {
-      const totalWidth = sigW * 2 + gap;
-      const startX = (pageW - totalWidth) / 2 + sigXOffset;
-
-      const addSello = (img, xPos) => {
+    const addSelloVertical = (img, xPos, yPos) => {
         const canvas = document.createElement('canvas');
         canvas.width = img.width;
         canvas.height = img.height;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0);
         const selloBase64 = canvas.toDataURL('image/png');
-        doc.addImage(selloBase64, 'PNG', xPos, sigY, sigW, sigH);
-      };
-      addSello(s1, startX);
-      addSello(s2, startX + sigW + gap);
+        doc.addImage(selloBase64, 'PNG', xPos, yPos, sigW, sigH);
+    };
+
+    if (s1 && s2) {
+      addSelloVertical(s1, sigX, sigY);
+      addSelloVertical(s2, sigX, sigY + sigH + gap);
     } else if (s1) {
       const canvas = document.createElement('canvas');
       canvas.width = s1.width;
@@ -319,8 +317,7 @@ export default async function Coprocultivo_Digitalizado(datos = {}, docExistente
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = (pageW - sigW) / 2 + sigXOffset;
-      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
+      doc.addImage(selloBase64, 'PNG', sigX, sigY, sigW, sigH);
     } else if (s2) {
       const canvas = document.createElement('canvas');
       canvas.width = s2.width;
@@ -328,8 +325,7 @@ export default async function Coprocultivo_Digitalizado(datos = {}, docExistente
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s2, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = (pageW - sigW) / 2 + sigXOffset;
-      doc.addImage(selloBase64, 'PNG', imgX, sigY, sigW, sigH);
+      doc.addImage(selloBase64, 'PNG', sigX, sigY, sigW, sigH);
     }
 
     // === FOOTER ===

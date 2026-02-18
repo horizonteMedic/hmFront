@@ -25,9 +25,9 @@ export default async function Informe_Lab_Vih(datos = {}, docExistente = null) {
 
   await drawHeader(doc, datos);
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
-  doc.text("INMUNOLOGÍA", pageW / 2, 38, { align: "center" });
+  doc.text("INMUNOLOGÍA", pageW / 2, 36, { align: "center" });
   doc.setFont(config.font, "bold").setFontSize(12);
-  doc.text("VIH", pageW / 2, 44, { align: "center" });
+  doc.text("VIH", pageW / 2, 40, { align: "center" });
   const finalYPos = drawPatientData(doc, datos);
 
   let y = finalYPos + 10;
@@ -132,7 +132,7 @@ const drawPatientData = (doc, datos = {}) => {
   const tablaInicioX = 15;
   const tablaAncho = 180;
   const filaAltura = 5;
-  let yPos = 43;
+  let yPos = 46;
 
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);

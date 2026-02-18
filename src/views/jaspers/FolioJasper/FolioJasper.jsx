@@ -77,7 +77,6 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "audiometria_2023",
         "informe_psicologico",
         "anexo16a",
-        "microbiologia",//NUEVO 
         "lhepatitis", //NUEVO
         "ac_coproparasitologico",
         "examen_inmunologico" //NUEVO
