@@ -308,9 +308,21 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
-    INMUNOLOGIA_HEPATITIS: { //nuevo Gr
-        nombre: "INMUNOLOGIA - HEPATITIS",
+    INMUNOLOGIA_HEPATITIS_A: { //nuevo Gr
+        nombre: "INMUNOLOGIA - HEPATITIS A",
         tabla: "lhepatitis",
+        url: "/api/v01/ct/inmunologia/obtenerReporteHepatitis",
+        esJasper: true,
+    },
+    INMUNOLOGIA_HEPATITIS_B: { //nuevo Gr
+        nombre: "INMUNOLOGIA - HEPATITIS B",
+        tabla: "hepatitis_b",
+        url: "/api/v01/ct/inmunologia/obtenerReporteHepatitis",
+        esJasper: true,
+    },
+    INMUNOLOGIA_HEPATITIS_C: { //nuevo Gr
+        nombre: "INMUNOLOGIA - HEPATITIS C",
+        tabla: "hepatitis_c",
         url: "/api/v01/ct/inmunologia/obtenerReporteHepatitis",
         esJasper: true,
     },

@@ -11,6 +11,8 @@ import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl = "/api/v01/ct/inmunologia/obtenerReporteHepatitis";
 const registrarUrl = "/api/v01/ct/inmunologia/registrarActualizarHepatitis";
+const registrarUrlB = "/api/v01/ct/inmunologia/registrarActualizarHepatitisB";
+const registrarUrlC = "/api/v01/ct/inmunologia/registrarActualizarHepatitisC";
 
 export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
   const res = await GetInfoServicioDefault(
@@ -24,6 +26,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
     set((prev) => ({
       ...prev,
       norden: res.norden ?? "",
+      id: res.id ?? null,
       fecha: res.fechaExamen,
 
       nombreExamen: res.nombreExamen ?? "",
@@ -65,6 +68,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla, datos
 
   const body = {
     norden: form.norden,
+    id: form.id,
     fechaExamen: form.fecha,
     txtMarca: form.marca,
     txtHepatitisa: form.resultadoHAV,
@@ -77,9 +81,14 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla, datos
     doctorAsignado: form.user_doctorAsignado,
   };
 
-  await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-    PrintHojaR(form.norden, token, tabla, datosFooter);
-  });
+  await SubmitDataServiceDefault(token, limpiar, body,
+    tabla === "lhepatitis" ? registrarUrl :
+      tabla === "hepatitis_b" ? registrarUrlB :
+        tabla === "hepatitis_c" ? registrarUrlC :
+          registrarUrl,
+    () => {
+      PrintHojaR(form.norden, token, tabla, datosFooter);
+    });
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
