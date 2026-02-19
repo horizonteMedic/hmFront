@@ -546,8 +546,8 @@ async function rasterizeAndCompressPdf(pdfBytes) {
     const mmPerPt = 25.4 / 72;
     const A4_WIDTH_MM = 210;
     const A4_HEIGHT_MM = 297;
-    const SCALE = 2.2;           // 🔥 DPI alto para texto nítido
-    const JPEG_QUALITY = 0.65;   // 🔥 Compresión fuerte sin borrosidad
+    const SCALE = 2.2;           // 🔥 DPI alto para texto nítido 1.9
+    const JPEG_QUALITY = 0.65;   // 🔥 Compresión fuerte sin borrosidad 0.20
 
     let doc = null;
 

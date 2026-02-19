@@ -5,7 +5,7 @@ import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import FolioJasper from "../../../../jaspers/FolioJasper/FolioJasper";
 import { getToday } from "../../../../utils/helpers";
-import { GetInfoPac, obtenerFirmas, SubmitDataService } from "./controllerFolio";
+import { GetInfoPac, obtenerFirmas, PrintHojaRAnexo16, PrintHojaRAnexo2, SubmitDataService } from "./controllerFolio";
 import Swal from "sweetalert2";
 import { buildExamenesList } from "./folioCatalogo";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
@@ -545,7 +545,6 @@ const Folio = () => {
 
     const toggleExamen = (index) => {
         const newList = [...form.listaExamenes];
-        // Solo permitir cambiar si el examen existe (resultado es true)
         if (newList[index].resultado) {
             newList[index].imprimir = !newList[index].imprimir;
             setForm((prev) => ({
@@ -553,6 +552,40 @@ const Folio = () => {
                 listaExamenes: newList,
             }));
         }
+    };
+
+    const toggleAllImprimir = () => {
+        setForm((prev) => {
+            if (!prev.listaExamenes) {
+                return prev;
+            }
+
+            const hasImprimibles = prev.listaExamenes.some((examen) => examen.resultado);
+
+            if (!hasImprimibles) {
+                return prev;
+            }
+
+            const shouldUncheckAll = prev.listaExamenes.some(
+                (examen) => examen.resultado && examen.imprimir
+            );
+
+            const updatedListaExamenes = prev.listaExamenes.map((examen) => {
+                if (!examen.resultado) {
+                    return examen;
+                }
+
+                return {
+                    ...examen,
+                    imprimir: !shouldUncheckAll,
+                };
+            });
+
+            return {
+                ...prev,
+                listaExamenes: updatedListaExamenes,
+            };
+        });
     };
 
     const handleGenerarFolio = async () => {
@@ -640,6 +673,18 @@ const Folio = () => {
             });
         }
     };
+
+    const handlePrintCamoAnexo2 = () => {
+        PrintHojaRAnexo2(form.norden, token, datosFooter);
+    };
+    const handlePrintCamoAnexo16 = () => {
+        PrintHojaRAnexo16(form.norden, token, datosFooter);
+    };
+
+    const hasImprimibles = !!form.listaExamenes?.some((examen) => examen.resultado);
+    const allImprimiblesMarcados =
+        hasImprimibles &&
+        form.listaExamenes?.every((examen) => !examen.resultado || examen.imprimir);
 
     return (
         <div className="w-full space-y-3 px-4">
@@ -796,7 +841,7 @@ const Folio = () => {
                             Exámenes Pasados Por el Paciente
                         </label>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                         <div className="text-sm font-bold text-red-700 bg-red-100 px-3 py-1 rounded-full">
                             No pasados: <span className="text-red-600 ml-1">{form.listaExamenes?.filter(e => !e.resultado).length || 0}</span>
                         </div>
@@ -805,6 +850,29 @@ const Folio = () => {
                         </div>
                         <div className="text-sm font-bold text-gray-700 bg-gray-100 px-3 py-1 rounded-full">
                             Exámenes a imprimir: <span className="text-blue-600 ml-1">{form.listaExamenes?.filter(e => e.imprimir).length || 0}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span
+                                className={`text-xs font-medium ${hasImprimibles ? "text-gray-700" : "text-gray-400"}`}
+                            >
+                                Imprimir todos
+                            </span>
+                            <button
+                                type="button"
+                                onClick={toggleAllImprimir}
+                                disabled={!hasImprimibles}
+                                className={`relative inline-flex items-center h-6 rounded-full w-12 transition-colors duration-200 focus:outline-none ${!hasImprimibles
+                                    ? "bg-gray-200 cursor-not-allowed opacity-50"
+                                    : allImprimiblesMarcados
+                                        ? "bg-green-500"
+                                        : "bg-gray-300"
+                                    }`}
+                            >
+                                <span
+                                    className={`inline-block w-5 h-5 transform bg-white rounded-full shadow transition-transform duration-200 ${allImprimiblesMarcados ? "translate-x-6" : "translate-x-1"
+                                        }`}
+                                />
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -894,20 +962,42 @@ const Folio = () => {
                         );
                     })}
                 </div>
-                <div className="flex justify-center items-center w-full gap-4">
-                    <button
-                        className="bg-yellow-400 hover:bg-yellow-500 text-white py-2 px-4 rounded-md mt-4 text-semibold"
-                        onClick={() => { handleClear(); setSelectedListType("COMPLETO") }}
-                    >
-                        Limpiar
-                    </button>
-                    <button
-                        className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
-                        onClick={handleGenerarFolio}
-                        disabled={(form.listaExamenes?.filter(e => e.imprimir).length || 0) == 0}
-                    >
-                        Generar Folio
-                    </button>
+                <div className="grid md:grid-cols-3 w-full gap-4">
+                    <div/>
+                    <div className="flex justify-center items-center w-full gap-4">
+                        <button
+                            className="bg-yellow-400 hover:bg-yellow-500 text-white py-2 px-4 rounded-md mt-4 text-semibold"
+                            onClick={() => { handleClear(); setSelectedListType("COMPLETO") }}
+                        >
+                            Limpiar
+                        </button>
+                        <button
+                            className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
+                            onClick={handleGenerarFolio}
+                            disabled={(form.listaExamenes?.filter(e => e.imprimir).length || 0) == 0}
+                        >
+                            Generar Folio
+                        </button>
+                    </div>
+
+                    <div className="flex  justify-center md:justify-end  items-center w-full gap-4">
+                        <button
+                            className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
+                            onClick={handlePrintCamoAnexo2}
+                            disabled={!form.norden || !form.listaExamenes?.some(e => e.resultado && e.tabla == "aptitud_medico_ocupacional_agro")}
+                        >
+                            Generar CAMO ANEXO 2
+                        </button>
+
+                        <button
+                            className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
+                            onClick={handlePrintCamoAnexo16}
+                            disabled={!form.norden || !form.listaExamenes?.some(e => e.resultado && e.tabla == "certificado_aptitud_medico_ocupacional")}
+                        >
+                            Generar CAMO ANEXO 16
+                        </button>
+                    </div>
+
                 </div>
 
             </SectionFieldset>

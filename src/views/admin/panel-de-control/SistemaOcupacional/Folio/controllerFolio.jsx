@@ -2,6 +2,7 @@ import Swal from "sweetalert2";
 import {
     GetInfoPacDefault,
     LoadingDefault,
+    PrintHojaRDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch, SubmitDataManejo } from "../../../../utils/apiHelpers";
@@ -12,6 +13,11 @@ const GetNomenclatura = `/api/v01/ct/fichaInterconsulta/obtenerEspecialidadesNom
 
 const registrarUrl = "/api/v01/ct/asignarFirma/registrarActualizarOrdenOcupacionalFirma";
 const obtenerUrl = "/api/v01/ct/asignarFirma/obtenerOrdenOcupacionalFirmaPorNOrden"
+
+
+//CAMO 
+const obtenerUrlCAMO2 = "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2"
+const obtenerUrlCAMO16 = "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16"
 
 export const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
     LoadingDefault("Validando datos");
@@ -205,4 +211,34 @@ export const SubmitDataService = async (
         Swal.fire("Error", "Ocurrio un error al registrar los datos", "error");
         return null;
     }
+};
+
+export const PrintHojaRAnexo2 = (nro, token, datosFooter) => {
+    const jasperModules = import.meta.glob(
+        "../../../../jaspers/Ficha_Anexo2/*.jsx"
+    );
+    PrintHojaRDefault(
+        nro,
+        token,
+        "aptitud_medico_ocupacional_agro",
+        datosFooter,
+        obtenerUrlCAMO2,
+        jasperModules,
+        "../../../../jaspers/Ficha_Anexo2"
+    );
+};
+
+export const PrintHojaRAnexo16 = (nro, token, datosFooter) => {
+    const jasperModules = import.meta.glob(
+        "../../../../jaspers/Ficha_Anexo16/*.jsx"
+    );
+    PrintHojaRDefault(
+        nro,
+        token,
+        "certificado_aptitud_medico_ocupacional",
+        datosFooter,
+        obtenerUrlCAMO16,
+        jasperModules,
+        "../../../../jaspers/Ficha_Anexo16"
+    );
 };
