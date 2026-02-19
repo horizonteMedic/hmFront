@@ -369,7 +369,7 @@ const drawFondoDeOjo = (doc, datos = {}, yInicio) => {
   // Sección: FONDO DE OJO - Header gris con todos los headers en la misma línea
   // Configuración de columnas bien organizadas: FONDO DE OJO | OD | OI | OD | OI | HALLAZGO
   // Anchos ajustados: OD y OI solo 8mm para marcar X, labels reducidos, resto para hallazgos
-  const anchoLabel = 25; // Ancho reducido para label "anormal" o "normal"
+  const anchoLabel = 35; // Ancho reducido para label "anormal" o "normal"
   const anchoOD = 8; // Solo para marcar X
   const anchoOI = 8; // Solo para marcar X
 
@@ -496,7 +496,8 @@ const drawFondoDeOjo = (doc, datos = {}, yInicio) => {
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
 
   // Configuración de columnas PIO (4 columnas): PIO | OD | OI | NO APLICA
-  const anchoLabelPIO = 30;
+  // Usar mismo ancho de label que FONDO DE OJO para alinear líneas verticales
+  const anchoLabelPIO = 35;
   const anchoPIO = (tablaAncho - anchoLabelPIO) / 3;
   const xPIOLabelEnd = tablaInicioX + anchoLabelPIO;
   const xPIOOD = xPIOLabelEnd + anchoPIO;
@@ -884,9 +885,9 @@ const drawRefraccion = (doc, datos = {}, yInicio) => {
   };
 
   // Fila: REFRACCIÓN | X | Aplica | X | No Aplica  (celditas)
-  const wRef = 45;
-  const wX = 10;
-  const wAplica = 55;
+  const wRef = 52;
+  const wX = 8;
+  const wAplica = 50;
   // const wNoAplica = tablaAncho - wRef - wAplica;
   const x0 = tablaInicioX;
   const xRefEnd = x0 + wRef;
@@ -1126,7 +1127,7 @@ const drawIndicadoresRestricciones = (doc, datos = {}, yInicio) => {
   const wL1 = 55;
   const wC1 = 10;
   const wL2 = 55;
-  const wC2 = 10;
+  const wC2 = 15;
   const wLCerca = 20;
   const wCCerca = 10;
   const wLLejos = 20;
@@ -1238,7 +1239,6 @@ const drawIndicadoresRestricciones = (doc, datos = {}, yInicio) => {
   // =========================
   // RESTRICCIONES (en tabla)
   // =========================
-  y += 0.5;
   doc.setFillColor(196, 196, 196);
   doc.rect(x, y, w, filaAltura, "F");
   doc.rect(x, y, w, filaAltura);
@@ -1247,7 +1247,7 @@ const drawIndicadoresRestricciones = (doc, datos = {}, yInicio) => {
   y += filaAltura;
 
   const drawRestrRow1 = (label, marcado) => {
-    const wLabel = w - 12;
+    const wLabel = w - 15;
     const wCheck = 12;
     const xLabelEnd = x + wLabel;
     doc.rect(x, y, w, filaAltura);
@@ -1262,7 +1262,7 @@ const drawIndicadoresRestricciones = (doc, datos = {}, yInicio) => {
   const drawRestrRow2 = (a, b) => {
     // [labelA][( )][labelB][( )]
     const wLabel = (w - 20) / 2;
-    const wCheck = 10;
+    const wCheck = 5;
     const xA1 = x + wLabel;
     const xA2 = xA1 + wCheck;
     const xB1 = xA2 + wLabel;

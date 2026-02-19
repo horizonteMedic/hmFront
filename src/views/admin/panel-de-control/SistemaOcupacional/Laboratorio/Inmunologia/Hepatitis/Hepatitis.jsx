@@ -9,15 +9,18 @@ import {
 import SectionFieldset from '../../../../../../components/reusableComponents/SectionFieldset';
 import EmpleadoComboBox from '../../../../../../components/reusableComponents/EmpleadoComboBox';
 import BotonesAccion from '../../../../../../components/templates/BotonesAccion';
-
-const tabla = 'lhepatitis';
+import { useEffect, useState } from 'react';
 
 export default function Hepatitis() {
   const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
   const today = getToday();
 
+  const [tabla, setTabla] = useState("lhepatitis");
+  const [tipoHepatitis, setTipoHepatitis] = useState({ tipoHepatitis: "A" })
+
   const initialFormState = {
     norden: '',
+    id: null,
     fecha: today,
 
     nombreExamen: "",
@@ -38,7 +41,6 @@ export default function Hepatitis() {
     ocupacion: "",
     cargoDesempenar: "",
 
-    tipoHepatitis: "A",
     marca: 'RAPID TEST - MONTEST',
     resultadoHAV: '',
     resultadoHBsAg: '',
@@ -52,6 +54,7 @@ export default function Hepatitis() {
     user_doctorAsignado: "",
   };
 
+
   const {
     form,
     setForm,
@@ -64,8 +67,18 @@ export default function Hepatitis() {
     handlePrintDefault,
   } = useForm(initialFormState);
 
+
+  const handleRadioButtonTipoHepatitis = (e, value) => {
+    const { name } = e.target;
+    setTipoHepatitis((f) => ({
+      ...f,
+      [name]: value.toUpperCase(),
+    }));
+    handleClearnotO();
+  };
+
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService({ ...form, ...tipoHepatitis }, token, userlogued, handleClear, tabla, datosFooter);
   };
 
   const handleSearch = (e) => {
@@ -80,6 +93,15 @@ export default function Hepatitis() {
       PrintHojaR(form.norden, token, tabla);
     });
   };
+
+  useEffect(() => {
+    const value = tipoHepatitis.tipoHepatitis;
+    setTabla(
+      value == "A" ? "lhepatitis" :
+        value == "B" ? "hepatitis_b" :
+          value == "C" ? "hepatitis_c" : "lhepatitis")
+    handleClearnotO();
+  }, [tipoHepatitis.tipoHepatitis])
 
   return (
     <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
@@ -205,16 +227,8 @@ export default function Hepatitis() {
       <SectionFieldset legend="Tipo de Prueba">
         <InputsRadioGroup
           name="tipoHepatitis"
-          value={form.tipoHepatitis}
-          onChange={(e, value) => {
-            handleRadioButton(e, value);
-            setForm(prev => ({
-              ...prev,
-              resultadoHAV: value != "A" ? "" : prev.resultadoHAV,
-              resultadoHBsAg: value != "B" ? "" : prev.resultadoHBsAg,
-              resultadoVHC: value != "C" ? "" : prev.resultadoVHC,
-            }))
-          }}
+          value={tipoHepatitis.tipoHepatitis}
+          onChange={handleRadioButtonTipoHepatitis}
           options={[
             { label: "HEPATITIS A (HAV)", value: "A" },
             { label: "HEPATITIS B (HBsAg)", value: "B" },
@@ -241,7 +255,7 @@ export default function Hepatitis() {
             name="resultadoHAV"
             value={form.resultadoHAV}
             onChange={handleChange}
-            disabled={form.tipoHepatitis != "A"}
+            disabled={tipoHepatitis.tipoHepatitis != "A"}
             labelWidth='120px'
             className='w-full max-w-[85%]'
           />
@@ -253,7 +267,7 @@ export default function Hepatitis() {
               { label: 'Positivo', value: 'POSITIVO' },
               { label: 'Negativo', value: 'NEGATIVO' }
             ]}
-            disabled={form.tipoHepatitis != "A"}
+            disabled={tipoHepatitis.tipoHepatitis != "A"}
           />
         </div>
         <div className='flex gap-4'>
@@ -263,7 +277,7 @@ export default function Hepatitis() {
             name="resultadoHBsAg"
             value={form.resultadoHBsAg}
             onChange={handleChange}
-            disabled={form.tipoHepatitis != "B"}
+            disabled={tipoHepatitis.tipoHepatitis != "B"}
             labelWidth='120px'
             className='w-full max-w-[85%]'
           />
@@ -275,7 +289,7 @@ export default function Hepatitis() {
               { label: 'Positivo', value: 'POSITIVO' },
               { label: 'Negativo', value: 'NEGATIVO' }
             ]}
-            disabled={form.tipoHepatitis != "B"}
+            disabled={tipoHepatitis.tipoHepatitis != "B"}
           />
         </div>
         <div className='flex gap-4'>
@@ -284,7 +298,7 @@ export default function Hepatitis() {
             name="resultadoVHC"
             value={form.resultadoVHC}
             onChange={handleChange}
-            disabled={form.tipoHepatitis != "C"}
+            disabled={tipoHepatitis.tipoHepatitis != "C"}
             labelWidth='120px'
             className='w-full max-w-[85%]'
           />
@@ -296,7 +310,7 @@ export default function Hepatitis() {
               { label: 'Positivo', value: 'POSITIVO' },
               { label: 'Negativo', value: 'NEGATIVO' }
             ]}
-            disabled={form.tipoHepatitis != "C"}
+            disabled={tipoHepatitis.tipoHepatitis != "C"}
           />
         </div>
       </SectionFieldset>

@@ -210,11 +210,9 @@ export const reportesMap = {
 
    inmunologia: InmunologiaLab_Digitalizado,
 
-   lhepatitis: { //nuevo
-      LHepatitisA_Digitalizado,
-      LHepatitisB_Digitalizado,
-      LHepatitisC_Digitalizado
-   },
+   lhepatitis: LHepatitisA_Digitalizado,
+   hepatitis_b: LHepatitisB_Digitalizado,
+   hepatitis_c: LHepatitisC_Digitalizado,
 
    inmunologia_vdrl: Informe_Lab_VRDL,  //nuevo
 

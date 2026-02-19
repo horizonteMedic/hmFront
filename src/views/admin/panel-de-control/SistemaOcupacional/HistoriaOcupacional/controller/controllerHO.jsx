@@ -82,6 +82,7 @@ export const GetInfoPac = (nro, set, token, sede) => {
       set(prev => ({
         ...prev,
         ...res,
+        nombres: res.nombresApellidos ?? "",
       }));
     })
 
@@ -102,10 +103,9 @@ export const GetInfoHistoriaOcupacinal = (nro, tabla, set, token, setTable) => {
         );
         set(prev => ({
           ...prev,
+          nombres: res.nombresApellidos ?? "",
           ...res,
           fecha: res.fechaHo,
-
-          nombres: res.nombresApellidos,
           user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
         setTable(detallesOrdenados)

@@ -9,22 +9,22 @@ import { faFileExcel, faMagnifyingGlass, faChevronLeft, faChevronRight, faSyncAl
 import ExcelJS from 'exceljs';
 
 const MATRICES_MAP = {
-  "Matriz-1": { url: "st/registros/matrizAdministrativa", method: "POST" },
-  "Matriz-2": { url: "st/registros/matrizSalud", method: "POST" },
-  "Matriz-3": { url: "ct/archivos", method: "GET" },
-  "Matriz-4": { url: "st/registros/matrizAdministrativaOhla", method: "POST" },
-  "Matriz-5": { url: "st/registros/matrizSaludOhla", method: "POST" },
-  "Matriz-6": { url: "st/registros/matrizGeneral", method: "POST" },
-  "Matriz-7": { url: "st/registros/matrizOhlaGestor", method: "POST" },
-  "Matriz-8": { url: "st/registros/matrizOhlaConstruccion", method: "POST" },
-  "Matriz-9": { url: "st/registros/matrizArena2026", method: "POST" },
-  "Matriz-10": { url: "st/registros/matrizPoderosa2026", method: "POST" },
-  "Matriz-11": { url: "st/registros/matrizCaraveli2026", method: "POST" },
-  "Matriz-12": { url: "st/registros/matrizProseguridadAsistencia2026", method: "POST" },
-  "Matriz-13": { url: "st/registros/matrizProseguridad2026", method: "POST" },
-  "Matriz-14": { url: "st/registros/matrizPacificoVida2026", method: "POST" },
-  "Matriz-15": { url: "st/registros/matrizBoroo2026", method: "POST" },
-  "Matriz-16": { url: "st/registros/matrizPoderosaAltura2026", method: "POST" },
+  "Matriz-1": { url: "api/v01/st/registros/matrizAdministrativa", method: "POST", name: "MATRIZ ADMINISTRATIVA" },
+  "Matriz-2": { url: "api/v01/st/registros/matrizSalud", method: "POST", name: "MATRIZ DE SALUD" },
+  "Matriz-3": { url: "api/v01/ct/archivos", method: "GET", name: "MATRIZ DE ARCHIVOS" },
+  "Matriz-4": { url: "api/v01/st/registros/matrizAdministrativaOhla", method: "POST", name: "MATRIZ ADMINISTRATIVA OHLA" },
+  "Matriz-5": { url: "api/v01/st/registros/matrizSaludOhla", method: "POST", name: "MATRIZ DE SALUD OHLA" },
+  "Matriz-6": { url: "api/v01/st/registros/matrizGeneral", method: "POST", name: "MATRIZ GENERAL" },
+  "Matriz-7": { url: "api/v01/st/registros/matrizOhlaGestor", method: "POST", name: "MATRIZ GESTOR OHLA" },
+  "Matriz-8": { url: "api/v01/st/registros/matrizOhlaConstruccion", method: "POST", name: "MATRIZ CONSTRUCCION OHLA" },
+  "Matriz-9": { urlH: "/api/headers/arena", methodH: "GET", urlB: "api/v01/st/registros/matrizArena2026", methodB: "POST", name: "MATRIZ LA ARENA" },
+  "Matriz-10": { url: "api/v01/st/registros/matrizPoderosa2026", method: "POST", name: "REPORTE CONSOLIDADO ATENCIONES DIARIAS - PODEROSA" },
+  "Matriz-11": { urlH: "api/headers/caraveli-2026", methodH: "GET", urlB: "api/v01/st/registros/matrizCaraveli2026", methodB: "POST", name: "MATRIZ COMPAÑIA MINERA CARAVELI" },
+  "Matriz-12": { url: "api/v01/st/registros/matrizProseguridadAsistencia2026", method: "POST", name: "PLANILLA ASISTENCIA PROSEGURIDAD" },
+  "Matriz-13": { url: "api/v01/st/registros/matrizProseguridad2026", method: "POST", name: "MATRIZ SALUD PROSEGURIDAD" },
+  "Matriz-14": { url: "api/v01/st/registros/matrizPacificoVida2026", method: "POST", name: "REPORTE CONSOLIDAD-PACIFICO VIDA - PODEROSA" },
+  "Matriz-15": { urlH: "api/headers/boroo", methodH: "GET", urlB: "api/v01/st/registros/matrizBoroo2026", methodB: "POST", name: "MATRIZ MINERA BOROO MISQUICHILCA" },
+  "Matriz-16": { url: "api/v01/st/registros/matrizPoderosaAltura2026", method: "POST", name: "REPORTE DE TRABAJOS EN ALTURA - PODEROSA" },
 
 };
 
@@ -172,34 +172,82 @@ const MatrizPostulante = () => {
 
     try {
       const config = MATRICES_MAP[datos.matrizSeleccionada];
-      console.log(config)
       if (!config) {
         setLoading(false);
         return;
       }
+      const isMatrizArena = datos.matrizSeleccionada === "Matriz-9";
+      const isMatrizCaraveli = datos.matrizSeleccionada === "Matriz-11";
 
-      const response = await GetMatrizUniversal(datosapi, config, token);
-      console.log(response)
-      if (!Array.isArray(response)) {
-        setData([]);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Ocurrió un error al traer la Matriz',
-        });
-        return;
+      if (config.urlH) {
+
+        const { urlH, methodH, urlB, methodB } = config;
+
+        const [headersResponse, bodyResponse] = await Promise.all([
+          GetMatrizUniversal(null, { url: urlH, method: methodH }, token),
+          GetMatrizUniversal(datosapi, { url: urlB, method: methodB }, token)
+        ]);
+
+        if (!Array.isArray(headersResponse) || !Array.isArray(bodyResponse)) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Ocurrió un error al traer la Matriz"
+          });
+          return;
+        }
+
+        let processedBody = bodyResponse;
+
+        // 🔥 SOLO MATRIZ 9
+        if (isMatrizArena || isMatrizCaraveli) {
+          processedBody = bodyResponse.map(item => ({
+            ...item,
+            responsable_digitalizacion: userlogued.datos.nombres_user.toUpperCase()
+          }));
+        }
+
+        setHeaders(headersResponse);
+        setData(processedBody);
+
+      } else {
+        const response = await GetMatrizUniversal(
+          datosapi,
+          { url: config.url, method: config.method },
+          token
+        );
+
+        if (!Array.isArray(response)) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Ocurrió un error al traer la Matriz"
+          });
+        }
+
+        setData(response);
+
+        // 🔥 Generar columnas automáticamente
+        if (response.length > 0) {
+          const autoHeaders = Object.keys(response[0]).map(key => ({
+            field: key,
+            headerName: key.toUpperCase()
+          }));
+
+          setHeaders(autoHeaders);
+        } else {
+          setHeaders([]);
+        }
       }
-      setData(response);
-      const headers = Object.keys(response[0] || {});
-      setHeaders(headers);
-      setTotalPages(Math.ceil(response.length / recordsPerPage));
 
     } catch (error) {
+
       Swal.fire({
-        icon: 'error',
-        title: 'Ocurrió un error al traer la Matriz',
-        text: 'No hay datos que mostrar',
+        icon: "error",
+        title: "Ocurrió un error al traer la Matriz",
+        text: "No hay datos que mostrar",
       });
+
     } finally {
       setLoading(false);
     }
@@ -236,6 +284,10 @@ const MatrizPostulante = () => {
       setReload(0); // Reinicia el estado reload para evitar múltiples recargas
     }
   }, [reload]);
+
+  const handleExport = () => {
+
+  }
 
   const exportToExcel = async () => {
     const workbook = new ExcelJS.Workbook();
@@ -339,6 +391,212 @@ const MatrizPostulante = () => {
     saveAs(dataFile, 'matriz_postulante.xlsx');
   };
 
+  const exportToExcel2 = async () => {
+    const config = MATRICES_MAP[datos.matrizSeleccionada];
+    const trabajadores = data || [];
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Reporte");
+
+    const borderStyle = {
+      top: { style: "thin" },
+      left: { style: "thin" },
+      bottom: { style: "thin" },
+      right: { style: "thin" }
+    };
+
+    // ============================================
+    // 🔍 SI NO HAY HEADERS DINÁMICOS (MODO PLANO)
+    // ============================================
+    if (!head || head.length === 0 || !head[0]?.children) {
+
+      if (trabajadores.length === 0) return;
+
+      const fields = Object.keys(trabajadores[0]);
+
+      // 1️⃣ HEADER SIMPLE
+      fields.forEach((field, index) => {
+        const cell = worksheet.getRow(1).getCell(index + 1);
+        cell.value = field;
+        cell.font = { bold: true };
+        cell.alignment = { horizontal: "center", vertical: "middle" };
+        cell.border = borderStyle;
+      });
+
+      // 2️⃣ DATA
+      let rowIndex = 2;
+
+      trabajadores.forEach(item => {
+
+        const row = worksheet.getRow(rowIndex);
+        fields.forEach((field, colIndex) => {
+          const cell = row.getCell(colIndex + 1);
+          cell.value = item[field] ?? "";
+          cell.border = borderStyle;
+          cell.alignment = { horizontal: "center", vertical: "middle" };
+        });
+
+        rowIndex++;
+      });
+
+      worksheet.columns.forEach(col => col.width = 18);
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      saveAs(new Blob([buffer]), `${config.name}.xlsx`);
+
+      return;
+    }
+
+    // ============================================
+    // 🔥 MODO JERÁRQUICO (CON ESTRUCTURA)
+    // ============================================
+
+    const estructura = head;
+
+    const getMaxDepth = (nodes, level = 1) =>
+      Math.max(...nodes.map(n =>
+        n.children?.length
+          ? getMaxDepth(n.children, level + 1)
+          : level
+      ));
+
+    const maxDepth = getMaxDepth(estructura);
+
+    const countLeaves = (node) =>
+      !node.children?.length
+        ? 1
+        : node.children.reduce((sum, child) => sum + countLeaves(child), 0);
+
+    const generateHeader = (nodes, level, startCol) => {
+
+      let currentCol = startCol;
+
+      nodes.forEach(node => {
+
+        const span = countLeaves(node);
+        const colStart = currentCol;
+        const colEnd = currentCol + span - 1;
+
+        const cell = worksheet.getRow(level).getCell(colStart);
+        cell.value = node.label ?? "";
+        cell.font = { bold: true };
+        cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+        cell.border = borderStyle;
+
+        // 🎨 Pintar SOLO si tiene color
+        if (node.color) {
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: node.color.replace("#", "") }
+          };
+        }
+
+        if (span > 1) {
+          worksheet.mergeCells(level, colStart, level, colEnd);
+        }
+
+        if (!node.children?.length && level < maxDepth) {
+          worksheet.mergeCells(level, colStart, maxDepth, colStart);
+        }
+
+        if (node.children?.length) {
+          generateHeader(node.children, level + 1, colStart);
+        }
+
+        currentCol += span;
+      });
+    };
+
+    generateHeader(estructura, 1, 1);
+
+    // Extraer hojas
+    const fields = [];
+
+    const extractFields = (nodes) => {
+      nodes.forEach(n => {
+        if (!n.children?.length) {
+          fields.push(n.field);
+        } else {
+          extractFields(n.children);
+        }
+      });
+    };
+
+    extractFields(estructura);
+
+    let dataStartRow = maxDepth + 1;
+
+    trabajadores.forEach(item => {
+
+      const row = worksheet.getRow(dataStartRow);
+
+      fields.forEach((field, colIndex) => {
+
+        const cell = row.getCell(colIndex + 1);
+        const valor = item[field] ?? "";
+        cell.value = valor;
+
+        if (datos.matrizSeleccionada === "Matriz-9" && field.toLowerCase() === "condicion") {
+
+          const normalized = String(valor).toLowerCase().trim();
+
+          if (normalized === "no apto") {
+            cell.fill = {
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: "FFFF0000" }
+            };
+            cell.font = {
+              bold: true,
+              color: { argb: "FFFFFFFF" }
+            };
+          }
+
+          if (normalized === "apto") {
+            cell.fill = {
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: "FF00B050" }
+            };
+            cell.font = {
+              bold: true,
+              color: { argb: "FFFFFFFF" }
+            };
+          }
+        }
+        cell.border = borderStyle;
+        cell.alignment = { horizontal: "center", vertical: "middle" };
+
+      });
+
+      dataStartRow++;
+    });
+
+    worksheet.columns.forEach(col => col.width = 18);
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    saveAs(new Blob([buffer]), `${config.name}.xlsx`);
+  };
+
+  const flattenTree = (nodes, level = 0, parentLabel = null, result = []) => {
+    nodes.forEach(node => {
+      result.push({
+        label: node.label,
+        field: node.field,
+        color: node.color,
+        level,
+        parentLabel
+      });
+
+      if (node.children && node.children.length > 0) {
+        flattenTree(node.children, level + 1, node.label, result);
+      }
+    });
+
+    return result;
+  };
+
+
   const reloadTable = () => {
     if (datos.matrizSeleccionada === "") {
       setData([]);
@@ -370,7 +628,37 @@ const MatrizPostulante = () => {
   const startIdx = (currentPage - 1) * recordsPerPage;
   const endIdx = startIdx + recordsPerPage;
   const currentData = Array.isArray(data) ? data.slice(startIdx, endIdx) : [];
+  const isHierarchical =
+    head &&
+    head.length > 0 &&
+    head[0]?.children &&
+    head[0].children.length > 0;
 
+  const getMaxDepth = (nodes, level = 1) =>
+    Math.max(
+      ...nodes.map(n =>
+        n.children?.length
+          ? getMaxDepth(n.children, level + 1)
+          : level
+      )
+    );
+
+  const countLeaves = (node) =>
+    !node.children?.length
+      ? 1
+      : node.children.reduce((sum, child) => sum + countLeaves(child), 0);
+
+  const extractLeaves = (nodes, result = []) => {
+    nodes.forEach(n => {
+      if (!n.children?.length) {
+        result.push(n.field);
+      } else {
+        extractLeaves(n.children, result);
+      }
+    });
+    return result;
+  };
+  console.log(datos.matrizSeleccionada)
   return (
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
@@ -378,7 +666,7 @@ const MatrizPostulante = () => {
           <h1 className="text-start font-bold color-azul text-white">Matriz Postulante</h1>
           <div className="flex items-center gap-4">
             <button
-              onClick={exportToExcel}
+              onClick={exportToExcel2}
               className={`verde-btn px-4 py-1 rounded-md ${exportButtonEnabled ? '' : 'cursor-not-allowed opacity-50'}`}
               disabled={!exportButtonEnabled}
             >
@@ -475,13 +763,13 @@ const MatrizPostulante = () => {
               className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
             >
               <option value="">Seleccionar...</option>
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Administrativa") && <option value="Matriz-1">Matriz Administrativa</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Salud") && <option value="Matriz-2">Matriz de Salud</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Archivos") && <option value="Matriz-3">Matriz de Archivos</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Administrativo OHLA") && <option value="Matriz-4">Matriz Administrativa OHLA</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz de Salud OHLA") && <option value="Matriz-5">Matriz de Salud OHLA</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz General") && <option value="Matriz-6">Matriz General</option>}
-              {tienePermisoEnVista("Matriz Postulante", "Matriz Gestor OHLA") && <option value="Matriz-7">Matriz Gestor OHLA</option>},
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Administrativa") && <option value="Matriz-1">MATRIZ ADMINISTRATIVA</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Salud") && <option value="Matriz-2">MATRIZ DE SALUD</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Archivos") && <option value="Matriz-3">MATRIZ DE ARCHIVOS</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Administrativo OHLA") && <option value="Matriz-4">MATRIZ ADMINISTRATIVA OHLA</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz de Salud OHLA") && <option value="Matriz-5">MATRIZ DE SALUD OHLA</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz General") && <option value="Matriz-6">MATRIZ GENERAL</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Gestor OHLA") && <option value="Matriz-7">MATRIZ GESTOR OHLA</option>},
               {tienePermisoEnVista("Matriz Postulante", "Matriz Construccion OHLA") && <option value="Matriz-8">Matriz Construccion OHLA</option>},
               {tienePermisoEnVista("Matriz Postulante", "Matriz Arena") && <option value="Matriz-9">MATRIZ LA ARENA</option>}
               {tienePermisoEnVista("Matriz Postulante", "Matriz Poderosa 2026") && <option value="Matriz-10">REPORTE CONSOLIDADO ATENCIONES DIARIAS - PODEROSA</option>}
@@ -515,20 +803,117 @@ const MatrizPostulante = () => {
           {loading || (
             <table className="w-full border border-gray-300">
               <thead>
-                <tr>
-                  {head.map((header) => (
-                    <th key={header} className="border border-gray-300 px-4 py-2">{header}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {currentData.map((item, index) => (
-                  <tr key={index}>
-                    {head.map((header) => (
-                      <td key={header} className="border border-gray-300 px-4 py-2">{item[header]}</td>
+                {isHierarchical ? (
+                  (() => {
+                    const maxDepth = getMaxDepth(head);
+                    const rows = Array.from({ length: maxDepth }, () => []);
+
+                    const generate = (nodes, level) => {
+                      nodes.forEach(node => {
+                        const colSpan = countLeaves(node);
+                        const rowSpan = node.children?.length ? 1 : maxDepth - level + 1;
+
+                        rows[level - 1].push({
+                          label: node.label,
+                          colSpan,
+                          rowSpan,
+                          color: node.color
+                        });
+
+                        if (node.children?.length) {
+                          generate(node.children, level + 1);
+                        }
+                      });
+                    };
+
+                    generate(head, 1);
+
+                    return rows.map((row, rowIndex) => (
+                      <tr key={rowIndex}>
+                        {row.map((cell, i) => (
+                          <th
+                            key={i}
+                            colSpan={cell.colSpan}
+                            rowSpan={cell.rowSpan}
+                            className="border border-gray-300 px-4 py-2 text-center font-bold"
+                            style={{
+                              backgroundColor: cell.color || undefined
+                            }}
+                          >
+                            {cell.label}
+                          </th>
+                        ))}
+                      </tr>
+                    ));
+                  })()
+                ) : (
+                  <tr>
+                    {(head?.length > 0
+                      ? head.map(h => h.field)
+                      : Object.keys(currentData?.[0] || {})
+                    ).map((field, i) => (
+                      <th
+                        key={i}
+                        className="border border-gray-300 px-4 py-2 text-center font-bold"
+                      >
+                        {field}
+                      </th>
                     ))}
                   </tr>
-                ))}
+                )}
+              </thead>
+
+              <tbody>
+                {currentData.length === 0 ? (
+                  (() => {
+                    const totalColumns = isHierarchical
+                      ? extractLeaves(head).length
+                      : head?.length > 0
+                        ? head.map(h => h.field).length
+                        : Object.keys(currentData?.[0] || {}).length || 1;
+
+                    return (
+                      <tr>
+                        <td
+                          colSpan={totalColumns}
+                          className="border border-gray-300 px-4 py-6 text-center font-semibold text-gray-500"
+                        >
+                          SIN DATOS
+                        </td>
+                      </tr>
+                    );
+                  })()
+                ) : (
+                  currentData.map((item, rowIndex) => {
+                    const fields = isHierarchical
+                      ? extractLeaves(head)
+                      : head?.length > 0
+                        ? head.map(h => h.field)
+                        : Object.keys(item);
+
+                    return (
+                      <tr key={rowIndex}>
+                        {fields.map((field, colIndex) => (
+                          <td
+                            key={colIndex}
+                            className={`border border-gray-300 px-4 py-2 text-center ${datos.matrizSeleccionada === "Matriz-9" &&
+                              field.toLowerCase() === "condicion" &&
+                              String(item[field]).toLowerCase().trim() === "no apto"
+                              ? "bg-[#FF0000] text-white font-bold"
+                              : datos.matrizSeleccionada === "Matriz-9" &&
+                                field.toLowerCase() === "condicion" &&
+                                String(item[field]).toLowerCase().trim() === "apto"
+                                ? "bg-[#47D359] text-white font-bold"
+                                : ""
+                              }`}
+                          >
+                            {item[field] ?? ""}
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           )}

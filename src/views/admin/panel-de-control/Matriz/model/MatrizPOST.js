@@ -129,8 +129,7 @@ export function GetMatrizGeneral(datos, token) {
         .then(res => res.json()).then(response => response)
 }
 
-export function GetMatrizUniversal(datos, config, token) {
-    const { url, method } = config;
+export function GetMatrizUniversal(datos, { url, method }, token) {
 
     const options = {
         method: method,
@@ -150,6 +149,6 @@ export function GetMatrizUniversal(datos, config, token) {
         });
     }
 
-    return fetch(`${URLAzure}/api/v01/${url}`, options)
+    return fetch(`${URLAzure}/${url}`, options)
         .then(res => res.json()).then(response => response)
 }
