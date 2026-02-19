@@ -45,7 +45,7 @@ import Anexo16A from "./views/admin/panel-de-control/SistemaOcupacional/Anexo16A
 
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/MusculoEsqueletica/Digitalizado/EvaluacionMuscoloEsqueletica.jsx";
+import Ficha from "./views/jaspers/Oftalmologia/oftalmoJean/EvaluacionOftalmologica2021_Digitalizado.jsx";
 
 
 
