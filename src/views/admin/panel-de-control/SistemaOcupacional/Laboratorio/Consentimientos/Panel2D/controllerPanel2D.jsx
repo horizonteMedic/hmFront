@@ -65,8 +65,8 @@ export const GetInfoServicio = async (nro, token, setForm, form) => {
         ...res,
         antecedentes: antecedentesActualizados,
         user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
-          nombre_doctorAsignado: res.doctorAsignado ?? "",
-          user_doctorAsignado: res.userMedicoOcup ?? "",
+        nombre_doctorAsignado: res.doctorAsignado ?? "",
+        user_doctorAsignado: res.userMedicoOcup ?? "",
 
       }));
     } else {

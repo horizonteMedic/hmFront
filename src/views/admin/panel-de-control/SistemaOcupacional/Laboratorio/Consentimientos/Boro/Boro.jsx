@@ -31,6 +31,9 @@ const Boro = () => {
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
+
+    nombre_doctorAsignado: "",
+    user_doctorAsignado: "",
   };
 
   const { form, setForm, handleChange, handleChangeSimple, handleClear, handlePrintDefault } = useForm(initialFormState);
