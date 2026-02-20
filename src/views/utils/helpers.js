@@ -137,34 +137,42 @@ export async function colocarSellosEnPdf(pdfBytes, sellos, coordenadas) {
         const url = sellos[key];
         const coord = coordenadas[key];
 
-        if (!coord || !esUrlImagenValida(url)) {
+        if (!coord || !esUrlBasicaValida(url)) {
             console.warn(`Sello omitido: ${key}`, url);
             continue;
         }
 
-        const imgBytes = await fetchImageBytes(url);
+        try {
+            const imgBytes = await fetchImageBytes(url);
 
-        const image =
-            url.toLowerCase().endsWith(".png") || url.toLowerCase().endsWith(".jpeg")
-                ? await pdfDoc.embedJpg(imgBytes)
-                : await pdfDoc.embedPng(imgBytes);
+            let image;
 
-        page.drawImage(image, {
-            x: coord.x,
-            y: height - coord.y - coord.height, // 👈 conversión PDF
-            width: coord.width,
-            height: coord.height,
-        });
+            // 🔥 Detectar tipo por contenido real
+            try {
+                image = await pdfDoc.embedPng(imgBytes);
+            } catch {
+                image = await pdfDoc.embedJpg(imgBytes);
+            }
+
+            page.drawImage(image, {
+                x: coord.x,
+                y: height - coord.y - coord.height, // 👈 conversión PDF
+                width: coord.width,
+                height: coord.height,
+            });
+        } catch (error) {
+            console.error(`Error procesando sello: ${key}`, error);
+        }
+
     }
 
     return await pdfDoc.save();
 }
 
-function esUrlImagenValida(url) {
+function esUrlBasicaValida(url) {
     if (!url || typeof url !== "string") return false;
     if (url === "Sin registro") return false;
-
-    return /\.(png|jpg|jpeg)$/i.test(url.split("?")[0]);
+    return true;
 }
 
 export function uint8ToBase64(uint8Array) {

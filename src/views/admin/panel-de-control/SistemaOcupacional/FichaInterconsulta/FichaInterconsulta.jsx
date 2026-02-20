@@ -32,7 +32,7 @@ const Especialidades = [
     "Oncologia",
     "Cirugía Oncológica",
     "Hematología",
-    "Ginecologia y Obstreticia",
+    "Ginecologia y Obstetricia",
     "Oftalmología",
     "Cardiología",
     "Neumología",
