@@ -19,10 +19,11 @@ export function GetInfoLaboratioEx(data, tabla, token, user) {
     const body = {
         nameConset: tabla,
         userRegistro: user,
-        userMedicoOcup: "",
+        userMedicoOcup: data?.user_doctorAsignado ?? "",
         fechaex: data.fecha,
         nOrden: data.norden,
         usuarioFirma: data?.user_medicoFirma ?? "",
+        doctorAsignado: data?.user_doctorAsignado ?? "",
     };
 
     if (data.antecedentes) {
@@ -82,6 +83,7 @@ export function SubmitInfoLaboratioExBoro(data, token, user) {
         notas: data.notas,
         norden: data.norden,
         usuarioFirma: data.user_medicoFirma,
+        doctorAsignado: data?.user_doctorAsignado ?? "",
     };
 
     const url = `${URLAzure}/api/v01/ct/laboratorio/registrarActualizarConsentimientoBORO`

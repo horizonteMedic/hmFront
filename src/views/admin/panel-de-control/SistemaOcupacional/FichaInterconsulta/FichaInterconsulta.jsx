@@ -32,7 +32,7 @@ const Especialidades = [
     "Oncologia",
     "Cirugía Oncológica",
     "Hematología",
-    "Ginecologia",
+    "Ginecologia y Obstetricia",
     "Oftalmología",
     "Cardiología",
     "Neumología",
@@ -50,7 +50,11 @@ const Especialidades = [
     "Agudeza Visual",
     "Odontologia",
     "Urologia",
-    "Nefrologia"
+    "Nefrologia",
+    "Psiquiatría",
+    "Psicología",
+    "Medicina Física y Rehabilitación",
+    "Emergencua y Desastres"
 ]
 
 

@@ -61,7 +61,7 @@ export const GetInfoPac = (nro, set, token, sede) => {
     })
 }
 
-export const GetInfoPacLaboratorioFil = (nro, tabla, set, token) => {
+export const GetInfoPacLaboratorioFil = (nro, tabla, set, token, user) => {
   getFetch(`/api/v01/ct/laboratorio/consentimiento-laboratorio?nOrden=${nro}&nameConset=${tabla}`, token)
     .then((res) => {
       if (res.norden) {
@@ -74,6 +74,9 @@ export const GetInfoPacLaboratorioFil = (nro, tabla, set, token) => {
           ...prev,
           ...res,
           user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+          user_doctorAsignado: res.doctorAsignado ?? "",
+
+
         }));
       } else {
         Swal.fire('Error', 'Ocurrio un error al traer los datos', 'error')

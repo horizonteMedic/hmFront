@@ -60,7 +60,8 @@ export const GetInfoServicio = async (nro, token, setForm, form) => {
         ...prev,
         ...res,
         antecedentes: antecedentesActualizados,
-        user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+        user_doctorAsignado: res.doctorAsignado ?? "",
+
       }));
     } else {
       Swal.fire('Error', 'Ocurrio un error al traer los datos', 'error');
