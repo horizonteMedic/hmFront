@@ -256,7 +256,8 @@ const Modal = ({ closeModal, Refresgpag }) => {
           celular: sanitized.celPa,
           departamento: departamentoId,
           provincia: provinciaId,
-          distrito: distritoId
+          distrito: distritoId,
+          direccion: sanitized.direccionPa
         }))
 
         /*if (sanitized.departamentoPa) {
