@@ -61,7 +61,7 @@ export const GetInfoPac = (nro, set, token, sede) => {
     })
 }
 
-export const GetInfoPacLaboratorioFil = (nro, tabla, set, token,user) => {
+export const GetInfoPacLaboratorioFil = (nro, tabla, set, token, user) => {
   getFetch(`/api/v01/ct/laboratorio/consentimiento-laboratorio?nOrden=${nro}&nameConset=${tabla}`, token)
     .then((res) => {
       if (res.norden) {
@@ -74,8 +74,8 @@ export const GetInfoPacLaboratorioFil = (nro, tabla, set, token,user) => {
           ...prev,
           ...res,
           user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
-          nombre_doctorAsignado: res.doctorAsignado ?? "",
-          user_doctorAsignado: res.userMedicoOcup ?? "",
+          user_doctorAsignado: res.doctorAsignado ?? "",
+
 
         }));
       } else {
