@@ -71,6 +71,8 @@ const Panel2D = () => {
       nombre_medico: userName,
       user_medicoFirma: userlogued,
 
+      nombre_doctorAsignado: "",
+      user_doctorAsignado: "",
     }));
   };
 
@@ -185,6 +187,14 @@ const Panel2D = () => {
             form={form}
             onChange={handleChangeSimple}
           />
+        <EmpleadoComboBox
+          value={form.nombre_doctorAsignado}
+          label="Doctor Asignado"
+          form={form}
+          onChange={handleChangeSimple}
+          nameField="nombre_doctorAsignado"
+          idField="user_doctorAsignado"
+        />
         </SectionFieldset>
 
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">

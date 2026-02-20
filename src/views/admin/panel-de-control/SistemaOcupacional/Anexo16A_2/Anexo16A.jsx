@@ -10,6 +10,7 @@ import DatosPersonalesLaborales from "../../../../components/templates/DatosPers
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import InputTextArea from "../../../../components/reusableComponents/InputTextArea";
 import RadioTable from "../../../../components/reusableComponents/RadioTable";
+import InputCheckbox from "../../../../components/reusableComponents/InputCheckbox";
 
 // import {
 //   PrintHojaR,
@@ -35,20 +36,16 @@ export default function Anexo16A() {
   const [visualerOpen, setVisualerOpen] = useState(null);
 
   const initialFormState = {
-    // Header
     norden: "",
     fechaExam: today,
     codigoAnexo: null,
     apto: undefined,
     actividadRealizar: "",
-    // Datos personales
     dni: "",
     nombres: "",
     sexo: "",
     fechaNac: "",
     edad: "",
-
-    // Signos vitales
     fc: "",
     pa: "",
     fr: "",
@@ -57,28 +54,22 @@ export default function Anexo16A() {
     temperatura: "",
     peso: "",
     talla: "",
-
     medicoDireccion: userDireccion,
-
-    // Antecedentes
     cirugiaMayor: false,
     desordenesCoagulacion: false,
     diabetes: false,
     hipertension: false,
     embarazo: false,
     furDescripcion: "",
-
     problemasNeurologicos: false,
     infeccionesRecientes: false,
     medicacionActual: "",
-
     obesidadMorbida: false,
     problemasCardiacos: false,
     problemasRespiratorios: false,
     problemasOftalmologicos: false,
     problemasDigestivos: false,
-    apneaSueno: false,
-
+    apneaSueño: false,
     otraCondicion: false,
     alergias: false,
     usoMedicacion: false,
@@ -88,13 +79,10 @@ export default function Anexo16A() {
     sobrepeso: false,
     htaControlada: false,
     lentesCorrectivos: false,
-
-    // Empresa
     contrata: "",
     empresa: "",
     observaciones: "",
-
-    // Agudeza Visual
+    //Agudeza Visual
     vcOD: "",
     vlOD: "",
     vcOI: "",
@@ -113,10 +101,10 @@ export default function Anexo16A() {
     hipertensionRed: false,
     problemasOftalmologicosRed: false,
 
-    // Médico
+    // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
-  };
+  }
 
   const {
     form,
@@ -127,7 +115,6 @@ export default function Anexo16A() {
     handleChangeSimple,
     handleClearnotO,
     handlePrintDefault,
-    handleRadioButton,
     handleRadioButtonBoolean,
   } = useForm(initialFormState, { storageKey: "anexo16a" });
 
@@ -147,7 +134,23 @@ export default function Anexo16A() {
       // PrintHojaR(form.norden, token, tabla, datosFooter);
     });
   };
+const handleCheckBoxChangeWithObservations = (e) => {
+    const { name, checked } = e.target;
+    const textoAsociado = checkboxTexts[name];
 
+    setForm((prev) => {
+      const newForm = { ...prev, [name]: checked };
+      let observaciones = (prev.observaciones || "").split("\n").filter(l => l.trim() !== "");
+
+      if (checked && textoAsociado && !observaciones.includes(textoAsociado)) {
+        observaciones.push(textoAsociado);
+      } else if (!checked) {
+        observaciones = observaciones.filter(l => l !== textoAsociado);
+      }
+      newForm.observaciones = observaciones.join("\n");
+      return newForm;
+    });
+  };
 return (
   <div className="px-4 max-w-[95%] xl:max-w-[90%] mx-auto">
 
@@ -205,14 +208,232 @@ return (
             onChange={handleChangeSimple}
           />
         </SectionFieldset>
-
-        <BotonesAccion
-          form={form}
-          onSave={handleSave}
-          onClear={handleClear}
-          onPrint={handlePrint}
+{/* --- ANTECEDENTES DEL REGISTRO MÉDICO --- */}
+<SectionFieldset legend="Antecedentes del Registro Médico" collapsible>
+  <h4 className="font-semibold text-gray-800 mb-3">El/la presenta o ha presentado en los 6 últimos meses</h4>
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-2">
+    
+    {/* Columna Izquierda */}
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <span>Cirugía Mayor Reciente</span>
+        <InputsBooleanRadioGroup
+          name="cirugiaMayor"
+          value={form?.cirugiaMayor}
+          onChange={handleRadioButtonBoolean}
         />
+      </div>
+      <div className="flex items-center justify-between">
+        <span>Desórdenes de la coagulación, trombosis, etc</span>
+        <InputsBooleanRadioGroup
+          name="desordenesCoagulacion"
+          value={form?.desordenesCoagulacion}
+          onChange={handleRadioButtonBoolean}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <span>Diabetes Mellitus</span>
+        <InputsBooleanRadioGroup
+          name="diabetes"
+          value={form?.diabetes}
+          onChange={handleRadioButtonBoolean}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <span className={`${form?.hipertensionRed ? 'text-red-500 font-bold' : ''}`}>Hipertensión Arterial</span>
+        <InputsBooleanRadioGroup
+          name="hipertension"
+          value={form?.hipertension}
+          onChange={(e, value) => { 
+            if (value === false) setForm(prev => ({ ...prev, hipertensionRed: false })); 
+            handleRadioButtonBoolean(e, value);
+          }}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <span>Embarazo</span>
+        <InputsBooleanRadioGroup
+          name="embarazo"
+          value={form?.embarazo}
+          onChange={handleRadioButtonBoolean}
+        />
+      </div>
+      <InputTextOneLine 
+        label="FUR" 
+        name="furDescripcion" 
+        value={form?.furDescripcion} 
+        onChange={handleChange} 
+      />
+      <div className="flex items-center justify-between">
+        <span>Problemas Neurológicos: Epilepsia, vértigo, etc</span>
+        <InputsBooleanRadioGroup
+          name="problemasNeurologicos"
+          value={form?.problemasNeurologicos}
+          onChange={handleRadioButtonBoolean}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <span>Infecciones recientes (especialmente oídos, nariz, garganta)</span>
+        <InputsBooleanRadioGroup
+          name="infeccionesRecientes"
+          value={form?.infeccionesRecientes}
+          onChange={handleRadioButtonBoolean}
+        />
+      </div>
+    </div>
 
+    {/* Columna Derecha */}
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <span className={`${form?.obesidadMorbidaRed ? 'text-red-500 font-bold' : ''}`}>Obesidad Mórbida (IMC mayor a 35 m/Kg 2)</span>
+        <InputsBooleanRadioGroup
+          name="obesidadMorbida"
+          value={form?.obesidadMorbida}
+          onChange={(e, value) => { 
+            if (value === false) setForm(prev => ({ ...prev, obesidadMorbidaRed: false })); 
+            handleRadioButtonBoolean(e, value);
+          }}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <span>Problemas Cardiacos: marca pasos, coronariopatías, etc</span>
+        <InputsBooleanRadioGroup
+          name="problemasCardiacos"
+          value={form?.problemasCardiacos}
+          onChange={handleRadioButtonBoolean}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <span>Problemas respiratorios: Asma, EPOC etc</span>
+        <InputsBooleanRadioGroup
+          name="problemasRespiratorios"
+          value={form?.problemasRespiratorios}
+          onChange={handleRadioButtonBoolean}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <span className={`${form?.problemasOftalmologicosRed ? 'text-red-500 font-bold' : ''}`}>Problemas Oftalmológicos: Retinopatía, glaucoma, etc</span>
+        <InputsBooleanRadioGroup
+          name="problemasOftalmologicos"
+          value={form?.problemasOftalmologicos}
+          onChange={(e, value) => { 
+            if (value === false) setForm(prev => ({ ...prev, problemasOftalmologicosRed: false })); 
+            handleRadioButtonBoolean(e, value);
+          }}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <span>Problemas Digestivos: Úlcera péptica, hepatitis, etc</span>
+        <InputsBooleanRadioGroup
+          name="problemasDigestivos"
+          value={form?.problemasDigestivos}
+          onChange={handleRadioButtonBoolean}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <span>Apnea del Sueño</span>
+        <InputsBooleanRadioGroup
+          name="apneaSueño"
+          value={form?.apneaSueño}
+          onChange={handleRadioButtonBoolean}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <span>Otra condición Médica Importante</span>
+        <InputsBooleanRadioGroup
+          name="otraCondicion"
+          value={form?.otraCondicion}
+          onChange={handleRadioButtonBoolean}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <span>Alergias</span>
+        <InputsBooleanRadioGroup
+          name="alergias"
+          value={form?.alergias} 
+          onChange={handleRadioButtonBoolean}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <span>Uso de Medicación Actual</span>
+        <InputsBooleanRadioGroup
+          name="usoMedicacion"
+          value={form?.usoMedicacion}
+          onChange={(e, value) => {
+            if (value === false) setForm(prev => ({ ...prev, medicacionActual: "" }));
+            handleRadioButtonBoolean(e, value);
+          }}
+        />
+      </div>
+      <InputTextOneLine 
+        label="Medicación Actual" 
+        name="medicacionActual" 
+        value={form?.medicacionActual} 
+        onChange={handleChange} 
+        disabled={!form?.usoMedicacion} 
+      />
+    </div>
+  </div>
+</SectionFieldset>
+
+<SectionFieldset legend="Recomendaciones y Observaciones" collapsible>
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-2">
+    <div>
+      <h4 className="font-semibold text-gray-800 mb-3">Recomendaciones</h4>
+      <div className="space-y-2">
+        {/* Todos los checked evalúan a false si no hay datos, por lo tanto inician vacíos */}
+        <InputCheckbox
+          label="Corregir Agudeza Visual"
+          checked={!!form?.corregirAgudeza} 
+          name="corregirAgudeza"
+          onChange={handleCheckBoxChangeWithObservations}
+        />
+        <InputCheckbox
+          label="Obesidad I. Dieta Hipocalórica y Ejercicios"
+          checked={!!form?.obesidadDieta}
+          name="obesidadDieta"
+          onChange={handleCheckBoxChangeWithObservations}
+        />
+        <InputCheckbox
+          label="D m II controlado, tto con:....."
+          checked={!!form?.diabetesControlado}
+          name="diabetesControlado"
+          onChange={handleCheckBoxChangeWithObservations}
+        />
+        <InputCheckbox
+          label="Sobrepeso. Dieta Hipocalórica y Ejercicios"
+          checked={!!form?.sobrepeso}
+          name="sobrepeso"
+          onChange={handleCheckBoxChangeWithObservations}
+        />
+        <InputCheckbox
+          label="HTA Controlada, en tto con:..."
+          checked={!!form?.htaControlada}
+          name="htaControlada"
+          onChange={handleCheckBoxChangeWithObservations}
+        />
+        <InputCheckbox
+          label="Uso de Lentes Correct. Lectura de Cerca"
+          checked={!!form?.lentesCorrectivos}
+          name="lentesCorrectivos"
+          onChange={handleCheckBoxChangeWithObservations}
+        />
+      </div>
+    </div>
+    <div>
+      <h4 className="font-semibold text-gray-800 mb-3">Observaciones</h4>
+      <InputTextArea rows={8} name="observaciones" value={form?.observaciones || ""} onChange={handleChange} />
+    </div>
+  </div>
+</SectionFieldset>
+
+      {/* 4. BOTONES AL FINAL */}
+      <BotonesAccion
+        form={form}
+        onSave={handleSave}
+        onClear={handleClear}
+        onPrint={handlePrint}
+      />
       </div>
 
       <div className="space-y-3">
@@ -352,59 +573,7 @@ return (
 
           </div>
         </SectionFieldset>
-
       </div>
-<SectionFieldset legend="Antecedentes del Registro Médico" collapsible>
-  <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
-
-    <RadioTable
-      items={[
-        { name: "cirugiaMayor", label: "Cirugía Mayor Reciente" },
-        { name: "desordenesCoagulacion", label: "Desórdenes de la coagulación, trombosis, etc." },
-        { name: "diabetes", label: "Diabetes Mellitus" },
-        { name: "hipertension", label: "Hipertensión Arterial" },
-        { name: "embarazo", label: "Embarazo" },
-        { name: "problemasNeurologicos", label: "Problemas Neurológicos: Epilepsia, vértigo, etc." },
-        { name: "infeccionesRecientes", label: "Infecciones recientes (oídos, nariz, garganta)" },
-
-        { name: "obesidadMorbida", label: "Obesidad Mórbida (IMC mayor a 35)" },
-        { name: "problemasCardiacos", label: "Problemas Cardíacos: marcapasos, coronariopatías" },
-        { name: "problemasRespiratorios", label: "Problemas respiratorios: Asma, EPOC" },
-        { name: "problemasOftalmologicos", label: "Problemas Oftalmológicos: Retinopatía, glaucoma" },
-        { name: "problemasDigestivos", label: "Problemas Digestivos: Úlcera péptica, hepatitis" },
-        { name: "apneaSueño", label: "Apnea del Sueño" },
-        { name: "otraCondicion", label: "Otra condición Médica Importante" },
-        { name: "alergias", label: "Alergias" },
-        { name: "usoMedicacion", label: "Uso de Medicación Actual" },
-      ]}
-      options={[
-        { value: "SI", label: "SI" },
-        { value: "NO", label: "NO" }
-      ]}
-      labelColumns={6}
-      form={form}
-      handleRadioButton={handleRadioButton}
-    />
-
-    {/* Campo adicional */}
-    <InputTextOneLine
-      label="Medicación Actual"
-      name="medicacionActual"
-      value={form?.medicacionActual}
-      onChange={handleChange}
-      disabled={form?.usoMedicacion !== "SI"}
-    />
-
-    <InputTextOneLine
-      label="FUR"
-      name="furDescripcion"
-      value={form?.furDescripcion}
-      onChange={handleChange}
-    />
-
-  </div>
-</SectionFieldset>
-
     </div>
   </div>
   

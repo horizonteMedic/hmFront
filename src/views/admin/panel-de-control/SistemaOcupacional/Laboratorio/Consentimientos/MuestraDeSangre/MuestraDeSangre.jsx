@@ -24,6 +24,9 @@ const MuestraDeSangre = () => {
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
+
+    nombre_doctorAsignado: "",
+    user_doctorAsignado: "",
   };
 
   const { form, setForm, handleChange, handleChangeSimple, handleClear, handlePrintDefault } = useForm(initialFormState);
@@ -135,6 +138,14 @@ const MuestraDeSangre = () => {
             form={form}
             onChange={handleChangeSimple}
           />
+        <EmpleadoComboBox
+          value={form.nombre_doctorAsignado}
+          label="Doctor Asignado"
+          form={form}
+          onChange={handleChangeSimple}
+          nameField="nombre_doctorAsignado"
+          idField="user_doctorAsignado"
+        />
         </SectionFieldset>
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex flex-wrap gap-3">

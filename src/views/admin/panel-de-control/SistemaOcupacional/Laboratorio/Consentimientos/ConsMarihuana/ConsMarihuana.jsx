@@ -177,6 +177,14 @@ const ConsMarihuana = () => {
             form={form}
             onChange={handleChangeSimple}
           />
+          <EmpleadoComboBox
+            value={form.nombre_doctorAsignado}
+            label="Doctor Asignado"
+            form={form}
+            onChange={handleChangeSimple}
+            nameField="nombre_doctorAsignado"
+            idField="user_doctorAsignado"
+          />
         </SectionFieldset>
 
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">

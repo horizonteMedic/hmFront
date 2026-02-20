@@ -19,10 +19,11 @@ export function GetInfoLaboratioEx(data, tabla, token, user) {
     const body = {
         nameConset: tabla,
         userRegistro: user,
-        userMedicoOcup: "",
+        userMedicoOcup: data?.user_doctorAsignado ?? "",
         fechaex: data.fecha,
         nOrden: data.norden,
         usuarioFirma: data?.user_medicoFirma ?? "",
+        doctorAsignado: data?.nombre_doctorAsignado ?? "",
     };
 
     if (data.antecedentes) {
