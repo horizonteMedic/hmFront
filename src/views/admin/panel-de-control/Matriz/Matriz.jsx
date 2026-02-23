@@ -18,13 +18,13 @@ const MATRICES_MAP = {
   "Matriz-7": { url: "api/v01/st/registros/matrizOhlaGestor", method: "POST", name: "MATRIZ GESTOR OHLA" },
   "Matriz-8": { url: "api/v01/st/registros/matrizOhlaConstruccion", method: "POST", name: "MATRIZ CONSTRUCCION OHLA" },
   "Matriz-9": { urlH: "/api/headers/arena", methodH: "GET", urlB: "api/v01/st/registros/matrizArena2026", methodB: "POST", name: "MATRIZ LA ARENA" },
-  "Matriz-10": { url: "api/v01/st/registros/matrizPoderosa2026", method: "POST", name: "REPORTE CONSOLIDADO ATENCIONES DIARIAS - PODEROSA" },
+  "Matriz-10": { urlH: "/api/headers/poderosa", methodH: "GET", urlB: "api/v01/st/registros/matrizPoderosa2026", methodB: "POST", name: "REPORTE CONSOLIDADO ATENCIONES DIARIAS - PODEROSA" },
   "Matriz-11": { urlH: "api/headers/caraveli-2026", methodH: "GET", urlB: "api/v01/st/registros/matrizCaraveli2026", methodB: "POST", name: "MATRIZ COMPAÑIA MINERA CARAVELI" },
-  "Matriz-12": { url: "api/v01/st/registros/matrizProseguridadAsistencia2026", method: "POST", name: "PLANILLA ASISTENCIA PROSEGURIDAD" },
-  "Matriz-13": { url: "api/v01/st/registros/matrizProseguridad2026", method: "POST", name: "MATRIZ SALUD PROSEGURIDAD" },
-  "Matriz-14": { url: "api/v01/st/registros/matrizPacificoVida2026", method: "POST", name: "REPORTE CONSOLIDAD-PACIFICO VIDA - PODEROSA" },
+  "Matriz-12": { urlH: "/api/headers/proseguridad/plantilla", method: "GET", urlB: "api/v01/st/registros/matrizProseguridadAsistencia2026", methodB: "POST", name: "PLANILLA ASISTENCIA PROSEGURIDAD" },
+  "Matriz-13": { urlH: "/api/headers/proseguridad", methodH: "GET", urlB: "api/v01/st/registros/matrizProseguridad2026", methodB: "POST", name: "MATRIZ SALUD PROSEGURIDAD" },
+  "Matriz-14": { urlH: "/api/headers/pacifico-vida", methodH: "GET", urlB: "api/v01/st/registros/matrizPacificoVida2026", methodB: "POST", name: "REPORTE CONSOLIDAD-PACIFICO VIDA - PODEROSA" },
   "Matriz-15": { urlH: "api/headers/boroo", methodH: "GET", urlB: "api/v01/st/registros/matrizBoroo2026", methodB: "POST", name: "MATRIZ MINERA BOROO MISQUICHILCA" },
-  "Matriz-16": { url: "api/v01/st/registros/matrizPoderosaAltura2026", method: "POST", name: "REPORTE DE TRABAJOS EN ALTURA - PODEROSA" },
+  "Matriz-16": { urlH: "/api/headers/trabajos-altura", methodH: "GET", urlB: "api/v01/st/registros/matrizPoderosaAltura2026", methodB: "POST", name: "REPORTE DE TRABAJOS EN ALTURA - PODEROSA" },
 
 };
 
@@ -285,118 +285,13 @@ const MatrizPostulante = () => {
     }
   }, [reload]);
 
-  const handleExport = () => {
-
-  }
-
-  const exportToExcel = async () => {
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Matriz Postulante');
-
-    const headerStyle = {
-      font: { bold: true, color: { argb: 'FFFFFFFF' } }, // Color de la letra blanco
-      alignment: { vertical: 'middle', horizontal: 'center' },
-      border: { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } },
-      fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: '4F7DE7' } } // Color de fondo azul específico
-    };
-
-    const dataStyle = {
-      alignment: { vertical: 'middle', horizontal: 'left' },
-      border: { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
-    };
-
-    // Convert header to uppercase and separate camel case
-    const formatHeader = (header) => {
-      return header.replace(/([a-z])([A-Z])/g, '$1 $2').toUpperCase();
-    };
-
-    const formattedHead = head.map(formatHeader);
-
-    const headerRow = worksheet.addRow(formattedHead);
-    headerRow.eachCell(cell => {
-      cell.style = headerStyle;
-    });
-
-    const indexResponsable = head.findIndex(
-      h => h.toLowerCase() === 'RESPONSABLE_DIGITALIZACION'
-    );
-
-    const indexCondicion = head.findIndex(
-      h => h.toLowerCase() === 'condicion'
-    );
-
-    data.forEach(row => {
-      const rowData = { ...row };
-
-      // 🔒 Lógica exclusiva Matriz-9
-      if (
-        datos.matrizSeleccionada === 'Matriz-9' &&
-        indexResponsable !== -1
-      ) {
-        rowData[head[indexResponsable]] =
-          userlogued.datos.nombres_user.toUpperCase();
-      }
-
-      const dataRow = worksheet.addRow(Object.values(rowData));
-      dataRow.eachCell((cell, colNumber) => {
-        cell.alignment = dataStyle.alignment;
-        cell.border = dataStyle.border;
-        if (
-          datos.matrizSeleccionada === 'Matriz-9' &&
-          indexCondicion !== -1 &&
-          colNumber - 1 === indexCondicion
-        ) {
-          const valor = String(cell.value || '').trim().toLowerCase();
-          if (valor === 'no apto') {
-            cell.fill = {
-              type: 'pattern',
-              pattern: 'solid',
-              fgColor: { argb: 'FFFF0000' } // Rojo
-            };
-            cell.font = {
-              bold: true,
-              color: { argb: 'FFFFFFFF' }
-            };
-          }
-
-          if (valor === 'apto') {
-            cell.fill = {
-              type: 'pattern',
-              pattern: 'solid',
-              fgColor: { argb: 'FF00B050' } // Verde profesional Excel
-            };
-            cell.font = {
-              bold: true,
-              color: { argb: 'FFFFFFFF' }
-            };
-          }
-        }
-
-
-
-      });
-    });
-
-    worksheet.columns.forEach(column => {
-      let maxWidth = 0;
-      column.eachCell(cell => {
-        const valueLength = cell.value ? String(cell.value).length : 0;
-        maxWidth = Math.max(maxWidth, valueLength);
-      });
-      column.width = maxWidth < 20 ? 20 : maxWidth;
-    });
-
-    const buffer = await workbook.xlsx.writeBuffer();
-    const dataFile = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    saveAs(dataFile, 'matriz_postulante.xlsx');
-  };
 
   const exportToExcel2 = async () => {
     const config = MATRICES_MAP[datos.matrizSeleccionada];
     const trabajadores = data || [];
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Reporte");
-
+    const isMatrizSaludProseguridad = datos.matrizSeleccionada === "Matriz-13";
     const borderStyle = {
       top: { style: "thin" },
       left: { style: "thin" },
@@ -411,14 +306,43 @@ const MatrizPostulante = () => {
 
       if (trabajadores.length === 0) return;
 
-      const fields = Object.keys(trabajadores[0]);
+      // 🔎 Detectar si head viene estructurado
+      const hasStructuredHead = head && head.length > 0;
+
+      const columns = hasStructuredHead
+        ? head
+        : Object.keys(trabajadores[0]).map(key => ({
+          label: key,
+          field: key
+        }));
 
       // 1️⃣ HEADER SIMPLE
-      fields.forEach((field, index) => {
+      columns.forEach((col, index) => {
+
         const cell = worksheet.getRow(1).getCell(index + 1);
-        cell.value = field;
-        cell.font = { bold: true };
-        cell.alignment = { horizontal: "center", vertical: "middle" };
+
+        cell.value = col.label ?? col.field ?? "";
+
+        // 🎨 COLOR DE TEXTO (SOLO MATRIZ 13)
+        cell.font = {
+          bold: true,
+          ...(isMatrizSaludProseguridad && {
+            color: { argb: "FFFFC000" }
+          })
+        };
+
+        // 🎨 COLOR DE FONDO SI VIENE DEFINIDO
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: {
+            argb: col.color
+              ? "FF" + col.color.replace("#", "")
+              : "FFFFFFFF" // blanco por defecto
+          }
+        };
+
+        cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
         cell.border = borderStyle;
       });
 
@@ -428,9 +352,12 @@ const MatrizPostulante = () => {
       trabajadores.forEach(item => {
 
         const row = worksheet.getRow(rowIndex);
-        fields.forEach((field, colIndex) => {
+
+        columns.forEach((col, colIndex) => {
+
           const cell = row.getCell(colIndex + 1);
-          cell.value = item[field] ?? "";
+
+          cell.value = item[col.field] ?? "";
           cell.border = borderStyle;
           cell.alignment = { horizontal: "center", vertical: "middle" };
         });
@@ -449,7 +376,6 @@ const MatrizPostulante = () => {
     // ============================================
     // 🔥 MODO JERÁRQUICO (CON ESTRUCTURA)
     // ============================================
-
     const estructura = head;
 
     const getMaxDepth = (nodes, level = 1) =>
@@ -633,7 +559,7 @@ const MatrizPostulante = () => {
     head.length > 0 &&
     head[0]?.children &&
     head[0].children.length > 0;
-
+  console.log(isHierarchical)
   const getMaxDepth = (nodes, level = 1) =>
     Math.max(
       ...nodes.map(n =>
@@ -658,7 +584,8 @@ const MatrizPostulante = () => {
     });
     return result;
   };
-  console.log(datos.matrizSeleccionada)
+  const isMatrizSaludProseguridad = datos.matrizSeleccionada === "Matriz-13"
+
   return (
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
@@ -819,7 +746,6 @@ const MatrizPostulante = () => {
                           rowSpan,
                           color: node.color
                         });
-
                         if (node.children?.length) {
                           generate(node.children, level + 1);
                         }
@@ -835,7 +761,7 @@ const MatrizPostulante = () => {
                             key={i}
                             colSpan={cell.colSpan}
                             rowSpan={cell.rowSpan}
-                            className="border border-gray-300 px-4 py-2 text-center font-bold"
+                            className={`border border-gray-300 px-4 py-2 text-center font-bold ${isMatrizSaludProseguridad ? "text-[#FFC000]" : ""}`}
                             style={{
                               backgroundColor: cell.color || undefined
                             }}
@@ -849,14 +775,18 @@ const MatrizPostulante = () => {
                 ) : (
                   <tr>
                     {(head?.length > 0
-                      ? head.map(h => h.field)
+                      ? head
                       : Object.keys(currentData?.[0] || {})
-                    ).map((field, i) => (
+                    ).map((column, i) => (
+
                       <th
                         key={i}
-                        className="border border-gray-300 px-4 py-2 text-center font-bold"
+                        style={{
+                          backgroundColor: column.color || undefined
+                        }}
+                        className={`border border-gray-300 px-4 py-2 text-center font-bold ${isMatrizSaludProseguridad ? "text-[#FFC000]" : ""}`}
                       >
-                        {field}
+                        {column.field}
                       </th>
                     ))}
                   </tr>
