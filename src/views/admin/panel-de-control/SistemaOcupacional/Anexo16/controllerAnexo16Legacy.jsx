@@ -1254,7 +1254,7 @@ export const MapearDatosAdicionales = (
     const recomendaciones =
       res.recomendacionesInformeElectroCardiograma_recomendaciones;
 
-    if (hallazgo && hallazgo !== "NORMAL."&&!isEdit) {
+    if (hallazgo && hallazgo !== "NORMAL.") {
       let electrocardiogramaText = `${contador}-ELECTROCARDIOGRAMA: ${hallazgo}`;
       if (recomendaciones) {
         electrocardiogramaText += `.${recomendaciones}`;
@@ -1418,27 +1418,60 @@ export const GetInfoServicioEditar = (
             colesterolAnalisisBioquimico_txtcolesterol: res.colesterolAnalisisBioquimico_txtcolesterol,
 
           };
+
+          console.log("interpretacionFuncionRespiratoria_interpretacion", res.interpretacionFuncionRespiratoria_interpretacion)
+          if (res.interpretacionFuncionRespiratoria_interpretacion != null) {
+            console.log("interpretacionFuncionRespiratoria_interpretacion2", res.interpretacionFuncionRespiratoria_interpretacion)
+
+            data.observacionesGenerales += "ESPIROMETRIA: " + res.interpretacionFuncionRespiratoria_interpretacion + "\n";
+          }
+
+          // Build observacionesGenerales from different medical areas
+          if (res.observacionesOdontograma_txtobservaciones != null) {
+            data.observacionesGenerales +=
+              "-ODONTOGRAMA : " +
+              res.observacionesOdontograma_txtobservaciones +
+              "\n";
+          }
           data.dentaduraObservaciones =
             res.observacionesOdontograma_txtobservaciones ?? "";
+
+          if (res.observacionesRadiografiaTorax_txtobservacionesrt != null) {
+            data.observacionesGenerales +=
+              "-RADIOGRAFIA : " +
+              res.observacionesRadiografiaTorax_txtobservacionesrt +
+              "\n";
+          }
+
+          if (res.observacionesLaboratorioClinico_txtobservacioneslb != null) {
+            data.observacionesGenerales +=
+              "-LAB CLINICO: " +
+              res.observacionesLaboratorioClinico_txtobservacioneslb +
+              "\n";
+          }
 
           // Drug test results
           const coca = res.cocainaLaboratorioClinico_txtcocaina;
           const marig = res.marihuanaLaboratorioClinico_txtmarihuana;
-          data.cocaina = coca;
-          data.marihuana = marig;
 
           if (coca != null && marig != null) {
             if (coca === "REACTIVO" || coca === "POSITIVO") {
+              data.observacionesGenerales += "-COCAINA: " + coca + "\n";
               data.cocainaRed = true;
             } else {
+              data.observacionesGenerales += "-COCAINA: " + coca + "\n";
               data.cocainaRed = false;
             }
+            data.cocaina = coca;
 
             if (marig === "REACTIVO" || marig === "POSITIVO") {
+              data.observacionesGenerales += "-MARIHUANA: " + marig + "\n";
               data.marihuanaRed = true;
             } else {
+              data.observacionesGenerales += "-MARIHUANA: " + marig + "\n";
               data.marihuanaRed = false;
             }
+            data.marihuana = marig;
           }
 
           // Basic lab values
@@ -1471,8 +1504,30 @@ export const GetInfoServicioEditar = (
           }
 
           // Build otrosExamenes field
-          data.otrosExamenes = res.examenRadiograficoOtros_txtotrosex;
-      
+          data.otrosExamenes = "";
+          // data.otrosExamenes += "-HEMOGRAMA: NORMAL. \n";//revisar
+          data.otrosExamenes += "HEMOGRAMA: " + (
+            res.examenQuimicoLeucocitos_txtleucocitoseq != null &&
+              res.sedimientoUrinarioHematies_txthematiessu != null &&
+              vsg != null && res.hemoglobina_txthemoglobina != null ? "NORMAL" : "N/A") + "\n";
+          data.otrosExamenes +=
+            gluc == null ? "" : "-GLUCOSA: " + gluc + " mg/dl. \n";
+          data.otrosExamenes +=
+            creat == null ? "" : "-CREATININA: " + creat + " mg/dl. \n";
+          data.otrosExamenes += vsg == null ? "" : "-VSG: " + vsg + ". \n";
+          data.otrosExamenes += "-EX ORINA: NORMAL. \n";
+          data.otrosExamenes +=
+            coca == null ? "" : "-COCAINA: " + coca + ". \n";
+          data.otrosExamenes +=
+            marig == null ? "" : "-MARIHUANA: " + marig + ".";
+
+          if (res.examenRadiograficosSanguineos_txtobservacionesrs != null) {
+            data.observacionesGenerales +=
+              "-EX. RX SANGUINEOS : " +
+              res.examenRadiograficosSanguineos_txtobservacionesrs +
+              "\n";
+          }
+
           // Personal information
           data.nomExamen = res.nombreExamen_nom_examen ?? "";
           data.dni = res.dni_cod_pa ?? "";
