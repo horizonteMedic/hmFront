@@ -327,7 +327,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                "-" +
+                ".-" +
                 res.verticesRadiografiaTorax_txtvertices +
                 "\n";
               data.contador++;
@@ -338,7 +338,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                "-" +
+                ".-" +
                 res.hiliosRadiografiaTorax_txthilios +
                 "\n";
               data.contador++;
@@ -351,7 +351,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                "-" +
+                ".-" +
                 res.senosCostoFrenicosRadiografiaTorax_txtsenoscostofrenicos +
                 "\n";
               data.contador++;
@@ -362,7 +362,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                "-" +
+                ".-" +
                 res.camposPulmonesRadiografiaTorax_txtcampospulm +
                 "\n";
               data.contador++;
@@ -373,7 +373,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                "-" +
+                ".-" +
                 res.mediastinosRadiografiaTorax_txtmediastinos +
                 "\n";
               data.contador++;
@@ -386,7 +386,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                "-" +
+                ".-" +
                 res.siluetaCardioVascularRadiografiaTorax_txtsiluetacardiovascular +
                 "\n";
               data.contador++;
@@ -397,7 +397,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                "-" +
+                ".-" +
                 res.osteomuscularRadiografiaTorax_txtosteomuscular +
                 "\n";
               data.contador++;
@@ -410,7 +410,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                "-" +
+                ".-" +
                 res.conclusionesRadiograficasTorax_txtconclusionesradiograficas +
                 "\n";
               data.contador++;
@@ -423,7 +423,7 @@ export const GetInfoServicio = (
           ) {
             data.observacionesGenerales +=
               data.contador +
-              "-" +
+              ".-" +
               res.observacionesRadiografiaTorax_txtobservacionesrt +
               "\n";
             data.contador++;
@@ -431,7 +431,7 @@ export const GetInfoServicio = (
           if (res.observacionesLaboratorioClinico_txtobservacioneslb != null) {
             data.observacionesGenerales +=
               data.contador +
-              "-" +
+              ".-" +
               res.observacionesLaboratorioClinico_txtobservacioneslb +
               "\n";
             data.contador++;
@@ -439,14 +439,14 @@ export const GetInfoServicio = (
           if (res.observacionesAlturaCertificado_alturabarrick != null) {
             data.observacionesGenerales +=
               data.contador +
-              "-" +
+              ".-" +
               res.observacionesAlturaCertificado_alturabarrick +
               "\n";
             data.contador++;
           } else if (res.observacionesAlturaCertificacion_certialtura != null) {
             data.observacionesGenerales +=
               data.contador +
-              "-" +
+              ".-" +
               res.observacionesAlturaCertificacion_certialtura +
               "\n";
             data.contador++;
@@ -454,7 +454,7 @@ export const GetInfoServicio = (
           if (res.observacionesConduccionCertificado_conduccion != null) {
             data.observacionesGenerales +=
               data.contador +
-              "-" +
+              ".-" +
               res.observacionesConduccionCertificado_conduccion +
               "\n";
             data.contador++;
@@ -466,7 +466,7 @@ export const GetInfoServicio = (
           if (coca === "REACTIVO" || coca === "POSITIVO") {
             data.observacionesGenerales +=
               data.contador +
-              "- TEST DE COCAINA: " +
+              ".- TEST DE COCAINA: " +
               coca +
               " COLABORADOR DE LA COMUNIDAD, CONSUME HOJA DE COCA.\n";
             data.cocainaRed = true;
@@ -477,7 +477,7 @@ export const GetInfoServicio = (
           if (marig === "REACTIVO" || marig === "POSITIVO") {
             data.observacionesGenerales +=
               data.contador +
-              "-MARIHUANA: " +
+              ".-MARIHUANA: " +
               marig +
               " COLABORADOR DE LA COMUNIDAD, CONSUME HOJA DE COCA.\n";
             data.marihuanaRed = true;
@@ -612,35 +612,35 @@ export const GetInfoServicio = (
                 data.imcRed = true;
                 data.observacionesGenerales +=
                   data.contador +
-                  "-" +
+                  ".-" +
                   "SOBREPESO:DIETA HIPOCALORICA Y EJERCICIOS.\n";
                 data.contador++;
               } else if (imc >= 30 && imc < 35) {
                 data.imcRed = true;
                 data.observacionesGenerales +=
                   data.contador +
-                  "-" +
+                  ".-" +
                   "OBESIDAD I.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
                 data.contador++;
               } else if (imc >= 35 && imc < 40) {
                 data.imcRed = true;
                 data.observacionesGenerales +=
                   data.contador +
-                  "-" +
+                  ".-" +
                   "OBESIDAD II.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
                 data.contador++;
               } else if (imc >= 40 && imc < 45) {
                 data.imcRed = true;
                 data.observacionesGenerales +=
                   data.contador +
-                  "-" +
+                  ".-" +
                   "OBESIDAD III.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
                 data.contador++;
               } else if (imc >= 45 && imc < 50) {
                 data.imcRed = true;
                 data.observacionesGenerales +=
                   data.contador +
-                  "-" +
+                  ".-" +
                   "OBESIDAD IV.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
                 data.contador++;
               }
@@ -683,14 +683,14 @@ export const GetInfoServicio = (
             data.enfermedadOculares !== ""
           ) {
             data.observacionesGenerales +=
-              data.contador + "-" + data.enfermedadOculares + "\n";
+              data.contador + ".-" + data.enfermedadOculares + "\n";
             data.contador++;
           }
 
           if (data.enfermedadOtros === "PTERIGION BILATERAL") {
             data.observacionesGenerales +=
               data.contador +
-              "-" +
+              ".-" +
               " PTERIGION BILATERAL:EVALUACION POR OFTALMOLOGIA.\n";
             data.contador++;
           } else if (
@@ -699,7 +699,7 @@ export const GetInfoServicio = (
           ) {
             data.observacionesGenerales +=
               data.contador +
-              "-" +
+              ".-" +
               data.enfermedadOtros +
               ":EVALUACION POR OFTALMOLOGIA.\n";
             data.contador++;
@@ -844,7 +844,7 @@ export const GetInfoServicio = (
           ) {
             data.observacionesGenerales +=
               data.contador +
-              "-ODONTOGRAMA : " +
+              ".-ODONTOGRAMA : " +
               res.observacionesOdontograma_txtobservaciones +
               "\n";
             data.dentaduraObservaciones =
@@ -855,7 +855,7 @@ export const GetInfoServicio = (
           // Espirometría
           if (data.fvc === "N/A") {
             data.observacionesGenerales +=
-              data.contador + "-" + "NO PASO EXAMEN DE ESPIROMETRIA.\n";
+              data.contador + ".-" + "NO PASO EXAMEN DE ESPIROMETRIA.\n";
             data.contador++;
             data.conclusionRespiratoria = interpretacionEspirometria;
           } else {
@@ -876,7 +876,7 @@ export const GetInfoServicio = (
                   conclusion += "-PATRON OBSTRUCTIVO\n";
                   data.observacionesGenerales +=
                     data.contador +
-                    "-" +
+                    ".-" +
                     "PATRON OBSTRUCTIVO LEVE. EVALUACION EN 6 MESES.\n";
                   data.contador++;
                 }
@@ -889,7 +889,7 @@ export const GetInfoServicio = (
                   conclusion += "-PATRON RESTRICTIVO\n";
                   data.observacionesGenerales +=
                     data.contador +
-                    "-" +
+                    ".-" +
                     "PATRON RESTRICTIVO LEVE.EVALUACION EN 6 MESES.\n";
                   data.contador++;
                 }
@@ -1255,7 +1255,7 @@ export const MapearDatosAdicionales = (
       res.recomendacionesInformeElectroCardiograma_recomendaciones;
 
     if (hallazgo && hallazgo !== "NORMAL."&&!isEdit) {
-      let electrocardiogramaText = `${contador}-ELECTROCARDIOGRAMA: ${hallazgo}`;
+      let electrocardiogramaText = `${contador}.-ELECTROCARDIOGRAMA: ${hallazgo}`;
       if (recomendaciones) {
         electrocardiogramaText += `.${recomendaciones}`;
       }
@@ -1324,7 +1324,7 @@ export const MapearDatosAdicionales = (
     ) {
       const colesterol = parseFloat(data.colesterolTotal);
       if (!isNaN(colesterol) && colesterol > 200) {
-        const observacion = `${contador}- HIPERCOLESTEROLEMIA.DIETA HIPOCALORICA Y EJERCICIOS.\n`;
+        const observacion = `${contador}.- HIPERCOLESTEROLEMIA.DIETA HIPOCALORICA Y EJERCICIOS.\n`;
         data.observacionesGenerales =
           (data.observacionesGenerales || "") + observacion;
         data.colesterolRed = true;
@@ -1372,7 +1372,7 @@ export const MapearDatosAdicionales = (
     ) {
       const trigliceridos = parseFloat(data.trigliceridos);
       if (!isNaN(trigliceridos) && trigliceridos > 150) {
-        const observacion = `${contador}- HIPERTRIGLICERIDEMIA.DIETA HIPOCALORICA Y EJERCICIOS.\n`;
+        const observacion = `${contador}.- HIPERTRIGLICERIDEMIA.DIETA HIPOCALORICA Y EJERCICIOS.\n`;
         data.observacionesGenerales =
           (data.observacionesGenerales || "") + observacion;
         data.trigliceridosRed = true;
