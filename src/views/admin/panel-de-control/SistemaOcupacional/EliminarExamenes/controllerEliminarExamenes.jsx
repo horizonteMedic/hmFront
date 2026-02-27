@@ -24,7 +24,7 @@ const urlsEliminar = {
     histOcupacional: "historiaOcupacional",
     cuestionarioNordico: "cuestionarioNordico",
     evMusculoEsqueletica: "evaluacionMusculoEsqueletica",
-    oftalmologia: "",
+    oftalmologia: "", //pendiente falta eliminar
     actitudMedOcupacional: "",
     usoRespiradores: "respiradores",
     anexo16A: "anexos/anexo16a",
@@ -32,24 +32,24 @@ const urlsEliminar = {
     anexo16: "anexos/anexo16",
     electrocardiograma: "electroCardiograma",
     // Trabajos en Altura
-    certTrabAlturaBarrik: "", //pendiente
-    certTrabajoAltura: "certificadoTrabajoAltura",
+    certTrabAlturaBarrik: "certificadoTrabajoAltura", //pendiente
+    certTrabajoAltura: "certificacionMedicinaAltura",
     // Otros Formatos
-    evMuscEsqueletico: "evaluacionMusculoEsqueletica",
+    evMuscEsqueletico: "evaluacionMusculoEsqueletica/booro",
     cuestCalidadSueno: "cuestionarioCalidadSueno",
-    evalOftalmologica: "",
+    testFatSomnolencia: "testFatigaSomnolencia",
+    evalOftalmologica: "agudezaVisual/evaluacionOftalmologica",
     certManipuladores: "certificadoManipuladoresAlimentos",
-    cuestAudiometria: "cuestionarioNordico",
+    cuestAudiometria: "audiometria/cuestionarioAudiometria",
     informeAudiometria: "audiometriaPo",
     perimetroToraxico: "",
     // Conducción de Vehículos
     fichaSAS: "fichaApneaSueno",
     certConduccVehiculos: "certificadoConduccion",
     // Fichas Sin Restricción 
-    fMedica: "anexos/fichaAnexo16",
-    fAptitudMedOcup: "",
+    fAptitudMedOcup: "anexos/fichaAnexo16",
     fMedicaAnexo2: "anexos/anexo2",
-    fAptitudAnexo2: "",
+    fAptitudAnexo2: "anexos/fichaAnexo2",
     fMedAgro: "", //pendiente
     fAptitudAgro: "", //pendiente   
 }
