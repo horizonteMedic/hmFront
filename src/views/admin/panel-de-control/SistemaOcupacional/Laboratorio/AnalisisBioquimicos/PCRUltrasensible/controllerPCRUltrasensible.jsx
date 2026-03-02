@@ -1,4 +1,4 @@
-import Swal from "sweetalert2";
+import Swal from "sweetalert2"; 
 import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
@@ -10,53 +10,60 @@ import {
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 // CAMBIAR SOLO LAS URL
-const obtenerReporteUrl = "/api/v01/ct/analisisBioquimico/obtenerReportePCRUltrasensible";
-const registrarUrl = "/api/v01/ct/analisisBioquimico/registrarActualizarPCRUltrasensible";
+const obtenerReporteUrl = "/api/v01/ct/pcrUltrasensible/obtenerReporte";
+const registrarUrl = "/api/v01/ct/pcrUltrasensible/registrarActualizar";
 
 // ===================== GET INFO SERVICIO =====================
-export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
-    const res = await GetInfoServicioDefault(
-        nro,
-        tabla,
-        token,
-        obtenerReporteUrl,
-        onFinish
-    );
+export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {}) => {
+  const res = await GetInfoServicioDefault(
+    nro,
+    tabla,
+    token,
+    obtenerReporteUrl,
+    onFinish
+  );
 
-    if (res) {
-        set((prev) => ({
-            ...prev,
-            norden: res.norden ?? "",
-            fecha: res.fecha ?? "",
-            codAb: res.codAb,
+  console.log("Respuesta PCR Ultrasensible:", res);
 
-            nombreExamen: res.nombreExamen ?? "",
-            dni: res.dniPaciente ?? "",
+  if (res) {
+    set((prev) => ({
+      ...prev,
 
-            nombres: res.nombres ?? "",
-            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-            edad: res.edadPaciente ?? "",
-            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
-            estadoCivil: res.estadoCivilPaciente,
-            nivelEstudios: res.nivelEstudioPaciente,
+      // Datos principales
+      norden: res.norden ?? "",
+      fecha: res.fechaExamen ?? "",
 
-            // Datos Laborales
-            empresa: res.empresa,
-            contrata: res.contrata,
-            ocupacion: res.ocupacionPaciente,
-            cargoDesempenar: res.cargoPaciente,
+      // Paciente
+      nombres: res.nombres ?? "",
+      apellidos: res.apellidos ?? "",
+      edad: res.edad ?? "",
 
-            // CAMPOS PCR
-            resultado: res.resultado ?? "",
-            muestra: res.muestra ?? "SALIVA",
-            examenDirecto: res.examenDirecto ?? false,
-            pruebaRapida: res.pruebaRapida ?? "",
+      // PCR
+      resultado: res.resultado ?? "",
+      muestra: res.muestra ?? "SALIVA",
 
-            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
-            user_doctorAsignado: res.doctorAsignado,
-        }));
-    }
+      // Médicos
+      user_medicoFirma: res.usuarioFirma ?? prev.user_medicoFirma,
+      user_doctorAsignado: res.doctorAsignado ?? "",
+
+      // Fijo porque no viene del backend
+      nombreExamen: "PCR ULTRASENSIBLE",
+
+      // Limpieza de campos que tu endpoint NO devuelve
+      dni: "",
+      fechaNacimiento: "",
+      lugarNacimiento: "",
+      sexo: "",
+      estadoCivil: "",
+      nivelEstudios: "",
+      empresa: "",
+      contrata: "",
+      ocupacion: "",
+      cargoDesempenar: "",
+      examenDirecto: false,
+      pruebaRapida: "",
+    }));
+  }
 };
 
 // ===================== SUBMIT =====================
@@ -111,29 +118,35 @@ export const PrintHojaR = (nro, token, tabla) => {
     );
 };
 
-// ===================== VERIFY =====================
+// ===================== VERIFY (CORREGIDO PARA PCR ULTRASENSIBLE) =====================
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
-    VerifyTRDefault(
-        nro,
-        tabla,
-        token,
-        set,
-        sede,
-        () => {
-            // NO tiene registro
-            GetInfoPac(nro, set, token, sede);
-        },
-        () => {
-            // SI tiene registro
-            GetInfoServicio(nro, tabla, set, token, () => {
-                Swal.fire(
-                    "Alerta",
-                    "Este paciente ya cuenta con registros de PCR Ultrasensible",
-                    "warning"
-                );
-            });
-        }
+  try {
+    const res = await GetInfoServicioDefault(
+      nro,
+      tabla,
+      token,
+      obtenerReporteUrl,
+      () => {}
     );
+    console.log("Verify PCR response:", res);
+
+    if (res && res.norden) {
+      GetInfoServicio(nro, tabla, set, token, () => {
+        Swal.fire(
+          "Alerta",
+          "Este paciente ya cuenta con registros de PCR Ultrasensible",
+          "warning"
+        );
+      });
+    } else {
+      GetInfoPac(nro, set, token, sede);
+    }
+
+  } catch (error) {
+    console.error("Error VerifyTR PCR:", error);
+
+    GetInfoPac(nro, set, token, sede);
+  }
 };
 
 // ===================== GET INFO PAC =====================
