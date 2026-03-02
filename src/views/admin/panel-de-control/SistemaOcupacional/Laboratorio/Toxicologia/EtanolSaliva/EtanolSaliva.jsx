@@ -1,5 +1,4 @@
 import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
-import InputCheckbox from "../../../../../../components/reusableComponents/InputCheckbox";
 import InputsRadioGroup from "../../../../../../components/reusableComponents/InputsRadioGroup";
 import InputTextOneLine from "../../../../../../components/reusableComponents/InputTextOneLine";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
@@ -7,7 +6,8 @@ import BotonesAccion from "../../../../../../components/templates/BotonesAccion"
 import DatosPersonalesLaborales from "../../../../../../components/templates/DatosPersonalesLaborales";
 import { useForm } from "../../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
-import { getToday} from '../../../../../../utils/helpers';
+import { getToday } from '../../../../../../utils/helpers';
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerEtanolSaliva";
 const tabla = 'etanol_saliva';
 
 export default function EtanolSaliva() {
@@ -39,7 +39,6 @@ export default function EtanolSaliva() {
     resultado: "",
 
     muestra: 'SALIVA',
-    examenDirecto: false,
 
     pruebaRapida: "",
 
@@ -65,19 +64,19 @@ export default function EtanolSaliva() {
   } = useForm(initialFormState);
 
   const handleSave = () => {
-    // SubmitDataService(form, token, userlogued, handleClear, tabla);
+    SubmitDataService(form, token, userlogued, handleClear, tabla);
   };
 
   const handleSearch = (e) => {
     if (e.key === 'Enter') {
       handleClearnotO();
-    //   VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
 
   const handlePrint = () => {
     handlePrintDefault(() => {
-    //   PrintHojaR(form.norden, token, tabla);
+      PrintHojaR(form.norden, token, tabla);
     });
   };
 
@@ -108,89 +107,71 @@ export default function EtanolSaliva() {
           labelWidth="120px"
         />
       </SectionFieldset>
-     <DatosPersonalesLaborales form={form} />
-            <SectionFieldset legend="Muestra" className="grid gap-3">
-                <InputTextOneLine
-                    label='Muestra'
-                    name="muestra"
-                    value={form.muestra}
-                    labelWidth='120px'
-                    onChange={handleChange}
-                />
-                <InputCheckbox
-                    label="Examen Completo"
-                    checked={form.examenDirecto}
-                    name="examenDirecto"
-                    onChange={(e) => {
-                        const checked = e.target.checked;
-                        setForm(prev => {
-                            const newState = { ...prev, examenDirecto: checked };
-                            if (!checked) {
-                                newState.colesterolTotal = '';
-                                newState.ldl = '';
-                                newState.hdl = '';
-                                newState.vldl = '';
-                                newState.trigliceridos = '';
-                            }
-                            return newState;
-                        });
-                    }}
-                />
-            </SectionFieldset>
-<SectionFieldset legend="Resultado" className="w-full">
-  <div className="flex items-center gap-4 w-full">
-    
-    {/* 1. Label de la prueba y el input (Cajita) */}
-    <div className="flex-grow">
-      <InputTextOneLine
-        label="PCR ULTRASENSIBLE (MÉTODO INMUNOTURBIDIMÉTRICO)"
-        name="resultado"
-        value={form.resultado}
-        labelWidth="400px" // Espacio suficiente para el nombre largo de la prueba
-        onChange={handleChangeSimple}
-        onKeyUp={handleFocusNext}
-        className="w-full"
-      />
-    </div>
+      <DatosPersonalesLaborales form={form} />
+      <SectionFieldset legend="Muestra" className="grid gap-3">
+        <InputTextOneLine
+          label='Muestra'
+          name="muestra"
+          value={form.muestra}
+          labelWidth='120px'
+          onChange={handleChange}
+        />
+     
+      </SectionFieldset>
+      <SectionFieldset legend="Resultado" className="w-full">
+        <div className="flex items-center gap-4 w-full">
 
-    {/* 2. Botones de Radio justo al lado */}
-    <div className="flex-none whitespace-nowrap">
-      <InputsRadioGroup
-        name="resultado"
-        value={form.resultado}
-        onChange={handleRadioButton}
-        options={[
-          { label: 'Positivo', value: 'POSITIVO' },
-          { label: 'Negativo', value: 'NEGATIVO' }
-        ]}
-      />
-    </div>
-
-  </div>
-</SectionFieldset>
-            <SectionFieldset legend="Asignación de Médico">
-                <EmpleadoComboBox
-                    value={form.nombre_medico}
-                    label="Especialista"
-                    form={form}
-                    onChange={handleChangeSimple}
-                />
-                <EmpleadoComboBox
-                    value={form.nombre_doctorAsignado}
-                    label="Doctor Asignado"
-                    form={form}
-                    onChange={handleChangeSimple}
-                    nameField="nombre_doctorAsignado"
-                    idField="user_doctorAsignado"
-                />
-            </SectionFieldset>
-            <BotonesAccion
-                form={form}
-                handleSave={handleSave}
-                handleClear={handleClear}
-                handlePrint={handlePrint}
-                handleChangeNumberDecimals={handleChangeNumberDecimals}
+          {/* 1. Label de la prueba y el input (Cajita) */}
+          <div className="flex-grow">
+            <InputTextOneLine
+              label="PCR ULTRASENSIBLE (MÉTODO INMUNOTURBIDIMÉTRICO)"
+              name="resultado"
+              value={form.resultado}
+              labelWidth="400px" // Espacio suficiente para el nombre largo de la prueba
+              onChange={handleChangeSimple}
+              onKeyUp={handleFocusNext}
+              className="w-full"
             />
+          </div>
+
+          {/* 2. Botones de Radio justo al lado */}
+          <div className="flex-none whitespace-nowrap">
+            <InputsRadioGroup
+              name="resultado"
+              value={form.resultado}
+              onChange={handleRadioButton}
+              options={[
+                { label: 'Positivo', value: 'POSITIVO' },
+                { label: 'Negativo', value: 'NEGATIVO' }
+              ]}
+            />
+          </div>
+
+        </div>
+      </SectionFieldset>
+      <SectionFieldset legend="Asignación de Médico">
+        <EmpleadoComboBox
+          value={form.nombre_medico}
+          label="Especialista"
+          form={form}
+          onChange={handleChangeSimple}
+        />
+        <EmpleadoComboBox
+          value={form.nombre_doctorAsignado}
+          label="Doctor Asignado"
+          form={form}
+          onChange={handleChangeSimple}
+          nameField="nombre_doctorAsignado"
+          idField="user_doctorAsignado"
+        />
+      </SectionFieldset>
+      <BotonesAccion
+        form={form}
+        handleSave={handleSave}
+        handleClear={handleClear}
+        handlePrint={handlePrint}
+        handleChangeNumberDecimals={handleChangeNumberDecimals}
+      />
     </div>
   );
 }
