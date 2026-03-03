@@ -331,7 +331,8 @@ export const GetInfoServicioEditar = async (
             // capacitaciones: [],
             experiencias: res.experienciaLaboral ?? [],
             referencias: res.referenciasPersonales ?? [],
-            aptitudAltura18: res.aptitudPoderosaSi === true ? true : res.aptitudPoderosaNo === true ? false : null
+            aptitudAltura18: res.aptitudPoderosaSi === true ? true : res.aptitudPoderosaNo === true ? false : null,
+            aptitud: res.apto === true ? "APTO" : res.aptoRestriccion === true ? "APTO RESTRICCION" : res.noApto === true ? "NO APTO" : false
         }));
         Swal.fire(
             "Alerta",
@@ -454,6 +455,9 @@ export const SubmitDataService = async (
         // capacitaciones: form.capacitaciones.map(item => ({ ...item, idFichaDatosPersonales: form.norden, cap: null })),
         instruccionAdquirida: buildInstruccionAdquirida,
         referenciasPersonales: form.referencias.map(item => ({ ...item, idFichaDatosPersonales: form.norden })),
+        apto: form.aptitud === "APTO" ? true : false,
+        aptoRestriccion: form.aptitud === "APTO RESTRICCION" ? true : false,
+        noApto: form.aptitud === "NO APTO" ? true : false,
     };
 
     await SubmitDataServiceDefaultManejo(token, limpiar, body, registrarUrl, () => {
