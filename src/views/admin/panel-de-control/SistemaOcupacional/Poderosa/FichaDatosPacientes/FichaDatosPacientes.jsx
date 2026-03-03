@@ -1007,15 +1007,15 @@ export default function FichaDatosPacientes() {
                         <InputTextOneLine
                             label="Sueldo/Jornal"
                             name="sueldoJornal"
+                            onChange={handleChangeNumber}
                             value={form.sueldoJornal}
-                            disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
                             label="Sistema Trabajo"
                             name="sistemaTrabajo"
+                            onChange={handleChangeSimple}
                             value={form.sistemaTrabajo}
-                            disabled
                             labelWidth="100px"
                         />
 
@@ -1050,16 +1050,16 @@ export default function FichaDatosPacientes() {
                             />
                             <InputTextOneLine
                                 name="viaticosValor"
+                                onChange={handleChange}
                                 value={form.viaticosValor ?? ""}
                                 className="w-full"
-                                disabled
                             />
                         </div>
                         <InputTextOneLine
                             label="Alimentación A cta. Contrata"
                             name="alimentacionContrata"
+                            onChange={handleChange}
                             value={form.alimentacionContrata}
-                            disabled
                             labelWidth="100px"
                         />
                     </div>
@@ -1082,15 +1082,19 @@ export default function FichaDatosPacientes() {
                     disabled
                     labelWidth="120px"
                 />
-                <InputsBooleanRadioGroup
-                    label="Aptitud"
+                <InputsRadioGroup
                     name="aptitud"
                     value={form.aptitud}
-                    onChange={handleRadioButtonBoolean}
-                    trueLabel="Apto"
-                    falseLabel="No Apto"
-                    labelWidth="120px"
+                    label="Aptitud"
+                    onChange={handleRadioButton}
+                    options={[
+                        { label: "Apto", value: "APTO" },
+                        { label: "No Apto", value: "NO APTO" },
+                        { label: "Apto con Restriccion", value: "APTO RESTRICCION" },
+                    ]}
+
                 />
+
             </SectionFieldset>
 
             {/* BOTONES DE ACCIÓN */}
