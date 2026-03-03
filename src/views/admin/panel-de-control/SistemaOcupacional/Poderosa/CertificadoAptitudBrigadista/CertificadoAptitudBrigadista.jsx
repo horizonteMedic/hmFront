@@ -8,25 +8,47 @@ import DatosPersonalesLaborales from "../../../../../components/templates/DatosP
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
+import { SubmitDataService, VerifyTR } from "./controllerAptitudBrigadista";
 
-const tabla = "ficha_datos_pacientes";
+const tabla = "certificado_aptitud_brigadista";
 const today = getToday();
 
 const CertificadoAptitudBrigadista = () => {
-    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+    const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
     const initialFormState = {
+        // Header
         norden: "",
-        id: null,
-        fechaIngreso: today,
-        tipoTrabajador: "",
-
-        empresa: "",
-        cargo: "",
-
+        codigoRespiradores: null,
+        fechaExam: today,
+        tipoExamen: "",
+        // Datos personales
+        dni: "",
         nombres: "",
-        apellidos: "",
         fechaNacimiento: "",
+        lugarNacimiento: "",
+        edad: "",
+        sexo: "",
+        estadoCivil: "",
+        nivelEstudios: "",
 
+        // Datos Laborales
+        empresa: "",
+        contrata: "",
+        ocupacion: "",
+        cargoDesempenar: "",
+        aptitud: "",
+        conclusiones: "",
+        restricciones: "",
+        recomendaciones: "",
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
+
+        nombre_doctorAsignado: "",
+        user_doctorAsignado: "",
+
+        nombre_doctorExtra: "",
+        user_doctorExtra: "",
     };
 
     const {
@@ -44,14 +66,14 @@ const CertificadoAptitudBrigadista = () => {
     } = useForm(initialFormState, { storageKey: "CertificadoAptitudBrigadista" });
 
     const handleSave = () => {
-        //SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
     const handleSearch = (e) => {
-        //if (e.key === "Enter") {
-        //  handleClearnotO();
-        //VerifyTR(form.norden, tabla, token, setForm, selectedSede);
-        //}
+        if (e.key === "Enter") {
+            handleClearnotO();
+            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        }
     };
 
     const handlePrint = () => {
@@ -74,9 +96,9 @@ const CertificadoAptitudBrigadista = () => {
                 />
                 <InputTextOneLine
                     label="Fecha de Ingreso"
-                    name="fechaIngreso"
+                    name="fechaExam"
                     type="date"
-                    value={form.fechaIngreso}
+                    value={form.fechaExam}
                     onChange={handleChangeSimple}
                     labelWidth="120px"
                 />
@@ -91,7 +113,7 @@ const CertificadoAptitudBrigadista = () => {
                     <SectionFieldset legend="Aptitud" className="w-full">
                         <InputsRadioGroup
                             vertical
-                            name="apto" value={form?.apto} className="py-2"
+                            name="aptitud" value={form?.aptitud} className="py-2"
                             onChange={handleRadioButton} options={[
                                 { label: "APTO (para el puesto en el que trabaja o postula)", value: "APTO" },
                                 { label: "No APTO (para el puesto en el que trabaja o postula)", value: "NOAPTO" }
@@ -106,6 +128,14 @@ const CertificadoAptitudBrigadista = () => {
                             form={form}
                             onChange={handleChangeSimple}
                         />
+                        <EmpleadoComboBox
+                            value={form.nombre_doctorAsignado}
+                            label="Doctor Asignado"
+                            form={form}
+                            onChange={handleChangeSimple}
+                            nameField="nombre_doctorAsignado"
+                            idField="user_doctorAsignado"
+                        />
                     </SectionFieldset>
                 </div>
 
@@ -114,6 +144,7 @@ const CertificadoAptitudBrigadista = () => {
                         <InputTextArea
                             label="Conclusiones"
                             name="conclusiones"
+                            onChange={handleChange}
                             value={form.conclusiones}
                             rows={3}
                             labelWidth="120px"
@@ -121,6 +152,7 @@ const CertificadoAptitudBrigadista = () => {
                         <InputTextArea
                             label="Restricciones"
                             name="restricciones"
+                            onChange={handleChange}
                             rows={3}
                             value={form.restricciones}
                             labelWidth="120px"
@@ -128,6 +160,7 @@ const CertificadoAptitudBrigadista = () => {
                         <InputTextArea
                             label="Recomendaciones"
                             name="recomendaciones"
+                            onChange={handleChange}
                             rows={3}
                             value={form.recomendaciones}
                             labelWidth="120px"

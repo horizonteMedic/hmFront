@@ -584,6 +584,23 @@ const MatrizPostulante = () => {
     });
     return result;
   };
+
+  const getCellStyle = (field, item) => {
+    if (datos.matrizSeleccionada !== "Matriz-9") return "";
+
+    const fieldName = typeof field === "string" ? field : field?.field;
+    if (!fieldName || fieldName.toLowerCase() !== "condicion") return "";
+
+    const value = typeof item?.[fieldName] === "string"
+      ? item[fieldName].toLowerCase().trim()
+      : "";
+
+    if (value === "no apto") return "bg-[#FF0000] text-white font-bold";
+    if (value === "apto") return "bg-[#47D359] text-white font-bold";
+
+    return "";
+  };
+
   const isMatrizSaludProseguridad = datos.matrizSeleccionada === "Matriz-13"
 
   return (
@@ -818,7 +835,9 @@ const MatrizPostulante = () => {
                     const fields = isHierarchical
                       ? extractLeaves(head)
                       : head?.length > 0
-                        ? head.map(h => h.field)
+                        ? head
+                          .map(h => h.field)
+                          .filter(Boolean)
                         : Object.keys(item);
 
                     return (
