@@ -28,7 +28,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
-            fecha: formatearFechaCorta(res.fechaExamen ?? ""),
+            fecha: res.fechaExamen,
             nombres: res.nombres ?? "",
             apellidos: res.apellidos ?? "",
             edad: res.edad ?? "",
@@ -52,6 +52,13 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
             contrata: res.contrata ?? "",
             ocupacion: res.cargoPaciente ?? "",
             cargoDesempenar: res.areaPaciente ?? "",
+
+            resultado: res.resultado ?? "",
+            muestra: res.muestra ?? "",
+
+
+            user_medicoFirma: res.usuarioFirma ?? "",
+            user_doctorAsignado: res.doctorAsignado ?? "",
         }));
     }
 };
@@ -63,19 +70,11 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     }
 
     const body = {
-        resultado: form.resultado,
         muestra: form.muestra,
-        pruebaRapida: form.pruebaRapida,
-
+        resultado: form.resultado,
         userRegistro: user,
-        userMedicoOcup: "",
-        nOrden: form.norden,
-
-        numTicket: 0,
-        txtReponsable: user,
-        fechaRegistro: form.fecha,
-
-        esEtanolSaliva: true,
+        fechaExamen: form.fecha,
+        norden: form.norden,
 
         usuarioFirma: form.user_medicoFirma,
         doctorAsignado: form.user_doctorAsignado,

@@ -171,12 +171,12 @@ export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporte
     // });
 };
 
-export const PrintHojaRJsReportDefault = async (nro, token, tabla, obtenerReporteUrl) => {
+export const PrintHojaRJsReportDefault = async (nro, token, tabla, obtenerReporteUrl, comprimir = false) => {
     try {
         LoadingDefault("Cargando Formato a Imprimir");
 
         const response = await getFetchPdf(
-            `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`,
+            `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&comprimir=${comprimir ? 1 : 0}`,
             token
         );
 

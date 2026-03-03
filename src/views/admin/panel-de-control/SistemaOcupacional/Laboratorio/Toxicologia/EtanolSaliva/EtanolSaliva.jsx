@@ -40,8 +40,6 @@ export default function EtanolSaliva() {
 
     muestra: 'SALIVA',
 
-    pruebaRapida: "",
-
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
@@ -116,7 +114,7 @@ export default function EtanolSaliva() {
           labelWidth='120px'
           onChange={handleChange}
         />
-     
+
       </SectionFieldset>
       <SectionFieldset legend="Resultado" className="w-full">
         <div className="flex items-center gap-4 w-full">
@@ -128,7 +126,7 @@ export default function EtanolSaliva() {
               name="resultado"
               value={form.resultado}
               labelWidth="400px" // Espacio suficiente para el nombre largo de la prueba
-              onChange={handleChangeSimple}
+              onChange={handleChange}
               onKeyUp={handleFocusNext}
               className="w-full"
             />
