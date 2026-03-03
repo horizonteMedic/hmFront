@@ -18,7 +18,7 @@ export default function PCRUltrasensible() {
     norden: '',
     fecha: today,
 
-    nombreExamen: "",
+    tipoExamen: "",
 
     dni: "",
     nombres: "",
@@ -101,8 +101,8 @@ export default function PCRUltrasensible() {
         />
         <InputTextOneLine
           label="Nombre del Examen"
-          name="nombreExamen"
-          value={form.nombreExamen}
+          name="tipoExamen"
+          value={form.tipoExamen}
           disabled
           labelWidth="120px"
         />
@@ -115,25 +115,6 @@ export default function PCRUltrasensible() {
                     value={form.muestra}
                     labelWidth='120px'
                     onChange={handleChange}
-                />
-                <InputCheckbox
-                    label="Examen Completo"
-                    checked={form.examenDirecto}
-                    name="examenDirecto"
-                    onChange={(e) => {
-                        const checked = e.target.checked;
-                        setForm(prev => {
-                            const newState = { ...prev, examenDirecto: checked };
-                            if (!checked) {
-                                newState.colesterolTotal = '';
-                                newState.ldl = '';
-                                newState.hdl = '';
-                                newState.vldl = '';
-                                newState.trigliceridos = '';
-                            }
-                            return newState;
-                        });
-                    }}
                 />
             </SectionFieldset>
             <SectionFieldset legend="Resultados" className="grid grid-cols-1 gap-4">
