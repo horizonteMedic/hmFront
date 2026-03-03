@@ -10,7 +10,7 @@ import { PDFDocument } from "pdf-lib";
 import pdfjsLib from "../../config/pdjfConfig";
 import { colocarSellosEnPdf, getSign } from "../../utils/helpers";
 
-export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType, signal, nombres = "", apellidos = "", datosFooter) {
+export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType, signal, nombres = "", apellidos = "", datosFooter, comprimidoz = false) {
     if (signal?.aborted) throw new DOMException("Aborted", "AbortError");//para poder cancelar la gereracion
 
     const pdfFinal = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true, precision: 1 });
@@ -403,16 +403,89 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
     }
 
     const baseBytes = pdfFinalBytes instanceof Uint8Array ? pdfFinalBytes : new Uint8Array(pdfFinalBytes);
-    //const rasterizedBytes = baseBytes;
-    const rasterizedBytes = await rasterizeAndCompressPdf(baseBytes);
 
     const nombreArchivo = (nombres && apellidos)
         ? `${nro} - ${apellidos.toUpperCase()} ${nombres.toUpperCase()}.pdf`
         : `Folio_${nro}.pdf`;
 
-    // descargarPdf(rasterizedBytes, nombreArchivo);
-    imprimirBytes(rasterizedBytes, nombreArchivo);
+    console.log({ comprimidoz });
+    if (comprimidoz) {
+        // descargarPdf(rasterizedBytes, nombreArchivo);
+        const archivoProcesado = await subirArchivoPdfNode(
+            baseBytes,
+            nombreArchivo
+        );
+        imprimirBytes(archivoProcesado, nombreArchivo);
+        // descargarBlob(archivoProcesado, nombreArchivo);
+    } else {
+        const rasterizedBytes = await rasterizeAndCompressPdf(baseBytes);
+        imprimirBytes(rasterizedBytes, nombreArchivo);
+    }
 }
+
+async function subirArchivoPdfNode(bytes, nombreArchivo) {
+    try {
+        const blob = new Blob([bytes], { type: "application/pdf" });
+
+        const formData = new FormData();
+        formData.append("archivo", blob, nombreArchivo);
+
+        const response = await fetch(
+            "https://reportes.horizontemedic.com/backend/api/archivos",
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Error al subir archivo");
+        }
+
+        return await response.blob(); // asumimos que devuelve archivo
+    } catch (error) {
+        console.error("Error subiendo archivo:", error);
+        throw error;
+    }
+}
+
+function descargarBlob(blob, nombreArchivo) {
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = nombreArchivo;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+}
+
+// function imprimirBlobConNombre(blob, nombreArchivo) {
+
+//     const file = new File([blob], nombreArchivo, { type: "application/pdf" });
+//     const fileUrl = URL.createObjectURL(file);
+
+//     const iframe = document.createElement("iframe");
+//     iframe.style.position = "fixed";
+//     iframe.style.right = "0";
+//     iframe.style.bottom = "0";
+//     iframe.style.width = "0";
+//     iframe.style.height = "0";
+//     iframe.style.border = "0";
+//     iframe.src = fileUrl;
+
+//     document.body.appendChild(iframe);
+
+//     iframe.onload = function () {
+//         iframe.contentWindow.focus();
+//         iframe.contentWindow.print();
+//     };
+
+//     setTimeout(() => {
+//         document.body.removeChild(iframe);
+//         URL.revokeObjectURL(fileUrl);
+//     }, 30000);
+// }
 
 function descargarPdf(pdfBytes, nombreArchivo) {
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
