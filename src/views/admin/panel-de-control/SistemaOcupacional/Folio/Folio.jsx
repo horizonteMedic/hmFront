@@ -588,7 +588,7 @@ const Folio = () => {
         });
     };
 
-    const handleGenerarFolio = async () => {
+    const handleGenerarFolio = async (comprimidoz = false) => {
         // Cancelar petición anterior si existe
         if (abortControllerRef.current) {
             abortControllerRef.current.abort();
@@ -649,7 +649,7 @@ const Folio = () => {
             };
 
             // Llamar a FolioJasper con el callback de progreso
-            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress, selectedListType, controller.signal, form.nombres, form.apellidos, datosFooter);
+            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress, selectedListType, controller.signal, form.nombres, form.apellidos, datosFooter, comprimidoz);
 
             // Cerrar la alerta de carga y mostrar éxito
             Swal.fire({
@@ -963,7 +963,7 @@ const Folio = () => {
                     })}
                 </div>
                 <div className="grid md:grid-cols-3 w-full gap-4">
-                    <div/>
+                    <div />
                     <div className="flex justify-center items-center w-full gap-4">
                         <button
                             className="bg-yellow-400 hover:bg-yellow-500 text-white py-2 px-4 rounded-md mt-4 text-semibold"
@@ -973,10 +973,17 @@ const Folio = () => {
                         </button>
                         <button
                             className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
-                            onClick={handleGenerarFolio}
+                            onClick={() => handleGenerarFolio(false)}
                             disabled={(form.listaExamenes?.filter(e => e.imprimir).length || 0) == 0}
                         >
                             Generar Folio
+                        </button>
+                        <button
+                            className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
+                            onClick={() => handleGenerarFolio(true)}
+                            disabled={(form.listaExamenes?.filter(e => e.imprimir).length || 0) == 0}
+                        >
+                            Generar Folio Comprimido
                         </button>
                     </div>
 

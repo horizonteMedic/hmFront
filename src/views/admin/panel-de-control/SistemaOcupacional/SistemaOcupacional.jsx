@@ -67,6 +67,7 @@ import {
   faArrowUp,
   faFileContract,
   faSearch,
+  faEnvelope,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -104,6 +105,7 @@ import EliminarExamenes from "./EliminarExamenes/EliminarExamenes.jsx";
 import LaboratorioTabSelector from "./Laboratorio/LaboratorioTabSelector.jsx";
 import Folio from "./Folio/Folio.jsx";
 import Altura18 from "./Altura18/Altura18.jsx";
+import PlantillasCorreo from "./PlantillasCorreo/PlantillasCorreo.jsx";
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
   { key: 7, label: "Test Altura" },
@@ -318,6 +320,7 @@ const TabComponent = () => {
                   { vista: "Uso de Respiradores", tab: 36, icons: [{ icon: faMaskVentilator }], label: "Uso de Respiradores" },
                   { vista: "Eliminar Examenes", tab: 38, icons: [{ icon: faFolderMinus }], label: "Eliminar Examenes" },
                   { vista: "Altura 1.8", tab: 39, icons: [{ icon: faArrowUp }], label: "Altura 1.8" },
+                  { vista: "Plantillas Correo", tab: 41, icons: [{ icon: faEnvelope }], label: "Plantillas de Correo" },
                   { vista: "Folio", tab: 40, icons: [{ icon: faFileContract }], label: "Folio" },
                 ];
                 return items
@@ -595,6 +598,7 @@ const TabComponent = () => {
               37: { title: "Poderosa", child: <PoderosaTabSelector tieneVista={tieneVista} /> },
               38: { title: "Eliminar Examenes", child: <EliminarExamenes /> },
               39: { title: "Altura 1.8", child: <Altura18 /> },
+              41: { title: "Plantillas de Correo", child: <PlantillasCorreo /> },
               40: { title: "Folio", child: <Folio /> },
             };
             const section = displayedInterfaces[activeTab];
@@ -655,6 +659,7 @@ const TabComponent = () => {
             "Eliminar Examenes": { activeTab: 38, subTab: 0 },
             "Altura 1.8": { activeTab: 39, subTab: 0 },
             "Folio": { activeTab: 40, subTab: 0 },
+            "Plantillas de Correo": { activeTab: 41, subTab: 0 },
           };
 
           const config = navConfig[idx];

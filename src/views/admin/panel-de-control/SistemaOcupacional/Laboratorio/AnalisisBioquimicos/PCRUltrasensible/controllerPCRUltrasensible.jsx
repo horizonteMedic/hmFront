@@ -39,7 +39,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
       dni: res.dniPaciente ?? "",
       edad: res.edad ?? "",
 
-      fechaNacimiento: res.fechaNacimientoPaciente ?? "",
+      fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
       lugarNacimiento: res.lugarNacimientoPaciente ?? "",
       sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
 
@@ -63,11 +63,6 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
       user_medicoFirma: res.usuarioFirma ?? prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado ?? "",
 
-      nombreExamen: "PCR ULTRASENSIBLE",
-
-      // CAMPOS QUE NO EXISTEN EN TU ENDPOINT
-      examenDirecto: false,
-      pruebaRapida: "",
     }));
   }
 };
