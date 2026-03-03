@@ -38,7 +38,7 @@ export default function PCRUltrasensible() {
 
     resultado: "",
 
-    muestra: 'SALIVA',
+    muestra: "",
     examenDirecto: false,
 
     pruebaRapida: "",
@@ -64,19 +64,19 @@ export default function PCRUltrasensible() {
   } = useForm(initialFormState);
 
   const handleSave = () => {
-    // SubmitDataService(form, token, userlogued, handleClear, tabla);
+      SubmitDataService(form, token, userlogued, handleClear, tabla);
   };
 
   const handleSearch = (e) => {
     if (e.key === 'Enter') {
       handleClearnotO();
-    //   VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
 
   const handlePrint = () => {
     handlePrintDefault(() => {
-    //   PrintHojaR(form.norden, token, tabla);
+      PrintHojaR(form.norden, token, tabla);
     });
   };
 

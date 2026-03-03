@@ -3,7 +3,7 @@ import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
     LoadingDefault,
-    PrintHojaRDefault,
+    PrintHojaRJsReportDefault,
     SubmitDataServiceDefault,
     VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
@@ -11,6 +11,7 @@ import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 // CAMBIAR SOLO LAS URL
 const obtenerReporteUrl = "/api/v01/ct/pcrUltrasensible/obtenerReporte";
+const obtenerReporteJsReportUrl = "/api/v01/ct/pcrUltrasensible/descargarReporte";
 const registrarUrl = "/api/v01/ct/pcrUltrasensible/registrarActualizar";
 
 // ===================== GET INFO SERVICIO =====================
@@ -29,37 +30,42 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
     set((prev) => ({
       ...prev,
 
-      // Datos principales
+      // DATOS PRINCIPALES
       norden: res.norden ?? "",
       fecha: res.fechaExamen ?? "",
 
-      // Paciente
       nombres: res.nombres ?? "",
       apellidos: res.apellidos ?? "",
+      dni: res.dniPaciente ?? "",
       edad: res.edad ?? "",
 
-      // PCR
-      resultado: res.resultado ?? "",
-      muestra: res.muestra ?? "SALIVA",
+      fechaNacimiento: res.fechaNacimientoPaciente ?? "",
+      lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+      sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
 
-      // Médicos
+      estadoCivil: res.estadoCivilPaciente ?? "",
+      nivelEstudios: res.nivelEstudioPaciente ?? "",
+
+      ocupacion: res.ocupacionPaciente ?? "",
+      cargoDesempenar: res.cargoPaciente ?? "",
+      area: res.areaPaciente ?? "",
+
+      empresa: res.empresa ?? "",
+      contrata: res.contrata ?? "",
+
+      tipoExamen: res.tipoExamen ?? "",
+
+      // EXAMEN
+      resultado: res.resultado ?? "",
+      muestra: res.muestra ?? "",
+
+      // USUARIOS
       user_medicoFirma: res.usuarioFirma ?? prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado ?? "",
 
-      // Fijo porque no viene del backend
       nombreExamen: "PCR ULTRASENSIBLE",
 
-      // Limpieza de campos que tu endpoint NO devuelve
-      dni: "",
-      fechaNacimiento: "",
-      lugarNacimiento: "",
-      sexo: "",
-      estadoCivil: "",
-      nivelEstudios: "",
-      empresa: "",
-      contrata: "",
-      ocupacion: "",
-      cargoDesempenar: "",
+      // CAMPOS QUE NO EXISTEN EN TU ENDPOINT
       examenDirecto: false,
       pruebaRapida: "",
     }));
@@ -97,24 +103,17 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden, token, tabla);
+      PrintHojaR(form.norden, token, tabla);
     });
 };
 
 // ===================== PRINT =====================
 export const PrintHojaR = (nro, token, tabla) => {
-    const jasperModules = import.meta.glob(
-        "../../../../../../jaspers/AnalisisBioquimicos/*.jsx"
-    );
-
-    PrintHojaRDefault(
-        nro,
-        token,
-        tabla,
-        null,
-        obtenerReporteUrl,
-        jasperModules,
-        "../../../../../../jaspers/AnalisisBioquimicos"
+    PrintHojaRJsReportDefault(
+      nro,
+      token,
+      tabla,
+      obtenerReporteJsReportUrl
     );
 };
 
