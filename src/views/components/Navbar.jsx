@@ -23,7 +23,6 @@ const median = (values) => {
 const Navbar = () => {
   const [showMenu, setShowMenu] = useState(false);
   const { selectedSede, userCompleto } = useSessionData();
-  console.log(userCompleto)
   const [activeLink, setActiveLink] = useState("");
   const setToken = useAuthStore((state) => state.setToken);
   const setuserlogued = useAuthStore((state) => state.setuserlogued);

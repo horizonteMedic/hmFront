@@ -1,0 +1,150 @@
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
+import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
+import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine"
+import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset"
+import BotonesAccion from "../../../../../components/templates/BotonesAccion";
+import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
+import { useForm } from "../../../../../hooks/useForm";
+import { useSessionData } from "../../../../../hooks/useSessionData";
+import { getToday } from "../../../../../utils/helpers";
+
+const tabla = "ficha_datos_pacientes";
+const today = getToday();
+
+const CertificadoAptitudBrigadista = () => {
+    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+    const initialFormState = {
+        norden: "",
+        id: null,
+        fechaIngreso: today,
+        tipoTrabajador: "",
+
+        empresa: "",
+        cargo: "",
+
+        nombres: "",
+        apellidos: "",
+        fechaNacimiento: "",
+
+    };
+
+    const {
+        form,
+        setForm,
+        handleChange,
+        handleChangeNumber,
+        handleRadioButton,
+        handleRadioButtonBoolean,
+        handleClear,
+        handleChangeSimple,
+        handleClearnotO,
+        handlePrintDefault,
+        handleChangeNumberDecimals,
+    } = useForm(initialFormState, { storageKey: "CertificadoAptitudBrigadista" });
+
+    const handleSave = () => {
+        //SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    const handleSearch = (e) => {
+        //if (e.key === "Enter") {
+        //  handleClearnotO();
+        //VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        //}
+    };
+
+    const handlePrint = () => {
+        handlePrintDefault(() => {
+            //PrintHojaR(form.norden, token, tabla, datosFooter);
+        });
+    };
+
+    return (
+        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+            {/* ===== SECCIÓN: N° ORDEN Y FECHA ===== */}
+            <SectionFieldset legend="Información General" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
+                <InputTextOneLine
+                    label="N° Orden"
+                    name="norden"
+                    value={form.norden}
+                    onKeyUp={handleSearch}
+                    onChange={handleChangeNumber}
+                    labelWidth="120px"
+                />
+                <InputTextOneLine
+                    label="Fecha de Ingreso"
+                    name="fechaIngreso"
+                    type="date"
+                    value={form.fechaIngreso}
+                    onChange={handleChangeSimple}
+                    labelWidth="120px"
+                />
+
+            </SectionFieldset>
+
+            {/* ===== SECCIÓN: DATOS LABORALES ===== */}
+            <DatosPersonalesLaborales form={form} />
+
+            <div className="flex gap-3 items-start w-full ">
+                <div className="w-[40%]">
+                    <SectionFieldset legend="Aptitud" className="w-full">
+                        <InputsRadioGroup
+                            vertical
+                            name="apto" value={form?.apto} className="py-2"
+                            onChange={handleRadioButton} options={[
+                                { label: "APTO (para el puesto en el que trabaja o postula)", value: "APTO" },
+                                { label: "No APTO (para el puesto en el que trabaja o postula)", value: "NOAPTO" }
+                            ]}
+                        />
+
+                    </SectionFieldset>
+                    <SectionFieldset legend="Asignación de Médico" className="w-full">
+                        <EmpleadoComboBox
+                            value={form.nombre_medico}
+                            label="Especialista"
+                            form={form}
+                            onChange={handleChangeSimple}
+                        />
+                    </SectionFieldset>
+                </div>
+
+                <div className="w-[60%]  ">
+                    <SectionFieldset legend="Txtos finales" className="w-full space-y-3">
+                        <InputTextArea
+                            label="Conclusiones"
+                            name="conclusiones"
+                            value={form.conclusiones}
+                            rows={3}
+                            labelWidth="120px"
+                        />
+                        <InputTextArea
+                            label="Restricciones"
+                            name="restricciones"
+                            rows={3}
+                            value={form.restricciones}
+                            labelWidth="120px"
+                        />
+                        <InputTextArea
+                            label="Recomendaciones"
+                            name="recomendaciones"
+                            rows={3}
+                            value={form.recomendaciones}
+                            labelWidth="120px"
+                        />
+                    </SectionFieldset>
+
+                </div>
+            </div>
+            {/* BOTONES DE ACCIÓN */}
+            <BotonesAccion
+                form={form}
+                handleSave={handleSave}
+                handleClear={handleClear}
+                handlePrint={handlePrint}
+            />
+        </div>
+    )
+}
+
+export default CertificadoAptitudBrigadista
