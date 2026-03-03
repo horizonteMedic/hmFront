@@ -331,6 +331,7 @@ export const GetInfoServicioEditar = async (
             // capacitaciones: [],
             experiencias: res.experienciaLaboral ?? [],
             referencias: res.referenciasPersonales ?? [],
+            aptitudAltura18: res.aptitudPoderosaSi === true ? true : res.aptitudPoderosaNo === true ? false : null
         }));
         Swal.fire(
             "Alerta",

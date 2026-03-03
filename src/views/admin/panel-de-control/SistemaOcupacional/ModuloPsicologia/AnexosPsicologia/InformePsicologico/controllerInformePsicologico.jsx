@@ -3,7 +3,7 @@ import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
     LoadingDefault,
-    PrintHojaRDefault,
+    PrintHojaRJsReportDefault,
     SubmitDataServiceDefault,
     VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
@@ -11,6 +11,8 @@ import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
     "/api/v01/ct/informePsicologico/obtenerReporteInformePsicologico";
+const obtenerReporteJsReportUrl =
+    "/api/v01/ct/etanolSaliva/descargarReporte";
 const registrarUrl =
     "/api/v01/ct/informePsicologico/registrarActualizarInformePsicologico";
 
@@ -142,17 +144,21 @@ export const SubmitDataService = async (
     });
 };
 
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformePsicologico/*.jsx");
-    PrintHojaRDefault(
-        nro,
-        token,
-        tabla,
-        datosFooter,
-        obtenerReporteUrl,
-        jasperModules,
-        "../../../../../../jaspers/ModuloPsicologia/InformePsicologico"
-    );
+// export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+//     const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformePsicologico/*.jsx");
+//     PrintHojaRDefault(
+//         nro,
+//         token,
+//         tabla,
+//         datosFooter,
+//         obtenerReporteUrl,
+//         jasperModules,
+//         "../../../../../../jaspers/ModuloPsicologia/InformePsicologico"
+//     );
+// };
+
+export const PrintHojaR = (nro, token, tabla) => {
+    PrintHojaRJsReportDefault(nro, token, "etanol_saliva", obtenerReporteJsReportUrl);
 };
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
