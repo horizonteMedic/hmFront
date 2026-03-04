@@ -36,6 +36,7 @@ export const GetInfoServicio = async (
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
+            fechaExam: prev.fechaExam ?? "",
             // Datos personales
             nombres: res.nombresApellidos ?? "",
             fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
@@ -120,7 +121,7 @@ export const SubmitDataService = async (
     }
     const body = {
         "norden": form.norden,
-        "fechaExamen": form.fechaExamen,
+        "fechaExamen": form.fechaExam,
         "conclusiones": form.conclusiones,
         "apto": form.aptitud === "APTO" ? true : false,
         "noApto": form.aptitud === "NOAPTO" ? true : false,
@@ -171,7 +172,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             GetInfoServicioEditar(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de C. de Aptitud Altura Poderosa",
+                    "Este paciente ya cuenta con registros de C. de Aptitud Brigadista",
                     "warning"
                 );
             });

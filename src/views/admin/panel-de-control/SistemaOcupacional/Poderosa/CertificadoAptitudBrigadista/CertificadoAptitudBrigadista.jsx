@@ -18,7 +18,6 @@ const CertificadoAptitudBrigadista = () => {
     const initialFormState = {
         // Header
         norden: "",
-        codigoRespiradores: null,
         fechaExam: today,
         tipoExamen: "",
         // Datos personales

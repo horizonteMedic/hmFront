@@ -1,5 +1,7 @@
 import InputsBooleanRadioGroup from "../../../../../components/reusableComponents/InputsBooleanRadioGroup";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine"
+import RadioTable from "../../../../../components/reusableComponents/RadioTable";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset"
 import BotonesAccion from "../../../../../components/templates/BotonesAccion"
 import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
@@ -132,6 +134,58 @@ const DirecionGeneralMineria = () => {
                 />
 
             </SectionFieldset>
+
+            <div className="grid xl:grid-cols-2 gap-x-4 gap-y-3">
+                <SectionFieldset legend="FACTORES HEREDITARIOS">
+
+                    <RadioTable
+                        items={[
+                            { name: "condPalpitaciones", label: "1.- Asma" },
+                            { name: "condConvulsiones", label: "2.- Alergias" },
+                            { name: "condDiabetes", label: "3.- Bronquitis" },
+                            { name: "condReaccionesAlergicasRespiracion", label: "4.- Pleuresia" },
+                            { name: "condClaustrofobia", label: "5.- Neumonia" },
+                            { name: "condClaustrofobia", label: "6.- Respiracion" },
+                            { name: "condClaustrofobia", label: "7.- Sangre en la Saliva" },
+                            { name: "condClaustrofobia", label: "8.- Respiracion Breve" },
+                            { name: "condClaustrofobia", label: "9.- Problemas Nasales" },
+                            { name: "condClaustrofobia", label: "10.- T.B.C." },
+                            { name: "condClaustrofobia", label: "Fuma" },
+                        ]}
+                        options={[
+                            { label: "SI", value: true },
+                            { label: "NO", value: false },
+                        ]}
+                        form={form}
+                        groupLabel="T.B.C."
+                        handleRadioButton={handleRadioButtonBoolean}
+                    />
+                </SectionFieldset>
+                <SectionFieldset legend="CANCER PULMONAR">
+                    <RadioTable
+                        items={[
+                            { name: "condClaustrofobia", label: "11.- Palpitaciones" },
+                            { name: "condClaustrofobia", label: "12.- Ritmo Cardiaco Irregular" },
+                            { name: "condClaustrofobia", label: "13.- Fallas Cardiacas" },
+                            { name: "condClaustrofobia", label: "14.- Desmayos" },
+                            { name: "condClaustrofobia", label: "15.- Tobillos Hinchados" },
+                            { name: "condClaustrofobia", label: "16.- Moretones Anormales" },
+                            { name: "condClaustrofobia", label: "17.- Presion Alta" },
+                            { name: "condClaustrofobia", label: "18.- Heridas del Pecho" },
+                            { name: "condClaustrofobia", label: "19.- Otras Enfermedades" },
+                            { name: "condClaustrofobia", label: "Toma alguna medicina" },
+                        ]}
+                        options={[
+                            { label: "SI", value: true },
+                            { label: "NO", value: false },
+                        ]}
+                        form={form}
+                        groupLabel="CANCER PULMONAR"
+                        handleRadioButton={handleRadioButtonBoolean}
+                    />
+                </SectionFieldset>
+            </div>
+
 
             {/* ===== SECCIÓN: DETALLES =====*/}
             <SectionFieldset legend="DETALLES" className="grid grid-cols-1  gap-x-4 gap-y-3">
@@ -343,6 +397,23 @@ const DirecionGeneralMineria = () => {
                         />
                     </div>
                 </SectionFieldset>
+            </SectionFieldset>
+
+            <SectionFieldset legend="Asignación de Médico" className="w-full">
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Especialista"
+                    form={form}
+                    onChange={handleChangeSimple}
+                />
+                <EmpleadoComboBox
+                    value={form.nombre_doctorAsignado}
+                    label="Doctor Asignado"
+                    form={form}
+                    onChange={handleChangeSimple}
+                    nameField="nombre_doctorAsignado"
+                    idField="user_doctorAsignado"
+                />
             </SectionFieldset>
 
 
