@@ -68,6 +68,7 @@ import {
   faFileContract,
   faSearch,
   faEnvelope,
+  faHandHoldingMedical,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -106,6 +107,7 @@ import LaboratorioTabSelector from "./Laboratorio/LaboratorioTabSelector.jsx";
 import Folio from "./Folio/Folio.jsx";
 import Altura18 from "./Altura18/Altura18.jsx";
 import PlantillasCorreo from "./PlantillasCorreo/PlantillasCorreo.jsx";
+import AsistencialTabSelector from "./Asistencial/AsistencialTabSelector.jsx";
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
   { key: 7, label: "Test Altura" },
@@ -321,6 +323,7 @@ const TabComponent = () => {
                   { vista: "Eliminar Examenes", tab: 38, icons: [{ icon: faFolderMinus }], label: "Eliminar Examenes" },
                   { vista: "Altura 1.8", tab: 39, icons: [{ icon: faArrowUp }], label: "Altura 1.8" },
                   { vista: "Plantillas Correo", tab: 41, icons: [{ icon: faEnvelope }], label: "Plantillas de Correo" },
+                  { vista: "Asistencial", tab: 42, icons: [{ icon: faHandHoldingMedical }], label: "Asistencial" },
                   { vista: "Folio", tab: 40, icons: [{ icon: faFileContract }], label: "Folio" },
                 ];
                 return items
@@ -599,6 +602,7 @@ const TabComponent = () => {
               38: { title: "Eliminar Examenes", child: <EliminarExamenes /> },
               39: { title: "Altura 1.8", child: <Altura18 /> },
               41: { title: "Plantillas de Correo", child: <PlantillasCorreo /> },
+              42: { title: "Asistencial", child: <AsistencialTabSelector tieneVista={tieneVista}/> },
               40: { title: "Folio", child: <Folio /> },
             };
             const section = displayedInterfaces[activeTab];
