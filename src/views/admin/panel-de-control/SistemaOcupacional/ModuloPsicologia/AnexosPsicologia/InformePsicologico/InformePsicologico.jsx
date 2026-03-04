@@ -8,9 +8,12 @@ import {
 import { useForm } from "../../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../../utils/helpers";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformePsicologico";
+import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerInformePsicologico";
 import SectionFieldset from "../../../../../../components/reusableComponents/SectionFieldset";
 import BotonesAccion from "../../../../../../components/templates/BotonesAccion";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
+import ButtonsPDF from "../../../../../../components/reusableComponents/ButtonsPDF";
 
 const tabla = "informe_psicologico";
 
@@ -90,6 +93,9 @@ export default function InformePsicologico() {
 
         // Aprobó Test
         aproboTest: undefined,
+
+        SubirDoc: false,
+        nomenclatura: "INFORME PSICOLOGICO"
     };
 
     const {
@@ -107,6 +113,7 @@ export default function InformePsicologico() {
     // Estado para el select de recomendaciones predefinidas
     const [selectedRecomendacion, setSelectedRecomendacion] = useState("");
 
+    const [visualerOpen, setVisualerOpen] = useState(null)
     // Opciones predefinidas para recomendaciones
     const opcionesRecomendaciones = [
         "Orientacion y consejeria psicologica",
@@ -325,6 +332,12 @@ export default function InformePsicologico() {
                     name="aproboTest"
                     value={form.aproboTest}
                     onChange={handleRadioButtonBoolean}
+                />
+
+                <ButtonsPDF
+                    {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
+                    {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+                    handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
                 />
             </SectionFieldset>
             {/* Contenido principal */}
@@ -717,6 +730,24 @@ export default function InformePsicologico() {
                 handlePrint={handlePrint}
                 handleChangeNumberDecimals={handleChangeNumberDecimals}
             />
+            {visualerOpen && (
+                <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+                    <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
+                        <div className="px-4 py-2 naranjabackgroud flex justify-between">
+                            <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
+                            <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+                        </div>
+                        <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
+                            <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
+                        </div>
+                        <div className="flex justify-center">
+                            <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                                <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
