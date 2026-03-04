@@ -53,11 +53,10 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
       empresa: res.empresa ?? "",
       contrata: res.contrata ?? "",
 
-      tipoExamen: res.tipoExamen ?? "",
-
       // EXAMEN
       resultado: res.resultado ?? "",
       muestra: res.muestra ?? "",
+      tipoExamen: res.tipoExamen ?? "",
 
       // USUARIOS
       user_medicoFirma: res.usuarioFirma ?? prev.user_medicoFirma,
@@ -114,33 +113,27 @@ export const PrintHojaR = (nro, token, tabla) => {
 
 // ===================== VERIFY (CORREGIDO PARA PCR ULTRASENSIBLE) =====================
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
-  try {
-    const res = await GetInfoServicioDefault(
-      nro,
-      tabla,
-      token,
-      obtenerReporteUrl,
-      () => {}
+    VerifyTRDefault(
+        nro,
+        tabla,
+        token,
+        set,
+        sede,
+        () => {
+            //NO Tiene registro
+            GetInfoPac(nro, set, token, sede);
+        },
+        () => {
+            //Tiene registro
+            GetInfoServicio(nro, tabla, set, token, () => {
+                Swal.fire(
+                    "Alerta",
+                    "Este paciente ya cuenta con registros de Glucosa Basal",
+                    "warning"
+                );
+            });
+        }
     );
-    console.log("Verify PCR response:", res);
-
-    if (res && res.norden) {
-      GetInfoServicio(nro, tabla, set, token, () => {
-        Swal.fire(
-          "Alerta",
-          "Este paciente ya cuenta con registros de PCR Ultrasensible",
-          "warning"
-        );
-      });
-    } else {
-      GetInfoPac(nro, set, token, sede);
-    }
-
-  } catch (error) {
-    console.error("Error VerifyTR PCR:", error);
-
-    GetInfoPac(nro, set, token, sede);
-  }
 };
 
 // ===================== GET INFO PAC =====================
@@ -155,7 +148,7 @@ const GetInfoPac = async (nro, set, token, sede) => {
             fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
             edad: res.edad,
             ocupacion: res.areaO ?? "",
-            nombreExamen: res.nomExam ?? "",
+            tipoExamen: res.nomExam ?? "",
             cargoDesempenar: res.cargo ?? "",
             lugarNacimiento: res.lugarNacimiento ?? "",
             sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
