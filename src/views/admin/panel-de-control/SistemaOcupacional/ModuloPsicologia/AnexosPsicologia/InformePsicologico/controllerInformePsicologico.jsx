@@ -2,8 +2,11 @@ import Swal from "sweetalert2";
 import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
+    handleSubidaMasiva,
+    handleSubirArchivoDefaultSinSellos,
     LoadingDefault,
-    PrintHojaRJsReportDefault,
+    PrintHojaRDefault,
+    ReadArchivosFormDefault,
     SubmitDataServiceDefault,
     VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
@@ -11,10 +14,12 @@ import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
     "/api/v01/ct/informePsicologico/obtenerReporteInformePsicologico";
-const obtenerReporteJsReportUrl =
-    "/api/v01/ct/etanolSaliva/descargarReporte";
 const registrarUrl =
     "/api/v01/ct/informePsicologico/registrarActualizarInformePsicologico";
+
+const registrarPDF =
+    "/api/v01/ct/archivos/archivoInterconsulta"
+
 
 export const GetInfoServicio = async (
     nro,
@@ -104,6 +109,8 @@ export const GetInfoServicio = async (
 
             // Aprobó Test
             aproboTest: res.aprobo ?? false,
+
+            SubirDoc: true,
         }));
     }
 };
@@ -144,21 +151,17 @@ export const SubmitDataService = async (
     });
 };
 
-// export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-//     const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformePsicologico/*.jsx");
-//     PrintHojaRDefault(
-//         nro,
-//         token,
-//         tabla,
-//         datosFooter,
-//         obtenerReporteUrl,
-//         jasperModules,
-//         "../../../../../../jaspers/ModuloPsicologia/InformePsicologico"
-//     );
-// };
-
-export const PrintHojaR = (nro, token, tabla) => {
-    PrintHojaRJsReportDefault(nro, token, "etanol_saliva", obtenerReporteJsReportUrl);
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformePsicologico/*.jsx");
+    PrintHojaRDefault(
+        nro,
+        token,
+        tabla,
+        datosFooter,
+        obtenerReporteUrl,
+        jasperModules,
+        "../../../../../../jaspers/ModuloPsicologia/InformePsicologico"
+    );
 };
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
@@ -207,3 +210,15 @@ const GetInfoPac = async (nro, set, token, sede) => {
 export const Loading = (mensaje) => {
     LoadingDefault(mensaje);
 };
+
+
+export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
+    handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
+};
+
+export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
+    ReadArchivosFormDefault(form, setVisualerOpen, token)
+}
+export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token) => {
+    handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token)
+}
