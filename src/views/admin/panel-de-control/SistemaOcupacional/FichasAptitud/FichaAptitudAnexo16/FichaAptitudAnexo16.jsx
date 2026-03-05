@@ -41,7 +41,6 @@ export default function FichaAptitudAnexo16() {
     contrata: "",
     ocupacion: "",
     cargoDesempenar: "",
-    esOhla: false,
 
     conclusiones: "",
     apto: "APTO",
@@ -226,13 +225,6 @@ export default function FichaAptitudAnexo16() {
                 rows={6}
               />
               <div className="space-y-3">
-                <InputCheckbox
-                  label="Formato OHLA"
-                  name="esOhla"
-                  checked={form?.esOhla}
-                  disabled
-                  className="justify-end"
-                />
                 <InputsRadioGroup
                   label="Aptitud"
                   name="apto"
@@ -273,7 +265,7 @@ export default function FichaAptitudAnexo16() {
                     { label: "NO APTO (para el puesto en el que trabaja o postula)", value: "NO APTO" },
                     { label: "CON OBSERVACION", value: "CON OBSERVACION" },
                     { label: "EVALUADO", value: "EVALUADO" },
-                  ].filter(item => (form.esOhla || (item.label != "CON OBSERVACION" && item.label != "EVALUADO")))}
+                  ]}
                 />
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-3">
                   <InputTextOneLine
