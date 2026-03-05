@@ -89,7 +89,10 @@ export const GetInfoServicioEditar = async (
             cargoDesempenar: res.cargoPaciente,
 
             conclusiones: res.conclusiones,
-            apto: res.apto ? "APTO" : (res.aptoConRestriccion ? "APTO CON RESTRICCION" : res.noApto ? "NO APTO" : ""),
+            apto: res.apto ? "APTO" : (res.aptoConRestriccion ? "APTO CON RESTRICCION" :
+                res.noApto ? "NO APTO" :
+                    res.conObservacion ? "CON OBSERVACION" :
+                        res.evaluado ? "EVALUADO" : ""),
             fechaValido: res.fechaDesde,
             fechaVencimiento: res.fechaHasta,
             recomendaciones: res.recomendaciones,
@@ -136,6 +139,8 @@ export const SubmitDataService = async (
         apto: form.apto === "APTO",
         aptoConRestriccion: form.apto === "APTO CON RESTRICCION",
         noApto: form.apto === "NO APTO",
+        conObservacion: form.apto === "CON OBSERVACION",
+        evaluado: form.apto === "EVALUADO",
         restriccionesDescripcion: form.restricciones,
         horaSalida: getHoraActual(),
         fechaHasta: form.fechaVencimiento,

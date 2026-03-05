@@ -50,7 +50,6 @@ export const GetInfoServicio = async (
             ocupacion: res.areaPaciente,
             cargoDesempenar: res.cargoPaciente,
 
-            esOhla: res.esOhla ?? false,
 
             conclusiones: res.observacionesFichaMedica,
 
@@ -111,8 +110,6 @@ export const GetInfoServicioEditar = async (
             puestoPostula: res.ocupacionPaciente,
             ocupacion: res.areaPaciente,
             cargoDesempenar: res.cargoPaciente,
-
-            esOhla: res.esOhla ?? false,
 
             conclusiones: res.conclusiones,
             apto: res.apto ? "APTO" :

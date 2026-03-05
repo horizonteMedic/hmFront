@@ -235,6 +235,8 @@ export default function FichaAptitudAnexo2() {
                 { label: "APTO (para el puesto en el que trabaja o postula)", value: "APTO" },
                 { label: "APTO CON RESTRICCIÓN (para el puesto en el que trabaja o postula)", value: "APTO CON RESTRICCION" },
                 { label: "NO APTO (para el puesto en el que trabaja o postula)", value: "NO APTO" },
+                { label: "CON OBSERVACION", value: "CON OBSERVACION" },
+                { label: "EVALUADO", value: "EVALUADO" },
               ]}
             />
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-4 gap-y-3 mt-1">
