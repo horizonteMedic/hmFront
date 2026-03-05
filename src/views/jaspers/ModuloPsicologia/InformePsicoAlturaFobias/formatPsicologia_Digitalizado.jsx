@@ -218,8 +218,11 @@ export default async function formatPsicologia_Digitalizado(data = {}, docExiste
   doc.text(datos.contrata || "", tablaInicioX + 22, yPos + 4);
   yPos += filaAltura;
 
-  // === SECCIÓN: CRITERIOS PSICOLÓGICOS ===
-  // Solo mostrar si esOhla es false
+  // Columna criterio (compartida por Aspecto Intelectual y Aspectos Personalidad)
+  const colCriterio = 65;
+
+  // === SECCIÓN: CRITERIOS PSICOLÓGICOS (solo cuando NO es OHLA) ===
+  // Cuando es OHLA se oculta solo la tabla "Aspecto Intelectual"; "Aspectos de Personalidad" siempre se muestra más abajo
   if (!datos.esOhla) {
     doc.setFillColor(196, 196, 196);
     doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
@@ -229,15 +232,12 @@ export default async function formatPsicologia_Digitalizado(data = {}, docExiste
     yPos += filaAltura;
 
     // === Aspecto Intelectual ===
-    const colCriterio = 65; // Reducido para dar más espacio a las opciones
     const colOpciones = (tablaAncho - colCriterio) / 5; // 5 columnas: I, NPI, NP, NPS, S
 
-    // Header de Aspecto Intelectual con opciones
     doc.setFillColor(220, 220, 220);
     doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
     doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
 
-    // Dibujar líneas verticales
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
     doc.line(tablaInicioX + colCriterio, yPos, tablaInicioX + colCriterio, yPos + filaAltura);
     doc.line(tablaInicioX + colCriterio + colOpciones, yPos, tablaInicioX + colCriterio + colOpciones, yPos + filaAltura);
@@ -256,17 +256,15 @@ export default async function formatPsicologia_Digitalizado(data = {}, docExiste
     doc.text("S", tablaInicioX + colCriterio + colOpciones * 4 + colOpciones / 2, yPos + filaAltura / 2 + 1, { align: "center" });
     yPos += filaAltura;
 
-    // Función para dibujar checkbox marcado
     const dibujarCheckbox = (x, y, marcado, alturaFila = filaAltura) => {
       if (marcado) {
         doc.setFont("helvetica", "bold").setFontSize(11.3);
-        doc.setTextColor(0, 51, 204); // #0033cc
+        doc.setTextColor(0, 51, 204);
         doc.text("X", x, y + alturaFila / 2 + 1, { align: "center" });
-        doc.setTextColor(0, 0, 0); // Volver a negro
+        doc.setTextColor(0, 0, 0);
       }
     };
 
-    // Función para dibujar fila de criterio intelectual
     const dibujarFilaCriterioIntelectual = (texto, valor) => {
       doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
       doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
@@ -295,101 +293,86 @@ export default async function formatPsicologia_Digitalizado(data = {}, docExiste
       yPos += filaAltura;
     };
 
-    // Dibujar criterios intelectuales
     dibujarFilaCriterioIntelectual("Razonamiento", datos.razonamiento);
     dibujarFilaCriterioIntelectual("Memoria", datos.memoria);
     dibujarFilaCriterioIntelectual("Atencion y Concentración", datos.atencionConcentracion);
     dibujarFilaCriterioIntelectual("Coordinación viso-motora", datos.coordinacionVisoMotora);
     dibujarFilaCriterioIntelectual("Orientación Espacial", datos.orientacionEspacial);
 
-    // Línea inferior del bloque de Aspecto Intelectual
-    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-
-    // === Aspectos Personalidad ===
-    doc.setFillColor(220, 220, 220);
-    doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
-    doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text("Aspectos Personalidad", tablaInicioX + 2, yPos + 4);
-    yPos += filaAltura;
-
-    // === FUNCIÓN PARA DIBUJAR FILA DE CRITERIO DE PERSONALIDAD ===
-    const dibujarFilaCriterioPersonalidad = (texto, opciones, valor) => {
-      const numOpciones = opciones.length;
-      const anchoDisponible = tablaAncho - colCriterio;
-      
-      // Anchos personalizados para "Fobia a la altura" (5 opciones)
-      let anchosColumnas;
-      if (numOpciones === 5 && texto === "Fobia a la altura") {
-        // Primera columna (Nada) más estrecha, resto más anchas
-        const anchoNada = 16; // Más estrecha para dar más espacio a las otras columnas
-        const anchoResto = (anchoDisponible - anchoNada) / 4; // Dividir el resto entre las 4 opciones
-        anchosColumnas = [anchoNada, anchoResto, anchoResto, anchoResto, anchoResto];
-      } else {
-        // Para otras opciones, dividir equitativamente
-        const colOpcion = anchoDisponible / numOpciones;
-        anchosColumnas = Array(numOpciones).fill(colOpcion);
-      }
-
-      // Línea superior
-      doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-
-      // Líneas verticales
-      doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-      doc.line(tablaInicioX + colCriterio, yPos, tablaInicioX + colCriterio, yPos + filaAltura);
-
-      let xActual = tablaInicioX + colCriterio;
-      anchosColumnas.forEach((ancho) => {
-        xActual += ancho;
-        doc.line(xActual, yPos, xActual, yPos + filaAltura);
-      });
-      doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-
-      // Texto del criterio (izquierda)
-      doc.setFont("helvetica", "normal").setFontSize(7);
-      doc.text(texto, tablaInicioX + 2, yPos + filaAltura / 2 + 2);
-
-      // Dibujar opciones con X en la columna seleccionada
-      xActual = tablaInicioX + colCriterio;
-      opciones.forEach((opcion, index) => {
-        const colOpcion = anchosColumnas[index];
-        const esSeleccionada = valor && opcion.toLowerCase() === valor.toLowerCase();
-
-        // Dibujar texto de la opción (izquierda de la columna)
-        doc.setFont("helvetica", "normal").setFontSize(7);
-        const espacioParaX = 6; // Espacio reservado para la X
-        const lineas = doc.splitTextToSize(opcion, colOpcion - espacioParaX - 2); // Dejar espacio para la X y padding
-        const alturaTotalTexto = lineas.length * 3;
-        const yTextoInicio = yPos + (filaAltura - alturaTotalTexto) / 2 + 2.5;
-
-        lineas.forEach((linea, idx) => {
-          doc.text(linea, xActual + 2, yTextoInicio + idx * 3);
-        });
-
-        // Dibujar X a la derecha de la columna si está seleccionada
-        if (esSeleccionada) {
-          doc.setFont("helvetica", "bold").setFontSize(11.3);
-          doc.setTextColor(0, 51, 204); // Azul
-          const xX = xActual + colOpcion - 3; // Posición X a la derecha con menos margen
-          doc.text("X", xX, yPos + filaAltura / 2 + 1, { align: "right" });
-          doc.setTextColor(0, 0, 0); // Volver a negro
-        }
-
-        xActual += colOpcion;
-      });
-
-      yPos += filaAltura;
-    };
-
-    // Criterios de personalidad (ahora con centrado perfecto)
-    dibujarFilaCriterioPersonalidad("Estabilidad emocional", ["Inestable", "Estable"], datos.estabilidadEmocional);
-    dibujarFilaCriterioPersonalidad("Nivel de ansiedad y Tendencias", ["Caso", "No Caso"], datos.nivelAnsiedad);
-    dibujarFilaCriterioPersonalidad("Consumo de Alcohol", ["Caso", "No Caso"], datos.consumoAlcohol);
-    dibujarFilaCriterioPersonalidad("Fobia a la altura", ["Nada", "Ligeramente", "Moderadamente", "Marcadamente", "Miedo Extremo"], datos.fobiaAltura);
-
-    // Línea inferior del bloque de Aspectos Personalidad
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   }
+
+  // === ASPECTOS DE PERSONALIDAD (siempre: para OHLA y para el resto) ===
+  doc.setFillColor(220, 220, 220);
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Aspectos Personalidad", tablaInicioX + 2, yPos + 4);
+  yPos += filaAltura;
+
+  const dibujarFilaCriterioPersonalidad = (texto, opciones, valor) => {
+    const numOpciones = opciones.length;
+    const anchoDisponible = tablaAncho - colCriterio;
+
+    let anchosColumnas;
+    if (numOpciones === 5 && texto === "Fobia a la altura") {
+      const anchoNada = 16;
+      const anchoResto = (anchoDisponible - anchoNada) / 4;
+      anchosColumnas = [anchoNada, anchoResto, anchoResto, anchoResto, anchoResto];
+    } else {
+      const colOpcion = anchoDisponible / numOpciones;
+      anchosColumnas = Array(numOpciones).fill(colOpcion);
+    }
+
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+    doc.line(tablaInicioX + colCriterio, yPos, tablaInicioX + colCriterio, yPos + filaAltura);
+
+    let xActual = tablaInicioX + colCriterio;
+    anchosColumnas.forEach((ancho) => {
+      xActual += ancho;
+      doc.line(xActual, yPos, xActual, yPos + filaAltura);
+    });
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.text(texto, tablaInicioX + 2, yPos + filaAltura / 2 + 2);
+
+    xActual = tablaInicioX + colCriterio;
+    opciones.forEach((opcion, index) => {
+      const colOpcion = anchosColumnas[index];
+      const esSeleccionada = valor && opcion.toLowerCase() === valor.toLowerCase();
+
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      const espacioParaX = 6;
+      const lineas = doc.splitTextToSize(opcion, colOpcion - espacioParaX - 2);
+      const alturaTotalTexto = lineas.length * 3;
+      const yTextoInicio = yPos + (filaAltura - alturaTotalTexto) / 2 + 2.5;
+
+      lineas.forEach((linea, idx) => {
+        doc.text(linea, xActual + 2, yTextoInicio + idx * 3);
+      });
+
+      if (esSeleccionada) {
+        doc.setFont("helvetica", "bold").setFontSize(11.3);
+        doc.setTextColor(0, 51, 204);
+        const xX = xActual + colOpcion - 3;
+        doc.text("X", xX, yPos + filaAltura / 2 + 1, { align: "right" });
+        doc.setTextColor(0, 0, 0);
+      }
+
+      xActual += colOpcion;
+    });
+
+    yPos += filaAltura;
+  };
+
+  dibujarFilaCriterioPersonalidad("Estabilidad emocional", ["Inestable", "Estable"], datos.estabilidadEmocional);
+  dibujarFilaCriterioPersonalidad("Nivel de ansiedad y Tendencias", ["Caso", "No Caso"], datos.nivelAnsiedad);
+  dibujarFilaCriterioPersonalidad("Consumo de Alcohol", ["Caso", "No Caso"], datos.consumoAlcohol);
+  dibujarFilaCriterioPersonalidad("Fobia a la altura", ["Nada", "Ligeramente", "Moderadamente", "Marcadamente", "Miedo Extremo"], datos.fobiaAltura);
+
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
 
   // === ANÁLISIS Y RESULTADOS ===
   // Verificar espacio antes de dibujar la sección
