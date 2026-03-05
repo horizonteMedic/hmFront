@@ -119,6 +119,7 @@ export default function PCRUltrasensible() {
             </SectionFieldset>
             <SectionFieldset legend="Resultados" className="grid grid-cols-1 gap-4">
 
+
               <div className="flex items-center gap-4">
                 <InputTextOneLine
                   label="PRC ULTRASENSIBLE (MÉTODO INMUNOTURBIDIMÉTRICO)"
