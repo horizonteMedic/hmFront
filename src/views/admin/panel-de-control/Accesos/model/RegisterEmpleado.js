@@ -20,14 +20,14 @@ export default async function NewEmpleado(form, userlogued) {
         celular: form.celular,
         telFijo: null,
         direccion: form.direccion,
-        estado: form.estado,
+        estado: form.activo,
         fechaNacimiento: form.startDate,
         fechaRegistro: `${year}-${month}-${day}`,
         userRegistro: userlogued,
         fechaActualizacion: null,
         userActualizacion: null
     }
-
+    console.log(data)
     const response = await fetch(`${URLAzure}/api/v01/st/empleado`, {
         method: 'POST',
         headers: {
