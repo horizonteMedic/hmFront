@@ -8,7 +8,7 @@ import DatosPersonalesLaborales from "../../../../../components/templates/DatosP
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
-import { SubmitDataService, VerifyTR } from "./controllerAptitudBrigadista";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAptitudBrigadista";
 
 const tabla = "certificado_aptitud_brigadista";
 const today = getToday();
@@ -77,7 +77,7 @@ const CertificadoAptitudBrigadista = () => {
 
     const handlePrint = () => {
         handlePrintDefault(() => {
-            //PrintHojaR(form.norden, token, tabla, datosFooter);
+            PrintHojaR(form.norden, token, tabla);
         });
     };
 

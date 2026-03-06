@@ -55,7 +55,6 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
 
       // EXAMEN
     resultado: res.resultado ? parseFloat(res.resultado).toFixed(2) : "",      
-    muestra: res.muestra ?? "",
     tipoExamen: res.tipoExamen ?? "",
 
       // USUARIOS
@@ -76,12 +75,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     const body = {
         codAb: form.codAb,
         fechaAb: form.fecha,
-
         resultado: form.resultado,
-        muestra: form.muestra,
-        examenDirecto: form.examenDirecto,
-        pruebaRapida: form.pruebaRapida,
-
         userRegistro: user,
         userMedicoOcup: "",
         nOrden: form.norden,
