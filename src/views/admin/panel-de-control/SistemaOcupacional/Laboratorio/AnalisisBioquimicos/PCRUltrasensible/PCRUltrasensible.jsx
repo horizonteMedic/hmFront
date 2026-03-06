@@ -38,7 +38,7 @@ export default function PCRUltrasensible() {
 
     resultado: "",
 
-    muestra: "",
+    muestra: "SUERO EN AYUNAS",
     examenDirecto: false,
 
     pruebaRapida: "",
@@ -113,8 +113,8 @@ export default function PCRUltrasensible() {
                     label='Muestra'
                     name="muestra"
                     value={form.muestra}
+                    disabled
                     labelWidth='120px'
-                    onChange={handleChange}
                 />
             </SectionFieldset>
             <SectionFieldset legend="Resultados" className="grid grid-cols-1 gap-4">

@@ -45,7 +45,7 @@ const CertificadoAptitudBrigadista = () => {
 
         nombre_doctorAsignado: "",
         user_doctorAsignado: "",
-
+        digitalizacion: [],
         nombre_doctorExtra: "",
         user_doctorExtra: "",
     };
@@ -125,6 +125,7 @@ const CertificadoAptitudBrigadista = () => {
                             value={form.nombre_medico}
                             label="Especialista"
                             form={form}
+                            setForm={setForm}
                             onChange={handleChangeSimple}
                         />
                         <EmpleadoComboBox

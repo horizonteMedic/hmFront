@@ -2,22 +2,20 @@ import Swal from "sweetalert2";
 import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
-    handleSubirArchivoDefault,
     LoadingDefault,
-    PrintHojaRDefault,
-    ReadArchivosFormDefault,
     SubmitDataServiceDefault,
     VerifyTRDefault,
+    PrintHojaRJsReportDefault
 } from "../../../../../utils/functionUtils";
-import { getFetch } from "../../../../../utils/apiHelpers";
-import { getHoraActual, getToday } from "../../../../../utils/helpers";
+
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
     "/api/v01/ct/certificadoAptitudBrigadista/obtenerReporte";
 const registrarUrl =
     "/api/v01/ct/certificadoAptitudBrigadista/registrarActualizar";
-
+const obtenerReporteJsReportUrl =
+    "/api/v01/ct/certificadoAptitudBrigadista/descargarReporte";
 
 export const GetInfoServicio = async (
     nro,
@@ -30,9 +28,7 @@ export const GetInfoServicio = async (
         token,
         sede
     );
-    console.log(res)
     if (res) {
-        console.log(res)
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
@@ -51,8 +47,10 @@ export const GetInfoServicio = async (
             // Campos usados por la interfaz principal
             cargoDesempenar: res.cargo ?? "",
             ocupacion: res.areaO ?? "",
-            usuarioFirma: res.user_medicoFirma,
-
+            user_medicoFirma: res.user_medicoFirma,
+            digitalizacion: res.digitalizacion && res.digitalizacion.length > 0 
+                ? res.digitalizacion 
+                : prev.digitalizacion // Mantiene la del médico logueado si existe
         }));
     }
 };
@@ -73,7 +71,6 @@ export const GetInfoServicioEditar = async (
         true
     );
     if (res) {
-        console.log(res)
         set((prev) => ({
             ...prev,
             // Header
@@ -101,58 +98,57 @@ export const GetInfoServicioEditar = async (
             restricciones: res.restricciones ?? "",
             recomendaciones: res.recomendaciones ?? "",
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+            // CORRECCIÓN: Guardamos la firma recibida en el estado
+            digitalizacion: res.digitalizacion ?? [], 
             user_doctorAsignado: res.doctorAsignado,
         }));
     }
 };
-
 
 export const SubmitDataService = async (
     form,
     token,
     user,
     limpiar,
-    tabla,
-    datosFooter
+    tabla
 ) => {
     if (!form.norden) {
-        await Swal.fire("Error", "Datos Incompletos", "error");
+        await Swal.fire("Error", "Datos Incompletos: El N° de Orden es obligatorio.", "error");
         return;
     }
+
     const body = {
         "norden": form.norden,
         "fechaExamen": form.fechaExam,
         "conclusiones": form.conclusiones,
-        "apto": form.aptitud === "APTO" ? true : false,
-        "noApto": form.aptitud === "NOAPTO" ? true : false,
+        "apto": form.aptitud === "APTO",
+        "noApto": form.aptitud === "NOAPTO",
         "restricciones": form.restricciones,
         "recomendaciones": form.recomendaciones,
-        "userRegistor": form.userlogued,
-        usuarioFirma: form.user_medicoFirma,
+        // CORRECCIÓN: Usamos el parámetro 'user' que es el 'userlogued' del componente
+        "userRegistor": user, 
+        "usuarioFirma": form.user_medicoFirma,
         "doctorAsignado": form.user_doctorAsignado,
+        // CORRECCIÓN: Enviamos la digitalización que está en el formulario
+        "digitalizacion": form.digitalizacion || [] 
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden, token, tabla, datosFooter);
+        PrintHojaR(form.norden, token, tabla);
     });
 };
 
-export const GetInfoServicioTabla = (nro, tabla, set, token) => {
-    GetInfoServicio(nro, tabla, set, token, () => {
-        Swal.close();
-    });
+export const GetInfoServicioTabla = (nro, set, token, sede) => {
+    GetInfoServicio(nro, set, token, sede);
+    Swal.close();
 };
 
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../jaspers/AptitupAlturaPoderosa/*.jsx");
-    PrintHojaRDefault(
+export const PrintHojaR = (nro, token, tabla) => {
+    PrintHojaRJsReportDefault(
         nro,
         token,
         tabla,
-        datosFooter,
-        obtenerReporteUrl,
-        jasperModules,
-        "../../../../../jaspers/AptitupAlturaPoderosa"
+        obtenerReporteJsReportUrl
     );
 };
 
@@ -187,7 +183,6 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         }
     );
 };
-
 
 export const Loading = (mensaje) => {
     LoadingDefault(mensaje);
