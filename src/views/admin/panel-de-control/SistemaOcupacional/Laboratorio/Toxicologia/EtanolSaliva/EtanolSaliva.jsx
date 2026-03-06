@@ -122,7 +122,7 @@ export default function EtanolSaliva() {
           {/* 1. Label de la prueba y el input (Cajita) */}
           <div className="flex-grow">
             <InputTextOneLine
-              label="PCR ULTRASENSIBLE (MÉTODO INMUNOTURBIDIMÉTRICO) :"
+              label="PRUEBA RÁPIDA EN TIRA DE ALCOHOL EN SALIVA (MONTEST)"
               name="resultado"
               value={form.resultado}
               labelWidth="400px" // Espacio suficiente para el nombre largo de la prueba
