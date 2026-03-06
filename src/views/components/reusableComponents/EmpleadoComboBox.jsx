@@ -8,7 +8,8 @@ export default function EmpleadoComboBox({
     className = "",
     label = "Médico que Certifica",
     nameField = "nombre_medico",
-    idField = "user_medicoFirma"
+    idField = "user_medicoFirma",
+    truelabel = true
 }) {
     const { listaEmpleados: empleados } = useSessionData();
     const safeEmpleados = empleados || [];
@@ -141,7 +142,7 @@ export default function EmpleadoComboBox({
 
     return (
         <div className={className}>
-            <label className="block font-semibold mb-1">{label} :</label>
+            {truelabel && <label className="block font-semibold mb-1">{label} :</label>}
             <div className="relative flex-grow flex items-center">
                 <input
                     id={nameField}

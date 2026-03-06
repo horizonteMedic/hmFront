@@ -6,10 +6,12 @@ import SectionFieldset from "../../../../../components/reusableComponents/Sectio
 import BotonesAccion from "../../../../../components/templates/BotonesAccion";
 import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
 import { useForm } from "../../../../../hooks/useForm";
+import useRealTime from "../../../../../hooks/useRealTime";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
+import { SubmitDataService, VerifyTR } from "./controllerHojaRutaEmo";
 
-const tabla = "certificado_aptitud_brigadista";
+const tabla = "hoja_ruta_emo";
 const today = getToday();
 
 const HojaDeRutaEmo = () => {
@@ -17,7 +19,7 @@ const HojaDeRutaEmo = () => {
     const initialFormState = {
         // Header
         norden: "",
-        fechaExam: today,
+        fechaExamen: today,
         tipoExamen: "",
         // Datos personales
         dni: "",
@@ -34,10 +36,40 @@ const HojaDeRutaEmo = () => {
         contrata: "",
         ocupacion: "",
         cargoDesempenar: "",
-        aptitud: "",
-        conclusiones: "",
-        restricciones: "",
-        recomendaciones: "",
+
+        //EXAMENES
+
+        usuarioEvaluacionMedica: "",
+        observacionesEvaluacionMedica: "",
+        //psicologica
+        usuarioInformeBrigadista: "",
+        observacionInformeBrigadista: "",
+        //Visual
+        usuarioEvaluacionOftalmologica: "",
+        observacionesEvaluacionVisual: "",
+        //Audiometria
+        usuarioAudiometria: "",
+        observacionAudiometria: "",
+        //Espirometria
+        usuarioEspirometria: "",
+        observacionEspirometria: "",
+        //Radiografia de torax
+        usuarioToraxConvencional: "",
+        observacionRadiografiaTorax: "",
+        //Cardiologia
+        usuarioElectrocardiograma: "",
+        observacionesElectrocardiograma: "",
+        //Laboratorio
+        usuarioExamenLaboratorio: "",
+        observacionesExamenLaboratorio: "",
+        //Brigadista
+        usuarioCertificadoAptitudBrigadista: "",
+        observacionBrigadista: "",
+        //horas
+        observacionesGenerales: "",
+        horaEntrada: "",
+        horaSalida: useRealTime(),
+
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
@@ -64,13 +96,13 @@ const HojaDeRutaEmo = () => {
     } = useForm(initialFormState, { storageKey: "CertificadoAptitudBrigadista" });
 
     const handleSave = () => {
-        //SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
             handleClearnotO();
-            //VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
         }
     };
 
@@ -94,12 +126,13 @@ const HojaDeRutaEmo = () => {
                 />
                 <InputTextOneLine
                     label="Fecha de Ingreso"
-                    name="fechaExam"
+                    name="fechaExamen"
                     type="date"
-                    value={form.fechaExam}
+                    value={form.fechaExamen}
                     onChange={handleChangeSimple}
                     labelWidth="120px"
                 />
+
 
             </SectionFieldset>
 
@@ -110,97 +143,82 @@ const HojaDeRutaEmo = () => {
                 <label className="text-center text-lg" htmlFor="">EXÁMENES</label>
                 <label className="text-center text-lg" htmlFor="">PRUEBAS REALIZADAS POR</label>
                 <label className="text-center text-lg" htmlFor="">OBSERVACIONES</label>
-                <h1 className="font-bold text-lg text-center">TRIAJE</h1>
 
-                <InputTextOneLine
-                    name="fechaExam"
-                    type="text"
-                    value={form.triaje2}
-                    onChange={handleChangeSimple}
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    name="fechaExam"
-                    type="text"
-                    value={form.triaje2}
-                    onChange={handleChangeSimple}
-                    labelWidth="120px"
-                />
                 <div className="grid grid-cols-3 gap-x-4 gap-y-3">
                     <InputTextOneLine
                         label="PESO"
-                        name="fechaExam"
+                        name="peso"
                         type="text"
-                        value={form.triaje2}
-                        onChange={handleChangeSimple}
+                        value={form.peso}
                         labelWidth="34px"
+                        disabled
                     />
                     <InputTextOneLine
                         label="TALLA"
-                        name="fechaExam"
+                        name="talla"
                         type="text"
-                        value={form.triaje2}
-                        onChange={handleChangeSimple}
+                        value={form.talla}
+                        disabled
                         labelWidth="36px"
                     />
                     <InputTextOneLine
                         label="P/A"
-                        name="fechaExam"
+                        name="pa"
                         type="text"
-                        value={form.triaje2}
-                        onChange={handleChangeSimple}
+                        value={form.pa}
+                        disabled
                         labelWidth="35px"
                     />
                 </div>
                 <div className="grid grid-cols-3 gap-x-4 gap-y-3">
                     <InputTextOneLine
                         label="SAT02"
-                        name="fechaExam"
+                        name="sat02"
                         type="text"
-                        value={form.triaje2}
-                        onChange={handleChangeSimple}
+                        value={form.sat02}
+                        disabled
                         labelWidth="38px"
                     />
                     <InputTextOneLine
                         label="CINTURA"
-                        name="fechaExam"
+                        name="cintura"
                         type="text"
-                        value={form.triaje2}
-                        onChange={handleChangeSimple}
+                        value={form.cintura}
+                        disabled
                         labelWidth="55px"
                     />
                     <InputTextOneLine
                         label="CADERA"
-                        name="fechaExam"
+                        name="cadera"
                         type="text"
-                        value={form.triaje2}
-                        onChange={handleChangeSimple}
+                        value={form.cadera}
+                        disabled
                         labelWidth="55px"
                     />
                 </div>
                 <div className="grid grid-cols-3 gap-x-4 gap-y-3">
                     <InputTextOneLine
                         label="FC"
-                        name="fechaExam"
+                        name="fc"
                         type="text"
-                        value={form.triaje2}
-                        onChange={handleChangeSimple}
+                        value={form.fc}
+                        disabled
                         labelWidth="34px"
                     />
                     <InputTextOneLine
                         label="FR"
-                        name="fechaExam"
+                        name="fr"
                         type="text"
-                        value={form.triaje2}
-                        onChange={handleChangeSimple}
+                        value={form.fr}
+                        disabled
                         labelWidth="36px"
                     />
                     <InputTextOneLine
                         label="CUELLO"
-                        name="fechaExam"
+                        name="cuello"
                         type="text"
-                        value={form.triaje2}
-                        onChange={handleChangeSimple}
+                        value={form.cuello}
+                        disabled
                         labelWidth="45px"
                     />
                 </div>
@@ -211,16 +229,17 @@ const HojaDeRutaEmo = () => {
                 </h1>
 
                 <InputTextOneLine
-                    name="fechaExam"
-                    type="text"
-                    value={form.triaje2}
+                    truelabel={false}
+                    value={form.usuarioEvaluacionMedica}
+                    form={form}
                     onChange={handleChangeSimple}
-                    labelWidth="120px"
+                    disabled
                 />
                 <InputTextOneLine
-                    name="fechaExam"
+                    name="observacionesEvaluacionMedica"
+                    disabled
                     type="text"
-                    value={form.triaje2}
+                    value={form.observacionesEvaluacionMedica}
                     onChange={handleChangeSimple}
                     labelWidth="120px"
                 />
@@ -232,16 +251,17 @@ const HojaDeRutaEmo = () => {
                 </h1>
 
                 <InputTextOneLine
-                    name="fechaExam"
-                    type="text"
-                    value={form.triaje2}
+                    truelabel={false}
+                    disabled
+                    value={form.usuarioInformeBrigadista}
+                    form={form}
                     onChange={handleChangeSimple}
-                    labelWidth="120px"
                 />
                 <InputTextOneLine
-                    name="fechaExam"
+                    name="observacionInformeBrigadista"
+                    disabled
                     type="text"
-                    value={form.triaje2}
+                    value={form.observacionInformeBrigadista}
                     onChange={handleChangeSimple}
                     labelWidth="120px"
                 />
@@ -254,16 +274,17 @@ const HojaDeRutaEmo = () => {
                 </h1>
 
                 <InputTextOneLine
-                    name="fechaExam"
-                    type="text"
-                    value={form.triaje2}
+                    truelabel={false}
+                    disabled
+                    value={form.usuarioEvaluacionOftalmologica}
+                    form={form}
                     onChange={handleChangeSimple}
-                    labelWidth="120px"
                 />
                 <InputTextOneLine
-                    name="fechaExam"
+                    name="observacionesEvaluacionVisual"
+                    disabled
                     type="text"
-                    value={form.triaje2}
+                    value={form.observacionesEvaluacionVisual}
                     onChange={handleChangeSimple}
                     labelWidth="120px"
                 />
@@ -275,16 +296,17 @@ const HojaDeRutaEmo = () => {
                 </h1>
 
                 <InputTextOneLine
-                    name="fechaExam"
-                    type="text"
-                    value={form.triaje2}
+                    truelabel={false}
+                    value={form.usuarioAudiometria}
+                    form={form}
                     onChange={handleChangeSimple}
-                    labelWidth="120px"
+                    disabled
                 />
                 <InputTextOneLine
-                    name="fechaExam"
+                    name="observacionAudiometria"
+                    disabled
                     type="text"
-                    value={form.triaje2}
+                    value={form.observacionAudiometria}
                     onChange={handleChangeSimple}
                     labelWidth="120px"
                 />
@@ -296,16 +318,17 @@ const HojaDeRutaEmo = () => {
                 </h1>
 
                 <InputTextOneLine
-                    name="fechaExam"
-                    type="text"
-                    value={form.triaje2}
+                    truelabel={false}
+                    value={form.usuarioEspirometria}
+                    form={form}
                     onChange={handleChangeSimple}
-                    labelWidth="120px"
+                    disabled
                 />
                 <InputTextOneLine
-                    name="fechaExam"
+                    name="observacionEspirometria"
+                    disabled
                     type="text"
-                    value={form.triaje2}
+                    value={form.observacionEspirometria}
                     onChange={handleChangeSimple}
                     labelWidth="120px"
                 />
@@ -317,16 +340,17 @@ const HojaDeRutaEmo = () => {
                 </h1>
 
                 <InputTextOneLine
-                    name="fechaExam"
-                    type="text"
-                    value={form.triaje2}
+                    truelabel={false}
+                    value={form.usuarioToraxConvencional}
+                    form={form}
                     onChange={handleChangeSimple}
-                    labelWidth="120px"
+                    disabled
                 />
                 <InputTextOneLine
-                    name="fechaExam"
+                    name="observacionRadiografiaTorax"
+                    disabled
                     type="text"
-                    value={form.triaje2}
+                    value={form.observacionRadiografiaTorax}
                     onChange={handleChangeSimple}
                     labelWidth="120px"
                 />
@@ -338,36 +362,38 @@ const HojaDeRutaEmo = () => {
                 </h1>
 
                 <InputTextOneLine
-                    name="fechaExam"
-                    type="text"
-                    value={form.triaje2}
+                    truelabel={false}
+                    disabled
+                    value={form.usuarioElectrocardiograma}
+                    form={form}
                     onChange={handleChangeSimple}
-                    labelWidth="120px"
                 />
                 <InputTextOneLine
-                    name="fechaExam"
+                    name="observacionesElectrocardiograma"
+                    disabled
                     type="text"
-                    value={form.triaje2}
+                    value={form.observacionesElectrocardiograma}
                     onChange={handleChangeSimple}
                     labelWidth="120px"
                 />
 
-                {/* */}
+                {/* LABORATIOR*/}
                 <h1 className="font-bold text-lg text-center">EXÁMENES DE LABORATORIO
 
                 </h1>
 
                 <InputTextOneLine
-                    name="fechaExam"
-                    type="text"
-                    value={form.triaje2}
+                    truelabel={false}
+                    value={form.usuarioExamenLaboratorio}
+                    form={form}
                     onChange={handleChangeSimple}
-                    labelWidth="120px"
+                    disabled
                 />
                 <InputTextOneLine
-                    name="fechaExam"
+                    name="observacionesExamenLaboratorio"
                     type="text"
-                    value={form.triaje2}
+                    disabled
+                    value={form.observacionesExamenLaboratorio}
                     onChange={handleChangeSimple}
                     labelWidth="120px"
                 />
@@ -379,32 +405,44 @@ const HojaDeRutaEmo = () => {
                 </h1>
 
                 <InputTextOneLine
-                    name="fechaExam"
-                    type="text"
-                    value={form.triaje2}
+                    className="flex justify-center items-center"
+                    truelabel={false}
+                    disabled
+                    value={form.usuarioCertificadoAptitudBrigadista}
+                    form={form}
                     onChange={handleChangeSimple}
-                    labelWidth="120px"
                 />
                 <InputTextOneLine
-                    name="fechaExam"
+                    name="observacionBrigadista"
                     type="text"
-                    value={form.triaje2}
+                    disabled
+                    value={form.observacionBrigadista}
                     onChange={handleChangeSimple}
                     labelWidth="120px"
                 />
 
             </SectionFieldset>
 
-            <SectionFieldset legend="Conclusiones">
+            <SectionFieldset legend="Conclusiones" className="gap-x-4 gap-y-3">
                 <InputTextArea
                     label="Conclusiones"
-                    name="fechaExam"
+                    name="observacionesGenerales"
                     type="text"
                     rows={3}
-                    value={form.triaje2}
-                    onChange={handleChangeSimple}
+                    value={form.observacionesGenerales}
+                    onChange={handleChange}
                     labelWidth="120px"
                 />
+                <div className="w-full flex justify-between">
+                    {form.horaEntrada && <div className="flex gap-2 items-center justify-center">
+                        <label htmlFor="">HORA ENTRADA:</label>
+                        <h1 className="text-lg font-bold">{form.horaEntrada}</h1>
+                    </div>}
+                    <div className="flex gap-2 items-center justify-center">
+                        <label htmlFor="">HORA SALIDA:</label>
+                        <h1 className="text-lg font-bold">{form.horaSalida}</h1>
+                    </div>
+                </div>
             </SectionFieldset>
 
             <SectionFieldset legend="Asignación de Médico" className="w-full">
