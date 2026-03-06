@@ -2,19 +2,16 @@ import Swal from "sweetalert2";
 import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
-    handleSubirArchivoDefault,
     LoadingDefault,
-    PrintHojaRDefault,
-    ReadArchivosFormDefault,
+    PrintHojaRJsReportDefault,
     SubmitDataServiceDefault,
     VerifyTRDefault,
 } from "../../../../../utils/functionUtils";
-import { getFetch } from "../../../../../utils/apiHelpers";
-import { getHoraActual, getToday } from "../../../../../utils/helpers";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
     "/api/v01/ct/certificadoAptitudBrigadista/obtenerReporte";
+const obtenerReporteJsReportUrl = "/api/v01/ct/certificadoAptitudBrigadista/descargarReporte";
 const registrarUrl =
     "/api/v01/ct/certificadoAptitudBrigadista/registrarActualizar";
 
@@ -143,19 +140,14 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
     });
 };
 
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../jaspers/AptitupAlturaPoderosa/*.jsx");
-    PrintHojaRDefault(
+export const PrintHojaR = (nro, token, tabla) => {
+    PrintHojaRJsReportDefault(
         nro,
         token,
         tabla,
-        datosFooter,
-        obtenerReporteUrl,
-        jasperModules,
-        "../../../../../jaspers/AptitupAlturaPoderosa"
+        obtenerReporteJsReportUrl
     );
 };
-
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
     VerifyTRDefault(
         nro,
