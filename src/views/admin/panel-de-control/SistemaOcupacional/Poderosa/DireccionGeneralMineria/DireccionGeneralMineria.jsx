@@ -12,10 +12,9 @@ import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerDireccionGe
 import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
 
 const tabla = "ministerio_energia_minas";
-const today = getToday();
 
-const DirecionGeneralMineria = () => {
-
+export default function DirecionGeneralMineria() {
+    const today = getToday();
     const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
     const initialFormState = {
         // Header
@@ -120,13 +119,11 @@ const DirecionGeneralMineria = () => {
         setForm,
         handleChange,
         handleChangeNumber,
-        handleRadioButton,
         handleRadioButtonBoolean,
         handleClear,
         handleChangeSimple,
         handleClearnotO,
         handlePrintDefault,
-        handleChangeNumberDecimals,
     } = useForm(initialFormState, { storageKey: "DireccionGeneralMineria" });
 
     const handleSave = () => {
@@ -200,21 +197,21 @@ const DirecionGeneralMineria = () => {
                     label="Color de Piel"
                     name="colorPiel"
                     value={form.colorPiel}
-                    onChange={handleChangeSimple}
+                    onChange={handleChange}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
                     label="Color de Ojos"
                     name="colorOjos"
                     value={form.colorOjos}
-                    onChange={handleChangeSimple}
+                    onChange={handleChange}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
                     label="Cabello"
                     name="cabello"
                     value={form.cabello}
-                    onChange={handleChangeSimple}
+                    onChange={handleChange}
                     labelWidth="120px"
                 />
 
@@ -222,7 +219,6 @@ const DirecionGeneralMineria = () => {
 
             <div className="grid xl:grid-cols-2 gap-x-4 gap-y-3">
                 <SectionFieldset legend="FACTORES HEREDITARIOS">
-
                     <RadioTable
                         items={[
                             { name: "asma", label: "1.- Asma" },
@@ -288,35 +284,35 @@ const DirecionGeneralMineria = () => {
                             label="Pulso en Reposo"
                             name="pulsoReposo"
                             value={form.pulsoReposo}
-                            onChange={handleChangeSimple}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="B.P."
                             name="pulsoReposoBp"
                             value={form.pulsoReposoBp}
-                            onChange={handleChangeSimple}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Despues de 30 flexiones en 60 seg"
                             name="pulso30flexiones"
                             value={form.pulso30flexiones}
-                            onChange={handleChangeSimple}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Respiracion en reposo"
                             name="respiracionReposo"
                             value={form.respiracionReposo}
-                            onChange={handleChangeSimple}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Despues de 30 flexiones en 60 seg"
                             name="respiracion30flexiones"
                             value={form.respiracion30flexiones}
-                            onChange={handleChangeSimple}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
                         <InputsBooleanRadioGroup
@@ -332,14 +328,14 @@ const DirecionGeneralMineria = () => {
                             label="Forma del pecho"
                             name="formaPecho"
                             value={form.formaPecho}
-                            onChange={handleChangeSimple}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Expansión del pecho Normal"
                             name="expansionPecho"
                             value={form.expansionPecho}
-                            onChange={handleChangeSimple}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
 
@@ -350,7 +346,7 @@ const DirecionGeneralMineria = () => {
                             name="pulmones"
                             type="text"
                             value={form.pulmones}
-                            onChange={handleChangeSimple}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
@@ -364,7 +360,7 @@ const DirecionGeneralMineria = () => {
                             label="Enfermedades Cronicas"
                             name="enfermedadesCronicas"
                             value={form.enfermedadesCronicas}
-                            onChange={handleChangeSimple}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
                         <div className="grid lg:grid-cols-2 gap-x-4 gap-y-3">
@@ -431,28 +427,28 @@ const DirecionGeneralMineria = () => {
                             label="Pecho Normal"
                             name="pechoNormal"
                             value={form.pechoNormal}
-                            onChange={handleChangeSimple}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="T.B.C."
                             name="tbcRayosX"
                             value={form.tbcRayosX}
-                            onChange={handleChangeSimple}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Pneumoconiosis"
                             name="pneumoconiosis"
                             value={form.pneumoconiosis}
-                            onChange={handleChangeSimple}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Clasificacion de la OIT (1980)"
                             name="clasificacionOit"
                             value={form.clasificacionOit}
-                            onChange={handleChangeSimple}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
 
@@ -470,14 +466,14 @@ const DirecionGeneralMineria = () => {
                             name="corazonRayosX"
                             type="text"
                             value={form.corazonRayosX}
-                            onChange={handleChangeSimple}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Otros Cambios"
                             name="otrosCambios"
                             value={form.otrosCambios}
-                            onChange={handleChangeSimple}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
@@ -491,7 +487,7 @@ const DirecionGeneralMineria = () => {
                 </SectionFieldset>
             </SectionFieldset>
 
-            <SectionFieldset legend="Opinioes" className="grid grid-cols-1  gap-x-4 gap-y-3">
+            <SectionFieldset legend="Opiniones" className="grid grid-cols-1  gap-x-4 gap-y-3">
                 <div className="grid grid-cols-3 gap-x-4 gap-y-3">
                     <InputTextOneLine
                         label="Pecho Normal"
@@ -505,12 +501,12 @@ const DirecionGeneralMineria = () => {
                         name="hallazgosAnormales"
                         value={form.hallazgosAnormales}
                         labelWidth="120px"
-                        onChange={handleChangeSimple}
+                        onChange={handleChange}
                     />
                     <InputTextOneLine
                         label="Clasificacion de la OIT (1980)"
                         name="clasificacionOit"
-                        onChange={handleChangeSimple}
+                        onChange={handleChange}
                         value={form.clasificacionOit}
                         labelWidth="120px"
                     />
@@ -520,7 +516,7 @@ const DirecionGeneralMineria = () => {
                     label="OPINION CLINICA (solo si difiere del examen medico)"
                     name="opinionClinica"
                     rows={2}
-                    onChange={handleChangeSimple}
+                    onChange={handleChange}
                     value={form.opinionClinica}
                     labelWidth="120px"
                 />
@@ -544,10 +540,6 @@ const DirecionGeneralMineria = () => {
                     idField="user_doctorAsignado"
                 />
             </SectionFieldset>
-
-
-
-
             {/* BOTONES DE ACCIÓN */}
             <BotonesAccion
                 form={form}
@@ -559,4 +551,3 @@ const DirecionGeneralMineria = () => {
     )
 }
 
-export default DirecionGeneralMineria
