@@ -66,7 +66,7 @@ export const GetInfoServicioEditar = async (
         tabla,
         token,
         obtenerReporteUrl,
-        onFinish,true
+        onFinish
     );
     if (res) {
         set((prev) => ({
