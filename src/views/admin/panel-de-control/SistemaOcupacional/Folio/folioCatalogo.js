@@ -29,12 +29,12 @@ export const EXAMENES_CATALOGO = {
         esJasper: true
     },
 
-    CERTIFICADO_ANEXO_02: {
-        nombre: "CERTIFICADO MEDICO OCUPACIONAL ANEXO 02",
-        tabla: "aptitud_medico_ocupacional_agro",
-        url: "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2",
-        esJasper: true,
-    },
+    // CERTIFICADO_ANEXO_02: {
+    //     nombre: "CERTIFICADO MEDICO OCUPACIONAL ANEXO 02",
+    //     tabla: "aptitud_medico_ocupacional_agro",
+    //     url: "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2",
+    //     esJasper: true,
+    // },
 
     CERTIFICADO_APTITUD_ANEXO_16: {
         nombre: "CERTIFICADO DE APTITUD ANEXO 16",
@@ -195,6 +195,13 @@ export const EXAMENES_CATALOGO = {
         nombre: "ETANOL EN SALIVA",
         tabla: "etanol_saliva",
         urlJsreport: "/api/v01/ct/etanolSaliva/descargarReporte",
+        esJsreport: true,
+    },
+
+    CERTIFICADO_ANEXO_02: {
+        nombre: "CERTIFICADO MEDICO OCUPACIONAL ANEXO 02",
+        tabla: "aptitud_medico_ocupacional_agro",
+        urlJsreport: "/api/v01/ct/anexos/fichaAnexo2/descargarReporteFichaAnexo2",
         esJsreport: true,
     },
 

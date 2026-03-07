@@ -12,7 +12,7 @@ import { getHoraActual } from "../../../../../utils/helpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/hojaRutaEmo/obtenerReporteHojaRuta";
-const obtenerReporteJsReportUrl = "/api/v01/ct/certificadoAptitudBrigadista/descargarReporte";
+const obtenerReporteJsReportUrl = "/api/v01/ct/hojaRutaEmo/descargarReporteHojaRuta";
 const registrarUrl =
     "/api/v01/ct/hojaRutaEmo/registrarActualizar";
 

@@ -1,5 +1,4 @@
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
-import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
 import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine"
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset"
@@ -9,12 +8,12 @@ import { useForm } from "../../../../../hooks/useForm";
 import useRealTime from "../../../../../hooks/useRealTime";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
-import { SubmitDataService, VerifyTR } from "./controllerHojaRutaEmo";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerHojaRutaEmo";
 
 const tabla = "hoja_ruta_emo";
-const today = getToday();
 
 const HojaDeRutaEmo = () => {
+    const today = getToday();
     const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
     const initialFormState = {
         // Header
@@ -108,7 +107,7 @@ const HojaDeRutaEmo = () => {
 
     const handlePrint = () => {
         handlePrintDefault(() => {
-            //PrintHojaR(form.norden, token, tabla, datosFooter);
+            PrintHojaR(form.norden, token, tabla, datosFooter);
         });
     };
 

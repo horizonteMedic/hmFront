@@ -130,7 +130,7 @@ export const reportesMap = {
       ficha_antecedente_patologico_boro
    },
 
-   aptitud_medico_ocupacional_agro: Aptitud_AgroindustrialH,
+   // aptitud_medico_ocupacional_agro: Aptitud_AgroindustrialH,
 
    certificado_aptitud_medico_ocupacional: {
       Aptitud_medico_ocupacional_11,
