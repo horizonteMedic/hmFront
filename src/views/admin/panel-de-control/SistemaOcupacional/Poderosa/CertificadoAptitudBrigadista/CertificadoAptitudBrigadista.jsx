@@ -139,7 +139,7 @@ const CertificadoAptitudBrigadista = () => {
                 </div>
 
                 <div className="w-[60%]  ">
-                    <SectionFieldset legend="Txtos finales" className="w-full space-y-3">
+                    <SectionFieldset legend="Conclusiones y Observaciones" className="w-full space-y-3">
                         <InputTextArea
                             label="Conclusiones"
                             name="conclusiones"

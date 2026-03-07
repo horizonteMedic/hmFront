@@ -8,7 +8,7 @@ import DatosPersonalesLaborales from "../../../../../components/templates/DatosP
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
-import { SubmitDataService, VerifyTR } from "./controllerDireccionGeneralMineria";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerDireccionGeneralMineria";
 import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
 
 const tabla = "ministerio_energia_minas";
@@ -142,7 +142,7 @@ const DirecionGeneralMineria = () => {
 
     const handlePrint = () => {
         handlePrintDefault(() => {
-            //PrintHojaR(form.norden, token, tabla, datosFooter);
+            PrintHojaR(form.norden, token, tabla, datosFooter);
         });
     };
 

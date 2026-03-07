@@ -11,7 +11,7 @@ import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
     "/api/v01/ct/ministerioEnergiaMinas/obtenerReporte";
-const obtenerReporteJsReportUrl = "/api/v01/ct/certificadoAptitudBrigadista/descargarReporte";
+const obtenerReporteJsReportUrl = "/api/v01/ct/ministerioEnergiaMinas/descargarReporteMinisterioEnergiaMinas";
 const registrarUrl =
     "/api/v01/ct/ministerioEnergiaMinas/registrarActualizar";
 
