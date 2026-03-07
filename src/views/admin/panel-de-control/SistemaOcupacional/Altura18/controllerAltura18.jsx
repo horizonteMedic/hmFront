@@ -92,6 +92,8 @@ export const GetInfoServicio = async (
             ...prev,
             norden: res.norden ?? "",
 
+            tituloExamen: res.tituloExamen ?? "CERTIFICACIÓN MEDICA PREVIA A TRABAJO DE ALTURA",
+
             codigoCertificadoAltura: null,
             aniosExperiencia: res.tiempoExperiencia ?? "",
 
@@ -303,6 +305,7 @@ export const SubmitDataService = async (
     }
     const body = {
         norden: form.norden,
+        tituloExamen: form.tituloExamen,
         codigoCertificadoAltura: form.codigoCertificadoAltura,
         fechaCertificacion: form.fecha,
         primeraActitud: form.examen == "PRIMERA ACTITUD",

@@ -17,16 +17,16 @@ import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerCAHerramien
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "certificado_aptitud_herramientas_manuales";
-const today = getToday();
 
 export default function CAHerramientasManuales() {
-
+  const today = getToday();
   const { token, userlogued, selectedSede, datosFooter, userName } =
     useSessionData();
 
   const initialFormState = {
     // Header - Campos principales
     norden: "",
+    tituloExamen: "CERTIFICADO DE APTITUD PARA USO DE HERRAMIENTAS MANUALES",
     idCertificado: null,
     fechaExam: today,
     fechahasta: getTodayPlusOneYear(),
@@ -101,6 +101,22 @@ export default function CAHerramientasManuales() {
             value={form?.nombreExamen}
             disabled
           />
+          <div className="flex gap-4 items-center ">
+            <h4 className="font-semibold min-w-[120px] max-w-[120px] text-primario">Título del Examen :</h4>
+            <select
+              name="tituloExamen"
+              value={form.tituloExamen}
+              onChange={handleChangeSimple}
+              className="border rounded px-2 py-1 text-base w-full"
+            >
+              <option value="CERTIFICADO DE APTITUD PARA USO DE HERRAMIENTAS MANUALES">
+                CERTIFICADO DE APTITUD PARA USO DE HERRAMIENTAS MANUALES
+              </option>
+              <option value="CERTIFICADO DE ESPACIOS CONFINADOS">
+                CERTIFICADO DE ESPACIOS CONFINADOS
+              </option>
+            </select>
+          </div>
           <InputTextOneLine
             label="Fecha Examen"
             name="fechaExam"

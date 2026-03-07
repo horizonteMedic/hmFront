@@ -53,7 +53,10 @@ export default async function Certificado_Aptitud_Herramientas_Manuales_Digitali
     // Datos para observaciones
     observaciones: data.observacion || data.observaciones || "",
     // Datos para fechas
-    fechaCaducidad: formatearFechaCorta(data.fechaCaducidad || data.fechaHasta)
+    fechaCaducidad: formatearFechaCorta(data.fechaCaducidad || data.fechaHasta),
+
+    // Datos para titulo examen
+    tituloExamen: String(data.tituloExamen || ""),
   };
 
   // Usar solo datos reales
@@ -68,7 +71,7 @@ export default async function Certificado_Aptitud_Herramientas_Manuales_Digitali
     if (pageNumber === 1) {
       doc.setFont("helvetica", "bold").setFontSize(12);
       doc.setTextColor(0, 0, 0);
-      doc.text("CERTIFICADO DE APTITUD PARA USO DE HERRAMIENTAS MANUALES", pageW / 2, 40, { align: "center" });
+      doc.text(datosFinales.tituloExamen, pageW / 2, 40, { align: "center" });
 
     }
 
@@ -543,19 +546,19 @@ export default async function Certificado_Aptitud_Herramientas_Manuales_Digitali
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });
-    if (docExistente) {
-      return doc;
-    } else {
-      imprimir(doc);
-    }
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
   }
-  
-  function imprimir(doc) {
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    iframe.onload = () => iframe.contentWindow.print();
+}
+
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
 }
