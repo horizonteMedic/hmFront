@@ -114,6 +114,7 @@ export default function DirecionGeneralMineria() {
         handleChange,
         handleChangeNumber,
         handleRadioButtonBoolean,
+        handleFocusNext,
         handleClear,
         handleChangeSimple,
         handleClearnotO,
@@ -140,7 +141,7 @@ export default function DirecionGeneralMineria() {
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
             {/* ===== SECCIÓN: N° ORDEN Y FECHA ===== */}
-            <SectionFieldset legend="Información General" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
+            <SectionFieldset legend="Información General" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
                 <InputTextOneLine
                     label="N° Orden"
                     name="norden"
@@ -192,6 +193,7 @@ export default function DirecionGeneralMineria() {
                     name="colorPiel"
                     value={form.colorPiel}
                     onChange={handleChange}
+                    onKeyUp={handleFocusNext}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
@@ -199,6 +201,7 @@ export default function DirecionGeneralMineria() {
                     name="colorOjos"
                     value={form.colorOjos}
                     onChange={handleChange}
+                    onKeyUp={handleFocusNext}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
@@ -286,6 +289,7 @@ export default function DirecionGeneralMineria() {
                             name="pulsoReposoBp"
                             value={form.pulsoReposoBp}
                             onChange={handleChange}
+                            onKeyUp={handleFocusNext}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
@@ -293,13 +297,15 @@ export default function DirecionGeneralMineria() {
                             name="pulso30flexiones"
                             value={form.pulso30flexiones}
                             onChange={handleChange}
+                            onKeyUp={handleFocusNext}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Respiracion en reposo"
                             name="respiracionReposo"
                             value={form.respiracionReposo}
-                            onChange={handleChange}
+                            onChange={handleChange} 
+                            onKeyUp={handleFocusNext}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
@@ -323,6 +329,7 @@ export default function DirecionGeneralMineria() {
                             name="formaPecho"
                             value={form.formaPecho}
                             onChange={handleChange}
+                            onKeyUp={handleFocusNext}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
@@ -341,6 +348,7 @@ export default function DirecionGeneralMineria() {
                             type="text"
                             value={form.pulmones}
                             onChange={handleChange}
+                            onKeyUp={handleFocusNext}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
@@ -422,6 +430,7 @@ export default function DirecionGeneralMineria() {
                             name="pechoNormal"
                             value={form.pechoNormal}
                             onChange={handleChange}
+                            onKeyUp={handleFocusNext}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
@@ -429,6 +438,7 @@ export default function DirecionGeneralMineria() {
                             name="tbcRayosX"
                             value={form.tbcRayosX}
                             onChange={handleChange}
+                            onKeyUp={handleFocusNext}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
@@ -436,6 +446,7 @@ export default function DirecionGeneralMineria() {
                             name="pneumoconiosis"
                             value={form.pneumoconiosis}
                             onChange={handleChange}
+                            onKeyUp={handleFocusNext}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
@@ -461,6 +472,7 @@ export default function DirecionGeneralMineria() {
                             type="text"
                             value={form.corazonRayosX}
                             onChange={handleChange}
+                            onKeyUp={handleFocusNext}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
@@ -494,6 +506,7 @@ export default function DirecionGeneralMineria() {
                         label="Hallazgos Anormales"
                         name="hallazgosAnormales"
                         value={form.hallazgosAnormales}
+                        onKeyUp={handleFocusNext}
                         labelWidth="120px"
                         onChange={handleChange}
                     />
@@ -501,6 +514,7 @@ export default function DirecionGeneralMineria() {
                         label="Clasificacion de la OIT (1980)"
                         name="clasificacionOit"
                         onChange={handleChange}
+                        onKeyUp={handleFocusNext}
                         value={form.clasificacionOit}
                         labelWidth="120px"
                     />
