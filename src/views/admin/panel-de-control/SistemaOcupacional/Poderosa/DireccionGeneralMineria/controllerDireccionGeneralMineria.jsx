@@ -49,7 +49,6 @@ export const GetInfoServicio = async (
             cargoDesempenar: res.cargo ?? "",
             ocupacion: res.areaO ?? "",
             usuarioFirma: res.user_medicoFirma,
-
         }));
     }
 };
@@ -96,9 +95,7 @@ export const GetInfoServicioEditar = async (
             //EXAMEN MEDICO
 
             // observacion
-
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
-            user_doctorAsignado: res.doctorAsignado,
         }));
     }
 };
@@ -120,9 +117,8 @@ export const SubmitDataService = async (
     const body = {
         "norden": form.norden,
         "fechaExamen": form.fechaExamen,
-        "userRegistro": form.userlogued,
+        "userRegistro": user,
         usuarioFirma: form.user_medicoFirma,
-        "doctorAsignado": form.user_doctorAsignado,
 
         "colorPiel": form.colorPiel,
         "colorOjos": form.colorOjos,

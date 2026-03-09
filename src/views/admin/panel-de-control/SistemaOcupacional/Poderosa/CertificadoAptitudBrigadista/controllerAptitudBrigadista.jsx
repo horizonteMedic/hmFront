@@ -98,7 +98,6 @@ export const GetInfoServicioEditar = async (
             restricciones: res.restricciones ?? "",
             recomendaciones: res.recomendaciones ?? "",
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
-            user_doctorAsignado: res.doctorAsignado,
         }));
     }
 };
@@ -126,7 +125,6 @@ export const SubmitDataService = async (
         "recomendaciones": form.recomendaciones,
         "userRegistor": form.userlogued,
         usuarioFirma: form.user_medicoFirma,
-        "doctorAsignado": form.user_doctorAsignado,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

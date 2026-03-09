@@ -97,9 +97,7 @@ export const GetInfoServicioEditar = async (
             //EXAMEN MEDICO
 
             // observacion
-
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
-            user_doctorAsignado: res.doctorAsignado,
         }));
     }
 };
@@ -123,7 +121,6 @@ export const SubmitDataService = async (
         "fechaExamen": form.fechaExamen,
         "userRegistro": form.userlogued,
         usuarioFirma: form.user_medicoFirma,
-        "doctorAsignado": form.user_doctorAsignado,
 
         "observacionesGenerales": form.observacionesGenerales,
         "horaSalida": getHoraActual()
