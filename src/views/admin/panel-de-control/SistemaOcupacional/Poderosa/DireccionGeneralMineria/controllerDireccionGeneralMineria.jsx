@@ -19,36 +19,40 @@ const registrarUrl =
 export const GetInfoServicio = async (
     nro,
     set,
-    token,
-    sede
+    token
 ) => {
-    const res = await GetInfoPacDefault(
+    const res = await GetInfoServicioDefault(
         nro,
+        tabla,
         token,
-        sede
+        obtenerReporteUrl,
+        () => { },
+        true
     );
-    console.log(res)
     if (res) {
         console.log(res)
         set((prev) => ({
             ...prev,
+            // Header
             norden: res.norden ?? "",
-            fechaExam: prev.fechaExam ?? "",
+            fechaExam: res.fechaExamen ?? "",
+            tipoExamen: res.nombreExamen ?? "",
             // Datos personales
-            nombres: res.nombresApellidos ?? "",
-            fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
-            lugarNacimiento: res.lugarNacimiento ?? "",
-            estadoCivil: res.estadoCivil ?? "",
-            nivelEstudios: res.nivelEstudios ?? "",
-            dni: res.dni ?? "",
-            edad: res.edad ?? "",
-            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
+            nombres: res.nombreCompletoPaciente ?? "",
+            dni: res.dniPaciente ?? "",
+            edad: res.edadPaciente ?? "",
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+            estadoCivil: res.estadoCivilPaciente ?? "",
+            nivelEstudios: res.nivelEstudioPaciente ?? "",
+            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
             empresa: res.empresa ?? "",
             contrata: res.contrata ?? "",
             // Campos usados por la interfaz principal
-            cargoDesempenar: res.cargo ?? "",
-            ocupacion: res.areaO ?? "",
-            usuarioFirma: res.user_medicoFirma,
+            cargoDesempenar: res.cargoPaciente ?? "",
+            ocupacion: res.ocupacionPaciente ?? "",
+
+
         }));
     }
 };
@@ -200,7 +204,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         sede,
         () => {
             //NO Tiene registro
-            GetInfoServicio(nro, set, token, sede);
+            GetInfoServicio(nro, tabla, set, token);
         },
         () => {
             //Tiene registro
