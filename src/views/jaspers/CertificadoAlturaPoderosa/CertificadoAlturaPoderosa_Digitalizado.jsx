@@ -1916,7 +1916,7 @@ export default async function CertificadoAlturaPoderosa_Digitalizado(data = {}, 
   let firmaMedicoUrl = null;
 
   if (data.digitalizacion && data.digitalizacion.length > 0) {
-    const firmaMedicoData = data.digitalizacion.find(item => item.nombreDigitalizacion === "SELLOFIRMA");
+    const firmaMedicoData = data.digitalizacion.find(item => item.nombreDigitalizacion === "SELLOFIRMADOCASIG");
 
     if (firmaMedicoData && firmaMedicoData.url) {
       firmaMedicoUrl = firmaMedicoData.url;

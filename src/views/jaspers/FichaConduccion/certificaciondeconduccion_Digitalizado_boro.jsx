@@ -1187,7 +1187,7 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}, 
   const firmaMedicoY = yPos + 3;
 
   // Agregar firma y sello médico
-  let firmaMedicoUrl = await getSignCompressed(data, "SELLOFIRMA");
+  let firmaMedicoUrl = await getSignCompressed(data, "SELLOFIRMADOCASIG");
   if (firmaMedicoUrl) {
     try {
       const imgWidth = 45;
