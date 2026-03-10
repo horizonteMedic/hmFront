@@ -148,6 +148,8 @@ export default function Altura18() {
         nombre_medico: userName,
         user_medicoFirma: userlogued,
 
+        nombre_doctorAsignado: "",
+        user_doctorAsignado: "",
     };
 
     const {
@@ -628,6 +630,14 @@ export default function Altura18() {
                             label="Especialista"
                             form={form}
                             onChange={handleChangeSimple}
+                        />
+                        <EmpleadoComboBox
+                            value={form.nombre_doctorAsignado}
+                            label="Doctor Asignado"
+                            form={form}
+                            onChange={handleChangeSimple}
+                            nameField="nombre_doctorAsignado"
+                            idField="user_doctorAsignado"
                         />
                     </SectionFieldset>
                 </div>

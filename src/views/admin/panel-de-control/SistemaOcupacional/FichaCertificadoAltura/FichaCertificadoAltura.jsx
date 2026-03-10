@@ -145,6 +145,10 @@ export default function FichaCertificadoAltura() {
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
+
+        nombre_doctorAsignado: "",
+        user_doctorAsignado: "",
+        
         SubirDoc: false,
         nomenclatura: "PSICOSENSOMETRICO CERT-ALTURA"
     };
@@ -450,7 +454,16 @@ export default function FichaCertificadoAltura() {
                                     <EmpleadoComboBox
                                         value={form.nombre_medico}
                                         form={form}
+                                        label="Especialista"
                                         onChange={handleChangeSimple}
+                                    />
+                                    <EmpleadoComboBox
+                                        value={form.nombre_doctorAsignado}
+                                        label="Doctor Asignado"
+                                        form={form}
+                                        onChange={handleChangeSimple}
+                                        nameField="nombre_doctorAsignado"
+                                        idField="user_doctorAsignado"
                                     />
                                 </div>
                                 {/* Columna Derecha - Recomendaciones */}

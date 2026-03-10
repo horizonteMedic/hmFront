@@ -45,6 +45,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         HUELLA: { x: 400, y: 680, width: 60, height: 60 },
         FIRMA: { x: 466, y: 680, width: 120, height: 60 },
         SELLOFIRMA: { x: 40, y: 680, width: 120, height: 80 },
+        SELLOFIRMADOCASIG: { x: 235, y: 680, width: 100, height: 60 },
     }
     const archivosConFirmas = {
         "ESPIROMETRIA": {
@@ -59,6 +60,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             HUELLA: { x: 400, y: 680, width: 60, height: 60 },
             FIRMA: { x: 466, y: 680, width: 120, height: 60 },
             SELLOFIRMADOCASIG: { x: 40, y: 680, width: 120, height: 80 },
+            SELLOFIRMA: { x: 235, y: 680, width: 100, height: 60 },
         },
 
         "PSICOSENSOMETRICO CERT-ALTURA": coordenadasPSICOSENSO,

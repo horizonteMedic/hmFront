@@ -335,7 +335,8 @@ export const GetInfoServicioEditar = async (
             // Examen Físico - Información Adicional
             detalleInformacionExamenFisico: res.detalleInformacion_d_informacion ?? "",
 
-            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+            user_medicoFirma: res.usuarioFirma ?? "",
+            user_doctorAsignado: res.doctorAsignado,
             //===============PARTE INFERIOR=======================
             // Conclusión y Comentarios
             aptoDesde: res.fechaDesde_f_desde ?? today,
@@ -459,6 +460,7 @@ export const SubmitDataService = async (
         antecedentesAnemiaCualquierGradoNo: !form.anemiaCriteriosOMS2011,
 
         usuarioFirma: form.user_medicoFirma,
+        doctorAsignado: form.user_doctorAsignado,
         usuarioRegistro: user,
     };
 

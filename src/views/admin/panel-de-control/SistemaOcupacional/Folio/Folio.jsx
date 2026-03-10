@@ -11,8 +11,10 @@ import { buildExamenesList } from "./folioCatalogo";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "PERFIL_LIPIDICO",
-    "ANALISIS_GLUCOSA_BASAL",
+    "PSICOSENSOMETRICO_CERT_ALTURA",
+    "PSICOSENSOMETRICO_CERT_ALTURA_PODEROSA",
+    "PSICOSENSOMETRICO_CERT_ALTURA_1_8",
+    "PSICOSENSOMETRICO_VEHI_FOLIO",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -242,7 +244,7 @@ const ExamenesListLaboratorio = buildExamenesList([
 ]);
 
 const ListaPorPlantilla = {
-    //PRUEBAS: ExamenesListPRUEBAS,
+    // PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     "COMPLETO": ExamenesListCOMPLETO,
     //OHLA: ExamenesListOHLA,

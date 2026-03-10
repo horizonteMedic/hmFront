@@ -281,6 +281,8 @@ export const GetInfoServicioEditar = async (
             corregirAgudezaLecturaCerca: (res.observaciones ?? "").includes("CORREGIR AGUDEZA VISUAL PARA LECTURA DE CERCA."),
 
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+            user_doctorAsignado: res.doctorAsignado,
+
             SubirDoc: true,
             digitalizacion: res.digitalizacion,
         }));
@@ -399,6 +401,7 @@ export const SubmitDataService = async (
         usuarioRegistro: user,
 
         usuarioFirma: form.user_medicoFirma,
+        doctorAsignado: form.user_doctorAsignado,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
