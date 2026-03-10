@@ -9,6 +9,7 @@ import CAHerramientasManuales from "./CAHerramientasManuales/CAHerramientasManua
 import FichaDatosPacientes from "./FichaDatosPacientes/FichaDatosPacientes";
 import CertificadoAptitudBrigadista from "./CertificadoAptitudBrigadista/CertificadoAptitudBrigadista";
 import DirecionGeneralMineria from "./DireccionGeneralMineria/DireccionGeneralMineria";
+import HojaDeRutaEmo from "./HojaDeRutaEmo/HojaDeRutaEmo";
 
 export default function PoderosaTabSelector({ tieneVista }) {
     const tabsConfig = [
@@ -71,6 +72,12 @@ export default function PoderosaTabSelector({ tieneVista }) {
             permission: "Direccion General Mineria",
             label: "Dirección General de Mineria",
             component: DirecionGeneralMineria
+        },
+        {
+            id: 10,
+            permission: "Hoja de Ruta EMO",
+            label: "Hoja de Ruta para EMO",
+            component: HojaDeRutaEmo
         }
     ];
     return (

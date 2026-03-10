@@ -1,31 +1,111 @@
 import InputsBooleanRadioGroup from "../../../../../components/reusableComponents/InputsBooleanRadioGroup";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine"
+import RadioTable from "../../../../../components/reusableComponents/RadioTable";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset"
 import BotonesAccion from "../../../../../components/templates/BotonesAccion"
 import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerDireccionGeneralMineria";
+import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
 
-const tabla = "ficha_datos_pacientes";
-const today = getToday();
+const tabla = "ministerio_energia_minas";
 
-const DirecionGeneralMineria = () => {
-
-    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+export default function DirecionGeneralMineria() {
+    const today = getToday();
+    const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
     const initialFormState = {
+        // Header
         norden: "",
-        id: null,
-        fechaIngreso: today,
-        tipoTrabajador: "",
-
-        empresa: "",
-        cargo: "",
-
+        fechaExamen: today,
+        tipoExamen: "",
+        // Datos personales
+        dni: "",
         nombres: "",
-        apellidos: "",
         fechaNacimiento: "",
+        lugarNacimiento: "",
+        edad: "",
+        sexo: "",
+        estadoCivil: "",
+        nivelEstudios: "",
 
+        // Datos Laborales
+        empresa: "",
+        contrata: "",
+        ocupacion: "",
+        cargoDesempenar: "",
+
+        //EXAMEN MEDICO
+        fechaNacimientoPaciente: "",
+        peso: "",
+        talla: "",
+        colorPiel: "",
+        colorOjos: "",
+        cabello: "",
+
+        //FACTORES HEREDITARIOS
+        //1
+        asma: false,
+        alergias: false,
+        bronquitis: false,
+        pleuresia: false,
+        neumonia: false,
+        respiracion: false,
+        sangreSaliva: false,
+        respiracionBreve: false,
+        problemasNasales: false,
+        tbc: false,
+        fuma: false,
+        //2
+        palpitaciones: false,
+        ritmoCardiacoIrregular: false,
+        fallasCardiacas: false,
+        desmayos: false,
+        tobillosHinchados: false,
+        moretonesAnormales: false,
+        presionAlta: false,
+        heridasPecho: false,
+        otrasEnfermedades: false,
+        tomaMedicina: false,
+
+        //DETALLES
+        //EXAMNE MEDICO
+        pulsoReposo: "",
+        pulsoReposoBp: "",
+        pulso30flexiones: "",
+        respiracionReposo: "",
+        respiracion30flexiones: "",
+        obstruccionNasal: "",
+        formaPecho: "",
+        expansionPecho: "",
+        pulmones: "",
+        corazon: "",
+        enfermedadesCronicas: "",
+        funcionPulmonar: "",
+        fvc: "",
+        fevl: "",
+        otros: "",
+        enForma: "",
+
+        //RAYOS X
+        fechaPlaca: "",
+        pechoNormal: "",
+        tbcRayosX: "",
+        pneumoconiosis: "",
+        clasificacionOit: "",
+        filmNumeroPlaca: "",
+        corazonRayosX: "",
+        otrosCambios: "",
+        examenSaliva: "",
+        //OPINOINES
+        hallazgosAnormales: "",
+        opinionClinica: "",
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
     };
 
     const {
@@ -33,36 +113,35 @@ const DirecionGeneralMineria = () => {
         setForm,
         handleChange,
         handleChangeNumber,
-        handleRadioButton,
         handleRadioButtonBoolean,
+        handleFocusNext,
         handleClear,
         handleChangeSimple,
         handleClearnotO,
         handlePrintDefault,
-        handleChangeNumberDecimals,
     } = useForm(initialFormState, { storageKey: "DireccionGeneralMineria" });
 
     const handleSave = () => {
-        //SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
     const handleSearch = (e) => {
-        //if (e.key === "Enter") {
-        //  handleClearnotO();
-        //VerifyTR(form.norden, tabla, token, setForm, selectedSede);
-        //}
+        if (e.key === "Enter") {
+            handleClearnotO();
+            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        }
     };
 
     const handlePrint = () => {
         handlePrintDefault(() => {
-            //PrintHojaR(form.norden, token, tabla, datosFooter);
+            PrintHojaR(form.norden, token, tabla, datosFooter);
         });
     };
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
             {/* ===== SECCIÓN: N° ORDEN Y FECHA ===== */}
-            <SectionFieldset legend="Información General" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
+            <SectionFieldset legend="Información General" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
                 <InputTextOneLine
                     label="N° Orden"
                     name="norden"
@@ -73,9 +152,9 @@ const DirecionGeneralMineria = () => {
                 />
                 <InputTextOneLine
                     label="Fecha de Ingreso"
-                    name="fechaIngreso"
+                    name="fechaExamen"
                     type="date"
-                    value={form.fechaIngreso}
+                    value={form.fechaExamen}
                     onChange={handleChangeSimple}
                     labelWidth="120px"
                 />
@@ -89,10 +168,10 @@ const DirecionGeneralMineria = () => {
             <SectionFieldset legend="EXÁMEN MEDICO (Debe ser llenado por el médico que hace la evaluación fisica)" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
                 <InputTextOneLine
                     label="Fecha de Nacimiento"
-                    name="fechaNacimiento"
-                    type="date"
-                    value={form.fechaNacimiento}
-                    onChange={handleChangeSimple}
+                    name="fechaNacimientoPaciente"
+                    type="text"
+                    value={form.fechaNacimientoPaciente}
+                    disabled
                     labelWidth="120px"
                 />
                 <InputTextOneLine
@@ -113,25 +192,78 @@ const DirecionGeneralMineria = () => {
                     label="Color de Piel"
                     name="colorPiel"
                     value={form.colorPiel}
-                    disabled
+                    onChange={handleChange}
+                    onKeyUp={handleFocusNext}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
                     label="Color de Ojos"
                     name="colorOjos"
                     value={form.colorOjos}
-                    disabled
+                    onChange={handleChange}
+                    onKeyUp={handleFocusNext}
                     labelWidth="120px"
                 />
                 <InputTextOneLine
                     label="Cabello"
                     name="cabello"
                     value={form.cabello}
-                    disabled
+                    onChange={handleChange}
                     labelWidth="120px"
                 />
 
             </SectionFieldset>
+
+            <div className="grid xl:grid-cols-2 gap-x-4 gap-y-3">
+                <SectionFieldset legend="FACTORES HEREDITARIOS">
+                    <RadioTable
+                        items={[
+                            { name: "asma", label: "1.- Asma" },
+                            { name: "alergias", label: "2.- Alergias" },
+                            { name: "bronquitis", label: "3.- Bronquitis" },
+                            { name: "pleuresia", label: "4.- Pleuresia" },
+                            { name: "neumonia", label: "5.- Neumonia" },
+                            { name: "respiracion", label: "6.- Respiracion" },
+                            { name: "sangreSaliva", label: "7.- Sangre en la Saliva" },
+                            { name: "respiracionBreve", label: "8.- Respiracion Breve" },
+                            { name: "problemasNasales", label: "9.- Problemas Nasales" },
+                            { name: "tbc", label: "10.- T.B.C." },
+                            { name: "fuma", label: "Fuma" },
+                        ]}
+                        options={[
+                            { label: "SI", value: true },
+                            { label: "NO", value: false },
+                        ]}
+                        form={form}
+                        groupLabel="T.B.C."
+                        handleRadioButton={handleRadioButtonBoolean}
+                    />
+                </SectionFieldset>
+                <SectionFieldset legend="CANCER PULMONAR">
+                    <RadioTable
+                        items={[
+                            { name: "palpitaciones", label: "11.- Palpitaciones" },
+                            { name: "ritmoCardiacoIrregular", label: "12.- Ritmo Cardiaco Irregular" },
+                            { name: "fallasCardiacas", label: "13.- Fallas Cardiacas" },
+                            { name: "desmayos", label: "14.- Desmayos" },
+                            { name: "tobillosHinchados", label: "15.- Tobillos Hinchados" },
+                            { name: "moretonesAnormales", label: "16.- Moretones Anormales" },
+                            { name: "presionAlta", label: "17.- Presion Alta" },
+                            { name: "heridasPecho", label: "18.- Heridas del Pecho" },
+                            { name: "otrasEnfermedades", label: "19.- Otras Enfermedades" },
+                            { name: "tomaMedicina", label: "Toma alguna medicina" },
+                        ]}
+                        options={[
+                            { label: "SI", value: true },
+                            { label: "NO", value: false },
+                        ]}
+                        form={form}
+                        groupLabel="CANCER PULMONAR"
+                        handleRadioButton={handleRadioButtonBoolean}
+                    />
+                </SectionFieldset>
+            </div>
+
 
             {/* ===== SECCIÓN: DETALLES =====*/}
             <SectionFieldset legend="DETALLES" className="grid grid-cols-1  gap-x-4 gap-y-3">
@@ -139,61 +271,72 @@ const DirecionGeneralMineria = () => {
                     <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                         <InputTextOneLine
                             label="Fecha"
-                            name="fechaNacimiento"
-                            type="date"
-                            value={form.fechaNacimiento}
-                            onChange={handleChangeSimple}
+                            name="fechaExamen"
+                            type="text"
+                            value={form.fechaExamen}
+                            disabled
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Pulso en Reposo"
-                            name="cabello"
-                            value={form.cabello}
-                            disabled
+                            name="pulsoReposo"
+                            value={form.pulsoReposo}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="B.P."
-                            name="cabello"
-                            value={form.cabello}
-                            disabled
+                            name="pulsoReposoBp"
+                            value={form.pulsoReposoBp}
+                            onChange={handleChange}
+                            onKeyUp={handleFocusNext}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Despues de 30 flexiones en 60 seg"
-                            name="cabello"
-                            value={form.cabello}
-                            disabled
+                            name="pulso30flexiones"
+                            value={form.pulso30flexiones}
+                            onChange={handleChange}
+                            onKeyUp={handleFocusNext}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Respiracion en reposo"
-                            name="cabello"
-                            value={form.cabello}
-                            disabled
+                            name="respiracionReposo"
+                            value={form.respiracionReposo}
+                            onChange={handleChange} 
+                            onKeyUp={handleFocusNext}
+                            labelWidth="120px"
+                        />
+                        <InputTextOneLine
+                            label="Despues de 30 flexiones en 60 seg"
+                            name="respiracion30flexiones"
+                            value={form.respiracion30flexiones}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
                         <InputsBooleanRadioGroup
                             label="Obstruccion Nasal"
-                            name="apto"
+                            name="obstruccionNasal"
                             labelWidth="120px"
-                            value={form?.apto}
+                            value={form?.obstruccionNasal}
                             onChange={handleRadioButtonBoolean}
                             trueLabel="Si"
                             falseLabel="No"
                         />
                         <InputTextOneLine
                             label="Forma del pecho"
-                            name="cabello"
-                            value={form.cabello}
-                            disabled
+                            name="formaPecho"
+                            value={form.formaPecho}
+                            onChange={handleChange}
+                            onKeyUp={handleFocusNext}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Expansión del pecho Normal"
-                            name="cabello"
-                            value={form.cabello}
-                            disabled
+                            name="expansionPecho"
+                            value={form.expansionPecho}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
 
@@ -201,38 +344,39 @@ const DirecionGeneralMineria = () => {
                     <div className="grid grid-cols-1 gap-x-4 gap-y-3">
                         <InputTextOneLine
                             label="Pulmones"
-                            name="fechaNacimiento"
+                            name="pulmones"
                             type="text"
-                            value={form.fechaNacimiento}
-                            onChange={handleChangeSimple}
+                            value={form.pulmones}
+                            onChange={handleChange}
+                            onKeyUp={handleFocusNext}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Corazon"
-                            name="cabello"
-                            value={form.cabello}
+                            name="corazon"
+                            value={form.corazon}
                             disabled
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Enfermedades Cronicas"
-                            name="cabello"
-                            value={form.cabello}
-                            disabled
+                            name="enfermedadesCronicas"
+                            value={form.enfermedadesCronicas}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
                         <div className="grid lg:grid-cols-2 gap-x-4 gap-y-3">
                             <InputTextOneLine
                                 label="Funcion Pulmonar"
-                                name="cabello"
-                                value={form.cabello}
+                                name="funcionPulmonar"
+                                value={form.funcionPulmonar}
                                 disabled
                                 labelWidth="120px"
                             />
                             <InputTextOneLine
                                 label="FVC"
-                                name="cabello"
-                                value={form.cabello}
+                                name="fvc"
+                                value={form.fvc}
                                 disabled
                                 labelWidth="120px"
                             />
@@ -242,31 +386,28 @@ const DirecionGeneralMineria = () => {
 
                             <InputTextOneLine
                                 label="FEVL"
-                                name="cabello"
-                                value={form.cabello}
+                                name="fevl"
+                                value={form.fevl}
                                 disabled
                                 labelWidth="120px"
                             />
                             <InputTextOneLine
                                 label="Otros"
-                                name="cabello"
-                                value={form.cabello}
+                                name="otros"
+                                value={form.otros}
                                 disabled
                                 labelWidth="120px"
                             />
                         </div>
                         <div className="grid lg:grid-cols-2 gap-x-4 gap-y-3">
-                            <InputTextOneLine
+                            <InputsBooleanRadioGroup
                                 label="En Forma"
-                                name="cabello"
-                                value={form.cabello}
+                                name="enForma"
                                 labelWidth="120px"
-                            />
-                            <InputTextOneLine
-                                label="Fuera de Forma"
-                                name="cabello"
-                                value={form.cabello}
-                                labelWidth="120px"
+                                value={form?.enForma}
+                                onChange={handleRadioButtonBoolean}
+                                trueLabel="Si"
+                                falseLabel="No"
                             />
                         </div>
 
@@ -277,39 +418,42 @@ const DirecionGeneralMineria = () => {
                     <div className="grid grid-cols-1 gap-x-4 gap-y-3">
                         <InputTextOneLine
                             label="Fecha"
-                            name="fechaNacimiento"
-                            type="date"
-                            value={form.fechaNacimiento}
-                            onChange={handleChangeSimple}
+                            name="fechaPlaca"
+                            type="text"
+                            value={form.fechaPlaca}
+                            disabled
                             labelWidth="120px"
                         />
 
                         <InputTextOneLine
                             label="Pecho Normal"
-                            name="cabello"
-                            value={form.cabello}
-                            disabled
+                            name="pechoNormal"
+                            value={form.pechoNormal}
+                            onChange={handleChange}
+                            onKeyUp={handleFocusNext}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="T.B.C."
-                            name="cabello"
-                            value={form.cabello}
-                            disabled
+                            name="tbcRayosX"
+                            value={form.tbcRayosX}
+                            onChange={handleChange}
+                            onKeyUp={handleFocusNext}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Pneumoconiosis"
-                            name="cabello"
-                            value={form.cabello}
-                            disabled
+                            name="pneumoconiosis"
+                            value={form.pneumoconiosis}
+                            onChange={handleChange}
+                            onKeyUp={handleFocusNext}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Clasificacion de la OIT (1980)"
-                            name="cabello"
-                            value={form.cabello}
-                            disabled
+                            name="clasificacionOit"
+                            value={form.clasificacionOit}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
 
@@ -317,37 +461,85 @@ const DirecionGeneralMineria = () => {
                     <div className="grid grid-cols-1 gap-x-4 gap-y-3">
                         <InputTextOneLine
                             label="Fllm N° de la placa"
-                            name="cabello"
-                            value={form.cabello}
+                            name="filmNumeroPlaca"
+                            value={form.filmNumeroPlaca}
+                            disabled
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Corazon"
-                            name="fechaNacimiento"
+                            name="corazonRayosX"
                             type="text"
-                            value={form.fechaNacimiento}
-                            onChange={handleChangeSimple}
+                            value={form.corazonRayosX}
+                            onChange={handleChange}
+                            onKeyUp={handleFocusNext}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Otros Cambios"
-                            name="cabello"
-                            value={form.cabello}
+                            name="otrosCambios"
+                            value={form.otrosCambios}
+                            onChange={handleChange}
                             labelWidth="120px"
                         />
                         <InputTextOneLine
                             label="Examen de Saliva"
-                            name="cabello"
-                            value={form.cabello}
+                            name="examenSaliva"
+                            disabled
+                            value={form.examenSaliva}
                             labelWidth="120px"
                         />
                     </div>
                 </SectionFieldset>
             </SectionFieldset>
 
+            <SectionFieldset legend="Opiniones" className="grid grid-cols-1  gap-x-4 gap-y-3">
+                <div className="grid grid-cols-3 gap-x-4 gap-y-3">
+                    <InputTextOneLine
+                        label="Pecho Normal"
+                        name="pechoNormal"
+                        value={form.pechoNormal}
+                        labelWidth="120px"
+                        disabled
+                    />
+                    <InputTextOneLine
+                        label="Hallazgos Anormales"
+                        name="hallazgosAnormales"
+                        value={form.hallazgosAnormales}
+                        onKeyUp={handleFocusNext}
+                        labelWidth="120px"
+                        onChange={handleChange}
+                    />
+                    <InputTextOneLine
+                        label="Clasificacion de la OIT (1980)"
+                        name="clasificacionOit"
+                        onChange={handleChange}
+                        onKeyUp={handleFocusNext}
+                        value={form.clasificacionOit}
+                        labelWidth="120px"
+                    />
+                </div>
+
+                <InputTextArea
+                    label="OPINION CLINICA (solo si difiere del examen medico)"
+                    name="opinionClinica"
+                    rows={2}
+                    onChange={handleChange}
+                    value={form.opinionClinica}
+                    labelWidth="120px"
+                />
 
 
+            </SectionFieldset>
 
+            <SectionFieldset legend="Asignación de Médico" className="w-full">
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Especialista"
+                    form={form}
+                    onChange={handleChangeSimple}
+                />
+            </SectionFieldset>
             {/* BOTONES DE ACCIÓN */}
             <BotonesAccion
                 form={form}
@@ -359,4 +551,3 @@ const DirecionGeneralMineria = () => {
     )
 }
 
-export default DirecionGeneralMineria

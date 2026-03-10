@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import { getFetch } from "../../utils/apiHelpers";
+import { getFetch, getFetchPdf } from "../../utils/apiHelpers";
 import { reportesMap } from "./reportesMap";
 import { PDFDocument } from "pdf-lib";
 // import * as pdfjsLib from "pdfjs-dist";
@@ -37,11 +37,15 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "INTERCONSULTA 2",
         "INTERCONSULTA 3",
         "INTERCONSULTA 4",
+        "pcr_ultrasensible",
+        "etanol_saliva",
+        "aptitud_medico_ocupacional_agro"
     ];
     const coordenadasPSICOSENSO = {
         HUELLA: { x: 400, y: 680, width: 60, height: 60 },
         FIRMA: { x: 466, y: 680, width: 120, height: 60 },
         SELLOFIRMA: { x: 40, y: 680, width: 120, height: 80 },
+        SELLOFIRMADOCASIG: { x: 235, y: 680, width: 100, height: 60 },
     }
     const archivosConFirmas = {
         "ESPIROMETRIA": {
@@ -56,6 +60,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             HUELLA: { x: 400, y: 680, width: 60, height: 60 },
             FIRMA: { x: 466, y: 680, width: 120, height: 60 },
             SELLOFIRMADOCASIG: { x: 40, y: 680, width: 120, height: 80 },
+            SELLOFIRMA: { x: 235, y: 680, width: 100, height: 60 },
         },
 
         "PSICOSENSOMETRICO CERT-ALTURA": coordenadasPSICOSENSO,
@@ -101,7 +106,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
     // Ejecutar todas las consultas a los endpoints en paralelo
     const resultadosFetch = await Promise.all(
         examenesFiltrados.map(async (examen) => {
-            if (archivos.includes(examen.tabla) && !Object.keys(archivosConFirmas).includes(examen.tabla)) {
+            if ((archivos.includes(examen.tabla) || examen.esJsreport) && !Object.keys(archivosConFirmas).includes(examen.tabla)) {
                 return null;
             }
             let apiUrl = ""
@@ -128,8 +133,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
         const examen = examenesFiltrados[i];
 
-        // ⚠️ Si el examen está en el array "archivos", NO se consulta - se insertará el PDF externo
-        if (archivos.includes(examen.tabla)) {
+        // ⚠️ Si el examen está en el array "archivos" o es un JSReport, NO se consulta - se insertará el PDF externo
+        if (archivos.includes(examen.tabla) || examen.esJsreport) {
             // Guardar referencia para insertar PDF externo después
             pdfsExternos.push({
                 examen: examen,
@@ -301,11 +306,20 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             let externoBytes;
             let externoPdf;
             try {
-                const response = await fetch(examen.url, { signal });
-                if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status}`);
+                if (examen.esJsreport) {
+                    const jsReportUrl = `${examen.urlJsreport}?nOrden=${nro}&nameService=${examen.tabla}&comprimir=0`;
+                    const blob = await getFetchPdf(jsReportUrl, token, signal);
+                    if (blob.error) {
+                        throw new Error(`Error fetching JSReport: ${blob.statusText || blob.message}`);
+                    }
+                    externoBytes = await blob.arrayBuffer();
+                } else {
+                    const response = await fetch(examen.url, { signal });
+                    if (!response.ok) {
+                        throw new Error(`Error HTTP: ${response.status}`);
+                    }
+                    externoBytes = await response.arrayBuffer();
                 }
-                externoBytes = await response.arrayBuffer();
 
 
 

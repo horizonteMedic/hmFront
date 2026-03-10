@@ -8,7 +8,7 @@ import DatosPersonalesLaborales from "../../../../../components/templates/DatosP
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
-import { SubmitDataService, VerifyTR } from "./controllerAptitudBrigadista";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAptitudBrigadista";
 
 const tabla = "certificado_aptitud_brigadista";
 const today = getToday();
@@ -18,7 +18,6 @@ const CertificadoAptitudBrigadista = () => {
     const initialFormState = {
         // Header
         norden: "",
-        codigoRespiradores: null,
         fechaExam: today,
         tipoExamen: "",
         // Datos personales
@@ -43,12 +42,6 @@ const CertificadoAptitudBrigadista = () => {
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
-
-        nombre_doctorAsignado: "",
-        user_doctorAsignado: "",
-
-        nombre_doctorExtra: "",
-        user_doctorExtra: "",
     };
 
     const {
@@ -78,7 +71,7 @@ const CertificadoAptitudBrigadista = () => {
 
     const handlePrint = () => {
         handlePrintDefault(() => {
-            //PrintHojaR(form.norden, token, tabla, datosFooter);
+            PrintHojaR(form.norden, token, tabla);
         });
     };
 
@@ -128,19 +121,11 @@ const CertificadoAptitudBrigadista = () => {
                             form={form}
                             onChange={handleChangeSimple}
                         />
-                        <EmpleadoComboBox
-                            value={form.nombre_doctorAsignado}
-                            label="Doctor Asignado"
-                            form={form}
-                            onChange={handleChangeSimple}
-                            nameField="nombre_doctorAsignado"
-                            idField="user_doctorAsignado"
-                        />
                     </SectionFieldset>
                 </div>
 
                 <div className="w-[60%]  ">
-                    <SectionFieldset legend="Txtos finales" className="w-full space-y-3">
+                    <SectionFieldset legend="Conclusiones y Observaciones" className="w-full space-y-3">
                         <InputTextArea
                             label="Conclusiones"
                             name="conclusiones"

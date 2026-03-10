@@ -30,6 +30,7 @@ export default function Altura18() {
         fecha: today,
         codigoCertificadoAltura: null,
         nombreExamen: "",
+        tituloExamen: "CERTIFICACIÓN MEDICA PREVIA A TRABAJO DE ALTURA",
         examen: "PRIMERA ACTITUD",
         aniosExperiencia: "",
 
@@ -147,6 +148,8 @@ export default function Altura18() {
         nombre_medico: userName,
         user_medicoFirma: userlogued,
 
+        nombre_doctorAsignado: "",
+        user_doctorAsignado: "",
     };
 
     const {
@@ -212,6 +215,22 @@ export default function Altura18() {
                         onChange={handleChangeSimple}
                         labelWidth="120px"
                     />
+                    <div className="flex gap-4 items-center ">
+                        <h4 className="font-semibold min-w-[120px] max-w-[120px] text-primario">Título del Examen :</h4>
+                        <select
+                            name="tituloExamen"
+                            value={form.tituloExamen}
+                            onChange={handleChangeSimple}
+                            className="border rounded px-2 py-1 text-base w-full"
+                        >
+                            <option value="CERTIFICACIÓN MEDICA PREVIA A TRABAJO DE ALTURA">
+                                CERTIFICACIÓN MEDICA PREVIA A TRABAJO DE ALTURA
+                            </option>
+                            <option value="TRABAJOS EN ESPACIOS CONFINADOS">
+                                TRABAJOS EN ESPACIOS CONFINADOS
+                            </option>
+                        </select>
+                    </div>
                     <InputTextOneLine
                         label="Nombre del Examen"
                         name="nombreExamen"
@@ -611,6 +630,14 @@ export default function Altura18() {
                             label="Especialista"
                             form={form}
                             onChange={handleChangeSimple}
+                        />
+                        <EmpleadoComboBox
+                            value={form.nombre_doctorAsignado}
+                            label="Doctor Asignado"
+                            form={form}
+                            onChange={handleChangeSimple}
+                            nameField="nombre_doctorAsignado"
+                            idField="user_doctorAsignado"
                         />
                     </SectionFieldset>
                 </div>

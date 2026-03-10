@@ -8,12 +8,13 @@ import {
     VerifyTRDefault,
 } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
+import { getHoraActual } from "../../../../../utils/helpers";
 
 const obtenerReporteUrl =
-    "/api/v01/ct/certificadoAptitudBrigadista/obtenerReporte";
-const obtenerReporteJsReportUrl = "/api/v01/ct/certificadoAptitudBrigadista/descargarReporte";
+    "/api/v01/ct/hojaRutaEmo/obtenerReporteHojaRuta";
+const obtenerReporteJsReportUrl = "/api/v01/ct/hojaRutaEmo/descargarReporteHojaRuta";
 const registrarUrl =
-    "/api/v01/ct/certificadoAptitudBrigadista/registrarActualizar";
+    "/api/v01/ct/hojaRutaEmo/registrarActualizar";
 
 
 export const GetInfoServicio = async (
@@ -73,9 +74,10 @@ export const GetInfoServicioEditar = async (
         console.log(res)
         set((prev) => ({
             ...prev,
+            ...res,
             // Header
             norden: res.norden ?? "",
-            fechaExam: res.fechaExamen ?? "",
+            fechaExamen: res.fechaExamen ?? prev.fechaExamen,
             tipoExamen: res.nombreExamen ?? "",
             // Datos personales
             nombres: res.nombreCompletoPaciente ?? "",
@@ -92,11 +94,9 @@ export const GetInfoServicioEditar = async (
             cargoDesempenar: res.cargoPaciente ?? "",
             ocupacion: res.ocupacionPaciente ?? "",
 
+            //EXAMEN MEDICO
+
             // observacion
-            aptitud: res.apto === true ? "APTO" : res.noApto === true ? "NOAPTO" : "",
-            conclusiones: res.conclusiones ?? "",
-            restricciones: res.restricciones ?? "",
-            recomendaciones: res.recomendaciones ?? "",
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
     }
@@ -115,16 +115,15 @@ export const SubmitDataService = async (
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
     }
+
     const body = {
         "norden": form.norden,
-        "fechaExamen": form.fechaExam,
-        "conclusiones": form.conclusiones,
-        "apto": form.aptitud === "APTO" ? true : false,
-        "noApto": form.aptitud === "NOAPTO" ? true : false,
-        "restricciones": form.restricciones,
-        "recomendaciones": form.recomendaciones,
-        "userRegistor": form.userlogued,
+        "fechaExamen": form.fechaExamen,
+        "userRegistro": form.userlogued,
         usuarioFirma: form.user_medicoFirma,
+
+        "observacionesGenerales": form.observacionesGenerales,
+        "horaSalida": getHoraActual()
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -155,14 +154,14 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         sede,
         () => {
             //NO Tiene registro
-            GetInfoServicio(nro, set, token, sede);
+            GetInfoServicioEditar(nro, tabla, set, token, () => { Swal.close() });
         },
         () => {
             //Tiene registro
             GetInfoServicioEditar(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de C. de Aptitud Brigadista",
+                    "Este paciente ya cuenta con registros de Hoja Ruta EMO",
                     "warning"
                 );
             });

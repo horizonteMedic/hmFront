@@ -38,7 +38,7 @@ export default function PCRUltrasensible() {
 
     resultado: "",
 
-    muestra: "",
+    muestra: "SUERO EN AYUNAS",
     examenDirecto: false,
 
     pruebaRapida: "",
@@ -113,21 +113,22 @@ export default function PCRUltrasensible() {
                     label='Muestra'
                     name="muestra"
                     value={form.muestra}
+                    disabled
                     labelWidth='120px'
-                    onChange={handleChange}
                 />
             </SectionFieldset>
             <SectionFieldset legend="Resultados" className="grid grid-cols-1 gap-4">
+
 
               <div className="flex items-center gap-4">
                 <InputTextOneLine
                   label="PRC ULTRASENSIBLE (MÉTODO INMUNOTURBIDIMÉTRICO)"
                   name="resultado"
                   value={form.resultado}
-                  labelWidth="400px" // Aumentamos esto porque el texto es mucho más largo que "Glucosa Basal"
-                  onChange={(e) => handleChangeNumberDecimals(e, 1)}
+                  labelWidth="400px"
+                  onChange={(e) => handleChangeNumberDecimals(e, 2)}
                   onKeyUp={handleFocusNext}
-                  className="flex-1" // Usamos flex-1 para que el input ocupe todo el espacio disponible
+                  className="flex-1"
                 />
                 <span className="text-gray-500 text-[11px] font-medium whitespace-nowrap">
                   {"(Valor Normal < 7.5 mg/l)"}

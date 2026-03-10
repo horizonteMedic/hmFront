@@ -292,6 +292,11 @@ const MatrizPostulante = () => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Reporte");
     const isMatrizSaludProseguridad = datos.matrizSeleccionada === "Matriz-13";
+
+    const columnasOjo = ["od", "oi", "od lejos", "oi lejos"];
+    const esColumnaOjo = (text) =>
+      columnasOjo.includes(String(text).toLowerCase().trim());
+
     const borderStyle = {
       top: { style: "thin" },
       left: { style: "thin" },
@@ -305,6 +310,7 @@ const MatrizPostulante = () => {
     if (!head || head.length === 0 || !head[0]?.children) {
 
       if (trabajadores.length === 0) return;
+
 
       // 🔎 Detectar si head viene estructurado
       const hasStructuredHead = head && head.length > 0;
@@ -324,11 +330,19 @@ const MatrizPostulante = () => {
         cell.value = col.label ?? col.field ?? "";
 
         // 🎨 COLOR DE TEXTO (SOLO MATRIZ 13)
+        const headerName = col.label ?? col.field ?? "";
+
+        let fontColor = undefined;
+
+        if (isMatrizSaludProseguridad) {
+          fontColor = esColumnaOjo(headerName)
+            ? { argb: "FF000000" } // negro
+            : { argb: "FFFFC000" }; // amarillo
+        }
+
         cell.font = {
           bold: true,
-          ...(isMatrizSaludProseguridad && {
-            color: { argb: "FFFFC000" }
-          })
+          ...(fontColor && { color: fontColor })
         };
 
         // 🎨 COLOR DE FONDO SI VIENE DEFINIDO
@@ -559,7 +573,7 @@ const MatrizPostulante = () => {
     head.length > 0 &&
     head[0]?.children &&
     head[0].children.length > 0;
-  console.log(isHierarchical)
+
   const getMaxDepth = (nodes, level = 1) =>
     Math.max(
       ...nodes.map(n =>
@@ -602,7 +616,8 @@ const MatrizPostulante = () => {
   };
 
   const isMatrizSaludProseguridad = datos.matrizSeleccionada === "Matriz-13"
-
+  //PARA MATRIZ DE PROSEGURIDAD
+  const columnasOjo = ["OD", "OI", "OD LEJOS", "OI LEJOS"];
   return (
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
@@ -752,6 +767,7 @@ const MatrizPostulante = () => {
                     const maxDepth = getMaxDepth(head);
                     const rows = Array.from({ length: maxDepth }, () => []);
 
+
                     const generate = (nodes, level) => {
                       nodes.forEach(node => {
                         const colSpan = countLeaves(node);
@@ -801,7 +817,11 @@ const MatrizPostulante = () => {
                         style={{
                           backgroundColor: column.color || undefined
                         }}
-                        className={`border border-gray-300 px-4 py-2 text-center font-bold ${isMatrizSaludProseguridad ? "text-[#FFC000]" : ""}`}
+                        className={`border border-gray-300 px-4 py-2 text-center font-bold ${isMatrizSaludProseguridad &&
+                          !columnasOjo.includes(column.field)
+                          ? "text-[#FFC000]"
+                          : "text-black"
+                          }`}
                       >
                         {column.field}
                       </th>

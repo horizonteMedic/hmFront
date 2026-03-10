@@ -90,32 +90,10 @@ export default async function InformePsicologico_Anexo02_Digitalizado(data = {},
   };
 
   // Usar solo datos reales
-  // Función para convertir texto a formato gramaticalmente correcto (primera letra mayúscula, resto minúsculas)
+  // Función para mostrar todo el contenido en MAYÚSCULAS
   const formatearTextoGramatical = (texto) => {
-    if (!texto || typeof texto !== 'string') return texto;
-
-    // Dividir por líneas para manejar listas con viñetas
-    const lineas = texto.split('\n');
-    const lineasFormateadas = lineas.map(linea => {
-      if (!linea.trim()) return linea; // Mantener líneas vacías
-
-      // Si la línea empieza con "- " (viñeta), formatear después del guión
-      if (linea.trim().startsWith('- ')) {
-        const contenido = linea.trim().substring(2); // Quitar "- "
-        return '- ' + contenido.charAt(0).toUpperCase() + contenido.slice(1).toLowerCase();
-      }
-
-      // Si la línea empieza con ". " (punto), formatear después del punto
-      if (linea.trim().startsWith('. ')) {
-        const contenido = linea.trim().substring(2); // Quitar ". "
-        return '. ' + contenido.charAt(0).toUpperCase() + contenido.slice(1).toLowerCase();
-      }
-
-      // Para líneas normales, formatear toda la línea
-      return linea.charAt(0).toUpperCase() + linea.slice(1).toLowerCase();
-    });
-
-    return lineasFormateadas.join('\n');
+    if (texto === null || texto === undefined) return '';
+    return String(texto).toUpperCase();
   };
 
   const datosFinales = datosReales;

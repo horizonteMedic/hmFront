@@ -34,6 +34,7 @@ export const GetInfoServicio = async (
             idCertificado: res.idCertificado,
             fechaExam: res.fechaCertificado,
             fechahasta: res.fechaCaducidad,
+            tituloExamen: res.tituloExamen ?? "CERTIFICADO DE APTITUD PARA USO DE HERRAMIENTAS MANUALES",
             nombreExamen: res.nombreExamen ?? "",
             aptitud: res.apto ? "APTO" :
                 res.aptoRestriccion ? "APTO CON RESTRICCION" :
@@ -76,6 +77,7 @@ export const SubmitDataService = async (
     }
     const body = {
         norden: form.norden,
+        tituloExamen: form.tituloExamen,
         idCertificado: form.idCertificado,
         apto: form.aptitud == "APTO",
         aptoRestriccion: form.aptitud == "APTO CON RESTRICCION",

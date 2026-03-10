@@ -2,7 +2,7 @@ import Swal from "sweetalert2";
 import {
     GetInfoServicioDefault,
     LoadingDefault,
-    PrintHojaRDefault,
+    PrintHojaRJsReportDefault,
     SubmitDataServiceDefault,
 } from "../../../../../utils/functionUtils";
 import { getFetch } from "../../../../../utils/apiHelpers";
@@ -11,6 +11,7 @@ import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
     "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2";
+const obtenerReporteJsReportUrl = "/api/v01/ct/anexos/fichaAnexo2/descargarReporteFichaAnexo2";
 const registrarUrl =
     "/api/v01/ct/anexos/fichaAnexo2/registrarActualizarFichaAnexo2";
 
@@ -89,7 +90,10 @@ export const GetInfoServicioEditar = async (
             cargoDesempenar: res.cargoPaciente,
 
             conclusiones: res.conclusiones,
-            apto: res.apto ? "APTO" : (res.aptoConRestriccion ? "APTO CON RESTRICCION" : res.noApto ? "NO APTO" : ""),
+            apto: res.apto ? "APTO" : (res.aptoConRestriccion ? "APTO CON RESTRICCION" :
+                res.noApto ? "NO APTO" :
+                    res.conObservacion ? "CON OBSERVACION" :
+                        res.evaluado ? "EVALUADO" : ""),
             fechaValido: res.fechaDesde,
             fechaVencimiento: res.fechaHasta,
             recomendaciones: res.recomendaciones,
@@ -136,6 +140,8 @@ export const SubmitDataService = async (
         apto: form.apto === "APTO",
         aptoConRestriccion: form.apto === "APTO CON RESTRICCION",
         noApto: form.apto === "NO APTO",
+        conObservacion: form.apto === "CON OBSERVACION",
+        evaluado: form.apto === "EVALUADO",
         restriccionesDescripcion: form.restricciones,
         horaSalida: getHoraActual(),
         fechaHasta: form.fechaVencimiento,
@@ -157,16 +163,24 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
     });
 };
 
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../jaspers/Ficha_Anexo2/*.jsx");
-    PrintHojaRDefault(
+// export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+//     const jasperModules = import.meta.glob("../../../../../jaspers/Ficha_Anexo2/*.jsx");
+//     PrintHojaRDefault(
+//         nro,
+//         token,
+//         tabla,
+//         datosFooter,
+//         obtenerReporteUrl,
+//         jasperModules,
+//         "../../../../../jaspers/Ficha_Anexo2"
+//     );
+// };
+export const PrintHojaR = (nro, token, tabla) => {
+    PrintHojaRJsReportDefault(
         nro,
         token,
         tabla,
-        datosFooter,
-        obtenerReporteUrl,
-        jasperModules,
-        "../../../../../jaspers/Ficha_Anexo2"
+        obtenerReporteJsReportUrl
     );
 };
 

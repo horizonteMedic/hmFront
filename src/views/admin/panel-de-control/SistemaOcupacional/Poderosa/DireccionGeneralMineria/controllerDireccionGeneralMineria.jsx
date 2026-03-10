@@ -10,10 +10,10 @@ import {
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
-    "/api/v01/ct/certificadoAptitudBrigadista/obtenerReporte";
-const obtenerReporteJsReportUrl = "/api/v01/ct/certificadoAptitudBrigadista/descargarReporte";
+    "/api/v01/ct/ministerioEnergiaMinas/obtenerReporte";
+const obtenerReporteJsReportUrl = "/api/v01/ct/ministerioEnergiaMinas/descargarReporteMinisterioEnergiaMinas";
 const registrarUrl =
-    "/api/v01/ct/certificadoAptitudBrigadista/registrarActualizar";
+    "/api/v01/ct/ministerioEnergiaMinas/registrarActualizar";
 
 
 export const GetInfoServicio = async (
@@ -49,7 +49,6 @@ export const GetInfoServicio = async (
             cargoDesempenar: res.cargo ?? "",
             ocupacion: res.areaO ?? "",
             usuarioFirma: res.user_medicoFirma,
-
         }));
     }
 };
@@ -73,6 +72,7 @@ export const GetInfoServicioEditar = async (
         console.log(res)
         set((prev) => ({
             ...prev,
+            ...res,
             // Header
             norden: res.norden ?? "",
             fechaExam: res.fechaExamen ?? "",
@@ -92,11 +92,9 @@ export const GetInfoServicioEditar = async (
             cargoDesempenar: res.cargoPaciente ?? "",
             ocupacion: res.ocupacionPaciente ?? "",
 
+            //EXAMEN MEDICO
+
             // observacion
-            aptitud: res.apto === true ? "APTO" : res.noApto === true ? "NOAPTO" : "",
-            conclusiones: res.conclusiones ?? "",
-            restricciones: res.restricciones ?? "",
-            recomendaciones: res.recomendaciones ?? "",
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
     }
@@ -115,16 +113,63 @@ export const SubmitDataService = async (
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
     }
+
     const body = {
         "norden": form.norden,
-        "fechaExamen": form.fechaExam,
-        "conclusiones": form.conclusiones,
-        "apto": form.aptitud === "APTO" ? true : false,
-        "noApto": form.aptitud === "NOAPTO" ? true : false,
-        "restricciones": form.restricciones,
-        "recomendaciones": form.recomendaciones,
-        "userRegistor": form.userlogued,
+        "fechaExamen": form.fechaExamen,
+        "userRegistro": user,
         usuarioFirma: form.user_medicoFirma,
+
+        "colorPiel": form.colorPiel,
+        "colorOjos": form.colorOjos,
+        "cabello": form.cabello,
+
+        //1
+        "asma": form.asma,
+        "alergias": form.alergias,
+        "bronquitis": form.bronquitis,
+        "pleuresia": form.pleuresia,
+        "neumonia": form.neumonia,
+        "respiracion": form.respiracion,
+        "sangreSaliva": form.sangreSaliva,
+        "respiracionBreve": form.respiracionBreve,
+        "problemasNasales": form.problemasNasales,
+        "tbc": form.tbc,
+        "fuma": form.fuma,
+
+        //2
+        "palpitaciones": form.palpitaciones,
+        "ritmoCardiacoIrregular": form.ritmoCardiacoIrregular,
+        "fallasCardiacas": form.fallasCardiacas,
+        "desmayos": form.desmayos,
+        "tobillosHinchados": form.tobillosHinchados,
+        "moretonesAnormales": form.moretonesAnormales,
+        "presionAlta": form.presionAlta,
+        "heridasPecho": form.heridasPecho,
+        "otrasEnfermedades": form.otrasEnfermedades,
+        "tomaMedicina": form.tomaMedicina,
+
+        //DETALLES
+        //EXAMEN MEDICO
+        "pulsoReposo": form.pulsoReposo,
+        "pulsoReposoBp": form.pulsoReposoBp,
+        "pulso30flexiones": form.pulso30flexiones,
+        "respiracionReposo": form.respiracionReposo,
+        "respiracion30flexiones": form.respiracion30flexiones,
+        "obstruccionNasal": form.obstruccionNasal,
+        "formaPecho": form.formaPecho,
+        "expansionPecho": form.expansionPecho,
+        "enfermedadesCronicas": form.enfermedadesCronicas,
+        "enForma": form.enForma,
+
+        "pechoNormal": form.pechoNormal,
+        "tbcRayosX": form.tbcRayosX,
+        "pneumoconiosis": form.pneumoconiosis,
+        "clasificacionOit": form.clasificacionOit,
+        "corazonRayosX": form.corazonRayosX,
+        "otrosCambios": form.otrosCambios,
+        "hallazgosAnormales": form.hallazgosAnormales,
+        "opinionClinica": form.opinionClinica,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -162,7 +207,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             GetInfoServicioEditar(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de C. de Aptitud Brigadista",
+                    "Este paciente ya cuenta con registros de Ministerio Energia y Minas",
                     "warning"
                 );
             });

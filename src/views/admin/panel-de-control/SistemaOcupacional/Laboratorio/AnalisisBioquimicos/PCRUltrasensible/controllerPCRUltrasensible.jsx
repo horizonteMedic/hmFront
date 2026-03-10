@@ -54,9 +54,8 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
       contrata: res.contrata ?? "",
 
       // EXAMEN
-      resultado: res.resultado ?? "",
-      muestra: res.muestra ?? "",
-      tipoExamen: res.tipoExamen ?? "",
+    resultado: res.resultado ? parseFloat(res.resultado).toFixed(2) : "",      
+    tipoExamen: res.tipoExamen ?? "",
 
       // USUARIOS
       user_medicoFirma: res.usuarioFirma ?? prev.user_medicoFirma,
@@ -76,12 +75,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     const body = {
         codAb: form.codAb,
         fechaAb: form.fecha,
-
         resultado: form.resultado,
-        muestra: form.muestra,
-        examenDirecto: form.examenDirecto,
-        pruebaRapida: form.pruebaRapida,
-
         userRegistro: user,
         userMedicoOcup: "",
         nOrden: form.norden,
@@ -128,7 +122,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             GetInfoServicio(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de Glucosa Basal",
+                    "Este paciente ya cuenta con registros de PCR Ultrasensible",
                     "warning"
                 );
             });

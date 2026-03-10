@@ -334,7 +334,7 @@ export const GetInfoServicioDefault = async (
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
         return null;
     } finally {
-        onFinish();
+        onFinish?.();
     }
 };
 

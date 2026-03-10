@@ -343,7 +343,7 @@ export const GetInfoServicioEditar = async (
             usoLentesCorrectoresLectura: (res.observacionesRecomendaciones_b_c_observaciones ?? "").includes("USO DE LENTES CORRECTORES PARA LECTURA DE CERCA."),
             corregirAgudezaLectura: (res.observacionesRecomendaciones_b_c_observaciones ?? "").includes("CORREGIR AGUDEZA VISUAL PARA LECTURA DE CERCA."),
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
-
+            user_doctorAsignado: res.doctorAsignado,
             SubirDoc: true,
             digitalizacion: res.digitalizacion
         }));
@@ -441,6 +441,7 @@ export const SubmitDataService = async (
         antecedentesComentariosDetalles: form.comentariosDetalleAntecedentes,
 
         usuarioFirma: form.user_medicoFirma,
+        doctorAsignado: form.user_doctorAsignado,
         usuarioRegistro: user,
     };
 
