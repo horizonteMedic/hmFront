@@ -1306,7 +1306,7 @@ export default async function Certificacion_suficiencia_trabajos_en_altura_boro_
   const firmaMedicoY = yDeclaracion + 3;
 
   // Agregar firma y sello médico
-  let firmaMedicoUrl = await getSignCompressed(data, "SELLOFIRMA");
+  let firmaMedicoUrl = await getSignCompressed(data, "SELLOFIRMADOCASIG");
   if (firmaMedicoUrl) {
     try {
       const imgWidth = 45;
