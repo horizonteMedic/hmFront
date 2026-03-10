@@ -11,7 +11,7 @@ import { getToday } from "../../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaDatosPacientes";
 import BotonesAccion from "../../../../../components/templates/BotonesAccion";
 
-const tabla = "ficha_datos_pacientes";
+const tabla = "ficha_datos_paciente";
 const today = getToday();
 
 export default function FichaDatosPacientes() {

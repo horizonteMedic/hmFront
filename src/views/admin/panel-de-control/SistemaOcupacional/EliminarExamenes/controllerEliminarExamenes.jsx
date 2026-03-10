@@ -24,11 +24,11 @@ const urlsEliminar = {
     histOcupacional: "historiaOcupacional",
     cuestionarioNordico: "cuestionarioNordico",
     evMusculoEsqueletica: "evaluacionMusculoEsqueletica",
-    oftalmologia: "", //pendiente falta eliminar
+    oftalmologia: "agudezaVisual/fichaOftalmologica", //pendiente falta eliminar
     actitudMedOcupacional: "",
     usoRespiradores: "respiradores",
     anexo16A: "anexos/anexo16a",
-    consentimientoDosaje: "",
+    consentimientoDosaje: "laboratorio/consentimiento",
     anexo16: "anexos/anexo16",
     electrocardiograma: "electroCardiograma",
     // Trabajos en Altura
@@ -77,7 +77,7 @@ export const DeleteExamen = async (norden, campo, token, setForm, form) => {
 
     if (result.isConfirmed) {
         try {
-            const response = await fetch(`${URLAzure}/api/v01/ct/${urlsEliminar[campo]}/eliminar/${norden}`, {
+            const response = await fetch(`${URLAzure}/api/v01/ct/${urlsEliminar[campo]}/eliminar/${norden}${campo === "consentimientoDosaje" ? "/consent_Muestra_Sangre" : ""}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
