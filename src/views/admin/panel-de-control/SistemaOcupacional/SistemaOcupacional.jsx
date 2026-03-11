@@ -601,7 +601,7 @@ const TabComponent = () => {
               37: { title: "Poderosa", child: <PoderosaTabSelector tieneVista={tieneVista} /> },
               38: { title: "Eliminar Examenes", child: <EliminarExamenes /> },
               39: { title: "Altura 1.8", child: <Altura18 /> },
-              41: { title: "Plantillas de Correo", child: <PlantillasCorreo /> },
+              41: { title: "Plantillas de Correo", child: <PlantillasCorreo ContrataMulti={ContrataMulti} EmpresasMulti={EmpresasMulti} /> },
               42: { title: "Asistencial", child: <AsistencialTabSelector tieneVista={tieneVista}/> },
               40: { title: "Folio", child: <Folio /> },
             };

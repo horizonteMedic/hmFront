@@ -60,6 +60,7 @@ export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporte
         token
     )
         .then(async (res) => {
+            console.log('asdas', res)
             // Manejar errores de la respuesta
             if (res.error) {
                 console.error("Error en la respuesta del servidor:", res);
