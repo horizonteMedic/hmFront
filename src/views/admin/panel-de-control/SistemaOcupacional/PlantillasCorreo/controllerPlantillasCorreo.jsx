@@ -26,15 +26,16 @@ export const SubmitEmpresaContrata = async (
 
 export const GetListEmpresaContrata = async (
     set,
-    token
+    token,
+    onFinish = () => { }
 ) => {
     try {
         const res = await getFetch(
             `${obtenerReporteUrl}`,
-            token,true
+            token
         );
-        if (res) {
-            console.log(res)
+        if (res?.resultado) {
+            set(res?.resultado)
         } else {
             Swal.fire("Error", "Ocurrió un error al traer los datos", "error");
             return null;
