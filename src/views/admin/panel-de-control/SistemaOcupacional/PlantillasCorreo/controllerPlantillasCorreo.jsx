@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 import { SubmitDataServiceDefault } from "../../../../utils/functionUtils";
-import { getFetch } from "../../../../utils/apiHelpers";
+import { URLAzure } from '../../../../config/config';
 
 const registrarUrl = "/api/v01/ct/empresaContrata/crearActualizar";
 const obtenerReporteUrl = "/api/v01/ct/empresaContrata/obtenerDatos"
@@ -24,26 +24,18 @@ export const SubmitEmpresaContrata = async (
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => { });
 };
 
-export const GetListEmpresaContrata = async (
-    set,
-    token
-) => {
-    try {
-        const res = await getFetch(
-            `${obtenerReporteUrl}`,
-            token,true
-        );
-        if (res) {
-            console.log(res)
-        } else {
-            Swal.fire("Error", "Ocurrió un error al traer los datos", "error");
-            return null;
+export const GetListEmpresaContrata = async (token) => {
+    const response = await fetch(`${URLAzure}${obtenerReporteUrl}`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
         }
-    } catch (error) {
-        Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
-        return null;
-    } finally {
-        onFinish?.();
+    });
+    if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
     }
-
+    const data = await response.json();
+    console.log("Respuesta:", data);
+    return data;
 };

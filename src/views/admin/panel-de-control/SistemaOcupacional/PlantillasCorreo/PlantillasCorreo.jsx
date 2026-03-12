@@ -92,7 +92,7 @@ export default function PlantillasCorreo({ ContrataMulti, EmpresasMulti }) {
     };
 
     const obtenerRelacionesEmpresaContrata = async () => {
-        await GetListEmpresaContrata(setEmpresaContrataList, token);
+        await GetListEmpresaContrata(token);
     }
 
     // useEffect(() => { obtenerRelacionesEmpresaContrata() }, [])
