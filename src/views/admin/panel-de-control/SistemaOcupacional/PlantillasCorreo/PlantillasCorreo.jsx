@@ -1,13 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
+import { GetListEmpresaContrata, SubmitEmpresaContrata } from "./controllerPlantillasCorreo";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSave } from "@fortawesome/free-solid-svg-icons";
 
 export default function PlantillasCorreo({ ContrataMulti, EmpresasMulti }) {
     const today = getToday();
     const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
     const initialFormState = {
+        idRelacionEmpresaContrata: null,
         razonEmpresa: "",
         rucEmpresa: "",
 
@@ -26,6 +30,8 @@ export default function PlantillasCorreo({ ContrataMulti, EmpresasMulti }) {
         handleClearnotO,
         handlePrintDefault,
     } = useForm(initialFormState);
+
+    const [empresaContrataList, setEmpresaContrataList] = useState([])
 
     const [searchEmpresa, setSearchEmpresa] = useState(form.razonEmpresa);
     const [filteredEmpresas, setFilteredEmpresas] = useState([]);
@@ -81,10 +87,21 @@ export default function PlantillasCorreo({ ContrataMulti, EmpresasMulti }) {
         document.getElementById('razonContrata')?.focus();
     };
 
+    const handleSave = async () => {
+        await SubmitEmpresaContrata(form, token, userlogued, handleClear);
+    };
 
+    const obtenerRelacionesEmpresaContrata = async () => {
+        await GetListEmpresaContrata(setEmpresaContrataList, token);
+    }
+
+    // useEffect(() => { obtenerRelacionesEmpresaContrata() }, [])
 
     return (
-        <div>
+        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+            <div>
+
+            </div>
             <div className="flex items-center space-x-2 mb-1">
                 <label htmlFor="razonEmpresa" className="block w-32">
                     Empresa:
@@ -175,6 +192,23 @@ export default function PlantillasCorreo({ ContrataMulti, EmpresasMulti }) {
                         </ul>
                     )}
                 </div>
+            </div>
+
+            <button
+                type="button"
+                onClick={obtenerRelacionesEmpresaContrata}
+                className="
+                bg-emerald-600 hover:bg-emerald-700
+                text-white text-base px-6 py-2 rounded
+                flex items-center gap-2
+                transition-all duration-150 ease-out
+                hover:shadow-lg
+                active:scale-95 active:shadow-inner"
+            >
+                <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+            </button>
+            <div>
+
             </div>
         </div>
     )

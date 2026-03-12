@@ -212,12 +212,26 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
   doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.2);
 
+  const empresaUpper = (datosFinales.empresa || "").toUpperCase().trim();
+  const ocultarAptoNoApto = empresaUpper === "CONSORCIO COPTOS" ||
+    empresaUpper === "EMPRESA REGIONAL DE SERVICIO PUBLICO DE ELECTRICIDAD ELECTRONORTEMEDIO SOCIEDAD ANONIMA - HIDRANDINA";
+
+
   // === Fila 1: Apellidos y Nombres ===
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Apellidos y Nombres:", tablaInicioX + 2, yPos + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.apellidosNombres || "", tablaInicioX + 40, yPos + 4);
+
+  if (ocultarAptoNoApto) {
+    doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Tipo de Examen:", tablaInicioX + 130, yPos + 4);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(datosFinales.tipoExamen || "", tablaInicioX + 120 + 38, yPos + 4);
+  }
+
   yPos += filaAltura;
 
   // === Fila 2: DNI, Edad, Sexo (3 columnas) ===
@@ -842,9 +856,6 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
   doc.text("Firma del Médico", 150, yFirmas + 20, { align: "center" }); // Reducido de 26 a 20
 
   // Solo mostrar APTO/NO APTO si la empresa NO es CONSORCIO COPTOS ni HIDRANDINA
-  const empresaUpper = (datosFinales.empresa || "").toUpperCase().trim();
-  const ocultarAptoNoApto = empresaUpper === "CONSORCIO COPTOS" ||
-    empresaUpper === "EMPRESA REGIONAL DE SERVICIO PUBLICO DE ELECTRICIDAD ELECTRONORTEMEDIO SOCIEDAD ANONIMA - HIDRANDINA";
 
   if (!ocultarAptoNoApto) {
     autoTable(doc, {
