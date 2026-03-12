@@ -19,7 +19,7 @@ const urlsEliminar = {
     odontograma: "odontograma",
     psicologia: "informePsicologico",
     fichaOIT: "oit",
-    exRxSanguineos: "", //pendiente
+    exRxSanguineos: "anexos/rx-sanguineo", //pendiente
     fichaAntPatologicos: "antecedentesPatologicos",
     histOcupacional: "historiaOcupacional",
     cuestionarioNordico: "cuestionarioNordico",
