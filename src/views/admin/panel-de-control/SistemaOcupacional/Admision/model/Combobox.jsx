@@ -337,6 +337,28 @@ const ComboboxContratasMulti = (sede) => {
   
     return options;
 }
+const ComboboxContratasMultiConRUC = (sede) => {
+    const [options, setOptions] = useState([]);
+    const token = useAuthStore((state) => state.token);
+    useEffect(() => { 
+        
+          fetch(`${URLAzure}/api/v01/ct/ocupacional/listadoContratasMutisucursalNP/${sede}`,{
+          method: 'GET', 
+          headers: {
+              'Authorization': `Bearer ${token}`
+          },
+      })
+          .then(response => response.json())
+          .then((data) => {
+              setOptions(data);
+          })
+          .catch((error) => {
+              console.error('Error obteniendo opciones de tipo de documento:', error);
+          });
+      }, []);
+  
+    return options;
+}
 
 const ComboboxMedicosMulti = (sede) => {
     const [options, setOptions] = useState([]);
@@ -538,7 +560,7 @@ const ComboboxPrecioExamenMulti = (sede,examen,token) => {
      
 }
 
-export { ComboboxEstadoCivil,ComboboxDepartamentos, ComboboxProvincias, ComboboxDistritos, 
+export { ComboboxEstadoCivil,ComboboxDepartamentos, ComboboxProvincias, ComboboxDistritos, ComboboxContratasMultiConRUC,
     ComboboxSexo, ComboboxTipoDoc, ComboboxSedes, ComboboxNivelE, ComboboxProfesión, ComboboxEmpresas, ComboboxContratas,
     ComboboxFormaPago, ComboboxListAuth, ComboboxEmpresasMulti, ComboboxContratasMulti, ComboboxMedicosMulti, ComboboxPruebaMulti,
     ComboboxCargoMulti, ComboboxAreaMulti, ComboboxExamenMMulti,ComboboxExplotacionMulti, ComboboxMineralMulti, ComboboxAlturaMulti, ComboboxPrecioExamenMulti }
