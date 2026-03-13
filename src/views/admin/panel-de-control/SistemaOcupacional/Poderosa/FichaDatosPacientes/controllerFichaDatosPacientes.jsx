@@ -4,6 +4,7 @@ import {
     GetInfoServicioDefaultManejo,
     LoadingDefault,
     PrintHojaRDefault,
+    PrintHojaRJsReportDefault,
     SubmitDataServiceDefault,
     SubmitDataServiceDefaultManejo,
     VerifyTRPerzonalizadoDefault,
@@ -13,6 +14,8 @@ import { getFetch } from "../../../../../utils/apiHelpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/fichaDatosPersonales/obtenerReporteFichaDatosPersonales";
+const obtenerReporteJsReportUrl = "/api/v01/ct/fichaDatosPersonales/descargarReporteFichaDatosPaciente";
+
 const registrarUrl =
     "/api/v01/ct/fichaDatosPersonales/registrarActualizarFichaDatosPersonales";
 
@@ -468,16 +471,11 @@ export const SubmitDataService = async (
 
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    console.log("sas")
-    const jasperModules = import.meta.glob("../../../../../jaspers/FichaDatosPersonales/*.jsx");
-    PrintHojaRPropio(
+    PrintHojaRJsReportDefault(
         nro,
         token,
         tabla,
-        datosFooter,
-        obtenerReporteUrl,
-        jasperModules,
-        "../../../../../jaspers/FichaDatosPersonales"
+        obtenerReporteJsReportUrl
     );
 };
 
