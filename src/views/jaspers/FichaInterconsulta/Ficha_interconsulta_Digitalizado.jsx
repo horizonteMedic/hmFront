@@ -224,13 +224,11 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.apellidosNombres || "", tablaInicioX + 40, yPos + 4);
 
-  if (ocultarAptoNoApto) {
-    doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("Tipo de Examen:", tablaInicioX + 130, yPos + 4);
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(datosFinales.tipoExamen || "", tablaInicioX + 120 + 38, yPos + 4);
-  }
 
   yPos += filaAltura;
 
