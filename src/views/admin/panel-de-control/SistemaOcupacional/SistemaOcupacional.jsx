@@ -11,6 +11,7 @@ import ParasitologiaCoprologico from "./Parasitologia/ParasitologiaCoprologico";
 import {
   ComboboxEmpresasMulti,
   ComboboxContratasMulti,
+  ComboboxContratasMultiConRUC,
   ComboboxMedicosMulti,
   ComboboxPruebaMulti,
   ComboboxCargoMulti,
@@ -174,6 +175,7 @@ const TabComponent = () => {
 
   const EmpresasMulti = ComboboxEmpresasMulti("T-NP");
   const ContrataMulti = ComboboxContratasMulti("T-NP");
+  const ContrataMultiNP = ComboboxContratasMultiConRUC("T-NP");
   const MedicosMulti = ComboboxMedicosMulti("T-NP");
   const PruebaMulti = ComboboxPruebaMulti("T-NP");
   const CargosMulti = ComboboxCargoMulti("T-NP");
@@ -208,6 +210,7 @@ const TabComponent = () => {
   const listasCombos = {
     EmpresasMulti,
     ContrataMulti,
+    ContrataMultiNP,
     MedicosMulti,
     PruebaMulti,
     CargosMulti,
@@ -601,8 +604,8 @@ const TabComponent = () => {
               37: { title: "Poderosa", child: <PoderosaTabSelector tieneVista={tieneVista} /> },
               38: { title: "Eliminar Examenes", child: <EliminarExamenes /> },
               39: { title: "Altura 1.8", child: <Altura18 /> },
-              41: { title: "Plantillas de Correo", child: <PlantillasCorreo ContrataMulti={ContrataMulti} EmpresasMulti={EmpresasMulti} /> },
-              42: { title: "Asistencial", child: <AsistencialTabSelector tieneVista={tieneVista}/> },
+              41: { title: "Plantillas de Correo", child: <PlantillasCorreo ContrataMulti={ContrataMultiNP} EmpresasMulti={EmpresasMulti} /> },
+              42: { title: "Asistencial", child: <AsistencialTabSelector tieneVista={tieneVista} /> },
               40: { title: "Folio", child: <Folio /> },
             };
             const section = displayedInterfaces[activeTab];
