@@ -28,6 +28,42 @@ export const EXAMENES_CONFIG = [
     },
     {
         column: 2,
+        legend: "Laboratorio",
+        items: [
+            { label: "Hemograma", name: "Hemograma", tabla: "hemograma_autom" },
+            { label: "Hemoglobina", name: "Hemoglobina", tabla: "lab_clinico_hemoglobina" },
+            { label: "Perfil Lipidico", name: "PerfilLipidico", tabla: "analisis_bioquimicos" },
+            { label: "Perfil Renal", name: "PerfilRenal", tabla: "l_bioquimica" },
+            { label: "Acido Urico", name: "AcidoUrico", tabla: "ac_bioquimica2022" },
+            { label: "Perfil Hepatico", name: "PerfilHepatico", tabla: "perfil_hepatico" },
+            { label: "Riesgo Coronario", name: "RiesgoCoronario", tabla: "riesgocoronario" },
+            { label: "Tolerancia a la Glucosa", name: "ToleranciaGlucosa", tabla: "glucosatolerancia" },
+            { label: "Glucosa Basal", name: "GlucosaBasal", tabla: "analisis_bioquimicos_glucosa_basal" },
+            { label: "PCR-Ultrasensible", name: "PCRUltrasensible", tabla: "pcr_ultrasensible" },
+            { label: "Gonadotropina", name: "Gonadotropina", tabla: "lgonadotropina" },
+            { label: "BK - KOH", name: "BKKOH", tabla: "microbiologia" },
+            { label: "BK - KOH Directo", name: "BKKOH", tabla: "koh" },
+            //
+            { label: "Aglutinaciones", name: "Aglutinaciones", tabla: "inmunologia" },
+            { label: "Hepatitis", name: "Hepatitis", tabla: "lhepatitis" },
+            { label: "VDRL", name: "VDRL", tabla: "inmunologia_vdrl" },
+            { label: "VIH", name: "VIH", tabla: "vih" },
+            { label: "Thevenon", name: "Thevenon", tabla: "vih" },
+            { label: "Panel 2D", name: "Panel2D", tabla: "panel2d" },
+            { label: "Panel 3D", name: "Panel3D", tabla: "panel3d" },
+            { label: "Panel 4D", name: "Panel4D", tabla: "panel4d" },
+            { label: "Panel 5D", name: "Panel5D", tabla: "toxicologia" },
+            { label: "Panel 10D", name: "Panel10D", tabla: "panel10d" },
+            { label: "Etanol saliva", name: "EtanolSaliva", tabla: "etanol_saliva" },
+            { label: "Consentimiento Boro", name: "ConsentimientoBoro", tabla: "consent_boro" },
+            { label: "Coprocultivo", name: "Coprocultivo", tabla: "ac_coprocultivo" },
+            { label: "Coproparasitológico", name: "Coproparasitológico", tabla: "ac_coproparasitologico" },
+            { label: "Examen orina", name: "ExamenOrina", tabla: "lab_clinico_examen_orina" },
+            { label: "Prueba Cualitativa Antígenos", name: "PruebaAntigenos", tabla: "examen_inmunologico" },
+        ],
+    },
+    {
+        column: 3,
         legend: "Trabajos en Altura",
         items: [
             { label: "Cert. Trab. Altura (Barrik)", name: "certTrabAlturaBarrik", tabla: "b_certificado_altura" },
@@ -35,7 +71,7 @@ export const EXAMENES_CONFIG = [
         ],
     },
     {
-        column: 2,
+        column: 3,
         legend: "Otros Formatos",
         items: [
             { label: "Ev. Musc. Esquelético", name: "evMuscEsqueletico", tabla: "evaluacion_musculo_esqueletica2021" },
@@ -49,7 +85,7 @@ export const EXAMENES_CONFIG = [
         ],
     },
     {
-        column: 2,
+        column: 3,
         legend: "Conducción de Vehículos",
         items: [
             { label: "Ficha S.A.S", name: "fichaSAS", tabla: "ficha_sas" },
@@ -64,7 +100,22 @@ export const EXAMENES_CONFIG = [
             { label: "F. Aptitud Med. Ocup.", name: "fAptitudMedOcup", tabla: "certificado_aptitud_medico_ocupacional" },
             { label: "F. Médica Anexo 2", name: "fMedicaAnexo2", tabla: "anexo_agroindustrial" },
             { label: "F. Aptitud Anexo 2", name: "fAptitudAnexo2", tabla: "aptitud_medico_ocupacional_agro" },
-
+        ],
+    },
+    {
+        column: 1,
+        legend: "Consentimientos",
+        items: [
+            //{ label: "F. Médica", name: "fMedica" },
+            { label: "Const. Informado", name: "ConstInformado", tabla: "consentimientoInformado" },
+            { label: "Const. Buena Salud", name: "ConstBuenaSalud", tabla: "consentimientobuenasalud" },
+            { label: "Sintomatico Respiratorio", name: "CONSENT_SINTOMATICO", tabla: "CONSENT_SINTOMATICO" },
+            { label: "Evaluacion Medica", name: "CONSENT_INFORMADO_MEDICA", tabla: "CONSENT_INFORMADO_MEDICA" },
+            { label: "Recepcion Examen Medico", name: "CONSENT_RECOM_MEDIC", tabla: "CONSENT_RECOM_MEDIC" },
+            { label: "Declaracion Antecedentes Personales", name: "DECLA_JURA_ANTECE_PERSON_FAM", tabla: "DECLA_JURA_ANTECE_PERSON_FAM" },
+            { label: "Declaracion Aptitud Medico O.", name: "DECLA_INFO_APTITUD_MO", tabla: "DECLA_INFO_APTITUD_MO" },
+            { label: "Const. Brigadista", name: "ConstBrigadista", tabla: "consta_brigadista" },
+            { label: "Conformidad EMO ", name: "ConformidadEmo", tabla: "conformidad_emo" },
         ],
     },
 ];

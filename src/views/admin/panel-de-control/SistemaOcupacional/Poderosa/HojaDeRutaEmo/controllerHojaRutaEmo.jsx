@@ -123,7 +123,16 @@ export const SubmitDataService = async (
         usuarioFirma: form.user_medicoFirma,
 
         "observacionesGenerales": form.observacionesGenerales,
-        "horaSalida": getHoraActual()
+        "horaSalida": getHoraActual(),
+        "observacionesMedicina": form.observacionesEvaluacionMedica,
+        "observacionesPsicologia": form.observacionInformeBrigadista,
+        "observacionesVisual": form.observacionesEvaluacionVisual,
+        "observacionesAudiometria": form.observacionAudiometria,
+        "observacionesEspirometria": form.observacionEspirometria,
+        "observacionesRadiografiaTorax": form.observacionRadiografiaTorax,
+        "observacionesCardiologia": form.observacionesElectrocardiograma,
+        "observacionesLaboratorio": form.observacionesExamenLaboratorio,
+        "observacionesBrigadista": form.observacionBrigadista,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

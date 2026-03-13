@@ -230,10 +230,9 @@ const HojaDeRutaEmo = () => {
                 />
                 <InputTextOneLine
                     name="observacionesEvaluacionMedica"
-                    disabled
                     type="text"
                     value={form.observacionesEvaluacionMedica}
-                    onChange={handleChangeSimple}
+                    onChange={handleChange}
                     labelWidth="120px"
                 />
 
@@ -252,10 +251,9 @@ const HojaDeRutaEmo = () => {
                 />
                 <InputTextOneLine
                     name="observacionInformeBrigadista"
-                    disabled
                     type="text"
                     value={form.observacionInformeBrigadista}
-                    onChange={handleChangeSimple}
+                    onChange={handleChange}
                     labelWidth="120px"
                 />
 
@@ -275,10 +273,9 @@ const HojaDeRutaEmo = () => {
                 />
                 <InputTextOneLine
                     name="observacionesEvaluacionVisual"
-                    disabled
                     type="text"
                     value={form.observacionesEvaluacionVisual}
-                    onChange={handleChangeSimple}
+                    onChange={handleChange}
                     labelWidth="120px"
                 />
 
@@ -297,10 +294,9 @@ const HojaDeRutaEmo = () => {
                 />
                 <InputTextOneLine
                     name="observacionAudiometria"
-                    disabled
                     type="text"
                     value={form.observacionAudiometria}
-                    onChange={handleChangeSimple}
+                    onChange={handleChange}
                     labelWidth="120px"
                 />
 
@@ -319,10 +315,9 @@ const HojaDeRutaEmo = () => {
                 />
                 <InputTextOneLine
                     name="observacionEspirometria"
-                    disabled
                     type="text"
                     value={form.observacionEspirometria}
-                    onChange={handleChangeSimple}
+                    onChange={handleChange}
                     labelWidth="120px"
                 />
 
@@ -341,10 +336,9 @@ const HojaDeRutaEmo = () => {
                 />
                 <InputTextOneLine
                     name="observacionRadiografiaTorax"
-                    disabled
                     type="text"
                     value={form.observacionRadiografiaTorax}
-                    onChange={handleChangeSimple}
+                    onChange={handleChange}
                     labelWidth="120px"
                 />
 
@@ -363,10 +357,9 @@ const HojaDeRutaEmo = () => {
                 />
                 <InputTextOneLine
                     name="observacionesElectrocardiograma"
-                    disabled
                     type="text"
                     value={form.observacionesElectrocardiograma}
-                    onChange={handleChangeSimple}
+                    onChange={handleChange}
                     labelWidth="120px"
                 />
 
@@ -385,9 +378,8 @@ const HojaDeRutaEmo = () => {
                 <InputTextOneLine
                     name="observacionesExamenLaboratorio"
                     type="text"
-                    disabled
                     value={form.observacionesExamenLaboratorio}
-                    onChange={handleChangeSimple}
+                    onChange={handleChange}
                     labelWidth="120px"
                 />
 
@@ -408,9 +400,8 @@ const HojaDeRutaEmo = () => {
                 <InputTextOneLine
                     name="observacionBrigadista"
                     type="text"
-                    disabled
                     value={form.observacionBrigadista}
-                    onChange={handleChangeSimple}
+                    onChange={handleChange}
                     labelWidth="120px"
                 />
 
@@ -441,7 +432,7 @@ const HojaDeRutaEmo = () => {
             <SectionFieldset legend="Asignación de Médico" className="w-full">
                 <EmpleadoComboBox
                     value={form.nombre_medico}
-                    label="Especialista"
+                    label="Doctor Asignado"
                     form={form}
                     onChange={handleChangeSimple}
                 />

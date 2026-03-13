@@ -503,6 +503,18 @@ const MatrizPostulante = () => {
               color: { argb: "FFFFFFFF" }
             };
           }
+
+          if (normalized === "evaluado") {
+            cell.fill = {
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: "FF00B050" }
+            };
+            cell.font = {
+              bold: true,
+              color: { argb: "FFFFFFFF" }
+            };
+          }
         }
         cell.border = borderStyle;
         cell.alignment = { horizontal: "center", vertical: "middle" };
@@ -873,7 +885,11 @@ const MatrizPostulante = () => {
                                 field.toLowerCase() === "condicion" &&
                                 String(item[field]).toLowerCase().trim() === "apto"
                                 ? "bg-[#47D359] text-white font-bold"
-                                : ""
+                                : datos.matrizSeleccionada === "Matriz-9" &&
+                                  field.toLowerCase() === "condicion" &&
+                                  String(item[field]).toLowerCase().trim() === "evaluado"
+                                  ? "bg-[#47D359] text-white font-bold"
+                                  : ""
                               }`}
                           >
                             {item[field] ?? ""}
