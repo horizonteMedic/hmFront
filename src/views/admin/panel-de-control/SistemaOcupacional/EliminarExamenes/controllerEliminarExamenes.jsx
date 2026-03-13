@@ -52,7 +52,56 @@ const urlsEliminar = {
     fAptitudAnexo2: "anexos/fichaAnexo2",
     fMedAgro: "", //pendiente
     fAptitudAgro: "", //pendiente   
+    //Laboratorio
+    Hemograma: "laboratorio/hemograma",
+    Hemoglobina: "laboratorio/hemoglobina",
+    PerfilLipidico: "analisisBioquimico/perfilLipidico",
+    PerfilRenal: "analisisBioquimico/perfilRenal",
+    AcidoUrico: "analisisBioquimico/acidoUrico",
+    PerfilHepatico: "analisisBioquimico/perfilHepatico",
+    RiesgoCoronario: "riesgoCoronario",
+    ToleranciaGlucosa: "glucosaTolerancia",
+    GlucosaBasal: "laboratorio/glucosaBasal",
+    PCRUltrasensible: "pcrUltrasensible",
+    Gonadotropina: "inmunologia/lgonadotropina",
+    BKKOH: "inmunologia/microbiologia",
+    //
+    Aglutinaciones: "inmunologia/aglutinaciones",
+    Hepatitis: "inmunologia/hepatitis",
+    VDRL: "inmunologia/vdrl",
+    VIH: "inmunologia/vih",
+    Thevenon: "inmunologia/thevenon",
+    Panel2D: "toxicologia/panel2D",
+    Panel3D: "toxicologia/panel3D",
+    Panel4D: "toxicologia/panel4D",
+    Panel5D: "toxicologia/panel5D",
+    Panel10D: "toxicologia/panel10D",
+    EtanolSaliva: "etanolSaliva",
+    ConsentimientoBoro: "laboratorio/consentimientoBoro",
+    Coprocultivo: "manipuladores/coprocultivo",
+    Coproparasitológico: "manipuladores/coproparasitologico",
+    ExamenOrina: "laboratorio/orina",
+    PruebaAntigenos: "pruebasCovid/pruebaCualitativa",
+    //Consentimientos
+    ConstInformado: "anexos/consentimiento-informado",
+    ConstBuenaSalud: "anexos/consentimiento-buena-salud",
+    CONSENT_SINTOMATICO: "consentimientos/consentimientos-admision",
+    CONSENT_INFORMADO_MEDICA: "consentimientos/consentimientos-admision",
+    CONSENT_RECOM_MEDIC: "consentimientos/consentimientos-admision",
+    DECLA_JURA_ANTECE_PERSON_FAM: "consentimientos/consentimientos-admision",
+    DECLA_INFO_APTITUD_MO: "consentimientos/consentimientos-admision",
+    ConstBrigadista: "constaBrigadista/consta-brigadista",
+    ConformidadEmo: "registroConformidadEmo/conformidad-emo"
 }
+
+const camposExtraEliminar = {
+    consentimientoDosaje: "consent_Muestra_Sangre",
+    CONSENT_SINTOMATICO: "CONSENT_SINTOMATICO",
+    CONSENT_INFORMADO_MEDICA: "CONSENT_INFORMADO_MEDICA",
+    CONSENT_RECOM_MEDIC: "CONSENT_RECOM_MEDIC",
+    DECLA_JURA_ANTECE_PERSON_FAM: "DECLA_JURA_ANTECE_PERSON_FAM",
+    DECLA_INFO_APTITUD_MO: "DECLA_INFO_APTITUD_MO",
+};
 
 export const VerifyTR = async (nro, tabla, token, set, sede, ExamenesList) => {
     GetInfoPac(nro, set, token, sede, ExamenesList);
@@ -77,7 +126,10 @@ export const DeleteExamen = async (norden, campo, token, setForm, form) => {
 
     if (result.isConfirmed) {
         try {
-            const response = await fetch(`${URLAzure}/api/v01/ct/${urlsEliminar[campo]}/eliminar/${norden}${campo === "consentimientoDosaje" ? "/consent_Muestra_Sangre" : ""}`, {
+            const extra = camposExtraEliminar[campo]
+                ? `/${camposExtraEliminar[campo]}`
+                : "";
+            const response = await fetch(`${URLAzure}/api/v01/ct/${urlsEliminar[campo]}/eliminar/${norden}${extra}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
