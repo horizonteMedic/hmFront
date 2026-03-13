@@ -477,16 +477,15 @@ export default async function Aptitud_Agroindustrial(data = {}, docExistente = n
     // Simular el dibujo para calcular la posición real final
     let yPosicionSimulada = 0; // Posición simulada
     const anchoMaximoRecomendaciones = 85;
+    doc.setFont("helvetica", "normal").setFontSize(7);
     recomendacionesArray.forEach((recomendacion) => {
       if (recomendacion && recomendacion.trim()) {
-        // Mostrar recomendación sin numeración ni guiones
         const textoRecomendacion = recomendacion.trim();
-        // Simular dibujarTextoPegado para obtener la posición final real
         yPosicionSimulada = simularDibujarTextoPegado(textoRecomendacion, yPosicionSimulada, anchoMaximoRecomendaciones);
       }
     });
-    // Altura real = posición final + 1mm de padding
-    const alturaContenidoRecomendaciones = yPosicionSimulada + 1;
+    // Incluir espacio del título "RECOMENDACIONES:" (10mm) + contenido + margen inferior (3mm)
+    const alturaContenidoRecomendaciones = 10 + yPosicionSimulada + 3;
     alturaRecomendaciones = Math.max(alturaMinimaRecomendaciones, alturaContenidoRecomendaciones);
   } else {
     // Si no hay recomendaciones, usar altura mínima

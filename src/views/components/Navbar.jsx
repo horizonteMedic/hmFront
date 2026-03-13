@@ -7,6 +7,7 @@ import { URLAzure } from '../config/config';
 import { clearLocalStorageExceptAuth } from '../utils/helpers';
 import Swal from 'sweetalert2';
 import CelebrationAnimation from './CelebrationAnimation';
+import { useSessionData } from '../hooks/useSessionData';
 
 const getNavigatorConnection = () =>
   navigator.connection || navigator.mozConnection || navigator.webkitConnection;
@@ -21,6 +22,7 @@ const median = (values) => {
 
 const Navbar = () => {
   const [showMenu, setShowMenu] = useState(false);
+  const { selectedSede, userCompleto } = useSessionData();
   const [activeLink, setActiveLink] = useState("");
   const setToken = useAuthStore((state) => state.setToken);
   const setuserlogued = useAuthStore((state) => state.setuserlogued);
@@ -356,13 +358,19 @@ const Navbar = () => {
           <FontAwesomeIcon icon={faRetweet} className="w-5 h-5 " />
         </button> */}
         <NetworkIndicator className="mr-5" />
-        <button
+        {/* <button
           className='bg-white text-[#233245] hover:scale-110 ease-in-out py-2 px-4 rounded-full flex items-center justify-center duration-300 mr-5 w-28'
           title="Limpiar datos"
           onClick={handleClickReload}
         >
           <FontAwesomeIcon icon={faTrash} className='w-5 h-5' /> <span className='font-bold ml-2'>Limpiar</span>
-        </button>
+        </button> */}
+        <p
+          className='bg-white text-[#233245] py-2 px-4 rounded-full flex items-center justify-center mr-5 font-bold'
+        >
+          {userCompleto?.sedes?.find((sede) => sede.cod_sede === selectedSede)?.nombre_sede}
+        </p>
+
         {/* <button
           className='bg-purple-500 text-white hover:scale-110 ease-in-out py-2 px-3 rounded-full flex items-center justify-center duration-300 mr-5'
           title="Probar animación de celebración"

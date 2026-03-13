@@ -10,61 +10,11 @@ import Swal from "sweetalert2";
 import { buildExamenesList } from "./folioCatalogo";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
-const ExamenesListPRUEBAS2 = buildExamenesList([
-    "OFTALMOLOGIA_VISION_TESTER",
-    "PSICOSENSOMETRICO_VEHI_FOLIO",
-]);
-
-const ExamenesListPRUEBASArchivos = buildExamenesList([
-    "DECLARACION_USO_FIRMA_ARCHIVO",
-    "ELECTROCARDIOGRAMA_ARCHIVO",
-    "ESPIROMETRIA_ARCHIVO",   //Tiene firma
-    "OFTALMOLOGIA_VISION_TESTER",//Tiene firma
-    "PSICOSENSOMETRICO_CERT_ALTURA", //Tiene firma
-    "PSICOSENSOMETRICO_VEHI_FOLIO", //Tiene firma
-    "RADIOGRAFIA_COLUMNA_ARCHIVO",
-    "RADIOGRAFIA_COLUMNA_ARCHIVO2",
-    "RAYOS_X_TORAX_ARCHIVO",
-    "INTERCONSULTAS"
-]);
-
 const ExamenesListPRUEBAS = buildExamenesList([
-    // "OFTALMOLOGIA_VISION_TESTER",
-    // "PSICOSENSOMETRICO_CERT_ALTURA",        //revisar
-    // "PSICOSENSOMETRICO_CERT_ALTURA_PODEROSA",
-    // "PSICOSENSOMETRICO_CERT_ALTURA_1_8",
-    // "PSICOSENSOMETRICO_VEHI_FOLIO",
-    // "ESPIROMETRIA_ARCHIVO",
-    // "LABORATORIO_ARCHIVO_EXTERNO",
-    // "DECLARACION_USO_FIRMA_ARCHIVO",
-    "PERFIL_LIPIDICO",
-    "ANALISIS_GLUCOSA_BASAL",
-    //PRUEBA 1 = ANEXOS
-    // "INFORME_PSICOLOGICO",
-    // "INFORME_PODEROSA_OPERAR",
-    // "PSICOLOGIA_ANEXO_02",
-    // "PSICOLOGIA_ANEXO_03",
-    // //PRUEBA 2 = BOROO
-    // "INFORME_PSICOLABORAL",  
-    // "INFORME_RIESGO_PSICOSOCIAL", //nuevo
-    // "INFORME_BURNOUT", //nuevo
-    // //Prueba 3
-    // "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
-    // "ESPACIOS_CONFINADOS_PSICOLOGIA",
-    // "CALIDADSUEÑO",
-    // "INFORME_PSICOLOGIA_FOBIAS",
-    // "AVERSION_RIESGO", //nuevo
-    // "TRABAJO_ALTURA_PSICO",
-    // "TRANSTORNO_PERSONALIDAD_PSICO", //nuevo
-    // //Prueba 4
-    // "INFORME_CONDUCTORES", //nuevo
-    // "ALTO_RIESGO", //nuevo
-    // "TRABAJO_ESPECIFICOS",
-    // "CUESTIONARIO_BERLIN",
-    // "EXAMENES_COMPLEMENTARIOS",
-    // "BRIGADISTAS_PSICOLOGIA", //nuevo
-    // "BOMBA_ELECTRICA", //nuevo
-    // "PSICOLOGIA_VIGIA" //nuevo
+    "PSICOSENSOMETRICO_CERT_ALTURA",
+    "PSICOSENSOMETRICO_CERT_ALTURA_PODEROSA",
+    "PSICOSENSOMETRICO_CERT_ALTURA_1_8",
+    "PSICOSENSOMETRICO_VEHI_FOLIO",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -134,6 +84,8 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "PERFIL_HEPATICO",
     "ANALISIS_RIESGO_CORONARIO",
     "GONADOTROPINA",
+    "PCR_ULTRASENSIBLE_JSREPORT",
+    "ETANOL_EN_SALIVA_JSREPORT",
     "PANEL_2D",
     "PANEL_3D",
     "PANEL_4D",
@@ -220,176 +172,6 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "INTERCONSULTAS"                         // 22 nuevo
 ]);
 
-const ExamenesListOHLA = buildExamenesList([       //OHLA
-    "RESUMEN_MEDICO_PODEROSA",                 // 1
-    "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",    // 2
-    "ANEXO_16",                                // 3
-    "CERTIFICADO_ALTURA",                      // 4
-    "OFTALMOLOGIA_VISION_TESTER",              // 5 no se mostrara si existe  PSICOSENSOMETRICO_VEHI_FOLIO 
-    "CERTIFICADO_VEHICULOS",                   // 6
-    "FICHA_SAS",                               // 7
-    "PSICOSENSOMETRICO_VEHI_FOLIO",            // 8
-    "HISTORIA_OCUPACIONAL",                    // 9
-    "ANTECEDENTES_PATOLOGICOS",                // 10
-    "DECLARACION_JURADA_ANTECEDENTES",         // 11
-    "CUESTIONARIO_NORDICO",                    // 12
-    "EVALUACION_MUSCULO_ESQUELETICA",          // 13
-    "CONSENT_MUESTRA_SANGRE",                  // 14
-    "LABORATORIO_CLINICO",                     // 15
-    "PERFIL_LIPIDICO",                         // 16
-    "GONADOTROPINA",                           // 17
-    "PERFIL_RENAL",                            // 18
-    "PERFIL_HEPATICO",                         // 19
-    "CONSENT_PANEL_5D",                        // 20
-    "OIT",                                     // 21
-    "RADIOGRAFIA_TORAX",             // 15
-    "RAYOS_X_TORAX_ARCHIVO",         // 16
-    "RADIOGRAFIA_COLUMNA",           // 17
-    "RADIOGRAFIA_COLUMNA_ARCHIVO",   // 18
-    "RADIOGRAFIA_COLUMNA_ARCHIVO2",  // 19
-    "ELECTROCARDIOGRAMA",                      // 25
-    "ESPIROMETRIA_ARCHIVO",                    // 26
-    "AUDIOMETRIA_OHLA",                        // 27
-    "ODONTOGRAMA",                             // 28
-    "PSICOLOGIA_ANEXO_02",                     // 29
-    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",    // 30
-    "CUESTIONARIO_BERLIN",                     // 31
-    "INFORME_PSICOLOGICO",                     // 32
-    "TRABAJO_ALTURA_PSICO",                    // 33
-    "OFTALMOLOGIA",                            // 34
-    "CONSENT_DECLARACION_APTITUD",             // 35
-    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL", //EXTRA VIVIANA
-    "DECLARACION_USO_FIRMA_ARCHIVO",           // 36
-    "INTERCONSULTAS"                           // 37
-]);
-
-const ExamenesListOHLA1 = buildExamenesList([       //OHLA 1
-    "RESUMEN_MEDICO_PODEROSA",
-    "CERTIFICADO_APTITUD_ANEXO_16",
-    "ANEXO_16",
-    "CERTIFICADO_ALTURA",
-    "PSICOSENSOMETRICO_CERT_ALTURA",
-    "CERTIFICADO_VEHICULOS",
-    "FICHA_SAS",
-    "HISTORIA_OCUPACIONAL",
-    "ANTECEDENTES_PATOLOGICOS",
-    "DECLARACION_JURADA_ANTECEDENTES",
-    "CUESTIONARIO_NORDICO",
-    "EVALUACION_MUSCULO_ESQUELETICA",
-    "CONSENT_MUESTRA_SANGRE",
-    "LABORATORIO_CLINICO",
-    "PERFIL_LIPIDICO",
-    "PERFIL_HEPATICO",
-    "PERFIL_RENAL",
-    "PANEL_5D",
-    "GONADOTROPINA",
-    "CONSENT_PANEL_5D",
-    "OIT",
-    "RADIOGRAFIA_TORAX",             // 15
-    "RAYOS_X_TORAX_ARCHIVO",         // 16
-    "RADIOGRAFIA_COLUMNA",           // 17
-    "RADIOGRAFIA_COLUMNA_ARCHIVO",   // 18
-    "RADIOGRAFIA_COLUMNA_ARCHIVO2",  // 19
-    "ELECTROCARDIOGRAMA",
-    "ELECTROCARDIOGRAMA_ARCHIVO",
-    "ESPIROMETRIA_ARCHIVO",
-    "AUDIOMETRIA_OHLA",
-    "ODONTOGRAMA",
-    "PSICOLOGIA_ANEXO_02",
-    "EXAMENES_COMPLEMENTARIOS",
-    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
-    "TRABAJO_ALTURA_PSICO",
-    "OFTALMOLOGIA",
-    "OFTALMOLOGIA_VISION_TESTER",
-    "CONSENT_DECLARACION_APTITUD",
-    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
-    "DECLARACION_USO_FIRMA_ARCHIVO",
-    "INTERCONSULTAS"
-]);
-
-const ExamenesListOHLA2 = buildExamenesList([       //OHLA 2
-    "RESUMEN_MEDICO_PODEROSA",
-    "CERTIFICADO_APTITUD_ANEXO_16",
-    "ANEXO_16",
-    "CERTIFICADO_VEHICULOS",
-    "PSICOSENSOMETRICO_VEHI_FOLIO",
-    "FICHA_SAS",
-    "HISTORIA_OCUPACIONAL",
-    "ANTECEDENTES_PATOLOGICOS",
-    "DECLARACION_JURADA_ANTECEDENTES",
-    "CUESTIONARIO_NORDICO",
-    "EVALUACION_MUSCULO_ESQUELETICA",
-    "CONSENT_MUESTRA_SANGRE",
-    "LABORATORIO_CLINICO",
-    "PERFIL_LIPIDICO",
-    "PERFIL_HEPATICO",
-    "PERFIL_RENAL",
-    "PANEL_5D",
-    "GONADOTROPINA",
-    "CONSENT_PANEL_5D",
-    "OIT",
-    "RADIOGRAFIA_TORAX",             // 15
-    "RAYOS_X_TORAX_ARCHIVO",         // 16
-    "RADIOGRAFIA_COLUMNA",           // 17
-    "RADIOGRAFIA_COLUMNA_ARCHIVO",   // 18
-    "RADIOGRAFIA_COLUMNA_ARCHIVO2",  // 19
-    "ELECTROCARDIOGRAMA",
-    "ELECTROCARDIOGRAMA_ARCHIVO",
-    "ESPIROMETRIA_ARCHIVO",
-    "AUDIOMETRIA_OHLA",
-    "ODONTOGRAMA",
-    "PSICOLOGIA_ANEXO_02",
-    "CUESTIONARIO_BERLIN",
-    "EXAMENES_COMPLEMENTARIOS",
-    "ESPACIOS_CONFINADOS_PSICOLOGIA",
-    "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
-
-    "OFTALMOLOGIA",
-    "OFTALMOLOGIA_VISION_TESTER",
-    "CONSENT_DECLARACION_APTITUD",
-    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
-    "DECLARACION_USO_FIRMA_ARCHIVO",
-    "INTERCONSULTAS"
-]);
-
-const ExamenesListOHLA3 = buildExamenesList([       //OHLA 3
-    "RESUMEN_MEDICO_PODEROSA",
-    "CERTIFICADO_APTITUD_ANEXO_16",
-    "ANEXO_16",
-    "HISTORIA_OCUPACIONAL",
-    "ANTECEDENTES_PATOLOGICOS",
-    "DECLARACION_JURADA_ANTECEDENTES",
-    "CUESTIONARIO_NORDICO",
-    "EVALUACION_MUSCULO_ESQUELETICA",
-    "CONSENT_MUESTRA_SANGRE",
-    "LABORATORIO_CLINICO",
-    "PERFIL_LIPIDICO",
-    "PERFIL_HEPATICO",
-    "PERFIL_RENAL",
-    "PANEL_5D",
-    "GONADOTROPINA",
-    "CONSENT_PANEL_5D",
-    "OIT",
-    "RADIOGRAFIA_TORAX",             // 15
-    "RAYOS_X_TORAX_ARCHIVO",         // 16
-    "RADIOGRAFIA_COLUMNA",           // 17
-    "RADIOGRAFIA_COLUMNA_ARCHIVO",   // 18
-    "RADIOGRAFIA_COLUMNA_ARCHIVO2",  // 19
-    "ELECTROCARDIOGRAMA",
-    "ELECTROCARDIOGRAMA_ARCHIVO",
-    "ESPIROMETRIA_ARCHIVO",
-    "AUDIOMETRIA_OHLA",
-    "ODONTOGRAMA",
-    "PSICOLOGIA_ANEXO_02",
-    "EXAMENES_COMPLEMENTARIOS",
-    "OFTALMOLOGIA",
-    "OFTALMOLOGIA_VISION_TESTER",
-    "CONSENT_DECLARACION_APTITUD",
-    "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
-    "DECLARACION_USO_FIRMA_ARCHIVO",
-    "INTERCONSULTAS"
-]);
-
 const ExamenesListPsicologia = buildExamenesList([
     "INFORME_PSICOLOGICO",
     "PSICOLOGIA_ANEXO_02",
@@ -426,6 +208,8 @@ const ExamenesListLaboratorio = buildExamenesList([
     "PERFIL_HEPATICO",
     "ANALISIS_RIESGO_CORONARIO",
     "GONADOTROPINA",
+    "PCR_ULTRASENSIBLE_JSREPORT",
+    "ETANOL_EN_SALIVA_JSREPORT",
     "PANEL_2D",
     "PANEL_3D",
     "PANEL_4D",
@@ -460,7 +244,7 @@ const ExamenesListLaboratorio = buildExamenesList([
 ]);
 
 const ListaPorPlantilla = {
-    //PRUEBAS: ExamenesListPRUEBAS,
+    // PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     "COMPLETO": ExamenesListCOMPLETO,
     //OHLA: ExamenesListOHLA,
@@ -588,7 +372,7 @@ const Folio = () => {
         });
     };
 
-    const handleGenerarFolio = async () => {
+    const handleGenerarFolio = async (comprimidoz = false) => {
         // Cancelar petición anterior si existe
         if (abortControllerRef.current) {
             abortControllerRef.current.abort();
@@ -649,7 +433,7 @@ const Folio = () => {
             };
 
             // Llamar a FolioJasper con el callback de progreso
-            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress, selectedListType, controller.signal, form.nombres, form.apellidos, datosFooter);
+            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress, selectedListType, controller.signal, form.nombres, form.apellidos, datosFooter, comprimidoz);
 
             // Cerrar la alerta de carga y mostrar éxito
             Swal.fire({
@@ -963,7 +747,7 @@ const Folio = () => {
                     })}
                 </div>
                 <div className="grid md:grid-cols-3 w-full gap-4">
-                    <div/>
+                    <div />
                     <div className="flex justify-center items-center w-full gap-4">
                         <button
                             className="bg-yellow-400 hover:bg-yellow-500 text-white py-2 px-4 rounded-md mt-4 text-semibold"
@@ -973,10 +757,17 @@ const Folio = () => {
                         </button>
                         <button
                             className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
-                            onClick={handleGenerarFolio}
+                            onClick={() => handleGenerarFolio(false)}
                             disabled={(form.listaExamenes?.filter(e => e.imprimir).length || 0) == 0}
                         >
                             Generar Folio
+                        </button>
+                        <button
+                            className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
+                            onClick={() => handleGenerarFolio(true)}
+                            disabled={(form.listaExamenes?.filter(e => e.imprimir).length || 0) == 0}
+                        >
+                            Generar Folio Comprimido
                         </button>
                     </div>
 
@@ -1006,3 +797,173 @@ const Folio = () => {
 };
 
 export default Folio;
+
+// const ExamenesListOHLA = buildExamenesList([       //OHLA
+//     "RESUMEN_MEDICO_PODEROSA",                 // 1
+//     "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",    // 2
+//     "ANEXO_16",                                // 3
+//     "CERTIFICADO_ALTURA",                      // 4
+//     "OFTALMOLOGIA_VISION_TESTER",              // 5 no se mostrara si existe  PSICOSENSOMETRICO_VEHI_FOLIO
+//     "CERTIFICADO_VEHICULOS",                   // 6
+//     "FICHA_SAS",                               // 7
+//     "PSICOSENSOMETRICO_VEHI_FOLIO",            // 8
+//     "HISTORIA_OCUPACIONAL",                    // 9
+//     "ANTECEDENTES_PATOLOGICOS",                // 10
+//     "DECLARACION_JURADA_ANTECEDENTES",         // 11
+//     "CUESTIONARIO_NORDICO",                    // 12
+//     "EVALUACION_MUSCULO_ESQUELETICA",          // 13
+//     "CONSENT_MUESTRA_SANGRE",                  // 14
+//     "LABORATORIO_CLINICO",                     // 15
+//     "PERFIL_LIPIDICO",                         // 16
+//     "GONADOTROPINA",                           // 17
+//     "PERFIL_RENAL",                            // 18
+//     "PERFIL_HEPATICO",                         // 19
+//     "CONSENT_PANEL_5D",                        // 20
+//     "OIT",                                     // 21
+//     "RADIOGRAFIA_TORAX",             // 15
+//     "RAYOS_X_TORAX_ARCHIVO",         // 16
+//     "RADIOGRAFIA_COLUMNA",           // 17
+//     "RADIOGRAFIA_COLUMNA_ARCHIVO",   // 18
+//     "RADIOGRAFIA_COLUMNA_ARCHIVO2",  // 19
+//     "ELECTROCARDIOGRAMA",                      // 25
+//     "ESPIROMETRIA_ARCHIVO",                    // 26
+//     "AUDIOMETRIA_OHLA",                        // 27
+//     "ODONTOGRAMA",                             // 28
+//     "PSICOLOGIA_ANEXO_02",                     // 29
+//     "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",    // 30
+//     "CUESTIONARIO_BERLIN",                     // 31
+//     "INFORME_PSICOLOGICO",                     // 32
+//     "TRABAJO_ALTURA_PSICO",                    // 33
+//     "OFTALMOLOGIA",                            // 34
+//     "CONSENT_DECLARACION_APTITUD",             // 35
+//     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL", //EXTRA VIVIANA
+//     "DECLARACION_USO_FIRMA_ARCHIVO",           // 36
+//     "INTERCONSULTAS"                           // 37
+// ]);
+
+// const ExamenesListOHLA1 = buildExamenesList([       //OHLA 1
+//     "RESUMEN_MEDICO_PODEROSA",
+//     "CERTIFICADO_APTITUD_ANEXO_16",
+//     "ANEXO_16",
+//     "CERTIFICADO_ALTURA",
+//     "PSICOSENSOMETRICO_CERT_ALTURA",
+//     "CERTIFICADO_VEHICULOS",
+//     "FICHA_SAS",
+//     "HISTORIA_OCUPACIONAL",
+//     "ANTECEDENTES_PATOLOGICOS",
+//     "DECLARACION_JURADA_ANTECEDENTES",
+//     "CUESTIONARIO_NORDICO",
+//     "EVALUACION_MUSCULO_ESQUELETICA",
+//     "CONSENT_MUESTRA_SANGRE",
+//     "LABORATORIO_CLINICO",
+//     "PERFIL_LIPIDICO",
+//     "PERFIL_HEPATICO",
+//     "PERFIL_RENAL",
+//     "PANEL_5D",
+//     "GONADOTROPINA",
+//     "CONSENT_PANEL_5D",
+//     "OIT",
+//     "RADIOGRAFIA_TORAX",             // 15
+//     "RAYOS_X_TORAX_ARCHIVO",         // 16
+//     "RADIOGRAFIA_COLUMNA",           // 17
+//     "RADIOGRAFIA_COLUMNA_ARCHIVO",   // 18
+//     "RADIOGRAFIA_COLUMNA_ARCHIVO2",  // 19
+//     "ELECTROCARDIOGRAMA",
+//     "ELECTROCARDIOGRAMA_ARCHIVO",
+//     "ESPIROMETRIA_ARCHIVO",
+//     "AUDIOMETRIA_OHLA",
+//     "ODONTOGRAMA",
+//     "PSICOLOGIA_ANEXO_02",
+//     "EXAMENES_COMPLEMENTARIOS",
+//     "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
+//     "TRABAJO_ALTURA_PSICO",
+//     "OFTALMOLOGIA",
+//     "OFTALMOLOGIA_VISION_TESTER",
+//     "CONSENT_DECLARACION_APTITUD",
+//     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+//     "DECLARACION_USO_FIRMA_ARCHIVO",
+//     "INTERCONSULTAS"
+// ]);
+
+// const ExamenesListOHLA2 = buildExamenesList([       //OHLA 2
+//     "RESUMEN_MEDICO_PODEROSA",
+//     "CERTIFICADO_APTITUD_ANEXO_16",
+//     "ANEXO_16",
+//     "CERTIFICADO_VEHICULOS",
+//     "PSICOSENSOMETRICO_VEHI_FOLIO",
+//     "FICHA_SAS",
+//     "HISTORIA_OCUPACIONAL",
+//     "ANTECEDENTES_PATOLOGICOS",
+//     "DECLARACION_JURADA_ANTECEDENTES",
+//     "CUESTIONARIO_NORDICO",
+//     "EVALUACION_MUSCULO_ESQUELETICA",
+//     "CONSENT_MUESTRA_SANGRE",
+//     "LABORATORIO_CLINICO",
+//     "PERFIL_LIPIDICO",
+//     "PERFIL_HEPATICO",
+//     "PERFIL_RENAL",
+//     "PANEL_5D",
+//     "GONADOTROPINA",
+//     "CONSENT_PANEL_5D",
+//     "OIT",
+//     "RADIOGRAFIA_TORAX",             // 15
+//     "RAYOS_X_TORAX_ARCHIVO",         // 16
+//     "RADIOGRAFIA_COLUMNA",           // 17
+//     "RADIOGRAFIA_COLUMNA_ARCHIVO",   // 18
+//     "RADIOGRAFIA_COLUMNA_ARCHIVO2",  // 19
+//     "ELECTROCARDIOGRAMA",
+//     "ELECTROCARDIOGRAMA_ARCHIVO",
+//     "ESPIROMETRIA_ARCHIVO",
+//     "AUDIOMETRIA_OHLA",
+//     "ODONTOGRAMA",
+//     "PSICOLOGIA_ANEXO_02",
+//     "CUESTIONARIO_BERLIN",
+//     "EXAMENES_COMPLEMENTARIOS",
+//     "ESPACIOS_CONFINADOS_PSICOLOGIA",
+//     "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",
+
+//     "OFTALMOLOGIA",
+//     "OFTALMOLOGIA_VISION_TESTER",
+//     "CONSENT_DECLARACION_APTITUD",
+//     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+//     "DECLARACION_USO_FIRMA_ARCHIVO",
+//     "INTERCONSULTAS"
+// ]);
+
+// const ExamenesListOHLA3 = buildExamenesList([       //OHLA 3
+//     "RESUMEN_MEDICO_PODEROSA",
+//     "CERTIFICADO_APTITUD_ANEXO_16",
+//     "ANEXO_16",
+//     "HISTORIA_OCUPACIONAL",
+//     "ANTECEDENTES_PATOLOGICOS",
+//     "DECLARACION_JURADA_ANTECEDENTES",
+//     "CUESTIONARIO_NORDICO",
+//     "EVALUACION_MUSCULO_ESQUELETICA",
+//     "CONSENT_MUESTRA_SANGRE",
+//     "LABORATORIO_CLINICO",
+//     "PERFIL_LIPIDICO",
+//     "PERFIL_HEPATICO",
+//     "PERFIL_RENAL",
+//     "PANEL_5D",
+//     "GONADOTROPINA",
+//     "CONSENT_PANEL_5D",
+//     "OIT",
+//     "RADIOGRAFIA_TORAX",             // 15
+//     "RAYOS_X_TORAX_ARCHIVO",         // 16
+//     "RADIOGRAFIA_COLUMNA",           // 17
+//     "RADIOGRAFIA_COLUMNA_ARCHIVO",   // 18
+//     "RADIOGRAFIA_COLUMNA_ARCHIVO2",  // 19
+//     "ELECTROCARDIOGRAMA",
+//     "ELECTROCARDIOGRAMA_ARCHIVO",
+//     "ESPIROMETRIA_ARCHIVO",
+//     "AUDIOMETRIA_OHLA",
+//     "ODONTOGRAMA",
+//     "PSICOLOGIA_ANEXO_02",
+//     "EXAMENES_COMPLEMENTARIOS",
+//     "OFTALMOLOGIA",
+//     "OFTALMOLOGIA_VISION_TESTER",
+//     "CONSENT_DECLARACION_APTITUD",
+//     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
+//     "DECLARACION_USO_FIRMA_ARCHIVO",
+//     "INTERCONSULTAS"
+// ]);

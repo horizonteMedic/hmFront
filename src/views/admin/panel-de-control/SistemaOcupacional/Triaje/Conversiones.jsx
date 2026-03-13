@@ -275,19 +275,20 @@ export const GetSat = async (event,triaje,set) => {
             await Swal.fire('Valor Absurdo','Ingrese otro dato por favor.','error')
             return
         }
-        if (Saturacion < 85) {
-            set(d => ({ ...d, sat02: '' }))
-            await Swal.fire('HIPOXIA SEVERA','Ingrese otro dato por favor.','error')
-            return
-        } else if (Saturacion >= 85 && Saturacion <= 88) {
-            set(d => ({ ...d, sat02: '' }))
-            await Swal.fire('HIPOXIA MODERADA','Ingrese otro dato por favor.','error')
-            return
-        } else if (Saturacion >= 89 && Saturacion <= 92) {
-            set(d => ({ ...d, sat02: '' }))
-            await Swal.fire('HIPOXIA LEVE','Ingrese otro dato por favor.','error')
-            return
-        } else if (Saturacion >= 93 && Saturacion <= 100) {
+        // if (Saturacion < 85) {
+        //     set(d => ({ ...d, sat02: '' }))
+        //     await Swal.fire('HIPOXIA SEVERA','Ingrese otro dato por favor.','error')
+        //     return
+        // } else if (Saturacion >= 85 && Saturacion <= 88) {
+        //     set(d => ({ ...d, sat02: '' }))
+        //     await Swal.fire('HIPOXIA MODERADA','Ingrese otro dato por favor.','error')
+        //     return
+        // } else if (Saturacion >= 89 && Saturacion <= 92) {
+        //     set(d => ({ ...d, sat02: '' }))
+        //     await Swal.fire('HIPOXIA LEVE','Ingrese otro dato por favor.','error')
+        //     return
+        // } 
+        else if (Saturacion >= 90 && Saturacion <= 100) {
             set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- SATURACIÓN DE OXIGENO: NORMAL.'+"\n" }))
         } else if (Saturacion >= 101) {
             set(d => ({ ...d, sat02: '' }))

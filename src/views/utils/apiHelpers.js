@@ -83,6 +83,31 @@ export function getFetch(url, token, signal) {
         });
     }).then(response => response)
 }
+export function getFetchPdf(url, token, signal) {
+    const options = {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    };
+
+    if (signal) {
+        options.signal = signal;
+    }
+
+    return fetch(URLAzure + url, options)
+        .then(async (res) => {
+            if (!res.ok) {
+                return { error: true, status: res.status, statusText: res.statusText };
+            }
+
+            const blob = await res.blob();
+            return blob; // 👈 devolvemos directamente el PDF como blob
+        })
+        .catch(error => {
+            return { error: true, message: error.message };
+        });
+}
 
 export async function getFetchManejo(url, token) {
     const res = await fetch(URLAzure + url, {

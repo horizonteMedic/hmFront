@@ -29,12 +29,12 @@ export const EXAMENES_CATALOGO = {
         esJasper: true
     },
 
-    CERTIFICADO_ANEXO_02: {
-        nombre: "CERTIFICADO MEDICO OCUPACIONAL ANEXO 02",
-        tabla: "aptitud_medico_ocupacional_agro",
-        url: "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2",
-        esJasper: true,
-    },
+    // CERTIFICADO_ANEXO_02: {
+    //     nombre: "CERTIFICADO MEDICO OCUPACIONAL ANEXO 02",
+    //     tabla: "aptitud_medico_ocupacional_agro",
+    //     url: "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2",
+    //     esJasper: true,
+    // },
 
     CERTIFICADO_APTITUD_ANEXO_16: {
         nombre: "CERTIFICADO DE APTITUD ANEXO 16",
@@ -182,6 +182,27 @@ export const EXAMENES_CATALOGO = {
         tablaArchivo: "funcion_abs",
         urlInfo: "/api/v01/ct/espirometria/obtenerReporteEspirometria",
         esArchivo: true,
+    },
+
+    PCR_ULTRASENSIBLE_JSREPORT: {
+        nombre: "PCR ULTRASENSIBLE",
+        tabla: "pcr_ultrasensible",
+        urlJsreport: "/api/v01/ct/pcrUltrasensible/descargarReporte",
+        esJsreport: true,
+    },
+
+    ETANOL_EN_SALIVA_JSREPORT: {
+        nombre: "ETANOL EN SALIVA",
+        tabla: "etanol_saliva",
+        urlJsreport: "/api/v01/ct/etanolSaliva/descargarReporte",
+        esJsreport: true,
+    },
+
+    CERTIFICADO_ANEXO_02: {
+        nombre: "CERTIFICADO MEDICO OCUPACIONAL ANEXO 02",
+        tabla: "aptitud_medico_ocupacional_agro",
+        urlJsreport: "/api/v01/ct/anexos/fichaAnexo2/descargarReporteFichaAnexo2",
+        esJsreport: true,
     },
 
     INTERCONSULTAS: {
@@ -817,6 +838,7 @@ export const EXAMENES_CATALOGO = {
 const EXAMEN_DEFAULT = {
     resultado: false,
     imprimir: false,
+    esJsreport: false,
     esJasper: false,
     nameConset: false,
 };

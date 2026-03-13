@@ -27,8 +27,9 @@ import EmpleadoComboBox from "../../../../components/reusableComponents/Empleado
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
 
 const tabla = "b_certificado_conduccion";
-const today = getToday();
+
 export default function FichaConduccionVehiculos() {
+    const today = getToday();
     const [activeTab, setActiveTab] = useState(0);
 
     const { token, userlogued, selectedSede, datosFooter, userCompleto, userName } =
@@ -144,6 +145,10 @@ export default function FichaConduccionVehiculos() {
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
+
+        nombre_doctorAsignado: "",
+        user_doctorAsignado: "",
+
 
         SubirDoc: false,
         nomenclatura: "PSICOSENSOMETRICO VEHI-FOLIO"
@@ -447,8 +452,17 @@ export default function FichaConduccionVehiculos() {
                                 />
                                 <EmpleadoComboBox
                                     value={form.nombre_medico}
+                                    label="Especialista"
                                     form={form}
                                     onChange={handleChangeSimple}
+                                />
+                                <EmpleadoComboBox
+                                    value={form.nombre_doctorAsignado}
+                                    label="Doctor Asignado"
+                                    form={form}
+                                    onChange={handleChangeSimple}
+                                    nameField="nombre_doctorAsignado"
+                                    idField="user_doctorAsignado"
                                 />
                             </div>
 

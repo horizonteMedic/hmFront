@@ -4,10 +4,10 @@ import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 
-export default async function FichaDatosPersonales(data = {}) {
+export default async function Informe_Ocu_DatosPacientes(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
-
+  console.log("ssa")
   // Datos de prueba si no hay data
   const datosPrueba = {
     empresa: "MINERA PODEROSA S.A.",
@@ -704,7 +704,7 @@ export default async function FichaDatosPersonales(data = {}) {
   // Filas de datos (Padre, Madre, Conviviente, Esposa, 5 Hijos)
   datosFinales.composicionFamiliar.forEach((familiar) => {
     xCol = tablaInicioX;
-
+    console.log("familiar", familiar)
     // Parentesco
     doc.line(xCol, yPos, xCol, yPos + filaAltura);
     doc.line(xCol + colParentesco, yPos, xCol + colParentesco, yPos + filaAltura);
@@ -729,7 +729,7 @@ export default async function FichaDatosPersonales(data = {}) {
     // F.Nacimiento
     doc.line(xCol, yPos, xCol, yPos + filaAltura);
     doc.line(xCol + colFNacimiento, yPos, xCol + colFNacimiento, yPos + filaAltura);
-    doc.text(familiar.fNacimiento, xCol + colFNacimiento / 2, yPos + 3.5, { align: "center" });
+    doc.text(String(familiar.fechaNacimiento ?? ""), xCol + colFNacimiento / 2, yPos + 3.5, { align: "center" });
     xCol += colFNacimiento;
 
     // Edad
@@ -748,7 +748,7 @@ export default async function FichaDatosPersonales(data = {}) {
     doc.line(xCol, yPos, xCol, yPos + filaAltura);
     doc.line(xCol + colGrado, yPos, xCol + colGrado, yPos + filaAltura);
     doc.setFontSize(5);
-    doc.text(familiar.grado, xCol + colGrado / 2, yPos + 3.5, { align: "center" });
+    doc.text(familiar.gradoInstruccion, xCol + colGrado / 2, yPos + 3.5, { align: "center" });
     doc.setFontSize(7);
     xCol += colGrado;
 
@@ -882,7 +882,7 @@ export default async function FichaDatosPersonales(data = {}) {
   // 5 filas para Instrucción Adquirida con datos
   datosFinales.instruccionAdquirida.forEach((inst) => {
     xColInst = tablaInicioX;
-
+    console.log("items", inst)
     // Instrucción
     doc.line(xColInst, yPos, xColInst, yPos + filaAltura);
     doc.line(xColInst + colInstruccion, yPos, xColInst + colInstruccion, yPos + filaAltura);
@@ -893,7 +893,7 @@ export default async function FichaDatosPersonales(data = {}) {
     // Centro de Estudios
     doc.line(xColInst, yPos, xColInst, yPos + filaAltura);
     doc.line(xColInst + colCentroEstudios, yPos, xColInst + colCentroEstudios, yPos + filaAltura);
-    doc.text(inst.centro, xColInst + colCentroEstudios / 2, yPos + 3.5, { align: "center" });
+    doc.text(inst.centroEstudio, xColInst + colCentroEstudios / 2, yPos + 3.5, { align: "center" });
     xColInst += colCentroEstudios;
 
     // Fecha Inicio
@@ -911,7 +911,7 @@ export default async function FichaDatosPersonales(data = {}) {
     // Grado Obtenido
     doc.line(xColInst, yPos, xColInst, yPos + filaAltura);
     doc.line(xColInst + colGradoObtenido, yPos, xColInst + colGradoObtenido, yPos + filaAltura);
-    doc.text(inst.grado, xColInst + colGradoObtenido / 2, yPos + 3.5, { align: "center" });
+    doc.text(inst.gradoObtenido, xColInst + colGradoObtenido / 2, yPos + 3.5, { align: "center" });
 
     // Líneas horizontales
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);

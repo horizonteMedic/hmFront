@@ -11,7 +11,7 @@ import { getToday } from "../../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaDatosPacientes";
 import BotonesAccion from "../../../../../components/templates/BotonesAccion";
 
-const tabla = "ficha_datos_pacientes";
+const tabla = "ficha_datos_paciente";
 const today = getToday();
 
 export default function FichaDatosPacientes() {
@@ -718,97 +718,6 @@ export default function FichaDatosPacientes() {
                 </div>
             </SectionFieldset>
 
-            {/* ===== SECCIÓN: CAPACITACIÓN ===== */}
-            {/* <SectionFieldset legend="Capacitación">
-                <div className="grid grid-cols-5 gap-2 mb-3 items-end">
-                    <InputTextOneLine
-                        label="Titulo Capacitación"
-                        name="capacitacionTitulo"
-                        value={form.capacitacionTitulo}
-                        onChange={handleChange}
-                        labelOnTop
-                    />
-                    <InputTextOneLine
-                        label="Centro de Estudios"
-                        name="capacitacionCentro"
-                        value={form.capacitacionCentro}
-                        onChange={handleChange}
-                        labelOnTop
-                    />
-                    <InputTextOneLine
-                        label="Fecha Inicio"
-                        name="capacitacionFechaInicio"
-                        type="date"
-                        value={form.capacitacionFechaInicio}
-                        onChange={handleChangeSimple}
-                        labelOnTop
-                    />
-                    <InputTextOneLine
-                        label="Fecha Término"
-                        name="capacitacionFechaTermino"
-                        type="date"
-                        value={form.capacitacionFechaTermino}
-                        onChange={handleChangeSimple}
-                        labelOnTop
-                    />
-                    <div className="flex flex-col gap-2">
-                        <label className="font-semibold">Grado Obtenido :</label>
-                        <div className="flex gap-2">
-                            <input
-                                name="capacitacionGrado"
-                                value={form.capacitacionGrado ?? ""}
-                                onChange={handleChange}
-                                className="border rounded px-2 py-1 w-full"
-                            />
-                            <button
-                                type="button"
-                                onClick={agregarCapacitacion}
-                                className="bg-green-500 hover:bg-green-600 text-white w-8 h-8 rounded flex-shrink-0 flex items-center justify-center"
-                                title="Agregar capacitación"
-                            >
-                                <FontAwesomeIcon icon={faCheckCircle} />
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                {form.capacitaciones.length > 0 && (
-                    <div className="overflow-x-auto">
-                        <table className="w-full border-collapse border border-gray-300 ">
-                            <thead className="bg-gray-100">
-                                <tr>
-                                    <th className="border border-gray-300 px-2 py-1">Titulo</th>
-                                    <th className="border border-gray-300 px-2 py-1">Centro de Estudios</th>
-                                    <th className="border border-gray-300 px-2 py-1">Fecha Inicio</th>
-                                    <th className="border border-gray-300 px-2 py-1">Fecha Término</th>
-                                    <th className="border border-gray-300 px-2 py-1">Grado Obtenido</th>
-                                    <th className="border border-gray-300 px-2 py-1">Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {form.capacitaciones.map((cap, index) => (
-                                    <tr key={index}>
-                                        <td className="border border-gray-300 px-2 py-1">{cap.instruccion}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{cap.centroEstudio}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{cap.fechaInicio}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{cap.fechaTermino}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{cap.gradoObtenido}</td>
-                                        <td className="border border-gray-300 px-2 py-1 text-center">
-                                            <button
-                                                type="button"
-                                                onClick={() => eliminarCapacitacion(index)}
-                                                className="text-red-500 hover:text-red-700"
-                                            >
-                                                <FontAwesomeIcon icon={faTrash} />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-            </SectionFieldset> */}
-
             {/* ===== SECCIÓN: EXPERIENCIA LABORAL ===== */}
             <SectionFieldset legend="Experiencia Laboral (Comenzar por último empleo)">
                 <div className="grid grid-cols-6 gap-2 mb-3 items-end">
@@ -1007,15 +916,15 @@ export default function FichaDatosPacientes() {
                         <InputTextOneLine
                             label="Sueldo/Jornal"
                             name="sueldoJornal"
+                            onChange={handleChangeNumber}
                             value={form.sueldoJornal}
-                            disabled
                             labelWidth="100px"
                         />
                         <InputTextOneLine
                             label="Sistema Trabajo"
                             name="sistemaTrabajo"
+                            onChange={handleChangeSimple}
                             value={form.sistemaTrabajo}
-                            disabled
                             labelWidth="100px"
                         />
 
@@ -1050,16 +959,16 @@ export default function FichaDatosPacientes() {
                             />
                             <InputTextOneLine
                                 name="viaticosValor"
+                                onChange={handleChange}
                                 value={form.viaticosValor ?? ""}
                                 className="w-full"
-                                disabled
                             />
                         </div>
                         <InputTextOneLine
                             label="Alimentación A cta. Contrata"
                             name="alimentacionContrata"
+                            onChange={handleChange}
                             value={form.alimentacionContrata}
-                            disabled
                             labelWidth="100px"
                         />
                     </div>
@@ -1082,15 +991,19 @@ export default function FichaDatosPacientes() {
                     disabled
                     labelWidth="120px"
                 />
-                <InputsBooleanRadioGroup
-                    label="Aptitud"
+                <InputsRadioGroup
                     name="aptitud"
                     value={form.aptitud}
-                    onChange={handleRadioButtonBoolean}
-                    trueLabel="Apto"
-                    falseLabel="No Apto"
-                    labelWidth="120px"
+                    label="Aptitud"
+                    onChange={handleRadioButton}
+                    options={[
+                        { label: "Apto", value: "APTO" },
+                        { label: "No Apto", value: "NO APTO" },
+                        { label: "Apto con Restriccion", value: "APTO RESTRICCION" },
+                    ]}
+
                 />
+
             </SectionFieldset>
 
             {/* BOTONES DE ACCIÓN */}

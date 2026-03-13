@@ -2,8 +2,11 @@ import Swal from "sweetalert2";
 import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
+    handleSubidaMasiva,
+    handleSubirArchivoDefaultSinSellos,
     LoadingDefault,
     PrintHojaRDefault,
+    ReadArchivosFormDefault,
     SubmitDataServiceDefault,
     VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
@@ -13,6 +16,10 @@ const obtenerReporteUrl =
     "/api/v01/ct/informePsicologico/obtenerReporteInformePsicologico";
 const registrarUrl =
     "/api/v01/ct/informePsicologico/registrarActualizarInformePsicologico";
+
+const registrarPDF =
+    "/api/v01/ct/archivos/archivoInterconsulta"
+
 
 export const GetInfoServicio = async (
     nro,
@@ -102,6 +109,8 @@ export const GetInfoServicio = async (
 
             // Aprobó Test
             aproboTest: res.aprobo ?? false,
+
+            SubirDoc: true,
         }));
     }
 };
@@ -201,3 +210,15 @@ const GetInfoPac = async (nro, set, token, sede) => {
 export const Loading = (mensaje) => {
     LoadingDefault(mensaje);
 };
+
+
+export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
+    handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
+};
+
+export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
+    ReadArchivosFormDefault(form, setVisualerOpen, token)
+}
+export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token) => {
+    handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token)
+}

@@ -92,6 +92,8 @@ export const GetInfoServicio = async (
             ...prev,
             norden: res.norden ?? "",
 
+            tituloExamen: res.tituloExamen ?? "CERTIFICACIÓN MEDICA PREVIA A TRABAJO DE ALTURA",
+
             codigoCertificadoAltura: null,
             aniosExperiencia: res.tiempoExperiencia ?? "",
 
@@ -279,6 +281,8 @@ export const GetInfoServicioEditar = async (
             corregirAgudezaLecturaCerca: (res.observaciones ?? "").includes("CORREGIR AGUDEZA VISUAL PARA LECTURA DE CERCA."),
 
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+            user_doctorAsignado: res.doctorAsignado,
+
             SubirDoc: true,
             digitalizacion: res.digitalizacion,
         }));
@@ -303,6 +307,7 @@ export const SubmitDataService = async (
     }
     const body = {
         norden: form.norden,
+        tituloExamen: form.tituloExamen,
         codigoCertificadoAltura: form.codigoCertificadoAltura,
         fechaCertificacion: form.fecha,
         primeraActitud: form.examen == "PRIMERA ACTITUD",
@@ -396,6 +401,7 @@ export const SubmitDataService = async (
         usuarioRegistro: user,
 
         usuarioFirma: form.user_medicoFirma,
+        doctorAsignado: form.user_doctorAsignado,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

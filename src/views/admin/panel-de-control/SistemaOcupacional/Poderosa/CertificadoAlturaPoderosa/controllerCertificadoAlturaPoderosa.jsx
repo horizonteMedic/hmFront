@@ -312,6 +312,7 @@ export const GetInfoServicioEditar = async (
             digitalizacion: res.digitalizacion,
 
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+            user_doctorAsignado: res.doctorAsignado,
         }));
     }
 };
@@ -446,6 +447,7 @@ export const SubmitDataService = async (
         usuarioRegistro: user,
 
         usuarioFirma: form.user_medicoFirma,
+        doctorAsignado: form.user_doctorAsignado,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

@@ -7,6 +7,9 @@ import HojaConsultaExterna from "./HojaConsultaExterna/HojaConsultaExterna";
 import CMManipuladoresAlimentos from "./CMManipuladoresAlimentos/CMManipuladoresAlimentos";
 import CAHerramientasManuales from "./CAHerramientasManuales/CAHerramientasManuales";
 import FichaDatosPacientes from "./FichaDatosPacientes/FichaDatosPacientes";
+import CertificadoAptitudBrigadista from "./CertificadoAptitudBrigadista/CertificadoAptitudBrigadista";
+import DirecionGeneralMineria from "./DireccionGeneralMineria/DireccionGeneralMineria";
+import HojaDeRutaEmo from "./HojaDeRutaEmo/HojaDeRutaEmo";
 
 export default function PoderosaTabSelector({ tieneVista }) {
     const tabsConfig = [
@@ -58,6 +61,24 @@ export default function PoderosaTabSelector({ tieneVista }) {
             label: "Ficha Datos Pacientes",
             component: FichaDatosPacientes
         },
+        {
+            id: 8,
+            permission: "Certificado Aptitud Brigadista",
+            label: "Certificado Aptitud Brigadista",
+            component: CertificadoAptitudBrigadista
+        },
+        {
+            id: 9,
+            permission: "Direccion General Mineria",
+            label: "Dirección General de Mineria",
+            component: DirecionGeneralMineria
+        },
+        {
+            id: 10,
+            permission: "Hoja de Ruta EMO",
+            label: "Hoja de Ruta para EMO",
+            component: HojaDeRutaEmo
+        }
     ];
     return (
         <TabSelector

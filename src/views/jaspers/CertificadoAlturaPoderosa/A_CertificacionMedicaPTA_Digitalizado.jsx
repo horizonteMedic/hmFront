@@ -114,6 +114,7 @@ export default async function A_CertificacionMedicaPTA_Digitalizado(data = {}, d
       color: Number(raw?.color ?? 0),
       codigoColor: String(raw?.codigoColor ?? ''),
       textoColor: String(raw?.textoColor ?? ''),
+      tituloExamen: String(raw?.tituloExamen ?? ''),
     };
     return datosFinales;
   }
@@ -128,11 +129,13 @@ export default async function A_CertificacionMedicaPTA_Digitalizado(data = {}, d
     // Título principal (subido 5mm, de 30 a 25)
     doc.setFont("helvetica", "bold").setFontSize(13);
     doc.setTextColor(0, 0, 0);
-    doc.text("CERTIFICACIÓN MEDICA PREVIA A TRABAJO DE ALTURA", pageW / 2, 25, { align: "center" });
+    doc.text(datosFinales.tituloExamen, pageW / 2, 25, { align: "center" });
 
     // Subtítulo (subido 5mm, de 36 a 31)
-    doc.setFont("helvetica", "normal").setFontSize(10);
-    doc.text("(encima de los 1,8 metros)", pageW / 2, 29.7, { align: "center" });
+    if (datosFinales.tituloExamen == "CERTIFICACIÓN MEDICA PREVIA A TRABAJO DE ALTURA") {
+      doc.setFont("helvetica", "normal").setFontSize(10);
+      doc.text("(encima de los 1,8 metros)", pageW / 2, 29.7, { align: "center" });
+    }
 
     // Número de Ficha, Sede, Fecha y Página (subidos 5mm)
     doc.setFont("helvetica", "normal").setFontSize(9);

@@ -7,6 +7,7 @@ import RiesgoCoronario from "./RiesgoCoronario/RiesgoCoronario";
 import ToleranciaGlucosa from "./ToleranciaGlucosa/ToleranciaGlucosa";
 import GlucosaBasal from "./GlucosaBasal/GlucosaBasal";
 import PerfilLipidico from "./PerfilLipidico/PerfilLipidico";
+import PCRUltrasensible from "./PCRUltrasensible/PCRUltrasensible";
 
 export default function AnalisisBioquimicosSubTabSelector({ tieneVista }) {
   const tabsConfig = [
@@ -58,6 +59,13 @@ export default function AnalisisBioquimicosSubTabSelector({ tieneVista }) {
       label: "Glucosa Basal",
       icon: faGlassWater,
       component: GlucosaBasal
+    },
+    {
+      id: 7,
+      permission: "PCR Ultrasensible",
+      label: "PCR ultrasensible",
+      icon: faGlassWater,
+      component: PCRUltrasensible
     },
   ];
   return (

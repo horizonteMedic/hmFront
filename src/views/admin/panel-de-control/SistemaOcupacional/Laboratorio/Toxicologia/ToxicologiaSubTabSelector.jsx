@@ -5,6 +5,7 @@ import Panel2D from './Panel2D/Panel2D';
 import Panel3D from './Panel3D/Panel3D';
 import Panel4D from './Panel4D/Panel4D';
 import Panel5D from './Panel5D/Panel5D';
+import EtanolSaliva from './EtanolSaliva/EtanolSaliva';
 
 export default function ToxicologiaSubTabSelector({ tieneVista }) {
   const tabsConfig = [
@@ -42,6 +43,13 @@ export default function ToxicologiaSubTabSelector({ tieneVista }) {
       permission: 'Panel 10D',
       icon: faLayerGroup,
       component: Panel10D
+    },
+    {
+      id: 5,
+      label: 'Etanol en Saliva',
+      permission: 'Etanol en Saliva',
+      icon: faLayerGroup,
+      component: EtanolSaliva
     }
   ];
   return (

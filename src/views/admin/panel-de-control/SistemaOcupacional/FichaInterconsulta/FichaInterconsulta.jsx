@@ -66,6 +66,7 @@ export default function FichaInterconsulta() {
     const Initialform = {
         norden: "",
         fechaExamen: today,
+        nombreExamen: "",
         especialidad: "",
         cargoPaciente: "",
         //Datos Usuario
@@ -242,7 +243,7 @@ export default function FichaInterconsulta() {
                             </select>
                         </div>
                         {/*<InputTextOneLine label="Especialidad" value={form.especialidad} onChange={handleChange} name="especialidad" />*/}
-                        <InputTextOneLine label="Puesto de Trabajo" value={form.cargoPaciente} disabled onChange={handleChange} name="cargoPaciente" />
+                        <InputTextOneLine label="Nombre Examen" value={form.nombreExamen} disabled name="nombreExamen" />
                     </div>
 
                     {/* Hora en tiempo real */}

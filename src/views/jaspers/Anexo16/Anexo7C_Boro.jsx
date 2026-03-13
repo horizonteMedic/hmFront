@@ -503,6 +503,24 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     return yPos; // Devuelve la nueva posición final
   };
 
+  // Calcular altura de texto con salto de línea (sin dibujar)
+  const calcularAlturaTextoConSalto = (texto, anchoMaximo, fontSize = 7) => {
+    if (!texto || String(texto).trim() === '') return 0;
+    doc.setFontSize(fontSize);
+    const palabras = String(texto).split(' ');
+    let lineas = 1;
+    let lineaActual = '';
+    palabras.forEach((palabra) => {
+      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+      if (doc.getTextWidth(textoPrueba) > anchoMaximo) {
+        if (lineaActual) { lineas++; lineaActual = palabra; } else { lineas++; lineaActual = ''; }
+      } else {
+        lineaActual = textoPrueba;
+      }
+    });
+    return lineas * fontSize * 0.35 + 1;
+  };
+
   // === CONFIGURACIÓN DE TABLA ===
   const tablaInicioX = 5;
   const tablaAncho = 200;
@@ -2529,9 +2547,18 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
 
   // === SECCIÓN: EVALUACIÓN NEUROLÓGICA, COLUMNA Y ABDOMEN ===
 
-  // Verificar si necesitamos nueva página
+  const anchoColEvaluacion = tablaAncho / 2;
+  const divColEvaluacion = tablaInicioX + anchoColEvaluacion;
   const alturaFilaEvaluacion = 5;
-  const alturaTotalEvaluacion = alturaFilaEvaluacion * 4; // 4 filas (ABDOMEN y TACTO RECTAL separados)
+
+  // Altura dinámica fila 1: Reflejos | Marcha (según texto con salto de línea)
+  const textoReflejos = datosFinales.evaluacionNeurologica?.reflejosOsteotendinosos || "";
+  const textoMarcha = datosFinales.evaluacionNeurologica?.marcha || "";
+  const anchoReflejos = divColEvaluacion - (tablaInicioX + 50) - 2;
+  const anchoMarcha = (tablaInicioX + tablaAncho) - (divColEvaluacion + 20) - 2;
+  const alturaFila1Evaluacion = Math.max(alturaFilaEvaluacion, Math.max(calcularAlturaTextoConSalto(textoReflejos, anchoReflejos), calcularAlturaTextoConSalto(textoMarcha, anchoMarcha)) + 2);
+
+  const alturaTotalEvaluacion = alturaFila1Evaluacion + alturaFilaEvaluacion * 3; // 1 dinámica + 3 fijas
   if (yPos + alturaTotalEvaluacion > pageHeight - 20) {
     footerTR(doc, { footerOffsetY: getFooterOffset() });
     doc.addPage();
@@ -2540,27 +2567,24 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     yPos = 35.5;
   }
 
-  // FILA 1: Reflejos Osteotendinosos | Marcha (2 columnas)
-  const anchoColEvaluacion = tablaAncho / 2;
-  const divColEvaluacion = tablaInicioX + anchoColEvaluacion;
-
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaEvaluacion);
-  doc.line(divColEvaluacion, yPos, divColEvaluacion, yPos + alturaFilaEvaluacion);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaEvaluacion);
+  // FILA 1: Reflejos Osteotendinosos | Marcha (2 columnas, altura dinámica)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila1Evaluacion);
+  doc.line(divColEvaluacion, yPos, divColEvaluacion, yPos + alturaFila1Evaluacion);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFila1Evaluacion);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaFilaEvaluacion, tablaInicioX + tablaAncho, yPos + alturaFilaEvaluacion);
+  doc.line(tablaInicioX, yPos + alturaFila1Evaluacion, tablaInicioX + tablaAncho, yPos + alturaFila1Evaluacion);
 
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("REFLEJOS OSTEOTENDINOSOS:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(datosFinales.evaluacionNeurologica?.reflejosOsteotendinosos || "", tablaInicioX + 50, yPos + 3.5);
+  dibujarTextoConSaltoLinea(textoReflejos, tablaInicioX + 50, yPos + 3.5, anchoReflejos);
 
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("MARCHA:", divColEvaluacion + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(datosFinales.evaluacionNeurologica?.marcha || "", divColEvaluacion + 20, yPos + 3.5);
+  dibujarTextoConSaltoLinea(textoMarcha, divColEvaluacion + 20, yPos + 3.5, anchoMarcha);
 
-  yPos += alturaFilaEvaluacion;
+  yPos += alturaFila1Evaluacion;
 
   // FILA 2: Columna vertebral (columna completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaEvaluacion);

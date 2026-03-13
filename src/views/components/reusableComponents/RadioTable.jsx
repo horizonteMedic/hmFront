@@ -4,6 +4,7 @@ export default function RadioTable({
   form,
   handleRadioButton,
   labelColumns = 2,
+  groupLabel
 }) {
   const styleButton = ` w-5 h-5
                         rounded-md
@@ -20,13 +21,23 @@ export default function RadioTable({
   return (
     <div>
       {/* Encabezados de columna */}
-      <div className={`grid ${gridColsClass} bg-gray-100 border-b rounded-t-lg`}>
-        <div className={`p-3 font-semibold text-gray-700 ${labelColSpanClass}`}></div>
-        {options.map((option, index) => (
-          <div key={index} className="p-3 text-center font-semibold ">
-            {option.label}
+      <div>
+        {groupLabel && (
+          <div className={`grid ${gridColsClass}  border-b`}>
+            <div className={`col-span-${labelColumns}`}></div>
+            <div className={`col-span-${options.length} text-center font-bold p-2`}>
+              {groupLabel}
+            </div>
           </div>
-        ))}
+        )}
+        <div className={`grid ${gridColsClass} bg-gray-100 border-b rounded-t-lg`}>
+          <div className={`p-3 font-semibold text-gray-700 ${labelColSpanClass}`}></div>
+          {options.map((option, index) => (
+            <div key={index} className="p-3 text-center font-semibold ">
+              {option.label}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Filas de items */}
@@ -70,7 +81,7 @@ const items = [
   { name: "orientacionEspacial", label: "5. Orientación espacial" },
   { name: "comprensionVerbal", label: "6. Comprensión verbal" }
 ];
-
+ 
 const options = [
   { value: "I", label: "I" },
   { value: "NP1", label: "NP1" },
@@ -78,7 +89,7 @@ const options = [
   { value: "NPS", label: "NPS" },
   { value: "S", label: "S" }
 ];
-
+ 
 <RadioTable
   items={items}
   options={options}
