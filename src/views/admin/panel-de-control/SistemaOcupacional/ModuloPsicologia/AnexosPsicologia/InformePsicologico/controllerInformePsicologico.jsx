@@ -6,6 +6,7 @@ import {
     handleSubirArchivoDefaultSinSellos,
     LoadingDefault,
     PrintHojaRDefault,
+    PrintHojaRJsReportDefault,
     ReadArchivosFormDefault,
     SubmitDataServiceDefault,
     VerifyTRDefault,
@@ -16,7 +17,7 @@ const obtenerReporteUrl =
     "/api/v01/ct/informePsicologico/obtenerReporteInformePsicologico";
 const registrarUrl =
     "/api/v01/ct/informePsicologico/registrarActualizarInformePsicologico";
-
+const obtenerReporteJsReportUrl = "/api/v01/ct/informePsicologico/descargarReporteInformePsicologico"
 const registrarPDF =
     "/api/v01/ct/archivos/archivoInterconsulta"
 
@@ -152,17 +153,13 @@ export const SubmitDataService = async (
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformePsicologico/*.jsx");
-    PrintHojaRDefault(
+    PrintHojaRJsReportDefault(
         nro,
         token,
         tabla,
-        datosFooter,
-        obtenerReporteUrl,
-        jasperModules,
-        "../../../../../../jaspers/ModuloPsicologia/InformePsicologico"
+        obtenerReporteJsReportUrl
     );
-};
+}
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
     VerifyTRDefault(
