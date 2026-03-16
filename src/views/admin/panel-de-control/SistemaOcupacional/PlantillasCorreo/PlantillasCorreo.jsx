@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
-import { GetListEmpresaContrata, getPlantillaPorEmpresaContrata, SubmitEmpresaContrata } from "./controllerPlantillasCorreo";
+import { GetListArchivos, GetListEmpresaContrata, getPlantillaPorEmpresaContrata, SubmitEmpresaContrata } from "./controllerPlantillasCorreo";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotateRight, faSave } from "@fortawesome/free-solid-svg-icons";
 import TablaTemplate from "../../../../components/templates/TablaTemplate";
 import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
+import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
 
 export default function PlantillasCorreo({ ContrataMulti, EmpresasMulti }) {
     const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
@@ -37,6 +38,8 @@ export default function PlantillasCorreo({ ContrataMulti, EmpresasMulti }) {
 
     const [empresaContrataList, setEmpresaContrataList] = useState([])
     const [empresaContrataListFiltered, setEmpresaContrataListFiltered] = useState([])
+
+    const [archivosList, setArchivosList] = useState([])
 
     const [searchEmpresa, setSearchEmpresa] = useState(form.razonEmpresa);
     const [filteredEmpresas, setFilteredEmpresas] = useState([]);
@@ -121,11 +124,18 @@ export default function PlantillasCorreo({ ContrataMulti, EmpresasMulti }) {
     const obtenerRelacionesEmpresaContrata = async () => {
         await GetListEmpresaContrata(setEmpresaContrataList, token);
     }
+    const obtenerListArchivos = async () => {
+        await GetListArchivos(setArchivosList, token);
+    }
+
     const obtenerPlantilla = async (id) => {
         await getPlantillaPorEmpresaContrata(id, setForm, token);
     }
 
-    useEffect(() => { obtenerRelacionesEmpresaContrata() }, [])
+    useEffect(() => {
+        obtenerRelacionesEmpresaContrata();
+        obtenerListArchivos();
+    }, [])
 
     useEffect(() => {
         const filtered = empresaContrataList
@@ -183,8 +193,15 @@ export default function PlantillasCorreo({ ContrataMulti, EmpresasMulti }) {
                 {
                     destino: "",
                     conCopia: "",
-                    asunto: "",
-                    mensaje: "",
+                    asunto: "{nombreExamen}//{nombrePaciente}//{empresa}//{fechaExamen}",
+                    mensaje: `Estimado/a Dr./Dra.,\n
+Se envían de manera adjunta {listaAdjuntos} del/la Sr./Sra.\n
+-{nombrePaciente}\n
+Colaborador/a de la empresa {empresa}.\n
+Con fecha: {fechaExamen}\n
+
+Saludos cordiales.\n
+{nombreUsuario}`,
                     archivos: []
                 }
             ]
@@ -355,6 +372,7 @@ export default function PlantillasCorreo({ ContrataMulti, EmpresasMulti }) {
                                 rucEmpresa: "",
                                 razonContrata: "",
                                 rucContrata: "",
+                                plantillaConfig: []
                             }))
                             setSearchEmpresa("")
                             setSearchContrata("")
@@ -395,18 +413,32 @@ export default function PlantillasCorreo({ ContrataMulti, EmpresasMulti }) {
                     >
                         + Nueva plantilla
                     </button>
+                    {/* VARIABLES */}
+                    <SectionFieldset legend="Indicaciones" collapsible defaultOpen={false}>
+                        <p className="text-gray-600">
+                            Utiliza las siguientes variables para personalizar el correo:
+                        </p>
+                        <div className="flex flex-wrap gap-2 text-gray-500">
+                            {
+                                ["empresa", "contrata", "nombrePaciente", "tipoExamen", "nombreExamen", "fechaExamen", "fechaCorreo", "listaAdjuntos", "nombreUsuario"].map((item, index) => (
+                                    <span className="bg-white px-2 py-1 rounded" key={index}>
+                                        {`{${item}}`}
+                                    </span>
+                                ))
+                            }
+                        </div>
+                    </SectionFieldset>
+
+
                     <div className="flex flex-col gap-4 max-h-[520px] overflow-y-auto pr-2">
 
                         {form.plantillaConfig?.map((emailForm, index) => (
-
                             <div
                                 key={index}
                                 className="border rounded-lg shadow-sm bg-white "
                             >
-
                                 {/* HEADER */}
                                 <div className="flex justify-between items-center px-4 py-2 bg-primario rounded-t-lg">
-
                                     <span className=" font-semibold text-white">
                                         Correo #{index + 1}
                                     </span>
@@ -432,7 +464,7 @@ export default function PlantillasCorreo({ ContrataMulti, EmpresasMulti }) {
                                             name="destino"
                                             value={emailForm.destino}
                                             onChange={(e) => handleEmailChange(index, e)}
-                                            placeholder="correo@empresa.com"
+                                            placeholder="correo@empresa.com , email@empresa.com"
                                             className="flex-1 border-b border-gray-300 focus:border-blue-500 outline-none "
                                         />
                                     </div>
@@ -447,7 +479,7 @@ export default function PlantillasCorreo({ ContrataMulti, EmpresasMulti }) {
                                             name="conCopia"
                                             value={emailForm.conCopia}
                                             onChange={(e) => handleEmailChange(index, e)}
-                                            placeholder="copia@empresa.com"
+                                            placeholder="copia@empresa.com , segundacopia@empresa.com"
                                             className="flex-1 border-b border-gray-300 focus:border-blue-500 outline-none "
                                         />
                                     </div>
@@ -470,17 +502,16 @@ export default function PlantillasCorreo({ ContrataMulti, EmpresasMulti }) {
                                     <div className="flex flex-wrap gap-2 pt-2">
 
                                         {emailForm.archivos?.map((archivo) => (
-
                                             <button
                                                 key={archivo.idTipoArchivo}
                                                 type="button"
                                                 onClick={() => toggleArchivo(index, archivo.idTipoArchivo)}
                                                 className={`
-                                px-3 py-1 text-xs rounded-full border transition
-                                ${archivo.checked
+                                                    px-3 py-1 text-xs rounded-full border transition
+                                                    ${archivo.checked
                                                         ? "bg-blue-100 border-blue-500 text-blue-700"
                                                         : "bg-gray-100 border-gray-300 text-gray-500"}
-                            `}
+                                                `}
                                             >
                                                 {archivo.nomenclatura}
                                             </button>
@@ -494,26 +525,10 @@ export default function PlantillasCorreo({ ContrataMulti, EmpresasMulti }) {
                                         name="mensaje"
                                         value={emailForm.mensaje}
                                         onChange={(e) => handleEmailChange(index, e)}
-                                        rows="10"
+                                        rows="14"
                                         placeholder="Escribe el mensaje..."
                                         className="w-full border rounded-md p-3  focus:ring-2 focus:ring-blue-500 outline-none resize-none"
                                     />
-
-                                    {/* VARIABLES */}
-                                    <div className="flex flex-wrap gap-2 text-xs text-gray-500">
-                                        <span className="bg-gray-100 px-2 py-1 rounded">
-                                            {"{empresa}"}
-                                        </span>
-
-                                        <span className="bg-gray-100 px-2 py-1 rounded">
-                                            {"{nombrepaciente}"}
-                                        </span>
-
-                                        <span className="bg-gray-100 px-2 py-1 rounded">
-                                            {"{tipoExamen}"}
-                                        </span>
-
-                                    </div>
 
                                 </div>
 

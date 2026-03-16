@@ -11,10 +11,7 @@ import { buildExamenesList } from "./folioCatalogo";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "PSICOSENSOMETRICO_CERT_ALTURA",
-    "PSICOSENSOMETRICO_CERT_ALTURA_PODEROSA",
-    "PSICOSENSOMETRICO_CERT_ALTURA_1_8",
-    "PSICOSENSOMETRICO_VEHI_FOLIO",
+    "INFORME_PSICOLOGICO_JSREPORT",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -34,7 +31,7 @@ const ExamenesListCAMPANA = buildExamenesList([ // Campaña
     "ELECTROCARDIOGRAMA",            // 14
     "ESPIROMETRIA_ARCHIVO",          // 15
     "AUDIOMETRIA_OHLA",              // 16
-    "INFORME_PSICOLOGICO",           // 17
+    "INFORME_PSICOLOGICO_JSREPORT",           // 17
     "OFTALMOLOGIA",                  // 18
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",      // 19
     "DECLARACION_USO_FIRMA_ARCHIVO"                            // 20 nuevo
@@ -135,7 +132,7 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "TEST_FATIGA_SOMNOLENCIA",
 
     //PSICOLOGÍA
-    "INFORME_PSICOLOGICO",
+    "INFORME_PSICOLOGICO_JSREPORT",
     "PSICOLOGIA_ANEXO_02",
     "PSICOLOGIA_ANEXO_03",
     "INFORME_PODEROSA_OPERAR",
@@ -173,7 +170,7 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
 ]);
 
 const ExamenesListPsicologia = buildExamenesList([
-    "INFORME_PSICOLOGICO",
+    "INFORME_PSICOLOGICO_JSREPORT",
     "PSICOLOGIA_ANEXO_02",
     "PSICOLOGIA_ANEXO_03",
     "INFORME_PODEROSA_OPERAR",
@@ -244,7 +241,7 @@ const ExamenesListLaboratorio = buildExamenesList([
 ]);
 
 const ListaPorPlantilla = {
-    // PRUEBAS: ExamenesListPRUEBAS,
+    PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     "COMPLETO": ExamenesListCOMPLETO,
     //OHLA: ExamenesListOHLA,
@@ -832,7 +829,7 @@ export default Folio;
 //     "PSICOLOGIA_ANEXO_02",                     // 29
 //     "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",    // 30
 //     "CUESTIONARIO_BERLIN",                     // 31
-//     "INFORME_PSICOLOGICO",                     // 32
+//     "INFORME_PSICOLOGICO_JSREPORT",                     // 32
 //     "TRABAJO_ALTURA_PSICO",                    // 33
 //     "OFTALMOLOGIA",                            // 34
 //     "CONSENT_DECLARACION_APTITUD",             // 35
