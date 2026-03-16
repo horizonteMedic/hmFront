@@ -405,9 +405,9 @@ export default function PlantillasCorreo({ ContrataMulti, EmpresasMulti }) {
                             >
 
                                 {/* HEADER */}
-                                <div className="flex justify-between items-center px-4 py-2 bg-gray-50 border-b">
+                                <div className="flex justify-between items-center px-4 py-2 bg-primario rounded-t-lg">
 
-                                    <span className=" font-semibold text-gray-700">
+                                    <span className=" font-semibold text-white">
                                         Correo #{index + 1}
                                     </span>
 
