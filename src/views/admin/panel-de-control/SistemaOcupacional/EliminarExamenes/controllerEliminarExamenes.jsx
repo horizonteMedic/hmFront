@@ -91,7 +91,19 @@ const urlsEliminar = {
     DECLA_JURA_ANTECE_PERSON_FAM: "consentimientos/consentimientos-admision",
     DECLA_INFO_APTITUD_MO: "consentimientos/consentimientos-admision",
     ConstBrigadista: "constaBrigadista/consta-brigadista",
-    ConformidadEmo: "registroConformidadEmo/conformidad-emo"
+    ConformidadEmo: "registroConformidadEmo/conformidad-emo",
+    //PSICOLOGIA
+    Fobias: "fobias/fobias",
+    AversionRiesgo: "aversionRiesgo/aversion-riesgo",
+    AlturaPsico: "informePsicologicoFobias/informe-psicologico-fobias",
+    TrastornoPersonalidad: "transtornoPersonalidad/trastorno-personalidad",
+    InformeConduc: "informeConductores/informe-conductores",
+    AltoRiesgo: "altoRiesgo/alto-riesgo",
+    TrabajosEspeci: "trabajoEspecifico/trabajos-especificos",
+    CuestionarioBer: "cuestionarioBerlin/cuestionario-berlin",
+    ExamComp: "examenComplementario/examen-complementario",
+    Brigadista: "psiBrigadista/informe-brigadista",
+    BombaElec: "bombaElectrica/bomba-electrica"
 }
 
 const camposExtraEliminar = {

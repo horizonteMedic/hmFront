@@ -5,11 +5,13 @@ import {
     PrintHojaRDefault,
     SubmitDataServiceDefault,
 } from "../../../../utils/functionUtils";
-import { getFetch } from "../../../../utils/apiHelpers";
+import { getFetch, getFetchPdf } from "../../../../utils/apiHelpers";
 import { getHoraActual, getToday } from "../../../../utils/helpers";
 
 const obtenerEspecialidad =
     "/api/v01/ct/fichaInterconsulta/obtenerEspecialidadesFichaInterconsulta";
+const obtenerJServerReporte =
+    "/api/v01/ct/fichaInterconsulta/descargarReporteFichaInterconsulta"
 const obtenerReporteUrl =
     "/api/v01/ct/fichaInterconsulta/obtenerFichaInterconsultaReporte";
 const registrarUrl =
@@ -90,11 +92,7 @@ export const GetInfoServicio = async (
                     nro,
                     especialidadSeleccionada.mensaje,
                     token,
-                    tabla,
-                    datosFooter,
-                    obtenerReporteUrl,
-                    jasperModules,
-                    "../../../../jaspers/FichaInterconsulta"
+                    tabla
                 );
 
             } else {
@@ -402,31 +400,71 @@ export const GetInfoNoRegisterInterconsulta = async (
 
 
 
-export const PrintHojaRFichaInterconsulta = (nro, especialidad, token, tabla, datosFooter, obtenerReporteUrl, jasperModules, nombreCarpeta) => {
+export const PrintHojaRFichaInterconsulta = async (nro, especialidad, token, tabla, comprimir = false) => {
 
-    LoadingDefault("Cargando Formato a Imprimir");
+    try {
+        LoadingDefault("Cargando Formato a Imprimir");
 
-    getFetch(
-        `${obtenerReporteUrl}?nOrden=${nro}&especialidad=${especialidad}&nameService=${tabla}&esJasper=true`,
-        token
-    )
-        .then(async (res) => {
-            console.log(res)
-            if (res.norden || res.norden_n_orden || res.n_orden) {
-                const nombre = res.nameJasper;
-                console.log(nombre)
-                const modulo = await jasperModules[
-                    `${nombreCarpeta}/${nombre}.jsx`
-                ]();
-                // Ejecuta la función exportada por default con los datos
-                if (typeof modulo.default === "function") {
-                    modulo.default({ ...res, ...datosFooter });
-                }
-            }
-        })
-        .finally(() => {
+        const response = await getFetchPdf(
+            `${obtenerJServerReporte}?nOrden=${nro}&especialidad=${especialidad}&nameService=${tabla}&comprimir=${comprimir ? 1 : 0}`,
+            token
+        );
+
+        // 🔴 Error controlado desde getFetchPdf
+        if (response?.error) {
+            console.error("Error HTTP:", response);
+
             Swal.close();
-        });
+
+            if (response.status === 401) {
+                Swal.fire("Sesión expirada", "Vuelve a iniciar sesión.", "warning");
+            } else if (response.status === 404) {
+                Swal.fire("No encontrado", "No se encontró el reporte.", "warning");
+            } else {
+                Swal.fire("Error", "Error al generar el reporte.", "error");
+            }
+
+            return;
+        }
+
+        // 🔴 Validación extra
+        if (!(response instanceof Blob)) {
+            Swal.close();
+            Swal.fire("Error", "Respuesta inválida del servidor.", "error");
+            return;
+        }
+
+        // ✅ Abrir visor de impresión (sin nueva pestaña)
+        const blobUrl = window.URL.createObjectURL(response);
+
+        const iframe = document.createElement("iframe");
+        iframe.style.position = "fixed";
+        iframe.style.right = "0";
+        iframe.style.bottom = "0";
+        iframe.style.width = "0";
+        iframe.style.height = "0";
+        iframe.style.border = "0";
+        iframe.src = blobUrl;
+
+        document.body.appendChild(iframe);
+
+        iframe.onload = function () {
+            Swal.close(); // cerrar loading cuando ya cargó
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+        };
+
+        // 🧹 limpiar memoria después
+        setTimeout(() => {
+            document.body.removeChild(iframe);
+            window.URL.revokeObjectURL(blobUrl);
+        }, 30000);
+
+    } catch (error) {
+        console.error("Error inesperado:", error);
+        Swal.close();
+        Swal.fire("Error", "Ocurrió un error inesperado al generar el reporte.", "error");
+    }
 };
 
 

@@ -27,6 +27,22 @@ export const EXAMENES_CONFIG = [
         ],
     },
     {
+        column: 1,
+        legend: "Consentimientos",
+        items: [
+            //{ label: "F. Médica", name: "fMedica" },
+            { label: "Const. Informado", name: "ConstInformado", tabla: "consentimientoInformado" },
+            { label: "Const. Buena Salud", name: "ConstBuenaSalud", tabla: "consentimientobuenasalud" },
+            { label: "Sintomatico Respiratorio", name: "CONSENT_SINTOMATICO", tabla: "CONSENT_SINTOMATICO" },
+            { label: "Evaluacion Medica", name: "CONSENT_INFORMADO_MEDICA", tabla: "CONSENT_INFORMADO_MEDICA" },
+            { label: "Recepcion Examen Medico", name: "CONSENT_RECOM_MEDIC", tabla: "CONSENT_RECOM_MEDIC" },
+            { label: "Declaracion Antecedentes Personales", name: "DECLA_JURA_ANTECE_PERSON_FAM", tabla: "DECLA_JURA_ANTECE_PERSON_FAM" },
+            { label: "Declaracion Aptitud Medico O.", name: "DECLA_INFO_APTITUD_MO", tabla: "DECLA_INFO_APTITUD_MO" },
+            { label: "Const. Brigadista", name: "ConstBrigadista", tabla: "consta_brigadista" },
+            { label: "Conformidad EMO ", name: "ConformidadEmo", tabla: "conformidad_emo" },
+        ],
+    },
+    {
         column: 2,
         legend: "Laboratorio",
         items: [
@@ -103,19 +119,23 @@ export const EXAMENES_CONFIG = [
         ],
     },
     {
-        column: 1,
-        legend: "Consentimientos",
+        column: 3,
+        legend: "Psicologia",
         items: [
             //{ label: "F. Médica", name: "fMedica" },
-            { label: "Const. Informado", name: "ConstInformado", tabla: "consentimientoInformado" },
-            { label: "Const. Buena Salud", name: "ConstBuenaSalud", tabla: "consentimientobuenasalud" },
-            { label: "Sintomatico Respiratorio", name: "CONSENT_SINTOMATICO", tabla: "CONSENT_SINTOMATICO" },
-            { label: "Evaluacion Medica", name: "CONSENT_INFORMADO_MEDICA", tabla: "CONSENT_INFORMADO_MEDICA" },
-            { label: "Recepcion Examen Medico", name: "CONSENT_RECOM_MEDIC", tabla: "CONSENT_RECOM_MEDIC" },
-            { label: "Declaracion Antecedentes Personales", name: "DECLA_JURA_ANTECE_PERSON_FAM", tabla: "DECLA_JURA_ANTECE_PERSON_FAM" },
-            { label: "Declaracion Aptitud Medico O.", name: "DECLA_INFO_APTITUD_MO", tabla: "DECLA_INFO_APTITUD_MO" },
-            { label: "Const. Brigadista", name: "ConstBrigadista", tabla: "consta_brigadista" },
-            { label: "Conformidad EMO ", name: "ConformidadEmo", tabla: "conformidad_emo" },
+            { label: "Informe Fobias", name: "Fobias", tabla: "fobias" },
+            { label: "Aversion al Riesgo", name: "AversionRiesgo", tabla: "aversionalriesgo" },
+            { label: "Formato Altura Psicologica", name: "AlturaPsico", tabla: "psicologiafobias" },
+            { label: "Trastorno Personalidad", name: "TrastornoPersonalidad", tabla: "trastornos_personalidad" },
+            { label: "Informe Conductores", name: "InformeConduc", tabla: "infor_conductores" },
+            { label: "Alto Riesgo", name: "AltoRiesgo", tabla: "alto_riesgo" },
+            { label: "Trabajos Especificos", name: "TrabajosEspeci", tabla: "especificos" },
+            { label: "Cuestionario Berlin", name: "CuestionarioBer", tabla: "cuestionario_berlin" },
+            { label: "Examen Complementario", name: "ExamComp", tabla: "exam_complementarios" },
+            { label: "Brigadista", name: "Brigadista", tabla: "psi_brigadistas" },
+            { label: "Bomba Electrico", name: "BombaElec", tabla: "bombaelectrica" },
+
         ],
     },
+
 ];
