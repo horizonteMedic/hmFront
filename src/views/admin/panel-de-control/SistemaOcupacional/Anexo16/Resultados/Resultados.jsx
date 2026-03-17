@@ -213,6 +213,7 @@ export default function Resultados({
               { label: "SI", value: "SI" },
               { label: "NO", value: "NO" },
               { label: "REEVALUACIÓN", value: "REEVALUACION" },
+              { label: "EVALUADO", value: "EVALUADO" }
             ]}
           />
           {/* Médico que Certifica */}

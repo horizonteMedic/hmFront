@@ -146,6 +146,7 @@ export const SubmitDataService = async (
       aptoNo: form.aptoParaTrabajar == "NO",
       aptoRe: form.aptoParaTrabajar == "REEVALUACION",
     },
+    evaluado: form.aptoParaTrabajar == "EVALUADO",
   };
   console.log(body);
 
@@ -1146,6 +1147,9 @@ export const MapearDatosAdicionales = (
         data.aptoParaTrabajar = "NO";
       else if (res.examenRadiograficoAptoRe_apto_re)
         data.aptoParaTrabajar = "REEVALUACION";
+      else if (res.evaluado) {
+        data.aptoParaTrabajar = "EVALUADO"
+      }
 
       const sexo = res.sexo_sexo_pa ?? data.sexo;
       if (
@@ -1254,7 +1258,7 @@ export const MapearDatosAdicionales = (
     const recomendaciones =
       res.recomendacionesInformeElectroCardiograma_recomendaciones;
 
-    if (hallazgo && hallazgo !== "NORMAL."&&!isEdit) {
+    if (hallazgo && hallazgo !== "NORMAL." && !isEdit) {
       let electrocardiogramaText = `${contador}.-ELECTROCARDIOGRAMA: ${hallazgo}`;
       if (recomendaciones) {
         electrocardiogramaText += `.${recomendaciones}`;
@@ -1472,7 +1476,7 @@ export const GetInfoServicioEditar = (
 
           // Build otrosExamenes field
           data.otrosExamenes = res.examenRadiograficoOtros_txtotrosex;
-      
+
           // Personal information
           data.nomExamen = res.nombreExamen_nom_examen ?? "";
           data.dni = res.dni_cod_pa ?? "";
@@ -1730,6 +1734,9 @@ export const GetInfoServicioEditar = (
 
           data.notasDoctor = res.notasDoctor ?? "";
           data.resultadoGonadotropina = res.sexo_sexo_pa === "M" ? "N/A" : res.resultadoGonadotropina
+          data.observacionesGenerales += ""
+
+
           data = MapearDatosAdicionales(res, data, 1, true);
           console.log("DATA EDITAR", data);
           set((prev) => ({ ...prev, ...res, ...data }));

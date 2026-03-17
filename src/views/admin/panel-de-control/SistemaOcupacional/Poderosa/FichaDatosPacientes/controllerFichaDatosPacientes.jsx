@@ -117,12 +117,12 @@ export const GetInfoServicio = async (
 
             //Pre-Evaluación
             grupoSanguineo: res.grupoSanguineo ?? "",
-            aptitudAltura18: res.aptitudAltura18,
-            aptitud: res.aptitud,
 
             // capacitaciones: [],
             experiencias: res.experienciaLaboral ?? [],
             referencias: res.referenciasPersonales ?? [],
+            aptitudAltura18: res.aptitudPoderosaSi === true ? true : res.aptitudPoderosaNo === true ? false : null,
+            aptitud: res.apto === true ? "APTO" : res.aptoRestriccion === true ? "APTO RESTRICCION" : res.noApto === true ? "NO APTO" : false
         }));
         Swal.close();
     }
@@ -329,8 +329,6 @@ export const GetInfoServicioEditar = async (
 
             //Pre-Evaluación
             grupoSanguineo: res.grupoSanguineo ?? "",
-            aptitudAltura18: res.aptitudAltura18,
-            aptitud: res.aptitud,
 
             // capacitaciones: [],
             experiencias: res.experienciaLaboral ?? [],
