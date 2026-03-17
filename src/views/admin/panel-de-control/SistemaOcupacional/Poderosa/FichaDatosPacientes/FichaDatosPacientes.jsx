@@ -21,7 +21,7 @@ export default function FichaDatosPacientes() {
         norden: "",
         id: null,
         fechaIngreso: today,
-        tipoTrabajador: "",
+        tipoTrabajador: "OBRERO",
 
         empresa: "",
         cargo: "",
