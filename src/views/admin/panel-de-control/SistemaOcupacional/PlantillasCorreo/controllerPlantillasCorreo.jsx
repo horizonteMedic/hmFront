@@ -1,9 +1,10 @@
 import Swal from "sweetalert2";
-import { LoadingDefault, SubmitDataServiceDefault } from "../../../../utils/functionUtils";
+import { LoadingDefault } from "../../../../utils/functionUtils";
 import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
 
 const registrarUrl = "/api/v01/ct/empresaContrata/crearActualizar";
 const obtenerReporteUrl = "/api/v01/ct/empresaContrata/obtenerDatos"
+const obtenerListArchivosUrl = "/api/v01/ct/tipoArchivo/obtenerTiposDeArchivoPlantillaCorreo"
 const obtenerPlantillaUrl = "/api/v01/ct/plantillaCorreo/obtenerPlantillaCorreoPorEmpresaContrata"
 
 export const SubmitEmpresaContrata = async (
@@ -47,6 +48,30 @@ export const GetListEmpresaContrata = async (
     try {
         const res = await getFetch(
             `${obtenerReporteUrl}`,
+            token
+        );
+        if (res?.resultado) {
+            set(res?.resultado)
+        } else {
+            Swal.fire("Error", "Ocurrió un error al traer los datos", "error");
+            return null;
+        }
+    } catch (error) {
+        Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
+        return null;
+    } finally {
+        onFinish?.();
+    }
+
+};
+export const GetListArchivos = async (
+    set,
+    token,
+    onFinish = () => { }
+) => {
+    try {
+        const res = await getFetch(
+            `${obtenerListArchivosUrl}`,
             token
         );
         if (res?.resultado) {
