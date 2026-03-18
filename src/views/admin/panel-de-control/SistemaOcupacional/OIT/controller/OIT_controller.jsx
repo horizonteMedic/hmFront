@@ -64,6 +64,7 @@ export const GetInfoPac = (nro, set, token, sede) => {
         ...prev,
         ...res,
         nombres: res.nombresApellidos,
+        txtSComentarios: `${res.txtSComentarios ? res.txtSComentarios + "\n" : ""}`
       }));
     })
     .finally(() => {
@@ -100,7 +101,7 @@ export const SubmitOIT = async (form, token, user, limpiar, tabla) => {
         console.log(res)
         if (res.id === 1 || res.id === 0) {
           Swal.fire({
-            title: 'Exito', text: `${res.mensaje},\n¿Desea imprimir?`, icon: 'success', showCancelButton: true,
+            title: 'Exito', text: `${res.mensaje}, \n¿Desea imprimir ? `, icon: 'success', showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
           }).then((result) => {
@@ -121,7 +122,7 @@ export const SubmitOIT = async (form, token, user, limpiar, tabla) => {
         console.log(res)
         if (res.id === 1 || res.id === 0) {
           Swal.fire({
-            title: 'Exito', text: `${res.mensaje},\n¿Desea imprimir?`, icon: 'success', showCancelButton: true,
+            title: 'Exito', text: `${res.mensaje}, \n¿Desea imprimir ? `, icon: 'success', showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
           }).then((result) => {
@@ -140,14 +141,14 @@ export const SubmitOIT = async (form, token, user, limpiar, tabla) => {
 
 export const PrintHojaR = (nro, token, tabla) => {
   Loading('Cargando Formato a Imprimir')
-  getFetch(`/api/v01/ct/oit/obtenerReporteOit?nOrden=${nro}&nameService=${tabla}`, token)
+  getFetch(`/ api / v01 / ct / oit / obtenerReporteOit ? nOrden = ${nro} & nameService=${tabla}`, token)
     .then(async (res) => {
       if (res.norden) {
         console.log(res)
         const nombre = res.nameJasper;
         console.log(nombre)
         const jasperModules = import.meta.glob('../../../../../jaspers/OIT/*.jsx');
-        const modulo = await jasperModules[`../../../../../jaspers/OIT/${nombre}.jsx`]();
+        const modulo = await jasperModules[`../../../../../ jaspers / OIT / ${nombre}.jsx`]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === 'function') {
           modulo.default(res);
@@ -163,7 +164,7 @@ export const PrintHojaR = (nro, token, tabla) => {
 
 export const PrintHojaSinDatos = (nro, token, tabla) => {
   Loading('Cargando Formato a Imprimir')
-  getFetch(`/api/v01/ct/oit/obtenerReporteOit?nOrden=${nro}&nameService=${tabla}`, token)
+  getFetch(`/ api / v01 / ct / oit / obtenerReporteOit ? nOrden = ${nro} & nameService=${tabla}`, token)
     .then(async (res) => {
       if (res.norden) {
         console.log(res)

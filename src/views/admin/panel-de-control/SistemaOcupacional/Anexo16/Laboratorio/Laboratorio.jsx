@@ -271,13 +271,10 @@ export default function Laboratorio({
 
                 {/* Gonadotropinas */}
                 <div className="bg-white border border-gray-200 rounded-lg p-3 h-full flex flex-col">
-                    <h4 className="font-semibold text-gray-800 mb-2">
-                        Gonadotropina
-                    </h4>
                     <div className="space-y-3 ">
                         <div className="space-y-2">
                             <InputTextOneLine
-                                label="Resultado"
+                                label="Gonadotropina"
                                 name="resultadoGonadotropina"
                                 value={form.resultadoGonadotropina}
                                 labelWidth="100px"
@@ -285,22 +282,39 @@ export default function Laboratorio({
                                 className={form.colesterolRed ? "text-red-600" : ""}
                             />
                         </div>
+                        <div className="space-y-3">
+                            <InputTextOneLine
+                                label="RPR"
+                                name="rprHematologia"
+                                value={form.rprHematologia}
+                                disabled
+                                labelWidth="100px"
+                            />
+                        </div>
                     </div>
                 </div>
 
                 {/* RPR */}
                 <div className="bg-white border border-gray-200 rounded-lg p-3 h-full flex flex-col">
-                    <h4 className="font-semibold text-gray-800 mb-2">
-                        RPR
-                    </h4>
-                    <div className="space-y-3">
-                        <InputTextOneLine
-                            label="RPR"
-                            name="rprHematologia"
-                            value={form.rprHematologia}
-                            disabled
-                            labelWidth="100px"
-                        />
+                    <div className="space-y-3 ">
+                        <div className="space-y-2">
+                            <InputTextOneLine
+                                label="Mercurio Orina"
+                                name="mercurioOrina"
+                                onChange={handleChange}
+                                value={form.mercurioOrina}
+                                labelWidth="100px"
+                            />
+                        </div>
+                        <div className="space-y-3">
+                            <InputTextOneLine
+                                label="Plomo Sangre"
+                                name="plomoSangre"
+                                onChange={handleChange}
+                                value={form.plomoSangre}
+                                labelWidth="100px"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

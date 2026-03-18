@@ -334,7 +334,10 @@ export const GetInfoServicioEditar = async (
             experiencias: res.experienciaLaboral ?? [],
             referencias: res.referenciasPersonales ?? [],
             aptitudAltura18: res.aptitudPoderosaSi === true ? true : res.aptitudPoderosaNo === true ? false : null,
-            aptitud: res.apto === true ? "APTO" : res.aptoRestriccion === true ? "APTO RESTRICCION" : res.noApto === true ? "NO APTO" : false
+            aptitud: res.apto === true ? "APTO" : res.aptoRestriccion === true ? "APTO RESTRICCION" : res.noApto === true ? "NO APTO" : false,
+
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+            user_doctorAsignado: res.doctorAsignado,
         }));
         Swal.fire(
             "Alerta",
@@ -460,6 +463,9 @@ export const SubmitDataService = async (
         apto: form.aptitud === "APTO" ? true : false,
         aptoRestriccion: form.aptitud === "APTO RESTRICCION" ? true : false,
         noApto: form.aptitud === "NO APTO" ? true : false,
+
+        usuarioFirma: form.user_medicoFirma,
+        doctorAsignado: form.user_doctorAsignado,
     };
 
     await SubmitDataServiceDefaultManejo(token, limpiar, body, registrarUrl, () => {

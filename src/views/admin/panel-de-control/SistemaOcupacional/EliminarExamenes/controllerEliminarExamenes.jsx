@@ -25,7 +25,7 @@ const urlsEliminar = {
     cuestionarioNordico: "cuestionarioNordico",
     evMusculoEsqueletica: "evaluacionMusculoEsqueletica",
     oftalmologia: "agudezaVisual/fichaOftalmologica", //pendiente falta eliminar
-    actitudMedOcupacional: "",
+    actitudMedOcupacional: "anexos/fichaAnexo2",
     usoRespiradores: "respiradores",
     anexo16A: "anexos/anexo16a",
     consentimientoDosaje: "laboratorio/consentimiento",
@@ -103,7 +103,12 @@ const urlsEliminar = {
     CuestionarioBer: "cuestionarioBerlin/cuestionario-berlin",
     ExamComp: "examenComplementario/examen-complementario",
     Brigadista: "psiBrigadista/informe-brigadista",
-    BombaElec: "bombaElectrica/bomba-electrica"
+    BombaElec: "bombaElectrica/bomba-electrica",
+    InformePsico: "informePsicolaboral/informe-psicolaboral",
+    InformeRiesgoPsico: "informeRiesgoPsicosocial/informe-riesgo-psicosocial",
+    InformeBurnout: "informeBurnout/informe-burnout",
+    InformePsicoAdeco: "informePsicologicoAdeco/informe-psicologico-adeco",
+    PsicoEspaciosConfi: "psicologiaEspaciosConfinados/psicologia-espacios-confinados",
 }
 
 const camposExtraEliminar = {
@@ -150,19 +155,42 @@ export const DeleteExamen = async (norden, campo, token, setForm, form) => {
             });
             console.log(response)
             if (response.ok === true) {
+
                 const actualizarLista = (lista, campo) =>
                     lista.map(section => ({
                         ...section,
-                        items: section.items.map(item =>
-                            item.name === campo
-                                ? { ...item, resultado: false, imprimir: false }
-                                : item
-                        )
+                        items: section.items.map(item => {
+                            // 🔴 Caso especial
+                            if (campo === "anexo16") {
+                                if (item.name === "anexo16" || item.name === "exRxSanguineos") {
+                                    return { ...item, resultado: false, imprimir: false };
+                                }
+                            }
+
+                            // 🟢 Caso normal
+                            if (item.name === campo) {
+                                return { ...item, resultado: false, imprimir: false };
+                            }
+
+                            return item;
+                        })
                     }));
+
                 Swal.fire("Eliminado", "El registro ha sido eliminado", "success");
+
                 setForm((prev) => ({
                     ...prev,
-                    [campo]: "",
+
+                    // 🔴 Caso especial en el state plano
+                    ...(campo === "anexo16"
+                        ? {
+                            anexo16: false,
+                            exRxSanguineos: prev.exRxSanguineos ? false : false // (siempre false, pero explícito)
+                        }
+                        : {
+                            [campo]: ""
+                        }),
+
                     listaExamenes: actualizarLista(prev.listaExamenes, campo),
                 }));
             } else {

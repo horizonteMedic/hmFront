@@ -10,12 +10,13 @@ import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaDatosPacientes";
 import BotonesAccion from "../../../../../components/templates/BotonesAccion";
+import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "ficha_datos_paciente";
 const today = getToday();
 
 export default function FichaDatosPacientes() {
-    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+    const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
     const initialFormState = {
         norden: "",
@@ -124,6 +125,13 @@ export default function FichaDatosPacientes() {
         // capacitaciones: [],
         experiencias: [],
         referencias: [],
+
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
+
+        nombre_doctorAsignado: "",
+        user_doctorAsignado: "",
     };
 
     const {
@@ -1004,6 +1012,22 @@ export default function FichaDatosPacientes() {
 
                 />
 
+            </SectionFieldset>
+            <SectionFieldset legend="Asignación de Médico">
+                <EmpleadoComboBox
+                    value={form.nombre_medico}
+                    label="Psicologo"
+                    form={form}
+                    onChange={handleChangeSimple}
+                />
+                <EmpleadoComboBox
+                    value={form.nombre_doctorAsignado}
+                    label="Doctor Asignado"
+                    form={form}
+                    onChange={handleChangeSimple}
+                    nameField="nombre_doctorAsignado"
+                    idField="user_doctorAsignado"
+                />
             </SectionFieldset>
 
             {/* BOTONES DE ACCIÓN */}

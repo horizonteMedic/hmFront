@@ -319,6 +319,9 @@ export default function Anexo16() {
     trigliceridosRed: "",
 
     notasDoctor: "",
+    //Laboratorio
+    mercurioOrina: "",
+    plomoSangre: "",
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
