@@ -259,7 +259,7 @@ export const GetInfoServicio = (
             observacionesAudio: "",
             contador: 1,
           };
-          data = MapearDatosAdicionales(res, data, data.contador, false);
+
           data.antecedentesPersonales2 = "NINGUNO";
 
 
@@ -922,6 +922,7 @@ export const GetInfoServicio = (
           data.resultadoGonadotropina = res.sexo_sexo_pa === "M" ? "N/A" : res.resultadoGonadotropina
 
           data.notasDoctor = res.notasDoctor ?? "";
+          data = MapearDatosAdicionales(res, data, data.contador, false);
           console.log("DATAAA", data);
           set((prev) => ({ ...prev, ...res, ...data }));
         }
@@ -1391,6 +1392,59 @@ export const MapearDatosAdicionales = (
     data.antecedentesPatologicos =
       res.antecedentesPatologicos_ante_patologicos ?? "";
 
+    //LABORATORIO OBSERVACIONES GENERALES
+    console.log("ALBORTARAIORMSAOINDOIAS")
+    const sexo = res.sexo_sexo_pa; // "M" o "F"
+    const esMujer = sexo === "F";
+    // Convertimos a número
+    const creatinina = parseFloat(res.creatininaPerfilRenal);
+
+    // Validamos que sea número válido
+    if (!isNaN(creatinina)) {
+      if (creatinina < 0.8 || creatinina > 1.4) {
+        data.observacionesGenerales = agregarObservacion(
+          data.observacionesGenerales,
+          `Creatinina Sérica: ${creatinina}`
+        );
+      }
+    }
+
+    const urea = parseFloat(res.ureaSericaPerfilRenal);
+
+    if (!isNaN(urea) && (urea < 10 || urea > 50)) {
+      data.observacionesGenerales = agregarObservacion(
+        data.observacionesGenerales,
+        `Urea Sérica: ${urea}`
+      );
+    }
+
+    const acidoUrico = parseFloat(res.acidoUricoSericoPerfilRenal);
+
+    if (!isNaN(acidoUrico)) {
+      let fueraDeRango = false;
+
+      if (esMujer) {
+        fueraDeRango = acidoUrico < 2.5 || acidoUrico > 6.8;
+      } else {
+        fueraDeRango = acidoUrico < 3.6 || acidoUrico > 7.7;
+      }
+
+      if (fueraDeRango) {
+        data.observacionesGenerales = agregarObservacion(
+          data.observacionesGenerales,
+          `Ácido Úrico Sérico: ${acidoUrico}`
+        );
+      }
+    }
+
+    if (esMujer && res.resultadoGonadotropina === "POSITIVO") {
+      data.observacionesGenerales = agregarObservacion(
+        data.observacionesGenerales,
+        `Gonadotropina: Positivo`
+      );
+    }
+
+
     return data;
   } catch (error) {
     console.error("Error en MapearDatosAdicionales:", error);
@@ -1734,8 +1788,6 @@ export const GetInfoServicioEditar = (
 
           data.notasDoctor = res.notasDoctor ?? "";
           data.resultadoGonadotropina = res.sexo_sexo_pa === "M" ? "N/A" : res.resultadoGonadotropina
-          data.observacionesGenerales += ""
-
 
           data = MapearDatosAdicionales(res, data, 1, true);
           console.log("DATA EDITAR", data);
@@ -1748,4 +1800,9 @@ export const GetInfoServicioEditar = (
     .finally(() => {
       onFinish();
     });
+};
+
+const agregarObservacion = (base, texto) => {
+  if (!texto) return base;
+  return base ? `${base}\n${texto}` : texto;
 };
