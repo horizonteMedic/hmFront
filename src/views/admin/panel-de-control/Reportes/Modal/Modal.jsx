@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUp, faFilePdf, faFileImage, faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUp, faFilePdf, faFileImage, faDownload, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { GetHistoryUser } from '../model/getHistoryUser';
 import { GetlistArchivos } from '../model/getlistArchivos';
 import ModalUpload from '../ModalsDeSubida/ModalUpload';
@@ -9,6 +9,7 @@ import { ReadArchivos, DeleteArchivos64 } from '../model/readArchivos';
 import Swal from 'sweetalert2';
 
 const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empresa, contrata, token, name, apell, Acces }) => {
+  // openModalCorreo,
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listarchivos, setListarchivos] = useState([]);
@@ -227,6 +228,7 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
                     <th className="border border-gray-300 px-2 py-1 text-center">Grupo sanguíneo</th>
                     <th className="border border-gray-300 px-2 py-1 text-center">Historia Clinica</th>
                     {Acces("Reportes", "Descargar Reportes") && <th className="border border-gray-300 px-2 py-1 text-center">Archivos</th>}
+                    {/* {Acces("Reportes", "Registrar Correo a Enviar") && <th className="border border-gray-300 px-2 py-1 text-center">Gestionar Correo</th>} */}
                   </tr>
                 </thead>
                 <tbody>
@@ -264,8 +266,11 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
                           ))}
                         </td>
                       )}
-
-
+                      {/* {Acces("Reportes", "Registrar Correo a Enviar") && (
+                        <td className="border border-gray-300 text-center">
+                          <button onClick={() => openModalCorreo(dataItem.orden)} className='py-2 px-3 bg-blue-500 rounded'><FontAwesomeIcon icon={faEnvelope} style={{ color: 'white' }} /></button>
+                        </td>
+                      )} */}
                     </tr>
                   ))}
                 </tbody>
@@ -273,7 +278,7 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
             </div>
           )}
         </div>
-        <div className="flex justify-center bg-gray-100 p-3 hidden md:flex">
+        <div className="flex justify-center bg-gray-100 p-3 md:flex">
           <div className="flex flex-wrap">
             {generateLegend()}
           </div>
