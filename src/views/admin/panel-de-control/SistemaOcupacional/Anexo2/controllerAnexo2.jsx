@@ -100,7 +100,7 @@ export const SubmitDataService = async (
     piel: form.piel,
     observacionesFichaMedica: form.observacionesGenerales,
     conclusion: form.conclusionRespiratoria,
-    edad: form.edad + " años",
+    edad: form.edad + " AÑOS",
     enfermedadesOcularesOtros: form.enfermedadOtros,
     sistemaNervioso: form.sistemaNervioso,
     otrosExamenes: form.otrosExamenes,
@@ -111,6 +111,7 @@ export const SubmitDataService = async (
     aptoRestriccion: form.aptitud == "RESTRICCION",
     fechaDesde: form.fechaAptitud,
     fechaVence: form.fechaVencimiento,
+    cerrado: form.cerrado,
     medico: form.nombre_medico,
     usuarioFirma: form.user_medicoFirma,
     userRegistro: user,
@@ -195,21 +196,56 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
     sede,
     () => {
       //NO Tiene registro
-      ValidarExamenesRealizados(nro, token, () => { //en caso pase se ejectua esto 
-        GetInfoServicio(nro, tabla, set, token, () => {
-          Swal.close();
-        });
+      GetInfoServicio(nro, tabla, set, token, () => {
+        ValidarExamenesRealizados(nro, token, () => { //en caso pase se ejectua esto 
+          set((prev) => ({
+            ...prev,
+            posibleCerrar: true,
+          }))
+          Swal.fire(
+            "Alerta",
+            "Este examen ya se puede cerrar.",
+            "info"
+          );
+        },
+          (listaFaltantes) => {
+            set((prev) => ({
+              ...prev,
+              notasDoctor: prev.notasDoctor + "\n" + listaFaltantes,
+            }))
+            Swal.close();
+          });
       });
+
     },
     () => {
       //Tiene registro
       GetInfoServicioEditar(nro, tabla, set, token, () => {
-        Swal.fire(
-          "Alerta",
-          "Este paciente ya cuenta con registros de Anexo 2.",
-          "warning"
+        ValidarExamenesRealizados(nro, token, () => { //en caso pase se ejectua esto 
+          set((prev) => ({
+            ...prev,
+            posibleCerrar: true,
+          }))
+          Swal.fire(
+            "Alerta",
+            "Este paciente ya cuenta con registros de Anexo 2. Este examen ya se puede cerrar.",
+            "info"
+          );
+        },
+          (listaFaltantes) => {
+            set((prev) => ({
+              ...prev,
+              notasDoctor: prev.notasDoctor + "\n" + listaFaltantes,
+            }))
+            Swal.fire(
+              "Alerta",
+              "Este paciente ya cuenta con registros de Anexo 2.\n" + listaFaltantes,
+              "info"
+            );
+          }
         );
       });
+
     }
   );
 };
@@ -275,7 +311,8 @@ export const GetExamenesRealizados = (
 export const ValidarExamenesRealizados = (
   nro,
   token,
-  onComplete = () => { }
+  onComplete = () => { },
+  onFail = () => { }
 ) => {
   getFetch(
     `${obtenerExamenesRealizadosUrl}?nOrden=${nro}`,
@@ -301,12 +338,18 @@ export const ValidarExamenesRealizados = (
         if (examenesFaltantes.length === 0) {
           onComplete();
         } else {
-          const listaFaltantes = examenesFaltantes.map(examen => `• ${examen}`).join('<br>');
-          Swal.fire({
-            title: "Alerta",
-            html: `<div style="text-align: center;">El paciente no ha realizado los siguientes exámenes:<br><br></div><div style="text-align: left;margin-left:5px">${listaFaltantes}</div>`,
-            icon: "warning"
-          });
+          // const listaFaltantes = examenesFaltantes.map(examen => `• ${examen}`).join('<br>');
+          // Swal.fire({
+          //   title: "Alerta",
+          //   html: `<div style="text-align: center;">El paciente no ha realizado los siguientes exámenes:<br><br></div><div style="text-align: left;margin-left:5px">${listaFaltantes}</div>`,
+          //   icon: "warning"
+          // });
+
+          const listaTexto = examenesFaltantes
+            .map(examen => `• ${examen}`)
+            .join('\n');
+
+          onFail(listaTexto == null || listaTexto == "" ? "" : "El paciente no ha realizado los siguientes exámenes:\n" + listaTexto);
         }
       } else {
         console.log("No se encontraron datos de exámenes realizados");
@@ -502,7 +545,7 @@ export const GetInfoServicio = (
           data.otrosExamenes += coca == null ? "" : "COCAINA: " + coca + ". \n";
           data.otrosExamenes +=
             marig == null ? "" : "MARIHUANA: " + marig + ". \n";
-          const sexo = res.sexo_sexo_pa;
+          const sexo = res.datosPaciente.sexo_sexo_pa;
           //===============================
           if (hemo != "N/A" && hemo != "") {
             const hemoglobina = parseFloat(hemo);
@@ -543,21 +586,21 @@ export const GetInfoServicio = (
           }
           //==========================
           data.nomExamen = res.nombreExamen_nom_examen ?? "";
-          data.dni = res.dni_cod_pa ?? "";
-          data.nombres = res.nombres_nombres_pa ?? "";
-          data.apellidos = res.apellidos_apellidos_pa ?? "";
+          data.dni = res.datosPaciente.dni_cod_pa ?? "";
+          data.nombres = res.datosPaciente.nombres_nombres_pa ?? "";
+          data.apellidos = res.datosPaciente.apellidos_apellidos_pa ?? "";
           data.fechaNac = formatearFechaCorta(
-            res.fechaNacimientoPaciente_fecha_nacimiento_pa
+            res.datosPaciente.fechaNacimientoPaciente_fecha_nacimiento_pa
           );
-          data.sexo = res.sexo_sexo_pa ?? "";
-          data.lugarNac = res.lugarNacPaciente_lugar_nac_pa ?? "";
-          data.domicilio = res.direccionPaciente_direccion_pa ?? "";
-          data.telefono = res.telefonoCasaPaciente_tel_casa_pa ?? "";
-          data.estadoCivil = res.estadoCivilPaciente_estado_civil_pa ?? "";
-          data.gradoInstruccion = res.nivelEstudiosPaciente_nivel_est_pa ?? "";
+          data.sexo = res.datosPaciente.sexo_sexo_pa ?? "";
+          data.lugarNac = res.datosPaciente.lugarNacPaciente_lugar_nac_pa ?? "";
+          data.domicilio = res.datosPaciente.direccionPaciente_direccion_pa ?? "";
+          data.telefono = res.datosPaciente.telefonoCasaPaciente_tel_casa_pa ?? "";
+          data.estadoCivil = res.datosPaciente.estadoCivilPaciente_estado_civil_pa ?? "";
+          data.gradoInstruccion = res.datosPaciente.nivelEstudiosPaciente_nivel_est_pa ?? "";
           data.empresa = res.empresa_razon_empresa ?? "";
           data.contrata = res.contrata_razon_contrata ?? "";
-          data.edad = (res.edad_fecha_nacimiento_pa ?? "") + " años";
+          data.edad = (res.datosPaciente.edad_fecha_nacimiento_pa ?? "") + " AÑOS";
           data.explotacion = res.explotacion_nom_ex ?? "";
           data.alturaLaboral = res.altura_altura_po ?? "";
           data.mineralExp = res.mineral_mineral_po ?? "";
@@ -844,10 +887,10 @@ export const GetInfoServicioEditar = (
           let data = {
             norden: res.norden_n_orden,
             codigoAnexo: res.codigoAnexo_cod_anexo,
-            observacionesGenerales: "", //txtObservacionesFichaMedica
-            otrosExamenes: "", //txtOtrosEx
-            conclusionRespiratoria: "", //txtconclusion
-
+            otrosExamenes: res.otrosExamenes_txtotrosex ?? "",
+            otrosExamenes2: "",
+            observacionesGenerales2: "",
+            cerrado: res.cerrado ?? false,
             //nuevos
             fechaExam: res.fechaAnexo_fecha,
 
@@ -940,9 +983,8 @@ export const GetInfoServicioEditar = (
             piel: res.piel_txtpiel ?? "",
             observacionesGenerales:
               res.observacionesFichaMedica_txtobservacionesfm ?? "",
-            conclusionRespiratoria: res.conclusion_txtconclusion ?? "",
             restricciones: res.restricciones_txtrestricciones ?? "",
-            edad: (res.edad_fecha_nacimiento_pa ?? "") + " años",
+            edad: (res.datosPaciente.edad_fecha_nacimiento_pa ?? "") + " AÑOS",
             aptitud: res.esApto_apto_si
               ? "APTO"
               : res.noEsApto_apto_no
@@ -958,23 +1000,23 @@ export const GetInfoServicioEditar = (
           };
 
           if (res.interpretacion_interpretacion != null) {
-            data.observacionesGenerales += "ESPIROMETRIA: " + res.interpretacion_interpretacion + "\n";
+            data.observacionesGenerales2 += "ESPIROMETRIA: " + res.interpretacion_interpretacion + "\n";
           }
 
           if (res.observacionesOdonto_txtobservaciones != null)
-            data.observacionesGenerales += `ODONTOGRAMA : ${res.observacionesOdonto_txtobservaciones}\n`;
+            data.observacionesGenerales2 += `ODONTOGRAMA : ${res.observacionesOdonto_txtobservaciones}\n`;
 
           if (res.observacionesRadiografiaTorax_txtobservacionesrt != null)
-            data.observacionesGenerales += `RADIOGRAFIA: ${res.observacionesRadiografiaTorax_txtobservacionesrt}\n`;
+            data.observacionesGenerales2 += `RADIOGRAFIA: ${res.observacionesRadiografiaTorax_txtobservacionesrt}\n`;
 
           if (res.observacionesLabClinico_txtobservacioneslb != null)
-            data.observacionesGenerales += `LAB CLINICO: ${res.observacionesLabClinico_txtobservacioneslb}\n`;
+            data.observacionesGenerales2 += `LAB CLINICO: ${res.observacionesLabClinico_txtobservacioneslb}\n`;
 
           const coca = res.cocaina_txtcocaina;
           const marig = res.marihuana_txtmarihuana;
           //==============================
           if (coca == "REACTIVO" || coca == "POSITIVO") {
-            data.observacionesGenerales += "COCAINA:" + coca + "\n";
+            data.observacionesGenerales2 += "COCAINA:" + coca + "\n";
             data.cocainaRed = true;
             data.cocaina = coca;
           } else {
@@ -982,7 +1024,7 @@ export const GetInfoServicioEditar = (
             data.cocaina = coca;
           }
           if (marig == "REACTIVO" || marig == "POSITIVO") {
-            data.observacionesGenerales += `MARIHUANA: ${marig}\n`;
+            data.observacionesGenerales2 += `MARIHUANA: ${marig}\n`;
             data.marihuana = marig;
             data.marihuanaRed = true;
           } else {
@@ -1014,7 +1056,7 @@ export const GetInfoServicioEditar = (
           data.vsg = vsg;
           data.glucosa = gluc;
           data.creatinina = creat;
-          data.otrosExamenes += "HEMOGRAMA: " + (vsg != null && hemo != null ? "NORMAL" : "N/A") + "\n";
+          data.otrosExamenes2 += "HEMOGRAMA: " + (vsg != null && hemo != null ? "NORMAL" : "N/A") + "\n";
           const rh =
             res.grupoSanguineoRhPositivo_rbrhpositivo
               ? "+"
@@ -1025,19 +1067,19 @@ export const GetInfoServicioEditar = (
             data.grupoSanguineo || rh
               ? `${data.grupoSanguineo || ""}${rh}`
               : "N/A";
-          data.otrosExamenes += `GRUPO SANGUINEO: ${textoGrupo}\n`;
+          data.otrosExamenes2 += `GRUPO SANGUINEO: ${textoGrupo}\n`;
 
-          data.otrosExamenes +=
+          data.otrosExamenes2 +=
             gluc == null ? "" : "GLUCOSA: " + gluc + " mg/dl.\n";
-          data.otrosExamenes +=
+          data.otrosExamenes2 +=
             creat == null ? "" : "CREATININA: " + creat + " mg/dl.\n";
-          data.otrosExamenes += vsg == null ? "" : "VSG: " + vsg + ". \n";
-          data.otrosExamenes += "EX ORINA: NORMAL. \n";
-          data.otrosExamenes += coca == null ? "" : "COCAINA: " + coca + ". \n";
-          data.otrosExamenes +=
+          data.otrosExamenes2 += vsg == null ? "" : "VSG: " + vsg + ". \n";
+          data.otrosExamenes2 += "EX ORINA: NORMAL. \n";
+          data.otrosExamenes2 += coca == null ? "" : "COCAINA: " + coca + ". \n";
+          data.otrosExamenes2 +=
             marig == null ? "" : "MARIHUANA: " + marig + ". \n";
 
-          const sexo = res.sexo_sexo_pa;
+          const sexo = res.datosPaciente.sexo_sexo_pa;
           if (hemo != "N/A" && hemo != "") {
             const hemoglobina = parseFloat(hemo);
             if (sexo == "M") {
@@ -1074,24 +1116,24 @@ export const GetInfoServicioEditar = (
             }
           }
           if (res.examenRadiograficosSanguineos_txtobservacionesrs != null) {
-            data.observacionesGenerales += `EX. RX SANGUINEOS : ${res.examenRadiograficosSanguineos_txtobservacionesrs}\n`;
+            data.observacionesGenerales2 += `EX. RX SANGUINEOS : ${res.examenRadiograficosSanguineos_txtobservacionesrs}\n`;
           }
           data.nomExamen = res.nombreExamen_nom_examen ?? "";
-          data.dni = res.dni_cod_pa ?? "";
-          data.nombres = res.nombres_nombres_pa ?? "";
-          data.apellidos = res.apellidos_apellidos_pa ?? "";
+          data.dni = res.datosPaciente.dni_cod_pa ?? "";
+          data.nombres = res.datosPaciente.nombres_nombres_pa ?? "";
+          data.apellidos = res.datosPaciente.apellidos_apellidos_pa ?? "";
           data.fechaNac = formatearFechaCorta(
             res.fechaNacimientoPaciente_fecha_nacimiento_pa
           );
-          data.sexo = res.sexo_sexo_pa ?? "";
+          data.sexo = res.datosPaciente.sexo_sexo_pa ?? "";
           data.lugarNac = res.lugarNacPaciente_lugar_nac_pa ?? "";
-          data.domicilio = res.direccionPaciente_direccion_pa ?? "";
-          data.telefono = res.telefonoCasaPaciente_tel_casa_pa ?? "";
+          data.domicilio = res.datosPaciente.direccionPaciente_direccion_pa ?? "";
+          data.telefono = res.datosPaciente.telefonoCasaPaciente_tel_casa_pa ?? "";
           data.estadoCivil = res.estadoCivilPaciente_estado_civil_pa ?? "";
-          data.gradoInstruccion = res.nivelEstudiosPaciente_nivel_est_pa ?? "";
+          data.gradoInstruccion = res.datosPaciente.nivelEstudiosPaciente_nivel_est_pa ?? "";
           data.empresa = res.empresa_razon_empresa ?? "";
           data.contrata = res.contrata_razon_contrata ?? "";
-          data.edad = (res.edad_fecha_nacimiento_pa ?? "") + " años";
+          data.edad = (res.datosPaciente.edad_fecha_nacimiento_pa ?? "") + " AÑOS";
           data.explotacion = res.explotacion_nom_ex ?? "";
           data.alturaLaboral = res.altura_altura_po ?? "";
           data.mineralExp = res.mineral_mineral_po ?? "";
@@ -1176,9 +1218,9 @@ export const GetInfoServicioEditar = (
 
           if (hallazgoECG && hallazgoECG !== "NORMAL.") {
             if (recomendacionesECG) {
-              data.observacionesGenerales += `\n -ELECTROCARDIOGRAMA: ${hallazgoECG}.${recomendacionesECG}\n`;
+              data.observacionesGenerales2 += `\n -ELECTROCARDIOGRAMA: ${hallazgoECG}.${recomendacionesECG}\n`;
             } else {
-              data.observacionesGenerales += `\n -ELECTROCARDIOGRAMA: ${hallazgoECG}\n`;
+              data.observacionesGenerales2 += `\n -ELECTROCARDIOGRAMA: ${hallazgoECG}\n`;
             }
           }
 
@@ -1197,11 +1239,11 @@ export const GetInfoServicioEditar = (
           const trigli = parseFloat(data.trigliceridos) || 0;
 
           if (ct > 200) {
-            data.observacionesGenerales += "HIPERCOLESTEROLEMIA.";
+            data.observacionesGenerales2 += "HIPERCOLESTEROLEMIA.";
             data.colesterolRed = true;
           }
           if (trigli > 150) {
-            data.observacionesGenerales += "- HIPERTRIGLICERIDEMIA.";
+            data.observacionesGenerales2 += "- HIPERTRIGLICERIDEMIA.";
             data.trigliceridosRed = true;
           }
           if (ldl > 129) {
@@ -1221,7 +1263,7 @@ export const GetInfoServicioEditar = (
             hdl > 60 ||
             vldl > 30
           ) {
-            data.observacionesGenerales +=
+            data.observacionesGenerales2 +=
               "DIETA HIPOCALORICA Y EJERCICIOS. \n";
           }
           //==============================

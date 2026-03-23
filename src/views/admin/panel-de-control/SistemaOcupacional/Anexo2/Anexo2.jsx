@@ -5,7 +5,6 @@ import {
   faStethoscope,
   faHeartbeat,
   faChartLine,
-  faFlask,
 } from "@fortawesome/free-solid-svg-icons";
 import Resultados from "./Resultados/Resultados";
 import ExamenFisico from "./ExamenFisico/ExamenFisico";
@@ -17,7 +16,6 @@ import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import { GetExamenesRealizados, PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAnexo2";
 import Swal from "sweetalert2";
-import Laboratorio from "./Laboratorio/Laboratorio";
 
 const tabla = "anexo_agroindustrial";
 const today = getToday();
@@ -301,6 +299,11 @@ export default function Anexo2() {
     oftalmologia: "",
 
     notasDoctor: "",
+
+    posibleCerrar: false,
+    cerrado: false,
+    observacionesGenerales2: "",
+    otrosExamenes2: "",
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
