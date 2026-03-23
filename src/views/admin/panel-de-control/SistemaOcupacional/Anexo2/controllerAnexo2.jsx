@@ -486,14 +486,14 @@ export const GetInfoServicio = (
           const marig = res.marihuana_txtmarihuana;
           //==============================
           if (coca == "REACTIVO") {
-            data.observacionesGenerales += `TEST DE COCAINA: COLABORADOR DE LA COMUNIDAD, CONSUME HOJA DE COCA.\n`;
+            data.observacionesGenerales += `COCAINA: REACTIVO.\n`;
             data.cocainaRed = true;
             data.cocaina = "REACTIVO";
           } else {
             data.cocaina = coca;
           }
           if (marig == "REACTIVO") {
-            data.observacionesGenerales += `MARIHUANA: COLABORADOR DE LA COMUNIDAD, CONSUME HOJA DE COCA.\n`;
+            data.observacionesGenerales += `MARIHUANA: REACTIVO.\n`;
             data.marihuanaRed = true;
             data.marihuana = "REACTIVO";
           } else {
@@ -959,6 +959,9 @@ export const GetInfoServicioEditar = (
             reflejosPupilares: res.reflejosPupilares_r_pupilares ?? "",
             visionBinocular: res.visionBinocular_v_binocular ?? "",
 
+
+
+
             miembrosSuperiores:
               res.miembrosSuperiores_txtmiembrossuperiores ?? "",
             miembrosInferiores:
@@ -999,18 +1002,100 @@ export const GetInfoServicioEditar = (
             dataEnfermedades: res.accidentes ?? [],
           };
 
+
+
+
           if (res.interpretacion_interpretacion != null) {
             data.observacionesGenerales2 += "ESPIROMETRIA: " + res.interpretacion_interpretacion + "\n";
           }
+          if (res.conclusionRadiografia_conclu != null) {
+            data.observacionesGenerales2 += "RAYOS X: " + res.conclusionRadiografia_conclu + "\n";
+          }
+          if (res.conclusionMusculoesqueletica != null) {
+            data.observacionesGenerales2 += "MUSCULOESQUELETICA: " + res.conclusionMusculoesqueletica + "\n";
+          }
 
-          if (res.observacionesOdonto_txtobservaciones != null)
+          if (res.observacionesConduccionCertificado_conduccion != null) {
+            data.observacionesGenerales2 += "FICHA CONDUCCION: " + res.observacionesConduccionCertificado_conduccion + "\n";
+          }
+
+          if (res.informacionesGeneralRadiografia_info_general != null) {
+            data.observacionesGenerales2 += `INFORME RADIOGRAFICO : ${res.informacionesGeneralRadiografia_info_general}\n`;
+          }
+          if (res.conclusionesRadiografia_conclu != null) {
+            data.observacionesGenerales2 += `CONCLUCIONES : ${res.conclusionesRadiografia_conclu}\n`;
+          }
+          if (res.observacionesOdonto_txtobservaciones != null &&
+            res.observacionesOdonto_txtobservaciones != "NINGUNA")
             data.observacionesGenerales2 += `ODONTOGRAMA : ${res.observacionesOdonto_txtobservaciones}\n`;
 
+          //------radio
+          if (
+            res.verticesRadiografiaTorax_txtvertices != null &&
+            res.verticesRadiografiaTorax_txtvertices != "NO SE TOMÓ RX DE TORAX"
+          ) {
+            if (
+              res.verticesRadiografiaTorax_txtvertices != null &&
+              res.verticesRadiografiaTorax_txtvertices != "LIBRES"
+            ) {
+              data.observacionesGenerales2 +=
+                res.verticesRadiografiaTorax_txtvertices;
+            }
+            if (
+              res.hilosRadiografiaTorax_txthilios != null &&
+              res.hilosRadiografiaTorax_txthilios != "NORMALES"
+            ) {
+              data.observacionesGenerales2 +=
+                res.hilosRadiografiaTorax_txthilios;
+            }
+            if (
+              res.senosCostoFrenicos_txtsenoscostofrenicos != null &&
+              res.senosCostoFrenicos_txtsenoscostofrenicos != "LIBRES"
+            ) {
+              data.observacionesGenerales2 +=
+                res.senosCostoFrenicos_txtsenoscostofrenicos;
+            }
+            if (
+              res.camposPulmones_txtcampospulm != null &&
+              res.camposPulmones_txtcampospulm != "NORMALES"
+            ) {
+              data.observacionesGenerales2 += res.camposPulmones_txtcampospulm;
+            }
+            if (
+              res.meadiastinos_txtmediastinos != null &&
+              res.meadiastinos_txtmediastinos != "NORMALES"
+            ) {
+              data.observacionesGenerales2 += res.meadiastinos_txtmediastinos;
+            }
+            if (
+              res.siluetaCardioVascular_txtsiluetacardiovascular != null &&
+              res.siluetaCardioVascular_txtsiluetacardiovascular != "NORMAL"
+            ) {
+              data.observacionesGenerales2 +=
+                res.siluetaCardioVascular_txtsiluetacardiovascular;
+            }
+            if (
+              res.osteoMuscular_txtosteomuscular != null &&
+              res.osteoMuscular_txtosteomuscular != "NORMAL"
+            ) {
+              data.observacionesGenerales2 += res.osteoMuscular_txtosteomuscular;
+            }
+            if (
+              res.conclusionesRadiograficas_txtconclusionesradiograficas !=
+              null &&
+              res.conclusionesRadiograficas_txtconclusionesradiograficas !=
+              "NORMAL"
+            ) {
+              data.observacionesGenerales2 +=
+                res.conclusionesRadiograficas_txtconclusionesradiograficas;
+            }
+          }
           if (res.observacionesRadiografiaTorax_txtobservacionesrt != null)
             data.observacionesGenerales2 += `RADIOGRAFIA: ${res.observacionesRadiografiaTorax_txtobservacionesrt}\n`;
 
           if (res.observacionesLabClinico_txtobservacioneslb != null)
             data.observacionesGenerales2 += `LAB CLINICO: ${res.observacionesLabClinico_txtobservacioneslb}\n`;
+
 
           const coca = res.cocaina_txtcocaina;
           const marig = res.marihuana_txtmarihuana;
@@ -1148,8 +1233,27 @@ export const GetInfoServicioEditar = (
           data.fev1Fvc = res.fev1fvc_fev1fvc ?? "";
           data.fef2575 = res.fef2575_fef25_75 ?? "";
 
-          data.conclusionRespiratoria = res.interpretacion_interpretacion ?? "";
+          if (data.fvc != "" && data.fvc != "N/A") {
+            const fvc = parseFloat(data.fvc);
+            if (fvc >= 80) {
+              // data.conclusionRespiratoria += "NORMAL";
+            } else {
+              // data.conclusionRespiratoria += "PATRON RESTRICTIVO" + "\n";
+              data.observacionesGenerales2 +=
+                "PATRON RESTRICTIVO LEVE.EVALUACION EN 6 MESES." + "\n";
+            }
+          }
           data.piezasMalEstado = res.piezasMalEstado_txtpiezasmalestado ?? "";
+          if (data.piezasMalEstado !== "") {
+            const malEstado = parseFloat(data.piezasMalEstado);
+            if (malEstado >= 1) {
+              data.observacionesGenerales2 +=
+                "CARIES DENTAL.TTO.EVALUACION EN 6 MESES.\n";
+            }
+          }
+
+          data.conclusionRespiratoria = res.interpretacion_interpretacion ?? "";
+
           data.piezasFaltan = res.ausentes_txtausentes ?? "";
 
           // Hijos
@@ -1160,6 +1264,56 @@ export const GetInfoServicioEditar = (
             "0";
 
           data.imc = res.imc_imc ?? "";
+          if (data.imc && data.imc !== "") {
+            const imc = parseFloat(data.imc);
+            data.imcRed = false;
+            if (imc >= 25 && imc < 30) {
+              data.imcRed = true;
+              data.observacionesGenerales2 +=
+                "SOBREPESO:DIETA HIPOCALORICA Y EJERCICIOS.\n";
+            } else if (imc >= 30 && imc < 35) {
+              data.imcRed = true;
+              data.observacionesGenerales2 +=
+                "OBESIDAD I.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
+            } else if (imc >= 35 && imc < 40) {
+              data.imcRed = true;
+              data.observacionesGenerales2 +=
+                "OBESIDAD II.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
+            }
+            else if (imc >= 40) {
+              data.imcRed = true;
+              data.observacionesGenerales2 +=
+                "OBESIDAD III.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
+            }
+          }
+
+
+          if (data.visionCercaOd !== "") {
+            if (
+              data.enfermedadOculares != "" &&
+              data.enfermedadOculares !== "NINGUNA"
+            ) {
+              data.observacionesGenerales2 += `${data.enfermedadOculares}\n`;
+            }
+          }
+          if (data.enfermedadOtros === "PTERIGION BILATERAL") {
+            data.observacionesGenerales2 +=
+              "PTERIGION BILATERAL:EVALUACION X OFTALMOLOGIA.\n";
+          } else if (
+            data.enfermedadOtros &&
+            data.enfermedadOtros !== "NINGUNA"
+          ) {
+            data.observacionesGenerales2 += `${data.enfermedadOtros}:EVALUACION X OFTALMOLOGIA.\n`;
+          }
+
+          if (
+            data.visionColores !== "NINGUNA" &&
+            data.visionColores !== "NORMAL"
+          ) {
+            data.observacionesGenerales2 += `${data.visionColores}\n`;
+          }
+
+
           // Medidas Generales
           data.talla = res.talla_talla ?? "";
           data.peso = res.peso_peso ?? "";
@@ -1203,6 +1357,22 @@ export const GetInfoServicioEditar = (
           data.oi4000 = res.oidoIzquierdo4000_o_i_4000 ?? "";
           data.oi6000 = res.oidoIzquierdo6000_o_i_6000 ?? "";
           data.oi8000 = res.oidoIzquierdo8000_o_i_8000 ?? "";
+
+          const diagnosticoAudiometria =
+            res.diagnosticoAudiometria_diagnostico ?? "";
+
+          // //************************************************************
+          if (
+            data.od500 !== "" &&
+            data.od500 !== "N/A" &&
+            diagnosticoAudiometria !== "NORMAL"
+          ) {
+            data.observacionesGenerales2 += `${diagnosticoAudiometria}.USO DE EPP AUDITIVO.EVALUACION ANUAL\n`;
+          } else if (data.od500 === "N/A") {
+            data.observacionesGenerales2 += "NO PASO EXAMEN AUDIOMETRIA.\n";
+          }
+
+
 
           if (data.hijosVivos && data.hijosMuertos) {
             const hv = parseInt(data.hijosVivos) || 0;
