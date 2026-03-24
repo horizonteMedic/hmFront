@@ -320,8 +320,8 @@ export default function Anexo16() {
 
     notasDoctor: "",
     //Laboratorio
-    mercurioOrina: "",
-    plomoSangre: "",
+    mercurioOrina: "N/A",
+    plomoSangre: "N/A",
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,

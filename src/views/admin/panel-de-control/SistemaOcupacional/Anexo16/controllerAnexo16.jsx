@@ -294,6 +294,7 @@ export const GetInfoServicio = (
             observacionesGenerales: "",
             observacionesAudio: "",
             contador: 1,
+
           };
 
           data.antecedentesPersonales2 = "NINGUNO";
@@ -1040,9 +1041,8 @@ export const ValidarExamenesRealizados = (
           Audiometría: res.audiometriaPo,
         };
 
-        const examenesFaltantes = Object.keys(examenes).filter(
-          (examen) => !examenes[examen]
-        );
+        const examenesFaltantes = Object.keys(examenes).filter(examen => !examenes[examen]);
+
         console.log(examenesFaltantes)
         if (examenesFaltantes.length === 0) {
           onComplete();
