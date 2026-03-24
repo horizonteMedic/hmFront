@@ -277,7 +277,7 @@ export default function Anexo16() {
     densidadFisico: "",
     phFisico: "",
     otrosExamenes: "",
-    aptoParaTrabajar: "SI",
+    aptoParaTrabajar: "",
 
     // Estado del Paciente
     nordenEstadoPaciente: "",
@@ -326,6 +326,11 @@ export default function Anexo16() {
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
+
+    observacionesGenerales2: "",
+    posibleCerrar: false,
+    cerrado: false,
+    otrosExamenes2: "",
   };
 
   const {

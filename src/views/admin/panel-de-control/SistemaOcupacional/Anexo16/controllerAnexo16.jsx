@@ -118,6 +118,7 @@ export const SubmitDataService = async (
     electricos: form.electricos,
     vibraciones: form.vibraciones,
     usuarioFirma: form.user_medicoFirma,
+    cerrado: form.cerrado,
     examenRadiograficoSanguineo: {
       codigoExamenRadiograficoSanguineo: form.codigoExamenRadiograficoSanguineo,
       nrx: form.numeroRx,
@@ -218,20 +219,53 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
     sede,
     () => {
       //NO Tiene registro
-      ValidarExamenesRealizados(nro, token, () => {
-        //en caso pase se ejectua esto
-        GetInfoServicio(nro, tabla, set, token, () => {
-          Swal.close();
-        });
-      });
+      GetInfoServicio(nro, tabla, set, token, () => {
+        ValidarExamenesRealizados(nro, token, () => {
+          set((prev) => ({
+            ...prev,
+            posibleCerrar: true,
+          }))
+          Swal.fire(
+            "Alerta",
+            "Este examen ya se puede cerrar.",
+            "info"
+          );
+        },
+          (listaFaltantes) => {
+            set((prev) => ({
+              ...prev,
+              notasDoctor: prev.notasDoctor + "\n" + listaFaltantes,
+            }))
+            Swal.close();
+          });
+      })
+
     },
     () => {
       //Tiene registro
       GetInfoServicioEditar(nro, tabla, set, token, () => {
-        Swal.fire(
-          "Alerta",
-          "Este paciente ya cuenta con registros de Anexo 16.",
-          "warning"
+        ValidarExamenesRealizados(nro, token, () => { //en caso pase se ejectua esto 
+          set((prev) => ({
+            ...prev,
+            posibleCerrar: true,
+          }))
+          Swal.fire(
+            "Alerta",
+            "Este paciente ya cuenta con registros de Anexo 16. Este examen ya se puede cerrar.",
+            "info"
+          );
+        },
+          (listaFaltantes) => {
+            set((prev) => ({
+              ...prev,
+              notasDoctor: prev.notasDoctor + "\n" + listaFaltantes,
+            }))
+            Swal.fire(
+              "Alerta",
+              "Este paciente ya cuenta con registros de Anexo 16.\n" + listaFaltantes,
+              "info"
+            );
+          }
         );
       });
     }
@@ -987,7 +1021,8 @@ export const GetInfoServicio = (
 export const ValidarExamenesRealizados = (
   nro,
   token,
-  onComplete = () => { }
+  onComplete = () => { },
+  onFail = () => { }
 ) => {
   getFetch(`${obtenerExamenesRealizadosUrl}?nOrden=${nro}`, token)
     .then((res) => {
@@ -1008,18 +1043,15 @@ export const ValidarExamenesRealizados = (
         const examenesFaltantes = Object.keys(examenes).filter(
           (examen) => !examenes[examen]
         );
-
+        console.log(examenesFaltantes)
         if (examenesFaltantes.length === 0) {
           onComplete();
         } else {
-          const listaFaltantes = examenesFaltantes
-            .map((examen) => `• ${examen}`)
-            .join("<br>");
-          Swal.fire({
-            title: "Alerta",
-            html: `<div style="text-align: center;">El paciente no ha realizado los siguientes exámenes:<br><br></div><div style="text-align: left;margin-left:5px">${listaFaltantes}</div>`,
-            icon: "warning",
-          });
+          const listaTexto = examenesFaltantes
+            .map(examen => `• ${examen}`)
+            .join('\n');
+
+          onFail(listaTexto == null || listaTexto == "" ? "" : "El paciente no ha realizado los siguientes exámenes:\n" + listaTexto);
         }
       } else {
         console.log("No se encontraron datos de exámenes realizados");
@@ -1443,7 +1475,7 @@ export const MapearDatosAdicionales = (
       res.antecedentesPatologicos_ante_patologicos ?? "";
 
     //LABORATORIO OBSERVACIONES GENERALES
-    console.log("ALBORTARAIORMSAOINDOIAS")
+
 
 
 
@@ -1461,15 +1493,22 @@ export const GetInfoServicioEditar = (
   token,
   onFinish = () => { }
 ) => {
-  getFetch(`${obtenerParaEditarUrl}?nOrden=${nro}&nameService=${tabla}`, token)
-    .then((res) => {
+  Promise.all([
+    getFetch(`${obtenerSimpleUrl}?nOrden=${nro}&nameService=${tabla}`, token),
+    getFetch(`${obtenerParaEditarUrl}?nOrden=${nro}&nameService=${tabla}`, token)
+  ])
+    .then(([resSimple, res]) => {
       if (res.norden_n_orden) {
         console.log(res);
         if (res) {
           let data = {
             norden: res.norden_n_orden,
-            observacionesGenerales: "",
+            observacionesGenerales:
+              res.observacionesFichaMedicaAnexo7c_txtobservacionesfm ?? "",
+            observacionesGenerales2: "",
+            cerrado: res.cerrado ?? false,
             observacionesAudio: "",
+            contador: 1,
             codigoAnexo: res.codigoAnexo7c_cod_anexo,
             codigoExamenRadiograficoSanguineo: res.codigoExamenRadiograficoSanguineo_cod_exra,
             imagenRadiograficaPolvo: res.examenRadiograficoIrep_txtirep ?? "",
@@ -1761,8 +1800,8 @@ export const GetInfoServicioEditar = (
           data.evaluacionCognitiva = res.lenguageAnexo7c_txtlenguage ?? "";
 
           // Medical conclusions and observations
-          data.observacionesGenerales +=
-            res.observacionesFichaMedicaAnexo7c_txtobservacionesfm ?? "";
+          //data.observacionesGenerales2 +=
+          //res.observacionesFichaMedicaAnexo7c_txtobservacionesfm ?? "";
           data.conclusionRespiratoria =
             res.interpretacionFuncionRespiratoria_interpretacion ?? "";
 
@@ -1790,6 +1829,423 @@ export const GetInfoServicioEditar = (
 
           data.notasDoctor = res.notasDoctor ?? "";
           data.resultadoGonadotropina = res.sexo_sexo_pa === "M" ? "N/A" : res.resultadoGonadotropina
+
+          if (resSimple.interpretacionFuncionRespiratoria_interpretacion != null) {
+            data.observacionesGenerales2 += "ESPIROMETRIA: " + res.interpretacionFuncionRespiratoria_interpretacion + "\n";
+          }
+
+          // if (res.conclusionradiografia_conclu != null) {
+          //   data.observacionesGenerales += "RAYOS X: " + res.conclusionradiografia_conclu + "\n";
+          // }
+
+          if (resSimple.conclusionMusculoesqueletica != null) {
+            data.observacionesGenerales2 += "MUSCULOESQUELETICA: " + res.conclusionMusculoesqueletica + "\n";
+          }
+
+          // if (res.observacionFichaConduccion != null) {
+          //   data.observacionesGenerales += "FICHA CONDUCCION: " + res.observacionFichaConduccion + "\n";
+          // }
+
+          // Información radiográfica
+          if (resSimple.infoGeneralRadiografia_info_general != null) {
+            data.observacionesGenerales2 +=
+              "-INFORME RADIOGRAFICO : " +
+              resSimple.infoGeneralRadiografia_info_general +
+              "\n";
+          }
+          if (resSimple.conclusionRadiografia_conclu != null) {
+            data.observacionesGenerales2 +=
+              "-CONCLUCIONES : " + resSimple.conclusionRadiografia_conclu + "\n";
+          }
+
+          // Radiografía de tórax
+          if (
+            resSimple.verticesRadiografiaTorax_txtvertices != null &&
+            resSimple.verticesRadiografiaTorax_txtvertices !==
+            "NO SE TOMÓ RX DE TORAX"
+          ) {
+            if (
+              resSimple.verticesRadiografiaTorax_txtvertices != null &&
+              resSimple.verticesRadiografiaTorax_txtvertices !== "LIBRES"
+            ) {
+              data.observacionesGenerales2 +=
+                data.contador +
+                ".-" +
+                resSimple.verticesRadiografiaTorax_txtvertices +
+                "\n";
+              data.contador++;
+            }
+            if (
+              resSimple.hiliosRadiografiaTorax_txthilios != null &&
+              resSimple.hiliosRadiografiaTorax_txthilios !== "NORMALES"
+            ) {
+              data.observacionesGenerales2 +=
+                data.contador +
+                ".-" +
+                resSimple.hiliosRadiografiaTorax_txthilios +
+                "\n";
+              data.contador++;
+            }
+            if (
+              resSimple.senosCostoFrenicosRadiografiaTorax_txtsenoscostofrenicos !=
+              null &&
+              resSimple.senosCostoFrenicosRadiografiaTorax_txtsenoscostofrenicos !==
+              "LIBRES"
+            ) {
+              data.observacionesGenerales2 +=
+                data.contador +
+                ".-" +
+                resSimple.senosCostoFrenicosRadiografiaTorax_txtsenoscostofrenicos +
+                "\n";
+              data.contador++;
+            }
+            if (
+              resSimple.camposPulmonesRadiografiaTorax_txtcampospulm != null &&
+              resSimple.camposPulmonesRadiografiaTorax_txtcampospulm !== "NORMALES"
+            ) {
+              data.observacionesGenerales2 +=
+                data.contador +
+                ".-" +
+                resSimple.camposPulmonesRadiografiaTorax_txtcampospulm +
+                "\n";
+              data.contador++;
+            }
+            if (
+              resSimple.mediastinosRadiografiaTorax_txtmediastinos != null &&
+              resSimple.mediastinosRadiografiaTorax_txtmediastinos !== "NORMALES"
+            ) {
+              data.observacionesGenerales2 +=
+                data.contador +
+                ".-" +
+                resSimple.mediastinosRadiografiaTorax_txtmediastinos +
+                "\n";
+              data.contador++;
+            }
+            if (
+              resSimple.siluetaCardioVascularRadiografiaTorax_txtsiluetacardiovascular !=
+              null &&
+              resSimple.siluetaCardioVascularRadiografiaTorax_txtsiluetacardiovascular !==
+              "NORMAL"
+            ) {
+              data.observacionesGenerales2 +=
+                data.contador +
+                ".-" +
+                resSimple.siluetaCardioVascularRadiografiaTorax_txtsiluetacardiovascular +
+                "\n";
+              data.contador++;
+            }
+            if (
+              resSimple.osteomuscularRadiografiaTorax_txtosteomuscular != null &&
+              resSimple.osteomuscularRadiografiaTorax_txtosteomuscular !== "NORMAL"
+            ) {
+              data.observacionesGenerales2 +=
+                data.contador +
+                ".-" +
+                resSimple.osteomuscularRadiografiaTorax_txtosteomuscular +
+                "\n";
+              data.contador++;
+            }
+            if (
+              resSimple.conclusionesRadiograficasTorax_txtconclusionesradiograficas !=
+              null &&
+              resSimple.conclusionesRadiograficasTorax_txtconclusionesradiograficas !==
+              "NORMAL"
+            ) {
+              data.observacionesGenerales2 +=
+                data.contador +
+                ".-" +
+                resSimple.conclusionesRadiograficasTorax_txtconclusionesradiograficas +
+                "\n";
+              data.contador++;
+            }
+          }
+
+          if (
+            resSimple.observacionesRadiografiaTorax_txtobservacionesrt != null &&
+            resSimple.observacionesRadiografiaTorax_txtobservacionesrt !== "NORMAL"
+          ) {
+            data.observacionesGenerales2 +=
+              data.contador +
+              ".-" +
+              resSimple.observacionesRadiografiaTorax_txtobservacionesrt +
+              "\n";
+            data.contador++;
+          }
+          if (resSimple.observacionesLaboratorioClinico_txtobservacioneslb != null) {
+            data.observacionesGenerales2 +=
+              data.contador +
+              ".-" +
+              resSimple.observacionesLaboratorioClinico_txtobservacioneslb +
+              "\n";
+            data.contador++;
+          }
+          if (resSimple.observacionesAlturaCertificado_alturabarrick != null) {
+            data.observacionesGenerales2 +=
+              data.contador +
+              ".-" +
+              resSimple.observacionesAlturaCertificado_alturabarrick +
+              "\n";
+            data.contador++;
+          } else if (resSimple.observacionesAlturaCertificacion_certialtura != null) {
+            data.observacionesGenerales2 +=
+              data.contador +
+              ".-" +
+              resSimple.observacionesAlturaCertificacion_certialtura +
+              "\n";
+            data.contador++;
+          }
+          if (resSimple.observacionesConduccionCertificado_conduccion != null) {
+            data.observacionesGenerales2 +=
+              data.contador +
+              ".-" +
+              resSimple.observacionesConduccionCertificado_conduccion +
+              "\n";
+            data.contador++;
+          }
+          if (coca === "REACTIVO" || coca === "POSITIVO") {
+            data.observacionesGenerales2 +=
+              data.contador +
+              ".- TEST DE COCAINA: " +
+              coca +
+              " COLABORADOR DE LA COMUNIDAD, CONSUME HOJA DE COCA.\n";
+            data.cocainaRed = true;
+            data.contador++;
+          }
+          data.cocaina = coca;
+
+          if (marig === "REACTIVO" || marig === "POSITIVO") {
+            data.observacionesGenerales2 +=
+              data.contador +
+              ".-MARIHUANA: " +
+              marig +
+              " COLABORADOR DE LA COMUNIDAD, CONSUME HOJA DE COCA.\n";
+            data.marihuanaRed = true;
+            data.contador++;
+          }
+          data.marihuana = marig;
+          data.piezasMalEstado =
+            resSimple.piezasMalEstadoOdontograma_txtpiezasmalestado ?? "";
+          if (data.piezasMalEstado && data.piezasMalEstado !== "") {
+            const malEstado = parseFloat(data.piezasMalEstado);
+            if (malEstado >= 1) {
+              data.observacionesGenerales2 +=
+                data.contador +
+                "-" +
+                "CARIES DENTAL.TTO.EVALUACION EN 6 MESES.\n";
+              data.contador++;
+            }
+          }
+          // IMC
+          data.imc = resSimple.imcTriaje_imc ?? "";
+          if (
+            resSimple.ordenAlturaCertificado_ordenaltura == null &&
+            resSimple.ordenConduccionCertificado_ordencond == null &&
+            resSimple.numeroAlturaCertificacion_numalt == null
+          ) {
+            if (data.imc && data.imc !== "") {
+              const imc = parseFloat(data.imc);
+              data.imcRed = false;
+              if (imc >= 25 && imc < 30) {
+                data.imcRed = true;
+                data.observacionesGenerales2 +=
+                  data.contador +
+                  ".-" +
+                  "SOBREPESO:DIETA HIPOCALORICA Y EJERCICIOS.\n";
+                data.contador++;
+              } else if (imc >= 30 && imc < 35) {
+                data.imcRed = true;
+                data.observacionesGenerales2 +=
+                  data.contador +
+                  ".-" +
+                  "OBESIDAD I.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
+                data.contador++;
+              } else if (imc >= 35 && imc < 40) {
+                data.imcRed = true;
+                data.observacionesGenerales2 +=
+                  data.contador +
+                  ".-" +
+                  "OBESIDAD II.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
+                data.contador++;
+              } else if (imc >= 40 && imc < 45) {
+                data.imcRed = true;
+                data.observacionesGenerales2 +=
+                  data.contador +
+                  ".-" +
+                  "OBESIDAD III.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
+                data.contador++;
+              } else if (imc >= 45 && imc < 50) {
+                data.imcRed = true;
+                data.observacionesGenerales2 +=
+                  data.contador +
+                  ".-" +
+                  "OBESIDAD IV.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
+                data.contador++;
+              }
+            }
+          }
+          if (
+            data.enfermedadOculares !== "NINGUNA" &&
+            data.enfermedadOculares !== ""
+          ) {
+            data.observacionesGenerales2 +=
+              data.contador + ".-" + data.enfermedadOculares + "\n";
+            data.contador++;
+          }
+
+          if (data.enfermedadOtros === "PTERIGION BILATERAL") {
+            data.observacionesGenerales2 +=
+              data.contador +
+              ".-" +
+              " PTERIGION BILATERAL:EVALUACION POR OFTALMOLOGIA.\n";
+            data.contador++;
+          } else if (
+            data.enfermedadOtros !== "NINGUNA" &&
+            data.enfermedadOtros !== ""
+          ) {
+            data.observacionesGenerales2 +=
+              data.contador +
+              ".-" +
+              data.enfermedadOtros +
+              ":EVALUACION POR OFTALMOLOGIA.\n";
+            data.contador++;
+          }
+
+          // Odontograma observaciones
+          if (
+            resSimple.observacionesOdontograma_txtobservaciones != null &&
+            resSimple.observacionesOdontograma_txtobservaciones !== "NINGUNA"
+          ) {
+            data.observacionesGenerales2 +=
+              data.contador +
+              ".-ODONTOGRAMA : " +
+              resSimple.observacionesOdontograma_txtobservaciones +
+              "\n";
+            data.dentaduraObservaciones =
+              resSimple.observacionesOdontograma_txtobservaciones;
+            data.contador++;
+          }
+          const interpretacionEspirometria =
+            resSimple.interpretacionFuncionRespiratoria_interpretacion ?? "";
+          // Espirometría
+          if (data.fvc === "N/A") {
+            data.observacionesGenerales2 +=
+              data.contador + ".-" + "NO PASO EXAMEN DE ESPIROMETRIA.\n";
+            data.contador++;
+            data.conclusionRespiratoria = interpretacionEspirometria;
+          } else {
+            if (
+              interpretacionEspirometria &&
+              interpretacionEspirometria.trim().length > 2
+            ) {
+              data.conclusionRespiratoria = interpretacionEspirometria;
+            } else {
+              let conclusion = "";
+              if (data.fev1Fvc !== "" && data.fvc !== "N/A") {
+                const fev1fvc = parseFloat(data.fev1Fvc);
+                if (fev1fvc >= 70.0) {
+                  if (conclusion !== "-NORMAL") {
+                    conclusion += "-NORMAL\n";
+                  }
+                } else {
+                  conclusion += "-PATRON OBSTRUCTIVO\n";
+                  data.observacionesGenerales2 +=
+                    data.contador +
+                    ".-" +
+                    "PATRON OBSTRUCTIVO LEVE. EVALUACION EN 6 MESES.\n";
+                  data.contador++;
+                }
+              }
+              if (data.fvc !== "" && data.fvc !== "N/A") {
+                const fvc = parseFloat(data.fvc);
+                if (fvc >= 80) {
+                  conclusion += "-NORMAL";
+                } else {
+                  conclusion += "-PATRON RESTRICTIVO\n";
+                  data.observacionesGenerales2 +=
+                    data.contador +
+                    ".-" +
+                    "PATRON RESTRICTIVO LEVE.EVALUACION EN 6 MESES.\n";
+                  data.contador++;
+                }
+              }
+              data.conclusionRespiratoria = conclusion;
+            }
+          }
+          // Visión de colores
+          if (
+            data.visionColores !== "NINGUNA" &&
+            data.visionColores !== "NORMAL"
+          ) {
+            console.log("aqui ta el guion de mird")
+
+            data.observacionesGenerales2 +=
+              data.contador + "-" + data.visionColores + "\n";
+            data.contador++;
+          }
+          const sistolica = resSimple.sistolicaTriaje_sistolica ?? "";
+          const diastolica = resSimple.diastolicaTriaje_diastolica ?? "";
+          // Presión arterial
+          if (sistolica !== "" && diastolica !== "") {
+            const sistolica1 = parseFloat(sistolica);
+            const diastolica1 = parseFloat(diastolica);
+            if (sistolica1 >= 140 || diastolica1 >= 90) {
+              data.observacionesGenerales2 +=
+                data.contador + "-" + "HTA NO CONTROLADA.\n";
+              data.contador++;
+            }
+          }
+          const sexo = resSimple.sexo_sexo_pa; // "M" o "F"
+          const esMujer = sexo === "F";
+          // Convertimos a número
+          const creatinina = parseFloat(resSimple.creatininaPerfilRenal);
+
+          // Validamos que sea número válido
+          if (!isNaN(creatinina)) {
+            if (creatinina < 0.8 || creatinina > 1.4) {
+              data.observacionesGenerales2 = agregarObservacion(
+                data.observacionesGenerales2,
+                `CREATININA SÉRICA: ${creatinina}`
+              );
+            }
+          }
+
+          const urea = parseFloat(resSimple.ureaSericaPerfilRenal);
+
+          if (!isNaN(urea) && (urea < 10 || urea > 50)) {
+            data.observacionesGenerales2 = agregarObservacion(
+              data.observacionesGenerales2,
+              `UREA SÉRICA: ${urea}`
+            );
+          }
+
+          const acidoUrico = parseFloat(resSimple.acidoUricoSericoPerfilRenal);
+
+          if (!isNaN(acidoUrico)) {
+            let fueraDeRango = false;
+
+            if (esMujer) {
+              fueraDeRango = acidoUrico < 2.5 || acidoUrico > 6.8;
+            } else {
+              fueraDeRango = acidoUrico < 3.6 || acidoUrico > 7.7;
+            }
+
+            if (fueraDeRango) {
+              data.observacionesGenerales2 = agregarObservacion(
+                data.observacionesGenerales2,
+                `ÁCIDO ÚRICO SÉRICO: ${acidoUrico}`
+              );
+            }
+          }
+
+          if (esMujer && resSimple.resultadoGonadotropina === "POSITIVO") {
+            data.observacionesGenerales2 = agregarObservacion(
+              data.observacionesGenerales2,
+              `GONADOTROPINA: POSITIVO`
+            );
+          }
+
+
+
 
           data = MapearDatosAdicionales(res, data, 1, true);
           console.log("DATA EDITAR", data);
