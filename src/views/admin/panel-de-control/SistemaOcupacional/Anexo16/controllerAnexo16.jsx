@@ -1253,7 +1253,7 @@ export const MapearDatosAdicionales = (
       // =============================================================================================
       // SECCIÓN EXAMENES SANGUINEOS cargarExamSanguineos   SOLO EN OBTENER
       // =============================================================================================
-      data.dni = res.cod_pa ?? "";
+      data.dni = res.dni_cod_pa ?? "";
       data.vertices = res.verticesRadiografiaTorax_txtvertices ?? "";
       data.hilios = res.hiliosRadiografiaTorax_txthilios ?? "";
       data.senos =
