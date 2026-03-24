@@ -75,6 +75,7 @@ export default function Resultados({
           <InputsRadioGroup
             name="aptitud"
             value={form.aptitud}
+            disabled={!form.cerrado}
             onChange={(e, value) => {
               if (value == "APTO") {
                 setForm((prev) => ({
@@ -235,7 +236,13 @@ export default function Resultados({
             checked={form.cerrado}
             disabled={!form.posibleCerrar}
             name="cerrado"
-            onChange={handleCheckBoxChange}
+            onChange={(e) => {
+              handleCheckBoxChange(e);
+              setForm((prev) => ({
+                ...prev,
+                aptitud: "",
+              }));
+            }}
           />
         </div>
 

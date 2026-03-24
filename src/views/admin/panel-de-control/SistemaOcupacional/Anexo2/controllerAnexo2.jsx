@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-import { LoadingDefault, VerifyTRDefault } from "../../../../utils/functionUtils";
+import { LoadingDefault, PrintHojaRJsReportDefault, VerifyTRDefault } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
 import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
@@ -10,6 +10,7 @@ const registrarUrl =
   "/api/v01/ct/anexos/anexo2/registrarActualizarAnexoAgroindustrial";
 const obtenerExamenesRealizadosUrl =
   "/api/v01/ct/anexos/anexo2/obtenerExamenesRealizados";
+const obtenerReporteJsReportUrl = "/api/v01/ct/anexos/descargarReporteAnexo2"
 
 export const SubmitDataService = async (
   form,
@@ -22,6 +23,10 @@ export const SubmitDataService = async (
 ) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
+    return;
+  }
+  if (form.cerrado && (form.aptitud == "" || form.aptitud == null || form.aptitud == undefined)) {
+    await Swal.fire("Error", "Debe seleccionar aptitud", "error");
     return;
   }
   Loading("Registrando Datos");
@@ -154,38 +159,46 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
   });
 };
 
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-  Loading("Cargando Formato a Imprimir");
-  getFetch(
-    `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`,
-    token
-  ).then(async (res) => {
-    if (res.norden_n_orden) {
-      // const nombre = res.nameJasper;
-      const nombre = "Anexo2";
-      console.log(nombre);
-      const jasperModules = import.meta.glob(
-        "../../../../jaspers/Anexo2/*.jsx"
-      );
-      const modulo = await jasperModules[
-        `../../../../jaspers/Anexo2/${nombre}.jsx`
-      ]();
+// export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+//   Loading("Cargando Formato a Imprimir");
+//   getFetch(
+//     `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`,
+//     token
+//   ).then(async (res) => {
+//     if (res.norden_n_orden) {
+//       // const nombre = res.nameJasper;
+//       const nombre = "Anexo2";
+//       console.log(nombre);
+//       const jasperModules = import.meta.glob(
+//         "../../../../jaspers/Anexo2/*.jsx"
+//       );
+//       const modulo = await jasperModules[
+//         `../../../../jaspers/Anexo2/${nombre}.jsx`
+//       ]();
 
-      // Ejecuta la función exportada por default con los datos
-      if (typeof modulo.default === "function") {
-        modulo.default({ ...res, datosFooter });
-      } else {
-        console.error(
-          `El archivo ${nombre}.jsx no exporta una función por defecto`
-        );
-      }
-      Swal.close();
-    } else {
-      Swal.close();
-    }
-  });
+//       // Ejecuta la función exportada por default con los datos
+//       if (typeof modulo.default === "function") {
+//         modulo.default({ ...res, datosFooter });
+//       } else {
+//         console.error(
+//           `El archivo ${nombre}.jsx no exporta una función por defecto`
+//         );
+//       }
+//       Swal.close();
+//     } else {
+//       Swal.close();
+//     }
+//   });
+// };
+
+export const PrintHojaR = (nro, token, tabla) => {
+  PrintHojaRJsReportDefault(
+    nro,
+    token,
+    tabla,
+    obtenerReporteJsReportUrl
+  );
 };
-
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
   VerifyTRDefault(
@@ -1435,6 +1448,15 @@ export const GetInfoServicioEditar = (
           ) {
             data.observacionesGenerales2 +=
               "DIETA HIPOCALORICA Y EJERCICIOS. \n";
+          }
+
+          if (data.presionSistolica !== "" && data.presionDiastolica !== "") {
+            const sistolica1 = parseFloat(data.presionSistolica);
+            const diastolica1 = parseFloat(data.presionDiastolica);
+
+            if (sistolica1 >= 140 || diastolica1 >= 90) {
+              data.observacionesGenerales2 += "HTA NO CONTROLADA.\n";
+            }
           }
           //==============================
 

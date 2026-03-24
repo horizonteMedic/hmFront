@@ -257,7 +257,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             //Necesita Agudeza visual 
             Swal.fire(
                 "Alerta",
-                "El paciente necesita pasar por Anexo 16 para poder registrarse.",
+                "El Anexo 16 debe estar completado y cerrado antes de registrar la ficha de aptitud.",
                 "warning"
             );
         }

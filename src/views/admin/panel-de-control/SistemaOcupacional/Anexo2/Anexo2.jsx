@@ -253,7 +253,7 @@ export default function Anexo2() {
     //CUARTA TAB RESULTADOS
     //=============================================================================================
     // Aptitud del Paciente
-    aptitud: "APTO",
+    aptitud: "",
     fechaAptitud: today,
     fechaVencimiento: today,
     restricciones: "NINGUNO",
