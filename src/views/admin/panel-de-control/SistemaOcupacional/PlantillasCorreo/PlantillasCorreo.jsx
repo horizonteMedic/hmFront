@@ -191,6 +191,7 @@ export default function PlantillasCorreo({ ContrataMulti, EmpresasMulti }) {
                     id: null,
                     destino: "",
                     conCopia: "",
+                    adicional: false,
                     asunto: "{nombreExamen}//{nombrePaciente}//{empresa}//{fechaExamen}",
                     mensaje: `Estimado/a Dr./Dra.,\n
 Se envían de manera adjunta {listaAdjuntos} del/la Sr./Sra.\n
@@ -207,14 +208,14 @@ Saludos cordiales.\n
     };
 
     const handleEmailChange = (index, e) => {
-        const { name, value } = e.target;
+        const { name, type, value, checked } = e.target;
 
         setForm(prev => {
             const newPlantillas = [...prev.plantillaConfig];
 
             newPlantillas[index] = {
                 ...newPlantillas[index],
-                [name]: value
+                [name]: type === "checkbox" ? checked : value
             };
 
             return {
@@ -560,6 +561,18 @@ Saludos cordiales.\n
                                                 value={emailForm.asunto}
                                                 onChange={(e) => handleEmailChange(index, e)}
                                                 className="flex-1 outline-none border-b border-gray-300"
+                                            />
+                                        </div>
+                                        <div className="flex items-center gap-8 pb-1">
+                                            <span className="font-semibold text-gray-500 flex items-center gap-1" title="El archivo principal automáticamente asigna EMOA, EMOR, EMPO, TEST ALTURA, PSICOSENSOMETRICO, MANIPULADOR ALIMENTOS O ANEXO 16A. Dependiendo del tipo de examen del paciente." >
+                                                Archivo Principal ℹ️
+                                            </span>
+                                            <input
+                                                type="checkbox"
+                                                name="adicional"
+                                                checked={emailForm.adicional}
+                                                onChange={(e) => handleEmailChange(index, e)}
+                                                className="w-4 h-4"
                                             />
                                         </div>
 

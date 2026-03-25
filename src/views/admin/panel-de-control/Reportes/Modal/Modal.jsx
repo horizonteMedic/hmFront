@@ -8,8 +8,8 @@ import { GetArchivosSubidos } from '../model/getArchivosSubidos';
 import { ReadArchivos, DeleteArchivos64 } from '../model/readArchivos';
 import Swal from 'sweetalert2';
 
-const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empresa, contrata, token, name, apell, Acces }) => {
-  // openModalCorreo,
+const Modal = ({ closeModal, openModalCorreo, user, iduser, start, end, sede, dni, nombre, empresa, contrata, token, name, apell, Acces }) => {
+
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listarchivos, setListarchivos] = useState([]);
@@ -228,7 +228,7 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
                     <th className="border border-gray-300 px-2 py-1 text-center">Grupo sanguíneo</th>
                     <th className="border border-gray-300 px-2 py-1 text-center">Historia Clinica</th>
                     {Acces("Reportes", "Descargar Reportes") && <th className="border border-gray-300 px-2 py-1 text-center">Archivos</th>}
-                    {/* {Acces("Reportes", "Registrar Correo a Enviar") && <th className="border border-gray-300 px-2 py-1 text-center">Gestionar Correo</th>} */}
+                    {Acces("Reportes", "Registrar Correo a Enviar") && <th className="border border-gray-300 px-2 py-1 text-center">Gestionar Correo</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -266,11 +266,11 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
                           ))}
                         </td>
                       )}
-                      {/* {Acces("Reportes", "Registrar Correo a Enviar") && (
+                      {Acces("Reportes", "Registrar Correo a Enviar") && (
                         <td className="border border-gray-300 text-center">
                           <button onClick={() => openModalCorreo(dataItem.orden)} className='py-2 px-3 bg-blue-500 rounded'><FontAwesomeIcon icon={faEnvelope} style={{ color: 'white' }} /></button>
                         </td>
-                      )} */}
+                      )}
                     </tr>
                   ))}
                 </tbody>

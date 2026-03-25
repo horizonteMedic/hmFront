@@ -83,6 +83,7 @@ export const SubmitPlantillaCorreo = async (
             asunto: a.asunto,
             mensaje: a.mensaje,
             usuarioRegistro: user,
+            adicional: a?.adicional ?? false,
             anulado: a?.anulado ?? false,
             archivos: [
                 ...a?.archivos.map(suba => ({

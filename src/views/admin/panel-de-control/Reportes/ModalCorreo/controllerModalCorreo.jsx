@@ -75,6 +75,8 @@ export const GetPlantillaPorNorden = async (
     set,
     onClose,
     token,
+    archivosList,
+    userName,
     onFinish = () => { }
 ) => {
     try {
@@ -101,6 +103,13 @@ export const GetPlantillaPorNorden = async (
                     contrata: resu.contrata ?? "",
                     fechaApartura: resu.fechaApartura ?? "",
                     plantillaConfig: resu.plantillaCorreo.map(a => {
+
+                        const archivoCorrespondiente = archivosList.find(item => item.nomenclatura === nombresExamen[resu.tipoExamen] ?? "");
+                        const newArchivos = [
+                            ...a.archivos,
+                            ...(a.adicional && adicional ? [archivoCorrespondiente] : [])
+                        ];
+
                         const palabrasReemplazo = {
                             empresa: resu.empresa ?? "",
                             contrata: resu.contrata ?? "",
@@ -109,13 +118,14 @@ export const GetPlantillaPorNorden = async (
                             nombreExamen: nombresExamen[resu.tipoExamen] ?? "",
                             fechaExamen: formatearFechaCorta(resu.fechaApertura),
                             fechaCorreo: formatearFechaCorta(getToday()),
-                            listaAdjuntos: listarArchivos(a.archivos) ?? "",
-                            nombreUsuario: resu?.nombreUsuario ?? "",
+                            listaAdjuntos: listarArchivos(newArchivos) ?? "",
+                            nombreUsuario: userName ?? "",
                         }
                         // console.log({ palabrasReemplazo })
 
                         return ({
                             ...a,
+                            archivos: newArchivos,
                             asunto: reemplazarTextoCorreo(a.asunto ?? "", palabrasReemplazo),
                             mensaje: reemplazarTextoCorreo(a.mensaje ?? "", palabrasReemplazo),
                         })

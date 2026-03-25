@@ -41,7 +41,7 @@ export default function ModalCorreo({ open, onClose, norden }) {
     }, [open]);
 
     const obtenerPlantillaPorNorden = async (norden, setForm, token) => {
-        await GetPlantillaPorNorden(norden, setForm, onClose, token);
+        await GetPlantillaPorNorden(norden, setForm, onCloseNew, token, archivosList, userName);
     }
 
     const obtenerListArchivos = async () => {
@@ -71,6 +71,12 @@ Saludos cordiales.\n
             ]
         }));
     };
+
+    const onCloseNew = () => {
+        handleClear();
+        setArchivosList([]);
+        onClose();
+    }
 
     const handleEmailChange = (index, e) => {
         const { name, value } = e.target;
@@ -187,7 +193,7 @@ Saludos cordiales.\n
                     </h2>
 
                     <button
-                        onClick={onClose}
+                        onClick={onCloseNew}
                         className="text-gray-400 hover:text-red-600"
                     >
                         ✕
@@ -323,7 +329,7 @@ Saludos cordiales.\n
                 {/* Footer */}
                 <div className="flex justify-end gap-2 p-6 pt-2 ">
                     <button
-                        onClick={onClose}
+                        onClick={onCloseNew}
                         className="px-4 py-2 text-sm rounded-lg bg-gray-100 hover:bg-gray-200"
                     >
                         Cancelar

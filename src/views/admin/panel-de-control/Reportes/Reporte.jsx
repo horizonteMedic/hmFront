@@ -490,10 +490,8 @@ const HistorialPaciente = () => {
         </div>
       </div>
 
-      {/* {isModalOpen && <Modal closeModal={closeModal} openModalCorreo={openModalCorreo} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_suc} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell} Acces={tienePermisoEnVista} />} */}
-      {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_suc} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell} Acces={tienePermisoEnVista} />}
-
-
+      {isModalOpen && <Modal closeModal={closeModal} openModalCorreo={openModalCorreo} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_suc} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell} Acces={tienePermisoEnVista} />}
+      {/* {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_suc} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell} Acces={tienePermisoEnVista} />} */}
 
       {/* Modal de carga de datos */}
       {/* {showCorreoModal &&   <ModalCorreo onClose={() => setShowCorreoModal(false)} /> }*/}
