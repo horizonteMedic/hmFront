@@ -1014,7 +1014,9 @@ export const GetInfoServicioEditar = (
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : "",
             dataEnfermedades: res.accidentes ?? [],
           };
-
+          console.log(formatearFechaCorta(
+            res.datosPaciente.fechaNacimientoPaciente_fecha_nacimiento_pa
+          ))
 
 
 
@@ -1221,13 +1223,13 @@ export const GetInfoServicioEditar = (
           data.nombres = res.datosPaciente.nombres_nombres_pa ?? "";
           data.apellidos = res.datosPaciente.apellidos_apellidos_pa ?? "";
           data.fechaNac = formatearFechaCorta(
-            res.fechaNacimientoPaciente_fecha_nacimiento_pa
+            res.datosPaciente.fechaNacimientoPaciente_fecha_nacimiento_pa
           );
           data.sexo = res.datosPaciente.sexo_sexo_pa ?? "";
-          data.lugarNac = res.lugarNacPaciente_lugar_nac_pa ?? "";
+          data.lugarNac = res.datosPaciente.lugarNacPaciente_lugar_nac_pa ?? "";
           data.domicilio = res.datosPaciente.direccionPaciente_direccion_pa ?? "";
           data.telefono = res.datosPaciente.telefonoCasaPaciente_tel_casa_pa ?? "";
-          data.estadoCivil = res.estadoCivilPaciente_estado_civil_pa ?? "";
+          data.estadoCivil = res.datosPaciente.estadoCivilPaciente_estado_civil_pa ?? "";
           data.gradoInstruccion = res.datosPaciente.nivelEstudiosPaciente_nivel_est_pa ?? "";
           data.empresa = res.empresa_razon_empresa ?? "";
           data.contrata = res.contrata_razon_contrata ?? "";

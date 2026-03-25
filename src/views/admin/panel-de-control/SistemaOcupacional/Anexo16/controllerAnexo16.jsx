@@ -298,7 +298,11 @@ export const GetInfoServicio = (
           };
 
           data.antecedentesPersonales2 = "NINGUNO";
-
+          // Vaccinations
+          data.tetano = res.tetanica ?? false;
+          data.hepatitisB = res.hepatitisb ?? false;
+          data.fiebreAmarilla =
+            res.fiebreAmarilla ?? false;
 
           data.ruido = res.ruidoAnexo7c_chkruido ?? false;
           data.polvo = res.polvoAnexo7c_chkpolvo ?? false;
@@ -1806,10 +1810,10 @@ export const GetInfoServicioEditar = (
             res.interpretacionFuncionRespiratoria_interpretacion ?? "";
 
           // Vaccinations
-          data.tetano = res.tetanoAnexo7c_tetano ?? false;
-          data.hepatitisB = res.hepatitisBAnexo7c_hepatitisb ?? false;
+          data.tetano = res.tetanica ?? false;
+          data.hepatitisB = res.hepatitisb ?? false;
           data.fiebreAmarilla =
-            res.fiebreAmarillaAnexo7c_fiebreamarilla ?? false;
+            res.fiebreAmarilla ?? false;
 
           // Additional observations and conclusions
           data.observacionesAudio =
