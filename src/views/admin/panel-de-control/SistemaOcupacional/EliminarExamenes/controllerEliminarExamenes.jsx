@@ -7,6 +7,7 @@ import { getFetch } from "../../../../utils/apiHelpers";
 const obtenerReporteUrl =
     "/api/v01/st/registros/obtenerExistenciasExamenes";
 const GetExamenURL = `/api/v01/st/registros/obtenerExistenciasExamenes`
+const obtenerAnexosExistencia = `/api/v01/ct/anexos/cerrado`
 
 const urlsEliminar = {
     // Examen Ocupacional
@@ -227,8 +228,12 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
     LoadingDefault("Cargando examenes");
 
     try {
-        const res = await getFetch(`${GetExamenURL}?nOrden=${nro}`, token);
-        console.log('respuesta', res)
+        const [res, anexo16, anexo2] = await Promise.all([
+            getFetch(`${GetExamenURL}?nOrden=${nro}`, token),
+            getFetch(`${obtenerAnexosExistencia}?tabla=anexo7c&nOrden=${nro}`, token),
+            getFetch(`${obtenerAnexosExistencia}?tabla=anexo_agroindustrial&nOrden=${nro}`, token)
+        ]);
+        console.log('respuesta', res, anexo16, anexo2)
 
         // 🔹 1. Normalizar respuesta a mapa por nameService
         const serviciosMap = Object.values(res).reduce((acc, item) => {
@@ -240,7 +245,18 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
         const configActualizada = ExamenesList.map(section => ({
             ...section,
             items: section.items.map(item => {
-                const existe = serviciosMap[item.tabla] === true;
+
+                let existe;
+
+                if (item.tabla === "anexo7c") {
+                    existe = anexo16;
+                } else if (item.tabla === "ex_radiograficos_sanguineos") {
+                    existe = anexo16;
+                } else if (item.tabla === "anexo_agroindustrial") {
+                    existe = anexo2;
+                } else {
+                    existe = serviciosMap[item.tabla] === true;
+                }
 
                 return {
                     ...item,

@@ -27,7 +27,8 @@ export default function InputCheckbox({
             onChange(e);
           }
         }}
-        className={styleButton}
+        className={`${styleButton} ${disabled ? "bg-gray-300" : ""
+          }`}
       />
       {labelRight && <span>{label}</span>}
     </label>

@@ -146,18 +146,21 @@ export default function DatosPersonales({
             <div className="grid grid-cols-3 gap-2">
               <InputCheckbox
                 label="Ruido"
+                disabled
                 checked={form.ruido}
                 name="ruido"
                 onChange={handleCheckBoxChange}
               />
               <InputCheckbox
                 label="Polvo"
+                disabled
                 checked={form.polvo}
                 name="polvo"
                 onChange={handleCheckBoxChange}
               />
               <InputCheckbox
                 label="Vid Segmentario"
+                disabled
                 checked={form.vidSegmentario}
                 name="vidSegmentario"
                 onChange={handleCheckBoxChange}
@@ -165,30 +168,35 @@ export default function DatosPersonales({
               <InputCheckbox
                 label="Vid Total"
                 checked={form.vidTotal}
+                disabled
                 name="vidTotal"
                 onChange={handleCheckBoxChange}
               />
               <InputCheckbox
                 label="Altura Estruct."
                 checked={form.alturaEstruct}
+                disabled
                 name="alturaEstruct"
                 onChange={handleCheckBoxChange}
               />
               <InputCheckbox
                 label="Vibraciones"
                 checked={form.vibraciones}
+                disabled
                 name="vibraciones"
                 onChange={handleCheckBoxChange}
               />
               <InputCheckbox
                 label="Cancerígenos"
                 checked={form.cancerigenos}
+                disabled
                 name="cancerigenos"
                 onChange={handleCheckBoxChange}
               />
               <InputCheckbox
                 label="Mutagenicos"
                 checked={form.mutagenicos}
+                disabled
                 name="mutagenicos"
                 onChange={handleCheckBoxChange}
               />
@@ -196,6 +204,7 @@ export default function DatosPersonales({
                 label="Solventes"
                 checked={form.solventes}
                 name="solventes"
+                disabled
                 onChange={handleCheckBoxChange}
               />
               <InputCheckbox
@@ -203,17 +212,20 @@ export default function DatosPersonales({
                 checked={form.metales}
                 name="metales"
                 onChange={handleCheckBoxChange}
+                disabled
               />
               <InputCheckbox
                 label="Altura Geograf."
                 checked={form.alturaGeograf}
                 name="alturaGeograf"
+                disabled
                 onChange={handleCheckBoxChange}
               />
               <InputCheckbox
                 label="Temperatura"
                 checked={form.temperaturaAgente}
                 name="temperaturaAgente"
+                disabled
                 onChange={handleCheckBoxChange}
               />
               <InputCheckbox
@@ -221,46 +233,54 @@ export default function DatosPersonales({
                 checked={form.biologicos}
                 name="biologicos"
                 onChange={handleCheckBoxChange}
+                disabled
               />
               <InputCheckbox
                 label="Posturas"
                 checked={form.posturas}
+                disabled
                 name="posturas"
                 onChange={handleCheckBoxChange}
               />
               <InputCheckbox
                 label="Turnos"
                 checked={form.turnos}
+                disabled
                 name="turnos"
                 onChange={handleCheckBoxChange}
               />
               <InputCheckbox
                 label="Químicos"
                 checked={form.quimicos}
+                disabled
                 name="quimicos"
                 onChange={handleCheckBoxChange}
               />
               <InputCheckbox
                 label="Cargas"
                 checked={form.cargas}
+                disabled
                 name="cargas"
                 onChange={handleCheckBoxChange}
               />
               <InputCheckbox
                 label="Mov. Repet"
                 checked={form.movRepet}
+                disabled
                 name="movRepet"
                 onChange={handleCheckBoxChange}
               />
               <InputCheckbox
                 label="PVD"
                 checked={form.pvd}
+                disabled
                 name="pvd"
                 onChange={handleCheckBoxChange}
               />
               <InputCheckbox
                 label="Electricos"
                 checked={form.electricos}
+                disabled
                 name="electricos"
                 onChange={handleCheckBoxChange}
               />
@@ -268,6 +288,7 @@ export default function DatosPersonales({
                 label="Otros"
                 checked={form.otros}
                 name="otros"
+                disabled
                 onChange={handleCheckBoxChange}
               />
             </div>
