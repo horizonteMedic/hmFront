@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { useForm } from "../../../../hooks/useForm";
-import { GetListArchivos, GetPlantillaPorNorden } from "./controllerModalCorreo";
+import { GetPlantillaPorNorden, SubmitCorreo } from "./controllerModalCorreo";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faFile, faX } from "@fortawesome/free-solid-svg-icons";
 
-export default function ModalCorreo({ open, onClose, norden }) {
+export default function ModalCorreo({ open, onClose, norden, archivosList }) {
     const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
     const initialFormState = {
@@ -26,7 +26,7 @@ export default function ModalCorreo({ open, onClose, norden }) {
         handleClear
     } = useForm(initialFormState);
 
-    const [archivosList, setArchivosList] = useState([])
+
 
     // bloquear scroll del body
     useEffect(() => {
@@ -44,9 +44,12 @@ export default function ModalCorreo({ open, onClose, norden }) {
         await GetPlantillaPorNorden(norden, setForm, onCloseNew, token, archivosList, userName);
     }
 
-    const obtenerListArchivos = async () => {
-        await GetListArchivos(setArchivosList, token);
+    const onSubmit = async (e) => {
+        e.preventDefault();
+        await SubmitCorreo({ ...form, norden }, token, userlogued, handleClear);
     }
+
+
 
     const addEmailForm = () => {
         setForm(prev => ({
@@ -74,7 +77,6 @@ Saludos cordiales.\n
 
     const onCloseNew = () => {
         handleClear();
-        setArchivosList([]);
         onClose();
     }
 
@@ -171,9 +173,9 @@ Saludos cordiales.\n
         });
     };
 
-    useEffect(() => {
-        if (open) obtenerListArchivos();
-    }, [open]);
+    // useEffect(() => {
+    //     if (open) obtenerListArchivos();
+    // }, [open]);
 
     if (!open) return null;
 
@@ -335,7 +337,9 @@ Saludos cordiales.\n
                         Cancelar
                     </button>
 
-                    <button className="px-4 py-2 text-sm rounded-lg bg-blue-500 text-white hover:bg-blue-600">
+                    <button
+                        onClick={onSubmit}
+                        className="px-4 py-2 text-sm rounded-lg bg-blue-500 text-white hover:bg-blue-600">
                         Enviar
                     </button>
                 </div>

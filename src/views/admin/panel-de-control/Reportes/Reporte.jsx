@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSearch, faSyncAlt, faChevronLeft, faChevronRight, faExpand, faCompress, faUpload, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSyncAlt, faChevronLeft, faChevronRight, faExpand, faCompress, faUpload, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { ComboboxSedes, ComboboxEmpresas, ComboboxContratas } from './Modal/Combobox';
 import { GetListREport } from './model/getlistreport';
 import { useAuthStore } from '../../../../store/auth';
@@ -9,6 +9,7 @@ import DataUploadModal from './DataUploadModal/DataUploadModal';
 import DataUploadModal2 from './Dataupload2/DataUploadModal2';
 import Historial from './Historial/Historial';
 import ModalCorreo from './ModalCorreo/ModalCorreo';
+import { GetListArchivos } from './ModalCorreo/controllerModalCorreo';
 
 const HistorialPaciente = () => {
   const [showDataUploadModal, setShowDataUploadModal] = useState(false);
@@ -24,6 +25,11 @@ const HistorialPaciente = () => {
   const [sede, setSede] = useState('');
   const [loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(false)
+
+
+  const [archivosList, setArchivosList] = useState([])
+
+
 
   useEffect(() => {
     if (ListSedes.length > 0) {
@@ -93,6 +99,15 @@ const HistorialPaciente = () => {
     const vista = Acceso.find(item => item.nombre === nombreVista);
     return vista?.listaPermisos.includes(permiso) ?? false;
   };
+
+
+  const obtenerListArchivos = async () => {
+    await GetListArchivos(setArchivosList, token);
+  }
+
+  useEffect(() => {
+    obtenerListArchivos();
+  }, []);
 
   useEffect(() => {
 
@@ -495,7 +510,7 @@ const HistorialPaciente = () => {
 
       {/* Modal de carga de datos */}
       {/* {showCorreoModal &&   <ModalCorreo onClose={() => setShowCorreoModal(false)} /> }*/}
-      <ModalCorreo open={showCorreoModal} norden={nordenSeleccionadoCorreo} onClose={() => { setShowCorreoModal(false); setNordenSeleccionadoCorreo('') }} />
+      <ModalCorreo open={showCorreoModal} archivosList={archivosList} norden={nordenSeleccionadoCorreo} onClose={() => { setShowCorreoModal(false); setNordenSeleccionadoCorreo('') }} />
       {showDataUploadModal && <DataUploadModal closeModal={() => setShowDataUploadModal(false)} Sedes={ListSedes} user={userlogued.sub} token={token} />}
       {showDataUploadModal2 && <DataUploadModal2 closeModal={() => setShowDataUploadModal2(false)} Sedes={ListSedes} user={userlogued.sub} token={token} />}
       {showHistorial && <Historial closeModal={() => setShowHistorial(false)} token={token} user={userlogued.sub} />}

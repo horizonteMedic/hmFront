@@ -105,9 +105,10 @@ export const GetPlantillaPorNorden = async (
                     plantillaConfig: resu.plantillaCorreo.map(a => {
 
                         const archivoCorrespondiente = archivosList.find(item => item.nomenclatura === nombresExamen[resu.tipoExamen] ?? "");
+                        console.log({ archivosList: archivosList })
                         const newArchivos = [
                             ...a.archivos,
-                            ...(a.adicional && adicional ? [archivoCorrespondiente] : [])
+                            ...(a.adicional && archivoCorrespondiente ? [archivoCorrespondiente] : [])
                         ];
 
                         const palabrasReemplazo = {
@@ -182,31 +183,25 @@ export const SubmitCorreo = async (
     }
 
     const body = [
-        // ...form.plantillaConfig.map(a => ({
-        //     id: a.id,
-        //     idEmpresaContrata: form.idRelacionEmpresaContrata,
-        //     destino: (a.destino ?? "").replace(/\s+/g, ""),
-        //     conCopia: (a.conCopia ?? "").replace(/\s+/g, ""),
-        //     asunto: a.asunto,
-        //     mensaje: a.mensaje,
-        //     usuarioRegistro: user,
-        //     anulado: a?.anulado ?? false,
-        //     archivos: [
-        //         ...a?.archivos.map(suba => ({
-        //             id: suba.idArchivoPlantilla ?? null,
-        //             idTipoArchivo: suba.idTipoArchivo,
-        //             idPlantillaCorreo: null,
-        //             usuarioRegistro: user,
-        //             anulado: suba.anulado ?? false,
-        //         })),
-        //     ]
-        // }))
+        ...form.plantillaConfig.map(a => ({
+            id: a.id,
+            norden: form.norden,
+            idEmpresaContrata: a.idEmpresaContrata,
+            destino: (a.destino ?? "").replace(/\s+/g, ""),
+            conCopia: (a.conCopia ?? "").replace(/\s+/g, ""),
+            asunto: a.asunto,
+            mensaje: a.mensaje,
+            usuarioRegistro: user,
+            archivos: [
+                ...a?.archivos.map(suba => suba.idTipoArchivo),
+            ]
+        }))
     ];
     console.log(body)
     Loading("Registrando Datos");
     SubmitData(body, registrarCorreoUrl, token).then((res) => {
         console.log(res)
-        if (res.codigo == 201) {
+        if (res.codigo == 202) {
             limpiar();
             Swal.fire({
                 title: "Exito",
