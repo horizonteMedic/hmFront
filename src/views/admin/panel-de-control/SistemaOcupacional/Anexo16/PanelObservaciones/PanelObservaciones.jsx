@@ -22,6 +22,15 @@ export default function PanelObservaciones({
             onChange={handleChange}
           />
         </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-3">
+          <InputTextArea
+            rows={18}
+            label="Observaciones Generales AUTO"
+            name="observacionesGenerales2"
+            value={form.observacionesGenerales2}
+            disabled
+          />
+        </div>
         {/* Observaciones */}
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <InputTextArea
