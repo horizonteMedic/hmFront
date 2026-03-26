@@ -141,15 +141,15 @@ export const SubmitOIT = async (form, token, user, limpiar, tabla) => {
 
 export const PrintHojaR = (nro, token, tabla) => {
   Loading('Cargando Formato a Imprimir')
-  getFetch(`/ api / v01 / ct / oit / obtenerReporteOit ? nOrden = ${nro} & nameService=${tabla}`, token)
+  getFetch(`/api/v01/ct/oit/obtenerReporteOit?nOrden=${nro}&nameService=${tabla}`, token)
     .then(async (res) => {
       if (res.norden) {
         console.log(res)
         const nombre = res.nameJasper;
         console.log(nombre)
         const jasperModules = import.meta.glob('../../../../../jaspers/OIT/*.jsx');
-        const modulo = await jasperModules[`../../../../../ jaspers / OIT / ${nombre}.jsx`]();
-        // Ejecuta la función exportada por default con los datos
+        const modulo = await jasperModules[`../../../../../jaspers/OIT/${nombre}.jsx`]();
+       // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === 'function') {
           modulo.default(res);
         } else {
