@@ -132,10 +132,10 @@ export const reportesMap = {
 
    // aptitud_medico_ocupacional_agro: Aptitud_AgroindustrialH,
 
-   certificado_aptitud_medico_ocupacional: {
-      Aptitud_medico_ocupacional_11,
-      Aptitud_medico_ocupacional_F
-   }, //son 2 jaspers
+   // certificado_aptitud_medico_ocupacional: {
+   //    Aptitud_medico_ocupacional_11,
+   //    Aptitud_medico_ocupacional_F
+   // }, //son 2 jaspers
 
    certificado_aptitud_medico_resumen: Aptitud_medico_resumen_Digitalizado,
 

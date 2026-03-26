@@ -3,6 +3,7 @@ import {
     GetInfoServicioDefault,
     LoadingDefault,
     PrintHojaRDefault,
+    PrintHojaRJsReportDefault,
     SubmitDataServiceDefault,
 } from "../../../../../utils/functionUtils";
 import { getFetch } from "../../../../../utils/apiHelpers";
@@ -13,6 +14,7 @@ const obtenerReporteUrl =
     "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16";
 const obtenerReporteResumenMedicoUrl =
     "/api/v01/ct/anexos/obtenerReporteResumenMedico";
+const obtenerReporteJsReportUrl = "/api/v01/ct/anexos/descargarReporteFichaAptitudAnexo16";
 const registrarUrl =
     "/api/v01/ct/anexos/fichaAnexo16/registrarActualizarFichaAnexo16";
 
@@ -208,18 +210,28 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
     });
 };
 
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../jaspers/Ficha_Anexo16/*.jsx");
-    PrintHojaRDefault(
+// export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+//     const jasperModules = import.meta.glob("../../../../../jaspers/Ficha_Anexo16/*.jsx");
+//     PrintHojaRDefault(
+//         nro,
+//         token,
+//         tabla,
+//         datosFooter,
+//         obtenerReporteUrl,
+//         jasperModules,
+//         "../../../../../jaspers/Ficha_Anexo16"
+//     );
+// };
+
+export const PrintHojaR = (nro, token, tabla) => {
+    PrintHojaRJsReportDefault(
         nro,
         token,
         tabla,
-        datosFooter,
-        obtenerReporteUrl,
-        jasperModules,
-        "../../../../../jaspers/Ficha_Anexo16"
+        obtenerReporteJsReportUrl
     );
 };
+
 export const PrintHojaR2 = (nro, token, tabla, datosFooter) => {
     const jasperModules = import.meta.glob("../../../../../jaspers/Ficha_Anexo16/ResumenMedico/*.jsx");
     PrintHojaRDefault(

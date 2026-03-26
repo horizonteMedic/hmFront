@@ -50,11 +50,18 @@ export const EXAMENES_CATALOGO = {
     //     esJasper: true,
     // },
 
+    // CERTIFICADO_APTITUD_ANEXO_16: {
+    //     nombre: "CERTIFICADO DE APTITUD ANEXO 16",
+    //     tabla: "certificado_aptitud_medico_ocupacional",
+    //     url: "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16",
+    //     esJasper: true,
+    // },
+
     CERTIFICADO_APTITUD_ANEXO_16: {
         nombre: "CERTIFICADO DE APTITUD ANEXO 16",
         tabla: "certificado_aptitud_medico_ocupacional",
-        url: "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16",
-        esJasper: true,
+        urlJsreport: "/api/v01/ct/anexos/descargarReporteFichaAptitudAnexo16",
+        esJsreport: true,
     },
 
     CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL: {
