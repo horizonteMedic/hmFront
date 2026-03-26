@@ -16,10 +16,17 @@ export const EXAMENES_CATALOGO = {
         esJsreport: true,
     },
 
+    // ANEXO_16: {
+    //     nombre: "ANEXO 16",
+    //     tabla: "anexo7c",
+    //     url: "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16",
+    // },
+
     ANEXO_16: {
         nombre: "ANEXO 16",
         tabla: "anexo7c",
-        url: "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16",
+        urlJsreport: "/api/v01/ct/anexos/descargarReporteAnexo16",
+        esJsreport: true,
     },
 
     ANEXO_16A: {
