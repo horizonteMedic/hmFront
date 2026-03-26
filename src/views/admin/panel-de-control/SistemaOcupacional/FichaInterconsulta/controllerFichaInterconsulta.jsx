@@ -262,8 +262,8 @@ export const SubmitDataService = async (
         "noApto": false,
         "horaSalida": getHoraActual(),
         "orden": null,
-        "userRegistro": user,
-        "usuarioFirma": form.user_medicoFirma
+        "userRegistro": form.user_medicoFirma,
+        //"usuarioFirma": form.user_medicoFirma
         // "nomenclatura": `INTERCONSULTA${form.NewNomenclatura ? ` ${form.NewNomenclatura}` : ""}`
     };
 
