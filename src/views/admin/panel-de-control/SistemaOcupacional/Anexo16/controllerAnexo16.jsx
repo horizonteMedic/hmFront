@@ -185,44 +185,45 @@ export const SubmitDataService = async (
   });
 };
 
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-  Loading("Cargando Formato a Imprimir");
-  getFetch(
-    `${obtenerParaJasperUrl}?nOrden=${nro}&nameService=${tabla}`,
-    token
-  ).then(async (res) => {
-    if (res.norden_n_orden) {
-      const nombre = res.nameJasper;
-      console.log(nombre);
-      const jasperModules = import.meta.glob(
-        "../../../../jaspers/Anexo16/*.jsx"
-      );
-      const modulo = await jasperModules[
-        `../../../../jaspers/Anexo16/${nombre}.jsx`
-      ]();
+// export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+//   Loading("Cargando Formato a Imprimir");
+//   getFetch(
+//     `${obtenerParaJasperUrl}?nOrden=${nro}&nameService=${tabla}`,
+//     token
+//   ).then(async (res) => {
+//     if (res.norden_n_orden) {
+//       const nombre = res.nameJasper;
+//       console.log(nombre);
+//       const jasperModules = import.meta.glob(
+//         "../../../../jaspers/Anexo16/*.jsx"
+//       );
+//       const modulo = await jasperModules[
+//         `../../../../jaspers/Anexo16/${nombre}.jsx`
+//       ]();
 
-      // Ejecuta la función exportada por default con los datos
-      if (typeof modulo.default === "function") {
-        modulo.default({ ...res, datosFooter });
-      } else {
-        console.error(
-          `El archivo ${nombre}.jsx no exporta una función por defecto`
-        );
-      }
-      Swal.close();
-    } else {
-      Swal.close();
-    }
-  });
-};
-// export const PrintHojaR = (nro, token, tabla) => {
-//   PrintHojaRJsReportDefault(
-//     nro,
-//     token,
-//     tabla,
-//     obtenerReporteJsReportUrl
-//   );
+//       // Ejecuta la función exportada por default con los datos
+//       if (typeof modulo.default === "function") {
+//         modulo.default({ ...res, datosFooter });
+//       } else {
+//         console.error(
+//           `El archivo ${nombre}.jsx no exporta una función por defecto`
+//         );
+//       }
+//       Swal.close();
+//     } else {
+//       Swal.close();
+//     }
+//   });
 // };
+
+export const PrintHojaR = (nro, token, tabla) => {
+  PrintHojaRJsReportDefault(
+    nro,
+    token,
+    tabla,
+    obtenerReporteJsReportUrl
+  );
+};
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
   VerifyTRDefault(

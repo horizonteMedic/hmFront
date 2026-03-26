@@ -43,6 +43,7 @@ export const GetInfoServicio = async (
             sexo: res.sexoPaciente == "F" ? "FEMENINO" : "MASCULINO",
             estadoCivil: res.estadoCivilPaciente,
             nivelEstudios: res.nivelEstudioPaciente,
+            recomendaciones: res.recomendaciones,
 
             empresa: res.empresa,
             contrata: res.contrata,
