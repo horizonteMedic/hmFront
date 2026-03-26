@@ -18,7 +18,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
     const reportesConHorizontal = [
         "historia_oc_info",
         "odontograma"
-    ];
+    ]
 
     const archivos = [
         "ESPIROMETRIA",//SI FIRMA
@@ -40,7 +40,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "pcr_ultrasensible",
         "etanol_saliva",
         "aptitud_medico_ocupacional_agro",
-        "informe_psicologico"
+        "informe_psicologico",
+        "anexo_agroindustrial"
     ];
     const coordenadasPSICOSENSO = {
         HUELLA: { x: 400, y: 680, width: 60, height: 60 },

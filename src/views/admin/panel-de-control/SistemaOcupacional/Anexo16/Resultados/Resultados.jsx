@@ -10,6 +10,7 @@ import EmpleadoComboBox from "../../../../../components/reusableComponents/Emple
 
 export default function Resultados({
   form,
+  setForm,
   handleChangeSimple,
   handleChange,
   handleChangeNumber,
@@ -242,7 +243,7 @@ export default function Resultados({
                   handleCheckBoxChange(e);
                   setForm((prev) => ({
                     ...prev,
-                    aptitud: "",
+                    aptoParaTrabajar: "",
                   }));
                 }}
               />

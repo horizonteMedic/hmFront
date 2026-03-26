@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-import { LoadingDefault, VerifyTRDefault } from "../../../../utils/functionUtils";
+import { LoadingDefault, PrintHojaRJsReportDefault, VerifyTRDefault } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
 import { getToday } from "../../../../utils/helpers";
@@ -8,6 +8,8 @@ const registrarUrl = "/api/v01/ct/anexos/anexo16/registrarActualizarAnexo7c";
 const obtenerSimpleUrl = "/api/v01/ct/anexos/anexo16/obtenerAnexo16";
 const obtenerParaEditarUrl = "/api/v01/ct/anexos/anexo16/reporteEditarAnexo16";
 const obtenerParaJasperUrl = "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16";
+
+const obtenerReporteJsReportUrl = "/api/v01/ct/anexos/descargarReporteAnexo16"
 
 const obtenerExamenesRealizadosUrl = "/api/v01/ct/anexos/anexo2/obtenerExamenesRealizados";
 
@@ -22,6 +24,10 @@ export const SubmitDataService = async (
 ) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
+    return;
+  }
+  if (form.cerrado && (form.aptoParaTrabajar == "" || form.aptoParaTrabajar == null || form.aptoParaTrabajar == undefined)) {
+    await Swal.fire("Error", "Debe seleccionar aptitud", "error");
     return;
   }
   Loading("Registrando Datos");
@@ -209,6 +215,14 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     }
   });
 };
+// export const PrintHojaR = (nro, token, tabla) => {
+//   PrintHojaRJsReportDefault(
+//     nro,
+//     token,
+//     tabla,
+//     obtenerReporteJsReportUrl
+//   );
+// };
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
   VerifyTRDefault(

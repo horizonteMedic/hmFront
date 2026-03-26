@@ -2,11 +2,18 @@ export const EXAMENES_CATALOGO = {
     /* =========================
        GENERALES / BASE
     ========================= */
+    // ANEXO_02: {
+    //     nombre: "ANEXO 02",
+    //     tabla: "anexo_agroindustrial",
+    //     url: "/api/v01/ct/anexos/anexo2/obtenerReporteAnexo2Completo",
+    //     esJasper: true,
+    // },
+
     ANEXO_02: {
         nombre: "ANEXO 02",
         tabla: "anexo_agroindustrial",
-        url: "/api/v01/ct/anexos/anexo2/obtenerReporteAnexo2Completo",
-        esJasper: true,
+        urlJsreport: "/api/v01/ct/anexos/descargarReporteAnexo2",
+        esJsreport: true,
     },
 
     ANEXO_16: {

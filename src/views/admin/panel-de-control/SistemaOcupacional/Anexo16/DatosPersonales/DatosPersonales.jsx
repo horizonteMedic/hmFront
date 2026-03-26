@@ -436,7 +436,7 @@ export default function DatosPersonales({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {/* Columna Izquierda - Hábitos */}
         <div className="space-y-3">
-          <div className="bg-white border border-gray-200 rounded-lg p-3 h-full">
+          <div className="bg-white border border-gray-200 rounded-lg p-3">
             <h4 className="font-semibold text-gray-800 mb-2">
               Hábitos
             </h4>
@@ -490,7 +490,7 @@ export default function DatosPersonales({
               label="Notas"
               name="notasDoctor"
               value={form.notasDoctor}
-              rows={4}
+              rows={10}
               disabled
             />
           </SectionFieldset>

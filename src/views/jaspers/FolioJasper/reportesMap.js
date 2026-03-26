@@ -116,7 +116,7 @@ export const reportesMap = {
    /* =========================
       GENERALES / BASE
    ========================= */
-   anexo_agroindustrial: InformePsicologico_Anexo02_Nuevo,
+   // anexo_agroindustrial: InformePsicologico_Anexo02_Nuevo,
 
    anexo7c: Anexo7C_Antiguo,
 

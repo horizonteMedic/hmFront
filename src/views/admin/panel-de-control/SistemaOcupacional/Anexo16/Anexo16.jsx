@@ -232,7 +232,7 @@ export default function Anexo16() {
     //Información Radiológica
     numeroRx: "",
     codigoExamenRadiograficoSanguineo: null,
-    fechaRx: getToday(),
+    fechaRx: today,
     calidadRx: "",
     simbolosRx: "N/A",
     //Conclusiones Radiográficas
