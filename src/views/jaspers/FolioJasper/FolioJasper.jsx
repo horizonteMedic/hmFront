@@ -18,7 +18,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
     const reportesConHorizontal = [
         "historia_oc_info",
         "odontograma"
-    ];
+    ]
 
     const archivos = [
         "ESPIROMETRIA",//SI FIRMA
@@ -40,7 +40,10 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "pcr_ultrasensible",
         "etanol_saliva",
         "aptitud_medico_ocupacional_agro",
-        "informe_psicologico"
+        "informe_psicologico",
+        "anexo_agroindustrial",
+        "anexo7c",
+        "certificado_aptitud_medico_ocupacional"
     ];
     const coordenadasPSICOSENSO = {
         HUELLA: { x: 400, y: 680, width: 60, height: 60 },
@@ -79,7 +82,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "oftalmologia2021",
         "antecedentes_patologicos",
         "informe_psicolaboral",
-        "certificado_aptitud_medico_ocupacional",
+        // "certificado_aptitud_medico_ocupacional",
         "audiometria_2023",
         "anexo16a",
         "ac_coproparasitologico",

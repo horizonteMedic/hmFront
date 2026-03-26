@@ -134,7 +134,11 @@ export const EXAMENES_CONFIG = [
             { label: "Examen Complementario", name: "ExamComp", tabla: "exam_complementarios" },
             { label: "Brigadista", name: "Brigadista", tabla: "psi_brigadistas" },
             { label: "Bomba Electrico", name: "BombaElec", tabla: "bombaelectrica" },
-
+            { label: "Informe Psicolaboral", name: "InformePsico", tabla: "informe_psicolaboral" },
+            { label: "Informe Riesgo Psicosocial", name: "InformeRiesgoPsico", tabla: "informe_riesgos_psicosociales" },
+            { label: "Informe Burnout", name: "InformeBurnout", tabla: "informe_burnout" },
+            { label: "Informe Psicologico Adeco", name: "InformePsicoAdeco", tabla: "informe_psicologico_estres" },
+            { label: "Psicologia Espacios Confinados", name: "PsicoEspaciosConfi", tabla: "psicologia_espacios_confinados" },
         ],
     },
 

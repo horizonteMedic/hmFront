@@ -1,18 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSearch, faSyncAlt, faChevronLeft, faChevronRight, faExpand, faCompress, faUpload, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSyncAlt, faChevronLeft, faChevronRight, faExpand, faCompress, faUpload, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { ComboboxSedes, ComboboxEmpresas, ComboboxContratas } from './Modal/Combobox';
 import { GetListREport } from './model/getlistreport';
 import { useAuthStore } from '../../../../store/auth';
 import Modal from './Modal/Modal';
-import DataUploadModal from './DataUploadModal/DataUploadModal'; 
-import DataUploadModal2 from './Dataupload2/DataUploadModal2'; 
+import DataUploadModal from './DataUploadModal/DataUploadModal';
+import DataUploadModal2 from './Dataupload2/DataUploadModal2';
 import Historial from './Historial/Historial';
+import ModalCorreo from './ModalCorreo/ModalCorreo';
+import { GetListArchivos } from './ModalCorreo/controllerModalCorreo';
 
 const HistorialPaciente = () => {
   const [showDataUploadModal, setShowDataUploadModal] = useState(false);
   const [showDataUploadModal2, setShowDataUploadModal2] = useState(false);
   const [showHistorial, setShowHistorial] = useState(false);
+
+  const [showCorreoModal, setShowCorreoModal] = useState(false);
+  const [nordenSeleccionadoCorreo, setNordenSeleccionadoCorreo] = useState('');
 
   const ListSedes = ComboboxSedes();
   const ListEmpresa = ComboboxEmpresas();
@@ -20,6 +25,11 @@ const HistorialPaciente = () => {
   const [sede, setSede] = useState('');
   const [loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(false)
+
+
+  const [archivosList, setArchivosList] = useState([])
+
+
 
   useEffect(() => {
     if (ListSedes.length > 0) {
@@ -37,10 +47,10 @@ const HistorialPaciente = () => {
         return
       }
     }
-  }, [ListSedes,ListEmpresa,ListContrata]);
+  }, [ListSedes, ListEmpresa, ListContrata]);
 
   const [data, setData] = useState([]);
-  
+
   const [refres, setRefresh] = useState(1);
   const hasFetchedData = useRef(false)
   const abortController = useRef(null);
@@ -49,22 +59,22 @@ const HistorialPaciente = () => {
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
 
-  
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [recordsPerPage, setRecordsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const today = new Date();
   const specificDate = new Date(2023, 0, 1); // Año 2023, mes 0 (enero), día 1
   const options = { timeZone: 'America/Lima' };
-  const formattedToday1 = today.toLocaleDateString('en-CA', options); 
+  const formattedToday1 = today.toLocaleDateString('en-CA', options);
   const formattedToday2 = specificDate.toLocaleDateString('en-CA', options);
 
-  today.setDate(today.getDate() - 1); 
+  today.setDate(today.getDate() - 1);
   const [startDate, setStartDate] = useState(formattedToday2);
   const [endDate, setEndDate] = useState(formattedToday1);
   const [isReloading, setIsReloading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1); 
-  const [totalPages, setTotalPages] = useState(1); 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [dnipicker, setDnipicker] = useState('')
   const [nombrespicker, setNombrespicker] = useState('')
   const [empresa, setEmpresa] = useState('');
@@ -90,8 +100,17 @@ const HistorialPaciente = () => {
     return vista?.listaPermisos.includes(permiso) ?? false;
   };
 
+
+  const obtenerListArchivos = async () => {
+    await GetListArchivos(setArchivosList, token);
+  }
+
   useEffect(() => {
-    
+    obtenerListArchivos();
+  }, []);
+
+  useEffect(() => {
+
     let results = []
     if (data === null) {
       return
@@ -100,28 +119,28 @@ const HistorialPaciente = () => {
       const isNumber = !isNaN(searchTerm[0]);
 
       if (isNumber) {
-          // Filtrar por dni si searchTerm comienza con un número
-          results = data.filter(item => item.dni.toString().includes(searchTerm));
-          setFilteredData(results)
+        // Filtrar por dni si searchTerm comienza con un número
+        results = data.filter(item => item.dni.toString().includes(searchTerm));
+        setFilteredData(results)
       } else {
-          if (data && data.length > 0) {
+        if (data && data.length > 0) {
 
-            results = data.filter(item =>  (typeof item.apellidos === 'string' && item.apellidos.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          results = data.filter(item => (typeof item.apellidos === 'string' && item.apellidos.toLowerCase().includes(searchTerm.toLowerCase())) ||
             (typeof item.nombres === 'string' && item.nombres.toLowerCase().includes(searchTerm.toLowerCase())))
-            setFilteredData(results)
-            return
-          }
+          setFilteredData(results)
+          return
+        }
         return
       }
-      
+
       return
     }
     setFilteredData([])
-    
-    
+
+
   }, [searchTerm]);
-  
-//Esto trae todos los datos cuando se entra a la vista de reportes
+
+  //Esto trae todos los datos cuando se entra a la vista de reportes
   useEffect(() => {
     setDisabled(true)
     if (abortController.current) {
@@ -141,11 +160,11 @@ const HistorialPaciente = () => {
             const porcentajePorSede = 100 / totalSedes;
             setPorsentaje(`${porcentajePorSede}%`)
             setData(response);
-            setTotalPages(Math.ceil(response.length / recordsPerPage)); 
+            setTotalPages(Math.ceil(response.length / recordsPerPage));
           }
         })
         .catch(error => {
-          
+
         })
         .finally(() => {
           if (abortController.current.signal.aborted) return;
@@ -154,7 +173,7 @@ const HistorialPaciente = () => {
         });
     }
   }, [startDate, endDate, sede, empresa, contrata, reload]);
-  
+
   const toTitleCase = (str) => {
     return str.replace(/\w\S*/g, (txt) => {
       return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
@@ -162,7 +181,7 @@ const HistorialPaciente = () => {
   };
 
   const SecondPlane = async () => {
-    
+
     if (secondPlaneAbortController.current) {
       secondPlaneAbortController.current.abort(); // Cancela la solicitud anterior si existe
     }
@@ -170,33 +189,33 @@ const HistorialPaciente = () => {
     const { signal } = secondPlaneAbortController.current;
 
     if (startDate && endDate && sede) {
-      
-        const otrasSedes = ListSedes.filter(s => s.cod_sede !== sede);
-        const fetchPromises = otrasSedes.map(s => GetListREport(userlogued.sub, startDate, endDate, s.cod_sede, empresa, contrata, token, {signal}));
-        try{
-          const otrasSedesData = await Promise.all(fetchPromises);
-          const nonEmptyData = otrasSedesData.filter(data => data.length > 0);
-          const allData = nonEmptyData.reduce((acc, data) => acc.concat(data), []);
-          setData(prevData => {
-            const updatedData = [...prevData, ...allData];
-            setTotalPages(Math.ceil(updatedData.length / recordsPerPage)); // Recalcular totalPages
-            return updatedData;
-          });
-          setDisabled(false)
-          setPorsentaje(`100%`)
+
+      const otrasSedes = ListSedes.filter(s => s.cod_sede !== sede);
+      const fetchPromises = otrasSedes.map(s => GetListREport(userlogued.sub, startDate, endDate, s.cod_sede, empresa, contrata, token, { signal }));
+      try {
+        const otrasSedesData = await Promise.all(fetchPromises);
+        const nonEmptyData = otrasSedesData.filter(data => data.length > 0);
+        const allData = nonEmptyData.reduce((acc, data) => acc.concat(data), []);
+        setData(prevData => {
+          const updatedData = [...prevData, ...allData];
+          setTotalPages(Math.ceil(updatedData.length / recordsPerPage)); // Recalcular totalPages
+          return updatedData;
+        });
+        setDisabled(false)
+        setPorsentaje(`100%`)
 
 
-        }catch (error){
-          if (error.name !== 'AbortError') {
-            
-          }
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+
         }
       }
     }
-  
+  }
 
-    
-  const openModal = (dni,nombres,apellidos, fecha_examen, cod_suc) => {
+
+
+  const openModal = (dni, nombres, apellidos, fecha_examen, cod_suc) => {
     setDnipicker(dni)
     //cambian por ser primero apellido
     setName(apellidos)
@@ -230,7 +249,7 @@ const HistorialPaciente = () => {
 
 
   const reloadTable = () => {
-    Setreload(reload+1)
+    Setreload(reload + 1)
   };
 
   const handlePageClick = (page) => {
@@ -251,11 +270,17 @@ const HistorialPaciente = () => {
     }
   };
 
+  const openModalCorreo = (norden) => {
+    setShowCorreoModal(true);
+    setNordenSeleccionadoCorreo(norden)
+  }
+
+
   const visiblePages = () => {
-    const totalVisiblePages = 5; 
+    const totalVisiblePages = 5;
     const halfVisiblePages = Math.floor(totalVisiblePages / 2);
     let startPage = currentPage - halfVisiblePages;
-    startPage = Math.max(startPage, 1); 
+    startPage = Math.max(startPage, 1);
     const endPage = startPage + totalVisiblePages - 1;
     return Array.from({ length: totalVisiblePages }, (_, i) => startPage + i).filter(page => page <= totalPages);
   };
@@ -264,64 +289,64 @@ const HistorialPaciente = () => {
   const endIdx = startIdx + recordsPerPage;
   const currentData = data.slice(startIdx, endIdx);
   const mensajePorcentaje = `Datos cargados: ${porsentaje}`;
-  
+
   return (
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
-      <div className="px-4 py-2 azuloscurobackground flex justify-between items-center"> 
-      <h1 className="text-start font-bold color-azul text-white">Reporte de Pacientes</h1>
-      
-      <div className="flex items-center">
-        <button className="naranja-btn  px-4 py-1 rounded flex items-center mr-3" onClick={toggleFullScreen}>
-          <FontAwesomeIcon icon={isFullScreen ? faCompress : faExpand} className="mr-2" />
-          {isFullScreen ? 'Reducir' : 'Expandir'}
-        </button>
+        <div className="px-4 py-2 azuloscurobackground flex justify-between items-center">
+          <h1 className="text-start font-bold color-azul text-white">Reporte de Pacientes</h1>
+
+          <div className="flex items-center">
+            <button className="naranja-btn  px-4 py-1 rounded flex items-center mr-3" onClick={toggleFullScreen}>
+              <FontAwesomeIcon icon={isFullScreen ? faCompress : faExpand} className="mr-2" />
+              {isFullScreen ? 'Reducir' : 'Expandir'}
+            </button>
 
 
-        {tienePermisoEnVista("Reportes","Carga Masiva 1") && <button
-          onClick={() => setShowDataUploadModal(true)}
-          className="verde-btn px-4 py-1 rounded flex items-center mr-3"
-        >
-          <FontAwesomeIcon icon={faUpload} className="mr-2" />
-          Subir Carpeta
-        </button>}
+            {tienePermisoEnVista("Reportes", "Carga Masiva 1") && <button
+              onClick={() => setShowDataUploadModal(true)}
+              className="verde-btn px-4 py-1 rounded flex items-center mr-3"
+            >
+              <FontAwesomeIcon icon={faUpload} className="mr-2" />
+              Subir Carpeta
+            </button>}
 
-        {tienePermisoEnVista("Reportes","Carga Masiva 2") && <button
-          onClick={() => setShowDataUploadModal2(true)}
-          className="verde-btn px-4 py-1 rounded flex items-center mr-3"
-        >
-          <FontAwesomeIcon icon={faUpload} className="mr-2" />
-          Subir Carpeta 2
-        </button>}
+            {tienePermisoEnVista("Reportes", "Carga Masiva 2") && <button
+              onClick={() => setShowDataUploadModal2(true)}
+              className="verde-btn px-4 py-1 rounded flex items-center mr-3"
+            >
+              <FontAwesomeIcon icon={faUpload} className="mr-2" />
+              Subir Carpeta 2
+            </button>}
 
-        {tienePermisoEnVista("Reportes","Historial Masivo") && <button
-          onClick={() => setShowHistorial(true)}
-          className="verde-btn px-4 py-1 rounded flex items-center mr-3"
-        >
-          <FontAwesomeIcon icon={faClockRotateLeft} className="mr-2" />
-          Historial
-        </button>}
-        
-          <button 
-          onClick={reloadTable} className="focus:outline-none relative">
-          {loading && <div className="absolute inset-0 opacity-50 rounded-md"></div>}
-          <FontAwesomeIcon icon={faSyncAlt} className={`text-white cursor-pointer tamañouno ${loading ? 'opacity-50' : ''}`} />
-        </button> 
-      </div>
-    </div>
-   
+            {tienePermisoEnVista("Reportes", "Historial Masivo") && <button
+              onClick={() => setShowHistorial(true)}
+              className="verde-btn px-4 py-1 rounded flex items-center mr-3"
+            >
+              <FontAwesomeIcon icon={faClockRotateLeft} className="mr-2" />
+              Historial
+            </button>}
+
+            <button
+              onClick={reloadTable} className="focus:outline-none relative">
+              {loading && <div className="absolute inset-0 opacity-50 rounded-md"></div>}
+              <FontAwesomeIcon icon={faSyncAlt} className={`text-white cursor-pointer tamañouno ${loading ? 'opacity-50' : ''}`} />
+            </button>
+          </div>
+        </div>
+
         {/* filtros */}
         <div className="p-4 flex flex-col md:flex-row justify-between items-start md:items-center md:space-x-4 flex-wrap">
           <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
             <span className="mr-2 fw-bold">Mostrar</span>
             <select className="border pointer border-gray-300 rounded-md px-2 py-1" value={recordsPerPage} onChange={handleChangeRecordsPerPage}>
-                      <option value={5}>5</option>
-                      <option value={10}>10</option>
-                      <option value={15}>15</option>
-                      <option value={20}>20</option>
-                      <option value={25}>25</option>
-                      <option value={-1}>Todos</option>
-                    </select>
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={15}>15</option>
+              <option value={20}>20</option>
+              <option value={25}>25</option>
+              <option value={-1}>Todos</option>
+            </select>
           </div>
           <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
             <span className="mr-2"><strong>Fecha inicio:</strong></span>
@@ -346,8 +371,9 @@ const HistorialPaciente = () => {
             <select
               className="pointer border border-gray-300 px-3 py-2 rounded-md mb-2 md:mb-0 md:mr-4"
               onChange={(e) => {
-                
-                setSede(e.target.value)}}
+
+                setSede(e.target.value)
+              }}
               required
               value={sede}
             >
@@ -371,7 +397,7 @@ const HistorialPaciente = () => {
               value={empresa}
             >
               <option value="">Seleccionar</option>
-              {ListEmpresa?.map((option,index) => (
+              {ListEmpresa?.map((option, index) => (
                 <option key={index} value={option.ruc}>{toTitleCase(option.razonSocial)}</option>
               ))}
             </select>
@@ -390,13 +416,13 @@ const HistorialPaciente = () => {
               value={contrata}
             >
               <option value="">Seleccionar</option>
-              {ListContrata?.map((option,index) => (
+              {ListContrata?.map((option, index) => (
                 <option key={index} value={option.ruc}>{option.razonSocial}</option>
               ))}
             </select>
           </div>
-        <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
-          <span className="mr-2"><strong>Buscar:</strong></span>
+          <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
+            <span className="mr-2"><strong>Buscar:</strong></span>
             <input
               type="text"
               className={`border rounded-md px-2 py-1 mb-2 md:mb-0 md:mr-4 ${disabled ? "bg-slate-300" : "bg-white"}`}
@@ -405,16 +431,16 @@ const HistorialPaciente = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
+          </div>
+
         </div>
-      
-      </div>
-      <div className='flex items-center justify-center h-full'>
-        <div className='bg-green-200 rounded-lg p-2 max-w-[300px] w-full fw-bold'>
-          <p className="text-black text-center">{mensajePorcentaje}</p>
+        <div className='flex items-center justify-center h-full'>
+          <div className='bg-green-200 rounded-lg p-2 max-w-[300px] w-full fw-bold'>
+            <p className="text-black text-center">{mensajePorcentaje}</p>
+          </div>
         </div>
-      </div>
         <div className="overflow-x-auto p-3">
-        {loading ? (
+          {loading ? (
             <p className="text-center">Cargando...</p>
           ) : (
             <table className="w-full border border-gray-300">
@@ -428,35 +454,35 @@ const HistorialPaciente = () => {
                 </tr>
               </thead>
               <tbody>
-              {searchTerm ? (
-                filteredData.map((item, index) => (
-                  <tr key={index}>
-                    <td className="border border-gray-300 px-3 py-2">
-                      <button onClick={() => { openModal(item.dni, item.apellidos, item.nombres, item.fecha_examen, item.codigo_sucursal) }} className="focus:outline-none">
-                        <FontAwesomeIcon icon={faPlus} className="text-blue-500 cursor-pointer" />
-                      </button>
-                    </td>
-                    <td className="border border-gray-300 px-3 py-2">{item.dni}</td>
-                    <td className="border border-gray-300 px-3 py-2">{item.apellidos}</td>
-                    <td className="border border-gray-300 px-3 py-2">{item.nombres}</td>
-                    <td className="border border-gray-300 px-3 py-2">{item.codigo_sucursal}</td>
-                  </tr>
-                ))
-              ) : (
-                currentData.map((item, index) => (
-                  <tr key={index}>
-                    <td className="border border-gray-300 px-3 py-2">
-                      <button onClick={() => { openModal(item.dni, item.apellidos, item.nombres, item.fecha_examen, item.codigo_sucursal) }} className="focus:outline-none">
-                        <FontAwesomeIcon icon={faPlus} className="text-blue-500 cursor-pointer" />
-                      </button>
-                    </td>
-                    <td className="border border-gray-300 px-3 py-2">{item.dni}</td>
-                    <td className="border border-gray-300 px-3 py-2">{item.apellidos}</td>
-                    <td className="border border-gray-300 px-3 py-2">{item.nombres}</td>
-                    <td className="border border-gray-300 px-3 py-2">{item.codigo_sucursal}</td>
-                  </tr>
-                ))
-              )}
+                {searchTerm ? (
+                  filteredData.map((item, index) => (
+                    <tr key={index}>
+                      <td className="border border-gray-300 px-3 py-2">
+                        <button onClick={() => { openModal(item.dni, item.apellidos, item.nombres, item.fecha_examen, item.codigo_sucursal) }} className="focus:outline-none">
+                          <FontAwesomeIcon icon={faPlus} className="text-blue-500 cursor-pointer" />
+                        </button>
+                      </td>
+                      <td className="border border-gray-300 px-3 py-2">{item.dni}</td>
+                      <td className="border border-gray-300 px-3 py-2">{item.apellidos}</td>
+                      <td className="border border-gray-300 px-3 py-2">{item.nombres}</td>
+                      <td className="border border-gray-300 px-3 py-2">{item.codigo_sucursal}</td>
+                    </tr>
+                  ))
+                ) : (
+                  currentData.map((item, index) => (
+                    <tr key={index}>
+                      <td className="border border-gray-300 px-3 py-2">
+                        <button onClick={() => { openModal(item.dni, item.apellidos, item.nombres, item.fecha_examen, item.codigo_sucursal) }} className="focus:outline-none">
+                          <FontAwesomeIcon icon={faPlus} className="text-blue-500 cursor-pointer" />
+                        </button>
+                      </td>
+                      <td className="border border-gray-300 px-3 py-2">{item.dni}</td>
+                      <td className="border border-gray-300 px-3 py-2">{item.apellidos}</td>
+                      <td className="border border-gray-300 px-3 py-2">{item.nombres}</td>
+                      <td className="border border-gray-300 px-3 py-2">{item.codigo_sucursal}</td>
+                    </tr>
+                  ))
+                )}
 
               </tbody>
 
@@ -478,9 +504,13 @@ const HistorialPaciente = () => {
           </button>
         </div>
       </div>
-      
-      {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_suc} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell}  Acces={tienePermisoEnVista} />}
+
+      {isModalOpen && <Modal closeModal={closeModal} openModalCorreo={openModalCorreo} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_suc} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell} Acces={tienePermisoEnVista} />}
+      {/* {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_suc} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell} Acces={tienePermisoEnVista} />} */}
+
       {/* Modal de carga de datos */}
+      {/* {showCorreoModal &&   <ModalCorreo onClose={() => setShowCorreoModal(false)} /> }*/}
+      <ModalCorreo open={showCorreoModal} archivosList={archivosList} norden={nordenSeleccionadoCorreo} onClose={() => { setShowCorreoModal(false); setNordenSeleccionadoCorreo('') }} />
       {showDataUploadModal && <DataUploadModal closeModal={() => setShowDataUploadModal(false)} Sedes={ListSedes} user={userlogued.sub} token={token} />}
       {showDataUploadModal2 && <DataUploadModal2 closeModal={() => setShowDataUploadModal2(false)} Sedes={ListSedes} user={userlogued.sub} token={token} />}
       {showHistorial && <Historial closeModal={() => setShowHistorial(false)} token={token} user={userlogued.sub} />}

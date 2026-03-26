@@ -232,7 +232,7 @@ export default function Anexo16() {
     //Información Radiológica
     numeroRx: "",
     codigoExamenRadiograficoSanguineo: null,
-    fechaRx: getToday(),
+    fechaRx: today,
     calidadRx: "",
     simbolosRx: "N/A",
     //Conclusiones Radiográficas
@@ -277,7 +277,7 @@ export default function Anexo16() {
     densidadFisico: "",
     phFisico: "",
     otrosExamenes: "",
-    aptoParaTrabajar: "SI",
+    aptoParaTrabajar: "",
 
     // Estado del Paciente
     nordenEstadoPaciente: "",
@@ -319,10 +319,18 @@ export default function Anexo16() {
     trigliceridosRed: "",
 
     notasDoctor: "",
+    //Laboratorio
+    mercurioOrina: "N/A",
+    plomoSangre: "N/A",
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
+
+    observacionesGenerales2: "",
+    posibleCerrar: false,
+    cerrado: false,
+    otrosExamenes2: "",
   };
 
   const {
@@ -336,6 +344,7 @@ export default function Anexo16() {
     handleRadioButtonBoolean,
     handleClear,
     handleClearnotO,
+    handleBlur
   } = useForm(initialFormState, { storageKey: "anexo_16" });
 
   const [activeTab, setActiveTab] = useState(0);
@@ -437,6 +446,7 @@ export default function Anexo16() {
                       handleSave={handleSave}
                       handleSearchExamenesRealizados={handleSearchExamenesRealizados}
                       handleChangeSimple={handleChangeSimple}
+                      handleBlur={handleBlur}
                     />
                   )
                 );

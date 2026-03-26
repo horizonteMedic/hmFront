@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  InputCheckbox,
   InputsRadioGroup,
   InputTextArea,
   InputTextOneLine,
@@ -9,6 +10,7 @@ import EmpleadoComboBox from "../../../../../components/reusableComponents/Emple
 
 export default function Resultados({
   form,
+  setForm,
   handleChangeSimple,
   handleChange,
   handleChangeNumber,
@@ -17,6 +19,7 @@ export default function Resultados({
   handleSave,
   handleClear,
   handleSearchExamenesRealizados,
+  handleCheckBoxChange
 }) {
 
   return (
@@ -208,11 +211,13 @@ export default function Resultados({
           <InputsRadioGroup
             name="aptoParaTrabajar"
             value={form.aptoParaTrabajar}
+            disabled={!form.cerrado}
             onChange={handleRadioButton}
             options={[
               { label: "SI", value: "SI" },
               { label: "NO", value: "NO" },
               { label: "REEVALUACIÓN", value: "REEVALUACION" },
+              { label: "EVALUADO", value: "EVALUADO" }
             ]}
           />
           {/* Médico que Certifica */}
@@ -227,7 +232,22 @@ export default function Resultados({
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <p className="font-semibold text-gray-800 mb-2">Imprimir Informes de Exámenes</p>
           {/* BOTONES DE ACCIÓN */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className={`flex flex-col md:flex-row justify-between items-center gap-4 `} >
+            <div className={`flex gap-2 ${!form.posibleCerrar ? "cursor-not-allowed opacity-50" : ""}`}>
+              <InputCheckbox
+                label="Cerrado"
+                checked={form.cerrado}
+                disabled={!form.posibleCerrar}
+                name="cerrado"
+                onChange={(e) => {
+                  handleCheckBoxChange(e);
+                  setForm((prev) => ({
+                    ...prev,
+                    aptoParaTrabajar: "",
+                  }));
+                }}
+              />
+            </div>
             <div className="flex gap-4">
               <button
                 type="button"

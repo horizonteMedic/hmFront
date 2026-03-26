@@ -25,6 +25,7 @@ const MATRICES_MAP = {
   "Matriz-14": { urlH: "/api/headers/pacifico-vida", methodH: "GET", urlB: "api/v01/st/registros/matrizPacificoVida2026", methodB: "POST", name: "REPORTE CONSOLIDAD-PACIFICO VIDA - PODEROSA" },
   "Matriz-15": { urlH: "api/headers/boroo", methodH: "GET", urlB: "api/v01/st/registros/matrizBoroo2026", methodB: "POST", name: "MATRIZ MINERA BOROO MISQUICHILCA" },
   "Matriz-16": { urlH: "/api/headers/trabajos-altura", methodH: "GET", urlB: "api/v01/st/registros/matrizPoderosaAltura2026", methodB: "POST", name: "REPORTE DE TRABAJOS EN ALTURA - PODEROSA" },
+  "Matriz-17": { url: "/api/v01/st/registros/matrizHuancayo2026", method: "POST", name: "MATRIZ HUANCAYO" },
 
 };
 
@@ -292,6 +293,7 @@ const MatrizPostulante = () => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Reporte");
     const isMatrizSaludProseguridad = datos.matrizSeleccionada === "Matriz-13";
+    const isMatriz17 = datos.matrizSeleccionada === "Matriz-17";
 
     const columnasOjo = ["od", "oi", "od lejos", "oi lejos"];
     const esColumnaOjo = (text) =>
@@ -327,33 +329,48 @@ const MatrizPostulante = () => {
 
         const cell = worksheet.getRow(1).getCell(index + 1);
 
-        cell.value = col.label ?? col.field ?? "";
-
-        // 🎨 COLOR DE TEXTO (SOLO MATRIZ 13)
         const headerName = col.label ?? col.field ?? "";
+        cell.value = headerName;
 
-        let fontColor = undefined;
+        let fontColor;
+        let bgColor;
 
-        if (isMatrizSaludProseguridad) {
+        // 🔵 PRIORIDAD: MATRIZ 17
+        if (isMatriz17) {
+          fontColor = { argb: "FFFFFFFF" }; // blanco
+          bgColor = "FF000080"; // azul oscuro (#000080)
+        }
+
+        // 🟡 MATRIZ 13
+        else if (isMatrizSaludProseguridad) {
           fontColor = esColumnaOjo(headerName)
             ? { argb: "FF000000" } // negro
             : { argb: "FFFFC000" }; // amarillo
+
+          bgColor = col.color
+            ? "FF" + col.color.replace("#", "")
+            : "FFFFFFFF";
         }
 
+        // ⚪ DEFAULT
+        else {
+          fontColor = undefined;
+          bgColor = col.color
+            ? "FF" + col.color.replace("#", "")
+            : "FFFFFFFF";
+        }
+
+        // 🎨 FONT
         cell.font = {
           bold: true,
           ...(fontColor && { color: fontColor })
         };
 
-        // 🎨 COLOR DE FONDO SI VIENE DEFINIDO
+        // 🎨 FILL
         cell.fill = {
           type: "pattern",
           pattern: "solid",
-          fgColor: {
-            argb: col.color
-              ? "FF" + col.color.replace("#", "")
-              : "FFFFFFFF" // blanco por defecto
-          }
+          fgColor: { argb: bgColor }
         };
 
         cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
@@ -628,6 +645,8 @@ const MatrizPostulante = () => {
   };
 
   const isMatrizSaludProseguridad = datos.matrizSeleccionada === "Matriz-13"
+  const isMatriz17 = datos.matrizSeleccionada === "Matriz-17";
+
   //PARA MATRIZ DE PROSEGURIDAD
   const columnasOjo = ["OD", "OI", "OD LEJOS", "OI LEJOS"];
   return (
@@ -750,6 +769,8 @@ const MatrizPostulante = () => {
               {tienePermisoEnVista("Matriz Postulante", "Matriz Pacifico Vida 2026") && <option value="Matriz-14">REPORTE CONSOLIDAD-PACIFICO VIDA - PODEROSA</option>}
               {tienePermisoEnVista("Matriz Postulante", "Matriz Boroo 2026") && <option value="Matriz-15">MATRIZ MINERA BOROO MISQUICHILCA</option>}
               {tienePermisoEnVista("Matriz Postulante", "Matriz Poderosa Altura 2026") && <option value="Matriz-16">REPORTE DE TRABAJOS EN ALTURA - PODEROSA</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Huancayo 2026") && <option value="Matriz-17">MATRIZ HUANCAYO</option>}
+
             </select>
           </div>
           <div className="flex flex-col flex-grow justify-end">
@@ -833,7 +854,7 @@ const MatrizPostulante = () => {
                           !columnasOjo.includes(column.field)
                           ? "text-[#FFC000]"
                           : "text-black"
-                          }`}
+                          } ${isMatriz17 ? "text-white bg-[#000080]" : ""}`}
                       >
                         {column.field}
                       </th>

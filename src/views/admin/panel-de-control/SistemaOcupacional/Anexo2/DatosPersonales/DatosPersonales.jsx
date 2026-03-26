@@ -246,7 +246,7 @@ export default function DatosPersonales({
             label="Nota"
             name="notasDoctor"
             value={form.notasDoctor}
-            rows={4}
+            rows={10}
             disabled
           />
           </SectionFieldset> 

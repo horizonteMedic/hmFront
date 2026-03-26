@@ -7,7 +7,8 @@ import {
 export default function PanelObservaciones({
   form,
   handleRadioButton,
-  handleChange
+  handleChange,
+  handleBlur
 }) {
   return (
     <div className="p-4 h-full mt-16">
@@ -20,6 +21,15 @@ export default function PanelObservaciones({
             name="observacionesGenerales"
             value={form.observacionesGenerales}
             onChange={handleChange}
+          />
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-3">
+          <InputTextArea
+            rows={18}
+            label="Observaciones Generales AUTO"
+            name="observacionesGenerales2"
+            value={form.observacionesGenerales2}
+            disabled
           />
         </div>
         {/* Observaciones */}
@@ -40,6 +50,7 @@ export default function PanelObservaciones({
             label="Recomendaciones y Restricciones"
             name="conclusionMedico"
             value={form.conclusionMedico}
+            onBlur={handleBlur}
             onChange={handleChange}
           />
         </div>
