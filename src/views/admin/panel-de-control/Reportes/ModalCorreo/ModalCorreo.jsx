@@ -1,12 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { useForm } from "../../../../hooks/useForm";
-import { GetPlantillaPorNorden, SubmitCorreo } from "./controllerModalCorreo";
+import { GetListArchivosDisponibles, GetPlantillaPorNorden, SubmitCorreo } from "./controllerModalCorreo";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faFile, faX } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faFile, faPlus, faX } from "@fortawesome/free-solid-svg-icons";
 
-export default function ModalCorreo({ open, onClose, norden, archivosList }) {
+export default function ModalCorreo({ open, onClose, norden, nordenYSede, archivosList }) {
     const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
+    const [archivosDisponibles, setArchivosDisponibles] = useState(null);
 
     const initialFormState = {
         idRelacionEmpresaContrata: null,
@@ -17,7 +18,7 @@ export default function ModalCorreo({ open, onClose, norden, archivosList }) {
         rucContrata: "",
         contrata: "",
         fechaApartura: "",
-        plantillaConfig: []
+        plantillaConfig: null
     };
 
     const {
@@ -26,14 +27,13 @@ export default function ModalCorreo({ open, onClose, norden, archivosList }) {
         handleClear
     } = useForm(initialFormState);
 
-
-
     // bloquear scroll del body
     useEffect(() => {
         if (open) {
             document.body.style.overflow = "hidden";
             // obtener plantilla por norden
             obtenerPlantillaPorNorden(norden, setForm, token);
+            obtenerListArchivosDisponibles(nordenYSede, setArchivosDisponibles, token);
         }
         else document.body.style.overflow = "auto";
 
@@ -43,13 +43,15 @@ export default function ModalCorreo({ open, onClose, norden, archivosList }) {
     const obtenerPlantillaPorNorden = async (norden, setForm, token) => {
         await GetPlantillaPorNorden(norden, setForm, onCloseNew, token, archivosList, userName);
     }
+    
+    const obtenerListArchivosDisponibles = async (nordenYSede, setForm, token) => {
+        await GetListArchivosDisponibles(nordenYSede, setForm, token);
+    }
 
     const onSubmit = async (e) => {
         e.preventDefault();
         await SubmitCorreo({ ...form, norden }, token, userlogued, handleClear);
     }
-
-
 
     const addEmailForm = () => {
         setForm(prev => ({
@@ -60,15 +62,8 @@ export default function ModalCorreo({ open, onClose, norden, archivosList }) {
                     id: null,
                     destino: "",
                     conCopia: "",
-                    asunto: "{nombreExamen}//{nombrePaciente}//{empresa}//{fechaExamen}",
-                    mensaje: `Estimado/a Dr./Dra.,\n
-Se envían de manera adjunta {listaAdjuntos} del/la Sr./Sra.\n
--{nombrePaciente}\n
-Colaborador/a de la empresa {empresa}.\n
-Con fecha: {fechaExamen}\n
-
-Saludos cordiales.\n
-{nombreUsuario}`,
+                    asunto: "",
+                    mensaje: "",
                     archivos: []
                 }
             ]
@@ -173,11 +168,7 @@ Saludos cordiales.\n
         });
     };
 
-    // useEffect(() => {
-    //     if (open) obtenerListArchivos();
-    // }, [open]);
-
-    if (!open) return null;
+    if (!open || !form.plantillaConfig) return null;
 
     return (
         <div className="fixed inset-0 z-[999] flex items-center justify-center ">
@@ -191,20 +182,27 @@ Saludos cordiales.\n
                 {/* Header */}
                 <div className="flex justify-between items-center p-6 pb-2">
                     <h2 className="text-lg font-semibold text-gray-800">
-                        Enviar correo
+                        Guardar Correo(s) para Envio
                     </h2>
-
                     <button
                         onClick={onCloseNew}
                         className="text-gray-400 hover:text-red-600"
                     >
                         ✕
                     </button>
-                </div>
 
+                </div>
+                <button
+                    type="button"
+                    onClick={addEmailForm}
+                    className="self-start bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md  shadow ml-6 mb-4"
+                >
+                    <FontAwesomeIcon icon={faPlus} /> Nuevo Correo
+                </button>
                 {/* Content (SCROLL AQUÍ 🔥) */}
                 <div className="px-6 overflow-y-auto ">
                     <div className="flex flex-col gap-4  overflow-y-auto pr-2">
+
                         {form.plantillaConfig?.map((emailForm, index) => {
                             if (emailForm.anulado) return null;
                             return (
@@ -330,17 +328,17 @@ Saludos cordiales.\n
 
                 {/* Footer */}
                 <div className="flex justify-end gap-2 p-6 pt-2 ">
-                    <button
+                    {/* <button
                         onClick={onCloseNew}
                         className="px-4 py-2 text-sm rounded-lg bg-gray-100 hover:bg-gray-200"
                     >
                         Cancelar
-                    </button>
+                    </button> */}
 
                     <button
                         onClick={onSubmit}
-                        className="px-4 py-2 text-sm rounded-lg bg-blue-500 text-white hover:bg-blue-600">
-                        Enviar
+                        className="px-4 py-2  rounded-lg bg-blue-500 text-white hover:bg-blue-600">
+                        Guardar Correo(s)
                     </button>
                 </div>
             </div>

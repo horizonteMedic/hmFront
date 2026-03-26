@@ -18,6 +18,7 @@ const HistorialPaciente = () => {
 
   const [showCorreoModal, setShowCorreoModal] = useState(false);
   const [nordenSeleccionadoCorreo, setNordenSeleccionadoCorreo] = useState('');
+  const [nordenYSedeSeleccionadoCorreo, setNordenYSedeSeleccionadoCorreo] = useState('');
 
   const ListSedes = ComboboxSedes();
   const ListEmpresa = ComboboxEmpresas();
@@ -193,7 +194,7 @@ const HistorialPaciente = () => {
       const otrasSedes = ListSedes.filter(s => s.cod_sede !== sede);
       const fetchPromises = otrasSedes.map(s => GetListREport(userlogued.sub, startDate, endDate, s.cod_sede, empresa, contrata, token, { signal }));
       try {
-        const otrasSedesData = await Promise.all(fetchPromises);
+        const otrasSedesData = await Promise.allSettled(fetchPromises);
         const nonEmptyData = otrasSedesData.filter(data => data.length > 0);
         const allData = nonEmptyData.reduce((acc, data) => acc.concat(data), []);
         setData(prevData => {
@@ -270,11 +271,11 @@ const HistorialPaciente = () => {
     }
   };
 
-  const openModalCorreo = (norden) => {
+  const openModalCorreo = (norden, historiaClinica) => {
     setShowCorreoModal(true);
+    setNordenYSedeSeleccionadoCorreo(historiaClinica)
     setNordenSeleccionadoCorreo(norden)
   }
-
 
   const visiblePages = () => {
     const totalVisiblePages = 5;
@@ -506,11 +507,9 @@ const HistorialPaciente = () => {
       </div>
 
       {isModalOpen && <Modal closeModal={closeModal} openModalCorreo={openModalCorreo} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_suc} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell} Acces={tienePermisoEnVista} />}
-      {/* {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_suc} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell} Acces={tienePermisoEnVista} />} */}
 
       {/* Modal de carga de datos */}
-      {/* {showCorreoModal &&   <ModalCorreo onClose={() => setShowCorreoModal(false)} /> }*/}
-      <ModalCorreo open={showCorreoModal} archivosList={archivosList} norden={nordenSeleccionadoCorreo} onClose={() => { setShowCorreoModal(false); setNordenSeleccionadoCorreo('') }} />
+      <ModalCorreo open={showCorreoModal} archivosList={archivosList} norden={nordenSeleccionadoCorreo} nordenYSede={nordenYSedeSeleccionadoCorreo} onClose={() => { setShowCorreoModal(false); setNordenSeleccionadoCorreo(''); setNordenYSedeSeleccionadoCorreo("") }} />
       {showDataUploadModal && <DataUploadModal closeModal={() => setShowDataUploadModal(false)} Sedes={ListSedes} user={userlogued.sub} token={token} />}
       {showDataUploadModal2 && <DataUploadModal2 closeModal={() => setShowDataUploadModal2(false)} Sedes={ListSedes} user={userlogued.sub} token={token} />}
       {showHistorial && <Historial closeModal={() => setShowHistorial(false)} token={token} user={userlogued.sub} />}

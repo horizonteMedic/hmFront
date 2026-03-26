@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUp, faFilePdf, faFileImage, faDownload, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUp, faFilePdf, faFileImage, faDownload, faEnvelope, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { GetHistoryUser } from '../model/getHistoryUser';
 import { GetlistArchivos } from '../model/getlistArchivos';
 import ModalUpload from '../ModalsDeSubida/ModalUpload';
 import { GetArchivosSubidos } from '../model/getArchivosSubidos';
 import { ReadArchivos, DeleteArchivos64 } from '../model/readArchivos';
 import Swal from 'sweetalert2';
+import { GetCorreosGuardados } from '../ModalCorreo/controllerModalCorreo';
 
 const Modal = ({ closeModal, openModalCorreo, user, iduser, start, end, sede, dni, nombre, empresa, contrata, token, name, apell, Acces }) => {
 
@@ -21,6 +22,15 @@ const Modal = ({ closeModal, openModalCorreo, user, iduser, start, end, sede, dn
   const [datosarc, setDatosarc] = useState(null)
   const [currentFile, setCurrentFile] = useState(null);
 
+  const [correosPendientesYEnviados, setCorreosPendientesYEnviados] = useState([])
+
+  const obtenerCorreosPendientes = async (norden) => {
+    return await GetCorreosGuardados(norden, 'pendiente', token);
+  }
+
+  const obtenerCorreosEnviados = async (norden) => {
+    return await GetCorreosGuardados(norden, 'enviado', token);
+  }
 
   useEffect(() => {
     setLoading(true);
@@ -51,7 +61,6 @@ const Modal = ({ closeModal, openModalCorreo, user, iduser, start, end, sede, dn
 
   }, []);
 
-
   useEffect(() => {
     if (data && data.length > 0) {
 
@@ -68,7 +77,31 @@ const Modal = ({ closeModal, openModalCorreo, user, iduser, start, end, sede, dn
         }
         setRead(archivosPorHistoria);
       };
+
+      const fetchCorreos = async () => {
+        const promises = data.map(async (item) => {
+          const pendientesPromise = obtenerCorreosPendientes(item.orden)
+          const enviadosPromise = obtenerCorreosEnviados(item.orden)
+
+          const [pendientes, enviados] = await Promise.all([
+            pendientesPromise,
+            enviadosPromise
+          ]);
+          return {
+            orden: item.orden,
+            pendientes: pendientes ?? [],
+            enviados: enviados ?? []
+          };
+        });
+
+        const resultados = await Promise.all(promises);
+        console.log({ resultados })
+        return resultados;
+      };
       fetchArchivos();
+      fetchCorreos().then(resultados => {
+        setCorreosPendientesYEnviados(resultados);
+      });
     }
   }, [data, reload])
 
@@ -229,6 +262,7 @@ const Modal = ({ closeModal, openModalCorreo, user, iduser, start, end, sede, dn
                     <th className="border border-gray-300 px-2 py-1 text-center">Historia Clinica</th>
                     {Acces("Reportes", "Descargar Reportes") && <th className="border border-gray-300 px-2 py-1 text-center">Archivos</th>}
                     {Acces("Reportes", "Registrar Correo a Enviar") && <th className="border border-gray-300 px-2 py-1 text-center">Gestionar Correo</th>}
+                    {Acces("Reportes", "Autorizar Envio Correo") && <th className="border border-gray-300 px-2 py-1 text-center">Enviar Correo</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -266,11 +300,40 @@ const Modal = ({ closeModal, openModalCorreo, user, iduser, start, end, sede, dn
                           ))}
                         </td>
                       )}
-                      {Acces("Reportes", "Registrar Correo a Enviar") && (
-                        <td className="border border-gray-300 text-center">
-                          <button onClick={() => openModalCorreo(dataItem.orden)} className='py-2 px-3 bg-blue-500 rounded'><FontAwesomeIcon icon={faEnvelope} style={{ color: 'white' }} /></button>
-                        </td>
-                      )}
+                      {Acces("Reportes", "Registrar Correo a Enviar") && (() => {
+                        const correos = correosPendientesYEnviados?.find(item => item.orden === dataItem.orden);
+                        const pendientes = correos?.pendientes?.length || 0;
+                        const enviados = correos?.enviados?.length || 0;
+                        return (
+                          <td className="border border-gray-300 text-center space-y-3">
+                            <p>Pendientes: {pendientes}</p>
+                            <p>Enviados: {enviados}</p>
+                            {pendientes === 0 && (
+                              <button onClick={() => openModalCorreo(dataItem.orden, dataItem.historiaClinica)} className='py-2 px-3 bg-blue-500 rounded space-x-1'><FontAwesomeIcon icon={faPlus} style={{ color: 'white' }} /><FontAwesomeIcon icon={faEnvelope} style={{ color: 'white' }} /></button>
+                            )}
+                          </td>
+                        );
+                      })()}
+                      {Acces("Reportes", "Autorizar Envio Correo") && (() => {
+                        const correos = correosPendientesYEnviados?.find(item => item.orden === dataItem.orden);
+                        const pendientes = correos?.pendientes?.length || 0;
+                        const enviados = correos?.enviados?.length || 0;
+                        return (
+                          <td className="border border-gray-300 text-center space-y-3">
+                            <p>Pendientes: {pendientes}</p>
+                            <p>Enviados: {enviados}</p>
+                            {pendientes != 0 && (
+                              <button
+                                onClick={() => { }}
+                                className="py-2 px-3 bg-green-700 rounded space-x-1 text-white"
+                              >
+                                <FontAwesomeIcon icon={faEnvelope} />
+                                <span>Enviar Correo</span>
+                              </button>
+                            )}
+                          </td>
+                        );
+                      })()}
                     </tr>
                   ))}
                 </tbody>

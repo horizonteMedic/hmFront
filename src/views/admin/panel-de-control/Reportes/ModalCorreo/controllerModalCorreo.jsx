@@ -5,6 +5,8 @@ import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getToday } from "../../../../utils/helpers";
 
 const obtenerListArchivosUrl = "/api/v01/ct/tipoArchivo/obtenerTiposDeArchivoPlantillaCorreo"
+const obtenerListArchivosDisponiblesUrl = "/api/v01/ct/archivos/detalleArchivoServidor"
+const obtenerCorreosGuardados = "/api/v01/st/email/buscarPorNordenYEstado"
 const obtenerPlantillaPorNordenUrl = "/api/v01/ct/plantillaCorreo/obtenerPlantillaCorreoDatosNorden"
 const registrarCorreoUrl = "/api/v01/st/email/registrarActualizarCorreo"
 
@@ -18,8 +20,6 @@ const nombresExamen = {
     "MANIPULADOR-ALIMENTOS": "MANIPULADOR ALIMENTOS",
     "ANEXO 16A": "ANEXO 16A"
 }
-
-
 
 export const GetListArchivos = async (
     set,
@@ -43,7 +43,60 @@ export const GetListArchivos = async (
     } finally {
         onFinish?.();
     }
+};
 
+export const GetListArchivosDisponibles = async (
+    nordenConSede,
+    set,
+    token,
+    onFinish = () => { }
+) => {
+    try {
+        const res = await getFetch(
+            `${obtenerListArchivosDisponiblesUrl}/${nordenConSede}`,
+            token
+        );
+        if (res?.resultado) {
+            return res.resultado;
+        } else if (res?.status === 404) {
+            return [];
+        } else {
+            Swal.fire("Error", "Ocurrió un error al traer la lista de archivos disponibles", "error");
+        }
+    } catch (error) {
+        Swal.fire("Error", "Ocurrio un error al traer la lista de archivos disponibles", "error");
+    } finally {
+        onFinish?.();
+    }
+};
+
+export const GetCorreosGuardados = async (
+    norden,
+    estado,
+    token,
+    onFinish = () => { }
+) => {
+    try {
+        const res = await getFetch(
+            `${obtenerCorreosGuardados}/${norden}/${estado}`,
+            token
+        );
+
+        if (res?.resultado) {
+            return res.resultado;
+        } else if (res?.status === 404) {
+            return [];
+        }
+        else {
+            Swal.fire("Error", "Ocurrió un error al traer los datos de correo", "error");
+
+        }
+    } catch (error) {
+        Swal.fire("Error", "Ocurrió un error fatal al traer los datos de correo", "error");
+        return [];
+    } finally {
+        onFinish?.();
+    }
 };
 
 const reemplazarTextoCorreo = (texto, palabrasReemplazo) => {
@@ -184,7 +237,7 @@ export const SubmitCorreo = async (
 
     const body = [
         ...form.plantillaConfig.map(a => ({
-            id: a.id,
+            id: null,
             norden: form.norden,
             idEmpresaContrata: a.idEmpresaContrata,
             destino: (a.destino ?? "").replace(/\s+/g, ""),
