@@ -251,7 +251,11 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
               ...prev,
               notasDoctor: prev.notasDoctor + "\n" + listaFaltantes,
             }))
-            Swal.close();
+            Swal.fire(
+              "Alerta",
+              listaFaltantes,
+              "info"
+            );
           });
       })
 
@@ -363,13 +367,13 @@ export const GetInfoServicio = (
           // Información radiográfica
           if (res.infoGeneralRadiografia_info_general != null) {
             data.observacionesGenerales +=
-              "-INFORME RADIOGRAFICO : " +
+              ". INFORME RADIOGRAFICO : " +
               res.infoGeneralRadiografia_info_general +
               "\n";
           }
           if (res.conclusionRadiografia_conclu != null) {
             data.observacionesGenerales +=
-              "-CONCLUCIONES : " + res.conclusionRadiografia_conclu + "\n";
+              ". CONCLUCIONES : " + res.conclusionRadiografia_conclu + "\n";
           }
 
           // Radiografía de tórax
@@ -384,7 +388,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ".-" +
+                ". " +
                 res.verticesRadiografiaTorax_txtvertices +
                 "\n";
               data.contador++;
@@ -395,7 +399,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ".-" +
+                ". " +
                 res.hiliosRadiografiaTorax_txthilios +
                 "\n";
               data.contador++;
@@ -408,7 +412,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ".-" +
+                ". " +
                 res.senosCostoFrenicosRadiografiaTorax_txtsenoscostofrenicos +
                 "\n";
               data.contador++;
@@ -419,7 +423,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ".-" +
+                ". " +
                 res.camposPulmonesRadiografiaTorax_txtcampospulm +
                 "\n";
               data.contador++;
@@ -430,7 +434,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ".-" +
+                ". " +
                 res.mediastinosRadiografiaTorax_txtmediastinos +
                 "\n";
               data.contador++;
@@ -443,7 +447,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ".-" +
+                ". " +
                 res.siluetaCardioVascularRadiografiaTorax_txtsiluetacardiovascular +
                 "\n";
               data.contador++;
@@ -454,7 +458,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ".-" +
+                ". " +
                 res.osteomuscularRadiografiaTorax_txtosteomuscular +
                 "\n";
               data.contador++;
@@ -467,7 +471,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ".-" +
+                ". " +
                 res.conclusionesRadiograficasTorax_txtconclusionesradiograficas +
                 "\n";
               data.contador++;
@@ -480,7 +484,7 @@ export const GetInfoServicio = (
           ) {
             data.observacionesGenerales +=
               data.contador +
-              ".-" +
+              ". " +
               res.observacionesRadiografiaTorax_txtobservacionesrt +
               "\n";
             data.contador++;
@@ -488,7 +492,7 @@ export const GetInfoServicio = (
           if (res.observacionesLaboratorioClinico_txtobservacioneslb != null) {
             data.observacionesGenerales +=
               data.contador +
-              ".-" +
+              ". " +
               res.observacionesLaboratorioClinico_txtobservacioneslb +
               "\n";
             data.contador++;
@@ -496,14 +500,14 @@ export const GetInfoServicio = (
           if (res.observacionesAlturaCertificado_alturabarrick != null) {
             data.observacionesGenerales +=
               data.contador +
-              ".-" +
+              ". " +
               res.observacionesAlturaCertificado_alturabarrick +
               "\n";
             data.contador++;
           } else if (res.observacionesAlturaCertificacion_certialtura != null) {
             data.observacionesGenerales +=
               data.contador +
-              ".-" +
+              ". " +
               res.observacionesAlturaCertificacion_certialtura +
               "\n";
             data.contador++;
@@ -511,7 +515,7 @@ export const GetInfoServicio = (
           if (res.observacionesConduccionCertificado_conduccion != null) {
             data.observacionesGenerales +=
               data.contador +
-              ".-" +
+              ". " +
               res.observacionesConduccionCertificado_conduccion +
               "\n";
             data.contador++;
@@ -523,7 +527,7 @@ export const GetInfoServicio = (
           if (coca === "REACTIVO" || coca === "POSITIVO") {
             data.observacionesGenerales +=
               data.contador +
-              ".- TEST DE COCAINA: " +
+              ". TEST DE COCAINA: " +
               coca +
               " COLABORADOR DE LA COMUNIDAD, CONSUME HOJA DE COCA.\n";
             data.cocainaRed = true;
@@ -534,7 +538,7 @@ export const GetInfoServicio = (
           if (marig === "REACTIVO" || marig === "POSITIVO") {
             data.observacionesGenerales +=
               data.contador +
-              ".-MARIHUANA: " +
+              ". MARIHUANA: " +
               marig +
               " COLABORADOR DE LA COMUNIDAD, CONSUME HOJA DE COCA.\n";
             data.marihuanaRed = true;
@@ -636,7 +640,7 @@ export const GetInfoServicio = (
             if (malEstado >= 1) {
               data.observacionesGenerales +=
                 data.contador +
-                "-" +
+                ". " +
                 "CARIES DENTAL.TTO.EVALUACION EN 6 MESES.\n";
               data.contador++;
             }
@@ -669,35 +673,35 @@ export const GetInfoServicio = (
                 data.imcRed = true;
                 data.observacionesGenerales +=
                   data.contador +
-                  ".-" +
+                  ". " +
                   "SOBREPESO:DIETA HIPOCALORICA Y EJERCICIOS.\n";
                 data.contador++;
               } else if (imc >= 30 && imc < 35) {
                 data.imcRed = true;
                 data.observacionesGenerales +=
                   data.contador +
-                  ".-" +
+                  ". " +
                   "OBESIDAD I.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
                 data.contador++;
               } else if (imc >= 35 && imc < 40) {
                 data.imcRed = true;
                 data.observacionesGenerales +=
                   data.contador +
-                  ".-" +
+                  ". " +
                   "OBESIDAD II.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
                 data.contador++;
               } else if (imc >= 40 && imc < 45) {
                 data.imcRed = true;
                 data.observacionesGenerales +=
                   data.contador +
-                  ".-" +
+                  ". " +
                   "OBESIDAD III.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
                 data.contador++;
               } else if (imc >= 45 && imc < 50) {
                 data.imcRed = true;
                 data.observacionesGenerales +=
                   data.contador +
-                  ".-" +
+                  ". " +
                   "OBESIDAD IV.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
                 data.contador++;
               }
@@ -733,21 +737,21 @@ export const GetInfoServicio = (
             res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "NINGUNA";
           data.enfermedadOculares =
             res.enfermedadesOcularesOftalmo_e_oculares ?? "NINGUNA";
-          data.visionColores = "NORMAL";
+
 
           if (
             data.enfermedadOculares !== "NINGUNA" &&
             data.enfermedadOculares !== ""
           ) {
             data.observacionesGenerales +=
-              data.contador + ".-" + data.enfermedadOculares + "\n";
+              data.contador + ". " + data.enfermedadOculares + "\n";
             data.contador++;
           }
 
           if (data.enfermedadOtros === "PTERIGION BILATERAL") {
             data.observacionesGenerales +=
               data.contador +
-              ".-" +
+              ". " +
               " PTERIGION BILATERAL:EVALUACION POR OFTALMOLOGIA.\n";
             data.contador++;
           } else if (
@@ -755,8 +759,9 @@ export const GetInfoServicio = (
             data.enfermedadOtros !== ""
           ) {
             data.observacionesGenerales +=
-              data.contador +
-              ".-" +
+              console.log("aosdnoadsnaosi")
+            data.contador +
+              ". " +
               data.enfermedadOtros +
               ":EVALUACION POR OFTALMOLOGIA.\n";
             data.contador++;
@@ -901,7 +906,7 @@ export const GetInfoServicio = (
           ) {
             data.observacionesGenerales +=
               data.contador +
-              ".-ODONTOGRAMA : " +
+              ". ODONTOGRAMA : " +
               res.observacionesOdontograma_txtobservaciones +
               "\n";
             data.dentaduraObservaciones =
@@ -912,7 +917,7 @@ export const GetInfoServicio = (
           // Espirometría
           if (data.fvc === "N/A") {
             data.observacionesGenerales +=
-              data.contador + ".-" + "NO PASO EXAMEN DE ESPIROMETRIA.\n";
+              data.contador + ". " + "NO PASO EXAMEN DE ESPIROMETRIA.\n";
             data.contador++;
             data.conclusionRespiratoria = interpretacionEspirometria;
           } else {
@@ -933,7 +938,7 @@ export const GetInfoServicio = (
                   conclusion += "-PATRON OBSTRUCTIVO\n";
                   data.observacionesGenerales +=
                     data.contador +
-                    ".-" +
+                    ". " +
                     "PATRON OBSTRUCTIVO LEVE. EVALUACION EN 6 MESES.\n";
                   data.contador++;
                 }
@@ -946,7 +951,7 @@ export const GetInfoServicio = (
                   conclusion += "-PATRON RESTRICTIVO\n";
                   data.observacionesGenerales +=
                     data.contador +
-                    ".-" +
+                    ". " +
                     "PATRON RESTRICTIVO LEVE.EVALUACION EN 6 MESES.\n";
                   data.contador++;
                 }
@@ -954,14 +959,15 @@ export const GetInfoServicio = (
               data.conclusionRespiratoria = conclusion;
             }
           }
-
+          data.visionColores = res.vc_vc ?? "NORMAL"
           // Visión de colores
           if (
             data.visionColores !== "NINGUNA" &&
             data.visionColores !== "NORMAL"
           ) {
+            console.log("jijijaja", data.visionColores)
             data.observacionesGenerales +=
-              data.contador + "-" + data.visionColores + "\n";
+              data.contador + ". " + data.visionColores + "\n";
             data.contador++;
           }
 
@@ -1026,7 +1032,9 @@ export const GetInfoServicio = (
             );
           }
           data.notasDoctor = res.notasDoctor ?? "";
-          data = MapearDatosAdicionales(res, data, data.contador, false);
+          data.mercurioOrina = res.mercurioOrina ?? prev.mercurioOrina,
+            data.plomoSangre = res.plomoSangre ?? prev.plomoSangre,
+            data = MapearDatosAdicionales(res, data, data.contador, false);
           console.log("DATAAA", data);
           set((prev) => ({ ...prev, ...res, ...data }));
         }
@@ -1069,7 +1077,7 @@ export const ValidarExamenesRealizados = (
           const listaTexto = examenesFaltantes
             .map(examen => `• ${examen}`)
             .join('\n');
-
+          console.log('faltan')
           onFail(listaTexto == null || listaTexto == "" ? "" : "El paciente no ha realizado los siguientes exámenes:\n" + listaTexto);
         }
       } else {
@@ -1361,7 +1369,7 @@ export const MapearDatosAdicionales = (
       res.recomendacionesInformeElectroCardiograma_recomendaciones;
 
     if (hallazgo && hallazgo !== "NORMAL." && !isEdit) {
-      let electrocardiogramaText = `${contador}.-ELECTROCARDIOGRAMA: ${hallazgo}`;
+      let electrocardiogramaText = `${contador}.ELECTROCARDIOGRAMA: ${hallazgo}`;
       if (recomendaciones) {
         electrocardiogramaText += `.${recomendaciones}`;
       }
@@ -1430,7 +1438,7 @@ export const MapearDatosAdicionales = (
     ) {
       const colesterol = parseFloat(data.colesterolTotal);
       if (!isNaN(colesterol) && colesterol > 200) {
-        const observacion = `${contador}.- HIPERCOLESTEROLEMIA.DIETA HIPOCALORICA Y EJERCICIOS.\n`;
+        const observacion = `${contador}. HIPERCOLESTEROLEMIA.DIETA HIPOCALORICA Y EJERCICIOS.\n`;
         data.observacionesGenerales =
           (data.observacionesGenerales || "") + observacion;
         data.colesterolRed = true;
@@ -1478,7 +1486,7 @@ export const MapearDatosAdicionales = (
     ) {
       const trigliceridos = parseFloat(data.trigliceridos);
       if (!isNaN(trigliceridos) && trigliceridos > 150) {
-        const observacion = `${contador}.- HIPERTRIGLICERIDEMIA.DIETA HIPOCALORICA Y EJERCICIOS.\n`;
+        const observacion = `${contador}. HIPERTRIGLICERIDEMIA.DIETA HIPOCALORICA Y EJERCICIOS.\n`;
         data.observacionesGenerales =
           (data.observacionesGenerales || "") + observacion;
         data.trigliceridosRed = true;
@@ -1889,7 +1897,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                ".-" +
+                "." +
                 resSimple.verticesRadiografiaTorax_txtvertices +
                 "\n";
               data.contador++;
@@ -1900,7 +1908,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                ".-" +
+                "." +
                 resSimple.hiliosRadiografiaTorax_txthilios +
                 "\n";
               data.contador++;
@@ -1913,7 +1921,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                ".-" +
+                "." +
                 resSimple.senosCostoFrenicosRadiografiaTorax_txtsenoscostofrenicos +
                 "\n";
               data.contador++;
@@ -1924,7 +1932,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                ".-" +
+                "." +
                 resSimple.camposPulmonesRadiografiaTorax_txtcampospulm +
                 "\n";
               data.contador++;
@@ -1935,7 +1943,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                ".-" +
+                "." +
                 resSimple.mediastinosRadiografiaTorax_txtmediastinos +
                 "\n";
               data.contador++;
@@ -1948,7 +1956,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                ".-" +
+                "." +
                 resSimple.siluetaCardioVascularRadiografiaTorax_txtsiluetacardiovascular +
                 "\n";
               data.contador++;
@@ -1959,7 +1967,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                ".-" +
+                "." +
                 resSimple.osteomuscularRadiografiaTorax_txtosteomuscular +
                 "\n";
               data.contador++;
@@ -1972,7 +1980,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                ".-" +
+                "." +
                 resSimple.conclusionesRadiograficasTorax_txtconclusionesradiograficas +
                 "\n";
               data.contador++;
@@ -1985,7 +1993,7 @@ export const GetInfoServicioEditar = (
           ) {
             data.observacionesGenerales2 +=
               data.contador +
-              ".-" +
+              "." +
               resSimple.observacionesRadiografiaTorax_txtobservacionesrt +
               "\n";
             data.contador++;
@@ -1993,7 +2001,7 @@ export const GetInfoServicioEditar = (
           if (resSimple.observacionesLaboratorioClinico_txtobservacioneslb != null) {
             data.observacionesGenerales2 +=
               data.contador +
-              ".-" +
+              "." +
               resSimple.observacionesLaboratorioClinico_txtobservacioneslb +
               "\n";
             data.contador++;
@@ -2001,14 +2009,14 @@ export const GetInfoServicioEditar = (
           if (resSimple.observacionesAlturaCertificado_alturabarrick != null) {
             data.observacionesGenerales2 +=
               data.contador +
-              ".-" +
+              "." +
               resSimple.observacionesAlturaCertificado_alturabarrick +
               "\n";
             data.contador++;
           } else if (resSimple.observacionesAlturaCertificacion_certialtura != null) {
             data.observacionesGenerales2 +=
               data.contador +
-              ".-" +
+              "." +
               resSimple.observacionesAlturaCertificacion_certialtura +
               "\n";
             data.contador++;
@@ -2016,7 +2024,7 @@ export const GetInfoServicioEditar = (
           if (resSimple.observacionesConduccionCertificado_conduccion != null) {
             data.observacionesGenerales2 +=
               data.contador +
-              ".-" +
+              "." +
               resSimple.observacionesConduccionCertificado_conduccion +
               "\n";
             data.contador++;
@@ -2024,7 +2032,7 @@ export const GetInfoServicioEditar = (
           if (coca === "REACTIVO" || coca === "POSITIVO") {
             data.observacionesGenerales2 +=
               data.contador +
-              ".- TEST DE COCAINA: " +
+              ". TEST DE COCAINA: " +
               coca +
               " COLABORADOR DE LA COMUNIDAD, CONSUME HOJA DE COCA.\n";
             data.cocainaRed = true;
@@ -2035,7 +2043,7 @@ export const GetInfoServicioEditar = (
           if (marig === "REACTIVO" || marig === "POSITIVO") {
             data.observacionesGenerales2 +=
               data.contador +
-              ".-MARIHUANA: " +
+              ".MARIHUANA: " +
               marig +
               " COLABORADOR DE LA COMUNIDAD, CONSUME HOJA DE COCA.\n";
             data.marihuanaRed = true;
@@ -2068,35 +2076,35 @@ export const GetInfoServicioEditar = (
                 data.imcRed = true;
                 data.observacionesGenerales2 +=
                   data.contador +
-                  ".-" +
+                  "." +
                   "SOBREPESO:DIETA HIPOCALORICA Y EJERCICIOS.\n";
                 data.contador++;
               } else if (imc >= 30 && imc < 35) {
                 data.imcRed = true;
                 data.observacionesGenerales2 +=
                   data.contador +
-                  ".-" +
+                  "." +
                   "OBESIDAD I.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
                 data.contador++;
               } else if (imc >= 35 && imc < 40) {
                 data.imcRed = true;
                 data.observacionesGenerales2 +=
                   data.contador +
-                  ".-" +
+                  "." +
                   "OBESIDAD II.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
                 data.contador++;
               } else if (imc >= 40 && imc < 45) {
                 data.imcRed = true;
                 data.observacionesGenerales2 +=
                   data.contador +
-                  ".-" +
+                  "." +
                   "OBESIDAD III.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
                 data.contador++;
               } else if (imc >= 45 && imc < 50) {
                 data.imcRed = true;
                 data.observacionesGenerales2 +=
                   data.contador +
-                  ".-" +
+                  "." +
                   "OBESIDAD IV.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
                 data.contador++;
               }
@@ -2107,14 +2115,14 @@ export const GetInfoServicioEditar = (
             data.enfermedadOculares !== ""
           ) {
             data.observacionesGenerales2 +=
-              data.contador + ".-" + data.enfermedadOculares + "\n";
+              data.contador + "." + data.enfermedadOculares + "\n";
             data.contador++;
           }
 
           if (data.enfermedadOtros === "PTERIGION BILATERAL") {
             data.observacionesGenerales2 +=
               data.contador +
-              ".-" +
+              "." +
               " PTERIGION BILATERAL:EVALUACION POR OFTALMOLOGIA.\n";
             data.contador++;
           } else if (
@@ -2123,7 +2131,7 @@ export const GetInfoServicioEditar = (
           ) {
             data.observacionesGenerales2 +=
               data.contador +
-              ".-" +
+              "." +
               data.enfermedadOtros +
               ":EVALUACION POR OFTALMOLOGIA.\n";
             data.contador++;
@@ -2136,7 +2144,7 @@ export const GetInfoServicioEditar = (
           ) {
             data.observacionesGenerales2 +=
               data.contador +
-              ".-ODONTOGRAMA : " +
+              ".ODONTOGRAMA : " +
               resSimple.observacionesOdontograma_txtobservaciones +
               "\n";
             data.dentaduraObservaciones =
@@ -2148,7 +2156,7 @@ export const GetInfoServicioEditar = (
           // Espirometría
           if (data.fvc === "N/A") {
             data.observacionesGenerales2 +=
-              data.contador + ".-" + "NO PASO EXAMEN DE ESPIROMETRIA.\n";
+              data.contador + "." + "NO PASO EXAMEN DE ESPIROMETRIA.\n";
             data.contador++;
             data.conclusionRespiratoria = interpretacionEspirometria;
           } else {
@@ -2169,7 +2177,7 @@ export const GetInfoServicioEditar = (
                   conclusion += "-PATRON OBSTRUCTIVO\n";
                   data.observacionesGenerales2 +=
                     data.contador +
-                    ".-" +
+                    "." +
                     "PATRON OBSTRUCTIVO LEVE. EVALUACION EN 6 MESES.\n";
                   data.contador++;
                 }
@@ -2182,7 +2190,7 @@ export const GetInfoServicioEditar = (
                   conclusion += "-PATRON RESTRICTIVO\n";
                   data.observacionesGenerales2 +=
                     data.contador +
-                    ".-" +
+                    "." +
                     "PATRON RESTRICTIVO LEVE.EVALUACION EN 6 MESES.\n";
                   data.contador++;
                 }

@@ -52,6 +52,15 @@ export const useForm = (initialFormState, options = {}) => {
     });
   };
 
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+
+    setForm((f) => ({
+      ...f,
+      [name]: value.toUpperCase()
+    }));
+  };
+
   const handleChangeNumber = (e) => {
     const { name, value } = e.target;
     if (/^[\d/]*$/.test(value)) {
@@ -210,6 +219,7 @@ export const useForm = (initialFormState, options = {}) => {
     handleClearnotO,
     handlePrintDefault,
     handleRadioButtonBoolean,
-    handleCheckBoxWriteOnText
+    handleCheckBoxWriteOnText,
+    handleBlur
   };
 };

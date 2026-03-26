@@ -7,7 +7,8 @@ import {
 export default function PanelObservaciones({
   form,
   handleRadioButton,
-  handleChange
+  handleChange,
+  handleBlur
 }) {
   return (
     <div className="p-4 h-full mt-16">
@@ -49,6 +50,7 @@ export default function PanelObservaciones({
             label="Recomendaciones y Restricciones"
             name="conclusionMedico"
             value={form.conclusionMedico}
+            onBlur={handleBlur}
             onChange={handleChange}
           />
         </div>
