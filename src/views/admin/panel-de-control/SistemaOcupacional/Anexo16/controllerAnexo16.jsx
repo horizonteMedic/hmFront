@@ -1032,8 +1032,9 @@ export const GetInfoServicio = (
             );
           }
           data.notasDoctor = res.notasDoctor ?? "";
-          data.mercurioOrina = res.mercurioOrina ?? prev.mercurioOrina,
-            data.plomoSangre = res.plomoSangre ?? prev.plomoSangre,
+          data.mercurioOrina = res.mercurioOrina ?? "N/A",
+            data.plomoSangre = res.plomoSangre ?? "N/A",
+
             data = MapearDatosAdicionales(res, data, data.contador, false);
           console.log("DATAAA", data);
           set((prev) => ({ ...prev, ...res, ...data }));

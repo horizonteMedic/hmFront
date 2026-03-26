@@ -189,7 +189,7 @@ export const GetInfoServicioEditar = async (
             edadPaciente: `${res.edadPaciente}`,
             dniUser: prev.dniUser,
             SubirDoc: true,
-
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
     }
 };
@@ -262,6 +262,8 @@ export const SubmitDataService = async (
         "noApto": false,
         "horaSalida": getHoraActual(),
         "orden": null,
+        "userRegistro": user,
+        "usuarioFirma": form.user_medicoFirma
         // "nomenclatura": `INTERCONSULTA${form.NewNomenclatura ? ` ${form.NewNomenclatura}` : ""}`
     };
 
@@ -409,7 +411,6 @@ export const PrintHojaRFichaInterconsulta = async (nro, especialidad, token, tab
             `${obtenerJServerReporte}?nOrden=${nro}&especialidad=${especialidad}&nameService=${tabla}&comprimir=${comprimir ? 1 : 0}`,
             token
         );
-
         // 🔴 Error controlado desde getFetchPdf
         if (response?.error) {
             console.error("Error HTTP:", response);
