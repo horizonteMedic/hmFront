@@ -344,6 +344,7 @@ export default function Anexo16() {
     handleRadioButtonBoolean,
     handleClear,
     handleClearnotO,
+    handleBlur
   } = useForm(initialFormState, { storageKey: "anexo_16" });
 
   const [activeTab, setActiveTab] = useState(0);
@@ -445,6 +446,7 @@ export default function Anexo16() {
                       handleSave={handleSave}
                       handleSearchExamenesRealizados={handleSearchExamenesRealizados}
                       handleChangeSimple={handleChangeSimple}
+                      handleBlur={handleBlur}
                     />
                   )
                 );
