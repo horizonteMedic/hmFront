@@ -759,12 +759,12 @@ export const GetInfoServicio = (
             data.enfermedadOtros !== ""
           ) {
             data.observacionesGenerales +=
-              console.log("aosdnoadsnaosi")
             data.contador +
               ". " +
               data.enfermedadOtros +
               ":EVALUACION POR OFTALMOLOGIA.\n";
             data.contador++;
+            console.log("aosdnoadsnaosi")
           }
 
           // Audiometría
