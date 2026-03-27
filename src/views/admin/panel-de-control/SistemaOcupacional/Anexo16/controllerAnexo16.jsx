@@ -489,14 +489,15 @@ export const GetInfoServicio = (
               "\n";
             data.contador++;
           }
-          if (res.observacionesLaboratorioClinico_txtobservacioneslb != null) {
-            data.observacionesGenerales +=
-              data.contador +
-              ". " +
-              res.observacionesLaboratorioClinico_txtobservacioneslb +
-              "\n";
-            data.contador++;
-          }
+          data.observacionesGenerales += 
+            data.contador + ". " + (
+              res.observacionesLaboratorioClinico_txtobservacioneslb != null &&
+              res.observacionesLaboratorioClinico_txtobservacioneslb !== ""
+                ? res.observacionesLaboratorioClinico_txtobservacioneslb
+                : "LABORATORIO: SIN OBSERVACIONES"
+            ) + "\n";
+
+          data.contador++;
           if (res.observacionesAlturaCertificado_alturabarrick != null) {
             data.observacionesGenerales +=
               data.contador +
@@ -759,12 +760,12 @@ export const GetInfoServicio = (
             data.enfermedadOtros !== ""
           ) {
             data.observacionesGenerales +=
-              console.log("aosdnoadsnaosi")
             data.contador +
               ". " +
               data.enfermedadOtros +
               ":EVALUACION POR OFTALMOLOGIA.\n";
             data.contador++;
+            console.log("aosdnoadsnaosi")
           }
 
           // Audiometría
@@ -1999,14 +2000,17 @@ export const GetInfoServicioEditar = (
               "\n";
             data.contador++;
           }
-          if (resSimple.observacionesLaboratorioClinico_txtobservacioneslb != null) {
-            data.observacionesGenerales2 +=
-              data.contador +
-              "." +
-              resSimple.observacionesLaboratorioClinico_txtobservacioneslb +
-              "\n";
-            data.contador++;
-          }
+          data.observacionesGenerales2 +=
+          data.contador + ". " +
+          (
+            resSimple.observacionesLaboratorioClinico_txtobservacioneslb != null &&
+            resSimple.observacionesLaboratorioClinico_txtobservacioneslb !== ""
+              ? resSimple.observacionesLaboratorioClinico_txtobservacioneslb
+              : "LABORATORIO: SIN OBSERVACIONES"
+          ) +
+          "\n";
+
+        data.contador++;
           if (resSimple.observacionesAlturaCertificado_alturabarrick != null) {
             data.observacionesGenerales2 +=
               data.contador +
