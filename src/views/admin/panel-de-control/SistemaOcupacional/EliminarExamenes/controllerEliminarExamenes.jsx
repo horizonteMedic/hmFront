@@ -13,7 +13,11 @@ const urlsEliminar = {
     // Examen Ocupacional
     triaje: "triaje",
     labClinico: "laboratorio",
+
     rxTorax: "rayosX",
+    radiografia: "rayosX/radiografia",
+    CuestMujeres: "rayosX/consentimiento-mujeres",
+
     fichaAudiologica: "audiometria/fichaAudiologica",
     audiometria: "audiometria/audiometriaPo",
     espirometria: "espirometria",
@@ -256,25 +260,7 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
         // 🔹 2. Mapear lista base de exámenes
         const configActualizada = ExamenesList.map(section => ({
             ...section,
-            items: section.items.map(item => {
-
-                let existe;
-
-                if (item.tabla === "anexo7c") {
-                    existe = anexo16;
-                } else if (item.tabla === "ex_radiograficos_sanguineos") {
-                    existe = anexo16;
-                } else if (item.tabla === "anexo_agroindustrial") {
-                    existe = anexo2;
-                } else {
-                    existe = serviciosMap[item.tabla] === true;
-                }
-
-                return {
-                    ...item,
-                    resultado: existe,
-                };
-            }),
+            items: mapItemsRecursivo(section.items, serviciosMap, anexo16, anexo2),
         }));
 
         console.log('configActualizada', configActualizada)
@@ -291,4 +277,35 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
         Swal.close();
     }
 
+};
+
+const mapItemsRecursivo = (items, serviciosMap, anexo16, anexo2) => {
+    return items.map(item => {
+
+        // 🔹 CASO 1: Es grupo (tiene sub-items)
+        if (item.items && item.title) {
+            return {
+                ...item,
+                items: mapItemsRecursivo(item.items, serviciosMap, anexo16, anexo2)
+            };
+        }
+
+        // 🔹 CASO 2: Es item normal
+        let existe;
+
+        if (item.tabla === "anexo7c") {
+            existe = anexo16;
+        } else if (item.tabla === "ex_radiograficos_sanguineos") {
+            existe = anexo16;
+        } else if (item.tabla === "anexo_agroindustrial") {
+            existe = anexo2;
+        } else {
+            existe = serviciosMap[item.tabla] === true;
+        }
+
+        return {
+            ...item,
+            resultado: existe,
+        };
+    });
 };
