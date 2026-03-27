@@ -226,7 +226,11 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
               ...prev,
               notasDoctor: prev.notasDoctor + "\n" + listaFaltantes,
             }))
-            Swal.close();
+              Swal.fire(
+                          "Alerta",
+                          listaFaltantes,
+                          "info"
+                        );
           });
       });
 
