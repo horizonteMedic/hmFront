@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUp, faFilePdf, faFileImage, faDownload, faEnvelope, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUp, faFilePdf, faFileImage, faDownload, faEnvelope, faPlus, faFileCsv } from '@fortawesome/free-solid-svg-icons';
 import { GetHistoryUser } from '../model/getHistoryUser';
 import { GetlistArchivos } from '../model/getlistArchivos';
 import ModalUpload from '../ModalsDeSubida/ModalUpload';
@@ -9,7 +9,7 @@ import { ReadArchivos, DeleteArchivos64 } from '../model/readArchivos';
 import Swal from 'sweetalert2';
 import { GetCorreosGuardados } from '../ModalCorreo/controllerModalCorreo';
 
-const Modal = ({ closeModal, openModalCorreo, user, iduser, start, end, sede, dni, nombre, empresa, contrata, token, name, apell, Acces }) => {
+const Modal = ({ closeModal, openModalCorreo, refreshe, user, iduser, start, end, sede, dni, nombre, empresa, contrata, token, name, apell, Acces }) => {
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -109,6 +109,11 @@ const Modal = ({ closeModal, openModalCorreo, user, iduser, start, end, sede, dn
     setReload(reload + 1)
   }
 
+  useEffect(() => {
+    reloadread();
+    console.log("useefec refres")
+  }, [refreshe])
+
   const filterArchivos = (readItem) => {
     const archivoEncontrado = listarchivos.find(archivo => archivo.id === readItem.id_tipo_archivo);
     if (archivoEncontrado) {
@@ -122,6 +127,13 @@ const Modal = ({ closeModal, openModalCorreo, user, iduser, start, end, sede, dn
         return (
           <>
             <FontAwesomeIcon icon={faFileImage} size='xl' className="mr-2" style={{ color: archivoEncontrado.codigo }} />
+          </>
+        );
+      }
+      else if (archivoEncontrado.extension === 'xlsx') {
+        return (
+          <>
+            <FontAwesomeIcon icon={faFileCsv} size='xl' className="mr-2" style={{ color: archivoEncontrado.codigo }} />
           </>
         );
       }

@@ -57,14 +57,15 @@ export const GetListArchivosDisponibles = async (
             token
         );
         if (res?.resultado) {
-            return res.resultado;
+            set(res.resultado);
         } else if (res?.status === 404) {
-            return [];
+            set([]);
         } else {
             Swal.fire("Error", "Ocurrió un error al traer la lista de archivos disponibles", "error");
         }
     } catch (error) {
         Swal.fire("Error", "Ocurrio un error al traer la lista de archivos disponibles", "error");
+        set([]);
     } finally {
         onFinish?.();
     }
@@ -210,7 +211,7 @@ export const SubmitCorreo = async (
     form,
     token,
     user,
-    limpiar
+    onFinish
 ) => {
     const esListaCorreosValida = (destino) => {
         if (!destino || destino.trim() === "") return false;
@@ -255,13 +256,13 @@ export const SubmitCorreo = async (
     SubmitData(body, registrarCorreoUrl, token).then((res) => {
         console.log(res)
         if (res.codigo == 202) {
-            limpiar();
             Swal.fire({
                 title: "Exito",
                 text: `Se ha registrado con Éxito`,
                 icon: "success",
                 confirmButtonColor: "#3085d6",
             });
+            onFinish();
         } else {
             Swal.fire("Error", "Ocurrio un error al Registrar", "error");
         }

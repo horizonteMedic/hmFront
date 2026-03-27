@@ -30,6 +30,8 @@ const HistorialPaciente = () => {
 
   const [archivosList, setArchivosList] = useState([])
 
+  const [refreshe, setRefreshe] = useState(0)
+
 
 
   useEffect(() => {
@@ -52,7 +54,7 @@ const HistorialPaciente = () => {
 
   const [data, setData] = useState([]);
 
-  const [refres, setRefresh] = useState(1);
+
   const hasFetchedData = useRef(false)
   const abortController = useRef(null);
   const secondPlaneAbortController = useRef(null);
@@ -100,6 +102,11 @@ const HistorialPaciente = () => {
     const vista = Acceso.find(item => item.nombre === nombreVista);
     return vista?.listaPermisos.includes(permiso) ?? false;
   };
+
+  const refrescar = () => {
+    console.log("regrescar")
+    setRefreshe(prev => prev + 1)
+  }
 
 
   const obtenerListArchivos = async () => {
@@ -506,10 +513,10 @@ const HistorialPaciente = () => {
         </div>
       </div>
 
-      {isModalOpen && <Modal closeModal={closeModal} openModalCorreo={openModalCorreo} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_suc} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell} Acces={tienePermisoEnVista} />}
+      {isModalOpen && <Modal closeModal={closeModal} openModalCorreo={openModalCorreo} refreshe={refreshe} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_suc} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell} Acces={tienePermisoEnVista} />}
 
       {/* Modal de carga de datos */}
-      <ModalCorreo open={showCorreoModal} archivosList={archivosList} norden={nordenSeleccionadoCorreo} nordenYSede={nordenYSedeSeleccionadoCorreo} onClose={() => { setShowCorreoModal(false); setNordenSeleccionadoCorreo(''); setNordenYSedeSeleccionadoCorreo("") }} />
+      <ModalCorreo open={showCorreoModal} archivosList={archivosList} refrescar={refrescar} norden={nordenSeleccionadoCorreo} nordenYSede={nordenYSedeSeleccionadoCorreo} onClose={() => { setShowCorreoModal(false); setNordenSeleccionadoCorreo(''); setNordenYSedeSeleccionadoCorreo("") }} />
       {showDataUploadModal && <DataUploadModal closeModal={() => setShowDataUploadModal(false)} Sedes={ListSedes} user={userlogued.sub} token={token} />}
       {showDataUploadModal2 && <DataUploadModal2 closeModal={() => setShowDataUploadModal2(false)} Sedes={ListSedes} user={userlogued.sub} token={token} />}
       {showHistorial && <Historial closeModal={() => setShowHistorial(false)} token={token} user={userlogued.sub} />}

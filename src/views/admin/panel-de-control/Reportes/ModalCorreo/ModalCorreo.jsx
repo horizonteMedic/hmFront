@@ -5,7 +5,7 @@ import { GetListArchivosDisponibles, GetPlantillaPorNorden, SubmitCorreo } from 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faFile, faPlus, faX } from "@fortawesome/free-solid-svg-icons";
 
-export default function ModalCorreo({ open, onClose, norden, nordenYSede, archivosList }) {
+export default function ModalCorreo({ open, onClose, refrescar, norden, nordenYSede, archivosList }) {
     const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
     const [archivosDisponibles, setArchivosDisponibles] = useState(null);
 
@@ -43,14 +43,14 @@ export default function ModalCorreo({ open, onClose, norden, nordenYSede, archiv
     const obtenerPlantillaPorNorden = async (norden, setForm, token) => {
         await GetPlantillaPorNorden(norden, setForm, onCloseNew, token, archivosList, userName);
     }
-    
+
     const obtenerListArchivosDisponibles = async (nordenYSede, setForm, token) => {
         await GetListArchivosDisponibles(nordenYSede, setForm, token);
     }
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        await SubmitCorreo({ ...form, norden }, token, userlogued, handleClear);
+        await SubmitCorreo({ ...form, norden }, token, userlogued, onCloseNew);
     }
 
     const addEmailForm = () => {
@@ -73,6 +73,7 @@ export default function ModalCorreo({ open, onClose, norden, nordenYSede, archiv
     const onCloseNew = () => {
         handleClear();
         onClose();
+        refrescar();
     }
 
     const handleEmailChange = (index, e) => {
