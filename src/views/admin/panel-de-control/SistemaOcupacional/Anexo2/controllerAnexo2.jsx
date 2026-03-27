@@ -496,9 +496,10 @@ export const GetInfoServicio = (
           ) {
             data.observacionesGenerales += `RADIOGRAFIA: ${res.observacionesRadiografiaTorax_txtobservacionesrt}\n`;
           }
-          if (res.observacionesLabClinico_txtobservacioneslb != null) {
-            data.observacionesGenerales += `LAB CLINICO: ${res.observacionesLabClinico_txtobservacioneslb}\n`;
-          }
+          data.observacionesGenerales += `LAB CLINICO: ${res.observacionesLabClinico_txtobservacioneslb != null &&
+            res.observacionesLabClinico_txtobservacioneslb != ""
+              ? res.observacionesLabClinico_txtobservacioneslb
+              : "SIN OBSERVACIONES"}\n`;
           const coca = res.cocaina_txtcocaina;
           const marig = res.marihuana_txtmarihuana;
           //==============================
@@ -1112,8 +1113,11 @@ export const GetInfoServicioEditar = (
           if (res.observacionesRadiografiaTorax_txtobservacionesrt != null)
             data.observacionesGenerales2 += `RADIOGRAFIA: ${res.observacionesRadiografiaTorax_txtobservacionesrt}\n`;
 
-          if (res.observacionesLabClinico_txtobservacioneslb != null)
-            data.observacionesGenerales2 += `LAB CLINICO: ${res.observacionesLabClinico_txtobservacioneslb}\n`;
+       
+           data.observacionesGenerales2 += `LAB CLINICO: ${res.observacionesLabClinico_txtobservacioneslb != null &&
+            res.observacionesLabClinico_txtobservacioneslb !== ""
+              ? res.observacionesLabClinico_txtobservacioneslb
+                : "SIN OBSERVACIONES"}\n`;
 
 
           const coca = res.cocaina_txtcocaina;
