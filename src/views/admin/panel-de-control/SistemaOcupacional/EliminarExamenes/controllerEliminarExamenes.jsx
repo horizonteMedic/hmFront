@@ -78,6 +78,12 @@ const urlsEliminar = {
     Panel5D: "toxicologia/panel5D",
     Panel10D: "toxicologia/panel10D",
     EtanolSaliva: "etanolSaliva",
+    Consentimiento2d: "laboratorio/consentimiento",
+    Consentimiento3d: "laboratorio/consentimiento",
+    Consentimiento4d: "laboratorio/consentimiento",
+    Consentimiento5d: "laboratorio/consentimiento",
+    Consentimiento10d: "laboratorio/consentimiento",
+    ConsentimientoMari: "laboratorio/consentimiento",
     ConsentimientoBoro: "laboratorio/consentimientoBoro",
     Coprocultivo: "manipuladores/coprocultivo",
     Coproparasitológico: "manipuladores/coproparasitologico",
@@ -119,6 +125,12 @@ const camposExtraEliminar = {
     CONSENT_RECOM_MEDIC: "CONSENT_RECOM_MEDIC",
     DECLA_JURA_ANTECE_PERSON_FAM: "DECLA_JURA_ANTECE_PERSON_FAM",
     DECLA_INFO_APTITUD_MO: "DECLA_INFO_APTITUD_MO",
+    Consentimiento2d: "con_panel2D",
+    Consentimiento3d: "con_panel3D",
+    Consentimiento4d: "con_panel4D",
+    Consentimiento5d: "con_panel5D",
+    Consentimiento10d: "con_panel10D",
+    ConsentimientoMari: "consent_marihuana",
 };
 
 export const VerifyTR = async (nro, tabla, token, set, sede, ExamenesList) => {
