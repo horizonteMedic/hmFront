@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { useForm } from "../../../../hooks/useForm";
 import { GetListArchivosDisponibles, GetPlantillaPorNorden, SubmitCorreo } from "./controllerModalCorreo";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faFile, faPlus, faX } from "@fortawesome/free-solid-svg-icons";
+
+const pesoMaximo = 24;
 
 export default function ModalCorreo({ open, onClose, refrescar, norden, nordenYSede, archivosList }) {
     const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
@@ -63,6 +66,30 @@ export default function ModalCorreo({ open, onClose, refrescar, norden, nordenYS
                     )
                 }))
         };
+
+        // VALIDACIÓN DE PESO MÁXIMO (2 MB) POR CORREO
+        const correosExcedidos = formFiltrado.plantillaConfig
+            .filter(p => !p.anulado)
+            .map((p, index) => {
+                const emailWeight = p.archivos.reduce((eAcc, a) => {
+                    const ad = archivosDisponibles?.find(d => d.nomenclatura === a.nomenclatura);
+                    return eAcc + (parseFloat(ad?.peso) || 0);
+                }, 0);
+                return { index: index + 1, emailWeight };
+            })
+            .filter(e => e.emailWeight > pesoMaximo);
+
+        if (correosExcedidos.length > 0) {
+            const indices = correosExcedidos.map(e => e.index).join(", ");
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peso máximo excedido',
+                text: `El correo ${correosExcedidos.length > 1 ? `s ${indices}` : indices} excede el límite de ${pesoMaximo} MB por correo.`,
+                confirmButtonColor: '#3085d6',
+            });
+            return;
+        }
+
         await SubmitCorreo({ ...formFiltrado, norden }, token, userlogued, onCloseNew);
     }
 
@@ -366,21 +393,24 @@ export default function ModalCorreo({ open, onClose, refrescar, norden, nordenYS
                                             })()}
 
                                             {/* Peso Total */}
-                                            <div className="flex justify-end pr-4 mt-1">
-                                                <span className="text-xs font-bold text-gray-500">
-                                                    Peso Total: {(() => {
-                                                        const total = form.plantillaConfig[index]?.archivos?.reduce((acc, a) => {
-                                                            if (a.anulado) return acc;
-                                                            const ad = archivosDisponibles?.find(d => d.nomenclatura === a.nomenclatura);
-                                                            if (!ad) return acc;
-                                                            // Intentar extraer el número del peso (ej: "1.2 MB" -> 1.2)
-                                                            const val = parseFloat(ad.peso) || 0;
-                                                            return acc + val;
-                                                        }, 0);
-                                                        return total?.toFixed(2) || "0.00";
-                                                    })()} MB
-                                                </span>
-                                            </div>
+                                            {(() => {
+                                                const total = form.plantillaConfig[index]?.archivos?.reduce((acc, a) => {
+                                                    if (a.anulado) return acc;
+                                                    const ad = archivosDisponibles?.find(d => d.nomenclatura === a.nomenclatura);
+                                                    if (!ad) return acc;
+                                                    const val = parseFloat(ad.peso) || 0;
+                                                    return acc + val;
+                                                }, 0) || 0;
+
+                                                return (
+                                                    <span
+                                                        className={`text-xs font-bold ${total > pesoMaximo ? "text-red-500" : "text-gray-500"
+                                                            }`}
+                                                    >
+                                                        Peso Total: {total.toFixed(2)} MB
+                                                    </span>
+                                                );
+                                            })()}
                                         </div>
                                         {/* MENSAJE */}
                                         <textarea
@@ -401,19 +431,31 @@ export default function ModalCorreo({ open, onClose, refrescar, norden, nordenYS
                 </div>
 
                 {/* Footer */}
-                <div className="flex justify-end gap-2 p-6 pt-2 ">
-                    {/* <button
-                        onClick={onCloseNew}
-                        className="px-4 py-2 text-sm rounded-lg bg-gray-100 hover:bg-gray-200"
-                    >
-                        Cancelar
-                    </button> */}
-
-                    <button
-                        onClick={onSubmit}
-                        className="px-4 py-2  rounded-lg bg-blue-500 text-white hover:bg-blue-600">
-                        Guardar Correo(s)
-                    </button>
+                <div className="flex justify-between items-center p-6 pt-2 ">
+                    <div className="flex flex-col">
+                        <span className="text-[10px] text-gray-400 font-semibold">
+                            (Máximo {pesoMaximo} MB por correo)
+                        </span>
+                        {(() => {
+                            const algunCorreoExcedido = form.plantillaConfig?.some(p => {
+                                if (p.anulado) return false;
+                                const emailWeight = p.archivos?.reduce((eAcc, a) => {
+                                    if (a.anulado) return eAcc;
+                                    const ad = archivosDisponibles?.find(d => d.nomenclatura === a.nomenclatura);
+                                    return eAcc + (parseFloat(ad?.peso) || 0);
+                                }, 0);
+                                return emailWeight > pesoMaximo;
+                            });
+                            return algunCorreoExcedido && <span className="text-[10px] text-red-500 font-semibold">⚠️ Un correo excede el límite permitido</span>;
+                        })()}
+                    </div>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={onSubmit}
+                            className="px-4 py-2  rounded-lg bg-blue-500 text-white hover:bg-blue-600">
+                            Guardar Correo(s)
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
