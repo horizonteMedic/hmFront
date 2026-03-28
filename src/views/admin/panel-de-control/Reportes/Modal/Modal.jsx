@@ -7,7 +7,7 @@ import ModalUpload from '../ModalsDeSubida/ModalUpload';
 import { GetArchivosSubidos } from '../model/getArchivosSubidos';
 import { ReadArchivos, DeleteArchivos64 } from '../model/readArchivos';
 import Swal from 'sweetalert2';
-import { GetCorreosGuardados } from '../ModalCorreo/controllerModalCorreo';
+import { AutorizarEnvioCorreo, GetCorreosGuardados } from '../ModalCorreo/controllerModalCorreo';
 
 const Modal = ({ closeModal, openModalCorreo, refreshe, user, iduser, start, end, sede, dni, nombre, empresa, contrata, token, name, apell, Acces }) => {
 
@@ -233,6 +233,12 @@ const Modal = ({ closeModal, openModalCorreo, refreshe, user, iduser, start, end
   };
   console.log(data)
 
+  const enviarAutorizacionCorreo = (ordenYSede) => {
+    AutorizarEnvioCorreo(ordenYSede, token, () => {
+      reloadread();
+    });
+  }
+
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
       <div
@@ -336,7 +342,7 @@ const Modal = ({ closeModal, openModalCorreo, refreshe, user, iduser, start, end
                             <p>Enviados: {enviados}</p>
                             {pendientes != 0 && (
                               <button
-                                onClick={() => { }}
+                                onClick={() => { enviarAutorizacionCorreo(dataItem.historiaClinica) }}
                                 className="py-2 px-3 bg-green-700 rounded space-x-1 text-white"
                               >
                                 <FontAwesomeIcon icon={faEnvelope} />

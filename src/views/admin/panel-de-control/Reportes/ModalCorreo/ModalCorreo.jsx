@@ -50,7 +50,20 @@ export default function ModalCorreo({ open, onClose, refrescar, norden, nordenYS
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        await SubmitCorreo({ ...form, norden }, token, userlogued, onCloseNew);
+        // Filtrar archivos que no están disponibles antes de enviar
+        const formFiltrado = {
+            ...form,
+            plantillaConfig: form.plantillaConfig
+                .filter(p => !p.anulado) // 1. Filtrar plantillas anuladas
+                .map(p => ({
+                    ...p,
+                    archivos: p.archivos.filter(a =>
+                        !a.anulado && // 2. Filtrar archivos anulados
+                        archivosDisponibles?.some(ad => ad.nomenclatura === a.nomenclatura) // 3. Filtrar archivos no disponibles
+                    )
+                }))
+        };
+        await SubmitCorreo({ ...formFiltrado, norden }, token, userlogued, onCloseNew);
     }
 
     const addEmailForm = () => {
@@ -273,41 +286,101 @@ export default function ModalCorreo({ open, onClose, refrescar, norden, nordenYS
                                         </div>
 
                                         {/* ARCHIVOS */}
-                                        <div className="flex flex-wrap gap-2 pt-2">
-                                            <span className="w-32 font-semibold text-gray-500">
-                                                Archivos
-                                            </span>
-                                            {archivosList?.map((archivo) => {
-                                                const seleccionado = form.plantillaConfig[index]?.archivos?.some(
-                                                    a => (a.idTipoArchivo === archivo.idTipoArchivo) && !a.anulado
+                                        <div className="flex flex-col gap-2 pt-2">
+                                            <div className="flex flex-wrap gap-2">
+                                                <span className="w-32 font-semibold text-gray-500">
+                                                    Archivos
+                                                </span>
+                                                {archivosList?.map((archivo) => {
+                                                    const seleccionado = form.plantillaConfig[index]?.archivos?.some(
+                                                        a => (a.idTipoArchivo === archivo.idTipoArchivo) && !a.anulado
+                                                    );
+                                                    const archivoDisponible = archivosDisponibles?.find(ad => ad.nomenclatura === archivo.nomenclatura);
+
+                                                    // Si no está disponible pero está seleccionado, lo mostramos abajo en "No subidos"
+                                                    if (!archivoDisponible && seleccionado) return null;
+
+                                                    const peso = archivoDisponible?.peso || "0";
+                                                    const noDisponible = !archivoDisponible;
+
+                                                    return (
+                                                        <button
+                                                            key={archivo.idTipoArchivo}
+                                                            type="button"
+                                                            disabled={noDisponible}
+                                                            onClick={() => toggleArchivo(index, archivo)}
+                                                            className={`
+                                                                           relative flex items-center gap-2 px-4 py-1.5 text-xs font-medium rounded-full border
+                                                                           transition-all duration-200 ease-in-out
+                                                                           ${noDisponible ? "opacity-40 cursor-not-allowed bg-gray-50 border-gray-200 text-gray-400" : "transform active:scale-95 hover:scale-105"}
+                       
+                                                                           ${seleccionado
+                                                                    ? "bg-blue-500 border-blue-500 text-white shadow-md"
+                                                                    : !noDisponible ? "bg-white border-gray-300 text-gray-600 hover:bg-gray-100 hover:border-gray-400 shadow-sm hover:shadow-md" : ""}
+                                                                           `}
+                                                        >
+                                                            {/* Icono SIEMPRE igual */}
+                                                            <FontAwesomeIcon icon={faFile} className="text-[12px]" />
+                                                            <span>{archivo.nomenclatura}</span>
+                                                            {!noDisponible && (
+                                                                <span className={`ml-1 text-[10px] ${seleccionado ? "text-blue-100" : "text-gray-400"}`}>
+                                                                    ({peso})
+                                                                </span>
+                                                            )}
+                                                            {/* Check pequeño flotante */}
+                                                            {seleccionado && (
+                                                                <span className="absolute -top-1 -right-1 bg-white text-blue-500 rounded-full text-[10px] px-1 shadow">
+                                                                    <FontAwesomeIcon icon={faCheck} />
+                                                                </span>
+                                                            )}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+
+                                            {/* Archivos no subidos */}
+                                            {(() => {
+                                                const marcadosNoDisponibles = form.plantillaConfig[index]?.archivos?.filter(
+                                                    a => !a.anulado && !archivosDisponibles?.some(ad => ad.nomenclatura === a.nomenclatura)
                                                 );
-                                                return (
-                                                    <button
-                                                        key={archivo.idTipoArchivo}
-                                                        type="button"
-                                                        onClick={() => toggleArchivo(index, archivo)}
-                                                        className={`
-                                                                      relative flex items-center gap-2 px-4 py-1.5 text-xs font-medium rounded-full border
-                                                                      transition-all duration-200 ease-in-out
-                                                                      transform active:scale-95 hover:scale-105
-                  
-                                                                      ${seleccionado
-                                                                ? "bg-blue-500 border-blue-500 text-white shadow-md"
-                                                                : "bg-white border-gray-300 text-gray-600 hover:bg-gray-100 hover:border-gray-400 shadow-sm hover:shadow-md"}
-                                                                      `}
-                                                    >
-                                                        {/* Icono SIEMPRE igual */}
-                                                        <FontAwesomeIcon icon={faFile} className="text-[12px]" />
-                                                        {archivo.nomenclatura}
-                                                        {/* Check pequeño flotante */}
-                                                        {seleccionado && (
-                                                            <span className="absolute -top-1 -right-1 bg-white text-blue-500 rounded-full text-[10px] px-1 shadow">
-                                                                <FontAwesomeIcon icon={faCheck} />
+
+                                                if (marcadosNoDisponibles?.length > 0) {
+                                                    return (
+                                                        <div className="flex flex-wrap gap-2 mt-1">
+                                                            <span className="w-32 font-semibold text-gray-400 text-[11px]">
+                                                                No subidos (No se enviarán)
                                                             </span>
-                                                        )}
-                                                    </button>
-                                                );
-                                            })}
+                                                            {marcadosNoDisponibles.map((a, i) => (
+                                                                <div
+                                                                    key={i}
+                                                                    className="flex items-center gap-2 px-4 py-1.5 text-xs font-medium rounded-full border bg-sky-50 border-sky-200 text-sky-400/70 cursor-not-allowed opacity-75"
+                                                                >
+                                                                    <FontAwesomeIcon icon={faFile} className="text-[12px]" />
+                                                                    {a.nomenclatura}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    );
+                                                }
+                                                return null;
+                                            })()}
+
+                                            {/* Peso Total */}
+                                            <div className="flex justify-end pr-4 mt-1">
+                                                <span className="text-xs font-bold text-gray-500">
+                                                    Peso Total: {(() => {
+                                                        const total = form.plantillaConfig[index]?.archivos?.reduce((acc, a) => {
+                                                            if (a.anulado) return acc;
+                                                            const ad = archivosDisponibles?.find(d => d.nomenclatura === a.nomenclatura);
+                                                            if (!ad) return acc;
+                                                            // Intentar extraer el número del peso (ej: "1.2 MB" -> 1.2)
+                                                            const val = parseFloat(ad.peso) || 0;
+                                                            return acc + val;
+                                                        }, 0);
+                                                        return total?.toFixed(2) || "0.00";
+                                                    })()} MB
+                                                </span>
+                                            </div>
                                         </div>
                                         {/* MENSAJE */}
                                         <textarea

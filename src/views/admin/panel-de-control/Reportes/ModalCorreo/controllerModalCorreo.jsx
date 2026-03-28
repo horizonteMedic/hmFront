@@ -9,6 +9,7 @@ const obtenerListArchivosDisponiblesUrl = "/api/v01/ct/archivos/detalleArchivoSe
 const obtenerCorreosGuardados = "/api/v01/st/email/buscarPorNordenYEstado"
 const obtenerPlantillaPorNordenUrl = "/api/v01/ct/plantillaCorreo/obtenerPlantillaCorreoDatosNorden"
 const registrarCorreoUrl = "/api/v01/st/email/registrarActualizarCorreo"
+const autorizarCorreoUrl="/api/v01/st/email/enviarCorreos"
 
 const nombresExamen = {
     ANUAL: "EMOA",
@@ -268,6 +269,30 @@ export const SubmitCorreo = async (
         }
     });
 };
+
+export const AutorizarEnvioCorreo = async (
+    nordenYSede,
+    token,
+    onFinish
+) => {
+    const body = {};
+    Loading("Enviando Correos");
+    SubmitData(body, `${autorizarCorreoUrl}/${nordenYSede}`, token).then((res) => {
+        console.log(res)
+        if (res.codigo == 202) {
+            Swal.fire({
+                title: "Exito",
+                text: `Los correos se han autorizado para ser enviados con Éxito`,
+                icon: "success",
+                confirmButtonColor: "#3085d6",
+            });
+            onFinish();
+        } else {
+            Swal.fire("Error", "Ocurrio un error al autorizar los correos", "error");
+        }
+    });
+};
+
 
 export const Loading = (mensaje) => {
     LoadingDefault(mensaje);
