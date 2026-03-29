@@ -8,6 +8,9 @@ const obtenerReporteUrl =
     "/api/v01/st/registros/obtenerExistenciasExamenes";
 const GetExamenURL = `/api/v01/st/registros/obtenerExistenciasExamenes`
 const obtenerAnexosExistencia = `/api/v01/ct/anexos/cerrado`
+const GetNomenclatura = `/api/v01/ct/fichaInterconsulta/obtenerEspecialidadesNomenclaturaFichaInterconsulta`
+const obtenerEspecialidad =
+    "/api/v01/ct/fichaInterconsulta/obtenerEspecialidadesFichaInterconsulta";
 
 const urlsEliminar = {
     // Examen Ocupacional
@@ -120,6 +123,13 @@ const urlsEliminar = {
     InformeBurnout: "informeBurnout/informe-burnout",
     InformePsicoAdeco: "informePsicologicoAdeco/informe-psicologico-adeco",
     PsicoEspaciosConfi: "psicologiaEspaciosConfinados/psicologia-espacios-confinados",
+    //Poderosa
+    CertAlturaPoderosa: "certificadoTrabajoAltura",
+    CertAptitudPoderosa: "aptitudCertificadoCaliente/aptitud-certificado-caliente",
+    AptitudLicencia: "aptitudLicenciaConducir/aptitud-licencia-conducir",
+    HojaConsultaEx: "hojaConsultaExterna/hoja-consulta-externa",
+    CertManpAlimentos: "certificadoManipuladoresAlimentos",
+    AptiHerramientas: "certificadoAptitudHerramientasManuales/certificado-aptitud-herramientas-manuales"
 }
 
 const camposExtraEliminar = {
@@ -147,6 +157,102 @@ export const DeleteExamen = async (norden, campo, token, setForm, form) => {
         return;
     }
     console.log(campo)
+    if (campo === "interconsulta") {
+        const res = await getFetch(
+            `${obtenerEspecialidad}?nOrden=${norden}`,
+            token
+        );
+        if (Array.isArray(res) && res.length > 0) {
+            const inputOptions = res.reduce((acc, item) => {
+                acc[item.mensaje] = item.mensaje;
+                return acc;
+            }, {});
+            console.log(inputOptions)
+            const totalRadios = Object.keys(inputOptions).length;
+            let height = 300; // base
+            let width;
+            if (totalRadios <= 2) width = "400px";
+            else if (totalRadios <= 5) width = "550px";
+            else if (totalRadios <= 8) width = "700px";
+            else width = "900px";
+            if (totalRadios > 5) height += (totalRadios - 5) * 30; // suma 40px por cada extra
+            // Mostrar SweetAlert con radios
+            const { value: seleccion } = await Swal.fire({
+                title: "¿Qué especialidad desea eliminar?",
+                input: "radio",
+                inputOptions,
+                inputValidator: (value) => {
+                    if (!value) return "Debes seleccionar una opción o crear una nueva.";
+                },
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonText: "Eliminar",
+                cancelButtonText: "Cancelar",
+                allowOutsideClick: false,
+                customClass: {
+                    popup: "swal-dinamico",
+                },
+                didOpen: () => {
+                    const popup = Swal.getPopup();
+                    popup.style.maxHeight = `${height}px`;
+                    popup.style.width = width; // ← se aplica el ancho dinámico aquí
+                }
+            });
+            if (seleccion) {
+                console.log("✅ Especialidad seleccionada:", seleccion);
+                const response = await fetch(`${URLAzure}/api/v01/ct/fichaInterconsulta/ficha-interconsulta/eliminar/${norden}/${seleccion}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                if (response.ok === true) {
+
+                    const actualizarLista = (lista, campo) =>
+                        lista.map(section => ({
+                            ...section,
+                            items: section.items.map(item => {
+                                // 🔴 Caso especial
+                                if (campo === "anexo16") {
+                                    if (item.name === "anexo16" || item.name === "exRxSanguineos") {
+                                        return { ...item, resultado: false, imprimir: false };
+                                    }
+                                }
+
+                                // 🟢 Caso normal
+                                if (item.name === campo) {
+                                    return { ...item, resultado: false, imprimir: false };
+                                }
+
+                                return item;
+                            })
+                        }));
+
+                    Swal.fire("Eliminado", "El registro ha sido eliminado", "success");
+
+                    setForm((prev) => ({
+                        ...prev,
+
+                        // 🔴 Caso especial en el state plano
+                        ...(campo === "anexo16"
+                            ? {
+                                anexo16: false,
+                                exRxSanguineos: prev.exRxSanguineos ? false : false // (siempre false, pero explícito)
+                            }
+                            : {
+                                [campo]: ""
+                            }),
+
+                        listaExamenes: actualizarLista(prev.listaExamenes, campo),
+                    }));
+                } else {
+                    Swal.fire("Error", "No se pudo eliminar el registro", "error");
+                }
+                return
+            }
+        }
+    }
     const result = await Swal.fire({
         title: "¿Está seguro?",
         text: `¿Desea eliminar el registro de ${campo}?`,
@@ -157,6 +263,7 @@ export const DeleteExamen = async (norden, campo, token, setForm, form) => {
         confirmButtonText: "Sí, eliminar",
         cancelButtonText: "Cancelar",
     });
+
 
     if (result.isConfirmed) {
         try {
@@ -244,15 +351,20 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
     LoadingDefault("Cargando examenes");
 
     try {
-        const [res, anexo16, anexo2] = await Promise.all([
+        const [res, anexo16, anexo2, interconsulta] = await Promise.allSettled([
             getFetch(`${GetExamenURL}?nOrden=${nro}`, token),
             getFetch(`${obtenerAnexosExistencia}?tabla=anexo7c&nOrden=${nro}`, token),
-            getFetch(`${obtenerAnexosExistencia}?tabla=anexo_agroindustrial&nOrden=${nro}`, token)
+            getFetch(`${obtenerAnexosExistencia}?tabla=anexo_agroindustrial&nOrden=${nro}`, token),
+            getFetch(`${GetNomenclatura}?nOrden=${nro}`, token)
         ]);
-        console.log('respuesta', res, anexo16, anexo2)
+        console.log('respuesta', res, anexo16, anexo2, interconsulta)
 
+        const listInterconsultas = interconsulta.value?.resultado ? interconsulta.value?.resultado : []
+        console.log(listInterconsultas)
+        const especialidades = listInterconsultas.map(i => i.especialidad);
+        console.log(especialidades)
         // 🔹 1. Normalizar respuesta a mapa por nameService
-        const serviciosMap = Object.values(res).reduce((acc, item) => {
+        const serviciosMap = Object.values(res.value).reduce((acc, item) => {
             acc[item.nameService] = item.existe;
             return acc;
         }, {});
@@ -260,7 +372,7 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
         // 🔹 2. Mapear lista base de exámenes
         const configActualizada = ExamenesList.map(section => ({
             ...section,
-            items: mapItemsRecursivo(section.items, serviciosMap, anexo16, anexo2),
+            items: mapItemsRecursivo(section.items, serviciosMap, anexo16.value, anexo2.value, especialidades),
         }));
 
         console.log('configActualizada', configActualizada)
@@ -279,18 +391,24 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
 
 };
 
-const mapItemsRecursivo = (items, serviciosMap, anexo16, anexo2) => {
+const mapItemsRecursivo = (items, serviciosMap, anexo16, anexo2, especialidades) => {
     return items.map(item => {
-
+        console.log('especialidada', especialidades)
         // 🔹 CASO 1: Es grupo (tiene sub-items)
         if (item.items && item.title) {
             return {
                 ...item,
-                items: mapItemsRecursivo(item.items, serviciosMap, anexo16, anexo2)
+                items: mapItemsRecursivo(item.items, serviciosMap, anexo16, anexo2, especialidades)
             };
         }
 
         // 🔹 CASO 2: Es item normal
+        if (item.tabla === "interconsulta") {
+            return {
+                ...item,
+                resultado: especialidades, // array
+            };
+        }
         let existe;
 
         if (item.tabla === "anexo7c") {

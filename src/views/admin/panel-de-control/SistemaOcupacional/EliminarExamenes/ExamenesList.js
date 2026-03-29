@@ -15,6 +15,18 @@ export const EXAMENES_CONFIG = [
             { label: "Anexo 16-A", name: "anexo16A", tabla: "anexo16a" },
             { label: "Muestra de Sangre", name: "consentimientoDosaje", tabla: "consent_Muestra_Sangre" },
             { label: "Anexo 16", name: "anexo16", tabla: "anexo7c" },
+            { label: "Ficha Interconsulta", name: "interconsulta", tabla: "interconsulta" },
+            {
+                title: "EXAMENES PODEROSA",
+                items: [
+                    { label: "Certificado Altura Poderosa", name: "CertAlturaPoderosa", tabla: "certificado_altura_poderosa" },
+                    { label: "Certificado Aptitud Poderosa", name: "CertAptitudPoderosa", tabla: "aptitud_altura_poderosa" },
+                    { label: "Aptitud Licencia Interna", name: "AptitudLicencia", tabla: "aptitud_licencia_conduciri" },
+                    { label: "Hoja Consulta Externa", name: "HojaConsultaEx", tabla: "hoja_consulta_externa" },
+                    { label: "Cert. Manipuladores de Alimentos", name: "CertManpAlimentos", tabla: "certificado_manipuladores_barrick" },
+                    { label: "Aptitud Herramientas Manuales", name: "AptiHerramientas", tabla: "certificado_aptitud_herramientas_manuales" },
+                ]
+            },
         ],
     },
     {
@@ -131,7 +143,6 @@ export const EXAMENES_CONFIG = [
             { label: "Audiometría Simple", name: "", tabla: "" }, //falta B.
             { label: "Audiometría OHLA", name: "audiometria", tabla: "audiometria_po" },
             { label: "Cuest. Audiometría", name: "cuestAudiometria", tabla: "cuestionario_audiometria" },
-            { label: "Ficha Audiológica", name: "fichaAudiologica", tabla: "ficha_audiologica" },//SEBORRA JUNTO CON AUDIOMETRIA OHLA, IGUAL QUE RX SANGUINEO Y 16
         ],
     },
     {

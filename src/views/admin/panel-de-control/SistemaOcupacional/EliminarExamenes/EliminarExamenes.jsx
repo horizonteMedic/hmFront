@@ -106,7 +106,7 @@ export default function EliminarExamenes() {
 
         return result;
     };
-
+    console.log(form.listaExamenes)
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
             {/* Búsqueda */}
@@ -156,7 +156,15 @@ export default function EliminarExamenes() {
                                                         key={item.name}
                                                         label={item.label}
                                                         name={item.name}
-                                                        value={item.resultado === true ? "PASO" : "NO PASO"}
+                                                        value={
+                                                            Array.isArray(item.resultado)
+                                                                ? item.resultado.length > 0
+                                                                    ? "PASO"
+                                                                    : "NO TIENE"
+                                                                : item.resultado === true
+                                                                    ? "PASO"
+                                                                    : "NO PASO"
+                                                        }
                                                     />
                                                 ))}
                                         </div>
