@@ -499,7 +499,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             //Necesita
             Swal.fire(
                 "Alerta",
-                "El paciente necesita pasar por Triaje.",
+                "El paciente necesita pasar por Triaje o Antecedentes Patológicos.",
                 "warning"
             );
         }
