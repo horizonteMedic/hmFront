@@ -123,13 +123,19 @@ const urlsEliminar = {
     InformeBurnout: "informeBurnout/informe-burnout",
     InformePsicoAdeco: "informePsicologicoAdeco/informe-psicologico-adeco",
     PsicoEspaciosConfi: "psicologiaEspaciosConfinados/psicologia-espacios-confinados",
+    AnteceEnfeAltura: "antecedentesEnfermedadesAltura/antecedentes-enfermedades-altura",
+    audiometria_2023: "manipuladores/audiometria-2023",
     //Poderosa
     CertAlturaPoderosa: "certificadoTrabajoAltura",
     CertAptitudPoderosa: "aptitudCertificadoCaliente/aptitud-certificado-caliente",
     AptitudLicencia: "aptitudLicenciaConducir/aptitud-licencia-conducir",
     HojaConsultaEx: "hojaConsultaExterna/hoja-consulta-externa",
     CertManpAlimentos: "certificadoManipuladoresAlimentos",
-    AptiHerramientas: "certificadoAptitudHerramientasManuales/certificado-aptitud-herramientas-manuales"
+    AptiHerramientas: "certificadoAptitudHerramientasManuales/certificado-aptitud-herramientas-manuales",
+    FichaDatosPacientes: "fichaDatosPersonales/ficha-datos-personales",
+    CertAptiBrigadista: "certificadoAptitudBrigadista/certificado-aptitud-brigadista",
+    DireccionMina: "ministerioEnergiaMinas/ministerio-energia",
+    HojaRutaEMO: "hojaRutaEmo/hoja-ruta-emo",
 }
 
 const camposExtraEliminar = {
@@ -185,7 +191,6 @@ export const DeleteExamen = async (norden, campo, token, setForm, form) => {
                     if (!value) return "Debes seleccionar una opción o crear una nueva.";
                 },
                 showCancelButton: true,
-                showDenyButton: true,
                 confirmButtonText: "Eliminar",
                 cancelButtonText: "Cancelar",
                 allowOutsideClick: false,
@@ -208,47 +213,13 @@ export const DeleteExamen = async (norden, campo, token, setForm, form) => {
                     },
                 });
                 if (response.ok === true) {
-
-                    const actualizarLista = (lista, campo) =>
-                        lista.map(section => ({
-                            ...section,
-                            items: section.items.map(item => {
-                                // 🔴 Caso especial
-                                if (campo === "anexo16") {
-                                    if (item.name === "anexo16" || item.name === "exRxSanguineos") {
-                                        return { ...item, resultado: false, imprimir: false };
-                                    }
-                                }
-
-                                // 🟢 Caso normal
-                                if (item.name === campo) {
-                                    return { ...item, resultado: false, imprimir: false };
-                                }
-
-                                return item;
-                            })
-                        }));
-
                     Swal.fire("Eliminado", "El registro ha sido eliminado", "success");
-
-                    setForm((prev) => ({
-                        ...prev,
-
-                        // 🔴 Caso especial en el state plano
-                        ...(campo === "anexo16"
-                            ? {
-                                anexo16: false,
-                                exRxSanguineos: prev.exRxSanguineos ? false : false // (siempre false, pero explícito)
-                            }
-                            : {
-                                [campo]: ""
-                            }),
-
-                        listaExamenes: actualizarLista(prev.listaExamenes, campo),
-                    }));
+                    GetExamenesCheck(norden, setForm, token, form.listaExamenes, false);
                 } else {
                     Swal.fire("Error", "No se pudo eliminar el registro", "error");
                 }
+                return
+            } else {
                 return
             }
         }
@@ -280,7 +251,7 @@ export const DeleteExamen = async (norden, campo, token, setForm, form) => {
             console.log(response)
             if (response.ok === true) {
 
-                const actualizarLista = (lista, campo) =>
+                /*const actualizarLista = (lista, campo) =>
                     lista.map(section => ({
                         ...section,
                         items: section.items.map(item => {
@@ -298,11 +269,11 @@ export const DeleteExamen = async (norden, campo, token, setForm, form) => {
 
                             return item;
                         })
-                    }));
+                    }));*/
 
                 Swal.fire("Eliminado", "El registro ha sido eliminado", "success");
-
-                setForm((prev) => ({
+                GetExamenesCheck(norden, setForm, token, form.listaExamenes, false)
+                /*setForm((prev) => ({
                     ...prev,
 
                     // 🔴 Caso especial en el state plano
@@ -316,7 +287,7 @@ export const DeleteExamen = async (norden, campo, token, setForm, form) => {
                         }),
 
                     listaExamenes: actualizarLista(prev.listaExamenes, campo),
-                }));
+                }));*/
             } else {
                 Swal.fire("Error", "No se pudo eliminar el registro", "error");
             }
@@ -347,8 +318,8 @@ const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
     }
 };
 
-const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
-    LoadingDefault("Cargando examenes");
+const GetExamenesCheck = async (nro, set, token, ExamenesList, carga = true) => {
+    if (carga === true) LoadingDefault("Cargando examenes")
 
     try {
         const [res, anexo16, anexo2, interconsulta] = await Promise.allSettled([

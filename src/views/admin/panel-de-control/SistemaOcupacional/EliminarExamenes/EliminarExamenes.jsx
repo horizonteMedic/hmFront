@@ -106,7 +106,7 @@ export default function EliminarExamenes() {
 
         return result;
     };
-    console.log(form.listaExamenes)
+
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
             {/* Búsqueda */}
@@ -137,8 +137,8 @@ export default function EliminarExamenes() {
                             .filter(section => section.column === col)
                             .map(section => (
                                 <SectionFieldset key={section.legend} legend={section.legend} className={"!px-0"}>
-                                    {(section.sections || normalizeItems(section.items)).map(sub => (
-                                        <div key={sub.title} className="mb-3">
+                                    {(section.sections || normalizeItems(section.items)).map((sub, index) => (
+                                        <div key={`${sub.title}-${index}`} className="mb-3">
 
                                             {/* 🔸 Título */}
                                             {sub.title && (
@@ -151,9 +151,9 @@ export default function EliminarExamenes() {
                                             {sub.items
                                                 .slice() // 🔹 evita mutar el original
                                                 .sort((a, b) => a.label.localeCompare(b.label, 'es', { sensitivity: 'base' }))
-                                                .map(item => (
+                                                .map((item, index) => (
                                                     <ExamenRow
-                                                        key={item.name}
+                                                        key={`${item.name}-${index}`}
                                                         label={item.label}
                                                         name={item.name}
                                                         value={

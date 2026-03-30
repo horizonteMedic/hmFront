@@ -18,15 +18,17 @@ const registrarUrl =
 
 export const GetInfoServicio = async (
     nro,
+    tabla,
     set,
-    token
+    token,
+    onFinish = () => { }
 ) => {
     const res = await GetInfoServicioDefault(
         nro,
         tabla,
         token,
         obtenerReporteUrl,
-        () => { },
+        onFinish,
         true
     );
     if (res) {
@@ -204,7 +206,9 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         sede,
         () => {
             //NO Tiene registro
-            GetInfoServicio(nro, tabla, set, token);
+            GetInfoServicio(nro, tabla, set, token, () => {
+                Swal.close();
+            });
         },
         () => {
             //Tiene registro

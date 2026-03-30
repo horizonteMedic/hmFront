@@ -16,6 +16,16 @@ export const EXAMENES_CONFIG = [
             { label: "Muestra de Sangre", name: "consentimientoDosaje", tabla: "consent_Muestra_Sangre" },
             { label: "Anexo 16", name: "anexo16", tabla: "anexo7c" },
             { label: "Ficha Interconsulta", name: "interconsulta", tabla: "interconsulta" },
+            { label: "Ficha S.A.S", name: "fichaSAS", tabla: "ficha_sas" },
+            { label: "Test Fat. Somnolencia", name: "testFatSomnolencia", tabla: "test_fatiga_somnolencia" },
+            { label: "Anexo 2", name: "fMedicaAnexo2", tabla: "anexo_agroindustrial" },
+            { label: "Cert. Trab. Altura (Barrik)", name: "certTrabAlturaBarrik", tabla: "b_certificado_altura" },
+            { label: "Cert. Medico Ocupacinal", name: "fAptitudMedOcup", tabla: "certificado_aptitud_medico_ocupacional" },
+            { label: "Ev. Musc. Esquelético Boroo.", name: "evMuscEsqueletico", tabla: "evaluacion_musculo_esqueletica2021" },
+            { label: "Ficha Conducción de Vehiculos", name: "certConduccVehiculos", tabla: "b_certificado_conduccion" },
+            { label: "Antecedentes Enfermedades Altura", name: "AnteceEnfeAltura", tabla: "antece_enfermedades_altura" },
+            { label: "Cert. Altura Basico 1.8", name: "certTrabajoAltura", tabla: "certificacion_medica_altura" },
+
             {
                 title: "EXAMENES PODEROSA",
                 items: [
@@ -25,6 +35,11 @@ export const EXAMENES_CONFIG = [
                     { label: "Hoja Consulta Externa", name: "HojaConsultaEx", tabla: "hoja_consulta_externa" },
                     { label: "Cert. Manipuladores de Alimentos", name: "CertManpAlimentos", tabla: "certificado_manipuladores_barrick" },
                     { label: "Aptitud Herramientas Manuales", name: "AptiHerramientas", tabla: "certificado_aptitud_herramientas_manuales" },
+
+                    { label: "Ficha Datos Pacientes", name: "FichaDatosPacientes", tabla: "ficha_datos_paciente" },
+                    { label: "Cert. Aptitud Brigadista", name: "CertAptiBrigadista", tabla: "certificado_aptitud_brigadista" },
+                    { label: "Direccion Mina", name: "DireccionMina", tabla: "ministerio_energia_minas" },
+                    { label: "Hoja de Ruta EMO", name: "HojaRutaEMO", tabla: "hoja_ruta_emo" },
                 ]
             },
         ],
@@ -97,7 +112,7 @@ export const EXAMENES_CONFIG = [
 
             //Manipuladores
             {
-                title: "Toxicologia",
+                title: "MANIPULADORES",
                 items: [
                     { label: "Coprocultivo", name: "Coprocultivo", tabla: "ac_coprocultivo" },
                     { label: "Coproparasitológico", name: "Coproparasitológico", tabla: "ac_coproparasitologico" },
@@ -130,17 +145,9 @@ export const EXAMENES_CONFIG = [
     },
     {
         column: 3,
-        legend: "TRABAJOS EN ALTURA",
-        items: [
-            { label: "Cert. Trab. Altura (Barrik)", name: "certTrabAlturaBarrik", tabla: "b_certificado_altura" },
-            { label: "Cert. Trabajo Altura", name: "certTrabajoAltura", tabla: "certificacion_medica_altura" },
-        ],
-    },
-    {
-        column: 3,
         legend: "AUDIOMETRIA",
         items: [
-            { label: "Audiometría Simple", name: "", tabla: "" }, //falta B.
+            { label: "Audiometría Simple", name: "audiometria_2023", tabla: "audiometria_2023" }, //falta B.
             { label: "Audiometría OHLA", name: "audiometria", tabla: "audiometria_po" },
             { label: "Cuest. Audiometría", name: "cuestAudiometria", tabla: "cuestionario_audiometria" },
         ],
@@ -188,21 +195,9 @@ export const EXAMENES_CONFIG = [
         column: 3,
         legend: "OTROS FORMATOS",
         items: [
-            { label: "Ev. Musc. Esquelético", name: "evMuscEsqueletico", tabla: "evaluacion_musculo_esqueletica2021" },
             { label: "Cuest. Calidad Sueño", name: "cuestCalidadSueno", tabla: "calidad_sueño" },
-            { label: "Test Fat. Somnolencia", name: "testFatSomnolencia", tabla: "test_fatiga_somnolencia" },
             { label: "Cert. Manipuladores", name: "certManipuladores", tabla: "certificado_manipuladores_barrick" },
-            //{ label: "Informe Audiometría", name: "informeAudiometria", tabla: "informe_audiometria" },
             { label: "Perímetro Torácico", name: "perimetroToraxico", tabla: "perimetro_toracico" },
-        ],
-    },
-    {
-        column: 3,
-        legend: "CONDUCCIOÓN DE VEHÍCULOS",
-        items: [
-            { label: "Ficha S.A.S", name: "fichaSAS", tabla: "ficha_sas" },
-            { label: "Cert. Cond. Vehículos (Barrik)", name: "certConduccVehiculos", tabla: "b_certificado_conduccion" },
-
         ],
     },
     {
@@ -210,13 +205,11 @@ export const EXAMENES_CONFIG = [
         legend: "FICHAS SIN RESTRICCIÓN",
         items: [
             //{ label: "F. Médica", name: "fMedica" },
-            { label: "F. Aptitud Med. Ocup.", name: "fAptitudMedOcup", tabla: "certificado_aptitud_medico_ocupacional" },
-            { label: "F. Médica Anexo 2", name: "fMedicaAnexo2", tabla: "anexo_agroindustrial" },
             { label: "F. Aptitud Anexo 2", name: "fAptitudAnexo2", tabla: "aptitud_medico_ocupacional_agro" },
         ],
     },
     {
-        column: 1,
+        column: 3,
         legend: "PSICOLOGIA",
         items: [
             //{ label: "F. Médica", name: "fMedica" },
