@@ -299,8 +299,8 @@ export default function ModalEditCorreo({ open, onClose, refrescar, norden, nord
                                                                     className="flex items-center gap-2 px-4 py-1.5 text-xs font-medium rounded-full border bg-sky-50 border-sky-200 text-sky-400/70 cursor-not-allowed opacity-75"
                                                                 >
                                                                     <FontAwesomeIcon icon={faFile} className="text-[12px]" />
-                                                                    {/* {a.nomenclatura} */}
-                                                                    {a.idTipoArchivo}
+                                                                    {/* {a.idTipoArchivo} */}
+                                                                    {archivosList?.find(ad => ad.idTipoArchivo === a.idTipoArchivo)?.nomenclatura ?? "Archivo"}
                                                                 </div>
                                                             ))}
                                                         </div>

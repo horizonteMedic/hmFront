@@ -3,7 +3,7 @@ import { faX, faEnvelope, faUser, faAt, faFile } from "@fortawesome/free-solid-s
 // import { GetListArchivosDisponibles } from "./controllerModalCorreo";
 // import { useState } from "react";
 
-export default function ModalListaCorreos({ open, onClose, title, listaCorreos }) {
+export default function ModalListaCorreos({ open, archivosList, onClose, title, listaCorreos }) {
 
     // const [archivosDisponibles, setArchivosDisponibles] = useState(null);
 
@@ -123,8 +123,8 @@ export default function ModalListaCorreos({ open, onClose, title, listaCorreos }
                                                 <div className="flex flex-wrap gap-2">
                                                     {correo.archivos.map((archivo, aIdx) => (
                                                         <div key={aIdx} className="flex items-center gap-2 bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-xs font-medium border border-blue-100">
-                                                            <FontAwesomeIcon icon={faFile} className="text-[10px]" />
-                                                            {archivo.nombreTipoArchivo || archivo.nombre || (typeof archivo === 'string' ? archivo : 'Archivo')}
+                                                            <FontAwesomeIcon icon={faFile} className="text-[10px]"/>
+                                                            {archivo.nombreTipoArchivo || archivo.nombre || archivosList?.find(ad => ad.idTipoArchivo === archivo.idTipoArchivo)?.nomenclatura || (typeof archivo === 'string' ? archivo : 'Archivo')}
                                                             <span className="text-[10px] opacity-60">({(convertirAMB(archivo.tamanio) || 0).toFixed(2)} MB)</span>
                                                         </div>
                                                     ))}

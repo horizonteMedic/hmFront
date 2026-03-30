@@ -521,7 +521,7 @@ const HistorialPaciente = () => {
         </div>
       </div>
 
-      {isModalOpen && <Modal closeModal={closeModal} openModalCorreo={openModalCorreo} openModalEditCorreo={openModalEditCorreo} refreshe={refreshe} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_suc} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell} Acces={tienePermisoEnVista} />}
+      {isModalOpen && <Modal closeModal={closeModal} archivosList={archivosList} openModalCorreo={openModalCorreo} openModalEditCorreo={openModalEditCorreo} refreshe={refreshe} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_suc} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell} Acces={tienePermisoEnVista} />}
 
       {/* Modal de carga de datos */}
       <ModalCorreo open={showCorreoModal} archivosList={archivosList} refrescar={refrescar} norden={nordenSeleccionadoCorreo} nordenYSede={nordenYSedeSeleccionadoCorreo} onClose={() => { setShowCorreoModal(false); setNordenSeleccionadoCorreo(''); setNordenYSedeSeleccionadoCorreo("") }} />

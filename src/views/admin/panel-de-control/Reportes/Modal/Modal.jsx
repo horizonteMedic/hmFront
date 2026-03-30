@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 import { AutorizarEnvioCorreo, GetCorreosGuardados } from '../ModalCorreo/controllerModalCorreo';
 import ModalListaCorreos from '../ModalCorreo/ModalListaCorreos';
 
-const Modal = ({ closeModal, openModalCorreo, openModalEditCorreo, refreshe, user, iduser, start, end, sede, dni, nombre, empresa, contrata, token, name, apell, Acces }) => {
+const Modal = ({ closeModal, archivosList, openModalCorreo, openModalEditCorreo, refreshe, user, iduser, start, end, sede, dni, nombre, empresa, contrata, token, name, apell, Acces }) => {
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -280,7 +280,7 @@ const Modal = ({ closeModal, openModalCorreo, openModalEditCorreo, refreshe, use
                 <div className="bg-green-200 rounded px-2 py-1 inline-block"><strong>{nombre}</strong></div>
               </div>
             </div>
-            <button className='mr-10 h-8 text-blue-500' title='Refrescar' onClick={reloadread}><FontAwesomeIcon icon={faRotate} size='lg'/></button>
+            <button className='mr-10 h-8 text-blue-500' title='Refrescar' onClick={reloadread}><FontAwesomeIcon icon={faRotate} size='lg' /></button>
           </div>
           {loading ? (
             <p className="text-center">Cargando...</p>
@@ -414,6 +414,7 @@ const Modal = ({ closeModal, openModalCorreo, openModalEditCorreo, refreshe, use
         modalListaCorreos && (
           <ModalListaCorreos
             open={modalListaCorreos}
+            archivosList={archivosList}
             onClose={() => setModalListaCorreos(false)}
             title={datosListaCorreos.title}
             listaCorreos={datosListaCorreos.lista}
