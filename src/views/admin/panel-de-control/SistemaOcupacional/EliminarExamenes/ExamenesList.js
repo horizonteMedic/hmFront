@@ -197,7 +197,6 @@ export const EXAMENES_CONFIG = [
         items: [
             { label: "Cuest. Calidad Sueño", name: "cuestCalidadSueno", tabla: "calidad_sueño" },
             { label: "Cert. Manipuladores", name: "certManipuladores", tabla: "certificado_manipuladores_barrick" },
-            { label: "Perímetro Torácico", name: "perimetroToraxico", tabla: "perimetro_toracico" },
         ],
     },
     {
