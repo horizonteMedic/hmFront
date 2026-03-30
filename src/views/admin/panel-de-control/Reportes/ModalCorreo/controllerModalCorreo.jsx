@@ -9,7 +9,7 @@ const obtenerListArchivosDisponiblesUrl = "/api/v01/ct/archivos/detalleArchivoSe
 const obtenerCorreosGuardados = "/api/v01/st/email/buscarPorNordenYEstado"
 const obtenerPlantillaPorNordenUrl = "/api/v01/ct/plantillaCorreo/obtenerPlantillaCorreoDatosNorden"
 const registrarCorreoUrl = "/api/v01/st/email/registrarActualizarCorreo"
-const autorizarCorreoUrl="/api/v01/st/email/enviarCorreos"
+const autorizarCorreoUrl = "/api/v01/st/email/enviarCorreos"
 
 const nombresExamen = {
     ANUAL: "EMOA",
@@ -212,6 +212,7 @@ export const SubmitCorreo = async (
     form,
     token,
     user,
+    isEdit,
     onFinish
 ) => {
     const esListaCorreosValida = (destino) => {
@@ -227,7 +228,7 @@ export const SubmitCorreo = async (
     };
     let mensajeError = ""
 
-    if (!form.plantillaConfig || form.plantillaConfig.filter(a => !a.anulado).length == 0) mensajeError += "Debe ingresar almenos un correo\n";
+    if (!isEdit && (!form.plantillaConfig || form.plantillaConfig.filter(a => !a.anulado).length == 0)) mensajeError += "Debe ingresar almenos un correo\n";
     else if (!form.idRelacionEmpresaContrata) mensajeError += "Debe ingresar almenos un correo válido\n";
     else if (form.plantillaConfig.some(a => !esListaCorreosValida(a.destino))) mensajeError += "Debe ingresar correos destino válidos\n";
     else if (form.plantillaConfig.some(a => a.conCopia ? !esListaCorreosValida(a.conCopia) : false)) mensajeError += "Debe ingresar correos válidos en CC\n";
@@ -239,7 +240,7 @@ export const SubmitCorreo = async (
 
     const body = [
         ...form.plantillaConfig.map(a => ({
-            id: null,
+            id: isEdit ? a.id : null,
             norden: form.norden,
             idEmpresaContrata: a.idEmpresaContrata,
             destino: (a.destino ?? "").replace(/\s+/g, ""),
@@ -247,6 +248,7 @@ export const SubmitCorreo = async (
             asunto: a.asunto,
             mensaje: a.mensaje,
             usuarioRegistro: user,
+            anulado: a.anulado || false,
             archivos: [
                 ...a?.archivos.map(suba => suba.idTipoArchivo),
             ]

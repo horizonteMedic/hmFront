@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUp, faFilePdf, faFileImage, faDownload, faEnvelope, faPlus, faFileCsv, faArrowRotateRight, faRotate } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUp, faFilePdf, faFileImage, faDownload, faEnvelope, faPlus, faFileCsv, faArrowRotateRight, faRotate, faEye } from '@fortawesome/free-solid-svg-icons';
 import { GetHistoryUser } from '../model/getHistoryUser';
 import { GetlistArchivos } from '../model/getlistArchivos';
 import ModalUpload from '../ModalsDeSubida/ModalUpload';
@@ -8,8 +8,9 @@ import { GetArchivosSubidos } from '../model/getArchivosSubidos';
 import { ReadArchivos, DeleteArchivos64 } from '../model/readArchivos';
 import Swal from 'sweetalert2';
 import { AutorizarEnvioCorreo, GetCorreosGuardados } from '../ModalCorreo/controllerModalCorreo';
+import ModalListaCorreos from '../ModalCorreo/ModalListaCorreos';
 
-const Modal = ({ closeModal, openModalCorreo, refreshe, user, iduser, start, end, sede, dni, nombre, empresa, contrata, token, name, apell, Acces }) => {
+const Modal = ({ closeModal, openModalCorreo, openModalEditCorreo, refreshe, user, iduser, start, end, sede, dni, nombre, empresa, contrata, token, name, apell, Acces }) => {
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -23,6 +24,14 @@ const Modal = ({ closeModal, openModalCorreo, refreshe, user, iduser, start, end
   const [currentFile, setCurrentFile] = useState(null);
 
   const [correosPendientesYEnviados, setCorreosPendientesYEnviados] = useState([])
+
+  const [modalListaCorreos, setModalListaCorreos] = useState(false);
+  const [datosListaCorreos, setDatosListaCorreos] = useState({ title: '', lista: [] });
+
+  const openViewCorreos = (title, lista) => {
+    setDatosListaCorreos({ title, lista });
+    setModalListaCorreos(true);
+  };
 
   const obtenerCorreosPendientes = async (norden) => {
     return await GetCorreosGuardados(norden, 'pendiente', token);
@@ -271,7 +280,7 @@ const Modal = ({ closeModal, openModalCorreo, refreshe, user, iduser, start, end
                 <div className="bg-green-200 rounded px-2 py-1 inline-block"><strong>{nombre}</strong></div>
               </div>
             </div>
-            <button className='mr-10 h-8' title='Refrescar' onClick={reloadread}><FontAwesomeIcon icon={faRotate} size='lg' style={{ color: 'blue' }} /></button>
+            <button className='mr-10 h-8 text-blue-500' title='Refrescar' onClick={reloadread}><FontAwesomeIcon icon={faRotate} size='lg'/></button>
           </div>
           {loading ? (
             <p className="text-center">Cargando...</p>
@@ -339,10 +348,10 @@ const Modal = ({ closeModal, openModalCorreo, refreshe, user, iduser, start, end
                         const enProgreso = correos?.enProgreso?.length || 0;
                         return (
                           <td className="border border-gray-300 text-center space-y-3">
-                            <p>Pendientes: {pendientes}</p>
-                            <p>En Cola: {enProgreso}</p>
-                            <p>Error al Enviar: {conError}</p>
-                            <p>Enviados: {enviados}</p>
+                            <p className={`${pendientes > 0 ? 'cursor-pointer hover:text-blue-500 font-semibold' : ''}`} onClick={() => { if (pendientes > 0) openModalEditCorreo(dataItem.orden, dataItem.historiaClinica) }}>Pendientes: {pendientes}</p>
+                            <p>En Cola: {enProgreso} {enProgreso > 0 && <FontAwesomeIcon icon={faEye} className="ml-2 cursor-pointer text-blue-500" title="Ver En Cola" onClick={() => openViewCorreos('Correos En Cola', correos.enProgreso)} />}</p>
+                            <p>Error al Enviar: {conError} {conError > 0 && <FontAwesomeIcon icon={faEye} className="ml-2 cursor-pointer text-blue-500" title="Ver Errores" onClick={() => openViewCorreos('Correos con Error', correos.conError)} />}</p>
+                            <p>Enviados: {enviados} {enviados > 0 && <FontAwesomeIcon icon={faEye} className="ml-2 cursor-pointer text-blue-500" title="Ver Enviados" onClick={() => openViewCorreos('Correos Enviados', correos.enviados)} />}</p>
                             {
                               enProgreso === 0 && (
                                 <button onClick={() => openModalCorreo(dataItem.orden, dataItem.historiaClinica)} className='py-2 px-3 bg-blue-500 rounded space-x-1'><FontAwesomeIcon icon={faPlus} style={{ color: 'white' }} /><FontAwesomeIcon icon={faEnvelope} style={{ color: 'white' }} /></button>
@@ -359,10 +368,10 @@ const Modal = ({ closeModal, openModalCorreo, refreshe, user, iduser, start, end
                         const enProgreso = correos?.enProgreso?.length || 0;
                         return (
                           <td className="border border-gray-300 text-center space-y-3">
-                            <p>Pendientes: {pendientes}</p>
-                            <p>En Cola: {enProgreso}</p>
-                            <p>Error al Enviar: {conError}</p>
-                            <p>Enviados: {enviados}</p>
+                            <p className={`${pendientes > 0 ? 'cursor-pointer hover:text-blue-500 font-semibold' : ''}`} onClick={() => { if (pendientes > 0) openModalEditCorreo(dataItem.orden, dataItem.historiaClinica) }}>Pendientes: {pendientes}</p>
+                            <p>En Cola: {enProgreso} {enProgreso > 0 && <FontAwesomeIcon icon={faEye} className="ml-2 cursor-pointer text-blue-500" title="Ver En Cola" onClick={() => openViewCorreos('Correos En Cola', correos.enProgreso)} />}</p>
+                            <p>Error al Enviar: {conError} {conError > 0 && <FontAwesomeIcon icon={faEye} className="ml-2 cursor-pointer text-blue-500" title="Ver Errores" onClick={() => openViewCorreos('Correos con Error', correos.conError)} />}</p>
+                            <p>Enviados: {enviados} {enviados > 0 && <FontAwesomeIcon icon={faEye} className="ml-2 cursor-pointer text-blue-500" title="Ver Enviados" onClick={() => openViewCorreos('Correos Enviados', correos.enviados)} />}</p>
                             {pendientes != 0 && (
                               <button
                                 onClick={() => { enviarAutorizacionCorreo(dataItem.historiaClinica); }}
@@ -399,6 +408,16 @@ const Modal = ({ closeModal, openModalCorreo, refreshe, user, iduser, start, end
       {
         modalArchivos && (
           <ModalUpload closeModal={closeModalArchivos} combinedParam={datosarc} dni={dni} user={user} token={token} reloadread={reloadread} sede={sede} />
+        )
+      }
+      {
+        modalListaCorreos && (
+          <ModalListaCorreos
+            open={modalListaCorreos}
+            onClose={() => setModalListaCorreos(false)}
+            title={datosListaCorreos.title}
+            listaCorreos={datosListaCorreos.lista}
+          />
         )
       }
       {
