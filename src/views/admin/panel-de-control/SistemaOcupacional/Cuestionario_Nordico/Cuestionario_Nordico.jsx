@@ -15,6 +15,7 @@ import Cuello from "./Cuello/Cuello";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { useForm } from "../../../../hooks/useForm";
 import { VerifyTR, SubmitCuestionarioNordic, PrintHojaR } from "./controller/ControllerCN"
+import { useState } from "react";
 
 const date = new Date();
 const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
@@ -214,7 +215,12 @@ const Cuestionario_Nordico = () => {
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
+
+    SubirDoc: false,
+    nomenclatura: "RESMAG"
   };
+
+  const [visualerOpen, setVisualerOpen] = useState(null)
 
 
   const { form, setForm, handleChange, handleChangeNumber, handleClear, handleChangeSimple, handleClearnotO, handleInputChangeChecked } = useForm(initialFormState)

@@ -1,16 +1,14 @@
 import Swal from "sweetalert2";
-import { LoadingDefault, PrintHojaRJsReportDefault, VerifyTRDefault } from "../../../../utils/functionUtils";
+import { handleSubidaMasiva, handleSubirArchivoDefaultSinSellos, LoadingDefault, PrintHojaRJsReportDefault, ReadArchivosFormDefault, VerifyTRDefault } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
 import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
 
-const obtenerReporteUrl =
-  "/api/v01/ct/anexos/anexo2/obtenerReporteAnexo2Completo";
-const registrarUrl =
-  "/api/v01/ct/anexos/anexo2/registrarActualizarAnexoAgroindustrial";
-const obtenerExamenesRealizadosUrl =
-  "/api/v01/ct/anexos/anexo2/obtenerExamenesRealizados";
+const obtenerReporteUrl = "/api/v01/ct/anexos/anexo2/obtenerReporteAnexo2Completo";
+const registrarUrl = "/api/v01/ct/anexos/anexo2/registrarActualizarAnexoAgroindustrial";
+const obtenerExamenesRealizadosUrl = "/api/v01/ct/anexos/anexo2/obtenerExamenesRealizados";
 const obtenerReporteJsReportUrl = "/api/v01/ct/anexos/descargarReporteAnexo2"
+const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta"
 
 export const SubmitDataService = async (
   form,
@@ -159,46 +157,46 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
   });
 };
 
-// export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-//   Loading("Cargando Formato a Imprimir");
-//   getFetch(
-//     `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`,
-//     token
-//   ).then(async (res) => {
-//     if (res.norden_n_orden) {
-//       // const nombre = res.nameJasper;
-//       const nombre = "Anexo2";
-//       console.log(nombre);
-//       const jasperModules = import.meta.glob(
-//         "../../../../jaspers/Anexo2/*.jsx"
-//       );
-//       const modulo = await jasperModules[
-//         `../../../../jaspers/Anexo2/${nombre}.jsx`
-//       ]();
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+  Loading("Cargando Formato a Imprimir");
+  getFetch(
+    `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`,
+    token
+  ).then(async (res) => {
+    if (res.norden_n_orden) {
+      // const nombre = res.nameJasper;
+      const nombre = "Anexo2";
+      console.log(nombre);
+      const jasperModules = import.meta.glob(
+        "../../../../jaspers/Anexo2/*.jsx"
+      );
+      const modulo = await jasperModules[
+        `../../../../jaspers/Anexo2/${nombre}.jsx`
+      ]();
 
-//       // Ejecuta la función exportada por default con los datos
-//       if (typeof modulo.default === "function") {
-//         modulo.default({ ...res, datosFooter });
-//       } else {
-//         console.error(
-//           `El archivo ${nombre}.jsx no exporta una función por defecto`
-//         );
-//       }
-//       Swal.close();
-//     } else {
-//       Swal.close();
-//     }
-//   });
-// };
-
-export const PrintHojaR = (nro, token, tabla) => {
-  PrintHojaRJsReportDefault(
-    nro,
-    token,
-    tabla,
-    obtenerReporteJsReportUrl
-  );
+      //Ejecuta la función exportada por default con los datos
+      if (typeof modulo.default === "function") {
+        modulo.default({ ...res, datosFooter });
+      } else {
+        console.error(
+          `El archivo ${nombre}.jsx no exporta una función por defecto`
+        );
+      }
+      Swal.close();
+    } else {
+      Swal.close();
+    }
+  });
 };
+
+// export const PrintHojaR = (nro, token, tabla) => {
+//   PrintHojaRJsReportDefault(
+//     nro,
+//     token,
+//     tabla,
+//     obtenerReporteJsReportUrl
+//   );
+// };
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
   VerifyTRDefault(
@@ -911,6 +909,7 @@ export const GetInfoServicioEditar = (
             cerrado: res.cerrado ?? false,
             //nuevos
             fechaExam: res.fechaAnexo_fecha,
+            SubirDoc: true,
 
             //Ant. Personales
             neoplasia: res.neoplasia_chkneoplasia,
@@ -1509,3 +1508,15 @@ export const GetInfoServicioEditar = (
       onFinish();
     });
 };
+
+
+export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
+  handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
+};
+export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
+  ReadArchivosFormDefault(form, setVisualerOpen, token)
+}
+
+export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token) => {
+  handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token)
+}

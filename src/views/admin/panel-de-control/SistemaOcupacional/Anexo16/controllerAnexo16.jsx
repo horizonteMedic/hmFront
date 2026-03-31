@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-import { LoadingDefault, PrintHojaRJsReportDefault, VerifyTRDefault } from "../../../../utils/functionUtils";
+import { handleSubidaMasiva, handleSubirArchivoDefaultSinSellos, LoadingDefault, PrintHojaRJsReportDefault, ReadArchivosFormDefault, VerifyTRDefault } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
 import { getToday } from "../../../../utils/helpers";
@@ -12,6 +12,8 @@ const obtenerParaJasperUrl = "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16";
 const obtenerReporteJsReportUrl = "/api/v01/ct/anexos/descargarReporteAnexo16"
 
 const obtenerExamenesRealizadosUrl = "/api/v01/ct/anexos/anexo2/obtenerExamenesRealizados";
+
+const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta"
 
 export const SubmitDataService = async (
   form,
@@ -185,45 +187,45 @@ export const SubmitDataService = async (
   });
 };
 
-// export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-//   Loading("Cargando Formato a Imprimir");
-//   getFetch(
-//     `${obtenerParaJasperUrl}?nOrden=${nro}&nameService=${tabla}`,
-//     token
-//   ).then(async (res) => {
-//     if (res.norden_n_orden) {
-//       const nombre = res.nameJasper;
-//       console.log(nombre);
-//       const jasperModules = import.meta.glob(
-//         "../../../../jaspers/Anexo16/*.jsx"
-//       );
-//       const modulo = await jasperModules[
-//         `../../../../jaspers/Anexo16/${nombre}.jsx`
-//       ]();
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+  Loading("Cargando Formato a Imprimir");
+  getFetch(
+    `${obtenerParaJasperUrl}?nOrden=${nro}&nameService=${tabla}`,
+    token
+  ).then(async (res) => {
+    if (res.norden_n_orden) {
+      const nombre = res.nameJasper;
+      console.log(nombre);
+      const jasperModules = import.meta.glob(
+        "../../../../jaspers/Anexo16/*.jsx"
+      );
+      const modulo = await jasperModules[
+        `../../../../jaspers/Anexo16/${nombre}.jsx`
+      ]();
 
-//      // Ejecuta la función exportada por default con los datos
-//      if (typeof modulo.default === "function") {
-//        modulo.default({ ...res, datosFooter });
-//      } else {
-//        console.error(
-//          `El archivo ${nombre}.jsx no exporta una función por defecto`
-//        );
-//      }
-//      Swal.close();
-//    } else {
-//      Swal.close();
-//    }
-//  });
-//  };
-
-export const PrintHojaR = (nro, token, tabla) => {
-  PrintHojaRJsReportDefault(
-    nro,
-    token,
-    tabla,
-    obtenerReporteJsReportUrl
-  );
+      // Ejecuta la función exportada por default con los datos
+      if (typeof modulo.default === "function") {
+        modulo.default({ ...res, datosFooter });
+      } else {
+        console.error(
+          `El archivo ${nombre}.jsx no exporta una función por defecto`
+        );
+      }
+      Swal.close();
+    } else {
+      Swal.close();
+    }
+  });
 };
+
+// export const PrintHojaR = (nro, token, tabla) => {
+//   PrintHojaRJsReportDefault(
+//     nro,
+//     token,
+//     tabla,
+//     obtenerReporteJsReportUrl
+//   );
+// };
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
   VerifyTRDefault(
@@ -489,10 +491,10 @@ export const GetInfoServicio = (
               "\n";
             data.contador++;
           }
-          data.observacionesGenerales += 
+          data.observacionesGenerales +=
             data.contador + ". " + (
               res.observacionesLaboratorioClinico_txtobservacioneslb != null &&
-              res.observacionesLaboratorioClinico_txtobservacioneslb !== ""
+                res.observacionesLaboratorioClinico_txtobservacioneslb !== ""
                 ? res.observacionesLaboratorioClinico_txtobservacioneslb
                 : "LABORATORIO: SIN OBSERVACIONES"
             ) + "\n";
@@ -760,7 +762,7 @@ export const GetInfoServicio = (
             data.enfermedadOtros !== ""
           ) {
             data.observacionesGenerales +=
-            data.contador +
+              data.contador +
               ". " +
               data.enfermedadOtros +
               ":EVALUACION POR OFTALMOLOGIA.\n";
@@ -1544,7 +1546,7 @@ export const GetInfoServicioEditar = (
             piel: res.pielAnexo7c_piel ? "NORMAL" : "ANORMAL",
             pielObservaciones: res.pielDescripcionAnexo7c_piel_descripcion,
             colesterolAnalisisBioquimico_txtcolesterol: res.colesterolAnalisisBioquimico_txtcolesterol,
-
+            SubirDoc: true,
           };
           data.dentaduraObservaciones =
             res.observacionesOdontograma_txtobservaciones ?? "";
@@ -2001,16 +2003,16 @@ export const GetInfoServicioEditar = (
             data.contador++;
           }
           data.observacionesGenerales2 +=
-          data.contador + ". " +
-          (
-            resSimple.observacionesLaboratorioClinico_txtobservacioneslb != null &&
-            resSimple.observacionesLaboratorioClinico_txtobservacioneslb !== ""
-              ? resSimple.observacionesLaboratorioClinico_txtobservacioneslb
-              : "LABORATORIO: SIN OBSERVACIONES"
-          ) +
-          "\n";
+            data.contador + ". " +
+            (
+              resSimple.observacionesLaboratorioClinico_txtobservacioneslb != null &&
+                resSimple.observacionesLaboratorioClinico_txtobservacioneslb !== ""
+                ? resSimple.observacionesLaboratorioClinico_txtobservacioneslb
+                : "LABORATORIO: SIN OBSERVACIONES"
+            ) +
+            "\n";
 
-        data.contador++;
+          data.contador++;
           if (resSimple.observacionesAlturaCertificado_alturabarrick != null) {
             data.observacionesGenerales2 +=
               data.contador +
@@ -2296,3 +2298,14 @@ const agregarObservacion = (base, texto) => {
   if (!texto) return base;
   return base ? `${base}\n${texto}` : texto;
 };
+
+export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
+  handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
+};
+export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
+  ReadArchivosFormDefault(form, setVisualerOpen, token)
+}
+
+export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token) => {
+  handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token)
+}
