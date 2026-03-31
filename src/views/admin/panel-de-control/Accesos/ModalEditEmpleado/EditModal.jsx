@@ -8,8 +8,8 @@ import EditEmpleado from '../model/EditEmpleado';
 import Swal from 'sweetalert2';
 import { ComboboxDepartamentos, ComboboxProvincias, ComboboxDistritos, ComboboxSexo, ComboboxTipoDoc } from '../model/Combobox';
 
-const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apellidos, Email, FechaNacimiento, 
-  Cip, Celular, Distrito, Sexo , Direccion, Cargo, Estado, FechaInicio, UserRegistro}) => {
+const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apellidos, Email, FechaNacimiento,
+  Cip, Celular, Distrito, Sexo, Direccion, Cargo, Estado, FechaInicio, UserRegistro }) => {
 
   const userlogued = useAuthStore(state => state.userlogued);
   const [tipoDocumento, setTipoDocumento] = useState(TipoDoc);
@@ -26,9 +26,9 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
   const [direccion, setDireccion] = useState(Direccion)
   const [cargo, setCargo] = useState(Cargo)
   const [activo, setActivo] = React.useState(Estado);
-  const [cip, setCip] = useState('')
+  const [cip, setCip] = useState(Cip ?? "")
   const ListDepartamentos = ComboboxDepartamentos();
-  const ListProvincias =  ComboboxProvincias()
+  const ListProvincias = ComboboxProvincias()
   const ListDistritos = ComboboxDistritos()
   const ListSexo = ComboboxSexo()
   const ListTiposDoc = ComboboxTipoDoc()
@@ -97,291 +97,291 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md  w-[400px] md:w-[800px] relative">
 
-      <FontAwesomeIcon
+        <FontAwesomeIcon
           icon={faTimes}
           className="absolute top-0 right-0 m-3 cursor-pointer  color-blanco"
           onClick={closeModal}
-      />
-      <div className="p azuloscurobackground flex justify-between p-3.5">
-        <h1 className="text-start font-bold color-azul text-white">Lista de Usuarios vinculados</h1>
-      </div>
-      <div className='container p-4'>
-        <form>
-          <div className="grid grid-cols-2 gap-4 mb-4 md:grid-cols-3">
-            <div>
-              <label htmlFor="tipoDocumento" className="block text-sm font-medium text-gray-700">
-                Tipo de Documento
-              </label>
-              <select
-                id="tipoDocumento"
-                value={tipoDocumento}
-                onChange={handleTipoDocumentoChange}
-                className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-                required
-              >
-                <option value="">Seleccionar</option>
-                {ListTiposDoc?.map((option) => (
-                  <option key={option.id} value={option.descripcion}>{option.descripcion}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label htmlFor="numeroDocumento" className="block text-sm font-medium text-gray-700">
-                Documento de Identidad D.N.I
-              </label>
-              <input
-                type="text"
-                value={nrodoc}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, ''); 
-                  if (value.length <= 8) {
-                    setNrodoc(value);
-                  }
-                }}
-                id="numeroDocumento"
-                className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-                required
-              />
+        />
+        <div className="p azuloscurobackground flex justify-between p-3.5">
+          <h1 className="text-start font-bold color-azul text-white">Lista de Usuarios vinculados</h1>
+        </div>
+        <div className='container p-4'>
+          <form>
+            <div className="grid grid-cols-2 gap-4 mb-4 md:grid-cols-3">
+              <div>
+                <label htmlFor="tipoDocumento" className="block text-sm font-medium text-gray-700">
+                  Tipo de Documento
+                </label>
+                <select
+                  id="tipoDocumento"
+                  value={tipoDocumento}
+                  onChange={handleTipoDocumentoChange}
+                  className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                  required
+                >
+                  <option value="">Seleccionar</option>
+                  {ListTiposDoc?.map((option) => (
+                    <option key={option.id} value={option.descripcion}>{option.descripcion}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="numeroDocumento" className="block text-sm font-medium text-gray-700">
+                  Documento de Identidad D.N.I
+                </label>
+                <input
+                  type="text"
+                  value={nrodoc}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '');
+                    if (value.length <= 8) {
+                      setNrodoc(value);
+                    }
+                  }}
+                  id="numeroDocumento"
+                  className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                  required
+                />
 
+              </div>
+              <div>
+                <label htmlFor="primerNombre" className="block text-sm font-medium text-gray-700">
+                  Nombres
+                </label>
+                <input
+                  type="text"
+                  value={nombres}
+                  onChange={(e) => {
+                    const value = e.target.value.toUpperCase();
+                    setNombres(
+                      value
+                        .split(' ')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ')
+                    );
+                  }}
+                  id="primerNombre"
+                  className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="apellidos" className="block text-sm font-medium text-gray-700">
+                  Apellidos
+                </label>
+                <input
+                  type="text"
+                  value={apellidos}
+                  onChange={(e) => {
+                    const value = e.target.value.toUpperCase();
+                    setApellidos(
+                      value
+                        .split(' ')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ')
+                    );
+                  }}
+                  id="apellidos"
+                  className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  id="email"
+                  onChange={(e) => setEmail(e.target.value.toUpperCase())}
+                  className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="fechaNacimiento" className="block text-sm font-medium text-gray-700">
+                  Fecha de Nacimiento
+                </label>
+                <DatePicker
+                  selected={startDate}
+                  onChange={(date) => setStartDate(date)}
+                  showYearDropdown
+                  yearDropdownItemNumber={30}
+                  scrollableYearDropdown
+                  dateFormat="dd/MM/yyyy"
+                  className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="sexo" className="block text-sm font-medium text-gray-700">
+                  Sexo
+                </label>
+                <select
+                  id="sexo"
+                  value={sexo}
+                  onChange={handleSexoChange}
+                  className=" pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                  required
+                >
+                  <option value="">Seleccionar</option>
+                  {ListSexo?.map((option) => (
+                    <option key={option.id} value={option.descripcion}>{option.descripcion}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="celular" className="block text-sm font-medium text-gray-700">
+                  Celular
+                </label>
+                <input
+                  type="text"
+                  value={celular}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '');
+                    if (value.length <= 9) {
+                      setCelular(value);
+                    }
+                  }}
+                  id="celular"
+                  className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="departamento" className="block text-sm font-medium text-gray-700">
+                  Departamento
+                </label>
+                <select
+                  id="departamento"
+                  value={departamento}
+                  onChange={handleDepartamentoChange}
+                  className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                  required
+                >
+                  <option value="">Seleccionar</option>
+                  {ListDepartamentos?.map((option) => (
+                    <option key={option.id} value={option.id} selected={option.id === departamento}>{option.nombre}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="provincia" className=" block text-sm font-medium text-gray-700">
+                  Provincia
+                </label>
+                <select
+                  id="provincia"
+                  value={provincia}
+                  onChange={handleProvinciaChange}
+                  className=" pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                  required
+                >
+                  <option value="">Seleccionar</option>
+                  {filterProvincias?.map((option) => (
+                    <option key={option.id} value={option.id} selected={option.id === provincia}>{option.nombre}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="distrito" className="block text-sm font-medium text-gray-700">
+                  Distrito
+                </label>
+                <select
+                  id="distrito"
+                  value={distrito}
+                  onChange={handleDistritoChange}
+                  className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                  required
+                >
+                  <option value="">Seleccionar</option>
+                  {filterDistritos?.map((option) => (
+                    <option key={option.id} value={option.id} selected={option.id === distrito}>{option.nombre}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="direccion" className="block text-sm font-medium text-gray-700">
+                  Dirección
+                </label>
+                <input
+                  type="text"
+                  value={direccion}
+                  id="direccion"
+                  onChange={(e) => setDireccion(e.target.value.toUpperCase())}
+                  className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="cargo" className="block text-sm font-medium text-gray-700">
+                  Cargo
+                </label>
+                <input
+                  type="text"
+                  value={cargo}
+                  onChange={(e) => {
+                    const value = e.target.value.toUpperCase();
+                    setCargo(
+                      value
+                        .split(' ')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ')
+                    );
+                  }}
+                  id="cargo"
+                  className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="cip" className="block text-sm font-medium text-gray-700">
+                  CIP
+                </label>
+                <input
+                  type="text"
+                  value={Cip}
+                  onChange={(e) => {
+                    const value = e.target.value.toLowerCase(); // Convertir todo a minúsculas
+                    setCip(
+                      value
+                        .split(' ')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalizar cada palabra
+                        .join(' ')
+                    );
+                  }}
+                  id="cip"
+                  className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                />
+              </div>
+              <div>
+                <label htmlFor="activo" className="block text-sm font-medium text-gray-700">
+                  Activo
+                </label>
+                <input
+                  type="checkbox"
+                  id="activo"
+                  checked={activo}
+                  onChange={handleActivoChange}
+                  className=" pointer form-checkbox text-blue-500 focus:ring-blue-500 h-6 w-6 bg-white"
+                  required
+                />
+              </div>
             </div>
-            <div>
-              <label htmlFor="primerNombre" className="block text-sm font-medium text-gray-700">
-                Nombres
-              </label>
-              <input
-                type="text"
-                value={nombres}
-                onChange={(e) => {
-                  const value = e.target.value.toUpperCase(); 
-                  setNombres(
-                    value
-                      .split(' ')
-                      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                      .join(' ')
-                  );
-                }}
-                id="primerNombre"
-                className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="apellidos" className="block text-sm font-medium text-gray-700">
-                Apellidos
-              </label>
-              <input
-                type="text"
-                value={apellidos}
-                onChange={(e) => {
-                  const value = e.target.value.toUpperCase();
-                  setApellidos(
-                    value
-                      .split(' ')
-                      .map(word => word.charAt(0).toUpperCase() + word.slice(1)) 
-                      .join(' ')
-                  );
-                }}
-                id="apellidos"
-                className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <input
-                type="email"
-                value={email}
-                id="email"
-                onChange={(e) => setEmail(e.target.value.toUpperCase())}
-                className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="fechaNacimiento" className="block text-sm font-medium text-gray-700">
-                Fecha de Nacimiento
-              </label>
-              <DatePicker
-                selected={startDate}
-                onChange={(date) => setStartDate(date)}
-                showYearDropdown
-                yearDropdownItemNumber={30}
-                scrollableYearDropdown
-                dateFormat="dd/MM/yyyy"
-                className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="sexo" className="block text-sm font-medium text-gray-700">
-                Sexo
-              </label>
-              <select
-                id="sexo"
-                value={sexo}
-                onChange={handleSexoChange}
-                className=" pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-                required
+            <div className="flex justify-end">
+              <button
+                onClick={handleSubmit}
+                type="submit"
+                className={`inline-flex justify-center items-center px-4 py-2 azul-btn rounded-md `}
               >
-                <option value="">Seleccionar</option>
-                {ListSexo?.map((option) => (
-                  <option key={option.id} value={option.descripcion}>{option.descripcion}</option>
-                ))}
-              </select>
+                Guardar Cambios
+              </button>
             </div>
-            <div>
-              <label htmlFor="celular" className="block text-sm font-medium text-gray-700">
-                Celular
-              </label>
-              <input
-                type="text"
-                value={celular}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, ''); 
-                  if (value.length <= 9) {
-                    setCelular(value);
-                  }
-                }}
-                id="celular"
-                className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="departamento" className="block text-sm font-medium text-gray-700">
-                Departamento
-              </label>
-              <select
-                id="departamento"
-                value={departamento}
-                onChange={handleDepartamentoChange}
-                className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-                required
-              >
-                <option value="">Seleccionar</option>
-                {ListDepartamentos?.map((option) => (
-                  <option key={option.id} value={option.id} selected={option.id === departamento}>{option.nombre}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label htmlFor="provincia" className=" block text-sm font-medium text-gray-700">
-                Provincia
-              </label>
-              <select
-                id="provincia"
-                value={provincia}
-                onChange={handleProvinciaChange}
-                className=" pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-                required
-              >
-                <option value="">Seleccionar</option>
-                {filterProvincias?.map((option) => (
-                  <option key={option.id} value={option.id} selected={option.id === provincia}>{option.nombre}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label htmlFor="distrito" className="block text-sm font-medium text-gray-700">
-                Distrito
-              </label>
-              <select
-                id="distrito"
-                value={distrito}
-                onChange={handleDistritoChange}
-                className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-                required
-              >
-                <option value="">Seleccionar</option>
-                {filterDistritos?.map((option) => (
-                  <option key={option.id} value={option.id} selected={option.id === distrito}>{option.nombre}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label htmlFor="direccion" className="block text-sm font-medium text-gray-700">
-                Dirección
-              </label>
-              <input
-                type="text"
-                value={direccion}
-                id="direccion"
-                onChange={(e) => setDireccion(e.target.value.toUpperCase())}
-                className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="cargo" className="block text-sm font-medium text-gray-700">
-                Cargo
-              </label>
-              <input
-                type="text"
-                value={cargo}
-                onChange={(e) => {
-                  const value = e.target.value.toUpperCase(); 
-                  setCargo(
-                    value
-                      .split(' ')
-                      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                      .join(' ')
-                  );
-                }}
-                id="cargo"
-                className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="cip" className="block text-sm font-medium text-gray-700">
-                CIP
-              </label>
-              <input
-                type="text"
-                value={Cip}
-                onChange={(e) => {
-                  const value = e.target.value.toLowerCase(); // Convertir todo a minúsculas
-                  setCip(
-                    value
-                      .split(' ')
-                      .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalizar cada palabra
-                      .join(' ')
-                  );
-                }}
-                id="cip"
-                className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-              />
-            </div>
-            <div>
-              <label htmlFor="activo" className="block text-sm font-medium text-gray-700">
-                Activo
-              </label>
-              <input
-                type="checkbox"
-                id="activo"
-                checked={activo}
-                onChange={handleActivoChange}
-                className=" pointer form-checkbox text-blue-500 focus:ring-blue-500 h-6 w-6 bg-white"
-                required
-              />
-            </div>
-          </div>
-          <div className="flex justify-end">
-            <button
-              onClick={handleSubmit}
-              type="submit"
-              className={`inline-flex justify-center items-center px-4 py-2 azul-btn rounded-md `}
-            >
-              Guardar Cambios
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
-  
+
   );
 };
 

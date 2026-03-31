@@ -22,6 +22,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
     apellidos: "",
     email: "",
     startDate: null,        // fecha
+    cip: "",
     sexo: "",
     celular: "",
     departamento: "",
@@ -553,6 +554,9 @@ const Modal = ({ closeModal, Refresgpag }) => {
                 <input
                   type="text"
                   id="cip"
+                  value={form.cip}
+                  name='cip'
+                  onChange={handleChange}
                   className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
                 />
               </div>
