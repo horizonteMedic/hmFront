@@ -1,6 +1,9 @@
 import { getFetch } from "../../../getFetch/getFetch";
 import Swal from "sweetalert2";
 import { SubmitCuestionarioNordicoJS } from "./CuestionarioN";
+import { handleSubidaMasiva, handleSubirArchivoDefaultSinSellos, ReadArchivosFormDefault } from "../../../../../utils/functionUtils";
+
+const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta"
 
 const Loading = (text) => {
   Swal.fire({
@@ -73,6 +76,7 @@ export const GetInfoCuestionarioNordic = (nro, tabla, set, token) => {
         ...prev,
         ...res,
         user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+        SubirDoc: true,
       }))
     })
     .finally(() => {
@@ -126,4 +130,14 @@ export const PrintHojaR = (nro, token, tabla) => {
         Swal.close()
       }
     })
+}
+export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
+  handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
+};
+export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
+  ReadArchivosFormDefault(form, setVisualerOpen, token)
+}
+
+export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token) => {
+  handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token)
 }
