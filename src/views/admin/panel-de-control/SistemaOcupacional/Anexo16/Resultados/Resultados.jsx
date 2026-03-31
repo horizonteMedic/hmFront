@@ -192,16 +192,16 @@ export default function Resultados({
         </div>
 
         {/* Otros Exámenes */}
-        <div className="bg-white border border-gray-200 rounded-lg p-3">
+        <div className="bg-white border border-gray-200 rounded-lg p-3 flex gap-2">
           <InputTextArea
             label="Otros Exámenes"
-            rows={4}
+            rows={6}
             name="otrosExamenes"
             value={form.otrosExamenes}
             onChange={handleChange}
           />
           <InputTextArea
-            rows="4"
+            rows="6"
             label="Otros Exámenes AUTO"
             name="otrosExamenes2"
             value={form.otrosExamenes2}
