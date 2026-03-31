@@ -23,10 +23,10 @@ export const SubmitEmpresaContrata = async (
         return;
     }
     const body = {
-        id: form.idRelacionEmpresaContrata,
-        rucEmpresa: form.rucEmpresa,
-        rucContrata: form.rucContrata,
-        userRegistro: user,
+        id: null,
+        rucEmpresa: form.rucEmpresa.trim(),
+        rucContrata: form.rucContrata.trim(),
+        usuarioRegistro: user,
     };
     Loading("Registrando Datos");
     SubmitData(body, registrarUrl, token).then((res) => {
