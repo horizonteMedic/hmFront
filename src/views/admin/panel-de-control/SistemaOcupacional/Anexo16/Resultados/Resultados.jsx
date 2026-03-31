@@ -200,6 +200,13 @@ export default function Resultados({
             value={form.otrosExamenes}
             onChange={handleChange}
           />
+          <InputTextArea
+            rows="4"
+            label="Otros Exámenes AUTO"
+            name="otrosExamenes2"
+            value={form.otrosExamenes2}
+            disabled
+          />
         </div>
       </div>
 
