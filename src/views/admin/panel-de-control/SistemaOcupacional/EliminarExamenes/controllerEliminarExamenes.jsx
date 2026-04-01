@@ -162,7 +162,6 @@ export const DeleteExamen = async (norden, campo, token, setForm, form) => {
         Swal.fire("Error", "Primero busque un paciente", "error");
         return;
     }
-    console.log(campo)
     if (campo === "interconsulta") {
         const res = await getFetch(
             `${obtenerEspecialidad}?nOrden=${norden}`,
@@ -173,7 +172,6 @@ export const DeleteExamen = async (norden, campo, token, setForm, form) => {
                 acc[item.mensaje] = item.mensaje;
                 return acc;
             }, {});
-            console.log(inputOptions)
             const totalRadios = Object.keys(inputOptions).length;
             let height = 300; // base
             let width;
@@ -248,7 +246,6 @@ export const DeleteExamen = async (norden, campo, token, setForm, form) => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log(response)
             if (response.ok === true) {
 
                 /*const actualizarLista = (lista, campo) =>
@@ -331,9 +328,8 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList, carga = true) => 
         console.log('respuesta', res, anexo16, anexo2, interconsulta)
 
         const listInterconsultas = interconsulta.value?.resultado ? interconsulta.value?.resultado : []
-        console.log(listInterconsultas)
+
         const especialidades = listInterconsultas.map(i => i.especialidad);
-        console.log(especialidades)
         // 🔹 1. Normalizar respuesta a mapa por nameService
         const serviciosMap = Object.values(res.value).reduce((acc, item) => {
             acc[item.nameService] = item.existe;
@@ -364,7 +360,6 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList, carga = true) => 
 
 const mapItemsRecursivo = (items, serviciosMap, anexo16, anexo2, especialidades) => {
     return items.map(item => {
-        console.log('especialidada', especialidades)
         // 🔹 CASO 1: Es grupo (tiene sub-items)
         if (item.items && item.title) {
             return {

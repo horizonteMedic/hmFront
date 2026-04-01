@@ -266,20 +266,20 @@ const Engrosamiento = ({ form, setForm }) => {
                                     setForm((f) => ({
                                         ...f,
                                         txtSComentarios: e.target.checked
-                                            ? "TRAMA BRONCOVASCULAR ACENTUADA EN ACP"
+                                            ? `${form.conclusionesRadiograficas}\nTRAMA BRONCOVASCULAR ACENTUADA EN ACP`
                                             : "",
                                     }))
                                 }
                                 }
-                                checked={form.txtSComentarios == "TRAMA BRONCOVASCULAR ACENTUADA EN ACP"} id=""
+                                checked={form.txtSComentarios === `${form.conclusionesRadiograficas}\nTRAMA BRONCOVASCULAR ACENTUADA EN ACP`} id=""
                             />
                             <label htmlFor="">TRAMA BRONCOVASCULAR ACENTUADA EN ACP</label>
-                            <input type="checkbox" name="opcionSComentario" checked={form.txtSComentarios == "EVALUACION ANUAL"}
+                            <input type="checkbox" name="opcionSComentario" checked={form.txtSComentarios === `${form.conclusionesRadiograficas}\nEVALUACION ANUAL`}
                                 onChange={e => {
                                     setForm((f) => ({
                                         ...f,
                                         txtSComentarios: e.target.checked
-                                            ? "EVALUACION ANUAL"
+                                            ? `${form.conclusionesRadiograficas}\nEVALUACION ANUAL`
                                             : "",
                                     }))
                                 }
