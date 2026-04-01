@@ -51,7 +51,7 @@ export default function EliminarExamenes() {
     };
 
     const ExamenRow = ({ label, name, value }) => (
-        <div className="flex items-center gap-2 mb-1">
+        <div className="flex items-center gap-2 mb-1 px-4">
             <InputTextOneLine
                 label={label}
                 name={name}
@@ -72,6 +72,40 @@ export default function EliminarExamenes() {
             </button>
         </div>
     );
+
+    const normalizeItems = (items = []) => {
+        const result = [];
+        let currentGroup = {
+            title: null,
+            items: []
+        };
+
+        items.forEach(el => {
+            // 🔹 Si es sección
+            if (el.items && el.title) {
+                // guarda grupo anterior
+                if (currentGroup.items.length) {
+                    result.push(currentGroup);
+                }
+
+                // agrega sección directamente
+                result.push(el);
+
+                // reinicia grupo
+                currentGroup = { title: null, items: [] };
+            } else {
+                // 🔹 item plano
+                currentGroup.items.push(el);
+            }
+        });
+
+        // último grupo
+        if (currentGroup.items.length) {
+            result.push(currentGroup);
+        }
+
+        return result;
+    };
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
@@ -102,14 +136,38 @@ export default function EliminarExamenes() {
                         {form.listaExamenes
                             .filter(section => section.column === col)
                             .map(section => (
-                                <SectionFieldset key={section.legend} legend={section.legend}>
-                                    {section.items.map(item => (
-                                        <ExamenRow
-                                            key={item.name}
-                                            label={item.label}
-                                            name={item.name}
-                                            value={item.resultado === true ? "PASO" : "NO PASO"}
-                                        />
+                                <SectionFieldset key={section.legend} legend={section.legend} className={"!px-0"}>
+                                    {(section.sections || normalizeItems(section.items)).map((sub, index) => (
+                                        <div key={`${sub.title}-${index}`} className="mb-3">
+
+                                            {/* 🔸 Título */}
+                                            {sub.title && (
+                                                <div className="font-semibold text-[10px] rounded-t flex items-center bg-primario  text-white px-4 py-2 w-full rounded mb-2">
+                                                    {sub.title}
+                                                </div>
+                                            )}
+
+                                            {/* 🔸 Items */}
+                                            {sub.items
+                                                .slice() // 🔹 evita mutar el original
+                                                .sort((a, b) => a.label.localeCompare(b.label, 'es', { sensitivity: 'base' }))
+                                                .map((item, index) => (
+                                                    <ExamenRow
+                                                        key={`${item.name}-${index}`}
+                                                        label={item.label}
+                                                        name={item.name}
+                                                        value={
+                                                            Array.isArray(item.resultado)
+                                                                ? item.resultado.length > 0
+                                                                    ? "PASO"
+                                                                    : "NO TIENE"
+                                                                : item.resultado === true
+                                                                    ? "PASO"
+                                                                    : "NO PASO"
+                                                        }
+                                                    />
+                                                ))}
+                                        </div>
                                     ))}
                                 </SectionFieldset>
                             ))}

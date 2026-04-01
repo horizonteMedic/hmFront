@@ -2,32 +2,32 @@ export const EXAMENES_CATALOGO = {
     /* =========================
        GENERALES / BASE
     ========================= */
-    ANEXO_02: {
-        nombre: "ANEXO 02",
-        tabla: "anexo_agroindustrial",
-        url: "/api/v01/ct/anexos/anexo2/obtenerReporteAnexo2Completo",
-        esJasper: true,
-    },
-
     // ANEXO_02: {
     //     nombre: "ANEXO 02",
     //     tabla: "anexo_agroindustrial",
-    //     urlJsreport: "/api/v01/ct/anexos/descargarReporteAnexo2",
-    //     esJsreport: true,
+    //     url: "/api/v01/ct/anexos/anexo2/obtenerReporteAnexo2Completo",
+    //     esJasper: true,
     // },
 
-    ANEXO_16: {
-        nombre: "ANEXO 16",
-        tabla: "anexo7c",
-        url: "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16",
+    ANEXO_02: {
+        nombre: "ANEXO 02",
+        tabla: "anexo_agroindustrial",
+        urlJsreport: "/api/v01/ct/anexos/descargarReporteAnexo2",
+        esJsreport: true,
     },
 
     // ANEXO_16: {
     //     nombre: "ANEXO 16",
     //     tabla: "anexo7c",
-    //     urlJsreport: "/api/v01/ct/anexos/descargarReporteAnexo16",
-    //     esJsreport: true,
+    //     url: "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16",
     // },
+
+    ANEXO_16: {
+        nombre: "ANEXO 16",
+        tabla: "anexo7c",
+        urlJsreport: "/api/v01/ct/anexos/descargarReporteAnexo16",
+        esJsreport: true,
+    },
 
     ANEXO_16A: {
         nombre: "ANEXO 16A",
@@ -296,6 +296,20 @@ export const EXAMENES_CATALOGO = {
         nombre: "RAYOS X TORAX ARCHIVO",
         tabla: "RAYOS X TORAX",
         nomenclatura: "RAYOS X TORAX",
+        esArchivo: true,
+    },
+
+    PRUEBA_DE_ESFUERZO_ARCHIVO: {
+        nombre: "PRUEBA DE ESFUERZO ARCHIVO",
+        tabla: "PRUEBA DE ESFUERZO",
+        nomenclatura: "PRUEBA DE ESFUERZO",
+        esArchivo: true,
+    },
+
+    RESONANCIA_MAGNETICA_ARCHIVO: {
+        nombre: "RESONANCIA MAGNETICA ARCHIVO",
+        tabla: "RESMAG",
+        nomenclatura: "RESMAG",
         esArchivo: true,
     },
 

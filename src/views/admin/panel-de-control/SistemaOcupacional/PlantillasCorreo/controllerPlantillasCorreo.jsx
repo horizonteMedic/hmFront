@@ -23,10 +23,10 @@ export const SubmitEmpresaContrata = async (
         return;
     }
     const body = {
-        id: form.idRelacionEmpresaContrata,
-        rucEmpresa: form.rucEmpresa,
-        rucContrata: form.rucContrata,
-        userRegistro: user,
+        id: null,
+        rucEmpresa: form.rucEmpresa.trim(),
+        rucContrata: form.rucContrata.trim(),
+        usuarioRegistro: user,
     };
     Loading("Registrando Datos");
     SubmitData(body, registrarUrl, token).then((res) => {
@@ -55,9 +55,9 @@ export const SubmitPlantillaCorreo = async (
         if (!destino || destino.trim() === "") return false;
 
         return destino
-            .split(",")
-            .map(c => c.trim()) // 🔥 elimina espacios antes/después
-            .filter(c => c !== "") // evita errores por comas extra
+            .split(";")
+            .map(c => c.trim())
+            .filter(c => c.length > 0)
             .every(correo =>
                 /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)
             );

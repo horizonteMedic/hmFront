@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-import { LoadingDefault, PrintHojaRJsReportDefault, VerifyTRDefault } from "../../../../utils/functionUtils";
+import { handleSubidaMasiva, handleSubirArchivoDefaultSinSellos, LoadingDefault, PrintHojaRJsReportDefault, ReadArchivosFormDefault, VerifyTRDefault } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
 import { getToday } from "../../../../utils/helpers";
@@ -12,6 +12,8 @@ const obtenerParaJasperUrl = "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16";
 const obtenerReporteJsReportUrl = "/api/v01/ct/anexos/descargarReporteAnexo16"
 
 const obtenerExamenesRealizadosUrl = "/api/v01/ct/anexos/anexo2/obtenerExamenesRealizados";
+
+const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta"
 
 export const SubmitDataService = async (
   form,
@@ -185,7 +187,7 @@ export const SubmitDataService = async (
   });
 };
 
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+/*export const PrintHojaR = (nro, token, tabla, datosFooter) => {
   Loading("Cargando Formato a Imprimir");
   getFetch(
     `${obtenerParaJasperUrl}?nOrden=${nro}&nameService=${tabla}`,
@@ -201,29 +203,29 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         `../../../../jaspers/Anexo16/${nombre}.jsx`
       ]();
 
-     // Ejecuta la función exportada por default con los datos
-     if (typeof modulo.default === "function") {
-       modulo.default({ ...res, datosFooter });
-     } else {
-       console.error(
-         `El archivo ${nombre}.jsx no exporta una función por defecto`
-       );
-     }
-     Swal.close();
-   } else {
-     Swal.close();
-   }
- });
- };
+      // Ejecuta la función exportada por default con los datos
+      if (typeof modulo.default === "function") {
+        modulo.default({ ...res, datosFooter });
+      } else {
+        console.error(
+          `El archivo ${nombre}.jsx no exporta una función por defecto`
+        );
+      }
+      Swal.close();
+    } else {
+      Swal.close();
+    }
+  });
+};*/
 
-// export const PrintHojaR = (nro, token, tabla) => {
-//   PrintHojaRJsReportDefault(
-//     nro,
-//     token,
-//     tabla,
-//     obtenerReporteJsReportUrl
-//   );
-// };
+export const PrintHojaR = (nro, token, tabla) => {
+  PrintHojaRJsReportDefault(
+    nro,
+    token,
+    tabla,
+    obtenerReporteJsReportUrl
+  );
+};
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
   VerifyTRDefault(
@@ -489,10 +491,10 @@ export const GetInfoServicio = (
               "\n";
             data.contador++;
           }
-          data.observacionesGenerales += 
+          data.observacionesGenerales +=
             data.contador + ". " + (
               res.observacionesLaboratorioClinico_txtobservacioneslb != null &&
-              res.observacionesLaboratorioClinico_txtobservacioneslb !== ""
+                res.observacionesLaboratorioClinico_txtobservacioneslb !== ""
                 ? res.observacionesLaboratorioClinico_txtobservacioneslb
                 : "LABORATORIO: SIN OBSERVACIONES"
             ) + "\n";
@@ -525,6 +527,8 @@ export const GetInfoServicio = (
           // Laboratorio - Drogas
           const coca = res.cocainaLaboratorioClinico_txtcocaina;
           const marig = res.marihuanaLaboratorioClinico_txtmarihuana;
+
+
           if (coca === "REACTIVO" || coca === "POSITIVO") {
             data.observacionesGenerales +=
               data.contador +
@@ -551,6 +555,24 @@ export const GetInfoServicio = (
           const vsg = res.vsgLaboratorioClinico_txtvsg;
           const gluc = res.glucosaLaboratorioClinico_txtglucosabio;
           const creat = res.creatininaLaboratorioClinico_txtcreatininabio;
+          const hemo = res.hemoglobina_txthemoglobina ?? "";
+          data.vsg = vsg ?? "";
+          data.glucosa = gluc ?? "";
+          data.creatinina = creat ?? "";
+          data.otrosExamenes = "";
+          // data.otrosExamenes += `-HEMOGRAMA: NORMAL. \n`; //revisar
+          data.otrosExamenes += "HEMOGRAMA: " + (
+            res.examenQuimicoLeucocitos_txtleucocitoseq != null &&
+              res.sedimientoUrinarioHematies_txthematiessu != null &&
+              vsg != null && hemo != null ? "NORMAL" : "N/A") + "\n";
+          data.otrosExamenes +=
+            gluc == null ? "" : "-GLUCOSA: " + gluc + " mg/dl. \n";
+          data.otrosExamenes +=
+            creat == null ? "" : "-CREATININA: " + creat + " mg/dl. \n";
+          data.otrosExamenes += vsg == null ? "" : "-VSG: " + vsg + ". \n";
+          data.otrosExamenes += "-EX ORINA: NORMAL. \n";
+          data.otrosExamenes += coca == null ? "" : "-COCAINA: " + coca + ". \n";
+          data.otrosExamenes += marig == null ? "" : "-MARIHUANA: " + marig + ".";
 
           data.vsg = vsg;
           data.glucosa = gluc;
@@ -760,7 +782,7 @@ export const GetInfoServicio = (
             data.enfermedadOtros !== ""
           ) {
             data.observacionesGenerales +=
-            data.contador +
+              data.contador +
               ". " +
               data.enfermedadOtros +
               ":EVALUACION POR OFTALMOLOGIA.\n";
@@ -1035,6 +1057,8 @@ export const GetInfoServicio = (
           data.notasDoctor = res.notasDoctor ?? "";
           data.mercurioOrina = res.mercurioOrina ?? "N/A",
             data.plomoSangre = res.plomoSangre ?? "N/A",
+
+
 
             data = MapearDatosAdicionales(res, data, data.contador, false);
           console.log("DATAAA", data);
@@ -1320,29 +1344,7 @@ export const MapearDatosAdicionales = (
           ? "RH(-)"
           : "";
 
-      const vsg = res.vsgLaboratorioClinico_txtvsg;
-      const gluc = res.glucosaLaboratorioClinico_txtglucosabio;
-      const creat = res.creatininaLaboratorioClinico_txtcreatininabio;
-      const coca = res.cocainaLaboratorioClinico_txtcocaina;
-      const marig = res.marihuanaLaboratorioClinico_txtmarihuana;
 
-      data.vsg = vsg ?? "";
-      data.glucosa = gluc ?? "";
-      data.creatinina = creat ?? "";
-      data.otrosExamenes = "";
-      // data.otrosExamenes += `-HEMOGRAMA: NORMAL. \n`; //revisar
-      data.otrosExamenes += "HEMOGRAMA: " + (
-        res.examenQuimicoLeucocitos_txtleucocitoseq != null &&
-          res.sedimientoUrinarioHematies_txthematiessu != null &&
-          vsg != null && hemo != null ? "NORMAL" : "N/A") + "\n";
-      data.otrosExamenes +=
-        gluc == null ? "" : "-GLUCOSA: " + gluc + " mg/dl. \n";
-      data.otrosExamenes +=
-        creat == null ? "" : "-CREATININA: " + creat + " mg/dl. \n";
-      data.otrosExamenes += vsg == null ? "" : "-VSG: " + vsg + ". \n";
-      data.otrosExamenes += "-EX ORINA: NORMAL. \n";
-      data.otrosExamenes += coca == null ? "" : "-COCAINA: " + coca + ". \n";
-      data.otrosExamenes += marig == null ? "" : "-MARIHUANA: " + marig + ".";
 
       data.fechaRx = getToday();
       data.calidadRx = "2";
@@ -1535,6 +1537,7 @@ export const GetInfoServicioEditar = (
             observacionesGenerales:
               res.observacionesFichaMedicaAnexo7c_txtobservacionesfm ?? "",
             observacionesGenerales2: "",
+            otrosExamenes2: "",
             cerrado: res.cerrado ?? false,
             observacionesAudio: "",
             contador: 1,
@@ -1544,7 +1547,7 @@ export const GetInfoServicioEditar = (
             piel: res.pielAnexo7c_piel ? "NORMAL" : "ANORMAL",
             pielObservaciones: res.pielDescripcionAnexo7c_piel_descripcion,
             colesterolAnalisisBioquimico_txtcolesterol: res.colesterolAnalisisBioquimico_txtcolesterol,
-
+            SubirDoc: true,
           };
           data.dentaduraObservaciones =
             res.observacionesOdontograma_txtobservaciones ?? "";
@@ -1573,6 +1576,25 @@ export const GetInfoServicioEditar = (
           const vsg = res.vsgLaboratorioClinico_txtvsg;
           const gluc = res.glucosaLaboratorioClinico_txtglucosabio;
           const creat = res.creatininaLaboratorioClinico_txtcreatininabio;
+          const hemo = res.hemoglobina_txthemoglobina ?? "";
+          data.vsg = vsg ?? "";
+          data.glucosa = gluc ?? "";
+          data.creatinina = creat ?? "";
+          data.otrosExamenes2 = "";
+          // data.otrosExamenes2 += `-HEMOGRAMA: NORMAL. \n`; //revisar
+          data.otrosExamenes2 += "HEMOGRAMA: " + (
+            res.examenQuimicoLeucocitos_txtleucocitoseq != null &&
+              res.sedimientoUrinarioHematies_txthematiessu != null &&
+              vsg != null && hemo != null ? "NORMAL" : "N/A") + "\n";
+          data.otrosExamenes2 +=
+            gluc == null ? "" : "-GLUCOSA: " + gluc + " mg/dl. \n";
+          data.otrosExamenes2 +=
+            creat == null ? "" : "-CREATININA: " + creat + " mg/dl. \n";
+          data.otrosExamenes2 += vsg == null ? "" : "-VSG: " + vsg + ". \n";
+          data.otrosExamenes2 += "-EX ORINA: NORMAL. \n";
+          data.otrosExamenes2 += coca == null ? "" : "-COCAINA: " + coca + ". \n";
+          data.otrosExamenes2 += marig == null ? "" : "-MARIHUANA: " + marig + ".";
+
 
           data.vsg = vsg ?? "";
           data.glucosa = gluc ?? "";
@@ -2001,16 +2023,16 @@ export const GetInfoServicioEditar = (
             data.contador++;
           }
           data.observacionesGenerales2 +=
-          data.contador + ". " +
-          (
-            resSimple.observacionesLaboratorioClinico_txtobservacioneslb != null &&
-            resSimple.observacionesLaboratorioClinico_txtobservacioneslb !== ""
-              ? resSimple.observacionesLaboratorioClinico_txtobservacioneslb
-              : "LABORATORIO: SIN OBSERVACIONES"
-          ) +
-          "\n";
+            data.contador + ". " +
+            (
+              resSimple.observacionesLaboratorioClinico_txtobservacioneslb != null &&
+                resSimple.observacionesLaboratorioClinico_txtobservacioneslb !== ""
+                ? resSimple.observacionesLaboratorioClinico_txtobservacioneslb
+                : "LABORATORIO: SIN OBSERVACIONES"
+            ) +
+            "\n";
 
-        data.contador++;
+          data.contador++;
           if (resSimple.observacionesAlturaCertificado_alturabarrick != null) {
             data.observacionesGenerales2 +=
               data.contador +
@@ -2296,3 +2318,14 @@ const agregarObservacion = (base, texto) => {
   if (!texto) return base;
   return base ? `${base}\n${texto}` : texto;
 };
+
+export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
+  handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
+};
+export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
+  ReadArchivosFormDefault(form, setVisualerOpen, token)
+}
+
+export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token) => {
+  handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token)
+}
