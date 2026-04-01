@@ -167,6 +167,8 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "CONSENT_BUENA_SALUD",
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
     "DECLARACION_USO_FIRMA_ARCHIVO",           // 36
+    "RESONANCIA_MAGNETICA_ARCHIVO",
+    "PRUEBA_DE_ESFUERZO_ARCHIVO",
     "INTERCONSULTAS"                         // 22 nuevo
 ]);
 
@@ -242,7 +244,7 @@ const ExamenesListLaboratorio = buildExamenesList([
 ]);
 
 const ListaPorPlantilla = {
-    PRUEBAS: ExamenesListPRUEBAS,
+    // PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     "COMPLETO": ExamenesListCOMPLETO,
     //OHLA: ExamenesListOHLA,

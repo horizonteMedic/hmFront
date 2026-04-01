@@ -41,8 +41,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "etanol_saliva",
         "aptitud_medico_ocupacional_agro",
         "informe_psicologico",
-        // "anexo_agroindustrial",
-        // "anexo7c",
+        "anexo_agroindustrial",
+        "anexo7c",
         "certificado_aptitud_medico_ocupacional",
         "PRUEBA DE ESFUERZO",
         "RESMAG"
