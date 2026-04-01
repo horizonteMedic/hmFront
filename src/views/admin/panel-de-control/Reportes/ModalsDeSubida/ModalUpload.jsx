@@ -64,7 +64,7 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
         });
         closeModal()
         return;
-      } else if (datosarch.extension !== 'pdf' && !['jpg', 'jpeg', 'png'].includes(fileExtension)) {
+      } else if (datosarch.extension !== 'pdf' && !['jpg', 'jpeg', 'png','xlsx'].includes(fileExtension)) {
         Swal.fire({
           icon: 'error',
           title: 'Error al subir archivo',
