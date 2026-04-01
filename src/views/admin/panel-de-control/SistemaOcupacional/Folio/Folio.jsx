@@ -11,7 +11,8 @@ import { buildExamenesList } from "./folioCatalogo";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "INFORME_PSICOLOGICO_JSREPORT",
+    "PRUEBA_DE_ESFUERZO_ARCHIVO",
+    "RESONANCIA_MAGNETICA_ARCHIVO"
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -241,7 +242,7 @@ const ExamenesListLaboratorio = buildExamenesList([
 ]);
 
 const ListaPorPlantilla = {
-    //PRUEBAS: ExamenesListPRUEBAS,
+    PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     "COMPLETO": ExamenesListCOMPLETO,
     //OHLA: ExamenesListOHLA,

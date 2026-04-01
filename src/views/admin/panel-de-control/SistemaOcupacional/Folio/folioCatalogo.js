@@ -299,6 +299,20 @@ export const EXAMENES_CATALOGO = {
         esArchivo: true,
     },
 
+    PRUEBA_DE_ESFUERZO_ARCHIVO: {
+        nombre: "PRUEBA DE ESFUERZO ARCHIVO",
+        tabla: "PRUEBA DE ESFUERZO",
+        nomenclatura: "PRUEBA DE ESFUERZO",
+        esArchivo: true,
+    },
+
+    RESONANCIA_MAGNETICA_ARCHIVO: {
+        nombre: "RESONANCIA MAGNETICA ARCHIVO",
+        tabla: "RESMAG",
+        nomenclatura: "RESMAG",
+        esArchivo: true,
+    },
+
     /* =========================
        LABORATORIO
     ========================= */
