@@ -64,7 +64,8 @@ export const GetInfoPac = (nro, set, token, sede) => {
         ...prev,
         ...res,
         nombres: res.nombresApellidos,
-        txtSComentarios: `${res.txtSComentarios ? res.txtSComentarios + "\n" : ""}`
+        txtSComentarios: `${res.conclusionesRadiograficas ? res.conclusionesRadiograficas + "\n" : ""}`,
+
       }));
     })
     .finally(() => {
@@ -149,7 +150,7 @@ export const PrintHojaR = (nro, token, tabla) => {
         console.log(nombre)
         const jasperModules = import.meta.glob('../../../../../jaspers/OIT/*.jsx');
         const modulo = await jasperModules[`../../../../../jaspers/OIT/${nombre}.jsx`]();
-       // Ejecuta la función exportada por default con los datos
+        // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === 'function') {
           modulo.default(res);
         } else {
