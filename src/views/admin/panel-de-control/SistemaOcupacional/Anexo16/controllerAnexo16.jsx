@@ -362,6 +362,17 @@ export const GetInfoServicio = (
             data.observacionesGenerales += "MUSCULOESQUELETICA: " + res.conclusionMusculoesqueletica + "\n";
           }
 
+          const hallazgoEKG = res.hallazgosInformeElectroCardiograma_hallazgo;
+          const conclusionesEkg = res.conclusionekg;
+          const recomendacionesEKG = res.recomendacionesInformeElectroCardiograma_recomendaciones;
+
+          if (
+            (hallazgoEKG && hallazgoEKG !== "NORMAL") ||
+            (conclusionesEkg && !conclusionesEkg.includes("DENTRO DE PARAMETROS NORMALES"))
+          ) {
+            data.observacionesGenerales += `ELECTROCARDIOGRAMA: ${recomendacionesEKG}\n`;
+          }
+
           // if (res.observacionFichaConduccion != null) {
           //   data.observacionesGenerales += "FICHA CONDUCCION: " + res.observacionFichaConduccion + "\n";
           // }
@@ -1368,23 +1379,23 @@ export const MapearDatosAdicionales = (
     // SECCIÓN ELECTROCARDIOGRAMA electroCardiograma
     // =============================================================================================
 
-    const hallazgo = res.hallazgosInformeElectroCardiograma_hallazgo;
-    const recomendaciones =
-      res.recomendacionesInformeElectroCardiograma_recomendaciones;
+    // const hallazgo = res.hallazgosInformeElectroCardiograma_hallazgo;
+    // const recomendaciones =
+    //   res.recomendacionesInformeElectroCardiograma_recomendaciones;
 
-    if (hallazgo && hallazgo !== "NORMAL." && !isEdit) {
-      let electrocardiogramaText = `${contador}.ELECTROCARDIOGRAMA: ${hallazgo}`;
-      if (recomendaciones) {
-        electrocardiogramaText += `.${recomendaciones}`;
-      }
-      // Agregar a observaciones generales si existe
-      if (data.observacionesGenerales) {
-        data.observacionesGenerales += electrocardiogramaText + "\n";
-      } else {
-        data.observacionesGenerales = electrocardiogramaText + "\n";
-      }
-      contador++;
-    }
+    // if (hallazgo && hallazgo !== "NORMAL." && !isEdit) {
+    //   let electrocardiogramaText = `${contador}.ELECTROCARDIOGRAMA: ${hallazgo}`;
+    //   if (recomendaciones) {
+    //     electrocardiogramaText += `.${recomendaciones}`;
+    //   }
+    //   // Agregar a observaciones generales si existe
+    //   if (data.observacionesGenerales) {
+    //     data.observacionesGenerales += electrocardiogramaText + "\n";
+    //   } else {
+    //     data.observacionesGenerales = electrocardiogramaText + "\n";
+    //   }
+    //   contador++;
+    // }
 
     // =============================================================================================
     // SECCIÓN EXAMEN DE ORINA
@@ -1896,6 +1907,17 @@ export const GetInfoServicioEditar = (
           // if (res.observacionFichaConduccion != null) {
           //   data.observacionesGenerales += "FICHA CONDUCCION: " + res.observacionFichaConduccion + "\n";
           // }
+
+          const hallazgoEKG = res.hallazgosInformeElectroCardiograma_hallazgo;
+          const conclusionesEkg = res.conclusionekg;
+          const recomendacionesEKG = res.recomendacionesInformeElectroCardiograma_recomendaciones;
+
+          if (
+            (hallazgoEKG && hallazgoEKG !== "NORMAL") ||
+            (conclusionesEkg && !conclusionesEkg.includes("DENTRO DE PARAMETROS NORMALES"))
+          ) {
+            data.observacionesGenerales2 += `-ELECTROCARDIOGRAMA: ${recomendacionesEKG}\n`;
+          }
 
           // Información radiográfica
           if (resSimple.infoGeneralRadiografia_info_general != null) {
