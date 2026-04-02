@@ -71,6 +71,7 @@ import {
   faEnvelope,
   faHandHoldingMedical,
   faUpload,
+  faMagnifyingGlassPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -111,6 +112,7 @@ import Altura18 from "./Altura18/Altura18.jsx";
 import PlantillasCorreo from "./PlantillasCorreo/PlantillasCorreo.jsx";
 import AsistencialTabSelector from "./Asistencial/AsistencialTabSelector.jsx";
 import SubidaArchivos from "./SubidaArchivos/SubidaArchivos.jsx";
+import PacientesObservados from "./PacientesObservados/PacientesObservados.jsx";
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
   { key: 7, label: "Test Altura" },
@@ -330,6 +332,7 @@ const TabComponent = () => {
                   { vista: "Plantillas Correo", tab: 41, icons: [{ icon: faEnvelope }], label: "Plantillas de Correo" },
                   { vista: "Asistencial", tab: 42, icons: [{ icon: faHandHoldingMedical }], label: "Asistencial" },
                   { vista: "Subida de Archivos", tab: 43, icons: [{ icon: faUpload }], label: "Subida de Archivos" },
+                  { vista: "Pacientes Observados", tab: 44, icons: [{ icon: faMagnifyingGlassPlus }], label: "Pacientes Observados" },
                   { vista: "Folio", tab: 40, icons: [{ icon: faFileContract }], label: "Folio" },
                 ];
                 return items
@@ -610,6 +613,7 @@ const TabComponent = () => {
               41: { title: "Plantillas de Correo", child: <PlantillasCorreo ContrataMulti={ContrataMultiNP} EmpresasMulti={EmpresasMulti} /> },
               42: { title: "Asistencial", child: <AsistencialTabSelector tieneVista={tieneVista} /> },
               43: { title: "Subida de Archivos", child: <SubidaArchivos /> },
+              44: { title: "Pacientes Observados", child: <PacientesObservados /> },
               40: { title: "Folio", child: <Folio /> },
             };
             const section = displayedInterfaces[activeTab];
