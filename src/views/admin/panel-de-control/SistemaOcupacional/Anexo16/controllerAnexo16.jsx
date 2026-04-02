@@ -354,9 +354,17 @@ export const GetInfoServicio = (
             data.observacionesGenerales += "ESPIROMETRIA: " + res.interpretacionFuncionRespiratoria_interpretacion + "\n";
           }
 
-          // if (res.conclusionradiografia_conclu != null) {
-          //   data.observacionesGenerales += "RAYOS X: " + res.conclusionradiografia_conclu + "\n";
-          // }
+          const rayosXConclusion = res.conclusionesradiograficastorax_txtconclusionesradiograficas;
+          const rayosXObservaciones = res.observacionesradiografiatorax_txtobservacionesrt;
+
+          if (rayosXConclusion || rayosXObservaciones) {
+            data.observacionesGenerales +=
+              `RAYOS X: ` +
+              (rayosXConclusion ?? "") +
+              (rayosXConclusion && rayosXObservaciones ? " - " : "") +
+              (rayosXObservaciones ?? "") +
+              ".\n";
+          }
 
           if (res.conclusionMusculoesqueletica != null) {
             data.observacionesGenerales += "MUSCULOESQUELETICA: " + res.conclusionMusculoesqueletica + "\n";
@@ -1896,9 +1904,17 @@ export const GetInfoServicioEditar = (
             data.observacionesGenerales2 += "ESPIROMETRIA: " + res.interpretacionFuncionRespiratoria_interpretacion + "\n";
           }
 
-          // if (res.conclusionradiografia_conclu != null) {
-          //   data.observacionesGenerales += "RAYOS X: " + res.conclusionradiografia_conclu + "\n";
-          // }
+          const rayosXConclusion = res.conclusionesradiograficastorax_txtconclusionesradiograficas;
+          const rayosXObservaciones = res.observacionesradiografiatorax_txtobservacionesrt;
+
+          if (rayosXConclusion || rayosXObservaciones) {
+            data.observacionesGenerales2 +=
+              `RAYOS X: ` +
+              (rayosXConclusion ?? "") +
+              (rayosXConclusion && rayosXObservaciones ? " - " : "") +
+              (rayosXObservaciones ?? "") +
+              ".\n";
+          }
 
           if (resSimple.conclusionMusculoesqueletica != null) {
             data.observacionesGenerales2 += "MUSCULOESQUELETICA: " + res.conclusionMusculoesqueletica + "\n";
