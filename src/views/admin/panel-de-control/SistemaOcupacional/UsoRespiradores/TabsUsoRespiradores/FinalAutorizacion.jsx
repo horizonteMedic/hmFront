@@ -5,7 +5,7 @@ export default function FinalAutorizacion({ form, setForm, handleChange, handleR
   return (
     <div className="space-y-3">
       <div className="bg-orange-100 border border-orange-300 text-orange-900 rounded-md p-3">
-        El trabajador mencionado ha sido examinado en el ajuste del respirador de conformidad con el Estándar de Barrick de Protección Respiratoria. Esta evaluación limitada es especificada para el uso del respirador solamente. Basado en mis hallazgos he determinado que la persona:
+        El trabajador mencionado ha sido examinado en el ajuste del respirador de conformidad con el estándar de la minera. Esta evaluación limitada es especificada para el uso del respirador solamente. Basado en mis hallazgos he determinado que la persona:
       </div>
       <SectionFieldset legend="Autorización para el uso de Respiradores" className="grid xl:grid-cols-2 gap-y-3 gap-x-4">
         <InputTextOneLine

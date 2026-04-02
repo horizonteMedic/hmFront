@@ -87,7 +87,16 @@ export const GetInfoServicio = async (
         const textoEnfermedadOftalmo = (res.enfermedadesocularesoftalmo_e_oculares ?? "").trim().toUpperCase();
 
         if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
-            const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
+            const enfermedadesRefractarias = [
+                "MIOPIA",//agregados
+                "ASIGMATISMO",//agregados
+                "AMETROPIA",
+                "PRESBICIA",
+                "HIPERMETROPIA",
+                "OJO CIEGO",
+                // "CUENTA DEDOS",
+                // "PERCIBE LUZ"
+            ];
             if (enfermedadesRefractarias.some(e => textoEnfermedadOftalmo.includes(e))) {
                 const visionLejosNormal = vlejoscod === "00" && vlejoscoi === "00";
                 const visionCercaNormal = vcercacod === "00" && vcercacoi === "00";
@@ -221,7 +230,16 @@ export const GetInfoServicioEditar = async (
         const textoEnfermedadOftalmo = (res.enfermedadesocularesoftalmo_e_oculares ?? "").trim().toUpperCase();
 
         if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
-            const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
+            const enfermedadesRefractarias = [
+                "MIOPIA",//agregados
+                "ASIGMATISMO",//agregados
+                "AMETROPIA",
+                "PRESBICIA",
+                "HIPERMETROPIA",
+                "OJO CIEGO",
+                // "CUENTA DEDOS",
+                // "PERCIBE LUZ"
+            ];
             if (enfermedadesRefractarias.some(e => textoEnfermedadOftalmo.includes(e))) {
                 const visionLejosNormal = vlejoscod === "00" && vlejoscoi === "00";
                 const visionCercaNormal = vcercacod === "00" && vcercacoi === "00";
