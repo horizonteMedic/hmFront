@@ -313,6 +313,20 @@ export const EXAMENES_CATALOGO = {
         esArchivo: true,
     },
 
+    MERCURIO_EN_ORINA_ARCHIVO: {
+        nombre: "MERCURIO EN ORINA ARCHIVO",
+        tabla: "MERCURIO EN ORINA",
+        nomenclatura: "MERCURIO EN ORINA",
+        esArchivo: true,
+    },
+
+    PLOMO_EN_SANGRE_ARCHIVO: {
+        nombre: "PLOMO EN SANGRE ARCHIVO",
+        tabla: "PLOMO EN SANGRE",
+        nomenclatura: "PLOMO EN SANGRE",
+        esArchivo: true,
+    },
+
     /* =========================
        LABORATORIO
     ========================= */

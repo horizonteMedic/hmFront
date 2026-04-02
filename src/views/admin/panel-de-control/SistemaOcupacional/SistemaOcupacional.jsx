@@ -70,6 +70,7 @@ import {
   faSearch,
   faEnvelope,
   faHandHoldingMedical,
+  faUpload,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -109,6 +110,7 @@ import Folio from "./Folio/Folio.jsx";
 import Altura18 from "./Altura18/Altura18.jsx";
 import PlantillasCorreo from "./PlantillasCorreo/PlantillasCorreo.jsx";
 import AsistencialTabSelector from "./Asistencial/AsistencialTabSelector.jsx";
+import SubidaArchivos from "./SubidaArchivos/SubidaArchivos.jsx";
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
   { key: 7, label: "Test Altura" },
@@ -327,6 +329,7 @@ const TabComponent = () => {
                   { vista: "Altura 1.8", tab: 39, icons: [{ icon: faArrowUp }], label: "Altura 1.8" },
                   { vista: "Plantillas Correo", tab: 41, icons: [{ icon: faEnvelope }], label: "Plantillas de Correo" },
                   { vista: "Asistencial", tab: 42, icons: [{ icon: faHandHoldingMedical }], label: "Asistencial" },
+                  { vista: "Subida de Archivos", tab: 43, icons: [{ icon: faUpload }], label: "Subida de Archivos" },
                   { vista: "Folio", tab: 40, icons: [{ icon: faFileContract }], label: "Folio" },
                 ];
                 return items
@@ -606,6 +609,7 @@ const TabComponent = () => {
               39: { title: "Altura 1.8", child: <Altura18 /> },
               41: { title: "Plantillas de Correo", child: <PlantillasCorreo ContrataMulti={ContrataMultiNP} EmpresasMulti={EmpresasMulti} /> },
               42: { title: "Asistencial", child: <AsistencialTabSelector tieneVista={tieneVista} /> },
+              43: { title: "Subida de Archivos", child: <SubidaArchivos /> },
               40: { title: "Folio", child: <Folio /> },
             };
             const section = displayedInterfaces[activeTab];

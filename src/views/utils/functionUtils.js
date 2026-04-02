@@ -576,7 +576,8 @@ export const handleSubirArchivoDefaultSinSellos = async (
     selectedSede,
     urlPDf,
     userlogued,
-    token
+    token,
+    nomenclatura = ""
 ) => {
     const { value: file } = await Swal.fire({
         title: "Selecciona un archivo PDF",
@@ -633,7 +634,7 @@ export const handleSubirArchivoDefaultSinSellos = async (
             nombreArchivo: nombreFinal,
             codigoSede: selectedSede,
             fileBase64: pdfBase64Final,
-            nomenclatura_tipo_archivo: form.nomenclatura,
+            nomenclatura_tipo_archivo: nomenclatura != "" ? nomenclatura : form.nomenclatura,
             orden: form.norden,
             indice_carga_masiva: undefined,
         };
@@ -740,7 +741,7 @@ export const handleImgtoPdfDefault = async (
     }
 };
 
-export const handleSubidaMasiva = async (form, selectedSede, urlPDf, userlogued, token) => {
+export const handleSubidaMasiva = async (form, selectedSede, urlPDf, userlogued, token, nomenclatura = "") => {
     let pdfFiles = [];
     const { isConfirmed } = await Swal.fire({
         title: "Selecciona la carpeta con PDFs",
@@ -830,7 +831,7 @@ export const handleSubidaMasiva = async (form, selectedSede, urlPDf, userlogued,
                 nombreArchivo: nombreFinal,
                 codigoSede: selectedSede,
                 fileBase64: pdfBase64Final,
-                nomenclatura_tipo_archivo: form.nomenclatura,
+                nomenclatura_tipo_archivo: nomenclatura != "" ? nomenclatura : form.nomenclatura,
                 orden,
                 indice_carga_masiva: undefined,
             };
@@ -1216,7 +1217,7 @@ export const handleSubidaMasivaImagenesRXDinamico = async (
 };
 
 
-export const ReadArchivosFormDefault = async (form, setVisualerOpen, token, nomenclatura) => {
+export const ReadArchivosFormDefault = async (form, setVisualerOpen, token, nomenclatura = null) => {
     LoadingDefault("Cargando Archivo")
     getFetch(`/api/v01/st/registros/detalleUrlArchivos/${form.norden}/${nomenclatura ?? form.nomenclatura}`, token)
         .then(response => {

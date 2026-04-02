@@ -11,8 +11,8 @@ import { buildExamenesList } from "./folioCatalogo";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "PRUEBA_DE_ESFUERZO_ARCHIVO",
-    "RESONANCIA_MAGNETICA_ARCHIVO"
+    "MERCURIO_EN_ORINA_ARCHIVO",
+    "PLOMO_EN_SANGRE_ARCHIVO"
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -78,6 +78,8 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     //LABORATORIO
     "LABORATORIO_CLINICO",
     "PERFIL_LIPIDICO",
+    "MERCURIO_EN_ORINA_ARCHIVO",
+    "PLOMO_EN_SANGRE_ARCHIVO",
     "PERFIL_RENAL",
     "PERFIL_HEPATICO",
     "ANALISIS_RIESGO_CORONARIO",
