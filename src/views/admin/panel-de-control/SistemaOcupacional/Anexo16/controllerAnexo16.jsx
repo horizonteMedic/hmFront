@@ -366,6 +366,18 @@ export const GetInfoServicio = (
               ".\n";
           }
 
+          const rayosXColumnaConclusion = res.conclusionrayoscolumna;
+
+          if (rayosXColumnaConclusion &&
+            rayosXColumnaConclusion !== "RADIOGRAFÍA DE COLUMNA LUMBAR AP-L SIN ALTERACIONES SIGNIFICATIVAS." &&
+            rayosXColumnaConclusion !== "RADIOGRAFÍA DE COLUMNA LUMBOSACRA AP-L SIN ALTERACIONES SIGNIFICATIVAS." &&
+            rayosXColumnaConclusion !== "CUERPOS VERTEBRALES DORSOLUMBARES EVALUADOS SIN ALTERACIONES SIGNIFICATIVAS.") {
+            data.observacionesGenerales +=
+              `RADIOGRAFIA COLUMNA: ` +
+              (rayosXColumnaConclusion ?? "") +
+              ".\n";
+          }
+
           if (res.conclusionMusculoesqueletica != null) {
             data.observacionesGenerales += "MUSCULOESQUELETICA: " + res.conclusionMusculoesqueletica + "\n";
           }
@@ -1913,6 +1925,18 @@ export const GetInfoServicioEditar = (
               (rayosXConclusion ?? "") +
               (rayosXConclusion && rayosXObservaciones ? " - " : "") +
               (rayosXObservaciones ?? "") +
+              ".\n";
+          }
+
+          const rayosXColumnaConclusion = res.conclusionrayoscolumna;
+
+          if (rayosXColumnaConclusion &&
+            rayosXColumnaConclusion !== "RADIOGRAFÍA DE COLUMNA LUMBAR AP-L SIN ALTERACIONES SIGNIFICATIVAS." &&
+            rayosXColumnaConclusion !== "RADIOGRAFÍA DE COLUMNA LUMBOSACRA AP-L SIN ALTERACIONES SIGNIFICATIVAS." &&
+            rayosXColumnaConclusion !== "CUERPOS VERTEBRALES DORSOLUMBARES EVALUADOS SIN ALTERACIONES SIGNIFICATIVAS.") {
+            data.observacionesGenerales2 +=
+              `RADIOGRAFIA COLUMNA: ` +
+              (rayosXColumnaConclusion ?? "") +
               ".\n";
           }
 

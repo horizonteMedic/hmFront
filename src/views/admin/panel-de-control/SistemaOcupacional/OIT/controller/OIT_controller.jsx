@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import { SubmitOITModel, SubmitOITModelSinDatos } from "./model";
 import OIT_B_Digitalizado from "../../../../../jaspers/OIT/OIT_B_Digitalizado";
 import OIT_B_Digitalizado_boro from "../../../../../jaspers/OIT/OIT_B_Digitalizado_boro";
-import { handleSubidaMasiva, handleSubirArchivoDefaultSinSellos, ReadArchivosFormDefault } from "../../../../../utils/functionUtils";
+import { handleSubidaMasiva, handleSubirArchivoDefaultSinSellos, ReadArchivosFormDefault, VerifyTRPerzonalizadoDefault } from "../../../../../utils/functionUtils";
 
 const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta"
 
@@ -39,22 +39,51 @@ const Loading = (text) => {
 
 }
 
+// export const VerifyTR = async (nro, tabla, token, set, sede) => {
+//   if (!nro) {
+//     await Swal.fire('Error', 'Debe Introducir un Nro de Historia Clinica valido', 'error')
+//     return
+//   }
+//   Loading('Validando datos')
+//   getFetch(`/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`, token)
+//     .then((res) => {
+//       console.log(res)
+//       if (res.id === 0) {
+//         GetInfoPac(nro, set, token, sede)
+//       } else {
+//         GetInfoPacLaboratorioFil(nro, tabla, set, token)
+//       }
+//     })
+// }
+
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
   if (!nro) {
     await Swal.fire('Error', 'Debe Introducir un Nro de Historia Clinica valido', 'error')
     return
   }
-  Loading('Validando datos')
-  getFetch(`/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`, token)
-    .then((res) => {
-      console.log(res)
-      if (res.id === 0) {
-        GetInfoPac(nro, set, token, sede)
-      } else {
-        GetInfoPacLaboratorioFil(nro, tabla, set, token)
-      }
-    })
-}
+  VerifyTRPerzonalizadoDefault(
+    nro,
+    tabla,
+    token,
+    set,
+    sede,
+    () => {
+      //NO Tiene registro
+      GetInfoPac(nro, set, token, sede)
+    },
+    () => {
+      GetInfoPacLaboratorioFil(nro, tabla, set, token)
+    },
+    () => {
+      //Necesita Agudeza visual 
+      Swal.fire(
+        "Alerta",
+        "El paciente necesita pasar por Rayos X Torax.",
+        "warning"
+      );
+    }
+  );
+};
 
 export const GetInfoPac = (nro, set, token, sede) => {
   getFetch(`/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`, token)
@@ -86,7 +115,11 @@ export const GetInfoPacLaboratorioFil = (nro, tabla, set, token) => {
       }))
     })
     .finally(() => {
-      Swal.close()
+      Swal.fire(
+        "Alerta",
+        "Este paciente ya cuenta con registros de OIT",
+        "warning"
+      );
     })
 }
 
