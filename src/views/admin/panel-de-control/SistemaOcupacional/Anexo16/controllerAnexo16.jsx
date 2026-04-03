@@ -404,10 +404,10 @@ export const GetInfoServicio = (
               res.infoGeneralRadiografia_info_general +
               "\n";
           }
-          if (res.conclusionRadiografia_conclu != null) {
-            data.observacionesGenerales +=
-              ". CONCLUSIONES : " + res.conclusionRadiografia_conclu + "\n";
-          }
+          // if (res.conclusionRadiografia_conclu != null) {
+          //   data.observacionesGenerales +=
+          //     ". CONCLUSIONES : " + res.conclusionRadiografia_conclu + "\n";
+          // }
 
           // Radiografía de tórax
           if (
@@ -1966,10 +1966,10 @@ export const GetInfoServicioEditar = (
               resSimple.infoGeneralRadiografia_info_general +
               "\n";
           }
-          if (resSimple.conclusionRadiografia_conclu != null) {
-            data.observacionesGenerales2 +=
-              "-CONCLUSIONES : " + resSimple.conclusionRadiografia_conclu + "\n";
-          }
+          // if (resSimple.conclusionRadiografia_conclu != null) {
+          //   data.observacionesGenerales2 +=
+          //     "-CONCLUSIONES : " + resSimple.conclusionRadiografia_conclu + "\n";
+          // }
 
           // Radiografía de tórax
           if (
