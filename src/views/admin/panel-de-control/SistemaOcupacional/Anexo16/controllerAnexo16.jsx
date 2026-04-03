@@ -366,7 +366,7 @@ export const GetInfoServicio = (
               ".\n";
           }
 
-          const rayosXColumnaConclusion = res.conclusionrayoscolumna;
+          const rayosXColumnaConclusion = res.conclusionRayosColumna;
 
           if (rayosXColumnaConclusion &&
             rayosXColumnaConclusion !== "RADIOGRAFÍA DE COLUMNA LUMBAR AP-L SIN ALTERACIONES SIGNIFICATIVAS." &&
@@ -1928,7 +1928,7 @@ export const GetInfoServicioEditar = (
               ".\n";
           }
 
-          const rayosXColumnaConclusion = res.conclusionrayoscolumna;
+          const rayosXColumnaConclusion = res.conclusionRayosColumna;
 
           if (rayosXColumnaConclusion &&
             rayosXColumnaConclusion !== "RADIOGRAFÍA DE COLUMNA LUMBAR AP-L SIN ALTERACIONES SIGNIFICATIVAS." &&
