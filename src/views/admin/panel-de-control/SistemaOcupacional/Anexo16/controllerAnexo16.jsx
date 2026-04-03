@@ -354,8 +354,8 @@ export const GetInfoServicio = (
             data.observacionesGenerales += "ESPIROMETRIA: " + res.interpretacionFuncionRespiratoria_interpretacion + "\n";
           }
 
-          const rayosXConclusion = res.conclusionesradiograficastorax_txtconclusionesradiograficas;
-          const rayosXObservaciones = res.observacionesradiografiatorax_txtobservacionesrt;
+          const rayosXConclusion = res.conclusionesRadiograficasTorax_txtconclusionesradiograficas;
+          const rayosXObservaciones = res.observacionesRadiografiaTorax_txtobservacionesrt;
 
           if (rayosXConclusion || rayosXObservaciones) {
             data.observacionesGenerales +=
@@ -406,7 +406,7 @@ export const GetInfoServicio = (
           }
           if (res.conclusionRadiografia_conclu != null) {
             data.observacionesGenerales +=
-              ". CONCLUCIONES : " + res.conclusionRadiografia_conclu + "\n";
+              ". CONCLUSIONES : " + res.conclusionRadiografia_conclu + "\n";
           }
 
           // Radiografía de tórax
@@ -511,17 +511,17 @@ export const GetInfoServicio = (
             }
           }
 
-          if (
-            res.observacionesRadiografiaTorax_txtobservacionesrt != null &&
-            res.observacionesRadiografiaTorax_txtobservacionesrt !== "NORMAL"
-          ) {
-            data.observacionesGenerales +=
-              data.contador +
-              ". " +
-              res.observacionesRadiografiaTorax_txtobservacionesrt +
-              "\n";
-            data.contador++;
-          }
+          // if (
+          //   res.observacionesRadiografiaTorax_txtobservacionesrt != null &&
+          //   res.observacionesRadiografiaTorax_txtobservacionesrt !== "NORMAL"
+          // ) {
+          //   data.observacionesGenerales +=
+          //     data.contador +
+          //     ". " +
+          //     res.observacionesRadiografiaTorax_txtobservacionesrt +
+          //     "\n";
+          //   data.contador++;
+          // }
           data.observacionesGenerales +=
             data.contador + ". " + (
               res.observacionesLaboratorioClinico_txtobservacioneslb != null &&
@@ -1916,8 +1916,8 @@ export const GetInfoServicioEditar = (
             data.observacionesGenerales2 += "ESPIROMETRIA: " + res.interpretacionFuncionRespiratoria_interpretacion + "\n";
           }
 
-          const rayosXConclusion = res.conclusionesradiograficastorax_txtconclusionesradiograficas;
-          const rayosXObservaciones = res.observacionesradiografiatorax_txtobservacionesrt;
+          const rayosXConclusion = res.conclusionesRadiograficasTorax_txtconclusionesradiograficas;
+          const rayosXObservaciones = res.observacionesRadiografiaTorax_txtobservacionesrt;
 
           if (rayosXConclusion || rayosXObservaciones) {
             data.observacionesGenerales2 +=
@@ -1968,7 +1968,7 @@ export const GetInfoServicioEditar = (
           }
           if (resSimple.conclusionRadiografia_conclu != null) {
             data.observacionesGenerales2 +=
-              "-CONCLUCIONES : " + resSimple.conclusionRadiografia_conclu + "\n";
+              "-CONCLUSIONES : " + resSimple.conclusionRadiografia_conclu + "\n";
           }
 
           // Radiografía de tórax
@@ -2058,19 +2058,19 @@ export const GetInfoServicioEditar = (
                 "\n";
               data.contador++;
             }
-            if (
-              resSimple.conclusionesRadiograficasTorax_txtconclusionesradiograficas !=
-              null &&
-              resSimple.conclusionesRadiograficasTorax_txtconclusionesradiograficas !==
-              "NORMAL"
-            ) {
-              data.observacionesGenerales2 +=
-                data.contador +
-                "." +
-                resSimple.conclusionesRadiograficasTorax_txtconclusionesradiograficas +
-                "\n";
-              data.contador++;
-            }
+            // if (
+            //   resSimple.conclusionesRadiograficasTorax_txtconclusionesradiograficas !=
+            //   null &&
+            //   resSimple.conclusionesRadiograficasTorax_txtconclusionesradiograficas !==
+            //   "NORMAL"
+            // ) {
+            //   data.observacionesGenerales2 +=
+            //     data.contador +
+            //     "." +
+            //     resSimple.conclusionesRadiograficasTorax_txtconclusionesradiograficas +
+            //     "\n";
+            //   data.contador++;
+            // }
           }
 
           if (
