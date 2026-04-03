@@ -398,7 +398,12 @@ export const GetInfoServicio = (
           // }
 
           // Información radiográfica
-          if (res.infoGeneralRadiografia_info_general != null) {
+          if (res.infoGeneralRadiografia_info_general != null && res.infoGeneralRadiografia_info_general !== ("CUERPOS VERTEBRALES MUESTRAN MORFOLOGÍA NORMAL.\n" +
+            "SACRO NO MUESTRA LESIONES EVIDENTES.\n" +
+            "ESPACIOS INTERVERTEBRALES CONSERVADOS.\n" +
+            "DENSIDAD ÓSEA ADECUADA.\n" +
+            "LORDOSIS LUMBAR NORMAL.\n" +
+            "CANAL RAQUÍDEO CON AMPLITUD NORMAL.")) {
             data.observacionesGenerales +=
               ". INFORME RADIOGRAFICO : " +
               res.infoGeneralRadiografia_info_general +
@@ -1960,7 +1965,12 @@ export const GetInfoServicioEditar = (
           }
 
           // Información radiográfica
-          if (resSimple.infoGeneralRadiografia_info_general != null) {
+          if (resSimple.infoGeneralRadiografia_info_general != null && resSimple.infoGeneralRadiografia_info_general !== ("CUERPOS VERTEBRALES MUESTRAN MORFOLOGÍA NORMAL.\n" +
+            "SACRO NO MUESTRA LESIONES EVIDENTES.\n" +
+            "ESPACIOS INTERVERTEBRALES CONSERVADOS.\n" +
+            "DENSIDAD ÓSEA ADECUADA.\n" +
+            "LORDOSIS LUMBAR NORMAL.\n" +
+            "CANAL RAQUÍDEO CON AMPLITUD NORMAL.")) {
             data.observacionesGenerales2 +=
               "-INFORME RADIOGRAFICO : " +
               resSimple.infoGeneralRadiografia_info_general +
