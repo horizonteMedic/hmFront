@@ -384,7 +384,7 @@ export const GetInfoServicio = (
 
           const hallazgoEKG = res.hallazgosInformeElectroCardiograma_hallazgo;
           const conclusionesEkg = res.conclusionekg;
-          const recomendacionesEKG = res.recomendacionesInformeElectroCardiograma_recomendaciones;
+          const recomendacionesEKG = res.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
 
           if (
             (hallazgoEKG && hallazgoEKG !== "NORMAL") ||
@@ -1950,7 +1950,7 @@ export const GetInfoServicioEditar = (
 
           const hallazgoEKG = res.hallazgosInformeElectroCardiograma_hallazgo;
           const conclusionesEkg = res.conclusionekg;
-          const recomendacionesEKG = res.recomendacionesInformeElectroCardiograma_recomendaciones;
+          const recomendacionesEKG = res.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
 
           if (
             (hallazgoEKG && hallazgoEKG !== "NORMAL") ||
