@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import Swal from "sweetalert2";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { useForm } from "../../../../hooks/useForm";
 import {
     GetInfoServicio,
     getInfoTabla,
-    handleLevantarObservacion,
+    handleEliminarObservacion,
+    handleExportar,
     Loading,
     SubmitDataService,
     VerifyTR,
@@ -21,13 +21,10 @@ import {
     faSearch,
     faFileExcel,
     faTrash,
-    faFileMedical,
-    faBroom,
 } from "@fortawesome/free-solid-svg-icons";
-import * as XLSX from "xlsx";
 import BotonesAccion from "../../../../components/templates/BotonesAccion";
 
-const tabla = "pacientes_observados";
+const tabla = "observaciones";
 
 export default function PacientesObservados() {
     const { token, userlogued, selectedSede, hora } = useSessionData();
@@ -35,7 +32,7 @@ export default function PacientesObservados() {
 
     const initialFormState = {
         norden: "",
-        codigoPacientesObservados: null,
+        idObservacion: null,
         fecha: today,
         dni: "",
         nombres: "",
@@ -68,14 +65,7 @@ export default function PacientesObservados() {
     };
 
     const obtenerInfoTabla = () => {
-        getInfoTabla(
-            form.nombres_search,
-            form.codigo_search,
-            form.fechaDesde,
-            form.fechaHasta,
-            setDataTabla,
-            token
-        );
+        getInfoTabla(form, setDataTabla, token);
     };
 
     const handleSpecialtyClick = (specialty) => {
@@ -90,35 +80,14 @@ export default function PacientesObservados() {
         });
     };
 
-    const handleExportar = () => {
-        if (dataTabla.length === 0) {
-            Swal.fire("Aviso", "No hay datos para exportar", "info");
-            return;
-        }
-        const dataToExport = dataTabla.map(row => ({
-            "N° Orden": row.norden,
-            "Nombres": row.nombres,
-            "Empresa": row.empresa,
-            "Contrata": row.contrata,
-            "Fecha": formatearFechaCorta(row.fechaInforme),
-            "Observaciones": row.interpretacion,
-            "Hora Inicio": row.horaInicio,
-            "Hora Fin": row.horaFin,
-        }));
-        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Pacientes Observados");
-        XLSX.writeFile(workbook, `Pacientes_Observados_${getToday()}.xlsx`);
-    };
-
     const handleLevantar = () => {
-        handleLevantarObservacion(form, token, userlogued, handleClear, obtenerInfoTabla);
+        handleEliminarObservacion(form, token, userlogued, handleClear, obtenerInfoTabla);
     };
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
             handleClearnotO();
-            // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
         }
     };
 
@@ -126,7 +95,7 @@ export default function PacientesObservados() {
         obtenerInfoTabla();
     }, []);
 
-    const specialties = [
+    const especialidades = [
         ["CARDIOLOGIA", "TEST ALTURA"],
         ["OFTALMOLOGIA", "HTA"],
         ["ODONTOLOGIA", "OTORINOLARINGOLOGIA"],
@@ -180,16 +149,15 @@ export default function PacientesObservados() {
                 </SectionFieldset>
 
                 <div className="grid grid-cols-2 gap-x-8 gap-y-2 ">
-                    {specialties.map((pair, idx) => (
+                    {especialidades.map((pair, idx) => (
                         <div key={idx} className="contents">
                             {pair.map((spec) => (
                                 <button
                                     key={spec}
                                     type="button"
                                     onClick={() => handleSpecialtyClick(spec)}
-                                    className="px-3 py-1 text-xs font-medium border rounded-md bg-gray-100 hover:bg-gray-200 transition"
+                                    className="px-3 py-1  font-medium border rounded-md bg-gray-100 hover:bg-gray-300 transition"
                                 >
-
                                     {spec}
                                 </button>
                             ))}
@@ -208,25 +176,27 @@ export default function PacientesObservados() {
                 </SectionFieldset>
 
                 <div className="flex justify-between items-center pt-4">
-                    <button
-                        onClick={handleLevantar}
-                        className="
+                    <BotonesAccion
+                        form={form}
+                        handleSave={handleSave} 
+                        handleClear={handleClear}
+                        hidePrint
+                    />
+                    {form.idObservacion && form.norden != "" &&
+                        <button
+                            onClick={handleLevantar}
+                            className="
                             bg-red-600 hover:bg-red-700
                             text-white text-base px-6 py-2 rounded
                             flex items-center gap-2
                             transition-all duration-150 ease-out
                             hover:shadow-lg
                             active:scale-95 active:shadow-inner"
-                    >
-                        <FontAwesomeIcon icon={faTrash} />
-                        Levantar Observ
-                    </button>
-                    <BotonesAccion
-                        form={form}
-                        handleSave={handleSave}
-                        handleClear={handleClear}
-                        hidePrint
-                    />
+                        >
+                            <FontAwesomeIcon icon={faTrash} />
+                            Eliminar Registro
+                        </button>
+                    }
                 </div>
             </div>
 
@@ -241,6 +211,7 @@ export default function PacientesObservados() {
                                 name="codigo_search"
                                 value={form.codigo_search}
                                 onChange={handleChangeNumberDecimals}
+                                onKeyUp={(e) => (e.key === "Enter" ? obtenerInfoTabla() : {})}
                             />
                             <InputTextOneLine
                                 label="Nombres/Apellidos"
@@ -248,6 +219,7 @@ export default function PacientesObservados() {
                                 name="nombres_search"
                                 value={form.nombres_search}
                                 onChange={handleChange}
+                                onKeyUp={(e) => (e.key === "Enter" ? obtenerInfoTabla() : {})}
                             />
                             <InputTextOneLine
                                 label="Empresa/Contrata"
@@ -255,6 +227,7 @@ export default function PacientesObservados() {
                                 name="empresas_search"
                                 value={form.empresas_search}
                                 onChange={handleChange}
+                                onKeyUp={(e) => (e.key === "Enter" ? obtenerInfoTabla() : {})}
                             />
                             <InputTextOneLine
                                 label="Observaciones"
@@ -262,6 +235,7 @@ export default function PacientesObservados() {
                                 name="observaciones_search"
                                 value={form.observaciones_search}
                                 onChange={handleChange}
+                                onKeyUp={(e) => (e.key === "Enter" ? obtenerInfoTabla() : {})}
                             />
                         </div>
                         <div className="col-span-4 space-y-3">
@@ -294,7 +268,7 @@ export default function PacientesObservados() {
                                     Buscar
                                 </button>
                                 <button
-                                    onClick={handleExportar}
+                                    onClick={() => handleExportar(dataTabla)}
                                     className="
                                         bg-green-600 hover:bg-green-700 justify-center
                                         text-white text-base px-6 py-2 rounded
@@ -327,21 +301,20 @@ function Table({ data, set, token, clean }) {
     function clicktable(nro) {
         clean();
         Loading("Importando Datos");
-        GetInfoServicio(nro, tabla, set, token, () => {
-            Swal.close();
-        });
+        GetInfoServicio(nro, tabla, set, token);
     }
 
     const columns = [
         {
             label: "N° Orden",
             accessor: "norden",
-            width: "100px",
+            width: "65px",
             render: (row) => <span className="font-bold">{row.norden}</span>,
         },
         {
             label: "Nombres",
             accessor: "nombres",
+            render: (row) => <span>{row.apellidosPaciente} {row.nombresPaciente}</span>,
         },
         {
             label: "Empresa",
@@ -352,21 +325,21 @@ function Table({ data, set, token, clean }) {
             accessor: "contrata",
         },
         {
-            label: "Fecha",
-            accessor: "fechaInforme",
-            width: "100px",
-            render: (row) => formatearFechaCorta(row.fechaInforme),
+            label: "Fecha Inicio",
+            accessor: "fechaInicio",
+            render: (row) => formatearFechaCorta(row.fechaInicio),
+        },
+        {
+            label: "Fecha Fin",
+            accessor: "fechaFin",
+            render: (row) => formatearFechaCorta(row.fechaFin),
         },
         {
             label: "Observaciones",
-            accessor: "interpretacion",
+            accessor: "examenes",
         },
         {
-            label: "Hora Inicio",
-            accessor: "horaInicio",
-        },
-        {
-            label: "Hora Fin",
+            label: "Hora",
             accessor: "horaFin",
         },
     ];
