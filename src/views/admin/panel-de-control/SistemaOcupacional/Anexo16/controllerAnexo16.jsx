@@ -501,19 +501,19 @@ export const GetInfoServicio = (
                 "\n";
               data.contador++;
             }
-            if (
-              res.conclusionesRadiograficasTorax_txtconclusionesradiograficas !=
-              null &&
-              res.conclusionesRadiograficasTorax_txtconclusionesradiograficas !==
-              "NORMAL"
-            ) {
-              data.observacionesGenerales +=
-                data.contador +
-                ". " +
-                res.conclusionesRadiograficasTorax_txtconclusionesradiograficas +
-                "\n";
-              data.contador++;
-            }
+            // if (
+            //   res.conclusionesRadiograficasTorax_txtconclusionesradiograficas !=
+            //   null &&
+            //   res.conclusionesRadiograficasTorax_txtconclusionesradiograficas !==
+            //   "NORMAL"
+            // ) {
+            //   data.observacionesGenerales +=
+            //     data.contador +
+            //     ". " +
+            //     res.conclusionesRadiograficasTorax_txtconclusionesradiograficas +
+            //     "\n";
+            //   data.contador++;
+            // }
           }
 
           // if (
