@@ -592,6 +592,7 @@ export const GetInfoServicio = (
           const gluc = res.glucosaLaboratorioClinico_txtglucosabio;
           const creat = res.creatininaLaboratorioClinico_txtcreatininabio;
           const hemo = res.hemoglobina_txthemoglobina ?? "";
+          const examenOrina = res.examenFisicoColor_txtcoloref;
           data.vsg = vsg ?? "";
           data.glucosa = gluc ?? "";
           data.creatinina = creat ?? "";
@@ -606,7 +607,8 @@ export const GetInfoServicio = (
           data.otrosExamenes +=
             creat == null ? "" : "-CREATININA: " + creat + " mg/dl. \n";
           data.otrosExamenes += vsg == null ? "" : "-VSG: " + vsg + ". \n";
-          data.otrosExamenes += "-EX ORINA: NORMAL. \n";
+          data.otrosExamenes +=
+            examenOrina != null && examenOrina != "N/A" ? "-EX ORINA: NORMAL" + ". \n" : "";
           data.otrosExamenes += coca == null ? "" : "-COCAINA: " + coca + ". \n";
           data.otrosExamenes += marig == null ? "" : "-MARIHUANA: " + marig + ".";
 
@@ -1613,6 +1615,8 @@ export const GetInfoServicioEditar = (
           const gluc = res.glucosaLaboratorioClinico_txtglucosabio;
           const creat = res.creatininaLaboratorioClinico_txtcreatininabio;
           const hemo = res.hemoglobina_txthemoglobina ?? "";
+          const examenOrina = res.examenFisicoColor_txtcoloref;
+
           data.vsg = vsg ?? "";
           data.glucosa = gluc ?? "";
           data.creatinina = creat ?? "";
@@ -1627,7 +1631,8 @@ export const GetInfoServicioEditar = (
           data.otrosExamenes2 +=
             creat == null ? "" : "-CREATININA: " + creat + " mg/dl. \n";
           data.otrosExamenes2 += vsg == null ? "" : "-VSG: " + vsg + ". \n";
-          data.otrosExamenes2 += "-EX ORINA: NORMAL. \n";
+          data.otrosExamenes2 +=
+            examenOrina != null && examenOrina != "N/A" ? "-EX ORINA: NORMAL" + ". \n" : "";
           data.otrosExamenes2 += coca == null ? "" : "-COCAINA: " + coca + ". \n";
           data.otrosExamenes2 += marig == null ? "" : "-MARIHUANA: " + marig + ".";
 
