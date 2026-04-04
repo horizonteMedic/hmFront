@@ -120,12 +120,14 @@ export const handleExportar = async (dataTabla) => {
     worksheet.columns = [
         { header: "N° Orden", key: "norden", width: 12 },
         { header: "Nombres", key: "nombres", width: 30 },
+        { header: "Fecha", key: "fechaInicio", width: 15 },
         { header: "Empresa", key: "empresa", width: 30 },
         { header: "Contrata", key: "contrata", width: 20 },
-        { header: "Fecha Inicio", key: "fechaInicio", width: 15 },
-        { header: "Fecha Fin", key: "fechaFin", width: 15 },
-        { header: "Observaciones", key: "observaciones", width: 60 },
-        { header: "Hora Fin", key: "horaFin", width: 12 },
+        { header: "Tipo de Examen", key: "tipoExamen", width: 25 },
+        { header: "Cargo", key: "cargoPaciente", width: 25 },
+        { header: "Observaciones", key: "examenes", width: 60 },
+        { header: "Hora Entrada", key: "horaEntrada", width: 15 },
+        { header: "Hora Salida", key: "horaFin", width: 15 },
     ];
 
     // Agregar datos
@@ -133,11 +135,13 @@ export const handleExportar = async (dataTabla) => {
         worksheet.addRow({
             norden: row.norden,
             nombres: `${row.apellidosPaciente} ${row.nombresPaciente}`,
+            fechaInicio: formatearFechaCorta(row.fechaInicio),
             empresa: row.empresa,
             contrata: row.contrata,
-            fechaInicio: formatearFechaCorta(row.fechaInicio),
-            fechaFin: formatearFechaCorta(row.fechaFin),
-            observaciones: row.examenes,
+            tipoExamen: row.tipoExamen,
+            cargoPaciente: row.cargoPaciente,
+            examenes: row.examenes,
+            horaEntrada: row.horaEntrada,
             horaFin: row.horaFin,
         });
     });

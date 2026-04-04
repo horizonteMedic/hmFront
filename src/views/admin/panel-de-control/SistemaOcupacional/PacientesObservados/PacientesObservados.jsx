@@ -318,6 +318,11 @@ function Table({ data, set, token, clean }) {
             render: (row) => <span>{row.apellidosPaciente} {row.nombresPaciente}</span>,
         },
         {
+            label: "Fecha",
+            accessor: "fechaInicio",
+            render: (row) => formatearFechaCorta(row.fechaInicio),
+        },
+        {
             label: "Empresa",
             accessor: "empresa",
         },
@@ -326,21 +331,23 @@ function Table({ data, set, token, clean }) {
             accessor: "contrata",
         },
         {
-            label: "Fecha Inicio",
-            accessor: "fechaInicio",
-            render: (row) => formatearFechaCorta(row.fechaInicio),
+            label: "Tipo de Examen",
+            accessor: "tipoExamen",
         },
         {
-            label: "Fecha Fin",
-            accessor: "fechaFin",
-            render: (row) => formatearFechaCorta(row.fechaFin),
+            label: "Cargo",
+            accessor: "cargoPaciente",
         },
         {
             label: "Observaciones",
             accessor: "examenes",
         },
         {
-            label: "Hora",
+            label: "Hora Entrada",
+            accessor: "horaEntrada",
+        },
+        {
+            label: "Hora Salida",
             accessor: "horaFin",
         },
     ];
