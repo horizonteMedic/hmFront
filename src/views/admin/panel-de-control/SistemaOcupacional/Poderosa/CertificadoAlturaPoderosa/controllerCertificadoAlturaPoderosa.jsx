@@ -76,6 +76,39 @@ export const GetInfoServicio = async (
             nuevoConclusiones += "HTA NO CONTROLADA.\n";
         }
 
+        let debeCorregirAgudezaVisual = false;
+        let debeUsarLentesCorrectores = false;
+        const vlejoscod = res.visionlejoscorregidaod_v_lejos_c_od || "";
+        const vlejoscoi = res.visionlejoscorregidaoi_v_lejos_c_oi || "";
+
+        const vcercacod = res.visioncercacorregidaod_v_cerca_c_od || "";
+        const vcercacoi = res.visioncercacorregidaoi_v_cerca_c_oi || "";
+        const textoEnfermedadOftalmo = (res.enfermedadesocularesoftalmo_e_oculares ?? "").trim().toUpperCase();
+
+        if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
+            const enfermedadesRefractarias = [
+                "MIOPIA",//agregados
+                "ASIGMATISMO",//agregados
+                "AMETROPIA",
+                "PRESBICIA",
+                "HIPERMETROPIA",
+                "OJO CIEGO",
+                // "CUENTA DEDOS",
+                // "PERCIBE LUZ"
+            ];
+            if (enfermedadesRefractarias.some(e => textoEnfermedadOftalmo.includes(e))) {
+                const visionLejosNormal = vlejoscod === "00" && vlejoscoi === "00";
+                const visionCercaNormal = vcercacod === "00" && vcercacoi === "00";
+
+                debeCorregirAgudezaVisual = visionLejosNormal && visionCercaNormal;
+                debeUsarLentesCorrectores = !debeCorregirAgudezaVisual;
+
+                nuevoConclusiones += debeCorregirAgudezaVisual
+                    ? "CORREGIR AGUDEZA VISUAL.\n"
+                    : "USO DE LENTES CORRECTORES.\n";
+            }
+        }
+
         set((prev) => ({
             ...prev,
             // Header

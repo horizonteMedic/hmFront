@@ -462,6 +462,7 @@ export default function EKG() {
                 setForm((prev) => ({
                   ...prev,
                   hallazgos: e.target.checked ? "NORMAL" : "",
+                  conclusiones: e.target.checked ? form.informeCompleto ? "DENTRO DE PARAMETROS NORMALES" : "" : "",
                   recomendaciones: e.target.checked ? "EVALUACIÓN ANUAL" : "",
                 }));
               }}

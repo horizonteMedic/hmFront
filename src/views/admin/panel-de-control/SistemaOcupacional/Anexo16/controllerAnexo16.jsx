@@ -354,12 +354,43 @@ export const GetInfoServicio = (
             data.observacionesGenerales += "ESPIROMETRIA: " + res.interpretacionFuncionRespiratoria_interpretacion + "\n";
           }
 
-          // if (res.conclusionradiografia_conclu != null) {
-          //   data.observacionesGenerales += "RAYOS X: " + res.conclusionradiografia_conclu + "\n";
-          // }
+          const rayosXConclusion = res.conclusionesRadiograficasTorax_txtconclusionesradiograficas;
+          const rayosXObservaciones = res.observacionesRadiografiaTorax_txtobservacionesrt;
+
+          if (rayosXConclusion || rayosXObservaciones) {
+            data.observacionesGenerales +=
+              `RAYOS X TORAX: ` +
+              (rayosXConclusion ?? "") +
+              (rayosXConclusion && rayosXObservaciones ? " - " : "") +
+              (rayosXObservaciones ?? "") +
+              ".\n";
+          }
+
+          const rayosXColumnaConclusion = res.conclusionRayosColumna;
+
+          if (rayosXColumnaConclusion &&
+            rayosXColumnaConclusion !== "RADIOGRAFÍA DE COLUMNA LUMBAR AP-L SIN ALTERACIONES SIGNIFICATIVAS." &&
+            rayosXColumnaConclusion !== "RADIOGRAFÍA DE COLUMNA LUMBOSACRA AP-L SIN ALTERACIONES SIGNIFICATIVAS." &&
+            rayosXColumnaConclusion !== "CUERPOS VERTEBRALES DORSOLUMBARES EVALUADOS SIN ALTERACIONES SIGNIFICATIVAS.") {
+            data.observacionesGenerales +=
+              `RADIOGRAFIA COLUMNA: ` +
+              (rayosXColumnaConclusion ?? "") +
+              ".\n";
+          }
 
           if (res.conclusionMusculoesqueletica != null) {
             data.observacionesGenerales += "MUSCULOESQUELETICA: " + res.conclusionMusculoesqueletica + "\n";
+          }
+
+          const hallazgoEKG = res.hallazgosInformeElectroCardiograma_hallazgo;
+          const conclusionesEkg = res.conclusionekg;
+          const recomendacionesEKG = res.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
+
+          if (
+            (hallazgoEKG && hallazgoEKG !== "NORMAL") ||
+            (conclusionesEkg && !conclusionesEkg.includes("DENTRO DE PARAMETROS NORMALES"))
+          ) {
+            data.observacionesGenerales += `ELECTROCARDIOGRAMA: ${recomendacionesEKG}\n`;
           }
 
           // if (res.observacionFichaConduccion != null) {
@@ -367,16 +398,21 @@ export const GetInfoServicio = (
           // }
 
           // Información radiográfica
-          if (res.infoGeneralRadiografia_info_general != null) {
+          if (res.infoGeneralRadiografia_info_general != null && res.infoGeneralRadiografia_info_general !== ("CUERPOS VERTEBRALES MUESTRAN MORFOLOGÍA NORMAL.\n" +
+            "SACRO NO MUESTRA LESIONES EVIDENTES.\n" +
+            "ESPACIOS INTERVERTEBRALES CONSERVADOS.\n" +
+            "DENSIDAD ÓSEA ADECUADA.\n" +
+            "LORDOSIS LUMBAR NORMAL.\n" +
+            "CANAL RAQUÍDEO CON AMPLITUD NORMAL.")) {
             data.observacionesGenerales +=
               ". INFORME RADIOGRAFICO : " +
               res.infoGeneralRadiografia_info_general +
               "\n";
           }
-          if (res.conclusionRadiografia_conclu != null) {
-            data.observacionesGenerales +=
-              ". CONCLUCIONES : " + res.conclusionRadiografia_conclu + "\n";
-          }
+          // if (res.conclusionRadiografia_conclu != null) {
+          //   data.observacionesGenerales +=
+          //     ". CONCLUSIONES : " + res.conclusionRadiografia_conclu + "\n";
+          // }
 
           // Radiografía de tórax
           if (
@@ -390,7 +426,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ". " +
+                ". VERTICES TORAX:" +
                 res.verticesRadiografiaTorax_txtvertices +
                 "\n";
               data.contador++;
@@ -401,7 +437,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ". " +
+                ". HILIOS TORAX:" +
                 res.hiliosRadiografiaTorax_txthilios +
                 "\n";
               data.contador++;
@@ -414,7 +450,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ". " +
+                ". SENOS TORAX:" +
                 res.senosCostoFrenicosRadiografiaTorax_txtsenoscostofrenicos +
                 "\n";
               data.contador++;
@@ -425,7 +461,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ". " +
+                ". CAMPOS PULMONARES TORAX:" +
                 res.camposPulmonesRadiografiaTorax_txtcampospulm +
                 "\n";
               data.contador++;
@@ -436,7 +472,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ". " +
+                ". CAMPOS MEDIASTINOS TORAX:" +
                 res.mediastinosRadiografiaTorax_txtmediastinos +
                 "\n";
               data.contador++;
@@ -449,7 +485,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ". " +
+                ". SILUETA CARDIOVASCULAR TORAX:" +
                 res.siluetaCardioVascularRadiografiaTorax_txtsiluetacardiovascular +
                 "\n";
               data.contador++;
@@ -460,37 +496,37 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ". " +
+                ". OSTEOMUSCULAR TORAX:" +
                 res.osteomuscularRadiografiaTorax_txtosteomuscular +
                 "\n";
               data.contador++;
             }
-            if (
-              res.conclusionesRadiograficasTorax_txtconclusionesradiograficas !=
-              null &&
-              res.conclusionesRadiograficasTorax_txtconclusionesradiograficas !==
-              "NORMAL"
-            ) {
-              data.observacionesGenerales +=
-                data.contador +
-                ". " +
-                res.conclusionesRadiograficasTorax_txtconclusionesradiograficas +
-                "\n";
-              data.contador++;
-            }
+            // if (
+            //   res.conclusionesRadiograficasTorax_txtconclusionesradiograficas !=
+            //   null &&
+            //   res.conclusionesRadiograficasTorax_txtconclusionesradiograficas !==
+            //   "NORMAL"
+            // ) {
+            //   data.observacionesGenerales +=
+            //     data.contador +
+            //     ". " +
+            //     res.conclusionesRadiograficasTorax_txtconclusionesradiograficas +
+            //     "\n";
+            //   data.contador++;
+            // }
           }
 
-          if (
-            res.observacionesRadiografiaTorax_txtobservacionesrt != null &&
-            res.observacionesRadiografiaTorax_txtobservacionesrt !== "NORMAL"
-          ) {
-            data.observacionesGenerales +=
-              data.contador +
-              ". " +
-              res.observacionesRadiografiaTorax_txtobservacionesrt +
-              "\n";
-            data.contador++;
-          }
+          // if (
+          //   res.observacionesRadiografiaTorax_txtobservacionesrt != null &&
+          //   res.observacionesRadiografiaTorax_txtobservacionesrt !== "NORMAL"
+          // ) {
+          //   data.observacionesGenerales +=
+          //     data.contador +
+          //     ". " +
+          //     res.observacionesRadiografiaTorax_txtobservacionesrt +
+          //     "\n";
+          //   data.contador++;
+          // }
           data.observacionesGenerales +=
             data.contador + ". " + (
               res.observacionesLaboratorioClinico_txtobservacioneslb != null &&
@@ -556,6 +592,7 @@ export const GetInfoServicio = (
           const gluc = res.glucosaLaboratorioClinico_txtglucosabio;
           const creat = res.creatininaLaboratorioClinico_txtcreatininabio;
           const hemo = res.hemoglobina_txthemoglobina ?? "";
+          const examenOrina = res.examenFisicoColor_txtcoloref;
           data.vsg = vsg ?? "";
           data.glucosa = gluc ?? "";
           data.creatinina = creat ?? "";
@@ -570,7 +607,8 @@ export const GetInfoServicio = (
           data.otrosExamenes +=
             creat == null ? "" : "-CREATININA: " + creat + " mg/dl. \n";
           data.otrosExamenes += vsg == null ? "" : "-VSG: " + vsg + ". \n";
-          data.otrosExamenes += "-EX ORINA: NORMAL. \n";
+          data.otrosExamenes +=
+            examenOrina != null && examenOrina != "N/A" ? "-EX ORINA: NORMAL" + ". \n" : "";
           data.otrosExamenes += coca == null ? "" : "-COCAINA: " + coca + ". \n";
           data.otrosExamenes += marig == null ? "" : "-MARIHUANA: " + marig + ".";
 
@@ -1368,23 +1406,23 @@ export const MapearDatosAdicionales = (
     // SECCIÓN ELECTROCARDIOGRAMA electroCardiograma
     // =============================================================================================
 
-    const hallazgo = res.hallazgosInformeElectroCardiograma_hallazgo;
-    const recomendaciones =
-      res.recomendacionesInformeElectroCardiograma_recomendaciones;
+    // const hallazgo = res.hallazgosInformeElectroCardiograma_hallazgo;
+    // const recomendaciones =
+    //   res.recomendacionesInformeElectroCardiograma_recomendaciones;
 
-    if (hallazgo && hallazgo !== "NORMAL." && !isEdit) {
-      let electrocardiogramaText = `${contador}.ELECTROCARDIOGRAMA: ${hallazgo}`;
-      if (recomendaciones) {
-        electrocardiogramaText += `.${recomendaciones}`;
-      }
-      // Agregar a observaciones generales si existe
-      if (data.observacionesGenerales) {
-        data.observacionesGenerales += electrocardiogramaText + "\n";
-      } else {
-        data.observacionesGenerales = electrocardiogramaText + "\n";
-      }
-      contador++;
-    }
+    // if (hallazgo && hallazgo !== "NORMAL." && !isEdit) {
+    //   let electrocardiogramaText = `${contador}.ELECTROCARDIOGRAMA: ${hallazgo}`;
+    //   if (recomendaciones) {
+    //     electrocardiogramaText += `.${recomendaciones}`;
+    //   }
+    //   // Agregar a observaciones generales si existe
+    //   if (data.observacionesGenerales) {
+    //     data.observacionesGenerales += electrocardiogramaText + "\n";
+    //   } else {
+    //     data.observacionesGenerales = electrocardiogramaText + "\n";
+    //   }
+    //   contador++;
+    // }
 
     // =============================================================================================
     // SECCIÓN EXAMEN DE ORINA
@@ -1577,6 +1615,8 @@ export const GetInfoServicioEditar = (
           const gluc = res.glucosaLaboratorioClinico_txtglucosabio;
           const creat = res.creatininaLaboratorioClinico_txtcreatininabio;
           const hemo = res.hemoglobina_txthemoglobina ?? "";
+          const examenOrina = res.examenFisicoColor_txtcoloref;
+
           data.vsg = vsg ?? "";
           data.glucosa = gluc ?? "";
           data.creatinina = creat ?? "";
@@ -1591,7 +1631,8 @@ export const GetInfoServicioEditar = (
           data.otrosExamenes2 +=
             creat == null ? "" : "-CREATININA: " + creat + " mg/dl. \n";
           data.otrosExamenes2 += vsg == null ? "" : "-VSG: " + vsg + ". \n";
-          data.otrosExamenes2 += "-EX ORINA: NORMAL. \n";
+          data.otrosExamenes2 +=
+            examenOrina != null && examenOrina != "N/A" ? "-EX ORINA: NORMAL" + ". \n" : "";
           data.otrosExamenes2 += coca == null ? "" : "-COCAINA: " + coca + ". \n";
           data.otrosExamenes2 += marig == null ? "" : "-MARIHUANA: " + marig + ".";
 
@@ -1885,9 +1926,29 @@ export const GetInfoServicioEditar = (
             data.observacionesGenerales2 += "ESPIROMETRIA: " + res.interpretacionFuncionRespiratoria_interpretacion + "\n";
           }
 
-          // if (res.conclusionradiografia_conclu != null) {
-          //   data.observacionesGenerales += "RAYOS X: " + res.conclusionradiografia_conclu + "\n";
-          // }
+          const rayosXConclusion = res.conclusionesRadiograficasTorax_txtconclusionesradiograficas;
+          const rayosXObservaciones = res.observacionesRadiografiaTorax_txtobservacionesrt;
+
+          if (rayosXConclusion || rayosXObservaciones) {
+            data.observacionesGenerales2 +=
+              `RAYOS X TORAX: ` +
+              (rayosXConclusion ?? "") +
+              (rayosXConclusion && rayosXObservaciones ? " - " : "") +
+              (rayosXObservaciones ?? "") +
+              ".\n";
+          }
+
+          const rayosXColumnaConclusion = res.conclusionRayosColumna;
+
+          if (rayosXColumnaConclusion &&
+            rayosXColumnaConclusion !== "RADIOGRAFÍA DE COLUMNA LUMBAR AP-L SIN ALTERACIONES SIGNIFICATIVAS." &&
+            rayosXColumnaConclusion !== "RADIOGRAFÍA DE COLUMNA LUMBOSACRA AP-L SIN ALTERACIONES SIGNIFICATIVAS." &&
+            rayosXColumnaConclusion !== "CUERPOS VERTEBRALES DORSOLUMBARES EVALUADOS SIN ALTERACIONES SIGNIFICATIVAS.") {
+            data.observacionesGenerales2 +=
+              `RADIOGRAFIA COLUMNA: ` +
+              (rayosXColumnaConclusion ?? "") +
+              ".\n";
+          }
 
           if (resSimple.conclusionMusculoesqueletica != null) {
             data.observacionesGenerales2 += "MUSCULOESQUELETICA: " + res.conclusionMusculoesqueletica + "\n";
@@ -1897,17 +1958,33 @@ export const GetInfoServicioEditar = (
           //   data.observacionesGenerales += "FICHA CONDUCCION: " + res.observacionFichaConduccion + "\n";
           // }
 
+          const hallazgoEKG = res.hallazgosInformeElectroCardiograma_hallazgo;
+          const conclusionesEkg = res.conclusionekg;
+          const recomendacionesEKG = res.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
+
+          if (
+            (hallazgoEKG && hallazgoEKG !== "NORMAL") ||
+            (conclusionesEkg && !conclusionesEkg.includes("DENTRO DE PARAMETROS NORMALES"))
+          ) {
+            data.observacionesGenerales2 += `-ELECTROCARDIOGRAMA: ${recomendacionesEKG}\n`;
+          }
+
           // Información radiográfica
-          if (resSimple.infoGeneralRadiografia_info_general != null) {
+          if (resSimple.infoGeneralRadiografia_info_general != null && resSimple.infoGeneralRadiografia_info_general !== ("CUERPOS VERTEBRALES MUESTRAN MORFOLOGÍA NORMAL.\n" +
+            "SACRO NO MUESTRA LESIONES EVIDENTES.\n" +
+            "ESPACIOS INTERVERTEBRALES CONSERVADOS.\n" +
+            "DENSIDAD ÓSEA ADECUADA.\n" +
+            "LORDOSIS LUMBAR NORMAL.\n" +
+            "CANAL RAQUÍDEO CON AMPLITUD NORMAL.")) {
             data.observacionesGenerales2 +=
               "-INFORME RADIOGRAFICO : " +
               resSimple.infoGeneralRadiografia_info_general +
               "\n";
           }
-          if (resSimple.conclusionRadiografia_conclu != null) {
-            data.observacionesGenerales2 +=
-              "-CONCLUCIONES : " + resSimple.conclusionRadiografia_conclu + "\n";
-          }
+          // if (resSimple.conclusionRadiografia_conclu != null) {
+          //   data.observacionesGenerales2 +=
+          //     "-CONCLUSIONES : " + resSimple.conclusionRadiografia_conclu + "\n";
+          // }
 
           // Radiografía de tórax
           if (
@@ -1921,7 +1998,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                "." +
+                ". VERTICES TORAX:" +
                 resSimple.verticesRadiografiaTorax_txtvertices +
                 "\n";
               data.contador++;
@@ -1932,7 +2009,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                "." +
+                ". HILIOS TORAX:" +
                 resSimple.hiliosRadiografiaTorax_txthilios +
                 "\n";
               data.contador++;
@@ -1945,7 +2022,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                "." +
+                ". SENOS TORAX:" +
                 resSimple.senosCostoFrenicosRadiografiaTorax_txtsenoscostofrenicos +
                 "\n";
               data.contador++;
@@ -1956,7 +2033,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                "." +
+                ". CAMPOS PULMONARES TORAX:" +
                 resSimple.camposPulmonesRadiografiaTorax_txtcampospulm +
                 "\n";
               data.contador++;
@@ -1967,7 +2044,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                "." +
+                ". CAMPOS MEDIASTINOS TORAX:" +
                 resSimple.mediastinosRadiografiaTorax_txtmediastinos +
                 "\n";
               data.contador++;
@@ -1980,7 +2057,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                "." +
+                ". SILUETA CARDIOVASCULAR TORAX:" +
                 resSimple.siluetaCardioVascularRadiografiaTorax_txtsiluetacardiovascular +
                 "\n";
               data.contador++;
@@ -1991,24 +2068,24 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                "." +
+                ". OSTEOMUSCULAR TORAX:" +
                 resSimple.osteomuscularRadiografiaTorax_txtosteomuscular +
                 "\n";
               data.contador++;
             }
-            if (
-              resSimple.conclusionesRadiograficasTorax_txtconclusionesradiograficas !=
-              null &&
-              resSimple.conclusionesRadiograficasTorax_txtconclusionesradiograficas !==
-              "NORMAL"
-            ) {
-              data.observacionesGenerales2 +=
-                data.contador +
-                "." +
-                resSimple.conclusionesRadiograficasTorax_txtconclusionesradiograficas +
-                "\n";
-              data.contador++;
-            }
+            // if (
+            //   resSimple.conclusionesRadiograficasTorax_txtconclusionesradiograficas !=
+            //   null &&
+            //   resSimple.conclusionesRadiograficasTorax_txtconclusionesradiograficas !==
+            //   "NORMAL"
+            // ) {
+            //   data.observacionesGenerales2 +=
+            //     data.contador +
+            //     "." +
+            //     resSimple.conclusionesRadiograficasTorax_txtconclusionesradiograficas +
+            //     "\n";
+            //   data.contador++;
+            // }
           }
 
           if (
