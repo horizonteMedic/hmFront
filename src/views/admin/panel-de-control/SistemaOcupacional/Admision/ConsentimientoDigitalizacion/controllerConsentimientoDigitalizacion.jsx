@@ -16,7 +16,7 @@ import { SubmitConsentimiento } from "../model/Consentimiento";
 
 const obtenerInfoConsentimientoUrl = "/api/v01/ct/consentDigit/infoFormatoConsentDigitalizado";
 const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta"
-const obtenerReporteJsReportUrl = ""
+const obtenerReporteJsReportUrl = "/api/v01/st/registros/descargarReporteConsentimientoDigitalizacion"
 
 
 export const GetInfoServicio = async (nro, tabla, set, token, sede, onFinish = () => { }) => {
@@ -150,46 +150,46 @@ const PrintValidation = async (dni, orderNumber, token) => {
     }
 };
 
-export const PrintHojaR = async (nro, token, tabla, datosFooter) => {
-    if (!nro) {
-        await Swal.fire("Error", "Ingrese Nro orden", "error");
-        return;
-    }
+// export const PrintHojaR = async (nro, token, tabla, datosFooter) => {
+//     if (!nro) {
+//         await Swal.fire("Error", "Ingrese Nro orden", "error");
+//         return;
+//     }
 
-    Swal.fire({
-        title: "Generando Consentimiento",
-        text: "Espere por favor...",
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        didOpen: () => {
-            Swal.showLoading();
-        },
-    });
+//     Swal.fire({
+//         title: "Generando Consentimiento",
+//         text: "Espere por favor...",
+//         allowOutsideClick: false,
+//         allowEscapeKey: false,
+//         didOpen: () => {
+//             Swal.showLoading();
+//         },
+//     });
 
-    try {
-        const res = await getFetch(
-            `${obtenerInfoConsentimientoUrl}/${nro}`,
-            token
-        );
+//     try {
+//         const res = await getFetch(
+//             `${obtenerInfoConsentimientoUrl}/${nro}`,
+//             token
+//         );
 
-        if (res && res.dni) {
-            await PrintValidation(res.dni, nro, token);
-        } else {
-            Swal.fire("Error", "No existe un consentimiento con este N° de Orden", "error");
-        }
-    } catch (error) {
-        Swal.fire("Error", "No se pudo generar el consentimiento", "error");
-    }
-};
-
-// export const PrintHojaR = (nro, token, tabla) => {
-//     PrintHojaRJsReportDefault(
-//         nro,
-//         token,
-//         tabla,
-//         obtenerReporteJsReportUrl
-//     );
+//         if (res && res.dni) {
+//             await PrintValidation(res.dni, nro, token);
+//         } else {
+//             Swal.fire("Error", "No existe un consentimiento con este N° de Orden", "error");
+//         }
+//     } catch (error) {
+//         Swal.fire("Error", "No se pudo generar el consentimiento", "error");
+//     }
 // };
+
+export const PrintHojaR = (nro, token, tabla) => {
+    PrintHojaRJsReportDefault(
+        nro,
+        token,
+        tabla,
+        obtenerReporteJsReportUrl
+    );
+};
 
 export const Loading = (mensaje) => {
     LoadingDefault(mensaje);
