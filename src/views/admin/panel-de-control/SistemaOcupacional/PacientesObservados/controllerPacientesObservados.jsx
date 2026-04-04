@@ -89,12 +89,12 @@ const GetInfoPac = async (nro, set, token, sede) => {
 export const getInfoTabla = (form, setData, token) => {
     try {
         let url = `${obtenerTablaUrl}?`;
-        if (form.codigo_search) url += `&nOrden=${form.codigo_search}`;
-        if (form.nombres_search) url += `&nombres=${form.nombres_search}`;
-        if (form.empresas_search) url += `&empresaContrata=${form.empresas_search}`;
-        if (form.observaciones_search) url += `&observaciones=${form.observaciones_search}`;
-        if (form.desde) url += `&fechaInicio=${form.desde}`;
-        if (form.hasta) url += `&fechaFin=${form.hasta}`;
+        if (form?.codigo_search) url += `&nOrden=${form.codigo_search}`;
+        if (form?.nombres_search) url += `&nombres=${form.nombres_search}`;
+        if (form?.empresas_search) url += `&empresaContrata=${form.empresas_search}`;
+        if (form?.observaciones_search) url += `&observaciones=${form.observaciones_search}`;
+        if (form?.desde) url += `&fechaInicio=${form.desde}`;
+        if (form?.hasta) url += `&fechaFin=${form.hasta}`;
 
         getFetch(url, token).then((res) => {
             if (res?.resultado) {

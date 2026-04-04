@@ -64,9 +64,10 @@ export default function PacientesObservados() {
         SubmitDataService(form, token, userlogued, handleClear, tabla, obtenerInfoTabla);
     };
 
-    const obtenerInfoTabla = () => {
-        getInfoTabla(form, setDataTabla, token);
+    const obtenerInfoTabla = (conInfo = true) => {
+        getInfoTabla(conInfo ? form : null, setDataTabla, token);
     };
+
 
     const handleSpecialtyClick = (specialty) => {
         setForm((prev) => {
@@ -178,8 +179,8 @@ export default function PacientesObservados() {
                 <div className="flex justify-between items-center pt-4">
                     <BotonesAccion
                         form={form}
-                        handleSave={handleSave} 
-                        handleClear={handleClear}
+                        handleSave={handleSave}
+                        handleClear={() => { handleClear(); obtenerInfoTabla(false); }}
                         hidePrint
                     />
                     {form.idObservacion && form.norden != "" &&
