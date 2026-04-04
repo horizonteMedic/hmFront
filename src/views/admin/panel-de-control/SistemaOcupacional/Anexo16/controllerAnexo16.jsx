@@ -359,7 +359,7 @@ export const GetInfoServicio = (
 
           if (rayosXConclusion || rayosXObservaciones) {
             data.observacionesGenerales +=
-              `RAYOS X: ` +
+              `RAYOS X TORAX: ` +
               (rayosXConclusion ?? "") +
               (rayosXConclusion && rayosXObservaciones ? " - " : "") +
               (rayosXObservaciones ?? "") +
@@ -426,7 +426,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ". " +
+                ". VERTICES TORAX:" +
                 res.verticesRadiografiaTorax_txtvertices +
                 "\n";
               data.contador++;
@@ -437,7 +437,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ". " +
+                ". HILIOS TORAX:" +
                 res.hiliosRadiografiaTorax_txthilios +
                 "\n";
               data.contador++;
@@ -450,7 +450,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ". " +
+                ". SENOS TORAX:" +
                 res.senosCostoFrenicosRadiografiaTorax_txtsenoscostofrenicos +
                 "\n";
               data.contador++;
@@ -461,7 +461,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ". " +
+                ". CAMPOS PULMONARES TORAX:" +
                 res.camposPulmonesRadiografiaTorax_txtcampospulm +
                 "\n";
               data.contador++;
@@ -472,7 +472,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ". " +
+                ". CAMPOS MEDIASTINOS TORAX:" +
                 res.mediastinosRadiografiaTorax_txtmediastinos +
                 "\n";
               data.contador++;
@@ -485,7 +485,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ". " +
+                ". SILUETA CARDIOVASCULAR TORAX:" +
                 res.siluetaCardioVascularRadiografiaTorax_txtsiluetacardiovascular +
                 "\n";
               data.contador++;
@@ -496,7 +496,7 @@ export const GetInfoServicio = (
             ) {
               data.observacionesGenerales +=
                 data.contador +
-                ". " +
+                ". OSTEOMUSCULAR TORAX:" +
                 res.osteomuscularRadiografiaTorax_txtosteomuscular +
                 "\n";
               data.contador++;
@@ -1926,7 +1926,7 @@ export const GetInfoServicioEditar = (
 
           if (rayosXConclusion || rayosXObservaciones) {
             data.observacionesGenerales2 +=
-              `RAYOS X: ` +
+              `RAYOS X TORAX: ` +
               (rayosXConclusion ?? "") +
               (rayosXConclusion && rayosXObservaciones ? " - " : "") +
               (rayosXObservaciones ?? "") +
@@ -1993,7 +1993,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                "." +
+                ". VERTICES TORAX:" +
                 resSimple.verticesRadiografiaTorax_txtvertices +
                 "\n";
               data.contador++;
@@ -2004,7 +2004,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                "." +
+                ". HILIOS TORAX:" +
                 resSimple.hiliosRadiografiaTorax_txthilios +
                 "\n";
               data.contador++;
@@ -2017,7 +2017,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                "." +
+                ". SENOS TORAX:" +
                 resSimple.senosCostoFrenicosRadiografiaTorax_txtsenoscostofrenicos +
                 "\n";
               data.contador++;
@@ -2028,7 +2028,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                "." +
+                ". CAMPOS PULMONARES TORAX:" +
                 resSimple.camposPulmonesRadiografiaTorax_txtcampospulm +
                 "\n";
               data.contador++;
@@ -2039,7 +2039,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                "." +
+                ". CAMPOS MEDIASTINOS TORAX:" +
                 resSimple.mediastinosRadiografiaTorax_txtmediastinos +
                 "\n";
               data.contador++;
@@ -2052,7 +2052,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                "." +
+                ". SILUETA CARDIOVASCULAR TORAX:" +
                 resSimple.siluetaCardioVascularRadiografiaTorax_txtsiluetacardiovascular +
                 "\n";
               data.contador++;
@@ -2063,7 +2063,7 @@ export const GetInfoServicioEditar = (
             ) {
               data.observacionesGenerales2 +=
                 data.contador +
-                "." +
+                ". OSTEOMUSCULAR TORAX:" +
                 resSimple.osteomuscularRadiografiaTorax_txtosteomuscular +
                 "\n";
               data.contador++;
