@@ -38,6 +38,7 @@ export default function OftalmologiaOhla() {
     dni: "",
     empresa: "",
     contrata: "",
+    edad: "",
 
     parpadosYAnexos: "NORMAL",
     corneas: "NORMAL",
@@ -146,6 +147,14 @@ export default function OftalmologiaOhla() {
     otrosOi: false,
     examenClinicoHallazgos: "",
 
+    //NUEVOS
+    visionColores: "",
+    enfOculares: "",
+    presenciaPterigion: "",
+    opcionPterigion: "",
+    //FIN NUEVOS
+
+
     SubirDoc: false,
     nomenclatura: "OFTALMOLOGIA VISION TESTER",
 
@@ -229,6 +238,69 @@ export default function OftalmologiaOhla() {
       }
     });
   };
+
+  function obtenerGrado(valor) {
+    const mapa = {
+      "20/20": { tipo: "", nivel: "NINGUNA" },
+      "20/25": { tipo: "AMETROPIA", nivel: "LEVE" },
+      "20/30": { tipo: "AMETROPIA", nivel: "LEVE" },
+      "20/40": { tipo: "AMETROPIA", nivel: "LEVE" },
+      "20/50": { tipo: "AMETROPIA", nivel: "MODERADA" },
+      "20/70": { tipo: "AMETROPIA", nivel: "MODERADA" },
+      "20/100": { tipo: "AMETROPIA", nivel: "SEVERA" },
+      "20/150": { tipo: "AMETROPIA", nivel: "SEVERA" },
+      "20/200": { tipo: "AMETROPIA", nivel: "SEVERA" },
+      "20/400": { tipo: "AMETROPIA", nivel: "SEVERA" },
+    };
+    return mapa[valor] || { tipo: "", nivel: "" };
+  }
+
+  function generarDiagnosticoLejos() {
+    const od = obtenerGrado(form.vl_sinc_od);
+    const oi = obtenerGrado(form.vl_sinc_oi);
+
+    if (od.nivel === "NINGUNA" && oi.nivel === "NINGUNA") return "NINGUNA";
+
+    // Caso bilateral del mismo nivel
+    if (od.tipo && oi.tipo && od.nivel === oi.nivel) {
+      return `${od.tipo} ${od.nivel} BILATERAL`;
+    }
+
+    // Caso cuando ambos son ametropía pero diferentes grados
+    if (od.tipo && oi.tipo) {
+      return `${od.tipo} ${od.nivel} OJO DERECHO Y ${oi.nivel} OJO IZQUIERDO`;
+    }
+
+    // Caso mixto
+    return `${od.tipo ? od.tipo + " " + od.nivel : od.nivel} OJO DERECHO Y ${oi.tipo ? oi.tipo + " " + oi.nivel : oi.nivel
+      } OJO IZQUIERDO`;
+  }
+
+  function generarDiagnosticoCerca() {
+    const od = obtenerGrado(form.vc_sinc_od);
+    const oi = obtenerGrado(form.vc_sinc_oi);
+    const edad = parseInt(form.edad);
+
+    // Caso sin ametropía en ambos
+    if (od.nivel === "NINGUNA" && oi.nivel === "NINGUNA") {
+      return "NINGUNA";
+    }
+
+    // Diagnóstico según edad
+    if (edad >= 18 && edad <= 39) {
+      return "HIPERMETROPIA";
+    } else if (edad >= 40) {
+      return "PRESBICIA";
+    }
+
+    return "";
+  }
+  useEffect(() => {
+    setForm((prev) => ({
+      ...prev,
+      diagnostico: form.presenciaPterigion + "\n" + form.enfOculares
+    }));
+  }, [form.presenciaPterigion, form.enfOculares])
 
   return (
     <div className="w-full text-[11px]">
@@ -1047,19 +1119,6 @@ export default function OftalmologiaOhla() {
                   />
                 </div>
               </div>
-              {/* Diagnóstico */}
-              <div className="mt-2">
-                <div className="font-semibold text-[11px] mb-1">
-                  DIAGNÓSTICO
-                </div>
-                <textarea
-                  name="diagnostico"
-                  value={form.diagnostico}
-                  onChange={handleChange}
-                  rows={8}
-                  className="w-full  border rounded p-2 text-[11px] resize-none"
-                />
-              </div>
             </div>
             {/* Columna derecha: Indicaciones y Restricciones */}
             <div className="flex flex-col gap-4 ">
@@ -1330,7 +1389,16 @@ export default function OftalmologiaOhla() {
                   value={form.vc_sinc_oi}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  onKeyUp={(e) => handleNextFocus(e, "vl_sinc_od")}
+                  onKeyUp={(e) => {
+                    handleNextFocus(e, "vl_sinc_od");
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      setForm((prev) => ({
+                        ...prev,
+                        presenciaPterigion: generarDiagnosticoCerca(),
+                      }));
+                    }
+                  }}
                   className="border rounded px-2 py-1"
                 />
                 <input
@@ -1381,7 +1449,16 @@ export default function OftalmologiaOhla() {
                   value={form.vl_sinc_oi}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  onKeyUp={(e) => handleNextFocus(e, "vc_conc_od")}
+                  onKeyUp={(e) => {
+                    handleNextFocus(e, "vc_conc_od");
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      setForm((prev) => ({
+                        ...prev,
+                        enfOculares: generarDiagnosticoLejos(),
+                      }));
+                    }
+                  }}
                   className="border rounded px-2 py-1"
                 />
                 <input
@@ -1445,6 +1522,149 @@ export default function OftalmologiaOhla() {
                   className="border rounded px-2 py-1 "
                 />
               </div>
+            </div>
+
+            <div className="grid grid-cols-5 gap-2 mb-1 items-center">
+              <label className="text-right pr-2">Visión de Colores :</label>
+
+              <input
+                name="visionColores"
+                value={form.visionColores || ""}
+                onChange={handleChange}
+                onKeyUp={(e) => handleNextFocus(e, "enfOculares")}
+                className="border rounded px-2 py-1 col-span-3 resize-none"
+              />
+
+              <div className="col-span-1 flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="normal"
+                  checked={
+                    form.visionColores != null &&
+                    form.visionColores.toUpperCase() === "NORMAL"
+                  }
+                  onChange={(e) => {
+                    handleCheckBoxChange(e);
+                    setForm((prev) => ({
+                      ...prev,
+                      visionColores: e.target.checked ? "NORMAL" : "",
+                    }));
+                  }}
+                  className="mr-1"
+                />
+                Normal
+              </div>
+            </div>
+
+            <div className="grid grid-cols-5 gap-2 mb-1 items-center">
+              <label className="text-right pr-2">Enferm.Oculares Lejos:</label>
+              <textarea
+                name="enfOculares"
+                rows={3}
+                value={form.enfOculares || ""}
+                onChange={handleChange}
+                // onKeyUp={(e) => handleNextFocus(e, "presenciaPterigion")}
+                className="border rounded px-2 py-1 col-span-3 resize-none"
+              />
+              <div className="col-span-1 flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="ninguna"
+                  checked={
+                    form.enfOculares != null &&
+                    form.enfOculares.toUpperCase() == "NINGUNA"
+                  }
+                  onChange={(e) => {
+                    handleCheckBoxChange(e);
+                    setForm((prev) => ({
+                      ...prev,
+                      enfOculares: e.target.checked ? "NINGUNA" : "",
+                    }));
+                  }}
+                  className="mr-1"
+                />{" "}
+                Ninguna
+              </div>
+            </div>
+            <div className="grid grid-cols-5 gap-2 mb-1 items-center">
+              <label className="text-right pr-2">Enferm.Oculares Cerca:</label>
+              <textarea
+                name="presenciaPterigion"
+                rows={2}
+                value={form.presenciaPterigion || ""}
+                // onKeyUp={(e) => handleNextFocus(e, "agudezaLejos")}
+                onChange={handleChange}
+                className="border rounded px-2 py-1 col-span-4 resize-none"
+              />
+              <div className="col-span-5 grid grid-cols-4 text-black">
+                <div></div>
+                <label className="flex items-center gap-2 font-normal text-black">
+                  <input
+                    type="checkbox"
+                    name="opcionPterigion"
+                    checked={form.presenciaPterigion.includes(
+                      "PTERIGIÓN OJO DERECHO"
+                    )}
+                    onChange={(e) =>
+                      setForm((f) => ({
+                        ...f,
+                        presenciaPterigion: e.target.checked
+                          ? f.presenciaPterigion + " PTERIGIÓN OJO DERECHO"
+                          : "",
+                      }))
+                    }
+                  />
+                  PTERIG.OJO DEREC
+                </label>
+                <label className="flex items-center gap-2 font-normal text-black">
+                  <input
+                    type="checkbox"
+                    name="opcionPterigion"
+                    checked={form.presenciaPterigion.includes(
+                      "PTERIGIÓN OJO IZQUIERDO"
+                    )}
+                    onChange={(e) =>
+                      setForm((f) => ({
+                        ...f,
+                        presenciaPterigion: e.target.checked
+                          ? f.presenciaPterigion + " PTERIGIÓN OJO IZQUIERDO"
+                          : "",
+                      }))
+                    }
+                  />
+                  PTERIG. OJO IZQ
+                </label>
+                <label className="flex items-center gap-2 font-normal text-black">
+                  <input
+                    type="checkbox"
+                    name="opcionPterigion"
+                    checked={form.presenciaPterigion.includes(
+                      "PTERIGIÓN BILATERAL"
+                    )}
+                    onChange={(e) =>
+                      setForm((f) => ({
+                        ...f,
+                        presenciaPterigion: e.target.checked
+                          ? f.presenciaPterigion + " PTERIGIÓN BILATERAL"
+                          : "",
+                      }))
+                    }
+                  />
+                  PTERIG. BILATERAL
+                </label>
+              </div>
+            </div>
+            <div className="mt-2">
+              <div className="font-semibold text-[11px] mb-1">
+                DIAGNÓSTICO
+              </div>
+              <textarea
+                name="diagnostico"
+                value={form.diagnostico}
+                onChange={handleChange}
+                rows={8}
+                className="w-full  border rounded p-2 text-[11px] resize-none"
+              />
             </div>
             <div className="border rounded p-4 space-y-4  w-full">
               <div className="text-blue-700 font-semibold text-center mb-4">
@@ -1520,6 +1740,8 @@ export default function OftalmologiaOhla() {
                 />
               </div>
             </div>
+
+
           </div>
         )}
         <SectionFieldset legend="Asignación de Médico">

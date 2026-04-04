@@ -155,6 +155,10 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
           otrosOi: res.rbecOtrosOi,
           examenClinicoHallazgos: res.txtecHallazgos ?? "",
 
+          visionColores: res.vcolores,
+          enfOculares: res.eoculares,
+          presenciaPterigion: res.eoculares1 ?? "",
+
           SubirDoc: true,
           digitalizacion: res.digitalizacion,
 
@@ -176,7 +180,7 @@ export const GetInfoDataOftalmoConObservaciones = (nro, set, token) => {
       console.log(res);
       set((prev) => ({
         ...prev,
-        diagnostico: (res.eoculares ?? "") + "\n" + (res.eoculares1 ?? ""),
+        // diagnostico: (res.eoculares ?? "") + "\n" + (res.eoculares1 ?? ""),
         vc_sinc_od: res.vcercaSOd ?? "",
         vc_sinc_oi: res.vcercaSOi ?? "",
         vc_conc_od: res.vcercaCOd ?? "",
@@ -303,6 +307,10 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     txtCristalino: form.cristalino,
     txtAntPersImp: form.antecedentesPersonales,
     txtFamImp: form.antecedentesFamiliares,
+
+    vcolores: form.visionColores,
+    eoculares: form.enfOculares,
+    eoculares1: form.presenciaPterigion,
 
     usuarioFirma: form.user_medicoFirma,
     doctorAsignado: form.user_doctorAsignado,
