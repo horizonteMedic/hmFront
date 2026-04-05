@@ -767,28 +767,40 @@ export const GetInfoServicio = (
           data.visionColores = res.visionColores_v_colores ?? "";
           data.visionBinocular = res.visionBinocular_v_binocular ?? "";
           data.enfermedadOculares =
-            res.enfermedadesOcularesOftalmo_e_oculares ?? "NINGUNA";
+            res.enfermedadesOcularesOftalmo_e_oculares ?? "";
           data.reflejosPupilares = res.reflejosPupilares_r_pupilares ?? "";
           data.enfermedadOtros =
-            res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "NINGUNA";
+            res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "";
 
-          if (data.visionCercaOd !== "") {
-            if (
-              data.enfermedadOculares != "" &&
-              data.enfermedadOculares !== "NINGUNA"
-            ) {
-              data.observacionesGenerales += `${data.enfermedadOculares}\n`;
-            }
-          }
-          if (data.enfermedadOtros === "PTERIGION BILATERAL") {
-            data.observacionesGenerales +=
-              "PTERIGION BILATERAL:EVALUACION X OFTALMOLOGIA.\n";
-          } else if (
-            data.enfermedadOtros &&
-            data.enfermedadOtros !== "NINGUNA"
+
+          if (
+            (data.enfermedadesOcularesOftalmo_e_oculares !== "NINGUNA" &&
+              data.enfermedadesOcularesOftalmo_e_oculares !== "") || (
+              res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "NINGUNA" &&
+              res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "")
           ) {
-            data.observacionesGenerales += `${data.enfermedadOtros}:EVALUACION X OFTALMOLOGIA.\n`;
+            data.observacionesGenerales += "OFTALMOLOGIA: " + data.enfermedadOculares + " " + (res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "") + "\n";
+
           }
+
+
+          // if (data.visionCercaOd !== "") {
+          //   if (
+          //     data.enfermedadOculares != "" &&
+          //     data.enfermedadOculares !== "NINGUNA"
+          //   ) {
+          //     data.observacionesGenerales += `${data.enfermedadOculares}\n`;
+          //   }
+          // }
+          // if (data.enfermedadOtros === "PTERIGION BILATERAL") {
+          //   data.observacionesGenerales +=
+          //     "PTERIGION BILATERAL:EVALUACION X OFTALMOLOGIA.\n";
+          // } else if (
+          //   data.enfermedadOtros &&
+          //   data.enfermedadOtros !== "NINGUNA"
+          // ) {
+          //   data.observacionesGenerales += `${data.enfermedadOtros}:EVALUACION X OFTALMOLOGIA.\n`;
+          // }
 
           if (
             data.visionColores !== "NINGUNA" &&
@@ -1361,30 +1373,40 @@ export const GetInfoServicioEditar = (
           }
 
 
-          if (data.visionCercaOd !== "") {
-            if (
-              data.enfermedadOculares != "" &&
-              data.enfermedadOculares !== "NINGUNA"
-            ) {
-              data.observacionesGenerales2 += `${data.enfermedadOculares}\n`;
-            }
-          }
-          if (data.enfermedadOtros === "PTERIGION BILATERAL") {
-            data.observacionesGenerales2 +=
-              "PTERIGION BILATERAL:EVALUACION X OFTALMOLOGIA.\n";
-          } else if (
-            data.enfermedadOtros &&
-            data.enfermedadOtros !== "NINGUNA"
+          if (
+            (data.enfermedadesOcularesOftalmo_e_oculares !== "NINGUNA" &&
+              data.enfermedadesOcularesOftalmo_e_oculares !== "") || (
+              res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "NINGUNA" &&
+              res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "")
           ) {
-            data.observacionesGenerales2 += `${data.enfermedadOtros}:EVALUACION X OFTALMOLOGIA.\n`;
+            data.observacionesGenerales2 += "OFTALMOLOGIA: " + data.enfermedadOculares + " " + (res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "") + "\n";
+
           }
 
-          if (
-            data.visionColores !== "NINGUNA" &&
-            data.visionColores !== "NORMAL"
-          ) {
-            data.observacionesGenerales2 += `${data.visionColores}\n`;
-          }
+          // if (data.visionCercaOd !== "") {
+          //   if (
+          //     data.enfermedadOculares != "" &&
+          //     data.enfermedadOculares !== "NINGUNA"
+          //   ) {
+          //     data.observacionesGenerales2 += `${data.enfermedadOculares}\n`;
+          //   }
+          // }
+          // if (data.enfermedadOtros === "PTERIGION BILATERAL") {
+          //   data.observacionesGenerales2 +=
+          //     "PTERIGION BILATERAL:EVALUACION X OFTALMOLOGIA.\n";
+          // } else if (
+          //   data.enfermedadOtros &&
+          //   data.enfermedadOtros !== "NINGUNA"
+          // ) {
+          //   data.observacionesGenerales2 += `${data.enfermedadOtros}:EVALUACION X OFTALMOLOGIA.\n`;
+          // }
+
+          // if (
+          //   data.visionColores !== "NINGUNA" &&
+          //   data.visionColores !== "NORMAL"
+          // ) {
+          //   data.observacionesGenerales2 += `${data.visionColores}\n`;
+          // }
 
 
           // Medidas Generales
