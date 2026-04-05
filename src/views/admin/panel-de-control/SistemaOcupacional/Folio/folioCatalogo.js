@@ -663,11 +663,11 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/manipuladores/obtenerReporteAudiometria",
     },
 
-    FICHA_OFTALMOLOGICA: {
-        nombre: "FICHA OFTALMOLOGICA",
-        tabla: "oftalmologia",
-        url: "/api/v01/ct/agudezaVisual/obtenerReporteOftalmologia"
-    },
+    // FICHA_OFTALMOLOGICA: {
+    //     nombre: "FICHA OFTALMOLOGICA",
+    //     tabla: "oftalmologia",
+    //     url: "/api/v01/ct/agudezaVisual/obtenerReporteOftalmologia"
+    // },
 
     ODONTOGRAMA: {
         nombre: "ODONTROGRAMA",
