@@ -40,6 +40,8 @@ export default function SubidaArchivos() {
     const nomenclaturas = {
         "MERCURIO EN ORINA": "MERCURIO EN ORINA",
         "PLOMO EN SANGRE": "PLOMO EN SANGRE",
+        "RESONANCIA MAGNETICA": "RESMAG",
+        "PRUEBA DE ESFUERZO": "PRUEBA DE ESFUERZO"
     }
 
     const [visualerOpen, setVisualerOpen] = useState(null)
@@ -82,24 +84,23 @@ export default function SubidaArchivos() {
             <DatosPersonalesLaborales form={form} />
             <SectionFieldset legend="Archivos">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                    {Object.values(nomenclaturas).map((nomenclatura, index) => (
+                    {Object.entries(nomenclaturas).map(([key, nomenclatura], index) => (
                         <div
                             key={index}
                             className="border rounded-xl p-4 flex flex-col gap-2 shadow-sm"
                         >
                             {/* Título */}
                             <span className="font-semibold text-sm">
-                                {nomenclatura}
+                                {key}
                             </span>
-
                             {/* Botones */}
                             <ButtonsPDF
                                 {...(form.SubirDoc ? { handleSave: () => handleSubirArchivo(form, selectedSede, userlogued, token, nomenclatura) } : {})}
                                 {...(form.SubirDoc ? { handleRead: () => ReadArchivosForm(form, setVisualerOpen, token, nomenclatura) } : {})}
                                 handleMasivo={() => handleSubirArchivoMasivo(form, selectedSede, userlogued, token, nomenclatura)}
-                                Nombre_1={`Subir archivo ${nomenclatura}`}
-                                Nombre_2={`Ver archivo ${nomenclatura}`}
-                                Nombre_3={`Subir masivo ${nomenclatura}`}
+                                Nombre_1={`Subir archivo ${key}`}
+                                Nombre_2={`Ver archivo ${key}`}
+                                Nombre_3={`Subir masivo ${key}`}
                             />
                         </div>
                     ))}
