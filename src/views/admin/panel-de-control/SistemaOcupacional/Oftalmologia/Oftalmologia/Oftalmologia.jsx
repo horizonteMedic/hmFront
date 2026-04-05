@@ -152,6 +152,8 @@ export default function OftalmologiaOhla() {
     enfOculares: "",
     presenciaPterigion: "",
     opcionPterigion: "",
+
+    completo: false,
     //FIN NUEVOS
 
 
@@ -388,6 +390,17 @@ export default function OftalmologiaOhla() {
             {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
             handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
           />
+          <div className="flex items-center gap-2 ">
+            <input
+              type="checkbox"
+              name="completo"
+              className="ml-2 text-[11px]"
+              checked={form.completo}
+              onChange={handleCheckBoxChange}
+            />
+            <span className="min-w-[70px] font-semibold">Examen Completo</span>
+
+          </div>
         </div>
       </div>
       {/* Tabs */}

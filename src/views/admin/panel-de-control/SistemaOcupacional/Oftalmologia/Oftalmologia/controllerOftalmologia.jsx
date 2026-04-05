@@ -23,6 +23,7 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
             ...prev,
             ...res,
             codOf: res.codOf,
+            completo: res.completo,
             nomExam: res.nomExam,
             fechaExam: res.fechaOf,
             fechaNac: res.fechaNac ? convertirFecha(res.fechaNac) : "",
@@ -211,6 +212,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
   const body = {
     codOf: form.codOf,
     norden: form.norden,
+    completo: res.completo,
     fechaOf: form.fechaExam,
     rbecPtosisOd: form.ptosisPalpebralOd,
     rbecPtosisOi: form.ptosisPalpebralOi,
@@ -342,7 +344,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
   });
 };
 function convertirFecha(fecha) {
-  if (fecha||fecha === "") return "";
+  if (fecha || fecha === "") return "";
   const [dia, mes, anio] = fecha.split("-");
   return `${anio}/${mes.padStart(2, "0")}/${dia.padStart(2, "0")}`;
 }
