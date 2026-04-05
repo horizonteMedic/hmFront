@@ -151,6 +151,19 @@ const camposExtraEliminar = {
     Consentimiento5d: "con_panel5D",
     Consentimiento10d: "con_panel10D",
     ConsentimientoMari: "consent_marihuana",
+    evalOftalmologica: "OFTALMOLOGIA VISION TESTER",
+    espirometria: "ESPIROMETRIA",
+    electrocardiograma: "ELECTROCARDIOGRAMA",
+    labClinico: "LABORATORIO MANIPULADORES",
+    //1.8
+    certTrabajoAltura: "PSICOSENSOMETRICO ALTURA 1-8",
+    certConduccVehiculos: "PSICOSENSOMETRICO VEHI-FOLIO",
+    certTrabAlturaBarrik: "PSICOSENSOMETRICO CERT-ALTURA",
+    CertAlturaPoderosa: "PSICOSENSOMETRICO ALTU-POD",
+
+
+
+
 };
 
 export const VerifyTR = async (nro, tabla, token, set, sede, ExamenesList) => {

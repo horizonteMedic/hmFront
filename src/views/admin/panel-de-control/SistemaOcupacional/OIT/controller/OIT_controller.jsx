@@ -70,9 +70,17 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
     () => {
       //NO Tiene registro
       GetInfoPac(nro, set, token, sede)
+      set(prev => ({
+        ...prev,
+        aPruebaDeSoledad: true,
+      }))
     },
     () => {
       GetInfoPacLaboratorioFil(nro, tabla, set, token)
+      set(prev => ({
+        ...prev,
+        aPruebaDeSoledad: true,
+      }))
     },
     () => {
       //Necesita Agudeza visual 
