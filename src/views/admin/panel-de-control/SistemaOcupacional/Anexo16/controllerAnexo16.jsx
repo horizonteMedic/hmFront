@@ -799,34 +799,35 @@ export const GetInfoServicio = (
           data.enfermedadOculares =
             res.enfermedadesOcularesOftalmo_e_oculares ?? "NINGUNA";
 
-
           if (
-            data.enfermedadOculares !== "NINGUNA" &&
-            data.enfermedadOculares !== ""
+            (data.enfermedadOculares !== "NINGUNA" &&
+              data.enfermedadOculares !== "") || (
+              res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "NINGUNA" &&
+              res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "")
           ) {
             data.observacionesGenerales +=
-              data.contador + ". " + data.enfermedadOculares + "\n";
+              data.contador + ".OFTALMOLOGIA: " + data.enfermedadOculares + " " + (res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "") + "\n";
             data.contador++;
           }
 
-          if (data.enfermedadOtros === "PTERIGION BILATERAL") {
-            data.observacionesGenerales +=
-              data.contador +
-              ". " +
-              " PTERIGION BILATERAL:EVALUACION POR OFTALMOLOGIA.\n";
-            data.contador++;
-          } else if (
-            data.enfermedadOtros !== "NINGUNA" &&
-            data.enfermedadOtros !== ""
-          ) {
-            data.observacionesGenerales +=
-              data.contador +
-              ". " +
-              data.enfermedadOtros +
-              ":EVALUACION POR OFTALMOLOGIA.\n";
-            data.contador++;
-            console.log("aosdnoadsnaosi")
-          }
+          // if (data.enfermedadOtros === "PTERIGION BILATERAL") {
+          //   data.observacionesGenerales +=
+          //     data.contador +
+          //     ". " +
+          //     " PTERIGION BILATERAL:EVALUACION POR OFTALMOLOGIA.\n";
+          //   data.contador++;
+          // } else if (
+          //   data.enfermedadOtros !== "NINGUNA" &&
+          //   data.enfermedadOtros !== ""
+          // ) {
+          //   data.observacionesGenerales +=
+          //     data.contador +
+          //     ". " +
+          //     data.enfermedadOtros +
+          //     " :EVALUACION POR OFTALMOLOGIA.\n";
+          //   data.contador++;
+          //   console.log("aosdnoadsnaosi")
+          // }
 
           // Audiometría
           data.od500 = res.oidoDerecho500Audiometria_o_d_500 ?? "";
@@ -1020,13 +1021,11 @@ export const GetInfoServicio = (
               data.conclusionRespiratoria = conclusion;
             }
           }
-          data.visionColores = res.vc_vc ?? "NORMAL"
+          data.visionColores = res.vc_vc ?? ""
           // Visión de colores
           if (
-            data.visionColores !== "NINGUNA" &&
-            data.visionColores !== "NORMAL"
+            data.visionColores && data.visionColores != ""
           ) {
-            console.log("jijijaja", data.visionColores)
             data.observacionesGenerales +=
               data.contador + ". " + data.visionColores + "\n";
             data.contador++;
@@ -2214,32 +2213,44 @@ export const GetInfoServicioEditar = (
               }
             }
           }
+          // if (
+          //   data.enfermedadOculares !== "NINGUNA" &&
+          //   data.enfermedadOculares !== ""
+          // ) {
+          //   data.observacionesGenerales2 +=
+          //     data.contador + "." + data.enfermedadOculares + "\n";
+          //   data.contador++;
+          // }
+
+          data.enfermedadOculares = res.enfermedadesOcularesOftalmo_e_oculares ?? "NINGUNA";
           if (
-            data.enfermedadOculares !== "NINGUNA" &&
-            data.enfermedadOculares !== ""
+            (data.enfermedadOculares !== "NINGUNA" &&
+              data.enfermedadOculares !== "") || (
+              res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "NINGUNA" &&
+              res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "")
           ) {
             data.observacionesGenerales2 +=
-              data.contador + "." + data.enfermedadOculares + "\n";
+              data.contador + ".OFTALMOLOGIA: " + data.enfermedadOculares + " " + (res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "") + "\n";
             data.contador++;
           }
 
-          if (data.enfermedadOtros === "PTERIGION BILATERAL") {
-            data.observacionesGenerales2 +=
-              data.contador +
-              "." +
-              " PTERIGION BILATERAL:EVALUACION POR OFTALMOLOGIA.\n";
-            data.contador++;
-          } else if (
-            data.enfermedadOtros !== "NINGUNA" &&
-            data.enfermedadOtros !== ""
-          ) {
-            data.observacionesGenerales2 +=
-              data.contador +
-              "." +
-              data.enfermedadOtros +
-              ":EVALUACION POR OFTALMOLOGIA.\n";
-            data.contador++;
-          }
+          // if (data.enfermedadOtros === "PTERIGION BILATERAL") {
+          //   data.observacionesGenerales2 +=
+          //     data.contador +
+          //     "." +
+          //     " PTERIGION BILATERAL:EVALUACION POR OFTALMOLOGIA.\n";
+          //   data.contador++;
+          // } else if (
+          //   data.enfermedadOtros !== "NINGUNA" &&
+          //   data.enfermedadOtros !== ""
+          // ) {
+          //   data.observacionesGenerales2 +=
+          //     data.contador +
+          //     "." +
+          //     data.enfermedadOtros +
+          //     ":EVALUACION POR OFTALMOLOGIA.\n";
+          //   data.contador++;
+          // }
 
           // Odontograma observaciones
           if (
@@ -2304,11 +2315,9 @@ export const GetInfoServicioEditar = (
           }
           // Visión de colores
           if (
-            data.visionColores !== "NINGUNA" &&
-            data.visionColores !== "NORMAL"
+            data.visionColores &&
+            data.visionColores !== ""
           ) {
-            console.log("aqui ta el guion de mird")
-
             data.observacionesGenerales2 +=
               data.contador + "-" + data.visionColores + "\n";
             data.contador++;

@@ -403,8 +403,29 @@ export const GetInfoServicio = (
             data.observacionesGenerales += "ESPIROMETRIA: " + res.interpretacion_interpretacion + "\n";
           }
 
-          if (res.conclusionRadiografia_conclu != null) {
-            data.observacionesGenerales += "RAYOS X: " + res.conclusionRadiografia_conclu + "\n";
+          const rayosXConclusion = res.conclusionesRadiograficasTorax_txtconclusionesradiograficas;
+          const rayosXObservaciones = res.observacionesRadiografiaTorax_txtobservacionesrt;
+
+          if (rayosXConclusion || rayosXObservaciones) {
+            data.observacionesGenerales +=
+              `RAYOS X TORAX: ` +
+              (rayosXConclusion ?? "") +
+              (rayosXConclusion && rayosXObservaciones ? " - " : "") +
+              (rayosXObservaciones ?? "") +
+              ".\n";
+          }
+
+
+          const rayosXColumnaConclusion = res.conclusionRayosColumna;
+
+          if (rayosXColumnaConclusion &&
+            rayosXColumnaConclusion !== "RADIOGRAFÍA DE COLUMNA LUMBAR AP-L SIN ALTERACIONES SIGNIFICATIVAS." &&
+            rayosXColumnaConclusion !== "RADIOGRAFÍA DE COLUMNA LUMBOSACRA AP-L SIN ALTERACIONES SIGNIFICATIVAS." &&
+            rayosXColumnaConclusion !== "CUERPOS VERTEBRALES DORSOLUMBARES EVALUADOS SIN ALTERACIONES SIGNIFICATIVAS.") {
+            data.observacionesGenerales +=
+              `RADIOGRAFIA COLUMNA: ` +
+              (rayosXColumnaConclusion ?? "") +
+              ".\n";
           }
 
           if (res.conclusionMusculoesqueletica != null) {
@@ -488,12 +509,12 @@ export const GetInfoServicio = (
                 res.conclusionesRadiograficas_txtconclusionesradiograficas;
             }
           }
-          if (
-            res.observacionesRadiografiaTorax_txtobservacionesrt != null &&
-            res.observacionesRadiografiaTorax_txtobservacionesrt != "NORMAL"
-          ) {
-            data.observacionesGenerales += `RADIOGRAFIA: ${res.observacionesRadiografiaTorax_txtobservacionesrt}\n`;
-          }
+          // if (
+          //   res.observacionesRadiografiaTorax_txtobservacionesrt != null &&
+          //   res.observacionesRadiografiaTorax_txtobservacionesrt != "NORMAL"
+          // ) {
+          //   data.observacionesGenerales += `RADIOGRAFIA: ${res.observacionesRadiografiaTorax_txtobservacionesrt}\n`;
+          // }
           data.observacionesGenerales += `LAB CLINICO: ${res.observacionesLabClinico_txtobservacioneslb != null &&
             res.observacionesLabClinico_txtobservacioneslb != ""
             ? res.observacionesLabClinico_txtobservacioneslb
@@ -696,16 +717,21 @@ export const GetInfoServicio = (
             } else if (imc >= 30 && imc < 35) {
               data.imcRed = true;
               data.observacionesGenerales +=
-                "OBESIDAD I.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
+                "OBESIDAD I.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
             } else if (imc >= 35 && imc < 40) {
               data.imcRed = true;
               data.observacionesGenerales +=
-                "OBESIDAD II.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
+                "OBESIDAD II.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
             }
-            else if (imc >= 40) {
+            else if (imc >= 40 && imc < 45) {
               data.imcRed = true;
               data.observacionesGenerales +=
-                "OBESIDAD III.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
+                "OBESIDAD III.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
+            }
+            else if (imc >= 45) {
+              data.imcRed = true;
+              data.observacionesGenerales +=
+                "OBESIDAD IV.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
             }
           }
 
@@ -741,28 +767,40 @@ export const GetInfoServicio = (
           data.visionColores = res.visionColores_v_colores ?? "";
           data.visionBinocular = res.visionBinocular_v_binocular ?? "";
           data.enfermedadOculares =
-            res.enfermedadesOcularesOftalmo_e_oculares ?? "NINGUNA";
+            res.enfermedadesOcularesOftalmo_e_oculares ?? "";
           data.reflejosPupilares = res.reflejosPupilares_r_pupilares ?? "";
           data.enfermedadOtros =
-            res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "NINGUNA";
+            res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "";
 
-          if (data.visionCercaOd !== "") {
-            if (
-              data.enfermedadOculares != "" &&
-              data.enfermedadOculares !== "NINGUNA"
-            ) {
-              data.observacionesGenerales += `${data.enfermedadOculares}\n`;
-            }
-          }
-          if (data.enfermedadOtros === "PTERIGION BILATERAL") {
-            data.observacionesGenerales +=
-              "PTERIGION BILATERAL:EVALUACION X OFTALMOLOGIA.\n";
-          } else if (
-            data.enfermedadOtros &&
-            data.enfermedadOtros !== "NINGUNA"
+
+          if (
+            (data.enfermedadesOcularesOftalmo_e_oculares !== "NINGUNA" &&
+              data.enfermedadesOcularesOftalmo_e_oculares !== "") || (
+              res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "NINGUNA" &&
+              res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "")
           ) {
-            data.observacionesGenerales += `${data.enfermedadOtros}:EVALUACION X OFTALMOLOGIA.\n`;
+            data.observacionesGenerales += "OFTALMOLOGIA: " + data.enfermedadOculares + " " + (res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "") + "\n";
+
           }
+
+
+          // if (data.visionCercaOd !== "") {
+          //   if (
+          //     data.enfermedadOculares != "" &&
+          //     data.enfermedadOculares !== "NINGUNA"
+          //   ) {
+          //     data.observacionesGenerales += `${data.enfermedadOculares}\n`;
+          //   }
+          // }
+          // if (data.enfermedadOtros === "PTERIGION BILATERAL") {
+          //   data.observacionesGenerales +=
+          //     "PTERIGION BILATERAL:EVALUACION X OFTALMOLOGIA.\n";
+          // } else if (
+          //   data.enfermedadOtros &&
+          //   data.enfermedadOtros !== "NINGUNA"
+          // ) {
+          //   data.observacionesGenerales += `${data.enfermedadOtros}:EVALUACION X OFTALMOLOGIA.\n`;
+          // }
 
           if (
             data.visionColores !== "NINGUNA" &&
@@ -807,17 +845,15 @@ export const GetInfoServicio = (
           data.fechaVencimiento = todayPlusOneYear;
 
           // electroCardiograma();=======================
-          const hallazgoECG =
-            res.hallazgosInformeElectroCardiograma_hallazgo ?? "";
-          const recomendacionesECG =
-            res.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
+          const hallazgoEKG = res.hallazgosInformeElectroCardiograma_hallazgo ?? "";
+          const conclusionesEkg = res.conclusionekg;
+          const recomendacionesEKG = res.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
 
-          if (hallazgoECG && hallazgoECG !== "NORMAL.") {
-            if (recomendacionesECG) {
-              data.observacionesGenerales += `\n -ELECTROCARDIOGRAMA: ${hallazgoECG}.${recomendacionesECG}\n`;
-            } else {
-              data.observacionesGenerales += `\n -ELECTROCARDIOGRAMA: ${hallazgoECG}\n`;
-            }
+          if (
+            (hallazgoEKG && hallazgoEKG !== "NORMAL") ||
+            (conclusionesEkg && !conclusionesEkg.includes("DENTRO DE PARAMETROS NORMALES"))
+          ) {
+            data.observacionesGenerales += `-ELECTROCARDIOGRAMA: ${recomendacionesEKG}\n`;
           }
 
           // cargarAnalisisB();=======================
@@ -1027,9 +1063,31 @@ export const GetInfoServicioEditar = (
           if (res.interpretacion_interpretacion != null) {
             data.observacionesGenerales2 += "ESPIROMETRIA: " + res.interpretacion_interpretacion + "\n";
           }
-          if (res.conclusionRadiografia_conclu != null) {
-            data.observacionesGenerales2 += "RAYOS X: " + res.conclusionRadiografia_conclu + "\n";
+
+          const rayosXConclusion = res.conclusionesRadiograficasTorax_txtconclusionesradiograficas;
+          const rayosXObservaciones = res.observacionesRadiografiaTorax_txtobservacionesrt;
+
+          if (rayosXConclusion || rayosXObservaciones) {
+            data.observacionesGenerales2 +=
+              `RAYOS X TORAX: ` +
+              (rayosXConclusion ?? "") +
+              (rayosXConclusion && rayosXObservaciones ? " - " : "") +
+              (rayosXObservaciones ?? "") +
+              ".\n";
           }
+
+          const rayosXColumnaConclusion = res.conclusionRayosColumna;
+
+          if (rayosXColumnaConclusion &&
+            rayosXColumnaConclusion !== "RADIOGRAFÍA DE COLUMNA LUMBAR AP-L SIN ALTERACIONES SIGNIFICATIVAS." &&
+            rayosXColumnaConclusion !== "RADIOGRAFÍA DE COLUMNA LUMBOSACRA AP-L SIN ALTERACIONES SIGNIFICATIVAS." &&
+            rayosXColumnaConclusion !== "CUERPOS VERTEBRALES DORSOLUMBARES EVALUADOS SIN ALTERACIONES SIGNIFICATIVAS.") {
+            data.observacionesGenerales2 +=
+              `RADIOGRAFIA COLUMNA: ` +
+              (rayosXColumnaConclusion ?? "") +
+              ".\n";
+          }
+
           if (res.conclusionMusculoesqueletica != null) {
             data.observacionesGenerales2 += "MUSCULOESQUELETICA: " + res.conclusionMusculoesqueletica + "\n";
           }
@@ -1109,8 +1167,8 @@ export const GetInfoServicioEditar = (
                 res.conclusionesRadiograficas_txtconclusionesradiograficas;
             }
           }
-          if (res.observacionesRadiografiaTorax_txtobservacionesrt != null)
-            data.observacionesGenerales2 += `RADIOGRAFIA: ${res.observacionesRadiografiaTorax_txtobservacionesrt}\n`;
+          // if (res.observacionesRadiografiaTorax_txtobservacionesrt != null)
+          //   data.observacionesGenerales2 += `RADIOGRAFIA: ${res.observacionesRadiografiaTorax_txtobservacionesrt}\n`;
 
 
           data.observacionesGenerales2 += `LAB CLINICO: ${res.observacionesLabClinico_txtobservacioneslb != null &&
@@ -1296,44 +1354,59 @@ export const GetInfoServicioEditar = (
             } else if (imc >= 30 && imc < 35) {
               data.imcRed = true;
               data.observacionesGenerales2 +=
-                "OBESIDAD I.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
+                "OBESIDAD I.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
             } else if (imc >= 35 && imc < 40) {
               data.imcRed = true;
               data.observacionesGenerales2 +=
-                "OBESIDAD II.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
+                "OBESIDAD II.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
             }
-            else if (imc >= 40) {
+            else if (imc >= 40 && imc < 45) {
               data.imcRed = true;
               data.observacionesGenerales2 +=
-                "OBESIDAD III.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
+                "OBESIDAD III.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
+            }
+            else if (imc >= 45) {
+              data.imcRed = true;
+              data.observacionesGenerales2 +=
+                "OBESIDAD IV.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
             }
           }
 
-
-          if (data.visionCercaOd !== "") {
-            if (
-              data.enfermedadOculares != "" &&
-              data.enfermedadOculares !== "NINGUNA"
-            ) {
-              data.observacionesGenerales2 += `${data.enfermedadOculares}\n`;
-            }
-          }
-          if (data.enfermedadOtros === "PTERIGION BILATERAL") {
-            data.observacionesGenerales2 +=
-              "PTERIGION BILATERAL:EVALUACION X OFTALMOLOGIA.\n";
-          } else if (
-            data.enfermedadOtros &&
-            data.enfermedadOtros !== "NINGUNA"
-          ) {
-            data.observacionesGenerales2 += `${data.enfermedadOtros}:EVALUACION X OFTALMOLOGIA.\n`;
-          }
 
           if (
-            data.visionColores !== "NINGUNA" &&
-            data.visionColores !== "NORMAL"
+            (data.enfermedadesOcularesOftalmo_e_oculares !== "NINGUNA" &&
+              data.enfermedadesOcularesOftalmo_e_oculares !== "") || (
+              res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "NINGUNA" &&
+              res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "")
           ) {
-            data.observacionesGenerales2 += `${data.visionColores}\n`;
+            data.observacionesGenerales2 += "OFTALMOLOGIA: " + data.enfermedadOculares + " " + (res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "") + "\n";
+
           }
+
+          // if (data.visionCercaOd !== "") {
+          //   if (
+          //     data.enfermedadOculares != "" &&
+          //     data.enfermedadOculares !== "NINGUNA"
+          //   ) {
+          //     data.observacionesGenerales2 += `${data.enfermedadOculares}\n`;
+          //   }
+          // }
+          // if (data.enfermedadOtros === "PTERIGION BILATERAL") {
+          //   data.observacionesGenerales2 +=
+          //     "PTERIGION BILATERAL:EVALUACION X OFTALMOLOGIA.\n";
+          // } else if (
+          //   data.enfermedadOtros &&
+          //   data.enfermedadOtros !== "NINGUNA"
+          // ) {
+          //   data.observacionesGenerales2 += `${data.enfermedadOtros}:EVALUACION X OFTALMOLOGIA.\n`;
+          // }
+
+          // if (
+          //   data.visionColores !== "NINGUNA" &&
+          //   data.visionColores !== "NORMAL"
+          // ) {
+          //   data.observacionesGenerales2 += `${data.visionColores}\n`;
+          // }
 
 
           // Medidas Generales
@@ -1403,17 +1476,15 @@ export const GetInfoServicioEditar = (
           }
 
           // electroCardiograma();=======================
-          const hallazgoECG =
-            res.hallazgosInformeElectroCardiograma_hallazgo ?? "";
-          const recomendacionesECG =
-            res.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
+          const hallazgoEKG = res.hallazgosInformeElectroCardiograma_hallazgo;
+          const conclusionesEkg = res.conclusionekg;
+          const recomendacionesEKG = res.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
 
-          if (hallazgoECG && hallazgoECG !== "NORMAL.") {
-            if (recomendacionesECG) {
-              data.observacionesGenerales2 += `\n -ELECTROCARDIOGRAMA: ${hallazgoECG}.${recomendacionesECG}\n`;
-            } else {
-              data.observacionesGenerales2 += `\n -ELECTROCARDIOGRAMA: ${hallazgoECG}\n`;
-            }
+          if (
+            (hallazgoEKG && hallazgoEKG !== "NORMAL") ||
+            (conclusionesEkg && !conclusionesEkg.includes("DENTRO DE PARAMETROS NORMALES"))
+          ) {
+            data.observacionesGenerales2 += `-ELECTROCARDIOGRAMA: ${recomendacionesEKG}\n`;
           }
 
           //FIN==============
