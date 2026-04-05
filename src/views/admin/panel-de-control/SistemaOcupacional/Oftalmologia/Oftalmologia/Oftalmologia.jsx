@@ -177,6 +177,11 @@ export default function OftalmologiaOhla() {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
   };
+
+  const handleChangeSimple = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+  };
   const handleChangeNumber = (e) => {
     const { name, value } = e.target;
     if (/^[\d/]*$/.test(value)) {
@@ -1753,8 +1758,6 @@ export default function OftalmologiaOhla() {
                 />
               </div>
             </div>
-
-
           </div>
         )}
         <SectionFieldset legend="Asignación de Médico">
@@ -1762,13 +1765,13 @@ export default function OftalmologiaOhla() {
             value={form.nombre_medico}
             label="Especialista"
             form={form}
-            onChange={handleChange}
+            onChange={handleChangeSimple}
           />
           <EmpleadoComboBox
             value={form.nombre_doctorAsignado}
             label="Doctor Asignado"
             form={form}
-            onChange={handleChange}
+            onChange={handleChangeSimple}
             nameField="nombre_doctorAsignado"
             idField="user_doctorAsignado"
           />

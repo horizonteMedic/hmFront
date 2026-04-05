@@ -212,7 +212,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
   const body = {
     codOf: form.codOf,
     norden: form.norden,
-    completo: res.completo,
+    completo: form.completo,
     fechaOf: form.fechaExam,
     rbecPtosisOd: form.ptosisPalpebralOd,
     rbecPtosisOi: form.ptosisPalpebralOi,
