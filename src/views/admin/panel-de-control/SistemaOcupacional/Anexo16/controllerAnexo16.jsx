@@ -758,7 +758,7 @@ export const GetInfoServicio = (
                   ". " +
                   "OBESIDAD III.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
                 data.contador++;
-              } else if (imc >= 45 && imc < 50) {
+              } else if (imc >= 45) {
                 data.imcRed = true;
                 data.observacionesGenerales +=
                   data.contador +
@@ -2204,7 +2204,7 @@ export const GetInfoServicioEditar = (
                   "." +
                   "OBESIDAD III.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
                 data.contador++;
-              } else if (imc >= 45 && imc < 50) {
+              } else if (imc >= 45) {
                 data.imcRed = true;
                 data.observacionesGenerales2 +=
                   data.contador +
