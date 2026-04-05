@@ -758,7 +758,7 @@ export const GetInfoServicio = (
                   ". " +
                   "OBESIDAD III.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
                 data.contador++;
-              } else if (imc >= 45) {
+              } else if (imc >= 45 && imc < 50) {
                 data.imcRed = true;
                 data.observacionesGenerales +=
                   data.contador +
@@ -1020,13 +1020,11 @@ export const GetInfoServicio = (
               data.conclusionRespiratoria = conclusion;
             }
           }
-          data.visionColores = res.vc_vc ?? "NORMAL"
+          data.visionColores = res.vc_vc ?? ""
           // Visión de colores
           if (
-            data.visionColores !== "NINGUNA" &&
-            data.visionColores !== "NORMAL"
+            data.visionColores && data.visionColores != ""
           ) {
-            console.log("jijijaja", data.visionColores)
             data.observacionesGenerales +=
               data.contador + ". " + data.visionColores + "\n";
             data.contador++;
@@ -2204,7 +2202,7 @@ export const GetInfoServicioEditar = (
                   "." +
                   "OBESIDAD III.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
                 data.contador++;
-              } else if (imc >= 45) {
+              } else if (imc >= 45 && imc < 50) {
                 data.imcRed = true;
                 data.observacionesGenerales2 +=
                   data.contador +
@@ -2304,11 +2302,9 @@ export const GetInfoServicioEditar = (
           }
           // Visión de colores
           if (
-            data.visionColores !== "NINGUNA" &&
-            data.visionColores !== "NORMAL"
+            data.visionColores &&
+            data.visionColores !== ""
           ) {
-            console.log("aqui ta el guion de mird")
-
             data.observacionesGenerales2 +=
               data.contador + "-" + data.visionColores + "\n";
             data.contador++;
