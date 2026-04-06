@@ -137,7 +137,7 @@ export const GetInfoServicio = async (
             vclrs: res.vcOftalmologia_vc ?? "",
             vb: res.vbOftalmologia_vb ?? "",
             rp: res.rpOftalmologia_rp ?? "",
-            enfermedadesOculares: res.enfermedadesOcularesOftalmologia_e_oculares ?? "",
+            enfermedadesOculares: `${res.enfermedadesOcularesOftalmologia_e_oculares ?? ""}\n${res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? ""}`,
 
             //Altura
             alturaLabor: `${res.altura ?? ""} M.S.N.M`,
@@ -265,7 +265,7 @@ export const GetInfoServicioEditar = async (
             vclrs: res.vcOftalmologia_vc ?? "",
             vb: res.vbOftalmologia_vb ?? "",
             rp: res.rpOftalmologia_rp ?? "",
-            enfermedadesOculares: res.enfermedadesOcularesOftalmologia_e_oculares ?? "",
+            enfermedadesOculares: `${res.enfermedadesOcularesOftalmologia_e_oculares ?? ""}\n${res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? ""}`,
 
             //Altura
             alturaLabor: res.altura ?? "",

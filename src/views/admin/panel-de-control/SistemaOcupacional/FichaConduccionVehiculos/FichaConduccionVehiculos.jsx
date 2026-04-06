@@ -663,7 +663,7 @@ export default function FichaConduccionVehiculos() {
                         </div>
                     )}
                     {/* Enfermedades Oculares */}
-                    <InputTextArea label="Enfermedades Oculares" rows={5} name="enfermedadesOculares" value={form?.enfermedadesOculares} onChange={handleChange} disabled />
+                    <InputTextArea label="Enfermedades Oculares" rows={6} name="enfermedadesOculares" value={form?.enfermedadesOculares} onChange={handleChange} disabled />
                 </div>
             </div>
         </div>
