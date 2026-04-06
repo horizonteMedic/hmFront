@@ -463,11 +463,11 @@ export default function Anexo16() {
 
         {/* Panel lateral de datos - 20% */}
         <div className="w-1/5">
-          <ButtonsPDF
+          {/* <ButtonsPDF
             {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
             {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
             handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
-          />
+          /> */}
           <PanelObservaciones
             form={form}
             handleRadioButton={handleRadioButton}
