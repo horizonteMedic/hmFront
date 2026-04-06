@@ -693,17 +693,27 @@ export const GetInfoServicio = (
           }
           data.piezasFaltan = res.ausentes_txtausentes ?? "";
           // Hijos
-          data.hijosVivos =
-            res.hijosVivosAnexo2_txthijosvivos || "0";
-          data.hijosMuertos =
-            res.hijosMuertosAnexo2_txthijosmuertos ||
-            "0";
-
+          if (sexo == "M") {
+            data.hijosVivos =
+              res.hijosVivosAntecedentesPatologicos_txtvhijosvivos || "0";
+            data.hijosMuertos =
+              res.hijosFallecidosAntecedentesPatologicos_txtvhijosfallecidos ||
+              "0";
+          }
+          else if (sexo == "F") {
+            data.hijosVivos =
+              res.hijasVivasAntecedentesPatologicos_txtdhijosvivos || "0";
+            data.hijosMuertos =
+              res.hijasFallecidasAntecedentesPatologicos_txtdhijosfallecidos ||
+              "0";
+          }
           if (data.hijosVivos && data.hijosMuertos) {
             const hv = parseInt(data.hijosVivos) || 0;
             const hm = parseInt(data.hijosMuertos) || 0;
             data.totalHijos = (hv + hm).toString();
           }
+
+
 
           // IMC
           data.imc = res.imc_imc ?? "";
@@ -1337,11 +1347,25 @@ export const GetInfoServicioEditar = (
           data.piezasFaltan = res.ausentes_txtausentes ?? "";
 
           // Hijos
-          data.hijosVivos =
-            res.hijosVivosAnexo2_txthijosvivos ?? "0";
-          data.hijosMuertos =
-            res.hijosMuertosAnexo2_txthijosmuertos ??
-            "0";
+          if (sexo == "M") {
+            data.hijosVivos =
+              res.hijosVivosAntecedentesPatologicos_txtvhijosvivos ?? "0";
+            data.hijosMuertos =
+              res.hijosFallecidosAntecedentesPatologicos_txtvhijosfallecidos ??
+              "0";
+          }
+          else if (sexo == "F") {
+            data.hijosVivos =
+              res.hijasVivasAntecedentesPatologicos_txtdhijosvivos || "0";
+            data.hijosMuertos =
+              res.hijasFallecidasAntecedentesPatologicos_txtdhijosfallecidos ||
+              "0";
+          }
+          if (data.hijosVivos && data.hijosMuertos) {
+            const hv = parseInt(data.hijosVivos) || 0;
+            const hm = parseInt(data.hijosMuertos) || 0;
+            data.totalHijos = (hv + hm).toString();
+          }
 
           data.imc = res.imc_imc ?? "";
           if (data.imc && data.imc !== "") {
@@ -1469,11 +1493,6 @@ export const GetInfoServicioEditar = (
 
 
 
-          if (data.hijosVivos && data.hijosMuertos) {
-            const hv = parseInt(data.hijosVivos) || 0;
-            const hm = parseInt(data.hijosMuertos) || 0;
-            data.totalHijos = (hv + hm).toString();
-          }
 
           // electroCardiograma();=======================
           const hallazgoEKG = res.hallazgosInformeElectroCardiograma_hallazgo;
