@@ -2389,7 +2389,7 @@ export const GetInfoServicioEditar = (
 
           data = MapearDatosAdicionales(res, data, 1, true);
           console.log("DATA EDITAR", data);
-          set((prev) => ({ ...prev, ...res, ...data }));
+          set((prev) => ({ ...prev, ...res, ...data, visionColores: resSimple.vc_vc ?? "", reflejosPupilares: resSimple.rp_rp ?? "", }));
         }
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
