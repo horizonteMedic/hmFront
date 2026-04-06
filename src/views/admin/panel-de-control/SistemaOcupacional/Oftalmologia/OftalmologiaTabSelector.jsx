@@ -14,6 +14,7 @@ const OftalmologiaTabSelector = ({ token, selectedSede, userlogued }) => {
 
         {/* Tab Navigation */}
         <nav className="flex bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
+        
           <button
             className={`flex-1 px-4 py-3 uppercase tracking-wider text-base border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${
               activeTab === 0
@@ -23,31 +24,20 @@ const OftalmologiaTabSelector = ({ token, selectedSede, userlogued }) => {
             onClick={() => setActiveTab(0)}
           >
             <FontAwesomeIcon icon={faEye} className="mr-2" />
-            Ficha Oftalmológica
-          </button>
-          <button
-            className={`flex-1 px-4 py-3 uppercase tracking-wider text-base border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${
-              activeTab === 1
-                ? "border-[#233245] text-[#233245] font-semibold"
-                : "border-transparent"
-            }`}
-            onClick={() => setActiveTab(1)}
-          >
-            <FontAwesomeIcon icon={faEye} className="mr-2" />
             Oftalmología
           </button>
         </nav>
 
         {/* Tab Content */}
         <div className="p-6  max-w-[95%] mx-auto">
-          {activeTab === 0 && (
+          {/* {activeTab === 0 && (
             <FichaOftalmologica
               token={token}
               userlogued={userlogued}
               selectedSede={selectedSede}
             />
-          )}
-          {activeTab === 1 && (
+          )} */}
+          {activeTab === 0 && (
             <Oftalmologia
               token={token}
               userlogued={userlogued}

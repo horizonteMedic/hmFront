@@ -152,6 +152,8 @@ export default function OftalmologiaOhla() {
     enfOculares: "",
     presenciaPterigion: "",
     opcionPterigion: "",
+
+    completo: false,
     //FIN NUEVOS
 
 
@@ -174,6 +176,11 @@ export default function OftalmologiaOhla() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
+  };
+
+  const handleChangeSimple = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
   };
   const handleChangeNumber = (e) => {
     const { name, value } = e.target;
@@ -388,6 +395,17 @@ export default function OftalmologiaOhla() {
             {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
             handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
           />
+          <div className="flex items-center gap-2 ">
+            <input
+              type="checkbox"
+              name="completo"
+              className="ml-2 text-[11px]"
+              checked={form.completo}
+              onChange={handleCheckBoxChange}
+            />
+            <span className="min-w-[70px] font-semibold">Examen Completo</span>
+
+          </div>
         </div>
       </div>
       {/* Tabs */}
@@ -1740,8 +1758,6 @@ export default function OftalmologiaOhla() {
                 />
               </div>
             </div>
-
-
           </div>
         )}
         <SectionFieldset legend="Asignación de Médico">
@@ -1749,13 +1765,13 @@ export default function OftalmologiaOhla() {
             value={form.nombre_medico}
             label="Especialista"
             form={form}
-            onChange={handleChange}
+            onChange={handleChangeSimple}
           />
           <EmpleadoComboBox
             value={form.nombre_doctorAsignado}
             label="Doctor Asignado"
             form={form}
-            onChange={handleChange}
+            onChange={handleChangeSimple}
             nameField="nombre_doctorAsignado"
             idField="user_doctorAsignado"
           />
