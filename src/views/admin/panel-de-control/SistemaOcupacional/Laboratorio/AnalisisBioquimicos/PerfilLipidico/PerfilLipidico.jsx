@@ -133,10 +133,16 @@ export default function PerfilLipidico() {
       }
       setForm((prev) => ({
         ...prev,
+        Editando: false,
         ...updates
       }));
     }
-
+    else {
+      setForm((prev) => ({
+        ...prev,
+        Editando: false,
+      }));
+    }
   }, [form.colesterolTotal, form.trigliceridos]);
 
   return (
@@ -264,7 +270,7 @@ export default function PerfilLipidico() {
               name="colesterolTotal"
               value={form.colesterolTotal}
               labelWidth="120px"
-              onChange={handleChange}
+              onChange={(e) => { handleChangeNumberDecimals(e, 2); }}
               onKeyUp={handleFocusNext}
               className='w-[75%]'
             />
@@ -276,7 +282,7 @@ export default function PerfilLipidico() {
               name="trigliceridos"
               value={form.trigliceridos}
               labelWidth="120px"
-              onChange={handleChange}
+              onChange={(e) => { handleChangeNumberDecimals(e, 2); }}
               onKeyUp={handleFocusNext}
               className='w-[75%]'
             />
@@ -288,7 +294,7 @@ export default function PerfilLipidico() {
               name="hdl"
               value={form.hdl}
               labelWidth="120px"
-              onChange={handleChange}
+              onChange={(e) => { handleChangeNumberDecimals(e, 2); }}
               onKeyUp={handleFocusNext}
               className='w-[75%]'
             />
@@ -300,7 +306,7 @@ export default function PerfilLipidico() {
               name="ldl"
               value={form.ldl}
               labelWidth="120px"
-              onChange={handleChange}
+              onChange={(e) => { handleChangeNumberDecimals(e, 2); }}
               onKeyUp={handleFocusNext}
               className='w-[75%]'
             />
@@ -312,7 +318,7 @@ export default function PerfilLipidico() {
               name="vldl"
               value={form.vldl}
               labelWidth="120px"
-              onChange={handleChangeNumberDecimals}
+              onChange={(e) => { handleChangeNumberDecimals(e, 2); }}
               className='w-[75%]'
             />
             <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 30 mg/dl)"}</span>
