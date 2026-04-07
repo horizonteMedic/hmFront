@@ -74,7 +74,16 @@ export const GetInfoServicio = async (
         const textoEnfermedadOftalmo = (res.enfermedadesOcularesOftalmologia_e_oculares ?? "").trim().toUpperCase();
 
         if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
-            const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
+            const enfermedadesRefractarias = [
+                "MIOPIA",//agregados
+                "ASIGMATISMO",//agregados
+                "AMETROPIA",
+                "PRESBICIA",
+                "HIPERMETROPIA",
+                "OJO CIEGO",
+                // "CUENTA DEDOS",
+                // "PERCIBE LUZ"
+            ];
             if (enfermedadesRefractarias.some(e => textoEnfermedadOftalmo.includes(e))) {
                 const visionLejosNormal = vlejoscod === "00" && vlejoscoi === "00";
                 const visionCercaNormal = vcercacod === "00" && vcercacoi === "00";
@@ -128,7 +137,7 @@ export const GetInfoServicio = async (
             vclrs: res.vcOftalmologia_vc ?? "",
             vb: res.vbOftalmologia_vb ?? "",
             rp: res.rpOftalmologia_rp ?? "",
-            enfermedadesOculares: res.enfermedadesOcularesOftalmologia_e_oculares ?? "",
+            enfermedadesOculares: `${res.enfermedadesOcularesOftalmologia_e_oculares ?? ""}\n${res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? ""}`,
 
             //Altura
             alturaLabor: `${res.altura ?? ""} M.S.N.M`,
@@ -256,7 +265,7 @@ export const GetInfoServicioEditar = async (
             vclrs: res.vcOftalmologia_vc ?? "",
             vb: res.vbOftalmologia_vb ?? "",
             rp: res.rpOftalmologia_rp ?? "",
-            enfermedadesOculares: res.enfermedadesOcularesOftalmologia_e_oculares ?? "",
+            enfermedadesOculares: `${res.enfermedadesOcularesOftalmologia_e_oculares ?? ""}\n${res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? ""}`,
 
             //Altura
             alturaLabor: res.altura ?? "",

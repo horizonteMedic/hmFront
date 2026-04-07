@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import { SubmitOITModel, SubmitOITModelSinDatos } from "./model";
 import OIT_B_Digitalizado from "../../../../../jaspers/OIT/OIT_B_Digitalizado";
 import OIT_B_Digitalizado_boro from "../../../../../jaspers/OIT/OIT_B_Digitalizado_boro";
-import { handleSubidaMasiva, handleSubirArchivoDefaultSinSellos, ReadArchivosFormDefault } from "../../../../../utils/functionUtils";
+import { handleSubidaMasiva, handleSubirArchivoDefaultSinSellos, ReadArchivosFormDefault, VerifyTRPerzonalizadoDefault } from "../../../../../utils/functionUtils";
 
 const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta"
 
@@ -39,22 +39,59 @@ const Loading = (text) => {
 
 }
 
+// export const VerifyTR = async (nro, tabla, token, set, sede) => {
+//   if (!nro) {
+//     await Swal.fire('Error', 'Debe Introducir un Nro de Historia Clinica valido', 'error')
+//     return
+//   }
+//   Loading('Validando datos')
+//   getFetch(`/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`, token)
+//     .then((res) => {
+//       console.log(res)
+//       if (res.id === 0) {
+//         GetInfoPac(nro, set, token, sede)
+//       } else {
+//         GetInfoPacLaboratorioFil(nro, tabla, set, token)
+//       }
+//     })
+// }
+
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
   if (!nro) {
     await Swal.fire('Error', 'Debe Introducir un Nro de Historia Clinica valido', 'error')
     return
   }
-  Loading('Validando datos')
-  getFetch(`/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`, token)
-    .then((res) => {
-      console.log(res)
-      if (res.id === 0) {
-        GetInfoPac(nro, set, token, sede)
-      } else {
-        GetInfoPacLaboratorioFil(nro, tabla, set, token)
-      }
-    })
-}
+  VerifyTRPerzonalizadoDefault(
+    nro,
+    tabla,
+    token,
+    set,
+    sede,
+    () => {
+      //NO Tiene registro
+      GetInfoPac(nro, set, token, sede)
+      set(prev => ({
+        ...prev,
+        aPruebaDeSoledad: true,
+      }))
+    },
+    () => {
+      GetInfoPacLaboratorioFil(nro, tabla, set, token)
+      set(prev => ({
+        ...prev,
+        aPruebaDeSoledad: true,
+      }))
+    },
+    () => {
+      //Necesita Agudeza visual 
+      Swal.fire(
+        "Alerta",
+        "El paciente necesita pasar por Rayos X Torax.",
+        "warning"
+      );
+    }
+  );
+};
 
 export const GetInfoPac = (nro, set, token, sede) => {
   getFetch(`/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`, token)
@@ -64,7 +101,8 @@ export const GetInfoPac = (nro, set, token, sede) => {
         ...prev,
         ...res,
         nombres: res.nombresApellidos,
-        txtSComentarios: `${res.txtSComentarios ? res.txtSComentarios + "\n" : ""}`
+        txtSComentarios: `${res.conclusionesRadiograficas ? res.conclusionesRadiograficas + "\n" : ""}`,
+
       }));
     })
     .finally(() => {
@@ -85,7 +123,11 @@ export const GetInfoPacLaboratorioFil = (nro, tabla, set, token) => {
       }))
     })
     .finally(() => {
-      Swal.close()
+      Swal.fire(
+        "Alerta",
+        "Este paciente ya cuenta con registros de OIT",
+        "warning"
+      );
     })
 }
 
@@ -141,14 +183,14 @@ export const SubmitOIT = async (form, token, user, limpiar, tabla) => {
 
 export const PrintHojaR = (nro, token, tabla) => {
   Loading('Cargando Formato a Imprimir')
-  getFetch(`/ api / v01 / ct / oit / obtenerReporteOit ? nOrden = ${nro} & nameService=${tabla}`, token)
+  getFetch(`/api/v01/ct/oit/obtenerReporteOit?nOrden=${nro}&nameService=${tabla}`, token)
     .then(async (res) => {
       if (res.norden) {
         console.log(res)
         const nombre = res.nameJasper;
         console.log(nombre)
         const jasperModules = import.meta.glob('../../../../../jaspers/OIT/*.jsx');
-        const modulo = await jasperModules[`../../../../../ jaspers / OIT / ${nombre}.jsx`]();
+        const modulo = await jasperModules[`../../../../../jaspers/OIT/${nombre}.jsx`]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === 'function') {
           modulo.default(res);

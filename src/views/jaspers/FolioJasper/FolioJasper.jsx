@@ -43,7 +43,11 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "informe_psicologico",
         "anexo_agroindustrial",
         "anexo7c",
-        "certificado_aptitud_medico_ocupacional"
+        "certificado_aptitud_medico_ocupacional",
+        "PRUEBA DE ESFUERZO",
+        "RESMAG",
+        "MERCURIO EN ORINA",
+        "PLOMO EN SANGRE",
     ];
     const coordenadasPSICOSENSO = {
         HUELLA: { x: 400, y: 680, width: 60, height: 60 },

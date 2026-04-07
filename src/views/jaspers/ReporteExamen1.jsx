@@ -137,20 +137,50 @@ export default async function ReporteExamen1(datos) {
     drawC(doc, "PLOMO EN SANGRE", leftspace + 118, headspace + 118, 35, 10, !datos.aplomo ? true : datos.plomos ? true : false);
     drawC(doc, "MERCURIO EN ORINA", leftspace + 160, headspace + 118, 35, 10, !datos.amercurio ? true : datos.mercurioo ? true : false);
 
+    const contenido = datos.hallazgoAnterior || '';
+    const lineas = doc.splitTextToSize(contenido, 180); // ancho en mm
+    const textoHallazgos = [
+        'HALLAZGOS:',
+        ...(Array.isArray(lineas) ? lineas : [])
+    ]
+        .filter(Boolean) // elimina null/undefined
+        .map(e => String(e)) // fuerza a string
+        .join('\n');
+
     autoTable(doc, {
-        startY: headspace + 136, // Increased from 140 to 150 to maintain spacing
+        startY: headspace + 136,
         body: [
-            [{ content: `HALLAZGOS: ${datos.hallazgos || ''}`, colSpan: 1, rowSpan: 1, styles: { valign: "top" } }],
-            [{ content: `___________________________________________________________________________________________________________________`, colSpan: 1, rowSpan: 1, styles: { valign: "top" } }],
-            [{ content: `___________________________________________________________________________________________________________________`, colSpan: 1, rowSpan: 1, styles: { valign: "top" } }],
-            [{ content: `___________________________________________________________________________________________________________________`, colSpan: 1, rowSpan: 1, styles: { valign: "top" } }],
-            [{ content: `___________________________________________________________________________________________________________________`, colSpan: 1, rowSpan: 1, styles: { valign: "top" } }],
-            [{ content: `___________________________________________________________________________________________________________________`, colSpan: 1, rowSpan: 1, styles: { valign: "top" } }],
+            [
+                {
+                    content: textoHallazgos,
+                    styles: {
+                        minCellHeight: lineas.length * 4 + 23,
+                        valign: "top",
+                        fontSize: 8,
+                        lineWidth: 0.5,
+                        lineColor: [0, 0, 0]
+                    }
+                }
+            ]
         ],
-        theme: "plain",
-        styles: { fontSize: 8, textColor: [0, 0, 0] },
-        headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0] },
+        theme: "grid",
+        didParseCell: function (data) {
+            if (data.row.index === 0 && data.column.index === 0) {
+                const text = data.cell.text;
+
+                if (Array.isArray(text) && text.length > 0) {
+                    text[0] = 'HALLAZGOS:'; // aseguras string
+
+                    data.cell.styles.fontStyle = 'normal';
+
+                    // solo primera línea bold
+                    data.cell.styles.fontStyle = 'bold';
+                }
+            }
+        }
     });
+
+
 
     doc.setFontSize(8);
     doc.setFont("helvetica", "bold");

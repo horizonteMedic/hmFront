@@ -1939,7 +1939,7 @@ export default async function UsoRespiradores(data = {}, docExistente = null) {
   // Texto de Minera Barrick con espacio superior de 0.6mm desde la línea superior
   // El texto se dibuja desde su baseline, así que necesitamos ajustar para que visualmente esté a 0.6mm de la línea
   const yTextoInicio = yInicioFila1 + espacioSuperior + 2; // 0.6mm espacio + 2mm para el baseline del texto
-  doc.text("Minera Barrick:", tablaInicioX + tablaAncho / 2 + 2, yTextoInicio);
+  doc.text("Minera:", tablaInicioX + tablaAncho / 2 + 2, yTextoInicio);
   // Dibujar texto de empresa con múltiples líneas si es necesario
   lineasEmpresa.forEach((linea, idx) => {
     doc.text(linea, tablaInicioX + tablaAncho / 2 + 20, yTextoInicio + (idx * 3.5));
@@ -1982,7 +1982,7 @@ export default async function UsoRespiradores(data = {}, docExistente = null) {
 
 
   // === SECCIÓN CON FONDO NARANJA - EVALUACIÓN MÉDICA ===
-  const textoEvaluacionMedica = "El trabajador mencionado ha sido examinado en el ajuste del respirador de conformidad con el Estándar de Barrick de Protección Respiratoria. Esta evaluación limitada es especificada para el uso del respirador solamente. Basado en mis hallazgos he determinado que la persona:";
+  const textoEvaluacionMedica = "El trabajador mencionado ha sido examinado en el ajuste del respirador de conformidad con el estándar de la minera de Protección Respiratoria. Esta evaluación limitada es especificada para el uso del respirador solamente. Basado en mis hallazgos he determinado que la persona:";
 
   // Calcular altura dinámica para la evaluación médica
   const calcularAlturaEvaluacionMedica = (texto, anchoMaximo, fontSize) => {

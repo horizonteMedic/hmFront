@@ -141,7 +141,7 @@ export default function DatosPersonales({
         <div className="space-y-3">
           <div className="bg-white border border-gray-200 rounded-lg p-3 h-full">
             <h4 className="font-semibold text-gray-800 mb-2">
-              Agentes presentes en Trabajo Actual
+              Agentes presentes en Trabajo Actual (lo trae de Antecedentes Patológicos)
             </h4>
             <div className="grid grid-cols-3 gap-2">
               <InputCheckbox
@@ -341,6 +341,32 @@ export default function DatosPersonales({
 
         {/* Columna Derecha - Datos del Puesto */}
         <div className="space-y-3">
+          {/* Inmunizaciones */}
+          <div className="bg-white border border-gray-200 rounded-lg p-3 ">
+            <h4 className="font-semibold text-gray-800 mb-2">
+              Inmunizaciones (lo trae de Antecedentes Patológicos)
+            </h4>
+            <div className="grid grid-cols-3 gap-2">
+              <InputCheckbox
+                label="Tetano"
+                checked={form.tetano}
+                name="tetano"
+                disabled
+              />
+              <InputCheckbox
+                label="Hepatitis - B"
+                checked={form.hepatitisB}
+                name="hepatitisB"
+                disabled
+              />
+              <InputCheckbox
+                label="Fiebre Amarilla"
+                checked={form.fiebreAmarilla}
+                name="fiebreAmarilla"
+                disabled
+              />
+            </div>
+          </div>
           <div className="bg-white border border-gray-200 rounded-lg p-3 h-full">
             <h4 className="font-semibold text-gray-800 mb-2">
               Datos del Puesto
@@ -524,32 +550,7 @@ export default function DatosPersonales({
 
             </div>
           </div>
-          {/* Inmunizaciones */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3 ">
-            <h4 className="font-semibold text-gray-800 mb-2">
-              Inmunizaciones
-            </h4>
-            <div className="grid grid-cols-3 gap-2">
-              <InputCheckbox
-                label="Tetano"
-                checked={form.tetano}
-                name="tetano"
-                onChange={handleCheckBoxChange}
-              />
-              <InputCheckbox
-                label="Hepatitis - B"
-                checked={form.hepatitisB}
-                name="hepatitisB"
-                onChange={handleCheckBoxChange}
-              />
-              <InputCheckbox
-                label="Fiebre Amarilla"
-                checked={form.fiebreAmarilla}
-                name="fiebreAmarilla"
-                onChange={handleCheckBoxChange}
-              />
-            </div>
-          </div>
+
         </div>
       </div>
     </div>

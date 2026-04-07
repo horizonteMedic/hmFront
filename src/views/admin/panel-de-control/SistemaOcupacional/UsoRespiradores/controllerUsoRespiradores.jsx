@@ -72,7 +72,7 @@ export const GetInfoServicio = async (
             vclrs: res.vcoftalmologiaVc ?? "",
             vb: res.vboftalmologiaVb ?? "",
             rp: res.rpoftalmologiaRp ?? "",
-            enfermedadesOculares: res.enfermedadesocularesoftalmoEOculares ?? "",
+            enfermedadesOculares: `${res.enfermedadesocularesoftalmoEOculares ?? ""}\n${res.enfermedadesocularesotrosoftalmoEOculares1 ?? ""}`,
         }));
     }
 };
@@ -124,7 +124,7 @@ export const GetInfoServicioEditar = async (
             vclrs: res.vcoftalmologiaVc ?? "",
             vb: res.vboftalmologiaVb ?? "",
             rp: res.rpoftalmologiaRp ?? "",
-            enfermedadesOculares: res.enfermedadesocularesoftalmoEOculares ?? "",
+            enfermedadesOculares: `${res.enfermedadesocularesoftalmoEOculares ?? ""}\n${res.enfermedadesocularesotrosoftalmoEOculares1 ?? ""}`,
 
             // ====================== LUGAR DE TRABAJO ======================
             // Tipo de respirador(es) a utilizar

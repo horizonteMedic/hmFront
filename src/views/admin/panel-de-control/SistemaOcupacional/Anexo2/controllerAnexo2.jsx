@@ -1,16 +1,14 @@
 import Swal from "sweetalert2";
-import { LoadingDefault, PrintHojaRJsReportDefault, VerifyTRDefault } from "../../../../utils/functionUtils";
+import { handleSubidaMasiva, handleSubirArchivoDefaultSinSellos, LoadingDefault, PrintHojaRJsReportDefault, ReadArchivosFormDefault, VerifyTRDefault } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
 import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
 
-const obtenerReporteUrl =
-  "/api/v01/ct/anexos/anexo2/obtenerReporteAnexo2Completo";
-const registrarUrl =
-  "/api/v01/ct/anexos/anexo2/registrarActualizarAnexoAgroindustrial";
-const obtenerExamenesRealizadosUrl =
-  "/api/v01/ct/anexos/anexo2/obtenerExamenesRealizados";
+const obtenerReporteUrl = "/api/v01/ct/anexos/anexo2/obtenerReporteAnexo2Completo";
+const registrarUrl = "/api/v01/ct/anexos/anexo2/registrarActualizarAnexoAgroindustrial";
+const obtenerExamenesRealizadosUrl = "/api/v01/ct/anexos/anexo2/obtenerExamenesRealizados";
 const obtenerReporteJsReportUrl = "/api/v01/ct/anexos/descargarReporteAnexo2"
+const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta"
 
 export const SubmitDataService = async (
   form,
@@ -159,37 +157,37 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
   });
 };
 
-// export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-//   Loading("Cargando Formato a Imprimir");
-//   getFetch(
-//     `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`,
-//     token
-//   ).then(async (res) => {
-//     if (res.norden_n_orden) {
-//       // const nombre = res.nameJasper;
-//       const nombre = "Anexo2";
-//       console.log(nombre);
-//       const jasperModules = import.meta.glob(
-//         "../../../../jaspers/Anexo2/*.jsx"
-//       );
-//       const modulo = await jasperModules[
-//         `../../../../jaspers/Anexo2/${nombre}.jsx`
-//       ]();
+/*export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+  Loading("Cargando Formato a Imprimir");
+  getFetch(
+    `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`,
+    token
+  ).then(async (res) => {
+    if (res.norden_n_orden) {
+      // const nombre = res.nameJasper;
+      const nombre = "Anexo2";
+      console.log(nombre);
+      const jasperModules = import.meta.glob(
+        "../../../../jaspers/Anexo2/*.jsx"
+      );
+      const modulo = await jasperModules[
+        `../../../../jaspers/Anexo2/${nombre}.jsx`
+      ]();
 
-//       // Ejecuta la función exportada por default con los datos
-//       if (typeof modulo.default === "function") {
-//         modulo.default({ ...res, datosFooter });
-//       } else {
-//         console.error(
-//           `El archivo ${nombre}.jsx no exporta una función por defecto`
-//         );
-//       }
-//       Swal.close();
-//     } else {
-//       Swal.close();
-//     }
-//   });
-// };
+      //Ejecuta la función exportada por default con los datos
+      if (typeof modulo.default === "function") {
+        modulo.default({ ...res, datosFooter });
+      } else {
+        console.error(
+          `El archivo ${nombre}.jsx no exporta una función por defecto`
+        );
+      }
+      Swal.close();
+    } else {
+      Swal.close();
+    }
+  });
+};*/
 
 export const PrintHojaR = (nro, token, tabla) => {
   PrintHojaRJsReportDefault(
@@ -226,7 +224,11 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
               ...prev,
               notasDoctor: prev.notasDoctor + "\n" + listaFaltantes,
             }))
-            Swal.close();
+            Swal.fire(
+              "Alerta",
+              listaFaltantes,
+              "info"
+            );
           });
       });
 
@@ -401,8 +403,29 @@ export const GetInfoServicio = (
             data.observacionesGenerales += "ESPIROMETRIA: " + res.interpretacion_interpretacion + "\n";
           }
 
-          if (res.conclusionRadiografia_conclu != null) {
-            data.observacionesGenerales += "RAYOS X: " + res.conclusionRadiografia_conclu + "\n";
+          const rayosXConclusion = res.conclusionesRadiograficasTorax_txtconclusionesradiograficas;
+          const rayosXObservaciones = res.observacionesRadiografiaTorax_txtobservacionesrt;
+
+          if (rayosXConclusion || rayosXObservaciones) {
+            data.observacionesGenerales +=
+              `RAYOS X TORAX: ` +
+              (rayosXConclusion ?? "") +
+              (rayosXConclusion && rayosXObservaciones ? " - " : "") +
+              (rayosXObservaciones ?? "") +
+              ".\n";
+          }
+
+
+          const rayosXColumnaConclusion = res.conclusionRayosColumna;
+
+          if (rayosXColumnaConclusion &&
+            rayosXColumnaConclusion !== "RADIOGRAFÍA DE COLUMNA LUMBAR AP-L SIN ALTERACIONES SIGNIFICATIVAS." &&
+            rayosXColumnaConclusion !== "RADIOGRAFÍA DE COLUMNA LUMBOSACRA AP-L SIN ALTERACIONES SIGNIFICATIVAS." &&
+            rayosXColumnaConclusion !== "CUERPOS VERTEBRALES DORSOLUMBARES EVALUADOS SIN ALTERACIONES SIGNIFICATIVAS.") {
+            data.observacionesGenerales +=
+              `RADIOGRAFIA COLUMNA: ` +
+              (rayosXColumnaConclusion ?? "") +
+              ".\n";
           }
 
           if (res.conclusionMusculoesqueletica != null) {
@@ -486,15 +509,16 @@ export const GetInfoServicio = (
                 res.conclusionesRadiograficas_txtconclusionesradiograficas;
             }
           }
-          if (
-            res.observacionesRadiografiaTorax_txtobservacionesrt != null &&
-            res.observacionesRadiografiaTorax_txtobservacionesrt != "NORMAL"
-          ) {
-            data.observacionesGenerales += `RADIOGRAFIA: ${res.observacionesRadiografiaTorax_txtobservacionesrt}\n`;
-          }
-          if (res.observacionesLabClinico_txtobservacioneslb != null) {
-            data.observacionesGenerales += `LAB CLINICO: ${res.observacionesLabClinico_txtobservacioneslb}\n`;
-          }
+          // if (
+          //   res.observacionesRadiografiaTorax_txtobservacionesrt != null &&
+          //   res.observacionesRadiografiaTorax_txtobservacionesrt != "NORMAL"
+          // ) {
+          //   data.observacionesGenerales += `RADIOGRAFIA: ${res.observacionesRadiografiaTorax_txtobservacionesrt}\n`;
+          // }
+          data.observacionesGenerales += `LAB CLINICO: ${res.observacionesLabClinico_txtobservacioneslb != null &&
+            res.observacionesLabClinico_txtobservacioneslb != ""
+            ? res.observacionesLabClinico_txtobservacioneslb
+            : "SIN OBSERVACIONES"}\n`;
           const coca = res.cocaina_txtcocaina;
           const marig = res.marihuana_txtmarihuana;
           //==============================
@@ -669,17 +693,27 @@ export const GetInfoServicio = (
           }
           data.piezasFaltan = res.ausentes_txtausentes ?? "";
           // Hijos
-          data.hijosVivos =
-            res.hijosVivosAnexo2_txthijosvivos || "0";
-          data.hijosMuertos =
-            res.hijosMuertosAnexo2_txthijosmuertos ||
-            "0";
-
+          if (sexo == "M") {
+            data.hijosVivos =
+              res.hijosVivosAntecedentesPatologicos_txtvhijosvivos || "0";
+            data.hijosMuertos =
+              res.hijosFallecidosAntecedentesPatologicos_txtvhijosfallecidos ||
+              "0";
+          }
+          else if (sexo == "F") {
+            data.hijosVivos =
+              res.hijasVivasAntecedentesPatologicos_txtdhijosvivos || "0";
+            data.hijosMuertos =
+              res.hijasFallecidasAntecedentesPatologicos_txtdhijosfallecidos ||
+              "0";
+          }
           if (data.hijosVivos && data.hijosMuertos) {
             const hv = parseInt(data.hijosVivos) || 0;
             const hm = parseInt(data.hijosMuertos) || 0;
             data.totalHijos = (hv + hm).toString();
           }
+
+
 
           // IMC
           data.imc = res.imc_imc ?? "";
@@ -693,16 +727,21 @@ export const GetInfoServicio = (
             } else if (imc >= 30 && imc < 35) {
               data.imcRed = true;
               data.observacionesGenerales +=
-                "OBESIDAD I.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
+                "OBESIDAD I.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
             } else if (imc >= 35 && imc < 40) {
               data.imcRed = true;
               data.observacionesGenerales +=
-                "OBESIDAD II.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
+                "OBESIDAD II.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
             }
-            else if (imc >= 40) {
+            else if (imc >= 40 && imc < 45) {
               data.imcRed = true;
               data.observacionesGenerales +=
-                "OBESIDAD III.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
+                "OBESIDAD III.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
+            }
+            else if (imc >= 45) {
+              data.imcRed = true;
+              data.observacionesGenerales +=
+                "OBESIDAD IV.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
             }
           }
 
@@ -738,28 +777,40 @@ export const GetInfoServicio = (
           data.visionColores = res.visionColores_v_colores ?? "";
           data.visionBinocular = res.visionBinocular_v_binocular ?? "";
           data.enfermedadOculares =
-            res.enfermedadesOcularesOftalmo_e_oculares ?? "NINGUNA";
+            res.enfermedadesOcularesOftalmo_e_oculares ?? "";
           data.reflejosPupilares = res.reflejosPupilares_r_pupilares ?? "";
           data.enfermedadOtros =
-            res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "NINGUNA";
+            res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "";
 
-          if (data.visionCercaOd !== "") {
-            if (
-              data.enfermedadOculares != "" &&
-              data.enfermedadOculares !== "NINGUNA"
-            ) {
-              data.observacionesGenerales += `${data.enfermedadOculares}\n`;
-            }
-          }
-          if (data.enfermedadOtros === "PTERIGION BILATERAL") {
-            data.observacionesGenerales +=
-              "PTERIGION BILATERAL:EVALUACION X OFTALMOLOGIA.\n";
-          } else if (
-            data.enfermedadOtros &&
-            data.enfermedadOtros !== "NINGUNA"
+
+          if (
+            (data.enfermedadesOcularesOftalmo_e_oculares !== "NINGUNA" &&
+              data.enfermedadesOcularesOftalmo_e_oculares !== "") || (
+              res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "NINGUNA" &&
+              res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "")
           ) {
-            data.observacionesGenerales += `${data.enfermedadOtros}:EVALUACION X OFTALMOLOGIA.\n`;
+            data.observacionesGenerales += "OFTALMOLOGIA: " + data.enfermedadOculares + " " + (res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "") + "\n";
+
           }
+
+
+          // if (data.visionCercaOd !== "") {
+          //   if (
+          //     data.enfermedadOculares != "" &&
+          //     data.enfermedadOculares !== "NINGUNA"
+          //   ) {
+          //     data.observacionesGenerales += `${data.enfermedadOculares}\n`;
+          //   }
+          // }
+          // if (data.enfermedadOtros === "PTERIGION BILATERAL") {
+          //   data.observacionesGenerales +=
+          //     "PTERIGION BILATERAL:EVALUACION X OFTALMOLOGIA.\n";
+          // } else if (
+          //   data.enfermedadOtros &&
+          //   data.enfermedadOtros !== "NINGUNA"
+          // ) {
+          //   data.observacionesGenerales += `${data.enfermedadOtros}:EVALUACION X OFTALMOLOGIA.\n`;
+          // }
 
           if (
             data.visionColores !== "NINGUNA" &&
@@ -804,17 +855,15 @@ export const GetInfoServicio = (
           data.fechaVencimiento = todayPlusOneYear;
 
           // electroCardiograma();=======================
-          const hallazgoECG =
-            res.hallazgosInformeElectroCardiograma_hallazgo ?? "";
-          const recomendacionesECG =
-            res.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
+          const hallazgoEKG = res.hallazgosInformeElectroCardiograma_hallazgo ?? "";
+          const conclusionesEkg = res.conclusionekg;
+          const recomendacionesEKG = res.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
 
-          if (hallazgoECG && hallazgoECG !== "NORMAL.") {
-            if (recomendacionesECG) {
-              data.observacionesGenerales += `\n -ELECTROCARDIOGRAMA: ${hallazgoECG}.${recomendacionesECG}\n`;
-            } else {
-              data.observacionesGenerales += `\n -ELECTROCARDIOGRAMA: ${hallazgoECG}\n`;
-            }
+          if (
+            (hallazgoEKG && hallazgoEKG !== "NORMAL") ||
+            (conclusionesEkg && !conclusionesEkg.includes("DENTRO DE PARAMETROS NORMALES"))
+          ) {
+            data.observacionesGenerales += `-ELECTROCARDIOGRAMA: ${recomendacionesEKG}\n`;
           }
 
           // cargarAnalisisB();=======================
@@ -906,6 +955,7 @@ export const GetInfoServicioEditar = (
             cerrado: res.cerrado ?? false,
             //nuevos
             fechaExam: res.fechaAnexo_fecha,
+            SubirDoc: true,
 
             //Ant. Personales
             neoplasia: res.neoplasia_chkneoplasia,
@@ -1023,9 +1073,31 @@ export const GetInfoServicioEditar = (
           if (res.interpretacion_interpretacion != null) {
             data.observacionesGenerales2 += "ESPIROMETRIA: " + res.interpretacion_interpretacion + "\n";
           }
-          if (res.conclusionRadiografia_conclu != null) {
-            data.observacionesGenerales2 += "RAYOS X: " + res.conclusionRadiografia_conclu + "\n";
+
+          const rayosXConclusion = res.conclusionesRadiograficasTorax_txtconclusionesradiograficas;
+          const rayosXObservaciones = res.observacionesRadiografiaTorax_txtobservacionesrt;
+
+          if (rayosXConclusion || rayosXObservaciones) {
+            data.observacionesGenerales2 +=
+              `RAYOS X TORAX: ` +
+              (rayosXConclusion ?? "") +
+              (rayosXConclusion && rayosXObservaciones ? " - " : "") +
+              (rayosXObservaciones ?? "") +
+              ".\n";
           }
+
+          const rayosXColumnaConclusion = res.conclusionRayosColumna;
+
+          if (rayosXColumnaConclusion &&
+            rayosXColumnaConclusion !== "RADIOGRAFÍA DE COLUMNA LUMBAR AP-L SIN ALTERACIONES SIGNIFICATIVAS." &&
+            rayosXColumnaConclusion !== "RADIOGRAFÍA DE COLUMNA LUMBOSACRA AP-L SIN ALTERACIONES SIGNIFICATIVAS." &&
+            rayosXColumnaConclusion !== "CUERPOS VERTEBRALES DORSOLUMBARES EVALUADOS SIN ALTERACIONES SIGNIFICATIVAS.") {
+            data.observacionesGenerales2 +=
+              `RADIOGRAFIA COLUMNA: ` +
+              (rayosXColumnaConclusion ?? "") +
+              ".\n";
+          }
+
           if (res.conclusionMusculoesqueletica != null) {
             data.observacionesGenerales2 += "MUSCULOESQUELETICA: " + res.conclusionMusculoesqueletica + "\n";
           }
@@ -1105,11 +1177,14 @@ export const GetInfoServicioEditar = (
                 res.conclusionesRadiograficas_txtconclusionesradiograficas;
             }
           }
-          if (res.observacionesRadiografiaTorax_txtobservacionesrt != null)
-            data.observacionesGenerales2 += `RADIOGRAFIA: ${res.observacionesRadiografiaTorax_txtobservacionesrt}\n`;
+          // if (res.observacionesRadiografiaTorax_txtobservacionesrt != null)
+          //   data.observacionesGenerales2 += `RADIOGRAFIA: ${res.observacionesRadiografiaTorax_txtobservacionesrt}\n`;
 
-          if (res.observacionesLabClinico_txtobservacioneslb != null)
-            data.observacionesGenerales2 += `LAB CLINICO: ${res.observacionesLabClinico_txtobservacioneslb}\n`;
+
+          data.observacionesGenerales2 += `LAB CLINICO: ${res.observacionesLabClinico_txtobservacioneslb != null &&
+            res.observacionesLabClinico_txtobservacioneslb !== ""
+            ? res.observacionesLabClinico_txtobservacioneslb
+            : "SIN OBSERVACIONES"}\n`;
 
 
           const coca = res.cocaina_txtcocaina;
@@ -1272,11 +1347,25 @@ export const GetInfoServicioEditar = (
           data.piezasFaltan = res.ausentes_txtausentes ?? "";
 
           // Hijos
-          data.hijosVivos =
-            res.hijosVivosAnexo2_txthijosvivos ?? "0";
-          data.hijosMuertos =
-            res.hijosMuertosAnexo2_txthijosmuertos ??
-            "0";
+          if (sexo == "M") {
+            data.hijosVivos =
+              res.hijosVivosAntecedentesPatologicos_txtvhijosvivos ?? "0";
+            data.hijosMuertos =
+              res.hijosFallecidosAntecedentesPatologicos_txtvhijosfallecidos ??
+              "0";
+          }
+          else if (sexo == "F") {
+            data.hijosVivos =
+              res.hijasVivasAntecedentesPatologicos_txtdhijosvivos || "0";
+            data.hijosMuertos =
+              res.hijasFallecidasAntecedentesPatologicos_txtdhijosfallecidos ||
+              "0";
+          }
+          if (data.hijosVivos && data.hijosMuertos) {
+            const hv = parseInt(data.hijosVivos) || 0;
+            const hm = parseInt(data.hijosMuertos) || 0;
+            data.totalHijos = (hv + hm).toString();
+          }
 
           data.imc = res.imc_imc ?? "";
           if (data.imc && data.imc !== "") {
@@ -1289,44 +1378,59 @@ export const GetInfoServicioEditar = (
             } else if (imc >= 30 && imc < 35) {
               data.imcRed = true;
               data.observacionesGenerales2 +=
-                "OBESIDAD I.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
+                "OBESIDAD I.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
             } else if (imc >= 35 && imc < 40) {
               data.imcRed = true;
               data.observacionesGenerales2 +=
-                "OBESIDAD II.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
+                "OBESIDAD II.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
             }
-            else if (imc >= 40) {
+            else if (imc >= 40 && imc < 45) {
               data.imcRed = true;
               data.observacionesGenerales2 +=
-                "OBESIDAD III.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
+                "OBESIDAD III.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
+            }
+            else if (imc >= 45) {
+              data.imcRed = true;
+              data.observacionesGenerales2 +=
+                "OBESIDAD IV.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
             }
           }
 
-
-          if (data.visionCercaOd !== "") {
-            if (
-              data.enfermedadOculares != "" &&
-              data.enfermedadOculares !== "NINGUNA"
-            ) {
-              data.observacionesGenerales2 += `${data.enfermedadOculares}\n`;
-            }
-          }
-          if (data.enfermedadOtros === "PTERIGION BILATERAL") {
-            data.observacionesGenerales2 +=
-              "PTERIGION BILATERAL:EVALUACION X OFTALMOLOGIA.\n";
-          } else if (
-            data.enfermedadOtros &&
-            data.enfermedadOtros !== "NINGUNA"
-          ) {
-            data.observacionesGenerales2 += `${data.enfermedadOtros}:EVALUACION X OFTALMOLOGIA.\n`;
-          }
 
           if (
-            data.visionColores !== "NINGUNA" &&
-            data.visionColores !== "NORMAL"
+            (data.enfermedadesOcularesOftalmo_e_oculares !== "NINGUNA" &&
+              data.enfermedadesOcularesOftalmo_e_oculares !== "") || (
+              res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "NINGUNA" &&
+              res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "")
           ) {
-            data.observacionesGenerales2 += `${data.visionColores}\n`;
+            data.observacionesGenerales2 += "OFTALMOLOGIA: " + data.enfermedadOculares + " " + (res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "") + "\n";
+
           }
+
+          // if (data.visionCercaOd !== "") {
+          //   if (
+          //     data.enfermedadOculares != "" &&
+          //     data.enfermedadOculares !== "NINGUNA"
+          //   ) {
+          //     data.observacionesGenerales2 += `${data.enfermedadOculares}\n`;
+          //   }
+          // }
+          // if (data.enfermedadOtros === "PTERIGION BILATERAL") {
+          //   data.observacionesGenerales2 +=
+          //     "PTERIGION BILATERAL:EVALUACION X OFTALMOLOGIA.\n";
+          // } else if (
+          //   data.enfermedadOtros &&
+          //   data.enfermedadOtros !== "NINGUNA"
+          // ) {
+          //   data.observacionesGenerales2 += `${data.enfermedadOtros}:EVALUACION X OFTALMOLOGIA.\n`;
+          // }
+
+          // if (
+          //   data.visionColores !== "NINGUNA" &&
+          //   data.visionColores !== "NORMAL"
+          // ) {
+          //   data.observacionesGenerales2 += `${data.visionColores}\n`;
+          // }
 
 
           // Medidas Generales
@@ -1389,24 +1493,17 @@ export const GetInfoServicioEditar = (
 
 
 
-          if (data.hijosVivos && data.hijosMuertos) {
-            const hv = parseInt(data.hijosVivos) || 0;
-            const hm = parseInt(data.hijosMuertos) || 0;
-            data.totalHijos = (hv + hm).toString();
-          }
 
           // electroCardiograma();=======================
-          const hallazgoECG =
-            res.hallazgosInformeElectroCardiograma_hallazgo ?? "";
-          const recomendacionesECG =
-            res.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
+          const hallazgoEKG = res.hallazgosInformeElectroCardiograma_hallazgo;
+          const conclusionesEkg = res.conclusionekg;
+          const recomendacionesEKG = res.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
 
-          if (hallazgoECG && hallazgoECG !== "NORMAL.") {
-            if (recomendacionesECG) {
-              data.observacionesGenerales2 += `\n -ELECTROCARDIOGRAMA: ${hallazgoECG}.${recomendacionesECG}\n`;
-            } else {
-              data.observacionesGenerales2 += `\n -ELECTROCARDIOGRAMA: ${hallazgoECG}\n`;
-            }
+          if (
+            (hallazgoEKG && hallazgoEKG !== "NORMAL") ||
+            (conclusionesEkg && !conclusionesEkg.includes("DENTRO DE PARAMETROS NORMALES"))
+          ) {
+            data.observacionesGenerales2 += `-ELECTROCARDIOGRAMA: ${recomendacionesEKG}\n`;
           }
 
           //FIN==============
@@ -1501,3 +1598,15 @@ export const GetInfoServicioEditar = (
       onFinish();
     });
 };
+
+
+export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {
+  handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token)
+};
+export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
+  ReadArchivosFormDefault(form, setVisualerOpen, token)
+}
+
+export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token) => {
+  handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token)
+}

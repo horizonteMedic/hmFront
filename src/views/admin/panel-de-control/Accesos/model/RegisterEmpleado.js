@@ -15,7 +15,7 @@ export default async function NewEmpleado(form, userlogued) {
         cargo: form.cargo,
         ubigeo: form.distrito,
         sexo: form.sexo,
-        cip: null,
+        cip: form.cip,
         correoElect: form.email,
         celular: form.celular,
         telFijo: null,

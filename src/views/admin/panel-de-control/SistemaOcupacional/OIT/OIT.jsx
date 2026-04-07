@@ -219,6 +219,8 @@ const OIT = () => {
     chk_29: false,
     txtSComentarios: "",
     opcionSComentario: "",
+
+    aPruebaDeSoledad: false,
     //
     SinDatos: false,
 
@@ -408,6 +410,7 @@ const OIT = () => {
       chk_29: false,
       txtSComentarios: "",
       opcionSComentario: "",
+      aPruebaDeSoledad: false,
 
       SubirDoc: false,
       nomenclatura: "OIT FOLIO",
@@ -899,15 +902,18 @@ const OIT = () => {
 
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4 px-4">
           <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={() => {
-                SubmitOIT(form, token, userlogued, handleClean, tabla);
-              }}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-            </button>
+            {form.aPruebaDeSoledad && (
+              <button
+                type="button"
+                onClick={() => {
+
+                  SubmitOIT(form, token, userlogued, handleClean, tabla);
+                }}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+              </button>
+            )}
             <button
               type="button"
               onClick={handleClean}

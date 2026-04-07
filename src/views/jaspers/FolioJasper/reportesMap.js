@@ -289,14 +289,15 @@ export const reportesMap = {
       "Audiometria2021-_Digitalizado": Audiometria2021
    },
 
-   oftalmologia: Oftalmologia,
+   // oftalmologia: Oftalmologia,
 
    odontograma: Odontograma_Digitalizado,
 
    oftalmologia2021: {
       EvaluacionOftalmologica2021_Digitalizado,
       EvaluacionOftalmologica2021_Digitalizado_ohla,
-      EvaluacionOftalmologica2021_Digitalizado_boro
+      EvaluacionOftalmologica2021_Digitalizado_boro,
+      Oftalmologia
    },
 
    oit: OIT_Digitalizado,

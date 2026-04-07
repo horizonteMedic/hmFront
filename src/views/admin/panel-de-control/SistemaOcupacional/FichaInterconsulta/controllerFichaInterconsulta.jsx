@@ -189,7 +189,7 @@ export const GetInfoServicioEditar = async (
             edadPaciente: `${res.edadPaciente}`,
             dniUser: prev.dniUser,
             SubirDoc: true,
-
+            user_medicoFirma: res.userRegistro ? res.userRegistro : prev.user_medicoFirma,
         }));
     }
 };
@@ -262,6 +262,8 @@ export const SubmitDataService = async (
         "noApto": false,
         "horaSalida": getHoraActual(),
         "orden": null,
+        "userRegistro": form.user_medicoFirma,
+        //"usuarioFirma": form.user_medicoFirma
         // "nomenclatura": `INTERCONSULTA${form.NewNomenclatura ? ` ${form.NewNomenclatura}` : ""}`
     };
 
@@ -354,7 +356,7 @@ export const GetInfoServicioInterconsulta = async (
     try {
         console.log('llegue a consultar causam', especialidad)
         const res = await getFetch(
-            `${obtenerReporteUrl}?nOrden=${nro}&especialidad=${especialidad}&nameService=${tabla}&esJasper=false`,
+            `${obtenerReporteUrl}?nOrden=${nro}&especialidad=${especialidad}&nameService=${tabla}&esJasper=true`,
             token
         );
         if (res?.norden || res?.norden_n_orden || res?.n_orden) {
@@ -381,7 +383,7 @@ export const GetInfoNoRegisterInterconsulta = async (
 ) => {
     try {
         const res = await getFetch(
-            `${obtenerReporteUrl}?nOrden=${nro}&especialidad=${especialidad}&nameService=${tabla}&esJasper=false`,
+            `${obtenerReporteUrl}?nOrden=${nro}&especialidad=${especialidad}&nameService=${tabla}&esJasper=true`,
             token
         );
         if (res?.norden || res?.norden_n_orden || res?.n_orden) {
@@ -409,7 +411,6 @@ export const PrintHojaRFichaInterconsulta = async (nro, especialidad, token, tab
             `${obtenerJServerReporte}?nOrden=${nro}&especialidad=${especialidad}&nameService=${tabla}&comprimir=${comprimir ? 1 : 0}`,
             token
         );
-
         // 🔴 Error controlado desde getFetchPdf
         if (response?.error) {
             console.error("Error HTTP:", response);

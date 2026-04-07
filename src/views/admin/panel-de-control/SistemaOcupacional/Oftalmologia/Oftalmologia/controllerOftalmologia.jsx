@@ -14,160 +14,170 @@ const registrarPDF =
   "/api/v01/ct/archivos/archivoInterconsulta"
 
 export const GetInfoServicio = (nro, tabla, set, token) => {
-  getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
-    .then((res) => {
-      if (res.norden) {
-        console.log(res);
-        set((prev) => ({
-          ...prev,
-          ...res,
-          codOf: res.codOf,
-          nomExam: res.nomExam,
-          fechaExam: res.fechaOf,
-          fechaNac: res.fechaNac ? convertirFecha(res.fechaNac) : "",
-          nombres: res.nombre + " " + res.apellido,
-          dni: res.dni,
-          empresa: res.empresa,
-          contrata: res.contrata,
+  try {
+    getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
+      .then((res) => {
+        if (res.norden) {
+          console.log(res);
+          set((prev) => ({
+            ...prev,
+            ...res,
+            codOf: res.codOf,
+            completo: res.completo,
+            nomExam: res.nomExam,
+            fechaExam: res.fechaOf,
+            fechaNac: res.fechaNac ? convertirFecha(res.fechaNac) : "",
+            nombres: res.nombre + " " + res.apellido,
+            dni: res.dni,
+            empresa: res.empresa,
+            contrata: res.contrata,
 
-          parpadosYAnexos: res.txtParpaAnex ?? "",
-          corneas: res.txtCorneas ?? "",
-          otrosHallazgos: res.txtOtrosHallaz ?? "",
-          conjuntivas: res.txtConjuntivas ?? "",
-          cristalino: res.txtCristalino ?? "",
+            parpadosYAnexos: res.txtParpaAnex ?? "",
+            corneas: res.txtCorneas ?? "",
+            otrosHallazgos: res.txtOtrosHallaz ?? "",
+            conjuntivas: res.txtConjuntivas ?? "",
+            cristalino: res.txtCristalino ?? "",
 
-          fondoNormalOD: res.rbfONormalOd,
-          fondoNormalOI: res.rbfONormalOi,
-          fondoAnormalOD: res.rbfOAnormalOd,
-          fondoAnormalOI: res.rbfOAnormalOi,
-          fondoHallazgos: res.txtFoHallazgos,
+            fondoNormalOD: res.rbfONormalOd,
+            fondoNormalOI: res.rbfONormalOi,
+            fondoAnormalOD: res.rbfOAnormalOd,
+            fondoAnormalOI: res.rbfOAnormalOi,
+            fondoHallazgos: res.txtFoHallazgos,
 
-          pioOd: res.txtPioOd ?? "",
-          pioOi: res.txtPioOi ?? "",
-          noAplica: res.txtPioNa ?? "",
+            pioOd: res.txtPioOd ?? "",
+            pioOi: res.txtPioOi ?? "",
+            noAplica: res.txtPioNa ?? "",
 
-          correctorOcular: res.rbcOsi ? "SI" : "NO",
-          correctorCerca: res.rbcOcerca,
-          correctorLejos: res.rbcOlejos,
-          noTrajocorrectorCerca: res.chkNtcc,
-          noTrajocorrectorLejos: res.chkNtcl,
+            correctorOcular: res.rbcOsi ? "SI" : "NO",
+            correctorCerca: res.rbcOcerca,
+            correctorLejos: res.rbcOlejos,
+            noTrajocorrectorCerca: res.chkNtcc,
+            noTrajocorrectorLejos: res.chkNtcl,
 
-          antecedentesPersonales: res.txtAntPersImp ?? "",
-          antecedentesFamiliares: res.txtFamImp ?? "",
+            antecedentesPersonales: res.txtAntPersImp ?? "",
+            antecedentesFamiliares: res.txtFamImp ?? "",
 
-          ishihara: res.rbtEcIshiharaNormal
-            ? "NORMAL"
-            : res.rbtEcIshiharaAnormal
-              ? "ANORMAL"
-              : res.rbtEcIshiharaNc
-                ? "N.C."
-                : "",
-          coloresPuros: res.rbtEcColeresNormal
-            ? "NORMAL"
-            : res.rbtEcColeresAnormal
-              ? "ANORMAL"
-              : res.rbtEcColeresNc
-                ? "N.C."
-                : "",
-          estereopsia: res.rbtEcEstereopsiaNormal
-            ? "NORMAL"
-            : res.rbtEcEstereopsiaAnormal
-              ? "ANORMAL"
-              : res.rbtEcEstereopsiaNc
-                ? "N.C."
-                : "",
-          estereopsiaText: res.txtTecEstereopsia ?? "",
+            ishihara: res.rbtEcIshiharaNormal
+              ? "NORMAL"
+              : res.rbtEcIshiharaAnormal
+                ? "ANORMAL"
+                : res.rbtEcIshiharaNc
+                  ? "N.C."
+                  : "",
+            coloresPuros: res.rbtEcColeresNormal
+              ? "NORMAL"
+              : res.rbtEcColeresAnormal
+                ? "ANORMAL"
+                : res.rbtEcColeresNc
+                  ? "N.C."
+                  : "",
+            estereopsia: res.rbtEcEstereopsiaNormal
+              ? "NORMAL"
+              : res.rbtEcEstereopsiaAnormal
+                ? "ANORMAL"
+                : res.rbtEcEstereopsiaNc
+                  ? "N.C."
+                  : "",
+            estereopsiaText: res.txtTecEstereopsia ?? "",
 
-          aplicaRefraccion: res.chkRefraccionAplica ? "SI" : "NO",
-          odsfL: res.txtLejosOdSf ?? "",
-          odcilL: res.txtLejosOdCil ?? "",
-          odejeL: res.txtLejosOdEje ?? "",
+            aplicaRefraccion: res.chkRefraccionAplica ? "SI" : "NO",
+            odsfL: res.txtLejosOdSf ?? "",
+            odcilL: res.txtLejosOdCil ?? "",
+            odejeL: res.txtLejosOdEje ?? "",
 
-          oisfL: res.txtLejosOiSf ?? "",
-          oicilL: res.txtLejosOiCil ?? "",
-          oiejeL: res.txtLejosOiEje ?? "",
-          dipL: res.txtLejosOdDip ?? "",
+            oisfL: res.txtLejosOiSf ?? "",
+            oicilL: res.txtLejosOiCil ?? "",
+            oiejeL: res.txtLejosOiEje ?? "",
+            dipL: res.txtLejosOdDip ?? "",
 
-          odsfC: res.txtCercaOdSf ?? "",
-          odcilC: res.txtCercaOdCil ?? "",
-          odejeC: res.txtCercaOdEje ?? "",
+            odsfC: res.txtCercaOdSf ?? "",
+            odcilC: res.txtCercaOdCil ?? "",
+            odejeC: res.txtCercaOdEje ?? "",
 
-          oisfC: res.txtCercaOiSf ?? "",
-          oicilC: res.txtCercaOiCil ?? "",
-          oiejeC: res.txtCercaOiEje ?? "",
-          dipC: res.txtCercaOdDip ?? "",
+            oisfC: res.txtCercaOiSf ?? "",
+            oicilC: res.txtCercaOiCil ?? "",
+            oiejeC: res.txtCercaOiEje ?? "",
+            dipC: res.txtCercaOdDip ?? "",
 
-          agudezaOdLejos: res.txtAvConRefraccionLejosOd ?? "",
-          agudezaOiLejos: res.txtAvConRefraccionLejosOi ?? "",
-          agudezaOdCerca: res.txtAvConRefraccionCercaOd ?? "",
-          agudezaOiCerca: res.txtAvConRefraccionCercaOi ?? "",
-          diagnostico: res.txtDiagnostico ?? "",
+            agudezaOdLejos: res.txtAvConRefraccionLejosOd ?? "",
+            agudezaOiLejos: res.txtAvConRefraccionLejosOi ?? "",
+            agudezaOdCerca: res.txtAvConRefraccionCercaOd ?? "",
+            agudezaOiCerca: res.txtAvConRefraccionCercaOi ?? "",
+            diagnostico: res.txtDiagnostico ?? "",
 
-          ninguna: res.chkInNinguna,
-          usoCorrectoresCerca: res.chkI2,
-          usoCorrectoresLejos: res.chkI3,
-          lentesCorrectoresCerca: res.chkI4Cerca,
-          lentesCorrectoresLejos: res.chkI4Lejos,
-          lentesCambioLunas: res.chkI5,
-          indicacionPterigion: res.chkI6,
-          indicacionOtras: res.chkI7,
+            ninguna: res.chkInNinguna,
+            usoCorrectoresCerca: res.chkI2,
+            usoCorrectoresLejos: res.chkI3,
+            lentesCorrectoresCerca: res.chkI4Cerca,
+            lentesCorrectoresLejos: res.chkI4Lejos,
+            lentesCambioLunas: res.chkI5,
+            indicacionPterigion: res.chkI6,
+            indicacionOtras: res.chkI7,
 
-          noRestringeActividades: res.chkR1,
-          restriccionCorrectorLejos: res.chkR2Lejos,
-          restriccionCorrectorCerca: res.chkR2Cerca,
-          noTrabajosCableElectrico: res.chkR3,
-          noConduccion: res.chkR4,
+            noRestringeActividades: res.chkR1,
+            restriccionCorrectorLejos: res.chkR2Lejos,
+            restriccionCorrectorCerca: res.chkR2Cerca,
+            noTrabajosCableElectrico: res.chkR3,
+            noConduccion: res.chkR4,
 
-          vc_sinc_od: res.txtCercaSinCorregirOd ?? "",
-          vc_sinc_oi: res.txtCercaSinCorregirOi ?? "",
-          vc_conc_od: res.txtCercaCorregidaOd ?? "",
-          vc_conc_oi: res.txtCercaCorregidaOi ?? "",
-          vc_agujero_od: res.txtCercaAgujeroOd ?? "",
-          vc_agujero_oi: res.txtCercaAgujeroOi ?? "",
-          vl_sinc_od: res.txtLejosSinCorregirOd ?? "",
-          vl_sinc_oi: res.txtLejosSinCorregirOi ?? "",
-          vl_conc_od: res.txtLejosCorregidaOd ?? "",
-          vl_conc_oi: res.txtLejosCorregidaOi ?? "",
-          vl_agujero_od: res.txtLejosAgujeroOd ?? "",
-          vl_agujero_oi: res.txtLejosAgujeroOi ?? "",
-          bino_sinc: res.txtBinocularSinCorregir ?? "",
-          bino_conc: res.txtBinocularCorregida ?? "",
-          reflejos_pupilares: res.txtRp ?? "",
+            vc_sinc_od: res.txtCercaSinCorregirOd ?? "",
+            vc_sinc_oi: res.txtCercaSinCorregirOi ?? "",
+            vc_conc_od: res.txtCercaCorregidaOd ?? "",
+            vc_conc_oi: res.txtCercaCorregidaOi ?? "",
+            vc_agujero_od: res.txtCercaAgujeroOd ?? "",
+            vc_agujero_oi: res.txtCercaAgujeroOi ?? "",
+            vl_sinc_od: res.txtLejosSinCorregirOd ?? "",
+            vl_sinc_oi: res.txtLejosSinCorregirOi ?? "",
+            vl_conc_od: res.txtLejosCorregidaOd ?? "",
+            vl_conc_oi: res.txtLejosCorregidaOi ?? "",
+            vl_agujero_od: res.txtLejosAgujeroOd ?? "",
+            vl_agujero_oi: res.txtLejosAgujeroOi ?? "",
+            bino_sinc: res.txtBinocularSinCorregir ?? "",
+            bino_conc: res.txtBinocularCorregida ?? "",
+            reflejos_pupilares: res.txtRp ?? "",
 
-          ptosisPalpebralOd: res.rbecPtosisOd,
-          ptosisPalpebralOi: res.rbecPtosisOi,
-          pterigionGradoOd: res.rbecPterigionOd,
-          pterigionGradoOi: res.rbecPterigionOi,
+            ptosisPalpebralOd: res.rbecPtosisOd,
+            ptosisPalpebralOi: res.rbecPtosisOi,
+            pterigionGradoOd: res.rbecPterigionOd,
+            pterigionGradoOi: res.rbecPterigionOi,
 
-          estrabismoOd: res.rbecEstrabismoOd,
-          estrabismoOi: res.rbecEstrabismoOi,
-          pingueculaOd: res.rbecPingueculaOd,
-          pingueculaOi: res.rbecPingueculaOi,
+            estrabismoOd: res.rbecEstrabismoOd,
+            estrabismoOi: res.rbecEstrabismoOi,
+            pingueculaOd: res.rbecPingueculaOd,
+            pingueculaOi: res.rbecPingueculaOi,
 
-          conjuntivitisOd: res.rbecConjuntivitisOd,
-          conjuntivitisOi: res.rbecConjuntivitisOi,
-          chalazionOd: res.rbecClalacionOd,
-          chalazionOi: res.rbecClalacionOi,
+            conjuntivitisOd: res.rbecConjuntivitisOd,
+            conjuntivitisOi: res.rbecConjuntivitisOi,
+            chalazionOd: res.rbecClalacionOd,
+            chalazionOi: res.rbecClalacionOi,
 
-          cataratasOd: res.rbecCataratasOd,
-          cataratasOi: res.rbecCataratasOi,
-          otrosOd: res.rbecOtrosOd,
-          otrosOi: res.rbecOtrosOi,
-          examenClinicoHallazgos: res.txtecHallazgos ?? "",
+            cataratasOd: res.rbecCataratasOd,
+            cataratasOi: res.rbecCataratasOi,
+            otrosOd: res.rbecOtrosOd,
+            otrosOi: res.rbecOtrosOi,
+            examenClinicoHallazgos: res.txtecHallazgos ?? "",
 
-          SubirDoc: true,
-          digitalizacion: res.digitalizacion,
+            visionColores: res.vcolores,
+            enfOculares: res.eoculares,
+            presenciaPterigion: res.eoculares1 ?? "",
 
-          user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
-          user_doctorAsignado: res.doctorAsignado,
-        }));
-      } else {
-        Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
-      }
-    })
-    .finally(() => {
-      Swal.close();
-    });
+            SubirDoc: true,
+            digitalizacion: res.digitalizacion,
+
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+            user_doctorAsignado: res.doctorAsignado,
+          }));
+        } else {
+          Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
+        }
+      })
+      .finally(() => {
+        Swal.close();
+      });
+  } catch (error) {
+    console.log(error);
+    Swal.fire("Error", "Ocurrio un error al obtener los datos del paciente", "error");
+  }
 };
 
 export const GetInfoDataOftalmoConObservaciones = (nro, set, token) => {
@@ -176,7 +186,7 @@ export const GetInfoDataOftalmoConObservaciones = (nro, set, token) => {
       console.log(res);
       set((prev) => ({
         ...prev,
-        diagnostico: (res.eoculares ?? "") + "\n" + (res.eoculares1 ?? ""),
+        // diagnostico: (res.eoculares ?? "") + "\n" + (res.eoculares1 ?? ""),
         vc_sinc_od: res.vcercaSOd ?? "",
         vc_sinc_oi: res.vcercaSOi ?? "",
         vc_conc_od: res.vcercaCOd ?? "",
@@ -202,6 +212,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
   const body = {
     codOf: form.codOf,
     norden: form.norden,
+    completo: form.completo,
     fechaOf: form.fechaExam,
     rbecPtosisOd: form.ptosisPalpebralOd,
     rbecPtosisOi: form.ptosisPalpebralOi,
@@ -304,6 +315,10 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     txtAntPersImp: form.antecedentesPersonales,
     txtFamImp: form.antecedentesFamiliares,
 
+    vcolores: form.visionColores,
+    eoculares: form.enfOculares,
+    eoculares1: form.presenciaPterigion,
+
     usuarioFirma: form.user_medicoFirma,
     doctorAsignado: form.user_doctorAsignado,
   };
@@ -329,7 +344,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
   });
 };
 function convertirFecha(fecha) {
-  if (fecha === "") return "";
+  if (fecha || fecha === "") return "";
   const [dia, mes, anio] = fecha.split("-");
   return `${anio}/${mes.padStart(2, "0")}/${dia.padStart(2, "0")}`;
 }
@@ -424,22 +439,28 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
 };
 
 export const GetInfoPac = (nro, set, token, sede) => {
-  getFetch(
-    `/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`,
-    token
-  )
-    .then((res) => {
-      console.log("pros", res);
-      set((prev) => ({
-        ...prev,
-        ...res,
-        fechaNac: convertirFecha(res.fechaNac),
-        nombres: res.nombresApellidos,
-      }));
-    })
-    .finally(() => {
-      Swal.close();
-    });
+  try {
+    getFetch(
+      `/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`,
+      token
+    )
+      .then((res) => {
+        console.log("pros", res);
+        set((prev) => ({
+          ...prev,
+          ...res,
+          fechaNac: convertirFecha(res.fechaNac),
+          nombres: res.nombresApellidos,
+        }));
+      })
+      .finally(() => {
+        Swal.close();
+      });
+  } catch (error) {
+    console.log(error);
+    Swal.fire("Error", "Ocurrio un error al obtener los datos del paciente", "error");
+  }
+
 };
 
 export const handleSubirArchivo = async (form, selectedSede, userlogued, token) => {

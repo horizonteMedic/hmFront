@@ -299,6 +299,34 @@ export const EXAMENES_CATALOGO = {
         esArchivo: true,
     },
 
+    PRUEBA_DE_ESFUERZO_ARCHIVO: {
+        nombre: "PRUEBA DE ESFUERZO ARCHIVO",
+        tabla: "PRUEBA DE ESFUERZO",
+        nomenclatura: "PRUEBA DE ESFUERZO",
+        esArchivo: true,
+    },
+
+    RESONANCIA_MAGNETICA_ARCHIVO: {
+        nombre: "RESONANCIA MAGNETICA ARCHIVO",
+        tabla: "RESMAG",
+        nomenclatura: "RESMAG",
+        esArchivo: true,
+    },
+
+    MERCURIO_EN_ORINA_ARCHIVO: {
+        nombre: "MERCURIO EN ORINA ARCHIVO",
+        tabla: "MERCURIO EN ORINA",
+        nomenclatura: "MERCURIO EN ORINA",
+        esArchivo: true,
+    },
+
+    PLOMO_EN_SANGRE_ARCHIVO: {
+        nombre: "PLOMO EN SANGRE ARCHIVO",
+        tabla: "PLOMO EN SANGRE",
+        nomenclatura: "PLOMO EN SANGRE",
+        esArchivo: true,
+    },
+
     /* =========================
        LABORATORIO
     ========================= */
@@ -635,11 +663,11 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/manipuladores/obtenerReporteAudiometria",
     },
 
-    FICHA_OFTALMOLOGICA: {
-        nombre: "FICHA OFTALMOLOGICA",
-        tabla: "oftalmologia",
-        url: "/api/v01/ct/agudezaVisual/obtenerReporteOftalmologia"
-    },
+    // FICHA_OFTALMOLOGICA: {
+    //     nombre: "FICHA OFTALMOLOGICA",
+    //     tabla: "oftalmologia",
+    //     url: "/api/v01/ct/agudezaVisual/obtenerReporteOftalmologia"
+    // },
 
     ODONTOGRAMA: {
         nombre: "ODONTROGRAMA",

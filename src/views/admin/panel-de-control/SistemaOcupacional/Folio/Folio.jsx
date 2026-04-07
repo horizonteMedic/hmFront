@@ -11,7 +11,7 @@ import { buildExamenesList } from "./folioCatalogo";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "INFORME_PSICOLOGICO_JSREPORT",
+    "OFTALMOLOGIA",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -77,6 +77,8 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     //LABORATORIO
     "LABORATORIO_CLINICO",
     "PERFIL_LIPIDICO",
+    "MERCURIO_EN_ORINA_ARCHIVO",
+    "PLOMO_EN_SANGRE_ARCHIVO",
     "PERFIL_RENAL",
     "PERFIL_HEPATICO",
     "ANALISIS_RIESGO_CORONARIO",
@@ -159,13 +161,15 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
 
     "OFTALMOLOGIA",
     "OFTALMOLOGIA_VISION_TESTER",
-    "FICHA_OFTALMOLOGICA",
+    // "FICHA_OFTALMOLOGICA",
     "CONSENT_DECLARACION_APTITUD",
     "CONSENT_SINTOMATICO_RESPIRATORIO",
     "CONSENT_INFORMADO_EVALUACION_MEDICA",
     "CONSENT_BUENA_SALUD",
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",
     "DECLARACION_USO_FIRMA_ARCHIVO",           // 36
+    "RESONANCIA_MAGNETICA_ARCHIVO",
+    "PRUEBA_DE_ESFUERZO_ARCHIVO",
     "INTERCONSULTAS"                         // 22 nuevo
 ]);
 

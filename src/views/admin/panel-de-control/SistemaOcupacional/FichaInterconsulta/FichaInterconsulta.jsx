@@ -14,6 +14,7 @@ import { SubirInterconsulta, ReadArchivos } from "./model";
 import { LoadingDefault } from "../../../../utils/functionUtils";
 import { useState } from "react";
 import { SubmitData } from "../../../../utils/apiHelpers";
+import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
 const tabla = "ficha_interconsulta"
 const today = getToday();
@@ -60,7 +61,7 @@ const Especialidades = [
 
 export default function FichaInterconsulta() {
 
-    const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+    const { token, userlogued, selectedSede, datosFooter, userCompleto, userName } =
         useSessionData();
     const [visualerOpen, setVisualerOpen] = useState(null)
     const Initialform = {
@@ -89,7 +90,9 @@ export default function FichaInterconsulta() {
         contrata: "",
         empresa: "",
         //Medico
-        nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
+
         cmpUsuario: "",
         direccionClinica: "",
         //Cuadros
@@ -426,19 +429,24 @@ export default function FichaInterconsulta() {
                     </div>
                 </section>
 
-                <h1 className="text-blue-600 font-semibold ">Médico</h1>
+                <h1 className="text-blue-600 font-semibold ">Doctor</h1>
                 <section className="bg-white border border-gray-200 rounded-lg mt-0 p-4 w-full">
                     {/* Checkboxes en grid responsivo */}
                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 w-full">
                         {/* Nombre Completo (más grande, ocupa 2 columnas en pantallas medianas o grandes) */}
                         <div className="sm:col-span-2">
-                            <InputTextOneLine label="Nombre Completo" value={form.nombre_medico} disabled name="nombre_medico" />
+                            <EmpleadoComboBox
+                                value={form.nombre_medico}
+                                label="Doctor Asignado"
+                                form={form}
+                                onChange={handleChangeSimple}
+                            />
                         </div>
 
                         {/* CMP (pequeño) */}
-                        <div className="sm:col-span-1">
+                        {/* <div className="sm:col-span-1">
                             <InputTextOneLine label="CMP" value={form.cmpUsuario} disabled name="cmp" />
-                        </div>
+                        </div> */}
 
                     </div>
                 </section>
