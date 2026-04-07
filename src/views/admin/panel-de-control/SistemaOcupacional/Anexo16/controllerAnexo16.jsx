@@ -1231,7 +1231,7 @@ export const MapearDatosAdicionales = (
     data.visionLejosOiCorregida = res.visionLejosCorregidaOi_v_lejos_c_oi ?? "";
 
     // Otros exámenes visuales
-    data.visionColores = res.visionColoresAnexo7c_txtvisioncolores ?? "";
+    data.visionColores = res.vc_vc ?? "";
     data.visionBinocular = res.visionBinocular_v_binocular ?? "";
     data.reflejosPupilares =
       res.rp_rp ?? "";
@@ -1843,7 +1843,7 @@ export const GetInfoServicioEditar = (
           data.cuello = res.cuelloAnexo7c_txtcuello ?? "";
           data.perimetro = res.perimetroAnexo7c_txtperimetro ?? "";
           data.bocaAmigdalasFaringeLaringe = res.baflAnexo7c_txtb_a_f_l ?? "";
-          data.visionColores = res.visionColoresAnexo7c_txtvisioncolores ?? "";
+          data.visionColores = res.vc_vc ?? "";
           data.enfermedadOculares =
             res.enfermedadesOcularesAnexo7c_txtenfermedadesoculares ?? "";
           data.enfermedadOtros =
