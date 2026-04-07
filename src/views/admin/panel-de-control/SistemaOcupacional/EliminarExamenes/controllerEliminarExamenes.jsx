@@ -155,6 +155,7 @@ const camposExtraEliminar = {
     espirometria: "ESPIROMETRIA",
     electrocardiograma: "ELECTROCARDIOGRAMA",
     labClinico: "LABORATORIO MANIPULADORES",
+    radiografia: ["INFORME RADIOGRAFICO", "INFORME RADIOGRAFICO 2"],
     //1.8
     certTrabajoAltura: "PSICOSENSOMETRICO ALTURA 1-8",
     certConduccVehiculos: "PSICOSENSOMETRICO VEHI-FOLIO",
@@ -252,6 +253,8 @@ export const DeleteExamen = async (norden, campo, token, setForm, form) => {
             const extra = camposExtraEliminar[campo]
                 ? `/${camposExtraEliminar[campo]}`
                 : "";
+            console.log(extra)
+            console.log(campo)
             const response = await fetch(`${URLAzure}/api/v01/ct/${urlsEliminar[campo]}/eliminar/${norden}${extra}`, {
                 method: "DELETE",
                 headers: {
