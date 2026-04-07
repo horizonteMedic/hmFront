@@ -153,7 +153,7 @@ export default function OftalmologiaOhla() {
     presenciaPterigion: "",
     opcionPterigion: "",
 
-    completo: false,
+    completo: true,
     //FIN NUEVOS
 
 
