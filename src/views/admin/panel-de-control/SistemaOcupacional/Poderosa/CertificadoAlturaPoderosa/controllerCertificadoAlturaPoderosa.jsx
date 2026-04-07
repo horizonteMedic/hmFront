@@ -138,7 +138,7 @@ export const GetInfoServicio = async (
             vclrs: res.vc_vc ?? "",
             vb: res.vb_vb ?? "",
             rp: res.rp_rp ?? "",
-            enfermedadesOculares: res.enfermedadesocularesoftalmo_e_oculares ?? "",
+            enfermedadesOculares: `${res.enfermedadesocularesoftalmo_e_oculares ?? ""}\n${res.enfermedadesocularesoftalmo_e_oculares1 ?? ""}`,
 
             // ====================== EXAMEN FISICO ======================
             // Perímetros
@@ -218,7 +218,7 @@ export const GetInfoServicioEditar = async (
             vclrs: res.vc_vc ?? "",
             vb: res.vb_vb ?? "",
             rp: res.rp_rp ?? "",
-            enfermedadesOculares: res.enfermedadesocularesoftalmo_e_oculares ?? "",
+            enfermedadesOculares: `${res.enfermedadesocularesoftalmo_e_oculares ?? ""}\n${res.enfermedadesocularesoftalmo_e_oculares1 ?? ""}`,
 
             // ====================== ANTECEDENTES ======================
             // Historial

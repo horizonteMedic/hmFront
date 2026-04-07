@@ -44,6 +44,7 @@ export const GetInfoServicio = async (
             cargoPaciente: res.cargo,
             ocupacionPaciente: res.areaO,
             fechaExamen: prev.fechaExamen,
+            enfermedadesOcularesOftalmo_e_oculares: `${res.enfermedadesOcularesOftalmo_e_oculares ?? ""}\n${res.enfermedadesocularesotrosoftalmo_e_oculares1 ?? ""}`,
 
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
@@ -76,6 +77,7 @@ export const GetInfoServicioEditar = async (
             edadPaciente: `${res.edadPaciente} AÑOS`,
             dniUser: res.dniUsuario,
             apto: res.apto ? "APTO" : res.aptoRestriccion ? "APTOCONRESTRICCION" : res.aptoTemporal ? "NOAPTOTEMPORAL" : res.noApto ? "NOAPTO" : "",
+            enfermedadesOcularesOftalmo_e_oculares: `${res.enfermedadesOcularesOftalmo_e_oculares ?? ""}\n${res.enfermedadesocularesotrosoftalmo_e_oculares1 ?? ""}`,
             nombre_medico: res.nombreMedico,
             digitalizacion: res.digitalizacion,
         }));

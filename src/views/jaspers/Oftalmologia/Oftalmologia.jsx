@@ -15,14 +15,14 @@ export default async function Oftalmologia(datos = {}, docExistente = null) {
 
   // Preparar datos reales
   const datosReales = {
-    apellidosNombres: String(datos.nombres || "").trim(),
+    apellidosNombres: String(datos.nombre || "").trim() + " " + String(datos.apellido || "").trim(),
     fechaExamen: formatearFechaCorta(datos.fechaOf),
     tipoExamen: String(datos.nomExam || ""),
     sexo: convertirGenero(datos.sexo),
     documentoIdentidad: String(datos.dni || ""),
     edad: String(datos.edad || ""),
-    areaTrabajo: datos.area || "",
-    puestoTrabajo: datos.cargo || "",
+    areaTrabajo: datos.areaO || "",
+    puestoTrabajo: datos.ocupacion || "",
     empresa: datos.empresa || "",
     contrata: datos.contrata || "",
     // Datos de color
@@ -337,37 +337,37 @@ export default async function Oftalmologia(datos = {}, docExistente = null) {
   // Visión de cerca
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.rect(margin + 60, y + 22, 18, 8);
-  doc.text(`${datos.vcercaSOd ?? ""}`, margin + 69, y + 27.5, {
+  doc.text(`${datos.txtCercaSinCorregirOd ?? ""}`, margin + 69, y + 27.5, {
     align: "center",
   });
   doc.rect(margin + 85, y + 22, 18, 8);
-  doc.text(`${datos.vcercaSOi ?? ""}`, margin + 94, y + 27.5, {
+  doc.text(`${datos.txtCercaSinCorregirOi ?? ""}`, margin + 94, y + 27.5, {
     align: "center",
   });
   doc.rect(margin + 125, y + 22, 18, 8);
-  doc.text(`${datos.vcercaCOd ?? ""}`, margin + 134, y + 27.5, {
+  doc.text(`${datos.txtCercaCorregidaOd ?? ""}`, margin + 134, y + 27.5, {
     align: "center",
   });
   doc.rect(margin + 150, y + 22, 18, 8);
-  doc.text(`${datos.vcercaCOi ?? ""}`, margin + 159, y + 27.5, {
+  doc.text(`${datos.txtCercaCorregidaOi ?? ""}`, margin + 159, y + 27.5, {
     align: "center",
   });
   // Visión de lejos
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.rect(margin + 60, y + 32, 18, 8);
-  doc.text(`${datos.vlejosSOd ?? ""}`, margin + 69, y + 37.5, {
+  doc.text(`${datos.txtLejosSinCorregirOd ?? ""}`, margin + 69, y + 37.5, {
     align: "center",
   });
   doc.rect(margin + 85, y + 32, 18, 8);
-  doc.text(`${datos.vlejosSOi ?? ""}`, margin + 94, y + 37.5, {
+  doc.text(`${datos.txtLejosSinCorregirOi ?? ""}`, margin + 94, y + 37.5, {
     align: "center",
   });
   doc.rect(margin + 125, y + 32, 18, 8);
-  doc.text(`${datos.vlejosCOd ?? ""}`, margin + 134, y + 37.5, {
+  doc.text(`${datos.txtLejosCorregidaOd ?? ""}`, margin + 134, y + 37.5, {
     align: "center",
   });
   doc.rect(margin + 150, y + 32, 18, 8);
-  doc.text(`${datos.vlejosCOi ?? ""}`, margin + 159, y + 37.5, {
+  doc.text(`${datos.txtLejosCorregidaOi ?? ""}`, margin + 159, y + 37.5, {
     align: "center",
   });
 
@@ -393,7 +393,7 @@ export default async function Oftalmologia(datos = {}, docExistente = null) {
   });
   doc.text(":", labelX + 2, startY + lineHeight - 13);
   doc.text(
-    `${(datos.vbinocular ?? "").toUpperCase()}`,
+    `${(datos.txtBinocularSinCorregir ?? "").toUpperCase()}`,
     margin + 60,
     startY + lineHeight - 13
   );
@@ -404,7 +404,7 @@ export default async function Oftalmologia(datos = {}, docExistente = null) {
   });
   doc.text(":", labelX + 2, startY + lineHeight * 2 - 13);
   doc.text(
-    `${(datos.rpupilares ?? "").toUpperCase()}`,
+    `${(datos.txtRp ?? "").toUpperCase()}`,
     margin + 60,
     startY + lineHeight * 2 - 13
   );

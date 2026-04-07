@@ -47,7 +47,7 @@ export const GetInfoServicio = async (
             fechaExamen: `${res.fechaExamen ? res.fechaExamen : today}`,
             fechaDesde: `${res.fechaDesde ? res.fechaDesde : today}`,
             fechahasta: `${res.fechahasta ? res.fechahasta : today}`,
-
+            enfermedadesOcularesOftalmologia_e_oculares: `${res.enfermedadesOcularesOftalmologia_e_oculares ?? ""}\n${res.enfermedadesocularesotrosoftalmo_e_oculares1 ?? ""}`,
         }));
     }
 };
@@ -78,7 +78,9 @@ export const GetInfoServicioEditar = async (
             PA: `${res.sistolica}/${res.diastolica}`,
             edadPaciente: res.edadPaciente,
             dniUser: res.dniUsuario,
-            apto: res.apto ? "APTO" : res.aptoconrestriccion ? "APTOCONRESTRICCION" : "NOAPTO"
+            apto: res.apto ? "APTO" : res.aptoconrestriccion ? "APTOCONRESTRICCION" : "NOAPTO",
+            enfermedadesOcularesOftalmologia_e_oculares: `${res.enfermedadesOcularesOftalmologia_e_oculares ?? ""}\n${res.enfermedadesocularesotrosoftalmo_e_oculares1 ?? ""}`,
+
         }));
     }
 };

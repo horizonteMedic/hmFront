@@ -204,8 +204,10 @@ const HistorialPaciente = () => {
       const fetchPromises = otrasSedes.map(s => GetListREport(userlogued.sub, startDate, endDate, s.cod_sede, empresa, contrata, token, { signal }));
       try {
         const otrasSedesData = await Promise.allSettled(fetchPromises);
-        const nonEmptyData = otrasSedesData.filter(data => data.length > 0);
-        const allData = nonEmptyData.reduce((acc, data) => acc.concat(data), []);
+        const allData = otrasSedesData
+          .filter(r => r.status === "fulfilled")
+          .flatMap(r => Array.isArray(r.value) ? r.value : []);
+        console.log(allData)
         setData(prevData => {
           const updatedData = [...prevData, ...allData];
           setTotalPages(Math.ceil(updatedData.length / recordsPerPage)); // Recalcular totalPages

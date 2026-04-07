@@ -418,7 +418,7 @@ const CertificadoAptitudPoderosa = () => {
                                 </div>
                             </div>
                             {/* Enfermedades Oculares */}
-                            <InputTextArea label="Enfermedades Oculares" rows={2} name="enfermedadesOcularesOftalmo_e_oculares" value={form?.enfermedadesOcularesOftalmo_e_oculares} onChange={handleChange} disabled />
+                            <InputTextArea label="Enfermedades Oculares" rows={6} name="enfermedadesOcularesOftalmo_e_oculares" value={form?.enfermedadesOcularesOftalmo_e_oculares} onChange={handleChange} disabled />
                         </div>
                         <div className="bg-white  rounded-lg p-4 m-4 flex-1 flex flex-col space-y-3">
                             <InputTextOneLine

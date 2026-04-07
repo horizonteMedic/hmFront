@@ -149,7 +149,7 @@ export const GetInfoServicio = async (
             vclrs: res.vcoftalmologia_vc ?? "",
             vb: res.vboftalmologia_vb ?? "",
             rp: res.rpoftalmologia_rp ?? "",
-            enfermedadesOculares: res.enfermedadesocularesoftalmo_e_oculares ?? "",
+            enfermedadesOculares: `${res.enfermedadesocularesoftalmo_e_oculares ?? ""}\n${res.enfermedadesocularesotrosoftalmo_e_oculares1 ?? ""}`,
 
             hipoacusiaFrecuenciasConversacionales: oidoMayor40,
             conclusion: oidoMayor40 || obesidadIMC30 ? "NO APTO" :
@@ -290,7 +290,7 @@ export const GetInfoServicioEditar = async (
             vclrs: res.vcoftalmologia_vc ?? "",
             vb: res.vboftalmologia_vb ?? "",
             rp: res.rpoftalmologia_rp ?? "",
-            enfermedadesOculares: res.enfermedadesocularesoftalmo_e_oculares ?? "",
+            enfermedadesOculares: `${res.enfermedadesocularesoftalmo_e_oculares ?? ""}\n${res.enfermedadesocularesotrosoftalmo_e_oculares1 ?? ""}`,
 
             //==========================TAB ANTECEDENTES===========================
             // Antecedentes - Columna Izquierda

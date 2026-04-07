@@ -11,8 +11,7 @@ import { buildExamenesList } from "./folioCatalogo";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 
 const ExamenesListPRUEBAS = buildExamenesList([
-    "MERCURIO_EN_ORINA_ARCHIVO",
-    "PLOMO_EN_SANGRE_ARCHIVO"
+    "OFTALMOLOGIA",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
@@ -162,7 +161,7 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
 
     "OFTALMOLOGIA",
     "OFTALMOLOGIA_VISION_TESTER",
-    "FICHA_OFTALMOLOGICA",
+    // "FICHA_OFTALMOLOGICA",
     "CONSENT_DECLARACION_APTITUD",
     "CONSENT_SINTOMATICO_RESPIRATORIO",
     "CONSENT_INFORMADO_EVALUACION_MEDICA",
@@ -246,7 +245,7 @@ const ExamenesListLaboratorio = buildExamenesList([
 ]);
 
 const ListaPorPlantilla = {
-    // PRUEBAS: ExamenesListPRUEBAS,
+    //PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     "COMPLETO": ExamenesListCOMPLETO,
     //OHLA: ExamenesListOHLA,
