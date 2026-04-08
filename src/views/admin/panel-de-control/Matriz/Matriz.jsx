@@ -892,7 +892,7 @@ const MatrizPostulante = () => {
                           .map(h => h.field)
                           .filter(Boolean)
                         : Object.keys(item);
-
+                    console.log('fields', fields)
                     return (
                       <tr key={rowIndex}>
                         {fields.map((field, colIndex) => (

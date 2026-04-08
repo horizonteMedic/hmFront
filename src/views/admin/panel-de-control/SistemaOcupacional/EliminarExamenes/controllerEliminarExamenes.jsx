@@ -106,6 +106,7 @@ const urlsEliminar = {
     DECLA_INFO_APTITUD_MO: "consentimientos/consentimientos-admision",
     ConstBrigadista: "constaBrigadista/consta-brigadista",
     ConformidadEmo: "registroConformidadEmo/conformidad-emo",
+    ConstFirmaHuella: "consentDigit",
     //PSICOLOGIA
     Fobias: "fobias/fobias",
     AversionRiesgo: "aversionRiesgo/aversion-riesgo",
@@ -155,7 +156,9 @@ const camposExtraEliminar = {
     espirometria: "ESPIROMETRIA",
     electrocardiograma: "ELECTROCARDIOGRAMA",
     labClinico: "LABORATORIO MANIPULADORES",
+    rxTorax: "RAYOS X TORAX",
     radiografia: ["INFORME RADIOGRAFICO", "INFORME RADIOGRAFICO 2"],
+    ConstFirmaHuella: "DECLARACION USO FIRMA",
     //1.8
     certTrabajoAltura: "PSICOSENSOMETRICO ALTURA 1-8",
     certConduccVehiculos: "PSICOSENSOMETRICO VEHI-FOLIO",
@@ -250,12 +253,23 @@ export const DeleteExamen = async (norden, campo, token, setForm, form) => {
 
     if (result.isConfirmed) {
         try {
-            const extra = camposExtraEliminar[campo]
-                ? `/${camposExtraEliminar[campo]}`
-                : "";
-            console.log(extra)
-            console.log(campo)
-            const response = await fetch(`${URLAzure}/api/v01/ct/${urlsEliminar[campo]}/eliminar/${norden}${extra}`, {
+
+            let query = "";
+
+            const extraValue = camposExtraEliminar[campo];
+
+            if (Array.isArray(extraValue)) {
+                // 🔹 Convertir array a string separado por coma
+                const nomenclaturas = extraValue.join(", ");
+                console.log(nomenclaturas)
+                // 🔹 Codificar para URL (MUY IMPORTANTE por espacios)
+                query = `?nomenclaturas=${encodeURIComponent(nomenclaturas)}`;
+            } else if (extraValue) {
+                // 🔹 Caso normal (como antes)
+                query = `/${extraValue}`;
+            }
+
+            const response = await fetch(`${URLAzure}/api/v01/ct/${urlsEliminar[campo]}/eliminar/${norden}${query}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
