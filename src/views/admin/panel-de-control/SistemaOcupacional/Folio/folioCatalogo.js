@@ -2,32 +2,32 @@ export const EXAMENES_CATALOGO = {
     /* =========================
        GENERALES / BASE
     ========================= */
-    // ANEXO_02: {
-    //     nombre: "ANEXO 02",
-    //     tabla: "anexo_agroindustrial",
-    //     url: "/api/v01/ct/anexos/anexo2/obtenerReporteAnexo2Completo",
-    //     esJasper: true,
-    // },
-
     ANEXO_02: {
         nombre: "ANEXO 02",
         tabla: "anexo_agroindustrial",
-        urlJsreport: "/api/v01/ct/anexos/descargarReporteAnexo2",
-        esJsreport: true,
+        url: "/api/v01/ct/anexos/anexo2/obtenerReporteAnexo2Completo",
+        esJasper: true,
     },
 
-    // ANEXO_16: {
-    //     nombre: "ANEXO 16",
-    //     tabla: "anexo7c",
-    //     url: "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16",
+    // ANEXO_02: {
+    //     nombre: "ANEXO 02",
+    //     tabla: "anexo_agroindustrial",
+    //     urlJsreport: "/api/v01/ct/anexos/descargarReporteAnexo2",
+    //     esJsreport: true,
     // },
 
     ANEXO_16: {
         nombre: "ANEXO 16",
         tabla: "anexo7c",
-        urlJsreport: "/api/v01/ct/anexos/descargarReporteAnexo16",
-        esJsreport: true,
+        url: "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16",
     },
+
+    // ANEXO_16: {
+    //     nombre: "ANEXO 16",
+    //     tabla: "anexo7c",
+    //     urlJsreport: "/api/v01/ct/anexos/descargarReporteAnexo16",
+    //     esJsreport: true,
+    // },
 
     ANEXO_16A: {
         nombre: "ANEXO 16A",
@@ -43,26 +43,26 @@ export const EXAMENES_CATALOGO = {
         esJasper: true
     },
 
-    // CERTIFICADO_ANEXO_02: {
-    //     nombre: "CERTIFICADO MEDICO OCUPACIONAL ANEXO 02",
-    //     tabla: "aptitud_medico_ocupacional_agro",
-    //     url: "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2",
-    //     esJasper: true,
-    // },
-
-    // CERTIFICADO_APTITUD_ANEXO_16: {
-    //     nombre: "CERTIFICADO DE APTITUD ANEXO 16",
-    //     tabla: "certificado_aptitud_medico_ocupacional",
-    //     url: "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16",
-    //     esJasper: true,
-    // },
+    CERTIFICADO_ANEXO_02: {
+        nombre: "CERTIFICADO MEDICO OCUPACIONAL ANEXO 02",
+        tabla: "aptitud_medico_ocupacional_agro",
+        url: "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2",
+        esJasper: true,
+    },
 
     CERTIFICADO_APTITUD_ANEXO_16: {
         nombre: "CERTIFICADO DE APTITUD ANEXO 16",
         tabla: "certificado_aptitud_medico_ocupacional",
-        urlJsreport: "/api/v01/ct/anexos/descargarReporteFichaAptitudAnexo16",
-        esJsreport: true,
+        url: "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16",
+        esJasper: true,
     },
+
+    // CERTIFICADO_APTITUD_ANEXO_16: {
+    //     nombre: "CERTIFICADO DE APTITUD ANEXO 16",
+    //     tabla: "certificado_aptitud_medico_ocupacional",
+    //     urlJsreport: "/api/v01/ct/anexos/descargarReporteFichaAptitudAnexo16",
+    //     esJsreport: true,
+    // },
 
     CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL: {
         nombre: "CONSTANCIA DE EXAMEN MEDICO OCUPACIONAL",
@@ -219,12 +219,12 @@ export const EXAMENES_CATALOGO = {
         esJsreport: true,
     },
 
-    CERTIFICADO_ANEXO_02: {
-        nombre: "CERTIFICADO MEDICO OCUPACIONAL ANEXO 02",
-        tabla: "aptitud_medico_ocupacional_agro",
-        urlJsreport: "/api/v01/ct/anexos/fichaAnexo2/descargarReporteFichaAnexo2",
-        esJsreport: true,
-    },
+    // CERTIFICADO_ANEXO_02: {
+    //     nombre: "CERTIFICADO MEDICO OCUPACIONAL ANEXO 02",
+    //     tabla: "aptitud_medico_ocupacional_agro",
+    //     urlJsreport: "/api/v01/ct/anexos/fichaAnexo2/descargarReporteFichaAnexo2",
+    //     esJsreport: true,
+    // },
 
     INTERCONSULTAS: {
         nombre: "INTERCONSULTAS",
