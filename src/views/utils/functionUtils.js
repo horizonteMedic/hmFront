@@ -325,7 +325,7 @@ export const GetInfoServicioDefault = async (
             `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=${esJasper}`,
             token
         );
-        if (res?.norden || res?.norden_n_orden || res?.n_orden) {
+        if (res?.norden || res?.norden_n_orden || res?.n_orden || res?.resultado) {
             return res;
         } else {
             Swal.fire("Error", "Ocurrió un error al traer los datos", "error");

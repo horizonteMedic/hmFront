@@ -159,6 +159,18 @@ export const GetInfoServicio = async (
             pToracicoInspiracion: res.maximaInspiracionPtoracico_p_max_inspiracion ?? "",
             pToracicoEspiracion: res.forazadaPtoracico_p_ex_forzada ?? "",
 
+            // Consumo de sustancias
+            tabaco: res.tabacoCantidad_txt_tabaco_cantiad || "",
+            tabacoFrecuencia: res.tabacoFrecuencia_txt_tabaco_frecuencia || "",
+            alcohol: res.alcoholCantidad_txt_alcohol_cantiad || "CERVEZA",
+            alcoholFrecuencia: res.alcoholFrecuencia_txt_alcohol_frecuencia || "C/MES",
+            drogas: res.drogasCantidad_txt_drogas_cantiad || "NO",
+            drogasFrecuencia: res.drogasFrecuencia_txt_drogas_frecuencia || "N/A",
+            hojaCoca: res.hojaCocaCantidad_txt_hojacoca_cantiad || "20 G",
+            hojaCocaFrecuencia: res.hojaCocaFrecuencia_txt_hojacoca_frecuencia || "C/DÍA",
+            cafe: res.cafeCantidad_txt_cafe_cantiad || "1 TAZA",
+            cafeFrecuencia: res.cafeFrecuencia_txt_cafe_frecuencia || "C/SEMANA",
+
             diagnostico: nuevoConclusiones,
         }));
     }

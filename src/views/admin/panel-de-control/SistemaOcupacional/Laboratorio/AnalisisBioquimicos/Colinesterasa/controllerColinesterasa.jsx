@@ -1,4 +1,4 @@
-import Swal from "sweetalert2"; 
+import Swal from "sweetalert2";
 import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
@@ -10,59 +10,57 @@ import {
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 
 // CAMBIAR SOLO LAS URL
-const obtenerReporteUrl = "";
-const obtenerReporteJsReportUrl = "";
-const registrarUrl = "";
+const obtenerReporteUrl = "/api/v01/ct/colinesterasa/reporte";
+const obtenerReporteJsReportUrl = "/api/v01/ct/colinesterasa/descargar";
+const registrarUrl = "/api/v01/ct/colinesterasa/registrar";
 
 // ===================== GET INFO SERVICIO =====================
-export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {}) => {
-  const res = await GetInfoServicioDefault(
-    nro,
-    tabla,
-    token,
-    obtenerReporteUrl,
-    onFinish
-  );
+export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
+    const res = await GetInfoServicioDefault(
+        nro,
+        tabla,
+        token,
+        obtenerReporteUrl,
+        onFinish
+    );
+    if (res?.resultado) {
+        const rese = res.resultado
+        set((prev) => ({
+            ...prev,
 
-  console.log("Respuesta PCR Ultrasensible:", res);
+            // DATOS PRINCIPALES
+            norden: rese.norden ?? "",
+            fecha: rese.fechaExamen ?? "",
 
-  if (res) {
-    set((prev) => ({
-      ...prev,
+            nombres: rese.nombres ?? "",
+            apellidos: rese.apellidos ?? "",
+            dni: rese.dniPaciente ?? "",
+            edad: rese.edad ?? "",
 
-      // DATOS PRINCIPALES
-      norden: res.norden ?? "",
-      fecha: res.fechaExamen ?? "",
+            fechaNacimiento: formatearFechaCorta(rese.fechaNacimientoPaciente ?? ""),
+            lugarNacimiento: rese.lugarNacimientoPaciente ?? "",
+            sexo: rese.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
 
-      nombres: res.nombres ?? "",
-      apellidos: res.apellidos ?? "",
-      dni: res.dniPaciente ?? "",
-      edad: res.edad ?? "",
+            estadoCivil: rese.estadoCivilPaciente ?? "",
+            nivelEstudios: rese.nivelEstudioPaciente ?? "",
 
-      fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-      lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-      sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+            ocupacion: rese.ocupacionPaciente ?? "",
+            cargoDesempenar: rese.cargoPaciente ?? "",
+            area: rese.areaPaciente ?? "",
 
-      estadoCivil: res.estadoCivilPaciente ?? "",
-      nivelEstudios: res.nivelEstudioPaciente ?? "",
+            empresa: rese.empresa ?? "",
+            contrata: rese.contrata ?? "",
 
-      ocupacion: res.ocupacionPaciente ?? "",
-      cargoDesempenar: res.cargoPaciente ?? "",
-      area: res.areaPaciente ?? "",
+            // EXAMEN
+            resultado: rese.resultado ? parseFloat(rese.resultado).toFixed(2) : "",
+            tipoExamen: rese.tipoExamen ?? "",
 
-      empresa: res.empresa ?? "",
-      contrata: res.contrata ?? "",
+            // USUARIOS
+            user_medicoFirma: rese.usuarioFirma ?? "",
+            user_doctorAsignado: rese.doctorAsignado ?? "",
 
-      // EXAMEN
-    resultado: res.resultado ? parseFloat(res.resultado).toFixed(2) : "",      
-    tipoExamen: res.tipoExamen ?? "",
-
-      // USUARIOS
-      user_medicoFirma: res.usuarioFirma ?? prev.user_medicoFirma,
-      user_doctorAsignado: res.doctorAsignado ?? "",
-
-    }));
-  }
+        }));
+    }
 };
 
 // ===================== SUBMIT =====================
@@ -73,35 +71,28 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     }
 
     const body = {
-        codAb: form.codAb,
-        fechaAb: form.fecha,
+        norden: form.norden,
+        fechaRegistro: form.fecha,
+        muestra: form.muestra,
         resultado: form.resultado,
         userRegistro: user,
-        userMedicoOcup: "",
-        nOrden: form.norden,
-
-        numTicket: 0,
-        txtReponsable: user,
-        fechaRegistro: form.fecha,
-
-        esPCRUltrasensible: true,
 
         usuarioFirma: form.user_medicoFirma,
         doctorAsignado: form.user_doctorAsignado,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-      PrintHojaR(form.norden, token, tabla);
+        PrintHojaR(form.norden, token, tabla);
     });
 };
 
 // ===================== PRINT =====================
 export const PrintHojaR = (nro, token, tabla) => {
     PrintHojaRJsReportDefault(
-      nro,
-      token,
-      tabla,
-      obtenerReporteJsReportUrl
+        nro,
+        token,
+        tabla,
+        obtenerReporteJsReportUrl
     );
 };
 
