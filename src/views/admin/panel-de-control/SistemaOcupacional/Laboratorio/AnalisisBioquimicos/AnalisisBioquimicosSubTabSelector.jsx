@@ -1,4 +1,4 @@
-import { faCandyCane, faCrown, faFlask, faGlassWater, faHandHoldingDroplet, faKiwiBird, faLungs } from "@fortawesome/free-solid-svg-icons";
+import { faCandyCane, faCrown, faDroplet, faFlask, faGlassWater, faHandHoldingDroplet, faHeart, faKiwiBird, faLungs } from "@fortawesome/free-solid-svg-icons";
 import SubTabSelector from "../../../../../components/reusableComponents/SubTabSelector";
 import AcidoUrico from "./AcidoUrico/AcidoUrico";
 import PerfilHepatico from "./PerfilHepatico/PerfilHepatico";
@@ -8,6 +8,7 @@ import ToleranciaGlucosa from "./ToleranciaGlucosa/ToleranciaGlucosa";
 import GlucosaBasal from "./GlucosaBasal/GlucosaBasal";
 import PerfilLipidico from "./PerfilLipidico/PerfilLipidico";
 import PCRUltrasensible from "./PCRUltrasensible/PCRUltrasensible";
+import Colinesterasa from "./Colinesterasa/Colinesterasa";
 
 export default function AnalisisBioquimicosSubTabSelector({ tieneVista }) {
   const tabsConfig = [
@@ -64,8 +65,15 @@ export default function AnalisisBioquimicosSubTabSelector({ tieneVista }) {
       id: 7,
       permission: "PCR Ultrasensible",
       label: "PCR ultrasensible",
-      icon: faGlassWater,
+      icon: faHeart,
       component: PCRUltrasensible
+    },
+    {
+      id: 8,
+      permission: "Colinesterasa",
+      label: "Colinesterasa",
+      icon: faDroplet,
+      component: Colinesterasa
     },
   ];
   return (

@@ -58,6 +58,7 @@ export const EXAMENES_CONFIG = [
             { label: "Declaracion Aptitud Medico O.", name: "DECLA_INFO_APTITUD_MO", tabla: "DECLA_INFO_APTITUD_MO" },
             { label: "Const. Brigadista", name: "ConstBrigadista", tabla: "consta_brigadista" },
             { label: "Conformidad EMO ", name: "ConformidadEmo", tabla: "conformidad_emo" },
+            { label: "Const. Uso de Firma y Huella", name: "ConstFirmaHuella", tabla: "consen_digit" }
         ],
     },
     {

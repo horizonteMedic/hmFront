@@ -19,34 +19,31 @@ const registrarUrl =
 
 export const GetInfoServicio = async (
     nro,
+    tabla,
     set,
     token,
-    sede
+    onFinish = () => { }
 ) => {
-    const res = await GetInfoPacDefault(
+    const res = await GetInfoServicioDefault(
         nro,
+        tabla,
         token,
-        sede
+        obtenerReporteUrl,
+        onFinish,
+        true
     );
-    console.log(res)
     if (res) {
         console.log(res)
         set((prev) => ({
             ...prev,
             ...res,
-            nombres: res.nombresApellidos,
+            nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
             sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
-            dniPaciente: res.dni,
-            edadPaciente: res.edad,
-            nombreExamen: res.nomExam,
-            empresa: res.empresa,
-            contrata: res.contrata,
-            cargoPaciente: res.cargo,
-            ocupacionPaciente: res.areaO,
-            fechaExamen: prev.fechaExamen,
+            edadPaciente: `${res.edadPaciente} AÑOS`,
+            dniUser: res.dniUsuario,
             enfermedadesOcularesOftalmo_e_oculares: `${res.enfermedadesOcularesOftalmo_e_oculares ?? ""}\n${res.enfermedadesocularesotrosoftalmo_e_oculares1 ?? ""}`,
-
-            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+            fechaExamen: prev.fechaExamen,
+            fechaHasta: prev.fechaHasta,
         }));
     }
 };
@@ -147,7 +144,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         sede,
         () => {
             //NO Tiene registro
-            GetInfoServicio(nro, set, token, sede);
+            GetInfoServicio(nro, tabla, set, token, () => { Swal.close(); });
         },
         () => {
             //Tiene registro
