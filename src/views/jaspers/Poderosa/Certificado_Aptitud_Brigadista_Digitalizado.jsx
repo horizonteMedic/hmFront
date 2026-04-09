@@ -273,10 +273,16 @@ export default async function Certificado_Aptitud_Brigadista_Digitalizado(data =
   const splitRest = doc.splitTextToSize(datosFinales.restricciones, col3W - 4);
 
   const recsContentHeight = (splitRecs.length * lineSpacing) + 15;
-  const restContentHeight = (splitRest.length * lineSpacing) + 15;
+  const restTextHeight = (splitRest.length * lineSpacing);
+  const firmaAreaHeight = 35; // Espacio reservado para la firma y sello
 
   const minBottomBoxHeight = 70;
-  const finalBottomHeight = Math.max(minBottomBoxHeight, recsContentHeight + 20, restContentHeight);
+  // El cuadro de restricciones (derecha) debe contener: 
+  // margen superior (8mm) + altura del texto + pequeño margen (2mm) + área de firma (35mm)
+  const restRequiredHeight = 8 + restTextHeight + 2 + firmaAreaHeight;
+
+  // El finalBottomHeight será el máximo entre el mínimo, lo que pide el lado izquierdo (recs) y lo que pide el derecho (rest + firma)
+  const finalBottomHeight = Math.max(minBottomBoxHeight, recsContentHeight + 20, restRequiredHeight);
 
   // Dibujar Recomendaciones (Izquierda Inferior)
   doc.rect(10, resY + 20, col1W + col2W, finalBottomHeight - 20, 'D');
@@ -294,8 +300,11 @@ export default async function Certificado_Aptitud_Brigadista_Digitalizado(data =
   doc.text(splitRest, rightX + 2, resY + 8);
 
   // Firma y Sello (Posicionados dinámicamente al final del cuadro derecho)
-  const firmaAreaHeight = 35;
   const firmaY = resY + finalBottomHeight - firmaAreaHeight;
+
+  // Línea divisoria entre texto de restricciones y área de firma
+  doc.line(rightX, firmaY, rightX + col3W, firmaY);
+
   doc.line(rightX + 10, resY + finalBottomHeight - 10, rightX + col3W - 10, resY + finalBottomHeight - 10);
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("SELLO Y FIRMA DE MEDICO QUE CERTIFICA", rightX + col3W / 2, resY + finalBottomHeight - 6, { align: "center" });
