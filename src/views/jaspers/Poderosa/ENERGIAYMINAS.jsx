@@ -332,7 +332,7 @@ const drawHereditaryFactors = (doc, datos = {}, y) => {
     doc.text(
         "FACTORES HEREDITARIOS",
         tablaInicioX + sideColW / 2 + 17,
-        yPos + totalHeight / 2 + 14,
+        yPos + totalHeight / 2 + 16,
         { angle: 90, align: "center" }
     );
 
