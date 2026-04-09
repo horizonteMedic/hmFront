@@ -357,10 +357,10 @@ export const reportesMap = {
 
    psicologiafobias: formatPsicologia_Digitalizado,
 
-   // informe_psicologico: {
-   //    InformePsicologico_Digitalizado,
-   //    Informe_Psicologico_Boroo
-   // },
+   informe_psicologico: {
+      InformePsicologico_Digitalizado,
+      Informe_Psicologico_Boroo
+   },
 
    exam_complementarios: InformePsicoExamComplementario,
 

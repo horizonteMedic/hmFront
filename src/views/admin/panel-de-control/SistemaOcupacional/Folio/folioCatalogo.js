@@ -806,19 +806,19 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
-    // INFORME_PSICOLOGICO: {
-    //     nombre: "INFORME PSICOLOGICO",
-    //     tabla: "informe_psicologico",
-    //     url: "/api/v01/ct/informePsicologico/obtenerReporteInformePsicologico",
-    //     esJasper: true,
-    // },
-
-    INFORME_PSICOLOGICO_JSREPORT: {
+    INFORME_PSICOLOGICO: {
         nombre: "INFORME PSICOLOGICO",
         tabla: "informe_psicologico",
-        urlJsreport: "/api/v01/ct/informePsicologico/descargarReporteInformePsicologico",
-        esJsreport: true,
+        url: "/api/v01/ct/informePsicologico/obtenerReporteInformePsicologico",
+        esJasper: true,
     },
+
+    // INFORME_PSICOLOGICO_JSREPORT: {
+    //     nombre: "INFORME PSICOLOGICO",
+    //     tabla: "informe_psicologico",
+    //     urlJsreport: "/api/v01/ct/informePsicologico/descargarReporteInformePsicologico",
+    //     esJsreport: true,
+    // },
 
     PSICOLOGIA_ANEXO_02: {
         nombre: "PSICOLOGIA ANEXO 02",
