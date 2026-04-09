@@ -88,11 +88,21 @@ export const GetInfoServicio = async (
             );
             console.log("✅ Especialidad seleccionada:", especialidadSeleccionada);
             if (jasperModules) {
+                // PrintHojaRFichaInterconsulta(
+                //     nro,
+                //     especialidadSeleccionada.mensaje,
+                //     token,
+                //     tabla
+                // );
                 PrintHojaRFichaInterconsulta(
                     nro,
                     especialidadSeleccionada.mensaje,
                     token,
-                    tabla
+                    tabla,
+                    datosFooter,
+                    obtenerReporteUrl,
+                    jasperModules,
+                    "../../../../jaspers/FichaInterconsulta"
                 );
 
             } else {
@@ -400,73 +410,99 @@ export const GetInfoNoRegisterInterconsulta = async (
     }
 };
 
+export const PrintHojaRFichaInterconsulta = (nro, especialidad, token, tabla, datosFooter, obtenerReporteUrl, jasperModules, nombreCarpeta) => {
 
+    LoadingDefault("Cargando Formato a Imprimir");
 
-export const PrintHojaRFichaInterconsulta = async (nro, especialidad, token, tabla, comprimir = false) => {
-
-    try {
-        LoadingDefault("Cargando Formato a Imprimir");
-
-        const response = await getFetchPdf(
-            `${obtenerJServerReporte}?nOrden=${nro}&especialidad=${especialidad}&nameService=${tabla}&comprimir=${comprimir ? 1 : 0}`,
-            token
-        );
-        // 🔴 Error controlado desde getFetchPdf
-        if (response?.error) {
-            console.error("Error HTTP:", response);
-
-            Swal.close();
-
-            if (response.status === 401) {
-                Swal.fire("Sesión expirada", "Vuelve a iniciar sesión.", "warning");
-            } else if (response.status === 404) {
-                Swal.fire("No encontrado", "No se encontró el reporte.", "warning");
-            } else {
-                Swal.fire("Error", "Error al generar el reporte.", "error");
+    getFetch(
+        `${obtenerReporteUrl}?nOrden=${nro}&especialidad=${especialidad}&nameService=${tabla}&esJasper=true`,
+        token
+    )
+        .then(async (res) => {
+            console.log(res)
+            if (res.norden || res.norden_n_orden || res.n_orden) {
+                const nombre = res.nameJasper;
+                console.log(nombre)
+                const modulo = await jasperModules[
+                    `${nombreCarpeta}/${nombre}.jsx`
+                ]();
+                // Ejecuta la función exportada por default con los datos
+                if (typeof modulo.default === "function") {
+                    modulo.default({ ...res, ...datosFooter });
+                }
             }
-
-            return;
-        }
-
-        // 🔴 Validación extra
-        if (!(response instanceof Blob)) {
+        })
+        .finally(() => {
             Swal.close();
-            Swal.fire("Error", "Respuesta inválida del servidor.", "error");
-            return;
-        }
-
-        // ✅ Abrir visor de impresión (sin nueva pestaña)
-        const blobUrl = window.URL.createObjectURL(response);
-
-        const iframe = document.createElement("iframe");
-        iframe.style.position = "fixed";
-        iframe.style.right = "0";
-        iframe.style.bottom = "0";
-        iframe.style.width = "0";
-        iframe.style.height = "0";
-        iframe.style.border = "0";
-        iframe.src = blobUrl;
-
-        document.body.appendChild(iframe);
-
-        iframe.onload = function () {
-            Swal.close(); // cerrar loading cuando ya cargó
-            iframe.contentWindow.focus();
-            iframe.contentWindow.print();
-        };
-
-        // 🧹 limpiar memoria después
-        setTimeout(() => {
-            document.body.removeChild(iframe);
-            window.URL.revokeObjectURL(blobUrl);
-        }, 30000);
-
-    } catch (error) {
-        console.error("Error inesperado:", error);
-        Swal.close();
-        Swal.fire("Error", "Ocurrió un error inesperado al generar el reporte.", "error");
-    }
+        });
 };
+
+
+// export const PrintHojaRFichaInterconsulta = async (nro, especialidad, token, tabla, comprimir = false) => {
+
+//     try {
+//         LoadingDefault("Cargando Formato a Imprimir");
+
+//         const response = await getFetchPdf(
+//             `${obtenerJServerReporte}?nOrden=${nro}&especialidad=${especialidad}&nameService=${tabla}&comprimir=${comprimir ? 1 : 0}`,
+//             token
+//         );
+//         // 🔴 Error controlado desde getFetchPdf
+//         if (response?.error) {
+//             console.error("Error HTTP:", response);
+
+//             Swal.close();
+
+//             if (response.status === 401) {
+//                 Swal.fire("Sesión expirada", "Vuelve a iniciar sesión.", "warning");
+//             } else if (response.status === 404) {
+//                 Swal.fire("No encontrado", "No se encontró el reporte.", "warning");
+//             } else {
+//                 Swal.fire("Error", "Error al generar el reporte.", "error");
+//             }
+
+//             return;
+//         }
+
+//         // 🔴 Validación extra
+//         if (!(response instanceof Blob)) {
+//             Swal.close();
+//             Swal.fire("Error", "Respuesta inválida del servidor.", "error");
+//             return;
+//         }
+
+//         // ✅ Abrir visor de impresión (sin nueva pestaña)
+//         const blobUrl = window.URL.createObjectURL(response);
+
+//         const iframe = document.createElement("iframe");
+//         iframe.style.position = "fixed";
+//         iframe.style.right = "0";
+//         iframe.style.bottom = "0";
+//         iframe.style.width = "0";
+//         iframe.style.height = "0";
+//         iframe.style.border = "0";
+//         iframe.src = blobUrl;
+
+//         document.body.appendChild(iframe);
+
+//         iframe.onload = function () {
+//             Swal.close(); // cerrar loading cuando ya cargó
+//             iframe.contentWindow.focus();
+//             iframe.contentWindow.print();
+//         };
+
+//         // 🧹 limpiar memoria después
+//         setTimeout(() => {
+//             document.body.removeChild(iframe);
+//             window.URL.revokeObjectURL(blobUrl);
+//         }, 30000);
+
+//     } catch (error) {
+//         console.error("Error inesperado:", error);
+//         Swal.close();
+//         Swal.fire("Error", "Ocurrió un error inesperado al generar el reporte.", "error");
+//     }
+// };
 
 
 //para ver las especialidadses registradas
