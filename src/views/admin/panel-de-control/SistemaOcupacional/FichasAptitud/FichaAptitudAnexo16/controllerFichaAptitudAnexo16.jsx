@@ -210,27 +210,27 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
     });
 };
 
-// export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-//     const jasperModules = import.meta.glob("../../../../../jaspers/Ficha_Anexo16/*.jsx");
-//     PrintHojaRDefault(
-//         nro,
-//         token,
-//         tabla,
-//         datosFooter,
-//         obtenerReporteUrl,
-//         jasperModules,
-//         "../../../../../jaspers/Ficha_Anexo16"
-//     );
-// };
-
-export const PrintHojaR = (nro, token, tabla) => {
-    PrintHojaRJsReportDefault(
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+    const jasperModules = import.meta.glob("../../../../../jaspers/Ficha_Anexo16/*.jsx");
+    PrintHojaRDefault(
         nro,
         token,
         tabla,
-        obtenerReporteJsReportUrl
+        datosFooter,
+        obtenerReporteUrl,
+        jasperModules,
+        "../../../../../jaspers/Ficha_Anexo16"
     );
 };
+
+// export const PrintHojaR = (nro, token, tabla) => {
+//     PrintHojaRJsReportDefault(
+//         nro,
+//         token,
+//         tabla,
+//         obtenerReporteJsReportUrl
+//     );
+// };
 
 export const PrintHojaR2 = (nro, token, tabla, datosFooter) => {
     const jasperModules = import.meta.glob("../../../../../jaspers/Ficha_Anexo16/ResumenMedico/*.jsx");

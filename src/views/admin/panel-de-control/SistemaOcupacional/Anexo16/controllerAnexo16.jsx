@@ -187,7 +187,7 @@ export const SubmitDataService = async (
   });
 };
 
-/*export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
   Loading("Cargando Formato a Imprimir");
   getFetch(
     `${obtenerParaJasperUrl}?nOrden=${nro}&nameService=${tabla}`,
@@ -216,16 +216,16 @@ export const SubmitDataService = async (
       Swal.close();
     }
   });
-};*/
-
-export const PrintHojaR = (nro, token, tabla) => {
-  PrintHojaRJsReportDefault(
-    nro,
-    token,
-    tabla,
-    obtenerReporteJsReportUrl
-  );
 };
+
+// export const PrintHojaR = (nro, token, tabla) => {
+//   PrintHojaRJsReportDefault(
+//     nro,
+//     token,
+//     tabla,
+//     obtenerReporteJsReportUrl
+//   );
+// };
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
   VerifyTRDefault(

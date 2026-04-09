@@ -163,26 +163,26 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
     });
 };
 
-// export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-//     const jasperModules = import.meta.glob("../../../../../jaspers/Ficha_Anexo2/*.jsx");
-//     PrintHojaRDefault(
-//         nro,
-//         token,
-//         tabla,
-//         datosFooter,
-//         obtenerReporteUrl,
-//         jasperModules,
-//         "../../../../../jaspers/Ficha_Anexo2"
-//     );
-// };
-export const PrintHojaR = (nro, token, tabla) => {
-    PrintHojaRJsReportDefault(
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+    const jasperModules = import.meta.glob("../../../../../jaspers/Ficha_Anexo2/*.jsx");
+    PrintHojaRDefault(
         nro,
         token,
         tabla,
-        obtenerReporteJsReportUrl
+        datosFooter,
+        obtenerReporteUrl,
+        jasperModules,
+        "../../../../../jaspers/Ficha_Anexo2"
     );
 };
+// export const PrintHojaR = (nro, token, tabla) => {
+//     PrintHojaRJsReportDefault(
+//         nro,
+//         token,
+//         tabla,
+//         obtenerReporteJsReportUrl
+//     );
+// };
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
     VerifyTRPerzonalizado(
