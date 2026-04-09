@@ -111,14 +111,16 @@ import LaboratorioClinico_Digitalizado from "../AnalisisBioquimicos/LaboratorioC
 import Informe_Lab_hemoglobina from "../LaboratorioClinico/Informe_Lab_hemoglobina";
 import Informe_Lab_Eco from "../AnalisisBioquimicos/Informe_Lab_Eco";
 import Certificado_Aptitud_Herramientas_Manuales_Digitalizado from "../Poderosa/Certificado_Aptitud_Herramientas_Manuales_Digitalizado"; //Gr nuevo
+import PCRULTRASENSIBLE from "../AnalisisBioquimicos/PCRULTRASENSIBLE";
+import ETANOLSALIVA from "../Toxicologia/ETANOLSALIVA";
 
 export const reportesMap = {
    /* =========================
       GENERALES / BASE
    ========================= */
-   // anexo_agroindustrial: InformePsicologico_Anexo02_Nuevo,
+   anexo_agroindustrial: InformePsicologico_Anexo02_Nuevo,
 
-   // anexo7c: Anexo7C_Antiguo,
+   anexo7c: Anexo7C_Antiguo,
 
    anexo16a: {
       Anexo16A_Digitalizado,
@@ -130,12 +132,12 @@ export const reportesMap = {
       ficha_antecedente_patologico_boro
    },
 
-   // aptitud_medico_ocupacional_agro: Aptitud_AgroindustrialH,
+   aptitud_medico_ocupacional_agro: Aptitud_AgroindustrialH,
 
-   // certificado_aptitud_medico_ocupacional: {
-   //    Aptitud_medico_ocupacional_11,
-   //    Aptitud_medico_ocupacional_F
-   // }, //son 2 jaspers
+   certificado_aptitud_medico_ocupacional: {
+      Aptitud_medico_ocupacional_11,
+      Aptitud_medico_ocupacional_F
+   }, //son 2 jaspers
 
    certificado_aptitud_medico_resumen: Aptitud_medico_resumen_Digitalizado,
 
@@ -357,10 +359,14 @@ export const reportesMap = {
 
    psicologiafobias: formatPsicologia_Digitalizado,
 
-   // informe_psicologico: {
-   //    InformePsicologico_Digitalizado,
-   //    Informe_Psicologico_Boroo
-   // },
+   informe_psicologico: {
+      InformePsicologico_Digitalizado,
+      Informe_Psicologico_Boroo
+   },
+
+   etanol_saliva: ETANOLSALIVA,
+
+   pcr_ultrasensible: PCRULTRASENSIBLE,
 
    exam_complementarios: InformePsicoExamComplementario,
 

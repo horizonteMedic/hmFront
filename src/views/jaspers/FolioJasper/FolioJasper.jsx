@@ -37,13 +37,13 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "INTERCONSULTA 2",
         "INTERCONSULTA 3",
         "INTERCONSULTA 4",
-        "pcr_ultrasensible",
-        "etanol_saliva",
-        "aptitud_medico_ocupacional_agro",
-        "informe_psicologico",
-        "anexo_agroindustrial",
-        "anexo7c",
-        "certificado_aptitud_medico_ocupacional",
+        // "pcr_ultrasensible",
+        // "etanol_saliva",
+        // "aptitud_medico_ocupacional_agro",
+        // "informe_psicologico",
+        // "anexo_agroindustrial",
+        // "anexo7c",
+        // "certificado_aptitud_medico_ocupacional",
         "PRUEBA DE ESFUERZO",
         "RESMAG",
         "MERCURIO EN ORINA",
@@ -86,11 +86,12 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "oftalmologia2021",
         "antecedentes_patologicos",
         "informe_psicolaboral",
-        // "certificado_aptitud_medico_ocupacional",
+        "certificado_aptitud_medico_ocupacional",
         "audiometria_2023",
         "anexo16a",
         "ac_coproparasitologico",
-        "examen_inmunologico" //NUEVO
+        "examen_inmunologico", //NUEVO
+        "informe_psicologico"
     ]
 
     const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true && ex.imprimir === true);
@@ -452,7 +453,7 @@ async function subirArchivoPdfNode(bytes, nombreArchivo) {
         formData.append("archivo", blob, nombreArchivo);
 
         const response = await fetch(
-            "https://reportes.horizontemedic.com/backend/api/archivos",
+            "https://hmbackendreportes-h3a2bzc5dycgf4ba.centralus-01.azurewebsites.net/api/v1/archivos",
             {
                 method: "POST",
                 body: formData

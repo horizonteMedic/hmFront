@@ -67,6 +67,8 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
     testIshihara: String(data.vcoftalmologia_vc ?? ""),
     refPupilares: String(data.rpoftalmologia_rp ?? ""),
     enfermedadesOculares: String(data.enfermedadesocularesoftalmo_e_oculares ?? ""),
+    enfermedadesOculares2: String(data.enfermedadesocularesotrosoftalmo_e_oculares1 ?? ""),
+
     // Datos del usuario médico
     nombreUsuario: String(data.nombreUsuario ?? ""),
     apellidoUsuario: String(data.apellidoUsuario ?? ""),
@@ -225,10 +227,10 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
   doc.text(datosFinales.apellidosNombres || "", tablaInicioX + 40, yPos + 4);
 
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'S');
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text("Tipo de Examen:", tablaInicioX + 130, yPos + 4);
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(datosFinales.tipoExamen || "", tablaInicioX + 120 + 38, yPos + 4);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Tipo de Examen:", tablaInicioX + 130, yPos + 4);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.tipoExamen || "", tablaInicioX + 120 + 38, yPos + 4);
 
   yPos += filaAltura;
 
@@ -547,9 +549,10 @@ export default async function Ficha_interconsulta_Digitalizado(data = {}) {
     doc.text(textosBinocularLejos, tablaInicioX + anchoCol1 + anchoCol2 + anchoCol3 + 2, yFila2 + 3.5, { maxWidth: anchoCol4 - 4, align: "left" });
 
     // E. Oculares - Fila 2 (Lejos)
-    if (enfermedadesOculares && enfermedadesOculares.trim() !== "") {
+    const enfermedadesOculares2 = datosFinales.enfermedadesOculares2 || "";
+    if (enfermedadesOculares2 && enfermedadesOculares2.trim() !== "") {
       const maxAnchoEOculares = anchoCol5 - 4;
-      const lineasEOculares2 = doc.splitTextToSize(enfermedadesOculares, maxAnchoEOculares);
+      const lineasEOculares2 = doc.splitTextToSize(enfermedadesOculares2, maxAnchoEOculares);
       let yEOculares2 = yFila2 + 3.5;
       const limiteSuperiorY = yFila2 + alturaFilaComun - 1;
       lineasEOculares2.forEach((linea) => {

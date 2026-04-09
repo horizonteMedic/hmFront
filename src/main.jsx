@@ -50,6 +50,7 @@ import Ficha from "./views/jaspers/Oftalmologia/oftalmoJean/EvaluacionOftalmolog
 
 
 import useAppVersionChecker from "./views/hooks/useAppVersionChecker.jsx";
+import Valorizacion from "./views/admin/panel-de-control/Valorizacion/Valorizacion.jsx";
 // import * as pdfjsLib from "pdfjs-dist";
 
 // pdfjsLib.disableWorker = true;
@@ -136,6 +137,7 @@ const AppContent = () => {
           <Route path="/roles" element={<Roles />} />
           <Route path="/reporte-pacientes" element={<Reporte />} />
           <Route path="/matriz-postulante" element={<Matriz />} />
+          <Route path="/valorizacion" element={<Valorizacion />} />
           <Route path="/configuracion" element={<Configuracion />} />
           <Route path="/agregar-sede" element={<AgregarSede />} />
           <Route path="/agregar-campaña" element={<AgregarCampaña />} />

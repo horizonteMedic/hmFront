@@ -1,68 +1,69 @@
-import Swal from "sweetalert2"; 
+import Swal from "sweetalert2";
 import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
     LoadingDefault,
+    PrintHojaRDefault,
     PrintHojaRJsReportDefault,
     SubmitDataServiceDefault,
     VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
-
+import { getFetch } from "../../../../../../utils/apiHelpers";
 // CAMBIAR SOLO LAS URL
 const obtenerReporteUrl = "/api/v01/ct/pcrUltrasensible/obtenerReporte";
 const obtenerReporteJsReportUrl = "/api/v01/ct/pcrUltrasensible/descargarReporte";
 const registrarUrl = "/api/v01/ct/pcrUltrasensible/registrarActualizar";
 
 // ===================== GET INFO SERVICIO =====================
-export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {}) => {
-  const res = await GetInfoServicioDefault(
-    nro,
-    tabla,
-    token,
-    obtenerReporteUrl,
-    onFinish
-  );
+export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
+    const res = await GetInfoServicioDefault(
+        nro,
+        tabla,
+        token,
+        obtenerReporteUrl,
+        onFinish
+    );
 
-  console.log("Respuesta PCR Ultrasensible:", res);
+    console.log("Respuesta PCR Ultrasensible:", res);
 
-  if (res) {
-    set((prev) => ({
-      ...prev,
+    if (res) {
+        set((prev) => ({
+            ...prev,
 
-      // DATOS PRINCIPALES
-      norden: res.norden ?? "",
-      fecha: res.fechaExamen ?? "",
+            // DATOS PRINCIPALES
+            norden: res.norden ?? "",
+            fecha: res.fechaExamen ?? "",
 
-      nombres: res.nombres ?? "",
-      apellidos: res.apellidos ?? "",
-      dni: res.dniPaciente ?? "",
-      edad: res.edad ?? "",
+            nombres: res.nombres ?? "",
+            apellidos: res.apellidos ?? "",
+            dni: res.dniPaciente ?? "",
+            edad: res.edad ?? "",
 
-      fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-      lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-      sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
 
-      estadoCivil: res.estadoCivilPaciente ?? "",
-      nivelEstudios: res.nivelEstudioPaciente ?? "",
+            estadoCivil: res.estadoCivilPaciente ?? "",
+            nivelEstudios: res.nivelEstudioPaciente ?? "",
 
-      ocupacion: res.ocupacionPaciente ?? "",
-      cargoDesempenar: res.cargoPaciente ?? "",
-      area: res.areaPaciente ?? "",
+            ocupacion: res.ocupacionPaciente ?? "",
+            cargoDesempenar: res.cargoPaciente ?? "",
+            area: res.areaPaciente ?? "",
 
-      empresa: res.empresa ?? "",
-      contrata: res.contrata ?? "",
+            empresa: res.empresa ?? "",
+            contrata: res.contrata ?? "",
 
-      // EXAMEN
-    resultado: res.resultado ? parseFloat(res.resultado).toFixed(2) : "",      
-    tipoExamen: res.tipoExamen ?? "",
+            // EXAMEN
+            resultado: res.resultado ? parseFloat(res.resultado).toFixed(2) : "",
+            tipoExamen: res.tipoExamen ?? "",
 
-      // USUARIOS
-      user_medicoFirma: res.usuarioFirma ?? prev.user_medicoFirma,
-      user_doctorAsignado: res.doctorAsignado ?? "",
+            // USUARIOS
+            user_medicoFirma: res.usuarioFirma ?? prev.user_medicoFirma,
+            user_doctorAsignado: res.doctorAsignado ?? "",
 
-    }));
-  }
+        }));
+    }
 };
 
 // ===================== SUBMIT =====================
@@ -91,19 +92,42 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-      PrintHojaR(form.norden, token, tabla);
+        PrintHojaR(form.norden, token, tabla);
     });
 };
 
 // ===================== PRINT =====================
-export const PrintHojaR = (nro, token, tabla) => {
+/*export const PrintHojaR = (nro, token, tabla) => {
     PrintHojaRJsReportDefault(
-      nro,
-      token,
-      tabla,
-      obtenerReporteJsReportUrl
+        nro,
+        token,
+        tabla,
+        obtenerReporteJsReportUrl
     );
-};
+};*/
+
+
+export const PrintHojaR = (nro, token, tabla) => {
+    Loading('Cargando Formato a Imprimir')
+    getFetch(`/api/v01/ct/pcrUltrasensible/obtenerReporte?nOrden=${nro}&nameService=${tabla}&esJasper=true`, token)
+        .then(async (res) => {
+            if (res.norden) {
+                const nombre = "PCRULTRASENSIBLE";
+                console.log(nombre)
+                const jasperModules = import.meta.glob('../../../../../../jaspers/AnalisisBioquimicos/*.jsx');
+                const modulo = await jasperModules[`../../../../../../jaspers/AnalisisBioquimicos/${nombre}.jsx`]();
+                // Ejecuta la función exportada por default con los datos
+                if (typeof modulo.default === 'function') {
+                    modulo.default(res);
+                } else {
+                    console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+                }
+                Swal.close()
+            } else {
+                Swal.close()
+            }
+        })
+}
 
 // ===================== VERIFY (CORREGIDO PARA PCR ULTRASENSIBLE) =====================
 export const VerifyTR = async (nro, tabla, token, set, sede) => {

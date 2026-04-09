@@ -31,7 +31,7 @@ const ExamenesListCAMPANA = buildExamenesList([ // Campaña
     "ELECTROCARDIOGRAMA",            // 14
     "ESPIROMETRIA_ARCHIVO",          // 15
     "AUDIOMETRIA_OHLA",              // 16
-    "INFORME_PSICOLOGICO_JSREPORT",           // 17
+    "INFORME_PSICOLOGICO",           // 17
     "OFTALMOLOGIA",                  // 18
     "CONSENTIMIENTO_INFORMADO_EXAMEN_MEDICO_OCUPACIONAL",      // 19
     "DECLARACION_USO_FIRMA_ARCHIVO"                            // 20 nuevo
@@ -134,7 +134,7 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "TEST_FATIGA_SOMNOLENCIA",
 
     //PSICOLOGÍA
-    "INFORME_PSICOLOGICO_JSREPORT",
+    "INFORME_PSICOLOGICO",
     "PSICOLOGIA_ANEXO_02",
     "PSICOLOGIA_ANEXO_03",
     "INFORME_PODEROSA_OPERAR",
@@ -174,7 +174,7 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
 ]);
 
 const ExamenesListPsicologia = buildExamenesList([
-    "INFORME_PSICOLOGICO_JSREPORT",
+    "INFORME_PSICOLOGICO",
     "PSICOLOGIA_ANEXO_02",
     "PSICOLOGIA_ANEXO_03",
     "INFORME_PODEROSA_OPERAR",
@@ -769,7 +769,7 @@ const Folio = () => {
                             disabled={(form.listaExamenes?.filter(e => e.imprimir).length || 0) == 0}
                         >
                             Generar Folio Comprimido
-                        </button>
+                        </button> 
                     </div>
 
                     <div className="flex  justify-center md:justify-end  items-center w-full gap-4">
@@ -833,7 +833,7 @@ export default Folio;
 //     "PSICOLOGIA_ANEXO_02",                     // 29
 //     "ESTRES_FATIGA_SOMNOLENCIA_PSICOLOGIA",    // 30
 //     "CUESTIONARIO_BERLIN",                     // 31
-//     "INFORME_PSICOLOGICO_JSREPORT",                     // 32
+//     "INFORME_PSICOLOGICO",                     // 32
 //     "TRABAJO_ALTURA_PSICO",                    // 33
 //     "OFTALMOLOGIA",                            // 34
 //     "CONSENT_DECLARACION_APTITUD",             // 35

@@ -57,6 +57,13 @@ export default async function InformePsicologico_Digitalizado(data = {}, docExis
 
   const datosFinales = buildDatosFinales(data);
 
+  const empresasSinTest = [
+    'SERVICIO E INGENIERIA DEL ORIENTE S.A.C.',
+    'INGENIEROS CONSULTORES ER & JO S.A.C.',
+    'SERVICIO E INGENIERIA ELCIME SOCIEDAD ANONIMA CERRADA']
+
+  const esEmpresaSinTest = empresasSinTest.includes(datosFinales.empresa);
+
   // Header reutilizable (igual que otros formatos)
   const drawHeader = async (pageNumber) => {
     // Logo y membrete
@@ -342,7 +349,7 @@ export default async function InformePsicologico_Digitalizado(data = {}, docExis
   };
 
   // Subheader de área intelectual
-  yPos = dibujarSubHeaderCeleste("a.- Área Intelectual (Test de Inteligencia de Barranquilla/test de Otis Intermedia)", yPos, filaAltura);
+  yPos = dibujarSubHeaderCeleste(`a.- Área Intelectual ${esEmpresaSinTest ? "" : "(Test de Inteligencia de Barranquilla / test de Otis Intermedia)"}`, yPos, filaAltura);
 
   // Calcular altura dinámica para la lista de datos
   const calcularAlturaLista = (items, anchoMaximo) => {
@@ -409,7 +416,7 @@ export default async function InformePsicologico_Digitalizado(data = {}, docExis
   const cuerpo = datosFinales.cuerpo;
 
   // b. Personalidad
-  yPos = dibujarSubHeaderCeleste("b.- Área de Personalidad(Test de la figura humana de machover / Inventario Multifásico de personalidad)", yPos, filaAltura);
+  yPos = dibujarSubHeaderCeleste(`b.- Área de Personalidad ${esEmpresaSinTest ? "" : "(Test de la figura humana de machover / Inventario Multifásico de personalidad)"}`, yPos, filaAltura);
   const areaPersonalidad = cuerpo.areaPersonalidad || [];
   const alturaFilaPersonalidad = calcularAlturaLista(areaPersonalidad, anchoMaximoLista);
 
