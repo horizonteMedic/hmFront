@@ -157,7 +157,7 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
   });
 };
 
-/*export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
   Loading("Cargando Formato a Imprimir");
   getFetch(
     `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`,
@@ -187,16 +187,16 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
       Swal.close();
     }
   });
-};*/
-
-export const PrintHojaR = (nro, token, tabla) => {
-  PrintHojaRJsReportDefault(
-    nro,
-    token,
-    tabla,
-    obtenerReporteJsReportUrl
-  );
 };
+
+// export const PrintHojaR = (nro, token, tabla) => {
+//   PrintHojaRJsReportDefault(
+//     nro,
+//     token,
+//     tabla,
+//     obtenerReporteJsReportUrl
+//   );
+// };
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
   VerifyTRDefault(
