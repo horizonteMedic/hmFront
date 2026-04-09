@@ -8,6 +8,7 @@ import {
     VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
+import { getFetch } from "../../../../../../utils/apiHelpers";
 
 const obtenerReporteUrl = "/api/v01/ct/etanolSaliva/obtenerReporte";
 const obtenerReporteJsReportUrl = "/api/v01/ct/etanolSaliva/descargarReporte";
@@ -85,9 +86,31 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     });
 };
 
-export const PrintHojaR = (nro, token, tabla) => {
+/*export const PrintHojaR = (nro, token, tabla) => {
     PrintHojaRJsReportDefault(nro, token, tabla, obtenerReporteJsReportUrl);
-};
+};*/
+
+export const PrintHojaR = (nro, token, tabla) => {
+    Loading('Cargando Formato a Imprimir')
+    getFetch(`/api/v01/ct/etanolSaliva/obtenerReporte?nOrden=${nro}&nameService=${tabla}&esJasper=true`, token)
+        .then(async (res) => {
+            if (res.norden) {
+                const nombre = "ETANOLSALIVA";
+                console.log(nombre)
+                const jasperModules = import.meta.glob('../../../../../../jaspers/Toxicologia/*.jsx');
+                const modulo = await jasperModules[`../../../../../../jaspers/Toxicologia/${nombre}.jsx`]();
+                // Ejecuta la función exportada por default con los datos
+                if (typeof modulo.default === 'function') {
+                    modulo.default(res);
+                } else {
+                    console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+                }
+                Swal.close()
+            } else {
+                Swal.close()
+            }
+        })
+}
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
     VerifyTRDefault(
