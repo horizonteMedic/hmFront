@@ -2,6 +2,7 @@ import Swal from "sweetalert2";
 import {
     GetInfoServicioDefault,
     LoadingDefault,
+    PrintHojaRDefault,
     PrintHojaRJsReportDefault,
     SubmitDataServiceDefault,
 } from "../../../../../utils/functionUtils";
