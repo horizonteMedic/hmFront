@@ -152,14 +152,27 @@ export const SubmitDataService = async (
     });
 };
 
+// export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+//     PrintHojaRJsReportDefault(
+//         nro,
+//         token,
+//         tabla,
+//         obtenerReporteJsReportUrl
+//     );
+// }
+
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    PrintHojaRJsReportDefault(
+    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformePsicologico/*.jsx");
+    PrintHojaRDefault(
         nro,
         token,
         tabla,
-        obtenerReporteJsReportUrl
+        datosFooter,
+        obtenerReporteUrl,
+        jasperModules,
+        "../../../../../../jaspers/ModuloPsicologia/InformePsicologico"
     );
-}
+};
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
     VerifyTRDefault(
