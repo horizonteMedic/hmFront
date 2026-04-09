@@ -250,7 +250,7 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   // Lista de hábitos nocivos
   const habitosNocivos = [
     { name: 'Alcohol', si: datosFinales.alcohol_si, tipo: datosFinales.alcohol_tipo, cantidad: datosFinales.alcohol_cantidad_frecuencia },
-    { name: 'Tabaco', si: datosFinales.tabaco_si, tipo: datosFinales.tabaco_tipo, cantidad: datosFinales.tabaco_cantidad_frecuencia },
+    { name: 'Tabaco', si: datosFinales.tabaco_si, tipo: `${datosFinales.tabaco_si === true ? "CIGARRILLOS" : "-"}`, cantidad: datosFinales.tabaco_cantidad_frecuencia },
     { name: 'Drogas', si: datosFinales.drogas_si, tipo: datosFinales.drogas_tipo, cantidad: datosFinales.drogas_cantidad_frecuencia },
     { name: 'Medicamento', si: datosFinales.medicamento_si, tipo: datosFinales.medicamento_tipo, cantidad: datosFinales.medicamento_cantidad_frecuencia }
   ];

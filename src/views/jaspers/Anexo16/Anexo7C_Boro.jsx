@@ -413,7 +413,8 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     aptoParaTrabajar: {
       si: data.examenRadiograficoAptoSi_apto_si ?? false,
       no: data.examenRadiograficoAptoNo_apto_no ?? false,
-      revaluacionEmpresa: data.examenRadiograficoAptoRe_apto_re ?? false
+      revaluacionEmpresa: data.examenRadiograficoAptoRe_apto_re ?? false,
+      evaluado: data.evaluado ?? false,
     },
     // Conclusiones
     conclusiones: data.observacionesFichaMedicaAnexo7c_txtobservacionesfm ?? "",
@@ -3950,6 +3951,20 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     doc.rect(xCheckApto, checkboxAptoY, checkboxAptoSize, checkboxAptoSize);
     doc.text("Revaluación en empresa", xCheckApto + checkboxAptoSize + 1, yPos + 3.5);
     if (datosFinales.aptoParaTrabajar?.revaluacionEmpresa) {
+      doc.setFont("helvetica", "bold").setFontSize(7);
+      const textWidthX = doc.getTextWidth("X");
+      const xCenteredX = xCheckApto + (checkboxAptoSize / 2) - (textWidthX / 2);
+      const yCenteredX = checkboxAptoY + (checkboxAptoSize / 2) + 1;
+      doc.text("X", xCenteredX, yCenteredX);
+      doc.setFont("helvetica", "normal").setFontSize(7);
+    }
+
+    xCheckApto += checkboxAptoSize + 32;
+
+    // Checkbox EVALUADO en empresa
+    doc.rect(xCheckApto, checkboxAptoY, checkboxAptoSize, checkboxAptoSize);
+    doc.text("Evaluado", xCheckApto + checkboxAptoSize + 1, yPos + 3.5);
+    if (datosFinales.aptoParaTrabajar?.evaluado) {
       doc.setFont("helvetica", "bold").setFontSize(7);
       const textWidthX = doc.getTextWidth("X");
       const xCenteredX = xCheckApto + (checkboxAptoSize / 2) - (textWidthX / 2);

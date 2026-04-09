@@ -808,64 +808,63 @@ function imprimir(doc) {
   iframe.onload = () => iframe.contentWindow.print();
 }
 
-function footerTR(doc,datos) {
-   const pageHeight = doc.internal.pageSize.getHeight();
-   const pageWidth = doc.internal.pageSize.getWidth();
-   // Aumenta el margen inferior si hace falta (ej. 30 en lugar de 20)
+function footerTR(doc, datos) {
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  // Aumenta el margen inferior si hace falta (ej. 30 en lugar de 20)
   const marginBottom = 15; // default sin cambios
-   // Posición base para el footer
+  // Posición base para el footer
   const offsetY = Number((datos && typeof datos === 'object' ? datos.footerOffsetY : 0) ?? 0); // opcional
   const baseY = pageHeight - marginBottom + offsetY;
-   
+
   // Calcular el ancho total del contenido del footer para centrarlo
   const contenidoAncho = 180; // Ancho aproximado del contenido
   const inicioX = (pageWidth - contenidoAncho) / 2; // Centrar el contenido
 
-   // Línea divisora púrpura antes del footer (centrada)
+  // Línea divisora púrpura antes del footer (centrada)
   const lineY = baseY - 3.6; // 5mm antes del contenido del footer
-   doc.setDrawColor(52, 2, 153); // Color #340299 en RGB
-   doc.setLineWidth(0.5); // Grosor de la línea
-   doc.line(inicioX, lineY, inicioX + contenidoAncho, lineY); // Línea horizontal centrada
+  doc.setDrawColor(52, 2, 153); // Color #340299 en RGB
+  doc.setLineWidth(0.5); // Grosor de la línea
+  doc.line(inicioX, lineY, inicioX + contenidoAncho, lineY); // Línea horizontal centrada
 
   // Datos de prueba para el footer (si no se pasan datos)
   const defaultFooter = {
-     dir_tru_pierola: "- Sede Trujillo: Av. Nicolas de Piérola N°1106 Urb. San Fernando",
-     dir_huamachuco: "- Sede Huamachuco: Jr. Leoncio Prado N°786",
-     dir_huancayo: "- Sede Huancayo: Av. Huancavelica N°2225 - Distrito El Tambo",
-     dir_trujillo: "Cl.Guillermo Prescott N°127 Urb. Sto. Dominguito",
-     cel_trujillo_pie: "964385075",
-     cel_huamachuco: "990094744-969603777",
-     email_tru_pierola: "admision@horizontemedic.com",
-     email_huancayo: "admision.huancayo@horizontemedic.com",
-     telf_tru_pierola: "044-666120",
-     telf_huamachuco: "044-348070",
-     telf_huancayo: "064-659554"
-   };
+    dir_tru_pierola: "- Sede Trujillo: Av. Nicolas de Piérola N°1106 Urb. San Fernando",
+    dir_huamachuco: "- Sede Huamachuco: Jr. Leoncio Prado N°786",
+    dir_huancayo: "- Sede Huancayo: Av. Huancavelica N°2225 - Distrito El Tambo",
+    dir_trujillo: "Cl.Guillermo Prescott N°127 Urb. Sto. Dominguito",
+    cel_trujillo_pie: "964385075",
+    cel_huamachuco: "990094744-969603777",
+    email_tru_pierola: "admision@horizontemedic.com",
+    email_huancayo: "admision.huancayo@horizontemedic.com",
+    telf_tru_pierola: "044-666120",
+    telf_huamachuco: "044-348070",
+    telf_huancayo: "064-659554"
+  };
   const datosFooter = {
     ...defaultFooter,
     ...(datos && typeof datos === 'object' && datos.footerData ? datos.footerData : {})
   };
 
-   // Ajustamos la fuente a normal (no negrita) y color a negro
-   const fontSize = (datos && typeof datos === 'object' && datos.fontSize) ? datos.fontSize : 7;
-   doc.setFont("helvetica", "normal").setFontSize(fontSize);
-   doc.setTextColor(0, 0, 0);
- 
-   // Crear líneas de texto centradas
-   const lineas = [
-     `${datosFooter?.dir_tru_pierola || ""} Cel. ${datosFooter?.cel_trujillo_pie || ""} ${datosFooter?.email_tru_pierola || ""} Telf. ${datosFooter?.telf_tru_pierola || ""}`,
-     `${datosFooter?.dir_huamachuco || ""} Cel. ${datosFooter?.cel_huamachuco || ""} ${datosFooter?.email_huancayo || ""} Telf. ${datosFooter?.telf_huamachuco || ""}`,
-     `${datosFooter?.dir_huancayo || ""} Telf. ${datosFooter?.telf_huancayo || ""}`,
-     `${datosFooter?.dir_trujillo || ""} Telf. 044-767608`
-   ];
+  // Ajustamos la fuente a normal (no negrita) y color a negro
+  const fontSize = (datos && typeof datos === 'object' && datos.fontSize) ? datos.fontSize : 7;
+  doc.setFont("helvetica", "normal").setFontSize(fontSize);
+  doc.setTextColor(0, 0, 0);
 
-   // Dibujar cada línea centrada
-   let yPos = baseY;
-   lineas.forEach((linea) => {
-     if (linea.trim()) {
-       doc.text(linea, pageWidth / 2, yPos, { align: "center" });
-       yPos += 3;
-     }
-   });
- }
- 
+  // Crear líneas de texto centradas
+  const lineas = [
+    `${datosFooter?.dir_tru_pierola || ""} Cel. ${datosFooter?.cel_trujillo_pie || ""} ${datosFooter?.email_tru_pierola || ""} Telf. ${datosFooter?.telf_tru_pierola || ""}`,
+    `${datosFooter?.dir_huamachuco || ""} Cel. ${datosFooter?.cel_huamachuco || ""} ${datosFooter?.email_huancayo || ""} Telf. ${datosFooter?.telf_huamachuco || ""}`,
+    `${datosFooter?.dir_huancayo || ""} Telf. ${datosFooter?.telf_huancayo || ""}`,
+    `${datosFooter?.dir_trujillo || ""} Telf. 044-767608`
+  ];
+
+  // Dibujar cada línea centrada
+  let yPos = baseY;
+  lineas.forEach((linea) => {
+    if (linea.trim()) {
+      doc.text(linea, pageWidth / 2, yPos, { align: "center" });
+      yPos += 3;
+    }
+  });
+}
