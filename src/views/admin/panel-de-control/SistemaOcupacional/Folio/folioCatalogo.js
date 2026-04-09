@@ -205,18 +205,32 @@ export const EXAMENES_CATALOGO = {
         esArchivo: true,
     },
 
+    // PCR_ULTRASENSIBLE_JSREPORT: {
+    //     nombre: "PCR ULTRASENSIBLE",
+    //     tabla: "pcr_ultrasensible",
+    //     urlJsreport: "/api/v01/ct/pcrUltrasensible/descargarReporte",
+    //     esJsreport: true,
+    // },
+
     PCR_ULTRASENSIBLE_JSREPORT: {
         nombre: "PCR ULTRASENSIBLE",
         tabla: "pcr_ultrasensible",
-        urlJsreport: "/api/v01/ct/pcrUltrasensible/descargarReporte",
-        esJsreport: true,
+        url: "/api/v01/ct/pcrUltrasensible/obtenerReporte",
+        esJasper: true,
     },
 
+    // ETANOL_EN_SALIVA_JSREPORT: {
+    //     nombre: "ETANOL EN SALIVA",
+    //     tabla: "etanol_saliva",
+    //     urlJsreport: "/api/v01/ct/etanolSaliva/descargarReporte",
+    //     esJsreport: true,
+    // },
+    
     ETANOL_EN_SALIVA_JSREPORT: {
         nombre: "ETANOL EN SALIVA",
         tabla: "etanol_saliva",
-        urlJsreport: "/api/v01/ct/etanolSaliva/descargarReporte",
-        esJsreport: true,
+        url: "/api/v01/ct/etanolSaliva/obtenerReporte",
+        esJasper: true,
     },
 
     // CERTIFICADO_ANEXO_02: {
