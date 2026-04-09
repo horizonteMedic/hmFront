@@ -3,12 +3,14 @@ import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
     LoadingDefault,
+    PrintHojaRDefault,
     PrintHojaRJsReportDefault,
     SubmitDataServiceDefault,
     VerifyTRDefault,
 } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import { getHoraActual } from "../../../../../utils/helpers";
+import { getFetch } from "../../../../../utils/apiHelpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/hojaRutaEmo/obtenerReporteHojaRuta";
@@ -146,13 +148,54 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
     });
 };
 
-export const PrintHojaR = (nro, token, tabla) => {
-    PrintHojaRJsReportDefault(
-        nro,
-        token,
-        tabla,
-        obtenerReporteJsReportUrl
-    );
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+    // const jasperModules = import.meta.glob("../../../../../jaspers/Poderosa/*.jsx");
+    // PrintHojaRDefault(
+    //     nro,
+    //     token,
+    //     tabla,
+    //     datosFooter,
+    //     obtenerReporteUrl,
+    //     jasperModules,
+    //     "../../../../../jaspers/Poderosa"
+    // );
+    Loading('Cargando Formato a Imprimir')
+    getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`, token)
+        .then(async (res) => {
+            if (res.norden) {
+                const nombre = "HojaDeRutaEmo_Digitalizado";
+                console.log(nombre)
+                const jasperModules = import.meta.glob('../../../../../jaspers/Poderosa/*.jsx');
+                const modulo = await jasperModules[`../../../../../jaspers/Poderosa/${nombre}.jsx`]();
+                // Ejecuta la función exportada por default con los datos
+                if (typeof modulo.default === 'function') {
+                    modulo.default(res);
+                } else {
+                    console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+                }
+                Swal.close()
+            } else {
+                Swal.close()
+            }
+        })
+};
+
+export const PrintHojaRData = (datos, datosFooter) => {
+    const jasperModules = import.meta.glob("../../../../../jaspers/Poderosa/*.jsx");
+    // Simulamos una respuesta del servidor con los datos proporcionados
+    const res = { ...datos, ...datosFooter, nameJasper: "HojaDeRutaEmo_Digitalizado", norden: datos.norden };
+
+    // Buscamos el módulo manualmente
+    const rutaCompleta = `../../../../../jaspers/Poderosa/HojaDeRutaEmo_Digitalizado.jsx`;
+    const moduloFunc = jasperModules[rutaCompleta];
+
+    if (moduloFunc) {
+        moduloFunc().then(modulo => {
+            if (typeof modulo.default === "function") {
+                modulo.default(res, null);
+            }
+        });
+    }
 };
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
     VerifyTRDefault(
