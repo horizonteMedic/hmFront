@@ -453,7 +453,7 @@ async function subirArchivoPdfNode(bytes, nombreArchivo) {
         formData.append("archivo", blob, nombreArchivo);
 
         const response = await fetch(
-            "https://reportes.horizontemedic.com/backend/api/archivos",
+            "https://hmbackendreportes-h3a2bzc5dycgf4ba.centralus-01.azurewebsites.net/api/v1/archivos",
             {
                 method: "POST",
                 body: formData

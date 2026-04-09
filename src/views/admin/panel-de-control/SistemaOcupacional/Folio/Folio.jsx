@@ -763,13 +763,13 @@ const Folio = () => {
                         >
                             Generar Folio
                         </button>
-                        {/* <button
+                        <button
                             className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
                             onClick={() => handleGenerarFolio(true)}
                             disabled={(form.listaExamenes?.filter(e => e.imprimir).length || 0) == 0}
                         >
                             Generar Folio Comprimido
-                        </button> */}
+                        </button> 
                     </div>
 
                     <div className="flex  justify-center md:justify-end  items-center w-full gap-4">
