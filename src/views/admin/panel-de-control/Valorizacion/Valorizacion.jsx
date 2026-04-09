@@ -1,0 +1,1012 @@
+import React, { useEffect, useState } from 'react';
+import { saveAs } from 'file-saver';
+import { ComboboxEmpresa, ComboboxContrata, ComboboxSedes, RucEmpoCon } from './model/Combobox';
+import { GetMatrizUniversal } from './model/MatrizPOST';
+import Swal from 'sweetalert2';
+import { useAuthStore } from '../../../../store/auth';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFileExcel, faMagnifyingGlass, faChevronLeft, faChevronRight, faSyncAlt } from '@fortawesome/free-solid-svg-icons';
+import ExcelJS from 'exceljs';
+
+const MATRICES_MAP = {
+    "Matriz-1": { url: "api/v01/st/registros/matrizAdministrativa", method: "POST", name: "MATRIZ ADMINISTRATIVA" },
+    "Matriz-2": { url: "api/v01/st/registros/matrizSalud", method: "POST", name: "MATRIZ DE SALUD" },
+    "Matriz-3": { url: "api/v01/ct/archivos", method: "GET", name: "MATRIZ DE ARCHIVOS" },
+    "Matriz-4": { url: "api/v01/st/registros/matrizAdministrativaOhla", method: "POST", name: "MATRIZ ADMINISTRATIVA OHLA" },
+    "Matriz-5": { url: "api/v01/st/registros/matrizSaludOhla", method: "POST", name: "MATRIZ DE SALUD OHLA" },
+    "Matriz-6": { url: "api/v01/st/registros/matrizGeneral", method: "POST", name: "MATRIZ GENERAL" },
+    "Matriz-7": { url: "api/v01/st/registros/matrizOhlaGestor", method: "POST", name: "MATRIZ GESTOR OHLA" },
+    "Matriz-8": { url: "api/v01/st/registros/matrizOhlaConstruccion", method: "POST", name: "MATRIZ CONSTRUCCION OHLA" },
+    "Matriz-9": { urlH: "/api/headers/arena", methodH: "GET", urlB: "api/v01/st/registros/matrizArena2026", methodB: "POST", name: "MATRIZ LA ARENA" },
+    "Matriz-10": { urlH: "/api/headers/poderosa", methodH: "GET", urlB: "api/v01/st/registros/matrizPoderosa2026", methodB: "POST", name: "REPORTE CONSOLIDADO ATENCIONES DIARIAS - PODEROSA" },
+    "Matriz-11": { urlH: "api/headers/caraveli-2026", methodH: "GET", urlB: "api/v01/st/registros/matrizCaraveli2026", methodB: "POST", name: "MATRIZ COMPAÑIA MINERA CARAVELI" },
+    "Matriz-12": { urlH: "/api/headers/proseguridad/plantilla", method: "GET", urlB: "api/v01/st/registros/matrizProseguridadAsistencia2026", methodB: "POST", name: "PLANILLA ASISTENCIA PROSEGURIDAD" },
+    "Matriz-13": { urlH: "/api/headers/proseguridad", methodH: "GET", urlB: "api/v01/st/registros/matrizProseguridad2026", methodB: "POST", name: "MATRIZ SALUD PROSEGURIDAD" },
+    "Matriz-14": { urlH: "/api/headers/pacifico-vida", methodH: "GET", urlB: "api/v01/st/registros/matrizPacificoVida2026", methodB: "POST", name: "REPORTE CONSOLIDAD-PACIFICO VIDA - PODEROSA" },
+    "Matriz-15": { urlH: "api/headers/boroo", methodH: "GET", urlB: "api/v01/st/registros/matrizBoroo2026", methodB: "POST", name: "MATRIZ MINERA BOROO MISQUICHILCA" },
+    "Matriz-16": { urlH: "/api/headers/trabajos-altura", methodH: "GET", urlB: "api/v01/st/registros/matrizPoderosaAltura2026", methodB: "POST", name: "REPORTE DE TRABAJOS EN ALTURA - PODEROSA" },
+    "Matriz-17": { url: "/api/v01/st/registros/matrizHuancayo2026", method: "POST", name: "MATRIZ HUANCAYO" },
+
+};
+
+const Valorizacion = () => {
+    const token = useAuthStore(state => state.token);
+    const userlogued = useAuthStore(state => state.userlogued);
+    const EmpresasMulti = ComboboxEmpresa()
+    const ContrataMulti = ComboboxContrata()
+    //ACCESOS
+    const Acceso = useAuthStore(state => state.listAccesos);
+    const tienePermisoEnVista = (nombreVista, permiso) => {
+        const vista = Acceso.find(item => item.nombre === nombreVista);
+        return vista?.listaPermisos.includes(permiso) ?? false;
+    };
+
+    const [loading, setLoading] = useState(false);
+    const [EmpresaUser, setEmpresaUser] = useState([])
+    const [ContrataUser, setContrataUser] = useState([])
+
+    const [datos, setDatos] = useState({
+        rucContrata: '',
+        rucEmpresa: '',
+        razonEmpresa: '',
+        razonContrata: '',
+        fechaInicio: '',
+        fechaFinal: '',
+        sede: '',
+        tipoPago: '',
+        matrizSeleccionada: '', // Agrega este estado para controlar la selección de matriz
+    });
+    const [data, setData] = useState([]);
+    const [head, setHeaders] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [recordsPerPage, setRecordsPerPage] = useState(15);
+    const [reload, setReload] = useState(0); // Estado para controlar la recarga de la tabla
+    const [exportButtonEnabled, setExportButtonEnabled] = useState(false);
+
+    const today = new Date().toLocaleDateString('en-CA');
+    const Sedes = ComboboxSedes();
+
+    // Autocompletado Empresa
+    const [searchEmpresa, setSearchEmpresa] = useState(datos.razonEmpresa);
+    const [filteredEmpresas, setFilteredEmpresas] = useState([]);
+
+    const handleEmpresaSearch = e => {
+        const v = e.target.value.toUpperCase();
+
+        if (v === "") {
+            setDatos(d => ({ ...d, razonEmpresa: "" }));
+        }
+        setDatos(d => ({ ...d, razonEmpresa: v }))
+        setSearchEmpresa(v);
+        setFilteredEmpresas(
+            v
+                ? EmpresasMulti.filter(emp =>
+                    emp.razonSocial.toLowerCase().includes(v.toLowerCase())
+                )
+                : []
+        );
+    };
+
+    const handleSelectEmpresa = emp => {
+        setSearchEmpresa(emp.razonSocial);
+        setDatos(d => ({ ...d, razonEmpresa: emp.razonSocial, rucEmpresa: emp.ruc }));
+        setFilteredEmpresas([]);
+        // mueve el foco al siguiente campo Contrata
+    };
+    //FIN AUTOCOMPLETADO EMPRESA
+    const [searchContrata, setSearchContrata] = useState(datos.razonContrata);
+    const [filteredContratas, setFilteredContratas] = useState([]);
+
+    const handleContrataSearch = e => {
+        const v = e.target.value.toUpperCase();
+        if (v === "") {
+            setDatos(d => ({ ...d, razonContrata: "" }));
+        }
+        setDatos(d => ({ ...d, razonContrata: v }))
+        setSearchContrata(v);
+        setFilteredContratas(
+            v
+                ? ContrataMulti.filter(c =>
+                    c.razonSocial.toLowerCase().includes(v.toLowerCase())
+                )
+                : []
+        );
+    };
+
+    const handleSelectContrata = c => {
+        setSearchContrata(c.razonSocial);
+        setDatos(d => ({ ...d, razonContrata: c.razonSocial, rucContrata: c.ruc }));
+        setFilteredContratas([]);
+        document.getElementById('n_medico')?.focus();
+    };
+    //AUCOMPLETADO CONTRATA
+
+    useEffect(() => {
+        if (data.length > 0) {
+            setExportButtonEnabled(true);
+        } else {
+            setExportButtonEnabled(false);
+        }
+    }, [data]);
+
+    useEffect(() => {
+        if (today) {
+            setDatos(prevDatos => ({
+                ...prevDatos,
+                fechaInicio: today,
+                fechaFinal: today,
+            }));
+        }
+    }, [today]);
+
+    useEffect(() => {
+        const SedeDefiner = Sedes.find(sedes => sedes.cod_sede === 'T-NP');
+
+        if (SedeDefiner) {
+            setDatos(prevDatos => ({
+                ...prevDatos,
+                sede: SedeDefiner
+            }));
+        }
+    }, [Sedes]);
+
+    const handleChange = (e) => {
+        const { name } = e.target;
+        const selectedOption = JSON.parse(e.target.value);
+        setDatos({
+            ...datos,
+            [name]: selectedOption,
+        });
+    };
+
+    const SubmitAPI = async () => {
+
+        if (!datos.matrizSeleccionada || datos.matrizSeleccionada === "") {
+            setData([]);
+            return;
+        }
+
+        setLoading(true);
+        const datosapi = {
+            rucContrata: datos.rucContrata,
+            rucEmpresa: datos.rucEmpresa,
+            fechaInicio: datos.fechaInicio,
+            fechaFinal: datos.fechaFinal,
+            sede: datos.sede.cod_sede
+        };
+
+        try {
+            const config = MATRICES_MAP[datos.matrizSeleccionada];
+            if (!config) {
+                setLoading(false);
+                return;
+            }
+            const isMatrizArena = datos.matrizSeleccionada === "Matriz-9";
+            const isMatrizCaraveli = datos.matrizSeleccionada === "Matriz-11";
+
+            if (config.urlH) {
+
+                const { urlH, methodH, urlB, methodB } = config;
+
+                const [headersResponse, bodyResponse] = await Promise.all([
+                    GetMatrizUniversal(null, { url: urlH, method: methodH }, token),
+                    GetMatrizUniversal(datosapi, { url: urlB, method: methodB }, token)
+                ]);
+
+                if (!Array.isArray(headersResponse) || !Array.isArray(bodyResponse)) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "Ocurrió un error al traer la Matriz"
+                    });
+                    return;
+                }
+
+                let processedBody = bodyResponse;
+
+                // 🔥 SOLO MATRIZ 9
+                if (isMatrizArena || isMatrizCaraveli) {
+                    processedBody = bodyResponse.map(item => ({
+                        ...item,
+                        responsable_digitalizacion: userlogued.datos.nombres_user.toUpperCase()
+                    }));
+                }
+
+                setHeaders(headersResponse);
+                setData(processedBody);
+
+            } else {
+                const response = await GetMatrizUniversal(
+                    datosapi,
+                    { url: config.url, method: config.method },
+                    token
+                );
+
+                if (!Array.isArray(response)) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "Ocurrió un error al traer la Matriz"
+                    });
+                }
+
+                setData(response);
+
+                // 🔥 Generar columnas automáticamente
+                if (response.length > 0) {
+                    const autoHeaders = Object.keys(response[0]).map(key => ({
+                        field: key,
+                        headerName: key.toUpperCase()
+                    }));
+
+                    setHeaders(autoHeaders);
+                } else {
+                    setHeaders([]);
+                }
+            }
+
+        } catch (error) {
+
+            Swal.fire({
+                icon: "error",
+                title: "Ocurrió un error al traer la Matriz",
+                text: "No hay datos que mostrar",
+            });
+
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleRUCEmpresa = (e) => {
+        //una para empresa
+        const selectedRuc = e.target.value;
+        const empresaSeleccionada = EmpresaUser.find(empresa => empresa.ruc === selectedRuc);
+        if (empresaSeleccionada) {
+            setDatos(prevDatos => ({
+                ...prevDatos,
+                rucContrata: null,
+                rucEmpresa: empresaSeleccionada.ruc,
+            }))
+            return
+        }
+        const contrataSeleccionada = ContrataUser.find(contrata => contrata.ruc === selectedRuc);
+
+        if (contrataSeleccionada) {
+            setDatos(prevDatos => ({
+                ...prevDatos,
+                rucContrata: contrataSeleccionada.ruc,
+                rucEmpresa: null,
+            }))
+        }
+
+        //otra para contrata
+    }
+
+    useEffect(() => {
+        if (reload > 0) {
+            SubmitAPI(); // Llama a la función SubmitAPI para recargar los datos
+            setReload(0); // Reinicia el estado reload para evitar múltiples recargas
+        }
+    }, [reload]);
+
+
+    const exportToExcel2 = async () => {
+        const config = MATRICES_MAP[datos.matrizSeleccionada];
+        const trabajadores = data || [];
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Reporte");
+        const isMatrizSaludProseguridad = datos.matrizSeleccionada === "Matriz-13";
+        const isMatriz17 = datos.matrizSeleccionada === "Matriz-17";
+
+        const columnasOjo = ["od", "oi", "od lejos", "oi lejos"];
+        const esColumnaOjo = (text) =>
+            columnasOjo.includes(String(text).toLowerCase().trim());
+
+        const borderStyle = {
+            top: { style: "thin" },
+            left: { style: "thin" },
+            bottom: { style: "thin" },
+            right: { style: "thin" }
+        };
+
+        // ============================================
+        // 🔍 SI NO HAY HEADERS DINÁMICOS (MODO PLANO)
+        // ============================================
+        if (!head || head.length === 0 || !head[0]?.children) {
+
+            if (trabajadores.length === 0) return;
+
+
+            // 🔎 Detectar si head viene estructurado
+            const hasStructuredHead = head && head.length > 0;
+
+            const columns = hasStructuredHead
+                ? head
+                : Object.keys(trabajadores[0]).map(key => ({
+                    label: key,
+                    field: key
+                }));
+
+            // 1️⃣ HEADER SIMPLE
+            columns.forEach((col, index) => {
+
+                const cell = worksheet.getRow(1).getCell(index + 1);
+
+                const headerName = col.label ?? col.field ?? "";
+                cell.value = headerName;
+
+                let fontColor;
+                let bgColor;
+
+                // 🔵 PRIORIDAD: MATRIZ 17
+                if (isMatriz17) {
+                    fontColor = { argb: "FFFFFFFF" }; // blanco
+                    bgColor = "FF000080"; // azul oscuro (#000080)
+                }
+
+                // 🟡 MATRIZ 13
+                else if (isMatrizSaludProseguridad) {
+                    fontColor = esColumnaOjo(headerName)
+                        ? { argb: "FF000000" } // negro
+                        : { argb: "FFFFC000" }; // amarillo
+
+                    bgColor = col.color
+                        ? "FF" + col.color.replace("#", "")
+                        : "FFFFFFFF";
+                }
+
+                // ⚪ DEFAULT
+                else {
+                    fontColor = undefined;
+                    bgColor = col.color
+                        ? "FF" + col.color.replace("#", "")
+                        : "FFFFFFFF";
+                }
+
+                // 🎨 FONT
+                cell.font = {
+                    bold: true,
+                    ...(fontColor && { color: fontColor })
+                };
+
+                // 🎨 FILL
+                cell.fill = {
+                    type: "pattern",
+                    pattern: "solid",
+                    fgColor: { argb: bgColor }
+                };
+
+                cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+                cell.border = borderStyle;
+            });
+
+            // 2️⃣ DATA
+            let rowIndex = 2;
+
+            trabajadores.forEach(item => {
+
+                const row = worksheet.getRow(rowIndex);
+
+                columns.forEach((col, colIndex) => {
+
+                    const cell = row.getCell(colIndex + 1);
+
+                    cell.value = item[col.field] ?? "";
+                    cell.border = borderStyle;
+                    cell.alignment = { horizontal: "center", vertical: "middle" };
+                });
+
+                rowIndex++;
+            });
+
+            worksheet.columns.forEach(col => col.width = 18);
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            saveAs(new Blob([buffer]), `${config.name}.xlsx`);
+
+            return;
+        }
+
+        // ============================================
+        // 🔥 MODO JERÁRQUICO (CON ESTRUCTURA)
+        // ============================================
+        const estructura = head;
+
+        const getMaxDepth = (nodes, level = 1) =>
+            Math.max(...nodes.map(n =>
+                n.children?.length
+                    ? getMaxDepth(n.children, level + 1)
+                    : level
+            ));
+
+        const maxDepth = getMaxDepth(estructura);
+
+        const countLeaves = (node) =>
+            !node.children?.length
+                ? 1
+                : node.children.reduce((sum, child) => sum + countLeaves(child), 0);
+
+        const generateHeader = (nodes, level, startCol) => {
+
+            let currentCol = startCol;
+
+            nodes.forEach(node => {
+
+                const span = countLeaves(node);
+                const colStart = currentCol;
+                const colEnd = currentCol + span - 1;
+
+                const cell = worksheet.getRow(level).getCell(colStart);
+                cell.value = node.label ?? "";
+                cell.font = { bold: true };
+                cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+                cell.border = borderStyle;
+
+                // 🎨 Pintar SOLO si tiene color
+                if (node.color) {
+                    cell.fill = {
+                        type: "pattern",
+                        pattern: "solid",
+                        fgColor: { argb: node.color.replace("#", "") }
+                    };
+                }
+
+                if (span > 1) {
+                    worksheet.mergeCells(level, colStart, level, colEnd);
+                }
+
+                if (!node.children?.length && level < maxDepth) {
+                    worksheet.mergeCells(level, colStart, maxDepth, colStart);
+                }
+
+                if (node.children?.length) {
+                    generateHeader(node.children, level + 1, colStart);
+                }
+
+                currentCol += span;
+            });
+        };
+
+        generateHeader(estructura, 1, 1);
+
+        // Extraer hojas
+        const fields = [];
+
+        const extractFields = (nodes) => {
+            nodes.forEach(n => {
+                if (!n.children?.length) {
+                    fields.push(n.field);
+                } else {
+                    extractFields(n.children);
+                }
+            });
+        };
+
+        extractFields(estructura);
+
+        let dataStartRow = maxDepth + 1;
+
+        trabajadores.forEach(item => {
+
+            const row = worksheet.getRow(dataStartRow);
+
+            fields.forEach((field, colIndex) => {
+
+                const cell = row.getCell(colIndex + 1);
+                const valor = item[field] ?? "";
+                cell.value = valor;
+
+                if (datos.matrizSeleccionada === "Matriz-9" && field.toLowerCase() === "condicion") {
+
+                    const normalized = String(valor).toLowerCase().trim();
+
+                    if (normalized === "no apto") {
+                        cell.fill = {
+                            type: "pattern",
+                            pattern: "solid",
+                            fgColor: { argb: "FFFF0000" }
+                        };
+                        cell.font = {
+                            bold: true,
+                            color: { argb: "FFFFFFFF" }
+                        };
+                    }
+
+                    if (normalized === "apto") {
+                        cell.fill = {
+                            type: "pattern",
+                            pattern: "solid",
+                            fgColor: { argb: "FF00B050" }
+                        };
+                        cell.font = {
+                            bold: true,
+                            color: { argb: "FFFFFFFF" }
+                        };
+                    }
+
+                    if (normalized === "evaluado") {
+                        cell.fill = {
+                            type: "pattern",
+                            pattern: "solid",
+                            fgColor: { argb: "FF00B050" }
+                        };
+                        cell.font = {
+                            bold: true,
+                            color: { argb: "FFFFFFFF" }
+                        };
+                    }
+                }
+                cell.border = borderStyle;
+                cell.alignment = { horizontal: "center", vertical: "middle" };
+
+            });
+
+            dataStartRow++;
+        });
+
+        worksheet.columns.forEach(col => col.width = 18);
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        saveAs(new Blob([buffer]), `${config.name}.xlsx`);
+    };
+
+    const flattenTree = (nodes, level = 0, parentLabel = null, result = []) => {
+        nodes.forEach(node => {
+            result.push({
+                label: node.label,
+                field: node.field,
+                color: node.color,
+                level,
+                parentLabel
+            });
+
+            if (node.children && node.children.length > 0) {
+                flattenTree(node.children, level + 1, node.label, result);
+            }
+        });
+
+        return result;
+    };
+
+
+    const reloadTable = () => {
+        if (datos.matrizSeleccionada === "") {
+            setData([]);
+            return;
+        }
+        setReload(reload + 1);
+    };
+
+    // Paginación
+    const visiblePages = () => {
+        const totalVisiblePages = 5;
+        const halfVisiblePages = Math.floor(totalVisiblePages / 2);
+        let startPage = currentPage - halfVisiblePages;
+        startPage = Math.max(startPage, 1);
+        const endPage = startPage + totalVisiblePages - 1;
+        return Array.from({ length: totalVisiblePages }, (_, i) => startPage + i).filter(page => page <= totalPages);
+    };
+
+    const handlePageClick = (page) => {
+        setCurrentPage(page);
+    };
+
+    const handleChangeRecordsPerPage = (e) => {
+        setRecordsPerPage(parseInt(e.target.value));
+        setCurrentPage(1);
+        setTotalPages(Math.ceil(data.length / parseInt(e.target.value)));
+    };
+
+    const startIdx = (currentPage - 1) * recordsPerPage;
+    const endIdx = startIdx + recordsPerPage;
+    const currentData = Array.isArray(data) ? data.slice(startIdx, endIdx) : [];
+    const isHierarchical =
+        head &&
+        head.length > 0 &&
+        head[0]?.children &&
+        head[0].children.length > 0;
+
+    const getMaxDepth = (nodes, level = 1) =>
+        Math.max(
+            ...nodes.map(n =>
+                n.children?.length
+                    ? getMaxDepth(n.children, level + 1)
+                    : level
+            )
+        );
+
+    const countLeaves = (node) =>
+        !node.children?.length
+            ? 1
+            : node.children.reduce((sum, child) => sum + countLeaves(child), 0);
+
+    const extractLeaves = (nodes, result = []) => {
+        nodes.forEach(n => {
+            if (!n.children?.length) {
+                result.push(n.field);
+            } else {
+                extractLeaves(n.children, result);
+            }
+        });
+        return result;
+    };
+
+    const getCellStyle = (field, item) => {
+        if (datos.matrizSeleccionada !== "Matriz-9") return "";
+
+        const fieldName = typeof field === "string" ? field : field?.field;
+        if (!fieldName || fieldName.toLowerCase() !== "condicion") return "";
+
+        const value = typeof item?.[fieldName] === "string"
+            ? item[fieldName].toLowerCase().trim()
+            : "";
+
+        if (value === "no apto") return "bg-[#FF0000] text-white font-bold";
+        if (value === "apto") return "bg-[#47D359] text-white font-bold";
+
+        return "";
+    };
+
+    const isMatrizSaludProseguridad = datos.matrizSeleccionada === "Matriz-13"
+    const isMatriz17 = datos.matrizSeleccionada === "Matriz-17";
+
+    //PARA MATRIZ DE PROSEGURIDAD
+    const columnasOjo = ["OD", "OI", "OD LEJOS", "OI LEJOS"];
+    return (
+        <div className="container mx-auto mt-12 mb-12">
+            <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
+                <div className="px-4 py-2 azuloscurobackground flex justify-between">
+                    <h1 className="text-start font-bold color-azul text-white">Valorizacion</h1>
+                    <div className="flex items-center gap-4">
+                        {/*<button
+                            onClick={exportToExcel2}
+                            className={`verde-btn px-4 py-1 rounded-md ${exportButtonEnabled ? '' : 'cursor-not-allowed opacity-50'}`}
+                            disabled={!exportButtonEnabled}
+                        >
+                            <FontAwesomeIcon icon={faFileExcel} className="mr-2" />
+                            Exportar a Excel
+                        </button>*/}
+                        <div className="flex items-center">
+                            <span className="ml-2 text-white mr-1">Resultados por página</span>
+                            <select
+                                className="border pointer border-gray-300 rounded-md px-1"
+                                value={recordsPerPage}
+                                onChange={handleChangeRecordsPerPage}
+                            >
+                                <option value={5}>5</option>
+                                <option value={10}>10</option>
+                                <option value={15}>15</option>
+                                <option value={20}>20</option>
+                                <option value={25}>25</option>
+                            </select>
+                        </div>
+                        <button onClick={reloadTable} className="focus:outline-none relative">
+                            {loading && <div className="absolute inset-0 opacity-50 rounded-md"></div>}
+                            <FontAwesomeIcon icon={faSyncAlt} className={`text-white cursor-pointer tamañouno ${loading ? 'opacity-50' : ''}`} />
+                        </button>
+                    </div>
+                </div>
+                {/* filtros */}
+                <div className="flex w-full flex-grow p-6 pb-0 gap-4">
+                    <div className='flex w-[50%] justify-center items-center gap-2'>
+                        <p className="font-semibold">Empresa:</p>
+                        <div className="relative flex-grow flex items-center">
+                            <input autoComplete="off"
+                                id="razonEmpresa"
+                                name="razonEmpresa"
+                                type="text"
+                                value={searchEmpresa}
+                                placeholder="Escribe para buscar empresa..."
+                                onChange={handleEmpresaSearch}
+                                className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full `}
+                                onKeyDown={e => {
+                                    if (e.key === 'Enter' && filteredEmpresas.length > 0) {
+                                        e.preventDefault();
+                                        handleSelectEmpresa(filteredEmpresas[0]);
+                                    }
+                                }}
+                                onFocus={() => {
+                                    if (searchEmpresa) {
+                                        setFilteredEmpresas(
+                                            EmpresasMulti.filter(emp =>
+                                                emp.mensaje.toLowerCase().includes(searchEmpresa.toLowerCase())
+                                            )
+                                        );
+                                    }
+                                }}
+                                onBlur={() => setTimeout(() => setFilteredEmpresas([]), 100)}
+                            />
+                            {searchEmpresa && filteredEmpresas.length > 0 && (
+                                <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                                    {filteredEmpresas.map(emp => (
+                                        <li
+                                            key={emp.id}
+                                            className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                                            onMouseDown={() => handleSelectEmpresa(emp)}
+                                        >
+                                            {emp.razonSocial}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                    </div>
+                    <div className='flex w-[50%] justify-center items-center gap-2'>
+                        <p className="font-semibold">Contrata:</p>
+                        <div className="relative flex-grow flex items-center">
+                            <input autoComplete="off"
+                                id="razonEmpresa"
+                                name="razonEmpresa"
+                                type="text"
+                                value={searchContrata}
+                                placeholder="Escribe para buscar empresa..."
+                                onChange={handleContrataSearch}
+                                className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full `}
+                                onKeyDown={e => {
+                                    if (e.key === 'Enter' && filteredContratas.length > 0) {
+                                        e.preventDefault();
+                                        handleSelectContrata(filteredContratas[0]);
+                                    }
+                                }}
+                                onFocus={() => {
+                                    if (searchContrata) {
+                                        setFilteredContratas(
+                                            EmpresasMulti.filter(emp =>
+                                                emp.razonSocial.toLowerCase().includes(searchEmpresa.toLowerCase())
+                                            )
+                                        );
+                                    }
+                                }}
+                                onBlur={() => setTimeout(() => setFilteredEmpresas([]), 100)}
+                            />
+                            {searchContrata && filteredContratas.length > 0 && (
+                                <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                                    {filteredContratas.map(emp => (
+                                        <li
+                                            key={emp.id}
+                                            className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                                            onMouseDown={() => handleSelectContrata(emp)}
+                                        >
+                                            {emp.razonSocial}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                    </div>
+                </div>
+                <div className="flex flex-wrap gap-4 p-6">
+                    <div className="flex flex-col flex-grow">
+                        <p className="font-semibold">Sede</p>
+                        <select
+                            value={datos.sede ? JSON.stringify(datos.sede) : ''}
+                            onChange={handleChange}
+                            name='sede'
+                            className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
+                        >
+                            <option value="">Seleccionar Sede</option>
+                            {Sedes.map((option) => (
+                                <option key={option.cod_sede} value={JSON.stringify(option)}>{option.nombre_sede}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="flex flex-col flex-grow">
+                        <p className="font-semibold">Fecha Inicio</p>
+                        <input
+                            type="date"
+                            id="fechaInicio"
+                            name="fechaInicio"
+                            value={datos.fechaInicio}
+                            onChange={(e) => setDatos({
+                                ...datos,
+                                fechaInicio: e.target.value,
+                            })}
+                            className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
+                        />
+                    </div>
+                    <div className="flex flex-col flex-grow">
+                        <p className="font-semibold">Fecha Fin</p>
+
+                        <input
+                            type="date"
+                            id="fechaFin"
+                            name="fechaFinal"
+                            value={datos.fechaFinal}
+                            onChange={(e) => setDatos({
+                                ...datos,
+                                fechaFinal: e.target.value,
+                            })}
+                            className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
+                        />
+                    </div>
+                    <div className="flex flex-col flex-grow">
+                        <p className="font-semibold">Tipo de Pago</p>
+                        <select
+                            name='tipoPago'
+                            value={datos.tipoPago}
+                            onChange={(e) => {
+                                setDatos(prevDatos => ({
+                                    ...prevDatos,
+                                    tipoPago: e.target.value
+                                }));
+                            }}
+                            className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
+                        >
+                            <option value="">Seleccionar...</option>
+                            <option value="EFECTIVO">EFECTIVO</option>
+                            <option value="CREDITO">CREDITO</option>
+                        </select>
+                    </div>
+                    <div className="flex flex-col flex-grow justify-end">
+                        <button
+                            onClick={SubmitAPI}
+                            className={`bg-blue-900 mt-4 text-white px-4 py-2 rounded-md  ${datos.matrizSeleccionada && (datos.rucContrata || datos.rucEmpresa) ? '' : 'opacity-50 cursor-not-allowed'}`}
+                            disabled={!datos.matrizSeleccionada || loading || (!datos.rucContrata && !datos.rucEmpresa) ||
+                                (datos.rucContrata === "" && datos.rucEmpresa === "")}
+                        >
+                            <FontAwesomeIcon icon={faMagnifyingGlass} className="mr-2" />
+                            Buscar Matriz
+                        </button>
+                    </div>
+                </div>
+                {/* Tabla de datos */}
+                <div className="overflow-x-auto p-3 relative">
+                    {loading && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
+                            <p className="text-xl font-semibold">Cargando...</p>
+                        </div>
+                    )}
+                    {loading || (
+                        <table className="w-full border border-gray-300">
+                            <thead>
+                                {isHierarchical ? (
+                                    (() => {
+                                        const maxDepth = getMaxDepth(head);
+                                        const rows = Array.from({ length: maxDepth }, () => []);
+
+
+                                        const generate = (nodes, level) => {
+                                            nodes.forEach(node => {
+                                                const colSpan = countLeaves(node);
+                                                const rowSpan = node.children?.length ? 1 : maxDepth - level + 1;
+
+                                                rows[level - 1].push({
+                                                    label: node.label,
+                                                    colSpan,
+                                                    rowSpan,
+                                                    color: node.color
+                                                });
+                                                if (node.children?.length) {
+                                                    generate(node.children, level + 1);
+                                                }
+                                            });
+                                        };
+
+                                        generate(head, 1);
+
+                                        return rows.map((row, rowIndex) => (
+                                            <tr key={rowIndex}>
+                                                {row.map((cell, i) => (
+                                                    <th
+                                                        key={i}
+                                                        colSpan={cell.colSpan}
+                                                        rowSpan={cell.rowSpan}
+                                                        className={`border border-gray-300 px-4 py-2 text-center font-bold ${isMatrizSaludProseguridad ? "text-[#FFC000]" : ""}`}
+                                                        style={{
+                                                            backgroundColor: cell.color || undefined
+                                                        }}
+                                                    >
+                                                        {cell.label}
+                                                    </th>
+                                                ))}
+                                            </tr>
+                                        ));
+                                    })()
+                                ) : (
+                                    <tr>
+                                        {(head?.length > 0
+                                            ? head
+                                            : Object.keys(currentData?.[0] || {})
+                                        ).map((column, i) => (
+
+                                            <th
+                                                key={i}
+                                                style={{
+                                                    backgroundColor: column.color || undefined
+                                                }}
+                                                className={`border border-gray-300 px-4 py-2 text-center font-bold ${isMatrizSaludProseguridad &&
+                                                    !columnasOjo.includes(column.field)
+                                                    ? "text-[#FFC000]"
+                                                    : "text-black"
+                                                    } ${isMatriz17 ? "text-white bg-[#000080]" : ""}`}
+                                            >
+                                                {column.field}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                )}
+                            </thead>
+
+                            <tbody>
+                                {currentData.length === 0 ? (
+                                    (() => {
+                                        const totalColumns = isHierarchical
+                                            ? extractLeaves(head).length
+                                            : head?.length > 0
+                                                ? head.map(h => h.field).length
+                                                : Object.keys(currentData?.[0] || {}).length || 1;
+
+                                        return (
+                                            <tr>
+                                                <td
+                                                    colSpan={totalColumns}
+                                                    className="border border-gray-300 px-4 py-6 text-center font-semibold text-gray-500"
+                                                >
+                                                    SIN DATOS
+                                                </td>
+                                            </tr>
+                                        );
+                                    })()
+                                ) : (
+                                    currentData.map((item, rowIndex) => {
+                                        const fields = isHierarchical
+                                            ? extractLeaves(head)
+                                            : head?.length > 0
+                                                ? head
+                                                    .map(h => h.field)
+                                                    .filter(Boolean)
+                                                : Object.keys(item);
+                                        console.log('fields', fields)
+                                        return (
+                                            <tr key={rowIndex}>
+                                                {fields.map((field, colIndex) => (
+                                                    <td
+                                                        key={colIndex}
+                                                        className={`border border-gray-300 px-4 py-2 text-center ${datos.matrizSeleccionada === "Matriz-9" &&
+                                                            field.toLowerCase() === "condicion" &&
+                                                            String(item[field]).toLowerCase().trim() === "no apto"
+                                                            ? "bg-[#FF0000] text-white font-bold"
+                                                            : datos.matrizSeleccionada === "Matriz-9" &&
+                                                                field.toLowerCase() === "condicion" &&
+                                                                String(item[field]).toLowerCase().trim() === "apto"
+                                                                ? "bg-[#47D359] text-white font-bold"
+                                                                : datos.matrizSeleccionada === "Matriz-9" &&
+                                                                    field.toLowerCase() === "condicion" &&
+                                                                    String(item[field]).toLowerCase().trim() === "evaluado"
+                                                                    ? "bg-[#47D359] text-white font-bold"
+                                                                    : ""
+                                                            }`}
+                                                    >
+                                                        {item[field] ?? ""}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                        );
+                                    })
+                                )}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+                <div className="flex justify-center p-4">
+                    <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} className="mx-1 px-3 py-1 naranjabackgroud text-white rounded-md">
+                        <FontAwesomeIcon icon={faChevronLeft} />
+                    </button>
+                    {/* Mostrar números de página */}
+                    {visiblePages().map((page) => (
+                        <button key={page} onClick={() => handlePageClick(page)} className={`mx-1 px-3 py-1 rounded-md ${currentPage === page ? 'azuloscurobackground text-white' : 'bg-gray-200'}`}>
+                            {page}
+                        </button>
+                    ))}
+                    <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} className="mx-1 px-3 py-1 naranjabackgroud text-white rounded-md">
+                        <FontAwesomeIcon icon={faChevronRight} />
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default Valorizacion;
