@@ -10,7 +10,6 @@ import {
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
 import { getFetch } from "../../../../../../utils/apiHelpers";
-import PCRULTRASENSIBLE from "../../../../../../jaspers/Inmunologia/PCRULTRASENSIBLE";
 // CAMBIAR SOLO LAS URL
 const obtenerReporteUrl = "/api/v01/ct/pcrUltrasensible/obtenerReporte";
 const obtenerReporteJsReportUrl = "/api/v01/ct/pcrUltrasensible/descargarReporte";
@@ -115,8 +114,8 @@ export const PrintHojaR = (nro, token, tabla) => {
             if (res.norden) {
                 const nombre = "PCRULTRASENSIBLE";
                 console.log(nombre)
-                const jasperModules = import.meta.glob('../../../../../../jaspers/Inmunologia/*.jsx');
-                const modulo = await jasperModules[`../../../../../../jaspers/Inmunologia/${nombre}.jsx`]();
+                const jasperModules = import.meta.glob('../../../../../../jaspers/AnalisisBioquimicos/*.jsx');
+                const modulo = await jasperModules[`../../../../../../jaspers/AnalisisBioquimicos/${nombre}.jsx`]();
                 // Ejecuta la función exportada por default con los datos
                 if (typeof modulo.default === 'function') {
                     modulo.default(res);
