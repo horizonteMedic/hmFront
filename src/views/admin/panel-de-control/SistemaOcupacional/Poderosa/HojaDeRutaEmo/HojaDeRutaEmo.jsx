@@ -162,7 +162,7 @@ const HojaDeRutaEmo = () => {
         handleClearnotO,
         handlePrintDefault,
         handleChangeNumberDecimals,
-    } = useForm(initialFormState, { storageKey: "CertificadoAptitudBrigadista" });
+    } = useForm(initialFormState, { storageKey: "HojaRutaEMO" });
 
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
@@ -527,6 +527,7 @@ const HojaDeRutaEmo = () => {
             {/* BOTONES DE ACCIÓN */}
             <BotonesAccion
                 form={form}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
                 handleSave={handleSave}
                 handleClear={handleClear}
                 handlePrint={handlePrint}
