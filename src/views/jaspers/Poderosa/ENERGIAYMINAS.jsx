@@ -86,7 +86,7 @@ const drawPatientData = (doc, datos = {}) => {
     doc.setFont("helvetica", "bold").setFontSize(9);
     doc.text("Nombres y Apellidos:", tablaInicioX + 2, yPos + 3.5);
     doc.setFont("helvetica", "normal");
-    doc.text(datos.nombres || datos.nombresPaciente || '', tablaInicioX + 40, yPos + 3.5);
+    doc.text(datos.nombreCompletoPaciente || datos.nombresPaciente || '', tablaInicioX + 40, yPos + 3.5);
     yPos += filaAltura;
 
     doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
@@ -361,14 +361,30 @@ const drawDetalles = (doc, datos = {}, y, s1) => {
     const margenX = 15;
     const anchoDoc = 180;
     const colMid = margenX + anchoDoc / 2;
-    const maxY = doc.internal.pageSize.getHeight() - 30; // tope antes del footer
+    const maxY = doc.internal.pageSize.getHeight() - 30;
     let yPos = y;
 
-    const lineH = 4;   // reducido
-    const secGap = 2;   // reducido
+    const lineH = 4;
+    const secGap = 2;
 
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
+
+    // ── Helpers ───────────────────────────────────────────────────
+    const bold = (txt, x, y2) => { doc.setFont("helvetica", "bold").setFontSize(7); doc.text(txt, x, y2); };
+    const normal = (txt, x, y2) => { doc.setFont("helvetica", "normal").setFontSize(7); doc.text(txt, x, y2); };
+    const row = (label, value, x, y2) => {
+        bold(label, x, y2);
+        normal(String(value ?? ''), x + doc.getTextWidth(label) + 1, y2);
+    };
+    const writeWrapped = (label, value, x, y2, maxWidth) => {
+        bold(label, x, y2);
+        doc.setFont("helvetica", "normal").setFontSize(7);
+        const labelW = doc.getTextWidth(label) + 3;
+        const lines = doc.splitTextToSize(String(value ?? ''), maxWidth - labelW);
+        lines.forEach((line, i) => doc.text(line, x + labelW, y2 + i * lineH));
+        return lines.length;
+    };
 
     // ── Título DETALLES ───────────────────────────────────────────
     doc.setFont("helvetica", "bold").setFontSize(8);
@@ -384,98 +400,140 @@ const drawDetalles = (doc, datos = {}, y, s1) => {
     doc.line(margenX, yPos, margenX + anchoDoc, yPos);
     yPos += lineH;
 
-    // ── Helpers ───────────────────────────────────────────────────
-    const bold = (txt, x, y2) => { doc.setFont("helvetica", "bold").setFontSize(7); doc.text(txt, x, y2); };
-    const normal = (txt, x, y2) => { doc.setFont("helvetica", "normal").setFontSize(7); doc.text(txt, x, y2); };
-    const row = (label, value, x, y2) => {
-        bold(label, x, y2);
-        normal(String(value ?? ''), x + doc.getTextWidth(label) + 1, y2);
-    };
-
     // ── Columnas izquierda + derecha ──────────────────────────────
-    const startY = yPos;
     let yLeft = yPos;
     let yRight = yPos;
+    let nLines;
 
-    // Izquierda
-    row("1.- Pulso en reposo:", `${datos.pulsoReposo}   B.P.: ${datos.pulsoReposoBp}`, margenX, yLeft); yLeft += lineH;
-    normal(`Después de 30 flexiones en 60 seg:  ${datos.pulso30flexiones}`, margenX + 3, yLeft); yLeft += lineH;
-    row("2.- Respiración en reposo:", datos.respiracionReposo, margenX, yLeft); yLeft += lineH;
-    normal(`Después de 30 flexiones en 60 seg:  ${datos.respiracion30flexiones}`, margenX + 3, yLeft); yLeft += lineH;
-    row("3.- Obstrucción Nasal:", datos.obstruccionNasal ? "SI [ X ]  NO [   ]" : "SI [   ]  NO [ X ]", margenX, yLeft); yLeft += lineH;
-    row("4.- Forma del pecho:", datos.formaPecho, margenX, yLeft); yLeft += lineH;
-    row("5.- Expansión del pecho Normal:", datos.expansionPecho, margenX, yLeft); yLeft += lineH;
+    // ── IZQUIERDA ─────────────────────────────────────────────────
+    row("1.- Pulso en reposo:", `${datos.pulsoReposo}   B.P.: ${datos.pulsoReposoBp}`, margenX, yLeft);
+    yLeft += lineH;
 
-    // Derecha
-    row("6.- Pulmones:", datos.pulmones, colMid, yRight); yRight += lineH;
-    row("7.- Corazón:", datos.corazon, colMid, yRight); yRight += lineH;
-    row("8.- Enfermedades Crónicas:", datos.enfermedadesCronicas, colMid, yRight); yRight += lineH;
-    row("9.- Función pulmonar:", datos.funcionPulmonar, colMid, yRight); yRight += lineH;
-    normal(`a.- FVC: ${datos.fvc}   FEV1: ${datos.fevl}`, colMid + 3, yRight); yRight += lineH;
-    normal(`b.- Otros:  ${datos.otros}`, colMid + 3, yRight); yRight += lineH;
-    row("10.-", datos.enForma ? "En forma: [ X ]   Fuera de forma: [   ]" : "En forma: [   ]   Fuera de forma: [ X ]", colMid, yRight); yRight += lineH;
+    normal(`Después de 30 flexiones en 60 seg:  ${datos.pulso30flexiones}`, margenX + 3, yLeft);
+    yLeft += lineH;
+
+    row("2.- Respiración en reposo:", datos.respiracionReposo, margenX, yLeft);
+    yLeft += lineH;
+
+    normal(`Después de 30 flexiones en 60 seg:  ${datos.respiracion30flexiones}`, margenX + 3, yLeft);
+    yLeft += lineH;
+
+    row("3.- Obstrucción Nasal:", datos.obstruccionNasal ? "SI [ X ]  NO [   ]" : "SI [   ]  NO [ X ]", margenX, yLeft);
+    yLeft += lineH;
+
+    nLines = writeWrapped("4.- Forma del pecho:", datos.formaPecho, margenX, yLeft, anchoDoc / 2);
+    yLeft += lineH * nLines;
+
+    nLines = writeWrapped("5.- Expansión del pecho Normal:", datos.expansionPecho, margenX, yLeft, anchoDoc / 2);
+    yLeft += lineH * nLines;
+
+    // ── DERECHA ───────────────────────────────────────────────────
+    nLines = writeWrapped("6.- Pulmones:", datos.pulmones, colMid, yRight, anchoDoc / 2);
+    yRight += lineH * nLines;
+
+    nLines = writeWrapped("7.- Corazón:", datos.corazon, colMid, yRight, anchoDoc / 2);
+    yRight += lineH * nLines;
+
+    nLines = writeWrapped("8.- Enfermedades Crónicas:", datos.enfermedadesCronicas, colMid, yRight, anchoDoc / 2);
+    yRight += lineH * nLines;
+
+    nLines = writeWrapped("9.- Función pulmonar:", datos.funcionPulmonar, colMid, yRight, anchoDoc / 2);
+    yRight += lineH * nLines;
+
+    normal(`a.- FVC: ${datos.fvc}   FEV1: ${datos.fevl}`, colMid + 3, yRight);
+    yRight += lineH;
+
+    normal(`b.- Otros:  ${datos.otros}`, colMid + 3, yRight);
+    yRight += lineH;
+
+    row("10.-", datos.enForma
+        ? "En forma: [ X ]   Fuera de forma: [   ]"
+        : "En forma: [   ]   Fuera de forma: [ X ]",
+        colMid, yRight);
+    yRight += lineH;
 
     yPos = Math.max(yLeft, yRight) + secGap;
 
     // ── RAYOS X ───────────────────────────────────────────────────
-    doc.line(margenX, yPos, margenX + anchoDoc, yPos); yPos += lineH - 1;
+    doc.line(margenX, yPos, margenX + anchoDoc, yPos);
+    yPos += lineH - 1;
+
     doc.setFont("helvetica", "bold").setFontSize(7.5);
-    doc.text("RAYOS X", margenX, yPos); yPos += lineH;
-    row("Fecha de la placa:", toDDMMYYYY(datos.fechaPlaca || ''), margenX, yPos); yPos += lineH;
+    doc.text("RAYOS X", margenX, yPos);
+    yPos += lineH;
+
+    row("Fecha de la placa:", toDDMMYYYY(datos.fechaPlaca || ''), margenX, yPos);
+    yPos += lineH;
 
     let yRXL = yPos;
     let yRXR = yPos;
 
     // Izquierda RX
-    row("1.- Pecho Normal:", datos.pechoNormal, margenX, yRXL); yRXL += lineH;
-    row("2.- T.B.C:", datos.tbcRayosX, margenX, yRXL); yRXL += lineH;
-    row("3.- Pneumoconiosis:", datos.pneumoconiosis, margenX, yRXL); yRXL += lineH;
-    normal(`Clasificación de la OIT (1980):  ${datos.clasificacionOit}`, margenX + 3, yRXL); yRXL += lineH;
-    normal(`Film N° de la placa:  ${datos.filmNumeroPlaca || ''}`, margenX + 3, yRXL); yRXL += lineH;
+    nLines = writeWrapped("1.- Pecho Normal:", datos.pechoNormal, margenX, yRXL, anchoDoc / 2);
+    yRXL += lineH * nLines;
+
+    nLines = writeWrapped("2.- T.B.C:", datos.tbcRayosX, margenX, yRXL, anchoDoc / 2);
+    yRXL += lineH * nLines;
+
+    nLines = writeWrapped("3.- Pneumoconiosis:", datos.pneumoconiosis, margenX, yRXL, anchoDoc / 2);
+    yRXL += lineH * nLines;
+
+    nLines = writeWrapped(`Clasificación de la OIT (1980):`, datos.clasificacionOit, margenX + 3, yRXL, anchoDoc / 2 - 3);
+    yRXL += lineH * nLines;
+
+    normal(`Film N° de la placa:  ${datos.filmNumeroPlaca || ''}`, margenX + 3, yRXL);
+    yRXL += lineH;
 
     // Derecha RX
-    row("4.- Corazón:", datos.corazonRayosX, colMid, yRXR); yRXR += lineH;
-    row("5.- Otros cambios:", datos.otrosCambios, colMid, yRXR); yRXR += lineH;
-    row("6.- Examen de saliva:", datos.examenSaliva, colMid, yRXR); yRXR += lineH;
+    nLines = writeWrapped("4.- Corazón:", datos.corazonRayosX, colMid, yRXR, anchoDoc / 2);
+    yRXR += lineH * nLines;
+
+    nLines = writeWrapped("5.- Otros cambios:", datos.otrosCambios, colMid, yRXR, anchoDoc / 2);
+    yRXR += lineH * nLines;
+
+    nLines = writeWrapped("6.- Examen de saliva:", datos.examenSaliva, colMid, yRXR, anchoDoc / 2);
+    yRXR += lineH * nLines;
 
     yPos = Math.max(yRXL, yRXR) + secGap;
 
     // ── Bloque conclusión ─────────────────────────────────────────
-    doc.line(margenX, yPos, margenX + anchoDoc, yPos); yPos += lineH;
-    row("Pecho Normal:", datos.pechoNormal, margenX, yPos); yPos += lineH;
-    row("Hallazgos anormales:", datos.hallazgosAnormales, margenX, yPos); yPos += lineH;
-    row("Clasificación de la OIT (1980):", datos.clasificacionOit, margenX, yPos); yPos += lineH;
-    row("OPINION CLINICA:", datos.opinionClinica, margenX, yPos); yPos += lineH + secGap;
+    doc.line(margenX, yPos, margenX + anchoDoc, yPos);
+    yPos += lineH;
 
-    // ── Línea de firma (pegada al tope del footer) ────────────────
-    // Si yPos se pasó del límite, forzamos la firma justo antes del footer
+    nLines = writeWrapped("Pecho Normal:", datos.pechoNormal, margenX, yPos, anchoDoc);
+    yPos += lineH * nLines;
+
+    nLines = writeWrapped("Hallazgos anormales:", datos.hallazgosAnormales, margenX, yPos, anchoDoc);
+    yPos += lineH * nLines;
+
+    nLines = writeWrapped("Clasificación de la OIT (1980):", datos.clasificacionOit, margenX, yPos, anchoDoc);
+    yPos += lineH * nLines;
+
+    nLines = writeWrapped("OPINION CLINICA:", datos.opinionClinica, margenX, yPos, anchoDoc);
+    yPos += lineH * nLines + secGap;
+
+    // ── Línea de firma ────────────────────────────────────────────
     const firmaY = Math.min(yPos, maxY - lineH * 2);
     const firmaX = margenX + anchoDoc - 70;
     const firmaAncho = 65;
-
-    doc.line(firmaX, firmaY, firmaX + firmaAncho, firmaY);
-    // Centro REAL de la línea
     const centerXFirma = firmaX + firmaAncho / 2;
 
     if (s1) {
         const imgW = 30;
         const imgH = 12;
-
-        // Centrado horizontal perfecto
         const imgX = centerXFirma - imgW / 2;
-
-        // Justo encima de la línea (con pequeño margen)
-        const offset = 2; // separación en mm
-        const imgY = firmaY - imgH - offset;
-
+        const imgY = firmaY - imgH - 2;
         doc.addImage(s1, "JPEG", imgX, imgY, imgW, imgH);
     }
+
+    doc.line(firmaX, firmaY, firmaX + firmaAncho, firmaY);
     doc.setFont("helvetica", "bold").setFontSize(6.5);
-    doc.text("Firma y Sello del Profesional", firmaX + firmaAncho / 2, firmaY + lineH - 1, { align: "center" });
-    doc.text("Responsable de la Evaluación", firmaX + firmaAncho / 2, firmaY + lineH * 2 - 1, { align: "center" });
+    doc.text("Firma y Sello del Profesional", centerXFirma, firmaY + lineH - 1, { align: "center" });
+    doc.text("Responsable de la Evaluación", centerXFirma, firmaY + lineH * 2 - 1, { align: "center" });
 
     return firmaY + lineH * 2;
 };
+
 // --- Componente Principal ---
 
 export default async function ENERGIAYMINAS(datos = {}, docExistente = null) {
