@@ -8,9 +8,85 @@ import { useForm } from "../../../../../hooks/useForm";
 import useRealTime from "../../../../../hooks/useRealTime";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerHojaRutaEmo";
+import { PrintHojaR, PrintHojaRData, SubmitDataService, VerifyTR } from "./controllerHojaRutaEmo";
 
 const tabla = "hoja_ruta_emo";
+
+const dataReportePrueba = { 
+    "dniPaciente": 76574022, 
+    "nombreCompletoPaciente": "JOSUE SPENCER ROJAS SIGUENZA", 
+    "nombresPaciente": "JOSUE SPENCER", 
+    "apellidosPaciente": "ROJAS SIGUENZA", 
+    "sexoPaciente": "M", 
+    "fechaNacimientoPaciente": "1995-07-19", 
+    "edadPaciente": "30", 
+    "nivelEstudioPaciente": "UNIVERSITARIO", 
+    "estadoCivilPaciente": "SOLTERO", 
+    "lugarNacimientoPaciente": "TRUJILLO", 
+    "ocupacionPaciente": "INGENIERO DE SISTEMAS", 
+    "observacionesGenerales": "DANI CONCLUSIONES SDAFAFDSF SDFSD FDSFSDF23FEFSDFSD FSDFSADFSDFSD FWEFDEWFDSFSD FWEFWEFWE FEFWER3EEREW RESR23423DSF SDFSDF23432 2 3 23423 DSFSD FW", 
+    "horaSalida": "11:21:44", 
+    "horaEntrada": "09:47:29", 
+    "peso": "67", 
+    "talla": "1.40", 
+    "pa": "90/90", 
+    "sat02": "100", 
+    "cintura": "100", 
+    "cadera": "100", 
+    "fc": "90", 
+    "fr": "40", 
+    "cuello": "40", 
+    "usuarioEvaluacionMedica": "JOSUE SPENCER ROJAS SIGUENZA", 
+    "observacionesEvaluacionMedica": "DANI OBSERVACION 1 SDAJHFASDKFSDA FSDAFSDFJSDLKFDFJ KDFJSDKLFJSDFKSJDF JSDF SDFSDFJSDFK DSFDK DJFDFJ DKJSDKLFJSDKFJ ", 
+    "usuarioInformeBrigadista": "JOSUE SPENCER ROJAS SIGUENZA", 
+    "observacionInformeBrigadista": "DANI OBSERVACION 1 SDAJHFASDKFSDA FSDAFSDFJSDLKFDFJ KDFJSDKLFJSDFKSJDF JSDF SDFSDFJSDFK DSFDK DJFDFJ DKJSDKLFJSDKFJ ", 
+    "usuarioEvaluacionOftalmologica": "JOSUE SPENCER ROJAS SIGUENZA", 
+    "usuarioAgudezaVisual": "JOSUE SPENCER ROJAS SIGUENZA", 
+    "observacionesEvaluacionVisual": "DANI OBSERVACION 1 SDAJHFASDKFSDA FSDAFSDFJSDLKFDFJ KDFJSDKLFJSDFKSJDF JSDF SDFSDFJSDFK DSFDK DJFDFJ DKJSDKLFJSDKFJ ", 
+    "usuarioAudiometria": "JOSUE SPENCER ROJAS SIGUENZA SDFSDF DSFDS FSDFDSF23", 
+    "observacionAudiometria": "DANI OBSERVACION 4", 
+    "usuarioEspirometria": "JOSUE SPENCER ROJAS SIGUENZA", 
+    "observacionEspirometria": "DANI OBSERVACION 4", 
+    "usuarioToraxConvencional": "JOSUE SPENCER ROJAS SIGUENZA", 
+    "usuarioToraxOit": " ", 
+    "observacionRadiografiaTorax": "DANI OBSERVACION 6", 
+    "usuarioElectrocardiograma": "JOSUE SPENCER ROJAS SIGUENZA", 
+    "observacionesElectrocardiograma": "DANI OBSERVACION 7", 
+    "usuarioExamenLaboratorio": "JOSUE SPENCER ROJAS SIGUENZA", 
+    "observacionesExamenLaboratorio": "DANI OBSERVACION 8", 
+    "usuarioExamenMedicoBrigadista": "JOSUE SPENCER ROJAS SIGUENZA", 
+    "usuarioCertificadoAptitudBrigadista": "JOSUE SPENCER ROJAS SIGUENZA", 
+    "usuarioConsultaExterna": "JOSUE SPENCER ROJAS SIGUENZA", 
+    "observacionBrigadista": "DANI OBSERVACION 9", 
+    "tipoExamen": "PRE-OCUPACIONAL", 
+    "empresa": "CONSORCIO COPTOS ", 
+    "contrata": "CENTRO MEDICO HORIZONTE MEDIC", 
+    "cargoPaciente": "ADMINISTRADOR", 
+    "areaPaciente": "ADMINISTRACION", 
+    "fechaApertura": "2025-06-26", 
+    "fechaExamen": "2026-03-06", 
+    "usuarioFirma": "developer", 
+    "doctorAsignado": null, 
+    "userRegistro": null, 
+    "nombreSede": "Trujillo-Pierola", 
+    "sede": "TRUJILLO-NICOLAS DE PIEROLA", 
+    "color": 1, 
+    "textoColor": "A", 
+    "codigoColor": "#00FFFF", 
+    "nameJasper": null, 
+    "codigoClinica": "4353-H", 
+    "digitalizacion": [ 
+        { 
+            "nombreDigitalizacion": "SELLOFIRMA", 
+            "url": "https://almacenamientotesthm.blob.core.windows.net/files1/EMPLEADO-DNI-76574021/Firma_ClaudiaChavezz.png?nocache=1773434998162" 
+        }, 
+        { 
+            "nombreDigitalizacion": "SELLOFIRMADOCASIG", 
+            "url": "https://almacenamientotesthm.blob.core.windows.net/files1/EMPLEADO-DNI-76574021/Firma_ClaudiaChavezz.png?nocache=1773434998181" 
+        } 
+    ], 
+    "norden": 148055 
+};
 
 const HojaDeRutaEmo = () => {
     const today = getToday();
@@ -86,7 +162,7 @@ const HojaDeRutaEmo = () => {
         handleClearnotO,
         handlePrintDefault,
         handleChangeNumberDecimals,
-    } = useForm(initialFormState, { storageKey: "CertificadoAptitudBrigadista" });
+    } = useForm(initialFormState, { storageKey: "HojaRutaEMO" });
 
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
@@ -438,9 +514,20 @@ const HojaDeRutaEmo = () => {
                 />
             </SectionFieldset>
 
+            {/* <div className="flex justify-end px-4">
+                <button
+                    type="button"
+                    onClick={() => PrintHojaRData(dataReportePrueba, datosFooter)}
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded shadow-md flex items-center gap-2 transition-all"
+                >
+                    Imprimir Reporte (Data)
+                </button>
+            </div> */}
+
             {/* BOTONES DE ACCIÓN */}
             <BotonesAccion
                 form={form}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
                 handleSave={handleSave}
                 handleClear={handleClear}
                 handlePrint={handlePrint}

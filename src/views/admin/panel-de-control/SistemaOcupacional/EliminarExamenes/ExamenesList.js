@@ -20,7 +20,7 @@ export const EXAMENES_CONFIG = [
             { label: "Test Fat. Somnolencia", name: "testFatSomnolencia", tabla: "test_fatiga_somnolencia" },
             { label: "Anexo 2", name: "fMedicaAnexo2", tabla: "anexo_agroindustrial" },
             { label: "Cert. Trab. Altura (Barrik)", name: "certTrabAlturaBarrik", tabla: "b_certificado_altura" },
-            { label: "Cert. Medico Ocupacinal", name: "fAptitudMedOcup", tabla: "certificado_aptitud_medico_ocupacional" },
+            { label: "F. Aptitud Anexo 16", name: "fAptitudMedOcup", tabla: "certificado_aptitud_medico_ocupacional" },
             { label: "Ev. Musc. Esquelético Boroo.", name: "evMuscEsqueletico", tabla: "evaluacion_musculo_esqueletica2021" },
             { label: "Ficha Conducción de Vehiculos", name: "certConduccVehiculos", tabla: "b_certificado_conduccion" },
             { label: "Antecedentes Enfermedades Altura", name: "AnteceEnfeAltura", tabla: "antece_enfermedades_altura" },
