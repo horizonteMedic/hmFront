@@ -54,7 +54,9 @@ export const GetInfoServicio = async (
             cargoDesempenar: res.cargoPaciente ?? "",
             ocupacion: res.ocupacionPaciente ?? "",
 
-
+            fechaNacimientoPaciente: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+            peso: res.peso ?? "",
+            talla: res.talla ?? "",
         }));
     }
 };
