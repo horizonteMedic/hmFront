@@ -1438,15 +1438,20 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   }
 
   if (imgEstado) {
-    const imgSize = cuadroAncho; // mismo tamaño de referencia que los cuadros
+    const imgSize = cuadroAncho - 15; // mismo tamaño que referencia
+    const separacion = 6;
 
-    // Centro exacto entre ambos cuadros
-    const centroX = xInicioCuadros + cuadroAncho + espacioEntreCuadros / 2;
+    // === IZQUIERDA de PSICOLOGIA ===
+    const imgXLeft = xInicioCuadros - separacion - imgSize;
+    const imgYLeft = yPos + (cuadroAlto - imgSize) / 2;
 
-    const imgX = centroX - imgSize / 2;
-    const imgY = yPos + (cuadroAlto - imgSize) / 2;
+    doc.addImage(imgEstado, "PNG", imgXLeft, imgYLeft, imgSize, imgSize);
 
-    doc.addImage(imgEstado, "PNG", imgX, imgY, imgSize, imgSize);
+    // === DERECHA de CENTRO MEDICO ===
+    const imgXRight = xCentroMedico + cuadroAncho + separacion;
+    const imgYRight = yPos + (cuadroAlto - imgSize) / 2;
+
+    doc.addImage(imgEstado, "PNG", imgXRight, imgYRight, imgSize, imgSize);
   }
 
   // Grupo Sanguíneo (alineado con Pre Evaluación)
