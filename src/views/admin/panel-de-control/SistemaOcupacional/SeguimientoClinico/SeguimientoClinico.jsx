@@ -1,17 +1,17 @@
 import {
     InputTextOneLine,
-    InputTextArea,
-    InputsBooleanRadioGroup,
 } from "../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import { useForm } from "../../../../hooks/useForm";
 // import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerBrigadista";
-import { BotonesAccion, DatosPersonalesLaborales } from "../../../../components/templates/Templates";
-import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
+import { DatosPersonalesLaborales, TablaTemplate } from "../../../../components/templates/Templates";
+import { useState } from "react";
+import { searchByNorden } from "./controllerSeguimientoClinico";
+import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 
-const tabla = "psi_brigadistas";
+const tabla = "";
 
 export default function SeguimientoClinico() {
     const today = getToday();
@@ -33,29 +33,7 @@ export default function SeguimientoClinico() {
         sexo: "",
         estadoCivil: "",
         nivelEstudios: "",
-
-        // Datos Laborales
-        empresa: "",
-        contrata: "",
-        ocupacion: "",
-        cargoDesempenar: "",
-
-        afrontamientoTomaDecisiones: "",
-        estiloDeConflicto: "",
-        afrontamientoSituacionesRiesgo: "",
-        nivelAnsiedad: "",
-
-        // Análisis FODA
-        fortalezasOportunidades: "",
-        amenazasDebilidades: "",
-
-        // Observaciones y Recomendaciones
-        observaciones: "",
-        recomendaciones: "",
-
-        // Médico que Certifica //BUSCADOR
-        nombre_medico: userName,
-        user_medicoFirma: userlogued,
+        historialOrdenes: []
     };
 
     const {
@@ -77,7 +55,7 @@ export default function SeguimientoClinico() {
     const handleSearch = (e) => {
         if (e.key === "Enter") {
             handleClearnotO();
-            // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+            searchByNorden(form.norden, setForm, token);
         }
     };
 
@@ -88,26 +66,63 @@ export default function SeguimientoClinico() {
     };
 
     return (
-        <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-            <SectionFieldset legend="Información del Examen" className="grid grid-cols-2 gap-3">
-                <InputTextOneLine
-                    label="N° Orden"
-                    name="norden"
-                    value={form.norden}
-                    onChange={handleChangeNumberDecimals}
-                    onKeyUp={handleSearch}
-                    labelWidth="120px"
-                />
-                <InputTextOneLine
-                    label="Nombre del Examen"
-                    name="nombreExamen"
-                    value={form.nombreExamen}
-                    disabled
-                    labelWidth="120px"
-                />
-            </SectionFieldset>
+        <div className="px-4 max-w-[90%] xl:max-w-[90%] mx-auto grid gap-x-4 lg:grid-cols-2 ">
+            <div className="space-y-3">
+                <SectionFieldset legend="Información del Paciente" className="grid grid-cols-2 gap-3">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form.norden}
+                        onChange={handleChangeNumberDecimals}
+                        onKeyUp={handleSearch}
+                        labelWidth="120px"
+                    />
+                </SectionFieldset>
+                <DatosPersonalesLaborales form={form} laborales={false} minSizePrincipal={"3xl"} />
+                <div className="flex-1">
+                    <Table data={form.historialOrdenes} />
+                </div>
+            </div>
 
-            <DatosPersonalesLaborales form={form} />
         </div>
+    );
+}
+
+function Table({ data }) {
+    const columns = [
+        {
+            label: "N° Orden",
+            accessor: "nroOrden",
+            width: "120px",
+            render: (row) => <span className="font-bold">{row.nroOrden}</span>,
+        },
+        {
+            label: "Empresa",
+            accessor: "empresa",
+        },
+        {
+            label: "Contrata",
+            accessor: "contrata",
+        },
+        {
+            label: "Fecha",
+            accessor: "fechaApertura",
+            render: (row) => formatearFechaCorta(row.fechaApertura),
+        },
+        {
+            label: "Aptitud",
+            accessor: "aptitud",
+        },
+    ];
+
+    return (
+        <TablaTemplate
+            columns={columns}
+            data={data}
+            height={300}
+            onRowClick={(row) => { }}
+            onRowRightClick={(row) => { }}
+        />
+
     );
 }
