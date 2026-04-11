@@ -1894,9 +1894,21 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
 
   yPos = dibujarHeaderSeccion("12. DIAGNÓSTICO MÉDICO OCUPACIONAL Y RECOMENDACIONES", yPos, filaAltura);
 
-  const anchoDisponibleDiagnostico = tablaAncho - 4;
-  const lineasDiagnostico = doc.splitTextToSize(datosDiagnostico, anchoDisponibleDiagnostico);
-  const alturaDinamicaDiagnostico = Math.max(40, lineasDiagnostico.length * interlineadoConclusiones + 4);
+  const paddingX = 2;
+  const paddingTop = 4;
+  const paddingBottom = 4;
+
+  const anchoDisponibleDiagnostico = tablaAncho - (paddingX * 2);
+
+  const lineasDiagnostico = doc.splitTextToSize(
+    datosDiagnostico,
+    anchoDisponibleDiagnostico
+  );
+
+  const alturaDinamicaDiagnostico = Math.max(
+    40,
+    (lineasDiagnostico.length * interlineadoConclusiones) + paddingTop + paddingBottom
+  );
 
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaDiagnostico);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaDiagnostico);
@@ -1904,8 +1916,14 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   doc.line(tablaInicioX, yPos + alturaDinamicaDiagnostico, tablaInicioX + tablaAncho, yPos + alturaDinamicaDiagnostico);
 
   doc.setFont("helvetica", "normal").setFontSize(7);
+  const startY = yPos + paddingTop;
+
   lineasDiagnostico.forEach((linea, index) => {
-    doc.text(linea, tablaInicioX + 2, yPos + 3.5 + (index * interlineadoConclusiones));
+    doc.text(
+      linea,
+      tablaInicioX + paddingX,
+      startY + (index * interlineadoConclusiones)
+    );
   });
   yPos += alturaDinamicaDiagnostico;
 

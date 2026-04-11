@@ -1864,7 +1864,7 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
   doc.setFont("helvetica", "normal").setFontSize(7);
 
   // Obtener la variable directamente de data
-  const enfermedades = String(data.enfermedadesOcularesAnexo7c_txtenfermedadesoculares || "").trim();
+  const enfermedades = String(data.diagnosticoOftalmologia2021_txtdiagnostico || "").trim();
 
   // Función para dividir texto por \n y crear items con guión
   const dividirEnItems = (texto) => {
@@ -1908,7 +1908,7 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     });
   } else {
     // Si no hay items, mostrar "NINGUNA"
-    doc.text("NINGUNA", xColumnaDerecha + 2, yActual);
+    // doc.text("NINGUNA", xColumnaDerecha + 2, yActual);
   }
 
   // REFLEJOS PUPILARES (parte inferior derecha)
