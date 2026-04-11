@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { saveAs } from 'file-saver';
 import { ComboboxEmpresa, ComboboxContrata, ComboboxSedes, RucEmpoCon } from './model/Combobox';
-import { GetMatrizUniversal } from './model/MatrizPOST';
-import Swal from 'sweetalert2';
-import { useAuthStore } from '../../../../store/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileExcel, faMagnifyingGlass, faChevronLeft, faChevronRight, faSyncAlt } from '@fortawesome/free-solid-svg-icons';
 import ExcelJS from 'exceljs';
@@ -11,27 +7,38 @@ import AutocompleteInput from '../../../components/reusableComponents/Autocomple
 import { useSessionData } from '../../../hooks/useSessionData';
 import { useForm } from '../../../hooks/useForm';
 import { SelectField } from '../../../components/reusableComponents/InputSelect';
-import InputTextOneLine from '../../../components/reusableComponents/InputTextOneLine';
 import InputsBooleanRadioGroup from '../../../components/reusableComponents/InputsBooleanRadioGroup';
+import ModalFiltros from './ModalFiltros';
+import { SubmitValorizaciones } from './model/controllerValo';
 
-const MATRICES_MAP = {
-    "Matriz-1": { url: "api/v01/st/registros/matrizAdministrativa", method: "POST", name: "MATRIZ ADMINISTRATIVA" },
-    "Matriz-2": { url: "api/v01/st/registros/matrizSalud", method: "POST", name: "MATRIZ DE SALUD" },
-    "Matriz-3": { url: "api/v01/ct/archivos", method: "GET", name: "MATRIZ DE ARCHIVOS" },
-    "Matriz-4": { url: "api/v01/st/registros/matrizAdministrativaOhla", method: "POST", name: "MATRIZ ADMINISTRATIVA OHLA" },
-    "Matriz-5": { url: "api/v01/st/registros/matrizSaludOhla", method: "POST", name: "MATRIZ DE SALUD OHLA" },
-    "Matriz-6": { url: "api/v01/st/registros/matrizGeneral", method: "POST", name: "MATRIZ GENERAL" },
-    "Matriz-7": { url: "api/v01/st/registros/matrizOhlaGestor", method: "POST", name: "MATRIZ GESTOR OHLA" },
-    "Matriz-8": { url: "api/v01/st/registros/matrizOhlaConstruccion", method: "POST", name: "MATRIZ CONSTRUCCION OHLA" },
-    "Matriz-9": { urlH: "/api/headers/arena", methodH: "GET", urlB: "api/v01/st/registros/matrizArena2026", methodB: "POST", name: "MATRIZ LA ARENA" },
-    "Matriz-10": { urlH: "/api/headers/poderosa", methodH: "GET", urlB: "api/v01/st/registros/matrizPoderosa2026", methodB: "POST", name: "REPORTE CONSOLIDADO ATENCIONES DIARIAS - PODEROSA" },
-    "Matriz-11": { urlH: "api/headers/caraveli-2026", methodH: "GET", urlB: "api/v01/st/registros/matrizCaraveli2026", methodB: "POST", name: "MATRIZ COMPAÑIA MINERA CARAVELI" },
-    "Matriz-12": { urlH: "/api/headers/proseguridad/plantilla", method: "GET", urlB: "api/v01/st/registros/matrizProseguridadAsistencia2026", methodB: "POST", name: "PLANILLA ASISTENCIA PROSEGURIDAD" },
-    "Matriz-13": { urlH: "/api/headers/proseguridad", methodH: "GET", urlB: "api/v01/st/registros/matrizProseguridad2026", methodB: "POST", name: "MATRIZ SALUD PROSEGURIDAD" },
-    "Matriz-14": { urlH: "/api/headers/pacifico-vida", methodH: "GET", urlB: "api/v01/st/registros/matrizPacificoVida2026", methodB: "POST", name: "REPORTE CONSOLIDAD-PACIFICO VIDA - PODEROSA" },
-    "Matriz-15": { urlH: "api/headers/boroo", methodH: "GET", urlB: "api/v01/st/registros/matrizBoroo2026", methodB: "POST", name: "MATRIZ MINERA BOROO MISQUICHILCA" },
-    "Matriz-16": { urlH: "/api/headers/trabajos-altura", methodH: "GET", urlB: "api/v01/st/registros/matrizPoderosaAltura2026", methodB: "POST", name: "REPORTE DE TRABAJOS EN ALTURA - PODEROSA" },
-    "Matriz-17": { url: "/api/v01/st/registros/matrizHuancayo2026", method: "POST", name: "MATRIZ HUANCAYO" },
+const Columnas = {
+    DNI: false,
+    Nombres: false,
+    Cargo: false,
+    Fecha: false,
+    "Tipo Pago": false,
+    Empresa: false,
+    Contrata: false,
+    EKG: false,
+    Sexo: false,
+    "T. Examen": false,
+    Psicosensometria: false,
+    "RX Lumbar": false,
+    "Trab. Calientes": false,
+    "Visual-Compl": false,
+    Covid1: false,
+    Covid2: false,
+    "Manipulador Alimentos": false,
+    "Herramientas Manuales": false,
+    "Fist-Test": false,
+    "Test Altura": false,
+    "RX Plomo": false,
+    "Espacios Confinados": false,
+    "Test Marihuana": false,
+    "Test Cocaina": false,
+    Mercurio: false,
+    "RX Lumbo Sacra": false,
+    "RX Dorso Lumbar": false
 };
 
 const Valorizacion = () => {
@@ -49,7 +56,8 @@ const Valorizacion = () => {
         sede: '',
         tipoPago: '',
         matrizSeleccionada: '', // Agrega este estado para controlar la selección de matriz
-        TipoBusqueda: true
+        TipoBusqueda: true,
+        Filtros: Columnas
     };
     const {
         form,
@@ -64,19 +72,15 @@ const Valorizacion = () => {
         handleClearnotO,
         handlePrintDefault,
     } = useForm(initialFormState);
-
     const [loading, setLoading] = useState(false);
-    const [EmpresaUser, setEmpresaUser] = useState([])
-    const [ContrataUser, setContrataUser] = useState([])
 
     const [data, setData] = useState([]);
-    const [head, setHeaders] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [recordsPerPage, setRecordsPerPage] = useState(15);
     const [reload, setReload] = useState(0); // Estado para controlar la recarga de la tabla
     const [exportButtonEnabled, setExportButtonEnabled] = useState(false);
-
+    const [modal, setModal] = useState(false)
     const today = new Date().toLocaleDateString('en-CA');
     const Sedes = ComboboxSedes();
 
@@ -553,6 +557,10 @@ const Valorizacion = () => {
         setTotalPages(Math.ceil(data.length / parseInt(e.target.value)));
     };
 
+    const SubmitAPI = () => {
+        SubmitValorizaciones(form, token)
+    }
+
     const startIdx = (currentPage - 1) * recordsPerPage;
     const endIdx = startIdx + recordsPerPage;
 
@@ -699,11 +707,18 @@ const Valorizacion = () => {
                             ]}
                         />
                     </div>
-                    <div className="flex flex-col flex-grow justify-end">
+                    <div className="flex flex-grow justify-center gap-2 w-full">
                         <button
-                            //onClick={SubmitAPI}
-                            className={`bg-blue-900 mt-4 text-white px-4 py-2 rounded-md  ${form.matrizSeleccionada && (form.rucContrata || form.rucEmpresa) ? '' : 'opacity-50 cursor-not-allowed'}`}
-                            disabled={!form.matrizSeleccionada || loading || (!form.rucContrata && !form.rucEmpresa) ||
+                            onClick={() => { setModal(true) }}
+                            className={`bg-green-600 mt-4 text-white px-4 py-2 rounded-md `}
+                        >
+                            <FontAwesomeIcon icon={faMagnifyingGlass} className="mr-2" />
+                            Filtros de Tabla
+                        </button>
+                        <button
+                            onClick={SubmitAPI}
+                            className={`bg-blue-900 mt-4 text-white px-4 py-2 rounded-md  ${form.tipoPago && (form.rucContrata || form.rucEmpresa) ? '' : 'opacity-50 cursor-not-allowed'}`}
+                            disabled={!form.tipoPago || loading || (!form.rucContrata && !form.rucEmpresa) ||
                                 (form.rucContrata === "" && form.rucEmpresa === "")}
                         >
                             <FontAwesomeIcon icon={faMagnifyingGlass} className="mr-2" />
@@ -730,6 +745,13 @@ const Valorizacion = () => {
                     </button>
                 </div>
             </div>
+            {modal && <ModalFiltros closeModal={() => { setModal(false) }} Filtros={form.Filtros}
+                setFiltros={(callback) =>
+                    setForm(prev => ({
+                        ...prev,
+                        Filtros: callback(prev.Filtros) // 🔥 AQUÍ está la clave
+                    }))
+                } />}
         </div>
     );
 };
