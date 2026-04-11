@@ -11,7 +11,7 @@ import {
 } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import { getFetch } from "../../../../../utils/apiHelpers";
-
+import Informe_Ocu_DatosPacientes from "../../../../../jaspers/FichaDatosPersonales/Informe_Ocu_DatosPacientes";
 const obtenerReporteUrl =
     "/api/v01/ct/fichaDatosPersonales/obtenerReporteFichaDatosPersonales";
 const obtenerReporteJsReportUrl = "/api/v01/ct/fichaDatosPersonales/descargarReporteFichaDatosPaciente";
@@ -474,14 +474,36 @@ export const SubmitDataService = async (
 };
 
 
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+/*export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     PrintHojaRJsReportDefault(
         nro,
         token,
         tabla,
         obtenerReporteJsReportUrl
     );
-};
+};*/
+
+export const PrintHojaR = (nro, token, tabla) => {
+    Loading('Cargando Formato a Imprimir')
+    getFetch(`/api/v01/ct/fichaDatosPersonales/obtenerReporteFichaDatosPersonales?nOrden=${nro}&nameService=${tabla}&esJasper=true`, token)
+        .then(async (res) => {
+            if (res.resultado.norden) {
+                const nombre = "Informe_Ocu_DatosPacientes";
+                console.log(nombre)
+                const jasperModules = import.meta.glob('../../../../../jaspers/FichaDatosPersonales/*.jsx');
+                const modulo = await jasperModules[`../../../../../jaspers/FichaDatosPersonales/${nombre}.jsx`]();
+                // Ejecuta la función exportada por default con los datos
+                if (typeof modulo.default === 'function') {
+                    modulo.default(res.resultado);
+                } else {
+                    console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+                }
+                Swal.close()
+            } else {
+                Swal.close()
+            }
+        })
+}
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
     VerifyTRPerzonalizadoDefault(

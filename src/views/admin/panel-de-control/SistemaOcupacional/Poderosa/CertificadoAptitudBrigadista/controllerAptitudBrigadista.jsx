@@ -3,11 +3,13 @@ import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
     LoadingDefault,
+    PrintHojaRDefault,
     PrintHojaRJsReportDefault,
     SubmitDataServiceDefault,
     VerifyTRDefault,
 } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
+import { getFetch } from "../../../../../utils/apiHelpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/certificadoAptitudBrigadista/obtenerReporte";
@@ -138,14 +140,36 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
     });
 };
 
-export const PrintHojaR = (nro, token, tabla) => {
-    PrintHojaRJsReportDefault(
-        nro,
-        token,
-        tabla,
-        obtenerReporteJsReportUrl
-    );
+// export const PrintHojaR = (nro, token, tabla) => {
+//     PrintHojaRJsReportDefault(
+//         nro,
+//         token,
+//         tabla,
+//         obtenerReporteJsReportUrl
+//     );
+// };
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+    Loading('Cargando Formato a Imprimir')
+    getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`, token)
+        .then(async (res) => {
+            if (res.norden) {
+                const nombre = "Certificado_Aptitud_Brigadista_Digitalizado";
+                console.log(nombre)
+                const jasperModules = import.meta.glob('../../../../../jaspers/Poderosa/*.jsx');
+                const modulo = await jasperModules[`../../../../../jaspers/Poderosa/${nombre}.jsx`]();
+                // Ejecuta la función exportada por default con los datos
+                if (typeof modulo.default === 'function') {
+                    modulo.default({ ...res, ...datosFooter });
+                } else {
+                    console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+                }
+                Swal.close()
+            } else {
+                Swal.close()
+            }
+        })
 };
+
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
     VerifyTRDefault(
         nro,

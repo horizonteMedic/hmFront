@@ -436,11 +436,13 @@ export const GetInfoServicio = (
             data.observacionesGenerales += "FICHA CONDUCCION: " + res.observacionesConduccionCertificado_conduccion + "\n";
           }
 
-          if (res.informacionesGeneralRadiografia_info_general != null) {
-            data.observacionesGenerales += `INFORME RADIOGRAFICO : ${res.informacionesGeneralRadiografia_info_general}\n`;
-          }
-          if (res.conclusionesRadiografia_conclu != null) {
-            data.observacionesGenerales += `CONCLUCIONES : ${res.conclusionesRadiografia_conclu}\n`;
+          if (res.conclusionesRadiografia_conclu != null && res.conclusionesRadiografia_conclu !== ("CUERPOS VERTEBRALES MUESTRAN MORFOLOGÍA NORMAL.\n" +
+            "SACRO NO MUESTRA LESIONES EVIDENTES.\n" +
+            "ESPACIOS INTERVERTEBRALES CONSERVADOS.\n" +
+            "DENSIDAD ÓSEA ADECUADA.\n" +
+            "LORDOSIS LUMBAR NORMAL.\n" +
+            "CANAL RAQUÍDEO CON AMPLITUD NORMAL.")) {
+            data.observacionesGenerales += `INFORME RADIOGRAFICO : ${res.conclusionesRadiografia_conclu}\n`;
           }
           if (
             res.observacionesOdonto_txtobservaciones != null &&
@@ -1106,12 +1108,15 @@ export const GetInfoServicioEditar = (
             data.observacionesGenerales2 += "FICHA CONDUCCION: " + res.observacionesConduccionCertificado_conduccion + "\n";
           }
 
-          if (res.informacionesGeneralRadiografia_info_general != null) {
-            data.observacionesGenerales2 += `INFORME RADIOGRAFICO : ${res.informacionesGeneralRadiografia_info_general}\n`;
+          if (res.conclusionesRadiografia_conclu != null && res.conclusionesRadiografia_conclu !== ("CUERPOS VERTEBRALES MUESTRAN MORFOLOGÍA NORMAL.\n" +
+            "SACRO NO MUESTRA LESIONES EVIDENTES.\n" +
+            "ESPACIOS INTERVERTEBRALES CONSERVADOS.\n" +
+            "DENSIDAD ÓSEA ADECUADA.\n" +
+            "LORDOSIS LUMBAR NORMAL.\n" +
+            "CANAL RAQUÍDEO CON AMPLITUD NORMAL.")) {
+            data.observacionesGenerales2 += `INFORME RADIOGRAFICO : ${res.conclusionesRadiografia_conclu}\n`;
           }
-          if (res.conclusionesRadiografia_conclu != null) {
-            data.observacionesGenerales2 += `CONCLUCIONES : ${res.conclusionesRadiografia_conclu}\n`;
-          }
+          
           if (res.observacionesOdonto_txtobservaciones != null &&
             res.observacionesOdonto_txtobservaciones != "NINGUNA")
             data.observacionesGenerales2 += `ODONTOGRAMA : ${res.observacionesOdonto_txtobservaciones}\n`;

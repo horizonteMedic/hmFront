@@ -113,6 +113,7 @@ import PlantillasCorreo from "./PlantillasCorreo/PlantillasCorreo.jsx";
 import AsistencialTabSelector from "./Asistencial/AsistencialTabSelector.jsx";
 import SubidaArchivos from "./SubidaArchivos/SubidaArchivos.jsx";
 import PacientesObservados from "./PacientesObservados/PacientesObservados.jsx";
+import SeguimientoClinico from "./SeguimientoClinico/SeguimientoClinico.jsx";
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
   { key: 7, label: "Test Altura" },
@@ -333,6 +334,7 @@ const TabComponent = () => {
                   { vista: "Asistencial", tab: 42, icons: [{ icon: faHandHoldingMedical }], label: "Asistencial" },
                   { vista: "Subida de Archivos", tab: 43, icons: [{ icon: faUpload }], label: "Subida de Archivos" },
                   { vista: "Pacientes Observados", tab: 44, icons: [{ icon: faMagnifyingGlassPlus }], label: "Pacientes Observados" },
+                  { vista: "Seguimiento Clinico", tab: 45, icons: [{ icon: faFileMedical }], label: "Seguimiento Clínico" },
                   { vista: "Folio", tab: 40, icons: [{ icon: faFileContract }], label: "Folio" },
                 ];
                 return items
@@ -614,6 +616,7 @@ const TabComponent = () => {
               42: { title: "Asistencial", child: <AsistencialTabSelector tieneVista={tieneVista} /> },
               43: { title: "Subida de Archivos", child: <SubidaArchivos /> },
               44: { title: "Pacientes Observados", child: <PacientesObservados /> },
+              45: { title: "Seguimiento Clinico", child: <SeguimientoClinico /> },
               40: { title: "Folio", child: <Folio /> },
             };
             const section = displayedInterfaces[activeTab];

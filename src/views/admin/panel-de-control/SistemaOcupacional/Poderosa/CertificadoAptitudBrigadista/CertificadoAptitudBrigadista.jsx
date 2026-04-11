@@ -1,3 +1,5 @@
+import { faPrint } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
 import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
@@ -69,9 +71,15 @@ const CertificadoAptitudBrigadista = () => {
         }
     };
 
+    // const handlePrint = () => {
+    //     handlePrintDefault(() => {
+    //         PrintHojaR(form.norden, token, tabla);
+    //     });
+    // };
+
     const handlePrint = () => {
         handlePrintDefault(() => {
-            PrintHojaR(form.norden, token, tabla);
+            PrintHojaR(form.norden, token, tabla, datosFooter);
         });
     };
 
@@ -157,6 +165,7 @@ const CertificadoAptitudBrigadista = () => {
             {/* BOTONES DE ACCIÓN */}
             <BotonesAccion
                 form={form}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
                 handleSave={handleSave}
                 handleClear={handleClear}
                 handlePrint={handlePrint}

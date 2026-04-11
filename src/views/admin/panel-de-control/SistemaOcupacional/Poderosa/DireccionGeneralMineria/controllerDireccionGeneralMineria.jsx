@@ -8,13 +8,13 @@ import {
     VerifyTRDefault,
 } from "../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
+import { getFetch } from "../../../../../utils/apiHelpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/ministerioEnergiaMinas/obtenerReporte";
 const obtenerReporteJsReportUrl = "/api/v01/ct/ministerioEnergiaMinas/descargarReporteMinisterioEnergiaMinas";
 const registrarUrl =
     "/api/v01/ct/ministerioEnergiaMinas/registrarActualizar";
-
 
 export const GetInfoServicio = async (
     nro,
@@ -54,7 +54,9 @@ export const GetInfoServicio = async (
             cargoDesempenar: res.cargoPaciente ?? "",
             ocupacion: res.ocupacionPaciente ?? "",
 
-
+            fechaNacimientoPaciente: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+            peso: res.peso ?? "",
+            talla: res.talla ?? "",
         }));
     }
 };
@@ -189,14 +191,38 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
     });
 };
 
-export const PrintHojaR = (nro, token, tabla) => {
+/*export const PrintHojaR = (nro, token, tabla) => {
     PrintHojaRJsReportDefault(
         nro,
         token,
         tabla,
         obtenerReporteJsReportUrl
     );
-};
+};*/
+
+export const PrintHojaR = (nro, token, tabla) => {
+    Loading('Cargando Formato a Imprimir')
+    getFetch(`/api/v01/ct/ministerioEnergiaMinas/obtenerReporte?nOrden=${nro}&nameService=${tabla}&esJasper=true`, token)
+        .then(async (res) => {
+            console.log(res)
+            if (res.norden) {
+                const nombre = "ENERGIAYMINAS";
+                console.log(nombre)
+                const jasperModules = import.meta.glob('../../../../../jaspers/Poderosa/*.jsx');
+                const modulo = await jasperModules[`../../../../../jaspers/Poderosa/${nombre}.jsx`]();
+                // Ejecuta la función exportada por default con los datos
+                if (typeof modulo.default === 'function') {
+                    modulo.default(res);
+                } else {
+                    console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+                }
+                Swal.close()
+            } else {
+                Swal.close()
+            }
+        })
+}
+
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
     VerifyTRDefault(
         nro,

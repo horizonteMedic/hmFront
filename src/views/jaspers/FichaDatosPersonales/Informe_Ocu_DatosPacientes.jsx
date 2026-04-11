@@ -3,6 +3,8 @@ import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
+import autoTable from "jspdf-autotable";
+import { getSign } from "../../utils/helpers.js";
 
 export default async function Informe_Ocu_DatosPacientes(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -85,63 +87,85 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   };
 
   const datosFinales = {
-    empresa: String(data.empresa ?? datosPrueba.empresa),
-    cargo: String(data.cargoPaciente ?? datosPrueba.cargo),
-    esEmpleado: (data.tipoTrabajador ?? datosPrueba.tipoTrabajador) === "EMPLEADO",
-    esObrero: (data.tipoTrabajador ?? datosPrueba.tipoTrabajador) === "OBRERO",
-    fechaIngreso: formatearFechaCorta(data.fechaIngreso) || datosPrueba.fechaIngreso,
-    codigoDpto: String(data.codigoDpto ?? datosPrueba.codigoDpto),
-    codigoActividad: String(data.codigoActividad ?? datosPrueba.codigoActividad),
-    zona: String(data.zona ?? datosPrueba.zona),
-    apellidos: String(data.apellidosPaciente ?? datosPrueba.apellidos),
-    nombres: String(data.nombresPaciente ?? datosPrueba.nombres),
-    sede: String(data.sede ?? data.nombreSede ?? datosPrueba.sede),
-    numeroFicha: String(data.norden ?? datosPrueba.numeroFicha),
-    codigoColor: String(data.codigoColor ?? datosPrueba.codigoColor),
-    textoColor: String(data.textoColor ?? datosPrueba.textoColor),
+    empresa: String(data.empresa ?? ""),
+    cargo: String(data.cargoPaciente ?? ""),
+    esEmpleado: data.tipoTrabajador === "EMPLEADO",
+    esObrero: data.tipoTrabajador === "OBRERO",
+    fechaIngreso: formatearFechaCorta(data.fechaIngreso) || "",
+    codigoDpto: String(data.codigoDpto ?? ""),
+    codigoActividad: String(data.codigoActividad ?? ""),
+    zona: String(data.zona ?? ""),
+    apellidos: String(data.apellidosPaciente ?? ""),
+    nombres: String(data.nombresPaciente ?? ""),
+    sede: String(data.sede ?? data.nombreSede ?? ""),
+    numeroFicha: String(data.norden ?? ""),
+    codigoColor: String(data.codigoColor ?? ""),
+    textoColor: String(data.textoColor ?? ""),
+
     // Fecha y lugar de nacimiento
-    diaNacimiento: String(data.diaNacimiento ?? datosPrueba.diaNacimiento),
-    mesNacimiento: String(data.mesNacimiento ?? datosPrueba.mesNacimiento),
-    anioNacimiento: String(data.anioNacimiento ?? datosPrueba.anioNacimiento),
-    distritoNacimiento: String(data.distritoNacimiento ?? datosPrueba.distritoNacimiento),
-    provinciaNacimiento: String(data.provinciaNacimiento ?? datosPrueba.provinciaNacimiento),
-    departamentoNacimiento: String(data.departamentoNacimiento ?? datosPrueba.departamentoNacimiento),
+    diaNacimiento: String(data.diaNacimiento ?? ""),
+    mesNacimiento: String(data.mesNacimiento ?? ""),
+    anioNacimiento: String(data.anioNacimiento ?? ""),
+    distritoNacimiento: String(data.distritoNacimiento ?? ""),
+    provinciaNacimiento: String(data.provinciaNacimiento ?? ""),
+    departamentoNacimiento: String(data.departamentoNacimiento ?? ""),
+
     // Datos adicionales
-    dni: String(data.dniPaciente ?? datosPrueba.dni),
-    lmNo: String(data.lmNo ?? datosPrueba.lmNo),
-    autogenerado: String(data.autogenerado ?? datosPrueba.autogenerado),
-    estadoCivil: String(data.estadoCivil ?? datosPrueba.estadoCivil),
-    afpSnp: String(data.afpSnp ?? datosPrueba.afpSnp),
-    estatura: String(data.estatura ?? datosPrueba.estatura),
-    licConducirNo: String(data.licConducirNo ?? datosPrueba.licConducirNo),
-    cusspNo: String(data.cusspNo ?? datosPrueba.cusspNo),
-    peso: String(data.peso ?? datosPrueba.peso),
+    dni: String(data.dniPaciente ?? ""),
+    lmNo: String(data.lmNo ?? ""),
+    autogenerado: String(data.autogenerado ?? ""),
+    estadoCivil: String(data.estadoCivil ?? ""),
+    afpSnp: String(data.afpSnp ?? ""),
+    estatura: String(data.estatura ?? ""),
+    licConducirNo: String(data.licConducirNo ?? ""),
+    cusspNo: String(data.cusspNo ?? ""),
+    peso: String(data.peso ?? ""),
+
     // Domicilio
-    direccionDomicilio: String(data.direccionPaciente ?? datosPrueba.direccionDomicilio),
-    distritoDomicilio: String(data.distritoDomicilio ?? datosPrueba.distritoDomicilio),
-    provinciaDomicilio: String(data.provinciaDomicilio ?? datosPrueba.provinciaDomicilio),
-    departamentoDomicilio: String(data.departamentoDomicilio ?? datosPrueba.departamentoDomicilio),
-    referenciaDomiciliaria: String(data.referenciaDomiciliaria ?? datosPrueba.referenciaDomiciliaria),
-    telefono1: String(data.telefono1 ?? datosPrueba.telefono1),
-    tipoViviendaPropia: data.tipoViviendaPropia ?? datosPrueba.tipoViviendaPropia,
-    tipoViviendaAlquilada: data.tipoViviendaAlquilada ?? datosPrueba.tipoViviendaAlquilada,
-    tipoViviendaOtros: data.tipoViviendaOtros ?? datosPrueba.tipoViviendaOtros,
-    telefono2: String(data.telefono2 ?? datosPrueba.telefono2),
-    email: String(data.email ?? datosPrueba.email),
-    radioFrec: String(data.radioFrec ?? datosPrueba.radioFrec),
-    celular: String(data.celular ?? datosPrueba.celular),
-    numeroCuentaAhorro: String(data.numeroCuentaAhorro ?? datosPrueba.numeroCuentaAhorro),
-    banco: String(data.banco ?? datosPrueba.banco),
+    direccionDomicilio: String(data.direccionPaciente ?? ""),
+    distritoDomicilio: String(data.distritoDomicilio ?? ""),
+    provinciaDomicilio: String(data.provinciaDomicilio ?? ""),
+    departamentoDomicilio: String(data.departamentoDomicilio ?? ""),
+    referenciaDomiciliaria: String(data.referenciaDomiciliaria ?? ""),
+    telefono1: String(data.telefono1 ?? ""),
+    tipoViviendaPropia: data.tipoViviendaPropia ?? false,
+    tipoViviendaAlquilada: data.tipoViviendaAlquilada ?? false,
+    tipoViviendaOtros: data.tipoViviendaOtros ?? false,
+    telefono2: String(data.telefono2 ?? ""),
+    email: String(data.email ?? ""),
+    radioFrec: String(data.radioFrec ?? ""),
+    celular: String(data.celular ?? ""),
+    numeroCuentaAhorro: String(data.numeroCuentaAhorro ?? ""),
+    banco: String(data.banco ?? ""),
+
     // Emergencia
-    emergenciaNombres: String(data.emergenciaNombres ?? datosPrueba.emergenciaNombres),
-    emergenciaParentesco: String(data.emergenciaParentesco ?? datosPrueba.emergenciaParentesco),
-    emergenciaTelefono: String(data.emergenciaTelefono ?? datosPrueba.emergenciaTelefono),
-    emergenciaDomicilio: String(data.emergenciaDomicilio ?? datosPrueba.emergenciaDomicilio),
-    emergenciaOtraReferencia: String(data.emergenciaOtraReferencia ?? datosPrueba.emergenciaOtraReferencia),
+    emergenciaNombres: String(data.emergenciaNombres ?? ""),
+    emergenciaParentesco: String(data.emergenciaParentesco ?? ""),
+    emergenciaTelefono: String(data.emergenciaTelefono ?? ""),
+    emergenciaDomicilio: String(data.emergenciaDomicilio ?? ""),
+    emergenciaOtraReferencia: String(data.emergenciaOtraReferencia ?? ""),
+
     // Composición familiar
-    composicionFamiliar: data.composicionFamiliar ?? datosPrueba.composicionFamiliar,
+    composicionFamiliar: data.composicionFamiliar ?? [],
+
     // Instrucción adquirida
-    instruccionAdquirida: data.instruccionAdquirida ?? datosPrueba.instruccionAdquirida,
+    instruccionAdquirida: data.instruccionAdquirida ?? [],
+
+    // EXP
+    experienciaLaboral: data.experienciaLaboral ?? [],
+    referenciasPersonales: data.referenciasPersonales ?? [],
+    sueldo: data.sueldo ?? "",
+    viaticosDescripcion: data.viaticosDescripcion ?? "",
+    sistemaTrabajo: data.sistemaTrabajo ?? "",
+
+    transporteTerrestre: data.transporteTerrestreSi === true ? "SI" :
+      data.transporteTerrestreNo === true ? "NO" : "",
+
+    viaticos: data.viaticosSi === true ? "SI" :
+      data.viaticosNo === true ? "NO" : "",
+
+    transporteAereo: data.transporteAereoSi === true ? "SI" :
+      data.transporteAereoNo === true ? "NO" : "",
   };
 
   // Header con logo
@@ -748,7 +772,7 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
     doc.line(xCol, yPos, xCol, yPos + filaAltura);
     doc.line(xCol + colGrado, yPos, xCol + colGrado, yPos + filaAltura);
     doc.setFontSize(5);
-    doc.text(familiar.gradoInstruccion, xCol + colGrado / 2, yPos + 3.5, { align: "center" });
+    doc.text(String(familiar.gradoInstruccion), xCol + colGrado / 2, yPos + 3.5, { align: "center" });
     doc.setFontSize(7);
     xCol += colGrado;
 
@@ -893,7 +917,7 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
     // Centro de Estudios
     doc.line(xColInst, yPos, xColInst, yPos + filaAltura);
     doc.line(xColInst + colCentroEstudios, yPos, xColInst + colCentroEstudios, yPos + filaAltura);
-    doc.text(inst.centroEstudio, xColInst + colCentroEstudios / 2, yPos + 3.5, { align: "center" });
+    doc.text(String(inst.centroEstudio), xColInst + colCentroEstudios / 2, yPos + 3.5, { align: "center" });
     xColInst += colCentroEstudios;
 
     // Fecha Inicio
@@ -911,7 +935,7 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
     // Grado Obtenido
     doc.line(xColInst, yPos, xColInst, yPos + filaAltura);
     doc.line(xColInst + colGradoObtenido, yPos, xColInst + colGradoObtenido, yPos + filaAltura);
-    doc.text(inst.gradoObtenido, xColInst + colGradoObtenido / 2, yPos + 3.5, { align: "center" });
+    doc.text(String(inst.gradoObtenido), xColInst + colGradoObtenido / 2, yPos + 3.5, { align: "center" });
 
     // Líneas horizontales
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
@@ -1041,10 +1065,10 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   // Header de la tabla Experiencia Laboral
   const colNombreEmpresa = 40;
   const colTelefonoExp = 22;
-  const colCargoDesempenado = 35;
+  const colCargoDesempenado = 45;
   const colFechaInicioExp = 25;
   const colFechaTerminoExp = 28;
-  const colMotivoSalida = 50;
+  const colMotivoSalida = 40;
 
   let xColExp = tablaInicioX;
 
@@ -1090,27 +1114,54 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   yPos += filaAltura;
 
   // 5 filas vacías para Experiencia Laboral
+  const dataExp = datosFinales.experienciaLaboral || [];
+
   for (let i = 0; i < 5; i++) {
+    const exp = dataExp[i] || {};
+    console.log('EXP', exp)
     xColExp = tablaInicioX;
+
+    doc.setFont("helvetica", "normal").setFontSize(7);
+
+    // Nombre de la Empresa
     doc.line(xColExp, yPos, xColExp, yPos + filaAltura);
     doc.line(xColExp + colNombreEmpresa, yPos, xColExp + colNombreEmpresa, yPos + filaAltura);
+    doc.text(String(exp.empresa || "-"), xColExp + colNombreEmpresa / 2, yPos + 3.5, { align: "center" });
     xColExp += colNombreEmpresa;
+
+    // Teléfono
     doc.line(xColExp, yPos, xColExp, yPos + filaAltura);
     doc.line(xColExp + colTelefonoExp, yPos, xColExp + colTelefonoExp, yPos + filaAltura);
+    doc.text(String(exp.telefono || "-"), xColExp + colTelefonoExp / 2, yPos + 3.5, { align: "center" });
     xColExp += colTelefonoExp;
+
+    // Cargo
     doc.line(xColExp, yPos, xColExp, yPos + filaAltura);
     doc.line(xColExp + colCargoDesempenado, yPos, xColExp + colCargoDesempenado, yPos + filaAltura);
+    doc.text(String(exp.cargoDesemp || "-"), xColExp + colCargoDesempenado / 2, yPos + 3.5, { align: "center" });
     xColExp += colCargoDesempenado;
+
+    // Fecha Inicio
     doc.line(xColExp, yPos, xColExp, yPos + filaAltura);
     doc.line(xColExp + colFechaInicioExp, yPos, xColExp + colFechaInicioExp, yPos + filaAltura);
+    doc.text(String(exp.fechaInicio || "-"), xColExp + colFechaInicioExp / 2, yPos + 3.5, { align: "center" });
     xColExp += colFechaInicioExp;
+
+    // Fecha Término
     doc.line(xColExp, yPos, xColExp, yPos + filaAltura);
     doc.line(xColExp + colFechaTerminoExp, yPos, xColExp + colFechaTerminoExp, yPos + filaAltura);
+    doc.text(String(exp.fechaTermino || "-"), xColExp + colFechaTerminoExp / 2, yPos + 3.5, { align: "center" });
     xColExp += colFechaTerminoExp;
+
+    // Motivo de Salida
     doc.line(xColExp, yPos, xColExp, yPos + filaAltura);
     doc.line(xColExp + colMotivoSalida, yPos, xColExp + colMotivoSalida, yPos + filaAltura);
+    doc.text(String(exp.motivoSalida || "-"), xColExp + colMotivoSalida / 2, yPos + 3.5, { align: "center" });
+
+    // Líneas horizontales
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+
     yPos += filaAltura;
   }
 
@@ -1125,10 +1176,6 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
 
-  doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text("Referencias Personales", pageW / 2, yPos + 3.5, { align: "center" });
-  yPos += filaAltura;
-
   // Header de la tabla Referencias Personales
   const colApellidosNombresRef = 45;
   const colCentroEstudiosRef = 45;
@@ -1136,65 +1183,76 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   const colTelefonoRef = 25;
   const colDireccionRef = 57;
 
-  let xColRef = tablaInicioX;
-
-  // Apellidos y Nombres
-  doc.line(xColRef, yPos, xColRef, yPos + filaAltura);
-  doc.line(xColRef + colApellidosNombresRef, yPos, xColRef + colApellidosNombresRef, yPos + filaAltura);
-  doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("Apellidos y Nombres", xColRef + colApellidosNombresRef / 2, yPos + 3.5, { align: "center" });
-  xColRef += colApellidosNombresRef;
-
-  // Centro de Estudios
-  doc.line(xColRef, yPos, xColRef, yPos + filaAltura);
-  doc.line(xColRef + colCentroEstudiosRef, yPos, xColRef + colCentroEstudiosRef, yPos + filaAltura);
-  doc.text("Centro de Estudios", xColRef + colCentroEstudiosRef / 2, yPos + 3.5, { align: "center" });
-  xColRef += colCentroEstudiosRef;
-
-  // Cargo
-  doc.line(xColRef, yPos, xColRef, yPos + filaAltura);
-  doc.line(xColRef + colCargoRef, yPos, xColRef + colCargoRef, yPos + filaAltura);
-  doc.text("Cargo", xColRef + colCargoRef / 2, yPos + 3.5, { align: "center" });
-  xColRef += colCargoRef;
-
-  // Teléfono
-  doc.line(xColRef, yPos, xColRef, yPos + filaAltura);
-  doc.line(xColRef + colTelefonoRef, yPos, xColRef + colTelefonoRef, yPos + filaAltura);
-  doc.text("Teléfono", xColRef + colTelefonoRef / 2, yPos + 3.5, { align: "center" });
-  xColRef += colTelefonoRef;
-
-  // Dirección
-  doc.line(xColRef, yPos, xColRef, yPos + filaAltura);
-  doc.line(xColRef + colDireccionRef, yPos, xColRef + colDireccionRef, yPos + filaAltura);
-  doc.text("Dirección", xColRef + colDireccionRef / 2, yPos + 3.5, { align: "center" });
-
-  // Líneas horizontales del header
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.setFont("helvetica", "bold").setFontSize(10);
+  doc.text("Referencias Personales", pageW / 2, yPos + 3.5, { align: "center" });
   yPos += filaAltura;
 
-  // 5 filas vacías para Referencias Personales
+  /// Datos
+  const dataRef = datosFinales.referenciasPersonales || [];
+
+  // Siempre 5 filas (como tu lógica original)
+  const bodyData = [];
   for (let i = 0; i < 5; i++) {
-    xColRef = tablaInicioX;
-    doc.line(xColRef, yPos, xColRef, yPos + filaAltura);
-    doc.line(xColRef + colApellidosNombresRef, yPos, xColRef + colApellidosNombresRef, yPos + filaAltura);
-    xColRef += colApellidosNombresRef;
-    doc.line(xColRef, yPos, xColRef, yPos + filaAltura);
-    doc.line(xColRef + colCentroEstudiosRef, yPos, xColRef + colCentroEstudiosRef, yPos + filaAltura);
-    xColRef += colCentroEstudiosRef;
-    doc.line(xColRef, yPos, xColRef, yPos + filaAltura);
-    doc.line(xColRef + colCargoRef, yPos, xColRef + colCargoRef, yPos + filaAltura);
-    xColRef += colCargoRef;
-    doc.line(xColRef, yPos, xColRef, yPos + filaAltura);
-    doc.line(xColRef + colTelefonoRef, yPos, xColRef + colTelefonoRef, yPos + filaAltura);
-    xColRef += colTelefonoRef;
-    doc.line(xColRef, yPos, xColRef, yPos + filaAltura);
-    doc.line(xColRef + colDireccionRef, yPos, xColRef + colDireccionRef, yPos + filaAltura);
-    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-    yPos += filaAltura;
+    const ref = dataRef[i] || {};
+    bodyData.push([
+      ref.nombres || "-",
+      ref.centroTrab || "-",
+      ref.cargoDesemp || "-",
+      ref.telefono || "-",
+      ref.direccion || "-"
+    ]);
   }
 
+  // AutoTable
+  autoTable(doc, {
+    startY: yPos,
+    margin: { left: tablaInicioX, right: 10 },
+
+    tableWidth: tablaAncho,
+
+    head: [[
+      "Apellidos y Nombres",
+      "Centro de Estudios",
+      "Cargo",
+      "Teléfono",
+      "Dirección"
+    ]],
+
+    body: bodyData,
+
+    styles: {
+      font: "helvetica",
+      fontSize: 7,
+      halign: "center",     // horizontal
+      valign: "middle",     // 🔥 centrado vertical real
+      cellPadding: 1.5,
+      lineWidth: 0.1,
+      lineColor: [0, 0, 0],
+      textColor: 0,
+    },
+
+    headStyles: {
+      fontStyle: "bold",
+      fillColor: [255, 255, 255], // blanco (como tu diseño)
+      textColor: 0,
+    },
+
+    columnStyles: {
+      0: { cellWidth: colApellidosNombresRef },
+      1: { cellWidth: colCentroEstudiosRef },
+      2: { cellWidth: colCargoRef },
+      3: { cellWidth: colTelefonoRef },
+      4: { cellWidth: colDireccionRef },
+    },
+    theme: "grid",
+
+    didDrawPage: (data) => {
+      // actualizar yPos para lo siguiente
+      yPos = data.cursor.y;
+    }
+  });
+
+  // espacio extra (como tu código)
   yPos += filaAltura;
 
   // === SECCIÓN: CONDICIONES LABORALES ===
@@ -1206,18 +1264,52 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   // Fila 1: Sueldo/Jornal | Transporte Terrestre | Viaticos
   doc.setFont("helvetica", "normal").setFontSize(8);
 
+  const drawInputText = (text, x, y, width, height) => {
+    const padding = 2;
+    const maxWidth = width - padding * 2;
+
+    const lines = doc.splitTextToSize(String(text || "-"), maxWidth);
+    const lineHeight = 3;
+
+    const textBlockHeight = lines.length * lineHeight;
+
+    let yText = y + (height - textBlockHeight) / 2 + lineHeight * 0.7;
+
+    lines.forEach(line => {
+      if (yText < y + height - 0.5) {
+        doc.text(line, x + width / 2, yText, {
+          maxWidth,
+          align: "center"
+        });
+        yText += lineHeight;
+      }
+    });
+  };
+
   // Sueldo/Jornal
   doc.text("Sueldo/Jornal:", tablaInicioX, yPos + 3.5);
   doc.text("S/.", tablaInicioX + 28, yPos + 3.5);
   doc.rect(tablaInicioX + 35, yPos + 0.5, 30, filaAltura - 1);
 
+  drawInputText(
+    datosFinales.sueldo,
+    tablaInicioX + 35,
+    yPos + 0.5,
+    30,
+    filaAltura - 1
+  );
+
   // Transporte Terrestre
   doc.text("Transporte Terrestre", tablaInicioX + 70, yPos + 3.5);
   doc.text("Si", tablaInicioX + 102, yPos + 3.5);
   doc.rect(tablaInicioX + 107, yPos + 0.5, 5, filaAltura - 1);
-  doc.text("X", tablaInicioX + 108.5, yPos + 3.5);
   doc.text("No", tablaInicioX + 114, yPos + 3.5);
   doc.rect(tablaInicioX + 120, yPos + 0.5, 5, filaAltura - 1);
+  if (datosFinales.transporteTerrestre === "SI") {
+    doc.text("X", tablaInicioX + 108.5, yPos + 3.5);
+  } else {
+    doc.text("X", tablaInicioX + 121.5, yPos + 3.5);
+  }
 
   // Viaticos
   doc.text("Viaticos", tablaInicioX + 130, yPos + 3.5);
@@ -1225,8 +1317,24 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   doc.rect(tablaInicioX + 153, yPos + 0.5, 5, filaAltura - 1);
   doc.text("No", tablaInicioX + 160, yPos + 3.5);
   doc.rect(tablaInicioX + 167, yPos + 0.5, 5, filaAltura - 1);
-  doc.text("S/.", tablaInicioX + 175, yPos + 3.5);
-  doc.rect(tablaInicioX + 182, yPos + 0.5, 18, filaAltura - 1);
+  if (datosFinales.viaticos === "SI") {
+    doc.text("X", tablaInicioX + 154.5, yPos + 3.5);
+  } else {
+    doc.text("X", tablaInicioX + 168.5, yPos + 3.5);
+  }
+  const altoExtra = filaAltura * 4;
+
+  doc.rect(tablaInicioX + 175, yPos + 0.5, 25, altoExtra - 1);
+
+  drawInputText(
+    datosFinales.viaticosDescripcion,
+    tablaInicioX + 175,
+    yPos + 0.5,
+    25,
+    altoExtra - 1
+  );
+
+  // IMPORTANTE: mover el cursor
 
   yPos += filaAltura;
 
@@ -1234,15 +1342,25 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   doc.text("Sistema Trabajo", tablaInicioX, yPos + 3.5);
   doc.rect(tablaInicioX + 35, yPos + 0.5, 30, filaAltura - 1);
 
+  drawInputText(
+    datosFinales.sistemaTrabajo,
+    tablaInicioX + 35,
+    yPos + 0.5,
+    30,
+    filaAltura - 1
+  );
+
   // Transporte Aéreo
   doc.text("Transporte Aéreo", tablaInicioX + 70, yPos + 3.5);
   doc.text("Si", tablaInicioX + 102, yPos + 3.5);
   doc.rect(tablaInicioX + 107, yPos + 0.5, 5, filaAltura - 1);
-  doc.text("X", tablaInicioX + 108.5, yPos + 3.5);
   doc.text("No", tablaInicioX + 114, yPos + 3.5);
   doc.rect(tablaInicioX + 120, yPos + 0.5, 5, filaAltura - 1);
-  doc.text("X", tablaInicioX + 121.5, yPos + 3.5);
-
+  if (datosFinales.transporteAereo === "SI") {
+    doc.text("X", tablaInicioX + 108.5, yPos + 3.5);
+  } else {
+    doc.text("X", tablaInicioX + 121.5, yPos + 3.5);
+  }
   yPos += filaAltura;
 
   // Fila 3: Alimentación A cta. Contrata
@@ -1252,12 +1370,22 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   // Fila 4: A cta. Contrata
   doc.text("A cta. Contrata", tablaInicioX, yPos + 3.5);
   doc.rect(tablaInicioX + 35, yPos + 0.5, 80, filaAltura - 1);
+
+  drawInputText(
+    datosFinales.cuentaContrata,
+    tablaInicioX + 35,
+    yPos + 0.5,
+    80,
+    filaAltura - 1
+  );
   yPos += filaAltura * 2;
 
   // === SECCIÓN: PRE EVALUACIÓN ===
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Pre Evaluación:", tablaInicioX, yPos + 3.5);
   yPos += filaAltura;
+  //SELO
+
 
   // Cuadros de PSICOLOGIA y CENTRO MEDICO (centrados)
   const cuadroAlto = 25;
@@ -1265,16 +1393,66 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   const espacioEntreCuadros = 60;
   const anchoTotalCuadros = cuadroAncho * 2 + espacioEntreCuadros;
   const xInicioCuadros = (pageW - anchoTotalCuadros) / 2;
+  const sellofirma = await getSign(data, "SELLOFIRMA");
+  const sellofirmaDoc = await getSign(data, "SELLOFIRMADOCASIG");
 
   // Cuadro PSICOLOGIA
   doc.rect(xInicioCuadros, yPos, cuadroAncho, cuadroAlto);
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("PSICOLOGIA", xInicioCuadros + cuadroAncho / 2, yPos + cuadroAlto + 4, { align: "center" });
+  if (sellofirma) {
+    const padding = 4;
+
+    const imgW = cuadroAncho - padding;
+    const imgH = cuadroAlto - padding;
+
+    const imgX = xInicioCuadros + (cuadroAncho - imgW) / 2;
+    const imgY = yPos + (cuadroAlto - imgH) / 2;
+
+    doc.addImage(sellofirma, "JPEG", imgX, imgY, imgW, imgH);
+  }
 
   // Cuadro CENTRO MEDICO
   const xCentroMedico = xInicioCuadros + cuadroAncho + espacioEntreCuadros;
   doc.rect(xCentroMedico, yPos, cuadroAncho, cuadroAlto);
   doc.text("CENTRO MEDICO", xCentroMedico + cuadroAncho / 2, yPos + cuadroAlto + 4, { align: "center" });
+  if (sellofirmaDoc) {
+    const padding = 4;
+
+    const imgW = cuadroAncho - padding;
+    const imgH = cuadroAlto - padding;
+
+    const imgX = xCentroMedico + (cuadroAncho - imgW) / 2;
+    const imgY = yPos + (cuadroAlto - imgH) / 2;
+
+    doc.addImage(sellofirmaDoc, "JPEG", imgX, imgY, imgW, imgH);
+  }
+
+  // === Imagen central (APTO / NO APTO) ===
+  let imgEstado = null;
+
+  if (data.apto || data.aptoRestriccion) {
+    imgEstado = "/img/DatosPacientes/APTO.png";
+  } else if (data.noApto) {
+    imgEstado = "/img/DatosPacientes/NOAPTO.png";
+  }
+
+  if (imgEstado) {
+    const imgSize = cuadroAncho - 15; // mismo tamaño que referencia
+    const separacion = 6;
+
+    // === IZQUIERDA de PSICOLOGIA ===
+    const imgXLeft = xInicioCuadros - separacion - imgSize;
+    const imgYLeft = yPos + (cuadroAlto - imgSize) / 2;
+
+    doc.addImage(imgEstado, "PNG", imgXLeft, imgYLeft, imgSize, imgSize);
+
+    // === DERECHA de CENTRO MEDICO ===
+    const imgXRight = xCentroMedico + cuadroAncho + separacion;
+    const imgYRight = yPos + (cuadroAlto - imgSize) / 2;
+
+    doc.addImage(imgEstado, "PNG", imgXRight, imgYRight, imgSize, imgSize);
+  }
 
   // Grupo Sanguíneo (alineado con Pre Evaluación)
   doc.setFont("helvetica", "bold").setFontSize(9);
@@ -1293,6 +1471,9 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   // === SECCIÓN: FIRMAS ===
   yPos += 3; // Bajar 3mm
 
+  const firmap = await getSign(data, "FIRMAP");
+  const huellap = await getSign(data, "HUELLA");
+
   // Cuadro Huella Digital (centro)
   const huellaAncho = 20;
   const huellaAlto = 25;
@@ -1300,11 +1481,29 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   doc.rect(xHuella, yPos, huellaAncho, huellaAlto);
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Huella Digital", pageW / 2, yPos + huellaAlto + 5, { align: "center" });
+  if (huellap) {
+    const imgW = huellaAncho - 4; // pequeño padding interno
+    const imgH = huellaAlto - 4;
+
+    const imgX = xHuella + (huellaAncho - imgW) / 2;
+    const imgY = yPos + (huellaAlto - imgH) / 2;
+
+    doc.addImage(huellap, "JPEG", imgX, imgY, imgW, imgH);
+  }
 
   // Firma del Trabajador (izquierda) - bajado 4mm
   doc.line(tablaInicioX + 10, yPos + huellaAlto - 1, tablaInicioX + 55, yPos + huellaAlto - 1);
   doc.text("Firma del Trabajador", tablaInicioX + 32, yPos + huellaAlto + 6, { align: "center" });
+  const centerXFirma = (tablaInicioX + 10 + tablaInicioX + 55) / 2;
+  if (firmap) {
+    const imgW = 30;   // ajusta según tu escala
+    const imgH = 12;
 
+    const imgX = centerXFirma - imgW / 2;
+    const imgY = (yPos + huellaAlto - 1) - imgH - 1; // encima de la línea
+
+    doc.addImage(firmap, "JPEG", imgX, imgY, imgW, imgH);
+  }
   // Firma y sello de contratista (derecha) - bajado 4mm
   doc.line(tablaInicioX + 145, yPos + huellaAlto - 1, tablaInicioX + 195, yPos + huellaAlto - 1);
   doc.text("Firma y sello de contratista", tablaInicioX + 170, yPos + huellaAlto + 6, { align: "center" });
