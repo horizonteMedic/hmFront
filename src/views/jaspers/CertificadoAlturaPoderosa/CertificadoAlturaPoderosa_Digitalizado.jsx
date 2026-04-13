@@ -203,7 +203,8 @@ export default async function CertificadoAlturaPoderosa_Digitalizado(data = {}, 
         categoria: "PIEL",
         datos: data.piel_txtpiel
       }
-    ]
+    ],
+    tituloExamen: data.tituloExamen,
   };
 
   // Función para convertir texto a mayúsculas
@@ -248,6 +249,8 @@ export default async function CertificadoAlturaPoderosa_Digitalizado(data = {}, 
     datosFinales.contrata
   );
 
+
+
   // Header reutilizable
   const drawHeader = async (pageNumber) => {
     // Logo y membrete
@@ -256,8 +259,14 @@ export default async function CertificadoAlturaPoderosa_Digitalizado(data = {}, 
     // Título principal (en todas las páginas)
     doc.setFont("helvetica", "bold").setFontSize(12);
     doc.setTextColor(0, 0, 0);
-    doc.text("EXAMEN MÉDICO OCUPACIONAL PARA TRABAJOS EN ALTURA", pageW / 2, 32.5, { align: "center" });
-    doc.text("MAYOR A 1.8 METROS", pageW / 2, 36.5, { align: "center" });
+
+    if (datosFinales.tituloExamen === "EXAMEN MÉDICO OCUPACIONAL PARA TRABAJOS EN ALTURA MAYOR A 1.8 METROS") {
+      doc.text("EXAMEN MÉDICO OCUPACIONAL PARA TRABAJOS EN ALTURA", pageW / 2, 32.5, { align: "center" });
+      doc.text("MAYOR A 1.8 METROS", pageW / 2, 36.5, { align: "center" });
+    } else if (datosFinales.tituloExamen === "EXAMEN MÉDICO OCUPACIONAL PARA TRABAJOS EN ESPACIOS CONFINADOS") {
+      doc.text("EXAMEN MÉDICO OCUPACIONAL PARA TRABAJOS", pageW / 2, 32.5, { align: "center" });
+      doc.text("EN ESPACIOS CONFINADOS", pageW / 2, 36.5, { align: "center" });
+    }
 
     // Número de Ficha y Página (alineación automática mejorada)
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -1034,8 +1043,8 @@ export default async function CertificadoAlturaPoderosa_Digitalizado(data = {}, 
   // Si tiene \n, solo tomar la primera parte (antes del salto de línea)
   const observacionesLejosRaw = data.enfermedadesocularesoftalmo_e_oculares || "";
   const observacionesLejos = formatearTextoGramatical(
-    observacionesLejosRaw.includes('\n') 
-      ? observacionesLejosRaw.split('\n')[0] 
+    observacionesLejosRaw.includes('\n')
+      ? observacionesLejosRaw.split('\n')[0]
       : observacionesLejosRaw
   );
   const alturaObservacionesLejos = calcularAlturaTextoCreciente(doc, observacionesLejos, colObservacionesAncho - 4, 8);

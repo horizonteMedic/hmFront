@@ -352,7 +352,7 @@ export const GetInfoServicioEditar = async (
             babinskiWeil: res.babinskiPositivo_chkneuro_pos8 ?? false,
             dixHallpike: res.dixPositivo_chkneuro_pos9 ?? false,
             marcha: res.marchaPositivo_chkneuro_pos10 ?? false,
-
+            tituloExamen: res.tituloExamen ?? prev.tituloExamen,
             SubirDoc: true,
             digitalizacion: res.digitalizacion,
 
@@ -490,6 +490,7 @@ export const SubmitDataService = async (
         otrosExamenesLaboratorio: form.otrosExaLaboratorio,
         altura: form.altura,
         usuarioRegistro: user,
+        tituloExamen: form.tituloExamen,
 
         usuarioFirma: form.user_medicoFirma,
         doctorAsignado: form.user_doctorAsignado,
