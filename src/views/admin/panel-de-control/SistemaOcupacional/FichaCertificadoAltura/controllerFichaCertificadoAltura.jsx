@@ -174,6 +174,8 @@ export const GetInfoServicio = async (
             perimetroToracicoEspiracion: res.forazadaPtoracico_p_ex_forzada ?? "",
 
             medicinasTomando: res.medicamentosAnexo16A ?? "",
+
+            razonVisita: (res.nombreExamen ?? "") == "ANUAL" ? "REVALIDACION" : "PRIMERA ACTITUD",
         }));
     }
 };
