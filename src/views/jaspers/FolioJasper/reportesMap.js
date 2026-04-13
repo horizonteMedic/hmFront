@@ -112,6 +112,7 @@ import Informe_Lab_hemoglobina from "../LaboratorioClinico/Informe_Lab_hemoglobi
 import Informe_Lab_Eco from "../AnalisisBioquimicos/Informe_Lab_Eco";
 import Certificado_Aptitud_Herramientas_Manuales_Digitalizado from "../Poderosa/Certificado_Aptitud_Herramientas_Manuales_Digitalizado"; //Gr nuevo
 import PCRULTRASENSIBLE from "../AnalisisBioquimicos/PCRULTRASENSIBLE";
+import COLINESTERASA from "../AnalisisBioquimicos/COLINESTERASA";
 import ETANOLSALIVA from "../Toxicologia/ETANOLSALIVA";
 
 export const reportesMap = {
@@ -367,6 +368,8 @@ export const reportesMap = {
    etanol_saliva: ETANOLSALIVA,
 
    pcr_ultrasensible: PCRULTRASENSIBLE,
+
+   colinesterasa: COLINESTERASA,
 
    exam_complementarios: InformePsicoExamComplementario,
 

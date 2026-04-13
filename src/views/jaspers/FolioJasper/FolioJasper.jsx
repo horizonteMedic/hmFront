@@ -49,6 +49,9 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "MERCURIO EN ORINA",
         "PLOMO EN SANGRE",
     ];
+    const conJsonAnidado = [
+        "colinesterasa",
+    ]
     const coordenadasPSICOSENSO = {
         HUELLA: { x: 400, y: 680, width: 60, height: 60 },
         FIRMA: { x: 466, y: 680, width: 120, height: 60 },
@@ -128,7 +131,10 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
                         : `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}`;
             }
             try {
-                const data = await getFetch(apiUrl, token, signal);
+                let data = await getFetch(apiUrl, token, signal);
+                if (conJsonAnidado.includes(examen.tabla)) {
+                    data = data.resultado;
+                }
                 return data ? { ...data, ...datosFooter } : null;
             } catch (err) {
                 console.error("Error cargando:", examen.nombre, err);
