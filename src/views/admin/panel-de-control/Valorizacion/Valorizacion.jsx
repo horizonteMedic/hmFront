@@ -11,35 +11,46 @@ import InputsBooleanRadioGroup from '../../../components/reusableComponents/Inpu
 import ModalFiltros from './ModalFiltros';
 import { SubmitValorizaciones } from './model/controllerValo';
 
-const Columnas = {
-    DNI: false,
-    Nombres: false,
-    Cargo: false,
-    Fecha: false,
-    "Tipo Pago": false,
-    Empresa: false,
-    Contrata: false,
-    EKG: false,
-    Sexo: false,
-    "T. Examen": false,
-    Psicosensometria: false,
-    "RX Lumbar": false,
-    "Trab. Calientes": false,
-    "Visual-Compl": false,
-    Covid1: false,
-    Covid2: false,
-    "Manipulador Alimentos": false,
-    "Herramientas Manuales": false,
-    "Fist-Test": false,
-    "Test Altura": false,
-    "RX Plomo": false,
-    "Espacios Confinados": false,
-    "Test Marihuana": false,
-    "Test Cocaina": false,
-    Mercurio: false,
-    "RX Lumbo Sacra": false,
-    "RX Dorso Lumbar": false
-};
+/*const Columnas = [
+    { nombre: "DNI", valor: false },
+    { nombre: "Nombres", valor: false },
+    { nombre: "Cargo", valor: false },
+    { nombre: "Fecha", valor: false },
+    { nombre: "Tipo Pago", valor: false },
+    { nombre: "Empresa", valor: false },
+    { nombre: "Contrata", valor: false },
+    { nombre: "EKG", valor: false },
+    { nombre: "Sexo", valor: false },
+    { nombre: "T. Examen", valor: false },
+    { nombre: "Psicosensometria", valor: false },
+    { nombre: "RX Lumbar", valor: false },
+    { nombre: "Trab. Calientes", valor: false },
+    { nombre: "Visual-Compl", valor: false },
+    { nombre: "Covid1", valor: false },
+    { nombre: "Covid2", valor: false },
+    { nombre: "Manipulador Alimentos", valor: false },
+    { nombre: "Herramientas Manuales", valor: false },
+    { nombre: "Fist-Test", valor: false },
+    { nombre: "Test Altura", valor: false },
+    { nombre: "RX Plomo", valor: false },
+    { nombre: "Espacios Confinados", valor: false },
+    { nombre: "Test Marihuana", valor: false },
+    { nombre: "Test Cocaina", valor: false },
+    { nombre: "Mercurio", valor: false },
+    { nombre: "RX Lumbo Sacra", valor: false },
+    { nombre: "RX Dorso Lumbar", valor: false }
+];*/
+
+const Columnas = [
+    { nombre: "DNI", key: "dni", valor: false },
+    { nombre: "Nombres", key: "nombres", valor: false },
+    { nombre: "Cargo", key: "cargo", valor: false },
+    { nombre: "Fecha", key: "fechaApertura", valor: false },
+    { nombre: "Tipo Pago", key: "tipoPago", valor: false },
+    { nombre: "Empresa", key: "empresa", valor: false },
+    { nombre: "Contrata", key: "contrata", valor: false },
+    { nombre: "T. Examen", key: "nombreExamen", valor: false }
+];
 
 const Valorizacion = () => {
     const { token, userlogued, selectedSede, datosFooter, userName, userDNI } =
@@ -558,11 +569,8 @@ const Valorizacion = () => {
     };
 
     const SubmitAPI = () => {
-        SubmitValorizaciones(form, token)
+        SubmitValorizaciones(form, token, setData)
     }
-
-    const startIdx = (currentPage - 1) * recordsPerPage;
-    const endIdx = startIdx + recordsPerPage;
 
     const getMaxDepth = (nodes, level = 1) =>
         Math.max(
@@ -588,6 +596,13 @@ const Valorizacion = () => {
         });
         return result;
     };
+
+    const columnasVisibles = form.TipoBusqueda
+        ? Columnas // todas
+        : Columnas.filter(col => col.valor);
+    const startIdx = (currentPage - 1) * recordsPerPage;
+    const endIdx = startIdx + recordsPerPage;
+    const currentData = Array.isArray(columnasVisibles) ? columnasVisibles.slice(startIdx, endIdx) : [];
 
     return (
         <div className="container mx-auto mt-12 mb-12">
@@ -728,7 +743,33 @@ const Valorizacion = () => {
                 </div>
                 {/* Tabla de form */}
                 <div className="overflow-x-auto p-3 relative">
-                                //
+                    <table className="min-w-full border border-gray-300 text-sm">
+
+                        {/* HEADER */}
+                        <thead className="bg-gray-100">
+                            <tr>
+                                {currentData.map((col, index) => (
+                                    <th key={index} className="border px-3 py-2 text-left">
+                                        {col.nombre}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+
+                        {/* BODY */}
+                        <tbody>
+                            {data.map((row, rowIndex) => (
+                                <tr key={rowIndex} className="hover:bg-gray-50">
+                                    {columnasVisibles.map((col, colIndex) => (
+                                        <td key={colIndex} className="border px-3 py-2">
+                                            {row[col.key] ?? "-"}
+                                        </td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tbody>
+
+                    </table>
                 </div>
                 <div className="flex justify-center p-4">
                     <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} className="mx-1 px-3 py-1 naranjabackgroud text-white rounded-md">

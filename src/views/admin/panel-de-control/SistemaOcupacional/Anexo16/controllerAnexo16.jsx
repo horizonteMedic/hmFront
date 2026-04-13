@@ -1957,9 +1957,9 @@ export const GetInfoServicioEditar = (
           //   data.observacionesGenerales += "FICHA CONDUCCION: " + res.observacionFichaConduccion + "\n";
           // }
 
-          const hallazgoEKG = res.hallazgosInformeElectroCardiograma_hallazgo;
-          const conclusionesEkg = res.conclusionekg;
-          const recomendacionesEKG = res.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
+          const hallazgoEKG = resSimple.hallazgosInformeElectroCardiograma_hallazgo;
+          const conclusionesEkg = resSimple.conclusionekg;
+          const recomendacionesEKG = resSimple.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
 
           if (
             (hallazgoEKG && hallazgoEKG !== "NORMAL") ||

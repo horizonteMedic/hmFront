@@ -6,11 +6,14 @@ const ModalFiltros = ({ closeModal, Refresgpag, id_user, userlogued, token, Filt
 
     const [selected, setSelected] = useState([]);
 
-    const toggleCheckbox = (col) => {
-        setFiltros(prev => ({
-            ...prev,
-            [col]: !prev[col]
-        }));
+    const toggleCheckbox = (nombre) => {
+        setFiltros(prev =>
+            prev.map(item =>
+                item.nombre === nombre
+                    ? { ...item, valor: !item.valor }
+                    : item
+            )
+        );
     };
     return (
         <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50 z-50">
@@ -30,17 +33,17 @@ const ModalFiltros = ({ closeModal, Refresgpag, id_user, userlogued, token, Filt
                 {/* Body scrollable */}
                 <div className="p-4 overflow-y-auto grid grid-cols-2 gap-3">
 
-                    {Object.keys(Filtros).map((col, index) => (
+                    {Filtros.map((item, index) => (
                         <label
                             key={index}
                             className="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-100 px-2 py-1 rounded transition"
                         >
                             <input
                                 type="checkbox"
-                                checked={Filtros[col]}
-                                onChange={() => toggleCheckbox(col)}
+                                checked={item.valor}
+                                onChange={() => toggleCheckbox(item.nombre)}
                             />
-                            {col}
+                            {item.nombre}
                         </label>
                     ))}
 
