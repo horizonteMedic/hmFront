@@ -42,6 +42,7 @@ export default function CertificadoAlturaPoderosa() {
     const initialFormState = {
         // Header - Campos principales
         norden: "",
+        tituloExamen: "CERTIFICADO DE APTITUD PARA USO DE HERRAMIENTAS MANUALES",
         codigoCertificado: null,
         fechaExam: today,
         nombreExamen: "",
@@ -297,6 +298,22 @@ export default function CertificadoAlturaPoderosa() {
                                 value={form?.nombreExamen}
                                 disabled
                             />
+                            <div className="flex gap-4 items-center ">
+                                <h4 className="font-semibold min-w-[120px] max-w-[120px] text-primario">Título del Examen :</h4>
+                                <select
+                                    name="tituloExamen"
+                                    value={form.tituloExamen}
+                                    onChange={handleChangeSimple}
+                                    className="border rounded px-2 py-1 text-base w-full"
+                                >
+                                    <option value="EXAMEN MÉDICO OCUPACIONAL PARA TRABAJOS EN ALTURA MAYOR A 1.8 METROS">
+                                        EXAMEN MÉDICO OCUPACIONAL PARA TRABAJOS EN ALTURA MAYOR A 1.8 METROS
+                                    </option>
+                                    <option value="EXAMEN MÉDICO OCUPACIONAL PARA TRABAJOS EN ESPACIOS CONFINADOS">
+                                        EXAMEN MÉDICO OCUPACIONAL PARA TRABAJOS EN ESPACIOS CONFINADOS
+                                    </option>
+                                </select>
+                            </div>
                             <InputTextOneLine
                                 label="Fecha Examen "
                                 name="fechaExam"
