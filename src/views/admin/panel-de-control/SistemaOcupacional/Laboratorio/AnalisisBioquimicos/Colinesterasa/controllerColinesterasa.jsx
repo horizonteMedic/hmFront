@@ -3,11 +3,12 @@ import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
     LoadingDefault,
-    PrintHojaRJsReportDefault,
     SubmitDataServiceDefault,
     VerifyTRDefault,
 } from "../../../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils";
+
+import { getFetch } from "../../../../../../utils/apiHelpers";
 
 // CAMBIAR SOLO LAS URL
 const obtenerReporteUrl = "/api/v01/ct/colinesterasa/reporte";
@@ -88,13 +89,26 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
 
 // ===================== PRINT =====================
 export const PrintHojaR = (nro, token, tabla) => {
-    PrintHojaRJsReportDefault(
-        nro,
-        token,
-        tabla,
-        obtenerReporteJsReportUrl
-    );
-};
+    Loading('Cargando Formato a Imprimir')
+    getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`, token)
+        .then(async (res) => {
+            if (res?.resultado?.norden) {
+                const nombre = "COLINESTERASA";
+                console.log(nombre)
+                const jasperModules = import.meta.glob('../../../../../../jaspers/AnalisisBioquimicos/*.jsx');
+                const modulo = await jasperModules[`../../../../../../jaspers/AnalisisBioquimicos/${nombre}.jsx`]();
+                // Ejecuta la función exportada por default con los datos
+                if (typeof modulo.default === 'function') {
+                    modulo.default(res.resultado);
+                } else {
+                    console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+                }
+                Swal.close()
+            } else {
+                Swal.close()
+            }
+        })
+}
 
 // ===================== VERIFY (CORREGIDO PARA PCR ULTRASENSIBLE) =====================
 export const VerifyTR = async (nro, tabla, token, set, sede) => {

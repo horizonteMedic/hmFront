@@ -219,6 +219,13 @@ export const EXAMENES_CATALOGO = {
         esJasper: true,
     },
 
+    COLINESTERASA: {
+        nombre: "COLINESTERASA",
+        tabla: "colinesterasa",
+        url: "/api/v01/ct/colinesterasa/reporte",
+        esJasper: true,
+    },
+
     // ETANOL_EN_SALIVA_JSREPORT: {
     //     nombre: "ETANOL EN SALIVA",
     //     tabla: "etanol_saliva",

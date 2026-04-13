@@ -3,8 +3,8 @@ import { getFetch } from "../../../../utils/apiHelpers";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { LoadingDefault } from "../../../../utils/functionUtils";
 
-const obtenerReporteUrl =
-    "/api/v01/st/registros/historial";
+const obtenerReporteUrl = "/api/v01/st/registros/historial";
+const obtenerHistorialExamenes = "/api/v01/st/registros/historialExamenes"
 
 export const searchByNorden = (
     nro,
@@ -12,7 +12,7 @@ export const searchByNorden = (
     token
 ) => {
     try {
-        Loading("Buscando Registros");
+        // Loading("Buscando Registros");
         getFetch(`${obtenerReporteUrl}?${nro == "" ? "" : `&norden=${nro}`}`, token)
             .then((res) => {
                 if (res) {
@@ -32,13 +32,45 @@ export const searchByNorden = (
                         historialOrdenes: res.historialOrdenes ?? [],
                     }));
                 }
-                Swal.close();
+                // Swal.close();
             });
     } catch (error) {
         console.error("Error en Encontrar Norden:", error);
         Swal.fire(
             "Error",
             "Ocurrió un error al obtener los datos del Norden",
+            "error"
+        );
+    }
+};
+
+export const getHistorialExamenes = (
+    nro,
+    setForm,
+    token
+) => {
+    try {
+        Loading("Buscando Registros de Exámenes");
+        getFetch(`${obtenerHistorialExamenes}?${nro == "" ? "" : `&norden=${nro}`}`, token)
+            .then((res) => {
+                if (res) {
+                    setForm(prev => ({
+                        ...prev,
+                        resultadoExamenes: res ?? {
+                            laboratorio: [],
+                            audiometria: [],
+                            oftalmologia: [],
+                            rayosX: []
+                        },
+                    }));
+                }
+                Swal.close();
+            });
+    } catch (error) {
+        console.error("Error en Encontrar Registros de Exámenes:", error);
+        Swal.fire(
+            "Error",
+            "Ocurrió un error al obtener los registros de exámenes",
             "error"
         );
     }
