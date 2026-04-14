@@ -390,7 +390,7 @@ export const GetInfoServicio = (
             (hallazgoEKG && hallazgoEKG !== "NORMAL") ||
             (conclusionesEkg && !conclusionesEkg.includes("DENTRO DE PARAMETROS NORMALES"))
           ) {
-            data.observacionesGenerales += `ELECTROCARDIOGRAMA: ${recomendacionesEKG}\n`;
+            data.observacionesGenerales += `ELECTROCARDIOGRAMA: ${hallazgoEKG ? hallazgoEKG + "\n" : ""}${conclusionesEkg ? conclusionesEkg + "\n" : ""}${recomendacionesEKG ?? ""}\n`;
           }
 
           // if (res.observacionFichaConduccion != null) {
@@ -1965,7 +1965,7 @@ export const GetInfoServicioEditar = (
             (hallazgoEKG && hallazgoEKG !== "NORMAL") ||
             (conclusionesEkg && !conclusionesEkg.includes("DENTRO DE PARAMETROS NORMALES"))
           ) {
-            data.observacionesGenerales2 += `-ELECTROCARDIOGRAMA: ${recomendacionesEKG}\n`;
+            data.observacionesGenerales2 += `-ELECTROCARDIOGRAMA: ${hallazgoEKG ? hallazgoEKG + "\n" : ""}${conclusionesEkg ? conclusionesEkg + "\n" : ""}${recomendacionesEKG ?? ""}\n`;
           }
 
           // Información radiográfica
