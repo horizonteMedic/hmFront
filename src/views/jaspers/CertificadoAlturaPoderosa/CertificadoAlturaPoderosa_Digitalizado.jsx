@@ -893,7 +893,7 @@ export default async function CertificadoAlturaPoderosa_Digitalizado(data = {}, 
 
   // Contenido de la fila OJOS
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("OÍDOS:", tablaInicioX + 2, yPos + 3.5);
+  doc.text("OJOS:", tablaInicioX + 2, yPos + 3.5);
 
   yPos += filaAltura;
 
