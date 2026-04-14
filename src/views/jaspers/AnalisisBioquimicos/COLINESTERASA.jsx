@@ -214,7 +214,7 @@ export default async function COLINESTERASA(datos = {}, docExistente = null) {
   // === CUERPO DE TABLA ===
   // PRUEBA
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
-  doc.text("COLINESTERASA", config.col1X, y + 10);
+  doc.text("COLINESTERASA SERICA", config.col1X, y + 10);
 
   // Resultado
   doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
@@ -222,9 +222,9 @@ export default async function COLINESTERASA(datos = {}, docExistente = null) {
 
   // Valores Normales (con saltos de línea y formato según la imagen)
   doc.setFont(config.font, "normal").setFontSize(config.fontSize.small);
-  
+
   let valY = y + 5;
-  const labelsX = config.col3X-15;
+  const labelsX = config.col3X - 15;
   const dotsX = labelsX + 45; // Posición de los dos puntos
   const valuesX = dotsX + 2;
 
