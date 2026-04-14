@@ -43,13 +43,32 @@ import { SubmitValorizaciones } from './model/controllerValo';
 
 const Columnas = [
     { nombre: "DNI", key: "dni", valor: false },
-    { nombre: "Nombres", key: "nombres", valor: false },
+    { nombre: "Nombres", key: "nombresCompletos", valor: false },
     { nombre: "Cargo", key: "cargo", valor: false },
     { nombre: "Fecha", key: "fechaApertura", valor: false },
     { nombre: "Tipo Pago", key: "tipoPago", valor: false },
     { nombre: "Empresa", key: "empresa", valor: false },
     { nombre: "Contrata", key: "contrata", valor: false },
-    { nombre: "T. Examen", key: "nombreExamen", valor: false }
+    { nombre: "EKG", key: "ekg", valor: false },
+    { nombre: "Sexo", key: "sexo", valor: false },
+    { nombre: "T. Examen", key: "nombreExamen", valor: false },
+    { nombre: "Psicosensometria", key: "psicosensometria", valor: false },
+    { nombre: "RX Lumbar", key: "rxLumbar", valor: false },
+    { nombre: "Trab. Calientes", key: "trabCalientes", valor: false },
+    { nombre: "Visual-Compl", key: "visualCompl", valor: false },
+    { nombre: "Covid1", key: "tipoPruebaCovid", valor: false },
+    { nombre: "Covid2", key: "tipoPruebaCovid", valor: false },
+    { nombre: "Manipulador Alimentos", key: "manipuladorAlimentos", valor: false },
+    { nombre: "Herramientas Manuales", key: "herramientasManuales", valor: false },
+    { nombre: "Fist-Test", key: "fistTest", valor: false },
+    { nombre: "Test Altura", key: "testAltura", valor: false },
+    { nombre: "RX Plomo", key: "rxPlomo", valor: false },
+    { nombre: "Espacios Confinados", key: "espaciosConfinados", valor: false },
+    { nombre: "Test Marihuana", key: "testMarihuana", valor: false },
+    { nombre: "Test Cocaina", key: "testCocaina", valor: false },
+    { nombre: "Mercurio", key: "mercurio", valor: false },
+    { nombre: "RX Lumbo Sacra", key: "rxLumboSacra", valor: false },
+    { nombre: "RX Dorso Lumbar", key: "rxDorsoLumbar", valor: false }
 ];
 
 const Valorizacion = () => {
@@ -84,7 +103,6 @@ const Valorizacion = () => {
         handlePrintDefault,
     } = useForm(initialFormState);
     const [loading, setLoading] = useState(false);
-
     const [data, setData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -569,7 +587,18 @@ const Valorizacion = () => {
     };
 
     const SubmitAPI = () => {
-        SubmitValorizaciones(form, token, setData)
+        const esPersonalizada = !form.TipoBusqueda;
+
+        if (esPersonalizada) {
+            setForm(prev => ({
+                ...prev,
+                Filtros: prev.Filtros.map(col => ({
+                    ...col,
+                    valor: true
+                }))
+            }));
+        }
+        SubmitValorizaciones(form, token, setData, setForm)
     }
 
     const getMaxDepth = (nodes, level = 1) =>
@@ -598,8 +627,8 @@ const Valorizacion = () => {
     };
 
     const columnasVisibles = form.TipoBusqueda
-        ? Columnas // todas
-        : Columnas.filter(col => col.valor);
+        ? form.Filtros // todas
+        : form.Filtros.filter(col => col.valor);
     const startIdx = (currentPage - 1) * recordsPerPage;
     const endIdx = startIdx + recordsPerPage;
     const currentData = Array.isArray(columnasVisibles) ? columnasVisibles.slice(startIdx, endIdx) : [];
@@ -748,8 +777,8 @@ const Valorizacion = () => {
                         {/* HEADER */}
                         <thead className="bg-gray-100">
                             <tr>
-                                {currentData.map((col, index) => (
-                                    <th key={index} className="border px-3 py-2 text-left">
+                                {currentData.map((col, i) => (
+                                    <th key={i} className="border px-3 py-2 text-left">
                                         {col.nombre}
                                     </th>
                                 ))}
@@ -758,13 +787,27 @@ const Valorizacion = () => {
 
                         {/* BODY */}
                         <tbody>
-                            {data.map((row, rowIndex) => (
-                                <tr key={rowIndex} className="hover:bg-gray-50">
-                                    {columnasVisibles.map((col, colIndex) => (
-                                        <td key={colIndex} className="border px-3 py-2">
-                                            {row[col.key] ?? "-"}
-                                        </td>
-                                    ))}
+                            {data.map((row, i) => (
+                                <tr key={i} className="hover:bg-gray-50">
+                                    {columnasVisibles.map((col, j) => {
+                                        let value = row[col.key];
+
+                                        // boolean → SI / NO
+                                        if (typeof value === "boolean") {
+                                            value = value ? "SI" : "NO";
+                                        }
+
+                                        // caso COVID
+                                        if (col.nombre === "Covid1" || col.nombre === "Covid2") {
+                                            value = row.tipoPruebaCovid || "-";
+                                        }
+
+                                        return (
+                                            <td key={j} className="border px-3 py-2">
+                                                {value ?? "-"}
+                                            </td>
+                                        );
+                                    })}
                                 </tr>
                             ))}
                         </tbody>

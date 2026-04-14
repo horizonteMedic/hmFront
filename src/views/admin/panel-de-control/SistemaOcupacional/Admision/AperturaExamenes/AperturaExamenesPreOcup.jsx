@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 import { useSessionData } from '../../../../../hooks/useSessionData.js';
 import { fixEncodingModern } from '../../../../../utils/helpers.js';
 import ModalExamenes from './modals/modalExamenes+/ModalExamenes'
+import SubidaMasiva from './modals/modalSubidaMasiva/ModalSubidaMasiva.jsx';
 
 const AperturaExamenesPreOcup = (props) => {
   const today = new Date();
@@ -105,6 +106,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [FechaCanP, setFechaCanP] = useState(format(today, 'dd/MM/yyyy'))
   //Examenes Adicionales
   const [modalExam, setModalexam] = useState(false)
+  const [modalSubidaMasiva, setModalSubidaMasiva] = useState(false)
   //lista de Protocolos
   const [protocoloOptions, setProtocoloOptions] = useState([])
   useEffect(() => {
@@ -966,8 +968,11 @@ const AperturaExamenesPreOcup = (props) => {
     <div >
       <div className="grid md:grid-cols-2 sm:flex-col gap-5 px-4">
         <div className="w-full sm:w-full md:w-auto text-lg font-semibold  ">
-          <div className="mb-1 pb-2">
+          <div className="mb-1 pb-2 flex justify-between">
             <h2 className="text-lg font-bold">Datos</h2>
+            {/*<button onClick={() => { setModalSubidaMasiva(true) }} className="verde-btn px-4 py-1 rounded flex items-center mr-3">
+              Subida Masiva
+            </button>*/}
           </div>
           <div className="flex items-center space-x-2 mb-1">
             <label htmlFor="dni" className="block w-40">DNI:</label>
@@ -1746,6 +1751,7 @@ const AperturaExamenesPreOcup = (props) => {
                 </tbody>
               </table>
             </div>
+
           </div>
         </div>
       </div>
@@ -1768,6 +1774,21 @@ const AperturaExamenesPreOcup = (props) => {
       {isContrataModalOpen && <ModalContrata
         isOpen={isContrataModalOpen}
         onClose={() => setIsContrataModalOpen(false)}
+        onSave={handleSaveContrata}
+        Swal={Swal}
+        Get={getFetch}
+        token={props.token}
+        GetRazonS={(e) => {
+          setDatos({
+            ...datos,
+            razonContrata: e
+          });
+          setSearchContrata(e)
+        }}
+      />}
+      {modalSubidaMasiva && <SubidaMasiva
+        isOpen={isContrataModalOpen}
+        onClose={() => setModalSubidaMasiva(false)}
         onSave={handleSaveContrata}
         Swal={Swal}
         Get={getFetch}
