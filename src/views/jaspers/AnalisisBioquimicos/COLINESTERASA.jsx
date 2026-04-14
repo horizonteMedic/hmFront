@@ -214,7 +214,7 @@ export default async function COLINESTERASA(datos = {}, docExistente = null) {
   // === CUERPO DE TABLA ===
   // PRUEBA
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
-  doc.text("COLINESTERASA SERICA", config.col1X, y + 10);
+  doc.text("COLINESTERASA SÉRICA", config.col1X, y + 10);
 
   // Resultado
   doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
