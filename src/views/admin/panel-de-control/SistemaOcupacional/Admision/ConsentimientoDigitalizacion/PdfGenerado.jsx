@@ -48,7 +48,7 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
       const ordValue = orderNumber || '';
       doc.setFont('helvetica', 'bold').setFontSize(12);
       const labelWidth = doc.getTextWidth(ordLabel + ' ');
-      const ordX = pageW - margin - doc.getTextWidth(ordLabel + ' ' + ordValue);
+      const ordX = pageW - margin - doc.getTextWidth(ordLabel + ' ' + ordValue)-25;
       const ordY = y + logoH / 2 + 4;
       doc.text(ordLabel, ordX, ordY);
       // Número grande y subrayado

@@ -865,7 +865,7 @@ export const GetInfoServicio = (
             (hallazgoEKG && hallazgoEKG !== "NORMAL") ||
             (conclusionesEkg && !conclusionesEkg.includes("DENTRO DE PARAMETROS NORMALES"))
           ) {
-            data.observacionesGenerales += `-ELECTROCARDIOGRAMA: ${recomendacionesEKG}\n`;
+            data.observacionesGenerales += `-ELECTROCARDIOGRAMA: ${hallazgoEKG ? hallazgoEKG + "\n" : ""}${conclusionesEkg ? conclusionesEkg + "\n" : ""}${recomendacionesEKG ?? ""}\n`;
           }
 
           // cargarAnalisisB();=======================
@@ -1116,7 +1116,7 @@ export const GetInfoServicioEditar = (
             "CANAL RAQUÍDEO CON AMPLITUD NORMAL.")) {
             data.observacionesGenerales2 += `INFORME RADIOGRAFICO : ${res.conclusionesRadiografia_conclu}\n`;
           }
-          
+
           if (res.observacionesOdonto_txtobservaciones != null &&
             res.observacionesOdonto_txtobservaciones != "NINGUNA")
             data.observacionesGenerales2 += `ODONTOGRAMA : ${res.observacionesOdonto_txtobservaciones}\n`;
@@ -1508,7 +1508,7 @@ export const GetInfoServicioEditar = (
             (hallazgoEKG && hallazgoEKG !== "NORMAL") ||
             (conclusionesEkg && !conclusionesEkg.includes("DENTRO DE PARAMETROS NORMALES"))
           ) {
-            data.observacionesGenerales2 += `-ELECTROCARDIOGRAMA: ${recomendacionesEKG}\n`;
+            data.observacionesGenerales2 += `-ELECTROCARDIOGRAMA: ${hallazgoEKG ? hallazgoEKG + "\n" : ""}${conclusionesEkg ? conclusionesEkg + "\n" : ""}${recomendacionesEKG ?? ""}\n`;
           }
 
           //FIN==============
