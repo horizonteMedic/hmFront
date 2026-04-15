@@ -44,7 +44,7 @@ export const GetInfoServicio = async (
                 ? "EMPLEADO"
                 : res.obrero
                     ? "OBRERO"
-                    : "",
+                    : prev.tipoTrabajador,
 
             // ===== DATOS LABORALES =====
             empresa: res.empresa ?? "",
@@ -334,7 +334,7 @@ export const GetInfoServicioEditar = async (
             experiencias: res.experienciaLaboral ?? [],
             referencias: res.referenciasPersonales ?? [],
             aptitudAltura18: res.aptitudPoderosaSi === true ? true : res.aptitudPoderosaNo === true ? false : null,
-            aptitud: res.apto === true ? "APTO" : res.aptoRestriccion === true ? "APTO RESTRICCION" : res.noApto === true ? "NO APTO" : false,
+            aptitud: res.faApto === true ? "APTO" : res.faAptoConRestriccion === true ? "APTO RESTRICCION" : res.faNoApto === true ? "NO APTO" : false,
 
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
             user_doctorAsignado: res.doctorAsignado,

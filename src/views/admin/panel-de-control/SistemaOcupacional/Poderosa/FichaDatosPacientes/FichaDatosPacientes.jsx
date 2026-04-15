@@ -1003,6 +1003,7 @@ export default function FichaDatosPacientes() {
                     name="aptitud"
                     value={form.aptitud}
                     label="Aptitud"
+                    disabled
                     onChange={handleRadioButton}
                     options={[
                         { label: "Apto", value: "APTO" },
