@@ -1,5 +1,7 @@
 import Swal from "sweetalert2";
 import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import ExcelJS from "exceljs";
 
 
 export const ImportData = (dni, Swal, getFetch, token, set, RendeSet) => {
@@ -92,4 +94,93 @@ const prepararDataExcel = (data) => {
 
     return newRow;
   });
+};
+
+export const descargarPlantillaExcel = async (MedicosMulti, FormaPago, ExamenMulti) => {
+
+  const listaMedicos = MedicosMulti.map(m => m.mensaje);
+  const listaFormaPago = FormaPago.map(f => f.descripcion);
+  const listaExamenes = ExamenMulti.map(e => e.mensaje); // 🔥 NUEVO
+
+  const workbook = new ExcelJS.Workbook();
+
+  const sheet = workbook.addWorksheet("PLANTILLA");
+  const sheetListas = workbook.addWorksheet("LISTAS");
+
+  sheetListas.state = "hidden";
+
+  const headers = [
+    "DNI", "EMPRESA", "CONTRATA", "MEDICO OCUP",
+    "CARGO", "TIPO PRUEBA", "AREA", "EXAMEN",
+    "PRECIO", "FORMA DE PAGO", "OBSERVACION"
+  ];
+
+  sheet.addRow(headers);
+
+  sheet.getRow(1).eachCell((cell) => {
+    cell.font = { bold: true };
+    cell.alignment = { horizontal: "center", vertical: "middle" };
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "CCFFCC" }
+    };
+  });
+
+  // 🔹 LISTAS
+  listaMedicos.forEach((m, i) => {
+    sheetListas.getCell(`A${i + 1}`).value = m;
+  });
+
+  listaFormaPago.forEach((f, i) => {
+    sheetListas.getCell(`C${i + 1}`).value = f;
+  });
+
+  listaExamenes.forEach((e, i) => { // 🔥 NUEVO
+    sheetListas.getCell(`D${i + 1}`).value = e;
+  });
+
+  // 🔹 FILAS BASE
+  for (let i = 0; i < 50; i++) {
+    sheet.addRow([
+      "", "", "",
+      "ARTEMIO ALEJANDRO GARCIA CABRERA",
+      "", "N/A", "", "", "", "", ""
+    ]);
+  }
+
+  // 🔥 RANGOS
+  const rangoMedicos = `LISTAS!$A$1:$A$${listaMedicos.length}`;
+  const rangoFormaPago = `LISTAS!$C$1:$C$${listaFormaPago.length}`;
+  const rangoExamenes = `LISTAS!$D$1:$D$${listaExamenes.length}`; // 🔥 NUEVO
+
+  // 🔥 VALIDACIONES
+  for (let i = 2; i <= 51; i++) {
+
+    // MEDICO OCUP
+    sheet.getCell(`D${i}`).dataValidation = {
+      type: "list",
+      allowBlank: false,
+      formulae: [rangoMedicos]
+    };
+
+    // EXAMEN 🔥 NUEVO
+    sheet.getCell(`H${i}`).dataValidation = {
+      type: "list",
+      allowBlank: false,
+      formulae: [rangoExamenes]
+    };
+
+    // FORMA DE PAGO
+    sheet.getCell(`J${i}`).dataValidation = {
+      type: "list",
+      allowBlank: false,
+      formulae: [rangoFormaPago]
+    };
+  }
+
+  sheet.columns = headers.map(() => ({ width: 25 }));
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  saveAs(new Blob([buffer]), "Plantilla_Registro_Masivo.xlsx");
 };

@@ -1787,12 +1787,7 @@ const AperturaExamenesPreOcup = (props) => {
         }}
       />}
       {modalSubidaMasiva && <SubidaMasiva
-        isOpen={isContrataModalOpen}
         onClose={() => setModalSubidaMasiva(false)}
-        onSave={handleSaveContrata}
-        Swal={Swal}
-        Get={getFetch}
-        token={props.token}
         GetRazonS={(e) => {
           setDatos({
             ...datos,
@@ -1800,6 +1795,9 @@ const AperturaExamenesPreOcup = (props) => {
           });
           setSearchContrata(e)
         }}
+        MedicosMulti={MedicosMulti}
+        FormaPago={FormaPago}
+        ExamenMulti={ExamenMulti}
       />}
       {/*modalExam && <ModalExamenes close={() => setModalexam(false)}/>*/}
     </div>
