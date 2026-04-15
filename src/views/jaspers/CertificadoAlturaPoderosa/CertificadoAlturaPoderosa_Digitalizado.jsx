@@ -259,7 +259,6 @@ export default async function CertificadoAlturaPoderosa_Digitalizado(data = {}, 
     // Título principal (en todas las páginas)
     doc.setFont("helvetica", "bold").setFontSize(12);
     doc.setTextColor(0, 0, 0);
-
     if (datosFinales.tituloExamen === "EXAMEN MÉDICO OCUPACIONAL PARA TRABAJOS EN ALTURA MAYOR A 1.8 METROS") {
       doc.text("EXAMEN MÉDICO OCUPACIONAL PARA TRABAJOS EN ALTURA", pageW / 2, 32.5, { align: "center" });
       doc.text("MAYOR A 1.8 METROS", pageW / 2, 36.5, { align: "center" });

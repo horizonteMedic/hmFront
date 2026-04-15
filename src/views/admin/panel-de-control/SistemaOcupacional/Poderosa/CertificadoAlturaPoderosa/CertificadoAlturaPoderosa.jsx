@@ -42,7 +42,7 @@ export default function CertificadoAlturaPoderosa() {
     const initialFormState = {
         // Header - Campos principales
         norden: "",
-        tituloExamen: "CERTIFICADO DE APTITUD PARA USO DE HERRAMIENTAS MANUALES",
+        tituloExamen: "EXAMEN MÉDICO OCUPACIONAL PARA TRABAJOS EN ALTURA MAYOR A 1.8 METROS",
         codigoCertificado: null,
         fechaExam: today,
         nombreExamen: "",

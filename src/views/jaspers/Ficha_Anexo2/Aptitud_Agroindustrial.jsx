@@ -9,6 +9,14 @@ export default async function Aptitud_AgroindustrialH(data = {}, docExistente = 
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
+  const limpiarTexto = (txt) =>
+    txt
+      .replace(/≥/g, ">=")
+      .replace(/≤/g, "<=")
+      .replace(/\n/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
   const datosFinales = {
     numeroHistoria: String(data.norden ?? ""), //revisar - podría ser norden del JSON
     tipoExamen: String(data.nombreExamen ?? ""),
@@ -35,11 +43,21 @@ export default async function Aptitud_AgroindustrialH(data = {}, docExistente = 
     apto: data.apto ? "APTO" : data?.noApto ? "NO APTO" : data.aptoConRestriccion ? "APTO CON RESTRICCIÓN" : "", //revisar - el JSON tiene boolean, necesita conversión
     restricciones: data.restriccionesDescripcion ?
       [...new Set(data.restriccionesDescripcion.split('\n').filter(rec => rec.trim() !== ''))].join('\n') : "",
-    recomendaciones: data.recomendaciones ?
-      (Array.isArray(data.recomendaciones) ?
-        [...new Set(data.recomendaciones.filter(rec => rec && rec.trim() !== ''))] :
-        [...new Set(data.recomendaciones.split('\n').filter(rec => rec.trim() !== ''))]) :
-      [],
+    recomendaciones: data.recomendaciones
+      ? (Array.isArray(data.recomendaciones)
+        ? [...new Set(
+          data.recomendaciones
+            .map(limpiarTexto)
+            .filter(rec => rec !== "")
+        )]
+        : [...new Set(
+          data.recomendaciones
+            .split('\n')
+            .map(limpiarTexto)
+            .filter(rec => rec !== "")
+        )]
+      )
+      : [],
     fechaDesde: formatearFechaCorta(data.fechaDesde ?? ""),
     fechaHasta: formatearFechaCorta(data.fechaHasta ?? ""),
   };

@@ -970,9 +970,9 @@ const AperturaExamenesPreOcup = (props) => {
         <div className="w-full sm:w-full md:w-auto text-lg font-semibold  ">
           <div className="mb-1 pb-2 flex justify-between">
             <h2 className="text-lg font-bold">Datos</h2>
-            {/*<button onClick={() => { setModalSubidaMasiva(true) }} className="verde-btn px-4 py-1 rounded flex items-center mr-3">
+            <button onClick={() => { setModalSubidaMasiva(true) }} className="verde-btn px-4 py-1 rounded flex items-center mr-3">
               Subida Masiva
-            </button>*/}
+            </button>
           </div>
           <div className="flex items-center space-x-2 mb-1">
             <label htmlFor="dni" className="block w-40">DNI:</label>
@@ -1798,6 +1798,9 @@ const AperturaExamenesPreOcup = (props) => {
         MedicosMulti={MedicosMulti}
         FormaPago={FormaPago}
         ExamenMulti={ExamenMulti}
+        sede={props.selectedSede}
+        token={props.token}
+        userlogued={userlogued}
       />}
       {/*modalExam && <ModalExamenes close={() => setModalexam(false)}/>*/}
     </div>

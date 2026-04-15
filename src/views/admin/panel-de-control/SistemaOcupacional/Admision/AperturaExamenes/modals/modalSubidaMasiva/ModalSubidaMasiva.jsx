@@ -1,9 +1,10 @@
 import { faChevronLeft, faChevronRight, faFileExcel, faTimes, faUpload } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useState } from "react";
-import { descargarPlantillaExcel, handleSubirExcel } from "../../../controller/HC";
+import { descargarPlantillaExcel, handleSubirExcel, submitMasivo } from "../../../controller/HC";
+import Swal from "sweetalert2";
 
-const SubidaMasiva = ({ onClose, MedicosMulti, FormaPago, ExamenMulti }) => {
+const SubidaMasiva = ({ onClose, MedicosMulti, FormaPago, ExamenMulti, sede, token, userlogued }) => {
     const [data, setData] = useState([]);
 
     const SubirExcel = () => {
@@ -13,6 +14,20 @@ const SubidaMasiva = ({ onClose, MedicosMulti, FormaPago, ExamenMulti }) => {
     const DownloadExcel = () => {
         descargarPlantillaExcel(MedicosMulti, FormaPago, ExamenMulti)
     }
+
+    const SubirDatos = async () => {
+
+        const res = await submitMasivo(data, sede, token, userlogued);
+
+        console.log("RESULTADOS:", res);
+
+        Swal.fire({
+            icon: "success",
+            title: "Carga masiva completada",
+            text: `Registros procesados: ${res.length}`
+        });
+    };
+
 
     return (
         <>
@@ -56,7 +71,7 @@ const SubidaMasiva = ({ onClose, MedicosMulti, FormaPago, ExamenMulti }) => {
                         )}
                     </div>
                     <div className="flex w-full justify-end items-center">
-                        <button onClick={SubirExcel} className="verde-btn px-4 py-1 rounded flex items-center mr-3">Subir Datos</button>
+                        {data && <button onClick={SubirDatos} className="verde-btn px-4 py-1 rounded flex items-center mr-3">Subir Datos</button>}
                     </div>
                 </div>
             </div>
