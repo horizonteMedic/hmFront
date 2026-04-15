@@ -85,12 +85,14 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
       { instruccion: "", centro: "", fechaInicio: "", fechaTermino: "", grado: "" },
     ],
   };
+  const fecha = data.fechaNacimientoPaciente ?? "";
 
+  const [anio = "", mes = "", dia = ""] = fecha.split("-");
   const datosFinales = {
     empresa: String(data.empresa ?? ""),
     cargo: String(data.cargoPaciente ?? ""),
-    esEmpleado: data.tipoTrabajador === "EMPLEADO",
-    esObrero: data.tipoTrabajador === "OBRERO",
+    esEmpleado: data.empleado ?? false,
+    esObrero: data.obrero ?? false,
     fechaIngreso: formatearFechaCorta(data.fechaIngreso) || "",
     codigoDpto: String(data.codigoDpto ?? ""),
     codigoActividad: String(data.codigoActividad ?? ""),
@@ -103,47 +105,47 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
     textoColor: String(data.textoColor ?? ""),
 
     // Fecha y lugar de nacimiento
-    diaNacimiento: String(data.diaNacimiento ?? ""),
-    mesNacimiento: String(data.mesNacimiento ?? ""),
-    anioNacimiento: String(data.anioNacimiento ?? ""),
-    distritoNacimiento: String(data.distritoNacimiento ?? ""),
-    provinciaNacimiento: String(data.provinciaNacimiento ?? ""),
-    departamentoNacimiento: String(data.departamentoNacimiento ?? ""),
+    diaNacimiento: String(dia ?? ""),
+    mesNacimiento: String(mes ?? ""),
+    anioNacimiento: String(anio ?? ""),
+    distritoNacimiento: String(data.distrito ?? ""),
+    provinciaNacimiento: String(data.provincia ?? ""),
+    departamentoNacimiento: String(data.departamento ?? ""),
 
     // Datos adicionales
     dni: String(data.dniPaciente ?? ""),
-    lmNo: String(data.lmNo ?? ""),
+    lmNo: String(data.lm ?? ""),
     autogenerado: String(data.autogenerado ?? ""),
-    estadoCivil: String(data.estadoCivil ?? ""),
-    afpSnp: String(data.afpSnp ?? ""),
-    estatura: String(data.estatura ?? ""),
-    licConducirNo: String(data.licConducirNo ?? ""),
-    cusspNo: String(data.cusspNo ?? ""),
+    estadoCivil: String(data.estadoCivilPaciente ?? ""),
+    afpSnp: String(data.afp ?? ""),
+    estatura: String(data.talla ?? ""),
+    licConducirNo: String(data.lincenciaConducir ?? ""),
+    cusspNo: String(data.cussp ?? ""),
     peso: String(data.peso ?? ""),
 
     // Domicilio
     direccionDomicilio: String(data.direccionPaciente ?? ""),
-    distritoDomicilio: String(data.distritoDomicilio ?? ""),
-    provinciaDomicilio: String(data.provinciaDomicilio ?? ""),
-    departamentoDomicilio: String(data.departamentoDomicilio ?? ""),
-    referenciaDomiciliaria: String(data.referenciaDomiciliaria ?? ""),
-    telefono1: String(data.telefono1 ?? ""),
-    tipoViviendaPropia: data.tipoViviendaPropia ?? false,
-    tipoViviendaAlquilada: data.tipoViviendaAlquilada ?? false,
-    tipoViviendaOtros: data.tipoViviendaOtros ?? false,
+    distritoDomicilio: String(data.distrito ?? ""),
+    provinciaDomicilio: String(data.provincia ?? ""),
+    departamentoDomicilio: String(data.departamento ?? ""),
+    referenciaDomiciliaria: String(data.referenciaDomicilio ?? ""),
+    telefono1: String(data.telefonoPaciente ?? ""),
+    tipoViviendaPropia: data.viviendaPropia ?? false,
+    tipoViviendaAlquilada: data.viviendaAlquilada ?? false,
+    tipoViviendaOtros: data.viviendaPropia === false && data.viviendaAlquilada === false ? true : false,
     telefono2: String(data.telefono2 ?? ""),
     email: String(data.email ?? ""),
-    radioFrec: String(data.radioFrec ?? ""),
-    celular: String(data.celular ?? ""),
-    numeroCuentaAhorro: String(data.numeroCuentaAhorro ?? ""),
+    radioFrec: String(data.radioFrecuencia ?? ""),
+    celular: String(data.celularPaciente ?? ""),
+    numeroCuentaAhorro: String(data.numeroCuenta ?? ""),
     banco: String(data.banco ?? ""),
 
     // Emergencia
-    emergenciaNombres: String(data.emergenciaNombres ?? ""),
-    emergenciaParentesco: String(data.emergenciaParentesco ?? ""),
-    emergenciaTelefono: String(data.emergenciaTelefono ?? ""),
-    emergenciaDomicilio: String(data.emergenciaDomicilio ?? ""),
-    emergenciaOtraReferencia: String(data.emergenciaOtraReferencia ?? ""),
+    emergenciaNombres: String(data.nombreEmergencia ?? ""),
+    emergenciaParentesco: String(data.parentescoEmergencia ?? ""),
+    emergenciaTelefono: String(data.telefonoEmergencia ?? ""),
+    emergenciaDomicilio: String(data.domicilioEmergencia ?? ""),
+    emergenciaOtraReferencia: String(data.otraReferenciaEmergencia ?? ""),
 
     // Composición familiar
     composicionFamiliar: data.composicionFamiliar ?? [],
@@ -838,12 +840,12 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Otra Referencia", tablaInicioX + 105, yPos + 3.5);
-  doc.line(tablaInicioX + 140, yPos, tablaInicioX + 140, yPos + filaAltura);
+  doc.line(tablaInicioX + 130, yPos, tablaInicioX + 130, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX + 140, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX + 140, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.emergenciaOtraReferencia, tablaInicioX + 142, yPos + 3.5);
+  doc.line(tablaInicioX + 130, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX + 130, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.setFont("helvetica", "normal").setFontSize(5);
+  doc.text(datosFinales.emergenciaOtraReferencia, tablaInicioX + 132, yPos + 3.5);
   yPos += filaAltura + 3;
 
   // === SECCIÓN: INSTRUCCIÓN ADQUIRIDA ===

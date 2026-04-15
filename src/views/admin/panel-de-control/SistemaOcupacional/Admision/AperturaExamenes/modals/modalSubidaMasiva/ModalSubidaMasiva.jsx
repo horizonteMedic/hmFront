@@ -1,13 +1,17 @@
-import { faChevronLeft, faChevronRight, faFileExcel, faTimes } from "@fortawesome/free-solid-svg-icons"
+import { faChevronLeft, faChevronRight, faFileExcel, faTimes, faUpload } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useState } from "react";
-import { handleSubirExcel } from "../../../controller/HC";
+import { descargarPlantillaExcel, handleSubirExcel } from "../../../controller/HC";
 
-const SubidaMasiva = ({ onClose }) => {
+const SubidaMasiva = ({ onClose, MedicosMulti, FormaPago, ExamenMulti }) => {
     const [data, setData] = useState([]);
 
     const SubirExcel = () => {
         handleSubirExcel(setData)
+    }
+
+    const DownloadExcel = () => {
+        descargarPlantillaExcel(MedicosMulti, FormaPago, ExamenMulti)
     }
 
     return (
@@ -20,8 +24,10 @@ const SubidaMasiva = ({ onClose }) => {
                         </h2>
                         <FontAwesomeIcon icon={faTimes} className="cursor-pointer text-black" style={{ fontSize: '14px' }} onClick={onClose} />
                     </div>
-                    <div className="flex items-center justify-center">
-                        <button onClick={SubirExcel} className="verde-btn px-4 py-1 rounded flex items-center mr-3">Subir Excel <FontAwesomeIcon icon={faFileExcel} className="ml-2" /></button>
+                    <div className="flex items-center justify-between">
+                        <button onClick={SubirExcel} className="verde-btn px-4 py-1 rounded flex items-center mr-3">Subir Excel <FontAwesomeIcon icon={faUpload} className="ml-2" /></button>
+                        <button onClick={DownloadExcel} className="verde-btn px-4 py-1 rounded flex items-center mr-3">Descargar Excel <FontAwesomeIcon icon={faFileExcel} className="ml-2" /></button>
+
                     </div>
                     <div className="overflow-x-auto mt-4">
                         {data.length > 0 && (
@@ -48,6 +54,9 @@ const SubidaMasiva = ({ onClose }) => {
                                 </tbody>
                             </table>
                         )}
+                    </div>
+                    <div className="flex w-full justify-end items-center">
+                        <button onClick={SubirExcel} className="verde-btn px-4 py-1 rounded flex items-center mr-3">Subir Datos</button>
                     </div>
                 </div>
             </div>
