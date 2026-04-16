@@ -127,7 +127,7 @@ const urlsEliminar = {
     AnteceEnfeAltura: "antecedentesEnfermedadesAltura/antecedentes-enfermedades-altura",
     audiometria_2023: "manipuladores/audiometria-2023",
     //Poderosa
-    CertAlturaPoderosa: "certificadoTrabajoAltura",
+    CertAlturaPoderosa: "certificadoTrabajoAltura/eliminar-poderosa",
     CertAptitudPoderosa: "aptitudCertificadoCaliente/aptitud-certificado-caliente",
     AptitudLicencia: "aptitudLicenciaConducir/aptitud-licencia-conducir",
     HojaConsultaEx: "hojaConsultaExterna/hoja-consulta-externa",

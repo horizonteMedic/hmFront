@@ -2,6 +2,8 @@ import Swal from "sweetalert2";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import ExcelJS from "exceljs";
+import { SubmitHistoriaC } from "../model/AdminHistoriaC";
+import { getToday } from "../../../../../utils/helpers";
 
 
 export const ImportData = (dni, Swal, getFetch, token, set, RendeSet) => {
@@ -78,6 +80,91 @@ export const handleSubirExcel = async (setData) => {
   reader.readAsBinaryString(file);
 };
 
+export const submitMasivo = async (data, sede, token, userlogued) => {
+
+  const resultados = [];
+
+  for (const row of data) {
+
+    const payload = mapRowToHistoria({ ...row, user_registro: userlogued });
+
+    try {
+      const response = await SubmitHistoriaC(payload, sede, token, 1);
+      resultados.push({ ok: true, data: response, row });
+    } catch (error) {
+      resultados.push({ ok: false, error, row });
+    }
+  }
+  console.log(resultados)
+  return resultados;
+};
+
+const mapRowToHistoria = (row) => {
+
+  const removePrefix = (str, prefix) => {
+    if (typeof str !== "string") return "";
+    const regex = new RegExp('^' + prefix);
+    return str.replace(regex, '');
+  };
+  console.log(row)
+  const currentDate = new Date();
+  const hours = String(currentDate.getHours()).padStart(2, '0');
+  const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+  const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+
+  const today = getToday();
+  console.log(today)
+  const [yyyy, mm, dd] = today.split('-');
+  const fechaFormateada = `${dd}/${mm}/${yyyy}`;
+
+  return {
+
+    // 🔥 DEL EXCEL
+    codPa: row["DNI"] || "",
+    razonEmpresa: row["EMPRESA"] || "",
+    razonContrata: row["CONTRATA"] || "",
+    nomExamen: row["EXAMEN"] || "",
+    cargoDe: row["CARGO"] || "",
+    areaO: row["AREA"] || "",
+    n_medico: row["MEDICO OCUP"] || "",
+    tipoPago: row["FORMA DE PAGO"] || "",
+    textObserv1: row["OBSERVACION"] || "",
+    precioPo: `${'S/.' + row["PRECIO"]}` || "",
+
+    // 🔒 DEFAULT / VACÍOS
+    tipoOperacion: "INSERT",
+    n_orden: null,
+    nomEx: "",
+    alturaPo: "",
+    mineralPo: "",
+    fechaAperturaPo: fechaFormateada, // si luego quieres autogenerar fecha aquí
+    estadoEx: "EN PROCESO",
+    n_fisttest: "",
+    n_psicosen: "",
+    n_testaltura: "",
+    visualCompl: "",
+    trabCalientes: "",
+    manipAlimentos: "",
+    protocolo: "",
+    autoriza: "",
+    herraManuales: "",
+    rxcDorsoLumbar: "",
+    rxcKLumbar: "",
+    rxcLumbosacra: "",
+    rxcPlomos: "",
+    mercurioo: "",
+    tmarihuana: "",
+    tcocaina: "",
+    espaciosConfinados: "",
+    user_registro: row["user_registro"],
+
+    // 🔧 SISTEMA
+    n_hora: `${hours}:${minutes}:${seconds}`,
+    tipoPrueba: row["TIPO PRUEBA"] || "N/A",
+    precioAdic: "S/.0",
+  };
+};
+
 const prepararDataExcel = (data) => {
   return data.map((row) => {
     const newRow = {};
@@ -95,6 +182,7 @@ const prepararDataExcel = (data) => {
     return newRow;
   });
 };
+
 
 export const descargarPlantillaExcel = async (MedicosMulti, FormaPago, ExamenMulti) => {
 
