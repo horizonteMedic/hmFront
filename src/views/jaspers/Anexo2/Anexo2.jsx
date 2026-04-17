@@ -676,7 +676,7 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   doc.text(datosFinales.areaTrabajo || "", tablaInicioX + 118, yTexto + 1);
   yTexto += filaAltura;
   // === SECCION 3
-  yPos = dibujarHeaderSeccion("3. ANTECEDENTES OCUPACINALES (Detalle de Antecedentes laborales esta en los sgtes anexos)", yPos, filaAltura);
+  yPos = dibujarHeaderSeccion("3. ANTECEDENTES OCUPACIONALES (Detalle de Antecedentes laborales esta en los sgtes anexos)", yPos, filaAltura);
 
   autoTable(doc, {
     startY: yPos,
