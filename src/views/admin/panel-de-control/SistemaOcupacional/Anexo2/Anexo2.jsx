@@ -14,7 +14,7 @@ import DatosPersonales from "./DatosPersonales/DatosPersonales";
 import PanelObservaciones from "./PanelObservaciones/PanelObservaciones";
 import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
-import { getToday } from "../../../../utils/helpers";
+import { getDatePlus364Days, getToday } from "../../../../utils/helpers";
 import { GetExamenesRealizados, handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerAnexo2";
 import Swal from "sweetalert2";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
@@ -257,7 +257,7 @@ export default function Anexo2() {
     // Aptitud del Paciente
     aptitud: "",
     fechaAptitud: today,
-    fechaVencimiento: today,
+    fechaVencimiento: getDatePlus364Days(today),
     restricciones: "NINGUNO",
 
     // Recomendaciones y Restricciones
