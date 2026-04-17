@@ -9,8 +9,8 @@ import {
 import { getFetch } from "../../../../../utils/apiHelpers";
 import { getHoraActual } from "../../../../../utils/helpers";
 
-const obtenerReporteUrl = "/api/v01/ct/certificadoAptitudCuadrador/obtenerReporte";
-const registrarUrl = "/api/v01/ct/certificadoAptitudCuadrador/registrarActualizar";
+const obtenerReporteUrl = "";
+const registrarUrl = "";
 
 export const GetInfoServicio = async (
     nro,
