@@ -1,12 +1,12 @@
 import { faChevronLeft, faChevronRight, faFileExcel, faTimes, faUpload } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useState } from "react";
-import { descargarPlantillaExcel, handleSubirExcel, submitMasivo } from "../../../controller/HC";
+import { descargarPlantillaExcel, getRowStatus, handleSubirExcel, isRowValid, submitMasivo } from "../../../controller/HC";
 import Swal from "sweetalert2";
 
 const SubidaMasiva = ({ onClose, MedicosMulti, FormaPago, ExamenMulti, sede, token, userlogued }) => {
     const [data, setData] = useState([]);
-
+    const [resultados, setResultados] = useState([]);
     const SubirExcel = () => {
         handleSubirExcel(setData)
     }
@@ -16,18 +16,31 @@ const SubidaMasiva = ({ onClose, MedicosMulti, FormaPago, ExamenMulti, sede, tok
     }
 
     const SubirDatos = async () => {
-
         const res = await submitMasivo(data, sede, token, userlogued);
 
-        console.log("RESULTADOS:", res);
+        setResultados(res); // 🔥 guardar resultados
+
+        const okCount = res.filter(r => r.ok).length;
+        const failCount = res.filter(r => !r.ok).length;
 
         Swal.fire({
             icon: "success",
             title: "Carga masiva completada",
-            text: `Registros procesados: ${res.length}`
+            html: `
+      ✅ Correctos: <b>${okCount}</b><br/>
+      ⚠️ Fallidos: <b>${failCount}</b>
+    `
         });
     };
 
+    const getCellError = (key, row) => {
+        if (["DNI", "EMPRESA", "EXAMEN"].includes(key)) {
+            return !row[key]?.toString().trim();
+        }
+        return false;
+    };
+
+    const hasErrors = data.some(row => !isRowValid(row));
 
     return (
         <>
@@ -49,29 +62,65 @@ const SubidaMasiva = ({ onClose, MedicosMulti, FormaPago, ExamenMulti, sede, tok
                             <table className="min-w-full border border-gray-300">
                                 <thead>
                                     <tr>
+                                        <th className="border px-4 py-2 bg-gray-100">ESTADO</th>
                                         {Object.keys(data[0]).map((col, index) => (
                                             <th key={index} className="border px-4 py-2 bg-gray-100">
                                                 {col}
                                             </th>
+
                                         ))}
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {data.map((row, i) => (
-                                        <tr key={i}>
-                                            {Object.values(row).map((val, j) => (
-                                                <td key={j} className="border px-4 py-2">
-                                                    {val}
+
+                                    {data.map((row, i) => {
+                                        const status = getRowStatus(row, i, resultados);
+
+                                        const rowColor =
+                                            status === "invalid"
+                                                ? "bg-red-100"
+                                                : status === "success"
+                                                    ? "bg-green-100"
+                                                    : status === "error"
+                                                        ? "bg-yellow-100"
+                                                        : "";
+
+                                        return (
+                                            <tr key={i} className={rowColor}>
+                                                <td className="border px-4 py-2 font-semibold">
+                                                    {status === "success" && "✔ Registrado"}
+                                                    {status === "error" && "⚠ Error"}
+                                                    {status === "invalid" && "✖ Incompleto"}
                                                 </td>
-                                            ))}
-                                        </tr>
-                                    ))}
+                                                {Object.values(row).map((val, j) => (
+                                                    <td
+                                                        key={j}
+                                                        className={`border px-4 py-2 ${getCellError(Object.keys(row)[j], row)
+                                                            ? "bg-red-200 text-red-800"
+                                                            : ""
+                                                            }`}
+                                                    >
+                                                        {val}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         )}
                     </div>
                     <div className="flex w-full justify-end items-center">
-                        {data && <button onClick={SubirDatos} className="verde-btn px-4 py-1 rounded flex items-center mr-3">Subir Datos</button>}
+                        {data.length > 0 && (
+                            <button
+                                onClick={SubirDatos}
+                                disabled={hasErrors}
+                                className={`px-4 py-1 rounded flex items-center mr-3 ${hasErrors ? "bg-gray-400 cursor-not-allowed" : "verde-btn"
+                                    }`}
+                            >
+                                Subir Datos
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>

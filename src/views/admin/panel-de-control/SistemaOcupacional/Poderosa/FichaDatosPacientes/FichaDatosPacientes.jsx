@@ -158,7 +158,7 @@ export default function FichaDatosPacientes() {
             VerifyTR(form.norden, tabla, token, setForm, selectedSede);
         }
     };
-    console.log(form)
+
     const handlePrint = () => {
         handlePrintDefault(() => {
             PrintHojaR(form.norden, token, tabla, datosFooter);

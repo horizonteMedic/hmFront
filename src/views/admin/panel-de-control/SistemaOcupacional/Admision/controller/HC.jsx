@@ -4,6 +4,7 @@ import { saveAs } from "file-saver";
 import ExcelJS from "exceljs";
 import { SubmitHistoriaC } from "../model/AdminHistoriaC";
 import { getToday } from "../../../../../utils/helpers";
+import { LoadingDefault } from "../../../../../utils/functionUtils";
 
 
 export const ImportData = (dni, Swal, getFetch, token, set, RendeSet) => {
@@ -81,21 +82,33 @@ export const handleSubirExcel = async (setData) => {
 };
 
 export const submitMasivo = async (data, sede, token, userlogued) => {
-
   const resultados = [];
-
+  LoadingDefault("Subiendo Datos")
   for (const row of data) {
-
     const payload = mapRowToHistoria({ ...row, user_registro: userlogued });
 
     try {
       const response = await SubmitHistoriaC(payload, sede, token, 1);
-      resultados.push({ ok: true, data: response, row });
+
+      const isOk = response && response.id; // 🔥 clave
+
+      resultados.push({
+        ok: isOk,
+        id: isOk ? response.id : null,
+        data: response,
+        row
+      });
+
     } catch (error) {
-      resultados.push({ ok: false, error, row });
+      resultados.push({
+        ok: false,
+        id: null,
+        error,
+        row
+      });
     }
   }
-  console.log(resultados)
+
   return resultados;
 };
 
@@ -133,29 +146,28 @@ const mapRowToHistoria = (row) => {
 
     // 🔒 DEFAULT / VACÍOS
     tipoOperacion: "INSERT",
-    n_orden: null,
     nomEx: "",
     alturaPo: "",
     mineralPo: "",
     fechaAperturaPo: fechaFormateada, // si luego quieres autogenerar fecha aquí
     estadoEx: "EN PROCESO",
-    n_fisttest: "",
-    n_psicosen: "",
-    n_testaltura: "",
-    visualCompl: "",
-    trabCalientes: "",
-    manipAlimentos: "",
+    n_fisttest: false,
+    n_psicosen: false,
+    n_testaltura: false,
+    visualCompl: false,
+    trabCalientes: false,
+    manipAlimentos: false,
     protocolo: "",
     autoriza: "",
-    herraManuales: "",
-    rxcDorsoLumbar: "",
-    rxcKLumbar: "",
-    rxcLumbosacra: "",
-    rxcPlomos: "",
-    mercurioo: "",
-    tmarihuana: "",
-    tcocaina: "",
-    espaciosConfinados: "",
+    herraManuales: false,
+    rxcDorsoLumbar: false,
+    rxcKLumbar: false,
+    rxcLumbosacra: false,
+    rxcPlomos: false,
+    mercurioo: false,
+    tmarihuana: false,
+    tcocaina: false,
+    espaciosConfinados: false,
     user_registro: row["user_registro"],
 
     // 🔧 SISTEMA
@@ -166,21 +178,22 @@ const mapRowToHistoria = (row) => {
 };
 
 const prepararDataExcel = (data) => {
-  return data.map((row) => {
-    const newRow = {};
+  return data
+    .map((row) => {
+      const newRow = {};
 
-    Object.keys(row).forEach((key) => {
-      const value = row[key];
+      Object.keys(row).forEach((key) => {
+        const value = row[key];
 
-      // Solo transformar strings
-      newRow[key.toUpperCase()] =
-        typeof value === "string"
-          ? value.toUpperCase().trim()
-          : value;
-    });
+        newRow[key.toUpperCase()] =
+          typeof value === "string"
+            ? value.toUpperCase().trim()
+            : value;
+      });
 
-    return newRow;
-  });
+      return newRow;
+    })
+    .filter(row => !isRowEmpty(row)); // 🔥 AQUÍ eliminas filas vacías
 };
 
 
@@ -271,4 +284,33 @@ export const descargarPlantillaExcel = async (MedicosMulti, FormaPago, ExamenMul
 
   const buffer = await workbook.xlsx.writeBuffer();
   saveAs(new Blob([buffer]), "Plantilla_Registro_Masivo.xlsx");
+};
+
+const isRowEmpty = (row) => {
+  return Object.values(row).every(value => {
+    if (value === null || value === undefined) return true;
+
+    // string vacío o espacios
+    if (typeof value === "string" && value.trim() === "") return true;
+
+    return false;
+  });
+};
+
+export const isRowValid = (row) => {
+  return (
+    row["DNI"]?.toString().trim() !== "" &&
+    row["EMPRESA"]?.toString().trim() !== "" &&
+    row["EXAMEN"]?.toString().trim() !== ""
+  );
+};
+
+export const getRowStatus = (row, index, resultados) => {
+  if (!isRowValid(row)) return "invalid";
+
+  const result = resultados[index];
+
+  if (!result) return "pending"; // aún no enviado
+
+  return result.ok ? "success" : "error";
 };
