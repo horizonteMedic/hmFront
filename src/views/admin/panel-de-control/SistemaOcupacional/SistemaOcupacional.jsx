@@ -467,6 +467,7 @@ const TabComponent = () => {
                       ChangeDNI={(nuevoDNI) => {
                         setDNIG(nuevoDNI);
                       }}
+                      tienePermisoEnVista={tienePermisoEnVista}
                     />
                   )}
                   {subTab === 3 && (

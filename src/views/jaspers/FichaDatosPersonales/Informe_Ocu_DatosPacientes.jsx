@@ -89,6 +89,7 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
 
   const [anio = "", mes = "", dia = ""] = fecha.split("-");
   const datosFinales = {
+    contrata: String(data.contrata ?? ""),
     empresa: String(data.empresa ?? ""),
     cargo: String(data.cargoPaciente ?? ""),
     esEmpleado: data.empleado ?? false,
@@ -97,6 +98,8 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
     codigoDpto: String(data.codigoDpto ?? ""),
     codigoActividad: String(data.codigoActividad ?? ""),
     zona: String(data.zona ?? ""),
+    apellidoMaterno: String(data.apellidoMaterno ?? ""),
+    apellidoPaterno: String(data.apellidoPaterno ?? ""),
     apellidos: String(data.apellidosPaciente ?? ""),
     nombres: String(data.nombresPaciente ?? ""),
     sede: String(data.sede ?? data.nombreSede ?? ""),
@@ -168,15 +171,43 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
 
     transporteAereo: data.transporteAereoSi === true ? "SI" :
       data.transporteAereoNo === true ? "NO" : "",
+
+    aptitudPoderosa: data.aptitudPoderosaSi ? "es apto" : data.aptitudPoderosaNo ? "no es apto" : ""
+  };
+
+  const drawRectWithCenteredText = ({
+    doc,
+    xText,          // posición X donde termina tu label (ej: después de "EMPRESA :")
+    yText,          // baseline del texto
+    labelWidth = 25, // ancho ocupado por el label (para separar el rectángulo)
+    width = 50,
+    height = 8,
+    text = "",
+    padding = 2
+  }) => {
+
+    // 🔹 calcular posición del rectángulo (a la derecha del texto)
+    const rectX = xText + labelWidth + padding;
+    const rectY = yText - height + 1.5;
+    // ajuste fino: jsPDF usa baseline, no top
+
+    // 🔹 dibujar rectángulo
+    doc.rect(rectX, rectY, width, height);
+
+    // 🔹 centrar texto horizontalmente
+    const textWidth = doc.getTextWidth(text);
+    const textX = rectX + (width / 2) - (textWidth / 2);
+
+    // 🔹 centrar texto verticalmente (baseline correction)
+    const fontSize = doc.internal.getFontSize();
+    const textY = rectY + (height / 2) + (fontSize * 0.35) - 2;
+
+    // 🔹 escribir texto
+    doc.text(text, textX, textY);
   };
 
   // Header con logo
-  await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
-
-  // Título principal
-  doc.setFont("helvetica", "bold").setFontSize(14);
-  doc.setTextColor(0, 0, 0);
-  doc.text("FICHA DE DATOS PERSONALES", pageW / 2, 32, { align: "center" });
+  /*await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
   // Drawer con Nro de ficha, Sede, Fecha (lado derecho) - mismas medidas que Aptitud_medico_ocupacional_11
   doc.setFont("helvetica", "normal").setFontSize(8);
@@ -200,12 +231,17 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
     showLine: true,
     fontSize: 30,
     textPosition: 0.9
-  });
+  });*/
+
+  // Título principal
+  doc.setFont("helvetica", "bold").setFontSize(14);
+  doc.setTextColor(0, 0, 0);
+  doc.text("FICHA DE DATOS", pageW / 2, 10, { align: "center" });
 
   // === TABLA DE DATOS PERSONALES ===
   const tablaInicioX = 5;
   const tablaAncho = 200;
-  let yPos = 35;
+  let yPos = 15;
   const filaAltura = 5;
 
   // Configurar líneas
@@ -219,117 +255,181 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   const col1Width = 90;
 
   // === FILA 1: Apellidos + Nombres + FOTO (inicio) ===
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + col1Width, yPos, tablaInicioX + col1Width, yPos + filaAltura);
-  doc.line(tablaInicioX + contenidoWidth, yPos, tablaInicioX + contenidoWidth, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + contenidoWidth, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + contenidoWidth, yPos + filaAltura);
-
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Apellidos :", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.apellidos, tablaInicioX + 40, yPos + 3.5);
+  doc.text("EMPRESA :", tablaInicioX + 2, yPos + 3.5);
+  drawRectWithCenteredText({
+    doc,
+    xText: tablaInicioX + 2,
+    yText: yPos + 3.5,
+    labelWidth: 15, // ajusta según tu texto "EMPRESA :"
+    width: 180,
+    height: 6,
+    text: datosFinales.contrata
+  });
 
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Nombres:", tablaInicioX + col1Width + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.nombres, tablaInicioX + col1Width + 25, yPos + 3.5);
+  doc.text("CARGO :", tablaInicioX + 4, yPos + 14);
+  drawRectWithCenteredText({
+    doc,
+    xText: tablaInicioX + 4,
+    yText: yPos + 14,
+    labelWidth: 15, // ajusta según tu texto "EMPRESA :"
+    width: 70,
+    height: 6,
+    text: datosFinales.cargo
+  });
 
-  // Celda FOTO (ocupa 4 filas)
-  doc.line(tablaInicioX + contenidoWidth, yPos, tablaInicioX + contenidoWidth, yPos + fotoHeight);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + fotoHeight);
-  doc.line(tablaInicioX + contenidoWidth, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX + contenidoWidth, yPos + fotoHeight, tablaInicioX + tablaAncho, yPos + fotoHeight);
+  doc.text("EMPLEADO :", tablaInicioX + 115, yPos + 12);
+  drawRectWithCenteredText({
+    doc,
+    xText: tablaInicioX + 115,
+    yText: yPos + 12,
+    labelWidth: 17, // ajusta según tu texto "EMPRESA :"
+    width: 15,
+    height: 4,
+    text: `${datosFinales.esEmpleado ? "X" : ""}`
+  });
 
-  // Rectángulo gris para FOTO
-  doc.setFillColor(180, 180, 180);
-  doc.rect(tablaInicioX + contenidoWidth + 3, yPos + 2, fotoWidth - 6, fotoHeight - 4, 'F');
+  doc.text("OBRERO :", tablaInicioX + 118, yPos + 16);
+  drawRectWithCenteredText({
+    doc,
+    xText: tablaInicioX + 115,
+    yText: yPos + 16,
+    labelWidth: 17, // ajusta según tu texto "EMPRESA :"
+    width: 15,
+    height: 4,
+    text: `${datosFinales.esObrero ? "X" : ""}`
+  });
+
+  doc.line(tablaInicioX + contenidoWidth, yPos + 6, tablaInicioX + contenidoWidth, yPos + fotoHeight + 6);
+  doc.line(tablaInicioX + tablaAncho, yPos + 6, tablaInicioX + tablaAncho, yPos + fotoHeight + 6);
+  doc.line(tablaInicioX + contenidoWidth, yPos + 6, tablaInicioX + tablaAncho, yPos + 6);
+  doc.line(tablaInicioX + contenidoWidth, yPos + fotoHeight + 6, tablaInicioX + tablaAncho, yPos + fotoHeight + 6);
 
   doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text("FOTO", tablaInicioX + contenidoWidth + fotoWidth / 2, yPos + fotoHeight / 2 + 2, { align: "center" });
-
-  yPos += filaAltura;
-
-  // === FILA 2: Codigo Actividad + Zona ===
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + col1Width, yPos, tablaInicioX + col1Width, yPos + filaAltura);
-  doc.line(tablaInicioX + contenidoWidth, yPos, tablaInicioX + contenidoWidth, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + contenidoWidth, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + contenidoWidth, yPos + filaAltura);
+  doc.text("FOTO", tablaInicioX + contenidoWidth + fotoWidth / 2, yPos + fotoHeight / 2 + 6, { align: "center" });
 
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Codigo Actividad :", tablaInicioX + 2, yPos + 3.5);
+  doc.text("Fecha de Ingreso :", tablaInicioX + 6, yPos + 26);
+  drawRectWithCenteredText({
+    doc,
+    xText: tablaInicioX + 6,
+    yText: yPos + 26,
+    labelWidth: 25, // ajusta según tu texto "EMPRESA :"
+    width: 30,
+    height: 5,
+    text: datosFinales.fechaIngreso
+  });
+
+  doc.text("Código DPTO :", tablaInicioX + 118, yPos + 26);
+  drawRectWithCenteredText({
+    doc,
+    xText: tablaInicioX + 118,
+    yText: yPos + 26,
+    labelWidth: 19, // ajusta según tu texto "EMPRESA :"
+    width: 25,
+    height: 5,
+    text: datosFinales.codigoDpto
+  });
+
+  doc.text("Codigo Actividad :", tablaInicioX + 6, yPos + 33);
+  drawRectWithCenteredText({
+    doc,
+    xText: tablaInicioX + 6,
+    yText: yPos + 33,
+    labelWidth: 25, // ajusta según tu texto "EMPRESA :"
+    width: 30,
+    height: 5,
+    text: datosFinales.codigoActividad
+  });
+
+  doc.text("Zona :", tablaInicioX + 130, yPos + 32);
+  drawRectWithCenteredText({
+    doc,
+    xText: tablaInicioX + 118,
+    yText: yPos + 32,
+    labelWidth: 19, // ajusta según tu texto "EMPRESA :"
+    width: 25,
+    height: 5,
+    text: datosFinales.zona
+  });
+
+  yPos += filaAltura + 35;
+
+  // === FILA X: Apellidos y Nombres (2 filas de alto) ===
+  const filaAlturaDoble = 10;
+  // Mismo ancho total que el bloque anterior (200)
+  const colApPaterno = 50;   // 25%
+  const colApMaterno = 50;   // 25%
+  const colNombres = 100;    // 50%
+
+  let xHeader2 = tablaInicioX;
+
+  // === Apellido Paterno ===
+  doc.line(xHeader2, yPos, xHeader2, yPos + filaAlturaDoble);
+  doc.line(xHeader2 + colApPaterno, yPos, xHeader2 + colApPaterno, yPos + filaAlturaDoble);
+  doc.line(xHeader2, yPos, xHeader2 + colApPaterno, yPos);
+  doc.line(xHeader2, yPos + filaAltura, xHeader2 + colApPaterno, yPos + filaAltura);
+  doc.line(xHeader2, yPos + filaAlturaDoble, xHeader2 + colApPaterno, yPos + filaAlturaDoble);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Apellido Paterno", xHeader2 + colApPaterno / 2, yPos + 3.5, { align: "center" });
+
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.codigoActividad, tablaInicioX + 40, yPos + 3.5);
+  doc.text(
+    datosFinales.apellidoPaterno || "",
+    xHeader2 + colApPaterno / 2,
+    yPos + 8,
+    { align: "center", maxWidth: colApPaterno - 2 }
+  );
+
+  xHeader2 += colApPaterno;
+
+
+  // === Apellido Materno ===
+  doc.line(xHeader2, yPos, xHeader2, yPos + filaAlturaDoble);
+  doc.line(xHeader2 + colApMaterno, yPos, xHeader2 + colApMaterno, yPos + filaAlturaDoble);
+  doc.line(xHeader2, yPos, xHeader2 + colApMaterno, yPos);
+  doc.line(xHeader2, yPos + filaAltura, xHeader2 + colApMaterno, yPos + filaAltura);
+  doc.line(xHeader2, yPos + filaAlturaDoble, xHeader2 + colApMaterno, yPos + filaAlturaDoble);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Zona :", tablaInicioX + col1Width + 2, yPos + 3.5);
+  doc.text("Apellido Materno", xHeader2 + colApMaterno / 2, yPos + 3.5, { align: "center" });
+
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.zona, tablaInicioX + col1Width + 15, yPos + 3.5);
+  doc.text(
+    datosFinales.apellidoMaterno || "",
+    xHeader2 + colApMaterno / 2,
+    yPos + 8,
+    { align: "center", maxWidth: colApMaterno - 2 }
+  );
 
-  yPos += filaAltura;
+  xHeader2 += colApMaterno;
 
-  // === FILA 3: Fecha de Ingreso + Código DPTO ===
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + col1Width, yPos, tablaInicioX + col1Width, yPos + filaAltura);
-  doc.line(tablaInicioX + contenidoWidth, yPos, tablaInicioX + contenidoWidth, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + contenidoWidth, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + contenidoWidth, yPos + filaAltura);
+
+  // === Nombres Completos ===
+  doc.line(xHeader2, yPos, xHeader2, yPos + filaAlturaDoble);
+  doc.line(xHeader2 + colNombres, yPos, xHeader2 + colNombres, yPos + filaAlturaDoble);
+  doc.line(xHeader2, yPos, xHeader2 + colNombres, yPos);
+  doc.line(xHeader2, yPos + filaAltura, xHeader2 + colNombres, yPos + filaAltura);
+  doc.line(xHeader2, yPos + filaAlturaDoble, xHeader2 + colNombres, yPos + filaAlturaDoble);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Fecha de Ingreso :", tablaInicioX + 2, yPos + 3.5);
+  doc.text("Nombres Completos", xHeader2 + colNombres / 2, yPos + 3.5, { align: "center" });
+
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.fechaIngreso, tablaInicioX + 40, yPos + 3.5);
+  doc.text(
+    datosFinales.nombres || "",
+    xHeader2 + colNombres / 2,
+    yPos + 8,
+    { align: "center", maxWidth: colNombres - 2 }
+  );
 
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Código DPTO :", tablaInicioX + col1Width + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.codigoDpto, tablaInicioX + col1Width + 30, yPos + 3.5);
+  // Avanzar posición
+  yPos += filaAlturaDoble + 4;
 
-  yPos += filaAltura;
-
-  // === FILA 4: CARGO + Empleado/Obrero ===
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + col1Width, yPos, tablaInicioX + col1Width, yPos + filaAltura);
-  doc.line(tablaInicioX + contenidoWidth, yPos, tablaInicioX + contenidoWidth, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + contenidoWidth, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + contenidoWidth, yPos + filaAltura);
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Cargo :", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.cargo, tablaInicioX + 40, yPos + 3.5);
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Empleado:", tablaInicioX + col1Width + 2, yPos + 3.5);
-  doc.rect(tablaInicioX + col1Width + 20, yPos + 1, 3.5, 3.5);
-  if (datosFinales.esEmpleado) {
-    doc.text("X", tablaInicioX + col1Width + 20.8, yPos + 3.8);
-  }
-
-  doc.text("Obrero:", tablaInicioX + col1Width + 40, yPos + 3.5);
-  doc.rect(tablaInicioX + col1Width + 53, yPos + 1, 3.5, 3.5);
-  if (datosFinales.esObrero) {
-    doc.text("X", tablaInicioX + col1Width + 53.8, yPos + 3.8);
-  }
-
-  yPos += filaAltura;
-
-  // === FILA 5: EMPRESA (sin FOTO, solo hasta contenidoWidth) ===
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + contenidoWidth, yPos, tablaInicioX + contenidoWidth, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + contenidoWidth, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + contenidoWidth, yPos + filaAltura);
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Empresa :", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.empresa, tablaInicioX + 80, yPos + 3.5);
-
-  yPos += filaAltura;
 
   // === FILA 6: Fecha y lugar de nacimiento (header con 2 filas de alto) ===
-  const filaAlturaDoble = 10;
+
   const colFechaLugar = 25; // Columna "Fecha y lugar de nacimiento"
   const colDia = 15;
   const colMes = 15;
@@ -422,84 +522,112 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.departamentoNacimiento, xHeader + colDepartamento / 2, yPos + 8, { align: "center" });
 
-  yPos += filaAlturaDoble;
+  yPos += filaAlturaDoble + 4;
 
-  // === FILA 7: DNI / C.Ext .Nº | L.M. No. | Autogenerado ===
-  const col3Width = 66.67; // 3 columnas iguales
+  doc.text("DNI / C.Ext. .N°:", tablaInicioX + 2, yPos + 4);
+  drawRectWithCenteredText({
+    doc,
+    xText: tablaInicioX + 2,
+    yText: yPos + 4,
+    labelWidth: 20, // ajusta según tu texto "EMPRESA :"
+    width: 50,
+    height: 5,
+    text: datosFinales.dni
+  });
 
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + col3Width, yPos, tablaInicioX + col3Width, yPos + filaAltura);
-  doc.line(tablaInicioX + col3Width * 2, yPos, tablaInicioX + col3Width * 2, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.text("Estado Civil:", tablaInicioX + 6, yPos + 9);
+  drawRectWithCenteredText({
+    doc,
+    xText: tablaInicioX + 2,
+    yText: yPos + 9,
+    labelWidth: 20, // ajusta según tu texto "EMPRESA :"
+    width: 50,
+    height: 5,
+    text: datosFinales.estadoCivil
+  });
 
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("DNI / C.Ext .Nº.", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.dni, tablaInicioX + 35, yPos + 3.5);
+  doc.text("Lic Conducir No:", tablaInicioX + 2, yPos + 14);
+  drawRectWithCenteredText({
+    doc,
+    xText: tablaInicioX + 2,
+    yText: yPos + 14,
+    labelWidth: 20, // ajusta según tu texto "EMPRESA :"
+    width: 50,
+    height: 5,
+    text: datosFinales.licConducirNo
+  });
 
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("L.M. No.", tablaInicioX + col3Width + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.lmNo, tablaInicioX + col3Width + 25, yPos + 3.5);
+  //part2
+  doc.text("L.M. No.:", tablaInicioX + 85, yPos + 4);
+  drawRectWithCenteredText({
+    doc,
+    xText: tablaInicioX + 80,
+    yText: yPos + 4,
+    labelWidth: 18, // ajusta según tu texto "EMPRESA :"
+    width: 40,
+    height: 5,
+    text: datosFinales.lmNo
+  });
 
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Autogenerado :", tablaInicioX + col3Width * 2 + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.autogenerado, tablaInicioX + col3Width * 2 + 35, yPos + 3.5);
+  doc.text("AFP/SNP:", tablaInicioX + 84, yPos + 9);
+  drawRectWithCenteredText({
+    doc,
+    xText: tablaInicioX + 80,
+    yText: yPos + 9,
+    labelWidth: 18, // ajusta según tu texto "EMPRESA :"
+    width: 40,
+    height: 5,
+    text: datosFinales.afpSnp
+  });
 
-  yPos += filaAltura;
+  doc.text("CUSSP No:", tablaInicioX + 82, yPos + 14);
+  drawRectWithCenteredText({
+    doc,
+    xText: tablaInicioX + 78,
+    yText: yPos + 14,
+    labelWidth: 20, // ajusta según tu texto "EMPRESA :"
+    width: 40,
+    height: 5,
+    text: datosFinales.cusspNo
+  });
 
-  // === FILA 8: Estado Civil | AFP/SNP | Estatura ===
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + col3Width, yPos, tablaInicioX + col3Width, yPos + filaAltura);
-  doc.line(tablaInicioX + col3Width * 2, yPos, tablaInicioX + col3Width * 2, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  //part3
+  doc.text("Autogenerado:", tablaInicioX + 149, yPos + 4);
+  drawRectWithCenteredText({
+    doc,
+    xText: tablaInicioX + 150,
+    yText: yPos + 4,
+    labelWidth: 18, // ajusta según tu texto "EMPRESA :"
+    width: 30,
+    height: 5,
+    text: datosFinales.autogenerado
+  });
 
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Estado Civil :", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.estadoCivil, tablaInicioX + 30, yPos + 3.5);
+  doc.text("Estatura:", tablaInicioX + 156, yPos + 9);
+  drawRectWithCenteredText({
+    doc,
+    xText: tablaInicioX + 150,
+    yText: yPos + 9,
+    labelWidth: 18, // ajusta según tu texto "EMPRESA :"
+    width: 30,
+    height: 5,
+    text: datosFinales.estatura
+  });
 
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("AFP/SNP :", tablaInicioX + col3Width + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.afpSnp, tablaInicioX + col3Width + 25, yPos + 3.5);
+  doc.text("Peso:", tablaInicioX + 160, yPos + 14);
+  drawRectWithCenteredText({
+    doc,
+    xText: tablaInicioX + 150,
+    yText: yPos + 14,
+    labelWidth: 18, // ajusta según tu texto "EMPRESA :"
+    width: 30,
+    height: 5,
+    text: datosFinales.peso
+  });
 
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Estatura :", tablaInicioX + col3Width * 2 + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.estatura, tablaInicioX + col3Width * 2 + 25, yPos + 3.5);
 
-  yPos += filaAltura;
+  yPos += 21
 
-  // === FILA 9: Lic.Conducir No. | CUSSP No. | Peso ===
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + col3Width, yPos, tablaInicioX + col3Width, yPos + filaAltura);
-  doc.line(tablaInicioX + col3Width * 2, yPos, tablaInicioX + col3Width * 2, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Lic.Conducir No.:", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.licConducirNo, tablaInicioX + 35, yPos + 3.5);
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("CUSSP No.:", tablaInicioX + col3Width + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.cusspNo, tablaInicioX + col3Width + 25, yPos + 3.5);
-
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Peso :", tablaInicioX + col3Width * 2 + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.peso, tablaInicioX + col3Width * 2 + 25, yPos + 3.5);
-
-  yPos += filaAltura;
 
   // === FILA 10: Direccion del Domicilio | Distrito | Provincia | Departamento (header) ===
   const colDireccion = 75;
@@ -507,8 +635,8 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   const colProvinciaDom = 40;
   const colDepartamentoDom = 40;
 
-  // Header gris
-  doc.setFillColor(196, 196, 196);
+  // Header gris NO
+  doc.setFillColor(255, 255, 255);
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
 
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
@@ -646,8 +774,8 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   yPos += filaAltura;
 
   // === SECCIÓN: COMPOSICIÓN FAMILIAR ===
-  // Título con fondo gris
-  doc.setFillColor(196, 196, 196);
+  // Título con fondo gris NO
+  doc.setFillColor(255, 255, 255);
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -849,8 +977,8 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   yPos += filaAltura + 3;
 
   // === SECCIÓN: INSTRUCCIÓN ADQUIRIDA ===
-  // Título con fondo gris
-  doc.setFillColor(196, 196, 196);
+  // Título con fondo grisNO
+  doc.setFillColor(255, 255, 255);
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -953,7 +1081,7 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   doc.addPage();
 
   // Header página 2
-  await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+  /*await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
   doc.setFont("helvetica", "bold").setFontSize(14);
   doc.setTextColor(0, 0, 0);
@@ -978,9 +1106,11 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
     showLine: true,
     fontSize: 30,
     textPosition: 0.9
-  });
-
-  yPos = 38;
+  });*/
+  doc.setDrawColor(0, 0, 0);
+  doc.setTextColor(0, 0, 0);
+  doc.setLineWidth(0.2);
+  yPos = 12;
 
   // === SECCIÓN: CAPACITACIÓN ===
   // Header de la tabla Capacitación
@@ -1052,8 +1182,8 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   yPos += filaAltura;
 
   // === SECCIÓN: EXPERIENCIA LABORAL ===
-  // Título con fondo gris
-  doc.setFillColor(196, 196, 196);
+  // Título con fondo grisNO
+  doc.setFillColor(255, 255, 255);
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1170,8 +1300,8 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   yPos += filaAltura;
 
   // === SECCIÓN: REFERENCIAS PERSONALES ===
-  // Título con fondo gris
-  doc.setFillColor(196, 196, 196);
+  // Título con fondo gris NO
+  doc.setFillColor(255, 255, 255);
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -1385,6 +1515,9 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   // === SECCIÓN: PRE EVALUACIÓN ===
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Pre Evaluación:", tablaInicioX, yPos + 3.5);
+
+  doc.text(`Aptitud Altura 1.8 mt: el trabajador ${datosFinales.aptitudPoderosa} para trabajar altura mayor a 25 m`, tablaInicioX + 20, yPos - 1);
+
   yPos += filaAltura;
   //SELO
 
@@ -1397,7 +1530,7 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   const xInicioCuadros = (pageW - anchoTotalCuadros) / 2;
   const sellofirma = await getSign(data, "SELLOFIRMA");
   const sellofirmaDoc = await getSign(data, "SELLOFIRMADOCASIG");
-
+  console.log(sellofirmaDoc)
   // Cuadro PSICOLOGIA
   doc.rect(xInicioCuadros, yPos, cuadroAncho, cuadroAlto);
   doc.setFont("helvetica", "bold").setFontSize(8);
