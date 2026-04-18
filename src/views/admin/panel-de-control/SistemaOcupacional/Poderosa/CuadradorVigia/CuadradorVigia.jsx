@@ -30,12 +30,13 @@ export default function CuadradorVigia() {
         fechaExamen: today,
         fechaHasta: nextYearDate,
         observaciones: "",
-        nombre_medico: userName,
-        userlogued: userlogued,
 
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
+
+        nombre_doctorAsignado: "",
+        user_doctorAsignado: "",
     }
 
     const {
@@ -210,6 +211,14 @@ export default function CuadradorVigia() {
                                             label="Especialista"
                                             form={form}
                                             onChange={handleChangeSimple}
+                                        />
+                                        <EmpleadoComboBox
+                                            value={form.nombre_doctorAsignado}
+                                            label="Doctor Asignado"
+                                            form={form}
+                                            onChange={handleChangeSimple}
+                                            nameField="nombre_doctorAsignado"
+                                            idField="user_doctorAsignado"
                                         />
                                     </SectionFieldset>
                                     <div className="w-full flex justify-between items-center gap-1 mt-4">

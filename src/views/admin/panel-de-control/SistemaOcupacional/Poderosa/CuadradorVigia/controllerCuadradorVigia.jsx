@@ -7,10 +7,10 @@ import {
     SubmitDataServiceDefault,
 } from "../../../../../utils/functionUtils";
 import { getFetch } from "../../../../../utils/apiHelpers";
-import { getHoraActual } from "../../../../../utils/helpers";
+import { convertirGenero } from "../../../../../utils/helpers";
 
-const obtenerReporteUrl = "";
-const registrarUrl = "";
+const obtenerReporteUrl = "/api/v01/ct/certificadoAptitudCuadrador/obtenerReporte";
+const registrarUrl = "/api/v01/ct/certificadoAptitudCuadrador/registrarActualizar";
 
 export const GetInfoServicio = async (
     nro,
@@ -23,14 +23,11 @@ export const GetInfoServicio = async (
         token,
         sede
     );
-    console.log(res)
     if (res) {
-        console.log(res)
         set((prev) => ({
             ...prev,
-            ...res,
             nombres: res.nombresApellidos,
-            sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
+            sexo: convertirGenero(res.genero ?? ""),
             dniPaciente: res.dni,
             edadPaciente: res.edad,
             nombreExamen: res.nomExam,
@@ -38,8 +35,6 @@ export const GetInfoServicio = async (
             contrata: res.contrata,
             cargoPaciente: res.cargo,
             ocupacionPaciente: res.areaO,
-            fechaExamen: prev.fechaExamen,
-
         }));
     }
 };
@@ -59,19 +54,30 @@ export const GetInfoServicioEditar = async (
         onFinish
     );
     if (res) {
-        console.log(res)
         set((prev) => ({
             ...prev,
-            ...res,
-            // Header
-            nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
-            sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
-            edadPaciente: res.edadPaciente,
-            dniUser: res.dniUsuario,
-            nombre_medico: res.nombreMedico,
-            apto: res.apto ? "APTO" : res.aptoRestriccion ? "APTOCONRESTRICCION" : res.aptoTemporal ? "NOAPTOTEMPORAL" : res.noApto ? "NOAPTO" : "",
+            norden: res.norden ?? "",
+            nombreExamen: res.tipoExamen ?? "",
+            nombres: `${res.nombres} ${res.apellidos}`,
+            dniPaciente: res.dniPaciente ?? "",
+            edadPaciente: res.edad ?? "",
+            sexo: convertirGenero(res.sexoPaciente ?? ""),
+            empresa: res.empresa ?? "",
+            contrata: res.contrata ?? "",
+            cargoPaciente: res.cargoPaciente ?? "",
+            ocupacionPaciente: res.ocupacionPaciente ?? "",
+            fechaExamen: res.fechaExamen ?? "",
+            fechaHasta: res.fechaCaducidad ?? "",
+            observaciones: res.observacion ?? "",
 
-            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+            apto: res.apto ? "APTO" :
+                res.noApto ? "NO_APTO" :
+                    res.aptoTemporal ? "APTO_TEMPORAL" :
+                        res.aptoConRestriccion ? "APTO_CON_RESTRICCION" : "",
+
+            // Médico que Certifica 
+            user_medicoFirma: res.usuarioFirma ?? "",
+            user_doctorAsignado: res.doctorAsignado ?? "",
         }));
     }
 };
@@ -90,20 +96,22 @@ export const SubmitDataService = async (
         return;
     }
     const body = {
-        "norden": form.norden,
-        "dni": form.dniPaciente,
-        "fechaExamen": form.fechaExamen,
-        "fechaHasta": form.fechaHasta,
-        "nombreMedico": form.nombre_medico,
-        "apto": form.apto === "APTO" ? true : false,
-        "aptoRestriccion": form.apto === "APTOCONRESTRICCION" ? true : false,
-        "noAptoTemporal": form.apto === "NOAPTOTEMPORAL" ? true : false,
-        "noApto": form.apto === "NOAPTO" ? true : false,
-        "observaciones": form.observaciones,
-        "horaSalida": getHoraActual(),
-        "usuarioRegistro": form.userlogued,
+        norden: form.norden,
+        fechaExamen: form.fechaExamen,
+        fechaCaducidad: form.fechaHasta,
 
+        apto: form.apto === "APTO",
+        aptoConRestriccion: form.apto === "APTO_CON_RESTRICCION",
+        aptoTemporal: form.apto === "APTO_TEMPORAL",
+        noApto: form.apto === "NO_APTO",
+
+
+        userRegistro: user,
         usuarioFirma: form.user_medicoFirma,
+        doctorAsignado: form.user_doctorAsignado,
+
+        observacion: form.observaciones,
+        userRegistro: form.userlogued,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -146,7 +154,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             GetInfoServicioEditar(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de Aptitud Licencia Interna",
+                    "Este paciente ya cuenta con registros de Cuadrador Vigia",
                     "warning"
                 );
             });
