@@ -7,10 +7,13 @@ import {
     SubmitDataServiceDefault,
 } from "../../../../../utils/functionUtils";
 import { getFetch } from "../../../../../utils/apiHelpers";
-import { convertirGenero } from "../../../../../utils/helpers";
+import { getHoraActual, getToday } from "../../../../../utils/helpers";
 
-const obtenerReporteUrl = "/api/v01/ct/certificadoAptitudCuadrador/obtenerReporte";
-const registrarUrl = "/api/v01/ct/certificadoAptitudCuadrador/registrarActualizar";
+const obtenerReporteUrl =
+    "/api/v01/ct/aptitudCertificadoCaliente/obtenerReporteAptitudCertificadoCaliente";
+const registrarUrl =
+    "/api/v01/ct/aptitudCertificadoCaliente/registrarActualizarAptitudCertificadoCaliente";
+const today = getToday();
 
 export const GetInfoServicio = async (
     nro,
@@ -23,22 +26,27 @@ export const GetInfoServicio = async (
         token,
         sede
     );
+    console.log(res)
     if (res) {
+        console.log(res)
         set((prev) => ({
             ...prev,
-            nombres: res.nombresApellidos,
-            sexo: convertirGenero(res.genero ?? ""),
-            dni: res.dni,
-            edad: res.edad,
-            fechaNacimiento: res.fechaNac,
-            lugarNacimiento: res.lugarNacimiento,
-            estadoCivil: res.estadoCivil,
-            nivelEstudios: res.nivelEstudios,
-            nombreExamen: res.nomExam,
-            empresa: res.empresa,
-            contrata: res.contrata,
-            cargoDesempenar: res.cargo,
-            ocupacion: res.areaO,
+            norden: res.norden??"",
+            nombreExamen: res.nomExam??"",
+            nombres: res.nombresApellidos??"",
+            edad: res.edad??"",
+            sexo: res.genero??"",
+            dni: res.dni??"",
+            fechaNacimiento: res.fechaNac??"",
+            lugarNacimiento: res.lugarNacimiento??"",
+            estadoCivil: res.estadoCivil??"",
+            nivelEstudios: res.nivelEstudios??"",
+
+            empresa: res.empresa??"",
+            contrata: res.contrata??"",
+            ocupacion: res.cargo??"",
+            cargoDesempenar: res.cargo??"",
+
         }));
     }
 };
@@ -58,32 +66,19 @@ export const GetInfoServicioEditar = async (
         onFinish
     );
     if (res) {
+        console.log(res)
         set((prev) => ({
             ...prev,
-            norden: res.norden ?? "",
-            nombreExamen: res.tipoExamen ?? "",
-            nombres: res.nombresApellidos??"",
-            dni: res.dni ?? "",
-            edad: res.edad ?? "",
-            sexo: convertirGenero(res.sexoPaciente ?? ""),
-            fechaNacimiento: res.fechaNac ?? "",
-            lugarNacimiento: res.lugarNacimiento ?? "",
-            empresa: res.empresa ?? "",
-            contrata: res.contrata ?? "",
-            cargoDesempenar: res.cargo ?? "",
-            ocupacionPaciente: res.ocupacion ?? "",
-            fechaExamen: res.fechaExamen ?? "",
-            fechaHasta: res.fechaCaducidad ?? "",
-            observaciones: res.observacion ?? "",
+            ...res,
+            // Header
+            nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
+            sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
+            edadPaciente: res.edadPaciente,
+            dniUser: res.dniUsuario,
+            nombre_medico: res.nombreMedico,
+            apto: res.apto ? "APTO" : res.aptoRestriccion ? "APTOCONRESTRICCION" : res.aptoTemporal ? "NOAPTOTEMPORAL" : res.noApto ? "NOAPTO" : "",
 
-            apto: res.apto ? "APTO" :
-                res.noApto ? "NO_APTO" :
-                    res.aptoTemporal ? "APTO_TEMPORAL" :
-                        res.aptoConRestriccion ? "APTO_CON_RESTRICCION" : "",
-
-            // Médico que Certifica 
-            user_medicoFirma: res.usuarioFirma ?? "",
-            user_doctorAsignado: res.doctorAsignado ?? "",
+            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
     }
 };
@@ -102,22 +97,20 @@ export const SubmitDataService = async (
         return;
     }
     const body = {
-        norden: form.norden,
-        fechaExamen: form.fechaExamen,
-        fechaCaducidad: form.fechaHasta,
+        "norden": form.norden,
+        "dni": form.dniPaciente,
+        "fechaExamen": form.fechaExamen,
+        "fechaHasta": form.fechaHasta,
+        "nombreMedico": form.nombre_medico,
+        "apto": form.apto === "APTO" ? true : false,
+        "aptoRestriccion": form.apto === "APTOCONRESTRICCION" ? true : false,
+        "noAptoTemporal": form.apto === "NOAPTOTEMPORAL" ? true : false,
+        "noApto": form.apto === "NOAPTO" ? true : false,
+        "observaciones": form.observaciones,
+        "horaSalida": getHoraActual(),
+        "usuarioRegistro": form.userlogued,
 
-        apto: form.apto === "APTO",
-        aptoConRestriccion: form.apto === "APTO_CON_RESTRICCION",
-        aptoTemporal: form.apto === "APTO_TEMPORAL",
-        noApto: form.apto === "NO_APTO",
-
-
-        userRegistro: user,
         usuarioFirma: form.user_medicoFirma,
-        doctorAsignado: form.user_doctorAsignado,
-
-        observacion: form.observaciones,
-        userRegistro: form.userlogued,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -132,7 +125,7 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../jaspers/AptitudLicenciaInterna/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../jaspers/AptitudCertificadoCaliente/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -140,7 +133,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../jaspers/AptitudLicenciaInterna"
+        "../../../../../jaspers/AptitudCertificadoCaliente"
     );
 };
 
@@ -160,7 +153,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             GetInfoServicioEditar(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de Cuadrador Vigia",
+                    "Este paciente ya cuenta con registros de C. Trabajos en Caliente",
                     "warning"
                 );
             });
