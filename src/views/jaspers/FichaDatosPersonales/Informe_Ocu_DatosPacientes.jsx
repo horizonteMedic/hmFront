@@ -172,7 +172,7 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
     transporteAereo: data.transporteAereoSi === true ? "SI" :
       data.transporteAereoNo === true ? "NO" : "",
 
-    aptitudPoderosa: data.aptitudPoderosaSi ? "es apto" : data.aptitudPoderosaNo ? "no es apto" : ""
+    aptitudPoderosa: data.aptitudPoderosaSi ? "APTO" : data.aptitudPoderosaNo ? "NO APTO" : ""
   };
 
   const drawRectWithCenteredText = ({
@@ -1516,7 +1516,7 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Pre Evaluación:", tablaInicioX, yPos + 3.5);
 
-  doc.text(`Aptitud Altura 1.8 mt: el trabajador ${datosFinales.aptitudPoderosa} para trabajar altura mayor a 25 m`, tablaInicioX + 20, yPos - 1);
+  doc.text(`Aptitud Altura 1.8 mt: ${datosFinales.aptitudPoderosa}`, tablaInicioX + 77, yPos + 3.5);
 
   yPos += filaAltura;
   //SELO
