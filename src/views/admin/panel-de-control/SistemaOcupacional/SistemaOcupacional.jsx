@@ -72,6 +72,7 @@ import {
   faHandHoldingMedical,
   faUpload,
   faMagnifyingGlassPlus,
+  faHandDots,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -114,6 +115,7 @@ import AsistencialTabSelector from "./Asistencial/AsistencialTabSelector.jsx";
 import SubidaArchivos from "./SubidaArchivos/SubidaArchivos.jsx";
 import PacientesObservados from "./PacientesObservados/PacientesObservados.jsx";
 import SeguimientoClinico from "./SeguimientoClinico/SeguimientoClinico.jsx";
+import TamizajeDermatologico from "./TamizajeDermatologico/TamizajeDermatologico.jsx";
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
   { key: 7, label: "Test Altura" },
@@ -335,6 +337,7 @@ const TabComponent = () => {
                   { vista: "Subida de Archivos", tab: 43, icons: [{ icon: faUpload }], label: "Subida de Archivos" },
                   { vista: "Pacientes Observados", tab: 44, icons: [{ icon: faMagnifyingGlassPlus }], label: "Pacientes Observados" },
                   { vista: "Seguimiento Clinico", tab: 45, icons: [{ icon: faFileMedical }], label: "Seguimiento Clínico" },
+                  { vista: "Tamizaje Dermatologico", tab: 46, icons: [{ icon: faHandDots }], label: "Tamizaje Dermatologico" },
                   { vista: "Folio", tab: 40, icons: [{ icon: faFileContract }], label: "Folio" },
                 ];
                 return items
@@ -618,6 +621,7 @@ const TabComponent = () => {
               43: { title: "Subida de Archivos", child: <SubidaArchivos /> },
               44: { title: "Pacientes Observados", child: <PacientesObservados /> },
               45: { title: "Seguimiento Clinico", child: <SeguimientoClinico /> },
+              46: { title: "Tamizaje Dermatológico", child: <TamizajeDermatologico /> },
               40: { title: "Folio", child: <Folio /> },
             };
             const section = displayedInterfaces[activeTab];

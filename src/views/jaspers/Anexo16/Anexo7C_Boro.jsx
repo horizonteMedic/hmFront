@@ -604,7 +604,7 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
   const anchoCol4 = tablaAncho / 4; // 25% cada columna
   const divCol1 = tablaInicioX + anchoCol4;
   const divCol2 = tablaInicioX + (anchoCol4 * 2);
-  const divCol3 = tablaInicioX + (anchoCol4 * 3);
+  const divCol3 = tablaInicioX + (anchoCol4 * 3) - 12; // Movido a la izquierda para el texto largo
   // Altura aumentada para que quepan todos los checkboxes
   const alturaFilaGrande = 18; // 16mm de altura
 
@@ -624,7 +624,8 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
   doc.line(divCol3, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
 
   // Línea vertical divisoria en columna 4 para separar las 2 sub-columnas de alturas
-  const divSubCol = divCol3 + (anchoCol4 / 2);
+  const anchoCol4_real = tablaAncho - (divCol3 - tablaInicioX);
+  const divSubCol = divCol3 + (anchoCol4_real / 2);
   doc.line(divSubCol, yPos + alturaHeader, divSubCol, yPos + alturaFilaGrande);
 
   // COLUMNA 1: LUGAR Y FECHA DE NACIMIENTO
@@ -706,13 +707,13 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     doc.text("X", xCentered, yCentered);
   }
 
-  // COLUMNA 4: ALTURA DE LA LABOR (MSNM) con checkboxes en 2 sub-columnas
+  // COLUMNA 4: ALTURA GEOGRÁFICA DE LA LABOR (MSNM) con checkboxes en 2 sub-columnas
   doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("ALTURA DE LA LABOR (MSNM):", divCol3 + 2, yPos + 3.5);
+  doc.text("ALTURA GEOGRÁFICA DE LA LABOR (MSNM):", divCol3 + 2, yPos + 3.5);
 
   // Checkboxes de Altura en 2 sub-columnas dentro de la columna 4
   const checkboxAlturaY = yPos + alturaHeader + 2;
-  const anchoSubCol = anchoCol4 / 2; // Mitad de la columna 4 para cada sub-columna
+  const anchoSubCol = anchoCol4_real / 2; // Mitad de la columna 4 para cada sub-columna
   let checkboxAlturaX1 = divCol3 + 2; // Sub-columna izquierda
   let checkboxAlturaX2 = divCol3 + anchoSubCol + 2; // Sub-columna derecha
   const checkboxAlturaSpacing = 3.5;
