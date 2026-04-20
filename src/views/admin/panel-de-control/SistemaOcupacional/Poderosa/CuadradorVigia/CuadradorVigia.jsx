@@ -164,7 +164,7 @@ export default function CuadradorVigia() {
                         value={form?.observaciones}
                         onChange={handleChange}
                         classNameLabel="text-blue-600"
-                        rows={20}
+                        rows={17}
                         name="observaciones"
                     />
                 </SectionFieldset>
