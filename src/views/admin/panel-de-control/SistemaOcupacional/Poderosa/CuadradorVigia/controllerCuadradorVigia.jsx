@@ -8,6 +8,7 @@ import {
 } from "../../../../../utils/functionUtils";
 import { getFetch } from "../../../../../utils/apiHelpers";
 import { convertirGenero } from "../../../../../utils/helpers";
+import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl = "/api/v01/ct/certificadoAptitudCuadrador/obtenerReporte";
 const registrarUrl = "/api/v01/ct/certificadoAptitudCuadrador/registrarActualizar";
@@ -30,7 +31,7 @@ export const GetInfoServicio = async (
             sexo: convertirGenero(res.genero ?? ""),
             dni: res.dni,
             edad: res.edad,
-            fechaNacimiento: res.fechaNac,
+            fechaNacimiento: formatearFechaCorta(res.fechaNac),
             lugarNacimiento: res.lugarNacimiento,
             estadoCivil: res.estadoCivil,
             nivelEstudios: res.nivelEstudios,
@@ -57,33 +58,34 @@ export const GetInfoServicioEditar = async (
         obtenerReporteUrl,
         onFinish
     );
-    if (res) {
+    const rese = res?.resultado;
+    if (rese) {
         set((prev) => ({
             ...prev,
-            norden: res.norden ?? "",
-            nombreExamen: res.tipoExamen ?? "",
-            nombres: res.nombresApellidos??"",
-            dni: res.dni ?? "",
-            edad: res.edad ?? "",
-            sexo: convertirGenero(res.sexoPaciente ?? ""),
-            fechaNacimiento: res.fechaNac ?? "",
-            lugarNacimiento: res.lugarNacimiento ?? "",
-            empresa: res.empresa ?? "",
-            contrata: res.contrata ?? "",
-            cargoDesempenar: res.cargo ?? "",
-            ocupacionPaciente: res.ocupacion ?? "",
-            fechaExamen: res.fechaExamen ?? "",
-            fechaHasta: res.fechaCaducidad ?? "",
-            observaciones: res.observacion ?? "",
+            norden: rese.norden ?? "",
+            nombreExamen: rese.tipoExamen ?? "",
+            nombres: `${rese.nombres ?? ""} ${rese.apellidos ?? ""}`,
+            dni: rese.dniPaciente ?? "",
+            edad: rese.edad ?? "",
+            sexo: convertirGenero(rese.sexoPaciente ?? ""),
+            fechaNacimiento: rese.fechaNac ?? "",
+            lugarNacimiento: rese.lugarNacimiento ?? "",
+            empresa: rese.empresa ?? "",
+            contrata: rese.contrata ?? "",
+            cargoDesempenar: rese.cargo ?? "",
+            ocupacionPaciente: rese.ocupacion ?? "",
+            fechaExamen: rese.fechaExamen ?? "",
+            fechaHasta: rese.fechaCaducidad ?? "",
+            observaciones: rese.observacion ?? "",
 
-            apto: res.apto ? "APTO" :
-                res.noApto ? "NO_APTO" :
-                    res.aptoTemporal ? "APTO_TEMPORAL" :
-                        res.aptoConRestriccion ? "APTO_CON_RESTRICCION" : "",
+            apto: rese.apto ? "APTO" :
+                rese.noApto ? "NO_APTO" :
+                    rese.aptoTemporal ? "APTO_TEMPORAL" :
+                        rese.aptoConRestriccion ? "APTO_CON_RESTRICCION" : "",
 
             // Médico que Certifica 
-            user_medicoFirma: res.usuarioFirma ?? "",
-            user_doctorAsignado: res.doctorAsignado ?? "",
+            user_medicoFirma: rese.usuarioFirma ?? "",
+            user_doctorAsignado: rese.doctorAsignado ?? "",
         }));
     }
 };
@@ -131,18 +133,40 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
     });
 };
 
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../jaspers/AptitudLicenciaInterna/*.jsx");
-    PrintHojaRDefault(
-        nro,
-        token,
-        tabla,
-        datosFooter,
-        obtenerReporteUrl,
-        jasperModules,
-        "../../../../../jaspers/AptitudLicenciaInterna"
-    );
-};
+// export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+//     const jasperModules = import.meta.glob("../../../../../jaspers/AptitudLicenciaInterna/*.jsx");
+//     PrintHojaRDefault(
+//         nro,
+//         token,
+//         tabla,
+//         datosFooter,
+//         obtenerReporteUrl,
+//         jasperModules,
+//         "../../../../../jaspers/AptitudLicenciaInterna"
+//     );
+// };
+
+export const PrintHojaR = (nro, token, tabla) => {
+    Loading('Cargando Formato a Imprimir')
+    getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`, token)
+        .then(async (res) => {
+            if (res?.resultado?.norden) {
+                const nombre = "CertificadoAptitudCuadrador";
+                console.log(nombre)
+                const jasperModules = import.meta.glob('../../../../../jaspers/AptitudLicenciaInterna/*.jsx');
+                const modulo = await jasperModules[`../../../../../jaspers/AptitudLicenciaInterna/${nombre}.jsx`]();
+                // Ejecuta la función exportada por default con los datos
+                if (typeof modulo.default === 'function') {
+                    modulo.default(res.resultado);
+                } else {
+                    console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+                }
+                Swal.close()
+            } else {
+                Swal.close()
+            }
+        })
+}
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
     VerifyTRPerzonalizado(
