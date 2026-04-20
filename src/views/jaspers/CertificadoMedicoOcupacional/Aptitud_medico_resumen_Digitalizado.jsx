@@ -38,6 +38,7 @@ export default async function Aptitud_medico_resumen_Digitalizado(data = {}, doc
     apto: Boolean(data.apto ?? false),
     aptoconrestriccion: Boolean(data.aptoconrestriccion ?? false),
     noapto: Boolean(data.noapto ?? false),
+    evaluado: Boolean(data.evaluado ?? false),
     fechaDesde: data.fechaDesde || "",
     // Datos de digitalización
     digitalizacion: data.digitalizacion || []
@@ -395,71 +396,61 @@ export default async function Aptitud_medico_resumen_Digitalizado(data = {}, doc
   // Fila final: Resultados (header gris)
   yPos = dibujarHeaderSeccion("TERMINANDO COMO RESULTADOS", yPos, filaAltura);
 
-  // Tabla de opciones de aptitud
-  const alturaTotalTabla = 15; // 3 filas de 5mm cada una
+  // Tabla de opciones de aptitud — 4 filas de 5mm = 20mm total
+  const filaH = 5;
+  const numFilas = 4;
+  const alturaTotalTabla = filaH * numFilas; // 20mm
   const mitadTabla = tablaAncho / 2;
+  const columnaX = 10; // ancho columna del checkbox
 
-  // Función para dibujar X
-  const dibujarX = (x, y) => {
+  // Helper X centrado en la columna checkbox
+  const dibujarX = (fila) => {
+    const cx = tablaInicioX + mitadTabla - columnaX + (columnaX / 2) - 1;
+    const cy = yPos + filaH * fila + 3.5;
     doc.setFont("helvetica", "bold").setFontSize(10);
-    doc.text("X", x, y);
+    doc.text("X", cx, cy, { align: "center" });
   };
 
-  // Dibujar bordes de la tabla completa
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaTotalTabla); // Línea izquierda
-  doc.line(tablaInicioX + mitadTabla, yPos, tablaInicioX + mitadTabla, yPos + alturaTotalTabla); // Línea divisoria vertical
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaTotalTabla); // Línea derecha
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
-  doc.line(tablaInicioX, yPos + alturaTotalTabla, tablaInicioX + tablaAncho, yPos + alturaTotalTabla); // Línea inferior
+  // ── Bordes externos ───────────────────────────────────────────
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaTotalTabla); // izq
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaTotalTabla); // der
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);                    // top
+  doc.line(tablaInicioX, yPos + alturaTotalTabla, tablaInicioX + tablaAncho, yPos + alturaTotalTabla); // bot
 
-  // Dibujar líneas horizontales solo en la mitad izquierda
-  doc.line(tablaInicioX, yPos + 5, tablaInicioX + mitadTabla, yPos + 5); // Línea después de fila 1
-  doc.line(tablaInicioX, yPos + 10, tablaInicioX + mitadTabla, yPos + 10); // Línea después de fila 2
+  // ── División vertical central (columna derecha: Fecha) ────────
+  doc.line(tablaInicioX + mitadTabla, yPos, tablaInicioX + mitadTabla, yPos + alturaTotalTabla);
 
-  // Dibujar división vertical para las X (columna de 20mm para las X)
-  const columnaX = 10;
+  // ── División vertical checkbox (solo mitad izquierda) ─────────
   doc.line(tablaInicioX + mitadTabla - columnaX, yPos, tablaInicioX + mitadTabla - columnaX, yPos + alturaTotalTabla);
 
-  // Contenido de las 3 filas
-  let yAptitud = yPos + 3.5;
-
-  // Fila 1: APTO
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("APTO (para el puesto en el que trabaja o postula)", tablaInicioX + 2, yAptitud);
-  // Marcar X solo si apto es true
-  if (data.apto === true) {
-    const centroX = tablaInicioX + mitadTabla - (columnaX / 2);
-    dibujarX(centroX - 1, yAptitud);
-  }
-  yAptitud += 5;
-
-  // Fila 2: APTO CON RESTRICCIÓN
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("APTO CON RESTRICCIÓN (para el puesto en el que trabaja", tablaInicioX + 2, yAptitud);
-  // Marcar X solo si aptoconrestriccion es true
-  if (data.aptoconrestriccion === true) {
-    const centroX = tablaInicioX + mitadTabla - (columnaX / 2);
-    dibujarX(centroX - 1, yAptitud);
-  }
-  yAptitud += 5;
-
-  // Fila 3: NO APTO
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("NO APTO (para el puesto en el que trabaja o postula)", tablaInicioX + 2, yAptitud);
-  // Marcar X solo si noapto es true
-  if (data.noapto === true) {
-    const centroX = tablaInicioX + mitadTabla - (columnaX / 2);
-    dibujarX(centroX - 1, yAptitud);
+  // ── Líneas horizontales internas (solo mitad izquierda) ───────
+  for (let i = 1; i < numFilas; i++) {
+    doc.line(tablaInicioX, yPos + filaH * i, tablaInicioX + mitadTabla, yPos + filaH * i);
   }
 
-  // Agregar "Fecha:" en el medio de la columna derecha usando fechaDesde
-  const centroColumnaDerecha = tablaInicioX + mitadTabla + (mitadTabla / 2);
-  const centroVerticalTabla = yPos + (alturaTotalTabla / 2);
+  // ── Contenido filas ───────────────────────────────────────────
+  const filas = [
+    { label: "APTO (para el puesto en el que trabaja o postula)", key: "apto" },
+    { label: "APTO CON RESTRICCIÓN (para el puesto en el que trabaja o postula)", key: "aptoconrestriccion" },
+    { label: "NO APTO (para el puesto en el que trabaja o postula)", key: "noapto" },
+    { label: "EVALUADO", key: "evaluado" },
+  ];
+
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  filas.forEach((fila, i) => {
+    const cy = yPos + filaH * i + 3.5;
+    doc.text(fila.label, tablaInicioX + 2, cy);
+    if (data[fila.key] === true) dibujarX(i);
+  });
+
+  // ── Fecha centrada en columna derecha ─────────────────────────
+  const centroColumnaDerecha = tablaInicioX + mitadTabla + mitadTabla / 2;
+  const centroVerticalTabla = yPos + alturaTotalTabla / 2;
+  const fechaDesde = data.fechaDesde ? formatearFechaCorta(data.fechaDesde) : "";
 
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Fecha:", centroColumnaDerecha - 15, centroVerticalTabla - 1);
   doc.setFont("helvetica", "bold").setFontSize(8);
-  const fechaDesde = data.fechaDesde ? formatearFechaCorta(data.fechaDesde) : "";
   doc.text(fechaDesde, centroColumnaDerecha + 5, centroVerticalTabla - 1);
 
   yPos += alturaTotalTabla;

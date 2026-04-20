@@ -78,7 +78,7 @@ export const GetInfoServicioEditar = async (
             PA: `${res.sistolica}/${res.diastolica}`,
             edadPaciente: res.edadPaciente,
             dniUser: res.dniUsuario,
-            apto: res.apto ? "APTO" : res.aptoconrestriccion ? "APTOCONRESTRICCION" : "NOAPTO",
+            apto: res.apto ? "APTO" : res.aptoconrestriccion ? "APTOCONRESTRICCION" : res.evaluado ? "EVALUADO" : res.noapto ? "NOAPTO" : "",
             enfermedadesOcularesOftalmologia_e_oculares: `${res.enfermedadesOcularesOftalmologia_e_oculares ?? ""}\n${res.enfermedadesocularesotrosoftalmo_e_oculares1 ?? ""}`,
 
         }));
@@ -106,6 +106,7 @@ export const SubmitDataService = async (
         "apto": form.apto === "APTO" ? true : false,
         "aptoConRestriccion": form.apto === "APTOCONRESTRICCION" ? true : false,
         "noApto": form.apto === "NOAPTO" ? true : false,
+        "evaluado": form.apto === "EVALUADO" ? true : false,
         "horaSalida": getHoraActual(),
         "fechaHasta": form.fechahasta,
         "conclusiones": form.conclusiones,
