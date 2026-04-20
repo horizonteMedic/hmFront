@@ -9,10 +9,8 @@ import {
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 
-const obtenerReporteUrl =
-    "/api/v01/ct/psiBrigadista/obtenerReporteBrigadista";
-const registrarUrl =
-    "/api/v01/ct/psiBrigadista/registrarActualizarBrigadista";
+const obtenerReporteUrl = "/api/v01/ct/tamizajeDermatologico/obtenerReporte";
+const registrarUrl = "/api/v01/ct/tamizajeDermatologico/registrarActualizar";
 
 export const GetInfoServicio = async (
     nro,
@@ -137,7 +135,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             GetInfoServicio(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de Brigadista.",
+                    "Este paciente ya cuenta con registros de Tamizaje Dermatológico.",
                     "warning"
                 );
             });

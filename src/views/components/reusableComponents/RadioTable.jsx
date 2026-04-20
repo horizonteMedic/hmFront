@@ -65,6 +65,13 @@ export default function RadioTable({
               />
             </div>
           ))}
+
+          {/* Fila extra para contenido opcional */}
+          {item.extraContent && (
+            <div className={`col-span-${totalColumns} p-3`}>
+              {item.extraContent}
+            </div>
+          )}
         </div>
       ))}
     </div>
