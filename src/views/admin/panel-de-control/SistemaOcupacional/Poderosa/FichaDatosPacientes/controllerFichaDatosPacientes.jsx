@@ -47,7 +47,7 @@ export const GetInfoServicio = async (
                     : prev.tipoTrabajador,
 
             // ===== DATOS LABORALES =====
-            empresa: res.empresa ?? "",
+            empresa: res.contrata ?? "",
             cargo: res.cargoPaciente ?? "",
 
             // ===== DATOS PERSONALES =====
@@ -258,7 +258,7 @@ export const GetInfoServicioEditar = async (
                     : "",
 
             // ===== DATOS LABORALES =====
-            empresa: res.empresa ?? "",
+            empresa: res.contrata ?? "",
             cargo: res.cargoPaciente ?? "",
 
             // ===== DATOS PERSONALES =====

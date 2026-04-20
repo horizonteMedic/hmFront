@@ -14,12 +14,12 @@ export default async function CertificadoAptitudCuadrador_Digitalizado(data = {}
 
 
   const datosReales = {
-    apellidosNombres: String((data.apellidosPaciente) + " " + (data.nombresPaciente)).trim(),
+    apellidosNombres: String((data.apellidos) + " " + (data.nombres)).trim(),
     fechaExamen: formatearFechaCorta(data.fechaExamen),
-    tipoExamen: String(data.nombreExamen),
+    tipoExamen: String(data.tipoExamen),
     sexo: convertirGenero(data.sexoPaciente),
     documentoIdentidad: String(data.dniPaciente),
-    edad: String(data.edadPaciente),
+    edad: String(data.edad),
     fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente || data.fechaNacimiento),
     areaTrabajo: data.areaPaciente,
     puestoTrabajo: data.cargoPaciente,
@@ -48,11 +48,12 @@ export default async function CertificadoAptitudCuadrador_Digitalizado(data = {}
     tipoTrabajo: data.explotacion,
     // Datos para resultado de evaluación
     resultadoEvaluacion: data.noApto ? "noApto" :
-      data.apto ? "apto" : "apto",
+      data.apto ? "apto" : data.aptoTemporal ? "aptoTemporal" : 
+      data.aptoConRestriccion ? "aptoConRestriccion" : "",
     // Datos para observaciones
-    observaciones: data.observaciones,
+    observaciones: data.observacion,
     // Datos para fechas
-    fechaCaducidad: formatearFechaCorta(data.fechaHasta)
+    fechaCaducidad: formatearFechaCorta(data.fechaCaducidad)
   };
 
   // Usar solo datos reales
@@ -67,7 +68,7 @@ export default async function CertificadoAptitudCuadrador_Digitalizado(data = {}
     if (pageNumber === 1) {
       doc.setFont("helvetica", "bold").setFontSize(12);
       doc.setTextColor(0, 0, 0);
-      doc.text("CERTIFICADO DE APTITUD PARA TRAMITAR LICENCIA DE CONDUCIR INTERNA", pageW / 2, 40, { align: "center" });
+      doc.text("CERTIFICADO DE APTITUD PARA CUADRADOR", pageW / 2, 40, { align: "center" });
 
       // Subtítulo
       doc.setFont("helvetica", "bold").setFontSize(12);
@@ -198,12 +199,12 @@ export default async function CertificadoAptitudCuadrador_Digitalizado(data = {}
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Fila: Domicilio (completa)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-  yPos += filaAltura;
+  // // Fila: Domicilio (completa)
+  // doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  // doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  // doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  // doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  // yPos += filaAltura;
 
   // Fila: Puesto de Trabajo, Área de Trabajo (2 columnas)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
@@ -267,11 +268,11 @@ export default async function CertificadoAptitudCuadrador_Digitalizado(data = {}
   yTexto += filaAltura;
 
   // Domicilio
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Domicilio:", tablaInicioX + 2, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.direccionPaciente || "", tablaInicioX + 25, yTexto + 1, 160);
-  yTexto += filaAltura;
+  // doc.setFont("helvetica", "bold").setFontSize(8);
+  // doc.text("Domicilio:", tablaInicioX + 2, yTexto + 1);
+  // doc.setFont("helvetica", "normal").setFontSize(8);
+  // dibujarTextoConSaltoLinea(datosFinales.direccionPaciente || "", tablaInicioX + 25, yTexto + 1, 160);
+  // yTexto += filaAltura;
 
   // Puesto de Trabajo, Área de Trabajo
   doc.setFont("helvetica", "bold").setFontSize(8);
@@ -351,9 +352,13 @@ export default async function CertificadoAptitudCuadrador_Digitalizado(data = {}
   // Fila única: CONDICION | APTO | X | NO APTO |
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + 40, yPos, tablaInicioX + 40, yPos + filaAltura); // División 1: CONDICION
-  doc.line(tablaInicioX + 100, yPos, tablaInicioX + 100, yPos + filaAltura); // División 2: APTO
-  doc.line(tablaInicioX + 120, yPos, tablaInicioX + 120, yPos + filaAltura); // División 3: X
-  doc.line(tablaInicioX + 170, yPos, tablaInicioX + 170, yPos + filaAltura); // División 4: NO APTO
+  doc.line(tablaInicioX + 60, yPos, tablaInicioX + 60, yPos + filaAltura); // División 2: APTO
+  doc.line(tablaInicioX + 70, yPos, tablaInicioX + 70, yPos + filaAltura); // División 3: X
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura); // División 4: NO APTO
+  doc.line(tablaInicioX + 100, yPos, tablaInicioX + 100, yPos + filaAltura); // División 5: X
+  doc.line(tablaInicioX + 140, yPos, tablaInicioX + 140, yPos + filaAltura); // División 6: APTO TEMPORAL
+  doc.line(tablaInicioX + 150, yPos, tablaInicioX + 150, yPos + filaAltura); // División 7: X 
+  doc.line(tablaInicioX + 190, yPos, tablaInicioX + 190, yPos + filaAltura); // División 8: APTO CON RESTR
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -371,14 +376,14 @@ export default async function CertificadoAptitudCuadrador_Digitalizado(data = {}
   doc.text("APTO", tablaInicioX + 43, yTexto3 + 1);
 
   // Marcar X en APTO si es la condición seleccionada
-  if (datosFinales.resultadoEvaluacion === "apto") {
+  if (datosFinales.resultadoEvaluacion === "apto") { 
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text("X", tablaInicioX + 110, yTexto3 + 1, { align: "center" });
   }
 
   // NO APTO
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("NO APTO", tablaInicioX + 122, yTexto3 + 1);
+  doc.text("NO APTO", tablaInicioX + 61, yTexto3 + 1);
 
   // Marcar X en NO APTO si es la condición seleccionada
   if (datosFinales.resultadoEvaluacion === "noApto") {
