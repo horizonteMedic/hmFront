@@ -10,6 +10,7 @@ import FichaDatosPacientes from "./FichaDatosPacientes/FichaDatosPacientes";
 import CertificadoAptitudBrigadista from "./CertificadoAptitudBrigadista/CertificadoAptitudBrigadista";
 import DirecionGeneralMineria from "./DireccionGeneralMineria/DireccionGeneralMineria";
 import HojaDeRutaEmo from "./HojaDeRutaEmo/HojaDeRutaEmo";
+import CuadradorVigia from "./CuadradorVigia/CuadradorVigia";
 
 export default function PoderosaTabSelector({ tieneVista }) {
     const tabsConfig = [
@@ -78,6 +79,12 @@ export default function PoderosaTabSelector({ tieneVista }) {
             permission: "Hoja de Ruta EMO",
             label: "Hoja de Ruta para EMO",
             component: HojaDeRutaEmo
+        },
+        {
+            id: 11,
+            permission: "Cuadrador Vigia",
+            label: "Cuadrador Vigia",
+            component: CuadradorVigia
         }
     ];
     return (

@@ -6,7 +6,7 @@ import {
   SectionFieldset
 } from "../../../../../components/reusableComponents/ResusableComponents";
 import { useSessionData } from "../../../../../hooks/useSessionData";
-import { getDatePlusOneYear, getToday } from "../../../../../utils/helpers";
+import { getDatePlus364Days, getToday } from "../../../../../utils/helpers";
 import { useForm } from "../../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaAptitudAnexo2";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
@@ -43,7 +43,7 @@ export default function FichaAptitudAnexo2() {
     conclusiones: "",
     apto: "APTO",
     fechaValido: today,
-    fechaVencimiento: getDatePlusOneYear(today),
+    fechaVencimiento: getDatePlus364Days(today),
     recomendaciones: "",
     restricciones: "NINGUNO.",
 
@@ -246,7 +246,7 @@ export default function FichaAptitudAnexo2() {
                 type="date"
                 value={form?.fechaValido}
                 onChange={(e) => {
-                  setForm(prev => ({ ...prev, fechaVencimiento: getDatePlusOneYear(e.target.value) }));
+                  setForm(prev => ({ ...prev, fechaVencimiento: getDatePlus364Days(e.target.value) }));
                   handleChangeSimple(e)
                 }}
               />

@@ -2,6 +2,9 @@ import Swal from "sweetalert2";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import ExcelJS from "exceljs";
+import { SubmitHistoriaC } from "../model/AdminHistoriaC";
+import { getToday } from "../../../../../utils/helpers";
+import { LoadingDefault } from "../../../../../utils/functionUtils";
 
 
 export const ImportData = (dni, Swal, getFetch, token, set, RendeSet) => {
@@ -78,23 +81,121 @@ export const handleSubirExcel = async (setData) => {
   reader.readAsBinaryString(file);
 };
 
-const prepararDataExcel = (data) => {
-  return data.map((row) => {
-    const newRow = {};
+export const submitMasivo = async (data, sede, token, userlogued) => {
+  const resultados = [];
+  LoadingDefault("Subiendo Datos")
+  for (const row of data) {
+    const payload = mapRowToHistoria({ ...row, user_registro: userlogued });
 
-    Object.keys(row).forEach((key) => {
-      const value = row[key];
+    try {
+      const response = await SubmitHistoriaC(payload, sede, token, 1);
 
-      // Solo transformar strings
-      newRow[key.toUpperCase()] =
-        typeof value === "string"
-          ? value.toUpperCase().trim()
-          : value;
-    });
+      const isOk = response && response.id; // 🔥 clave
 
-    return newRow;
-  });
+      resultados.push({
+        ok: isOk,
+        id: isOk ? response.id : null,
+        data: response,
+        row
+      });
+
+    } catch (error) {
+      resultados.push({
+        ok: false,
+        id: null,
+        error,
+        row
+      });
+    }
+  }
+
+  return resultados;
 };
+
+const mapRowToHistoria = (row) => {
+
+  const removePrefix = (str, prefix) => {
+    if (typeof str !== "string") return "";
+    const regex = new RegExp('^' + prefix);
+    return str.replace(regex, '');
+  };
+  console.log(row)
+  const currentDate = new Date();
+  const hours = String(currentDate.getHours()).padStart(2, '0');
+  const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+  const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+
+  const today = getToday();
+  console.log(today)
+  const [yyyy, mm, dd] = today.split('-');
+  const fechaFormateada = `${dd}/${mm}/${yyyy}`;
+
+  return {
+
+    // 🔥 DEL EXCEL
+    codPa: row["DNI"] || "",
+    razonEmpresa: row["EMPRESA"] || "",
+    razonContrata: row["CONTRATA"] || "",
+    nomExamen: row["EXAMEN"] || "",
+    cargoDe: row["CARGO"] || "",
+    areaO: row["AREA"] || "",
+    n_medico: row["MEDICO OCUP"] || "",
+    tipoPago: row["FORMA DE PAGO"] || "",
+    textObserv1: row["OBSERVACION"] || "",
+    precioPo: `${'S/.' + row["PRECIO"]}` || "",
+
+    // 🔒 DEFAULT / VACÍOS
+    tipoOperacion: "INSERT",
+    nomEx: "",
+    alturaPo: "",
+    mineralPo: "",
+    fechaAperturaPo: fechaFormateada, // si luego quieres autogenerar fecha aquí
+    estadoEx: "EN PROCESO",
+    n_fisttest: false,
+    n_psicosen: false,
+    n_testaltura: false,
+    visualCompl: false,
+    trabCalientes: false,
+    manipAlimentos: false,
+    protocolo: "",
+    autoriza: "",
+    herraManuales: false,
+    rxcDorsoLumbar: false,
+    rxcKLumbar: false,
+    rxcLumbosacra: false,
+    rxcPlomos: false,
+    mercurioo: false,
+    tmarihuana: false,
+    tcocaina: false,
+    espaciosConfinados: false,
+    user_registro: row["user_registro"],
+
+    // 🔧 SISTEMA
+    n_hora: `${hours}:${minutes}:${seconds}`,
+    tipoPrueba: row["TIPO PRUEBA"] || "N/A",
+    precioAdic: "S/.0",
+  };
+};
+
+const prepararDataExcel = (data) => {
+  return data
+    .map((row) => {
+      const newRow = {};
+
+      Object.keys(row).forEach((key) => {
+        const value = row[key];
+
+        newRow[key.toUpperCase()] =
+          typeof value === "string"
+            ? value.toUpperCase().trim()
+            : value;
+      });
+
+      return newRow;
+    })
+    .filter(row => !isRowEmpty(row)); // 🔥 AQUÍ eliminas filas vacías
+};
+
 
 export const descargarPlantillaExcel = async (MedicosMulti, FormaPago, ExamenMulti) => {
 
@@ -183,4 +284,33 @@ export const descargarPlantillaExcel = async (MedicosMulti, FormaPago, ExamenMul
 
   const buffer = await workbook.xlsx.writeBuffer();
   saveAs(new Blob([buffer]), "Plantilla_Registro_Masivo.xlsx");
+};
+
+const isRowEmpty = (row) => {
+  return Object.values(row).every(value => {
+    if (value === null || value === undefined) return true;
+
+    // string vacío o espacios
+    if (typeof value === "string" && value.trim() === "") return true;
+
+    return false;
+  });
+};
+
+export const isRowValid = (row) => {
+  return (
+    row["DNI"]?.toString().trim() !== "" &&
+    row["EMPRESA"]?.toString().trim() !== "" &&
+    row["EXAMEN"]?.toString().trim() !== ""
+  );
+};
+
+export const getRowStatus = (row, index, resultados) => {
+  if (!isRowValid(row)) return "invalid";
+
+  const result = resultados[index];
+
+  if (!result) return "pending"; // aún no enviado
+
+  return result.ok ? "success" : "error";
 };

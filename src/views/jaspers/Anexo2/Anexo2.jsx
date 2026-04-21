@@ -4,6 +4,7 @@ import { convertirGenero, getSign } from "../../utils/helpers.js";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
+import autoTable from "jspdf-autotable";
 
 // Utilidad para eliminar duplicados sin alterar el formato original
 function dedupeText(input) {
@@ -674,9 +675,43 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text(datosFinales.areaTrabajo || "", tablaInicioX + 118, yTexto + 1);
   yTexto += filaAltura;
+  // === SECCION 3
+  yPos = dibujarHeaderSeccion("3. ANTECEDENTES OCUPACIONALES (Detalle de Antecedentes laborales esta en los sgtes anexos)", yPos, filaAltura);
 
-  // === SECCIÓN 3: ANTECEDENTES PATOLÓGICOS PERSONALES ===
-  yPos = dibujarHeaderSeccion("3. ANTECEDENTES PATOLÓGICOS PERSONALES", yPos, filaAltura);
+  autoTable(doc, {
+    startY: yPos,
+    margin: { left: 5, right: 5 },
+    theme: "grid",
+    styles: { fontSize: 9, textColor: [0, 0, 0], halign: "center", valign: "middle" },
+    tableLineColor: [0, 0, 0],
+    tableLineWidth: 0.2,
+    tableWidth: "auto",
+    body: [
+      [
+        { content: "Empresa" },
+        { content: "Área de Trabajo" },
+        { content: "Ocupación" },
+        { content: "Fecha" },
+        { content: "Tiempo" },
+        { content: "Exposición Ocupacional" },
+        { content: "EPP" },
+      ],
+      [
+        { content: "" },
+        { content: "" },
+        { content: "" },
+        { content: "" },
+        { content: "" },
+        { content: "" },
+        { content: "" },
+      ],
+    ],
+  });
+
+  yPos += 14;
+
+  // === SECCIÓN 4: ANTECEDENTES PATOLÓGICOS PERSONALES ===
+  yPos = dibujarHeaderSeccion("4. ANTECEDENTES PATOLÓGICOS PERSONALES", yPos, filaAltura);
 
   // Configuración de columnas para la tabla de antecedentes
   const colAnteWidth = 54; // Aumentado de 49 a 54 (+5mm)
@@ -904,7 +939,7 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   });
 
   // === SECCIÓN 4: ANTECEDENTES PATOLÓGICOS FAMILIARES ===
-  yPos = dibujarHeaderSeccion("4. ANTECEDENTES PATOLÓGICOS FAMILIARES", yPos, filaAltura);
+  yPos = dibujarHeaderSeccion("5. ANTECEDENTES PATOLÓGICOS FAMILIARES", yPos, filaAltura);
 
   // Primera fila: Padre | Madre | Hermanos
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
@@ -1095,7 +1130,7 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   }
 
   // === SECCIÓN 5: EVALUACIÓN MÉDICA ===
-  yPos = dibujarHeaderSeccion("5. EVALUACIÓN MÉDICA", yPos, filaAltura);
+  yPos = dibujarHeaderSeccion("6. EVALUACIÓN MÉDICA", yPos, filaAltura);
 
   // === FILA CELESTE: ANAMNESIS ===
   // Dibujar fondo celeste
@@ -1718,7 +1753,7 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   });
 
   // === SECCIÓN VI: CONCLUSIÓN DE EVALUACIÓN PSICOLÓGICA ===
-  yPos = dibujarHeaderSeccion("6. CONCLUSIÓN DE EVALUACIÓN PSICOLÓGICA", yPos, filaAltura);
+  yPos = dibujarHeaderSeccion("7. CONCLUSIÓN DE EVALUACIÓN PSICOLÓGICA", yPos, filaAltura);
 
   // Fila de datos dinámica creciente
   const textoConclusionesPsicologicas = (datosFinales.conclusionesEvaluacionPsicologica || "").toString();
@@ -1779,8 +1814,8 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
 
   // Textos de headers
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("7. CONCLUSIONES RADIOGRÁFICAS", tablaInicioX + 2, yPos + 3.5);
-  doc.text("8. HALLAZGOS PATOLÓGICOS DE LABORATORIO", puntoDivisionCols + 2, yPos + 3.5);
+  doc.text("8. CONCLUSIONES RADIOGRÁFICAS", tablaInicioX + 2, yPos + 3.5);
+  doc.text("9. HALLAZGOS PATOLÓGICOS DE LABORATORIO", puntoDivisionCols + 2, yPos + 3.5);
   yPos += filaAltura;
 
   // Dibujar líneas de contenido
@@ -1847,8 +1882,8 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
 
   // Textos de headers
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("9. CONCLUSIÓN AUDIOMETRÍA", tablaInicioX + 2, yPos + 3.5);
-  doc.text("10. CONCLUSIÓN DE ESPIROMETRÍA", puntoDivisionColsPag3 + 2, yPos + 3.5);
+  doc.text("10. CONCLUSIÓN AUDIOMETRÍA", tablaInicioX + 2, yPos + 3.5);
+  doc.text("11. CONCLUSIÓN DE ESPIROMETRÍA", puntoDivisionColsPag3 + 2, yPos + 3.5);
   yPos += filaAltura;
 
   // Dibujar líneas de contenido
@@ -1871,7 +1906,7 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   const textoOtros = (datosFinales.otros || "").toString();
   const datosOtros = textoOtros ? textoOtros.toUpperCase() : "-";
 
-  yPos = dibujarHeaderSeccion("11. OTROS", yPos, filaAltura);
+  yPos = dibujarHeaderSeccion("12. OTROS", yPos, filaAltura);
 
   const anchoDisponibleOtros = tablaAncho - 4;
   const lineasOtros = doc.splitTextToSize(datosOtros, anchoDisponibleOtros);
@@ -1892,7 +1927,7 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   const textoDiagnostico = (datosFinales.diagnosticoMedicoOcupacional || "").toString();
   const datosDiagnostico = textoDiagnostico ? textoDiagnostico.toUpperCase() : "-";
 
-  yPos = dibujarHeaderSeccion("12. DIAGNÓSTICO MÉDICO OCUPACIONAL Y RECOMENDACIONES", yPos, filaAltura);
+  yPos = dibujarHeaderSeccion("13. DIAGNÓSTICO MÉDICO OCUPACIONAL Y RECOMENDACIONES", yPos, filaAltura);
 
   const paddingX = 2;
   const paddingTop = 4;
@@ -1928,7 +1963,7 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   yPos += alturaDinamicaDiagnostico;
 
   // === SECCIÓN XIII: CONCLUSIONES ===
-  yPos = dibujarHeaderSeccion("13. CONCLUSIONES", yPos, filaAltura);
+  yPos = dibujarHeaderSeccion("14. CONCLUSIONES", yPos, filaAltura);
 
   // Fila con Apto | X | Apto con restricción | X | No apto | X
   // Distribución: 3 columnas de texto de ~53mm cada una, 3 columnas de checkbox de ~13mm cada una
@@ -1998,7 +2033,7 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   yPos += filaAltura;
 
   // === FILA GRIS: RESTRICCIONES ===
-  yPos = dibujarHeaderSeccion("14. RESTRICCIONES", yPos, filaAltura);
+  yPos = dibujarHeaderSeccion("15. RESTRICCIONES", yPos, filaAltura);
 
   // Fila dinámica para restricciones
   const textoRestricciones = (datosFinales.restricciones || "").toString();

@@ -158,7 +158,7 @@ export default function FichaDatosPacientes() {
             VerifyTR(form.norden, tabla, token, setForm, selectedSede);
         }
     };
-    console.log(form)
+
     const handlePrint = () => {
         handlePrintDefault(() => {
             PrintHojaR(form.norden, token, tabla, datosFooter);
@@ -1003,6 +1003,7 @@ export default function FichaDatosPacientes() {
                     name="aptitud"
                     value={form.aptitud}
                     label="Aptitud"
+                    disabled
                     onChange={handleRadioButton}
                     options={[
                         { label: "Apto", value: "APTO" },

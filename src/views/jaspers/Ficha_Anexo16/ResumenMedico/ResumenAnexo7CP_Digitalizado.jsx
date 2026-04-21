@@ -561,7 +561,7 @@ export default async function ResumenAnexo7CP_Digitalizado(data = {}, docExisten
   const dibujarFilaDinamica = (label, valor, yInicio) => {
     doc.setFont("helvetica", "normal").setFontSize(8);
     const anchoDisponible = tablaAncho - 54; // Ancho para el valor
-    const texto = valor || "";
+    const texto = (valor || "").replace(/\n/g, " ");
 
     // Calcular altura necesaria
     let alturaFila = filaAltura;
@@ -595,7 +595,7 @@ export default async function ResumenAnexo7CP_Digitalizado(data = {}, docExisten
 
   // Dibujar todas las filas dinámicamente
   yPos = dibujarFilaDinamica("EVALUACIÓN OFTALMOLÓGICA:", datosFinales.evaluaciones.oftalmologica, yPos);
-  yPos = dibujarFilaDinamica("EXAMEN AUDITIVA:", datosFinales.evaluaciones.auditiva, yPos);
+  yPos = dibujarFilaDinamica("EXAMEN  :", datosFinales.evaluaciones.auditiva, yPos);
   yPos = dibujarFilaDinamica("RADIOGRAFÍA DE TÓRAX:", datosFinales.evaluaciones.radiografia, yPos);
   yPos = dibujarFilaDinamica("ESPIROMETRÍA:", datosFinales.evaluaciones.espirometria, yPos);
   yPos = dibujarFilaDinamica("ELECTROCARDIOGRAMA:", datosFinales.evaluaciones.electrocardiograma, yPos);

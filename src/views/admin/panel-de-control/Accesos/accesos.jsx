@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faUsers, faSortAlphaDown, faSortAlphaUp } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faUsers, faSortAlphaDown, faSortAlphaUp, faSignature } from '@fortawesome/free-solid-svg-icons';
 import Modal from './ModalRegistroEmpleado/Modal';
 import EditModal from './ModalEditEmpleado/EditModal';
 import RegistroUsuarioModal from './ModalRegistroUsuario/ModalRegistroUsuario';
 import UsersModal from './ModalViewUser/ModalViewUser';
+import ModalFirma from './ModalFirma/ModalFirma';
 import { getFetch } from '../getFetch/getFetch';
 import { Loading } from '../../../components/Loading';
 import { useAuthStore } from '../../../../store/auth';
@@ -20,7 +21,10 @@ const Accesos = () => {
   const [isConfigurarAccesosModalOpen, setIsConfigurarAccesosModalOpen] = useState(false);
   const [isRegistroUsuarioModalOpen, setIsRegistroUsuarioModalOpen] = useState(false);
   const [isViewUsersModalOpen, SetIsViewUsersModalOpen] = useState(false);
+  const [isFirmaModalOpen, setIsFirmaModalOpen] = useState(false);
   const [idEmpleado, SetIdEmpleado] = useState('');
+  const [dniEmpleado, setDniEmpleado] = useState('');
+  const [nombreCompletoEmpleado, setNombreCompletoEmpleado] = useState('');
 
   const [tipoDocumento, setTipoDocumento] = useState('');
   const [nrodoc, setNrodoc] = useState('');
@@ -150,6 +154,16 @@ const Accesos = () => {
     SetIsViewUsersModalOpen(prevState => !prevState);
   };
 
+  const openFirmaModal = (dni, nombres, apellidos) => {
+    setDniEmpleado(dni);
+    setNombreCompletoEmpleado(`${nombres} ${apellidos}`);
+    setIsFirmaModalOpen(true);
+  };
+
+  const closeFirmaModal = () => {
+    setIsFirmaModalOpen(false);
+  };
+
   // Filtrar los datos según el término de búsqueda
   // Filtrar los datos según el término de búsqueda
   const filteredData = data.filter((item) => {
@@ -228,6 +242,12 @@ const Accesos = () => {
                       onClick={() => OpenViewUsersModal(item.id_empleado)}
                       title="Ver Usuarios"
                     />
+                    <FontAwesomeIcon
+                      icon={faSignature}
+                      className="text-green-500 cursor-pointer"
+                      onClick={() => openFirmaModal(item.numDocumento, item.nombres, item.apellidos)}
+                      title="Gestionar Firma"
+                    />
                   </td>
                   <td className="border border-gray-300 px-2 py-1">{item.tipoDoc}</td>
                   <td className="border border-gray-300 px-2 py-1">{item.numDocumento}</td>
@@ -257,6 +277,10 @@ const Accesos = () => {
           <div className="flex items-center ml-6 md:ml-8">
             <FontAwesomeIcon icon={faUsers} className="text-orange-500" />
             <p className="text-sm ml-2 md:ml-4">Ver Usuarios</p>
+          </div>
+          <div className="flex items-center ml-6 md:ml-8">
+            <FontAwesomeIcon icon={faSignature} className="text-green-500" />
+            <p className="text-sm ml-2 md:ml-4">Gestionar Firma</p>
           </div>
         </div>
       </div>
@@ -288,6 +312,7 @@ const Accesos = () => {
       {isConfigurarAccesosModalOpen && <ConfigurarAccesosModal closeModal={closeConfigurarAccesosModal} />}
       {isRegistroUsuarioModalOpen && <RegistroUsuarioModal closeModal={closeRegistroUsuarioModal} token={token} Refresgpag={Refresgpag} />}
       {isViewUsersModalOpen && <UsersModal closeModal={OpenViewUsersModal} idEmpleado={idEmpleado} userlogued={userlogued.sub} token={token} />}
+      {isFirmaModalOpen && <ModalFirma closeModal={closeFirmaModal} dni={dniEmpleado} token={token} nombreEmpleado={nombreCompletoEmpleado} />}
     </div>
   );
 };

@@ -11,35 +11,26 @@ import InputsBooleanRadioGroup from '../../../components/reusableComponents/Inpu
 import ModalFiltros from './ModalFiltros';
 import { SubmitValorizaciones } from './model/controllerValo';
 
-/*const Columnas = [
-    { nombre: "DNI", valor: false },
-    { nombre: "Nombres", valor: false },
-    { nombre: "Cargo", valor: false },
-    { nombre: "Fecha", valor: false },
-    { nombre: "Tipo Pago", valor: false },
-    { nombre: "Empresa", valor: false },
-    { nombre: "Contrata", valor: false },
-    { nombre: "EKG", valor: false },
-    { nombre: "Sexo", valor: false },
-    { nombre: "T. Examen", valor: false },
-    { nombre: "Psicosensometria", valor: false },
-    { nombre: "RX Lumbar", valor: false },
-    { nombre: "Trab. Calientes", valor: false },
-    { nombre: "Visual-Compl", valor: false },
-    { nombre: "Covid1", valor: false },
-    { nombre: "Covid2", valor: false },
-    { nombre: "Manipulador Alimentos", valor: false },
-    { nombre: "Herramientas Manuales", valor: false },
-    { nombre: "Fist-Test", valor: false },
-    { nombre: "Test Altura", valor: false },
-    { nombre: "RX Plomo", valor: false },
-    { nombre: "Espacios Confinados", valor: false },
-    { nombre: "Test Marihuana", valor: false },
-    { nombre: "Test Cocaina", valor: false },
-    { nombre: "Mercurio", valor: false },
-    { nombre: "RX Lumbo Sacra", valor: false },
-    { nombre: "RX Dorso Lumbar", valor: false }
-];*/
+const columnasBase = [
+    { nombre: "DNI", key: "dni" },
+    { nombre: "Nombres", key: "nombres" },
+    { nombre: "Apellidos", key: "apellidos" },
+    { nombre: "Empresa", key: "empresa" },
+    { nombre: "Contrata", key: "contrata" },
+    { nombre: "Fecha", key: "fechaApertura" },
+    { nombre: "Hora", key: "horaDeRegistro" },
+    { nombre: "T. Examen", key: "nombreExamen" },
+    { nombre: "Tipo Pago", key: "tipoPago" },
+    { nombre: "Precio", key: "precioPo" },
+    { nombre: "Exa. Adicional", key: "exaAdicional" },
+    { nombre: "Tipo Prueba", key: "tipoPrueba" },
+    { nombre: "Precio Adicional", key: "precioAdicional" },
+    { nombre: "Autoriza", key: "autoriza" },
+    { nombre: "Obs 1", key: "observacion1" },
+    { nombre: "Obs 2", key: "observacion2" },
+    { nombre: "Sede", key: "sede" },
+    { nombre: "N° Orden", key: "norden" }
+];
 
 const Columnas = [
     { nombre: "DNI", key: "dni", valor: false },
@@ -627,12 +618,14 @@ const Valorizacion = () => {
     };
 
     const columnasVisibles = form.TipoBusqueda
-        ? form.Filtros // todas
+        ? columnasBase
         : form.Filtros.filter(col => col.valor);
     const startIdx = (currentPage - 1) * recordsPerPage;
     const endIdx = startIdx + recordsPerPage;
-    const currentData = Array.isArray(columnasVisibles) ? columnasVisibles.slice(startIdx, endIdx) : [];
-
+    const currentData = Array.isArray(data)
+        ? data.slice(startIdx, endIdx)
+        : [];
+    console.log(columnasVisibles)
     return (
         <div className="container mx-auto mt-12 mb-12">
             <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
@@ -777,7 +770,7 @@ const Valorizacion = () => {
                         {/* HEADER */}
                         <thead className="bg-gray-100">
                             <tr>
-                                {currentData.map((col, i) => (
+                                {columnasVisibles.map((col, i) => (
                                     <th key={i} className="border px-3 py-2 text-left">
                                         {col.nombre}
                                     </th>
@@ -787,23 +780,17 @@ const Valorizacion = () => {
 
                         {/* BODY */}
                         <tbody>
-                            {data.map((row, i) => (
-                                <tr key={i} className="hover:bg-gray-50">
+                            {currentData.map((row, i) => (
+                                <tr key={i}>
                                     {columnasVisibles.map((col, j) => {
                                         let value = row[col.key];
 
-                                        // boolean → SI / NO
                                         if (typeof value === "boolean") {
                                             value = value ? "SI" : "NO";
                                         }
 
-                                        // caso COVID
-                                        if (col.nombre === "Covid1" || col.nombre === "Covid2") {
-                                            value = row.tipoPruebaCovid || "-";
-                                        }
-
                                         return (
-                                            <td key={j} className="border px-3 py-2">
+                                            <td key={j} className="border px-2 py-1">
                                                 {value ?? "-"}
                                             </td>
                                         );
