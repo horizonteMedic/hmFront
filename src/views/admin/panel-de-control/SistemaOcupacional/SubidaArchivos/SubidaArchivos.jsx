@@ -46,6 +46,7 @@ export default function SubidaArchivos() {
         "ARCHIVO EXTERNO PARA CORREO 1": "ARCHIVO EXTERNO 1",
         "ARCHIVO EXTERNO PARA CORREO 2": "ARCHIVO EXTERNO 2",
         "MATRIZ (EXCEL)": { nomenclatura: "MTR", onlyExcel: true },
+        "MATRIZ 2 (EXCEL)": { nomenclatura: "MTR 2", onlyExcel: true },
     }
 
     const [visualerOpen, setVisualerOpen] = useState(null)
