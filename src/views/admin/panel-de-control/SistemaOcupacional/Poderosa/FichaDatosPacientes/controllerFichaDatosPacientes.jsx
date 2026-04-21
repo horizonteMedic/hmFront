@@ -524,7 +524,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             //Necesita
             Swal.fire(
                 "Alerta",
-                "El paciente necesita pasar por Aptitud Altura Poderosa o Laboratorio Clínico.",
+                "El paciente necesita pasar por Laboratorio Clínico.",
                 "warning"
             );
         }
