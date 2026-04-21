@@ -115,7 +115,7 @@ export const SubmitDataService = async (
         aptoConRestriccion: form.apto === "APTO_CON_RESTRICCION",
         aptoTemporal: form.apto === "APTO_TEMPORAL",
         noApto: form.apto === "NO_APTO",
-
+        explotacion: form.explotacion,
 
         doctorAsignado: form.user_doctorAsignado,
 
