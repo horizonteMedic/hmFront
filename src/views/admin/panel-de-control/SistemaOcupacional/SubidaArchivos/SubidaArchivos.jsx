@@ -41,7 +41,12 @@ export default function SubidaArchivos() {
         "MERCURIO EN ORINA": "MERCURIO EN ORINA",
         "PLOMO EN SANGRE": "PLOMO EN SANGRE",
         "RESONANCIA MAGNETICA": "RESMAG",
-        "PRUEBA DE ESFUERZO": "PRUEBA DE ESFUERZO"
+        "PRUEBA DE ESFUERZO": "PRUEBA DE ESFUERZO",
+        // "MATRIZ": "MTR",
+        "ARCHIVO EXTERNO PARA CORREO 1": "ARCHIVO EXTERNO 1",
+        "ARCHIVO EXTERNO PARA CORREO 2": "ARCHIVO EXTERNO 2",
+        "MATRIZ (EXCEL)": { nomenclatura: "MTR", onlyExcel: true },
+        "MATRIZ 2 (EXCEL)": { nomenclatura: "MTR 2", onlyExcel: true },
     }
 
     const [visualerOpen, setVisualerOpen] = useState(null)
@@ -84,26 +89,30 @@ export default function SubidaArchivos() {
             <DatosPersonalesLaborales form={form} />
             <SectionFieldset legend="Archivos">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                    {Object.entries(nomenclaturas).map(([key, nomenclatura], index) => (
-                        <div
-                            key={index}
-                            className="border rounded-xl p-4 flex flex-col gap-2 shadow-sm"
-                        >
-                            {/* Título */}
-                            <span className="font-semibold text-sm">
-                                {key}
-                            </span>
-                            {/* Botones */}
-                            <ButtonsPDF
-                                {...(form.SubirDoc ? { handleSave: () => handleSubirArchivo(form, selectedSede, userlogued, token, nomenclatura) } : {})}
-                                {...(form.SubirDoc ? { handleRead: () => ReadArchivosForm(form, setVisualerOpen, token, nomenclatura) } : {})}
-                                handleMasivo={() => handleSubirArchivoMasivo(form, selectedSede, userlogued, token, nomenclatura)}
-                                Nombre_1={`Subir archivo ${key}`}
-                                Nombre_2={`Ver archivo ${key}`}
-                                Nombre_3={`Subir masivo ${key}`}
-                            />
-                        </div>
-                    ))}
+                    {Object.entries(nomenclaturas).map(([key, value], index) => {
+                        const nomenclatura = typeof value === "string" ? value : value.nomenclatura;
+                        const onlyExcel = typeof value === "object" ? value.onlyExcel : false;
+                        return (
+                            <div
+                                key={index}
+                                className="border rounded-xl p-4 flex flex-col gap-2 shadow-sm"
+                            >
+                                {/* Título */}
+                                <span className="font-semibold text-sm">
+                                    {key}
+                                </span>
+                                {/* Botones */}
+                                <ButtonsPDF
+                                    {...(form.SubirDoc ? { handleSave: () => handleSubirArchivo(form, selectedSede, userlogued, token, nomenclatura, onlyExcel) } : {})}
+                                    {...(form.SubirDoc ? { handleRead: () => ReadArchivosForm(form, setVisualerOpen, token, nomenclatura) } : {})}
+                                    handleMasivo={() => handleSubirArchivoMasivo(form, selectedSede, userlogued, token, nomenclatura, onlyExcel)}
+                                    Nombre_1={`Subir archivo ${key}`}
+                                    Nombre_2={`Ver archivo ${key}`}
+                                    Nombre_3={`Subir masivo ${key}`}
+                                />
+                            </div>
+                        )
+                    })}
                 </div>
             </SectionFieldset>
 

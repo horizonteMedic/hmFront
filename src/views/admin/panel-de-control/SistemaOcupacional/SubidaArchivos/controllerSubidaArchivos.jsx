@@ -27,16 +27,16 @@ const GetInfoPac = async (nro, set, token, sede) => {
     }
 };
 
-export const handleSubirArchivo = async (form, selectedSede, userlogued, token, nomenclatura = "") => {
-    handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token, nomenclatura)
+export const handleSubirArchivo = async (form, selectedSede, userlogued, token, nomenclatura = "", onlyExcel = false) => {
+    handleSubirArchivoDefaultSinSellos(form, selectedSede, registrarPDF, userlogued, token, nomenclatura, onlyExcel)
 };
 
 export const ReadArchivosForm = async (form, setVisualerOpen, token, nomenclatura = null) => {
     ReadArchivosFormDefault(form, setVisualerOpen, token, nomenclatura)
 }
 
-export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token, nomenclatura = "") => {
-    handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token, nomenclatura)
+export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token, nomenclatura = "", onlyExcel = false) => {
+    handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token, nomenclatura, onlyExcel)
 }
 
 export const Loading = (mensaje) => {

@@ -164,10 +164,6 @@ const camposExtraEliminar = {
     certConduccVehiculos: "PSICOSENSOMETRICO VEHI-FOLIO",
     certTrabAlturaBarrik: "PSICOSENSOMETRICO CERT-ALTURA",
     CertAlturaPoderosa: "PSICOSENSOMETRICO ALTU-POD",
-
-
-
-
 };
 
 export const VerifyTR = async (nro, tabla, token, set, sede, ExamenesList) => {

@@ -577,22 +577,33 @@ export const handleSubirArchivoDefaultSinSellos = async (
     urlPDf,
     userlogued,
     token,
-    nomenclatura = ""
+    nomenclatura = "",
+    onlyExcel = false
 ) => {
+    const excelTypes = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel";
     const { value: file } = await Swal.fire({
-        title: "Selecciona un archivo PDF",
+        title: onlyExcel ? "Selecciona un archivo Excel" : "Selecciona un archivo PDF",
         input: "file",
         inputAttributes: {
-            accept: "application/pdf",
-            "aria-label": "Sube tu archivo en formato PDF",
+            accept: onlyExcel ? excelTypes : "application/pdf",
+            "aria-label": onlyExcel ? "Sube tu archivo en formato Excel" : "Sube tu archivo en formato PDF",
         },
         showCancelButton: true,
         confirmButtonText: "Subir",
         cancelButtonText: "Cancelar",
         inputValidator: (file) => {
             if (!file) return "Debes seleccionar un archivo.";
-            if (file.type !== "application/pdf")
-                return "Solo se permiten archivos PDF.";
+            const allowedExcelTypes = [
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "application/vnd.ms-excel",
+            ];
+            if (onlyExcel) {
+                if (!allowedExcelTypes.includes(file.type))
+                    return "Solo se permiten archivos Excel.";
+            } else {
+                if (file.type !== "application/pdf")
+                    return "Solo se permiten archivos PDF.";
+            }
         },
     });
 
@@ -608,16 +619,17 @@ export const handleSubirArchivoDefaultSinSellos = async (
         LoadingDefault("Subiendo documento");
 
         const base64WithoutHeader = e.target.result.split(",")[1];
-        const pdfBytes = Uint8Array.from(
+        const fileBytes = Uint8Array.from(
             atob(base64WithoutHeader),
             (c) => c.charCodeAt(0)
         );
 
-        const pdfBase64Final = uint8ToBase64(pdfBytes);
+        const fileBase64Final = uint8ToBase64(fileBytes);
 
-        const nombreOriginal = file.name.replace(/\.pdf$/i, "");
+        const extension = file.name.split(".").pop();
+        const nombreOriginal = file.name.replace(new RegExp(`\\.${extension}$`, "i"), "");
         const idCorto = generarIdCorto();
-        const nombreFinal = `${nombreOriginal}-${idCorto}.pdf`;
+        const nombreFinal = `${nombreOriginal}-${idCorto}.${extension}`;
 
         const datos = {
             rutaArchivo: null,
@@ -633,7 +645,7 @@ export const handleSubirArchivoDefaultSinSellos = async (
 
             nombreArchivo: nombreFinal,
             codigoSede: selectedSede,
-            fileBase64: pdfBase64Final,
+            fileBase64: fileBase64Final,
             nomenclatura_tipo_archivo: nomenclatura != "" ? nomenclatura : form.nomenclatura,
             orden: form.norden,
             indice_carga_masiva: undefined,
@@ -741,16 +753,17 @@ export const handleImgtoPdfDefault = async (
     }
 };
 
-export const handleSubidaMasiva = async (form, selectedSede, urlPDf, userlogued, token, nomenclatura = "") => {
-    let pdfFiles = [];
+export const handleSubidaMasiva = async (form, selectedSede, urlPDf, userlogued, token, nomenclatura = "", onlyExcel = false) => {
+    let filesList = [];
+    const excelTypes = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel";
     const { isConfirmed } = await Swal.fire({
-        title: "Selecciona la carpeta con PDFs",
+        title: onlyExcel ? "Selecciona la carpeta con archivos Excel" : "Selecciona la carpeta con PDFs",
         input: "file",
         inputAttributes: {
             webkitdirectory: true,
             directory: true,
             multiple: true,
-            accept: "application/pdf",
+            accept: onlyExcel ? excelTypes : "application/pdf",
         },
         showCancelButton: true,
         confirmButtonText: "Subir archivos",
@@ -759,27 +772,36 @@ export const handleSubidaMasiva = async (form, selectedSede, urlPDf, userlogued,
             const input = Swal.getInput();
             input.addEventListener("change", () => {
                 const files = Array.from(input.files || []);
-                pdfFiles = files.filter(f => f.type === "application/pdf");
+                const allowedExcelTypes = [
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "application/vnd.ms-excel",
+                ];
+                filesList = files.filter(f => {
+                    if (onlyExcel) {
+                        return allowedExcelTypes.includes(f.type);
+                    }
+                    return f.type === "application/pdf";
+                });
 
-                const htmlList = pdfFiles.length
+                const htmlList = filesList.length
                     ? `
                         <div style="max-height:250px;overflow:auto;text-align:left">
-                            <b>Archivos detectados (${pdfFiles.length}):</b>
+                            <b>Archivos detectados (${filesList.length}):</b>
                             <ul>
-                                ${pdfFiles.map(f => `<li>${f.name}</li>`).join("")}
+                                ${filesList.map(f => `<li>${f.name}</li>`).join("")}
                             </ul>
                         </div>
                       `
-                    : `<p style="color:red">No se encontraron archivos PDF</p>`;
+                    : `<p style="color:red">No se encontraron archivos válidos</p>`;
 
                 Swal.update({ html: htmlList });
             });
         },
 
         preConfirm: () => {
-            if (!pdfFiles.length) {
+            if (!filesList.length) {
                 Swal.showValidationMessage(
-                    "No hay archivos PDF válidos para subir"
+                    `No hay archivos ${onlyExcel ? "Excel" : "PDF"} válidos para subir`
                 );
                 return false;
             }
@@ -796,7 +818,7 @@ export const handleSubidaMasiva = async (form, selectedSede, urlPDf, userlogued,
     const month = ("0" + (currentDate.getMonth() + 1)).slice(-2);
     const day = ("0" + currentDate.getDate()).slice(-2);
 
-    const uploadPromises = pdfFiles.map(async (file) => {
+    const uploadPromises = filesList.map(async (file) => {
         const orden = obtenerOrdenDesdeNombre(file.name);
         if (!orden) {
             return { name: file.name, status: "ignored", message: "Sin N° Orden detectado" };
@@ -806,15 +828,16 @@ export const handleSubidaMasiva = async (form, selectedSede, urlPDf, userlogued,
             const base64 = await readFileAsBase64(file);
             const base64WithoutHeader = base64.split(",")[1];
 
-            const pdfBytes = Uint8Array.from(
+            const fileBytes = Uint8Array.from(
                 atob(base64WithoutHeader),
                 (c) => c.charCodeAt(0)
             );
 
-            const pdfBase64Final = uint8ToBase64(pdfBytes);
+            const fileBase64Final = uint8ToBase64(fileBytes);
 
-            const nombreOriginal = file.name.replace(/\.pdf$/i, "");
-            const nombreFinal = `${nombreOriginal}-${generarIdCorto()}.pdf`;
+            const extension = file.name.split(".").pop();
+            const nombreOriginal = file.name.replace(new RegExp(`\\.${extension}$`, "i"), "");
+            const nombreFinal = `${nombreOriginal}-${generarIdCorto()}.${extension}`;
 
             const datos = {
                 rutaArchivo: null,
@@ -830,7 +853,7 @@ export const handleSubidaMasiva = async (form, selectedSede, urlPDf, userlogued,
 
                 nombreArchivo: nombreFinal,
                 codigoSede: selectedSede,
-                fileBase64: pdfBase64Final,
+                fileBase64: fileBase64Final,
                 nomenclatura_tipo_archivo: nomenclatura != "" ? nomenclatura : form.nomenclatura,
                 orden,
                 indice_carga_masiva: undefined,

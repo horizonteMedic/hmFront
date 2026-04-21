@@ -9,7 +9,8 @@ import { useForm } from '../../../hooks/useForm';
 import { SelectField } from '../../../components/reusableComponents/InputSelect';
 import InputsBooleanRadioGroup from '../../../components/reusableComponents/InputsBooleanRadioGroup';
 import ModalFiltros from './ModalFiltros';
-import { SubmitValorizaciones } from './model/controllerValo';
+import { exportToExcel, SubmitValorizaciones } from './model/controllerValo';
+import { getToday } from '../../../utils/helpers';
 
 const columnasBase = [
     { nombre: "DNI", key: "dni" },
@@ -67,13 +68,14 @@ const Valorizacion = () => {
         useSessionData();
     const EmpresasMulti = ComboboxEmpresa()
     const ContrataMulti = ComboboxContrata()
+    const today = getToday();
     const initialFormState = {
         rucContrata: '',
         rucEmpresa: '',
         razonEmpresa: '',
         razonContrata: '',
-        fechaInicio: '',
-        fechaFinal: '',
+        fechaInicio: today,
+        fechaFinal: today,
         sede: '',
         tipoPago: '',
         matrizSeleccionada: '', // Agrega este estado para controlar la selección de matriz
@@ -101,7 +103,6 @@ const Valorizacion = () => {
     const [reload, setReload] = useState(0); // Estado para controlar la recarga de la tabla
     const [exportButtonEnabled, setExportButtonEnabled] = useState(false);
     const [modal, setModal] = useState(false)
-    const today = new Date().toLocaleDateString('en-CA');
     const Sedes = ComboboxSedes();
 
     // Autocompletado Empresa
@@ -118,16 +119,6 @@ const Valorizacion = () => {
     }, [data]);
 
     useEffect(() => {
-        if (today) {
-            setForm(prevDatos => ({
-                ...prevDatos,
-                fechaInicio: today,
-                fechaFinal: today,
-            }));
-        }
-    }, [today]);
-
-    useEffect(() => {
         const SedeDefiner = Sedes.find(sedes => sedes.cod_sede === 'T-NP');
 
         if (SedeDefiner) {
@@ -138,130 +129,6 @@ const Valorizacion = () => {
         }
     }, [Sedes]);
 
-    /*const SubmitAPI = async () => {
-
-        if (!form.matrizSeleccionada || form.matrizSeleccionada === "") {
-            setData([]);
-            return;
-        }
-
-        setLoading(true);
-        const datosapi = {
-            rucContrata: form.rucContrata,
-            rucEmpresa: form.rucEmpresa,
-            fechaInicio: form.fechaInicio,
-            fechaFinal: form.fechaFinal,
-            sede: form.sede.cod_sede
-        };
-
-        try {
-            const config = MATRICES_MAP[form.matrizSeleccionada];
-            if (!config) {
-                setLoading(false);
-                return;
-            }
-            const isMatrizArena = form.matrizSeleccionada === "Matriz-9";
-            const isMatrizCaraveli = form.matrizSeleccionada === "Matriz-11";
-
-            if (config.urlH) {
-
-                const { urlH, methodH, urlB, methodB } = config;
-
-                const [headersResponse, bodyResponse] = await Promise.all([
-                    GetMatrizUniversal(null, { url: urlH, method: methodH }, token),
-                    GetMatrizUniversal(datosapi, { url: urlB, method: methodB }, token)
-                ]);
-
-                if (!Array.isArray(headersResponse) || !Array.isArray(bodyResponse)) {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: "Ocurrió un error al traer la Matriz"
-                    });
-                    return;
-                }
-
-                let processedBody = bodyResponse;
-
-                // 🔥 SOLO MATRIZ 9
-                if (isMatrizArena || isMatrizCaraveli) {
-                    processedBody = bodyResponse.map(item => ({
-                        ...item,
-                        responsable_digitalizacion: userlogued.form.nombres_user.toUpperCase()
-                    }));
-                }
-
-                setHeaders(headersResponse);
-                setData(processedBody);
-
-            } else {
-                const response = await GetMatrizUniversal(
-                    datosapi,
-                    { url: config.url, method: config.method },
-                    token
-                );
-
-                if (!Array.isArray(response)) {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: "Ocurrió un error al traer la Matriz"
-                    });
-                }
-
-                setData(response);
-
-                // 🔥 Generar columnas automáticamente
-                if (response.length > 0) {
-                    const autoHeaders = Object.keys(response[0]).map(key => ({
-                        field: key,
-                        headerName: key.toUpperCase()
-                    }));
-
-                    setHeaders(autoHeaders);
-                } else {
-                    setHeaders([]);
-                }
-            }
-
-        } catch (error) {
-
-            Swal.fire({
-                icon: "error",
-                title: "Ocurrió un error al traer la Matriz",
-                text: "No hay form que mostrar",
-            });
-
-        } finally {
-            setLoading(false);
-        }
-    };*/
-
-    /*const handleRUCEmpresa = (e) => {
-        //una para empresa
-        const selectedRuc = e.target.value;
-        const empresaSeleccionada = EmpresaUser.find(empresa => empresa.ruc === selectedRuc);
-        if (empresaSeleccionada) {
-            setForm(prevDatos => ({
-                ...prevDatos,
-                rucContrata: null,
-                rucEmpresa: empresaSeleccionada.ruc,
-            }))
-            return
-        }
-        const contrataSeleccionada = ContrataUser.find(contrata => contrata.ruc === selectedRuc);
-
-        if (contrataSeleccionada) {
-            setForm(prevDatos => ({
-                ...prevDatos,
-                rucContrata: contrataSeleccionada.ruc,
-                rucEmpresa: null,
-            }))
-        }
-
-        //otra para contrata
-    }*/
-
     useEffect(() => {
         if (reload > 0) {
             SubmitAPI(); // Llama a la función SubmitAPI para recargar los form
@@ -269,266 +136,14 @@ const Valorizacion = () => {
         }
     }, [reload]);
 
-
-    /*const exportToExcel2 = async () => {
-        const config = MATRICES_MAP[form.matrizSeleccionada];
-        const trabajadores = data || [];
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet("Reporte");
-        const isMatrizSaludProseguridad = form.matrizSeleccionada === "Matriz-13";
-        const isMatriz17 = form.matrizSeleccionada === "Matriz-17";
-
-        const columnasOjo = ["od", "oi", "od lejos", "oi lejos"];
-        const esColumnaOjo = (text) =>
-            columnasOjo.includes(String(text).toLowerCase().trim());
-
-        const borderStyle = {
-            top: { style: "thin" },
-            left: { style: "thin" },
-            bottom: { style: "thin" },
-            right: { style: "thin" }
-        };
-
-        // ============================================
-        // 🔍 SI NO HAY HEADERS DINÁMICOS (MODO PLANO)
-        // ============================================
-        if (!head || head.length === 0 || !head[0]?.children) {
-
-            if (trabajadores.length === 0) return;
-
-
-            // 🔎 Detectar si head viene estructurado
-            const hasStructuredHead = head && head.length > 0;
-
-            const columns = hasStructuredHead
-                ? head
-                : Object.keys(trabajadores[0]).map(key => ({
-                    label: key,
-                    field: key
-                }));
-
-            // 1️⃣ HEADER SIMPLE
-            columns.forEach((col, index) => {
-
-                const cell = worksheet.getRow(1).getCell(index + 1);
-
-                const headerName = col.label ?? col.field ?? "";
-                cell.value = headerName;
-
-                let fontColor;
-                let bgColor;
-
-                // 🔵 PRIORIDAD: MATRIZ 17
-                if (isMatriz17) {
-                    fontColor = { argb: "FFFFFFFF" }; // blanco
-                    bgColor = "FF000080"; // azul oscuro (#000080)
-                }
-
-                // 🟡 MATRIZ 13
-                else if (isMatrizSaludProseguridad) {
-                    fontColor = esColumnaOjo(headerName)
-                        ? { argb: "FF000000" } // negro
-                        : { argb: "FFFFC000" }; // amarillo
-
-                    bgColor = col.color
-                        ? "FF" + col.color.replace("#", "")
-                        : "FFFFFFFF";
-                }
-
-                // ⚪ DEFAULT
-                else {
-                    fontColor = undefined;
-                    bgColor = col.color
-                        ? "FF" + col.color.replace("#", "")
-                        : "FFFFFFFF";
-                }
-
-                // 🎨 FONT
-                cell.font = {
-                    bold: true,
-                    ...(fontColor && { color: fontColor })
-                };
-
-                // 🎨 FILL
-                cell.fill = {
-                    type: "pattern",
-                    pattern: "solid",
-                    fgColor: { argb: bgColor }
-                };
-
-                cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
-                cell.border = borderStyle;
-            });
-
-            // 2️⃣ DATA
-            let rowIndex = 2;
-
-            trabajadores.forEach(item => {
-
-                const row = worksheet.getRow(rowIndex);
-
-                columns.forEach((col, colIndex) => {
-
-                    const cell = row.getCell(colIndex + 1);
-
-                    cell.value = item[col.field] ?? "";
-                    cell.border = borderStyle;
-                    cell.alignment = { horizontal: "center", vertical: "middle" };
-                });
-
-                rowIndex++;
-            });
-
-            worksheet.columns.forEach(col => col.width = 18);
-
-            const buffer = await workbook.xlsx.writeBuffer();
-            saveAs(new Blob([buffer]), `${config.name}.xlsx`);
-
-            return;
-        }
-
-        // ============================================
-        // 🔥 MODO JERÁRQUICO (CON ESTRUCTURA)
-        // ============================================
-        const estructura = head;
-
-        const getMaxDepth = (nodes, level = 1) =>
-            Math.max(...nodes.map(n =>
-                n.children?.length
-                    ? getMaxDepth(n.children, level + 1)
-                    : level
-            ));
-
-        const maxDepth = getMaxDepth(estructura);
-
-        const countLeaves = (node) =>
-            !node.children?.length
-                ? 1
-                : node.children.reduce((sum, child) => sum + countLeaves(child), 0);
-
-        const generateHeader = (nodes, level, startCol) => {
-
-            let currentCol = startCol;
-
-            nodes.forEach(node => {
-
-                const span = countLeaves(node);
-                const colStart = currentCol;
-                const colEnd = currentCol + span - 1;
-
-                const cell = worksheet.getRow(level).getCell(colStart);
-                cell.value = node.label ?? "";
-                cell.font = { bold: true };
-                cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
-                cell.border = borderStyle;
-
-                // 🎨 Pintar SOLO si tiene color
-                if (node.color) {
-                    cell.fill = {
-                        type: "pattern",
-                        pattern: "solid",
-                        fgColor: { argb: node.color.replace("#", "") }
-                    };
-                }
-
-                if (span > 1) {
-                    worksheet.mergeCells(level, colStart, level, colEnd);
-                }
-
-                if (!node.children?.length && level < maxDepth) {
-                    worksheet.mergeCells(level, colStart, maxDepth, colStart);
-                }
-
-                if (node.children?.length) {
-                    generateHeader(node.children, level + 1, colStart);
-                }
-
-                currentCol += span;
-            });
-        };
-
-        generateHeader(estructura, 1, 1);
-
-        // Extraer hojas
-        const fields = [];
-
-        const extractFields = (nodes) => {
-            nodes.forEach(n => {
-                if (!n.children?.length) {
-                    fields.push(n.field);
-                } else {
-                    extractFields(n.children);
-                }
-            });
-        };
-
-        extractFields(estructura);
-
-        let dataStartRow = maxDepth + 1;
-
-        trabajadores.forEach(item => {
-
-            const row = worksheet.getRow(dataStartRow);
-
-            fields.forEach((field, colIndex) => {
-
-                const cell = row.getCell(colIndex + 1);
-                const valor = item[field] ?? "";
-                cell.value = valor;
-
-                if (form.matrizSeleccionada === "Matriz-9" && field.toLowerCase() === "condicion") {
-
-                    const normalized = String(valor).toLowerCase().trim();
-
-                    if (normalized === "no apto") {
-                        cell.fill = {
-                            type: "pattern",
-                            pattern: "solid",
-                            fgColor: { argb: "FFFF0000" }
-                        };
-                        cell.font = {
-                            bold: true,
-                            color: { argb: "FFFFFFFF" }
-                        };
-                    }
-
-                    if (normalized === "apto") {
-                        cell.fill = {
-                            type: "pattern",
-                            pattern: "solid",
-                            fgColor: { argb: "FF00B050" }
-                        };
-                        cell.font = {
-                            bold: true,
-                            color: { argb: "FFFFFFFF" }
-                        };
-                    }
-
-                    if (normalized === "evaluado") {
-                        cell.fill = {
-                            type: "pattern",
-                            pattern: "solid",
-                            fgColor: { argb: "FF00B050" }
-                        };
-                        cell.font = {
-                            bold: true,
-                            color: { argb: "FFFFFFFF" }
-                        };
-                    }
-                }
-                cell.border = borderStyle;
-                cell.alignment = { horizontal: "center", vertical: "middle" };
-
-            });
-
-            dataStartRow++;
+    const handleExport = () => {
+        exportToExcel({
+            data,
+            form,
+            columnasBase,
+            config: { name: "Reporte_Valorizacion" }
         });
-
-        worksheet.columns.forEach(col => col.width = 18);
-
-        const buffer = await workbook.xlsx.writeBuffer();
-        saveAs(new Blob([buffer]), `${config.name}.xlsx`);
-    };*/
+    };
 
     const flattenTree = (nodes, level = 0, parentLabel = null, result = []) => {
         nodes.forEach(node => {
@@ -546,15 +161,6 @@ const Valorizacion = () => {
         });
 
         return result;
-    };
-
-
-    const reloadTable = () => {
-        if (form.matrizSeleccionada === "") {
-            setData([]);
-            return;
-        }
-        setReload(reload + 1);
     };
 
     // Paginación
@@ -589,7 +195,7 @@ const Valorizacion = () => {
                 }))
             }));
         }
-        SubmitValorizaciones(form, token, setData, setForm)
+        SubmitValorizaciones(form, token, setData, setTotalPages, recordsPerPage)
     }
 
     const getMaxDepth = (nodes, level = 1) =>
@@ -625,13 +231,21 @@ const Valorizacion = () => {
     const currentData = Array.isArray(data)
         ? data.slice(startIdx, endIdx)
         : [];
-    console.log(columnasVisibles)
+
     return (
         <div className="container mx-auto mt-12 mb-12">
             <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
                 <div className="px-4 py-2 azuloscurobackground flex justify-between">
                     <h1 className="text-start font-bold color-azul text-white">Valorizacion</h1>
                     <div className="flex items-center gap-4">
+                        <button
+                            onClick={handleExport}
+                            className={`verde-btn px-4 py-1 rounded-md ${exportButtonEnabled ? '' : 'cursor-not-allowed opacity-50'}`}
+                            disabled={!exportButtonEnabled}
+                        >
+                            <FontAwesomeIcon icon={faFileExcel} className="mr-2" />
+                            Exportar a Excel
+                        </button>
                         <div className="flex items-center">
                             <span className="ml-2 text-white mr-1">Resultados por página</span>
                             <select
@@ -646,10 +260,6 @@ const Valorizacion = () => {
                                 <option value={25}>25</option>
                             </select>
                         </div>
-                        <button onClick={reloadTable} className="focus:outline-none relative">
-                            {loading && <div className="absolute inset-0 opacity-50 rounded-md"></div>}
-                            <FontAwesomeIcon icon={faSyncAlt} className={`text-white cursor-pointer tamañouno ${loading ? 'opacity-50' : ''}`} />
-                        </button>
                     </div>
                 </div>
                 {/* filtros */}
@@ -745,13 +355,13 @@ const Valorizacion = () => {
                         />
                     </div>
                     <div className="flex flex-grow justify-center gap-2 w-full">
-                        <button
+                        {!form.TipoBusqueda && <button
                             onClick={() => { setModal(true) }}
                             className={`bg-green-600 mt-4 text-white px-4 py-2 rounded-md `}
                         >
                             <FontAwesomeIcon icon={faMagnifyingGlass} className="mr-2" />
                             Filtros de Tabla
-                        </button>
+                        </button>}
                         <button
                             onClick={SubmitAPI}
                             className={`bg-blue-900 mt-4 text-white px-4 py-2 rounded-md  ${form.tipoPago && (form.rucContrata || form.rucEmpresa) ? '' : 'opacity-50 cursor-not-allowed'}`}

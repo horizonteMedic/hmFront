@@ -1,0 +1,564 @@
+import jsPDF from "jspdf";
+import { formatearFechaCorta } from "../../utils/formatDateUtils";
+import { convertirGenero } from "../../utils/helpers";
+import drawColorBox from '../components/ColorBox.jsx';
+import CabeceraLogo from '../components/CabeceraLogo.jsx';
+import footerTR from '../components/footerTR.jsx';
+
+export default async function CertificadoAptitudCuadrador_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+  const pageW = doc.internal.pageSize.getWidth();
+
+  // Contador de páginas dinámico
+  let numeroPagina = 1;
+
+
+  const datosReales = {
+    apellidosNombres: String((data.apellidos) + " " + (data.nombres)).trim(),
+    fechaExamen: formatearFechaCorta(data.fechaExamen),
+    tipoExamen: String(data.tipoExamen),
+    sexo: convertirGenero(data.sexoPaciente),
+    documentoIdentidad: String(data.dniPaciente),
+    edad: String(data.edad),
+    fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente || data.fechaNacimiento),
+    areaTrabajo: data.areaPaciente,
+    puestoTrabajo: data.cargoPaciente,
+    empresa: data.empresa,
+    contrata: data.contrata,
+    vitalSigns: {
+      fc: String(data.frecuenciaCardiaca),
+      fr: String(data.frecuenciaRespiratoriaTriaje),
+      pa: String(data.sistolica) + "/" + String(data.diastolica),
+      satO2: String(data.saturacionOxigenoTriaje),
+      imc: String(data.imcTriaje),
+      temperatura: String(data.temperatura),
+      peso: String(data.peso),
+      talla: String(data.tallaTriaje)
+    },
+    // Datos de color
+    color: data.color,
+    codigoColor: data.codigoColor,
+    textoColor: data.textoColor,
+    // Datos adicionales para header
+    numeroFicha: String(data.norden),
+    sede: data.sede || data.nombreSede,
+    horaSalida: String(data.horaSalida),
+    direccionPaciente: String(data.direccionPaciente),
+    // Datos para tipo de trabajo
+    explotacion: data.explotacion,
+    // Datos para resultado de evaluación
+    resultadoEvaluacion: data.noApto ? "noApto" :
+      data.apto ? "apto" : data.aptoTemporal ? "aptoTemporal" : 
+      data.aptoConRestriccion ? "aptoConRestriccion" : "",
+    // Datos para observaciones
+    observaciones: data.observacion,
+    // Datos para fechas
+    fechaCaducidad: formatearFechaCorta(data.fechaCaducidad)
+  };
+
+  // Usar solo datos reales
+  const datosFinales = datosReales;
+
+  // Header reutilizable
+  const drawHeader = async (pageNumber) => {
+    // Logo y membrete
+    await CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+
+    // Título principal (solo en página 1)
+    if (pageNumber === 1) {
+      doc.setFont("helvetica", "bold").setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+      doc.text("CERTIFICADO DE APTITUD PARA CUADRADOR", pageW / 2, 40, { align: "center" });
+
+      // Subtítulo
+      // doc.setFont("helvetica", "bold").setFontSize(12);
+      // doc.text("(LIC)", pageW / 2, 45, { align: "center" });
+
+      // doc.text("(DUMPER - SCOOP - LOCOMOTORA - OTROS EQUIPOS MOVILES)", pageW / 2, 50, { align: "center" });
+    }
+
+    // Número de Ficha y Página (alineación automática mejorada)
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Nro de ficha: ", pageW - 80, 15);
+
+    doc.setFont("helvetica", "normal").setFontSize(18);
+    doc.text(datosFinales.numeroFicha, pageW - 60, 16);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Sede: " + datosFinales.sede, pageW - 80, 20);
+    doc.text("Fecha de examen: " + datosFinales.fechaExamen, pageW - 80, 25);
+
+    doc.text("Pag. " + pageNumber.toString().padStart(2, '0'), pageW - 30, 10);
+
+    // Bloque de color (posición mejorada)
+    drawColorBox(doc, {
+      color: datosFinales.codigoColor,
+      text: datosFinales.textoColor,
+      x: pageW - 30,
+      y: 10,
+      size: 22,
+      showLine: true,
+      fontSize: 30,
+      textPosition: 0.9
+    });
+  };
+
+  // === DIBUJAR HEADER ===
+  await drawHeader(numeroPagina);
+
+  // === FUNCIONES AUXILIARES ===
+  // Función para texto con salto de línea
+  const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
+    // Validar que el texto no sea undefined, null o vacío
+    if (!texto || texto === null || texto === undefined) {
+      return y;
+    }
+
+    const fontSize = doc.internal.getFontSize();
+    const palabras = String(texto).split(' ');
+    let lineaActual = '';
+    let yPos = y;
+
+    palabras.forEach(palabra => {
+      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+      const anchoTexto = doc.getTextWidth(textoPrueba);
+
+      if (anchoTexto <= anchoMaximo) {
+        lineaActual = textoPrueba;
+      } else {
+        if (lineaActual) {
+          doc.text(lineaActual, x, yPos);
+          yPos += fontSize * 0.35; // salto real entre líneas
+          lineaActual = palabra;
+        } else {
+          doc.text(palabra, x, yPos);
+          yPos += fontSize * 0.35;
+        }
+      }
+    });
+
+    if (lineaActual) {
+      doc.text(lineaActual, x, yPos);
+      yPos += fontSize * 0.35;
+    }
+
+    return yPos; // Devuelve la nueva posición final
+  };
+
+  // Función general para dibujar header de sección con fondo gris
+  const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
+    const tablaInicioX = 10;
+    const tablaAncho = 190;
+
+    // Configurar líneas con grosor consistente
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
+
+    // Dibujar fondo gris más oscuro
+    doc.setFillColor(196, 196, 196);
+    doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
+
+    // Dibujar líneas del header
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
+
+    // Dibujar texto del título
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
+
+    return yPos + alturaHeader;
+  };
+
+  // === SECCIÓN 1: DATOS PERSONALES ===
+  const tablaInicioX = 10;
+  const tablaAncho = 190;
+  let yPos = 55;
+  const filaAltura = 5;
+
+  // Header de datos personales
+  yPos = dibujarHeaderSeccion("1. DATOS PERSONALES", yPos, filaAltura);
+
+  // Fila: Apellidos y Nombres con división para Tipo de examen
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + filaAltura); // División para Tipo de examen
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 45, yPos, tablaInicioX + 45, yPos + filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // // Fila: Domicilio (completa)
+  // doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  // doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  // doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  // doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  // yPos += filaAltura;
+
+  // Fila: Puesto de Trabajo, Área de Trabajo (2 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Fila: Empresa (completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Fila: Contrata (completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // === CONTENIDO DE LA TABLA ===
+  let yTexto = 55 + filaAltura + 2.5; // Ajustar para el header
+
+  // Apellidos y Nombres
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  // Ajustar ancho para la nueva división (hasta x = tablaInicioX + 140)
+  dibujarTextoConSaltoLinea(datosFinales.apellidosNombres || "", tablaInicioX + 35, yTexto + 1, 95);
+
+  // Columna derecha: Tipo de examen
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("T. Examen:", tablaInicioX + 137, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.tipoExamen || "", tablaInicioX + 155, yTexto + 1);
+  yTexto += filaAltura;
+
+  // DNI, Edad, Sexo, Fecha Nac.
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("DNI:", tablaInicioX + 2, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.documentoIdentidad || "", tablaInicioX + 12, yTexto + 1);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Edad:", tablaInicioX + 47, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.edad ? (datosFinales.edad + " AÑOS") : ""), tablaInicioX + 58, yTexto + 1);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Sexo:", tablaInicioX + 92, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.sexo || "", tablaInicioX + 105, yTexto + 1);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Fecha Nac.:", tablaInicioX + 137, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.fechaNacimiento || "", tablaInicioX + 155, yTexto + 1);
+  yTexto += filaAltura;
+
+  // Domicilio
+  // doc.setFont("helvetica", "bold").setFontSize(8);
+  // doc.text("Domicilio:", tablaInicioX + 2, yTexto + 1);
+  // doc.setFont("helvetica", "normal").setFontSize(8);
+  // dibujarTextoConSaltoLinea(datosFinales.direccionPaciente || "", tablaInicioX + 25, yTexto + 1, 160);
+  // yTexto += filaAltura;
+
+  // Puesto de Trabajo, Área de Trabajo
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.puestoTrabajo || "", tablaInicioX + 30, yTexto + 1);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Área de Trabajo:", tablaInicioX + 92, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.areaTrabajo || "", tablaInicioX + 118, yTexto + 1);
+  yTexto += filaAltura;
+
+  // Empresa
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Empresa:", tablaInicioX + 2, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.empresa || "", tablaInicioX + 24, yTexto + 1, 160);
+  yTexto += filaAltura;
+
+  // Contratista
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Contratista:", tablaInicioX + 2, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.contrata || "", tablaInicioX + 24, yTexto + 1);
+  yTexto += filaAltura;
+
+  // Fila adicional: Superficie, X, PLANTA, SUBSUELO (4 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 40, yPos, tablaInicioX + 40, yPos + filaAltura); // División 1
+  doc.line(tablaInicioX + 60, yPos, tablaInicioX + 60, yPos + filaAltura); // División 2
+  doc.line(tablaInicioX + 100, yPos, tablaInicioX + 100, yPos + filaAltura); // División 3
+  doc.line(tablaInicioX + 120, yPos, tablaInicioX + 120, yPos + filaAltura); // División 4
+  doc.line(tablaInicioX + 170, yPos, tablaInicioX + 170, yPos + filaAltura); // División 5
+
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Contenido de la fila adicional
+  let yTexto2 = yPos - filaAltura + 2.5;
+
+  // Superficie
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("SUPERFICIE", tablaInicioX + 2, yTexto2 + 1);
+
+  // Marcar X en Superficie si es el tipo seleccionado
+  if (datosFinales.explotacion === "SUPERFICIE") {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", tablaInicioX + 49, yTexto2 + 1);
+  }
+
+  // PLANTA (centrado en la tercera columna)
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("PLANTA", tablaInicioX + 63, yTexto2 + 1);
+
+  // Marcar X en Planta si es el tipo seleccionado
+  if (datosFinales.explotacion === "PLANTA") {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", tablaInicioX + 109, yTexto2 + 1);
+  }
+
+  // SUBSUELO (centrado en la cuarta columna)
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("SUBSUELO", tablaInicioX + 122, yTexto2 + 1);
+
+  // Marcar X en Subsuelo si es el tipo seleccionado
+  if (datosFinales.explotacion === "SUBSUELO") {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", tablaInicioX + 178.5, yTexto2 + 1);
+  }
+
+  // === SECCIÓN 2: RESULTADO DE LA EVALUACIÓN ===
+  yPos = dibujarHeaderSeccion("2. RESULTADO DE LA EVALUACIÓN", yPos, filaAltura);
+
+  // Fila única: CONDICION | APTO | X | NO APTO | APTO TEMPORAL | X | APTO CON RESTR
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + 40, yPos, tablaInicioX + 40, yPos + filaAltura); // División 1: CONDICION
+  doc.line(tablaInicioX + 60, yPos, tablaInicioX + 60, yPos + filaAltura); // División 2: APTO
+  doc.line(tablaInicioX + 70, yPos, tablaInicioX + 70, yPos + filaAltura); // División 3: X
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura); // División 4: NO APTO
+  doc.line(tablaInicioX + 100, yPos, tablaInicioX + 100, yPos + filaAltura); // División 5: X
+  doc.line(tablaInicioX + 128, yPos, tablaInicioX + 128, yPos + filaAltura); // División 6: APTO TEMPORAL
+  doc.line(tablaInicioX + 138, yPos, tablaInicioX + 138, yPos + filaAltura); // División 7: X 
+  doc.line(tablaInicioX + 180, yPos, tablaInicioX + 180, yPos + filaAltura); // División 8: APTO CON RESTR
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Contenido de la fila única
+  let yTexto3 = yPos - filaAltura + 2.5;
+
+  // CONDICION
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("CONDICIÓN", tablaInicioX + 2, yTexto3 + 1);
+
+  // APTO
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("APTO", tablaInicioX + 43, yTexto3 + 1);
+
+  // Marcar X en APTO si es la condición seleccionada
+  if (datosFinales.resultadoEvaluacion === "apto") { 
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", tablaInicioX + 65, yTexto3 + 1, { align: "center" });
+  }
+
+  // NO APTO
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("NO APTO", tablaInicioX + 72, yTexto3 + 1);
+
+  // Marcar X en NO APTO si es la condición seleccionada
+  if (datosFinales.resultadoEvaluacion === "noApto") {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", tablaInicioX + 95, yTexto3 + 1, { align: "center" });
+  }
+
+    // APTO TEMPORAL
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("APTO TEMPORAL", tablaInicioX + 102, yTexto3 + 1);
+
+  // Marcar X en APTO TEMPORAL si es la condición seleccionada
+  if (datosFinales.resultadoEvaluacion === "aptoTemporal") {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", tablaInicioX + 133, yTexto3 + 1, { align: "center" });
+  }
+
+    // APTO CON RESTRICCIONES
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("APTO CON RESTRICCIONES", tablaInicioX + 140, yTexto3 + 1);
+
+  // Marcar X en APTO CON RESTRICCIONES si es la condición seleccionada
+  if (datosFinales.resultadoEvaluacion === "aptoConRestriccion") {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", tablaInicioX + 185, yTexto3 + 1, { align: "center" });
+  }
+
+  // === SECCIÓN 3: OBSERVACIONES ===
+  yPos = dibujarHeaderSeccion("3. OBSERVACIONES", yPos, filaAltura);
+
+  // Fila de observaciones con altura dinámica
+  const observacionesTexto = datosFinales.observaciones || "";
+  const anchoMaximoObservaciones = tablaAncho - 4;
+
+  // Función para calcular altura dinámica de observaciones
+  const calcularAlturaObservaciones = (texto, anchoMaximo) => {
+    if (!texto || texto.trim() === "") return 20; // Altura fija mínima si no hay texto
+
+    const palabras = texto.split(' ');
+    let lineaActual = '';
+    let lineas = 1;
+
+    palabras.forEach(palabra => {
+      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+      const anchoTexto = doc.getTextWidth(textoPrueba);
+
+      if (anchoTexto <= anchoMaximo) {
+        lineaActual = textoPrueba;
+      } else {
+        if (lineaActual) {
+          lineas++;
+          lineaActual = palabra;
+        } else {
+          lineas++;
+        }
+      }
+    });
+
+    // Altura fija mínima de 20mm, altura por línea de 3mm
+    const alturaCalculada = lineas * 3 + 2;
+    return Math.max(alturaCalculada, 100); // Altura fija mínima de 20mm
+  };
+
+  const alturaFilaObservaciones = calcularAlturaObservaciones(observacionesTexto, anchoMaximoObservaciones);
+
+  // Dibujar líneas de la fila de observaciones
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaObservaciones);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaObservaciones);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaFilaObservaciones, tablaInicioX + tablaAncho, yPos + alturaFilaObservaciones);
+
+  // Contenido de la fila de observaciones
+  doc.setFont("helvetica", "normal").setFontSize(8);
+
+  // Dividir el texto en líneas y agregar guión a cada una
+  const lineasObservaciones = observacionesTexto.split('\n').filter(linea => linea.trim() !== '');
+  let yTextoObservaciones = yPos + 5;
+
+  if (lineasObservaciones.length > 0) {
+    lineasObservaciones.forEach(linea => {
+      const textoConGuion = `- ${linea.trim()}`;
+      yTextoObservaciones = dibujarTextoConSaltoLinea(textoConGuion, tablaInicioX + 2, yTextoObservaciones, anchoMaximoObservaciones);
+      yTextoObservaciones += 3; // Espaciado entre líneas
+    });
+  } else {
+    // Si no hay observaciones, mostrar texto por defecto
+    doc.text("- Sin observaciones registradas", tablaInicioX + 2, yTextoObservaciones);
+  }
+
+  yPos += alturaFilaObservaciones;
+
+  // === FILA DE FECHAS ===
+  // Fila: Fecha Examen | Fecha Caducidad (2 columnas)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + (tablaAncho / 2), yPos, tablaInicioX + (tablaAncho / 2), yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  yPos += filaAltura;
+
+  // Contenido de la fila de fechas
+  let yTexto4 = yPos - filaAltura + 2.5;
+
+  // Fecha Examen
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Fecha Examen :", tablaInicioX + 2, yTexto4 + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.fechaExamen || "", tablaInicioX + 30, yTexto4 + 1);
+
+  // Fecha Caducidad
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Fecha Caducidad :", tablaInicioX + (tablaAncho / 2) + 2, yTexto4 + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.fechaCaducidad || "", tablaInicioX + (tablaAncho / 2) + 35, yTexto4 + 1);
+
+  // === SECCIÓN DE FIRMAS ===
+  const yFirmas = yPos; // Continuar directamente desde la sección anterior
+  const alturaSeccionFirmas = 30; // Altura para la sección de firmas
+
+  // Dibujar las líneas de la sección de firmas (una sola columna centrada)
+  doc.line(tablaInicioX, yFirmas, tablaInicioX, yFirmas + alturaSeccionFirmas); // Línea izquierda
+  doc.line(tablaInicioX + tablaAncho, yFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea derecha
+  doc.line(tablaInicioX, yFirmas, tablaInicioX + tablaAncho, yFirmas); // Línea superior
+  doc.line(tablaInicioX, yFirmas + alturaSeccionFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea inferior
+
+  // === FIRMA DEL MÉDICO CENTRADA ===
+  const firmaMedicoY = yFirmas + 3;
+
+  // Función para obtener URL de digitalización por nombre
+  const getDigitalizacionUrl = (digitalizaciones, nombre) => {
+    if (!digitalizaciones || !Array.isArray(digitalizaciones)) return null;
+    const item = digitalizaciones.find(d => d.nombreDigitalizacion === nombre);
+    return item ? item.url : null;
+  };
+
+  // Calcular centro de la fila para centrar la firma
+  const centroFilaX = tablaInicioX + (tablaAncho / 2);
+
+  // Agregar firma y sello médico centrada
+  let firmaMedicoUrl = getDigitalizacionUrl(data.digitalizacion, "SELLOFIRMADOCASIG");
+
+  if (firmaMedicoUrl) {
+    try {
+      const imgWidth = 45;
+      const imgHeight = 20;
+      const x = centroFilaX - (imgWidth / 2); // Centrar horizontalmente
+      const y = firmaMedicoY;
+      doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando firma del médico:", error);
+    }
+  }
+
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text("Sello y Firma del Médico", centroFilaX, yFirmas + 26, { align: "center" });
+  doc.text("Responsable de la Evaluación", centroFilaX, yFirmas + 28.5, { align: "center" });
+
+  yPos += alturaSeccionFirmas;
+
+  // === FOOTER ===
+  footerTR(doc, { footerOffsetY: 8 });
+
+  // === Imprimir ===
+  if (docExistente) {
+    return doc
+  } else {
+    imprimir(doc);
+
+  }
+}
+
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
+}

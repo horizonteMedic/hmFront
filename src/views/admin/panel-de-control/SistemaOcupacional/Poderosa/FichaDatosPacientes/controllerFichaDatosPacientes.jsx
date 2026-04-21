@@ -47,7 +47,7 @@ export const GetInfoServicio = async (
                     : prev.tipoTrabajador,
 
             // ===== DATOS LABORALES =====
-            empresa: res.empresa ?? "",
+            empresa: res.contrata ?? "",
             cargo: res.cargoPaciente ?? "",
 
             // ===== DATOS PERSONALES =====
@@ -258,7 +258,7 @@ export const GetInfoServicioEditar = async (
                     : "",
 
             // ===== DATOS LABORALES =====
-            empresa: res.empresa ?? "",
+            empresa: res.contrata ?? "",
             cargo: res.cargoPaciente ?? "",
 
             // ===== DATOS PERSONALES =====
@@ -524,7 +524,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             //Necesita
             Swal.fire(
                 "Alerta",
-                "El paciente necesita pasar por Aptitud Altura Poderosa o Laboratorio Clínico.",
+                "El paciente necesita pasar por Laboratorio Clínico.",
                 "warning"
             );
         }
