@@ -11,12 +11,12 @@ import EmpleadoComboBox from "../../../../../components/reusableComponents/Emple
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
 
-const today = getToday();
-const nextYearDate = getDatePlus364Days(today);
-
 const tabla = "certificado_aptitud_cuadrador"
 
 export default function CuadradorVigia() {
+    const today = getToday();
+    const nextYearDate = getDatePlus364Days(today);
+
     const { token, userlogued, selectedSede, datosFooter, userName, hora } = useSessionData();
 
     const InitialForm = {
@@ -78,7 +78,7 @@ export default function CuadradorVigia() {
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
             {/* Header */}
-            <SectionFieldset legend="Información general" className="grid grid-cols-1 lg:grid-cols-4 gap-x-4 gap-y-3">
+            <SectionFieldset legend="Información general" className="grid grid-cols-1 xl:grid-cols-3 gap-x-4 gap-y-3">
                 <InputTextOneLine
                     label="N° Orden"
                     name="norden"
@@ -94,13 +94,16 @@ export default function CuadradorVigia() {
                     value={form?.nombreExamen}
                     onChange={handleChange}
                 />
-
-                <InputTextOneLine
+                <InputsRadioGroup
                     label="Explotación"
                     name="explotacion"
-                    disabled
                     value={form?.explotacion}
-                    onChange={handleChange}
+                    onChange={handleRadioButton}
+                    options={[
+                        { label: "Superficie", value: "SUPERFICIE" },
+                        { label: "Planta", value: "PLANTA" },
+                        { label: "Subsuelo", value: "SUBSUELO" },
+                    ]}
                 />
 
                 <InputTextOneLine

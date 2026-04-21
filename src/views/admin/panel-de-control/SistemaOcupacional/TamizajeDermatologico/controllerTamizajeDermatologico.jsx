@@ -3,9 +3,8 @@ import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
     LoadingDefault,
-    PrintHojaRDefault,
     SubmitDataServiceDefault,
-    VerifyTRDefault,
+    VerifyTRDefault
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { convertirGenero } from "../../../../utils/helpers";
@@ -81,7 +80,6 @@ export const GetInfoServicio = async (
             comentarios: rese.comentarios ?? "",
 
             // Médico que Certifica
-            user_medicoFirma: rese.usuarioFirma ?? "",
             user_doctorAsignado: rese.doctorAsignado ?? "",
         }));
     }
@@ -126,7 +124,6 @@ export const SubmitDataService = async (
         especialidad: "",
         fechaExamen: form.fecha,
         userRegistro: user,
-        usuarioFirma: form.user_medicoFirma,
         doctorAsignado: form.user_doctorAsignado,
     };
 

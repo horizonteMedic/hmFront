@@ -62,12 +62,8 @@ export default function TamizajeDermatologico() {
         interconsultaDermatologia: false,
 
         // Médico que Certifica //BUSCADOR
-        nombre_medico: userName,
-        user_medicoFirma: userlogued,
-
-        nombre_doctorAsignado: "",
-        user_doctorAsignado: "",
-
+        nombre_doctorAsignado: userName,
+        user_doctorAsignado: userlogued,
     };
 
     const {
@@ -270,12 +266,6 @@ export default function TamizajeDermatologico() {
             </SectionFieldset>
 
             <SectionFieldset legend="Asignación de Médico">
-                <EmpleadoComboBox
-                    value={form.nombre_medico}
-                    label="Especialista"
-                    form={form}
-                    onChange={handleChangeSimple}
-                />
                 <EmpleadoComboBox
                     value={form.nombre_doctorAsignado}
                     label="Doctor Asignado"
