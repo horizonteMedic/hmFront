@@ -155,8 +155,8 @@ export const PrintHojaR = (nro, token, tabla) => {
             if (res?.resultado?.norden) {
                 const nombre = "CertificadoAptitudCuadrador";
                 console.log(nombre)
-                const jasperModules = import.meta.glob('../../../../../jaspers/AptitudLicenciaInterna/*.jsx');
-                const modulo = await jasperModules[`../../../../../jaspers/AptitudLicenciaInterna/${nombre}.jsx`]();
+                const jasperModules = import.meta.glob('../../../../../jaspers/Poderosa/*.jsx');
+                const modulo = await jasperModules[`../../../../../jaspers/Poderosa/${nombre}.jsx`]();
                 // Ejecuta la función exportada por default con los datos
                 if (typeof modulo.default === 'function') {
                     modulo.default(res.resultado);
