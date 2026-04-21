@@ -28,6 +28,7 @@ export const GetInfoServicio = async (
         set((prev) => ({
             ...prev,
             nombres: res.nombresApellidos,
+            explotacion: res.explotacion,
             sexo: convertirGenero(res.genero ?? ""),
             dni: res.dni,
             edad: res.edad,
@@ -64,6 +65,7 @@ export const GetInfoServicioEditar = async (
             ...prev,
             norden: rese.norden ?? "",
             nombreExamen: rese.tipoExamen ?? "",
+            explotacion: rese.explotacion ?? "",
             nombres: `${rese.nombres ?? ""} ${rese.apellidos ?? ""}`,
             dni: rese.dniPaciente ?? "",
             edad: rese.edad ?? "",
@@ -86,7 +88,7 @@ export const GetInfoServicioEditar = async (
                         rese.aptoConRestriccion ? "APTO_CON_RESTRICCION" : "",
 
             // Médico que Certifica 
-            user_medicoFirma: rese.usuarioFirma ?? "",
+            // user_medicoFirma: rese.usuarioFirma ?? "",
             user_doctorAsignado: rese.doctorAsignado ?? "",
         }));
     }
@@ -116,12 +118,10 @@ export const SubmitDataService = async (
         noApto: form.apto === "NO_APTO",
 
 
-        userRegistro: user,
-        usuarioFirma: form.user_medicoFirma,
         doctorAsignado: form.user_doctorAsignado,
 
         observacion: form.observaciones,
-        userRegistro: form.userlogued,
+        userRegistro: user,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {

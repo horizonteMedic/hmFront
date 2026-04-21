@@ -22,6 +22,7 @@ export default function CuadradorVigia() {
     const InitialForm = {
         norden: "",
         nombreExamen: "",
+        explotacion: "",
         nombres: "",
         dni: "",
         edad: "",
@@ -40,11 +41,8 @@ export default function CuadradorVigia() {
         observaciones: "",
 
         // Médico que Certifica //BUSCADOR
-        nombre_medico: userName,
-        user_medicoFirma: userlogued,
-
-        nombre_doctorAsignado: "",
-        user_doctorAsignado: "",
+        nombre_doctorAsignado: userName,
+        user_doctorAsignado: userlogued,
     }
 
     const {
@@ -80,7 +78,7 @@ export default function CuadradorVigia() {
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
             {/* Header */}
-            <SectionFieldset legend="Información general" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
+            <SectionFieldset legend="Información general" className="grid grid-cols-1 lg:grid-cols-4 gap-x-4 gap-y-3">
                 <InputTextOneLine
                     label="N° Orden"
                     name="norden"
@@ -94,6 +92,14 @@ export default function CuadradorVigia() {
                     name="nombreExamen"
                     disabled
                     value={form?.nombreExamen}
+                    onChange={handleChange}
+                />
+
+                <InputTextOneLine
+                    label="Explotación"
+                    name="explotacion"
+                    disabled
+                    value={form?.explotacion}
                     onChange={handleChange}
                 />
 
@@ -142,12 +148,12 @@ export default function CuadradorVigia() {
                     </SectionFieldset>
 
                     <SectionFieldset legend="Asignación de Médico">
-                        <EmpleadoComboBox
+                        {/* <EmpleadoComboBox
                             value={form.nombre_medico}
                             label="Especialista"
                             form={form}
                             onChange={handleChangeSimple}
-                        />
+                        /> */}
                         <EmpleadoComboBox
                             value={form.nombre_doctorAsignado}
                             label="Doctor Asignado"

@@ -45,7 +45,7 @@ export default async function CertificadoAptitudCuadrador_Digitalizado(data = {}
     horaSalida: String(data.horaSalida),
     direccionPaciente: String(data.direccionPaciente),
     // Datos para tipo de trabajo
-    tipoTrabajo: data.explotacion,
+    explotacion: data.explotacion,
     // Datos para resultado de evaluación
     resultadoEvaluacion: data.noApto ? "noApto" :
       data.apto ? "apto" : data.aptoTemporal ? "aptoTemporal" : 
@@ -71,12 +71,10 @@ export default async function CertificadoAptitudCuadrador_Digitalizado(data = {}
       doc.text("CERTIFICADO DE APTITUD PARA CUADRADOR", pageW / 2, 40, { align: "center" });
 
       // Subtítulo
-      doc.setFont("helvetica", "bold").setFontSize(12);
-      doc.text("(LIC)", pageW / 2, 45, { align: "center" });
+      // doc.setFont("helvetica", "bold").setFontSize(12);
+      // doc.text("(LIC)", pageW / 2, 45, { align: "center" });
 
-      // Descripción de equipos
-      doc.setFont("helvetica", "bold").setFontSize(12);
-      doc.text("(DUMPER - SCOOP - LOCOMOTORA - OTROS EQUIPOS MOVILES)", pageW / 2, 50, { align: "center" });
+      // doc.text("(DUMPER - SCOOP - LOCOMOTORA - OTROS EQUIPOS MOVILES)", pageW / 2, 50, { align: "center" });
     }
 
     // Número de Ficha y Página (alineación automática mejorada)
@@ -254,7 +252,7 @@ export default async function CertificadoAptitudCuadrador_Digitalizado(data = {}
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Edad:", tablaInicioX + 47, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((datosFinales.edad ? (datosFinales.edad + " Años") : ""), tablaInicioX + 58, yTexto + 1);
+  doc.text((datosFinales.edad ? (datosFinales.edad + " AÑOS") : ""), tablaInicioX + 58, yTexto + 1);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Sexo:", tablaInicioX + 92, yTexto + 1);
@@ -321,7 +319,7 @@ export default async function CertificadoAptitudCuadrador_Digitalizado(data = {}
   doc.text("SUPERFICIE", tablaInicioX + 2, yTexto2 + 1);
 
   // Marcar X en Superficie si es el tipo seleccionado
-  if (datosFinales.tipoTrabajo === "SUPERFICIE") {
+  if (datosFinales.explotacion === "SUPERFICIE") {
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text("X", tablaInicioX + 49, yTexto2 + 1);
   }
@@ -331,7 +329,7 @@ export default async function CertificadoAptitudCuadrador_Digitalizado(data = {}
   doc.text("PLANTA", tablaInicioX + 63, yTexto2 + 1);
 
   // Marcar X en Planta si es el tipo seleccionado
-  if (datosFinales.tipoTrabajo === "PLANTA") {
+  if (datosFinales.explotacion === "PLANTA") {
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text("X", tablaInicioX + 109, yTexto2 + 1);
   }
@@ -341,7 +339,7 @@ export default async function CertificadoAptitudCuadrador_Digitalizado(data = {}
   doc.text("SUBSUELO", tablaInicioX + 122, yTexto2 + 1);
 
   // Marcar X en Subsuelo si es el tipo seleccionado
-  if (datosFinales.tipoTrabajo === "SUBSUELO") {
+  if (datosFinales.explotacion === "SUBSUELO") {
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text("X", tablaInicioX + 178.5, yTexto2 + 1);
   }
@@ -349,16 +347,16 @@ export default async function CertificadoAptitudCuadrador_Digitalizado(data = {}
   // === SECCIÓN 2: RESULTADO DE LA EVALUACIÓN ===
   yPos = dibujarHeaderSeccion("2. RESULTADO DE LA EVALUACIÓN", yPos, filaAltura);
 
-  // Fila única: CONDICION | APTO | X | NO APTO |
+  // Fila única: CONDICION | APTO | X | NO APTO | APTO TEMPORAL | X | APTO CON RESTR
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + 40, yPos, tablaInicioX + 40, yPos + filaAltura); // División 1: CONDICION
   doc.line(tablaInicioX + 60, yPos, tablaInicioX + 60, yPos + filaAltura); // División 2: APTO
   doc.line(tablaInicioX + 70, yPos, tablaInicioX + 70, yPos + filaAltura); // División 3: X
   doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura); // División 4: NO APTO
   doc.line(tablaInicioX + 100, yPos, tablaInicioX + 100, yPos + filaAltura); // División 5: X
-  doc.line(tablaInicioX + 140, yPos, tablaInicioX + 140, yPos + filaAltura); // División 6: APTO TEMPORAL
-  doc.line(tablaInicioX + 150, yPos, tablaInicioX + 150, yPos + filaAltura); // División 7: X 
-  doc.line(tablaInicioX + 190, yPos, tablaInicioX + 190, yPos + filaAltura); // División 8: APTO CON RESTR
+  doc.line(tablaInicioX + 128, yPos, tablaInicioX + 128, yPos + filaAltura); // División 6: APTO TEMPORAL
+  doc.line(tablaInicioX + 138, yPos, tablaInicioX + 138, yPos + filaAltura); // División 7: X 
+  doc.line(tablaInicioX + 180, yPos, tablaInicioX + 180, yPos + filaAltura); // División 8: APTO CON RESTR
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -378,17 +376,37 @@ export default async function CertificadoAptitudCuadrador_Digitalizado(data = {}
   // Marcar X en APTO si es la condición seleccionada
   if (datosFinales.resultadoEvaluacion === "apto") { 
     doc.setFont("helvetica", "bold").setFontSize(10);
-    doc.text("X", tablaInicioX + 110, yTexto3 + 1, { align: "center" });
+    doc.text("X", tablaInicioX + 65, yTexto3 + 1, { align: "center" });
   }
 
   // NO APTO
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("NO APTO", tablaInicioX + 61, yTexto3 + 1);
+  doc.text("NO APTO", tablaInicioX + 72, yTexto3 + 1);
 
   // Marcar X en NO APTO si es la condición seleccionada
   if (datosFinales.resultadoEvaluacion === "noApto") {
     doc.setFont("helvetica", "bold").setFontSize(10);
-    doc.text("X", tablaInicioX + 180, yTexto3 + 1, { align: "center" });
+    doc.text("X", tablaInicioX + 95, yTexto3 + 1, { align: "center" });
+  }
+
+    // APTO TEMPORAL
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("APTO TEMPORAL", tablaInicioX + 102, yTexto3 + 1);
+
+  // Marcar X en APTO TEMPORAL si es la condición seleccionada
+  if (datosFinales.resultadoEvaluacion === "aptoTemporal") {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", tablaInicioX + 133, yTexto3 + 1, { align: "center" });
+  }
+
+    // APTO CON RESTRICCIONES
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("APTO CON RESTRICCIONES", tablaInicioX + 140, yTexto3 + 1);
+
+  // Marcar X en APTO CON RESTRICCIONES si es la condición seleccionada
+  if (datosFinales.resultadoEvaluacion === "aptoConRestriccion") {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", tablaInicioX + 185, yTexto3 + 1, { align: "center" });
   }
 
   // === SECCIÓN 3: OBSERVACIONES ===
@@ -503,7 +521,7 @@ export default async function CertificadoAptitudCuadrador_Digitalizado(data = {}
   const centroFilaX = tablaInicioX + (tablaAncho / 2);
 
   // Agregar firma y sello médico centrada
-  let firmaMedicoUrl = getDigitalizacionUrl(data.digitalizacion, "SELLOFIRMA");
+  let firmaMedicoUrl = getDigitalizacionUrl(data.digitalizacion, "SELLOFIRMADOCASIG");
 
   if (firmaMedicoUrl) {
     try {
