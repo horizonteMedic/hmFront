@@ -8,6 +8,8 @@ import {
     VerifyTRDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
+import { convertirGenero } from "../../../../utils/helpers";
+import { getFetch } from "../../../../utils/apiHelpers";
 
 const obtenerReporteUrl = "/api/v01/ct/tamizajeDermatologico/obtenerReporte";
 const registrarUrl = "/api/v01/ct/tamizajeDermatologico/registrarActualizar";
@@ -26,44 +28,61 @@ export const GetInfoServicio = async (
         obtenerReporteUrl,
         onFinish
     );
-    if (res) {
+    const rese = res?.resultado;
+    if (rese) {
         set((prev) => ({
             ...prev,
-            norden: res.norden ?? "",
-            fecha: res.fechaRegistro,
+            // Header - Información del examen
+            norden: rese.norden ?? "",
+            fecha: rese.fechaExamen ?? "",
+            nombreExamen: rese.nomExamen ?? "",
 
-            esApto: res.cumplePerfil,
+            dni: rese.dniPaciente ?? "",
+            nombres: `${rese.nombres ?? ""} ${rese.apellidos ?? ""}`,
+            fechaNacimiento: formatearFechaCorta(rese.fechaNacimientoPaciente ?? ""),
+            lugarNacimiento: rese.lugarNacimientoPaciente ?? "",
+            edad: rese.edad ?? "",
+            sexo: convertirGenero(rese.sexoPaciente ?? ""),
+            estadoCivil: rese.estadoCivilPaciente ?? "",
+            nivelEstudios: rese.nivelEstudioPaciente ?? "",
 
-            nombreExamen: res.tipoExamen ?? "",
-            dni: res.dniPaciente ?? "",
-
-            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
-            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-            lugarNacimiento: res.lugarNacimiento ?? "",
-            edad: res.edadPaciente ?? "",
-            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
-            estadoCivil: res.estadoCivil ?? "",
-            nivelEstudios: res.nivelEstudio ?? "",
             // Datos Laborales
-            empresa: res.empresa ?? "",
-            contrata: res.contrata ?? "",
-            ocupacion: res.areaPaciente ?? "",
-            cargoDesempenar: res.cargoPaciente ?? "",
+            empresa: rese.razonEmpresa ?? "",
+            contrata: rese.razonContrata ?? "",
+            ocupacion: rese.ocupacionPaciente ?? "",
+            cargoDesempenar: rese.cargoDe ?? "",
 
-            afrontamientoTomaDecisiones: res.afronTdd ?? "",
-            estiloDeConflicto: res.estiloConflicto ?? "",
-            afrontamientoSituacionesRiesgo: res.afronSitRiesgo ?? "",
-            nivelAnsiedad: res.levelAnsiedad ?? "",
+            // Tamizaje Dermatológico
+            enfermedadPiel: rese.tieneEnfermedadPiel ?? false,
+            enfermedadPielDetalle: rese.diagnosticoEnfermedad ?? "",
+            algunaLesion: rese.tieneLesionActual ?? false,
+            algunaLesionLocalizacion: rese.localizacionLesion ?? "",
+            algunaLesionDesdeCuando: rese.tiempoLesion ?? "",
+            coloracionPiel: rese.cambioColoracionPiel ?? false,
+            variasLesiones: rese.lesionesRecurrentesAnuales ?? false,
+            enrojecimiento: rese.tieneEnrojecimiento ?? false,
+            enrojecimientoLocalizacion: rese.localizacionEnrojecimiento ?? "",
+            comezon: rese.tieneComezon ?? false,
+            comezonLocalizacion: rese.localizacionComezon ?? "",
+            hinchazon: rese.tieneHinchazon ?? false,
+            hinchazonLocalizacion: rese.localizacionHinchazon ?? "",
+            alergiaAsma: rese.tieneRinitisOAsma ?? false,
+            usaEpp: rese.usaEpp ?? true,
+            usaEppProteccion: rese.tipoEpp ?? "",
+            cambiosEnUnas: rese.cambiosEnUnas ?? false,
+            algunaMedicacion: rese.tomaMedicacion ?? false,
 
-            // Análisis FODA
-            fortalezasOportunidades: res.fodaForOpor ?? "",
-            amenazasDebilidades: res.fodaAmenDebi ?? "",
+            // Para el médico
+            dermatopatia: rese.hallazgoSugerenteDermatopatia ?? false,
+            necesitaDermatologo: rese.requiereEvaluacionDermatologica ?? false,
+            interconsultaDermatologia: rese.requiereInterconsultaEspecialidad ?? false,
 
-            // Observaciones y Recomendaciones
-            observaciones: res.observacion ?? "",
-            recomendaciones: res.recomenda ?? "",
+            // Comentarios
+            comentarios: rese.comentarios ?? "",
 
-            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+            // Médico que Certifica
+            user_medicoFirma: rese.usuarioFirma ?? "",
+            user_doctorAsignado: rese.doctorAsignado ?? "",
         }));
     }
 };
@@ -80,25 +99,35 @@ export const SubmitDataService = async (
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
     }
-    if (form.esApto === undefined || form.esApto === null) {
-        await Swal.fire("Error", "Debe marcar aptitud", "error");
-        return;
-    }
     const body = {
         norden: form.norden,
-        fechaRegistro: form.fecha,
-        afronTdd: form.afrontamientoTomaDecisiones,
-        estiloConflicto: form.estiloDeConflicto,
-        afronSitRiesgo: form.afrontamientoSituacionesRiesgo,
-        levelAnsiedad: form.nivelAnsiedad,
-        fodaForOpor: form.fortalezasOportunidades,
-        fodaAmenDebi: form.amenazasDebilidades,
-        observacion: form.observaciones,
-        recomenda: form.recomendaciones,
-        cumplePerfil: form.esApto,
-        //agregar
+        tieneEnfermedadPiel: form.enfermedadPiel ?? false,
+        diagnosticoEnfermedad: form.enfermedadPielDetalle ?? "",
+        tieneLesionActual: form.algunaLesion ?? false,
+        localizacionLesion: form.algunaLesionLocalizacion ?? "",
+        tiempoLesion: form.algunaLesionDesdeCuando ?? "",
+        cambioColoracionPiel: form.coloracionPiel ?? false,
+        lesionesRecurrentesAnuales: form.variasLesiones ?? false,
+        tieneEnrojecimiento: form.enrojecimiento ?? false,
+        localizacionEnrojecimiento: form.enrojecimientoLocalizacion ?? "",
+        tieneComezon: form.comezon ?? false,
+        localizacionComezon: form.comezonLocalizacion ?? "",
+        tieneHinchazon: form.hinchazon ?? false,
+        localizacionHinchazon: form.hinchazonLocalizacion ?? "",
+        tieneRinitisOAsma: form.alergiaAsma ?? false,
+        usaEpp: form.usaEpp ?? false,
+        tipoEpp: form.usaEppProteccion ?? "",
+        cambiosEnUnas: form.cambiosEnUnas ?? false,
+        tomaMedicacion: form.algunaMedicacion ?? false,
+        comentarios: form.comentarios ?? "",
+        hallazgoSugerenteDermatopatia: form.dermatopatia ?? false,
+        requiereEvaluacionDermatologica: form.necesitaDermatologo ?? false,
+        requiereInterconsultaEspecialidad: form.interconsultaDermatologia ?? false,
+        especialidad: "",
+        fechaExamen: form.fecha,
         userRegistro: user,
         usuarioFirma: form.user_medicoFirma,
+        doctorAsignado: form.user_doctorAsignado,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -106,18 +135,41 @@ export const SubmitDataService = async (
     });
 };
 
-export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../../jaspers/ModuloPsicologia/InformePsicoBrigadista/*.jsx");
-    PrintHojaRDefault(
-        nro,
-        token,
-        tabla,
-        datosFooter,
-        obtenerReporteUrl,
-        jasperModules,
-        "../../../../../../jaspers/ModuloPsicologia/InformePsicoBrigadista"
-    );
-};
+// export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+//     const jasperModules = import.meta.glob("../../../../../../jaspers/TamizajeDermatologico/*.jsx");
+//     PrintHojaRDefault(
+//         nro,
+//         token,
+//         tabla,
+//         datosFooter,
+//         obtenerReporteUrl,
+//         jasperModules,
+//         "../../../../../../jaspers/TamizajeDermatologico"
+//     );
+// };
+
+export const PrintHojaR = (nro, token, tabla) => {
+    Loading('Cargando Formato a Imprimir')
+    getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`, token)
+        .then(async (res) => {
+            if (res?.resultado?.norden) {
+                const nombre = "TamizajeDermatologico";
+                console.log(nombre)
+                const jasperModules = import.meta.glob('../../../../jaspers/TamizajeDermatologico/*.jsx');
+                const modulo = await jasperModules[`../../../../jaspers/TamizajeDermatologico/${nombre}.jsx`]();
+                // Ejecuta la función exportada por default con los datos
+                if (typeof modulo.default === 'function') {
+                    modulo.default(res.resultado);
+                } else {
+                    console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+                }
+                Swal.close()
+            } else {
+                Swal.close()
+            }
+        })
+}
+
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
     VerifyTRDefault(
@@ -156,7 +208,7 @@ const GetInfoPac = async (nro, set, token, sede) => {
             nombreExamen: res.nomExam ?? "",
             cargoDesempenar: res.cargo ?? "",
             lugarNacimiento: res.lugarNacimiento ?? "",
-            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
+            sexo: convertirGenero(res.genero),
         }));
     }
 };

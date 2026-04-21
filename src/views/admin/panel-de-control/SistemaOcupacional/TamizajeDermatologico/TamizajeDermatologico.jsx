@@ -20,7 +20,6 @@ export default function TamizajeDermatologico() {
 
         dni: "",
         nombres: "",
-        apellidos: "",
         fechaNacimiento: "",
         lugarNacimiento: "",
         edad: "",
@@ -33,15 +32,6 @@ export default function TamizajeDermatologico() {
         contrata: "",
         ocupacion: "",
         cargoDesempenar: "",
-
-        afrontamientoTomaDecisiones: "",
-        estiloDeConflicto: "",
-        afrontamientoSituacionesRiesgo: "",
-        nivelAnsiedad: "",
-
-        // Análisis FODA
-        fortalezasOportunidades: "",
-        amenazasDebilidades: "",
 
         // Tamizaje Dermatológico
         enfermedadPiel: false,
@@ -63,18 +53,21 @@ export default function TamizajeDermatologico() {
         cambiosEnUnas: false,
         algunaMedicacion: false,
 
+        // Comentarios
+        comentarios: "",
+
         // Para el médico
         dermatopatia: false,
         necesitaDermatologo: false,
         interconsultaDermatologia: false,
 
-        // Observaciones y Recomendaciones
-        observaciones: "",
-        recomendaciones: "",
-
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
+
+        nombre_doctorAsignado: "",
+        user_doctorAsignado: "",
+
     };
 
     const {
@@ -258,6 +251,7 @@ export default function TamizajeDermatologico() {
                     rows={4}
                 />
             </SectionFieldset>
+            
             <SectionFieldset legend="Para el Médico">
                 <RadioTable
                     items={[
@@ -281,6 +275,14 @@ export default function TamizajeDermatologico() {
                     label="Especialista"
                     form={form}
                     onChange={handleChangeSimple}
+                />
+                <EmpleadoComboBox
+                    value={form.nombre_doctorAsignado}
+                    label="Doctor Asignado"
+                    form={form}
+                    onChange={handleChangeSimple}
+                    nameField="nombre_doctorAsignado"
+                    idField="user_doctorAsignado"
                 />
             </SectionFieldset>
 
