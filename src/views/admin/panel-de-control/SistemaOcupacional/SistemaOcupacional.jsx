@@ -73,6 +73,7 @@ import {
   faUpload,
   faMagnifyingGlassPlus,
   faHandDots,
+  faFloppyDisk,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -116,6 +117,7 @@ import SubidaArchivos from "./SubidaArchivos/SubidaArchivos.jsx";
 import PacientesObservados from "./PacientesObservados/PacientesObservados.jsx";
 import SeguimientoClinico from "./SeguimientoClinico/SeguimientoClinico.jsx";
 import TamizajeDermatologico from "./TamizajeDermatologico/TamizajeDermatologico.jsx";
+import GeneradorReportes from "./GeneradorReportes/GeneradorReportes.jsx";
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
   { key: 7, label: "Test Altura" },
@@ -338,6 +340,7 @@ const TabComponent = () => {
                   { vista: "Pacientes Observados", tab: 44, icons: [{ icon: faMagnifyingGlassPlus }], label: "Pacientes Observados" },
                   { vista: "Seguimiento Clinico", tab: 45, icons: [{ icon: faFileMedical }], label: "Seguimiento Clínico" },
                   { vista: "Tamizaje Dermatologico", tab: 46, icons: [{ icon: faHandDots }], label: "Tamizaje Dermatologico" },
+                  { vista: "Generador de Reportes", tab: 47, icons: [{ icon: faFloppyDisk }], label: "Generador Reportes" },
                   { vista: "Folio", tab: 40, icons: [{ icon: faFileContract }], label: "Folio" },
                 ];
                 return items
@@ -622,6 +625,7 @@ const TabComponent = () => {
               44: { title: "Pacientes Observados", child: <PacientesObservados /> },
               45: { title: "Seguimiento Clinico", child: <SeguimientoClinico /> },
               46: { title: "Tamizaje Dermatológico", child: <TamizajeDermatologico /> },
+              47: { title: "Generador de Reportes", child: <GeneradorReportes /> },
               40: { title: "Folio", child: <Folio /> },
             };
             const section = displayedInterfaces[activeTab];
@@ -683,6 +687,7 @@ const TabComponent = () => {
             "Altura 1.8": { activeTab: 39, subTab: 0 },
             "Folio": { activeTab: 40, subTab: 0 },
             "Plantillas de Correo": { activeTab: 41, subTab: 0 },
+            "Generador de Reportes": { activeTab: 47, subTab: 0 },
           };
 
           const config = navConfig[idx];
