@@ -3,9 +3,22 @@ import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
 import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
-import { GetInfoPac, handleImprimirYSubir, ListaPorPlantilla } from "./controllerGeneradorReportes";
+import { GetInfoPac, handleImprimirYSubir } from "./controllerGeneradorReportes";
 import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
 import BotonesAccion from "../../../../components/templates/BotonesAccion";
+import { buildExamenesList } from "../Folio/folioCatalogo";
+
+const ExamenesListCOMPLETO = buildExamenesList([
+    "RESUMEN_MEDICO_PODEROSA",
+    "TRABAJO_ALTURA_PSICO",
+    "BOMBA_ELECTRICA",
+    "PSICOLOGIA_VIGIA",
+    "TRANSTORNO_PERSONALIDAD_PSICO",
+]);
+
+export const ListaPorPlantilla = {
+    "COMPLETO": ExamenesListCOMPLETO,
+};
 
 export default function GeneradorReportes() {
     const abortControllerRef = useRef(null);
@@ -124,21 +137,17 @@ export default function GeneradorReportes() {
                         return (
                             <div
                                 key={index}
-                                className={`flex flex-col justify-between border p-4 rounded-xl shadow-sm gap-3 transition-all duration-200 ${
-                                    examen.resultado ? "bg-white border-blue-200" : "bg-gray-50 border-gray-200 opacity-75"
-                                }`}
+                                className={`flex flex-col justify-between border p-4 rounded-xl shadow-sm gap-3 transition-all duration-200 ${examen.resultado ? "bg-white border-blue-200" : "bg-gray-50 border-gray-200 opacity-75"
+                                    }`}
                             >
                                 <div className="flex flex-col gap-1">
-                                    <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">
-                                        Examen {index + 1}
-                                    </span>
                                     <span className="font-semibold text-gray-800 text-sm leading-tight">
-                                        {examen.nombre}
+                                        {index + 1}.- {examen.nombre}
                                     </span>
+
                                     <div className="flex items-center gap-2 mt-1">
-                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                                            examen.resultado ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                                        }`}>
+                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${examen.resultado ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                                            }`}>
                                             {examen.resultado ? "REALIZADO" : "PENDIENTE"}
                                         </span>
                                         {examen.esArchivo && (
@@ -150,11 +159,10 @@ export default function GeneradorReportes() {
                                 </div>
 
                                 <button
-                                    className={`w-full py-2 px-4 rounded-lg text-sm font-bold transition-all ${
-                                        examen.resultado 
-                                        ? "bg-blue-600 hover:bg-blue-700 text-white shadow-sm" 
+                                    className={`w-full py-2 px-4 rounded-lg text-sm font-bold transition-all ${examen.resultado
+                                        ? "bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
                                         : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                                    }`}
+                                        }`}
                                     disabled={!examen.resultado}
                                     onClick={() => handleImprimirYSubir(examen, form, token, selectedSede, userlogued, datosFooter, abortControllerRef)}
                                 >

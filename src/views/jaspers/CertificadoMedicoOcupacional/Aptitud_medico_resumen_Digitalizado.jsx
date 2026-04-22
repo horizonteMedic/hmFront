@@ -439,10 +439,11 @@ export default async function Aptitud_medico_resumen_Digitalizado(data = {}, doc
   doc.setFont("helvetica", "normal").setFontSize(7);
   filas.forEach((fila, i) => {
     const cy = yPos + filaH * i + 3.5;
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(fila.label, tablaInicioX + 2, cy);
     if (data[fila.key] === true) dibujarX(i);
   });
-
+  doc.setFont("helvetica", "normal").setFontSize(7);
   // ── Fecha centrada en columna derecha ─────────────────────────
   const centroColumnaDerecha = tablaInicioX + mitadTabla + mitadTabla / 2;
   const centroVerticalTabla = yPos + alturaTotalTabla / 2;
