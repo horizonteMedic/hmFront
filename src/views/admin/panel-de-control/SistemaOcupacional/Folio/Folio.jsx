@@ -246,7 +246,7 @@ const ExamenesListLaboratorio = buildExamenesList([
     "INMUNOLOGIA_THEVENON",
 ]);
 
-const ListaPorPlantilla = {
+export const ListaPorPlantilla = {
     //PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     "COMPLETO": ExamenesListCOMPLETO,

@@ -1,5 +1,3 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBroom, faSave, faPrint } from "@fortawesome/free-solid-svg-icons";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { useForm } from "../../../../hooks/useForm";
 import {
@@ -9,6 +7,13 @@ import {
 } from "./controllerAntecedentesDeAltura";
 import { getToday } from "../../../../utils/helpers";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
+import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
+import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
+import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
+import RadioTable from "../../../../components/reusableComponents/RadioTable";
+import InputsBooleanRadioGroup from "../../../../components/reusableComponents/InputsBooleanRadioGroup";
+import InputTextArea from "../../../../components/reusableComponents/InputTextArea";
+import BotonesAccion from "../../../../components/templates/BotonesAccion";
 
 const tabla = "antece_enfermedades_altura";
 
@@ -20,21 +25,26 @@ export default function AntecedentesDeAltura() {
     codigoAntecedentesAltura: null,
     nombres: "",
     edad: "",
-    fechaNac: "",
+    fechaNacimiento: "",
+    lugarNacimiento: "",
+    estadoCivil: "",
+    nivelEstudios: "",
     fechaExam: today,
-    contrata: "",
     empresa: "",
+    contrata: "",
+    ocupacion: "",
+    cargoDesempenar: "",
+    cargo: "",
     dni: "",
     sexo: "",
-    cargo: "",
     apto: true,
 
     // Información del médico
     dniMedico: userDNI,
     nombreMedico: userName,
     cmp: userCMP,
-    email: userEmail,
-    direccionMedico: userDireccion,
+    email: userEmail.toUpperCase(),
+    direccionMedico: userDireccion.toUpperCase(),
 
     // Antecedentes patológicos - todos en false por defecto
     accidenteCerebrovascular: false,
@@ -77,7 +87,7 @@ export default function AntecedentesDeAltura() {
     form,
     setForm,
     handleChange,
-    handleChangeNumber,
+    handleChangeNumberDecimals,
     handleClear,
     handleChangeSimple,
     handleClearnotO,
@@ -103,475 +113,226 @@ export default function AntecedentesDeAltura() {
   };
 
   return (
-    <div className="w-full p-4 text-[11px]">
-      <h2 className="text-2xl font-bold text-center mb-10">
-        Antecedentes de Enfermedades en Altura
-      </h2>
+    <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+      <SectionFieldset legend="Antecedentes de Enfermedades en Altura" className="grid grid-cols-1 xl:grid-cols-3 gap-x-4 gap-y-3">
+        <InputTextOneLine
+          label="N° Orden"
+          name="norden"
+          value={form?.norden}
+          onChange={handleChangeNumberDecimals}
+          onKeyUp={handleSearch}
+        />
 
-      <div className="w-full">
-        {/* PANEL ÚNICO - FORMULARIO DE DATOS */}
-        <div className="border rounded-3xl shadow-md p-6 w-[90%] mx-auto">
-          {/* SECCIÓN SUPERIOR - FILIACIÓN */}
-          <div className="space-y-4 p-4 rounded-[9px] border">
-            {/* Fila 1: N° Orden, Fecha, DNI, Aptitud, Actividad a Realizar */}
-            <div className="grid grid-cols-4 gap-4">
-              <div className="flex items-center gap-4">
-                <label className="font-semibold text-[11px] min-w-[65px] max-w-[65px]">
-                  N° Orden:
-                </label>
-                <input
-                  className="border rounded px-2 py-1 w-full"
-                  name="norden"
-                  value={form.norden || ""}
-                  onKeyUp={handleSearch}
-                  onChange={handleChangeNumber}
-                />
-              </div>
-              <div className="flex items-center gap-4">
-                <label className="font-semibold text-[11px] min-w-[65px] max-w-[65px]">
-                  Fecha:
-                </label>
-                <input
-                  type="date"
-                  className="border rounded px-2 py-1 w-full"
-                  name="fechaExam"
-                  value={form.fechaExam || ""}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="flex items-center gap-4">
-                <label className="font-semibold text-[11px] min-w-[65px] max-w-[65px]">
-                  DNI:
-                </label>
-                <input
-                  className="border rounded px-2 py-1 w-full"
-                  name="dni"
-                  value={form.dni || ""}
-                  disabled
-                />
-              </div>
-              <div className="flex items-center gap-4">
-                <label className="font-semibold text-[11px] min-w-[65px] max-w-[65px]">
-                  Aptitud:
-                </label>
-                <div className="flex gap-4">
-                  <label className="flex items-center gap-1">
-                    <input
-                      type="checkbox"
-                      name="apto"
-                      checked={form.apto}
-                      onChange={(e) => handleRadioButtonBoolean(e, true)}
-                    />
-                    <span className="text-[11px]">Apto</span>
-                  </label>
-                  <label className="flex items-center gap-1">
-                    <input
-                      type="checkbox"
-                      name="apto"
-                      checked={!form.apto}
-                      onChange={(e) => handleRadioButtonBoolean(e, false)}
-                    />
-                    <span className="text-[11px]">No Apto</span>
-                  </label>
-                </div>
-              </div>
-            </div>
+        <InputTextOneLine
+          label="Fecha"
+          type="date"
+          className="border rounded px-2 py-1 w-full"
+          name="fechaExam"
+          value={form.fechaExam || ""}
+          onChange={handleChange}
+        />
 
-            {/* Fila 2: Nombres, Sexo, Fecha Nac, Edad */}
-            <div className="grid grid-cols-4 gap-4">
-              <div className="flex items-center gap-4 col-span-3">
-                <label className="font-semibold text-[11px] min-w-[65px] max-w-[65px]">
-                  Nombres:
-                </label>
-                <input
-                  className="border rounded px-2 py-1 w-full"
-                  name="nombres"
-                  value={form.nombres || ""}
-                  disabled
-                />
-              </div>
+        <InputsBooleanRadioGroup
+          label="Aptitud: "
+          name="apto"
+          value={form?.apto}
+          onChange={handleRadioButtonBoolean}
+          trueLabel="Apto"
+          falseLabel="No apto"
+        />
 
-              <div className="flex items-center gap-4">
-                <label className="font-semibold text-[11px] min-w-[65px] max-w-[65px]">
-                  Sexo:
-                </label>
-                <input
-                  className="border rounded px-2 py-1 w-full"
-                  name="sexo"
-                  value={form.sexo || ""}
-                  disabled
-                />
-              </div>
-            </div>
+      </SectionFieldset>
 
-            {/* Fila 3: Empresa, Contrata */}
-            <div className="grid grid-cols-4 gap-4">
-              <div className="flex items-center gap-4">
-                <label className="font-semibold text-[11px] min-w-[65px] max-w-[65px]">
-                  Fecha Nacimiento:
-                </label>
-                <input
-                  type="text"
-                  className="border rounded px-2 py-1 w-full"
-                  name="fechaNac"
-                  value={form.fechaNac || ""}
-                  disabled
-                />
-              </div>
-              <div className="flex items-center gap-4">
-                <label className="font-semibold text-[11px] min-w-[65px] max-w-[65px]">
-                  Edad:
-                </label>
-                <input
-                  className="border rounded px-2 py-1 w-full"
-                  name="edad"
-                  value={form.edad || ""}
-                  disabled
-                />
-              </div>
-              <div className="flex items-center gap-4 col-span-2">
-                <label className="font-semibold text-[11px] min-w-[65px] max-w-[65px]">
-                  Actividad:
-                </label>
-                <input
-                  className="border rounded px-2 py-1 w-full"
-                  name="cargo"
-                  value={form.cargo || ""}
-                  disabled
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center gap-4">
-                <label className="font-semibold text-[11px] min-w-[65px] max-w-[65px]">
-                  Empresa:
-                </label>
-                <input
-                  className="border rounded px-2 py-1 w-full"
-                  name="empresa"
-                  value={form.empresa || ""}
-                  disabled
-                />
-              </div>
-              <div className="flex items-center gap-4">
-                <label className="font-semibold text-[11px] min-w-[65px] max-w-[65px]">
-                  Contrata:
-                </label>
-                <input
-                  className="border rounded px-2 py-1 w-full"
-                  name="contrata"
-                  value={form.contrata || ""}
-                  disabled
-                />
-              </div>
-            </div>
-          </div>
+      <DatosPersonalesLaborales form={form} />
 
-          {/* SECCIÓN MÉDICO */}
-          <div className="space-y-3  rounded-[9px] border p-4 mt-3 bg-white">
-            <h3 className="font-bold text-lg text-blue-900">Médico</h3>
+      <SectionFieldset legend="Médico" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
+        <InputTextOneLine
+          label="Nombres"
+          name="nombreMedico"
+          value={form?.nombreMedico}
+          disabled
+        />
+        <InputTextOneLine
+          label="CMP"
+          name="cmp"
+          value={form.cmp || ""}
+          disabled
+        />
+        <InputTextOneLine
+          label="Email"
+          name="email"
+          value={form?.email}
+          onChange={handleChangeSimple}
+          disabled
+        />
+        <InputTextOneLine
+          label="Dirección"
+          name="direccionMedico"
+          value={form.direccionMedico || ""}
+          disabled
+        />
+      </SectionFieldset>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center gap-4">
-                <label className="font-semibold text-[11px] min-w-[65px] max-w-[65px]">
-                  Nombres:
-                </label>
-                <input
-                  className="border rounded px-2 py-1 w-full capitalize"
-                  name="nombreMedico"
-                  value={form.nombreMedico || ""}
-                  disabled
-                />
-              </div>
-              <div className="flex items-center gap-4">
-                <label className="font-semibold text-[11px] min-w-[65px] max-w-[65px]">
-                  CMP:
-                </label>
-                <input
-                  className="border rounded px-2 py-1 w-full"
-                  name="cmp"
-                  value={form.cmp || ""}
-                  disabled
-                />
-              </div>
-            </div>
+      <SectionFieldset legend="Antecedentes patológicos">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center gap-4">
-                <label className="font-semibold text-[11px] min-w-[65px] max-w-[65px]">
-                  Email:
-                </label>
-                <input
-                  className="border rounded px-2 py-1 w-full"
-                  name="email"
-                  value={form.email || ""}
-                  disabled
-                />
-              </div>
-              <div className="flex items-center gap-4">
-                <label className="font-semibold text-[11px] min-w-[65px] max-w-[65px]">
-                  Dirección:
-                </label>
-                <input
-                  className="border rounded px-2 py-1 w-full"
-                  name="direccionMedico"
-                  value={form.direccionMedico || ""}
-                  disabled
-                />
-              </div>
-            </div>
-          </div>
+          <RadioTable className="grid grid-cols-1 md:grid-cols-2"
+            items={[
+              {
+                name: "accidenteCerebrovascular",
+                label: "Accidente cerebrovascular"
+              },
+              {
+                name: "anginaInestable",
+                label: "Angina inestable"
+              },
+              {
+                name: "antecedenteBypass",
+                label:
+                  "Antecedente de Bypass arterial coronario/Angioplastia/Stent",
+              },
+              {
+                name: "antecedenteEdemaCerebral",
+                label: "Antecedente de edema cerebral de altura",
+              },
+              {
+                name: "antecedenteEdemaPulmonar",
+                label: "Antecendente de edema pulmonar de altura",
+              },
+              {
+                name: "antecedenteNeumotorax",
+                label: "Antecedente de Neumotórax en los ultimos 6 meses",
+              },
+              {
+                name: "arritmiaCardiaca",
+                label: "Arritmia cardiaca no controlada",
+              },
+              {
+                name: "cardiomiopatiaHipertrofica",
+                label: "Cardiomiopatía hipertrófica idiopática",
+              },
+              {
+                name: "cirugiaMayor",
+                label: "Cirugía mayor en los últimos 30 días",
+              },
+              {
+                name: "insuficienciaValvulaAortica",
+                label: "Cualquier insuficiencia en la válvula aórtica",
+              },
+              {
+                name: "diabetesMellitus",
+                label: "Diabetes Mellitus"
+              },
+              {
+                name: "embarazo",
+                label: "Embarazo"
+              },
+              {
+                name: "epilepsia",
+                label: "Epilepsia"
+              },
+            ]}
+            options={[
+              { value: true, label: "SI" },
+              { value: false, label: "NO" }
+            ]}
+            labelColumns={6}
+            form={form}
+            handleRadioButton={handleRadioButtonBoolean}
+          />
 
-          {/* ANTECEDENTES PATOLÓGICOS */}
-          <div className="space-y-3 rounded-[9px] border p-4 mt-3 bg-white">
-            <h3 className="font-bold text-lg text-blue-900 mb-3">
-              ANTECEDENTES PATOLÓGICOS
-            </h3>
+          <RadioTable className="grid grid-cols-1 md:grid-cols-2"
+            items={[
+              {
+                name: "epoc",
+                label: "EPOC - Enfermedad pulmonar obstructiva crónica confirmada",
+              },
+              {
+                name: "eritrocitosisExcesiva",
+                label: "Eritrocitosis excesiva (mal de montaña crónico)",
+              },
+              {
+                name: "hipertensionArterial",
+                label: "Hipertensión arterial",
+              },
+              {
+                name: "hipertensionPulmonar",
+                label: "Hipertensión pulmonar",
+              },
+              {
+                name: "infartoMiocardio",
+                label: "Infarto al miocardio en los últimos 6 meses",
+              },
+              {
+                name: "insuficienciaCardiaca",
+                label: "Insuficiencia cardíaca congestiva",
+              },
+              {
+                name: "patologiaHemorragicaRetina",
+                label: "Patología hemorrágica de retina",
+              },
+              {
+                name: "patologiaValvularCardiaca",
+                label: "Patología Valvular Cardíaca en tratamiento (ICC)",
+              },
+              {
+                name: "presenciaMarcapasos",
+                label: "Presencia de marcapasos",
+              },
+              {
+                name: "riesgoCardiovascularAlto",
+                label: "Presencia de riesgo cardiovascular alto",
+              },
+              {
+                name: "trastornosCoagulacion",
+                label: "Trastornos de la coagulación",
+              },
+              {
+                name: "trombosisVenosaCerebral",
+                label: "Trombosis venosa cerebral",
+              },
+              {
+                name: "otros",
+                label: "Otros"
+              },
 
-            {/* Dos columnas de antecedentes */}
-            <div className="grid grid-cols-2 gap-8">
-              {/* Columna 1 */}
-              <div className="space-y-3">
-                {[
-                  {
-                    key: "accidenteCerebrovascular",
-                    label: "Accidente cerebrovascular",
-                  },
-                  { key: "anginaInestable", label: "Angina inestable" },
-                  {
-                    key: "antecedenteBypass",
-                    label:
-                      "Antecedente de Bypass arterial coronario/Angioplastia/Stent",
-                  },
-                  {
-                    key: "antecedenteEdemaCerebral",
-                    label: "Antecedente de edema cerebral de altura",
-                  },
-                  {
-                    key: "antecedenteEdemaPulmonar",
-                    label: "Antecendente de edema pulmonar de altura",
-                  },
-                  {
-                    key: "antecedenteNeumotorax",
-                    label: "Antecedente de Neumotórax en los ultimos 6 meses",
-                  },
-                  {
-                    key: "arritmiaCardiaca",
-                    label: "Arritmia cardiaca no controlada",
-                  },
-                  {
-                    key: "cardiomiopatiaHipertrofica",
-                    label: "Cardiomiopatía hipertrófica idiopática",
-                  },
-                  {
-                    key: "cirugiaMayor",
-                    label: "Cirugía mayor en los últimos 30 días",
-                  },
-                  {
-                    key: "insuficienciaValvulaAortica",
-                    label: "Cualquier insuficiencia en la válvula aórtica",
-                  },
-                  { key: "diabetesMellitus", label: "Diabetes Mellitus" },
-                  { key: "embarazo", label: "Embarazo" },
-                  { key: "epilepsia", label: "Epilepsia" },
-                ].map((item) => (
-                  <div
-                    key={item.key}
-                    className="flex items-center justify-between border-b border-gray-200 pb-2"
-                  >
-                    <span className="text=[11px] flex-1">{item.label}</span>
-                    <div className="flex gap-6 ml-4">
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          name={item.key}
-                          checked={form[item.key] === false}
-                          onChange={(e) => handleRadioButtonBoolean(e, false)}
-                        />
-                        <span className="text-[11px]">NO</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          name={item.key}
-                          checked={form[item.key] === true}
-                          onChange={(e) => handleRadioButtonBoolean(e, true)}
-                        />
-                        <span className="text-[11px]">SI</span>
-                      </label>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Columna 2 */}
-              <div className="space-y-3">
-                {[
-                  {
-                    key: "epoc",
-                    label:
-                      "EPOC - Enfermedad pulmonar obstructiva crónica confirmada",
-                  },
-                  {
-                    key: "eritrocitosisExcesiva",
-                    label: "Eritrocitosis excesiva (mal de montaña crónico)",
-                  },
-                  {
-                    key: "hipertensionArterial",
-                    label: "Hipertensión arterial",
-                  },
-                  {
-                    key: "hipertensionPulmonar",
-                    label: "Hipertensión pulmonar",
-                  },
-                  {
-                    key: "infartoMiocardio",
-                    label: "Infarto al miocardio en los últimos 6 meses",
-                  },
-                  {
-                    key: "insuficienciaCardiaca",
-                    label: "Insuficiencia cardíaca congestiva",
-                  },
-                  {
-                    key: "patologiaHemorragicaRetina",
-                    label: "Patología hemorrágica de retina",
-                  },
-                  {
-                    key: "patologiaValvularCardiaca",
-                    label: "Patología Valvular Cardíaca en tratamiento (ICC)",
-                  },
-                  {
-                    key: "presenciaMarcapasos",
-                    label: "Presencia de marcapasos",
-                  },
-                  {
-                    key: "riesgoCardiovascularAlto",
-                    label: "Presencia de riesgo cardiovascular alto",
-                  },
-                  {
-                    key: "trastornosCoagulacion",
-                    label: "Trastornos de la coagulación",
-                  },
-                  {
-                    key: "trombosisVenosaCerebral",
-                    label: "Trombosis venosa cerebral",
-                  },
-                  { key: "otros", label: "Otros" },
-                ].map((item) => (
-                  <div
-                    key={item.key}
-                    className="flex items-center justify-between border-b border-gray-200 pb-2"
-                  >
-                    <span className="text=[11px]  flex-1">{item.label}</span>
-                    <div className="flex gap-6 ml-4">
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          name={item.key}
-                          checked={form[item.key] === false}
-                          onChange={(e) => {
-                            handleRadioButtonBoolean(e, false);
-                            if (item.key === "otros") {
-                              setForm((prev) => ({
-                                ...prev,
-                                otrosDescripcion: "",
-                              }));
-                            }
-                          }}
-                        />
-                        <span className="text-[11px]">NO</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          name={item.key}
-                          checked={form[item.key] === true}
-                          onChange={(e) => handleRadioButtonBoolean(e, true)}
-                        />
-                        <span className="text-[11px]">SI</span>
-                      </label>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Campo de descripción para "Otros" */}
-            {form.otros && (
-              <div className="mt-3">
-                <label className="font-semibold block mb-2">
-                  Especificar otros:
-                </label>
-                <input
-                  className="border rounded px-3 py-2 w-full"
-                  name="otrosDescripcion"
-                  value={form.otrosDescripcion}
-                  onChange={handleChange}
-                  placeholder="Describa otros antecedentes..."
-                />
-              </div>
-            )}
-
-            {/* Comentarios del médico */}
-            <div className="mt-5">
-              <label className="font-semibold block mb-2">
-                Comentarios del medico Evaluador/Observaciones:
-              </label>
-              <textarea
-                className="border rounded px-3 py-2 w-full h-24 resize-none"
-                name="comentarios"
-                value={form.comentarios}
-                onChange={handleChange}
-                placeholder="Comentarios y observaciones del médico evaluador..."
-              />
-            </div>
-            <EmpleadoComboBox
-              value={form.nombre_medico}
-              form={form}
-              onChange={handleChangeSimple}
-            />
-          </div>
-
-
-          {/* BOTONES DE ACCIÓN */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 px-4 pt-4">
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={handleSave}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faSave} /> Agregar/Actualizar
-              </button>
-              <button
-                type="button"
-                onClick={handleClear}
-                className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faBroom} /> Limpiar
-              </button>
-            </div>
-            <div className="flex flex-col items-end">
-              <span className="font-bold italic text-base mb-1">Imprimir</span>
-              <div className="flex items-center gap-2">
-                <input
-                  name="norden"
-                  value={form.norden}
-                  onChange={handleChange}
-                  className="border rounded px-2 py-1 text-base w-24"
-                />
-                <button
-                  type="button"
-                  onClick={handlePrint}
-                  className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                >
-                  <FontAwesomeIcon icon={faPrint} />
-                </button>
-              </div>
-            </div>
-          </div>
+            ]}
+            options={[
+              { value: true, label: "SI" },
+              { value: false, label: "NO" }
+            ]}
+            labelColumns={6}
+            form={form}
+            handleRadioButton={handleRadioButtonBoolean}
+          />
         </div>
-      </div>
+      </SectionFieldset>
+
+      <SectionFieldset legend="Comentarios">
+        <InputTextArea
+          name="comentarios"
+          value={form.comentarios}
+          onChange={handleChange}
+          rows={4}
+        />
+      </SectionFieldset>
+
+      <SectionFieldset legend="Asignación de médico">
+        <EmpleadoComboBox
+          value={form.nombre_medico}
+          form={form}
+          onChange={handleChangeSimple}
+        />
+      </SectionFieldset>
+
+      <BotonesAccion
+        form={form}
+        handleSave={handleSave}
+        handleClear={handleClear}
+        handlePrint={handlePrint}
+        handleChangeNumberDecimals={handleChangeNumberDecimals}
+      />
+
     </div>
   );
 }

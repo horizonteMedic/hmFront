@@ -445,9 +445,11 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         );
         imprimirBytes(archivoProcesado, nombreArchivo);
         // descargarBlob(archivoProcesado, nombreArchivo);
+        return archivoProcesado; // Retornar el blob procesado
     } else {
         const rasterizedBytes = await rasterizeAndCompressPdf(baseBytes);
         imprimirBytes(rasterizedBytes, nombreArchivo);
+        return rasterizedBytes; // Retornar los bytes rasterizados
     }
 }
 
