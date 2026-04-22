@@ -10,6 +10,7 @@ import { getDatePlus364Days, getToday } from "../../../../../utils/helpers";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
+import BotonesAccion from "../../../../../components/templates/BotonesAccion";
 
 const tabla = "certificado_aptitud_cuadrador"
 
@@ -173,48 +174,19 @@ export default function CuadradorVigia() {
                         value={form?.observaciones}
                         onChange={handleChange}
                         classNameLabel="text-blue-600"
-                        rows={17}
+                        rows={14}
                         name="observaciones"
                     />
                 </SectionFieldset>
             </div>
 
-            <div className="w-full flex justify-between items-center gap-1 mt-4">
-                <div className="flex gap-1">
-                    <button
-                        type="button"
-                        onClick={handleSave}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                    >
-                        <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-                    </button>
-                    <button
-                        type="button"
-                        onClick={handleClear}
-                        className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                    >
-                        <FontAwesomeIcon icon={faBroom} /> Limpiar
-                    </button>
-                </div>
-                <div className="flex gap-1 items-center">
-                    <span className="font-bold italic text-base mb-1 mx-4">Imprimir</span>
-                    <input
-                        name="norden"
-                        value={form?.norden}
-                        onChange={handleChangeNumber}
-                        className="border rounded px-2 py-1 text-base w-24"
-                    />
-
-                    <button
-                        type="button"
-                        onClick={handlePrint}
-                        className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                    >
-                        <FontAwesomeIcon icon={faPrint} />
-                    </button>
-                </div>
-            </div>
-
+            <BotonesAccion
+                form={form}
+                handleSave={handleSave}
+                handleClear={handleClear}
+                handlePrint={handlePrint}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+            />
 
         </div>
     )
