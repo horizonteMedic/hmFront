@@ -172,7 +172,7 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
     transporteAereo: data.transporteAereoSi === true ? "SI" :
       data.transporteAereoNo === true ? "NO" : "",
 
-    aptitudPoderosa: data.aptitudPoderosaSi ? "APTO" : data.aptitudPoderosaNo ? "NO APTO" : ""
+    aptitudPoderosa: data.aptitudPoderosaSi ? "APTO" : data.aptitudPoderosaNo ? "NO APTO" : null
   };
 
   const drawRectWithCenteredText = ({
@@ -1516,7 +1516,9 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Pre Evaluación:", tablaInicioX, yPos + 3.5);
 
-  doc.text(`Aptitud Altura 1.8 mt: ${datosFinales.aptitudPoderosa}`, tablaInicioX + 77, yPos + 3.5);
+  if (datosFinales.aptitudPoderosa) {
+    doc.text(`Aptitud Altura 1.8 mt: ${datosFinales.aptitudPoderosa}`, tablaInicioX + 77, yPos + 3.5);
+  }
 
   yPos += filaAltura;
   //SELO
@@ -1564,29 +1566,44 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   }
 
   // === Imagen central (APTO / NO APTO) ===
-  let imgEstado = null;
+  let imgEstadoPsicologia = null;
+  let imgEstadoAnexo = null;
 
+  // --- PSICOLOGIA ---
+  if (data.aptitudInformePsicologico === true) {
+    imgEstadoPsicologia = "/img/DatosPacientes/APTO.png";
+  } else if (data.aptitudInformePsicologico === false) {
+    imgEstadoPsicologia = "/img/DatosPacientes/NOAPTO.png";
+  }
+  // si es null -> se queda en null (no se dibuja)
+
+  // --- ANEXO (CENTRO MEDICO) ---
   if (data.apto || data.aptoRestriccion) {
-    imgEstado = "/img/DatosPacientes/APTO.png";
+    imgEstadoAnexo = "/img/DatosPacientes/APTO.png";
   } else if (data.noApto) {
-    imgEstado = "/img/DatosPacientes/NOAPTO.png";
+    imgEstadoAnexo = "/img/DatosPacientes/NOAPTO.png";
   }
 
-  if (imgEstado) {
-    const imgSize = cuadroAncho - 15; // mismo tamaño que referencia
-    const separacion = 6;
+  // === CONFIGURACION GRAFICA ===
+  const imgSize = cuadroAncho - 15;
+  const separacion = 6;
 
-    // === IZQUIERDA de PSICOLOGIA ===
-    const imgXLeft = xInicioCuadros - separacion - imgSize;
-    const imgYLeft = yPos + (cuadroAlto - imgSize) / 2;
+  // === IZQUIERDA (PSICOLOGIA) ===
+  const imgXLeft = xInicioCuadros - separacion - imgSize;
+  const imgYLeft = yPos + (cuadroAlto - imgSize) / 2;
 
-    doc.addImage(imgEstado, "PNG", imgXLeft, imgYLeft, imgSize, imgSize);
+  // Solo dibuja si NO es null
+  if (imgEstadoPsicologia) {
+    doc.addImage(imgEstadoPsicologia, "PNG", imgXLeft, imgYLeft, imgSize, imgSize);
+  }
 
-    // === DERECHA de CENTRO MEDICO ===
-    const imgXRight = xCentroMedico + cuadroAncho + separacion;
-    const imgYRight = yPos + (cuadroAlto - imgSize) / 2;
+  // === DERECHA (CENTRO MEDICO) ===
+  const imgXRight = xCentroMedico + cuadroAncho + separacion;
+  const imgYRight = yPos + (cuadroAlto - imgSize) / 2;
 
-    doc.addImage(imgEstado, "PNG", imgXRight, imgYRight, imgSize, imgSize);
+  // Solo dibuja si NO es null
+  if (imgEstadoAnexo) {
+    doc.addImage(imgEstadoAnexo, "PNG", imgXRight, imgYRight, imgSize, imgSize);
   }
 
   // Grupo Sanguíneo (alineado con Pre Evaluación)
