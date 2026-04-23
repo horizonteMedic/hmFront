@@ -34,7 +34,6 @@ export default function AntecedentesDeAltura() {
     contrata: "",
     ocupacion: "",
     cargoDesempenar: "",
-    cargo: "",
     dni: "",
     sexo: "",
     apto: true,
@@ -126,10 +125,9 @@ export default function AntecedentesDeAltura() {
         <InputTextOneLine
           label="Fecha"
           type="date"
-          className="border rounded px-2 py-1 w-full"
           name="fechaExam"
           value={form.fechaExam || ""}
-          onChange={handleChange}
+          onChange={handleChangeSimple}
         />
 
         <InputsBooleanRadioGroup
@@ -151,12 +149,14 @@ export default function AntecedentesDeAltura() {
           name="nombreMedico"
           value={form?.nombreMedico}
           disabled
+          labelWidth="120px"
         />
         <InputTextOneLine
           label="CMP"
           name="cmp"
           value={form.cmp || ""}
           disabled
+          labelWidth="120px"
         />
         <InputTextOneLine
           label="Email"
@@ -164,12 +164,14 @@ export default function AntecedentesDeAltura() {
           value={form?.email}
           onChange={handleChangeSimple}
           disabled
+          labelWidth="120px"
         />
         <InputTextOneLine
           label="Dirección"
           name="direccionMedico"
           value={form.direccionMedico || ""}
           disabled
+          labelWidth="120px"
         />
       </SectionFieldset>
 
