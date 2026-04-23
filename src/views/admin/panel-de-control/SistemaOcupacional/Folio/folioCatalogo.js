@@ -232,7 +232,7 @@ export const EXAMENES_CATALOGO = {
     //     urlJsreport: "/api/v01/ct/etanolSaliva/descargarReporte",
     //     esJsreport: true,
     // },
-    
+
     ETANOL_EN_SALIVA_JSREPORT: {
         nombre: "ETANOL EN SALIVA",
         tabla: "etanol_saliva",
@@ -907,6 +907,13 @@ export const EXAMENES_CATALOGO = {
         nombre: "CALIDAD DE SUEÑO",
         tabla: "calidad_sueño",
         url: "/api/v01/ct/cuestionarioCalidadSueno/obtenerReporteCalidadSueno",
+        esJasper: true,
+    },
+
+    TAMIZAJE_DERMATOLOGICO: {
+        nombre: "TAMIZAJE DERMATOLOGICO",
+        tabla: "tamizaje_dermatologico",
+        url: "/api/v01/ct/tamizajeDermatologico/obtenerReporte",
         esJasper: true,
     },
 };
