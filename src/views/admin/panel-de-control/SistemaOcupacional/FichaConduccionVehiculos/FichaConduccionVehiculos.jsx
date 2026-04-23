@@ -143,12 +143,11 @@ export default function FichaConduccionVehiculos() {
         corregirAgudezaLectura: false,
 
         // Médico que Certifica //BUSCADOR
-        nombre_medico: userName,
-        user_medicoFirma: userlogued,
+        nombre_medico: "",
+        user_medicoFirma: "",
 
-        nombre_doctorAsignado: "",
-        user_doctorAsignado: "",
-
+        nombre_doctorAsignado: userName,
+        user_doctorAsignado: userlogued,
 
         SubirDoc: false,
         nomenclatura: "PSICOSENSOMETRICO VEHI-FOLIO"
