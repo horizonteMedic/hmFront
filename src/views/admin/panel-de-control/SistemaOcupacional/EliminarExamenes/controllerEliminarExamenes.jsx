@@ -128,7 +128,7 @@ const urlsEliminar = {
     audiometria_2023: "manipuladores/audiometria-2023",
     //Poderosa
     CertAlturaPoderosa: "certificadoTrabajoAltura/poderosa",
-    CertAptitudPoderosa: "aptitudCertificadoCaliente/aptitud-certificado-caliente",
+    CertAptitudPoderosa: "aptitudAltura/aptitud-altura-poderosa",
     AptitudLicencia: "aptitudLicenciaConducir/aptitud-licencia-conducir",
     HojaConsultaEx: "hojaConsultaExterna/hoja-consulta-externa",
     CertManpAlimentos: "certificadoManipuladoresAlimentos",
