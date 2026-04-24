@@ -64,7 +64,7 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
                     resultado: match ? match.existe : false,
                     imprimir: match ? match.existe : false,
                 };
-            });
+            });    
         }
 
         // 🔹 Procesar INTERCONSULTAS
