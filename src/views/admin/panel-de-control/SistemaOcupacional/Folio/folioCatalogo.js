@@ -909,6 +909,20 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/cuestionarioCalidadSueno/obtenerReporteCalidadSueno",
         esJasper: true,
     },
+
+    CUADRADOR_VIGIA: {
+        nombre: "CUADRADOR VIGIA",
+        tabla: "certificado_aptitud_cuadrador",
+        url: "/api/v01/ct/certificadoAptitudCuadrador/obtenerReporte",
+        esJasper: true,
+    },
+
+    FICHA_DATOS_PACIENTE: {
+        nombre: "FICHA DATOS PACIENTE",
+        tabla: "ficha_datos_paciente",
+        url: "/api/v01/ct/fichaDatosPersonales/obtenerReporteFichaDatosPersonales",
+        esJasper: true,
+    },
 };
 
 
