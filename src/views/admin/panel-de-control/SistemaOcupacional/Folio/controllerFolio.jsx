@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 import {
-    GetInfoPacDefault,
+    GetInfoPacDefault,  
     LoadingDefault,
     PrintHojaRDefault,
     PrintHojaRJsReportDefault,
