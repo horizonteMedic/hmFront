@@ -41,6 +41,7 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "RESUMEN_MEDICO_PODEROSA",                 // 1
     "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",    // 2
     "CERTIFICADO_APTITUD_ANEXO_16",  // 3
+    "TAMIZAJE_DERMATOLOGICO",
     "ANEXO_16",                      // 4
     "CERTIFICADO_ANEXO_02",
     "ANEXO_02",
@@ -773,7 +774,7 @@ const Folio = () => {
                             disabled={(form.listaExamenes?.filter(e => e.imprimir).length || 0) == 0}
                         >
                             Generar Folio Comprimido
-                        </button> 
+                        </button>
                     </div>
 
                     <div className="flex  justify-center md:justify-end  items-center w-full gap-4">

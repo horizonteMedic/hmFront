@@ -116,6 +116,7 @@ import COLINESTERASA from "../AnalisisBioquimicos/COLINESTERASA";
 import ETANOLSALIVA from "../Toxicologia/ETANOLSALIVA";
 import CertificadoAptitudCuadrador_Digitalizado from "../Poderosa/CertificadoAptitudCuadrador";
 import Informe_Ocu_DatosPacientes from "../FichaDatosPersonales/Informe_Ocu_DatosPacientes";
+import TamizajeDermatologico from "../TamizajeDermatologico/TamizajeDermatologico";
 
 export const reportesMap = {
    /* =========================
@@ -129,6 +130,8 @@ export const reportesMap = {
       Anexo16A_Digitalizado,
       Anexo16ABoro_Digitalizado
    },
+
+   tamizaje_dermatologico: TamizajeDermatologico,
 
    antecedentes_patologicos: {
       ficha_antecedente_patologico_Digitalizado,

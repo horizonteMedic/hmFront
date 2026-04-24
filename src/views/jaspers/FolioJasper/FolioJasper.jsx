@@ -53,6 +53,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "colinesterasa",
         "certificado_aptitud_cuadrador",
         "ficha_datos_paciente",
+        "tamizaje_dermatologico",
     ]
     const coordenadasPSICOSENSO = {
         HUELLA: { x: 400, y: 680, width: 60, height: 60 },
