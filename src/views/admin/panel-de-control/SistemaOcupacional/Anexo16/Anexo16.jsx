@@ -324,6 +324,7 @@ export default function Anexo16() {
     //Laboratorio
     mercurioOrina: "N/A",
     plomoSangre: "N/A",
+    pcr_ultrasensible: "",
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,

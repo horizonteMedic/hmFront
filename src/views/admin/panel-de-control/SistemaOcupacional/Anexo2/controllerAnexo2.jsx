@@ -118,6 +118,8 @@ export const SubmitDataService = async (
     medico: form.nombre_medico,
     usuarioFirma: form.user_medicoFirma,
     userRegistro: user,
+    mercurioOrina: form.mercurioOrina,
+    plomoSangre: form.plomoSangre,
     accidentes: form.dataEnfermedades.map((item) => ({
       ...item,
       codigoAnexo: null,
@@ -919,9 +921,49 @@ export const GetInfoServicio = (
               data.observacionesGenerales += "HTA NO CONTROLADA.\n";
             }
           }
+          data.resultadoGonadotropina = res.sexo_sexo_pa === "M" ? "N/A" : res.resultadoGonadotropina
+
 
           data.notasDoctor = res.notasDoctor ?? "";
-          console.log("DATAAA", data);
+          data.mercurioOrina = res.mercurioOrina ?? "N/A",
+            data.plomoSangre = res.plomoSangre ?? "N/A",
+
+            data.leucocitosHematologia = res.leucocitosHematologia ?? "",
+            data.hematiesHematologia = res.hematiesHematologia ?? "",
+            data.plaquetasHematologia = res.plaquetasHematologia ?? "",
+            data.neutrofilosHematologia = res.neutrofilosHematologia ?? "",
+            data.abastonadosHematologia = res.abastonadosHematologia ?? "",
+            data.segmentadosHematologia = res.segmentadosHematologia ?? "",
+            data.monocitosHematologia = res.monocitosHematologia ?? "",
+            data.eosinofilosHematologia = res.eosinofilosHematologia ?? "",
+            data.basofilosHematologia = res.basofilosHematologia ?? "",
+            data.linfocitosHematologia = res.linfocitosHematologia ?? "",
+            data.vihHematologia = res.vihHematologia ?? "",
+
+            data.colesterolAnalisisBioquimico_txtcolesterol = res.colesterolAnalisisBioquimico_txtcolesterol ?? "",
+            data.ldlcolesterolAnalisisBioquimico_txtldlcolesterol = res.ldlcolesterolAnalisisBioquimico_txtldlcolesterol ?? "",
+            data.hdlcolesterolAnalisisBioquimico_txthdlcolesterol = res.hdlcolesterolAnalisisBioquimico_txthdlcolesterol ?? "",
+            data.vldlcolesterolAnalisisBioquimico_txtvldlcolesterol = res.vldlcolesterolAnalisisBioquimico_txtvldlcolesterol ?? "",
+            data.trigliseridosAnalisisBioquimico_txttrigliseridos = res.trigliseridosAnalisisBioquimico_txttrigliseridos ?? "",
+
+            data.creatininaPerfilRenal = res.creatininaPerfilRenal ?? "",
+            data.ureaSericaPerfilRenal = res.ureaSericaPerfilRenal ?? "",
+            data.acidoUricoSericoPerfilRenal = res.acidoUricoSericoPerfilRenal ?? "",
+
+            data.fosfatasaAlcalinaPerfilHepatico = res.fosfatasaAlcalinaPerfilHepatico ?? "",
+            data.bilirrubinaDirectaPerfilHepatico = res.bilirrubinaDirectaPerfilHepatico ?? "",
+            data.ggtPerfilHepatico = res.ggtPerfilHepatico ?? "",
+            data.bilirrubinaIndirectaPerfilHepatico = res.bilirrubinaIndirectaPerfilHepatico ?? "",
+            data.tgpPerfilHepatico = res.tgpPerfilHepatico ?? "",
+            data.proteinaTotalesPerfilHepatico = res.proteinaTotalesPerfilHepatico ?? "",
+            data.tgoPerfilHepatico = res.tgoPerfilHepatico ?? "",
+            data.albuminaPerfilHepatico = res.albuminaPerfilHepatico ?? "",
+            data.bilirrubinaTotalPerfilHepatico = res.bilirrubinaTotalPerfilHepatico ?? "",
+            data.globulinaSericaPerfilHepatico = res.globulinaSericaPerfilHepatico ?? "",
+
+            data.rprHematologia = res.rprHematologia ?? "",
+            data.pcrUltrasensible = res.pcrUltrasensible ?? "",
+            console.log("DATAAA", data);
           set((prev) => ({ ...prev, ...data }));
         }
       } else {
@@ -950,6 +992,7 @@ export const GetInfoServicioEditar = (
         if (res) {
           let data = {
             norden: res.norden_n_orden,
+
             codigoAnexo: res.codigoAnexo_cod_anexo,
             otrosExamenes: res.otrosExamenes_txtotrosex ?? "",
             otrosExamenes2: "",
@@ -1592,8 +1635,10 @@ export const GetInfoServicioEditar = (
           // Marcar "ninguno" si restricciones es "NINGUNO" o está vacío
           data.ninguno = restriccionesTexto === "NINGUNO" || restriccionesTexto === "";
           data.notasDoctor = res.notasDoctor ?? "";
-          console.log("DATA EDITAR", data);
-          set((prev) => ({ ...prev, ...data, ...res }));
+          data.mercurioOrina = res.mercurioOrina ?? "N/A",
+            data.plomoSangre = res.plomoSangre ?? "N/A",
+            console.log("DATA EDITAR", data);
+          set((prev) => ({ ...prev, ...res, ...data, }));
         }
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");

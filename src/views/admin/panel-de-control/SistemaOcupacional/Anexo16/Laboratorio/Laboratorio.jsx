@@ -291,6 +291,16 @@ export default function Laboratorio({
                                 labelWidth="100px"
                             />
                         </div>
+                        <div className="space-y-3">
+                            <InputTextOneLine
+                                label="PCR"
+                                name="pcr_ultrasensible"
+                                onChange={handleChange}
+                                disabled
+                                value={form.pcr_ultrasensible}
+                                labelWidth="100px"
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -315,6 +325,7 @@ export default function Laboratorio({
                                 labelWidth="100px"
                             />
                         </div>
+
                     </div>
                 </div>
             </div>
