@@ -114,6 +114,8 @@ import Certificado_Aptitud_Herramientas_Manuales_Digitalizado from "../Poderosa/
 import PCRULTRASENSIBLE from "../AnalisisBioquimicos/PCRULTRASENSIBLE";
 import COLINESTERASA from "../AnalisisBioquimicos/COLINESTERASA";
 import ETANOLSALIVA from "../Toxicologia/ETANOLSALIVA";
+import CertificadoAptitudCuadrador_Digitalizado from "../Poderosa/CertificadoAptitudCuadrador";
+import Informe_Ocu_DatosPacientes from "../FichaDatosPersonales/Informe_Ocu_DatosPacientes";
 import TamizajeDermatologico from "../TamizajeDermatologico/TamizajeDermatologico";
 
 export const reportesMap = {
@@ -378,6 +380,10 @@ export const reportesMap = {
 
    certificacion_medica_altura: A_CertificacionMedicaPTA_Digitalizado,
 
-   calidad_sueño: CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado
+   calidad_sueño: CUESTIONARIO_CALIDAD_DE_SUEÑO_Digitalizado,
+
+   certificado_aptitud_cuadrador: CertificadoAptitudCuadrador_Digitalizado,
+
+   ficha_datos_paciente: Informe_Ocu_DatosPacientes,
 
 };

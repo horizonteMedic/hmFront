@@ -50,6 +50,7 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "ANEXO_16A",
     "PSICOSENSOMETRICO_CERT_ALTURA_PODEROSA", //Gr nuevo
     "CERTIFICADO_ALTURA_PODEROSA", //Gr nuevo
+    "CUADRADOR_VIGIA",
     "HOJA_DE_CONSULTA_EXTERNA", //Gr nuevo
     "LICENCIA_CONDUCIR_PODEROSA", //Gr nuevo
     "APTITUD_HERRAMIENTAS_MANUALES", //Gr nuevo
@@ -172,7 +173,8 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "DECLARACION_USO_FIRMA_ARCHIVO",           // 36
     "RESONANCIA_MAGNETICA_ARCHIVO",
     "PRUEBA_DE_ESFUERZO_ARCHIVO",
-    "INTERCONSULTAS"                         // 22 nuevo
+    "FICHA_DATOS_PACIENTE",
+    "INTERCONSULTAS",
 ]);
 
 const ExamenesListPsicologia = buildExamenesList([

@@ -6,10 +6,10 @@ import drawColorBox from '../components/ColorBox.jsx';
 import autoTable from "jspdf-autotable";
 import { getSign } from "../../utils/helpers.js";
 
-export default async function Informe_Ocu_DatosPacientes(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-  const pageW = doc.internal.pageSize.getWidth();
-  console.log("ssa")
+export default async function Informe_Ocu_DatosPacientes(data = {}, docExistente = null) {
+   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+   const pageW = doc.internal.pageSize.getWidth();
+ 
   // Datos de prueba si no hay data
   const datosPrueba = {
     empresa: "MINERA PODEROSA S.A.",
@@ -611,7 +611,7 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
     labelWidth: 18, // ajusta según tu texto "EMPRESA :"
     width: 30,
     height: 5,
-    text: datosFinales.estatura
+    text: datosFinales.estatura+" mts"
   });
 
   doc.text("Peso:", tablaInicioX + 160, yPos + 14);
@@ -622,7 +622,7 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
     labelWidth: 18, // ajusta según tu texto "EMPRESA :"
     width: 30,
     height: 5,
-    text: datosFinales.peso
+    text: datosFinales.peso+" kg"
   });
 
 
@@ -1678,7 +1678,12 @@ export default async function Informe_Ocu_DatosPacientes(data = {}) {
   footerTR(doc, { footerOffsetY: 5 });
 
   // Imprimir
-  imprimir(doc);
+   // === Imprimir ===
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {

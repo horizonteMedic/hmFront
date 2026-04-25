@@ -51,6 +51,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
     ];
     const conJsonAnidado = [
         "colinesterasa",
+        "certificado_aptitud_cuadrador",
+        "ficha_datos_paciente",
         "tamizaje_dermatologico",
     ]
     const coordenadasPSICOSENSO = {

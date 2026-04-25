@@ -171,6 +171,7 @@ export default function ExamenOrina() {
                                 value={form.densidad}
                                 labelWidth="100px"
                                 onChange={handleChange}
+                                onKeyUp={(e) => { handleFocusNext(e, "ph") }}
                             />
                             <InputTextOneLine
                                 label="PH"

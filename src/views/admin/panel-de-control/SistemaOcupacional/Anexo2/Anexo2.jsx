@@ -6,6 +6,7 @@ import {
   faHeartbeat,
   faChartLine,
   faDownload,
+  faFlask,
 } from "@fortawesome/free-solid-svg-icons";
 import Resultados from "./Resultados/Resultados";
 import ExamenFisico from "./ExamenFisico/ExamenFisico";
@@ -18,6 +19,7 @@ import { getDatePlus364Days, getToday } from "../../../../utils/helpers";
 import { GetExamenesRealizados, handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerAnexo2";
 import Swal from "sweetalert2";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
+import Laboratorio from "./Laboratorio/Laboratorio";
 
 const tabla = "anexo_agroindustrial";
 const today = getToday();
@@ -306,6 +308,32 @@ export default function Anexo2() {
     cerrado: false,
     observacionesGenerales2: "",
     otrosExamenes2: "",
+    pcrUltrasensible: "",
+    mercurioOrina: "",
+    plomoSangre: "",
+    // Exámenes de Laboratorio
+    nitritos: "",
+    proteinas: "",
+    cetonas: "",
+    leucocitos: "",
+    urobilinogeno: "",
+    bilirrubina: "",
+    glucosaQuimico: "",
+    sangre: "",
+    leucocitosSedimento: "",
+    celulasEpiteliales: "",
+    cilindios: "",
+    bacterias: "",
+    hematies: "",
+    cristales: "",
+    pus: "",
+    otrosSedimento: "",
+    colorFisico: "",
+    aspectoFisico: "",
+    densidadFisico: "",
+    phFisico: "",
+    otrosExamenes: "",
+    aptoParaTrabajar: "",
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
@@ -341,7 +369,7 @@ export default function Anexo2() {
       component: DatosPersonales,
     },
     { id: 1, name: "Exámenes", icon: faStethoscope, component: Examenes },
-    //{ id: 2, name: "Laboratorio", icon: faFlask, component: Laboratorio },
+    { id: 2, name: "Laboratorio", icon: faFlask, component: Laboratorio },
     {
       id: 3,
       name: "Examen Físico",
