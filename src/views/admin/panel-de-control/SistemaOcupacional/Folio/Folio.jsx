@@ -157,11 +157,10 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "INFORME_BURNOUT",
     "AVERSION_RIESGO",
     "TRABAJO_ALTURA_PSICO",
+    "CUADRADOR_VIGIA", 
     "BOMBA_ELECTRICA",
     "PSICOLOGIA_VIGIA",
     "TRANSTORNO_PERSONALIDAD_PSICO",
-    // "CUADRADOR_VIGIA", 
-    // "FICHA_DATOS_PACIENTE",             
 
     "OFTALMOLOGIA",
     "OFTALMOLOGIA_VISION_TESTER",
@@ -174,6 +173,7 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "DECLARACION_USO_FIRMA_ARCHIVO",           // 36
     "RESONANCIA_MAGNETICA_ARCHIVO",
     "PRUEBA_DE_ESFUERZO_ARCHIVO",
+    "FICHA_DATOS_PACIENTE",             
     "INTERCONSULTAS",
 ]);
 
