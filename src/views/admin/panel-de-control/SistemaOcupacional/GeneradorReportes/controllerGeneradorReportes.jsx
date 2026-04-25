@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
-import { GetInfoPacDefault, LoadingDefault, handleSubirArchivoDefaultSinSellos } from "../../../../utils/functionUtils";
+import { GetInfoPacDefault, LoadingDefault } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
-import { getFetch } from "../../../../utils/apiHelpers";
+import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
 import FolioJasper from "../../../../jaspers/FolioJasper/FolioJasper";
 import { ListaPorPlantilla } from "../Folio/Folio";
 
@@ -114,17 +114,17 @@ export const handleImprimirYSubir = async (examen, form, token, selectedSede, us
         // Generar el PDF usando FolioJasper para un solo examen
         // Creamos una lista con solo este examen y marcamos imprimir=true
         const soloEsteExamen = [{ ...examen, imprimir: true, resultado: true }];
-        
+
         const pdfResult = await FolioJasper(
-            form.norden, 
-            token, 
-            soloEsteExamen, 
-            null, 
-            "INDIVIDUAL", 
-            controller.signal, 
-            form.nombres, 
-            form.apellidos, 
-            datosFooter, 
+            form.norden,
+            token,
+            soloEsteExamen,
+            null,
+            "INDIVIDUAL",
+            controller.signal,
+            form.nombres,
+            form.apellidos,
+            datosFooter,
             false // No comprimido por defecto
         );
 
@@ -142,16 +142,20 @@ export const handleImprimirYSubir = async (examen, form, token, selectedSede, us
             cancelButtonColor: '#d33',
         });
 
-        if (isConfirmed) {
-            const nomenclature = examen.nomenclatura || examen.tabla;
-            
+        if (isConfirmed && examen.nomenclaturaSubida) {
+            const nomenclature = examen.nomenclaturaSubida;
+
             // Preparar el form para handleSubirArchivoDefaultSinSellos
             // El componente espera que el archivo esté en form.SubirDoc (que es un booleano en SubidaArchivos)
             // Pero handleSubirArchivoDefaultSinSellos en realidad abre un selector de archivos si no se le pasa uno.
             // Necesitamos una forma de pasarle los bytes directamente.
-            
+
             // Revisemos handleSubirArchivoDefaultSinSellos en functionUtils.js
             await subirArchivoDirecto(pdfResult, form, nomenclature, selectedSede, userlogued, token);
+        }
+        if (!examen.nomenclaturaSubida) {
+            Swal.fire('Error', 'El examen no tiene nomenclatura subida.', 'error');
+            return;
         }
 
     } catch (error) {
@@ -164,27 +168,46 @@ export const handleImprimirYSubir = async (examen, form, token, selectedSede, us
 async function subirArchivoDirecto(pdfData, form, nomenclature, selectedSede, userlogued, token) {
     try {
         LoadingDefault("Subiendo archivo...");
-        
+
         const blob = pdfData instanceof Blob ? pdfData : new Blob([pdfData], { type: "application/pdf" });
-        const nombreArchivo = `${form.norden}_${nomenclature}.pdf`;
-        const file = new File([blob], nombreArchivo, { type: "application/pdf" });
 
-        const formData = new FormData();
-        formData.append("norden", form.norden);
-        formData.append("archivo", file);
-        formData.append("nomenclatura", nomenclature);
-        formData.append("sede", selectedSede);
-        formData.append("usuario", userlogued);
-
-        const response = await fetch(registrarPDF, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            },
-            body: formData
+        // Convertir Blob a base64
+        const reader = new FileReader();
+        const base64Promise = new Promise((resolve, reject) => {
+            reader.onloadend = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
         });
 
-        const result = await response.json();
+        const pdfBase64Final = await base64Promise;
+        const nombreArchivo = `${form.norden}_${nomenclature}.pdf`;
+
+        const currentDate = new Date();
+        const year = currentDate.getFullYear();
+        const month = ("0" + (currentDate.getMonth() + 1)).slice(-2);
+        const day = ("0" + currentDate.getDate()).slice(-2);
+
+        const datos = {
+            rutaArchivo: null,
+            dni: null,
+            historiaClinica: null,
+            servidor: "azure",
+            estado: true,
+            fechaRegistro: `${year}-${month}-${day}`,
+            userRegistro: userlogued,
+            fechaActualizacion: null,
+            userActualizacion: null,
+            id_tipo_archivo: null,
+
+            nombreArchivo: nombreArchivo,
+            codigoSede: selectedSede,
+            fileBase64: pdfBase64Final,
+            nomenclatura_tipo_archivo: nomenclature,
+            orden: form.norden,
+            indice_carga_masiva: undefined,
+        };
+
+        const result = await SubmitData(datos, registrarPDF, token);
 
         if (result.id === 1 || result.id === "1") {
             Swal.fire('¡Éxito!', 'Archivo subido correctamente.', 'success');

@@ -48,6 +48,7 @@ export const EXAMENES_CATALOGO = {
         tabla: "aptitud_medico_ocupacional_agro",
         url: "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2",
         esJasper: true,
+        nomenclaturaSubida: "CAMO",
     },
 
     CERTIFICADO_APTITUD_ANEXO_16: {
@@ -55,6 +56,7 @@ export const EXAMENES_CATALOGO = {
         tabla: "certificado_aptitud_medico_ocupacional",
         url: "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16",
         esJasper: true,
+        nomenclaturaSubida: "CAMO",
     },
 
     // CERTIFICADO_APTITUD_ANEXO_16: {
@@ -920,7 +922,7 @@ export const EXAMENES_CATALOGO = {
         nombre: "FICHA DATOS PACIENTE",
         tabla: "ficha_datos_paciente",
         url: "/api/v01/ct/fichaDatosPersonales/obtenerReporteFichaDatosPersonales",
-          esJasper: true,
+        esJasper: true,
     },
     TAMIZAJE_DERMATOLOGICO: {
         nombre: "TAMIZAJE DERMATOLOGICO",
