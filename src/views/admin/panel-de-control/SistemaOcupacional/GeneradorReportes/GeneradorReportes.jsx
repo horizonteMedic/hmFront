@@ -9,11 +9,8 @@ import BotonesAccion from "../../../../components/templates/BotonesAccion";
 import { buildExamenesList } from "../Folio/folioCatalogo";
 
 const ExamenesListCOMPLETO = buildExamenesList([
-    "RESUMEN_MEDICO_PODEROSA",
-    "TRABAJO_ALTURA_PSICO",
-    "BOMBA_ELECTRICA",
-    "PSICOLOGIA_VIGIA",
-    "TRANSTORNO_PERSONALIDAD_PSICO",
+    "CERTIFICADO_ANEXO_02",
+    "CERTIFICADO_APTITUD_ANEXO_16",
 ]);
 
 export const ListaPorPlantilla = {
