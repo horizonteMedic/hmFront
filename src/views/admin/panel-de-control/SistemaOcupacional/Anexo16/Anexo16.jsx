@@ -19,7 +19,7 @@ import Swal from "sweetalert2";
 import Abdomen from "./Abdomen/Abdomen";
 import Laboratorio from "./Laboratorio/Laboratorio";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
-
+import CIE10 from "./CIE10/CIE10";
 const tabla = "anexo7c";
 
 export default function Anexo16() {
@@ -354,6 +354,7 @@ export default function Anexo16() {
 
   const [visualerOpen, setVisualerOpen] = useState(null)
   const [activeTab, setActiveTab] = useState(0);
+  const [modalCIE10, setModalCIE10] = useState(false)
 
   const tabs = [
     {
@@ -406,7 +407,7 @@ export default function Anexo16() {
       }
     });
   };
-
+  console.log(modalCIE10)
   return (
     <div className="mx-auto bg-white overflow-hidden ">
       <div className="flex h-full">
@@ -453,6 +454,7 @@ export default function Anexo16() {
                       handleSearchExamenesRealizados={handleSearchExamenesRealizados}
                       handleChangeSimple={handleChangeSimple}
                       handleBlur={handleBlur}
+
                     />
                   )
                 );
@@ -474,6 +476,7 @@ export default function Anexo16() {
 
             activeTab={activeTab}
             handleChange={handleChange}
+            setmodalCIE10={(boolean) => { setModalCIE10(boolean) }}
           />
         </div>
         {visualerOpen && (
@@ -495,6 +498,7 @@ export default function Anexo16() {
           </div>
         )}
       </div>
+      {modalCIE10 && <CIE10 closeModal={() => { setModalCIE10(false) }} />}
     </div>
   );
 }
