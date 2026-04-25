@@ -8,6 +8,7 @@ import {
   VerifyTRDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
+import { convertirGenero } from "../../../../utils/helpers";
 
 const obtenerReporteUrl =
   "/api/v01/ct/antecedentesEnfermedadesAltura/obtenerReporteAntecedentesEnfermedadesAltura";
@@ -100,7 +101,7 @@ export const SubmitDataService = async (
   const body = {
     codigoEnfermedadesAltura: form.codigoAntecedentesAltura,
     fechaAntecedente: form.fechaExam,
-    edad: form.edad?.replace(""),
+    edad: form.edad,
     dniUsuario: form.dniMedico,
     direccionUsuario: form.direccionMedico,
     emailUsuario: form.email,
@@ -232,12 +233,15 @@ const GetInfoPac = async (nro, set, token, sede) => {
     set((prev) => ({
       ...prev,
       ...res,
-      fechaNac: formatearFechaCorta(res.fechaNac ?? ""),
+      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
       edad: res.edad,
       nombres: res.nombresApellidos,
       dni: res.dni,
-      sexo: res.genero,
+      sexo: convertirGenero(res.genero ?? ""),
       cargo: res.cargo,
+
+      ocupacion: res.areaO,
+      cargoDesempenar: res.cargo,
 
       hipertensionArterial: hipertension,
     }));

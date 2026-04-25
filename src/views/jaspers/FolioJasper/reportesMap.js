@@ -114,6 +114,7 @@ import Certificado_Aptitud_Herramientas_Manuales_Digitalizado from "../Poderosa/
 import PCRULTRASENSIBLE from "../AnalisisBioquimicos/PCRULTRASENSIBLE";
 import COLINESTERASA from "../AnalisisBioquimicos/COLINESTERASA";
 import ETANOLSALIVA from "../Toxicologia/ETANOLSALIVA";
+import TamizajeDermatologico from "../TamizajeDermatologico/TamizajeDermatologico";
 
 export const reportesMap = {
    /* =========================
@@ -127,6 +128,8 @@ export const reportesMap = {
       Anexo16A_Digitalizado,
       Anexo16ABoro_Digitalizado
    },
+
+   tamizaje_dermatologico: TamizajeDermatologico,
 
    antecedentes_patologicos: {
       ficha_antecedente_patologico_Digitalizado,
