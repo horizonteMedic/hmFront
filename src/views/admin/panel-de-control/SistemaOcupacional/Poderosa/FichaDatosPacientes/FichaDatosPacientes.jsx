@@ -410,7 +410,7 @@ export default function FichaDatosPacientes() {
                                 labelWidth="120px"
                             />
                             <InputTextOneLine
-                                label="Estatura"
+                                label="Estatura (m)"
                                 name="estatura"
                                 value={form.estatura}
                                 disabled
@@ -434,7 +434,7 @@ export default function FichaDatosPacientes() {
                             />
                         </div>
                         <InputTextOneLine
-                            label="Peso"
+                            label="Peso (Kg)"
                             name="peso"
                             value={form.peso}
                             disabled
