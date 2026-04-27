@@ -82,7 +82,7 @@ const CIE10 = ({ closeModal, token }) => {
                     <div className="relative">
                         <FontAwesomeIcon
                             icon={loading ? faSpinner : faSearch}
-                            className={`absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm ${loading ? "animate-spin" : ""}`}
+                            className={`absolute left top-1/2 -translate-y-1/2 text-gray-400 text-sm ${loading ? "animate-spin" : ""}`}
                         />
                         <input
                             type="text"

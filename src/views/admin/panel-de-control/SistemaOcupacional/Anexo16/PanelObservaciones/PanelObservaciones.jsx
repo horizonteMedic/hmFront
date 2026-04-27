@@ -17,13 +17,13 @@ export default function PanelObservaciones({
       <div className="space-y-4">
         {/* Observaciones Generales */}
         <div className="w-full flex justify-center items-center">
-          <button
+          {/*<button
             type="button"
             onClick={() => setmodalCIE10(true)}
             className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center justify-center gap-2"
           >
             Ingresar CIE 10
-          </button>
+          </button>*/}
         </div>
         <div className="bg-white border border-gray-200 rounded-lg p-3 ">
           <InputTextArea
