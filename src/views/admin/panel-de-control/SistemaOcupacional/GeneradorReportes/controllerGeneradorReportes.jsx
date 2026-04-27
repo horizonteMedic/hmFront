@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-import { GetInfoPacDefault, LoadingDefault } from "../../../../utils/functionUtils";
+import { GetInfoPacDefault, LoadingDefault, ReadArchivosFormDefault } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
 import FolioJasper from "../../../../jaspers/FolioJasper/FolioJasper";
@@ -30,12 +30,12 @@ export const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
             sexo: res.genero === "M" ? "MASCULINO" : res.genero === "F" ? "FEMENINO" : "",
         }));
         await GetExamenesCheck(nro, set, token, ExamenesList);
+
     }
 };
 
 const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
     LoadingDefault("Cargando examenes");
-    const existeInterconsultas = ExamenesList.some(exa => exa.nombre == "INTERCONSULTAS");
     const listaFiltrada = ExamenesList.filter(exa => exa.nombre != "INTERCONSULTAS");
     try {
         const res = await getFetch(`${GetExamenURL}?nOrden=${nro}`, token);
@@ -53,38 +53,19 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
             });
         }
 
-        if (existeInterconsultas) {
-            const interconsultasResponse = await getFetch(`${GetNomenclatura}?nOrden=${nro}`, token);
-            if (interconsultasResponse?.resultado && Array.isArray(interconsultasResponse.resultado)) {
-                const interconsultasConNomenclatura = interconsultasResponse.resultado.filter(
-                    (item) => item.nomenclatura && item.nomenclatura.trim() !== ""
-                );
-                if (interconsultasConNomenclatura.length > 0) {
-                    const interconsultasFormateadas = interconsultasConNomenclatura.map((item) => ({
-                        nombre: `INTERCONSULTA - ${item.especialidad}`,
-                        resultado: true,
-                        imprimir: true,
-                        tabla: item.nomenclatura,
-                        nomenclatura: item.nomenclatura,
-                    }));
-                    listaActualizada = [...listaActualizada, ...interconsultasFormateadas];
-                }
-            }
-        }
-
-        const examenesConNomenclatura = listaActualizada.filter((examen) => examen.nomenclatura);
+        const examenesConNomenclatura = listaActualizada.filter((examen) => examen.nomenclaturaSubida);
         const promesasArchivosExternos = examenesConNomenclatura.map((examen) =>
-            getFetch(`${GetExamenExterno}/${nro}/${examen.nomenclatura}`, token)
-                .then((response) => ({ nomenclatura: examen.nomenclatura, response }))
-                .catch(() => ({ nomenclatura: examen.nomenclatura, response: null }))
+            getFetch(`${GetExamenExterno}/${nro}/${examen.nomenclaturaSubida}`, token)
+                .then((response) => ({ nomenclaturaSubida: examen.nomenclaturaSubida, response }))
+                .catch(() => ({ nomenclaturaSubida: examen.nomenclaturaSubida, response: null }))
         );
 
         const resultadosArchivosExternos = await Promise.all(promesasArchivosExternos);
-        resultadosArchivosExternos.forEach(({ nomenclatura, response }) => {
+        resultadosArchivosExternos.forEach(({ nomenclaturaSubida, response }) => {
             if (response?.id === 1) {
                 listaActualizada = listaActualizada.map((examen) =>
-                    examen.nomenclatura === nomenclatura
-                        ? { ...examen, resultado: true, imprimir: true, url: response.mensaje }
+                    examen.nomenclaturaSubida === nomenclaturaSubida
+                        ? { ...examen, resultado: true, imprimir: true, urlArchivo: response.mensaje }
                         : examen
                 );
             }
@@ -97,6 +78,10 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
         Swal.close();
     }
 };
+
+export const ReadArchivosForm = async (form, setVisualerOpen, token, nomenclatura = null) => {
+    ReadArchivosFormDefault(form, setVisualerOpen, token, nomenclatura)
+}
 
 export const handleImprimirYSubir = async (examen, form, token, selectedSede, userlogued, datosFooter, abortControllerRef) => {
     try {
