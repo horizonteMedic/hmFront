@@ -26,93 +26,88 @@ export default function HematologiaBioquimicaECO() {
 
   const EXAMENES_LABORATORIO = [
     {
-      legend: "EXÁMENES",
+      title: "Laboratorio Clínico",
       items: [
-        {
-          title: "Laboratorio Clínico",
-          items: [
-            { label: "Lab. Clínico", name: "labClinico", tabla: "lab_clinico" },
-            { label: "Hemograma", name: "Hemograma", tabla: "hemograma_autom" },
-            { label: "Hemoglobina", name: "Hemoglobina", tabla: "lab_clinico_hemoglobina" },
-          ]
-        },
-        //   ],
-        // },
-        //titulo Analisis Bioquimicos
-        {
-          title: "Análisis Bioquímicos",
-          items: [
-            { label: "Perfil Lipidico", name: "PerfilLipidico", tabla: "analisis_bioquimicos" },
-            { label: "Perfil Renal", name: "PerfilRenal", tabla: "l_bioquimica" },
-            { label: "Acido Urico", name: "AcidoUrico", tabla: "ac_bioquimica2022" },
-            { label: "Perfil Hepatico", name: "PerfilHepatico", tabla: "perfil_hepatico" },
-            { label: "Riesgo Coronario", name: "RiesgoCoronario", tabla: "riesgocoronario" },
-            { label: "Tolerancia a la Glucosa", name: "ToleranciaGlucosa", tabla: "glucosatolerancia" },
-            { label: "Glucosa Basal", name: "GlucosaBasal", tabla: "analisis_bioquimicos_glucosa_basal" },
-            { label: "PCR-Ultrasensible", name: "PCRUltrasensible", tabla: "pcr_ultrasensible" },
-          ]
-        },
+        { label: "Lab. Clínico", name: "labClinico", tabla: "lab_clinico" },
+        { label: "Hemograma", name: "Hemograma", tabla: "hemograma_autom" },
+        { label: "Hemoglobina", name: "Hemoglobina", tabla: "lab_clinico_hemoglobina" },
+      ]
+    },
+    //   ],
+    // },
+    //titulo Analisis Bioquimicos
+    {
+      title: "Análisis Bioquímicos",
+      items: [
+        { label: "Perfil Lipidico", name: "PerfilLipidico", tabla: "analisis_bioquimicos" },
+        { label: "Perfil Renal", name: "PerfilRenal", tabla: "l_bioquimica" },
+        { label: "Acido Urico", name: "AcidoUrico", tabla: "ac_bioquimica2022" },
+        { label: "Perfil Hepatico", name: "PerfilHepatico", tabla: "perfil_hepatico" },
+        { label: "Riesgo Coronario", name: "RiesgoCoronario", tabla: "riesgocoronario" },
+        { label: "Tolerancia a la Glucosa", name: "ToleranciaGlucosa", tabla: "glucosatolerancia" },
+        { label: "Glucosa Basal", name: "GlucosaBasal", tabla: "analisis_bioquimicos_glucosa_basal" },
+        { label: "PCR-Ultrasensible", name: "PCRUltrasensible", tabla: "pcr_ultrasensible" },
+      ]
+    },
 
-        //Inmunologia
-        {
-          title: "Inmunologia",
-          items: [
-            { label: "Gonadotropina", name: "Gonadotropina", tabla: "lgonadotropina" },
-            { label: "BK - KOH", name: "BKKOH", tabla: "microbiologia" },
-            { label: "BK - KOH Directo", name: "BKKOH", tabla: "koh" },
-            { label: "Aglutinaciones", name: "Aglutinaciones", tabla: "inmunologia" },
-            { label: "Hepatitis", name: "Hepatitis", tabla: "lhepatitis" },
-            { label: "VDRL", name: "VDRL", tabla: "inmunologia_vdrl" },
-            { label: "VIH", name: "VIH", tabla: "vih" },
-            { label: "Thevenon", name: "Thevenon", tabla: "vih" },
-          ]
-        },
+    //Inmunologia
+    {
+      title: "Inmunologia",
+      items: [
+        { label: "Gonadotropina", name: "Gonadotropina", tabla: "lgonadotropina" },
+        { label: "BK - KOH", name: "BKKOH", tabla: "microbiologia" },
+        { label: "BK - KOH Directo", name: "BKKOH", tabla: "koh" },
+        { label: "Aglutinaciones", name: "Aglutinaciones", tabla: "inmunologia" },
+        { label: "Hepatitis", name: "Hepatitis", tabla: "lhepatitis" },
+        { label: "VDRL", name: "VDRL", tabla: "inmunologia_vdrl" },
+        { label: "VIH", name: "VIH", tabla: "vih" },
+        { label: "Thevenon", name: "Thevenon", tabla: "vih" },
+      ]
+    },
 
-        //Toxicologia
-        {
-          title: "Toxicologia",
-          items: [
-            { label: "Toxicologia-Panel 2D", name: "Panel2D", tabla: "panel2d" },
-            { label: "Toxicologia-Panel 3D", name: "Panel3D", tabla: "panel3d" },
-            { label: "Toxicologia-Panel 4D", name: "Panel4D", tabla: "panel4d" },
-            { label: "Toxicologia-Panel 5D", name: "Panel5D", tabla: "toxicologia" },
-            { label: "Toxicologia-Panel 10D", name: "Panel10D", tabla: "panel10d" },
-            { label: "Etanol saliva", name: "EtanolSaliva", tabla: "etanol_saliva" },
-          ]
-        },
+    //Toxicologia
+    {
+      title: "Toxicologia",
+      items: [
+        { label: "Toxicologia-Panel 2D", name: "Panel2D", tabla: "panel2d" },
+        { label: "Toxicologia-Panel 3D", name: "Panel3D", tabla: "panel3d" },
+        { label: "Toxicologia-Panel 4D", name: "Panel4D", tabla: "panel4d" },
+        { label: "Toxicologia-Panel 5D", name: "Panel5D", tabla: "toxicologia" },
+        { label: "Toxicologia-Panel 10D", name: "Panel10D", tabla: "panel10d" },
+        { label: "Etanol saliva", name: "EtanolSaliva", tabla: "etanol_saliva" },
+      ]
+    },
 
-        //Manipuladores
-        {
-          title: "MANIPULADORES",
-          items: [
-            { label: "Coprocultivo", name: "Coprocultivo", tabla: "ac_coprocultivo" },
-            { label: "Coproparasitológico", name: "Coproparasitológico", tabla: "ac_coproparasitologico" },
-            { label: "Examen orina", name: "ExamenOrina", tabla: "lab_clinico_examen_orina" },
-          ]
-        },
+    //Manipuladores
+    {
+      title: "MANIPULADORES",
+      items: [
+        { label: "Coprocultivo", name: "Coprocultivo", tabla: "ac_coprocultivo" },
+        { label: "Coproparasitológico", name: "Coproparasitológico", tabla: "ac_coproparasitologico" },
+        { label: "Examen orina", name: "ExamenOrina", tabla: "lab_clinico_examen_orina" },
+      ]
+    },
 
-        //Pruebas Covid
-        {
-          title: "Pruebas Covid",
-          items: [
-            { label: "Prueba Cualitativa Antígenos", name: "PruebaAntigenos", tabla: "examen_inmunologico" },
-          ]
-        },
+    //Pruebas Covid
+    {
+      title: "Pruebas Covid",
+      items: [
+        { label: "Prueba Cualitativa Antígenos", name: "PruebaAntigenos", tabla: "examen_inmunologico" },
+      ]
+    },
 
-        //Consentimientos
-        {
-          title: "Consentimientos",
-          items: [
-            { label: "Const - Panel 2D", name: "Consentimiento2d", tabla: "con_panel2D" },
-            { label: "Const - Panel 3D", name: "Consentimiento3d", tabla: "con_panel3D" },
-            { label: "Const - Panel 4D", name: "Consentimiento4d", tabla: "con_panel4D" },
-            { label: "Const - Panel 5D", name: "Consentimiento5d", tabla: "con_panel5D" },
-            { label: "Const - Panel 10D", name: "Consentimiento10d", tabla: "con_panel10D" },
-            { label: "Const - Marihuana", name: "ConsentimientoMari", tabla: "consent_marihuana" },
-            { label: "Consentimiento Boro", name: "ConsentimientoBoro", tabla: "consent_boro" },
-          ]
-        },
-      ],
+    //Consentimientos
+    {
+      title: "Consentimientos",
+      items: [
+        { label: "Const - Panel 2D", name: "Consentimiento2d", tabla: "con_panel2D" },
+        { label: "Const - Panel 3D", name: "Consentimiento3d", tabla: "con_panel3D" },
+        { label: "Const - Panel 4D", name: "Consentimiento4d", tabla: "con_panel4D" },
+        { label: "Const - Panel 5D", name: "Consentimiento5d", tabla: "con_panel5D" },
+        { label: "Const - Panel 10D", name: "Consentimiento10d", tabla: "con_panel10D" },
+        { label: "Const - Marihuana", name: "ConsentimientoMari", tabla: "consent_marihuana" },
+        { label: "Consentimiento Boro", name: "ConsentimientoBoro", tabla: "consent_boro" },
+      ]
     },
   ]
 
@@ -870,48 +865,33 @@ export default function HematologiaBioquimicaECO() {
           <div className="flex-1 space-y-3">
             {form.listExamLab
               .map(section => (
-                <SectionFieldset key={section.legend} legend={section.legend} className={"!px-0"}>
-                  {(section.items || []).map((sub, index) => (
-                    <div key={`${sub.title}-${index}`} className="mb-3">
+                <SectionFieldset key={section.title} legend={section.title} className={"!px-0"}>
+                  {(section.items || []).map((item, index) => {
+                    const estado = Array.isArray(item.resultado)
+                      ? item.resultado.length > 0
+                        ? "PASO"
+                        : "NO TIENE"
+                      : item.resultado === true
+                        ? "PASO"
+                        : "NO PASO";
 
-                      {/* 🔸 Título */}
-                      {sub.title && (
-                        <div className="font-semibold text-[10px] rounded-t flex items-center bg-primario  text-white px-4 py-2 w-full rounded mb-2">
-                          {sub.title}
+                    return (
+                      <div key={`${item.label}-${index}`} className="mb-3">
+                        {/* 🔸 Items */}
+                        <div className="flex items-center gap-2 mb-1 px-4" key={index}>
+                          <InputTextOneLine
+                            label={item.label}
+                            name={item.name}
+                            value={estado}
+                            inputClassName={`text-center font-bold ${estado == "PASO" ? "text-green-600" : estado === "NO PASO" ? "text-red-700" : "text-gray-500"}`}
+                            disabled
+                            labelWidth="160px"
+                          />
+
                         </div>
-                      )}
-
-                      {/* 🔸 Items */}
-                      {(sub.items || [])
-                        .slice() // 🔹 evita mutar el original
-                        .sort((a, b) => a.label.localeCompare(b.label, 'es', { sensitivity: 'base' }))
-                        .map((item, index) => {
-                          const estado = Array.isArray(item.resultado)
-                            ? item.resultado.length > 0
-                              ? "PASO"
-                              : "NO TIENE"
-                            : item.resultado === true
-                              ? "PASO"
-                              : "NO PASO";
-
-                          return (
-                             <div className="flex items-center gap-2 mb-1 px-4" key={index}>
-                                <InputTextOneLine
-                                  label={item.label}
-                                  name={item.name}
-
-                                  value={estado}
-                                  inputClassName={`text-center font-bold ${estado == "PASO" ? "text-green-600" : estado === "NO PASO" ? "text-red-700" : "text-gray-500"}`}
-                                  onChange={handleChange}
-                                  disabled
-                                  labelWidth="160px"
-                                />
-
-                              </div>
-                          )
-                        })}
-                    </div>
-                  ))}
+                      </div>
+                    );
+                  })}
                 </SectionFieldset>
               ))}
           </div>

@@ -216,7 +216,9 @@ export const VerifyTR = async (nro, tabla, token, set, sede, ExamenesList) => {
     set,
     sede,
     () => {
-      GetInfoPac(nro, set, token, sede, ExamenesList);
+      GetInfoPac(nro, set, token, sede, async () => {
+        await GetExamenesLab(nro, set, token, ExamenesList);
+      });
     },
     () => {
       GetInfoServicio(nro, tabla, set, token, async () => {
@@ -231,8 +233,8 @@ export const VerifyTR = async (nro, tabla, token, set, sede, ExamenesList) => {
   );
 };
 
-const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
-
+const GetInfoPac = async (nro, set, token, sede, finallyOnFinish = () => {}) => {
+try {
   const res = await GetInfoPacDefault(nro, token, sede);
   if (res) {
     set((prev) => ({
@@ -246,8 +248,14 @@ const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
       cargoDesempenar: res.cargo ?? "",
       lugarNacimiento: res.lugarNacimiento ?? "",
       sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
+      
     }));
+    finallyOnFinish();
   }
+} catch (error) {
+  console.error("Error al obtener información del paciente:", error);
+}
+  
 };
 
 const GetExamenesLab = async (nro, set, token, ExamenesList) => {
@@ -265,12 +273,12 @@ const GetExamenesLab = async (nro, set, token, ExamenesList) => {
 
     const configActualizada = ExamenesList.map(section => ({
       ...section,
-      items: section.items.map(sub => ({
-        ...sub,
-        items: sub.items.map(item => ({
-          ...item,
+      items: section.items.map(item => ({
+        ...item,
+        // items: sub.items.map(item => ({
+        //   ...item,
           resultado: serviciosMap[item.tabla] ?? false
-        }))
+        // }))
       }))
     })); 
 
