@@ -3,10 +3,13 @@ import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
 import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
-import { GetInfoPac, handleImprimirYSubir } from "./controllerGeneradorReportes";
+import { GetInfoPac, handleImprimirYSubir, ReadArchivosForm } from "./controllerGeneradorReportes";
 import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
 import BotonesAccion from "../../../../components/templates/BotonesAccion";
 import { buildExamenesList } from "../Folio/folioCatalogo";
+import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
 const ExamenesListCOMPLETO = buildExamenesList([
     "CERTIFICADO_ANEXO_02",
@@ -22,6 +25,8 @@ export default function GeneradorReportes() {
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
     const [selectedListType, setSelectedListType] = useState("COMPLETO");
     const [showOnlyPassed, setShowOnlyPassed] = useState(false);
+
+    const [visualerOpen, setVisualerOpen] = useState(null)
 
     const initialFormState = {
         norden: "",
@@ -143,15 +148,20 @@ export default function GeneradorReportes() {
                                     </span>
 
                                     <div className="flex items-center gap-2 mt-1">
-                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${examen.resultado ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                                            }`}>
+                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${examen.resultado ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
                                             {examen.resultado ? "REALIZADO" : "PENDIENTE"}
                                         </span>
-                                        {examen.esArchivo && (
-                                            <span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                                                ARCHIVO
-                                            </span>
-                                        )}
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
+                                            {examen.urlArchivo ? "SUBIDO" : "NO SUBIDO"}
+                                        </span>
+                                        <ButtonsPDF
+                                            {...(examen.urlArchivo ? {
+                                                handleRead: () =>
+                                                    ReadArchivosForm(form, setVisualerOpen, token, examen.nomenclaturaSubida)
+                                            } : {})}
+                                            Nombre_1={`Subir archivo`}
+                                            Nombre_2={`Ver archivo`}
+                                        />
                                     </div>
                                 </div>
 
@@ -177,6 +187,24 @@ export default function GeneradorReportes() {
                 hideSave
                 hidePrint
             />
+            {visualerOpen && (
+                <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+                    <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
+                        <div className="px-4 py-2 naranjabackgroud flex justify-between">
+                            <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
+                            <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+                        </div>
+                        <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
+                            <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
+                        </div>
+                        <div className="flex justify-center">
+                            <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                                <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
