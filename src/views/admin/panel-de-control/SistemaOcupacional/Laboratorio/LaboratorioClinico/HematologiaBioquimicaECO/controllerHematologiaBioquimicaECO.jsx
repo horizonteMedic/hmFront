@@ -11,10 +11,12 @@ import {
   VerifyTRDefault,
 } from "../../../../../../utils/functionUtils.js";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils.js";
+import { getFetch } from "../../../../../../utils/apiHelpers.js";
 
 const obtenerReporteUrl = "/api/v01/ct/laboratorio/obtenerReporteLaboratorioClinico";
 const registrarUrl = "/api/v01/ct/laboratorio/registrarActualizarLaboratorioClinicp";
-const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta"
+const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta";
+const GetExamenURL = `/api/v01/st/registros/obtenerExistenciasExamenes`;
 
 export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => { }) => {
   const res = await GetInfoServicioDefault(
@@ -206,7 +208,7 @@ export const PrintHojaR = async (nro, token, tabla) => {
   );
 };
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
+export const VerifyTR = async (nro, tabla, token, set, sede, ExamenesList) => {
   await VerifyTRDefault(
     nro,
     tabla,
@@ -214,10 +216,11 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
     set,
     sede,
     () => {
-      GetInfoPac(nro, set, token, sede);
+      GetInfoPac(nro, set, token, sede, ExamenesList);
     },
     () => {
-      GetInfoServicio(nro, tabla, set, token, () => {
+      GetInfoServicio(nro, tabla, set, token, async () => {
+        await GetExamenesLab(nro, set, token, ExamenesList);
         Swal.fire(
           "Alerta",
           "Este paciente ya cuenta con registros en Laboratorio Clinico",
@@ -228,7 +231,8 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
   );
 };
 
-const GetInfoPac = async (nro, set, token, sede) => {
+const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
+
   const res = await GetInfoPacDefault(nro, token, sede);
   if (res) {
     set((prev) => ({
@@ -246,6 +250,44 @@ const GetInfoPac = async (nro, set, token, sede) => {
   }
 };
 
+const GetExamenesLab = async (nro, set, token, ExamenesList) => {
+  console.log("ENTRANDO A GetExamenesLab");
+
+  try {
+    const res = await getFetch(`${GetExamenURL}?nOrden=${nro}`, token);
+    console.log('respuesta', res)
+
+    const serviciosMap = Object.values(res|| {}).reduce((acc, item) => {
+      acc[item.nameService] = item.existe;
+      return acc;
+    }, {});
+    console.log("servicios normalizados", {serviciosMap})
+
+    const configActualizada = ExamenesList.map(section => ({
+      ...section,
+      items: section.items.map(sub => ({
+        ...sub,
+        items: sub.items.map(item => ({
+          ...item,
+          resultado: serviciosMap[item.tabla] ?? false
+        }))
+      }))
+    })); 
+
+     set(prev => ({
+       ...prev,
+       listExamLab: configActualizada,
+     }));
+
+
+  } catch (error) {
+    console.error("Error al cargar exámenes:", error);
+  } finally {
+    Swal.close();
+  }
+
+};
+
 export const Loading = (mensaje) => {
   LoadingDefault(mensaje);
 };
@@ -259,5 +301,5 @@ export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
 }
 
 export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token) => {
-    handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token)
+  handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token)
 }
