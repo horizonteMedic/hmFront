@@ -329,6 +329,13 @@ export const EXAMENES_CATALOGO = {
         esArchivo: true,
     },
 
+    RIESGO_CARDIOVASCULAR_ARCHIVO: {
+        nombre: "RIESGO CARDIOVASCULAR ARCHIVO",
+        tabla: "RIESGO CARDIOVASCULAR",
+        nomenclatura: "RIESGO CARDIOVASCULAR",
+        esArchivo: true,
+    },
+
     RESONANCIA_MAGNETICA_ARCHIVO: {
         nombre: "RESONANCIA MAGNETICA ARCHIVO",
         tabla: "RESMAG",

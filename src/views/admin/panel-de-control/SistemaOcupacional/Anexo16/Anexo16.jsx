@@ -324,6 +324,7 @@ export default function Anexo16() {
     //Laboratorio
     mercurioOrina: "N/A",
     plomoSangre: "N/A",
+    pcr_ultrasensible: "",
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
@@ -407,7 +408,7 @@ export default function Anexo16() {
       }
     });
   };
-  console.log(modalCIE10)
+
   return (
     <div className="mx-auto bg-white overflow-hidden ">
       <div className="flex h-full">
@@ -498,7 +499,7 @@ export default function Anexo16() {
           </div>
         )}
       </div>
-      {modalCIE10 && <CIE10 closeModal={() => { setModalCIE10(false) }} />}
+      {modalCIE10 && <CIE10 closeModal={() => { setModalCIE10(false) }} token={token} />}
     </div>
   );
 }

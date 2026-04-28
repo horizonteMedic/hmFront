@@ -22,7 +22,7 @@ export default function FichaDatosPacientes() {
         norden: "",
         id: null,
         fechaIngreso: today,
-        tipoTrabajador: "OBRERO",
+        tipoTrabajador: "",
 
         empresa: "",
         cargo: "",
@@ -303,6 +303,7 @@ export default function FichaDatosPacientes() {
                     labelWidth="120px"
                     value={form.tipoTrabajador}
                     onChange={handleRadioButton}
+                    allowUncheck
                     options={tipoTrabajadorOptions}
                 />
             </SectionFieldset>
@@ -410,7 +411,7 @@ export default function FichaDatosPacientes() {
                                 labelWidth="120px"
                             />
                             <InputTextOneLine
-                                label="Estatura"
+                                label="Estatura (mts)"
                                 name="estatura"
                                 value={form.estatura}
                                 disabled
@@ -434,7 +435,7 @@ export default function FichaDatosPacientes() {
                             />
                         </div>
                         <InputTextOneLine
-                            label="Peso"
+                            label="Peso (kg)"
                             name="peso"
                             value={form.peso}
                             disabled

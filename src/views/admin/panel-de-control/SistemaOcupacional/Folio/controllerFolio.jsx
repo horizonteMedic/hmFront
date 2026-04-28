@@ -1,12 +1,13 @@
 import Swal from "sweetalert2";
 import {
-    GetInfoPacDefault,  
+    GetInfoPacDefault,
     LoadingDefault,
     PrintHojaRDefault,
     PrintHojaRJsReportDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch, SubmitDataManejo } from "../../../../utils/apiHelpers";
+import { Loading } from "../Anexo2/controllerAnexo2";
 
 const GetExamenURL = `/api/v01/st/registros/obtenerExistenciasExamenes`
 const GetExamenExterno = `/api/v01/st/registros/detalleUrlArchivos`
@@ -19,6 +20,9 @@ const obtenerUrl = "/api/v01/ct/asignarFirma/obtenerOrdenOcupacionalFirmaPorNOrd
 //CAMO 
 const obtenerReporteJsCAMO2ReportUrl = "/api/v01/ct/anexos/fichaAnexo2/descargarReporteFichaAnexo2"
 const obtenerReporteJsCAMO16ReportUrl = "/api/v01/ct/anexos/descargarReporteFichaAptitudAnexo16"
+
+const Anexo16URL = "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16";
+const Anexo2URL = "/api/v01/ct/anexos/anexo2/obtenerReporteAnexo2Completo";
 
 export const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
     LoadingDefault("Validando datos");
@@ -64,7 +68,7 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
                     resultado: match ? match.existe : false,
                     imprimir: match ? match.existe : false,
                 };
-            });    
+            });
         }
 
         // 🔹 Procesar INTERCONSULTAS
@@ -243,19 +247,76 @@ export const SubmitDataService = async (
 //         "../../../../jaspers/Ficha_Anexo16"
 //     );
 // };
-export const PrintHojaRAnexo16 = (nro, token, tabla) => {
-    PrintHojaRJsReportDefault(
+export const PrintHojaRAnexo16 = (nro, token, datosFooter) => {
+    Loading("Cargando Formato a Imprimir");
+    getFetch(
+        `${Anexo16URL}?nOrden=${nro}&nameService=anexo7c`,
+        token
+    ).then(async (res) => {
+        if (res.norden_n_orden) {
+            const nombre = res.nameJasper;
+            console.log(nombre);
+            const jasperModules = import.meta.glob(
+                "../../../../jaspers/Anexo16/*.jsx"
+            );
+            const modulo = await jasperModules[
+                `../../../../jaspers/Anexo16/${nombre}.jsx`
+            ]();
+
+            // Ejecuta la función exportada por default con los datos
+            if (typeof modulo.default === "function") {
+                modulo.default({ ...res, datosFooter });
+            } else {
+                console.error(
+                    `El archivo ${nombre}.jsx no exporta una función por defecto`
+                );
+            }
+            Swal.close();
+        } else {
+            Swal.close();
+        }
+    });
+    /*PrintHojaRJsReportDefault(
         nro,
         token,
         "anexo7c",
         obtenerReporteJsCAMO16ReportUrl
-    );
+    );*/
 };
-export const PrintHojaRAnexo2 = (nro, token, tabla) => {
-    PrintHojaRJsReportDefault(
+export const PrintHojaRAnexo2 = (nro, token, datosFooter) => {
+    Loading("Cargando Formato a Imprimir");
+    getFetch(
+        `${Anexo2URL}?nOrden=${nro}&nameService=certificado_aptitud_medico_ocupacional&esJasper=true`,
+        token
+    ).then(async (res) => {
+        if (res.norden_n_orden) {
+            // const nombre = res.nameJasper;
+            const nombre = "Anexo2";
+            console.log(nombre);
+            const jasperModules = import.meta.glob(
+                "../../../../jaspers/Anexo2/*.jsx"
+            );
+            const modulo = await jasperModules[
+                `../../../../jaspers/Anexo2/${nombre}.jsx`
+            ]();
+
+            //Ejecuta la función exportada por default con los datos
+            if (typeof modulo.default === "function") {
+                modulo.default({ ...res, datosFooter });
+            } else {
+                console.error(
+                    `El archivo ${nombre}.jsx no exporta una función por defecto`
+                );
+            }
+            Swal.close();
+        } else {
+            Swal.close();
+        }
+    });
+    /*PrintHojaRJsReportDefault(
         nro,
         token,
         "certificado_aptitud_medico_ocupacional",
         obtenerReporteJsCAMO2ReportUrl
-    );
+    );*/
 };

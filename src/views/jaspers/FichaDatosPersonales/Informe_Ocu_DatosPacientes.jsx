@@ -611,7 +611,7 @@ export default async function Informe_Ocu_DatosPacientes(data = {}, docExistente
     labelWidth: 18, // ajusta según tu texto "EMPRESA :"
     width: 30,
     height: 5,
-    text: datosFinales.estatura
+    text: datosFinales.estatura+" mts"
   });
 
   doc.text("Peso:", tablaInicioX + 160, yPos + 14);
@@ -622,7 +622,7 @@ export default async function Informe_Ocu_DatosPacientes(data = {}, docExistente
     labelWidth: 18, // ajusta según tu texto "EMPRESA :"
     width: 30,
     height: 5,
-    text: datosFinales.peso
+    text: datosFinales.peso+" kg"
   });
 
 
