@@ -307,7 +307,6 @@ export default function Anexo2() {
     posibleCerrar: false,
     cerrado: false,
     observacionesGenerales2: "",
-    otrosExamenes2: "",
     pcrUltrasensible: "",
     mercurioOrina: "",
     plomoSangre: "",
