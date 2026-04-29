@@ -68,15 +68,15 @@ export const GetInfoServicio = async (
 
             // ===== NACIMIENTO =====
             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-            distritoNacimiento: res.distritoNacimientoPaciente ?? "",
-            provinciaNacimiento: res.provinciaNacimientoPaciente ?? "",
-            departamentoNacimiento: res.departamentoNacimientoPaciente ?? "",
+            distritoNacimiento: res.distritoForm ?? "",
+            provinciaNacimiento: res.provinciaForm ?? "",
+            departamentoNacimiento: res.departamentoForm ?? "",
 
             // ===== DOMICILIO =====
             direccionDomicilio: res.direccionPaciente ?? "",
-            distritoDomicilio: res.distrito ?? "",
-            provinciaDomicilio: res.provincia ?? "",
-            departamentoDomicilio: res.departamento ?? "",
+            distritoDomicilio: res.distritoAdmisionPaciente ?? "",
+            provinciaDomicilio: res.provinciaAdmisionPaciente ?? "",
+            departamentoDomicilio: res.departamentoAdmisionPaciente ?? "",
             referenciaDomiciliaria: res.referenciaDomicilio ?? "",
 
             // ===== CONTACTO =====
