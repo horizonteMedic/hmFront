@@ -20,6 +20,7 @@ import { GetExamenesRealizados, handleSubirArchivo, handleSubirArchivoMasivo, Pr
 import Swal from "sweetalert2";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
 import Laboratorio from "./Laboratorio/Laboratorio";
+import CIE10 from "./CIE10/CIE10";
 
 const tabla = "anexo_agroindustrial";
 const today = getToday();
@@ -360,6 +361,7 @@ export default function Anexo2() {
   const [visualerOpen, setVisualerOpen] = useState(null)
 
   const [activeTab, setActiveTab] = useState(0);
+  const [modalCIE10, setModalCIE10] = useState(false)
 
   const tabs = [
     {
@@ -471,6 +473,7 @@ export default function Anexo2() {
             handleRadioButton={handleRadioButton}
             handleClear={handleClear}
             handleSave={handleSave}
+            setmodalCIE10={(boolean) => { setModalCIE10(boolean) }}
           />
         </div>
         {visualerOpen && (
@@ -492,6 +495,7 @@ export default function Anexo2() {
           </div>
         )}
       </div>
+      {modalCIE10 && <CIE10 closeModal={() => { setModalCIE10(false) }} token={token} setForm={setForm} />}
     </div>
   );
 }

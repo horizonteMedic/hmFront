@@ -7,9 +7,9 @@ import autoTable from "jspdf-autotable";
 import { getSign } from "../../utils/helpers.js";
 
 export default async function Informe_Ocu_DatosPacientes(data = {}, docExistente = null) {
-   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-   const pageW = doc.internal.pageSize.getWidth();
- 
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+  const pageW = doc.internal.pageSize.getWidth();
+
   // Datos de prueba si no hay data
   const datosPrueba = {
     empresa: "MINERA PODEROSA S.A.",
@@ -111,9 +111,9 @@ export default async function Informe_Ocu_DatosPacientes(data = {}, docExistente
     diaNacimiento: String(dia ?? ""),
     mesNacimiento: String(mes ?? ""),
     anioNacimiento: String(anio ?? ""),
-    distritoNacimiento: String(data.distrito ?? ""),
-    provinciaNacimiento: String(data.provincia ?? ""),
-    departamentoNacimiento: String(data.departamento ?? ""),
+    distritoNacimiento: String(data.distritoNacimientoPaciente ?? ""),
+    provinciaNacimiento: String(data.provinciaNacimientoPaciente ?? ""),
+    departamentoNacimiento: String(data.departamentoNacimientoPaciente ?? ""),
 
     // Datos adicionales
     dni: String(data.dniPaciente ?? ""),
@@ -611,7 +611,7 @@ export default async function Informe_Ocu_DatosPacientes(data = {}, docExistente
     labelWidth: 18, // ajusta según tu texto "EMPRESA :"
     width: 30,
     height: 5,
-    text: datosFinales.estatura+" mts"
+    text: datosFinales.estatura + " mts"
   });
 
   doc.text("Peso:", tablaInicioX + 160, yPos + 14);
@@ -622,7 +622,7 @@ export default async function Informe_Ocu_DatosPacientes(data = {}, docExistente
     labelWidth: 18, // ajusta según tu texto "EMPRESA :"
     width: 30,
     height: 5,
-    text: datosFinales.peso+" kg"
+    text: datosFinales.peso + " kg"
   });
 
 
@@ -1678,7 +1678,7 @@ export default async function Informe_Ocu_DatosPacientes(data = {}, docExistente
   footerTR(doc, { footerOffsetY: 5 });
 
   // Imprimir
-   // === Imprimir ===
+  // === Imprimir ===
   if (docExistente) {
     return doc;
   } else {

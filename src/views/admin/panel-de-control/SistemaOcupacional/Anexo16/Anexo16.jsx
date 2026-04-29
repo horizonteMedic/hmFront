@@ -499,7 +499,7 @@ export default function Anexo16() {
           </div>
         )}
       </div>
-      {modalCIE10 && <CIE10 closeModal={() => { setModalCIE10(false) }} token={token} />}
+      {modalCIE10 && <CIE10 closeModal={() => { setModalCIE10(false) }} token={token} setForm={setForm} />}
     </div>
   );
 }
