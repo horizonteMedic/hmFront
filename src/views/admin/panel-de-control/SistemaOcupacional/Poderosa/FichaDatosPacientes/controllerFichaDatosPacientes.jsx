@@ -68,9 +68,9 @@ export const GetInfoServicio = async (
 
             // ===== NACIMIENTO =====
             fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-            distritoNacimiento: res.distrito ?? "",
-            provinciaNacimiento: res.provincia ?? "",
-            departamentoNacimiento: res.departamento ?? "",
+            distritoNacimiento: res.distritoNacimientoPaciente ?? "",
+            provinciaNacimiento: res.provinciaNacimientoPaciente ?? "",
+            departamentoNacimiento: res.departamentoNacimientoPaciente ?? "",
 
             // ===== DOMICILIO =====
             direccionDomicilio: res.direccionPaciente ?? "",
@@ -280,9 +280,9 @@ export const GetInfoServicioEditar = async (
             peso: res.peso ?? "",
 
             // ===== NACIMIENTO =====
-            distritoNacimiento: res.distrito ?? "",
-            provinciaNacimiento: res.provincia ?? "",
-            departamentoNacimiento: res.departamento ?? "",
+            distritoNacimiento: res.distritoNacimientoPaciente ?? "",
+            provinciaNacimiento: res.provinciaNacimientoPaciente ?? "",
+            departamentoNacimiento: res.departamentoNacimientoPaciente ?? "",
 
             // ===== DOMICILIO =====
             direccionDomicilio: res.direccionPaciente ?? "",
