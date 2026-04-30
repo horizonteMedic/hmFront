@@ -61,7 +61,7 @@ export default async function ReporteExamenR(datos) {
 
     drawC(doc, "FIRST TEST", leftspace + 15, headspace + 55, 25, 10, !datos.altaft ? true : datos.fisttest ? true : false);
     drawC(doc, "TEST ALTURA", leftspace + 70, headspace + 55, 25, 10, !datos.testaltura ? true : !datos.cerificadoaltura && !datos.b_certialtura ? false : true);
-    drawC(doc, "PSICOSENSOMETRIA", leftspace + 130, headspace + 55, 35, 10, datos.altaps ? true : datos.psicosen ? true : false);
+    drawC(doc, "PSICOSENSOMETRIA", leftspace + 130, headspace + 55, 35, 10, !datos.altaps ? true : datos.psicosen ? true : false);
     drawLine(leftspace + 85, headspace + 65, leftspace + 85, headspace + 70);
     drawC(doc, "EVALUACION MEDICA", leftspace + 70, headspace + 70, 35, 10, datos.anexo7c ? true : false);
 

@@ -95,6 +95,7 @@ export const EXAMENES_CATALOGO = {
         nombre: "RESUMEN MEDICO",
         tabla: "resumen_medico_poderosa",
         url: "/api/v01/ct/anexos/obtenerReporteResumenMedico",
+        nomenclaturaSubida: "INFORME EMO",
     },
 
     /* =========================
@@ -126,6 +127,7 @@ export const EXAMENES_CATALOGO = {
         tabla: "b_certificado_conduccion",
         url: "/api/v01/ct/certificadoConduccion/obtenerReporteCertificadoConduccion",
         esJasper: true,
+        nomenclaturaSubida: "CCV",
     },
 
     ENFERMEDADES_ALTURA: {
@@ -930,6 +932,7 @@ export const EXAMENES_CATALOGO = {
         tabla: "ficha_datos_paciente",
         url: "/api/v01/ct/fichaDatosPersonales/obtenerReporteFichaDatosPersonales",
         esJasper: true,
+        nomenclaturaSubida: "FICHA DE DATOS",
     },
     TAMIZAJE_DERMATOLOGICO: {
         nombre: "TAMIZAJE DERMATOLOGICO",

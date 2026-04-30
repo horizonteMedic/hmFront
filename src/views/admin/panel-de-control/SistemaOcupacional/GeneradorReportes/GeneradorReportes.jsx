@@ -14,6 +14,9 @@ import { faDownload } from "@fortawesome/free-solid-svg-icons";
 const ExamenesListCOMPLETO = buildExamenesList([
     "CERTIFICADO_ANEXO_02",
     "CERTIFICADO_APTITUD_ANEXO_16",
+    "RESUMEN_MEDICO_PODEROSA",
+    "FICHA_DATOS_PACIENTE",
+    "CERTIFICADO_VEHICULOS"
 ]);
 
 export const ListaPorPlantilla = {
@@ -59,11 +62,15 @@ export default function GeneradorReportes() {
 
     const handleSearch = async (e) => {
         if (e.key === "Enter") {
-            handleClearnotO();
-            const currentList = ListaPorPlantilla[selectedListType] || ListaPorPlantilla["COMPLETO"];
-            await GetInfoPac(form.norden, setForm, token, selectedSede, currentList);
+            search();
         }
     };
+
+    const search = async () => {
+        handleClearnotO();
+        const currentList = ListaPorPlantilla[selectedListType] || ListaPorPlantilla["COMPLETO"];
+        await GetInfoPac(form.norden, setForm, token, selectedSede, currentList);
+    }
 
     const handleListChange = (e) => {
         const newValue = e.target.value;
@@ -171,7 +178,7 @@ export default function GeneradorReportes() {
                                         : "bg-gray-200 text-gray-400 cursor-not-allowed"
                                         }`}
                                     disabled={!examen.resultado}
-                                    onClick={() => handleImprimirYSubir(examen, form, token, selectedSede, userlogued, datosFooter, abortControllerRef)}
+                                    onClick={() => handleImprimirYSubir(examen, form, token, selectedSede, userlogued, datosFooter, abortControllerRef,search)}
                                 >
                                     Imprimir y Subir
                                 </button>

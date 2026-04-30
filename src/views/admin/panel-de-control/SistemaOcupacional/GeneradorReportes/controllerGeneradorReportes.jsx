@@ -20,6 +20,7 @@ export const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
             ...prev,
             ...res,
             nombres: res.nombresApellidos ?? "",
+            nombre: res.nombres ?? "",
             fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
             edad: res.edad,
             ocupacion: res.areaO ?? "",
@@ -83,7 +84,7 @@ export const ReadArchivosForm = async (form, setVisualerOpen, token, nomenclatur
     ReadArchivosFormDefault(form, setVisualerOpen, token, nomenclatura)
 }
 
-export const handleImprimirYSubir = async (examen, form, token, selectedSede, userlogued, datosFooter, abortControllerRef) => {
+export const handleImprimirYSubir = async (examen, form, token, selectedSede, userlogued, datosFooter, abortControllerRef, search) => {
     try {
         if (abortControllerRef.current) abortControllerRef.current.abort();
         const controller = new AbortController();
@@ -136,7 +137,7 @@ export const handleImprimirYSubir = async (examen, form, token, selectedSede, us
             // Necesitamos una forma de pasarle los bytes directamente.
 
             // Revisemos handleSubirArchivoDefaultSinSellos en functionUtils.js
-            await subirArchivoDirecto(pdfResult, form, nomenclature, selectedSede, userlogued, token);
+            await subirArchivoDirecto(pdfResult, form, nomenclature, selectedSede, userlogued, token, search);
         }
         if (!examen.nomenclaturaSubida) {
             Swal.fire('Error', 'El examen no tiene nomenclatura subida.', 'error');
@@ -150,7 +151,7 @@ export const handleImprimirYSubir = async (examen, form, token, selectedSede, us
     }
 };
 
-async function subirArchivoDirecto(pdfData, form, nomenclature, selectedSede, userlogued, token) {
+async function subirArchivoDirecto(pdfData, form, nomenclature, selectedSede, userlogued, token, search) {
     try {
         LoadingDefault("Subiendo archivo...");
 
@@ -165,7 +166,7 @@ async function subirArchivoDirecto(pdfData, form, nomenclature, selectedSede, us
         });
 
         const pdfBase64Final = await base64Promise;
-        const nombreArchivo = `${form.norden}_${nomenclature}.pdf`;
+        const nombreArchivo = `${form.norden}-${nomenclature}-${form.apellidos ?? ""} ${form.nombre ?? ""}.pdf`;
 
         const currentDate = new Date();
         const year = currentDate.getFullYear();
@@ -195,6 +196,7 @@ async function subirArchivoDirecto(pdfData, form, nomenclature, selectedSede, us
         const result = await SubmitData(datos, registrarPDF, token);
 
         if (result.id === 1 || result.id === "1") {
+            search();
             Swal.fire('¡Éxito!', 'Archivo subido correctamente.', 'success');
         } else {
             throw new Error(result.mensaje || "Error desconocido al subir");
