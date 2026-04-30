@@ -16,7 +16,7 @@ export default function PanelObservaciones({
     <div className="p-4 h-full mt-16">
       <div className="space-y-4">
         {/* Observaciones Generales */}
-        <div className="w-full flex justify-center items-center">
+        {/* <div className="w-full flex justify-center items-center">
           <button
             type="button"
             onClick={() => setmodalCIE10(true)}
@@ -24,7 +24,7 @@ export default function PanelObservaciones({
           >
             Ingresar CIE 10
           </button>
-        </div>
+        </div> */}
         <div className="bg-white border border-gray-200 rounded-lg p-3 ">
           <InputTextArea
             rows={18}

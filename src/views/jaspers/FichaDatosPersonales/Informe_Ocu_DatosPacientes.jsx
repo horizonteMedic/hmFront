@@ -111,9 +111,9 @@ export default async function Informe_Ocu_DatosPacientes(data = {}, docExistente
     diaNacimiento: String(dia ?? ""),
     mesNacimiento: String(mes ?? ""),
     anioNacimiento: String(anio ?? ""),
-    distritoNacimiento: String(data.distritoNacimientoPaciente ?? ""),
-    provinciaNacimiento: String(data.provinciaNacimientoPaciente ?? ""),
-    departamentoNacimiento: String(data.departamentoNacimientoPaciente ?? ""),
+    distritoNacimiento: String(data.distritoForm ?? ""),
+    provinciaNacimiento: String(data.provinciaForm ?? ""),
+    departamentoNacimiento: String(data.departamentoForm ?? ""),
 
     // Datos adicionales
     dni: String(data.dniPaciente ?? ""),
@@ -128,9 +128,9 @@ export default async function Informe_Ocu_DatosPacientes(data = {}, docExistente
 
     // Domicilio
     direccionDomicilio: String(data.direccionPaciente ?? ""),
-    distritoDomicilio: String(data.distrito ?? ""),
-    provinciaDomicilio: String(data.provincia ?? ""),
-    departamentoDomicilio: String(data.departamento ?? ""),
+    distritoDomicilio: String(data.distritoAdmisionPaciente ?? ""),
+    provinciaDomicilio: String(data.provinciaAdmisionPaciente ?? ""),
+    departamentoDomicilio: String(data.departamentoAdmisionPaciente ?? ""),
     referenciaDomiciliaria: String(data.referenciaDomicilio ?? ""),
     telefono1: String(data.telefonoPaciente ?? ""),
     tipoViviendaPropia: data.viviendaPropia ?? false,
