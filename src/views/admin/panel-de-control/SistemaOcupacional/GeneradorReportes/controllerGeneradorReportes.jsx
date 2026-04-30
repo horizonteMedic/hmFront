@@ -7,7 +7,6 @@ import { ListaPorPlantilla } from "../Folio/Folio";
 
 const GetExamenURL = `/api/v01/st/registros/obtenerExistenciasExamenes`
 const GetExamenExterno = `/api/v01/st/registros/detalleUrlArchivos`
-const GetNomenclatura = `/api/v01/ct/fichaInterconsulta/obtenerEspecialidadesNomenclaturaFichaInterconsulta`
 const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta"
 
 export { ListaPorPlantilla };
@@ -84,6 +83,138 @@ export const ReadArchivosForm = async (form, setVisualerOpen, token, nomenclatur
     ReadArchivosFormDefault(form, setVisualerOpen, token, nomenclatura)
 }
 
+export const handleImprimirYSubirMasivo = async (examenes, form, token, selectedSede, userlogued, datosFooter, abortControllerRef, search) => {
+    const lista = Array.isArray(examenes) ? examenes.filter((e) => e?.resultado) : [];
+    if (!form?.norden || lista.length === 0) return;
+
+    const decision = await Swal.fire({
+        title: "Generar reportes",
+        text: `Se generarán ${lista.length} reportes de la orden ${form.norden}.`,
+        icon: "question",
+        showDenyButton: true,
+        showCancelButton: true,
+        confirmButtonText: "Generar y subir",
+        denyButtonText: "Solo generar",
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "#3085d6",
+        denyButtonColor: "#6b7280",
+        cancelButtonColor: "#d33",
+    });
+
+    if (!decision.isConfirmed && !decision.isDenied) return;
+    const subir = decision.isConfirmed;
+
+    try {
+        if (abortControllerRef.current) abortControllerRef.current.abort();
+        const controller = new AbortController();
+        abortControllerRef.current = controller;
+
+        let generados = 0;
+        let subidos = 0;
+        let omitidosSinNomenclatura = 0;
+        let fallidos = 0;
+        let cancelado = false;
+
+        Swal.fire({
+            title: subir ? "Generando y subiendo" : "Generando",
+            html: `0 / ${lista.length}`,
+            allowOutsideClick: false,
+            showCancelButton: true,
+            cancelButtonText: "Cancelar",
+            didOpen: () => {
+                Swal.showLoading();
+                const btn = Swal.getCancelButton();
+                if (btn) btn.addEventListener("click", () => controller.abort());
+            },
+        });
+
+        for (let i = 0; i < lista.length; i++) {
+            const examen = lista[i];
+            if (controller.signal.aborted) {
+                cancelado = true;
+                break;
+            }
+
+            Swal.update({
+                html: `${i + 1} / ${lista.length}<br/><b>${examen.nombre}</b>`,
+            });
+
+            try {
+                const soloEsteExamen = [{ ...examen, imprimir: true, resultado: true }];
+                const pdfResult = await FolioJasper(
+                    form.norden,
+                    token,
+                    soloEsteExamen,
+                    null,
+                    "INDIVIDUAL",
+                    controller.signal,
+                    form.nombres,
+                    form.apellidos,
+                    datosFooter,
+                    false
+                );
+
+                generados += 1;
+
+                if (!subir) continue;
+
+                if (!examen.nomenclaturaSubida) {
+                    omitidosSinNomenclatura += 1;
+                    continue;
+                }
+
+                const uploadRes = await subirArchivoDirecto(
+                    pdfResult,
+                    form,
+                    examen.nomenclaturaSubida,
+                    selectedSede,
+                    userlogued,
+                    token,
+                    search,
+                    { showLoading: false, showSuccessAlert: false, showErrorAlert: false, refreshAfterUpload: false }
+                );
+
+                if (uploadRes?.ok) subidos += 1;
+                else fallidos += 1;
+            } catch (error) {
+                if (error?.name === "AbortError") {
+                    cancelado = true;
+                    break;
+                }
+                fallidos += 1;
+            }
+        }
+
+        Swal.close();
+
+        if (subir && subidos > 0) {
+            await search();
+        }
+
+        const resumen = [
+            `Generados: ${generados}`,
+            subir ? `Subidos: ${subidos}` : null,
+            subir ? `Omitidos (sin nomenclatura): ${omitidosSinNomenclatura}` : null,
+            `Fallidos: ${fallidos}`,
+            cancelado ? "Estado: Cancelado" : "Estado: Finalizado",
+        ]
+            .filter(Boolean)
+            .join("\n");
+
+        await Swal.fire({
+            title: "Proceso masivo",
+            icon: cancelado ? "warning" : fallidos > 0 ? "warning" : "success",
+            text: resumen,
+            confirmButtonText: "OK",
+            confirmButtonColor: "#3085d6",
+        });
+    } catch (error) {
+        if (error?.name === "AbortError") return;
+        console.error("Error en handleImprimirYSubirMasivo:", error);
+        Swal.fire("Error", "Hubo un problema al procesar los reportes.", "error");
+    }
+};
+
 export const handleImprimirYSubir = async (examen, form, token, selectedSede, userlogued, datosFooter, abortControllerRef, search) => {
     try {
         if (abortControllerRef.current) abortControllerRef.current.abort();
@@ -151,9 +282,16 @@ export const handleImprimirYSubir = async (examen, form, token, selectedSede, us
     }
 };
 
-async function subirArchivoDirecto(pdfData, form, nomenclature, selectedSede, userlogued, token, search) {
+async function subirArchivoDirecto(pdfData, form, nomenclature, selectedSede, userlogued, token, search, options = {}) {
     try {
-        LoadingDefault("Subiendo archivo...");
+        const {
+            showLoading = true,
+            showSuccessAlert = true,
+            showErrorAlert = true,
+            refreshAfterUpload = true,
+        } = options;
+
+        if (showLoading) LoadingDefault("Subiendo archivo...");
 
         const blob = pdfData instanceof Blob ? pdfData : new Blob([pdfData], { type: "application/pdf" });
 
@@ -196,13 +334,16 @@ async function subirArchivoDirecto(pdfData, form, nomenclature, selectedSede, us
         const result = await SubmitData(datos, registrarPDF, token);
 
         if (result.id === 1 || result.id === "1") {
-            search();
-            Swal.fire('¡Éxito!', 'Archivo subido correctamente.', 'success');
+            if (refreshAfterUpload) search();
+            if (showSuccessAlert) Swal.fire('¡Éxito!', 'Archivo subido correctamente.', 'success');
+            return { ok: true, result };
         } else {
             throw new Error(result.mensaje || "Error desconocido al subir");
         }
     } catch (error) {
         console.error("Error al subir archivo:", error);
-        Swal.fire('Error', error.message || 'No se pudo subir el archivo.', 'error');
+        const { showErrorAlert = true } = options;
+        if (showErrorAlert) Swal.fire('Error', error.message || 'No se pudo subir el archivo.', 'error');
+        return { ok: false, error };
     }
 }

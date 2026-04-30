@@ -3,7 +3,7 @@ import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
 import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
-import { GetInfoPac, handleImprimirYSubir, ReadArchivosForm } from "./controllerGeneradorReportes";
+import { GetInfoPac, handleImprimirYSubir, handleImprimirYSubirMasivo, ReadArchivosForm } from "./controllerGeneradorReportes";
 import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
 import BotonesAccion from "../../../../components/templates/BotonesAccion";
 import { buildExamenesList } from "../Folio/folioCatalogo";
@@ -28,6 +28,7 @@ export default function GeneradorReportes() {
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
     const [selectedListType, setSelectedListType] = useState("COMPLETO");
     const [showOnlyPassed, setShowOnlyPassed] = useState(false);
+    const [bulkRunning, setBulkRunning] = useState(false);
 
     const [visualerOpen, setVisualerOpen] = useState(null)
 
@@ -71,6 +72,28 @@ export default function GeneradorReportes() {
         const currentList = ListaPorPlantilla[selectedListType] || ListaPorPlantilla["COMPLETO"];
         await GetInfoPac(form.norden, setForm, token, selectedSede, currentList);
     }
+
+    const handleGenerarMasivo = async () => {
+        if (bulkRunning) return;
+        const examenesParaGenerar = (form.listaExamenes ?? []).filter((e) => e?.resultado);
+        if (!form.norden || examenesParaGenerar.length === 0) return;
+
+        setBulkRunning(true);
+        try {
+            await handleImprimirYSubirMasivo(
+                examenesParaGenerar,
+                form,
+                token,
+                selectedSede,
+                userlogued,
+                datosFooter,
+                abortControllerRef,
+                search
+            );
+        } finally {
+            setBulkRunning(false);
+        }
+    };
 
     const handleListChange = (e) => {
         const newValue = e.target.value;
@@ -139,6 +162,19 @@ export default function GeneradorReportes() {
             </SectionFieldset>
 
             <SectionFieldset legend="Lista de Reportes" className="flex flex-col w-full">
+                <div className="flex justify-end pb-3">
+                    <button
+                        type="button"
+                        className={`py-2 px-4 rounded-lg text-sm font-bold transition-all ${(!form.nombres || bulkRunning || !(form.listaExamenes ?? []).some((e) => e?.resultado))
+                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                            : "bg-green-600 hover:bg-green-700 text-white shadow-sm"
+                            }`}
+                        disabled={!form.nombres || bulkRunning || !(form.listaExamenes ?? []).some((e) => e?.resultado)}
+                        onClick={handleGenerarMasivo}
+                    >
+                        Generar reportes (secuencial)
+                    </button>
+                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full">
                     {form.listaExamenes?.map((examen, index) => {
                         if (showOnlyPassed && !examen.resultado) return null;
