@@ -112,6 +112,7 @@ export const SubmitDataService = async (
     esApto: form.aptitud == "APTO",
     noEsApto: form.aptitud == "NO APTO",
     aptoRestriccion: form.aptitud == "RESTRICCION",
+    evaluado: form.aptitud == "EVALUADO",
     fechaDesde: form.fechaAptitud,
     fechaVence: form.fechaVencimiento,
     cerrado: form.cerrado,
@@ -1101,7 +1102,9 @@ export const GetInfoServicioEditar = (
                 ? "NO APTO"
                 : res.aptoRestriccion_apto_re
                   ? "RESTRICCION"
-                  : "",
+                  : res.esEvaluado
+                    ? "EVALUADO"
+                    : "",
             fechaAptitud: res.fechaDesde_fechadesde ?? "",
             fechaVencimiento: res.fechaHasta_fechahasta ?? "",
             // nombre_medico: res.medico_medico ?? "",
