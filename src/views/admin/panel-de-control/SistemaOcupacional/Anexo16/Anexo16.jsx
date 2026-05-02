@@ -333,7 +333,7 @@ export default function Anexo16() {
     observacionesGenerales2: "",
     posibleCerrar: false,
     cerrado: false,
-    otrosExamenes2: "",
+    // otrosExamenes2: "",
 
     SubirDoc: false,
     nomenclatura: "RESMAG"

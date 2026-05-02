@@ -1574,7 +1574,7 @@ export const GetInfoServicioEditar = (
             observacionesGenerales:
               res.observacionesFichaMedicaAnexo7c_txtobservacionesfm ?? "",
             observacionesGenerales2: "",
-            otrosExamenes2: "",
+            // otrosExamenes2: "",
             cerrado: res.cerrado ?? false,
             observacionesAudio: "",
             contador: 1,
@@ -1619,21 +1619,21 @@ export const GetInfoServicioEditar = (
           data.vsg = vsg ?? "";
           data.glucosa = gluc ?? "";
           data.creatinina = creat ?? "";
-          data.otrosExamenes2 = "";
+          data.otrosExamenes = "";
           // data.otrosExamenes2 += `-HEMOGRAMA: NORMAL. \n`; //revisar
-          data.otrosExamenes2 += "HEMOGRAMA: " + (
+          data.otrosExamenes += "HEMOGRAMA: " + (
             res.examenQuimicoLeucocitos_txtleucocitoseq != null &&
               res.sedimientoUrinarioHematies_txthematiessu != null &&
               vsg != null && hemo != null ? "NORMAL" : "N/A") + "\n";
-          data.otrosExamenes2 +=
+          data.otrosExamenes +=
             gluc == null ? "" : "-GLUCOSA: " + gluc + " mg/dl. \n";
-          data.otrosExamenes2 +=
+          data.otrosExamenes +=
             creat == null ? "" : "-CREATININA: " + creat + " mg/dl. \n";
-          data.otrosExamenes2 += vsg == null ? "" : "-VSG: " + vsg + ". \n";
-          data.otrosExamenes2 +=
+          data.otrosExamenes += vsg == null ? "" : "-VSG: " + vsg + ". \n";
+          data.otrosExamenes +=
             examenOrina != null && examenOrina != "N/A" ? "-EX ORINA: NORMAL" + ". \n" : "";
-          data.otrosExamenes2 += coca == null ? "" : "-COCAINA: " + coca + ". \n";
-          data.otrosExamenes2 += marig == null ? "" : "-MARIHUANA: " + marig + ".";
+          data.otrosExamenes += coca == null ? "" : "-COCAINA: " + coca + ". \n";
+          data.otrosExamenes += marig == null ? "" : "-MARIHUANA: " + marig + ".";
 
 
           data.vsg = vsg ?? "";
