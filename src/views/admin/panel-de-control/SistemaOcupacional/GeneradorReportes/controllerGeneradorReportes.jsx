@@ -151,14 +151,16 @@ export const handleImprimirYSubirMasivo = async (examenes, form, token, selected
                     form.nombres,
                     form.apellidos,
                     datosFooter,
-                    false
+                    true
                 );
 
                 generados += 1;
 
                 if (!subir) continue;
 
-                if (!examen.nomenclaturaSubida) {
+                console.log("el examen es:", examen.nomenclaturaSubida)
+
+                if (examen.nomenclaturaSubida == null || examen.nomenclaturaSubida === "") {
                     omitidosSinNomenclatura += 1;
                     continue;
                 }
@@ -194,17 +196,17 @@ export const handleImprimirYSubirMasivo = async (examenes, form, token, selected
         const resumen = [
             `Generados: ${generados}`,
             subir ? `Subidos: ${subidos}` : null,
-            subir ? `Omitidos (sin nomenclatura): ${omitidosSinNomenclatura}` : null,
             `Fallidos: ${fallidos}`,
+            "",
             cancelado ? "Estado: Cancelado" : "Estado: Finalizado",
         ]
-            .filter(Boolean)
-            .join("\n");
+            .filter(item => item !== null)
+            .join("<br>");
 
         await Swal.fire({
-            title: "Proceso masivo",
+            title: "Generación Finalizada",
             icon: cancelado ? "warning" : fallidos > 0 ? "warning" : "success",
-            text: resumen,
+            html: resumen,
             confirmButtonText: "OK",
             confirmButtonColor: "#3085d6",
         });
@@ -242,7 +244,7 @@ export const handleImprimirYSubir = async (examen, form, token, selectedSede, us
             form.nombres,
             form.apellidos,
             datosFooter,
-            false // No comprimido por defecto
+            true // No comprimido por defecto
         );
 
         Swal.close();
