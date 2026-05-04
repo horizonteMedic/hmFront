@@ -1585,6 +1585,7 @@ export const GetInfoServicioEditar = (
             pielObservaciones: res.pielDescripcionAnexo7c_piel_descripcion,
             colesterolAnalisisBioquimico_txtcolesterol: res.colesterolAnalisisBioquimico_txtcolesterol,
             SubirDoc: true,
+            otrosExamenes: "",
           };
           data.dentaduraObservaciones =
             res.observacionesOdontograma_txtobservaciones ?? "";
@@ -1619,7 +1620,7 @@ export const GetInfoServicioEditar = (
           data.vsg = vsg ?? "";
           data.glucosa = gluc ?? "";
           data.creatinina = creat ?? "";
-          data.otrosExamenes = "";
+
           // data.otrosExamenes2 += `-HEMOGRAMA: NORMAL. \n`; //revisar
           data.otrosExamenes += "HEMOGRAMA: " + (
             res.examenQuimicoLeucocitos_txtleucocitoseq != null &&
@@ -1661,7 +1662,7 @@ export const GetInfoServicioEditar = (
           }
 
           // Build otrosExamenes field
-          data.otrosExamenes = res.examenRadiograficoOtros_txtotrosex;
+          // data.otrosExamenes = res.examenRadiograficoOtros_txtotrosex;
 
           // Personal information
           data.nomExamen = res.nombreExamen_nom_examen ?? "";
