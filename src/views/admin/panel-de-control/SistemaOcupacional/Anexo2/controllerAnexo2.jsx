@@ -112,7 +112,7 @@ export const SubmitDataService = async (
     esApto: form.aptitud == "APTO",
     noEsApto: form.aptitud == "NO APTO",
     aptoRestriccion: form.aptitud == "RESTRICCION",
-    evaluado: form.aptitud == "EVALUADO",
+    esEvaluado: form.aptitud == "EVALUADO",
     fechaDesde: form.fechaAptitud,
     fechaVence: form.fechaVencimiento,
     cerrado: form.cerrado,
@@ -964,7 +964,37 @@ export const GetInfoServicio = (
 
             data.rprHematologia = res.rprHematologia ?? "",
             data.pcrUltrasensible = res.pcrUltrasensible ?? "",
-            console.log("DATAAA", data);
+            //Data anexo 16
+            // Examen físico de orina
+            data.colorFisico = res.laboratorioClinicoAdicionales.examenFisicoColor_txtcoloref ?? "";
+          data.aspectoFisico = res.laboratorioClinicoAdicionales.examenFisicoAspecto_txtaspectoef ?? "";
+          data.densidadFisico = res.laboratorioClinicoAdicionales.examenFisicoDensidad_txtdensidadef ?? "";
+          data.phFisico = res.laboratorioClinicoAdicionales.examenFisicoPh_txtphef ?? "";
+
+          // Examen químico de orina
+          data.nitritos = res.laboratorioClinicoAdicionales.examenQuimicoNitritos_txtnitritoseq ?? "";
+          data.proteinas = res.laboratorioClinicoAdicionales.examenQuimicoProteinas_txtproteinaseq ?? "";
+          data.leucocitos = res.laboratorioClinicoAdicionales.examenQuimicoLeucocitos_txtleucocitoseq ?? "";
+          data.cetonas = res.laboratorioClinicoAdicionales.examenQuimicoCetonas_txtcetonaseq ?? "";
+          data.urobilinogeno =
+            res.laboratorioClinicoAdicionales.examenQuimicoUrobilinogeno_txturobilinogenoeq ?? "";
+          data.bilirrubina = res.laboratorioClinicoAdicionales.examenQuimicoBilirubina_txtbilirubinaeq ?? "";
+          data.glucosaQuimico = res.laboratorioClinicoAdicionales.examenQuimicoGlucosa_txtglucosaeq ?? "";
+          data.sangre = res.laboratorioClinicoAdicionales.examenQuimicoSangre_txtsangreeq ?? "";
+
+          // Sedimento urinario
+          data.leucocitosSedimento =
+            res.laboratorioClinicoAdicionales.sedimientoUrinarioLeucocitos_txtleucocitossu ?? "";
+          data.celulasEpiteliales =
+            res.laboratorioClinicoAdicionales.sedimientoUrinarioEpiteliales_txtcelepitelialessu ?? "";
+          data.cilindios = res.laboratorioClinicoAdicionales.sedimientoUrinarioCilindios_txtcilindiossu ?? "";
+          data.bacterias = res.laboratorioClinicoAdicionales.sedimientoUrinarioBacterias_txtbacteriassu ?? "";
+          data.hematies = res.laboratorioClinicoAdicionales.sedimientoUrinarioHematies_txthematiessu ?? "";
+          data.cristales = res.laboratorioClinicoAdicionales.sedimientoUrinarioCristales_txtcristalessu ?? "";
+          data.pus = res.laboratorioClinicoAdicionales.sedimientoUrinarioPus_txtpussu ?? "";
+          data.otrosSedimento = res.laboratorioClinicoAdicionales.sedimientoUrinarioOtros_txtotrossu ?? "";
+
+          console.log("DATAAA", data);
           set((prev) => ({ ...prev, ...data }));
         }
       } else {
@@ -1639,8 +1669,40 @@ export const GetInfoServicioEditar = (
           data.notasDoctor = res.notasDoctor ?? "";
           data.mercurioOrina = res.mercurioOrina ?? "N/A",
             data.plomoSangre = res.plomoSangre ?? "N/A",
-            console.log("DATA EDITAR", data);
-          set((prev) => ({ ...prev, ...res, ...data, }));
+            data.resultadoGonadotropina = sexo === "M" ? "N/A" : res.resultadoGonadotropina
+
+          //Data anexo 16
+          // Examen físico de orina
+          data.colorFisico = res.laboratorioClinicoAdicionales.examenFisicoColor_txtcoloref ?? "";
+          data.aspectoFisico = res.laboratorioClinicoAdicionales.examenFisicoAspecto_txtaspectoef ?? "";
+          data.densidadFisico = res.laboratorioClinicoAdicionales.examenFisicoDensidad_txtdensidadef ?? "";
+          data.phFisico = res.laboratorioClinicoAdicionales.examenFisicoPh_txtphef ?? "";
+
+          // Examen químico de orina
+          data.nitritos = res.laboratorioClinicoAdicionales.examenQuimicoNitritos_txtnitritoseq ?? "";
+          data.proteinas = res.laboratorioClinicoAdicionales.examenQuimicoProteinas_txtproteinaseq ?? "";
+          data.leucocitos = res.laboratorioClinicoAdicionales.examenQuimicoLeucocitos_txtleucocitoseq ?? "";
+          data.cetonas = res.laboratorioClinicoAdicionales.examenQuimicoCetonas_txtcetonaseq ?? "";
+          data.urobilinogeno =
+            res.laboratorioClinicoAdicionales.examenQuimicoUrobilinogeno_txturobilinogenoeq ?? "";
+          data.bilirrubina = res.laboratorioClinicoAdicionales.examenQuimicoBilirubina_txtbilirubinaeq ?? "";
+          data.glucosaQuimico = res.laboratorioClinicoAdicionales.examenQuimicoGlucosa_txtglucosaeq ?? "";
+          data.sangre = res.laboratorioClinicoAdicionales.examenQuimicoSangre_txtsangreeq ?? "";
+
+          // Sedimento urinario
+          data.leucocitosSedimento =
+            res.laboratorioClinicoAdicionales.sedimientoUrinarioLeucocitos_txtleucocitossu ?? "";
+          data.celulasEpiteliales =
+            res.laboratorioClinicoAdicionales.sedimientoUrinarioEpiteliales_txtcelepitelialessu ?? "";
+          data.cilindios = res.laboratorioClinicoAdicionales.sedimientoUrinarioCilindios_txtcilindiossu ?? "";
+          data.bacterias = res.laboratorioClinicoAdicionales.sedimientoUrinarioBacterias_txtbacteriassu ?? "";
+          data.hematies = res.laboratorioClinicoAdicionales.sedimientoUrinarioHematies_txthematiessu ?? "";
+          data.cristales = res.laboratorioClinicoAdicionales.sedimientoUrinarioCristales_txtcristalessu ?? "";
+          data.pus = res.laboratorioClinicoAdicionales.sedimientoUrinarioPus_txtpussu ?? "";
+          data.otrosSedimento = res.laboratorioClinicoAdicionales.sedimientoUrinarioOtros_txtotrossu ?? "";
+
+          console.log("DATA EDITAR", data);
+          set((prev) => ({ ...prev, ...res, ...data }));
         }
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");

@@ -65,7 +65,7 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
             if (response?.id === 1) {
                 listaActualizada = listaActualizada.map((examen) =>
                     examen.nomenclaturaSubida === nomenclaturaSubida
-                        ? { ...examen, resultado: true, imprimir: true, urlArchivo: response.mensaje }
+                        ? { ...examen, urlArchivo: response.mensaje }
                         : examen
                 );
             }
