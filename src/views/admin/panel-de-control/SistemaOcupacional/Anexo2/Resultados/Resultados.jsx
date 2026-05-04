@@ -113,6 +113,10 @@ export default function Resultados({
                 label: "NO APTO (para el puesto en el que trabaja o postula)",
                 value: "NO APTO",
               },
+              {
+                label: "EVALUADO",
+                value: "EVALUADO",
+              },
             ]}
           />
 

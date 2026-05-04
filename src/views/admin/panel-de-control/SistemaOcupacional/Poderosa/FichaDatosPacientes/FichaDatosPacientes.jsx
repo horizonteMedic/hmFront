@@ -22,7 +22,7 @@ export default function FichaDatosPacientes() {
         norden: "",
         id: null,
         fechaIngreso: today,
-        tipoTrabajador: "OBRERO",
+        tipoTrabajador: "",
 
         empresa: "",
         cargo: "",
@@ -303,6 +303,7 @@ export default function FichaDatosPacientes() {
                     labelWidth="120px"
                     value={form.tipoTrabajador}
                     onChange={handleRadioButton}
+                    allowUncheck
                     options={tipoTrabajadorOptions}
                 />
             </SectionFieldset>

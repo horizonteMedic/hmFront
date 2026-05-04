@@ -178,14 +178,7 @@ export default function ExamenFisico({
           value={form.nombre_medico}
           form={form}
           onChange={handleChangeSimple}
-        />
-        <InputTextArea
-          rows="8"
-          label="Otros Exámenes AUTO"
-          name="otrosExamenes2"
-          value={form.otrosExamenes2}
-          disabled
-        />
+        /> 
       </div>
     </div>
   );

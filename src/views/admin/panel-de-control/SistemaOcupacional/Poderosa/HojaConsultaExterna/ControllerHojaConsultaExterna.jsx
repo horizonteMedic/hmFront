@@ -1,20 +1,18 @@
 import Swal from "sweetalert2";
 import {
-    GetInfoPacDefault,
     GetInfoServicioDefault,
     LoadingDefault,
     PrintHojaRDefault,
     SubmitDataServiceDefault,
 } from "../../../../../utils/functionUtils";
 import { getFetch } from "../../../../../utils/apiHelpers";
-import { getHoraActual, getToday } from "../../../../../utils/helpers";
-import Hoja_Consulta_Externa from "../../../../../jaspers/HojaConsultaExterna/Hoja_Consulta_Externa";
+import { getHoraActual} from "../../../../../utils/helpers";
+import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
     "/api/v01/ct/hojaConsultaExterna/obtenerReporteHojaConsultaExterna";
 const registrarUrl =
     "/api/v01/ct/hojaConsultaExterna/registrarActualizarHojaConsultaExterna";
-const today = getToday();
 
 const generarObservaciones = (res) => {
     return [
@@ -62,17 +60,23 @@ export const GetInfoServicio = async (
             ...prev,
             ...res,
             nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
-            sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
-            dniUser: res.dniUsuario,
-            edadPaciente: res.edadPaciente,
+            edad: res.edadPaciente ?? "",
+            sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
+            dni: res.dniPaciente ?? "",
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+            estadoCivil: res.estadoCivilPaciente ?? "",
+            nivelEstudios: res.nivelEstudioPaciente ?? "",
+
+            empresa: res.empresa ?? "",
+            contrata: res.contrata ?? "",
+            ocupacion: res.ocupacionPaciente ?? "",
+            cargoDesempenar: res.cargoPaciente ?? "",
+
+
             nombreExamen: res.nombreExamen,
-            empresa: res.empresa,
-            contrata: res.contrata,
-            cargoPaciente: res.cargoPaciente,
-            ocupacionPaciente: res.ocupacionPaciente,
             fechaExamen: prev.fechaExamen,
             observaciones: generarObservaciones(res),
-
         }));
     }
 };
@@ -99,10 +103,17 @@ export const GetInfoServicioEditar = async (
             // Header
             nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
             sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
-            edadPaciente: `${res.edadPaciente} AÑOS`,
-            dniUser: res.dniUsuario,
+            edad: res.edadPaciente,
+            dni: res.dniPaciente ?? "",
+            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
+            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
+            estadoCivil: res.estadoCivilPaciente ?? "",
+            nivelEstudios: res.nivelEstudioPaciente ?? "",
+            ocupacion: res.ocupacionPaciente ?? "",
+            cargoDesempenar: res.cargoPaciente ?? "",
             cajon: res.paraiso ? "PARAISO" : res.postaVijus ? "POSTA VIJUS" : res.cedro ? "CEDRO" : res.otros ? "OTROS" : "",
             nombre_medico: res.nombreMedico,
+            observacionesAuto: generarObservaciones(res),
 
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
@@ -188,7 +199,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             //Necesita Agudeza visual 
             Swal.fire(
                 "Alerta",
-                "El paciente necesita pasar por ANEXO 16 primero (OBLIGATORIO)",
+                "El paciente necesita tener un registro de ANEXO 16 cerrado.",
                 "warning"
             );
         }

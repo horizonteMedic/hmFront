@@ -112,6 +112,7 @@ export const SubmitDataService = async (
     esApto: form.aptitud == "APTO",
     noEsApto: form.aptitud == "NO APTO",
     aptoRestriccion: form.aptitud == "RESTRICCION",
+    evaluado: form.aptitud == "EVALUADO",
     fechaDesde: form.fechaAptitud,
     fechaVence: form.fechaVencimiento,
     cerrado: form.cerrado,
@@ -994,8 +995,7 @@ export const GetInfoServicioEditar = (
             norden: res.norden_n_orden,
 
             codigoAnexo: res.codigoAnexo_cod_anexo,
-            otrosExamenes: res.otrosExamenes_txtotrosex ?? "",
-            otrosExamenes2: "",
+            otrosExamenes: "",
             observacionesGenerales2: "",
             cerrado: res.cerrado ?? false,
             //nuevos
@@ -1102,7 +1102,9 @@ export const GetInfoServicioEditar = (
                 ? "NO APTO"
                 : res.aptoRestriccion_apto_re
                   ? "RESTRICCION"
-                  : "",
+                  : res.esEvaluado
+                    ? "EVALUADO"
+                    : "",
             fechaAptitud: res.fechaDesde_fechadesde ?? "",
             fechaVencimiento: res.fechaHasta_fechahasta ?? "",
             // nombre_medico: res.medico_medico ?? "",
@@ -1279,7 +1281,7 @@ export const GetInfoServicioEditar = (
           data.vsg = vsg;
           data.glucosa = gluc;
           data.creatinina = creat;
-          data.otrosExamenes2 += "HEMOGRAMA: " + (vsg != null && hemo != null ? "NORMAL" : "N/A") + "\n";
+          data.otrosExamenes += "HEMOGRAMA: " + (vsg != null && hemo != null ? "NORMAL" : "N/A") + "\n";
           const rh =
             res.grupoSanguineoRhPositivo_rbrhpositivo
               ? "+"
@@ -1290,16 +1292,16 @@ export const GetInfoServicioEditar = (
             data.grupoSanguineo || rh
               ? `${data.grupoSanguineo || ""}${rh}`
               : "N/A";
-          data.otrosExamenes2 += `GRUPO SANGUINEO: ${textoGrupo}\n`;
+          data.otrosExamenes += `GRUPO SANGUINEO: ${textoGrupo}\n`;
 
-          data.otrosExamenes2 +=
+          data.otrosExamenes +=
             gluc == null ? "" : "GLUCOSA: " + gluc + " mg/dl.\n";
-          data.otrosExamenes2 +=
+          data.otrosExamenes +=
             creat == null ? "" : "CREATININA: " + creat + " mg/dl.\n";
-          data.otrosExamenes2 += vsg == null ? "" : "VSG: " + vsg + ". \n";
-          data.otrosExamenes2 += "EX ORINA: NORMAL. \n";
-          data.otrosExamenes2 += coca == null ? "" : "COCAINA: " + coca + ". \n";
-          data.otrosExamenes2 +=
+          data.otrosExamenes += vsg == null ? "" : "VSG: " + vsg + ". \n";
+          data.otrosExamenes += "EX ORINA: NORMAL. \n";
+          data.otrosExamenes += coca == null ? "" : "COCAINA: " + coca + ". \n";
+          data.otrosExamenes +=
             marig == null ? "" : "MARIHUANA: " + marig + ". \n";
 
           const sexo = res.datosPaciente.sexo_sexo_pa;
