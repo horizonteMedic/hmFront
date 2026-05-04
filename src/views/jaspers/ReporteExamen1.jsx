@@ -196,283 +196,321 @@ export default async function ReporteExamen1(datos) {
     const yOffset = 0; // 10 puntos más arriba (cambiado de 10 a 0)
 
     // Código de color usando datos reales
-    const color =
-        (datos.codigoColor?.trim() && datos.codigoColor.trim() !== ""
-            ? datos.codigoColor.trim()
-            : "#008f39");
+    // === DISEÑO DE LA SEGUNDA PÁGINA (LABORATORIO) ===
+    const marginL = 7;
+    let currentY = 7;
 
-    const boxText =
-        (datos.textoColor?.trim() && datos.textoColor.trim() !== ""
-            ? datos.textoColor.trim().toUpperCase()
-            : "F");
-    const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
-    if (colorValido) {
-        const boxSize = 15;
-        const boxX = pageW - margin - boxSize + 7; // 5 puntos a la derecha
-        const boxY = yOffset + 2;
+    // Dibujar borde exterior delgado
+    doc.setLineWidth(0.1);
+    doc.setDrawColor(0);
+    doc.rect(marginL-2, 3, 200, 285);
+    doc.setLineWidth(0.2);
+    doc.rect(marginL, 5, 196, 157);
 
-        // Draw box outline in black
-        doc.setDrawColor(0);
-        doc.setLineWidth(0.5);
-        doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
-
-        // Línea de color
-        doc.setDrawColor(color);
-        doc.setLineWidth(2);
-        doc.setLineCap('round');
-        doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
-        doc.setLineCap('butt');
-
-        // Texto del código
-        doc.setFontSize(20); // Aumentado de 18 a 20 (2 puntos más grande)
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(color);
-        doc.text(boxText, boxX + boxSize / 2, boxY + (boxSize / 2), {
-            align: "center",
-            baseline: "middle",
-            maxWidth: boxSize - 1
-        });
-
-        // Número de color al lado izquierdo - AHORA USANDO EL NÚMERO DE ORDEN DEL REGISTRO
-        // COMENTADO: Ya no se necesita mostrar el número visiblemente en la página 2
-        /*
-        doc.setFontSize(60);
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(255, 0, 0); // Rojo
-        
-        // Usar el número de orden del registro en lugar del color de la API
-        // Si no viene el número de orden, usar el color como fallback
-        const numeroColor = datos.numeroOrden || datos.color || "1";
-        
-        // Coordenadas individuales para el número de color
-        const numeroColorX = boxX - 15;
-        const numeroColorY = boxY + boxSize/2;
-        
-        doc.text(String(numeroColor), numeroColorX, numeroColorY, { 
-        align: "center",
-        baseline: "middle"
-        });
-        */
-
-        // Reset color settings
-        doc.setDrawColor(0);
-        doc.setTextColor(0);
-    }
-
-    // Agregar la imagen de la hoja de ruta en la mitad superior de la página 2
+    // --- CABECERA ---
     try {
-        const imgPath = "./img/pag2_hojaderuta.png";
-        const pageW = doc.internal.pageSize.getWidth();
-        const pageH = doc.internal.pageSize.getHeight();
-
-        // Definir márgenes de 1.5pt (convertir a mm: 1.5pt ≈ 0.53mm)
-        const margin = 0.53;
-
-        // Calcular dimensiones para que la imagen ocupe la mitad superior con márgenes
-        const imgW = pageW - (2 * margin); // 100% del ancho menos márgenes laterales
-        const imgH = (pageH / 2) - margin; // Mitad de la altura menos margen superior
-
-        // Posicionar la imagen con márgenes
-        const imgX = margin; // Margen izquierdo
-        const imgY = margin; // Margen superior
-
-        doc.addImage(imgPath, 'PNG', imgX, imgY, imgW, imgH);
-
-        // === COLOCAR DATOS DE PRUEBA EN EL FRAME ===
-        // Configuración de fuentes para los datos
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(9);
-
-        // === COLOCAR DATOS REALES EN EL FRAME ===
-        // MUESTRA - Checkbox SANGRE (siempre marcado por defecto)
-        // doc.setFont("helvetica", "bold");
-        // doc.text("X", 25, 25); // X: 25, Y: 25
-
-        // CÓDIGO
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(20);
-        doc.text(String(datos.orden || "148055"), 131, 12); // X: 80, Y: 35 - Ajustado para ser más visible
-
-        // Restaurar fuente normal para los campos siguientes
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(9);
-
-        // TIPO DE EXAMEN - Solo abreviar en página 2 (autónomo)
-        doc.setFontSize(8.5);
-
-        // Función abreviadora autónoma para página 2
-        const abreviarExamenPagina2 = (examen) => {
-            if (!examen) return "EXAMEN";
-
-            const examenLower = examen.toLowerCase();
-
-            // Mapeo de abreviaciones específicas para página 2
-            if (examenLower.includes("psicosensometria") || examenLower.includes("psicosensometría")) return "PSICO";
-            if (examenLower.includes("anexo16-a") || examenLower.includes("anexo 16-a")) return "ANX16-A";
-            if (examenLower.includes("anexo16a") || examenLower.includes("anexo 16a")) return "ANX16A";
-            if (examenLower.includes("anexo16") || examenLower.includes("anexo 16")) return "ANX16";
-            if (examenLower.includes("anual")) return "ANUAL";
-            if (examenLower.includes("pre-ocupacional") || examenLower.includes("preocupacional")) return "PRE-OC";
-            if (examenLower.includes("ocupacional")) return "OCUP";
-            if (examenLower.includes("periodico") || examenLower.includes("periódico")) return "PER";
-            if (examenLower.includes("retiro")) return "RETIRO";
-            if (examenLower.includes("reingreso")) return "REING";
-            if (examenLower.includes("post-ocupacional")) return "POST-OC";
-
-            // Si no hay mapeo específico, truncar a 7 caracteres máximo
-            return examen.substring(0, 7).toUpperCase();
-        };
-
-        // Solo aplicar abreviación en página 2 si hay datos reales del backend
-        if (datos.examen) {
-            const examenParaPagina2 = abreviarExamenPagina2(datos.examen);
-            doc.text(examenParaPagina2, 30, 25.3);
-        } else {
-            // Si no hay datos del backend, mostrar valor de prueba
-            const examenPrueba = "PRE-OC";
-            doc.text(examenPrueba, 31, 25.5);
-        }
-
-        doc.setFontSize(9); // Restaurar tamaño de fuente para los siguientes campos
-
-        // EMPRESA - Con ancho máximo y ajuste de posición Y hacia arriba
-        const empresaTexto = String(datos.empresa || "EMPRESA NO ESPECIFICADA ");
-        const empresaMaxWidth = 62; // Ancho máximo para empresa
-        let empresaLines;
-
-        // Si excede de 2 líneas, usar ancho 70 solo para la primera línea
-        if (doc.splitTextToSize(empresaTexto, empresaMaxWidth).length > 2) {
-            // Primera línea con ancho 70, resto con ancho normal
-            const primeraLinea = doc.splitTextToSize(empresaTexto, 80)[0];
-            const restoTexto = empresaTexto.substring(primeraLinea.length).trim();
-            const restoLineas = doc.splitTextToSize(restoTexto, empresaMaxWidth);
-            empresaLines = [primeraLinea, ...restoLineas];
-        } else {
-            empresaLines = doc.splitTextToSize(empresaTexto, empresaMaxWidth);
-        }
-
-        const empresaX = 64; // Posición X específica para empresa (movida a la izquierda)
-        const empresaY = 25.5; // Posición Y base (última línea)
-
-        // Reducir fuente si pasa de 3 líneas
-        if (empresaLines.length > 2) {
-            doc.setFontSize(8); // Reducir de 9 a 8
-        }
-
-        empresaLines.forEach((line, index) => {
-            // Calcular Y para que la última línea esté en empresaY y las anteriores arriba
-            const lineY = empresaY - ((empresaLines.length - 1 - index) * 3);
-            doc.text(line, empresaX, lineY);
-        });
-
-        // Restaurar fuente para contrata
-        doc.setFontSize(9);
-
-        // CONTRATA - Con ancho máximo y ajuste de posición Y hacia arriba
-        const contrataTexto = String(datos.contrata || "CONTRATA NO ESPECIFICADA");
-        const contrataMaxWidth = 62; // Ancho máximo para contrata
-        const contrataLines = doc.splitTextToSize(contrataTexto, contrataMaxWidth);
-        const contrataX = 120; // Posición X específica para contrata (movida a la izquierda)
-        const contrataY = 25.5; // Posición Y base (última línea)
-
-        // Reducir fuente si pasa de 3 líneas
-        if (contrataLines.length > 2) {
-            doc.setFontSize(8); // Reducir de 9 a 8
-        }
-
-        contrataLines.forEach((line, index) => {
-            // Calcular Y para que la última línea esté en contrataY y las anteriores arriba
-            const lineY = contrataY - ((contrataLines.length - 1 - index) * 3);
-            doc.text(line, 143, lineY); // Cambiado de 155 a 110 para mover más a la izquierda
-        });
-
-        // Restaurar fuente para los siguientes campos
-        doc.setFontSize(9);
-
-        // NOMBRES Y APELLIDOS
-        doc.setFontSize(10);
-        doc.text(String(datos.nombres || "NOMBRE DE PRUEBA PACIENTE"), 53.5, 31); // X: 35, Y: 84
-        doc.setFontSize(9); // Restaurar tamaño de fuente para los siguientes campos
-
-        // EDAD
-        doc.setFontSize(10.5);
-        doc.text(datos.edad ? `${String(datos.edad)}` : "30", 140, 31); // X: 120, Y: 84
-        doc.setFontSize(9); // Restaurar tamaño de fuente para los siguientes campos
-
-        // FECHA
-        doc.setFontSize(10.5);
-        doc.text(String(formatearFecha(datos.fecha) || "23/08/2025"), 175, 31); // X: 160, Y: 84
-        doc.setFontSize(9); // Restaurar tamaño de fuente para los siguientes campos
-
-        // CARGO - Con ancho máximo y ajuste de posición Y hacia arriba
-        const cargoTexto = String(datos.cargo || "CARGO NO ESPECIFICADO");
-        const cargoMaxWidth = 45; // Ancho máximo para cargo
-        const cargoLines = doc.splitTextToSize(cargoTexto, cargoMaxWidth);
-        const cargoY = 37.8; // Posición Y base (última línea)
-        cargoLines.forEach((line, index) => {
-            // Calcular Y para que la última línea esté en cargoY y las anteriores arriba
-            const lineY = cargoY - ((cargoLines.length - 1 - index) * 3);
-            doc.text(line, 24.5, lineY);
-        });
-
-        // === CHECKBOXES DE EVALUACIONES ===
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(14);
-        doc.setTextColor(255, 0, 0); // Color rojo
-
-        // T.ALTURA - Marcar si NO está hecho en página 1 (usar la misma lógica)
-        if (!datos.testaltura ? true : !datos.cerificadoaltura && !datos.b_certialtura ? false : true) {
-            // Si está marcado en página 1, NO marcar en página 2
-        } else {
-            doc.text("X", 89, 37.3); // Marcar si NO se hizo test altura
-        }
-
-        // PSICOSENSOMETRIA - Marcar si NO está hecho en página 1
-        if (!datos.altaps ? true : datos.psicosen ? true : false) {
-            // Si está marcado en página 1, NO marcar en página 2
-        } else {
-            doc.text("X", 111, 37.3); // Marcar si NO se hizo psicosensometría
-        }
-
-        // M. A. (Manipulador de Alimentos) - Marcar si NO está hecho en página 1
-        if (!datos.altamanipalim ? true : datos.manipalimen ? true : false) {
-            // Si está marcado en página 1, NO marcar en página 2
-        } else {
-            doc.text("X", 130.5, 37.3); // Marcar si NO se hizo manip. alimentos
-        }
-
-        // MET. P. (Metales Pesados) - Marcar si NO está hecho en página 1
-        if (!datos.aplomo || !datos.amercurio ? true : !datos.plomos || !datos.mercurioo ? true : false) {
-            // Si está marcado en página 1, NO marcar en página 2
-        } else {
-            doc.text("X", 154.2, 37.3); // Marcar si NO se hicieron metales pesados
-        }
-
-        // Pb (Plomo) - Marcar si NO está hecho en página 1
-        if (!datos.aplomo ? true : datos.plomos ? true : false) {
-            // Si está marcado en página 1, NO marcar en página 2
-        } else {
-            doc.text("X", 171, 37.3); // Marcar si NO se hizo plomo
-        }
-
-        // T. CAL (Trabajos Calientes) - Marcar si NO está hecho en página 1
-        if (!datos.altatc ? true : datos.trabcalientes ? true : false) {
-            // Si está marcado en página 1, NO marcar en página 2
-        } else {
-            doc.text("X", 194, 37.3); // Marcar si NO se hicieron trabajos calientes
-        }
-
-        // Restaurar fuente normal
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(9);
-
-    } catch (error) {
-        console.error("No se pudo cargar la imagen de la hoja de ruta:", error);
-        // Si falla la imagen, agregar texto alternativo
-        doc.setFontSize(16);
-        doc.setFont("helvetica", "bold");
-        doc.text("HOJA DE RUTA", 80, 100, { align: "center" });
+        const logoImg = "/img/logo-color.png";
+        doc.addImage(logoImg, "PNG", marginL + 5, 8, 45, 12);
+    } catch (e) {
+        console.error("Error cargando logo", e);
     }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7);
+    doc.text("MUESTRA:", marginL + 55, 15);
+
+    doc.setFont("helvetica", "normal");
+    doc.text("SANGRE", marginL + 72, 14);
+    doc.rect(marginL + 85, 11.5, 4, 3); // Checkbox Sangre
+    doc.text("ORINA", marginL + 72, 18);
+    doc.rect(marginL + 85, 15.5, 4, 3); // Checkbox Orina
+    doc.text("HECES", marginL + 72, 22);
+    doc.rect(marginL + 85, 19.5, 4, 3); // Checkbox Heces
+
+    // Cuadro de tiempos
+    doc.setLineWidth(0.2);
+    doc.rect(marginL + 92, 10, 48, 15);
+    doc.line(marginL + 92, 15, marginL + 140, 15);
+    doc.line(marginL + 92, 20, marginL + 140, 20);
+    doc.line(marginL + 125, 10, marginL + 125, 25);
+
+    doc.setFontSize(5.5);
+    doc.text("HORA DE TOMA DE MUESTRA", marginL + 93, 13);
+    doc.text("HORA DE INICIO DE PROCESO", marginL + 93, 18);
+    doc.text("HORA DE TERMINO DE PROCESO", marginL + 93, 23);
+
+    // Código
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "bold");
+    doc.text("CÓDIGO", marginL + 142, 17);
+    doc.setLineWidth(0.5);
+    doc.rect(marginL + 155, 11, 22, 10);
+    doc.setFontSize(15);
+    doc.text(String(datos.orden || ""), marginL + 157, 17);
+
+    // Dynamic BM Box (Top Right)
+    const displayColor = (datos.codigoColor?.trim() ? datos.codigoColor.trim() : "#ADD8E6");
+    const displayText = (datos.textoColor?.trim() ? datos.textoColor.trim().toUpperCase() : "BM");
+
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.6);
+    doc.roundedRect(marginL + 180, 9, 12, 14, 1, 1);
+
+    doc.setLineWidth(1.6);
+    doc.setDrawColor(displayColor);
+    doc.setLineCap('round');
+    doc.line(marginL + 194, 9, marginL + 194, 23);
+    doc.setLineCap('butt');
+
+    doc.setTextColor(displayColor);
+    doc.setFontSize(displayText.length > 1 ? 15 : 20);
+    doc.text(displayText, marginL + 186, 16, { align: "center", baseline: "middle" });
+    doc.setTextColor(0);
+    doc.setDrawColor(0);
+
+
+    // --- INFO PACIENTE ---
+    doc.setLineWidth(0.3);
+    currentY = 32;
+    doc.setFontSize(7.5);
+    doc.setFont("helvetica", "bold");
+
+    doc.text("T. EXAMEN:", marginL + 5, currentY);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.text(String(datos.examen || ""), marginL + 23, currentY);
+    doc.line(marginL + 22, currentY + 0.5, marginL + 45, currentY + 0.5);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7.5);
+    doc.text("EMPRESA:", marginL + 48, currentY);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.text(String(datos.empresa || ""), marginL + 64, currentY);
+    doc.line(marginL + 63, currentY + 0.5, marginL + 130, currentY + 0.5);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7.5);
+    doc.text("CONTRATA:", marginL + 132, currentY);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.text(String(datos.contrata || "N/A"), marginL + 150, currentY);
+    doc.line(marginL + 149, currentY + 0.5, marginL + 192, currentY + 0.5);
+
+    currentY += 5;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7.5);
+    doc.text("NOMBRES Y APELLIDOS:", marginL + 5, currentY);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.text(String(datos.nombres || ""), marginL + 42, currentY);
+    doc.line(marginL + 41, currentY + 0.5, marginL + 130, currentY + 0.5);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7.5);
+    doc.text("EDAD:", marginL + 132, currentY);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.text(String(datos.edad || ""), marginL + 143, currentY);
+    doc.text("Años", marginL + 152, currentY);
+    doc.line(marginL + 142, currentY + 0.5, marginL + 150, currentY + 0.5);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7.5);
+    doc.text("FECHA:", marginL + 162, currentY);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.text(formatearFecha(datos.fecha) || "", marginL + 175, currentY);
+    doc.line(marginL + 174, currentY + 0.5, marginL + 192, currentY + 0.5);
+
+    currentY += 5;
+    doc.setFont("helvetica", "bold");
+    doc.text("CARGO:", marginL + 5, currentY);
+    doc.setFont("helvetica", "normal");
+    doc.text(String(datos.cargo || ""), marginL + 18, currentY);
+    doc.line(marginL + 17, currentY + 0.5, marginL + 57, currentY + 0.5);
+
+    // Checkboxes (T.ALTURA, PSICO, etc.)
+    const cbXStart = 65;
+    const cbLabels = ["T.ALTURA", "PSICO", "M. A.", "MET. P.", "Pb", "T. CAL"];
+    doc.setFont("helvetica", "bold");
+    cbLabels.forEach((label, i) => {
+        doc.text(label, cbXStart + (i * 22), currentY);
+        doc.rect(cbXStart + (i * 22) + 13, currentY - 3, 5, 4);
+
+        // Marcar automáticamente si corresponde según la lógica de la página 1
+        let marked = false;
+        if (label === "T.ALTURA") marked = !(!datos.testaltura ? true : !datos.cerificadoaltura && !datos.b_certialtura ? false : true);
+        if (label === "PSICO") marked = !(!datos.altaps ? true : datos.psicosen ? true : false);
+        if (label === "M. A.") marked = !(!datos.altamanipalim ? true : datos.manipalimen ? true : false);
+        if (label === "MET. P.") marked = !(!datos.aplomo || !datos.amercurio ? true : !datos.plomos || !datos.mercurioo ? true : false);
+        if (label === "Pb") marked = !(!datos.aplomo ? true : datos.plomos ? true : false);
+        if (label === "T. CAL") marked = !(!datos.altatc ? true : datos.trabcalientes ? true : false);
+
+        if (marked) {
+            doc.setFontSize(9);
+            doc.setTextColor(255, 0, 0);
+            doc.text("X", cbXStart + (i * 22) + 14.5, currentY - 0.2);
+            doc.setTextColor(0);
+            doc.setFontSize(7.5);
+        }
+    });
+
+    // --- TABLAS DE RESULTADOS ---
+    currentY += 7;
+    const tableTop = currentY;
+    const col1Width = 100;
+    const col2Width = 90;
+
+    // Columna Izquierda
+    doc.setFillColor(253, 233, 174); // Light orange/yellow for header
+    doc.rect(marginL + 5, currentY, col1Width - 5, 5, 'FD');
+    doc.setFontSize(7.5);
+    doc.setFont("helvetica", "bold");
+    doc.text("PRUEBA", marginL + 10, currentY + 3.5);
+    doc.line(marginL + 35, currentY, marginL + 35, currentY + 5);
+    doc.text("RESULTADOS DE ANALISIS CLÍNICOS", marginL + 40, currentY + 3.5);
+
+    const rowsLeft = [
+        { label: "G.S Y FACT. Rh", h: 6 },
+        { label: "Hb y Hto", h: 6, sub: ["Hb:", "Hto:"] },
+        { label: "VSG", h: 6 },
+        { label: "LEUCOCITOS", h: 6 },
+        { label: "HEMATÍES", h: 6 },
+        { label: "PLAQUETAS", h: 6 },
+        { label: "RECUENTO\nDIFERENCIAL", h: 12, sub: ["NEUT:", "AB:", "SEG:", "MON:", "EOS:", "BAS:", "LIN:"] },
+        { label: "GLUCOSA", h: 6 },
+        { label: "CREATININA", h: 6 },
+        { label: "ÚREA", h: 6 },
+        { label: "ÁCIDO ÚRICO", h: 6 }
+    ];
+
+    let yL = currentY + 5;
+    rowsLeft.forEach(row => {
+        doc.setLineWidth(0.2);
+        doc.rect(marginL + 5, yL, 30, row.h);
+        doc.rect(marginL + 35, yL, col1Width - 35, row.h);
+        doc.setFontSize(6.5);
+        doc.setFont("helvetica", "bold");
+
+        const lines = doc.splitTextToSize(row.label, 28);
+        doc.text(lines, marginL + 20, yL + (row.h / 2), { align: "center", baseline: "middle" });
+
+        if (row.sub) {
+            doc.setFont("helvetica", "normal");
+            if (row.label === "Hb y Hto") {
+                doc.text(row.sub[0], marginL + 36, yL + 4);
+                doc.line(marginL + 64, yL, marginL + 64, yL + 6);
+                doc.text(row.sub[1], marginL + 65, yL + 4);
+            } else if (row.label === "RECUENTO\nDIFERENCIAL") {
+                doc.text(row.sub[0], marginL + 36, yL + 4);
+                doc.text(row.sub[1], marginL + 51, yL + 4);
+                doc.text(row.sub[2], marginL + 71, yL + 4);
+                doc.text(row.sub[3], marginL + 36, yL + 10);
+                doc.text(row.sub[4], marginL + 51, yL + 10);
+                doc.text(row.sub[5], marginL + 71, yL + 10);
+                doc.text(row.sub[6], marginL + 86, yL + 10);
+
+                doc.line(marginL + 50, yL, marginL + 50, yL + 6);
+                doc.line(marginL + 70, yL, marginL + 70, yL + 6);
+                doc.line(marginL + 35, yL + 6, marginL + 100, yL + 6);
+                doc.line(marginL + 50, yL + 6, marginL + 50, yL + 12);
+                doc.line(marginL + 70, yL + 6, marginL + 70, yL + 12);
+                doc.line(marginL + 85, yL + 6, marginL + 85, yL + 12);
+            }
+        }
+        yL += row.h;
+    });
+
+    // Columna Derecha
+    let yR = tableTop;
+    const rowsRight = [
+        "COLESTEROL", "TRIGLICÉRIDOS", "HDL", "LDL", "VLDL", "RPR O VDRL",
+        "PREGNOSTICON", "COCAÍNA", "MARIHUANA", "PANEL 5D", "ECO"
+    ];
+
+    rowsRight.forEach(label => {
+        doc.rect(marginL + 105, yR, 35, 6);
+        doc.rect(marginL + 140, yR, col2Width - 40, 6);
+        doc.setFontSize(6.5);
+        doc.setFont("helvetica", "bold");
+        doc.text(label, marginL + 106, yR + 4);
+        yR += 6;
+    });
+
+    // P. HEPATICO
+    doc.rect(marginL + 105, yR, col2Width - 5, 11);
+    doc.setLineWidth(0.3);
+    doc.line(marginL + 140, yR, marginL + 140, yR + 11);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(6);
+    doc.text("D:", marginL + 141, yR + 3.5);
+    doc.text("Ph:", marginL + 165, yR + 3.5);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("P. HEPÁTICO", marginL + 106, yR + 8);
+    doc.setLineWidth(0.2);
+    doc.line(marginL + 164, yR + 5, marginL + 164, yR + 11);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(6);
+    doc.text("GGT:", marginL + 165, yR + 8.5);
+    doc.line(marginL + 105, yR + 5, marginL + 190, yR + 5);
+
+    // --- COMENTARIOS ---
+    currentY = yL + 3;
+    doc.setLineWidth(0.4);
+    doc.rect(marginL + 5, currentY, 185, 30);
+    // doc.roundedRect(marginL + 5, currentY, 190, 30, 1.5, 1.5);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7.5);
+    doc.text("COMENTARIOS", marginL + 8, currentY + 5);
+    doc.setLineWidth(0.3);
+    doc.line(marginL + 8, currentY + 6, marginL + 28, currentY + 6);
+
+    doc.setLineWidth(0.4);
+    doc.setFontSize(6.5);
+    doc.text("• FAM. DIABÉTICO :", marginL + 8, currentY + 11);
+    doc.line(marginL + 35, currentY + 11.5, marginL + 100, currentY + 11.5);
+    doc.text("• MEDICAMENTO :", marginL + 8, currentY + 18);
+    doc.line(marginL + 35, currentY + 18.5, marginL + 100, currentY + 18.5);
+    doc.text("• P. MENSTRUAL :", marginL + 8, currentY + 25);
+    doc.line(marginL + 35, currentY + 25.5, marginL + 100, currentY + 25.5);
+
+    doc.rect(marginL + 105, currentY + 2, 83, 26);
+    doc.text("• L      :", marginL + 108, currentY + 9);
+    doc.line(marginL + 120, currentY + 9.5, marginL + 148, currentY + 9.5);
+    doc.text("• CEL  :", marginL + 108, currentY + 14);
+    doc.line(marginL + 120, currentY + 14.5, marginL + 148, currentY + 14.5);
+    doc.text("• CRIST :", marginL + 108, currentY + 19);
+    doc.line(marginL + 120, currentY + 19.5, marginL + 186, currentY + 19.5);
+    doc.text("• OTROS :", marginL + 108, currentY + 24);
+    doc.line(marginL + 120, currentY + 24.5, marginL + 186, currentY + 24.5);
+ 
+    doc.text("• H     :", marginL + 152, currentY + 9);
+    doc.line(marginL + 162, currentY + 9.5, marginL + 186, currentY + 9.5);
+    doc.text("• BAC :", marginL + 152, currentY + 14);
+    doc.line(marginL + 162, currentY + 14.5, marginL + 186, currentY + 14.5);
+
+
+
+    // --- FIRMAS ---
+    currentY += 35;
+    doc.setLineWidth(0.8);
+    doc.setDrawColor(0, 51, 102); // Dark blue for the signature box
+    doc.rect(marginL, currentY, 196, 35);
+    doc.setDrawColor(0);
+    doc.setFontSize(6.5);
+    doc.setFont("helvetica", "bold");
+    doc.text("FIRMA:", marginL + 10, currentY + 5);
+    doc.text("FIRMA:", marginL + 105, currentY + 5);
+
+    doc.setLineWidth(0.4);
+    doc.line(marginL + 25, currentY + 28, marginL + 85, currentY + 28);
+    doc.text("RESPONSABLE DE TOMA DE MUESTRA", marginL + 30, currentY + 32);
+
+    doc.line(marginL + 115, currentY + 28, marginL + 175, currentY + 28);
+    doc.text("RESPONSABLE DE PROCESO", marginL + 125, currentY + 32);
+
 
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
