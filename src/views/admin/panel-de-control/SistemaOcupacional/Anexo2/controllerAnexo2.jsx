@@ -112,7 +112,7 @@ export const SubmitDataService = async (
     esApto: form.aptitud == "APTO",
     noEsApto: form.aptitud == "NO APTO",
     aptoRestriccion: form.aptitud == "RESTRICCION",
-    evaluado: form.aptitud == "EVALUADO",
+    esEvaluado: form.aptitud == "EVALUADO",
     fechaDesde: form.fechaAptitud,
     fechaVence: form.fechaVencimiento,
     cerrado: form.cerrado,

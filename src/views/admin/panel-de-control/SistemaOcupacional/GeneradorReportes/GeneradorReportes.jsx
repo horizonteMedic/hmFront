@@ -198,7 +198,7 @@ export default function GeneradorReportes() {
                                             {examen.urlArchivo ? "SUBIDO" : "NO SUBIDO"}
                                         </span>
                                         <ButtonsPDF
-                                            {...(examen.urlArchivo ? {
+                                            {...(examen.urlArchivo && examen.resultado ? {
                                                 handleRead: () =>
                                                     ReadArchivosForm(form, setVisualerOpen, token, examen.nomenclaturaSubida)
                                             } : {})}
@@ -214,7 +214,7 @@ export default function GeneradorReportes() {
                                         : "bg-gray-200 text-gray-400 cursor-not-allowed"
                                         }`}
                                     disabled={!examen.resultado}
-                                    onClick={() => handleImprimirYSubir(examen, form, token, selectedSede, userlogued, datosFooter, abortControllerRef,search)}
+                                    onClick={() => handleImprimirYSubir(examen, form, token, selectedSede, userlogued, datosFooter, abortControllerRef, search)}
                                 >
                                     Imprimir y Subir
                                 </button>
