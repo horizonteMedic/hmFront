@@ -223,6 +223,15 @@ const Valorizacion = () => {
         return result;
     };
 
+    const handleChangeOptions = (e) => {
+        const { name } = e.target;
+        const selectedOption = JSON.parse(e.target.value);
+        setForm({
+            ...form,
+            [name]: selectedOption,
+        });
+    };
+
     const columnasVisibles = form.TipoBusqueda
         ? columnasBase
         : form.Filtros.filter(col => col.valor);
@@ -231,7 +240,7 @@ const Valorizacion = () => {
     const currentData = Array.isArray(data)
         ? data.slice(startIdx, endIdx)
         : [];
-
+    console.log(form)
     return (
         <div className="container mx-auto mt-12 mb-12">
             <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
@@ -311,14 +320,18 @@ const Valorizacion = () => {
                 </div>
                 <div className="flex flex-wrap gap-4 p-6">
                     <div className="flex flex-col flex-grow">
-                        <SelectField
-                            label="Sede"
-                            name="sede"
-                            value={form.sede ? JSON.stringify(form.sede) : ""}
-                            onChange={handleChange}
-                            placeholder="Seleccionar Sede"
-                            options={Sedes.map(s => ({ value: JSON.stringify(s), label: s.nombre_sede }))}
-                        />
+                        <p className="font-semibold">Sede</p>
+                        <select
+                            value={form.sede ? JSON.stringify(form.sede) : ''}
+                            onChange={handleChangeOptions}
+                            name='sede'
+                            className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
+                        >
+                            <option value="">Seleccionar Sede</option>
+                            {Sedes.map((option) => (
+                                <option key={option.cod_sede} value={JSON.stringify(option)}>{option.nombre_sede}</option>
+                            ))}
+                        </select>
                     </div>
                     <div className="flex flex-col flex-grow">
                         <p className="font-semibold">Fecha Inicio</p>

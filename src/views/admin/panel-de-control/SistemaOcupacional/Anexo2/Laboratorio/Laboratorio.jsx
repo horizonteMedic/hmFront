@@ -328,6 +328,165 @@ export default function Laboratorio({
 
                     </div>
                 </div>
+
+                {/* Exámen Químico */}
+                <div className="bg-white border border-gray-200 rounded-lg p-3">
+                    <h4 className="font-semibold text-gray-800 mb-2">Exámen Químico</h4>
+                    <div className="space-y-2">
+                        <InputTextOneLine
+                            label="Nitritos"
+                            name="nitritos"
+                            value={form.nitritos}
+                            labelWidth="90px"
+                            disabled
+                        />
+                        <InputTextOneLine
+                            label="Proteínas"
+                            name="proteinas"
+                            value={form.proteinas}
+                            labelWidth="90px"
+                            disabled
+                        />
+                        <InputTextOneLine
+                            label="Cetonas"
+                            name="cetonas"
+                            value={form.cetonas}
+                            labelWidth="90px"
+                            disabled
+                        />
+                        <InputTextOneLine
+                            label="Leucocitos"
+                            name="leucocitos"
+                            value={form.leucocitos}
+                            labelWidth="90px"
+                            disabled
+                        />
+                        <InputTextOneLine
+                            label="Urobilinogeno"
+                            name="urobilinogeno"
+                            value={form.urobilinogeno}
+                            labelWidth="90px"
+                            disabled
+                        />
+                        <InputTextOneLine
+                            label="Bilirrubina"
+                            name="bilirrubina"
+                            value={form.bilirrubina}
+                            labelWidth="90px"
+                            disabled
+                        />
+                        <InputTextOneLine
+                            label="Glucosa"
+                            name="glucosaQuimico"
+                            value={form.glucosaQuimico}
+                            labelWidth="90px"
+                            disabled
+                        />
+                        <InputTextOneLine
+                            label="Sangre"
+                            name="sangre"
+                            value={form.sangre}
+                            labelWidth="90px"
+                            disabled
+                        />
+                    </div>
+                </div>
+                {/* Sedimento Unitario */}
+                <div className="bg-white border border-gray-200 rounded-lg p-3">
+                    <h4 className="font-semibold text-gray-800 mb-2">Sedimento Unitario</h4>
+                    <div className="space-y-2">
+                        <InputTextOneLine
+                            label="Leucocitos"
+                            name="leucocitosSedimento"
+                            value={form.leucocitosSedimento}
+                            labelWidth="90px"
+                            disabled
+                        />
+                        <InputTextOneLine
+                            label="Cel.Epiteliales"
+                            name="celulasEpiteliales"
+                            value={form.celulasEpiteliales}
+                            labelWidth="90px"
+                            disabled
+                        />
+                        <InputTextOneLine
+                            label="Cilindios"
+                            name="cilindios"
+                            value={form.cilindios}
+                            labelWidth="90px"
+                            disabled
+                        />
+                        <InputTextOneLine
+                            label="Bacterías"
+                            name="bacterias"
+                            value={form.bacterias}
+                            labelWidth="90px"
+                            disabled
+                        />
+                        <InputTextOneLine
+                            label="Hematies"
+                            name="hematies"
+                            value={form.hematies}
+                            labelWidth="90px"
+                            disabled
+                        />
+                        <InputTextOneLine
+                            label="Cristales"
+                            name="cristales"
+                            value={form.cristales}
+                            labelWidth="90px"
+                            disabled
+                        />
+                        <InputTextOneLine
+                            label="Pus"
+                            name="pus"
+                            value={form.pus}
+                            labelWidth="90px"
+                            disabled
+                        />
+                        <InputTextOneLine
+                            label="Otros"
+                            name="otrosSedimento"
+                            value={form.otrosSedimento}
+                            labelWidth="90px"
+                            disabled
+                        />
+                    </div>
+                </div>
+                {/* Exámen Físico */}
+                <div className="bg-white border border-gray-200 rounded-lg p-3">
+                    <h4 className="font-semibold text-gray-800 mb-2">Exámen Físico</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                        <InputTextOneLine
+                            label="Color"
+                            name="colorFisico"
+                            value={form.colorFisico}
+                            labelWidth="60px"
+                            disabled
+                        />
+                        <InputTextOneLine
+                            label="Aspecto"
+                            name="aspectoFisico"
+                            value={form.aspectoFisico}
+                            labelWidth="60px"
+                            disabled
+                        />
+                        <InputTextOneLine
+                            label="Densidad"
+                            name="densidadFisico"
+                            value={form.densidadFisico}
+                            labelWidth="60px"
+                            disabled
+                        />
+                        <InputTextOneLine
+                            label="PH"
+                            name="phFisico"
+                            value={form.phFisico}
+                            labelWidth="60px"
+                            disabled
+                        />
+                    </div>
+                </div>
             </div>
         </div>
     );

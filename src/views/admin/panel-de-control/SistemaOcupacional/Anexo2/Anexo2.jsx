@@ -311,7 +311,7 @@ export default function Anexo2() {
     pcrUltrasensible: "",
     mercurioOrina: "",
     plomoSangre: "",
-    // Exámenes de Laboratorio
+    // Exámenes de Laboratorio 2.0
     nitritos: "",
     proteinas: "",
     cetonas: "",
@@ -332,8 +332,7 @@ export default function Anexo2() {
     aspectoFisico: "",
     densidadFisico: "",
     phFisico: "",
-    otrosExamenes: "",
-    aptoParaTrabajar: "",
+
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
