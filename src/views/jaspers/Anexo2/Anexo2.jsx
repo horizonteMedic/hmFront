@@ -221,6 +221,7 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
     apto: data.esApto_apto_si === true || data.esApto_apto_si === "true",
     aptoConRestriccion: data.aptoRestriccion_apto_re === true || data.aptoRestriccion_apto_re === "true",
     noApto: data.noEsApto_apto_no === true || data.noEsApto_apto_no === "true",
+    evaluado: data.esEvaluado === true || data.esEvaluado === "true",
     restricciones: (data.restricciones_txtrestricciones === null || data.restricciones_txtrestricciones === undefined || data.restricciones_txtrestricciones === "") ? "" : data.restricciones_txtrestricciones,
     fechaDesde: formatearFechaCorta(data.fechaDesde_fechadesde || ""),
     fechaHasta: formatearFechaCorta(data.fechaHasta_fechahasta || ""),
@@ -1968,15 +1969,17 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   // Fila con Apto | X | Apto con restricción | X | No apto | X
   // Distribución: 3 columnas de texto de ~53mm cada una, 3 columnas de checkbox de ~13mm cada una
   // Total: 53*3 + 13*3 = 159 + 39 = 198mm (ajustado a 200mm)
-  const colConclusWidth = 53; // Ancho de cada columna de texto
-  const colCheckWidth = 13; // Ancho de cada columna de checkbox
+  const colConclusWidth = 39; // Ancho de cada columna de texto
+  const colCheckWidth = 10; // Ancho de cada columna de checkbox
   const verticalLinesConclus = [
     tablaInicioX, // inicio
     tablaInicioX + colConclusWidth, // después de "Apto"
-    tablaInicioX + colConclusWidth + colCheckWidth, // después de X
+    tablaInicioX + colConclusWidth + colCheckWidth, //  después de X
     tablaInicioX + colConclusWidth + colCheckWidth + colConclusWidth, // después de "Apto con restricción"
     tablaInicioX + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth, // después de X
     tablaInicioX + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth + colConclusWidth, // después de "No apto"
+    tablaInicioX + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth,// después de X
+    tablaInicioX + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth + colConclusWidth,// después de Evaluado
     tablaInicioX + tablaAncho // final
   ];
 
@@ -2011,6 +2014,12 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
     doc.text('X', tablaInicioX + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth / 2, yPos + 3.5, { align: "center" });
   }
 
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("EVALUADO", tablaInicioX + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth + 2, yPos + 3.5);
+  if (datosFinales.evaluado) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text('X', tablaInicioX + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth + colConclusWidth  + colCheckWidth / 2, yPos + 3.5, { align: "center" });
+  }
   yPos += filaAltura;
 
   // === FILA: FECHA DESDE | FECHA HASTA ===
