@@ -5,7 +5,7 @@ import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import FolioJasper from "../../../../jaspers/FolioJasper/FolioJasper";
 import { getToday } from "../../../../utils/helpers";
-import { GetInfoPac, obtenerFirmas, PrintHojaRAnexo16, PrintHojaRAnexo2, SubmitDataService } from "./controllerFolio";
+import { GetInfoPac, nombresExamen, obtenerFirmas, PrintHojaRAnexo16, PrintHojaRAnexo2, subirArchivoFolio, SubmitDataService } from "./controllerFolio";
 import Swal from "sweetalert2";
 import { buildExamenesList } from "./folioCatalogo";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
@@ -466,15 +466,161 @@ const Folio = () => {
             };
 
             // Llamar a FolioJasper con el callback de progreso
-            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress, selectedListType, controller.signal, form.nombres, form.apellidos, datosFooter, comprimidoz);
+            const archivoGenerado = await FolioJasper(
+                form.norden,
+                token,
+                form.listaExamenes,
+                updateProgress,
+                selectedListType,
+                controller.signal,
+                form.nombres,
+                form.apellidos,
+                datosFooter,
+                comprimidoz
+            );
 
-            // Cerrar la alerta de carga y mostrar éxito
-            Swal.fire({
+            await Swal.fire({
                 icon: 'success',
                 title: '¡Folio Generado!',
                 text: 'El folio se ha generado correctamente',
-                timer: 2000,
-                showConfirmButton: false
+                confirmButtonText: "Continuar",
+            });
+
+            const decision = await Swal.fire({
+                title: "¿Deseas subir el archivo?",
+                text: "El folio generado se subirá al sistema.",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Sí, subir",
+                cancelButtonText: "No",
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+            });
+
+            if (!decision.isConfirmed) return;
+
+            const seleccion = await Swal.fire({
+                title: "Selecciona dónde se subirá el archivo",
+                width: '700px',
+                html: (() => {
+                    const normalizeKey = (value) =>
+                        String(value ?? "")
+                            .trim()
+                            .toUpperCase()
+                            .replace(/[_\s]+/g, "-")
+                            .replace(/-+/g, "-");
+
+                    const nombreExamenPaciente = normalizeKey(form?.nombreExamen);
+                    const opciones = Object.keys(nombresExamen);
+                    const defaultKey =
+                        opciones.find((key) => normalizeKey(key) === nombreExamenPaciente) ??
+                        opciones.find((key) => (nombreExamenPaciente || "").includes(normalizeKey(key))) ??
+                        "ANUAL";
+
+                    const apellidosPreview = (form?.apellidos ?? "").trim();
+                    const nombresPreview = (form?.nombres ?? form?.nombre ?? "").trim();
+                    const nombrePersonaPreview = `${apellidosPreview}${apellidosPreview && nombresPreview ? " " : ""}${nombresPreview}`;
+
+                    const buildNombreArchivoPreview = (selectedKey) => {
+                        const nomenclature = nombresExamen[selectedKey] ?? "";
+                        return `${form?.norden}-${nomenclature}-${nombrePersonaPreview}.pdf`;
+                    };
+
+                    const htmlOpciones = opciones
+                        .map((key) => {
+                            const checked = key === defaultKey ? "checked" : "";
+                            const id = `folio-upload-${key.replace(/[^A-Za-z0-9_-]/g, "")}`;
+                            return `
+                                <label for="${id}" class="flex items-center gap-2 p-2 rounded border border-gray-200 hover:border-blue-300 cursor-pointer">
+                                    <input id="${id}" type="radio" name="folioUploadDestino" value="${key}" ${checked} />
+                                    <div class="flex flex-col leading-tight">
+                                        <span class="font-semibold text-gray-800">${key}</span>
+                                        <span class="text-xs text-gray-500">Nomenclatura: ${nombresExamen[key]}</span>
+                                    </div>
+                                </label>
+                            `;
+                        })
+                        .join("");
+
+                    return `
+                        <div class="flex flex-col gap-3 text-left">
+                            <div class="text-sm text-gray-600">
+                                Valor por defecto: <b>${defaultKey}</b> (según el tipo de examen del paciente)
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                ${htmlOpciones}
+                            </div>
+                            <div class="bg-gray-50 border border-gray-200 rounded p-3">
+                                <div class="text-xs text-gray-500 mb-1">Previsualización del nombre:</div>
+                                <div id="folio-upload-preview" class="font-mono text-sm text-gray-800 break-all">
+                                    ${buildNombreArchivoPreview(defaultKey)}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                })(),
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: "Subir",
+                cancelButtonText: "Cancelar",
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                didOpen: () => {
+                    const normalizeKey = (value) =>
+                        String(value ?? "")
+                            .trim()
+                            .toUpperCase()
+                            .replace(/[_\s]+/g, "-")
+                            .replace(/-+/g, "-");
+
+                    const nombreExamenPaciente = normalizeKey(form?.nombreExamen);
+                    const opciones = Object.keys(nombresExamen);
+                    const defaultKey =
+                        opciones.find((key) => normalizeKey(key) === nombreExamenPaciente) ??
+                        opciones.find((key) => (nombreExamenPaciente || "").includes(normalizeKey(key))) ??
+                        "ANUAL";
+
+                    const apellidosPreview = (form?.apellidos ?? "").trim();
+                    const nombresPreview = (form?.nombres ?? form?.nombre ?? "").trim();
+                    const nombrePersonaPreview = `${apellidosPreview}${apellidosPreview && nombresPreview ? " " : ""}${nombresPreview}`;
+
+                    const buildNombreArchivoPreview = (selectedKey) => {
+                        const nomenclature = nombresExamen[selectedKey] ?? "";
+                        return `${form?.norden}-${nomenclature}-${nombrePersonaPreview}.pdf`;
+                    };
+
+                    const container = Swal.getHtmlContainer();
+                    const preview = container?.querySelector("#folio-upload-preview");
+                    const radios = Array.from(container?.querySelectorAll('input[name="folioUploadDestino"]') ?? []);
+
+                    const updatePreview = () => {
+                        const selected = radios.find((r) => r.checked)?.value ?? defaultKey;
+                        if (preview) preview.textContent = buildNombreArchivoPreview(selected);
+                    };
+
+                    radios.forEach((r) => r.addEventListener("change", updatePreview));
+                    updatePreview();
+                },
+                preConfirm: () => {
+                    const container = Swal.getHtmlContainer();
+                    const selected = container?.querySelector('input[name="folioUploadDestino"]:checked')?.value;
+                    if (!selected) {
+                        Swal.showValidationMessage("Selecciona una opción");
+                        return;
+                    }
+                    return selected;
+                },
+            });
+
+            if (!seleccion.isConfirmed) return;
+
+            const nomenclature = nombresExamen[seleccion.value];
+            await subirArchivoFolio(archivoGenerado, {
+                form,
+                nomenclature,
+                selectedSede,
+                userlogued,
+                token,
             });
         } catch (error) {
             if (error.name === 'AbortError' || error.message === 'Aborted') {
