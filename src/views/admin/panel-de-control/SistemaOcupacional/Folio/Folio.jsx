@@ -497,6 +497,9 @@ const Folio = () => {
     const handlePrintCamoAnexo16 = () => {
         PrintHojaRAnexo16(form.norden, token, datosFooter);
     };
+    const handlePrintCamoAdministrativos = () => {
+        PrintHojaRAnexo16(form.norden, token, datosFooter);
+    };
 
     const hasImprimibles = !!form.listaExamenes?.some((examen) => examen.resultado);
     const allImprimiblesMarcados =
@@ -820,12 +823,20 @@ const Folio = () => {
                         >
                             Generar CAMO ANEXO 16
                         </button>
+
+                        <button
+                            className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
+                            onClick={handlePrintCamoAdministrativos}
+                            disabled={!form.norden}
+                        >
+                            Generar CAMO ADMINISTRATIVOS
+                        </button>
                     </div>
 
                 </div>
 
-            </SectionFieldset>
-        </div>
+            </SectionFieldset >
+        </div >
     );
 };
 

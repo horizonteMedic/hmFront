@@ -14,6 +14,8 @@ import { faDownload } from "@fortawesome/free-solid-svg-icons";
 const ExamenesListCOMPLETO = buildExamenesList([
     "CERTIFICADO_ANEXO_02",
     "CERTIFICADO_APTITUD_ANEXO_16",
+    "CERTIFICADO_ANEXO_02_ADMINISTRATIVO",
+    "CERTIFICADO_APTITUD_ANEXO_16_ADMINISTRATIVO",
     "RESUMEN_MEDICO_PODEROSA",
     "FICHA_DATOS_PACIENTE",
     "CERTIFICADO_VEHICULOS"

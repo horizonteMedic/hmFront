@@ -19,7 +19,7 @@ import InformeElectrocardiograma2023 from "../EKG/InformeElectrocardiograma2023"
 import InformeElectrocardiograma_Digitalizado from "../EKG/InformeElectrocardiograma_Digitalizado";
 import OIT_Digitalizado from "../OIT/OIT_Digitalizado";
 import Aptitud_medico_resumen_Digitalizado from "../CertificadoMedicoOcupacional/Aptitud_medico_resumen_Digitalizado";
-import Aptitud_AgroindustrialH from "../Ficha_Anexo2/Aptitud_Agroindustrial";
+import Aptitud_Agroindustrial from "../Ficha_Anexo2/Aptitud_Agroindustrial";
 import InformePsicologico_Anexo02_Nuevo from "../Anexo2/Anexo2";
 import Certificacion_suficiencia_trabajos_en_altura_boro_Digitalizado from "../CertificadoAltura/Certificacion_suficiencia_trabajos_en_altura_boro_Digitalizado";
 import Aptitud_Poderosa_Digitalizado from "../AptitupAlturaPoderosa/Aptitud_Poderosa_Digitalizado";
@@ -117,6 +117,7 @@ import ETANOLSALIVA from "../Toxicologia/ETANOLSALIVA";
 import CertificadoAptitudCuadrador_Digitalizado from "../Poderosa/CertificadoAptitudCuadrador";
 import Informe_Ocu_DatosPacientes from "../FichaDatosPersonales/Informe_Ocu_DatosPacientes";
 import TamizajeDermatologico from "../TamizajeDermatologico/TamizajeDermatologico";
+import CAMO_Administrativo from "../CAMOAdmin/CAMO_Administrativo";
 
 export const reportesMap = {
    /* =========================
@@ -138,11 +139,15 @@ export const reportesMap = {
       ficha_antecedente_patologico_boro
    },
 
-   aptitud_medico_ocupacional_agro: Aptitud_AgroindustrialH,
+   aptitud_medico_ocupacional_agro: {
+      Aptitud_Agroindustrial,
+      CAMO_Administrativo
+   },
 
    certificado_aptitud_medico_ocupacional: {
       Aptitud_medico_ocupacional_11,
-      Aptitud_medico_ocupacional_F
+      Aptitud_medico_ocupacional_F,
+      CAMO_Administrativo
    }, //son 2 jaspers
 
    certificado_aptitud_medico_resumen: Aptitud_medico_resumen_Digitalizado,
