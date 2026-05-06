@@ -51,12 +51,28 @@ export const EXAMENES_CATALOGO = {
         nomenclaturaSubida: "CAMO",
     },
 
+    CERTIFICADO_ANEXO_02_ADMINISTRATIVO: {
+        nombre: "CERTIFICADO MEDICO OCUPACIONAL ANEXO 02 ADMINISTRATIVO",
+        tabla: "aptitud_medico_ocupacional_agro",
+        url: "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2Camo",
+        esJasper: true,
+        nomenclaturaSubida: "CAMO ADM",
+    },
+
     CERTIFICADO_APTITUD_ANEXO_16: {
         nombre: "CERTIFICADO DE APTITUD ANEXO 16",
         tabla: "certificado_aptitud_medico_ocupacional",
         url: "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16",
         esJasper: true,
         nomenclaturaSubida: "CAMO",
+    },
+
+    CERTIFICADO_APTITUD_ANEXO_16_ADMINISTRATIVO: {
+        nombre: "CERTIFICADO DE APTITUD ANEXO 16 ADMINISTRATIVO",
+        tabla: "certificado_aptitud_medico_ocupacional",
+        url: "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16Camo",
+        esJasper: true,
+        nomenclaturaSubida: "CAMO ADM",
     },
 
     // CERTIFICADO_APTITUD_ANEXO_16: {
