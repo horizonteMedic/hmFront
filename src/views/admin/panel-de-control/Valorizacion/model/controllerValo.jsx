@@ -6,16 +6,28 @@ import { saveAs } from "file-saver";
 
 const urlSubmit = '/api/v01/st/registros/matrizControlInterno2026'
 const urlSubmitPerso = '/api/v01/st/registros/matrizControlInterno2026Examenes'
+const urlMatriz = '/api/v01/st/registros/matrizGeneralSede'
 
 export const SubmitValorizaciones = async (form, token, setData, setTotalPages, recordsPerPage) => {
-    const body = {
-        "tipoPago": form.tipoPago,
-        "contrata": form.razonContrata,
-        "empresa": form.razonEmpresa,
-        "fechaDesde": form.fechaInicio,
-        "fechaHasta": form.fechaFinal
-    };
-    const url = form.TipoBusqueda ? urlSubmit : urlSubmitPerso
+    let body
+    if (form.TipoBusqueda === "1" || form.TipoBusqueda === "2") {
+        body = {
+            "tipoPago": form.tipoPago,
+            "contrata": form.razonContrata,
+            "empresa": form.razonEmpresa,
+            "fechaDesde": form.fechaInicio,
+            "fechaHasta": form.fechaFinal,
+            "sede": form.sede.cod_sede ?? ""
+        };
+    } else {
+        body = {
+            "fechaInicio": form.fechaInicio,
+            "fechaFinal": form.fechaFinal,
+            "sede": form.sede.cod_sede ?? ""
+        };
+    }
+
+    const url = form.TipoBusqueda === "1" ? urlSubmit : form.TipoBusqueda === "2" ? urlSubmitPerso : urlMatriz
     LoadingDefault('Realizando Busqueda')
     SubmitData(body, url, token)
         .then((res) => {
@@ -32,17 +44,23 @@ export const SubmitValorizaciones = async (form, token, setData, setTotalPages, 
         })
 }
 
+
 export const exportToExcel = async ({
     data,
     form,
     columnasBase,
     config // { name: "archivo" }
 }) => {
-
+    LoadingDefault('Exportando a Excel')
     // 🔥 1. Determinar columnas activas
-    const columnasVisibles = form.TipoBusqueda
+    const columnasVisibles = form.TipoBusqueda === "1"
         ? columnasBase
-        : (form.Filtros || []).filter(col => col.valor);
+        : form.TipoBusqueda === "2" ? (form.Filtros || []).filter(col => col.valor) : form.TipoBusqueda === "3" && data.length > 0
+            ? Object.keys(data[0]).map(key => ({
+                key,
+                nombre: key // luego puedes formatearlo si quieres
+            }))
+            : [];
 
     if (!Array.isArray(data) || data.length === 0) {
         console.warn("No hay data para exportar");
@@ -100,4 +118,5 @@ export const exportToExcel = async ({
     // 🔥 5. DESCARGA
     const buffer = await workbook.xlsx.writeBuffer();
     saveAs(new Blob([buffer]), `${config?.name || "reporte"}.xlsx`);
+    Swal.close()
 };

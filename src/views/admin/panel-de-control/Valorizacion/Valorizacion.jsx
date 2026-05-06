@@ -11,6 +11,7 @@ import InputsBooleanRadioGroup from '../../../components/reusableComponents/Inpu
 import ModalFiltros from './ModalFiltros';
 import { exportToExcel, SubmitValorizaciones } from './model/controllerValo';
 import { getToday } from '../../../utils/helpers';
+import InputsRadioGroup from '../../../components/reusableComponents/InputsRadioGroup';
 
 const columnasBase = [
     { nombre: "DNI", key: "dni" },
@@ -79,7 +80,7 @@ const Valorizacion = () => {
         sede: '',
         tipoPago: '',
         matrizSeleccionada: '', // Agrega este estado para controlar la selección de matriz
-        TipoBusqueda: true,
+        TipoBusqueda: "1",
         Filtros: Columnas
     };
     const {
@@ -128,6 +129,12 @@ const Valorizacion = () => {
             }));
         }
     }, [Sedes]);
+
+    useEffect(() => {
+        setData([]);
+        setTotalPages(1)
+        setCurrentPage(1)
+    }, [form.TipoBusqueda]);
 
     useEffect(() => {
         if (reload > 0) {
@@ -184,7 +191,7 @@ const Valorizacion = () => {
     };
 
     const SubmitAPI = () => {
-        const esPersonalizada = !form.TipoBusqueda;
+        const esPersonalizada = form.TipoBusqueda === "2";
 
         if (esPersonalizada) {
             setForm(prev => ({
@@ -232,9 +239,21 @@ const Valorizacion = () => {
         });
     };
 
-    const columnasVisibles = form.TipoBusqueda
-        ? columnasBase
-        : form.Filtros.filter(col => col.valor);
+    const isDisabled = form.TipoBusqueda === "3"
+        ? false
+        : (
+            !form.tipoPago ||
+            loading ||
+            (!form.rucContrata && !form.rucEmpresa) ||
+            (form.rucContrata === "" && form.rucEmpresa === "")
+        );
+
+    const columnasVisibles = form.TipoBusqueda === "1" ? columnasBase : form.TipoBusqueda === "2" ? form.Filtros.filter(col => col.valor) : form.TipoBusqueda === "3" && data.length > 0
+        ? Object.keys(data[0]).map(key => ({
+            key,
+            nombre: key // luego puedes formatearlo si quieres
+        }))
+        : [];
     const startIdx = (currentPage - 1) * recordsPerPage;
     const endIdx = startIdx + recordsPerPage;
     const currentData = Array.isArray(data)
@@ -273,15 +292,18 @@ const Valorizacion = () => {
                 </div>
                 {/* filtros */}
                 <div className='flex w-full justify-center items-center mt-4'>
-                    <InputsBooleanRadioGroup
+                    <InputsRadioGroup
                         name="TipoBusqueda"
-                        trueLabel="Orden Servicio"
-                        falseLabel="Personalizada"
                         value={form?.TipoBusqueda}
-                        onChange={handleRadioButtonBoolean}
+                        onChange={handleRadioButton}
+                        options={[
+                            { label: "Orden Servicio", value: "1" },
+                            { label: "Personalizado", value: "2" },
+                            { label: "Matriz General", value: "3" },
+                        ]}
                     />
                 </div>
-                <div className="flex w-full flex-grow p-6 pb-0 gap-4">
+                {form.TipoBusqueda !== "3" && <div className="flex w-full flex-grow p-6 pb-0 gap-4">
                     <div className='flex w-[50%] justify-center items-center gap-2'>
                         <AutocompleteInput
                             label="Empresa"
@@ -317,7 +339,7 @@ const Valorizacion = () => {
                             }}
                         />
                     </div>
-                </div>
+                </div>}
                 <div className="flex flex-wrap gap-4 p-6">
                     <div className="flex flex-col flex-grow">
                         <p className="font-semibold">Sede</p>
@@ -355,7 +377,7 @@ const Valorizacion = () => {
                             className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
                         />
                     </div>
-                    <div className="flex flex-col flex-grow">
+                    {form.TipoBusqueda !== "3" && <div className="flex flex-col flex-grow">
                         <SelectField
                             label="Tipo de Pago"
                             name="tipoPago"
@@ -366,9 +388,9 @@ const Valorizacion = () => {
                                 { value: "CREDITO", label: "CREDITO" },
                             ]}
                         />
-                    </div>
+                    </div>}
                     <div className="flex flex-grow justify-center gap-2 w-full">
-                        {!form.TipoBusqueda && <button
+                        {form.TipoBusqueda === "2" && <button
                             onClick={() => { setModal(true) }}
                             className={`bg-green-600 mt-4 text-white px-4 py-2 rounded-md `}
                         >
@@ -377,9 +399,8 @@ const Valorizacion = () => {
                         </button>}
                         <button
                             onClick={SubmitAPI}
-                            className={`bg-blue-900 mt-4 text-white px-4 py-2 rounded-md  ${form.tipoPago && (form.rucContrata || form.rucEmpresa) ? '' : 'opacity-50 cursor-not-allowed'}`}
-                            disabled={!form.tipoPago || loading || (!form.rucContrata && !form.rucEmpresa) ||
-                                (form.rucContrata === "" && form.rucEmpresa === "")}
+                            className={`bg-blue-900 mt-4 text-white px-4 py-2 rounded-md  ${!isDisabled ? '' : 'opacity-50 cursor-not-allowed'}`}
+                            disabled={isDisabled}
                         >
                             <FontAwesomeIcon icon={faMagnifyingGlass} className="mr-2" />
                             Buscar
