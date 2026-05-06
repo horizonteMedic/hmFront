@@ -4,6 +4,7 @@ import {
     LoadingDefault,
     PrintHojaRDefault,
     PrintHojaRJsReportDefault,
+    ReadArchivosFormDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch, SubmitData, SubmitDataManejo } from "../../../../utils/apiHelpers";
@@ -34,8 +35,55 @@ export const nombresExamen = {
     "TEST-ALTURA": "TEST ALTURA",
     "PSICOSENSOMETRIA": "PSICOSENSOMETRICO",
     "MANIPULADOR-ALIMENTOS": "MANIPULADOR ALIMENTOS",
-    "ANEXO 16A": "ANEXO 16A"
+    "ANEXO 16A": "ANEXO 16A",
+    "PSICOSENSOMETRICO ADMISION": "PSICOSENSOMETRICO",
+    "TEST ALTURA ADMISION": "TEST ALTURA",
 }
+
+export const GetArchivosFolioStatus = async (nOrden, token) => {
+    if (!nOrden) return [];
+
+    try {
+        LoadingDefault("Cargando archivos del folio");
+
+        const entries = Object.entries(nombresExamen);
+        const results = await Promise.all(
+            entries.map(async ([tipo, nomenclatura]) => {
+                try {
+                    const response = await getFetch(`${GetExamenExterno}/${nOrden}/${nomenclatura}`, token);
+                    const existe = response?.id === 1 || response?.id === "1";
+                    return {
+                        tipo,
+                        nomenclatura,
+                        existe,
+                        url: existe ? response?.mensaje : null,
+                        nombreArchivo: existe ? response?.nombreArchivo : null,
+                    };
+                } catch (error) {
+                    console.error(`Error al consultar archivo ${nomenclatura}:`, error);
+                    return {
+                        tipo,
+                        nomenclatura,
+                        existe: false,
+                        url: null,
+                        nombreArchivo: null,
+                    };
+                }
+            })
+        );
+
+        return results;
+    } catch (error) {
+        console.error("Error al consultar archivos del folio:", error);
+        return [];
+    } finally {
+        Swal.close();
+    }
+};
+
+export const ReadArchivoFolio = async (form, setVisualerOpen, token, nomenclatura) => {
+    return ReadArchivosFormDefault(form, setVisualerOpen, token, nomenclatura);
+};
 
 export async function subirArchivoFolio(archivoData, { form, nomenclature, selectedSede, userlogued, token }) {
     try {

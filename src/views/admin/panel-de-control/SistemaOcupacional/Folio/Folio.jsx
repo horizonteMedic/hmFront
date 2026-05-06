@@ -5,10 +5,12 @@ import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import FolioJasper from "../../../../jaspers/FolioJasper/FolioJasper";
 import { getToday } from "../../../../utils/helpers";
-import { GetInfoPac, nombresExamen, obtenerFirmas, PrintHojaRAnexo16, PrintHojaRAnexo2, subirArchivoFolio, SubmitDataService } from "./controllerFolio";
+import { GetArchivosFolioStatus, GetInfoPac, nombresExamen, obtenerFirmas, PrintHojaRAnexo16, PrintHojaRAnexo2, ReadArchivoFolio, subirArchivoFolio, SubmitDataService } from "./controllerFolio";
 import Swal from "sweetalert2";
 import { buildExamenesList } from "./folioCatalogo";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const ExamenesListPRUEBAS = buildExamenesList([
     "OFTALMOLOGIA",
@@ -294,6 +296,8 @@ const Folio = () => {
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
     const [selectedListType, setSelectedListType] = useState("COMPLETO");
     const [showOnlyPassed, setShowOnlyPassed] = useState(false);
+    const [archivosFolio, setArchivosFolio] = useState([]);
+    const [visualerOpen, setVisualerOpen] = useState(null);
     const initialFormState = {
         norden: "",
         codigoInforme: null,
@@ -330,12 +334,18 @@ const Folio = () => {
         handleClearnotO,
     } = useForm(initialFormState);
 
+    const fetchArchivosFolio = async (nOrden) => {
+        const status = await GetArchivosFolioStatus(nOrden, token);
+        setArchivosFolio(status);
+    };
+
     const handleSearch = async (e) => {
         if (e.key === "Enter") {
             handleClearnotO();
             const currentList = ListaPorPlantilla[selectedListType] || ListaPorPlantilla["COMPLETO"];
             await GetInfoPac(form.norden, setForm, token, selectedSede, currentList);
             obtenerFirmas(form.norden, token, setForm);
+            await fetchArchivosFolio(form.norden);
         }
     };
 
@@ -352,6 +362,7 @@ const Folio = () => {
             handleClearnotO();
             GetInfoPac(form.norden, setForm, token, selectedSede, newList);
             obtenerFirmas(form.norden, token, setForm);
+            fetchArchivosFolio(form.norden);
         } else {
             setForm((prev) => ({
                 ...prev,
@@ -512,10 +523,13 @@ const Folio = () => {
 
                     const nombreExamenPaciente = normalizeKey(form?.nombreExamen);
                     const opciones = Object.keys(nombresExamen);
+                    const forcedDefaultKey = opciones.includes(selectedListType) ? selectedListType : null;
                     const defaultKey =
+                        forcedDefaultKey ??
                         opciones.find((key) => normalizeKey(key) === nombreExamenPaciente) ??
                         opciones.find((key) => (nombreExamenPaciente || "").includes(normalizeKey(key))) ??
                         "ANUAL";
+                    const defaultReason = forcedDefaultKey ? "según la plantilla seleccionada" : "según el tipo de examen del paciente";
 
                     const apellidosPreview = (form?.apellidos ?? "").trim();
                     const nombresPreview = (form?.nombres ?? form?.nombre ?? "").trim();
@@ -545,7 +559,7 @@ const Folio = () => {
                     return `
                         <div class="flex flex-col gap-3 text-left">
                             <div class="text-sm text-gray-600">
-                                Valor por defecto: <b>${defaultKey}</b> (según el tipo de examen del paciente)
+                                Valor por defecto: <b>${defaultKey}</b> (${defaultReason})
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 ${htmlOpciones}
@@ -575,7 +589,9 @@ const Folio = () => {
 
                     const nombreExamenPaciente = normalizeKey(form?.nombreExamen);
                     const opciones = Object.keys(nombresExamen);
+                    const forcedDefaultKey = opciones.includes(selectedListType) ? selectedListType : null;
                     const defaultKey =
+                        forcedDefaultKey ??
                         opciones.find((key) => normalizeKey(key) === nombreExamenPaciente) ??
                         opciones.find((key) => (nombreExamenPaciente || "").includes(normalizeKey(key))) ??
                         "ANUAL";
@@ -843,6 +859,55 @@ const Folio = () => {
                     </div>
                 </div>
             </SectionFieldset>
+            <SectionFieldset legend="Archivos del Folio" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4" collapsible defaultOpen={false}>
+                {!form.norden ? (
+                    <div className="text-sm text-gray-500 col-span-full">
+                        Ingresa un N° Orden y presiona Enter para ver el estado de los archivos.
+                    </div>
+                ) : (
+                    <>
+                        {Object.entries(nombresExamen).map(([tipo, nomenclatura]) => {
+                            const match = archivosFolio.find((x) => x.tipo === tipo && x.nomenclatura === nomenclatura);
+                            const existe = match?.existe ?? false;
+
+                            return (
+                                <div
+                                    key={`${tipo}-${nomenclatura}`}
+                                    className="border rounded-xl p-4 flex flex-col gap-3 shadow-sm"
+                                >
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div className="flex flex-col leading-tight">
+                                            <span className="font-semibold text-sm text-gray-800">{tipo}</span>
+                                            <span className="text-xs text-gray-500">Nomenclatura: {nomenclatura}</span>
+                                        </div>
+                                        <span
+                                            className={`text-[11px] font-bold px-2 py-1 rounded-full ${existe
+                                                ? "bg-green-100 text-green-700"
+                                                : "bg-red-100 text-red-700"
+                                                }`}
+                                        >
+                                            {existe ? "SUBIDO" : "NO SUBIDO"}
+                                        </span>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => ReadArchivoFolio(form, setVisualerOpen, token, nomenclatura)}
+                                        disabled={!existe}
+                                        className={`text-white text-base px-4 py-2 rounded flex items-center justify-center gap-2 transition-all duration-150 ease-out ${!existe
+                                            ? "bg-gray-400 cursor-not-allowed opacity-70"
+                                            : "bg-emerald-600 hover:bg-emerald-700 hover:shadow-lg active:scale-95 active:shadow-inner"
+                                            }`}
+                                    >
+                                        <FontAwesomeIcon icon={faDownload} />
+                                        Ver / Descargar
+                                    </button>
+                                </div>
+                            );
+                        })}
+                    </>
+                )}
+            </SectionFieldset>
             <SectionFieldset legend="Asignación de Profesional Firma" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <EmpleadoComboBox
                     value={form.nombre_medico}
@@ -933,7 +998,7 @@ const Folio = () => {
                     <div className="flex justify-center items-center w-full gap-4">
                         <button
                             className="bg-yellow-400 hover:bg-yellow-500 text-white py-2 px-4 rounded-md mt-4 text-semibold"
-                            onClick={() => { handleClear(); setSelectedListType("COMPLETO") }}
+                            onClick={() => { handleClear(); setSelectedListType("COMPLETO"); setArchivosFolio([]); setVisualerOpen(null); }}
                         >
                             Limpiar
                         </button>
@@ -982,6 +1047,28 @@ const Folio = () => {
                 </div>
 
             </SectionFieldset >
+            {visualerOpen && (
+                <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+                    <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
+                        <div className="px-4 py-2 naranjabackgroud flex justify-between">
+                            <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
+                            <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+                        </div>
+                        <div className="px-6 py-4 overflow-y-auto flex h-auto justify-center items-center">
+                            <iframe
+                                src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`}
+                                type="application/pdf"
+                                className="h-[500px] w-[500px] max-w-full"
+                            />
+                        </div>
+                        <div className="flex justify-center">
+                            <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                                <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div >
     );
 };
