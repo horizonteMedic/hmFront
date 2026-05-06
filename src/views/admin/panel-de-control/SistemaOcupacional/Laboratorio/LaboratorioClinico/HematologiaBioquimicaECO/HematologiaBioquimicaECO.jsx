@@ -22,6 +22,7 @@ const tabla = "lab_clinico";
 export default function HematologiaBioquimicaECO() {
   const today = getToday();
 
+  const [showOnlyPassed, setShowOnlyPassed] = useState(false);
   const { token, userlogued, selectedSede, userName } = useSessionData();
 
   const EXAMENES_LABORATORIO = [
@@ -100,6 +101,7 @@ export default function HematologiaBioquimicaECO() {
     {
       title: "Consentimientos",
       items: [
+        { label: "Muestra de Sangre", name: "consentimientoDosaje", tabla: "consent_Muestra_Sangre" },
         { label: "Const - Panel 2D", name: "Consentimiento2d", tabla: "con_panel2D" },
         { label: "Const - Panel 3D", name: "Consentimiento3d", tabla: "con_panel3D" },
         { label: "Const - Panel 4D", name: "Consentimiento4d", tabla: "con_panel4D" },
@@ -280,6 +282,12 @@ export default function HematologiaBioquimicaECO() {
     const rh = (form.factorRh).replace("RH", "");
     setForm(prev => ({ ...prev, gfSangPedido: `${grupo} ${rh}`.trim() }));
   }, [form.grupoSanguineo, form.factorRh]);
+
+  const allExams = form.listExamLab?.flatMap(s => s.items) || [];
+
+  const passed = allExams.filter(e => e.resultado === true).length;
+  const notPassed = allExams.filter(e => !e.resultado).length;
+
 
   return (
     <>
@@ -863,37 +871,82 @@ export default function HematologiaBioquimicaECO() {
 
         <div className="lg:col-span-1">
           <div className="flex-1 space-y-3">
-            {form.listExamLab
-              .map(section => (
-                <SectionFieldset key={section.title} legend={section.title} className={"!px-0"}>
-                  {(section.items || []).map((item, index) => {
-                    const estado = Array.isArray(item.resultado)
-                      ? item.resultado.length > 0
-                        ? "PASO"
-                        : "NO TIENE"
-                      : item.resultado === true
-                        ? "PASO"
-                        : "NO PASO";
 
-                    return (
-                      <div key={`${item.label}-${index}`} className="mb-3">
-                        {/* 🔸 Items */}
-                        <div className="flex items-center gap-2 mb-1 px-4" key={index}>
-                          <InputTextOneLine
-                            label={item.label}
-                            name={item.name}
-                            value={estado}
-                            inputClassName={`text-center font-bold ${estado == "PASO" ? "text-green-600" : estado === "NO PASO" ? "text-red-700" : "text-gray-500"}`}
-                            disabled
-                            labelWidth="160px"
-                          />
 
+            <div className="w-full flex  justify-between items-center px-2">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="showPassed"
+                  checked={showOnlyPassed}
+                  onChange={(e) => setShowOnlyPassed(e.target.checked)}
+                  disabled={!form.nombres}
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                />
+                <label htmlFor="showPassed" className={`text-sm font-medium ${!form.nombres ? 'text-gray-400' : 'text-gray-700'} cursor-pointer select-none`}>
+                  Exámenes Pasados
+                </label>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="text-sm font-bold text-red-700 bg-red-100 px-3 py-1 rounded-full">
+                  No pasados: <span className="text-red-600 ml-1">{notPassed}</span>
+                </div>
+                <div className="text-sm font-bold text-green-700 bg-green-100 px-3 py-1 rounded-full">
+                  Pasados: <span className="text-green-600 ml-1">{passed}</span>
+                </div>
+              </div>
+            </div>
+
+
+            {form.listExamLab?.map(
+              section => {
+                const visibleItems = (section.items || []).filter(item =>
+                  showOnlyPassed ? item.resultado : true
+                );
+
+                if (visibleItems.length === 0) return null;
+
+                return (
+                  <SectionFieldset key={section.title} legend={section.title} className={"!px-0"}>
+                    {(section.items || []).map((item, index) => {
+                      const estado = Array.isArray(item.resultado)
+                        ? item.resultado.length > 0
+                          ? "PASO"
+                          : "NO TIENE"
+                        : item.resultado === true
+                          ? "PASO"
+                          : "NO PASO";
+                      if (showOnlyPassed && !item.resultado) return null;
+
+                      let cardClass = "break-inside-avoid mb-2 flex justify-between items-center border-2 p-3 mx-3 rounded-md shadow-sm gap-2 h-20 transition-all duration-200";
+
+                      if (!item.resultado) {
+                        // NO PASO -> ROJO FUERTE
+                        cardClass += " bg-red-200 border-red-400 cursor-not-allowed opacity-90";
+                      } else {
+                        // SI PASO -> POINTER
+                        cardClass += " bg-green-200 border-green-500 ";
+                      }
+                      return (
+                        <div key={`${item.label}-${index}`} className="mb-3">
+                          {/* 🔸 Items */}
+                          <div className={`${cardClass} onClick ${cardClass}`} key={index}>
+                            <InputTextOneLine
+                              label={item.label}
+                              name={item.name}
+                              value={estado}
+                              inputClassName={`text-center font-bold bg-transparent border-0 ${estado == "PASO" ? "text-green-600" : estado === "NO PASO" ? "text-red-700" : "text-gray-500"}`}
+                              disabled
+                              labelWidth="160px"
+                            />
+
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </SectionFieldset>
-              ))}
+                      );
+                    })}
+                  </SectionFieldset>
+                );
+              })}
           </div>
         </div>
       </div>
