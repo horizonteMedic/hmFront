@@ -117,7 +117,8 @@ import ETANOLSALIVA from "../Toxicologia/ETANOLSALIVA";
 import CertificadoAptitudCuadrador_Digitalizado from "../Poderosa/CertificadoAptitudCuadrador";
 import Informe_Ocu_DatosPacientes from "../FichaDatosPersonales/Informe_Ocu_DatosPacientes";
 import TamizajeDermatologico from "../TamizajeDermatologico/TamizajeDermatologico";
-import CAMO_Administrativo from "../CAMOAdmin/CAMO_Administrativo";
+import CAMO_Administrativo16 from "../CAMOAdmin/CAMO_Administrativo16";
+import CAMO_Administrativo2 from "../CAMOAdmin/CAMO_Administrativo2";
 
 export const reportesMap = {
    /* =========================
@@ -141,13 +142,13 @@ export const reportesMap = {
 
    aptitud_medico_ocupacional_agro: {
       Aptitud_Agroindustrial,
-      CAMO_Administrativo
+      CAMO_Administrativo2
    },
 
    certificado_aptitud_medico_ocupacional: {
       Aptitud_medico_ocupacional_11,
       Aptitud_medico_ocupacional_F,
-      CAMO_Administrativo
+      CAMO_Administrativo16
    }, //son 2 jaspers
 
    certificado_aptitud_medico_resumen: Aptitud_medico_resumen_Digitalizado,

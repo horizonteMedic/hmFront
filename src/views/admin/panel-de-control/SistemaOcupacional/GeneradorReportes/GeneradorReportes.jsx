@@ -112,7 +112,7 @@ export default function GeneradorReportes() {
             }));
         }
     };
-
+    console.log(form.listaExamenes)
     return (
         <div className="w-full space-y-3 px-4 max-w-[95%] mx-auto">
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-2 gap-3">

@@ -45,7 +45,7 @@ import Anexo16A from "./views/admin/panel-de-control/SistemaOcupacional/Anexo16A
 
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/CAMOAdmin/CAMO_Administrativo.jsx";
+import Ficha from "./views/jaspers/CAMOAdmin/CAMO_Administrativo16.jsx";
 
 
 
