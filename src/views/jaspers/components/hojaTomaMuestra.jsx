@@ -22,9 +22,8 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
     // Dibujar borde exterior delgado
     doc.setLineWidth(0.1);
     doc.setDrawColor(0);
-    doc.rect(marginL-2, 3, 200, 285);
-    doc.setLineWidth(0.2);
-    doc.rect(marginL, 5, 196, 157);
+    doc.rect(marginL - 2, 3, 200, 285);
+    doc.setLineWidth(0.2); 
 
     // --- CABECERA ---
     try {
@@ -100,21 +99,102 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
     doc.text(String(datos.examen || ""), marginL + 22, currentY);
     doc.line(marginL + 22, currentY + 0.5, marginL + 45, currentY + 0.5);
 
+
+    const baseY = currentY; // <- posición fija de toda la fila
+
+    // ================= EMPRESA =================
     doc.setFont("helvetica", "bold");
     doc.setFontSize(7.5);
     doc.text("EMPRESA:", marginL + 48, currentY);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(7);
-    doc.text(String(datos.empresa || ""), marginL + 64, currentY);
-    doc.line(marginL + 63, currentY + 0.5, marginL + 130, currentY + 0.5);
 
+    const empresaTexto = String(datos.empresa || "EMPRESA NO ESPECIFICADA");
+    const empresaMaxWidth = 68; // Ancho máximo para empresa
+    let empresaLines;
+
+    // Si excede de 2 líneas, usar ancho 70 solo para la primera línea
+    if (doc.splitTextToSize(empresaTexto, empresaMaxWidth).length > 2) {
+        // Primera línea con ancho 70, resto con ancho normal
+        const primeraLinea = doc.splitTextToSize(empresaTexto, 80)[0];
+        const restoTexto = empresaTexto.substring(primeraLinea.length).trim();
+        const restoLineas = doc.splitTextToSize(restoTexto, empresaMaxWidth);
+        empresaLines = [primeraLinea, ...restoLineas];
+    } else {
+        empresaLines = doc.splitTextToSize(empresaTexto, empresaMaxWidth);
+    }
+
+    const empresaX = 70; // Posición X específica para empresa (movida a la izquierda)
+    const empresaY = baseY;
+
+    // Reducir fuente si pasa de 3 líneas
+    if (empresaLines.length > 2) {
+        doc.setFontSize(6); // Reducir de 9 a 8
+    }
+
+    const lineHeight = 4; // el mismo que usas arriba
+    const empresaExtraLines = empresaLines.length - 1;
+
+    empresaLines.forEach((line, index) => {
+        // Calcular Y para que la última línea esté en empresaY y las anteriores arriba
+        const lineY = empresaY + (index * lineHeight);
+        doc.text(line, empresaX, lineY);
+        doc.line(empresaX, lineY + 1, empresaX + empresaMaxWidth, lineY + 1);
+
+    });
+
+
+
+    // ================= CONTRATA =================
     doc.setFont("helvetica", "bold");
     doc.setFontSize(7.5);
-    doc.text("CONTRATA:", marginL + 132, currentY);
+    doc.text("CONTRATA:", marginL + 132, baseY);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(7);
-    doc.text(String(datos.contrata || "N/A"), marginL + 150, currentY);
-    doc.line(marginL + 149, currentY + 0.5, marginL + 192, currentY + 0.5);
+
+
+    const contrataTexto = String(datos.contrata || "N/A");
+    const contrataMaxWidth = 40;
+
+    let contrataLines;
+
+    if (doc.splitTextToSize(contrataTexto, contrataMaxWidth).length > 2) {
+
+        const primeraLinea = doc.splitTextToSize(contrataTexto, 50)[0];
+        const restoTexto = contrataTexto.substring(primeraLinea.length).trim();
+        const restoLineas = doc.splitTextToSize(restoTexto, contrataMaxWidth);
+
+        contrataLines = [primeraLinea, ...restoLineas];
+
+    } else {
+
+        contrataLines = doc.splitTextToSize(contrataTexto, contrataMaxWidth);
+
+    }
+
+    const contrataX = marginL + 150;
+    const contrataY = baseY;
+
+    if (contrataLines.length > 2) {
+        doc.setFontSize(6);
+    }
+
+    doc.setFont("helvetica", "normal");
+
+    const contrataExtraLines = contrataLines.length - 1;
+
+    contrataLines.forEach((line, index) => {
+
+        const lineY = contrataY + (index * lineHeight);
+        doc.text(line, contrataX, lineY);
+        doc.line(contrataX, lineY + 1, contrataX + contrataMaxWidth, lineY + 1);
+    });
+
+
+    const maxExtraLines = Math.max(
+        empresaExtraLines,
+        contrataExtraLines
+    );
+
+    currentY += maxExtraLines * lineHeight;
 
     currentY += 5;
     doc.setFont("helvetica", "bold");
@@ -174,7 +254,7 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
             doc.setFontSize(7.5);
         }
     });
- 
+
     // --- TABLAS DE RESULTADOS ---
     currentY += 7;
     const tableTop = currentY;
@@ -304,7 +384,7 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
     doc.line(marginL + 120, currentY + 19.5, marginL + 186, currentY + 19.5);
     doc.text("• OTROS :", marginL + 108, currentY + 24);
     doc.line(marginL + 120, currentY + 24.5, marginL + 186, currentY + 24.5);
- 
+
     doc.text("• H     :", marginL + 152, currentY + 9);
     doc.line(marginL + 162, currentY + 9.5, marginL + 186, currentY + 9.5);
     doc.text("• BAC :", marginL + 152, currentY + 14);

@@ -5,10 +5,12 @@ import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import FolioJasper from "../../../../jaspers/FolioJasper/FolioJasper";
 import { getToday } from "../../../../utils/helpers";
-import { GetInfoPac, obtenerFirmas, PrintHojaRAnexo16, PrintHojaRAnexo2, SubmitDataService } from "./controllerFolio";
+import { GetArchivosFolioStatus, GetInfoPac, nombresExamen, obtenerFirmas, PrintHojaRAnexo16, PrintHojaRAnexo2, ReadArchivoFolio, subirArchivoFolio, SubmitDataService } from "./controllerFolio";
 import Swal from "sweetalert2";
 import { buildExamenesList } from "./folioCatalogo";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const ExamenesListPRUEBAS = buildExamenesList([
     "OFTALMOLOGIA",
@@ -294,6 +296,8 @@ const Folio = () => {
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
     const [selectedListType, setSelectedListType] = useState("COMPLETO");
     const [showOnlyPassed, setShowOnlyPassed] = useState(false);
+    const [archivosFolio, setArchivosFolio] = useState([]);
+    const [visualerOpen, setVisualerOpen] = useState(null);
     const initialFormState = {
         norden: "",
         codigoInforme: null,
@@ -330,12 +334,82 @@ const Folio = () => {
         handleClearnotO,
     } = useForm(initialFormState);
 
+    const sanitizeNombreArchivo = (value) =>
+        String(value ?? "")
+            .replace(/[\\/:*?"<>|]/g, "-")
+            .replace(/\s+/g, " ")
+            .trim();
+
+    const buildNombreArchivo = (nomenclatura) => {
+        const apellidos = (form?.apellidos ?? "").trim();
+        const nombres = (form?.nombres ?? form?.nombre ?? "").trim();
+        const nombreArchivo = `${form?.norden}-${nomenclatura}-${apellidos}${apellidos && nombres ? " " : ""}${nombres}.pdf`;
+        return sanitizeNombreArchivo(nombreArchivo);
+    };
+
+    const handleOpenArchivoFolio = (nomenclatura) => {
+        ReadArchivoFolio(
+            form,
+            (response) => {
+                const nombreArchivo = buildNombreArchivo(nomenclatura);
+                setVisualerOpen({ ...response, nombreArchivo, nomenclatura });
+            },
+            token,
+            nomenclatura
+        );
+    };
+
+    const handleDownloadVisualer = async () => {
+        const urlArchivo = visualerOpen?.mensaje;
+        const nombreArchivo = visualerOpen?.nombreArchivo || "archivo.pdf";
+        if (!urlArchivo) return;
+
+        try {
+            const res = await fetch(urlArchivo);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const blob = await res.blob();
+
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = nombreArchivo;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Error descargando archivo:", error);
+            window.open(urlArchivo, "_blank", "noopener,noreferrer");
+        }
+    };
+
+    const descargarArchivoGenerado = (archivoData, nombreArchivo) => {
+        const blob = archivoData instanceof Blob
+            ? archivoData
+            : new Blob([archivoData], { type: "application/pdf" });
+
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = nombreArchivo;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+    };
+
+    const fetchArchivosFolio = async (nOrden) => {
+        const status = await GetArchivosFolioStatus(nOrden, token);
+        setArchivosFolio(status);
+    };
+
     const handleSearch = async (e) => {
         if (e.key === "Enter") {
             handleClearnotO();
             const currentList = ListaPorPlantilla[selectedListType] || ListaPorPlantilla["COMPLETO"];
             await GetInfoPac(form.norden, setForm, token, selectedSede, currentList);
             obtenerFirmas(form.norden, token, setForm);
+            await fetchArchivosFolio(form.norden);
         }
     };
 
@@ -352,6 +426,7 @@ const Folio = () => {
             handleClearnotO();
             GetInfoPac(form.norden, setForm, token, selectedSede, newList);
             obtenerFirmas(form.norden, token, setForm);
+            fetchArchivosFolio(form.norden);
         } else {
             setForm((prev) => ({
                 ...prev,
@@ -466,15 +541,194 @@ const Folio = () => {
             };
 
             // Llamar a FolioJasper con el callback de progreso
-            await FolioJasper(form.norden, token, form.listaExamenes, updateProgress, selectedListType, controller.signal, form.nombres, form.apellidos, datosFooter, comprimidoz);
+            const archivoGenerado = await FolioJasper(
+                form.norden,
+                token,
+                form.listaExamenes,
+                updateProgress,
+                selectedListType,
+                controller.signal,
+                form.nombres,
+                form.apellidos,
+                datosFooter,
+                comprimidoz
+            );
 
-            // Cerrar la alerta de carga y mostrar éxito
-            Swal.fire({
-                icon: 'success',
-                title: '¡Folio Generado!',
-                text: 'El folio se ha generado correctamente',
-                timer: 2000,
-                showConfirmButton: false
+            const normalizeKey = (value) =>
+                String(value ?? "")
+                    .trim()
+                    .toUpperCase()
+                    .replace(/[_\s]+/g, "-")
+                    .replace(/-+/g, "-");
+
+            const nombreExamenPaciente = normalizeKey(form?.nombreExamen);
+            const opciones = Object.keys(nombresExamen);
+            const forcedDefaultKey = opciones.includes(selectedListType) ? selectedListType : null;
+            const defaultKey =
+                forcedDefaultKey ??
+                opciones.find((key) => normalizeKey(key) === nombreExamenPaciente) ??
+                opciones.find((key) => (nombreExamenPaciente || "").includes(normalizeKey(key))) ??
+                "ANUAL";
+            const nomenclaturaDefault = nombresExamen[defaultKey] ?? "";
+            const nombreArchivoDefault = buildNombreArchivo(nomenclaturaDefault);
+
+            const generado = await Swal.fire({
+                icon: "success",
+                title: "¡Folio Generado!",
+                html: `
+                    <div class="text-gray-700">El folio se ha generado correctamente.</div>
+                    <div class="mt-2 text-xs text-gray-500">Nombre por defecto:</div>
+                    <div class="font-mono text-sm break-all">${nombreArchivoDefault}</div>
+                `,
+                showDenyButton: true,
+                confirmButtonText: "Descargar",
+                denyButtonText: "Continuar",
+            });
+
+            if (generado.isConfirmed) {
+                descargarArchivoGenerado(archivoGenerado, nombreArchivoDefault);
+            }
+
+            const decision = await Swal.fire({
+                title: "¿Deseas subir el archivo?",
+                text: "El folio generado se subirá al sistema.",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Sí, subir",
+                cancelButtonText: "No",
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+            });
+
+            if (!decision.isConfirmed) return;
+
+            const seleccion = await Swal.fire({
+                title: "Selecciona dónde se subirá el archivo",
+                width: '700px',
+                html: (() => {
+                    const normalizeKey = (value) =>
+                        String(value ?? "")
+                            .trim()
+                            .toUpperCase()
+                            .replace(/[_\s]+/g, "-")
+                            .replace(/-+/g, "-");
+
+                    const nombreExamenPaciente = normalizeKey(form?.nombreExamen);
+                    const opciones = Object.keys(nombresExamen);
+                    const forcedDefaultKey = opciones.includes(selectedListType) ? selectedListType : null;
+                    const defaultKey =
+                        forcedDefaultKey ??
+                        opciones.find((key) => normalizeKey(key) === nombreExamenPaciente) ??
+                        opciones.find((key) => (nombreExamenPaciente || "").includes(normalizeKey(key))) ??
+                        "ANUAL";
+                    const defaultReason = forcedDefaultKey ? "según la plantilla seleccionada" : "según el tipo de examen del paciente";
+
+                    const apellidosPreview = (form?.apellidos ?? "").trim();
+                    const nombresPreview = (form?.nombres ?? form?.nombre ?? "").trim();
+                    const nombrePersonaPreview = `${apellidosPreview}${apellidosPreview && nombresPreview ? " " : ""}${nombresPreview}`;
+
+                    const buildNombreArchivoPreview = (selectedKey) => {
+                        const nomenclature = nombresExamen[selectedKey] ?? "";
+                        return `${form?.norden}-${nomenclature}-${nombrePersonaPreview}.pdf`;
+                    };
+
+                    const htmlOpciones = opciones
+                        .map((key) => {
+                            const checked = key === defaultKey ? "checked" : "";
+                            const id = `folio-upload-${key.replace(/[^A-Za-z0-9_-]/g, "")}`;
+                            return `
+                                <label for="${id}" class="flex items-center gap-2 p-2 rounded border border-gray-200 hover:border-blue-300 cursor-pointer">
+                                    <input id="${id}" type="radio" name="folioUploadDestino" value="${key}" ${checked} />
+                                    <div class="flex flex-col leading-tight">
+                                        <span class="font-semibold text-gray-800">${key}</span>
+                                        <span class="text-xs text-gray-500">Nomenclatura: ${nombresExamen[key]}</span>
+                                    </div>
+                                </label>
+                            `;
+                        })
+                        .join("");
+
+                    return `
+                        <div class="flex flex-col gap-3 text-left">
+                            <div class="text-sm text-gray-600">
+                                Valor por defecto: <b>${defaultKey}</b> (${defaultReason})
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                ${htmlOpciones}
+                            </div>
+                            <div class="bg-gray-50 border border-gray-200 rounded p-3">
+                                <div class="text-xs text-gray-500 mb-1">Previsualización del nombre:</div>
+                                <div id="folio-upload-preview" class="font-mono text-sm text-gray-800 break-all">
+                                    ${buildNombreArchivoPreview(defaultKey)}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                })(),
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: "Subir",
+                cancelButtonText: "Cancelar",
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                didOpen: () => {
+                    const normalizeKey = (value) =>
+                        String(value ?? "")
+                            .trim()
+                            .toUpperCase()
+                            .replace(/[_\s]+/g, "-")
+                            .replace(/-+/g, "-");
+
+                    const nombreExamenPaciente = normalizeKey(form?.nombreExamen);
+                    const opciones = Object.keys(nombresExamen);
+                    const forcedDefaultKey = opciones.includes(selectedListType) ? selectedListType : null;
+                    const defaultKey =
+                        forcedDefaultKey ??
+                        opciones.find((key) => normalizeKey(key) === nombreExamenPaciente) ??
+                        opciones.find((key) => (nombreExamenPaciente || "").includes(normalizeKey(key))) ??
+                        "ANUAL";
+
+                    const apellidosPreview = (form?.apellidos ?? "").trim();
+                    const nombresPreview = (form?.nombres ?? form?.nombre ?? "").trim();
+                    const nombrePersonaPreview = `${apellidosPreview}${apellidosPreview && nombresPreview ? " " : ""}${nombresPreview}`;
+
+                    const buildNombreArchivoPreview = (selectedKey) => {
+                        const nomenclature = nombresExamen[selectedKey] ?? "";
+                        return `${form?.norden}-${nomenclature}-${nombrePersonaPreview}.pdf`;
+                    };
+
+                    const container = Swal.getHtmlContainer();
+                    const preview = container?.querySelector("#folio-upload-preview");
+                    const radios = Array.from(container?.querySelectorAll('input[name="folioUploadDestino"]') ?? []);
+
+                    const updatePreview = () => {
+                        const selected = radios.find((r) => r.checked)?.value ?? defaultKey;
+                        if (preview) preview.textContent = buildNombreArchivoPreview(selected);
+                    };
+
+                    radios.forEach((r) => r.addEventListener("change", updatePreview));
+                    updatePreview();
+                },
+                preConfirm: () => {
+                    const container = Swal.getHtmlContainer();
+                    const selected = container?.querySelector('input[name="folioUploadDestino"]:checked')?.value;
+                    if (!selected) {
+                        Swal.showValidationMessage("Selecciona una opción");
+                        return;
+                    }
+                    return selected;
+                },
+            });
+
+            if (!seleccion.isConfirmed) return;
+
+            const nomenclature = nombresExamen[seleccion.value];
+            await subirArchivoFolio(archivoGenerado, {
+                form,
+                nomenclature,
+                selectedSede,
+                userlogued,
+                token,
             });
         } catch (error) {
             if (error.name === 'AbortError' || error.message === 'Aborted') {
@@ -697,6 +951,55 @@ const Folio = () => {
                     </div>
                 </div>
             </SectionFieldset>
+            <SectionFieldset legend="Archivos del Folio" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4" collapsible defaultOpen={false}>
+                {!form.norden ? (
+                    <div className="text-sm text-gray-500 col-span-full">
+                        Ingresa un N° Orden y presiona Enter para ver el estado de los archivos.
+                    </div>
+                ) : (
+                    <>
+                        {Object.entries(nombresExamen).map(([tipo, nomenclatura]) => {
+                            const match = archivosFolio.find((x) => x.tipo === tipo && x.nomenclatura === nomenclatura);
+                            const existe = match?.existe ?? false;
+
+                            return (
+                                <div
+                                    key={`${tipo}-${nomenclatura}`}
+                                    className="border rounded-xl p-4 flex flex-col gap-3 shadow-sm"
+                                >
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div className="flex flex-col leading-tight">
+                                            <span className="font-semibold text-sm text-gray-800">{tipo}</span>
+                                            <span className="text-xs text-gray-500">Nomenclatura: {nomenclatura}</span>
+                                        </div>
+                                        <span
+                                            className={`text-[11px] font-bold px-2 py-1 rounded-full ${existe
+                                                ? "bg-green-100 text-green-700"
+                                                : "bg-red-100 text-red-700"
+                                                }`}
+                                        >
+                                            {existe ? "SUBIDO" : "NO SUBIDO"}
+                                        </span>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => handleOpenArchivoFolio(nomenclatura)}
+                                        disabled={!existe}
+                                        className={`text-white text-base px-4 py-2 rounded flex items-center justify-center gap-2 transition-all duration-150 ease-out ${!existe
+                                            ? "bg-gray-400 cursor-not-allowed opacity-70"
+                                            : "bg-emerald-600 hover:bg-emerald-700 hover:shadow-lg active:scale-95 active:shadow-inner"
+                                            }`}
+                                    >
+                                        <FontAwesomeIcon icon={faDownload} />
+                                        Ver / Descargar
+                                    </button>
+                                </div>
+                            );
+                        })}
+                    </>
+                )}
+            </SectionFieldset>
             <SectionFieldset legend="Asignación de Profesional Firma" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <EmpleadoComboBox
                     value={form.nombre_medico}
@@ -787,7 +1090,7 @@ const Folio = () => {
                     <div className="flex justify-center items-center w-full gap-4">
                         <button
                             className="bg-yellow-400 hover:bg-yellow-500 text-white py-2 px-4 rounded-md mt-4 text-semibold"
-                            onClick={() => { handleClear(); setSelectedListType("COMPLETO") }}
+                            onClick={() => { handleClear(); setSelectedListType("COMPLETO"); setArchivosFolio([]); setVisualerOpen(null); }}
                         >
                             Limpiar
                         </button>
@@ -836,6 +1139,28 @@ const Folio = () => {
                 </div>
 
             </SectionFieldset >
+            {visualerOpen && (
+                <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+                    <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
+                        <div className="px-4 py-2 naranjabackgroud flex justify-between">
+                            <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
+                            <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+                        </div>
+                        <div className="px-6 py-4 overflow-y-auto flex h-auto justify-center items-center">
+                            <iframe
+                                src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`}
+                                type="application/pdf"
+                                className="h-[500px] w-[500px] max-w-full"
+                            />
+                        </div>
+                        <div className="flex justify-center">
+                            <button type="button" onClick={handleDownloadVisualer} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                                <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div >
     );
 };
