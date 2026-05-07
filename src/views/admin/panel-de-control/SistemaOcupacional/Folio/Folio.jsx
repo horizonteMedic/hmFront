@@ -334,6 +334,70 @@ const Folio = () => {
         handleClearnotO,
     } = useForm(initialFormState);
 
+    const sanitizeNombreArchivo = (value) =>
+        String(value ?? "")
+            .replace(/[\\/:*?"<>|]/g, "-")
+            .replace(/\s+/g, " ")
+            .trim();
+
+    const buildNombreArchivo = (nomenclatura) => {
+        const apellidos = (form?.apellidos ?? "").trim();
+        const nombres = (form?.nombres ?? form?.nombre ?? "").trim();
+        const nombreArchivo = `${form?.norden}-${nomenclatura}-${apellidos}${apellidos && nombres ? " " : ""}${nombres}.pdf`;
+        return sanitizeNombreArchivo(nombreArchivo);
+    };
+
+    const handleOpenArchivoFolio = (nomenclatura) => {
+        ReadArchivoFolio(
+            form,
+            (response) => {
+                const nombreArchivo = buildNombreArchivo(nomenclatura);
+                setVisualerOpen({ ...response, nombreArchivo, nomenclatura });
+            },
+            token,
+            nomenclatura
+        );
+    };
+
+    const handleDownloadVisualer = async () => {
+        const urlArchivo = visualerOpen?.mensaje;
+        const nombreArchivo = visualerOpen?.nombreArchivo || "archivo.pdf";
+        if (!urlArchivo) return;
+
+        try {
+            const res = await fetch(urlArchivo);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const blob = await res.blob();
+
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = nombreArchivo;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Error descargando archivo:", error);
+            window.open(urlArchivo, "_blank", "noopener,noreferrer");
+        }
+    };
+
+    const descargarArchivoGenerado = (archivoData, nombreArchivo) => {
+        const blob = archivoData instanceof Blob
+            ? archivoData
+            : new Blob([archivoData], { type: "application/pdf" });
+
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = nombreArchivo;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+    };
+
     const fetchArchivosFolio = async (nOrden) => {
         const status = await GetArchivosFolioStatus(nOrden, token);
         setArchivosFolio(status);
@@ -490,12 +554,40 @@ const Folio = () => {
                 comprimidoz
             );
 
-            await Swal.fire({
-                icon: 'success',
-                title: '¡Folio Generado!',
-                text: 'El folio se ha generado correctamente',
-                confirmButtonText: "Continuar",
+            const normalizeKey = (value) =>
+                String(value ?? "")
+                    .trim()
+                    .toUpperCase()
+                    .replace(/[_\s]+/g, "-")
+                    .replace(/-+/g, "-");
+
+            const nombreExamenPaciente = normalizeKey(form?.nombreExamen);
+            const opciones = Object.keys(nombresExamen);
+            const forcedDefaultKey = opciones.includes(selectedListType) ? selectedListType : null;
+            const defaultKey =
+                forcedDefaultKey ??
+                opciones.find((key) => normalizeKey(key) === nombreExamenPaciente) ??
+                opciones.find((key) => (nombreExamenPaciente || "").includes(normalizeKey(key))) ??
+                "ANUAL";
+            const nomenclaturaDefault = nombresExamen[defaultKey] ?? "";
+            const nombreArchivoDefault = buildNombreArchivo(nomenclaturaDefault);
+
+            const generado = await Swal.fire({
+                icon: "success",
+                title: "¡Folio Generado!",
+                html: `
+                    <div class="text-gray-700">El folio se ha generado correctamente.</div>
+                    <div class="mt-2 text-xs text-gray-500">Nombre por defecto:</div>
+                    <div class="font-mono text-sm break-all">${nombreArchivoDefault}</div>
+                `,
+                showDenyButton: true,
+                confirmButtonText: "Descargar",
+                denyButtonText: "Continuar",
             });
+
+            if (generado.isConfirmed) {
+                descargarArchivoGenerado(archivoGenerado, nombreArchivoDefault);
+            }
 
             const decision = await Swal.fire({
                 title: "¿Deseas subir el archivo?",
@@ -892,7 +984,7 @@ const Folio = () => {
 
                                     <button
                                         type="button"
-                                        onClick={() => ReadArchivoFolio(form, setVisualerOpen, token, nomenclatura)}
+                                        onClick={() => handleOpenArchivoFolio(nomenclatura)}
                                         disabled={!existe}
                                         className={`text-white text-base px-4 py-2 rounded flex items-center justify-center gap-2 transition-all duration-150 ease-out ${!existe
                                             ? "bg-gray-400 cursor-not-allowed opacity-70"
@@ -1062,9 +1154,9 @@ const Folio = () => {
                             />
                         </div>
                         <div className="flex justify-center">
-                            <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                            <button type="button" onClick={handleDownloadVisualer} className="azul-btn font-bold py-2 px-4 rounded mb-4">
                                 <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
