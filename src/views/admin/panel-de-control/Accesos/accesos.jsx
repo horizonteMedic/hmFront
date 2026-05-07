@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faUsers, faSortAlphaDown, faSortAlphaUp, faSignature } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faUsers, faSortAlphaDown, faSortAlphaUp, faSignature, faDownload } from '@fortawesome/free-solid-svg-icons';
 import Modal from './ModalRegistroEmpleado/Modal';
 import EditModal from './ModalEditEmpleado/EditModal';
 import RegistroUsuarioModal from './ModalRegistroUsuario/ModalRegistroUsuario';
@@ -200,6 +200,21 @@ const Accesos = () => {
 
           {/* Botones para registrar */}
           <div className="flex space-x-2">
+
+            <div className="flex justify-end">
+              <button className="bg-primario py-2 px-3 text-white rounded-xl ">
+                <a href="/MANUAL-DE-CREACION-DE-USUARIO.pdf"
+                  download="MANUAL-DE-CREACION-DE-USUARIO.pdf"
+                  className="flex gap-x-4 justify-center items-center">
+                  <FontAwesomeIcon
+                    icon={faDownload}
+                  />
+                  <span className="download-button-text">Descargar Manual de Creación de Usuarios</span>
+                </a>
+              </button>
+            </div>
+
+
             <button className="naranja-btn px-4 py-2 w-[150px]  rounded-md" onClick={openModal}>+ Registrar Empleado</button>
             <button className="azul-btn px-4 py-2  w-[150px]   rounded-md" onClick={openRegistroUsuarioModal}>+ Registrar Usuario</button>
           </div>
