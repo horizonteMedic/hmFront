@@ -4,9 +4,10 @@ import {
     LoadingDefault,
     PrintHojaRDefault,
     PrintHojaRJsReportDefault,
+    ReadArchivosFormDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
-import { getFetch, SubmitDataManejo } from "../../../../utils/apiHelpers";
+import { getFetch, SubmitData, SubmitDataManejo } from "../../../../utils/apiHelpers";
 import { Loading } from "../Anexo2/controllerAnexo2";
 
 const GetExamenURL = `/api/v01/st/registros/obtenerExistenciasExamenes`
@@ -23,6 +24,124 @@ const obtenerReporteJsCAMO16ReportUrl = "/api/v01/ct/anexos/descargarReporteFich
 
 const Anexo16URL = "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16";
 const Anexo2URL = "/api/v01/ct/anexos/anexo2/obtenerReporteAnexo2Completo";
+
+const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta";
+
+export const nombresExamen = {
+    ANUAL: "EMOA",
+    REUBICACION: "EMPO",
+    RETIRO: "EMOR",
+    "PRE-OCUPACIONAL": "EMPO",
+    "TEST-ALTURA": "TEST ALTURA",
+    "PSICOSENSOMETRIA": "PSICOSENSOMETRICO",
+    "MANIPULADOR-ALIMENTOS": "MANIPULADOR ALIMENTOS",
+    "ANEXO 16A": "ANEXO 16A",
+    "PSICOSENSOMETRICO ADMISION": "PSICOSENSOMETRICO",
+    "TEST ALTURA ADMISION": "TEST ALTURA",
+}
+
+export const GetArchivosFolioStatus = async (nOrden, token) => {
+    if (!nOrden) return [];
+
+    try {
+        LoadingDefault("Cargando archivos del folio");
+
+        const entries = Object.entries(nombresExamen);
+        const results = await Promise.all(
+            entries.map(async ([tipo, nomenclatura]) => {
+                try {
+                    const response = await getFetch(`${GetExamenExterno}/${nOrden}/${nomenclatura}`, token);
+                    const existe = response?.id === 1 || response?.id === "1";
+                    return {
+                        tipo,
+                        nomenclatura,
+                        existe,
+                        url: existe ? response?.mensaje : null,
+                        nombreArchivo: existe ? response?.nombreArchivo : null,
+                    };
+                } catch (error) {
+                    console.error(`Error al consultar archivo ${nomenclatura}:`, error);
+                    return {
+                        tipo,
+                        nomenclatura,
+                        existe: false,
+                        url: null,
+                        nombreArchivo: null,
+                    };
+                }
+            })
+        );
+
+        return results;
+    } catch (error) {
+        console.error("Error al consultar archivos del folio:", error);
+        return [];
+    } finally {
+        Swal.close();
+    }
+};
+
+export const ReadArchivoFolio = async (form, setVisualerOpen, token, nomenclatura) => {
+    return ReadArchivosFormDefault(form, setVisualerOpen, token, nomenclatura);
+};
+
+export async function subirArchivoFolio(archivoData, { form, nomenclature, selectedSede, userlogued, token }) {
+    try {
+        LoadingDefault("Subiendo archivo...");
+
+        const blob = archivoData instanceof Blob
+            ? archivoData
+            : new Blob([archivoData], { type: "application/pdf" });
+
+        const reader = new FileReader();
+        const pdfBase64Final = await new Promise((resolve, reject) => {
+            reader.onloadend = () => resolve(reader.result.split(",")[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+
+        const apellidos = (form?.apellidos ?? "").trim();
+        const nombres = (form?.nombres ?? form?.nombre ?? "").trim();
+        const nombreArchivo = `${form?.norden}-${nomenclature}-${apellidos}${apellidos && nombres ? " " : ""}${nombres}.pdf`;
+
+        const currentDate = new Date();
+        const year = currentDate.getFullYear();
+        const month = ("0" + (currentDate.getMonth() + 1)).slice(-2);
+        const day = ("0" + currentDate.getDate()).slice(-2);
+
+        const datos = {
+            rutaArchivo: null,
+            dni: null,
+            historiaClinica: null,
+            servidor: "azure",
+            estado: true,
+            fechaRegistro: `${year}-${month}-${day}`,
+            userRegistro: userlogued,
+            fechaActualizacion: null,
+            userActualizacion: null,
+            id_tipo_archivo: null,
+            nombreArchivo,
+            codigoSede: selectedSede,
+            fileBase64: pdfBase64Final,
+            nomenclatura_tipo_archivo: nomenclature,
+            orden: form?.norden,
+            indice_carga_masiva: undefined,
+        };
+
+        const result = await SubmitData(datos, registrarPDF, token);
+
+        if (result?.id === 1 || result?.id === "1") {
+            Swal.fire("¡Éxito!", "Archivo subido correctamente.", "success");
+            return { ok: true, result };
+        }
+
+        throw new Error(result?.mensaje || "Error desconocido al subir");
+    } catch (error) {
+        console.error("Error al subir archivo:", error);
+        Swal.fire("Error", error?.message || "No se pudo subir el archivo.", "error");
+        return { ok: false, error };
+    }
+}
 
 export const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
     LoadingDefault("Validando datos");
