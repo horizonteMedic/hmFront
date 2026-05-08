@@ -96,6 +96,7 @@ export default function EKG() {
     handleClear,
     handleClearnotO,
     handlePrintDefault,
+    handleFocusNext,
   } = useForm(initialFormState, { storageKey: "ekg" });
 
   const [dataTabla, setDataTabla] = useState([]);
@@ -320,7 +321,7 @@ export default function EKG() {
                   ...prev,
                   ritmo: e.target.checked ? "SINUSAL" : "",
                 }));
-              }}
+              }} 
             />
 
             <InputCheckbox
@@ -332,7 +333,7 @@ export default function EKG() {
                   ...prev,
                   pr: e.target.checked ? "0.20" : "",
                 }));
-              }}
+              }} 
             />
 
             <InputCheckbox
@@ -366,6 +367,7 @@ export default function EKG() {
             value={form.ritmo ?? ""}
             onChange={handleChange}
             labelWidth="80px"
+            onKeyUp={handleFocusNext}
           />
 
           <InputTextOneLine
@@ -374,6 +376,7 @@ export default function EKG() {
             value={form.fc ?? ""}
             onChange={handleChange}
             labelWidth="80px"
+            onKeyUp={handleFocusNext}
           />
 
           <InputTextOneLine
@@ -382,6 +385,7 @@ export default function EKG() {
             value={form.eje ?? ""}
             onChange={handleChange}
             labelWidth="80px"
+            onKeyUp={handleFocusNext}
           />
 
           {/* Fila 2 */}
@@ -391,6 +395,7 @@ export default function EKG() {
             value={form.pr ?? ""}
             onChange={handleChange}
             labelWidth="80px"
+            onKeyUp={handleFocusNext}
           />
 
           <InputTextOneLine
@@ -399,6 +404,7 @@ export default function EKG() {
             value={form.qrs ?? ""}
             onChange={handleChange}
             labelWidth="80px"
+            onKeyUp={handleFocusNext}   
           />
 
           <InputTextOneLine
@@ -407,6 +413,7 @@ export default function EKG() {
             value={form.qtc ?? ""}
             onChange={handleChange}
             labelWidth="80px"
+            onKeyUp={handleFocusNext}       
           />
 
           {/* Fila 3 */}
@@ -416,7 +423,8 @@ export default function EKG() {
             value={form.st ?? ""}
             onChange={handleChange}
             disabled={!form.informeCompleto}
-            labelWidth="80px"
+            labelWidth="80px" 
+            onKeyUp={handleFocusNext}
           />
 
           <InputTextOneLine
@@ -426,6 +434,7 @@ export default function EKG() {
             onChange={handleChange}
             disabled={!form.informeCompleto}
             labelWidth="80px"
+            onKeyUp={handleFocusNext}
           />
 
           <InputTextOneLine
@@ -435,6 +444,7 @@ export default function EKG() {
             onChange={handleChange}
             disabled={!form.informeCompleto}
             labelWidth="80px"
+            onKeyUp={handleFocusNext}
           />
         </SectionFieldset>
 
