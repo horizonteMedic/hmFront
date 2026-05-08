@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
 import { GetInfoPacDefault, LoadingDefault, ReadArchivosFormDefault } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
-import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
+import { deleteArchivoPorOrdenNomenclatura, getFetch, SubmitData } from "../../../../utils/apiHelpers";
 import FolioJasper from "../../../../jaspers/FolioJasper/FolioJasper";
 import { ListaPorPlantilla } from "../Folio/Folio";
 
@@ -82,6 +82,19 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
 export const ReadArchivosForm = async (form, setVisualerOpen, token, nomenclatura = null) => {
     ReadArchivosFormDefault(form, setVisualerOpen, token, nomenclatura)
 }
+
+export const DeleteArchivoGeneradorReportes = async (nOrden, nomenclatura, token) => {
+    if (!nOrden || !nomenclatura) return null;
+    try {
+        LoadingDefault("Eliminando archivo");
+        return await deleteArchivoPorOrdenNomenclatura(nOrden, nomenclatura, token);
+    } catch (error) {
+        console.error("Error al eliminar archivo:", error);
+        return null;
+    } finally {
+        Swal.close();
+    }
+};
 
 export const handleImprimirYSubirMasivo = async (examenes, form, token, selectedSede, userlogued, datosFooter, abortControllerRef, search) => {
     const lista = Array.isArray(examenes) ? examenes.filter((e) => e?.resultado) : [];

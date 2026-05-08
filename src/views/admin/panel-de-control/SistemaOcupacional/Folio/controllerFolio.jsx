@@ -7,7 +7,7 @@ import {
     ReadArchivosFormDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
-import { getFetch, SubmitData, SubmitDataManejo } from "../../../../utils/apiHelpers";
+import { deleteArchivoPorOrdenNomenclatura, getFetch, SubmitData, SubmitDataManejo } from "../../../../utils/apiHelpers";
 import { Loading } from "../Anexo2/controllerAnexo2";
 
 const GetExamenURL = `/api/v01/st/registros/obtenerExistenciasExamenes`
@@ -76,6 +76,20 @@ export const GetArchivosFolioStatus = async (nOrden, token) => {
     } catch (error) {
         console.error("Error al consultar archivos del folio:", error);
         return [];
+    } finally {
+        Swal.close();
+    }
+};
+
+export const DeleteArchivoFolio = async (nOrden, nomenclatura, token) => {
+    if (!nOrden || !nomenclatura) return null;
+
+    try {
+        LoadingDefault("Eliminando archivo");
+        return await deleteArchivoPorOrdenNomenclatura(nOrden, nomenclatura, token);
+    } catch (error) {
+        console.error("Error al eliminar archivo del folio:", error);
+        return null;
     } finally {
         Swal.close();
     }
