@@ -134,11 +134,30 @@ const HistorialPaciente = () => {
         setFilteredData(results)
       } else {
         if (data && data.length > 0) {
+          const term = searchTerm.toLowerCase().trim();
 
-          results = data.filter(item => (typeof item.apellidos === 'string' && item.apellidos.toLowerCase().includes(searchTerm.toLowerCase())) ||
-            (typeof item.nombres === 'string' && item.nombres.toLowerCase().includes(searchTerm.toLowerCase())))
-          setFilteredData(results)
-          return
+          results = data.filter(item => {
+            const nombres = typeof item.nombres === 'string'
+              ? item.nombres.toLowerCase()
+              : '';
+
+            const apellidos = typeof item.apellidos === 'string'
+              ? item.apellidos.toLowerCase()
+              : '';
+
+            const nombreCompleto1 = `${nombres} ${apellidos}`;
+            const nombreCompleto2 = `${apellidos} ${nombres}`;
+
+            return (
+              nombres.includes(term) ||
+              apellidos.includes(term) ||
+              nombreCompleto1.includes(term) ||
+              nombreCompleto2.includes(term)
+            );
+          });
+
+          setFilteredData(results);
+          return;
         }
         return
       }

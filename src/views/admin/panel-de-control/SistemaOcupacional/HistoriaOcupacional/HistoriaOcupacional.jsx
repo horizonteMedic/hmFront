@@ -188,7 +188,7 @@ const HistoriaOcupacional = ({
       setRowData((prev) => ({
         ...prev,
         socavon: value, // se guarda como string
-        superficie: numero !== 0 ? "0" : prev.superficie, // se resetea si socavon no es 0
+        superficie: prev.superficie == "" && numero !== 0 ? "0" : prev.superficie, // se resetea si socavon no es 0
       }));
       return;
     }
@@ -197,7 +197,7 @@ const HistoriaOcupacional = ({
       setRowData((prev) => ({
         ...prev,
         superficie: value,
-        socavon: numero !== 0 ? "0" : prev.socavon,
+        socavon: prev.socavon == "" && numero !== 0 ? "0" : prev.socavon,
       }));
       return;
     }

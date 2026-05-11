@@ -112,11 +112,11 @@ function evaluarObservacionesObtener(res, set) {
     const vcercacoi = res.oiccOftalmologia_oicc || "";
     const textoEnfermedadOftalmo = (res.enfermedadesOcularesOftalmo_e_oculares ?? "").trim().toUpperCase();
 
-    if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
-        const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
+    if (textoEnfermedadOftalmo !== "NINGUNA") {
+        const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "MIOPÍA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
+        problemasOftalmologicos = true;
+        problemasOftalmologicosRed = true;
         if (enfermedadesRefractarias.some(e => textoEnfermedadOftalmo.includes(e))) {
-            problemasOftalmologicos = true;
-            problemasOftalmologicosRed = true;
             const visionLejosNormal = vlejoscod === "00" && vlejoscoi === "00";
             const visionCercaNormal = vcercacod === "00" && vcercacoi === "00";
             nuevasObservaciones += visionLejosNormal && visionCercaNormal
@@ -180,11 +180,11 @@ function evaluarObservacionesEditar(res, set) {
     const vcercacoi = res.oiccOftalmologia_oicc || "";
     const textoEnfermedadOftalmo = (res.enfermedadesOcularesOftalmo_e_oculares ?? "").trim().toUpperCase();
 
-    if (textoEnfermedadOftalmo && textoEnfermedadOftalmo !== "NINGUNA") {
-        const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
+    if (textoEnfermedadOftalmo !== "NINGUNA") {
+        const enfermedadesRefractarias = ["AMETROPIA", "PRESBICIA", "MIOPÍA", "HIPERMETROPIA", "OJO CIEGO", "CUENTA DEDOS", "PERCIBE LUZ"];
+        problemasOftalmologicos = true;
+        problemasOftalmologicosRed = true;
         if (enfermedadesRefractarias.some(e => textoEnfermedadOftalmo.includes(e))) {
-            problemasOftalmologicos = true;
-            problemasOftalmologicosRed = true;
             const visionLejosNormal = vlejoscod === "00" && vlejoscoi === "00";
             const visionCercaNormal = vcercacod === "00" && vcercacoi === "00";
             nuevasObservaciones += visionLejosNormal && visionCercaNormal
