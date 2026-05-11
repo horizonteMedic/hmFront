@@ -35,37 +35,37 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
-    doc.text("MUESTRA:", marginL + 54, 15);
+    doc.text("MUESTRA:", marginL + 54, 10);
 
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
-    doc.text("SANGRE", marginL + 72, 14);
-    doc.rect(marginL + 85, 11.5, 4, 3); // Checkbox Sangre
-    doc.text("ORINA", marginL + 72, 18);
-    doc.rect(marginL + 85, 15.5, 4, 3); // Checkbox Orina
-    doc.text("HECES", marginL + 72, 22);
-    doc.rect(marginL + 85, 19.5, 4, 3); // Checkbox Heces
+    doc.text("SANGRE", marginL + 54, 14);
+    doc.rect(marginL + 67, 11.5, 4, 3); // Checkbox Sangre
+    doc.text("ORINA", marginL + 54, 18);
+    doc.rect(marginL + 67, 15.5, 4, 3); // Checkbox Orina
+    doc.text("HECES", marginL + 54, 22);
+    doc.rect(marginL + 67, 19.5, 4, 3); // Checkbox Heces
 
     // Cuadro de tiempos
     doc.setLineWidth(0.2);
-    doc.rect(marginL + 92, 10, 48, 15);
-    doc.line(marginL + 92, 15, marginL + 140, 15);
-    doc.line(marginL + 92, 20, marginL + 140, 20);
-    doc.line(marginL + 125, 10, marginL + 125, 25);
+    doc.rect(marginL + 73, 10, 48, 15);
+    doc.line(marginL + 73, 15, marginL + 121, 15);
+    doc.line(marginL + 73, 20, marginL + 121, 20);
+    doc.line(marginL + 108, 10, marginL + 108, 25);
 
     doc.setFontSize(5.5);
-    doc.text("HORA DE TOMA DE MUESTRA", marginL + 93, 13);
-    doc.text("HORA DE INICIO DE PROCESO", marginL + 93, 18);
-    doc.text("HORA DE TERMINO DE PROCESO", marginL + 93, 23);
+    doc.text("HORA DE TOMA DE MUESTRA", marginL + 74, 13);
+    doc.text("HORA DE INICIO DE PROCESO", marginL + 74, 18);
+    doc.text("HORA DE TERMINO DE PROCESO", marginL + 74, 23);
 
     // Código
     doc.setFontSize(9);
     doc.setFont("helvetica", "bold");
-    doc.text("CÓDIGO", marginL + 141, 17);
+    doc.text("CÓDIGO", marginL + 123, 17);
     doc.setLineWidth(0.5);
-    doc.rect(marginL + 155, 11, 22, 10);
-    doc.setFontSize(15);
-    doc.text(String(datos.orden || ""), marginL + 157, 17);
+    doc.rect(marginL + 137, 11, 26, 11);
+    doc.setFontSize(20);
+    doc.text(String(datos.orden || ""), marginL + 138, 18);
 
     // Dynamic BM Box (Top Right)
     const displayColor = (datos.codigoColor?.trim() ? datos.codigoColor.trim() : finalConfig.defaultColor);
@@ -98,116 +98,20 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.5);
     doc.text(String(datos.examen || ""), marginL + 24, currentY);
-    doc.line(marginL + 24, currentY + 0.5, marginL + 51, currentY + 0.5);
+    doc.line(marginL + 24, currentY + 0.5, marginL + 55, currentY + 0.5);
 
-
-    const baseY = currentY; // <- posición fija de toda la fila
-
-    // ================= EMPRESA =================
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.text("EMPRESA:", marginL + 53, currentY);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8.5);
-
-    const empresaTexto = String(datos.empresa || "EMPRESA NO ESPECIFICADA");
-    const empresaMaxWidth = 60; // Ancho máximo para empresa
-    let empresaLines;
-
-    // Si excede de 2 líneas, usar ancho 70 solo para la primera línea
-    if (doc.splitTextToSize(empresaTexto, empresaMaxWidth).length > 2) {
-        // Primera línea con ancho 70, resto con ancho normal
-        const primeraLinea = doc.splitTextToSize(empresaTexto, 70)[0];
-        const restoTexto = empresaTexto.substring(primeraLinea.length).trim();
-        const restoLineas = doc.splitTextToSize(restoTexto, empresaMaxWidth);
-        empresaLines = [primeraLinea, ...restoLineas];
-    } else {
-        empresaLines = doc.splitTextToSize(empresaTexto, empresaMaxWidth);
-    }
-
-    const empresaX = marginL + 53 + 20; // Posición X específica para empresa (movida a la izquierda)
-    const empresaY = baseY;
-
-    // Reducir fuente si pasa de 3 líneas
-    if (empresaLines.length > 2) {
-        doc.setFontSize(7.5); // Reducir de 9 a 8
-    }
-
-    const lineHeight = 4; // el mismo que usas arriba
-    const empresaExtraLines = empresaLines.length - 1;
-
-    empresaLines.forEach((line, index) => {
-        // Calcular Y para que la última línea esté en empresaY y las anteriores arriba
-        const lineY = empresaY + (index * lineHeight);
-        doc.text(line, empresaX, lineY);
-        doc.line(empresaX, lineY + 1, empresaX + empresaMaxWidth, lineY + 1);
-
-    });
-
-
-
-    // ================= CONTRATA =================
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.text("CONTRATA:", marginL + 132, baseY);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8.5);
-
-    const contrataTexto = String(datos.contrata || "N/A");
-    const contrataMaxWidth = 40;
-
-    let contrataLines;
-
-    if (doc.splitTextToSize(contrataTexto, contrataMaxWidth).length > 2) {
-
-        const primeraLinea = doc.splitTextToSize(contrataTexto, 50)[0];
-        const restoTexto = contrataTexto.substring(primeraLinea.length).trim();
-        const restoLineas = doc.splitTextToSize(restoTexto, contrataMaxWidth);
-
-        contrataLines = [primeraLinea, ...restoLineas];
-
-    } else {
-
-        contrataLines = doc.splitTextToSize(contrataTexto, contrataMaxWidth);
-
-    }
-
-    const contrataX = marginL + 152;
-    const contrataY = baseY;
-
-    if (contrataLines.length > 2) {
-        doc.setFontSize(7.5);
-    }
-
-    doc.setFont("helvetica", "normal");
-
-    const contrataExtraLines = contrataLines.length - 1;
-
-    contrataLines.forEach((line, index) => {
-
-        const lineY = contrataY + (index * lineHeight);
-        doc.text(line, contrataX, lineY);
-        doc.line(contrataX, lineY + 1, contrataX + contrataMaxWidth, lineY + 1);
-    });
-
-
-    const maxExtraLines = Math.max(
-        empresaExtraLines,
-        contrataExtraLines
-    );
-
-    currentY += maxExtraLines * lineHeight;
+    const lineHeight = 4;
     // ================= NOMBRES Y APELLIDOS =================
-    currentY += 5;
+    //currentY += 5;
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
-    doc.text("NOMBRES Y APELLIDOS:", marginL + 5, currentY);
+    doc.text("NOMBRES Y APELLIDOS:", marginL + 57, currentY);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.5);
 
 
     const nombresTexto = String(datos.nombres || "NOMBRE NO ESPECIFICADO");
-    const nombresMaxWidth = 85;
+    const nombresMaxWidth = 93;
 
     let nombresLines;
 
@@ -236,7 +140,7 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
 
     }
 
-    const nombresX = marginL + 45;
+    const nombresX = marginL + 57 + 40;
     const nombresY = currentY;
 
     // Reducir fuente si tiene muchas líneas
@@ -264,20 +168,82 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
     // Ajustar currentY para lo que siga debajo
     currentY += nombresExtraLines * lineHeight;
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.text("EDAD:", marginL + 132, currentY);
-    doc.setFont("helvetica", "normal");
-    doc.text(String(datos.edad || ""), marginL + 143, currentY);
-    doc.text("Años", marginL + 152, currentY);
-    doc.line(marginL + 142, currentY + 0.5, marginL + 150, currentY + 0.5);
+
+
+    // ================= EMPRESA =================
+    currentY += 5;
+    const baseY = currentY; // <- posición fija de toda la fila
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
-    doc.text("FECHA:", marginL + 162, currentY);
+    doc.text("EMPRESA:", marginL + 5, currentY);
     doc.setFont("helvetica", "normal");
-    doc.text(formatearFecha(datos.fecha) || "", marginL + 175, currentY);
-    doc.line(marginL + 174, currentY + 0.5, marginL + 192, currentY + 0.5);
+    doc.setFontSize(8.5);
+
+    const empresaTexto = String(datos.empresa || "EMPRESA NO ESPECIFICADA");
+    const empresaMaxWidth = 165; // Ancho máximo para empresa
+    let empresaLines = doc.splitTextToSize(empresaTexto, empresaMaxWidth);
+
+    const empresaX = marginL + 25; // Posición X específica para empresa (movida a la izquierda)
+    const empresaY = currentY;
+
+    // Reducir fuente si pasa de 3 líneas
+    if (empresaLines.length > 2) {
+        doc.setFontSize(7.5); // Reducir de 9 a 8
+    }
+
+    empresaLines.forEach((line, index) => {
+        // Calcular Y para que la última línea esté en empresaY y las anteriores arriba
+        const lineY = empresaY + (index * lineHeight);
+        doc.text(line, empresaX, lineY);
+        doc.line(empresaX, lineY + 1, empresaX + empresaMaxWidth, lineY + 1);
+    });
+
+    // CUÁNTO CRECIÓ EMPRESA
+    const empresaHeight = (empresaLines.length - 1) * lineHeight;
+
+    // MOVER currentY
+    currentY += empresaHeight;
+
+
+    // ================= CONTRATA ================= 
+    currentY += 5;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.text("CONTRATA:", marginL + 5, currentY);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8.5);
+
+    const contrataTexto = String(datos.contrata || "N/A");
+    const contrataMaxWidth = 165;
+
+    let contrataLines = doc.splitTextToSize(contrataTexto, contrataMaxWidth);
+
+    const contrataX = marginL + 25;
+    const contrataY = currentY;
+
+    if (contrataLines.length > 2) {
+        doc.setFontSize(7.5);
+    }
+
+    contrataLines.forEach((line, index) => {
+        const lineY = contrataY + (index * lineHeight);
+        doc.text(line, contrataX, lineY);
+        doc.line(contrataX, lineY + 1, contrataX + contrataMaxWidth, lineY + 1);
+    });
+
+    // CRECER currentY
+    const contrataHeight = (contrataLines.length - 1) * lineHeight;
+
+    currentY += contrataHeight;
+
+    // const maxExtraLines = Math.max(
+    //     empresaHeight,
+    //     contrataHeight
+    // );
+
+    // currentY += maxExtraLines * lineHeight;
 
     currentY += 5;
     doc.setFont("helvetica", "bold");
@@ -286,10 +252,27 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.5);
     doc.text(String(datos.cargo || ""), marginL + 19, currentY);
-    doc.line(marginL + 19, currentY + 0.5, marginL + 57, currentY + 0.5);
+    doc.line(marginL + 19, currentY + 0.5, marginL + 120, currentY + 0.5);
 
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.text("EDAD:", marginL + 122, currentY);
+    doc.setFont("helvetica", "normal");
+    doc.text(String(datos.edad || ""), marginL + 133, currentY);
+    doc.text("Años", marginL + 140, currentY);
+    doc.line(marginL + 133, currentY + 0.5, marginL + 138, currentY + 0.5);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.text("FECHA:", marginL + 158, currentY);
+    doc.setFont("helvetica", "normal");
+    doc.text(formatearFecha(datos.fecha) || "", marginL + 173, currentY);
+    doc.line(marginL + 173, currentY + 0.5, marginL + 190, currentY + 0.5);
+
+ 
     // Checkboxes (T.ALTURA, PSICO, etc.)
-    const cbXStart = 67;
+    currentY += 5;
+    const cbXStart = marginL + 5;
     const cbLabels = ["T.ALTURA", "PSICO", "M. A.", "MET. P.", "Pb", "T. CAL"];
 
     doc.setFont("helvetica", "bold");
@@ -334,7 +317,7 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
     doc.setFontSize(9);
     doc.setFont("helvetica", "bold");
     doc.text("PRUEBA", marginL + 13, currentY + 3.5);
-    doc.line(marginL + 35, currentY, marginL + 35, currentY + 5);
+    doc.line(marginL + 33, currentY, marginL + 33, currentY + 5);
     doc.text("RESULTADOS DE ANALISIS CLÍNICOS", marginL + 38, currentY + 3.5);
 
     const rowsLeft = [
@@ -354,11 +337,11 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
     let yL = currentY + 5;
     rowsLeft.forEach(row => {
         doc.setLineWidth(0.3);
-        doc.rect(marginL + 5, yL, 30, row.h);
-        doc.rect(marginL + 35, yL, col1Width - 35, row.h);
+        doc.rect(marginL + 5, yL, 28, row.h);
+        doc.rect(marginL + 33, yL, col1Width - 33, row.h);
 
         const lines = doc.splitTextToSize(row.label, 28);
-        doc.text(lines, marginL + 20, yL + (row.h / 2), { align: "center", baseline: "middle" });
+        doc.text(lines, marginL + 19, yL + (row.h / 2), { align: "center", baseline: "middle" });
 
         if (row.sub) {
             if (row.label === "Hb y Hto") {
@@ -366,20 +349,20 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
                 doc.line(marginL + 64, yL, marginL + 64, yL + 6);
                 doc.text(row.sub[1], marginL + 65, yL + 4);
             } else if (row.label === "RECUENTO\nDIFERENCIAL") {
-                doc.text(row.sub[0], marginL + 36, yL + 4);
-                doc.text(row.sub[1], marginL + 51, yL + 4);
-                doc.text(row.sub[2], marginL + 71, yL + 4);
-                doc.text(row.sub[3], marginL + 36, yL + 10);
-                doc.text(row.sub[4], marginL + 51, yL + 10);
+                doc.text(row.sub[0], marginL + 34, yL + 4);
+                doc.text(row.sub[1], marginL + 56, yL + 4);
+                doc.text(row.sub[2], marginL + 76, yL + 4);
+                doc.text(row.sub[3], marginL + 34, yL + 10);
+                doc.text(row.sub[4], marginL + 54, yL + 10);
                 doc.text(row.sub[5], marginL + 71, yL + 10);
                 doc.text(row.sub[6], marginL + 86, yL + 10);
 
-                doc.line(marginL + 50, yL, marginL + 50, yL + 6);
-                doc.line(marginL + 70, yL, marginL + 70, yL + 6);
-                doc.line(marginL + 35, yL + 6, marginL + 100, yL + 6);
-                doc.line(marginL + 50, yL + 6, marginL + 50, yL + 12);
-                doc.line(marginL + 70, yL + 6, marginL + 70, yL + 12);
-                doc.line(marginL + 85, yL + 6, marginL + 85, yL + 12);
+                doc.line(marginL + 55, yL, marginL + 55, yL + 6);       //NEUT
+                doc.line(marginL + 75, yL, marginL + 75, yL + 6);
+                doc.line(marginL + 33, yL + 6, marginL + 100, yL + 6);
+                doc.line(marginL + 53, yL + 6, marginL + 53, yL + 12);  //MON
+                doc.line(marginL + 70, yL + 6, marginL + 70, yL + 12);  //EOS
+                doc.line(marginL + 85, yL + 6, marginL + 85, yL + 12);  //BAS
             }
         }
         yL += row.h;
