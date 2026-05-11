@@ -1578,9 +1578,9 @@ export default async function Informe_Ocu_DatosPacientes(data = {}, docExistente
   // si es null -> se queda en null (no se dibuja)
 
   // --- ANEXO (CENTRO MEDICO) ---
-  if (data.apto || data.aptoRestriccion) {
+  if (data.faApto || data.faAptoConRestriccion) {
     imgEstadoAnexo = "/img/DatosPacientes/APTO.png";
-  } else if (data.noApto) {
+  } else if (data.faNoApto) {
     imgEstadoAnexo = "/img/DatosPacientes/NOAPTO.png";
   }
 

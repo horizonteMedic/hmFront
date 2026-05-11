@@ -167,3 +167,9 @@ export function deleteData(url, token) {
         } return res.json()
     }).then(response => response)
 }
+
+export function deleteArchivoPorOrdenNomenclatura(nOrden, nomenclatura, token) {
+    if (!nOrden || !nomenclatura) return null;
+    const url = `/api/v01/ct/archivos/eliminarArchivo/${encodeURIComponent(nOrden)}/${encodeURIComponent(nomenclatura)}`;
+    return deleteData(url, token);
+}

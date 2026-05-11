@@ -1,15 +1,15 @@
 import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo, useCallback } from "react";
 import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import FolioJasper from "../../../../jaspers/FolioJasper/FolioJasper";
 import { getToday } from "../../../../utils/helpers";
-import { GetArchivosFolioStatus, GetInfoPac, nombresExamen, obtenerFirmas, PrintHojaRAnexo16, PrintHojaRAnexo2, ReadArchivoFolio, subirArchivoFolio, SubmitDataService } from "./controllerFolio";
+import { DeleteArchivoFolio, GetArchivosFolioStatus, GetInfoPac, nombresExamen, obtenerFirmas, PrintHojaRAnexo16, PrintHojaRAnexo2, ReadArchivoFolio, subirArchivoFolio, SubmitDataService } from "./controllerFolio";
 import Swal from "sweetalert2";
 import { buildExamenesList } from "./folioCatalogo";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
-import { faDownload } from "@fortawesome/free-solid-svg-icons";
+import { faDownload, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const ExamenesListPRUEBAS = buildExamenesList([
@@ -296,8 +296,10 @@ const Folio = () => {
     const { token, userlogued, selectedSede, datosFooter } = useSessionData();
     const [selectedListType, setSelectedListType] = useState("COMPLETO");
     const [showOnlyPassed, setShowOnlyPassed] = useState(false);
+    const [showOnlyUploadedFolio, setShowOnlyUploadedFolio] = useState(false);
     const [archivosFolio, setArchivosFolio] = useState([]);
     const [visualerOpen, setVisualerOpen] = useState(null);
+    const [deletingFolioNomenclatura, setDeletingFolioNomenclatura] = useState(null);
     const initialFormState = {
         norden: "",
         codigoInforme: null,
@@ -340,6 +342,34 @@ const Folio = () => {
             .replace(/\s+/g, " ")
             .trim();
 
+    const normalizeExamenKey = useCallback(
+        (value) =>
+            String(value ?? "")
+                .trim()
+                .toUpperCase()
+                .replace(/[_\s]+/g, "-")
+                .replace(/-+/g, "-"),
+        []
+    );
+
+    const expectedTipoKey = useMemo(
+        () => normalizeExamenKey(form?.nombreExamen),
+        [form?.nombreExamen, normalizeExamenKey]
+    );
+
+    const expectedNomenclatura = useMemo(
+        () => nombresExamen[expectedTipoKey] ?? null,
+        [expectedTipoKey]
+    );
+
+    const archivosFolioIndex = useMemo(() => {
+        const index = new Map();
+        for (const item of archivosFolio ?? []) {
+            index.set(`${item?.tipo}||${item?.nomenclatura}`, item);
+        }
+        return index;
+    }, [archivosFolio]);
+
     const buildNombreArchivo = (nomenclatura) => {
         const apellidos = (form?.apellidos ?? "").trim();
         const nombres = (form?.nombres ?? form?.nombre ?? "").trim();
@@ -357,6 +387,60 @@ const Folio = () => {
             token,
             nomenclatura
         );
+    };
+
+    const handleDeleteArchivoFolio = async (nomenclatura) => {
+        if (!form?.norden || !nomenclatura) return;
+
+        const decision = await Swal.fire({
+            title: "¿Eliminar archivo?",
+            html: `
+                <div class="text-sm text-gray-700">
+                    Se eliminará el archivo con nomenclatura:
+                </div>
+                <div class="mt-2 font-mono text-sm break-all">${String(nomenclatura)}</div>
+                <div class="mt-2 text-xs text-gray-500">N° Orden: ${String(form.norden)}</div>
+            `,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar",
+            confirmButtonColor: "#d33",
+        });
+
+        if (!decision.isConfirmed) return;
+
+        setDeletingFolioNomenclatura(nomenclatura);
+        try {
+            const response = await DeleteArchivoFolio(form.norden, nomenclatura, token);
+
+            const ok =
+                response?.id === 1 ||
+                response?.id === "1" ||
+                response?.codigo === 200 ||
+                response?.codigo === 201 ||
+                response?.ok === true;
+
+            if (!ok) {
+                const message =
+                    response?.mensaje ||
+                    response?.message ||
+                    response?.statusText ||
+                    "No se pudo eliminar el archivo.";
+                await Swal.fire("Error", message, "error");
+                return;
+            }
+
+            await Swal.fire("Eliminado", "El archivo fue eliminado correctamente.", "success");
+
+            if (visualerOpen?.nomenclatura === nomenclatura) {
+                setVisualerOpen(null);
+            }
+
+            await fetchArchivosFolio(form.norden);
+        } finally {
+            setDeletingFolioNomenclatura(null);
+        }
     };
 
     const handleDownloadVisualer = async () => {
@@ -600,7 +684,10 @@ const Folio = () => {
                 cancelButtonColor: "#d33",
             });
 
-            if (!decision.isConfirmed) return;
+            if (!decision.isConfirmed) {
+                await fetchArchivosFolio(form.norden);
+                return;
+            }
 
             const seleccion = await Swal.fire({
                 title: "Selecciona dónde se subirá el archivo",
@@ -720,7 +807,10 @@ const Folio = () => {
                 },
             });
 
-            if (!seleccion.isConfirmed) return;
+            if (!seleccion.isConfirmed) {
+                await fetchArchivosFolio(form.norden);
+                return;
+            }
 
             const nomenclature = nombresExamen[seleccion.value];
             await subirArchivoFolio(archivoGenerado, {
@@ -730,6 +820,7 @@ const Folio = () => {
                 userlogued,
                 token,
             });
+            await fetchArchivosFolio(form.norden);
         } catch (error) {
             if (error.name === 'AbortError' || error.message === 'Aborted') {
                 Swal.fire('Cancelado', 'La generación del folio ha sido cancelada.', 'info');
@@ -958,42 +1049,88 @@ const Folio = () => {
                     </div>
                 ) : (
                     <>
+                        <div className="col-span-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    id="showUploadedFolio"
+                                    checked={showOnlyUploadedFolio}
+                                    onChange={(e) => setShowOnlyUploadedFolio(e.target.checked)}
+                                    disabled={!form.norden}
+                                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                />
+                                <label
+                                    htmlFor="showUploadedFolio"
+                                    className={`text-sm font-medium ${!form.norden ? "text-gray-400" : "text-gray-700"} cursor-pointer select-none`}
+                                >
+                                    Solo subidos
+                                </label>
+                            </div>
+                            {!!expectedNomenclatura && (
+                                <div className="text-xs text-gray-600">
+                                    Archivo esperado: <span className="font-semibold">{expectedTipoKey}</span> ({expectedNomenclatura})
+                                </div>
+                            )}
+                        </div>
                         {Object.entries(nombresExamen).map(([tipo, nomenclatura]) => {
-                            const match = archivosFolio.find((x) => x.tipo === tipo && x.nomenclatura === nomenclatura);
+                            const match = archivosFolioIndex.get(`${tipo}||${nomenclatura}`);
                             const existe = match?.existe ?? false;
+                            const isExpected = !!expectedTipoKey && tipo === expectedTipoKey;
+
+                            if (showOnlyUploadedFolio && !existe && !isExpected) return null;
 
                             return (
                                 <div
                                     key={`${tipo}-${nomenclatura}`}
-                                    className="border rounded-xl p-4 flex flex-col gap-3 shadow-sm"
+                                    className={`border rounded-xl p-4 flex flex-col gap-3 shadow-sm transition-colors ${isExpected
+                                        ? "border-green-400 bg-green-100"
+                                        : "bg-white"
+                                        }`}
                                 >
                                     <div className="flex items-start justify-between gap-3">
                                         <div className="flex flex-col leading-tight">
                                             <span className="font-semibold text-sm text-gray-800">{tipo}</span>
                                             <span className="text-xs text-gray-500">Nomenclatura: {nomenclatura}</span>
                                         </div>
-                                        <span
-                                            className={`text-[11px] font-bold px-2 py-1 rounded-full ${existe
-                                                ? "bg-green-100 text-green-700"
-                                                : "bg-red-100 text-red-700"
-                                                }`}
-                                        >
-                                            {existe ? "SUBIDO" : "NO SUBIDO"}
-                                        </span>
+                                        <div className="flex  items-end gap-1">
+                                            <span
+                                                className={`text-[11px] font-bold px-2 py-1 rounded-full ${existe
+                                                    ? "bg-green-200 text-green-700"
+                                                    : "bg-red-100 text-red-700"
+                                                    }`}
+                                            >
+                                                {existe ? "SUBIDO" : "NO SUBIDO"}
+                                            </span>
+                                        </div>
                                     </div>
 
-                                    <button
-                                        type="button"
-                                        onClick={() => handleOpenArchivoFolio(nomenclatura)}
-                                        disabled={!existe}
-                                        className={`text-white text-base px-4 py-2 rounded flex items-center justify-center gap-2 transition-all duration-150 ease-out ${!existe
-                                            ? "bg-gray-400 cursor-not-allowed opacity-70"
-                                            : "bg-emerald-600 hover:bg-emerald-700 hover:shadow-lg active:scale-95 active:shadow-inner"
-                                            }`}
-                                    >
-                                        <FontAwesomeIcon icon={faDownload} />
-                                        Ver / Descargar
-                                    </button>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleOpenArchivoFolio(nomenclatura)}
+                                            disabled={!existe}
+                                            className={`text-white text-base px-4 py-2 rounded flex items-center justify-center gap-2 transition-all duration-150 ease-out ${!existe
+                                                ? "bg-gray-400 cursor-not-allowed opacity-70"
+                                                : "bg-emerald-600 hover:bg-emerald-700 hover:shadow-lg active:scale-95 active:shadow-inner"
+                                                }`}
+                                        >
+                                            <FontAwesomeIcon icon={faDownload} />
+                                            Ver / Descargar
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => handleDeleteArchivoFolio(nomenclatura)}
+                                            disabled={!existe || deletingFolioNomenclatura === nomenclatura}
+                                            className={`text-white text-base px-4 py-2 rounded flex items-center justify-center gap-2 transition-all duration-150 ease-out ${!existe || deletingFolioNomenclatura === nomenclatura
+                                                ? "bg-gray-400 cursor-not-allowed opacity-70"
+                                                : "bg-red-600 hover:bg-red-700 hover:shadow-lg active:scale-95 active:shadow-inner"
+                                                }`}
+                                        >
+                                            <FontAwesomeIcon icon={faTrash} />
+                                            Eliminar
+                                        </button>
+                                    </div>
                                 </div>
                             );
                         })}
