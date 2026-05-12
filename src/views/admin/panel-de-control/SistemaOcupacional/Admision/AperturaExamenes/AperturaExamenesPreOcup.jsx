@@ -966,8 +966,8 @@ const AperturaExamenesPreOcup = (props) => {
 
   return (
     <div >
-      <div className="grid md:grid-cols-2 sm:flex-col gap-5 px-4">
-        <div className="w-full sm:w-full md:w-auto text-lg font-semibold  ">
+      <div className="grid md:grid-cols-7 sm:flex-col gap-2 px-4">
+        <div className="w-full sm:w-full md:w-auto text-lg font-semibold  col-span-3">
           <div className="mb-1 pb-2 flex justify-between">
             <h2 className="text-lg font-bold">Datos</h2>
             {props.tienePermisoEnVista("Admision", "Subida Masiva Examenes Ocupacionales")
@@ -1628,7 +1628,7 @@ const AperturaExamenesPreOcup = (props) => {
         </div>
 
         {/* Nueva columna con estructura solicitada */}
-        <div className="w-full sm:w-full mb-4 pl-4">
+        <div className="w-full sm:w-full mb-4 pl-4 col-span-4">
           <div className="flex items-center space-x-2 mb-2">
             <label htmlFor="soloMiSede" className="block w-1/6">Solo mi Sede</label>
             <input autoComplete="off" type="checkbox" id="soloMiSede" name="soloMiSede" className="mr-2 pointer" />
