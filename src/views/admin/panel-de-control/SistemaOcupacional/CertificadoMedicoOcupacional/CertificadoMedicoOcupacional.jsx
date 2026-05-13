@@ -326,13 +326,15 @@ export default function CertificadoMedicoOcupacional() {
                             <div className="w-1/2">
                                 <section className="bg-white border border-gray-200 rounded-lg p-4 gap-4 mt-0 m-4">
                                     <InputsRadioGroup
+                                        disabled
                                         vertical
                                         name="apto" value={form?.apto} className="py-2"
                                         onChange={handleRadioButton} options={[
                                             { label: "APTO (para el puesto en el que trabaja o postula)", value: "APTO" },
                                             { label: "APTO con RESTRICCION (para el puesto en el que trabaja o postula)", value: "APTOCONRESTRICCION" },
                                             { label: "No APTO (para el puesto en el que trabaja o postula)", value: "NOAPTO" },
-                                            { label: "Evaluado", value: "EVALUADO" }
+                                            { label: "CON OBSERVACION", value: "OBSERVACION" },
+                                            { label: "EVALUADO", value: "EVALUADO" }
                                         ]}
                                     />
 
