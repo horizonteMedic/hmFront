@@ -1,11 +1,16 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { InputTextOneLine, InputsBooleanRadioGroup, SectionFieldset } from "../../../../components/reusableComponents/ResusableComponents";
 import { SelectField } from "../../../../components/reusableComponents/InputSelect";
 import { useForm } from "../../../../hooks/useForm";
+import { getToday } from "../../../../utils/helpers";
+import { useSessionData } from "../../../../hooks/useSessionData";
+import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerRiesgoCardiovascular";
+import BotonesAccion from "../../../../components/templates/BotonesAccion";
 
 const sexoOptions = [
-    { value: "M", label: "Varón" },
-    { value: "F", label: "Mujer" },
+    { value: "MASCULINO", label: "MASCULINO" },
+    { value: "FEMENINO", label: "FEMENINO" },
 ];
 
 const clampNumber = (value, min, max) => Math.min(max, Math.max(min, value));
@@ -26,7 +31,7 @@ const ageGroupKey = (age) => {
 const getAgePointsChol = (sexo, age) => {
     const group = ageGroupKey(age);
     if (!group) return null;
-    const table = sexo === "M"
+    const table = sexo === "MASCULINO"
         ? { "30-34": -1, "35-39": 0, "40-44": 1, "45-49": 2, "50-54": 3, "55-59": 4, "60-64": 5, "65-69": 6, "70-74": 7 }
         : { "30-34": -9, "35-39": -4, "40-44": 0, "45-49": 3, "50-54": 6, "55-59": 7, "60-64": 8, "65-69": 8, "70-74": 8 };
     return table[group];
@@ -34,7 +39,7 @@ const getAgePointsChol = (sexo, age) => {
 
 const getTotalCholPoints = (sexo, totalChol) => {
     const tc = totalChol;
-    if (sexo === "M") {
+    if (sexo === "MASCULINO") {
         if (tc < 160) return -3;
         if (tc <= 199) return 0;
         if (tc <= 239) return 1;
@@ -50,7 +55,7 @@ const getTotalCholPoints = (sexo, totalChol) => {
 
 const getLdlPoints = (sexo, ldl) => {
     const v = ldl;
-    if (sexo === "M") {
+    if (sexo === "MASCULINO") {
         if (v < 100) return -3;
         if (v <= 129) return 0;
         if (v <= 159) return 0;
@@ -66,7 +71,7 @@ const getLdlPoints = (sexo, ldl) => {
 
 const getHdlPointsChol = (sexo, hdl) => {
     const v = hdl;
-    if (sexo === "M") {
+    if (sexo === "MASCULINO") {
         if (v < 35) return 2;
         if (v <= 44) return 1;
         if (v <= 49) return 0;
@@ -90,7 +95,7 @@ const bpRank = (sist, diast) => {
 
 const getBpPointsChol = (sexo, sist, diast) => {
     const r = bpRank(sist, diast);
-    if (sexo === "M") {
+    if (sexo === "MASCULINO") {
         return [0, 0, 1, 2, 3][r];
     }
     return [-3, 0, 0, 2, 3][r];
@@ -98,13 +103,13 @@ const getBpPointsChol = (sexo, sist, diast) => {
 
 const getDiabetesPointsChol = (sexo, diabetes) => {
     if (!diabetes) return 0;
-    return sexo === "M" ? 2 : 4;
+    return sexo === "MASCULINO" ? 2 : 4;
 };
 
 const getSmokerPointsChol = (smoker) => (smoker ? 2 : 0);
 
 const riskFromPointsChol = (sexo, points) => {
-    if (sexo === "M") {
+    if (sexo === "MASCULINO") {
         if (points <= -1) return { display: "2", numeric: 2 };
         const map = {
             0: 3,
@@ -122,7 +127,7 @@ const riskFromPointsChol = (sexo, points) => {
             12: 37,
             13: 45,
         };
-        if (points >= 14) return { display: "≥53", numeric: 53 };
+        if (points >= 14) return { display: "≥ 53", numeric: 53 };
         return { display: String(map[points] ?? 0), numeric: map[points] ?? 0 };
     }
 
@@ -147,12 +152,12 @@ const riskFromPointsChol = (sexo, points) => {
         15: 20,
         16: 24,
     };
-    if (points >= 17) return { display: "≥27", numeric: 27 };
+    if (points >= 17) return { display: "≥ 27", numeric: 27 };
     return { display: String(map[String(points)] ?? 0), numeric: map[String(points)] ?? 0 };
 };
 
 const riskFromPointsLdl = (sexo, points) => {
-    if (sexo === "M") {
+    if (sexo === "MASCULINO") {
         if (points <= -3) return { display: "1", numeric: 1 };
         if (points === -2) return { display: "2", numeric: 2 };
         if (points === -1) return { display: "2", numeric: 2 };
@@ -172,7 +177,7 @@ const riskFromPointsLdl = (sexo, points) => {
             12: 40,
             13: 47,
         };
-        if (points >= 14) return { display: "≥56", numeric: 56 };
+        if (points >= 14) return { display: "≥ 56", numeric: 56 };
         return { display: String(map[points] ?? 0), numeric: map[points] ?? 0 };
     }
 
@@ -197,14 +202,14 @@ const riskFromPointsLdl = (sexo, points) => {
         15: 24,
         16: 27,
     };
-    if (points >= 17) return { display: "≥32", numeric: 32 };
+    if (points >= 17) return { display: "≥ 32", numeric: 32 };
     return { display: String(map[String(points)] ?? 0), numeric: map[String(points)] ?? 0 };
 };
 
 const comparativeRisk = (sexo, age) => {
     const group = ageGroupKey(age);
     if (!group) return null;
-    if (sexo === "M") {
+    if (sexo === "MASCULINO") {
         const avg = { "30-34": "3", "35-39": "5", "40-44": "7", "45-49": "11", "50-54": "14", "55-59": "16", "60-64": "21", "65-69": "25", "70-74": "30" };
         const avgHard = { "30-34": "1", "35-39": "4", "40-44": "4", "45-49": "8", "50-54": "10", "55-59": "13", "60-64": "20", "65-69": "22", "70-74": "25" };
         const low = { "30-34": "2", "35-39": "3", "40-44": "4", "45-49": "4", "50-54": "6", "55-59": "7", "60-64": "9", "65-69": "11", "70-74": "14" };
@@ -216,10 +221,35 @@ const comparativeRisk = (sexo, age) => {
     return { avg: avg[group], avgHard: avgHard[group], low: low[group] };
 };
 
+const tabla = "";
+
 export default function RiesgoCardiovascular() {
+    const today = getToday();
+    const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
+
     const initialFormState = {
+        // Header - Información del examen
+        norden: "",
+        fecha: today,
+        nombreExamen: "",
+
+        dni: "",
+        nombres: "",
+        apellidos: "",
+        fechaNacimiento: "",
+        lugarNacimiento: "",
         edad: "",
         sexo: "",
+        estadoCivil: "",
+        nivelEstudios: "",
+
+        // Datos Laborales
+        empresa: "",
+        contrata: "",
+        ocupacion: "",
+        cargoDesempenar: "",
+
+
         diabetes: null,
         fuma: null,
         tensionSistolica: "",
@@ -228,11 +258,24 @@ export default function RiesgoCardiovascular() {
         colesterolHdl: "",
         trigliceridos: "",
         colesterolLdl: "",
+        riesgoEventoCoronario10: "",
+        riesgoPromedioEventoCoronario10: "",
+        riesgoIdealEventoCoronario10: "",
+        riesgoPromedioEventoCoronarioSevero10: "",
+        // Médico que Certifica //BUSCADOR
+        nombre_medico: userName,
+        user_medicoFirma: userlogued,
     };
 
-    const { form, handleChangeSimple, handleChangeNumberDecimals, handleRadioButtonBoolean, handleClear } = useForm(initialFormState, {
+    const { form, setForm, handleChangeSimple, handleChangeNumberDecimals, handleRadioButtonBoolean, handleClear, handleClearnotO, handlePrintDefault } = useForm(initialFormState, {
         storageKey: "riesgo_cardiovascular",
     });
+
+    useEffect(() => {
+        if (!form.sexo) return;
+        if (form.sexo === "MASCULINO" || form.sexo === "FEMENINO") return;
+        setForm((prev) => ({ ...prev, sexo: "" }));
+    }, [form.sexo, setForm]);
 
     const calculo = useMemo(() => {
         const edad = Number(form.edad);
@@ -248,7 +291,7 @@ export default function RiesgoCardiovascular() {
 
         const missing =
             !Number.isFinite(edad) ||
-            !sexo ||
+            (sexo !== "MASCULINO" && sexo !== "FEMENINO") ||
             form.diabetes === null ||
             form.fuma === null ||
             !Number.isFinite(sist) ||
@@ -301,33 +344,79 @@ export default function RiesgoCardiovascular() {
         };
     }, [form]);
 
-    const sexoLabel = form.sexo === "M" ? "varón" : form.sexo === "F" ? "mujer" : "";
+    const handleSearch = (e) => {
+        if (e.key === "Enter") {
+            handleClearnotO();
+            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        }
+    };
+
+    const handleSave = () => {
+        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    const handlePrint = () => {
+        handlePrintDefault(() => {
+            PrintHojaR(form.norden, token, tabla, datosFooter);
+        });
+    };
+
+    const sexoLabel = form.sexo === "MASCULINO" || form.sexo === "FEMENINO" ? form.sexo : "";
+    const riesgoEventoCoronario10 = calculo.ready ? `${calculo.risk.display} %` : "";
+    const riesgoPromedioEventoCoronario10 = calculo.ready ? `${calculo.comparative.avg} %` : "";
+    const riesgoIdealEventoCoronario10 = calculo.ready ? `${calculo.comparative.low} %` : "";
+    const riesgoPromedioEventoCoronarioSevero10 = calculo.ready ? `${calculo.comparative.avgHard} %` : "";
+
+    useEffect(() => {
+        setForm((prev) => {
+            if (
+                prev.riesgoEventoCoronario10 === riesgoEventoCoronario10 &&
+                prev.riesgoPromedioEventoCoronario10 === riesgoPromedioEventoCoronario10 &&
+                prev.riesgoIdealEventoCoronario10 === riesgoIdealEventoCoronario10 &&
+                prev.riesgoPromedioEventoCoronarioSevero10 === riesgoPromedioEventoCoronarioSevero10
+            ) {
+                return prev;
+            }
+            return {
+                ...prev,
+                riesgoEventoCoronario10,
+                riesgoPromedioEventoCoronario10,
+                riesgoIdealEventoCoronario10,
+                riesgoPromedioEventoCoronarioSevero10,
+            };
+        });
+    }, [riesgoEventoCoronario10, riesgoIdealEventoCoronario10, riesgoPromedioEventoCoronario10, riesgoPromedioEventoCoronarioSevero10, setForm]);
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-            <div className="w-full flex justify-center items-center">
-                <h2 className="text-2xl font-bold text-[#233245]">Riesgo cardiovascular</h2>
-            </div>
-
-            <SectionFieldset legend="Factores de riesgo (requeridos)" className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-4 gap-3">
                 <InputTextOneLine
-                    label="Edad"
-                    name="edad"
-                    type="number"
-                    value={form.edad}
+                    label="N° Orden"
+                    name="norden"
+                    value={form.norden}
                     onChange={handleChangeNumberDecimals}
-                    labelWidth="140px"
+                    onKeyUp={handleSearch}
+                    labelWidth="120px"
                 />
-
-                <SelectField
-                    label="Sexo"
-                    name="sexo"
-                    value={form.sexo}
+                <InputTextOneLine
+                    label="Fecha"
+                    name="fecha"
+                    type="date"
+                    value={form.fecha}
                     onChange={handleChangeSimple}
-                    options={sexoOptions}
-                    placeholder="Elija..."
+                    labelWidth="120px"
                 />
+                <InputTextOneLine
+                    label="Nombre del Examen"
+                    name="nombreExamen"
+                    value={form.nombreExamen}
+                    disabled
+                    labelWidth="120px"
+                />
+            </SectionFieldset>
 
+            <DatosPersonalesLaborales form={form} />
+            <SectionFieldset legend="Factores de riesgo (requeridos)" className="grid grid-cols-1 xl:grid-cols-2 gap-3">
                 <InputsBooleanRadioGroup
                     name="diabetes"
                     value={form.diabetes}
@@ -353,7 +442,6 @@ export default function RiesgoCardiovascular() {
                 <InputTextOneLine
                     label="Sistólica o máxima"
                     name="tensionSistolica"
-                    type="number"
                     value={form.tensionSistolica}
                     onChange={handleChangeNumberDecimals}
                     labelWidth="170px"
@@ -361,7 +449,6 @@ export default function RiesgoCardiovascular() {
                 <InputTextOneLine
                     label="Diastólica o mínima"
                     name="tensionDiastolica"
-                    type="number"
                     value={form.tensionDiastolica}
                     onChange={handleChangeNumberDecimals}
                     labelWidth="170px"
@@ -372,7 +459,6 @@ export default function RiesgoCardiovascular() {
                 <InputTextOneLine
                     label="Colesterol total"
                     name="colesterolTotal"
-                    type="number"
                     value={form.colesterolTotal}
                     onChange={handleChangeNumberDecimals}
                     labelWidth="170px"
@@ -380,7 +466,6 @@ export default function RiesgoCardiovascular() {
                 <InputTextOneLine
                     label="Colesterol HDL"
                     name="colesterolHdl"
-                    type="number"
                     value={form.colesterolHdl}
                     onChange={handleChangeNumberDecimals}
                     labelWidth="170px"
@@ -388,7 +473,6 @@ export default function RiesgoCardiovascular() {
                 <InputTextOneLine
                     label="Triglicéridos"
                     name="trigliceridos"
-                    type="number"
                     value={form.trigliceridos}
                     onChange={handleChangeNumberDecimals}
                     labelWidth="170px"
@@ -396,22 +480,11 @@ export default function RiesgoCardiovascular() {
                 <InputTextOneLine
                     label="Colesterol LDL"
                     name="colesterolLdl"
-                    type="number"
                     value={form.colesterolLdl}
                     onChange={handleChangeNumberDecimals}
                     labelWidth="170px"
                 />
             </SectionFieldset>
-
-            <div className="flex items-center justify-end gap-2">
-                <button
-                    type="button"
-                    onClick={handleClear}
-                    className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                >
-                    Limpiar
-                </button>
-            </div>
 
             <SectionFieldset legend="Resultado" className="space-y-3">
                 {calculo.error ? <p className="text-red-600 font-semibold">{calculo.error}</p> : null}
@@ -437,17 +510,47 @@ export default function RiesgoCardiovascular() {
                     </p>
                 </div>
 
-                {calculo.ready ? (
-                    <div className="space-y-1">
-                        <p className="font-semibold">Datos calculados</p>
-                        <p>Su riesgo de evento coronario a 10 años es de un: {calculo.risk.display} %</p>
-                        <p className="font-semibold">Para su misma edad y sexo</p>
-                        <p>El riesgo promedio de evento coronario a 10 años es de un: {calculo.comparative.avg} %</p>
-                        <p>El riesgo ideal de evento coronario a 10 años es de un: {calculo.comparative.low} %</p>
-                        <p>El riesgo promedio de evento coronario severo a 10 años es de un: {calculo.comparative.avgHard} %</p>
+                <div className="space-y-2">
+                    <p className="font-semibold">Datos calculados</p>
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+                        <InputTextOneLine
+                            label="Su riesgo de evento coronario a 10 años es de un"
+                            name="riesgoEventoCoronario10"
+                            value={form.riesgoEventoCoronario10}
+                            disabled
+                            labelWidth="320px"
+                        />
+                        <InputTextOneLine
+                            label="El riesgo promedio de evento coronario a 10 años es de un"
+                            name="riesgoPromedioEventoCoronario10"
+                            value={form.riesgoPromedioEventoCoronario10}
+                            disabled
+                            labelWidth="320px"
+                        />
+                        <InputTextOneLine
+                            label="El riesgo ideal de evento coronario a 10 años es de un"
+                            name="riesgoIdealEventoCoronario10"
+                            value={form.riesgoIdealEventoCoronario10}
+                            disabled
+                            labelWidth="320px"
+                        />
+                        <InputTextOneLine
+                            label="El riesgo promedio de evento coronario severo a 10 años es de un"
+                            name="riesgoPromedioEventoCoronarioSevero10"
+                            value={form.riesgoPromedioEventoCoronarioSevero10}
+                            disabled
+                            labelWidth="320px"
+                        />
                     </div>
-                ) : null}
+                </div>
             </SectionFieldset>
+            <BotonesAccion
+                form={form}
+                handleSave={handleSave}
+                handleClear={handleClear}
+                handlePrint={handlePrint}
+                handleChangeNumberDecimals={handleChangeNumberDecimals}
+            />
         </div>
     );
 }
