@@ -386,7 +386,7 @@ export default async function EscalaLakeLouise(datos = {}, docExistente = null) 
 
   const puntaje = Number(datos.calificacion || 0);
   let txtPuntaje = "Sin clasificación";
-  if (puntaje >= 1 && puntaje <= 3) txtPuntaje = "MMA LEVE";
+  if (puntaje >= 0 && puntaje <= 3) txtPuntaje = "MMA LEVE";
   else if (puntaje >= 4 && puntaje <= 6) txtPuntaje = "MMA MODERADO";
   else if (puntaje >= 7) txtPuntaje = "MMA GRAVE";
 

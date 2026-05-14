@@ -36,14 +36,14 @@ export default function EscalaLakeLouise() {
         cargoDesempenar: "",
 
         //todos son int
-        cefalea: "",
-        sintomasDigestivos: "",
-        fatiga: "",
-        vertigo: "",
-        alteracionesSueno: "",
-        alteracionesMentales: "",
-        ataxia: "",
-        edemasPerifericos: "",
+        cefalea: parseInt("0"),
+        sintomasDigestivos: parseInt("0"),
+        fatiga: parseInt("0"),
+        vertigo: parseInt("0"),
+        alteracionesSueno: parseInt("0"),
+        alteracionesMentales: parseInt("0"),
+        ataxia: parseInt("0"),
+        edemasPerifericos: parseInt("0"),
         calificacion: "",
 
         nombre_medico: userName,
@@ -160,7 +160,7 @@ export default function EscalaLakeLouise() {
 
     let txtPuntaje = "";
 
-    if (puntaje >= 1 && puntaje <= 3) {
+    if (puntaje >= 0 && puntaje <= 3) {
         txtPuntaje = "MMA Leve";
     } else if (puntaje >= 4 && puntaje <= 6) {
         txtPuntaje = "MMA Moderado";
@@ -204,13 +204,14 @@ export default function EscalaLakeLouise() {
 
                         <div className="col-span-2"></div>
 
-
-                        <div className="col-span-4 bg-gray-100 border-b rounded-t-lg grid grid-cols-4">
-                            <div className="text-center font-bold text-blue-800 py-2">0</div>
-                            <div className="text-center font-bold text-blue-800 py-2">1</div>
-                            <div className="text-center font-bold text-blue-800 py-2">2</div>
-                            <div className="text-center font-bold text-blue-800 py-2">3</div>
-                        </div>
+                        {[0, 1, 2, 3].map((n) => (
+                            <div
+                                key={n}
+                                className="text-center font-bold text-blue-800 bg-gray-100 py-2 rounded-t-lg"
+                            >
+                                {n}
+                            </div>
+                        ))}
                         {sintomasQuestions.map((question, index) => (
                             <RowCheck
                                 className="font-bold"
@@ -231,14 +232,14 @@ export default function EscalaLakeLouise() {
 
                         <div className="col-span-2"></div>
 
-                        <div className="col-span-5 bg-gray-100 border-b gap-3 p-2 rounded-t-lg grid grid-cols-5">
-
-                            <div className="text-center font-bold text-blue-800">0</div>
-                            <div className="text-center font-bold text-blue-800">1</div>
-                            <div className="text-center font-bold text-blue-800">2</div>
-                            <div className="text-center font-bold text-blue-800">3</div>
-                            <div className="text-center font-bold text-blue-800">4</div>
-                        </div>
+                        {[0, 1, 2, 3, 4].map((n) => (
+                            <div
+                                key={n}
+                                className="text-center font-bold text-blue-800 bg-gray-100 p-2 rounded-t-lg"
+                            >
+                                {n}
+                            </div>
+                        ))}
                         {hallazgosQuestions.map((question, index) => (
                             <RowCheck
                                 className="font-bold"

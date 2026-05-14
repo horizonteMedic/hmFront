@@ -631,7 +631,7 @@ const TabComponent = () => {
               45: { title: "Seguimiento Clinico", child: <SeguimientoClinico /> },
               46: { title: "Tamizaje Dermatológico", child: <TamizajeDermatologico /> },
               47: { title: "Generador de Reportes", child: <GeneradorReportes /> },
-              48: { title: "Escala de Lake Louise para Mal de Montaña Agudo", child: <EscalaLakeLouise /> },
+              48: { title: "Escala de Lake Louise para Mal de Montaña Agudo - Barrick", child: <EscalaLakeLouise /> },
               49: { title: "Riesgo Cardiovascular", child: <RiesgoCardiovascular /> },
               40: { title: "Folio", child: <Folio /> },
             };
