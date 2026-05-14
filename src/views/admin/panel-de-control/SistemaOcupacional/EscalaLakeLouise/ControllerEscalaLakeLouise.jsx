@@ -53,7 +53,7 @@ export const GetInfoServicio = async (
             edemasPerifericos: Number(rese.edemasPerifericos) || 0,
             calificacion: rese.calificacion || "",
 
-            user_medicoFirma: res.usuarioFirma,
+            user_medicoFirma: rese.usuarioFirma ? rese.usuarioFirma : prev.user_medicoFirma,
         }));
     }
 };
