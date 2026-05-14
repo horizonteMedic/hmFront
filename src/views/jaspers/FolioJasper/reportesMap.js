@@ -119,6 +119,7 @@ import Informe_Ocu_DatosPacientes from "../FichaDatosPersonales/Informe_Ocu_Dato
 import TamizajeDermatologico from "../TamizajeDermatologico/TamizajeDermatologico";
 import CAMO_Administrativo16 from "../CAMOAdmin/CAMO_Administrativo16";
 import CAMO_Administrativo2 from "../CAMOAdmin/CAMO_Administrativo2";
+import EscalaLakeLouise from "../EscalaLakeLouise/EscalaLakeLouise";
 
 export const reportesMap = {
    /* =========================
@@ -391,5 +392,7 @@ export const reportesMap = {
    certificado_aptitud_cuadrador: CertificadoAptitudCuadrador_Digitalizado,
 
    ficha_datos_paciente: Informe_Ocu_DatosPacientes,
+
+   escala_lake_louise: EscalaLakeLouise,
 
 };

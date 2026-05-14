@@ -956,6 +956,13 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/tamizajeDermatologico/obtenerReporte",
         esJasper: true,
     },
+
+    ESCALA_LAKE_LOUISE: {
+        nombre: "ESCALA DE LAKE LOUISE",
+        tabla: "escala_lake_louise",
+        url: "/api/v01/ct/escalaLakeLouise/obtenerReporte",
+        esJasper: true,
+    }
 };
 
 

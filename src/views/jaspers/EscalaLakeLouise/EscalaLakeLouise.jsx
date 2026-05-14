@@ -34,8 +34,9 @@ const drawHeader = async (doc, datos = {}) => {
   doc.text("Fecha de examen: " + fechaExamen, pageW - 80, 25);
 
   // Página
-  doc.text("Pag. 01", pageW - 30, 10);
+  //doc.text("Pag. 01", pageW - 30, 10);
 
+   
   // Bloque de color
   drawColorBox(doc, {
     color: datos.codigoColor,
@@ -254,6 +255,9 @@ export default async function EscalaLakeLouise(datos = {}, docExistente = null) 
 
   // 1) Header
   await drawHeader(doc, datos);
+  // Página
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Pag. 01", pageW - 30, 10);
 
   // 2) Título
   doc.setFont("helvetica", "bold").setFontSize(12);
@@ -322,7 +326,9 @@ export default async function EscalaLakeLouise(datos = {}, docExistente = null) 
   doc.addPage();
 
   await drawHeader(doc, datos);
-  // doc.text("Pag. 02", pageW - 30, 10);
+  // Página
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Pag. 02", pageW - 30, 10); 
   y = 45;
 
   // === III. HALLAZGOS CLÍNICOS ===
