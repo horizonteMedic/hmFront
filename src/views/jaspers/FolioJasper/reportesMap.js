@@ -120,6 +120,7 @@ import TamizajeDermatologico from "../TamizajeDermatologico/TamizajeDermatologic
 import CAMO_Administrativo16 from "../CAMOAdmin/CAMO_Administrativo16";
 import CAMO_Administrativo2 from "../CAMOAdmin/CAMO_Administrativo2";
 import EscalaLakeLouise from "../EscalaLakeLouise/EscalaLakeLouise";
+import RiesgoCardiovascular from "../RiesgoCardiovascular/RiesgoCardiovascular";
 
 export const reportesMap = {
    /* =========================
@@ -394,5 +395,7 @@ export const reportesMap = {
    ficha_datos_paciente: Informe_Ocu_DatosPacientes,
 
    escala_lake_louise: EscalaLakeLouise,
+
+   riesgo_cardiovascular: RiesgoCardiovascular,
 
 };
