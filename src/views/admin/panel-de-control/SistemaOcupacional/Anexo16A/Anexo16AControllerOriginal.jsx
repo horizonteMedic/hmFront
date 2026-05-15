@@ -187,33 +187,32 @@ function evaluarObservacionesEditar(res, set) {
         if (enfermedadesRefractarias.some(e => textoEnfermedadOftalmo.includes(e))) {
             const visionLejosNormal = vlejoscod === "00" && vlejoscoi === "00";
             const visionCercaNormal = vcercacod === "00" && vcercacoi === "00";
-            // nuevasObservaciones += visionLejosNormal && visionCercaNormal
-            //     ? "- CORREGIR AGUDEZA VISUAL.\n"
-            //     : "- USO DE LENTES CORRECTORES.\n";
+            nuevasObservaciones += visionLejosNormal && visionCercaNormal
+                ? "- CORREGIR AGUDEZA VISUAL.\n"
+                : "- USO DE LENTES CORRECTORES.\n";
         }
     }
 
     // Evaluación del IMC - Convertido desde Java
-    //let imc = res.imcTriaje_imc || "";
-    // if (imc) {
-       // let imcValue = parseFloat(imc);
-        
-        // if (!isNaN(imcValue) && imcValue > 25) {
-        //     imcRed = true;
+    let imc = res.imcTriaje_imc || "";
+    if (imc) {
+        let imcValue = parseFloat(imc);
+        if (!isNaN(imcValue) && imcValue > 25) {
+            imcRed = true;
 
-        //     if (imcValue >= 25 && imcValue < 29.91) {
-        //         nuevasObservaciones += "- SOBREPESO: DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
-        //     } else if (imcValue >= 29.91 && imcValue < 35) {
-        //         // obesidadMorbida = true;
-        //         // obesidadMorbidaRed = true;
-        //         nuevasObservaciones += "- OBESIDAD I: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
-        //     } else if (imcValue >= 35) {
-        //         obesidadMorbida = true;
-        //         obesidadMorbidaRed = true;
-        //         nuevasObservaciones += "- OBESIDAD II: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
-        //     }
-        // }
-    //}
+            if (imcValue >= 25 && imcValue < 29.91) {
+                nuevasObservaciones += "- SOBREPESO: DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+            } else if (imcValue >= 29.91 && imcValue < 35) {
+                // obesidadMorbida = true;
+                // obesidadMorbidaRed = true;
+                nuevasObservaciones += "- OBESIDAD I: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+            } else if (imcValue >= 35) {
+                obesidadMorbida = true;
+                obesidadMorbidaRed = true;
+                nuevasObservaciones += "- OBESIDAD II: NO HACER TRABAJO 1.8 M.N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.\n";
+            }
+        }
+    }
 
     // Evaluación oftalmológica - Convertido desde Java
     // if (
@@ -239,7 +238,7 @@ function evaluarObservacionesEditar(res, set) {
             (sistolicValue >= 140 || diastolicValue >= 90)) {
             hipertension = true;
             hipertensionRed = true;
-            // nuevasObservaciones += "- HTA NO CONTROLADA.\n";
+            nuevasObservaciones += "- HTA NO CONTROLADA.\n";
         }
     }
     set(prev => ({
@@ -251,7 +250,7 @@ function evaluarObservacionesEditar(res, set) {
         hipertensionRed,
         problemasOftalmologicos,
         problemasOftalmologicosRed,
-        // observaciones: (nuevasObservaciones.trim() + "PRUEBA EDIT")
+        observaciones: nuevasObservaciones.trim()
     }))
 }
 
@@ -317,7 +316,7 @@ export const GetInfoServicioEditar = async (
             lentesCorrectivos: res.observacionesAnexo16a_observaciones?.includes("Uso de Lentes Correct. Lectura de Cerca") || false,
             contrata: res.contrata_razon_contrata,
             empresa: res.empresa_razon_empresa,
-            observaciones: res.observacionesAnexo16a_observaciones,
+            // observaciones: res.observacionesAnexo16a_observaciones,
             //Agudeza Visual
             vcOD: res.visionCercaSinCorregirOd_v_cerca_s_od,
             vlOD: res.visionLejosSinCorregirOd_v_lejos_s_od,

@@ -163,7 +163,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             //Necesita Agudeza visual 
             Swal.fire(
                 "Alerta",
-                "El paciente necesita pasar por Triaje.",
+                "El paciente necesita pasar por Ficha de Aptitud 02 o 16.",
                 "warning"
             );
         }
