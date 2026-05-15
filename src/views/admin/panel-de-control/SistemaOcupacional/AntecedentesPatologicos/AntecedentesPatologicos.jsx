@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faStethoscope, faFileMedical } from "@fortawesome/free-solid-svg-icons";
+import { faUser, faStethoscope, faFileMedical, faN } from "@fortawesome/free-solid-svg-icons";
 import AntecedentesPatologicosTab from "./AntecedentesPatologicosTab/AntecedentesPatologicosTab"
 import IndicarEnfermedades from "./IndicarEnfermedades/IndicarEnfermedades"
 import Antecedentes from "./Antecedentes/Antecedentes";
@@ -9,6 +9,7 @@ import { useForm } from "../../../../hooks/useForm";
 import { useState } from "react";
 import { getToday } from "../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAntecedentesPatologicos";
+import MinerosdelNorte from "./MinerosdelNorte/MinerosdelNorte";
 
 const tabla = "antecedentes_patologicos"
 
@@ -318,6 +319,12 @@ export default function AntecedentesPatologicos({ listas }) {
       name: "Antecedentes",
       icon: faFileMedical,
       component: Antecedentes,
+    },
+    {
+      id: 3,
+      name: "Mineros del Norte",
+      icon: faN,
+      component: MinerosdelNorte,
     },
   ];
 
