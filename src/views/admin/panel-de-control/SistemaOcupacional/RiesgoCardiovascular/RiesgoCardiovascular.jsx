@@ -1,6 +1,5 @@
 import { useEffect, useMemo } from "react";
 import { InputTextOneLine, InputsBooleanRadioGroup, SectionFieldset } from "../../../../components/reusableComponents/ResusableComponents";
-import { SelectField } from "../../../../components/reusableComponents/InputSelect";
 import { useForm } from "../../../../hooks/useForm";
 import { getToday } from "../../../../utils/helpers";
 import { useSessionData } from "../../../../hooks/useSessionData";
@@ -8,10 +7,7 @@ import DatosPersonalesLaborales from "../../../../components/templates/DatosPers
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerRiesgoCardiovascular";
 import BotonesAccion from "../../../../components/templates/BotonesAccion";
 
-const sexoOptions = [
-    { value: "MASCULINO", label: "MASCULINO" },
-    { value: "FEMENINO", label: "FEMENINO" },
-];
+const tabla = "riesgo_cardiovascular";
 
 const clampNumber = (value, min, max) => Math.min(max, Math.max(min, value));
 
@@ -66,7 +62,7 @@ const getLdlPoints = (sexo, ldl) => {
     if (v <= 129) return 0;
     if (v <= 159) return 0;
     if (v <= 189) return 2;
-    return 2;
+    return 3;
 };
 
 const getHdlPointsChol = (sexo, hdl) => {
@@ -221,7 +217,6 @@ const comparativeRisk = (sexo, age) => {
     return { avg: avg[group], avgHard: avgHard[group], low: low[group] };
 };
 
-const tabla = "";
 
 export default function RiesgoCardiovascular() {
     const today = getToday();
@@ -230,6 +225,7 @@ export default function RiesgoCardiovascular() {
     const initialFormState = {
         // Header - Información del examen
         norden: "",
+        id: null,
         fecha: today,
         nombreExamen: "",
 
@@ -389,7 +385,7 @@ export default function RiesgoCardiovascular() {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-4 gap-3">
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 2xl:grid-cols-3 gap-3">
                 <InputTextOneLine
                     label="N° Orden"
                     name="norden"
@@ -420,7 +416,7 @@ export default function RiesgoCardiovascular() {
                 <InputsBooleanRadioGroup
                     name="diabetes"
                     value={form.diabetes}
-                    onChange={handleRadioButtonBoolean}
+                    disabled
                     trueLabel="Sí"
                     falseLabel="No"
                     label="Diabetes"
@@ -430,7 +426,7 @@ export default function RiesgoCardiovascular() {
                 <InputsBooleanRadioGroup
                     name="fuma"
                     value={form.fuma}
-                    onChange={handleRadioButtonBoolean}
+                    disabled
                     trueLabel="Sí"
                     falseLabel="No"
                     label="Fuma"
@@ -438,58 +434,101 @@ export default function RiesgoCardiovascular() {
                 />
             </SectionFieldset>
 
-            <SectionFieldset legend="Presión / tensión arterial (solo en mm de Hg)" className="grid grid-cols-1 xl:grid-cols-2 gap-3">
-                <InputTextOneLine
-                    label="Sistólica o máxima"
-                    name="tensionSistolica"
-                    value={form.tensionSistolica}
-                    onChange={handleChangeNumberDecimals}
-                    labelWidth="170px"
-                />
-                <InputTextOneLine
-                    label="Diastólica o mínima"
-                    name="tensionDiastolica"
-                    value={form.tensionDiastolica}
-                    onChange={handleChangeNumberDecimals}
-                    labelWidth="170px"
-                />
-            </SectionFieldset>
+            <div className="grid 2xl:grid-cols-2 gap-x-4 gap-y-3">
+                <SectionFieldset
+                    legend="Perfil de lípidos (solo en mg/dl)"
+                    className="grid grid-cols-1 gap-3"
+                >
+                    <div className="flex items-center gap-3">
+                        <InputTextOneLine
+                            label="Colesterol total"
+                            name="colesterolTotal"
+                            value={form.colesterolTotal}
+                            disabled
+                            labelWidth="220px"
+                        />
+                        <span className="text-sm text-gray-600 whitespace-nowrap">
+                            70 - 1200 mg/dl
+                        </span>
+                    </div>
 
-            <SectionFieldset legend="Perfil de lípidos (solo en mg/dl)" className="grid grid-cols-1 xl:grid-cols-2 gap-3">
-                <InputTextOneLine
-                    label="Colesterol total"
-                    name="colesterolTotal"
-                    value={form.colesterolTotal}
-                    onChange={handleChangeNumberDecimals}
-                    labelWidth="170px"
-                />
-                <InputTextOneLine
-                    label="Colesterol HDL"
-                    name="colesterolHdl"
-                    value={form.colesterolHdl}
-                    onChange={handleChangeNumberDecimals}
-                    labelWidth="170px"
-                />
-                <InputTextOneLine
-                    label="Triglicéridos"
-                    name="trigliceridos"
-                    value={form.trigliceridos}
-                    onChange={handleChangeNumberDecimals}
-                    labelWidth="170px"
-                />
-                <InputTextOneLine
-                    label="Colesterol LDL"
-                    name="colesterolLdl"
-                    value={form.colesterolLdl}
-                    onChange={handleChangeNumberDecimals}
-                    labelWidth="170px"
-                />
-            </SectionFieldset>
+                    <div className="flex items-center gap-3">
+                        <InputTextOneLine
+                            label="Colesterol HDL"
+                            name="colesterolHdl"
+                            value={form.colesterolHdl}
+                            disabled
+                            labelWidth="220px"
+                        />
+                        <span className="text-sm text-gray-600 whitespace-nowrap">
+                            20 - 150 mg/dl
+                        </span>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <InputTextOneLine
+                            label="Triglicéridos"
+                            name="trigliceridos"
+                            value={form.trigliceridos}
+                            disabled
+                            labelWidth="220px"
+                        />
+                        <span className="text-sm text-gray-600 whitespace-nowrap">
+                            25 - 1200 mg/dl
+                        </span>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <InputTextOneLine
+                            label="Colesterol LDL"
+                            name="colesterolLdl"
+                            value={form.colesterolLdl}
+                            disabled
+                            labelWidth="220px"
+                        />
+                        <span className="text-sm text-gray-600 whitespace-nowrap">
+                            6 - 540 mg/dl
+                        </span>
+                    </div>
+                </SectionFieldset>
+
+                <SectionFieldset
+                    legend="Presión / tensión arterial (solo en mm de Hg)"
+                    className="grid grid-cols-1 gap-3"
+                >
+                    <div className="flex items-center gap-3">
+                        <InputTextOneLine
+                            label="Sistólica o máxima"
+                            name="tensionSistolica"
+                            value={form.tensionSistolica}
+                            disabled
+                            labelWidth="220px"
+                        />
+                        <span className="text-sm text-gray-600 whitespace-nowrap">
+                            60 - 300 mm de Hg
+                        </span>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <InputTextOneLine
+                            label="Diastólica o mínima"
+                            name="tensionDiastolica"
+                            value={form.tensionDiastolica}
+                            disabled
+                            labelWidth="220px"
+                        />
+                        <span className="text-sm text-gray-600 whitespace-nowrap">
+                            40 - 150 mm de Hg
+                        </span>
+                    </div>
+                </SectionFieldset>
+            </div>
+
 
             <SectionFieldset legend="Resultado" className="space-y-3">
                 {calculo.error ? <p className="text-red-600 font-semibold">{calculo.error}</p> : null}
 
-                <div className="space-y-1">
+                {/* <div className="space-y-1">
                     <p>
                         Edad: {form.edad ? `${form.edad} años` : "-"} {sexoLabel ? `Sexo: ${sexoLabel}` : ""}
                     </p>
@@ -508,38 +547,38 @@ export default function RiesgoCardiovascular() {
                         Colesterol LDL (Ligado a lipoproteínas de baja densidad): {form.colesterolLdl ? `${form.colesterolLdl} mg/dl` : "-"} Triglicéridos:{" "}
                         {form.trigliceridos ? `${form.trigliceridos} mg/dl` : "-"}.
                     </p>
-                </div>
+                </div> */}
 
                 <div className="space-y-2">
-                    <p className="font-semibold">Datos calculados</p>
-                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+                    {/* <p className="font-semibold">Datos calculados</p> */}
+                    <div className="grid grid-cols-1  gap-3">
                         <InputTextOneLine
                             label="Su riesgo de evento coronario a 10 años es de un"
                             name="riesgoEventoCoronario10"
                             value={form.riesgoEventoCoronario10}
                             disabled
-                            labelWidth="320px"
+                            labelWidth="350px"
                         />
                         <InputTextOneLine
                             label="El riesgo promedio de evento coronario a 10 años es de un"
                             name="riesgoPromedioEventoCoronario10"
                             value={form.riesgoPromedioEventoCoronario10}
                             disabled
-                            labelWidth="320px"
+                            labelWidth="350px"
                         />
                         <InputTextOneLine
                             label="El riesgo ideal de evento coronario a 10 años es de un"
                             name="riesgoIdealEventoCoronario10"
                             value={form.riesgoIdealEventoCoronario10}
                             disabled
-                            labelWidth="320px"
+                            labelWidth="350px"
                         />
                         <InputTextOneLine
                             label="El riesgo promedio de evento coronario severo a 10 años es de un"
                             name="riesgoPromedioEventoCoronarioSevero10"
                             value={form.riesgoPromedioEventoCoronarioSevero10}
                             disabled
-                            labelWidth="320px"
+                            labelWidth="350px"
                         />
                     </div>
                 </div>

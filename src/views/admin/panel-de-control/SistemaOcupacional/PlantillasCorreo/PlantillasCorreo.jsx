@@ -486,7 +486,7 @@ Saludos cordiales.\n
                         </p>
                         <div className="flex flex-wrap gap-2 text-gray-500">
                             {
-                                ["empresa", "contrata", "nombrePaciente", "tipoExamen", "nombreExamen", "fechaExamen", "fechaCorreo", "listaAdjuntos", "nombreUsuario"].map((item, index) => (
+                                ["empresa", "contrata", "nombrePaciente", "tipoExamen", "nombreExamen", "fechaExamen", "fechaCorreo", "listaAdjuntos", "nombreUsuario","telefonoPaciente"].map((item, index) => (
                                     <span className="bg-white px-2 py-1 rounded" key={index}>
                                         {`{${item}}`}
                                     </span>
