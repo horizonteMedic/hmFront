@@ -383,7 +383,7 @@ export const GetInfoServicio = (
           }
 
           const hallazgoEKG = res.hallazgosInformeElectroCardiograma_hallazgo;
-          const conclusionesEkg = res.conclusionekg;
+          const conclusionesEkg = res.conclusionEkg;
           const recomendacionesEKG = res.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
 
           if (
@@ -1959,7 +1959,7 @@ export const GetInfoServicioEditar = (
           // }
 
           const hallazgoEKG = resSimple.hallazgosInformeElectroCardiograma_hallazgo;
-          const conclusionesEkg = resSimple.conclusionekg;
+          const conclusionesEkg = resSimple.conclusionEkg;
           const recomendacionesEKG = resSimple.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
 
           if (

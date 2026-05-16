@@ -320,12 +320,12 @@ export default function AntecedentesPatologicos({ listas }) {
       icon: faFileMedical,
       component: Antecedentes,
     },
-    {
+    /*{
       id: 3,
       name: "Mineros del Norte",
       icon: faN,
       component: MinerosdelNorte,
-    },
+    },*/
   ];
 
   const handleSave = () => {

@@ -21,6 +21,7 @@ import ButtonsPDF from "../../../../../components/reusableComponents/ButtonsPDF"
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
+import { useForm } from "../../../../../hooks/useForm";
 
 const tabla = "oftalmologia2021";
 
@@ -168,26 +169,40 @@ export default function OftalmologiaOhla() {
     user_doctorAsignado: "",
 
   };
-  const [form, setForm] = useState(initialFormState);
+
+  const {
+    form,
+    setForm,
+    handleChange,
+    handleChangeNumberDecimals,
+    handleClear,
+    handleChangeSimple,
+    handleClearnotO,
+    handleFocusNext
+  } = useForm(initialFormState, { storageKey: "antecedentes_altura" });
+
+
+  // const [form, setForm] = useState(initialFormState);
   const [tab, setTab] = useState(0);
 
   const [visualerOpen, setVisualerOpen] = useState(null)
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
-  };
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
+  // };
 
-  const handleChangeSimple = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
-  };
-  const handleChangeNumber = (e) => {
-    const { name, value } = e.target;
-    if (/^[\d/]*$/.test(value)) {
-      setForm((f) => ({ ...f, [name]: value }));
-    }
-  };
+  // const handleChangeSimple = (e) => {
+  //   const { name, value } = e.target;
+  //   setForm((f) => ({ ...f, [name]: value }));
+  // };
+  // const handleChangeNumber = (e) => {
+  //   const { name, value } = e.target;
+  //   if (/^[\d/]*$/.test(value)) {
+  //     setForm((f) => ({ ...f, [name]: value }));
+  //   }
+  // };
+
   const handleCheckBoxChange = (e) => {
     const { name, checked } = e.target;
     setForm((f) => ({
@@ -203,18 +218,30 @@ export default function OftalmologiaOhla() {
     }));
   };
   const handleNextFocus = (e, name) => {
-    if (e.key == "Enter") document.getElementsByName(name)[0]?.focus();
+    if (e.key === "Enter") {
+      e.preventDefault();
+
+      const target = document.getElementsByName(name)[0];
+
+      if (target) {
+        target.focus();
+        if (target.value === "00") {
+          target.select?.();
+        }
+      }
+    }
   };
+
   const handleBlur = (e) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value == "" ? "00" : value }));
   };
-  const handleClear = () => {
-    setForm(initialFormState);
-  };
-  const handleClearnotO = () => {
-    setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
-  };
+  // const handleClear = () => {
+  //   setForm(initialFormState);
+  // };
+  // const handleClearnotO = () => {
+  //   setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
+  // };
   const handleSearch = (e) => {
     if (e.key === "Enter") {
       handleClearnotO();
@@ -319,9 +346,9 @@ export default function OftalmologiaOhla() {
             <input
               className="border rounded px-2 py-1 w-full"
               name="norden"
-              value={form.norden || ""}
+              value={form?.norden}
+              onChange={handleChangeNumberDecimals}
               onKeyUp={handleSearch}
-              onChange={handleChangeNumber}
             />
           </div>
           <div className="flex items-center gap-4">

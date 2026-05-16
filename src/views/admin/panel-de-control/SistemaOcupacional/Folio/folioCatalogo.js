@@ -354,6 +354,13 @@ export const EXAMENES_CATALOGO = {
         esArchivo: true,
     },
 
+    RIESGO_CARDIOVASCULAR: {
+        nombre: "RIESGO CARDIOVASCULAR",
+        tabla: "riesgo_cardiovascular",
+        url: "/api/v01/ct/riesgoCardiovascular/obtenerReporte",
+        esJasper: true,
+    },
+
     RESONANCIA_MAGNETICA_ARCHIVO: {
         nombre: "RESONANCIA MAGNETICA ARCHIVO",
         tabla: "RESMAG",
