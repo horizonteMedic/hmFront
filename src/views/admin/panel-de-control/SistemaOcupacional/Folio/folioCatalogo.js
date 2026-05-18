@@ -354,6 +354,13 @@ export const EXAMENES_CATALOGO = {
         esArchivo: true,
     },
 
+    RIESGO_CARDIOVASCULAR: {
+        nombre: "RIESGO CARDIOVASCULAR",
+        tabla: "riesgo_cardiovascular",
+        url: "/api/v01/ct/riesgoCardiovascular/obtenerReporte",
+        esJasper: true,
+    },
+
     RESONANCIA_MAGNETICA_ARCHIVO: {
         nombre: "RESONANCIA MAGNETICA ARCHIVO",
         tabla: "RESMAG",
@@ -956,6 +963,13 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/tamizajeDermatologico/obtenerReporte",
         esJasper: true,
     },
+
+    ESCALA_LAKE_LOUISE: {
+        nombre: "ESCALA DE LAKE LOUISE",
+        tabla: "escala_lake_louise",
+        url: "/api/v01/ct/escalaLakeLouise/obtenerReporte",
+        esJasper: true,
+    }
 };
 
 

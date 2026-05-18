@@ -243,11 +243,11 @@ export default function GeneradorReportes() {
                                         {index + 1}.- {examen.nombre}
                                     </span>
 
-                                    <div className="flex items-center gap-2 mt-1">
-                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full  ${examen.resultado ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                                    <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full mx-auto  ${examen.resultado ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
                                             {examen.resultado ? "REALIZADO" : "PENDIENTE"}
                                         </span>
-                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full mx-auto bg-gray-100 text-gray-700">
                                             {examen.urlArchivo ? "SUBIDO" : "NO SUBIDO"}
                                         </span>
                                         <ButtonsPDF
@@ -283,7 +283,7 @@ export default function GeneradorReportes() {
                                     disabled={!examen.resultado}
                                     onClick={() => handleImprimirYSubir(examen, form, token, selectedSede, userlogued, datosFooter, abortControllerRef, search)}
                                 >
-                                    Imprimir y Subir
+                                    Generar
                                 </button>
                             </div>
                         );

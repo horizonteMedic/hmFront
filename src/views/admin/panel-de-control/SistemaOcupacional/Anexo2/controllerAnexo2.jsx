@@ -861,7 +861,7 @@ export const GetInfoServicio = (
 
           // electroCardiograma();=======================
           const hallazgoEKG = res.hallazgosInformeElectroCardiograma_hallazgo ?? "";
-          const conclusionesEkg = res.conclusionekg;
+          const conclusionesEkg = res.conclusionesEkg;
           const recomendacionesEKG = res.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
 
           if (
@@ -1576,7 +1576,7 @@ export const GetInfoServicioEditar = (
 
           // electroCardiograma();=======================
           const hallazgoEKG = res.hallazgosInformeElectroCardiograma_hallazgo;
-          const conclusionesEkg = res.conclusionekg;
+          const conclusionesEkg = res.conclusionesEkg;
           const recomendacionesEKG = res.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
 
           if (

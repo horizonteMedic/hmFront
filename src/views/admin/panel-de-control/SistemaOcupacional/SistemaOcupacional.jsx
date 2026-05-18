@@ -118,6 +118,9 @@ import PacientesObservados from "./PacientesObservados/PacientesObservados.jsx";
 import SeguimientoClinico from "./SeguimientoClinico/SeguimientoClinico.jsx";
 import TamizajeDermatologico from "./TamizajeDermatologico/TamizajeDermatologico.jsx";
 import GeneradorReportes from "./GeneradorReportes/GeneradorReportes.jsx";
+import RiesgoCardiovascular from "./RiesgoCardiovascular/RiesgoCardiovascular.jsx";
+import EscalaLakeLouise from "./EscalaLakeLouise/EscalaLakeLouise.jsx";
+import { faSellsy } from "@fortawesome/free-brands-svg-icons";
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
   { key: 7, label: "Test Altura" },
@@ -340,7 +343,9 @@ const TabComponent = () => {
                   { vista: "Pacientes Observados", tab: 44, icons: [{ icon: faMagnifyingGlassPlus }], label: "Pacientes Observados" },
                   { vista: "Seguimiento Clinico", tab: 45, icons: [{ icon: faFileMedical }], label: "Seguimiento Clínico" },
                   { vista: "Tamizaje Dermatologico", tab: 46, icons: [{ icon: faHandDots }], label: "Tamizaje Dermatologico" },
+                  { vista: "Escala de Lake Louise", tab: 48, icons: [{ icon: faSellsy}], label: "Escala de Lake Louise" },
                   { vista: "Generador de Reportes", tab: 47, icons: [{ icon: faFloppyDisk }], label: "Generador Reportes" },
+                  { vista: "Riesgo Cardiovascular", tab: 49, icons: [{ icon: faHeartbeat }], label: "Riesgo Cardiovascular" },
                   { vista: "Folio", tab: 40, icons: [{ icon: faFileContract }], label: "Folio" },
                 ];
                 return items
@@ -626,6 +631,8 @@ const TabComponent = () => {
               45: { title: "Seguimiento Clinico", child: <SeguimientoClinico /> },
               46: { title: "Tamizaje Dermatológico", child: <TamizajeDermatologico /> },
               47: { title: "Generador de Reportes", child: <GeneradorReportes /> },
+              48: { title: "Escala de Lake Louise para Mal de Montaña Agudo - Barrick", child: <EscalaLakeLouise /> },
+              49: { title: "Riesgo Cardiovascular", child: <RiesgoCardiovascular /> },
               40: { title: "Folio", child: <Folio /> },
             };
             const section = displayedInterfaces[activeTab];

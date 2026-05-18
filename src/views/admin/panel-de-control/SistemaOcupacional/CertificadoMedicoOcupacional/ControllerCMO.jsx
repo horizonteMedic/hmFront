@@ -43,7 +43,7 @@ export const GetInfoServicio = async (
             contrata: res.contrata,
             cargoPaciente: res.cargoPaciente,
             ocupacionPaciente: res.ocupacionPaciente,
-            apto: "APTO",
+            apto: res.esAptoAnexo ? "APTO" : res.aptoConRestriccionAnexo ? "APTOCONRESTRICCION" : res.evaluadoAnexo ? "EVALUADO" : res.noAptoAnexo ? "NOAPTO" : res.conObservacionAnexo ? "OBSERVACION" : "",
             fechaExamen: `${res.fechaExamen ? res.fechaExamen : today}`,
             fechaDesde: `${res.fechaDesde ? res.fechaDesde : today}`,
             fechahasta: `${res.fechahasta ? res.fechahasta : today}`,
@@ -78,7 +78,7 @@ export const GetInfoServicioEditar = async (
             PA: `${res.sistolica}/${res.diastolica}`,
             edadPaciente: res.edadPaciente,
             dniUser: res.dniUsuario,
-            apto: res.apto ? "APTO" : res.aptoconrestriccion ? "APTOCONRESTRICCION" : res.evaluado ? "EVALUADO" : res.noapto ? "NOAPTO" : "",
+            apto: res.esAptoAnexo ? "APTO" : res.aptoConRestriccionAnexo ? "APTOCONRESTRICCION" : res.evaluadoAnexo ? "EVALUADO" : res.noAptoAnexo ? "NOAPTO" : res.conObservacionAnexo ? "OBSERVACION" : "",
             enfermedadesOcularesOftalmologia_e_oculares: `${res.enfermedadesOcularesOftalmologia_e_oculares ?? ""}\n${res.enfermedadesocularesotrosoftalmo_e_oculares1 ?? ""}`,
 
         }));
@@ -163,7 +163,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             //Necesita Agudeza visual 
             Swal.fire(
                 "Alerta",
-                "El paciente necesita pasar por Triaje.",
+                "El paciente necesita pasar por Ficha de Aptitud 02 o 16.",
                 "warning"
             );
         }
