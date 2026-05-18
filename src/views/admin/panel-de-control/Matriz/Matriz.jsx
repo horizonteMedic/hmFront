@@ -26,7 +26,8 @@ const MATRICES_MAP = {
   "Matriz-15": { urlH: "api/headers/boroo", methodH: "GET", urlB: "api/v01/st/registros/matrizBoroo2026", methodB: "POST", name: "MATRIZ MINERA BOROO MISQUICHILCA" },
   "Matriz-16": { urlH: "/api/headers/trabajos-altura", methodH: "GET", urlB: "api/v01/st/registros/matrizPoderosaAltura2026", methodB: "POST", name: "REPORTE DE TRABAJOS EN ALTURA - PODEROSA" },
   "Matriz-17": { url: "/api/v01/st/registros/matrizHuancayo2026", method: "POST", name: "MATRIZ HUANCAYO" },
-  "Matriz-18": { url: "/api/v01/st/registros/colinesterasa", method: "POST", name: "MATRIZ COLINESTERASA" }
+  "Matriz-18": { url: "/api/v01/st/registros/colinesterasa", method: "POST", name: "MATRIZ COLINESTERASA" },
+  "Matriz-19": { url: "/api/v01/st/registros/matrizOhlaGeneral", method: "POST", name: "MATRIZ OHLA GENERAL" }
 };
 
 const MatrizPostulante = () => {
@@ -210,7 +211,7 @@ const MatrizPostulante = () => {
 
         setHeaders(headersResponse);
         setData(processedBody);
-
+        setTotalPages(Math.ceil(bodyResponse.length / recordsPerPage));
       } else {
         const response = await GetMatrizUniversal(
           datosapi,
@@ -227,7 +228,7 @@ const MatrizPostulante = () => {
         }
 
         setData(response);
-
+        setTotalPages(Math.ceil(response.length / recordsPerPage));
         // 🔥 Generar columnas automáticamente
         if (response.length > 0) {
           const autoHeaders = Object.keys(response[0]).map(key => ({
@@ -771,6 +772,8 @@ const MatrizPostulante = () => {
               {tienePermisoEnVista("Matriz Postulante", "Matriz Poderosa Altura 2026") && <option value="Matriz-16">REPORTE DE TRABAJOS EN ALTURA - PODEROSA</option>}
               {tienePermisoEnVista("Matriz Postulante", "Matriz Huancayo 2026") && <option value="Matriz-17">MATRIZ HUANCAYO</option>}
               {tienePermisoEnVista("Matriz Postulante", "Matriz Colinesterasa") && <option value="Matriz-18">MATRIZ COLINESTERASA</option>}
+              {tienePermisoEnVista("Matriz Postulante", "Matriz Ohla-General") && <option value="Matriz-19">MATRIZ ADMINISTRATIVA GENERAL</option>}
+
             </select>
           </div>
           <div className="flex flex-col flex-grow justify-end">
