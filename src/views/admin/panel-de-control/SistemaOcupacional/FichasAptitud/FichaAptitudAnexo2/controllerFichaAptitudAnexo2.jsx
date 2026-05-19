@@ -3,7 +3,6 @@ import {
     GetInfoServicioDefault,
     LoadingDefault,
     PrintHojaRDefault,
-    PrintHojaRJsReportDefault,
     SubmitDataServiceDefault,
 } from "../../../../../utils/functionUtils";
 import { getFetch } from "../../../../../utils/apiHelpers";
@@ -12,6 +11,7 @@ import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
     "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2";
+const obtenerReporteResumenMedicoUrl = "/api/v01/ct/anexos/obtenerReporteResumenMedicoAnexo2"
 const obtenerReporteJsReportUrl = "/api/v01/ct/anexos/fichaAnexo2/descargarReporteFichaAnexo2";
 const registrarUrl =
     "/api/v01/ct/anexos/fichaAnexo2/registrarActualizarFichaAnexo2";
@@ -176,6 +176,20 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         "../../../../../jaspers/Ficha_Anexo2"
     );
 };
+
+export const PrintHojaR2 = (nro, token, tabla, datosFooter) => {
+    const jasperModules = import.meta.glob("../../../../../jaspers/Ficha_Anexo2/ResumenMedico/*.jsx");
+    PrintHojaRDefault(
+        nro,
+        token,
+        tabla,
+        datosFooter,
+        obtenerReporteResumenMedicoUrl,
+        jasperModules,
+        "../../../../../jaspers/Ficha_Anexo2/ResumenMedico"
+    );
+};
+
 // export const PrintHojaR = (nro, token, tabla) => {
 //     PrintHojaRJsReportDefault(
 //         nro,
