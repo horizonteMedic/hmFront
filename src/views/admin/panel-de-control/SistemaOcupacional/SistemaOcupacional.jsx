@@ -74,6 +74,7 @@ import {
   faMagnifyingGlassPlus,
   faHandDots,
   faFloppyDisk,
+  faSun,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -121,6 +122,7 @@ import GeneradorReportes from "./GeneradorReportes/GeneradorReportes.jsx";
 import RiesgoCardiovascular from "./RiesgoCardiovascular/RiesgoCardiovascular.jsx";
 import EscalaLakeLouise from "./EscalaLakeLouise/EscalaLakeLouise.jsx";
 import { faSellsy } from "@fortawesome/free-brands-svg-icons";
+import CertificadoExposicionAlCalor from "./CertificadoExposicionAlCalor/CertificadoExposicionAlCalor.jsx";
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
   { key: 7, label: "Test Altura" },
@@ -346,6 +348,7 @@ const TabComponent = () => {
                   { vista: "Escala de Lake Louise", tab: 48, icons: [{ icon: faSellsy}], label: "Escala de Lake Louise" },
                   { vista: "Generador de Reportes", tab: 47, icons: [{ icon: faFloppyDisk }], label: "Generador Reportes" },
                   { vista: "Riesgo Cardiovascular", tab: 49, icons: [{ icon: faHeartbeat }], label: "Riesgo Cardiovascular" },
+                  { vista: "Certificado Exposicion al Calor", tab: 50, icons: [{ icon: faSun }], label: "Certificado Exposicion al Calor" },
                   { vista: "Folio", tab: 40, icons: [{ icon: faFileContract }], label: "Folio" },
                 ];
                 return items
@@ -633,6 +636,7 @@ const TabComponent = () => {
               47: { title: "Generador de Reportes", child: <GeneradorReportes /> },
               48: { title: "Escala de Lake Louise para Mal de Montaña Agudo - Barrick", child: <EscalaLakeLouise /> },
               49: { title: "Riesgo Cardiovascular", child: <RiesgoCardiovascular /> },
+              50: { title: "Certificado Exposicion al Calor", child: <CertificadoExposicionAlCalor /> },
               40: { title: "Folio", child: <Folio /> },
             };
             const section = displayedInterfaces[activeTab];
