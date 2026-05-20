@@ -69,6 +69,7 @@ const ExamenesListCAMPANA = buildExamenesList([ // Campaña
 
 const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "RESUMEN_MEDICO_PODEROSA",                 // 1
+    "RESUMEN_MEDICO_ANEXO_02",
     "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",    // 2
     "CERTIFICADO_APTITUD_ANEXO_16",  // 3
     "TAMIZAJE_DERMATOLOGICO",

@@ -121,6 +121,7 @@ import CAMO_Administrativo16 from "../CAMOAdmin/CAMO_Administrativo16";
 import CAMO_Administrativo2 from "../CAMOAdmin/CAMO_Administrativo2";
 import EscalaLakeLouise from "../EscalaLakeLouise/EscalaLakeLouise";
 import RiesgoCardiovascular from "../RiesgoCardiovascular/RiesgoCardiovascular";
+import ResumenMedicoAnexo2 from "../Ficha_Anexo2/ResumenMedico/ResumenMedicoAnexo2";
 
 export const reportesMap = {
    /* =========================
@@ -165,6 +166,8 @@ export const reportesMap = {
       ResumenAnexo7C_OHLA_Digitalizado,
       ResumenAnexo7CP_Digitalizado
    },
+
+   resumen_medico_poderosa_anexo02: ResumenMedicoAnexo2,
 
    /* =========================
       ALTURA / VEHÍCULOS

@@ -108,10 +108,16 @@ export const EXAMENES_CATALOGO = {
     },
 
     RESUMEN_MEDICO_PODEROSA: {
-        nombre: "RESUMEN MEDICO",
+        nombre: "RESUMEN MEDICO ANEXO 16",
         tabla: "resumen_medico_poderosa",
         url: "/api/v01/ct/anexos/obtenerReporteResumenMedico",
         nomenclaturaSubida: "INFORME EMO",
+    },
+
+    RESUMEN_MEDICO_ANEXO_02: {
+        nombre: "RESUMEN MEDICO ANEXO 02",
+        tabla: "resumen_medico_poderosa_anexo02",
+        url: "/api/v01/ct/anexos/obtenerReporteResumenMedicoAnexo2",
     },
 
     /* =========================
