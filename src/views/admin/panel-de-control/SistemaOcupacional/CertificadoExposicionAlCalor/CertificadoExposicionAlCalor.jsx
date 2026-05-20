@@ -8,8 +8,11 @@ import DatosPersonalesLaborales from "../../../../components/templates/DatosPers
 import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
+import { PrintHojaR, VerifyTR } from "./ControllerCertificadoExposicionAlCalor";
 
 export default function CertificadoExposicionAlCalor() {
+
+    const tabla = "certificado_exposicion_al_calor"
 
     const today = getToday();
     const { token, userlogued, selectedSede, datosFooter, userName, userCMP, hora } = useSessionData();
@@ -17,7 +20,7 @@ export default function CertificadoExposicionAlCalor() {
     const initialFormState = {
         norden: "",
         id: null,
-        fechaExamen: today,
+        fecha: today,
         nombreExamen: "",
 
         nombres: "",
@@ -38,18 +41,18 @@ export default function CertificadoExposicionAlCalor() {
 
         signosVitalesResultados: "",
         signosVitalesObservaciones: "",
-        sistemaCardiovascularResultados: "",
-        sistemaCardiovascularObservaciones: "",
-        sistemaRespiratorioResultados: "",
-        sistemaRespiratorioObservaciones: "",
-        estadoNeurológicoResultados: "",
-        estadoNeurológicoObservaciones: "",
-        estadoHidratacionResultados: "",
-        estadoHidratacionObservaciones: "",
-        toleranciaCalorResultados: "",
-        toleranciaCalorObservaciones: "",
-        sudoracionResultados: "",
-        sudoracionObservaciones: "",
+        sistemaCardiovascularResultados: "NO INGURGITACION YUGULAR, CAROTIDEO, RADIAL, FEMORAL, PEDIO CONSERVADOS.RCRR, NO SOPLOS, NO FROTES.",
+        sistemaCardiovascularObservaciones: "NINGUNA",
+        sistemaRespiratorioResultados: "RESPIRACIÓN NORMAL, EXPANSIÓN TORACICA SIMÉTRICA, BPMV EN ACP, NO RALES.",
+        sistemaRespiratorioObservaciones: "NINGUNA",
+        estadoNeurologicoResultados: "DESPIERTO, OTEP, SENSIBILIDAD Y MOTRICIDAD CONSERVADA, ROTS CONSERVADOS. PARES CRANEALES CONSERVADOS. NO SIGNOS MENINGEOS.",
+        estadoNeurologicoObservaciones: "NINGUNA",
+        estadoHidratacionResultados: "MUCOSAS ORALES HIDRATADAS, PIEL TURGENTE, LLENADO CAPILAR < 2 SEG.",
+        estadoHidratacionObservaciones: "NINGUNA",
+        toleranciaCalorResultados: "SI",
+        toleranciaCalorObservaciones: "N/A",
+        sudoracionResultados: "SI",
+        sudoracionObservaciones: "N/A",
 
 
         esApto: false,
@@ -114,6 +117,7 @@ export default function CertificadoExposicionAlCalor() {
                     label="Nombre del Examen"
                     name="nombreExamen"
                     value={form.nombreExamen}
+                    onChange={handleChangeSimple}
                     disabled
                     labelWidth="120px"
                 />
@@ -134,6 +138,7 @@ export default function CertificadoExposicionAlCalor() {
                     label="Médico evaluador"
                     name="nombre_medico"
                     value={form.nombre_medico}
+                    onChange={handleChangeSimple}
                     disabled
                     labelWidth="120px"
                 />
@@ -141,36 +146,57 @@ export default function CertificadoExposicionAlCalor() {
                 <InputTextOneLine
                     label="CMP"
                     name="userCMP"
+                    onChange={handleChangeSimple}
                     value={userCMP}
                     disabled
                     labelWidth="120px"
                 />
             </SectionFieldset>
 
-            <SectionFieldset legend="Evaluación Clínica y Ocupacional" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                <InputTextArea
-                    label="Signos Vitales"
-                    name="signosVitalesObservaciones"
-                    value={form.signosVitalesObservaciones}
-                    labelWidth="120px"
-                />
-
-
-            </SectionFieldset>
-
             <SectionFieldset legend="Evaluación Clínica y Ocupacional" className="grid md:grid-cols-2 gap-x-4 gap-y-3">
                 <div>
-                    <div className="font-semibold mb-2 text-center ml-[80px]">Ojo Derecho</div>
+                    <div className="font-semibold mb-2 text-center ml-[80px]">Resultado</div>
                     <div className="space-y-3">
-                        <InputTextArea label="Signos Vitales" name="vcOD" value={form?.vcOD} disabled labelWidth="70px" />
-                        <InputTextOneLine label="Visión Lejos" name="vlOD" value={form?.vlOD} disabled labelWidth="70px" />
+                        <div className="grid grid-cols-5 gap-2">
+                            <label className="col-span-1">Signos vitales</label>
+                            <InputTextArea className="col-span-4" rows={6} name="signosVitalesResultados" value={form?.signosVitalesResultados} onChange={handleChangeSimple} />
+                        </div>
+                        <div className="grid grid-cols-5 gap-2">
+                            <label className="col-span-1">Sistema Cardiovascular</label>
+                            <InputTextArea className="col-span-4" rows={6} name="sistemaCardiovascularResultados" value={form?.sistemaCardiovascularResultados} onChange={handleChangeSimple} />
+                        </div>
+                        <div className="grid grid-cols-5 gap-2">
+                            <label className="col-span-1">Sistema Respiratorio</label>
+                            <InputTextArea className="col-span-4" rows={6} name="sistemaRespiratorioResultados" value={form?.sistemaRespiratorioResultados} onChange={handleChangeSimple} />
+                        </div>
+                        <div className="grid grid-cols-5 gap-2">
+                            <label className="col-span-1">Estado Neurológico</label>
+                            <InputTextArea className="col-span-4" rows={6} name="estadoNeurologicoResultados" value={form?.estadoNeurologicoResultados} onChange={handleChangeSimple} />
+                        </div>
+                        <div className="grid grid-cols-5 gap-2">
+                            <label className="col-span-1">Estado de Hidratación</label>
+                            <InputTextArea className="col-span-4" rows={6} name="estadoHidratacionResultados" value={form?.estadoHidratacionResultados} onChange={handleChangeSimple} />
+                        </div>
+                        <div className="grid grid-cols-5 gap-2">
+                            <label className="col-span-1">Tolerancia al Calor</label>
+                            <InputTextArea className="col-span-4" rows={6} name="toleranciaCalorResultados" value={form?.toleranciaCalorResultados} onChange={handleChangeSimple} />
+                        </div>
+                        <div className="grid grid-cols-5 gap-2">
+                            <label className="col-span-1">Sudoración / Termorregulación</label>
+                            <InputTextArea className="col-span-4" rows={6} name="sudoracionResultados" value={form?.sudoracionResultados} onChange={handleChangeSimple} />
+                        </div>
                     </div>
                 </div>
                 <div>
-                    <div className="font-semibold mb-2 text-center ml-[80px]">Ojo Izquierdo</div>
+                    <div className="font-semibold mb-2 text-center ml-[80px]">Observaciones</div>
                     <div className="space-y-3">
-                        <InputTextOneLine label="Visión Cerca" name="vcOI" value={form?.vcOI} disabled labelWidth="70px" />
-                        <InputTextOneLine label="Visión Lejos" name="vlOI" value={form?.vlOI} disabled labelWidth="70px" />
+                        <InputTextArea className="col-span-4" rows={6} name="signosVitalesObservaciones" value={form?.signosVitalesObservaciones} onChange={handleChangeSimple} />
+                        <InputTextArea className="col-span-4" rows={6} name="sistemaCardiovascularObservaciones" value={form?.sistemaCardiovascularObservaciones} onChange={handleChangeSimple} />
+                        <InputTextArea className="col-span-4" rows={6} name="sistemaRespiratorioObservaciones" value={form?.sistemaRespiratorioObservaciones} onChange={handleChangeSimple} />
+                        <InputTextArea className="col-span-4" rows={6} name="estadoNeurologicoObservaciones" value={form?.estadoNeurologicoObservaciones} onChange={handleChangeSimple} />
+                        <InputTextArea className="col-span-4" rows={6} name="estadoHidratacionObservaciones" value={form?.estadoHidratacionObservaciones} onChange={handleChangeSimple} />
+                        <InputTextArea className="col-span-4" rows={6} name="toleranciaCalorObservaciones" value={form?.toleranciaCalorObservaciones} onChange={handleChangeSimple} />
+                        <InputTextArea className="col-span-4" rows={6} name="sudoracionObservaciones" value={form?.sudoracionObservaciones} onChange={handleChangeSimple} />
                     </div>
                 </div>
             </SectionFieldset>
@@ -178,16 +204,29 @@ export default function CertificadoExposicionAlCalor() {
             <SectionFieldset legend="Aptitud" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 <InputsRadioGroup
                     name="aptitud"
-                    value={form.aptitud}
+                    value={
+                        form.esApto
+                            ? "APTO"
+                            : form.aptoRestriccion
+                                ? "RESTRICCION"
+                                : form.noEsApto
+                                    ? "NO APTO"
+                                    : ""
+                    }
                     disabled={!form.cerrado}
                     onChange={(e, value) => {
-                        if (value == "APTO") {
-                            setForm((prev) => ({
-                                ...prev,
-                                restricciones: "NINGUNO",
-                            }));
-                        }
-                        handleRadioButton(e, value);
+                        setForm((prev) => ({
+                            ...prev,
+
+                            esApto: value === "APTO",
+                            aptoRestriccion: value === "RESTRICCION",
+                            noEsApto: value === "NO APTO",
+
+                            restricciones:
+                                value === "APTO"
+                                    ? "NINGUNO"
+                                    : prev.restricciones,
+                        }));
                     }}
                     vertical
                     options={[
