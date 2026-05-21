@@ -26,7 +26,7 @@ export default async function HistoriaOcupacional_Digitalizado(
 ) {
   const doc = docExistente || new jsPDF({
     unit: "mm",
-    format: "letter",
+    format: "a4",
     orientation: "landscape",
   });
   const pageW = doc.internal.pageSize.getWidth();
@@ -310,7 +310,7 @@ export default async function HistoriaOcupacional_Digitalizado(
     finalY = newY;
   }
 
-  const signatureTop = finalY + spacingAfterTable;
+  let signatureTop = finalY + spacingAfterTable;
   if (tablaVacia) {
     doc.setFontSize(20);
     doc.setTextColor(255, 0, 0); // Rojo en RGB
@@ -318,6 +318,7 @@ export default async function HistoriaOcupacional_Digitalizado(
     doc.setFontSize(9);
     doc.setTextColor(0, 0, 0); // Color negro
   }
+  signatureTop+=5
 
   doc.text(`Fecha: ${datos.fechaHo}`, 15, signatureTop + 35);
   //FIRMA
