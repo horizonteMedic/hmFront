@@ -17,7 +17,7 @@ export const GetInfoServicio = async (
   tabla,
   set,
   token,
-  onFinish = () => {},
+  onFinish = () => { },
 ) => {
   const res = await GetInfoServicioDefault(
     nro,
@@ -26,31 +26,32 @@ export const GetInfoServicio = async (
     obtenerReporteUrl,
     onFinish,
   );
+  const rese = res.resultado
   if (res) {
     let resultadosSignosVitales =
       "-PA: " +
       "SISTOLICA: " +
-      (res.sistolica ?? "N/A") +
+      (rese.sistolica ?? "N/A") +
       " / " +
       "DIASTOLICA: " +
-      (res.diastolica ?? "N/A") +
+      (rese.diastolica ?? "N/A") +
       "\n" +
       "-FRECUENCIA CARDIACA: " +
-      (res.fcardiaca ?? "N/A") +
+      (rese.fcardiaca ?? "N/A") +
       "\n" +
       "-FRECUENCIA RESPIRATORIA: " +
-      (res.frespiratoria ?? "N/A") +
+      (rese.frespiratoria ?? "N/A") +
       "\n" +
       "-TEMPERATURA: " +
-      (res.temperatura ?? "N/A") +
+      (rese.temperatura ?? "N/A") +
       "\n" +
       "-SATURACIÓN DE OXIGENO: " +
-      (res.saturacionOxigeno ?? "N/A");
+      (rese.saturacionOxigeno ?? "N/A");
 
     let observacionSignosVitales = "";
-    if (res.sistolica !== "" && res.diastolica !== "") {
-      const sistolica = parseFloat(res.sistolica);
-      const diastolica = parseFloat(res.diastolica);
+    if (rese.sistolica !== "" && rese.diastolica !== "") {
+      const sistolica = parseFloat(rese.sistolica);
+      const diastolica = parseFloat(rese.diastolica);
 
       if (sistolica >= 140 || diastolica >= 90) {
         observacionSignosVitales = "- HTA NO CONTROLADA.\n";
@@ -58,8 +59,8 @@ export const GetInfoServicio = async (
     }
 
     let frecuenciaCardiaca = "";
-    if (res.fcardiaca) {
-      const fcardiaca = parseFloat(res.fcardiaca);
+    if (rese.fcardiaca) {
+      const fcardiaca = parseFloat(rese.fcardiaca);
 
       if (fcardiaca >= 40 && fcardiaca <= 49) {
         frecuenciaCardiaca = "- FRECUENCIA CARDIACA: BRADICARDIA." + "\n";
@@ -67,19 +68,12 @@ export const GetInfoServicio = async (
         frecuenciaCardiaca = "- FRECUENCIA CARDIACA: NORMAL." + "\n";
       } else if (fcardiaca >= 100 && fcardiaca <= 250) {
         frecuenciaCardiaca = "- FRECUENCIA CARDIACA: TAQUICARDIA." + "\n";
-      } else if (fcardiaca > 250) {
-        await Swal.fire(
-          "Valor Absurdo",
-          "Ingrese otro dato por favor.",
-          "error",
-        );
-        return;
       }
     }
 
     let frecuenciaRespiratoria = "";
-    if (res.frespiratoria) {
-      const frespiratoria = parseFloat(res.frespiratoria);
+    if (rese.frespiratoria) {
+      const frespiratoria = parseFloat(rese.frespiratoria);
 
       if (frespiratoria <= 13) {
         frecuenciaRespiratoria = "- FRECUENCIA RESPIRATORIA: BRADIPNEA." + "\n";
@@ -91,8 +85,8 @@ export const GetInfoServicio = async (
     }
 
     let estadoTemperatura = "";
-    if (res.temperatura) {
-      const temperatura = parseFloat(res.temperatura);
+    if (rese.temperatura) {
+      const temperatura = parseFloat(rese.temperatura);
 
       if (temperatura >= 17 && temperatura <= 28) {
         estadoTemperatura = "- HIPOTERMIA PROFUNDA";
@@ -114,25 +108,25 @@ export const GetInfoServicio = async (
     //const rese = res.resultado
     set((prev) => ({
       ...prev,
-      id: res.id,
-      norden: res.norden ?? "",
-      nombreExamen: res.nombreExamen ?? "",
+      id: rese.id,
+      norden: rese.norden ?? "",
+      nombreExamen: rese.nombreExamen ?? "",
       // nombres: res.nombresPaciente ?? "",
-      nombres: res.nombres + " " + res.apellidosPaciente,
-      dni: res.dni ?? "",
-      edad: res.edad ?? "",
-      sexo: convertirGenero(res.sexo) ?? "",
-      fecha: res.fechaExamen ?? prev.fecha,
+      nombres: rese.nombres + " " + rese.apellidosPaciente,
+      dni: rese.dni ?? "",
+      edad: rese.edad ?? "",
+      sexo: convertirGenero(rese.sexo) ?? "",
+      fecha: rese.fechaExamen ?? prev.fecha,
 
-      fechaNacimiento: formatearFechaCorta(res.fechaNacimiento) ?? "",
-      lugarNacimiento: res.lugarNacimiento ?? "",
-      estadoCivil: res.estadoCivil ?? "",
-      nivelEstudios: res.nivelEstudios ?? "",
+      fechaNacimiento: formatearFechaCorta(rese.fechaNacimiento) ?? "",
+      lugarNacimiento: rese.lugarNacimiento ?? "",
+      estadoCivil: rese.estadoCivil ?? "",
+      nivelEstudios: rese.nivelEstudios ?? "",
 
-      empresa: res.empresa ?? "",
-      contrata: res.contrata ?? "",
-      ocupacion: res.ocupacion ?? "",
-      cargoDesempenar: res.cargoDesempenar ?? "",
+      empresa: rese.empresa ?? "",
+      contrata: rese.contrata ?? "",
+      ocupacion: rese.ocupacion ?? "",
+      cargoDesempenar: rese.cargoDesempenar ?? "",
 
       signosVitalesResultados: resultadosSignosVitales,
       signosVitalesObservaciones:
@@ -140,6 +134,8 @@ export const GetInfoServicio = async (
         (frecuenciaCardiaca ?? "") +
         (estadoTemperatura ?? "") +
         "- SATURACIÓN DE OXIGENO: NORMAL.",
+
+      user_medicoFirma: rese.usuarioFirma ? rese.usuarioFirma : prev.user_medicoFirma
     }));
   }
 };
@@ -149,7 +145,7 @@ export const GetInfoServicioEditar = async (
   tabla,
   set,
   token,
-  onFinish = () => {},
+  onFinish = () => { },
 ) => {
   const res = await GetInfoServicioDefault(
     nro,
@@ -160,58 +156,58 @@ export const GetInfoServicioEditar = async (
     true,
   );
   if (res) {
+    const rese = res.resultado
     set((prev) => ({
       ...prev,
       // Header
-      norden: res.norden ?? "",
-      fecha: res.fecha ?? "",
-      nombreExamen: res.nombreExamen ?? "",
-      nombres: res.nombres + " " + res.apellidosPaciente,
-      dni: res.dni ?? "",
-      edad: res.edad ?? "",
-      sexo: convertirGenero(res.sexo) ?? "",
+      norden: rese.norden ?? "",
+      fecha: rese.fecha ?? "",
+      nombreExamen: rese.nombreExamen ?? "",
+      nombres: rese.nombres + " " + rese.apellidosPaciente,
+      dni: rese.dni ?? "",
+      edad: rese.edad ?? "",
+      sexo: convertirGenero(rese.sexo) ?? "",
 
-      fechaNacimiento: formatearFechaCorta(res.fechaNacimiento) ?? "",
-      lugarNacimiento: res.lugarNacimiento ?? "",
-      estadoCivil: res.estadoCivil ?? "",
-      nivelEstudios: res.nivelEstudios ?? "",
+      fechaNacimiento: formatearFechaCorta(rese.fechaNacimiento) ?? "",
+      lugarNacimiento: rese.lugarNacimiento ?? "",
+      estadoCivil: rese.estadoCivil ?? "",
+      nivelEstudios: rese.nivelEstudios ?? "",
 
-      signosVitalesResultados: res.signosVitalesResultados,
-      signosVitalesObservaciones: res.signosVitalesObservaciones,
-      sistemaCardiovascularResultados: res.sistemaCardiovascularResultados,
+      signosVitalesResultados: rese.signosVitalesResultados,
+      signosVitalesObservaciones: rese.signosVitalesObservaciones,
+      sistemaCardiovascularResultados: rese.sistemaCardiovascularResultados,
       sistemaCardiovascularObservaciones:
-        res.sistemaCardiovascularObservaciones,
-      sistemaRespiratorioResultados: res.sistemaRespiratorioResultados,
-      sistemaRespiratorioObservaciones: res.sistemaRespiratorioObservaciones,
-      estadoNeurologicoResultados: res.estadoNeurologicoResultados,
-      estadoNeurologicoObservaciones: res.estadoNeurologicoObservaciones,
-      estadoHidratacionResultados: res.estadoHidratacionResultados,
-      estadoHidratacionObservaciones: res.estadoHidratacionObservaciones,
-      toleranciaCalorResultados: res.toleranciaCalorResultados,
-      toleranciaCalorObservaciones: res.toleranciaCalorObservaciones,
-      sudoracionResultados: res.sudoracionResultados,
-      sudoracionObservaciones: res.sudoracionObservaciones,
+        rese.sistemaCardiovascularObservaciones,
+      sistemaRespiratorioResultados: rese.sistemaRespiratorioResultados,
+      sistemaRespiratorioObservaciones: rese.sistemaRespiratorioObservaciones,
+      estadoNeurologicoResultados: rese.estadoNeurologicoResultados,
+      estadoNeurologicoObservaciones: rese.estadoNeurologicoObservaciones,
+      estadoHidratacionResultados: rese.estadoHidratacionResultados,
+      estadoHidratacionObservaciones: rese.estadoHidratacionObservaciones,
+      toleranciaCalorResultados: rese.toleranciaCalorResultados,
+      toleranciaCalorObservaciones: rese.toleranciaCalorObservaciones,
+      sudoracionResultados: rese.sudoracionResultados,
+      sudoracionObservaciones: rese.sudoracionObservaciones,
 
-      empresa: res.empresa ?? "",
-      contrata: res.contrata ?? "",
-      ocupacion: res.ocupacion ?? "",
-      cargoDesempenar: res.cargoDesempenar ?? "",
+      empresa: rese.empresa ?? "",
+      contrata: rese.contrata ?? "",
+      ocupacion: rese.ocupacion ?? "",
+      cargoDesempenar: rese.cargoDesempenar ?? "",
 
-      aptitud: res.esApto
+      aptitud: rese.esApto
         ? "APTO"
-        : res.noEsApto
+        : rese.noEsApto
           ? "NO APTO"
-          : res.aptoRestriccion
+          : rese.aptoRestriccion
             ? "RESTRICCION"
             : "",
 
-      observaciones: res.observaciones,
-      restricciones: res.restricciones,
+      observaciones: rese.observaciones,
+      restricciones: rese.restricciones,
 
-      user_medicoFirma: res.usuarioFirma
-        ? res.usuarioFirma
-        : prev.user_medicoFirma,
-      user_doctorAsignado: res.doctorAsignado,
+      user_medicoFirma: rese.user_medicoFirma
+        ? rese.user_medicoFirma
+        : prev.user_medicoFirma, 
     }));
   }
 };
@@ -243,9 +239,10 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     sudoracionObservaciones: form.sudoracionObservaciones,
 
     esApto: form.aptitud == "APTO",
-    aptoRestriccion: form.aptitud == "NO APTO",
-    noEsApto: form.aptitud == "RESTRICCION",
+    aptoRestriccion: form.aptitud == "RESTRICCION",
+    noEsApto: form.aptitud == "NO APTO",
 
+    observaciones: form.observaciones,
     restricciones: form.restricciones,
 
     usuarioFirma: form.user_medicoFirma,
@@ -270,14 +267,14 @@ export const PrintHojaR = (nro, token, tabla) => {
     token,
   ).then(async (res) => {
     if (res?.resultado?.norden) {
-      const nombre = "EscalaLakeLouise";
+      const nombre = "CertificadoExposicionAlCalor";
       console.log(nombre);
       const jasperModules = import.meta.glob(
-        "../../../../jaspers/EscalaLakeLouise/*.jsx",
+        "../../../../jaspers/CertificadoExposicionAlCalor/*.jsx",
       );
       const modulo =
         await jasperModules[
-          `../../../../jaspers/EscalaLakeLouise/${nombre}.jsx`
+          `../../../../jaspers/CertificadoExposicionAlCalor/${nombre}.jsx`
         ]();
 
       if (typeof modulo.default === "function") {
@@ -321,29 +318,6 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
       Swal.fire("Alerta", "El paciente necesita pasar por Triaje.", "warning");
     },
   );
-};
-
-const GetInfoPac = async (nro, set, token, sede) => {
-  const res = await GetInfoPacDefault(nro, token, sede);
-  if (res) {
-    set((prev) => ({
-      ...prev,
-      nombreExamen: res.nomExam ?? "",
-      nombres: res.nombresApellidos ?? "",
-      edad: res.edad ?? "",
-      sexo: convertirGenero(res.genero ?? ""),
-      dni: res.dni ?? "",
-      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
-      lugarNacimiento: res.lugarNacimiento ?? "",
-      estadoCivil: res.estadoCivil,
-      nivelEstudios: res.nivelEstudios,
-      // Datos Laborales
-      empresa: res.empresa,
-      contrata: res.contrata,
-      ocupacion: res.areaO,
-      cargoDesempenar: res.cargo,
-    }));
-  }
 };
 
 export const Loading = (mensaje) => {
