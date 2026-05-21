@@ -61,7 +61,7 @@ const drawPatientData = (doc, datos = {}) => {
   const filaAltura = 5;
   let yPos = 43;
 
-  const apellidosNombres = String(datos.apellidosPaciente || "").trim() +" "+ String(datos.nombresPaciente||"").trim();
+  const apellidosNombres = String(datos.apellidosPaciente || "").trim() + " " + String(datos.nombresPaciente || "").trim();
   const dni = String(datos.dni || datos.dniPaciente || "");
   const edad = String(datos.edad || datos.edadPaciente || "");
   const sexo =
@@ -298,8 +298,7 @@ export default async function RiesgoCardiovascular(datos = {}, docExistente = nu
   doc.text("PRESIÓN ARTERIAL", colPrueba, y);
   doc.text(presion || "/", colResultado, y, { align: "center" });
   doc.setFont(config.font, "normal").setFontSize(7.5);
-  doc.text("Sistólica: 60 - 300 mmHg", colValores, y);
-  doc.text("Diastólica: 40 - 150 mmHg", colValores, y + 3.2);
+
   y += config.lineHeight + 3;
 
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
@@ -323,10 +322,10 @@ export default async function RiesgoCardiovascular(datos = {}, docExistente = nu
   y += config.lineHeight;
 
   const labs = [
-    { label: "COLESTEROL TOTAL", value: datos.colesterol ?? datos.colesterolTotal, ref: "70 - 1200 mg/dl" },
-    { label: "COLESTEROL HDL", value: datos.hdlColesterol ?? datos.colesterolHdl, ref: "20 - 150 mg/dl" },
-    { label: "TRIGLICÉRIDOS", value: datos.trigliseridos ?? datos.trigliceridos, ref: "25 - 1200 mg/dl" },
-    { label: "COLESTEROL LDL", value: datos.ldlColesterol ?? datos.colesterolLdl, ref: "6 - 540 mg/dl" },
+    { label: "COLESTEROL TOTAL", value: datos.colesterol ?? datos.colesterolTotal, ref: "< 200 mg/dl" },
+    { label: "COLESTEROL HDL", value: datos.hdlColesterol ?? datos.colesterolHdl, ref: "40 - 60 mg/dl" },
+    { label: "TRIGLICÉRIDOS", value: datos.trigliseridos ?? datos.trigliceridos, ref: "< 150 mg/dl" },
+    { label: "COLESTEROL LDL", value: datos.ldlColesterol ?? datos.colesterolLdl, ref: "< 129 mg/dl" },
   ];
 
   labs.forEach((row) => {
@@ -353,29 +352,35 @@ export default async function RiesgoCardiovascular(datos = {}, docExistente = nu
     datos.riesgoPromedioSevero ?? datos.riesgoPromedioEventoCoronarioSevero10 ?? "",
   ).trim();
 
-  doc.setFont(config.font, "normal").setFontSize(8.5);
-  doc.text(`Su evento de riesgo coronario a 10 años es de un:`, config.margin, y);
-  doc.setFont(config.font, "bold").setFontSize(8.5);
-  doc.text(`${riesgo}`, colResultado, y, { align: "center" });
-  y += 4;
-  doc.text(`Para su mismo edad y sexo`, config.margin, y);
-  doc.setFont(config.font, "normal").setFontSize(8.5);
-  y += 4;
-  doc.text(`El riesgo promedio de evento coronario a 10 años es de un:`, config.margin, y);
-  doc.setFont(config.font, "bold").setFontSize(8.5);
-  doc.text(`${riesgoPromedio}`, colResultado, y, { align: "center" });
-  y += 4;
-  doc.setFont(config.font, "normal").setFontSize(8.5);
-  doc.text(`El riesgo ideal de evento coronario a 10 años es de un:`, config.margin, y);
-  doc.setFont(config.font, "bold").setFontSize(8.5);
-  doc.text(`${riesgoIdeal}`, colResultado, y, { align: "center" });
-  y += 4;
-  doc.setFont(config.font, "normal").setFontSize(8.5);
-  doc.text(`El riesgo promedio de evento coronario severo a 10 años es de un:`, config.margin, y);
-  doc.setFont(config.font, "bold").setFontSize(8.5);
-  doc.text(`${riesgoPromSevero}`, colResultado, y, { align: "center" });
-  doc.setFont(config.font, "normal").setFontSize(8.5);
+  if (datos.edadPaciente && datos.edadPaciente >= 30 && datos.edadPaciente <= 74) {
+    doc.setFont(config.font, "normal").setFontSize(8.5);
+    doc.text(`Su evento de riesgo coronario a 10 años es de un:`, config.margin, y);
+    doc.setFont(config.font, "bold").setFontSize(8.5);
+    doc.text(`${riesgo}`, colResultado, y, { align: "center" });
+    y += 4;
+    doc.text(`Para su mismo edad y sexo`, config.margin, y);
+    doc.setFont(config.font, "normal").setFontSize(8.5);
+    y += 4;
+    doc.text(`El riesgo promedio de evento coronario a 10 años es de un:`, config.margin, y);
+    doc.setFont(config.font, "bold").setFontSize(8.5);
+    doc.text(`${riesgoPromedio}`, colResultado, y, { align: "center" });
+    y += 4;
+    doc.setFont(config.font, "normal").setFontSize(8.5);
+    doc.text(`El riesgo ideal de evento coronario a 10 años es de un:`, config.margin, y);
+    doc.setFont(config.font, "bold").setFontSize(8.5);
+    doc.text(`${riesgoIdeal}`, colResultado, y, { align: "center" });
+    y += 4;
+    doc.setFont(config.font, "normal").setFontSize(8.5);
+    doc.text(`El riesgo promedio de evento coronario severo a 10 años es de un:`, config.margin, y);
+    doc.setFont(config.font, "bold").setFontSize(8.5);
+    doc.text(`${riesgoPromSevero}`, colResultado, y, { align: "center" });
 
+  } else {
+    doc.setFont(config.font, "bold").setFontSize(10);
+    doc.text(`RIESGO CARDIOVASCULAR SEGUN FRAMINGHAM: NO CUANTIFICABLE POR LIMITE DE EDAD.`, config.margin, y + 1, { maxWidth: pageW - config.margin });
+  }
+
+  doc.setFont(config.font, "normal").setFontSize(8.5);
 
   await dibujarFirmas({ doc, datos, y: y + 18, pageW });
   footerTR(doc, datos);

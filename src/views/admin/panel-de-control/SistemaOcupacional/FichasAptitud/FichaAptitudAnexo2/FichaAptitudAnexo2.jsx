@@ -1,3 +1,5 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPrint } from "@fortawesome/free-solid-svg-icons";
 import {
   InputTextOneLine,
   InputTextArea,
@@ -8,12 +10,13 @@ import {
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getDatePlus364Days, getToday } from "../../../../../utils/helpers";
 import { useForm } from "../../../../../hooks/useForm";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaAptitudAnexo2";
+import { PrintHojaR, PrintHojaR2, SubmitDataService, VerifyTR } from "./controllerFichaAptitudAnexo2";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
 import BotonesAccion from "../../../../../components/templates/BotonesAccion";
 
 const tabla = "aptitud_medico_ocupacional_agro"
+const tabla2 = "resumen_medico_poderosa_anexo02"
 
 export default function FichaAptitudAnexo2() {
   const today = getToday();
@@ -92,6 +95,12 @@ export default function FichaAptitudAnexo2() {
   const handlePrint = () => {
     handlePrintDefault(() => {
       PrintHojaR(form.norden, token, tabla, datosFooter);
+    });
+  };
+
+  const handlePrint2 = () => {
+    handlePrintDefault(() => {
+      PrintHojaR2(form.norden, token, tabla2, datosFooter);
     });
   };
 
@@ -397,13 +406,31 @@ export default function FichaAptitudAnexo2() {
           </div>
         </SectionFieldset>
       </div>
-      <BotonesAccion
-        form={form}
-        handleSave={handleSave}
-        handleClear={handleClear}
-        handlePrint={handlePrint}
-        handleChangeNumberDecimals={handleChangeNumberDecimals}
-      />
+      <div className="flex justify-between">
+        <div className="w-full">
+          <BotonesAccion
+            form={form}
+            handleSave={handleSave}
+            handleClear={handleClear}
+            handlePrint={handlePrint}
+            handleChangeNumberDecimals={handleChangeNumberDecimals}
+          />
+        </div>
+        <button
+          type="button"
+          onClick={handlePrint2}
+          className="
+                             bg-green-500 hover:bg-green-600  
+                             text-white text-base px-6 py-2 rounded
+                             flex items-center gap-2
+                             transition-all duration-150 ease-out
+                             hover:shadow-lg
+                             active:scale-95 active:shadow-inner w-full 
+                             max-w-[140px] max-h-[21px] justify-center mt-auto"
+        >
+          Resumen Médico <FontAwesomeIcon icon={faPrint} />
+        </button>
+      </div>
     </div>
   );
 }

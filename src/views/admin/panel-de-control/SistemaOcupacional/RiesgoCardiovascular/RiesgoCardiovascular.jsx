@@ -303,7 +303,7 @@ export default function RiesgoCardiovascular() {
         if (missing) return { ready: false, error: "" };
 
         if (edad < 30 || edad > 74) {
-            return { ready: false, error: "El cálculo aplica a personas de 30 a 74 años." };
+            return { ready: false, error: "RIESGO CARDIOVASCULAR SEGUN FRAMINGHAM: NO CUANTIFICABLE POR LIMITE DE EDAD." };
         }
 
         const sistClamped = clampNumber(sist, 80, 250);
@@ -526,62 +526,40 @@ export default function RiesgoCardiovascular() {
 
 
             <SectionFieldset legend="Resultado" className="space-y-3">
-                {calculo.error ? <p className="text-red-600 font-semibold">{calculo.error}</p> : null}
-
-                {/* <div className="space-y-1">
-                    <p>
-                        Edad: {form.edad ? `${form.edad} años` : "-"} {sexoLabel ? `Sexo: ${sexoLabel}` : ""}
-                    </p>
-                    <p>
-                        Tensión arterial:{" "}
-                        {form.tensionSistolica && form.tensionDiastolica
-                            ? `${form.tensionSistolica}/${form.tensionDiastolica} milímetros de mercurio (mmHg)`
-                            : "-"}{" "}
-                        Diabetes: {form.diabetes === null ? "-" : form.diabetes ? "sí" : "no"} Fuma: {form.fuma === null ? "-" : form.fuma ? "sí" : "no"}
-                    </p>
-                    <p>
-                        Colesterol total: {form.colesterolTotal ? `${form.colesterolTotal} mg/dl` : "-"} Colesterol HDL (ligado a lipoproteínas de alta densidad):{" "}
-                        {form.colesterolHdl ? `${form.colesterolHdl} mg/dl` : "-"}
-                    </p>
-                    <p>
-                        Colesterol LDL (Ligado a lipoproteínas de baja densidad): {form.colesterolLdl ? `${form.colesterolLdl} mg/dl` : "-"} Triglicéridos:{" "}
-                        {form.trigliceridos ? `${form.trigliceridos} mg/dl` : "-"}.
-                    </p>
-                </div> */}
-
-                <div className="space-y-2">
-                    {/* <p className="font-semibold">Datos calculados</p> */}
-                    <div className="grid grid-cols-1  gap-3">
-                        <InputTextOneLine
-                            label="Su riesgo de evento coronario a 10 años es de un"
-                            name="riesgoEventoCoronario10"
-                            value={form.riesgoEventoCoronario10}
-                            disabled
-                            labelWidth="350px"
-                        />
-                        <InputTextOneLine
-                            label="El riesgo promedio de evento coronario a 10 años es de un"
-                            name="riesgoPromedioEventoCoronario10"
-                            value={form.riesgoPromedioEventoCoronario10}
-                            disabled
-                            labelWidth="350px"
-                        />
-                        <InputTextOneLine
-                            label="El riesgo ideal de evento coronario a 10 años es de un"
-                            name="riesgoIdealEventoCoronario10"
-                            value={form.riesgoIdealEventoCoronario10}
-                            disabled
-                            labelWidth="350px"
-                        />
-                        <InputTextOneLine
-                            label="El riesgo promedio de evento coronario severo a 10 años es de un"
-                            name="riesgoPromedioEventoCoronarioSevero10"
-                            value={form.riesgoPromedioEventoCoronarioSevero10}
-                            disabled
-                            labelWidth="350px"
-                        />
-                    </div>
-                </div>
+                {calculo.error ? (<p className="text-red-600 font-semibold">{calculo.error}</p>) :
+                    (<div className="space-y-2">
+                        <div className="grid grid-cols-1  gap-3">
+                            <InputTextOneLine
+                                label="Su riesgo de evento coronario a 10 años es de un"
+                                name="riesgoEventoCoronario10"
+                                value={form.riesgoEventoCoronario10}
+                                disabled
+                                labelWidth="350px"
+                            />
+                            <InputTextOneLine
+                                label="El riesgo promedio de evento coronario a 10 años es de un"
+                                name="riesgoPromedioEventoCoronario10"
+                                value={form.riesgoPromedioEventoCoronario10}
+                                disabled
+                                labelWidth="350px"
+                            />
+                            <InputTextOneLine
+                                label="El riesgo ideal de evento coronario a 10 años es de un"
+                                name="riesgoIdealEventoCoronario10"
+                                value={form.riesgoIdealEventoCoronario10}
+                                disabled
+                                labelWidth="350px"
+                            />
+                            <InputTextOneLine
+                                label="El riesgo promedio de evento coronario severo a 10 años es de un"
+                                name="riesgoPromedioEventoCoronarioSevero10"
+                                value={form.riesgoPromedioEventoCoronarioSevero10}
+                                disabled
+                                labelWidth="350px"
+                            />
+                        </div>
+                    </div>)
+                }
             </SectionFieldset>
             <BotonesAccion
                 form={form}
