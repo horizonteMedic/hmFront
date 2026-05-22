@@ -7,8 +7,12 @@ import Swal from "sweetalert2";
 const SubidaMasiva = ({ onClose, MedicosMulti, FormaPago, ExamenMulti, sede, token, userlogued }) => {
     const [data, setData] = useState([]);
     const [resultados, setResultados] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [recordsPerPage, setRecordsPerPage] = useState(50);
+
     const SubirExcel = () => {
-        handleSubirExcel(setData)
+        handleSubirExcel(setData, setTotalPages)
     }
 
     const DownloadExcel = () => {
@@ -17,7 +21,7 @@ const SubidaMasiva = ({ onClose, MedicosMulti, FormaPago, ExamenMulti, sede, tok
 
     const SubirDatos = async () => {
         const res = await submitMasivo(data, sede, token, userlogued);
-
+        console.log(res)
         setResultados(res); // 🔥 guardar resultados
 
         const okCount = res.filter(r => r.ok).length;
@@ -41,7 +45,20 @@ const SubidaMasiva = ({ onClose, MedicosMulti, FormaPago, ExamenMulti, sede, tok
     };
 
     const hasErrors = data.some(row => !isRowValid(row));
+    const startIdx = (currentPage - 1) * recordsPerPage;
+    const endIdx = startIdx + recordsPerPage;
 
+    const totalArchivos = data.length;
+
+    const totalCorrectos = resultados.filter(r => r.ok === true).length;
+
+    const totalErrores = resultados.filter(r => r.ok === false).length;
+
+    const totalIncompletos = data.filter(row =>
+        Object.keys(row).some(key => getCellError(key, row))
+    ).length;
+
+    console.log(data)
     return (
         <>
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ">
@@ -55,6 +72,35 @@ const SubidaMasiva = ({ onClose, MedicosMulti, FormaPago, ExamenMulti, sede, tok
                     <div className="flex items-center justify-between">
                         <button onClick={SubirExcel} className="verde-btn px-4 py-1 rounded flex items-center mr-3">Subir Excel <FontAwesomeIcon icon={faUpload} className="ml-2" /></button>
                         <button onClick={DownloadExcel} className="verde-btn px-4 py-1 rounded flex items-center mr-3">Descargar Excel <FontAwesomeIcon icon={faFileExcel} className="ml-2" /></button>
+
+                    </div>
+                    <div className="flex gap-4 mt-4 mb-2 flex-wrap">
+
+                        <div className="bg-gray-100 rounded px-4 py-2 shadow-sm">
+                            <p className="text-sm text-gray-600">Total Registros</p>
+                            <p className="text-xl font-bold">{totalArchivos}</p>
+                        </div>
+
+                        <div className="bg-green-100 rounded px-4 py-2 shadow-sm">
+                            <p className="text-sm text-green-700">Correctos</p>
+                            <p className="text-xl font-bold text-green-800">
+                                {totalCorrectos}
+                            </p>
+                        </div>
+
+                        <div className="bg-yellow-100 rounded px-4 py-2 shadow-sm">
+                            <p className="text-sm text-yellow-700">Errores</p>
+                            <p className="text-xl font-bold text-yellow-800">
+                                {totalErrores}
+                            </p>
+                        </div>
+
+                        <div className="bg-red-100 rounded px-4 py-2 shadow-sm">
+                            <p className="text-sm text-red-700">Incompletos</p>
+                            <p className="text-xl font-bold text-red-800">
+                                {totalIncompletos}
+                            </p>
+                        </div>
 
                     </div>
                     <div className="overflow-x-auto mt-4">
@@ -74,7 +120,8 @@ const SubidaMasiva = ({ onClose, MedicosMulti, FormaPago, ExamenMulti, sede, tok
                                 <tbody>
 
                                     {data.map((row, i) => {
-                                        const status = getRowStatus(row, i, resultados);
+                                        const realIndex = startIdx + i; // ← índice real en data completo
+                                        const status = getRowStatus(row, realIndex, resultados);
 
                                         const rowColor =
                                             status === "invalid"
@@ -110,6 +157,7 @@ const SubidaMasiva = ({ onClose, MedicosMulti, FormaPago, ExamenMulti, sede, tok
                             </table>
                         )}
                     </div>
+
                     <div className="flex w-full justify-end items-center">
                         {data.length > 0 && (
                             <button
@@ -119,6 +167,16 @@ const SubidaMasiva = ({ onClose, MedicosMulti, FormaPago, ExamenMulti, sede, tok
                                     }`}
                             >
                                 Subir Datos
+                            </button>
+                        )}
+                        {resultados.length > 0 && resultados.ok === false && (
+                            <button
+                                onClick={SubirDatos}
+                                disabled={hasErrors}
+                                className={`px-4 py-1 rounded flex items-center mr-3 ${hasErrors ? "bg-gray-400 cursor-not-allowed" : "verde-btn"
+                                    }`}
+                            >
+                                Descargar errores
                             </button>
                         )}
                     </div>
