@@ -89,6 +89,26 @@ export function SubmitHistoriaC(data, sede, token, operacion) {
 
 }
 
+export function SubmitHistoriaCMasivo(body, token) {
+
+  const url = `${URLAzure}/api/v01/ct/preNordenOcupacional/registrarLote`
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(body)
+  }
+  return fetch(url, options).then(res => {
+    if (!res.ok) {
+      return res
+    } return res.json()
+  }).then(response => response)
+
+}
+
+
 export function GetHistoriaC(data, sede, token) {
 
   const body = {

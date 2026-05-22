@@ -2,9 +2,10 @@ import Swal from "sweetalert2";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import ExcelJS from "exceljs";
-import { SubmitHistoriaC } from "../model/AdminHistoriaC";
+import { SubmitHistoriaC, SubmitHistoriaCMasivo } from "../model/AdminHistoriaC";
 import { getToday } from "../../../../../utils/helpers";
 import { LoadingDefault } from "../../../../../utils/functionUtils";
+import { getFetch } from "../../../../../utils/apiHelpers";
 
 
 export const ImportData = (dni, Swal, getFetch, token, set, RendeSet) => {
@@ -44,7 +45,7 @@ export const ImportData = (dni, Swal, getFetch, token, set, RendeSet) => {
     });
 }
 
-export const handleSubirExcel = async (setData) => {
+export const handleSubirExcel = async (setData, setTotalPages) => {
   const { value: file } = await Swal.fire({
     title: "Selecciona un archivo Excel",
     input: "file",
@@ -57,7 +58,7 @@ export const handleSubirExcel = async (setData) => {
   });
 
   if (!file) return;
-
+  setData([])
   const reader = new FileReader();
 
   reader.onload = (e) => {
@@ -73,109 +74,140 @@ export const handleSubirExcel = async (setData) => {
 
     const dataPreparada = prepararDataExcel(jsonData);
 
-    console.log("Data preparada:", dataPreparada);
-
     setData(dataPreparada);
+    setTotalPages(Math.ceil(dataPreparada.length / 50));
   };
 
   reader.readAsBinaryString(file);
 };
 
 export const submitMasivo = async (data, sede, token, userlogued) => {
-  const resultados = [];
-  LoadingDefault("Subiendo Datos")
-  for (const row of data) {
-    const payload = mapRowToHistoria({ ...row, user_registro: userlogued });
+  LoadingDefault("Subiendo Datos");
+  try {
+    const { hora, fechaFormateada } = await getFechaHoraActual();
 
-    try {
-      const response = await SubmitHistoriaC(payload, sede, token, 1);
+    const body = data.map(row => ({
+      // Datos del Excel
+      dni: row["DNI"] || null,
+      razonEmpresa: row["EMPRESA"] || "",
+      razonContrata: row["CONTRATA"] || "N/A",
+      nombreExamen: row["EXAMEN"] || "",
+      cargo: row["CARGO"] || "",
+      area: row["AREA"] || "",
+      medico: row["MEDICO OCUP"] || "",
+      tipoPago: row["FORMA DE PAGO"] || "",
+      observacion1: row["OBSERVACION"] || "",
+      precio: row["PRECIO"] ? `S/.${row["PRECIO"]}` : "S/.0",
+      tipoPrueba: row["TIPO PRUEBA"] || "N/A",
 
-      const isOk = response && response.id; // 🔥 clave
+      // Defaults del sistema
+      nordenGenerado: null,
+      nomEx: "",
+      altura: "",
+      mineral: "",
+      fechaApertura: fechaFormateada,
+      estado: "EN PROCESO",
+      hora,
+      fisttest: false,
+      psicosen: false,
+      testAltura: false,
+      color: 30,
+      grupoSanguineo: null,
+      factorSanguineo: null,
+      codigoClinica: "4353-H",
+      visualCompl: false,
+      trabajosCalientes: false,
+      covid1: false,
+      covid2: false,
+      manipuladorAlimentos: false,
+      protocolo: "",
+      autoriza: "",
+      numeroOperacion: null,
+      herramientasManuales: false,
+      rxcDorsoLumbar: false,
+      rxcKLumbar: false,
+      rxcLumbosacra: false,
+      rxcPlomos: false,
+      mercurioo: false,
+      marihuana: false,
+      cocaina: false,
+      espaciosConfinados: false,
+      precioAdicional: "S/.0",
+      tipoPruebaCovid: "RA",
+      nombreHotel: "N/A",
+      codigoSede: sede,
+      usuarioRegistro: userlogued,
+    }));
 
-      resultados.push({
-        ok: isOk,
-        id: isOk ? response.id : null,
-        data: response,
-        row
-      });
+    console.log("Body a enviar:", body);
 
-    } catch (error) {
-      resultados.push({
-        ok: false,
-        id: null,
-        error,
-        row
-      });
-    }
+    const response = await SubmitHistoriaCMasivo(body, token);
+    const errores = response?.resultado?.errores || [];
+
+    // Campos que pueden variar entre body y respuesta API
+    const camposIgnorar = new Set(["hora", "id"]);
+
+    const sinVariables = (reg) => {
+      const obj = {};
+      Object.keys(reg)
+        .filter(k => !camposIgnorar.has(k))
+        .sort() // ← ordenar keys alfabéticamente
+        .forEach(k => { obj[k] = reg[k]; });
+      return JSON.stringify(obj);
+    };
+
+    // Set con los registros que fallaron (sin hora e id)
+    const erroresSet = new Map(
+      errores.map(err => [sinVariables(err.registro), err.motivo])
+    );
+
+    // DEBUG: compara lado a lado
+    /*const keyError = sinVariables(errores[0].registro);
+    const keyBody = sinVariables(body.find(r => r.dni === null)); // el que tiene dni null
+
+    console.log("KEY ERROR:", keyError);
+    console.log("KEY BODY:", keyBody);
+    console.log("SON IGUALES:", keyError === keyBody);
+
+    // Ver diferencias campo por campo
+    const regError = errores[0].registro;
+    const regBody = body.find(r => r.dni === null);
+    Object.keys(regError).forEach(k => {
+      if (camposIgnorar.has(k)) return;
+      if (JSON.stringify(regError[k]) !== JSON.stringify(regBody?.[k])) {
+        console.log(`DIFERENCIA en "${k}":`, JSON.stringify(regError[k]), "vs", JSON.stringify(regBody?.[k]));
+      }
+    })*/
+
+    const resultados = body.map((registro, index) => {
+      const key = sinVariables(registro);
+      const motivo = erroresSet.get(key);
+
+      return {
+        ok: !motivo,
+        error: motivo || null,
+        row: data[index],
+        registro
+      };
+    });
+
+
+
+    Swal.close();
+    return resultados;
+
+  } catch (error) {
+    Swal.close();
+    console.error(error);
+    throw error;
   }
-
-  return resultados;
 };
 
-const mapRowToHistoria = (row) => {
+export const getMasivoimport = async () => {
+  LoadingDefault("Importando Datos");
+  getFetch(`/api/v01/ct/preNordenOcupacional/obtenerPaginado`, token)
+}
 
-  const removePrefix = (str, prefix) => {
-    if (typeof str !== "string") return "";
-    const regex = new RegExp('^' + prefix);
-    return str.replace(regex, '');
-  };
-  console.log(row)
-  const currentDate = new Date();
-  const hours = String(currentDate.getHours()).padStart(2, '0');
-  const minutes = String(currentDate.getMinutes()).padStart(2, '0');
-  const seconds = String(currentDate.getSeconds()).padStart(2, '0');
-
-  const today = getToday();
-  console.log(today)
-  const [yyyy, mm, dd] = today.split('-');
-  const fechaFormateada = `${dd}/${mm}/${yyyy}`;
-
-  return {
-
-    // 🔥 DEL EXCEL
-    codPa: row["DNI"] || "",
-    razonEmpresa: row["EMPRESA"] || "",
-    razonContrata: row["CONTRATA"] || "",
-    nomExamen: row["EXAMEN"] || "",
-    cargoDe: row["CARGO"] || "",
-    areaO: row["AREA"] || "",
-    n_medico: row["MEDICO OCUP"] || "",
-    tipoPago: row["FORMA DE PAGO"] || "",
-    textObserv1: row["OBSERVACION"] || "",
-    precioPo: `${'S/.' + row["PRECIO"]}` || "",
-
-    // 🔒 DEFAULT / VACÍOS
-    tipoOperacion: "INSERT",
-    nomEx: "",
-    alturaPo: "",
-    mineralPo: "",
-    fechaAperturaPo: fechaFormateada, // si luego quieres autogenerar fecha aquí
-    estadoEx: "EN PROCESO",
-    n_fisttest: false,
-    n_psicosen: false,
-    n_testaltura: false,
-    visualCompl: false,
-    trabCalientes: false,
-    manipAlimentos: false,
-    protocolo: "",
-    autoriza: "",
-    herraManuales: false,
-    rxcDorsoLumbar: false,
-    rxcKLumbar: false,
-    rxcLumbosacra: false,
-    rxcPlomos: false,
-    mercurioo: false,
-    tmarihuana: false,
-    tcocaina: false,
-    espaciosConfinados: false,
-    user_registro: row["user_registro"],
-
-    // 🔧 SISTEMA
-    n_hora: `${hours}:${minutes}:${seconds}`,
-    tipoPrueba: row["TIPO PRUEBA"] || "N/A",
-    precioAdic: "S/.0",
-  };
-};
 
 const prepararDataExcel = (data) => {
   return data
@@ -312,5 +344,30 @@ export const getRowStatus = (row, index, resultados) => {
 
   if (!result) return "pending"; // aún no enviado
 
-  return result.ok ? "success" : "error";
+  return result.ok !== false ? "success" : "error";
+};
+
+const getFechaHoraActual = () => {
+
+  const currentDate = new Date();
+
+  // Hora
+  const hours = String(currentDate.getHours()).padStart(2, '0');
+  const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+  const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+
+  const hora = `${hours}:${minutes}:${seconds}`;
+
+  // Fecha YYYY-MM-DD
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  const day = String(currentDate.getDate()).padStart(2, '0');
+
+  const fechaFormateada = `${year}-${month}-${day}`;
+
+  return {
+    hora,
+    fechaFormateada
+  };
+
 };

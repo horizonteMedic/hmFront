@@ -964,6 +964,10 @@ const AperturaExamenesPreOcup = (props) => {
     }
   }
 
+  const ImportarPreCarga = () => {
+
+  }
+
   return (
     <div >
       <div className="grid md:grid-cols-7 sm:flex-col gap-2 px-4">
@@ -1005,6 +1009,14 @@ const AperturaExamenesPreOcup = (props) => {
               <FontAwesomeIcon icon={faFileImport} className="mr-2" />
               IMPORTAR
             </button>
+            <button
+
+              className='mr-2 flex items-center justify-center border-1 border-orange-500 text-white px-3 py-1 bg-orange-700 mb-1 rounded-md hover:bg-orange-500 hover:text-white focus:outline-none'
+            >
+              <FontAwesomeIcon icon={faFileImport} className="mr-2" />
+              PRECARG
+            </button>
+
             <label htmlFor="apellidos" className="block w-36">G.Sang.:</label>
             <input autoComplete="off"
               type="text"
