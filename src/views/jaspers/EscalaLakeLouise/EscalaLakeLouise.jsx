@@ -240,7 +240,7 @@ const drawPatientData = (doc, datos = {}) => {
 const drawRadioOption = (doc, x, y, isSelected, label, index) => {
   doc.circle(x, y, 1.8);
   if (isSelected) {
-    doc.setFillColor(0, 0, 0);
+    doc.setFillColor(0, 0, 255); // Azul
     doc.circle(x, y, 1.1, "F");
   }
   doc.setFont("helvetica", "normal").setFontSize(7.5);
@@ -277,33 +277,33 @@ export default async function EscalaLakeLouise(datos = {}, docExistente = null) 
   doc.line(tablaInicioX + 65, y + 4.6, tablaInicioX + 65, y + 140);
   y += 5;
 
-  const sintomas = [
-    {
-      name: "cefalea",
-      title: "Cefalea",
-      options: ["Ausente", "Leve", "Moderada", "Grave"]
-    },
-    {
-      name: "sintomasDigestivos",
-      title: "Síntomas digestivos",
-      options: ["Buen apetito", "Poco apetito o náuseas", "Náuseas moderadas o vómitos", "Náuseas o vómitos graves o incapacitantes"]
-    },
-    {
-      name: "fatiga",
-      title: "Fatiga y/o debilidad",
-      options: ["Ausentes", "Leve", "Moderada", "Grave o incapacitante"]
-    },
-    {
-      name: "vertigo",
-      title: "Vértigo / Mareos",
-      options: ["Ausentes", "Leves", "Moderados", "Graves o incapacitantes"]
-    },
-    {
-      name: "alteracionesSueno",
-      title: "Alteraciones del sueño",
-      options: ["Duerme como habitualmente lo hace", "No duerme como habitualmente lo hace", "Se despierta muchas veces, sueño nocturno escaso", "No puede dormir"]
-    }
-  ];
+ const sintomas = [
+  {
+    name: "cefalea",
+    title: "CEFALEA",
+    options: ["AUSENTE", "LEVE", "MODERADA", "GRAVE"]
+  },
+  {
+    name: "sintomasDigestivos",
+    title: "SÍNTOMAS DIGESTIVOS",
+    options: ["BUEN APETITO", "POCO APETITO O NÁUSEAS", "NÁUSEAS MODERADAS O VÓMITOS", "NÁUSEAS O VÓMITOS GRAVES O INCAPACITANTES"]
+  },
+  {
+    name: "fatiga",
+    title: "FATIGA Y/O DEBILIDAD",
+    options: ["AUSENTES", "LEVE", "MODERADA", "GRAVE O INCAPACITANTE"]
+  },
+  {
+    name: "vertigo",
+    title: "VÉRTIGO / MAREOS",
+    options: ["AUSENTES", "LEVES", "MODERADOS", "GRAVES O INCAPACITANTES"]
+  },
+  {
+    name: "alteracionesSueno",
+    title: "ALTERACIONES DEL SUEÑO",
+    options: ["DUERME COMO HABITUALMENTE LO HACE", "NO DUERME COMO HABITUALMENTE LO HACE", "SE DESPIERTA MUCHAS VECES, SUEÑO NOCTURNO ESCASO", "NO PUEDE DORMIR"]
+  }
+];
 
   sintomas.forEach((sintoma, idx) => {
     const selectedVal = Number(datos[sintoma.name] || 0);
@@ -338,50 +338,50 @@ export default async function EscalaLakeLouise(datos = {}, docExistente = null) 
   doc.rect(tablaInicioX, y, tablaAncho, 5, 'FD');
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("III. HALLAZGOS CLÍNICOS", tablaInicioX + 2, y + 3.5);
-  doc.line(tablaInicioX + 65, y + 4.8, tablaInicioX + 65, y + 95);
+  doc.line(tablaInicioX + 65, y + 4.8, tablaInicioX + 65, y + 100);
   y += 5;
 
-  const hallazgos = [
-    {
-      name: "alteracionesMentales",
-      title: "Alteraciones mentales",
-      options: ["Ausentes", "Letargo", "Desorientado / confuso", "Estupor / semiconciencia", "Coma"],
-      subtitle: null
-    },
-    {
-      name: "ataxia",
-      title: "Ataxia",
-      subtitle: "(Caminar sobre una línea haciendo coincidir taco con punta)",
-      options: ["Marcha normal", "Marcha tambaleante", "Pisadas fuera de línea", "Caídas al suelo", "Incapacidad para pararse"]
-    },
-    {
-      name: "edemasPerifericos",
-      title: "Edemas periféricos",
-      options: ["Ausentes", "En una extremidad", "En >= 2 extremidades"],
-      subtitle: null
-    }
-  ];
+ const hallazgos = [
+  {
+    name: "alteracionesMentales",
+    title: "ALTERACIONES MENTALES",
+    options: ["AUSENTES", "LETARGO", "DESORIENTADO / CONFUSO", "ESTUPOR / SEMICONCIENCIA", "COMA"],
+    subtitle: null
+  },
+  {
+    name: "ataxia",
+    title: "ATAXIA",
+    subtitle: "(CAMINAR SOBRE UNA LÍNEA HACIENDO COINCIDIR TACO CON PUNTA)",
+    options: ["MARCHA NORMAL", "MARCHA TAMBALEANTE", "PISADAS FUERA DE LÍNEA", "CAÍDAS AL SUELO", "INCAPACIDAD PARA PARARSE"]
+  },
+  {
+    name: "edemasPerifericos",
+    title: "EDEMAS PERIFÉRICOS",
+    options: ["AUSENTES", "EN UNA EXTREMIDAD", "EN >= 2 EXTREMIDADES"],
+    subtitle: null
+  }
+];
 
-  hallazgos.forEach((hallazgo, idx) => {
-    const selectedVal = Number(datos[hallazgo.name] || 0);
-    const filaAltura = (hallazgo.subtitle ? 3 : 0) + hallazgo.options.length * 6 + 3;
+hallazgos.forEach((hallazgo, idx) => {
+  const selectedVal = Number(datos[hallazgo.name] || 0);
+  const filaAltura = (hallazgo.subtitle ? 7 : 0) + hallazgo.options.length * 6 + 3;
 
-    doc.rect(tablaInicioX, y, tablaAncho, filaAltura);
-    doc.setFont("helvetica", "bold").setFontSize(8.5);
-    doc.text(`${idx + 1}. ${hallazgo.title}`, tablaInicioX + 2, y + 4);
+  doc.rect(tablaInicioX, y, tablaAncho, filaAltura);
+  doc.setFont("helvetica", "bold").setFontSize(8.5);
+  doc.text(`${idx + 1}. ${hallazgo.title}`, tablaInicioX + 2, y + 4);
 
-    if (hallazgo.subtitle) {
-      doc.setFont("helvetica", "italic").setFontSize(6.5);
-      doc.text(hallazgo.subtitle, tablaInicioX + 2, y + 8);
-    }
+  if (hallazgo.subtitle) {
+    doc.setFont("helvetica", "italic").setFontSize(6.5);
+    doc.text("(CAMINAR SOBRE UNA LÍNEA HACIENDO", tablaInicioX + 2, y + 8);
+    doc.text("COINCIDIR TACO CON PUNTA)", tablaInicioX + 2, y + 12);
+  }
 
-    const yOffsetOpt = hallazgo.subtitle ? 8 : 4;
-    hallazgo.options.forEach((opt, optIdx) => {
-      drawRadioOption(doc, tablaInicioX + 70, y + yOffsetOpt + optIdx * 6, selectedVal === optIdx, opt, optIdx);
-    });
-
-    y += filaAltura;
+  hallazgo.options.forEach((opt, optIdx) => {
+    drawRadioOption(doc, tablaInicioX + 70, y + 3.5 + optIdx * 6, selectedVal === optIdx, opt, optIdx);
   });
+
+  y += filaAltura;
+});
 
   // === IV. CALIFICACIÓN ===
   doc.setFillColor(196, 196, 196);
@@ -391,7 +391,7 @@ export default async function EscalaLakeLouise(datos = {}, docExistente = null) 
   y += 5;
 
   const puntaje = Number(datos.calificacion || 0);
-  let txtPuntaje = "Sin clasificación";
+  let txtPuntaje = "SIN CLASIFICACIÓN";
   if (puntaje >= 0 && puntaje <= 3) txtPuntaje = "MMA LEVE";
   else if (puntaje >= 4 && puntaje <= 6) txtPuntaje = "MMA MODERADO";
   else if (puntaje >= 7) txtPuntaje = "MMA GRAVE";
@@ -407,20 +407,20 @@ export default async function EscalaLakeLouise(datos = {}, docExistente = null) 
   doc.line(tablaInicioX, y + filaCalifH * 2, tablaInicioX + tablaAncho - 60, y + filaCalifH * 2);
 
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("MMA Leve", tablaInicioX + 2, y + 3.5);
-  doc.text("1 - 3 ptos.", tablaInicioX + 62, y + 3.5);
+  doc.text("MMA LEVE", tablaInicioX + 2, y + 3.5);
+  doc.text("1 - 3 PTOS.", tablaInicioX + 62, y + 3.5);
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text(`Puntuación total: ${puntaje}`, tablaInicioX + 122, y + 5);
 
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("MMA Moderado", tablaInicioX + 2, y + filaCalifH + 3.5);
-  doc.text("4 - 6 ptos.", tablaInicioX + 62, y + filaCalifH + 3.5);
+  doc.text("MMA MODERADO", tablaInicioX + 2, y + filaCalifH + 3.5);
+  doc.text("4 - 6 PTOS.", tablaInicioX + 62, y + filaCalifH + 3.5);
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text(`Diagnóstico: ${txtPuntaje}`, tablaInicioX + 122, y + filaCalifH + 5);
 
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("MMA Grave", tablaInicioX + 2, y + filaCalifH * 2 + 3.5);
-  doc.text(">= 7 ptos.", tablaInicioX + 62, y + filaCalifH * 2 + 3.5);
+  doc.text("MMA GRAVE", tablaInicioX + 2, y + filaCalifH * 2 + 3.5);
+  doc.text(">= 7 PTOS.", tablaInicioX + 62, y + filaCalifH * 2 + 3.5);
 
   y += filaCalifH * 3 + 10;
 
