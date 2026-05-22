@@ -25,7 +25,7 @@ export const EXAMENES_CONFIG = [
             { label: "Ficha Conducción de Vehiculos", name: "certConduccVehiculos", tabla: "b_certificado_conduccion" },
             { label: "Antecedentes Enfermedades Altura", name: "AnteceEnfeAltura", tabla: "antece_enfermedades_altura" },
             { label: "Cert. Altura Basico 1.8", name: "certTrabajoAltura", tabla: "certificacion_medica_altura" },
-
+            { label: "Riesgo Cardiovascular", name: "RiesgoCardio", tabla: "riesgo_cardiovascular" },
             {
                 title: "EXAMENES PODEROSA",
                 items: [
