@@ -131,6 +131,7 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "CONSENT_PANEL_5D",
     "CONSENT_PANEL_10D",
     "CONSENT_MARIHUANA",
+    "ACIDO_URICO",
     "CONSENT_DROGAS_BOROO",
 
     "INMUNOLOGIA_BK_KOH",
@@ -146,7 +147,6 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "HEMOGRAMA",
     "HEMOGLOBINA",
     "ANALISIS_GLUCOSA_BASAL",
-    "ACIDO_URICO",
     "ANALISIS_TOLERANCIA_GLUCOSA",
     "INMUNOLOGIA_VDRL",
     "INMUNOLOGIA_VIH",
@@ -261,6 +261,7 @@ const ExamenesListLaboratorio = buildExamenesList([
     "CONSENT_PANEL_5D",
     "CONSENT_PANEL_10D",
     "CONSENT_MARIHUANA",
+    "ACIDO_URICO",
     "CONSENT_DROGAS_BOROO",
 
     "INMUNOLOGIA_BK_KOH",
@@ -276,7 +277,6 @@ const ExamenesListLaboratorio = buildExamenesList([
     "HEMOGRAMA",
     "HEMOGLOBINA",
     "ANALISIS_GLUCOSA_BASAL",
-    "ACIDO_URICO",
     "ANALISIS_TOLERANCIA_GLUCOSA",
     "INMUNOLOGIA_VDRL",
     "INMUNOLOGIA_VIH",

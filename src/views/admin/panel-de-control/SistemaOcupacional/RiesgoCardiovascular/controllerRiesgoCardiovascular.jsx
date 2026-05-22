@@ -50,32 +50,27 @@ export const GetInfoServicio = async (
 
             diabetes: rese.diabetes ?? false,
             fuma: rese.fuma ?? false,
-            tensionSistolica: rese.sistolica
-                ? parseInt(rese.sistolica).toString()
-                : "",
+            tensionSistolica: convertirNumero(rese.sistolica),
 
-            tensionDiastolica: rese.diastolica
-                ? parseInt(rese.diastolica).toString()
-                : "",
+            tensionDiastolica: convertirNumero(rese.diastolica),
 
-            colesterolTotal: rese.colesterol
-                ? parseInt(rese.colesterol).toString()
-                : "",
+            colesterolTotal: convertirNumero(rese.colesterol),
 
-            colesterolHdl: rese.hdlColesterol
-                ? parseInt(rese.hdlColesterol).toString()
-                : "",
+            colesterolHdl: convertirNumero(rese.hdlColesterol),
 
-            trigliceridos: rese.trigliseridos
-                ? parseInt(rese.trigliseridos).toString()
-                : "",
+            trigliceridos: convertirNumero(rese.trigliseridos),
 
-            colesterolLdl: rese.ldlColesterol
-                ? parseInt(rese.ldlColesterol).toString()
-                : "",
+            colesterolLdl: convertirNumero(rese.ldlColesterol),
         }));
     }
 };
+
+const convertirNumero = (numero) => {
+    return numero
+        ? Math.round(parseFloat(numero)).toString()
+        : "";
+}
+
 export const GetInfoServicioEditar = async (
     nro,
     tabla,
@@ -115,29 +110,19 @@ export const GetInfoServicioEditar = async (
 
             diabetes: rese.diabetes ?? false,
             fuma: rese.fuma ?? false,
-            tensionSistolica: rese.sistolica
-                ? parseInt(rese.sistolica).toString()
-                : "",
 
-            tensionDiastolica: rese.diastolica
-                ? parseInt(rese.diastolica).toString()
-                : "",
+            tensionSistolica: convertirNumero(rese.sistolica),
 
-            colesterolTotal: rese.colesterol
-                ? parseInt(rese.colesterol).toString()
-                : "",
+            tensionDiastolica: convertirNumero(rese.diastolica),
 
-            colesterolHdl: rese.hdlColesterol
-                ? parseInt(rese.hdlColesterol).toString()
-                : "",
+            colesterolTotal: convertirNumero(rese.colesterol),
 
-            trigliceridos: rese.trigliseridos
-                ? parseInt(rese.trigliseridos).toString()
-                : "",
+            colesterolHdl: convertirNumero(rese.hdlColesterol),
 
-            colesterolLdl: rese.ldlColesterol
-                ? parseInt(rese.ldlColesterol).toString()
-                : "",
+            trigliceridos: convertirNumero(rese.trigliseridos),
+
+            colesterolLdl: convertirNumero(rese.ldlColesterol),
+
             user_medicoFirma: rese.usuarioFirma ? rese.usuarioFirma : prev.user_medicoFirma,
         }));
     }
