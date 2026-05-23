@@ -26,6 +26,7 @@ export const EXAMENES_CONFIG = [
             { label: "Antecedentes Enfermedades Altura", name: "AnteceEnfeAltura", tabla: "antece_enfermedades_altura" },
             { label: "Cert. Altura Basico 1.8", name: "certTrabajoAltura", tabla: "certificacion_medica_altura" },
             { label: "Riesgo Cardiovascular", name: "RiesgoCardio", tabla: "riesgo_cardiovascular" },
+            { label: "Escala Lake Louise", name: "LakeLouise", tabla: "escala_lake_louise" },
             {
                 title: "EXAMENES PODEROSA",
                 items: [

@@ -993,7 +993,7 @@ export const GetInfoServicio = (
           data.cristales = res.laboratorioClinicoAdicionales.sedimientoUrinarioCristales_txtcristalessu ?? "";
           data.pus = res.laboratorioClinicoAdicionales.sedimientoUrinarioPus_txtpussu ?? "";
           data.otrosSedimento = res.laboratorioClinicoAdicionales.sedimientoUrinarioOtros_txtotrossu ?? "";
-
+          data.resultadoAcidoUrico = res.resultadoAcidoUrico
           console.log("DATAAA", data);
           set((prev) => ({ ...prev, ...data }));
         }
