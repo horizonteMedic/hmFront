@@ -71,7 +71,7 @@ export function SubmitHistoriaC(data, sede, token, operacion) {
     espaciosConfinados: data.espaciosConfinados,
     user_registro: data.user_registro,
   };
-
+  console.log(JSON.stringify(body))
   const url = `${URLAzure}/api/v01/ct/registroPacientes/historiaClinicaOcupacional`
   const options = {
     method: 'POST',
@@ -88,6 +88,26 @@ export function SubmitHistoriaC(data, sede, token, operacion) {
   }).then(response => response)
 
 }
+
+export function SubmitHistoriaCMasivo(body, token) {
+
+  const url = `${URLAzure}/api/v01/ct/preNordenOcupacional/registrarLote`
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(body)
+  }
+  return fetch(url, options).then(res => {
+    if (!res.ok) {
+      return res
+    } return res.json()
+  }).then(response => response)
+
+}
+
 
 export function GetHistoriaC(data, sede, token) {
 

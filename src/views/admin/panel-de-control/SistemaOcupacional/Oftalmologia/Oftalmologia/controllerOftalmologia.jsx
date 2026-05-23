@@ -2,6 +2,7 @@ import Swal from "sweetalert2";
 import { getFetch } from "../../../getFetch/getFetch";
 import { SubmitData } from "../model";
 import { handleSubidaMasiva, handleSubirArchivoDefaultSinSellos, ReadArchivosFormDefault } from "../../../../../utils/functionUtils";
+import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 
 //===============Zona Modificación===============
 const obtenerReporteUrl =
@@ -26,7 +27,7 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
             completo: res.completo,
             nomExam: res.nomExam,
             fechaExam: res.fechaOf,
-            fechaNac: res.fechaNac ? convertirFecha(res.fechaNac) : "",
+            fechaNac: res.fechaNac ? formatearFechaCorta(res.fechaNac) : "",
             nombres: res.nombre + " " + res.apellido,
             dni: res.dni,
             empresa: res.empresa,
@@ -343,11 +344,6 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     }
   });
 };
-function convertirFecha(fecha) {
-  if (fecha || fecha === "") return "";
-  const [dia, mes, anio] = fecha.split("-");
-  return `${anio}/${mes.padStart(2, "0")}/${dia.padStart(2, "0")}`;
-}
 
 export const PrintHojaR = (nro, token, tabla) => {
   Loading("Cargando Formato a Imprimir");
@@ -417,25 +413,55 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
   if (!nro) {
     await Swal.fire(
       "Error",
-      "Debe Introducir un Nro de Historia Clinica válido",
+      "Debe Introducir un Nro de Orden válido",
       "error"
     );
     return;
   }
   Loading("Validando datos");
-  getFetch(
-    `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
-    token
-  ).then((res) => {
+
+  try {
+    const res = await getFetch(
+      `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
+      token
+    );
+
     console.log(res);
-    if (res.id === 0) {
-      //No tiene registro previo
-      GetInfoPac(nro, set, token, sede);
-      GetInfoDataOftalmoConObservaciones(nro, set, token);
-    } else {
+    if (res.id !== 0) {
+      //Tiene registro previo
       GetInfoServicio(nro, tabla, set, token);
+      return;
+    } 
+    
+    // VALIDAR SI EL PACIENTE EXISTE
+    const paciente = await getFetch(
+      `/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`,
+      token
+    );
+
+    // NO EXISTE
+    if (!paciente || paciente.error) {
+      await Swal.fire(
+        "Error",
+        "Debe ingresar un Nro de Orden válido",
+        "error"
+      );
+      return;
     }
-  });
+
+    // EXISTE PERO SIN FORMULARIO
+    GetInfoPac(nro, set, token, sede);
+    GetInfoDataOftalmoConObservaciones(nro, set, token);
+
+  } catch (error) {
+    console.error(error);
+
+    await Swal.fire(
+      "Error",
+      "El número de orden no existe",
+      "error"
+    );
+  }
 };
 
 export const GetInfoPac = (nro, set, token, sede) => {
@@ -449,7 +475,7 @@ export const GetInfoPac = (nro, set, token, sede) => {
         set((prev) => ({
           ...prev,
           ...res,
-          fechaNac: convertirFecha(res.fechaNac),
+          fechaNac: formatearFechaCorta(res.fechaNac),
           nombres: res.nombresApellidos,
         }));
       })

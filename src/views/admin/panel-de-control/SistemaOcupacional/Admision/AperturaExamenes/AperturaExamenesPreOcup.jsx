@@ -964,10 +964,14 @@ const AperturaExamenesPreOcup = (props) => {
     }
   }
 
+  const ImportarPreCarga = () => {
+
+  }
+
   return (
     <div >
-      <div className="grid md:grid-cols-2 sm:flex-col gap-5 px-4">
-        <div className="w-full sm:w-full md:w-auto text-lg font-semibold  ">
+      <div className="grid md:grid-cols-7 sm:flex-col gap-2 px-4">
+        <div className="w-full sm:w-full md:w-auto text-lg font-semibold  col-span-3">
           <div className="mb-1 pb-2 flex justify-between">
             <h2 className="text-lg font-bold">Datos</h2>
             {props.tienePermisoEnVista("Admision", "Subida Masiva Examenes Ocupacionales")
@@ -1005,6 +1009,14 @@ const AperturaExamenesPreOcup = (props) => {
               <FontAwesomeIcon icon={faFileImport} className="mr-2" />
               IMPORTAR
             </button>
+            <button
+
+              className='mr-2 flex items-center justify-center border-1 border-orange-500 text-white px-3 py-1 bg-orange-700 mb-1 rounded-md hover:bg-orange-500 hover:text-white focus:outline-none'
+            >
+              <FontAwesomeIcon icon={faFileImport} className="mr-2" />
+              PRECARG
+            </button>
+
             <label htmlFor="apellidos" className="block w-36">G.Sang.:</label>
             <input autoComplete="off"
               type="text"
@@ -1628,7 +1640,7 @@ const AperturaExamenesPreOcup = (props) => {
         </div>
 
         {/* Nueva columna con estructura solicitada */}
-        <div className="w-full sm:w-full mb-4 pl-4">
+        <div className="w-full sm:w-full mb-4 pl-4 col-span-4">
           <div className="flex items-center space-x-2 mb-2">
             <label htmlFor="soloMiSede" className="block w-1/6">Solo mi Sede</label>
             <input autoComplete="off" type="checkbox" id="soloMiSede" name="soloMiSede" className="mr-2 pointer" />

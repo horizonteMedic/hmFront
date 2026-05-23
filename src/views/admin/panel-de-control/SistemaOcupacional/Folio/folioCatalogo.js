@@ -51,12 +51,28 @@ export const EXAMENES_CATALOGO = {
         nomenclaturaSubida: "CAMO",
     },
 
+    CERTIFICADO_ANEXO_02_ADMINISTRATIVO: {
+        nombre: "CERTIFICADO MEDICO OCUPACIONAL ANEXO 02 ADMINISTRATIVO",
+        tabla: "aptitud_medico_ocupacional_agro",
+        url: "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2Camo",
+        esJasper: true,
+        nomenclaturaSubida: "CAMO ADM",
+    },
+
     CERTIFICADO_APTITUD_ANEXO_16: {
         nombre: "CERTIFICADO DE APTITUD ANEXO 16",
         tabla: "certificado_aptitud_medico_ocupacional",
         url: "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16",
         esJasper: true,
         nomenclaturaSubida: "CAMO",
+    },
+
+    CERTIFICADO_APTITUD_ANEXO_16_ADMINISTRATIVO: {
+        nombre: "CERTIFICADO DE APTITUD ANEXO 16 ADMINISTRATIVO",
+        tabla: "certificado_aptitud_medico_ocupacional",
+        url: "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16Camo",
+        esJasper: true,
+        nomenclaturaSubida: "CAMO ADM",
     },
 
     // CERTIFICADO_APTITUD_ANEXO_16: {
@@ -92,10 +108,16 @@ export const EXAMENES_CATALOGO = {
     },
 
     RESUMEN_MEDICO_PODEROSA: {
-        nombre: "RESUMEN MEDICO",
+        nombre: "RESUMEN MEDICO ANEXO 16",
         tabla: "resumen_medico_poderosa",
         url: "/api/v01/ct/anexos/obtenerReporteResumenMedico",
         nomenclaturaSubida: "INFORME EMO",
+    },
+
+    RESUMEN_MEDICO_ANEXO_02: {
+        nombre: "RESUMEN MEDICO ANEXO 02",
+        tabla: "resumen_medico_poderosa_anexo02",
+        url: "/api/v01/ct/anexos/obtenerReporteResumenMedicoAnexo2",
     },
 
     /* =========================
@@ -336,6 +358,13 @@ export const EXAMENES_CATALOGO = {
         tabla: "RIESGO CARDIOVASCULAR",
         nomenclatura: "RIESGO CARDIOVASCULAR",
         esArchivo: true,
+    },
+
+    RIESGO_CARDIOVASCULAR: {
+        nombre: "RIESGO CARDIOVASCULAR",
+        tabla: "riesgo_cardiovascular",
+        url: "/api/v01/ct/riesgoCardiovascular/obtenerReporte",
+        esJasper: true,
     },
 
     RESONANCIA_MAGNETICA_ARCHIVO: {
@@ -940,6 +969,13 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/tamizajeDermatologico/obtenerReporte",
         esJasper: true,
     },
+
+    ESCALA_LAKE_LOUISE: {
+        nombre: "ESCALA DE LAKE LOUISE",
+        tabla: "escala_lake_louise",
+        url: "/api/v01/ct/escalaLakeLouise/obtenerReporte",
+        esJasper: true,
+    }
 };
 
 

@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
 import { GetInfoPacDefault, LoadingDefault, ReadArchivosFormDefault } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
-import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
+import { deleteArchivoPorOrdenNomenclatura, getFetch, SubmitData } from "../../../../utils/apiHelpers";
 import FolioJasper from "../../../../jaspers/FolioJasper/FolioJasper";
 import { ListaPorPlantilla } from "../Folio/Folio";
 
@@ -10,6 +10,35 @@ const GetExamenExterno = `/api/v01/st/registros/detalleUrlArchivos`
 const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta"
 
 export { ListaPorPlantilla };
+
+const sanitizeNombreArchivo = (value) =>
+    String(value ?? "")
+        .replace(/[\\/:*?"<>|]/g, "-")
+        .replace(/\s+/g, " ")
+        .trim();
+
+const buildNombreArchivoRotulado = (form, nomenclatura) => {
+    const apellidos = (form?.apellidos ?? "").trim();
+    const nombres = (form?.nombres ?? form?.nombre ?? "").trim();
+    const nombrePersona = `${apellidos}${apellidos && nombres ? " " : ""}${nombres}`.trim();
+    const nombreArchivo = `${form?.norden}-${nomenclatura}-${nombrePersona}.pdf`;
+    return sanitizeNombreArchivo(nombreArchivo);
+};
+
+const descargarArchivoGenerado = (archivoData, nombreArchivo) => {
+    const blob = archivoData instanceof Blob
+        ? archivoData
+        : new Blob([archivoData], { type: "application/pdf" });
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = nombreArchivo;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+};
 
 export const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
     LoadingDefault("Validando datos");
@@ -82,6 +111,19 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
 export const ReadArchivosForm = async (form, setVisualerOpen, token, nomenclatura = null) => {
     ReadArchivosFormDefault(form, setVisualerOpen, token, nomenclatura)
 }
+
+export const DeleteArchivoGeneradorReportes = async (nOrden, nomenclatura, token) => {
+    if (!nOrden || !nomenclatura) return null;
+    try {
+        LoadingDefault("Eliminando archivo");
+        return await deleteArchivoPorOrdenNomenclatura(nOrden, nomenclatura, token);
+    } catch (error) {
+        console.error("Error al eliminar archivo:", error);
+        return null;
+    } finally {
+        Swal.close();
+    }
+};
 
 export const handleImprimirYSubirMasivo = async (examenes, form, token, selectedSede, userlogued, datosFooter, abortControllerRef, search) => {
     const lista = Array.isArray(examenes) ? examenes.filter((e) => e?.resultado) : [];
@@ -249,33 +291,50 @@ export const handleImprimirYSubir = async (examen, form, token, selectedSede, us
 
         Swal.close();
 
-        // Preguntar si desea subir el archivo
+        const nomenclaturaParaNombre =
+            examen?.nomenclaturaSubida ||
+            examen?.tabla ||
+            examen?.nombre ||
+            "REPORTE";
+
+        const nombreArchivoDefault = buildNombreArchivoRotulado(form, nomenclaturaParaNombre);
+
+        const generado = await Swal.fire({
+            icon: "success",
+            title: "¡Reporte Generado!",
+            html: `
+                <div class="text-gray-700">El reporte se generó correctamente.</div>
+                <div class="mt-2 text-xs text-gray-500">Nombre por defecto:</div>
+                <div class="font-mono text-sm break-all">${nombreArchivoDefault}</div>
+            `,
+            showDenyButton: true,
+            confirmButtonText: "Descargar",
+            denyButtonText: "Continuar",
+        });
+
+        if (generado.isConfirmed) {
+            descargarArchivoGenerado(pdfResult, nombreArchivoDefault);
+        }
+
         const { isConfirmed } = await Swal.fire({
             title: '¿Estás de acuerdo en subir el archivo?',
             text: `El reporte "${examen.nombre}" se subirá al sistema.`,
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Sí, subir',
-            cancelButtonText: 'No, solo imprimir',
+            cancelButtonText: 'No',
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
         });
 
-        if (isConfirmed && examen.nomenclaturaSubida) {
-            const nomenclature = examen.nomenclaturaSubida;
+        if (!isConfirmed) return;
 
-            // Preparar el form para handleSubirArchivoDefaultSinSellos
-            // El componente espera que el archivo esté en form.SubirDoc (que es un booleano en SubidaArchivos)
-            // Pero handleSubirArchivoDefaultSinSellos en realidad abre un selector de archivos si no se le pasa uno.
-            // Necesitamos una forma de pasarle los bytes directamente.
-
-            // Revisemos handleSubirArchivoDefaultSinSellos en functionUtils.js
-            await subirArchivoDirecto(pdfResult, form, nomenclature, selectedSede, userlogued, token, search);
-        }
-        if (!examen.nomenclaturaSubida) {
+        if (!examen?.nomenclaturaSubida) {
             Swal.fire('Error', 'El examen no tiene nomenclatura subida.', 'error');
             return;
         }
+
+        await subirArchivoDirecto(pdfResult, form, examen.nomenclaturaSubida, selectedSede, userlogued, token, search);
 
     } catch (error) {
         if (error.name === 'AbortError') return;
@@ -306,7 +365,7 @@ async function subirArchivoDirecto(pdfData, form, nomenclature, selectedSede, us
         });
 
         const pdfBase64Final = await base64Promise;
-        const nombreArchivo = `${form.norden}-${nomenclature}-${form.apellidos ?? ""} ${form.nombre ?? ""}.pdf`;
+        const nombreArchivo = buildNombreArchivoRotulado(form, nomenclature);
 
         const currentDate = new Date();
         const year = currentDate.getFullYear();

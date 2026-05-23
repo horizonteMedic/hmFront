@@ -55,6 +55,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "certificado_aptitud_cuadrador",
         "ficha_datos_paciente",
         "tamizaje_dermatologico",
+        "escala_lake_louise",
+        "riesgo_cardiovascular",
     ]
     const coordenadasPSICOSENSO = {
         HUELLA: { x: 400, y: 680, width: 60, height: 60 },
@@ -98,7 +100,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "anexo16a",
         "ac_coproparasitologico",
         "examen_inmunologico", //NUEVO
-        "informe_psicologico"
+        "informe_psicologico",
+        "aptitud_medico_ocupacional_agro",
     ]
 
     const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true && ex.imprimir === true);

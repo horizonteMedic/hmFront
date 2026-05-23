@@ -398,7 +398,7 @@ export default async function Aptitud_medico_resumen_Digitalizado(data = {}, doc
 
   // Tabla de opciones de aptitud — 4 filas de 5mm = 20mm total
   const filaH = 5;
-  const numFilas = 4;
+  const numFilas = 5;
   const alturaTotalTabla = filaH * numFilas; // 20mm
   const mitadTabla = tablaAncho / 2;
   const columnaX = 10; // ancho columna del checkbox
@@ -430,10 +430,11 @@ export default async function Aptitud_medico_resumen_Digitalizado(data = {}, doc
 
   // ── Contenido filas ───────────────────────────────────────────
   const filas = [
-    { label: "APTO (para el puesto en el que trabaja o postula)", key: "apto" },
-    { label: "APTO CON RESTRICCIÓN (para el puesto en el que trabaja o postula)", key: "aptoconrestriccion" },
-    { label: "NO APTO (para el puesto en el que trabaja o postula)", key: "noapto" },
-    { label: "EVALUADO", key: "evaluado" },
+    { label: "APTO (para el puesto en el que trabaja o postula)", key: "esAptoAnexo" },
+    { label: "APTO CON RESTRICCIÓN (para el puesto en el que trabaja o postula)", key: "aptoConRestriccionAnexo" },
+    { label: "NO APTO (para el puesto en el que trabaja o postula)", key: "noAptoAnexo" },
+    { label: "CON OBSERVACION", key: "conObservacionAnexo" },
+    { label: "EVALUADO", key: "evaluadoAnexo" },
   ];
 
   doc.setFont("helvetica", "normal").setFontSize(7);

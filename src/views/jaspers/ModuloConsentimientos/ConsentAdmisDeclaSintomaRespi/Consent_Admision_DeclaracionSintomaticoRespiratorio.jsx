@@ -249,7 +249,7 @@ export default async function ConsentAdmisionDeclaracionSintomaticoRespiratorio(
   // Tercera línea: "Trujillo, [día] de [mes] de 2025." (bajada 15mm)
   yPos += 15;
   doc.setFont("helvetica", "normal");
-  const texto3 = `Trujillo, ${dia} de ${mes} 2025.`;
+  const texto3 = `Trujillo, ${formatearFechaLarga(data?.fechaRegistro ?? "") ?? ""}.`;
   doc.text(texto3, margin, yPos);
   yPos += 20;
 

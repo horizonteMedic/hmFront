@@ -175,6 +175,7 @@ export const GetPlantillaPorNorden = async (
                             fechaExamen: formatearFechaCorta(resu.fechaApertura),
                             fechaCorreo: formatearFechaCorta(getToday()),
                             listaAdjuntos: listarArchivos(newArchivos) ?? "",
+                            telefonoPaciente: resu.telefonoPaciente ?? "",
                             nombreUsuario: userName ?? "",
                         }
                         // console.log({ palabrasReemplazo })

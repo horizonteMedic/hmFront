@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBroom, faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faBroom, faDownload, faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { InputTextOneLine } from "../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
@@ -109,6 +109,20 @@ export default function EliminarExamenes() {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+
+            <div className="flex justify-end">
+                <button className="bg-primario py-2 px-3 text-white rounded-xl ">
+                    <a href="/MANUAL-DE-ELIMINAR-EXAMANES.pdf"
+                        download="MANUAL-DE-ELIMINAR-EXAMANES.pdf"
+                        className="flex gap-x-4 justify-center items-center">
+                        <FontAwesomeIcon
+                            icon={faDownload}
+                        />
+                        <span className="download-button-text">Descargar Manual de Eliminar Exámenes</span>
+                    </a>
+                </button>
+            </div>
+
             {/* Búsqueda */}
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
                 <InputTextOneLine

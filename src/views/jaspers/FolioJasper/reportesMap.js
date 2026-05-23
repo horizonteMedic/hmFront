@@ -19,7 +19,7 @@ import InformeElectrocardiograma2023 from "../EKG/InformeElectrocardiograma2023"
 import InformeElectrocardiograma_Digitalizado from "../EKG/InformeElectrocardiograma_Digitalizado";
 import OIT_Digitalizado from "../OIT/OIT_Digitalizado";
 import Aptitud_medico_resumen_Digitalizado from "../CertificadoMedicoOcupacional/Aptitud_medico_resumen_Digitalizado";
-import Aptitud_AgroindustrialH from "../Ficha_Anexo2/Aptitud_Agroindustrial";
+import Aptitud_Agroindustrial from "../Ficha_Anexo2/Aptitud_Agroindustrial";
 import InformePsicologico_Anexo02_Nuevo from "../Anexo2/Anexo2";
 import Certificacion_suficiencia_trabajos_en_altura_boro_Digitalizado from "../CertificadoAltura/Certificacion_suficiencia_trabajos_en_altura_boro_Digitalizado";
 import Aptitud_Poderosa_Digitalizado from "../AptitupAlturaPoderosa/Aptitud_Poderosa_Digitalizado";
@@ -117,6 +117,11 @@ import ETANOLSALIVA from "../Toxicologia/ETANOLSALIVA";
 import CertificadoAptitudCuadrador_Digitalizado from "../Poderosa/CertificadoAptitudCuadrador";
 import Informe_Ocu_DatosPacientes from "../FichaDatosPersonales/Informe_Ocu_DatosPacientes";
 import TamizajeDermatologico from "../TamizajeDermatologico/TamizajeDermatologico";
+import CAMO_Administrativo16 from "../CAMOAdmin/CAMO_Administrativo16";
+import CAMO_Administrativo2 from "../CAMOAdmin/CAMO_Administrativo2";
+import EscalaLakeLouise from "../EscalaLakeLouise/EscalaLakeLouise";
+import RiesgoCardiovascular from "../RiesgoCardiovascular/RiesgoCardiovascular";
+import ResumenMedicoAnexo2 from "../Ficha_Anexo2/ResumenMedico/ResumenMedicoAnexo2";
 
 export const reportesMap = {
    /* =========================
@@ -138,11 +143,15 @@ export const reportesMap = {
       ficha_antecedente_patologico_boro
    },
 
-   aptitud_medico_ocupacional_agro: Aptitud_AgroindustrialH,
+   aptitud_medico_ocupacional_agro: {
+      Aptitud_Agroindustrial,
+      CAMO_Administrativo2
+   },
 
    certificado_aptitud_medico_ocupacional: {
       Aptitud_medico_ocupacional_11,
-      Aptitud_medico_ocupacional_F
+      Aptitud_medico_ocupacional_F,
+      CAMO_Administrativo16
    }, //son 2 jaspers
 
    certificado_aptitud_medico_resumen: Aptitud_medico_resumen_Digitalizado,
@@ -157,6 +166,8 @@ export const reportesMap = {
       ResumenAnexo7C_OHLA_Digitalizado,
       ResumenAnexo7CP_Digitalizado
    },
+
+   resumen_medico_poderosa_anexo02: ResumenMedicoAnexo2,
 
    /* =========================
       ALTURA / VEHÍCULOS
@@ -385,5 +396,9 @@ export const reportesMap = {
    certificado_aptitud_cuadrador: CertificadoAptitudCuadrador_Digitalizado,
 
    ficha_datos_paciente: Informe_Ocu_DatosPacientes,
+
+   escala_lake_louise: EscalaLakeLouise,
+
+   riesgo_cardiovascular: RiesgoCardiovascular,
 
 };

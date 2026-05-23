@@ -3,17 +3,20 @@ import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
 import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
-import { GetInfoPac, handleImprimirYSubir, handleImprimirYSubirMasivo, ReadArchivosForm } from "./controllerGeneradorReportes";
+import { DeleteArchivoGeneradorReportes, GetInfoPac, handleImprimirYSubir, handleImprimirYSubirMasivo, ReadArchivosForm } from "./controllerGeneradorReportes";
 import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
 import BotonesAccion from "../../../../components/templates/BotonesAccion";
 import { buildExamenesList } from "../Folio/folioCatalogo";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownload } from "@fortawesome/free-solid-svg-icons";
+import { faDownload, faTrash } from "@fortawesome/free-solid-svg-icons";
+import Swal from "sweetalert2";
 
 const ExamenesListCOMPLETO = buildExamenesList([
     "CERTIFICADO_ANEXO_02",
     "CERTIFICADO_APTITUD_ANEXO_16",
+    "CERTIFICADO_ANEXO_02_ADMINISTRATIVO",
+    "CERTIFICADO_APTITUD_ANEXO_16_ADMINISTRATIVO",
     "RESUMEN_MEDICO_PODEROSA",
     "FICHA_DATOS_PACIENTE",
     "CERTIFICADO_VEHICULOS"
@@ -29,6 +32,7 @@ export default function GeneradorReportes() {
     const [selectedListType, setSelectedListType] = useState("COMPLETO");
     const [showOnlyPassed, setShowOnlyPassed] = useState(false);
     const [bulkRunning, setBulkRunning] = useState(false);
+    const [deletingNomenclatura, setDeletingNomenclatura] = useState(null);
 
     const [visualerOpen, setVisualerOpen] = useState(null)
 
@@ -73,6 +77,55 @@ export default function GeneradorReportes() {
         await GetInfoPac(form.norden, setForm, token, selectedSede, currentList);
     }
 
+    const handleDeleteArchivo = async (nomenclatura) => {
+        if (!form?.norden || !nomenclatura) return;
+
+        const decision = await Swal.fire({
+            title: "¿Eliminar archivo?",
+            html: `
+                <div class="text-sm text-gray-700">
+                    Se eliminará el archivo con nomenclatura:
+                </div>
+                <div class="mt-2 font-mono text-sm break-all">${String(nomenclatura)}</div>
+                <div class="mt-2 text-xs text-gray-500">N° Orden: ${String(form.norden)}</div>
+            `,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar",
+            confirmButtonColor: "#d33",
+        });
+
+        if (!decision.isConfirmed) return;
+
+        setDeletingNomenclatura(nomenclatura);
+        try {
+            const response = await DeleteArchivoGeneradorReportes(form.norden, nomenclatura, token);
+            const ok =
+                response?.id === 1 ||
+                response?.id === "1" ||
+                response?.codigo === 200 ||
+                response?.codigo === 201 ||
+                response?.ok === true;
+
+            if (!ok) {
+                const message =
+                    response?.mensaje ||
+                    response?.message ||
+                    response?.statusText ||
+                    "No se pudo eliminar el archivo.";
+                await Swal.fire("Error", message, "error");
+                return;
+            }
+
+            await Swal.fire("Eliminado", "El archivo fue eliminado correctamente.", "success");
+            setVisualerOpen(null);
+            await search();
+        } finally {
+            setDeletingNomenclatura(null);
+        }
+    };
+
     const handleGenerarMasivo = async () => {
         if (bulkRunning) return;
         const examenesParaGenerar = (form.listaExamenes ?? []).filter((e) => e?.resultado);
@@ -110,7 +163,7 @@ export default function GeneradorReportes() {
             }));
         }
     };
-
+    console.log(form.listaExamenes)
     return (
         <div className="w-full space-y-3 px-4 max-w-[95%] mx-auto">
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -190,11 +243,11 @@ export default function GeneradorReportes() {
                                         {index + 1}.- {examen.nombre}
                                     </span>
 
-                                    <div className="flex items-center gap-2 mt-1">
-                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${examen.resultado ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                                    <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full mx-auto  ${examen.resultado ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
                                             {examen.resultado ? "REALIZADO" : "PENDIENTE"}
                                         </span>
-                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
+                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full mx-auto bg-gray-100 text-gray-700">
                                             {examen.urlArchivo ? "SUBIDO" : "NO SUBIDO"}
                                         </span>
                                         <ButtonsPDF
@@ -205,6 +258,20 @@ export default function GeneradorReportes() {
                                             Nombre_1={`Subir archivo`}
                                             Nombre_2={`Ver archivo`}
                                         />
+                                        {examen.urlArchivo && examen.resultado && (
+                                            <button
+                                                type="button"
+                                                onClick={() => handleDeleteArchivo(examen.nomenclaturaSubida)}
+                                            disabled={!examen.urlArchivo || deletingNomenclatura === examen.nomenclaturaSubida}
+                                            className={`text-white text-base px-4 py-2 rounded flex items-center justify-center gap-2 transition-all duration-150 ease-out ${!examen.urlArchivo || deletingNomenclatura === examen.nomenclaturaSubida
+                                                ? "bg-gray-400 cursor-not-allowed opacity-70"
+                                                : "bg-red-600 hover:bg-red-700 hover:shadow-lg active:scale-95 active:shadow-inner"
+                                                }`}
+                                        >
+                                            <FontAwesomeIcon icon={faTrash} />
+                                            Eliminar
+                                        </button>
+                                        )}
                                     </div>
                                 </div>
 
@@ -216,7 +283,7 @@ export default function GeneradorReportes() {
                                     disabled={!examen.resultado}
                                     onClick={() => handleImprimirYSubir(examen, form, token, selectedSede, userlogued, datosFooter, abortControllerRef, search)}
                                 >
-                                    Imprimir y Subir
+                                    Generar
                                 </button>
                             </div>
                         );

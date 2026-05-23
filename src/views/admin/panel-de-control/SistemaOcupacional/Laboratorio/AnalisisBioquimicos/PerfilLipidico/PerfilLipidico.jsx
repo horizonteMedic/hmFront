@@ -156,6 +156,22 @@ export default function PerfilLipidico() {
             onChange={handleChangeNumberDecimals}
             onKeyUp={handleSearch}
           />
+          <button
+            onClick={() => {
+              setForm(prev => {
+                const norden = parseInt(prev.norden);
+                if (isNaN(norden) || norden >= 1000000 ) {
+                  return prev;
+                }
+                return (
+                  {
+                    ...prev,
+                    norden: (norden + 1000000).toString()
+                  })
+              })
+            }}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md max-w-[120px]"
+          >Es Legacy</button>
           <InputTextOneLine
             label="Fecha"
             name="fecha"
@@ -167,10 +183,8 @@ export default function PerfilLipidico() {
             label="Nombre Examen"
             name="nombreExamen"
             value={form.nombreExamen}
-            className='col-span-2'
             onChange={handleChangeNumberDecimals}
           />
-
         </SectionFieldset>
         <SectionFieldset legend="Datos Personales" collapsible className="grid lg:grid-cols-2 gap-3 lg:gap-4">
           <InputTextOneLine

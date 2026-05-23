@@ -40,7 +40,7 @@ export default async function Aptitud_AgroindustrialH(data = {}, docExistente = 
     conclusiones: data.conclusiones ?
       [...new Set(data.conclusiones.split('\n').filter(rec => rec.trim() !== ''))] : [],
     // Datos de aptitud
-    apto: data.apto ? "APTO" : data?.noApto ? "NO APTO" : data.aptoConRestriccion ? "APTO CON RESTRICCIÓN" : "", //revisar - el JSON tiene boolean, necesita conversión
+    apto: data.apto ? "APTO" : data?.noApto ? "NO APTO" : data.aptoConRestriccion ? "APTO CON RESTRICCIÓN" : data.conObservacion ? "OBSERVACION" : data.evaluado ? "EVALUADO" : "", //revisar - el JSON tiene boolean, necesita conversión
     restricciones: data.restriccionesDescripcion ?
       [...new Set(data.restriccionesDescripcion.split('\n').filter(rec => rec.trim() !== ''))].join('\n') : "",
     recomendaciones: data.recomendaciones
@@ -67,13 +67,17 @@ export default async function Aptitud_AgroindustrialH(data = {}, docExistente = 
   const getAptitudCheckbox = (apto) => {
     switch (apto) {
       case "APTO":
-        return { apto: true, aptoConRestriccion: false, noApto: false };
+        return { apto: true, aptoConRestriccion: false, noApto: false, conObservacion: false, evaluado: false };
       case "APTO CON RESTRICCIÓN":
-        return { apto: false, aptoConRestriccion: true, noApto: false };
+        return { apto: false, aptoConRestriccion: true, noApto: false, conObservacion: false, evaluado: false };
       case "NO APTO":
-        return { apto: false, aptoConRestriccion: false, noApto: true };
+        return { apto: false, aptoConRestriccion: false, noApto: true, conObservacion: false, evaluado: false };
+      case "OBSERVACION":
+        return { apto: false, aptoConRestriccion: false, noApto: false, conObservacion: true, evaluado: false };
+      case "EVALUADO":
+        return { apto: false, aptoConRestriccion: false, noApto: false, conObservacion: false, evaluado: true };
       default:
-        return { apto: false, aptoConRestriccion: false, noApto: false };
+        return { apto: false, aptoConRestriccion: false, noApto: false, conObservacion: false, evaluado: false };
     }
   };
 
@@ -555,21 +559,26 @@ export default async function Aptitud_AgroindustrialH(data = {}, docExistente = 
   doc.rect(tablaAptitudInicioX, tablaAptitudInicioY, tablaAptitudAncho, alturaTablaAptitud);
 
   // Líneas verticales
-  doc.line(tablaAptitudInicioX + 85, tablaAptitudInicioY, tablaAptitudInicioX + 85, tablaAptitudInicioY + (3 * filaAptitudAltura)); // División principal solo hasta la tercera fila
+  doc.line(
+    tablaAptitudInicioX + 85,
+    tablaAptitudInicioY,
+    tablaAptitudInicioX + 85,
+    tablaAptitudInicioY + (5 * filaAptitudAltura)
+  ); // División principal solo hasta la tercera fila
   doc.line(tablaAptitudInicioX + 95, tablaAptitudInicioY, tablaAptitudInicioX + 95, tablaAptitudInicioY + alturaBloqueSuperior + alturaFirma); // División para checkboxes hasta la línea de fecha
 
 
 
 
   // Líneas horizontales
-  for (let i = 1; i <= 2; i++) {
+  for (let i = 1; i <= 4; i++) {
     const y = tablaAptitudInicioY + (i * filaAptitudAltura);
     // Primeras 2 líneas horizontales solo hasta la mitad (división vertical principal)
     doc.line(tablaAptitudInicioX, y, tablaAptitudInicioX + 95, y);
   }
 
   // Tercera línea horizontal (debajo de NO APTO) que llega hasta la división vertical
-  const yTerceraFila = tablaAptitudInicioY + (3 * filaAptitudAltura);
+  const yTerceraFila = tablaAptitudInicioY + (5 * filaAptitudAltura);
   doc.line(tablaAptitudInicioX, yTerceraFila, tablaAptitudInicioX + 95, yTerceraFila);
 
   // Línea horizontal "mitad" - base para restricciones (se mueve dinámicamente según altura de restricciones)
@@ -650,6 +659,34 @@ export default async function Aptitud_AgroindustrialH(data = {}, docExistente = 
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("NO APTO (para el puesto en el que trabaja o postula)", tablaAptitudInicioX + 2, yAptitud + 4);
   }
+  yAptitud += filaAptitudAltura;
+
+  if (aptitudCheckboxes.conObservacion) {
+    doc.setTextColor(255, 165, 0); // Color naranja
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("CON OBSERVACION", tablaAptitudInicioX + 2, yAptitud + 4);
+    doc.setFont("helvetica", "bold").setFontSize(12);
+    doc.text("X", tablaAptitudInicioX + 89, yAptitud + 4);
+    doc.setTextColor(0, 0, 0);
+  } else {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("CON OBSERVACION", tablaAptitudInicioX + 2, yAptitud + 4);
+  }
+  yAptitud += filaAptitudAltura;
+
+  // Quinta fila: EVALUADO
+  if (aptitudCheckboxes.evaluado) {
+    doc.setTextColor(128, 0, 128); // Color morado
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("EVALUADO", tablaAptitudInicioX + 2, yAptitud + 4);
+    doc.setFont("helvetica", "bold").setFontSize(12);
+    doc.text("X", tablaAptitudInicioX + 89, yAptitud + 4);
+    doc.setTextColor(0, 0, 0);
+  } else {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("EVALUADO", tablaAptitudInicioX + 2, yAptitud + 4);
+  }
+
   yAptitud += filaAptitudAltura;
 
   // Cuarta fila: RECOMENDACIONES

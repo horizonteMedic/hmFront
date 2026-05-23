@@ -861,7 +861,7 @@ export const GetInfoServicio = (
 
           // electroCardiograma();=======================
           const hallazgoEKG = res.hallazgosInformeElectroCardiograma_hallazgo ?? "";
-          const conclusionesEkg = res.conclusionekg;
+          const conclusionesEkg = res.conclusionesEkg;
           const recomendacionesEKG = res.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
 
           if (
@@ -872,11 +872,11 @@ export const GetInfoServicio = (
           }
 
           // cargarAnalisisB();=======================
-          data.colesterolTotal = res.colesterol_txtcolesterol ?? "";
-          data.LDLColesterol = res.ldlColesterol_txtldlcolesterol ?? "";
-          data.HDLColesterol = res.hdlColesterol_txthdlcolesterol ?? "";
-          data.VLDLColesterol = res.vldlColesterol_txtvldlcolesterol ?? "";
-          data.trigliceridos = res.trigliseridos_txttrigliseridos ?? "";
+          data.colesterolTotal = res.colesterolAnalisisBioquimico_txtcolesterol ?? "";
+          data.LDLColesterol = res.ldlcolesterolAnalisisBioquimico_txtldlcolesterol ?? "";
+          data.HDLColesterol = res.hdlcolesterolAnalisisBioquimico_txthdlcolesterol ?? "";
+          data.VLDLColesterol = res.vldlcolesterolAnalisisBioquimico_txtvldlcolesterol ?? "";
+          data.trigliceridos = res.trigliceridosAnalisisBioquimico_txttrigliceridos ?? "";
           const ct = parseFloat(data.colesterolTotal);
           const ldl = parseFloat(data.LDLColesterol) || 0;
           const hdl = parseFloat(data.HDLColesterol) || 0;
@@ -945,7 +945,7 @@ export const GetInfoServicio = (
             data.ldlcolesterolAnalisisBioquimico_txtldlcolesterol = res.ldlcolesterolAnalisisBioquimico_txtldlcolesterol ?? "",
             data.hdlcolesterolAnalisisBioquimico_txthdlcolesterol = res.hdlcolesterolAnalisisBioquimico_txthdlcolesterol ?? "",
             data.vldlcolesterolAnalisisBioquimico_txtvldlcolesterol = res.vldlcolesterolAnalisisBioquimico_txtvldlcolesterol ?? "",
-            data.trigliseridosAnalisisBioquimico_txttrigliseridos = res.trigliseridosAnalisisBioquimico_txttrigliseridos ?? "",
+            data.trigliseridosAnalisisBioquimico_txttrigliseridos = res.trigliceridosAnalisisBioquimico_txttrigliceridos ?? "",
 
             data.creatininaPerfilRenal = res.creatininaPerfilRenal ?? "",
             data.ureaSericaPerfilRenal = res.ureaSericaPerfilRenal ?? "",
@@ -1576,7 +1576,7 @@ export const GetInfoServicioEditar = (
 
           // electroCardiograma();=======================
           const hallazgoEKG = res.hallazgosInformeElectroCardiograma_hallazgo;
-          const conclusionesEkg = res.conclusionekg;
+          const conclusionesEkg = res.conclusionesEkg;
           const recomendacionesEKG = res.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
 
           if (
@@ -1589,11 +1589,11 @@ export const GetInfoServicioEditar = (
           //FIN==============
 
           // cargarAnalisisB();=======================
-          data.colesterolTotal = res.colesterol_txtcolesterol ?? "";
-          data.LDLColesterol = res.ldlColesterol_txtldlcolesterol ?? "";
-          data.HDLColesterol = res.hdlColesterol_txthdlcolesterol ?? "";
-          data.VLDLColesterol = res.vldlColesterol_txtvldlcolesterol ?? "";
-          data.trigliceridos = res.trigliseridos_txttrigliseridos ?? "";
+          data.colesterolTotal = res.colesterolAnalisisBioquimico_txtcolesterol ?? "";
+          data.LDLColesterol = res.ldlcolesterolAnalisisBioquimico_txtldlcolesterol ?? "";
+          data.HDLColesterol = res.hdlcolesterolAnalisisBioquimico_txthdlcolesterol ?? "";
+          data.VLDLColesterol = res.vldlcolesterolAnalisisBioquimico_txtvldlcolesterol ?? "";
+          data.trigliceridos = res.trigliceridosAnalisisBioquimico_txttrigliceridos ?? "";
           const ct = parseFloat(data.colesterolTotal);
           const ldl = parseFloat(data.LDLColesterol) || 0;
           const hdl = parseFloat(data.HDLColesterol) || 0;

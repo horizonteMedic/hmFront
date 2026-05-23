@@ -57,6 +57,7 @@ export default function InformePsicologico() {
 
         infosencilla: false,
         infogeneral: false,
+        infodificultad: false,
 
         compInfo: false,
         // compBajo: false,
@@ -65,9 +66,11 @@ export default function InformePsicologico() {
         promVerbalNum: false,
         promSupVerbalNum: false,
         promBajoVerbalNum: false,
+        bajoVerbalNum: false,
 
         adecuado: false,
         prmBajo: false,
+        inadecuado: false,
 
         // Área de Personalidad
         areaPersonalidad: "",
@@ -75,15 +78,18 @@ export default function InformePsicologico() {
         // Área de Psicomotricidad
         areaPsicomotricidad: "",
         nivAdecuadoPs: false,
+        nivBajoPs: false,
 
         facilidad: false,
         dificultad: false,
+        sencilla: false,
 
         // Área de Organicidad
         areaOrganicidad: "",
         orientadoTiempo: false,
 
         adecuadoManejo: false,
+        promBajoManejo: false,
         bajoManejo: false,
 
         noEnvidencia: false,
@@ -146,12 +152,12 @@ export default function InformePsicologico() {
 
     // Definición de grupos de checkboxes del área intelectual
     const intellectualGroups = {
-        nivelIntelectual: ['intelectualSuperior', 'intelectualPromedio', 'intelectualPromedioSuperior', 'intelectualPromedioBajo'],
-        facilidadDificultad: ['infosencilla', 'infogeneral'],
-        capacidadNumerica: ['supVerbalNum', 'promVerbalNum', 'promSupVerbalNum', 'promBajoVerbalNum'],
-        nivelPsicomotor: ['promSuperior', 'promedio', 'superior', 'promBajo'],
+        nivelIntelectual: ['intelectualSuperior', 'intelectualPromedio', 'intelectualPromedioSuperior', 'intelectualPromedioBajo', 'intelectualBajo'],
+        facilidadDificultad: ['infosencilla', 'infogeneral', 'infodificultad'],
+        capacidadNumerica: ['supVerbalNum', 'promVerbalNum', 'promSupVerbalNum', 'promBajoVerbalNum', 'bajoVerbalNum'],
+        nivelPsicomotor: ['promSuperior', 'promedio', 'superior', 'promBajo', 'bajo'],
         nivelAtencion: ['compInfo'], //, 'compBajo'
-        retencionDigitos: ['adecuado', 'prmBajo']
+        retencionDigitos: ['adecuado', 'prmBajo', 'inadecuado']
     };
 
     // Textos específicos para cada checkbox
@@ -160,25 +166,30 @@ export default function InformePsicologico() {
         intelectualPromedio: "- EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO.",
         intelectualPromedioSuperior: "- EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO SUPERIOR.",
         intelectualPromedioBajo: "- EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO BAJO.",
+        intelectualBajo: "- EL EVALUADO POSEE UN NIVEL INTELECTUAL BAJO.",
 
         infosencilla: "- COMPRENDE Y PROCESA LA INFORMACION SENCILLA CON FACILIDAD.",
         infogeneral: "- COMPRENDE Y PROCESA LA INFORMACION CON FACILIDAD.",
+        infodificultad: "- COMPRENDE Y PROCESA LA INFORMACION CON DIFICULTAD.",
 
         supVerbalNum: "- POSEE UN NIVEL SUPERIOR EN COMPRENSION VERBAL Y EN CAPACIDAD NUMÉRICA.",
         promVerbalNum: "- POSEE UN NIVEL PROMEDIO EN COMPRENSION VERBAL Y EN CAPACIDAD NUMÉRICA.",
         promSupVerbalNum: "- POSEE UN NIVEL PROMEDIO SUPERIOR EN COMPRENSION VERBAL Y EN CAPACIDAD NUMÉRICA.",
         promBajoVerbalNum: "- POSEE UN NIVEL PROMEDIO BAJO EN COMPRENSION VERBAL Y EN CAPACIDAD NUMÉRICA.",
+        bajoVerbalNum: "- POSEE UN NIVEL BAJO EN COMPRENSION VERBAL Y EN CAPACIDAD NUMÉRICA.",
 
         promSuperior: "- POSEE UN NIVEL PROMEDIO SUPERIOR EN COMPRENSION VERBAL Y EN CAPACIDAD DE CÁLCULO.",
         promedio: "- POSEE UN NIVEL PROMEDIO EN COMPRENSION VERBAL Y EN CAPACIDAD DE CÁLCULO.",
         superior: "- POSEE UN NIVEL SUPERIOR EN COMPRENSION VERBAL Y EN CAPACIDAD DE CÁLCULO.",
         promBajo: "- POSEE UN NIVEL PROMEDIO BAJO EN COMPRENSION VERBAL Y EN CAPACIDAD DE CÁLCULO.",
+        bajo: "- POSEE UN NIVEL BAJO EN COMPRENSION VERBAL Y EN CAPACIDAD DE CÁLCULO.",
 
         compInfo: "- COMPRENDE Y PROCESA LA INFORMACION SENCILLA CON FACILIDAD.",
         // compBajo: "- POSEE UN NIVEL PROMEDIO BAJO EN EL MANEJO DE FACULTADES MENTALES.",
 
         adecuado: "- ADECUADA RETENCION DE DIGITOS.",
-        prmBajo: "- PRESENTA UN NIVEL PROMEDIO BAJO RETENCION DE DIGITOS."
+        prmBajo: "- PRESENTA UN NIVEL PROMEDIO BAJO RETENCION DE DIGITOS.",
+        inadecuado: "- INADECUADA, RETENCIÓN DE DIGITOS."
     };
 
     // Configuración de grupos y textos para todas las áreas
@@ -190,13 +201,14 @@ export default function InformePsicologico() {
         },
         organicidad: {
             groups: {
-                manejoFacultades: ['adecuadoManejo', 'bajoManejo'],
+                manejoFacultades: ['adecuadoManejo', 'promBajoManejo', 'bajoManejo'],
                 orientacion: ['orientadoTiempo'],
                 danoOrganico: ['noEnvidencia']
             },
             texts: {
                 adecuadoManejo: '- POSEE UN ADECUADO MANEJO DE FACULTADES MENTALES.',
-                bajoManejo: '- POSEE UN NIVEL PROMEDIO BAJO EN EL MANEJO DE FACULTADES MENTALES.',
+                promBajoManejo: '- POSEE UN NIVEL PROMEDIO BAJO EN EL MANEJO DE FACULTADES MENTALES.',
+                bajoManejo: '- POSEE UN BAJO MANEJO DE FACULTADES MENTALES.',
                 orientadoTiempo: '- ORIENTADO EN TIEMPO, ESPACIO, Y PERSONA.',
                 noEnvidencia: '- NO SE EVIDENCIA DAÑO ORGÁNICO.'
             },
@@ -204,13 +216,15 @@ export default function InformePsicologico() {
         },
         psicomotricidad: {
             groups: {
-                nivel: ['nivAdecuado'],
-                facilidad: ['facilidad', 'dificultad']
+                nivel: ['nivAdecuado', 'nivBajoPs'],
+                facilidad: ['facilidad', 'dificultad', 'sencilla']
             },
             texts: {
                 nivAdecuado: '- NIVEL ADECUADO EN DESARROLLO PSICOMOTOR.',
+                nivBajoPs: '- NIVEL BAJO EN DESARROLLO PSICOMOTOR.',
                 facilidad: '- REALIZA LAS INSTRUCCIONES BRINDADAS CON FACILIDAD',
-                dificultad: '- REALIZA LAS INSTRUCCIONES BRINDADAS CON DIFICULTAD.'
+                dificultad: '- REALIZA LAS INSTRUCCIONES BRINDADAS CON DIFICULTAD.',
+                sencilla: '- REALIZA LAS INSTRUCCIONES SENCILLAS BRINDADAS CON FACILIDAD.'
             },
             fieldName: 'areaPsicomotricidad'
         }
@@ -488,6 +502,12 @@ export default function InformePsicologico() {
                                         checked={form.intelectualPromedioBajo}
                                         onChange={handleIntellectualCheckboxChange}
                                     />
+                                    <InputCheckbox
+                                        label="BAJO"
+                                        name="intelectualBajo"
+                                        checked={form.intelectualBajo}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
                                 </SectionFieldset>
                                 <SectionFieldset >
                                     <InputCheckbox
@@ -500,6 +520,12 @@ export default function InformePsicologico() {
                                         label="INFORMACION GENERAL"
                                         name="infogeneral"
                                         checked={form.infogeneral}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="DIFICULTAD"
+                                        name="infodificultad"
+                                        checked={form.infodificultad}
                                         onChange={handleIntellectualCheckboxChange}
                                     />
                                 </SectionFieldset>
@@ -528,6 +554,12 @@ export default function InformePsicologico() {
                                         checked={form.promBajoVerbalNum}
                                         onChange={handleIntellectualCheckboxChange}
                                     />
+                                    <InputCheckbox
+                                        label="N.B.VERBAL Y NUMÉRICA"
+                                        name="bajoVerbalNum"
+                                        checked={form.bajoVerbalNum}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
                                 </SectionFieldset>
                                 <SectionFieldset>
                                     <InputCheckbox
@@ -552,6 +584,12 @@ export default function InformePsicologico() {
                                         label="N.P.B.VERBAL Y CÁLCULO"
                                         name="promBajo"
                                         checked={form.promBajo}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="N.B.VERBAL Y CÁLCULO"
+                                        name="bajo"
+                                        checked={form.bajo}
                                         onChange={handleIntellectualCheckboxChange}
                                     />
                                 </SectionFieldset>
@@ -582,6 +620,12 @@ export default function InformePsicologico() {
                                         checked={form.prmBajo}
                                         onChange={handleIntellectualCheckboxChange}
                                     />
+                                    <InputCheckbox
+                                        label="INADECUADA"
+                                        name="inadecuado"
+                                        checked={form.inadecuado}
+                                        onChange={handleIntellectualCheckboxChange}
+                                    />
                                 </SectionFieldset>
                             </div>
                         </div>
@@ -603,6 +647,12 @@ export default function InformePsicologico() {
                                         label="ADECUADO MANEJO DE FACULTADES MENTALES"
                                         name="adecuadoManejo"
                                         checked={form.adecuadoManejo}
+                                        onChange={handleOrganicidadCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="PROMEDIO BAJO MANEJO DE FACULTADES MENTALES"
+                                        name="promBajoManejo"
+                                        checked={form.promBajoManejo}
                                         onChange={handleOrganicidadCheckboxChange}
                                     />
                                     <InputCheckbox
@@ -668,6 +718,13 @@ export default function InformePsicologico() {
                                         checked={form.nivAdecuado}
                                         onChange={handlePsicomotricidadCheckboxChange}
                                     />
+
+                                    <InputCheckbox
+                                        label="NIVEL BAJO"
+                                        name="nivBajoPs"
+                                        checked={form.nivBajoPs}
+                                        onChange={handlePsicomotricidadCheckboxChange}
+                                    />
                                 </SectionFieldset>
                                 <SectionFieldset>
                                     <InputCheckbox
@@ -680,6 +737,12 @@ export default function InformePsicologico() {
                                         label="DIFICULTAD"
                                         name="dificultad"
                                         checked={form.dificultad}
+                                        onChange={handlePsicomotricidadCheckboxChange}
+                                    />
+                                    <InputCheckbox
+                                        label="SENCILLA"
+                                        name="sencilla"
+                                        checked={form.sencilla}
                                         onChange={handlePsicomotricidadCheckboxChange}
                                     />
                                 </SectionFieldset>
