@@ -16,7 +16,8 @@ const urlsEliminar = {
     // Examen Ocupacional
     triaje: "triaje",
     labClinico: "laboratorio",
-
+    LakeLouise: "escalaLakeLouise",
+    RiesgoCardio: "riesgoCardiovascular",
     rxTorax: "rayosX",
     radiografia: "rayosX/radiografia",
     CuestMujeres: "rayosX/consentimiento-mujeres",

@@ -8,7 +8,7 @@ import { InputsSelect, InputsSelect2 } from '../InputsSelect';
 import { getFetch } from "../../../getFetch/getFetch.js";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAsterisk, faFileImport } from '@fortawesome/free-solid-svg-icons';
-import { ImportData } from '../controller/HC';
+import { getMasivoimport, ImportData } from '../controller/HC';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import ModalEmpresa from './modals/modalEmpresa/ModalEmpresa';
 import ModalContrata from './modals/modalContrata/ModalContrata';
@@ -17,6 +17,7 @@ import { useSessionData } from '../../../../../hooks/useSessionData.js';
 import { fixEncodingModern } from '../../../../../utils/helpers.js';
 import ModalExamenes from './modals/modalExamenes+/ModalExamenes'
 import SubidaMasiva from './modals/modalSubidaMasiva/ModalSubidaMasiva.jsx';
+import ModalPreCarga from './modals/modalPreCargaTable/ModalPreCargaTable.jsx';
 
 const AperturaExamenesPreOcup = (props) => {
   const today = new Date();
@@ -107,6 +108,9 @@ const AperturaExamenesPreOcup = (props) => {
   //Examenes Adicionales
   const [modalExam, setModalexam] = useState(false)
   const [modalSubidaMasiva, setModalSubidaMasiva] = useState(false)
+  const [modalPreCarga, setModalPreCarga] = useState(false);
+  const [opcionesPreCarga, setOpcionesPreCarga] = useState([]);
+
   //lista de Protocolos
   const [protocoloOptions, setProtocoloOptions] = useState([])
   useEffect(() => {
@@ -445,7 +449,6 @@ const AperturaExamenesPreOcup = (props) => {
         setSearchExamenMedico(res.nomExamen || "")
         setSearchProtocolo(res.protocolo || "")
       })
-
     setRegister(false)
     setHabilitar(true)
     setShowEdit(true)
@@ -965,8 +968,31 @@ const AperturaExamenesPreOcup = (props) => {
   }
 
   const ImportarPreCarga = () => {
-
+    getMasivoimport(datos.codPa, props.token, (resultados) => {
+      console.log(resultados)
+      if (resultados.length === 1) {
+        aplicarPreCarga(resultados[0]);
+      } else {
+        setOpcionesPreCarga(resultados);
+        setModalPreCarga(true);
+      }
+    });
   }
+
+  const aplicarPreCarga = (item) => {
+    console.log(item)
+    setDatos({
+      ...item,
+      nombresPa: item.nombres,
+      apellidosPa: item.apellidos,
+      razonEmpresa: item.razonEmpresa,
+      fechaAperturaPo: formatDate(item.fechaApertura),
+      userRegistroDatos: item.usuarioRegistro ?? "",
+      protocolo: item.protocolo
+    });
+    RendeSet(item)
+    setModalPreCarga(false);
+  };
 
   return (
     <div >
@@ -1010,7 +1036,7 @@ const AperturaExamenesPreOcup = (props) => {
               IMPORTAR
             </button>
             <button
-
+              onClick={ImportarPreCarga}
               className='mr-2 flex items-center justify-center border-1 border-orange-500 text-white px-3 py-1 bg-orange-700 mb-1 rounded-md hover:bg-orange-500 hover:text-white focus:outline-none'
             >
               <FontAwesomeIcon icon={faFileImport} className="mr-2" />
@@ -1818,6 +1844,11 @@ const AperturaExamenesPreOcup = (props) => {
         sede={props.selectedSede}
         token={props.token}
         userlogued={userlogued}
+      />}
+      {modalPreCarga && <ModalPreCarga
+        opcionesPreCarga={opcionesPreCarga}
+        setModalPreCarga={setModalPreCarga}
+        aplicarPreCarga={aplicarPreCarga}
       />}
       {/*modalExam && <ModalExamenes close={() => setModalexam(false)}/>*/}
     </div>
