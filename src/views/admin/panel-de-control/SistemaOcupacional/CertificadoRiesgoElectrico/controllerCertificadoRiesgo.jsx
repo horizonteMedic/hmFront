@@ -40,7 +40,7 @@ export const GetInfoServicio = async (
             fechaExam: rese.fechaExamen ?? "",
             tipoExamen: rese.nombreExamen ?? "",
             // Datos personales
-            nombres: rese.nombreCompletoPaciente ?? "",
+            nombres: `${rese.nombresPaciente} ${rese.apellidosPaciente}` ?? "",
             dni: rese.dniPaciente ?? "",
             edad: rese.edadPaciente ?? "",
             fechaNacimiento: formatearFechaCorta(rese.fechaNacimientoPaciente ?? ""),
@@ -53,7 +53,7 @@ export const GetInfoServicio = async (
             // Campos usados por la interfaz principal
             cargoDesempenar: rese.cargoPaciente ?? "",
             ocupacion: rese.ocupacionPaciente ?? "",
-
+            tiempoExperiencia: rese.tiempoExperiencia ?? "",
             fechaNacimientoPaciente: formatearFechaCorta(rese.fechaNacimientoPaciente ?? ""),
             peso: rese.peso ?? "",
             talla: rese.talla ?? "",
@@ -99,8 +99,10 @@ export const GetInfoServicioEditar = async (
             contrata: rese.contrata ?? "",
             // Campos usados por la interfaz principal
             cargoDesempenar: rese.cargoPaciente ?? "",
-            ocupacion: rese.ocupacionPaciente ?? "", 
-            
+            ocupacion: rese.ocupacionPaciente ?? "",
+
+            ubicacionSitio: res.ubicacionSitio ?? "",
+            tiempoExperiencia: res.tiempoExperiencia ?? "",
 
             evaluacionRiesgoRealizada: rese.evaluacionRiesgoRealizada ?? "",
             personalCompetenteAreaElectrica: rese.personalCompetenteAreaElectrica ?? "",
@@ -170,7 +172,7 @@ export const SubmitDataService = async (
         "trabajosSimultaneosControlados": form.trabajosSimultaneosControlados,
         "personalEntrenadoRiesgoElectrico": form.personalEntrenadoRiesgoElectrico,
         "medidasSeguridadSatisfactorias": form.medidasSeguridadSatisfactorias,
-
+        "ubicacionSitio": form.ubicacionSitio
 
     };
 

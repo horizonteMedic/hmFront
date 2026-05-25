@@ -41,7 +41,7 @@ const CertficadoRiesgoElectrico = () => {
         ocupacion: "",
         cargoDesempenar: "",
 
-        ubicacionExacta: "",
+        ubicacionSitio: "",
         tiempoExperiencia: "",
 
         evaluacionRiesgoRealizada: false,
@@ -128,8 +128,8 @@ const CertficadoRiesgoElectrico = () => {
                 <SectionFieldset className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
                     <InputTextOneLine
                         label="Ubicación del sitio"
-                        name="ubicacion"
-                        value={form.ubicacion}
+                        name="ubicacionSitio"
+                        value={form.ubicacionSitio}
                         onChange={handleChange}
                         labelWidth="120px"
                     />
@@ -138,6 +138,7 @@ const CertficadoRiesgoElectrico = () => {
                         name="tiempoExperiencia"
                         value={form.tiempoExperiencia}
                         onChange={handleChange}
+                        disabled
                         labelWidth="120px"
                     />
                 </SectionFieldset>
