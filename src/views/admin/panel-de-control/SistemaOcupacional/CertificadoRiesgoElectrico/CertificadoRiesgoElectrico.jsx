@@ -1,4 +1,5 @@
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
+import InputsRadioGroup from "../../../../components/reusableComponents/InputsRadioGroup";
 import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine"
 import RadioTable from "../../../../components/reusableComponents/RadioTable";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset"
@@ -9,7 +10,13 @@ import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerCertificadoRiesgo";
 
+const tabla = "riesgo_electrico"
+
 const CertficadoRiesgoElectrico = () => {
+
+    // const tabla = "certificado_exposicion_calor_vapor"
+
+
     const today = getToday();
     const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
@@ -34,72 +41,27 @@ const CertficadoRiesgoElectrico = () => {
         ocupacion: "",
         cargoDesempenar: "",
 
-        //EXAMEN MEDICO
-        fechaNacimientoPaciente: "",
-        peso: "",
-        talla: "",
-        colorPiel: "",
-        colorOjos: "",
-        cabello: "",
+        ubicacionExacta: "",
+        tiempoExperiencia: "",
 
-        //FACTORES HEREDITARIOS
-        //1
-        asma: false,
-        alergias: false,
-        bronquitis: false,
-        pleuresia: false,
-        neumonia: false,
-        respiracion: false,
-        sangreSaliva: false,
-        respiracionBreve: false,
-        problemasNasales: false,
-        tbc: false,
-        fuma: false,
-        //2
-        palpitaciones: false,
-        ritmoCardiacoIrregular: false,
-        fallasCardiacas: false,
-        desmayos: false,
-        tobillosHinchados: false,
-        moretonesAnormales: false,
-        presionAlta: false,
-        heridasPecho: false,
-        otrasEnfermedades: false,
-        tomaMedicina: false,
+        evaluacionRiesgoRealizada: false,
+        personalCompetenteAreaElectrica: false,
+        conoceTipoVoltaje: false,
+        personalCertificadoVoltaje: false,
+        eppApropiadoTarea: false,
+        sistemaDesenergizado: false,
+        sistemaAislado: false,
+        tarjetasAdvertenciaInstaladas: false,
+        bloqueosInstalados: false,
+        sistemasAterrizados: false,
+        trabajosSimultaneosControlados: false,
+        personalEntrenadoRiesgoElectrico: false,
+        medidasSeguridadSatisfactorias: false,
 
-        //DETALLES
-        //EXAMNE MEDICO
-        pulsoReposo: "",
-        pulsoReposoBp: "",
-        pulso30flexiones: "",
-        respiracionReposo: "",
-        respiracion30flexiones: "",
-        obstruccionNasal: "",
-        formaPecho: "",
-        expansionPecho: "",
-        pulmones: "",
-        corazon: "",
-        enfermedadesCronicas: "",
-        funcionPulmonar: "",
-        fvc: "",
-        fevl: "",
-        otros: "",
-        enForma: "",
 
-        //RAYOS X
-        fechaPlaca: "",
-        pechoNormal: "",
-        tbcRayosX: "",
-        pneumoconiosis: "",
-        clasificacionOit: "",
-        filmNumeroPlaca: "",
-        corazonRayosX: "",
-        otrosCambios: "",
-        examenSaliva: "",
-        //OPINOINES
-        hallazgosAnormales: "",
-        opinionClinica: "",
 
+
+        aptitud: "",
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
         user_medicoFirma: userlogued,
@@ -111,6 +73,7 @@ const CertficadoRiesgoElectrico = () => {
         handleChange,
         handleChangeNumber,
         handleRadioButtonBoolean,
+        handleRadioButton,
         handleFocusNext,
         handleClear,
         handleChangeSimple,
@@ -162,27 +125,44 @@ const CertficadoRiesgoElectrico = () => {
                 {/* ===== SECCIÓN: DATOS LABORALES ===== */}
                 <DatosPersonalesLaborales form={form} />
 
-                <SectionFieldset legend="FACTORES HEREDITARIOS" className="w-full">
+                <SectionFieldset className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
+                    <InputTextOneLine
+                        label="Ubicación del sitio"
+                        name="ubicacion"
+                        value={form.ubicacion}
+                        onChange={handleChange}
+                        labelWidth="120px"
+                    />
+                    <InputTextOneLine
+                        label="Tiempo de experiencia"
+                        name="tiempoExperiencia"
+                        value={form.tiempoExperiencia}
+                        onChange={handleChange}
+                        labelWidth="120px"
+                    />
+                </SectionFieldset>
+
+                <SectionFieldset legend="ITEMS" className="w-full">
                     <RadioTable
                         items={[
-                            { name: "asma", label: "1.- ¿Se ha realizado una evaluación de riesgo al trabajo específico?" },
-                            { name: "alergias", label: "2.- ¿Las personas que van a realizar el trabajo son competentes en el área eléctrica?" },
-                            { name: "bronquitis", label: "3.- 3	¿Las personas que van a realizar el trabajo conocen el voltaje (medio, bajo, otro) que se va a intervenir?" },
-                            { name: "pleuresia", label: "4.- ¿Están certificadas las personas para trabajar en este tipo de voltaje?" },
-                            { name: "neumonia", label: "5.- ¿Los elementos y equipos de protección personal son los apropiados para la tarea  y según el tipo de voltaje?" },
-                            { name: "respiracion", label: "6.- ¿Se ha verificado que se encuentra des-energizado el sistema que va a ser intervenido?" },
-                            { name: "sangreSaliva", label: "7.- ¿Se ha verificado que se encuentra des-energizado el sistema que va a ser intervenido?" },
-                            { name: "respiracionBreve", label: "8.- ¿Se han instalado tarjetas de advertencias y/o peligroso?" },
-                            { name: "problemasNasales", label: "9.- ¿Se han instalado los bloqueos pertinentes?" },
-                            { name: "tbc", label: "10.- ¿Se encuentran aterrizados los sistemas que van a ser intervenidos?" },
-                            { name: "fuma", label: "11.- ¿Si existen trabajos simultáneos que pueden afectar el trabajo ya fueron notificados y se tomaron las acciones pertinentes." },
-                            { name: "fuma", label: "12.- ¿Todas las personas que intervienen en el trabajo, han sido entrenadas en riesgos eléctricos?" },
-                            { name: "fuma", label: "13.- ¿Se siente usted satisfecho y considera que de todas las medidas de seguridad industrial han sido tomadas y se va a desarrollar un trabajo seguro?" }
+                            { name: "evaluacionRiesgoRealizada", label: "1.- ¿Se ha realizado una evaluación de riesgo al trabajo específico?" },
+                            { name: "personalCompetenteAreaElectrica", label: "2.- ¿Las personas que van a realizar el trabajo son competentes en el área eléctrica?" },
+                            { name: "conoceTipoVoltaje", label: "3.- 3	¿Las personas que van a realizar el trabajo conocen el voltaje (medio, bajo, otro) que se va a intervenir?" },
+                            { name: "personalCertificadoVoltaje", label: "4.- ¿Están certificadas las personas para trabajar en este tipo de voltaje?" },
+                            { name: "eppApropiadoTarea", label: "5.- ¿Los elementos y equipos de protección personal son los apropiados para la tarea  y según el tipo de voltaje?" },
+                            { name: "sistemaDesenergizado", label: "6.- ¿Se ha verificado que se encuentra des-energizado el sistema que va a ser intervenido?" },
+                            { name: "sistemaAislado", label: "7.- ¿Ha sido aislado el sistema que va a ser intervenido?" },
+                            { name: "tarjetasAdvertenciaInstaladas", label: "8.- ¿Se han instalado tarjetas de advertencias y/o peligroso?" },
+                            { name: "bloqueosInstalados", label: "9.- ¿Se han instalado los bloqueos pertinentes?" },
+                            { name: "sistemasAterrizados", label: "10.- ¿Se encuentran aterrizados los sistemas que van a ser intervenidos?" },
+                            { name: "trabajosSimultaneosControlados", label: "11.- ¿Si existen trabajos simultáneos que pueden afectar el trabajo ya fueron notificados y se tomaron las acciones pertinentes." },
+                            { name: "personalEntrenadoRiesgoElectrico", label: "12.- ¿Todas las personas que intervienen en el trabajo, han sido entrenadas en riesgos eléctricos?" },
+                            { name: "medidasSeguridadSatisfactorias", label: "13.- ¿Se siente usted satisfecho y considera que de todas las medidas de seguridad industrial han sido tomadas y se va a desarrollar un trabajo seguro?" }
                         ]}
                         options={[
                             { label: "SI", value: "SI" },
                             { label: "NO", value: "NO" },
-                            { label: "N/A", value: "N/A" },
+                            { label: "N/A", value: "NA" },
                         ]}
                         form={form}
                         labelColumns={5}
@@ -191,6 +171,33 @@ const CertficadoRiesgoElectrico = () => {
                     />
                 </SectionFieldset>
 
+                <SectionFieldset
+                    legend="Conclusión de Aptitud"
+                    className="grid grid-cols-1  gap-3"
+                >
+                    <InputsRadioGroup
+                        name="aptitud"
+                        value={form?.aptitud}
+                        onChange={handleRadioButton}
+                        vertical
+                        options={[
+                            {
+                                label: "APTO (Puede realizar trabajos con exposición al calor.)",
+                                value: "APTO",
+                            },
+                            {
+                                label:
+                                    "APTO CON RESTRICCION (Debe cumplir medidas preventivas específicas.)",
+                                value: "RESTRICCION",
+                            },
+                            {
+                                label:
+                                    "NO APTO (No apto para trabajos con exposición al calor y vapor)",
+                                value: "NO APTO",
+                            },
+                        ]}
+                    />
+                </SectionFieldset>
 
                 <SectionFieldset legend="Asignación de Médico" className="w-full">
                     <EmpleadoComboBox
