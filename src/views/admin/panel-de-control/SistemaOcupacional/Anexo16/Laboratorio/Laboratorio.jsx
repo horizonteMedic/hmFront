@@ -176,10 +176,13 @@ export default function Laboratorio({
                             disabled
                             labelWidth="100px"
                         />
+                        <h4 className="font-semibold text-gray-800 mb-2 mt-4">
+                            Boroo
+                        </h4>
                         <InputTextOneLine
                             label="Acido Urico Sérico"
-                            name="acidoUricoSericoPerfilRenal"
-                            value={form.acidoUricoSericoPerfilRenal}
+                            name="resultadoacidourico"
+                            value={form.resultadoacidourico}
                             disabled
                             labelWidth="100px"
                         />

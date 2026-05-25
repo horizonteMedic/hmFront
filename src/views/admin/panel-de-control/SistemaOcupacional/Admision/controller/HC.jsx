@@ -203,11 +203,15 @@ export const submitMasivo = async (data, sede, token, userlogued) => {
   }
 };
 
-export const getMasivoimport = async () => {
+export const getMasivoimport = async (dni, token, onResult) => {
   LoadingDefault("Importando Datos");
-  getFetch(`/api/v01/ct/preNordenOcupacional/obtenerPaginado`, token)
+  getFetch(`/api/v01/ct/preNordenOcupacional/buscarPorDni/${dni}`, token)
+    .then((res) => {
+      Swal.close();
+      const lista = res?.resultado || [];
+      onResult(lista);
+    })
 }
-
 
 const prepararDataExcel = (data) => {
   return data
