@@ -350,8 +350,8 @@ const TabComponent = () => {
                   { vista: "Escala de Lake Louise", tab: 48, icons: [{ icon: faSellsy }], label: "Escala de Lake Louise" },
                   { vista: "Generador de Reportes", tab: 47, icons: [{ icon: faFloppyDisk }], label: "Generador Reportes" },
                   { vista: "Riesgo Cardiovascular", tab: 49, icons: [{ icon: faHeartbeat }], label: "Riesgo Cardiovascular" },
-                  { vista: "Certificado Exposicion al Calor", tab: 50, icons: [{ icon: faSun }], label: "Certificado Exposicion al Calor" },
-                  { vista: "Certificado Riesgo Electrico", tab: 51, icons: [{ icon: faBolt }], label: "Certificado Riesgo Electrico" },
+                  { vista: "Certificado Exposicion al Calor", tab: 50, icons: [{ icon: faSun }], label: "Certificado Exposición al Calor" },
+                  { vista: "Certificado Riesgo Electrico", tab: 51, icons: [{ icon: faBolt }], label: "Certificado Riesgo Eléctrico" },
                   { vista: "Folio", tab: 40, icons: [{ icon: faFileContract }], label: "Folio" },
                 ];
                 return items
@@ -639,8 +639,8 @@ const TabComponent = () => {
               47: { title: "Generador de Reportes", child: <GeneradorReportes /> },
               48: { title: "Escala de Lake Louise para Mal de Montaña Agudo - Barrick", child: <EscalaLakeLouise /> },
               49: { title: "Riesgo Cardiovascular", child: <RiesgoCardiovascular /> },
-              50: { title: "Certificado Exposicion al Calor", child: <CertificadoExposicionAlCalor /> },
-              51: { title: "Certificado Riesgo Electrico", child: <CertficadoRiesgoElectrico /> },
+              50: { title: "Certificado Exposición al Calor", child: <CertificadoExposicionAlCalor /> },
+              51: { title: "Certificado Riesgo Eléctrico", child: <CertficadoRiesgoElectrico /> },
               40: { title: "Folio", child: <Folio /> },
             };
             const section = displayedInterfaces[activeTab];

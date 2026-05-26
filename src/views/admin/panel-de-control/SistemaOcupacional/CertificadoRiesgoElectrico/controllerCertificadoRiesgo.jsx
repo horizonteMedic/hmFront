@@ -11,9 +11,9 @@ import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
 
 const obtenerReporteUrl =
-    "/api/v01/ct/ministerioEnergiaMinas/obtenerReporte";
+    "/api/v01/ct/riesgoElectrico/obtenerReporte";
 const registrarUrl =
-    "/api/v01/ct/ministerioEnergiaMinas/registrarActualizar";
+    "/api/v01/ct/riesgoElectrico/registrarActualizar";
 
 export const GetInfoServicio = async (
     nro,
@@ -32,30 +32,31 @@ export const GetInfoServicio = async (
     );
     if (res) {
         console.log(res)
+        const rese = res.resultado
         set((prev) => ({
             ...prev,
             // Header
-            norden: res.norden ?? "",
-            fechaExam: res.fechaExamen ?? "",
-            tipoExamen: res.nombreExamen ?? "",
+            norden: rese.norden ?? "",
+            fechaExam: rese.fechaExamen ?? "",
+            tipoExamen: rese.nombreExamen ?? "",
             // Datos personales
-            nombres: res.nombreCompletoPaciente ?? "",
-            dni: res.dniPaciente ?? "",
-            edad: res.edadPaciente ?? "",
-            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-            estadoCivil: res.estadoCivilPaciente ?? "",
-            nivelEstudios: res.nivelEstudioPaciente ?? "",
-            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
-            empresa: res.empresa ?? "",
-            contrata: res.contrata ?? "",
+            nombres: `${rese.nombresPaciente} ${rese.apellidosPaciente}` ?? "",
+            dni: rese.dniPaciente ?? "",
+            edad: rese.edadPaciente ?? "",
+            fechaNacimiento: formatearFechaCorta(rese.fechaNacimientoPaciente ?? ""),
+            lugarNacimiento: rese.lugarNacimientoPaciente ?? "",
+            estadoCivil: rese.estadoCivilPaciente ?? "",
+            nivelEstudios: rese.nivelEstudioPaciente ?? "",
+            sexo: rese.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+            empresa: rese.empresa ?? "",
+            contrata: rese.contrata ?? "",
             // Campos usados por la interfaz principal
-            cargoDesempenar: res.cargoPaciente ?? "",
-            ocupacion: res.ocupacionPaciente ?? "",
-
-            fechaNacimientoPaciente: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-            peso: res.peso ?? "",
-            talla: res.talla ?? "",
+            cargoDesempenar: rese.cargoPaciente ?? "",
+            ocupacion: rese.ocupacionPaciente ?? "",
+            tiempoExperiencia: rese.tiempoExperiencia ?? "",
+            fechaNacimientoPaciente: formatearFechaCorta(rese.fechaNacimientoPaciente ?? ""),
+            peso: rese.peso ?? "",
+            talla: rese.talla ?? "",
         }));
     }
 };
@@ -77,32 +78,55 @@ export const GetInfoServicioEditar = async (
     );
     if (res) {
         console.log(res)
+        const rese = res.resultado
         set((prev) => ({
             ...prev,
             ...res,
             // Header
-            norden: res.norden ?? "",
-            fechaExam: res.fechaExamen ?? "",
-            tipoExamen: res.nombreExamen ?? "",
+            norden: rese.norden ?? "",
+            fechaExam: rese.fechaExamen ?? "",
+            tipoExamen: rese.nombreExamen ?? "",
             // Datos personales
-            nombres: res.nombreCompletoPaciente ?? "",
-            dni: res.dniPaciente ?? "",
-            edad: res.edadPaciente ?? "",
-            fechaNacimiento: formatearFechaCorta(res.fechaNacimientoPaciente ?? ""),
-            lugarNacimiento: res.lugarNacimientoPaciente ?? "",
-            estadoCivil: res.estadoCivilPaciente ?? "",
-            nivelEstudios: res.nivelEstudioPaciente ?? "",
-            sexo: res.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
-            empresa: res.empresa ?? "",
-            contrata: res.contrata ?? "",
+            nombres: (rese.nombresPaciente + " " + rese.apellidosPaciente) ?? "",
+            dni: rese.dniPaciente ?? "",
+            edad: rese.edadPaciente ?? "",
+            fechaNacimiento: formatearFechaCorta(rese.fechaNacimientoPaciente ?? ""),
+            lugarNacimiento: rese.lugarNacimientoPaciente ?? "",
+            estadoCivil: rese.estadoCivilPaciente ?? "",
+            nivelEstudios: rese.nivelEstudioPaciente ?? "",
+            sexo: rese.sexoPaciente === "M" ? "MASCULINO" : "FEMENINO",
+            empresa: rese.empresa ?? "",
+            contrata: rese.contrata ?? "",
             // Campos usados por la interfaz principal
-            cargoDesempenar: res.cargoPaciente ?? "",
-            ocupacion: res.ocupacionPaciente ?? "",
+            cargoDesempenar: rese.cargoPaciente ?? "",
+            ocupacion: rese.ocupacionPaciente ?? "",
 
-            //EXAMEN MEDICO
+            ubicacionSitio: res.ubicacionSitio ?? "",
+            tiempoExperiencia: res.tiempoExperiencia ?? "",
 
-            // observacion
-            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+            evaluacionRiesgoRealizada: rese.evaluacionRiesgoRealizada ?? "",
+            personalCompetenteAreaElectrica: rese.personalCompetenteAreaElectrica ?? "",
+            conoceTipoVoltaje: rese.conoceTipoVoltaje ?? "",
+            personalCertificadoVoltaje: rese.personalCertificadoVoltaje ?? "",
+            eppApropiadoTarea: rese.eppApropiadoTarea ?? "",
+            sistemaDesenergizado: rese.sistemaDesenergizado ?? "",
+            sistemaAislado: rese.sistemaAislado ?? "",
+            tarjetasAdvertenciaInstaladas: rese.tarjetasAdvertenciaInstaladas ?? "",
+            bloqueosInstalados: rese.bloqueosInstalados ?? "",
+            sistemasAterrizados: rese.sistemasAterrizados ?? "",
+            trabajosSimultaneosControlados: rese.trabajosSimultaneosControlados ?? "",
+            personalEntrenadoRiesgoElectrico: rese.personalEntrenadoRiesgoElectrico ?? "",
+            medidasSeguridadSatisfactorias: rese.medidasSeguridadSatisfactorias ?? "",
+
+            aptitud: rese.apto
+                ? "APTO"
+                : rese.noEsApto
+                    ? "NO APTO"
+                    : rese.conRestriccion
+                        ? "RESTRICCION"
+                        : "",
+
+            user_medicoFirma: rese.usuarioFirma ? rese.usuarioFirma : prev.user_medicoFirma,
         }));
     }
 };
@@ -131,52 +155,25 @@ export const SubmitDataService = async (
         "colorOjos": form.colorOjos,
         "cabello": form.cabello,
 
-        //1
-        "asma": form.asma,
-        "alergias": form.alergias,
-        "bronquitis": form.bronquitis,
-        "pleuresia": form.pleuresia,
-        "neumonia": form.neumonia,
-        "respiracion": form.respiracion,
-        "sangreSaliva": form.sangreSaliva,
-        "respiracionBreve": form.respiracionBreve,
-        "problemasNasales": form.problemasNasales,
-        "tbc": form.tbc,
-        "fuma": form.fuma,
+        "apto": form.aptitud == "APTO",
+        "conRestriccion": form.aptitud == "RESTRICCION",
+        "noEsApto": form.aptitud == "NO APTO",
 
-        //2
-        "palpitaciones": form.palpitaciones,
-        "ritmoCardiacoIrregular": form.ritmoCardiacoIrregular,
-        "fallasCardiacas": form.fallasCardiacas,
-        "desmayos": form.desmayos,
-        "tobillosHinchados": form.tobillosHinchados,
-        "moretonesAnormales": form.moretonesAnormales,
-        "presionAlta": form.presionAlta,
-        "heridasPecho": form.heridasPecho,
-        "otrasEnfermedades": form.otrasEnfermedades,
-        "tomaMedicina": form.tomaMedicina,
+        "evaluacionRiesgoRealizada": form.evaluacionRiesgoRealizada,
+        "personalCompetenteAreaElectrica": form.personalCompetenteAreaElectrica,
+        "conoceTipoVoltaje": form.conoceTipoVoltaje,
+        "personalCertificadoVoltaje": form.personalCertificadoVoltaje,
+        "eppApropiadoTarea": form.eppApropiadoTarea,
+        "sistemaDesenergizado": form.sistemaDesenergizado,
+        "sistemaAislado": form.sistemaAislado,
+        "tarjetasAdvertenciaInstaladas": form.tarjetasAdvertenciaInstaladas,
+        "bloqueosInstalados": form.bloqueosInstalados,
+        "sistemasAterrizados": form.sistemasAterrizados,
+        "trabajosSimultaneosControlados": form.trabajosSimultaneosControlados,
+        "personalEntrenadoRiesgoElectrico": form.personalEntrenadoRiesgoElectrico,
+        "medidasSeguridadSatisfactorias": form.medidasSeguridadSatisfactorias,
+        "ubicacionSitio": form.ubicacionSitio
 
-        //DETALLES
-        //EXAMEN MEDICO
-        "pulsoReposo": form.pulsoReposo,
-        "pulsoReposoBp": form.pulsoReposoBp,
-        "pulso30flexiones": form.pulso30flexiones,
-        "respiracionReposo": form.respiracionReposo,
-        "respiracion30flexiones": form.respiracion30flexiones,
-        "obstruccionNasal": form.obstruccionNasal,
-        "formaPecho": form.formaPecho,
-        "expansionPecho": form.expansionPecho,
-        "enfermedadesCronicas": form.enfermedadesCronicas,
-        "enForma": form.enForma,
-
-        "pechoNormal": form.pechoNormal,
-        "tbcRayosX": form.tbcRayosX,
-        "pneumoconiosis": form.pneumoconiosis,
-        "clasificacionOit": form.clasificacionOit,
-        "corazonRayosX": form.corazonRayosX,
-        "otrosCambios": form.otrosCambios,
-        "hallazgosAnormales": form.hallazgosAnormales,
-        "opinionClinica": form.opinionClinica,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
