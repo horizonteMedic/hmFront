@@ -567,7 +567,7 @@ const Folio = () => {
         });
     };
 
-    const handleGenerarFolio = async (comprimidoz = false) => {
+    const handleGenerarFolio = async (comprimidoz = false, urlType = "azure") => {
         // Cancelar petición anterior si existe
         if (abortControllerRef.current) {
             abortControllerRef.current.abort();
@@ -638,7 +638,8 @@ const Folio = () => {
                 form.nombres,
                 form.apellidos,
                 datosFooter,
-                comprimidoz
+                comprimidoz,
+                urlType
             );
 
             const normalizeKey = (value) =>
@@ -1243,10 +1244,17 @@ const Folio = () => {
                         </button>
                         <button
                             className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
-                            onClick={() => handleGenerarFolio(true)}
+                            onClick={() => handleGenerarFolio(true, "azure")}
                             disabled={(form.listaExamenes?.filter(e => e.imprimir).length || 0) == 0}
                         >
                             Generar Folio Comprimido
+                        </button>
+                        <button
+                            className="bg-purple-500 hover:bg-purple-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-md mt-4 text-semibold"
+                            onClick={() => handleGenerarFolio(true, "respaldo")}
+                            disabled={(form.listaExamenes?.filter(e => e.imprimir).length || 0) == 0}
+                        >
+                            Generar Folio Comprimido Respaldo
                         </button>
                     </div>
 

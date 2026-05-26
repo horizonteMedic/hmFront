@@ -10,7 +10,7 @@ import { PDFDocument } from "pdf-lib";
 import pdfjsLib from "../../config/pdjfConfig";
 import { colocarSellosEnPdf, getSign } from "../../utils/helpers";
 
-export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType, signal, nombres = "", apellidos = "", datosFooter, comprimidoz = false) {
+export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType, signal, nombres = "", apellidos = "", datosFooter, comprimidoz = false, urlType = "azure") {
     if (signal?.aborted) throw new DOMException("Aborted", "AbortError");//para poder cancelar la gereracion
 
     const pdfFinal = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true, precision: 1 });
@@ -106,7 +106,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
 
     const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true && ex.imprimir === true);
 
-    //const examenesFiltrados = ListaExamenes; //SOLO ACTIVAR PARA PRUEBAS 
+    //const examenesFiltrados = ListaExamenes; //SOLO ACTIVAR PARA PRUEBAS
     const totalReportes = examenesFiltrados.length;
 
     // Array para almacenar estadísticas de peso
@@ -448,7 +448,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         // descargarPdf(rasterizedBytes, nombreArchivo);
         const archivoProcesado = await subirArchivoPdfNode(
             baseBytes,
-            nombreArchivo
+            nombreArchivo,
+            urlType
         );
         imprimirBytes(archivoProcesado, nombreArchivo);
         // descargarBlob(archivoProcesado, nombreArchivo);
@@ -460,15 +461,22 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
     }
 }
 
-async function subirArchivoPdfNode(bytes, nombreArchivo) {
+async function subirArchivoPdfNode(bytes, nombreArchivo, urlType = "azure") {
     try {
         const blob = new Blob([bytes], { type: "application/pdf" });
 
         const formData = new FormData();
         formData.append("archivo", blob, nombreArchivo);
 
+        const urls = {
+            azure: "https://hmbackendreportes-h3a2bzc5dycgf4ba.centralus-01.azurewebsites.net/api/v1/archivos",
+            respaldo: "https://reportes.horizontemedic.com/backend/api/archivos/"
+        };
+
+        const url = urls[urlType] || urls.azure;
+
         const response = await fetch(
-            "https://hmbackendreportes-h3a2bzc5dycgf4ba.centralus-01.azurewebsites.net/api/v1/archivos",
+            url,
             {
                 method: "POST",
                 body: formData
