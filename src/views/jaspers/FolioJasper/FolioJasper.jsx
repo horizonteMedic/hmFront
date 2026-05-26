@@ -106,7 +106,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
 
     const examenesFiltrados = ListaExamenes.filter(ex => ex.resultado === true && ex.imprimir === true);
 
-    //const examenesFiltrados = ListaExamenes; //SOLO ACTIVAR PARA PRUEBAS 
+    //const examenesFiltrados = ListaExamenes; //SOLO ACTIVAR PARA PRUEBAS
     const totalReportes = examenesFiltrados.length;
 
     // Array para almacenar estadísticas de peso
@@ -468,8 +468,8 @@ async function subirArchivoPdfNode(bytes, nombreArchivo) {
         formData.append("archivo", blob, nombreArchivo);
 
         const response = await fetch(
-            // "https://hmbackendreportes-h3a2bzc5dycgf4ba.centralus-01.azurewebsites.net/api/v1/archivos",
-            "https://reportes.horizontemedic.com/backend/api/archivos/",
+            "https://hmbackendreportes-h3a2bzc5dycgf4ba.centralus-01.azurewebsites.net/api/v1/archivos",
+            // "https://reportes.horizontemedic.com/backend/api/archivos/",
             {
                 method: "POST",
                 body: formData
