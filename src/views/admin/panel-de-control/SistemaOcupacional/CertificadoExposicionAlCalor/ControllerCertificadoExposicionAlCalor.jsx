@@ -5,9 +5,12 @@ import {
   LoadingDefault,
   SubmitDataServiceDefault,
   VerifyTRDefault,
+  VerifyTRPerzonalizadoDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { convertirGenero } from "../../../../utils/helpers";
+import { getFetch } from "../../../../utils/apiHelpers";
+import { VerifyTRPerzonalizado } from "../FichaCertificadoAltura/controllerFichaCertificadoAltura";
 
 const obtenerReporteUrl = "/api/v01/ct/exposicionCalor/obtenerReporte";
 const registrarUrl = "/api/v01/ct/exposicionCalor/registrarActualizar";
@@ -116,7 +119,7 @@ export const GetInfoServicio = async (
       dni: rese.dni ?? "",
       edad: rese.edad ?? "",
       sexo: convertirGenero(rese.sexo) ?? "",
-      fecha: rese.fechaExamen ?? prev.fecha,
+      fecha: (rese.fechaExamen || rese.fecha) ?? prev.fecha,
 
       fechaNacimiento: formatearFechaCorta(rese.fechaNacimiento) ?? "",
       lugarNacimiento: rese.lugarNacimiento ?? "",
@@ -292,7 +295,7 @@ export const PrintHojaR = (nro, token, tabla) => {
 };
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
-  VerifyTRDefault(
+  VerifyTRPerzonalizadoDefault(
     nro,
     tabla,
     token,
