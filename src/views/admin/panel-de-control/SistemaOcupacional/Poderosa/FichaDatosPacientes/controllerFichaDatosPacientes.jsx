@@ -122,7 +122,9 @@ export const GetInfoServicio = async (
             experiencias: res.experienciaLaboral ?? [],
             referencias: res.referenciasPersonales ?? [],
             aptitudAltura18: res.aptitudPoderosaSi === true ? true : res.aptitudPoderosaNo === true ? false : null,
-            aptitud: res.faApto === true ? "APTO" : res.faAptoConRestriccion === true ? "APTO RESTRICCION" : res.faNoApto === true ? "NO APTO" : false
+            aptitud: res.faApto === true ? "APTO" : res.faAptoConRestriccion === true ? "APTO RESTRICCION" : res.faNoApto === true ? "NO APTO" : false,
+            nombrePsicologo: res.nombrePsicologo ?? "",
+            nombreMedicoAnexo16: res.nombreMedicoAnexo16 ?? "",
         }));
         Swal.close();
     }
@@ -338,6 +340,8 @@ export const GetInfoServicioEditar = async (
 
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
             user_doctorAsignado: res.doctorAsignado,
+            nombrePsicologo: res.nombrePsicologo ?? "",
+            nombreMedicoAnexo16: res.nombreMedicoAnexo16 ?? "",
         }));
         Swal.fire(
             "Alerta",

@@ -27,6 +27,7 @@ export const EXAMENES_CONFIG = [
             { label: "Cert. Altura Basico 1.8", name: "certTrabajoAltura", tabla: "certificacion_medica_altura" },
             { label: "Riesgo Cardiovascular", name: "RiesgoCardio", tabla: "riesgo_cardiovascular" },
             { label: "Escala Lake Louise", name: "LakeLouise", tabla: "escala_lake_louise" },
+            { label: "Certificado Exposicion Calor", name: "exposicionCalor", tabla: "certificado_exposicion_al_calor" },
             {
                 title: "EXAMENES PODEROSA",
                 items: [
