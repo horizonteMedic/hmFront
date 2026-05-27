@@ -443,4 +443,4 @@ function imprimir(doc) {
   iframe.src = url;
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
-}
+}   

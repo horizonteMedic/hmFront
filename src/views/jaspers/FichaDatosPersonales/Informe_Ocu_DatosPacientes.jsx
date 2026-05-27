@@ -1610,7 +1610,7 @@ export default async function Informe_Ocu_DatosPacientes(data = {}, docExistente
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Grupo Sang.", tablaInicioX + 160, yPos - filaAltura + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("O+", tablaInicioX + 185, yPos - filaAltura + 3.5);
+  doc.text(data.grupoSanguineo ?? "", tablaInicioX + 185, yPos - filaAltura + 3.5);
 
   yPos += cuadroAlto + 8;
 

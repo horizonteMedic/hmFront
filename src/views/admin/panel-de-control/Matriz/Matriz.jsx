@@ -27,7 +27,7 @@ const MATRICES_MAP = {
   "Matriz-16": { urlH: "/api/headers/trabajos-altura", methodH: "GET", urlB: "api/v01/st/registros/matrizPoderosaAltura2026", methodB: "POST", name: "REPORTE DE TRABAJOS EN ALTURA - PODEROSA" },
   "Matriz-17": { url: "/api/v01/st/registros/matrizHuancayo2026", method: "POST", name: "MATRIZ HUANCAYO" },
   "Matriz-18": { url: "/api/v01/st/registros/colinesterasa", method: "POST", name: "MATRIZ COLINESTERASA" },
-  "Matriz-19": { url: "/api/v01/st/registros/matrizOhlaGeneral", method: "POST", name: "MATRIZ OHLA GENERAL" }
+  "Matriz-19": { url: "/api/v01/st/registros/matrizOhlaGeneral", method: "POST", name: "MATRIZ ADMINISTRATIVA" }
 };
 
 const MatrizPostulante = () => {
@@ -295,6 +295,7 @@ const MatrizPostulante = () => {
     const worksheet = workbook.addWorksheet("Reporte");
     const isMatrizSaludProseguridad = datos.matrizSeleccionada === "Matriz-13";
     const isMatriz17 = datos.matrizSeleccionada === "Matriz-17";
+    const isMatriz19 = datos.matrizSeleccionada === "Matriz-19";
 
     const columnasOjo = ["od", "oi", "od lejos", "oi lejos"];
     const esColumnaOjo = (text) =>
@@ -340,6 +341,10 @@ const MatrizPostulante = () => {
         if (isMatriz17) {
           fontColor = { argb: "FFFFFFFF" }; // blanco
           bgColor = "FF000080"; // azul oscuro (#000080)
+        }
+
+        if (isMatriz19) {
+          bgColor = "51F5ED";
         }
 
         // 🟡 MATRIZ 13

@@ -40,12 +40,11 @@ export const VerifyTR = async (nro, tabla, token, set, sede, setTable) => {
   }
   Loading('Validando datos')
   getFetch(`/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`, token)
-    .then((res) => {
-      console.log(res)
+    .then(async (res) => {
+      console.log
       if (res.id === 0) {
-        GetInfoPac(nro, set, token, sede)
-
-        GetInfoAnterior(nro, token, setTable)
+        const dni = await GetInfoPac(nro, set, token, sede)
+        GetInfoAnterior(dni, nro, token, setTable, sede)
       } else {
         Swal.fire('Alerta', 'Este paciente ya cuenta con registros de Historia Ocupacional.', 'warning');
         GetInfoHistoriaOcupacinal(nro, tabla, set, token, setTable)
@@ -53,21 +52,22 @@ export const VerifyTR = async (nro, tabla, token, set, sede, setTable) => {
     })
 }
 
-export const GetInfoAnterior = (nro, token, setTable) => {
+export const GetInfoAnterior = (dni, nro, token, setTable, sede) => {
   getFetch(`/api/v01/ct/historiaOcupacional/obtenerHistoriaOcupacionalDetallesPorNorden?nOrden=${nro}`, token)
     .then((res) => {
       if (res && res.length > 0) {
         Swal.fire('Info', 'Este norden no cuenta con historia ocupacional', 'info')
-        console.log(res)
         const detallesOrdenados = res.sort(
           (a, b) => getAñoInicial(a.fecha) - getAñoInicial(b.fecha)
         );
-
         setTable(detallesOrdenados);
       } else {
-        Swal.close()
-        Swal.fire('Info', 'Este norden no tiene registros de historia ocupacional previos', 'info')
-
+        console.log(dni)
+        if (sede === "HMAC") {
+          GetInfoHuamachuco(dni, nro, token, setTable)
+        } else {
+          Swal.fire('Info', 'Este norden no tiene registros de historia ocupacional previos', 'info')
+        }
       }
     }).catch((err) => {
       console.error(err)
@@ -75,17 +75,36 @@ export const GetInfoAnterior = (nro, token, setTable) => {
     })
 }
 
-export const GetInfoPac = (nro, set, token, sede) => {
-  getFetch(`/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`, token)
+const GetInfoHuamachuco = (dni, nro, token, setTable) => {
+  console.log('buscando en guama')
+  Loading("Buscando en Huamachuco")
+  getFetch(`/api/v01/local-huamachuco/historiaOcupacional/obtenerUltimoDetalleRegistroPorDni?dni=${dni}`, token)
     .then((res) => {
-      console.log('pros', res)
+      if (res.resultado) {
+        const ress = res.resultado
+        const detallesOrdenados = [...ress.detalles].sort(
+          (a, b) => getAñoInicial(a.fecha) - getAñoInicial(b.fecha)
+        );
+        setTable(detallesOrdenados)
+        Swal.close()
+      } else {
+        Swal.fire('Info', 'Este norden no tiene registros de historia ocupacional previos en Huamachuco', 'info')
+      }
+    })
+}
+
+export const GetInfoPac = async (nro, set, token, sede) => {
+  let dni
+  await getFetch(`/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`, token)
+    .then((res) => {
       set(prev => ({
         ...prev,
         ...res,
         nombres: res.nombresApellidos ?? "",
       }));
+      dni = res.dni
     })
-
+  return dni
 }
 
 const getAñoInicial = (fecha) => {

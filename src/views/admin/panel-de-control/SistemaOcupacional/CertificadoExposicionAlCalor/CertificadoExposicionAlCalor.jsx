@@ -6,6 +6,7 @@ import SectionFieldset from "../../../../components/reusableComponents/SectionFi
 import BotonesAccion from "../../../../components/templates/BotonesAccion";
 import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
 import { useForm } from "../../../../hooks/useForm";
+import useRealTime from "../../../../hooks/useRealTime";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import {
@@ -25,7 +26,6 @@ export default function CertificadoExposicionAlCalor() {
     datosFooter,
     userName,
     userCMP,
-    hora,
   } = useSessionData();
 
   const initialFormState = {
@@ -133,7 +133,6 @@ export default function CertificadoExposicionAlCalor() {
           label="Nombre del Examen"
           name="nombreExamen"
           value={form.nombreExamen}
-          onChange={handleChangeSimple}
           disabled
           labelWidth="120px"
         />
@@ -141,7 +140,7 @@ export default function CertificadoExposicionAlCalor() {
         <InputTextOneLine
           label="Hora"
           name="hora"
-          value={hora}
+          value={form.hora}
           disabled
           labelWidth="120px"
         />
@@ -313,63 +312,52 @@ export default function CertificadoExposicionAlCalor() {
         </div>
       </SectionFieldset>
 
-      <SectionFieldset
-        legend="Conclusión de Aptitud"
-        className="grid grid-cols-1  gap-3"
-      >
-        <InputsRadioGroup
-          name="aptitud"
-          value={form?.aptitud}
-          onChange={handleRadioButton}
-          vertical
-          options={[
-            {
-              label: "APTO (Puede realizar trabajos con exposición al calor.)",
-              value: "APTO",
-            },
-            {
-              label:
-                "APTO CON RESTRICCION (Debe cumplir medidas preventivas específicas.)",
-              value: "RESTRICCION",
-            },
-            {
-              label:
-                "NO APTO (No apto para trabajos con exposición al calor y vapor)",
-              value: "NO APTO",
-            },
-          ]}
-        />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <SectionFieldset
+          legend="Conclusión de Aptitud"
+          className="grid grid-cols-1  gap-3"
+        >
+          <InputsRadioGroup
+            name="aptitud"
+            value={form?.aptitud}
+            onChange={handleRadioButton}
+            vertical
+            options={[
+              {
+                label: "APTO (Puede realizar trabajos con exposición al calor.)",
+                value: "APTO",
+              },
+              {
+                label:
+                  "APTO CON RESTRICCION (Debe cumplir medidas preventivas específicas.)",
+                value: "RESTRICCION",
+              },
+              {
+                label:
+                  "NO APTO (No apto para trabajos con exposición al calor y vapor)",
+                value: "NO APTO",
+              },
+            ]}
+          />
 
-        <InputTextArea
-          label="Observaciones"
-          name="observaciones"
-          value={form?.observaciones}
-          onChange={handleChangeSimple}
-          rows={5}
-        ></InputTextArea>
-      </SectionFieldset>
+          <InputTextArea
+            label="Observaciones"
+            name="observaciones"
+            value={form?.observaciones}
+            onChange={handleChangeSimple}
+            rows={5}
+          ></InputTextArea>
+        </SectionFieldset>
 
-      <SectionFieldset legend="Recomendaciones">
-        <ul>
-          <li>
-            Mantener adecuada hidratación antes, durante y después de la jornada
-            laboral.
-          </li>
-          <li>Realizar pausas activas y descansos programados.</li>
-          <li>Uso obligatorio de EPP adecuado.</li>
-          <li>Monitoreo periódico de signos de fatiga térmica.</li>
-          <li>Capacitación en prevención de estrés térmico.</li>
-        </ul>
-      </SectionFieldset>
-
-      <SectionFieldset legend="Restricciones">
-        <InputTextArea
-          name="restricciones"
-          value={form?.restricciones}
-          onChange={handleChangeSimple}
-          rows={5}
-        ></InputTextArea>
-      </SectionFieldset>
+        <SectionFieldset legend="Restricciones">
+          <InputTextArea
+            name="restricciones"
+            value={form?.restricciones}
+            onChange={handleChangeSimple}
+            rows={10}
+          ></InputTextArea>
+        </SectionFieldset>
+      </div>
 
       <SectionFieldset legend="Asignación de Médico" className="w-full">
         <EmpleadoComboBox

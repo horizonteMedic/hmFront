@@ -5,9 +5,12 @@ import {
   LoadingDefault,
   SubmitDataServiceDefault,
   VerifyTRDefault,
+  VerifyTRPerzonalizadoDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
-import { convertirGenero } from "../../../../utils/helpers";
+import { convertirGenero, getHoraActual } from "../../../../utils/helpers";
+import { getFetch } from "../../../../utils/apiHelpers";
+import { VerifyTRPerzonalizado } from "../FichaCertificadoAltura/controllerFichaCertificadoAltura";
 
 const obtenerReporteUrl = "/api/v01/ct/exposicionCalor/obtenerReporte";
 const registrarUrl = "/api/v01/ct/exposicionCalor/registrarActualizar";
@@ -116,7 +119,7 @@ export const GetInfoServicio = async (
       dni: rese.dni ?? "",
       edad: rese.edad ?? "",
       sexo: convertirGenero(rese.sexo) ?? "",
-      fecha: rese.fechaExamen ?? prev.fecha,
+      fecha: (rese.fechaExamen || rese.fecha) ?? prev.fecha,
 
       fechaNacimiento: formatearFechaCorta(rese.fechaNacimiento) ?? "",
       lugarNacimiento: rese.lugarNacimiento ?? "",
@@ -168,6 +171,8 @@ export const GetInfoServicioEditar = async (
       edad: rese.edad ?? "",
       sexo: convertirGenero(rese.sexo) ?? "",
 
+      hora: rese.hora ?? "",
+
       fechaNacimiento: formatearFechaCorta(rese.fechaNacimiento) ?? "",
       lugarNacimiento: rese.lugarNacimiento ?? "",
       estadoCivil: rese.estadoCivil ?? "",
@@ -207,7 +212,7 @@ export const GetInfoServicioEditar = async (
 
       user_medicoFirma: rese.user_medicoFirma
         ? rese.user_medicoFirma
-        : prev.user_medicoFirma, 
+        : prev.user_medicoFirma,
     }));
   }
 };
@@ -218,10 +223,18 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     return;
   }
 
+
+  if (form.aptitud == "") {
+    await Swal.fire("Advertencia", "Debe seleccionar la aptitud", "warning");
+    return;
+  }
+
   const body = {
     norden: form.norden,
     id: form.id,
     fecha: form.fecha,
+
+    horaRegistro:  getHoraActual(),
 
     signosVitalesResultados: form.signosVitalesResultados,
     signosVitalesObservaciones: form.signosVitalesObservaciones,
@@ -292,7 +305,7 @@ export const PrintHojaR = (nro, token, tabla) => {
 };
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
-  VerifyTRDefault(
+  VerifyTRPerzonalizadoDefault(
     nro,
     tabla,
     token,
