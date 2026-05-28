@@ -74,9 +74,9 @@ export default function ModalListaCorreos({ open, archivosList, onClose, title, 
                                             <span className="bg-white text-blue-700 text-xs font-bold px-2.5 py-1 rounded-full uppercase">
                                                 Correo #{index + 1}
                                             </span>
-                                            {correo.fechaRegistro && (
-                                                <span className="text-xs text-gray-500">
-                                                    Registrado el: {new Date(correo.fechaRegistro).toLocaleString()}
+                                            {correo.fechaEnvio && (
+                                                <span className="text-xs text-white">
+                                                    Enviado el: {new Date(correo.fechaEnvio).toLocaleString()}
                                                 </span>
                                             )}
                                         </div>
@@ -123,7 +123,7 @@ export default function ModalListaCorreos({ open, archivosList, onClose, title, 
                                                 <div className="flex flex-wrap gap-2">
                                                     {correo.archivos.map((archivo, aIdx) => (
                                                         <div key={aIdx} className="flex items-center gap-2 bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-xs font-medium border border-blue-100">
-                                                            <FontAwesomeIcon icon={faFile} className="text-[10px]"/>
+                                                            <FontAwesomeIcon icon={faFile} className="text-[10px]" />
                                                             {archivo.nombreTipoArchivo || archivo.nombre || archivosList?.find(ad => ad.idTipoArchivo === archivo.idTipoArchivo)?.nomenclatura || (typeof archivo === 'string' ? archivo : 'Archivo')}
                                                             <span className="text-[10px] opacity-60">({(convertirAMB(archivo.tamanio) || 0).toFixed(2)} MB)</span>
                                                         </div>
@@ -137,7 +137,7 @@ export default function ModalListaCorreos({ open, archivosList, onClose, title, 
                                                 {correo.mensaje}
                                             </div>
                                         </div>
-
+                                      
 
                                     </div>
                                 </div>
