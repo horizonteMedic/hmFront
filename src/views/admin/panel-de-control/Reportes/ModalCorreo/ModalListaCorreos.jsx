@@ -111,6 +111,17 @@ export default function ModalListaCorreos({ open, archivosList, onClose, title, 
                                                     </div>
                                                 </div>
                                             )}
+                                            {correo.conCopiaOculto && (
+                                                <div className="flex items-start gap-3">
+                                                    <div className="mt-1 text-gray-400">
+                                                        <FontAwesomeIcon icon={faUser} />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Con Copia Oculta</p>
+                                                        <p className="text-sm text-gray-700 font-medium break-all">{correo.conCopiaOculto}</p>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
 
                                         <div className="pt-2">
@@ -137,7 +148,7 @@ export default function ModalListaCorreos({ open, archivosList, onClose, title, 
                                                 {correo.mensaje}
                                             </div>
                                         </div>
-                                      
+
 
                                     </div>
                                 </div>

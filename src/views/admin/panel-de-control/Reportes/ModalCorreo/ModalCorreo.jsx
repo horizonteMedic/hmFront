@@ -109,6 +109,7 @@ export default function ModalCorreo({ open, onClose, refrescar, norden, nordenYS
                     id: null,
                     destino: "",
                     conCopia: "",
+                    conCopiaOculto: "",
                     asunto: "",
                     mensaje: "",
                     archivos: []
@@ -304,6 +305,20 @@ export default function ModalCorreo({ open, onClose, refrescar, norden, nordenYS
                                                 className="flex-1 border-b border-gray-300 focus:border-blue-500 outline-none "
                                             />
                                         </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-32 font-semibold text-gray-500">
+                                                Con Copia Oculta
+                                            </span>
+
+                                            <input
+                                                name="conCopiaOculto"
+                                                value={emailForm.conCopiaOculto}
+                                                onChange={(e) => handleEmailChange(index, e)}
+                                                placeholder="copia@empresa.com , segundacopia@empresa.com"
+                                                className="flex-1 border-b border-gray-300 focus:border-blue-500 outline-none "
+                                            />
+                                        </div>
+
 
                                         {/* ASUNTO */}
                                         <div className="flex items-center gap-2  pb-1">

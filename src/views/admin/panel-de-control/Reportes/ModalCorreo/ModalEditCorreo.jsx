@@ -59,6 +59,7 @@ export default function ModalEditCorreo({ open, onClose, refrescar, norden, nord
                     id: p.id,
                     destino: p.destino,
                     conCopia: p.conCopia,
+                    conCopiaOculto: p.conCopiaOculto,
                     asunto: p.asunto,
                     mensaje: p.mensaje,
                     archivos: p.archivos || [],
@@ -234,6 +235,17 @@ export default function ModalEditCorreo({ open, onClose, refrescar, norden, nord
                                                 value={emailForm.conCopia}
                                                 onChange={(e) => handleEmailChange(index, e)}
                                                 placeholder="copia@empresa.com"
+                                                className="flex-1 border-b border-gray-300 focus:border-blue-500 outline-none "
+                                            />
+                                        </div>
+                                        
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-32 font-semibold text-gray-500">Con Copia Oculta</span>
+                                            <input
+                                                name="conCopiaOculto"
+                                                value={emailForm.conCopiaOculto}
+                                                onChange={(e) => handleEmailChange(index, e)}
+                                                placeholder="copiaoculto@empresa.com"
                                                 className="flex-1 border-b border-gray-300 focus:border-blue-500 outline-none "
                                             />
                                         </div>
