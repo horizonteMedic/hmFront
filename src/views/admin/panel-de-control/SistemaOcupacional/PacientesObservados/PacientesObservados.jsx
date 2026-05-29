@@ -350,6 +350,10 @@ function Table({ data, set, token, clean }) {
             label: "Hora Salida",
             accessor: "horaFin",
         },
+        {
+            label: "Sede",
+            accessor: "sede",
+        },
     ];
 
     return (

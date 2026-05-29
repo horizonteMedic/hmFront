@@ -468,8 +468,8 @@ export const SubmitDataService = async (
         aptoRestriccion: form.aptitud === "APTO RESTRICCION" ? true : false,
         noApto: form.aptitud === "NO APTO" ? true : false,
 
-        usuarioFirma: form.user_medicoFirma,
-        doctorAsignado: form.user_doctorAsignado,
+        usuarioFirma: "",
+        doctorAsignado: "",
     };
 
     await SubmitDataServiceDefaultManejo(token, limpiar, body, registrarUrl, () => {
