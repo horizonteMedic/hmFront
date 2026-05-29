@@ -23,7 +23,7 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
 
     const datosReales = {
         apellidosNombres: String(`${data.apellidosPaciente ?? ""} ${data.nombresPaciente ?? ""}`).trim(),
-        fechaExamen: formatearFechaCorta(data.fechaFichaAnexo16_fecha ?? ""),
+        fechaExamen: formatearFechaCorta(data.fechaFichaAnexo2_fecha ?? ""),
         tipoExamen: String(data.nombreExamen ?? ""),
         sexo: convertirGenero(data.sexoPaciente) || "",
         documentoIdentidad: String(data.dniPaciente ?? ""),
@@ -464,8 +464,8 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
 
     // Primera línea
     doc.text("Estimados Señores de: ", tablaInicioX + 2, yTexto + 2);
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text(`${datosFinales.empresa || ""}`, tablaInicioX + 2 + doc.getTextWidth("Estimados Señores de: "), yTexto + 2);
+    doc.setFont("helvetica", "bold").setFontSize(7);
+    doc.text(`${datosFinales.empresa || ""}`, tablaInicioX + 4 + doc.getTextWidth("Estimados Señores de: "), yTexto + 2);
 
     // Segunda línea - usando todo el ancho disponible
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -473,7 +473,7 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
 
     // Calcular posición del nombre en negrita
     const posicionNombre = tablaInicioX + 2 + doc.getTextWidth("Enviamos el informe: ");
-    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(7);
     doc.text(`${datosFinales.apellidosNombres || ""}`, posicionNombre, yTexto + 5.5);
 
     // Calcular posición del texto final usando el ancho del nombre en negrita
