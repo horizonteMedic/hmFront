@@ -49,11 +49,11 @@ export default function SeguimientoClinico() {
         handleClearnotO,
     } = useForm(initialFormState);
 
-    const handleSearch = (e) => {
+    const handleSearch = async (e) => {
         if (e.key === "Enter") {
             handleClearnotO();
-            searchByNorden(form.norden, setForm, token);
-            getHistorialExamenes(form.norden, setForm, token);
+            const dni = await searchByNorden(form.norden, setForm, token, selectedSede);
+            await getHistorialExamenes(form.norden, setForm, token, dni, selectedSede);
         }
     };
 
@@ -149,7 +149,7 @@ function ComparisonTabs({ resultadoExamenes, currentNorden }) {
 
         const nordenOptions = data.map(item => ({
             value: String(item.norden),
-            label: `${item.norden} (${formatearFechaCorta(item.fecha_registro)})`
+            label: `${item.norden} (${formatearFechaCorta(item.fecha_registro)}) - ${item.sede ?? "Trujillo"}`
         }));
 
         return (
@@ -203,8 +203,8 @@ function ComparisonTabs({ resultadoExamenes, currentNorden }) {
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                         className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${activeTab === tab.id
-                                ? "border-blue-600 text-blue-600"
-                                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                            ? "border-blue-600 text-blue-600"
+                            : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                             }`}
                     >
                         {tab.label}
@@ -224,6 +224,13 @@ function LaboratorioTable({ data }) {
         { label: "Fecha", accessor: "fecha_registro", render: (row) => row.fecha_registro ? formatearFechaCorta(row.fecha_registro) : "SIN REGISTROS" },
         { label: "Grupo Sanguíneo", accessor: "grupo_sanguineo" },
         { label: "Factor RH", accessor: "factor_rh" },
+        {
+            label: "Sede", accessor: "sede", render: (row) => (
+                <span>
+                    {row.sede ?? "Trujillo"}
+                </span>
+            )
+        },
     ];
 
     return (
@@ -354,6 +361,10 @@ function Table({ data }) {
         {
             label: "Aptitud",
             accessor: "aptitud",
+        },
+        {
+            label: "Sede",
+            accessor: "sede",
         },
     ];
 

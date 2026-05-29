@@ -6,6 +6,7 @@ import SectionFieldset from "../../../../components/reusableComponents/SectionFi
 import BotonesAccion from "../../../../components/templates/BotonesAccion";
 import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
 import { useForm } from "../../../../hooks/useForm";
+import useRealTime from "../../../../hooks/useRealTime";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import {
@@ -25,7 +26,6 @@ export default function CertificadoExposicionAlCalor() {
     datosFooter,
     userName,
     userCMP,
-    hora,
   } = useSessionData();
 
   const initialFormState = {
@@ -140,7 +140,7 @@ export default function CertificadoExposicionAlCalor() {
         <InputTextOneLine
           label="Hora"
           name="hora"
-          value={hora}
+          value={form.hora}
           disabled
           labelWidth="120px"
         />

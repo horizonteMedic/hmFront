@@ -191,6 +191,7 @@ export default function PlantillasCorreo({ ContrataMulti, EmpresasMulti }) {
                     id: null,
                     destino: "",
                     conCopia: "",
+                    conCopiaOculto: "",
                     adicional: false,
                     asunto: "{nombreExamen}//{nombrePaciente}//{empresa}//{fechaExamen}",
                     mensaje: `Estimado/a Dr./Dra.,\n
@@ -486,7 +487,7 @@ Saludos cordiales.\n
                         </p>
                         <div className="flex flex-wrap gap-2 text-gray-500">
                             {
-                                ["empresa", "contrata", "nombrePaciente", "tipoExamen", "nombreExamen", "fechaExamen", "fechaCorreo", "listaAdjuntos", "nombreUsuario","telefonoPaciente"].map((item, index) => (
+                                ["empresa", "contrata", "nombrePaciente", "tipoExamen", "nombreExamen", "fechaExamen", "fechaCorreo", "listaAdjuntos", "nombreUsuario", "telefonoPaciente"].map((item, index) => (
                                     <span className="bg-white px-2 py-1 rounded" key={index}>
                                         {`{${item}}`}
                                     </span>
@@ -530,7 +531,7 @@ Saludos cordiales.\n
                                                 name="destino"
                                                 value={emailForm.destino}
                                                 onChange={(e) => handleEmailChange(index, e)}
-                                                placeholder="correo@empresa.com , email@empresa.com"
+                                                placeholder="correo@empresa.com ; email@empresa.com"
                                                 className="flex-1 border-b border-gray-300 focus:border-blue-500 outline-none "
                                             />
                                         </div>
@@ -545,7 +546,19 @@ Saludos cordiales.\n
                                                 name="conCopia"
                                                 value={emailForm.conCopia}
                                                 onChange={(e) => handleEmailChange(index, e)}
-                                                placeholder="copia@empresa.com , segundacopia@empresa.com"
+                                                placeholder="copia@empresa.com ; segundacopia@empresa.com"
+                                                className="flex-1 border-b border-gray-300 focus:border-blue-500 outline-none "
+                                            />
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-32 font-semibold text-gray-500">
+                                                Con Copia Oculto
+                                            </span>
+                                            <input
+                                                name="conCopiaOculto"
+                                                value={emailForm.conCopiaOculto}
+                                                onChange={(e) => handleEmailChange(index, e)}
+                                                placeholder="copiaoculta@empresa.com ; segundacopiaoculta@empresa.com"
                                                 className="flex-1 border-b border-gray-300 focus:border-blue-500 outline-none "
                                             />
                                         </div>

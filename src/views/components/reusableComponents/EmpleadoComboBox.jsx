@@ -5,6 +5,7 @@ export default function EmpleadoComboBox({
     value,
     onChange,
     form,
+    disabled,
     className = "",
     label = "Médico que Certifica",
     nameField = "nombre_medico",
@@ -147,11 +148,12 @@ export default function EmpleadoComboBox({
                 <input
                     id={nameField}
                     name={nameField}
+                    disabled={disabled}
                     type="text"
                     autoComplete="off"
                     value={inputValue}
                     onChange={handleSearch}
-                    className={`border rounded px-2 py-1 w-full ${isLoading ? 'pr-8' : ''}`}
+                    className={`border rounded px-2 py-1 w-full  ${isLoading ? 'pr-8' : ''} ${disabled ? 'bg-gray-300' : ''}`}
                     onKeyDown={(e) => {
                         if (e.key === "Enter" && filteredEmpleados.length > 0) {
                             e.preventDefault();

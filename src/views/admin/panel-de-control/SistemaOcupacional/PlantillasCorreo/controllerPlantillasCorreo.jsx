@@ -68,6 +68,7 @@ export const SubmitPlantillaCorreo = async (
     else if (!form.idRelacionEmpresaContrata) mensajeError += "Debe ingresar almenos un correo válido\n";
     else if (form.plantillaConfig.some(a => !esListaCorreosValida(a.destino))) mensajeError += "Debe ingresar correos destino válidos\n";
     else if (form.plantillaConfig.some(a => a.conCopia ? !esListaCorreosValida(a.conCopia) : false)) mensajeError += "Debe ingresar correos válidos en CC\n";
+    else if (form.plantillaConfig.some(a => a.conCopiaOculto ? !esListaCorreosValida(a.conCopiaOculto) : false)) mensajeError += "Debe ingresar correos válidos en CC Oculta\n";
     else if (form.plantillaConfig.some(a => !a.asunto)) mensajeError += "Debe ingresar un asunto válido\n";
     if (mensajeError) {
         await Swal.fire("Error", mensajeError, "error");
@@ -80,6 +81,7 @@ export const SubmitPlantillaCorreo = async (
             idEmpresaContrata: form.idRelacionEmpresaContrata,
             destino: (a.destino ?? "").replace(/\s+/g, ""),
             conCopia: (a.conCopia ?? "").replace(/\s+/g, ""),
+            conCopiaOculto: (a.conCopiaOculto ?? "").replace(/\s+/g, ""),
             asunto: a.asunto,
             mensaje: a.mensaje,
             usuarioRegistro: user,
