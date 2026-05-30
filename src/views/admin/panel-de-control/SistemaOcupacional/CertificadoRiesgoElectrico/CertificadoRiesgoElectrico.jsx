@@ -7,7 +7,7 @@ import BotonesAccion from "../../../../components/templates/BotonesAccion";
 import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
 import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
-import { getToday } from "../../../../utils/helpers";
+import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerCertificadoRiesgo";
 
 const tabla = "riesgo_electrico"
@@ -24,6 +24,7 @@ const CertficadoRiesgoElectrico = () => {
         // Header
         norden: "",
         fechaExamen: today,
+        fechaExpiracion: getTodayPlusOneYear(),
         tipoExamen: "",
         // Datos personales
         dni: "",
@@ -44,22 +45,19 @@ const CertficadoRiesgoElectrico = () => {
         ubicacionSitio: "",
         tiempoExperiencia: "",
 
-        evaluacionRiesgoRealizada: false,
-        personalCompetenteAreaElectrica: false,
-        conoceTipoVoltaje: false,
-        personalCertificadoVoltaje: false,
-        eppApropiadoTarea: false,
-        sistemaDesenergizado: false,
-        sistemaAislado: false,
-        tarjetasAdvertenciaInstaladas: false,
-        bloqueosInstalados: false,
-        sistemasAterrizados: false,
-        trabajosSimultaneosControlados: false,
-        personalEntrenadoRiesgoElectrico: false,
-        medidasSeguridadSatisfactorias: false,
-
-
-
+        evaluacionRiesgoRealizada: "SI",
+        personalCompetenteAreaElectrica: "SI",
+        conoceTipoVoltaje: "SI",
+        personalCertificadoVoltaje: "SI",
+        eppApropiadoTarea: "SI",
+        sistemaDesenergizado: "SI",
+        sistemaAislado: "SI",
+        tarjetasAdvertenciaInstaladas: "SI",
+        bloqueosInstalados: "SI",
+        sistemasAterrizados: "SI",
+        trabajosSimultaneosControlados: "SI",
+        personalEntrenadoRiesgoElectrico: "SI",
+        medidasSeguridadSatisfactorias: "SI",
 
         aptitud: "",
         // Médico que Certifica //BUSCADOR
@@ -72,9 +70,9 @@ const CertficadoRiesgoElectrico = () => {
         setForm,
         handleChange,
         handleChangeNumber,
+        handleChangeNumberDecimals,
         handleRadioButtonBoolean,
         handleRadioButton,
-        handleFocusNext,
         handleClear,
         handleChangeSimple,
         handleClearnotO,
@@ -112,6 +110,13 @@ const CertficadoRiesgoElectrico = () => {
                         labelWidth="120px"
                     />
                     <InputTextOneLine
+                        label="Nombre del Examen"
+                        name="tipoExamen"
+                        value={form.tipoExamen}
+                        disabled
+                        labelWidth="120px"
+                    />
+                    <InputTextOneLine
                         label="Fecha de Ingreso"
                         name="fechaExamen"
                         type="date"
@@ -119,7 +124,14 @@ const CertficadoRiesgoElectrico = () => {
                         onChange={handleChangeSimple}
                         labelWidth="120px"
                     />
-
+                    <InputTextOneLine
+                        label="Fecha expiración"
+                        name="fechaExpiracion"
+                        type="date"
+                        value={form?.fechaExpiracion}
+                        onChange={handleChangeSimple}
+                        labelWidth="120px"
+                    />
                 </SectionFieldset>
 
                 {/* ===== SECCIÓN: DATOS LABORALES ===== */}
@@ -137,9 +149,8 @@ const CertficadoRiesgoElectrico = () => {
                         label="Tiempo de experiencia"
                         name="tiempoExperiencia"
                         value={form.tiempoExperiencia}
-                        onChange={handleChange}
                         disabled
-                        labelWidth="120px"
+                        labelWidth="121px"
                     />
                 </SectionFieldset>
 
@@ -194,7 +205,7 @@ const CertficadoRiesgoElectrico = () => {
                             {
                                 label:
                                     "NO APTO (No apto para trabajos con exposición al calor y vapor)",
-                                value: "NO APTO",
+                                value: "NO_APTO",
                             },
                         ]}
                     />
@@ -214,6 +225,7 @@ const CertficadoRiesgoElectrico = () => {
                     handleSave={handleSave}
                     handleClear={handleClear}
                     handlePrint={handlePrint}
+                    handleChangeNumberDecimals={handleChangeNumberDecimals}
                 />
             </div>
         </>
