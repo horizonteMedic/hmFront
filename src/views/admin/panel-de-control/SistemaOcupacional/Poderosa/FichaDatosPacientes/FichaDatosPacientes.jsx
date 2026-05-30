@@ -132,6 +132,8 @@ export default function FichaDatosPacientes() {
 
         nombre_doctorAsignado: "",
         user_doctorAsignado: "",
+        nombrePsicologo: "",
+        nombreMedicoAnexo16: "",
     };
 
     const {
@@ -1016,20 +1018,25 @@ export default function FichaDatosPacientes() {
 
             </SectionFieldset>
             <SectionFieldset legend="Asignación de Médico">
-                <EmpleadoComboBox
-                    value={form.nombre_medico}
+                {/*Nombre_medico */}
+                <InputTextOneLine
+                    labelOnTop={true}
                     label="Psicologo"
-                    form={form}
-                    onChange={handleChangeSimple}
+                    name="Psicologo"
+                    value={form.nombrePsicologo}
+                    disabled
+                    labelWidth="100px"
                 />
-                <EmpleadoComboBox
-                    value={form.nombre_doctorAsignado}
+                {/*NOMBRE-DOCTORASIGNADO */}
+                <InputTextOneLine
                     label="Doctor Asignado"
-                    form={form}
-                    onChange={handleChangeSimple}
-                    nameField="nombre_doctorAsignado"
-                    idField="user_doctorAsignado"
+                    labelOnTop={true}
+                    name="nombreMedicoAnexo16"
+                    value={form.nombreMedicoAnexo16}
+                    disabled
+                    labelWidth="100px"
                 />
+
             </SectionFieldset>
 
             {/* BOTONES DE ACCIÓN */}
