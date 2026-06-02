@@ -280,6 +280,54 @@ export const VerifyTRDefault = async (nro, tabla, token, set, sede, noTieneRegis
     });
 };
 
+export const VerifyTRDefaultValidado = async (nro, tabla, token, sede, noTieneRegistro = () => { }, tieneRegistro = () => { }) => {
+    if (!nro) {
+        await Swal.fire(
+            "Error",
+            "Debe Introducir un Nro de Historia Clínica válido",
+            "error"
+        );
+        return;
+    }
+    LoadingDefault("Validando datos");
+
+    try {
+        const res = await getFetch(
+            `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`, token);
+        console.log(res)
+
+        if (res.id !== 0) {
+            tieneRegistro();//obtener data servicio
+            return;
+            //No tiene registro previo 
+        }
+
+        const paciente = await getFetch(
+            `/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`,
+            token
+        );
+
+        if (!paciente || paciente.error) {
+            await Swal.fire(
+                "Error",
+                "Debe ingresar un Nro de Orden válido",
+                "error"
+            );
+            return;
+        }
+
+        noTieneRegistro();//datos paciente
+
+    } catch (error) {
+        console.log(error);
+        await Swal.fire(
+            "Error",
+            "El número de orden no existe",
+            "error"
+        );
+    }
+};
+
 export const VerifyTRPerzonalizadoDefault = async (nro, tabla, token, set, sede, noTieneRegistro = () => { }, tieneRegistro = () => { }, necesitaExamen = () => { }) => {
     if (!nro) {
         await Swal.fire(
