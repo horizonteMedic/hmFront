@@ -125,7 +125,7 @@ export default function OftalmologiaOhla() {
     vl_agujero_oi: "00",
     bino_sinc: "00",
     bino_conc: "00",
-    reflejos_pupilares: "",
+    reflejos_pupilares: "PUPILAS ISOCORICAS",
 
     ptosisPalpebralOd: false,
     ptosisPalpebralOi: false,
@@ -1557,21 +1557,64 @@ export default function OftalmologiaOhla() {
                   onKeyUp={(e) => handleNextFocus(e, "reflejos_pupilares")}
                   className="border rounded px-2 py-1 col-span-2"
                 />
-                <span className="font-semibold text-center">
-                  Reflejos Pupilares:
-                </span>
-                <input
-                  name="reflejos_pupilares"
-                  value={form.reflejos_pupilares}
-                  onChange={handleChange}
-                  className="border rounded px-2 py-1 "
-                />
               </div>
             </div>
 
             <div className="grid grid-cols-5 gap-2 mb-1 items-center">
-              <label className="text-right pr-2">Visión de Colores :</label>
+              <label className="text-right pr-2">
+                Reflejos Pupilares:
+              </label>
+              <select
+                name="reflejos_pupilares"
+                value={form.reflejos_pupilares}
+                onChange={handleChange}
+                className="border rounded px-2 py-1 col-span-4"
+              >
+                <option value="PUPILAS ISOCORICAS">
+                  PUPILAS ISOCORICAS
+                </option>
+                <option value="PUPILA DERECHA MIDRIATICA">
+                  PUPILA DERECHA MIDRIATICA
+                </option>
 
+                <option value="PUPILA IZQUIERDA MIDRIATICA">
+                  PUPILA IZQUIERDA MIDRIATICA
+                </option>
+
+                <option value="PUPILA DERECHA MIOTICA">
+                  PUPILA DERECHA MIOTICA
+                </option>
+
+                <option value="PUPILA IZQUIERDA MIOTICA">
+                  PUPILA IZQUIERDA MIOTICA
+                </option>
+
+                <option value="PUPILAS MIOTICAS">
+                  PUPILAS MIOTICAS
+                </option>
+
+                <option value="PUPILAS MIDRIATICAS">
+                  PUPILAS MIDRIATICAS
+                </option>
+
+                <option value="PUPILAS ANISOCORICAS">
+                  PUPILAS ANISOCORICAS
+                </option>
+
+                <option value="PUPILA DERECHA ARREACTIVA">
+                  PUPILA DERECHA ARREACTIVA
+                </option>
+
+                <option value="PUPILA IZQUIERDA ARREACTIVA">
+                  PUPILA IZQUIERDA ARREACTIVA
+                </option>
+
+                <option value="PUPILAS ARREACTIVAS">
+                  PUPILAS ARREACTIVAS
+                </option>
+              </select>
+
+              <label className="text-right pr-2">Visión de Colores :</label>
               <input
                 name="visionColores"
                 value={form.visionColores || ""}
