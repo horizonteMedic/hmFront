@@ -6,8 +6,8 @@ import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 
-export default async function ficha_antecedente_patologico_boro_nuevo(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function ficha_antecedente_patologico_boro_nuevo(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
   const datosFinales = {
@@ -473,7 +473,11 @@ export default async function ficha_antecedente_patologico_boro_nuevo(data = {})
   footerTR(doc, { footerOffsetY: 8 });
 
   // === Imprimir ===
-  imprimir(doc);
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
+  }
 }
 
 function imprimir(doc) {

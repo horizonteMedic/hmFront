@@ -57,6 +57,8 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "tamizaje_dermatologico",
         "escala_lake_louise",
         "riesgo_cardiovascular",
+        "certificado_exposicion_al_calor",
+        "riesgo_electrico",
     ]
     const coordenadasPSICOSENSO = {
         HUELLA: { x: 400, y: 680, width: 60, height: 60 },

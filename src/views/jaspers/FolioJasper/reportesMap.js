@@ -122,6 +122,10 @@ import CAMO_Administrativo2 from "../CAMOAdmin/CAMO_Administrativo2";
 import EscalaLakeLouise from "../EscalaLakeLouise/EscalaLakeLouise";
 import RiesgoCardiovascular from "../RiesgoCardiovascular/RiesgoCardiovascular";
 import ResumenMedicoAnexo2 from "../Ficha_Anexo2/ResumenMedico/ResumenMedicoAnexo2";
+import CertificadoExposicionAlCalor from "../CertificadoExposicionAlCalor/CertificadoExposicionAlCalor";
+import CertificadoRiesgoElectrico from "../CertificadoRiesgoElectrico/CertificadoRiesgoElectrico";
+import Aptitud_Trabajos_EnCaliente_Digitalizado from "../AptitudCertificadoCaliente/Aptitud_Trabajos_EnCaliente_Digitalizado";
+import ficha_antecedente_patologico_boro_nuevo from "../Poderosa/CertificadoMedicoManipuladores_Barrick_Digitalizado";
 
 export const reportesMap = {
    /* =========================
@@ -400,5 +404,10 @@ export const reportesMap = {
    escala_lake_louise: EscalaLakeLouise,
 
    riesgo_cardiovascular: RiesgoCardiovascular,
+
+   aptitud_trabajos_encaliente: Aptitud_Trabajos_EnCaliente_Digitalizado,
+   certificado_exposicion_al_calor: CertificadoExposicionAlCalor,
+   riesgo_electrico: CertificadoRiesgoElectrico,
+   certificado_manipuladores_barrick: ficha_antecedente_patologico_boro_nuevo,
 
 };
