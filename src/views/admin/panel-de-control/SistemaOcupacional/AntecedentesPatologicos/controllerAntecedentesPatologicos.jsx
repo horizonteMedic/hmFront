@@ -12,11 +12,52 @@ const obtenerReporteUrl =
 const registrarUrl =
     "/api/v01/ct/antecedentesPatologicos/registrarActualizarAntecedentesPatologicos";
 
+// Helper function to fetch antecedentes from Huamachuco
+const fetchAntecedentesHuamachuco = async (dni, token) => {
+    try {
+        Swal.fire({
+            title: "Buscando en Huamachuco",
+            text: "Por favor espere...",
+            icon: "info",
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        const res = await getFetch(
+            `/api/v01/local-huamachuco/antecedentesQuirurgicos/obtenerPorPaciente?dni=${dni}`,
+            token
+        );
+
+        Swal.close();
+
+        if (res && res.operaciones) {
+            return res.operaciones.map((op, index) => ({
+                codAntecedentesPatologicosQuirurgicos: null,
+                quirurjicosId: null,
+                fecha: op.fechaOperacion || null,
+                hospitalOperacion: op.hospitalOperacion || "",
+                operacion: op.operacion || "",
+                diasHospitalizado: op.diasHospitalizado || "",
+                complicaciones: op.complicaciones || "",
+            }));
+        }
+        return [];
+    } catch (error) {
+        console.error("Error fetching antecedentes from Huamachuco:", error);
+        Swal.close();
+        return [];
+    }
+};
+
 export const GetInfoServicio = async (
     nro,
     tabla,
     set,
     token,
+    selectedSede,
     onFinish = () => { }
 ) => {
     const res = await GetInfoServicioDefault(
@@ -37,6 +78,26 @@ export const GetInfoServicio = async (
         }
 
         const medicamentosAnexo16A = res.medicamentosAnexo16A ?? "";
+
+        // Check if we need to fetch from Huamachuco
+        let antecedentesData = [];
+        if (res.antecedentesPatologicosQuirurjicos && res.antecedentesPatologicosQuirurjicos.length > 0) {
+            antecedentesData = res.antecedentesPatologicosQuirurjicos.map((item) => ({
+                codAntecedentesPatologicosQuirurgicos: item.codAntecedentesPatologicosQuirurgicos,
+                quirurjicosId: item.quirurjicosId,
+                fecha: item.fecha,
+                hospitalOperacion: item.hospitalOperacion,
+                operacion: item.operacion,
+                diasHospitalizado: item.diasHospitalizado,
+                complicaciones: item.complicaciones,
+            }));
+        } else if (res.dni_cod_pa ) {
+            const dni = res.dni_cod_pa;
+            console.log({ selectedSede });
+            if (selectedSede == "HMAC") {
+                antecedentesData = await fetchAntecedentesHuamachuco(dni, token);
+            }
+        }
 
         set((prev) => ({
             ...prev,
@@ -70,15 +131,7 @@ export const GetInfoServicio = async (
             medicamentos: medicamentosAnexo16A != "",
             especifiqueMedicamentos: medicamentosAnexo16A,
 
-            antecedentes: res.antecedentesPatologicosQuirurjicos.map((item) => ({
-                codAntecedentesPatologicosQuirurgicos: item.codAntecedentesPatologicosQuirurgicos,
-                quirurjicosId: item.quirurjicosId,
-                fecha: item.fecha,
-                hospitalOperacion: item.hospitalOperacion,
-                operacion: item.operacion,
-                diasHospitalizado: item.diasHospitalizado,
-                complicaciones: item.complicaciones,
-            })) || [],
+            antecedentes: antecedentesData,
         }));
     }
 };
@@ -98,6 +151,23 @@ export const GetInfoServicioEditar = async (
         onFinish
     );
     if (res) {
+        // Check if we need to fetch from Huamachuco
+        let antecedentesData = [];
+        if (res.antecedentesPatologicosQuirurjicos && res.antecedentesPatologicosQuirurjicos.length > 0) {
+            antecedentesData = res.antecedentesPatologicosQuirurjicos.map((item) => ({
+                codAntecedentesPatologicosQuirurgicos: item.codAntecedentesPatologicosQuirurgicos,
+                quirurjicosId: item.quirurjicosId,
+                fecha: item.fecha,
+                hospitalOperacion: item.hospitalOperacion,
+                operacion: item.operacion,
+                diasHospitalizado: item.diasHospitalizado,
+                complicaciones: item.complicaciones,
+            }));
+        } else if (res.dniPaciente || res.dni_paciente || res.dni) {
+            const dni = res.dniPaciente || res.dni_paciente || res.dni;
+            antecedentesData = await fetchAntecedentesHuamachuco(dni, token);
+        }
+
         set((prev) => ({
             ...prev,
             //PRIMERA TAB==========================================================================
@@ -331,16 +401,7 @@ export const GetInfoServicioEditar = async (
             especifiqueActividadFisica: res.actividadFisicaEspecifiqueBoro_activ_fisic_detal,
 
             //TERCERA TAB==========================================================================
-            // antecedentes: res.antecedentesPatologicosQuirurjicos || [],
-            antecedentes: res.antecedentesPatologicosQuirurjicos.map((item) => ({
-                codAntecedentesPatologicosQuirurgicos: item.codAntecedentesPatologicosQuirurgicos,
-                quirurjicosId: item.quirurjicosId,
-                fecha: item.fecha,
-                hospitalOperacion: item.hospitalOperacion,
-                operacion: item.operacion,
-                diasHospitalizado: item.diasHospitalizado,
-                complicaciones: item.complicaciones,
-            })) || [],
+            antecedentes: antecedentesData,
 
             hijosVivos: res.hijosVivosVarones_txtvhijosvivos,
             hijosFallecidos: res.hijosFallecidosVarones_txtvhijosfallecidos,
@@ -657,7 +718,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         sede,
         () => {
             //NO Tiene registro
-            GetInfoServicio(nro, tabla, set, token, () => { Swal.close(); });
+            GetInfoServicio(nro, tabla, set, token, sede, () => { Swal.close(); });
         },
         () => {
             //Tiene registro
@@ -699,7 +760,7 @@ export const VerifyTRPerzonalizado = async (nro, tabla, token, set, sede, noTien
             //No tiene registro previo 
             noTieneRegistro();//datos paciente
         } else if (res.id === 2) {
-            necesitaExamen();
+            noTieneRegistro();//datos paciente
         } else {
             tieneRegistro();//obtener data servicio
         }
