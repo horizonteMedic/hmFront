@@ -969,7 +969,6 @@ const AperturaExamenesPreOcup = (props) => {
 
   const ImportarPreCarga = () => {
     getMasivoimport(datos.codPa, props.token, (resultados) => {
-      console.log(resultados)
       if (resultados.length === 1) {
         aplicarPreCarga(resultados[0]);
       } else {

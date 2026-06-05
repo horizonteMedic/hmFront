@@ -7,7 +7,6 @@ import { getToday } from "../../../../../utils/helpers";
 import { LoadingDefault } from "../../../../../utils/functionUtils";
 import { getFetch } from "../../../../../utils/apiHelpers";
 
-
 export const ImportData = (dni, Swal, getFetch, token, set, RendeSet) => {
   Swal.fire({
     title: 'Cargando Datos',
