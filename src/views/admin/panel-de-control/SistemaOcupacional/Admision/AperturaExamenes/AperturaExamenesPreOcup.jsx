@@ -128,7 +128,6 @@ const AperturaExamenesPreOcup = (props) => {
           EnlistarProtos(res)
         })
     }
-
   }, [datos.rucEmpresa])
 
 
@@ -457,11 +456,11 @@ const AperturaExamenesPreOcup = (props) => {
   const RendeSet = (res) => {
     setSearchEmpresa(res.razonEmpresa || "");
     setSearchContrata(res.razonContrata || "")
-    setSearchMedico(res.n_medico || "");
+    setSearchMedico(res.n_medico || res.medico || "");
     setSearchPrueba(res.tipoPrueba || "N/A")
-    setSearchCargo(res.cargoDe || "")
-    setSearchArea(res.areaO || "")
-    setSearchExamenMedico(res.nomExamen || "")
+    setSearchCargo(res.cargoDe || res.cargo || "")
+    setSearchArea(res.areaO || res.area || "")
+    setSearchExamenMedico(res.nomExamen || res.nombreExamen || "")
   }
 
   const SearchHC = (event, type) => {
@@ -978,21 +977,43 @@ const AperturaExamenesPreOcup = (props) => {
     });
   }
 
-  const aplicarPreCarga = (item) => {
+  const aplicarPreCarga = async (item) => {
     console.log(item)
-    setDatos({
-      ...item,
-      nombresPa: item.nombres,
-      apellidosPa: item.apellidos,
-      razonEmpresa: item.razonEmpresa,
-      fechaAperturaPo: formatDate(item.fechaApertura),
-      userRegistroDatos: item.usuarioRegistro ?? "",
-      protocolo: item.protocolo
-    });
-    RendeSet(item)
-    setModalPreCarga(false);
-  };
+    try {
+      const res = await SearchPacienteDNI(props.selectedSede, datos.codPa, props.token);
+      if (!res.codPa) {
+        return Swal.fire('Error', 'No se ha encontrado al Paciente', 'error');
+      }
+      setDatos(prev => ({
+        ...prev,
+        // Datos del paciente buscado
+        nombres: res.nombresPa,
+        apellidos: res.apellidosPa,
+        nombresPa: res.nombresPa,
+        apellidosPa: res.apellidosPa,
+        // Datos de la pre-carga
+        ...item,
+        razonEmpresa: item.razonEmpresa,
+        fechaAperturaPo: formatDate(item.fechaApertura),
+        userRegistroDatos: item.usuarioRegistro ?? "",
+        protocolo: item.protocolo,
 
+        precioPo: item.precio,
+        tipoPago: item.tipoPago,
+        textObserv1: item.observacion1,
+        idPreNorden: item.id
+        //n_medico: 
+
+      }));
+      RendeSet(item)
+      Swal.close()
+    } catch {
+      Swal.fire('Error', 'Ha ocurrido un Error', 'error');
+    } finally {
+      setModalPreCarga(false);
+    }
+  }
+  console.log(datos.idPreNorden)
   return (
     <div >
       <div className="grid md:grid-cols-7 sm:flex-col gap-2 px-4">
@@ -1016,7 +1037,7 @@ const AperturaExamenesPreOcup = (props) => {
               onKeyDown={handleSearch}
               onChange={handleDNI}
               name="codPa"
-              className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none  flex-grow w-full ${habilitar ? "bg-slate-400" : "bg-slate-100"}`}
+              className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none  flex-grow w-full ${habilitar ? "bg-slate-400" : "bg-slate-100"} ${datos.idPreNorden ? "!bg-orange-600 !text-white" : ""}`}
             />
             <button
               onClick={() => {

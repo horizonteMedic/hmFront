@@ -70,8 +70,9 @@ export function SubmitHistoriaC(data, sede, token, operacion) {
     tcocaina: data.tcocaina,
     espaciosConfinados: data.espaciosConfinados,
     user_registro: data.user_registro,
+    idPreNorden: data.idPreNorden ? data.idPreNorden : null,
   };
-  console.log(JSON.stringify(body))
+
   const url = `${URLAzure}/api/v01/ct/registroPacientes/historiaClinicaOcupacional`
   const options = {
     method: 'POST',
