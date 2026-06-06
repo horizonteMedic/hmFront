@@ -180,7 +180,7 @@ export default async function HojadeRutaDinamico(datos = {}) {
     const startY = 70;
 
 doc.setFillColor(245, 245, 245);
-doc.rect(10, startY, 130, 25, 'F');
+doc.rect(10, startY, 130, 24, 'F');
 
 doc.setTextColor(200, 0, 0);
 doc.setFontSize(8);
