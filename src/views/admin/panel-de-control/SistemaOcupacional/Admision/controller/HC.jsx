@@ -90,7 +90,7 @@ export const submitMasivo = async (data, sede, token, userlogued) => {
       dni: row["DNI"] || null,
       razonEmpresa: row["EMPRESA"] || "",
       razonContrata: row["CONTRATA"] || "N/A",
-      nombreExamen: row["EXAMEN"] || "",
+      protocolo: row["PROTOCOLOS/PERFIL"] || "",
       cargo: row["CARGO"] || "",
       area: row["AREA"] || "",
       medico: row["MEDICO OCUP"] || "",
@@ -119,7 +119,7 @@ export const submitMasivo = async (data, sede, token, userlogued) => {
       covid1: false,
       covid2: false,
       manipuladorAlimentos: false,
-      protocolo: "",
+      nombreExamen: "",
       autoriza: "",
       numeroOperacion: null,
       herramientasManuales: false,
@@ -206,6 +206,8 @@ export const getMasivoimport = async (dni, token, onResult) => {
   LoadingDefault("Importando Datos");
   getFetch(`/api/v01/ct/preNordenOcupacional/buscarPorDni/${dni}`, token)
     .then((res) => {
+      console.log(res)
+
       Swal.close();
       const lista = res?.resultado || [];
       onResult(lista);
@@ -236,7 +238,7 @@ export const descargarPlantillaExcel = async (MedicosMulti, FormaPago, ExamenMul
 
   const listaMedicos = MedicosMulti.map(m => m.mensaje);
   const listaFormaPago = FormaPago.map(f => f.descripcion);
-  const listaExamenes = ExamenMulti.map(e => e.mensaje); // 🔥 NUEVO
+  const listaPerfiles = Array.from({ length: 20 }, (_, i) => `Perfil ${i + 1}`);
 
   const workbook = new ExcelJS.Workbook();
 
@@ -247,7 +249,7 @@ export const descargarPlantillaExcel = async (MedicosMulti, FormaPago, ExamenMul
 
   const headers = [
     "DNI", "EMPRESA", "CONTRATA", "MEDICO OCUP",
-    "CARGO", "TIPO PRUEBA", "AREA", "EXAMEN",
+    "CARGO", "TIPO PRUEBA", "AREA", "PROTOCOLOS/PERFIL",
     "PRECIO", "FORMA DE PAGO", "OBSERVACION"
   ];
 
@@ -272,23 +274,22 @@ export const descargarPlantillaExcel = async (MedicosMulti, FormaPago, ExamenMul
     sheetListas.getCell(`C${i + 1}`).value = f;
   });
 
-  listaExamenes.forEach((e, i) => { // 🔥 NUEVO
-    sheetListas.getCell(`D${i + 1}`).value = e;
-  });
+  listaPerfiles.forEach((p, i) => { sheetListas.getCell(`D${i + 1}`).value = p; });
+
 
   // 🔹 FILAS BASE
   for (let i = 0; i < 50; i++) {
     sheet.addRow([
-      "", "", "",
+      "", "GREEN PERU S.A", "N/A",
       "ARTEMIO ALEJANDRO GARCIA CABRERA",
-      "", "N/A", "", "", "", "", ""
+      "", "N/A", "", "", "", "CREDITO", ""
     ]);
   }
 
   // 🔥 RANGOS
   const rangoMedicos = `LISTAS!$A$1:$A$${listaMedicos.length}`;
   const rangoFormaPago = `LISTAS!$C$1:$C$${listaFormaPago.length}`;
-  const rangoExamenes = `LISTAS!$D$1:$D$${listaExamenes.length}`; // 🔥 NUEVO
+  const rangoPerfiles = `LISTAS!$D$1:$D$${listaPerfiles.length}`; // 🔥 NUEVO
 
   // 🔥 VALIDACIONES
   for (let i = 2; i <= 51; i++) {
@@ -302,9 +303,7 @@ export const descargarPlantillaExcel = async (MedicosMulti, FormaPago, ExamenMul
 
     // EXAMEN 🔥 NUEVO
     sheet.getCell(`H${i}`).dataValidation = {
-      type: "list",
-      allowBlank: false,
-      formulae: [rangoExamenes]
+      type: "list", allowBlank: false, formulae: [rangoPerfiles]
     };
 
     // FORMA DE PAGO
@@ -318,7 +317,7 @@ export const descargarPlantillaExcel = async (MedicosMulti, FormaPago, ExamenMul
   sheet.columns = headers.map(() => ({ width: 25 }));
 
   const buffer = await workbook.xlsx.writeBuffer();
-  saveAs(new Blob([buffer]), "Plantilla_Registro_Masivo.xlsx");
+  saveAs(new Blob([buffer]), "Plantilla_Registro_Masivo_GREENPERU.xlsx");
 };
 
 const isRowEmpty = (row) => {

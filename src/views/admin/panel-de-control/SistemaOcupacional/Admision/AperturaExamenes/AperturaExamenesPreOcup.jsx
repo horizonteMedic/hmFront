@@ -461,6 +461,7 @@ const AperturaExamenesPreOcup = (props) => {
     setSearchCargo(res.cargoDe || res.cargo || "")
     setSearchArea(res.areaO || res.area || "")
     setSearchExamenMedico(res.nomExamen || res.nombreExamen || "")
+    setSearchProtocolo(res.protocolo || "")
   }
 
   const SearchHC = (event, type) => {
@@ -844,7 +845,8 @@ const AperturaExamenesPreOcup = (props) => {
 
   const handleSubmit = (e) => {
     const camposRequeridos = ['codPa', 'nombres', 'apellidos', 'razonEmpresa', 'razonContrata', 'n_medico', 'tipoPrueba',
-      'cargoDe', 'areaO', 'nomExamen', 'nomEx', 'mineralPo', 'alturaPo', 'tipoPago', 'fechaAperturaPo']; // agrega los campos que quieras
+      'cargoDe', 'areaO', 'tipoPago', 'fechaAperturaPo']; // agrega los campos que quieras
+    //nomExamen, nomEx, mineralPo, alturaPo
     const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
     if (camposVacios.length > 0) {
       const lista = camposVacios.join(', ');
@@ -1001,9 +1003,13 @@ const AperturaExamenesPreOcup = (props) => {
         precioPo: item.precio,
         tipoPago: item.tipoPago,
         textObserv1: item.observacion1,
-        idPreNorden: item.id
-        //n_medico: 
-
+        idPreNorden: item.id,
+        n_medico: item.medico,
+        cargoDe: item.cargo,
+        areaO: item.area,
+        //nombreExamen
+        //mineral
+        //altura
       }));
       RendeSet(item)
       Swal.close()
@@ -1013,7 +1019,7 @@ const AperturaExamenesPreOcup = (props) => {
       setModalPreCarga(false);
     }
   }
-  console.log(datos.idPreNorden)
+
   return (
     <div >
       <div className="grid md:grid-cols-7 sm:flex-col gap-2 px-4">
@@ -1292,6 +1298,32 @@ const AperturaExamenesPreOcup = (props) => {
                   placeholder="N° Orden"
                 />
               </div>
+            </div>
+          </div>
+          {/* — Autocomplete Protocolo — */}
+          <div className="flex items-center space-x-2 mb-1">
+            <label htmlFor="protocolo" className="block w-32">Protocolo:</label>
+            <div className="relative flex-grow">
+              <input autoComplete="off"
+                id="protocolo" name="protocolo"
+                type="text" value={searchProtocolo}
+                placeholder="Escribe para buscar protocolo..."
+                disabled={habilitar || !(protocoloOptions?.length > 0)} onChange={handleProtocoloSearch}
+                className={`border border-gray-300 px-3 py-1 rounded-md w-full ${!(protocoloOptions?.length > 0) ? "bg-slate-300" : "bg-slate-100"}`}
+                onKeyDown={e => { if (e.key === 'Enter' && filteredProtocolos.length > 0) { e.preventDefault(); handleSelectProtocolo(filteredProtocolos[0]); } }}
+                onFocus={() => setFilteredProtocolos(protocoloOptions.filter(p => p.nombre.toLowerCase().includes(searchProtocolo.toLowerCase())))}
+                onBlur={() => setTimeout(() => setFilteredProtocolos([]), 100)}
+              />
+              {searchProtocolo && filteredProtocolos.length > 0 && (
+                <ul className="absolute inset-x-0 top-full bg-white border rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                  {filteredProtocolos.map(p => (
+                    <li key={p.idProtocolo} className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                      onMouseDown={() => handleSelectProtocolo(p)}>
+                      {p.nombre}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
 
@@ -1618,32 +1650,7 @@ const AperturaExamenesPreOcup = (props) => {
               />
             </div>
 
-            {/* — Autocomplete Protocolo — */}
-            <div className="flex items-center space-x-2 mb-1">
-              <label htmlFor="protocolo" className="block w-32">Protocolo:</label>
-              <div className="relative flex-grow">
-                <input autoComplete="off"
-                  id="protocolo" name="protocolo"
-                  type="text" value={searchProtocolo}
-                  placeholder="Escribe para buscar protocolo..."
-                  disabled={habilitar || !(protocoloOptions?.length > 0)} onChange={handleProtocoloSearch}
-                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${!(protocoloOptions?.length > 0) ? "bg-slate-300" : "bg-slate-100"}`}
-                  onKeyDown={e => { if (e.key === 'Enter' && filteredProtocolos.length > 0) { e.preventDefault(); handleSelectProtocolo(filteredProtocolos[0]); } }}
-                  onFocus={() => setFilteredProtocolos(protocoloOptions.filter(p => p.nombre.toLowerCase().includes(searchProtocolo.toLowerCase())))}
-                  onBlur={() => setTimeout(() => setFilteredProtocolos([]), 100)}
-                />
-                {searchProtocolo && filteredProtocolos.length > 0 && (
-                  <ul className="absolute inset-x-0 top-full bg-white border rounded-md mt-1 max-h-40 overflow-y-auto z-10">
-                    {filteredProtocolos.map(p => (
-                      <li key={p.idProtocolo} className="cursor-pointer px-3 py-2 hover:bg-gray-100"
-                        onMouseDown={() => handleSelectProtocolo(p)}>
-                        {p.nombre}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
+
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="userRegistroDatos" className="block w-36">Registrado por :</label>
               <input
