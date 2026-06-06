@@ -18,6 +18,7 @@ import { fixEncodingModern } from '../../../../../utils/helpers.js';
 import ModalExamenes from './modals/modalExamenes+/ModalExamenes'
 import SubidaMasiva from './modals/modalSubidaMasiva/ModalSubidaMasiva.jsx';
 import ModalPreCarga from './modals/modalPreCargaTable/ModalPreCargaTable.jsx';
+import HojadeRutaDinamico from '../../../../../jaspers/HojadeRutaDinamica/HojadeRutaDinamico.jsx';
 
 const AperturaExamenesPreOcup = (props) => {
   const today = new Date();
@@ -128,7 +129,6 @@ const AperturaExamenesPreOcup = (props) => {
           EnlistarProtos(res)
         })
     }
-
   }, [datos.rucEmpresa])
 
 
@@ -457,11 +457,12 @@ const AperturaExamenesPreOcup = (props) => {
   const RendeSet = (res) => {
     setSearchEmpresa(res.razonEmpresa || "");
     setSearchContrata(res.razonContrata || "")
-    setSearchMedico(res.n_medico || "");
+    setSearchMedico(res.n_medico || res.medico || "");
     setSearchPrueba(res.tipoPrueba || "N/A")
-    setSearchCargo(res.cargoDe || "")
-    setSearchArea(res.areaO || "")
-    setSearchExamenMedico(res.nomExamen || "")
+    setSearchCargo(res.cargoDe || res.cargo || "")
+    setSearchArea(res.areaO || res.area || "")
+    setSearchExamenMedico(res.nomExamen || res.nombreExamen || "")
+    setSearchProtocolo(res.protocolo || "")
   }
 
   const SearchHC = (event, type) => {
@@ -730,80 +731,116 @@ const AperturaExamenesPreOcup = (props) => {
     });
     getFetch(`/api/v01/ct/consentDigit/busquedaHistoriaOcupNOrden/${n_orden.n_orden}`, props.token)
       .then((res) => {
-        InfoHR2(res.n_orden, res.nomExamen, res.razonEmpresa, res.n_psicosen, res.n_testaltura, res.nombres);
+        InfoHR2(res.n_orden, res.nomExamen, res.razonEmpresa, res.n_psicosen, res.n_testaltura, res.nombres, res.protocolo ?? "");
       })
   }
 
-  const InfoHR2 = (HC, nomExamen, razonEmpresa, n_psicosen, n_testaltura, nombres) => {
-    getFetch(`/api/v01/ct/consentDigit/nombreHojaRuta?nameExamen=${nomExamen}&empresa=${razonEmpresa}&altaPsicosen=${n_psicosen}&testAltura=${n_testaltura}`, props.token)
-      .then(async (res) => {
-        if (res.id === 1) {
-          const jasperName = res.mensaje; // por ejemplo: 'TestAltura1'
-          const filePath = `../../../../../jaspers/${jasperName}.jsx`;
-          if (jasperModules[filePath]) {
-            const module = await jasperModules[filePath](); // carga el módulo
-            if (typeof module.default === 'function') {
-              const datos = await GetDatoHR(HC)
+  const InfoHR2 = (HC, nomExamen, razonEmpresa, n_psicosen, n_testaltura, nombres, protocolo) => {
+    if (protocolo) {
+      getFetch(`/api/v01/ct/consentDigit/infoFormatoHojaRutaProtocolo/${HC}`, props.token)
+        .then(async (res) => {
+          if (res.codigo === 200) {
 
-              // Obtener la fecha del registro que se va a imprimir
-              const registroActual = searchHC.find(item => item.n_orden === HC);
-              const fechaRegistro = registroActual ? registroActual.fecha_apertura_po : null;
+            Swal.fire({
+              title: `<span style='font-size:1.3em;font-weight:bold;'>¿Desea Imprimir Hoja de Ruta?</span>`,
+              html: `<div style='font-size:1.1em;'>N° <b style='color:#2563eb;'>${HC}</b> - <span style='color:#0d9488;font-weight:bold;'>${nombres}</span></div>`,
+              icon: 'question',
+              background: '#f0f6ff',
+              color: '#22223b',
+              showCancelButton: true,
+              confirmButtonText: 'Sí, Imprimir',
+              cancelButtonText: 'Cancelar',
+              customClass: {
+                popup: 'swal2-border-radius',
+                title: 'swal2-title-custom',
+                htmlContainer: 'swal2-html-custom',
+                confirmButton: 'swal2-confirm-custom',
+                cancelButton: 'swal2-cancel-custom',
+              },
+              showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+              },
+              hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+              }
+            }).then((result) => {
+              if (result.isConfirmed) HojadeRutaDinamico(res.resultado);
+            });
+          }
+        })
 
-              if (fechaRegistro) {
-                // Filtrar registros de la misma fecha del registro
-                const registrosMismaFecha = searchHC.filter(item => item.fecha_apertura_po === fechaRegistro);
+    } else {
+      getFetch(`/api/v01/ct/consentDigit/nombreHojaRuta?nameExamen=${nomExamen}&empresa=${razonEmpresa}&altaPsicosen=${n_psicosen}&testAltura=${n_testaltura}`, props.token)
+        .then(async (res) => {
+          if (res.id === 1) {
+            const jasperName = res.mensaje; // por ejemplo: 'TestAltura1'
+            const filePath = `../../../../../jaspers/${jasperName}.jsx`;
+            if (jasperModules[filePath]) {
+              const module = await jasperModules[filePath](); // carga el módulo
+              if (typeof module.default === 'function') {
+                const datos = await GetDatoHR(HC)
 
-                // Buscar la posición del registro en la lista filtrada de esa fecha
-                const indiceRegistro = registrosMismaFecha.findIndex(item => item.n_orden === HC);
-                const numeroOrden = indiceRegistro !== -1 ? registrosMismaFecha.length - indiceRegistro : 1;
+                // Obtener la fecha del registro que se va a imprimir
+                const registroActual = searchHC.find(item => item.n_orden === HC);
+                const fechaRegistro = registroActual ? registroActual.fecha_apertura_po : null;
 
-                // Agregar el número de orden a los datos
-                const datosConOrden = {
-                  ...datos,
-                  numeroOrden: numeroOrden
-                };
+                if (fechaRegistro) {
+                  // Filtrar registros de la misma fecha del registro
+                  const registrosMismaFecha = searchHC.filter(item => item.fecha_apertura_po === fechaRegistro);
 
-                Swal.fire({
-                  title: `<span style='font-size:1.3em;font-weight:bold;'>¿Desea Imprimir Hoja de Ruta?</span>`,
-                  html: `<div style='font-size:1.1em;'>N° <b style='color:#2563eb;'>${HC}</b> - <span style='color:#0d9488;font-weight:bold;'>${nombres}</span></div>`,
-                  icon: 'question',
-                  background: '#f0f6ff',
-                  color: '#22223b',
-                  showCancelButton: true,
-                  confirmButtonText: 'Sí, Imprimir',
-                  cancelButtonText: 'Cancelar',
-                  customClass: {
-                    popup: 'swal2-border-radius',
-                    title: 'swal2-title-custom',
-                    htmlContainer: 'swal2-html-custom',
-                    confirmButton: 'swal2-confirm-custom',
-                    cancelButton: 'swal2-cancel-custom',
-                  },
-                  showClass: {
-                    popup: 'animate__animated animate__fadeInDown'
-                  },
-                  hideClass: {
-                    popup: 'animate__animated animate__fadeOutUp'
-                  }
-                }).then((result) => {
-                  if (result.isConfirmed) module.default(datosConOrden);
-                });
+                  // Buscar la posición del registro en la lista filtrada de esa fecha
+                  const indiceRegistro = registrosMismaFecha.findIndex(item => item.n_orden === HC);
+                  const numeroOrden = indiceRegistro !== -1 ? registrosMismaFecha.length - indiceRegistro : 1;
+
+                  // Agregar el número de orden a los datos
+                  const datosConOrden = {
+                    ...datos,
+                    numeroOrden: numeroOrden
+                  };
+
+                  Swal.fire({
+                    title: `<span style='font-size:1.3em;font-weight:bold;'>¿Desea Imprimir Hoja de Ruta?</span>`,
+                    html: `<div style='font-size:1.1em;'>N° <b style='color:#2563eb;'>${HC}</b> - <span style='color:#0d9488;font-weight:bold;'>${nombres}</span></div>`,
+                    icon: 'question',
+                    background: '#f0f6ff',
+                    color: '#22223b',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, Imprimir',
+                    cancelButtonText: 'Cancelar',
+                    customClass: {
+                      popup: 'swal2-border-radius',
+                      title: 'swal2-title-custom',
+                      htmlContainer: 'swal2-html-custom',
+                      confirmButton: 'swal2-confirm-custom',
+                      cancelButton: 'swal2-cancel-custom',
+                    },
+                    showClass: {
+                      popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                      popup: 'animate__animated animate__fadeOutUp'
+                    }
+                  }).then((result) => {
+                    if (result.isConfirmed) module.default(datosConOrden);
+                  });
+                } else {
+                  // Fallback si no se encuentra el registro
+                  Swal.fire({
+                    title: "Error",
+                    text: "No se pudo determinar la fecha del registro",
+                    icon: "error"
+                  });
+                }
               } else {
-                // Fallback si no se encuentra el registro
-                Swal.fire({
-                  title: "Error",
-                  text: "No se pudo determinar la fecha del registro",
-                  icon: "error"
-                });
+                console.warn('El módulo no exporta una función por defecto');
               }
             } else {
-              console.warn('El módulo no exporta una función por defecto');
+              Swal.fire('Advertencia', `No se encontró el componente jasper: ${jasperName}`, 'warning');
             }
-          } else {
-            Swal.fire('Advertencia', `No se encontró el componente jasper: ${jasperName}`, 'warning');
           }
-        }
-      })
+        })
+    }
+
   }
 
   const handleSubmitEdit = e => {
@@ -845,7 +882,8 @@ const AperturaExamenesPreOcup = (props) => {
 
   const handleSubmit = (e) => {
     const camposRequeridos = ['codPa', 'nombres', 'apellidos', 'razonEmpresa', 'razonContrata', 'n_medico', 'tipoPrueba',
-      'cargoDe', 'areaO', 'nomExamen', 'nomEx', 'mineralPo', 'alturaPo', 'tipoPago', 'fechaAperturaPo']; // agrega los campos que quieras
+      'cargoDe', 'areaO', 'tipoPago', 'fechaAperturaPo']; // agrega los campos que quieras
+    //nomExamen, nomEx, mineralPo, alturaPo
     const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
     if (camposVacios.length > 0) {
       const lista = camposVacios.join(', ');
@@ -969,7 +1007,6 @@ const AperturaExamenesPreOcup = (props) => {
 
   const ImportarPreCarga = () => {
     getMasivoimport(datos.codPa, props.token, (resultados) => {
-      console.log(resultados)
       if (resultados.length === 1) {
         aplicarPreCarga(resultados[0]);
       } else {
@@ -979,20 +1016,46 @@ const AperturaExamenesPreOcup = (props) => {
     });
   }
 
-  const aplicarPreCarga = (item) => {
+  const aplicarPreCarga = async (item) => {
     console.log(item)
-    setDatos({
-      ...item,
-      nombresPa: item.nombres,
-      apellidosPa: item.apellidos,
-      razonEmpresa: item.razonEmpresa,
-      fechaAperturaPo: formatDate(item.fechaApertura),
-      userRegistroDatos: item.usuarioRegistro ?? "",
-      protocolo: item.protocolo
-    });
-    RendeSet(item)
-    setModalPreCarga(false);
-  };
+    try {
+      const res = await SearchPacienteDNI(props.selectedSede, datos.codPa, props.token);
+      if (!res.codPa) {
+        return Swal.fire('Error', 'No se ha encontrado al Paciente', 'error');
+      }
+      setDatos(prev => ({
+        ...prev,
+        // Datos del paciente buscado
+        nombres: res.nombresPa,
+        apellidos: res.apellidosPa,
+        nombresPa: res.nombresPa,
+        apellidosPa: res.apellidosPa,
+        // Datos de la pre-carga
+        ...item,
+        razonEmpresa: item.razonEmpresa,
+        fechaAperturaPo: formatDate(item.fechaApertura),
+        userRegistroDatos: item.usuarioRegistro ?? "",
+        protocolo: item.protocolo,
+
+        precioPo: item.precio,
+        tipoPago: item.tipoPago,
+        textObserv1: item.observacion1,
+        idPreNorden: item.id,
+        n_medico: item.medico,
+        cargoDe: item.cargo,
+        areaO: item.area,
+        //nombreExamen
+        //mineral
+        //altura
+      }));
+      RendeSet(item)
+      Swal.close()
+    } catch {
+      Swal.fire('Error', 'Ha ocurrido un Error', 'error');
+    } finally {
+      setModalPreCarga(false);
+    }
+  }
 
   return (
     <div >
@@ -1017,7 +1080,7 @@ const AperturaExamenesPreOcup = (props) => {
               onKeyDown={handleSearch}
               onChange={handleDNI}
               name="codPa"
-              className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none  flex-grow w-full ${habilitar ? "bg-slate-400" : "bg-slate-100"}`}
+              className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none  flex-grow w-full ${habilitar ? "bg-slate-400" : "bg-slate-100"} ${datos.idPreNorden ? "!bg-orange-600 !text-white" : ""}`}
             />
             <button
               onClick={() => {
@@ -1272,6 +1335,32 @@ const AperturaExamenesPreOcup = (props) => {
                   placeholder="N° Orden"
                 />
               </div>
+            </div>
+          </div>
+          {/* — Autocomplete Protocolo — */}
+          <div className="flex items-center space-x-2 mb-1">
+            <label htmlFor="protocolo" className="block w-32">Protocolo:</label>
+            <div className="relative flex-grow">
+              <input autoComplete="off"
+                id="protocolo" name="protocolo"
+                type="text" value={searchProtocolo}
+                placeholder="Escribe para buscar protocolo..."
+                disabled={habilitar || !(protocoloOptions?.length > 0)} onChange={handleProtocoloSearch}
+                className={`border border-gray-300 px-3 py-1 rounded-md w-full ${!(protocoloOptions?.length > 0) ? "bg-slate-300" : "bg-slate-100"}`}
+                onKeyDown={e => { if (e.key === 'Enter' && filteredProtocolos.length > 0) { e.preventDefault(); handleSelectProtocolo(filteredProtocolos[0]); } }}
+                onFocus={() => setFilteredProtocolos(protocoloOptions.filter(p => p.nombre.toLowerCase().includes(searchProtocolo.toLowerCase())))}
+                onBlur={() => setTimeout(() => setFilteredProtocolos([]), 100)}
+              />
+              {searchProtocolo && filteredProtocolos.length > 0 && (
+                <ul className="absolute inset-x-0 top-full bg-white border rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                  {filteredProtocolos.map(p => (
+                    <li key={p.idProtocolo} className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                      onMouseDown={() => handleSelectProtocolo(p)}>
+                      {p.nombre}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
 
@@ -1598,32 +1687,7 @@ const AperturaExamenesPreOcup = (props) => {
               />
             </div>
 
-            {/* — Autocomplete Protocolo — */}
-            <div className="flex items-center space-x-2 mb-1">
-              <label htmlFor="protocolo" className="block w-32">Protocolo:</label>
-              <div className="relative flex-grow">
-                <input autoComplete="off"
-                  id="protocolo" name="protocolo"
-                  type="text" value={searchProtocolo}
-                  placeholder="Escribe para buscar protocolo..."
-                  disabled={habilitar || !(protocoloOptions?.length > 0)} onChange={handleProtocoloSearch}
-                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${!(protocoloOptions?.length > 0) ? "bg-slate-300" : "bg-slate-100"}`}
-                  onKeyDown={e => { if (e.key === 'Enter' && filteredProtocolos.length > 0) { e.preventDefault(); handleSelectProtocolo(filteredProtocolos[0]); } }}
-                  onFocus={() => setFilteredProtocolos(protocoloOptions.filter(p => p.nombre.toLowerCase().includes(searchProtocolo.toLowerCase())))}
-                  onBlur={() => setTimeout(() => setFilteredProtocolos([]), 100)}
-                />
-                {searchProtocolo && filteredProtocolos.length > 0 && (
-                  <ul className="absolute inset-x-0 top-full bg-white border rounded-md mt-1 max-h-40 overflow-y-auto z-10">
-                    {filteredProtocolos.map(p => (
-                      <li key={p.idProtocolo} className="cursor-pointer px-3 py-2 hover:bg-gray-100"
-                        onMouseDown={() => handleSelectProtocolo(p)}>
-                        {p.nombre}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
+
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="userRegistroDatos" className="block w-36">Registrado por :</label>
               <input
