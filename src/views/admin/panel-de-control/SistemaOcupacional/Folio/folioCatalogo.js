@@ -975,7 +975,35 @@ export const EXAMENES_CATALOGO = {
         tabla: "escala_lake_louise",
         url: "/api/v01/ct/escalaLakeLouise/obtenerReporte",
         esJasper: true,
-    }
+    },
+
+    APTITUD_TRABAJOS_CALIENTE: {
+        nombre: "APTITUD TRABAJOS EN CALIENTE",
+        tabla: "aptitud_trabajos_encaliente",
+        url: "/api/v01/ct/aptitudCertificadoCaliente/obtenerReporteAptitudCertificadoCaliente",
+        esJasper: true,
+    },
+
+    CERTIFICADO_EXPOSICION_CALOR: {
+        nombre: "CERTIFICADO EXPOSICION AL CALOR",
+        tabla: "certificado_exposicion_al_calor",
+        url: "/api/v01/ct/exposicionCalor/obtenerReporte",
+        esJasper: true,
+    },
+
+    CERTIFICADO_RIESGO_ELECTRICO: {
+        nombre: "CERTIFICADO RIESGO ELECTRICO",
+        tabla: "riesgo_electrico",
+        url: "/api/v01/ct/riesgoElectrico/obtenerReporte",
+        esJasper: true,
+    },
+
+    CERTIFICADO_MANIPULADORES_ALIMENTOS: {
+        nombre: "CERTIFICADO MANIPULADORES DE ALIMENTOS",
+        tabla: "certificado_manipuladores_barrick",
+        url: "/api/v01/ct/certificadoManipuladoresAlimentos/obtenerReporteCertificadoManipuladoresAlimentos",
+        esJasper: true,
+    },
 };
 
 
