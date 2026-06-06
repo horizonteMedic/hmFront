@@ -18,6 +18,7 @@ import { fixEncodingModern } from '../../../../../utils/helpers.js';
 import ModalExamenes from './modals/modalExamenes+/ModalExamenes'
 import SubidaMasiva from './modals/modalSubidaMasiva/ModalSubidaMasiva.jsx';
 import ModalPreCarga from './modals/modalPreCargaTable/ModalPreCargaTable.jsx';
+import HojadeRutaDinamico from '../../../../../jaspers/HojadeRutaDinamica/HojadeRutaDinamico.jsx';
 
 const AperturaExamenesPreOcup = (props) => {
   const today = new Date();
@@ -730,80 +731,116 @@ const AperturaExamenesPreOcup = (props) => {
     });
     getFetch(`/api/v01/ct/consentDigit/busquedaHistoriaOcupNOrden/${n_orden.n_orden}`, props.token)
       .then((res) => {
-        InfoHR2(res.n_orden, res.nomExamen, res.razonEmpresa, res.n_psicosen, res.n_testaltura, res.nombres);
+        InfoHR2(res.n_orden, res.nomExamen, res.razonEmpresa, res.n_psicosen, res.n_testaltura, res.nombres, res.protocolo ?? "");
       })
   }
 
-  const InfoHR2 = (HC, nomExamen, razonEmpresa, n_psicosen, n_testaltura, nombres) => {
-    getFetch(`/api/v01/ct/consentDigit/nombreHojaRuta?nameExamen=${nomExamen}&empresa=${razonEmpresa}&altaPsicosen=${n_psicosen}&testAltura=${n_testaltura}`, props.token)
-      .then(async (res) => {
-        if (res.id === 1) {
-          const jasperName = res.mensaje; // por ejemplo: 'TestAltura1'
-          const filePath = `../../../../../jaspers/${jasperName}.jsx`;
-          if (jasperModules[filePath]) {
-            const module = await jasperModules[filePath](); // carga el módulo
-            if (typeof module.default === 'function') {
-              const datos = await GetDatoHR(HC)
+  const InfoHR2 = (HC, nomExamen, razonEmpresa, n_psicosen, n_testaltura, nombres, protocolo) => {
+    if (protocolo) {
+      getFetch(`/api/v01/ct/consentDigit/infoFormatoHojaRutaProtocolo/${HC}`, props.token)
+        .then(async (res) => {
+          if (res.codigo === 200) {
 
-              // Obtener la fecha del registro que se va a imprimir
-              const registroActual = searchHC.find(item => item.n_orden === HC);
-              const fechaRegistro = registroActual ? registroActual.fecha_apertura_po : null;
+            Swal.fire({
+              title: `<span style='font-size:1.3em;font-weight:bold;'>¿Desea Imprimir Hoja de Ruta?</span>`,
+              html: `<div style='font-size:1.1em;'>N° <b style='color:#2563eb;'>${HC}</b> - <span style='color:#0d9488;font-weight:bold;'>${nombres}</span></div>`,
+              icon: 'question',
+              background: '#f0f6ff',
+              color: '#22223b',
+              showCancelButton: true,
+              confirmButtonText: 'Sí, Imprimir',
+              cancelButtonText: 'Cancelar',
+              customClass: {
+                popup: 'swal2-border-radius',
+                title: 'swal2-title-custom',
+                htmlContainer: 'swal2-html-custom',
+                confirmButton: 'swal2-confirm-custom',
+                cancelButton: 'swal2-cancel-custom',
+              },
+              showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+              },
+              hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+              }
+            }).then((result) => {
+              if (result.isConfirmed) HojadeRutaDinamico(res.resultado);
+            });
+          }
+        })
 
-              if (fechaRegistro) {
-                // Filtrar registros de la misma fecha del registro
-                const registrosMismaFecha = searchHC.filter(item => item.fecha_apertura_po === fechaRegistro);
+    } else {
+      getFetch(`/api/v01/ct/consentDigit/nombreHojaRuta?nameExamen=${nomExamen}&empresa=${razonEmpresa}&altaPsicosen=${n_psicosen}&testAltura=${n_testaltura}`, props.token)
+        .then(async (res) => {
+          if (res.id === 1) {
+            const jasperName = res.mensaje; // por ejemplo: 'TestAltura1'
+            const filePath = `../../../../../jaspers/${jasperName}.jsx`;
+            if (jasperModules[filePath]) {
+              const module = await jasperModules[filePath](); // carga el módulo
+              if (typeof module.default === 'function') {
+                const datos = await GetDatoHR(HC)
 
-                // Buscar la posición del registro en la lista filtrada de esa fecha
-                const indiceRegistro = registrosMismaFecha.findIndex(item => item.n_orden === HC);
-                const numeroOrden = indiceRegistro !== -1 ? registrosMismaFecha.length - indiceRegistro : 1;
+                // Obtener la fecha del registro que se va a imprimir
+                const registroActual = searchHC.find(item => item.n_orden === HC);
+                const fechaRegistro = registroActual ? registroActual.fecha_apertura_po : null;
 
-                // Agregar el número de orden a los datos
-                const datosConOrden = {
-                  ...datos,
-                  numeroOrden: numeroOrden
-                };
+                if (fechaRegistro) {
+                  // Filtrar registros de la misma fecha del registro
+                  const registrosMismaFecha = searchHC.filter(item => item.fecha_apertura_po === fechaRegistro);
 
-                Swal.fire({
-                  title: `<span style='font-size:1.3em;font-weight:bold;'>¿Desea Imprimir Hoja de Ruta?</span>`,
-                  html: `<div style='font-size:1.1em;'>N° <b style='color:#2563eb;'>${HC}</b> - <span style='color:#0d9488;font-weight:bold;'>${nombres}</span></div>`,
-                  icon: 'question',
-                  background: '#f0f6ff',
-                  color: '#22223b',
-                  showCancelButton: true,
-                  confirmButtonText: 'Sí, Imprimir',
-                  cancelButtonText: 'Cancelar',
-                  customClass: {
-                    popup: 'swal2-border-radius',
-                    title: 'swal2-title-custom',
-                    htmlContainer: 'swal2-html-custom',
-                    confirmButton: 'swal2-confirm-custom',
-                    cancelButton: 'swal2-cancel-custom',
-                  },
-                  showClass: {
-                    popup: 'animate__animated animate__fadeInDown'
-                  },
-                  hideClass: {
-                    popup: 'animate__animated animate__fadeOutUp'
-                  }
-                }).then((result) => {
-                  if (result.isConfirmed) module.default(datosConOrden);
-                });
+                  // Buscar la posición del registro en la lista filtrada de esa fecha
+                  const indiceRegistro = registrosMismaFecha.findIndex(item => item.n_orden === HC);
+                  const numeroOrden = indiceRegistro !== -1 ? registrosMismaFecha.length - indiceRegistro : 1;
+
+                  // Agregar el número de orden a los datos
+                  const datosConOrden = {
+                    ...datos,
+                    numeroOrden: numeroOrden
+                  };
+
+                  Swal.fire({
+                    title: `<span style='font-size:1.3em;font-weight:bold;'>¿Desea Imprimir Hoja de Ruta?</span>`,
+                    html: `<div style='font-size:1.1em;'>N° <b style='color:#2563eb;'>${HC}</b> - <span style='color:#0d9488;font-weight:bold;'>${nombres}</span></div>`,
+                    icon: 'question',
+                    background: '#f0f6ff',
+                    color: '#22223b',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, Imprimir',
+                    cancelButtonText: 'Cancelar',
+                    customClass: {
+                      popup: 'swal2-border-radius',
+                      title: 'swal2-title-custom',
+                      htmlContainer: 'swal2-html-custom',
+                      confirmButton: 'swal2-confirm-custom',
+                      cancelButton: 'swal2-cancel-custom',
+                    },
+                    showClass: {
+                      popup: 'animate__animated animate__fadeInDown'
+                    },
+                    hideClass: {
+                      popup: 'animate__animated animate__fadeOutUp'
+                    }
+                  }).then((result) => {
+                    if (result.isConfirmed) module.default(datosConOrden);
+                  });
+                } else {
+                  // Fallback si no se encuentra el registro
+                  Swal.fire({
+                    title: "Error",
+                    text: "No se pudo determinar la fecha del registro",
+                    icon: "error"
+                  });
+                }
               } else {
-                // Fallback si no se encuentra el registro
-                Swal.fire({
-                  title: "Error",
-                  text: "No se pudo determinar la fecha del registro",
-                  icon: "error"
-                });
+                console.warn('El módulo no exporta una función por defecto');
               }
             } else {
-              console.warn('El módulo no exporta una función por defecto');
+              Swal.fire('Advertencia', `No se encontró el componente jasper: ${jasperName}`, 'warning');
             }
-          } else {
-            Swal.fire('Advertencia', `No se encontró el componente jasper: ${jasperName}`, 'warning');
           }
-        }
-      })
+        })
+    }
+
   }
 
   const handleSubmitEdit = e => {

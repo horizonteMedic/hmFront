@@ -7,15 +7,6 @@ import footer from "../components/footer";
 
 export default async function HojadeRutaDinamico(datos = {}) {
 
-    // ==========================================
-    // 1. DEFINICIÓN DE EXÁMENES (AGRUPACIÓN DINÁMICA)
-    // ==========================================
-
-    // Lista de prueba solicitada por el usuario
-    const testExams = [
-        { nombreExamen: "Sin Examenes", nombreArea: "Sin Area" },
-    ];
-
     const getCategorizedExams = (d) => {
         if (!Array.isArray(d?.areas)) return [];
 
@@ -34,7 +25,7 @@ export default async function HojadeRutaDinamico(datos = {}) {
                 area: area.nombre.toUpperCase(),
                 examenes: [...examenesNormales, ...examenesAdicionales]
             };
-        }).filter(g => g.examenes.length > 0); // 👈 elimina áreas vacías
+        }).filter(g => g.examenes.length > 0);
     };
 
     const baseAdicionales = [
@@ -45,66 +36,135 @@ export default async function HojadeRutaDinamico(datos = {}) {
         { nombre: "EXAMEN DE ODONTOLOGIA", flag: false },
     ];
 
+    const evaluacionMedica = [
+        {
+            titulo: "EVALUACIÓN MÉDICA",
+            examenes: [
+                "Ficha Médica Ocupacional (Anexo N°02)",
+                "EXAMEN OFTALMOLOGICO BASICO",
+                "Evaluación Psicológica Ocupacional",
+            ]
+        },
+        {
+            titulo: "LABORATORIO",
+            examenes: [
+                "Hemograma Completo",
+                "Grupo Sanguíneo y Factor RH",
+                "Examen Completo de Orina",
+                "UREA Y CREATININA",
+                "Perfil Lipídico (Colesterol total, HDL y Triglicéridos)",
+                "Glucosa en Ayunas",
+                "Colinesterasa Sérica",
+                "Toxicológico (Cocaína y Marihuana)",
+            ]
+        },
+        {
+            titulo: "COMPLEMENTARIO",
+            examenes: [
+                "EKG (Solo mayores o iguales a 45 años, con antecedentes cardiovasculares y trabajos en altura)",
+                "Audiometría Completa",
+                "Espirometría Forzada",
+                "Radiografía de Tórax Frontal + Lectura OIT",
+                "Certificado de Suficiencia para Exposición a Calor y Vapor",
+                "Test de Estrés y Somnolencia (Test de Epworth)",
+                "Test de Altura",
+            ]
+        },
+        {
+            titulo: "SALUD ALIMENTARIO",
+            examenes: [
+                "BK en Esputo",
+                "Aglutinaciones en Sangre",
+                "Hepatitis A",
+                "Parasitológico en Heces (2 muestras)",
+            ]
+        },
+    ];
+
     // ==========================================
     // 2. GENERACIÓN DE TABLA ÚNICA POR CATEGORÍAS
     // ==========================================
     const drawTable = async (doc, startY, categories, adicionales) => {
         const tableBody = [];
-        console.log("categories", categories);
+
         // 1. ITERAR CATEGORÍAS Y CREAR FILAS
-        await categories.forEach(cat => {
-            const activeExams = cat.examenes
-            console.log("activeExams", activeExams);
+        categories.forEach(cat => {
+            const activeExams = cat.examenes;
             if (activeExams.length > 0) {
-                // Usar viñetas más estéticas (•) en lugar de asteriscos (*)
                 const examList = activeExams.map(e => `• ${e.nombre}`).join("\n");
-                console.log("examList", examList);
                 tableBody.push([
-                    // Agregar salto de línea simple para separar el título del área de los exámenes
-                    { content: cat.area + "\n" + examList, styles: { halign: 'left' } },
-                    { content: "", styles: { minCellHeight: 10 } }
+                    {
+                        content: cat.area + "\n" + examList,
+                        styles: { halign: 'left', fontStyle: 'normal' }
+                    },
+                    { content: "", styles: { minCellHeight: 12 } },
+                    { content: "", styles: { minCellHeight: 12 } }
                 ]);
             }
         });
 
-        // 2. ADICIONALES (COMO UNA FILA MÁS)
+        // 2. ADICIONALES
         if (adicionales && adicionales.length > 0) {
             const adicList = adicionales.map(a => `• ${a.nombre}`).join("\n");
             tableBody.push([
-                { content: "EXÁMENES ADICIONALES\n" + adicList, styles: { halign: 'left' } },
-                { content: "", styles: { minCellHeight: 20 } }
+                {
+                    content: "EXÁMENES ADICIONALES\n" + adicList,
+                    styles: { halign: 'left', fontStyle: 'normal' }
+                },
+                { content: "", styles: { minCellHeight: 22 } },
+                { content: "", styles: { minCellHeight: 22 } }
             ]);
         }
 
-        // 3. DIBUJAR TABLA ÚNICA
+        // 3. EVALUACIÓN MÉDICA Y SECCIONES
+        evaluacionMedica.forEach(seccion => {
+            const examList = seccion.examenes.map(e => `• ${e}`).join("\n");
+            tableBody.push([
+                {
+                    content: seccion.titulo + "\n" + examList,
+                    styles: { halign: 'left', fontStyle: 'normal' }
+                },
+                { content: "", styles: { minCellHeight: 12 } },
+                { content: "", styles: { minCellHeight: 12 } }
+            ]);
+        });
+
+        // 4. DIBUJAR TABLA
         autoTable(doc, {
             startY: startY,
             head: [['EVALUACIÓN / EXÁMENES', 'PRUEBAS REALIZADAS POR:', 'OBSERVACIONES:']],
             body: tableBody,
             theme: 'grid',
             headStyles: {
-                fillColor: [255, 255, 255],
+                fillColor: [220, 220, 220],
                 textColor: [0, 0, 0],
                 fontStyle: 'bold',
-                lineWidth: 0.1,
-                lineColor: [0, 0, 0],
-                halign: 'center'
+                lineWidth: 0.3,
+                lineColor: [150, 150, 150],
+                halign: 'center',
+                fontSize: 8.5,
+                cellPadding: { top: 3, right: 4, bottom: 3, left: 4 }
             },
             styles: {
-                fontSize: 8,
-                cellPadding: { top: 1, right: 1, bottom: 0, left: 1 },
-                // Color de línea gris suave para un diseño más limpio
-                lineColor: [200, 200, 200],
-                lineWidth: 0.1,
+                fontSize: 8.5,              // ← un poco más chico
+                fontStyle: 'normal',        // ← sin negrita
+                cellPadding: { top: 3, right: 4, bottom: 3, left: 4 },
+                lineColor: [180, 180, 180],
+                lineWidth: 0.2,
                 textColor: [0, 0, 0],
                 valign: 'middle'
             },
             columnStyles: {
-                0: { cellWidth: 70 }, // Exámenes
-                1: { cellWidth: 60 }, // Firmas
-                2: { cellWidth: 'auto' } // Observaciones
+                0: { cellWidth: 70 },
+                1: { cellWidth: 60 },
+                2: { cellWidth: 'auto' }
             },
-            margin: { left: 10, right: 10 }
+            margin: { left: 10, right: 10 },
+            didParseCell: (data) => {
+                if (data.section === 'body') {
+                    data.cell.styles.fontStyle = 'normal'; // ← fuerza normal en todo el cuerpo
+                }
+            }
         });
 
         return doc.lastAutoTable.finalY;
