@@ -3,6 +3,7 @@ import {
   InputTextArea,
   InputTextOneLine,
 } from "../../../../../components/reusableComponents/ResusableComponents";
+import CIE10 from "../CIE10/CIE10";
 
 
 export default function PanelObservaciones({
@@ -10,21 +11,20 @@ export default function PanelObservaciones({
   handleRadioButton,
   handleChange,
   handleBlur,
-  setmodalCIE10
+  token,
+  setForm
 }) {
   return (
     <div className="p-4 h-full mt-16">
       <div className="space-y-4">
         {/* Observaciones Generales */}
-        {/* <div className="w-full flex justify-center items-center">
-          <button
-            type="button"
-            onClick={() => setmodalCIE10(true)}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center justify-center gap-2"
-          >
-            Ingresar CIE 10
-          </button>
-        </div> */}
+        <CIE10 
+          token={token}
+          setForm={setForm}
+          fieldName="observacionesGenerales"
+          inputType="multiple"
+          buttonLabel="Ingresar CIE 10"
+        />
         <div className="bg-white border border-gray-200 rounded-lg p-3 ">
           <InputTextArea
             rows={18}

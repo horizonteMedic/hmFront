@@ -355,7 +355,7 @@ export default function Anexo16() {
 
   const [visualerOpen, setVisualerOpen] = useState(null)
   const [activeTab, setActiveTab] = useState(0);
-  const [modalCIE10, setModalCIE10] = useState(false)
+  // const [modalCIE10, setModalCIE10] = useState(false)
 
   const tabs = [
     {
@@ -477,7 +477,11 @@ export default function Anexo16() {
 
             activeTab={activeTab}
             handleChange={handleChange}
-            setmodalCIE10={(boolean) => { setModalCIE10(boolean) }}
+
+            handleBlur={handleBlur}
+            token={token}
+            setForm={setForm}
+          // setmodalCIE10={(boolean) => { setModalCIE10(boolean) }}
           />
         </div>
         {visualerOpen && (
@@ -499,7 +503,7 @@ export default function Anexo16() {
           </div>
         )}
       </div>
-      {modalCIE10 && <CIE10 closeModal={() => { setModalCIE10(false) }} token={token} setForm={setForm} />}
+      {/* {modalCIE10 && <CIE10 closeModal={() => { setModalCIE10(false) }} token={token} setForm={setForm} />} */}
     </div>
   );
 }
