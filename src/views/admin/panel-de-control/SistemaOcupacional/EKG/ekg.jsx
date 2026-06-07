@@ -597,13 +597,16 @@ export default function EKG() {
             rows={4}
             disabled
           /> */}
-          <CIE10List
-            value={form.hallazgosCie10}
-            fieldName="hallazgosCie10"
-            label="Hallazgos CIE10"
-            token={token}
-            setForm={setForm}
-          />
+          <div className="bg-green-200 p-3 rounded-xl">
+            <CIE10List
+              value={form.hallazgosCie10}
+              fieldName="hallazgosCie10"
+              label="Hallazgos CIE10"
+              token={token}
+              setForm={setForm}
+            />
+          </div>
+
 
           <InputTextArea
             label="Conclusiones"
@@ -621,14 +624,17 @@ export default function EKG() {
             rows={4}
             disabled
           /> */}
-          <CIE10List
-            value={form.conclusionesCie10}
-            fieldName="conclusionesCie10"
-            label="Conclusiones CIE10"
-            token={token}
-            setForm={setForm}
+          <div className="bg-green-200 p-3 rounded-xl">
+            <CIE10List
+              value={form.conclusionesCie10}
+              fieldName="conclusionesCie10"
+              label="Conclusiones CIE10"
+              token={token}
+              setForm={setForm}
               disabled={!form.informeCompleto}
-          />
+            />
+          </div>
+
 
           <InputTextArea
             label="Recomendaciones"
