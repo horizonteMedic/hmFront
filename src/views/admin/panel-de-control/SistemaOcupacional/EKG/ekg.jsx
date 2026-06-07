@@ -25,6 +25,7 @@ import TablaTemplate from "../../../../components/templates/TablaTemplate";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
+import CIE10 from "../Anexo16/CIE10/CIE10";
 
 const tabla = "informe_electrocardiograma";
 
@@ -321,7 +322,7 @@ export default function EKG() {
                   ...prev,
                   ritmo: e.target.checked ? "SINUSAL" : "",
                 }));
-              }} 
+              }}
             />
 
             <InputCheckbox
@@ -333,7 +334,7 @@ export default function EKG() {
                   ...prev,
                   pr: e.target.checked ? "0.20" : "",
                 }));
-              }} 
+              }}
             />
 
             <InputCheckbox
@@ -404,7 +405,7 @@ export default function EKG() {
             value={form.qrs ?? ""}
             onChange={handleChange}
             labelWidth="80px"
-            onKeyUp={handleFocusNext}   
+            onKeyUp={handleFocusNext}
           />
 
           <InputTextOneLine
@@ -413,7 +414,7 @@ export default function EKG() {
             value={form.qtc ?? ""}
             onChange={handleChange}
             labelWidth="80px"
-            onKeyUp={handleFocusNext}       
+            onKeyUp={handleFocusNext}
           />
 
           {/* Fila 3 */}
@@ -423,7 +424,7 @@ export default function EKG() {
             value={form.st ?? ""}
             onChange={handleChange}
             disabled={!form.informeCompleto}
-            labelWidth="80px" 
+            labelWidth="80px"
             onKeyUp={handleFocusNext}
           />
 
@@ -454,20 +455,33 @@ export default function EKG() {
           legend="Conclusiones y Recomendaciones"
           className="space-y-3"
         >
-          <InputTextArea
-            label="Hallazgos / Observaciones"
-            name="hallazgos"
-            value={form.hallazgos}
-            rows={4}
-            onChange={handleChange}
-          />
+          <div className="grid grid-cols-10 gap-x-4">
+            <InputTextArea
+              label="Hallazgos / Observaciones"
+              name="hallazgos"
+              className="col-span-8"
+              value={form.hallazgos}
+              rows={4}
+              onChange={handleChange}
+            />
+            <div className="col-span-2 my-auto">
+              <CIE10
+                token={token}
+                setForm={setForm}
+                fieldName="hallazgos"
+                inputType="multiple"
+                buttonLabel="Ingresar CIE 10"
+                containerClassName="w-full"
+              />
+            </div>
+          </div>
 
           {/* Checkboxes de hallazgos */}
           <div className="grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-6 gap-4">
             <InputCheckbox
               label="Normal"
               name="normal"
-              checked={form.hallazgos.includes("NORMAL")}
+              checked={form.hallazgos.includes("NORMAL") && !form.hallazgos.includes("ANORMAL")}
               onChange={(e) => {
                 setForm((prev) => ({
                   ...prev,
@@ -481,9 +495,9 @@ export default function EKG() {
             <InputCheckbox
               label="B.S. Fisiológica"
               name="bradicardiaSinusalFisiologica"
-              checked={form.hallazgos.includes("BRADICARDIA SINUSAL FISIOLOGICA")}
+              checked={form.hallazgos.includes("CIE 10: R00.1 - BRADICARDIA, NO ESPECIFICADA")}
               onChange={(e) => {
-                handleHallazgosChange(e, "BRADICARDIA SINUSAL FISIOLOGICA");
+                handleHallazgosChange(e, "CIE 10: R00.1 - BRADICARDIA, NO ESPECIFICADA");
                 setForm((prev) => ({
                   ...prev,
                   recomendaciones: e.target.checked ? "EVALUACIÓN ANUAL" : "",
@@ -494,9 +508,9 @@ export default function EKG() {
             <InputCheckbox
               label="B.S. Asintomática"
               name="bradicardiaSinusalAsintomatica"
-              checked={form.hallazgos.includes("BRADICARDIA SINUSAL ASINTOMATICA")}
+              checked={form.hallazgos.includes("CIE 10: R00.1 - BRADICARDIA, NO ESPECIFICADA")}
               onChange={(e) => {
-                handleHallazgosChange(e, "BRADICARDIA SINUSAL ASINTOMATICA");
+                handleHallazgosChange(e, "CIE 10: R00.1 - BRADICARDIA, NO ESPECIFICADA");
                 setForm((prev) => ({
                   ...prev,
                   recomendaciones: e.target.checked ? "EVALUACIÓN ANUAL" : "",
@@ -507,9 +521,9 @@ export default function EKG() {
             <InputCheckbox
               label="B.I. Rama Derecha"
               name="bloqueoRamaDerecha"
-              checked={form.hallazgos.includes("BLOQUEO INCOMPLETO RAMA DERECHA")}
+              checked={form.hallazgos.includes("CIE 10: I45.1 - OTROS TIPOS DE BLOQUEO DE RAMA DERECHA DEL HAZ Y LOS NO ESPECIFICADOS")}
               onChange={(e) => {
-                handleHallazgosChange(e, "BLOQUEO INCOMPLETO RAMA DERECHA");
+                handleHallazgosChange(e, "CIE 10: I45.1 - OTROS TIPOS DE BLOQUEO DE RAMA DERECHA DEL HAZ Y LOS NO ESPECIFICADOS");
                 setForm((prev) => ({
                   ...prev,
                   recomendaciones: e.target.checked
@@ -520,11 +534,27 @@ export default function EKG() {
             />
 
             <InputCheckbox
+              label="B.C. Rama Derecha"
+              name="bloqueoCompletoRamaDerecha"
+              checked={form.hallazgos.includes("CIE 10: I45.1 - OTROS TIPOS DE BLOQUEO DE RAMA DERECHA DEL HAZ Y LOS NO ESPECIFICADOS")}
+              onChange={(e) => {
+                handleHallazgosChange(e, "CIE 10: I45.1 - OTROS TIPOS DE BLOQUEO DE RAMA DERECHA DEL HAZ Y LOS NO ESPECIFICADOS");
+                setForm((prev) => ({
+                  ...prev,
+                  recomendaciones: e.target.checked
+                    ? ""
+                    : prev.recomendaciones,
+                }));
+              }}
+            />
+
+
+            <InputCheckbox
               label="D.I. Eje Cardíaco"
               name="desviacionEjeCardiacoIzquierda"
-              checked={form.hallazgos.includes("DESVIACIÓN IZQUIERDA DEL EJE CARDIACO")}
+              checked={form.hallazgos.includes("CIE 10: R94.3 - RESULTADOS ANORMALES EN ESTUDIOS FUNCIONALES CARDIOVASCULARES")}
               onChange={(e) => {
-                handleHallazgosChange(e, "DESVIACIÓN IZQUIERDA DEL EJE CARDIACO");
+                handleHallazgosChange(e, "CIE 10: R94.3 - RESULTADOS ANORMALES EN ESTUDIOS FUNCIONALES CARDIOVASCULARES");
                 setForm((prev) => ({
                   ...prev,
                   recomendaciones: e.target.checked
@@ -537,9 +567,9 @@ export default function EKG() {
             <InputCheckbox
               label="D.D. Eje Cardíaco"
               name="desviacionEjeCardiacoDerecha"
-              checked={form.hallazgos.includes("DESVIACIÓN DERECHA EJE CARDIACO")}
+              checked={form.hallazgos.includes("CIE 10: R94.3 - RESULTADOS ANORMALES EN ESTUDIOS FUNCIONALES CARDIOVASCULARES")}
               onChange={(e) => {
-                handleHallazgosChange(e, "DESVIACIÓN DERECHA EJE CARDIACO");
+                handleHallazgosChange(e, "CIE 10: R94.3 - RESULTADOS ANORMALES EN ESTUDIOS FUNCIONALES CARDIOVASCULARES");
                 setForm((prev) => ({
                   ...prev,
                   recomendaciones: e.target.checked
@@ -550,14 +580,30 @@ export default function EKG() {
             />
           </div>
 
-          <InputTextArea
-            label="Conclusiones"
-            name="conclusiones"
-            value={form.conclusiones}
-            rows={4}
-            onChange={handleChange}
-            disabled={!form.informeCompleto}
-          />
+
+          <div className="grid grid-cols-10 gap-x-4">
+            <InputTextArea
+              label="Conclusiones"
+              name="conclusiones"
+              value={form.conclusiones}
+              className="col-span-8"
+              rows={4}
+              onChange={handleChange}
+              disabled={!form.informeCompleto}
+            />
+            <div className="col-span-2 my-auto">
+              {form.informeCompleto && (
+                <CIE10
+                  token={token}
+                  setForm={setForm}
+                  fieldName="conclusiones"
+                  inputType="multiple"
+                  buttonLabel="Ingresar CIE 10"
+                  containerClassName="w-full"
+                />
+              )}
+            </div>
+          </div>
 
           <InputTextArea
             label="Recomendaciones"
