@@ -21,6 +21,7 @@ import ButtonsPDF from "../../../../../components/reusableComponents/ButtonsPDF"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
+import CIE10 from "../../Anexo16/CIE10/CIE10";
 
 const tabla = "radiografia";
 
@@ -176,6 +177,14 @@ export default function RayosXColumna() {
           rows={6}
           onChange={handleChange}
         />
+        <CIE10
+            token={token}
+            setForm={setForm}
+            fieldName="conclusion"
+            inputType="multiple"
+            buttonLabel="Ingresar CIE 10"
+            containerClassName="xl:col-span-3 items-left"
+          />
         <InputTextArea
           label="Conclusión"
           name="conclusion"

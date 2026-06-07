@@ -12,6 +12,7 @@ import {
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import CIE10 from "../../Anexo16/CIE10/CIE10";
 
 const tabla = "evaluacion_musculo_esqueletica";
 const date = new Date();
@@ -558,6 +559,14 @@ export default function EvaluacionMusculoEsqueletica() {
             />
           </div>
           <div className="mb-3">
+            <CIE10
+              token={token}
+              setForm={setForm}
+              fieldName="diagnostico"
+              inputType="lineal"
+              buttonLabel="Ingresar CIE 10"
+              containerClassName="xl:col-span-3 items-left mb-3"
+            />
             <label className="font-semibold block mb-1">Diagnóstico:</label>
             <textarea
               className="border rounded px-3 py-1 w-full resize-none"

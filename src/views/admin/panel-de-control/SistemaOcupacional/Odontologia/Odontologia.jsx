@@ -399,6 +399,7 @@ export default function Odontologia() {
               <OdontogramaAdultos
                 form={form}
                 setForm={setForm}
+                token={token}
                 handleChange={handleChange}
                 handleChangeSimple={handleChangeSimple}
                 handleCheckBoxChange={handleCheckBoxChange}

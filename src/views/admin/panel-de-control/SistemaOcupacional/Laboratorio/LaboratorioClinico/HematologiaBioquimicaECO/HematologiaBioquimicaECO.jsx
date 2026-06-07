@@ -16,6 +16,7 @@ import BotonesAccion from "../../../../../../components/templates/BotonesAccion"
 import ButtonsPDF from "../../../../../../components/reusableComponents/ButtonsPDF";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
+import CIE10 from "../../../Anexo16/CIE10/CIE10";
 
 const tabla = "lab_clinico";
 
@@ -811,6 +812,14 @@ export default function HematologiaBioquimicaECO() {
             </div>
 
             <SectionFieldset legend="Conclusiones" className="space-y-4">
+              <CIE10
+                token={token}
+                setForm={setForm}
+                fieldName="observaciones"
+                inputType="multiple"
+                buttonLabel="Ingresar CIE 10"
+                containerClassName="xl:col-span-3 items-left"
+              />
               <InputTextArea
                 label="Observaciones"
                 name="observaciones"

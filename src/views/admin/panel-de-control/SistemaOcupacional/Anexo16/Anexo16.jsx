@@ -19,13 +19,11 @@ import Swal from "sweetalert2";
 import Abdomen from "./Abdomen/Abdomen";
 import Laboratorio from "./Laboratorio/Laboratorio";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
-import CIE10 from "./CIE10/CIE10";
 const tabla = "anexo7c";
 
 export default function Anexo16() {
   const today = getToday();
-  const { token, userlogued, selectedSede, datosFooter, userName } =
-    useSessionData();
+  const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
 
   const initialFormState = {
     norden: "",
@@ -44,7 +42,7 @@ export default function Anexo16() {
     domicilio: "",
     telefono: "",
     estadoCivil: "",
-    gradoInstruccion: "",
+    nivelEstudios: "",
     //Agentes presentes en Trabajo Actual
     ruido: true,
     polvo: true,
@@ -62,7 +60,7 @@ export default function Anexo16() {
     posturas: true,
     turnos: false,
     quimicos: false,
-    cargas: true,
+    cargos: true,
     movRepet: true,
     pvd: false,
     electricos: false,
@@ -97,203 +95,143 @@ export default function Anexo16() {
     hepatitisB: false,
     fiebreAmarilla: false,
 
-    //=============================================================================================
-    //TAB LATERAL
-    //=============================================================================================
-    observacionesGenerales: "",
-    observacionesAudio: "",
-    conclusionMedico: "",
+    //Examenes
+    //Cabeza
+    cabeza: "NORMAL",
+    cabezaDesc: "",
+    //Nariz y Oídos
+    nariz: "NORMAL",
+    narizDesc: "",
+    oidoD: "NORMAL",
+    oidoDDesc: "",
+    oidoI: "NORMAL",
+    oidoIDesc: "",
+    //Boca y Garganta
+    boca: "NORMAL",
+    bocaDesc: "",
+    garganta: "NORMAL",
+    gargantaDesc: "",
+    //Cuello
+    cuello: "NORMAL",
+    cuelloDesc: "",
+    //Piel
+    piel: "NORMAL",
+    pielDesc: "",
+    pielObservaciones: "",
+    //Ojos - Visión
+    ojoD: "NORMAL",
+    ojoDDesc: "",
+    ojoI: "NORMAL",
+    ojoIDesc: "",
+    visionLejana: "",
+    visionColor: "NORMAL",
+    reflejosPupilares: "NORMAL",
+    visionBinocular: "NORMAL",
+    enfermedadOculares: "",
+    enfermedadOtros: "",
+    //Tórax
+    torax: "NORMAL",
+    toraxDesc: "",
+    //Corazón
+    corazon: "NORMAL",
+    corazonDesc: "",
+    //Pulmones
+    pulmones: "NORMAL",
+    pulmonesDesc: "",
+    pulmonesObservaciones: "",
+    //Abdomen
+    abdomen: "NORMAL",
+    abdomenDesc: "",
+    //Miembros superiores
+    miembrosSuperiores: "NORMAL",
+    miembrosSuperioresDesc: "",
+    //Miembros inferiores
+    miembrosInferiores: "NORMAL",
+    miembrosInferioresDesc: "",
+    //Reflejos
+    reflejosOsteotendinosos: "NORMAL",
+    reflejosOsteotendinososDesc: "",
+    //Marcha
+    marcha: "NORMAL",
+    marchaDesc: "",
+    //Columna vertebral
+    columnaVertebral: "NORMAL",
+    columnaVertebralDesc: "",
+    //Organos genitales
+    organosGenitales: "NORMAL",
+    organosGenitalesDesc: "",
+    //Tacto rectal
+    tactoRectal: "NORMAL",
+    tactoRectalDesc: "",
+    //Hernia inguinal
+    hernias: "NORMAL",
+    herniasDesc: "",
+    //Varices
+    varices: "NORMAL",
+    varicesDesc: "",
+    //Ganglios
+    ganglios: "NORMAL",
+    gangliosDesc: "",
+    //Evaluación cognitiva
+    evaluacionCognitiva: "NORMAL",
+    evaluacionCognitivaDesc: "",
+    //Estado mental
+    estadoMental: "NORMAL",
+    estadoMentalDesc: "",
 
-    //Resultados de Laboratorio
+    //Laboratorio
+    grupoSanguineo: "",
+    factorRh: "",
+    grupoSanguineoPrevio: "",
+    grupoSanguineoGrupo: "",
     vsg: "",
     glucosa: "",
     creatinina: "",
     marihuana: "",
-    cocaina: "NO REACTIVO",
+    cocaina: "",
     hemoglobinaHematocrito: "",
-    //Grupo Sanguineo
-    grupoSanguineoPrevio: "",
-    grupoSanguineoGrupo: "",
-    grupoSanguineo: "",
-    factorRh: "",
-    //Resultados de Laboratorio
+
+    //Perfil Lipídico
     colesterolTotal: "",
     LDLColesterol: "",
     HDLColesterol: "",
     VLDLColesterol: "",
     trigliceridos: "",
 
-
-    //=============================================================================================
-    //SEGUNDA TAB EXAMENES
-    //=============================================================================================
-    // Información Triaje
-    //Medidas Generales
-    temperatura: "",
-    cintura: "",
-    cadera: "",
-    icc: "",
-    // Signos Vitales
-    frecuenciaRespiratoria: "",
-    frecuenciaCardiaca: "",
-    saturacionO2: "",
-    // Presión Arterial
-    presionSistolica: "",
-    presionDiastolica: "",
-
-    //Medidas Generales
-    talla: "",
-    peso: "",
-    imc: "",
-    imcRojo: false,
-
-    // Audiometría - Oído Derecho
-    od500: "",
-    od1000: "",
-    od2000: "",
-    od3000: "",
-    od4000: "",
-    od6000: "",
-    od8000: "",
-
-    // Audiometría - Oído Izquierdo
-    oi500: "",
-    oi1000: "",
-    oi2000: "",
-    oi3000: "",
-    oi4000: "",
-    oi6000: "",
-    oi8000: "",
-
-    otoscopiaOd: "NORMAL",
-    otoscopiaOi: "NORMAL",
-
-    // Función Respiratoria
-    fvc: "",
-    funcionABSNormal: false,
-    funcionABSOBSTR: false,
-    fev1: "",
-    fev1Fvc: "",
-    fef2575: "",
-    conclusionRespiratoria: "",
-
-    // Examen Físico
-    cabeza: "NORMAL",
-    nariz: "CENTRAL, PERMEABLE",
-    cuello: "CENTRAL, MOVIL",
-    perimetro: "",
-    bocaAmigdalasFaringeLaringe: "HUMECTADA, NO HIPERTROFICAS, NO CONGESTIVAS",
-
-    piel: "NORMAL",
-    pielObservaciones: "NORMAL. NO MANCHAS, AUSENCIA DE LUNARES SOSPECHOSOS DE MALIGNIDAD.",
-    //Miembros y reflejos
-    miembrosSuperiores: "SIMETRICOS, NO DEFORMIDADES, MOTRICIDAD CONSERVADA.",
-    miembrosInferiores: "SIMETRICOS, NO DEFORMIDADES, MOTRICIDAD CONSERVADA.",
-    reflejosOsteotendinosos: "CONSERVADOS",
-    marcha: "NORMAL",
-
-    // Ojos
-    visionCercaOd: "",
-    visionCercaOi: "",
-    visionCercaOdCorregida: "",
-    visionCercaOiCorregida: "",
-
-    visionLejosOd: "",
-    visionLejosOi: "",
-    visionLejosOdCorregida: "",
-    visionLejosOiCorregida: "",
-
-    visionColores: "NORMAL",
-    enfermedadOculares: "NINGUNA",
-    enfermedadOtros: "NINGUNA",
-    reflejosPupilares: "CONSERVADOS",
-    visionBinocular: "",
-
-    pulmones: "NORMAL",
-    pulmonesObservaciones: "BPMV EN ACP. NO RALES.",
-    torax: "BPMV EN ACP, NO RALES.",
-    corazon: "RCRR, NO SOPLOS.",
-    // Dentadura
-    piezasMalEstado: "",
-    piezasFaltan: "",
-    dentaduraObservaciones: "",
-    //=============================================================================================
-    //TERCERA TAB RESULTADOS
-    //=============================================================================================
-    // Examen Físico - Abdomen
-    abdomen: "RHA(+), B/D, NO DOLOROSO A LA PALPACION",
-    columnaVertebral: "CENTRAL, MOVIL, CURVATURAS CONSERVADAS",
-    anillosInguinales: "CONSERVADOS",
-    organosGenitales: "DE CARACTER NORMAL",
-    //Tacto Rectal
-    tactoRectal: "NO_SE_HIZO",
-    hernias: "NO",
-    varices: "NO",
-    ganglios: "NO LINFADENOPATIAS",
-    evaluacionCognitiva: "NORMAL",
-    //Información Radiológica
-    numeroRx: "",
-    codigoExamenRadiograficoSanguineo: null,
-    fechaRx: today,
-    calidadRx: "",
-    simbolosRx: "N/A",
-    //Conclusiones Radiográficas
-    vertices: "",
-    hilios: "",
-    senos: "",
-    mediastinos: "",
-    conclusionesRadiograficas: "",
-    siluetaCardiovascular: "",
-    //Estado Mental y Anamnesis
-    estadoMental: "DESPIERTO, OTEP, COMUNICATIVO.",
-    anamnesis: "COLABORADOR REFIERE SENTIRSE BIEN, SIN PROBLEMAS DE SALUD, NO practica deporte o deporte de alto rendimiento.",
-    //Clasificación y Neumoconiosis
-    clasificacion: "0/0",
-    reaccionesSerologicas: "NEGATIVO",
-    sinNeumoconiosis: "NORMAL",
-    imagenRadiograficaPolvo: "SOSPECHA",
-    conNeumoconiosis: "",
-
-    //=============================================================================================
-    //CUARTA TAB RESULTADOS
-    //=============================================================================================
-    // Exámenes de Laboratorio
-    nitritos: "",
-    proteinas: "",
-    cetonas: "",
-    leucocitos: "",
-    urobilinogeno: "",
-    bilirrubina: "",
-    glucosaQuimico: "",
-    sangre: "",
-    leucocitosSedimento: "",
-    celulasEpiteliales: "",
-    cilindios: "",
-    bacterias: "",
-    hematies: "",
-    cristales: "",
-    pus: "",
-    otrosSedimento: "",
-    colorFisico: "",
-    aspectoFisico: "",
-    densidadFisico: "",
-    phFisico: "",
-    otrosExamenes: "",
-    aptoParaTrabajar: "",
-
-    // Estado del Paciente
-    nordenEstadoPaciente: "",
-    nombresEstadoPaciente: "",
-    tipoExamenEstadoPaciente: "",
-
-    // Exámenes Realizados
-    triaje: "",
-    labClinico: "",
+    //Otras pruebas
     electrocardiograma: "",
-    rxToraxPA: "",
-    fichaAudiologica: "",
+    electrocardiogramaDesc: "",
+    rxTorax: "",
+    rxToraxDesc: "",
     espirometria: "",
-    odontograma: "",
+    espirometriaDesc: "",
+    audiometria: "",
+    audiometriaDesc: "",
+    otoscopiaOd: "",
+    otoscopiaOi: "",
+
+    //Diagnósticos y Conclusiones
+    clasificacion: "",
+    observacionesGenerales: "",
+    observacionesAudio: "",
+    diagnosticosCIE10: [],
+
+    //Conclusión Medica
+    conclusionMedico: "",
+    //Observaciones y restricciones
+    observacionesFichaMedica: "",
+    //Conclusión de la salud y riesgo
+    // apto: false,
+    // noApto: false,
+    // conRestriccion: false,
+    //Recomendaciones y restricciones
+    notasDoctor: "",
+    apto: false,
+    noApto: false,
+    conRestriccion: false,
+    aptoCondicion: "",
+
+    //Psicología y otros
     psicologia: "",
     anexo7D: "",
     histOcupacional: "",
@@ -353,9 +291,8 @@ export default function Anexo16() {
     handleBlur
   } = useForm(initialFormState, { storageKey: "anexo_16" });
 
-  const [visualerOpen, setVisualerOpen] = useState(null)
+  const [visualerOpen, setVisualerOpen] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
-  // const [modalCIE10, setModalCIE10] = useState(false)
 
   const tabs = [
     {
@@ -368,7 +305,6 @@ export default function Anexo16() {
     { id: 2, name: "Laboratorio", icon: faFlask, component: Laboratorio },
     { id: 3, name: "Abdomen", icon: faChartLine, component: Abdomen },
     { id: 4, name: "Resultados", icon: faChartLine, component: Resultados },
-
   ];
 
   const handleSave = () => {
@@ -377,7 +313,7 @@ export default function Anexo16() {
   const handleSearchExamenesRealizados = (e) => {
     if (e.key === "Enter") {
       // handleClearnotO();
-      GetExamenesRealizados(form.nordenEstadoPaciente, setForm, token, () => { Swal.close() });
+      GetExamenesRealizados(form.nordenEstadoPaciente, setForm, token, () => { Swal.close(); });
     }
   };
 
@@ -420,10 +356,7 @@ export default function Anexo16() {
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
-                  className={`flex-1 px-4 py-3 uppercase tracking-wider text=[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${activeTab === tab.id
-                    ? "border-[#233245] text-[#233245] font-semibold"
-                    : "border-transparent"
-                    }`}
+                  className={`flex-1 px-4 py-3 uppercase tracking-wider text-[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${activeTab === tab.id ? "border-[#233245] text-[#233245] font-semibold" : "border-transparent"}`}
                   onClick={() => setActiveTab(tab.id)}
                 >
                   <FontAwesomeIcon icon={tab.icon} className="mr-2" />
@@ -448,14 +381,15 @@ export default function Anexo16() {
                       handleCheckBoxChange={handleCheckBoxChange}
                       handleClear={handleClear}
                       handleClearnotO={handleClearnotO}
-                      handleRadioButtonBoolean={handleRadioButtonBoolean}
-                      handlePrint={handlePrint}
-                      handleSearch={handleSearch}
-                      handleSave={handleSave}
-                      handleSearchExamenesRealizados={handleSearchExamenesRealizados}
                       handleChangeSimple={handleChangeSimple}
                       handleBlur={handleBlur}
-
+                      token={token}
+                      selectedSede={selectedSede}
+                      userlogued={userlogued}
+                      today={today}
+                      handleSearch={handleSearch}
+                      handleSearchExamenesRealizados={handleSearchExamenesRealizados}
+                      handleRadioButtonBoolean={handleRadioButtonBoolean}
                     />
                   )
                 );
@@ -464,32 +398,45 @@ export default function Anexo16() {
           </div>
         </div>
 
-        {/* Panel lateral de datos - 20% */}
-        <div className="w-1/5">
-          {/* <ButtonsPDF
-            {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
-            {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
-            handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
-          /> */}
-          <PanelObservaciones
-            form={form}
-            handleRadioButton={handleRadioButton}
-
-            activeTab={activeTab}
-            handleChange={handleChange}
-
-            handleBlur={handleBlur}
-            token={token}
-            setForm={setForm}
-          // setmodalCIE10={(boolean) => { setModalCIE10(boolean) }}
-          />
+        {/* Sidebar - 20% */}
+        <div className="w-1/5 bg-gray-50 border-l border-gray-200 overflow-y-auto">
+          <div className="p-4 space-y-4">
+            <ButtonsPDF
+              norden={form.norden}
+              handlePrint={handlePrint}
+              handleSave={handleSave}
+              form={form}
+              setForm={setForm}
+              tabla={tabla}
+              token={token}
+            />
+            {/* <SubirArchivosAnexo16
+              form={form}
+              setForm={setForm}
+              token={token}
+              selectedSede={selectedSede}
+              userlogued={userlogued}
+              handleSearch={handleSearch}
+              {...form.SubirDoc ? { handleSave: () => { handleSubirArchivo(form, selectedSede, userlogued, token) } } : {}}
+              {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
+              handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
+            /> */}
+            <PanelObservaciones
+              form={form}
+              handleRadioButton={handleRadioButton}
+              handleChange={handleChange}
+              handleBlur={handleBlur}
+              token={token}
+              setForm={setForm}
+            />
+          </div>
         </div>
         {visualerOpen && (
           <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
             <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
               <div className="px-4 py-2 naranjabackgroud flex justify-between">
                 <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
-                <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+                <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: "23px" }}>×</button>
               </div>
               <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
                 <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
@@ -503,7 +450,6 @@ export default function Anexo16() {
           </div>
         )}
       </div>
-      {/* {modalCIE10 && <CIE10 closeModal={() => { setModalCIE10(false) }} token={token} setForm={setForm} />} */}
     </div>
   );
 }

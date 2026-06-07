@@ -2,6 +2,7 @@ import {
     InputTextOneLine,
     InputCheckbox,
     InputTextArea,
+    CIE10List
 } from "../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
 import { useSessionData } from "../../../../hooks/useSessionData";
@@ -15,6 +16,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
 import { handleSubirArchivo } from "../Altura18/controllerAltura18";
+import CIE10 from "../Anexo16/CIE10/CIE10";
 
 const tabla = "funcion_abs";
 
@@ -54,7 +56,8 @@ export default function Espirometria() {
         fvcTeorico: "",
         fev1Teorico: "",
 
-        interpretacion: "",
+        interpretacion: "ESPIROMETRIA NORMAL",
+        interpretacionCIE10: "",
 
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
@@ -227,9 +230,34 @@ export default function Espirometria() {
                     rows={4}
                     name="interpretacion"
                     value={form?.interpretacion}
-                    className="xl:col-span-3"
+                    className="xl:col-span-3 ml-0"
                     onChange={handleChange}
                 />
+                <div className="xl:col-span-3">
+                    <CIE10
+                        token={token}
+                        setForm={setForm}
+                        fieldName="interpretacionCIE10"
+                        inputType="multiple"
+                        buttonLabel="Ingresar CIE 10"
+                        containerClassName="w-full flex justify-start items-center"
+                        value={form.interpretacionCIE10}
+                    />
+                </div>
+                <div className="xl:col-span-3">
+                    <CIE10List
+                        value={form.interpretacionCIE10}
+                        onChange={(nuevoValor) => {
+                            setForm(prev => ({
+                                ...prev,
+                                interpretacionCIE10: nuevoValor
+                            }));
+                        }}
+                        label="Diagnósticos CIE10"
+                        delimiter="\n"
+                    />
+                </div>
+
             </SectionFieldset>
 
             <SectionFieldset legend="Asignación de Médico">

@@ -28,6 +28,7 @@ import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import ButtonsPDF from "../../../../../components/reusableComponents/ButtonsPDF";
 import { handleSubirArchivo2 } from "../rayosXColumna/controllerRayosXColumna";
+import CIE10 from "../../Anexo16/CIE10/CIE10";
 
 const tabla = "radiografia_torax";
 
@@ -249,6 +250,14 @@ export default function RayosXToraxPA() {
             value={form.osteomuscular ?? ""}
             onChange={handleChange}
             labelWidth="150px"
+          />
+          <CIE10
+            token={token}
+            setForm={setForm}
+            fieldName="conclusiones"
+            inputType="lineal"
+            buttonLabel="Ingresar CIE 10"
+            containerClassName="xl:col-span-3 items-left"
           />
 
           <InputTextOneLine
