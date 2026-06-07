@@ -1,4 +1,4 @@
-import { faCheck, faSearch, faSpinner, faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faPlus, faPlusCircle, faSearch, faSpinner, faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
 import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getFetch } from "../../../getFetch/getFetch";
@@ -11,7 +11,8 @@ const CIE10 = ({
   buttonLabel = "Ingresar CIE 10",
   buttonClassName = "bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center justify-center gap-2",
   containerClassName = "w-full flex justify-center items-center",
-  value // Nuevo prop: valor actual del formulario
+  value, // Nuevo prop: valor actual del formulario
+  isIcon = false,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [inputSearch, setInputSearch] = useState("");
@@ -150,9 +151,9 @@ const CIE10 = ({
         <button
           type="button"
           onClick={handleOpenModal}
-          className={buttonClassName}
+          className={isIcon ? "" : buttonClassName}
         >
-          {buttonLabel}
+          {isIcon ? <FontAwesomeIcon icon={faPlusCircle} className="text-green-700 text-2xl"/> : buttonLabel}
         </button>
       </div>
 

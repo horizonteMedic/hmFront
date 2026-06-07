@@ -400,8 +400,8 @@ export default function Anexo16() {
 
         {/* Sidebar - 20% */}
         <div className="w-1/5 bg-gray-50 border-l border-gray-200 overflow-y-auto">
-          <div className="p-4 space-y-4">
-            <ButtonsPDF
+          <div className="p-4 ">
+            {/* <ButtonsPDF
               norden={form.norden}
               handlePrint={handlePrint}
               handleSave={handleSave}
@@ -409,7 +409,7 @@ export default function Anexo16() {
               setForm={setForm}
               tabla={tabla}
               token={token}
-            />
+            /> */}
             {/* <SubirArchivosAnexo16
               form={form}
               setForm={setForm}

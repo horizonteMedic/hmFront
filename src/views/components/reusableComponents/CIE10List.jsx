@@ -1,5 +1,6 @@
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import CIE10 from "../../admin/panel-de-control/SistemaOcupacional/Anexo16/CIE10/CIE10";
 
 /**
  * Componente para mostrar y gestionar una lista de diagnósticos CIE10.
@@ -7,14 +8,25 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
  * @param {string} props.value - Cadena con los diagnósticos separados por " | " o saltos de línea
  * @param {function} props.onChange - Función para actualizar el valor en el formulario
  * @param {string} [props.label="Diagnósticos CIE10"] - Etiqueta para el campo
- * @param {string} [props.delimiter=" | "] - Separador de los diagnósticos en la cadena
+ * @param {string} [props.delimiter="\n"] - Separador de los diagnósticos en la cadena
  */
 const CIE10List = ({ 
   value, 
   onChange, 
   label = "Diagnósticos CIE10", 
-  delimiter = " | " 
+  delimiter = "\n",
+  token,
+  setForm,
+  fieldName,
 }) => {
+  const handleChange = onChange || ((nuevoValor) => {
+    if (setForm && fieldName) {
+      setForm(prev => ({
+        ...prev,
+        [fieldName]: nuevoValor
+      }));
+    }
+  });
   // Función para parsear la cadena en un array de objetos { codigo, descripcion }
   const parseDiagnosticos = (str) => {
     if (!str || str.trim() === "") return [];
@@ -59,15 +71,25 @@ const CIE10List = ({
   // Función para eliminar un diagnóstico
   const eliminarDiagnostico = (index) => {
     const nuevosDiagnosticos = diagnosticos.filter((_, i) => i !== index);
-    onChange(stringifyDiagnosticos(nuevosDiagnosticos));
+    handleChange(stringifyDiagnosticos(nuevosDiagnosticos));
   };
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">
-        {label}
+      <div className="flex justify-between w-full">
+      <label className="block font-semibold ">
+        {label} :
       </label>
-      
+      <CIE10
+          token={token}
+          setForm={setForm}
+          fieldName={fieldName}
+          inputType="multiple"
+          containerClassName="mr-2"
+          isIcon
+          value={value}
+        />
+        </div>
       {diagnosticos.length === 0 ? (
         <div className="p-3 bg-gray-50 border border-gray-200 rounded-md text-center text-gray-500 text-sm">
           No hay diagnósticos seleccionados
