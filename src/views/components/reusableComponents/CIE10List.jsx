@@ -18,6 +18,9 @@ const CIE10List = ({
   token,
   setForm,
   fieldName,
+  disabled = false,
+  allowAdd = true,
+  allowRemove = true,
 }) => {
   const handleChange = onChange || ((nuevoValor) => {
     if (setForm && fieldName) {
@@ -74,13 +77,17 @@ const CIE10List = ({
     handleChange(stringifyDiagnosticos(nuevosDiagnosticos));
   };
 
+  const isAddDisabled = disabled || !allowAdd;
+  const isRemoveDisabled = disabled || !allowRemove;
+
   return (
     <div className="space-y-2">
       <div className="flex justify-between w-full">
       <label className="block font-semibold ">
         {label} :
       </label>
-      <CIE10
+      {!isAddDisabled && (
+        <CIE10
           token={token}
           setForm={setForm}
           fieldName={fieldName}
@@ -89,6 +96,7 @@ const CIE10List = ({
           isIcon
           value={value}
         />
+      )}
         </div>
       {diagnosticos.length === 0 ? (
         <div className="p-3 bg-gray-50 border border-gray-200 rounded-md text-center text-gray-500 text-sm">
@@ -107,13 +115,15 @@ const CIE10List = ({
               <span className="text-sm text-green-800 flex-1 break-words whitespace-normal leading-tight" title={item.descripcion}>
                 {item.descripcion}
               </span>
-              <button
-                onClick={() => eliminarDiagnostico(index)}
-                className="text-red-500 hover:text-red-700 shrink-0 p-1"
-                title="Eliminar diagnóstico"
-              >
-                <FontAwesomeIcon icon={faTrash} />
-              </button>
+              {!isRemoveDisabled && (
+                <button
+                  onClick={() => eliminarDiagnostico(index)}
+                  className="text-red-500 hover:text-red-700 shrink-0 p-1"
+                  title="Eliminar diagnóstico"
+                >
+                  <FontAwesomeIcon icon={faTrash} />
+                </button>
+              )}
             </div>
           ))}
         </div>

@@ -25,9 +25,18 @@ import TablaTemplate from "../../../../components/templates/TablaTemplate";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
-import CIE10 from "../Anexo16/CIE10/CIE10";
+import CIE10List from "../../../../components/reusableComponents/CIE10List";
 
 const tabla = "informe_electrocardiograma";
+
+const equivalencias = {
+  "BRADICARDIA SINUSAL FISIOLOGICA": "CIE 10: R00.1 - BRADICARDIA, NO ESPECIFICADA",
+  "BRADICARDIA SINUSAL ASINTOMATICA": "CIE 10: R00.1 - BRADICARDIA, NO ESPECIFICADA",
+  "BLOQUEO INCOMPLETO RAMA DERECHA": "CIE 10: I45.1 - OTROS TIPOS DE BLOQUEO DE RAMA DERECHA DEL HAZ Y LOS NO ESPECIFICADOS",
+  "BLOQUEO COMPLETO RAMA DERECHA": "CIE 10: I45.1 - OTROS TIPOS DE BLOQUEO DE RAMA DERECHA DEL HAZ Y LOS NO ESPECIFICADOS",
+  "DESVIACIÓN IZQUIERDA DEL EJE CARDIACO": "CIE 10: R94.3 - RESULTADOS ANORMALES EN ESTUDIOS FUNCIONALES CARDIOVASCULARES",
+  "DESVIACIÓN DERECHA EJE CARDIACO": "CIE 10: R94.3 - RESULTADOS ANORMALES EN ESTUDIOS FUNCIONALES CARDIOVASCULARES"
+}
 
 export default function EKG() {
   const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
@@ -67,8 +76,12 @@ export default function EKG() {
     ondaT: "",
     qtc: "N/E",
 
-    conclusiones: "",
     hallazgos: "",
+    hallazgosCie10: "",
+
+    conclusiones: "",
+    conclusionesCie10: "",
+
     recomendaciones: "",
 
     nombres_search: "",
@@ -123,20 +136,29 @@ export default function EKG() {
 
   const handleHallazgosChange = (e, value) => {
     const { checked } = e.target;
+
     setForm((prev) => {
       let hallazgos = prev.hallazgos;
+      let hallazgosCie10 = prev.hallazgosCie10;
 
       if (checked) {
         if (hallazgos.trim() === "" || hallazgos.trim() === "NORMAL") {
           hallazgos = value;
+          if (equivalencias[value] && equivalencias[value]) {
+            hallazgosCie10 = equivalencias[value];
+          }
         } else {
           hallazgos += "\n" + value;
+          if (equivalencias[value] && !hallazgosCie10.includes(equivalencias[value])) {
+            hallazgosCie10 += "\n" + equivalencias[value];
+          }
         }
       } else {
         hallazgos = "";
+        hallazgosCie10 = "";
       }
 
-      return { ...prev, hallazgos };
+      return { ...prev, hallazgos, hallazgosCie10 };
     });
   };
 
@@ -192,6 +214,7 @@ export default function EKG() {
               setForm((prev) => ({
                 ...prev,
                 conclusiones: "",
+                conclusionesCie10: "",
 
                 ritmo: "",
                 fc: "",
@@ -455,37 +478,25 @@ export default function EKG() {
           legend="Conclusiones y Recomendaciones"
           className="space-y-3"
         >
-          <div className="grid grid-cols-10 gap-x-4">
-            <InputTextArea
-              label="Hallazgos / Observaciones"
-              name="hallazgos"
-              className="col-span-8"
-              value={form.hallazgos}
-              rows={4}
-              onChange={handleChange}
-            />
-            <div className="col-span-2 my-auto">
-              <CIE10
-                token={token}
-                setForm={setForm}
-                fieldName="hallazgos"
-                inputType="multiple"
-                buttonLabel="Ingresar CIE 10"
-                containerClassName="w-full"
-              />
-            </div>
-          </div>
+          <InputTextArea
+            label="Hallazgos / Observaciones"
+            name="hallazgos"
+            value={form.hallazgos}
+            rows={4}
+            onChange={handleChange}
+          />
 
           {/* Checkboxes de hallazgos */}
-          <div className="grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4">
             <InputCheckbox
               label="Normal"
               name="normal"
-              checked={form.hallazgos.includes("NORMAL") && !form.hallazgos.includes("ANORMAL")}
+              checked={form.hallazgos.includes("NORMAL")}
               onChange={(e) => {
                 setForm((prev) => ({
                   ...prev,
                   hallazgos: e.target.checked ? "NORMAL" : "",
+                  hallazgosCie10: e.target.checked ? "" : prev.hallazgosCie10,
                   conclusiones: e.target.checked ? form.informeCompleto ? "DENTRO DE PARAMETROS NORMALES" : "" : "",
                   recomendaciones: e.target.checked ? "EVALUACIÓN ANUAL" : "",
                 }));
@@ -495,9 +506,9 @@ export default function EKG() {
             <InputCheckbox
               label="B.S. Fisiológica"
               name="bradicardiaSinusalFisiologica"
-              checked={form.hallazgos.includes("CIE 10: R00.1 - BRADICARDIA, NO ESPECIFICADA")}
+              checked={form.hallazgos.includes("BRADICARDIA SINUSAL FISIOLOGICA")}
               onChange={(e) => {
-                handleHallazgosChange(e, "CIE 10: R00.1 - BRADICARDIA, NO ESPECIFICADA");
+                handleHallazgosChange(e, "BRADICARDIA SINUSAL FISIOLOGICA");
                 setForm((prev) => ({
                   ...prev,
                   recomendaciones: e.target.checked ? "EVALUACIÓN ANUAL" : "",
@@ -508,9 +519,9 @@ export default function EKG() {
             <InputCheckbox
               label="B.S. Asintomática"
               name="bradicardiaSinusalAsintomatica"
-              checked={form.hallazgos.includes("CIE 10: R00.1 - BRADICARDIA, NO ESPECIFICADA")}
+              checked={form.hallazgos.includes("BRADICARDIA SINUSAL ASINTOMATICA")}
               onChange={(e) => {
-                handleHallazgosChange(e, "CIE 10: R00.1 - BRADICARDIA, NO ESPECIFICADA");
+                handleHallazgosChange(e, "BRADICARDIA SINUSAL ASINTOMATICA");
                 setForm((prev) => ({
                   ...prev,
                   recomendaciones: e.target.checked ? "EVALUACIÓN ANUAL" : "",
@@ -521,9 +532,9 @@ export default function EKG() {
             <InputCheckbox
               label="B.I. Rama Derecha"
               name="bloqueoRamaDerecha"
-              checked={form.hallazgos.includes("CIE 10: I45.1 - OTROS TIPOS DE BLOQUEO DE RAMA DERECHA DEL HAZ Y LOS NO ESPECIFICADOS")}
+              checked={form.hallazgos.includes("BLOQUEO INCOMPLETO RAMA DERECHA")}
               onChange={(e) => {
-                handleHallazgosChange(e, "CIE 10: I45.1 - OTROS TIPOS DE BLOQUEO DE RAMA DERECHA DEL HAZ Y LOS NO ESPECIFICADOS");
+                handleHallazgosChange(e, "BLOQUEO INCOMPLETO RAMA DERECHA");
                 setForm((prev) => ({
                   ...prev,
                   recomendaciones: e.target.checked
@@ -536,9 +547,9 @@ export default function EKG() {
             <InputCheckbox
               label="B.C. Rama Derecha"
               name="bloqueoCompletoRamaDerecha"
-              checked={form.hallazgos.includes("CIE 10: I45.1 - OTROS TIPOS DE BLOQUEO DE RAMA DERECHA DEL HAZ Y LOS NO ESPECIFICADOS")}
+              checked={form.hallazgos.includes("BLOQUEO COMPLETO RAMA DERECHA")}
               onChange={(e) => {
-                handleHallazgosChange(e, "CIE 10: I45.1 - OTROS TIPOS DE BLOQUEO DE RAMA DERECHA DEL HAZ Y LOS NO ESPECIFICADOS");
+                handleHallazgosChange(e, "BLOQUEO COMPLETO RAMA DERECHA");
                 setForm((prev) => ({
                   ...prev,
                   recomendaciones: e.target.checked
@@ -548,13 +559,12 @@ export default function EKG() {
               }}
             />
 
-
             <InputCheckbox
               label="D.I. Eje Cardíaco"
               name="desviacionEjeCardiacoIzquierda"
-              checked={form.hallazgos.includes("CIE 10: R94.3 - RESULTADOS ANORMALES EN ESTUDIOS FUNCIONALES CARDIOVASCULARES")}
+              checked={form.hallazgos.includes("DESVIACIÓN IZQUIERDA DEL EJE CARDIACO")}
               onChange={(e) => {
-                handleHallazgosChange(e, "CIE 10: R94.3 - RESULTADOS ANORMALES EN ESTUDIOS FUNCIONALES CARDIOVASCULARES");
+                handleHallazgosChange(e, "DESVIACIÓN IZQUIERDA DEL EJE CARDIACO");
                 setForm((prev) => ({
                   ...prev,
                   recomendaciones: e.target.checked
@@ -567,9 +577,9 @@ export default function EKG() {
             <InputCheckbox
               label="D.D. Eje Cardíaco"
               name="desviacionEjeCardiacoDerecha"
-              checked={form.hallazgos.includes("CIE 10: R94.3 - RESULTADOS ANORMALES EN ESTUDIOS FUNCIONALES CARDIOVASCULARES")}
+              checked={form.hallazgos.includes("DESVIACIÓN DERECHA EJE CARDIACO")}
               onChange={(e) => {
-                handleHallazgosChange(e, "CIE 10: R94.3 - RESULTADOS ANORMALES EN ESTUDIOS FUNCIONALES CARDIOVASCULARES");
+                handleHallazgosChange(e, "DESVIACIÓN DERECHA EJE CARDIACO");
                 setForm((prev) => ({
                   ...prev,
                   recomendaciones: e.target.checked
@@ -580,30 +590,45 @@ export default function EKG() {
             />
           </div>
 
+          {/* <InputTextArea
+            label="Hallazgos CIE10"
+            name="hallazgosCie10"
+            value={form.hallazgosCie10}
+            rows={4}
+            disabled
+          /> */}
+          <CIE10List
+            value={form.hallazgosCie10}
+            fieldName="hallazgosCie10"
+            label="Hallazgos CIE10"
+            token={token}
+            setForm={setForm}
+          />
 
-          <div className="grid grid-cols-10 gap-x-4">
-            <InputTextArea
-              label="Conclusiones"
-              name="conclusiones"
-              value={form.conclusiones}
-              className="col-span-8"
-              rows={4}
-              onChange={handleChange}
+          <InputTextArea
+            label="Conclusiones"
+            name="conclusiones"
+            value={form.conclusiones}
+            rows={4}
+            onChange={handleChange}
+            disabled={!form.informeCompleto}
+          />
+
+          {/* <InputTextArea
+            label="Conclusiones CIE10"
+            name="conclusionesCie10"
+            value={form.conclusionesCie10}
+            rows={4}
+            disabled
+          /> */}
+          <CIE10List
+            value={form.conclusionesCie10}
+            fieldName="conclusionesCie10"
+            label="Conclusiones CIE10"
+            token={token}
+            setForm={setForm}
               disabled={!form.informeCompleto}
-            />
-            <div className="col-span-2 my-auto">
-              {form.informeCompleto && (
-                <CIE10
-                  token={token}
-                  setForm={setForm}
-                  fieldName="conclusiones"
-                  inputType="multiple"
-                  buttonLabel="Ingresar CIE 10"
-                  containerClassName="w-full"
-                />
-              )}
-            </div>
-          </div>
+          />
 
           <InputTextArea
             label="Recomendaciones"
