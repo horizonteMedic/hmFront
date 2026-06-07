@@ -118,7 +118,7 @@ const CIE10List = ({
               {!isRemoveDisabled && (
                 <button
                   onClick={() => eliminarDiagnostico(index)}
-                  className="text-red-500 hover:text-red-700 shrink-0 p-1"
+                  className="text-red-500 hover:text-red-700 shrink-0 pr-2"
                   title="Eliminar diagnóstico"
                 >
                   <FontAwesomeIcon icon={faTrash} />
