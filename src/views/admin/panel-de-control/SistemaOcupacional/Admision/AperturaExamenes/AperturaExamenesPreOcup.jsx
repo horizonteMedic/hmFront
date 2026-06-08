@@ -121,15 +121,15 @@ const AperturaExamenesPreOcup = (props) => {
       })
   }, [FechaCanP])
 
-  //Traer listas de protocolos
-  useEffect(() => {
+  //Traer listas de protocolos - Desabilitado para Green Peru
+  /*useEffect(() => {
     if (datos.rucEmpresa) {
       getFetch(`/api/v01/ct/protocolo/obtenerProtocoloRucEmpresa/empresa/${datos.rucEmpresa}`, props.token)
         .then((res) => {
           EnlistarProtos(res)
         })
     }
-  }, [datos.rucEmpresa])
+  }, [datos.rucEmpresa])*/
 
 
 
@@ -333,14 +333,15 @@ const AperturaExamenesPreOcup = (props) => {
     if (v === "") {
       setDatos(d => ({ ...d, protocolo: "" }));
     }
+    setDatos(d => ({ ...d, protocolo: v }));
     setSearchProtocolo(v);
-    setFilteredProtocolos(
+    /*setFilteredProtocolos(
       v
         ? protocoloOptions.filter(p =>
           p.nombre.toLowerCase().includes(v.toLowerCase())
         )
         : []
-    );
+    );*/
   };
   const handleSelectProtocolo = p => {
     console.log(p)
@@ -633,75 +634,80 @@ const AperturaExamenesPreOcup = (props) => {
   }
 
   const InfoHR = (HC) => {
-    getFetch(`/api/v01/ct/consentDigit/nombreHojaRuta?nameExamen=${datos.nomExamen}&empresa=${datos.razonEmpresa}&altaPsicosen=${datos.n_psicosen}&testAltura=${datos.n_testaltura}`, props.token)
-      .then(async (res) => {
-        if (res.id === 1) {
-          const jasperName = res.mensaje; // por ejemplo: 'TestAltura1'
-          const filePath = `../../../../../jaspers/${jasperName}.jsx`;
-          if (jasperModules[filePath]) {
-            const module = await jasperModules[filePath](); // carga el módulo
-            if (typeof module.default === 'function') {
-              const datos = await GetDatoHR(HC)
+    if (datos.protocolo) {
+      PrintHojadeRutaDinamica(HC)
+    } else {
+      getFetch(`/api/v01/ct/consentDigit/nombreHojaRuta?nameExamen=${datos.nomExamen}&empresa=${datos.razonEmpresa}&altaPsicosen=${datos.n_psicosen}&testAltura=${datos.n_testaltura}`, props.token)
+        .then(async (res) => {
+          if (res.id === 1) {
+            const jasperName = res.mensaje; // por ejemplo: 'TestAltura1'
+            const filePath = `../../../../../jaspers/${jasperName}.jsx`;
+            if (jasperModules[filePath]) {
+              const module = await jasperModules[filePath](); // carga el módulo
+              if (typeof module.default === 'function') {
+                const datos = await GetDatoHR(HC)
 
-              // Obtener la fecha del registro que se va a imprimir
-              const registroActual = searchHC.find(item => item.n_orden === HC);
-              const fechaRegistro = registroActual ? registroActual.fecha_apertura_po : null;
+                // Obtener la fecha del registro que se va a imprimir
+                const registroActual = searchHC.find(item => item.n_orden === HC);
+                const fechaRegistro = registroActual ? registroActual.fecha_apertura_po : null;
 
-              if (fechaRegistro) {
-                // Filtrar registros de la misma fecha del registro
-                const registrosMismaFecha = searchHC.filter(item => item.fecha_apertura_po === fechaRegistro);
+                if (fechaRegistro) {
+                  // Filtrar registros de la misma fecha del registro
+                  const registrosMismaFecha = searchHC.filter(item => item.fecha_apertura_po === fechaRegistro);
 
-                // Buscar la posición del registro en la lista filtrada de esa fecha
-                const indiceRegistro = registrosMismaFecha.findIndex(item => item.n_orden === HC);
-                const numeroOrden = indiceRegistro !== -1 ? registrosMismaFecha.length - indiceRegistro : 1;
+                  // Buscar la posición del registro en la lista filtrada de esa fecha
+                  const indiceRegistro = registrosMismaFecha.findIndex(item => item.n_orden === HC);
+                  const numeroOrden = indiceRegistro !== -1 ? registrosMismaFecha.length - indiceRegistro : 1;
 
-                // Agregar el número de orden a los datos
-                const datosConOrden = {
-                  ...datos,
-                  numeroOrden: numeroOrden
-                };
+                  // Agregar el número de orden a los datos
+                  const datosConOrden = {
+                    ...datos,
+                    numeroOrden: numeroOrden
+                  };
 
-                Swal.fire({
-                  title: "Hoja de Ruta",
-                  text: "¿Desea Imprimir?.",
-                  icon: "success",
-                  cancelButtonText: "Cancelar"
-                }).then((result) => {
-                  if (result.isConfirmed) module.default(datosConOrden);
-                });
+                  Swal.fire({
+                    title: "Hoja de Ruta",
+                    text: "¿Desea Imprimir?.",
+                    icon: "success",
+                    cancelButtonText: "Cancelar"
+                  }).then((result) => {
+                    if (result.isConfirmed) module.default(datosConOrden);
+                  });
+                } else {
+                  // Si no se encuentra el registro en searchHC (caso de nuevo registro), usar la fecha actual
+                  const fechaHoy = format(new Date(), 'yyyy-MM-dd');
+
+                  // Filtrar registros de la fecha de hoy
+                  const registrosHoy = searchHC.filter(item => item.fecha_apertura_po === fechaHoy);
+
+                  // El nuevo registro será el siguiente número
+                  const numeroOrden = registrosHoy.length + 1;
+
+                  // Agregar el número de orden a los datos
+                  const datosConOrden = {
+                    ...datos,
+                    numeroOrden: numeroOrden
+                  };
+
+                  Swal.fire({
+                    title: "Hoja de Ruta",
+                    text: "¿Desea Imprimir?.",
+                    icon: "success",
+                    cancelButtonText: "Cancelar"
+                  }).then((result) => {
+                    if (result.isConfirmed) module.default(datosConOrden);
+                  });
+                }
               } else {
-                // Si no se encuentra el registro en searchHC (caso de nuevo registro), usar la fecha actual
-                const fechaHoy = format(new Date(), 'yyyy-MM-dd');
-
-                // Filtrar registros de la fecha de hoy
-                const registrosHoy = searchHC.filter(item => item.fecha_apertura_po === fechaHoy);
-
-                // El nuevo registro será el siguiente número
-                const numeroOrden = registrosHoy.length + 1;
-
-                // Agregar el número de orden a los datos
-                const datosConOrden = {
-                  ...datos,
-                  numeroOrden: numeroOrden
-                };
-
-                Swal.fire({
-                  title: "Hoja de Ruta",
-                  text: "¿Desea Imprimir?.",
-                  icon: "success",
-                  cancelButtonText: "Cancelar"
-                }).then((result) => {
-                  if (result.isConfirmed) module.default(datosConOrden);
-                });
+                console.warn('El módulo no exporta una función por defecto');
               }
             } else {
-              console.warn('El módulo no exporta una función por defecto');
+              Swal.fire('Advertencia', `No se encontró el componente jasper: ${jasperName}`, 'warning');
             }
-          } else {
-            Swal.fire('Advertencia', `No se encontró el componente jasper: ${jasperName}`, 'warning');
           }
-        }
-      })
+        })
+    }
+
   }
 
   const SearchClickRight = (n_orden) => {
@@ -735,40 +741,43 @@ const AperturaExamenesPreOcup = (props) => {
       })
   }
 
+  const PrintHojadeRutaDinamica = (HC) => {
+    getFetch(`/api/v01/ct/consentDigit/infoFormatoHojaRutaProtocolo/${HC}`, props.token)
+      .then(async (res) => {
+        if (res.codigo === 200) {
+
+          Swal.fire({
+            title: `<span style='font-size:1.3em;font-weight:bold;'>¿Desea Imprimir Hoja de Ruta?</span>`,
+            html: `<div style='font-size:1.1em;'>N° <b style='color:#2563eb;'>${HC}</b></div>`,
+            icon: 'question',
+            background: '#f0f6ff',
+            color: '#22223b',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, Imprimir',
+            cancelButtonText: 'Cancelar',
+            customClass: {
+              popup: 'swal2-border-radius',
+              title: 'swal2-title-custom',
+              htmlContainer: 'swal2-html-custom',
+              confirmButton: 'swal2-confirm-custom',
+              cancelButton: 'swal2-cancel-custom',
+            },
+            showClass: {
+              popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+              popup: 'animate__animated animate__fadeOutUp'
+            }
+          }).then((result) => {
+            if (result.isConfirmed) HojadeRutaDinamico(res.resultado);
+          });
+        }
+      })
+  }
+
   const InfoHR2 = (HC, nomExamen, razonEmpresa, n_psicosen, n_testaltura, nombres, protocolo) => {
     if (protocolo) {
-      getFetch(`/api/v01/ct/consentDigit/infoFormatoHojaRutaProtocolo/${HC}`, props.token)
-        .then(async (res) => {
-          if (res.codigo === 200) {
-
-            Swal.fire({
-              title: `<span style='font-size:1.3em;font-weight:bold;'>¿Desea Imprimir Hoja de Ruta?</span>`,
-              html: `<div style='font-size:1.1em;'>N° <b style='color:#2563eb;'>${HC}</b> - <span style='color:#0d9488;font-weight:bold;'>${nombres}</span></div>`,
-              icon: 'question',
-              background: '#f0f6ff',
-              color: '#22223b',
-              showCancelButton: true,
-              confirmButtonText: 'Sí, Imprimir',
-              cancelButtonText: 'Cancelar',
-              customClass: {
-                popup: 'swal2-border-radius',
-                title: 'swal2-title-custom',
-                htmlContainer: 'swal2-html-custom',
-                confirmButton: 'swal2-confirm-custom',
-                cancelButton: 'swal2-cancel-custom',
-              },
-              showClass: {
-                popup: 'animate__animated animate__fadeInDown'
-              },
-              hideClass: {
-                popup: 'animate__animated animate__fadeOutUp'
-              }
-            }).then((result) => {
-              if (result.isConfirmed) HojadeRutaDinamico(res.resultado);
-            });
-          }
-        })
-
+      PrintHojadeRutaDinamica(HC)
     } else {
       getFetch(`/api/v01/ct/consentDigit/nombreHojaRuta?nameExamen=${nomExamen}&empresa=${razonEmpresa}&altaPsicosen=${n_psicosen}&testAltura=${n_testaltura}`, props.token)
         .then(async (res) => {
@@ -845,7 +854,7 @@ const AperturaExamenesPreOcup = (props) => {
 
   const handleSubmitEdit = e => {
     const camposRequeridos = ['codPa', 'nombres', 'apellidos', 'razonEmpresa', 'razonContrata', 'n_medico', 'tipoPrueba',
-      'cargoDe', 'areaO', 'nomExamen', 'nomEx', 'mineralPo', 'alturaPo', 'tipoPago', 'fechaAperturaPo']; // agrega los campos que quieras
+      'cargoDe', 'areaO', 'tipoPago', 'fechaAperturaPo']; // agrega los campos que quieras
     const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
     if (camposVacios.length > 0) {
       const lista = camposVacios.join(', ');
@@ -1345,8 +1354,8 @@ const AperturaExamenesPreOcup = (props) => {
                 id="protocolo" name="protocolo"
                 type="text" value={searchProtocolo}
                 placeholder="Escribe para buscar protocolo..."
-                disabled={habilitar || !(protocoloOptions?.length > 0)} onChange={handleProtocoloSearch}
-                className={`border border-gray-300 px-3 py-1 rounded-md w-full ${!(protocoloOptions?.length > 0) ? "bg-slate-300" : "bg-slate-100"}`}
+                disabled={habilitar} onChange={handleProtocoloSearch}
+                className={`border border-gray-300 px-3 py-1 rounded-md w-full  bg-slate-100`}
                 onKeyDown={e => { if (e.key === 'Enter' && filteredProtocolos.length > 0) { e.preventDefault(); handleSelectProtocolo(filteredProtocolos[0]); } }}
                 onFocus={() => setFilteredProtocolos(protocoloOptions.filter(p => p.nombre.toLowerCase().includes(searchProtocolo.toLowerCase())))}
                 onBlur={() => setTimeout(() => setFilteredProtocolos([]), 100)}

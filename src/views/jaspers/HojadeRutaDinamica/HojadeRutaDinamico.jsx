@@ -5,12 +5,33 @@ import drawBox from "../components/drawBox";
 import drawC from "../components/drawC";
 import footer from "../components/footer";
 
-export default async function HojadeRutaDinamico(datos = {}) {
+const ORDEN_AREAS = [
+    "LABORATORIO",
+    "TRIAJE",
+    "OFTALMOLOGIA",
+    "PSICOLOGIA",
+    "EKG",
+    "AUDIOMETRIA",
+    "ESPIROMETRIA",
+    "RADIOGRAFIA",
+    "CERTIFICADO EXPOSICION AL CALOR",
+    "TEST DE ESTRES",
+    "TEST DE ALTURA",
+    "BK EN ESPUTO",
+    "AGLUTINACIONES EN SANGRE",
+    "HEPATITIS A",
+    "PARASITOLOGICO EN HECES",
+    "MEDICINA GENERAL OCUPACIONAL",
+];
 
+export default async function HojadeRutaDinamico(datos = {}) {
+    console.log(datos)
     const getCategorizedExams = (d) => {
         if (!Array.isArray(d?.areas)) return [];
 
-        return d.areas.map((area) => {
+        const edad = parseInt(d?.edad) || 0;
+
+        const mapped = d.areas.map((area) => {
             const examenesNormales = (area.examenes || []).map(ex => ({
                 nombre: ex.nombre,
                 subExamenes: (ex.subExamenes || []).map(se => se.nombre)
@@ -25,8 +46,23 @@ export default async function HojadeRutaDinamico(datos = {}) {
                 area: area.nombre.toUpperCase(),
                 examenes: [...examenesNormales, ...examenesAdicionales]
             };
-        }).filter(g => g.examenes.length > 0);
-    }
+        }).filter(g => {
+            if (g.examenes.length === 0) return false;
+
+            // EKG solo aparece si el paciente tiene 45 o más años
+            if (g.area.includes("EKG") && edad < 45) return false;
+
+            return true;
+        });
+
+        return mapped.sort((a, b) => {
+            const idxA = ORDEN_AREAS.findIndex(o => a.area.includes(o) || o.includes(a.area));
+            const idxB = ORDEN_AREAS.findIndex(o => b.area.includes(o) || o.includes(b.area));
+            const posA = idxA === -1 ? 999 : idxA;
+            const posB = idxB === -1 ? 999 : idxB;
+            return posA - posB;
+        });
+    };
 
     // ==========================================
     // 2. GENERACIÓN DE TABLA ÚNICA POR CATEGORÍAS
@@ -50,10 +86,10 @@ export default async function HojadeRutaDinamico(datos = {}) {
             tableBody.push([
                 {
                     content: cat.area + "\n" + examList,
-                    styles: { halign: 'left', minCellHeight: 20 }
+                    styles: { halign: 'left', minCellHeight: 16.5 }
                 },
-                { content: "", styles: { minCellHeight: 20 } },
-                { content: "", styles: { minCellHeight: 20 } }
+                { content: "", styles: { minCellHeight: 16.5 } },
+                { content: "", styles: { minCellHeight: 16.5 } }
             ]);
         });
 
@@ -85,7 +121,7 @@ export default async function HojadeRutaDinamico(datos = {}) {
                 cellPadding: { top: 3, right: 4, bottom: 3, left: 4 }
             },
             styles: {
-                fontSize: 8.5,
+                fontSize: 7.5,
                 fontStyle: 'normal',
                 cellPadding: { top: 4, right: 4, bottom: 4, left: 4 },
                 lineColor: [180, 180, 180],
@@ -126,13 +162,13 @@ export default async function HojadeRutaDinamico(datos = {}) {
 
     await headerHR(doc, datos);
 
-    const startY = 70;
+    const startY = 62;
 
     doc.setFillColor(245, 245, 245);
-    doc.rect(10, startY, 130, 24, 'F');
+    doc.rect(10, startY, 120, 18, 'F');
 
     doc.setTextColor(200, 0, 0);
-    doc.setFontSize(8);
+    doc.setFontSize(6.8);
     doc.setFont("helvetica", "bold");
     doc.text("INDICACIONES:", 12, startY + 5);
 
@@ -146,10 +182,7 @@ export default async function HojadeRutaDinamico(datos = {}) {
 
     const categorizedExams = getCategorizedExams(datos);
 
-    await drawTable(doc, startY + 26, categorizedExams, []);
-
-    footer(doc, datos);
-
+    await drawTable(doc, startY + 22, categorizedExams, []);
 
 
     const pdfBlob = doc.output("blob");

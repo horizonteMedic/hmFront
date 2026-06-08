@@ -120,11 +120,11 @@ const headerHR = (doc, datos) => {
   doc.text(`${datos.hora || ""}`, margin + 135, y1);
 
   doc.setFont("helvetica", "bold");
-  doc.text("N° DE ORDEN:", margin + 145, y1 - 6);
+  doc.text("N° DE ORDEN:", margin + 140, y1 - 6);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(18);
   const orderText = `${datos.orden || ""}`;
-  const orderX = margin + 170;
+  const orderX = margin + 165;
   const orderY = y1 - 6;
 
   // Draw underline
@@ -210,10 +210,10 @@ const headerHR = (doc, datos) => {
   doc.text(`${datos.contrata || ""}`, margin + 40, y5, { maxWidth: 170 });
 
   if (Array.isArray(datos.subReporte) && datos.subReporte.length > 0) {
-    doc.setFontSize(10)
+    doc.setFontSize(7.5)
     doc.setFont("helvetica", "bold");
     datos.subReporte.forEach((item, index) => {
-      doc.text(`${item.orden}        ${item.fecha}            ${item.grupo}`, margin + 134, y5 + 6 + (index * 6));
+      doc.text(`${item.orden}        ${item.fecha}            ${item.grupo}`, margin + 134, y5 + (index * 4));
     });
   }
   doc.setFontSize(9)
