@@ -70,6 +70,7 @@ const AudiometriaOhlaTabSelector = ({
     nombres_search: "",
     codigo_search: "",
     diagnostico: "",
+    diagnosticoCie10: "",
   };
   const [formOhla, setFormOhla] = useState(initialFormStateOhla);
 

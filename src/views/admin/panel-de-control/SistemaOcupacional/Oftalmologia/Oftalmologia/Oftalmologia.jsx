@@ -22,12 +22,13 @@ import { useSessionData } from "../../../../../hooks/useSessionData";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
 import { useForm } from "../../../../../hooks/useForm";
+import CIE10List from "../../../../../components/reusableComponents/CIE10List";
 
 const tabla = "oftalmologia2021";
+const today = getToday();
 
 export default function OftalmologiaOhla() {
   const { token, userlogued, selectedSede, userName } = useSessionData();
-  const today = getToday();
 
   const initialFormState = {
     norden: "",
@@ -150,8 +151,11 @@ export default function OftalmologiaOhla() {
 
     //NUEVOS
     visionColores: "",
+    visionColoresCie10: "",
     enfOculares: "",
+    enfOcularesCie10: "",
     presenciaPterigion: "",
+    presenciaPterigionCie10: "",
     opcionPterigion: "",
 
     completo: true,
@@ -1438,9 +1442,14 @@ export default function OftalmologiaOhla() {
                     handleNextFocus(e, "vl_sinc_od");
                     if (e.key === "Enter") {
                       e.preventDefault();
+                      const diagnosticoCerca = generarDiagnosticoCerca()
                       setForm((prev) => ({
                         ...prev,
-                        presenciaPterigion: generarDiagnosticoCerca(),
+                        presenciaPterigion: diagnosticoCerca,
+                        presenciaPterigionCie10: diagnosticoCerca ?
+                          diagnosticoCerca.includes("HIPERMETROPIA") ? "CIE 10: H52.0 - HIPERMETROPÍA" :
+                            diagnosticoCerca.includes("PRESBICIA") ? "CIE 10: H52.4 - PRESBICIA" : ""
+                          : ""
                       }));
                     }
                   }}
@@ -1498,9 +1507,11 @@ export default function OftalmologiaOhla() {
                     handleNextFocus(e, "vc_conc_od");
                     if (e.key === "Enter") {
                       e.preventDefault();
+                      const diagnosticoLejos = generarDiagnosticoLejos()
                       setForm((prev) => ({
                         ...prev,
-                        enfOculares: generarDiagnosticoLejos(),
+                        enfOculares: diagnosticoLejos,
+                        enfOcularesCie10: diagnosticoLejos ? diagnosticoLejos.includes("AMETROPIA") ? "CIE 10: H54.7 - DISMINUCIÓN DE LA AGUDEZA VISUAL, SIN ESPECIFICACIÓN" : "" : ""
                       }));
                     }
                   }}
@@ -1642,6 +1653,15 @@ export default function OftalmologiaOhla() {
                 />
                 Normal
               </div>
+              <div className="bg-green-200 p-3 rounded-xl col-span-3 col-start-2">
+                <CIE10List
+                  value={form.visionColoresCie10}
+                  fieldName="visionColoresCie10"
+                  label="Visión de Colores CIE10"
+                  token={token}
+                  setForm={setForm}
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-5 gap-2 mb-1 items-center">
@@ -1673,7 +1693,18 @@ export default function OftalmologiaOhla() {
                 />{" "}
                 Ninguna
               </div>
+              <div className="bg-green-200 p-3 rounded-xl col-span-3 col-start-2">
+                <CIE10List
+                  value={form.enfOcularesCie10}
+                  fieldName="enfOcularesCie10"
+                  label="Enferm. Oculares Lejos CIE10"
+                  token={token}
+                  setForm={setForm}
+                />
+              </div>
             </div>
+
+
             <div className="grid grid-cols-5 gap-2 mb-1 items-center">
               <label className="text-right pr-2">Enferm.Oculares Cerca:</label>
               <textarea
@@ -1699,6 +1730,11 @@ export default function OftalmologiaOhla() {
                         presenciaPterigion: e.target.checked
                           ? f.presenciaPterigion + " PTERIGIÓN OJO DERECHO"
                           : "",
+                        presenciaPterigionCie10: e.target.checked
+                          ? f.presenciaPterigionCie10 && !f.presenciaPterigionCie10.includes("CIE 10: H11.0 - PTERIGIÓN")
+                            ? f.presenciaPterigionCie10 + "\nCIE 10: H11.0 - PTERIGIÓN"
+                            : "CIE 10: H11.0 - PTERIGIÓN"
+                          : "",
                       }))
                     }
                   />
@@ -1716,6 +1752,11 @@ export default function OftalmologiaOhla() {
                         ...f,
                         presenciaPterigion: e.target.checked
                           ? f.presenciaPterigion + " PTERIGIÓN OJO IZQUIERDO"
+                          : "",
+                        presenciaPterigionCie10: e.target.checked
+                          ? f.presenciaPterigionCie10 && !f.presenciaPterigionCie10.includes("CIE 10: H11.0 - PTERIGIÓN")
+                            ? f.presenciaPterigionCie10 + "\nCIE 10: H11.0 - PTERIGIÓN"
+                            : "CIE 10: H11.0 - PTERIGIÓN"
                           : "",
                       }))
                     }
@@ -1735,11 +1776,25 @@ export default function OftalmologiaOhla() {
                         presenciaPterigion: e.target.checked
                           ? f.presenciaPterigion + " PTERIGIÓN BILATERAL"
                           : "",
+                        presenciaPterigionCie10: e.target.checked
+                          ? f.presenciaPterigionCie10 && !f.presenciaPterigionCie10.includes("CIE 10: H11.0 - PTERIGIÓN")
+                            ? f.presenciaPterigionCie10 + "\nCIE 10: H11.0 - PTERIGIÓN"
+                            : "CIE 10: H11.0 - PTERIGIÓN"
+                          : "",
                       }))
                     }
                   />
                   PTERIG. BILATERAL
                 </label>
+              </div>
+              <div className="bg-green-200 p-3 rounded-xl col-span-3 col-start-2">
+                <CIE10List
+                  value={form.presenciaPterigionCie10}
+                  fieldName="presenciaPterigionCie10"
+                  label="Enferm. Oculares Cerca CIE10"
+                  token={token}
+                  setForm={setForm}
+                />
               </div>
             </div>
             <div className="mt-2">

@@ -60,7 +60,7 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
           oi_o_6000: res.oi1_6000,
           oi_o_8000: res.oi1_8000,
           diagnostico: res.diagnostico,
-
+          diagnosticoCie10: res.diagnosticoCie10,
           // user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
           // user_doctorAsignado: res.doctorAsignado,
           // user_doctorExtra: res.doctorExtra,
@@ -119,6 +119,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     oi1_8000: form.oi_o_8000,
 
     diagnostico: form.diagnostico,
+    diagnosticoCie10: form.diagnosticoCie10,
     userRegistro: user,
 
     // usuarioFirma: form.user_medicoFirma,
