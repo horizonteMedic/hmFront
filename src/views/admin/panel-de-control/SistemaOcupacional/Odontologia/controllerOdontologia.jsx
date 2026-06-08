@@ -101,6 +101,7 @@ export const GetInfoServicio = (
           d32: interpretarUrlParaLeer(res.lbl38),
 
           observaciones: res.txtObservaciones || "",
+          observacionesCie10: res.observacionesCie10 || "",
           noPasoExamen: res?.txtObservaciones?.includes(
             "NO PASO EXAMEN ODONTOLOGICO"
           ),
@@ -187,6 +188,7 @@ export const SubmitDataService = async (
     txtNormales: form.normal,
     txtCoronas: form.corona,
     txtObservaciones: form.observaciones,
+    observacionesCie10: form.observacionesCie10,
     userRegistro: user,
 
     usuarioFirma: form.user_medicoFirma,

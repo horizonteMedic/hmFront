@@ -100,6 +100,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
       marihuana: res.txtMarihuana ?? "",
       // Observaciones
       observaciones: res.txtObservacionesLb ?? "",
+      observacionesCie10: res.observacionesCie10 ?? "",
       notasDoctor: res.notasDoctor ?? "",
 
       SubirDoc: true,
@@ -178,6 +179,7 @@ export const SubmitDataService = async (
     txtCocaina: form.cocaina,
     txtMarihuana: form.marihuana,
     txtObservacionesLb: form.observaciones,
+    observacionesCie10: form.observacionesCie10,
     userRegistro: user,
     userMedicoOcup: "",
     norden: form.norden,

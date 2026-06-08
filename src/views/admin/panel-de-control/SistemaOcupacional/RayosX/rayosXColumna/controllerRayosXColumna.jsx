@@ -67,6 +67,7 @@ export const GetInfoServicio = async (
       tipoRadiografia: res.tipoRadio ?? "",
       informe: res.informacionGeneral ?? "",
       conclusion: res.conclusiones ?? "",
+      conclusionCie10: res.conclusionCie10 ?? "",
 
       user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
 
@@ -95,6 +96,7 @@ export const SubmitDataService = async (
     tipoRadio: form.tipoRadiografia,
     informacionGeneral: form.informe,
     conclusiones: form.conclusion,
+    conclusionCie10: form.conclusionCie10,
     userRegistro: user,
 
     usuarioFirma: form.user_medicoFirma,

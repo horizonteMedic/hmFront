@@ -88,6 +88,7 @@ export default function Odontologia() {
     malEstado: 0,
 
     observaciones: "",
+    observacionesCie10: "",
     noPasoExamen: false,
 
     nombres_search: "",

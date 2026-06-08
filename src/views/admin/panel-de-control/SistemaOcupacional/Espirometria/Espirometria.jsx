@@ -57,7 +57,7 @@ export default function Espirometria() {
         fev1Teorico: "",
 
         interpretacion: "ESPIROMETRIA NORMAL",
-        interpretacionCIE10: "",
+        interpretacionCie10: "",
 
         // Médico que Certifica //BUSCADOR
         nombre_medico: userName,
@@ -233,31 +233,15 @@ export default function Espirometria() {
                     className="xl:col-span-3 ml-0"
                     onChange={handleChange}
                 />
-                <div className="xl:col-span-3">
-                    <CIE10
+                <div className="bg-green-200 p-3 rounded-xl col-span-3">
+                    <CIE10List
+                        value={form.interpretacionCie10}
+                        fieldName="interpretacionCie10"
+                        label="Interpretación CIE10"
                         token={token}
                         setForm={setForm}
-                        fieldName="interpretacionCIE10"
-                        inputType="multiple"
-                        buttonLabel="Ingresar CIE 10"
-                        containerClassName="w-full flex justify-start items-center"
-                        value={form.interpretacionCIE10}
                     />
                 </div>
-                <div className="xl:col-span-3">
-                    <CIE10List
-                        value={form.interpretacionCIE10}
-                        onChange={(nuevoValor) => {
-                            setForm(prev => ({
-                                ...prev,
-                                interpretacionCIE10: nuevoValor
-                            }));
-                        }}
-                        label="Diagnósticos CIE10"
-                        delimiter="\n"
-                    />
-                </div>
-
             </SectionFieldset>
 
             <SectionFieldset legend="Asignación de Médico">
