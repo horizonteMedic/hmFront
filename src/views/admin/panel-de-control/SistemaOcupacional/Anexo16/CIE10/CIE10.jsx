@@ -24,6 +24,7 @@ const CIE10 = ({
   const debounceRef = useRef(null);
   const containerRef = useRef(null);
 
+
   // Función para parsear el valor inicial del formulario a la lista
   const parseValueToList = (value) => {
     if (!value || value.trim() === "") return [];
@@ -106,8 +107,10 @@ const CIE10 = ({
       // Verificar que no esté ya en la lista
       const isAlreadyAdded = selectedList.some(item => item.codigo === selectedResult.codigo);
       if (!isAlreadyAdded) {
-        setSelectedList(prev => [...prev, selectedResult]);
-      }
+        setSelectedList(prev => [...prev, selectedResult].sort((a, b) =>
+          a.codigo.localeCompare(b.codigo)
+        ));
+      } 
       // Limpiar selección después de agregar
       setSelectedResult(null);
       setInputSearch("");
@@ -153,7 +156,7 @@ const CIE10 = ({
           onClick={handleOpenModal}
           className={isIcon ? "" : buttonClassName}
         >
-          {isIcon ? <FontAwesomeIcon icon={faPlusCircle} className="text-green-700 text-2xl"/> : buttonLabel}
+          {isIcon ? <FontAwesomeIcon icon={faPlusCircle} className="text-green-700 text-2xl" /> : buttonLabel}
         </button>
       </div>
 

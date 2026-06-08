@@ -1,6 +1,7 @@
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import CIE10 from "../../admin/panel-de-control/SistemaOcupacional/Anexo16/CIE10/CIE10";
+import { useEffect, useState } from "react";
 
 /**
  * Componente para mostrar y gestionar una lista de diagnósticos CIE10.
@@ -62,7 +63,18 @@ const CIE10List = ({
   };
 
   // Parseamos el valor a un array
-  const diagnosticos = parseDiagnosticos(value);
+  // const diagnosticos = parseDiagnosticos(value);
+  const [diagnosticos, setDiagnosticos] = useState([]);
+
+useEffect(() => {
+  const listaOrdenada = parseDiagnosticos(value).sort((a, b) =>
+    a.codigo.localeCompare(b.codigo, "es", {
+      sensitivity: "base",
+    })
+  );
+
+  setDiagnosticos(listaOrdenada);
+}, [value]);
 
   // Función para convertir el array de vuelta a una cadena
   const stringifyDiagnosticos = (arr) => {
@@ -79,6 +91,8 @@ const CIE10List = ({
 
   const isAddDisabled = disabled || !allowAdd;
   const isRemoveDisabled = disabled || !allowRemove;
+
+  
 
   return (
     <div className="space-y-2">

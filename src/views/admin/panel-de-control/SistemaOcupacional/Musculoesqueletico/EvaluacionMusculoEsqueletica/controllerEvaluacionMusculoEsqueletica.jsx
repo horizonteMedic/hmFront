@@ -45,7 +45,7 @@ export const GetInfoServicio = (
           areaTrabajo: res.paciente.areaTrabajo ?? "",
           edad: res.paciente.edad + " años",
           sexo: res.paciente.sexo ?? "",
-          fecha: res.fechaExamen,
+          fecha: res.paciente.fechaExamen,
           empresa: res.paciente.empresa ?? "",
           tiempoServicio: res.tipoServicio ?? "",
 
@@ -256,11 +256,12 @@ export const SubmitDataService = async (
   const body = {
     codEvaluacion: form.codEvaluacion,
     norden: form.norden,
-    dni: form.dni,
-    edad: cortarHastaPrimerEspacio(form.edad + ""),
-    tipoServicio: form.tiempoServicio,
-    fechaExamen: form.fecha,
-
+    datosPaciente: {
+      dni: form.dni,
+      edad: cortarHastaPrimerEspacio(form.edad + ""),
+      tipoServicio: form.tiempoServicio,
+      fechaExamen: form.fecha,
+    },
     sintomaSi: form.sintomas == "SI",
     sintomaNo: form.sintomas == "NO",
     sintomas: form.cualesSintomas,
