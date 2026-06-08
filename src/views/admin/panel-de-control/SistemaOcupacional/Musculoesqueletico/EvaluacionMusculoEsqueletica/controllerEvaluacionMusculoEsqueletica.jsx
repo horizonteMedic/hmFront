@@ -45,7 +45,7 @@ export const GetInfoServicio = (
           areaTrabajo: res.paciente.areaTrabajo ?? "",
           edad: res.paciente.edad + " años",
           sexo: res.paciente.sexo ?? "",
-          fecha: res.fechaExamen,
+          fecha: res.paciente.fechaExamen,
           empresa: res.paciente.empresa ?? "",
           tiempoServicio: res.tipoServicio ?? "",
 
@@ -223,6 +223,7 @@ export const GetInfoServicio = (
           tratamiento: leerBoolSI(res.tratamientoSi),
           conclusion: leerBoolSI(res.conclusionAsintomaticoSi),
           diagnostico: res.diagnostico ?? "",
+          diagnosticoCie10: res.diagnosticoCie10 ?? "",
           recomendaciones: res.recomendaciones ?? "",
           user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
         }));
@@ -255,11 +256,12 @@ export const SubmitDataService = async (
   const body = {
     codEvaluacion: form.codEvaluacion,
     norden: form.norden,
-    dni: form.dni,
-    edad: cortarHastaPrimerEspacio(form.edad + ""),
-    tipoServicio: form.tiempoServicio,
-    fechaExamen: form.fecha,
-
+    datosPaciente: {
+      dni: form.dni,
+      edad: cortarHastaPrimerEspacio(form.edad + ""),
+      tipoServicio: form.tiempoServicio,
+      fechaExamen: form.fecha,
+    },
     sintomaSi: form.sintomas == "SI",
     sintomaNo: form.sintomas == "NO",
     sintomas: form.cualesSintomas,
@@ -512,6 +514,7 @@ export const SubmitDataService = async (
     tratamientoNo: form.tratamiento == "NO",
     dniUser: dniUser,
     diagnostico: form.diagnostico,
+    diagnosticoCie10: form.diagnosticoCie10,
     conclusionAsintomaticoSi: form.conclusion == "SI",
     conclusionAsintomaticoNo: form.conclusion == "NO",
     recomendaciones: form.recomendaciones,

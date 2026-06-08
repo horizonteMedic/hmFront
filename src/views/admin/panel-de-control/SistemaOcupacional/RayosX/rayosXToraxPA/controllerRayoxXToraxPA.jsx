@@ -70,7 +70,8 @@ export const GetInfoServicio = async (
       mediastinos: res.mediastinos ?? "",
       siluetaCardiovascular: res.siluetaCardiovascular ?? "",
       osteomuscular: res.osteomuscular ?? "",
-      conclusiones: res.conclusionesRadiograficas ?? "",
+      conclusiones: res.conclusionesRadiograficas ?? "", 
+      conclusionesCie10: res.conclusionesCie10 ?? "",
       observaciones: res.observacionesRadiografiaTorax ?? "",
 
       user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
@@ -113,6 +114,7 @@ export const SubmitDataService = async (
     siluetaCardiovascular: form.siluetaCardiovascular,
     osteomuscular: form.osteomuscular,
     conclusionesRadiograficas: form.conclusiones,
+    conclusionesCie10: form.conclusionesCie10,
     observacionesRadiografiaTorax: form.observaciones,
     userRegistro: user,
     usuarioFirma: form.user_medicoFirma,

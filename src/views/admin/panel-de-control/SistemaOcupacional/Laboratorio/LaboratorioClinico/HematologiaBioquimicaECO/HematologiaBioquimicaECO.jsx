@@ -5,7 +5,8 @@ import {
   InputTextArea,
   InputCheckbox,
   SectionFieldset,
-  InputsRadioGroup
+  InputsRadioGroup,
+  CIE10List
 } from '../../../../../../components/reusableComponents/ResusableComponents';
 import { getToday } from "../../../../../../utils/helpers";
 import { useForm } from "../../../../../../hooks/useForm";
@@ -16,6 +17,7 @@ import BotonesAccion from "../../../../../../components/templates/BotonesAccion"
 import ButtonsPDF from "../../../../../../components/reusableComponents/ButtonsPDF";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
+import CIE10 from "../../../Anexo16/CIE10/CIE10";
 
 const tabla = "lab_clinico";
 
@@ -191,6 +193,7 @@ export default function HematologiaBioquimicaECO() {
     marihuana: '',
 
     observaciones: '',
+    observacionesCie10: '',
 
     notasDoctor: "",
 
@@ -810,7 +813,7 @@ export default function HematologiaBioquimicaECO() {
               </div>
             </div>
 
-            <SectionFieldset legend="Conclusiones" className="space-y-4">
+            <SectionFieldset legend="Conclusiones" className="space-y-4"> 
               <InputTextArea
                 label="Observaciones"
                 name="observaciones"
@@ -818,6 +821,15 @@ export default function HematologiaBioquimicaECO() {
                 rows={4}
                 onChange={handleChange}
               />
+              <div className="bg-green-200 p-3 rounded-xl col-span-3">
+                <CIE10List
+                  value={form.observacionesCie10}
+                  fieldName="observacionesCie10"
+                  label="Observaciones CIE10"
+                  token={token}
+                  setForm={setForm}
+                />
+              </div>
               <InputTextArea
                 label="Notas Para Doctor"
                 name="notasDoctor"

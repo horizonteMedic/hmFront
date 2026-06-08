@@ -21,6 +21,8 @@ import {
 } from "./controllerAudiometriaOhla";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import SectionFieldset from "../../../../../components/reusableComponents/SectionFieldset";
+import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
+import CIE10List from "../../../../../components/reusableComponents/CIE10List";
 
 const tabla = "audiometria_po";
 const frecuencias = ["500", "1000", "2000", "3000", "4000", "6000", "8000"];
@@ -728,14 +730,17 @@ export default function AudiometriaOhla({
     console.log("Oído Derecho - Promedio:", odPromedio);
     console.log("Oído Izquierdo - Promedio:", oiPromedio);
 
+    const diagnosticoGenerado = realizarCalculoDiagnostico(
+      odPromedio,
+      oiPromedio,
+      odValues.length,
+      oiValues.length
+    )
+
     setForm((prev) => ({
       ...prev,
-      diagnostico: realizarCalculoDiagnostico(
-        odPromedio,
-        oiPromedio,
-        odValues.length,
-        oiValues.length
-      ),
+      diagnostico: diagnosticoGenerado,
+      diagnosticoCie10: diagnosticoGenerado ? diagnosticoGenerado.includes("HIPOACUSIA") ? "CIE 10: H90.5 - HIPOACUSIA NEUROSENSORIAL, SIN OTRA ESPECIFICACIÓN" : "" : "",
       perdida_global: calcularPerdidaGlobal(),
     }));
   };
@@ -1232,6 +1237,22 @@ export default function AudiometriaOhla({
                 onChange={handleChange}
                 className="w-full border rounded px-2 py-1"
                 rows={3}
+              />
+            </div>
+            {/* <InputTextArea
+              label="Diagnóstico CIE10"
+              name="diagnosticoCie10"
+              value={form.diagnosticoCie10}
+              rows={4}
+              disabled
+            /> */}
+            <div className="bg-green-200 p-3 rounded-xl">
+              <CIE10List
+                value={form.diagnosticoCie10}
+                fieldName="diagnosticoCie10"
+                label="Diagnóstico CIE10"
+                token={token}
+                setForm={setForm}
               />
             </div>
           </div>

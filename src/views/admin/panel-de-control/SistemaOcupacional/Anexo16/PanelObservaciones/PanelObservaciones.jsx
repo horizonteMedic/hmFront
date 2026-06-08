@@ -2,30 +2,44 @@ import {
   InputsRadioGroup,
   InputTextArea,
   InputTextOneLine,
+  CIE10List
 } from "../../../../../components/reusableComponents/ResusableComponents";
-
 
 export default function PanelObservaciones({
   form,
   handleRadioButton,
   handleChange,
   handleBlur,
-  setmodalCIE10
+  token,
+  setForm
 }) {
   return (
-    <div className="p-4 h-full mt-16">
+    <div className="p-4 h-full">
       <div className="space-y-4">
-        {/* Observaciones Generales */}
-        {/* <div className="w-full flex justify-center items-center">
-          <button
-            type="button"
-            onClick={() => setmodalCIE10(true)}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center justify-center gap-2"
-          >
-            Ingresar CIE 10
-          </button>
+        {/* Componente CIE10 autocontenido */}
+        {/* <CIE10
+          token={token}
+          setForm={setForm}
+          fieldName="observacionesGenerales2"
+          inputType="multiple"
+          buttonLabel="Ingresar CIE 10"
+          isIcon
+          value={form.observacionesGenerales}
+        /> */}
+
+        {/* Lista de diagnósticos CIE10 usando el nuevo componente */}
+        {/* <div className="bg-white border border-gray-200 rounded-lg p-3">
+          <CIE10List
+            value={form.observacionesGenerales2}
+            fieldName="observacionesGenerales2"
+            label="Observaciones CIE10"
+            token={token}
+            setForm={setForm}
+          />
         </div> */}
-        <div className="bg-white border border-gray-200 rounded-lg p-3 ">
+
+        {/* Otras partes del formulario */}
+        <div className="bg-white border border-gray-200 rounded-lg p-3">
           <InputTextArea
             rows={18}
             label="Observaciones Generales"
@@ -34,6 +48,7 @@ export default function PanelObservaciones({
             onChange={handleChange}
           />
         </div>
+
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <InputTextArea
             rows={18}
@@ -43,6 +58,7 @@ export default function PanelObservaciones({
             disabled
           />
         </div>
+
         {/* Observaciones */}
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <InputTextArea
@@ -65,6 +81,7 @@ export default function PanelObservaciones({
             onChange={handleChange}
           />
         </div>
+
         {/* Comparación Grupo Sanguíneo */}
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <h4 className="font-semibold text-gray-800 mb-2">
@@ -84,6 +101,7 @@ export default function PanelObservaciones({
             />
           </div>
         </div>
+
         {/* Grupo Sanguíneo */}
         <div className="bg-white border border-gray-200 rounded-lg p-3 flex-1">
           <h4 className="font-semibold text-gray-800 mb-2">Grupo Sanguíneo</h4>
@@ -113,6 +131,7 @@ export default function PanelObservaciones({
             />
           </div>
         </div>
+
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <p className="font-semibold text-gray-800 mb-2">
             Resultados de Laboratorio
@@ -169,8 +188,6 @@ export default function PanelObservaciones({
           </div>
         </div>
 
-
-
         {/* Perfil Lipídico */}
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <h4 className="font-semibold text-gray-700 mb-3">Perfil Lipídico</h4>
@@ -219,8 +236,6 @@ export default function PanelObservaciones({
             </div>
           </div>
         </div>
-
-
       </div>
     </div>
   );

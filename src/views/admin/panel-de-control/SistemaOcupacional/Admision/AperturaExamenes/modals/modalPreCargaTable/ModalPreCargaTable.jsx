@@ -24,7 +24,7 @@ const ModalPreCarga = ({ opcionesPreCarga = [], setModalPreCarga, aplicarPreCarg
                                 <th className="border px-3 py-2 text-left">ID</th>
                                 <th className="border px-3 py-2 text-left">Fecha</th>
                                 <th className="border px-3 py-2 text-left">Empresa</th>
-                                <th className="border px-3 py-2 text-left">Examen</th>
+                                <th className="border px-3 py-2 text-left">Perfil</th>
                                 <th className="border px-3 py-2 text-left">Cargo</th>
                                 <th className="border px-3 py-2 text-left">Área</th>
                                 <th className="border px-3 py-2 text-left">Precio</th>
@@ -37,7 +37,7 @@ const ModalPreCarga = ({ opcionesPreCarga = [], setModalPreCarga, aplicarPreCarg
                                     <td className="border px-3 py-2">{item.id}</td>
                                     <td className="border px-3 py-2">{item.fechaApertura}</td>
                                     <td className="border px-3 py-2">{item.razonEmpresa}</td>
-                                    <td className="border px-3 py-2">{item.nombreExamen}</td>
+                                    <td className="border px-3 py-2">{item.protocolo}</td>
                                     <td className="border px-3 py-2">{item.cargo}</td>
                                     <td className="border px-3 py-2">{item.area}</td>
                                     <td className="border px-3 py-2">{item.precio}</td>

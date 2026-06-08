@@ -21,6 +21,8 @@ import ButtonsPDF from "../../../../../components/reusableComponents/ButtonsPDF"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
+import CIE10 from "../../Anexo16/CIE10/CIE10";
+import CIE10List from "../../../../../components/reusableComponents/CIE10List";
 
 const tabla = "radiografia";
 
@@ -57,7 +59,7 @@ export default function RayosXColumna() {
       "CANAL RAQUÍDEO CON AMPLITUD NORMAL.",
     conclusion:
       "CUERPOS VERTEBRALES DORSOLUMBARES EVALUADOS SIN ALTERACIONES SIGNIFICATIVAS.",
-
+    conclusionCie10: "",
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
@@ -183,6 +185,16 @@ export default function RayosXColumna() {
           rows={4}
           onChange={handleChange}
         />
+        <div className="bg-green-200 p-3 rounded-xl col-span-3">
+          <CIE10List
+            value={form.conclusionCie10}
+            fieldName="conclusionCie10"
+            label="Conclusiones CIE10"
+            token={token}
+            setForm={setForm}
+          />
+        </div>
+        
       </SectionFieldset>
 
       <SectionFieldset legend="Asignación de Médico">

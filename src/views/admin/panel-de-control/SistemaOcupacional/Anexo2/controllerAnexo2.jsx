@@ -127,6 +127,8 @@ export const SubmitDataService = async (
       fecha: null,
       userRegistro: user,
     })),
+
+    observacionesGeneralesCie10: form.observacionesGeneralesCie10,
   };
   console.log(body);
 
@@ -378,6 +380,22 @@ export const ValidarExamenesRealizados = (
     });
 };
 
+function agregarTexto(textoActual, nuevoTexto) {
+  if (!nuevoTexto || !nuevoTexto.trim()) return textoActual;
+  if (!textoActual || !textoActual.trim()) return nuevoTexto;
+  return `${textoActual}\n${nuevoTexto}`;
+}
+function limpiarObservaciones(texto) {
+  return [...new Set(
+    String(texto || '')
+      .split('\n')
+      .map(x => x.trim())
+      .filter(x => x !== '')
+  )]
+    .sort((a, b) => a.localeCompare(b, 'es'))
+    .join('\n');
+}
+
 export const GetInfoServicio = (
   nro,
   tabla,
@@ -401,6 +419,18 @@ export const GetInfoServicio = (
             otrosExamenes: "", //txtOtrosEx
             conclusionRespiratoria: "", //txtconclusion
           };
+          data.observacionesGeneralesCie10 = "";
+
+          try {
+            data.observacionesGeneralesCie10 = Object.values(res?.valoresCie10 ?? {})
+              .filter(value => value != null && value !== '')
+              .map(String)
+              .sort((a, b) => a.localeCompare(b, 'es'))
+              .join('\n');
+          } catch {
+            data.observacionesGeneralesCie10 = '';
+          }
+
 
           if (res.interpretacion_interpretacion != null) {
             data.observacionesGenerales += "ESPIROMETRIA: " + res.interpretacion_interpretacion + "\n";
@@ -663,6 +693,8 @@ export const GetInfoServicio = (
               data.conclusionRespiratoria += "PATRON RESTRICTIVO" + "\n";
               data.observacionesGenerales +=
                 "PATRON RESTRICTIVO LEVE.EVALUACION EN 6 MESES." + "\n";
+
+              data.observacionesGeneralesCie10 = agregarTexto(data.observacionesGeneralesCie10, 'CIE 10: R94.2 - RESULTADOS ANORMALES EN ESTUDIOS FUNCIONALES DEL PULMÓN');
             }
           }
           //==========================================
@@ -684,6 +716,8 @@ export const GetInfoServicio = (
                 data.conclusionRespiratoria += "PATRON OBSTRUCTIVO" + "\n";
                 data.observacionesGenerales +=
                   "PATRON OBSTRUCTIVO LEVE.EVALUACION EN 6 MESES." + "\n";
+
+                data.observacionesGeneralesCie10 = agregarTexto(data.observacionesGeneralesCie10, 'CIE 10: R94.2 - RESULTADOS ANORMALES EN ESTUDIOS FUNCIONALES DEL PULMÓN');
               }
             }
           }
@@ -694,6 +728,7 @@ export const GetInfoServicio = (
             if (malEstado >= 1) {
               data.observacionesGenerales +=
                 "CARIES DENTAL.TTO.EVALUACION EN 6 MESES.\n";
+              data.observacionesGeneralesCie10 = agregarTexto(data.observacionesGeneralesCie10, 'CIE 10: K02 - CARIES DENTAL');
             }
           }
           data.piezasFaltan = res.ausentes_txtausentes ?? "";
@@ -729,24 +764,29 @@ export const GetInfoServicio = (
               data.imcRed = true;
               data.observacionesGenerales +=
                 "SOBREPESO:DIETA HIPOCALORICA Y EJERCICIOS.\n";
+              data.observacionesGeneralesCie10 = agregarTexto(data.observacionesGeneralesCie10, "CIE 10: E66.9 - OBESIDAD, NO ESPECIFICADA");
             } else if (imc >= 30 && imc < 35) {
               data.imcRed = true;
               data.observacionesGenerales +=
                 "OBESIDAD I.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
+              data.observacionesGeneralesCie10 = agregarTexto(data.observacionesGeneralesCie10, "CIE 10: E66.9 - OBESIDAD, NO ESPECIFICADA");
             } else if (imc >= 35 && imc < 40) {
               data.imcRed = true;
               data.observacionesGenerales +=
                 "OBESIDAD II.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
+              data.observacionesGeneralesCie10 = agregarTexto(data.observacionesGeneralesCie10, "CIE 10: E66.9 - OBESIDAD, NO ESPECIFICADA");
             }
             else if (imc >= 40 && imc < 45) {
               data.imcRed = true;
               data.observacionesGenerales +=
                 "OBESIDAD III.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
+              data.observacionesGeneralesCie10 = agregarTexto(data.observacionesGeneralesCie10, "CIE 10: E66.9 - OBESIDAD, NO ESPECIFICADA");
             }
             else if (imc >= 45) {
               data.imcRed = true;
               data.observacionesGenerales +=
                 "OBESIDAD IV.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
+              data.observacionesGeneralesCie10 = agregarTexto(data.observacionesGeneralesCie10, "CIE 10: E66.9 - OBESIDAD, NO ESPECIFICADA");
             }
           }
 
@@ -885,10 +925,12 @@ export const GetInfoServicio = (
 
           if (ct > 200) {
             data.observacionesGenerales += "HIPERCOLESTEROLEMIA.";
+            data.observacionesGeneralesCie10 = agregarTexto(data.observacionesGeneralesCie10, "CIE 10: E78.0 - HIPERCOLESTEROLEMIA PURA");
             data.colesterolRed = true;
           }
           if (trigli > 150) {
             data.observacionesGenerales += "- HIPERTRIGLICERIDEMIA.";
+            data.observacionesGeneralesCie10 = agregarTexto(data.observacionesGeneralesCie10, "CIE 10: E78.1 - HIPERGLICERIDEMIA PURA");
             data.trigliceridosRed = true;
           }
           if (ldl > 129) {
@@ -920,6 +962,7 @@ export const GetInfoServicio = (
 
             if (sistolica1 >= 140 || diastolica1 >= 90) {
               data.observacionesGenerales += "HTA NO CONTROLADA.\n";
+              data.observacionesGeneralesCie10 = agregarTexto(data.observacionesGeneralesCie10, "CIE 10: I10 - HIPERTENSIÓN ESENCIAL (PRIMARIA)");
             }
           }
           data.resultadoGonadotropina = res.sexo_sexo_pa === "M" ? "N/A" : res.resultadoGonadotropina
@@ -994,6 +1037,12 @@ export const GetInfoServicio = (
           data.pus = res.laboratorioClinicoAdicionales.sedimientoUrinarioPus_txtpussu ?? "";
           data.otrosSedimento = res.laboratorioClinicoAdicionales.sedimientoUrinarioOtros_txtotrossu ?? "";
           data.resultadoAcidoUrico = res.resultadoAcidoUrico
+
+          //ordenamiento
+
+          data.observacionesGeneralesCie10 = limpiarObservaciones(data.observacionesGeneralesCie10);
+
+
           console.log("DATAAA", data);
           set((prev) => ({ ...prev, ...data }));
         }
@@ -1144,8 +1193,18 @@ export const GetInfoServicioEditar = (
           console.log(formatearFechaCorta(
             res.datosPaciente.fechaNacimientoPaciente_fecha_nacimiento_pa
           ))
+          data.observacionesGeneralesCie10 = res.observacionesGeneralesCie10 ?? "";
 
-
+          data.observacionesGenerales2Cie10 = "";
+          try {
+            data.observacionesGenerales2Cie10 = Object.values(res?.valoresCie10 ?? {})
+              .filter(value => value != null && value !== '')
+              .map(String)
+              .sort((a, b) => a.localeCompare(b, 'es'))
+              .join('\n');
+          } catch {
+            data.observacionesGenerales2Cie10 = '';
+          }
 
           if (res.interpretacion_interpretacion != null) {
             data.observacionesGenerales2 += "ESPIROMETRIA: " + res.interpretacion_interpretacion + "\n";
@@ -1411,6 +1470,7 @@ export const GetInfoServicioEditar = (
               // data.conclusionRespiratoria += "PATRON RESTRICTIVO" + "\n";
               data.observacionesGenerales2 +=
                 "PATRON RESTRICTIVO LEVE.EVALUACION EN 6 MESES." + "\n";
+              data.observacionesGenerales2Cie10 = agregarTexto(data.observacionesGenerales2Cie10, 'CIE 10: R94.2 - RESULTADOS ANORMALES EN ESTUDIOS FUNCIONALES DEL PULMÓN');
             }
           }
           data.piezasMalEstado = res.piezasMalEstado_txtpiezasmalestado ?? "";
@@ -1419,6 +1479,7 @@ export const GetInfoServicioEditar = (
             if (malEstado >= 1) {
               data.observacionesGenerales2 +=
                 "CARIES DENTAL.TTO.EVALUACION EN 6 MESES.\n";
+              data.observacionesGenerales2Cie10 = agregarTexto(data.observacionesGenerales2Cie10, 'CIE 10: K02 - CARIES DENTAL');
             }
           }
 
@@ -1455,24 +1516,29 @@ export const GetInfoServicioEditar = (
               data.imcRed = true;
               data.observacionesGenerales2 +=
                 "SOBREPESO:DIETA HIPOCALORICA Y EJERCICIOS.\n";
+              data.observacionesGenerales2Cie10 = agregarTexto(data.observacionesGenerales2Cie10, "CIE 10: E66.9 - OBESIDAD, NO ESPECIFICADA");
             } else if (imc >= 30 && imc < 35) {
               data.imcRed = true;
               data.observacionesGenerales2 +=
                 "OBESIDAD I.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
+              data.observacionesGenerales2Cie10 = agregarTexto(data.observacionesGenerales2Cie10, "CIE 10: E66.9 - OBESIDAD, NO ESPECIFICADA");
             } else if (imc >= 35 && imc < 40) {
               data.imcRed = true;
               data.observacionesGenerales2 +=
                 "OBESIDAD II.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
+              data.observacionesGenerales2Cie10 = agregarTexto(data.observacionesGenerales2Cie10, "CIE 10: E66.9 - OBESIDAD, NO ESPECIFICADA");
             }
             else if (imc >= 40 && imc < 45) {
               data.imcRed = true;
               data.observacionesGenerales2 +=
                 "OBESIDAD III.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
+              data.observacionesGenerales2Cie10 = agregarTexto(data.observacionesGenerales2Cie10, "CIE 10: E66.9 - OBESIDAD, NO ESPECIFICADA");
             }
             else if (imc >= 45) {
               data.imcRed = true;
               data.observacionesGenerales2 +=
                 "OBESIDAD IV.NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO.DIETA HIPOCALORICA Y EJERCICIOS.EVALUACION POR ENDOCRINOLOGIA Y CARDIOLOGO\n";
+              data.observacionesGenerales2Cie10 = agregarTexto(data.observacionesGenerales2Cie10, "CIE 10: E66.9 - OBESIDAD, NO ESPECIFICADA");
             }
           }
 
@@ -1603,10 +1669,12 @@ export const GetInfoServicioEditar = (
           if (ct > 200) {
             data.observacionesGenerales2 += "HIPERCOLESTEROLEMIA.";
             data.colesterolRed = true;
+            data.observacionesGenerales2Cie10 = agregarTexto(data.observacionesGenerales2Cie10, "CIE 10: E78.0 - HIPERCOLESTEROLEMIA PURA");
           }
           if (trigli > 150) {
             data.observacionesGenerales2 += "- HIPERTRIGLICERIDEMIA.";
             data.trigliceridosRed = true;
+            data.observacionesGenerales2Cie10 = agregarTexto(data.observacionesGenerales2Cie10, "CIE 10: E78.1 - HIPERGLICERIDEMIA PURA");
           }
           if (ldl > 129) {
             data.LDLColesterolRed = true;
@@ -1635,6 +1703,7 @@ export const GetInfoServicioEditar = (
 
             if (sistolica1 >= 140 || diastolica1 >= 90) {
               data.observacionesGenerales2 += "HTA NO CONTROLADA.\n";
+              data.observacionesGenerales2Cie10 = agregarTexto(data.observacionesGenerales2Cie10, "CIE 10: I10 - HIPERTENSIÓN ESENCIAL (PRIMARIA)");
             }
           }
           //==============================
@@ -1702,6 +1771,9 @@ export const GetInfoServicioEditar = (
           data.otrosSedimento = res.laboratorioClinicoAdicionales.sedimientoUrinarioOtros_txtotrossu ?? "";
 
           console.log("DATA EDITAR", data);
+
+          data.observacionesGenerales2Cie10 = limpiarObservaciones(data.observacionesGenerales2Cie10);
+
           set((prev) => ({ ...prev, ...res, ...data }));
         }
       } else {

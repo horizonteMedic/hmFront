@@ -148,7 +148,7 @@ export default function CertificadoExposicionAlCalor() {
 
       <DatosPersonalesLaborales form={form} />
 
-      <SectionFieldset
+      {/* <SectionFieldset
         legend="Datos del especialista"
         className="grid grid-cols-1 lg:grid-cols-2 gap-3"
       >
@@ -169,7 +169,7 @@ export default function CertificadoExposicionAlCalor() {
           disabled
           labelWidth="120px"
         />
-      </SectionFieldset>
+      </SectionFieldset> */}
 
       <SectionFieldset
         legend="Evaluación Clínica y Ocupacional"

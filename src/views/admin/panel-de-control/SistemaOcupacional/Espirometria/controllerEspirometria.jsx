@@ -73,6 +73,7 @@ export const GetInfoServicio = async (
             fvcTeorico: res.fvcTeorico,
             fev1Teorico: res.fev1Teorico,
             interpretacion: res.interpretacion,
+            interpretacionCie10: res.interpretacionCie10,
 
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
             user_doctorAsignado: res.doctorAsignado,
@@ -106,6 +107,7 @@ export const SubmitDataService = async (
         fev1Fvc: form.fev1_fvc,
         fef2575: form.fef,
         interpretacion: form.interpretacion,
+        interpretacionCie10: form.interpretacionCie10,
         fvcTeorico: form.fvcTeorico,
         fev1Teorico: form.fev1Teorico,
 

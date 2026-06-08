@@ -9,7 +9,6 @@ import { useForm } from "../../../../hooks/useForm";
 import { useState } from "react";
 import { getToday } from "../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAntecedentesPatologicos";
-import MinerosdelNorte from "./MinerosdelNorte/MinerosdelNorte";
 
 const tabla = "antecedentes_patologicos"
 
