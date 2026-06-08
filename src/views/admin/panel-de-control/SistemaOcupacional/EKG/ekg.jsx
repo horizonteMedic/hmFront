@@ -617,13 +617,13 @@ export default function EKG() {
             disabled={!form.informeCompleto}
           />
 
-          {/* <InputTextArea
+          <InputTextArea
             label="Conclusiones CIE10"
             name="conclusionesCie10"
             value={form.conclusionesCie10}
             rows={4}
             disabled
-          /> */}
+          /> 
           <div className="bg-green-200 p-3 rounded-xl">
             <CIE10List
               value={form.conclusionesCie10}
