@@ -385,6 +385,16 @@ function agregarTexto(textoActual, nuevoTexto) {
   if (!textoActual || !textoActual.trim()) return nuevoTexto;
   return `${textoActual}\n${nuevoTexto}`;
 }
+function limpiarObservaciones(texto) {
+  return [...new Set(
+    String(texto || '')
+      .split('\n')
+      .map(x => x.trim())
+      .filter(x => x !== '')
+  )]
+    .sort((a, b) => a.localeCompare(b, 'es'))
+    .join('\n');
+}
 
 export const GetInfoServicio = (
   nro,
@@ -754,7 +764,7 @@ export const GetInfoServicio = (
               data.imcRed = true;
               data.observacionesGenerales +=
                 "SOBREPESO:DIETA HIPOCALORICA Y EJERCICIOS.\n";
-              // data.observacionesGeneralesCie10 = agregarTexto(data.observacionesGeneralesCie10, "");
+              data.observacionesGeneralesCie10 = agregarTexto(data.observacionesGeneralesCie10, "CIE 10: E66.9 - OBESIDAD, NO ESPECIFICADA");
             } else if (imc >= 30 && imc < 35) {
               data.imcRed = true;
               data.observacionesGenerales +=
@@ -1029,11 +1039,8 @@ export const GetInfoServicio = (
           data.resultadoAcidoUrico = res.resultadoAcidoUrico
 
           //ordenamiento
-          // data.observacionesGeneralesCie10 = data.observacionesGeneralesCie10
-          //   .split('\n')
-          //   .filter(x => x.trim() !== '')
-          //   .sort((a, b) => a.localeCompare(b, 'es'))
-          //   .join('\n');
+
+          data.observacionesGeneralesCie10 = limpiarObservaciones(data.observacionesGeneralesCie10);
 
 
           console.log("DATAAA", data);
@@ -1509,7 +1516,7 @@ export const GetInfoServicioEditar = (
               data.imcRed = true;
               data.observacionesGenerales2 +=
                 "SOBREPESO:DIETA HIPOCALORICA Y EJERCICIOS.\n";
-              // data.observacionesGenerales2Cie10 = agregarTexto(data.observacionesGenerales2Cie10, "CIE 10: E66.9 - OBESIDAD, NO ESPECIFICADA");
+              data.observacionesGenerales2Cie10 = agregarTexto(data.observacionesGenerales2Cie10, "CIE 10: E66.9 - OBESIDAD, NO ESPECIFICADA");
             } else if (imc >= 30 && imc < 35) {
               data.imcRed = true;
               data.observacionesGenerales2 +=
@@ -1765,12 +1772,7 @@ export const GetInfoServicioEditar = (
 
           console.log("DATA EDITAR", data);
 
-          //ordenamiento
-          // data.observacionesGenerales2Cie10 = data.observacionesGenerales2Cie10
-          //   .split('\n')
-          //   .filter(x => x.trim() !== '')
-          //   .sort((a, b) => a.localeCompare(b, 'es'))
-          //   .join('\n');
+          data.observacionesGenerales2Cie10 = limpiarObservaciones(data.observacionesGenerales2Cie10);
 
           set((prev) => ({ ...prev, ...res, ...data }));
         }
