@@ -41,6 +41,9 @@ export default function PanelObservaciones({
             label="Observaciones Generales CIE10"
             token={token}
             setForm={setForm}
+            setAdditionalForm={setForm}
+            additionalFieldName="observacionesGenerales"
+            // additionalDelimiter="\n"
           />
         </div>
         <div className="bg-white border border-gray-200 rounded-lg p-3">

@@ -13,6 +13,7 @@ const CIE10 = ({
   containerClassName = "w-full flex justify-center items-center",
   value, // Nuevo prop: valor actual del formulario
   isIcon = false,
+  onConfirm,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [inputSearch, setInputSearch] = useState("");
@@ -110,6 +111,7 @@ const CIE10 = ({
         setSelectedList(prev => [...prev, selectedResult].sort((a, b) =>
           a.codigo.localeCompare(b.codigo)
         ));
+          // setSelectedList(prev => [...prev, selectedResult]);
       } 
       // Limpiar selección después de agregar
       setSelectedResult(null);
@@ -127,10 +129,16 @@ const CIE10 = ({
         `CIE 10: ${item.codigo} - ${item.descripcion}`
       ).join(inputType === "multiple" ? "\n" : " | ");
 
+      const newValue = nuevosDiagnosticos.toUpperCase();
+      
       setForm(prev => ({
         ...prev,
-        [fieldName]: nuevosDiagnosticos.toUpperCase()
+        [fieldName]: newValue
       }));
+
+      if (onConfirm) {
+        onConfirm(newValue, selectedList);
+      }
 
       setModalOpen(false);
       // Limpiar la lista después de cerrar
