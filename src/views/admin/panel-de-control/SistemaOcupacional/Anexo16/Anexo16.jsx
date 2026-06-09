@@ -386,10 +386,12 @@ export default function Anexo16() {
                       token={token}
                       selectedSede={selectedSede}
                       userlogued={userlogued}
+                      handleSave={handleSave}
                       today={today}
                       handleSearch={handleSearch}
                       handleSearchExamenesRealizados={handleSearchExamenesRealizados}
                       handleRadioButtonBoolean={handleRadioButtonBoolean}
+                      handlePrint={handlePrint}
                     />
                   )
                 );
