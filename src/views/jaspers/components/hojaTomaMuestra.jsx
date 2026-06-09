@@ -97,7 +97,7 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
     doc.text("T. EXAMEN:", marginL + 5, currentY);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.5);
-    doc.text(String(datos.examen || ""), marginL + 24, currentY);
+    doc.text(String(datos.examen || datos.protocoloNombre || ""), marginL + 24, currentY);
     doc.line(marginL + 24, currentY + 0.5, marginL + 55, currentY + 0.5);
 
     const lineHeight = 4;
@@ -269,7 +269,7 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
     doc.text(formatearFecha(datos.fecha) || "", marginL + 173, currentY);
     doc.line(marginL + 173, currentY + 0.5, marginL + 190, currentY + 0.5);
 
- 
+
     // Checkboxes (T.ALTURA, PSICO, etc.)
     currentY += 5;
     const cbXStart = marginL + 5;

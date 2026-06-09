@@ -851,10 +851,10 @@ const AperturaExamenesPreOcup = (props) => {
     }
 
   }
-
+  console.log(datos)
   const handleSubmitEdit = e => {
     const camposRequeridos = ['codPa', 'nombres', 'apellidos', 'razonEmpresa', 'razonContrata', 'n_medico', 'tipoPrueba',
-      'cargoDe', 'areaO', 'tipoPago', 'fechaAperturaPo']; // agrega los campos que quieras
+      'cargoDe', 'tipoPago', 'fechaAperturaPo']; // agrega los campos que quieras
     const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
     if (camposVacios.length > 0) {
       const lista = camposVacios.join(', ');
@@ -891,7 +891,7 @@ const AperturaExamenesPreOcup = (props) => {
 
   const handleSubmit = (e) => {
     const camposRequeridos = ['codPa', 'nombres', 'apellidos', 'razonEmpresa', 'razonContrata', 'n_medico', 'tipoPrueba',
-      'cargoDe', 'areaO', 'tipoPago', 'fechaAperturaPo']; // agrega los campos que quieras
+      'cargoDe', 'tipoPago', 'fechaAperturaPo']; // agrega los campos que quieras
     //nomExamen, nomEx, mineralPo, alturaPo
     const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
     if (camposVacios.length > 0) {
@@ -1053,11 +1053,18 @@ const AperturaExamenesPreOcup = (props) => {
         n_medico: item.medico,
         cargoDe: item.cargo,
         areaO: item.area,
+        nomEx: "SUPERFICIE",
+        mineralPo: "N/A",
+        alturaPo: "DEBAJO 2500",
+        autoriza: "DR. ARTEMIO",
+        nomExamen: "ANUAL",
+        precioAdic: 1,
         //nombreExamen
         //mineral
         //altura
       }));
       RendeSet(item)
+      setSearchExamenMedico("ANUAL")
       Swal.close()
     } catch {
       Swal.fire('Error', 'Ha ocurrido un Error', 'error');

@@ -4,6 +4,7 @@ import headerHR from "../components/headerHR";
 import drawBox from "../components/drawBox";
 import drawC from "../components/drawC";
 import footer from "../components/footer";
+import hojaTomaMuestra from "../components/hojaTomaMuestra";
 
 const ORDEN_AREAS = [
     "LABORATORIO",
@@ -86,10 +87,10 @@ export default async function HojadeRutaDinamico(datos = {}) {
             tableBody.push([
                 {
                     content: cat.area + "\n" + examList,
-                    styles: { halign: 'left', minCellHeight: 16.5 }
+                    styles: { halign: 'left', minCellHeight: 16 }
                 },
-                { content: "", styles: { minCellHeight: 16.5 } },
-                { content: "", styles: { minCellHeight: 16.5 } }
+                { content: "", styles: { minCellHeight: 16 } },
+                { content: "", styles: { minCellHeight: 16 } }
             ]);
         });
 
@@ -117,7 +118,7 @@ export default async function HojadeRutaDinamico(datos = {}) {
                 lineWidth: 0.3,
                 lineColor: [150, 150, 150],
                 halign: 'center',
-                fontSize: 8.5,
+                fontSize: 7,
                 cellPadding: { top: 3, right: 4, bottom: 3, left: 4 }
             },
             styles: {
@@ -182,8 +183,17 @@ export default async function HojadeRutaDinamico(datos = {}) {
 
     const categorizedExams = getCategorizedExams(datos);
 
-    await drawTable(doc, startY + 22, categorizedExams, []);
+    await drawTable(doc, startY + 20, categorizedExams, []);
 
+
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    // === AGREGAR SEGUNDA PÁGINA ===
+    doc.addPage();
+    hojaTomaMuestra(doc, datos, {
+        defaultColor: "#ADD8E6",
+        defaultText: "BM",
+    });
 
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
