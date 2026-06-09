@@ -10,6 +10,7 @@ import { SearchPacienteDNI, SubmitRegistrarPaciente } from './model/AdminPacient
 import NewPad from './pad/Newpad';
 import NewHuellaFut from './huella/HuellaFut';
 import { VerifyHoF } from './model/Submit';
+import SubidaMasiva from './RegistroPacientes/MasivoRegistroPacientes';
 
 const RegistroClientes = (props) => {
   // ref para mantener el cursor fijo en "Nombres"
@@ -17,7 +18,7 @@ const RegistroClientes = (props) => {
   const dniRef = useRef(null);   // ⬅️  nuevo
 
   const [startDate, setStartDate] = useState(new Date());
-
+  const [modalSubidaMasiva, setModalSubidaMasiva] = useState(false)
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredProfesiones, setFilteredProfesiones] = useState([]);
@@ -491,12 +492,15 @@ const RegistroClientes = (props) => {
     props.setDatos(d => ({ ...d, fechaNaciminetoPa: formatted }));
   };
 
-  console.log(props.datos)
   return (
     <div className="p-4">
+      <button onClick={() => { setModalSubidaMasiva(true) }} className="verde-btn px-4 py-1 rounded flex items-center mr-3">
+        Subida Masiva
+      </button>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-1">
         {/* Columna 1 */}
         <div className="flex flex-col space-y-2">
+
           <div className="flex items-center space-x-2">
             <label htmlFor="codPa" className="block w-[11.5em]">
               DNI/LM:
@@ -1047,6 +1051,11 @@ const RegistroClientes = (props) => {
           setFirma={() => { setFirmaP({ id: 1 }) }}
         />
       )}
+      {modalSubidaMasiva && <SubidaMasiva
+        onClose={() => setModalSubidaMasiva(false)}
+        sede={props.selectedSede}
+        token={props.token}
+      />}
     </div>
   );
 };
