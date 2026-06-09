@@ -83,7 +83,7 @@ const headerHR = (doc, datos) => {
     .setFont("helvetica", "bold")
     .setFontSize(10)
     .text(
-      `SEDE: ${datos.nombreSede || ""}`,
+      `SEDE: ${datos.sede || ""}`,
       margin,
       25 + yOffset,
       { align: "left" }
@@ -107,7 +107,7 @@ const headerHR = (doc, datos) => {
   doc.setFont("helvetica", "bold");
   doc.text("TIPO EX:", margin, y1);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.examen || ""}`, margin + 20, y1);
+  doc.text(`${datos.protocoloNombre || ""}`, margin + 20, y1);
 
   doc.setFont("helvetica", "bold");
   doc.text("FECHA:", margin + 80, y1);
