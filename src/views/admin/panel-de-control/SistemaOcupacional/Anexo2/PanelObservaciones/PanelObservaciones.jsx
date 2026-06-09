@@ -1,4 +1,5 @@
 import {
+  CIE10List,
   InputsRadioGroup,
   InputTextArea,
   InputTextOneLine,
@@ -8,7 +9,8 @@ export default function PanelObservaciones({
   form,
   handleRadioButton,
   handleChange,
-  setmodalCIE10
+  setmodalCIE10, token, setForm
+
 }) {
   return (
     <div className="p-4 h-full mt-16">
@@ -32,12 +34,34 @@ export default function PanelObservaciones({
             onChange={handleChange}
           />
         </div>
+        <div className="bg-green-200 p-3 rounded-xl">
+          <CIE10List
+            value={form.observacionesGeneralesCie10}
+            fieldName="observacionesGeneralesCie10"
+            label="Observaciones Generales CIE10"
+            token={token}
+            setForm={setForm}
+            setAdditionalForm={setForm}
+            additionalFieldName="observacionesGenerales"
+            // additionalDelimiter="\n"
+          />
+        </div>
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <InputTextArea
             rows={18}
             label="Observaciones Generales AUTO"
             name="observacionesGenerales2"
             value={form.observacionesGenerales2}
+            disabled
+          />
+        </div>
+        <div className="bg-green-200 p-3 rounded-xl">
+          <CIE10List
+            value={form.observacionesGenerales2Cie10}
+            fieldName="observacionesGenerales2Cie10"
+            label="Observaciones Generales AUTO CIE10"
+            token={token}
+            setForm={setForm}
             disabled
           />
         </div>

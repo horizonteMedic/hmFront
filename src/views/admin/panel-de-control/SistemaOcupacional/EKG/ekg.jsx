@@ -25,8 +25,18 @@ import TablaTemplate from "../../../../components/templates/TablaTemplate";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
+import CIE10List from "../../../../components/reusableComponents/CIE10List";
 
 const tabla = "informe_electrocardiograma";
+
+const equivalencias = {
+  "BRADICARDIA SINUSAL FISIOLOGICA": "CIE 10: R00.1 - BRADICARDIA, NO ESPECIFICADA",
+  "BRADICARDIA SINUSAL ASINTOMATICA": "CIE 10: R00.1 - BRADICARDIA, NO ESPECIFICADA",
+  "BLOQUEO INCOMPLETO RAMA DERECHA": "CIE 10: I45.1 - OTROS TIPOS DE BLOQUEO DE RAMA DERECHA DEL HAZ Y LOS NO ESPECIFICADOS",
+  "BLOQUEO COMPLETO RAMA DERECHA": "CIE 10: I45.1 - OTROS TIPOS DE BLOQUEO DE RAMA DERECHA DEL HAZ Y LOS NO ESPECIFICADOS",
+  "DESVIACIÓN IZQUIERDA DEL EJE CARDIACO": "CIE 10: R94.3 - RESULTADOS ANORMALES EN ESTUDIOS FUNCIONALES CARDIOVASCULARES",
+  "DESVIACIÓN DERECHA EJE CARDIACO": "CIE 10: R94.3 - RESULTADOS ANORMALES EN ESTUDIOS FUNCIONALES CARDIOVASCULARES"
+}
 
 export default function EKG() {
   const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
@@ -66,8 +76,12 @@ export default function EKG() {
     ondaT: "",
     qtc: "N/E",
 
-    conclusiones: "",
     hallazgos: "",
+    hallazgosCie10: "",
+
+    conclusiones: "",
+    conclusionesCie10: "",
+
     recomendaciones: "",
 
     nombres_search: "",
@@ -122,20 +136,29 @@ export default function EKG() {
 
   const handleHallazgosChange = (e, value) => {
     const { checked } = e.target;
+
     setForm((prev) => {
       let hallazgos = prev.hallazgos;
+      let hallazgosCie10 = prev.hallazgosCie10;
 
       if (checked) {
         if (hallazgos.trim() === "" || hallazgos.trim() === "NORMAL") {
           hallazgos = value;
+          if (equivalencias[value] && equivalencias[value]) {
+            hallazgosCie10 = equivalencias[value];
+          }
         } else {
           hallazgos += "\n" + value;
+          if (equivalencias[value] && !hallazgosCie10.includes(equivalencias[value])) {
+            hallazgosCie10 += "\n" + equivalencias[value];
+          }
         }
       } else {
         hallazgos = "";
+        hallazgosCie10 = "";
       }
 
-      return { ...prev, hallazgos };
+      return { ...prev, hallazgos, hallazgosCie10 };
     });
   };
 
@@ -191,6 +214,7 @@ export default function EKG() {
               setForm((prev) => ({
                 ...prev,
                 conclusiones: "",
+                conclusionesCie10: "",
 
                 ritmo: "",
                 fc: "",
@@ -321,7 +345,7 @@ export default function EKG() {
                   ...prev,
                   ritmo: e.target.checked ? "SINUSAL" : "",
                 }));
-              }} 
+              }}
             />
 
             <InputCheckbox
@@ -333,7 +357,7 @@ export default function EKG() {
                   ...prev,
                   pr: e.target.checked ? "0.20" : "",
                 }));
-              }} 
+              }}
             />
 
             <InputCheckbox
@@ -404,7 +428,7 @@ export default function EKG() {
             value={form.qrs ?? ""}
             onChange={handleChange}
             labelWidth="80px"
-            onKeyUp={handleFocusNext}   
+            onKeyUp={handleFocusNext}
           />
 
           <InputTextOneLine
@@ -413,7 +437,7 @@ export default function EKG() {
             value={form.qtc ?? ""}
             onChange={handleChange}
             labelWidth="80px"
-            onKeyUp={handleFocusNext}       
+            onKeyUp={handleFocusNext}
           />
 
           {/* Fila 3 */}
@@ -423,7 +447,7 @@ export default function EKG() {
             value={form.st ?? ""}
             onChange={handleChange}
             disabled={!form.informeCompleto}
-            labelWidth="80px" 
+            labelWidth="80px"
             onKeyUp={handleFocusNext}
           />
 
@@ -463,7 +487,7 @@ export default function EKG() {
           />
 
           {/* Checkboxes de hallazgos */}
-          <div className="grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4">
             <InputCheckbox
               label="Normal"
               name="normal"
@@ -472,6 +496,7 @@ export default function EKG() {
                 setForm((prev) => ({
                   ...prev,
                   hallazgos: e.target.checked ? "NORMAL" : "",
+                  hallazgosCie10: e.target.checked ? "" : prev.hallazgosCie10,
                   conclusiones: e.target.checked ? form.informeCompleto ? "DENTRO DE PARAMETROS NORMALES" : "" : "",
                   recomendaciones: e.target.checked ? "EVALUACIÓN ANUAL" : "",
                 }));
@@ -520,6 +545,21 @@ export default function EKG() {
             />
 
             <InputCheckbox
+              label="B.C. Rama Derecha"
+              name="bloqueoCompletoRamaDerecha"
+              checked={form.hallazgos.includes("BLOQUEO COMPLETO RAMA DERECHA")}
+              onChange={(e) => {
+                handleHallazgosChange(e, "BLOQUEO COMPLETO RAMA DERECHA");
+                setForm((prev) => ({
+                  ...prev,
+                  recomendaciones: e.target.checked
+                    ? ""
+                    : prev.recomendaciones,
+                }));
+              }}
+            />
+
+            <InputCheckbox
               label="D.I. Eje Cardíaco"
               name="desviacionEjeCardiacoIzquierda"
               checked={form.hallazgos.includes("DESVIACIÓN IZQUIERDA DEL EJE CARDIACO")}
@@ -550,6 +590,24 @@ export default function EKG() {
             />
           </div>
 
+          {/* <InputTextArea
+            label="Hallazgos CIE10"
+            name="hallazgosCie10"
+            value={form.hallazgosCie10}
+            rows={4}
+            disabled
+          /> */}
+          <div className="bg-green-200 p-3 rounded-xl">
+            <CIE10List
+              value={form.hallazgosCie10}
+              fieldName="hallazgosCie10"
+              label="Hallazgos CIE10"
+              token={token}
+              setForm={setForm}
+            />
+          </div>
+
+
           <InputTextArea
             label="Conclusiones"
             name="conclusiones"
@@ -558,6 +616,25 @@ export default function EKG() {
             onChange={handleChange}
             disabled={!form.informeCompleto}
           />
+
+          <InputTextArea
+            label="Conclusiones CIE10"
+            name="conclusionesCie10"
+            value={form.conclusionesCie10}
+            rows={4}
+            disabled
+          /> 
+          <div className="bg-green-200 p-3 rounded-xl">
+            <CIE10List
+              value={form.conclusionesCie10}
+              fieldName="conclusionesCie10"
+              label="Conclusiones CIE10"
+              token={token}
+              setForm={setForm}
+              disabled={!form.informeCompleto}
+            />
+          </div>
+
 
           <InputTextArea
             label="Recomendaciones"

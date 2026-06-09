@@ -6,9 +6,12 @@ import {
     PrintHojaRJsReportDefault,
     SubmitDataServiceDefault,
     VerifyTRDefault,
+    VerifyTRDefaultValidado,
+    VerifyTRPerzonalizadoDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
+import { getTodayPlusOneYear } from "../../../../utils/helpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/riesgoElectrico/obtenerReporte";
@@ -37,8 +40,7 @@ export const GetInfoServicio = async (
             ...prev,
             // Header
             norden: rese.norden ?? "",
-            fechaExam: rese.fechaExamen ?? "",
-            tipoExamen: rese.nombreExamen ?? "",
+            tipoExamen: rese.tipoExamen ?? "",
             // Datos personales
             nombres: `${rese.nombresPaciente} ${rese.apellidosPaciente}` ?? "",
             dni: rese.dniPaciente ?? "",
@@ -84,8 +86,9 @@ export const GetInfoServicioEditar = async (
             ...res,
             // Header
             norden: rese.norden ?? "",
-            fechaExam: rese.fechaExamen ?? "",
-            tipoExamen: rese.nombreExamen ?? "",
+            fechaExamen: rese.fechaExamen ?? "",
+            fechaExpiracion: rese.fechaExpiracion ?? "" ?? getTodayPlusOneYear(),
+            tipoExamen: rese.tipoExamen ?? "",
             // Datos personales
             nombres: (rese.nombresPaciente + " " + rese.apellidosPaciente) ?? "",
             dni: rese.dniPaciente ?? "",
@@ -101,8 +104,8 @@ export const GetInfoServicioEditar = async (
             cargoDesempenar: rese.cargoPaciente ?? "",
             ocupacion: rese.ocupacionPaciente ?? "",
 
-            ubicacionSitio: res.ubicacionSitio ?? "",
-            tiempoExperiencia: res.tiempoExperiencia ?? "",
+            ubicacionSitio: rese.ubicacionSitio ?? "",
+            tiempoExperiencia: rese.tiempoExperiencia ?? "",
 
             evaluacionRiesgoRealizada: rese.evaluacionRiesgoRealizada ?? "",
             personalCompetenteAreaElectrica: rese.personalCompetenteAreaElectrica ?? "",
@@ -120,8 +123,8 @@ export const GetInfoServicioEditar = async (
 
             aptitud: rese.apto
                 ? "APTO"
-                : rese.noEsApto
-                    ? "NO APTO"
+                : rese.noApto
+                    ? "NO_APTO"
                     : rese.conRestriccion
                         ? "RESTRICCION"
                         : "",
@@ -145,34 +148,42 @@ export const SubmitDataService = async (
         return;
     }
 
+    if (form.aptitud == "") {
+        await Swal.fire("Advertencia", "Debe seleccionar la aptitud", "warning");
+        return;
+    }
+
+    if (form.ubicacionSitio == "") {
+        await Swal.fire("Advertencia", "Debe seleccionar la ubicación del sitio", "warning");
+        return;
+    }
+
     const body = {
-        "norden": form.norden,
-        "fechaExamen": form.fechaExamen,
-        "userRegistro": user,
+        norden: form.norden,
+        fecha: form.fechaExamen,
+        fechaExpiracion: form.fechaExpiracion,
+        userRegistro: user,
         usuarioFirma: form.user_medicoFirma,
 
-        "colorPiel": form.colorPiel,
-        "colorOjos": form.colorOjos,
-        "cabello": form.cabello,
+        ubicacionSitio: form.ubicacionSitio,
 
-        "apto": form.aptitud == "APTO",
-        "conRestriccion": form.aptitud == "RESTRICCION",
-        "noEsApto": form.aptitud == "NO APTO",
+        apto: form.aptitud == "APTO",
+        conRestriccion: form.aptitud == "RESTRICCION",
+        noApto: form.aptitud == "NO_APTO",
 
-        "evaluacionRiesgoRealizada": form.evaluacionRiesgoRealizada,
-        "personalCompetenteAreaElectrica": form.personalCompetenteAreaElectrica,
-        "conoceTipoVoltaje": form.conoceTipoVoltaje,
-        "personalCertificadoVoltaje": form.personalCertificadoVoltaje,
-        "eppApropiadoTarea": form.eppApropiadoTarea,
-        "sistemaDesenergizado": form.sistemaDesenergizado,
-        "sistemaAislado": form.sistemaAislado,
-        "tarjetasAdvertenciaInstaladas": form.tarjetasAdvertenciaInstaladas,
-        "bloqueosInstalados": form.bloqueosInstalados,
-        "sistemasAterrizados": form.sistemasAterrizados,
-        "trabajosSimultaneosControlados": form.trabajosSimultaneosControlados,
-        "personalEntrenadoRiesgoElectrico": form.personalEntrenadoRiesgoElectrico,
-        "medidasSeguridadSatisfactorias": form.medidasSeguridadSatisfactorias,
-        "ubicacionSitio": form.ubicacionSitio
+        evaluacionRiesgoRealizada: form.evaluacionRiesgoRealizada,
+        personalCompetenteAreaElectrica: form.personalCompetenteAreaElectrica,
+        conoceTipoVoltaje: form.conoceTipoVoltaje,
+        personalCertificadoVoltaje: form.personalCertificadoVoltaje,
+        eppApropiadoTarea: form.eppApropiadoTarea,
+        sistemaDesenergizado: form.sistemaDesenergizado,
+        sistemaAislado: form.sistemaAislado,
+        tarjetasAdvertenciaInstaladas: form.tarjetasAdvertenciaInstaladas,
+        bloqueosInstalados: form.bloqueosInstalados,
+        sistemasAterrizados: form.sistemasAterrizados,
+        trabajosSimultaneosControlados: form.trabajosSimultaneosControlados,
+        personalEntrenadoRiesgoElectrico: form.personalEntrenadoRiesgoElectrico,
+        medidasSeguridadSatisfactorias: form.medidasSeguridadSatisfactorias,
 
     };
 
@@ -198,17 +209,17 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
 
 export const PrintHojaR = (nro, token, tabla) => {
     Loading('Cargando Formato a Imprimir')
-    getFetch(`/api/v01/ct/ministerioEnergiaMinas/obtenerReporte?nOrden=${nro}&nameService=${tabla}&esJasper=true`, token)
+    getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`, token)
         .then(async (res) => {
             console.log(res)
-            if (res.norden) {
-                const nombre = "ENERGIAYMINAS";
+            if (res?.resultado?.norden) {
+                const nombre = "CertificadoRiesgoElectrico";
                 console.log(nombre)
-                const jasperModules = import.meta.glob('../../../../../jaspers/Poderosa/*.jsx');
-                const modulo = await jasperModules[`../../../../../jaspers/Poderosa/${nombre}.jsx`]();
+                const jasperModules = import.meta.glob('../../../../jaspers/CertificadoRiesgoElectrico/*.jsx');
+                const modulo = await jasperModules[`../../../../jaspers/CertificadoRiesgoElectrico/${nombre}.jsx`]();
                 // Ejecuta la función exportada por default con los datos
                 if (typeof modulo.default === 'function') {
-                    modulo.default(res);
+                    modulo.default(res.resultado);
                 } else {
                     console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
                 }
@@ -220,35 +231,27 @@ export const PrintHojaR = (nro, token, tabla) => {
 }
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
-    VerifyTRDefault(
+    VerifyTRDefaultValidado(
         nro,
         tabla,
         token,
-        set,
         sede,
         () => {
             //NO Tiene registro
             GetInfoServicio(nro, tabla, set, token, () => {
                 Swal.close();
             });
+
         },
         () => {
             //Tiene registro
             GetInfoServicioEditar(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de Ministerio Energia y Minas",
+                    "Este paciente ya cuenta con registros de Certificado Riesgo Eléctrico",
                     "warning"
                 );
             });
-        },
-        () => {
-            //Necesita Agudeza visual 
-            Swal.fire(
-                "Alerta",
-                "El paciente necesita pasar por Triaje.",
-                "warning"
-            );
         }
     );
 };

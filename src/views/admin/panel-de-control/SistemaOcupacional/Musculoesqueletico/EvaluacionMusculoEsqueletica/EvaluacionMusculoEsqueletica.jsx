@@ -12,6 +12,8 @@ import {
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import CIE10 from "../../Anexo16/CIE10/CIE10";
+import CIE10List from "../../../../../components/reusableComponents/CIE10List";
 
 const tabla = "evaluacion_musculo_esqueletica";
 const date = new Date();
@@ -166,6 +168,7 @@ export default function EvaluacionMusculoEsqueletica() {
     tratamiento: "NO",
     conclusion: "SI",
     diagnostico: "",
+    diagnosticoCie10: "",
     recomendaciones: "-EVALUACIÓN ANUAL",
     nombreMedico: `${fixEncodingModern(
       userCompleto?.datos?.nombres_user ?? ""
@@ -558,6 +561,7 @@ export default function EvaluacionMusculoEsqueletica() {
             />
           </div>
           <div className="mb-3">
+            
             <label className="font-semibold block mb-1">Diagnóstico:</label>
             <textarea
               className="border rounded px-3 py-1 w-full resize-none"
@@ -566,6 +570,15 @@ export default function EvaluacionMusculoEsqueletica() {
               value={form.diagnostico}
               onChange={handleChange}
             />
+            <div className="bg-green-200 p-3 rounded-xl col-span-3">
+              <CIE10List
+                value={form.diagnosticoCie10}
+                fieldName="diagnosticoCie10"
+                label="Diagnóstico CIE10"
+                token={token}
+                setForm={setForm}
+              />
+            </div>
           </div>
           <div>
             <label className="font-semibold block mb-1">

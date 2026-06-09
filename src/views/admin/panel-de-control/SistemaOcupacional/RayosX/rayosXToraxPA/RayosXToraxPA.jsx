@@ -28,6 +28,8 @@ import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import ButtonsPDF from "../../../../../components/reusableComponents/ButtonsPDF";
 import { handleSubirArchivo2 } from "../rayosXColumna/controllerRayosXColumna";
+import CIE10 from "../../Anexo16/CIE10/CIE10";
+import CIE10List from "../../../../../components/reusableComponents/CIE10List";
 
 const tabla = "radiografia_torax";
 
@@ -67,6 +69,7 @@ export default function RayosXToraxPA() {
     siluetaCardiovascular: "NORMAL",
     osteomuscular: "NORMAL",
     conclusiones: "NORMAL",
+    conclusionesCie10: "",
     observaciones: "NORMAL",
 
     nombres_search: "",
@@ -249,7 +252,17 @@ export default function RayosXToraxPA() {
             value={form.osteomuscular ?? ""}
             onChange={handleChange}
             labelWidth="150px"
-          />
+          /> 
+
+          <div className="bg-green-200 p-3 rounded-xl col-span-3">
+            <CIE10List
+              value={form.conclusionesCie10}
+              fieldName="conclusionesCie10"
+              label="Conclusiones CIE10"
+              token={token}
+              setForm={setForm}
+            />
+          </div>
 
           <InputTextOneLine
             label="Conclusiones Radiográficas"

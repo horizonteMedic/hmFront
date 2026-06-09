@@ -21,7 +21,7 @@ const urlsEliminar = {
     rxTorax: "rayosX",
     radiografia: "rayosX/radiografia",
     CuestMujeres: "rayosX/consentimiento-mujeres",
-
+    exposicionCalor: "exposicionCalor",
     fichaAudiologica: "audiometria/fichaAudiologica",
     audiometria: "audiometria/audiometriaPo",
     espirometria: "espirometria",

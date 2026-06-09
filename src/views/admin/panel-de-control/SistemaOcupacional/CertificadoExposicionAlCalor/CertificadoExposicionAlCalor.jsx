@@ -6,6 +6,7 @@ import SectionFieldset from "../../../../components/reusableComponents/SectionFi
 import BotonesAccion from "../../../../components/templates/BotonesAccion";
 import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales";
 import { useForm } from "../../../../hooks/useForm";
+import useRealTime from "../../../../hooks/useRealTime";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import {
@@ -25,7 +26,6 @@ export default function CertificadoExposicionAlCalor() {
     datosFooter,
     userName,
     userCMP,
-    hora,
   } = useSessionData();
 
   const initialFormState = {
@@ -140,7 +140,7 @@ export default function CertificadoExposicionAlCalor() {
         <InputTextOneLine
           label="Hora"
           name="hora"
-          value={hora}
+          value={form.hora}
           disabled
           labelWidth="120px"
         />
@@ -148,7 +148,7 @@ export default function CertificadoExposicionAlCalor() {
 
       <DatosPersonalesLaborales form={form} />
 
-      <SectionFieldset
+      {/* <SectionFieldset
         legend="Datos del especialista"
         className="grid grid-cols-1 lg:grid-cols-2 gap-3"
       >
@@ -169,7 +169,7 @@ export default function CertificadoExposicionAlCalor() {
           disabled
           labelWidth="120px"
         />
-      </SectionFieldset>
+      </SectionFieldset> */}
 
       <SectionFieldset
         legend="Evaluación Clínica y Ocupacional"

@@ -8,7 +8,7 @@ import {
   VerifyTRPerzonalizadoDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
-import { convertirGenero } from "../../../../utils/helpers";
+import { convertirGenero, getHoraActual } from "../../../../utils/helpers";
 import { getFetch } from "../../../../utils/apiHelpers";
 import { VerifyTRPerzonalizado } from "../FichaCertificadoAltura/controllerFichaCertificadoAltura";
 
@@ -171,6 +171,8 @@ export const GetInfoServicioEditar = async (
       edad: rese.edad ?? "",
       sexo: convertirGenero(rese.sexo) ?? "",
 
+      hora: rese.hora ?? "",
+
       fechaNacimiento: formatearFechaCorta(rese.fechaNacimiento) ?? "",
       lugarNacimiento: rese.lugarNacimiento ?? "",
       estadoCivil: rese.estadoCivil ?? "",
@@ -210,7 +212,7 @@ export const GetInfoServicioEditar = async (
 
       user_medicoFirma: rese.user_medicoFirma
         ? rese.user_medicoFirma
-        : prev.user_medicoFirma, 
+        : prev.user_medicoFirma,
     }));
   }
 };
@@ -221,10 +223,18 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     return;
   }
 
+
+  if (form.aptitud == "") {
+    await Swal.fire("Advertencia", "Debe seleccionar la aptitud", "warning");
+    return;
+  }
+
   const body = {
     norden: form.norden,
     id: form.id,
     fecha: form.fecha,
+
+    horaRegistro:  getHoraActual(),
 
     signosVitalesResultados: form.signosVitalesResultados,
     signosVitalesObservaciones: form.signosVitalesObservaciones,

@@ -379,8 +379,8 @@ export default async function CertificadoExposicionAlCalor(data = {}, docExisten
         }
     ];
 
-    const evCol1 = TW * 0.45;
-    const evCol2 = TW * 0.25;
+    const evCol1 = TW * 0.25;
+    const evCol2 = TW * 0.40;
     const evCol3 = TW - evCol1 - evCol2;
 
     const calcularAlturaDinamica = (texto, anchoMaximo, esSimple = false) => {

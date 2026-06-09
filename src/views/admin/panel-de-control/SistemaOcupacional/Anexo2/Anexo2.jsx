@@ -109,6 +109,7 @@ export default function Anexo2() {
     //TAB LATERAL
     //=============================================================================================
     observacionesGenerales: "",
+    observacionesGeneralesCie10: "",
     colesterolTotal: "",
     LDLColesterol: "",
     HDLColesterol: "",
@@ -308,6 +309,7 @@ export default function Anexo2() {
     posibleCerrar: false,
     cerrado: false,
     observacionesGenerales2: "",
+    observacionesGenerales2Cie10: "",
     pcrUltrasensible: "",
     mercurioOrina: "",
     plomoSangre: "",
@@ -472,6 +474,8 @@ export default function Anexo2() {
             handleClear={handleClear}
             handleSave={handleSave}
             setmodalCIE10={(boolean) => { setModalCIE10(boolean) }}
+            token={token}
+            setForm={setForm}
           />
         </div>
         {visualerOpen && (

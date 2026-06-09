@@ -4,10 +4,13 @@ import { faBroom, faSave, faPrint } from "@fortawesome/free-solid-svg-icons";
 import "./OdontogramaAdultos.css";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
+import CIE10 from "../Anexo16/CIE10/CIE10";
+import CIE10List from "../../../../components/reusableComponents/CIE10List";
 
 export default function OdontogramaAdultos({
   form,
   setForm,
+  token,
   handleChange,
   handleChangeSimple,
   handleCheckBoxChange,
@@ -393,7 +396,7 @@ export default function OdontogramaAdultos({
       </div>
       {/*OBSERVACIONES & NO PASO EXAMEN*/}
       <div className="mt-4 px-6 text-[11px]">
-        <div className="observaciones-section">
+        <div className="observaciones-section"> 
           <label className="observaciones-label text-[11px]">
             Observaciones:
           </label>
@@ -404,6 +407,16 @@ export default function OdontogramaAdultos({
             className="resize-none w-full border text-[11px] rounded px-2 py-1 "
             rows="3"
           />
+
+          <div className="bg-green-200 p-3 rounded-xl col-span-3">
+            <CIE10List
+              value={form.observacionesCie10}
+              fieldName="observacionesCie10"
+              label="Observaciones CIE10"
+              token={token}
+              setForm={setForm}
+            />
+          </div>
         </div>
 
         <div className="checkbox-section">

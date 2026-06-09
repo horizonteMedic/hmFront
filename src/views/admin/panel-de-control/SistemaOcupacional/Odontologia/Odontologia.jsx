@@ -88,6 +88,7 @@ export default function Odontologia() {
     malEstado: 0,
 
     observaciones: "",
+    observacionesCie10: "",
     noPasoExamen: false,
 
     nombres_search: "",
@@ -399,6 +400,7 @@ export default function Odontologia() {
               <OdontogramaAdultos
                 form={form}
                 setForm={setForm}
+                token={token}
                 handleChange={handleChange}
                 handleChangeSimple={handleChangeSimple}
                 handleCheckBoxChange={handleCheckBoxChange}

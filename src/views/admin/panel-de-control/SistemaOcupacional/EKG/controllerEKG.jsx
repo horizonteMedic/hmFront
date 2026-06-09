@@ -73,7 +73,9 @@ export const GetInfoServicio = async (
 
       informeCompleto: res.informeCompleto ?? "",
       conclusiones: res.conclusion ?? "",
+      conclusionesCie10: res.conclusionesCie10 ?? "",
       hallazgos: res.hallazgo ?? "",
+      hallazgosCie10: res.hallazgosCie10 ?? "",
       recomendaciones: res.recomendaciones ?? "",
 
       user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
@@ -111,7 +113,9 @@ export const SubmitDataService = async (
     mensajeOndaT: form.ondaT,
     mensajeEje: form.eje,
     hallazgo: form.hallazgos,
+    hallazgosCie10: form.hallazgosCie10,
     conclusion: form.conclusiones,
+    conclusionesCie10: form.conclusionesCie10,
     recomendaciones: form.recomendaciones,
     edadPaciente: form.edad,
 

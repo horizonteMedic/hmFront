@@ -159,8 +159,11 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
             examenClinicoHallazgos: res.txtecHallazgos ?? "",
 
             visionColores: res.vcolores,
+            visionColoresCie10: res.visionColoresCie10,
             enfOculares: res.eoculares,
+            enfOcularesCie10: res.enfOcularesCie10,
             presenciaPterigion: res.eoculares1 ?? "",
+            presenciaPterigionCie10: res.presenciaPterigionCie10,
 
             SubirDoc: true,
             digitalizacion: res.digitalizacion,
@@ -317,8 +320,11 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     txtFamImp: form.antecedentesFamiliares,
 
     vcolores: form.visionColores,
+    visionColoresCie10: form.visionColoresCie10,
     eoculares: form.enfOculares,
+    enfOcularesCie10: form.enfOcularesCie10,
     eoculares1: form.presenciaPterigion,
+    presenciaPterigionCie10: form.presenciaPterigionCie10,
 
     usuarioFirma: form.user_medicoFirma,
     doctorAsignado: form.user_doctorAsignado,

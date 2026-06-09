@@ -960,33 +960,101 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
+
+  function escribirTextoAdaptable({
+    doc,
+    label,
+    texto,
+    labelX,
+    textoX,
+    y,
+    maxWidth,
+    normalSize = 7,
+    smallSize = 4,
+    smallYOffset = -0.25,
+  }) {
+    // Label
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text(label, labelX, y + 1);
+
+    // Texto limpio
+    const contenido =
+      texto === null || texto === undefined || texto === ""
+        ? "-"
+        : texto;
+
+    doc.setFont("helvetica", "normal");
+
+    // Medir si entra en una línea
+    doc.setFontSize(normalSize);
+    const textWidth = doc.getTextWidth(contenido);
+
+    if (textWidth <= maxWidth) {
+      // Texto corto
+      doc.setFontSize(normalSize);
+      doc.text(contenido, textoX, y + 1);
+    } else {
+      // Texto largo
+      doc.setFontSize(smallSize);
+      doc.text(contenido, textoX, y + smallYOffset, {
+        maxWidth,
+      });
+    }
+  }
+
   // Contenido de la primera fila
   let yTextoFamilia = yPos - (filaAltura * 2) + 2.5;
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Padre:", tablaInicioX + 2, yTextoFamilia + 1);
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  const padreTexto = (datosFinales.padre_antecedentes === null || datosFinales.padre_antecedentes === undefined || datosFinales.padre_antecedentes === "") ? "-" : datosFinales.padre_antecedentes;
-  doc.text(padreTexto, tablaInicioX + 15, yTextoFamilia + 1);
 
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Madre:", tablaInicioX + 62, yTextoFamilia + 1);
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  const madreTexto = (datosFinales.madre_antecedentes === null || datosFinales.madre_antecedentes === undefined || datosFinales.madre_antecedentes === "") ? "-" : datosFinales.madre_antecedentes;
-  doc.text(madreTexto, tablaInicioX + 75, yTextoFamilia + 1);
+  escribirTextoAdaptable({
+    doc,
+    label: "Padre:",
+    texto: datosFinales.padre_antecedentes,
+    labelX: tablaInicioX + 2,
+    textoX: tablaInicioX + 15,
+    y: yTextoFamilia,
+    maxWidth: 40,
+  });
 
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Hermanos:", tablaInicioX + 122, yTextoFamilia + 1);
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  const hermanosTexto = (datosFinales.hermanos_antecedentes === null || datosFinales.hermanos_antecedentes === undefined || datosFinales.hermanos_antecedentes === "") ? "-" : datosFinales.hermanos_antecedentes;
-  doc.text(hermanosTexto, tablaInicioX + 140, yTextoFamilia + 1);
+  escribirTextoAdaptable({
+    doc,
+    label: "Madre:",
+    texto: datosFinales.madre_antecedentes,
+    labelX: tablaInicioX + 62,
+    textoX: tablaInicioX + 72,
+    y: yTextoFamilia,
+    maxWidth: 50,
+  });
+
+  escribirTextoAdaptable({
+    doc,
+    label: "Hermanos:",
+    texto: datosFinales.hermanos_antecedentes,
+    labelX: tablaInicioX + 122,
+    textoX: tablaInicioX + 140,
+    y: yTextoFamilia,
+    maxWidth: 50,
+  });
+
+
   yTextoFamilia += filaAltura;
 
+  escribirTextoAdaptable({
+    doc,
+    label: "Espos(a):",
+    texto: datosFinales.esposo_antecedentes,
+    labelX: tablaInicioX + 2,
+    textoX: tablaInicioX + 20,
+    y: yTextoFamilia,
+    maxWidth: 33,
+  });
+
+
   // Contenido de la segunda fila
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Espos(a):", tablaInicioX + 2, yTextoFamilia + 1);
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  const esposoTexto = (datosFinales.esposo_antecedentes === null || datosFinales.esposo_antecedentes === undefined || datosFinales.esposo_antecedentes === "") ? "-" : datosFinales.esposo_antecedentes;
-  doc.text(esposoTexto, tablaInicioX + 20, yTextoFamilia + 1);
+  // doc.setFont("helvetica", "bold").setFontSize(8);
+  // doc.text("Espos(a):", tablaInicioX + 2, yTextoFamilia + 1);
+  // doc.setFont("helvetica", "normal").setFontSize(7);
+  // const esposoTexto = (datosFinales.esposo_antecedentes === null || datosFinales.esposo_antecedentes === undefined || datosFinales.esposo_antecedentes === "") ? "-" : datosFinales.esposo_antecedentes;
+  // doc.text(esposoTexto, tablaInicioX + 20, yTextoFamilia + 1);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("N° de hijos vivos:", tablaInicioX + 62, yTextoFamilia + 1);
@@ -2018,7 +2086,7 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   doc.text("EVALUADO", tablaInicioX + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth + 2, yPos + 3.5);
   if (datosFinales.evaluado) {
     doc.setFont("helvetica", "bold").setFontSize(10);
-    doc.text('X', tablaInicioX + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth + colConclusWidth  + colCheckWidth / 2, yPos + 3.5, { align: "center" });
+    doc.text('X', tablaInicioX + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth + colConclusWidth + colCheckWidth / 2, yPos + 3.5, { align: "center" });
   }
   yPos += filaAltura;
 
