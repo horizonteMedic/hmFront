@@ -305,6 +305,16 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
         x = boxX + 10;
     });
 
+    if (datos.protocoloNombre) {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.text("PROTOCOLO:", marginL + 138, currentY);
+        doc.setFont("helvetica", "normal");
+        doc.text(datos.protocoloNombre || "", marginL + 162, currentY);
+        doc.line(marginL + 162, currentY + 0.5, marginL + 190, currentY + 0.5);
+    }
+
+
     // --- TABLAS DE RESULTADOS ---
     currentY += 7;
     const tableTop = currentY;
