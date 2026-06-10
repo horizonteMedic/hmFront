@@ -103,7 +103,7 @@ export const submitMasivo = async (data, sede, token, userlogued) => {
       nordenGenerado: null,
       nomEx: "SUPERFICIE",
       altura: "DEBAJO 2500",
-      mineral: "",
+      mineral: "N/A",
       fechaApertura: fechaFormateada,
       estado: "EN PROCESO",
       hora,
