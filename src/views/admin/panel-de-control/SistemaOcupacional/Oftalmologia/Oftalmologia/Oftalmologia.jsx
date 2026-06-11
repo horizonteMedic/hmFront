@@ -319,6 +319,8 @@ export default function OftalmologiaOhla() {
     const oi = obtenerGrado(form.vc_sinc_oi);
     const edad = parseInt(form.edad);
 
+    if (form.vc_sinc_od == "00" || form.vc_sinc_oi == "00") return "";
+
     // Caso sin ametropía en ambos
     if (od.nivel === "NINGUNA" && oi.nivel === "NINGUNA") {
       return "NINGUNA";
