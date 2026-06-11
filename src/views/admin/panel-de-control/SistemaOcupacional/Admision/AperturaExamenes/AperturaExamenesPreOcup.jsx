@@ -851,7 +851,7 @@ const AperturaExamenesPreOcup = (props) => {
     }
 
   }
-  console.log(datos)
+
   const handleSubmitEdit = e => {
     const camposRequeridos = ['codPa', 'nombres', 'apellidos', 'razonEmpresa', 'razonContrata', 'n_medico', 'tipoPrueba',
       'cargoDe', 'tipoPago', 'fechaAperturaPo']; // agrega los campos que quieras
@@ -1026,7 +1026,6 @@ const AperturaExamenesPreOcup = (props) => {
   }
 
   const aplicarPreCarga = async (item) => {
-    console.log(item)
     try {
       const res = await SearchPacienteDNI(props.selectedSede, datos.codPa, props.token);
       if (!res.codPa) {
@@ -1042,7 +1041,7 @@ const AperturaExamenesPreOcup = (props) => {
         // Datos de la pre-carga
         ...item,
         razonEmpresa: item.razonEmpresa,
-        fechaAperturaPo: formatDate(item.fechaApertura),
+        fechaAperturaPo: prev.fechaAperturaPo,
         userRegistroDatos: item.usuarioRegistro ?? "",
         protocolo: item.protocolo,
 
