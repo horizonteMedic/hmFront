@@ -168,7 +168,16 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
     // Ajustar currentY para lo que siga debajo
     currentY += nombresExtraLines * lineHeight;
 
+    // ================= DNI =================
+    currentY += 5;
 
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.text("DNI:", marginL + 5, currentY);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8.5);
+    doc.text(String(datos.dni || ""), marginL + 15, currentY);
+    doc.line(marginL + 15, currentY + 0.5, marginL + 55, currentY + 0.5);
 
     // ================= EMPRESA =================
     currentY += 5;
@@ -309,7 +318,7 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
         doc.setFont("helvetica", "bold");
         doc.setFontSize(9);
         doc.text("PROTOCOLO:", marginL + 138, currentY);
-        doc.setFont("helvetica", "normal");
+        doc.setFont("helvetica", "bold");
         doc.text(datos.protocoloNombre || "", marginL + 162, currentY);
         doc.line(marginL + 162, currentY + 0.5, marginL + 190, currentY + 0.5);
     }
