@@ -19,6 +19,7 @@ import ModalExamenes from './modals/modalExamenes+/ModalExamenes'
 import SubidaMasiva from './modals/modalSubidaMasiva/ModalSubidaMasiva.jsx';
 import ModalPreCarga from './modals/modalPreCargaTable/ModalPreCargaTable.jsx';
 import HojadeRutaDinamico from '../../../../../jaspers/HojadeRutaDinamica/HojadeRutaDinamico.jsx';
+import ReportePacientes from './modals/modalReportePacientes/ModalReportePacientes.jsx';
 
 const AperturaExamenesPreOcup = (props) => {
   const today = new Date();
@@ -111,7 +112,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [modalSubidaMasiva, setModalSubidaMasiva] = useState(false)
   const [modalPreCarga, setModalPreCarga] = useState(false);
   const [opcionesPreCarga, setOpcionesPreCarga] = useState([]);
-
+  const [modalReportePacientes, setModalReportePacientes] = useState(false)
   //lista de Protocolos
   const [protocoloOptions, setProtocoloOptions] = useState([])
   useEffect(() => {
@@ -1822,10 +1823,16 @@ const AperturaExamenesPreOcup = (props) => {
                   className="border border-gray-300 px-3 py-1 rounded-md focus:outline-none bg-white w-32"
                 />
               </div>
-              <div className="flex text-lg flex-col sm:flex-row sm:space-x-6 mt-2 sm:mt-0">
-                <span className="font-medium text-blue-900">Pacientes completados: <span className="font-bold text-green-600">{CanP.Completos}</span></span>
-                <span className="font-medium text-blue-900">Pacientes faltantes: <span className="font-bold text-red-600">{CanP.Faltantes}</span></span>
+              <div className="flex flex-col text-lg ">
+                <div className='flex flex-col sm:flex-row sm:space-x-6 mt-2 sm:mt-0'>
+                  <span className="font-medium text-blue-900">Pacientes completados: <span className="font-bold text-green-600">{CanP.Completos}</span></span>
+                  <span className="font-medium text-blue-900">Pacientes faltantes: <span className="font-bold text-red-600">{CanP.Faltantes}</span></span>
+                </div>
+                <div className='flex items-center justify-end mt-2'>
+                  <button onClick={() => setModalReportePacientes(true)} className='verde-btn px-4 py-1 rounded flex items-center mr-3'>Reporte de Pacientes</button>
+                </div>
               </div>
+
             </div>
             <div className="flex items-center mb-2 bg-gray-50">
               <span className="mr-2 text-xl">🖱️</span>
@@ -1930,6 +1937,11 @@ const AperturaExamenesPreOcup = (props) => {
         opcionesPreCarga={opcionesPreCarga}
         setModalPreCarga={setModalPreCarga}
         aplicarPreCarga={aplicarPreCarga}
+      />}
+      {modalReportePacientes && <ReportePacientes
+        onClose={() => setModalReportePacientes(false)}
+        sede={props.selectedSede}
+        token={props.token}
       />}
       {/*modalExam && <ModalExamenes close={() => setModalexam(false)}/>*/}
     </div>
