@@ -51,7 +51,7 @@ export default async function HojadeRutaDinamico(datos = {}) {
             if (g.examenes.length === 0) return false;
 
             // EKG solo aparece si el paciente tiene 45 o más años
-            if (g.area.includes("EKG") && edad < 45) return false;
+            if (g.area.includes("EKG") && edad < 50) return false;
 
             return true;
         });
