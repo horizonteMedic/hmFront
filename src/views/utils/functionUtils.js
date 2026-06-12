@@ -1379,3 +1379,13 @@ export const resolverEmpresaContratistaBoroo = (empresa, contratista) => {
         empresaTexto: empresaTexto,
     };
 };
+
+
+
+export function dnicompletarConCeros(dni) {
+    const str = String(dni ?? '');
+    if (str === '') {
+        return '';
+    }
+    return str.padStart(8, '0');
+}
