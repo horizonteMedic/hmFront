@@ -5,6 +5,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 import autoTable from "jspdf-autotable";
+import { dnicompletarConCeros } from "../../utils/functionUtils.js";
 
 // Utilidad para eliminar duplicados sin alterar el formato original
 function dedupeText(input) {
@@ -500,7 +501,7 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("DNI:", tablaInicioX + 2, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.documentoIdentidad || "", tablaInicioX + 12, yTexto + 1);
+  doc.text(dnicompletarConCeros(datosFinales.documentoIdentidad), tablaInicioX + 12, yTexto + 1);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Edad:", tablaInicioX + 47, yTexto + 1);

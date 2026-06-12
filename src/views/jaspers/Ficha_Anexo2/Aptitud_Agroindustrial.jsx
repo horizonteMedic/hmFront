@@ -4,6 +4,7 @@ import { getSign, getSignCompressed } from "../../utils/helpers";
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
+import { dnicompletarConCeros } from "../../utils/functionUtils.js";
 
 export default async function Aptitud_AgroindustrialH(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -396,7 +397,7 @@ export default async function Aptitud_AgroindustrialH(data = {}, docExistente = 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("DNI :", tablaInicioX + 2, yTexto + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.documentoIdentidad, tablaInicioX + 15, yTexto + 4);
+  doc.text(dnicompletarConCeros(datosFinales.documentoIdentidad), tablaInicioX + 15, yTexto + 4);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("GENERO :", tablaInicioX + 62, yTexto + 4);
