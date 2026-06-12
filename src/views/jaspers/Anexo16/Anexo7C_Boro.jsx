@@ -522,6 +522,47 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     return lineas * fontSize * 0.35 + 1;
   };
 
+  function escribirTextoAdaptable({
+    doc,
+    label,
+    texto,
+    labelX,
+    textoX,
+    y,
+    maxWidth,
+    normalSize = 7,
+    smallSize = 4,
+    smallYOffset = -0.25,
+  }) {
+    // Label
+    doc.setFont("helvetica", "bold").setFontSize(7);
+    doc.text(label, labelX, y + 3.5);
+
+    // Texto limpio
+    const contenido =
+      texto === null || texto === undefined || texto === ""
+        ? "-"
+        : texto;
+
+    doc.setFont("helvetica", "normal");
+
+    // Medir si entra en una línea
+    doc.setFontSize(normalSize);
+    const textWidth = doc.getTextWidth(contenido);
+
+    if (textWidth <= maxWidth) {
+      // Texto corto
+      doc.setFontSize(normalSize);
+      doc.text(contenido, textoX, y + 3.5);
+    } else {
+      // Texto largo
+      doc.setFontSize(smallSize);
+      doc.text(contenido, textoX, y + 3.5 + smallYOffset, {
+        maxWidth,
+      });
+    }
+  };
+
   // === CONFIGURACIÓN DE TABLA ===
   const tablaInicioX = 5;
   const tablaAncho = 200;
@@ -2951,16 +2992,26 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     doc.text(datosFinales.radiografiaTorax?.fecha || "", tablaInicioX + 15, yPos + 3.5);
 
     // Columna 3 sub1: Compos pulmonares
-    doc.setFont("helvetica", "bold").setFontSize(7);
-    doc.text("CAMPOS PULMONARES:", divColRX2 + 2, yPos + 3.5);
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.text(datosFinales.radiografiaTorax?.composicionesPulmonares || "", divColRX2 + 40, yPos + 3.5);
+    escribirTextoAdaptable({
+      doc,
+      label: "CAMPOS PULMONARES:",
+      texto: datosFinales.radiografiaTorax?.composicionesPulmonares,
+      labelX: divColRX2 + 2,
+      textoX: divColRX2 + 30,
+      y: yPos,
+      maxWidth: 15,
+    });
 
     // Columna 3 sub2: mediastinos
-    doc.setFont("helvetica", "bold").setFontSize(7);
-    doc.text("MEDIASTINOS:", divCol3Sub1 + 2, yPos + 3.5);
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.text(datosFinales.radiografiaTorax?.mediastinos || "", divCol3Sub1 + 28, yPos + 3.5);
+    escribirTextoAdaptable({
+      doc,
+      label: "MEDIASTINOS:",
+      texto: datosFinales.radiografiaTorax?.mediastinos,
+      labelX: divCol3Sub1 + 2,
+      textoX: divCol3Sub1 + 22,
+      y: yPos,
+      maxWidth: 32,
+    });
 
     yPos += alturaFilaRX;
 
@@ -2975,16 +3026,26 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     doc.text(datosFinales.radiografiaTorax?.calidad || "", tablaInicioX + 18, yPos + 3.5);
 
     // Columna 3 sub1: hilios
-    doc.setFont("helvetica", "bold").setFontSize(7);
-    doc.text("HILIOS:", divColRX2 + 2, yPos + 3.5);
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.text(datosFinales.radiografiaTorax?.hilios || "", divColRX2 + 18, yPos + 3.5);
+    escribirTextoAdaptable({
+      doc,
+      label: "HILIOS:",
+      texto: datosFinales.radiografiaTorax?.hilios,
+      labelX: divColRX2 + 2,
+      textoX: divColRX2 + 12,
+      y: yPos,
+      maxWidth: 37,
+    });
 
     // Columna 3 sub2: senos
-    doc.setFont("helvetica", "bold").setFontSize(7);
-    doc.text("SENOS:", divCol3Sub1 + 2, yPos + 3.5);
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.text(datosFinales.radiografiaTorax?.senos || "", divCol3Sub1 + 18, yPos + 3.5);
+    escribirTextoAdaptable({
+      doc,
+      label: "SENOS:",
+      texto: datosFinales.radiografiaTorax?.senos,
+      labelX: divCol3Sub1 + 2,
+      textoX: divCol3Sub1 + 13,
+      y: yPos,
+      maxWidth: 42,
+    });
 
     yPos += alturaFilaRX;
 
