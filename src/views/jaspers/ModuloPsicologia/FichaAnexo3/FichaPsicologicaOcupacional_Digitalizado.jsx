@@ -5,6 +5,7 @@ import { normalizeList } from "../../../utils/listUtils.js";
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import { convertirGenero, getSign } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
+import { dnicompletarConCeros } from "../../../utils/functionUtils.js";
 
 export default async function FichaPsicologicaOcupacional_Digitalizado(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -475,7 +476,7 @@ export default async function FichaPsicologicaOcupacional_Digitalizado(data = {}
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("DNI:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(datosFinales.documentoIdentidad, tablaInicioX + 10, yTexto + 1.5);
+  doc.text(dnicompletarConCeros(datosFinales.documentoIdentidad), tablaInicioX + 10, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Edad:", tablaInicioX + 47, yTexto + 1.5);

@@ -156,22 +156,6 @@ export default function PerfilLipidico() {
             onChange={handleChangeNumberDecimals}
             onKeyUp={handleSearch}
           />
-          <button
-            onClick={() => {
-              setForm(prev => {
-                const norden = parseInt(prev.norden);
-                if (isNaN(norden) || norden >= 1000000 ) {
-                  return prev;
-                }
-                return (
-                  {
-                    ...prev,
-                    norden: (norden + 1000000).toString()
-                  })
-              })
-            }}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md max-w-[120px]"
-          >Es Legacy</button>
           <InputTextOneLine
             label="Fecha"
             name="fecha"

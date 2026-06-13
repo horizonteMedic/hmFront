@@ -5,6 +5,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
 import { dibujarFirmas } from '../../utils/dibujarFirmas.js';
+import { dnicompletarConCeros } from "../../utils/functionUtils.js";
 
 export default async function Oftalmologia(datos = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -227,7 +228,7 @@ export default async function Oftalmologia(datos = {}, docExistente = null) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("DNI:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosReales.documentoIdentidad, tablaInicioX + 12, yTexto + 1.5);
+  doc.text(dnicompletarConCeros(datosReales.documentoIdentidad), tablaInicioX + 12, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Edad:", tablaInicioX + 47, yTexto + 1.5);

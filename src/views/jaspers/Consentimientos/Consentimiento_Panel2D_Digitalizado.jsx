@@ -4,6 +4,7 @@ import CabeceraLogo from "../components/CabeceraLogo.jsx";
 import footerTR from "../components/footerTR.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
 import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
+import { dnicompletarConCeros } from "../../utils/functionUtils.js";
 
 export default async function Consentimiento_Panel2D_Digitalizado(datos = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -84,7 +85,7 @@ export default async function Consentimiento_Panel2D_Digitalizado(datos = {}, do
   y += 10;
   const nombre = String(datos.nombres || '_________________________');
   const edad = String(datos.edad || '___');
-  const dni = String(datos.dni || '__________');
+  const dni = dnicompletarConCeros(datos.dni);
   // Construir bloques de texto (normales y negrita)
   const bloques = [
     { text: 'Yo' + '\u00A0\u00A0', bold: false },
