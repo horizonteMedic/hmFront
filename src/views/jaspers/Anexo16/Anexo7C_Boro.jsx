@@ -314,7 +314,7 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
       calidad: data.calidadExamenRadiografico_txtcalidad ?? "",
       simbolos: data.simbolosExamenRadiografico_txtsimbolos ?? "",
       vertices: data.verticesRadiografiaTorax_txtvertices ?? "",
-      composicionesPulmonares: data.composicionesPulmonares_txtcomposicionespulmonares ?? "",
+      composicionesPulmonares: data.campospulmonesradiografiatorax_txtcampospulm ?? "",
       mediastinos: data.meadiastinos_txtmediastinos ?? "",
       hilios: data.hilosRadiografiaTorax_txthilios ?? "",
       senos: data.senosCostoFrenicos_txtsenoscostofrenicos ?? "",
@@ -2974,10 +2974,20 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     doc.text(datosFinales.radiografiaTorax?.numeroRx || "", tablaInicioX + 15, yPos + 3.5);
 
     // Columna 3: vértices (ocupa todo el ancho de col3)
-    doc.setFont("helvetica", "bold").setFontSize(7);
-    doc.text("VERTICES:", divColRX2 + 2, yPos + 3.5);
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.text(datosFinales.radiografiaTorax?.vertices || "", divColRX2 + 20, yPos + 3.5);
+    // doc.setFont("helvetica", "bold").setFontSize(7);
+    // doc.text("VERTICES:", divColRX2 + 2, yPos + 3.5);
+    // doc.setFont("helvetica", "normal").setFontSize(7);
+    // doc.text(datosFinales.radiografiaTorax?.vertices || "", divColRX2 + 20, yPos + 3.5);
+    escribirTextoAdaptable({
+      doc,
+      label: "VERTICES:",
+      texto: datosFinales.radiografiaTorax?.vertices,
+      labelX: divColRX2 + 2,
+      textoX: divColRX2 + 17,
+      y: yPos,
+      maxWidth: 90,
+      smallYOffset: -1
+    });
 
     yPos += alturaFilaRX;
 
@@ -2997,9 +3007,11 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
       label: "CAMPOS PULMONARES:",
       texto: datosFinales.radiografiaTorax?.composicionesPulmonares,
       labelX: divColRX2 + 2,
-      textoX: divColRX2 + 30,
+      textoX: divColRX2 + 33,
       y: yPos,
-      maxWidth: 15,
+      maxWidth: 20,
+      smallYOffset: -1.5,
+      smallSize:3
     });
 
     // Columna 3 sub2: mediastinos
@@ -3007,10 +3019,11 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
       doc,
       label: "MEDIASTINOS:",
       texto: datosFinales.radiografiaTorax?.mediastinos,
-      labelX: divCol3Sub1 + 2,
-      textoX: divCol3Sub1 + 22,
+      labelX: divCol3Sub1,
+      textoX: divCol3Sub1 + 19,
       y: yPos,
       maxWidth: 32,
+      smallYOffset: -1,
     });
 
     yPos += alturaFilaRX;
@@ -3033,7 +3046,8 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
       labelX: divColRX2 + 2,
       textoX: divColRX2 + 12,
       y: yPos,
-      maxWidth: 37,
+      maxWidth: 40,
+      smallYOffset: -1,
     });
 
     // Columna 3 sub2: senos
@@ -3041,10 +3055,11 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
       doc,
       label: "SENOS:",
       texto: datosFinales.radiografiaTorax?.senos,
-      labelX: divCol3Sub1 + 2,
-      textoX: divCol3Sub1 + 13,
+      labelX: divCol3Sub1 ,
+      textoX: divCol3Sub1 + 11,
       y: yPos,
       maxWidth: 42,
+      smallYOffset:-1,
     });
 
     yPos += alturaFilaRX;
@@ -3062,10 +3077,21 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     // Columna 2: espacio vacío (sin líneas horizontales internas)
 
     // Columna 3: Conclusiones (ocupa todo el ancho de col3)
-    doc.setFont("helvetica", "bold").setFontSize(7);
-    doc.text("CONCLUSIONES:", divColRX2 + 2, yPos + 3.5);
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.text(datosFinales.radiografiaTorax?.conclusiones || "", divColRX2 + 30, yPos + 3.5);
+    // doc.setFont("helvetica", "bold").setFontSize(7);
+    // doc.text("CONCLUSIONES:", divColRX2 + 2, yPos + 3.5);
+    // doc.setFont("helvetica", "normal").setFontSize(7);
+    // doc.text(datosFinales.radiografiaTorax?.conclusiones || "", divColRX2 + 30, yPos + 3.5);
+
+    escribirTextoAdaptable({
+      doc,
+      label: "CONCLUSIONES:",
+      texto: datosFinales.radiografiaTorax?.conclusiones,
+      labelX: divColRX2 +2,
+      textoX: divColRX2 + 24,
+      y: yPos,
+      maxWidth: 80,
+      smallYOffset:-1,
+    });
 
     yPos += alturaFilaRX;
 
@@ -3076,10 +3102,21 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     // Columna 2: espacio vacío (imagen continúa)
 
     // Columna 3: Silueta cardiovascular (ocupa todo el ancho de col3)
-    doc.setFont("helvetica", "bold").setFontSize(7);
-    doc.text("SILUETA CARDIOVASCULAR:", divColRX2 + 2, yPos + 3.5);
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.text(datosFinales.radiografiaTorax?.siluetaCardiovascular || "", divColRX2 + 45, yPos + 3.5);
+    // doc.setFont("helvetica", "bold").setFontSize(7);
+    // doc.text("SILUETA CARDIOVASCULAR:", divColRX2 + 2, yPos + 3.5);
+    // doc.setFont("helvetica", "normal").setFontSize(7);
+    // doc.text(datosFinales.radiografiaTorax?.siluetaCardiovascular || "", divColRX2 + 45, yPos + 3.5);
+
+    escribirTextoAdaptable({
+      doc,
+      label: "SILUETA CARDIOVASCULAR:",
+      texto: datosFinales.radiografiaTorax?.siluetaCardiovascular,
+      labelX: divColRX2 +2,
+      textoX: divColRX2 + 39,
+      y: yPos,
+      maxWidth: 70,
+      smallYOffset:-1
+    });
 
     yPos += alturaFilaRX;
 
