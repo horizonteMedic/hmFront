@@ -4,6 +4,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 import { convertirGenero, getSignCompressed } from "../../utils/helpers.js";
+import { dnicompletarConCeros } from "../../utils/functionUtils.js";
 export default async function LaboratorioClinico_Digitalizado(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
@@ -193,7 +194,7 @@ export default async function LaboratorioClinico_Digitalizado(data = {}, docExis
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("DNI:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datosReales.documentoIdentidad, tablaInicioX + 12, yPos + 3.5);
+  doc.text(dnicompletarConCeros(datosReales.documentoIdentidad), tablaInicioX + 12, yPos + 3.5);
 
   doc.setFont("helvetica", "bold");
   doc.text("Edad:", tablaInicioX + 52, yPos + 3.5);

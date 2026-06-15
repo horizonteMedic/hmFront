@@ -3,6 +3,7 @@ import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import { getSignCompressed } from "../../utils/helpers";
+import { dnicompletarConCeros } from "../../utils/functionUtils.js";
 
 // --- Configuración Centralizada ---
 const config = {
@@ -97,7 +98,7 @@ const drawPatientData = (doc, datos = {}) => {
   doc.setFont("helvetica", "bold");
   doc.text("DNI:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(String(datos.dniPaciente || datos.dni || ''), tablaInicioX + 12, yPos + 3.5);
+  doc.text(dnicompletarConCeros(datos.dniPaciente || datos.dni), tablaInicioX + 12, yPos + 3.5);
   doc.setFont("helvetica", "bold");
   doc.text("Edad:", tablaInicioX + 47, yPos + 3.5);
   doc.setFont("helvetica", "normal");

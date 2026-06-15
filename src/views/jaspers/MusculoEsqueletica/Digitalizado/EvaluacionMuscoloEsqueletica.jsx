@@ -4,6 +4,7 @@ import drawColorBox from '../../components/ColorBox.jsx';
 import footerTR from '../../components/footerTR.jsx';
 import { formatearFechaCorta } from '../../../utils/formatDateUtils';
 import { dibujarFirmas } from "../../../utils/dibujarFirmas";
+import { dnicompletarConCeros } from "../../../utils/functionUtils.js";
 
 // Header con logo, color box y título (reutilizable para todas las páginas)
 const drawHeader = async (doc, datos = {}, numeroPagina = 1) => {
@@ -196,7 +197,7 @@ const drawPatientData = (doc, datos = {}) => {
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("DNI:", tablaInicioX + 2, yTexto);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(dni, tablaInicioX + 12, yTexto);
+  doc.text(dnicompletarConCeros(dni), tablaInicioX + 12, yTexto);
 
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Edad:", tablaInicioX + tercioTabla + 2, yTexto);

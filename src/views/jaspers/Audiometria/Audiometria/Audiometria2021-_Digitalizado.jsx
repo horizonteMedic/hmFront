@@ -4,6 +4,7 @@ import drawColorBox from '../../components/ColorBox.jsx';
 import footerTR from '../../components/footerTR.jsx';
 import { formatearFechaCorta } from '../../../utils/formatDateUtils';
 import { dibujarFirmas } from '../../../utils/dibujarFirmas.js';
+import { dnicompletarConCeros } from "../../../utils/functionUtils.js";
 
 // Header con logo, color box y título
 const drawHeader = async (doc, datos = {}) => {
@@ -186,7 +187,7 @@ const drawPatientData = (doc, datos = {}) => {
   // DNI, Edad, Sexo, Fecha Nac.
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("DNI:", tablaInicioX + 2, yCentro(yTexto));
-  doc.text(dni, tablaInicioX + 12, yCentro(yTexto));
+  doc.text(dnicompletarConCeros(dni), tablaInicioX + 12, yCentro(yTexto));
 
   doc.text("Edad:", tablaInicioX + 47, yCentro(yTexto));
   doc.text((edad ? edad + " Años" : ""), tablaInicioX + 58, yCentro(yTexto));

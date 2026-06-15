@@ -3,6 +3,7 @@ import CabeceraLogo from "../components/CabeceraLogo.jsx";
 import footerTR from "../components/footerTR.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
 import { dibujarFirmas } from "../../utils/dibujarFirmas.js";
+import { dnicompletarConCeros } from "../../utils/functionUtils.js";
 
 export default async function Consentimiento_Muestra_Sangre_Digitalizado(datos = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -91,7 +92,7 @@ export default async function Consentimiento_Muestra_Sangre_Digitalizado(datos =
   // ─── 2) PREPARAR DATOS Y TEXTO ────────────────────
   const nombre = String(datos.nombres || '_________________________').trim();
   const edad = String(datos.edad || '___').trim();
-  const dni = String(datos.dni || '__________').trim();
+  const dni = dnicompletarConCeros(datos.dni).trim();
   const empresa = String(datos.empresa || '_________________________').trim();
 
   // Usar formato con marcadores similar al otro archivo
@@ -250,7 +251,7 @@ export default async function Consentimiento_Muestra_Sangre_Digitalizado(datos =
   try {
     await dibujarFirmas({ doc, datos, y: baseY, pageW });
     footerTR(doc, datos);
-    
+
     if (docExistente) {
       return doc;
     } else {

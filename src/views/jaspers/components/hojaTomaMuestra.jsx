@@ -179,6 +179,18 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
     doc.text(String(datos.dni || ""), marginL + 15, currentY);
     doc.line(marginL + 15, currentY + 0.5, marginL + 55, currentY + 0.5);
 
+    //PROTOCOLO
+    if (datos.protocoloNombre) {
+        currentY += 5;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.text("PROTOCOLO:", marginL + 5, currentY);
+        doc.setFont("helvetica", "bold");
+        doc.text(datos.protocoloNombre || "", marginL + 29, currentY);
+        doc.line(marginL + 27, currentY + 0.5, marginL + 80, currentY + 0.5);
+    }
+
+
     // ================= EMPRESA =================
     currentY += 5;
     const baseY = currentY; // <- posición fija de toda la fila
@@ -314,14 +326,7 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
         x = boxX + 10;
     });
 
-    if (datos.protocoloNombre) {
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(9);
-        doc.text("PROTOCOLO:", marginL + 138, currentY);
-        doc.setFont("helvetica", "bold");
-        doc.text(datos.protocoloNombre || "", marginL + 162, currentY);
-        doc.line(marginL + 162, currentY + 0.5, marginL + 190, currentY + 0.5);
-    }
+
 
 
     // --- TABLAS DE RESULTADOS ---
