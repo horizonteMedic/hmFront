@@ -12,6 +12,9 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
   const esBoro = String(data.empresa) === "MINERA BOROO MISQUICHILCA S.A."
   const Recomendaciones = esBoro && data.recomendaciones ? data.recomendaciones.split('\n').filter(rec => rec.trim() !== '') : []
 
+  const Recomendaciones2 = data.recomendaciones ? data.recomendaciones.split('\n').filter(rec => rec.trim() !== '') : []
+
+
   const datosFinales = {
     numeroHistoria: String(data.norden ?? ""), //revisar - podría ser norden del JSON
     tipoExamen: String(data.nombreExamen ?? ""),
@@ -19,7 +22,7 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
     documentoIdentidad: String(data.dniPaciente ?? ""),
     genero: data.sexoPaciente === "M" ? "MASCULINO" : data.sexoPaciente === "F" ? "FEMENINO" : String(data.sexoPaciente ?? ""),
     edad: String(`${data.edadPaciente ?? ""} AÑOS`),
-    grupoSanguineo: String(data.grupoFactor ?? ""),
+    grupoSanguineo: String(data.grupoSanguineo ?? ""),
     empresa: String(data.empresa ?? ""),
     contratista: String(data.contrata ?? ""),
     puestoPostula: String(data.cargoPaciente ?? ""),
@@ -1027,7 +1030,7 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Cintura/ Cadera:", x2 + 92, yPos2 + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(data.cinturaCadera ? `${data.cinturaCadera} cm` : "", x2 + 130, yPos2 + 4);
+  doc.text(data.triajeIcc ? `${data.triajeIcc} cm` : "", x2 + 130, yPos2 + 4);
   yPos2 += altTemp;
 
   // --- Reacciones Serológicas | Hemoglobina / Hematocrito ---
@@ -1035,14 +1038,14 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
   doc.rect(x2, yPos2, ancho2, altSerologia);
   doc.line(x2 + 90, yPos2, x2 + 90, yPos2 + altSerologia);
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Reacciones Serológicas a lues", x2 + 2, yPos2 + 4);
+  doc.text("Reacciones Serológicas a lues:", x2 + 2, yPos2 + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(data.reaccionesSerologicas ?? "", x2 + 60, yPos2 + 4);
+  doc.text(data.prpPositivo ? "POSTIVO" : "NEGATIVO", x2 + 60, yPos2 + 4);
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Hemoglobina / Hematocrito", x2 + 92, yPos2 + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  const hemoVal = data.hemoglobina ? `${data.hemoglobina} g/dL` : "";
-  const hemtoVal = data.hematocrito ? `${data.hematocrito} %` : "";
+  const hemoVal = data.hemoglobinaTxthemoglobina ? `${data.hemoglobinaTxthemoglobina} g/dL` : "";
+  const hemtoVal = data.hematocritoLabClinicoTxthematocrito ? `${data.hematocritoLabClinicoTxthematocrito} %` : "";
   const separador = (hemoVal || hemtoVal) ? " / " : "";
   doc.text(`${hemoVal}${separador}${hemtoVal}`, x2 + 150, yPos2 + 4);
   yPos2 += altSerologia;
@@ -1058,7 +1061,7 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Factor RH:", x2 + 92, yPos2 + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(data.factorRH ?? "", x2 + 115, yPos2 + 4);
+  doc.text(data.factorSanguineo ?? "", x2 + 115, yPos2 + 4);
   yPos2 += altGrupoRH;
 
   // --- Orina: encabezado ---
@@ -1078,10 +1081,10 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
 
   const filaOrina = 5.5;
   const orinaRows = [
-    ["Color :", data.orinaColor ?? "", "Leu :", data.orinaLeu ?? "", "Densidad :", data.orinaDensidad ?? "", "Bili Ori :", data.orinaBiliOri ?? "", "Nitritos :", data.orinaNitritos ?? ""],
-    ["Aspecto :", data.orinaAspecto ?? "", "Herm :", data.orinaHerm ?? "", "Prot Ori :", data.orinaProtOri ?? "", "Uro Ori :", data.orinaUroOri ?? "", "", ""],
-    ["Cel Epi :", data.orinaCelEpi ?? "", "Cristales :", data.orinaCristales ?? "", "Glu Ori :", data.orinaGluOri ?? "", "Hem Ori :", data.orinaHemOri ?? "", "", ""],
-    ["Ger :", data.orinaGer ?? "", "PH :", data.orinaPH ?? "", "Cue Ceto :", data.orinaCueCeto ?? "", "Est Leu :", data.orinaEstLeu ?? "", "", ""],
+    ["Color :", data.orinaColor ?? "", "Leu :", data.orinaLeucocitosSedimento ?? "", "Densidad :", data.orinaDensidad ?? "", "Bili Ori :", data.orinaBilirrubina ?? "", "Nitritos :", data.orinaNitritos ?? ""],
+    ["Aspecto :", data.orinaAspecto ?? "", "Herm :", data.orinaHematies ?? "", "Prot Ori :", data.orinaProteinas ?? "", "Uro Ori :", data.orinaUrobilinogeno ?? "", "", ""],
+    ["Cel Epi :", data.orinaCelEpiteliales ?? "", "Cristales :", data.orinaCristales ?? "", "Glu Ori :", data.orinaGlucosa ?? "", "Hem Ori :", data.orinaSangre ?? "", "", ""],
+    ["Ger :", data.orinaBacterias ?? "", "PH :", data.orinaPh ?? "", "Cue Ceto :", data.orinaCetonas ?? "", "Est Leu :", data.orinaLeucocitosQuimico ?? "", "", ""],
   ];
 
   orinaRows.forEach((fila, idx) => {
@@ -1111,14 +1114,14 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
 
   yPos2 += 3;
   // --- Observaciones ---
-  const observaciones = String(data.observaciones ?? "");
+  const observaciones = String(data.observacionesFichaMedica ?? "");
   doc.setFillColor(196, 196, 196);
   doc.rect(x2, yPos2, ancho2, altHeaderGris, 'FD');
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("III. OBSERVACIONES", x2 + 2, yPos2 + 3.5);
   yPos2 += altHeaderGris;
 
-  const altObservaciones = Math.max(filaAltura * 4, calcularAlturaTexto(observaciones || " ", 174, 8) + 4);
+  const altObservaciones = Math.max(filaAltura, calcularAlturaTexto(observaciones || " ", 174, 8) + 4);
   doc.rect(x2, yPos2, ancho2, altObservaciones);
   doc.setFont("helvetica", "normal").setFontSize(8);
   if (observaciones) dibujarTextoConSaltoLinea(observaciones, x2 + 4, yPos2 + 5, 174);
@@ -1135,14 +1138,14 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
   let yPos3 = 40;
 
   // --- Recomendaciones ---
-  const recomendacionesPag3 = datosFinales.recomendaciones.join('\n');
+  const recomendacionesPag3 = Recomendaciones2.join('\n');
   doc.setFillColor(196, 196, 196);
   doc.rect(x2, yPos3, ancho2, altHeaderGris, 'FD');
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("IV. RECOMENDACIONES", x2 + 2, yPos3 + 3.5);
   yPos3 += altHeaderGris;
 
-  const altRecomendaciones = Math.max(filaAltura * 5, calcularAlturaTexto(recomendacionesPag3 || " ", 174, 8) + 4);
+  const altRecomendaciones = Math.max(filaAltura, calcularAlturaTexto(recomendacionesPag3 || " ", 174, 8) + 4);
   doc.rect(x2, yPos3, ancho2, altRecomendaciones);
   doc.setFont("helvetica", "normal").setFontSize(8);
   if (recomendacionesPag3) dibujarTextoConSaltoLinea(recomendacionesPag3, x2 + 4, yPos3 + 5, 174);
@@ -1151,14 +1154,14 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
   yPos3 += 3;
 
   // --- Restricciones ---
-  const restricciones = String(data.restricciones ?? "");
+  const restricciones = String(data.restriccionesDescripcion ?? "");
   doc.setFillColor(196, 196, 196);
   doc.rect(x2, yPos3, ancho2, altHeaderGris, 'FD');
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("V. RESTRICCIONES", x2 + 2, yPos3 + 3.5);
   yPos3 += altHeaderGris;
 
-  const altRestricciones = Math.max(filaAltura * 3, calcularAlturaTexto(restricciones || " ", 174, 8) + 4);
+  const altRestricciones = Math.max(filaAltura, calcularAlturaTexto(restricciones || " ", 174, 8) + 4);
   doc.rect(x2, yPos3, ancho2, altRestricciones);
   doc.setFont("helvetica", "normal").setFontSize(8);
   if (restricciones) dibujarTextoConSaltoLinea(restricciones, x2 + 4, yPos3 + 5, 174);
@@ -1167,14 +1170,14 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
   yPos3 += 3;
 
   // --- Otros examenes ---
-  const otrosExamenes = String(data.otrosExamenes ?? "");
+  const otrosExamenes = String(data.otrosExamenesRx ?? "");
   doc.setFillColor(196, 196, 196);
   doc.rect(x2, yPos3, ancho2, altHeaderGris, 'FD');
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("VI. OTROS EXÁMENES", x2 + 2, yPos3 + 3.5);
   yPos3 += altHeaderGris;
 
-  const altOtrosExamenes = Math.max(filaAltura * 1.2, calcularAlturaTexto(otrosExamenes || " ", 174, 8) + 4);
+  const altOtrosExamenes = Math.max(filaAltura, calcularAlturaTexto(otrosExamenes || " ", 174, 8) + 4);
   doc.rect(x2, yPos3, ancho2, altOtrosExamenes);
   doc.setFont("helvetica", "normal").setFontSize(8);
   if (otrosExamenes) dibujarTextoConSaltoLinea(otrosExamenes, x2 + 4, yPos3 + 5, 174);
@@ -1192,7 +1195,7 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
 
   doc.rect(x2, yPos3, ancho2, altApto);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(data.aptoPara || "", x2 + 2, yPos3 + 4);
+  doc.text(data.apto ? "APTO" : data.aptoConRestriccion ? "APTO CON RESTRICCION" : data.noApto ? "NO APTO" : "", x2 + 2, yPos3 + 4);
   yPos3 += altApto;
 
   yPos3 += 3;
