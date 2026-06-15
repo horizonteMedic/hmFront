@@ -71,10 +71,24 @@ export default async function HojadeRutaDinamico(datos = {}) {
     const drawTable = async (doc, startY, categories, adicionales) => {
         const tableBody = [];
 
+        const protocolo = String(datos.protocoloNombre || "").toUpperCase();
+        const sexo = String(datos.sexo || datos.sexoPa || "").toUpperCase();
+
+        const esPerfil4 = protocolo.includes("PERFIL 4");
+        const esPerfil12 = protocolo.includes("PERFIL 12");
+        const esMasculino = sexo === "M" || sexo === "MASCULINO";
+
         categories.forEach(cat => {
             if (cat.examenes.length === 0) return;
 
-            const examList = cat.examenes
+            const areaNorm = cat.area.toUpperCase();
+
+            // Perfil 12: omitir ALTURA y TEST DE ESTRES si no es masculino
+            if (esPerfil12 && !esMasculino) {
+                if (areaNorm.includes("ALTURA") || areaNorm.includes("TEST DE ESTRES")) return;
+            }
+
+            let examList = cat.examenes
                 .map(e => {
                     let texto = `• ${e.nombre?.toUpperCase()}`;
                     if (e.subExamenes?.length > 0) {
@@ -140,14 +154,50 @@ export default async function HojadeRutaDinamico(datos = {}) {
                 if (data.section === 'body' && data.column.index === 0) {
                     const content = String(data.cell.raw?.content || "");
                     const lines = content.split("\n");
-                    // Primera línea en negrita, resto normal
-                    // autoTable no soporta mixed styles inline, 
-                    // así que ponemos bold solo si es solo el título
+
                     if (lines.length === 1) {
                         data.cell.styles.fontStyle = 'bold';
                     } else {
                         data.cell.styles.fontStyle = 'normal';
                     }
+                }
+            },
+            didDrawCell: (data) => {
+                if (data.section === 'body' && data.column.index === 0) {
+                    const content = String(data.cell.raw?.content || "");
+                    const lines = content.split("\n");
+
+                    // Buscar líneas que empiecen con * y redibujarlas más pequeñas
+                    lines.forEach((line, i) => {
+                        if (line.startsWith("*")) {
+                            // Calcular posición Y aproximada de esa línea
+                            const lineHeight = 3.5;
+                            const offsetY = data.cell.padding('top') + (i * lineHeight);
+
+                            // Tapar con fondo blanco esa línea
+                            doc.setFillColor(255, 255, 255);
+                            doc.rect(
+                                data.cell.x + 1,
+                                data.cell.y + offsetY - 0.5,
+                                data.cell.width - 2,
+                                lineHeight + 0.5,
+                                'F'
+                            );
+
+                            // Redibujar en tamaño pequeño e itálica
+                            doc.setFont("helvetica", "italic");
+                            doc.setFontSize(5.5);
+                            doc.setTextColor(80, 80, 80);
+                            doc.text(
+                                line,
+                                data.cell.x + data.cell.padding('left'),
+                                data.cell.y + offsetY + lineHeight - 0.5
+                            );
+                            doc.setFont("helvetica", "normal");
+                            doc.setFontSize(7.5);
+                            doc.setTextColor(0, 0, 0);
+                        }
+                    });
                 }
             },
             // ← SIN didDrawCell, era el causante del texto doble
