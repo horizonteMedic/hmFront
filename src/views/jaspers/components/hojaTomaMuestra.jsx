@@ -473,6 +473,44 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
 
     doc.line(marginL + 115, currentY + 28, marginL + 175, currentY + 28);
     doc.text("RESPONSABLE DE PROCESO", marginL + 121, currentY + 32);
+
+
+    if (datos && datos?.protocoloNombre && datos?.protocoloNombre != "PROTOCOLO") {
+        const area = datos?.areas?.find(area => area.nombre == "LABORATORIO");
+        if (area && area.examenes && area.examenes.length > 0) {
+            currentY += 40;
+            const boxWidth = 90;
+            let boxHeight = 8;
+            
+            const lineHeight = 4;
+            area.examenes.forEach(() => {
+                boxHeight += lineHeight;
+            });
+            
+            doc.setLineWidth(0.3);
+            doc.rect(marginL + 5, currentY, boxWidth, boxHeight);
+            
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9);
+            doc.text(area.nombre, marginL + 8, currentY + 5);
+            doc.setLineWidth(0.2);
+            doc.line(marginL + 5, currentY + 6, marginL + 5 + boxWidth, currentY + 6);
+            
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            let listY = currentY + 6 + lineHeight;
+            
+            area.examenes.forEach(examen => {
+                doc.text(`• ${examen.nombre}`, marginL + 8, listY);
+                listY += lineHeight;
+            });
+        }
+    }
+
+
+
+
+
 };
 
 export default hojaTomaMuestra;
