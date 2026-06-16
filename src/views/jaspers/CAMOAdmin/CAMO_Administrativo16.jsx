@@ -80,8 +80,8 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
 
     // Título principal
     doc.setFont("helvetica", "bold").setFontSize(14);
-    doc.setTextColor(0, 0, 0);
-    doc.text("CERTIFICADO DE APTITUD MEDICO OCUPACIONAL", pageW / 2, 36, { align: "center" });
+
+    doc.text(pageNumber == 1 ? "CERTIFICADO DE APTITUD MEDICO OCUPACIONAL" : "INFORME MÉDICO", pageW / 2, 36, { align: "center" });
 
     // Número de Ficha y Página (alineación automática mejorada)
     doc.setFont("helvetica", "normal").setFontSize(8);
