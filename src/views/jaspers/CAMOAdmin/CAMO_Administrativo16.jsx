@@ -1291,7 +1291,7 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
     const recomendacionesPag3 = Recomendaciones2.join('\n');
     const numeroPaginaRef3 = { value: numeroPagina };
 
-    yPos3 = await dibujarSeccionPaginada(doc, "IV. RECOMENDACIONES", "", x2, yPos3, ancho2, drawHeader, numeroPaginaRef3);
+    yPos3 = await dibujarSeccionPaginada(doc, "IV. RECOMENDACIONES", recomendacionesPag3, x2, yPos3, ancho2, drawHeader, numeroPaginaRef3);
     numeroPagina = numeroPaginaRef3.value;
 
     yPos3 += 3;
@@ -1300,7 +1300,7 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
     const restricciones = String(data.restriccionesDescripcion ?? "");
     const numeroPaginaRef4 = { value: numeroPagina };
 
-    yPos3 = await dibujarSeccionPaginada(doc, "V. RESTRICCIONES", restricciones, x2, yPos3, ancho2, drawHeader, numeroPaginaRef4);
+    yPos3 = await dibujarSeccionPaginada(doc, "V. RESTRICCIONES", "", x2, yPos3, ancho2, drawHeader, numeroPaginaRef4);
     numeroPagina = numeroPaginaRef4.value;
     yPos3 += 3;
 

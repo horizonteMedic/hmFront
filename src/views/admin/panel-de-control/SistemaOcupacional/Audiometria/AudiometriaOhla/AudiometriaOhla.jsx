@@ -705,10 +705,10 @@ export default function AudiometriaOhla({
       .map((v) => parseFloat(v) || 0)
       .filter((v) => v >= 25);
 
-    let odPromedio = (
+    let odPromedio = Math.round((
       odValues.reduce((acc, val) => acc + val, 0) /
       (odValues.length === 0 ? 1 : odValues.length)
-    ).toFixed(2);
+    ).toFixed(2));
 
     const oiValues = [
       form.oi_500,
@@ -722,13 +722,13 @@ export default function AudiometriaOhla({
       .map((v) => parseFloat(v) || 0)
       .filter((v) => v > 25);
 
-    let oiPromedio = (
+    let oiPromedio = Math.round((
       oiValues.reduce((acc, val) => acc + val, 0) /
       (oiValues.length === 0 ? 1 : oiValues.length)
-    ).toFixed(2);
+    ).toFixed(2));
 
-    console.log("Oído Derecho - Promedio:", odPromedio);
-    console.log("Oído Izquierdo - Promedio:", oiPromedio);
+    console.log("Oído Derecho - Promedio:", {odPromedio,cant:odValues.length});
+    console.log("Oído Izquierdo - Promedio:", {oiPromedio,cant:oiValues.length});
 
     const diagnosticoGenerado = realizarCalculoDiagnostico(
       odPromedio,
@@ -736,6 +736,7 @@ export default function AudiometriaOhla({
       odValues.length,
       oiValues.length
     )
+    console.log({diagnosticoGenerado});
 
     setForm((prev) => ({
       ...prev,
