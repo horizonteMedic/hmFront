@@ -68,7 +68,15 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}, 
     conclusionNoApto: Boolean(data.noApto_chk_no ?? false),
     conclusionObservado: Boolean(data.observado_chk_observado ?? false),
     // Detalle nueva sección
-    detalleNuevaSeccion: String(data.detalleMedicinas_d_medicina ?? "")
+    detalleNuevaSeccion: String(data.detalleMedicinas_d_medicina ?? ""),
+    // Boroo fields
+    numeroDeLicencia: String(data.numeroDeLicencia ?? ""),
+    claseLicencia: String(data.claseLicencia ?? ""),
+    fechaRevalidacionLicencia: formatearFechaCorta(data.fechaRevalidacionLicencia ?? ""),
+    categoriaLicencia: String(data.categoriaLicencia ?? ""),
+    procedenciaLicencia: String(data.procedenciaLicencia ?? ""),
+    maquina: String(data.maquina ?? ""),
+    usoEstrictoLentesCorrectores: Boolean(data.usoEstrictoLentesCorrectores ?? false)
   };
   console.log(datosReales)
 
@@ -340,6 +348,76 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}, 
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(")", tablaInicioX + 150, yTexto + 1);
   yTexto += filaAltura;
+
+  // === SECCIÓN BOROO (solo si es Boroo) ===
+  if ( esBoroo) {
+    // Primera fila: Número de Licencia | Clase | Categoría | Máquina
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
+    doc.line(tablaInicioX + 52, yPos, tablaInicioX + 52, yPos + filaAltura); // División N° Licencia
+    doc.line(tablaInicioX + 80, yPos, tablaInicioX + 80, yPos + filaAltura); // División Clase
+    doc.line(tablaInicioX + 125+17, yPos, tablaInicioX + 125+17, yPos + filaAltura+filaAltura); // División Categoría
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
+    doc.line(tablaInicioX + 125+37, yPos, tablaInicioX + 125+37, yPos + filaAltura+filaAltura); // División máquina
+    doc.line(tablaInicioX + 125+37+20, yPos, tablaInicioX + 125+37+20, yPos + filaAltura+filaAltura); // División máquina2
+    
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho-48, yPos + filaAltura); // Línea inferior
+
+       doc.line(tablaInicioX + tablaAncho-28, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
+
+    // Etiquetas primera fila
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Número de Licencia:", tablaInicioX + 2, yTexto + 1);
+    doc.text("Clase:", tablaInicioX + 55, yTexto + 1);
+    doc.text("Categoría:", tablaInicioX + 82, yTexto + 1);
+    doc.text("Máquina:", tablaInicioX + 145, yTexto - 1 + (filaAltura / 2));
+
+    // Valores primera fila
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(datosFinales.numeroDeLicencia, tablaInicioX + 31, yTexto + 1);
+    doc.text(datosFinales.claseLicencia, tablaInicioX + 65, yTexto + 1);
+    doc.text(datosFinales.categoriaLicencia, tablaInicioX + 97, yTexto + 1);
+
+    // Opciones Máquina (Liviano y Pesado)
+    doc.setFont("helvetica", "bold").setFontSize(7);
+    doc.text("LIVIANO", tablaInicioX + 165, yTexto + 1);
+    doc.text("PESADO", tablaInicioX + 165, yTexto + 1 + filaAltura);
+
+    // (Marcar "x")
+    doc.setFont("helvetica", "normal").setFontSize(6);
+    doc.text("(Marcar \"x\")", tablaInicioX + 145, yTexto - 1 + (filaAltura / 2) + 3);
+
+    // X para Máquina
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    if (datosFinales.maquina == "LIVIANO") {
+      doc.text("X", tablaInicioX + 185, yTexto + 1);
+    } else if (datosFinales.maquina == "PESADO") {
+      doc.text("X", tablaInicioX + 185, yTexto + 1 + filaAltura);
+    }
+
+    yTexto += filaAltura;
+    yPos += filaAltura;
+
+    // Segunda fila: Fecha de Revalidación de Licencia | Procedencia
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
+    doc.line(tablaInicioX + 80, yPos, tablaInicioX + 80, yPos + filaAltura); // División
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
+    // doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
+    doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
+
+    // Etiquetas segunda fila
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Fecha de Revalidación de Licencia:", tablaInicioX + 2, yTexto + 1);
+    doc.text("Procedencia:", tablaInicioX + 82, yTexto + 1);
+
+    // Valores segunda fila
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(datosFinales.fechaRevalidacionLicencia, tablaInicioX + 52, yTexto+1 );//
+    doc.text(datosFinales.procedenciaLicencia, tablaInicioX + 100, yTexto + 1 );//
+
+    yTexto += filaAltura;
+    yPos += filaAltura;
+  }
 
 
   // === SECCIÓN DE ANTECEDENTES ===
@@ -883,92 +961,175 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}, 
   }
 
   // === SECCIÓN 5: CONCLUSIÓN DE LA PRESENTE EVALUACIÓN ===
-  const alturaHeaderConclusion = 4;
-  yPos = dibujarHeaderSeccion("5.- CONCLUSIÓN DE LA PRESENTE EVALUACIÓN", yPos, alturaHeaderConclusion);
+  if (esBoroo) {
+    // Boroo-specific Section 5
+    const alturaHeaderConclusion = 4;
+    yPos = dibujarHeaderSeccion("5.- CONCLUSIÓN DE LA PRESENTE EVALUACIÓN", yPos, alturaHeaderConclusion);
 
-  // === Fila única: Fechas + Opciones de Aptitud (6 columnas con anchos variables) ===
-  const alturaFilaCombinada = 4.5;
+    // Fila 1: APTO PARA CONDUCCIÓN DE VEHÍCULOS + Si/No
+    const alturaFilaApto = 5;
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaApto); // izquierda
+    doc.line(tablaInicioX + 130, yPos, tablaInicioX + 130, yPos + alturaFilaApto); // división
+    doc.line(tablaInicioX + 155, yPos, tablaInicioX + 155, yPos + alturaFilaApto); // división
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaApto); // derecha
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // superior
+    doc.line(tablaInicioX, yPos + alturaFilaApto, tablaInicioX + tablaAncho, yPos + alturaFilaApto); // inferior
 
-  // Definir anchos de columnas proporcionales al contenido
-  const anchoDesde = 35;      // "Desde:" + fecha
-  const anchoHasta = 35;      // "Hasta:" + fecha  
-  const anchoApto = 25;       // "Apto" (más estrecho)
-  const anchoObservado = 30;   // "Observado"
-  const anchoNoApto = 25;     // "No Apto"
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("APTO PARA CONDUCCIÓN DE VEHÍCULOS", tablaInicioX + 2, yPos + 3);
+    doc.text("Si", tablaInicioX + 135, yPos + 3);
+    doc.text("No", tablaInicioX + 160, yPos + 3);
 
-  // Calcular posiciones de las divisiones
-  const posDesde = tablaInicioX;
-  const posHasta = posDesde + anchoDesde;
-  const posApto = posHasta + anchoHasta;
-  const posObservado = posApto + anchoApto;
-  const posNoApto = posObservado + anchoObservado;
-  const posRestriccion = posNoApto + anchoNoApto;
+    // Marcar X
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    if (datosFinales.conclusionApto) {
+      doc.text("X", tablaInicioX + 140, yPos + 3);
+    } else if (datosFinales.conclusionNoApto) {
+      doc.text("X", tablaInicioX + 165, yPos + 3);
+    }
 
-  // Líneas verticales para la fila combinada
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaCombinada); // izquierda
-  doc.line(posHasta, yPos, posHasta, yPos + alturaFilaCombinada); // división 1
-  doc.line(posApto, yPos, posApto, yPos + alturaFilaCombinada); // división 2
-  doc.line(posObservado, yPos, posObservado, yPos + alturaFilaCombinada); // división 3
-  doc.line(posNoApto, yPos, posNoApto, yPos + alturaFilaCombinada); // división 4
-  doc.line(posRestriccion, yPos, posRestriccion, yPos + alturaFilaCombinada); // división 5
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaCombinada); // derecha
+    yPos += alturaFilaApto;
 
-  // Líneas horizontales para la fila combinada
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // superior
-  doc.line(tablaInicioX, yPos + alturaFilaCombinada, tablaInicioX + tablaAncho, yPos + alturaFilaCombinada); // inferior
+    // Fila 2: USO ESTRICTO DE LENTES CORRECTORES + Si/No
+    const alturaFilaLentes = 5;
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaLentes); // izquierda
+    doc.line(tablaInicioX + 130, yPos, tablaInicioX + 130, yPos + alturaFilaLentes); // división
+    doc.line(tablaInicioX + 155, yPos, tablaInicioX + 155, yPos + alturaFilaLentes); // división
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaLentes); // derecha
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // superior
+    doc.line(tablaInicioX, yPos + alturaFilaLentes, tablaInicioX + tablaAncho, yPos + alturaFilaLentes); // inferior
 
-  // Contenido de la fila combinada
-  doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("USO ESTRICTO DE LENTES CORRECTORES", tablaInicioX + 2, yPos + 3);
+    doc.text("Si", tablaInicioX + 135, yPos + 3);
+    doc.text("No", tablaInicioX + 160, yPos + 3);
 
-  // Columna 1: Desde
-  doc.text("Desde:", posDesde + 2, yPos + 3);
-  doc.text(datosFinales.conclusionDesde || "", posDesde + 15, yPos + 3);
+    // Marcar X
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    if (datosFinales.usoEstrictoLentesCorrectores) {
+      doc.text("X", tablaInicioX + 140, yPos + 3);
+    } else {
+      doc.text("X", tablaInicioX + 165, yPos + 3);
+    }
 
-  // Columna 2: Hasta
-  doc.text("Hasta:", posHasta + 2, yPos + 3);
-  doc.text(datosFinales.conclusionHasta || "", posHasta + 15, yPos + 3);
+    yPos += alturaFilaLentes;
 
-  // Columna 3: Apto (más estrecho)
-  doc.text("Apto", posApto + 3, yPos + 3);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("(", posApto + 15, yPos + 3);
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text(datosFinales.conclusionApto ? "X" : "   ", posApto + 17, yPos + 3);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(")", posApto + 20, yPos + 3);
+    // === SECCIÓN 6: EXAMEN PSICOSENSOMÉTRICO ===
+    const alturaHeaderPsicosensometrico = 4;
+    yPos = dibujarHeaderSeccion("6.- EXAMEN PSICOSENSOMÉTRICO", yPos, alturaHeaderPsicosensometrico);
 
-  // Columna 4: Observado
-  doc.text("Observado", posObservado + 2, yPos + 3);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("(", posObservado + 20, yPos + 3);
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text(datosFinales.conclusionObservado ? "X" : "   ", posObservado + 22, yPos + 3);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(")", posObservado + 25, yPos + 3);
+    // Fila: FECHA + VÁLIDO HASTA (CONSIDERAR MÁXIMO 2 AÑOS)
+    const alturaFilaPsicosensometrico = 5;
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaPsicosensometrico); // izquierda
+    doc.line(tablaInicioX + 95, yPos, tablaInicioX + 95, yPos + alturaFilaPsicosensometrico); // división
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaPsicosensometrico); // derecha
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // superior
+    doc.line(tablaInicioX, yPos + alturaFilaPsicosensometrico, tablaInicioX + tablaAncho, yPos + alturaFilaPsicosensometrico); // inferior
 
-  // Columna 5: No Apto
-  doc.text("No Apto", posNoApto + 2, yPos + 3);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("(", posNoApto + 18, yPos + 3);
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text(datosFinales.conclusionNoApto ? "X" : "   ", posNoApto + 20, yPos + 3);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(")", posNoApto + 23, yPos + 3);
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("FECHA", tablaInicioX + 2, yPos + 3);
+    doc.text("VÁLIDO HASTA", tablaInicioX + 97, yPos + 3);
+    doc.setFont("helvetica", "normal").setFontSize(7);
 
-  // Columna 6: Apto con Restricción (más ancho)
-  doc.text("Apto c/Restricción", posRestriccion + 2, yPos + 3);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("(", posRestriccion + 30, yPos + 3);
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text(datosFinales.conclusionAptoConRestriccion ? "X" : "   ", posRestriccion + 32, yPos + 3);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(")", posRestriccion + 35, yPos + 3);
+    // Valores
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(datosFinales.conclusionDesde || "", tablaInicioX + 30, yPos + 3);
+    doc.text(datosFinales.conclusionHasta || "", tablaInicioX + 150, yPos + 3);
 
-  yPos += alturaFilaCombinada;
+    yPos += alturaFilaPsicosensometrico;
 
-  // === SECCIÓN 6: OBSERVACIONES Y RECOMENDACIONES ===
-  const alturaHeaderObservaciones = 4;
-  yPos = dibujarHeaderSeccion("6.- OBSERVACIONES Y RECOMENDACIONES", yPos, alturaHeaderObservaciones);
+    // === SECCIÓN 7: OBSERVACIONES Y RECOMENDACIONES ===
+    const alturaHeaderObservaciones = 4;
+    yPos = dibujarHeaderSeccion("7.- OBSERVACIONES Y RECOMENDACIONES", yPos, alturaHeaderObservaciones);
+  } else {
+    // Original Section 5
+    const alturaHeaderConclusion = 4;
+    yPos = dibujarHeaderSeccion("5.- CONCLUSIÓN DE LA PRESENTE EVALUACIÓN", yPos, alturaHeaderConclusion);
+
+    // === Fila única: Fechas + Opciones de Aptitud (6 columnas con anchos variables) ===
+    const alturaFilaCombinada = 4.5;
+
+    // Definir anchos de columnas proporcionales al contenido
+    const anchoDesde = 35;      // "Desde:" + fecha
+    const anchoHasta = 35;      // "Hasta:" + fecha  
+    const anchoApto = 25;       // "Apto" (más estrecho)
+    const anchoObservado = 30;   // "Observado"
+    const anchoNoApto = 25;     // "No Apto"
+
+    // Calcular posiciones de las divisiones
+    const posDesde = tablaInicioX;
+    const posHasta = posDesde + anchoDesde;
+    const posApto = posHasta + anchoHasta;
+    const posObservado = posApto + anchoApto;
+    const posNoApto = posObservado + anchoObservado;
+    const posRestriccion = posNoApto + anchoNoApto;
+
+    // Líneas verticales para la fila combinada
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaCombinada); // izquierda
+    doc.line(posHasta, yPos, posHasta, yPos + alturaFilaCombinada); // división 1
+    doc.line(posApto, yPos, posApto, yPos + alturaFilaCombinada); // división 2
+    doc.line(posObservado, yPos, posObservado, yPos + alturaFilaCombinada); // división 3
+    doc.line(posNoApto, yPos, posNoApto, yPos + alturaFilaCombinada); // división 4
+    doc.line(posRestriccion, yPos, posRestriccion, yPos + alturaFilaCombinada); // división 5
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaCombinada); // derecha
+
+    // Líneas horizontales para la fila combinada
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // superior
+    doc.line(tablaInicioX, yPos + alturaFilaCombinada, tablaInicioX + tablaAncho, yPos + alturaFilaCombinada); // inferior
+
+    // Contenido de la fila combinada
+    doc.setFont("helvetica", "normal").setFontSize(8);
+
+    // Columna 1: Desde
+    doc.text("Desde:", posDesde + 2, yPos + 3);
+    doc.text(datosFinales.conclusionDesde || "", posDesde + 15, yPos + 3);
+
+    // Columna 2: Hasta
+    doc.text("Hasta:", posHasta + 2, yPos + 3);
+    doc.text(datosFinales.conclusionHasta || "", posHasta + 15, yPos + 3);
+
+    // Columna 3: Apto (más estrecho)
+    doc.text("Apto", posApto + 3, yPos + 3);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("(", posApto + 15, yPos + 3);
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text(datosFinales.conclusionApto ? "X" : "   ", posApto + 17, yPos + 3);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(")", posApto + 20, yPos + 3);
+
+    // Columna 4: Observado
+    doc.text("Observado", posObservado + 2, yPos + 3);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("(", posObservado + 20, yPos + 3);
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text(datosFinales.conclusionObservado ? "X" : "   ", posObservado + 22, yPos + 3);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(")", posObservado + 25, yPos + 3);
+
+    // Columna 5: No Apto
+    doc.text("No Apto", posNoApto + 2, yPos + 3);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("(", posNoApto + 18, yPos + 3);
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text(datosFinales.conclusionNoApto ? "X" : "   ", posNoApto + 20, yPos + 3);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(")", posNoApto + 23, yPos + 3);
+
+    // Columna 6: Apto con Restricción (más ancho)
+    doc.text("Apto c/Restricción", posRestriccion + 2, yPos + 3);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("(", posRestriccion + 30, yPos + 3);
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text(datosFinales.conclusionAptoConRestriccion ? "X" : "   ", posRestriccion + 32, yPos + 3);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(")", posRestriccion + 35, yPos + 3);
+
+    yPos += alturaFilaCombinada;
+
+    // === SECCIÓN 6: OBSERVACIONES Y RECOMENDACIONES ===
+    const alturaHeaderObservaciones = 4;
+    yPos = dibujarHeaderSeccion("6.- OBSERVACIONES Y RECOMENDACIONES", yPos, alturaHeaderObservaciones);
+  }
 
   // === Función para procesar recomendaciones con numeración ===
   const procesarRecomendaciones = (texto) => {
@@ -1208,7 +1369,9 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}, 
   yPos += alturaSeccionDeclaracion;
 
   // === FOOTER ===
-  footerTR(doc, { footerOffsetY: 8 });
+  if (!esBoroo) {
+    footerTR(doc, { footerOffsetY: 8 });
+  }
 
   // === Imprimir ===
   if (docExistente) {

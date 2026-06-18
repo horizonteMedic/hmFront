@@ -9,6 +9,7 @@ import {
     SubmitDataServiceDefault,
 } from "../../../../utils/functionUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
+import { getDatePlusYears } from "../../../../utils/helpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/certificadoConduccion/obtenerReporteCertificadoConduccion";
@@ -122,6 +123,9 @@ export const GetInfoServicio = async (
             }
         }
 
+        const esBoroo = ((res.empresa ?? "") === "MINERA BOROO MISQUICHILCA S.A.");
+        const yearsToAdd = esBoroo ? 2 : 1;
+
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
@@ -176,6 +180,9 @@ export const GetInfoServicio = async (
             medicinasTomando: res.medicamentosAnexo16A ?? "",
 
             obesidadIMC30: parseFloat(res.imcTriaje) >= 30,
+
+            esBoroo,
+            aptoHasta: getDatePlusYears(prev.aptoDesde, yearsToAdd),
 
             SubirDoc: true,
             digitalizacion: res.digitalizacion
@@ -249,6 +256,11 @@ export const GetInfoServicioEditar = async (
                 imcRed = true;
             }
         }
+        const esBoroo = ((res.empresa ?? "") === "MINERA BOROO MISQUICHILCA S.A.");
+        const yearsToAdd = esBoroo ? 2 : 1;
+        const aptoDesde = res.fechaDesde_f_desde ?? prev.aptoDesde;
+        const aptoHasta = getDatePlusYears(aptoDesde, yearsToAdd);
+
         set((prev) => ({
             ...prev,
             // Header
@@ -343,8 +355,8 @@ export const GetInfoServicioEditar = async (
 
             //PARTE INFERIOR
             // Conclusión y Comentarios
-            aptoDesde: res.fechaDesde_f_desde ?? "",
-            aptoHasta: res.fechaHasta_f_hasta ?? "",
+            aptoDesde,
+            aptoHasta,
             conclusion: oidoMayor40 ? "NO APTO" :
                 debeUsarLentesCorrectores ? "APTO CON RESTRICCION" :
                     res.apto_chk_si ? "APTO" :
@@ -360,6 +372,18 @@ export const GetInfoServicioEditar = async (
             obesidadDietaHipocalorica: (res.observacionesRecomendaciones_b_c_observaciones ?? "").includes("OBESIDAD I. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS."),
             usoLentesCorrectoresLectura: (res.observacionesRecomendaciones_b_c_observaciones ?? "").includes("USO DE LENTES CORRECTORES PARA LECTURA DE CERCA."),
             corregirAgudezaLectura: (res.observacionesRecomendaciones_b_c_observaciones ?? "").includes("CORREGIR AGUDEZA VISUAL PARA LECTURA DE CERCA."),
+
+            //BOROO
+            numeroDeLicencia: res.numeroDeLicencia ?? "",
+            claseLicencia: res.claseLicencia ?? "",
+            fechaRevalidacionLicencia: res.fechaRevalidacionLicencia ?? "",
+            categoriaLicencia: res.categoriaLicencia ?? "",
+            procedenciaLicencia: res.procedenciaLicencia ?? "",
+            maquina: res.maquina ?? "",
+            usoEstrictoLentesCorrectores: res.usoEstrictoLentesCorrectores ?? false,
+            esBoroo,
+
+            //VALORES FIRMA
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
             user_doctorAsignado: res.doctorAsignado,
             SubirDoc: true,
@@ -457,6 +481,15 @@ export const SubmitDataService = async (
         pcomplementariasTestSas: form.testSASAnormal,
         examenFisicoSustentacionPie: form.sustentacionUnPie,
         antecedentesComentariosDetalles: form.comentariosDetalleAntecedentes,
+
+        //BOROO
+        numeroDeLicencia: form.numeroDeLicencia,
+        claseLicencia: form.claseLicencia,
+        fechaRevalidacionLicencia: form.fechaRevalidacionLicencia,
+        categoriaLicencia: form.categoriaLicencia,
+        procedenciaLicencia: form.procedenciaLicencia,
+        maquina: form.maquina,
+        usoEstrictoLentesCorrectores: form.usoEstrictoLentesCorrectores,
 
         usuarioFirma: form.user_medicoFirma,
         doctorAsignado: form.user_doctorAsignado,
