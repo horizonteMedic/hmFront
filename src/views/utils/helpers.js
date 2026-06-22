@@ -15,6 +15,9 @@ export function getTodayPlusOneYear() {
 export function getDatePlusOneYear(fechaStr) {//INPUT 2025-01-28 //OUTPUT 2026-01-28
     return fechaStr ? format(addYears(parse(fechaStr, "yyyy-MM-dd", new Date()), 1), "yyyy-MM-dd") : "";
 }
+export function getDatePlusYears(fechaStr, cantidadAnios) {//INPUT fechaStr: 2025-01-28, cantidadAnios: 2 //OUTPUT 2027-01-28
+    return fechaStr ? format(addYears(parse(fechaStr, "yyyy-MM-dd", new Date()), cantidadAnios), "yyyy-MM-dd") : "";
+}
 export function getDatePlus364Days(fechaStr) {
     return fechaStr
         ? format(addDays(parse(fechaStr, "yyyy-MM-dd", new Date()), 364), "yyyy-MM-dd")

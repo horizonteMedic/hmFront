@@ -3,6 +3,7 @@ import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import drawColorBox from '../../components/ColorBox.jsx';
 import footerTR from '../../components/footerTR.jsx';
 import { dibujarFirmas } from '../../../utils/dibujarFirmas.js';
+import { dnicompletarConCeros } from "../../../utils/functionUtils.js";
 
 // Función para formatear fecha a DD/MM/YYYY
 const toDDMMYYYY = (fecha) => {
@@ -141,7 +142,7 @@ const drawPatientData = (doc, datos = {}) => {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("DNI:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(dni, tablaInicioX + 12, yPos + 3.5);
+  doc.text(dnicompletarConCeros(dni), tablaInicioX + 12, yPos + 3.5);
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Edad:", tablaInicioX + 47, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);

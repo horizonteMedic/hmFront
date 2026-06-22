@@ -1,3 +1,4 @@
+import { dnicompletarConCeros } from "../../../utils/functionUtils";
 import { compressImage } from "../../../utils/helpers";
 
 const headerEvaluacionMuscoloEsqueletica = async (doc, datos, mostrarFrame = true, numeroPagina = 1) => {
@@ -121,7 +122,7 @@ const headerEvaluacionMuscoloEsqueletica = async (doc, datos, mostrarFrame = tru
     // DNI
     const xDni = margin + 32;
     const yDni = margin + 25;
-    doc.text(String(datosFinales.dni || "").toUpperCase(), xDni, yDni);
+    doc.text(dnicompletarConCeros(datosFinales.dni || "").toUpperCase(), xDni, yDni);
 
     // Empresa
     const xEmpresa = margin + 32;

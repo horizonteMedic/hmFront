@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faUser,
@@ -8,6 +8,7 @@ import {
     faPrint,
     faSave,
     faDownload,
+    faCarSide,
 } from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
@@ -19,12 +20,13 @@ import { useForm } from "../../../../hooks/useForm";
 import ExamenMedico from "./ExamenMedico/ExamenMedico";
 import Antecedentes from "./Antecedentes/Antecedentes";
 import PruebasComplementarias from "./PruebasComplementarias/PruebasComplementarias";
-import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
+import { getToday, getTodayPlusOneYear, getDatePlusYears } from "../../../../utils/helpers";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import Swal from "sweetalert2";
 import { handleSubirArchivo, handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerFichaConduccionVehiculos";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
+import Boroo from "./Boroo/Boroo";
 
 const tabla = "b_certificado_conduccion";
 
@@ -126,6 +128,17 @@ export default function FichaConduccionVehiculos() {
         medicinasTomando: "",
         otrosDatosRelevancia: "",
 
+        //=====================TAB BOROO=====================
+        numeroDeLicencia: "",
+        claseLicencia: "",
+        fechaRevalidacionLicencia: today,
+        categoriaLicencia: "",
+        procedenciaLicencia: "",
+        maquina: "",
+        usoEstrictoLentesCorrectores: false,
+
+        esBoroo: false,
+
         //PARTE INFERIOR
         // Conclusión y Comentarios
         aptoDesde: today,
@@ -166,6 +179,18 @@ export default function FichaConduccionVehiculos() {
         handleCheckBoxChange,
         handleClear,
     } = useForm(initialFormState, { storageKey: "fichaConduccionVehiculos" });
+
+    // Handler para cuando cambia aptoDesde: actualiza aptoHasta automáticamente
+    const handleAptoDesdeChange = (e) => {
+        const { name, value } = e.target;
+        const yearsToAdd = form.esBoroo ? 2 : 1;
+        const newAptoHasta = getDatePlusYears(value, yearsToAdd);
+        setForm(prev => ({
+            ...prev,
+            [name]: value,
+            aptoHasta: newAptoHasta
+        }));
+    };
 
     // Mapeo de textos para Recomendaciones vinculadas a los checkboxes
     const recomendacionesTextMap = {
@@ -224,6 +249,12 @@ export default function FichaConduccionVehiculos() {
             icon: faChartLine,
             component: PruebasComplementarias,
         },
+        {
+            id: 3,
+            name: "Boroo",
+            icon: faCarSide,
+            component: Boroo,
+        },
     ];
 
     const handleSave = () => {
@@ -235,12 +266,13 @@ export default function FichaConduccionVehiculos() {
             })
             return
         }
-        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        SubmitDataService(form, token, userlogued, () => { handleClear(); setActiveTab(0) }, tabla, datosFooter);
     };
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
             handleClearnotO();
+            setActiveTab(0);
             VerifyTR(form.norden, tabla, token, setForm, selectedSede);
         }
     };
@@ -358,21 +390,22 @@ export default function FichaConduccionVehiculos() {
 
                     {/* Tab Navigation */}
                     <nav className="flex bg-white border-b border-gray-200 sticky top-0 z-20">
-                        {tabs.map((tab) => (
-                            <button
-                                key={tab.id}
-                                className={`flex-1 px-4 py-3 uppercase tracking-wider text=[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${activeTab === tab.id
-                                    ? "border-[#233245] text-[#233245] font-semibold"
-                                    : "border-transparent"
-                                    }`}
-                                onClick={() => setActiveTab(tab.id)}
-                            >
-                                <FontAwesomeIcon icon={tab.icon} className="mr-2" />
-                                {tab.name}
-                            </button>
-                        ))}
+                        {tabs.map((tab) =>
+                            tab.id != 3 || form.esBoroo ? (
+                                <button
+                                    key={tab.id}
+                                    className={`flex-1 px-4 py-3 uppercase tracking-wider text-[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${activeTab === tab.id
+                                        ? "border-[#233245] text-[#233245] font-semibold"
+                                        : "border-transparent"
+                                        }`}
+                                    onClick={() => setActiveTab(tab.id)}
+                                >
+                                    <FontAwesomeIcon icon={tab.icon} className="mr-2" />
+                                    {tab.name}
+                                </button>
+                            ) : null
+                        )}
                     </nav>
-
                     {/* Tab Content */}
                     <div className="max-w-full">
                         {tabs.map((tab) => {
@@ -385,8 +418,11 @@ export default function FichaConduccionVehiculos() {
                                         setForm={setForm}
                                         handleChange={handleChange}
                                         handleChangeNumber={handleChangeNumber}
+                                        handleRadioButton={handleRadioButton}
+                                        handleChangeSimple={handleChangeSimple}
                                         handleRadioButtonBoolean={handleRadioButtonBoolean}
-                                        handleClear={handleClear}
+                                        handleCheckBoxChange={handleCheckBoxChange}
+                                        handleClear={() => { handleClear(); setActiveTab(0) }}
                                     />
                                 )
                             );
@@ -409,14 +445,14 @@ export default function FichaConduccionVehiculos() {
                                             name="aptoDesde"
                                             type="date"
                                             value={form?.aptoDesde}
-                                            onChange={handleChangeSimple}
+                                            onChange={handleAptoDesdeChange}
                                         />
                                         <InputTextOneLine
                                             label="Hasta"
                                             name="aptoHasta"
                                             type="date"
                                             value={form?.aptoHasta}
-                                            onChange={handleChangeSimple}
+                                            disabled
                                         />
                                     </div>
                                 </div>
@@ -430,7 +466,10 @@ export default function FichaConduccionVehiculos() {
                                         value={form?.conclusion}
                                         onChange={handleRadioButton}
                                         vertical
-                                        options={[
+                                        options={form?.esBoroo ? [
+                                            { label: "Apto", value: "APTO" },
+                                            { label: "No Apto", value: "NO APTO" },
+                                        ] : [
                                             { label: "Apto", value: "APTO" },
                                             { label: "Observado", value: "OBSERVADO" },
                                             { label: "No Apto", value: "NO APTO" },
@@ -520,7 +559,7 @@ export default function FichaConduccionVehiculos() {
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={handleClear}
+                                    onClick={() => { handleClear(); setActiveTab(0) }}
                                     className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
                                 >
                                     <FontAwesomeIcon icon={faBroom} /> Limpiar

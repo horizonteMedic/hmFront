@@ -5,6 +5,7 @@ import { dibujarTextoEnFilaCreciente, calcularAlturaTextoCreciente } from "../..
 import drawColorBox from '../../components/ColorBox.jsx';
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import footerTR from '../../components/footerTR.jsx';
+import { dnicompletarConCeros } from "../../../utils/functionUtils.js";
 
 export default async function InformePsicologico_Anexo02_Digitalizado(data = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -318,7 +319,7 @@ export default async function InformePsicologico_Anexo02_Digitalizado(data = {},
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("DNI:", tablaInicioX + 2, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.documentoIdentidad || "", tablaInicioX + 12, yTexto + 1);
+  doc.text(dnicompletarConCeros(datosFinales.documentoIdentidad), tablaInicioX + 12, yTexto + 1);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Edad:", tablaInicioX + 47, yTexto + 1);

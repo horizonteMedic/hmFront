@@ -5,6 +5,7 @@ import { normalizeList } from "../../../utils/listUtils.js";
 import CabeceraLogo from '../../components/CabeceraLogo.jsx';
 import { getSign, convertirGenero, getSignCompressed } from "../../../utils/helpers.js";
 import footerTR from '../../components/footerTR.jsx';
+import { dnicompletarConCeros } from "../../../utils/functionUtils.js";
 
 export default async function InformePsicologico_Digitalizado_Boroo(data = {}, docExistente = null) {
     const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -258,7 +259,7 @@ export default async function InformePsicologico_Digitalizado_Boroo(data = {}, d
     doc.setFont("helvetica", "bold").setFontSize(9);
     doc.text("DNI:", tablaInicioX + 2, yTexto + 1.5);
     doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.text(datosFinales.documentoIdentidad, tablaInicioX + 12, yTexto + 1.5);
+    doc.text(dnicompletarConCeros(datosFinales.documentoIdentidad), tablaInicioX + 12, yTexto + 1.5);
 
     doc.setFont("helvetica", "bold").setFontSize(9);
     doc.text("Edad:", tablaInicioX + 47, yTexto + 1.5);

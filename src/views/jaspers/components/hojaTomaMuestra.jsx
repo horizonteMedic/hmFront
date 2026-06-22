@@ -179,6 +179,18 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
     doc.text(String(datos.dni || ""), marginL + 15, currentY);
     doc.line(marginL + 15, currentY + 0.5, marginL + 55, currentY + 0.5);
 
+    //PROTOCOLO
+    if (datos.protocoloNombre) {
+        currentY += 5;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.text("PROTOCOLO:", marginL + 5, currentY);
+        doc.setFont("helvetica", "bold");
+        doc.text(datos.protocoloNombre || "", marginL + 29, currentY);
+        doc.line(marginL + 27, currentY + 0.5, marginL + 80, currentY + 0.5);
+    }
+
+
     // ================= EMPRESA =================
     currentY += 5;
     const baseY = currentY; // <- posición fija de toda la fila
@@ -314,14 +326,7 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
         x = boxX + 10;
     });
 
-    if (datos.protocoloNombre) {
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(9);
-        doc.text("PROTOCOLO:", marginL + 138, currentY);
-        doc.setFont("helvetica", "bold");
-        doc.text(datos.protocoloNombre || "", marginL + 162, currentY);
-        doc.line(marginL + 162, currentY + 0.5, marginL + 190, currentY + 0.5);
-    }
+
 
 
     // --- TABLAS DE RESULTADOS ---
@@ -468,6 +473,44 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
 
     doc.line(marginL + 115, currentY + 28, marginL + 175, currentY + 28);
     doc.text("RESPONSABLE DE PROCESO", marginL + 121, currentY + 32);
+
+
+    if (datos && datos?.protocoloNombre && datos?.protocoloNombre != "PROTOCOLO") {
+        const area = datos?.areas?.find(area => area.nombre == "LABORATORIO");
+        if (area && area.examenes && area.examenes.length > 0) {
+            currentY += 40;
+            const boxWidth = 90;
+            let boxHeight = 8;
+            
+            const lineHeight = 4;
+            area.examenes.forEach(() => {
+                boxHeight += lineHeight;
+            });
+            
+            doc.setLineWidth(0.3);
+            doc.rect(marginL + 5, currentY, boxWidth, boxHeight);
+            
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9);
+            doc.text(area.nombre, marginL + 8, currentY + 5);
+            doc.setLineWidth(0.2);
+            doc.line(marginL + 5, currentY + 6, marginL + 5 + boxWidth, currentY + 6);
+            
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            let listY = currentY + 6 + lineHeight;
+            
+            area.examenes.forEach(examen => {
+                doc.text(`• ${examen.nombre}`, marginL + 8, listY);
+                listY += lineHeight;
+            });
+        }
+    }
+
+
+
+
+
 };
 
 export default hojaTomaMuestra;

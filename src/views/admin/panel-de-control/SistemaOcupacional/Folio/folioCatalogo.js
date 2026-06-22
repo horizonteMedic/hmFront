@@ -70,7 +70,7 @@ export const EXAMENES_CATALOGO = {
     CERTIFICADO_APTITUD_ANEXO_16_ADMINISTRATIVO: {
         nombre: "CERTIFICADO DE APTITUD ANEXO 16 ADMINISTRATIVO",
         tabla: "certificado_aptitud_medico_ocupacional",
-        url: "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16Camo",
+        url: "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16CamoAdministrativo",
         esJasper: true,
         nomenclaturaSubida: "CAMO ADM",
     },

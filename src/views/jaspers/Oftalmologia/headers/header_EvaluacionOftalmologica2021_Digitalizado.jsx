@@ -1,5 +1,5 @@
 import { compressImage } from "../../../utils/helpers";
-import { resolverEmpresaContratistaBoroo } from "../../../utils/functionUtils";
+import { dnicompletarConCeros, resolverEmpresaContratistaBoroo } from "../../../utils/functionUtils";
 
 /**
  * Header para Evaluación Oftalmológica 2021 Digitalizado
@@ -213,7 +213,7 @@ const header_EvaluacionOftalmologica2021_Digitalizado = async (doc, datos = {}) 
     const yterceraFila = margin + 27;
     const ycuartaFila = margin + 33;
     const xDni = margin + 30;
-    doc.text(String(datos.dni || ""), xDni, ysegundaFila);
+    doc.text(dnicompletarConCeros(datos.dni), xDni, ysegundaFila);
 
     // Edad
     const xEdad = margin + 95;

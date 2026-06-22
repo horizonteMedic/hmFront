@@ -52,54 +52,68 @@ const separarNombreApellido = (nombreCompleto) => {
 };
 
 export const submitMasivo = async (data, sede, token) => {
-    LoadingDefault("Subiendo Datos");
+    const BATCH_SIZE = 50;
+    const totalBloques = Math.ceil(data.length / BATCH_SIZE);
+    const resultados = [];
+
     try {
-        const body = data.map(row => ({
-            codPa: row.codPa || null,
-            apellidosPa: row.apellidosPa || "",
-            nombresPa: row.nombresPa || "",
-            fechaNaciminetoPa: row.fechaNaciminetoPa || "",
-            sexoPa: row.sexoPa || "",
-            area: row.area || "",
-            cargo: row.cargo || "",
-        }));
-        console.log(sede)
-        console.log("Body a enviar:", body);
+        for (let i = 0; i < totalBloques; i++) {
+            const inicio = i * BATCH_SIZE;
+            const fin = inicio + BATCH_SIZE;
+            const loteData = data.slice(inicio, fin);
 
-        const response = await SubmitData(
-            body,
-            `/api/v01/ct/registroPacientes/datosPacienteMasivo/${sede}`,
-            token
-        );
+            LoadingDefault(`Subiendo Datos... Bloque ${i + 1}/${totalBloques}`);
 
-        console.log("Respuesta API:", response);
+            const body = loteData.map(row => ({
+                codPa: row.codPa || null,
+                apellidosPa: row.apellidosPa || "",
+                nombresPa: row.nombresPa || "",
+                fechaNaciminetoPa: row.fechaNaciminetoPa || "",
+                sexoPa: row.sexoPa || "",
+                tipoDoc: 1,
+                area: row.area || "",
+                cargo: row.cargo || "",
+            }));
 
-        const errores = response?.resultado?.errores || [];
-        const camposIgnorar = new Set(["id"]);
+            console.log(`Bloque ${i + 1}/${totalBloques} - Body a enviar:`, body);
 
-        const sinVariables = (reg) => {
-            const obj = {};
-            Object.keys(reg)
-                .filter(k => !camposIgnorar.has(k))
-                .sort()
-                .forEach(k => { obj[k] = reg[k]; });
-            return JSON.stringify(obj);
-        };
+            const response = await SubmitData(
+                body,
+                `/api/v01/ct/registroPacientes/datosPacienteMasivo/${sede}`,
+                token
+            );
 
-        const erroresSet = new Map(
-            errores.map(err => [sinVariables(err.registro), err.motivo])
-        );
+            console.log(`Bloque ${i + 1}/${totalBloques} - Respuesta API:`, response);
 
-        const resultados = body.map((registro, index) => {
-            const key = sinVariables(registro);
-            const motivo = erroresSet.get(key);
-            return {
-                ok: !motivo,
-                error: motivo || null,
-                row: data[index],
-                registro
+            const errores = response?.resultado?.errores || [];
+            const camposIgnorar = new Set(["id"]);
+
+            const sinVariables = (reg) => {
+                const obj = {};
+                Object.keys(reg)
+                    .filter(k => !camposIgnorar.has(k))
+                    .sort()
+                    .forEach(k => { obj[k] = reg[k]; });
+                return JSON.stringify(obj);
             };
-        });
+
+            const erroresSet = new Map(
+                errores.map(err => [sinVariables(err.registro), err.motivo])
+            );
+
+            const resultadosLote = body.map((registro, index) => {
+                const key = sinVariables(registro);
+                const motivo = erroresSet.get(key);
+                return {
+                    ok: !motivo,
+                    error: motivo || null,
+                    row: loteData[index],
+                    registro
+                };
+            });
+
+            resultados.push(...resultadosLote);
+        }
 
         Swal.close();
         return resultados;
