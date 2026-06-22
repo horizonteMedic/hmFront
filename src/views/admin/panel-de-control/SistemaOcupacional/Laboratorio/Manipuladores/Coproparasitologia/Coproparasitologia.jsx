@@ -103,7 +103,7 @@ export default function Coproparasitologia() {
     setForm,
     handleChangeNumberDecimals,
     handleChange,
-    handleCheckBoxChange,
+    //handleCheckBoxChange,
     handleChangeSimple,
     handleClear,
     handleClearnotO,
@@ -248,6 +248,31 @@ export default function Coproparasitologia() {
     );
   };
 
+  const handleCheckBoxChange = (e) => {
+    const { name, checked } = e.target;
+
+    setForm((prev) => {
+      const newForm = {
+        ...prev,
+        [name]: checked,
+      };
+
+      if (name === "sinHecesTres") {
+        // MUESTRA: HECES III
+        muestraFields.forEach((field) => {
+          newForm[`heces3_${field.key}`] = checked ? "N/A" : "";
+        });
+
+        // EXAMEN MICROSCÓPICO III
+        microsFields.forEach((field) => {
+          newForm[`micro3_${field.key}`] = checked ? "N/A" : "";
+        });
+      }
+
+      return newForm;
+    });
+  };
+
   return (
     <div className="/space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
       {/* Información del Examen */}
@@ -279,6 +304,12 @@ export default function Coproparasitologia() {
           label="COPROPARASITOLÓGICO"
           name="tipoCoproparasitologico"
           checked={form.tipoCoproparasitologico}
+          onChange={handleCheckBoxChange}
+        />
+        <InputCheckbox
+          label="SIN HECES"
+          name="sinHecesTres"
+          checked={form.sinHecesTres}
           onChange={handleCheckBoxChange}
         />
       </SectionFieldset>
@@ -379,7 +410,10 @@ export default function Coproparasitologia() {
       <SectionFieldset legend="Muestras" className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {muestrasConfig.map((sample, idx) => {
-            const disabled = form.tipoCoproparasitologico && idx > 0;
+            const disabled =
+              (form.tipoCoproparasitologico && idx > 0) ||
+              (sample.id === "3" && form.sinHecesTres);
+
             return (
               <SectionFieldset
                 key={sample.id}
@@ -398,7 +432,8 @@ export default function Coproparasitologia() {
       <SectionFieldset legend="Examen Microscópico" className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {microsConfig.map((sample, idx) => {
-            const disabled = form.tipoCoproparasitologico && idx > 0;
+            const disabled = form.tipoCoproparasitologico && idx > 0 ||
+              (sample.id === "3" && form.sinHecesTres);
             return (
               <SectionFieldset
                 key={sample.id}
