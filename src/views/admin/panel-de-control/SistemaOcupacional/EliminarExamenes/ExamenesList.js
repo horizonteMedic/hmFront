@@ -82,6 +82,7 @@ export const EXAMENES_CONFIG = [
                     { label: "Tolerancia a la Glucosa", name: "ToleranciaGlucosa", tabla: "glucosatolerancia" },
                     { label: "Glucosa Basal", name: "GlucosaBasal", tabla: "analisis_bioquimicos_glucosa_basal" },
                     { label: "PCR-Ultrasensible", name: "PCRUltrasensible", tabla: "pcr_ultrasensible" },
+                    { label: "Colinesterasa", name: "Colinesterasa", tabla: "colinesterasa" },
                 ]
             },
 

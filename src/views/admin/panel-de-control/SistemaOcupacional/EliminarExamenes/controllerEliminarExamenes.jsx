@@ -68,6 +68,8 @@ const urlsEliminar = {
     PerfilRenal: "analisisBioquimico/perfilRenal",
     AcidoUrico: "analisisBioquimico/acidoUrico",
     PerfilHepatico: "analisisBioquimico/perfilHepatico",
+    Colinesterasa: "colinesterasa",
+
     RiesgoCoronario: "riesgoCoronario",
     ToleranciaGlucosa: "glucosaTolerancia",
     GlucosaBasal: "laboratorio/glucosaBasal",
