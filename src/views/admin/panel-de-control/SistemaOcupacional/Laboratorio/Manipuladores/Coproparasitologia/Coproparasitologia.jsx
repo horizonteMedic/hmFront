@@ -307,7 +307,7 @@ export default function Coproparasitologia() {
           onChange={handleCheckBoxChange}
         />
         <InputCheckbox
-          label="SIN HECES"
+          label="2 MUESTRAS"
           name="sinHecesTres"
           checked={form.sinHecesTres}
           onChange={handleCheckBoxChange}
