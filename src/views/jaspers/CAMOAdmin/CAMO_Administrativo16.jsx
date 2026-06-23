@@ -10,7 +10,8 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
   const pageW = doc.internal.pageSize.getWidth();
   let numeroPagina = 1;
   const esBoro = String(data.empresa) === "MINERA BOROO MISQUICHILCA S.A."
-  const Recomendaciones = esBoro && data.recomendaciones ? data.recomendaciones.split('\n').filter(rec => rec.trim() !== '') : []
+  const esMARSA = String(data.empresa) === "MINERA AURIFERA RETAMAS S.A."
+  const Recomendaciones = (esBoro||esMARSA) && data.recomendaciones ? data.recomendaciones.split('\n').filter(rec => rec.trim() !== '') : []
 
   const Recomendaciones2 = data.recomendaciones ? data.recomendaciones.split('\n').filter(rec => rec.trim() !== '') : []
 
@@ -69,6 +70,8 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
         return { apto: false, aptoConRestriccion: false, noApto: false, conObservacion: false, evaluado: false };
     }
   };
+
+
 
   const aptitudCheckboxes = getAptitudCheckbox(datosFinales.apto);
 
@@ -801,7 +804,7 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
   // === FOOTER ===
   // Llamar al footer (los datos de prueba están dentro del componente)
   footerTR(doc);
-  if (datosFinales.empresa === "MINERA AURIFERA RETAMAS S.A.") {
+  if (esMARSA) {
     // === PÁGINA 2 ===
     doc.addPage();
     numeroPagina++;
