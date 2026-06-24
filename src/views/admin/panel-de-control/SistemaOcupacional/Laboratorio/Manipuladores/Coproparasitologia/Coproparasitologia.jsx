@@ -75,6 +75,7 @@ export default function Coproparasitologia() {
       cargoDesempenar: "",
 
       tipoCoproparasitologico: false,
+      sinHecesTres: false,
 
       // Médico que Certifica //BUSCADOR
       nombre_medico: userName,
@@ -103,7 +104,7 @@ export default function Coproparasitologia() {
     setForm,
     handleChangeNumberDecimals,
     handleChange,
-    handleCheckBoxChange,
+    //handleCheckBoxChange,
     handleChangeSimple,
     handleClear,
     handleClearnotO,
@@ -248,12 +249,75 @@ export default function Coproparasitologia() {
     );
   };
 
+  const handleCheckBoxChange = (e) => {
+    const { name, checked } = e.target;
+
+    setForm((prev) => {
+      const newForm = {
+        ...prev,
+        [name]: checked,
+      };
+
+      if (name === "tipoCoproparasitologico" && checked) {
+        newForm.sinHecesTres = false;
+      } else if (name === "sinHecesTres" && checked) {
+        newForm.tipoCoproparasitologico = false;
+      }
+
+      if (name === "sinHecesTres") {
+        muestraFields.forEach((field) => {
+          newForm[`heces3_${field.key}`] = checked ? "N/A" : "";
+        });
+
+        microsFields.forEach((field) => {
+          newForm[`micro3_${field.key}`] = checked ? "N/A" : "";
+        });
+
+        if (checked) {
+          muestraFields.forEach((field) => {
+            newForm[`heces2_${field.key}`] = "";
+          });
+          microsFields.forEach((field) => {
+            newForm[`micro2_${field.key}`] = "";
+          });
+        }
+      }
+
+      if (name === "tipoCoproparasitologico") {
+        muestraFields.forEach((field) => {
+          newForm[`heces2_${field.key}`] = checked ? "N/A" : "";
+          newForm[`heces3_${field.key}`] = checked ? "N/A" : "";
+        });
+
+        microsFields.forEach((field) => {
+          newForm[`micro2_${field.key}`] = checked ? "N/A" : "";
+          newForm[`micro3_${field.key}`] = checked ? "N/A" : "";
+        });
+
+        if (checked) {
+          muestraFields.forEach((field) => {
+            newForm[`heces2_${field.key}`] = "N/A";
+            newForm[`heces3_${field.key}`] = "N/A";
+          });
+          microsFields.forEach((field) => {
+            newForm[`micro2_${field.key}`] = "N/A";
+            newForm[`micro3_${field.key}`] = "N/A";
+          });
+        }
+      }
+
+      return newForm;
+    });
+  };
+
   const marcarTodoAusenteMuestras = () => {
     setForm((prev) => {
       const updated = { ...prev };
 
       const anyAusente = muestrasConfig.some((sample, idx) => {
-        const disabled = form.tipoCoproparasitologico && idx > 0;
+        const disabled =
+          (prev.tipoCoproparasitologico && idx > 0) ||
+          (sample.id === "3" && prev.sinHecesTres);
         if (disabled) return false;
         return ["moco", "grasa", "sangre", "restos"].some(field =>
           updated[`heces${sample.id}_${field}`] === "AUSENTE"
@@ -261,8 +325,11 @@ export default function Coproparasitologia() {
       });
 
       muestrasConfig.forEach((sample, idx) => {
-        const disabled = form.tipoCoproparasitologico && idx > 0;
-        if (disabled) return;
+        const disabled =
+          (prev.tipoCoproparasitologico && idx > 0) ||
+          (sample.id === "3" && prev.sinHecesTres);
+
+        if (disabled) return false;
 
         ["moco", "grasa", "sangre", "restos"].forEach((field) => {
           updated[`heces${sample.id}_${field}`] = anyAusente ? "" : "AUSENTE";
@@ -278,7 +345,8 @@ export default function Coproparasitologia() {
       const updated = { ...prev };
 
       const anyAusente = microsConfig.some((sample, idx) => {
-        const disabled = form.tipoCoproparasitologico && idx > 0;
+        const disabled = (prev.tipoCoproparasitologico && idx > 0) ||
+          (sample.id === "3" && prev.sinHecesTres);
         if (disabled) return false;
         return ["leucocitos", "hematies", "parasitos"].some(field =>
           updated[`micro${sample.id}_${field}`] === "NO SE OBSERVAN",
@@ -287,8 +355,9 @@ export default function Coproparasitologia() {
       });
 
       microsConfig.forEach((sample, idx) => {
-        const disabled = form.tipoCoproparasitologico && idx > 0;
-        if (disabled) return;
+        const disabled = (prev.tipoCoproparasitologico && idx > 0) ||
+          (sample.id === "3" && prev.sinHecesTres);
+        if (disabled) return false;
 
         ["leucocitos", "hematies"].forEach((field) => {
           updated[`micro${sample.id}_${field}`] = anyAusente ? "" : "NO SE OBSERVAN";
@@ -314,7 +383,7 @@ export default function Coproparasitologia() {
           value={form.norden}
           onChange={handleChangeNumberDecimals}
           onKeyUp={handleSearch}
-          labelWidth="120px"
+          labelWidth="100px"
         />
         <InputTextOneLine
           label="Fecha"
@@ -331,12 +400,26 @@ export default function Coproparasitologia() {
           disabled
           labelWidth="120px"
         />
-        <InputCheckbox
-          label="COPROPARASITOLÓGICO"
-          name="tipoCoproparasitologico"
-          checked={form.tipoCoproparasitologico}
-          onChange={handleCheckBoxChange}
-        />
+
+        <div className="grid grid-cols-[auto_1fr] gap-2 items-center">
+
+          <label htmlFor="" className="h-6 align-middle">Muestras: </label>
+          <div className="flex flex-col gap-2">
+            <InputCheckbox
+              label="COPROPARASITOLÓGICO"
+              name="tipoCoproparasitologico"
+              checked={form.tipoCoproparasitologico}
+              onChange={handleCheckBoxChange}
+            />
+            <InputCheckbox
+              label="2 MUESTRAS"
+              name="sinHecesTres"
+              checked={form.sinHecesTres}
+              onChange={handleCheckBoxChange}
+            />
+          </div>
+        </div>
+
       </SectionFieldset>
 
       <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
@@ -447,7 +530,10 @@ export default function Coproparasitologia() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {muestrasConfig.map((sample, idx) => {
-            const disabled = form.tipoCoproparasitologico && idx > 0;
+            const disabled =
+              (form.tipoCoproparasitologico && idx > 0) ||
+              (sample.id === "3" && form.sinHecesTres);
+
             return (
               <SectionFieldset
                 key={sample.id}
@@ -480,7 +566,8 @@ export default function Coproparasitologia() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {microsConfig.map((sample, idx) => {
-            const disabled = form.tipoCoproparasitologico && idx > 0;
+            const disabled = form.tipoCoproparasitologico && idx > 0 ||
+              (sample.id === "3" && form.sinHecesTres);
             return (
               <SectionFieldset
                 key={sample.id}

@@ -226,17 +226,17 @@ export default async function LBioquimica_Digitalizado(datos = {}, docExistente 
   const dataRows = [
     {
       prueba: 'CREATININA SÉRICA',
-      resultado: datos.txtCreatinina || '',
+      resultado: datos.txtCreatinina || 'N/A',
       normales: 'Adulto: 0.8 - 1.4 mg/dl\nNiño: 0.24 - 0.84 mg/dl'
     },
     {
       prueba: 'UREA SÉRICA',
-      resultado: datos.txtUreaSerica || '',
+      resultado: datos.txtUreaSerica || 'N/A',
       normales: '10 - 50 mg/dl'
     },
     {
       prueba: 'ÁCIDO ÚRICO SÉRICO',
-      resultado: datos.txtAcidoUrico || '',
+      resultado: datos.txtAcidoUrico || 'N/A',
       normales: 'Mujeres: 2.5 - 6.8 mg/dl\nHombres 3.6 - 7.7 mg/dl'
     }
   ];

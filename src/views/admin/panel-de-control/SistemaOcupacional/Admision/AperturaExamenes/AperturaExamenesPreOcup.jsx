@@ -20,6 +20,7 @@ import SubidaMasiva from './modals/modalSubidaMasiva/ModalSubidaMasiva.jsx';
 import ModalPreCarga from './modals/modalPreCargaTable/ModalPreCargaTable.jsx';
 import HojadeRutaDinamico from '../../../../../jaspers/HojadeRutaDinamica/HojadeRutaDinamico.jsx';
 import ReportePacientes from './modals/modalReportePacientes/ModalReportePacientes.jsx';
+import ReportePacientes2 from './modals/modalReportePacientes2/ModalReportePacientes2.jsx';
 
 const AperturaExamenesPreOcup = (props) => {
   const today = new Date();
@@ -113,6 +114,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [modalPreCarga, setModalPreCarga] = useState(false);
   const [opcionesPreCarga, setOpcionesPreCarga] = useState([]);
   const [modalReportePacientes, setModalReportePacientes] = useState(false)
+  const [modalReportePacientes2, setModalReportePacientes2] = useState(false)
   //lista de Protocolos
   const [protocoloOptions, setProtocoloOptions] = useState([])
   useEffect(() => {
@@ -1830,6 +1832,7 @@ const AperturaExamenesPreOcup = (props) => {
                 </div>
                 <div className='flex items-center justify-end mt-2'>
                   <button onClick={() => setModalReportePacientes(true)} className='verde-btn px-4 py-1 rounded flex items-center mr-3'>Reporte de Pacientes</button>
+                  <button onClick={() => setModalReportePacientes2(true)} className='verde-btn px-4 py-1 rounded flex items-center mr-3'>Reporte de Pacientes 2</button>
                 </div>
               </div>
 
@@ -1940,6 +1943,11 @@ const AperturaExamenesPreOcup = (props) => {
       />}
       {modalReportePacientes && <ReportePacientes
         onClose={() => setModalReportePacientes(false)}
+        sede={props.selectedSede}
+        token={props.token}
+      />}
+      {modalReportePacientes2 && <ReportePacientes2
+        onClose={() => setModalReportePacientes2(false)}
         sede={props.selectedSede}
         token={props.token}
       />}
