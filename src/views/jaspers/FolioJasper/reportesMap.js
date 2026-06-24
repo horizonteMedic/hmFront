@@ -126,6 +126,8 @@ import CertificadoExposicionAlCalor from "../CertificadoExposicionAlCalor/Certif
 import CertificadoRiesgoElectrico from "../CertificadoRiesgoElectrico/CertificadoRiesgoElectrico";
 import Aptitud_Trabajos_EnCaliente_Digitalizado from "../AptitudCertificadoCaliente/Aptitud_Trabajos_EnCaliente_Digitalizado";
 import ficha_antecedente_patologico_boro_nuevo from "../Poderosa/CertificadoMedicoManipuladores_Barrick_Digitalizado";
+import CAMO_Administrativo16_MARSA from "../CAMOAdmin/CAMO_Administrativo16_MARSA";
+import CAMO_Administrativo16_Simple from "../CAMOAdmin/CAMO_Administrativo16_Simple";
 
 export const reportesMap = {
    /* =========================
@@ -155,8 +157,11 @@ export const reportesMap = {
    certificado_aptitud_medico_ocupacional: {
       Aptitud_medico_ocupacional_11,
       Aptitud_medico_ocupacional_F,
-      CAMO_Administrativo16
-   }, //son 2 jaspers
+
+      CAMO_Administrativo16,
+      CAMO_Administrativo16_Simple,
+      CAMO_Administrativo16_MARSA
+   }, 
 
    certificado_aptitud_medico_resumen: Aptitud_medico_resumen_Digitalizado,
 
