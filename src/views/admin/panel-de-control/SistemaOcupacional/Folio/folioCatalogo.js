@@ -75,6 +75,22 @@ export const EXAMENES_CATALOGO = {
         nomenclaturaSubida: "CAMO ADM",
     },
 
+    CERTIFICADO_APTITUD_ANEXO_16_ADMINISTRATIVO_SIMPLE: {
+        nombre: "CERTIFICADO DE APTITUD ANEXO 16 ADMINISTRATIVO SIMPLE",
+        tabla: "certificado_aptitud_medico_ocupacional",
+        url: "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16CamoAdministrativo",
+        esJasper: true,
+        extraParams: { tipoReporte: "simple" },
+    },
+
+    RESUMEN_MEDICO_MARSA: {
+        nombre: "MARSA RESUMEN MEDICO",
+        tabla: "certificado_aptitud_medico_ocupacional",
+        url: "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16CamoAdministrativo",
+        esJasper: true,
+        extraParams: { tipoReporte: "marsaResumen" },
+    },
+
     // CERTIFICADO_APTITUD_ANEXO_16: {
     //     nombre: "CERTIFICADO DE APTITUD ANEXO 16",
     //     tabla: "certificado_aptitud_medico_ocupacional",

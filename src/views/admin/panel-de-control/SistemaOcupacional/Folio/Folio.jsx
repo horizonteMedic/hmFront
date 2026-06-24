@@ -67,7 +67,7 @@ const ExamenesListCAMPANA = buildExamenesList([ // Campaña
     "DECLARACION_USO_FIRMA_ARCHIVO"                            // 20 nuevo
 ]);
 
-const ExamenesListCOMPLETO = buildExamenesList([ // Completo
+const ExamenesListCOMPLETO_BASE = [ // Completo
     "RESUMEN_MEDICO_PODEROSA",                 // 1
     "RESUMEN_MEDICO_ANEXO_02",
     "CONSTANCIA_EXAMEN_MEDICO_OCUPACIONAL",    // 2
@@ -215,7 +215,18 @@ const ExamenesListCOMPLETO = buildExamenesList([ // Completo
     "PRUEBA_DE_ESFUERZO_ARCHIVO",
     "FICHA_DATOS_PACIENTE",
     "INTERCONSULTAS",
-]);
+];
+
+const ExamenesListCOMPLETO = buildExamenesList(ExamenesListCOMPLETO_BASE);
+
+const ExamenesListCOMPLETO_MARSA = buildExamenesList(
+    ExamenesListCOMPLETO_BASE.map(item =>
+        item === "RESUMEN_MEDICO_PODEROSA" ? "RESUMEN_MEDICO_MARSA" :
+        item === "RESUMEN_MEDICO_ANEXO_02" ? "RESUMEN_MEDICO_MARSA" :
+        item === "CERTIFICADO_APTITUD_ANEXO_16" ? "CERTIFICADO_APTITUD_ANEXO_16_ADMINISTRATIVO_SIMPLE" :
+        item
+    ).filter((item, index, arr) => arr.indexOf(item) === index) // deduplica RESUMEN_MEDICO_MARSA
+);
 
 const ExamenesListPsicologia = buildExamenesList([
     "INFORME_PSICOLOGICO",
@@ -293,6 +304,7 @@ export const ListaPorPlantilla = {
     //PRUEBAS: ExamenesListPRUEBAS,
     CAMPANA: ExamenesListCAMPANA,
     "COMPLETO": ExamenesListCOMPLETO,
+    "COMPLETO MARSA": ExamenesListCOMPLETO_MARSA,
     "PSICOSENSOMETRICO ADMISION": ExamenesListPSICOSENSOMETRICO_ADMISION,
     "TEST ALTURA ADMISION": ExamenesListTEST_ALTURA_ADMISION,
     PSICOLOGIA: ExamenesListPsicologia,

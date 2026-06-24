@@ -139,6 +139,9 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
                         `${examen.url}?nOrden=${nro}&nameConset=${examen.tabla}`
                         : `${examen.url}?nOrden=${nro}&nameService=${examen.tabla}`;
             }
+            if (examen.extraParams) {
+                apiUrl += `&${new URLSearchParams(examen.extraParams).toString()}`;
+            }
             try {
                 let data = await getFetch(apiUrl, token, signal);
                 if (conJsonAnidado.includes(examen.tabla)) {
