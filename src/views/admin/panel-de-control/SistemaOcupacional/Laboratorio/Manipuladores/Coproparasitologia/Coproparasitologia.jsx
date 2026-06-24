@@ -248,6 +248,62 @@ export default function Coproparasitologia() {
     );
   };
 
+  const marcarTodoAusenteMuestras = () => {
+    setForm((prev) => {
+      const updated = { ...prev };
+
+      const anyAusente = muestrasConfig.some((sample, idx) => {
+        const disabled = form.tipoCoproparasitologico && idx > 0;
+        if (disabled) return false;
+        return ["moco", "grasa", "sangre", "restos"].some(field =>
+          updated[`heces${sample.id}_${field}`] === "AUSENTE"
+        );
+      });
+
+      muestrasConfig.forEach((sample, idx) => {
+        const disabled = form.tipoCoproparasitologico && idx > 0;
+        if (disabled) return;
+
+        ["moco", "grasa", "sangre", "restos"].forEach((field) => {
+          updated[`heces${sample.id}_${field}`] = anyAusente ? "" : "AUSENTE";
+        });
+      });
+
+      return updated;
+    });
+  };
+
+  const marcarTodoAusenteExm = () => {
+    setForm((prev) => {
+      const updated = { ...prev };
+
+      const anyAusente = microsConfig.some((sample, idx) => {
+        const disabled = form.tipoCoproparasitologico && idx > 0;
+        if (disabled) return false;
+        return ["leucocitos", "hematies", "parasitos"].some(field =>
+          updated[`micro${sample.id}_${field}`] === "NO SE OBSERVAN",
+          // updated[`micro${sample.id}_${field}`] === "AUSENTE"
+        );
+      });
+
+      microsConfig.forEach((sample, idx) => {
+        const disabled = form.tipoCoproparasitologico && idx > 0;
+        if (disabled) return;
+
+        ["leucocitos", "hematies"].forEach((field) => {
+          updated[`micro${sample.id}_${field}`] = anyAusente ? "" : "NO SE OBSERVAN";
+        });
+
+        ["parasitos"].forEach((field) => {
+          updated[`micro${sample.id}_${field}`] = anyAusente ? "" : "AUSENTE";
+        });
+      });
+
+      return updated;
+    });
+  };
+
+
   return (
     <div className="/space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
       {/* Información del Examen */}
@@ -377,6 +433,18 @@ export default function Coproparasitologia() {
       </SectionFieldset>
 
       <SectionFieldset legend="Muestras" className="space-y-6">
+        <div className="mb-4">
+          <button
+            type="button"
+            onClick={marcarTodoAusenteMuestras}
+            className="bg-blue-500 hover:bg-blue-600 text-white text-base px-4 py-2 rounded
+                        flex items-center gap-2 transition-all duration-150 ease-out
+                        hover:shadow-lg active:scale-95 active:shadow-inner"
+          >
+            Marcar todo AUSENTE
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {muestrasConfig.map((sample, idx) => {
             const disabled = form.tipoCoproparasitologico && idx > 0;
@@ -386,9 +454,11 @@ export default function Coproparasitologia() {
                 legend={sample.label}
                 className="space-y-4"
               >
-                {muestraFields.map((field) =>
-                  renderMuestraField(sample.id, field, disabled)
-                )}
+                {muestraFields.map((field) => (
+                  <div key={field.key}>
+                    {renderMuestraField(sample.id, field, disabled)}
+                  </div>
+                ))}
               </SectionFieldset>
             );
           })}
@@ -396,6 +466,18 @@ export default function Coproparasitologia() {
       </SectionFieldset>
 
       <SectionFieldset legend="Examen Microscópico" className="space-y-6">
+        <div className="mb-4">
+          <button
+            type="button"
+            onClick={marcarTodoAusenteExm}
+            className="bg-blue-500 hover:bg-blue-600 text-white text-base px-4 py-2 rounded
+                        flex items-center gap-2 transition-all duration-150 ease-out
+                        hover:shadow-lg active:scale-95 active:shadow-inner"
+          >
+            Marcar todo NO SE OBSERVAN / AUSENTE
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {microsConfig.map((sample, idx) => {
             const disabled = form.tipoCoproparasitologico && idx > 0;
