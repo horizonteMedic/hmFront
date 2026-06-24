@@ -78,6 +78,7 @@ export const GetInfoServicio = async (
       micro3_leucocitos: res.txtleucocitos2 ?? "",
       micro3_hematies: res.txthematies2 ?? "",
       micro3_parasitos: res.txtlugol2 ?? "",
+      sinHecesTres: res.sinHecesTres ?? false,
 
       user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado,
@@ -128,6 +129,7 @@ export const SubmitDataService = async (
     txthematies2: form.micro3_hematies,
     txtlugol2: form.micro3_parasitos,
     tipoCoproparasitologico: form.tipoCoproparasitologico,
+    sinHecesTres: form.sinHecesTres,
     userRegistro: user,
     userMedicoOcup: "",
 

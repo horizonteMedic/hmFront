@@ -477,42 +477,45 @@ export default async function ParasitologiaSeriado_Digitalizado(datos = {}, docE
     });
     y += 6;
     // MUESTRA: HECES III
-    doc.setFont("helvetica", "bold");
-    doc.text("MUESTRA: HECES III", pageW / 2, y, { align: "center" });
-    y += 5;
-    // EXAMEN MACROSCÓPICO III
-    doc.setFont("helvetica", "bold");
-    doc.text("EXAMEN MACROSCÓPICO III", xLeft, y);
-    y += 5;
-    doc.setFont("helvetica", "normal");
-    [
-      ["COLOR", datosFinales.muestra3.color],
-      ["ASPECTO", datosFinales.muestra3.aspecto],
-      ["MOCO FECAL", datosFinales.muestra3.mocoFecal],
-      ["SANGRE VISIBLE", datosFinales.muestra3.sangreVisible],
-      ["RESTOS ALIMENTICIOS", datosFinales.muestra3.restosAlimenticios],
-      ["GRASA", datosFinales.muestra3.grasa]
-    ].forEach(([lbl, value]) => {
-      doc.text(lbl, xLeft, y);
-      doc.text(":", xDato, y);
-      doc.text(value != null && value !== "" ? String(value) : "", xDato + 4, y);
+    if (!datos.sinHecesTres) {
+      doc.setFont("helvetica", "bold");
+      doc.text("MUESTRA: HECES III", pageW / 2, y, { align: "center" });
       y += 5;
-    });
-    y += 4;
-    doc.setFont("helvetica", "bold");
-    doc.text("EXAMEN MICROSCÓPICO III", xLeft, y);
-    y += 5;
-    doc.setFont("helvetica", "normal");
-    [
-      ["LEUCOCITOS", datosFinales.microscopico3.leucocitos],
-      ["HEMATÍES", datosFinales.microscopico3.hematies],
-      ["INVESTIGACIÓN DE PARÁSITOS", datosFinales.microscopico3.parasitos]
-    ].forEach(([lbl, value]) => {
-      doc.text(lbl, xLeft, y);
-      doc.text(":", xDato, y);
-      doc.text(value != null && value !== "" ? String(value) : "", xDato + 4, y);
+      // EXAMEN MACROSCÓPICO III
+      doc.setFont("helvetica", "bold");
+      doc.text("EXAMEN MACROSCÓPICO III", xLeft, y);
       y += 5;
-    });
+      doc.setFont("helvetica", "normal");
+      [
+        ["COLOR", datosFinales.muestra3.color],
+        ["ASPECTO", datosFinales.muestra3.aspecto],
+        ["MOCO FECAL", datosFinales.muestra3.mocoFecal],
+        ["SANGRE VISIBLE", datosFinales.muestra3.sangreVisible],
+        ["RESTOS ALIMENTICIOS", datosFinales.muestra3.restosAlimenticios],
+        ["GRASA", datosFinales.muestra3.grasa]
+      ].forEach(([lbl, value]) => {
+        doc.text(lbl, xLeft, y);
+        doc.text(":", xDato, y);
+        doc.text(value != null && value !== "" ? String(value) : "", xDato + 4, y);
+        y += 5;
+      });
+      y += 4;
+      doc.setFont("helvetica", "bold");
+      doc.text("EXAMEN MICROSCÓPICO III", xLeft, y);
+      y += 5;
+      doc.setFont("helvetica", "normal");
+      [
+        ["LEUCOCITOS", datosFinales.microscopico3.leucocitos],
+        ["HEMATÍES", datosFinales.microscopico3.hematies],
+        ["INVESTIGACIÓN DE PARÁSITOS", datosFinales.microscopico3.parasitos]
+      ].forEach(([lbl, value]) => {
+        doc.text(lbl, xLeft, y);
+        doc.text(":", xDato, y);
+        doc.text(value != null && value !== "" ? String(value) : "", xDato + 4, y);
+        y += 5;
+      });
+    }
+
 
     // Centrar los sellos en la hoja - Mismo tamaño fijo para ambos
     const sigW2 = 48;
