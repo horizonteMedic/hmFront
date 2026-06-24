@@ -2,17 +2,16 @@ import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 import { getSign } from "../../utils/helpers.js";
 import drawColorBox from '../components/ColorBox.jsx';
-// import footerTR from '../components/footerTR.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import CAMO_Administrativo16_MARSA from './CAMO_Administrativo16_MARSA.jsx';
 
-export default async function CAMO_Administrativo16(data = {}, docExistente = null) {
+export default async function CAMO_Administrativo16(data = {}, docExistente = null, isSimple = false) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   let numeroPagina = 1;
   const esBoro = String(data.empresa) === "MINERA BOROO MISQUICHILCA S.A."
   const esMARSA = String(data.empresa) === "MINERA AURIFERA RETAMAS S.A."
-  const Recomendaciones = (esBoro||esMARSA) && data.recomendaciones ? data.recomendaciones.split('\n').filter(rec => rec.trim() !== '') : []
+  const Recomendaciones = (esBoro || esMARSA) && data.recomendaciones ? data.recomendaciones.split('\n').filter(rec => rec.trim() !== '') : []
 
   const datosFinales = {
     numeroHistoria: String(data.norden ?? ""), //revisar - podría ser norden del JSON
@@ -798,8 +797,8 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
   footerTR(doc);
 
   // === PÁGINAS ADICIONALES MARSA (módulo independiente) ===
-  if (esMARSA) {
-    await CAMO_Administrativo16_MARSA(data, doc, numeroPagina);
+  if (esMARSA && !isSimple) {
+    await CAMO_Administrativo16_MARSA(data, doc, 2);
   }
 
   // === Imprimir ===

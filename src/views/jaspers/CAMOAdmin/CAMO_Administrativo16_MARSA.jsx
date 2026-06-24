@@ -264,8 +264,10 @@ export default async function CAMO_Administrativo16_MARSA(data = {}, docExistent
   };
 
   // === PÁGINA 2 ===
-  doc.addPage();
-  numeroPagina++;
+  if (numeroPagina == 2) {
+    doc.addPage();
+    numeroPagina++;
+  }
   await drawHeader(numeroPagina);
 
   let yPos2 = 40;
