@@ -75,6 +75,7 @@ export default function Coproparasitologia() {
       cargoDesempenar: "",
 
       tipoCoproparasitologico: false,
+      sinHecesTres: false,
 
       // Médico que Certifica //BUSCADOR
       nombre_medico: userName,
@@ -257,21 +258,120 @@ export default function Coproparasitologia() {
         [name]: checked,
       };
 
+      if (name === "tipoCoproparasitologico" && checked) {
+        newForm.sinHecesTres = false;
+      } else if (name === "sinHecesTres" && checked) {
+        newForm.tipoCoproparasitologico = false;
+      }
+
       if (name === "sinHecesTres") {
-        // MUESTRA: HECES III
         muestraFields.forEach((field) => {
           newForm[`heces3_${field.key}`] = checked ? "N/A" : "";
         });
 
-        // EXAMEN MICROSCÓPICO III
         microsFields.forEach((field) => {
           newForm[`micro3_${field.key}`] = checked ? "N/A" : "";
         });
+
+        if (checked) {
+          muestraFields.forEach((field) => {
+            newForm[`heces2_${field.key}`] = "";
+          });
+          microsFields.forEach((field) => {
+            newForm[`micro2_${field.key}`] = "";
+          });
+        }
+      }
+
+      if (name === "tipoCoproparasitologico") {
+        muestraFields.forEach((field) => {
+          newForm[`heces2_${field.key}`] = checked ? "N/A" : "";
+          newForm[`heces3_${field.key}`] = checked ? "N/A" : "";
+        });
+
+        microsFields.forEach((field) => {
+          newForm[`micro2_${field.key}`] = checked ? "N/A" : "";
+          newForm[`micro3_${field.key}`] = checked ? "N/A" : "";
+        });
+
+        if (checked) {
+          muestraFields.forEach((field) => {
+            newForm[`heces2_${field.key}`] = "N/A";
+            newForm[`heces3_${field.key}`] = "N/A";
+          });
+          microsFields.forEach((field) => {
+            newForm[`micro2_${field.key}`] = "N/A";
+            newForm[`micro3_${field.key}`] = "N/A";
+          });
+        }
       }
 
       return newForm;
     });
   };
+
+  const marcarTodoAusenteMuestras = () => {
+    setForm((prev) => {
+      const updated = { ...prev };
+
+      const anyAusente = muestrasConfig.some((sample, idx) => {
+        const disabled =
+          (prev.tipoCoproparasitologico && idx > 0) ||
+          (sample.id === "3" && prev.sinHecesTres);
+        if (disabled) return false;
+        return ["moco", "grasa", "sangre", "restos"].some(field =>
+          updated[`heces${sample.id}_${field}`] === "AUSENTE"
+        );
+      });
+
+      muestrasConfig.forEach((sample, idx) => {
+        const disabled =
+          (prev.tipoCoproparasitologico && idx > 0) ||
+          (sample.id === "3" && prev.sinHecesTres);
+
+        if (disabled) return false;
+
+        ["moco", "grasa", "sangre", "restos"].forEach((field) => {
+          updated[`heces${sample.id}_${field}`] = anyAusente ? "" : "AUSENTE";
+        });
+      });
+
+      return updated;
+    });
+  };
+
+  const marcarTodoAusenteExm = () => {
+    setForm((prev) => {
+      const updated = { ...prev };
+
+      const anyAusente = microsConfig.some((sample, idx) => {
+        const disabled = (prev.tipoCoproparasitologico && idx > 0) ||
+          (sample.id === "3" && prev.sinHecesTres);
+        if (disabled) return false;
+        return ["leucocitos", "hematies", "parasitos"].some(field =>
+          updated[`micro${sample.id}_${field}`] === "NO SE OBSERVAN",
+          // updated[`micro${sample.id}_${field}`] === "AUSENTE"
+        );
+      });
+
+      microsConfig.forEach((sample, idx) => {
+        const disabled = (prev.tipoCoproparasitologico && idx > 0) ||
+          (sample.id === "3" && prev.sinHecesTres);
+        if (disabled) return false;
+
+        ["leucocitos", "hematies"].forEach((field) => {
+          updated[`micro${sample.id}_${field}`] = anyAusente ? "" : "NO SE OBSERVAN";
+        });
+
+        ["parasitos"].forEach((field) => {
+          updated[`micro${sample.id}_${field}`] = anyAusente ? "" : "AUSENTE";
+        });
+      });
+
+      return updated;
+    });
+  };
+
 
   return (
     <div className="/space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
@@ -283,7 +383,7 @@ export default function Coproparasitologia() {
           value={form.norden}
           onChange={handleChangeNumberDecimals}
           onKeyUp={handleSearch}
-          labelWidth="120px"
+          labelWidth="100px"
         />
         <InputTextOneLine
           label="Fecha"
@@ -300,18 +400,26 @@ export default function Coproparasitologia() {
           disabled
           labelWidth="120px"
         />
-        <InputCheckbox
-          label="COPROPARASITOLÓGICO"
-          name="tipoCoproparasitologico"
-          checked={form.tipoCoproparasitologico}
-          onChange={handleCheckBoxChange}
-        />
-        <InputCheckbox
-          label="2 MUESTRAS"
-          name="sinHecesTres"
-          checked={form.sinHecesTres}
-          onChange={handleCheckBoxChange}
-        />
+
+        <div className="grid grid-cols-[auto_1fr] gap-2 items-center">
+
+          <label htmlFor="" className="h-6 align-middle">Muestras: </label>
+          <div className="flex flex-col gap-2">
+            <InputCheckbox
+              label="COPROPARASITOLÓGICO"
+              name="tipoCoproparasitologico"
+              checked={form.tipoCoproparasitologico}
+              onChange={handleCheckBoxChange}
+            />
+            <InputCheckbox
+              label="2 MUESTRAS"
+              name="sinHecesTres"
+              checked={form.sinHecesTres}
+              onChange={handleCheckBoxChange}
+            />
+          </div>
+        </div>
+
       </SectionFieldset>
 
       <SectionFieldset legend="Datos Personales" collapsible className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
@@ -408,6 +516,18 @@ export default function Coproparasitologia() {
       </SectionFieldset>
 
       <SectionFieldset legend="Muestras" className="space-y-6">
+        <div className="mb-4">
+          <button
+            type="button"
+            onClick={marcarTodoAusenteMuestras}
+            className="bg-blue-500 hover:bg-blue-600 text-white text-base px-4 py-2 rounded
+                        flex items-center gap-2 transition-all duration-150 ease-out
+                        hover:shadow-lg active:scale-95 active:shadow-inner"
+          >
+            Marcar todo AUSENTE
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {muestrasConfig.map((sample, idx) => {
             const disabled =
@@ -420,9 +540,11 @@ export default function Coproparasitologia() {
                 legend={sample.label}
                 className="space-y-4"
               >
-                {muestraFields.map((field) =>
-                  renderMuestraField(sample.id, field, disabled)
-                )}
+                {muestraFields.map((field) => (
+                  <div key={field.key}>
+                    {renderMuestraField(sample.id, field, disabled)}
+                  </div>
+                ))}
               </SectionFieldset>
             );
           })}
@@ -430,6 +552,18 @@ export default function Coproparasitologia() {
       </SectionFieldset>
 
       <SectionFieldset legend="Examen Microscópico" className="space-y-6">
+        <div className="mb-4">
+          <button
+            type="button"
+            onClick={marcarTodoAusenteExm}
+            className="bg-blue-500 hover:bg-blue-600 text-white text-base px-4 py-2 rounded
+                        flex items-center gap-2 transition-all duration-150 ease-out
+                        hover:shadow-lg active:scale-95 active:shadow-inner"
+          >
+            Marcar todo NO SE OBSERVAN / AUSENTE
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {microsConfig.map((sample, idx) => {
             const disabled = form.tipoCoproparasitologico && idx > 0 ||
