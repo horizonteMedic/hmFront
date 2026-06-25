@@ -19,8 +19,8 @@ const sanitizeNombreArchivo = (value) =>
 
 const buildNombreArchivoRotulado = (form, nomenclatura) => {
     const apellidos = (form?.apellidos ?? "").trim();
-    const nombres = (form?.nombres ?? form?.nombre ?? "").trim();
-    const nombrePersona = `${apellidos}${apellidos && nombres ? " " : ""}${nombres}`.trim();
+    const nombres = (form?.nombre ?? "").trim();
+    const nombrePersona = `${apellidos} ${nombres}`.trim();
     const nombreArchivo = `${form?.norden}-${nomenclatura}-${nombrePersona}.pdf`;
     return sanitizeNombreArchivo(nombreArchivo);
 };
