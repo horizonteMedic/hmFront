@@ -15,7 +15,6 @@ const AudiometriaOhlaTabSelector = ({
     2,
     "0"
   )}-${String(date.getDate()).padStart(2, "0")}`;
-
   const initialFormStateOhla = {
     codAu: "",
     norden: "",
@@ -194,7 +193,7 @@ const AudiometriaOhlaTabSelector = ({
         <AudiometriaOhla
           token={token}
           selectedSede={selectedSede}
-          userlogued={userlogued.sub}
+          userlogued={userlogued}
           form={formOhla}
           setForm={setFormOhla}
           handleClear={handleClearOhla}
