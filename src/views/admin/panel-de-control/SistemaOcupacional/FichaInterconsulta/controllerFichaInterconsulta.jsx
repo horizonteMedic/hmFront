@@ -200,6 +200,7 @@ export const GetInfoServicioEditar = async (
             dniUser: prev.dniUser,
             SubirDoc: true,
             user_medicoFirma: res.userRegistro ? res.userRegistro : prev.user_medicoFirma,
+            fechaReevaluacion: res.fechaReevaluacion ?? "",
         }));
     }
 };
@@ -240,6 +241,7 @@ export const GetInfoServicioNewEditar = async (
             diagnostico: "",
             tratamiento: "",
             apto: false,
+            fechaReevaluacion: "",
             // NewNomenclatura: NewNomenclatura
         }));
     }
@@ -273,6 +275,7 @@ export const SubmitDataService = async (
         "horaSalida": getHoraActual(),
         "orden": null,
         "userRegistro": form.user_medicoFirma,
+        "fechaReevaluacion": form.fechaReevaluacion || null,
         //"usuarioFirma": form.user_medicoFirma
         // "nomenclatura": `INTERCONSULTA${form.NewNomenclatura ? ` ${form.NewNomenclatura}` : ""}`
     };
