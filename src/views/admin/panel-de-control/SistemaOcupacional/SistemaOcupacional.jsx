@@ -76,6 +76,7 @@ import {
   faFloppyDisk,
   faSun,
   faBolt,
+  faNewspaper,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -125,6 +126,7 @@ import EscalaLakeLouise from "./EscalaLakeLouise/EscalaLakeLouise.jsx";
 import { faSellsy } from "@fortawesome/free-brands-svg-icons";
 import CertificadoExposicionAlCalor from "./CertificadoExposicionAlCalor/CertificadoExposicionAlCalor.jsx";
 import CertficadoRiesgoElectrico from "./CertificadoRiesgoElectrico/CertificadoRiesgoElectrico.jsx";
+import RegistrosComplementarios from "./RegistrosComplementarios/RegistrosComplementarios.jsx";
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
   { key: 7, label: "Test Altura" },
@@ -353,6 +355,7 @@ const TabComponent = () => {
                   { vista: "Certificado Exposicion al Calor", tab: 50, icons: [{ icon: faSun }], label: "Certificado Exposición al Calor" },
                   { vista: "Certificado Riesgo Electrico", tab: 51, icons: [{ icon: faBolt }], label: "Certificado Riesgo Eléctrico" },
                   { vista: "Folio", tab: 40, icons: [{ icon: faFileContract }], label: "Folio" },
+                  { vista: "Registros Complementarios", tab: 41, icons: [{ icon: faNewspaper }], label: "Registros Complementarios" },
                 ];
                 return items
                   .filter((item) => tieneVista(item.vista))
@@ -642,6 +645,7 @@ const TabComponent = () => {
               50: { title: "Certificado Exposición al Calor", child: <CertificadoExposicionAlCalor /> },
               51: { title: "Certificado Riesgo Eléctrico", child: <CertficadoRiesgoElectrico /> },
               40: { title: "Folio", child: <Folio /> },
+              41: { title: "Registros Complementarios", child: <RegistrosComplementarios /> },
             };
             const section = displayedInterfaces[activeTab];
             return section ? (

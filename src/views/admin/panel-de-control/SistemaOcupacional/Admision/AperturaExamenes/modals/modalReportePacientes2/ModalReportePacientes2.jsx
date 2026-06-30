@@ -76,7 +76,9 @@ const ReportePacientes2 = ({ onClose, sede, token }) => {
             { key: "dni", label: "DNI", width: 14, destacado: false },
             { key: "apellidos", label: "APELLIDOS", width: 28, destacado: false },
             { key: "nombres", label: "NOMBRES", width: 24, destacado: false },
+            { key: "edad", label: "EDAD", width: 24, destacado: false },
             { key: "empresa", label: "EMPRESA", width: 30, destacado: false },
+            { key: "protocolo", label: "PERFIL", width: 24, destacado: false },
             { key: "fechaApertura", label: "FECHA", width: 30, destacado: false },
         ];
 
@@ -167,13 +169,6 @@ const ReportePacientes2 = ({ onClose, sede, token }) => {
         });
 
         // ── Fila total ────────────────────────────────────────────────
-        const totalRow = sheet.addRow([`TOTAL: ${data.length} registros`, ...Array(totalCols - 1).fill("")]);
-        sheet.mergeCells(`A${totalRow.number}:${lastCol}${totalRow.number}`);
-        const totalCell = sheet.getCell(`A${totalRow.number}`);
-        totalCell.font = { bold: true, size: 9, color: { argb: "FFFFFFFF" } };
-        totalCell.alignment = { horizontal: "right", vertical: "middle" };
-        totalCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1F4E79" } };
-        totalRow.height = 18;
 
         // ── Exportar ──────────────────────────────────────────────────
         const buffer = await workbook.xlsx.writeBuffer();

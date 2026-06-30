@@ -42,7 +42,6 @@ export default function AudiometriaOhla({
   handleClearFicha,
 }) {
   const [dataTabla, setDataTabla] = useState([]);
-
   useEffect(() => {
     obtenerInfoTabla();
   }, []);
@@ -727,8 +726,8 @@ export default function AudiometriaOhla({
       (oiValues.length === 0 ? 1 : oiValues.length)
     ).toFixed(2));
 
-    console.log("Oído Derecho - Promedio:", {odPromedio,cant:odValues.length});
-    console.log("Oído Izquierdo - Promedio:", {oiPromedio,cant:oiValues.length});
+    console.log("Oído Derecho - Promedio:", { odPromedio, cant: odValues.length });
+    console.log("Oído Izquierdo - Promedio:", { oiPromedio, cant: oiValues.length });
 
     const diagnosticoGenerado = realizarCalculoDiagnostico(
       odPromedio,
@@ -736,7 +735,7 @@ export default function AudiometriaOhla({
       odValues.length,
       oiValues.length
     )
-    console.log({diagnosticoGenerado});
+    console.log({ diagnosticoGenerado });
 
     setForm((prev) => ({
       ...prev,
