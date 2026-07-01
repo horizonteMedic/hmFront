@@ -355,7 +355,7 @@ const TabComponent = () => {
                   { vista: "Certificado Exposicion al Calor", tab: 50, icons: [{ icon: faSun }], label: "Certificado Exposición al Calor" },
                   { vista: "Certificado Riesgo Electrico", tab: 51, icons: [{ icon: faBolt }], label: "Certificado Riesgo Eléctrico" },
                   { vista: "Folio", tab: 40, icons: [{ icon: faFileContract }], label: "Folio" },
-                  { vista: "Registros Complementarios", tab: 41, icons: [{ icon: faNewspaper }], label: "Registros Complementarios" },
+                  { vista: "Registros Complementarios", tab: 52, icons: [{ icon: faNewspaper }], label: "Registros Complementarios" },
                 ];
                 return items
                   .filter((item) => tieneVista(item.vista))
@@ -645,7 +645,7 @@ const TabComponent = () => {
               50: { title: "Certificado Exposición al Calor", child: <CertificadoExposicionAlCalor /> },
               51: { title: "Certificado Riesgo Eléctrico", child: <CertficadoRiesgoElectrico /> },
               40: { title: "Folio", child: <Folio /> },
-              41: { title: "Registros Complementarios", child: <RegistrosComplementarios /> },
+              52: { title: "Registros Complementarios", child: <RegistrosComplementarios /> },
             };
             const section = displayedInterfaces[activeTab];
             return section ? (
