@@ -104,6 +104,7 @@ export default function FichaInterconsulta() {
         SubirDoc: false,
         nomenclatura: "",
         orden: "",
+        fechaReevaluacion: "",
     }
 
     const { form, setForm, handleChangeSimple, handleChange, handleClear, handleClearnotO, handleChangeNumber, handleRadioButtonBoolean, handleRadioButton, handlePrintDefault } = useForm(Initialform, { storageKey: "ficha_interconsultas_form" })
@@ -498,6 +499,48 @@ export default function FichaInterconsulta() {
                                 name="tratamiento"
                                 classNameArea="bg-[#99FFFF]"
                             />
+
+                            {/* Fecha Reevaluación */}
+                            <div className="flex flex-col gap-2 mt-4 p-3 border rounded-lg">
+                                <label className="text-blue-600 font-semibold text-sm">Fecha Reevaluación</label>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <InputTextOneLine
+                                        type="date"
+                                        name="fechaReevaluacion"
+                                        value={form.fechaReevaluacion}
+                                        onChange={handleChangeSimple}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const d = new Date(form.fechaExamen + "T00:00:00");
+                                            d.setMonth(d.getMonth() + 1);
+                                            setForm(prev => ({ ...prev, fechaReevaluacion: d.toISOString().split('T')[0] }));
+                                        }}
+                                        className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded"
+                                    >
+                                        + 1 mes
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const d = new Date(form.fechaExamen + "T00:00:00");
+                                            d.setMonth(d.getMonth() + 3);
+                                            setForm(prev => ({ ...prev, fechaReevaluacion: d.toISOString().split('T')[0] }));
+                                        }}
+                                        className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded"
+                                    >
+                                        + 3 meses
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setForm(prev => ({ ...prev, fechaReevaluacion: "" }))}
+                                        className="bg-gray-400 hover:bg-gray-500 text-white text-xs px-3 py-1 rounded"
+                                    >
+                                        Limpiar
+                                    </button>
+                                </div>
+                            </div>
 
                             <div className="flex  p-3 mt-4 text-lg items-center font-bold rounded-lg justify-between">
                                 <div className="flex justify-between gap-1 p-2 border">
