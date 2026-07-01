@@ -252,7 +252,15 @@ export default function RayosXToraxPA() {
             value={form.osteomuscular ?? ""}
             onChange={handleChange}
             labelWidth="150px"
-          /> 
+          />
+
+          <InputTextOneLine
+            label="Conclusiones Radiográficas"
+            name="conclusiones"
+            value={form.conclusiones ?? ""}
+            onChange={handleChange}
+            labelWidth="150px"
+          />
 
           <div className="bg-green-200 p-3 rounded-xl col-span-3">
             <CIE10List
@@ -263,14 +271,6 @@ export default function RayosXToraxPA() {
               setForm={setForm}
             />
           </div>
-
-          <InputTextOneLine
-            label="Conclusiones Radiográficas"
-            name="conclusiones"
-            value={form.conclusiones ?? ""}
-            onChange={handleChange}
-            labelWidth="150px"
-          />
 
           <div className="md:col-span-2 flex gap-x-4">
             <InputTextArea

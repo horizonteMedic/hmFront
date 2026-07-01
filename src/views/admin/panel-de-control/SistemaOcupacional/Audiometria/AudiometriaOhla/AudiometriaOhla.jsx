@@ -761,19 +761,35 @@ export default function AudiometriaOhla({
               <input
                 name="norden"
                 value={form.norden}
-                onKeyUp={(e) => {
+                onKeyUp={async (e) => {
                   if (e.key === "Enter") {
+                    if (!form.norden) {
+                      await Swal.fire(
+                        "Error",
+                        "Debe Introducir un Nro de Historia Clinica válido",
+                        "error"
+                      );
+                      return;
+                    }
                     handleClearnotO();
-                    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
-
                     handleClearnotOFicha(); //enviar
-                    VerifyTRFicha(
+
+                    // Se ejecutan en secuencia (no en paralelo) porque ambas
+                    // comparten el mismo modal de SweetAlert2: si corren al
+                    // mismo tiempo, una puede cerrar el mensaje de la otra
+                    // antes de que el usuario alcance a leerlo.
+                    // Además, OHLA y Ficha están conectadas: si el paciente ya
+                    // tiene Audiometría (Normal), se bloquean ambas con una
+                    // sola alerta (se reutiliza el resultado de VerifyTR).
+                    const resultado = await VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+                    await VerifyTRFicha(
                       form.norden,
                       tablaFicha, //enviar
                       token,
                       setFormFicha, //enviar
                       selectedSede,
-                      setSearchNombreMedico //enviar
+                      setSearchNombreMedico, //enviar
+                      resultado
                     );
                   }
                 }}
