@@ -2,6 +2,7 @@ import Swal from "sweetalert2";
 import { getFetch } from "../../../getFetch/getFetch";
 import { SubmitData } from "../model";
 import jsPDF from "jspdf";
+import { existeRegistro } from "../../../../../utils/functionUtils";
 
 //===============Zona Modificación===============
 const obtenerReporteUrl =
@@ -16,8 +17,26 @@ const registrarUrlFicha =
 const obtenerReporteUrlJasper =
   "/api/v01/ct/audiometria/obtenerReporteAudiometriaM";
 
+const TABLA_AUDIOMETRIA_OHLA = "audiometria_po";
+const TABLA_AUDIOMETRIA_NORMAL = "audiometria_2023";
+const MENSAJE_BLOQUEO_AUDIOMETRIA_NORMAL =
+  "No se puede registrar porque este paciente ya cuenta con registros de Audiometría (Normal).";
+
+// Audiometría OHLA y Ficha Audiológica son parte del mismo examen: si el
+// paciente ya tiene un registro de Audiometría "Normal" (tabla legada
+// audiometria_2023) y todavía no tiene su propio registro OHLA, se bloquean
+// ambas (ni se cargan datos ni se permite guardar) hasta que exista el
+// registro OHLA propio (caso legado en el que sí conviven ambas).
+const verificarBloqueoAudiometriaNormal = async (nro, token) => {
+  const [existeOhla, existeNormal] = await Promise.all([
+    existeRegistro(nro, TABLA_AUDIOMETRIA_OHLA, token),
+    existeRegistro(nro, TABLA_AUDIOMETRIA_NORMAL, token),
+  ]);
+  return { bloqueado: !existeOhla && existeNormal, existeOhla, existeNormal };
+};
+
 export const GetInfoServicio = (nro, tabla, set, token) => {
-  getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
+  return getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
     .then((res) => {
       if (res.norden) {
         console.log(res);
@@ -66,7 +85,7 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
           // user_doctorExtra: res.doctorExtra,
         }));
       } else {
-        Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
+        return Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
       }
     })
     .finally(() => {
@@ -77,6 +96,11 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
 export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
+    return;
+  }
+  const { bloqueado } = await verificarBloqueoAudiometriaNormal(form.norden, token);
+  if (bloqueado) {
+    await Swal.fire("Error", MENSAJE_BLOQUEO_AUDIOMETRIA_NORMAL, "error");
     return;
   }
   Loading("Registrando Datos");
@@ -197,30 +221,68 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
       "Debe Introducir un Nro de Historia Clinica válido",
       "error"
     );
-    return;
+    return { bloqueado: false };
   }
   Loading("Validando datos");
-  getFetch(
-    `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
-    token
-  ).then((res) => {
-    console.log(res);
-    if (res.id === 0) {
-      //No tiene registro previo
-      GetInfoPac(nro, set, token, sede);
-    } else {
-      GetInfoServicio(nro, tabla, set, token);
-    }
-  });
+
+  let existeOhla, existeNormal, bloqueado;
+  try {
+    ({ existeOhla, existeNormal, bloqueado } = await verificarBloqueoAudiometriaNormal(
+      nro,
+      token
+    ));
+  } catch (error) {
+    Swal.close();
+    await Swal.fire("Error", "Ocurrió un error al validar el Nro de Orden.", "error");
+    return { bloqueado: false };
+  }
+  Swal.close();
+
+  if (bloqueado) {
+    await Swal.fire("Error", MENSAJE_BLOQUEO_AUDIOMETRIA_NORMAL, "error");
+    console.log("Bloqueado: Normal existe, OHLA aún no. No se cargan datos.");
+    return { bloqueado: true };
+  }
+
+  if (existeOhla) {
+    await GetInfoServicio(nro, tabla, set, token);
+    await Swal.fire(
+      "Alerta",
+      "Este paciente ya cuenta con registros de Audiometría.",
+      "warning"
+    );
+    console.log(existeNormal ? "Caso legado: ambas existen" : "Solo OHLA existe");
+    return { bloqueado: false };
+  }
+
+  try {
+    await GetInfoPac(nro, set, token, sede);
+    console.log("Ninguna existe, registro nuevo");
+  } catch (error) {
+    console.error("Error al obtener info del paciente:", error);
+    await Swal.fire(
+      "Error",
+      "No se encontró información para el Nro de Orden ingresado.",
+      "error"
+    );
+  }
+  return { bloqueado: false };
 };
 
 export const GetInfoPac = (nro, set, token, sede) => {
-  getFetch(
+  return getFetch(
     `/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`,
     token
   )
     .then((res) => {
       console.log("pros", res);
+      if (!res || res.error || !res.nombresApellidos) {
+        return Swal.fire(
+          "Error",
+          "No se encontró información para el Nro de Orden ingresado.",
+          "error"
+        );
+      }
       set((prev) => ({
         ...prev,
         ...res,
@@ -228,6 +290,14 @@ export const GetInfoPac = (nro, set, token, sede) => {
         genero: res.genero == "M" ? "Masculino" : "Femenino",
         nombres: res.nombresApellidos,
       }));
+    })
+    .catch((error) => {
+      console.error("Error en GetInfoPac:", error);
+      return Swal.fire(
+        "Error",
+        "Ocurrió un error al obtener los datos del paciente.",
+        "error"
+      );
     })
     .finally(() => {
       Swal.close();
@@ -269,7 +339,9 @@ export const VerifyTRFicha = async (
   token,
   set,
   sede,
-  setSearchNombreMedico
+  setSearchNombreMedico,
+  precomputado // resultado opcional de VerifyTR({bloqueado}); evita repetir la
+  // verificación y la alerta cuando ambas se llaman juntas desde la pestaña OHLA
 ) => {
   if (!nro) {
     await Swal.fire(
@@ -279,19 +351,56 @@ export const VerifyTRFicha = async (
     );
     return;
   }
+
+  if (precomputado) {
+    if (precomputado.bloqueado) {
+      // La alerta ya se mostró en VerifyTR (misma validación, un solo mensaje).
+      console.log(
+        "Bloqueado (Ficha, verificación compartida con OHLA): no se cargan datos."
+      );
+      return;
+    }
+  } else {
+    Loading("Validando datos");
+    let bloqueado;
+    try {
+      ({ bloqueado } = await verificarBloqueoAudiometriaNormal(nro, token));
+    } catch (error) {
+      Swal.close();
+      await Swal.fire("Error", "Ocurrió un error al validar el Nro de Orden.", "error");
+      return;
+    }
+    Swal.close();
+
+    if (bloqueado) {
+      await Swal.fire("Error", MENSAJE_BLOQUEO_AUDIOMETRIA_NORMAL, "error");
+      console.log("Bloqueado (Ficha): Normal existe, OHLA aún no. No se cargan datos.");
+      return;
+    }
+  }
+
   Loading("Validando datos");
-  getFetch(
-    `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
-    token
-  ).then((res) => {
+  try {
+    const res = await getFetch(
+      `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
+      token
+    );
     console.log(res);
     if (res.id === 0) {
       //No tiene registro previo
-      GetInfoPac(nro, set, token, sede);
+      await GetInfoPac(nro, set, token, sede);
     } else {
-      GetInfoServicioFicha(nro, tabla, set, token, setSearchNombreMedico);
+      await GetInfoServicioFicha(nro, tabla, set, token, setSearchNombreMedico);
     }
-  });
+  } catch (error) {
+    console.error("Error en VerifyTRFicha:", error);
+    Swal.close();
+    await Swal.fire(
+      "Error",
+      "Ocurrió un error al validar el Nro de Orden (Ficha Audiológica).",
+      "error"
+    );
+  }
 };
 
 export const GetInfoServicioFicha = (
@@ -301,7 +410,7 @@ export const GetInfoServicioFicha = (
   token,
   setSearchNombreMedico
 ) => {
-  getFetch(`${obtenerReporteFicha}?nOrden=${nro}&nameService=${tabla}`, token)
+  return getFetch(`${obtenerReporteFicha}?nOrden=${nro}&nameService=${tabla}`, token)
     .then((res) => {
       if (res.norden) {
         console.log(res);
@@ -383,7 +492,7 @@ export const GetInfoServicioFicha = (
         }));
         // setSearchNombreMedico(res.txtMedico);
       } else {
-        Swal.fire(
+        return Swal.fire(
           "Error",
           "Ocurrio un error al traer los datos de ficha audiometría",
           "error"
@@ -406,6 +515,11 @@ export const SubmitDataServiceFicha = async (
 ) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
+    return;
+  }
+  const { bloqueado } = await verificarBloqueoAudiometriaNormal(form.norden, token);
+  if (bloqueado) {
+    await Swal.fire("Error", MENSAJE_BLOQUEO_AUDIOMETRIA_NORMAL, "error");
     return;
   }
   Loading("Registrando Datos");

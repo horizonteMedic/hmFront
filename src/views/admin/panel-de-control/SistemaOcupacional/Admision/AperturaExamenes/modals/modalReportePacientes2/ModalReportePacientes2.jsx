@@ -9,6 +9,7 @@ import { getFetch, SubmitData } from "../../../../../../../utils/apiHelpers";
 import { LoadingDefault } from "../../../../../../../utils/functionUtils";
 
 const urlSubmit = "/api/v01/ct/clientes/completo"
+const GetExamenesComplementarios = '/api/v01/ct/campana/obtenerEstados'
 
 const ReportePacientes2 = ({ onClose, sede, token }) => {
     const today = getToday();
@@ -29,11 +30,6 @@ const ReportePacientes2 = ({ onClose, sede, token }) => {
 
     const GetReporte = () => {
         LoadingDefault("Generando Reporte");
-        const data = {
-            "fechaInicio": form.fechaInicio,
-            "fechaFinal": form.fechaFin,
-            "sede": sede
-        }
         getFetch(urlSubmit + `?fechaInicio=${form.fechaInicio}&fechaFin=${form.fechaFin}&empresa=${form.empresa}&sede=${sede}`, token)
             .then((res) => {
                 console.log(res)
@@ -51,56 +47,61 @@ const ReportePacientes2 = ({ onClose, sede, token }) => {
             return;
         }
 
-        // Obtener keys de examenes dinámicamente del primer registro
         const examenKeys = Object.keys(data[0]?.examenes || {});
         const examenLabels = {
-            triaje: "TRIAJE",
-            audiometria: "AUDIOMETRÍA",
-            rayos_x: "RAYOS X",
-            espirometria: "ESPIROMETRÍA",
-            oftalmologia: "OFTALMOLOGÍA",
-            laboratorio: "LABORATORIO",
-            conduccion: "CONDUCCIÓN",
-            altura: "ALTURA",
-            psicologia: "PSICOLOGÍA",
-            odontologia: "ODONTOLOGÍA",
-            ekg: "EKG",
+            triaje: "TRIAJE", audiometria: "AUDIOMETRÍA", rayos_x: "RAYOS X",
+            espirometria: "ESPIROMETRÍA", oftalmologia: "OFTALMOLOGÍA", laboratorio: "LABORATORIO",
+            conduccion: "CONDUCCIÓN", altura: "ALTURA", psicologia: "PSICOLOGÍA",
+            odontologia: "ODONTOLOGÍA", ekg: "EKG",
         };
 
-        const workbook = new ExcelJS.Workbook();
-        const sheet = workbook.addWorksheet("REPORTE EXÁMENES");
-
-        // ── Headers base (fijos) ──────────────────────────────────────
-        const headersFijos = [
-            { key: "norden", label: "N° ORDEN", width: 14, destacado: false },
-            { key: "dni", label: "DNI", width: 14, destacado: false },
-            { key: "apellidos", label: "APELLIDOS", width: 28, destacado: false },
-            { key: "nombres", label: "NOMBRES", width: 24, destacado: false },
-            { key: "edad", label: "EDAD", width: 24, destacado: false },
-            { key: "empresa", label: "EMPRESA", width: 30, destacado: false },
-            { key: "protocolo", label: "PERFIL", width: 24, destacado: false },
-            { key: "fechaApertura", label: "FECHA", width: 30, destacado: false },
-        ];
-
-        // Headers dinámicos de exámenes (todos destacados)
-        const headersExamenes = examenKeys.map(key => ({
-            key,
-            label: examenLabels[key] || key.toUpperCase().replace(/_/g, " "),
-            width: 14,
-            destacado: true,
-            esExamen: true
-        }));
-
-        const headers = [...headersFijos, ...headersExamenes];
-        const totalCols = headers.length;
         const colLetter = (n) => {
             let s = "";
             while (n > 0) { s = String.fromCharCode(((n - 1) % 26) + 65) + s; n = Math.floor((n - 1) / 26); }
             return s;
         };
-        const lastCol = colLetter(totalCols);
 
-        // ── Título ────────────────────────────────────────────────────
+        const workbook = new ExcelJS.Workbook();
+        const sheet = workbook.addWorksheet("REPORTE EXÁMENES");
+
+        const headersFijos = [
+            { key: "norden", label: "N° ORDEN", width: 14, seccion: "general" },
+            { key: "dni", label: "DNI", width: 14, seccion: "general" },
+            { key: "apellidos", label: "APELLIDOS", width: 28, seccion: "general" },
+            { key: "nombres", label: "NOMBRES", width: 24, seccion: "general" },
+            { key: "edad", label: "EDAD", width: 8, seccion: "general" },
+            { key: "empresa", label: "EMPRESA", width: 30, seccion: "general" },
+            { key: "protocolo", label: "PERFIL", width: 24, seccion: "general" },
+            { key: "fechaApertura", label: "FECHA", width: 14, seccion: "general" },
+        ];
+
+        const headersExamenes = examenKeys.map(key => ({
+            key,
+            label: examenLabels[key] || key.toUpperCase().replace(/_/g, " "),
+            width: 14,
+            seccion: "examen",
+        }));
+
+        // ── 4 columnas de complementos pre-registro ───────────────────
+        const preRegistroMap = [
+            { key: "comp_toma_muestras", backendKey: "TOMA_MUESTRAS", label: "TOMA DE MUESTRAS", width: 16 },
+            { key: "comp_examen_medico", backendKey: "EXAMEN_MEDICO", label: "EXAMEN MÉDICO", width: 16 },
+            { key: "comp_radiografia", backendKey: "comp_radiografia", label: "RADIOGRAFÍA", width: 14 },
+            { key: "comp_ekg", backendKey: "comp_ekg", label: "EKG", width: 10 },
+        ];
+        const headersComplemento = preRegistroMap.map(({ key, label, width }) => ({
+            key, label, width, seccion: "complemento",
+        }));
+
+        const headers = [...headersFijos, ...headersExamenes, ...headersComplemento];
+        const totalCols = headers.length;
+        const lastCol = colLetter(totalCols);
+        const examenStart = headersFijos.length + 1;
+        const compStart = headersFijos.length + headersExamenes.length + 1;
+        const examenEndL = colLetter(compStart - 1);
+        const compStartL = colLetter(compStart);
+
+        // ── Fila 1: Título ────────────────────────────────────────────
         sheet.mergeCells(`A1:${lastCol}1`);
         const titleCell = sheet.getCell("A1");
         titleCell.value = `REPORTE DE EXÁMENES | ${fechaInicio} al ${fechaFin}`;
@@ -109,23 +110,38 @@ const ReportePacientes2 = ({ onClose, sede, token }) => {
         titleCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1F4E79" } };
         sheet.getRow(1).height = 25;
 
-        // ── Fila de headers ───────────────────────────────────────────
+        // ── Fila 2: Secciones ─────────────────────────────────────────
+        const applySeccionCell = (cellRef, label, color) => {
+            const cell = sheet.getCell(cellRef);
+            cell.value = label;
+            cell.font = { bold: true, size: 9, color: { argb: "FFFFFFFF" } };
+            cell.alignment = { horizontal: "center", vertical: "middle" };
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: color } };
+        };
+
+        sheet.mergeCells(`A2:${colLetter(examenStart - 1)}2`);
+        applySeccionCell("A2", "DATOS GENERALES", "FF2E75B6");
+
+        sheet.mergeCells(`${colLetter(examenStart)}2:${examenEndL}2`);
+        applySeccionCell(`${colLetter(examenStart)}2`, "EXÁMENES REQUERIDOS", "FF1D6B5E");
+
+        sheet.mergeCells(`${compStartL}2:${lastCol}2`);
+        applySeccionCell(`${compStartL}2`, "COMPLEMENTOS PRE-REGISTRO", "FF6B4C9A");
+        sheet.getRow(2).height = 18;
+
+        // ── Fila 3: Headers de columnas ───────────────────────────────
         const headerRow = sheet.addRow(headers.map(h => h.label));
         headerRow.height = 22;
 
+        const colorHeader = { general: "FF2E75B6", examen: "FF1D6B5E", complemento: "FF9B72CF" };
         headerRow.eachCell((cell, colNumber) => {
             const h = headers[colNumber - 1];
             cell.font = { bold: true, size: 9, color: { argb: "FFFFFFFF" } };
             cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
-            cell.fill = {
-                type: "pattern", pattern: "solid",
-                fgColor: { argb: h?.esExamen ? "FF1D6B5E" : "FF2E75B6" }
-            };
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: colorHeader[h?.seccion] ?? "FF2E75B6" } };
             cell.border = {
-                top: { style: "thin", color: { argb: "FFFFFFFF" } },
-                bottom: { style: "thin", color: { argb: "FFFFFFFF" } },
-                left: { style: "thin", color: { argb: "FFFFFFFF" } },
-                right: { style: "thin", color: { argb: "FFFFFFFF" } },
+                top: { style: "thin", color: { argb: "FFFFFFFF" } }, bottom: { style: "thin", color: { argb: "FFFFFFFF" } },
+                left: { style: "thin", color: { argb: "FFFFFFFF" } }, right: { style: "thin", color: { argb: "FFFFFFFF" } },
             };
         });
 
@@ -133,9 +149,16 @@ const ReportePacientes2 = ({ onClose, sede, token }) => {
 
         // ── Filas de datos ────────────────────────────────────────────
         data.forEach((item, rowIdx) => {
-            const valoresFijos = headersFijos.map(h => item[h.key] ?? "");
-            const valoresExamenes = examenKeys.map(key => item.examenes?.[key] ?? "");
-            const values = [...valoresFijos, ...valoresExamenes];
+            const preReg = item.examenesPreRegistro ?? {};
+
+            const values = headers.map(h => {
+                if (h.seccion === "examen") return item.examenes?.[h.key] ?? "";
+                if (h.seccion === "complemento") {
+                    const bk = preRegistroMap.find(p => p.key === h.key)?.backendKey;
+                    return preReg[bk] === "PASÓ" ? "SÍ" : "NO";
+                }
+                return item[h.key] ?? "";
+            });
 
             const dataRow = sheet.addRow(values);
             dataRow.height = 18;
@@ -143,32 +166,38 @@ const ReportePacientes2 = ({ onClose, sede, token }) => {
 
             dataRow.eachCell((cell, colNumber) => {
                 const h = headers[colNumber - 1];
-                const esExamen = h?.esExamen;
-                const valorCell = cell.value;
-
-                // Color especial para SI/NO en exámenes
+                const val = cell.value;
                 let fillColor;
-                if (esExamen) {
-                    if (valorCell === "SI") fillColor = esPar ? "FFB7E1CD" : "FFD4EDDA"; // verde
-                    else if (valorCell === "NO") fillColor = esPar ? "FFF5C6CB" : "FFF8D7DA"; // rojo
-                    else fillColor = esPar ? "FFEEEEEE" : "FFFFFFFF"; // neutro
+
+                if (h?.seccion === "examen") {
+                    if (val === "SI") fillColor = esPar ? "FFB7E1CD" : "FFD4EDDA";
+                    else if (val === "NO") fillColor = esPar ? "FFF5C6CB" : "FFF8D7DA";
+                    else fillColor = esPar ? "FFEEEEEE" : "FFFFFFFF";
+                } else if (h?.seccion === "complemento") {
+                    fillColor = val === "SÍ"
+                        ? (esPar ? "FFD8F3DC" : "FFB7E4C7")
+                        : (esPar ? "FFFFD6CC" : "FFFFB4A2");
                 } else {
                     fillColor = esPar ? "FFF2F2F2" : "FFFFFFFF";
                 }
 
                 cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
-                cell.font = { size: 9, bold: esExamen };
+                cell.font = {
+                    size: 9,
+                    bold: h?.seccion !== "general",
+                    color: {
+                        argb: h?.seccion === "complemento"
+                            ? (val === "SÍ" ? "FF2D6A4F" : "FF9B2226")
+                            : "FF000000"
+                    }
+                };
                 cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: fillColor } };
                 cell.border = {
-                    top: { style: "hair", color: { argb: "FFCCCCCC" } },
-                    bottom: { style: "hair", color: { argb: "FFCCCCCC" } },
-                    left: { style: "hair", color: { argb: "FFCCCCCC" } },
-                    right: { style: "hair", color: { argb: "FFCCCCCC" } },
+                    top: { style: "hair", color: { argb: "FFCCCCCC" } }, bottom: { style: "hair", color: { argb: "FFCCCCCC" } },
+                    left: { style: "hair", color: { argb: "FFCCCCCC" } }, right: { style: "hair", color: { argb: "FFCCCCCC" } },
                 };
             });
         });
-
-        // ── Fila total ────────────────────────────────────────────────
 
         // ── Exportar ──────────────────────────────────────────────────
         const buffer = await workbook.xlsx.writeBuffer();

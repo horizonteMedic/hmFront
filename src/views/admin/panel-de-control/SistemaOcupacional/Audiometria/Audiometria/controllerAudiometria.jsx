@@ -1,5 +1,6 @@
 import Swal from "sweetalert2";
 import {
+  existeRegistro,
   GetInfoPacDefault,
   GetInfoServicioDefault,
   LoadingDefault,
@@ -14,6 +15,20 @@ const obtenerReporteUrl =
   "/api/v01/ct/manipuladores/obtenerReporteAudiometria";
 const registrarUrl =
   "/api/v01/ct/manipuladores/registrarActualizarManipuladoresAudiometria";
+
+const MENSAJE_BLOQUEO_AUDIOMETRIA_OHLA =
+  "No se puede registrar porque este paciente ya cuenta con registros de Audiometría (OHLA).";
+
+// Igual que en Audiometría OHLA: si el paciente ya tiene un registro OHLA
+// (tabla audiometria_po) y todavía no tiene su propio registro de
+// Audiometría Normal (tabla), se bloquea tanto la carga como el guardado.
+const verificarBloqueoAudiometriaOhla = async (nro, tabla, token) => {
+  const [existePropia, existeOhla] = await Promise.all([
+    existeRegistro(nro, tabla, token),
+    existeRegistro(nro, "audiometria_po", token),
+  ]);
+  return { bloqueado: !existePropia && existeOhla, existePropia, existeOhla };
+};
 
 // ================= GET INFO SERVICIO =================
 export const GetInfoServicio = async (
@@ -189,6 +204,12 @@ export const SubmitDataService = async (
     return;
   }
 
+  const { bloqueado } = await verificarBloqueoAudiometriaOhla(form.norden, tabla, token);
+  if (bloqueado) {
+    await Swal.fire("Error", MENSAJE_BLOQUEO_AUDIOMETRIA_OHLA, "error");
+    return;
+  }
+
   const body = {
     codAu: form.codAu,
     norden: form.norden,
@@ -351,45 +372,77 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
 
 // ================= VERIFY =================
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
-  VerifyTRDefault(
-    nro,
-    tabla,
-    token,
-    set,
-    sede,
-    () => {
-      GetInfoPac(nro, set, token, sede);
-    },
-    () => {
-      GetInfoServicio(nro, tabla, set, token, () => {
-        Swal.fire(
-          "Alerta",
-          "Este paciente ya cuenta con registros de Audiometría.",
-          "warning"
-        );
-      });
-    }
-  );
+  if (!nro) {
+    await Swal.fire(
+      "Error",
+      "Debe Introducir un Nro de Historia Clinica válido",
+      "error"
+    );
+    return;
+  }
+  Loading("Validando datos");
+
+  let existePropia, existeOhla, bloqueado;
+  try {
+    ({ existePropia, existeOhla, bloqueado } = await verificarBloqueoAudiometriaOhla(
+      nro,
+      tabla,
+      token
+    ));
+  } catch (error) {
+    Swal.close();
+    await Swal.fire("Error", "Ocurrió un error al validar el Nro de Orden.", "error");
+    return;
+  }
+  Swal.close();
+
+  if (bloqueado) {
+    await Swal.fire("Error", MENSAJE_BLOQUEO_AUDIOMETRIA_OHLA, "error");
+    console.log("Bloqueado: OHLA existe, audiometria aún no. No se cargan datos.");
+    return; // no se llama a GetInfoPac
+  }
+
+  if (existePropia) {
+    GetInfoServicio(nro, tabla, set, token, () => {
+      Swal.fire(
+        "Alerta",
+        "Este paciente ya cuenta con registros de Audiometría.",
+        "warning"
+      );
+      console.log(existeOhla ? "Caso legado: ambas existen" : "Solo Normal existe");
+    });
+    return;
+  }
+
+  await GetInfoPac(nro, set, token, sede);
+  console.log("Ninguna existe, registro nuevo");
 };
 
 // ================= GET INFO PAC =================
 const GetInfoPac = async (nro, set, token, sede) => {
   const res = await GetInfoPacDefault(nro, token, sede);
 
-  if (res) {
-    set((prev) => ({
-      ...prev,
-      ...res,
-      nombres: res.nombresApellidos ?? "",
-      fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
-      edad: res.edad,
-      ocupacion: res.areaO ?? "",
-      nombreExamen: res.nomExam ?? "",
-      cargoDesempenar: res.cargo ?? "",
-      lugarNacimiento: res.lugarNacimiento ?? "",
-      sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
-    }));
+  if (!res || res.error || !res.nombresApellidos) {
+    await Swal.fire(
+      "Error",
+      "No se encontró información para el Nro de Orden ingresado.",
+      "error"
+    );
+    return;
   }
+
+  set((prev) => ({
+    ...prev,
+    ...res,
+    nombres: res.nombresApellidos ?? "",
+    fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+    edad: res.edad,
+    ocupacion: res.areaO ?? "",
+    nombreExamen: res.nomExam ?? "",
+    cargoDesempenar: res.cargo ?? "",
+    lugarNacimiento: res.lugarNacimiento ?? "",
+    sexo: res.genero === "M" ? "MASCULINO" : "FEMENINO",
+  }));
 };
 
 // ================= LOADING =================

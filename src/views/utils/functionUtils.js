@@ -359,6 +359,20 @@ export const VerifyTRPerzonalizadoDefault = async (nro, tabla, token, set, sede,
 
 };
 
+export const existeRegistro = async (nro, tabla, token) => {
+    try {
+        const res = await getFetch(
+            `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
+            token
+        );
+        return res?.id !== 0;
+    } catch (error) {
+        console.error(`Error al verificar examen ${tabla}:`, error);
+        return false; // si falla la verificación, no bloqueamos por defecto
+    }
+};
+
+
 export const GetInfoServicioDefault = async (
     nro,
     tabla,
