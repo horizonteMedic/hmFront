@@ -1,18 +1,17 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine"
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset"
 import DatosPersonalesLaborales from "../../../../components/templates/DatosPersonalesLaborales"
 import { useForm } from "../../../../hooks/useForm";
+import { useSessionData } from "../../../../hooks/useSessionData";
+import { GetInfoPac, RegistrarEstadoExamen } from "./controllerRegistrosComplementarios";
 
 const EXAMENES = [
-    { label: "Toma de Muestras",  key: "toma_muestras",  icon: "🧪" },
-    { label: "Examen Médico",     key: "examen_medico",  icon: "🩺" },
-    { label: "Radiografía",       key: "radiografia",    icon: "🦴" },
-    { label: "EKG",               key: "ekg",            icon: "❤️" },
+    { label: "Toma de Muestras", key: "toma_muestras", icon: "🧪" },
+    { label: "Examen Médico", key: "examen_medico", icon: "🩺" },
+    { label: "Radiografía", key: "radiografia", icon: "🦴" },
+    { label: "EKG", key: "ekg", icon: "❤️" },
 ];
-
-const BASE_URL = "http://localhost:8080/api/v01/ct/campana";
-const USUARIO = "developer";
 
 const ExamenCard = ({ examen, norden, estado, onToggle, loading }) => {
     const existe = estado === true;
@@ -95,61 +94,35 @@ const RegistrosComplementarios = () => {
         cargoDesempenar: "",
     };
 
-    const { form, setForm, handleChangeNumber, handleClear } = useForm(initialFormState);
+    const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+    const { form, setForm, handleChangeNumber, handleClear, handleClearnotO } = useForm(initialFormState);
 
     // estados[key] = true | false | null (null = no consultado aún)
     const [estados, setEstados] = useState({});
     const [loadingKey, setLoadingKey] = useState(null);
     const [fetchingEstados, setFetchingEstados] = useState(false);
 
-    const fetchEstados = useCallback(async (norden) => {
-        if (!norden) return;
-        setFetchingEstados(true);
-        try {
-            const res = await fetch(`${BASE_URL}/obtenerEstados?nOrden=${norden}`);
-            if (!res.ok) throw new Error("Error al obtener estados");
-            const data = await res.json();
-            // Se espera un objeto/array con los estados; adaptar según respuesta real
-            const mapa = {};
-            if (Array.isArray(data)) {
-                data.forEach((item) => {
-                    mapa[item.nombreExamen] = item.estado;
-                });
-            } else if (typeof data === "object") {
-                Object.keys(data).forEach((k) => {
-                    mapa[k] = data[k];
-                });
-            }
-            setEstados(mapa);
-        } catch {
+    const handleSearch = (e) => {
+        if (e.key === "Enter") {
+            handleClearnotO();
             setEstados({});
-        } finally {
-            setFetchingEstados(false);
-        }
-    }, []);
-
-    // Buscar al presionar Enter en N° Orden
-    const handleSearchOrden = (e) => {
-        if (e.key === "Enter" && form.norden) {
-            fetchEstados(form.norden);
+            GetInfoPac(form.norden, setForm, token, selectedSede, setEstados);
         }
     };
 
     const handleToggle = async (nombreExamen, nuevoEstado) => {
         setLoadingKey(nombreExamen);
         try {
-            const res = await fetch(`${BASE_URL}/registrarEstadoExamen`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    norden: Number(form.norden),
-                    nombreExamen,
-                    estado: nuevoEstado,
-                    usuarioRegistro: USUARIO,
-                }),
-            });
-            if (!res.ok) throw new Error("Error al registrar");
-            setEstados((prev) => ({ ...prev, [nombreExamen]: nuevoEstado }));
+            const res = await RegistrarEstadoExamen(
+                form.norden,
+                nombreExamen,
+                nuevoEstado,
+                userlogued,
+                token
+            );
+            if (res && !res.error) {
+                setEstados((prev) => ({ ...prev, [nombreExamen]: nuevoEstado }));
+            }
         } catch (err) {
             console.error(err);
         } finally {
@@ -164,7 +137,7 @@ const RegistrosComplementarios = () => {
                     label="N° Orden"
                     name="norden"
                     value={form.norden}
-                    onKeyUp={handleSearchOrden}
+                    onKeyUp={handleSearch}
                     onChange={handleChangeNumber}
                     labelWidth="120px"
                 />
