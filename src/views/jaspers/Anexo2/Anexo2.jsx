@@ -1753,8 +1753,8 @@ export default async function InformePsicologico_Anexo02_Nuevo(data = {}, docExi
   // Contenido de Reflejos Pupilares
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Reflejos Pupilares:", tablaInicioX + 2, yPos + 3.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text((datosFinales.reflejosPupilares || "").toString().toUpperCase(), tablaInicioX + 35, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(5.5);
+  doc.text((datosFinales.reflejosPupilares || "").toString().toUpperCase(), tablaInicioX + 28, yPos + 3.5);
 
   // Contenido de Visión de Colores
   doc.setFont("helvetica", "bold").setFontSize(8);
