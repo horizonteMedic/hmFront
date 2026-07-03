@@ -249,6 +249,8 @@ export default function Anexo16() {
     anamnesis: "COLABORADOR REFIERE SENTIRSE BIEN, SIN PROBLEMAS DE SALUD, NO practica deporte o deporte de alto rendimiento.",
     //Clasificación y Neumoconiosis
     clasificacion: "0/0",
+    clasificacionABC: "",
+    clasificacionST: "St",
     reaccionesSerologicas: "NEGATIVO",
     sinNeumoconiosis: "NORMAL",
     imagenRadiograficaPolvo: "SOSPECHA",
@@ -336,7 +338,21 @@ export default function Anexo16() {
     // otrosExamenes2: "",
 
     SubirDoc: false,
-    nomenclatura: "RESMAG"
+    nomenclatura: "RESMAG",
+
+    //forma y tamaño - abdomen simbolos
+    chkP1: false,
+    chkP2: false,
+    chkP3: false,
+    chkP4: false,
+    chkP5: false,
+    chkP6: false,
+    chkS1: false,
+    chkS2: false,
+    chkS3: false,
+    chkS4: false,
+    chkS5: false,
+    chkS6: false,
   };
 
   const {

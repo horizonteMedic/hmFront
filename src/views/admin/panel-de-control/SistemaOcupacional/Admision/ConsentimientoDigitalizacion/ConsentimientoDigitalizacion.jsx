@@ -1,9 +1,10 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPrint, faEdit, faEraser, faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faPrint, faEdit, faEraser, faDownload, faLayerGroup, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useForm } from '../../../../../hooks/useForm';
 import { useSessionData } from '../../../../../hooks/useSessionData';
 import { getToday } from '../../../../../utils/helpers';
 import {
+  GenerarConsentimientosMasivo,
   handleSubirArchivo,
   handleSubirArchivoMasivo,
   PrintHojaR,
@@ -31,6 +32,10 @@ const ConsentimientoDigitalizacion = () => {
     nomenclatura: "DECLARACION USO FIRMA"
   };
   const [visualerOpen, setVisualerOpen] = useState(null)
+  const [masivoModalOpen, setMasivoModalOpen] = useState(false);
+  const [masivoNordenes, setMasivoNordenes] = useState('');
+  const [masivoFecha, setMasivoFecha] = useState(today);
+  const [masivoProcesando, setMasivoProcesando] = useState(false);
 
   const {
     form,
@@ -62,6 +67,21 @@ const ConsentimientoDigitalizacion = () => {
 
   const handlePrint = () => {
     PrintHojaR(form.norden, token, tabla);
+  };
+
+  const handleGenerarMasivoSave = async () => {
+    setMasivoProcesando(true);
+    const resultado = await GenerarConsentimientosMasivo(masivoNordenes, masivoFecha, userlogued, token);
+    setMasivoProcesando(false);
+
+    if (resultado) {
+      if (resultado.fallidos.length > 0) {
+        setMasivoNordenes(resultado.fallidos.map((f) => f.norden).join(', '));
+      } else {
+        setMasivoModalOpen(false);
+        setMasivoNordenes('');
+      }
+    }
   };
 
   return (
@@ -99,6 +119,15 @@ const ConsentimientoDigitalizacion = () => {
           {...form.SubirDoc ? { handleRead: () => { ReadArchivosForm(form, setVisualerOpen, token) } } : {}}
           handleMasivo={() => { handleSubirArchivoMasivo(form, selectedSede, userlogued, token) }}
         />
+
+        <button
+          type="button"
+          className="flex items-center gap-2 px-6 py-2 rounded-md font-semibold text-white bg-purple-600 hover:bg-purple-700 shadow transition-colors duration-200"
+          onClick={() => setMasivoModalOpen(true)}
+        >
+          <FontAwesomeIcon icon={faLayerGroup} />
+          Generar masivo
+        </button>
 
       </div>
 
@@ -178,6 +207,71 @@ const ConsentimientoDigitalizacion = () => {
               <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
                 <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
               </a>
+            </div>
+          </div>
+        </div>
+      )}
+      {masivoModalOpen && (
+        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[500px] max-h-[90%]">
+            <div className="px-4 py-2 naranjabackgroud flex justify-between items-center">
+              <h2 className="text-lg font-bold color-blanco">Generar masivo</h2>
+              <button
+                onClick={() => !masivoProcesando && setMasivoModalOpen(false)}
+                className="text-xl text-white"
+                style={{ fontSize: '23px' }}
+              >
+                <FontAwesomeIcon icon={faTimes} />
+              </button>
+            </div>
+            <div className="px-6 py-5 flex flex-col gap-4">
+              <label className="block">
+                <span className="block mb-1" style={{ color: '#000', fontWeight: 'bold' }}>
+                  Nro. Orden (separados por comas)
+                </span>
+                <textarea
+                  rows={4}
+                  value={masivoNordenes}
+                  onChange={(e) => setMasivoNordenes(e.target.value.replace(/[^0-9,\s]/g, ''))}
+                  onPaste={(e) => {
+                    e.preventDefault();
+                    const texto = e.clipboardData.getData('text').replace(/[^0-9,\s]/g, '');
+                    setMasivoNordenes((prev) => prev + texto);
+                  }}
+                  className="w-full border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
+                  placeholder="Ej: 12345, 12346, 12347"
+                  disabled={masivoProcesando}
+                />
+              </label>
+              <label className="block">
+                <span className="block mb-1" style={{ color: '#000', fontWeight: 'bold' }}>Fecha</span>
+                <input
+                  type="date"
+                  value={masivoFecha}
+                  onChange={(e) => setMasivoFecha(e.target.value)}
+                  className="w-full border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={masivoProcesando}
+                />
+              </label>
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  className="flex items-center gap-2 px-6 py-2 rounded-md font-semibold text-gray-800 bg-gray-200 hover:bg-gray-300 shadow border border-gray-400 transition-colors duration-200"
+                  onClick={() => setMasivoModalOpen(false)}
+                  disabled={masivoProcesando}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  className={`flex items-center gap-2 px-6 py-2 rounded-md font-semibold text-white shadow transition-colors duration-200 ${masivoProcesando || !masivoNordenes.trim() || !masivoFecha ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+                  onClick={handleGenerarMasivoSave}
+                  disabled={masivoProcesando || !masivoNordenes.trim() || !masivoFecha}
+                >
+                  <FontAwesomeIcon icon={faEdit} />
+                  {masivoProcesando ? 'Guardando...' : 'Guardar'}
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -324,7 +324,9 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     // Clasificación de Neumoconiosis
     clasificacionNeumoconiosis: {
       clasificaciones: {
-        "0/0": data.examenRadiografico0_ex_0 ?? false,
+        "0/-": data.examenRadiografico1_ex_1 ?? false,
+        "1/1": data.examenRadiografico11_ex_11 ?? false,
+        "0/1": data.examenRadiografico01_ex_01 ?? false,
         "1/0": data.examenRadiografico10_ex_10 ?? false,
         "1/1": data.examenRadiografico11_ex_11 ?? false,
         "1/2": data.examenRadiografico12_ex_12 ?? false,
@@ -531,7 +533,7 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     y,
     maxWidth,
     normalSize = 7,
-    smallSize = 4,
+    smallSize = 3.5,
     smallYOffset = -0.25,
   }) {
     // Label
@@ -3137,7 +3139,7 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     }
 
     // Estructura: 7 columnas principales (0/0 | 1/0 | 1/1+1/2 | 2/1+2/2+2/3 | 3/2+3/3+3/+ | A,B,C | St)
-    const numColumnasPrincipales = 7;
+    const numColumnasPrincipales = 6;
     const anchoColumnaPrincipal = tablaAncho / numColumnasPrincipales;
 
     // Línea horizontal superior
@@ -3160,9 +3162,8 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
 
     // Estructura de checkboxes: 0/0 | 1/0 | 1/1, 1/2 | 2/1, 2/2, 2/3 | 3/2, 3/3, 3/+ | A,B,C | St
     const estructuraCheckboxes = [
-      ["0/0"],
-      ["1/0"],
-      ["1/1", "1/2"],
+      ["0/-", "0/0","0/1"],
+      ["1/0", "1/1", "1/2"],
       ["2/1", "2/2", "2/3"],
       ["3/2", "3/3", "3/+"],
       ["A,B,C"],
@@ -3256,29 +3257,30 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     const xCero = tablaInicioX;
     doc.text("CERO", xCero + (anchoColumnaPrincipal / 2), yPos + 3.5, { align: "center" });
 
-    // Columna 2: 1/0
+    // Columna 2: UNO
     const xCol2 = xCero + anchoColumnaPrincipal;
-    doc.text("1/0", xCol2 + (anchoColumnaPrincipal / 2), yPos + 3.5, { align: "center" });
+    // doc.text("1/0", xCol2 + (anchoColumnaPrincipal / 2), yPos + 3.5, { align: "center" });
+    doc.text("UNO", xCol2 + (anchoColumnaPrincipal / 2), yPos + 3.5, { align: "center" });
 
-    // Columna 3: UNO
+    // Columna 3: DOS
     const xUno = xCol2 + anchoColumnaPrincipal;
-    doc.text("UNO", xUno + (anchoColumnaPrincipal / 2), yPos + 3.5, { align: "center" });
+    doc.text("DOS", xUno + (anchoColumnaPrincipal / 2), yPos + 3.5, { align: "center" });
 
-    // Columna 4: DOS
+    // Columna 4: TRES
     const xDos = xUno + anchoColumnaPrincipal;
-    doc.text("DOS", xDos + (anchoColumnaPrincipal / 2), yPos + 3.5, { align: "center" });
+    doc.text("TRES", xDos + (anchoColumnaPrincipal / 2), yPos + 3.5, { align: "center" });
 
-    // Columna 5: TRES
+    // Columna 5: CUATRO
     const xTres = xDos + anchoColumnaPrincipal;
-    doc.text("TRES", xTres + (anchoColumnaPrincipal / 2), yPos + 3.5, { align: "center" });
+    doc.text("CUATRO", xTres + (anchoColumnaPrincipal / 2), yPos + 3.5, { align: "center" });
 
-    // Columna 6: CUATRO
+    // Columna 6: -
     const xCuatro = xTres + anchoColumnaPrincipal;
-    doc.text("CUATRO", xCuatro + (anchoColumnaPrincipal / 2), yPos + 3.5, { align: "center" });
+    doc.text("-", xCuatro + (anchoColumnaPrincipal / 2), yPos + 3.5, { align: "center" });
 
     // Columna 7: - (vacía)
-    const xCol7 = xCuatro + anchoColumnaPrincipal;
-    doc.text("-", xCol7 + (anchoColumnaPrincipal / 2), yPos + 3.5, { align: "center" });
+    // const xCol7 = xCuatro + anchoColumnaPrincipal;
+    // doc.text("-", xCol7 + (anchoColumnaPrincipal / 2), yPos + 3.5, { align: "center" });
 
     // Línea horizontal después de categorías
     doc.line(tablaInicioX, yPos + alturaFilaCategoria, tablaInicioX + tablaAncho, yPos + alturaFilaCategoria);
@@ -3293,7 +3295,9 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
 
     // Celda 1: SIN NEUMOCONIOSIS (columna 1 - CERO)
     const anchoCelda1 = anchoColumnaPrincipal; // Solo columna CERO
+
     const textSinNeumo = "Sin neumoconiosis";
+    
     const centroCelda1 = xCero + (anchoCelda1 / 2);
     doc.text(textSinNeumo, centroCelda1, yPos + 3.5, { align: "center" });
     // Línea vertical entre celda 1 y 2
@@ -3389,27 +3393,49 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
     doc.line(tablaInicioX, yPos + alturaFilaVacia, tablaInicioX + tablaAncho, yPos + alturaFilaVacia);
 
     // Mostrar datos en FILA 5
-    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.setFont("helvetica", "normal").setFontSize(3);
+
+    // Función para dibujar un texto centrado en una celda, ajustando el tamaño
+    // de letra al mínimo necesario para que todas las líneas quepan dentro del
+    // alto de la celda (en vez de usar siempre el tamaño más pequeño)
+    const dibujarTextoCentradoEnCelda = (texto, xCentro, anchoDisponible, alturaCelda, fontSizeInicial = 5, fontSizeMinimo = 3) => {
+      let fontSize = fontSizeInicial;
+      let lineas = dividirTextoEnLineas(texto, anchoDisponible, fontSize);
+      let alturaTotalTexto;
+
+      while (true) {
+        doc.setFontSize(fontSize);
+        const espacioEntreLineas = fontSize * 0.5;
+        alturaTotalTexto = (lineas.length - 1) * espacioEntreLineas + fontSize * 0.4;
+
+        if (alturaTotalTexto <= alturaCelda - 1 || fontSize <= fontSizeMinimo) {
+          break;
+        }
+
+        fontSize -= 0.5;
+        lineas = dividirTextoEnLineas(texto, anchoDisponible, fontSize);
+      }
+
+      doc.setFontSize(fontSize);
+      const espacioEntreLineas = fontSize * 0.5;
+      const yInicio = yPos + (alturaCelda / 2) - (alturaTotalTexto / 2) + (fontSize * 0.3);
+      lineas.forEach((linea, index) => {
+        doc.text(linea, xCentro, yInicio + (index * espacioEntreLineas), { align: "center" });
+      });
+    };
 
     // Celda 1: SIN NEUMOCONIOSIS
     const textoSinNeumo = datosFinales.clasificacionNeumoconiosis?.sinNeumoconiosis || "N/A";
     const maxAnchoCelda1 = anchoColumnaPrincipal - 4;
-    const lineasSinNeumo = doc.splitTextToSize(textoSinNeumo, maxAnchoCelda1);
-    const yInicioSinNeumo = yPos + (alturaFilaVacia / 2) - ((lineasSinNeumo.length - 1) * 2);
-    lineasSinNeumo.forEach((linea, index) => {
-      doc.text(linea, xCero + (anchoColumnaPrincipal / 2), yInicioSinNeumo + (index * 2.5), { align: "center" });
-    });
+    dibujarTextoCentradoEnCelda(textoSinNeumo, xCero + (anchoColumnaPrincipal / 2), maxAnchoCelda1, alturaFilaVacia);
 
     // Celda 2: IMAGEN RADIOGRAFICA de EXPOSICIÓN A POLVO
     const textoImagen = datosFinales.clasificacionNeumoconiosis?.imagenRadiograficaPolvo || "N/A";
     const maxAnchoCelda2 = anchoColumnaPrincipal - 4;
-    const lineasImagen = doc.splitTextToSize(textoImagen, maxAnchoCelda2);
-    const yInicioImagen = yPos + (alturaFilaVacia / 2) - ((lineasImagen.length - 1) * 2);
-    lineasImagen.forEach((linea, index) => {
-      doc.text(linea, xCol2 + (anchoColumnaPrincipal / 2), yInicioImagen + (index * 2.5), { align: "center" });
-    });
+    dibujarTextoCentradoEnCelda(textoImagen, xCol2 + (anchoColumnaPrincipal / 2), maxAnchoCelda2, alturaFilaVacia);
 
     // Celda 3: CON NEUMOCONIOSIS
+    doc.setFont("helvetica", "normal").setFontSize(7);
     const textoConNeumo = datosFinales.clasificacionNeumoconiosis?.conNeumoconiosis || "NO";
     const maxAnchoCelda3 = anchoColumnaPrincipal * 5 - 4;
     const lineasConNeumo = doc.splitTextToSize(textoConNeumo, maxAnchoCelda3);
