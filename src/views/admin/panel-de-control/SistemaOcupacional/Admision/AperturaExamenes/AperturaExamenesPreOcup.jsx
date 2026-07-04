@@ -1059,14 +1059,14 @@ const AperturaExamenesPreOcup = (props) => {
         mineralPo: "N/A",
         alturaPo: "DEBAJO 2500",
         autoriza: "DR. ARTEMIO",
-        nomExamen: "ANUAL",
+        nomExamen: item.nombreExamen,
         precioAdic: 1,
         //nombreExamen
         //mineral
         //altura
       }));
       RendeSet(item)
-      setSearchExamenMedico("ANUAL")
+      //setSearchExamenMedico()
       Swal.close()
     } catch {
       Swal.fire('Error', 'Ha ocurrido un Error', 'error');
