@@ -23,6 +23,7 @@ export function FormLogin() {
   const setlistAccesos = useAuthStore((state) => state.setlistAccesos);
   const setdatosFooter = useAuthStore((state) => state.setdatosFooter);
   const setListaEmpleados = useAuthStore((state) => state.setListaEmpleados);
+  const setSelectedSede = useAuthStore((state) => state.setSelectedSede);
   const [loading, setloadign] = useState(false);
   const [errormess, setErrormess] = useState("");
 
@@ -109,6 +110,7 @@ export function FormLogin() {
     setlistView(todasLasVistas);
     setlistAccesos(todosLosPermisos)
     setListaEmpleados(listaEmpleados)
+    setSelectedSede(null); // Evita arrastrar la sede del usuario/sesión anterior
     setuserlogued(userConSedes);
     setToken(token);
     Loginvnigate(token);

@@ -208,3 +208,68 @@ export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
 export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token) => {
     handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token)
 }
+
+export const GenerarConsentimientosMasivo = async (nordenesTexto, fecha, userlogued, token) => {
+    const ordenes = [...new Set(
+        String(nordenesTexto || "")
+            .split(",")
+            .map((n) => n.trim())
+            .filter((n) => n !== "")
+    )];
+
+    if (ordenes.length === 0) {
+        Swal.fire("Error", "Ingrese al menos un número de orden", "error");
+        return null;
+    }
+    if (!fecha) {
+        Swal.fire("Error", "Ingrese la fecha", "error");
+        return null;
+    }
+
+    LoadingDefault("Generando declaraciones juradas...");
+
+    const resultados = await Promise.all(
+        ordenes.map(async (norden) => {
+            try {
+                const res = await SubmitConsentimiento({ user: userlogued, norden, fecha }, token);
+                if (res && res.norden) {
+                    return { norden, status: "success", message: "Registrado correctamente" };
+                }
+                return { norden, status: "error", message: res?.mensaje || "No se pudo registrar" };
+            } catch (error) {
+                console.error(error);
+                return { norden, status: "error", message: "Error interno al registrar" };
+            }
+        })
+    );
+
+    const exitosos = resultados.filter((r) => r.status === "success");
+    const fallidos = resultados.filter((r) => r.status !== "success");
+
+    const htmlList = `
+        <div style="text-align:left; max-height:300px; overflow:auto;">
+            <p><b>Resumen:</b> ${exitosos.length} registrados, ${fallidos.length} no registrados.</p>
+            ${exitosos.length > 0 ? `
+                <h5 style="color:green; margin-top:10px; font-size:16px;">Registrados correctamente:</h5>
+                <ul style="font-size:14px; margin-bottom:10px;">
+                    ${exitosos.map((f) => `<li>N° Orden ${f.norden}</li>`).join("")}
+                </ul>
+            ` : ""}
+            ${fallidos.length > 0 ? `
+                <h5 style="color:red; margin-top:10px; font-size:16px;">No se pudieron registrar:</h5>
+                <ul style="font-size:14px;">
+                    ${fallidos.map((f) => `<li>N° Orden ${f.norden} <span style="color:gray">(${f.message})</span></li>`).join("")}
+                </ul>
+            ` : ""}
+        </div>
+    `;
+
+    Swal.fire({
+        title: "Registro Masivo Finalizado",
+        html: htmlList,
+        icon: fallidos.length === 0 ? "success" : "warning",
+        width: "600px",
+    });
+
+    return { exitosos, fallidos };
+};

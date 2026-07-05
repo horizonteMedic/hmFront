@@ -110,14 +110,14 @@ const headerHR = (doc, datos) => {
   doc.text(`${datos.protocoloNombre || datos.examen || ""}`, margin + 20, y1);
 
   doc.setFont("helvetica", "bold");
-  doc.text("FECHA:", margin + 80, y1);
+  doc.text("FECHA:", margin + 100, y1);
   doc.setFont("helvetica", "normal");
-  doc.text(`${formatearFecha(datos.fecha) || ""}`, margin + 95, y1);
+  doc.text(`${formatearFecha(datos.fecha) || ""}`, margin + 115, y1);
 
   doc.setFont("helvetica", "bold");
-  doc.text("HORA:", margin + 120, y1);
+  doc.text("HORA:", margin + 147, y1);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.hora || ""}`, margin + 135, y1);
+  doc.text(`${datos.hora || ""}`, margin + 158, y1);
 
   doc.setFont("helvetica", "bold");
   doc.text("N° DE ORDEN:", margin + 140, y1 - 6);

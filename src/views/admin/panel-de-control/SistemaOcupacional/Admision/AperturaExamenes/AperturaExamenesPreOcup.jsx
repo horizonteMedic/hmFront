@@ -1034,6 +1034,7 @@ const AperturaExamenesPreOcup = (props) => {
       if (!res.codPa) {
         return Swal.fire('Error', 'No se ha encontrado al Paciente', 'error');
       }
+      console.log(item)
       setDatos(prev => ({
         ...prev,
         // Datos del paciente buscado
@@ -1055,18 +1056,18 @@ const AperturaExamenesPreOcup = (props) => {
         n_medico: item.medico,
         cargoDe: item.cargo,
         areaO: item.area,
-        nomEx: "SUPERFICIE",
-        mineralPo: "N/A",
-        alturaPo: "DEBAJO 2500",
+        nomEx: item.nomEx,
+        mineralPo: item.mineral,
+        alturaPo: item.altura,
         autoriza: "DR. ARTEMIO",
-        nomExamen: "ANUAL",
+        nomExamen: item.nombreExamen,
         precioAdic: 1,
         //nombreExamen
         //mineral
         //altura
       }));
       RendeSet(item)
-      setSearchExamenMedico("ANUAL")
+      //setSearchExamenMedico()
       Swal.close()
     } catch {
       Swal.fire('Error', 'Ha ocurrido un Error', 'error');

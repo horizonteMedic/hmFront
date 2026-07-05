@@ -134,7 +134,9 @@ export const SubmitDataService = async (
       calidad: form.calidadRx,
       simbolos: form.simbolosRx,
       norden: form.norden,
+      calificacionEx: form.clasificacion == "0/-",
       calificacionEx0: form.clasificacion == "0/0",
+      calificacionEx01: form.clasificacion == "0/1",
       calificacionEx10: form.clasificacion == "1/0",
       calificacionEx11: form.clasificacion == "1/1",
       calificacionEx12: form.clasificacion == "1/2",
@@ -144,8 +146,8 @@ export const SubmitDataService = async (
       calificacionEx32: form.clasificacion == "3/2",
       calificacionEx33: form.clasificacion == "3/3",
       calificacionEx3Mas: form.clasificacion == "3/+",
-      calificacionExAbc: form.clasificacion == "ABC",
-      calificacionExSt: form.clasificacion == "ST",
+      calificacionExAbc: form.clasificacionABC == "ABC",
+      calificacionExSt: form.clasificacionST == "ST",
       sinNeumoconiosis: form.sinNeumoconiosis,
       conNeumoconiosis: form.conNeumoconiosis,
       irep: form.imagenRadiograficaPolvo,
@@ -1085,6 +1087,27 @@ export const GetInfoServicio = (
             }
           }
 
+          if (res.chk1) data.clasificacion = "0/-";
+          else if (res.chk5) data.clasificacion = "0/0";
+          else if (res.chk9) data.clasificacion = "0/1";
+          else if (res.chk2) data.clasificacion = "1/0";
+          else if (res.chk6) data.clasificacion = "1/1";
+          else if (res.chk10) data.clasificacion = "1/2";
+          else if (res.chk3) data.clasificacion = "2/1";
+          else if (res.chk7) data.clasificacion = "2/2";
+          else if (res.chk11) data.clasificacion = "2/3";
+          else if (res.chk4) data.clasificacion = "3/2";
+          else if (res.chk8) data.clasificacion = "3/3";
+          else if (res.chk12) data.clasificacion = "3/+";
+
+          if (res.chka || res.chkb || res.chkc) data.clasificacionABC = "ABC"; 
+          // else if (res.examenRadiograficoAbc_ex_abc) data.clasificacionABC = "ABC";
+          // else if (res.examenRadiograficoSt_ex_st) data.clasificacionST = "ST";
+
+          data.simbolosRx = construirSimbolosFormaTamano(res) || "";
+          data.calidadRx = obtenerCalidadRadiografica(res) ?? "";
+
+
           if (esMujer && res.resultadoGonadotropina === "POSITIVO") {
             data.observacionesGenerales = agregarObservacion(
               data.observacionesGenerales,
@@ -1094,6 +1117,8 @@ export const GetInfoServicio = (
           data.notasDoctor = res.notasDoctor ?? "";
           data.mercurioOrina = res.mercurioOrina ?? "N/A",
             data.plomoSangre = res.plomoSangre ?? "N/A",
+
+
 
 
 
@@ -1204,6 +1229,43 @@ export const GetExamenesRealizados = (nro, set, token, onFinish = () => { }) => 
     });
 };
 
+// Convierte los checks de OIT "Forma y Tamaño" (chk_p_1..chk_p_6 primaria,
+// chk_s_1..chk_s_6 secundaria) al símbolo que representan (p, q, r, s, t, u)
+// y arma el texto "primario/secundario" (ej. "p/q") para el campo Símbolos
+// de la sección Abdomen del Anexo 16.
+const SIMBOLOS_FORMA_TAMANO = ["p", "q", "r", "s", "t", "u"];
+
+const obtenerSimboloFormaTamano = (res, prefijo) => {
+  for (let i = 1; i <= 6; i++) {
+    if (res[`chk_${prefijo}_${i}`]) {
+      return SIMBOLOS_FORMA_TAMANO[i - 1];
+    }
+  }
+  return "";
+};
+
+const obtenerProfusion = (res) => {
+  for (let i = 1; i <= 12; i++) {
+    if (res[`chk_${i}`]) {
+      return SIMBOLOS_FORMA_TAMANO[i - 1];
+    }
+  }
+}
+
+const obtenerCalidadRadiografica = (res) => {
+  if (res.rb_buena) return "1";
+  if (res.rb_aceptable) return "2";
+  if (res.rb_bajacalidad) return "3";
+  if (res.rb_inaceptable) return "4";
+  return "";
+}
+
+const construirSimbolosFormaTamano = (res) => {
+  const primaria = obtenerSimboloFormaTamano(res, "p");
+  const secundaria = obtenerSimboloFormaTamano(res, "s");
+  return primaria || secundaria ? `${primaria}/${secundaria}` : "";
+};
+
 // Función adaptada del código Java (líneas 915-1076) para mapear datos adicionales
 export const MapearDatosAdicionales = (
   res,
@@ -1292,10 +1354,12 @@ export const MapearDatosAdicionales = (
       data.fechaRx = res.fechaExamenRadiografico_fecha_exra ?? "";
       data.calidadRx = res.calidadExamenRadiografico_txtcalidad ?? "";
       data.simbolosRx = res.simbolosExamenRadiografico_txtsimbolos ?? "";
-
+      
       // Clasificación radiográfica
-      if (res.examenRadiografico0_ex_0) data.clasificacion = "0/0";
+      if (res.examenRadiografico1_ex_1) data.clasificacion = "0/-";
+      else if (res.examenRadiografico0_ex_0) data.clasificacion = "0/0";
       else if (res.examenRadiografico10_ex_10) data.clasificacion = "1/0";
+      else if (res.examenRadiografico01_ex_01) data.clasificacion = "0/1";
       else if (res.examenRadiografico11_ex_11) data.clasificacion = "1/1";
       else if (res.examenRadiografico12_ex_12) data.clasificacion = "1/2";
       else if (res.examenRadiografico21_ex_21) data.clasificacion = "2/1";
@@ -1304,12 +1368,14 @@ export const MapearDatosAdicionales = (
       else if (res.examenRadiografico32_ex_32) data.clasificacion = "3/2";
       else if (res.examenRadiografico33_ex_33) data.clasificacion = "3/3";
       else if (res.examenRadiografico3mas_ex_3mas) data.clasificacion = "3/+";
-      else if (res.examenRadiograficoAbc_ex_abc) data.clasificacion = "ABC";
-      else if (res.examenRadiograficoSt_ex_st) data.clasificacion = "ST";
-
+      if (res.examenRadiograficoAbc_ex_abc) data.clasificacionABC = "ABC";
+      if (res.examenRadiograficoSt_ex_st) data.clasificacionST = "ST";
+      
       // Neumoconiosis
+      // data.sinNeumoconiosis =
+      //   res.examenRadiograficoSinNeumoconiosis_txtsinneumoconiosis ?? "";
       data.sinNeumoconiosis =
-        res.examenRadiograficoSinNeumoconiosis_txtsinneumoconiosis ?? "";
+        res.txt_s_comentarios ?? "";
       data.conNeumoconiosis =
         res.examenRadiograficoConNeumoconiosis_txtconneumoconiosis ?? "";
       data.polvo = res.polvoAnexo7c_chkpolvo ?? "";
@@ -1384,8 +1450,8 @@ export const MapearDatosAdicionales = (
 
 
       data.fechaRx = getToday();
-      data.calidadRx = "2";
-      data.simbolosRx = "N/A";
+      // data.calidadRx = "2";
+      data.simbolosRx = construirSimbolosFormaTamano(res) || "N/A";
       const sexo = res.sexo_sexo_pa ?? "";
       data.sexo = sexo;
       if (hemo && hemo !== "" && hemo !== "N/A") {

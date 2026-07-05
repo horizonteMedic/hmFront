@@ -79,6 +79,27 @@ const Parenquimatosas = ({ form, setForm }) => {
         }));
     };
 
+    // Limita la selección a una sola opción dentro del grupo indicado 
+    const handleCheckGroupOne = (grupo) => (e) => {
+        const { name, checked } = e.target;
+        const checks = {};
+
+        grupo.forEach((key) => {
+            checks[key] = false;
+        });
+
+        checks[name] = checked;
+        setForm(prev => ({
+            ...prev,
+            ...checks
+        }));
+    };
+
+    const handleCheckProfusion = handleCheckGroupOne(['chk1', 'chk2', 'chk3', 'chk4', 'chk5', 'chk6', 'chk7', 'chk8', 'chk9', 'chk10', 'chk11', 'chk12']);
+    const handleCheckPrimaria = handleCheckGroupOne(['chkP1', 'chkP2', 'chkP3', 'chkP4', 'chkP5', 'chkP6']);
+    const handleCheckSecundaria = handleCheckGroupOne(['chkS1', 'chkS2', 'chkS3', 'chkS4', 'chkS5', 'chkS6']);
+    const handleCheckOpacidadesGrandes = handleCheckGroupOne(['chko', 'chka', 'chkb', 'chkc']);
+
     const AnormalidadesNo = (set) => {
         set(prev => ({
             ...prev,
@@ -277,22 +298,22 @@ const Parenquimatosas = ({ form, setForm }) => {
                         <div className="grid grid-cols-3 gap-y-2 gap-x-8 pl-4 mx-auto">
 
                             {/* Fila Superior */}
-                            <div className="flex font-semibold"><input  type="checkbox" name="chk1" id="chk1" checked={form.chk1} onChange={handleInputChangeChecked} /> <p className="pl-2">0/-</p> </div>
-                            <div className="flex font-semibold"><input  type="checkbox" name="chk5" id="chk5" checked={form.chk5} onChange={handleInputChangeChecked} /> <p className="pl-2">0/0</p> </div>
-                            <div className="flex font-semibold"><input  type="checkbox" name="chk9" id="chk9" checked={form.chk9} onChange={handleInputChangeChecked} /> <p className="pl-2">0/1</p> </div>
+                            <div className="flex font-semibold"><input  type="checkbox" name="chk1" id="chk1" checked={form.chk1} onChange={handleCheckProfusion} /> <p className="pl-2">0/-</p> </div>
+                            <div className="flex font-semibold"><input  type="checkbox" name="chk5" id="chk5" checked={form.chk5} onChange={handleCheckProfusion} /> <p className="pl-2">0/0</p> </div>
+                            <div className="flex font-semibold"><input  type="checkbox" name="chk9" id="chk9" checked={form.chk9} onChange={handleCheckProfusion} /> <p className="pl-2">0/1</p> </div>
                             {/* Fila Medio */}
-                            <div className="flex font-semibold"><input  type="checkbox" name="chk2" id="chk2" checked={form.chk2} onChange={handleInputChangeChecked} /> <p className="pl-2">1/0</p> </div>
-                            <div className="flex font-semibold"><input  type="checkbox" name="chk6" id="chk6" checked={form.chk6} onChange={handleInputChangeChecked} /> <p className="pl-2">1/1</p> </div>
-                            <div className="flex font-semibold"><input  type="checkbox" name="chk10" id="chk10" checked={form.chk10} onChange={handleInputChangeChecked} /> <p className="pl-2">1/2</p> </div>
+                            <div className="flex font-semibold"><input  type="checkbox" name="chk2" id="chk2" checked={form.chk2} onChange={handleCheckProfusion} /> <p className="pl-2">1/0</p> </div>
+                            <div className="flex font-semibold"><input  type="checkbox" name="chk6" id="chk6" checked={form.chk6} onChange={handleCheckProfusion} /> <p className="pl-2">1/1</p> </div>
+                            <div className="flex font-semibold"><input  type="checkbox" name="chk10" id="chk10" checked={form.chk10} onChange={handleCheckProfusion} /> <p className="pl-2">1/2</p> </div>
 
                             {/* Fila Inferior */}
-                            <div className="flex font-semibold"><input  type="checkbox" name="chk3" id="chk3" checked={form.chk3} onChange={handleInputChangeChecked} /> <p className="pl-2">2/1</p> </div>
-                            <div className="flex font-semibold"><input  type="checkbox" name="chk7" id="chk7" checked={form.chk7} onChange={handleInputChangeChecked} /> <p className="pl-2">2/2</p> </div>
-                            <div className="flex font-semibold"><input  type="checkbox" name="chk11" id="chk11" checked={form.chk11} onChange={handleInputChangeChecked} /> <p className="pl-2">/3</p> </div>
+                            <div className="flex font-semibold"><input  type="checkbox" name="chk3" id="chk3" checked={form.chk3} onChange={handleCheckProfusion} /> <p className="pl-2">2/1</p> </div>
+                            <div className="flex font-semibold"><input  type="checkbox" name="chk7" id="chk7" checked={form.chk7} onChange={handleCheckProfusion} /> <p className="pl-2">2/2</p> </div>
+                            <div className="flex font-semibold"><input  type="checkbox" name="chk11" id="chk11" checked={form.chk11} onChange={handleCheckProfusion} /> <p className="pl-2">2/3</p> </div>
 
-                            <div className="flex font-semibold"><input  type="checkbox" name="chk4" id="chk4" checked={form.chk4} onChange={handleInputChangeChecked} /> <p className="pl-2">3/2</p> </div>
-                            <div className="flex font-semibold"><input  type="checkbox" name="chk8" id="chk8" checked={form.chk8} onChange={handleInputChangeChecked} /> <p className="pl-2">3/3</p> </div>
-                            <div className="flex font-semibold"><input  type="checkbox" name="chk12" id="chk12" checked={form.chk12} onChange={handleInputChangeChecked} /> <p className="pl-2">3/+</p> </div>
+                            <div className="flex font-semibold"><input  type="checkbox" name="chk4" id="chk4" checked={form.chk4} onChange={handleCheckProfusion} /> <p className="pl-2">3/2</p> </div>
+                            <div className="flex font-semibold"><input  type="checkbox" name="chk8" id="chk8" checked={form.chk8} onChange={handleCheckProfusion} /> <p className="pl-2">3/3</p> </div>
+                            <div className="flex font-semibold"><input  type="checkbox" name="chk12" id="chk12" checked={form.chk12} onChange={handleCheckProfusion} /> <p className="pl-2">3/+</p> </div>
                         </div>
                     </div>
 
@@ -310,44 +331,44 @@ const Parenquimatosas = ({ form, setForm }) => {
                         <div className="grid grid-cols-4 gap-y-2 gap-x-8 pl-2 mx-auto">
                             {/* Fila 1 */}
                             <label className="flex items-center space-x-1">
-                                <input type="checkbox" name="chkP1" id="chkP1" checked={form.chkP1} onChange={handleInputChangeChecked} /> <span className="pl-2">P</span>
+                                <input type="checkbox" name="chkP1" id="chkP1" checked={form.chkP1} onChange={handleCheckPrimaria} /> <span className="pl-2">p</span>
                             </label>
                             <label className="flex items-center space-x-1">
-                                <input type="checkbox" name="chkP4" id="chkP4" checked={form.chkP4} onChange={handleInputChangeChecked} /> <span className="pl-2">q</span>
+                                <input type="checkbox" name="chkP4" id="chkP4" checked={form.chkP4} onChange={handleCheckPrimaria} /> <span className="pl-2">s</span>
                             </label>
                             <label className="flex items-center space-x-1">
-                                <input type="checkbox" name="chkS1" id="chkS1" checked={form.chkS1} onChange={handleInputChangeChecked} /> <span className="pl-2">p</span>
+                                <input type="checkbox" name="chkS1" id="chkS1" checked={form.chkS1} onChange={handleCheckSecundaria} /> <span className="pl-2">p</span>
                             </label>
                             <label className="flex items-center space-x-1">
-                                <input type="checkbox" name="chkS4" id="chkS4" checked={form.chkS4} onChange={handleInputChangeChecked} /> <span className="pl-2">s</span>
+                                <input type="checkbox" name="chkS4" id="chkS4" checked={form.chkS4} onChange={handleCheckSecundaria} /> <span className="pl-2">s</span>
                             </label>
 
                             {/* Fila 2 */}
                             <label className="flex items-center space-x-1">
-                                <input type="checkbox" name="chkP2" id="chkP2" checked={form.chkP2} onChange={handleInputChangeChecked} /> <span className="pl-2">q</span>
+                                <input type="checkbox" name="chkP2" id="chkP2" checked={form.chkP2} onChange={handleCheckPrimaria} /> <span className="pl-2">q</span>
                             </label>
                             <label className="flex items-center space-x-1">
-                                <input type="checkbox" name="chkP5" id="chkP5" checked={form.chkP5} onChange={handleInputChangeChecked} /> <span className="pl-2">t</span>
+                                <input type="checkbox" name="chkP5" id="chkP5" checked={form.chkP5} onChange={handleCheckPrimaria} /> <span className="pl-2">t</span>
                             </label>
                             <label className="flex items-center space-x-1">
-                                <input type="checkbox" name="chkS2" id="chkS2" checked={form.chkS2} onChange={handleInputChangeChecked} /> <span className="pl-2">q</span>
+                                <input type="checkbox" name="chkS2" id="chkS2" checked={form.chkS2} onChange={handleCheckSecundaria} /> <span className="pl-2">q</span>
                             </label>
                             <label className="flex items-center space-x-1">
-                                <input type="checkbox" name="chkS5" id="chkS5" checked={form.chkS5} onChange={handleInputChangeChecked} /> <span className="pl-2">t</span>
+                                <input type="checkbox" name="chkS5" id="chkS5" checked={form.chkS5} onChange={handleCheckSecundaria} /> <span className="pl-2">t</span>
                             </label>
 
                             {/* Fila 3 */}
                             <label className="flex items-center space-x-1">
-                                <input type="checkbox" name="chkP3" id="chkP3" checked={form.chkP3} onChange={handleInputChangeChecked} /> <span className="pl-2">r</span>
+                                <input type="checkbox" name="chkP3" id="chkP3" checked={form.chkP3} onChange={handleCheckPrimaria} /> <span className="pl-2">r</span>
                             </label>
                             <label className="flex items-center space-x-1">
-                                <input type="checkbox" name="chkP6" id="chkP6" checked={form.chkP6} onChange={handleInputChangeChecked} /> <span className="pl-2">u</span>
+                                <input type="checkbox" name="chkP6" id="chkP6" checked={form.chkP6} onChange={handleCheckPrimaria} /> <span className="pl-2">u</span>
                             </label>
                             <label className="flex items-center space-x-1">
-                                <input type="checkbox" name="chkS3" id="chkS3" checked={form.chkS3} onChange={handleInputChangeChecked} /> <span className="pl-2">r</span>
+                                <input type="checkbox" name="chkS3" id="chkS3" checked={form.chkS3} onChange={handleCheckSecundaria} /> <span className="pl-2">r</span>
                             </label>
                             <label className="flex items-center space-x-1">
-                                <input type="checkbox" name="chkS6" id="chkS6" checked={form.chkS6} onChange={handleInputChangeChecked} /> <span className="pl-2">u</span>
+                                <input type="checkbox" name="chkS6" id="chkS6" checked={form.chkS6} onChange={handleCheckSecundaria} /> <span className="pl-2">u</span>
                             </label>
                         </div>
                     </div>
@@ -360,19 +381,19 @@ const Parenquimatosas = ({ form, setForm }) => {
                         {/* Opciones */}
                         <div className="gap-y-2 gap-x-4 flex flex-col justify-center mt-4 mx-auto">
                             <div className="flex ">
-                                <input type="checkbox" name="chko" id="chko" checked={form.chko} onChange={handleInputChangeChecked} />
+                                <input type="checkbox" name="chko" id="chko" checked={form.chko} onChange={handleCheckOpacidadesGrandes} />
                                 <label htmlFor="" className="pl-2"> O</label>
                             </div>
                             <div className="flex ">
-                                <input type="checkbox" name="chka" id="chka" checked={form.chka} onChange={handleInputChangeChecked} />
+                                <input type="checkbox" name="chka" id="chka" checked={form.chka} onChange={handleCheckOpacidadesGrandes} />
                                 <label htmlFor="" className="pl-2"> A</label>
                             </div>
                             <div className="flex ">
-                                <input type="checkbox" name="chkb" id="chkb" checked={form.chkb} onChange={handleInputChangeChecked} />
+                                <input type="checkbox" name="chkb" id="chkb" checked={form.chkb} onChange={handleCheckOpacidadesGrandes} />
                                 <label htmlFor="" className="pl-2"> B</label>
                             </div>
                             <div className="flex ">
-                                <input type="checkbox" name="chkc" id="chkc" checked={form.chkc} onChange={handleInputChangeChecked} />
+                                <input type="checkbox" name="chkc" id="chkc" checked={form.chkc} onChange={handleCheckOpacidadesGrandes} />
                                 <label htmlFor="" className="pl-2"> C</label>
                             </div>
                         </div>

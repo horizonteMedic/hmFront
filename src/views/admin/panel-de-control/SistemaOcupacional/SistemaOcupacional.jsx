@@ -167,6 +167,11 @@ const TabComponent = () => {
   const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
     if (userlogued?.sedes?.length > 0) {
+      const yaSeleccionada = userlogued.sedes.some((sede) => sede.cod_sede === selectedSede);
+      if (yaSeleccionada) {
+        setSelectSede(selectedSede);
+        return;
+      }
       const sedeTNP = userlogued.sedes.find((sede) => sede.cod_sede === "T-NP");
       setSelectSede(sedeTNP?.cod_sede || userlogued.sedes[0].cod_sede);
       setSelectedSede(sedeTNP?.cod_sede || userlogued.sedes[0].cod_sede);

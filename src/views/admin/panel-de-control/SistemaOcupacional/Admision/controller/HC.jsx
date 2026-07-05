@@ -101,9 +101,9 @@ export const submitMasivo = async (data, sede, token, userlogued) => {
 
       // Defaults del sistema
       nordenGenerado: null,
-      nomEx: "SUPERFICIE",
-      altura: "DEBAJO 2500",
-      mineral: "N/A",
+      nomEx: row["EXPLOTACION"] || "N/A",
+      altura: row["ALTURA"] || "DEBAJO 2500",
+      mineral: row["MINERAL"] || "N/A",
       fechaApertura: fechaFormateada,
       estado: "EN PROCESO",
       hora,
@@ -119,7 +119,7 @@ export const submitMasivo = async (data, sede, token, userlogued) => {
       covid1: false,
       covid2: false,
       manipuladorAlimentos: false,
-      nombreExamen: "ANUAL",
+      nombreExamen: row["EXAMEN MEDICO"] || "ANUAL",
       autoriza: "DR. ARTEMIO",
       numeroOperacion: null,
       herramientasManuales: false,
@@ -250,7 +250,8 @@ export const descargarPlantillaExcel = async (MedicosMulti, FormaPago, ExamenMul
   const headers = [
     "DNI", "EMPRESA", "CONTRATA", "MEDICO OCUP",
     "CARGO", "TIPO PRUEBA", "AREA", "PROTOCOLOS/PERFIL",
-    "PRECIO", "FORMA DE PAGO", "OBSERVACION"
+    "PRECIO", "FORMA DE PAGO", "OBSERVACION", "EXAMEN MEDICO",
+    "EXPLOTACION", "MINERAL", "ALTURA"
   ];
 
   sheet.addRow(headers);
@@ -282,7 +283,8 @@ export const descargarPlantillaExcel = async (MedicosMulti, FormaPago, ExamenMul
     sheet.addRow([
       "", "GREEN PERU S.A", "N/A",
       "ARTEMIO ALEJANDRO GARCIA CABRERA",
-      "", "N/A", "", "", "", "CREDITO", ""
+      "", "N/A", "", "", "", "CREDITO", "", "ANUAL",
+      "N/A", "N/A", "DEBAJO 2500"
     ]);
   }
 
@@ -317,7 +319,7 @@ export const descargarPlantillaExcel = async (MedicosMulti, FormaPago, ExamenMul
   sheet.columns = headers.map(() => ({ width: 25 }));
 
   const buffer = await workbook.xlsx.writeBuffer();
-  saveAs(new Blob([buffer]), "Plantilla_Registro_Masivo_GREENPERU.xlsx");
+  saveAs(new Blob([buffer]), "Plantilla_Registro_Masivo.xlsx");
 };
 
 const isRowEmpty = (row) => {

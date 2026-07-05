@@ -73,6 +73,7 @@ const AppContent = () => {
   const setuserlogued = useAuthStore((state) => state.setuserlogued);
   const setlistView = useAuthStore((state) => state.setlistView);
   const setListAccesos = useAuthStore((state) => state.setlistAccesos);
+  const setSelectedSede = useAuthStore((state) => state.setSelectedSede);
   //VISTA DE API
   const [TotalView, setTotalView] = useState([]);
   const location = useLocation();
@@ -93,6 +94,7 @@ const AppContent = () => {
       setuserlogued(null);
       setlistView([]);
       setListAccesos([]);
+      setSelectedSede(null);
     }
   }, [token]);
 
