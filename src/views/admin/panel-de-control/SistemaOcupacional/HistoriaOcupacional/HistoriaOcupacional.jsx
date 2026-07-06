@@ -116,6 +116,11 @@ const proteccionOptions = [
       "EPPS COMPLETO : CASCO, LENTES, GUANTES,TAPONES AUDITIVOS,RESPIRADOR, OREJERAS,ZAPATOS DE SEGURIDAD",
   },
   { id: 6, mensaje: "NINGUNO" },
+  {
+    id: 7,
+    mensaje:
+      "GORRO, POLO MANGA LARGA, PROTECCIÓN SOLAR, GUANTES, TYVEK, GUANTES DE NITRILO, BOTAS CAÑA ALTA, MASCARILLAS N95",
+  },
 ];
 
 const HistoriaOcupacional = ({
@@ -189,12 +194,14 @@ const HistoriaOcupacional = ({
       if (empresaUpper.includes("GREEN PERU")) {
         setSearchAltitud("34 M.S.N.M.");
         setSearchArea("CAMPO");
+        setSearchCargoOcupacion("AYUDANTE");
         setRowData((prev) => ({
           ...prev,
           empresa: value,
           altitud: "34 M.S.N.M.",
           actividad: "AGROINDUSTRIA",
           areaEmpresa: "CAMPO",
+          ocupacion: "AYUDANTE",
           socavon: "0",
           superficie: "AÑOS",
           riesgo:
