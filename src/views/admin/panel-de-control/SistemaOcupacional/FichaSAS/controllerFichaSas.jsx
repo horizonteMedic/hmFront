@@ -46,7 +46,7 @@ export const GetInfoServicio = async (
         if (res.perimetroCuelloTriaje) {
             let cuello = parseFloat(res.perimetroCuelloTriaje);
             if (!isNaN(cuello)) {
-                if (sexo == "M" && cuello >= 43.2) {
+                if (sexo == "M" && cuello > 43.2) {
                     cuello_varon_normal = false;
                     criterio_d_cuello = true;
                     concatenacionObservacion += textoCuello + "\n"
