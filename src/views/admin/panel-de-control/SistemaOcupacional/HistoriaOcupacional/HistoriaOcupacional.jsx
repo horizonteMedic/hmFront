@@ -181,9 +181,19 @@ const HistoriaOcupacional = ({
   const [filteredArea, setFilteredArea] = useState([]);
   const [filteredRiesgo, setFilteredRiesgo] = useState([]);
   const [filteredProt, setFilteredProt] = useState([]);
+  const [filteredActividad, setFilteredActividad] = useState([]);
+  const [filteredSuperficie, setFilteredSuperficie] = useState([]);
+  const [filteredSocavon, setFilteredSocavon] = useState([]);
 
   //listas
   const { EmpresasMulti, AlturaMulti, AreaMulti, CargosMulti } = listas;
+  const ActividadMulti = [
+    { id: 1, mensaje: "AGROINDUSTRIA" },
+    { id: 2, mensaje: "METAL MECÁNICA" },
+    { id: 3, mensaje: "CONSTRUCCIÓN" },
+    { id: 4, mensaje: "RETAIL" },
+    { id: 5, mensaje: "PETRÓLEO" },
+  ];
   // Opciones random de ejemplo para los selects
   //ALGUNOS YA TREEN DATOS DE VERITAS
   const handleRowChange = (field, value) => {
@@ -280,6 +290,8 @@ const HistoriaOcupacional = ({
     setSearchArea("");
     setSearchRiesgo("");
     setSearchProt("");
+    setFilteredSuperficie([]);
+    setFilteredSocavon([]);
   };
 
   const handleClean = () => {
@@ -316,6 +328,8 @@ const HistoriaOcupacional = ({
     setSearchRiesgo("");
     setSearchProt("");
     setSearchArea("");
+    setFilteredSuperficie([]);
+    setFilteredSocavon([]);
   };
 
   const handleset = () => {
@@ -599,13 +613,22 @@ const HistoriaOcupacional = ({
                         // Ajustar altura
                         e.target.style.height = "auto";
                         e.target.style.height = `${e.target.scrollHeight}px`;
-                        handleSearch(
-                          e,
-                          setSearchAltitud,
-                          handleRowChange,
-                          setFilteredAltitud,
-                          AlturaMulti
-                        );
+                        const v = e.target.value.toUpperCase();
+                        setSearchAltitud(v);
+                        handleRowChange("altitud", v);
+                        const matches = v
+                          ? AlturaMulti.filter((m) =>
+                              m.mensaje.toLowerCase().includes(v.toLowerCase())
+                            )
+                          : [];
+                        const trimmed = v.trim();
+                        if (/^\d+$/.test(trimmed)) {
+                          matches.unshift({
+                            id: "sugerencia-msnm",
+                            mensaje: `${trimmed} M.S.N.M.`,
+                          });
+                        }
+                        setFilteredAltitud(matches);
                       }}
                       onKeyUp={(e) => {
                         if (e.key === "Enter" && filteredAltitud.length > 0) {
@@ -652,12 +675,57 @@ const HistoriaOcupacional = ({
                 </div>
               </td>
               <td>
-                <AutoResizeInput
-                  value={rowData.actividad}
-                  onChange={(e) =>
-                    handleRowChange("actividad", e.target.value.toUpperCase())
-                  }
-                />
+                <div className="relative">
+                  <div className="flex flex-col items-center justify-center">
+                    <textarea
+                      rows={5}
+                      autoComplete="off"
+                      className="resize-none overflow-hidden w-full bg-transparent outline-none"
+                      value={rowData.actividad}
+                      name="actividad"
+                      onChange={(e) => {
+                        e.target.style.height = "auto";
+                        e.target.style.height = `${e.target.scrollHeight}px`;
+                        const v = e.target.value.toUpperCase();
+                        handleRowChange("actividad", v);
+                        setFilteredActividad(
+                          v
+                            ? ActividadMulti.filter((m) =>
+                                m.mensaje.toLowerCase().includes(v.toLowerCase())
+                              )
+                            : []
+                        );
+                      }}
+                      onFocus={() => setFilteredActividad(ActividadMulti)}
+                      onKeyUp={(e) => {
+                        if (e.key === "Enter" && filteredActividad.length > 0) {
+                          e.preventDefault();
+                          handleRowChange("actividad", filteredActividad[0].mensaje);
+                          setFilteredActividad([]);
+                        }
+                      }}
+                      onBlur={() =>
+                        setTimeout(() => setFilteredActividad([]), 100)
+                      }
+                    />
+                    {filteredActividad.length > 0 && (
+                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-50">
+                        {filteredActividad.map((opt) => (
+                          <li
+                            key={opt.id}
+                            className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                            onMouseDown={() => {
+                              handleRowChange("actividad", opt.mensaje);
+                              setFilteredActividad([]);
+                            }}
+                          >
+                            {opt.mensaje}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
               </td>
               <td>
                 {/* <AutoResizeInput
@@ -803,20 +871,128 @@ const HistoriaOcupacional = ({
                 </div>
               </td>
               <td>
-                <AutoResizeInput
-                  value={rowData.socavon}
-                  onChange={(e) =>
-                    handleRowChange("socavon", e.target.value.toUpperCase())
-                  }
-                />
+                <div className="relative">
+                  <div className="flex flex-col items-center justify-center">
+                    <textarea
+                      rows={5}
+                      autoComplete="off"
+                      className="resize-none overflow-hidden w-full bg-transparent outline-none"
+                      value={rowData.socavon}
+                      name="socavon"
+                      onChange={(e) => {
+                        e.target.style.height = "auto";
+                        e.target.style.height = `${e.target.scrollHeight}px`;
+                        const v = e.target.value.toUpperCase();
+                        handleRowChange("socavon", v);
+                        const trimmed = v.trim();
+                        let sugerencia = null;
+                        if (/^\d+$/.test(trimmed)) {
+                          const n = parseInt(trimmed, 10);
+                          sugerencia = `${trimmed} ${n === 1 ? "AÑO" : "AÑOS"}`;
+                        } else {
+                          const match = trimmed.match(
+                            /^(\d+)\s+A[ÑN]OS?\.?\s+(\d+)$/
+                          );
+                          if (match) {
+                            const meses = parseInt(match[2], 10);
+                            sugerencia = `${trimmed} ${
+                              meses === 1 ? "MES" : "MESES"
+                            }`;
+                          }
+                        }
+                        setFilteredSocavon(sugerencia ? [sugerencia] : []);
+                      }}
+                      onKeyUp={(e) => {
+                        if (e.key === "Enter" && filteredSocavon.length > 0) {
+                          e.preventDefault();
+                          handleRowChange("socavon", filteredSocavon[0]);
+                          setFilteredSocavon([]);
+                        }
+                      }}
+                      onBlur={() =>
+                        setTimeout(() => setFilteredSocavon([]), 100)
+                      }
+                    />
+                    {filteredSocavon.length > 0 && (
+                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-50">
+                        {filteredSocavon.map((sug, i) => (
+                          <li
+                            key={i}
+                            className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                            onMouseDown={() => {
+                              handleRowChange("socavon", sug);
+                              setFilteredSocavon([]);
+                            }}
+                          >
+                            {sug}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
               </td>
               <td>
-                <AutoResizeInput
-                  value={rowData.superficie}
-                  onChange={(e) =>
-                    handleRowChange("superficie", e.target.value.toUpperCase())
-                  }
-                />
+                <div className="relative">
+                  <div className="flex flex-col items-center justify-center">
+                    <textarea
+                      rows={5}
+                      autoComplete="off"
+                      className="resize-none overflow-hidden w-full bg-transparent outline-none"
+                      value={rowData.superficie}
+                      name="superficie"
+                      onChange={(e) => {
+                        e.target.style.height = "auto";
+                        e.target.style.height = `${e.target.scrollHeight}px`;
+                        const v = e.target.value.toUpperCase();
+                        handleRowChange("superficie", v);
+                        const trimmed = v.trim();
+                        let sugerencia = null;
+                        if (/^\d+$/.test(trimmed)) {
+                          const n = parseInt(trimmed, 10);
+                          sugerencia = `${trimmed} ${n === 1 ? "AÑO" : "AÑOS"}`;
+                        } else {
+                          const match = trimmed.match(
+                            /^(\d+)\s+A[ÑN]OS?\.?\s+(\d+)$/
+                          );
+                          if (match) {
+                            const meses = parseInt(match[2], 10);
+                            sugerencia = `${trimmed} ${
+                              meses === 1 ? "MES" : "MESES"
+                            }`;
+                          }
+                        }
+                        setFilteredSuperficie(sugerencia ? [sugerencia] : []);
+                      }}
+                      onKeyUp={(e) => {
+                        if (e.key === "Enter" && filteredSuperficie.length > 0) {
+                          e.preventDefault();
+                          handleRowChange("superficie", filteredSuperficie[0]);
+                          setFilteredSuperficie([]);
+                        }
+                      }}
+                      onBlur={() =>
+                        setTimeout(() => setFilteredSuperficie([]), 100)
+                      }
+                    />
+                    {filteredSuperficie.length > 0 && (
+                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-50">
+                        {filteredSuperficie.map((sug, i) => (
+                          <li
+                            key={i}
+                            className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                            onMouseDown={() => {
+                              handleRowChange("superficie", sug);
+                              setFilteredSuperficie([]);
+                            }}
+                          >
+                            {sug}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
               </td>
               <td>
                 <AutoResizeInput
