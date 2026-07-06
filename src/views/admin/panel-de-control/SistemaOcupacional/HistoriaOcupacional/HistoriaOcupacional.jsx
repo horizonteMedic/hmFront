@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./HistoriaOcupacional.module.css";
 import {
   handleSearch,
@@ -185,6 +185,33 @@ const HistoriaOcupacional = ({
   const [filteredSuperficie, setFilteredSuperficie] = useState([]);
   const [filteredSocavon, setFilteredSocavon] = useState([]);
 
+  const empresaRef = useRef(null);
+  const altitudRef = useRef(null);
+  const actividadRef = useRef(null);
+  const areaRef = useRef(null);
+  const ocupacionRef = useRef(null);
+  const socavonRef = useRef(null);
+  const superficieRef = useRef(null);
+  const riesgoRef = useRef(null);
+  const protRef = useRef(null);
+
+  const autoResize = (ref) => {
+    if (ref.current) {
+      ref.current.style.height = "auto";
+      ref.current.style.height = `${ref.current.scrollHeight}px`;
+    }
+  };
+
+  useEffect(() => autoResize(empresaRef), [searchEmpresa]);
+  useEffect(() => autoResize(altitudRef), [searchAltitud]);
+  useEffect(() => autoResize(actividadRef), [rowData.actividad]);
+  useEffect(() => autoResize(areaRef), [searchArea]);
+  useEffect(() => autoResize(ocupacionRef), [searchCargoOcupacion]);
+  useEffect(() => autoResize(socavonRef), [rowData.socavon]);
+  useEffect(() => autoResize(superficieRef), [rowData.superficie]);
+  useEffect(() => autoResize(riesgoRef), [searchRiesgo]);
+  useEffect(() => autoResize(protRef), [searchProt]);
+
   //listas
   const { EmpresasMulti, AlturaMulti, AreaMulti, CargosMulti } = listas;
   const ActividadMulti = [
@@ -205,6 +232,12 @@ const HistoriaOcupacional = ({
         setSearchAltitud("34 M.S.N.M.");
         setSearchArea("CAMPO");
         setSearchCargoOcupacion("AYUDANTE");
+        setSearchRiesgo(
+          "MOV. Y POSICIONES DISERGONOMICAS, BAJAS TEMPERATURAS,INSOLACIÓN,GOLPES,CAIDAS,RUIDO"
+        );
+        setSearchProt(
+          "GORRO, POLO MANGA LARGA, PROTECCIÓN SOLAR, GUANTES, TYVEK, GUANTES DE NITRILO, BOTAS CAÑA ALTA, MASCARILLAS N95"
+        );
         setRowData((prev) => ({
           ...prev,
           empresa: value,
@@ -524,7 +557,7 @@ const HistoriaOcupacional = ({
                   }
                 />
               </td>
-              <td>
+              <td onClick={() => empresaRef.current?.focus()}>
                 {/* <AutoResizeInput
                   value={rowData.empresa}
                   onChange={(e) => handleRowChange("empresa", e.target.value)}
@@ -532,16 +565,14 @@ const HistoriaOcupacional = ({
                 <div className="relative">
                   <div className="flex flex-col items-center justify-center">
                     <textarea
+                      ref={empresaRef}
                       autoComplete="off"
-                      rows={5}
+                      rows={1}
                       className={`resize-none overflow-hidden w-full bg-transparent outline-none `}
                       value={searchEmpresa}
                       name="empresa"
+                      onFocus={() => setFilteredEmpresa(EmpresasMulti)}
                       onChange={(e) => {
-                        // Ajustar altura
-                        e.target.style.height = "auto";
-                        e.target.style.height = `${e.target.scrollHeight}px`;
-
                         handleSearch(
                           e,
                           setSearchEmpresa,
@@ -568,8 +599,8 @@ const HistoriaOcupacional = ({
                         setTimeout(() => setFilteredEmpresa([]), 100)
                       }
                     />
-                    {searchEmpresa && filteredEmpresa.length > 0 && (
-                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-60">
+                    {filteredEmpresa.length > 0 && (
+                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-60">
                         {filteredEmpresa.map((opt) => (
                           <li
                             key={opt.id}
@@ -594,7 +625,7 @@ const HistoriaOcupacional = ({
                   </div>
                 </div>
               </td>
-              <td>
+              <td onClick={() => altitudRef.current?.focus()}>
                 {/* <AutoResizeInput
                   value={rowData.altitud}
                   onChange={(e) => handleRowChange("altitud", e.target.value)}
@@ -602,17 +633,16 @@ const HistoriaOcupacional = ({
                 <div className="relative">
                   <div className="flex flex-col items-center justify-center">
                     <textarea
+                      ref={altitudRef}
                       type="text"
                       id="altitud"
-                      rows={5}
+                      rows={1}
                       autoComplete="off"
                       className={`resize-none overflow-hidden w-full bg-transparent outline-none `}
                       value={searchAltitud}
                       name="altitud"
+                      onFocus={() => setFilteredAltitud(AlturaMulti)}
                       onChange={(e) => {
-                        // Ajustar altura
-                        e.target.style.height = "auto";
-                        e.target.style.height = `${e.target.scrollHeight}px`;
                         const v = e.target.value.toUpperCase();
                         setSearchAltitud(v);
                         handleRowChange("altitud", v);
@@ -648,8 +678,8 @@ const HistoriaOcupacional = ({
                         setTimeout(() => setFilteredAltitud([]), 100)
                       }
                     />
-                    {searchAltitud && filteredAltitud.length > 0 && (
-                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-50">
+                    {filteredAltitud.length > 0 && (
+                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
                         {filteredAltitud.map((opt) => (
                           <li
                             key={opt.id}
@@ -674,18 +704,17 @@ const HistoriaOcupacional = ({
                   </div>
                 </div>
               </td>
-              <td>
+              <td onClick={() => actividadRef.current?.focus()}>
                 <div className="relative">
                   <div className="flex flex-col items-center justify-center">
                     <textarea
-                      rows={5}
+                      ref={actividadRef}
+                      rows={1}
                       autoComplete="off"
                       className="resize-none overflow-hidden w-full bg-transparent outline-none"
                       value={rowData.actividad}
                       name="actividad"
                       onChange={(e) => {
-                        e.target.style.height = "auto";
-                        e.target.style.height = `${e.target.scrollHeight}px`;
                         const v = e.target.value.toUpperCase();
                         handleRowChange("actividad", v);
                         setFilteredActividad(
@@ -709,7 +738,7 @@ const HistoriaOcupacional = ({
                       }
                     />
                     {filteredActividad.length > 0 && (
-                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-50">
+                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
                         {filteredActividad.map((opt) => (
                           <li
                             key={opt.id}
@@ -727,7 +756,7 @@ const HistoriaOcupacional = ({
                   </div>
                 </div>
               </td>
-              <td>
+              <td onClick={() => areaRef.current?.focus()}>
                 {/* <AutoResizeInput
                   value={rowData.areaEmpresa}
                   onChange={(e) =>
@@ -737,16 +766,16 @@ const HistoriaOcupacional = ({
                 <div className="relative">
                   <div className="flex flex-col items-center justify-center">
                     <textarea
+                      ref={areaRef}
                       type="text"
                       id="areaEmpresa"
                       autoComplete="off"
-                      rows={5}
+                      rows={1}
                       className={`resize-none overflow-hidden w-full bg-transparent outline-none `}
                       value={searchArea}
                       name="areaEmpresa"
+                      onFocus={() => setFilteredArea(AreaMulti)}
                       onChange={(e) => {
-                        e.target.style.height = "auto";
-                        e.target.style.height = `${e.target.scrollHeight}px`;
                         handleSearch(
                           e,
                           setSearchArea,
@@ -771,8 +800,8 @@ const HistoriaOcupacional = ({
                       }}
                       onBlur={() => setTimeout(() => setFilteredArea([]), 100)}
                     />
-                    {searchArea && filteredArea.length > 0 && (
-                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                    {filteredArea.length > 0 && (
+                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-10">
                         {filteredArea.map((opt) => (
                           <li
                             key={opt.id}
@@ -797,7 +826,7 @@ const HistoriaOcupacional = ({
                   </div>
                 </div>
               </td>
-              <td>
+              <td onClick={() => ocupacionRef.current?.focus()}>
                 {/* <AutoResizeInput
                   value={rowData.ocupacion}
                   onChange={(e) => handleRowChange("ocupacion", e.target.value)}
@@ -805,16 +834,14 @@ const HistoriaOcupacional = ({
                 <div className="relative">
                   <div className="flex flex-col items-center justify-center">
                     <textarea
+                      ref={ocupacionRef}
                       autoComplete="off"
-                      rows={5}
+                      rows={1}
                       className={`resize-none overflow-hidden w-full bg-transparent outline-none `}
                       value={searchCargoOcupacion}
                       name="ocupacion"
+                      onFocus={() => setFilteredCargoOcupacion(CargosMulti)}
                       onChange={(e) => {
-                        // Ajustar altura
-                        e.target.style.height = "auto";
-                        e.target.style.height = `${e.target.scrollHeight}px`;
-
                         handleSearch(
                           e,
                           setSearchCargoOcupacion,
@@ -844,9 +871,8 @@ const HistoriaOcupacional = ({
                         setTimeout(() => setFilteredCargoOcupacion([]), 100)
                       }
                     />
-                    {searchCargoOcupacion &&
-                      filteredCargoOcupacion.length > 0 && (
-                        <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-60">
+                    {filteredCargoOcupacion.length > 0 && (
+                        <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-60">
                           {filteredCargoOcupacion.map((opt, index) => (
                             <li
                               key={index}
@@ -870,18 +896,17 @@ const HistoriaOcupacional = ({
                   </div>
                 </div>
               </td>
-              <td>
+              <td onClick={() => socavonRef.current?.focus()}>
                 <div className="relative">
                   <div className="flex flex-col items-center justify-center">
                     <textarea
-                      rows={5}
+                      ref={socavonRef}
+                      rows={1}
                       autoComplete="off"
                       className="resize-none overflow-hidden w-full bg-transparent outline-none"
                       value={rowData.socavon}
                       name="socavon"
                       onChange={(e) => {
-                        e.target.style.height = "auto";
-                        e.target.style.height = `${e.target.scrollHeight}px`;
                         const v = e.target.value.toUpperCase();
                         handleRowChange("socavon", v);
                         const trimmed = v.trim();
@@ -914,7 +939,7 @@ const HistoriaOcupacional = ({
                       }
                     />
                     {filteredSocavon.length > 0 && (
-                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-50">
+                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
                         {filteredSocavon.map((sug, i) => (
                           <li
                             key={i}
@@ -932,18 +957,17 @@ const HistoriaOcupacional = ({
                   </div>
                 </div>
               </td>
-              <td>
+              <td onClick={() => superficieRef.current?.focus()}>
                 <div className="relative">
                   <div className="flex flex-col items-center justify-center">
                     <textarea
-                      rows={5}
+                      ref={superficieRef}
+                      rows={1}
                       autoComplete="off"
                       className="resize-none overflow-hidden w-full bg-transparent outline-none"
                       value={rowData.superficie}
                       name="superficie"
                       onChange={(e) => {
-                        e.target.style.height = "auto";
-                        e.target.style.height = `${e.target.scrollHeight}px`;
                         const v = e.target.value.toUpperCase();
                         handleRowChange("superficie", v);
                         const trimmed = v.trim();
@@ -976,7 +1000,7 @@ const HistoriaOcupacional = ({
                       }
                     />
                     {filteredSuperficie.length > 0 && (
-                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-50">
+                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
                         {filteredSuperficie.map((sug, i) => (
                           <li
                             key={i}
@@ -994,23 +1018,134 @@ const HistoriaOcupacional = ({
                   </div>
                 </div>
               </td>
-              <td>
-                <AutoResizeInput
-                  value={rowData.riesgo}
-                  onChange={(e) => {
-                    setSearchRiesgo(e.target.value);
-                    handleRowChange("riesgo", e.target.value.toUpperCase());
-                  }}
-                />
+              <td onClick={() => riesgoRef.current?.focus()}>
+                <div className="relative">
+                  <div className="flex flex-col items-center justify-center">
+                    <textarea
+                      ref={riesgoRef}
+                      id="riesgo"
+                      rows={1}
+                      autoComplete="off"
+                      className="resize-none overflow-hidden w-full bg-transparent outline-none"
+                      value={searchRiesgo}
+                      name="riesgo"
+                      onFocus={() => setFilteredRiesgo(riesgosOptions)}
+                      onChange={(e) => {
+                        handleSearch(
+                          e,
+                          setSearchRiesgo,
+                          handleRowChange,
+                          setFilteredRiesgo,
+                          riesgosOptions
+                        );
+                      }}
+                      onKeyUp={(e) => {
+                        if (e.key === "Enter" && filteredRiesgo.length > 0) {
+                          e.preventDefault();
+                          handleSelect(
+                            e,
+                            e.target.name,
+                            filteredRiesgo[0].mensaje,
+                            setSearchRiesgo,
+                            handleRowChange,
+                            setFilteredRiesgo
+                          );
+                          document.getElementById("proteccion")?.focus();
+                        }
+                      }}
+                      onBlur={() =>
+                        setTimeout(() => setFilteredRiesgo([]), 100)
+                      }
+                    />
+                    {filteredRiesgo.length > 0 && (
+                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-50">
+                        {filteredRiesgo.map((opt, index) => (
+                          <li
+                            key={index}
+                            name="riesgo"
+                            className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                            onMouseDown={(e) =>
+                              handleSelect(
+                                e,
+                                "riesgo",
+                                opt.mensaje,
+                                setSearchRiesgo,
+                                handleRowChange,
+                                setFilteredRiesgo
+                              )
+                            }
+                          >
+                            {opt.title}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
               </td>
-              <td>
-                <AutoResizeInput
-                  value={rowData.proteccion}
-                  onChange={(e) => {
-                    setSearchProt(e.target.value);
-                    handleRowChange("proteccion", e.target.value.toUpperCase());
-                  }}
-                />
+              <td onClick={() => protRef.current?.focus()}>
+                <div className="relative">
+                  <div className="flex flex-col items-center justify-center">
+                    <textarea
+                      ref={protRef}
+                      id="proteccion"
+                      rows={1}
+                      autoComplete="off"
+                      className="resize-none overflow-hidden w-full bg-transparent outline-none"
+                      value={searchProt}
+                      name="proteccion"
+                      onFocus={() => setFilteredProt(proteccionOptions)}
+                      onChange={(e) => {
+                        handleSearch(
+                          e,
+                          setSearchProt,
+                          handleRowChange,
+                          setFilteredProt,
+                          proteccionOptions
+                        );
+                      }}
+                      onKeyUp={(e) => {
+                        if (e.key === "Enter" && filteredProt.length > 0) {
+                          e.preventDefault();
+                          handleSelect(
+                            e,
+                            e.target.name,
+                            filteredProt[0].mensaje,
+                            setSearchProt,
+                            handleRowChange,
+                            setFilteredProt
+                          );
+                        }
+                      }}
+                      onBlur={() =>
+                        setTimeout(() => setFilteredProt([]), 100)
+                      }
+                    />
+                    {filteredProt.length > 0 && (
+                      <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-72 min-w-[320px] overflow-y-auto z-40">
+                        {filteredProt.map((opt) => (
+                          <li
+                            key={opt.id}
+                            name="proteccion"
+                            className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                            onMouseDown={(e) =>
+                              handleSelect(
+                                e,
+                                "proteccion",
+                                opt.mensaje,
+                                setSearchProt,
+                                handleRowChange,
+                                setFilteredProt
+                              )
+                            }
+                          >
+                            {opt.mensaje}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
               </td>
               <td>
                 <AutoResizeInput
@@ -1187,134 +1322,6 @@ const HistoriaOcupacional = ({
             )}
           </div>
         </div> */}
-        {/*RIESGOS */}
-        <div className="relative flex-1">
-          <div className="flex flex-col items-center justify-center">
-            <label htmlFor="">Riesgos</label>
-            <input
-              type="text"
-              id="riesgo"
-              autoComplete="off"
-              // className={styles.inputLarge}
-              className={`${styles.inputLarge} min-w-[100%]`}
-              value={searchRiesgo}
-              name="riesgo"
-              onFocus={() => {
-                setFilteredRiesgo(riesgosOptions);
-              }}
-              onChange={(e) => {
-                handleSearch(
-                  e,
-                  setSearchRiesgo,
-                  handleRowChange,
-                  setFilteredRiesgo,
-                  riesgosOptions
-                );
-              }}
-              onKeyUp={(e) => {
-                if (e.key === "Enter" && filteredRiesgo.length > 0) {
-                  e.preventDefault();
-                  handleSelect(
-                    e,
-                    e.target.name,
-                    filteredRiesgo[0].mensaje,
-                    setSearchRiesgo,
-                    handleRowChange,
-                    setFilteredRiesgo
-                  );
-                  document.getElementById("proteccion").focus();
-                }
-              }}
-              onBlur={() => setTimeout(() => setFilteredRiesgo([]), 100)}
-            />
-            {true && (
-              <ul className="absolute inset-x-0 top-full bg-white  border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
-                {filteredRiesgo.map((opt, index) => (
-                  <li
-                    key={index}
-                    name="riesgo"
-                    className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                    onMouseDown={(e) =>
-                      handleSelect(
-                        e,
-                        "riesgo",
-                        opt.mensaje,
-                        setSearchRiesgo,
-                        handleRowChange,
-                        setFilteredRiesgo
-                      )
-                    }
-                  >
-                    {opt.title}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-        {/*EPPS*/}
-        <div className="relative flex-1 ">
-          <div className="flex flex-col items-center justify-center">
-            <label htmlFor="">Protección</label>
-            <input
-              type="text"
-              id="proteccion"
-              autoComplete="off"
-              className={`${styles.inputLarge} min-w-[100%]`}
-              value={searchProt}
-              name="proteccion"
-              onFocus={() => {
-                setFilteredProt(proteccionOptions);
-              }}
-              onChange={(e) => {
-                handleSearch(
-                  e,
-                  setSearchProt,
-                  handleRowChange,
-                  setFilteredProt,
-                  proteccionOptions
-                );
-              }}
-              onKeyUp={(e) => {
-                if (e.key === "Enter" && filteredProt.length > 0) {
-                  e.preventDefault();
-                  handleSelect(
-                    e,
-                    e.target.name,
-                    filteredProt[0].mensaje,
-                    setSearchProt,
-                    handleRowChange,
-                    setFilteredProt
-                  );
-                }
-              }}
-              onBlur={() => setTimeout(() => setFilteredProt([]), 100)}
-            />
-            {true && (
-              <ul className="absolute inset-x-0 top-full bg-white  border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
-                {filteredProt.map((opt) => (
-                  <li
-                    key={opt.id}
-                    name="proteccion"
-                    className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                    onMouseDown={(e) =>
-                      handleSelect(
-                        e,
-                        "proteccion",
-                        opt.mensaje,
-                        setSearchProt,
-                        handleRowChange,
-                        setFilteredProt
-                      )
-                    }
-                  >
-                    {opt.mensaje}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
         <button
           type="button"
           style={{
