@@ -184,6 +184,30 @@ const HistoriaOcupacional = ({
   const handleRowChange = (field, value) => {
     const numero = Number(value); // solo para lógica de control
 
+    if (field === "empresa") {
+      const empresaUpper = value.toUpperCase();
+      if (empresaUpper.includes("GREEN PERU")) {
+        setSearchAltitud("34 M.S.N.M.");
+        setSearchArea("CAMPO");
+        setRowData((prev) => ({
+          ...prev,
+          empresa: value,
+          altitud: "34 M.S.N.M.",
+          actividad: "AGROINDUSTRIA",
+          areaEmpresa: "CAMPO",
+          socavon: "0",
+          superficie: "AÑOS",
+          riesgo:
+            "MOV. Y POSICIONES DISERGONOMICAS, BAJAS TEMPERATURAS,INSOLACIÓN,GOLPES,CAIDAS,RUIDO",
+          proteccion:
+            "GORRO, POLO MANGA LARGA, PROTECCIÓN SOLAR, GUANTES, TYVEK, GUANTES DE NITRILO, BOTAS CAÑA ALTA, MASCARILLAS N95",
+        }));
+        return;
+      }
+      setRowData((prev) => ({ ...prev, empresa: value }));
+      return;
+    }
+
     if (field === "socavon") {
       setRowData((prev) => ({
         ...prev,
