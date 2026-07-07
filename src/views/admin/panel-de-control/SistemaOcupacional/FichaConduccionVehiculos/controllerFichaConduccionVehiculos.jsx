@@ -124,7 +124,9 @@ export const GetInfoServicio = async (
         }
 
         const esBoroo = ((res.empresa ?? "") === "MINERA BOROO MISQUICHILCA S.A.");
-        const yearsToAdd = esBoroo ? 2 : 1;
+        const esNYV = ((res.empresa ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C." || 
+                        (res.contrata ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C.");
+        const yearsToAdd = (esBoroo || esNYV) ? 2 : 1;
 
         set((prev) => ({
             ...prev,
@@ -182,6 +184,7 @@ export const GetInfoServicio = async (
             obesidadIMC30: parseFloat(res.imcTriaje) >= 30,
 
             esBoroo,
+            esNYV,
             aptoHasta: getDatePlusYears(prev.aptoDesde, yearsToAdd),
 
             SubirDoc: true,
@@ -257,7 +260,10 @@ export const GetInfoServicioEditar = async (
             }
         }
         const esBoroo = ((res.empresa ?? "") === "MINERA BOROO MISQUICHILCA S.A.");
-        const yearsToAdd = esBoroo ? 2 : 1;
+        const esNYV = ((res.empresa ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C." || 
+                        (res.contrata ?? "") === "EMPRESA DE TRANSPORTES N & V S.A.C.");
+
+        const yearsToAdd = (esBoroo || esNYV) ? 2 : 1;
         const aptoDesde = res.fechaDesde_f_desde ?? prev.aptoDesde;
         const aptoHasta = getDatePlusYears(aptoDesde, yearsToAdd);
 
@@ -382,7 +388,7 @@ export const GetInfoServicioEditar = async (
             maquina: res.maquina ?? "",
             usoEstrictoLentesCorrectores: res.usoEstrictoLentesCorrectores ?? false,
             esBoroo,
-
+            esNYV,
             //VALORES FIRMA
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
             user_doctorAsignado: res.doctorAsignado,
