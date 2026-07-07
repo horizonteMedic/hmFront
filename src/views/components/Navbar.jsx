@@ -26,6 +26,7 @@ const Navbar = () => {
   const [activeLink, setActiveLink] = useState("");
   const setToken = useAuthStore((state) => state.setToken);
   const setuserlogued = useAuthStore((state) => state.setuserlogued);
+  const setSelectedSede = useAuthStore((state) => state.setSelectedSede);
 
   const [diasParaPago, setDiasParaPago] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
@@ -269,6 +270,27 @@ const Navbar = () => {
     };
   }, []);
 
+  const handleSedeChange = async (e) => {
+    const nuevaSede = e.target.value;
+    if (nuevaSede === selectedSede) return;
+
+    const result = await Swal.fire({
+      icon: 'warning',
+      title: '¿Cambiar de sede?',
+      text: 'Se perderán los datos que estás llenando en la página actual para volver a empezar.',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, cambiar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#fc6b03',
+    });
+
+    if (!result.isConfirmed) return;
+
+    setSelectedSede(nuevaSede);
+    clearLocalStorageExceptAuth();
+    window.location.reload();
+  };
+
   const handleNavLinkClick = (to) => {
     setActiveLink(to === "/panel-de-control" ? "" : to);
   };
@@ -297,7 +319,7 @@ const Navbar = () => {
   const Logoutbutton = () => {
     return (
       <button
-        onClick={() => { setToken(null); setuserlogued(null); }}
+        onClick={() => { setToken(null); setuserlogued(null); setSelectedSede(null); }}
         className="ml-4 flex items-center justify-center w-24 h-10 bg-red-600 rounded-full text-white font-bold hover:bg-red-700 transition duration-300 ease-in-out"
       >
         <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
@@ -365,11 +387,18 @@ const Navbar = () => {
         >
           <FontAwesomeIcon icon={faTrash} className='w-5 h-5' /> <span className='font-bold ml-2'>Limpiar</span>
         </button> */}
-        <p
-          className='bg-white text-[#233245] py-2 px-4 rounded-full flex items-center justify-center mr-5 font-bold'
+        <select
+          className='bg-white text-[#233245] py-2 px-4 rounded-full flex items-center justify-center mr-5 font-bold cursor-pointer border-none outline-none'
+          value={selectedSede || ""}
+          onChange={handleSedeChange}
+          title="Cambiar sede"
         >
-          {userCompleto?.sedes?.find((sede) => sede.cod_sede === selectedSede)?.nombre_sede}
-        </p>
+          {userCompleto?.sedes?.map((sede) => (
+            <option key={sede.cod_sede} value={sede.cod_sede}>
+              {sede.nombre_sede}
+            </option>
+          ))}
+        </select>
 
         {/* <button
           className='bg-purple-500 text-white hover:scale-110 ease-in-out py-2 px-3 rounded-full flex items-center justify-center duration-300 mr-5'

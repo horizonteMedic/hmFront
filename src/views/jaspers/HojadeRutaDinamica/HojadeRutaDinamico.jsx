@@ -8,6 +8,7 @@ import hojaTomaMuestra from "../components/hojaTomaMuestra";
 
 const ORDEN_AREAS = [
     "LABORATORIO",
+    "LABORATORIO PLOMO",
     "TRIAJE",
     "OFTALMOLOGIA",
     "PSICOLOGIA",
@@ -50,8 +51,9 @@ export default async function HojadeRutaDinamico(datos = {}) {
         }).filter(g => {
             if (g.examenes.length === 0) return false;
 
-            // EKG solo aparece si el paciente tiene 45 o más años
-            if (g.area.includes("EKG") && edad < 45) return false;
+            // Solo Green Peru: EKG solo aparece si el paciente tiene 45 o más años
+            const empresaFiltro = String(datos.razonEmpresa || datos.empresa || "").toUpperCase();
+            if (empresaFiltro.includes("GREEN PERU") && g.area.includes("EKG") && edad < 45) return false;
 
             return true;
         });
@@ -73,8 +75,11 @@ export default async function HojadeRutaDinamico(datos = {}) {
 
         const protocolo = String(datos.protocoloNombre || "").toUpperCase();
         const sexo = String(datos.sexo || datos.sexoPa || "").toUpperCase();
+        const empresa = String(datos.razonEmpresa || datos.empresa || "").toUpperCase();
+        const edad = parseInt(datos.edad) || 0;
 
-        const esPerfil4 = protocolo.includes("PERFIL 4");
+        const esGreenPeru = empresa.includes("GREEN PERU");
+        const esMinerosSur = empresa.includes("MINEROS DEL NORTE");
         const esPerfil12 = protocolo.includes("PERFIL 12");
         const esMasculino = sexo === "M" || sexo === "MASCULINO";
 
@@ -83,9 +88,24 @@ export default async function HojadeRutaDinamico(datos = {}) {
 
             const areaNorm = cat.area.toUpperCase();
 
-            // Perfil 12: omitir ALTURA y TEST DE ESTRES si no es masculino
-            if (esPerfil12 && !esMasculino) {
+            // Solo Green Peru: Perfil 12 omite ALTURA y TEST DE ESTRES si no es masculino
+            if (esGreenPeru && esPerfil12 && !esMasculino) {
                 if (areaNorm.includes("ALTURA") || areaNorm.includes("TEST DE ESTRES")) return;
+            }
+
+            // Mineros del Norte + protocolo COCINA: DORSOLUMBAR solo si es mayor de 35 años
+            // Otros protocolos de Mineros del Norte: DORSOLUMBAR siempre aparece
+            const esProtocoloCocina = protocolo.includes("COCINA");
+            if (esMinerosSur && esProtocoloCocina && areaNorm.includes("RAYOS X")) {
+                cat = {
+                    ...cat,
+                    examenes: cat.examenes.filter(e => {
+                        const nom = e.nombre?.toUpperCase() || "";
+                        if (nom.includes("DORSOLUMBAR")) return edad > 35;
+                        return true;
+                    })
+                };
+                if (cat.examenes.length === 0) return;
             }
 
             let examList = cat.examenes
@@ -98,13 +118,15 @@ export default async function HojadeRutaDinamico(datos = {}) {
                 })
                 .join("\n");
 
+            const esLabPlomo = areaNorm.includes("LABORATORIO PLOMO");
+            const estiloFila = esLabPlomo
+                ? { halign: 'left', minCellHeight: 16, textColor: [200, 0, 0], fontStyle: 'bold' }
+                : { halign: 'left', minCellHeight: 16 };
+
             tableBody.push([
-                {
-                    content: cat.area + "\n" + examList,
-                    styles: { halign: 'left', minCellHeight: 16 }
-                },
-                { content: "", styles: { minCellHeight: 16 } },
-                { content: "", styles: { minCellHeight: 16 } }
+                { content: cat.area + "\n" + examList, styles: estiloFila },
+                { content: "", styles: { minCellHeight: 16, ...(esLabPlomo && { textColor: [200, 0, 0] }) } },
+                { content: "", styles: { minCellHeight: 16, ...(esLabPlomo && { textColor: [200, 0, 0] }) } }
             ]);
         });
 
