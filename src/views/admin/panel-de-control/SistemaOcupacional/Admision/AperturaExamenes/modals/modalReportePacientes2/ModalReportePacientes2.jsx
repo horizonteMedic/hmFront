@@ -86,8 +86,8 @@ const ReportePacientes2 = ({ onClose, sede, token }) => {
         const preRegistroMap = [
             { key: "comp_toma_muestras", backendKey: "TOMA_MUESTRAS", label: "TOMA DE MUESTRAS", width: 16 },
             { key: "comp_examen_medico", backendKey: "EXAMEN_MEDICO", label: "EXAMEN MÉDICO", width: 16 },
-            { key: "comp_radiografia", backendKey: "comp_radiografia", label: "RADIOGRAFÍA", width: 14 },
-            { key: "comp_ekg", backendKey: "comp_ekg", label: "EKG", width: 10 },
+            { key: "COMP_RADIOGRAFIA", backendKey: "COMP_RADIOGRAFIA", label: "RADIOGRAFÍA", width: 14 },
+            { key: "COMP_EKG", backendKey: "COMP_EKG", label: "EKG", width: 10 },
         ];
         const headersComplemento = preRegistroMap.map(({ key, label, width }) => ({
             key, label, width, seccion: "complemento",

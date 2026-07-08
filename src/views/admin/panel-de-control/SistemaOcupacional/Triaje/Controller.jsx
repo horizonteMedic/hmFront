@@ -320,6 +320,7 @@ export const GetListTriajeMult = async (nro, set, get, token, jasper, setHTR) =>
                     fechaNac: res.fecha_nac,
                     nombres: res.nombres,
                     apellidos: res.apellidos,
+                    edad: res.edad,
                     fechaExamen: res.fecha_triaje,
                     talla: res.talla,
                     peso: res.peso,
