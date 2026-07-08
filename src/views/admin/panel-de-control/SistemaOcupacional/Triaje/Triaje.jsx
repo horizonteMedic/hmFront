@@ -328,14 +328,14 @@ export default function Triaje() {
                             disabled
                             labelWidth="120px"
                         />
-                        <InputTextOneLine
+                        {/* <InputTextOneLine
                             label="N° Historial"
                             name="nroHistorial"
                             value={form.nroHistorial}
                             onChange={handleChange}
                             disabled
                             labelWidth="120px"
-                        />
+                        /> */}
                         <InputTextOneLine
                             label="Nombres"
                             name="nombres"
