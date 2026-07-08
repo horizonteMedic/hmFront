@@ -4,6 +4,7 @@ export default function InputTextOneLine({
   value,
   onChange,
   onKeyUp,
+  onBlur,
   disabled = false,
   type = "text",
   labelWidth = "80px",
@@ -32,6 +33,7 @@ export default function InputTextOneLine({
         value={value ?? ""}
         onKeyUp={onKeyUp}
         onChange={onChange}
+        onBlur={onBlur}
         disabled={disabled}
       />
     </div>

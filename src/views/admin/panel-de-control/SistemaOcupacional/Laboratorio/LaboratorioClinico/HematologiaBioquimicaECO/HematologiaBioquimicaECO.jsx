@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import { getFetch } from "../../../../getFetch/getFetch";
 import {
   InputTextOneLine,
@@ -228,6 +229,17 @@ export default function HematologiaBioquimicaECO() {
 
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear, tabla);
+  };
+
+  const handleHemoglobinaBlur = (e) => {
+    const { value } = e.target;
+    if (value === "" || value === "N/A") return;
+
+    const numero = Number(value);
+    if (isNaN(numero) || numero <= 0 || numero > 25) {
+      Swal.fire("Valor no válido", "La Hemoglobina debe ser un valor mayor a 0 y menor o igual a 25 g/dl", "warning");
+      setForm(prev => ({ ...prev, hemoglobina: "" }));
+    }
   };
 
   const handleSearch = (e) => {
@@ -489,6 +501,7 @@ export default function HematologiaBioquimicaECO() {
                       labelWidth="120px"
                       onChange={handleChange}
                       onKeyUp={handleFocusNext}
+                      onBlur={key === "Hemoglobina" ? handleHemoglobinaBlur : undefined}
                     />
                   ))}
                 </div>
