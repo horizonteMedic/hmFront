@@ -83,6 +83,7 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}, 
   // Usar datos reales
   const datosFinales = datosReales;
 
+  const isNYV = (datosFinales.empresa === "EMPRESA DE TRANSPORTES N & V S.A.C." || datosFinales.contratista === "EMPRESA DE TRANSPORTES N & V S.A.C.") ?? false
   const { esBoroo, empresaTexto } = resolverEmpresaContratistaBoroo(datosFinales.empresa, datosFinales.contratista);
 
   // Header reutilizable
@@ -230,7 +231,7 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}, 
   yPos += filaAltura;
 
   // Séptima fila: Contrata (fila completa) - Solo si NO es BOROO
-  if (!esBoroo) {
+  if (!esBoroo || !isNYV) {
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
@@ -316,7 +317,7 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}, 
   yTexto += filaAltura;
 
   // Séptima fila: Contrata - Solo si NO es BOROO
-  if (!esBoroo) {
+  if (!esBoroo || !isNYV) {
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("Contratista:", tablaInicioX + 2, yTexto + 1);
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -350,7 +351,7 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}, 
   yTexto += filaAltura;
 
   // === SECCIÓN BOROO (solo si es Boroo) ===
-  if ( esBoroo) {
+  if ( esBoroo || isNYV) {
     // Primera fila: Número de Licencia | Clase | Categoría | Máquina
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
     doc.line(tablaInicioX + 52, yPos, tablaInicioX + 52, yPos + filaAltura); // División N° Licencia
@@ -961,7 +962,7 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}, 
   }
 
   // === SECCIÓN 5: CONCLUSIÓN DE LA PRESENTE EVALUACIÓN ===
-  if (esBoroo) {
+  if (esBoroo || isNYV) {
     // Boroo-specific Section 5
     const alturaHeaderConclusion = 4;
     yPos = dibujarHeaderSeccion("5.- CONCLUSIÓN DE LA PRESENTE EVALUACIÓN", yPos, alturaHeaderConclusion);
@@ -1369,7 +1370,7 @@ export default async function Certificaciondeconduccion_Digitalizado(data = {}, 
   yPos += alturaSeccionDeclaracion;
 
   // === FOOTER ===
-  if (!esBoroo) {
+  if (!esBoroo || !isNYV) {
     footerTR(doc, { footerOffsetY: 8 });
   }
 

@@ -32,7 +32,7 @@ export const GetInfoPac = async (nro, set, token, sede, setEstados) => {
 const GetExamenesCheck = async (nro, token, setEstados) => {
     const res = await getFetch(`${GetExamenes}?nOrden=${nro}`, token);
     const lista = res?.resultado ?? [];
-
+    console.log('lista', lista)
     // Backend devuelve nombreExamen en UPPERCASE → normalizamos a lowercase para comparar
     const mapaBackend = {};
     lista.forEach((item) => {

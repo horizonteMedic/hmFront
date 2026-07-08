@@ -138,6 +138,7 @@ export default function FichaConduccionVehiculos() {
         usoEstrictoLentesCorrectores: false,
 
         esBoroo: false,
+        esNYV: false,
 
         //PARTE INFERIOR
         // Conclusión y Comentarios
@@ -183,7 +184,7 @@ export default function FichaConduccionVehiculos() {
     // Handler para cuando cambia aptoDesde: actualiza aptoHasta automáticamente
     const handleAptoDesdeChange = (e) => {
         const { name, value } = e.target;
-        const yearsToAdd = form.esBoroo ? 2 : 1;
+        const yearsToAdd = (form.esBoroo || form.esNYV) ? 2 : 1;
         const newAptoHasta = getDatePlusYears(value, yearsToAdd);
         setForm(prev => ({
             ...prev,
@@ -391,7 +392,7 @@ export default function FichaConduccionVehiculos() {
                     {/* Tab Navigation */}
                     <nav className="flex bg-white border-b border-gray-200 sticky top-0 z-20">
                         {tabs.map((tab) =>
-                            tab.id != 3 || form.esBoroo ? (
+                            tab.id != 3 || form.esBoroo || form.esNYV ? (
                                 <button
                                     key={tab.id}
                                     className={`flex-1 px-4 py-3 uppercase tracking-wider text-[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${activeTab === tab.id
@@ -466,7 +467,7 @@ export default function FichaConduccionVehiculos() {
                                         value={form?.conclusion}
                                         onChange={handleRadioButton}
                                         vertical
-                                        options={form?.esBoroo ? [
+                                        options={form?.esBoroo || form?.esNYV ? [
                                             { label: "Apto", value: "APTO" },
                                             { label: "No Apto", value: "NO APTO" },
                                         ] : [

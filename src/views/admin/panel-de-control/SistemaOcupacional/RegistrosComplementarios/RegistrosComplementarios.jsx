@@ -9,8 +9,8 @@ import { GetInfoPac, RegistrarEstadoExamen } from "./controllerRegistrosCompleme
 const EXAMENES = [
     { label: "Toma de Muestras", key: "toma_muestras", icon: "🧪" },
     { label: "Examen Médico", key: "examen_medico", icon: "🩺" },
-    { label: "Radiografía", key: "radiografia", icon: "🦴" },
-    { label: "EKG", key: "ekg", icon: "❤️" },
+    { label: "Radiografía", key: "comp_radiografia", icon: "🦴" },
+    { label: "EKG", key: "comp_ekg", icon: "❤️" },
 ];
 
 const ExamenCard = ({ examen, norden, estado, onToggle, loading }) => {
