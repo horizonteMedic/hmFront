@@ -53,7 +53,7 @@ export default async function HojadeRutaDinamico(datos = {}) {
 
             // Solo Green Peru: EKG solo aparece si el paciente tiene 45 o más años
             const empresaFiltro = String(datos.razonEmpresa || datos.empresa || "").toUpperCase();
-            if (empresaFiltro.includes("GREEN PERU") && g.area.includes("EKG") && edad < 45) return false;
+            if (empresaFiltro.includes("GREEN PERU") && g.area.includes("EKG") && edad < 50) return false;
 
             return true;
         });
@@ -79,7 +79,19 @@ export default async function HojadeRutaDinamico(datos = {}) {
         const edad = parseInt(datos.edad) || 0;
 
         const esGreenPeru = empresa.includes("GREEN PERU");
-        const esMinerosSur = empresa.includes("MINEROS DEL NORTE");
+    
+        const empresas = [
+            "MINEROS DEL NORTE E.I.R.L.",
+            "MAGNUM SECURITY S.A.C.",
+            "SOCIEDAD MINERA DE RESPONSABILIDAD LIMITADA OSO DORADO"
+        ];
+
+        const empresaNormalizada = empresa.toUpperCase();
+
+        const esMinerosSur = empresas.some(nombre =>
+            empresaNormalizada.includes(nombre.toUpperCase())
+        );
+
         const esPerfil12 = protocolo.includes("PERFIL 12");
         const esMasculino = sexo === "M" || sexo === "MASCULINO";
 
