@@ -2,6 +2,7 @@ import Swal from "sweetalert2";
 import { getFetch } from "../../../getFetch/getFetch";
 import { SubmitData } from "../model";
 import jsPDF from "jspdf";
+import { existeRegistro } from "../../../../../utils/functionUtils";
 
 //===============Zona Modificación===============
 const obtenerReporteUrl =
@@ -9,6 +10,23 @@ const obtenerReporteUrl =
 const registrarUrl =
   "/api/v01/ct/evaluacionMusculoEsqueletica/registrarActualizarEvaluacionMusculoEsqueletica";
 const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+
+const TABLA_EVALUACION_NORMAL = "evaluacion_musculo_esqueletica";
+const TABLA_EVALUACION_2021 = "evaluacion_musculo_esqueletica2021";
+const MENSAJE_BLOQUEO_EVALUACION_2021 =
+  "No se puede registrar porque este paciente ya cuenta con registros de Evaluación Músculo Esquelética BOORO.";
+
+// Evaluación Músculo Esquelética (Normal) y 2021 son parte del mismo examen: si
+// el paciente ya tiene un registro 2021 y todavía no tiene su propio registro
+// Normal, se bloquean ambas (ni se cargan datos ni se permite guardar) hasta
+// que exista el registro Normal propio (caso legado en el que sí conviven ambas).
+const verificarBloqueoEvaluacion2021 = async (nro, token) => {
+  const [existePropia, existe2021] = await Promise.all([
+    existeRegistro(nro, TABLA_EVALUACION_NORMAL, token),
+    existeRegistro(nro, TABLA_EVALUACION_2021, token),
+  ]);
+  return { bloqueado: !existePropia && existe2021, existePropia, existe2021 };
+};
 const leerBoolSI = (bool) => {
   return bool ? "SI" : "NO";
 };
@@ -250,6 +268,11 @@ export const SubmitDataService = async (
 ) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
+    return;
+  }
+  const { bloqueado } = await verificarBloqueoEvaluacion2021(form.norden, token);
+  if (bloqueado) {
+    await Swal.fire("Error", MENSAJE_BLOQUEO_EVALUACION_2021, "error");
     return;
   }
   Loading("Registrando Datos");
@@ -646,24 +669,40 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
     return;
   }
   Loading("Validando datos");
-  getFetch(
-    `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
-    token
-  ).then((res) => {
-    console.log(res);
-    if (res.id === 0) {
-      //No tiene registro previo
-      GetInfoPac(nro, set, token, sede);
-    } else {
-      GetInfoServicio(nro, tabla, set, token, () => {
-        Swal.fire(
-          "Alerta",
-          "Este paciente ya cuenta con registros de MusculoEsqueletica.",
-          "warning"
-        );
-      });
-    }
-  });
+
+  let existePropia, existe2021, bloqueado;
+  try {
+    ({ existePropia, existe2021, bloqueado } = await verificarBloqueoEvaluacion2021(
+      nro,
+      token
+    ));
+  } catch (error) {
+    Swal.close();
+    await Swal.fire("Error", "Ocurrió un error al validar el Nro de Orden.", "error");
+    return;
+  }
+  Swal.close();
+
+  if (bloqueado) {
+    await Swal.fire("Error", MENSAJE_BLOQUEO_EVALUACION_2021, "error");
+    console.log("Bloqueado: 2021 existe, Normal aún no. No se cargan datos.");
+    return;
+  }
+
+  if (existePropia) {
+    GetInfoServicio(nro, tabla, set, token, () => {
+      Swal.fire(
+        "Alerta",
+        "Este paciente ya cuenta con registros de MusculoEsqueletica.",
+        "warning"
+      );
+      console.log(existe2021 ? "Caso legado: ambas existen" : "Solo Normal existe");
+    });
+    return;
+  }
+
+  GetInfoPac(nro, set, token, sede);
+  console.log("Ninguna existe, registro nuevo");
 };
 
 export const GetInfoPac = (nro, set, token, sede) => {
