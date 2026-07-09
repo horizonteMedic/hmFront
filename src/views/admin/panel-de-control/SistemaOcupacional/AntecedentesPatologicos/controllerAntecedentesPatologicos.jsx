@@ -688,12 +688,30 @@ const mapExamenesActualesForm = (resActual) => ({
     marihuanaRed: (resActual?.marihuanaLaboratorioClinico_txtmarihuana ?? "") == "POSITIVO",
 });
 
-// Cuando cancela   
+// Cuando cancela
 export const GetInfoBasicoNordenActual = async (nordenActual, tabla, set, token) => {
     const resActual = await getFetch(
         `${obtenerReporteUrl}?nOrden=${nordenActual}&nameService=${tabla}&esJasper=false`,
         token
     );
+
+    // Antecedentes Quirúrgicos del norden ACTUAL (o del Huamachuco por DNI
+    // si todavía no hay ninguno registrado bajo este norden).
+    let antecedentesData = [];
+    if (resActual?.antecedentesPatologicosQuirurjicos && resActual.antecedentesPatologicosQuirurjicos.length > 0) {
+        antecedentesData = resActual.antecedentesPatologicosQuirurjicos.map((item) => ({
+            codAntecedentesPatologicosQuirurgicos: null,
+            quirurjicosId: null,
+            fecha: item.fecha,
+            hospitalOperacion: item.hospitalOperacion,
+            operacion: item.operacion,
+            diasHospitalizado: item.diasHospitalizado,
+            complicaciones: item.complicaciones,
+        }));
+    } else if (resActual?.dniPaciente || resActual?.dni_paciente || resActual?.dni) {
+        const dni = resActual.dniPaciente || resActual.dni_paciente || resActual.dni;
+        antecedentesData = await fetchAntecedentesHuamachuco(dni, token);
+    }
 
     const hoy = new Date();
     const fechaActual = `${hoy.getFullYear()}-${("0" + (hoy.getMonth() + 1)).slice(-2)}-${("0" + hoy.getDate()).slice(-2)}`;
@@ -705,6 +723,7 @@ export const GetInfoBasicoNordenActual = async (nordenActual, tabla, set, token)
         fechaCovid: fechaActual,
         ...mapDatosPacienteForm(resActual),
         ...mapExamenesActualesForm(resActual),
+        antecedentes: antecedentesData,
     }));
 };
 
