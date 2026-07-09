@@ -2,8 +2,8 @@ import jsPDF from "jspdf";
 import footerCons from "./FooterCons.jsx";
 import headerConInformadoOcupacional from "./Header/header_conInformadoOcupacional_Digitalizado.jsx";
 
-export default async function ConsentimientoRayosX_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+export default async function ConsentimientoRayosX_Digitalizado(data = {}, docExistente = null) {
+  const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const margin = 20;
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
@@ -77,11 +77,12 @@ export default async function ConsentimientoRayosX_Digitalizado(data = {}) {
       img.onload = () => res(img);
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
-  Promise.all([
-    isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
-    isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-  ]).then(([s1, s2]) => {
-    // Usar datos reales o datos de prueba
+  const [s1, s2] = await Promise.all([
+    isValidUrl(sello1?.url) ? loadImg(sello1.url).catch(() => null) : Promise.resolve(null),
+    isValidUrl(sello2?.url) ? loadImg(sello2.url).catch(() => null) : Promise.resolve(null),
+  ]);
+
+  // Usar datos reales o datos de prueba
     const datosFinales =
       data && Object.keys(data).length > 0 ? datosReales : datosPrueba;
 
@@ -378,7 +379,12 @@ export default async function ConsentimientoRayosX_Digitalizado(data = {}) {
     // Agregar footer con datos de contacto
     footerCons(doc, data);
 
-    // === 8) Generar blob y abrir en iframe para imprimir automáticamente ===
+    // === 8) Si viene de un folio, retornar el doc para seguir agregando páginas ===
+    if (docExistente) {
+      return doc;
+    }
+
+    // === 9) Generar blob y abrir en iframe para imprimir automáticamente ===
     const blob = doc.output("blob");
     const url = URL.createObjectURL(blob);
     const iframe = document.createElement("iframe");
@@ -389,5 +395,4 @@ export default async function ConsentimientoRayosX_Digitalizado(data = {}) {
       iframe.contentWindow.focus();
       iframe.contentWindow.print();
     };
-  });
 }

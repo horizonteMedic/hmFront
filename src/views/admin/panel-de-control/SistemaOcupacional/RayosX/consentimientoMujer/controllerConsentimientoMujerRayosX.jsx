@@ -33,6 +33,7 @@ export const GetInfoServicio = async (
     set((prev) => ({
       ...prev,
       ...res,
+      fechaUltimaRegla: res.fechaUltimaRegla ?? "",
     }));
   }
 };
@@ -67,13 +68,14 @@ export const SubmitDataService = async (
   tabla,
   datosFooter
 ) => {
-  if (!form.norden) {
+  if (!form.norden || !form.fechaUltimaRegla) {
     await Swal.fire("Error", "Datos incompletos", "error");
     return;
   }
   const body = {
     norden: form.norden,
     fecha: form.fecha,
+    fechaUltimaRegla: form.fechaUltimaRegla,
     hora: getHoraActual(),
     userRegistro: user,
   };

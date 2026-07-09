@@ -18,6 +18,7 @@ import conInformadoOcupacional_Digitalizado from "../ConsentimientoInformado/con
 import InformeElectrocardiograma2023 from "../EKG/InformeElectrocardiograma2023";
 import InformeElectrocardiograma_Digitalizado from "../EKG/InformeElectrocardiograma_Digitalizado";
 import OIT_Digitalizado from "../OIT/OIT_Digitalizado";
+import ConsentimientoRayosX_Digitalizado from "../RayosX/consentimientoMujer/ConsentimientoRayosX_Digitalizado";
 import Aptitud_medico_resumen_Digitalizado from "../CertificadoMedicoOcupacional/Aptitud_medico_resumen_Digitalizado";
 import Aptitud_Agroindustrial from "../Ficha_Anexo2/Aptitud_Agroindustrial";
 import InformePsicologico_Anexo02_Nuevo from "../Anexo2/Anexo2";
@@ -329,6 +330,8 @@ export const reportesMap = {
    },
 
    oit: OIT_Digitalizado,
+
+   consentimiento_rayosx: ConsentimientoRayosX_Digitalizado,
 
    radiografia: RAYOSXXXOFI_Digitalizado,
 
