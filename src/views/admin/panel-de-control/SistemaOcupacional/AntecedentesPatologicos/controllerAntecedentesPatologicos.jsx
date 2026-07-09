@@ -7,11 +7,119 @@ import {
 } from "../../../../utils/functionUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
 
+const listaNordenFecha = [
+    {
+        norden: "1",
+        fecha: "2023-01-01",
+    },
+    {
+        norden: "2",
+        fecha: "2023-01-02",
+    }
+];
+
+
 const obtenerReporteUrl =
     "/api/v01/ct/antecedentesPatologicos/obtenerReporteAntecedentesPatologicos";
 const registrarUrl =
     "/api/v01/ct/antecedentesPatologicos/registrarActualizarAntecedentesPatologicos";
+const obtenerListaNordenUrl = "/api/v01/ct/antecedentesPatologicos/historial";
 
+const OpenModalNorden = async (
+    norden,
+    tabla,
+    set,
+    token,
+) => {
+    const list = await getFetch(`${obtenerListaNordenUrl}?nOrden=${norden}`, token);
+     const inputOptions = list.reduce((acc, item) => {
+        acc[item.norden] = `N° ${item.norden} - ${item.fecha_registro_antecedente}`;
+        return acc;
+    }, {});
+
+    const { value: seleccion } = await Swal.fire({
+        title: "Selecciona un N° de orden",
+        html: `<p style="margin:0 0 4px;color:#64748b;font-size:13px;">Elige el registro anterior desde el cual traer la información</p>`,
+        input: "radio",
+        inputOptions,
+        inputValidator: (value) => {
+            if (!value) return "Debes seleccionar una opción o crear una nueva.";
+        },
+        showCancelButton: true,
+        confirmButtonText: "Buscar",
+        cancelButtonText: "Cancelar",
+        allowOutsideClick: false,
+        customClass: {
+            popup: "swal-dinamico swal-norden-popup",
+        },
+        didOpen: () => {
+            const popup = Swal.getPopup();
+            popup.style.maxWidth = "480px";
+            popup.style.width = "90vw";
+            popup.style.maxHeight = "80vh";
+
+            if (!document.getElementById("swal-norden-styles")) {
+                const style = document.createElement("style");
+                style.id = "swal-norden-styles";
+                style.textContent = `
+                    .swal-norden-popup .swal2-radio {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 10px;
+                        width: 100%;
+                        max-height: 40vh;
+                        overflow-y: auto;
+                        padding: 4px 2px;
+                        margin: 12px 0 !important;
+                    }
+                    .swal-norden-popup .swal2-radio label {
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        margin: 0 !important;
+                        padding: 12px 16px;
+                        border: 1px solid #d7dde5;
+                        border-radius: 10px;
+                        background: #f8fafc;
+                        cursor: pointer;
+                        transition: border-color .15s ease, background-color .15s ease;
+                    }
+                    .swal-norden-popup .swal2-radio label:hover {
+                        border-color: #0d9488;
+                        background: #f0fdfa;
+                    }
+                    .swal-norden-popup .swal2-radio label:has(input:checked) {
+                        border-color: #0d9488;
+                        background: #e6fbf8;
+                        box-shadow: 0 0 0 1px #0d9488 inset;
+                    }
+                    .swal-norden-popup .swal2-radio input[type="radio"] {
+                        width: 18px;
+                        height: 18px;
+                        margin: 0;
+                        accent-color: #0d9488;
+                        flex-shrink: 0;
+                    }
+                    .swal-norden-popup .swal2-radio .swal2-label {
+                        margin: 0;
+                        font-size: 14px;
+                        color: #1f2937;
+                        text-align: left;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+    });
+
+    // Si seleccionó una opción, se trae la data de ese N° de orden anterior
+    // pero conservando el "norden" actual, para guardarla como un registro nuevo.
+    if (seleccion) {
+        GetInfoServicioParaNuevoRegistro(seleccion, norden, tabla, set, token, () => {
+            Swal.close();
+        });
+    }
+}
 // Helper function to fetch antecedentes from Huamachuco
 const fetchAntecedentesHuamachuco = async (dni, token) => {
     try {
@@ -91,7 +199,7 @@ export const GetInfoServicio = async (
                 diasHospitalizado: item.diasHospitalizado,
                 complicaciones: item.complicaciones,
             }));
-        } else if (res.dni_cod_pa ) {
+        } else if (res.dni_cod_pa) {
             const dni = res.dni_cod_pa;
             console.log({ selectedSede });
             if (selectedSede == "HMAC") {
@@ -136,40 +244,10 @@ export const GetInfoServicio = async (
     }
 };
 
-export const GetInfoServicioEditar = async (
-    nro,
-    tabla,
-    set,
-    token,
-    onFinish = () => { }
-) => {
-    const res = await GetInfoServicioDefault(
-        nro,
-        tabla,
-        token,
-        obtenerReporteUrl,
-        onFinish
-    );
-    if (res) {
-        // Check if we need to fetch from Huamachuco
-        let antecedentesData = [];
-        if (res.antecedentesPatologicosQuirurjicos && res.antecedentesPatologicosQuirurjicos.length > 0) {
-            antecedentesData = res.antecedentesPatologicosQuirurjicos.map((item) => ({
-                codAntecedentesPatologicosQuirurgicos: item.codAntecedentesPatologicosQuirurgicos,
-                quirurjicosId: item.quirurjicosId,
-                fecha: item.fecha,
-                hospitalOperacion: item.hospitalOperacion,
-                operacion: item.operacion,
-                diasHospitalizado: item.diasHospitalizado,
-                complicaciones: item.complicaciones,
-            }));
-        } else if (res.dniPaciente || res.dni_paciente || res.dni) {
-            const dni = res.dniPaciente || res.dni_paciente || res.dni;
-            antecedentesData = await fetchAntecedentesHuamachuco(dni, token);
-        }
-
-        set((prev) => ({
-            ...prev,
+// Arma el objeto de campos del formulario a partir de la respuesta del backend.
+// Se usa tanto para editar un registro existente como para "copiar" datos de
+// un N° de orden anterior hacia un registro nuevo (ver GetInfoServicioParaNuevoRegistro).
+const mapAntecedentesPatologicosForm = (res, antecedentesData, prev) => ({
             //PRIMERA TAB==========================================================================
             norden: res.n_orden,
             codigoAntecedentesPatologicos_cod_ap: res.codigoAntecedentesPatologicos_cod_ap,
@@ -424,6 +502,94 @@ export const GetInfoServicioEditar = async (
             carnetConadis: res.conadisEspecifiqueBoro_conadisdetalle,
 
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+});
+
+export const GetInfoServicioEditar = async (
+    nro,
+    tabla,
+    set,
+    token,
+    onFinish = () => { }
+) => {
+    const res = await GetInfoServicioDefault(
+        nro,
+        tabla,
+        token,
+        obtenerReporteUrl,
+        onFinish
+    );
+    if (res) {
+        // Check if we need to fetch from Huamachuco
+        let antecedentesData = [];
+        if (res.antecedentesPatologicosQuirurjicos && res.antecedentesPatologicosQuirurjicos.length > 0) {
+            antecedentesData = res.antecedentesPatologicosQuirurjicos.map((item) => ({
+                codAntecedentesPatologicosQuirurgicos: item.codAntecedentesPatologicosQuirurgicos,
+                quirurjicosId: item.quirurjicosId,
+                fecha: item.fecha,
+                hospitalOperacion: item.hospitalOperacion,
+                operacion: item.operacion,
+                diasHospitalizado: item.diasHospitalizado,
+                complicaciones: item.complicaciones,
+            }));
+        } else if (res.dniPaciente || res.dni_paciente || res.dni) {
+            const dni = res.dniPaciente || res.dni_paciente || res.dni;
+            antecedentesData = await fetchAntecedentesHuamachuco(dni, token);
+        }
+
+        set((prev) => ({
+            ...prev,
+            ...mapAntecedentesPatologicosForm(res, antecedentesData, prev),
+        }));
+    }
+};
+
+// Trae la información de un N° de orden anterior (seleccionado en el modal de
+// OpenModalNorden) para usarla como base de un registro NUEVO, sin tocar el
+// N° de orden ni el código de registro actuales, para que se guarde como un
+// registro independiente en lugar de sobreescribir el anterior.
+export const GetInfoServicioParaNuevoRegistro = async (
+    nordenBuscar,
+    nordenActual,
+    tabla,
+    set,
+    token,
+    onFinish = () => { }
+) => {
+    const res = await GetInfoServicioDefault(
+        nordenBuscar,
+        tabla,
+        token,
+        obtenerReporteUrl,
+        onFinish
+    );
+    if (res) {
+        // Check if we need to fetch from Huamachuco
+        let antecedentesData = [];
+        if (res.antecedentesPatologicosQuirurjicos && res.antecedentesPatologicosQuirurjicos.length > 0) {
+            antecedentesData = res.antecedentesPatologicosQuirurjicos.map((item) => ({
+                codAntecedentesPatologicosQuirurgicos: null,
+                quirurjicosId: null,
+                fecha: item.fecha,
+                hospitalOperacion: item.hospitalOperacion,
+                operacion: item.operacion,
+                diasHospitalizado: item.diasHospitalizado,
+                complicaciones: item.complicaciones,
+            }));
+        } else if (res.dniPaciente || res.dni_paciente || res.dni) {
+            const dni = res.dniPaciente || res.dni_paciente || res.dni;
+            antecedentesData = await fetchAntecedentesHuamachuco(dni, token);
+        }
+
+        const hoy = new Date();
+        const fechaActual = `${hoy.getFullYear()}-${("0" + (hoy.getMonth() + 1)).slice(-2)}-${("0" + hoy.getDate()).slice(-2)}`;
+
+        set((prev) => ({
+            ...prev,
+            ...mapAntecedentesPatologicosForm(res, antecedentesData, prev),
+            norden: nordenActual,
+            fechaExam: fechaActual,
+            fechaCovid: fechaActual,
+            codigoAntecedentesPatologicos_cod_ap: null,
         }));
     }
 };
@@ -718,7 +884,8 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         sede,
         () => {
             //NO Tiene registro
-            GetInfoServicio(nro, tabla, set, token, sede, () => { Swal.close(); });
+            // GetInfoServicio(nro, tabla, set, token, sede, () => { Swal.close(); });
+            OpenModalNorden(nro, tabla, set, token );
         },
         () => {
             //Tiene registro
@@ -760,7 +927,7 @@ export const VerifyTRPerzonalizado = async (nro, tabla, token, set, sede, noTien
             //No tiene registro previo 
             noTieneRegistro();//datos paciente
         } else if (res.id === 2) {
-            noTieneRegistro();//datos paciente
+            necesitaExamen();//datos paciente
         } else {
             tieneRegistro();//obtener data servicio
         }
