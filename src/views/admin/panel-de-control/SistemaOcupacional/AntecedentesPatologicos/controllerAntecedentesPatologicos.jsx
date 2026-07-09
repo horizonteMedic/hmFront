@@ -39,7 +39,7 @@ const OpenModalNorden = async (
 
     const { value: seleccion } = await Swal.fire({
         title: "Selecciona un N° de orden",
-        html: `<p style="margin:0 0 4px;color:#64748b;font-size:13px;">Elige el registro anterior desde el cual traer la información</p>`,
+        html: `<p style="margin:0 0 4px;color:#64748b;font-size:12px;">Elige el registro anterior desde el cual traer la información</p>`,
         input: "radio",
         inputOptions,
         inputValidator: (value) => {
@@ -54,61 +54,81 @@ const OpenModalNorden = async (
         },
         didOpen: () => {
             const popup = Swal.getPopup();
-            popup.style.maxWidth = "480px";
-            popup.style.width = "90vw";
-            popup.style.maxHeight = "80vh";
-
-            if (!document.getElementById("swal-norden-styles")) {
-                const style = document.createElement("style");
+            popup.style.maxWidth = "350px";
+            popup.style.width = "80vw";
+ 
+            let style = document.getElementById("swal-norden-styles");
+            if (!style) {
+                style = document.createElement("style");
                 style.id = "swal-norden-styles";
-                style.textContent = `
-                    .swal-norden-popup .swal2-radio {
-                        display: flex;
-                        flex-direction: column;
-                        gap: 10px;
-                        width: 100%;
-                        max-height: 40vh;
-                        overflow-y: auto;
-                        padding: 4px 2px;
-                        margin: 12px 0 !important;
-                    }
-                    .swal-norden-popup .swal2-radio label {
-                        display: flex;
-                        align-items: center;
-                        gap: 12px;
-                        margin: 0 !important;
-                        padding: 12px 16px;
-                        border: 1px solid #d7dde5;
-                        border-radius: 10px;
-                        background: #f8fafc;
-                        cursor: pointer;
-                        transition: border-color .15s ease, background-color .15s ease;
-                    }
-                    .swal-norden-popup .swal2-radio label:hover {
-                        border-color: #0d9488;
-                        background: #f0fdfa;
-                    }
-                    .swal-norden-popup .swal2-radio label:has(input:checked) {
-                        border-color: #0d9488;
-                        background: #e6fbf8;
-                        box-shadow: 0 0 0 1px #0d9488 inset;
-                    }
-                    .swal-norden-popup .swal2-radio input[type="radio"] {
-                        width: 18px;
-                        height: 18px;
-                        margin: 0;
-                        accent-color: #0d9488;
-                        flex-shrink: 0;
-                    }
-                    .swal-norden-popup .swal2-radio .swal2-label {
-                        margin: 0;
-                        font-size: 14px;
-                        color: #1f2937;
-                        text-align: left;
-                    }
-                `;
                 document.head.appendChild(style);
             }
+            style.textContent = `
+                .swal-norden-popup {
+                    padding-bottom: 1em;
+                }
+                .swal-norden-popup .swal2-title {
+                    padding: 0.6em 0.9em 0;
+                    font-size: 1.4em;
+                }
+                .swal-norden-popup .swal2-html-container {
+                    margin: 0.3em 0.9em 0;
+                }
+                .swal-norden-popup .swal2-radio {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: stretch;
+                    gap: 6px;
+                    width: auto;
+                    max-height: 45vh;
+                    overflow-y: auto;
+                    overflow-x: hidden;
+                    padding: 6px 6px 2px;
+                    margin: 0.6em 0.9em 0 !important;
+                }
+                .swal-norden-popup .swal2-radio label {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    margin: 0 !important;
+                    padding: 8px 12px;
+                    border: 1px solid #d7dde5;
+                    border-radius: 8px;
+                    background: #f8fafc;
+                    cursor: pointer;
+                    box-sizing: border-box;
+                    transition: border-color .15s ease, background-color .15s ease;
+                }
+                .swal-norden-popup .swal2-radio label:hover {
+                    border-color: #0d9488;
+                    background: #f0fdfa;
+                }
+                .swal-norden-popup .swal2-radio label:has(input:checked) {
+                    border-color: #0d9488;
+                    background: #e6fbf8;
+                    box-shadow: 0 0 0 1px #0d9488 inset;
+                }
+                .swal-norden-popup .swal2-radio input[type="radio"] {
+                    width: 16px;
+                    height: 16px;
+                    margin: 0;
+                    accent-color: #0d9488;
+                    flex-shrink: 0;
+                }
+                .swal-norden-popup .swal2-radio .swal2-label {
+                    margin: 0;
+                    font-size: 11px;
+                    color: #1f2937;
+                    text-align: left;
+                }
+                .swal-norden-popup .swal2-radio::-webkit-scrollbar {
+                    width: 6px;
+                }
+                .swal-norden-popup .swal2-radio::-webkit-scrollbar-thumb {
+                    background: #cbd5e1;
+                    border-radius: 4px;
+                }
+            `;
         }
     });
 
