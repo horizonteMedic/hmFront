@@ -222,9 +222,9 @@ const ExamenesListCOMPLETO = buildExamenesList(ExamenesListCOMPLETO_BASE);
 const ExamenesListCOMPLETO_MARSA = buildExamenesList(
     ExamenesListCOMPLETO_BASE.map(item =>
         item === "RESUMEN_MEDICO_PODEROSA" ? "RESUMEN_MEDICO_MARSA" :
-        item === "RESUMEN_MEDICO_ANEXO_02" ? "RESUMEN_MEDICO_MARSA" :
-        item === "CERTIFICADO_APTITUD_ANEXO_16" ? "CERTIFICADO_APTITUD_ANEXO_16_ADMINISTRATIVO_SIMPLE" :
-        item
+            item === "RESUMEN_MEDICO_ANEXO_02" ? "RESUMEN_MEDICO_MARSA" :
+                item === "CERTIFICADO_APTITUD_ANEXO_16" ? "CERTIFICADO_APTITUD_ANEXO_16_ADMINISTRATIVO_SIMPLE" :
+                    item
     ).filter((item, index, arr) => arr.indexOf(item) === index) // deduplica RESUMEN_MEDICO_MARSA
 );
 
@@ -346,6 +346,10 @@ const Folio = () => {
         idFirma: null,
         nombre_medico: "",
         user_medicoFirma: "",
+
+        // Fecha personalizada para reemplazar la fecha de los exámenes al generar el folio
+        fechaPersonalizada: "",
+        diasVencimientoPersonalizado: "",
     };
 
     const {
@@ -522,6 +526,13 @@ const Folio = () => {
         SubmitDataService(token, () => { handleSearch({ key: "Enter" }) }, form);
     }
 
+    const handleChangeDiasVencimiento = (e) => {
+        const { value } = e.target;
+        if (/^\d*$/.test(value)) {
+            setForm((prev) => ({ ...prev, diasVencimientoPersonalizado: value }));
+        }
+    };
+
     const handleListChange = (e) => {
         const newValue = e.target.value;
         setSelectedListType(newValue);
@@ -657,7 +668,9 @@ const Folio = () => {
                 form.apellidos,
                 datosFooter,
                 comprimidoz,
-                urlType
+                urlType,
+                form.fechaPersonalizada,
+                form.diasVencimientoPersonalizado
             );
 
             const normalizeKey = (value) =>
@@ -1014,6 +1027,31 @@ const Folio = () => {
                         ))}
                     </select>
                 </div>
+                {selectedSede && selectedSede == "CMPA" && <div className="flex items-center gap-4">
+                    <InputTextOneLine
+                        label="Fecha Personalizada"
+                        name="fechaPersonalizada"
+                        type="date"
+                        value={form.fechaPersonalizada}
+                        onChange={handleChangeSimple}
+                        labelWidth="150px"
+                    />
+                    {/* <InputTextOneLine
+                        label="Vencimiento (días)"
+                        name="diasVencimientoPersonalizado"
+                        type="number"
+                        value={form.diasVencimientoPersonalizado}
+                        onChange={handleChangeDiasVencimiento}
+                        disabled={!form.fechaPersonalizada}
+                        labelWidth="140px"
+                    />
+                    <span className="text-xs text-gray-500 whitespace-nowrap">
+                        {form.fechaPersonalizada
+                            ? (form.diasVencimientoPersonalizado ? `Vence en ${form.diasVencimientoPersonalizado} día(s)` : "Vence en 1 año (por defecto)")
+                            : "Opcional: reemplaza la fecha de todos los exámenes al generar el folio"}
+                    </span> */}
+                </div>}
+
                 <div className="w-full flex  justify-between items-center px-2">
                     <div className="flex items-center gap-2">
                         <input
