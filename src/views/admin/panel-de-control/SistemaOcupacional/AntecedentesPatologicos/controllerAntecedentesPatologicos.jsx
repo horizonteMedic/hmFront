@@ -37,9 +37,9 @@ const OpenModalNorden = async (
         return acc;
     }, {});
 
-    const { value: seleccion } = await Swal.fire({
+    const resultadoModal = await Swal.fire({
         title: "Selecciona un N° de orden",
-        html: `<p style="margin:0 0 4px;color:#64748b;font-size:12px;">Elige el registro anterior desde el cual traer la información</p>`,
+        html: `<p style="margin:0 0 4px;color:#64748b;font-size:12px;">Elige el registro anterior</p>`,
         input: "radio",
         inputOptions,
         inputValidator: (value) => {
@@ -54,9 +54,33 @@ const OpenModalNorden = async (
         },
         didOpen: () => {
             const popup = Swal.getPopup();
-            popup.style.maxWidth = "350px";
-            popup.style.width = "80vw";
  
+            const applyLayout = () => {
+                const title = popup.querySelector(".swal2-title");
+                const htmlContainer = popup.querySelector(".swal2-html-container");
+                const radioGroup = popup.querySelector(".swal2-radio");
+                const actions = popup.querySelector(".swal2-actions");
+
+                popup.style.maxWidth = "350px";
+                popup.style.width = "80vw";
+                popup.style.maxHeight = "80vh";
+                popup.style.display = "flex";
+                popup.style.flexDirection = "column";
+                popup.style.overflow = "hidden";
+
+                if (title) title.style.flex = "0 0 auto";
+                if (htmlContainer) htmlContainer.style.flex = "0 0 auto";
+                if (actions) actions.style.flex = "0 0 auto";
+                if (radioGroup) {
+                    radioGroup.style.flex = "1 1 auto";
+                    radioGroup.style.minHeight = "0";
+                }
+            };
+
+            applyLayout();
+            window.addEventListener("resize", applyLayout);
+            popup._nordenResizeHandler = applyLayout;
+
             let style = document.getElementById("swal-norden-styles");
             if (!style) {
                 style = document.createElement("style");
@@ -68,11 +92,12 @@ const OpenModalNorden = async (
                     padding-bottom: 1em;
                 }
                 .swal-norden-popup .swal2-title {
-                    padding: 0.6em 0.9em 0;
+                    margin: 0;
+                    padding: .5rem .5rem .5rem;
                     font-size: 1.4em;
                 }
                 .swal-norden-popup .swal2-html-container {
-                    margin: 0.3em 0.9em 0;
+                    margin: 0.3em 0.9em 0 ;
                 }
                 .swal-norden-popup .swal2-radio {
                     display: flex;
@@ -80,11 +105,11 @@ const OpenModalNorden = async (
                     align-items: stretch;
                     gap: 6px;
                     width: auto;
-                    max-height: 45vh;
                     overflow-y: auto;
                     overflow-x: hidden;
                     padding: 6px 6px 2px;
-                    margin: 0.6em 0.9em 0 !important;
+                    margin: 1em 1em 0 !important;
+                    padding-top: 15px;
                 }
                 .swal-norden-popup .swal2-radio label {
                     display: flex;
@@ -129,15 +154,25 @@ const OpenModalNorden = async (
                     border-radius: 4px;
                 }
             `;
+        },
+        willClose: () => {
+            const popup = Swal.getPopup();
+            if (popup?._nordenResizeHandler) {
+                window.removeEventListener("resize", popup._nordenResizeHandler);
+            }
         }
     });
 
-    // Si seleccionó una opción, se trae la data de ese N° de orden anterior
-    // pero conservando el "norden" actual, para guardarla como un registro nuevo.
+    const seleccion = resultadoModal.value;
+
+    // Si seleccionó una opción, se trae la data de ese N° de orden anterior con "norden" actual 
     if (seleccion) {
         GetInfoServicioParaNuevoRegistro(seleccion, norden, tabla, set, token, () => {
             Swal.close();
         });
+    } else if (resultadoModal.dismiss === Swal.DismissReason.cancel) {
+        // Si cancela  
+        GetInfoBasicoNordenActual(norden, tabla, set, token);
     }
 }
 // Helper function to fetch antecedentes from Huamachuco
@@ -563,10 +598,7 @@ export const GetInfoServicioEditar = async (
     }
 };
 
-// Trae la información de un N° de orden anterior (seleccionado en el modal de
-// OpenModalNorden) para usarla como base de un registro NUEVO, sin tocar el
-// N° de orden ni el código de registro actuales, para que se guarde como un
-// registro independiente en lugar de sobreescribir el anterior.
+// Trae la información de un N° de orden anterior  
 export const GetInfoServicioParaNuevoRegistro = async (
     nordenBuscar,
     nordenActual,
@@ -603,9 +635,9 @@ export const GetInfoServicioParaNuevoRegistro = async (
         const hoy = new Date();
         const fechaActual = `${hoy.getFullYear()}-${("0" + (hoy.getMonth() + 1)).slice(-2)}-${("0" + hoy.getDate()).slice(-2)}`;
 
-        // El Examen Ocular (Oftalmología) pertenece al N° de orden ACTUAL
-        // (viene de su propia Agudeza Visual), así que se trae por separado
-        // en lugar de usar el del norden anterior seleccionado en el modal.
+        // El Examen Ocular (Oftalmología) y el Laboratorio pertenecen al N°
+        // de orden ACTUAL, así que se traen por separado en lugar de usar
+        // los del norden anterior seleccionado en el modal.
         const resActual = await getFetch(
             `${obtenerReporteUrl}?nOrden=${nordenActual}&nameService=${tabla}&esJasper=false`,
             token
@@ -618,26 +650,62 @@ export const GetInfoServicioParaNuevoRegistro = async (
             fechaExam: fechaActual,
             fechaCovid: fechaActual,
             codigoAntecedentesPatologicos_cod_ap: null,
-            vcOD: resActual?.visioncercasincorregirod_v_cerca_s_od ?? "",
-            vcOI: resActual?.visioncercasincorregiroi_v_cerca_s_oi ?? "",
-            vlOD: resActual?.visionlejossincorregirod_v_lejos_s_od ?? "",
-            vlOI: resActual?.visionlejossincorregiroi_v_lejos_s_oi ?? "",
-            vcCorregidaOD: resActual?.oftalodccmologia_odcc ?? "",
-            vcCorregidaOI: resActual?.oiccoftalmologia_oicc ?? "",
-            vlCorregidaOD: resActual?.odlcoftalmologia_odlc ?? "",
-            vlCorregidaOI: resActual?.oilcoftalmologia_oilc ?? "",
-            vclrs: resActual?.vcoftalmologia_vc ?? "",
-            vb: resActual?.vboftalmologia_vb ?? "",
-            rp: resActual?.rpoftalmologia_rp ?? "",
-            enfermedadesOculares: resActual?.enfermedadesocularesoftalmo_e_oculares ?? "",
-            // Igual que el Examen Ocular: cocaína/marihuana vienen del
-            // Laboratorio Clínico del norden ACTUAL, no del anterior.
-            cocaina: resActual?.cocainaLaboratorioClinico_txtcocaina ?? "",
-            cocainaRed: (resActual?.cocainaLaboratorioClinico_txtcocaina ?? "") == "POSITIVO",
-            marihuana: resActual?.marihuanaLaboratorioClinico_txtmarihuana ?? "",
-            marihuanaRed: (resActual?.marihuanaLaboratorioClinico_txtmarihuana ?? "") == "POSITIVO",
+            ...mapDatosPacienteForm(resActual),
+            ...mapExamenesActualesForm(resActual),
         }));
     }
+};
+
+// Datos básicos del paciente (nombre, sexo, edad) según el reporte del N°
+// de orden ACTUAL, independientes del norden anterior que se haya elegido.
+const mapDatosPacienteForm = (resActual) => ({
+    nombres: resActual?.nombres_nombres_pa
+        ? `${resActual.nombres_nombres_pa} ${resActual.apellidos_apellidos_pa ?? ""}`.trim()
+        : "",
+    sexo: resActual?.sexo_sexo_pa == "M" ? "MASCULINO" : resActual?.sexo_sexo_pa == "F" ? "FEMENINO" : "",
+    edad: resActual?.edad_edad ? `${resActual.edad_edad} AÑOS` : "",
+    boroo: resActual?.esBoro ?? false,
+});
+
+// Examen Ocular (Oftalmología) y Laboratorio (cocaína/marihuana) del N° de
+// orden ACTUAL: nunca se pisan con los del norden anterior seleccionado.
+const mapExamenesActualesForm = (resActual) => ({
+    vcOD: resActual?.visioncercasincorregirod_v_cerca_s_od ?? "",
+    vcOI: resActual?.visioncercasincorregiroi_v_cerca_s_oi ?? "",
+    vlOD: resActual?.visionlejossincorregirod_v_lejos_s_od ?? "",
+    vlOI: resActual?.visionlejossincorregiroi_v_lejos_s_oi ?? "",
+    vcCorregidaOD: resActual?.oftalodccmologia_odcc ?? "",
+    vcCorregidaOI: resActual?.oiccoftalmologia_oicc ?? "",
+    vlCorregidaOD: resActual?.odlcoftalmologia_odlc ?? "",
+    vlCorregidaOI: resActual?.oilcoftalmologia_oilc ?? "",
+    vclrs: resActual?.vcoftalmologia_vc ?? "",
+    vb: resActual?.vboftalmologia_vb ?? "",
+    rp: resActual?.rpoftalmologia_rp ?? "",
+    enfermedadesOculares: resActual?.enfermedadesocularesoftalmo_e_oculares ?? "",
+    cocaina: resActual?.cocainaLaboratorioClinico_txtcocaina ?? "",
+    cocainaRed: (resActual?.cocainaLaboratorioClinico_txtcocaina ?? "") == "POSITIVO",
+    marihuana: resActual?.marihuanaLaboratorioClinico_txtmarihuana ?? "",
+    marihuanaRed: (resActual?.marihuanaLaboratorioClinico_txtmarihuana ?? "") == "POSITIVO",
+});
+
+// Cuando cancela   
+export const GetInfoBasicoNordenActual = async (nordenActual, tabla, set, token) => {
+    const resActual = await getFetch(
+        `${obtenerReporteUrl}?nOrden=${nordenActual}&nameService=${tabla}&esJasper=false`,
+        token
+    );
+
+    const hoy = new Date();
+    const fechaActual = `${hoy.getFullYear()}-${("0" + (hoy.getMonth() + 1)).slice(-2)}-${("0" + hoy.getDate()).slice(-2)}`;
+
+    set((prev) => ({
+        ...prev,
+        norden: nordenActual,
+        fechaExam: fechaActual,
+        fechaCovid: fechaActual,
+        ...mapDatosPacienteForm(resActual),
+        ...mapExamenesActualesForm(resActual),
+    }));
 };
 
 export const SubmitDataService = async (
