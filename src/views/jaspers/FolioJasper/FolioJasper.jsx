@@ -9,8 +9,9 @@ import { PDFDocument } from "pdf-lib";
 
 import pdfjsLib from "../../config/pdjfConfig";
 import { colocarSellosEnPdf, getSign } from "../../utils/helpers";
+import { aplicarFechaPersonalizada } from "../../admin/panel-de-control/SistemaOcupacional/Folio/fechaOverrideMap";
 
-export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType, signal, nombres = "", apellidos = "", datosFooter, comprimidoz = false, urlType = "azure") {
+export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType, signal, nombres = "", apellidos = "", datosFooter, comprimidoz = false, urlType = "azure", fechaPersonalizada = "", diasVencimientoPersonalizado = "") {
     if (signal?.aborted) throw new DOMException("Aborted", "AbortError");//para poder cancelar la gereracion
 
     const pdfFinal = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true, precision: 1 });
@@ -147,7 +148,9 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
                 if (conJsonAnidado.includes(examen.tabla)) {
                     data = data.resultado;
                 }
-                return data ? { ...data, ...datosFooter } : null;
+                if (!data) return null;
+                data = aplicarFechaPersonalizada(data, examen.tabla, fechaPersonalizada, diasVencimientoPersonalizado);
+                return { ...data, ...datosFooter };
             } catch (err) {
                 console.error("Error cargando:", examen.nombre, err);
                 return null;
