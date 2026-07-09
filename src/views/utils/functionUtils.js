@@ -359,10 +359,10 @@ export const VerifyTRPerzonalizadoDefault = async (nro, tabla, token, set, sede,
 
 };
 
-export const existeRegistro = async (nro, tabla, token, sede) => {
+export const existeRegistro = async (nro, tabla, token) => {
     try {
         const res = await getFetch(
-            `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}&codSede=${sede}`,
+            `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
             token
         );
         return res?.id !== 0;
