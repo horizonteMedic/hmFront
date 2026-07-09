@@ -17,6 +17,7 @@ export default async function ConsentimientoRayosX_Digitalizado(data = {}) {
     empresa:
       "CORPORACION PERUANA DE CENTROS MEDICOS SAC CON RUC 20123456789 Y DENOMINACION COMERCIAL EXTENDIDA RAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
     fecha: "2025-08-01",
+    fechaUltimaRegla: "2025-07-01",
   };
   function formatearFechaLarga(fecha) {
     if (fecha == "" || fecha == null) {
@@ -59,6 +60,7 @@ export default async function ConsentimientoRayosX_Digitalizado(data = {}) {
     ocupacion: obtenerStringMayus("ocupacion"),
     empresa: obtenerStringMayus("empresa"),
     fecha: obtenerString("fecha"),
+    fechaUltimaRegla: obtenerString("fechaUltimaRegla"),
     codigoSede: obtenerString("codigoSede"),
   };
 
@@ -190,28 +192,94 @@ export default async function ConsentimientoRayosX_Digitalizado(data = {}) {
 
     // === 5) CUERPO DEL CONSENTIMIENTO ===
     doc.setFont("helvetica", "normal").setFontSize(11);
-    const consentimiento =
-      "Declaro que he recibido explicaciones satisfactorias sobre el propósito, naturaleza y riesgos de la toma de RAYOS X, por lo cual doy de conocimiento y declaro que a la fecha no me encuentro en estado de gestación, ya que soy consciente de los eventuales riesgos que se pueden derivar de la realización de dicho examen en caso de encontrarme gestando. Por lo cual AUTORIZO a que se me realice la radiografía, indicada por el protocolo de la empresa contratante.";
 
     // Usar la posición final de la empresa + espaciado para el cuerpo del consentimiento
     const cuerpoY = empresaEndY + 5; // 5 puntos de separación después de la empresa
 
-    // Usar el mismo método simple que en conInformadoOcupacional_Digitalizado.jsx
-    doc.text(consentimiento, margin, cuerpoY, { maxWidth: pageW - 2 * margin, align: "justify" });
+    const consentimientoLineHeight = 5;
+    const consentimientoMaxWidth = pageW - 2 * margin;
+    const blankWidth = 30; // ancho de la línea en blanco para llenado manual
 
-    // Calcular la posición final del cuerpo del consentimiento (aproximada)
-    const cuerpoEndY = cuerpoY + 60; // Espacio aproximado para el texto del consentimiento
+    let consentimientoX = margin;
+    let consentimientoY = cuerpoY;
+
+    // Agrega un fragmento de texto (normal o negrita) respetando el ancho de línea
+    const agregarFragmento = (texto, esNegrita) => {
+      doc.setFont("helvetica", esNegrita ? "bold" : "normal");
+      doc.text(texto, consentimientoX, consentimientoY);
+      consentimientoX += doc.getTextWidth(texto);
+    };
+
+    // Agrega una línea en blanco (subrayado) para llenado manual, cuando no llega el dato
+    const agregarEspacioEnBlanco = () => {
+      if (consentimientoX + blankWidth > consentimientoMaxWidth + margin) {
+        consentimientoY += consentimientoLineHeight;
+        consentimientoX = margin;
+      }
+      doc.setLineWidth(0.3);
+      doc.line(
+        consentimientoX,
+        consentimientoY + 1,
+        consentimientoX + blankWidth,
+        consentimientoY + 1
+      );
+      consentimientoX += blankWidth;
+    };
+
+    const fechaUltimaReglaTexto = formatearFechaLarga(
+      datosFinales.fechaUltimaRegla
+    );
+
+    const consentimientoPartes = [
+      {
+        text: "Declaro que he recibido explicaciones satisfactorias sobre el propósito, naturaleza y riesgos de la toma de RAYOS X, por lo cual doy de conocimiento y declaro que a la fecha no me encuentro en estado de gestación, ya que soy consciente de los eventuales riesgos que se pueden derivar de la realización de dicho examen en caso de encontrarme gestando. Así mismo mi ",
+        bold: false,
+      },
+      { text: "Fecha de Última Regla", bold: true },
+      { text: " fue el ", bold: false },
+      fechaUltimaReglaTexto
+        ? { text: fechaUltimaReglaTexto, bold: false }
+        : { blank: true },
+      {
+        text: ". Por lo cual AUTORIZO a que se me realice la radiografía, indicada por el protocolo de la empresa contratante.",
+        bold: false,
+      },
+    ];
+
+    consentimientoPartes.forEach((parte) => {
+      if (parte.blank) {
+        agregarEspacioEnBlanco();
+        return;
+      }
+      const palabras = parte.text.split(' ');
+      palabras.forEach((palabra, i) => {
+        const palabraConEspacio = i > 0 ? ' ' + palabra : palabra;
+        const anchoPalabra = doc.getTextWidth(palabraConEspacio);
+
+        if (consentimientoX + anchoPalabra <= consentimientoMaxWidth + margin) {
+          agregarFragmento(palabraConEspacio, parte.bold);
+        } else {
+          consentimientoY += consentimientoLineHeight;
+          consentimientoX = margin;
+          agregarFragmento(palabra, parte.bold);
+        }
+      });
+    });
+
+    doc.setFont("helvetica", "normal");
+
+    const notaFirmaY = consentimientoY + 14;
 
     doc.text(
       "Y para que así conste, firmo el presente consentimiento.",
       margin,
-      cuerpoEndY - 10
+      notaFirmaY
     );
 
     doc.text(
       `${datosFinales.codigoSede}, ${formatearFechaLarga(datosFinales.fecha)}`,
       margin,
-      cuerpoEndY - 4
+      notaFirmaY + 6
     );
 
     // === 6) FOOTER CON FECHA, Y FIRMAS ===
