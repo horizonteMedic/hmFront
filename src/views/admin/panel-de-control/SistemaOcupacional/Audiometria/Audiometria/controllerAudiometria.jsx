@@ -22,10 +22,10 @@ const MENSAJE_BLOQUEO_AUDIOMETRIA_OHLA =
 // Igual que en Audiometría OHLA: si el paciente ya tiene un registro OHLA
 // (tabla audiometria_po) y todavía no tiene su propio registro de
 // Audiometría Normal (tabla), se bloquea tanto la carga como el guardado.
-const verificarBloqueoAudiometriaOhla = async (nro, tabla, token) => {
+const verificarBloqueoAudiometriaOhla = async (nro, tabla, token, sede) => {
   const [existePropia, existeOhla] = await Promise.all([
-    existeRegistro(nro, tabla, token),
-    existeRegistro(nro, "audiometria_po", token),
+    existeRegistro(nro, tabla, token, sede),
+    existeRegistro(nro, "audiometria_po", token, sede),
   ]);
   return { bloqueado: !existePropia && existeOhla, existePropia, existeOhla };
 };
@@ -204,7 +204,7 @@ export const SubmitDataService = async (
     return;
   }
 
-  const { bloqueado } = await verificarBloqueoAudiometriaOhla(form.norden, tabla, token);
+  const { bloqueado } = await verificarBloqueoAudiometriaOhla(form.norden, tabla, token, sede);
   if (bloqueado) {
     await Swal.fire("Error", MENSAJE_BLOQUEO_AUDIOMETRIA_OHLA, "error");
     return;
@@ -387,7 +387,8 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
     ({ existePropia, existeOhla, bloqueado } = await verificarBloqueoAudiometriaOhla(
       nro,
       tabla,
-      token
+      token,
+      sede
     ));
   } catch (error) {
     Swal.close();
