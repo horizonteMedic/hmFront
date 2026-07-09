@@ -764,6 +764,12 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/oit/obtenerReporteOit",
     },
 
+    CONSENTIMIENTO_MUJER_RAYOS_X: {
+        nombre: "CONSENTIMIENTO DE TOMA RADIOGRAFICA EN MUJERES EN EDAD FERTIL",
+        tabla: "consentimiento_rayosx",
+        url: "/api/v01/ct/rayosX/obtenerReporteConsentimientoRayosX",
+    },
+
     RADIOGRAFIA_COLUMNA: {
         nombre: "INFORME RADIOGRAFICO (RADIOGRAFIA COLUMNA)",
         tabla: "radiografia",
