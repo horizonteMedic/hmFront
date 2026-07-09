@@ -603,6 +603,14 @@ export const GetInfoServicioParaNuevoRegistro = async (
         const hoy = new Date();
         const fechaActual = `${hoy.getFullYear()}-${("0" + (hoy.getMonth() + 1)).slice(-2)}-${("0" + hoy.getDate()).slice(-2)}`;
 
+        // El Examen Ocular (Oftalmología) pertenece al N° de orden ACTUAL
+        // (viene de su propia Agudeza Visual), así que se trae por separado
+        // en lugar de usar el del norden anterior seleccionado en el modal.
+        const resActual = await getFetch(
+            `${obtenerReporteUrl}?nOrden=${nordenActual}&nameService=${tabla}&esJasper=false`,
+            token
+        );
+
         set((prev) => ({
             ...prev,
             ...mapAntecedentesPatologicosForm(res, antecedentesData, prev),
@@ -610,6 +618,24 @@ export const GetInfoServicioParaNuevoRegistro = async (
             fechaExam: fechaActual,
             fechaCovid: fechaActual,
             codigoAntecedentesPatologicos_cod_ap: null,
+            vcOD: resActual?.visioncercasincorregirod_v_cerca_s_od ?? "",
+            vcOI: resActual?.visioncercasincorregiroi_v_cerca_s_oi ?? "",
+            vlOD: resActual?.visionlejossincorregirod_v_lejos_s_od ?? "",
+            vlOI: resActual?.visionlejossincorregiroi_v_lejos_s_oi ?? "",
+            vcCorregidaOD: resActual?.oftalodccmologia_odcc ?? "",
+            vcCorregidaOI: resActual?.oiccoftalmologia_oicc ?? "",
+            vlCorregidaOD: resActual?.odlcoftalmologia_odlc ?? "",
+            vlCorregidaOI: resActual?.oilcoftalmologia_oilc ?? "",
+            vclrs: resActual?.vcoftalmologia_vc ?? "",
+            vb: resActual?.vboftalmologia_vb ?? "",
+            rp: resActual?.rpoftalmologia_rp ?? "",
+            enfermedadesOculares: resActual?.enfermedadesocularesoftalmo_e_oculares ?? "",
+            // Igual que el Examen Ocular: cocaína/marihuana vienen del
+            // Laboratorio Clínico del norden ACTUAL, no del anterior.
+            cocaina: resActual?.cocainaLaboratorioClinico_txtcocaina ?? "",
+            cocainaRed: (resActual?.cocainaLaboratorioClinico_txtcocaina ?? "") == "POSITIVO",
+            marihuana: resActual?.marihuanaLaboratorioClinico_txtmarihuana ?? "",
+            marihuanaRed: (resActual?.marihuanaLaboratorioClinico_txtmarihuana ?? "") == "POSITIVO",
         }));
     }
 };
