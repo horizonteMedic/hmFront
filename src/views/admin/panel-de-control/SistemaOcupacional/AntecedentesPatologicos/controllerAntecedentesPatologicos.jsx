@@ -171,8 +171,8 @@ const OpenModalNorden = async (
             Swal.close();
         });
     } else if (resultadoModal.dismiss === Swal.DismissReason.cancel) {
-        // Si cancela  
-        GetInfoBasicoNordenActual(norden, tabla, set, token);
+        // Si cancela
+        GetInfoBasicoNordenActual(norden, tabla, set, token, list);
     }
 }
 // Helper function to fetch antecedentes from Huamachuco
@@ -688,29 +688,41 @@ const mapExamenesActualesForm = (resActual) => ({
     marihuanaRed: (resActual?.marihuanaLaboratorioClinico_txtmarihuana ?? "") == "POSITIVO",
 });
 
-// Cuando cancela
-export const GetInfoBasicoNordenActual = async (nordenActual, tabla, set, token) => {
+// Cuando cancela: nombre/sexo/edad y Oftalmología/Laboratorio del norden ACTUAL, 
+// Antecedentes Quirúrgicos del N° de orden mas reciente(fecha_registro_antecedente)
+export const GetInfoBasicoNordenActual = async (nordenActual, tabla, set, token, list = []) => {
     const resActual = await getFetch(
         `${obtenerReporteUrl}?nOrden=${nordenActual}&nameService=${tabla}&esJasper=false`,
         token
     );
 
-    // Antecedentes Quirúrgicos del norden ACTUAL (o del Huamachuco por DNI
-    // si todavía no hay ninguno registrado bajo este norden).
+    const nordenMasReciente = list.reduce((masReciente, item) => {
+        if (!masReciente) return item;
+        return new Date(item.fecha_registro_antecedente) > new Date(masReciente.fecha_registro_antecedente)
+            ? item
+            : masReciente;
+    }, null);
+
     let antecedentesData = [];
-    if (resActual?.antecedentesPatologicosQuirurjicos && resActual.antecedentesPatologicosQuirurjicos.length > 0) {
-        antecedentesData = resActual.antecedentesPatologicosQuirurjicos.map((item) => ({
-            codAntecedentesPatologicosQuirurgicos: null,
-            quirurjicosId: null,
-            fecha: item.fecha,
-            hospitalOperacion: item.hospitalOperacion,
-            operacion: item.operacion,
-            diasHospitalizado: item.diasHospitalizado,
-            complicaciones: item.complicaciones,
-        }));
-    } else if (resActual?.dniPaciente || resActual?.dni_paciente || resActual?.dni) {
-        const dni = resActual.dniPaciente || resActual.dni_paciente || resActual.dni;
-        antecedentesData = await fetchAntecedentesHuamachuco(dni, token);
+    if (nordenMasReciente) {
+        const resAnterior = await getFetch(
+            `${obtenerReporteUrl}?nOrden=${nordenMasReciente.norden}&nameService=${tabla}&esJasper=false`,
+            token
+        );
+        if (resAnterior?.antecedentesPatologicosQuirurjicos && resAnterior.antecedentesPatologicosQuirurjicos.length > 0) {
+            antecedentesData = resAnterior.antecedentesPatologicosQuirurjicos.map((item) => ({
+                codAntecedentesPatologicosQuirurgicos: null,
+                quirurjicosId: null,
+                fecha: item.fecha,
+                hospitalOperacion: item.hospitalOperacion,
+                operacion: item.operacion,
+                diasHospitalizado: item.diasHospitalizado,
+                complicaciones: item.complicaciones,
+            }));
+        } else if (resAnterior?.dniPaciente || resAnterior?.dni_paciente || resAnterior?.dni) {
+            const dni = resAnterior.dniPaciente || resAnterior.dni_paciente || resAnterior.dni;
+            antecedentesData = await fetchAntecedentesHuamachuco(dni, token);
+        }
     }
 
     const hoy = new Date();
