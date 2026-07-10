@@ -380,8 +380,15 @@ export const GetInfoServicio = (
               ".\n";
           }
 
-          if (res.conclusionMusculoesqueletica != null) {
-            data.observacionesGenerales += "MUSCULOESQUELETICA: " + res.conclusionMusculoesqueletica + "\n";
+          const musculoEsqueleticoAnexo = res.musculoEsqueleticoAnexo ?? {};
+          const musculoDiagnostico = musculoEsqueleticoAnexo.musculoesqueleticoDiagnostico;
+          const musculoConclusiones = musculoEsqueleticoAnexo.musculoEsqueleticoBorooConclusiones;
+          const mostrarMusculoesqueletico = musculoDiagnostico != null
+            ? musculoDiagnostico !== "NORMAL"
+            : (musculoConclusiones != null && musculoConclusiones !== "NORMAL");
+
+          if (mostrarMusculoesqueletico) {
+            data.observacionesGenerales += `MUSCULOESQUELETICA: ${musculoConclusiones ? musculoConclusiones + "\n" : ""}${musculoDiagnostico ?? ""}\n`;
           }
 
           const hallazgoEKG = res.hallazgosInformeElectroCardiograma_hallazgo;
@@ -2016,8 +2023,15 @@ export const GetInfoServicioEditar = (
               ".\n";
           }
 
-          if (resSimple.conclusionMusculoesqueletica != null) {
-            data.observacionesGenerales2 += "MUSCULOESQUELETICA: " + res.conclusionMusculoesqueletica + "\n";
+          const musculoEsqueleticoAnexo2 = resSimple.musculoEsqueleticoAnexo ?? {};
+          const musculoDiagnostico2 = musculoEsqueleticoAnexo2.musculoesqueleticoDiagnostico;
+          const musculoConclusiones2 = musculoEsqueleticoAnexo2.musculoEsqueleticoBorooConclusiones;
+          const mostrarMusculoesqueletico2 = musculoDiagnostico2 != null
+            ? musculoDiagnostico2 !== "NORMAL"
+            : (musculoConclusiones2 != null && musculoConclusiones2 !== "NORMAL");
+
+          if (mostrarMusculoesqueletico2) {
+            data.observacionesGenerales2 += `MUSCULOESQUELETICA: ${musculoConclusiones2 ? musculoConclusiones2 + "\n" : ""}${musculoDiagnostico2 ?? ""}\n`;
           }
 
           // if (res.observacionFichaConduccion != null) {

@@ -465,13 +465,12 @@ export const GetInfoServicio = (
           const musculoEsqueleticoAnexo = res.musculoEsqueleticoAnexo ?? {};
           const musculoDiagnostico = musculoEsqueleticoAnexo.musculoesqueleticoDiagnostico;
           const musculoConclusiones = musculoEsqueleticoAnexo.musculoEsqueleticoBorooConclusiones;
-          const musculoRecomendaciones = musculoEsqueleticoAnexo.musculoEsqueleticoBorooRecomendaciones;
           const mostrarMusculoesqueletico = musculoDiagnostico != null
             ? musculoDiagnostico !== "NORMAL"
             : (musculoConclusiones != null && musculoConclusiones !== "NORMAL");
 
           if (mostrarMusculoesqueletico) {
-            data.observacionesGenerales += `MUSCULOESQUELETICA: ${musculoRecomendaciones ? musculoRecomendaciones + "\n" : ""}${musculoConclusiones ? musculoConclusiones + "\n" : ""}${musculoDiagnostico ?? ""} ${res.valoresCie10.musculoEsqueleticoDiagnosticoCie10 ?? ""}\n`;
+            data.observacionesGenerales += `MUSCULOESQUELETICA: ${musculoConclusiones ? musculoConclusiones + "\n" : ""}${musculoDiagnostico ?? ""} ${res.valoresCie10.musculoEsqueleticoDiagnosticoCie10 ?? ""}\n`;
           }
 
           if (res.observacionesConduccionCertificado_conduccion != null) {
@@ -1247,13 +1246,12 @@ export const GetInfoServicioEditar = (
           const musculoEsqueleticoAnexo2 = res.musculoEsqueleticoAnexo ?? {};
           const musculoDiagnostico2 = musculoEsqueleticoAnexo2.musculoesqueleticoDiagnostico;
           const musculoConclusiones2 = musculoEsqueleticoAnexo2.musculoEsqueleticoBorooConclusiones;
-          const musculoRecomendaciones2 = musculoEsqueleticoAnexo2.musculoEsqueleticoBorooRecomendaciones;
           const mostrarMusculoesqueletico2 = musculoDiagnostico2 != null
             ? musculoDiagnostico2 !== "NORMAL"
             : (musculoConclusiones2 != null && musculoConclusiones2 !== "NORMAL");
 
           if (mostrarMusculoesqueletico2) {
-            data.observacionesGenerales2 += `MUSCULOESQUELETICA: ${musculoRecomendaciones2 ? musculoRecomendaciones2 + "\n" : ""}${musculoConclusiones2 ? musculoConclusiones2 + "\n" : ""}${musculoDiagnostico2 ?? ""} ${res.valoresCie10.musculoEsqueleticoDiagnosticoCie10 ?? ""}\n`;
+            data.observacionesGenerales2 += `MUSCULOESQUELETICA: ${musculoConclusiones2 ? musculoConclusiones2 + "\n" : ""}${musculoDiagnostico2 ?? ""} ${res.valoresCie10.musculoEsqueleticoDiagnosticoCie10 ?? ""}\n`;
           }
 
           if (res.observacionesConduccionCertificado_conduccion != null) {
