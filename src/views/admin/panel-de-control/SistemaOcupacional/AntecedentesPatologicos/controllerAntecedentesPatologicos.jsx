@@ -7,11 +7,184 @@ import {
 } from "../../../../utils/functionUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
 
+const listaNordenFecha = [
+    {
+        norden: "1",
+        fecha: "2023-01-01",
+    },
+    {
+        norden: "2",
+        fecha: "2023-01-02",
+    }
+];
+
+
 const obtenerReporteUrl =
     "/api/v01/ct/antecedentesPatologicos/obtenerReporteAntecedentesPatologicos";
 const registrarUrl =
     "/api/v01/ct/antecedentesPatologicos/registrarActualizarAntecedentesPatologicos";
+const obtenerListaNordenUrl = "/api/v01/ct/antecedentesPatologicos/historial";
 
+const OpenModalNorden = async (
+    norden,
+    tabla,
+    set,
+    token,
+) => {
+    const list = await getFetch(`${obtenerListaNordenUrl}?nOrden=${norden}`, token);
+    if (list.length === 0) {
+        GetInfoBasicoNordenActual(norden, tabla, set, token, list);
+        Swal.fire({
+            title: "N° de Orden sin registros anteriores",
+            text: "No hay registros anteriores para este N° de Orden.",
+            icon: "warning",
+        });
+
+        return;
+    }
+    const inputOptions = list.reduce((acc, item) => {
+        acc[item.norden] = `N° ${item.norden} - ${item.fecha_registro_antecedente}`;
+        return acc;
+    }, {});
+
+    const resultadoModal = await Swal.fire({
+        title: "Selecciona un N° de orden",
+        html: `<p style="margin:0 0 4px;color:#64748b;font-size:12px;">Elige el registro anterior</p>`,
+        input: "radio",
+        inputOptions,
+        inputValidator: (value) => {
+            if (!value) return "Debes seleccionar una opción o crear una nueva.";
+        },
+        showCancelButton: true,
+        confirmButtonText: "Buscar",
+        cancelButtonText: "Cancelar",
+        allowOutsideClick: false,
+        customClass: {
+            popup: "swal-dinamico swal-norden-popup",
+        },
+        didOpen: () => {
+            const popup = Swal.getPopup();
+
+            const applyLayout = () => {
+                const title = popup.querySelector(".swal2-title");
+                const htmlContainer = popup.querySelector(".swal2-html-container");
+                const radioGroup = popup.querySelector(".swal2-radio");
+                const actions = popup.querySelector(".swal2-actions");
+
+                popup.style.maxWidth = "350px";
+                popup.style.width = "80vw";
+                popup.style.maxHeight = "80vh";
+                popup.style.display = "flex";
+                popup.style.flexDirection = "column";
+                popup.style.overflow = "hidden";
+
+                if (title) title.style.flex = "0 0 auto";
+                if (htmlContainer) htmlContainer.style.flex = "0 0 auto";
+                if (actions) actions.style.flex = "0 0 auto";
+                if (radioGroup) {
+                    radioGroup.style.flex = "1 1 auto";
+                    radioGroup.style.minHeight = "0";
+                }
+            };
+
+            applyLayout();
+            window.addEventListener("resize", applyLayout);
+            popup._nordenResizeHandler = applyLayout;
+
+            let style = document.getElementById("swal-norden-styles");
+            if (!style) {
+                style = document.createElement("style");
+                style.id = "swal-norden-styles";
+                document.head.appendChild(style);
+            }
+            style.textContent = `
+                .swal-norden-popup {
+                    padding-bottom: 1em;
+                }
+                .swal-norden-popup .swal2-title {
+                    margin: 0;
+                    padding: .5rem .5rem .5rem;
+                    font-size: 1.4em;
+                }
+                .swal-norden-popup .swal2-html-container {
+                    margin: 0.3em 0.9em 0 ;
+                }
+                .swal-norden-popup .swal2-radio {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: stretch;
+                    gap: 6px;
+                    width: auto;
+                    overflow-y: auto;
+                    overflow-x: hidden;
+                    padding: 6px 6px 2px;
+                    margin: 1em 1em 0 !important;
+                    padding-top: 15px;
+                }
+                .swal-norden-popup .swal2-radio label {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    margin: 0 !important;
+                    padding: 8px 12px;
+                    border: 1px solid #d7dde5;
+                    border-radius: 8px;
+                    background: #f8fafc;
+                    cursor: pointer;
+                    box-sizing: border-box;
+                    transition: border-color .15s ease, background-color .15s ease;
+                }
+                .swal-norden-popup .swal2-radio label:hover {
+                    border-color: #0d9488;
+                    background: #f0fdfa;
+                }
+                .swal-norden-popup .swal2-radio label:has(input:checked) {
+                    border-color: #0d9488;
+                    background: #e6fbf8;
+                    box-shadow: 0 0 0 1px #0d9488 inset;
+                }
+                .swal-norden-popup .swal2-radio input[type="radio"] {
+                    width: 16px;
+                    height: 16px;
+                    margin: 0;
+                    accent-color: #0d9488;
+                    flex-shrink: 0;
+                }
+                .swal-norden-popup .swal2-radio .swal2-label {
+                    margin: 0;
+                    font-size: 11px;
+                    color: #1f2937;
+                    text-align: left;
+                }
+                .swal-norden-popup .swal2-radio::-webkit-scrollbar {
+                    width: 6px;
+                }
+                .swal-norden-popup .swal2-radio::-webkit-scrollbar-thumb {
+                    background: #cbd5e1;
+                    border-radius: 4px;
+                }
+            `;
+        },
+        willClose: () => {
+            const popup = Swal.getPopup();
+            if (popup?._nordenResizeHandler) {
+                window.removeEventListener("resize", popup._nordenResizeHandler);
+            }
+        }
+    });
+
+    const seleccion = resultadoModal.value;
+
+    // Si seleccionó una opción, se trae la data de ese N° de orden anterior con "norden" actual 
+    if (seleccion) {
+        GetInfoServicioParaNuevoRegistro(seleccion, norden, tabla, set, token, () => {
+            Swal.close();
+        });
+    } else if (resultadoModal.dismiss === Swal.DismissReason.cancel) {
+        // Si cancela
+        GetInfoBasicoNordenActual(norden, tabla, set, token, list);
+    }
+}
 // Helper function to fetch antecedentes from Huamachuco
 const fetchAntecedentesHuamachuco = async (dni, token) => {
     try {
@@ -91,7 +264,7 @@ export const GetInfoServicio = async (
                 diasHospitalizado: item.diasHospitalizado,
                 complicaciones: item.complicaciones,
             }));
-        } else if (res.dni_cod_pa ) {
+        } else if (res.dni_cod_pa) {
             const dni = res.dni_cod_pa;
             console.log({ selectedSede });
             if (selectedSede == "HMAC") {
@@ -136,6 +309,266 @@ export const GetInfoServicio = async (
     }
 };
 
+// Arma el objeto de campos del formulario a partir de la respuesta del backend.
+// Se usa tanto para editar un registro existente como para "copiar" datos de
+// un N° de orden anterior hacia un registro nuevo (ver GetInfoServicioParaNuevoRegistro).
+const mapAntecedentesPatologicosForm = (res, antecedentesData, prev) => ({
+    //PRIMERA TAB==========================================================================
+    norden: res.n_orden,
+    codigoAntecedentesPatologicos_cod_ap: res.codigoAntecedentesPatologicos_cod_ap,
+    fechaExam: res.fechaAntecedentesPatologicos_fecha_ap,
+    nombres: res.nombres_nombres_pa + " " + res.apellidos_apellidos_pa,
+    sexo: res.sexo_sexo_pa == "M" ? "MASCULINO" : "FEMENINO",
+    edad: res.edad_edad + " AÑOS",
+    boroo: res.esBoro ?? false,
+
+    covid19: res.covid_chkcovid,
+    fechaCovid: res.fechaCovid_fechacovid,
+    severidadCovid: res.covidLevel_chkcovidl ? "LEVE" : res.covidModerado_chkcovidm ? "MODERADA" : res.covidSevero_chkcovids ? "SEVERA" : "",
+
+    ruido: res.ruidoAnexo7c_chkruido,
+    polvo: res.polvoAnexo7c_chkpolvo,
+    vidSegmentario: res.vidSegmentarioAnexo7c_chkvidsegmentario,
+    vidTotal: res.vidTotalAnexo7c_chkvidtotal,
+    alturaEstruct: res.alturaEstructuraAnexo7c_altura_estructura,
+    vibraciones: res.vibracionesAnexo7c_vibraciones,
+    cancerigenos: res.cancerigenosAnexo7c_chkcancerigenos,
+    mutagenicos: res.mutagenicosAnexo7c_chkmutagenicos,
+    solventes: res.solventesAnexo7c_chksolventes,
+    metales: res.metalesAnexo7c_chkmetales,
+    alturaGeograf: res.alturaGeograficaAnexo7c_altura_geog,
+    temperaturaAgente: res.temperaturaAnexo7c_chktemperatura,
+    biologicos: res.biologicosAnexo7c_chkbiologicos,
+    posturas: res.posturasAnexo7c_chkposturas,
+    turnos: res.turnosAnexo7c_chkturnos,
+    quimicos: res.quimicosAnexo7c_quimicos,
+    cargas: res.cargasAnexo7c_chkcargas,
+    movRepet: res.movRepetAnexo7c_chkmovrepet,
+    pvd: res.pvdAnexo7c_chkpvd,
+    electricos: res.electricosAnexo7c_electricos,
+    otrosAgentes: res.otrosAnexo7c_chkotros,
+
+    alergias: res.alergias_chk1,
+    amigdalitisCronica: res.amigdalitisCronica_chk2,
+    arritmiasCardiacas: res.arritmiasCardiacas_chk3,
+    asma: res.asma_chk4,
+    bocio: res.bocio_chk5,
+    bronconeumonia: res.bronconeumonia_chk6,
+    bronquitisRepeticion: res.bronquitisARepeticion_chk7,
+    cariesGingivitis: res.cariesOGingivitis_chk8,
+    colecistitis: res.colecistitis_chk9,
+    dermatitis: res.dermatitis_chk10,
+    diabetes: res.diabetes_chk11,
+    disenteria: res.disenteria_chk12,
+    enfCorazon: res.enfermedadesCorazon_chk13,
+    enfOculares: res.enfermedadesOculares_chk14,
+
+    epilepsiaConvulsiones: res.epilsepsiaOConvulsiones_chk15,
+    faringitisCronica: res.faringitisCronica_chk16,
+    fiebreMalta: res.fiebreMalta_chk17,
+    fiebreTifoidea: res.fiebreTifoidea_chk18,
+    tifoidea: res.tifoideaBoro_tifoidea,
+    vertigos: res.vertigosBoro_vertigos,
+    fiebreReumatica: res.fiebreReumatica_chk19,
+    forunculosis: res.foruncolois_chk20,
+
+    gastritisCronica: res.gastritisCronica_chk21,
+    gonorrea: res.gonorrea_chk22,
+    gota: res.gota_chk23,
+    hemorroides: res.hemorroides_chk24,
+    hepatitis: res.hepatitis_chk25,
+    hernias: res.hernias_chk26,
+    hipertensionArterial: res.hipertencionArterial_chk27,
+    infUrinariasRepetidas: res.urinariasRepetidas_chk28,
+    intoxicaciones: res.intoxicaciones_chk29,
+    insuficienciaCardiaca: res.insuficienciaCardiaca_chk30,
+    insuficienciaCoronariaCronica: res.insuficienciaCoronariaCronica_chk31,
+    insuficienciaRenalCronica: res.insuficienciaRenalCronica_chk32,
+    litiasisUrinaria: res.litiasisUrinaria_chk33,
+    meningitis: res.meningitis_chk34,
+    neuritisRepeticion: res.neuritis_chk35,
+    otitisMedia: res.otitisMedia_chk36,
+    presionAltaBaja: res.presionAltaOBaja_chk37,
+    paludismoMalaria: res.paludismoOMalaria_chk38,
+    parasitosisIntestinal: res.parasitosisIntestinal_chk39,
+    parotiditis: res.paratiditis_chk40,
+
+    pleuresia: res.pleuresia_chk41,
+    plumbismo: res.plumbismo_chk42,
+    poliomielitis: res.poliomielitis_chk43,
+    portadorMarcapaso: res.portadorMarcapasos_chk44,
+    protesisCardiacasValvulares: res.protesisCardiacasValvulares_chk45,
+    resfriosFrecuentes: res.resfriosFrecuentes_chk46,
+    reumatismoRepeticion: res.reumatismo_chk47,
+    sarampion: res.sarampion_chk48,
+    sifilis: res.sifilis_chk49,
+    silicosis: res.silicosis_chk50,
+    sinusitisCronica: res.sinusitisCronica_chk51,
+    tosConvulsiva: res.tosConvulsiva_chk52,
+    trastornosNerviosos: res.transtornosNerviosos_chk53,
+    traumatismoEncefalocraneano: res.traumatismoEncefalocraneano_chk54,
+    tuberculosis: res.tuberculosis_chk55,
+    tumoresQuistes: res.tumoresQuistes_chk56,
+    ulceraPeptica: res.ulceraPeptica_chk57,
+    varicela: res.varicela_chk58,
+    varices: res.varices_chk59,
+    varicocele: res.varicocele_chk60,
+
+    ima: res.imaBoro_ima,
+    acv: res.acvBoro_acv,
+    tbc: res.tbcBoro_tbc,
+    ets: res.etsBoro_ets,
+    vih: res.vihBoro_vih,
+    fobias: res.fobiasBoro_fobias,
+
+    neoplasias: res.neoplasiasBoro_neoplasias,
+    quemaduras: res.quemadurasBoro_quemaduras,
+    discopatias: res.discopatiasBoro_discopatias,
+    columna: res.columnaBoro_columna,
+    enfPsiquiatricas: res.enfermedadesPsiquiatricasBoro_enf_psiquiatricas,
+
+    enfReumatica: res.enfermedadesReumaticasBoro_enf_reumatica,
+    enfPulmonares: res.enfermedadesPulmonaresBoro_enf_pulmonares,
+    enfPiel: res.enfermedadesPielBoro_enf_piel,
+    tendinitis: res.tendinitisBoro_tendinitis,
+    onicomicosis: res.onicomicosisBoro_onicomicosis,
+    fracturas: res.fracturasBoro_fracturas,
+    anemia: res.anemiaBoro_anemia,
+    obesidad: res.obesidadBoro_obesidad,
+    dislipidemia: res.dislipidemiaBoro_dislipidemia,
+    amputacion: res.amputacionBoro_amputacion,
+    sordera: res.sorderaBoro_sordera,
+    migrana: res.migranaBoro_migrana,
+
+    otrasPatologias: res.otrosDescripcionAntecedentesPatologicos_txtotrosap,
+    detallesTratamiento: res.especifiqueTratamientoBoro_especifique_detalleenfermedades,
+    alergiasMedicamentos: res.alergiasAlimentosBoro_alergias_medic_alim,
+    especifiqueAlergias: res.alergiasAlimentosEspecifiqueBoro_alergias_medic_alimdetall,
+
+    accidenteTrabajo: res.accidenteTrabajoBoro_accitrabajo,
+    fechaAccidente: res.accidenteTrabajoFechaBoro_accit_fecha,
+    tiempoPerdido: res.descansoMedicoBoro_accit_descanso,
+    especifiqueTiempoPerdido: res.descansoMedicoEspecifiqueBoro_accit_descanso_detal,
+    tipoIncapacidad: res.tiempoIncapacidadBoro_timeincapacidad,
+
+    enfermedadProfesional: res.enfermedadesProfesionalesBoro_enfe_prof,
+    evaluadoCalificacion: res.enfermedadesLaboralesCalificacionBoro_enfe_lab_calif,
+    especifiqueCalificacion: res.enfermedadesLaboralesEspecifiqueBoro_enfe_lab_califdetal,
+    fechaCalificacion: res.enfermedadesProfesionalesFechaBoro_enfe_profecha,
+
+    //LATERAL TAB==========================================================================
+    vcOD: res.visioncercasincorregirod_v_cerca_s_od,
+    vlOD: res.visionlejossincorregirod_v_lejos_s_od,
+    vcOI: res.visioncercasincorregiroi_v_cerca_s_oi,
+    vlOI: res.visionlejossincorregiroi_v_lejos_s_oi,
+    vcCorregidaOD: res.oftalodccmologia_odcc,
+    vlCorregidaOD: res.odlcoftalmologia_odlc,
+    vcCorregidaOI: res.oiccoftalmologia_oicc,
+    vlCorregidaOI: res.oilcoftalmologia_oilc,
+    vclrs: res.vcoftalmologia_vc,
+    vb: res.vboftalmologia_vb,
+    rp: res.rpoftalmologia_rp,
+    enfermedadesOculares: res.enfermedadesocularesoftalmo_e_oculares,
+    dosisVacunas: res.dosisVacunas_txtdosis,
+    cocaina: res.cocainaLaboratorioClinico_txtcocaina,
+    cocainaRed: (res.cocainaLaboratorioClinico_txtcocaina ?? "") == "POSITIVO",
+    marihuana: res.marihuanaLaboratorioClinico_txtmarihuana,
+    marihuanaRed: (res.marihuanaLaboratorioClinico_txtmarihuana ?? "") == "POSITIVO",
+
+    //SEGUNDA TAB==========================================================================
+    perdidaMemoria: res.perdidaMemoria_chk61,
+    preocupacionesAngustia: res.preocupacionesAngustia_chk62,
+    doloresArticulares: res.doloresArticulares_chk63,
+    aumentoDisminucionPeso: res.aumentoDisminucionPeso_chk64,
+    dolorCabeza: res.dolorCabeza_chk65,
+    diarrea: res.diarrea_chk66,
+    agitacionEjercicios: res.agitacionEjercicio_chk67,
+    dolorOcular: res.dolorOcular_chk68,
+    dolorOpresivoTorax: res.dolorOpresivoTorax_chk69,
+    hinchazonPiesManos: res.hinchazonPiesOManos_chk70,
+
+    estrenimiento: res.estrenimiento_chk71,
+    vomitosSangre: res.vomitosConSangre_chk72,
+    sangradoOrina: res.sangradoPorOrina_chk73,
+    tosSangre: res.tosConSangre_chk74,
+    coloracionAmarilla: res.coloracionAmarrillaPiel_chk75,
+    indigestionFrecuente: res.indigestionFrecuente_chk76,
+    insomnio: res.insomnio_chk77,
+    lumbalgias: res.lumbalgiaODolorCintura_chk78,
+    mareosDesmayos: res.mareos_chk79,
+    hecesNegras: res.hecesNegras_chk80,
+
+    orinaDolorArdor: res.orinaConDolor_chk81,
+    orinaInvoluntaria: res.orinaInvoluntaria_chk82,
+    dolorOido: res.dolorOido_chk83,
+    secrecionesOido: res.secrecionesOido_chk84,
+    palpitaciones: res.palpitaciones_chk85,
+    adormecimientos: res.adormecimientos_chk86,
+    pesadillasFrecuentes: res.pesadillasFrecuentes_chk87,
+    doloresMusculares: res.doloresMusculares_chk88,
+    tosCronica: res.tosCronica_chk89,
+    sangradoEncias: res.sangradoEncias_chk90,
+    otrasEnfermedades: res.otrosDescripcionIndicarEnfermedades_txtotros1ap,
+
+    antitetanica: res.antitetanicaBoro_antitetanica,
+    fiebreAmarilla: res.fiebreAmarillaBoro_fiebre_amarilla,
+    influenza: res.influenzaBoro_influenza,
+    hepatitisA: res.hepatitisABoro_hepatitisa,
+    hepatitisB: res.hepatitisBBoro_hepatitisb,
+
+    gripeInfluenza: res.gripeInfluenzaBoro_gripe_influenza,
+    neumococo: res.neumococoBoro_neumococo,
+    rabia: res.rabiaBoro_rabia,
+    papilomaHumano: res.papilomaHumanoBoro_papiloma_humano,
+    covidAntecedentePatologico: res.covidAntecedentePatologicoBoro_covid_antepatologico,
+
+    drogas: res.drogasSi_rbdrogassi ?? false,
+    tipoDrogas: res.drogasTipo_txtdrogastipo ?? "",
+    frecuenciaDrogas: res.drogasFrecuencia_txtdrogasfrecuencia ?? "",
+
+    licor: res.licorSi_rblicorsi ?? false,
+    tipoLicor: res.licorTipoFrecuente_txtlicortipofrecuente ?? "",
+    frecuenciaLicor: res.licorFrecuencia_txtlicorfrecuencia ?? "",
+
+    fumar: res.fumarSi_rbfumarsi ?? false,
+    numeroCigarrillos: res.numeroCigarrillos_txtncigarrillos ?? "",
+
+    otros: res.otrosSiIndicarEnfermedades_rbotrossi ?? false,
+    tipoOtros: res.otrosTipoIndicarEnfermedades_txtotros ?? "",
+    frecuenciaOtros: res.otrosFrecuenciaIndicarEnfermedades_txtotrosfrecuencia ?? "",
+
+    medicamentos: res.medicamentoBoro_medicamento,
+    especifiqueMedicamentos: res.medicamentoEspecifiqueBoro_medicamento_detal,
+
+    actividadFisica: res.actividadFisicaBoro_activ_fisic,
+    especifiqueActividadFisica: res.actividadFisicaEspecifiqueBoro_activ_fisic_detal,
+
+    //TERCERA TAB==========================================================================
+    antecedentes: antecedentesData,
+
+    hijosVivos: res.hijosVivosVarones_txtvhijosvivos,
+    hijosFallecidos: res.hijosFallecidosVarones_txtvhijosfallecidos,
+    abortosParejas: res.abortosParejasVarones_txtvnabortosparejas,
+    causasAbortos: res.precisarCausasVarones_txtvcausas,
+
+    inicioMenstruacion: res.inicioMestruacionDamas_txtdiniciomestruacion,
+    inicioVidaSexual: res.inicioVidaSexualDamas_txtdiniciovidasexual,
+    parejasSexuales: res.numeroParejasSexActualidadDamas_txtdnumparejassexactualidad,
+    hijosVivosDamas: res.hijosVivosDamas_txtdhijosvivos,
+    hijosFallecidosDamas: res.hijosFallecidosDamas_txtdhijosfallecidos,
+    abortosDamas: res.numerosDeAbortosDamas_txtdnumerosdeabortos,
+    causasAbortosDamas: res.precisarCausasDamas_txtdcausas,
+
+    padre: res.padreEspecifiqueBoro_padre_detall,
+    madre: res.madreEspecifiqueBoro_madre_detall,
+    hermanos: res.hermanosEspecifiqueBoro_hermanos_detall,
+    hijos: res.hijosEspecifiqueBoro_hijos_detall,
+    esposaConyuge: res.esposConyEspecifiqueBoro_espos_cony_detall,
+    carnetConadis: res.conadisEspecifiqueBoro_conadisdetalle,
+
+    user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+});
+
 export const GetInfoServicioEditar = async (
     nro,
     tabla,
@@ -170,262 +603,150 @@ export const GetInfoServicioEditar = async (
 
         set((prev) => ({
             ...prev,
-            //PRIMERA TAB==========================================================================
-            norden: res.n_orden,
-            codigoAntecedentesPatologicos_cod_ap: res.codigoAntecedentesPatologicos_cod_ap,
-            fechaExam: res.fechaAntecedentesPatologicos_fecha_ap,
-            nombres: res.nombres_nombres_pa + " " + res.apellidos_apellidos_pa,
-            sexo: res.sexo_sexo_pa == "M" ? "MASCULINO" : "FEMENINO",
-            edad: res.edad_edad + " AÑOS",
-            boroo: res.esBoro ?? false,
-
-            covid19: res.covid_chkcovid,
-            fechaCovid: res.fechaCovid_fechacovid,
-            severidadCovid: res.covidLevel_chkcovidl ? "LEVE" : res.covidModerado_chkcovidm ? "MODERADA" : res.covidSevero_chkcovids ? "SEVERA" : "",
-
-            ruido: res.ruidoAnexo7c_chkruido,
-            polvo: res.polvoAnexo7c_chkpolvo,
-            vidSegmentario: res.vidSegmentarioAnexo7c_chkvidsegmentario,
-            vidTotal: res.vidTotalAnexo7c_chkvidtotal,
-            alturaEstruct: res.alturaEstructuraAnexo7c_altura_estructura,
-            vibraciones: res.vibracionesAnexo7c_vibraciones,
-            cancerigenos: res.cancerigenosAnexo7c_chkcancerigenos,
-            mutagenicos: res.mutagenicosAnexo7c_chkmutagenicos,
-            solventes: res.solventesAnexo7c_chksolventes,
-            metales: res.metalesAnexo7c_chkmetales,
-            alturaGeograf: res.alturaGeograficaAnexo7c_altura_geog,
-            temperaturaAgente: res.temperaturaAnexo7c_chktemperatura,
-            biologicos: res.biologicosAnexo7c_chkbiologicos,
-            posturas: res.posturasAnexo7c_chkposturas,
-            turnos: res.turnosAnexo7c_chkturnos,
-            quimicos: res.quimicosAnexo7c_quimicos,
-            cargas: res.cargasAnexo7c_chkcargas,
-            movRepet: res.movRepetAnexo7c_chkmovrepet,
-            pvd: res.pvdAnexo7c_chkpvd,
-            electricos: res.electricosAnexo7c_electricos,
-            otrosAgentes: res.otrosAnexo7c_chkotros,
-
-            alergias: res.alergias_chk1,
-            amigdalitisCronica: res.amigdalitisCronica_chk2,
-            arritmiasCardiacas: res.arritmiasCardiacas_chk3,
-            asma: res.asma_chk4,
-            bocio: res.bocio_chk5,
-            bronconeumonia: res.bronconeumonia_chk6,
-            bronquitisRepeticion: res.bronquitisARepeticion_chk7,
-            cariesGingivitis: res.cariesOGingivitis_chk8,
-            colecistitis: res.colecistitis_chk9,
-            dermatitis: res.dermatitis_chk10,
-            diabetes: res.diabetes_chk11,
-            disenteria: res.disenteria_chk12,
-            enfCorazon: res.enfermedadesCorazon_chk13,
-            enfOculares: res.enfermedadesOculares_chk14,
-
-            epilepsiaConvulsiones: res.epilsepsiaOConvulsiones_chk15,
-            faringitisCronica: res.faringitisCronica_chk16,
-            fiebreMalta: res.fiebreMalta_chk17,
-            fiebreTifoidea: res.fiebreTifoidea_chk18,
-            tifoidea: res.tifoideaBoro_tifoidea,
-            vertigos: res.vertigosBoro_vertigos,
-            fiebreReumatica: res.fiebreReumatica_chk19,
-            forunculosis: res.foruncolois_chk20,
-
-            gastritisCronica: res.gastritisCronica_chk21,
-            gonorrea: res.gonorrea_chk22,
-            gota: res.gota_chk23,
-            hemorroides: res.hemorroides_chk24,
-            hepatitis: res.hepatitis_chk25,
-            hernias: res.hernias_chk26,
-            hipertensionArterial: res.hipertencionArterial_chk27,
-            infUrinariasRepetidas: res.urinariasRepetidas_chk28,
-            intoxicaciones: res.intoxicaciones_chk29,
-            insuficienciaCardiaca: res.insuficienciaCardiaca_chk30,
-            insuficienciaCoronariaCronica: res.insuficienciaCoronariaCronica_chk31,
-            insuficienciaRenalCronica: res.insuficienciaRenalCronica_chk32,
-            litiasisUrinaria: res.litiasisUrinaria_chk33,
-            meningitis: res.meningitis_chk34,
-            neuritisRepeticion: res.neuritis_chk35,
-            otitisMedia: res.otitisMedia_chk36,
-            presionAltaBaja: res.presionAltaOBaja_chk37,
-            paludismoMalaria: res.paludismoOMalaria_chk38,
-            parasitosisIntestinal: res.parasitosisIntestinal_chk39,
-            parotiditis: res.paratiditis_chk40,
-
-            pleuresia: res.pleuresia_chk41,
-            plumbismo: res.plumbismo_chk42,
-            poliomielitis: res.poliomielitis_chk43,
-            portadorMarcapaso: res.portadorMarcapasos_chk44,
-            protesisCardiacasValvulares: res.protesisCardiacasValvulares_chk45,
-            resfriosFrecuentes: res.resfriosFrecuentes_chk46,
-            reumatismoRepeticion: res.reumatismo_chk47,
-            sarampion: res.sarampion_chk48,
-            sifilis: res.sifilis_chk49,
-            silicosis: res.silicosis_chk50,
-            sinusitisCronica: res.sinusitisCronica_chk51,
-            tosConvulsiva: res.tosConvulsiva_chk52,
-            trastornosNerviosos: res.transtornosNerviosos_chk53,
-            traumatismoEncefalocraneano: res.traumatismoEncefalocraneano_chk54,
-            tuberculosis: res.tuberculosis_chk55,
-            tumoresQuistes: res.tumoresQuistes_chk56,
-            ulceraPeptica: res.ulceraPeptica_chk57,
-            varicela: res.varicela_chk58,
-            varices: res.varices_chk59,
-            varicocele: res.varicocele_chk60,
-
-            ima: res.imaBoro_ima,
-            acv: res.acvBoro_acv,
-            tbc: res.tbcBoro_tbc,
-            ets: res.etsBoro_ets,
-            vih: res.vihBoro_vih,
-            fobias: res.fobiasBoro_fobias,
-
-            neoplasias: res.neoplasiasBoro_neoplasias,
-            quemaduras: res.quemadurasBoro_quemaduras,
-            discopatias: res.discopatiasBoro_discopatias,
-            columna: res.columnaBoro_columna,
-            enfPsiquiatricas: res.enfermedadesPsiquiatricasBoro_enf_psiquiatricas,
-
-            enfReumatica: res.enfermedadesReumaticasBoro_enf_reumatica,
-            enfPulmonares: res.enfermedadesPulmonaresBoro_enf_pulmonares,
-            enfPiel: res.enfermedadesPielBoro_enf_piel,
-            tendinitis: res.tendinitisBoro_tendinitis,
-            onicomicosis: res.onicomicosisBoro_onicomicosis,
-            fracturas: res.fracturasBoro_fracturas,
-            anemia: res.anemiaBoro_anemia,
-            obesidad: res.obesidadBoro_obesidad,
-            dislipidemia: res.dislipidemiaBoro_dislipidemia,
-            amputacion: res.amputacionBoro_amputacion,
-            sordera: res.sorderaBoro_sordera,
-            migrana: res.migranaBoro_migrana,
-
-            otrasPatologias: res.otrosDescripcionAntecedentesPatologicos_txtotrosap,
-            detallesTratamiento: res.especifiqueTratamientoBoro_especifique_detalleenfermedades,
-            alergiasMedicamentos: res.alergiasAlimentosBoro_alergias_medic_alim,
-            especifiqueAlergias: res.alergiasAlimentosEspecifiqueBoro_alergias_medic_alimdetall,
-
-            accidenteTrabajo: res.accidenteTrabajoBoro_accitrabajo,
-            fechaAccidente: res.accidenteTrabajoFechaBoro_accit_fecha,
-            tiempoPerdido: res.descansoMedicoBoro_accit_descanso,
-            especifiqueTiempoPerdido: res.descansoMedicoEspecifiqueBoro_accit_descanso_detal,
-            tipoIncapacidad: res.tiempoIncapacidadBoro_timeincapacidad,
-
-            enfermedadProfesional: res.enfermedadesProfesionalesBoro_enfe_prof,
-            evaluadoCalificacion: res.enfermedadesLaboralesCalificacionBoro_enfe_lab_calif,
-            especifiqueCalificacion: res.enfermedadesLaboralesEspecifiqueBoro_enfe_lab_califdetal,
-            fechaCalificacion: res.enfermedadesProfesionalesFechaBoro_enfe_profecha,
-
-            //LATERAL TAB==========================================================================
-            vcOD: res.visioncercasincorregirod_v_cerca_s_od,
-            vlOD: res.visionlejossincorregirod_v_lejos_s_od,
-            vcOI: res.visioncercasincorregiroi_v_cerca_s_oi,
-            vlOI: res.visionlejossincorregiroi_v_lejos_s_oi,
-            vcCorregidaOD: res.oftalodccmologia_odcc,
-            vlCorregidaOD: res.odlcoftalmologia_odlc,
-            vcCorregidaOI: res.oiccoftalmologia_oicc,
-            vlCorregidaOI: res.oilcoftalmologia_oilc,
-            vclrs: res.vcoftalmologia_vc,
-            vb: res.vboftalmologia_vb,
-            rp: res.rpoftalmologia_rp,
-            enfermedadesOculares: res.enfermedadesocularesoftalmo_e_oculares,
-            dosisVacunas: res.dosisVacunas_txtdosis,
-            cocaina: res.cocainaLaboratorioClinico_txtcocaina,
-            cocainaRed: (res.cocainaLaboratorioClinico_txtcocaina ?? "") == "POSITIVO",
-            marihuana: res.marihuanaLaboratorioClinico_txtmarihuana,
-            marihuanaRed: (res.marihuanaLaboratorioClinico_txtmarihuana ?? "") == "POSITIVO",
-
-            //SEGUNDA TAB==========================================================================
-            perdidaMemoria: res.perdidaMemoria_chk61,
-            preocupacionesAngustia: res.preocupacionesAngustia_chk62,
-            doloresArticulares: res.doloresArticulares_chk63,
-            aumentoDisminucionPeso: res.aumentoDisminucionPeso_chk64,
-            dolorCabeza: res.dolorCabeza_chk65,
-            diarrea: res.diarrea_chk66,
-            agitacionEjercicios: res.agitacionEjercicio_chk67,
-            dolorOcular: res.dolorOcular_chk68,
-            dolorOpresivoTorax: res.dolorOpresivoTorax_chk69,
-            hinchazonPiesManos: res.hinchazonPiesOManos_chk70,
-
-            estrenimiento: res.estrenimiento_chk71,
-            vomitosSangre: res.vomitosConSangre_chk72,
-            sangradoOrina: res.sangradoPorOrina_chk73,
-            tosSangre: res.tosConSangre_chk74,
-            coloracionAmarilla: res.coloracionAmarrillaPiel_chk75,
-            indigestionFrecuente: res.indigestionFrecuente_chk76,
-            insomnio: res.insomnio_chk77,
-            lumbalgias: res.lumbalgiaODolorCintura_chk78,
-            mareosDesmayos: res.mareos_chk79,
-            hecesNegras: res.hecesNegras_chk80,
-
-            orinaDolorArdor: res.orinaConDolor_chk81,
-            orinaInvoluntaria: res.orinaInvoluntaria_chk82,
-            dolorOido: res.dolorOido_chk83,
-            secrecionesOido: res.secrecionesOido_chk84,
-            palpitaciones: res.palpitaciones_chk85,
-            adormecimientos: res.adormecimientos_chk86,
-            pesadillasFrecuentes: res.pesadillasFrecuentes_chk87,
-            doloresMusculares: res.doloresMusculares_chk88,
-            tosCronica: res.tosCronica_chk89,
-            sangradoEncias: res.sangradoEncias_chk90,
-            otrasEnfermedades: res.otrosDescripcionIndicarEnfermedades_txtotros1ap,
-
-            antitetanica: res.antitetanicaBoro_antitetanica,
-            fiebreAmarilla: res.fiebreAmarillaBoro_fiebre_amarilla,
-            influenza: res.influenzaBoro_influenza,
-            hepatitisA: res.hepatitisABoro_hepatitisa,
-            hepatitisB: res.hepatitisBBoro_hepatitisb,
-
-            gripeInfluenza: res.gripeInfluenzaBoro_gripe_influenza,
-            neumococo: res.neumococoBoro_neumococo,
-            rabia: res.rabiaBoro_rabia,
-            papilomaHumano: res.papilomaHumanoBoro_papiloma_humano,
-            covidAntecedentePatologico: res.covidAntecedentePatologicoBoro_covid_antepatologico,
-
-            drogas: res.drogasSi_rbdrogassi ?? false,
-            tipoDrogas: res.drogasTipo_txtdrogastipo ?? "",
-            frecuenciaDrogas: res.drogasFrecuencia_txtdrogasfrecuencia ?? "",
-
-            licor: res.licorSi_rblicorsi ?? false,
-            tipoLicor: res.licorTipoFrecuente_txtlicortipofrecuente ?? "",
-            frecuenciaLicor: res.licorFrecuencia_txtlicorfrecuencia ?? "",
-
-            fumar: res.fumarSi_rbfumarsi ?? false,
-            numeroCigarrillos: res.numeroCigarrillos_txtncigarrillos ?? "",
-
-            otros: res.otrosSiIndicarEnfermedades_rbotrossi ?? false,
-            tipoOtros: res.otrosTipoIndicarEnfermedades_txtotros ?? "",
-            frecuenciaOtros: res.otrosFrecuenciaIndicarEnfermedades_txtotrosfrecuencia ?? "",
-
-            medicamentos: res.medicamentoBoro_medicamento,
-            especifiqueMedicamentos: res.medicamentoEspecifiqueBoro_medicamento_detal,
-
-            actividadFisica: res.actividadFisicaBoro_activ_fisic,
-            especifiqueActividadFisica: res.actividadFisicaEspecifiqueBoro_activ_fisic_detal,
-
-            //TERCERA TAB==========================================================================
-            antecedentes: antecedentesData,
-
-            hijosVivos: res.hijosVivosVarones_txtvhijosvivos,
-            hijosFallecidos: res.hijosFallecidosVarones_txtvhijosfallecidos,
-            abortosParejas: res.abortosParejasVarones_txtvnabortosparejas,
-            causasAbortos: res.precisarCausasVarones_txtvcausas,
-
-            inicioMenstruacion: res.inicioMestruacionDamas_txtdiniciomestruacion,
-            inicioVidaSexual: res.inicioVidaSexualDamas_txtdiniciovidasexual,
-            parejasSexuales: res.numeroParejasSexActualidadDamas_txtdnumparejassexactualidad,
-            hijosVivosDamas: res.hijosVivosDamas_txtdhijosvivos,
-            hijosFallecidosDamas: res.hijosFallecidosDamas_txtdhijosfallecidos,
-            abortosDamas: res.numerosDeAbortosDamas_txtdnumerosdeabortos,
-            causasAbortosDamas: res.precisarCausasDamas_txtdcausas,
-
-            padre: res.padreEspecifiqueBoro_padre_detall,
-            madre: res.madreEspecifiqueBoro_madre_detall,
-            hermanos: res.hermanosEspecifiqueBoro_hermanos_detall,
-            hijos: res.hijosEspecifiqueBoro_hijos_detall,
-            esposaConyuge: res.esposConyEspecifiqueBoro_espos_cony_detall,
-            carnetConadis: res.conadisEspecifiqueBoro_conadisdetalle,
-
-            user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
+            ...mapAntecedentesPatologicosForm(res, antecedentesData, prev),
         }));
     }
+};
+
+// Trae la información de un N° de orden anterior  
+export const GetInfoServicioParaNuevoRegistro = async (
+    nordenBuscar,
+    nordenActual,
+    tabla,
+    set,
+    token,
+    onFinish = () => { }
+) => {
+    const res = await GetInfoServicioDefault(
+        nordenBuscar,
+        tabla,
+        token,
+        obtenerReporteUrl,
+        onFinish
+    );
+    if (res) {
+        // Check if we need to fetch from Huamachuco
+        let antecedentesData = [];
+        if (res.antecedentesPatologicosQuirurjicos && res.antecedentesPatologicosQuirurjicos.length > 0) {
+            antecedentesData = res.antecedentesPatologicosQuirurjicos.map((item) => ({
+                codAntecedentesPatologicosQuirurgicos: null,
+                quirurjicosId: null,
+                fecha: item.fecha,
+                hospitalOperacion: item.hospitalOperacion,
+                operacion: item.operacion,
+                diasHospitalizado: item.diasHospitalizado,
+                complicaciones: item.complicaciones,
+            }));
+        } else if (res.dniPaciente || res.dni_paciente || res.dni) {
+            const dni = res.dniPaciente || res.dni_paciente || res.dni;
+            antecedentesData = await fetchAntecedentesHuamachuco(dni, token);
+        }
+
+        const hoy = new Date();
+        const fechaActual = `${hoy.getFullYear()}-${("0" + (hoy.getMonth() + 1)).slice(-2)}-${("0" + hoy.getDate()).slice(-2)}`;
+
+        // El Examen Ocular (Oftalmología) y el Laboratorio pertenecen al N°
+        // de orden ACTUAL, así que se traen por separado en lugar de usar
+        // los del norden anterior seleccionado en el modal.
+        const resActual = await getFetch(
+            `${obtenerReporteUrl}?nOrden=${nordenActual}&nameService=${tabla}&esJasper=false`,
+            token
+        );
+
+        set((prev) => ({
+            ...prev,
+            ...mapAntecedentesPatologicosForm(res, antecedentesData, prev),
+            norden: nordenActual,
+            fechaExam: fechaActual,
+            fechaCovid: fechaActual,
+            codigoAntecedentesPatologicos_cod_ap: null,
+            ...mapDatosPacienteForm(resActual),
+            ...mapExamenesActualesForm(resActual),
+        }));
+    }
+};
+
+// Datos básicos del paciente (nombre, sexo, edad) según el reporte del N°
+// de orden ACTUAL, independientes del norden anterior que se haya elegido.
+const mapDatosPacienteForm = (resActual) => ({
+    nombres: resActual?.nombres_nombres_pa
+        ? `${resActual.nombres_nombres_pa} ${resActual.apellidos_apellidos_pa ?? ""}`.trim()
+        : "",
+    sexo: resActual?.sexo_sexo_pa == "M" ? "MASCULINO" : resActual?.sexo_sexo_pa == "F" ? "FEMENINO" : "",
+    edad: resActual?.edad_edad ? `${resActual.edad_edad} AÑOS` : "",
+    boroo: resActual?.esBoro ?? false,
+});
+
+// Examen Ocular (Oftalmología) y Laboratorio (cocaína/marihuana) del N° de
+// orden ACTUAL: nunca se pisan con los del norden anterior seleccionado.
+const mapExamenesActualesForm = (resActual) => ({
+    vcOD: resActual?.visioncercasincorregirod_v_cerca_s_od ?? "",
+    vcOI: resActual?.visioncercasincorregiroi_v_cerca_s_oi ?? "",
+    vlOD: resActual?.visionlejossincorregirod_v_lejos_s_od ?? "",
+    vlOI: resActual?.visionlejossincorregiroi_v_lejos_s_oi ?? "",
+    vcCorregidaOD: resActual?.oftalodccmologia_odcc ?? "",
+    vcCorregidaOI: resActual?.oiccoftalmologia_oicc ?? "",
+    vlCorregidaOD: resActual?.odlcoftalmologia_odlc ?? "",
+    vlCorregidaOI: resActual?.oilcoftalmologia_oilc ?? "",
+    vclrs: resActual?.vcoftalmologia_vc ?? "",
+    vb: resActual?.vboftalmologia_vb ?? "",
+    rp: resActual?.rpoftalmologia_rp ?? "",
+    enfermedadesOculares: resActual?.enfermedadesocularesoftalmo_e_oculares ?? "",
+    cocaina: resActual?.cocainaLaboratorioClinico_txtcocaina ?? "",
+    cocainaRed: (resActual?.cocainaLaboratorioClinico_txtcocaina ?? "") == "POSITIVO",
+    marihuana: resActual?.marihuanaLaboratorioClinico_txtmarihuana ?? "",
+    marihuanaRed: (resActual?.marihuanaLaboratorioClinico_txtmarihuana ?? "") == "POSITIVO",
+});
+
+// Cuando cancela: nombre/sexo/edad y Oftalmología/Laboratorio del norden ACTUAL, 
+// Antecedentes Quirúrgicos del N° de orden mas reciente(fecha_registro_antecedente)
+export const GetInfoBasicoNordenActual = async (nordenActual, tabla, set, token, list = []) => {
+    const resActual = await getFetch(
+        `${obtenerReporteUrl}?nOrden=${nordenActual}&nameService=${tabla}&esJasper=false`,
+        token
+    );
+
+    const nordenMasReciente = list.reduce((masReciente, item) => {
+        if (!masReciente) return item;
+        return new Date(item.fecha_registro_antecedente) > new Date(masReciente.fecha_registro_antecedente)
+            ? item
+            : masReciente;
+    }, null);
+
+    let antecedentesData = [];
+    if (nordenMasReciente) {
+        const resAnterior = await getFetch(
+            `${obtenerReporteUrl}?nOrden=${nordenMasReciente.norden}&nameService=${tabla}&esJasper=false`,
+            token
+        );
+        if (resAnterior?.antecedentesPatologicosQuirurjicos && resAnterior.antecedentesPatologicosQuirurjicos.length > 0) {
+            antecedentesData = resAnterior.antecedentesPatologicosQuirurjicos.map((item) => ({
+                codAntecedentesPatologicosQuirurgicos: null,
+                quirurjicosId: null,
+                fecha: item.fecha,
+                hospitalOperacion: item.hospitalOperacion,
+                operacion: item.operacion,
+                diasHospitalizado: item.diasHospitalizado,
+                complicaciones: item.complicaciones,
+            }));
+        } else if (resAnterior?.dniPaciente || resAnterior?.dni_paciente || resAnterior?.dni) {
+            const dni = resAnterior.dniPaciente || resAnterior.dni_paciente || resAnterior.dni;
+            antecedentesData = await fetchAntecedentesHuamachuco(dni, token);
+        }
+    }
+
+    const hoy = new Date();
+    const fechaActual = `${hoy.getFullYear()}-${("0" + (hoy.getMonth() + 1)).slice(-2)}-${("0" + hoy.getDate()).slice(-2)}`;
+
+    set((prev) => ({
+        ...prev,
+        norden: nordenActual,
+        fechaExam: fechaActual,
+        fechaCovid: fechaActual,
+        ...mapDatosPacienteForm(resActual),
+        ...mapExamenesActualesForm(resActual),
+        antecedentes: antecedentesData,
+    }));
 };
 
 export const SubmitDataService = async (
@@ -718,7 +1039,8 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         sede,
         () => {
             //NO Tiene registro
-            GetInfoServicio(nro, tabla, set, token, sede, () => { Swal.close(); });
+            // GetInfoServicio(nro, tabla, set, token, sede, () => { Swal.close(); });
+            OpenModalNorden(nro, tabla, set, token);
         },
         () => {
             //Tiene registro
@@ -760,7 +1082,7 @@ export const VerifyTRPerzonalizado = async (nro, tabla, token, set, sede, noTien
             //No tiene registro previo 
             noTieneRegistro();//datos paciente
         } else if (res.id === 2) {
-            noTieneRegistro();//datos paciente
+            necesitaExamen();//datos paciente
         } else {
             tieneRegistro();//obtener data servicio
         }

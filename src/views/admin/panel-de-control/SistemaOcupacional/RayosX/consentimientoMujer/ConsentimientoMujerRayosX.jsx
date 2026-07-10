@@ -11,7 +11,8 @@ import { InputTextOneLine, SectionFieldset } from "../../../../../components/reu
 
 const tabla = "consentimiento_rayosx";
 
-const textoFinalConsentimiento = `Declaro que he recibido explicaciones satisfactorias sobre el propósito, naturaleza y riesgos de la toma de RAYOS X, por lo cual doy de conocimiento y declaro que a la fecha no me encuentro en estado de gestación, ya que soy consciente de los eventuales riesgos que se pueden derivar de la realización de dicho examen en caso de encontrarme gestando. Por lo cual AUTORIZO a que se me realice la radiografía, indicada por el protocolo de la empresa contratante.`;
+const textoConsentimientoParte1 = `Declaro que he recibido explicaciones satisfactorias sobre el propósito, naturaleza y riesgos de la toma de RAYOS X, por lo cual doy de conocimiento y declaro que a la fecha no me encuentro en estado de gestación, ya que soy consciente de los eventuales riesgos que se pueden derivar de la realización de dicho examen en caso de encontrarme gestando.`;
+const textoConsentimientoParte2 = `Por lo cual AUTORIZO a que se me realice la radiografía, indicada por el protocolo de la empresa contratante.`;
 
 export default function ConsentimientoMujerRayosX() {
   const today = getToday();
@@ -26,6 +27,7 @@ export default function ConsentimientoMujerRayosX() {
     empresa: "",
     contrata: "",
     ocupacion: "",
+    fechaUltimaRegla: "",
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
     user_medicoFirma: userlogued,
@@ -130,7 +132,16 @@ export default function ConsentimientoMujerRayosX() {
               />
             </div>
             <p className="text-justify">
-              {textoFinalConsentimiento}
+              {textoConsentimientoParte1} Así mismo mi Fecha de Última Regla fue el{" "}
+              <input
+                type="date"
+                name="fechaUltimaRegla"
+                value={form.fechaUltimaRegla}
+                onChange={handleChangeSimple}
+                required
+                className="border rounded px-2 py-1 mx-1 align-middle"
+              />
+              . {textoConsentimientoParte2}
             </p>
           </div>
         </div>
