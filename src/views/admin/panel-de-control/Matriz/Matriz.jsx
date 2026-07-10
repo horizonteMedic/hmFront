@@ -28,7 +28,7 @@ const MATRICES_MAP = {
   "Matriz-17": { url: "/api/v01/st/registros/matrizHuancayo2026", method: "POST", name: "MATRIZ HUANCAYO" },
   "Matriz-18": { url: "/api/v01/st/registros/colinesterasa", method: "POST", name: "MATRIZ COLINESTERASA" },
   "Matriz-19": { url: "/api/v01/st/registros/matrizOhlaGeneral", method: "POST", name: "MATRIZ ADMINISTRATIVA" },
-  "Matriz-20": { url: "/api/v01/st/registros/matrizHidrandina", method: "POST", name: "MATRIZ HIDRANDINA" }
+  "Matriz-20": { urlH: "/api/headers/hidrandina", methodH: "GET", urlB: "/api/v01/st/registros/matrizHidrandina", methodB: "POST", name: "MATRIZ HIDRANDINA" },
 };
 
 const MatrizPostulante = () => {
