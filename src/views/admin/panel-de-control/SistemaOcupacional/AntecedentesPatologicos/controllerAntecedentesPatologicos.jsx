@@ -35,8 +35,8 @@ const OpenModalNorden = async (
     if (list.length === 0) {
         GetInfoBasicoNordenActual(norden, tabla, set, token, list);
         Swal.fire({
-            title: "N° de Orden no encontrado",
-            text: "No se encontró ningún registro con este N° de Orden.",
+            title: "N° de Orden sin registros anteriores",
+            text: "No hay registros anteriores para este N° de Orden.",
             icon: "warning",
         });
 
