@@ -24,7 +24,11 @@ export default async function ConsentAdmisionDeclacionAntecePatologicos(data = {
     antecedentesPatologicos: data?.antecedentesPatologicos ?? false,
     detalleAntecedentes: String(data?.detalleAntecedentes ?? ''),
     fechaFirma: data?.fechaFirma ?? data?.fechaRegistro ?? '',
+    tipoExamen: String(data?.tipoExamen ?? ''),
   };
+
+  const esExamenAnual = datosFinales.tipoExamen.toUpperCase().includes('ANUAL');
+  const textoCargo = esExamenAnual ? ", colaborador(a) con el cargo de " : ", postulante al cargo de ";
 
   // Función para obtener día y mes de la fecha
   const obtenerDiaYMes = (fechaStr) => {
@@ -274,7 +278,7 @@ export default async function ConsentAdmisionDeclacionAntecePatologicos(data = {
     { texto: datosFinales.apellidosNombres, negrita: true },
     { texto: ", con DNI N° ", negrita: false },
     { texto: datosFinales.documentoIdentidad, negrita: true },
-    { texto: ", postulante al cargo de ", negrita: false },
+    { texto: textoCargo, negrita: false },
     { texto: datosFinales.puestoTrabajo, negrita: true },
     { texto: " de la empresa ", negrita: false },
     { texto: datosFinales.empresa, negrita: true }

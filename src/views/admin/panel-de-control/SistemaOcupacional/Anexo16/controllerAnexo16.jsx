@@ -380,8 +380,15 @@ export const GetInfoServicio = (
               ".\n";
           }
 
-          if (res.conclusionMusculoesqueletica != null) {
-            data.observacionesGenerales += "MUSCULOESQUELETICA: " + res.conclusionMusculoesqueletica + "\n";
+          const musculoEsqueleticoAnexo = res.musculoEsqueleticoAnexo ?? {};
+          const musculoDiagnostico = musculoEsqueleticoAnexo.musculoesqueleticoDiagnostico;
+          const musculoConclusiones = musculoEsqueleticoAnexo.musculoEsqueleticoBorooConclusiones;
+          const mostrarMusculoesqueletico = musculoDiagnostico != null
+            ? musculoDiagnostico !== "NORMAL"
+            : (musculoConclusiones != null && musculoConclusiones !== "NORMAL");
+
+          if (mostrarMusculoesqueletico) {
+            data.observacionesGenerales += `MUSCULOESQUELETICA: ${musculoConclusiones ? musculoConclusiones + "\n" : ""}${musculoDiagnostico ?? ""}\n`;
           }
 
           const hallazgoEKG = res.hallazgosInformeElectroCardiograma_hallazgo;
@@ -1100,7 +1107,7 @@ export const GetInfoServicio = (
           else if (res.chk8) data.clasificacion = "3/3";
           else if (res.chk12) data.clasificacion = "3/+";
 
-          if (res.chka || res.chkb || res.chkc) data.clasificacionABC = "ABC"; 
+          if (res.chka || res.chkb || res.chkc) data.clasificacionABC = "ABC";
           // else if (res.examenRadiograficoAbc_ex_abc) data.clasificacionABC = "ABC";
           // else if (res.examenRadiograficoSt_ex_st) data.clasificacionST = "ST";
 
@@ -1354,7 +1361,7 @@ export const MapearDatosAdicionales = (
       data.fechaRx = res.fechaExamenRadiografico_fecha_exra ?? "";
       data.calidadRx = res.calidadExamenRadiografico_txtcalidad ?? "";
       data.simbolosRx = res.simbolosExamenRadiografico_txtsimbolos ?? "";
-      
+
       // Clasificación radiográfica
       if (res.examenRadiografico1_ex_1) data.clasificacion = "0/-";
       else if (res.examenRadiografico0_ex_0) data.clasificacion = "0/0";
@@ -1370,7 +1377,7 @@ export const MapearDatosAdicionales = (
       else if (res.examenRadiografico3mas_ex_3mas) data.clasificacion = "3/+";
       if (res.examenRadiograficoAbc_ex_abc) data.clasificacionABC = "ABC";
       if (res.examenRadiograficoSt_ex_st) data.clasificacionST = "ST";
-      
+
       // Neumoconiosis
       // data.sinNeumoconiosis =
       //   res.examenRadiograficoSinNeumoconiosis_txtsinneumoconiosis ?? "";
@@ -1457,10 +1464,34 @@ export const MapearDatosAdicionales = (
       if (hemo && hemo !== "" && hemo !== "N/A") {
         const hemoglobina = parseFloat(data.hemoglobinaHematocrito);
         if (!isNaN(hemoglobina)) {
+          let hemoglobinaBaja = false;
+          let hemoglobinaAlta = false;
+
           if (sexo === "M" || sexo === "MASCULINO") {
-            data.hemoglobinaRed = hemoglobina < 14 || hemoglobina > 20;
+            hemoglobinaBaja = hemoglobina < 14;
+            hemoglobinaAlta = hemoglobina > 20;
           } else if (sexo === "F" || sexo === "FEMENINO") {
-            data.hemoglobinaRed = hemoglobina < 13.5 || hemoglobina > 20;
+            hemoglobinaBaja = hemoglobina < 13.5;
+            hemoglobinaAlta = hemoglobina > 20;
+          }
+
+          data.hemoglobinaRed = hemoglobinaBaja || hemoglobinaAlta;
+
+          if (data.hemoglobinaRed) {
+            let motivo = "";
+
+            if (hemoglobinaBaja) {
+              motivo = "HEMOGLOBINA: BAJA";
+            } else if (hemoglobinaAlta) {
+              motivo = "HEMOGLOBINA: ALTA";
+            }
+
+            const observacion = `${contador}. ${motivo}.\n`;
+
+            data.observacionesGenerales =
+              (data.observacionesGenerales || "") + observacion;
+
+            contador++;
           }
         }
       }
@@ -2016,8 +2047,15 @@ export const GetInfoServicioEditar = (
               ".\n";
           }
 
-          if (resSimple.conclusionMusculoesqueletica != null) {
-            data.observacionesGenerales2 += "MUSCULOESQUELETICA: " + res.conclusionMusculoesqueletica + "\n";
+          const musculoEsqueleticoAnexo2 = resSimple.musculoEsqueleticoAnexo ?? {};
+          const musculoDiagnostico2 = musculoEsqueleticoAnexo2.musculoesqueleticoDiagnostico;
+          const musculoConclusiones2 = musculoEsqueleticoAnexo2.musculoEsqueleticoBorooConclusiones;
+          const mostrarMusculoesqueletico2 = musculoDiagnostico2 != null
+            ? musculoDiagnostico2 !== "NORMAL"
+            : (musculoConclusiones2 != null && musculoConclusiones2 !== "NORMAL");
+
+          if (mostrarMusculoesqueletico2) {
+            data.observacionesGenerales2 += `MUSCULOESQUELETICA: ${musculoConclusiones2 ? musculoConclusiones2 + "\n" : ""}${musculoDiagnostico2 ?? ""}\n`;
           }
 
           // if (res.observacionFichaConduccion != null) {
@@ -2404,6 +2442,38 @@ export const GetInfoServicioEditar = (
           const sexo = resSimple.sexo_sexo_pa; // "M" o "F"
           const esMujer = sexo === "F";
           // Convertimos a número
+          if (!isNaN(hemo)) {
+            let hemoglobinaBaja = false;
+            let hemoglobinaAlta = false;
+
+            if (sexo === "M" || sexo === "MASCULINO") {
+              hemoglobinaBaja = hemo < 14;
+              hemoglobinaAlta = hemo > 20;
+            } else if (sexo === "F" || sexo === "FEMENINO") {
+              hemoglobinaBaja = hemo < 13.5;
+              hemoglobinaAlta = hemo > 20;
+            }
+
+            data.hemoglobinaRed = hemoglobinaBaja || hemoglobinaAlta;
+
+            if (data.hemoglobinaRed) {
+              let motivo = "";
+
+              if (hemoglobinaBaja) {
+                motivo = "HEMOGLOBINA: BAJA";
+              } else if (hemoglobinaAlta) {
+                motivo = "HEMOGLOBINA: ALTA";
+              }
+
+              const observacion = `${data.contador}. ${motivo}.\n`;
+
+              data.observacionesGenerales2 =
+                (data.observacionesGenerales2 || "") + observacion;
+
+              data.contador++;
+            }
+          }
+
           const creatinina = parseFloat(resSimple.creatininaPerfilRenal);
 
           // Validamos que sea número válido
