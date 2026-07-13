@@ -355,7 +355,9 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
         { label: "GLUCOSA", h: 6 },
         { label: "CREATININA", h: 6 },
         { label: "ÚREA", h: 6 },
-        { label: "ÁCIDO ÚRICO", h: 6 }
+        { label: "ÁCIDO ÚRICO", h: 6 },
+        { label: "PCR SENSIBLE", h: 6 },
+        { label: "ETANOL EN SALIVA", h: 8 }
     ];
 
     let yL = currentY + 5;
@@ -365,7 +367,12 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
         doc.rect(marginL + 33, yL, col1Width - 33, row.h);
 
         const lines = doc.splitTextToSize(row.label, 28);
-        doc.text(lines, marginL + 19, yL + (row.h / 2), { align: "center", baseline: "middle" });
+        const rowLineHeight = 3.5;
+        const blockHeight = (lines.length - 1) * rowLineHeight;
+        const labelStartY = yL + (row.h / 2) - (blockHeight / 2);
+        lines.forEach((line, idx) => {
+            doc.text(line, marginL + 19, labelStartY + (idx * rowLineHeight), { align: "center", baseline: "middle" });
+        });
 
         if (row.sub) {
             if (row.label === "Hb y Hto") {
@@ -396,7 +403,7 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
     let yR = tableTop;
     const rowsRight = [
         "COLESTEROL", "TRIGLICÉRIDOS", "HDL", "LDL", "VLDL", "RPR O VDRL",
-        "PREGNOSTICON", "COCAÍNA", "MARIHUANA", "PANEL 5D", "ECO"
+        "PREGNOSTICON", "COCAÍNA", "MARIHUANA", "PANEL 5D", "ECO", "BK-OH"
     ];
 
     rowsRight.forEach(label => {

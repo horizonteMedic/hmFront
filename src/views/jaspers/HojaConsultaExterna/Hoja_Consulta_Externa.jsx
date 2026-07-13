@@ -26,7 +26,7 @@ export default async function Hoja_Consulta_Externa(data = {}, docExistente = nu
     empresa: data.empresa,
     contrata: data.contrata,
     // Datos de ubicación
-    ubicacion: data.postaVijus ? "POSTA" : data.cedro ? "CEDRO" : data.paraiso ? "PARAIS" : data.otros ? "OTROS" : "",
+    ubicacion: data.postaVijus ? "POSTA" : data.cedro ? "CEDRO" : data.paraiso ? "PARAISO" : data.otros ? "OTROS" : "",
     otrosDescripcion: data.otrosDescripcion || "",
     // Datos adicionales
     observaciones: data.observaciones,
@@ -477,10 +477,10 @@ export default async function Hoja_Consulta_Externa(data = {}, docExistente = nu
 
   // PARAIS
   doc.setFont("helvetica", "bold").setFontSize(7.5);
-  doc.text("PARAIS", tablaInicioX + 82, yTexto2 + 1);
+  doc.text("PARAISO", tablaInicioX + 82, yTexto2 + 1);
 
   // Marcar X en PARAIS si es la ubicación seleccionada
-  if (datosFinales.ubicacion === "PARAIS") {
+  if (datosFinales.ubicacion === "PARAISO") {
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text("X", tablaInicioX + 115, yTexto2 + 1);
   }
