@@ -9,6 +9,10 @@ import {
     VerifyTR,
 } from "./controllerConsentimientoInformado";
 import BotonesAccion from "../../../../../components/templates/BotonesAccion";
+import ModalSubidaMasiva from "./modalSubidaMasiva/ModalSubidaMasiva";
+import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUpload } from "@fortawesome/free-solid-svg-icons";
 
 const tabla = "consentimientoInformado";
 
@@ -18,6 +22,7 @@ const textoFinalConsentimiento = `De acuerdo a los peligros y riesgos identifica
 export default function ConsentimientoInformado() {
     const today = getToday();
     const { token, selectedSede, userlogued, datosFooter, hora } = useSessionData();
+    const [showModal, setShowModal] = useState(false);
 
     const initialFormState = {
         norden: "",
@@ -59,28 +64,45 @@ export default function ConsentimientoInformado() {
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-            <SectionFieldset legend="Información del Examen" className="grid xl:grid-cols-3 gap-x-4 gap-y-3">
-                <InputTextOneLine
-                    label="N° Orden"
-                    name="norden"
-                    value={form.norden}
-                    onKeyUp={handleSearch}
-                    onChange={handleChangeNumberDecimals}
+            {showModal && (
+                <ModalSubidaMasiva
+                    onClose={() => setShowModal(false)}
+                    token={token}
+                    userlogued={userlogued}
+                    sede={selectedSede}
                 />
-                <InputTextOneLine
-                    label="Fecha"
-                    type="date"
-                    name="fecha"
-                    value={form.fecha}
-                    onChange={handleChangeSimple}
-                />
-                <InputTextOneLine
-                    label="Hora"
-                    name="hora"
-                    value={hora}
-                    disabled
-                />
-            </SectionFieldset>
+            )}
+            <div className="relative">
+                <button
+                    type="button"
+                    onClick={() => setShowModal(true)}
+                    className="verde-btn px-3 py-1 rounded flex items-center gap-2 text-sm absolute right-3 top-2 z-10"
+                >
+                    Subida Masiva <FontAwesomeIcon icon={faUpload} />
+                </button>
+                <SectionFieldset legend="Información del Examen" className="grid xl:grid-cols-3 gap-x-4 gap-y-3">
+                    <InputTextOneLine
+                        label="N° Orden"
+                        name="norden"
+                        value={form.norden}
+                        onKeyUp={handleSearch}
+                        onChange={handleChangeNumberDecimals}
+                    />
+                    <InputTextOneLine
+                        label="Fecha"
+                        type="date"
+                        name="fecha"
+                        value={form.fecha}
+                        onChange={handleChangeSimple}
+                    />
+                    <InputTextOneLine
+                        label="Hora"
+                        name="hora"
+                        value={hora}
+                        disabled
+                    />
+                </SectionFieldset>
+            </div>
 
             {/* Contenido del Consentimiento */}
             <SectionFieldset legend="Consentimiento Informado Ocupacional" className="space-y-3">
