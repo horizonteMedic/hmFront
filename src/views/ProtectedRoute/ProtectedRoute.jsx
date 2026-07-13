@@ -51,7 +51,8 @@ const protectedRoutes = {
   '/odontologia': "Odontología",
   '/rayosx': "Rayos X",
   '/consentimiento-informado': "Consentimiento Informado",
-  '/valorizacion': "Valorizacion"
+  '/valorizacion': "Valorizacion",
+  '/ModuloAsistencial': "Modulo Asistencial",
 };
 
 export function ProtectedRoute() {
