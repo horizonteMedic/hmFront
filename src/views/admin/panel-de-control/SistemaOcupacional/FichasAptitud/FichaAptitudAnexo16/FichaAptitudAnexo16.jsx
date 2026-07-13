@@ -54,6 +54,7 @@ export default function FichaAptitudAnexo16() {
     corregirAgudezaVisual: false,
     dietaHipocalorica: false,
     evitarMovimientosDisergonomicos: false,
+    noHacerTrabajoConCodigoColores: false,
     noHacerTrabajoAltoRiesgo: false,
     noHacerTrabajoSobre18: false,
     usoEppAuditivo: false,
@@ -133,6 +134,7 @@ export default function FichaAptitudAnexo16() {
         newForm.corregirAgudezaVisual = false;
         newForm.dietaHipocalorica = false;
         newForm.evitarMovimientosDisergonomicos = false;
+        newForm.noHacerTrabajoConCodigoColores = false;
         newForm.noHacerTrabajoAltoRiesgo = false;
         newForm.noHacerTrabajoSobre18 = false;
         newForm.usoEppAuditivo = false;
@@ -151,6 +153,7 @@ export default function FichaAptitudAnexo16() {
         if (newForm.corregirAgudezaVisual) restricciones.push("CORREGIR AGUDEZA VISUAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO");
         if (newForm.dietaHipocalorica) restricciones.push("DIETA HIPOCALÓRICA Y EJERCICIOS");
         if (newForm.evitarMovimientosDisergonomicos) restricciones.push("EVITAR MOVIMIENTOS Y POSICIONES DISERGONÓMICAS");
+        if (newForm.noHacerTrabajoConCodigoColores) restricciones.push("NO HACER TRABAJO CON CÓDIGO DE COLORES");
         if (newForm.noHacerTrabajoAltoRiesgo) restricciones.push("NO HACER TRABAJO DE ALTO RIESGO");
         if (newForm.noHacerTrabajoSobre18) restricciones.push("NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO");
         if (newForm.usoEppAuditivo) restricciones.push("USO DE EPP AUDITIVO ANTE EXPOSICIÓN A RUIDO >=80 DB");
@@ -168,6 +171,7 @@ export default function FichaAptitudAnexo16() {
           if (newForm.corregirAgudezaVisual) restricciones.push("CORREGIR AGUDEZA VISUAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO");
           if (newForm.dietaHipocalorica) restricciones.push("DIETA HIPOCALÓRICA Y EJERCICIOS");
           if (newForm.evitarMovimientosDisergonomicos) restricciones.push("EVITAR MOVIMIENTOS Y POSICIONES DISERGONÓMICAS");
+          if (newForm.noHacerTrabajoConCodigoColores) restricciones.push("NO HACER TRABAJO CON CÓDIGO DE COLORES");
           if (newForm.noHacerTrabajoAltoRiesgo) restricciones.push("NO HACER TRABAJO DE ALTO RIESGO");
           if (newForm.noHacerTrabajoSobre18) restricciones.push("NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO");
           if (newForm.usoEppAuditivo) restricciones.push("USO DE EPP AUDITIVO ANTE EXPOSICIÓN A RUIDO >=80 DB");
@@ -239,6 +243,7 @@ export default function FichaAptitudAnexo16() {
                         corregirAgudezaVisual: false,
                         dietaHipocalorica: false,
                         evitarMovimientosDisergonomicos: false,
+                        noHacerTrabajoConCodigoColores: false,
                         noHacerTrabajoAltoRiesgo: false,
                         noHacerTrabajoSobre18: false,
                         usoEppAuditivo: false,
@@ -359,6 +364,14 @@ export default function FichaAptitudAnexo16() {
                 label="EVITAR MOVIMIENTOS Y POSICIONES DISERGONÓMICAS"
               />
               <InputCheckbox
+                name="noHacerTrabajoConCodigoColores"
+                checked={form?.noHacerTrabajoConCodigoColores}
+                onChange={(e) => handleRestriccionesChange("noHacerTrabajoConCodigoColores", e.target.checked)}
+                disabled={form?.ninguno}
+                className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
+                label="NO HACER TRABAJO CON CÓDIGO DE COLORES"
+              />
+              <InputCheckbox
                 name="noHacerTrabajoAltoRiesgo"
                 checked={form?.noHacerTrabajoAltoRiesgo}
                 onChange={(e) => handleRestriccionesChange("noHacerTrabajoAltoRiesgo", e.target.checked)}
@@ -410,9 +423,9 @@ export default function FichaAptitudAnexo16() {
                 name="ninguno"
                 checked={form?.ninguno}
                 onChange={(e) => handleRestriccionesChange("ninguno", e.target.checked)}
-                disabled={form?.corregirAgudezaVisualTotal || form?.corregirAgudezaVisual || form?.dietaHipocalorica || form?.evitarMovimientosDisergonomicos || form?.noHacerTrabajoAltoRiesgo || form?.noHacerTrabajoSobre18 || form?.usoEppAuditivo || form?.usoLentesConducir || form?.usoLentesTrabajo || form?.usoLentesTrabajoSobre18 || form?.noConducirVehiculos}
+                disabled={form?.corregirAgudezaVisualTotal || form?.corregirAgudezaVisual || form?.dietaHipocalorica || form?.evitarMovimientosDisergonomicos || form?.noHacerTrabajoConCodigoColores || form?.noHacerTrabajoAltoRiesgo || form?.noHacerTrabajoSobre18 || form?.usoEppAuditivo || form?.usoLentesConducir || form?.usoLentesTrabajo || form?.usoLentesTrabajoSobre18 || form?.noConducirVehiculos}
                 className={(() => {
-                  const isDisabled = form?.corregirAgudezaVisualTotal || form?.corregirAgudezaVisual || form?.dietaHipocalorica || form?.evitarMovimientosDisergonomicos || form?.noHacerTrabajoAltoRiesgo || form?.noHacerTrabajoSobre18 || form?.usoEppAuditivo || form?.usoLentesConducir || form?.usoLentesTrabajo || form?.usoLentesTrabajoSobre18 || form?.noConducirVehiculos;
+                  const isDisabled = form?.corregirAgudezaVisualTotal || form?.corregirAgudezaVisual || form?.dietaHipocalorica || form?.evitarMovimientosDisergonomicos || form?.noHacerTrabajoConCodigoColores || form?.noHacerTrabajoAltoRiesgo || form?.noHacerTrabajoSobre18 || form?.usoEppAuditivo || form?.usoLentesConducir || form?.usoLentesTrabajo || form?.usoLentesTrabajoSobre18 || form?.noConducirVehiculos;
                   return isDisabled ? "opacity-50 text-gray-400 cursor-not-allowed" : "";
                 })()}
                 label="NINGUNO."

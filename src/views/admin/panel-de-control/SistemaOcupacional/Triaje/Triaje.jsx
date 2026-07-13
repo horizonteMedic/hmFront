@@ -249,7 +249,7 @@ export default function Triaje() {
                                 }}
                             />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid xl:grid-cols-2 gap-3 xl:gap-4">
                             <InputTextOneLine
                                 label="Norden"
                                 name="nro"
@@ -360,7 +360,7 @@ export default function Triaje() {
                             disabled
                             labelWidth="120px"
                         />
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid xl:grid-cols-2 gap-3 xl:gap-4">
                             <InputTextOneLine
                                 label="Fecha Nac"
                                 type="date"
@@ -384,7 +384,7 @@ export default function Triaje() {
 
                     {/* Sección: Datos de Triaje */}
                     <SectionFieldset legend="Datos Triaje" className="space-y-2">
-                        <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                        <div className="grid xl:grid-cols-2 gap-x-6 gap-y-2">
                             <div className="space-y-3">
                                 <InputTextOneLine
                                     label="Talla (m)"
@@ -494,7 +494,7 @@ export default function Triaje() {
                         </div>
 
                         <h2 className="font-bold mb-3 mt-3">Presión Sistémica</h2>
-                        <div className="grid grid-cols-3 gap-4 mb-3">
+                        <div className="grid xl:grid-cols-2 gap-4 mb-3">
                             <InputTextOneLine
                                 label="Sistólica (mm Hg)"
                                 name="sistolica"
@@ -593,7 +593,7 @@ export default function Triaje() {
             <div className="bg-white rounded p-4 min-w-[400px] w-full md:w-[55%]">
                 {/* Filtro de búsqueda */}
                 <SectionFieldset legend="Últimos Agregados & Hojas de Ruta" className="mb-2">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid xl:grid-cols-2 gap-3 xl:gap-4">
                         <InputTextOneLine
                             label="Código"
                             name="codigo"
