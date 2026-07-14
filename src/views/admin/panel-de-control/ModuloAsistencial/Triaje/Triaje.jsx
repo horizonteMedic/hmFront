@@ -10,35 +10,35 @@ import SectionFieldset from '../../../../components/reusableComponents/SectionFi
 import { useForm } from '../../../../hooks/useForm';
 import { useSessionData } from '../../../../hooks/useSessionData';
 import { getToday } from '../../../../utils/helpers';
-import {
-    Convert,
-    GetCC,
-    GetCintura,
-    GetCuello,
-    GetFC,
-    GetFRespira,
-    GetICC,
-    GetIMC,
-    GetPA,
-    GetSat,
-    GetSistolica,
-} from './Conversiones';
-import {
-    Clean,
-    GetListTriajeMult,
-    GetListTriajeMulttable,
-    GetTable,
-    handleNombreChange,
-    handleSubmit,
-    SearchHC,
-    VerifyTR,
-} from './Controller';
+// import {
+//     Convert,
+//     GetCC,
+//     GetCintura,
+//     GetCuello,
+//     GetFC,
+//     GetFRespira,
+//     GetICC,
+//     GetIMC,
+//     GetPA,
+//     GetSat,
+//     GetSistolica,
+// } from './Conversiones';
+//  import {
+//      Clean,
+//      GetListTriajeMult,
+//      GetListTriajeMulttable,
+//      GetTable,
+//      handleNombreChange,
+//      handleSubmit,
+//      SearchHC,
+//      VerifyTR,
+//  } from './Controller';
 import { getFetch } from '../../getFetch/getFetch';
 import Swal from 'sweetalert2';
 
 const today = getToday();
 
-export default function Triaje() {
+export default function TriajeAsistencial() {
     const { token, selectedSede } = useSessionData();
     const debounceTimeout = useRef(null);
 
@@ -104,7 +104,7 @@ export default function Triaje() {
     // Cargar tabla inicial
     useEffect(() => {
         if (form.codigo === '' && form.nombresBusqueda === '') {
-            GetTable(form.codigo, form.nombresBusqueda, selectedSede, token, setTablehc);
+            // GetTable(form.codigo, form.nombresBusqueda, selectedSede, token, setTablehc);
         }
     }, [form.codigo, form.nombresBusqueda, refresh, selectedSede, token]);
 
@@ -162,14 +162,14 @@ export default function Triaje() {
     // Modifica la función para cargar datos al hacer click izquierdo
     const handleRowClick = async (row) => {
         await new Promise((res) => setTimeout(res, 800));
-        await GetListTriajeMulttable(
-            row.n_orden,
-            setForm,
-            getFetch,
-            token,
-            setHabilitarTR,
-            setHabilitar
-        );
+        // await GetListTriajeMulttable(
+        //     row.n_orden,
+        //     setForm,
+        //     getFetch,
+        //     token,
+        //     setHabilitarTR,
+        //     setHabilitar
+        // );
     };
 
     // Click derecho: imprimir
@@ -199,7 +199,7 @@ export default function Triaje() {
             },
         }).then((result) => {
             if (result.isConfirmed) {
-                GetListTriajeMult(row.n_orden, setForm, getFetch, token, true);
+                // GetListTriajeMult(row.n_orden, setForm, getFetch, token, true);
             }
         });
     };
@@ -249,7 +249,7 @@ export default function Triaje() {
                                 }}
                             />
                         </div>
-                        <div className="grid xl:grid-cols-2 gap-3 xl:gap-4">
+                        <div className="grid grid-cols-2 gap-4">
                             <InputTextOneLine
                                 label="Norden"
                                 name="nro"
@@ -258,15 +258,15 @@ export default function Triaje() {
                                 onKeyUp={(event) => {
                                     if (event.key === 'Enter') {
                                         handleTR();
-                                        VerifyTR(
-                                            form,
-                                            getFetch,
-                                            token,
-                                            setForm,
-                                            selectedSede,
-                                            setHabilitarTR,
-                                            setHabilitar
-                                        );
+                                        // VerifyTR(
+                                        //     form,
+                                        //     getFetch,
+                                        //     token,
+                                        //     setForm,
+                                        //     selectedSede,
+                                        //     setHabilitarTR,
+                                        //     setHabilitar
+                                        // );
                                     }
                                 }}
                                 labelWidth="120px"
@@ -360,7 +360,7 @@ export default function Triaje() {
                             disabled
                             labelWidth="120px"
                         />
-                        <div className="grid xl:grid-cols-2 gap-3 xl:gap-4">
+                        <div className="grid grid-cols-2 gap-4">
                             <InputTextOneLine
                                 label="Fecha Nac"
                                 type="date"
@@ -384,16 +384,16 @@ export default function Triaje() {
 
                     {/* Sección: Datos de Triaje */}
                     <SectionFieldset legend="Datos Triaje" className="space-y-2">
-                        <div className="grid xl:grid-cols-2 gap-x-6 gap-y-2">
+                        <div className="grid grid-cols-2 gap-x-6 gap-y-2">
                             <div className="space-y-3">
                                 <InputTextOneLine
                                     label="Talla (m)"
                                     name="talla"
                                     value={form.talla}
                                     onChange={handleTriajeChange}
-                                    onKeyUp={(e) => {
-                                        Convert(e, form, setForm, Swal);
-                                    }}
+                                    // onKeyUp={(e) => {
+                                    //     Convert(e, form, setForm, Swal);
+                                    // }}
                                     disabled={habilitarTR}
                                     labelWidth="120px"
                                 />
@@ -402,9 +402,9 @@ export default function Triaje() {
                                     name="peso"
                                     value={form.peso}
                                     onChange={handleTriajeChange}
-                                    onKeyUp={(e) => {
-                                        GetIMC(e, form, setForm, Swal);
-                                    }}
+                                    // onKeyUp={(e) => {
+                                    //     GetIMC(e, form, setForm, Swal);
+                                    // }}
                                     disabled={habilitarTR}
                                     labelWidth="120px"
                                 />
@@ -420,9 +420,9 @@ export default function Triaje() {
                                     name="cintura"
                                     value={form.cintura}
                                     onChange={handleTriajeChange}
-                                    onKeyUp={(e) => {
-                                        GetCintura(e, form, setForm, Swal);
-                                    }}
+                                    // onKeyUp={(e) => {
+                                    //     GetCintura(e, form, setForm, Swal);
+                                    // }}
                                     disabled={habilitarTR}
                                     labelWidth="120px"
                                 />
@@ -440,9 +440,9 @@ export default function Triaje() {
                                     name="cadera"
                                     value={form.cadera}
                                     onChange={handleTriajeChange}
-                                    onKeyUp={(e) => {
-                                        GetICC(e, form, setForm, Swal);
-                                    }}
+                                    // onKeyUp={(e) => {
+                                    //     GetICC(e, form, setForm, Swal);
+                                    // }}
                                     disabled={habilitarTR}
                                     labelWidth="120px"
                                 />
@@ -451,9 +451,9 @@ export default function Triaje() {
                                     name="temperatura"
                                     value={form.temperatura}
                                     onChange={handleTriajeChange}
-                                    onKeyUp={(e) => {
-                                        GetCC(e, form, setForm, Swal);
-                                    }}
+                                    // onKeyUp={(e) => {
+                                    //     GetCC(e, form, setForm, Swal);
+                                    // }}
                                     disabled={habilitarTR}
                                     labelWidth="120px"
                                 />
@@ -462,9 +462,9 @@ export default function Triaje() {
                                     name="fCardiaca"
                                     value={form.fCardiaca}
                                     onChange={handleTriajeChange}
-                                    onKeyUp={(e) => {
-                                        GetFC(e, form, setForm, Swal);
-                                    }}
+                                    // onKeyUp={(e) => {
+                                    //     GetFC(e, form, setForm, Swal);
+                                    // }}
                                     disabled={habilitarTR}
                                     labelWidth="120px"
                                 />
@@ -473,9 +473,9 @@ export default function Triaje() {
                                     name="sat02"
                                     value={form.sat02}
                                     onChange={handleTriajeChange}
-                                    onKeyUp={(e) => {
-                                        GetSat(e, form, setForm, Swal);
-                                    }}
+                                    // onKeyUp={(e) => {
+                                    //     GetSat(e, form, setForm, Swal);
+                                    // }}
                                     disabled={habilitarTR}
                                     labelWidth="120px"
                                 />
@@ -484,9 +484,9 @@ export default function Triaje() {
                                     name="perimetroCuello"
                                     value={form.perimetroCuello}
                                     onChange={handleTriajeChange}
-                                    onKeyUp={(e) => {
-                                        GetCuello(e, form, setForm, Swal);
-                                    }}
+                                    // onKeyUp={(e) => {
+                                    //     GetCuello(e, form, setForm, Swal);
+                                    // }}
                                     disabled={habilitarTR}
                                     labelWidth="120px"
                                 />
@@ -494,15 +494,15 @@ export default function Triaje() {
                         </div>
 
                         <h2 className="font-bold mb-3 mt-3">Presión Sistémica</h2>
-                        <div className="grid xl:grid-cols-2 gap-4 mb-3">
+                        <div className="grid grid-cols-3 gap-4 mb-3">
                             <InputTextOneLine
                                 label="Sistólica (mm Hg)"
                                 name="sistolica"
                                 value={form.sistolica}
                                 onChange={handleTriajeChange}
-                                onKeyUp={(e) => {
-                                    GetSistolica(e, form, setForm, Swal);
-                                }}
+                                // onKeyUp={(e) => {
+                                //     GetSistolica(e, form, setForm, Swal);
+                                // }}
                                 disabled={habilitarTR}
                                 labelWidth="120px"
                             />
@@ -511,9 +511,9 @@ export default function Triaje() {
                                 name="diastolica"
                                 value={form.diastolica}
                                 onChange={handleTriajeChange}
-                                onKeyUp={(e) => {
-                                    GetPA(e, form, setForm, Swal);
-                                }}
+                                // onKeyUp={(e) => {
+                                //     GetPA(e, form, setForm, Swal);
+                                // }}
                                 disabled={habilitarTR}
                                 labelWidth="120px"
                             />
@@ -522,9 +522,9 @@ export default function Triaje() {
                                 name="fRespiratoria"
                                 value={form.fRespiratoria}
                                 onChange={handleTriajeChange}
-                                onKeyUp={(e) => {
-                                    GetFRespira(e, form, setForm, Swal);
-                                }}
+                                // onKeyUp={(e) => {
+                                //     GetFRespira(e, form, setForm, Swal);
+                                // }}
                                 disabled={habilitarTR}
                                 labelWidth="120px"
                             />
@@ -545,40 +545,40 @@ export default function Triaje() {
                             <div className="flex gap-4">
                                 <button
                                     type="button"
-                                    onClick={() => {
-                                        setHabilitarEdicion(true);
-                                        setHabilitarTR(false);
-                                    }}
+                                    // onClick={() => {
+                                    //     setHabilitarEdicion(true);
+                                    //     setHabilitarTR(false);
+                                    // }}
                                     className="bg-blue-600 hover:bg-blue-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
                                 >
                                     <FontAwesomeIcon icon={faPencil} /> Editar
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => {
-                                        handleSubmit(
-                                            form,
-                                            form.edad,
-                                            form.nro,
-                                            form.fechaExamen,
-                                            Swal,
-                                            token,
-                                            setForm,
-                                            refreshtable,
-                                            getFetch,
-                                            setHabilitar
-                                        );
-                                    }}
+                                    // onClick={() => {
+                                    //     handleSubmit(
+                                    //         form,
+                                    //         form.edad,
+                                    //         form.nro,
+                                    //         form.fechaExamen,
+                                    //         Swal,
+                                    //         token,
+                                    //         setForm,
+                                    //         refreshtable,
+                                    //         getFetch,
+                                    //         setHabilitar
+                                    //     );
+                                    // }}
                                     className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
                                 >
                                     <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => {
-                                        Clean(setForm);
-                                        setHabilitarEdicion(false);
-                                    }}
+                                    // onClick={() => {
+                                    //     Clean(setForm);
+                                    //     setHabilitarEdicion(false);
+                                    // }}
                                     className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
                                 >
                                     <FontAwesomeIcon icon={faBroom} /> Limpiar/Cancelar
@@ -593,13 +593,13 @@ export default function Triaje() {
             <div className="bg-white rounded p-4 min-w-[400px] w-full md:w-[55%]">
                 {/* Filtro de búsqueda */}
                 <SectionFieldset legend="Últimos Agregados & Hojas de Ruta" className="mb-2">
-                    <div className="grid xl:grid-cols-2 gap-3 xl:gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                         <InputTextOneLine
                             label="Código"
                             name="codigo"
                             value={form.codigo}
                             onKeyUp={(event) => {
-                                SearchHC(event, form, setTablehc, selectedSede, token);
+                                // SearchHC(event, form, setTablehc, selectedSede, token);
                             }}
                             onChange={handleCodigoChange}
                             labelWidth="120px"
@@ -609,14 +609,14 @@ export default function Triaje() {
                             name="nombresBusqueda"
                             value={form.nombresBusqueda}
                             onChange={(e) => {
-                                handleNombreChange(
-                                    e,
-                                    setForm,
-                                    setTablehc,
-                                    selectedSede,
-                                    token,
-                                    debounceTimeout
-                                );
+                                // handleNombreChange(
+                                //     e,
+                                //     setForm,
+                                //     setTablehc,
+                                //     selectedSede,
+                                //     token,
+                                //     debounceTimeout
+                                // );
                             }}
                             labelWidth="120px"
                         />
@@ -716,7 +716,7 @@ export default function Triaje() {
                               : ''
                       }`}
                                         style={{ zIndex: 1, position: 'relative' }}
-                                        onClick={() => handleRowClick(row)}
+                                        // onClick={() => handleRowClick(row)}
                                         onContextMenu={(e) => handleRowContextMenu(e, row)}
                                         onMouseEnter={() => setHoveredRow(i)}
                                         onMouseLeave={() => setHoveredRow(null)}

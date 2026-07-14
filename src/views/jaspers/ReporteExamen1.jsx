@@ -138,7 +138,7 @@ export default async function ReporteExamen1(datos) {
     drawC(doc, "PLOMO EN SANGRE", leftspace + 118, headspace + 118, 35, 10, !datos.aplomo ? true : datos.plomos ? true : false);
     drawC(doc, "MERCURIO EN ORINA", leftspace + 160, headspace + 118, 35, 10, !datos.amercurio ? true : datos.mercurioo ? true : false);
 
-    const contenido = datos.hallazgoAnterior || '';
+    const contenido = datos.hallazgoAnterior ? datos.hallazgoAnterior + ' - ' + datos.fechaAnteriorHallazgo : '';
     const lineas = doc.splitTextToSize(contenido, 180); // ancho en mm
     const textoHallazgos = [
         'HALLAZGOS:',
@@ -194,7 +194,7 @@ export default async function ReporteExamen1(datos) {
         defaultColor: "#ADD8E6",
         defaultText: "BM",
     });
-    
+
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
 

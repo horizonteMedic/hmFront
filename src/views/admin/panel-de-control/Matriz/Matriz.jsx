@@ -780,7 +780,6 @@ const MatrizPostulante = () => {
               {tienePermisoEnVista("Matriz Postulante", "Matriz Colinesterasa") && <option value="Matriz-18">MATRIZ COLINESTERASA</option>}
               {tienePermisoEnVista("Matriz Postulante", "Matriz Ohla-General") && <option value="Matriz-19">MATRIZ ADMINISTRATIVA GENERAL</option>}
               {tienePermisoEnVista("Matriz Postulante", "Matriz Hidrandina") && <option value="Matriz-20">MATRIZ HIDRANDINA</option>}
-
             </select>
           </div>
           <div className="flex flex-col flex-grow justify-end">

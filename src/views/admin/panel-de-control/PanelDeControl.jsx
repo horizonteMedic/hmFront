@@ -30,6 +30,7 @@ const Dashboard = ({ TotalView }) => {
     { to: "/valorizacion", name: "Valorizacion", icon: faDollarSign, title: "Valorizacion" },
     { to: "/configuracion", name: "Configuracion", icon: faGears, title: "Configuración" },
     { to: "/SistemaOcupacional", name: "Modulo Ocupacional", icon: faNotesMedical, title: "Sistema Ocupacional" },
+    { to: "/ModuloAsistencial", name: "Modulo Asistencial", icon: faNotesMedical, title: "Modulo Asistencial" },
     // { to: "/HistoriaOcupacional", name: "Historia Ocupacional", icon: faNotesMedical, title: "Historia Ocupacional" },
     { to: "/Espirometria", name: "Espirometría", icon: faNotesMedical, title: "Espirometría" },
     { to: "/Oftalmologia", name: "Oftalmología", icon: faNotesMedical, title: "Oftalmología" }
