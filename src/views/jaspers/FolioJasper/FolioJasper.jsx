@@ -69,11 +69,22 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
     }
     const archivosConFirmas = {
         "ESPIROMETRIA": {
-            FIRMA: { x: 40, y: 750, width: 120, height: 60 },
-            HUELLA: { x: 180, y: 750, width: 60, height: 60 },
-            SELLOFIRMA: { x: 220, y: 700, width: 100, height: 60 },
-            SELLOFIRMADOCASIG: { x: 340, y: 700, width: 100, height: 60 },
-            "SELLOFIRMADOCASIG-EXTRA": { x: 460, y: 700, width: 100, height: 60 },
+            // Coordenadas cuando la página del PDF es vertical (portrait)
+            vertical: {
+                FIRMA: { x: 40, y: 750, width: 120, height: 60 },
+                HUELLA: { x: 180, y: 750, width: 60, height: 60 },
+                SELLOFIRMA: { x: 220, y: 700, width: 100, height: 60 },
+                SELLOFIRMADOCASIG: { x: 340, y: 700, width: 100, height: 60 },
+                "SELLOFIRMADOCASIG-EXTRA": { x: 460, y: 700, width: 100, height: 60 },
+            },
+            // Coordenadas cuando la página del PDF es horizontal (landscape) - AJUSTAR SEGÚN RESULTADO REAL
+            horizontal: {
+                FIRMA: { x: 57, y: 503, width: 120, height: 60 },
+                HUELLA: { x: 255, y: 503, width: 60, height: 60 },
+                SELLOFIRMA: { x: 311, y: 453, width: 100, height: 60 },
+                SELLOFIRMADOCASIG: { x: 481, y: 453, width: 100, height: 60 },
+                "SELLOFIRMADOCASIG-EXTRA": { x: 651, y: 453, width: 100, height: 60 },
+            },
         },
 
         "OFTALMOLOGIA VISION TESTER": {
