@@ -628,21 +628,36 @@ export const GetInfoServicio = (
           const sexo = res.datosPaciente.sexo_sexo_pa;
           //===============================
           if (hemo != "N/A" && hemo != "") {
-            const hemoglobina = parseFloat(hemo);
-            if (sexo == "M") {
-              if (hemoglobina < 14 || hemoglobina > 20) {
-                data.hemoglobinaRed = true;
-              } else {
-                data.hemoglobinaRed = false;
-              }
+            let hemoglobinaBaja = false;
+            let hemoglobinaAlta = false;
+
+            if (sexo === "M" || sexo === "MASCULINO") {
+              hemoglobinaBaja = hemo < 14;
+              hemoglobinaAlta = hemo > 20;
+            } else if (sexo === "F" || sexo === "FEMENINO") {
+              hemoglobinaBaja = hemo < 13.5;
+              hemoglobinaAlta = hemo > 20;
             }
-            if (sexo == "F") {
-              if (hemoglobina < 13.5 || hemoglobina > 20) {
-                data.hemoglobinaRed = true;
-              } else {
-                data.hemoglobinaRed = false;
+
+            data.hemoglobinaRed = hemoglobinaBaja || hemoglobinaAlta;
+
+            if (data.hemoglobinaRed) {
+              let motivo = "";
+
+              if (hemoglobinaBaja) {
+                motivo = "HEMOGLOBINA: BAJA";
+              } else if (hemoglobinaAlta) {
+                motivo = "HEMOGLOBINA: ALTA";
               }
+
+              const observacion = `${motivo}.\n`;
+
+              data.observacionesGenerales =
+                (data.observacionesGenerales || "") + observacion;
+
+              data.contador++;
             }
+
           }
 
           data.vsg = vsg;
@@ -842,7 +857,7 @@ export const GetInfoServicio = (
               res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "NINGUNA" &&
               res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "")
           ) {
-            data.observacionesGenerales += "OFTALMOLOGIA: " + data.enfermedadOculares + " " + (res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "") + "  " + (res.valoresCie10.oftalmologiaEnfOcularesCie10 ?? "")+ "  " + (res.valoresCie10.oftalmologiaPresenciaPterigionCie10 ?? "") + "\n";
+            data.observacionesGenerales += "OFTALMOLOGIA: " + data.enfermedadOculares + " " + (res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "") + "  " + (res.valoresCie10.oftalmologiaEnfOcularesCie10 ?? "") + "  " + (res.valoresCie10.oftalmologiaPresenciaPterigionCie10 ?? "") + "\n";
 
           }
 
@@ -1411,20 +1426,34 @@ export const GetInfoServicioEditar = (
 
           const sexo = res.datosPaciente.sexo_sexo_pa;
           if (hemo != "N/A" && hemo != "") {
-            const hemoglobina = parseFloat(hemo);
-            if (sexo == "M") {
-              if (hemoglobina < 14 || hemoglobina > 20) {
-                data.hemoglobinaRed = true;
-              } else {
-                data.hemoglobinaRed = false;
-              }
+            let hemoglobinaBaja = false;
+            let hemoglobinaAlta = false;
+
+            if (sexo === "M" || sexo === "MASCULINO") {
+              hemoglobinaBaja = hemo < 14;
+              hemoglobinaAlta = hemo > 20;
+            } else if (sexo === "F" || sexo === "FEMENINO") {
+              hemoglobinaBaja = hemo < 13.5;
+              hemoglobinaAlta = hemo > 20;
             }
-            if (sexo == "F") {
-              if (hemoglobina < 13.5 || hemoglobina > 20) {
-                data.hemoglobinaRed = true;
-              } else {
-                data.hemoglobinaRed = false;
+
+            data.hemoglobinaRed = hemoglobinaBaja || hemoglobinaAlta;
+
+            if (data.hemoglobinaRed) {
+              let motivo = "";
+
+              if (hemoglobinaBaja) {
+                motivo = "HEMOGLOBINA: BAJA";
+              } else if (hemoglobinaAlta) {
+                motivo = "HEMOGLOBINA: ALTA";
               }
+
+              const observacion = `${motivo}.\n`;
+
+              data.observacionesGenerales2 =
+                (data.observacionesGenerales2 || "") + observacion;
+
+              data.contador++;
             }
           }
 
@@ -1565,7 +1594,7 @@ export const GetInfoServicioEditar = (
               res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "NINGUNA" &&
               res.enfermedadesOcularesOtrosOftalmo_e_oculares1 !== "")
           ) {
-            data.observacionesGenerales2 += "OFTALMOLOGIA: " + data.enfermedadOculares + " " + (res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "")  + "  " + (res.valoresCie10.oftalmologiaEnfOcularesCie10 ?? "")+ "  " + (res.valoresCie10.oftalmologiaPresenciaPterigionCie10 ?? "") + "\n";
+            data.observacionesGenerales2 += "OFTALMOLOGIA: " + data.enfermedadOculares + " " + (res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "") + "  " + (res.valoresCie10.oftalmologiaEnfOcularesCie10 ?? "") + "  " + (res.valoresCie10.oftalmologiaPresenciaPterigionCie10 ?? "") + "\n";
 
           }
 
