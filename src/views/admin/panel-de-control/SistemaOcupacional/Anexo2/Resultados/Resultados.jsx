@@ -180,7 +180,7 @@ export default function Resultados({
               name="noTrabajoSobre18m"
             />
             <RestriccionCheckbox
-              label="USO DE EPP AUDITIVO ANTE EXPOSICION A RUIDO ≥80 DB"
+              label="USO DE EPP AUDITIVO ANTE EXPOSICION A RUIDO > = 80 DB"
               name="usoEppAuditivo"
             />
             <RestriccionCheckbox
