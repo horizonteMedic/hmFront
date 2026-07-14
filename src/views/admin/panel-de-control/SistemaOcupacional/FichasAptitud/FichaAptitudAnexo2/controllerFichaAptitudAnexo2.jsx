@@ -107,7 +107,7 @@ export const GetInfoServicioEditar = async (
             evitarMovimientosDisergonomicos: res.restriccionesDescripcion?.includes("EVITAR MOVIMIENTOS Y POSICIONES DISERGONÓMICAS") || false,
             noHacerTrabajoAltoRiesgo: res.restriccionesDescripcion?.includes("NO HACER TRABAJO DE ALTO RIESGO") || false,
             noHacerTrabajoSobre18: res.restriccionesDescripcion?.includes("NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO") || false,
-            usoEppAuditivo: res.restriccionesDescripcion?.includes("USO DE EPP AUDITIVO ANTE EXPOSICIÓN A RUIDO >=80 DB") || false,
+            usoEppAuditivo: res.restriccionesDescripcion?.includes("USO DE EPP AUDITIVO ANTE EXPOSICIÓN A RUIDO > = 80 DB") || false,
             usoLentesConducir: res.restriccionesDescripcion?.includes("USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHÍCULOS MOTORIZADOS") || false,
             usoLentesTrabajo: res.restriccionesDescripcion?.includes("USO DE LENTES CORRECTORES PARA TRABAJO.") || false,
             usoLentesTrabajoSobre18: res.restriccionesDescripcion?.includes("USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO") || false,

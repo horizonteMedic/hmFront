@@ -1735,7 +1735,7 @@ export const GetInfoServicioEditar = (
             "EVITAR MOVIMIENTOS Y POSICIONES DISERGONOMICAS": "evitarMovimientosDisergonomicos",
             "NO HACER TRABAJO DE ALTO RIESGO": "noTrabajoAltoRiesgo",
             "NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO": "noTrabajoSobre18m",
-            "USO DE EPP AUDITIVO ANTE EXPOSICION A RUIDO ≥80 DB": "usoEppAuditivo",
+            "USO DE EPP AUDITIVO ANTE EXPOSICION A RUIDO > = 80 DB": "usoEppAuditivo",
             "USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHICULOS MOTORIZADOS": "usoLentesCorrectorConducir",
             "USO DE LENTES CORRECTORES PARA TRABAJO": "usoLentesCorrectorTrabajo",
             "USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO": "usoLentesCorrectorTrabajo18m"

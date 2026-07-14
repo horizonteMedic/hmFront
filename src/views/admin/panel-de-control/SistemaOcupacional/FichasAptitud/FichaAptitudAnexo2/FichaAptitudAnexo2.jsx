@@ -137,7 +137,7 @@ export default function FichaAptitudAnexo2() {
         if (newForm.noHacerTrabajoConCodigoColores) restricciones.push("NO HACER TRABAJO CON CÓDIGO DE COLORES");
         if (newForm.noHacerTrabajoAltoRiesgo) restricciones.push("NO HACER TRABAJO DE ALTO RIESGO");
         if (newForm.noHacerTrabajoSobre18) restricciones.push("NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO");
-        if (newForm.usoEppAuditivo) restricciones.push("USO DE EPP AUDITIVO ANTE EXPOSICIÓN A RUIDO >=80 DB");
+        if (newForm.usoEppAuditivo) restricciones.push("USO DE EPP AUDITIVO ANTE EXPOSICIÓN A RUIDO > = 80 DB");
         if (newForm.usoLentesConducir) restricciones.push("USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHÍCULOS MOTORIZADOS");
         if (newForm.usoLentesTrabajo) restricciones.push("USO DE LENTES CORRECTORES PARA TRABAJO.");
         if (newForm.usoLentesTrabajoSobre18) restricciones.push("USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO");
@@ -155,7 +155,7 @@ export default function FichaAptitudAnexo2() {
           if (newForm.noHacerTrabajoConCodigoColores) restricciones.push("NO HACER TRABAJO CON CÓDIGO DE COLORES");
           if (newForm.noHacerTrabajoAltoRiesgo) restricciones.push("NO HACER TRABAJO DE ALTO RIESGO");
           if (newForm.noHacerTrabajoSobre18) restricciones.push("NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO");
-          if (newForm.usoEppAuditivo) restricciones.push("USO DE EPP AUDITIVO ANTE EXPOSICIÓN A RUIDO >=80 DB");
+          if (newForm.usoEppAuditivo) restricciones.push("USO DE EPP AUDITIVO ANTE EXPOSICIÓN A RUIDO > = 80 DB");
           if (newForm.usoLentesConducir) restricciones.push("USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHÍCULOS MOTORIZADOS");
           if (newForm.usoLentesTrabajo) restricciones.push("USO DE LENTES CORRECTORES PARA TRABAJO.");
           if (newForm.usoLentesTrabajoSobre18) restricciones.push("USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO");
@@ -371,7 +371,7 @@ export default function FichaAptitudAnexo2() {
               onChange={(e) => handleRestriccionesChange("usoEppAuditivo", e.target.checked)}
               disabled={form?.ninguno}
               className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
-              label="USO DE EPP AUDITIVO ANTE EXPOSICIÓN A RUIDO >=80 DB"
+              label="USO DE EPP AUDITIVO ANTE EXPOSICIÓN A RUIDO > = 80 DB"
             />
             <InputCheckbox
               name="usoLentesConducir"
