@@ -139,11 +139,19 @@ export async function colocarSellosEnPdf(pdfBytes, sellos, coordenadas) {
     const pages = pdfDoc.getPages();
     const page = pages[pages.length - 1]; // 👈 última página
 
-    const { height } = page.getSize();
+    const { width, height } = page.getSize();
+
+    // Si vienen coordenadas separadas por orientación ({ vertical, horizontal }),
+    // se elige el set según la orientación real de la página del PDF.
+    const tieneVariantesPorOrientacion = coordenadas?.vertical || coordenadas?.horizontal;
+    const esHorizontal = width > height;
+    const coordenadasFinal = tieneVariantesPorOrientacion
+        ? (esHorizontal ? coordenadas.horizontal : coordenadas.vertical) ?? {}
+        : coordenadas;
 
     for (const key of Object.keys(sellos)) {
         const url = sellos[key];
-        const coord = coordenadas[key];
+        const coord = coordenadasFinal[key];
 
         if (!coord || !esUrlBasicaValida(url)) {
             console.warn(`Sello omitido: ${key}`, url);
