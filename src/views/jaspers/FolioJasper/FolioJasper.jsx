@@ -50,6 +50,7 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
         "MERCURIO EN ORINA",
         "PLOMO EN SANGRE",
         "RIESGO CARDIOVASCULAR",
+        "INFORME PSICOLOGICO"
     ];
     const conJsonAnidado = [
         "colinesterasa",
