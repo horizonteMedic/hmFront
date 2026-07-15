@@ -441,6 +441,7 @@ export default function HematologiaBioquimicaECO() {
             <SectionFieldset legend="Hematología" className="space-y-3">
               <div className="flex justify-end">
                 <button
+                  type="button"
                   className="bg-red-600 text-white px-4 py-2 rounded-md"
                   onClick={() => {
                     const text = form.vsg == "N/A" ? "" : "N/A";
@@ -826,7 +827,7 @@ export default function HematologiaBioquimicaECO() {
               </div>
             </div>
 
-            <SectionFieldset legend="Conclusiones" className="space-y-4"> 
+            <SectionFieldset legend="Conclusiones" className="space-y-4">
               <InputTextArea
                 label="Observaciones"
                 name="observaciones"

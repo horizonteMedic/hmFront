@@ -245,7 +245,33 @@ export default function PerfilHepatico() {
         />
       </SectionFieldset>
 
-      <SectionFieldset legend="Resultados" className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <SectionFieldset legend="Resultados" className='space-y-3'>
+        <div className="flex justify-end">
+          <button
+            type="button"
+            className="bg-red-600 text-white px-4 py-2 rounded-md"
+            onClick={() => {
+              const text = form.fosfAlc == "N/A" ? "" : "N/A";
+              setForm(prev => ({
+                ...prev,
+                fosfAlc: text,
+                ggt: text,
+                tgp: text,
+                tgo: text,
+                biliTotal: text,
+                biliDir: text,
+                biliInd: text,
+                protTot: text,
+                albumina: text,
+                globSer: text,
+              }))
+            }}
+          >
+            N/A
+          </button>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
         <div className='space-y-4'>
           {testFields.slice(0, 5).map(({ label, name }) => (
             <InputTextOneLine
@@ -284,6 +310,8 @@ export default function PerfilHepatico() {
             />
           ))}
         </div>
+        </div>
+
       </SectionFieldset>
 
       <SectionFieldset legend="Asignación de Médico" className="space-y-4">
@@ -293,14 +321,14 @@ export default function PerfilHepatico() {
           form={form}
           onChange={handleChangeSimple}
         />
-          <EmpleadoComboBox
-            value={form.nombre_doctorAsignado}
-            label="Doctor Asignado"
-            form={form}
-            onChange={handleChangeSimple}
-            nameField="nombre_doctorAsignado"
-            idField="user_doctorAsignado"
-          />
+        <EmpleadoComboBox
+          value={form.nombre_doctorAsignado}
+          label="Doctor Asignado"
+          form={form}
+          onChange={handleChangeSimple}
+          nameField="nombre_doctorAsignado"
+          idField="user_doctorAsignado"
+        />
       </SectionFieldset>
 
       <BotonesAccion

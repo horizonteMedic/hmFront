@@ -250,6 +250,7 @@ export default async function ExamenGlucosaBasal(data = {}, docExistente = null)
   doc.text("VALORES NORMALES", colValores, y);
   y += 2;
 
+
   // Línea debajo del header
   doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
   y += config.lineHeight;
@@ -261,33 +262,37 @@ export default async function ExamenGlucosaBasal(data = {}, docExistente = null)
   doc.text("70 - 110 mg/dl", colValores, y);
   y += config.lineHeight;
 
-  // Línea separadora
-  doc.setLineWidth(0.2).line(config.margin, y, pageW - config.margin, y);
-  y += config.lineHeight;
-
-  // Título PERFIL LIPÍDICO
-  doc.setFont(config.font, "bold").setFontSize(10);
-  doc.text("PERFIL LIPÍDICO", colPrueba, y);
-  y += config.lineHeight;
-
-  // Filas del perfil lipídico
-  const testsLipidico = [
-    { label: "COLESTEROL TOTAL", valor: datosFinales.colesterolTotal, valores: "< 200 mg/dl" },
-    { label: "TRIGLICERIDOS", valor: datosFinales.trigliceridos, valores: "< 150 mg/dl" },
-    { label: "HDL COLESTEROL", valor: datosFinales.hdlColesterol, valores: "40 - 60 mg/dl" },
-    { label: "LDL COLESTEROL", valor: datosFinales.ldlColesterol, valores: "< 130 mg/dl" },
-    { label: "VLDL COLESTEROL", valor: datosFinales.vldlColesterol, valores: "< 30 mg/dl" },
-  ];
-
-  testsLipidico.forEach(({ label, valor, valores }) => {
-    doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
-    doc.text(label, colPrueba, y);
-
-    doc.text(valor, colResultado, y, { align: "center" });
-    doc.text(valores, colValores, y);
-
+  if (datosFinales.colesterolTotal || datosFinales.trigliceridos) {
+    // Línea separadora
+    doc.setLineWidth(0.2).line(config.margin, y, pageW - config.margin, y);
     y += config.lineHeight;
-  });
+
+    // Título PERFIL LIPÍDICO
+    doc.setFont(config.font, "bold").setFontSize(10);
+    doc.text("PERFIL LIPÍDICO", colPrueba, y);
+    y += config.lineHeight;
+
+    // Filas del perfil lipídico
+    const testsLipidico = [
+      { label: "COLESTEROL TOTAL", valor: datosFinales.colesterolTotal, valores: "< 200 mg/dl" },
+      { label: "TRIGLICERIDOS", valor: datosFinales.trigliceridos, valores: "< 150 mg/dl" },
+      { label: "HDL COLESTEROL", valor: datosFinales.hdlColesterol, valores: "40 - 60 mg/dl" },
+      { label: "LDL COLESTEROL", valor: datosFinales.ldlColesterol, valores: "< 130 mg/dl" },
+      { label: "VLDL COLESTEROL", valor: datosFinales.vldlColesterol, valores: "< 30 mg/dl" },
+    ];
+
+    testsLipidico
+      .filter(({ valor }) => !!valor)
+      .forEach(({ label, valor, valores }) => {
+        doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
+        doc.text(label, colPrueba, y);
+
+        doc.text(valor, colResultado, y, { align: "center" });
+        doc.text(valores, colValores, y);
+
+        y += config.lineHeight;
+      });
+  }
 
   // === FIRMAS ===
   const yFirmas = 210; // Mantener la posición original donde estaban las firmas
