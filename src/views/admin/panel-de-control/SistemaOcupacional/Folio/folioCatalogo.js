@@ -247,6 +247,13 @@ export const EXAMENES_CATALOGO = {
         esArchivo: true,
     },
 
+    INFORME_PSIOLOGICO_ARCHIVO: {
+        nombre: "INFORME PSICOLOGICO",
+        tabla: "INFORME PSICOLOGICO",
+        nomenclatura: "INFORME PSICOLOGICO",
+        esArchivo: true,
+    },
+
     // PCR_ULTRASENSIBLE_JSREPORT: {
     //     nombre: "PCR ULTRASENSIBLE",
     //     tabla: "pcr_ultrasensible",

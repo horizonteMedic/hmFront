@@ -13,9 +13,10 @@ export default function RegistroAtencionTabSelector({ tieneVista }) {
                 setActiveTab(0);
             } else if (tieneVista("TicketAsistencial")) {
                 setActiveTab(1);
-            } else {
-                setActiveTab(-1); // -1 significa que no tiene permisos
             }
+            //  else {
+            //     setActiveTab(-1); // -1 significa que no tiene permisos
+            // }
         },
         [
             /* aquí puedes poner dependencias si cambian los permisos */

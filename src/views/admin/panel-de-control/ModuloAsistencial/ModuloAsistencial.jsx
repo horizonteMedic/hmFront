@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useAuthStore } from "../../../../store/auth";
 import styles from "./ModuloAsistencial.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { fa1, fa6, faSearch, faStethoscope, faUserCheck } from "@fortawesome/free-solid-svg-icons";
+import { fa1, fa6, faNotesMedical, faSearch, faStethoscope, faUserCheck } from "@fortawesome/free-solid-svg-icons";
 import SectionWithBack from "./SectionWithBack";
 import RegistroAtencionTabSelector from "./RegistroAtencion/RegistroAtencionTabSelector";
 import TriajeAsistencial from "./Triaje/Triaje";
+import AsistencialTabSelector from "./Asistencial/AsistencialTabSelector";
 
 const ModuloAsistencial = () => {
     const [activeTab, setActiveTab] = useState(null); // null: dashboard, 0: Admisión, 1: Triaje, 2: Laboratorio
@@ -76,6 +77,7 @@ const ModuloAsistencial = () => {
                                 const items = [
                                     { vista: "Registro de Atencion", tab: 1, icons: [{ icon: faUserCheck }], label: "Registro de Atención" },
                                     { vista: "Triaje Asistencial", tab: 2, icons: [{ icon: faStethoscope }], label: "Triaje" },
+                                    { vista: "Historia Asistencial", tab: 3, icons: [{ icon: faNotesMedical}], label: "Historia Asistencial" },
                                 ];
                                 return items
                                     .filter((item) => tieneVista(item.vista))
@@ -104,6 +106,7 @@ const ModuloAsistencial = () => {
                         const displayedInterfaces = {
                             1: { title: "Registro de Atención", child: <RegistroAtencionTabSelector tieneVista={tieneVista} /> },
                             2: { title: "Triaje", child: <TriajeAsistencial /> },
+                            3: { title: "Historia Asistencial", child: <AsistencialTabSelector tieneVista={tieneVista} /> },
 
                         };
                         console.log(activeTab);
