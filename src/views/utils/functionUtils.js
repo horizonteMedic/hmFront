@@ -718,7 +718,7 @@ export const handleSubirArchivoDefaultSinSellos = async (
         if (response?.id === 1) {
             Swal.fire("Éxito", "Archivo subido con éxito", "success");
         } else {
-            Swal.fire("Error", "No se pudo subir el archivo", "error");
+            Swal.fire("Error", response?.mensaje || "No se pudo subir el archivo", "error");
         }
     };
 
@@ -925,7 +925,7 @@ export const handleSubidaMasiva = async (form, selectedSede, urlPDf, userlogued,
             return {
                 name: file.name,
                 status: res?.id === 1 ? "success" : "error",
-                message: res?.id === 1 ? "OK" : (res?.message || "Error al subir")
+                message: res?.id === 1 ? "OK" : (res?.mensaje || "Error al subir")
             };
         } catch (err) {
             console.error(err);
