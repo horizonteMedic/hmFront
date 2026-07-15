@@ -70,6 +70,7 @@ export const EXAMENES_CONFIG = [
             { label: "Lab. Clínico", name: "labClinico", tabla: "lab_clinico" },
             { label: "Hemograma", name: "Hemograma", tabla: "hemograma_autom" },
             { label: "Hemoglobina", name: "Hemoglobina", tabla: "lab_clinico_hemoglobina" },
+            { label: "Coagulación", name: "Coagulacion", tabla: "tiempo_coagulacion_sangria" },
             //titulo Analisis Bioquimicos
             {
                 title: "Análisis Bioquímicos",
