@@ -6,11 +6,11 @@ import DatosPersonalesLaborales from "../../../../../../components/templates/Dat
 import { useForm } from "../../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../../utils/helpers";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./ControllerCoagulacion";
+import { SubmitDataService, VerifyTR } from "./ControllerCuagulacion";
 
 const tabla = "tiempo_coagulacion_sangria"
 
-const Coagulacion = () => {
+const Cuagulacion = () => {
 
     const { token, userlogued, selectedSede, userName } = useSessionData();
     const today = getToday();
@@ -75,9 +75,9 @@ const Coagulacion = () => {
     };
 
     const handlePrint = () => {
-        handlePrintDefault(() => {
+        /*handlePrintDefault(() => {
             PrintHojaR(form.norden, token, tabla);
-        });
+        });*/
     };
 
     return (
@@ -171,4 +171,4 @@ const Coagulacion = () => {
     )
 }
 
-export default Coagulacion
+export default Cuagulacion
