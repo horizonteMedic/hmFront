@@ -166,8 +166,7 @@ const drawPatientData = (doc, datos = {}) => {
   doc.text("Apellidos y Nombres:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
   const nombreCompleto = datos.nombreCompleto
-    || [datos.apellidosPaciente, datos.nombresPaciente].filter(Boolean).join(' ').trim()
-    || datos.nombres || '';
+    || (datos.nombresPaciente && datos.apellidosPaciente ? `${datos.nombresPaciente} ${datos.apellidosPaciente}`.trim() : datos.nombresPaciente || datos.nombres || '');
   doc.text(nombreCompleto, tablaInicioX + 40, yPos + 3.5);
   yPos += filaAltura;
 
@@ -205,7 +204,7 @@ const drawPatientData = (doc, datos = {}) => {
   doc.setFont("helvetica", "bold");
   doc.text("Tipo Examen:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.nombreExamen || datos.tipoExamen || '', tablaInicioX + 28, yPos + 3.5);
+  doc.text(datos.nombreExamen || '', tablaInicioX + 28, yPos + 3.5);
   doc.setFont("helvetica", "bold");
   doc.text("Fecha Nac.:", tablaInicioX + 92, yPos + 3.5);
   doc.setFont("helvetica", "normal");
