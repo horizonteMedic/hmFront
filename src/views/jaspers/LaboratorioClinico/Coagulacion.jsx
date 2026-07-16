@@ -39,38 +39,55 @@ export default async function Coagulacion(data = {}, docExistente = null) {
   const colResultado = config.margin + 70;
   const colValores = config.margin + 120;
 
-  // Header de la tabla
-  doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
-  doc.text("PRUEBA", colPrueba, y);
-  doc.text("RESULTADO", colResultado, y, { align: "center" });
-  doc.text("VALORES NORMALES", colValores, y);
-  y += 2;
-
-  // Línea debajo del header
-  doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
-  y += config.lineHeight;
+  // Considera "sin dato" un valor vacío, en blanco o un centinela del backend
+  const tieneDato = (v) => {
+    const s = String(v ?? "").trim();
+    return s !== "" && !["null", "undefined", "-", "--", "s/d", "n/a"].includes(s.toLowerCase());
+  };
 
   // Mapeo defensivo de resultados del formulario (respuesta plana del backend)
   const tiempoCoagulacion = String(
     data.tiempoCoagulacionResultado ?? data.tiempoCoagulacion ?? data.coagulacion ?? data.txtCoagulacion ?? ""
-  );
+  ).trim();
   const tiempoSangria = String(
     data.tiempoSangriaResultado ?? data.tiempoSangria ?? data.sangria ?? data.txtSangria ?? ""
-  );
+  ).trim();
+
+  // TEMPORAL: ver el valor exacto que llega del backend
+  console.log("Coagulacion resultados >>", {
+    tiempoCoagulacionResultado: data.tiempoCoagulacionResultado,
+    tiempoSangriaResultado: data.tiempoSangriaResultado,
+    tiempoCoagulacion,
+    tiempoSangria,
+  });
 
   const pruebas = [
     { prueba: "TIEMPO DE COAGULACIÓN", resultado: tiempoCoagulacion, normal: "5 - 12 min." },
     { prueba: "TIEMPO DE SANGRÍA", resultado: tiempoSangria, normal: "1 - 5 min." },
   ];
 
-  pruebas.forEach((item) => {
-    doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
-    doc.text(item.prueba, colPrueba, y);
-    doc.setFont(config.font, "normal");
-    doc.text(item.resultado, colResultado, y, { align: "center" });
-    doc.text(item.normal, colValores, y);
-    y += config.lineHeight;
-  });
+  // Encabezado de la tabla (siempre visible)
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+  doc.text("PRUEBA", colPrueba, y);
+  doc.text("RESULTADO", colResultado, y, { align: "center" });
+  doc.text("VALORES NORMALES", colValores, y);
+  y += 2;
+
+  // Línea debajo del encabezado
+  doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
+  y += config.lineHeight;
+
+  // Solo se dibujan las filas que tienen resultado
+  pruebas
+    .filter(item => tieneDato(item.resultado))
+    .forEach((item) => {
+      doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
+      doc.text(item.prueba, colPrueba, y);
+      doc.setFont(config.font, "normal");
+      doc.text(item.resultado, colResultado, y, { align: "center" });
+      doc.text(item.normal, colValores, y);
+      y += config.lineHeight;
+    });
 
   // === FIRMAS ===
   const yFirmas = 210;
@@ -204,7 +221,7 @@ const drawPatientData = (doc, datos = {}) => {
   doc.setFont("helvetica", "bold");
   doc.text("Tipo Examen:", tablaInicioX + 2, yPos + 3.5);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.nombreExamen || '', tablaInicioX + 28, yPos + 3.5);
+  doc.text(datos.tipoExamen || '', tablaInicioX + 28, yPos + 3.5);
   doc.setFont("helvetica", "bold");
   doc.text("Fecha Nac.:", tablaInicioX + 92, yPos + 3.5);
   doc.setFont("helvetica", "normal");
