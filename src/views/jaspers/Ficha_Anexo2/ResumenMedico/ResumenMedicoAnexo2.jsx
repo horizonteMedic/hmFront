@@ -81,11 +81,12 @@ export default async function ResumenMedicoAnexo2(data = {}, docExistente = null
             cocaina: String(data.cocainaLaboratorioClinico_txtcocaina ?? ""),
             marihuana: String(data.marihuanaLaboratorioClinico_txtmarihuana ?? ""),
             examenOrina: "NORMAL",
-            vdrl: data.positivoLaboratorioClinico_chkpositivo === true
-                ? "REACTIVO"
-                : data.positivoLaboratorioClinico_chkpositivo === false
-                    ? "NO REACTIVO"
-                    : "",
+            // vdrl: data.positivoLaboratorioClinico_chkpositivo === true
+            //     ? "REACTIVO"
+            //     : data.positivoLaboratorioClinico_chkpositivo === false
+            //         ? "NO REACTIVO"
+            //         : "N/A",
+            vdrl: String(data.inmunologiaVdrl ?? ""),
             vsg: String(data.vsgLaboratorioClinico_txtvsg ?? ""),
             colesterol: String(data.colesterolAnalisisBioquimico_txtcolesterol ?? ""),
             trigliceridos: String(data.trigliseridosAnalisisBioquimico_txttrigliseridos ?? "")
