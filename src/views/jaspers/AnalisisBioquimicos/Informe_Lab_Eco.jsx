@@ -19,7 +19,7 @@ const config = {
 
 // --- Componente Principal ---
 
-export default async function Informe_Lab_Eco(datos= {}, docExistente = null) {
+export default async function Informe_Lab_Eco(datos = {}, docExistente = null) {
   const doc = docExistente || new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -67,6 +67,11 @@ export default async function Informe_Lab_Eco(datos= {}, docExistente = null) {
     y += 5;
   });
 
+  const agregarXCampo = (valor) => {
+    return valor ? `${valor} X CAMPO` : "";
+  };
+
+
   y += 4;
 
   // === SEDIMENTO URINARIO ===
@@ -77,8 +82,8 @@ export default async function Informe_Lab_Eco(datos= {}, docExistente = null) {
   doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
   const sedimento = [
     ["Células epiteliales", datos.txtCelulasEpiteliales || datos.celulasEpiteliales || ""],
-    ["Leucocitos", datos.txtLeuocitosSedimento || datos.leucocitosSu || ""],
-    ["Hematíes", datos.txtHematiesSedimento || datos.hematiesSu || ""],
+    ["Leucocitos", agregarXCampo(datos.txtLeuocitosSedimento || datos.leucocitosSu)],
+    ["Hematíes", agregarXCampo(datos.txtHematiesSedimento || datos.hematiesSu)],
     ["Cristales", datos.txtCristales || datos.cristales || ""],
     ["Cilindros", datos.txtCilindros || datos.cilindros || ""],
     ["Bacterias", datos.txtBacterias || datos.bacterias || ""],
@@ -133,22 +138,22 @@ export default async function Informe_Lab_Eco(datos= {}, docExistente = null) {
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });
- 
-    if (docExistente) {
-      return doc;
-    } else {
-      imprimir(doc);
-    }
+
+  if (docExistente) {
+    return doc;
+  } else {
+    imprimir(doc);
   }
-  
-  function imprimir(doc) {
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    iframe.onload = () => iframe.contentWindow.print();
+}
+
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
 }
 // --- Funciones de Ayuda ---
 

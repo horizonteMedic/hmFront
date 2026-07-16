@@ -49,7 +49,7 @@ export const GetInfoServicio = async (nro, tabla, set, token, onFinish = () => {
                 res.chka ? "A" :
                     res.chkb ? "B" :
                         res.chkab ? "AB" : "",
-            factorRh: res.rbrhpositivo ? "RH(+)" : "RH(-)",
+            factorRh: res.rbrhpositivo ? "RH(+)" : res.rbrhnegativo ? "RH(-)" : "",
             hematocrito: res.hematocrito ?? "",
             hemoglobina: res.hemoglobina ?? "",
 

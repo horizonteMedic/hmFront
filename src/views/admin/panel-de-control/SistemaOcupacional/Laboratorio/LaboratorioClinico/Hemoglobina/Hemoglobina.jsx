@@ -63,6 +63,7 @@ export default function Hemoglobina() {
         handleClearnotO,
         handleClear,
         handlePrintDefault,
+        handleFocusNext,
     } = useForm(initialFormState);
 
     const handleSave = () => {
@@ -135,6 +136,7 @@ export default function Hemoglobina() {
                     value={form.hematocrito}
                     onChange={handleChangeNumberDecimals}
                     labelWidth="120px"
+                    onKeyUp={(handleFocusNext)}
                 />
                 <InputTextOneLine
                     label="Hemoglobina"

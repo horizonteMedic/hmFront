@@ -193,70 +193,74 @@ export default function GlucosaBasal() {
                     />
                     <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal 70 - 110 mg/dl)"}</span>
                 </div>
-                <div className="flex items-center gap-4">
-                    <InputTextOneLine
-                        label="Colesterol Total"
-                        name="colesterolTotal"
-                        value={form.colesterolTotal}
-                        labelWidth="120px"
-                        onChange={(e) => handleChangeNumberDecimals(e, 1)}
-                        onKeyUp={handleFocusNext}
-                        disabled={!form.examenDirecto}
-                        className='w-[85%]'
-                    />
-                    <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 200 mg/dl)"}</span>
-                </div>
-                <div className="flex items-center gap-4">
-                    <InputTextOneLine
-                        label="Triglicéridos"
-                        name="trigliceridos"
-                        value={form.trigliceridos}
-                        labelWidth="120px"
-                        onChange={(e) => handleChangeNumberDecimals(e, 1)}
-                        onKeyUp={handleFocusNext}
-                        disabled={!form.examenDirecto}
-                        className='w-[85%]'
-                    />
-                    <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 150 mg/dl)"}</span>
-                </div>
-                <div className="flex items-center gap-4">
-                    <InputTextOneLine
-                        label="H.D.L. Colesterol"
-                        name="hdl"
-                        value={form.hdl}
-                        labelWidth="120px"
-                        onChange={(e) => handleChangeNumberDecimals(e, 1)}
-                        onKeyUp={handleFocusNext}
-                        disabled={!form.examenDirecto}
-                        className='w-[85%]'
-                    />
-                    <span className="text-gray-500 text-[10px] font-medium">(Valor Normal 40 - 60 mg/dl)</span>
-                </div>
-                <div className="flex items-center gap-4">
-                    <InputTextOneLine
-                        label="L.D.L. Colesterol"
-                        name="ldl"
-                        value={form.ldl}
-                        labelWidth="120px"
-                        onChange={(e) => handleChangeNumberDecimals(e, 1)}
-                        onKeyUp={handleFocusNext}
-                        disabled={!form.examenDirecto}
-                        className='w-[85%]'
-                    />
-                    <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 129 mg/dl)"}</span>
-                </div>
-                <div className="flex items-center gap-4">
-                    <InputTextOneLine
-                        label="V.L.D.L. Colesterol"
-                        name="vldl"
-                        value={form.vldl}
-                        labelWidth="120px"
-                        onChange={(e) => handleChangeNumberDecimals(e, 1)}
-                        disabled={!form.examenDirecto}
-                        className='w-[85%]'
-                    />
-                    <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 30 mg/dl)"}</span>
-                </div>
+                {form.examenDirecto && (
+                    <>
+                        <div className="flex items-center gap-4">
+                            <InputTextOneLine
+                                label="Colesterol Total"
+                                name="colesterolTotal"
+                                value={form.colesterolTotal}
+                                labelWidth="120px"
+                                onChange={(e) => handleChangeNumberDecimals(e, 1)}
+                                onKeyUp={handleFocusNext}
+                                disabled={!form.examenDirecto}
+                                className='w-[85%]'
+                            />
+                            <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 200 mg/dl)"}</span>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <InputTextOneLine
+                                label="Triglicéridos"
+                                name="trigliceridos"
+                                value={form.trigliceridos}
+                                labelWidth="120px"
+                                onChange={(e) => handleChangeNumberDecimals(e, 1)}
+                                onKeyUp={handleFocusNext}
+                                disabled={!form.examenDirecto}
+                                className='w-[85%]'
+                            />
+                            <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 150 mg/dl)"}</span>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <InputTextOneLine
+                                label="H.D.L. Colesterol"
+                                name="hdl"
+                                value={form.hdl}
+                                labelWidth="120px"
+                                onChange={(e) => handleChangeNumberDecimals(e, 1)}
+                                onKeyUp={handleFocusNext}
+                                disabled={!form.examenDirecto}
+                                className='w-[85%]'
+                            />
+                            <span className="text-gray-500 text-[10px] font-medium">(Valor Normal 40 - 60 mg/dl)</span>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <InputTextOneLine
+                                label="L.D.L. Colesterol"
+                                name="ldl"
+                                value={form.ldl}
+                                labelWidth="120px"
+                                onChange={(e) => handleChangeNumberDecimals(e, 1)}
+                                onKeyUp={handleFocusNext}
+                                disabled={!form.examenDirecto}
+                                className='w-[85%]'
+                            />
+                            <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 129 mg/dl)"}</span>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <InputTextOneLine
+                                label="V.L.D.L. Colesterol"
+                                name="vldl"
+                                value={form.vldl}
+                                labelWidth="120px"
+                                onChange={(e) => handleChangeNumberDecimals(e, 1)}
+                                disabled={!form.examenDirecto}
+                                className='w-[85%]'
+                            />
+                            <span className="text-gray-500 text-[10px] font-medium">{"(Valor Normal < 30 mg/dl)"}</span>
+                        </div>
+                    </>
+                )}
             </SectionFieldset>
 
             <SectionFieldset legend="Asignación de Médico">

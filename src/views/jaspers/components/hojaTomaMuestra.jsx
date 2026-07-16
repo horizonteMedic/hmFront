@@ -403,7 +403,7 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
     let yR = tableTop;
     const rowsRight = [
         "COLESTEROL", "TRIGLICÉRIDOS", "HDL", "LDL", "VLDL", "RPR O VDRL",
-        "PREGNOSTICON", "COCAÍNA", "MARIHUANA", "PANEL 5D", "ECO", "BK-OH"
+        "PREGNOSTICON", "COCAÍNA", "MARIHUANA", "PANEL 5D", "ECO", "", "BK-OH", "P. HEPÁTICO"
     ];
 
     rowsRight.forEach(label => {
@@ -415,18 +415,14 @@ const hojaTomaMuestra = (doc, datos, config = {}) => {
         yR += 6;
     });
 
-    // P. HEPATICO
-    doc.rect(marginL + 105, yR, col2Width - 5, 11);
+    // P. HEPATICO 
     doc.setLineWidth(0.3);
-    doc.line(marginL + 140, yR, marginL + 140, yR + 11);
-    doc.text("D:", marginL + 141, yR + 3.5);
-    doc.text("Ph:", marginL + 165, yR + 3.5);
-
-    doc.setFont("helvetica", "bold");
-    doc.text("P. HEPÁTICO", marginL + 106, yR + 8);
-    doc.line(marginL + 164, yR + 5, marginL + 164, yR + 11);
-    doc.text("GGT:", marginL + 165, yR + 8.5);
-    doc.line(marginL + 105, yR + 5, marginL + 190, yR + 5);
+    doc.line(marginL + 164, yR-18, marginL + 164, yR-12);
+    doc.text("D:", marginL + 141, yR -13);
+    doc.text("Ph:", marginL + 165, yR -13);
+ 
+    doc.line(marginL + 164, yR-6, marginL + 164, yR);
+    doc.text("GGT:", marginL + 165, yR-2); 
 
     // --- COMENTARIOS ---
     currentY = yL + 3;

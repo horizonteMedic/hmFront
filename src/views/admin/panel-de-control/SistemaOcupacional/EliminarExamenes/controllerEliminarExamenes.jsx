@@ -14,6 +14,7 @@ const obtenerEspecialidad =
 
 const urlsEliminar = {
     // Examen Ocupacional
+    Coagulacion: "tiempoCoagulacionSangria",
     triaje: "triaje",
     labClinico: "laboratorio",
     LakeLouise: "escalaLakeLouise",

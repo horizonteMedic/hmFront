@@ -47,45 +47,57 @@ export default async function Hemoglobina(datos = {}, docExistente = null) {
   doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
   y += config.lineHeight;
 
-  // GRUPO SANGUÍNEO
   doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
-  doc.text("GRUPO SANGUÍNEO", colPrueba, y);
+
   // Mapear los datos del formulario
   const grupoSanguineo = datos.chko ? "O" : datos.chka ? "A" : datos.chkb ? "B" : datos.chkab ? "AB" : datos.txtGrupoSanguineo || "";
-  doc.text(grupoSanguineo, colResultado, y);
-  // Marcar el grupo correspondiente
-  const grupo = grupoSanguineo.toUpperCase();
-  const grupoO = grupo === "O" ? "✓" : "O";
-  const grupoA = grupo === "A" ? "✓" : "A";
-  const grupoB = grupo === "B" ? "✓" : "B";
-  const grupoAB = grupo === "AB" ? "✓" : "AB";
-  const grupoTexto = `(${grupoO} / ${grupoA} / ${grupoB} / ${grupoAB})`;
-  doc.text(grupoTexto, colValores, y);
-  y += config.lineHeight;
+  const factorRh = datos.rbrhpositivo ? "POSITIVO" : datos.rbrhnegativo ? "NEGATIVO" : datos.txtFactorRh || "";
+  const hematocrito = datos.txtHematocrito || datos.hematocrito || "";
+  const hemoglobina = datos.txtHemoglobina || datos.hemoglobina || "";
+
+  // GRUPO SANGUÍNEO
+  if (grupoSanguineo) {
+    doc.text("GRUPO SANGUÍNEO", colPrueba, y);
+    doc.text(grupoSanguineo, colResultado, y);
+    // Marcar el grupo correspondiente
+    const grupo = grupoSanguineo.toUpperCase();
+    const grupoO = grupo === "O" ? "✓" : "O";
+    const grupoA = grupo === "A" ? "✓" : "A";
+    const grupoB = grupo === "B" ? "✓" : "B";
+    const grupoAB = grupo === "AB" ? "✓" : "AB";
+    const grupoTexto = `(${grupoO} / ${grupoA} / ${grupoB} / ${grupoAB})`;
+    doc.text(grupoTexto, colValores, y);
+    y += config.lineHeight;
+  }
 
   // FACTOR (RH)
-  doc.text("FACTOR (RH)", colPrueba, y);
-  const factorRh = datos.rbrhpositivo ? "POSITIVO" : datos.rbrhnegativo ? "NEGATIVO" : datos.txtFactorRh || "";
-  doc.text(factorRh, colResultado, y);
-  // Marcar + o - según el resultado
-  const esPositivo = factorRh.toUpperCase().includes("POSITIVO") || factorRh === "+";
-  doc.text(esPositivo ? "(+)" : "(-)", colValores, y);
-  y += config.lineHeight;
+  if (factorRh) {
+    doc.text("FACTOR (RH)", colPrueba, y);
+    doc.text(factorRh, colResultado, y);
+    // Marcar + o - según el resultado
+    const esPositivo = factorRh.toUpperCase().includes("POSITIVO") || factorRh === "+";
+    doc.text(esPositivo ? "(+)" : "(-)", colValores, y);
+    y += config.lineHeight;
+  }
 
   // HEMATOCRITO
-  doc.text("HEMATOCRITO", colPrueba, y);
-  doc.text(datos.txtHematocrito || datos.hematocrito || "", colResultado, y);
-  doc.text("Mujeres 36 – 50 %", colValores, y);
-  y += 4;
-  doc.text("Hombres 40 – 55 %", colValores, y);
-  y += config.lineHeight;
+  if (hematocrito) {
+    doc.text("HEMATOCRITO", colPrueba, y);
+    doc.text(hematocrito, colResultado, y);
+    doc.text("Mujeres 36 – 50 %", colValores, y);
+    y += 4;
+    doc.text("Hombres 40 – 55 %", colValores, y);
+    y += config.lineHeight;
+  }
 
   // HEMOGLOBINA
-  doc.text("HEMOGLOBINA", colPrueba, y);
-  doc.text(datos.txtHemoglobina || datos.hemoglobina || "", colResultado, y);
-  doc.text("Mujeres 12 – 16 g/dl", colValores, y);
-  y += 4;
-  doc.text("Hombres 13 – 18 g/dl", colValores, y);
+  if (hemoglobina) {
+    doc.text("HEMOGLOBINA", colPrueba, y);
+    doc.text(hemoglobina, colResultado, y);
+    doc.text("Mujeres 12 – 16 g/dl", colValores, y);
+    y += 4;
+    doc.text("Hombres 13 – 18 g/dl", colValores, y);
+  }
 
   // === FIRMAS ===
   const yFirmas = 210; // Posición para las firmas (abajo como estaba antes)

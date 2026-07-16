@@ -258,22 +258,27 @@ export default async function GlucosaTolerancia(data = {}, docExistente = null) 
   doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
   y += config.lineHeight;
 
+  const glucosaBasica = datosFinales.glucosaBasica;
+  const glucosa60 = datosFinales.glucosa60;
+  const glucosa120 = datosFinales.glucosa120;
+
   // Filas de datos
   const tests = [
-    { label: "GLUCOSA (Básica)", valor: datosFinales.glucosaBasica, valores: "70 - 110 mg/dl" },
-    { label: "GLUCOSA (Tolerancia 60 minutos)", valor: datosFinales.glucosa60, valores: "120 - 170 mg/dl" },
-    { label: "GLUCOSA (Tolerancia 120 minutos)", valor: datosFinales.glucosa120, valores: "70 - 120 mg/dl" },
+    { label: "GLUCOSA (Básica)", valor: glucosaBasica, valores: "70 - 110 mg/dl" },
+    { label: "GLUCOSA (Tolerancia 60 minutos)", valor: glucosa60 || '', valores: "120 - 170 mg/dl" },
+    { label: "GLUCOSA (Tolerancia 120 minutos)", valor: glucosa120 || '', valores: "70 - 120 mg/dl" },
   ];
 
-  tests.forEach(({ label, valor, valores }) => {
-    doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
-    doc.text(label, colPrueba, y);
+  tests.filter(({ valor }) => valor != null && String(valor).trim() !== '')
+    .forEach(({ label, valor, valores }) => {
+      doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
+      doc.text(label, colPrueba, y);
 
-    doc.text(valor, colResultado, y, { align: "center" });
-    doc.text(valores, colValores, y);
+      doc.text(valor, colResultado, y, { align: "center" });
+      doc.text(valores, colValores, y);
 
-    y += config.lineHeight;
-  });
+      y += config.lineHeight;
+    });
 
   // === FIRMAS ===
   const yFirmas = 210; // Mantener la posición original donde estaban las firmas
@@ -281,7 +286,7 @@ export default async function GlucosaTolerancia(data = {}, docExistente = null) 
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });
-   
+
   if (docExistente) {
     return doc;
   } else {
@@ -297,4 +302,4 @@ function imprimir(doc) {
   iframe.src = url;
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
-  }
+}
