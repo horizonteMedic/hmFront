@@ -83,6 +83,9 @@ const CertificadoAptitudBrigadista = () => {
         });
     };
 
+    // Deshabilita el N° Orden cuando ya se cargaron datos del paciente tras la búsqueda
+    const nordenDisabled = Boolean(form.nombres || form.dni);
+
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
             {/* ===== SECCIÓN: N° ORDEN Y FECHA ===== */}
@@ -93,6 +96,7 @@ const CertificadoAptitudBrigadista = () => {
                     value={form.norden}
                     onKeyUp={handleSearch}
                     onChange={handleChangeNumber}
+                    disabled={nordenDisabled}
                     labelWidth="120px"
                 />
                 <InputTextOneLine

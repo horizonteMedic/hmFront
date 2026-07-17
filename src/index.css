@@ -75,13 +75,23 @@ body {
   background-color: #2ba265;
 }
 
-/* Scroll horizontal delicado para pestañas (TabSelector) */
-.no-scrollbar {
-  -ms-overflow-style: none;   /* IE y Edge */
-  scrollbar-width: none;      /* Firefox */
+/* Scroll horizontal delgado y azul para pestañas (TabSelector) */
+.scrollbar-tabs {
+  scrollbar-width: thin;                              /* Firefox: barra fina */
+  scrollbar-color: rgba(35, 50, 69, 0.55) transparent; /* thumb (primario) y track */
 }
-.no-scrollbar::-webkit-scrollbar {
-  display: none;              /* Chrome, Safari y Opera */
+.scrollbar-tabs::-webkit-scrollbar {
+  height: 6px;                                        /* Chrome, Safari, Edge: grosor */
+}
+.scrollbar-tabs::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-tabs::-webkit-scrollbar-thumb {
+  background-color: rgba(35, 50, 69, 0.55);           /* primario translúcido: delicado */
+  border-radius: 9999px;                              /* extremos redondeados */
+}
+.scrollbar-tabs::-webkit-scrollbar-thumb:hover {
+  background-color: #233245;                          /* primario sólido al pasar el cursor */
 }
 
 /* MINERA */
