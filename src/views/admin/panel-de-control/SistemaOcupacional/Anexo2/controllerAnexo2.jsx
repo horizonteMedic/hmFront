@@ -988,7 +988,7 @@ export const GetInfoServicio = (
               data.observacionesGeneralesCie10 = agregarTexto(data.observacionesGeneralesCie10, "CIE 10: I10 - HIPERTENSIÓN ESENCIAL (PRIMARIA)");
             }
           }
-          data.resultadoGonadotropina = res.sexo_sexo_pa === "M" ? "N/A" : res.resultadoGonadotropina
+          data.resultadoGonadotropina = res.resultadoGonadotropina
 
 
           data.notasDoctor = res.notasDoctor ?? "";
@@ -1783,7 +1783,7 @@ export const GetInfoServicioEditar = (
           data.notasDoctor = res.notasDoctor ?? "";
           data.mercurioOrina = res.mercurioOrina ?? "N/A",
             data.plomoSangre = res.plomoSangre ?? "N/A",
-            data.resultadoGonadotropina = sexo === "M" ? "N/A" : res.resultadoGonadotropina
+            data.resultadoGonadotropina = res.resultadoGonadotropina
 
           //Data anexo 16
           // Examen físico de orina
