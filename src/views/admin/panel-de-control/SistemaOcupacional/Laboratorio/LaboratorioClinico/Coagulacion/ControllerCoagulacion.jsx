@@ -2,11 +2,13 @@ import Swal from "sweetalert2";
 import {
     GetInfoPacDefault,
     GetInfoServicioDefault,
-    PrintHojaRDefault,
+    LoadingDefault,
     SubmitDataServiceDefault,
     VerifyTRDefault,
 } from "../../../../../../utils/functionUtils.js";
 import { formatearFechaCorta } from "../../../../../../utils/formatDateUtils.js";
+import { getFetch } from "../../../../../../utils/apiHelpers.js";
+import CoagulacionReporte from "../../../../../../jaspers/LaboratorioClinico/Coagulacion.jsx";
 
 const obtenerReporteUrl = "/api/v01/ct/tiempoCoagulacionSangria/obtenerReporte";
 const registrarUrl = "/api/v01/ct/tiempoCoagulacionSangria/registrarActualizar"
@@ -78,18 +80,27 @@ export const SubmitDataService = async (
 };
 
 export const PrintHojaR = async (nro, token, tabla) => {
-    const jasperModules = import.meta.glob(
-        "../../../../../../jaspers/LaboratorioClinico/*.jsx"
-    );
-    await PrintHojaRDefault(
-        nro,
-        token,
-        tabla,
-        null,
-        obtenerReporteUrl,
-        jasperModules,
-        "../../../../../../jaspers/LaboratorioClinico"
-    );
+    LoadingDefault("Cargando Formato a Imprimir");
+    try {
+        const res = await getFetch(
+            `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`,
+            token
+        );
+
+        // El backend devuelve los datos anidados en `resultado`; desanidar si aplica.
+        const data = res?.resultado ?? res;
+
+        if (res?.error || !data?.norden) {
+            Swal.fire("Error", "No existe registro para imprimir.", "error");
+            return;
+        }
+
+        await CoagulacionReporte(data, null);
+        Swal.close();
+    } catch (error) {
+        console.error("Error al imprimir Coagulación:", error);
+        Swal.fire("Error", "No se pudo generar el reporte.", "error");
+    }
 };
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
     await VerifyTRDefault(
