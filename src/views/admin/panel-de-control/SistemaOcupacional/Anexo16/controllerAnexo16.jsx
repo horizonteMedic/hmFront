@@ -2017,7 +2017,7 @@ export const GetInfoServicioEditar = (
           data.vibraciones = res.vibracionesAnexo7c_vibraciones ?? false;
 
           data.notasDoctor = res.notasDoctor ?? "";
-          data.resultadoGonadotropina = res.sexo_sexo_pa === "M" ? "N/A" : res.resultadoGonadotropina
+          data.resultadoGonadotropina = res.resultadoGonadotropina
 
           if (resSimple.interpretacionFuncionRespiratoria_interpretacion != null) {
             data.observacionesGenerales2 += "ESPIROMETRIA: " + res.interpretacionFuncionRespiratoria_interpretacion + "\n";
