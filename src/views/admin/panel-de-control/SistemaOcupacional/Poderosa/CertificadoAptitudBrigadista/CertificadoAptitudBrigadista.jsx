@@ -86,7 +86,7 @@ const CertificadoAptitudBrigadista = () => {
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
             {/* ===== SECCIÓN: N° ORDEN Y FECHA ===== */}
-            <SectionFieldset legend="Información General" className="grid grid-cols-1 lg:grid-cols-3 gap-x-4 gap-y-3">
+            <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-3">
                 <InputTextOneLine
                     label="N° Orden"
                     name="norden"
@@ -109,8 +109,8 @@ const CertificadoAptitudBrigadista = () => {
             {/* ===== SECCIÓN: DATOS LABORALES ===== */}
             <DatosPersonalesLaborales form={form} />
 
-            <div className="flex gap-3 items-start w-full ">
-                <div className="w-[40%]">
+            <div className="flex flex-col md:flex-row gap-3 items-start w-full ">
+                <div className="w-full md:w-[40%]">
                     <SectionFieldset legend="Aptitud" className="w-full">
                         <InputsRadioGroup
                             vertical
@@ -132,7 +132,7 @@ const CertificadoAptitudBrigadista = () => {
                     </SectionFieldset>
                 </div>
 
-                <div className="w-[60%]  ">
+                <div className="w-full md:w-[60%]  ">
                     <SectionFieldset legend="Conclusiones y Observaciones" className="w-full space-y-3">
                         <InputTextArea
                             label="Conclusiones"
