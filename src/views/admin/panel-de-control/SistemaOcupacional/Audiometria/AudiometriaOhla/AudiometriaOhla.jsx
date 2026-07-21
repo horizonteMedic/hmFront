@@ -44,6 +44,7 @@ export default function AudiometriaOhla({
   goToFicha,
 }) {
   const [dataTabla, setDataTabla] = useState([]);
+  console.log(form)
   useEffect(() => {
     obtenerInfoTabla();
   }, []);
@@ -1280,15 +1281,15 @@ export default function AudiometriaOhla({
       {/* Acciones */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex gap-3">
-          {/*<button
+          <button
             type="button"
             onClick={() => {
               SubmitDataService(form, token, userlogued, handleClear, tabla);
             }}
             className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-            </button>*/}
+          >
+            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+          </button>
           <button
             type="button"
             onClick={() => goToFicha?.()}
