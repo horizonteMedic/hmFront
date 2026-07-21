@@ -662,6 +662,11 @@ export const GetInfoServicioParaNuevoRegistro = async (
             codigoAntecedentesPatologicos_cod_ap: null,
             ...mapDatosPacienteForm(resActual),
             ...mapExamenesActualesForm(resActual),
+            // Va después del spread del norden anterior a propósito: para las
+            // variables con validación (hipertensión, enf. oculares,
+            // medicamentos) el norden actual tiene prioridad y pisa lo que
+            // vino copiado del norden anterior.
+            ...mapValidacionesActuales(resActual),
         }));
     }
 };
@@ -698,7 +703,30 @@ const mapExamenesActualesForm = (resActual) => ({
     marihuanaRed: (resActual?.marihuanaLaboratorioClinico_txtmarihuana ?? "") == "POSITIVO",
 });
 
-// Cuando cancela: nombre/sexo/edad y Oftalmología/Laboratorio del norden ACTUAL, 
+// Checkboxes que NO son una simple respuesta guardada, sino que se calculan
+// ("se validan") a partir de otros datos del examen: hipertensión sale de la
+// presión arterial, enfOculares sale del texto de Oftalmología, y
+// medicamentos sale del Anexo 16A. Estos SIEMPRE deben salir del N° de
+// orden ACTUAL (nunca del norden anterior elegido en el modal), porque esos
+// datos se toman el día de hoy y pueden haber cambiado desde la visita vieja.
+const mapValidacionesActuales = (resActual) => {
+    const presionSistolica = parseFloat(resActual?.sistolica);
+    const presionDiastolica = parseFloat(resActual?.diastolica);
+    const hipertension = !isNaN(presionSistolica) && !isNaN(presionDiastolica) &&
+        (presionSistolica >= 140 || presionDiastolica >= 90);
+
+    const enfermedadesOcularesTexto = resActual?.enfermedadesocularesoftalmo_e_oculares ?? "";
+    const medicamentosAnexo16A = resActual?.medicamentosAnexo16A ?? "";
+
+    return {
+        hipertensionArterial: hipertension,
+        enfOculares: enfermedadesOcularesTexto != "" && !enfermedadesOcularesTexto.includes("NINGUNA"),
+        medicamentos: medicamentosAnexo16A != "",
+        especifiqueMedicamentos: medicamentosAnexo16A,
+    };
+};
+
+// Cuando cancela: nombre/sexo/edad y Oftalmología/Laboratorio del norden ACTUAL,
 // Antecedentes Quirúrgicos del N° de orden mas reciente(fecha_registro_antecedente)
 export const GetInfoBasicoNordenActual = async (nordenActual, tabla, set, token, list = []) => {
     const resActual = await getFetch(
@@ -745,6 +773,7 @@ export const GetInfoBasicoNordenActual = async (nordenActual, tabla, set, token,
         fechaCovid: fechaActual,
         ...mapDatosPacienteForm(resActual),
         ...mapExamenesActualesForm(resActual),
+        ...mapValidacionesActuales(resActual),
         antecedentes: antecedentesData,
     }));
 };
