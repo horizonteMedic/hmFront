@@ -5,6 +5,7 @@ import {
   faBroom,
   faPrint,
   faStethoscope,
+  faArrowRightLong,
 } from "@fortawesome/free-solid-svg-icons";
 
 import Swal from "sweetalert2";
@@ -40,6 +41,7 @@ export default function AudiometriaOhla({
   setFormFicha,
   setSearchNombreMedico,
   handleClearFicha,
+  goToFicha,
 }) {
   const [dataTabla, setDataTabla] = useState([]);
   useEffect(() => {
@@ -753,7 +755,7 @@ export default function AudiometriaOhla({
         <div className="border rounded p-4 mt-6 flex flex-col gap-4">
           {/* Encabezado */}
 
-          <div className="flex flex-col 2xl:flex-row gap-4">
+          <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 flex items-center gap-2">
               <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
                 Nro Ficha:
@@ -811,7 +813,7 @@ export default function AudiometriaOhla({
             </div>
           </div>
           {/* Paciente */}
-          <div className="flex flex-col 2xl:flex-row gap-4">
+          <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 flex items-center gap-2">
               <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
                 DNI:
@@ -945,9 +947,9 @@ export default function AudiometriaOhla({
           <div className="grid grid-cols-1 gap-8 border rounded p-4 ">
             <h4 className="font-semibold text-lg ">Audiometría Aérea:</h4>
             {/* Oído Derecho */}
-            <div className="flex flex-col p-4 border rounded items-center justify-center">
+            <div className="flex flex-col p-4 border rounded items-center justify-center overflow-x-auto w-full">
               <h4 className="font-medium mb-2 w-full">Oído Derecho</h4>
-              <div className="grid grid-cols-8 gap-1 text-center text-sm font-semibold ">
+              <div className="grid grid-cols-8 gap-1 text-center text-sm font-semibold min-w-[520px] w-full">
                 <div className="flex flex-col items-start  gap-2">
                   <p>hz</p>
                   <p>dB (A)</p>
@@ -985,9 +987,9 @@ export default function AudiometriaOhla({
             </div>
 
             {/* Oído Izquierdo */}
-            <div className="flex flex-col p-4 border rounded items-center justify-center">
+            <div className="flex flex-col p-4 border rounded items-center justify-center overflow-x-auto w-full">
               <h4 className="font-medium mb-2 w-full">Oído Izquierdo</h4>
-              <div className="grid grid-cols-8 gap-1 text-center text-sm font-semibold">
+              <div className="grid grid-cols-8 gap-1 text-center text-sm font-semibold min-w-[520px] w-full">
                 <div className="flex flex-col items-start gap-2">
                   <p>hz</p>
                   <p>dB (A)</p>
@@ -1069,10 +1071,10 @@ export default function AudiometriaOhla({
               </label>
             </div>
             {/* Oído Derecho */}
-            <div className="flex flex-col p-4 border rounded items-center justify-center">
+            <div className="flex flex-col p-4 border rounded items-center justify-center overflow-x-auto w-full">
               <h4 className="font-medium mb-2 w-full">Oído Derecho</h4>
 
-              <div className="grid grid-cols-8 gap-1 text-center text-sm font-semibold ">
+              <div className="grid grid-cols-8 gap-1 text-center text-sm font-semibold min-w-[520px] w-full">
                 <div className="flex flex-col items-start  gap-2">
                   <p>hz</p>
                   <p>dB (A)</p>
@@ -1109,9 +1111,9 @@ export default function AudiometriaOhla({
               </div>
             </div>
             {/* Oído Izquierdo */}
-            <div className="flex flex-col p-4 border rounded items-center justify-center">
+            <div className="flex flex-col p-4 border rounded items-center justify-center overflow-x-auto w-full">
               <h4 className="font-medium mb-2 w-full">Oído Izquierdo</h4>
-              <div className="grid grid-cols-8 gap-1 text-center text-sm font-semibold">
+              <div className="grid grid-cols-8 gap-1 text-center text-sm font-semibold min-w-[520px] w-full">
                 <div className="flex flex-col items-start gap-2">
                   <p>hz</p>
                   <p>dB (A)</p>
@@ -1177,7 +1179,7 @@ export default function AudiometriaOhla({
         <div className="border rounded p-4 mt-6 flex flex-col gap-4">
           {/* Search */}
 
-          <div className="flex flex-col 2xl:flex-row gap-4">
+          <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 flex items-center gap-2">
               <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
                 Nombres:
@@ -1278,14 +1280,22 @@ export default function AudiometriaOhla({
       {/* Acciones */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex gap-3">
-          <button
+          {/*<button
             type="button"
             onClick={() => {
               SubmitDataService(form, token, userlogued, handleClear, tabla);
             }}
             className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+            </button>*/}
+          <button
+            type="button"
+            onClick={() => goToFicha?.()}
+            className="bg-cyan-600 hover:bg-cyan-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
           >
-            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+            Siguiente
+            <FontAwesomeIcon icon={faArrowRightLong} />
           </button>
           <button
             type="button"
