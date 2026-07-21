@@ -130,11 +130,11 @@ const AudiometriaFichaAudiologica = ({
   console.log(form)
   return (
     <div className="w-full bg-white rounded shadow p-4 border border-gray-200 mb-4">
-      <div className="w-full flex flex-row flex-nowrap gap-4 text-[12px] pb-4">
+      <div className="w-full flex flex-col xl:flex-row gap-4 text-[12px] pb-4">
         {/* Columna 1 */}
-        <div className="basis-[65%] min-w-0 text-[12px] flex flex-col gap-3">
+        <div className="w-full xl:basis-[65%] min-w-0 text-[12px] flex flex-col gap-3">
           {/* Fila 1 */}
-          <div className="grid grid-cols-4 w-full gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 w-full gap-4">
             <div className="flex items-center gap-2">
               <label className="font-bold min-w-[80px] text-[13px]">
                 Nro Orden :
@@ -215,8 +215,8 @@ const AudiometriaFichaAudiologica = ({
             </div>
           </div>
           {/* Fila 2 */}
-          <div className="grid grid-cols-4 w-full gap-4 ">
-            <div className="flex items-center gap-2 col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 w-full gap-4 ">
+            <div className="flex items-center gap-2 col-span-2 sm:col-span-1 lg:col-span-2">
               <label className="font-bold min-w-[80px] text-[13px]">
                 Nombres:
               </label>
@@ -272,9 +272,9 @@ const AudiometriaFichaAudiologica = ({
           </div>
 
           {/* Fila 3 */}
-          <div className="grid grid-cols-4 w-full gap-4 ">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 w-full gap-4 ">
             {/* Sexo */}
-            <div className="flex items-center gap-2 col-span-2">
+            <div className="flex items-center gap-2 col-span-2 sm:col-span-1 lg:col-span-2">
               <label className="font-bold text-[13px] min-w-[80px]">
                 Sexo :
               </label>
@@ -313,7 +313,7 @@ const AudiometriaFichaAudiologica = ({
           </div>
 
           {/* Fila 4 */}
-          <div className="grid grid-cols-2 w-full gap-4 ">
+          <div className="grid grid-cols-1 sm:grid-cols-2 w-full gap-4 ">
             {/* Ocupación */}
             <div className="flex items-center gap-2 ">
               <label className="font-bold text-[13px] min-w-[80px]">
@@ -341,7 +341,7 @@ const AudiometriaFichaAudiologica = ({
           </div>
 
           {/* Fila 5 */}
-          <div className="grid grid-cols-2 w-full gap-4 ">
+          <div className="grid grid-cols-1 sm:grid-cols-2 w-full gap-4 ">
             {/* Empresa */}
             <div className="flex items-center gap-2">
               <label className="font-bold text-[13px] min-w-[80px]">
@@ -368,7 +368,7 @@ const AudiometriaFichaAudiologica = ({
           </div>
         </div>
         {/* Columna 2 */}
-        <div className="basis-[35%] min-w-0 flex flex-col gap-4 text-[12px]">
+        <div className="w-full xl:basis-[35%] min-w-0 flex flex-col gap-4 text-[12px]">
           <fieldset className="border rounded-lg min-w-[220px] text-[12px] p-3">
             <legend className="font-bold text-[14px]">AUDIÓMETRO</legend>
             <div className="flex flex-col gap-3">
@@ -448,12 +448,12 @@ const AudiometriaFichaAudiologica = ({
         </div>
       </div>
       {/* --- NUEVO BLOQUE EN DOS COLUMNAS --- */}
-      <div className="w-full flex flex-row flex-nowrap gap-4">
+      <div className="w-full flex flex-col lg:flex-row gap-4">
         {/* Columna Izquierda */}
         <div className="bg-white rounded shadow p-4 border border-gray-200 text-[12px] space-y-4 flex flex-col justify-between flex-1">
           <div className=" text-[12px] space-y-4">
             {/* Uso de protectores auditivos y apreciación del ruido */}
-            <div className="grid grid-cols-3 gap-4 mb-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-2">
               <fieldset className="border rounded p-2 text-[12px] px-3">
                 <legend className="font-bold text-[13px] mt-2">
                   Uso de protectores Auditivos

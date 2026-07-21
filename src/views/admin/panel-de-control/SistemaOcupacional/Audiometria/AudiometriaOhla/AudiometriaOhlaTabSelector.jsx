@@ -204,6 +204,7 @@ const AudiometriaOhlaTabSelector = ({
           setFormFicha={setFormFicha}
           setSearchNombreMedico={setSearchNombreMedico}
           handleClearFicha={handleClearFicha}
+          goToFicha={() => setActiveTab(1)}
         />
       ),
     },
