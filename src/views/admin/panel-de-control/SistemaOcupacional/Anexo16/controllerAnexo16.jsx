@@ -4,7 +4,7 @@ import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
 import { getToday } from "../../../../utils/helpers";
 
-const registrarUrl = "/api/v01/ct/anexos/anexo16/registrarActualizarAnexo7c";
+export const registrarUrl = "/api/v01/ct/anexos/anexo16/registrarActualizarAnexo7c";
 const obtenerSimpleUrl = "/api/v01/ct/anexos/anexo16/obtenerAnexo16";
 const obtenerParaEditarUrl = "/api/v01/ct/anexos/anexo16/reporteEditarAnexo16";
 const obtenerParaJasperUrl = "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16";
@@ -15,24 +15,7 @@ const obtenerExamenesRealizadosUrl = "/api/v01/ct/anexos/anexo2/obtenerExamenesR
 
 const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta"
 
-export const SubmitDataService = async (
-  form,
-  setForm,
-  token,
-  user,
-  limpiar,
-  tabla,
-  datosFooter
-) => {
-  if (!form.norden) {
-    await Swal.fire("Error", "Datos Incompletos", "error");
-    return;
-  }
-  if (form.cerrado && (form.aptoParaTrabajar == "" || form.aptoParaTrabajar == null || form.aptoParaTrabajar == undefined)) {
-    await Swal.fire("Error", "Debe seleccionar aptitud", "error");
-    return;
-  }
-  Loading("Registrando Datos");
+export const construirBodyAnexo16 = (form, user) => {
   const body = {
     norden: form.norden,
     codigoAnexo: form.codigoAnexo,
@@ -161,6 +144,28 @@ export const SubmitDataService = async (
     mercurioOrina: form.mercurioOrina,
     plomoSangre: form.plomoSangre,
   };
+  return body;
+};
+
+export const SubmitDataService = async (
+  form,
+  setForm,
+  token,
+  user,
+  limpiar,
+  tabla,
+  datosFooter
+) => {
+  if (!form.norden) {
+    await Swal.fire("Error", "Datos Incompletos", "error");
+    return;
+  }
+  if (form.cerrado && (form.aptoParaTrabajar == "" || form.aptoParaTrabajar == null || form.aptoParaTrabajar == undefined)) {
+    await Swal.fire("Error", "Debe seleccionar aptitud", "error");
+    return;
+  }
+  Loading("Registrando Datos");
+  const body = construirBodyAnexo16(form, user);
   console.log(body);
 
   SubmitData(body, registrarUrl, token).then((res) => {
