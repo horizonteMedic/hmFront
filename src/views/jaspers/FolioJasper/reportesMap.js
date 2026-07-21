@@ -118,6 +118,7 @@ import ETANOLSALIVA from "../Toxicologia/ETANOLSALIVA";
 import CertificadoAptitudCuadrador_Digitalizado from "../Poderosa/CertificadoAptitudCuadrador";
 import Informe_Ocu_DatosPacientes from "../FichaDatosPersonales/Informe_Ocu_DatosPacientes";
 import TamizajeDermatologico from "../TamizajeDermatologico/TamizajeDermatologico";
+import Espirometria_OHLA_Digitalizado from "../Espirometria/Espirometria_OHLA_Digitalizado";
 import CAMO_Administrativo16 from "../CAMOAdmin/CAMO_Administrativo16";
 import CAMO_Administrativo2 from "../CAMOAdmin/CAMO_Administrativo2";
 import EscalaLakeLouise from "../EscalaLakeLouise/EscalaLakeLouise";
@@ -144,6 +145,8 @@ export const reportesMap = {
    },
 
    tamizaje_dermatologico: TamizajeDermatologico,
+
+   funcion_abs: Espirometria_OHLA_Digitalizado,
 
    antecedentes_patologicos: {
       ficha_antecedente_patologico_Digitalizado,
