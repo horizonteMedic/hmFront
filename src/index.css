@@ -21,6 +21,15 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
+/* Aparición sutil para mensajes de validación de campos (borde/mensaje rojo) */
+@keyframes fieldErrorIn {
+  from { opacity: 0; transform: translateY(-3px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-field-error {
+  animation: fieldErrorIn 0.2s ease-out;
+}
+
 /* para textos */
 .color-blanco{
   color: #ffffff;
@@ -95,4 +104,104 @@ body {
 }
 
 /* MINERA */
+
+
+/* ============================================================
+   SweetAlert2 — Estilo corporativo: llamativo pero profesional.
+   El acento de color (borde, título y botón) se aplica AUTOMÁTICO
+   según el icono de la alerta (error/warning/success/info/question),
+   por lo que aplica a TODOS los formularios sin tocar el código JS.
+   ============================================================ */
+
+/* Base del popup: bordes redondeados, sombra limpia y acento superior */
+.swal2-popup {
+  border-radius: 16px !important;
+  padding-top: 1.25em !important;
+  border-top: 5px solid #94a3b8;            /* color neutro por defecto */
+  box-shadow: 0 18px 45px -12px rgba(15, 23, 42, 0.35) !important;
+}
+
+/* Título: más marcado con negrita + color (SIN aumentar el tamaño) */
+.swal2-title {
+  font-weight: 700 !important;
+  letter-spacing: 0.2px;
+}
+/* Espaciado uniforme para íconos (FontAwesome) dentro del título.
+   El ícono hereda el color del título según el tipo de alerta. */
+.swal2-title i { margin-right: .45em; }
+
+/* Texto del cuerpo un poco más legible */
+.swal2-html-container { color: #334155; }
+
+/* Botones: forma de píldora y mejor presencia (respetan el color propio) */
+.swal2-actions { gap: 8px; }
+.swal2-styled.swal2-confirm,
+.swal2-styled.swal2-cancel {
+  border-radius: 9999px !important;
+  font-weight: 600 !important;
+  padding: 0.6em 1.9em !important;
+  box-shadow: 0 6px 16px -6px rgba(15, 23, 42, 0.45);
+  transition: transform .08s ease, filter .15s ease;
+}
+.swal2-styled.swal2-confirm:hover,
+.swal2-styled.swal2-cancel:hover { filter: brightness(1.05); }
+.swal2-styled.swal2-confirm:active,
+.swal2-styled.swal2-cancel:active { transform: translateY(1px); }
+.swal2-styled:focus { box-shadow: 0 0 0 3px rgba(148, 163, 184, .4) !important; }
+
+/* ---------- ERROR (rojo) ---------- */
+.swal2-popup:has(.swal2-icon.swal2-error) {
+  border-top-color: #dc2626;
+  box-shadow: 0 0 0 1px rgba(220, 38, 38, .20),
+              0 18px 45px -12px rgba(220, 38, 38, .45) !important;
+}
+.swal2-popup:has(.swal2-icon.swal2-error) .swal2-title { color: #b91c1c !important; }
+/* El color del botón va SIN !important: si un diálogo define su propio
+   confirmButtonColor, ese gana; las alertas simples toman el rojo. */
+.swal2-popup:has(.swal2-icon.swal2-error) .swal2-confirm { background-color: #dc2626; }
+/* Micro "pop" de entrada, solo para errores (no afecta la animación de cierre) */
+.swal2-popup.swal2-show:has(.swal2-icon.swal2-error) {
+  animation: swalPop .32s cubic-bezier(.36, .07, .19, .97);
+}
+
+/* ---------- WARNING (ámbar) ---------- */
+.swal2-popup:has(.swal2-icon.swal2-warning) {
+  border-top-color: #f59e0b;
+  box-shadow: 0 0 0 1px rgba(245, 158, 11, .18),
+              0 18px 45px -12px rgba(217, 119, 6, .40) !important;
+}
+.swal2-popup:has(.swal2-icon.swal2-warning) .swal2-title { color: #b45309 !important; }
+.swal2-popup:has(.swal2-icon.swal2-warning) .swal2-confirm { background-color: #f59e0b; }
+
+/* ---------- SUCCESS (verde) ---------- */
+.swal2-popup:has(.swal2-icon.swal2-success) {
+  border-top-color: #16a34a;
+  box-shadow: 0 0 0 1px rgba(22, 163, 74, .18),
+              0 18px 45px -12px rgba(22, 163, 74, .40) !important;
+}
+.swal2-popup:has(.swal2-icon.swal2-success) .swal2-title { color: #15803d !important; }
+.swal2-popup:has(.swal2-icon.swal2-success) .swal2-confirm { background-color: #16a34a; }
+
+/* ---------- INFO (azul) ---------- */
+.swal2-popup:has(.swal2-icon.swal2-info) {
+  border-top-color: #0284c7;
+  box-shadow: 0 0 0 1px rgba(2, 132, 199, .16),
+              0 18px 45px -12px rgba(2, 132, 199, .40) !important;
+}
+.swal2-popup:has(.swal2-icon.swal2-info) .swal2-title { color: #0369a1 !important; }
+.swal2-popup:has(.swal2-icon.swal2-info) .swal2-confirm { background-color: #0284c7; }
+
+/* ---------- QUESTION (índigo) ---------- */
+.swal2-popup:has(.swal2-icon.swal2-question) {
+  border-top-color: #6366f1;
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, .16),
+              0 18px 45px -12px rgba(99, 102, 241, .40) !important;
+}
+.swal2-popup:has(.swal2-icon.swal2-question) .swal2-title { color: #4338ca !important; }
+
+@keyframes swalPop {
+  0%   { transform: scale(.92); }
+  60%  { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
 

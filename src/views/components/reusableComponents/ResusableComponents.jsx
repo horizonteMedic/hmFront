@@ -7,3 +7,4 @@ export { default as TabSelector } from "./TabSelector";
 export { default as RadioTable } from "./RadioTable";
 export { default as SectionFieldset } from "./SectionFieldset";
 export { default as CIE10List } from "./CIE10List";
+export { default as SearchButton } from "./SearchButton";

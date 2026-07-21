@@ -40,6 +40,15 @@ export function formatearFechaLargaConDia(fechaStr) {//INPUT 2025-01-28 //OUTPUT
     return resultado.charAt(0).toUpperCase() + resultado.slice(1);
 }
 
+export function formatearFechaHora(fechaStr) {
+    // INPUT:  "2026-07-18T09:32:15" | "2026-07-18 09:32:15" | Date
+    // OUTPUT: "18/07/2026 09:32:15"  (vacío si no hay valor / es inválido)
+    if (!fechaStr) return "";
+    const fecha = fechaStr instanceof Date ? fechaStr : new Date(fechaStr);
+    if (isNaN(fecha.getTime())) return "";
+    return format(fecha, "dd/MM/yyyy HH:mm:ss");
+}
+
 export function formatearHora(horaStr) {
     // INPUT: "16:57:08.318"
     // OUTPUT: "16:57"

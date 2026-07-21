@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSessionData } from "../../hooks/useSessionData";
+import RevertButton from "./RevertButton";
 
 export default function EmpleadoComboBox({
     value,
@@ -10,8 +11,11 @@ export default function EmpleadoComboBox({
     label = "Médico que Certifica",
     nameField = "nombre_medico",
     idField = "user_medicoFirma",
-    truelabel = true
+    truelabel = true,
+    edited = false,
+    onRevert
 }) {
+    const showRevert = edited && typeof onRevert === "function";
     const { listaEmpleados: empleados } = useSessionData();
     const safeEmpleados = empleados || [];
     const [filteredEmpleados, setFilteredEmpleados] = useState([]);
@@ -143,7 +147,16 @@ export default function EmpleadoComboBox({
 
     return (
         <div className={className}>
-            {truelabel && <label className="block font-semibold mb-1">{label} :</label>}
+            {(truelabel || showRevert) && (
+                <div className="flex items-center justify-between mb-1">
+                    {truelabel ? (
+                        <label className="block font-semibold">{label} :</label>
+                    ) : (
+                        <span />
+                    )}
+                    {showRevert && <RevertButton onClick={onRevert} />}
+                </div>
+            )}
             <div className="relative flex-grow flex items-center">
                 <input
                     id={nameField}
@@ -153,7 +166,7 @@ export default function EmpleadoComboBox({
                     autoComplete="off"
                     value={inputValue}
                     onChange={handleSearch}
-                    className={`border rounded px-2 py-1 w-full  ${isLoading ? 'pr-8' : ''} ${disabled ? 'bg-gray-300' : ''}`}
+                    className={`border rounded px-2 py-1 w-full  ${isLoading ? 'pr-8' : ''} ${disabled ? 'bg-gray-300' : ''} ${edited ? 'border-orange-600 bg-orange-100' : ''}`}
                     onKeyDown={(e) => {
                         if (e.key === "Enter" && filteredEmpleados.length > 0) {
                             e.preventDefault();
