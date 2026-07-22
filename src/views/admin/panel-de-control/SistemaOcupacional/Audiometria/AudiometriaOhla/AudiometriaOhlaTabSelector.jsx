@@ -187,7 +187,7 @@ const AudiometriaOhlaTabSelector = ({
 
   const tabs = [
     {
-      label: "Audiometría Ohla",
+      label: "Parte 1",
       icon: faHeadphones,
       component: (
         <AudiometriaOhla
@@ -209,7 +209,7 @@ const AudiometriaOhlaTabSelector = ({
       ),
     },
     {
-      label: "Ficha Audiológica",
+      label: "Parte 2",
       icon: faFileAlt,
       component: (
         <AudiometriaFichaAudiologica

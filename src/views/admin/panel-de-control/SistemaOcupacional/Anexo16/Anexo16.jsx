@@ -22,7 +22,7 @@ import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
 import CIE10 from "./CIE10/CIE10";
 const tabla = "anexo7c";
 
-export default function Anexo16() {
+export default function Anexo16({ SinReestricciones = false }) {
   const today = getToday();
   const { token, userlogued, selectedSede, datosFooter, userName } =
     useSessionData();
@@ -400,7 +400,7 @@ export default function Anexo16() {
   const handleSearch = (e) => {
     if (e.key === "Enter") {
       handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede, SinReestricciones);
     }
   };
   const handlePrint = (numPage) => {

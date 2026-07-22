@@ -161,7 +161,6 @@ export const SubmitDataService = async (
     mercurioOrina: form.mercurioOrina,
     plomoSangre: form.plomoSangre,
   };
-  console.log(body);
 
   SubmitData(body, registrarUrl, token).then((res) => {
     console.log(res);
@@ -229,7 +228,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
 //   );
 // };
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
+export const VerifyTR = async (nro, tabla, token, set, sede, SinReestricciones) => {
   VerifyTRDefault(
     nro,
     tabla,
@@ -239,7 +238,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
     () => {
       //NO Tiene registro
       GetInfoServicio(nro, tabla, set, token, () => {
-        ValidarExamenesRealizados(nro, token, () => {
+        ValidarExamenesRealizados(nro, token, SinReestricciones, () => {
           set((prev) => ({
             ...prev,
             posibleCerrar: true,
@@ -267,7 +266,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
     () => {
       //Tiene registro
       GetInfoServicioEditar(nro, tabla, set, token, () => {
-        ValidarExamenesRealizados(nro, token, () => { //en caso pase se ejectua esto 
+        ValidarExamenesRealizados(nro, token, SinReestricciones, () => { //en caso pase se ejectua esto 
           set((prev) => ({
             ...prev,
             posibleCerrar: true,
@@ -1144,6 +1143,7 @@ export const GetInfoServicio = (
 export const ValidarExamenesRealizados = (
   nro,
   token,
+  SinReestricciones,
   onComplete = () => { },
   onFail = () => { }
 ) => {
@@ -1165,10 +1165,12 @@ export const ValidarExamenesRealizados = (
 
         const examenesFaltantes = Object.keys(examenes).filter(examen => !examenes[examen]);
 
-        console.log(examenesFaltantes)
         if (examenesFaltantes.length === 0) {
           onComplete();
         } else {
+          if (SinReestricciones) {
+            onComplete();
+          }
           const listaTexto = examenesFaltantes
             .map(examen => `• ${examen}`)
             .join('\n');
