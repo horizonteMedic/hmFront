@@ -8,7 +8,7 @@ import {
     PrintHojaRJsReportDefault,
     SubmitDataServiceDefault,
 } from "../../../../../utils/functionUtils";
-import { formatearFechaCorta, formatearFechaHora } from "../../../../../utils/formatDateUtils";
+import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 import { getFetch } from "../../../../../utils/apiHelpers";
 import { getTimestampActual } from "../../../../../utils/helpers";
 
@@ -108,10 +108,12 @@ export const GetInfoServicioEditar = async (
             recomendaciones: res.recomendaciones ?? "",
             user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
 
-            // Auditoría real de la última actualización (la trae obtenerReporte).
-            // La fecha llega como ISO y se formatea para mostrarla como "dd/MM/yyyy HH:mm:ss";
-            // si aún es null (registro sin editar) queda vacía y la vista muestra un respaldo.
-            fechaActualizacion: formatearFechaHora(res.fechaActualizacion),
+            // Auditoría REAL del registro (obtenerReporte). Se guardan CRUDOS (la vista
+            // los formatea: UTC -> hora local). La creación se conserva para reenviarla
+            // al editar y que el backend no la borre en el UPDATE.
+            fechaRegistro: res.fechaRegistro ?? "",
+            userRegistro: res.userRegistro ?? "",
+            fechaActualizacion: res.fechaActualizacion ?? "",
             usuarioActualizacion: res.usuarioActualizacion ?? "",
             tieneRegistro: true,
         }));
@@ -122,10 +124,9 @@ export const GetInfoServicioEditar = async (
 // Construye el body de registrarActualizar sellando la auditoría según el caso:
 //  - Registro NUEVO (esActualizacion = false): sella la creación (userRegistro +
 //    fechaRegistro) y deja la actualización en null.
-//  - EDICIÓN (esActualizacion = true): sella la actualización con la fecha-hora
-//    EXACTA del momento y el usuario en sesión. Se sobrescribe en cada nueva
-//    edición (2da, 3ra, ...). No se reenvían los campos de creación: el backend
-//    conserva los originales del registro.
+//  - EDICIÓN (esActualizacion = true): sella la actualización (userActualizacion +
+//    fechaActualizacion) y REENVÍA la creación original para que el UPDATE no la
+//    borre. Se sobrescribe la actualización en cada nueva edición (2da, 3ra, ...).
 const construirBody = (form, user, esActualizacion) => {
     const ahora = getTimestampActual();
     const base = {
@@ -142,12 +143,17 @@ const construirBody = (form, user, esActualizacion) => {
     // OJO: el body del request usa el prefijo "user" (userRegistro / userActualizacion),
     // igual que userRegistro (que sí persistió al crear) y que el módulo Protocolos.
     // La respuesta de obtenerReporte, en cambio, lo devuelve como "usuarioActualizacion":
-    // es una asimetría del backend, no la unifiques.
+    // es una ASIMETRÍA del backend. NO cambies "userActualizacion" por "usuarioActualizacion"
+    // en el request: está PROBADO que así NO persiste (la columna queda null).
     return esActualizacion
         ? {
             ...base,
             usuarioActualizacion: user,
             fechaActualizacion: ahora,
+            // Reenvía la creación original: en el UPDATE el backend pone userRegistro
+            // en null si no se incluye (fechaRegistro la conserva, pero la mandamos igual).
+            userRegistro: form.userRegistro || null,
+            fechaRegistro: form.fechaRegistro || null,
         }
         : {
             ...base,

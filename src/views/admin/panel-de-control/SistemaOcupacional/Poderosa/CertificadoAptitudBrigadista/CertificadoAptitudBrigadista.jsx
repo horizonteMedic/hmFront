@@ -12,19 +12,12 @@ import DatosPersonalesLaborales from "../../../../../components/templates/DatosP
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
+import { formatearFechaHora } from "../../../../../utils/formatDateUtils";
 import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerAptitudBrigadista";
 import BotonesForm from "../../../../../components/templates/BotonesForm";
 
 const tabla = "certificado_aptitud_brigadista";
 const today = getToday();
-
-// Datos de auditoría de CREACIÓN (placeholder). El backend aún no envía la
-// fecha ni el usuario de creación originales del registro; en modo edición se
-// muestran estos valores de ejemplo hasta que estén disponibles.
-const AUDITORIA_CREACION_DEMO = {
-    fechaCreacion: "18/07/2026 09:32:15",
-    userRegistro: "SISTEMAS.HM",
-};
 
 // Campos que el usuario puede editar en este formulario (para resaltar/revertir cambios).
 const CAMPOS_EDITABLES = [
@@ -71,6 +64,8 @@ const CertificadoAptitudBrigadista = () => {
         tieneRegistro: false,
 
         // Auditoría
+        userRegistro: "",
+        fechaRegistro: "",
         usuarioActualizacion: "",
         fechaActualizacion: "",
     };
@@ -225,25 +220,21 @@ const CertificadoAptitudBrigadista = () => {
     // dentro de useSessionData), por lo que refleja el momento actual hasta guardar.
     const fechaHoraActual = getFechaHoraActual();
 
-    // - Nuevo registro: solo creación -> fecha = ahora, usuario = sesión.
-    // - Edición: creación = valores originales del registro (placeholder hasta que
-    //   el backend los envíe) y edición = ahora / usuario en sesión (hasta guardar).
+    // Auditoría del registro. Las fechas del backend llegan con su zona horaria;
+    // formatearFechaHora las muestra en hora local. Nuevo: solo creación en vivo.
+    // Edición: datos REALES de obtenerReporte (si la actualización es null, muestra "—").
     const auditoria = form.tieneRegistro
         ? {
-            // Registro existente: creación como placeholder (el backend aún no la envía).
-            fechaCreacion: AUDITORIA_CREACION_DEMO.fechaCreacion,
-            userRegistro: AUDITORIA_CREACION_DEMO.userRegistro,
-            // Actualización: valores REALES que trae obtenerReporte. Si el registro
-            // aún no se ha editado, vienen vacíos y la sección muestra "—"
-            // (antes se usaba un reloj en vivo, pero confundía porque parecía que
-            // el registro se estaba editando en tiempo real).
-            fechaActualizacion: form.fechaActualizacion,
+            // Registro existente: creación y actualización REALES (obtenerReporte).
+            fechaCreacion: formatearFechaHora(form.fechaRegistro),
+            usuarioRegistro: form.userRegistro,
+            fechaActualizacion: formatearFechaHora(form.fechaActualizacion),
             usuarioActualizacion: form.usuarioActualizacion,
         }
         : {
-            // Registro nuevo: solo datos de creación en vivo.
+            // Registro nuevo: solo datos de creación en vivo (aún no existe en BD).
             fechaCreacion: fechaHoraActual,
-            userRegistro: userlogued,
+            usuarioRegistro: userlogued,
             fechaActualizacion: "",
             usuarioActualizacion: "",
         };
@@ -376,7 +367,7 @@ const CertificadoAptitudBrigadista = () => {
                     mostrarEdicion={form.tieneRegistro}
                     fechaCreacion={auditoria.fechaCreacion}
                     fechaEdicion={auditoria.fechaActualizacion}
-                    userRegistro={auditoria.userRegistro}
+                    usuarioRegistro={auditoria.usuarioRegistro}
                     usuarioEdicion={auditoria.usuarioActualizacion}
                 />
             )}
