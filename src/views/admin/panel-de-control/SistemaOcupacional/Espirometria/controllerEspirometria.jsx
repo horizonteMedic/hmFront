@@ -10,6 +10,9 @@ import {
     VerifyTRPerzonalizadoDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
+import { getFetch } from "../../../../utils/apiHelpers";
+
+const EMPRESA_OHLA = "OBRASCON HUARTE LAIN S.A";
 
 const obtenerReporteUrl =
     "/api/v01/ct/espirometria/obtenerReporteEspirometria";
@@ -79,7 +82,23 @@ export const GetInfoServicio = async (
             user_doctorAsignado: res.doctorAsignado,
             user_doctorExtra: res.doctorExtra,
             SubirDoc: true,
-            digitalizacion: res.digitalizacion
+            digitalizacion: res.digitalizacion,
+
+            // Cuestionario Platino - Espirometría (OHLA)
+            esOHLA: res.esOHLA,
+            ohlaCirugiaPulmonToraxAbdomen: res.ohlaCirugiaPulmonToraxAbdomen ?? null,
+            ohlaInfartoCorazon: res.ohlaInfartoCorazon ?? null,
+            ohlaDesprendimientoRetina: res.ohlaDesprendimientoRetina ?? null,
+            ohlaHospitalizadoCorazon: res.ohlaHospitalizadoCorazon ?? null,
+            ohlaMedicamentoTuberculosis: res.ohlaMedicamentoTuberculosis ?? null,
+            ohlaEmbarazada: res.ohlaEmbarazada ?? null,
+            ohlaPulso: res.ohlaPulso ?? "",
+            ohlaInfeccionRespiratoria: res.ohlaInfeccionRespiratoria ?? null,
+            ohlaUsoMedicamentoRespiracion: res.ohlaUsoMedicamentoRespiracion ?? null,
+            ohlaFumoCigarro: res.ohlaFumoCigarro ?? null,
+            ohlaFumoCigarroCuantos: res.ohlaFumoCigarroCuantos ?? "",
+            ohlaEjercicioFisico: res.ohlaEjercicioFisico ?? null,
+            ohlaResultadoPrueba: res.ohlaResultadoPrueba ?? "",
         }));
     }
 };
@@ -116,6 +135,20 @@ export const SubmitDataService = async (
         doctorAsignado: form.user_doctorAsignado,
         doctorExtra: form.user_doctorExtra,
 
+        esOHLA: form.esOHLA,
+        ohlaCirugiaPulmonToraxAbdomen: form.ohlaCirugiaPulmonToraxAbdomen,
+        ohlaInfartoCorazon: form.ohlaInfartoCorazon,
+        ohlaDesprendimientoRetina: form.ohlaDesprendimientoRetina,
+        ohlaHospitalizadoCorazon: form.ohlaHospitalizadoCorazon,
+        ohlaMedicamentoTuberculosis: form.ohlaMedicamentoTuberculosis,
+        ohlaEmbarazada: form.ohlaEmbarazada,
+        ohlaPulso: form.ohlaPulso,
+        ohlaInfeccionRespiratoria: form.ohlaInfeccionRespiratoria,
+        ohlaUsoMedicamentoRespiracion: form.ohlaUsoMedicamentoRespiracion,
+        ohlaFumoCigarro: form.ohlaFumoCigarro,
+        ohlaFumoCigarroCuantos: form.ohlaFumoCigarroCuantos,
+        ohlaEjercicioFisico: form.ohlaEjercicioFisico,
+        ohlaResultadoPrueba: form.ohlaResultadoPrueba,
     };
     console.log(body)
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -127,6 +160,26 @@ export const SubmitDataService = async (
         });
     }, false);
 };
+
+export const PrintHojaR = (nro, token, tabla) => {
+    Loading('Cargando Formato a Imprimir')
+    getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`, token)
+        .then(async (res) => {
+            if (res?.norden) {
+                const nombre = "Espirometria_OHLA_Digitalizado";
+                const jasperModules = import.meta.glob('../../../../jaspers/Espirometria/*.jsx');
+                const modulo = await jasperModules[`../../../../jaspers/Espirometria/${nombre}.jsx`]();
+                if (typeof modulo.default === 'function') {
+                    modulo.default(res);
+                } else {
+                    console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+                }
+                Swal.close()
+            } else {
+                Swal.close()
+            }
+        })
+}
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
     VerifyTRPerzonalizadoDefault(
@@ -166,6 +219,7 @@ const GetInfoPac = async (nro, set, token, sede) => {
         set((prev) => ({
             ...prev,
             ...res,
+            esOHLA: res.empresa === EMPRESA_OHLA,
             nombres: res.nombresApellidos ?? "",
             fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
             edad: res.edad,

@@ -242,9 +242,16 @@ export const EXAMENES_CATALOGO = {
         nombre: "ESPIROMETRIA",
         tabla: "ESPIROMETRIA",
         nomenclatura: "ESPIROMETRIA",
-        tablaArchivo: "funcion_abs",
+        // tablaArchivo: "funcion_abs",
         urlInfo: "/api/v01/ct/espirometria/obtenerReporteEspirometria",
         esArchivo: true,
+    },
+
+    ESPIROMETRIA_CUESTIONARIO_OHLA: {
+        nombre: "ESPIROMETRIA - CUESTIONARIO PLATINO",
+        tabla: "funcion_abs",
+        url: "/api/v01/ct/espirometria/obtenerReporteEspirometria",
+        esJasper: true,
     },
 
     INFORME_PSIOLOGICO_ARCHIVO: {

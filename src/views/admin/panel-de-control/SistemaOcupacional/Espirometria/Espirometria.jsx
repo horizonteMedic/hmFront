@@ -2,13 +2,15 @@ import {
     InputTextOneLine,
     InputCheckbox,
     InputTextArea,
+    InputsBooleanRadioGroup,
+    InputsRadioGroup,
     CIE10List
 } from "../../../../components/reusableComponents/ResusableComponents";
 import SectionFieldset from "../../../../components/reusableComponents/SectionFieldset";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import { useForm } from "../../../../hooks/useForm";
-import { handleSubirArchivoMasivo, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerEspirometria";
+import { handleSubirArchivoMasivo, PrintHojaR, ReadArchivosForm, SubmitDataService, VerifyTR } from "./controllerEspirometria";
 import { BotonesAccion, DatosPersonalesLaborales } from "../../../../components/templates/Templates";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
@@ -16,7 +18,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
 import { handleSubirArchivo } from "../Altura18/controllerAltura18";
-import CIE10 from "../Anexo16/CIE10/CIE10";
 
 const tabla = "funcion_abs";
 
@@ -70,7 +71,23 @@ export default function Espirometria() {
         user_doctorExtra: "",
 
         SubirDoc: false,
-        nomenclatura: "ESPIROMETRIA"
+        nomenclatura: "ESPIROMETRIA",
+
+        // Cuestionario Platino - Espirometría (OHLA)
+        esOHLA: false,
+        ohlaCirugiaPulmonToraxAbdomen: null,
+        ohlaInfartoCorazon: null,
+        ohlaDesprendimientoRetina: null,
+        ohlaHospitalizadoCorazon: null,
+        ohlaMedicamentoTuberculosis: null,
+        ohlaEmbarazada: null,
+        ohlaPulso: "",
+        ohlaInfeccionRespiratoria: null,
+        ohlaUsoMedicamentoRespiracion: null,
+        ohlaFumoCigarro: null,
+        ohlaFumoCigarroCuantos: "",
+        ohlaEjercicioFisico: null,
+        ohlaResultadoPrueba: "",
     };
 
     const {
@@ -81,8 +98,11 @@ export default function Espirometria() {
         handleFocusNext,
         handleChangeSimple,
         handleCheckBoxChange,
+        handleRadioButtonBoolean,
+        handleRadioButton,
         handleClear,
         handleClearnotO,
+        handlePrintDefault,
     } = useForm(initialFormState, { storageKey: "espirometria" });
 
     const [visualerOpen, setVisualerOpen] = useState(null)
@@ -96,6 +116,12 @@ export default function Espirometria() {
             handleClearnotO();
             VerifyTR(form.norden, tabla, token, setForm, selectedSede);
         }
+    };
+
+    const handlePrint = () => {
+        handlePrintDefault(() => {
+            PrintHojaR(form.norden, token, tabla);
+        });
     };
     console.log(form)
 
@@ -141,6 +167,32 @@ export default function Espirometria() {
                                 : "",
                         }));
                         handleCheckBoxChange(e);
+                    }}
+                />
+                <InputCheckbox
+                    label="Es OHLA"
+                    name="esOHLA"
+                    checked={form.esOHLA}
+                    onChange={(e) => {
+                        const checked = e.target.checked;
+                        setForm((prev) => ({
+                            ...prev,
+                            esOHLA: checked,
+                            ...(checked ? {
+                                ohlaCirugiaPulmonToraxAbdomen: false,
+                                ohlaInfartoCorazon: false,
+                                ohlaDesprendimientoRetina: false,
+                                ohlaHospitalizadoCorazon: false,
+                                ohlaMedicamentoTuberculosis: false,
+                                ohlaEmbarazada: false,
+                                ohlaInfeccionRespiratoria: false,
+                                ohlaUsoMedicamentoRespiracion: false,
+                                ohlaFumoCigarro: false,
+                                ohlaFumoCigarroCuantos: "",
+                                ohlaEjercicioFisico: false,
+                                ohlaResultadoPrueba: "COMPLETA",
+                            } : {}),
+                        }));
                     }}
                 />
                 <ButtonsPDF
@@ -244,6 +296,117 @@ export default function Espirometria() {
                 </div>
             </SectionFieldset>
 
+            {form.esOHLA && (
+                <SectionFieldset legend="Cuestionario Platino - Espirometría" className="grid grid-cols-1 xl:grid-cols-2 gap-x-6 gap-y-4">
+                    <SectionFieldset legend="Preguntas de Exclusión para la Espirometría" className="flex flex-col gap-x-4 gap-y-3">
+                        <InputsBooleanRadioGroup
+                            label="1. ¿Tuvo alguna cirugía (operación) en su pulmón, en su tórax o en su abdomen, en los últimos 3 meses?"
+                            name="ohlaCirugiaPulmonToraxAbdomen"
+                            value={form.ohlaCirugiaPulmonToraxAbdomen}
+                            onChange={handleRadioButtonBoolean}
+                            labelOnTop
+                        />
+                        <InputsBooleanRadioGroup
+                            label="2. ¿Tuvo un ataque cardiaco o infarto al corazón, en los últimos 3 meses?"
+                            name="ohlaInfartoCorazon"
+                            value={form.ohlaInfartoCorazon}
+                            onChange={handleRadioButtonBoolean}
+                            labelOnTop
+                        />
+                        <InputsBooleanRadioGroup
+                            label="3. ¿Tuvo desprendimiento de la retina o una operación (cirugía) de los ojos, en los últimos 3 meses?"
+                            name="ohlaDesprendimientoRetina"
+                            value={form.ohlaDesprendimientoRetina}
+                            onChange={handleRadioButtonBoolean}
+                            labelOnTop
+                        />
+                        <InputsBooleanRadioGroup
+                            label="4. ¿Estuvo hospitalizado por cualquier otro problema del corazón, en los últimos 3 meses?"
+                            name="ohlaHospitalizadoCorazon"
+                            value={form.ohlaHospitalizadoCorazon}
+                            onChange={handleRadioButtonBoolean}
+                            labelOnTop
+                        />
+                        <InputsBooleanRadioGroup
+                            label="5. ¿Está usando medicamentos para la tuberculosis, en este momento?"
+                            name="ohlaMedicamentoTuberculosis"
+                            value={form.ohlaMedicamentoTuberculosis}
+                            onChange={handleRadioButtonBoolean}
+                            labelOnTop
+                        />
+                        <InputsBooleanRadioGroup
+                            label="6. ¿Está embarazada, en este momento?"
+                            name="ohlaEmbarazada"
+                            value={form.ohlaEmbarazada}
+                            onChange={handleRadioButtonBoolean}
+                            labelOnTop
+                        />
+                        <InputTextOneLine
+                            label="7. Pulso (bpm)"
+                            name="ohlaPulso"
+                            value={form.ohlaPulso}
+                            disabled
+                            onChange={handleChangeNumberDecimals}
+                        />
+                    </SectionFieldset>
+
+                    <SectionFieldset legend="Preguntas para Entrevistados sin Criterios de Exclusión" className="flex flex-col gap-x-4 gap-y-3">
+                        <InputsBooleanRadioGroup
+                            label="1. ¿Tuvo una infección respiratoria (resfriado), en las últimas 3 semanas?"
+                            name="ohlaInfeccionRespiratoria"
+                            value={form.ohlaInfeccionRespiratoria}
+                            onChange={handleRadioButtonBoolean}
+                            labelOnTop
+                        />
+                        <InputsBooleanRadioGroup
+                            label="2. ¿Usó cualquier remedio o medicamento para la respiración (aerosoles, sprays inhalados o nebulizaciones), en las últimas 3 horas?"
+                            name="ohlaUsoMedicamentoRespiracion"
+                            value={form.ohlaUsoMedicamentoRespiracion}
+                            onChange={handleRadioButtonBoolean}
+                            labelOnTop
+                        />
+                        <InputsBooleanRadioGroup
+                            label="3. ¿Fumó cualquier tipo de cigarro (puro o pipa), en las últimas dos horas?"
+                            name="ohlaFumoCigarro"
+                            value={form.ohlaFumoCigarro}
+                            onChange={handleRadioButtonBoolean}
+                            labelOnTop
+                        />
+                        {form.ohlaFumoCigarro && (
+                            <InputTextOneLine
+                                label="¿Cuántos?"
+                                name="ohlaFumoCigarroCuantos"
+                                value={form.ohlaFumoCigarroCuantos}
+                                onChange={handleChangeNumberDecimals}
+                                labelWidth="220px"
+                            />
+                        )}
+                        <InputsBooleanRadioGroup
+                            label="4. ¿Realizó algún ejercicio físico fuerte, como gimnasia, caminata o trotar, en la última hora?"
+                            name="ohlaEjercicioFisico"
+                            value={form.ohlaEjercicioFisico}
+                            onChange={handleRadioButtonBoolean}
+                            labelOnTop
+                        />
+                        <InputsRadioGroup
+                            name="ohlaResultadoPrueba"
+                            label="5. Resultado de la Prueba"
+                            labelOnTop
+                            value={form.ohlaResultadoPrueba}
+                            onChange={handleRadioButton}
+                            vertical
+                            options={[
+                                { label: "Prueba completa", value: "COMPLETA" },
+                                { label: "Incompleta: el(la) entrevistado(a) no entendió las instrucciones", value: "INCOMPLETA_NO_ENTENDIO" },
+                                { label: "Incompleta: el(la) entrevistado(a) fue excluido por razones médicas (no elegible)", value: "INCOMPLETA_EXCLUIDO_MEDICO" },
+                                { label: "Incompleta: el(la) entrevistado(a) no fue capaz de realizar la prueba (otras razones)", value: "INCOMPLETA_NO_CAPAZ" },
+                                { label: "Incompleta: el(la) entrevistado(a) rechazó", value: "INCOMPLETA_RECHAZO" },
+                            ]}
+                        />
+                    </SectionFieldset>
+                </SectionFieldset>
+            )}
+
             <SectionFieldset legend="Asignación de Médico">
                 <EmpleadoComboBox
                     value={form.nombre_medico}
@@ -273,9 +436,8 @@ export default function Espirometria() {
                 form={form}
                 handleSave={handleSave}
                 handleClear={handleClear}
-                handlePrint={() => { }}
+                handlePrint={handlePrint}
                 handleChangeNumberDecimals={handleChangeNumberDecimals}
-                hidePrint
             />
             {visualerOpen && (
                 <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">

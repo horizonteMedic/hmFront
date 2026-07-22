@@ -20,7 +20,7 @@ export default async function CAMO_Administrativo16(data = {}, docExistente = nu
     documentoIdentidad: String(data.dniPaciente ?? ""),
     genero: data.sexoPaciente === "M" ? "MASCULINO" : data.sexoPaciente === "F" ? "FEMENINO" : String(data.sexoPaciente ?? ""),
     edad: String(`${data.edadPaciente ?? ""} AÑOS`),
-    grupoSanguineo: String(data.grupoSanguineo ?? ""),
+    grupoSanguineo: `${String(data.grupoSanguineo ?? "")}${data.factorSanguineo == "POSITIVO" ? "+" : data.factorSanguineo == "NEGATIVO" ? "-" : ""}`,
     empresa: String(data.empresa ?? ""),
     contratista: String(data.contrata ?? ""),
     puestoPostula: String(data.cargoPaciente ?? ""),
