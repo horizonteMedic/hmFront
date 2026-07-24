@@ -4,7 +4,7 @@ import { faSave, faBroom, faPrint } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import {
   PrintHojaR,
-  SubmitDataServiceFicha,
+  SubmitDataServiceAmbos,
   VerifyTRFicha,
 } from "./controllerAudiometriaOhla";
 import { useSessionData } from "../../../../../hooks/useSessionData";
@@ -674,17 +674,31 @@ const AudiometriaFichaAudiologica = ({
 
             </div>
           </div>
-          <div className="flex gap-2 mt-4 text-[12px] border p-4 rounded-lg">
+          <div className="flex flex-col gap-2 mt-4 text-[12px] border p-4 rounded-lg">
+            <p className="text-[11px] text-gray-500 italic">
+              ⚠️ Al guardar se registran ambos formularios: <strong>Audiometría Ohla</strong> y <strong>Ficha Audiológica</strong>. Ambos deben tener N° Orden cargado.
+            </p>
+            <div className="flex gap-2 flex-wrap items-center">
+              <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${formOhla.norden ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
+                Ohla: {formOhla.norden ? `N° ${formOhla.norden} ✓` : "Sin N° Orden ✗"}
+              </span>
+              <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${form.norden ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
+                Ficha: {form.norden ? `N° ${form.norden} ✓` : "Sin N° Orden ✗"}
+              </span>
+            </div>
+            <div className="flex gap-2">
             <button
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border-none font-semibold bg-[#059669] text-white transition"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg border-none font-semibold bg-[#059669] text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ minWidth: "140px" }}
+              disabled={!formOhla.norden || !form.norden}
               onClick={() => {
-                SubmitDataServiceFicha(
+                SubmitDataServiceAmbos(
+                  formOhla,
                   form,
                   token,
                   userloguedCompleto.sub,
+                  handleClearOhla,
                   handleClear,
-                  tabla,
                   formOhla.activar_grafico,
                   formOhla.asignar_especialista
                 );
@@ -694,7 +708,7 @@ const AudiometriaFichaAudiologica = ({
                 icon={faSave}
                 style={{ color: "#fff", fontSize: "12px" }}
               />{" "}
-              Guardar/Actualizar
+              Guardar Ambos
             </button>
             <button
               className="flex items-center gap-2 px-4 py-2 rounded-lg border-none font-semibold bg-[#facc14] text-[#FFFFFF] transition"
@@ -710,6 +724,7 @@ const AudiometriaFichaAudiologica = ({
               />{" "}
               Limpiar
             </button>
+            </div>
           </div>
         </div>
 

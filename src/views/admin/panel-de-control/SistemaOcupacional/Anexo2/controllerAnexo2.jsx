@@ -203,7 +203,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
 //   );
 // };
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
+export const VerifyTR = async (nro, tabla, token, set, sede, SinReestricciones) => {
   VerifyTRDefault(
     nro,
     tabla,
@@ -213,7 +213,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
     () => {
       //NO Tiene registro
       GetInfoServicio(nro, tabla, set, token, () => {
-        ValidarExamenesRealizados(nro, token, () => { //en caso pase se ejectua esto 
+        ValidarExamenesRealizados(nro, token, SinReestricciones, () => { //en caso pase se ejectua esto 
           set((prev) => ({
             ...prev,
             posibleCerrar: true,
@@ -241,7 +241,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
     () => {
       //Tiene registro
       GetInfoServicioEditar(nro, tabla, set, token, () => {
-        ValidarExamenesRealizados(nro, token, () => { //en caso pase se ejectua esto 
+        ValidarExamenesRealizados(nro, token, SinReestricciones, () => { //en caso pase se ejectua esto 
           set((prev) => ({
             ...prev,
             posibleCerrar: true,
@@ -331,6 +331,7 @@ export const GetExamenesRealizados = (
 export const ValidarExamenesRealizados = (
   nro,
   token,
+  SinReestricciones,
   onComplete = () => { },
   onFail = () => { }
 ) => {
@@ -364,6 +365,9 @@ export const ValidarExamenesRealizados = (
           //   html: `<div style="text-align: center;">El paciente no ha realizado los siguientes exámenes:<br><br></div><div style="text-align: left;margin-left:5px">${listaFaltantes}</div>`,
           //   icon: "warning"
           // });
+          if (SinReestricciones) {
+            onComplete();
+          }
 
           const listaTexto = examenesFaltantes
             .map(examen => `• ${examen}`)
