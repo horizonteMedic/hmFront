@@ -157,8 +157,7 @@ export const handleSubmit = async (
     setH
 ) => {
     const camposRequeridos = [
-        'talla',
-        'peso',
+
         'cintura',
         'cadera',
         'temperatura',
@@ -170,15 +169,16 @@ export const handleSubmit = async (
         'fRespiratoria',
     ];
     const camposVacios = camposRequeridos.filter((campo) => !form[campo]);
+    const tieneValor = (valor) => valor !== "" && valor != null;
     if (camposVacios.length > 0) {
         const lista = camposVacios.join(', ');
         return Swal.fire('Error', `Faltan completar: ${lista}`, 'error');
     }
-    if (form.talla < 1.3 || form.talla > 2.8) {
+    if (tieneValor(form.talla) && (form.talla < 1.3 || form.talla > 2.8)) {
         await Swal.fire('Error', 'No se permite este dato en Talla', 'error');
         return;
     }
-    if (form.peso < 40 || form.peso > 150) {
+    if (tieneValor(form.peso) && (form.peso < 40 || form.peso > 150)) {
         await Swal.fire('Error', 'No se permite este dato en Peso', 'error');
         return;
     }
