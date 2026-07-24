@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
 import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
@@ -7,14 +7,14 @@ import SectionFieldset from "../../../../../components/reusableComponents/Sectio
 import SearchButton from "../../../../../components/reusableComponents/SearchButton";
 import RegistroEstadoPill from "../../../../../components/reusableComponents/RegistroEstadoPill";
 import AuditoriaRegistro from "../../../../../components/reusableComponents/AuditoriaRegistro";
-import BotonesAccion from "../../../../../components/templates/BotonesAccion";
 import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
+import BotonesForm from "../../../../../components/templates/BotonesForm";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
+import { useRegistroEditable } from "../../../../../hooks/useRegistroEditable";
 import { getToday, getFechaHoraActual } from "../../../../../utils/helpers";
-import { formatearFechaHora } from "../../../../../utils/formatDateUtils";
+import { buildAuditoria } from "../../../../../utils/auditoriaUtils";
 import { PrintHojaR, SubmitDataService, UpdateDataService, VerifyTR } from "./controllerAptitudBrigadista";
-import BotonesForm from "../../../../../components/templates/BotonesForm";
 
 const tabla = "certificado_aptitud_brigadista";
 const today = getToday();
@@ -32,6 +32,7 @@ const CAMPOS_EDITABLES = [
 
 const CertificadoAptitudBrigadista = () => {
     const { token, userlogued, selectedSede, datosFooter, userName } = useSessionData();
+
     const initialFormState = {
         // Header
         norden: "",
@@ -76,22 +77,31 @@ const CertificadoAptitudBrigadista = () => {
         handleChange,
         handleChangeNumber,
         handleRadioButton,
-        handleRadioButtonBoolean,
         handleClear,
         handleChangeSimple,
         handleClearnotO,
         handlePrintDefault,
         handleChangeNumberDecimals,
     } = useForm(initialFormState, { storageKey: "CertificadoAptitudBrigadista" });
+ 
+    const {
+        edicionHabilitada,
+        habilitarEdicion,
+        camposDeshabilitados,
+        isFieldEdited,
+        revertField,
+        revertFields,
+    } = useRegistroEditable(form, setForm, { tieneRegistro: form.tieneRegistro, camposEditables: CAMPOS_EDITABLES, });
 
-    // ===== Validación de campos obligatorios (feedback visual, sin Swal) =====
+    // El médico se compone de 2 campos (id de firma + nombre): se detecta el cambio por
+    // el id y se revierten ambos en conjunto.
+    const isMedicoEdited = isFieldEdited("user_medicoFirma");
+    const revertMedico = () => revertFields(["user_medicoFirma", "nombre_medico"]);
+
     const [errors, setErrors] = useState({});
 
-    // Edición de un registro existente: bloqueada hasta pulsar "Habilitar edición".
-    const [edicionHabilitada, setEdicionHabilitada] = useState(false);
-
-    // El error de Conclusiones se muestra solo tras intentar guardar y mientras
-    // el campo siga vacío; se limpia solo a medida que el usuario escribe.
+    // El error de Conclusiones se muestra solo tras intentar guardar y mientras el campo
+    // siga vacío; se limpia solo a medida que el usuario escribe.
     const conclusionesError =
         errors.conclusiones && !form.conclusiones?.trim() ? errors.conclusiones : "";
 
@@ -103,7 +113,7 @@ const CertificadoAptitudBrigadista = () => {
         setErrors(next);
         return Object.keys(next).length === 0;
     };
-
+ 
     const handleSave = () => {
         if (!validateForm()) return;
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
@@ -114,86 +124,25 @@ const CertificadoAptitudBrigadista = () => {
         UpdateDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
-    // Limpia el formulario y descarta los errores de validación visibles.
     const handleClearForm = () => {
         setErrors({});
         handleClear();
     };
 
-    // ===== Modo edición: detectar y revertir cambios por campo =====
-    // Snapshot de los valores originales tomados al cargar un registro existente.
-    const [valoresOriginales, setValoresOriginales] = useState(null);
-
-    useEffect(() => {
-        // Cada vez que cambia el registro cargado, la edición vuelve a bloquearse.
-        setEdicionHabilitada(false);
-        if (form.tieneRegistro) {
-            // Al entrar en modo edición guardamos los valores cargados como "originales".
-            setValoresOriginales(
-                CAMPOS_EDITABLES.reduce((acc, campo) => {
-                    acc[campo] = form[campo];
-                    return acc;
-                }, {})
-            );
-        } else {
-            setValoresOriginales(null);
-        }
-        // Solo queremos capturar el snapshot al pasar a modo edición.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [form.tieneRegistro]);
-
-    // ¿El campo difiere de su valor original? (solo aplica en modo edición).
-    const isFieldEdited = (campo) =>
-        Boolean(valoresOriginales) && valoresOriginales[campo] !== form[campo];
-
-    // Revierte un campo a su valor original.
-    const revertField = (campo) => {
-        if (!valoresOriginales) return;
-        setForm((f) => ({ ...f, [campo]: valoresOriginales[campo] }));
-    };
-
-    // El médico se compone de 2 campos (id + nombre); se detecta/revierte en conjunto.
-    const isMedicoEdited =
-        Boolean(valoresOriginales) &&
-        valoresOriginales.user_medicoFirma !== form.user_medicoFirma;
-
-    const revertMedico = () => {
-        if (!valoresOriginales) return;
-        setForm((f) => ({
-            ...f,
-            user_medicoFirma: valoresOriginales.user_medicoFirma,
-            nombre_medico: valoresOriginales.nombre_medico,
-        }));
-    };
-
-
-    //Buscar por Norden
+    // ===== Búsqueda con boton =====
     const executeSearch = () => {
         setErrors({});
         handleClearnotO();
         VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     };
 
+    // ===== Búsqueda con enter =====
     const handleSearch = (e) => {
         if (!e || e.key === "Enter") {
             executeSearch();
         }
     };
 
-    // const handlePrint = () => {
-    //     handlePrintDefault(() => {
-    //         PrintHojaR(form.norden, token, tabla);
-    //     });
-    // };
-
-    const handlePrint = () => {
-        handlePrintDefault(() => {
-            PrintHojaR(form.norden, token, tabla, datosFooter, selectedSede);
-        });
-    };
-
-    // Al cambiar el N° Orden en la casilla de imprimir: si había datos cargados de otro
-    // norden, se limpian para no dejar información desactualizada en pantalla.
     const handlePrintNordenChange = (e) => {
         const value = e.target.value;
         if (!/^\d*$/.test(value)) return; // solo dígitos
@@ -207,49 +156,23 @@ const CertificadoAptitudBrigadista = () => {
         }
     };
 
-    // ¿Ya se buscó y cargó un registro de paciente? Mientras el formulario esté
-    // vacío (sin búsqueda) usamos este flag para ocultar la pill de estado y la
-    // sección de auditoría, y para deshabilitar el N° Orden.
+    // ===== Impresión =====
+    const handlePrint = () => {
+        handlePrintDefault(() => {
+            PrintHojaR(form.norden, token, tabla, datosFooter, selectedSede);
+        });
+    };
+ 
     const hayRegistroCargado = Boolean(form.nombres || form.dni);
-
-    // Deshabilita el N° Orden cuando ya se cargaron datos del paciente tras la búsqueda
     const nordenDisabled = hayRegistroCargado;
-
-    // ===== Auditoría dinámica del registro =====
-    // Fecha/hora "en vivo": el formulario se re-renderiza cada segundo (useRealTime
-    // dentro de useSessionData), por lo que refleja el momento actual hasta guardar.
-    const fechaHoraActual = getFechaHoraActual();
-
-    // Auditoría del registro. Las fechas del backend llegan con su zona horaria;
-    // formatearFechaHora las muestra en hora local. Nuevo: solo creación en vivo.
-    // Edición: datos REALES de obtenerReporte (si la actualización es null, muestra "—").
-    const auditoria = form.tieneRegistro
-        ? {
-            // Registro existente: creación y actualización REALES (obtenerReporte).
-            fechaCreacion: formatearFechaHora(form.fechaRegistro),
-            usuarioRegistro: form.userRegistro,
-            fechaActualizacion: formatearFechaHora(form.fechaActualizacion),
-            usuarioActualizacion: form.usuarioActualizacion,
-        }
-        : {
-            // Registro nuevo: solo datos de creación en vivo (aún no existe en BD).
-            fechaCreacion: fechaHoraActual,
-            usuarioRegistro: userlogued,
-            fechaActualizacion: "",
-            usuarioActualizacion: "",
-        };
-
-    // Habilita la edición de los campos del formulario (solo para registros existentes).
-    const habilitarEdicion = () => setEdicionHabilitada(true);
-
-    // Campos propios del formulario: bloqueados si es un registro existente y aún no se
-    // pulsó "Habilitar edición". En un registro nuevo siempre están habilitados.
-    const camposDeshabilitados = form.tieneRegistro && !edicionHabilitada;
+ 
+    const auditoria = buildAuditoria(form, {
+        usuarioActual: userlogued,
+        fechaHoraActual: getFechaHoraActual(),
+    });
 
     return (
         <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
-            {/* ===== ESTADO DEL FORMULARIO (nuevo / edición) ===== */}
-            {/* La pill solo aparece cuando ya se buscó/cargó un registro. */}
             {hayRegistroCargado && (
                 <div className="sticky top-2 z-20 flex justify-end pointer-events-none">
                     <RegistroEstadoPill tieneRegistro={form.tieneRegistro} />
@@ -359,9 +282,7 @@ const CertificadoAptitudBrigadista = () => {
                 </div>
             </div>
 
-            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO (independiente de las firmas) ===== */}
-            {/* Solo se muestra tras buscar un N° Orden. Nuevo: solo creación.
-                Edición: los 4 campos (edición = fecha/usuario actual). */}
+            {/* ===== SECCIÓN: AUDITORÍA DEL REGISTRO ===== */} 
             {hayRegistroCargado && (
                 <AuditoriaRegistro
                     mostrarEdicion={form.tieneRegistro}
@@ -372,15 +293,7 @@ const CertificadoAptitudBrigadista = () => {
                 />
             )}
 
-            {/* BOTONES DE ACCIÓN */}
-            {/* <BotonesAccion
-                form={form}
-                handleChangeNumberDecimals={handleChangeNumberDecimals}
-                handleSave={handleSave}
-                handleClear={handleClear}
-                handlePrint={handlePrint}
-            /> */}
-
+            {/* ===== BOTONES DE ACCIÓN ===== */}
             <BotonesForm
                 form={form}
                 handleChangeNumberDecimals={handleChangeNumberDecimals}
