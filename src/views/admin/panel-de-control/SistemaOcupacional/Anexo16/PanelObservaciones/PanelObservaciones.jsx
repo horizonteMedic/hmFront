@@ -1,3 +1,5 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUpload } from "@fortawesome/free-solid-svg-icons";
 import {
   InputsRadioGroup,
   InputTextArea,
@@ -10,7 +12,8 @@ export default function PanelObservaciones({
   handleRadioButton,
   handleChange,
   handleBlur,
-  setmodalCIE10
+  setmodalCIE10,
+  abrirCargaMasiva
 }) {
   return (
     <div className="p-4 h-full mt-16">
@@ -25,6 +28,15 @@ export default function PanelObservaciones({
             Ingresar CIE 10
           </button>
         </div> */}
+        <div className="w-full flex justify-center items-center">
+          <button
+            type="button"
+            onClick={abrirCargaMasiva}
+            className="verde-btn px-6 py-2 rounded flex items-center justify-center gap-2"
+          >
+            Carga Masiva <FontAwesomeIcon icon={faUpload} />
+          </button>
+        </div>
         <div className="bg-white border border-gray-200 rounded-lg p-3 ">
           <InputTextArea
             rows={18}
