@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 import { getFetch, getFetchManejo, getFetchPdf, SubmitData, SubmitDataManejo } from "./apiHelpers";
-import { colocarSellosEnPdf, getSign, uint8ToBase64, optimizePdf, imagenToPdf, imagenToPdfA4 } from "./helpers";
+import { colocarSellosEnPdf, getSign, uint8ToBase64, optimizePdf, imagenToPdf, imagenToPdfA4, comprimirPdfAzureSiSuperaLimite } from "./helpers";
 import { PDFDocument } from "pdf-lib";
 
 export const LoadingDefault = (text) => {
@@ -681,10 +681,14 @@ export const handleSubirArchivoDefaultSinSellos = async (
         LoadingDefault("Subiendo documento");
 
         const base64WithoutHeader = e.target.result.split(",")[1];
-        const fileBytes = Uint8Array.from(
+        let fileBytes = Uint8Array.from(
             atob(base64WithoutHeader),
             (c) => c.charCodeAt(0)
         );
+
+        if (!onlyExcel) {
+            fileBytes = await comprimirPdfAzureSiSuperaLimite(fileBytes, file.name);
+        }
 
         const fileBase64Final = uint8ToBase64(fileBytes);
 
@@ -890,10 +894,14 @@ export const handleSubidaMasiva = async (form, selectedSede, urlPDf, userlogued,
             const base64 = await readFileAsBase64(file);
             const base64WithoutHeader = base64.split(",")[1];
 
-            const fileBytes = Uint8Array.from(
+            let fileBytes = Uint8Array.from(
                 atob(base64WithoutHeader),
                 (c) => c.charCodeAt(0)
             );
+
+            if (!onlyExcel) {
+                fileBytes = await comprimirPdfAzureSiSuperaLimite(fileBytes, file.name);
+            }
 
             const fileBase64Final = uint8ToBase64(fileBytes);
 
