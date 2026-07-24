@@ -166,6 +166,14 @@ export const PrintHojaR = (nro, token, tabla) => {
     getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`, token)
         .then(async (res) => {
             if (res?.norden) {
+                if (!res.esOHLA) {
+                    Swal.fire(
+                        "Alerta",
+                        "El paciente no cuenta con registros de cuestionario.",
+                        "warning"
+                    );
+                    return;
+                }
                 const nombre = "Espirometria_OHLA_Digitalizado";
                 const jasperModules = import.meta.glob('../../../../jaspers/Espirometria/*.jsx');
                 const modulo = await jasperModules[`../../../../jaspers/Espirometria/${nombre}.jsx`]();
