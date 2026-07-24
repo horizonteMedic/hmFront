@@ -34,7 +34,7 @@ const drawHeader = async (doc, datos = {}) => {
 
   // Sede
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Sede: " + (datos.sede || datos.nombreSede || ""), pageW - 80, 20);
+  doc.text("Sede: " + (datos.sede || datos.sedeDescripcion || ""), pageW - 80, 20);
 
   // Fecha de examen
   const fechaExamen = toDDMMYYYY(datos.fecha || datos.fechaAbs || "");
@@ -76,7 +76,7 @@ const drawPatientData = (doc, datos = {}) => {
   // Fila de una sola columna (label + valor) con salto de línea automático si el valor no cabe
   const drawWrapRow = (label, value, valueX) => {
     const texto = String(value || '');
-    const availableWidth = tablaAncho - (valueX - tablaInicioX) - 4;
+    const availableWidth = tablaAncho - (valueX - tablaInicioX) - 10;
     const lines = texto ? doc.splitTextToSize(texto, availableWidth) : [''];
     const rowH = Math.max(filaAltura, lines.length * lineH + 1.5);
 
@@ -90,7 +90,7 @@ const drawPatientData = (doc, datos = {}) => {
     yPos += rowH;
   };
 
-  drawWrapRow("Apellidos y Nombres:", datos.nombres, 40);
+  drawWrapRow("Apellidos y Nombres:", datos.apellidosPaciente + " " + datos.nombresPaciente, 40);
 
   doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura);
   doc.line(tablaInicioX + 45, yPos, tablaInicioX + 45, yPos + filaAltura);
@@ -122,7 +122,7 @@ const drawPatientData = (doc, datos = {}) => {
   yPos += filaAltura;
 
   drawWrapRow("Empresa:", datos.empresa, 20);
-  drawWrapRow("Contrata:", datos.contrata, 22);
+  drawWrapRow("Contrata:", datos.contrata, 20);
   drawWrapRow("Ocupación:", datos.ocupacionPaciente || datos.ocupacion, 25);
   drawWrapRow("Cargo:", datos.cargoPaciente || datos.cargoDesempenar, 18);
 
@@ -162,15 +162,16 @@ export default async function Espirometria_OHLA_Digitalizado(datos = {}, docExis
     y += 5;
   };
 
-  const drawRow = (num, text, respuesta, notaText = "") => {
+  const drawRow = (num, text, respuesta, notaLabel = "", notaBoldValue = null) => {
     doc.setFont("helvetica", "normal").setFontSize(8);
     const textoCompleto = `${num}. ${text}`;
     const lines = doc.splitTextToSize(textoCompleto, colPreguntaW - 4);
     let rowH = lines.length * lineHTable + paddingTop + paddingBottom;
 
+    const notaTextCompleto = notaBoldValue ? `${notaLabel}${notaBoldValue}` : notaLabel;
     let notaLines = [];
-    if (notaText) {
-      notaLines = doc.splitTextToSize(notaText, colPreguntaW - 8);
+    if (notaTextCompleto) {
+      notaLines = doc.splitTextToSize(notaTextCompleto, colPreguntaW - 8);
       rowH += notaLines.length * lineHTable;
     }
 
@@ -182,12 +183,27 @@ export default async function Espirometria_OHLA_Digitalizado(datos = {}, docExis
       doc.text(line, tablaInicioX + 2, y + paddingTop + lineHTable - 1 + i * lineHTable);
     });
 
-    if (notaText) {
+    if (notaTextCompleto) {
       doc.setFont("helvetica", "italic").setFontSize(7);
       const notaStartY = y + paddingTop + lines.length * lineHTable;
-      notaLines.forEach((line, i) => {
-        doc.text(line, tablaInicioX + 6, notaStartY + lineHTable - 1 + i * lineHTable);
-      });
+      const notaX = tablaInicioX + 6;
+
+      if (notaBoldValue) {
+        const lineY = notaStartY + lineHTable - 1;
+        doc.text(notaLabel, notaX, lineY);
+        const labelWidth = doc.getTextWidth(notaLabel);
+        const valueX = notaX + labelWidth;
+
+        doc.setFont("helvetica", "bold").setFontSize(7);
+        doc.text(notaBoldValue, valueX, lineY);
+        const valueWidth = doc.getTextWidth(notaBoldValue);
+        doc.setLineWidth(0.2);
+        doc.line(valueX, lineY + 0.5, valueX + valueWidth, lineY + 0.5);
+      } else {
+        notaLines.forEach((line, i) => {
+          doc.text(line, notaX, notaStartY + lineHTable - 1 + i * lineHTable);
+        });
+      }
       doc.setFont("helvetica", "normal").setFontSize(8);
     }
 
@@ -197,50 +213,58 @@ export default async function Espirometria_OHLA_Digitalizado(datos = {}, docExis
     y += rowH;
   };
 
-  // I. Preguntas de Exclusión para la Espirometría
-  drawSectionTitle("I. PREGUNTAS DE EXCLUSIÓN PARA LA ESPIROMETRÍA");
-  drawRow(1, "¿Tuvo alguna cirugía (operación) en su pulmón, en su tórax o en su abdomen, en los últimos 3 meses?", datos.ohlaCirugiaPulmonToraxAbdomen);
-  drawRow(2, "¿Tuvo un ataque cardiaco o infarto al corazón, en los últimos 3 meses?", datos.ohlaInfartoCorazon);
-  drawRow(3, "¿Tuvo desprendimiento de la retina o una operación (cirugía) de los ojos, en los últimos 3 meses?", datos.ohlaDesprendimientoRetina);
-  drawRow(4, "¿Estuvo hospitalizado por cualquier otro problema del corazón, en los últimos 3 meses?", datos.ohlaHospitalizadoCorazon);
-  drawRow(5, "¿Está usando medicamentos para la tuberculosis, en este momento?", datos.ohlaMedicamentoTuberculosis);
-  drawRow(6, "¿Está embarazada, en este momento?", datos.ohlaEmbarazada);
+  if (datos.esOHLA) {
+    // I. Preguntas de Exclusión para la Espirometría
+    drawSectionTitle("I. PREGUNTAS DE EXCLUSIÓN PARA LA ESPIROMETRÍA");
+    drawRow(1, "¿Tuvo alguna cirugía (operación) en su pulmón, en su tórax o en su abdomen, en los últimos 3 meses?", datos.ohlaCirugiaPulmonToraxAbdomen);
+    drawRow(2, "¿Tuvo un ataque cardiaco o infarto al corazón, en los últimos 3 meses?", datos.ohlaInfartoCorazon);
+    drawRow(3, "¿Tuvo desprendimiento de la retina o una operación (cirugía) de los ojos, en los últimos 3 meses?", datos.ohlaDesprendimientoRetina);
+    drawRow(4, "¿Estuvo hospitalizado por cualquier otro problema del corazón, en los últimos 3 meses?", datos.ohlaHospitalizadoCorazon);
+    drawRow(5, "¿Está usando medicamentos para la tuberculosis, en este momento?", datos.ohlaMedicamentoTuberculosis);
+    drawRow(6, "¿Está embarazada, en este momento?", datos.ohlaEmbarazada);
 
-  // Pulso
-  doc.rect(tablaInicioX, y, tablaAncho, 6);
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("7. Pulso:", tablaInicioX + 2, y + 4);
-  doc.setFont("helvetica", "normal");
-  doc.text(`${datos.ohlaPulso || ''} bpm`, tablaInicioX + 22, y + 4);
-  y += 6;
+    // Pulso
+    doc.rect(tablaInicioX, y, tablaAncho, 6);
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("7. Pulso:", tablaInicioX + 2, y + 4);
+    doc.setFont("helvetica", "normal");
+    doc.text(`${datos.pulso || ''} bpm`, tablaInicioX + 22, y + 4);
+    y += 6;
 
-  // II. Preguntas para entrevistados sin criterios de exclusión
-  drawSectionTitle("II. PREGUNTAS PARA ENTREVISTADOS SIN CRITERIOS DE EXCLUSIÓN");
-  drawRow(1, "¿Tuvo una infección respiratoria (resfriado), en las últimas 3 semanas?", datos.ohlaInfeccionRespiratoria);
-  drawRow(2, "¿Usó cualquier remedio o medicamento para la respiración (aerosoles, sprays inhalados o nebulizaciones), en las últimas 3 horas?", datos.ohlaUsoMedicamentoRespiracion);
-  drawRow(3, "¿Fumó cualquier tipo de cigarro (puro o pipa), en las últimas dos horas?", datos.ohlaFumoCigarro, datos.ohlaFumoCigarro ? `¿Cuántos? ${datos.ohlaFumoCigarroCuantos || ""}` : "");
-  drawRow(4, "¿Realizó algún ejercicio físico fuerte, como gimnasia, caminata o trotar, en la última hora?", datos.ohlaEjercicioFisico);
+    // II. Preguntas para entrevistados sin criterios de exclusión
+    drawSectionTitle("II. PREGUNTAS PARA ENTREVISTADOS SIN CRITERIOS DE EXCLUSIÓN");
+    drawRow(1, "¿Tuvo una infección respiratoria (resfriado), en las últimas 3 semanas?", datos.ohlaInfeccionRespiratoria);
+    drawRow(2, "¿Usó cualquier remedio o medicamento para la respiración (aerosoles, sprays inhalados o nebulizaciones), en las últimas 3 horas?", datos.ohlaUsoMedicamentoRespiracion);
+    drawRow(
+      3,
+      "¿Fumó cualquier tipo de cigarro (puro o pipa), en las últimas dos horas?",
+      datos.ohlaFumoCigarro,
+      datos.ohlaFumoCigarro ? "¿Cuántos? " : "",
+      datos.ohlaFumoCigarro ? (datos.ohlaFumoCigarroCuantos || "") : null
+    );
+    drawRow(4, "¿Realizó algún ejercicio físico fuerte, como gimnasia, caminata o trotar, en la última hora?", datos.ohlaEjercicioFisico);
 
-  // 5. Resultado de la prueba
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  const resultadoLines = doc.splitTextToSize("5. Resultado de la Prueba:", tablaAncho - 4);
-  const alturaOpciones = RESULTADO_PRUEBA_OPCIONES.length * lineHTable;
-  const rowHResultado = resultadoLines.length * lineHTable + alturaOpciones + paddingTop + paddingBottom;
+    // 5. Resultado de la prueba
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    const resultadoLines = doc.splitTextToSize("5. Resultado de la Prueba:", tablaAncho - 4);
+    const alturaOpciones = RESULTADO_PRUEBA_OPCIONES.length * lineHTable;
+    const rowHResultado = resultadoLines.length * lineHTable + alturaOpciones + paddingTop + paddingBottom;
 
-  doc.rect(tablaInicioX, y, tablaAncho, rowHResultado);
-  doc.setFont("helvetica", "bold");
-  resultadoLines.forEach((line, i) => {
-    doc.text(line, tablaInicioX + 2, y + paddingTop + lineHTable - 1 + i * lineHTable);
-  });
+    doc.rect(tablaInicioX, y, tablaAncho, rowHResultado);
+    doc.setFont("helvetica", "bold");
+    resultadoLines.forEach((line, i) => {
+      doc.text(line, tablaInicioX + 2, y + paddingTop + lineHTable - 1 + i * lineHTable);
+    });
 
-  let yOpcion = y + paddingTop + resultadoLines.length * lineHTable;
-  doc.setFont("helvetica", "normal");
-  RESULTADO_PRUEBA_OPCIONES.forEach((opcion) => {
-    const marcado = datos.ohlaResultadoPrueba === opcion.value;
-    doc.text(`( ${marcado ? "X" : " "} ) ${opcion.label}`, tablaInicioX + 6, yOpcion + lineHTable - 1);
-    yOpcion += lineHTable;
-  });
-  y += rowHResultado;
+    let yOpcion = y + paddingTop + resultadoLines.length * lineHTable;
+    doc.setFont("helvetica", "normal");
+    RESULTADO_PRUEBA_OPCIONES.forEach((opcion) => {
+      const marcado = datos.ohlaResultadoPrueba === opcion.value;
+      doc.text(`( ${marcado ? "X" : " "} ) ${opcion.label}`, tablaInicioX + 6, yOpcion + lineHTable - 1);
+      yOpcion += lineHTable;
+    });
+    y += rowHResultado;
+  }
 
   // Firmas y Footer (solo SELLOFIRMA y SELLOFIRMADOCASIG, sin firma/huella del paciente)
   y += 10;
