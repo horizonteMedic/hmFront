@@ -163,6 +163,7 @@ const ExamenesListCOMPLETO_BASE = [ // Completo
     "ELECTROCARDIOGRAMA",            // 20
     "ELECTROCARDIOGRAMA_ARCHIVO",
     "ESPIROMETRIA_ARCHIVO",          // 21
+    "ESPIROMETRIA_CUESTIONARIO_OHLA",
     "AUDIOMETRIA_OHLA",              // 22
     "FICHA_AUDIOMETRIA",
 

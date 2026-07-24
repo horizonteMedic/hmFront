@@ -620,6 +620,126 @@ export const SubmitDataServiceFicha = async (
   });
 };
 
+export const SubmitDataServiceAmbos = async (
+  formOhla,
+  formFicha,
+  token,
+  user,
+  limpiarOhla,
+  limpiarFicha,
+  mostrarGrafico,
+  firmaExtra
+) => {
+  if (!formOhla.norden || !formFicha.norden) {
+    await Swal.fire("Error", "Ambos formularios deben tener N° Orden antes de guardar", "error");
+    return;
+  }
+  const { bloqueado } = await verificarBloqueoAudiometriaNormal(formOhla.norden, token);
+  if (bloqueado) {
+    await Swal.fire("Error", MENSAJE_BLOQUEO_AUDIOMETRIA_NORMAL, "error");
+    return;
+  }
+
+  Loading("Registrando Audiometría Ohla...");
+
+  const bodyOhla = {
+    codAu: formOhla.codAu == "" ? null : formOhla.codAu,
+    norden: formOhla.norden,
+    numTicket: null,
+    fechaAu: formOhla.fecha,
+    od500: formOhla.od_500, od1000: formOhla.od_1000, od2000: formOhla.od_2000,
+    od3000: formOhla.od_3000, od4000: formOhla.od_4000, od6000: formOhla.od_6000, od8000: formOhla.od_8000,
+    oi500: formOhla.oi_500, oi1000: formOhla.oi_1000, oi2000: formOhla.oi_2000,
+    oi3000: formOhla.oi_3000, oi4000: formOhla.oi_4000, oi6000: formOhla.oi_6000, oi8000: formOhla.oi_8000,
+    od1_500: formOhla.od_o_500, od1_1000: formOhla.od_o_1000, od1_2000: formOhla.od_o_2000,
+    od1_3000: formOhla.od_o_3000, od1_4000: formOhla.od_o_4000, od1_6000: formOhla.od_o_6000, od1_8000: formOhla.od_o_8000,
+    oi1_500: formOhla.oi_o_500, oi1_1000: formOhla.oi_o_1000, oi1_2000: formOhla.oi_o_2000,
+    oi1_3000: formOhla.oi_o_3000, oi1_4000: formOhla.oi_o_4000, oi1_6000: formOhla.oi_o_6000, oi1_8000: formOhla.oi_o_8000,
+    diagnostico: formOhla.diagnostico,
+    diagnosticoCie10: formOhla.diagnosticoCie10,
+    userRegistro: user,
+  };
+
+  const resOhla = await SubmitData(bodyOhla, registrarUrl, token);
+  if (resOhla.id !== 1 && resOhla.id !== 0) {
+    Swal.close();
+    await Swal.fire("Error", "Error al guardar Audiometría Ohla", "error");
+    return;
+  }
+
+  Loading("Registrando Ficha Audiológica...");
+
+  const bodyFicha = {
+    codFa: formFicha.codFa == "" ? null : formFicha.codFa,
+    norden: formFicha.norden,
+    fechaExamen: formFicha.fecha,
+    tiempoTrabajo: formFicha.aniosTrabajo,
+    tiempoExposicionTotalPonderado: formFicha.tiempoExposicion,
+    edadFa: formFicha.edad,
+    chkTapones: formFicha.tapones,
+    chkgrajeras: formFicha.orejeras,
+    chkIntenso: formFicha.apreciacion_ruido == "RUIDO MUY INTENSO",
+    chkModerado: formFicha.apreciacion_ruido == "RUIDO MODERADO",
+    chkNoMolesto: formFicha.apreciacion_ruido == "RUIDO NO MOLESTO",
+    txtMarca: formFicha.marca,
+    txtModelo: formFicha.modelo,
+    fechaCalibracion: formFicha.calibracion,
+    chk1Si: formFicha.consumo_tabaco == "SI", chk2Si: formFicha.servicio_militar == "SI",
+    chk3Si: formFicha.hobbies_ruido == "SI", chk4Si: formFicha.exposicion_quimicos == "SI",
+    chk5Si: formFicha.infeccion_oido == "SI", chk6Si: formFicha.uso_ototoxicos == "SI",
+    chk7Si: formFicha.disminucion_audicion == "SI", chk8Si: formFicha.dolor_oidos == "SI",
+    chk9Si: formFicha.zumbido == "SI", chk10Si: formFicha.mareos == "SI",
+    chk11Si: formFicha.infeccion_oido_actual == "SI", chk12Si: formFicha.otro == "SI",
+    otros: formFicha.otroDescripcion,
+    chk1No: formFicha.consumo_tabaco == "NO", chk2No: formFicha.servicio_militar == "NO",
+    chk3No: formFicha.hobbies_ruido == "NO", chk4No: formFicha.exposicion_quimicos == "NO",
+    chk5No: formFicha.infeccion_oido == "NO", chk6No: formFicha.uso_ototoxicos == "NO",
+    chk7No: formFicha.disminucion_audicion == "NO", chk8No: formFicha.dolor_oidos == "NO",
+    chk9No: formFicha.zumbido == "NO", chk10No: formFicha.mareos == "NO",
+    chk11No: formFicha.infeccion_oido_actual == "NO", chk12No: formFicha.otro == "NO",
+    txtDod250: formFicha.od_250, txtDod500: formFicha.od_500, txtDod1000: formFicha.od_1000,
+    txtDoi250: formFicha.oi_250, txtDoi500: formFicha.oi_500, txtDoi1000: formFicha.oi_1000,
+    txtLDUmbralDiscriminacion: formFicha.d_umbral_discriminacion,
+    txtLIUmbralDiscriminacion: formFicha.i_umbral_discriminacion,
+    txtLDPorcentajeDiscriminacion: formFicha.d_porcentaje,
+    txtLIPorcentajeDiscriminacion: formFicha.i_porcentaje,
+    txtLDConfort: formFicha.d_umbral_confort, txtLIConfort: formFicha.i_umbral_confort,
+    txtLDDisconfort: formFicha.d_umbral_disconfort, txtLIDisconfort: formFicha.i_umbral_disconfort,
+    txtResponsable: formFicha.nombre_profecional,
+    txtConclusiones: formFicha.conclusiones,
+    txtOtoscopia: formFicha.otoscopia,
+    txtMesesTrabajo: formFicha.mesesTrabajo,
+    userRegistro: user,
+    userMedicoOcup: formFicha.nombre_profecional,
+    usuarioFirma: formFicha.user_medicoFirma,
+    doctorAsignado: formFicha.user_doctorAsignado,
+    doctorExtra: formFicha.user_doctorExtra,
+  };
+
+  const resFicha = await SubmitData(bodyFicha, registrarUrlFicha, token);
+  Swal.close();
+
+  if (resFicha.id === 1 || resFicha.id === 0) {
+    const result = await Swal.fire({
+      title: "Ambos registros guardados",
+      text: `${resFicha.mensaje}\n¿Desea imprimir la Ficha Audiológica?`,
+      icon: "success",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Imprimir",
+      cancelButtonText: "No",
+    });
+    limpiarOhla();
+    limpiarFicha();
+    if (result.isConfirmed) {
+      PrintHojaR(formFicha.norden, token, "audiometria_po", mostrarGrafico, firmaExtra);
+    }
+  } else {
+    await Swal.fire("Error", "Error al guardar Ficha Audiológica", "error");
+  }
+};
+
 export const PrintHojaR = (nro, token, tabla, mostrarGrafico, firmaExtra) => {
   Loading("Cargando Formato a Imprimir");
 

@@ -25,8 +25,8 @@ import CIE10 from "./CIE10/CIE10";
 const tabla = "anexo_agroindustrial";
 const today = getToday();
 
-export default function Anexo2() {
-
+export default function Anexo2({ SinReestricciones = false }) {
+  console.log(SinReestricciones)
   const { token, userlogued, selectedSede, datosFooter, userName } =
     useSessionData();
 
@@ -388,7 +388,7 @@ export default function Anexo2() {
   const handleSearch = (e) => {
     if (e.key === "Enter") {
       handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede, SinReestricciones);
     }
   };
 

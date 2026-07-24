@@ -77,6 +77,8 @@ import {
   faSun,
   faBolt,
   faNewspaper,
+  faS,
+  faR,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -123,10 +125,12 @@ import TamizajeDermatologico from "./TamizajeDermatologico/TamizajeDermatologico
 import GeneradorReportes from "./GeneradorReportes/GeneradorReportes.jsx";
 import RiesgoCardiovascular from "./RiesgoCardiovascular/RiesgoCardiovascular.jsx";
 import EscalaLakeLouise from "./EscalaLakeLouise/EscalaLakeLouise.jsx";
-import { faSellsy } from "@fortawesome/free-brands-svg-icons";
+import { faDraft2digital, faSellsy } from "@fortawesome/free-brands-svg-icons";
 import CertificadoExposicionAlCalor from "./CertificadoExposicionAlCalor/CertificadoExposicionAlCalor.jsx";
 import CertficadoRiesgoElectrico from "./CertificadoRiesgoElectrico/CertificadoRiesgoElectrico.jsx";
 import RegistrosComplementarios from "./RegistrosComplementarios/RegistrosComplementarios.jsx";
+import Anexo2SR from "./Anexo2/Anexo2SR.jsx";
+import Anexo16SR from "./Anexo16/Anexo16SR.jsx";
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
   { key: 7, label: "Test Altura" },
@@ -361,6 +365,8 @@ const TabComponent = () => {
                   { vista: "Certificado Riesgo Electrico", tab: 51, icons: [{ icon: faBolt }], label: "Certificado Riesgo Eléctrico" },
                   { vista: "Folio", tab: 40, icons: [{ icon: faFileContract }], label: "Folio" },
                   { vista: "Registros Complementarios", tab: 52, icons: [{ icon: faNewspaper }], label: "Registros Complementarios" },
+                  { vista: "Anexo 2 SR", tab: 53, icons: [{ icon: faDraft2digital }], label: "Anexo 2 Sin Restricciones" },
+                  { vista: "Anexo 16 SR", tab: 54, icons: [{ icon: fa1 }, { icon: fa6 }, { icon: faS }, { icon: faR }], label: "Anexo 16 Sin Restricciones" },
                 ];
                 return items
                   .filter((item) => tieneVista(item.vista))
@@ -651,6 +657,8 @@ const TabComponent = () => {
               51: { title: "Certificado Riesgo Eléctrico", child: <CertficadoRiesgoElectrico /> },
               40: { title: "Folio", child: <Folio /> },
               52: { title: "Registros Complementarios", child: <RegistrosComplementarios /> },
+              53: { title: "Anexo 2 Sin Reestricciones", child: <Anexo2SR /> },
+              54: { title: "Anexo 16 Sin Reestricciones", child: <Anexo16SR /> },
             };
             const section = displayedInterfaces[activeTab];
             return section ? (

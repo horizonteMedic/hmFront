@@ -96,9 +96,9 @@ export default async function ResumenAnexo7C_OHLA_Digitalizado(data = {}, docExi
       fc: String(raw?.frecuenciaCardiacaTriaje_f_cardiaca),
       fr: String(raw?.frecuenciaRespiratoriaTriaje_f_respiratoria),
       pa: String((raw?.sistolicatriaje_sistolica) + "/" + (raw?.diastolicatriaje_diastolica)),
-      talla: String(raw?.tallatriaje_talla),
-      peso: String(raw?.pesotriaje_peso),
-      imc: String(raw?.imctriaje_imc),
+      talla: String(raw?.tallatriaje_talla ?? ""),
+      peso: String(raw?.pesotriaje_peso ?? ""),
+      imc: String(raw?.imctriaje_imc ?? ""),
       satO2: String(raw?.saturacionoxigenotriaje_sat_02),
       // Mapeo de exámenes complementarios - usando los campos correctos
       estadoNutricional: String(raw?.conclusionImc || ''),
@@ -1025,7 +1025,7 @@ export default async function ResumenAnexo7C_OHLA_Digitalizado(data = {}, docExi
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 12 });
 
-   // === Imprimir ===
+  // === Imprimir ===
   if (docExistente) {
     return doc;
   } else {
