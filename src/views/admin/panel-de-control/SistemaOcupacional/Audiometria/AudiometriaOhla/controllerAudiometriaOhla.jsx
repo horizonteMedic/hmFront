@@ -425,6 +425,8 @@ export const GetInfoServicioFicha = (
 
           bellPlus:
             res.txtMarca == "BELL INVENTIS" && res.txtModelo == "BELL PLUS",
+          maico:
+            res.txtMarca == "MAICO" && res.txtModelo == "MA 28",
 
           genero: res.sexo == "M" ? "Masculino" : "Femenino",
           aniosTrabajo: res.tiempoTrabajo,

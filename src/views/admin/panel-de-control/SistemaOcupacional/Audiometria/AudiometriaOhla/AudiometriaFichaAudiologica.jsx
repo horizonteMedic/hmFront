@@ -238,37 +238,48 @@ const AudiometriaFichaAudiologica = ({
               />
               <span className="text-[11px]">años</span>
             </div>
+            <div>
+              <div className="flex items-center gap-2 pl-8">
+                <input
+                  name="bellPlus"
+                  type="checkbox"
+                  checked={form.bellPlus}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setForm((prev) => ({
+                      ...prev,
+                      bellPlus: checked,
+                      marca: checked ? "BELL INVENTIS" : "AMPLIVOX",
+                      modelo: checked ? "BELL PLUS" : "AMPLIVOX 270",
+                      calibracion: today,
+                      noExamen: false,
+                    }));
+                  }}
+                />
+                <span className=" font-bold">BELL PLUS</span>
+              </div>
+              <div className="flex items-center gap-2 pl-8">
+                <input
+                  name="maico"
+                  type="checkbox"
+                  checked={form.maico}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
 
-            <div className="flex items-center gap-2 pl-8">
-              <input
-                name="bellPlus"
-                type="checkbox"
-                checked={form.bellPlus}
-                onChange={(e) => {
-                  const nuevoValor = !form.bellPlus;
-                  if (nuevoValor) {
                     setForm((prev) => ({
                       ...prev,
-                      bellPlus: nuevoValor,
-                      marca: "BELL INVENTIS",
-                      modelo: "BELL PLUS",
+                      maico: checked,
+                      marca: checked ? "MAICO" : "AMPLIVOX",
+                      modelo: checked ? "MA 28" : "AMPLIVOX 270",
                       calibracion: today,
                       noExamen: false,
-                    }));
-                  } else {
-                    setForm((prev) => ({
-                      ...prev,
-                      bellPlus: nuevoValor,
-                      marca: "AMPLIVOX",
-                      modelo: "AMPLIVOX 270",
-                      calibracion: today,
-                      noExamen: false,
-                    }));
-                  }
-                }}
-              />
-              <span className=" font-bold">BELL PLUS</span>
+                    })); 
+                  }}
+                />
+                <span className=" font-bold">MAICO</span>
+              </div>
             </div>
+
           </div>
 
           {/* Fila 3 */}
@@ -687,43 +698,43 @@ const AudiometriaFichaAudiologica = ({
               </span>
             </div>
             <div className="flex gap-2">
-            <button
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border-none font-semibold bg-[#059669] text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ minWidth: "140px" }}
-              disabled={!formOhla.norden || !form.norden}
-              onClick={() => {
-                SubmitDataServiceAmbos(
-                  formOhla,
-                  form,
-                  token,
-                  userloguedCompleto.sub,
-                  handleClearOhla,
-                  handleClear,
-                  formOhla.activar_grafico,
-                  formOhla.asignar_especialista
-                );
-              }}
-            >
-              <FontAwesomeIcon
-                icon={faSave}
-                style={{ color: "#fff", fontSize: "12px" }}
-              />{" "}
-              Guardar Ambos
-            </button>
-            <button
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border-none font-semibold bg-[#facc14] text-[#FFFFFF] transition"
-              style={{ minWidth: "120px" }}
-              onClick={() => {
-                handleClear();
-                handleClearOhla();
-              }}
-            >
-              <FontAwesomeIcon
-                icon={faBroom}
-                style={{ color: "white", fontSize: "12px" }}
-              />{" "}
-              Limpiar
-            </button>
+              <button
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border-none font-semibold bg-[#059669] text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ minWidth: "140px" }}
+                disabled={!formOhla.norden || !form.norden}
+                onClick={() => {
+                  SubmitDataServiceAmbos(
+                    formOhla,
+                    form,
+                    token,
+                    userloguedCompleto.sub,
+                    handleClearOhla,
+                    handleClear,
+                    formOhla.activar_grafico,
+                    formOhla.asignar_especialista
+                  );
+                }}
+              >
+                <FontAwesomeIcon
+                  icon={faSave}
+                  style={{ color: "#fff", fontSize: "12px" }}
+                />{" "}
+                Guardar Ambos
+              </button>
+              <button
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border-none font-semibold bg-[#facc14] text-[#FFFFFF] transition"
+                style={{ minWidth: "120px" }}
+                onClick={() => {
+                  handleClear();
+                  handleClearOhla();
+                }}
+              >
+                <FontAwesomeIcon
+                  icon={faBroom}
+                  style={{ color: "white", fontSize: "12px" }}
+                />{" "}
+                Limpiar
+              </button>
             </div>
           </div>
         </div>
