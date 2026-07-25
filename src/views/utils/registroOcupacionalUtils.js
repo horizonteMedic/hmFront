@@ -12,15 +12,26 @@ import {
  */
 
 const existenciaExamenesUrl = "/api/v01/ct/consentDigit/existenciaExamenes";
-const infoPacienteUrl = "/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros";
+const sedeNordenUrl = "/api/v01/st/registros/sede";
 
-
-export const perteneceASede = async (nro, sede, token) => {
-  const pac = await getFetch(
-    `${infoPacienteUrl}?nOrden=${nro}&nomSede=${sede}`,
-    token
-  );
-  return Boolean(pac && !pac.error && pac.norden);
+/**
+ * Consulta la sede dueña de un N° Orden y la compara con la sede actual.
+ *
+ * Devuelve:
+ *  - "ok"           el N° Orden existe y pertenece a `sede`.
+ *  - "otraSede"      el N° Orden existe pero pertenece a otra sede.
+ *  - "noEncontrado"  el backend no encontró el N° Orden (404).
+ *  - "error"         error de backend/red (p. ej. N° Orden inválido/demasiado largo, 500).
+ */
+export const validarSede = async (nro, sede, token) => {
+  const res = await getFetch(`${sedeNordenUrl}/${nro}`, token);
+  if (res && !res.error) {
+    return res.codigoSucursal === sede ? "ok" : "otraSede";
+  }
+  if (res && res.status === 404) {
+    return "noEncontrado";
+  }
+  return "error";
 };
 
 /**
@@ -112,8 +123,9 @@ export const actualizarRegistro = async ({
  * VERIFICAR por N° Orden: decide si se trata de un registro NUEVO o EXISTENTE y delega la
  * carga de datos en los callbacks correspondientes.
  *
+ *  - Se valida primero que el N° Orden pertenezca a la sede actual (si se pasa `sede`).
  *  - Sin registro previo (id === 0) -> onNuevo()      (cargar datos del paciente).
- *  - Con registro previo            -> valida sede -> onExistente()  (cargar para edición).
+ *  - Con registro previo            -> onExistente()  (cargar para edición).
  *
  * @param {object}   p
  * @param {string}   p.nro
@@ -156,19 +168,31 @@ export const verificarRegistro = async ({
     return;
   }
 
+  // Validar que la Orden pertenezca a la sede actual antes de cargar nada (nuevo o existente).
+  if (sede) {
+    const estadoSede = await validarSede(nro, sede, token);
+    if (estadoSede === "otraSede") {
+      Swal.fire({
+        icon: "warning",
+        title: '<i class="fa-solid fa-location-dot"></i>Sede incorrecta',
+        html: `El N° Orden ${nro} pertenece a otra sede.`,
+      });
+      return;
+    }
+    if (estadoSede !== "ok") {
+      // "noEncontrado" (inconsistente con existenciaExamenes) o "error" (p. ej. N° Orden inválido).
+      Swal.fire({
+        icon: "error",
+        title: '<i class="fa-solid fa-triangle-exclamation"></i>Error',
+        html: `Verifique el número de orden ${nro} e intente nuevamente.`,
+      });
+      return;
+    }
+  }
+
   if (res.id === 0) {
     // No tiene registro de este examen -> se cargan los datos del paciente.
     onNuevo();
-    return;
-  }
-
-  // Ya tiene registro: validar que pertenezca a la sede actual antes de cargarlo.
-  if (sede && !(await perteneceASede(nro, sede, token))) {
-    Swal.fire({
-      icon: "warning",
-      title: '<i class="fa-solid fa-location-dot"></i>Sede incorrecta',
-      html: `El N° Orden ${nro} pertenece a otra sede.`,
-    });
     return;
   }
 
@@ -207,6 +231,34 @@ export const imprimirReporteJasper = ({
     token
   )
     .then(async (res) => {
+      // Validar que la Orden pertenezca a la sede actual (solo en impresión manual).
+      if (sede) {
+        const estadoSede = await validarSede(nro, sede, token);
+        if (estadoSede === "otraSede") {
+          Swal.fire({
+            icon: "warning",
+            title: '<i class="fa-solid fa-location-dot"></i>Sede incorrecta',
+            html: `El N° Orden ${nro} pertenece a otra sede.`,
+          });
+          return;
+        }
+        if (estadoSede === "noEncontrado") {
+          Swal.fire({
+            icon: "warning",
+            title: '<i class="fa-solid fa-magnifying-glass"></i>Norden no encontrado',
+            html: `No se encontraron registros para el N° Orden ${nro}.`,
+          });
+          return;
+        }
+        if (estadoSede === "error") {
+          Swal.fire({
+            icon: "error",
+            title: '<i class="fa-solid fa-triangle-exclamation"></i>Error',
+            html: `Verifique el número de orden ${nro} e intente nuevamente.`,
+          });
+          return;
+        }
+      }
       // Sin datos / error del backend (500, 404) / N° Orden inexistente o inválido.
       if (!res || res.error || !(res.norden || res.norden_n_orden || res.n_orden)) {
         Swal.fire({
@@ -217,15 +269,7 @@ export const imprimirReporteJasper = ({
         return;
       }
 
-      // El N° Orden existe: validar que pertenezca a la sede actual (solo en impresión manual).
-      if (sede && !(await perteneceASede(nro, sede, token))) {
-        Swal.fire({
-          icon: "warning",
-          title: '<i class="fa-solid fa-location-dot"></i>Sede incorrecta',
-          html: `El N° Orden ${nro} pertenece a otra sede.`,
-        });
-        return;
-      }
+     
 
       const modulo = await jasperModules[rutaModulo]();
       if (typeof modulo.default === "function") {
