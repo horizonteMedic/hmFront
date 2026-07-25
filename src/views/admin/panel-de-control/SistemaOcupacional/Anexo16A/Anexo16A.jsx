@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBroom,
   faPrint,
   faSave,
+  faUpload,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   InputCheckbox,
@@ -16,6 +18,8 @@ import { useForm } from "../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./Anexo16AController";
 import Swal from "sweetalert2";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
+import { getAnexo16AInitialFormState } from "./anexo16aFormDefaults";
+import CargaMasivaAnexo16A from "./CargaMasivaAnexo16A/CargaMasivaAnexo16A";
 
 const tabla = "anexo16a";
 
@@ -23,76 +27,10 @@ export default function Anexo16A() {
   const today = getToday();
   const { token, userlogued, selectedSede, datosFooter, userName, userDireccion } = useSessionData();
 
-  const initialFormState = {
-    norden: "",
-    fechaExam: today,
-    codigoAnexo: null,
-    apto: undefined,
-    actividadRealizar: "",
-    dni: "",
-    nombres: "",
-    sexo: "",
-    fechaNac: "",
-    edad: "",
-    fc: "",
-    pa: "",
-    fr: "",
-    imc: "",
-    satO2: "",
-    temperatura: "",
-    peso: "",
-    talla: "",
-    medicoDireccion: userDireccion,
-    cirugiaMayor: false,
-    desordenesCoagulacion: false,
-    diabetes: false,
-    hipertension: false,
-    embarazo: false,
-    furDescripcion: "",
-    problemasNeurologicos: false,
-    infeccionesRecientes: false,
-    medicacionActual: "",
-    obesidadMorbida: false,
-    problemasCardiacos: false,
-    problemasRespiratorios: false,
-    problemasOftalmologicos: false,
-    problemasDigestivos: false,
-    apneaSueño: false,
-    otraCondicion: false,
-    alergias: false,
-    usoMedicacion: false,
-    corregirAgudeza: false,
-    obesidadDieta: false,
-    diabetesControlado: false,
-    sobrepeso: false,
-    htaControlada: false,
-    lentesCorrectivos: false,
-    contrata: "",
-    empresa: "",
-    observaciones: "",
-    //Agudeza Visual
-    vcOD: "",
-    vlOD: "",
-    vcOI: "",
-    vlOI: "",
-    vcCorregidaOD: "",
-    vlCorregidaOD: "",
-    vclrs: "",
-    vb: "",
-    rp: "",
-    vcCorregidaOI: "",
-    vlCorregidaOI: "",
-    enfermedadesOculares: "",
+  const initialFormState = getAnexo16AInitialFormState({ today, userlogued, userName, userDireccion });
 
-    imcRed: false,
-    obesidadMorbidaRed: false,
-    hipertensionRed: false,
-    problemasOftalmologicosRed: false,
+  const [modalCargaMasiva, setModalCargaMasiva] = useState(false);
 
-    // Médico que Certifica //BUSCADOR
-    nombre_medico: userName,
-    user_medicoFirma: userlogued,
-  }
   const {
     form,
     setForm,
@@ -280,11 +218,11 @@ export default function Anexo16A() {
 
           {/* Médico */}
           <div className="bg-white border border-gray-200 rounded-lg p-3">
-           <EmpleadoComboBox
-                value={form.nombre_medico}
-                form={form}
-                onChange={handleChangeSimple}
-              />
+            <EmpleadoComboBox
+              value={form.nombre_medico}
+              form={form}
+              onChange={handleChangeSimple}
+            />
           </div>
 
           {/* Antecedentes Médicos */}
@@ -490,6 +428,14 @@ export default function Anexo16A() {
 
         {/* Columna de Agudeza Visual (derecha) - 1/4 del ancho */}
         <div className="lg:col-span-1 flex flex-col">
+          {/* Fila 3: Carga Masiva */}
+          <button
+            type="button"
+            onClick={() => setModalCargaMasiva(true)}
+            className=" px-4 mx-auto mb-3 verde-btn py-2 rounded flex items-center justify-center gap-2"
+          >
+            <FontAwesomeIcon icon={faUpload} /> Carga Masiva
+          </button>
           <div className="bg-white border border-gray-200 rounded-lg p-3 flex-1 flex flex-col">
             <h4 className="font-semibold text-gray-800 mb-3">Agudeza Visual</h4>
 
@@ -652,10 +598,23 @@ export default function Anexo16A() {
                   <FontAwesomeIcon icon={faPrint} /> Imprimir
                 </button>
               </div>
+
+
             </div>
           </div>
         </div>
       </div>
+      {modalCargaMasiva && (
+        <CargaMasivaAnexo16A
+          onClose={() => setModalCargaMasiva(false)}
+          token={token}
+          userlogued={userlogued}
+          userName={userName}
+          userDireccion={userDireccion}
+          tabla={tabla}
+          sede={selectedSede}
+        />
+      )}
     </div>
   );
 }
