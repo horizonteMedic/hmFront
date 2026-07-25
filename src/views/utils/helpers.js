@@ -241,6 +241,43 @@ export async function optimizePdf(pdfBytes) {
     }
 }
 
+const AZURE_COMPRESOR_URL = "https://hmbackendreportes-h3a2bzc5dycgf4ba.centralus-01.azurewebsites.net/api/v1/archivos";
+const LIMITE_COMPRESION_BYTES = 5 * 1024 * 1024; // 5MB
+
+/**
+ * Comprime un PDF usando el compresor de Azure (mismo backend que FolioJasper)
+ * solo si su tamaño supera el límite indicado. Si falla o no lo supera, retorna el original.
+ * @param {Uint8Array} pdfBytes
+ * @param {string} nombreArchivo
+ * @returns {Promise<Uint8Array>}
+ */
+export async function comprimirPdfAzureSiSuperaLimite(pdfBytes, nombreArchivo) {
+    if (!pdfBytes || pdfBytes.length <= LIMITE_COMPRESION_BYTES) {
+        return pdfBytes;
+    }
+
+    try {
+        const blob = new Blob([pdfBytes], { type: "application/pdf" });
+        const formData = new FormData();
+        formData.append("archivo", blob, nombreArchivo);
+
+        const response = await fetch(AZURE_COMPRESOR_URL, {
+            method: "POST",
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error("Error al comprimir archivo");
+        }
+
+        const compressedBlob = await response.blob();
+        return new Uint8Array(await compressedBlob.arrayBuffer());
+    } catch (error) {
+        console.error("Error comprimiendo PDF con Azure:", error);
+        return pdfBytes; // si falla la compresión, se sube el original
+    }
+}
+
 export async function imagenToPdf(file) {
     const imgBytes = await file.arrayBuffer();
     const pdfDoc = await PDFDocument.create();

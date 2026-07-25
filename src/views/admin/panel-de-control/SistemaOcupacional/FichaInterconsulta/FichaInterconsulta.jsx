@@ -8,7 +8,7 @@ import useRealTime from "../../../../hooks/useRealTime";
 import { useForm } from "../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaInterconsulta";
 import { useSessionData } from "../../../../hooks/useSessionData";
-import { getToday, optimizePdf, uint8ToBase64 } from "../../../../utils/helpers";
+import { getToday, comprimirPdfAzureSiSuperaLimite, uint8ToBase64 } from "../../../../utils/helpers";
 import Swal from "sweetalert2";
 import { SubirInterconsulta, ReadArchivos } from "./model";
 import { LoadingDefault } from "../../../../utils/functionUtils";
@@ -169,27 +169,15 @@ export default function FichaInterconsulta() {
                 const base64WithoutHeader = e.target.result.split(',')[1];
                 let pdfBytes = Uint8Array.from(atob(base64WithoutHeader), c => c.charCodeAt(0));
 
-                // Calcular tamaño antes de optimizar
-                const tamañoAntesKB = (pdfBytes.length / 1024).toFixed(2);
-                console.log(`📄 Tamaño del PDF ANTES de optimizar: ${tamañoAntesKB} KB (${pdfBytes.length} bytes)`);
+                // Comprime con Azure solo si el archivo pesa más de 5MB
+                pdfBytes = await comprimirPdfAzureSiSuperaLimite(pdfBytes, file.name);
 
-                // Optimizar el PDF
-                const pdfBytesOptimizado = await optimizePdf(pdfBytes);
-
-                // Calcular tamaño después de optimizar
-                const tamañoDespuesKB = (pdfBytesOptimizado.length / 1024).toFixed(2);
-                const reduccionKB = (tamañoAntesKB - tamañoDespuesKB).toFixed(2);
-                const porcentajeReduccion = ((reduccionKB / tamañoAntesKB) * 100).toFixed(1);
-
-                console.log(`📄 Tamaño del PDF DESPUÉS de optimizar: ${tamañoDespuesKB} KB (${pdfBytesOptimizado.length} bytes)`);
-                console.log(`✅ Reducción: ${reduccionKB} KB (${porcentajeReduccion}%)`);
-
-                const base64Optimizado = uint8ToBase64(new Uint8Array(pdfBytesOptimizado));
+                const base64Final = uint8ToBase64(new Uint8Array(pdfBytes));
 
                 const datos = {
                     nombre: file.name,
                     sede: selectedSede,
-                    base64: base64Optimizado,
+                    base64: base64Final,
                     nomenclatura: form.nomenclatura,
                     norden: form.norden
                 };
@@ -217,8 +205,10 @@ export default function FichaInterconsulta() {
             .then(response => {
                 if (response.id === 1) {
                     setVisualerOpen(response)
+                    Swal.close()
+                } else {
+                    Swal.fire("Error", "No Existe reporte para este Numero de Orden", "error")
                 }
-                Swal.close()
             })
             .catch(error => {
                 Swal.fire("Error", "Ocurrio un Error al visualizar la interconsulta", "error")
