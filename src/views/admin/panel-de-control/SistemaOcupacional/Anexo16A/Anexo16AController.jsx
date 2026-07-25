@@ -11,7 +11,7 @@ import { getFetch } from "../../../../utils/apiHelpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/anexos/anexo16a/obtenerReporteAnexo16a";
-const registrarUrl =
+export const registrarUrl =
     "/api/v01/ct/anexos/anexo16a/registrarActualizarAnexo16a";
 
 export const GetInfoServicio = async (
@@ -338,6 +338,55 @@ export const GetInfoServicioEditar = async (
     }
 };
 
+export const construirBodyAnexo16A = (form, user) => ({
+    norden: form.norden,
+    codigoAnexo16a: form.codigoAnexo,
+    fechaExamen: form.fechaExam,
+    edad: form.edad,
+    dni: form.medicoDNI,
+    direccionClinica: form.medicoDireccion,
+    apto: form.apto,
+    noApto: !form.apto,
+    cirujiaMayorRecienteNo: !form.cirugiaMayor,
+    cirujiaMayorRecienteSi: form.cirugiaMayor,
+    desordenCoagulacionNo: !form.desordenesCoagulacion,
+    desordenCoagulacionSi: form.desordenesCoagulacion,
+    diabetesMellitusNo: !form.diabetes,
+    diabetesMellitusSi: form.diabetes,
+    hipertensionArterialNo: !form.hipertension,
+    hipertensionArterialSi: form.hipertension,
+    embarazoNo: !form.embarazo,
+    embarazoSi: form.embarazo,
+    furDescripcion: form.furDescripcion,
+    problemaNeurologicoNo: !form.problemasNeurologicos,
+    problemaNeurologicoSi: form.problemasNeurologicos,
+    infeccionRecienteNo: !form.infeccionesRecientes,
+    infeccionRecienteSi: form.infeccionesRecientes,
+    obesidadMorbididadNo: !form.obesidadMorbida,
+    obesidadMorbididadSi: form.obesidadMorbida,
+    problemasCardiacoNo: !form.problemasCardiacos,
+    problemasCardiacoSi: form.problemasCardiacos,
+    problemasRespiratoriosNo: !form.problemasRespiratorios,
+    problemasRespiratoriosSi: form.problemasRespiratorios,
+    problemasOftalmologicosNo: !form.problemasOftalmologicos,
+    problemasOftalmologicosSi: form.problemasOftalmologicos,
+    problemasDigestivosNo: !form.problemasDigestivos,
+    problemasDigestivosSi: form.problemasDigestivos,
+    apneaDelSuenoNo: !form.apneaSueño,
+    apneaDelSuenoSi: form.apneaSueño,
+    otraCondicionMedicaNo: !form.otraCondicion,
+    otraCondicionMedicaSi: form.otraCondicion,
+    alergiasNo: !form.alergias,
+    alergiasSi: form.alergias,
+    usoMedicacionActualNo: !form.usoMedicacion,
+    usoMedicacionActualSi: form.usoMedicacion,
+    medicacionActual: form.medicacionActual,
+    observaciones: form.observaciones,
+
+    usuarioFirma: form.user_medicoFirma,
+    userRegistro: user,
+});
+
 export const SubmitDataService = async (
     form,
     token,
@@ -350,54 +399,7 @@ export const SubmitDataService = async (
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
     }
-    const body = {
-        norden: form.norden,
-        codigoAnexo16a: form.codigoAnexo,
-        fechaExamen: form.fechaExam,
-        edad: form.edad,
-        dni: form.medicoDNI,
-        direccionClinica: form.medicoDireccion,
-        apto: form.apto,
-        noApto: !form.apto,
-        cirujiaMayorRecienteNo: !form.cirugiaMayor,
-        cirujiaMayorRecienteSi: form.cirugiaMayor,
-        desordenCoagulacionNo: !form.desordenesCoagulacion,
-        desordenCoagulacionSi: form.desordenesCoagulacion,
-        diabetesMellitusNo: !form.diabetes,
-        diabetesMellitusSi: form.diabetes,
-        hipertensionArterialNo: !form.hipertension,
-        hipertensionArterialSi: form.hipertension,
-        embarazoNo: !form.embarazo,
-        embarazoSi: form.embarazo,
-        furDescripcion: form.furDescripcion,
-        problemaNeurologicoNo: !form.problemasNeurologicos,
-        problemaNeurologicoSi: form.problemasNeurologicos,
-        infeccionRecienteNo: !form.infeccionesRecientes,
-        infeccionRecienteSi: form.infeccionesRecientes,
-        obesidadMorbididadNo: !form.obesidadMorbida,
-        obesidadMorbididadSi: form.obesidadMorbida,
-        problemasCardiacoNo: !form.problemasCardiacos,
-        problemasCardiacoSi: form.problemasCardiacos,
-        problemasRespiratoriosNo: !form.problemasRespiratorios,
-        problemasRespiratoriosSi: form.problemasRespiratorios,
-        problemasOftalmologicosNo: !form.problemasOftalmologicos,
-        problemasOftalmologicosSi: form.problemasOftalmologicos,
-        problemasDigestivosNo: !form.problemasDigestivos,
-        problemasDigestivosSi: form.problemasDigestivos,
-        apneaDelSuenoNo: !form.apneaSueño,
-        apneaDelSuenoSi: form.apneaSueño,
-        otraCondicionMedicaNo: !form.otraCondicion,
-        otraCondicionMedicaSi: form.otraCondicion,
-        alergiasNo: !form.alergias,
-        alergiasSi: form.alergias,
-        usoMedicacionActualNo: !form.usoMedicacion,
-        usoMedicacionActualSi: form.usoMedicacion,
-        medicacionActual: form.medicacionActual,
-        observaciones: form.observaciones,
-
-        usuarioFirma: form.user_medicoFirma,
-        userRegistro: user,
-    };
+    const body = construirBodyAnexo16A(form, user);
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
         PrintHojaR(form.norden, token, tabla, datosFooter);

@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUpload } from "@fortawesome/free-solid-svg-icons";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { useForm } from "../../../../hooks/useForm";
 import {
@@ -14,73 +17,25 @@ import RadioTable from "../../../../components/reusableComponents/RadioTable";
 import InputsBooleanRadioGroup from "../../../../components/reusableComponents/InputsBooleanRadioGroup";
 import InputTextArea from "../../../../components/reusableComponents/InputTextArea";
 import BotonesAccion from "../../../../components/templates/BotonesAccion";
+import { getAntecedentesDeAlturaInitialFormState } from "./antecedentesDeAlturaFormDefaults";
+import CargaMasivaAntecedentesDeAltura from "./CargaMasivaAntecedentesDeAltura/CargaMasivaAntecedentesDeAltura";
 
 const tabla = "antece_enfermedades_altura";
 
 export default function AntecedentesDeAltura() {
   const today = getToday();
   const { token, userlogued, selectedSede, datosFooter, userName, userDNI, userCMP, userEmail, userDireccion } = useSessionData();
-  const initialFormState = {
-    norden: "",
-    codigoAntecedentesAltura: null,
-    nombres: "",
-    edad: "",
-    fechaNacimiento: "",
-    lugarNacimiento: "",
-    estadoCivil: "",
-    nivelEstudios: "",
-    fechaExam: today,
-    empresa: "",
-    contrata: "",
-    ocupacion: "",
-    cargoDesempenar: "",
-    dni: "",
-    sexo: "",
-    apto: true,
+  const initialFormState = getAntecedentesDeAlturaInitialFormState({
+    today,
+    userlogued,
+    userName,
+    userDNI,
+    userCMP,
+    userEmail,
+    userDireccion,
+  });
 
-    // Información del médico
-    dniMedico: userDNI,
-    nombreMedico: userName,
-    cmp: userCMP,
-    email: userEmail.toUpperCase(),
-    direccionMedico: userDireccion.toUpperCase(),
-
-    // Antecedentes patológicos - todos en false por defecto
-    accidenteCerebrovascular: false,
-    anginaInestable: false,
-    antecedenteBypass: false,
-    antecedenteEdemaCerebral: false,
-    antecedenteEdemaPulmonar: false,
-    antecedenteNeumotorax: false,
-    arritmiaCardiaca: false,
-    cardiomiopatiaHipertrofica: false,
-    cirugiaMayor: false,
-    insuficienciaValvulaAortica: false,
-    diabetesMellitus: false,
-    embarazo: false,
-    epilepsia: false,
-    epoc: false,
-    eritrocitosisExcesiva: false,
-    hipertensionArterial: false,
-    hipertensionPulmonar: false,
-    infartoMiocardio: false,
-    insuficienciaCardiaca: false,
-    patologiaHemorragicaRetina: false,
-    patologiaValvularCardiaca: false,
-    presenciaMarcapasos: false,
-    riesgoCardiovascularAlto: false,
-    trastornosCoagulacion: false,
-    trombosisVenosaCerebral: false,
-    otros: false,
-    otrosDescripcion: "",
-    comentarios: "",
-
-    usuario: userlogued ?? "",
-
-    // Médico que Certifica //BUSCADOR
-    nombre_medico: userName,
-    user_medicoFirma: userlogued,
-  };
+  const [modalCargaMasiva, setModalCargaMasiva] = useState(false);
 
   const {
     form,
@@ -113,6 +68,15 @@ export default function AntecedentesDeAltura() {
 
   return (
     <div className="space-y-3 px-4 max-w-[90%] xl:max-w-[80%] mx-auto">
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => setModalCargaMasiva(true)}
+          className="verde-btn px-4 py-2 rounded flex items-center gap-2"
+        >
+          <FontAwesomeIcon icon={faUpload} /> Carga Masiva
+        </button>
+      </div>
       <SectionFieldset legend="Antecedentes de Enfermedades en Altura" className="grid grid-cols-1 xl:grid-cols-3 gap-x-4 gap-y-3">
         <InputTextOneLine
           label="N° Orden"
@@ -335,6 +299,20 @@ export default function AntecedentesDeAltura() {
         handleChangeNumberDecimals={handleChangeNumberDecimals}
       />
 
+      {modalCargaMasiva && (
+        <CargaMasivaAntecedentesDeAltura
+          onClose={() => setModalCargaMasiva(false)}
+          token={token}
+          userlogued={userlogued}
+          userName={userName}
+          userDNI={userDNI}
+          userCMP={userCMP}
+          userEmail={userEmail}
+          userDireccion={userDireccion}
+          tabla={tabla}
+          sede={selectedSede}
+        />
+      )}
     </div>
   );
 }

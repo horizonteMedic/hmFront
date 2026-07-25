@@ -92,7 +92,7 @@ export const GetInfoServicio = async (
             ohlaHospitalizadoCorazon: res.ohlaHospitalizadoCorazon ?? null,
             ohlaMedicamentoTuberculosis: res.ohlaMedicamentoTuberculosis ?? null,
             ohlaEmbarazada: res.ohlaEmbarazada ?? null,
-            ohlaPulso: res.ohlaPulso ?? "",
+            pulso: res.pulso ?? "",
             ohlaInfeccionRespiratoria: res.ohlaInfeccionRespiratoria ?? null,
             ohlaUsoMedicamentoRespiracion: res.ohlaUsoMedicamentoRespiracion ?? null,
             ohlaFumoCigarro: res.ohlaFumoCigarro ?? null,
@@ -142,7 +142,7 @@ export const SubmitDataService = async (
         ohlaHospitalizadoCorazon: form.ohlaHospitalizadoCorazon,
         ohlaMedicamentoTuberculosis: form.ohlaMedicamentoTuberculosis,
         ohlaEmbarazada: form.ohlaEmbarazada,
-        ohlaPulso: form.ohlaPulso,
+        pulso: form.pulso,
         ohlaInfeccionRespiratoria: form.ohlaInfeccionRespiratoria,
         ohlaUsoMedicamentoRespiracion: form.ohlaUsoMedicamentoRespiracion,
         ohlaFumoCigarro: form.ohlaFumoCigarro,
@@ -166,6 +166,14 @@ export const PrintHojaR = (nro, token, tabla) => {
     getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`, token)
         .then(async (res) => {
             if (res?.norden) {
+                if (!res.esOHLA) {
+                    Swal.fire(
+                        "Alerta",
+                        "El paciente no cuenta con registros de cuestionario.",
+                        "warning"
+                    );
+                    return;
+                }
                 const nombre = "Espirometria_OHLA_Digitalizado";
                 const jasperModules = import.meta.glob('../../../../jaspers/Espirometria/*.jsx');
                 const modulo = await jasperModules[`../../../../jaspers/Espirometria/${nombre}.jsx`]();
