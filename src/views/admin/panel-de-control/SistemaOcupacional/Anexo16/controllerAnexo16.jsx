@@ -1153,7 +1153,14 @@ export const GetInfoServicio = (
             ...prev,
             ...res,
             ...data,
-            antecedentesPersonales: `${prev.antecedentesPersonales ?? ""}\n${res.alergia_medicamentos_an ?? ""}`,
+            // antecedentesPersonales: `${res.antecedentesPersonalesAnexo7c_txtantecedentespersonales ?? ""}\n${res.alergia_medicamentos_an ?? ""}\n${prev.antecedentesPersonales ?? ""}`,
+            antecedentesPersonales: [
+              res.antecedentesPersonalesAnexo7c_txtantecedentespersonales,
+              res.alergia_medicamentos_an,
+              prev.antecedentesPersonales
+            ]
+              .filter(texto => texto?.trim())
+              .join("\n"),
           }));
         }
       } else {
