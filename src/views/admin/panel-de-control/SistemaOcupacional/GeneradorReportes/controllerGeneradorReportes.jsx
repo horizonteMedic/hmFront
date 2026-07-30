@@ -108,6 +108,51 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
     }
 };
 
+// Obtiene los datos del paciente sin React state (para uso en carga masiva)
+export const obtenerInfoPacParaMasivo = async (nro, token, sede) => {
+    const res = await GetInfoPacDefault(nro, token, sede);
+    if (!res) return null;
+    return {
+        norden: nro,
+        nombres: res.nombresApellidos ?? "",
+        nombre: res.nombres ?? "",
+        apellidos: res.apellidos ?? "",
+        fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
+        edad: res.edad,
+        ocupacion: res.areaO ?? "",
+        nombreExamen: res.nomExam ?? "",
+        cargoDesempenar: res.cargo ?? "",
+        lugarNacimiento: res.lugarNacimiento ?? "",
+        domicilioActual: res.direccion ?? "",
+        sexo: res.genero === "M" ? "MASCULINO" : res.genero === "F" ? "FEMENINO" : "",
+        empresa: res.empresa ?? "",
+        contrata: res.contrata ?? "",
+        estadoCivil: res.estadoCivil ?? "",
+        nivelEstudios: res.nivelEstudios ?? "",
+    };
+};
+
+// Verifica si un examen específico existe para un norden
+export const verificarExamenExiste = async (nro, tabla, token) => {
+    try {
+        const res = await getFetch(`${GetExamenURL}?nOrden=${nro}`, token);
+        if (!res) return false;
+        return Object.values(res).some((item) => item.nameService === tabla && item.existe);
+    } catch {
+        return false;
+    }
+};
+
+// Sube un PDF generado al sistema con la nomenclatura dada
+export const subirPDFGenerado = async (pdfData, form, nomenclatura, selectedSede, userlogued, token) => {
+    return subirArchivoDirecto(pdfData, form, nomenclatura, selectedSede, userlogued, token, () => { }, {
+        showLoading: false,
+        showSuccessAlert: false,
+        showErrorAlert: false,
+        refreshAfterUpload: false,
+    });
+};
+
 export const ReadArchivosForm = async (form, setVisualerOpen, token, nomenclatura = null) => {
     ReadArchivosFormDefault(form, setVisualerOpen, token, nomenclatura)
 }
