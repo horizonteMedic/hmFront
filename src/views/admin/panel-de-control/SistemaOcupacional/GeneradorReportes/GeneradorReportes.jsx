@@ -11,6 +11,7 @@ import ButtonsPDF from "../../../../components/reusableComponents/ButtonsPDF";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
+import ModalSubidaMasiva from "./GeneracionMasiva/GeneracionMasiva";
 
 const ExamenesListCOMPLETO = buildExamenesList([
     "CERTIFICADO_ANEXO_02",
@@ -36,6 +37,8 @@ export default function GeneradorReportes() {
 
     const [visualerOpen, setVisualerOpen] = useState(null)
 
+    //Subida Masiva
+    const [subidaMasiva, setSubidaMasiva] = useState(false)
     const initialFormState = {
         norden: "",
         nombreExamen: "",
@@ -163,7 +166,7 @@ export default function GeneradorReportes() {
             }));
         }
     };
-    console.log(form.listaExamenes)
+
     return (
         <div className="w-full space-y-3 px-4 max-w-[95%] mx-auto">
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -262,15 +265,15 @@ export default function GeneradorReportes() {
                                             <button
                                                 type="button"
                                                 onClick={() => handleDeleteArchivo(examen.nomenclaturaSubida)}
-                                            disabled={!examen.urlArchivo || deletingNomenclatura === examen.nomenclaturaSubida}
-                                            className={`text-white text-base px-4 py-2 rounded flex items-center justify-center gap-2 transition-all duration-150 ease-out ${!examen.urlArchivo || deletingNomenclatura === examen.nomenclaturaSubida
-                                                ? "bg-gray-400 cursor-not-allowed opacity-70"
-                                                : "bg-red-600 hover:bg-red-700 hover:shadow-lg active:scale-95 active:shadow-inner"
-                                                }`}
-                                        >
-                                            <FontAwesomeIcon icon={faTrash} />
-                                            Eliminar
-                                        </button>
+                                                disabled={!examen.urlArchivo || deletingNomenclatura === examen.nomenclaturaSubida}
+                                                className={`text-white text-base px-4 py-2 rounded flex items-center justify-center gap-2 transition-all duration-150 ease-out ${!examen.urlArchivo || deletingNomenclatura === examen.nomenclaturaSubida
+                                                    ? "bg-gray-400 cursor-not-allowed opacity-70"
+                                                    : "bg-red-600 hover:bg-red-700 hover:shadow-lg active:scale-95 active:shadow-inner"
+                                                    }`}
+                                            >
+                                                <FontAwesomeIcon icon={faTrash} />
+                                                Eliminar
+                                            </button>
                                         )}
                                     </div>
                                 </div>
@@ -285,6 +288,13 @@ export default function GeneradorReportes() {
                                 >
                                     Generar
                                 </button>
+                                {examen.masivo && <button
+                                    className={`w-full py-2 px-4 rounded-lg text-sm font-bold transition-all
+                                        bg-purple-600 hover:bg-purple-700 text-white shadow-sm`}
+                                    onClick={() => setSubidaMasiva(examen)}
+                                >
+                                    Generar Masivamente
+                                </button>}
                             </div>
                         );
                     })}
@@ -297,6 +307,16 @@ export default function GeneradorReportes() {
                 hideSave
                 hidePrint
             />
+            {subidaMasiva && (
+                <ModalSubidaMasiva
+                    examen={subidaMasiva}
+                    onClose={() => setSubidaMasiva(false)}
+                    token={token}
+                    selectedSede={selectedSede}
+                    userlogued={userlogued}
+                    datosFooter={datosFooter}
+                />
+            )}
             {visualerOpen && (
                 <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
                     <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">

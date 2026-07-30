@@ -11,7 +11,7 @@ import pdfjsLib from "../../config/pdjfConfig";
 import { colocarSellosEnPdf, getSign } from "../../utils/helpers";
 import { aplicarFechaPersonalizada } from "../../admin/panel-de-control/SistemaOcupacional/Folio/fechaOverrideMap";
 
-export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType, signal, nombres = "", apellidos = "", datosFooter, comprimidoz = false, urlType = "azure", fechaPersonalizada = "", diasVencimientoPersonalizado = "") {
+export default async function FolioJasper(nro, token, ListaExamenes = [], onProgress = null, selectedListType, signal, nombres = "", apellidos = "", datosFooter, comprimidoz = false, silencioso = false, urlType = "azure", fechaPersonalizada = "", diasVencimientoPersonalizado = "") {
     if (signal?.aborted) throw new DOMException("Aborted", "AbortError");//para poder cancelar la gereracion
 
     const pdfFinal = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true, precision: 1 });
@@ -471,12 +471,12 @@ export default async function FolioJasper(nro, token, ListaExamenes = [], onProg
             nombreArchivo,
             urlType
         );
-        imprimirBytes(archivoProcesado, nombreArchivo);
+        if (!silencioso) imprimirBytes(archivoProcesado, nombreArchivo);
         // descargarBlob(archivoProcesado, nombreArchivo);
         return archivoProcesado; // Retornar el blob procesado
     } else {
         const rasterizedBytes = await rasterizeAndCompressPdf(baseBytes);
-        imprimirBytes(rasterizedBytes, nombreArchivo);
+        if (!silencioso) imprimirBytes(rasterizedBytes, nombreArchivo);
         return rasterizedBytes; // Retornar los bytes rasterizados
     }
 }
