@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPrint } from "@fortawesome/free-solid-svg-icons";
+import { faPrint, faUpload } from "@fortawesome/free-solid-svg-icons";
 import {
   InputTextOneLine,
   InputTextArea,
@@ -14,6 +14,8 @@ import { PrintHojaR, PrintHojaR2, SubmitDataService, VerifyTR } from "./controll
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import BotonesAccion from "../../../../../components/templates/BotonesAccion";
 import DatosPersonalesLaborales from "../../../../../components/templates/DatosPersonalesLaborales";
+import { useState } from "react";
+import CargaMasivaFA16 from "./CargaMasivaFA16/CargaMasivaFA16";
 
 const tabla = "certificado_aptitud_medico_ocupacional"
 const tabla2 = "resumen_medico_poderosa"
@@ -22,7 +24,7 @@ export default function FichaAptitudAnexo16() {
   const today = getToday();
 
   const { token, userlogued, selectedSede, datosFooter, userName, hora } = useSessionData();
-
+  const [modalCargaMasiva, setModalCargaMasiva] = useState(false);
   const initialFormState = {
     // Datos básicos
     norden: "",
@@ -212,6 +214,13 @@ export default function FichaAptitudAnexo16() {
           disabled
         />
       </SectionFieldset>
+      <button
+        type="button"
+        onClick={() => setModalCargaMasiva(true)}
+        className=" px-4 mx-auto mb-3 verde-btn py-2 rounded flex items-center justify-center gap-2"
+      >
+        <FontAwesomeIcon icon={faUpload} /> Carga Masiva
+      </button>
       <div className="space-y-3">
         {/* Información del paciente */}
         <DatosPersonalesLaborales form={form} />
@@ -468,6 +477,13 @@ export default function FichaAptitudAnexo16() {
           </button>
         </div>
       </div>
+      {modalCargaMasiva && <CargaMasivaFA16
+        onClose={() => setModalCargaMasiva(false)}
+        token={token}
+        userlogued={userlogued}
+        userName={userName}
+        tabla={tabla}
+        sede={selectedSede} />}
     </div>
   );
 }

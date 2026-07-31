@@ -49,8 +49,7 @@ export default function CargaMasivaAntecedentesDeAltura({
                 row.norden === resultado.norden
                     ? {
                         ...row,
-                        tipo: resultado.tipo,
-                        estado: resultado.ok ? "success" : "error",
+                        estado: resultado.omitido ? "omitido" : resultado.ok ? "success" : "error",
                         mensaje: resultado.mensaje,
                     }
                     : row
@@ -65,8 +64,8 @@ export default function CargaMasivaAntecedentesDeAltura({
         if (!puedeProcesar) return;
 
         const confirm = await Swal.fire({
-            title: "¿Procesar y guardar todos los registros?",
-            html: `Se buscará cada N° de Orden (se EDITARÁ con los datos nuevos si ya existía, o se CREARÁ si no) y se guardará como <b>APTO</b> con:<br/>Médico: <b>${medico.nombre_medico}</b><br/>Fecha: <b>${fecha}</b>`,
+            title: "¿Procesar y guardar los registros?",
+            html: `Solo se CREARÁN los N° de Orden que no tengan registro previo.<br/>Los que ya existan serán <b>omitidos</b>.<br/><br/>Médico: <b>${medico.nombre_medico}</b><br/>Fecha: <b>${fecha}</b>`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí, procesar",
@@ -101,14 +100,13 @@ export default function CargaMasivaAntecedentesDeAltura({
         setResultadosFinales(resultados);
 
         const okCount = resultados.filter((r) => r.ok).length;
-        const failCount = resultados.filter((r) => !r.ok).length;
-        const creados = resultados.filter((r) => r.ok && r.tipo === "CREADO").length;
-        const editados = resultados.filter((r) => r.ok && r.tipo === "EDITADO").length;
+        const omitidosCount = resultados.filter((r) => r.omitido).length;
+        const failCount = resultados.filter((r) => !r.ok && !r.omitido).length;
 
         Swal.fire({
             icon: failCount === 0 ? "success" : "warning",
             title: "Carga masiva finalizada",
-            html: `✅ Guardados correctamente: <b>${okCount}</b> (creados: ${creados}, editados: ${editados})<br/>⚠️ Con errores: <b>${failCount}</b>`,
+            html: `✅ Creados correctamente: <b>${okCount}</b><br/>⊘ Omitidos (ya tenían registro): <b>${omitidosCount}</b><br/>⚠️ Con errores: <b>${failCount}</b>`,
         });
     };
 
@@ -118,11 +116,13 @@ export default function CargaMasivaAntecedentesDeAltura({
 
     const totalOk = data.filter((r) => r.estado === "success").length;
     const totalError = data.filter((r) => r.estado === "error").length;
+    const totalOmitido = data.filter((r) => r.estado === "omitido").length;
     const totalPendiente = data.filter((r) => r.estado === "pendiente" || r.estado === "procesando").length;
 
     const rowColor = (estado) => {
         if (estado === "success") return "bg-green-50";
         if (estado === "error") return "bg-red-50";
+        if (estado === "omitido") return "bg-orange-50";
         if (estado === "procesando") return "bg-blue-50";
         return "";
     };
@@ -130,6 +130,7 @@ export default function CargaMasivaAntecedentesDeAltura({
     const estadoLabel = (estado) => {
         if (estado === "success") return "✔ Guardado";
         if (estado === "error") return "✖ Error";
+        if (estado === "omitido") return "⊘ Omitido";
         if (estado === "procesando") return "⏳ Procesando";
         return "— Pendiente";
     };
@@ -196,6 +197,10 @@ export default function CargaMasivaAntecedentesDeAltura({
                             <p className="text-sm text-green-700">Guardados</p>
                             <p className="text-xl font-bold text-green-800">{totalOk}</p>
                         </div>
+                        <div className="bg-orange-100 rounded px-4 py-2 shadow-sm">
+                            <p className="text-sm text-orange-700">Omitidos</p>
+                            <p className="text-xl font-bold text-orange-800">{totalOmitido}</p>
+                        </div>
                         <div className="bg-red-100 rounded px-4 py-2 shadow-sm">
                             <p className="text-sm text-red-700">Errores</p>
                             <p className="text-xl font-bold text-red-800">{totalError}</p>
@@ -213,7 +218,6 @@ export default function CargaMasivaAntecedentesDeAltura({
                             <thead>
                                 <tr>
                                     <th className="border px-4 py-2 bg-gray-100 whitespace-nowrap">N° ORDEN</th>
-                                    <th className="border px-4 py-2 bg-gray-100 whitespace-nowrap">TIPO</th>
                                     <th className="border px-4 py-2 bg-gray-100 whitespace-nowrap">ESTADO</th>
                                     <th className="border px-4 py-2 bg-gray-100">MENSAJE</th>
                                 </tr>
@@ -222,7 +226,6 @@ export default function CargaMasivaAntecedentesDeAltura({
                                 {data.map((row, i) => (
                                     <tr key={`${row.norden}-${i}`} className={rowColor(row.estado)}>
                                         <td className="border px-4 py-2 whitespace-nowrap">{row.norden}</td>
-                                        <td className="border px-4 py-2 whitespace-nowrap">{row.tipo || "—"}</td>
                                         <td className="border px-4 py-2 font-semibold whitespace-nowrap">
                                             {estadoLabel(row.estado)}
                                         </td>

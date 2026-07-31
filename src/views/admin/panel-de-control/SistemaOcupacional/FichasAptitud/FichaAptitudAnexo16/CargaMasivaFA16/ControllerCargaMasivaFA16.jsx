@@ -2,19 +2,15 @@ import * as XLSX from "xlsx";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import Swal from "sweetalert2";
-import { GetInfoPacDefault } from "../../../../../utils/functionUtils";
-import { SubmitData, getFetch } from "../../../../../utils/apiHelpers";
-import { convertirGenero } from "../../../../../utils/helpers";
-import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
-import {
-    GetInfoServicio,
-    construirBodyAnexo16A,
-} from "../Anexo16AController";
-import { getAnexo16AInitialFormState } from "../anexo16aFormDefaults";
+import { SubmitData, getFetch } from "../../../../../../utils/apiHelpers";
+import { getHoraActual } from "../../../../../../utils/helpers";
+import { GetInfoServicio } from "../controllerFichaAptitudAnexo16";
+import { getFA16InitialFormState } from "../FA16FormDefaults";
 
-const urlRegistroMasivo = "/api/v01/ct/anexos/anexo16a/registrarLote"
+const urlRegistroMasivo = "/api/v01/ct/anexos/fichaAnexo16/registrarActualizarMasivoFichaAnexo16";
+const tabla = "certificado_aptitud_medico_ocupacional";
 
-export const descargarPlantillaCargaMasivaAnexo16A = async () => {
+export const descargarPlantillaFA16 = async () => {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet("PLANTILLA");
 
@@ -32,7 +28,7 @@ export const descargarPlantillaCargaMasivaAnexo16A = async () => {
     sheet.columns = [{ width: 18 }];
 
     const buffer = await workbook.xlsx.writeBuffer();
-    saveAs(new Blob([buffer]), "Plantilla_CargaMasivaAnexo16A.xlsx");
+    saveAs(new Blob([buffer]), "Plantilla_CargaMasivaFichaAptitud16.xlsx");
 };
 
 const normalizarNorden = (valor) => {
@@ -40,7 +36,7 @@ const normalizarNorden = (valor) => {
     return String(valor).trim();
 };
 
-export const handleSubirExcelCargaMasivaAnexo16A = async (setData) => {
+export const handleSubirExcelFA16 = async (setData) => {
     const { value: file } = await Swal.fire({
         title: "Selecciona un archivo Excel",
         input: "file",
@@ -84,49 +80,50 @@ export const handleSubirExcelCargaMasivaAnexo16A = async (setData) => {
     reader.readAsBinaryString(file);
 };
 
-// Obtiene los datos del paciente para un norden (sin verificar existencia).
-// Usa GetInfoServicio para traer datos del triaje/paciente; si no hay, intenta GetInfoPacDefault.
-const obtenerDatosPacienteAnexo16A = (norden, { token, userlogued, userName, tabla, fecha, userDireccion, sede }) =>
-    new Promise((resolve) => {
-        let state = {
-            ...getAnexo16AInitialFormState({ today: fecha, userlogued, userName, userDireccion }),
-            norden,
-        };
-        const fakeSet = (updater) => {
-            state = typeof updater === "function" ? updater(state) : { ...state, ...updater };
-        };
+// await directo sobre GetInfoServicio: cuando resuelve, fakeSet ya corrió con los datos del reporte.
+const obtenerDatosPacienteFA16 = async (norden, { token, userlogued, userName, fecha }) => {
+    let state = {
+        ...getFA16InitialFormState({ today: fecha, userlogued, userName }),
+        norden,
+    };
+    const fakeSet = (updater) => {
+        state = typeof updater === "function" ? updater(state) : { ...state, ...updater };
+    };
 
-        const onFinish = async () => {
-            if (!state.dni && !state.nombres) {
-                const pac = await GetInfoPacDefault(norden, token, sede).catch(() => null);
-                if (pac) {
-                    state = {
-                        ...state,
-                        dni: pac.dni ?? "",
-                        nombres: pac.nombresApellidos ?? "",
-                        sexo: convertirGenero(pac.genero ?? ""),
-                        fechaNac: formatearFechaCorta(pac.fechaNac ?? ""),
-                        edad: pac.edad ?? "",
-                        actividadRealizar: pac.cargo ?? "",
-                        contrata: pac.contrata ?? "",
-                        empresa: pac.empresa ?? "",
-                    };
-                }
-            }
-            resolve(state);
-        };
+    await GetInfoServicio(norden, tabla, fakeSet, token);
 
-        GetInfoServicio(norden, tabla, fakeSet, token, onFinish);
-    });
+    return state;
+};
+
+// Arma el body de FA16 a partir del state, igual que SubmitDataService de controllerFichaAptitudAnexo16.
+const construirBodyFA16 = (state, userlogued, medicoNombre, medicoUsername) => ({
+    norden: state.norden,
+    dni: state.dni,
+    fecha: state.fechaValido,
+    nombreMedico: medicoNombre,
+    apto: state.apto === "APTO",
+    aptoRestriccion: state.apto === "APTO CON RESTRICCION",
+    noApto: state.apto === "NO APTO",
+    conObservacion: state.apto === "CON OBSERVACION",
+    evaluado: state.apto === "EVALUADO",
+    restriccionesDescripcion: state.restricciones,
+    horaSalida: getHoraActual(),
+    fechaHasta: state.fechaVencimiento,
+    recomendaciones: state.recomendaciones,
+    conclusiones: state.conclusiones,
+    usuarioRegistro: userlogued,
+    usuarioFirma: medicoUsername,
+});
 
 // Fase 1: verifica existencia de cada norden.
-//   - Si ya tiene registro (id=1) → se omite (no se sobreescribe).
-//   - Si no → obtiene datos del paciente y arma el body.
+//   - id=1 → ya tiene registro, se omite.
+//   - id=2 → requisito previo no cumplido, se omite con el mensaje del backend.
+//   - id=0 → nuevo, obtiene datos del paciente y arma el body.
 // Fase 2: envía todos los nuevos en un único lote al endpoint urlRegistroMasivo.
 // Parsea la respuesta { exitosos, fallidos, errores:[{motivo, registro:{norden}}] }.
-export const guardarCargaMasivaAnexo16A = async (
+export const guardarCargaMasivaFA16 = async (
     data,
-    { token, userlogued, userName, tabla, fecha, medicoNombre, medicoUsername, userDireccion, sede },
+    { token, userlogued, userName, fecha, medicoNombre, medicoUsername, sede },
     onProgress = () => { }
 ) => {
     const resultados = [];
@@ -157,8 +154,8 @@ export const guardarCargaMasivaAnexo16A = async (
                 continue;
             }
 
-            const state = await obtenerDatosPacienteAnexo16A(norden, {
-                token, userlogued, userName, tabla, fecha, userDireccion, sede,
+            const state = await obtenerDatosPacienteFA16(norden, {
+                token, userlogued, userName, fecha,
             });
 
             if (!state.dni && !state.nombres) {
@@ -168,12 +165,7 @@ export const guardarCargaMasivaAnexo16A = async (
                 continue;
             }
 
-            state.fechaExam = fecha;
-            state.nombre_medico = medicoNombre;
-            state.user_medicoFirma = medicoUsername;
-            state.apto = true;
-
-            const body = construirBodyAnexo16A(state, userlogued);
+            const body = construirBodyFA16(state, userlogued, medicoNombre, medicoUsername);
             lote.push({ norden, body });
 
         } catch (error) {
@@ -210,12 +202,11 @@ export const guardarCargaMasivaAnexo16A = async (
     return resultados;
 };
 
-export const exportarResultadosCargaMasivaAnexo16A = async (resultados) => {
+export const exportarResultadosFA16 = async (resultados) => {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet("RESULTADO");
 
-    const headers = ["N° ORDEN", "ESTADO", "MENSAJE"];
-    sheet.addRow(headers);
+    sheet.addRow(["N° ORDEN", "ESTADO", "MENSAJE"]);
     sheet.getRow(1).eachCell((cell) => {
         cell.font = { bold: true };
         cell.alignment = { horizontal: "center", vertical: "middle" };
@@ -231,5 +222,5 @@ export const exportarResultadosCargaMasivaAnexo16A = async (resultados) => {
 
     const buffer = await workbook.xlsx.writeBuffer();
     const fecha = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
-    saveAs(new Blob([buffer]), `Resultado_CargaMasivaAnexo16A_${fecha}.xlsx`);
+    saveAs(new Blob([buffer]), `Resultado_CargaMasivaFichaAptitud16_${fecha}.xlsx`);
 };

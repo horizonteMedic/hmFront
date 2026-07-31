@@ -34,7 +34,7 @@ export const GetIMC = async (event, triaje, set, s) => {
 }
 
 export const GetCintura = async (event, triaje, set, s) => {
-    if (!triaje.cintura || !triaje.imc) {
+    if (!triaje.cintura) {
         return
     }
     if (event.key === 'Enter') {
@@ -43,20 +43,23 @@ export const GetCintura = async (event, triaje, set, s) => {
             await Swal.fire('Error', 'No se permite este dato', 'error')
             return
         }
-        const imc = triaje.imc
-        if (imc < 18.5) {
-            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: BAJO DE PESO.' + "\n" }))
-        } else if (imc >= 18.5 && imc < 25) {
-            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: NORMAL.' + "\n" }))
-        } else if (imc >= 25 && imc < 30) {
-            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: SOBREPESO.' + "\n" }))
-        } else if (imc >= 30 && imc < 35) {
-            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: OBESIDAD I.' + "\n" }))
-        } else if (imc >= 35 && imc < 40) {
-            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: OBESIDAD II.' + "\n" }))
-        } else if (imc >= 40) {
-            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: OBESIDAD III.' + "\n" }))
+        if (triaje.imc) {
+            const imc = triaje.imc
+            if (imc < 18.5) {
+                set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: BAJO DE PESO.' + "\n" }))
+            } else if (imc >= 18.5 && imc < 25) {
+                set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: NORMAL.' + "\n" }))
+            } else if (imc >= 25 && imc < 30) {
+                set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: SOBREPESO.' + "\n" }))
+            } else if (imc >= 30 && imc < 35) {
+                set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: OBESIDAD I.' + "\n" }))
+            } else if (imc >= 35 && imc < 40) {
+                set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: OBESIDAD II.' + "\n" }))
+            } else if (imc >= 40) {
+                set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- INDICE DE MASA CORPORAL: OBESIDAD III.' + "\n" }))
+            }
         }
+
         document.getElementById('cadera')?.focus();
     }
 }

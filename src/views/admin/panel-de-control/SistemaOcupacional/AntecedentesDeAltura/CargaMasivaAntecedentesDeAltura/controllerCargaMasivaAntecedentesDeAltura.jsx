@@ -2,10 +2,8 @@ import * as XLSX from "xlsx";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import Swal from "sweetalert2";
-import { existeRegistro } from "../../../../../utils/functionUtils";
-import { SubmitData } from "../../../../../utils/apiHelpers";
+import { SubmitData, getFetch } from "../../../../../utils/apiHelpers";
 import {
-    GetInfoServicio,
     GetInfoPac,
     construirBodyAntecedentesDeAltura,
     registrarUrl,
@@ -82,16 +80,11 @@ export const handleSubirExcelCargaMasivaAntecedentesDeAltura = async (setData) =
     reader.readAsBinaryString(file);
 };
 
-// Reutiliza el mismo análisis de datos que usa el formulario individual de
-// Antecedentes de Altura, sin depender de React ni de useState.
-// Si ya existe un registro previo -> se EDITA con GetInfoServicio (trae los
-// antecedentes ya guardados). Si no existe -> se CREA a partir de los datos
-// básicos del paciente (GetInfoPac), igual que hace la búsqueda individual.
-// Devuelve también "tipo" (CREADO / EDITADO) para diferenciarlos en la tabla
-// y en el reporte final.
-const procesarNordenAntecedentesDeAltura = (
+// Obtiene los datos básicos del paciente para un norden nuevo (sin registro previo),
+// reutilizando el mismo análisis que usa el formulario individual (GetInfoPac).
+const obtenerDatosPacienteAntecedentesDeAltura = (
     norden,
-    { token, userlogued, userName, tabla, fecha, userDNI, userCMP, userEmail, userDireccion, sede }
+    { token, userDNI, userCMP, userEmail, userDireccion, userName, userlogued, fecha, sede }
 ) =>
     new Promise((resolve) => {
         let state = {
@@ -110,20 +103,13 @@ const procesarNordenAntecedentesDeAltura = (
             state = typeof updater === "function" ? updater(state) : { ...state, ...updater };
         };
 
-        existeRegistro(norden, tabla, token).then((existe) => {
-            const tipo = existe ? "EDITADO" : "CREADO";
-            const onFinish = () => resolve({ state, tipo });
-            if (existe) {
-                GetInfoServicio(norden, tabla, fakeSet, token, onFinish);
-            } else {
-                GetInfoPac(norden, fakeSet, token, sede).then(onFinish);
-            }
-        });
+        GetInfoPac(norden, fakeSet, token, sede).then(() => resolve(state));
     });
 
-// Procesa la lista de N° de Orden uno por uno: busca y analiza la info del paciente
-// (diferenciando si ya tenía registro -> se EDITA con los datos nuevos, o si no -> se CREA),
-// asigna la firma y fecha elegidas para todos, y guarda el registro como APTO.
+// Procesa la lista de N° de Orden uno por uno:
+//   - Si ya tiene registro (id=1) -> se omite (no se sobreescribe).
+//   - Si no -> obtiene los datos básicos del paciente (GetInfoPac), asigna la
+//     firma y fecha elegidas para todos, y crea el registro como APTO.
 export const guardarCargaMasivaAntecedentesDeAltura = async (
     data,
     { token, userlogued, userName, tabla, fecha, medicoNombre, medicoUsername, userDNI, userCMP, userEmail, userDireccion, sede },
@@ -134,23 +120,25 @@ export const guardarCargaMasivaAntecedentesDeAltura = async (
     for (const row of data) {
         const norden = row.norden;
         try {
-            const { state, tipo } = await procesarNordenAntecedentesDeAltura(norden, {
-                token,
-                userlogued,
-                userName,
-                tabla,
-                fecha,
-                userDNI,
-                userCMP,
-                userEmail,
-                userDireccion,
-                sede,
+            const existencia = await getFetch(
+                `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${norden}&nomService=${tabla}`,
+                token
+            );
+
+            if ((existencia?.id ?? 0) === 1) {
+                const resultado = { norden, ok: false, omitido: true, mensaje: "Ya tiene registro, se omitió" };
+                resultados.push(resultado);
+                onProgress(resultado);
+                continue;
+            }
+
+            const state = await obtenerDatosPacienteAntecedentesDeAltura(norden, {
+                token, userDNI, userCMP, userEmail, userDireccion, userName, userlogued, fecha, sede,
             });
 
             if (!state.dni && !state.nombres) {
                 const resultado = {
                     norden,
-                    tipo,
                     ok: false,
                     mensaje: "No se encontró información para este N° de Orden",
                 };
@@ -170,17 +158,14 @@ export const guardarCargaMasivaAntecedentesDeAltura = async (
             const ok = res?.id === 1 || !!res?.nOrden || res?.codigo == "201";
             const resultado = {
                 norden,
-                tipo,
                 ok,
-                mensaje: ok
-                    ? (tipo === "EDITADO" ? "Editado y guardado como apto" : "Creado y guardado como apto")
-                    : (res?.mensaje || "Error al registrar"),
+                mensaje: ok ? "Creado y guardado como apto" : (res?.mensaje || "Error al registrar"),
             };
             resultados.push(resultado);
             onProgress(resultado);
         } catch (error) {
             console.error(`Error al procesar N° Orden ${norden}:`, error);
-            const resultado = { norden, tipo: "", ok: false, mensaje: "Error interno al procesar" };
+            const resultado = { norden, ok: false, mensaje: "Error interno al procesar" };
             resultados.push(resultado);
             onProgress(resultado);
         }
@@ -195,7 +180,7 @@ export const exportarResultadosCargaMasivaAntecedentesDeAltura = async (resultad
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet("RESULTADO");
 
-    const headers = ["N° ORDEN", "TIPO", "ESTADO", "MENSAJE"];
+    const headers = ["N° ORDEN", "ESTADO", "MENSAJE"];
     sheet.addRow(headers);
     sheet.getRow(1).eachCell((cell) => {
         cell.font = { bold: true };
@@ -204,15 +189,11 @@ export const exportarResultadosCargaMasivaAntecedentesDeAltura = async (resultad
     });
 
     resultados.forEach((r) => {
-        sheet.addRow([
-            r.norden,
-            r.tipo || "",
-            r.ok ? "OK" : "ERROR",
-            r.mensaje || "",
-        ]);
+        const estado = r.omitido ? "OMITIDO" : r.ok ? "OK" : "ERROR";
+        sheet.addRow([r.norden, estado, r.mensaje || ""]);
     });
 
-    sheet.columns = [{ width: 14 }, { width: 12 }, { width: 10 }, { width: 60 }];
+    sheet.columns = [{ width: 14 }, { width: 12 }, { width: 60 }];
 
     const buffer = await workbook.xlsx.writeBuffer();
     const fecha = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");

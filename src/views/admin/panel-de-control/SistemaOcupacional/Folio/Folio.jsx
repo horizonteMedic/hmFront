@@ -9,8 +9,9 @@ import { DeleteArchivoFolio, GetArchivosFolioStatus, GetInfoPac, nombresExamen, 
 import Swal from "sweetalert2";
 import { buildExamenesList } from "./folioCatalogo";
 import EmpleadoComboBox from "../../../../components/reusableComponents/EmpleadoComboBox";
-import { faDownload, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faDownload, faTrash, faUpload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import CargaMasivaFolio from "./CargaMasivaFolio/CargaMasivaFolio";
 
 const ExamenesListPRUEBAS = buildExamenesList([
     "OFTALMOLOGIA",
@@ -325,6 +326,7 @@ const Folio = () => {
     const [archivosFolio, setArchivosFolio] = useState([]);
     const [visualerOpen, setVisualerOpen] = useState(null);
     const [deletingFolioNomenclatura, setDeletingFolioNomenclatura] = useState(null);
+    const [modalCargaMasiva, setModalCargaMasiva] = useState(false);
     const initialFormState = {
         norden: "",
         codigoInforme: null,
@@ -892,6 +894,15 @@ const Folio = () => {
 
     return (
         <div className="w-full space-y-3 px-4">
+            <div className="flex justify-end">
+                <button
+                    type="button"
+                    onClick={() => setModalCargaMasiva(true)}
+                    className="verde-btn px-4 py-2 rounded flex items-center gap-2"
+                >
+                    <FontAwesomeIcon icon={faUpload} /> Carga Masiva
+                </button>
+            </div>
             {/* ===== SECCIÓN: DATOS NECESARIOS ===== */}
             <SectionFieldset legend="Información del Examen" className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 <InputTextOneLine
@@ -1368,6 +1379,15 @@ const Folio = () => {
                         </div>
                     </div>
                 </div>
+            )}
+            {modalCargaMasiva && (
+                <CargaMasivaFolio
+                    onClose={() => setModalCargaMasiva(false)}
+                    token={token}
+                    userlogued={userlogued}
+                    selectedSede={selectedSede}
+                    datosFooter={datosFooter}
+                />
             )}
         </div >
     );

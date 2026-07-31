@@ -2,16 +2,16 @@ import { useState } from "react";
 import Swal from "sweetalert2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileExcel, faTimes, faUpload } from "@fortawesome/free-solid-svg-icons";
-import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
-import { getToday } from "../../../../../utils/helpers";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
+import { getDatePlus364Days, getToday } from "../../../../../../utils/helpers";
 import {
-    descargarPlantillaCargaMasivaAnexo16A,
-    exportarResultadosCargaMasivaAnexo16A,
-    guardarCargaMasivaAnexo16A,
-    handleSubirExcelCargaMasivaAnexo16A,
-} from "./controllerCargaMasivaAnexo16A";
+    descargarPlantillaFA16,
+    exportarResultadosFA16,
+    guardarCargaMasivaFA16,
+    handleSubirExcelFA16,
+} from "./ControllerCargaMasivaFA16";
 
-export default function CargaMasivaAnexo16A({ onClose, token, userlogued, userName, userDireccion, tabla, sede }) {
+export default function CargaMasivaFA16({ onClose, token, userlogued, userName, userDireccion, sede }) {
     const [data, setData] = useState([]);
     const [medico, setMedico] = useState({ nombre_medico: "", user_medicoFirma: "" });
     const [fecha, setFecha] = useState(getToday());
@@ -25,11 +25,11 @@ export default function CargaMasivaAnexo16A({ onClose, token, userlogued, userNa
 
     const handleSubir = () => {
         setResultadosFinales([]);
-        handleSubirExcelCargaMasivaAnexo16A(setData);
+        handleSubirExcelFA16(setData);
     };
 
     const handleDescargar = () => {
-        descargarPlantillaCargaMasivaAnexo16A();
+        descargarPlantillaFA16();
     };
 
     const actualizarFila = (resultado) => {
@@ -66,14 +66,12 @@ export default function CargaMasivaAnexo16A({ onClose, token, userlogued, userNa
         setResultadosFinales([]);
         setData((prev) => prev.map((row) => ({ ...row, estado: "procesando", mensaje: "" })));
 
-        const resultados = await guardarCargaMasivaAnexo16A(
+        const resultados = await guardarCargaMasivaFA16(
             data,
             {
                 token,
                 userlogued,
                 userName,
-                userDireccion,
-                tabla,
                 fecha,
                 medicoNombre: medico.nombre_medico,
                 medicoUsername: medico.user_medicoFirma,
@@ -92,12 +90,12 @@ export default function CargaMasivaAnexo16A({ onClose, token, userlogued, userNa
         Swal.fire({
             icon: failCount === 0 ? "success" : "warning",
             title: "Carga masiva finalizada",
-            html: `✅ Creados correctamente: <b>${okCount}</b><br/>⊘ Omitidos (ya tenían registro): <b>${omitidosCount}</b><br/>⚠️ Con errores: <b>${failCount}</b>`,
+            html: `✅ Creados correctamente: <b>${okCount}</b><br/>⊘ Omitidos (ya tenían registro o falta examen): <b>${omitidosCount}</b><br/>⚠️ Con errores: <b>${failCount}</b>`,
         });
     };
 
     const handleExportar = () => {
-        exportarResultadosCargaMasivaAnexo16A(resultadosFinales);
+        exportarResultadosFA16(resultadosFinales);
     };
 
     const totalOk = data.filter((r) => r.estado === "success").length;
@@ -125,7 +123,7 @@ export default function CargaMasivaAnexo16A({ onClose, token, userlogued, userNa
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg w-auto max-w-[80%] max-h-[90vh] flex flex-col p-6 gap-4">
                 <div className="flex justify-between items-center">
-                    <h2 className="text-blue-600 text-xl font-semibold">Carga Masiva — Anexo 16A</h2>
+                    <h2 className="text-blue-600 text-xl font-semibold">Carga Masiva — Ficha Aptitud Anexo 16</h2>
                     <FontAwesomeIcon
                         icon={faTimes}
                         className="cursor-pointer text-black"
@@ -143,7 +141,7 @@ export default function CargaMasivaAnexo16A({ onClose, token, userlogued, userNa
                         disabled={procesando}
                     />
                     <div>
-                        <label className="block font-semibold mb-1">Fecha para todos :</label>
+                        <label className="block font-semibold mb-1">Fecha de validez para todos :</label>
                         <input
                             type="date"
                             value={fecha}

@@ -1,35 +1,31 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Swal from "sweetalert2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileExcel, faTimes, faUpload } from "@fortawesome/free-solid-svg-icons";
-import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
-import { getToday } from "../../../../../utils/helpers";
+import { ListaPorPlantilla } from "../Folio";
 import {
-    descargarPlantillaCargaMasivaAnexo16A,
-    exportarResultadosCargaMasivaAnexo16A,
-    guardarCargaMasivaAnexo16A,
-    handleSubirExcelCargaMasivaAnexo16A,
-} from "./controllerCargaMasivaAnexo16A";
+    descargarPlantillaCargaMasivaFolio,
+    exportarResultadosCargaMasivaFolio,
+    handleSubirExcelCargaMasivaFolio,
+    procesarCargaMasivaFolio,
+} from "./controllerCargaMasivaFolio";
 
-export default function CargaMasivaAnexo16A({ onClose, token, userlogued, userName, userDireccion, tabla, sede }) {
+export default function CargaMasivaFolio({ onClose, token, userlogued, selectedSede, datosFooter }) {
+    const abortControllerRef = useRef(null);
     const [data, setData] = useState([]);
-    const [medico, setMedico] = useState({ nombre_medico: "", user_medicoFirma: "" });
-    const [fecha, setFecha] = useState(getToday());
+    const [selectedListType, setSelectedListType] = useState("COMPLETO");
+    const [sobrescribir, setSobrescribir] = useState(false);
     const [procesando, setProcesando] = useState(false);
     const [resultadosFinales, setResultadosFinales] = useState([]);
-
-    const handleChangeMedico = (e) => {
-        const { name, value } = e.target;
-        setMedico((prev) => ({ ...prev, [name]: value }));
-    };
+    const [progresoLote, setProgresoLote] = useState(null);
 
     const handleSubir = () => {
         setResultadosFinales([]);
-        handleSubirExcelCargaMasivaAnexo16A(setData);
+        handleSubirExcelCargaMasivaFolio(setData);
     };
 
     const handleDescargar = () => {
-        descargarPlantillaCargaMasivaAnexo16A();
+        descargarPlantillaCargaMasivaFolio();
     };
 
     const actualizarFila = (resultado) => {
@@ -39,6 +35,7 @@ export default function CargaMasivaAnexo16A({ onClose, token, userlogued, userNa
                     ? {
                         ...row,
                         estado: resultado.omitido ? "omitido" : resultado.ok ? "success" : "error",
+                        nomenclatura: resultado.nomenclatura || "",
                         mensaje: resultado.mensaje,
                     }
                     : row
@@ -46,43 +43,52 @@ export default function CargaMasivaAnexo16A({ onClose, token, userlogued, userNa
         );
     };
 
-    const puedeProcesar =
-        data.length > 0 && !!medico.user_medicoFirma && !!fecha && !procesando;
+    const puedeProcesar = data.length > 0 && !procesando;
 
     const handleProcesar = async () => {
         if (!puedeProcesar) return;
 
         const confirm = await Swal.fire({
-            title: "¿Procesar y guardar los registros?",
-            html: `Solo se CREARÁN los N° de Orden que no tengan registro previo.<br/>Los que ya existan serán <b>omitidos</b>.<br/><br/>Médico: <b>${medico.nombre_medico}</b><br/>Fecha: <b>${fecha}</b>`,
+            title: "¿Generar y subir los folios?",
+            html: `Se generarán <b>${data.length}</b> folio(s) con la plantilla <b>${selectedListType}</b>.<br/>${sobrescribir
+                ? "Se sobrescribirán los que ya existan."
+                : "Los N° de Orden que ya tengan un folio subido con la misma nomenclatura serán <b>omitidos</b>."
+                }`,
             icon: "warning",
             showCancelButton: true,
-            confirmButtonText: "Sí, procesar",
+            confirmButtonText: "Sí, generar",
             cancelButtonText: "Cancelar",
         });
         if (!confirm.isConfirmed) return;
 
+        if (abortControllerRef.current) abortControllerRef.current.abort();
+        const controller = new AbortController();
+        abortControllerRef.current = controller;
+
         setProcesando(true);
         setResultadosFinales([]);
+        setProgresoLote(null);
         setData((prev) => prev.map((row) => ({ ...row, estado: "procesando", mensaje: "" })));
 
-        const resultados = await guardarCargaMasivaAnexo16A(
+        const resultados = await procesarCargaMasivaFolio(
             data,
             {
                 token,
                 userlogued,
-                userName,
-                userDireccion,
-                tabla,
-                fecha,
-                medicoNombre: medico.nombre_medico,
-                medicoUsername: medico.user_medicoFirma,
-                sede,
+                selectedSede,
+                datosFooter,
+                selectedListType,
+                comprimidoz: true,
+                urlType: "azure",
+                sobrescribir,
+                signal: controller.signal,
             },
-            actualizarFila
+            actualizarFila,
+            setProgresoLote
         );
 
         setProcesando(false);
+        setProgresoLote(null);
         setResultadosFinales(resultados);
 
         const okCount = resultados.filter((r) => r.ok).length;
@@ -92,12 +98,16 @@ export default function CargaMasivaAnexo16A({ onClose, token, userlogued, userNa
         Swal.fire({
             icon: failCount === 0 ? "success" : "warning",
             title: "Carga masiva finalizada",
-            html: `✅ Creados correctamente: <b>${okCount}</b><br/>⊘ Omitidos (ya tenían registro): <b>${omitidosCount}</b><br/>⚠️ Con errores: <b>${failCount}</b>`,
+            html: `✅ Generados y subidos: <b>${okCount}</b><br/>⊘ Omitidos: <b>${omitidosCount}</b><br/>⚠️ Con errores: <b>${failCount}</b>`,
         });
     };
 
+    const handleCancelar = () => {
+        if (abortControllerRef.current) abortControllerRef.current.abort();
+    };
+
     const handleExportar = () => {
-        exportarResultadosCargaMasivaAnexo16A(resultadosFinales);
+        exportarResultadosCargaMasivaFolio(resultadosFinales);
     };
 
     const totalOk = data.filter((r) => r.estado === "success").length;
@@ -114,7 +124,7 @@ export default function CargaMasivaAnexo16A({ onClose, token, userlogued, userNa
     };
 
     const estadoLabel = (estado) => {
-        if (estado === "success") return "✔ Guardado";
+        if (estado === "success") return "✔ Generado";
         if (estado === "error") return "✖ Error";
         if (estado === "omitido") return "⊘ Omitido";
         if (estado === "procesando") return "⏳ Procesando";
@@ -123,9 +133,9 @@ export default function CargaMasivaAnexo16A({ onClose, token, userlogued, userNa
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg w-auto max-w-[80%] max-h-[90vh] flex flex-col p-6 gap-4">
+            <div className="bg-white rounded-lg w-auto max-w-[85%] max-h-[90vh] flex flex-col p-6 gap-4">
                 <div className="flex justify-between items-center">
-                    <h2 className="text-blue-600 text-xl font-semibold">Carga Masiva — Anexo 16A</h2>
+                    <h2 className="text-blue-600 text-xl font-semibold">Carga Masiva — Folio</h2>
                     <FontAwesomeIcon
                         icon={faTimes}
                         className="cursor-pointer text-black"
@@ -135,22 +145,30 @@ export default function CargaMasivaAnexo16A({ onClose, token, userlogued, userNa
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4 border border-gray-200 rounded p-3">
-                    <EmpleadoComboBox
-                        value={medico.nombre_medico}
-                        form={medico}
-                        onChange={handleChangeMedico}
-                        label="Firma para todos los registros"
-                        disabled={procesando}
-                    />
                     <div>
-                        <label className="block font-semibold mb-1">Fecha para todos :</label>
-                        <input
-                            type="date"
-                            value={fecha}
-                            disabled={procesando}
-                            onChange={(e) => setFecha(e.target.value)}
+                        <label className="block font-semibold mb-1">Plantilla Protocolo:</label>
+                        <select
                             className="border rounded px-2 py-1 w-full"
-                        />
+                            value={selectedListType}
+                            disabled={procesando}
+                            onChange={(e) => setSelectedListType(e.target.value)}
+                        >
+                            {Object.keys(ListaPorPlantilla).map((elemento) => (
+                                <option value={elemento} key={elemento}>{elemento}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="flex items-end">
+                        <label className="flex items-center gap-2 cursor-pointer select-none">
+                            <input
+                                type="checkbox"
+                                checked={sobrescribir}
+                                disabled={procesando}
+                                onChange={(e) => setSobrescribir(e.target.checked)}
+                                className="w-4 h-4"
+                            />
+                            <span className="text-sm font-medium text-gray-700">Sobrescribir si ya existe</span>
+                        </label>
                     </div>
                 </div>
 
@@ -180,7 +198,7 @@ export default function CargaMasivaAnexo16A({ onClose, token, userlogued, userNa
                             <p className="text-xl font-bold">{data.length}</p>
                         </div>
                         <div className="bg-green-100 rounded px-4 py-2 shadow-sm">
-                            <p className="text-sm text-green-700">Guardados</p>
+                            <p className="text-sm text-green-700">Generados</p>
                             <p className="text-xl font-bold text-green-800">{totalOk}</p>
                         </div>
                         <div className="bg-orange-100 rounded px-4 py-2 shadow-sm">
@@ -198,6 +216,37 @@ export default function CargaMasivaAnexo16A({ onClose, token, userlogued, userNa
                     </div>
                 )}
 
+                {procesando && progresoLote && (
+                    <div className="border border-gray-200 rounded p-3 flex flex-col gap-3 bg-gray-50">
+                        <div>
+                            <div className="flex justify-between text-xs text-gray-600 mb-1">
+                                <span>
+                                    Procesando N° Orden <b>{progresoLote.norden}</b> ({progresoLote.index + 1} de {progresoLote.totalNordenes})
+                                </span>
+                                <span>{Math.round(((progresoLote.index) / progresoLote.totalNordenes) * 100)}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-3">
+                                <div
+                                    className="bg-blue-600 h-3 rounded-full transition-all duration-200"
+                                    style={{ width: `${Math.round((progresoLote.index / progresoLote.totalNordenes) * 100)}%` }}
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <div className="flex justify-between text-xs text-gray-600 mb-1">
+                                <span>{progresoLote.reportName || "Preparando..."}</span>
+                                <span>{progresoLote.total ? `${progresoLote.current} / ${progresoLote.total}` : ""}</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-3">
+                                <div
+                                    className="bg-purple-500 h-3 rounded-full transition-all duration-200"
+                                    style={{ width: `${progresoLote.percentage || 0}%` }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {data.length > 0 && (
                     <div className="overflow-auto flex-1">
                         <table className="min-w-full border border-gray-300 text-sm">
@@ -205,6 +254,7 @@ export default function CargaMasivaAnexo16A({ onClose, token, userlogued, userNa
                                 <tr>
                                     <th className="border px-4 py-2 bg-gray-100 whitespace-nowrap">N° ORDEN</th>
                                     <th className="border px-4 py-2 bg-gray-100 whitespace-nowrap">ESTADO</th>
+                                    <th className="border px-4 py-2 bg-gray-100 whitespace-nowrap">NOMENCLATURA</th>
                                     <th className="border px-4 py-2 bg-gray-100">MENSAJE</th>
                                 </tr>
                             </thead>
@@ -215,6 +265,7 @@ export default function CargaMasivaAnexo16A({ onClose, token, userlogued, userNa
                                         <td className="border px-4 py-2 font-semibold whitespace-nowrap">
                                             {estadoLabel(row.estado)}
                                         </td>
+                                        <td className="border px-4 py-2 whitespace-nowrap">{row.nomenclatura}</td>
                                         <td className="border px-4 py-2">{row.mensaje}</td>
                                     </tr>
                                 ))}
@@ -233,13 +284,20 @@ export default function CargaMasivaAnexo16A({ onClose, token, userlogued, userNa
                                 Exportar Resultado <FontAwesomeIcon icon={faFileExcel} />
                             </button>
                         )}
+                        {procesando && (
+                            <button
+                                onClick={handleCancelar}
+                                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+                            >
+                                Cancelar
+                            </button>
+                        )}
                         <button
                             onClick={handleProcesar}
                             disabled={!puedeProcesar}
                             className={`px-4 py-2 rounded ${!puedeProcesar ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "verde-btn"}`}
-                            title={!medico.user_medicoFirma ? "Debe seleccionar un médico" : ""}
                         >
-                            {procesando ? "Procesando..." : "Procesar y Guardar Todos (Aptos)"}
+                            {procesando ? "Procesando..." : "Generar y Subir Todos"}
                         </button>
                     </div>
                 )}
