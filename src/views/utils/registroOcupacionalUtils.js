@@ -17,7 +17,7 @@ const sedeNordenUrl = "/api/v01/st/registros/sede";
 /**
  * Consulta la sede dueña de un N° Orden y la compara con la sede actual.
  *
- * Devuelve:
+ * Devuelve `{ estado, descripcionSede }`, donde `estado` es uno de:
  *  - "ok"           el N° Orden existe y pertenece a `sede`.
  *  - "otraSede"      el N° Orden existe pero pertenece a otra sede.
  *  - "noEncontrado"  el backend no encontró el N° Orden (404).
@@ -26,12 +26,13 @@ const sedeNordenUrl = "/api/v01/st/registros/sede";
 export const validarSede = async (nro, sede, token) => {
   const res = await getFetch(`${sedeNordenUrl}/${nro}`, token);
   if (res && !res.error) {
-    return res.codigoSucursal === sede ? "ok" : "otraSede";
+    const estado = res.codigoSucursal === sede ? "ok" : "otraSede";
+    return { estado, descripcionSede: res.descripcion };
   }
   if (res && res.status === 404) {
-    return "noEncontrado";
+    return { estado: "noEncontrado" };
   }
-  return "error";
+  return { estado: "error" };
 };
 
 /**
@@ -170,12 +171,12 @@ export const verificarRegistro = async ({
 
   // Validar que la Orden pertenezca a la sede actual antes de cargar nada (nuevo o existente).
   if (sede) {
-    const estadoSede = await validarSede(nro, sede, token);
+    const { estado: estadoSede, descripcionSede } = await validarSede(nro, sede, token);
     if (estadoSede === "otraSede") {
       Swal.fire({
         icon: "warning",
         title: '<i class="fa-solid fa-location-dot"></i>Sede incorrecta',
-        html: `El N° Orden ${nro} pertenece a otra sede.`,
+        html: `El N° Orden ${nro} pertenece a la sede: ${descripcionSede ? ` ${descripcionSede}` : ""}.`,
       });
       return;
     }
@@ -233,12 +234,12 @@ export const imprimirReporteJasper = ({
     .then(async (res) => {
       // Validar que la Orden pertenezca a la sede actual (solo en impresión manual).
       if (sede) {
-        const estadoSede = await validarSede(nro, sede, token);
+        const { estado: estadoSede, descripcionSede } = await validarSede(nro, sede, token);
         if (estadoSede === "otraSede") {
           Swal.fire({
             icon: "warning",
             title: '<i class="fa-solid fa-location-dot"></i>Sede incorrecta',
-            html: `El N° Orden ${nro} pertenece a otra sede.`,
+            html: `El N° Orden ${nro} pertenece a otra sede${descripcionSede ? ` (${descripcionSede})` : ""}.`,
           });
           return;
         }

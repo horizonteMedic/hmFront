@@ -200,7 +200,7 @@ const CertificadoAptitudBrigadista = () => {
                     type="date"
                     value={form.fechaExam}
                     onChange={handleChangeSimple}
-                    disabled={form.tieneRegistro}
+                    disabled={camposDeshabilitados}
                     labelWidth="120px"
                     edited={isFieldEdited("fechaExam")}
                     onRevert={() => revertField("fechaExam")}
