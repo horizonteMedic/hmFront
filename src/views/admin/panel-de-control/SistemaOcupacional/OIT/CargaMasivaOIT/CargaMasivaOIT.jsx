@@ -5,21 +5,18 @@ import { faFileExcel, faTimes, faUpload } from "@fortawesome/free-solid-svg-icon
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
 import { getToday } from "../../../../../utils/helpers";
 import {
-    descargarPlantillaCargaMasivaAntecedentesDeAltura,
-    exportarResultadosCargaMasivaAntecedentesDeAltura,
-    guardarCargaMasivaAntecedentesDeAltura,
-    handleSubirExcelCargaMasivaAntecedentesDeAltura,
-} from "./controllerCargaMasivaAntecedentesDeAltura";
+    descargarPlantillaCargaMasivaOIT,
+    exportarResultadosCargaMasivaOIT,
+    guardarCargaMasivaOIT,
+    handleSubirExcelCargaMasivaOIT,
+} from "./controllerCargaMasivaOIT";
 
-export default function CargaMasivaAntecedentesDeAltura({
+export default function CargaMasivaOIT({
     onClose,
     token,
     userlogued,
     userName,
     userDNI,
-    userCMP,
-    userEmail,
-    userDireccion,
     tabla,
     sede,
 }) {
@@ -37,11 +34,11 @@ export default function CargaMasivaAntecedentesDeAltura({
 
     const handleSubir = () => {
         setResultadosFinales([]);
-        handleSubirExcelCargaMasivaAntecedentesDeAltura(setData);
+        handleSubirExcelCargaMasivaOIT(setData);
     };
 
     const handleDescargar = () => {
-        descargarPlantillaCargaMasivaAntecedentesDeAltura();
+        descargarPlantillaCargaMasivaOIT();
     };
 
     const actualizarFila = (resultado) => {
@@ -52,6 +49,8 @@ export default function CargaMasivaAntecedentesDeAltura({
                         ...row,
                         estado: resultado.omitido ? "omitido" : resultado.ok ? "success" : "error",
                         mensaje: resultado.mensaje,
+                        comentario: resultado.comentario,
+                        comentarioDiferente: resultado.comentarioDiferente,
                     }
                     : row
             )
@@ -69,7 +68,7 @@ export default function CargaMasivaAntecedentesDeAltura({
             html: `${reemplazar
                     ? "Se CREARÁN los N° de Orden nuevos y se <b>REEMPLAZARÁN</b> los que ya tengan registro."
                     : "Solo se CREARÁN los N° de Orden que no tengan registro previo.<br/>Los que ya existan serán <b>omitidos</b>."
-                }<br/><br/>Médico: <b>${medico.nombre_medico}</b><br/>Fecha: <b>${fecha}</b>`,
+                }<br/>Los pacientes que aún necesiten pasar por Rayos X Tórax serán omitidos.<br/><br/>Médico: <b>${medico.nombre_medico}</b><br/>Fecha: <b>${fecha}</b>`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí, procesar",
@@ -81,16 +80,13 @@ export default function CargaMasivaAntecedentesDeAltura({
         setResultadosFinales([]);
         setData((prev) => prev.map((row) => ({ ...row, estado: "procesando", mensaje: "" })));
 
-        const resultados = await guardarCargaMasivaAntecedentesDeAltura(
+        const resultados = await guardarCargaMasivaOIT(
             data,
             {
                 token,
                 userlogued,
                 userName,
                 userDNI,
-                userCMP,
-                userEmail,
-                userDireccion,
                 tabla,
                 fecha,
                 medicoNombre: medico.nombre_medico,
@@ -107,22 +103,26 @@ export default function CargaMasivaAntecedentesDeAltura({
         const okCount = resultados.filter((r) => r.ok).length;
         const omitidosCount = resultados.filter((r) => r.omitido).length;
         const failCount = resultados.filter((r) => !r.ok && !r.omitido).length;
+        const comentarioDiferenteCount = resultados.filter((r) => r.ok && r.comentarioDiferente).length;
 
         Swal.fire({
             icon: failCount === 0 ? "success" : "warning",
             title: "Carga masiva finalizada",
-            html: `✅ Creados correctamente: <b>${okCount}</b><br/>⊘ Omitidos (ya tenían registro): <b>${omitidosCount}</b><br/>⚠️ Con errores: <b>${failCount}</b>`,
+            html: `✅ Registrados correctamente: <b>${okCount}</b><br/>⊘ Omitidos: <b>${omitidosCount}</b><br/>⚠️ Con errores: <b>${failCount}</b><br/>📝 Con dictado distinto a "NORMAL": <b>${comentarioDiferenteCount}</b>`,
         });
     };
 
     const handleExportar = () => {
-        exportarResultadosCargaMasivaAntecedentesDeAltura(resultadosFinales);
+        exportarResultadosCargaMasivaOIT(resultadosFinales);
     };
 
     const totalOk = data.filter((r) => r.estado === "success").length;
     const totalError = data.filter((r) => r.estado === "error").length;
     const totalOmitido = data.filter((r) => r.estado === "omitido").length;
     const totalPendiente = data.filter((r) => r.estado === "pendiente" || r.estado === "procesando").length;
+    const totalComentarioDiferente = data.filter(
+        (r) => r.estado === "success" && r.comentarioDiferente
+    ).length;
 
     const rowColor = (estado) => {
         if (estado === "success") return "bg-green-50";
@@ -142,9 +142,9 @@ export default function CargaMasivaAntecedentesDeAltura({
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg w-auto max-w-[80%] max-h-[90vh] flex flex-col p-6 gap-4">
+            <div className="bg-white rounded-lg w-auto max-w-[85%] max-h-[90vh] flex flex-col p-6 gap-4">
                 <div className="flex justify-between items-center">
-                    <h2 className="text-blue-600 text-xl font-semibold">Carga Masiva — Antecedentes de Altura</h2>
+                    <h2 className="text-blue-600 text-xl font-semibold">Carga Masiva — OIT</h2>
                     <FontAwesomeIcon
                         icon={faTimes}
                         className="cursor-pointer text-black"
@@ -223,6 +223,10 @@ export default function CargaMasivaAntecedentesDeAltura({
                             <p className="text-sm text-blue-700">Pendientes</p>
                             <p className="text-xl font-bold text-blue-800">{totalPendiente}</p>
                         </div>
+                        <div className="bg-purple-100 rounded px-4 py-2 shadow-sm">
+                            <p className="text-sm text-purple-700">Dictado distinto a NORMAL</p>
+                            <p className="text-xl font-bold text-purple-800">{totalComentarioDiferente}</p>
+                        </div>
                     </div>
                 )}
 
@@ -233,6 +237,8 @@ export default function CargaMasivaAntecedentesDeAltura({
                                 <tr>
                                     <th className="border px-4 py-2 bg-gray-100 whitespace-nowrap">N° ORDEN</th>
                                     <th className="border px-4 py-2 bg-gray-100 whitespace-nowrap">ESTADO</th>
+                                    <th className="border px-4 py-2 bg-gray-100 whitespace-nowrap">¿DISTINTO A NORMAL?</th>
+                                    <th className="border px-4 py-2 bg-gray-100">COMENTARIO ENVIADO</th>
                                     <th className="border px-4 py-2 bg-gray-100">MENSAJE</th>
                                 </tr>
                             </thead>
@@ -243,6 +249,16 @@ export default function CargaMasivaAntecedentesDeAltura({
                                         <td className="border px-4 py-2 font-semibold whitespace-nowrap">
                                             {estadoLabel(row.estado)}
                                         </td>
+                                        <td className="border px-4 py-2 whitespace-nowrap text-center">
+                                            {row.comentarioDiferente ? (
+                                                <span className="text-purple-700 font-semibold">SÍ</span>
+                                            ) : row.estado === "success" ? (
+                                                "No"
+                                            ) : (
+                                                ""
+                                            )}
+                                        </td>
+                                        <td className="border px-4 py-2 max-w-[320px]">{row.comentario}</td>
                                         <td className="border px-4 py-2">{row.mensaje}</td>
                                     </tr>
                                 ))}
@@ -267,7 +283,7 @@ export default function CargaMasivaAntecedentesDeAltura({
                             className={`px-4 py-2 rounded ${!puedeProcesar ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "verde-btn"}`}
                             title={!medico.user_medicoFirma ? "Debe seleccionar un médico" : ""}
                         >
-                            {procesando ? "Procesando..." : "Procesar y Guardar Todos (Aptos)"}
+                            {procesando ? "Procesando..." : "Procesar y Guardar Todos"}
                         </button>
                     </div>
                 )}

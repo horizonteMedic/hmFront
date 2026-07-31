@@ -94,7 +94,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
 };
 
 export const GetInfoPac = (nro, set, token, sede) => {
-  getFetch(`/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`, token)
+  return getFetch(`/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`, token)
     .then((res) => {
       console.log('pros', res)
       set(prev => ({

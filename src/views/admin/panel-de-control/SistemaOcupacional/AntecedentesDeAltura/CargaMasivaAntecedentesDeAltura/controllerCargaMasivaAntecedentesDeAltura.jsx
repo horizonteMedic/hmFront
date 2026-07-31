@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import { SubmitData, getFetch } from "../../../../../utils/apiHelpers";
 import {
     GetInfoPac,
+    GetInfoServicio,
     construirBodyAntecedentesDeAltura,
     registrarUrl,
 } from "../controllerAntecedentesDeAltura";
@@ -106,13 +107,29 @@ const obtenerDatosPacienteAntecedentesDeAltura = (
         GetInfoPac(norden, fakeSet, token, sede).then(() => resolve(state));
     });
 
+// Obtiene el código y los datos demográficos de un registro YA EXISTENTE
+// (reutilizando GetInfoServicio, el mismo análisis que usa el formulario
+// individual al editar), para poder reemplazarlo sin perder su identificador.
+const obtenerDatosServicioExistenteAntecedentesDeAltura = (norden, { token, tabla }) =>
+    new Promise((resolve) => {
+        let state = {};
+        const fakeSet = (updater) => {
+            state = typeof updater === "function" ? updater(state) : { ...state, ...updater };
+        };
+        GetInfoServicio(norden, tabla, fakeSet, token).then(() => resolve(state));
+    });
+
 // Procesa la lista de N° de Orden uno por uno:
-//   - Si ya tiene registro (id=1) -> se omite (no se sobreescribe).
-//   - Si no -> obtiene los datos básicos del paciente (GetInfoPac), asigna la
-//     firma y fecha elegidas para todos, y crea el registro como APTO.
+//   - Si ya tiene registro (id=1) y no se pidió reemplazar -> se omite.
+//   - Si ya tiene registro y se pidió reemplazar -> se recupera su código e
+//     información demográfica y se sobreescribe con los antecedentes
+//     patológicos por defecto (todos en NO), la firma y la fecha elegidas.
+//   - Si no tiene registro -> obtiene los datos básicos del paciente
+//     (GetInfoPac), asigna la firma y fecha elegidas para todos, y crea el
+//     registro como APTO.
 export const guardarCargaMasivaAntecedentesDeAltura = async (
     data,
-    { token, userlogued, userName, tabla, fecha, medicoNombre, medicoUsername, userDNI, userCMP, userEmail, userDireccion, sede },
+    { token, userlogued, userName, tabla, fecha, medicoNombre, medicoUsername, userDNI, userCMP, userEmail, userDireccion, sede, reemplazar },
     onProgress = () => { }
 ) => {
     const resultados = [];
@@ -124,27 +141,65 @@ export const guardarCargaMasivaAntecedentesDeAltura = async (
                 `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${norden}&nomService=${tabla}`,
                 token
             );
+            const yaTeniaRegistro = (existencia?.id ?? 0) === 1;
 
-            if ((existencia?.id ?? 0) === 1) {
+            if (yaTeniaRegistro && !reemplazar) {
                 const resultado = { norden, ok: false, omitido: true, mensaje: "Ya tiene registro, se omitió" };
                 resultados.push(resultado);
                 onProgress(resultado);
                 continue;
             }
 
-            const state = await obtenerDatosPacienteAntecedentesDeAltura(norden, {
-                token, userDNI, userCMP, userEmail, userDireccion, userName, userlogued, fecha, sede,
-            });
+            let state;
+            if (yaTeniaRegistro) {
+                const servicioState = await obtenerDatosServicioExistenteAntecedentesDeAltura(norden, { token, tabla });
 
-            if (!state.dni && !state.nombres) {
-                const resultado = {
+                if (!servicioState.codigoAntecedentesAltura && !servicioState.norden) {
+                    const resultado = {
+                        norden,
+                        ok: false,
+                        mensaje: "No se pudo recuperar el registro existente para reemplazarlo",
+                    };
+                    resultados.push(resultado);
+                    onProgress(resultado);
+                    continue;
+                }
+
+                state = {
+                    ...getAntecedentesDeAlturaInitialFormState({
+                        today: fecha, userlogued, userName, userDNI, userCMP, userEmail, userDireccion,
+                    }),
                     norden,
-                    ok: false,
-                    mensaje: "No se encontró información para este N° de Orden",
+                    codigoAntecedentesAltura: servicioState.codigoAntecedentesAltura ?? null,
+                    nombres: servicioState.nombres ?? "",
+                    dni: servicioState.dni ?? "",
+                    edad: servicioState.edad ?? "",
+                    sexo: servicioState.sexo ?? "",
+                    cargo: servicioState.cargo ?? "",
+                    ocupacion: servicioState.ocupacion ?? "",
+                    cargoDesempenar: servicioState.cargoDesempenar ?? "",
+                    empresa: servicioState.empresa ?? "",
+                    contrata: servicioState.contrata ?? "",
+                    fechaNacimiento: servicioState.fechaNacimiento ?? "",
+                    lugarNacimiento: servicioState.lugarNacimiento ?? "",
+                    estadoCivil: servicioState.estadoCivil ?? "",
+                    nivelEstudios: servicioState.nivelEstudios ?? "",
                 };
-                resultados.push(resultado);
-                onProgress(resultado);
-                continue;
+            } else {
+                state = await obtenerDatosPacienteAntecedentesDeAltura(norden, {
+                    token, userDNI, userCMP, userEmail, userDireccion, userName, userlogued, fecha, sede,
+                });
+
+                if (!state.dni && !state.nombres) {
+                    const resultado = {
+                        norden,
+                        ok: false,
+                        mensaje: "No se encontró información para este N° de Orden",
+                    };
+                    resultados.push(resultado);
+                    onProgress(resultado);
+                    continue;
+                }
             }
 
             state.fechaExam = fecha;
@@ -159,7 +214,10 @@ export const guardarCargaMasivaAntecedentesDeAltura = async (
             const resultado = {
                 norden,
                 ok,
-                mensaje: ok ? "Creado y guardado como apto" : (res?.mensaje || "Error al registrar"),
+                accion: yaTeniaRegistro ? "actualizado" : "creado",
+                mensaje: ok
+                    ? `${yaTeniaRegistro ? "Actualizado" : "Creado"} y guardado como apto`
+                    : (res?.mensaje || "Error al registrar"),
             };
             resultados.push(resultado);
             onProgress(resultado);
@@ -180,7 +238,7 @@ export const exportarResultadosCargaMasivaAntecedentesDeAltura = async (resultad
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet("RESULTADO");
 
-    const headers = ["N° ORDEN", "ESTADO", "MENSAJE"];
+    const headers = ["N° ORDEN", "ESTADO", "ACCIÓN", "MENSAJE"];
     sheet.addRow(headers);
     sheet.getRow(1).eachCell((cell) => {
         cell.font = { bold: true };
@@ -190,10 +248,10 @@ export const exportarResultadosCargaMasivaAntecedentesDeAltura = async (resultad
 
     resultados.forEach((r) => {
         const estado = r.omitido ? "OMITIDO" : r.ok ? "OK" : "ERROR";
-        sheet.addRow([r.norden, estado, r.mensaje || ""]);
+        sheet.addRow([r.norden, estado, r.accion ? r.accion.toUpperCase() : "", r.mensaje || ""]);
     });
 
-    sheet.columns = [{ width: 14 }, { width: 12 }, { width: 60 }];
+    sheet.columns = [{ width: 14 }, { width: 12 }, { width: 12 }, { width: 60 }];
 
     const buffer = await workbook.xlsx.writeBuffer();
     const fecha = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
