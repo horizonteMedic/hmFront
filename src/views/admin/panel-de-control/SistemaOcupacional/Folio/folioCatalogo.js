@@ -49,6 +49,7 @@ export const EXAMENES_CATALOGO = {
         url: "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2",
         esJasper: true,
         nomenclaturaSubida: "CAMO",
+        masivo: true,
     },
 
     CERTIFICADO_ANEXO_02_ADMINISTRATIVO: {
