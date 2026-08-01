@@ -1232,14 +1232,32 @@ export default async function Anexo7C_Antiguo(data = {}, docExistente = null) {
 
   // Columna derecha: Espacio para completar (mostrar datos si existen)
   if (datosFinales.antecedentesPersonales) {
-    doc.setFont("helvetica", "normal").setFontSize(7);
     const textoAntecedentes = String(datosFinales.antecedentesPersonales).trim();
-    // Dividir texto en líneas si es muy largo
     const maxWidth = tablaAncho - anchoColAntecedentes - 4;
-    const lineas = doc.splitTextToSize(textoAntecedentes, maxWidth);
-    lineas.forEach((linea, index) => {
-      if (yPos + 3.5 + (index * 3) + 3 <= yPos + alturaFilaAntecedentes - 1) {
-        doc.text(linea, divAntecedentes + 2, yPos + 3.5 + (index * 3));
+    const alturaDisponible = alturaFilaAntecedentes - 5; // margen superior 3.5 + margen inferior 1.5
+
+    // Reducir la fuente hasta que el texto completo entre en la fila (altura fija),
+    // en vez de cortar las líneas que sobran.
+    const fontSizeMaximo = 7;
+    const fontSizeMinimo = 5;
+    let fontSizeAntecedentes = fontSizeMaximo;
+    let lineasAntecedentes = [];
+    let interlineadoAntecedentes = fontSizeMaximo * 0.43;
+
+    while (fontSizeAntecedentes >= fontSizeMinimo) {
+      doc.setFont("helvetica", "normal").setFontSize(fontSizeAntecedentes);
+      lineasAntecedentes = doc.splitTextToSize(textoAntecedentes, maxWidth);
+      interlineadoAntecedentes = fontSizeAntecedentes * 0.43;
+      const alturaNecesaria = (lineasAntecedentes.length - 1) * interlineadoAntecedentes + 3;
+      if (alturaNecesaria <= alturaDisponible) break;
+      fontSizeAntecedentes -= 0.5;
+    }
+
+    doc.setFont("helvetica", "normal").setFontSize(fontSizeAntecedentes);
+    lineasAntecedentes.forEach((linea, index) => {
+      // Resguardo final: si ni con la fuente mínima entra todo, no dibujar fuera de la celda
+      if ((index * interlineadoAntecedentes) + 3 <= alturaDisponible) {
+        doc.text(linea, divAntecedentes + 2, yPos + 3.5 + (index * interlineadoAntecedentes));
       }
     });
   }

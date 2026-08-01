@@ -174,7 +174,7 @@ export const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
             domicilioActual: res.direccion ?? "",
             sexo: res.genero === "M" ? "MASCULINO" : res.genero === "F" ? "FEMENINO" : "",
         }));
-        GetExamenesCheck(nro, set, token, ExamenesList);
+        await GetExamenesCheck(nro, set, token, ExamenesList);
     }
 };
 

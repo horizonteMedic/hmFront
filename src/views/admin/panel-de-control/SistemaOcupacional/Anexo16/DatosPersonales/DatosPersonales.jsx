@@ -426,7 +426,8 @@ export default function DatosPersonales({
                   onChange={handleChange}
                   labelOnTop
                 />
-                <InputTextOneLine
+                <InputTextArea
+                  rows={6} 
                   name="antecedentesPersonales"
                   value={form.antecedentesPersonales}
                   onChange={handleChange}
@@ -441,6 +442,8 @@ export default function DatosPersonales({
                 onChange={handleChange}
                 labelOnTop
               />
+
+              
             </div>
           </div>
         </div>

@@ -326,6 +326,19 @@ export const GetInfoServicio = (
           };
 
           data.antecedentesPersonales2 = "NINGUNO";
+
+          // Antecedentes Familiares (solo al obtener/crear un nuevo registro, concatenados en un solo campo)
+          const antecedentesFamiliaresPartes = [
+            res.antecedentes_padre ? `Padre: ${res.antecedentes_padre}` : null,
+            res.antecedentes_madre ? `Madre: ${res.antecedentes_madre}` : null,
+            res.antecedentes_hermanos ? `Hermanos: ${res.antecedentes_hermanos}` : null,
+            res.antecedentes_hijos ? `Hijos: ${res.antecedentes_hijos}` : null,
+            res.antecedentes_esposa ? `Esposa(o): ${res.antecedentes_esposa}` : null,
+            res.antecedentes_conadis ? `Conadis: ${res.antecedentes_conadis}` : null,
+          ].filter(Boolean);
+          if (antecedentesFamiliaresPartes.length > 0) {
+            data.antecedentesFamiliares = antecedentesFamiliaresPartes.join(", ");
+          }
           // Vaccinations
           data.tetano = res.tetanica ?? false;
           data.hepatitisB = res.hepatitisb ?? false;
@@ -1136,7 +1149,19 @@ export const GetInfoServicio = (
 
             data = MapearDatosAdicionales(res, data, data.contador, false);
           console.log("DATAAA", data);
-          set((prev) => ({ ...prev, ...res, ...data }));
+          set((prev) => ({
+            ...prev,
+            ...res,
+            ...data,
+            // antecedentesPersonales: `${res.antecedentesPersonalesAnexo7c_txtantecedentespersonales ?? ""}\n${res.alergia_medicamentos_an ?? ""}\n${prev.antecedentesPersonales ?? ""}`,
+            antecedentesPersonales: [
+              res.antecedentesPersonalesAnexo7c_txtantecedentespersonales,
+              res.alergia_medicamentos_an,
+              prev.antecedentesPersonales
+            ]
+              .filter(texto => texto?.trim())
+              .join("\n"),
+          }));
         }
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
