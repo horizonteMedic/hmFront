@@ -29,7 +29,7 @@ export default function Anexo16({ SinReestricciones = false }) {
   const { token, userlogued, selectedSede, datosFooter, userName } =
     useSessionData();
 
-  const initialFormState = getAnexo16InitialFormState({ today, userlogued, userName });
+  const initialFormState = getAnexo16InitialFormState({ today, userlogued, userName, SinReestricciones });
 
   const {
     form,
@@ -63,9 +63,9 @@ export default function Anexo16({ SinReestricciones = false }) {
     { id: 4, name: "Resultados", icon: faChartLine, component: Resultados },
 
   ];
-
+  console.log(SinReestricciones)
   const handleSave = () => {
-    SubmitDataService(form, setForm, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, setForm, token, userlogued, handleClear, tabla, datosFooter, SinReestricciones);
   };
   const handleSearchExamenesRealizados = (e) => {
     if (e.key === "Enter") {
