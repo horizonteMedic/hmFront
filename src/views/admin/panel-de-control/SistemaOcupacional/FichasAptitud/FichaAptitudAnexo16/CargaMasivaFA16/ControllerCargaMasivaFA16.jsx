@@ -149,7 +149,9 @@ const obtenerDatosPacienteFA16 = async (norden, { token, userlogued, userName, f
         state = typeof updater === "function" ? updater(state) : { ...state, ...updater };
     };
 
-    await GetInfoServicio(norden, tabla, fakeSet, token);
+    // silent=true: evita el Swal de error cuando el N° de Orden no existe;
+    // la fila se marca como error más abajo al no traer dni/nombres.
+    await GetInfoServicio(norden, tabla, fakeSet, token, () => { }, true);
 
     return state;
 };

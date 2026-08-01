@@ -379,7 +379,8 @@ export const GetInfoServicioDefault = async (
     token,
     obtenerReporteUrl,
     onFinish = () => { },
-    esJasper = false
+    esJasper = false,
+    silent = false
 ) => {
     try {
         console.log(esJasper)
@@ -390,11 +391,11 @@ export const GetInfoServicioDefault = async (
         if (res?.norden || res?.norden_n_orden || res?.n_orden || res?.resultado) {
             return res;
         } else {
-            Swal.fire("Error", "Ocurrió un error al traer los datos", "error");
+            if (!silent) Swal.fire("Error", "Ocurrió un error al traer los datos", "error");
             return null;
         }
     } catch (error) {
-        Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
+        if (!silent) Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
         return null;
     } finally {
         onFinish?.();

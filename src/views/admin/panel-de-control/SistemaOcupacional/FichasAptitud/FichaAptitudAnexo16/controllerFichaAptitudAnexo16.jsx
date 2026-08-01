@@ -23,14 +23,17 @@ export const GetInfoServicio = async (
     tabla,
     set,
     token,
-    onFinish = () => { }
+    onFinish = () => { },
+    silent = false
 ) => {
     const res = await GetInfoServicioDefault(
         nro,
         tabla,
         token,
         obtenerReporteUrl,
-        onFinish
+        onFinish,
+        false,
+        silent
     );
     if (res) {
         set((prev) => ({
