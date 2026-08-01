@@ -15,7 +15,7 @@ const obtenerExamenesRealizadosUrl = "/api/v01/ct/anexos/anexo2/obtenerExamenesR
 
 const registrarPDF = "/api/v01/ct/archivos/archivoInterconsulta"
 
-export const construirBodyAnexo16 = (form, user) => {
+export const construirBodyAnexo16 = (form, user, SinReestricciones) => {
   const body = {
     norden: form.norden,
     codigoAnexo: form.codigoAnexo,
@@ -143,6 +143,9 @@ export const construirBodyAnexo16 = (form, user) => {
     evaluado: form.aptoParaTrabajar == "EVALUADO",
     mercurioOrina: form.mercurioOrina,
     plomoSangre: form.plomoSangre,
+    ...(form.codigoAnexo == null
+      ? { registroSinRestriccion: SinReestricciones }
+      : {}),
   };
   return body;
 };
@@ -154,7 +157,8 @@ export const SubmitDataService = async (
   user,
   limpiar,
   tabla,
-  datosFooter
+  datosFooter,
+  SinReestricciones
 ) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
@@ -165,7 +169,7 @@ export const SubmitDataService = async (
     return;
   }
   Loading("Registrando Datos");
-  const body = construirBodyAnexo16(form, user);
+  const body = construirBodyAnexo16(form, user, SinReestricciones);
   console.log(body);
 
   SubmitData(body, registrarUrl, token).then((res) => {
