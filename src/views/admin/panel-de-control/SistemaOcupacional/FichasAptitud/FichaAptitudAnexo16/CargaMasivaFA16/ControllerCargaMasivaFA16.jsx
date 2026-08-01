@@ -10,22 +10,30 @@ import { getFA16InitialFormState } from "../FA16FormDefaults";
 const urlRegistroMasivo = "/api/v01/ct/anexos/fichaAnexo16/registrarActualizarMasivoFichaAnexo16";
 const tabla = "certificado_aptitud_medico_ocupacional";
 
+const formatearFechaDDMMYYYY = (date) => {
+    const d = String(date.getDate()).padStart(2, "0");
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const y = date.getFullYear();
+    return `${d}/${m}/${y}`;
+};
+
 export const descargarPlantillaFA16 = async () => {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet("PLANTILLA");
 
-    sheet.addRow(["NORDEN"]);
+    sheet.addRow(["NORDEN", "FECHA (DD/MM/AAAA)"]);
     sheet.getRow(1).eachCell((cell) => {
         cell.font = { bold: true };
         cell.alignment = { horizontal: "center", vertical: "middle" };
         cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFCCFFCC" } };
     });
 
+    const ejemploFecha = formatearFechaDDMMYYYY(new Date());
     for (let i = 0; i < 10; i++) {
-        sheet.addRow([""]);
+        sheet.addRow(["", ejemploFecha]);
     }
 
-    sheet.columns = [{ width: 18 }];
+    sheet.columns = [{ width: 18 }, { width: 20 }];
 
     const buffer = await workbook.xlsx.writeBuffer();
     saveAs(new Blob([buffer]), "Plantilla_CargaMasivaFichaAptitud16.xlsx");
@@ -34,6 +42,44 @@ export const descargarPlantillaFA16 = async () => {
 const normalizarNorden = (valor) => {
     if (valor === null || valor === undefined) return "";
     return String(valor).trim();
+};
+
+// Valida y convierte la fecha de una fila del Excel (formato DD/MM/AAAA o
+// número de serie de Excel) a YYYY-MM-DD para uso interno.
+// Devuelve valido=true y valor="" cuando la celda viene vacía, para que se
+// use la fecha por defecto seleccionada en el modal.
+const normalizarFechaFilaFA16 = (valor) => {
+    if (valor === null || valor === undefined || String(valor).trim() === "") {
+        return { valor: "", valido: true };
+    }
+
+    // Número serial de fecha de Excel (ej: 46215)
+    if (typeof valor === "number") {
+        const fecha = new Date(Math.round((valor - 25569) * 86400 * 1000));
+        if (isNaN(fecha.getTime())) return { valor: "", valido: false };
+        const y = fecha.getUTCFullYear();
+        const m = String(fecha.getUTCMonth() + 1).padStart(2, "0");
+        const d = String(fecha.getUTCDate()).padStart(2, "0");
+        return { valor: `${y}-${m}-${d}`, valido: true };
+    }
+
+    const str = String(valor).trim();
+    const match = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(str);
+    if (!match) return { valor: "", valido: false };
+
+    const dia = Number(match[1]);
+    const mes = Number(match[2]);
+    const anio = Number(match[3]);
+    const fecha = new Date(anio, mes - 1, dia);
+    const esValida =
+        fecha.getFullYear() === anio && fecha.getMonth() === mes - 1 && fecha.getDate() === dia;
+
+    if (!esValida) return { valor: "", valido: false };
+
+    return {
+        valor: `${anio}-${String(mes).padStart(2, "0")}-${String(dia).padStart(2, "0")}`,
+        valido: true,
+    };
 };
 
 export const handleSubirExcelFA16 = async (setData) => {
@@ -60,20 +106,33 @@ export const handleSubirExcelFA16 = async (setData) => {
         const sheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
-        const nordenes = jsonData
+        const filas = jsonData
             .map((row) => {
-                const key = Object.keys(row).find((k) => k.toUpperCase().trim() === "NORDEN");
-                return normalizarNorden(key ? row[key] : "");
-            })
-            .filter((norden) => norden !== "");
+                const keyNorden = Object.keys(row).find((k) => k.toUpperCase().trim() === "NORDEN");
+                const keyFecha = Object.keys(row).find((k) => k.toUpperCase().trim().startsWith("FECHA"));
 
-        const nordenesUnicos = [...new Set(nordenes)];
+                const norden = normalizarNorden(keyNorden ? row[keyNorden] : "");
+                const { valor: fecha, valido: fechaValida } = normalizarFechaFilaFA16(
+                    keyFecha ? row[keyFecha] : ""
+                );
+
+                return { norden, fecha, fechaValida };
+            })
+            .filter((row) => row.norden !== "");
+
+        const vistos = new Set();
+        const filasUnicas = filas.filter((row) => {
+            if (vistos.has(row.norden)) return false;
+            vistos.add(row.norden);
+            return true;
+        });
 
         setData(
-            nordenesUnicos.map((norden) => ({
+            filasUnicas.map(({ norden, fecha, fechaValida }) => ({
                 norden,
-                estado: "pendiente",
-                mensaje: "",
+                fecha,
+                estado: fechaValida ? "pendiente" : "error",
+                mensaje: fechaValida ? "" : "Fecha formato incorrecto",
             }))
         );
     };
@@ -90,7 +149,9 @@ const obtenerDatosPacienteFA16 = async (norden, { token, userlogued, userName, f
         state = typeof updater === "function" ? updater(state) : { ...state, ...updater };
     };
 
-    await GetInfoServicio(norden, tabla, fakeSet, token);
+    // silent=true: evita el Swal de error cuando el N° de Orden no existe;
+    // la fila se marca como error más abajo al no traer dni/nombres.
+    await GetInfoServicio(norden, tabla, fakeSet, token, () => { }, true);
 
     return state;
 };
@@ -132,6 +193,17 @@ export const guardarCargaMasivaFA16 = async (
     // Fase 1: verificar existencia y preparar cuerpos
     for (const row of data) {
         const norden = row.norden;
+
+        // Fila ya marcada como inválida al leer el Excel (p.ej. fecha con formato incorrecto)
+        if (row.estado === "error" && row.mensaje) {
+            const resultado = { norden, ok: false, mensaje: row.mensaje };
+            resultados.push(resultado);
+            onProgress(resultado);
+            continue;
+        }
+
+        const fechaFila = row.fecha || fecha;
+
         try {
             const existencia = await getFetch(
                 `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${norden}&nomService=${tabla}`,
@@ -155,7 +227,7 @@ export const guardarCargaMasivaFA16 = async (
             }
 
             const state = await obtenerDatosPacienteFA16(norden, {
-                token, userlogued, userName, fecha,
+                token, userlogued, userName, fecha: fechaFila,
             });
 
             if (!state.dni && !state.nombres) {

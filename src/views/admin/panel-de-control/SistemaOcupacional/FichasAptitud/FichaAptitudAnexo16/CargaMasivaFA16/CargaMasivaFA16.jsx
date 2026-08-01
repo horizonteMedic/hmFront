@@ -141,7 +141,7 @@ export default function CargaMasivaFA16({ onClose, token, userlogued, userName, 
                         disabled={procesando}
                     />
                     <div>
-                        <label className="block font-semibold mb-1">Fecha de validez para todos :</label>
+                        <label className="block font-semibold mb-1">Fecha de validez por defecto (si el Excel no trae fecha) :</label>
                         <input
                             type="date"
                             value={fecha}
@@ -151,6 +151,10 @@ export default function CargaMasivaFA16({ onClose, token, userlogued, userName, 
                         />
                     </div>
                 </div>
+                <p className="text-xs text-gray-500 -mt-2">
+                    La plantilla incluye una columna "FECHA (DD/MM/AAAA)" para asignar una fecha distinta a cada N° de Orden.
+                    Si una fila trae una fecha con formato inválido, esa fila no se registrará.
+                </p>
 
                 <div className="flex gap-3">
                     <button
@@ -202,6 +206,7 @@ export default function CargaMasivaFA16({ onClose, token, userlogued, userName, 
                             <thead>
                                 <tr>
                                     <th className="border px-4 py-2 bg-gray-100 whitespace-nowrap">N° ORDEN</th>
+                                    <th className="border px-4 py-2 bg-gray-100 whitespace-nowrap">FECHA</th>
                                     <th className="border px-4 py-2 bg-gray-100 whitespace-nowrap">ESTADO</th>
                                     <th className="border px-4 py-2 bg-gray-100">MENSAJE</th>
                                 </tr>
@@ -210,6 +215,9 @@ export default function CargaMasivaFA16({ onClose, token, userlogued, userName, 
                                 {data.map((row, i) => (
                                     <tr key={`${row.norden}-${i}`} className={rowColor(row.estado)}>
                                         <td className="border px-4 py-2 whitespace-nowrap">{row.norden}</td>
+                                        <td className="border px-4 py-2 whitespace-nowrap">
+                                            {row.estado === "error" && !row.fecha ? "—" : (row.fecha || fecha)}
+                                        </td>
                                         <td className="border px-4 py-2 font-semibold whitespace-nowrap">
                                             {estadoLabel(row.estado)}
                                         </td>
