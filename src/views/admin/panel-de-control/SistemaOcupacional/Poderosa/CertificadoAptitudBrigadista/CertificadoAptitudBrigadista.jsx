@@ -212,7 +212,7 @@ const CertificadoAptitudBrigadista = () => {
             <DatosPersonalesLaborales form={form} />
 
             <div className="flex flex-col md:flex-row gap-3 items-start w-full ">
-                <div className="w-full md:w-[40%]">
+                <div className="w-full md:w-[40%] space-y-3">
                     <SectionFieldset legend="Aptitud" className="w-full">
                         <InputsRadioGroup
                             vertical
