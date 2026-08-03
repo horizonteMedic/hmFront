@@ -44,7 +44,7 @@ export default function Anexo16({ SinReestricciones = false }) {
     handleClearnotO,
     handleBlur
   } = useForm(initialFormState, { storageKey: "anexo_16" });
-
+  console.log(form.registrado_sin_restriccion)
   const [visualerOpen, setVisualerOpen] = useState(null)
   const [activeTab, setActiveTab] = useState(0);
   const [modalCIE10, setModalCIE10] = useState(false)
@@ -63,7 +63,7 @@ export default function Anexo16({ SinReestricciones = false }) {
     { id: 4, name: "Resultados", icon: faChartLine, component: Resultados },
 
   ];
-  console.log(SinReestricciones)
+
   const handleSave = () => {
     SubmitDataService(form, setForm, token, userlogued, handleClear, tabla, datosFooter, SinReestricciones);
   };

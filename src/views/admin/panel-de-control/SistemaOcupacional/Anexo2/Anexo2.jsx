@@ -26,7 +26,7 @@ const tabla = "anexo_agroindustrial";
 const today = getToday();
 
 export default function Anexo2({ SinReestricciones = false }) {
-  console.log(SinReestricciones)
+
   const { token, userlogued, selectedSede, datosFooter, userName } =
     useSessionData();
 
@@ -334,7 +334,7 @@ export default function Anexo2({ SinReestricciones = false }) {
     aspectoFisico: "",
     densidadFisico: "",
     phFisico: "",
-
+    registrado_sin_restriccion: false,
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userName,
@@ -382,7 +382,7 @@ export default function Anexo2({ SinReestricciones = false }) {
   ];
 
   const handleSave = () => {
-    SubmitDataService(form, setForm, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, setForm, token, userlogued, handleClear, tabla, datosFooter, SinReestricciones);
   };
 
   const handleSearch = (e) => {
