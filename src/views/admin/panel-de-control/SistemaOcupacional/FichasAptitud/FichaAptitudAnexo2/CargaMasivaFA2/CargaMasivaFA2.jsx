@@ -2,31 +2,19 @@ import { useState } from "react";
 import Swal from "sweetalert2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileExcel, faTimes, faUpload } from "@fortawesome/free-solid-svg-icons";
-import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
-import { getToday } from "../../../../../utils/helpers";
+import EmpleadoComboBox from "../../../../../../components/reusableComponents/EmpleadoComboBox";
+import { getToday } from "../../../../../../utils/helpers";
 import {
-    descargarPlantillaCargaMasivaAntecedentesDeAltura,
-    exportarResultadosCargaMasivaAntecedentesDeAltura,
-    guardarCargaMasivaAntecedentesDeAltura,
-    handleSubirExcelCargaMasivaAntecedentesDeAltura,
-} from "./controllerCargaMasivaAntecedentesDeAltura";
+    descargarPlantillaFA2,
+    exportarResultadosFA2,
+    guardarCargaMasivaFA2,
+    handleSubirExcelFA2,
+} from "./ControllerCargaMasivaFA2";
 
-export default function CargaMasivaAntecedentesDeAltura({
-    onClose,
-    token,
-    userlogued,
-    userName,
-    userDNI,
-    userCMP,
-    userEmail,
-    userDireccion,
-    tabla,
-    sede,
-}) {
+export default function CargaMasivaFA2({ onClose, token, userlogued, userName, sede }) {
     const [data, setData] = useState([]);
     const [medico, setMedico] = useState({ nombre_medico: "", user_medicoFirma: "" });
     const [fecha, setFecha] = useState(getToday());
-    const [reemplazar, setReemplazar] = useState(false);
     const [procesando, setProcesando] = useState(false);
     const [resultadosFinales, setResultadosFinales] = useState([]);
 
@@ -37,11 +25,11 @@ export default function CargaMasivaAntecedentesDeAltura({
 
     const handleSubir = () => {
         setResultadosFinales([]);
-        handleSubirExcelCargaMasivaAntecedentesDeAltura(setData);
+        handleSubirExcelFA2(setData);
     };
 
     const handleDescargar = () => {
-        descargarPlantillaCargaMasivaAntecedentesDeAltura();
+        descargarPlantillaFA2();
     };
 
     const actualizarFila = (resultado) => {
@@ -66,10 +54,7 @@ export default function CargaMasivaAntecedentesDeAltura({
 
         const confirm = await Swal.fire({
             title: "¿Procesar y guardar los registros?",
-            html: `${reemplazar
-                    ? "Se CREARÁN los N° de Orden nuevos y se <b>REEMPLAZARÁN</b> los que ya tengan registro."
-                    : "Solo se CREARÁN los N° de Orden que no tengan registro previo.<br/>Los que ya existan serán <b>omitidos</b>."
-                }<br/><br/>Médico: <b>${medico.nombre_medico}</b><br/>Fecha: <b>${fecha}</b>`,
+            html: `Solo se CREARÁN los N° de Orden que no tengan registro previo.<br/>Los que ya existan serán <b>omitidos</b>.<br/><br/>Médico: <b>${medico.nombre_medico}</b><br/>Fecha por defecto: <b>${fecha}</b>`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí, procesar",
@@ -79,24 +64,20 @@ export default function CargaMasivaAntecedentesDeAltura({
 
         setProcesando(true);
         setResultadosFinales([]);
-        setData((prev) => prev.map((row) => ({ ...row, estado: "procesando", mensaje: "" })));
+        setData((prev) => prev.map((row) =>
+            row.estado === "error" ? row : { ...row, estado: "procesando", mensaje: "" }
+        ));
 
-        const resultados = await guardarCargaMasivaAntecedentesDeAltura(
+        const resultados = await guardarCargaMasivaFA2(
             data,
             {
                 token,
                 userlogued,
                 userName,
-                userDNI,
-                userCMP,
-                userEmail,
-                userDireccion,
-                tabla,
                 fecha,
                 medicoNombre: medico.nombre_medico,
                 medicoUsername: medico.user_medicoFirma,
                 sede,
-                reemplazar,
             },
             actualizarFila
         );
@@ -111,12 +92,12 @@ export default function CargaMasivaAntecedentesDeAltura({
         Swal.fire({
             icon: failCount === 0 ? "success" : "warning",
             title: "Carga masiva finalizada",
-            html: `✅ Creados correctamente: <b>${okCount}</b><br/>⊘ Omitidos (ya tenían registro): <b>${omitidosCount}</b><br/>⚠️ Con errores: <b>${failCount}</b>`,
+            html: `✅ Creados correctamente: <b>${okCount}</b><br/>⊘ Omitidos (ya tenían registro o falta examen): <b>${omitidosCount}</b><br/>⚠️ Con errores: <b>${failCount}</b>`,
         });
     };
 
     const handleExportar = () => {
-        exportarResultadosCargaMasivaAntecedentesDeAltura(resultadosFinales);
+        exportarResultadosFA2(resultadosFinales);
     };
 
     const totalOk = data.filter((r) => r.estado === "success").length;
@@ -144,7 +125,7 @@ export default function CargaMasivaAntecedentesDeAltura({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg w-auto max-w-[80%] max-h-[90vh] flex flex-col p-6 gap-4">
                 <div className="flex justify-between items-center">
-                    <h2 className="text-blue-600 text-xl font-semibold">Carga Masiva — Antecedentes de Altura</h2>
+                    <h2 className="text-blue-600 text-xl font-semibold">Carga Masiva — Ficha Aptitud Anexo 2</h2>
                     <FontAwesomeIcon
                         icon={faTimes}
                         className="cursor-pointer text-black"
@@ -153,7 +134,7 @@ export default function CargaMasivaAntecedentesDeAltura({
                     />
                 </div>
 
-                <div className="grid md:grid-cols-3 gap-4 border border-gray-200 rounded p-3 items-end">
+                <div className="grid md:grid-cols-2 gap-4 border border-gray-200 rounded p-3">
                     <EmpleadoComboBox
                         value={medico.nombre_medico}
                         form={medico}
@@ -162,7 +143,7 @@ export default function CargaMasivaAntecedentesDeAltura({
                         disabled={procesando}
                     />
                     <div>
-                        <label className="block font-semibold mb-1">Fecha para todos :</label>
+                        <label className="block font-semibold mb-1">Fecha por defecto (si el Excel no trae fecha):</label>
                         <input
                             type="date"
                             value={fecha}
@@ -171,16 +152,11 @@ export default function CargaMasivaAntecedentesDeAltura({
                             className="border rounded px-2 py-1 w-full"
                         />
                     </div>
-                    <label className="flex items-center gap-2 font-semibold">
-                        <input
-                            type="checkbox"
-                            checked={reemplazar}
-                            disabled={procesando}
-                            onChange={(e) => setReemplazar(e.target.checked)}
-                        />
-                        Reemplazar los que ya tengan registro
-                    </label>
                 </div>
+                <p className="text-xs text-gray-500 -mt-2">
+                    La plantilla incluye columna "FECHA (DD/MM/AAAA)" para asignar fecha distinta a cada N° de Orden.
+                    Si una fila trae fecha con formato inválido, esa fila no se registrará.
+                </p>
 
                 <div className="flex gap-3">
                     <button
@@ -232,6 +208,7 @@ export default function CargaMasivaAntecedentesDeAltura({
                             <thead>
                                 <tr>
                                     <th className="border px-4 py-2 bg-gray-100 whitespace-nowrap">N° ORDEN</th>
+                                    <th className="border px-4 py-2 bg-gray-100 whitespace-nowrap">FECHA</th>
                                     <th className="border px-4 py-2 bg-gray-100 whitespace-nowrap">ESTADO</th>
                                     <th className="border px-4 py-2 bg-gray-100">MENSAJE</th>
                                 </tr>
@@ -240,6 +217,9 @@ export default function CargaMasivaAntecedentesDeAltura({
                                 {data.map((row, i) => (
                                     <tr key={`${row.norden}-${i}`} className={rowColor(row.estado)}>
                                         <td className="border px-4 py-2 whitespace-nowrap">{row.norden}</td>
+                                        <td className="border px-4 py-2 whitespace-nowrap text-gray-600">
+                                            {row.fecha || <span className="italic text-gray-400">usa defecto</span>}
+                                        </td>
                                         <td className="border px-4 py-2 font-semibold whitespace-nowrap">
                                             {estadoLabel(row.estado)}
                                         </td>

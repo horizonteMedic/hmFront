@@ -1,0 +1,235 @@
+export const getOITInitialFormState = ({ today, userlogued, userName, userDNI }) => ({
+  //DATOS PERSONALES
+  norden: "",
+  nplaca: "",
+  nombres: "",
+  doctor: "",
+  dni: "",
+  dniUser: userDNI,
+  edad: "",
+  fradiografia: today,
+  flectura: today,
+  //PARENQUIMATOSAS
+  anormalidades_parenquimatosas_si: false,
+  anormalidades_parenquimatosas_no: true,
+  rbAceptable: true,
+  rbInaceptable: false,
+  rbBajacalidad: false,
+  rbBuena: false,
+  //causas
+  rbSobreexposicion: false,
+  rbSubexposicion: false,
+  rbPosicioncentrado: true,
+  rbInspiracionInsuficiente: false,
+  rbEscapulas: false,
+  rbArtefactos: false,
+  rbOtros: false,
+  //PARENQUIMATOSAS2.0
+  txtDefectosTecnicos: "",
+  chk1D: false,
+  chk1I: false,
+  chk2D: false,
+  chk2I: false,
+  chk3D: false,
+  chk3I: false,
+  //a
+  chk1: false,
+  chk2: false,
+  chk3: false,
+  chk4: false,
+  chk5: true,
+  chk6: false,
+  chk7: false,
+  chk8: false,
+  chk9: false,
+  chk10: false,
+  chk11: false,
+  chk12: false,
+  //b
+  chkP1: false,
+  chkP2: false,
+  chkP3: false,
+  chkP4: false,
+  chkP5: false,
+  chkP6: false,
+  chkS1: false,
+  chkS2: false,
+  chkS3: false,
+  chkS4: false,
+  chkS5: false,
+  chkS6: false,
+  //c
+  chko: true,
+  chka: false,
+  chkb: false,
+  chkc: false,
+  //Pleurales
+  chk2Si: false,
+  chk2No: true,
+  chkE1: false,
+  chkE2: false,
+  chkE3: false,
+  chkE4: false,
+  chkE5: false,
+  chkE6: false,
+  //a
+  chk2_1: true,
+  chk2_2: true,
+  chk2_3: true,
+  chk2_4: false,
+  chk2_5: false,
+  chk2_6: false,
+  chk2_7: false,
+  chk2_8: false,
+  chk2_9: false,
+  chk2_10: true,
+  chk2_11: true,
+  chk2_12: true,
+  chk2_13: false,
+  chk2_14: false,
+  chk2_15: false,
+  chk2_16: false,
+  chk2_17: false,
+  chk2_18: false,
+  chk2_19: false,
+  chk2_20: true,
+  chk2_21: false,
+  chk2_22: false,
+  chk2_23: false,
+  chk2_24: false,
+  chk2_25: true,
+  chk2_26: false,
+  chk2_27: false,
+  chk2_28: false,
+  chk2_29: false,
+  chk2_30: false,
+  chk2_31: false,
+  chk2_32: false,
+  chk2_33: false,
+  chk2_34: false,
+  chk2_35: false,
+  chk2_36: false,
+  chk2_37: true,
+  chk2_38: false,
+  chk2_39: false,
+  chk2_40: false,
+  chk2_41: true,
+  chk2_42: false,
+  chk2_43: false,
+  chk2_44: false,
+  chk2_45: false,
+  chk2_46: false,
+  chk2_47: true,
+  chk2_48: false,
+  chk2_49: false,
+  chk2_50: false,
+  chk2_51: false,
+  chk2_52: false,
+  chk2_53: true,
+  chk2_54: false,
+  chk2_55: false,
+  chk2_56: false,
+  chk2_57: false,
+  chk2_58: true,
+  chk2_59: false,
+  chk2_60: false,
+  chk2_61: false,
+  chk2_62: false,
+  chk2_63: false,
+  chk2_64: false,
+  chk2_65: false,
+  chk2_66: false,
+  chk2_67: false,
+  chk2_68: false,
+  chk2_69: false,
+  //
+  chk3Si: false,
+  chk3No: true,
+  chk_01: false,
+  chk_02: false,
+  chk_03: false,
+  chk_04: false,
+  chk_05: false,
+  chk_06: false,
+  chk_07: false,
+  chk_08: false,
+  chk_09: false,
+  chk_10: false,
+  chk_11: false,
+  chk_12: false,
+  chk_13: false,
+  chk_14: false,
+  chk_15: false,
+  chk_16: false,
+  chk_17: false,
+  chk_18: false,
+  chk_19: false,
+  chk_20: false,
+  chk_21: false,
+  chk_22: false,
+  chk_23: false,
+  chk_24: false,
+  chk_25: false,
+  chk_26: false,
+  chk_27: false,
+  chk_28: false,
+  chk_29: false,
+  txtSComentarios: "",
+  opcionSComentario: "",
+
+  aPruebaDeSoledad: false,
+  //
+  SinDatos: false,
+
+  SubirDoc: false,
+  nomenclatura: "OIT FOLIO",
+  // Médico que Certifica //BUSCADOR
+  nombre_medico: userName,
+  user_medicoFirma: userlogued,
+});
+
+// Para registros de carga masiva cuyo COMENTARIO (conclusionesRadiograficas)
+// es distinto de "TÓRAX SIN ALTERACIONES": se conservan los valores por defecto
+// de Calidad Radiográfica, Causas, y los encabezados SI/NO de las secciones
+// II. ANORMALIDADES PARENQUIMATOSAS, III. ANORMALIDADES PLEURALES y IV. SIMBOLOS*,
+// pero el detalle marcado por defecto dentro de esas secciones (perfil "sin
+// anormalidades") se considera desmarcado, ya que no fue derivado del dictado.
+export const getOITAnormalOverrides = () => ({
+  chk5: false,
+  chko: false,
+  chk2_1: false,
+  chk2_2: false,
+  chk2_3: false,
+  chk2_10: false,
+  chk2_11: false,
+  chk2_12: false,
+  chk2_20: false,
+  chk2_25: false,
+  chk2_37: false,
+  chk2_41: false,
+  chk2_47: false,
+  chk2_53: false,
+  chk2_58: false,
+});
+
+// Texto con el que se reemplaza el COMENTARIO cuando el dictado original dice "NORMAL".
+export const TORAX_SIN_ALTERACIONES = "TÓRAX SIN ALTERACIONES";
+
+const COMENTARIO_NORMAL = "NORMAL";
+
+const DIACRITICS_REGEX = new RegExp("[̀-ͯ]", "g");
+
+export const normalizarComentarioOIT = (texto) =>
+  (texto ?? "")
+    .normalize("NFD")
+    .replace(DIACRITICS_REGEX, "")
+    .toUpperCase()
+    .trim();
+
+// El dictado original (conclusionesRadiograficas) se considera "normal" cuando
+// dice exactamente "NORMAL" (o viene vacío). En ese caso el COMENTARIO que se
+// envía se reemplaza por "TÓRAX SIN ALTERACIONES" (ver TORAX_SIN_ALTERACIONES).
+export const esComentarioOITNormal = (texto) => {
+  const normalizado = normalizarComentarioOIT(texto);
+  return normalizado === "" || normalizado === COMENTARIO_NORMAL;
+};
