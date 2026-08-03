@@ -4,11 +4,11 @@ import { saveAs } from "file-saver";
 import Swal from "sweetalert2";
 import { SubmitData, getFetch } from "../../../../../../utils/apiHelpers";
 import { getHoraActual } from "../../../../../../utils/helpers";
-import { GetInfoServicio } from "../controllerFichaAptitudAnexo16";
-import { getFA16InitialFormState } from "../FA16FormDefaults";
+import { GetInfoServicio } from "../controllerFichaAptitudAnexo2";
+import { getFA2InitialFormState } from "../FA2FormDefaults";
 
-const urlRegistroMasivo = "/api/v01/ct/anexos/fichaAnexo16/registrarActualizarMasivoFichaAnexo16";
-const tabla = "certificado_aptitud_medico_ocupacional";
+const urlRegistroMasivo = "/api/v01/ct/anexos/fichaAnexo2/registrarActualizarMasivoFichaAnexo2";
+const tabla = "aptitud_medico_ocupacional_agro";
 
 const formatearFechaDDMMYYYY = (date) => {
     const d = String(date.getDate()).padStart(2, "0");
@@ -17,7 +17,7 @@ const formatearFechaDDMMYYYY = (date) => {
     return `${d}/${m}/${y}`;
 };
 
-export const descargarPlantillaFA16 = async () => {
+export const descargarPlantillaFA2 = async () => {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet("PLANTILLA");
 
@@ -36,7 +36,7 @@ export const descargarPlantillaFA16 = async () => {
     sheet.columns = [{ width: 18 }, { width: 20 }];
 
     const buffer = await workbook.xlsx.writeBuffer();
-    saveAs(new Blob([buffer]), "Plantilla_CargaMasivaFichaAptitud16.xlsx");
+    saveAs(new Blob([buffer]), "Plantilla_CargaMasivaFichaAptitud2.xlsx");
 };
 
 const normalizarNorden = (valor) => {
@@ -46,14 +46,12 @@ const normalizarNorden = (valor) => {
 
 // Valida y convierte la fecha de una fila del Excel (formato DD/MM/AAAA o
 // número de serie de Excel) a YYYY-MM-DD para uso interno.
-// Devuelve valido=true y valor="" cuando la celda viene vacía, para que se
-// use la fecha por defecto seleccionada en el modal.
-const normalizarFechaFilaFA16 = (valor) => {
+// Devuelve valido=true y valor="" cuando la celda viene vacía → se usa la fecha por defecto.
+const normalizarFechaFila = (valor) => {
     if (valor === null || valor === undefined || String(valor).trim() === "") {
         return { valor: "", valido: true };
     }
 
-    // Número serial de fecha de Excel (ej: 46215)
     if (typeof valor === "number") {
         const fecha = new Date(Math.round((valor - 25569) * 86400 * 1000));
         if (isNaN(fecha.getTime())) return { valor: "", valido: false };
@@ -82,7 +80,7 @@ const normalizarFechaFilaFA16 = (valor) => {
     };
 };
 
-export const handleSubirExcelFA16 = async (setData) => {
+export const handleSubirExcelFA2 = async (setData) => {
     const { value: file } = await Swal.fire({
         title: "Selecciona un archivo Excel",
         input: "file",
@@ -112,7 +110,7 @@ export const handleSubirExcelFA16 = async (setData) => {
                 const keyFecha = Object.keys(row).find((k) => k.toUpperCase().trim().startsWith("FECHA"));
 
                 const norden = normalizarNorden(keyNorden ? row[keyNorden] : "");
-                const { valor: fecha, valido: fechaValida } = normalizarFechaFilaFA16(
+                const { valor: fecha, valido: fechaValida } = normalizarFechaFila(
                     keyFecha ? row[keyFecha] : ""
                 );
 
@@ -132,7 +130,7 @@ export const handleSubirExcelFA16 = async (setData) => {
                 norden,
                 fecha,
                 estado: fechaValida ? "pendiente" : "error",
-                mensaje: fechaValida ? "" : "Fecha formato incorrecto",
+                mensaje: fechaValida ? "" : "Fecha con formato incorrecto (usar DD/MM/AAAA)",
             }))
         );
     };
@@ -140,30 +138,28 @@ export const handleSubirExcelFA16 = async (setData) => {
 };
 
 // await directo sobre GetInfoServicio: cuando resuelve, fakeSet ya corrió con los datos del reporte.
-const obtenerDatosPacienteFA16 = async (norden, { token, userlogued, userName, fecha }) => {
+const obtenerDatosPacienteFA2 = async (norden, { token, userlogued, userName, fecha }) => {
     let state = {
-        ...getFA16InitialFormState({ today: fecha, userlogued, userName }),
+        ...getFA2InitialFormState({ today: fecha, userlogued, userName }),
         norden,
     };
     const fakeSet = (updater) => {
         state = typeof updater === "function" ? updater(state) : { ...state, ...updater };
     };
 
-    // silent=true: evita el Swal de error cuando el N° de Orden no existe;
-    // la fila se marca como error más abajo al no traer dni/nombres.
-    await GetInfoServicio(norden, tabla, fakeSet, token, () => { }, true);
+    await GetInfoServicio(norden, tabla, fakeSet, token, () => { });
 
     return state;
 };
 
-// Arma el body de FA16 a partir del state, igual que SubmitDataService de controllerFichaAptitudAnexo16.
-const construirBodyFA16 = (state, userlogued, medicoNombre, medicoUsername) => ({
+// Arma el body de FA2 a partir del state. Campos alineados con SubmitDataService de controllerFichaAptitudAnexo2.
+const construirBodyFA2 = (state, userlogued, medicoNombre, medicoUsername) => ({
     norden: state.norden,
     dni: state.dni,
     fecha: state.fechaValido,
     nombreMedico: medicoNombre,
     apto: state.apto === "APTO",
-    aptoRestriccion: state.apto === "APTO CON RESTRICCION",
+    aptoConRestriccion: state.apto === "APTO CON RESTRICCION",
     noApto: state.apto === "NO APTO",
     conObservacion: state.apto === "CON OBSERVACION",
     evaluado: state.apto === "EVALUADO",
@@ -182,9 +178,9 @@ const construirBodyFA16 = (state, userlogued, medicoNombre, medicoUsername) => (
 //   - id=0 → nuevo, obtiene datos del paciente y arma el body.
 // Fase 2: envía todos los nuevos en un único lote al endpoint urlRegistroMasivo.
 // Parsea la respuesta { exitosos, fallidos, errores:[{motivo, registro:{norden}}] }.
-export const guardarCargaMasivaFA16 = async (
+export const guardarCargaMasivaFA2 = async (
     data,
-    { token, userlogued, userName, fecha, medicoNombre, medicoUsername, sede },
+    { token, userlogued, userName, fecha, medicoNombre, medicoUsername },
     onProgress = () => { }
 ) => {
     const resultados = [];
@@ -194,7 +190,7 @@ export const guardarCargaMasivaFA16 = async (
     for (const row of data) {
         const norden = row.norden;
 
-        // Fila ya marcada como inválida al leer el Excel (p.ej. fecha con formato incorrecto)
+        // Fila ya marcada como inválida al leer el Excel (fecha con formato incorrecto)
         if (row.estado === "error" && row.mensaje) {
             const resultado = { norden, ok: false, mensaje: row.mensaje };
             resultados.push(resultado);
@@ -226,7 +222,7 @@ export const guardarCargaMasivaFA16 = async (
                 continue;
             }
 
-            const state = await obtenerDatosPacienteFA16(norden, {
+            const state = await obtenerDatosPacienteFA2(norden, {
                 token, userlogued, userName, fecha: fechaFila,
             });
 
@@ -237,7 +233,7 @@ export const guardarCargaMasivaFA16 = async (
                 continue;
             }
 
-            const body = construirBodyFA16(state, userlogued, medicoNombre, medicoUsername);
+            const body = construirBodyFA2(state, userlogued, medicoNombre, medicoUsername);
             lote.push({ norden, body });
 
         } catch (error) {
@@ -274,11 +270,11 @@ export const guardarCargaMasivaFA16 = async (
     return resultados;
 };
 
-export const exportarResultadosFA16 = async (resultados) => {
+export const exportarResultadosFA2 = async (resultados) => {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet("RESULTADO");
 
-    sheet.addRow(["N° ORDEN", "ESTADO", "MENSAJE"]);
+    sheet.addRow(["N° ORDEN", "FECHA", "ESTADO", "MENSAJE"]);
     sheet.getRow(1).eachCell((cell) => {
         cell.font = { bold: true };
         cell.alignment = { horizontal: "center", vertical: "middle" };
@@ -287,12 +283,12 @@ export const exportarResultadosFA16 = async (resultados) => {
 
     resultados.forEach((r) => {
         const estado = r.omitido ? "OMITIDO" : r.ok ? "OK" : "ERROR";
-        sheet.addRow([r.norden, estado, r.mensaje || ""]);
+        sheet.addRow([r.norden, r.fecha || "", estado, r.mensaje || ""]);
     });
 
-    sheet.columns = [{ width: 14 }, { width: 12 }, { width: 60 }];
+    sheet.columns = [{ width: 14 }, { width: 16 }, { width: 12 }, { width: 60 }];
 
     const buffer = await workbook.xlsx.writeBuffer();
     const fecha = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
-    saveAs(new Blob([buffer]), `Resultado_CargaMasivaFichaAptitud16_${fecha}.xlsx`);
+    saveAs(new Blob([buffer]), `Resultado_CargaMasivaFichaAptitud2_${fecha}.xlsx`);
 };

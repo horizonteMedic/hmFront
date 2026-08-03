@@ -2,10 +2,11 @@ import { useRef, useState } from "react";
 import Swal from "sweetalert2";
 import * as XLSX from "xlsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { faFileExcel, faTimes, faUpload } from "@fortawesome/free-solid-svg-icons";
 import { getFetch } from "../../../../../utils/apiHelpers";
 import FolioJasper from "../../../../../jaspers/FolioJasper/FolioJasper";
 import {
+    descargarPlantillaGeneracionMasiva,
     obtenerInfoPacParaMasivo,
     verificarExamenExiste,
     subirPDFGenerado,
@@ -121,7 +122,7 @@ export default function GeneracionMasiva({ examen, onClose, token, selectedSede,
 
                 actualizarFila(norden, "procesando", "Generando PDF...");
 
-                // 4. Generar PDF (silencioso=true para no abrir el visor/impresora)
+                // 4. Generar PDF (omitirImpresion=true para no abrir el visor/impresora)
                 const soloEsteExamen = [{ ...examen, imprimir: true, resultado: true }];
                 const pdfResult = await FolioJasper(
                     norden,
@@ -133,8 +134,11 @@ export default function GeneracionMasiva({ examen, onClose, token, selectedSede,
                     form.nombres,
                     form.apellidos,
                     datosFooter,
-                    false,  // comprimidoz
-                    true    // silencioso: no abrir visor ni impresora
+                    false,   // comprimidoz
+                    "azure", // urlType
+                    "",      // fechaPersonalizada
+                    "",      // diasVencimientoPersonalizado
+                    true     // omitirImpresion: no abrir visor ni impresora
                 );
 
                 generados++;
@@ -179,6 +183,10 @@ export default function GeneracionMasiva({ examen, onClose, token, selectedSede,
 
     const handleCancelar = () => {
         if (abortRef.current) abortRef.current.abort();
+    };
+
+    const handleDescargarPlantilla = () => {
+        descargarPlantillaGeneracionMasiva(examen);
     };
 
     const totalOk = data.filter((r) => r.estado === "success").length;
@@ -233,6 +241,13 @@ export default function GeneracionMasiva({ examen, onClose, token, selectedSede,
                         className="verde-btn px-4 py-1 rounded flex items-center gap-2"
                     >
                         Subir Excel <FontAwesomeIcon icon={faUpload} />
+                    </button>
+                    <button
+                        onClick={handleDescargarPlantilla}
+                        disabled={procesando}
+                        className="verde-btn px-4 py-1 rounded flex items-center gap-2"
+                    >
+                        Descargar Plantilla <FontAwesomeIcon icon={faFileExcel} />
                     </button>
                 </div>
 
