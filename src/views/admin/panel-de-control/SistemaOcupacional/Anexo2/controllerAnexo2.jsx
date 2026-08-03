@@ -17,7 +17,8 @@ export const SubmitDataService = async (
   user,
   limpiar,
   tabla,
-  datosFooter
+  datosFooter,
+  SinReestricciones
 ) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
@@ -129,6 +130,10 @@ export const SubmitDataService = async (
     })),
 
     observacionesGeneralesCie10: form.observacionesGeneralesCie10,
+    ...(form.codigoAnexo == null
+      ? { registrado_sin_restriccion: SinReestricciones }
+      : { registrado_sin_restriccion: form.registrado_sin_restriccion }),
+
   };
   console.log(body);
 
