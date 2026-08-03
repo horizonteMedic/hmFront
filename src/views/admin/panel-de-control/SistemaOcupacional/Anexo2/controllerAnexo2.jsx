@@ -780,6 +780,10 @@ export const GetInfoServicio = (
             data.totalHijos = (hv + hm).toString();
           }
 
+          //Riesgo cardiovascular
+          data.riesgoCoronarioValor = res.riesgoCoronarioValor ?? "";
+
+
 
 
           // IMC
@@ -1064,6 +1068,19 @@ export const GetInfoServicio = (
           data.pus = res.laboratorioClinicoAdicionales.sedimientoUrinarioPus_txtpussu ?? "";
           data.otrosSedimento = res.laboratorioClinicoAdicionales.sedimientoUrinarioOtros_txtotrossu ?? "";
           data.resultadoAcidoUrico = res.resultadoAcidoUrico
+
+          //
+          if (
+            (data.empresa === "Boroo" || data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
+            parseFloat(data.edad) > 30 &&
+            data.nomExamen === "PRE-OCUPACIONAL"
+          ) {
+            data.observacionesGenerales = agregarObservacion(
+              data.observacionesGenerales,
+              `RIESGO CARDIOVASCULAR SEGUN FRAMINGHAM: ${data.riesgoCoronarioValor}. CONTROL ANUAL\n`
+            );
+          }
+
 
           //ordenamiento
 
@@ -1703,6 +1720,10 @@ export const GetInfoServicioEditar = (
 
           //FIN==============
 
+          //Riesgo cardiovascular
+          data.riesgoCoronarioValor = res.riesgoCoronarioValor ?? "";
+
+
           // cargarAnalisisB();=======================
           data.colesterolTotal = res.colesterolAnalisisBioquimico_txtcolesterol ?? "";
           data.LDLColesterol = res.ldlcolesterolAnalisisBioquimico_txtldlcolesterol ?? "";
@@ -1819,6 +1840,18 @@ export const GetInfoServicioEditar = (
           data.pus = res.laboratorioClinicoAdicionales.sedimientoUrinarioPus_txtpussu ?? "";
           data.otrosSedimento = res.laboratorioClinicoAdicionales.sedimientoUrinarioOtros_txtotrossu ?? "";
 
+          if (
+            (data.empresa === "Boroo" || data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
+            parseFloat(data.edad) > 30 &&
+            data.nomExamen === "PRE-OCUPACIONAL"
+          ) {
+            data.observacionesGenerales2 = agregarObservacion(
+              data.observacionesGenerales2,
+              `RIESGO CARDIOVASCULAR SEGUN FRAMINGHAM: ${data.riesgoCoronarioValor}. CONTROL ANUAL\n`
+            );
+          }
+
+
           console.log("DATA EDITAR", data);
 
           data.observacionesGenerales2Cie10 = limpiarObservaciones(data.observacionesGenerales2Cie10);
@@ -1845,3 +1878,8 @@ export const ReadArchivosForm = async (form, setVisualerOpen, token) => {
 export const handleSubirArchivoMasivo = async (form, selectedSede, userlogued, token) => {
   handleSubidaMasiva(form, selectedSede, registrarPDF, userlogued, token)
 }
+
+const agregarObservacion = (base, texto) => {
+  if (!texto) return base;
+  return base ? `${base}\n${texto}` : texto;
+};

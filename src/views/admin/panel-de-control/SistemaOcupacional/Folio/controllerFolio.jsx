@@ -38,6 +38,7 @@ export const nombresExamen = {
     "ANEXO 16A": "ANEXO 16A",
     "PSICOSENSOMETRICO ADMISION": "PSICOSENSOMETRICO",
     "TEST ALTURA ADMISION": "TEST ALTURA",
+    "MANEJO ALIMENTOS GREEN": "MANIPULADOR ALIMENTOS GREEN",
 }
 
 export const GetArchivosFolioStatus = async (nOrden, token) => {

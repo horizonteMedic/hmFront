@@ -987,6 +987,9 @@ export const GetInfoServicio = (
             }
           }
 
+          //Riesgo cardiovascular
+          data.riesgo_coronario_valor = res.riesgo_coronario_valor ?? "";
+
           // Validación grupo sanguíneo
           if (data.grupoSanguineoGrupo !== data.grupoSanguineoPrevio) {
             console.error("Grupo Sanguíneo incongruente por favor revisar");
@@ -1144,14 +1147,23 @@ export const GetInfoServicio = (
             );
           }
           data.notasDoctor = res.notasDoctor ?? "";
-          data.mercurioOrina = res.mercurioOrina ?? "N/A",
-            data.plomoSangre = res.plomoSangre ?? "N/A",
+          data.mercurioOrina = res.mercurioOrina ?? "N/A";
+          data.plomoSangre = res.plomoSangre ?? "N/A";
+
+          if (
+            (data.empresa === "Boroo" || data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
+            parseFloat(data.edad) > 30 &&
+            data.nomExamen === "PRE-OCUPACIONAL"
+          ) {
+            data.observacionesGenerales = agregarObservacion(
+              data.observacionesGenerales,
+              `RIESGO CARDIOVASCULAR SEGUN FRAMINGHAM: ${data.riesgo_coronario_valor}. CONTROL ANUAL\n`
+            );
+          }
 
 
 
-
-
-            data = MapearDatosAdicionales(res, data, data.contador, false);
+          data = MapearDatosAdicionales(res, data, data.contador, false);
           console.log("DATAAA", data);
           set((prev) => ({
             ...prev,
@@ -1669,6 +1681,8 @@ export const MapearDatosAdicionales = (
       }
     }
 
+
+
     // =============================================================================================
     // SECCIÓN ANTECEDENTES PATOLÓGICOS
     // =============================================================================================
@@ -2044,6 +2058,10 @@ export const GetInfoServicioEditar = (
             res.conclusionMedicoAnexo7c_txtconclusionmed ?? "";
           data.estadoMental = res.estadoMentalAnexo7c_txtestadomental ?? "";
           data.anamnesis = res.anamnesisAnexo7c_txtanamnesis ?? "";
+
+          //Riesgo cardiovascular
+          data.riesgo_coronario_valor = res.riesgo_coronario_valor ?? "";
+
 
           // Additional risk factors
           data.alturaEstruct =
@@ -2558,8 +2576,16 @@ export const GetInfoServicioEditar = (
             );
           }
 
-
-
+          if (
+            (data.empresa === "Boroo" || data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
+            parseFloat(data.edad) > 30 &&
+            data.nomExamen === "PRE-OCUPACIONAL"
+          ) {
+            data.observacionesGenerales2 = agregarObservacion(
+              data.observacionesGenerales2,
+              `RIESGO CARDIOVASCULAR SEGUN FRAMINGHAM: ${data.riesgo_coronario_valor}. CONTROL ANUAL`
+            );
+          }
 
           data = MapearDatosAdicionales(res, data, 1, true);
           console.log("DATA EDITAR", data);
