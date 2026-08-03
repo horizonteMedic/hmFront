@@ -45,7 +45,7 @@ const descargarArchivoGenerado = (archivoData, nombreArchivo) => {
 export const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
     LoadingDefault("Validando datos");
     const res = await GetInfoPacDefault(nro, token, sede);
-    if (res) {
+    if (res.norden) {
         set((prev) => ({
             ...prev,
             ...res,
@@ -61,8 +61,10 @@ export const GetInfoPac = async (nro, set, token, sede, ExamenesList) => {
             sexo: res.genero === "M" ? "MASCULINO" : res.genero === "F" ? "FEMENINO" : "",
         }));
         await GetExamenesCheck(nro, set, token, ExamenesList);
-
+    } else {
+        Swal.fire("Error", "Sede Equivocada", "error")
     }
+
 };
 
 const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
@@ -113,7 +115,7 @@ const GetExamenesCheck = async (nro, set, token, ExamenesList) => {
 // Obtiene los datos del paciente sin React state (para uso en carga masiva)
 export const obtenerInfoPacParaMasivo = async (nro, token, sede) => {
     const res = await GetInfoPacDefault(nro, token, sede);
-    if (!res) return null;
+    if (!res.norden) return null;
     return {
         norden: nro,
         nombres: res.nombresApellidos ?? "",
