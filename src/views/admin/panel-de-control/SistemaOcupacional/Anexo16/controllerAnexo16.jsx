@@ -1153,7 +1153,7 @@ export const GetInfoServicio = (
           data.plomoSangre = res.plomoSangre ?? "N/A";
 
           if (
-            (data.empresa === "Boroo" || data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
+            (data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
             parseFloat(data.edad) > 30 &&
             data.nomExamen === "PRE-OCUPACIONAL"
           ) {
@@ -2579,7 +2579,7 @@ export const GetInfoServicioEditar = (
           }
 
           if (
-            (data.empresa === "Boroo" || data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
+            (data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
             parseFloat(data.edad) > 30 &&
             data.nomExamen === "PRE-OCUPACIONAL"
           ) {
