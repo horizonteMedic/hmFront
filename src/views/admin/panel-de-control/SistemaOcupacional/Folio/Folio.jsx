@@ -49,6 +49,7 @@ const ExamenesListMANEJO_ALIMENTOS_GREEN = buildExamenesList([
     "INMUNOLOGIA_BK_KOH",
     "MANIPULADORES_PARASITOLOGIA",
     "INMUNLOGIA_AGLUTINACIONES",
+    "INMUNOLOGIA_HEPATITIS_A",
 ]);
 
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
