@@ -45,6 +45,12 @@ const ExamenesListTEST_ALTURA_ADMISION = buildExamenesList([
     "DECLARACION_USO_FIRMA_ARCHIVO",
 ]);
 
+const ExamenesListMANEJO_ALIMENTOS_GREEN = buildExamenesList([
+    "INMUNOLOGIA_BK_KOH",
+    "MANIPULADORES_PARASITOLOGIA",
+    "INMUNLOGIA_AGLUTINACIONES",
+]);
+
 const ExamenesListCAMPANA = buildExamenesList([ // Campaña
     "CERTIFICADO_APTITUD_ANEXO_16",  // 1
     "ANEXO_16",                      // 2
@@ -310,6 +316,7 @@ export const ListaPorPlantilla = {
     CAMPANA: ExamenesListCAMPANA,
     "COMPLETO": ExamenesListCOMPLETO,
     "COMPLETO MARSA": ExamenesListCOMPLETO_MARSA,
+    "MANEJO ALIMENTOS GREEN": ExamenesListMANEJO_ALIMENTOS_GREEN,
     "PSICOSENSOMETRICO ADMISION": ExamenesListPSICOSENSOMETRICO_ADMISION,
     "TEST ALTURA ADMISION": ExamenesListTEST_ALTURA_ADMISION,
     PSICOLOGIA: ExamenesListPsicologia,
