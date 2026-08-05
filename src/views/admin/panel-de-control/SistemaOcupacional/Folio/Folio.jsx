@@ -530,9 +530,11 @@ const Folio = () => {
         if (e.key === "Enter") {
             handleClearnotO();
             const currentList = ListaPorPlantilla[selectedListType] || ListaPorPlantilla["COMPLETO"];
-            await GetInfoPac(form.norden, setForm, token, selectedSede, currentList);
-            obtenerFirmas(form.norden, token, setForm);
-            await fetchArchivosFolio(form.norden);
+            const info = await GetInfoPac(form.norden, setForm, token, selectedSede, currentList);
+            if (info !== null) {
+                obtenerFirmas(form.norden, token, setForm);
+                await fetchArchivosFolio(form.norden);
+            }
         }
     };
 

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faTentArrowDownToLine, faBuilding, faLock, faCircleCheck, faUserSlash, faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faTentArrowDownToLine, faBuilding, faLink, faLock, faCircleCheck, faUserSlash, faEdit } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import AsignarSedeUser from '../AsignarSedeUser/AsignarSedeUser';
-import AsignarEmpresaContrataModal from '../AsignarEmpresaContrataModal/AsignarEmpresaContrataModal'; 
+import AsignarEmpresaContrataModal from '../AsignarEmpresaContrataModal/AsignarEmpresaContrataModal';
+import AsignarEmpresaContrataVinculado from '../AsignarEmpresaContrataVinculado/AsignarEmpresaContrataVinculado';
 import { ListUser, DeleteUsers, EnabledUsers } from '../model/ListUserID';
 import TableRoles from '../RolesUsuario/TableRoles';
 import EditUserModal from '../ModalEditUser/EditUser';
@@ -12,7 +13,8 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
     const [data, setData] = useState([]);
     const [refresh, setRefresh] = useState(0)
     const [showAsignarSedeUser, setShowAsignarSedeUser] = useState(false);
-    const [showAsignarEmpresaContrataModal, setShowAsignarEmpresaContrataModal] = useState(false); 
+    const [showAsignarEmpresaContrataModal, setShowAsignarEmpresaContrataModal] = useState(false);
+    const [showAsignarEmpresaContrataVinculado, setShowAsignarEmpresaContrataVinculado] = useState(false);
     const [openModalRol, setOpenModalRol] = useState(false)
     const [iduser, setIduser] = useState('')
     const [username, setUsername] = useState('')
@@ -107,7 +109,13 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
     const handleAsignarEmpresaContrataIconClick = (id,username) => {
         setIduser(id)
         setUsername(username)
-        setShowAsignarEmpresaContrataModal(true); 
+        setShowAsignarEmpresaContrataModal(true);
+    };
+
+    const handleAsignarEmpresaContrataVinculadoIconClick = (id,username) => {
+        setIduser(id)
+        setUsername(username)
+        setShowAsignarEmpresaContrataVinculado(true);
     };
 
     const handleAsignarRol = (id,username) => {
@@ -155,6 +163,7 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
                                             }
                                             <FontAwesomeIcon icon={faTentArrowDownToLine} onClick={()=> {handleConfigIconClick(item.idUser,item.username)}} className="text-blue-500 mr-3 cursor-pointer" />
                                             <FontAwesomeIcon icon={faBuilding} onClick={() => {handleAsignarEmpresaContrataIconClick(item.idUser,item.username)}} className="text-green-500 mr-3 cursor-pointer" />
+                                            <FontAwesomeIcon icon={faLink} onClick={() => {handleAsignarEmpresaContrataVinculadoIconClick(item.idUser,item.username)}} className="text-teal-500 mr-3 cursor-pointer" />
                                             <FontAwesomeIcon icon={faLock} onClick={() => {handleAsignarRol(item.idUser,item.username)}} className="text-gray-500  cursor-pointer" />
                                         </td>
                                         <td className="border border-gray-300 px-2 py-1">{item.username}</td>
@@ -190,6 +199,10 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
                                 <p className="text-sm ml-2 md:ml-4">Asignar Empresa/Contrata</p>
                             </div>
                             <div className="flex items-center mb-2 md:mb-0 md:ml-6">
+                                <FontAwesomeIcon icon={faLink} className="text-teal-500" />
+                                <p className="text-sm ml-2 md:ml-4">Asignar Empresa-Contrata Vinculado</p>
+                            </div>
+                            <div className="flex items-center mb-2 md:mb-0 md:ml-6">
                                 <FontAwesomeIcon icon={faLock} className="text-gray-500" />
                                 <p className="text-sm ml-2 md:ml-4">Asignar Roles</p>
                             </div>
@@ -201,6 +214,7 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
             {showAsignarSedeUser && <AsignarSedeUser closeModal={() => setShowAsignarSedeUser(false)} id={iduser} user={username} userlogued={userlogued} token={token}/>}
             {/* Renderizamos el nuevo modal */}
             {showAsignarEmpresaContrataModal && <AsignarEmpresaContrataModal closeModal={() => setShowAsignarEmpresaContrataModal(false)} id={iduser} user={username} userlogued={userlogued} token={token}/>}
+            {showAsignarEmpresaContrataVinculado && <AsignarEmpresaContrataVinculado closeModal={() => setShowAsignarEmpresaContrataVinculado(false)} id={iduser} user={username} userlogued={userlogued} token={token}/>}
             {openModalRol && <TableRoles closeModal={() => setOpenModalRol(false)} id={iduser} user={username} userlogued={userlogued} token={token}/>}
             {openEditUser && <EditUserModal closeModal={() => setOpenEditUser(false)} datos={itemdata} Refresgpag={Refresgpag} token={token} />}
         </>

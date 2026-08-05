@@ -1076,7 +1076,7 @@ export const GetInfoServicio = (
 
           //
           if (
-            (data.empresa === "Boroo" || data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
+            (data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
             parseFloat(data.edad) > 30 &&
             data.nomExamen === "PRE-OCUPACIONAL"
           ) {
@@ -1846,7 +1846,7 @@ export const GetInfoServicioEditar = (
           data.otrosSedimento = res.laboratorioClinicoAdicionales.sedimientoUrinarioOtros_txtotrossu ?? "";
 
           if (
-            (data.empresa === "Boroo" || data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
+            (data.empresa === "MINERA BOROO MISQUICHILCA S.A.") &&
             parseFloat(data.edad) > 30 &&
             data.nomExamen === "PRE-OCUPACIONAL"
           ) {
