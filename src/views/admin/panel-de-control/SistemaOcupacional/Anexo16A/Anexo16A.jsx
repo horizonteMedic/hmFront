@@ -12,6 +12,7 @@ import {
   InputTextOneLine,
   InputTextArea,
   CIE10List,
+  InputTextAreaUpper,
 } from "../../../../components/reusableComponents/ResusableComponents";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
@@ -422,7 +423,22 @@ export default function Anexo16A() {
             {/* Columna 2: Observaciones */}
             <div className="bg-white border border-gray-200 rounded-lg p-3">
               <h4 className="font-semibold text-gray-800 mb-3">Observaciones</h4>
-              <InputTextArea rows={7} name="observaciones" value={form?.observaciones} onChange={handleChange} />
+              <InputTextAreaUpper
+                name="observaciones"
+                value={form.observaciones}
+                rows={7}
+                onChange={(upper) => {
+                  const cie10Lines = upper
+                    .split("\n")
+                    .filter(l => /^CIE 10:/i.test(l.trim()));
+                  const nuevoCie10 = cie10Lines.join("\n");
+                  setForm((d) => ({
+                    ...d,
+                    observaciones: upper,
+                    ...(nuevoCie10 !== d.conclusionesCie10 && { conclusionesCie10: nuevoCie10 }),
+                  }));
+                }}
+              />
               <div className="bg-green-200 p-3 rounded-xl col-span-3">
                 <CIE10List
                   value={form.conclusionesCie10}
@@ -430,6 +446,9 @@ export default function Anexo16A() {
                   label="Conclusiones CIE10"
                   token={token}
                   setForm={setForm}
+                  setAdditionalForm={setForm}
+                  additionalFieldName="observaciones"
+                  additionalDelimiter={"\n"}
                 />
               </div>
             </div>

@@ -1737,7 +1737,7 @@ export const GetInfoServicioEditar = (
             colesterolAnalisisBioquimico_txtcolesterol: res.colesterolAnalisisBioquimico_txtcolesterol,
             SubirDoc: true,
             otrosExamenes: "",
-            conclusionesCie10: res.conclusionesCie10
+            conclusionesCie10: res.conclusiones_cie_10
           };
           data.dentaduraObservaciones =
             res.observacionesOdontograma_txtobservaciones ?? "";
