@@ -183,6 +183,7 @@ export const GetInfoServicio = async (
       oi_o_4000: res.oi14000,
       oi_o_6000: res.oi16000,
       oi_o_8000: res.oi18000,
+      conclusionesCie10: res.conclusionesCie10,
 
       user_medicoFirma: res.usuarioFirma ? res.usuarioFirma : prev.user_medicoFirma,
       user_doctorAsignado: res.doctorAsignado,
@@ -338,6 +339,7 @@ export const SubmitDataService = async (
     userRegistro: user,
     userMedicoOcup: "",
     formato: "",
+    conclusionesCie10: form.conclusionesCie10,
     usuarioFirma: form.user_medicoFirma,
     doctorAsignado: form.user_doctorAsignado,
   };

@@ -19,6 +19,7 @@ import InputsRadioGroup from "../../../../../components/reusableComponents/Input
 import InputCheckbox from "../../../../../components/reusableComponents/InputCheckbox";
 import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
 import EmpleadoComboBox from "../../../../../components/reusableComponents/EmpleadoComboBox";
+import CIE10List from "../../../../../components/reusableComponents/CIE10List";
 
 const tabla = "audiometria_2023";
 
@@ -40,6 +41,7 @@ export default function Audiometria() {
     norden: "",
     fecha: today,
     nomExam: "",
+    conclusionesCie10: "",
 
     dni: "",
     nombres: "",
@@ -669,6 +671,15 @@ export default function Audiometria() {
                 labelOnTop
                 onChange={handleChange}
               />
+              <div className="bg-green-200 p-3 rounded-xl col-span-3">
+                <CIE10List
+                  value={form.conclusionesCie10}
+                  fieldName="conclusionesCie10"
+                  label="Conclusiones CIE10"
+                  token={token}
+                  setForm={setForm}
+                />
+              </div>
               <InputTextArea
                 label="Comentarios"
                 name="comentarios_audiometria"

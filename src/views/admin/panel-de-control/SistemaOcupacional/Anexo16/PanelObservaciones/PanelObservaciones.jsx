@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload } from "@fortawesome/free-solid-svg-icons";
 import {
+  CIE10List,
   InputsRadioGroup,
   InputTextArea,
   InputTextOneLine,
@@ -13,7 +14,9 @@ export default function PanelObservaciones({
   handleChange,
   handleBlur,
   setmodalCIE10,
-  abrirCargaMasiva
+  abrirCargaMasiva,
+  setForm,
+  token
 }) {
   return (
     <div className="p-4 h-full mt-16">
@@ -46,6 +49,15 @@ export default function PanelObservaciones({
             onChange={handleChange}
           />
         </div>
+        <div className="bg-green-200 p-3 rounded-xl col-span-3">
+          <CIE10List
+            value={form.conclusionesCie10}
+            fieldName="conclusionesCie10"
+            label="Observaciones Generales CIE10"
+            token={token}
+            setForm={setForm}
+          />
+        </div>
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <InputTextArea
             rows={18}
@@ -53,6 +65,15 @@ export default function PanelObservaciones({
             name="observacionesGenerales2"
             value={form.observacionesGenerales2}
             disabled
+          />
+        </div>
+        <div className="bg-green-200 p-3 rounded-xl col-span-3">
+          <CIE10List
+            value={form.conclusionesCie10}
+            fieldName="conclusionesCie10"
+            label="Observaciones Generales AUTO CIE10"
+            token={token}
+            setForm={setForm}
           />
         </div>
         {/* Observaciones */}

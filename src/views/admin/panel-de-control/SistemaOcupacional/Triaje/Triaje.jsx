@@ -536,9 +536,15 @@ export default function Triaje() {
                             value={form.diagnostico}
                             rows={7}
                             onChange={(e) => {
+                                const nuevoDiag = e.target.value.toUpperCase();
+                                // Sincronizar CIE10 eliminados manualmente del textarea
+                                const cie10Lines = nuevoDiag
+                                    .split("\n")
+                                    .filter(l => /^CIE 10:/i.test(l.trim()));
                                 setForm((d) => ({
                                     ...d,
-                                    diagnostico: e.target.value.toUpperCase(),
+                                    diagnostico: nuevoDiag,
+                                    conclusionesCie10: cie10Lines.join("\n"),
                                 }));
                             }}
                         />
@@ -549,6 +555,9 @@ export default function Triaje() {
                                 label="Conclusiones CIE10"
                                 token={token}
                                 setForm={setForm}
+                                setAdditionalForm={setForm}
+                                additionalFieldName="diagnostico"
+                                additionalDelimiter={"\n"}
                             />
                         </div>
                         <section className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4">

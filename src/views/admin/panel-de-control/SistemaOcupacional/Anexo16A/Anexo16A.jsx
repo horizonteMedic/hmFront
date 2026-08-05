@@ -11,6 +11,7 @@ import {
   InputsBooleanRadioGroup,
   InputTextOneLine,
   InputTextArea,
+  CIE10List,
 } from "../../../../components/reusableComponents/ResusableComponents";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
@@ -422,6 +423,15 @@ export default function Anexo16A() {
             <div className="bg-white border border-gray-200 rounded-lg p-3">
               <h4 className="font-semibold text-gray-800 mb-3">Observaciones</h4>
               <InputTextArea rows={7} name="observaciones" value={form?.observaciones} onChange={handleChange} />
+              <div className="bg-green-200 p-3 rounded-xl col-span-3">
+                <CIE10List
+                  value={form.conclusionesCie10}
+                  fieldName="conclusionesCie10"
+                  label="Conclusiones CIE10"
+                  token={token}
+                  setForm={setForm}
+                />
+              </div>
             </div>
           </div>
         </div>
